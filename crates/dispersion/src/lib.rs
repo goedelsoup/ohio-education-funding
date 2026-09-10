@@ -38,6 +38,7 @@ pub mod composition;
 pub mod equity_factor;
 pub mod exemplars;
 pub mod functions;
+pub mod fy2016;
 pub mod identified;
 pub mod lea_directory;
 pub mod mr81;

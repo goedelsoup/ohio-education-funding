@@ -253,6 +253,8 @@ pub struct Inputs {
     /// ECOT's eight years in the survey, and Cleveland's fifteen — the other two agencies whose
     /// nodes recorded a series as unpopulated that the panel already held.
     pub closed: Closed,
+    /// What moved in the panel's state column at FY2016, and what it tracks.
+    pub fy2016: Fy2016,
     /// Every state's Education Finance Incentive Grant equity factor, widest spread first.
     ///
     /// Computed once because each call walks all 10,739 rows of the national district panel, and
@@ -270,6 +272,16 @@ pub struct Inputs {
     /// decided on. Binding them is what makes the next change to a projection constant redden the
     /// corpus rather than silently restate it.
     pub forecasts: Forecasts,
+}
+
+/// The FY2016 move, measured against the tax base and the formula that arrived that year.
+pub struct Fy2016 {
+    /// Every district the step and Table SD-1 can both be computed for.
+    pub districts: Vec<dispersion::fy2016::District>,
+    /// Mean step by fifth of total assessed value, smallest first.
+    pub by_valuation: [f64; 5],
+    /// The step on log total valuation, wealth per pupil and disadvantage together.
+    pub model: dispersion::Regression,
 }
 
 /// ECOT and Cleveland, on the series their nodes recorded as unpopulated.
@@ -445,6 +457,11 @@ impl Inputs {
                     .collect();
                 column.sort_by(|a, b| a.partial_cmp(b).expect("no NaN in a published dollar"));
                 dispersion::median(&column).expect("the function file is not empty")
+            },
+            fy2016: Fy2016 {
+                districts: dispersion::fy2016::frame(),
+                by_valuation: dispersion::fy2016::quintiles_by(|d| d.total_valuation),
+                model: dispersion::fy2016::model(),
             },
             closed: {
                 use dispersion::exemplars::{self, CLEVELAND, ECOT};
@@ -2491,6 +2508,88 @@ pub static FIGURES: &[Figure] = &[
         pinned: 0.2016,
         tolerance: 0.0005,
         compute: |i| operating_dispersion(i).coefficient_of_variation,
+    },
+    // What moved at FY2016. The correlations are exported as magnitudes with the direction in the
+    // key, per this manifest's convention.
+    Figure {
+        key: "dispersion/fy2016-step-against-total-valuation-negative",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The FY2016 move in state revenue per pupil against log total assessed value \
+                \u{2014} negative, and the strongest correlate of it",
+        pinned: 0.3419,
+        tolerance: 0.0005,
+        compute: |i| {
+            let steps: Vec<f64> = i.fy2016.districts.iter().map(|d| d.step).collect();
+            let value: Vec<f64> = i
+                .fy2016
+                .districts
+                .iter()
+                .map(|d| d.total_valuation.ln())
+                .collect();
+            dispersion::wealth_neutrality(&value, &steps)
+                .expect("paired")
+                .correlation
+                .abs()
+        },
+    },
+    Figure {
+        key: "dispersion/fy2016-step-against-industrial-share",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "And against industrial property share \u{2014} positive, which is the wrong sign \
+                for a tangible personal property reading",
+        pinned: 0.0904,
+        tolerance: 0.0005,
+        compute: |i| {
+            let steps: Vec<f64> = i.fy2016.districts.iter().map(|d| d.step).collect();
+            let industrial: Vec<f64> = i
+                .fy2016
+                .districts
+                .iter()
+                .map(|d| d.industrial_share)
+                .collect();
+            dispersion::wealth_neutrality(&industrial, &steps)
+                .expect("paired")
+                .correlation
+        },
+    },
+    Figure {
+        key: "dispersion/fy2016-step-lowest-valuation-quintile",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Mean FY2016 move for the fifth of districts with the smallest total assessed value",
+        pinned: 0.2412,
+        tolerance: 0.0005,
+        compute: |i| i.fy2016.by_valuation[0],
+    },
+    Figure {
+        key: "dispersion/fy2016-step-highest-valuation-quintile",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "And for the fifth with the largest",
+        pinned: 0.0416,
+        tolerance: 0.0005,
+        compute: |i| i.fy2016.by_valuation[4],
+    },
+    Figure {
+        key: "dispersion/fy2016-step-total-valuation-coefficient-negative",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Log total assessed value against the FY2016 move, standardised, holding wealth \
+                per pupil and disadvantage \u{2014} negative",
+        pinned: 0.2910,
+        tolerance: 0.0005,
+        compute: |i| i.fy2016.model.standardized[0].abs(),
+    },
+    Figure {
+        key: "dispersion/fy2016-step-wealth-per-pupil-coefficient-negative",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Wealth per pupil in the same model \u{2014} negative, and a third the size",
+        pinned: 0.1122,
+        tolerance: 0.0005,
+        compute: |i| i.fy2016.model.standardized[1].abs(),
     },
     // ECOT and Cleveland, on the series their nodes said were unpopulated.
     Figure {
