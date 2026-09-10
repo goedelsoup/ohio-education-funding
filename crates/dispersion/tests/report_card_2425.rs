@@ -899,6 +899,11 @@ fn model_frame(impute_english_learner: bool) -> (Vec<Vec<f64>>, Vec<f64>, Vec<f6
 /// next step. It does not identify an effect and this file claims none. It does establish that
 /// the sign difference between the two outcome measures is not an artifact of controlling for
 /// poverty alone.
+///
+/// The +0.209 is a constrained average and comes apart: `dispersion::composition` splits the
+/// spending variable into the functions the department publishes it under, and the growth
+/// relationship is entirely the classroom half — +0.243 against −0.032. See
+/// `tests/what_the_money_was_spent_on.rs`.
 #[test]
 fn the_need_adjusted_model_keeps_the_sign_difference() {
     let (predictors, level, growth, _) = model_frame(true);

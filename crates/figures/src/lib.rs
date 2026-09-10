@@ -245,6 +245,9 @@ pub struct Inputs {
     /// The median district's operating spending per headcount pupil, over the 607 the department
     /// rates. The line `perrysburg-exempted-village` places itself below.
     pub median_operating_per_pupil: f64,
+    /// FY2025 spending by function joined to the report card, and the models that take the
+    /// corpus's published spending coefficient apart.
+    pub composition: Composition,
     /// Every state's Education Finance Incentive Grant equity factor, widest spread first.
     ///
     /// Computed once because each call walks all 10,739 rows of the national district panel, and
@@ -262,6 +265,24 @@ pub struct Inputs {
     /// decided on. Binding them is what makes the next change to a projection constant redden the
     /// corpus rather than silently restate it.
     pub forecasts: Forecasts,
+}
+
+/// The four models that answer `metric/progress-value-added`'s largest recorded omission.
+///
+/// Held together because they share one join — the report card, the function file and the profile
+/// report, over the 606 districts on all three — and because a figure quoting one of them beside
+/// another has to be sure they were fitted on the same rows.
+pub struct Composition {
+    /// The frame itself, for the descriptive figures.
+    pub districts: Vec<dispersion::composition::District>,
+    /// The department's classroom / non-classroom split against growth.
+    pub split: dispersion::Regression,
+    /// Total spending and the classroom share together, against growth.
+    pub on_growth: dispersion::Regression,
+    /// The same pair against attainment level, where the two signs differ.
+    pub on_level: dispersion::Regression,
+    /// All nine published functions at once, against growth.
+    pub functions: dispersion::Regression,
 }
 
 /// The projected runs the manifest quotes, computed once because each walks all 609 districts.
@@ -385,6 +406,16 @@ impl Inputs {
                     .collect();
                 column.sort_by(|a, b| a.partial_cmp(b).expect("no NaN in a published dollar"));
                 dispersion::median(&column).expect("the function file is not empty")
+            },
+            composition: {
+                let districts = dispersion::composition::frame();
+                Composition {
+                    split: dispersion::composition::split_on_growth(&districts),
+                    on_growth: dispersion::composition::composition_on(&districts, |d| d.growth),
+                    on_level: dispersion::composition::composition_on(&districts, |d| d.level),
+                    functions: dispersion::composition::every_function_on_growth(&districts),
+                    districts,
+                }
             },
             equity: dispersion::equity_factor::by_state(),
             equity_bracket: dispersion::equity_factor::ohio_bracket(),
@@ -2399,6 +2430,135 @@ pub static FIGURES: &[Figure] = &[
         pinned: 0.2016,
         tolerance: 0.0005,
         compute: |i| operating_dispersion(i).coefficient_of_variation,
+    },
+    // What the money was spent on, entered into the model that only knew how much. The coefficients
+    // are standardised — standard deviations of outcome per standard deviation of predictor — so
+    // that a dollar figure and a percentage-point share can be read against each other at all. The
+    // negative ones follow this manifest's convention: exported as magnitudes with the direction in
+    // the key, because `numerals()` does not read a sign.
+    Figure {
+        key: "dispersion/classroom-spending-on-growth",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Classroom instruction per pupil against the Progress effect size, standardised, \
+                with non-classroom spending and five controls",
+        pinned: 0.2432,
+        tolerance: 0.0005,
+        compute: |i| i.composition.split.standardized[0],
+    },
+    Figure {
+        key: "dispersion/nonclassroom-spending-on-growth-negative",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Non-classroom spending per pupil against the Progress effect size in the same \
+                model \u{2014} negative, and not distinguishable from zero",
+        pinned: 0.0320,
+        tolerance: 0.0005,
+        compute: |i| i.composition.split.standardized[1].abs(),
+    },
+    Figure {
+        key: "dispersion/classroom-share-on-growth",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Classroom share of operating spending against the Progress effect size, holding \
+                total spending and five controls fixed",
+        pinned: 0.1215,
+        tolerance: 0.0005,
+        compute: |i| i.composition.on_growth.standardized[1],
+    },
+    Figure {
+        key: "dispersion/classroom-share-on-level",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The same share against the Performance Index, where the level of spending runs \
+                the other way",
+        pinned: 0.0948,
+        tolerance: 0.0005,
+        compute: |i| i.composition.on_level.standardized[1],
+    },
+    Figure {
+        key: "dispersion/spending-level-on-level-negative",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Operating spending per pupil against the Performance Index in the model that also \
+                carries the classroom share \u{2014} negative",
+        pinned: 0.0562,
+        tolerance: 0.0005,
+        compute: |i| i.composition.on_level.standardized[0].abs(),
+    },
+    Figure {
+        key: "dispersion/instruction-on-growth",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Instruction per pupil against the Progress effect size, all nine published \
+                functions entered at once",
+        pinned: 0.1944,
+        tolerance: 0.0005,
+        compute: |i| i.composition.functions.standardized[0],
+    },
+    Figure {
+        key: "dispersion/plant-maintenance-on-growth-negative",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Operations and maintenance of plant in the same model \u{2014} negative, and the \
+                only function that is reliably so",
+        pinned: 0.1259,
+        tolerance: 0.0005,
+        compute: |i| i.composition.functions.standardized[5].abs(),
+    },
+    Figure {
+        key: "dispersion/pupil-transportation-on-growth-negative",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Pupil transportation in the same model \u{2014} the corpus's own example, and not \
+                distinguishable from zero",
+        pinned: 0.0346,
+        tolerance: 0.0005,
+        compute: |i| i.composition.functions.standardized[6].abs(),
+    },
+    Figure {
+        key: "dispersion/median-classroom-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Median district's classroom share of operating spending, FY2025",
+        pinned: 0.6700,
+        tolerance: 0.0005,
+        compute: |i| {
+            let shares: Vec<f64> = i
+                .composition
+                .districts
+                .iter()
+                .map(|d| d.classroom_share() / 100.0)
+                .collect();
+            dispersion::median(&{
+                let mut sorted = shares;
+                sorted.sort_by(f64::total_cmp);
+                sorted
+            })
+            .expect("districts report a classroom share")
+        },
+    },
+    Figure {
+        key: "dispersion/classroom-share-against-spending-negative",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Correlation between the classroom share and operating spending per pupil \
+                \u{2014} negative: spending more buys a smaller classroom fraction",
+        pinned: 0.3371,
+        tolerance: 0.0005,
+        compute: |i| {
+            let shares: Vec<f64> = i
+                .composition
+                .districts
+                .iter()
+                .map(dispersion::composition::District::classroom_share)
+                .collect();
+            let totals: Vec<f64> = i.composition.districts.iter().map(|d| d.operating).collect();
+            dispersion::wealth_neutrality(&shares, &totals)
+                .expect("paired series")
+                .correlation
+                .abs()
+        },
     },
     // The same statistic as the line above, computed the way 20 U.S.C. 6337 computes it, so that
     // 0.2016 finally has something to be read against. Enrolment-weighted, on the Census Bureau's
