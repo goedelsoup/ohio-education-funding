@@ -397,20 +397,46 @@ test.describe("the chrome above the fold", () => {
      * layout actually changed. 520px was 43px out and nothing looked at 520px.
      */
     const heights: string[] = [];
+    /*
+     * What the row was asked to hold, at each width, so a wrap says by how much.
+     *
+     * This is not asserted and cannot be: the brand is set in `system-ui`, which is a different
+     * typeface on the machine running this than on the machine reading it, and the runner's is
+     * wider than a Mac's. A header that wrapped used to report only that it was 92px instead of
+     * 52 — true, and no help at all in deciding how much room to find. These are the numbers that
+     * decide it, so they travel with the failure.
+     */
+    const room: string[] = [];
     for (const width of [360, 390, 480, 520, 700, 900, 1000, 1280]) {
       await page.setViewportSize({ width, height: 800 });
       await page.goto("/district/043786");
-      const state = await page.evaluate(() => ({
-        header: Math.round(document.querySelector("header.site")!.getBoundingClientRect().height),
-        h1: Math.round(document.querySelector("h1")!.getBoundingClientRect().top + window.scrollY),
-        sideways:
-          document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
-      }));
+      const state = await page.evaluate(() => {
+        const row = document.querySelector(".site-inner")!;
+        const style = getComputedStyle(row);
+        const inner =
+          row.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+        const children = [...row.children].map((child) => ({
+          what: child.className.split(" ")[0] || child.tagName.toLowerCase(),
+          w: child.getBoundingClientRect().width,
+        }));
+        const gaps = (children.length - 1) * parseFloat(style.columnGap);
+        const wants = children.reduce((total, child) => total + child.w, 0) + gaps;
+        return {
+          header: Math.round(document.querySelector("header.site")!.getBoundingClientRect().height),
+          h1: Math.round(document.querySelector("h1")!.getBoundingClientRect().top + window.scrollY),
+          sideways:
+            document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
+          room: `${Math.round(inner - wants)} spare (${Math.round(inner)} for ${children
+            .map((child) => `${child.what} ${Math.round(child.w)}`)
+            .join(" + ")} + ${Math.round(gaps)} gap)`,
+        };
+      });
       expect(state.sideways, `the document scrolls sideways at ${width}px`).toBe(false);
       heights.push(`${width}: header ${state.header}, h1 at ${state.h1}`);
+      room.push(`${width}: ${state.room}`);
     }
     // One row is 52px. Asserted as a set so a regression names the width it happened at.
-    expect(heights).toEqual([
+    expect(heights, `what the row was holding —\n${room.join("\n")}\n`).toEqual([
       "360: header 52, h1 at 80",
       "390: header 52, h1 at 80",
       "480: header 52, h1 at 80",
