@@ -58,6 +58,7 @@
 #![forbid(unsafe_code)]
 
 pub mod charge_off;
+pub mod reappraisal_incidence;
 pub mod recognized_valuation;
 
 use std::collections::HashMap;

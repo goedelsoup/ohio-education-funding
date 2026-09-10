@@ -221,6 +221,37 @@ findings: |
   next year. [verified] The regime switch is real and the boundary is sharp in the statute; the
   *assignment* of districts to sides is not stable, and a simulation that treats floor status
   as a fixed district attribute will be wrong about that eighth. [inference]
+
+  ### Which districts are on the far side of the boundary, measured rather than supposed
+
+  The passage above calls the floor "the single most important fact about Ohio local school
+  revenue" and says a quarter of districts are on a trajectory where reappraisal raises income
+  directly. It never said *which* quarter. Asked of the wealth distribution the equalization
+  measure uses — Ohio's comparable districts cut into quartiles on local revenue per pupil — the
+  answer is monotone and steep: **46.1% of the poorest quartile sits at the floor against 12.5% of
+  the richest**, with 39.5% and 28.3% in between.
+  [verified — crates/regime-diff, `reappraisal_incidence::by_wealth`, pinned by test]
+
+  This is the general form of the observation already recorded above about the six districts that
+  never voted twenty mills, all of them in Appalachian and southern counties. It is not six
+  districts; it is the shape of the whole distribution.
+
+  **What it does to a reappraisal.** H.B. 920 holds a district's yield flat as values rise, so a
+  revaluation is a revenue event only on the far side of this boundary — which is to say, mostly
+  for poor districts. Across FY2022 to FY2024 local revenue per pupil grew **22.5% in the poorest
+  quartile and 11.3% in the richest**, and removing the reappraisals from the data — putting every
+  district on its own quiet-year rate — makes the FY2024 gap between the two **$212 wider**, not
+  narrower. [verified — crates/regime-diff, `reappraisal_incidence::gap`, pinned by test]
+
+  The identification is Ohio's own staggered cycle rather than an assumption: the 88 counties
+  revalue in different years, Table SD-1 carries four of them, and a cohort's event year moves its
+  class-I value 24 to 55 times as much as its quiet years. [verified]
+
+  **This was recorded backwards elsewhere in the corpus.** `doctrine/equity` held that Ohio's
+  FY2023 reappraisals "would raise local revenue in the richest quartile mechanically", and
+  offered that as one of two candidate causes for a break in the equalization series. The
+  mechanism runs the other way, and the break was an artefact of a five-pupil district entering
+  the survey population. See that node's revisions.
 revisions:
   - was: |
       Of the 193 districts that began TY2023 at the floor, **7** saw their effective Class 1 rate
@@ -279,6 +310,26 @@ revisions:
       joint vocational district. The bound is untouched, and so is every distributional finding
       above — none of them turned on the cause.
 figures:
+  - key: regime-diff/poorest-quartile-at-the-millage-floor
+    value: 0.46053
+    field: findings
+    as_written: "**46.1% of the poorest quartile sits at the floor against 12.5% of\n  the richest**"
+  - key: regime-diff/richest-quartile-at-the-millage-floor
+    value: 0.125
+    field: findings
+    as_written: "**46.1% of the poorest quartile sits at the floor against 12.5% of\n  the richest**"
+  - key: regime-diff/poorest-quartile-local-revenue-growth
+    value: 0.2251
+    field: findings
+    as_written: "**22.5% in the poorest\n  quartile and 11.3% in the richest**"
+  - key: regime-diff/richest-quartile-local-revenue-growth
+    value: 0.1129
+    field: findings
+    as_written: "**22.5% in the poorest\n  quartile and 11.3% in the richest**"
+  - key: regime-diff/reappraisal-held-the-gap-down-by
+    value: 212.0
+    field: findings
+    as_written: "makes the FY2024 gap between the two **$212 wider**"
   - key: dispersion/median-millage-reduction
     value: 0.42446
     field: findings
