@@ -61,8 +61,44 @@ findings: |
   dividing special-education spending by a population that is mostly not receiving it.
   [inference]
 
-  Not yet held: audited-statement figures, the scholarship and community-school deduction that
-  a district of this size and poverty carries, and any year before FY2024. [open]
+  ### The years before FY2024, which the survey holds and this node did not read
+
+  The Census F-33 Ohio panel runs from FY2009 and carries Toledo in every year it holds.
+  [verified — [`crates/dispersion`](../../../crates/dispersion/tests/the_pair_and_its_fifteen_years.rs)]
+
+  **Toledo's state revenue per pupil in FY2024 is below its FY2009 level in nominal dollars** —
+  $10,662 against $11,146 — and prices rose 45.7% in between, so in constant dollars it fell
+  34.3%. Its local revenue per pupil fell 8.14% in real terms over the same span, while its
+  enrolment fell 21%. Both of Toledo's revenue sources lost ground against prices for fifteen
+  years. Beside it, [Perrysburg](perrysburg-exempted-village.yml) lost 22.75% of its state
+  revenue in real terms and gained 22.3% of its local. [verified]
+
+  ### A step at FY2016, which is not a policy fact and is not this district's alone
+
+  The real series does not decline smoothly. It runs near $15,000 per pupil in FY2024 dollars
+  through FY2015 and near $10,500 from FY2016 on, a one-year fall of roughly 30% that never
+  reverses. Toledo is not alone in it and it is not general: measured as the mean of FY2016-FY2019
+  against the mean of FY2012, FY2013 and FY2015, **27 districts fall more than a fifth and they
+  hold 6.7% of the panel's pupils**, while the median district *rises* 9.6%. The tail is mostly
+  small districts with large industrial tax bases — Green Local, Botkins, Ridgemont, Otsego,
+  Carey — which is the profile of a district losing tangible personal property revenue. Whether
+  that is the cause is not established here, and
+  [`tpp-replacement-payments`](../revenue-stream/tpp-replacement-payments.yml) is where it would
+  be settled. [open]
+
+  What is established is that the step reaches nothing the corpus publishes off this panel. The
+  equalization series cuts by quartile and takes an unweighted mean over about 152 districts, so
+  the poorest quartile's state revenue per pupil *rises* across FY2016 and the band
+  [`equity`](../doctrine/equity.yml) states holds either side of it. A quartile mean is one tiny
+  district wide, and by the same arithmetic it is six enormous districts deep. [verified]
+
+  Two cautions on the series. The survey's state revenue column is every dollar the state sent,
+  capital included, so one district-year of it is not that district's foundation aid — a district
+  in a build year reports state revenue above its whole current spending. And FY2014 is absent
+  from the archive. [verified]
+
+  Not yet held: audited-statement figures, and the scholarship and community-school deduction
+  that a district of this size and poverty carries. [open]
 revisions:
   - was: |
       A published fact-check read Toledo's $2,766 per pupil of special-education instruction
@@ -93,6 +129,30 @@ revisions:
       [Perrysburg](perrysburg-exempted-village.yml). Nothing reads the gap to the dollar, and the
       function shares beside it are untouched. [verified]
 figures:
+  - key: dispersion/toledo-state-revenue-real-change-negative
+    value: 0.34329
+    field: findings
+    as_written: "in constant dollars it fell\n  34.3%"
+  - key: dispersion/toledo-local-revenue-real-change-negative
+    value: 0.08141
+    field: findings
+    as_written: "local revenue per pupil fell 8.14% in real terms"
+  - key: dispersion/perrysburg-state-revenue-real-change-negative
+    value: 0.22751
+    field: findings
+    as_written: "lost 22.75% of its state\n  revenue in real terms"
+  - key: dispersion/perrysburg-local-revenue-real-change
+    value: 0.22336
+    field: findings
+    as_written: "gained 22.3% of its local"
+  - key: dispersion/fy2016-step-districts
+    value: 27
+    field: findings
+    as_written: "**27 districts fall more than a fifth and they"
+  - key: dispersion/fy2016-step-pupil-share
+    value: 0.067
+    field: findings
+    as_written: "hold 6.7% of the panel's pupils**"
   - key: dispersion/toledo-enrolled-adm
     value: 21159.7532
     field: description

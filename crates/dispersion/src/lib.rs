@@ -36,6 +36,7 @@ pub mod casino;
 pub mod census_states;
 pub mod composition;
 pub mod equity_factor;
+pub mod exemplars;
 pub mod functions;
 pub mod identified;
 pub mod lea_directory;
