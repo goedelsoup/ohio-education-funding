@@ -170,6 +170,13 @@ pub struct Inputs {
     pub profile: Vec<dispersion::profile::ProfileDistrict>,
     /// Table SD-1, every district and every tax year the abstract carries.
     pub sd1: Vec<dispersion::sd1::TaxRow>,
+    /// The general fund's transfers line by year, and the two attributions of the FY2021-FY2024
+    /// cash build-up to the federal relief — one levelled on FY2020, one on both baseline years.
+    pub transfers: BTreeMap<u16, project::transfers::Year>,
+    /// Levelled on FY2020 alone.
+    pub attribution_before: project::transfers::Attribution,
+    /// Levelled on the mean of FY2020 and FY2025.
+    pub attribution_both: project::transfers::Attribution,
     /// The quartile equalization measure for every year of the survey panel.
     ///
     /// Read for the band's two ends and for FY2024. Held here rather than recomputed per figure
@@ -336,6 +343,9 @@ impl Inputs {
             recognized_total,
             // Computed once here rather than per figure: each of the three walks the whole
             // ten-year panel and deflates it, and fourteen figures below read them.
+            transfers: project::transfers::by_year(),
+            attribution_before: project::transfers::attribution(false),
+            attribution_both: project::transfers::attribution(true),
             equalization: dispersion::ohio_panel::equalization_by_year(),
             incidence: regime_diff::reappraisal_incidence::by_wealth(),
             reappraisal: regime_diff::reappraisal_incidence::gap(2024),
@@ -1610,6 +1620,74 @@ pub static FIGURES: &[Figure] = &[
         pinned: 13_932.0,
         tolerance: 1.0,
         compute: |i| i.quartiles[3].local_per_pupil,
+    },
+    Figure {
+        key: "project/general-fund-transfers-fy2020",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Transfers, advances and note proceeds into Ohio districts' general funds, FY2020 \
+                — the year before the relief window",
+        pinned: 281_900_000.0,
+        tolerance: 500_000.0,
+        compute: |i| i.transfers[&2020].transfers(),
+    },
+    Figure {
+        key: "project/general-fund-transfers-fy2024",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same line at its peak, FY2024",
+        pinned: 720_500_000.0,
+        tolerance: 500_000.0,
+        compute: |i| i.transfers[&2024].transfers(),
+    },
+    Figure {
+        key: "project/general-fund-transfers-fy2025",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And in FY2025, the first year after the grants ended",
+        pinned: 433_500_000.0,
+        tolerance: 500_000.0,
+        compute: |i| i.transfers[&2025].transfers(),
+    },
+    Figure {
+        key: "project/cash-build-up-against-relief",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "How closely a district's FY2021-FY2024 cash build-up tracks the federal relief it \
+                received — the correlation, across 606 districts",
+        pinned: 0.0751,
+        tolerance: 0.0005,
+        compute: |_| project::transfers::build_up_against_relief(),
+    },
+    Figure {
+        key: "project/excess-transfers-share-of-the-build-up",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "Transfers into the general fund across FY2021-FY2024 above both baseline years' \
+                level, as a share of the cash build-up — the ceiling on what relief can explain",
+        pinned: 0.3131,
+        tolerance: 0.0005,
+        compute: |i| i.attribution_both.excess_share(),
+    },
+    Figure {
+        key: "project/relief-attributable-share-of-the-build-up",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "And the share the relief itself explains on that baseline, by the slope a few \
+                large districts cannot pull",
+        pinned: 0.0638,
+        tolerance: 0.0005,
+        compute: |i| i.attribution_both.attributable().0,
+    },
+    Figure {
+        key: "project/relief-attributable-share-at-its-widest",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The largest share any baseline and slope the corpus can defend attributes to the \
+                relief — the FY2020 baseline read by least squares",
+        pinned: 0.3938,
+        tolerance: 0.0005,
+        compute: |i| i.attribution_before.attributable().1,
     },
     Figure {
         key: "dispersion/island-local-revenue-per-pupil",

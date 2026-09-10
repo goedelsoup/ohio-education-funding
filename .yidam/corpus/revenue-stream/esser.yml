@@ -100,6 +100,15 @@ findings: |
   spread across all four exposure quartiles rather than concentrated in the exposed one. A
   district-by-district answer needs the special revenue funds, which the five-year forecast does
   not report and no source here carries. [open]
+
+  One partial instrument has since been built and it does not close that. The filings' transfers
+  line — `total_revenue_and_sources` less `total_revenue` — is the route relief money took into the
+  general fund where it took one, and it is per district and per year. It doubles across the relief
+  years and falls back when the grants end, and what a district moved through it bears only weakly
+  on what that district received: see
+  [general fund cash balance](../metric/general-fund-cash-balance.yml). It says how much reached
+  the general fund and still says nothing about what was bought with the rest.
+  [verified — crates/project]
 properties:
   name: Elementary and Secondary School Emergency Relief Fund
   level: federal
