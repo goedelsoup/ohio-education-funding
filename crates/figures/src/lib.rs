@@ -1622,6 +1622,56 @@ pub static FIGURES: &[Figure] = &[
         compute: |i| i.quartiles[3].local_per_pupil,
     },
     Figure {
+        key: "project/bienniums-coupling-no-dollar-to-a-rating",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "LSC greenbooks from FY2002 to FY2024 carrying no rating-driven formula payment \
+                at all, of twelve",
+        pinned: 8.0,
+        tolerance: 0.0,
+        compute: |_| project::rating_payments::quiet().len() as f64,
+    },
+    Figure {
+        key: "project/rating-driven-formula-couplings",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Points at which an Ohio accountability rating has determined a formula payment, \
+                FY2002 to FY2027",
+        pinned: 5.0,
+        tolerance: 0.0,
+        compute: |_| project::rating_payments::formula_couplings().len() as f64,
+    },
+    Figure {
+        key: "project/closing-the-achievement-gap-rate",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The share of the formula amount Closing the Achievement Gap paid per pupil in \
+                FY2008, in percentage points — Ohio's first rating-driven formula payment",
+        pinned: 0.15,
+        tolerance: 0.0001,
+        compute: |_| {
+            // Tied to the greenbook rather than restated: LSC writes the rate twice, as a
+            // multiplier and as a percentage, and this is the second.
+            project::rating_payments::stated("hb119", "on a per student basis, 0.15% of the", 0.15)
+        },
+    },
+    Figure {
+        key: "project/closing-the-achievement-gap-districts",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts qualifying for it — those with both an academic distress index and a \
+                poverty index of 1.0 or above",
+        pinned: 31.0,
+        tolerance: 0.0,
+        compute: |_| {
+            project::rating_payments::stated(
+                "hb119",
+                "Thirty-one districts have both academic distress indices and poverty indices greater than or equal to one",
+                31.0,
+            )
+        },
+    },
+    Figure {
         key: "project/general-fund-transfers-fy2020",
         owner: "crates/project",
         unit: Unit::Dollars,

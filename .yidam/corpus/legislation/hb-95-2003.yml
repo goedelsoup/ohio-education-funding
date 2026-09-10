@@ -77,7 +77,16 @@ properties:
     Nothing in this act's funding formula was vetoed, which is consistent with the rest of it: the
     formula is what this budget left alone.
   accountability_effect: |
-    Not assessed against `accountability-regime` here. [open]
+    **The earliest point this corpus can evidence at which an Ohio rating determined a funding
+    amount.** Two appropriations, both paying *to* low-rated districts and both outside the
+    formula: a set-aside of $3.7 million in FY2004 and $5.9 million in FY2005 for academic
+    emergency districts to buy intervention services, distributed per pupil; and $4.6 million a
+    year for professional development on the Ohio Graduation Test, as grants to districts in
+    academic emergency. [verified — crates/project, `rating_payments`, pinned by test]
+
+    Neither is a formula component — this act's formula has no rating term in it, and would not
+    until H.B. 119 four years later. The chronology of every such coupling is at
+    [Ohio report card](../accountability-regime/ohio-report-card.yml).
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of

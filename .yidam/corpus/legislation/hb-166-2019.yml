@@ -96,8 +96,21 @@ properties:
     and a study committee.
   accountability_effect: |
     Carried academic distress commission provisions, end-of-course examination and graduation
-    requirement changes, and industry-recognised credential provisions. Not assessed against
-    `accountability-regime` here. [open]
+    requirement changes, and industry-recognised credential provisions.
+
+    **And its freeze severed the link between a district's report card and its money, while leaving
+    that link running for community and STEM schools.** Every traditional district and JVSD
+    received the same foundation aid in FY2020 and FY2021 as in FY2019, so a district's graduation
+    and third-grade reading bonuses stopped moving with its results — but the act required each
+    community and STEM school's bonuses, which the state pays directly, to be *"recalculated each
+    year using a formula amount of $6,020."*
+    [verified — crates/project, `rating_payments`, pinned by test]
+
+    For two years the only Ohio schools whose funding still moved with their own report card were
+    community and STEM schools, on the version of the bonus that had never carried the state share
+    index. That un-equalised form is the one Ohio readopted in FY2026. See
+    [Ohio report card](../accountability-regime/ohio-report-card.yml) and
+    [performance supplement rate](../parameter/performance-supplement-rate.yml).
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of

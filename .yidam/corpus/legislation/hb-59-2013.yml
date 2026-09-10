@@ -81,7 +81,18 @@ properties:
     with disabilities from the core-subject teacher retesting requirement.
   accountability_effect: |
     Carried the third-grade reading guarantee's retention provisions and a new generation of
-    assessments. Not assessed against `accountability-regime` here. [open]
+    assessments, and coupled no dollar to any of it.
+
+    **This is the act that rebuilt Ohio's report card and left the funding formula rating-blind.**
+    Its nine foundation components — the opportunity grant, targeted assistance, and seven
+    categorical aids — contain no rating term, and its greenbook is one of the eight of twelve
+    carrying no rating-driven formula payment at all.
+    [verified — crates/project, `rating_payments::quiet`, pinned by test]
+
+    Worth stating rather than leaving as an absence: the A-F report card and the third-grade
+    reading guarantee's retention provisions arrived here, two years before the first formula
+    component that paid on results. Ohio built the measure first and priced it afterwards. See
+    [Ohio report card](../accountability-regime/ohio-report-card.yml).
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of
