@@ -34,6 +34,7 @@
 pub mod building;
 pub mod casino;
 pub mod census_states;
+pub mod composition;
 pub mod equity_factor;
 pub mod functions;
 pub mod identified;
@@ -401,8 +402,13 @@ pub struct Regression {
 /// Adding controls to a cross-section removes the part of an association that the controls
 /// explain. It does not turn the remainder into an effect. Every caution on
 /// [`partial_correlation`] applies with more force here, because a model with six predictors
-/// looks far more like an answer than a correlation does. Ohio districts differ in what they
-/// spend money *on*, and no column in this workspace measures that.
+/// looks far more like an answer than a correlation does.
+///
+/// This paragraph used to end "Ohio districts differ in what they spend money *on*, and no column
+/// in this workspace measures that." [`composition`] measures it, and the difference is not
+/// cosmetic: the spending coefficient the corpus publishes against Ohio's growth measure is
+/// carried entirely by the classroom half of the money. A total is a constraint that two halves
+/// move together, and it was not holding.
 ///
 /// # Errors
 ///

@@ -34,6 +34,48 @@ description: |
   `project::outcomes` from the beginning and reached no consumer until now. [verified]
 
 figures:
+  # What the money was spent on. The coefficients are standardised, and the negative ones are
+  # bound as magnitudes with the direction in the key, per convention.
+  - key: dispersion/classroom-spending-on-growth
+    value: 0.24318
+    field: findings
+    as_written: "classroom instruction per pupil          +0.243    t +5.11"
+  - key: dispersion/nonclassroom-spending-on-growth-negative
+    value: 0.03199
+    field: findings
+    as_written: "everything else per pupil                −0.032    t −0.61"
+  - key: dispersion/classroom-share-on-growth
+    value: 0.12148
+    field: findings
+    as_written: "three-year growth      +0.2309  t +5.04       +0.1215  t +2.89"
+  - key: dispersion/classroom-share-on-level
+    value: 0.09483
+    field: findings
+    as_written: "attainment level       −0.0562  t −2.18       +0.0948  t +4.01"
+  - key: dispersion/spending-level-on-level-negative
+    value: 0.05622
+    field: findings
+    as_written: "attainment level       −0.0562  t −2.18       +0.0948  t +4.01"
+  - key: dispersion/instruction-on-growth
+    value: 0.19443
+    field: findings
+    as_written: "instruction is\n  +0.1944, t +4.52"
+  - key: dispersion/plant-maintenance-on-growth-negative
+    value: 0.12589
+    field: findings
+    as_written: "operations and maintenance of plant, at −0.126, t −2.97"
+  - key: dispersion/pupil-transportation-on-growth-negative
+    value: 0.03464
+    field: findings
+    as_written: "pupil transportation is −0.035 and not distinguishable from zero"
+  - key: dispersion/median-classroom-share
+    value: 0.66998
+    field: findings
+    as_written: "the median district spends 67.0% of\n  operating money in the classroom"
+  - key: dispersion/classroom-share-against-spending-negative
+    value: 0.33705
+    field: findings
+    as_written: "spend a *smaller* fraction in the classroom, at −0.337"
   - key: bundle/growth-measures-determinate
     value: 534
     field: findings
@@ -110,10 +152,68 @@ findings: |
   **What this does not license.** A standardised coefficient of +0.21 in a single-year
   cross-section is not evidence that spending raises achievement, and six controls do not make
   it one. Adding controls removes the part of an association the controls explain; it does not
-  turn the remainder into an effect. What remains unmodelled is not a list of minor omissions:
-  district typology, regional labour cost, and — the largest — **what the money was actually
-  spent on**, which no column in this workspace measures. A district that spends more on
-  instruction and one that spends more on transportation are the same observation here. [open]
+  turn the remainder into an effect. What remains unmodelled includes district typology and
+  regional labour cost. [inference]
+
+  ### What the money was spent on, which used to head that list
+
+  The largest of those omissions was recorded as "**what the money was actually spent on**, which
+  no column in this workspace measures. A district that spends more on instruction and one that
+  spends more on transportation are the same observation here." The department publishes that
+  column and this repository has held it since
+  [`expenditure-functions-fy25`](../../../crates/dispersion/fixtures/expenditure-functions-fy25.csv)
+  was committed: the same FY2025 operating total, split into the eleven functions it is reported
+  under, per pupil. It had been used to compare two named districts and never entered into a
+  model. [verified]
+
+  **The growth relationship is the classroom half of the money and nothing else.** Replacing the
+  total with the department's own two-way split, on the same 606 districts and the same five
+  controls: [verified —
+  [`crates/dispersion`](../../../crates/dispersion/tests/what_the_money_was_spent_on.rs)]
+
+      against the three-year Progress effect size, standardised
+        classroom instruction per pupil          +0.243    t +5.11
+        everything else per pupil                −0.032    t −0.61
+
+  The +0.209 above is those two averaged under a constraint that they move together. Released
+  from it, one of them is the whole result and the other is indistinguishable from zero — so the
+  two districts in the sentence are not the same observation, and the difference between them is
+  the finding rather than a caveat. [verified]
+
+  **And composition carries information the level of spending does not.** Entering total spending
+  and the classroom share together asks whether *how* a district spends predicts anything once
+  *how much* is held fixed:
+
+      outcome                total operating        classroom share
+      three-year growth      +0.2309  t +5.04       +0.1215  t +2.89
+      attainment level       −0.0562  t −2.18       +0.0948  t +4.01
+
+  On level the two signs differ in the same model, on the same districts: spending more
+  associates with lower attainment and spending a larger share of it in the classroom associates
+  with higher attainment. On level, composition is the firmer of the two. [verified]
+
+  **Two things this is not.** It is not a lever. The classroom share correlates +0.38 with log
+  enrolment and −0.40 with transportation spending per pupil — a small rural district buses
+  children a long way and cannot spend that money twice — so part of the share is geography.
+  Enrolment is already a control and entering transportation spending directly leaves the share
+  coefficient at +0.112, t +2.48, which is the right check and still a description. [verified]
+  And it is not equally firm everywhere: on the 303 districts whose English-learner share the
+  department did not suppress, the coefficient falls to +0.087 and t to +1.56. The estimate moves
+  little while the sample halves, which reads as power rather than contradiction — and it is
+  below the conventional bar. [verified]
+
+  **The example the corpus chose was the wrong one.** Entered function by function against
+  growth, pupil transportation is −0.035 and not distinguishable from zero. The function that is
+  reliably negative is operations and maintenance of plant, at −0.126, t −2.97; instruction is
+  +0.1944, t +4.52. Transportation spending is not what separates these districts and building
+  maintenance is. [verified]
+
+  Composition also varies far less than level does — the median district spends 67.0% of
+  operating money in the classroom, and that share's coefficient of variation is under half the
+  spending total's. Two facts sit beside it. Property wealth does not predict the split at all,
+  which pairs with wealth predicting level and not growth above. And districts that spend more
+  spend a *smaller* fraction in the classroom, at −0.337, which is why the total understates the
+  classroom coefficient rather than overstating it. [verified]
 
   The honest statement is unchanged in substance and firmer in support: on Ohio's growth
   measure the relationship is not negative, and it survives the controls that were supposed to
