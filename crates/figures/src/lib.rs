@@ -245,6 +245,14 @@ pub struct Inputs {
     /// The median district's operating spending per headcount pupil, over the 607 the department
     /// rates. The line `perrysburg-exempted-village` places itself below.
     pub median_operating_per_pupil: f64,
+    /// Every state's Education Finance Incentive Grant equity factor, widest spread first.
+    ///
+    /// Computed once because each call walks all 10,739 rows of the national district panel, and
+    /// six figures here read it.
+    pub equity: Vec<dispersion::equity_factor::StateEquity>,
+    /// Ohio's factor with and without the statutory poverty adjustment — the pair that brackets
+    /// which band Ohio is in, rather than estimating it.
+    pub equity_bracket: (f64, f64),
     /// The four projected runs `metric/enrolled-adm` quotes.
     ///
     /// The first projection figures in this manifest, and they are here because of how the ones
@@ -378,6 +386,8 @@ impl Inputs {
                 column.sort_by(|a, b| a.partial_cmp(b).expect("no NaN in a published dollar"));
                 dispersion::median(&column).expect("the function file is not empty")
             },
+            equity: dispersion::equity_factor::by_state(),
+            equity_bracket: dispersion::equity_factor::ohio_bracket(),
             forecasts: {
                 // `panel_for_forecasts` because `panel` has moved into the literal above.
                 let prior = project::report::enrollment_growth_prior(
@@ -1024,6 +1034,18 @@ fn outcome_correlation(
 ///
 /// Over the 605 districts that report one — the panel is 606 and one district publishes no
 /// operating expenditure at all, which is a fact about coverage rather than about spending.
+/// One jurisdiction's row of the equity-factor table.
+///
+/// # Panics
+///
+/// If the national panel does not carry `state`.
+fn equity_of<'a>(i: &'a Inputs, state: &str) -> &'a dispersion::equity_factor::StateEquity {
+    i.equity
+        .iter()
+        .find(|s| s.state == state)
+        .expect("the national panel carries this jurisdiction")
+}
+
 fn operating_dispersion(i: &Inputs) -> dispersion::Dispersion {
     let column = dispersion::profile::column(&i.profile, |d| d.operating_expenditure_per_pupil);
     dispersion::Dispersion::of(&column).expect("districts report operating expenditure")
@@ -2377,6 +2399,83 @@ pub static FIGURES: &[Figure] = &[
         pinned: 0.2016,
         tolerance: 0.0005,
         compute: |i| operating_dispersion(i).coefficient_of_variation,
+    },
+    // The same statistic as the line above, computed the way 20 U.S.C. 6337 computes it, so that
+    // 0.2016 finally has something to be read against. Enrolment-weighted, on the Census Bureau's
+    // current spending for FY2022 rather than the department's operating expenditure for FY2024,
+    // and over the comparable agencies only — see `dispersion::equity_factor`, which says at
+    // length why that filter is not optional here.
+    Figure {
+        key: "dispersion/ohio-equity-factor",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Ohio's Education Finance Incentive Grant equity factor, FY2022",
+        pinned: 0.19873,
+        tolerance: 0.0005,
+        compute: |i| equity_of(i, "OH").factor,
+    },
+    Figure {
+        key: "dispersion/ohio-equity-factor-rank",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Where Ohio's equity factor ranks among the 51 jurisdictions, widest spread first",
+        pinned: 9.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.equity
+                .iter()
+                .position(|s| s.state == "OH")
+                .expect("the national panel carries Ohio") as f64
+                + 1.0
+        },
+    },
+    Figure {
+        key: "dispersion/median-state-equity-factor",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The median jurisdiction's equity factor, FY2022",
+        pinned: 0.15818,
+        tolerance: 0.0005,
+        compute: |i| {
+            let mut factors: Vec<f64> = i.equity.iter().map(|s| s.factor).collect();
+            factors.sort_by(f64::total_cmp);
+            factors[factors.len() / 2]
+        },
+    },
+    Figure {
+        key: "dispersion/ohio-equity-factor-distance-to-band-edge",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "How far Ohio's equity factor sits below the 0.20 edge where the within-state \
+                poverty ladder steepens",
+        pinned: 0.00127,
+        tolerance: 0.0005,
+        compute: |i| equity_of(i, "OH").distance_to_edge(),
+    },
+    Figure {
+        key: "dispersion/ohio-equity-factor-poverty-adjusted",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Ohio's equity factor with the statutory 1.4 poverty weight over-applied to its \
+                economically disadvantaged count — the low end of the bracket",
+        pinned: 0.16840,
+        tolerance: 0.0005,
+        compute: |i| i.equity_bracket.0,
+    },
+    Figure {
+        key: "dispersion/ohio-efig-rate-against-a-median-state",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "How far Ohio's `1.30 minus equity factor` per-child rate falls below a median \
+                jurisdiction's",
+        pinned: 0.0355,
+        tolerance: 0.0005,
+        compute: |i| {
+            let mut factors: Vec<f64> = i.equity.iter().map(|s| s.factor).collect();
+            factors.sort_by(f64::total_cmp);
+            let median = dispersion::equity_factor::STATE_RATE_CONSTANT - factors[factors.len() / 2];
+            1.0 - equity_of(i, "OH").state_rate() / median
+        },
     },
     Figure {
         key: "dispersion/operating-expenditure-restricted-range-ratio",
