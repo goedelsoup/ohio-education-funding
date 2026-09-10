@@ -250,6 +250,9 @@ pub struct Inputs {
     pub composition: Composition,
     /// The corpus's worked pair, over the fifteen years its two nodes said they could not see.
     pub pair: Pair,
+    /// ECOT's eight years in the survey, and Cleveland's fifteen — the other two agencies whose
+    /// nodes recorded a series as unpopulated that the panel already held.
+    pub closed: Closed,
     /// Every state's Education Finance Incentive Grant equity factor, widest spread first.
     ///
     /// Computed once because each call walks all 10,739 rows of the national district panel, and
@@ -267,6 +270,19 @@ pub struct Inputs {
     /// decided on. Binding them is what makes the next change to a projection constant redden the
     /// corpus rather than silently restate it.
     pub forecasts: Forecasts,
+}
+
+/// ECOT and Cleveland, on the series their nodes recorded as unpopulated.
+pub struct Closed {
+    /// Every year the panel holds ECOT, oldest first.
+    pub ecot: Vec<dispersion::exemplars::Year>,
+    /// State revenue and enrolment summed over the comparable districts, by year — the
+    /// denominator a community school's draw is read against.
+    pub districts: BTreeMap<u16, (f64, f64)>,
+    /// Cleveland's state revenue per pupil across the panel's span.
+    pub cleveland_state: dispersion::exemplars::Change,
+    /// And its enrolment.
+    pub cleveland_enrolment: dispersion::exemplars::Change,
 }
 
 /// Toledo and Perrysburg on the four measures their nodes recorded as not held.
@@ -429,6 +445,15 @@ impl Inputs {
                     .collect();
                 column.sort_by(|a, b| a.partial_cmp(b).expect("no NaN in a published dollar"));
                 dispersion::median(&column).expect("the function file is not empty")
+            },
+            closed: {
+                use dispersion::exemplars::{self, CLEVELAND, ECOT};
+                Closed {
+                    ecot: exemplars::history(ECOT),
+                    districts: exemplars::district_state_revenue(),
+                    cleveland_state: exemplars::change(CLEVELAND, |y| y.state),
+                    cleveland_enrolment: exemplars::change(CLEVELAND, |y| y.enrolment),
+                }
             },
             pair: {
                 use dispersion::exemplars::{self, PERRYSBURG, TOLEDO};
@@ -2466,6 +2491,107 @@ pub static FIGURES: &[Figure] = &[
         pinned: 0.2016,
         tolerance: 0.0005,
         compute: |i| operating_dispersion(i).coefficient_of_variation,
+    },
+    // ECOT and Cleveland, on the series their nodes said were unpopulated.
+    Figure {
+        key: "dispersion/ecot-peak-enrolment",
+        owner: "crates/dispersion",
+        // A `Count` rather than `Pupils`: `V33` is fall membership, a headcount of children on a
+        // day, not an average daily membership. The survey publishes it whole and it compares
+        // exactly.
+        unit: Unit::Count,
+        label: "Electronic Classroom of Tomorrow peak enrolment, FY2016, on the Census count",
+        pinned: 14_153.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.closed
+                .ecot
+                .iter()
+                .map(|y| y.enrolment)
+                .fold(0.0, f64::max)
+        },
+    },
+    Figure {
+        key: "dispersion/ecot-peak-state-revenue",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "And the state money it received that year",
+        pinned: 109_371_000.0,
+        tolerance: 1000.0,
+        compute: |i| {
+            i.closed
+                .ecot
+                .iter()
+                .map(|y| y.state * y.enrolment)
+                .fold(0.0, f64::max)
+        },
+    },
+    Figure {
+        key: "dispersion/ecot-state-revenue-total",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "State money ECOT received across the eight years the survey holds it, FY2009 to \
+                FY2017",
+        pinned: 666_576_000.0,
+        tolerance: 1000.0,
+        compute: |i| i.closed.ecot.iter().map(|y| y.state * y.enrolment).sum(),
+    },
+    Figure {
+        key: "dispersion/ecot-funding-against-the-average-district",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "ECOT's state revenue per pupil over the average Ohio district's, FY2016",
+        pinned: 1.3995,
+        tolerance: 0.0005,
+        compute: |i| {
+            let year = i
+                .closed
+                .ecot
+                .iter()
+                .find(|y| y.fiscal_year == 2016)
+                .expect("the panel holds ECOT in FY2016");
+            let (total, enrolment) = i.closed.districts[&2016];
+            year.state / (total / enrolment)
+        },
+    },
+    Figure {
+        key: "dispersion/ecot-share-of-district-state-revenue",
+        owner: "crates/dispersion",
+        // A `Ratio` and not a `Share`, because 0.0124 is under the floor a share is allowed: at
+        // that size the manifest cannot tell a fraction from a percentage typed by mistake. Prose
+        // bound to this may not carry a per-cent sign.
+        unit: Unit::Ratio,
+        label: "ECOT's draw as a fraction of what Ohio's districts received in state money, FY2016",
+        pinned: 0.0124,
+        tolerance: 0.0005,
+        compute: |i| {
+            let year = i
+                .closed
+                .ecot
+                .iter()
+                .find(|y| y.fiscal_year == 2016)
+                .expect("the panel holds ECOT in FY2016");
+            year.state * year.enrolment / i.closed.districts[&2016].0
+        },
+    },
+    Figure {
+        key: "dispersion/cleveland-state-revenue-real-change-negative",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Cleveland Municipal state revenue per pupil, FY2009 to FY2024, in constant \
+                dollars \u{2014} negative",
+        pinned: 0.31915,
+        tolerance: 0.0005,
+        compute: |i| i.closed.cleveland_state.real.abs(),
+    },
+    Figure {
+        key: "dispersion/cleveland-enrolment-change-negative",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Cleveland Municipal enrolment over the same span \u{2014} negative",
+        pinned: 0.3225,
+        tolerance: 0.0005,
+        compute: |i| i.closed.cleveland_enrolment.nominal.abs(),
     },
     // The pair's fifteen years, and the four measures its two nodes recorded as not held. Real
     // changes are exported as magnitudes with the direction in the key, except Perrysburg's local
