@@ -320,8 +320,8 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1401 | supported by a committed primary source |
-| `[inference]` | 311 | drawn from verified facts, not witnessed |
+| `[verified]` | 1410 | supported by a committed primary source |
+| `[inference]` | 312 | drawn from verified facts, not witnessed |
 | `[open]` | 195 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
@@ -329,8 +329,8 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 70 | 0 |
-| `description` | 48 | 0 |
+| `findings` | 71 | 0 |
+| `description` | 47 | 0 |
 | `revisions` | 10 | 0 |
 | `series` | 7 | 0 |
 | `statutory_basis` | 6 | 0 |
@@ -362,7 +362,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `appropriation_line` | 1 | 0 |
 | `appropriating_bill` | 1 | 0 |
 
-**75 recorded withdrawals across 38 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**76 recorded withdrawals across 39 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Relationship vocabulary
@@ -489,7 +489,7 @@ Sorted by: kind, then alphabetically.
 | [`enrolled-adm`](metric/enrolled-adm.yml) | metric | Enrolled ADM | 8 | 8 |
 | [`expenditure-per-equivalent-pupil`](metric/expenditure-per-equivalent-pupil.yml) | metric | Expenditure Per Equivalent Pupil | 8 | 6 |
 | [`general-fund-cash-balance`](metric/general-fund-cash-balance.yml) | metric | General Fund Cash Balance | 5 | 3 |
-| [`per-pupil-operating-expenditure`](metric/per-pupil-operating-expenditure.yml) | metric | Per-Pupil Operating Expenditure | 12 | 4 |
+| [`per-pupil-operating-expenditure`](metric/per-pupil-operating-expenditure.yml) | metric | Per-Pupil Operating Expenditure | 12 | 5 |
 | [`performance-index`](metric/performance-index.yml) | metric | Performance Index | 6 | 12 |
 | [`progress-value-added`](metric/progress-value-added.yml) | metric | Progress (Value-Added) | 5 | 6 |
 | [`state-share-percentage`](metric/state-share-percentage.yml) | metric | State Share Percentage | 5 | 3 |
@@ -525,7 +525,7 @@ Sorted by: kind, then alphabetically.
 | [`local-property-tax`](revenue-stream/local-property-tax.yml) | revenue-stream | Local Property Tax | 6 | 8 |
 | [`lottery-profits`](revenue-stream/lottery-profits.yml) | revenue-stream | Lottery Profits Education Fund | 4 | 1 |
 | [`state-foundation-aid`](revenue-stream/state-foundation-aid.yml) | revenue-stream | State Foundation Aid | 5 | 21 |
-| [`title-i`](revenue-stream/title-i.yml) | revenue-stream | Title I, Part A | 4 | 5 |
+| [`title-i`](revenue-stream/title-i.yml) | revenue-stream | Title I, Part A | 5 | 5 |
 | [`tpp-replacement-payments`](revenue-stream/tpp-replacement-payments.yml) | revenue-stream | Tangible Personal Property Tax Replacement Payments | 6 | 7 |
 | [`fsfp-input-year-refresh`](scenario/fsfp-input-year-refresh.yml) | scenario | FSFP Cost Input Refresh vs. Freeze | 9 | 9 |
 | [`guarantee-phase-out`](scenario/guarantee-phase-out.yml) | scenario | Phasing Out the Temporary Transitional Aid Guarantee | 11 | 4 |

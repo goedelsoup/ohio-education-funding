@@ -54,6 +54,29 @@ findings: |
   - The distribution is right-skewed — the top half runs further above the median than the
     bottom half runs below it — so any mean-based summary overstates the typical district.
 
+  ### What 0.202 is large or small against
+
+  That coefficient of variation had no benchmark for as long as this node has quoted it. Ohio
+  describing itself cannot say whether Ohio is unusual, and no other state's distribution had been
+  computed. Congress computes exactly this statistic for all 51 jurisdictions and pays states on
+  it: under 20 U.S.C. 6337 a state's **equity factor** is the enrolment-weighted coefficient of
+  variation of per-pupil expenditure across its own districts, and the Education Finance Incentive
+  Grant multiplies the state's per-child amount by 1.30 minus that factor. [verified — 20 U.S.C.
+  6337(b)]
+
+  On the Census Bureau's FY2022 district file, computed for every state the same way, **Ohio's
+  factor is 0.1987 and ranks 9 of 51** — against a median jurisdiction at 0.1582. Only 8
+  jurisdictions spread wider, and 3 of those have fewer than 50 districts. [verified —
+  [`crates/dispersion`](../../../crates/dispersion/tests/the_statistic_congress_prices.rs)]
+
+  Two things follow. The federal government treats Ohio's dispersion as a fault and prices it, at
+  3.55% of Ohio's per-formula-child rate against a median jurisdiction — the doctrinal question
+  this node is about already has a dollar consequence attached to it, in a channel
+  [`revenue-stream/title-i`](../revenue-stream/title-i.yml) covers and the formula nodes do not.
+  And the two independent measures of the same quantity agree: 0.202 from the department's FY2024
+  operating expenditure and 0.1987 from the Bureau's FY2022 current spending, on different
+  populations in different years, 0.003 apart. [inference]
+
   ### Wealth neutrality, which is more interesting than the dispersion
 
   State revenue per pupil correlates with assessed valuation per pupil at **−0.548**: aid does
@@ -412,6 +435,22 @@ figures:
     value: 1.84357
     field: findings
     as_written: "restricted range ratio **1.844**"
+  - key: dispersion/ohio-equity-factor
+    value: 0.19873
+    field: findings
+    as_written: "factor is 0.1987 and ranks 9 of 51**"
+  - key: dispersion/ohio-equity-factor-rank
+    value: 9
+    field: findings
+    as_written: "factor is 0.1987 and ranks 9 of 51**"
+  - key: dispersion/median-state-equity-factor
+    value: 0.15818
+    field: findings
+    as_written: "against a median jurisdiction at 0.1582"
+  - key: dispersion/ohio-efig-rate-against-a-median-state
+    value: 0.03551
+    field: findings
+    as_written: "3.55% of Ohio's per-formula-child rate against a median jurisdiction"
   - key: dispersion/profile-districts
     value: 606
     field: findings

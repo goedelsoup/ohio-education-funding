@@ -21,10 +21,11 @@ description: |
   counts diverge for a given district is not established here. [open]
 
   **Four sub-formulas, not one**, and they behave differently: Basic Grants, Concentration
-  Grants, Targeted Grants and Education Finance Incentive Grants. The last is the one that reaches
-  back into state policy — it weights allocations by a state's own equity and effort, so Ohio's
-  local-reliance position affects what Ohio receives. Whether that has been material for Ohio is
-  not established. [open]
+  Grants, Targeted Grants and Education Finance Incentive Grants. The last reaches back into
+  state policy, and what it reaches for is dispersion: it prices how widely per-pupil spending
+  varies among a state's own districts, and pays a wider-spread state less per child. Ohio's
+  spread ranks 9 of 51 and costs it 3.55% of its per-child rate against a median jurisdiction,
+  every year. [verified — `crates/dispersion/src/equity_factor.rs`]
 
   **The size of the channel is only measurable through the Census F-33**, not through any Title
   I file: Ohio districts received $2,466 per pupil in *all* federal revenue in FY2022, against a
@@ -32,6 +33,80 @@ description: |
   `crates/dispersion/src/census_states.rs`] Title I is the largest component of that, but the
   F-33 does not decompose it, so no Title I figure for Ohio or for any district is entered here.
   [open]
+findings: |
+  ### The sub-formula that prices Ohio's own dispersion
+
+  This node recorded that the Education Finance Incentive Grant "weights allocations by a state's
+  own equity and effort, so Ohio's local-reliance position affects what Ohio receives", and left
+  the materiality open. The premise names the wrong quantity, and the question has an answer.
+
+  **Local reliance does not enter this formula anywhere.** 20 U.S.C. 6337 multiplies a state's
+  per-formula-child amount by two factors and neither is about the state-and-local split. The
+  *effort* factor is per-pupil expenditure over per-capita income, relative to the national
+  ratio — total spending against ability to pay. The *equity* factor is the enrolment-weighted
+  coefficient of variation of per-pupil expenditure across the state's own local education
+  agencies, counting only agencies enrolling more than 200 pupils. Ohio raising 51.8% of school
+  revenue locally is invisible to both. [verified — 20 U.S.C. 6337(b)]
+
+  **The equity factor is a statistic this repository already computed.** It is the same
+  coefficient of variation quoted in every equity finding here — and until now that number had
+  nothing to be read against, because Ohio describing itself cannot say whether Ohio is unusual.
+  Computed for all 51 jurisdictions off the Census Bureau's FY2022 district file, **Ohio's factor
+  is 0.1987 and ranks 9 of 51**, against a median jurisdiction at 0.1582. Only Alaska,
+  Massachusetts, Vermont, Idaho, Louisiana, Montana, New York and South Dakota spread wider.
+  [verified — `crates/dispersion/src/equity_factor.rs`]
+
+  **It enters the allocation twice, in opposite directions.** The state's per-child rate is 1.30
+  minus its factor, so a wider-spread state is paid less per child; and the *within*-state poverty
+  ladder steepens in three bands at 0.10 and 0.20, so a wider-spread state's money concentrates
+  harder on its poorest counties — the top rung is 4.0, 6.0 or 8.0 by band. Congress prices
+  dispersion as a fault and then treats the same number as grounds to redistribute inside the
+  state. [verified — 20 U.S.C. 6337(b)]
+
+  ### Material on the rate, and never once on the band
+
+  Ohio's spread costs it **3.55% of its per-formula-child rate against a median jurisdiction**,
+  and 8.23% against a state held at the 0.10 cap. That is a standing reduction, in force every
+  year, priced on exactly the dispersion
+  [`doctrine/equity`](../doctrine/equity.yml) is about. [verified —
+  `crates/dispersion/src/equity_factor.rs`]
+
+  The band is the other half and the answer there is no. **Ohio is the closest state in the
+  country to the 0.20 edge — 0.0013 below it**, nearer than every state but Washington, which sits
+  at the other edge — and it is below. The one statutory step the fixture cannot reproduce is the
+  1.4 weight on a poverty child, and it can be bounded rather than guessed: over-applied to Ohio's
+  economically disadvantaged count, roughly three times the Census poverty count, the factor falls
+  to 0.1684. The true value lies in that interval and the whole interval is inside the middle
+  band. [verified — `crates/dispersion/src/equity_factor.rs`]
+
+  The measurement is the statute's, not a choice: unweighted, Ohio's districts spread at 0.1779
+  and nothing here would be close to an edge. The statute weights by pupils served, and Ohio's
+  large districts are its extreme ones. [verified — `crates/dispersion`]
+
+  What remains open is the effort factor. No fixture here carries state personal income, so it is
+  not computed — though the statute bounds it to 0.95 and 1.05, which caps its whole range at a
+  tenth of the rate against a ladder that at 0.20 doubles the top rung. [open]
+revisions:
+  - was: |
+      "it weights allocations by a state's own equity and effort, so Ohio's local-reliance
+      position affects what Ohio receives"
+    now: |
+      Ohio's local reliance is not an input to the Education Finance Incentive Grant. The
+      formula's two multipliers are total spending against per-capita income, and the dispersion
+      of spending across the state's own districts; neither reads the state-and-local split. The
+      corrected reading is the sharper one — the corpus was already computing the quantity that
+      matters and had never recognised it as a federal parameter.
+    found_by: |
+      Reading the statute in order to answer the materiality question the same sentence left open.
+      51.8% local is the fact this corpus reaches for whenever a national comparison is wanted,
+      and it was reached for here without checking that the formula uses it.
+    reach: |
+      No figure in this node was pinned to the claim, so nothing moves. What changes is which
+      measure the node points at: the equity factor is a coefficient of variation, so the
+      quantities that bear on Ohio's Title I receipts are the ones in
+      [`doctrine/equity`](../doctrine/equity.yml) and
+      [`metric/per-pupil-operating-expenditure`](../metric/per-pupil-operating-expenditure.yml),
+      not the local-share table in `dispersion::census_states`.
 figures:
   - key: dispersion/ohio-federal-revenue-per-pupil-fy2022
     value: 2466.19
@@ -45,6 +120,30 @@ figures:
     value: 0.1387
     field: description
     as_written: "which is 13.87% of Ohio school revenue"
+  - key: dispersion/ohio-equity-factor-rank
+    value: 9
+    field: description
+    as_written: "spread ranks 9 of 51 and costs it 3.55% of its per-child rate"
+  - key: dispersion/ohio-efig-rate-against-a-median-state
+    value: 0.03551
+    field: description
+    as_written: "3.55% of its per-child rate against a median jurisdiction"
+  - key: dispersion/ohio-equity-factor
+    value: 0.19873
+    field: findings
+    as_written: "**Ohio's factor\n  is 0.1987 and ranks 9 of 51**"
+  - key: dispersion/median-state-equity-factor
+    value: 0.15818
+    field: findings
+    as_written: "against a median jurisdiction at 0.1582"
+  - key: dispersion/ohio-equity-factor-distance-to-band-edge
+    value: 0.00127
+    field: findings
+    as_written: "country to the 0.20 edge — 0.0013 below it**"
+  - key: dispersion/ohio-equity-factor-poverty-adjusted
+    value: 0.1684
+    field: findings
+    as_written: "the factor falls\n  to 0.1684"
 properties:
   name: Title I, Part A — Improving Basic Programs Operated by Local Educational Agencies
   level: federal
