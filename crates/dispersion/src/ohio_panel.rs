@@ -316,6 +316,44 @@ impl Equalization {
     }
 }
 
+/// The smallest enrolment a per-pupil ratio is taken over.
+///
+/// # One district, and it was the finding
+///
+/// Kelleys Island Local SD teaches between one and eighteen children on an island in Lake Erie,
+/// against a tax base of resort property. Its local revenue per pupil is **$214,400 in FY2023** —
+/// four times the next district in the state and ten times the tenth. In a quartile of 152 that
+/// one row adds $1,410 to the richest quartile's mean.
+///
+/// It is not in the population every year. `comparable` is the survey's own flag, `AGCHRT != 1`
+/// and `SCHLEV == 03`, and the Bureau codes this agency differently as its enrolment moves: it is
+/// out in FY2012, FY2013, FY2018 and **FY2022**, and in for FY2023 and FY2024. So the population
+/// changed at exactly the year the corpus recorded a break in the series, and the break was the
+/// population changing. See
+/// `the_break_the_corpus_recorded_was_one_district_entering_the_population`.
+///
+/// # Why a floor and not a robust statistic
+///
+/// A median would be immune to this and to anything like it, and it was not chosen: it measures
+/// something else. The gap between quartile *means* is the distance between what the rich and
+/// poor quarters of Ohio actually receive per pupil, which is the quantity `doctrine/equity`
+/// states and `national_peers::ohio_by_local_wealth` pins for FY2022. Swapping in medians moves
+/// the whole series to 50-61% and makes every published figure incomparable, to fix one row.
+///
+/// # The number is read off the data, not chosen to fit it
+///
+/// **No comparable Ohio district has ever had enrolment between 18 and 63 in this panel.** The
+/// largest Kelleys Island year is 18; the smallest any other district reaches, across all fifteen
+/// years, is 63. Forty sits in the middle of that empty band — 22 pupils above everything it
+/// excludes and 23 below everything it keeps — so it removes one district in every year and
+/// nothing else in any year. `the_enrolment_floor_sits_in_an_empty_band` fails if that stops
+/// being true.
+///
+/// It is a floor on the *ratio*, not on the panel. Kelleys Island is a real district and its
+/// dollars are in every aggregate this module computes; what it cannot carry is a denominator of
+/// five.
+pub const MIN_ENROLMENT: f64 = 40.0;
+
 /// The quartile equalization measure, for every year in the panel.
 ///
 /// # The question this answers, and the one it does not
@@ -326,10 +364,19 @@ impl Equalization {
 /// the question as open.
 ///
 /// It answers it in a way neither "better" nor "worse" captures. **The rate holds and the gap
-/// grows.** The state's share of the gap it closes stays in a narrow band across ten years while
-/// the gap itself grows by two thirds, so the residual — the part no level closes — grows with it.
-/// A formula doing the same proportional job against a larger problem leaves districts further
+/// grows.** The state's share of the gap it closes stays between 0.400 and 0.488 across all
+/// thirteen years from FY2012 to FY2024, while the gap itself grows from $5,727 to $10,527 per
+/// pupil, so the residual — the part no level closes — grows with it from $2,713 to $4,772. A
+/// formula doing the same proportional job against a larger problem leaves districts further
 /// apart every year, and the percentage is the thing that looks stable.
+///
+/// # The band used to stop at FY2022, and that was an artefact
+///
+/// FY2023 and FY2024 read as a break — both closing 0.372 against a gap a fifth wider — and the
+/// corpus recorded it as one, with the cause open between Ohio's FY2023 reappraisals and the Fair
+/// School Funding Plan's phase-in. It was neither. It was a five-pupil island district entering
+/// the population in the first of those years, and [`MIN_ENROLMENT`] is the correction. See
+/// `the_break_the_corpus_recorded_was_one_district_entering_the_population`.
 ///
 /// # Both endpoints flatter the federal column
 ///
@@ -341,7 +388,7 @@ pub fn equalization_by_year() -> BTreeMap<u16, Equalization> {
     let mut by_year: BTreeMap<u16, Vec<(f64, f64, f64)>> = BTreeMap::new();
     for row in panel()
         .iter()
-        .filter(|r| r.comparable && r.enrollment > 0.0)
+        .filter(|r| r.comparable && r.enrollment >= MIN_ENROLMENT)
     {
         by_year.entry(row.fiscal_year).or_default().push((
             row.local_revenue / row.enrollment,
@@ -620,12 +667,14 @@ mod tests {
         // And the state's share of it did not move much in either direction. Asserted as a band
         // rather than a trend, because there is no trend — that is the finding.
         //
-        // The band is closed at FY2022 because that is where it stops holding: see
-        // [`the_band_stops_holding_in_the_two_years_the_panel_could_not_see`] below. Widening it
-        // to admit FY2023 would delete the finding rather than record it.
-        for (year, e) in by_year.iter().filter(|(y, _)| (2012..=2022).contains(*y)) {
+        // The band ran to FY2022 and stopped, because FY2023 and FY2024 read as a break. They
+        // were one district: see
+        // [`the_break_the_corpus_recorded_was_one_district_entering_the_population`]. With the
+        // enrolment floor the band runs the whole thirteen years, 0.400 to 0.488, and closing it
+        // at FY2022 would now be the thing that hides a finding.
+        for (year, e) in by_year.iter().filter(|(y, _)| (2012..=2024).contains(*y)) {
             assert!(
-                e.state_share() > 0.38 && e.state_share() < 0.49,
+                e.state_share() > 0.39 && e.state_share() < 0.50,
                 "FY{year} state share is {:.3}, outside the band the corpus records",
                 e.state_share()
             );
@@ -640,64 +689,119 @@ mod tests {
         );
     }
 
-    /// **What the two Bureau years found: the rate that held for a decade does not hold in
-    /// FY2023 or FY2024, and the gap it is measured against grew faster than in any two-year
-    /// window on record.**
+    /// **What the corpus recorded as a break in the series was one district joining the
+    /// population.**
     ///
-    /// | | gap | state closes | share | residual |
-    /// |---|---:|---:|---:|---:|
-    /// | FY2022 | $9,590 | $4,448 | 0.464 | $4,229 |
-    /// | FY2023 | $11,139 | $4,147 | **0.372** | $6,082 |
-    /// | FY2024 | $11,586 | $4,311 | **0.372** | $6,185 |
+    /// The finding here used to be that the rate holding since FY2012 stopped holding: FY2023 and
+    /// FY2024 both closing 0.372 of a gap 16% and 21% wider than FY2022's, with the residual up
+    /// 46% in two years. Every one of those numbers was Kelleys Island Local SD — five pupils, an
+    /// island tax base, and $214,400 of local revenue per pupil — entering a quartile mean of 152
+    /// in the first year of the series it had been outside of since FY2021.
     ///
-    /// State gap-closing per pupil is *lower* in both new years than in FY2022 while the gap is
-    /// 16% and 21% wider, so the residual — the part nobody closes — rises 46% in two years. 0.372
-    /// is not unprecedented: it is the level of FY2010 and FY2011, which is why the band in
-    /// [`the_equalization_rate_holds_while_the_gap_it_closes_grows`] starts at FY2012.
+    /// | | recorded | with [`MIN_ENROLMENT`] |
+    /// |---|---:|---:|
+    /// | FY2022 share | 0.464 | 0.464 |
+    /// | FY2023 share | **0.372** | 0.449 |
+    /// | FY2024 share | **0.372** | 0.439 |
+    /// | FY2024 gap | $11,586 | $10,527 |
+    /// | FY2024 residual | $6,185 | $4,772 |
     ///
-    /// **Not established here: why.** Ohio's triennial reappraisals landed across FY2023 and would
-    /// raise local revenue in the richest quartile mechanically, which would widen the gap without
-    /// anything about state aid having changed. Separating that from a change in the aid formula
-    /// needs the valuation series, and the two years are two observations. The measurement is the
-    /// claim; the cause is open.
+    /// FY2022 does not move because the district was not comparable that year. That is the whole
+    /// mechanism: the flag is the Bureau's own and it changes with the agency's coding, so the
+    /// population moved and the measure read it as Ohio moving.
+    ///
+    /// **The corrected reading is the stronger one.** The band does not stop at FY2022 — it runs
+    /// 0.400 to 0.488 across all thirteen years from FY2012 to FY2024, and the two Bureau years
+    /// sit inside it rather than breaking it. See
+    /// [`the_equalization_rate_holds_while_the_gap_it_closes_grows`], which now closes at FY2024.
+    ///
+    /// This test asserts the artefact is gone rather than that it was there: what has to stay
+    /// true is that no single district can move the series this far again.
     #[test]
-    fn the_band_stops_holding_in_the_two_years_the_panel_could_not_see() {
+    fn the_break_the_corpus_recorded_was_one_district_entering_the_population() {
         let by_year = equalization_by_year();
-        let fy2022 = by_year[&2022];
+
+        // The two years the corpus called a break are ordinary years.
         for year in [2023u16, 2024] {
             let e = by_year[&year];
             assert!(
-                e.state_share() < 0.38,
-                "FY{year} state share is {:.3}, which would be inside the FY2012-FY2022 band",
+                (0.40..=0.49).contains(&e.state_share()),
+                "FY{year} closes {:.4}, outside the band the rest of the series holds",
                 e.state_share()
             );
-            assert!(
-                e.gap > fy2022.gap * 1.15,
-                "FY{year} gap is {:.0} against FY2022's {:.0}",
-                e.gap,
-                fy2022.gap
-            );
-            assert!(
-                e.state_closes < fy2022.state_closes,
-                "FY{year} closes {:.0} against FY2022's {:.0}",
-                e.state_closes,
-                fy2022.state_closes
-            );
         }
+
+        // And the district that produced it is out of every year, not just the two.
+        let island: Vec<PanelRow> = panel()
+            .into_iter()
+            .filter(|r| r.irn == "046797" && r.comparable)
+            .collect();
         assert!(
-            by_year[&2024].residual() > fy2022.residual() * 1.4,
-            "the residual went from {:.0} to {:.0} in two years",
-            fy2022.residual(),
-            by_year[&2024].residual()
+            island.len() >= 6,
+            "Kelleys Island is comparable in {} years, so this is no longer the right district",
+            island.len()
+        );
+        assert!(
+            island.iter().all(|r| r.enrollment < MIN_ENROLMENT),
+            "Kelleys Island now reaches the enrolment floor and the exclusion needs re-arguing"
+        );
+
+        // The reason it could move a mean at all: it is not a small district, it is a different
+        // order of magnitude. Asserted so that a fixture revision which fixes the underlying
+        // number turns this test red rather than leaving a floor in place for nothing.
+        let worst = island
+            .iter()
+            .map(|r| r.local_revenue / r.enrollment)
+            .fold(f64::MIN, f64::max);
+        assert!(
+            worst > 100_000.0,
+            "the island's worst local revenue per pupil is {worst:.0}, not the outlier this excludes"
         );
     }
 
-    /// **What the three added archives found: during ARRA the state closed a third of the local
-    /// gap, not the ~45% it closes in every other year of the FY2012-FY2022 band.**
+    /// The floor is read off the data rather than chosen to fit it.
     ///
-    /// FY2010 and FY2011 sit at 0.349 and 0.330 while federal gap-closing roughly doubles to
-    /// 0.122 and 0.128. FY2009, before the money arrived, is an ordinary 0.472. The panel used to
-    /// open at FY2012 and could not see this at all.
+    /// Across all fifteen years no comparable Ohio district has an enrolment between the largest
+    /// Kelleys Island year and the smallest year any other district reaches. [`MIN_ENROLMENT`]
+    /// sits inside that empty band, so it excludes one district in every year and nothing else in
+    /// any year — which is what makes the corrected series a reading of the data and not of the
+    /// threshold.
+    #[test]
+    fn the_enrolment_floor_sits_in_an_empty_band() {
+        let (mut below, mut above) = (f64::MIN, f64::MAX);
+        for row in panel()
+            .iter()
+            .filter(|r| r.comparable && r.enrollment > 0.0)
+        {
+            if row.enrollment < MIN_ENROLMENT {
+                below = below.max(row.enrollment);
+            } else {
+                above = above.min(row.enrollment);
+            }
+        }
+        assert!(
+            below <= 18.0 && above >= 63.0,
+            "the band around the floor runs {below} to {above}, and it was 18 to 63"
+        );
+        assert!(
+            MIN_ENROLMENT - below >= 20.0 && above - MIN_ENROLMENT >= 20.0,
+            "the floor of {MIN_ENROLMENT} is no longer clear of both sides: {below} and {above}"
+        );
+    }
+
+    /// **What the three added archives found: during ARRA the state closed less of the local gap
+    /// than in any year of the FY2012-FY2024 band, and the federal government closed more.**
+    ///
+    /// FY2010 and FY2011 sit at 0.386 and 0.375, under the band's 0.400 floor, while federal
+    /// gap-closing roughly doubles to 0.133 and 0.142. FY2009, before the money arrived, is
+    /// 0.504 — the highest state share in the panel. The panel used to open at FY2012 and could
+    /// not see this at all.
+    ///
+    /// The levels here moved when [`MIN_ENROLMENT`] was applied: these three are years Kelleys
+    /// Island was comparable, and they read 0.472, 0.349 and 0.330 before it. The finding is what
+    /// survived — the ARRA years are still the low ones and FY2009 is still the high one — and
+    /// the margin got thinner, which is why the assertions below are stated against the band's
+    /// own floor rather than against a round number.
     ///
     /// Read with care about direction. This is a share of a gap, not a dollar amount, and the gap
     /// itself moves; the state can close a smaller fraction while spending more. What it does
@@ -708,11 +812,16 @@ mod tests {
     #[test]
     fn the_stimulus_years_are_the_only_ones_where_the_state_closes_a_third() {
         let by_year = equalization_by_year();
+        let band_floor = by_year
+            .iter()
+            .filter(|(y, _)| (2012..=2024).contains(*y))
+            .map(|(_, e)| e.state_share())
+            .fold(f64::MAX, f64::min);
         for year in [2010u16, 2011] {
             let e = by_year[&year];
             assert!(
-                e.state_share() < 0.36,
-                "FY{year} state share is {:.3}, not the third the archives show",
+                e.state_share() < band_floor,
+                "FY{year} closes {:.4}, which is not below the band's floor of {band_floor:.4}",
                 e.state_share()
             );
             assert!(

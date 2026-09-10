@@ -20,17 +20,18 @@
  * 1. **The state share fell and the local share rose.** State revenue went from roughly 46% of
  *    school revenue to roughly 34% across the panel. That is the H.B. 920 story arriving from
  *    outside Ohio's own accounting.
- * 2. **The rate held while the gap grew — and then it stopped holding.** State aid closed a
- *    stable share of the distance between the poorest and richest quartiles of districts from
- *    FY2012 to FY2022, between 40% and 47%, while that distance itself grew by two thirds. In
- *    FY2023 and FY2024 the share is 37% in both years, below every year since FY2011, while the
- *    gap is 16% and 21% wider than FY2022's. A page showing only the percentage would have
- *    reported the first decade as stability, which is why the residual is drawn in dollars — and
- *    the residual is what moves most: it rises 46% across the two new years.
+ * 2. **The rate held while the gap grew.** State aid closed a stable share of the distance
+ *    between the poorest and richest quartiles of districts — between 40% and 49% in every year
+ *    from FY2012 to FY2024 — while that distance itself grew by 84%. A page showing only the
+ *    percentage would report thirteen years of stability, which is why the residual is drawn in
+ *    dollars: it is what a district experiences and it grows with the gap.
  *
- * The prose beside the chart is computed from the endpoints rather than written, so it says
- * "held" or "moved" according to what the panel does. It said "held" until the panel reached
- * FY2023.
+ * FY2023 and FY2024 read as a break in this series until the measure took an enrolment floor.
+ * They were a five-pupil island district entering the survey's comparable population; see
+ * `dispersion::ohio_panel::MIN_ENROLMENT` and `doctrine/equity`'s revisions.
+ *
+ * The prose beside the chart is computed rather than written, so it says "held" or "moved"
+ * according to what the panel does.
  *
  * Both endpoints flatter the federal column: FY2009-FY2011 carry the ARRA tail and FY2022-FY2023
  * carry ESSER, so the federal contribution is roughly double its ordinary size at each end. The
@@ -39,7 +40,7 @@
  *
  * # Real dollars are not optional here
  *
- * CPI-U rose 45% across this panel. A gap growing from $5,674 to $11,586 per pupil in nominal
+ * CPI-U rose 45% across this panel. A gap growing from $5,364 to $10,527 per pupil in nominal
  * terms is a different claim from the same gap in constant dollars, and only one of them is the
  * finding. The dollar series is therefore shown on both bases, through the same {@link Basis}
  * toggle every other financial view uses, and a year the index cannot cover is dropped rather
@@ -53,6 +54,16 @@ import { renderToString } from "./plot/ssr.ts";
 import { convert, type Basis } from "./real.ts";
 import type { Bundle, Deflator, HistoryYear } from "./types.ts";
 import { yearChip } from "./year.ts";
+
+/**
+ * The first year of the band the "held or moved" sentence is computed over.
+ *
+ * Not the panel's own first year. FY2009-FY2011 are the ARRA years, where federal money displaced
+ * state gap-closing and the state share of the gap sits at its lowest in the series — a verdict
+ * that included them would be reading the stimulus arriving and leaving rather than the formula.
+ * The corpus states the band from here for the same reason; see `doctrine/equity`.
+ */
+const BAND_FROM = 2012;
 import { anchor } from "./section.ts";
 
 /** What neither level of government closes — the part a district actually experiences. */
@@ -239,8 +250,24 @@ export function renderEqualization(
   { label: `Gap in local revenue per pupil between the poorest and richest quarter of districts, and the part neither state nor federal aid closes, FY${first.fiscal_year} to FY${last.fiscal_year}, ${basis === "real" && base != null ? `in FY${base} dollars` : "in the dollars of each year"}`, description: "The axis is truncated to the range of the two series rather than starting at zero, and the line breaks at any year the panel skips" },
   );
 
-  const rateHeld =
-    Math.abs(stateShareOfGap(last) - stateShareOfGap(first)) < 0.06 ? "held" : "moved";
+  /*
+   * "Held" is the band, not the endpoints.
+   *
+   * This compared the panel's first year to its last and called a move anything over six points.
+   * Two things were wrong with it. The panel opens in FY2009-FY2011, where federal money displaced
+   * state gap-closing and the state share is at its lowest — so an endpoint comparison measures
+   * the stimulus arriving and leaving rather than the formula. And it was a binary sitting half a
+   * point from its own threshold, which would have flipped the sentence on a fixture revision that
+   * changed nothing about Ohio.
+   *
+   * The finding is a band across FY2012 onward. This is that band's whole spread, against a bar
+   * wide enough to admit the year-to-year variation the series has always had and narrow enough
+   * to fail if the rate ever starts trending.
+   */
+  const banded = history.filter((y) => y.fiscal_year >= BAND_FROM);
+  const band = banded.map(stateShareOfGap);
+  const bandFirst = Math.min(...banded.map((y) => y.fiscal_year));
+  const rateHeld = Math.max(...band) - Math.min(...band) < 0.1 ? "held" : "moved";
 
   return `
     <div class="card" data-part="equity-gap">
@@ -252,10 +279,10 @@ export function renderEqualization(
 
       <div class="scroll">${chart}</div>
 
-      <p class="note">State aid's share of the gap ${rateHeld} — ${pct(stateShareOfGap(first), 0)}
-        in FY${first.fiscal_year} against ${pct(stateShareOfGap(last), 0)} in
-        FY${last.fiscal_year} — while the gap itself grew from ${money(first.gap_per_pupil)} to
-        ${money(last.gap_per_pupil)}. ${
+      <p class="note">State aid's share of the gap ${rateHeld} — ${pct(Math.min(...band), 0)} to
+        ${pct(Math.max(...band), 0)} in every year from FY${bandFirst} — while the gap itself grew
+        from
+        ${money(first.gap_per_pupil)} to ${money(last.gap_per_pupil)}. ${
           rateHeld === "held"
             ? `A formula doing the same proportional job against a larger problem leaves districts
         further apart every year, and the percentage is the thing that looks stable.`

@@ -8,7 +8,15 @@ publish.workspace = true
 description = "Difference two funding regimes at component level, with the residual the decomposition does not explain"
 
 [dependencies]
+# Table SD-1's valuation series and the survey panel, which `reappraisal_incidence` joins. Both
+# are `dispersion`'s fixtures and this crate reached them through `project` before it needed them
+# by name.
+dispersion = { path = "../dispersion" }
 edfund-core = { path = "../edfund-core" }
+# For `reappraisal_incidence`, which needs the twenty-mill floor to say whether a reappraisal
+# reaches a district's revenue at all. The floor is a statutory number and this crate should not
+# carry a second copy of it.
+millage = { path = "../millage" }
 project = { path = "../project" }
 
 [lints]

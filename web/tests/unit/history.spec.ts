@@ -88,25 +88,50 @@ test("the gap grew across the whole panel, and the residual grew with it", () =>
   expect(residual(last)).toBeGreaterThan(residual(first));
 });
 
-test("the rate held through FY2022 and does not hold after it", () => {
-  // The other half, which stopped being true when the panel reached FY2023 from the Bureau's own
-  // file. The card's prose is computed rather than written — it reads "held" or "moved" off these
-  // same numbers — so this test is what keeps the two from drifting apart.
-  const held = history.filter((y) => y.fiscal_year >= 2012 && y.fiscal_year <= 2022);
-  for (const year of held) {
-    expect(stateShareOfGap(year)).toBeGreaterThan(0.38);
-    expect(stateShareOfGap(year)).toBeLessThan(0.49);
+test("the rate holds across every year from FY2012, which is the finding the card computes", () => {
+  // The other half of the card's claim. Its prose is computed rather than written — it reads
+  // "held" or "moved" off these same numbers — so this test is what keeps the two from drifting.
+  //
+  // It used to assert the opposite after FY2022: that FY2023 and FY2024 both fell below 0.38 and
+  // broke the band. They did, in the fixture as it stood, and the break was one five-pupil
+  // district entering the survey's comparable population. See `MIN_ENROLMENT` in
+  // `dispersion::ohio_panel`, and `doctrine/equity`'s revisions.
+  const band = history
+    .filter((y) => y.fiscal_year >= 2012)
+    .map((y) => y.state_closes_per_pupil / y.gap_per_pupil);
+  expect(band).toHaveLength(12);
+  for (const share of band) {
+    expect(share).toBeGreaterThan(0.39);
+    expect(share).toBeLessThan(0.5);
   }
-  const after = history.filter((y) => y.fiscal_year >= 2023);
-  expect(after).toHaveLength(2);
-  for (const year of after) {
-    expect(stateShareOfGap(year)).toBeLessThan(0.38);
+  // The spread is what the card's binary reads, and it has to stay clear of the bar in the
+  // direction that would flip the sentence.
+  expect(Math.max(...band) - Math.min(...band)).toBeLessThan(0.1);
+
+  // The ARRA years sit below the band, which is why the window opens at FY2012 rather than at the
+  // panel's own first year — and why the card no longer compares endpoints.
+  const stimulus = history
+    .filter((y) => y.fiscal_year === 2010 || y.fiscal_year === 2011)
+    .map((y) => y.state_closes_per_pupil / y.gap_per_pupil);
+  expect(stimulus).toHaveLength(2);
+  for (const share of stimulus) {
+    expect(share).toBeLessThan(Math.min(...band));
   }
-  // And the endpoint comparison the card renders from is now outside the band it used to sit in,
-  // which is what flips the sentence from "held" to "moved".
-  const first = history[0]!;
-  const last = history[history.length - 1]!;
-  expect(Math.abs(stateShareOfGap(last) - stateShareOfGap(first))).toBeGreaterThan(0.06);
+});
+
+test("no district carries a per-pupil ratio the quartile means cannot survive", () => {
+  // The defect the enrolment floor exists for, asserted on the shipped feed rather than on the
+  // crate: a district with five pupils put $214,400 of local revenue per pupil into a quartile
+  // mean of 152 and moved the published series by seven points.
+  //
+  // The feed carries quartile aggregates and not the districts behind them, so what is checkable
+  // here is the consequence: no year's richest-quartile mean may sit far enough above its own
+  // poorest to be one district's doing.
+  for (const year of history) {
+    const gap = year.gap_per_pupil;
+    expect(gap).toBeGreaterThan(0);
+    expect(year.richest_local_per_pupil / year.poorest_local_per_pupil).toBeLessThan(4);
+  }
 });
 
 test("a real-terms year is deflated on every dollar column or dropped entirely", () => {

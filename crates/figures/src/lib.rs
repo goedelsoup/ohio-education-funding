@@ -170,6 +170,17 @@ pub struct Inputs {
     pub profile: Vec<dispersion::profile::ProfileDistrict>,
     /// Table SD-1, every district and every tax year the abstract carries.
     pub sd1: Vec<dispersion::sd1::TaxRow>,
+    /// The quartile equalization measure for every year of the survey panel.
+    ///
+    /// Read for the band's two ends and for FY2024. Held here rather than recomputed per figure
+    /// because each call walks fifteen years of the panel.
+    pub equalization: BTreeMap<u16, dispersion::ohio_panel::Equalization>,
+    /// Ohio's districts quartiled on local revenue per pupil in FY2022, with the share of each
+    /// quartile at the twenty-mill floor and what its local revenue did through FY2024.
+    pub incidence: [regime_diff::reappraisal_incidence::Quartile; 4],
+    /// The FY2024 quartile gap as observed and with every district on its own quiet-year rate —
+    /// the reappraisals removed and the trend kept.
+    pub reappraisal: regime_diff::reappraisal_incidence::Counterfactual,
     /// The 2024-25 report card, joined to the profile report by IRN — 606 districts on both, the
     /// report card rating 607 and the profile report covering 606.
     pub outcomes: Vec<(
@@ -325,6 +336,9 @@ impl Inputs {
             recognized_total,
             // Computed once here rather than per figure: each of the three walks the whole
             // ten-year panel and deflates it, and fourteen figures below read them.
+            equalization: dispersion::ohio_panel::equalization_by_year(),
+            incidence: regime_diff::reappraisal_incidence::by_wealth(),
+            reappraisal: regime_diff::reappraisal_incidence::gap(2024),
             trough: dispersion::ohio_panel::trough::contraction(),
             predictors: dispersion::ohio_panel::trough::predictors(),
             decile: dispersion::ohio_panel::trough::deepest_decile(),
@@ -1596,6 +1610,98 @@ pub static FIGURES: &[Figure] = &[
         pinned: 13_932.0,
         tolerance: 1.0,
         compute: |i| i.quartiles[3].local_per_pupil,
+    },
+    Figure {
+        key: "dispersion/island-local-revenue-per-pupil",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Kelleys Island Local SD's local revenue per pupil, FY2023 — four times the next \
+                district in Ohio, and the whole of the break the corpus recorded at FY2023",
+        pinned: 214_400.0,
+        tolerance: 50.0,
+        compute: |_| {
+            dispersion::ohio_panel::panel()
+                .iter()
+                .find(|r| r.irn == "046797" && r.fiscal_year == 2023)
+                .map_or(f64::NAN, |r| r.local_revenue / r.enrollment)
+        },
+    },
+    Figure {
+        key: "dispersion/equalization-band-narrowest",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The least of the local gap the state closes in any year from FY2012 to FY2024",
+        pinned: 0.4002,
+        tolerance: 0.0005,
+        compute: |i| band(i).0,
+    },
+    Figure {
+        key: "dispersion/equalization-band-widest",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "And the most, in the same thirteen years — the band the series does not leave",
+        pinned: 0.4884,
+        tolerance: 0.0005,
+        compute: |i| band(i).1,
+    },
+    Figure {
+        key: "dispersion/state-share-of-the-local-gap-fy2024",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The share of the local gap state aid closes in FY2024, the last year the survey \
+                reaches",
+        pinned: 0.4390,
+        tolerance: 0.0005,
+        compute: |i| i.equalization[&2024].state_share(),
+    },
+    Figure {
+        key: "regime-diff/poorest-quartile-at-the-millage-floor",
+        owner: "crates/regime-diff",
+        unit: Unit::Share,
+        label: "The poorest quartile of Ohio districts sitting at the twenty-mill floor, TY2023, \
+                where a reappraisal reaches revenue",
+        // Not 0.4605: written as 46.1% that sits exactly on the corpus's rounding tolerance and
+        // the phrase check fails on the last bit of the float.
+        pinned: 0.46053,
+        tolerance: 0.0005,
+        compute: |i| i.incidence[0].at_the_floor,
+    },
+    Figure {
+        key: "regime-diff/richest-quartile-at-the-millage-floor",
+        owner: "crates/regime-diff",
+        unit: Unit::Share,
+        label: "And the richest quartile, which is where the corpus placed the reappraisal effect",
+        pinned: 0.1250,
+        tolerance: 0.0005,
+        compute: |i| i.incidence[3].at_the_floor,
+    },
+    Figure {
+        key: "regime-diff/poorest-quartile-local-revenue-growth",
+        owner: "crates/regime-diff",
+        unit: Unit::Share,
+        label: "Median growth in local revenue per pupil, poorest quartile, FY2022 to FY2024",
+        pinned: 0.2251,
+        tolerance: 0.0005,
+        compute: |i| i.incidence[0].local_growth,
+    },
+    Figure {
+        key: "regime-diff/richest-quartile-local-revenue-growth",
+        owner: "crates/regime-diff",
+        unit: Unit::Share,
+        label: "The same for the richest quartile, at half the rate",
+        pinned: 0.1129,
+        tolerance: 0.0005,
+        compute: |i| i.incidence[3].local_growth,
+    },
+    Figure {
+        key: "regime-diff/reappraisal-held-the-gap-down-by",
+        owner: "crates/regime-diff",
+        unit: Unit::Dollars,
+        label: "How much wider the FY2024 quartile gap would be with the reappraisals removed and \
+                every district left on its own quiet-year rate",
+        pinned: 212.0,
+        tolerance: 5.0,
+        compute: |i| -i.reappraisal.attributable(),
     },
     Figure {
         key: "dispersion/local-revenue-gap-per-pupil",
@@ -5877,3 +5983,21 @@ pub static FIGURES: &[Figure] = &[
         compute: |_| hb643().priced().len() as f64,
     },
 ];
+
+/// The narrowest and widest share of the local gap state aid closes across FY2012-FY2024.
+///
+/// The window opens at FY2012 because FY2010 and FY2011 are ARRA years and sit below it, and it
+/// closes at FY2024 because that is where the survey stops. It used to close at FY2022: see
+/// `dispersion::ohio_panel::MIN_ENROLMENT` for why the two years after it read as a break.
+fn band(i: &Inputs) -> (f64, f64) {
+    let shares: Vec<f64> = i
+        .equalization
+        .iter()
+        .filter(|(year, _)| (2012..=2024).contains(*year))
+        .map(|(_, e)| e.state_share())
+        .collect();
+    (
+        shares.iter().copied().fold(f64::MAX, f64::min),
+        shares.iter().copied().fold(f64::MIN, f64::max),
+    )
+}

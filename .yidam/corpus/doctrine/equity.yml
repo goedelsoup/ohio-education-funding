@@ -140,43 +140,89 @@ findings: |
       2016       $6,768           44.0%       6.5%      $3,352
       2017       $7,041           45.8%       5.8%      $3,408
       2018       $7,558           46.5%       5.1%      $3,661
-      2019       $8,444           44.3%       4.7%      $4,305
-      2020       $9,262           43.8%       5.0%      $4,744
-      2021       $9,384           41.1%       5.3%      $5,031
+      2019       $7,784           48.8%       5.2%      $3,576
+      2020       $8,572           48.3%       5.7%      $3,939
+      2021       $8,808           44.6%       5.9%      $4,360
       2022       $9,590           46.4%       9.5%      $4,229
-      2023      $11,139           37.2%       8.2%      $6,082
-      2024      $11,586           37.2%       9.4%      $6,185
+      2023       $9,810           44.9%       9.7%      $4,457
+      2024      $10,527           43.9%      10.8%      $4,772
 
-  **Through FY2022 the state's share of the gap it closes does not move**: 42.4% at the start,
-  46.4% at FY2022, and never outside 40.0-46.5% in between. There is no trend inside that window,
-  and the absence of one was the finding rather than a null result.
+  **The state's share of the gap it closes does not move**: 42.4% at the start, 43.9% at the end,
+  and never outside 40.0% to 48.8% in any of the thirteen years. There is no trend inside that
+  window, and the absence of one is the finding rather than a null result.
 
-  **The gap grows by two thirds across it** — $5,727 to $9,590 per pupil — so a constant rate
-  leaves a growing remainder. **The residual, what neither level closes, grows 56%** to $4,229 per
-  pupil.
+  **The gap grows by 84% across it** — $5,727 to $10,527 per pupil — so a constant rate leaves a
+  growing remainder. **The residual, what neither level closes, grows 76%** to $4,772 per pupil.
 
-  ### And in the two years the panel could not see, the rate stops holding
+  ### What looked like a break in the last two years was one district
 
-  [verified — `dispersion::ohio_panel::equalization_by_year`, pinned by test]
+  Until this revision the section here recorded that the band stopped holding — FY2023 and FY2024
+  both closing 37.2% of a gap 16% and 21% wider than FY2022's, the residual up 46% in two years,
+  and the cause open between Ohio's reappraisals and the phase-in. Every one of those numbers was
+  **Kelleys Island Local SD**.
 
-  FY2023 and FY2024 are the first years of this series taken from the Bureau's own file rather
-  than NCES's, which stops at FY2022. They break the band in both directions at once: **the state
-  closes 37.2% of the gap in both years** — below every year since FY2011 — while **the gap is 16%
-  and 21% wider than FY2022's**. State gap-closing per pupil is *lower* in both than in FY2022,
-  $4,147 and $4,311 against $4,448, so the two movements compound rather than offset. **The
-  residual rises 46% in two years**, from $4,229 to $6,185 per pupil, the largest two-year move in
-  the series. [verified]
+  It is a district on an island in Lake Erie that teaches between one and eighteen children against
+  a tax base of resort property, and its local revenue is **$214,400 per pupil in FY2023** — four
+  times the next district in the state and ten times the tenth. In a quartile of 152 that single
+  row adds $1,410 to the richest quartile's mean.
+  [verified — `dispersion::ohio_panel`, pinned by test]
 
-  37.2% is not an unprecedented level. It is the level of FY2010 and FY2011, the ARRA years, which
-  is why the band above is stated from FY2012. What is unprecedented is reaching it while the gap
-  is at its widest: in FY2011 a 33.0% rate sat against a $6,142 gap, and in FY2024 a 37.2% rate
-  sits against one nearly twice that. [verified]
+  It is not in the survey's comparable population every year. `comparable` is the Bureau's own
+  flag — `AGCHRT != 1` and `SCHLEV == 03` — and it moves as the agency is coded, so the district
+  is out in FY2012, FY2013, FY2018 and **FY2022** and in for FY2023 and FY2024. The population
+  changed in exactly the year the break appears, and the break was the population changing.
+  [verified]
 
-  **Why is not established here.** Ohio's triennial property reappraisals landed across FY2023 and
-  would raise local revenue in the richest quartile mechanically — widening the gap with nothing
-  about state aid having changed — and the Fair School Funding Plan's own phase-in moves state aid
-  over the same years. Separating the two needs the valuation series beside this one, and two
-  observations cannot do it. The measurement is the claim; the cause is [open]
+  The measure now takes a floor of forty pupils before it forms a per-pupil ratio. Forty is read
+  off the data rather than chosen to fit it: across all fifteen years no comparable Ohio district
+  has an enrolment between 18 and 63, so any number inside that empty band removes this district
+  in every year and nothing else in any year. Its dollars remain in every aggregate; what it
+  cannot carry is a denominator of five.
+  [verified — `dispersion::ohio_panel::MIN_ENROLMENT`, pinned by test]
+
+  With the floor, FY2023 and FY2024 close 44.9% and 43.9% — inside the band, which now runs the
+  whole thirteen years to FY2024 rather than stopping at FY2022. The gap grows 9.8% across the two
+  years against 5.3% a year over the decade before them, so it is on trend rather than off it.
+  [verified]
+
+  ### The reappraisals did not widen the gap, and could not have
+
+  The cause this node held open was between Ohio's FY2023 property reappraisals and the Fair
+  School Funding Plan's phase-in, and it recorded that separating them "needs the valuation series
+  beside this one, and two observations cannot do it." There are four observations, and they are
+  staggered.
+
+  Ohio's 88 counties revalue on a published cycle and Table SD-1 carries TY2021 through TY2024, so
+  every district has one event year and two quiet ones. The arms separate without a threshold:
+  median class-I valuation growth in a cohort's own event year is **+21.6%, +35.7% and +32.0%**
+  against **+0.65% to +0.91%** in its quiet years.
+  [verified — crates/regime-diff, `reappraisal_incidence`, pinned by test]
+
+  **The premise fails before the measurement does.** A reappraisal raises a district's revenue only
+  where H.B. 920's reduction factors have stopped operating, which is the twenty-mill floor of
+  R.C. 319.301(E)(2) — and the floor is where the poor districts are. **46.1% of the poorest
+  quartile sits at it against 12.5% of the richest**, falling monotonically across the four. Where
+  a reappraisal reaches revenue at all it reaches the bottom of the distribution hardest, so the
+  mechanism proposed for widening the gap is one that narrows it.
+  [verified — crates/regime-diff, `reappraisal_incidence::by_wealth`, pinned by test]
+
+  The arithmetic agrees. Local revenue per pupil grew **22.5% in the poorest quartile and 11.3% in
+  the richest** across FY2022-FY2024. Putting every district on its own quiet-year rate — removing
+  the events and keeping the trend — moves the FY2023 gap by **+$26** and the FY2024 gap by
+  **−$212**. Reappraisal explains none of a $937 widening, and in the second year it was holding
+  the gap down.
+  [verified — crates/regime-diff, `reappraisal_incidence::gap`, pinned by test]
+
+  Two cautions on the second number. Taxes charged for a tax year are collected across two fiscal
+  years, so the counterfactual charges an event wholly to the first and overstates what it removes
+  — and it still comes out the wrong sign for the hypothesis, which is why the direction is the
+  claim and the magnitude is not. And the panel ends at FY2024, so the 181 districts whose counties
+  revalued in TY2024 contribute two quiet revenue years: they are the control arm, not a hole.
+  [verified]
+
+  What the phase-in did over the same years is a separate question and this does not answer it. It
+  no longer has a break to explain, so what remains is whether state aid's *level* moved with the
+  phase-in in a way the share of a widening gap conceals. [open]
 
   Ohio's formula is doing the same proportional job against a larger problem. Both readings that
   were available before this run are wrong: equalization has not decayed, and it has not held.
@@ -224,6 +270,49 @@ findings: |
   learning. Whether that is the funding system compensating, or a growth measure normed in a way
   that removes level differences by construction, cannot be told from one cross-section. [open]
 revisions:
+  - was: |
+      "**The state closes 37.2% of the gap in both years** — below every year since FY2011 — while
+      **the gap is 16% and 21% wider than FY2022's**… **The residual rises 46% in two years**, from
+      $4,229 to $6,185 per pupil, the largest two-year move in the series." And, of the cause:
+      "Ohio's triennial property reappraisals landed across FY2023 and would raise local revenue in
+      the richest quartile mechanically… Separating the two needs the valuation series beside this
+      one, and two observations cannot do it."
+    now: |
+      **Withdrawn.** There was no break. FY2023 and FY2024 close 44.9% and 43.9%, inside the band,
+      and the gap is $9,810 and $10,527 rather than $11,139 and $11,586. The whole of the recorded
+      movement was Kelleys Island Local SD — five pupils, $214,400 of local revenue per pupil —
+      entering the survey's comparable population in FY2023 after being outside it in FY2022.
+    found_by: |
+      Asking the open question. Separating the reappraisal from the phase-in needed the valuation
+      series, which Table SD-1 holds for four tax years, and the reappraisal calendar, which
+      `regime_diff::recognized_valuation::CYCLE` already carried — and reproducing
+      `equalization_by_year` in order to decompose it put a single district at $214,400 per pupil
+      at the top of the FY2023 distribution, four times the next one.
+    reach: |
+      **No pinned figure in this node changes**: every one of them is FY2022, and the district was
+      not comparable that year — which is the same fact that produced the artefact. Nine of the
+      fifteen years in the series move, FY2019 through FY2021 among them, so the band widens from
+      40.0-46.5% to 40.0-48.8% and the ARRA finding in
+      `dispersion::ohio_panel` is restated against the band's own floor rather than against a third.
+      `dispersion::ohio_panel::MIN_ENROLMENT` is the correction and it is asserted, not assumed:
+      the empty enrolment band it sits in is a test.
+  - was: |
+      "Ohio's triennial property reappraisals… would raise local revenue in the richest quartile
+      mechanically — widening the gap with nothing about state aid having changed."
+    now: |
+      The mechanism runs the other way. A reappraisal reaches revenue only at the twenty-mill
+      floor, where H.B. 920's reduction factors have stopped, and 46.1% of the poorest quartile
+      sits there against 12.5% of the richest. Removing the reappraisals moves the FY2024 gap
+      **up** by $212.
+    found_by: |
+      `regime_diff::reappraisal_incidence`, which joins Table SD-1's four tax years to the county
+      reappraisal calendar and the twenty-mill floor. The identification is Ohio's own staggered
+      cycle: a cohort's event year moves class-I value 24 to 55 times as much as its quiet years.
+    reach: |
+      It does not touch the measurement, only the cause the node offered for it — and the cause is
+      no longer needed, because the movement it was offered to explain was an artefact. The finding
+      stands on its own: this is what a reappraisal does to Ohio's distribution whether or not
+      anything else moved.
   - was: |
       "**The state's share of the gap it closes does not move**: 42.4% at the start, 46.4% at the
       end, and never outside 40.0-46.5% in between. There is no trend, and the absence of one is
@@ -371,6 +460,42 @@ figures:
     value: 4229.04
     field: findings
     as_written: "**$4,229 per pupil of the gap survives both.**"
+  - key: dispersion/state-share-of-the-local-gap-fy2024
+    value: 0.439
+    field: findings
+    as_written: "42.4% at the start, 43.9% at the end"
+  - key: dispersion/equalization-band-narrowest
+    value: 0.4002
+    field: findings
+    as_written: "never outside 40.0% to 48.8% in any of the thirteen years"
+  - key: dispersion/equalization-band-widest
+    value: 0.4884
+    field: findings
+    as_written: "never outside 40.0% to 48.8% in any of the thirteen years"
+  - key: dispersion/island-local-revenue-per-pupil
+    value: 214400.0
+    field: findings
+    as_written: "its local revenue is **$214,400 per pupil in\n  FY2023**"
+  - key: regime-diff/poorest-quartile-at-the-millage-floor
+    value: 0.46053
+    field: findings
+    as_written: "**46.1% of the poorest\n  quartile sits at it against 12.5% of the richest**"
+  - key: regime-diff/richest-quartile-at-the-millage-floor
+    value: 0.125
+    field: findings
+    as_written: "**46.1% of the poorest\n  quartile sits at it against 12.5% of the richest**"
+  - key: regime-diff/poorest-quartile-local-revenue-growth
+    value: 0.2251
+    field: findings
+    as_written: "**22.5% in the poorest quartile and 11.3% in\n  the richest**"
+  - key: regime-diff/richest-quartile-local-revenue-growth
+    value: 0.1129
+    field: findings
+    as_written: "**22.5% in the poorest quartile and 11.3% in\n  the richest**"
+  - key: regime-diff/reappraisal-held-the-gap-down-by
+    value: 212.0
+    field: findings
+    as_written: "the FY2024 gap by\n  **\u2212$212**"
 links:
   - target: ../doctrine.ont.yml
     relationship: instance-of
