@@ -60,6 +60,7 @@ pub mod act;
 pub mod cli;
 pub mod crosswalk;
 pub mod drafts;
+pub mod esser;
 pub mod finances;
 pub mod greenbook;
 pub mod joint_vocational;

@@ -101,10 +101,11 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * SD-1's two taxes-charged columns turned out to be a joint vocational membership list, which
  * disconfirmed the term the twenty-mill floor's anomaly had been attributed to — and 517/64 when
  * `education-agency/eastland-fairfield-ctc` became the sixty-fourth carrier, three of its four
- * unpopulated fields having been committed the whole time.
+ * unpopulated fields having been committed the whole time — and 523/64 when the relief cliff was
+ * read against the fund the five-year forecasts actually report, and left no trace in it.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "517 bindings; raise this when you add one").toBeGreaterThanOrEqual(517);
+  expect(bindings.length, "523 bindings; raise this when you add one").toBeGreaterThanOrEqual(523);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "64 nodes carry bindings; raise this when a sixty-fifth does",
