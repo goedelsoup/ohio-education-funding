@@ -83,8 +83,17 @@ properties:
     disabilities; and permission to administer state assessments on paper.
   accountability_effect: |
     Changed the application periods for the Jon Peterson Special Needs and income-based EdChoice
-    scholarship programmes, and carried College Credit Plus provisions. Not assessed against
-    `accountability-regime` here. [open]
+    scholarship programmes, and carried College Credit Plus provisions.
+
+    On the funding side it carried both of H.B. 64's report-card bonuses into FY2018-19 unchanged,
+    and it is the act whose analysis sets the community and STEM school version beside the district
+    one and names the difference: the charter payment is *"identical to the calculation of the
+    payment for traditional districts except that it does not use the state share index."*
+    [verified — crates/project, `rating_payments`, pinned by test]
+
+    That sentence is why the un-equalised form is identifiable at all, and it is the form that
+    outlived the equalised one — H.B. 166 froze districts and kept recalculating the charter
+    bonuses. See [Ohio report card](../accountability-regime/ohio-report-card.yml).
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of

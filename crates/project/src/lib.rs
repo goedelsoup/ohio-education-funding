@@ -69,6 +69,7 @@ pub mod legislative_district;
 pub mod outcomes;
 pub mod panel;
 pub mod policy;
+pub mod rating_payments;
 pub mod report;
 pub mod scholarship;
 pub mod series;

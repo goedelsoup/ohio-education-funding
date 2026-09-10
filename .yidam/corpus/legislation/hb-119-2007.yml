@@ -96,7 +96,25 @@ properties:
   accountability_effect: |
     Closing the Achievement Gap pays on the academic watch and academic emergency building counts,
     which makes it one of the earliest points where Ohio's accountability ratings determine a
-    funding amount. Not assessed against `accountability-regime` here. [open]
+    funding amount — the first inside the formula, and the mechanism was never recorded.
+
+    Closing the Achievement Gap paid
+    `0.0015 × formula amount × poverty index × academic distress index × formula ADM`, where the
+    academic distress index is the share of a district's buildings in academic watch or emergency
+    over the state's share. A district qualified only with **both** that index and its poverty
+    index at 1.0 or above, and **31 districts** did; statewide 447 of 3,867 buildings
+    (11.6%) carried one of the two ratings on the 2005-06 report card.
+    [verified — crates/project, `rating_payments`, pinned by test]
+
+    **It paid on failure, and in its second year it also paid on improvement.** A district that
+    qualified in FY2008 and lowered its academic distress percentage received its FY2008 subsidy
+    times 1.035; one that did not improve received the same amount flat; a district newly
+    qualifying got the formula. So the same programme rewarded being rated badly and getting
+    better, which no later Ohio coupling has done. [verified]
+
+    The rate is 0.15 per cent of the formula amount. The bonuses H.B. 64 introduced eight years
+    later paid seven and a half per cent — fifty times as much — and in the opposite direction. See
+    [Ohio report card](../accountability-regime/ohio-report-card.yml).
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of
@@ -115,3 +133,12 @@ links:
       FY2008-09, the decade's peak in both real foundation aid and its share of the department's budget.
   - target: ../../catalog/lsc-dew-redbook.md
     relationship: sourced-from
+figures:
+  - key: project/closing-the-achievement-gap-districts
+    value: 31.0
+    field: accountability_effect
+    as_written: "**31 districts** did"
+  - key: project/closing-the-achievement-gap-rate
+    value: 0.15
+    field: accountability_effect
+    as_written: "The rate is 0.15 per cent of the formula amount"

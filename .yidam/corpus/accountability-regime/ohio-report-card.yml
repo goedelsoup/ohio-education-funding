@@ -109,7 +109,66 @@ findings: |
   star and 91 hold five. Nothing in the section requires the scale to be centred, only that it
   not collapse, and the corpus holds no year in which any component came close to collapsing.
 
+  ### What a rating has bought, and how often
+
+  Six budget acts each carried a property saying they were "not assessed against
+  `accountability-regime` here". Asked once instead of six times, the question is where an Ohio
+  rating has determined a funding amount — and the twelve committed LSC greenbooks cover every
+  biennium from FY2002 to FY2024.
+
+  **A rating has driven a formula payment in exactly two episodes.** The terms that occur only
+  where one does — *academic distress index*, *graduation bonus*, *third grade reading bonus*,
+  *performance bonus* — appear in four of the twelve greenbooks and no others: H.B. 119, H.B. 64,
+  H.B. 49, and H.B. 166, which mentions them only to say what its freeze did to them. **8 of the 12
+  bienniums carry none at all.** [verified — crates/project, `rating_payments::quiet`, pinned by
+  test]
+
+      FY2004-05   H.B.  95   earmarks to academic emergency districts     on failure   outside the formula
+      FY2006-07   H.B.  66   EdChoice eligibility on building ratings     on failure   deducted from the district
+      FY2008-09   H.B. 119   Closing the Achievement Gap                  on failure   0.15% of the formula amount
+      FY2016-19   H.B.  64   graduation and third grade reading bonuses   on success   7.5%, times the state share index
+      FY2020-21   H.B. 166   the same bonuses, community and STEM only    on success   7.5%, no state share index
+      FY2026-27   H.B.  96   performance supplement                       on success   $13 a pupil, flat
+
+  5 of the 6 are formula components; the first two rows reach a district's money without passing
+  through the formula at all. [verified]
+
+  **The direction reversed and then the equaliser went.** Closing the Achievement Gap paid more
+  where more buildings were rated badly, and only to districts whose poverty index was 1.0 or
+  above — thirty-one qualified. The bonuses paid more where results were better, at fifty times
+  the rate, and multiplied by the state share index, which makes a payment larger in a poorer
+  district. The supplement now in force pays on results and multiplies by nothing.
+  [verified — crates/project, `rating_payments`, pinned by test]
+
+  **The un-equalised form is the one that survived.** H.B. 166's freeze held every district and
+  JVSD at its FY2019 foundation aid, so a district's bonus stopped moving with its report card,
+  while requiring community and STEM schools' bonuses to be recalculated each year at a frozen
+  formula amount. That version had never used the state share index — LSC calls it *"identical to
+  the calculation of the payment for traditional districts except that it does not use the state
+  share index"* — so for two years the only Ohio schools whose funding moved with their own
+  results were charters and STEM schools, on the un-equalised calculation Ohio then readopted for
+  everyone. [verified]
+
+  What that costs is measured at
+  [performance supplement rate](../parameter/performance-supplement-rate.yml): per pupil the
+  present supplement runs 2.56 times higher in the least-poor fifth of districts than in the
+  poorest. [verified]
+
+  **Ohio built the measure long before it priced it.** The report card predates the first formula
+  coupling by years in both episodes, and H.B. 59 — the act that rebuilt the card as A-F — coupled
+  no dollar to it at all. [verified] Whether the couplings were designed against the composition
+  effect this node's own findings describe, or arrived at independently of it, is not established.
+  [open]
+
 figures:
+  - key: project/bienniums-coupling-no-dollar-to-a-rating
+    value: 8.0
+    field: findings
+    as_written: "**8 of the 12\n  bienniums carry none at all.**"
+  - key: project/rating-driven-formula-couplings
+    value: 5.0
+    field: findings
+    as_written: "5 of the 6 are formula components"
   - key: dispersion/achievement-maximum-2425
     value: 109.8
     field: findings

@@ -86,8 +86,21 @@ properties:
     state career-technical funding on career-technical programmes.
   accountability_effect: |
     Introduced the graduation and third-grade reading bonuses, which pay on report-card measures
-    and so join the funding and accountability systems at a point neither
-    `accountability-regime` nor the formula nodes currently record. [open]
+    and so join the funding and accountability systems.
+
+    `Graduation rate × 0.075 × formula amount × graduate count × state share index`, and the same
+    shape on third-grade reading proficiency. [verified — crates/project, `rating_payments`,
+    pinned by test]
+
+    **It is the reversal.** Ohio's only prior formula coupling, H.B. 119's Closing the Achievement
+    Gap, paid more to districts with more failing buildings and only to poor ones. This pays more
+    to districts with better results, at fifty times the rate, and the state share index makes the
+    payment larger in poorer districts rather than gating it on poverty. [verified]
+
+    The mechanism, its wealth gradient and its disappearance are at
+    [performance supplement rate](../parameter/performance-supplement-rate.yml); the chronology of
+    every rating-to-dollar coupling is at
+    [Ohio report card](../accountability-regime/ohio-report-card.yml).
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of
