@@ -22,6 +22,11 @@ deflator = { path = "../deflator" }
 # third parser of it. `foundation` dev-depends on this crate in turn, which Cargo allows
 # because neither dependency is a build one.
 foundation = { path = "../foundation" }
+# For `tests/what_fell_out_of_the_state_column.rs`, which checks the FY2016 finding against the
+# words LSC used for capacity aid. The greenbooks are `project`'s fixture and its reader is
+# `project`'s; the alternative was a fourth copy of the flattening. `project` depends on this
+# crate in turn, which Cargo allows because neither dependency is a build one.
+project = { path = "../project" }
 
 [lints]
 workspace = true
