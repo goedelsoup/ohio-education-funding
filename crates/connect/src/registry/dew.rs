@@ -75,11 +75,16 @@ pub(super) const FOUNDATION: Connector = Connector {
             filename: "fy26-calculator.xlsx",
             format: Format::Xlsx,
             catalog: Some("dew-fy26-funding-calculator"),
-            fixtures: &[crate::fixtures::TRANSPORT_RATES_FIXTURE],
+            fixtures: &[
+                crate::fixtures::TRANSPORT_RATES_FIXTURE,
+                crate::fixtures::FY26_FIXTURE,
+            ],
             note: "The FY2026 model, from the Internet Archive because the department serves \
-                   no copy. Read only for the statewide transportation factors; its \
-                   per-district tables are the FY2027 model's a year earlier and are not \
-                   committed.",
+                   no copy. Two fixtures: the statewide transportation factors, and sixteen \
+                   per-district columns that let the FY2027 model be read against it. The note \
+                   here said those tables restate FY2027's and are not committed; per-pupil \
+                   local capacity moves 9.3% between the two years and DPIA aid moves -8.6%, \
+                   so they do not.",
         },
         Source {
             key: "sfpr-line-by-line-fy21",

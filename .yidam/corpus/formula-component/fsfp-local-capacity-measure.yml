@@ -125,10 +125,54 @@ findings: |
   On the published inputs the residual is zero. **The 4.4% gap was not a finding about Ohio; it
   was the cost of not opening a sheet.** [verified]
 
-  Why the fortieth, out of 609, is not stated in the section. [open] And how far the value has
-  moved between biennia is still unmeasured here, because the corpus holds one year of the
-  calculator — but it is now a question about a distribution rather than about a decision.
-  [open]
+  Why the fortieth, out of 609, is not stated in the section. [open]
+
+  ### The decision is stable. The distribution is not.
+
+  That last question framed itself correctly and answered itself wrongly. The corpus holds
+  **two** years of the calculator — the department serves FY2027 and the Internet Archive has
+  FY2026 — and the catalog entry for the earlier one recorded a decision not to extract its
+  per-district tables, on the ground that they "are the FY2027 model's a year earlier and the
+  counts are very nearly identical". That was measured on bus miles and rider counts, which are
+  a survey a year apart and are stable. This column is not. [verified —
+  [`crates/project`](../../../crates/project/tests/the_two_clocks_the_plan_runs_on.rs)]
+
+  The decision — the fortieth-highest district's income ratio, `[C5]` — moves from **1.46670942
+  to 1.46503636**, a tenth of a per cent. The rate `[C6]` it caps moves 0.13% at the median. And
+  the per-pupil amount `[b1]` those two produce moves **$472.44**, which is 9.3% in one year.
+  [verified]
+
+  ### That is one half of a subtraction, and the other half is frozen
+
+  A district's state share of its base cost is `(base cost per pupil − capacity per pupil) /
+  base cost per pupil`. The capacity side reads the three most recent tax years and the window
+  rolls forward annually: FY2026's sheet heads them TY2024, TY2023 and TY2022, FY2027's heads
+  them TY2025, TY2024 and TY2023. The cost side does not roll. H.B. 96 retains FY2022 cost inputs
+  and maintains the FY2024 statewide averages through FY2027, so the median district's base cost
+  per pupil moves **$4.11** while its capacity moves $472.44. [verified]
+
+  The consequence is arithmetic:
+
+      median district's state share           FY2026  41.40%   FY2027  36.00%
+      the state's share of the aggregate      FY2026  35.35%   FY2027  31.52%
+      districts the 10% floor binds for       FY2026  105      FY2027  138
+
+  **The median district's state share falls 4.11 percentage points in one year, and it falls in
+  540 of 609 districts.** 33 districts that were on a computed share in FY2026 are on the floor in
+  FY2027. The 4.11 is the median of the per-district falls and the 5.40 between the two levels
+  above is the fall in the median district, which is a different statistic; both are reported
+  because quoting either alone invites the other reading. [verified]
+
+  And the fall is the capacity side alone. Pair FY2027's own base cost with FY2026's capacity and
+  the median state share comes back to **41.23%** — a sixth of a point from where FY2026 published
+  it. Freezing one side of a subtraction while the other tracks the property market is a reduction
+  in the state's share that requires no vote and appears in no act. [verified]
+
+  **What this does not say.** Not that state aid fell. FY2026 ran at an 83.33% phase-in and
+  FY2027 at 100%, so foundation funding rises across the same interval; what falls is the
+  fraction of a district's costed education that the state's formula assigns to the state.
+  Whether the General Assembly intends the two clocks to run at different speeds, or has ever
+  been shown this comparison, is not established by anything here. [open]
 
   ### The valuation is the lesser of two, and the rule is one-sided
 
@@ -273,6 +317,50 @@ properties:
   statutory_basis: R.C. 3317.017; state share and state share percentage at 3317.017(B) and (C). [verified]
   calculator: local-capacity
 figures:
+  - key: project/capacity-per-pupil-rise-fy2026-to-fy2027
+    value: 472.44069999999965
+    field: findings
+    as_written: "the per-pupil amount `[b1]` those two produce moves **$472.44**"
+  - key: project/base-cost-per-pupil-rise-fy2026-to-fy2027
+    value: 4.110000000000582
+    field: findings
+    as_written: "per pupil moves **$4.11**"
+  - key: project/state-share-fall-fy2026-to-fy2027-negative
+    value: 4.1125
+    field: findings
+    as_written: "state share falls 4.11 percentage points in one year"
+  - key: project/districts-whose-state-share-fell
+    value: 540
+    field: findings
+    as_written: "540 of 609 districts"
+  - key: project/median-state-share-fy2026
+    value: 0.4140033
+    field: findings
+    as_written: "FY2026  41.40%"
+  - key: project/median-state-share-fy2027
+    value: 0.3600332
+    field: findings
+    as_written: "FY2027  36.00%"
+  - key: project/median-state-share-holding-capacity-still
+    value: 0.41233077457422024
+    field: findings
+    as_written: "the median state share comes back to **41.23%**"
+  - key: project/aggregate-state-share-fy2026
+    value: 0.3535014889591587
+    field: findings
+    as_written: "FY2026  35.35%"
+  - key: project/aggregate-state-share-fy2027
+    value: 0.3152369262096924
+    field: findings
+    as_written: "FY2027  31.52%"
+  - key: project/districts-at-the-minimum-state-share-fy2026
+    value: 105
+    field: findings
+    as_written: "FY2026  105"
+  - key: project/districts-that-fell-onto-the-minimum-state-share
+    value: 33
+    field: findings
+    as_written: "33 districts that were on a computed share in FY2026"
   - key: regime-diff/districts-the-charge-off-pays-more
     value: 316
     field: findings
