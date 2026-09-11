@@ -216,16 +216,13 @@ fn and_in_the_year_the_calculator_models_it_is_not() {
 #[test]
 fn the_transportation_proration_history_says_fy2027_is_the_first() {
     // Already committed, in `transportation-rates.csv`, and read by nothing when the node said
-    // earlier years were open.
-    let rates = include_str!("../fixtures/transportation-rates.csv");
-    let column = |year: &str| -> f64 {
-        rates
-            .lines()
-            .find(|line| line.starts_with(year))
-            .and_then(|line| line.split(',').nth(3))
-            .and_then(|cell| cell.parse::<f64>().ok())
-            .unwrap_or_else(|| panic!("no FY{year} row"))
+    // earlier years were open. Read through `project::transport` rather than a private parser
+    // here, which is where the third caller of this fixture put it.
+    let factor = |fiscal_year: u16| {
+        project::transport::rates_for(fiscal_year)
+            .unwrap_or_else(|| panic!("no FY{fiscal_year} row"))
+            .sped_proration
     };
-    assert!((column("2026") - 1.0).abs() < 1e-12, "{}", column("2026"));
-    assert!((column("2027") - 0.917_459_740_976_215).abs() < 1e-12);
+    assert!((factor(2026) - 1.0).abs() < 1e-12, "{}", factor(2026));
+    assert!((factor(2027) - 0.917_459_740_976_215).abs() < 1e-12);
 }

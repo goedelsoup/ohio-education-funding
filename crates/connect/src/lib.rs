@@ -991,11 +991,13 @@ fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         let base_cost = book.rows(fixtures::fy26::BASE_COST_SHEET)?;
         let local_capacity = book.rows(fixtures::fy26::LOCAL_CAPACITY_SHEET)?;
         let dpia = book.rows(fixtures::fy26::DPIA_SHEET)?;
+        let transportation = book.rows(fixtures::TRANSPORT_SHEET)?;
         fixtures::build_fy26_model(&fixtures::Fy26Sheets {
             detail: &detail,
             base_cost: &base_cost,
             local_capacity: &local_capacity,
             dpia: &dpia,
+            transportation: &transportation,
         })
         .map_err(RebuildError::Layout)
     })();

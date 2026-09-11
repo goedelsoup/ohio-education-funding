@@ -103,6 +103,36 @@ pub const PRESCHOOL_REMAINDER: &str = "Remainder – preschool special education
 /// The line total of [`SPECIAL_EDUCATION_ENHANCEMENTS`].
 pub const ALI_200540_TOTAL: &str = "GRF ALI 200540 total";
 
+/// The pupil transportation line, as [`FOUNDATION_AID`] splits it into two.
+///
+/// The split is the document's own and it is the thing a proration wants: `Earmarks` against
+/// `Remainder – Foundation aid`. Two formulas are paid out of one ALI, and each divides by its
+/// own half.
+///
+/// Anchoring is why this is spelled without the trailing `, Earmarks`: the earmark table's own
+/// heading begins with these words and does not end with them, so [`row`]'s ends-with rule keeps
+/// the two apart. Both appear exactly once in both editions.
+pub const PUPIL_TRANSPORTATION: &str = "GRF ALI 200502, Pupil Transportation";
+
+/// The earmark table inside [`PUPIL_TRANSPORTATION`].
+pub const PUPIL_TRANSPORTATION_EARMARKS: &str = "GRF ALI 200502, Pupil Transportation, Earmarks";
+
+/// The earmark that pays special education transportation, and the denominator's numerator.
+pub const SPECIAL_EDUCATION_TRANSPORTATION: &str = "Special education transportation";
+
+/// The bottom line of [`PUPIL_TRANSPORTATION_EARMARKS`].
+pub const ALI_200502_EARMARK_TOTAL: &str = "ALI 200502 Earmark total";
+
+/// What is left of a foundation aid line after its earmarks, which is what the formula is paid
+/// from.
+///
+/// Ambiguous on its own — [`FOUNDATION_AID`] carries one of these rows per line item — so it is
+/// only ever passed with a fund/ALI section that narrows it, such as [`PUPIL_TRANSPORTATION`].
+pub const FOUNDATION_AID_REMAINDER: &str = "Remainder – Foundation aid";
+
+/// The earmarks of a foundation aid line, taken together.
+pub const FOUNDATION_AID_EARMARKS: &str = "Earmarks";
+
 /// The three columns every table in these documents carries.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Row {
@@ -194,6 +224,19 @@ pub fn foundation_aid(edition: Edition, label: &str) -> Row {
 #[must_use]
 pub fn special_education_enhancements(edition: Edition, label: &str) -> Row {
     row(edition, SPECIAL_EDUCATION_ENHANCEMENTS, label)
+}
+
+/// A row of the ALI 200502 split — [`FOUNDATION_AID_EARMARKS`] or
+/// [`FOUNDATION_AID_REMAINDER`].
+#[must_use]
+pub fn pupil_transportation(edition: Edition, label: &str) -> Row {
+    row(edition, PUPIL_TRANSPORTATION, label)
+}
+
+/// A row of the ALI 200502 earmark table.
+#[must_use]
+pub fn pupil_transportation_earmarks(edition: Edition, label: &str) -> Row {
+    row(edition, PUPIL_TRANSPORTATION_EARMARKS, label)
 }
 
 /// What one row of the foundation aid table moved between the proposal and the act, in FY2026.

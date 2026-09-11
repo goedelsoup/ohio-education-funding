@@ -33,47 +33,20 @@
 //! FY2026 line-by-line explanation added the same language to the density supplement a year
 //! earlier — see `the_department_explains_its_own_method`. Two transportation lines, two
 //! consecutive years, the same pressure.
+//!
+//! # And what the factor divides by
+//!
+//! This file states the two proration factors and leaves them as observations. What each one is a
+//! quotient *of* — the enacted earmark over a statewide allocation that reaches past the
+//! calculator's own districts — is
+//! [`the_denominator_that_is_larger_than_the_model`](the_denominator_that_is_larger_than_the_model.rs).
+//! The fixture reader this file used to declare privately moved to
+//! [`project::transport`](../src/transport.rs) when a third caller wanted it.
 
-use edfund_core::csv;
-
-/// The committed series.
-const FIXTURE: &str = include_str!("../fixtures/transportation-rates.csv");
-
-/// The header this test was written against.
-const EXPECTED_HEADER: &str =
-    "fiscal_year,per_rider,per_mile,sped_proration,minimum_state_share,inflation_factor";
-
-/// One fiscal year's statewide transportation factors.
-#[derive(Debug, Clone, Copy)]
-struct Rates {
-    fiscal_year: u16,
-    per_rider: f64,
-    per_mile: f64,
-    sped_proration: f64,
-    minimum_state_share: f64,
-    inflation_factor: f64,
-}
-
-fn rates() -> Vec<Rates> {
-    csv::rows(FIXTURE, EXPECTED_HEADER)
-        .filter_map(|row| {
-            Some(Rates {
-                fiscal_year: row.str(0).parse().ok()?,
-                per_rider: row.num(1)?,
-                per_mile: row.num(2)?,
-                sped_proration: row.num(3)?,
-                minimum_state_share: row.num(4)?,
-                inflation_factor: row.num(5)?,
-            })
-        })
-        .collect()
-}
+use project::transport::{rates, rates_for, Rates};
 
 fn year(fy: u16) -> Rates {
-    rates()
-        .into_iter()
-        .find(|r| r.fiscal_year == fy)
-        .unwrap_or_else(|| panic!("FY{fy} is not in the committed series"))
+    rates_for(fy).unwrap_or_else(|| panic!("FY{fy} is not in the committed series"))
 }
 
 /// The series is two years, and the values are the department's own.

@@ -320,21 +320,21 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1504 | supported by a committed primary source |
+| `[verified]` | 1512 | supported by a committed primary source |
 | `[inference]` | 312 | drawn from verified facts, not witnessed |
-| `[open]` | 193 | a live question — unknown, contested, or being worked |
+| `[open]` | 191 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-193 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+191 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
 | `findings` | 75 | 0 |
-| `description` | 44 | 0 |
+| `description` | 43 | 0 |
 | `revisions` | 10 | 0 |
 | `series` | 7 | 0 |
-| `statutory_basis` | 5 | 0 |
 | `mechanism` | 5 | 0 |
+| `statutory_basis` | 4 | 0 |
 | `amount` | 4 | 0 |
 | `vetoes` | 3 | 0 |
 | `roles` | 3 | 0 |
