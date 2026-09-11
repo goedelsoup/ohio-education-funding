@@ -137,23 +137,31 @@ function sources(dir: string): string[] {
 }
 
 /**
- * Blank out comments, keeping offsets so a hit can be classified by position.
+ * Blank out what is not a year on a page, keeping offsets so a hit can be classified by position.
  *
  * A year in a docstring is documentation and always fine — most of the 145 in this tree explain
  * *why* a year is what it is, which is exactly the writing this rule wants more of.
+ *
+ * A URL is the other case, and it is not documentation — it is a live string that no page renders
+ * as a date. `https://json-schema.org/draft/2020-12/schema` is the version of a specification; it
+ * matches the `20\d\d-\d\d` arm exactly and means nothing the allowlist can argue about, since
+ * the mechanism's question — is this a fact about the past, or a label on a moving fixture? — has
+ * no answer for it. Blanking the URL is the honest classification; an allowance would have been a
+ * licence granted on a false premise.
  */
-function withoutComments(source: string): string {
+function withoutUnrendered(source: string): string {
   return source
     .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, " "))
     .replace(/^\s*\/\/.*$/gm, (m) => " ".repeat(m.length))
-    .replace(/\{\/\*[\s\S]*?\*\/\}/g, (m) => m.replace(/[^\n]/g, " "));
+    .replace(/\{\/\*[\s\S]*?\*\/\}/g, (m) => m.replace(/[^\n]/g, " "))
+    .replace(/\bhttps?:\/\/\S+/g, (m) => " ".repeat(m.length));
 }
 
 /** Every live year literal in one file, as `LITERAL` paired with the line it is on. */
 function literals(file: string): { year: string; line: number }[] {
   const YEAR = /FY20\d\d|TY20\d\d|\b20[0-2]\d-[0-9]\d\b/g;
   const raw = readFileSync(file, "utf8");
-  const live = withoutComments(raw);
+  const live = withoutUnrendered(raw);
   const found: { year: string; line: number }[] = [];
   for (const match of raw.matchAll(YEAR)) {
     const at = match.index ?? 0;
