@@ -377,6 +377,9 @@ pub const F33_OHIO_PANEL_HEADER: &[&str] = &[
     "current_spending",
     "student_transportation",
     "charter_payments",
+    "general_formula_assistance",
+    "state_nonspecified",
+    "capital_outlay",
 ];
 
 /// One year of the survey, paired with the fiscal year it reports.
@@ -470,6 +473,18 @@ fn panel_rows(
 /// zero the survey should not have accepted — FY2009 and FY2022 both carry unreported deducts as
 /// `0` rather than as `-1`, which is why the correction is only sound from FY2010 to FY2021.
 ///
+/// # The state column is a sum, and three of its parts travel beside it
+///
+/// `TSTREV` is `C01 + C04 + C05 + ... + C39`, and for ten years this fixture kept only the sum.
+/// Two of the parts answer questions the corpus had recorded as unanswerable. `C01`, general
+/// formula assistance, is 94% of Ohio's state revenue and excludes capital, which is what makes it
+/// the operating series the total is not. `C35`, "nonspecified", is where Ohio's school
+/// construction money arrives: it correlates 0.47 to 0.72 with capital outlay in every year of the
+/// panel while `C01` correlates with it at zero, 95.5% of it sits in district-years with real
+/// capital spending, and the share of a district's capital outlay it covers falls monotonically
+/// with district wealth exactly as the Classroom Facilities Assistance Program's own rule says it
+/// should. `TCAPOUT` travels with them so that share is a division rather than an inference.
+///
 /// # The join is to one directory, and that is a real limitation
 ///
 /// `LEAID` to IRN comes from the FY2022-23 CCD directory, because that is the directory this
@@ -536,6 +551,14 @@ pub fn build_f33_ohio_panel(
         // column is two different quantities either side of that year and nothing in the fixture
         // says so. See [`crate::fixtures::F33_OHIO_PANEL_HEADER`] and `dispersion::survey_basis`.
         let charter_payments = at("V92")?;
+        // The state column is a sum of fourteen items and the fixture kept only the total, which
+        // left two questions unanswerable that the survey had always held. `C01` is general
+        // formula assistance, about 94% of Ohio's state revenue and the operating part of it;
+        // `C35` is "nonspecified", which in Ohio is where the school construction money is
+        // reported — it tracks `TCAPOUT` in every year and nothing else in the state block does.
+        // Carried with capital outlay beside them so the state's share of a project is computable
+        // rather than inferable. See `dispersion::facilities`.
+        let (formula, nonspecified, capital) = (at("C01")?, at("C35")?, at("TCAPOUT")?);
         // Money is stated in thousands in the Bureau's file and in dollars in NCES's. Enrolment is
         // a headcount in both, so the scale is applied per column rather than per row.
         let scale: i64 = if census { 1_000 } else { 1 };
@@ -597,6 +620,9 @@ pub fn build_f33_ohio_panel(
             row.push(unreported_is_blank(net_spending));
             row.push(unreported_is_blank(number(transportation)));
             row.push(unreported_is_blank(number(charter_payments)));
+            for column in [formula, nonspecified, capital] {
+                row.push(unreported_is_blank(number(column)));
+            }
             out.push(row);
             kept += 1;
         }

@@ -37,6 +37,7 @@ pub mod census_states;
 pub mod composition;
 pub mod equity_factor;
 pub mod exemplars;
+pub mod facilities;
 pub mod functions;
 pub mod fy2016;
 pub mod identified;
