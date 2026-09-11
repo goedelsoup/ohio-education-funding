@@ -91,9 +91,76 @@ findings: |
 
   $55.7m against $7.28bn of state aid is 0.8%, so a district's whole supplement is smaller than
   the noise in most other lines — and a regressive 0.8% inside a progressive $7.28bn is a
-  different object from a regressive program. The gradient is measured; whether it moves any
-  district's position is not. [open]
+  different object from a regressive program. The gradient is measured, and whether it moves any
+  district's position is now measured too.
+
+  ### It moves them, by about one place
+
+  Order Ohio's 609 districts by total state support per pupil and take the supplement away. **370
+  of them change place** — by a mean of **1.0673 places**, a largest anywhere in the state of 8,
+  and **4 crossings of a quintile boundary**: Fremont City, Monroeville Local, Madison Local and
+  Fort Frye Local. More than half the state moves, and it moves one place. [verified —
+  [`crates/project`](../../../crates/project/tests/whether_the_supplement_moves_a_position.rs)]
+
+  ### And it narrows the equalisation, which is the regressive reading and not a refutation of it
+
+  The coefficient of variation of state support per pupil is **0.5242** with the supplement and
+  **0.5281** without it, so the supplement *compresses* the distribution of state aid by 0.0040 —
+  0.0075 of the dispersion. That sign is easy to state backwards. Ohio disperses state aid on
+  purpose: the poorest quartile of districts receives **$10,265** per pupil against the least-poor
+  quartile's **$4,851**, and that gap is the equalisation. A payment that falls with need therefore
+  rises as a *share of aid*, and compresses the gap. [verified]
+
+  Against the aid a district already has, the supplement is worth **0.011408** of the least-poor
+  quartile's and **0.002173** of the poorest's — a ratio above five where the per-pupil gradient is
+  2.56. That is the number that decides whether the distribution moves, and it is twice the one the
+  per-pupil table shows. [verified]
+
+  ### Why it has any purchase at all
+
+  Because the guarantee does not absorb it. The supplement is line `[O]` and the guarantee holds a
+  district at a base computed from `[H]`, so a guaranteed district is paid on top rather than held
+  flat — **217 of the 294 districts on the guarantee receive one**. Being outside the guarantee is
+  what this node records as the supplement's exposure; it is also the only grip on a district's
+  position it has. [verified]
+
+  What none of this settles is whether one place in an ordering, or four quintile crossings, is a
+  consequence. Position in the state-aid distribution is not position in total resources per pupil,
+  which is the quantity [equity](../../doctrine/equity.yml) is stated over, and the model this is
+  computed from carries no local revenue. [open]
 figures:
+  - key: project/performance-supplement-districts-moved
+    value: 370
+    field: findings
+    as_written: "**370\n  of them change place**"
+  - key: project/performance-supplement-mean-rank-move
+    value: 1.0673
+    field: findings
+    as_written: "a mean of **1.0673 places**"
+  - key: project/performance-supplement-quintile-crossings
+    value: 4
+    field: findings
+    as_written: "**4 crossings of a quintile boundary**"
+  - key: project/state-aid-dispersion-with-supplement
+    value: 0.5242
+    field: findings
+    as_written: "**0.5242** with the supplement"
+  - key: project/state-aid-dispersion-without-supplement
+    value: 0.5281
+    field: findings
+    as_written: "**0.5281** without it"
+  - key: project/performance-supplement-share-of-least-poor-aid
+    value: 0.011408
+    field: findings
+    as_written: "worth **0.011408** of the least-poor\n  quartile's"
+  - key: project/performance-supplement-share-of-poorest-aid
+    value: 0.002173
+    field: findings
+    as_written: "**0.002173** of the poorest's"
+  - key: project/guaranteed-districts-paid-a-supplement
+    value: 217
+    field: findings
+    as_written: "**217 of the 294 districts on the guarantee receive one**"
   - key: project/performance-supplement-to-youngstown
     value: 162207.67
     field: findings
