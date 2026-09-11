@@ -6525,6 +6525,187 @@ pub static FIGURES: &[Figure] = &[
         },
     },
     Figure {
+        key: "project/sped-transportation-implied-allocation",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The statewide special education transportation allocation FY2027\u{2019}s \
+                proration factor implies \u{2014} the enacted earmark divided by the factor the \
+                calculator states",
+        pinned: 212_348_136.16,
+        tolerance: 0.01,
+        compute: |_| {
+            project::transport::special_education(2027)
+                .expect("FY2027 is modelled")
+                .implied_statewide()
+        },
+    },
+    Figure {
+        key: "project/sped-transportation-districts-allocation",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the 611 districts in the FY2027 calculator are allocated before proration \
+                \u{2014} the part of that denominator the model can see",
+        pinned: 199_061_038.65,
+        tolerance: 0.01,
+        compute: |_| {
+            project::transport::special_education(2027)
+                .expect("FY2027 is modelled")
+                .districts
+        },
+    },
+    Figure {
+        key: "project/sped-transportation-outside-the-model",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The part of the FY2027 denominator no district in the calculator accounts for, \
+                which the greenbook attributes to county DD boards and ESCs",
+        pinned: 13_287_097.51,
+        tolerance: 0.01,
+        compute: |_| {
+            project::transport::special_education(2027)
+                .expect("FY2027 is modelled")
+                .outside_the_model()
+        },
+    },
+    Figure {
+        key: "project/sped-transportation-outside-the-model-share",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The same residual as a share of the implied statewide allocation",
+        pinned: 0.062_571_930_7,
+        tolerance: 0.000_005,
+        compute: |_| {
+            let allocation =
+                project::transport::special_education(2027).expect("FY2027 is modelled");
+            allocation.outside_the_model() / allocation.implied_statewide()
+        },
+    },
+    Figure {
+        key: "project/sped-transportation-districts-only-factor",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The FY2027 proration factor a reader would get by dividing the earmark by the \
+                districts the calculator holds, against the 0.91746 it states",
+        pinned: 0.978_699_133,
+        tolerance: 0.000_000_5,
+        compute: |_| {
+            project::transport::special_education(2027)
+                .expect("FY2027 is modelled")
+                .districts_only_factor()
+        },
+    },
+    Figure {
+        key: "project/sped-transportation-fy2026-ceiling",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What FY2026\u{2019}s factor of 1.0 leaves for everything outside the calculator \
+                \u{2014} the earmark less what its districts are allocated",
+        pinned: 11_778_159.68,
+        tolerance: 0.01,
+        compute: |_| {
+            project::transport::special_education(2026)
+                .expect("FY2026 is modelled")
+                .headroom()
+        },
+    },
+    Figure {
+        key: "project/sped-transportation-cost-step",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the prior year\u{2019}s reported costs add to the special education \
+                transportation allocation between FY2026 and FY2027",
+        pinned: 26_808_906.80,
+        tolerance: 0.01,
+        compute: |_| {
+            project::transport::movement()
+                .expect("both years are modelled")
+                .cost()
+        },
+    },
+    Figure {
+        key: "project/sped-transportation-state-share-fall",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What falling state share percentages take back off that allocation over the same \
+                interval \u{2014} the one term of the three that moves against the proration",
+        pinned: 4_207_654.26,
+        tolerance: 0.01,
+        compute: |_| {
+            -project::transport::movement()
+                .expect("both years are modelled")
+                .state_share()
+        },
+    },
+    Figure {
+        key: "project/sped-transportation-floor-step",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the floor under the state share adds by stepping from 45.83% to 50%, the \
+                term that puts the allocation past its earmark",
+        pinned: 11_340_267.79,
+        tolerance: 0.01,
+        compute: |_| {
+            project::transport::movement()
+                .expect("both years are modelled")
+                .floor()
+        },
+    },
+    Figure {
+        key: "project/sped-transportation-at-the-old-floor",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What would have been left of the FY2027 earmark if the floor had stayed at \
+                45.83% \u{2014} against the $4.2m it is short at 50%",
+        pinned: 7_100_095.14,
+        tolerance: 0.01,
+        compute: |inputs| {
+            let _ = inputs;
+            let allocation =
+                project::transport::special_education(2027).expect("FY2027 is modelled");
+            let movement = project::transport::movement().expect("both years are modelled");
+            allocation.appropriation - movement.after_state_share
+        },
+    },
+    Figure {
+        key: "project/general-transportation-headroom-fy2026",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "How much of ALI 200502\u{2019}s unearmarked remainder the general transportation \
+                formula left unspent in FY2026 \u{2014} the width of a proration factor of 1.0",
+        pinned: 5_594_475.23,
+        tolerance: 0.01,
+        compute: |_| {
+            let (paid, line) = project::transport::general_headroom(2026).expect("FY2026");
+            line - paid
+        },
+    },
+    Figure {
+        key: "project/general-transportation-headroom-fy2027",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same headroom a year later, on a remainder the legislature raised",
+        pinned: 36_760_324.87,
+        tolerance: 0.01,
+        compute: |_| {
+            let (paid, line) = project::transport::general_headroom(2027).expect("FY2027");
+            line - paid
+        },
+    },
+    Figure {
+        key: "project/sped-transportation-floor-districts",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts whose FY2027 special education transportation is paid at the statutory \
+                floor rather than at their own state share, of the 563 that report a cost",
+        pinned: 411.0,
+        tolerance: 0.0,
+        compute: |_| {
+            project::transport::special_education(2027)
+                .expect("FY2027 is modelled")
+                .at_the_floor as f64
+        },
+    },
+    Figure {
         key: "regime-diff/walter-in-derolph-i",
         owner: "crates/regime-diff",
         unit: Unit::Count,

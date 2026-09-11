@@ -38,14 +38,14 @@ description: |
   1.0 as "no proration" loses the only evidence the corpus holds that the line was tested.
   [inference]
 
-  ### Still open
+  ### All three are quotients now
 
-  No factor publishes a history, so "when each was last set" is answered for preschool and open
-  for the other two. [open]
+  ~~"When each was last set" is answered for preschool and open for the other two.~~ Answered in
+  `findings`: each factor divides an enacted appropriation, and the FY2027 transportation
+  denominator reaches past every district the calculator holds.
 
   ~~Also open: whether prorations apply anywhere inside `[H] Foundation Funding`.~~ Answered
-  above, from the workbook's own labels: none do, and the pattern is real rather than an
-  artefact of three observations.
+  above, from the workbook's own labels: none do.
 findings: |
   ### Three are known, and only one publishes its appropriation
 
@@ -160,6 +160,83 @@ findings: |
   reading was right and is now sourced from the enacted act's analysis rather than inferred
   from the proposal. [verified]
 
+  ### The denominator is bigger than the model
+
+  A proration factor is a quotient, and LSC writes the formula out — *"Adjustment percentage =
+  (Earmarked appropriation)/(Total statewide allocation)"*. For FY2027 special education
+  transportation the numerator is **$194,820,866**, an earmark inside GRF ALI 200502. Divide it
+  by the 0.91745974 the workbook states and the allocation comes to **$212,348,136**. The 611
+  districts in that same workbook account for **$199,061,039** of it.
+
+  The **$13,287,098** left over — **6.26%** of the whole — is not a rounding, and the greenbook
+  names who it belongs to in the paragraph describing the earmark:
+
+  > County DD boards and ESCs are funded through a nearly identical special education
+  > transportation formula, except that the state share percentage for these entities is a
+  > uniform amount equal to the minimums for traditional districts.
+
+  So a proration factor is the one number in this model that measures a population the model
+  does not contain. A reader who divided the earmark by the districts it can see would get
+  **0.9787** — six points high, with nothing on the sheet to say so. [verified —
+  [`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs)]
+
+  FY2026 bounds the same quantity from the other side. Its factor is 1.0, so the whole statewide
+  allocation fitted inside a $176,897,678 earmark while the districts took $165,119,518 of it:
+  everything outside the model came to at most **$11,778,160** that year, against the $13.3m
+  FY2027 measures. That is what the year which does *not* prorate was worth extracting for.
+  [verified —
+  [`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs)]
+
+  ### It prorates because the floor stepped, not because the line was cut
+
+  The earmark **rose 10.13%** between the two years. The district allocation rose 20.56%, and
+  the three things that moved do not move together:
+
+      the FY2026 allocation                          $165,119,518
+      + the prior year's reported costs               +$26,808,907
+      + state share percentages, which fell            -$4,207,654
+      + the floor under them, 45.83% to 50%           +$11,340,268
+      = the FY2027 allocation                        $199,061,039
+
+  Reported costs added **$26,808,907**; falling state shares took **$4,207,654** back off; and
+  the statutory floor, which H.B. 96 steps by a twenty-fourth a year, added **$11,340,268** on
+  its own. Hold that floor where it was and the districts sit **$7,100,095 inside** the earmark
+  instead of $4,240,173 outside it. The proration is the price of a scheduled increase in the
+  state's share of a cost, arriving in a year the line had already been raised for. [verified —
+  [`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs)]
+
+  The floor now pays **411** of the 563 districts that report a cost, against 332 a year
+  earlier — so it is not only higher, it reaches further. [verified —
+  [`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs)]
+
+  ### A factor of 1.0 is a measurement, and this is what it measured
+
+  General transportation is paid from what is left of ALI 200502 after its earmarks, which the
+  greenbook publishes as a row of its own: **$703,348,806** in FY2026 and **$762,819,905** in
+  FY2027. The districts' transportation funding against those is $697,754,331 and $726,059,580.
+
+  So the FY2026 factor of 1.0 held by **$5,594,475** — eight tenths of one per cent of the line
+  — and the FY2027 one by **$36,760,325**. The general formula came within a rounding of
+  prorating in the year before the special education earmark did, out of the same appropriation.
+  [verified —
+  [`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs)]
+
+  ### The earmark that binds is the one the legislature did not touch
+
+      GRF ALI 200502 earmark                  FY2025 actual   FY2026 approp   FY2027 approp
+      Bus driver training                          $970,720      $1,088,930      $1,088,930
+      Special education transportation         $138,038,038    $176,897,678    $194,820,866
+      Rural Transportation Grant Program                 $0        $450,000        $450,000
+      Montgomery County Transportation Pilot             $0        $250,000        $250,000
+      ALI 200502 earmark total                 $139,008,758    $178,686,608    $196,609,796
+
+  Special education transportation is the one row identical in the redbook and the greenbook:
+  the executive proposed these two figures and the act carries them unchanged. Everything around
+  it moved — bus driver training lost $3.9m of its FY2027 proposal, two earmarks were added, and
+  the unearmarked remainder was raised in both years. The conference committee was in this line
+  item and did not open the half of it that prorates. [verified —
+  [`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs)]
+
   ### The residual claimant grew while its line shrank
 figures:
   - key: project/preschool-proration-factor-fy2026
@@ -198,6 +275,58 @@ figures:
     value: 908183.7600001395
     field: findings
     as_written: "rather than $908,184 over"
+  - key: project/sped-transportation-implied-allocation
+    value: 212348136.1620321
+    field: findings
+    as_written: "the allocation comes to **$212,348,136**"
+  - key: project/sped-transportation-districts-allocation
+    value: 199061038.65038046
+    field: findings
+    as_written: "account for **$199,061,039** of it"
+  - key: project/sped-transportation-outside-the-model
+    value: 13287097.511651635
+    field: findings
+    as_written: "The **$13,287,098** left over"
+  - key: project/sped-transportation-outside-the-model-share
+    value: 0.06257223515968571
+    field: findings
+    as_written: "**6.26%** of the whole"
+  - key: project/sped-transportation-districts-only-factor
+    value: 0.9786991332953524
+    field: findings
+    as_written: "would get\n  **0.9787** \u2014 six points high"
+  - key: project/sped-transportation-fy2026-ceiling
+    value: 11778159.68381238
+    field: findings
+    as_written: "at most **$11,778,160** that year"
+  - key: project/sped-transportation-cost-step
+    value: 26808906.803826123
+    field: findings
+    as_written: "Reported costs added **$26,808,907**"
+  - key: project/sped-transportation-state-share-fall
+    value: 4207654.26002264
+    field: findings
+    as_written: "falling state shares took **$4,207,654** back off"
+  - key: project/sped-transportation-floor-step
+    value: 11340267.790389359
+    field: findings
+    as_written: "added **$11,340,268** on\n  its own"
+  - key: project/sped-transportation-at-the-old-floor
+    value: 7100095.140008897
+    field: findings
+    as_written: "sit **$7,100,095 inside** the earmark"
+  - key: project/sped-transportation-floor-districts
+    value: 411
+    field: findings
+    as_written: "The floor now pays **411** of the 563 districts"
+  - key: project/general-transportation-headroom-fy2026
+    value: 5594475.23158586
+    field: findings
+    as_written: "1.0 held by **$5,594,475**"
+  - key: project/general-transportation-headroom-fy2027
+    value: 36760324.87000024
+    field: findings
+    as_written: "the FY2027 one by **$36,760,325**"
 revisions:
   - was: |
       The 0.96854448 factor was read against the $147,500,000 limit printed beside it, making
@@ -239,8 +368,14 @@ properties:
     proration arises at all. The calculator applies 0.96854448 anyway, within six millionths of
     the prior year's, and the program lands **$5,568,648 under** the line it is paid from. A
     factor that was computed in FY2026 was carried into a year whose own arithmetic does not
-    produce it. What produced the difference in the sixth decimal place is not established.
-    [open]
+    produce it.
+
+    **And it was edited in, rather than carried forward with the rest.** Every other cell of that
+    sheet's header block holds across the two workbooks — the $4,000 base amount, the $8,241.61
+    average base cost, all six special education weights, and the $147,500,000 limit, which is
+    stale in both. The proration factor is the one cell in the block that moved. So somebody
+    typed a new number into a copied sheet, and what produced the difference in the sixth decimal
+    place is still not established. [open]
   series: |
     FY2027: special education transportation 0.91746; preschool special education 0.96854448,
     stated beside a $147,500,000 cell that is the **FY2025 estimate** — the FY2027 appropriation
@@ -254,9 +389,27 @@ properties:
     So the FY2027 special education transportation proration is **the first one**, and this node
     recorded earlier years as unheld while `crates/project/fixtures/transportation-rates.csv`
     already carried both. [verified]
+
+    The two transportation factors now carry their appropriations with them: the special
+    education earmark is $176,897,678 then $194,820,866, and the unearmarked remainder the
+    general formula is paid from is $703,348,806 then $762,819,905. A factor without the line it
+    divides is an unexplained multiplier, which is the argument `sensitivity` makes for three
+    properties rather than one. [verified —
+    [`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs)]
   statutory_basis: |
-    Set by the appropriation rather than by R.C. 3317. Which budget line governs each, and whether
-    the department's discretion in setting the factor is bounded, is [open].
+    Set by the appropriation rather than by R.C. 3317, and each of the three divides a different
+    half of a line:
+
+        special education transportation   an earmark inside GRF ALI 200502
+        transportation, general            what is left of GRF ALI 200502 after its earmarks
+        preschool special education        what is left of GRF ALI 200540 after its five
+
+    ~~Whether the department's discretion in setting the factor is bounded.~~ It is not
+    discretion. The budget's own language is *"DEW must prorate the payments so as not to exceed
+    the amount appropriated"*, and LSC states the arithmetic that produces the number:
+    *"Adjustment percentage = (Earmarked appropriation)/(Total statewide allocation)"*. Both
+    halves are observable for all three, and all three close. [verified —
+    [`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs)]
   simulation_key: proration_factor
   written_as: |
     general proration

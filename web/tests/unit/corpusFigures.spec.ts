@@ -103,13 +103,23 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * `education-agency/eastland-fairfield-ctc` became the sixty-fourth carrier, three of its four
  * unpopulated fields having been committed the whole time — and 523/64 when the relief cliff was
  * read against the fund the five-year forecasts actually report, and left no trace in it.
+ *
+ * # And then it drifted again, by a hundred and sixty-nine
+ *
+ * Re-counted at **705/72** when the transportation proration factors got their appropriations, and
+ * the floor was sitting at 523/64 against 692/72 before that branch added a line. So eight
+ * carriers and a hundred and sixty-nine bindings had arrived without the ratchet moving, which is
+ * the same failure the section above describes and a larger instance of it. The narrative list
+ * stops here: a running commentary on a number is what let the number go unchecked, and both
+ * values below are now recomputed the way the test computes them — `loadCorpus().nodes` flattened
+ * over `figures`, and the nodes with a non-empty one — rather than incremented.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "523 bindings; raise this when you add one").toBeGreaterThanOrEqual(523);
+  expect(bindings.length, "705 bindings; raise this when you add one").toBeGreaterThanOrEqual(705);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "64 nodes carry bindings; raise this when a sixty-fifth does",
-  ).toBeGreaterThanOrEqual(64);
+    "72 nodes carry bindings; raise this when a seventy-third does",
+  ).toBeGreaterThanOrEqual(72);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

@@ -1,6 +1,6 @@
 //! The department's FY2026 calculator, in the columns that answer what moved.
 //!
-//! # Why a second year, and why only sixteen columns of it
+//! # Why a second year, and why only nineteen columns of it
 //!
 //! [`super::fy27`] turns eleven sheets of the department's FY2027 workbook into the 162-column
 //! fixture every calculator crate reads. This is the same workbook a year earlier, and the
@@ -21,10 +21,21 @@
 //! - per-pupil local capacity moves **+9.34% at the median**, and 2 districts of 609 are unchanged;
 //! - disadvantaged pupil impact aid moves **-8.57%**, and none is unchanged.
 //!
-//! So this takes sixteen columns rather than 162 — the two sides of the state share, the local
-//! capacity build-up, and the disadvantaged pupil blend — which is about sixty kilobytes and
+//! So this takes nineteen columns rather than 162 — the two sides of the state share, the local
+//! capacity build-up, and the disadvantaged pupil blend — which is about seventy kilobytes and
 //! answers the questions. Everything else on those sheets is either already held for FY2027 or
 //! genuinely does restate it.
+//!
+//! # And three of the nineteen are transportation, for a reason the count does not show
+//!
+//! `[j] Reported Spec Ed Trans Cost`, `[J] Special Education Transportation` and
+//! `[G] Transportation Funding` are here because a **proration factor is a quotient and neither
+//! half of it is in the panel**. The FY2027 model states 0.91745974 for special education
+//! transportation and 1.0 for FY2026, and LSC states the formula that produces such a number:
+//! *"Adjustment percentage = (Earmarked appropriation)/(Total statewide allocation)"*. The
+//! numerator is in the enacted budget analysis. The denominator is what these columns sum to —
+//! and the year where the factor is 1.0 is the one that makes the other year legible, because
+//! it fixes what the same arithmetic looks like when the appropriation does not bind.
 //!
 //! # The aggregate row is named here
 //!
@@ -36,6 +47,7 @@
 use std::collections::HashMap;
 
 use super::format::{clean_name, format_value};
+use super::transport_rates::TRANSPORT_SHEET;
 use crate::conventions::{cell, cell_number, is_statewide_row, rows_by_key};
 
 /// Columns of the FY2026 comparison fixture.
@@ -56,6 +68,9 @@ pub const FY26_HEADER: &[&str] = &[
     "dpia_weighted_adm",
     "dpia_percentage",
     "dpia_aid",
+    "trans_reported_sped_cost",
+    "trans_special_education",
+    "trans_total",
 ];
 
 /// The sheets this reads, by the name the workbook gives them.
@@ -67,7 +82,7 @@ pub const LOCAL_CAPACITY_SHEET: &str = "Local_Capacity";
 /// The disadvantaged pupil blend, one row per district.
 pub const DPIA_SHEET: &str = "DPIA";
 
-/// The four sheets, as the rebuild reads them.
+/// The five sheets, as the rebuild reads them.
 pub struct Fy26Sheets<'a> {
     /// `Detail_SFPR`.
     pub detail: &'a [Vec<String>],
@@ -77,6 +92,8 @@ pub struct Fy26Sheets<'a> {
     pub local_capacity: &'a [Vec<String>],
     /// `DPIA`.
     pub dpia: &'a [Vec<String>],
+    /// `Transportation`, for the three columns a proration factor is checked against.
+    pub transportation: &'a [Vec<String>],
 }
 
 /// The first row whose first cell is the department's IRN header, and the rows after it.
@@ -135,9 +152,10 @@ pub fn build_fy26_model(sheets: &Fy26Sheets<'_>) -> Result<Vec<Vec<String>>, Str
     let (base_header, base) = table(sheets.base_cost, BASE_COST_SHEET)?;
     let (capacity_header, capacity) = table(sheets.local_capacity, LOCAL_CAPACITY_SHEET)?;
     let (dpia_header, dpia) = table(sheets.dpia, DPIA_SHEET)?;
+    let (transport_header, transport) = table(sheets.transportation, TRANSPORT_SHEET)?;
 
     let name_at = column(detail_header, "District Names", DETAIL_SHEET)?;
-    let joins: [Join<'_>; 13] = [
+    let joins: [Join<'_>; 17] = [
         (detail, detail_header, "[a] Enrolled ADM", DETAIL_SHEET),
         (
             base,
@@ -161,22 +179,25 @@ pub fn build_fy26_model(sheets: &Fy26Sheets<'_>) -> Result<Vec<Vec<String>>, Str
         (dpia, dpia_header, "d1b", DPIA_SHEET),
         (dpia, dpia_header, "d1 ", DPIA_SHEET),
         (dpia, dpia_header, "d2 ", DPIA_SHEET),
+        (dpia, dpia_header, "Disadvantaged Pupil", DPIA_SHEET),
+        (transport, transport_header, "[j] Reported", TRANSPORT_SHEET),
+        (transport, transport_header, "[J] Special", TRANSPORT_SHEET),
+        (
+            transport,
+            transport_header,
+            "[G] Transportation",
+            TRANSPORT_SHEET,
+        ),
     ];
 
-    let mut columns: Vec<HashMap<&str, f64>> = Vec::with_capacity(joins.len() + 1);
+    let mut columns: Vec<HashMap<&str, f64>> = Vec::with_capacity(joins.len());
     for (rows, header, tag, sheet) in joins {
         columns.push(by_irn(rows, header, tag, sheet)?);
     }
-    columns.push(by_irn(
-        dpia,
-        dpia_header,
-        "Disadvantaged Pupil",
-        DPIA_SHEET,
-    )?);
 
     // Places per column, matching how `fy27` writes the same quantity. Shares and ratios carry
     // more than dollars because a share rounded to two places is not a share any more.
-    const PLACES: [usize; 14] = [4, 4, 2, 2, 2, 10, 2, 12, 10, 4, 4, 4, 12, 2];
+    const PLACES: [usize; 17] = [4, 4, 2, 2, 2, 10, 2, 12, 10, 4, 4, 4, 12, 2, 2, 12, 12];
 
     let mut out = Vec::new();
     for (irn, row) in rows_by_key(detail, 0).filter(|(_, row)| !is_statewide_row(row, 1)) {

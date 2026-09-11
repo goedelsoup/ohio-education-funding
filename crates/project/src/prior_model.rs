@@ -58,7 +58,8 @@ const EXPECTED_HEADER: &str = "irn,district,enrolled_adm,base_cost_enrolled_adm,
                                state_share_percentage,valuation_per_pupil,\
                                local_capacity_percentage,benchmark_ratio,\
                                dpia_econ_disadvantaged_adm,dpia_directly_certified_adm,\
-                               dpia_weighted_adm,dpia_percentage,dpia_aid";
+                               dpia_weighted_adm,dpia_percentage,dpia_aid,\
+                               trans_reported_sped_cost,trans_special_education,trans_total";
 
 /// The disadvantaged pupil blend weights the FY2026 model uses.
 ///
@@ -224,6 +225,12 @@ pub struct Prior {
     pub dpia_percentage: f64,
     /// The district's disadvantaged pupil impact aid.
     pub dpia_aid: Dollars,
+    /// `[j]` the prior year's reported special education transportation cost.
+    pub reported_sped_transport_cost: Dollars,
+    /// `[J]` special education transportation, after the year's proration factor.
+    pub special_education_transportation: Dollars,
+    /// `[G]` the whole of the district's transportation funding.
+    pub transportation_total: Dollars,
 }
 
 /// The FY2026 model, in IRN order.
@@ -252,6 +259,9 @@ pub fn frame() -> Vec<Prior> {
             dpia_weighted_adm: row.num(13).unwrap_or(0.0),
             dpia_percentage: row.num(14).unwrap_or(0.0),
             dpia_aid: row.num(15).unwrap_or(0.0),
+            reported_sped_transport_cost: row.num(16).unwrap_or(0.0),
+            special_education_transportation: row.num(17).unwrap_or(0.0),
+            transportation_total: row.num(18).unwrap_or(0.0),
         })
         .collect()
 }
