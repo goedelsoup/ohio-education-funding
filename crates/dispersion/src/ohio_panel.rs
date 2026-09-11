@@ -64,7 +64,7 @@ const FIXTURE: &str = include_str!("../fixtures/f33-ohio-panel.csv");
 /// The header this loader was written against.
 const EXPECTED_HEADER: &str = "fiscal_year,leaid,irn,comparable,enrollment,total_revenue,\
 federal_revenue,state_revenue,local_revenue,property_tax,current_spending,student_transportation,\
-charter_payments";
+charter_payments,general_formula_assistance,state_nonspecified,capital_outlay";
 
 /// One Ohio agency in one year of the survey.
 #[derive(Debug, Clone, PartialEq)]
@@ -126,6 +126,24 @@ pub struct PanelRow {
     /// [`crate::survey_basis`], which is where the two eras are put on one basis, and never
     /// subtract this by hand — it is already out of the state column in the later years.
     pub charter_payments: Option<f64>,
+    /// `C01` — general formula assistance, in dollars.
+    ///
+    /// About 94% of Ohio's state revenue and the part of it that is not capital, which is what
+    /// makes it the operating series [`Self::state_revenue`] is not. It is the column the Bureau's
+    /// charter adjustment acts on, so it carries the FY2016 basis break too — see
+    /// [`crate::survey_basis`].
+    pub general_formula_assistance: Option<f64>,
+    /// `C35` — state revenue the reporting unit could not split across the survey's categories.
+    ///
+    /// The survey calls it "nonspecified" and in Ohio it is the school construction money: see
+    /// [`crate::facilities`], which is where the identification is made and its limits stated.
+    pub state_nonspecified: Option<f64>,
+    /// `TCAPOUT` — total capital outlay spending, in dollars, from every source.
+    ///
+    /// Beside [`Self::state_nonspecified`] so the state's share of a district's capital spending
+    /// is a division rather than an inference. Excluded from [`Self::current_spending`] by
+    /// definition, which is why a build year shows state revenue above current spending.
+    pub capital_outlay: Option<f64>,
 }
 
 impl PanelRow {
@@ -198,6 +216,9 @@ pub fn panel() -> Vec<PanelRow> {
                 current_spending: row.num(10),
                 student_transportation: row.num(11),
                 charter_payments: row.num(12),
+                general_formula_assistance: row.num(13),
+                state_nonspecified: row.num(14),
+                capital_outlay: row.num(15),
             })
         })
         .collect()

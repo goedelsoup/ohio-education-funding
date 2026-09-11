@@ -257,6 +257,8 @@ pub struct Inputs {
     pub fy2016: Fy2016,
     /// The break the same column has at that year, which belongs to the survey and not to Ohio.
     pub basis: SurveyBasis,
+    /// The school construction program, from the side of it the survey counts.
+    pub facilities: Facilities,
     /// Every state's Education Finance Incentive Grant equity factor, widest spread first.
     ///
     /// Computed once because each call walks all 10,739 rows of the national district panel, and
@@ -284,6 +286,27 @@ pub struct Fy2016 {
     pub by_valuation: [f64; 5],
     /// The step on log total valuation, wealth per pupil and disadvantage together.
     pub model: dispersion::Regression,
+}
+
+/// Ohio's school construction program as the survey's receiving side records it.
+///
+/// Held as a block because every figure walks the whole panel and joins the profile report, and
+/// because the identification only means anything as a set. See [`dispersion::facilities`].
+pub struct Facilities {
+    /// One row per district: state capital money, capital spending, and wealth.
+    pub districts: Vec<dispersion::facilities::District>,
+    /// State capital money and capital spending by year, in dollars.
+    pub by_year: BTreeMap<u16, (f64, f64)>,
+    /// State share of capital spending by fifth of district wealth, poorest first.
+    pub by_wealth: [f64; 5],
+    /// The same averaged over district-years instead, which is the measure not used.
+    pub by_wealth_annual: [f64; 5],
+    /// Nonspecified state revenue against capital outlay, per year.
+    pub against_capital: Vec<(u16, f64)>,
+    /// And general formula assistance against it, which is the control.
+    pub formula_against_capital: Vec<(u16, f64)>,
+    /// Districts whose peak year of state capital money is a build year, over those examined.
+    pub peaks: (usize, usize),
 }
 
 /// Local and state revenue shares by fiscal year, over comparable districts.
@@ -490,6 +513,18 @@ impl Inputs {
                 districts: dispersion::fy2016::frame(),
                 by_valuation: dispersion::fy2016::quintiles_by(|d| d.total_valuation),
                 model: dispersion::fy2016::model(),
+            },
+            facilities: {
+                use dispersion::facilities as f;
+                Facilities {
+                    districts: f::frame(),
+                    by_year: f::by_year(),
+                    by_wealth: f::by_wealth(),
+                    by_wealth_annual: f::by_wealth_annual(),
+                    against_capital: f::against_capital(),
+                    formula_against_capital: f::formula_against_capital(),
+                    peaks: f::peaks_are_build_years(),
+                }
             },
             basis: {
                 use dispersion::survey_basis::{self as sb, Basis};
@@ -2655,6 +2690,147 @@ pub static FIGURES: &[Figure] = &[
         pinned: 0.1204,
         tolerance: 0.0005,
         compute: |i| i.fy2016.model.standardized[1].abs(),
+    },
+    // Ohio's school construction program, which the corpus had no series for because it looked for
+    // one on the paying side. `Ratio` for the correlations; magnitudes with the direction in the
+    // key, as everywhere here.
+    Figure {
+        key: "dispersion/facilities-state-money",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "State capital money reaching Ohio's school districts, FY2009 to FY2024",
+        pinned: 12_651_245_000.0,
+        tolerance: 1000.0,
+        compute: |i| i.facilities.districts.iter().map(|d| d.received).sum(),
+    },
+    Figure {
+        key: "dispersion/facilities-capital-outlay",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "What those districts spent on capital over the same span, from every source",
+        pinned: 33_283_507_000.0,
+        tolerance: 1000.0,
+        compute: |i| i.facilities.districts.iter().map(|d| d.spent).sum(),
+    },
+    Figure {
+        key: "dispersion/facilities-state-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "So the state's share of what Ohio's districts spent on buildings",
+        pinned: 0.3801,
+        tolerance: 0.0005,
+        compute: |i| {
+            let received: f64 = i.facilities.districts.iter().map(|d| d.received).sum();
+            let spent: f64 = i.facilities.districts.iter().map(|d| d.spent).sum();
+            received / spent
+        },
+    },
+    Figure {
+        key: "dispersion/facilities-share-poorest-quintile",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The state's share for the fifth of districts with the least assessed value per \
+                pupil",
+        pinned: 0.5756,
+        tolerance: 0.0005,
+        compute: |i| i.facilities.by_wealth[0],
+    },
+    Figure {
+        key: "dispersion/facilities-share-wealthiest-quintile",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "And for the fifth with the most, which is the program's own rule measured rather \
+                than described",
+        pinned: 0.1895,
+        tolerance: 0.0005,
+        compute: |i| i.facilities.by_wealth[4],
+    },
+    Figure {
+        key: "dispersion/facilities-share-against-wealth-negative",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "A district's fifteen-year state share against the log of its assessed value per \
+                pupil \u{2014} negative",
+        pinned: 0.4405,
+        tolerance: 0.0005,
+        compute: |_| dispersion::facilities::share_against_wealth().abs(),
+    },
+    Figure {
+        key: "dispersion/facilities-smallest-district-total",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "What the least-funded of the 606 districts received across the whole span \u{2014} \
+                the program is a queue ordered by poverty and it still reached every district",
+        pinned: 730_000.0,
+        tolerance: 1000.0,
+        compute: |i| {
+            i.facilities
+                .districts
+                .iter()
+                .map(|d| d.received)
+                .fold(f64::INFINITY, f64::min)
+        },
+    },
+    Figure {
+        key: "dispersion/facilities-fy2009",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "State capital money in FY2009, which is the largest year the panel holds",
+        pinned: 1_356_609_000.0,
+        tolerance: 1000.0,
+        compute: |i| i.facilities.by_year[&2009].0,
+    },
+    Figure {
+        key: "dispersion/facilities-fy2013",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "And in FY2013, four years later",
+        pinned: 492_539_000.0,
+        tolerance: 1000.0,
+        compute: |i| i.facilities.by_year[&2013].0,
+    },
+    Figure {
+        key: "dispersion/facilities-nonspecified-against-capital-lowest",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The weakest of fifteen yearly correlations between nonspecified state revenue and \
+                capital outlay per pupil",
+        pinned: 0.4733,
+        tolerance: 0.0005,
+        compute: |i| {
+            i.facilities
+                .against_capital
+                .iter()
+                .map(|(_, r)| *r)
+                .fold(f64::INFINITY, f64::min)
+        },
+    },
+    Figure {
+        key: "dispersion/facilities-formula-against-capital-highest",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "And the strongest the same correlation reaches for general formula assistance, \
+                which is the control the identification rests on",
+        pinned: 0.1122,
+        tolerance: 0.0005,
+        compute: |i| {
+            i.facilities
+                .formula_against_capital
+                .iter()
+                .map(|(_, r)| *r)
+                .fold(f64::NEG_INFINITY, f64::max)
+        },
+    },
+    Figure {
+        key: "dispersion/facilities-peaks-that-are-build-years",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Districts whose largest year of state capital money is a year their own capital \
+                spending beat their own median",
+        pinned: 0.818,
+        tolerance: 0.0005,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |i| i.facilities.peaks.0 as f64 / i.facilities.peaks.1 as f64,
     },
     // The break the same column has at FY2016, which is what put every figure above on a basis
     // rather than on the column as published. `Ratio` for the correlations, so the prose bound to

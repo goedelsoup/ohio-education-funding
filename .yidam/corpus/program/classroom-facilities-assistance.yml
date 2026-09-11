@@ -24,25 +24,147 @@ description: |
   property-poor districts requires those districts to pass a levy in a tax environment shaped
   by [H.B. 920](../legislation/hb-920-1976.yml). [inference] How often that requirement has
   delayed or blocked projects is not established here. [open]
+findings: |
+  ### The money, from the side that receives it
+
+  **$12.65 billion of state capital money reached Ohio's school districts between FY2009 and
+  FY2024**, against $33.28 billion those districts spent on buildings from every source — so the
+  state paid **38.0%** of Ohio's school construction bill across sixteen years. [verified —
+  [`crates/dispersion`](../../../crates/dispersion/tests/the_program_the_capital_act_hid.rs)]
+
+  This corpus recorded the amount as unpopulated and gave a reason: the appropriation sits in the
+  capital act, which no connector retrieves. That is true of the paying side and it is not true of
+  the receiving side. The Census F-33 counts the money as it arrives at a district, and it has done
+  so for every year of the panel under `C35` — the item the survey calls **nonspecified**, defined
+  as state revenue "that pertain[s] to more than one of the above categories, but for which
+  reporting units could not provide distinct amounts by category". [verified]
+
+  Because that is a catch-all rather than a facilities line, the reading rests on measurement
+  rather than on a label. Four things hold and nothing else in the survey's state block does any of
+  them. The column correlates with capital outlay per pupil in **every one of the fifteen years**
+  the panel holds, never below 0.4733; general formula assistance, the control, never reaches
+  0.1122 against the same measure and is negative in ten of the fifteen. Only 4% of the money lands
+  where a district spent under $200 per pupil on capital. **81.8%** of districts whose largest
+  receipt year is worth reading were building that year on their own median — a within-district
+  test, so neither size nor wealth can produce it. And the state's share behaves the way the
+  program says it does, below. The last two years come from the Bureau's own file rather than
+  NCES's and behave like the other thirteen, so this is not one publisher's recoding. [verified]
+
+  ### The wealth rule, measured rather than described
+
+  The share of a district's capital spending the state covered falls monotonically with the
+  district's assessed value per pupil: **57.56% for the poorest fifth of districts and 18.95% for
+  the wealthiest**, three times as much of the bill, at a correlation of −0.4405 against log wealth per
+  pupil. This corpus already stated the rule — "poorer districts receive a higher percentage" —
+  marked verified against a description of the statute. It is now verified against the payments.
+  [verified]
+
+  Two cautions on that share. It is the state's share of **capital outlay**, not of assessed
+  project cost, so it counts locally funded work outside any approved project and is the lower of
+  the two numbers; the gradient is the finding and the level is a bound. And it is computed by
+  summing a district's whole run before dividing, because a project's state and local money arrive
+  in different years — averaging annual ratios instead gives 0.664 of the same gradient, which is
+  how a real rule can be made to look like a weak tendency. [verified]
+
+  ### Two things the series says that the program's description does not
+
+  **Every one of the 606 districts received some of it**, the smallest fifteen-year total being
+  $730,000. The program is described here and elsewhere as a queue ordered by poverty, and it is —
+  what separates a poor district from a wealthy one is not whether the state paid but how much of
+  the bill it took. [verified]
+
+  **And it was already shrinking when the corpus's longest series opens.** Districts received
+  $1.357 billion in FY2009 and $492.5 million in FY2013, a fall of nearly two thirds in four years,
+  and FY2009 remains the largest year the panel holds — in nominal dollars, sixteen years later.
+  The clearest structural response to *DeRolph* is the one channel of Ohio school funding this
+  corpus had no series for, and it has been contracting for the whole period the corpus can see.
+  [verified]
+
+  What the survey cannot say is which project a district-year's money belongs to, or what share of
+  an approved project's assessed cost the state set. Those are in the Commission's own records and
+  in the capital appropriations act, and neither is retrieved here. [open]
 properties:
   name: Classroom Facilities Assistance Program
   mechanism: capital-assistance
   eligibility: |
     School districts, prioritized by relative wealth ranking, with the state share percentage
-    determined on the same basis. Districts must provide the local share, generally through a
-    voter-approved bond issue. Exact ranking methodology and share schedule not yet
-    established. [open]
+    determined on the same basis — which the payments confirm: the state covered 57.56% of the
+    poorest fifth's capital spending against 18.95% of the wealthiest's. [verified] Districts must
+    provide the local share, generally through a voter-approved bond issue. The exact ranking
+    methodology and the statutory share schedule are still not held; what is held is the gradient
+    they produce. [open]
   amount: |
-    Not yet populated. [open] State share is a percentage of assessed project cost varying by
-    district wealth ranking.
+    $12.65 billion reaching districts between FY2009 and FY2024, 38.0% of what they spent on
+    buildings, from crates/dispersion/fixtures/f33-ohio-panel.csv. [verified] Read
+    `dispersion::facilities` and not the column directly: the state share is a percentage of
+    assessed project cost varying by district wealth ranking, and what the survey counts is money
+    arriving, which is a lower bound on that percentage. Per-project amounts are not held. [open]
   appropriation_line: |
     Capital appropriations, separate from the operating budget and therefore absent from the
     Department of Education and Workforce redbook this corpus holds — that document covers the
     operating budget only. [verified] The specific line is in the capital appropriations act,
-    which no connector retrieves.
+    which no connector retrieves, so what the General Assembly *appropriated* is still not held.
+    What districts *received* is, per district and per year, in the survey's `state_nonspecified`
+    column. [verified] A blank appropriation line is not a blank program.
 unfilled:
   - field: the capital appropriation line
-    why: It is in the capital appropriations act, which no connector retrieves.
+    why: |
+      It is in the capital appropriations act, which no connector retrieves. This blocks the
+      appropriated figure only — what districts received is now held per district and per year, so
+      the field it used to block, `amount`, is filled from the receiving side instead.
+  - field: the statutory share schedule by wealth percentile
+    why: |
+      The payments give the gradient the schedule produces and not the schedule itself, which is in
+      the Commission's rules rather than in any source here.
+figures:
+  - key: dispersion/facilities-state-money
+    value: 12651245000
+    field: findings
+    as_written: "**$12.65 billion of state capital money reached Ohio's school districts between FY2009 and\n  FY2024**"
+  - key: dispersion/facilities-capital-outlay
+    value: 33283507000
+    field: findings
+    as_written: "against $33.28 billion those districts spent on buildings"
+  - key: dispersion/facilities-state-share
+    value: 0.3801
+    field: findings
+    as_written: "the\n  state paid **38.0%** of Ohio's school construction bill"
+  - key: dispersion/facilities-nonspecified-against-capital-lowest
+    value: 0.4733
+    field: findings
+    as_written: "never below 0.4733"
+  - key: dispersion/facilities-formula-against-capital-highest
+    value: 0.1122
+    field: findings
+    as_written: "never reaches\n  0.1122 against the same measure"
+  - key: dispersion/facilities-peaks-that-are-build-years
+    value: 0.818
+    field: findings
+    as_written: "**81.8%** of districts whose largest receipt year is worth reading"
+  - key: dispersion/facilities-share-poorest-quintile
+    value: 0.5756
+    field: findings
+    as_written: "**57.56% for the poorest fifth of districts"
+  - key: dispersion/facilities-share-wealthiest-quintile
+    value: 0.1895
+    field: findings
+    as_written: "18.95% for\n  the wealthiest**"
+  - key: dispersion/facilities-share-against-wealth-negative
+    value: 0.4405
+    field: findings
+    as_written: "a correlation of −0.4405 against log wealth per\n  pupil"
+  - key: dispersion/facilities-smallest-district-total
+    value: 730000
+    field: findings
+    as_written: "the smallest fifteen-year total being\n  $730,000"
+  - key: dispersion/facilities-fy2009
+    value: 1356609000
+    field: findings
+    as_written: "Districts received\n  $1.357 billion in FY2009"
+  - key: dispersion/facilities-fy2013
+    value: 492539000
+    field: findings
+    as_written: "$492.5 million in FY2013"
 links:
   - target: ../program.ont.yml
     relationship: instance-of
