@@ -47,6 +47,7 @@ pub mod ohio_panel;
 pub mod profile;
 pub mod report_card;
 pub mod sd1;
+pub mod survey_basis;
 
 use edfund_core::Dollars;
 

@@ -47,17 +47,30 @@ findings: |
   pair is the base, not the rate. [verified —
   [`crates/dispersion`](../../../crates/dispersion/tests/the_pair_and_its_fifteen_years.rs)]
 
-  **And the fifteen years the node could not see are the equity claim in miniature.** From FY2009
-  to FY2024, both districts lost state revenue per pupil in constant dollars — Perrysburg by
-  22.75% and Toledo by 34.3%. Only one of them replaced it: Perrysburg's local revenue per pupil
-  rose **22.3% in real terms** while Toledo's fell 8.14%, and Perrysburg's enrolment grew 20%
-  while Toledo's fell 21%. The state's real contribution retreated from both; the tax base
-  decided who could follow. [verified]
+  **And the years the node could not see are the equity claim in miniature — though not in the
+  column it first seemed to be.** From FY2010 to FY2024, measured net of the community-school
+  deduct in both years, both districts lost state revenue per pupil in constant dollars —
+  Perrysburg by 20.29% and Toledo by 15.06%. Only one of them replaced it: Perrysburg's local
+  revenue per pupil rose **22.3% in real terms** while Toledo's fell 8.14%, and Perrysburg's
+  enrolment grew 20% while Toledo's fell 21%. The state's real contribution retreated from both;
+  the tax base decided who could follow, and the tax base is the whole of the difference.
+  [verified]
 
-  Two cautions travel with that series. The survey's state revenue column is every dollar the
+  This replaces a published pair — Perrysburg 22.75%, Toledo 34.3% — that read the survey's state
+  column as printed, which is gross of each district's community-school deduct before FY2016 and
+  net of it afterwards. Toledo has one of Ohio's largest deducts and Perrysburg has almost none,
+  so the uncorrected measure charged Toledo a third of its state revenue and Perrysburg nothing.
+  Correcting it **reverses the state half of the comparison**: the wealthy district's state
+  revenue lost more ground against prices than the high-need one's. The local half, which is the
+  half the equity claim turns on, is untouched. [verified —
+  [`crates/dispersion`](../../../crates/dispersion/tests/the_break_that_belonged_to_the_survey.rs)]
+
+  Three cautions travel with that series. The survey's state revenue column is every dollar the
   state sent, capital included, so one district-year of it is not that district's foundation aid —
   Carey Exempted Village reports $21.0m of state revenue against $8.0m of current spending in a
-  building year. And FY2014 is absent from the archive. [verified]
+  building year. FY2014 is absent from the archive. And the deduct column the correction above
+  rests on is reported as a zero rather than as a missing value in FY2009 and FY2022, which is why
+  the span starts at FY2010. [verified]
 
   Perrysburg spends **73.11%** of its operating money in the classroom, which puts it at percentile 95.0 of
   Ohio's 606 districts; Toledo's 63.43% is at percentile 18.5. That is the pair standing at
@@ -94,13 +107,13 @@ figures:
     field: findings
     as_written: "Toledo's 35.5476, the higher of the two"
   - key: dispersion/perrysburg-state-revenue-real-change-negative
-    value: 0.22751
+    value: 0.20291
     field: findings
-    as_written: "22.75% and Toledo by 34.3%"
+    as_written: "Perrysburg by 20.29% and Toledo by 15.06%"
   - key: dispersion/toledo-state-revenue-real-change-negative
-    value: 0.34329
+    value: 0.15062
     field: findings
-    as_written: "22.75% and Toledo by 34.3%"
+    as_written: "Perrysburg by 20.29% and Toledo by 15.06%"
   - key: dispersion/perrysburg-local-revenue-real-change
     value: 0.22336
     field: findings

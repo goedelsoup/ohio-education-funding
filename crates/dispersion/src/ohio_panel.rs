@@ -36,6 +36,14 @@
 //! **The denominator is the Bureau's** — `V33`, fall membership — and not Ohio's enrolled ADM. A
 //! per-pupil figure from this module must never be shown beside one from the funding model.
 //!
+//! **The state column changes basis at FY2016**, and it is the caveat that has already produced
+//! a wrong published finding. From FY2016 the Bureau nets each district's community-school
+//! deduct out of its general formula assistance and before FY2016 it does not, so a big-city
+//! district appears to lose a fifth to a third of its state money in a single year and did not.
+//! [`crate::survey_basis`] holds the correction, the evidence that locates the break, and the
+//! list of what it overturned. Nothing that compares this column across FY2015 and FY2016 is
+//! sound without it.
+//!
 //! **The panel's membership changes, and naming it took sixteen directories.** `LEAID` resolves
 //! to an IRN through the CCD directory *for the panel's own year*, so an agency that closed in
 //! FY2015 is named by the file written in FY2015. [`unnamed_agencies`] is now zero everywhere and
@@ -55,7 +63,8 @@ const FIXTURE: &str = include_str!("../fixtures/f33-ohio-panel.csv");
 
 /// The header this loader was written against.
 const EXPECTED_HEADER: &str = "fiscal_year,leaid,irn,comparable,enrollment,total_revenue,\
-federal_revenue,state_revenue,local_revenue,property_tax,current_spending,student_transportation";
+federal_revenue,state_revenue,local_revenue,property_tax,current_spending,student_transportation,\
+charter_payments";
 
 /// One Ohio agency in one year of the survey.
 #[derive(Debug, Clone, PartialEq)]
@@ -109,6 +118,14 @@ pub struct PanelRow {
     /// `None` where the agency reports none, which for a district that buses nobody is a real
     /// zero reported as absent rather than as `0`.
     pub student_transportation: Option<f64>,
+    /// `V92` — what the district paid community schools, in dollars.
+    ///
+    /// Carried because [`Self::state_revenue`] is not one quantity across FY2016 without it. From
+    /// FY2016 the Bureau subtracts this figure from Ohio's general formula assistance to remove
+    /// the double count Ohio's deduct creates, and before FY2016 it does not. See
+    /// [`crate::survey_basis`], which is where the two eras are put on one basis, and never
+    /// subtract this by hand — it is already out of the state column in the later years.
+    pub charter_payments: Option<f64>,
 }
 
 impl PanelRow {
@@ -180,6 +197,7 @@ pub fn panel() -> Vec<PanelRow> {
                 property_tax: row.num(9),
                 current_spending: row.num(10),
                 student_transportation: row.num(11),
+                charter_payments: row.num(12),
             })
         })
         .collect()

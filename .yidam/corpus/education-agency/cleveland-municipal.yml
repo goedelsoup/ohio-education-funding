@@ -52,12 +52,21 @@ findings: |
   through FY2024. [verified —
   [`crates/dispersion`](../../../crates/dispersion/tests/the_series_the_panel_already_held.rs)]
 
-  **State revenue per pupil is flat in nominal dollars and gone by a third in real ones**:
-  $11,103 in FY2009 against $11,011 in FY2024, which after 45.7% of price growth is a fall of
-  31.92%. Enrollment fell 32.25% over the same span, from 49,952 to 33,841. And Cleveland's share
-  of what Ohio's districts receive in state money fell with it, from 5.72% to 3.66% — the state
-  did not redirect money away from Cleveland so much as Cleveland's claim on it shrank with its
-  roll. [verified]
+  **State revenue per pupil rose a quarter in nominal dollars and lost an eighth in real ones**:
+  measured net of the community-school deduct in both years, which is the only way the survey's
+  state column is one quantity across FY2016, it goes from $8,772 per pupil in FY2010 to $11,011
+  in FY2024 — a nominal gain of 25.5% against 44.2% of price growth, so a real fall of **12.91%**.
+  Enrollment fell 32.25% from FY2009 to FY2024, from 49,952 to 33,841. And Cleveland's share of
+  what Ohio's districts receive in state money fell with it, from 5.72% to 3.66% — the state did
+  not redirect money away from Cleveland so much as Cleveland's claim on it shrank with its roll.
+  [verified]
+
+  This replaces a published figure — flat in nominal dollars, a real fall of 31.92% from FY2009 —
+  that read the state column as printed. Before FY2016 the survey credits a district with the
+  money it passes to community schools and from FY2016 it does not, and Cleveland's deduct was
+  28.9% of its credited state revenue in FY2015, so the uncorrected series charged Cleveland that
+  deduct once and called it a fall. [verified —
+  [`crates/dispersion`](../../../crates/dispersion/tests/the_break_that_belonged_to_the_survey.rs)]
 
   The series also carries the FY2016 discontinuity [Toledo](toledo-city.yml) records: state
   revenue per pupil falls from $12,591 to $8,534 in one year. Cleveland differs from Toledo in
@@ -69,13 +78,13 @@ findings: |
   Scholarship dollar amounts remain unpopulated. [open]
 figures:
   - key: dispersion/cleveland-state-revenue-real-change-negative
-    value: 0.31915
+    value: 0.12913
     field: findings
-    as_written: "which after 45.7% of price growth is a fall of\n  31.92%"
+    as_written: "so a real fall of **12.91%**"
   - key: dispersion/cleveland-enrolment-change-negative
     value: 0.32253
     field: findings
-    as_written: "Enrollment fell 32.25% over the same span"
+    as_written: "Enrollment fell 32.25% from FY2009 to FY2024"
 properties:
   seeded_because: |
     It sits at the intersection of three mechanisms that operate on no other agency in the same
