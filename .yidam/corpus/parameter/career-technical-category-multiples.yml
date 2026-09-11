@@ -108,10 +108,11 @@ properties:
 
     FY2026 and FY2027 only. The section states no value for FY2028 or later. [verified]
 
-    The counts these multiply are frozen at FY2021: the calculator's own column headers read
-    `Category 1 Career Tech FTE-FY21`. So a FY2027 payment funds the programme a district ran
-    six years earlier, while base cost is computed on a rolling three-year average ending
-    FY2026. [verified]
+    The counts these multiply are the current year's. The calculator's column headers read
+    `Category 1 Career Tech FTE-FY21` and this corpus took the suffix for a vintage, until the
+    department's own table of where each variable is drawn from was read against it — see
+    [fsfp-career-technical-weights](../formula-component/fsfp-career-technical-weights.yml),
+    which carries the correction and its evidence. [verified — crates/project]
   statutory_basis: |
     R.C. 3317.014, read. Divisions (A)(1) to (A)(5) for the category multiples, (B) for
     associated services, (C) and (D) for how each is applied. The separate career-technical

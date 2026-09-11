@@ -59,6 +59,7 @@
 pub mod act;
 pub mod base_cost;
 pub mod cli;
+pub mod counts;
 pub mod crosswalk;
 pub mod drafts;
 pub mod esser;

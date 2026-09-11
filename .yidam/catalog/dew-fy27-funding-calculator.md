@@ -55,6 +55,22 @@ needing a spreadsheet engine.
   609 funded-and-costed districts; a count over the sheet is over 611 funded ones. Both are
   correct and they are not interchangeable — the transportation floor catches 440 of 611 and 438
   of 609. Pinned at `crates/project/tests/the_population_the_panel_speaks_for.rs`.
+- **A column header in this workbook is not evidence of a vintage.** The `CTE` and `EL` sheets
+  head their count columns `Category 1 Career Tech FTE-FY21` and `Category 1 EL ADM-FY21`, and
+  those are the only two places in either published year where the suffix appears on a count.
+  Both sheets restate columns the `ADM Data` sheet carries with no year on them at all — the same
+  numbers, district by district, all 611, checked at rebuild time by
+  [`connect::fixtures::counts`](../../crates/connect/src/fixtures/counts.rs). Four corpus nodes
+  read a six-year freeze off those headers; there is none.
+
+  **The `Directions` sheet is the vintage table, and it is the maintained one.** It carries the
+  department's own `Calculation | Variable | Data from` table, rewritten for each year's file,
+  and it says the categorical FTEs are FY26 — the August #1 collection for the FY2026 model and
+  the November #2 collection for FY2027. Where it can be checked against something independent it
+  holds: its base cost enrolled ADM line is R.C. 3317.02(C) advancing exactly one year. The
+  `Notes` sheet carries the same table for the FY2024 and FY2025 models and is byte-identical in
+  both workbooks — two biennia stale, carried forward with everything else. Committed at
+  `crates/project/fixtures/calculator-vintages.tsv`.
 - **Display sheets and data sheets are different things.** `Base Cost`, `Local Capacity`, and
   `Summary SFPR` (with spaces) are single-district display views driven by a selector. The
   per-district tables are the underscore variants: `Base_Cost`, `Local_Capacity`,

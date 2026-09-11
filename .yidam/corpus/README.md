@@ -320,8 +320,8 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1488 | supported by a committed primary source |
-| `[inference]` | 312 | drawn from verified facts, not witnessed |
+| `[verified]` | 1493 | supported by a committed primary source |
+| `[inference]` | 311 | drawn from verified facts, not witnessed |
 | `[open]` | 193 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
@@ -329,8 +329,8 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 72 | 0 |
-| `description` | 46 | 0 |
+| `findings` | 74 | 0 |
+| `description` | 44 | 0 |
 | `revisions` | 10 | 0 |
 | `series` | 7 | 0 |
 | `statutory_basis` | 6 | 0 |
@@ -361,7 +361,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `calculator` | 1 | 0 |
 | `appropriating_bill` | 1 | 0 |
 
-**79 recorded withdrawals across 39 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**81 recorded withdrawals across 40 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Relationship vocabulary
@@ -439,7 +439,7 @@ Sorted by: kind, then alphabetically.
 | [`fy2027`](fiscal-period/fy2027.yml) | fiscal-period | Fiscal Year 2027 | 6 | 3 |
 | [`charge-off-local-share`](formula-component/charge-off-local-share.yml) | formula-component | Charge-Off Local Share | 6 | 8 |
 | [`fsfp-base-cost-calculation`](formula-component/fsfp-base-cost-calculation.yml) | formula-component | FSFP Base Cost Calculation | 7 | 9 |
-| [`fsfp-career-technical-weights`](formula-component/fsfp-career-technical-weights.yml) | formula-component | FSFP Career-Technical Weights | 5 | 4 |
+| [`fsfp-career-technical-weights`](formula-component/fsfp-career-technical-weights.yml) | formula-component | FSFP Career-Technical Weights | 6 | 4 |
 | [`fsfp-disadvantaged-pupil-impact-aid`](formula-component/fsfp-disadvantaged-pupil-impact-aid.yml) | formula-component | FSFP Disadvantaged Pupil Impact Aid | 3 | 7 |
 | [`fsfp-english-learner-weights`](formula-component/fsfp-english-learner-weights.yml) | formula-component | FSFP English Learner Weights | 5 | 4 |
 | [`fsfp-enrolment-supplements`](formula-component/fsfp-enrolment-supplements.yml) | formula-component | FSFP Base and Enrollment Growth Supplements | 6 | 4 |
@@ -498,7 +498,7 @@ Sorted by: kind, then alphabetically.
 | [`base-cost-per-pupil`](parameter/base-cost-per-pupil.yml) | parameter | Base Cost Per Pupil | 9 | 24 |
 | [`career-technical-category-multiples`](parameter/career-technical-category-multiples.yml) | parameter | Career-Technical Category Multiples | 6 | 2 |
 | [`dpia-per-pupil-amount`](parameter/dpia-per-pupil-amount.yml) | parameter | Disadvantaged Pupil Impact Aid Per-Pupil Amount | 4 | 1 |
-| [`english-learner-category-multiples`](parameter/english-learner-category-multiples.yml) | parameter | English Learner Category Multiples | 5 | 2 |
+| [`english-learner-category-multiples`](parameter/english-learner-category-multiples.yml) | parameter | English Learner Category Multiples | 5 | 3 |
 | [`enrolment-supplement-amounts`](parameter/enrolment-supplement-amounts.yml) | parameter | Enrolment Supplement Amounts | 3 | 2 |
 | [`fsfp-phase-in-percentage`](parameter/fsfp-phase-in-percentage.yml) | parameter | FSFP Phase-In Percentage | 5 | 18 |
 | [`gifted-funding-rates`](parameter/gifted-funding-rates.yml) | parameter | Gifted Funding Rates | 3 | 1 |

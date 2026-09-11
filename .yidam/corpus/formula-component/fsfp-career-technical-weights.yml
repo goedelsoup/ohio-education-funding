@@ -23,16 +23,13 @@ description: |
   services rather than instruction, and it is the one part of the program that does not vary
   with which category a pupil is in. [verified]
 
-  ### The counts are frozen at FY2021
+  ### The counts are this year's, and the header that said otherwise is four years stale
 
-  The sheet's own column headers say so: `Category 1 Career Tech FTE-FY21`. A FY2027
-  calculation is funding career-technical enrolment as it stood six years earlier, while base
-  cost is computed on a rolling three-year average ending FY2026. The same is true of [English
-  learners](fsfp-english-learner-weights.yml). [verified]
-
-  Whether that is a deliberate hold-harmless, a phase-in artefact, or a data-availability
-  constraint is not established, and it matters: a district whose career-technical programme
-  has grown since 2021 is funded for the programme it had. [open]
+  The `CTE` sheet heads its five count columns `Category 1 Career Tech FTE-FY21`, and the suffix
+  is a label on the FY2022 report the sheet was built for. The department's own table of what
+  each variable is drawn from puts the categorical counts at **FY2026**, and the English learner
+  column carrying the identical suffix moves in **512 of 611 districts** across the two published
+  models. No six-year-old file does that. [verified — `crates/project`]
 
   ### The weights descend across the five categories
 
@@ -60,6 +57,28 @@ findings: |
 
   **All five multiples match the statute exactly.** [verified —
   `crates/project/tests/the_statute_behind_the_weights.rs`]
+
+  ### Stable is not frozen, and the workbook has a control for the difference
+
+  Career-technical really is nearly still — **559 of 611 districts** carry an identical FTE
+  across the two published models, and the statewide total moves from 28,558 to **28,642**,
+  three tenths of a per cent. Gifted moves in 22 districts. Special education moves in 608. All
+  three are drawn from the same fiscal year by the same line of the same table, so what separates
+  them is the kind of count rather than the calendar: a career-technical FTE is fixed by a course
+  schedule and a gifted identification is cumulative, while a special education ADM is
+  re-evaluated all year. [verified — `crates/project`]
+
+  One column on that sheet genuinely is held back. The school building count names FY2025 in its
+  header *and* in the department's vintage table, and it is identical for **all 611 districts in
+  both models**. Nothing else on the sheet manages that, and a count that moves in fifty-two
+  districts is not doing what it does. [verified — `crates/project`]
+
+  What survives of the retracted claim is a narrower question the workbook cannot answer. R.C.
+  3317.02(E) defines these counts as enrolment "during the school year", and a FY2027 simulation
+  cannot use FY2027 counts because FY2027 has not happened — it uses the November 2026 collection
+  and says on its own first sheet that "actual aid will be calculated based on actual data".
+  Whether the payment is finally recomputed on the payment year's own counts, or whether the
+  prior collection is what a district is settled against, is not established here. [open]
 figures:
   - key: project/career-technical-total
     value: 53875678.32
@@ -98,6 +117,51 @@ figures:
     value: 0.1570
     field: description
     as_written: "— 0.623, 0.5905, 0.2154, 0.183, 0.157 —"
+
+  - key: project/english-learner-count-districts-changed
+    value: 512
+    field: description
+    as_written: "moves in **512 of 611 districts** across the two published"
+  - key: project/career-technical-count-districts-unchanged
+    value: 559
+    field: findings
+    as_written: "**559 of 611 districts** carry an identical FTE"
+  - key: project/career-technical-fte-statewide-fy2027
+    value: 28641.919504
+    field: findings
+    as_written: "from 28,558 to **28,642**"
+  - key: project/school-building-count-districts-unchanged
+    value: 611
+    field: findings
+    as_written: "identical for **all 611 districts in\n  both models**"
+revisions:
+  - was: |
+      The counts these weights multiply are frozen at FY2021 — "the sheet's own column headers
+      say so: `Category 1 Career Tech FTE-FY21`" — so a FY2027 payment funds the programme a
+      district ran six years earlier, and whether that is a hold-harmless, a phase-in artefact
+      or a data-availability constraint was recorded as an open question.
+    now: |
+      There is no freeze. The suffix is a label carried forward with a sheet built for the
+      FY2022 report, and the counts under it are FY2026's. The question it opened was a question
+      about a spreadsheet.
+    found_by: |
+      Three things at once, in
+      [`crates/project`](../../../crates/project/tests/the_freeze_that_was_a_stale_column_header.rs).
+      The department's own vintage table, on the `Directions` sheet of each workbook and the
+      `Notes` sheet for the two models before them, names four models and puts the categorical
+      counts at FY23, FY23, FY26 (Aug #1) and FY26 (Nov #2) — the one thing in either file drawn
+      from FY2021 is the guarantee funding base, which is a dollar amount. The English learner
+      column carrying the identical suffix moves in 512 of 611 districts. And every `-FY21`
+      column is the same number, district by district, as an unsuffixed column on the sheet the
+      calculator tells you to edit — checked at rebuild time, both workbooks, all 611.
+    reach: |
+      Four nodes carried the claim and all four are corrected together:
+      [english learner weights](fsfp-english-learner-weights.yml) and the two `parameter` nodes
+      under them. The one that had gone furthest is
+      [english-learner-category-multiples](../parameter/english-learner-category-multiples.yml),
+      whose `sensitivity` reasoned from the freeze to conclude that what moves the programme is
+      composition rather than size — composition does move it, but for the opposite reason.
+      No weight, amount or total on this component changes.
 properties:
   name: Career-technical education weights
   function: |

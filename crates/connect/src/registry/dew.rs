@@ -79,11 +79,14 @@ pub(super) const FOUNDATION: Connector = Connector {
                 crate::fixtures::TRANSPORT_RATES_FIXTURE,
                 crate::fixtures::FY26_FIXTURE,
                 crate::fixtures::CALCULATOR_SCALARS_FIXTURE,
+                crate::fixtures::CALCULATOR_COUNTS_FIXTURE,
+                crate::fixtures::CALCULATOR_VINTAGES_FIXTURE,
             ],
             note: "The FY2026 model, from the Internet Archive because the department serves \
-                   no copy. Two fixtures: the statewide transportation factors, and sixteen \
-                   per-district columns that let the FY2027 model be read against it, and the \
-                   statewide scalars both years state. The note \
+                   no copy. Five fixtures: the statewide transportation factors, sixteen \
+                   per-district columns that let the FY2027 model be read against it, the \
+                   statewide scalars both years state, every count the plan multiplies, and \
+                   the department's own table of where each input came from. The note \
                    here said those tables restate FY2027's and are not committed; per-pupil \
                    local capacity moves 9.3% between the two years and DPIA aid moves -8.6%, \
                    so they do not.",

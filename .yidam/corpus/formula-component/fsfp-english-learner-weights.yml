@@ -33,12 +33,14 @@ description: |
   than a discretion. Whether the descent expresses a judgement that acquisition costs most at
   the start is still not established. [open]
 
-  ### The counts are frozen at FY2021
+  ### The counts are not frozen, and watching them move is the taper in action
 
-  , as with [career-technical](fsfp-career-technical-weights.yml) — `Category 1 EL ADM-FY21`.
-  For a program whose whole structure is about how recently a pupil arrived, funding on a count
-  six years old is a stranger fact than it is for CTE: the FY2021 Category 1 learners are not
-  the FY2027 Category 1 learners. [verified, and its intent is [open]]
+  The `EL` sheet heads its three count columns `Category 1 EL ADM-FY21`, and the suffix is a
+  label on the FY2022 report the sheet was built for. The count moves in **512 of 611 districts**
+  between the department's two published models, and it moves the way the schedule says it
+  should: Category 1, the most recently arrived, falls **22%**, while Category 3 — already
+  scored proficient — rises 12.8% and the total barely moves. That is one year of a cohort
+  walking down the taper, visible in the counts. [verified — `crates/project`]
 findings: |
   **All three multiples match the statute exactly** — 0.2104, 0.1577, 0.1053. [verified]
 
@@ -53,7 +55,60 @@ findings: |
   to a few dozen districts" are both true of the same $36m, and a reader given only the total
   will pick whichever they already believed. That is the general argument for decomposing the
   categorical lump, stated by the smallest program in it. [inference]
+
+  ### Composition moves this programme, and it is now a number
+
+  Because the schedule descends, a pupil who advances a category costs their district money
+  without leaving its population. Between the department's two published models **46 districts**
+  held or grew their English learner headcount and saw their weighted count fall anyway, out of
+  the 524 with any English learner at all. The statewide weighted count falls 3.3% against a
+  headcount that falls 1.2%. [verified — `crates/project`]
+
+  ### The vintage itself moved, and the department does not say why
+
+  Its own table covers four models. The FY2024 and FY2025 simulations drew their categorical
+  counts from FY2023 — the prior year, an actual. The FY2026 and FY2027 simulations draw them
+  from FY2026, which for the later of the two is a year that has not ended. A prior-year count is
+  something a district reported and a current-year count is something it is still reporting, and
+  the change between them is unexplained in the table that records it. [open]
+figures:
+  - key: project/english-learner-count-districts-changed
+    value: 512
+    field: description
+    as_written: "moves in **512 of 611 districts**"
+  - key: project/english-learner-category-one-fall-negative
+    value: 0.2197380352052386
+    field: description
+    as_written: "falls **22%**"
+  - key: project/english-learner-composition-losers
+    value: 46
+    field: findings
+    as_written: "**46 districts**"
 revisions:
+  - was: |
+      The counts these weights multiply are frozen at FY2021, on the strength of the column
+      header `Category 1 EL ADM-FY21` — and "for a program whose whole structure is about how
+      recently a pupil arrived, funding on a count six years old is a stranger fact than it is
+      for CTE: the FY2021 Category 1 learners are not the FY2027 Category 1 learners".
+    now: |
+      The suffix is a label carried forward with a sheet built for the FY2022 report. The counts
+      are FY2026's, and this programme is where the mistake was easiest to catch, because its
+      counts are the ones that move most: 512 of 611 districts, and Category 1 down 22% in a
+      single year.
+    found_by: |
+      [`crates/project`](../../../crates/project/tests/the_freeze_that_was_a_stale_column_header.rs),
+      against the department's own table of where each variable is drawn from. It names four
+      models and puts the categorical counts at FY23, FY23, FY26 (Aug #1) and FY26 (Nov #2); the
+      only thing in either workbook drawn from FY2021 is the guarantee funding base, which is a
+      dollar amount.
+    reach: |
+      The same claim stood on [career-technical](fsfp-career-technical-weights.yml), which is
+      where it was first written, and on both `parameter` nodes beneath them. The furthest it
+      reached is this programme's own
+      [multiples node](../parameter/english-learner-category-multiples.yml), whose `sensitivity`
+      argued from the freeze that what moves the programme is composition rather than size.
+      Composition does move it — the taper is real — but because pupils advance through the
+      categories, not because nobody recounted them.
   - was: |
       This was recorded as the only weighted categorical whose weights run downward — "every
       other weighted categorical runs the other way".
