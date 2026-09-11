@@ -55,6 +55,51 @@ findings: |
   assumed. It is the only entry in this corpus's charge-off series that needs two rows. See
   [`local-share-charge-off-millage`](../parameter/local-share-charge-off-millage.yml).
 
+  ### How much of the state budget the model actually touched
+
+  Ohio wrote the Evidence-Based Model into a new chapter of the Revised Code, R.C. 3306, rather
+  than amending the school-funding chapter it replaced. **That chapter reaches 1 line of the state
+  budget, in 3 editions of the Catalog of Budget Line Items, and appears nowhere else in the
+  other 15** — GRF 200550, Foundation Funding, in 2009, 2010 and 2011. Every other education
+  appropriation went on citing the chapter it had cited before.
+  [verified —
+  [`crates/project`](../../../crates/project/tests/the_chapter_that_reached_one_budget_line.rs)]
+
+  The displaced chapter moves with it. R.C. 3317 authorises **10** of the department's line items
+  in the 2006 and 2008 editions and **6** in each of the model's three, does not reach ten again
+  until the [Fair School Funding Plan](fair-school-funding-plan.yml) era, and stands at **13** in
+  the 2025 edition. The appropriation record dates the regime without being asked to. [verified]
+
+  And the last of the three citations is the one worth reading twice. The 2011 edition authorises
+  Foundation Funding under R.C. 3306 by **Am. Sub. H.B. 153 of the 129th General Assembly** — the
+  act that repealed the model. For one biennium the formula was appropriated under the chapter of
+  the regime being dismantled, which is what a repeal that leaves the payment running looks like
+  in the budget. [verified]
+
+  What this cannot say is how much money moved. A line item's legal basis is its authority, not
+  its amount, and 200550 carries every district's foundation payment in every regime — so the
+  chapter citation dates the model and measures nothing about it. [open]
+figures:
+  - key: project/evidence-based-model-line-items
+    value: 1
+    field: findings
+    as_written: "reaches 1 line of the state\n  budget"
+  - key: project/evidence-based-model-editions
+    value: 3
+    field: findings
+    as_written: "in 3 editions of the Catalog of Budget Line Items"
+  - key: project/chapter-3317-line-items-before-the-model
+    value: 10
+    field: findings
+    as_written: "authorises **10** of the department's line items\n  in the 2006 and 2008 editions"
+  - key: project/chapter-3317-line-items-under-the-model
+    value: 6
+    field: findings
+    as_written: "**6** in each of the model's three"
+  - key: project/chapter-3317-line-items-now
+    value: 13
+    field: findings
+    as_written: "stands at **13** in\n  the 2025 edition"
 properties:
   name: Evidence-Based Model
   effective_from: FY2010

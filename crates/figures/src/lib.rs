@@ -624,6 +624,21 @@ impl Inputs {
     }
 }
 
+/// How many line items one Catalog edition authorises under R.C. 3317.
+///
+/// # Panics
+///
+/// If the edition is not in the basis fixture, which means the extract lost a year.
+fn chapter_lines(edition: u16) -> f64 {
+    #[allow(clippy::cast_precision_loss)]
+    {
+        project::ledger::line_origins::lines_under("3317")
+            .get(&edition)
+            .unwrap_or_else(|| panic!("the {edition} edition"))
+            .len() as f64
+    }
+}
+
 /// One district's FY2016 step on [`dispersion::fy2016::BASIS`].
 ///
 /// # Panics
@@ -2690,6 +2705,75 @@ pub static FIGURES: &[Figure] = &[
         pinned: 0.1204,
         tolerance: 0.0005,
         compute: |i| i.fy2016.model.standardized[1].abs(),
+    },
+    // The Catalog of Budget Line Items' other clause: which Revised Code chapter authorises a line
+    // this biennium, which changes where the establishing act does not.
+    Figure {
+        key: "project/evidence-based-model-line-items",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Line items of the state budget authorised under R.C. 3306, the Evidence-Based \
+                Model's chapter, across eighteen editions of the Catalog",
+        pinned: 1.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| {
+            let under = project::ledger::line_origins::lines_under("3306");
+            let mut alis: Vec<String> = under.into_values().flatten().collect();
+            alis.sort();
+            alis.dedup();
+            alis.len() as f64
+        },
+    },
+    Figure {
+        key: "project/evidence-based-model-editions",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "And the editions it appears in, which are FY2009, FY2010 and FY2011",
+        pinned: 3.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| project::ledger::line_origins::lines_under("3306").len() as f64,
+    },
+    Figure {
+        key: "project/chapter-3317-line-items-before-the-model",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Line items authorised under R.C. 3317 in the 2006 edition, before the model",
+        pinned: 10.0,
+        tolerance: 0.0,
+        compute: |_| chapter_lines(2006),
+    },
+    Figure {
+        key: "project/chapter-3317-line-items-under-the-model",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "In the 2009 edition, its first, which is the same count as each of its three",
+        pinned: 6.0,
+        tolerance: 0.0,
+        compute: |_| chapter_lines(2009),
+    },
+    Figure {
+        key: "project/chapter-3317-line-items-now",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "And in the 2025 edition, under the Fair School Funding Plan",
+        pinned: 13.0,
+        tolerance: 0.0,
+        compute: |_| chapter_lines(2025),
+    },
+    Figure {
+        key: "project/scholarship-line-establishing-span",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Years between the oldest and newest establishing acts of the five line items that \
+                pay Ohio's foundation aid and its scholarships",
+        pinned: 42.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let convened = project::ledger::line_origins::convened;
+            f64::from(convened(133)) - f64::from(convened(112))
+        },
     },
     // Ohio's school construction program, which the corpus had no series for because it looked for
     // one on the paying side. `Ratio` for the correlations; magnitudes with the direction in the
