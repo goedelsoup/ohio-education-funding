@@ -16,6 +16,9 @@ is a build error — `mise run parity` enforces it before running any SDK tests.
 | `find_citations` | Return all nodes that have a directed edge pointing to a given node; result sorted by code point |
 | `is_recognized_verb` | Whether a leading commit verb is in the closed vocabulary |
 | `compile_class_schema` | Compile a `.ont.yml` class definition into a JSON Schema for its instances |
+| `parse_reference` | Parse RFC-0032's reference grammar — `yidam://<corpus>/<kind>/<path>[@<rev>][#<property>]`, the relative forms, and the legacy spellings — into a `Reference`. Total: `null` only for input naming no thing at all |
+| `render_reference` | Render a `Reference` back to a string. The only place an identifier is built |
+| `reference_conforms` | Whether every segment of a `Reference` is a slug, so it needs no escaping in any rendering — and whether its fragment names something, per kind |
 
 The parity surface is versioned in [`VERSION`](VERSION). Any change to a function's
 contract — input shape, output shape, or classification logic — requires bumping this
@@ -25,6 +28,61 @@ version and updating ALL THREE SDK implementations in the same PR.
 table held ten, and `VERSIONING.md` used to say "the six". A number written beside a list is
 a second copy of the list's length with nothing keeping it honest, so the numbers are gone
 and the rows are what a reader counts.
+
+**`references:` is a named field, not a key that survives `extra`.** A node's reference to a thing
+that is not a node — an issue, a crate, a catalog entry — goes in `references:`, as a **string** in
+the grammar rather than a struct: `parse_reference` is the reader, and a struct would be a second
+encoding of the identifier the grammar already spells. `parse_instance/references-are-read-as-written.toml`
+also pins that an unreadable entry is **kept**: a lint check is what names it, and a parser that
+dropped it would hide it from the check.
+
+It had to be named. The key already reached `extra`'s passthrough, so a corpus could write it today
+and nothing would read it — which is how `[unentered]` happened one layer up, and the exit there was
+structure beside the tag rather than a mark the tooling guessed at.
+
+**Two kinds arrived by measurement, not by design (#783).** Across the five corpora that write
+evidence-tag details, 496 references sit inside brackets where nothing can read them, and the two
+largest shapes had no form in the grammar:
+
+| Shape | Count | What it needed |
+|---|---|---|
+| `[verified — #362]` | 252 | a sixth `kind`, `issue` |
+| `` [verified — `dispersion::ohio_panel::equalization_by_year`] `` | 32 | a fragment that can name a code item |
+
+So `kind` is six, and `fragment_conforms` takes the kind: for a `crate` the fragment names a code
+item or a file — `::`, `/`, uppercase and `.` all admitted, because a foreign toolchain names those
+— and for everything else it stays §4.4's dotted property path.
+`reference_conforms/a-code-fragment-on-a-node-does-not-conform.toml` is what fails if the widening
+leaks past `crate`. §4.4's refusal is untouched: what it refuses is a fragment naming a **claim**,
+which RFC-0008 measured to have no identity by surface form, and a Rust item has one a compiler
+enforces.
+
+**The reference grammar is one parser, and the round trip is why.** `parse_reference` and
+`render_reference` are inverses, and `render_reference`'s fixtures are graded twice — once against
+their expected text, and once by parsing that text back. The case that makes it a contract rather
+than a nicety is a corpus with a class named after a kind: `skill/foo` read as a relative reference
+is the *skill* `foo`, because the grammar puts a kind in that position, so a **node** in a class
+called `skill` has to render `node/skill/foo`. Drop that rule in one language and only that
+language's round trip fails, on only the corpora that name a class after a kind. See
+`render_reference/a-class-shadowing-a-kind-names-node.toml`.
+
+Everywhere else the shape is unambiguous without a rule, because a path's segment count decides:
+`node/concept/foo` leaves a two-segment node path so `node` is the kind, and `node/foo` would leave
+one so `node` is a class name.
+
+**`reference_conforms` is reported, never required, and two of its fixtures exist to stop three
+languages agreeing by coincidence.** The predicate is an explicit ASCII range in all three, not a
+regex and not a library call, because `\w` matches `_` in both JavaScript and Python and
+`str.islower()` is true of `é` in Python as `char::is_lowercase` is in Rust. A rule written the
+convenient way in each language would pass every all-ASCII fixture and diverge on the first corpus
+that was not. `an-underscore-does-not-conform.toml` and `non-ascii-lowercase-does-not-conform.toml`
+are what fail when one of them is written the convenient way.
+
+The reason conformance is reported rather than enforced here is measured: fourteen of the sixteen
+corpora with tracked nodes conform, and two do not — `yidam lint --bless` is the supported way to
+be one of the two (#777). A parser that refused non-conforming input would leave six of one
+corpus's ten nodes unnameable and grow a fallback path in every consumer, which is the
+per-surface improvisation the grammar exists to end.
 
 **A YAML date is a string, and the three libraries do not agree about that.** The node
 parser is the only parity function that reads arbitrary YAML, and scalar resolution is where
@@ -170,12 +228,18 @@ It is the largest fixture family here and it went undocumented in this file unti
 check below started asking who reads each directory — which is the finding that check exists
 to produce.
 
-Runners: `yidam/cli/tests/report_goldens.rs` for the goldens themselves, and six test files
-in `yidam/editors/vscode/test/` which drive the extension's reader against the same corpus,
-so a fixture whose output changes fails the goldens and the extension together. Both stage
+Runners: `yidam/cli/tests/report_goldens.rs` for the goldens themselves; six test files in
+`yidam/editors/vscode/test/` which drive the extension's reader against the same corpus; and
+`yidam/editors/web/test/gate.mjs`, which reads the committed `expected/lint.json` directly. So
+a fixture whose output changes fails the goldens and both editors together. The first two stage
 the repository through `basic/stage.toml` rather than each building its own — see
 `basic/README.md` for what the corpus is deliberately built to reach, and for why there were
 once seven copies of that staging.
+
+**The extension's runners need `YIDAM_BIN`, and skip silently without it.** They are the only
+readers here that go through a real binary, so `npm run test:unit` in `yidam/editors/vscode`
+reports a clean pass while checking nothing about a fixture change. Build the CLI and export
+`YIDAM_BIN` before believing that suite about anything under `fixtures/reports/`.
 
 ## The diagnostic_severity fixtures
 

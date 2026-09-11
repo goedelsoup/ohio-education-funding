@@ -12,7 +12,12 @@
     "passed": false,
     "new_violations": 1,
     "baselined_violations": 2,
-    "stale_baseline_entries": [],
+    "stale_baseline_entries": [
+      {
+        "check": "unknown-class",
+        "node": ".yidam/corpus/concept/mixing-zone.yml"
+      }
+    ],
     "expired_baseline_entries": [
       {
         "check": "dangling-edge",
@@ -195,6 +200,20 @@
       "violations": []
     },
     {
+      "id": "name-not-a-slug",
+      "title": "Name that cannot be put in a URI",
+      "severity": "error",
+      "rationale": "A node's id is `<class>/<name>`, and that id is rendered as an MCP resource URI, an LSP `file://` document URI, a web route and an RDF subject. The three that build the string do it three different ways: the MCP surface interpolates raw and matches back with `strip_prefix`, so a space produces a URI no client can round-trip; the LSP escapes a space and nothing else; only the web editor encodes per segment. So a name outside the slug set does not fail loudly, it fails as a resource that cannot be fetched.\n\nMeasured across sixteen corpora and 2,764 instance nodes: fourteen have no finding, and the only non-alphabetic characters those fourteen use are `-` and the digits. Two do have findings — 6 and 16 — and both are the youngest corpora measured, both because their class names came from their domain's vocabulary in its own case: a manufacturing corpus writes `NonConformance`, a water-quality one writes `DischargePoint`. So this is a convention corpora converge on with maturity rather than one they start with.\n\nError anyway, because the finding is true: a name outside this set names a resource no client can fetch, and reporting that quietly would not make it fetchable. What makes it survivable is the baseline — `yidam lint --bless` records the names a corpus already has, and the check still stops the next one. Renaming is what costs, because an edge into a node is written by its name.",
+      "violations": []
+    },
+    {
+      "id": "reference-not-in-the-grammar",
+      "title": "A `references:` entry that is not a reference",
+      "severity": "warn",
+      "rationale": "`references:` is where a node names something that is not a node — an issue, a crate, a catalog entry, a decision — and every entry is a reference in RFC-0032's grammar, written as a string. `yidam_core::uri` is the one parser, so an entry it cannot resolve is an entry no surface can: not the MCP resource namespace, not the RDF export, not a rendered citation.\n\nThe finding names which rule the entry missed, because \"not a reference\" is not actionable and the three causes have three different fixes: a segment count that does not match the kind, a segment that cannot survive being put in a URI, or a fragment that does not name what its kind's fragment names.\n\nWarn rather than Error because the field is new and nothing writes it yet: 496 references across five corpora are still inside evidence-tag brackets, which is the population `yidam migrate references` moves. A finding here is a typo in a file somebody is already editing, and the baseline is what keeps it from going quiet.",
+      "violations": []
+    },
+    {
       "id": "missing-label",
       "title": "Instance with no human-readable label",
       "severity": "warn",
@@ -212,7 +231,7 @@
       "id": "claim-tag-malformed",
       "title": "Evidence tag that counts as nothing",
       "severity": "warn",
-      "rationale": "The three tokens are matched exactly, which is what keeps `[open questions](…)` from reading as an open claim. The cost is that a tag with its citation folded inside the brackets matches nothing and is silently counted as untagged — a node that looks tagged to a reader and reads as bare assertion to every counter. This reports the near miss rather than guessing at it. Brackets are matched by depth over the block rather than to the first `]` on the line, because a citation that is itself a link both nests a `]` and wraps: measured on one derived corpus, the line scan found 234 of 445 such tags and none of the 179 that wrapped. The block is the bound, so an unbalanced `[` in quoted source costs one bracket rather than every tag below it.\n\nScope: every instance file and every class file, read as bytes — so a tag in a class's `description`, in a `properties[]` or `edges[]` entry, or in its `analytic_note` is reported the same way one in a node is. Measured over 17 corpora, all four carry tags. Reading a class's parsed fields instead would miss two of the four outright, because the property and edge structs declare no `description` at all. `universal.yml` is not read: it is a property list, not an argument.",
+      "rationale": "The three tokens are matched exactly, which is what keeps `[open questions](…)` from reading as an open claim. The cost is that a tag with its citation folded inside the brackets matches nothing and is silently counted as untagged — a node that looks tagged to a reader and reads as bare assertion to every counter. This reports the near miss rather than guessing at it. Brackets are matched by depth over the block rather than to the first `]` on the line, because a citation that is itself a link both nests a `]` and wraps: measured on one derived corpus, the line scan found 234 of 445 such tags and none of the 179 that wrapped. The block is the bound, so an unbalanced `[` in quoted source costs one bracket rather than every tag below it.\n\nScope: every instance file and every class file, read as bytes — so a tag in a class's `description`, in a `properties[]` or `edges[]` entry, or in its `analytic_note` is reported the same way one in a node is. Measured over 17 corpora, all four carry tags. Reading a class's parsed fields instead would miss two of the four outright, because the property and edge structs declare no `description` at all. `universal.yml` is not read: it is a property list, not an argument.\n\nOne check, two pieces of advice. A detail naming a source is told to put the citation beside the tag. A detail that *narrows* the claim is not, because moving `as proposed` out of the brackets leaves a bare `[verified]` asserting more than the sentence does — the advice would make the corpus less accurate and the counter more confident. Measured over thirteen derived corpora, ~89% of details name a source, so the citation advice is the default and a detail diverts only on an unambiguous narrowing tell: a second standing, or a narrowing head as its first word. That tell also admits a space-introduced detail the separator list cannot see, which is where 59 of the 105 narrowing details in the population were sitting.",
       "violations": []
     },
     {
