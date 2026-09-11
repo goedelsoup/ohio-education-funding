@@ -153,10 +153,24 @@ test("no node writes the retired fourth mark, and the structure replaced it", ()
  */
 test("the retired mark survives only where the corpus is recording that it retired it", () => {
   const YIDAM = join(import.meta.dirname, "../../../.yidam");
+  // `.vendor/` is out of scope, and not as an exemption for inconvenient material. The rule above
+  // is about what a file is FOR: an instruction here answers "how do I write a node today", and
+  // the vendored prelude is not this repository's instruction to anyone — it is imported
+  // unmodified from yidam and adopted by re-vendoring, which is why `yidam lint` files broken
+  // links in it under `unauthored-prose-link` rather than `broken-prose-link`. Editing it to pass
+  // a test of ours would falsify the record of what was imported, and the next re-vendor would
+  // overwrite the edit anyway.
+  //
+  // It cost a red gate to find: yidam's cli/v0.12.0 prelude added a parity README that cites
+  // `[unentered]` as the precedent for naming a key rather than guessing at a mark — upstream
+  // reasoning about THIS corpus's retired mark, in a paragraph that teaches nothing about writing
+  // one here.
   const files = (dir: string): string[] =>
     readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
       entry.isDirectory()
-        ? files(join(dir, entry.name))
+        ? entry.name === ".vendor"
+          ? []
+          : files(join(dir, entry.name))
         : /\.(md|yml)$/.test(entry.name)
           ? [join(dir, entry.name)]
           : [],
