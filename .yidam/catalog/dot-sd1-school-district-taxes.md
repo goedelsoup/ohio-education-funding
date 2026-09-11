@@ -24,11 +24,18 @@ how [recognized valuation](dot-reappraisal-calendar.md) is reconstructed without
 publishes it. The separation is stark — a median 28.6% jump in the event year against 1.5%
 otherwise.
 
-**A trap the extra years set, recorded because it caught four callers.** With two tax years,
+**A trap the extra years set, recorded because it caught five callers.** With two tax years,
 `first()` and `last()` are adjacent, so every consumer that wanted a year-over-year change took
 the ends. With four they are three years apart and span a reappraisal. Nothing failed loudly:
 a rate is still a rate and a page still renders. Anything reading this fixture as a change must
 take the **last two**.
+
+The fifth caller was a node rather than a function, and it failed differently: `metric/assessed-
+valuation-per-pupil` published a three-row table with one TY2024 row and two TY2023 rows, a count
+and a median that reproduce only on TY2024, and the numerator identity the finding rests on, which
+holds only on TY2023 — all labelled `[verified — TY2023]`. No figure was wrong about the fixture
+and no two of them had to be from the same year. **Anything reading this fixture as a level must
+name a tax year in a constant**, which is what `dispersion::valuation::TAX_YEAR` now is.
 
 **Two worksheets per workbook, differing in one thing.** `SD1DAT…` counts the joint vocational
 school district's operating levy in the taxes charged; `ExJVS…` removes it. 501 of 611 districts

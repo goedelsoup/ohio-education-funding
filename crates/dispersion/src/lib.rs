@@ -49,6 +49,7 @@ pub mod profile;
 pub mod report_card;
 pub mod sd1;
 pub mod survey_basis;
+pub mod valuation;
 
 use edfund_core::Dollars;
 

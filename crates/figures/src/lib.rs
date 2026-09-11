@@ -624,6 +624,17 @@ impl Inputs {
     }
 }
 
+/// One district's resident pupils per pupil taught, on `dispersion::valuation::TAX_YEAR`.
+///
+/// # Panics
+///
+/// If the district does not join both tables, which means one of the fixtures moved.
+fn named_ratio(irn: &str) -> f64 {
+    dispersion::valuation::district(irn)
+        .unwrap_or_else(|| panic!("{irn} joins both tables"))
+        .denominator_ratio()
+}
+
 /// How many line items one Catalog edition authorises under R.C. 3317.
 ///
 /// # Panics
@@ -2858,6 +2869,97 @@ pub static FIGURES: &[Figure] = &[
         compute: |_| {
             let convened = project::ledger::line_origins::convened;
             f64::from(convened(133)) - f64::from(convened(112))
+        },
+    },
+    // The metric Ohio publishes twice. Every figure on `dispersion::valuation::TAX_YEAR`, because
+    // the node that published them first did not fix a year and the table came out three.
+    Figure {
+        key: "dispersion/valuation-numerator-agreement",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts on which the Department of Taxation's total taxable value and the \
+                District Profile Report's valuation per pupil reproduce each other exactly, of 606",
+        pinned: 606.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| dispersion::valuation::numerators_agree().0 as f64,
+    },
+    Figure {
+        key: "dispersion/valuation-agreement-within-two-per-cent",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "And districts whose two published per-pupil figures agree within 2% \u{2014} the \
+                numerators are identical, so the rest is the pupil count",
+        pinned: 63.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| dispersion::valuation::agreement().0 as f64,
+    },
+    Figure {
+        key: "dispersion/valuation-median-enrolled",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Median assessed valuation per pupil on the count of children a district teaches",
+        pinned: 248_096.51,
+        tolerance: 0.01,
+        compute: |_| dispersion::valuation::medians().0,
+    },
+    Figure {
+        key: "dispersion/valuation-median-resident",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "And on the count of children resident in it \u{2014} six per cent apart at the \
+                median, and more than two to one in the districts that matter",
+        pinned: 233_319.65,
+        tolerance: 0.01,
+        compute: |_| dispersion::valuation::medians().1,
+    },
+    Figure {
+        key: "dispersion/youngstown-denominator-ratio",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Resident pupils per pupil taught, Youngstown City \u{2014} the widest in the state",
+        pinned: 2.2337,
+        tolerance: 0.0005,
+        compute: |_| named_ratio("045161"),
+    },
+    Figure {
+        key: "dispersion/columbus-denominator-ratio",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Resident pupils per pupil taught, Columbus City \u{2014} the largest district \
+                with the divergence",
+        pinned: 1.6725,
+        tolerance: 0.0005,
+        compute: |_| named_ratio("043802"),
+    },
+    Figure {
+        key: "dispersion/youngstown-valuation-per-pupil-enrolled",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Youngstown City's assessed valuation per pupil on the Department of Education's \
+                count",
+        pinned: 172_999.40,
+        tolerance: 0.01,
+        compute: |_| {
+            dispersion::valuation::district("045161")
+                .expect("Youngstown joins both tables")
+                .on_enrolled()
+                .value
+        },
+    },
+    Figure {
+        key: "dispersion/youngstown-valuation-per-pupil-resident",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "And on the Department of Taxation's, which is the same property",
+        pinned: 77_450.72,
+        tolerance: 0.01,
+        compute: |_| {
+            dispersion::valuation::district("045161")
+                .expect("Youngstown joins both tables")
+                .on_resident()
+                .value
         },
     },
     // Ohio's school construction program, which the corpus had no series for because it looked for
