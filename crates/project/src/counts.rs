@@ -419,3 +419,237 @@ pub fn composition_losers() -> (usize, usize) {
     }
     (losers, any)
 }
+
+/// Enrolled ADM as each workbook publishes it, long-form.
+const ADM_SERIES: &str = include_str!("../fixtures/calculator-adm-series.csv");
+
+/// One district's enrolled ADM in one column of one workbook.
+#[derive(Debug, Clone)]
+pub struct AdmRow {
+    /// The fiscal year the workbook models.
+    pub workbook: u16,
+    /// The department's district key.
+    pub irn: String,
+    /// District name.
+    pub name: String,
+    /// `a`, `b1`, `b2` or `b3`.
+    pub column: String,
+    /// The fiscal year the column's heading names — `None` for `[a]`, which names none.
+    pub label_fiscal_year: Option<u16>,
+    /// The count.
+    pub enrolled_adm: Adm,
+}
+
+/// Every row of the enrolled ADM series.
+///
+/// # Panics
+///
+/// If the fixture's header is not the one this reader was written against.
+#[must_use]
+pub fn adm_series() -> Vec<AdmRow> {
+    let mut lines = ADM_SERIES.lines();
+    assert_eq!(
+        lines.next().unwrap_or_default(),
+        "workbook,irn,district,column,label_fiscal_year,enrolled_adm",
+        "calculator-adm-series.csv header changed under a positional reader"
+    );
+    lines
+        .filter_map(|line| {
+            let cells: Vec<&str> = line.split(',').collect();
+            assert_eq!(cells.len(), 6, "calculator-adm-series.csv row: {line}");
+            Some(AdmRow {
+                workbook: cells[0].parse().ok()?,
+                irn: cells[1].to_string(),
+                name: cells[2].to_string(),
+                column: cells[3].to_string(),
+                label_fiscal_year: cells[4].parse().ok(),
+                enrolled_adm: cells[5].parse().ok()?,
+            })
+        })
+        .collect()
+}
+
+/// The department's own enrolled ADM history, by fiscal year and then by IRN.
+///
+/// Four years, FY2023 to FY2026, because the two workbooks carry overlapping three-year windows.
+/// Where both publish a year the later workbook wins — it is the department's own restatement, and
+/// [`adm_restatement`] is how far it moved.
+#[must_use]
+pub fn adm_history() -> BTreeMap<u16, BTreeMap<String, f64>> {
+    let mut out: BTreeMap<u16, BTreeMap<String, f64>> = BTreeMap::new();
+    let mut rows = adm_series();
+    rows.sort_by_key(|row| row.workbook);
+    for row in rows {
+        let Some(year) = row.label_fiscal_year else {
+            continue;
+        };
+        out.entry(year)
+            .or_default()
+            .insert(row.irn, row.enrolled_adm);
+    }
+    out
+}
+
+/// How far a year moved between the workbook that first published it and the next one.
+#[derive(Debug, Clone, Copy)]
+pub struct Restatement {
+    /// The fiscal year restated.
+    pub fiscal_year: u16,
+    /// Districts both workbooks publish it for.
+    pub paired: usize,
+    /// Of those, how many carry an identical value.
+    pub identical: usize,
+    /// The statewide total as first published.
+    pub before: f64,
+    /// And as restated.
+    pub after: f64,
+    /// The largest relative move in any one district.
+    pub worst: f64,
+}
+
+/// The two years both workbooks publish, as first published and as restated.
+///
+/// This is the size of the caveat that the most recent observation in a model is a departmental
+/// estimate. It is real and it is small.
+#[must_use]
+pub fn adm_restatement(fiscal_year: u16) -> Option<Restatement> {
+    let rows = adm_series();
+    let at = |workbook: u16| -> BTreeMap<String, f64> {
+        rows.iter()
+            .filter(|row| row.workbook == workbook && row.label_fiscal_year == Some(fiscal_year))
+            .map(|row| (row.irn.clone(), row.enrolled_adm))
+            .collect()
+    };
+    let (before, after) = (at(YEARS.0), at(YEARS.1));
+    if before.is_empty() || after.is_empty() {
+        return None;
+    }
+    let mut out = Restatement {
+        fiscal_year,
+        paired: 0,
+        identical: 0,
+        before: 0.0,
+        after: 0.0,
+        worst: 0.0,
+    };
+    for (irn, first) in &before {
+        let Some(later) = after.get(irn) else {
+            continue;
+        };
+        out.paired += 1;
+        out.before += first;
+        out.after += later;
+        if (first - later).abs() < 1e-9 {
+            out.identical += 1;
+        } else if *first != 0.0 {
+            out.worst = out.worst.max(((later - first) / first).abs());
+        }
+    }
+    Some(out)
+}
+
+/// Whether a model's `[a]` column is its own `[b3]`, district by district.
+///
+/// In the FY2026 model it is, for all 611 — and the department's line-by-line explanation says
+/// why: *"The Enrolled ADM is calculated for FY 2023, FY 2024, and FY 2025. The Base Cost Enrolled
+/// ADM is the larger of the 3-year Average or the FY 2025 Enrolled ADM."* A model's most recent
+/// enrolled ADM is the **previous** fiscal year's, so the `Directions` sheet's "FY26 (Aug #1)"
+/// names a collection window rather than a year of data.
+///
+/// In the FY2027 model it is not, and no line-by-line explanation of that model is published.
+#[must_use]
+pub fn current_is_the_third_column(workbook: u16) -> (usize, usize) {
+    let rows = adm_series();
+    let pick = |column: &str| -> BTreeMap<String, f64> {
+        rows.iter()
+            .filter(|row| row.workbook == workbook && row.column == column)
+            .map(|row| (row.irn.clone(), row.enrolled_adm))
+            .collect()
+    };
+    let (current, third) = (pick("a"), pick("b3"));
+    let same = current
+        .iter()
+        .filter(|(irn, value)| {
+            third
+                .get(*irn)
+                .is_some_and(|other| (*value - other).abs() < 1e-9)
+        })
+        .count();
+    (same, current.len())
+}
+
+/// Year-over-year growth in enrolled ADM, by the later year and then by IRN.
+#[must_use]
+pub fn adm_growth() -> BTreeMap<u16, BTreeMap<String, f64>> {
+    let history = adm_history();
+    let years: Vec<u16> = history.keys().copied().collect();
+    let mut out: BTreeMap<u16, BTreeMap<String, f64>> = BTreeMap::new();
+    for pair in years.windows(2) {
+        let (earlier, later) = (&history[&pair[0]], &history[&pair[1]]);
+        for (irn, before) in earlier {
+            let Some(after) = later.get(irn) else {
+                continue;
+            };
+            if *before > 0.0 {
+                out.entry(pair[1])
+                    .or_default()
+                    .insert(irn.clone(), after / before - 1.0);
+            }
+        }
+    }
+    out
+}
+
+/// How much of a district's growth rate carries into the next year.
+///
+/// `(earlier year, later year, correlation, districts)`, one entry per consecutive pair of growth
+/// rates. Each year's own mean is removed before correlating, so a common statewide trend cannot
+/// produce the result.
+///
+/// # Why this is the figure worth having
+///
+/// [`crate::series::DEFAULT_DAMPING`] is exactly this quantity — the share of a fitted growth rate
+/// the projection carries into each further year — and it was fitted at **0.30** out of sample on
+/// the F-33 panel's `V33` fall membership, a different measure over a different population.
+/// The department's own enrolled ADM had three observations and so could not check it. With four
+/// it can, and does.
+#[must_use]
+pub fn adm_persistence() -> Vec<(u16, u16, f64, usize)> {
+    let growth = adm_growth();
+    let years: Vec<u16> = growth.keys().copied().collect();
+    let mut out = Vec::new();
+    for pair in years.windows(2) {
+        let (first, second) = (&growth[&pair[0]], &growth[&pair[1]]);
+        let paired: Vec<(f64, f64)> = first
+            .iter()
+            .filter_map(|(irn, a)| second.get(irn).map(|b| (*a, *b)))
+            .collect();
+        if paired.len() < 2 {
+            continue;
+        }
+        let n = paired.len() as f64;
+        let mean_x = paired.iter().map(|(a, _)| a).sum::<f64>() / n;
+        let mean_y = paired.iter().map(|(_, b)| b).sum::<f64>() / n;
+        let covariance: f64 = paired
+            .iter()
+            .map(|(a, b)| (a - mean_x) * (b - mean_y))
+            .sum();
+        let spread_x: f64 = paired
+            .iter()
+            .map(|(a, _)| (a - mean_x).powi(2))
+            .sum::<f64>()
+            .sqrt();
+        let spread_y: f64 = paired
+            .iter()
+            .map(|(_, b)| (b - mean_y).powi(2))
+            .sum::<f64>()
+            .sqrt();
+        out.push((
+            pair[0],
+            pair[1],
+            covariance / (spread_x * spread_y),
+            paired.len(),
+        ));
+    }
+    out
+}

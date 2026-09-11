@@ -159,6 +159,18 @@ impl Method {
 /// worse than the optimum, and a least-squares straight line is worse still and gets worse with
 /// more history — it projects a district through zero, which is the failure damping exists to
 /// prevent.
+///
+/// # And the department's own series now agrees, which it could not before
+///
+/// The fit above is out of sample on the F-33 panel — Census `V33` fall membership, 602 districts
+/// — because the department's enrolled ADM had three observations and three observations give one
+/// growth rate per district. Reading the FY2026 model's `ADM Data` beside the FY2027 model's gives
+/// **four** years and so two estimates of the quantity this constant is: the correlation between a
+/// district's growth rate and its next one. They are **0.328** and **0.341**, over 609 districts,
+/// each year demeaned. A different survey, a different population and a different method land
+/// within five hundredths of the fitted value. See
+/// `crates/project/tests/the_two_columns_that_both_say_fy2023.rs`, which also shows what splicing
+/// the growth supplement's FY2023 column into that series does to the earlier of the two.
 pub const DEFAULT_DAMPING: f64 = 0.30;
 
 /// How much of a district's own three-point rate survives the shrink toward its long-run one.

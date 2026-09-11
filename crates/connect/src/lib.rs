@@ -908,6 +908,40 @@ fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(cause) => Rebuilt::skipped(fixtures::CALCULATOR_COUNTS_FIXTURE, cause.to_string()),
     });
 
+    // Enrolled ADM as each workbook publishes it. Two overlapping three-year windows, so the
+    // department's own series runs FY2023-FY2026 rather than the three years either file shows.
+    let adm_series = (|| -> Result<Vec<Vec<String>>, RebuildError> {
+        let mut books = Vec::new();
+        for (fiscal_year, key) in [(2026, "fy26-calculator"), (2027, "fy27-calculator")] {
+            let book = open_workbook(root, registered(key))?;
+            books.push((
+                fiscal_year,
+                book.rows(fixtures::counts::ADM_SHEET)?,
+                book.rows(fixtures::counts::CTE_SHEET)?,
+                book.rows(fixtures::counts::EL_SHEET)?,
+            ));
+        }
+        let years: Vec<fixtures::CountYear<'_>> = books
+            .iter()
+            .map(|(fiscal_year, adm, cte, el)| fixtures::CountYear {
+                fiscal_year: *fiscal_year,
+                adm,
+                cte,
+                el,
+            })
+            .collect();
+        fixtures::build_calculator_adm_series(&years).map_err(RebuildError::Layout)
+    })();
+    out.push(match adm_series {
+        Ok(rows) => csv_fixture(
+            root,
+            fixtures::CALCULATOR_ADM_FIXTURE,
+            fixtures::CALCULATOR_ADM_HEADER,
+            &rows,
+        )?,
+        Err(cause) => Rebuilt::skipped(fixtures::CALCULATOR_ADM_FIXTURE, cause.to_string()),
+    });
+
     let vintages = (|| -> Result<Vec<Vec<String>>, RebuildError> {
         let mut books = Vec::new();
         for (workbook, key) in [(2026, "fy26-calculator"), (2027, "fy27-calculator")] {

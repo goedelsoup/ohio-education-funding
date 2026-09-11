@@ -3172,6 +3172,62 @@ pub static FIGURES: &[Figure] = &[
     },
     // The counts the plan multiplies, both published models. Four nodes read a vintage off a
     // column header -- `Category 1 Career Tech FTE-FY21` -- and the header is four years stale.
+    // Four years of the department's enrolled ADM, and what the fourth one buys.
+    Figure {
+        key: "project/adm-growth-persistence",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "How much of a district's enrolment growth rate carries into the next year, \
+                FY2025 to FY2026 \u{2014} the quantity the projection's damping parameterises",
+        pinned: 0.341_205,
+        tolerance: 0.000_01,
+        compute: |_| project::counts::adm_persistence()[1].2,
+    },
+    Figure {
+        key: "project/adm-growth-persistence-earlier-window",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The same correlation one year earlier, on the consistent series",
+        pinned: 0.327_930,
+        tolerance: 0.000_01,
+        compute: |_| project::counts::adm_persistence()[0].2,
+    },
+    Figure {
+        key: "project/adm-fy2023-columns-that-disagree",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts where the growth supplement's FY2023 enrolled ADM differs from the base \
+                cost window's \u{2014} two columns of one workbook under one name",
+        pinned: 608.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |i| {
+            let base_cost = project::counts::adm_history();
+            let base_cost = base_cost.get(&2023).cloned().unwrap_or_default();
+            i.panel
+                .iter()
+                .filter(|record| {
+                    base_cost.get(&record.irn).is_some_and(|ours| {
+                        (ours - record.supplements.adm_fy23).abs() >= 1e-9
+                    })
+                })
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "project/adm-fy2025-restated-districts",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts whose FY2025 enrolled ADM the department restated between its two \
+                published models \u{2014} of 611, and by at most a third of a per cent",
+        pinned: 140.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| {
+            let restated = project::counts::adm_restatement(2025).expect("both models publish it");
+            (restated.paired - restated.identical) as f64
+        },
+    },
     Figure {
         key: "project/english-learner-count-districts-changed",
         owner: "crates/project",

@@ -498,7 +498,14 @@ mod growth_columns {
     pub const IRN: usize = 0;
     /// `L Base Funding Supplement` — $40 times enrolled ADM, for everyone.
     pub const BASE_SUPPLEMENT: usize = 4;
-    /// `M1B FY23 Enrolled ADM` — a fourth ADM year, which the panel did not hold.
+    /// `M1B FY23 Enrolled ADM` — the growth supplement's base year, and **not** the `[b1] FY23`
+    /// the `ADM Data` sheet publishes under the same words.
+    ///
+    /// The two disagree in 608 of 611 districts, by up to 4.6%, and reading them as one series
+    /// reverses a correlation the workspace publishes a constant for — see
+    /// `crates/project/tests/the_two_columns_that_both_say_fy2023.rs`. This one belongs to the
+    /// supplement and is right for it; the base-cost family's FY2023 is in
+    /// `crates/project/fixtures/calculator-adm-series.csv`.
     pub const ADM_FY23: usize = 6;
     /// `M1` — the three-year change, against which `M2` tests 3%.
     pub const CHANGE: usize = 7;

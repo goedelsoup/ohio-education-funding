@@ -79,6 +79,20 @@ pub const CALCULATOR_COUNTS_HEADER: &[&str] = &[
     "school_buildings",
 ];
 
+/// Columns of the enrolled ADM series: one row per district per ADM column per workbook.
+///
+/// Long rather than wide because the two workbooks carry **overlapping** three-year windows —
+/// FY2023-FY2025 and FY2024-FY2026 — and the overlap is the point. A wide row would have to pick
+/// one of the two readings of FY2024 and FY2025; this keeps both and lets a reader compare them.
+pub const CALCULATOR_ADM_HEADER: &[&str] = &[
+    "workbook",
+    "irn",
+    "district",
+    "column",
+    "label_fiscal_year",
+    "enrolled_adm",
+];
+
 /// Columns of the vintage fixture: the department's own account of its own inputs.
 pub const CALCULATOR_VINTAGES_HEADER: &[&str] =
     &["workbook", "model", "calculation", "variable", "data_from"];
@@ -239,6 +253,13 @@ fn suffixed_columns_restate_the_data_sheet(year: &CountYear<'_>) -> Result<usize
     Ok(checked)
 }
 
+/// The `ADM Data` columns carrying a year of enrolled ADM.
+///
+/// `[b1]`, `[b2]` and `[b3]` head their own fiscal year and `[a]` heads none. Read by tag and the
+/// year taken from the heading, because the window advances one year between workbooks: the
+/// FY2026 model's `[b1]` is FY2023 and the FY2027 model's is FY2024.
+const ADM_TAGS: &[&str] = &["a", "b1", "b2", "b3"];
+
 /// One year's workbook, in the two tables that say where its numbers came from.
 pub struct VintageYear<'a> {
     /// The fiscal year the workbook models.
@@ -247,6 +268,79 @@ pub struct VintageYear<'a> {
     pub directions: &'a [Vec<String>],
     /// [`NOTES_SHEET`].
     pub notes: &'a [Vec<String>],
+}
+
+/// One row per district per enrolled ADM column per workbook, oldest workbook first.
+///
+/// # Errors
+///
+/// If a year's `ADM Data` sheet is missing its header row, or a `[b]` column's heading no longer
+/// carries the fiscal year it is for. A `[b]` column without a year is the one thing this fixture
+/// cannot guess at: the window moves, so position says nothing.
+pub fn build_calculator_adm_series(years: &[CountYear<'_>]) -> Result<Vec<Vec<String>>, String> {
+    let mut out = Vec::new();
+    for year in years {
+        let head = header_row(year.adm, ADM_SHEET)?;
+        let mut columns: Vec<(usize, &str, String)> = Vec::new();
+        for tag in ADM_TAGS {
+            let at = year.adm[head]
+                .iter()
+                .position(|found| {
+                    let found = found.trim();
+                    found.starts_with(&format!("[{tag}]")) && found.contains("Enrolled ADM")
+                })
+                .ok_or_else(|| {
+                    format!(
+                        "FY{}: `{ADM_SHEET}` has no `[{tag}] … Enrolled ADM`",
+                        year.fiscal_year
+                    )
+                })?;
+            let heading = year.adm[head][at].trim();
+            // `[a]` heads no year, and that is itself a fact worth committing: in the FY2026 model
+            // its values are the `[b3]` column's exactly, and the department's line-by-line says
+            // why — the most recent enrolled ADM a model uses is the *previous* fiscal year's.
+            let label = if *tag == "a" {
+                String::new()
+            } else {
+                let at_fy = heading.find("FY").ok_or_else(|| {
+                    format!(
+                        "FY{}: `{heading}` names no fiscal year, and the window moves",
+                        year.fiscal_year
+                    )
+                })?;
+                let digits: String = heading[at_fy + 2..]
+                    .chars()
+                    .take_while(char::is_ascii_digit)
+                    .collect();
+                let short: u16 = digits
+                    .parse()
+                    .map_err(|_| format!("FY{}: `{heading}`", year.fiscal_year))?;
+                if short < 100 { 2000 + short } else { short }.to_string()
+            };
+            columns.push((at, tag, label));
+        }
+        for row in &year.adm[head + 1..] {
+            let irn = cell(row, 0).trim().to_string();
+            if irn.is_empty() || is_statewide_row(row, 1) {
+                continue;
+            }
+            for (at, tag, label) in &columns {
+                let value = row.get(*at).and_then(|raw| raw.trim().parse::<f64>().ok());
+                out.push(vec![
+                    year.fiscal_year.to_string(),
+                    irn.clone(),
+                    clean_name(cell(row, 1)),
+                    (*tag).to_string(),
+                    label.clone(),
+                    format_value(value, 6),
+                ]);
+            }
+        }
+    }
+    out.sort_by(|left, right| {
+        (&left[0], &left[1], &left[3]).cmp(&(&right[0], &right[1], &right[3]))
+    });
+    Ok(out)
 }
 
 /// The header row of a per-district table, found by its first cell rather than by position.
