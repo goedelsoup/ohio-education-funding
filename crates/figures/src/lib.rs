@@ -2706,6 +2706,91 @@ pub static FIGURES: &[Figure] = &[
         tolerance: 0.0005,
         compute: |i| i.fy2016.model.standardized[1].abs(),
     },
+    // Whether the performance supplement moves a district's position, which the node that
+    // measured its gradient recorded as open.
+    Figure {
+        key: "project/performance-supplement-districts-moved",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts whose place in the order of state support per pupil changes when the \
+                performance supplement is removed, of 609",
+        pinned: 370.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| project::supplement_reach::rank_moves().0 as f64,
+    },
+    Figure {
+        key: "project/performance-supplement-mean-rank-move",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "And how far the average district moves, in places",
+        pinned: 1.0673,
+        tolerance: 0.0005,
+        compute: |_| project::supplement_reach::rank_moves().1,
+    },
+    Figure {
+        key: "project/performance-supplement-quintile-crossings",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts the supplement carries across a quintile boundary of state aid per pupil",
+        pinned: 4.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| project::supplement_reach::quintile_crossings().len() as f64,
+    },
+    Figure {
+        key: "project/state-aid-dispersion-with-supplement",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "Coefficient of variation of state support per pupil across Ohio's districts",
+        pinned: 0.5242,
+        tolerance: 0.0005,
+        compute: |_| project::supplement_reach::dispersion().0,
+    },
+    Figure {
+        key: "project/state-aid-dispersion-without-supplement",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The same with the performance supplement removed \u{2014} wider, so the \
+                supplement narrows Ohio's equalisation rather than widening it",
+        pinned: 0.5281,
+        tolerance: 0.0005,
+        compute: |_| project::supplement_reach::dispersion().1,
+    },
+    Figure {
+        key: "project/performance-supplement-share-of-least-poor-aid",
+        owner: "crates/project",
+        // Under this manifest's share floor, like its pair below: the prose bound to it carries
+        // the bare numeral and no per-cent sign.
+        unit: Unit::Ratio,
+        label: "The supplement as a share of the state aid the least-poor quartile of districts \
+                already receives",
+        pinned: 0.011408,
+        tolerance: 0.0005,
+        compute: |_| project::supplement_reach::relative_to_aid()[0],
+    },
+    Figure {
+        key: "project/performance-supplement-share-of-poorest-aid",
+        owner: "crates/project",
+        // Under this manifest's share floor, so the prose bound to it carries no per-cent sign.
+        unit: Unit::Ratio,
+        label: "And of the aid the poorest quartile receives \u{2014} a fifth as much, against a \
+                per-pupil gradient of 2.56",
+        pinned: 0.002173,
+        tolerance: 0.0005,
+        compute: |_| project::supplement_reach::relative_to_aid()[3],
+    },
+    Figure {
+        key: "project/guaranteed-districts-paid-a-supplement",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts on the guarantee that are paid a performance supplement on top of it, \
+                of 294 \u{2014} the supplement is line [O] and the guarantee is computed on [H]",
+        pinned: 217.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| project::supplement_reach::paid_on_the_guarantee().1 as f64,
+    },
     // The Catalog of Budget Line Items' other clause: which Revised Code chapter authorises a line
     // this biennium, which changes where the establishing act does not.
     Figure {
