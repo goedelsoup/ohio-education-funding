@@ -166,9 +166,19 @@ findings: |
   [H.B. 166](../legislation/hb-166-2019.yml) both years were held at FY2019, so a FY2021
   transportation payment may be the same dollar the section reaches back for — which
   [transportation-cost-rates](../parameter/transportation-cost-rates.yml) keeps as unfilled,
-  because settling it needs a per-district figure for one of those years and no committed source
-  carries one. What is settled is what the base *is*: one definition, stated in two places, and
-  neither of them this formula. [verified for the definition; the identification is [open]]
+  because settling it needs a per-district figure for one of those years. What is settled is what
+  the base *is*: one definition, stated in two places, and neither of them this formula.
+  [verified for the definition]
+
+  **That blocker has now been checked rather than asserted, and it holds.** No committed fixture
+  carries a per-district FY2020 or FY2021 transportation *payment*. The FY2027 model's
+  `trans_fy21_base` is the quantity in question and not an independent check; the FY2026 model
+  carries only reported special-education cost, the special-education payment and the total;
+  `f33-ohio-panel` carries district *spending* under `V45`, which is what a district laid out
+  rather than what the state sent; and `district-finances` splits aid no finer than unrestricted
+  against restricted. [verified] So the identification is not unasked — it is waiting on the
+  department's per-district payment reports, the source behind `dew-payment-reports`, whose own
+  blocker is an authenticated portal rather than an absence. [open — pending that retrieval]
 
   ### The general proration factor is an appropriation, not a dial
 
