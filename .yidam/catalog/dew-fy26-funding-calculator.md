@@ -79,14 +79,27 @@ hundred kilobytes. Built by
 [`project::prior_model`](../../crates/project/src/prior_model.rs). The rest of the per-district
 tables genuinely do restate what FY2027 already holds, and are still not taken.
 
+**And the second year is what makes a vintage checkable at all.** The `CTE` and `EL` sheets head
+their count columns `-FY21`, and four corpus nodes read a six-year freeze off that suffix. It is a
+stale label on a sheet built for the FY2022 report: the English learner column carrying it moves in
+512 of 611 districts between these two workbooks, and the department's own `Directions` table —
+rewritten for each year's file, unlike the headers — puts the categorical counts at FY26 in both.
+One workbook could not have shown that. Every count the plan multiplies is committed for both years
+at `crates/project/fixtures/calculator-counts.csv`, and the two vintage tables at
+`crates/project/fixtures/calculator-vintages.tsv`, built by
+[`crates/connect/src/fixtures/counts.rs`](../../crates/connect/src/fixtures/counts.rs).
+
 ## Used by
 
 - [`parameter/transportation-cost-rates`](../corpus/parameter/transportation-cost-rates.yml)
 - [`formula-component/fsfp-local-capacity-measure`](../corpus/formula-component/fsfp-local-capacity-measure.yml)
 - [`formula-component/fsfp-disadvantaged-pupil-impact-aid`](../corpus/formula-component/fsfp-disadvantaged-pupil-impact-aid.yml)
+- [`formula-component/fsfp-career-technical-weights`](../corpus/formula-component/fsfp-career-technical-weights.yml)
+- [`formula-component/fsfp-english-learner-weights`](../corpus/formula-component/fsfp-english-learner-weights.yml)
 
 ## Feeds connector
 
 [`dew-foundation`](../../crates/connect/src/registry/dew.rs), built by
 [`crates/connect/src/fixtures/transport_rates.rs`](../../crates/connect/src/fixtures/transport_rates.rs)
-and [`crates/connect/src/fixtures/fy26.rs`](../../crates/connect/src/fixtures/fy26.rs).
+[`crates/connect/src/fixtures/fy26.rs`](../../crates/connect/src/fixtures/fy26.rs) and
+[`crates/connect/src/fixtures/counts.rs`](../../crates/connect/src/fixtures/counts.rs).

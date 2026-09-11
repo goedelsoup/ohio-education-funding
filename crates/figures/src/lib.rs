@@ -3170,6 +3170,105 @@ pub static FIGURES: &[Figure] = &[
             .1
         },
     },
+    // The counts the plan multiplies, both published models. Four nodes read a vintage off a
+    // column header -- `Category 1 Career Tech FTE-FY21` -- and the header is four years stale.
+    Figure {
+        key: "project/english-learner-count-districts-changed",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts whose English learner count differs between the two published models, \
+                under the column header that calls the count FY2021",
+        pinned: 512.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| {
+            let (before, after) = (
+                project::counts::year(2026),
+                project::counts::year(2027),
+            );
+            before
+                .iter()
+                .filter(|(irn, earlier)| {
+                    after
+                        .get(*irn)
+                        .is_some_and(|later| later.english_learner != earlier.english_learner)
+                })
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "project/english-learner-category-one-fall-negative",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "How far the most recently arrived English learners fall between the two models \
+                \u{2014} a cohort ageing through the taper, not a file nobody refreshed",
+        pinned: 0.219_738_035_205_238_6,
+        tolerance: 0.000_001,
+        compute: |_| -project::counts::stability(project::counts::Series::EnglishLearner(1)).change(),
+    },
+    Figure {
+        key: "project/english-learner-composition-losers",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts whose English learner headcount held or grew between the two models \
+                and whose weighted count fell anyway \u{2014} the taper, not the population",
+        pinned: 46.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| project::counts::composition_losers().0 as f64,
+    },
+    Figure {
+        key: "project/career-technical-count-districts-unchanged",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts carrying an identical career-technical FTE across the two models \
+                \u{2014} stable, which is not the same as held",
+        pinned: 559.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| {
+            let (before, after) = (
+                project::counts::year(2026),
+                project::counts::year(2027),
+            );
+            before
+                .iter()
+                .filter(|(irn, earlier)| {
+                    after
+                        .get(*irn)
+                        .is_some_and(|later| later.career_technical == earlier.career_technical)
+                })
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "project/career-technical-fte-statewide-fy2027",
+        owner: "crates/project",
+        unit: Unit::Pupils,
+        label: "Career-technical full-time equivalents statewide in the FY2027 model, against \
+                28,558 in the FY2026 one",
+        pinned: 28_641.919_504,
+        tolerance: 0.001,
+        compute: |_| {
+            project::counts::year(2027)
+                .values()
+                .map(|row| row.career_technical.iter().sum::<f64>())
+                .sum()
+        },
+    },
+    Figure {
+        key: "project/school-building-count-districts-unchanged",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts whose school building count is identical across the two models \
+                \u{2014} every one of them, and the only column on the sheet that manages it",
+        pinned: 611.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| {
+            project::counts::stability(project::counts::Series::SchoolBuildings).unchanged as f64
+        },
+    },
     // The parameter the corpus calls the most consequential number in Ohio school funding, read
     // off twelve committed greenbooks and put through the deflator this workspace has had all
     // along. Every real figure is in FY2026 dollars, the last June the Bureau has published.

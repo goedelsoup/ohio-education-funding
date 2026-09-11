@@ -33,11 +33,15 @@ findings: |
   "still funded after the pupil stopped being one". [verified for the definition; inference for
   the reading]
 
-  ### The counts are frozen at FY2021, like career-technical
+  ### The counts are the current year's, and they turn over fast
 
-  The FY2027 calculator prices these against FY2021 English learner counts. A district whose
-  English learner population has changed since 2021 — and the years since include a period of
-  substantial change in arrivals — is funded for the population it had. [verified]
+  The `EL` sheet heads these columns `Category 1 EL ADM-FY21` and this corpus read a vintage off
+  the suffix. The department's own table of where each variable is drawn from says otherwise, and
+  so do the counts — see
+  [fsfp-english-learner-weights](../formula-component/fsfp-english-learner-weights.yml). What is
+  true is the thing the mistaken reading was reaching for: between the department's two published
+  models the category one count falls by more than a fifth while the headcount barely moves.
+  [verified — crates/project]
 
   ### They are the 2015 dollars over a new denominator, and nothing else changed
 
@@ -101,10 +105,14 @@ properties:
     A constant, not a lever.
   sensitivity: |
     The smallest of the three weighted programmes by money, and the one whose sensitivity is
-    least about its own multiples. Because the counts are frozen at FY2021 and the schedule
-    tapers, what moves this programme is the *composition* of a district's English learner
-    population across the three categories rather than its size — and the composition is a
-    property of a count taken six years before the payment. [inference]
+    least about its own multiples. Because the schedule tapers, what moves this programme is the
+    *composition* of a district's English learner population across the three categories rather
+    than its size. That was first written as a consequence of counts frozen years earlier, which
+    they are not; it survives the correction for the opposite reason, and it is now measured —
+    districts that held or grew their English learner population and saw their weighted count
+    fall anyway are counted at
+    [fsfp-english-learner-weights](../formula-component/fsfp-english-learner-weights.yml).
+    [verified — crates/project]
 
     Priced in the general statewide average base cost per pupil, so
     [base-cost-per-pupil](base-cost-per-pupil.yml) moves all three together, and the scenario

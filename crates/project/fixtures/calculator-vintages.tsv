@@ -1,0 +1,177 @@
+workbook	model	calculation	variable	data_from
+2026	2026	Base Cost	Average Salaries (s5a-s5j)	FY22
+2026	2026	Base Cost	Average Annual Employer-Paid Insurance (s4)	FY22
+2026	2026	Base Cost	Average Base Cost Per-Pupil for s6a-s6g	FY22
+2026	2026	Base Cost	Base Cost Enrolled ADM (b)	Greater of FY25 or average of (FY25, 24, 23)
+2026	2026	Base Cost	Number of School Buildings (a)	FY25
+2026	2026	Base Cost	District Athletic Eligibility (E1)	FY26
+2026	2026	Summary SFPR	General phase-in %	0.83330000000000004
+2026	2026	Summary SFPR	DPIA phase-in %	0.83330000000000004
+2026	2026	Detailed SFPR	Enrolled ADM (a)	FY26 (Aug #1)
+2026	2026	Detailed SFPR	Categorical FTEs (b-g)	FY26 (Aug #1)
+2026	2026	Detailed SFPR	Statewide Average Base Cost Per Pupil (s1)	8241.61
+2026	2026	Detailed SFPR	Statewide Average CTE Base Cost Per  Pupil (s2)	9855.6200000000008
+2026	2026	Detailed SFPR	Minimum State Share Percentage	0.1
+2026	2026	Detailed SFPR	Statewide Economically Disadvantaged Percentage	0.56599024499999995
+2026	2026	Detailed SFPR	FY26 Directly Certified ADM	FY25 Directly Certified from December 2024
+2026	2026	Detailed SFPR	SpEd, EL and CTE Weights	Same as FY22
+2026	2026	Detailed SFPR	Performance Supplement data	Uses 2023-2024 and 2024-2025 report cards
+2026	2026	Local Capacity, Targeted Assistance	Property Valuation	TY24, TY23, TY22
+2026	2026	Local Capacity, Targeted Assistance	Income	TY23, 22, 21
+2026	2026	Local Capacity, Targeted Assistance	Median Weighted Wealth	TY24, 23, 22
+2026	2026	Local Capacity, Targeted Assistance	Number of state returns filed	TY23
+2026	2026	Local Capacity, Targeted Assistance	Statewide Federal Median Income	51456
+2026	2026	Local Capacity, Targeted Assistance	Statewide Median Weighted Wealth	362326436.80000001
+2026	2026	Local Capacity, Targeted Assistance	Statewide Median Weighted Wealth Per-Pupil	253337.38
+2026	2026	Transportation	Statewide Average  Per-Rider amount	$1,275.00 (estimated)
+2026	2026	Transportation	Statewide Average Per-Mile amount	$7.06 (estimated)
+2026	2026	Transportation	Transportation T-1 data	FY25
+2026	2026	Transportation	Transportation T-2 data	FY24 with 5% Inflation Factor
+2026	2026	Transportation	Special Education Transportation Proration Factor	1
+2026	2026	Transportation	Rider Capacity Target	FY25
+2026	2026	Transportation	Minimum State Share	0.45829999999999999
+2026	2026	Pre-K Special Education	ADM	FY26 (Aug #1)
+2026	2026	Pre-K Special Education	Proration Factor	0.96853811000000001
+2026	2024	Base Cost	Average Salaries (s5a-s5j)	FY22
+2026	2025	Base Cost	Average Salaries (s5a-s5j)	FY22
+2026	2024	Base Cost	Average Annual Employer-Paid Insurance (s4)	FY22
+2026	2025	Base Cost	Average Annual Employer-Paid Insurance (s4)	FY22
+2026	2024	Base Cost	Average Base Cost Per-Pupil for s6a-s6g	FY24
+2026	2025	Base Cost	Average Base Cost Per-Pupil for s6a-s6g	FY24
+2026	2024	Base Cost	Base cost Enrolled ADM (b)	Greater of FY23 or average of (FY23, 22, 21)
+2026	2025	Base Cost	Base cost Enrolled ADM (b)	Greater of FY23 or average of (FY23, 23, 22)
+2026	2024	Base Cost	Number of School Buildings (a)	FY23
+2026	2025	Base Cost	Number of School Buildings (a)	FY23
+2026	2024	Base Cost	District/CS Athletic Eligibility (E1)	FY23
+2026	2025	Base Cost	District/CS Athletic Eligibility (E1)	FY23
+2026	2024	Detailed SFPR	Enrolled ADM (a)	FY23
+2026	2025	Detailed SFPR	Enrolled ADM (a)	FY23
+2026	2024	Detailed SFPR	Categorical FTEs (b-g)	FY23
+2026	2025	Detailed SFPR	Categorical FTEs (b-g)	FY23
+2026	2024	Detailed SFPR	Statewide Average Base Cost Per Pupil (s1)	FY24
+2026	2025	Detailed SFPR	Statewide Average Base Cost Per Pupil (s1)	FY24
+2026	2024	Detailed SFPR	Statewide Average CTE Base Cost Per  Pupil (s2)	FY24
+2026	2025	Detailed SFPR	Statewide Average CTE Base Cost Per  Pupil (s2)	FY24
+2026	2024	Detailed SFPR	Minimum State Share Percentage	0.1
+2026	2025	Detailed SFPR	Minimum State Share Percentage	0.1
+2026	2024	Detailed SFPR	SpEd, EL and CTE Weights	Same as FY22
+2026	2025	Detailed SFPR	SpEd, EL and CTE Weights	Same as FY22
+2026	2024	Detailed SFPR	Funding Base (H2-H3)	FY20 (same as FY23)
+2026	2025	Detailed SFPR	Funding Base (H2-H3)	FY20 (same as FY23)
+2026	2024	Detailed SFPR	FY21 Funding Base (L1)	FY21 (same as FY22)
+2026	2025	Detailed SFPR	FY21 Funding Base (L1)	FY21 (same as FY22)
+2026	2024	Detailed SFPR	Gifted PD	21
+2026	2025	Detailed SFPR	Gifted PD	28
+2026	2024	Local Capacity, Targeted Assistance	Property Valuation	TY22, 21, 20
+2026	2025	Local Capacity, Targeted Assistance	Property Valuation	TY23 (23 TAX projection for real property valuation + 2021 PUPP valuation), TY22, 21
+2026	2024	Local Capacity, Targeted Assistance	Income	TY21, 20, 19
+2026	2025	Local Capacity, Targeted Assistance	Income	TY22 adjusted, 21, 20
+2026	2024	Local Capacity, Targeted Assistance	Number of state returns filed	TY21
+2026	2025	Local Capacity, Targeted Assistance	Number of state returns filed	TY22 adjusted
+2026	2024	Local Capacity, Targeted Assistance	Median Weighted Wealth	TY22, 21, 20
+2026	2025	Local Capacity, Targeted Assistance	Median Weighted Wealth	TY23, 22, 21
+2026	2024	Supplemental Targeted Assistance	Enrolled and Total ADM (c and d)	FY19
+2026	2025	Supplemental Targeted Assistance	Enrolled and Total ADM (c and d)	FY19
+2026	2024	Summary SFPR	General phase-in % - TRAD	0.5
+2026	2025	Summary SFPR	General phase-in % - TRAD	0.66669999999999996
+2026	2024	Summary SFPR	DPIA phase-in % - TRAD	0.5
+2026	2025	Summary SFPR	DPIA phase-in % - TRAD	0.66669999999999996
+2026	2024	Transportation	Statewide Average  Per-Rider and Per-Mile PPA	FY22 with 5% inflationary increase.
+2026	2025	Transportation	Statewide Average  Per-Rider and Per-Mile PPA	FY22 with 5% and then another 5%.
+2026	2024	Transportation	Transportation T-1 data	FY23
+2026	2025	Transportation	Transportation T-1 data	FY23
+2026	2024	Transportation	Transportation T-2 data	FY22 with 5% inflationary increase.
+2026	2025	Transportation	Transportation T-2 data	FY22 with 5% and then another 5%.
+2026	2024	Transportation	Rider Capacity Target	FY23
+2026	2025	Transportation	Rider Capacity Target	FY23
+2026	2024	Transportation	Minimum State Share	0.375
+2026	2025	Transportation	Minimum State Share	0.41670000000000001
+2026	2024	Transportation	HB45 change - adding weighted miles	FY23
+2026	2025	Transportation	HB45 change - adding weighted miles	FY23
+2027	2027	Base Cost	Average Salaries (s5a-s5j)	FY22
+2027	2027	Base Cost	Average Annual Employer-Paid Insurance (s4)	FY22
+2027	2027	Base Cost	Average Base Cost Per-Pupil for s6a-s6g	FY22
+2027	2027	Base Cost	Base Cost Enrolled ADM (b)	Greater of FY26 (Nov #2) or average of (FY26, 25, 24)
+2027	2027	Base Cost	Number of School Buildings (a)	FY25
+2027	2027	Base Cost	District Athletic Eligibility (E1)	FY26
+2027	2027	Detailed SFPR	Enrolled ADM (a)	FY26 (Nov #2)
+2027	2027	Detailed SFPR	Categorical FTEs (b-g)	FY26 (Nov #2)
+2027	2027	Detailed SFPR	Statewide Average Base Cost Per Pupil (s1)	8241.61
+2027	2027	Detailed SFPR	Statewide Average CTE Base Cost Per  Pupil (s2)	9855.6200000000008
+2027	2027	Detailed SFPR	Minimum State Share Percentage	0.1
+2027	2027	Detailed SFPR	Statewide Weighted Economically Disadvantaged Percentage	0.53338031060671032
+2027	2027	Detailed SFPR	FY26 Directly Certified ADM	FY26 Nov #2
+2027	2027	Detailed SFPR	SpEd, EL and CTE Weights	Same as FY22
+2027	2027	Detailed SFPR	Performance Supplement data	Uses 2023-2024 and 2024-2025 report cards
+2027	2027	Local Capacity, Targeted Assistance	Property Valuation	TY25 projected + FY24 PUPP, TY24,  TY23
+2027	2027	Local Capacity, Targeted Assistance	Federal Adjusted Gross Income (FAGI)	TY24 estimated, TY23, TY22
+2027	2027	Local Capacity, Targeted Assistance	Median FAGI	TY24 estimated
+2027	2027	Local Capacity, Targeted Assistance	Number of state tax returns filed	TY24 estimated
+2027	2027	Local Capacity, Targeted Assistance	Statewide Federal Median Income	51456
+2027	2027	Local Capacity, Targeted Assistance	Statewide Median Weighted Wealth	392151306.63298076
+2027	2027	Local Capacity, Targeted Assistance	Statewide Median Weighted Wealth Per-Pupil	276708.96999999997
+2027	2027	Transportation	Statewide Average  Per-Rider amount	$1,337.18 (estimated)
+2027	2027	Transportation	Statewide Average Per-Mile amount	$6.87 (estimated)
+2027	2027	Transportation	Transportation T-1 data	FY25
+2027	2027	Transportation	Transportation T-2 data	FY25 with 5% Inflation Factor
+2027	2027	Transportation	Special Education Transportation Proration Factor	0.91745974097621497
+2027	2027	Transportation	Rider Capacity Target	FY25
+2027	2027	Transportation	Minimum State Share	0.5
+2027	2027	Pre-K Special Education	ADM	FY26 (Nov #2)
+2027	2027	Pre-K Special Education	Proration Factor	1
+2027	2024	Base Cost	Average Salaries (s5a-s5j)	FY22
+2027	2025	Base Cost	Average Salaries (s5a-s5j)	FY22
+2027	2024	Base Cost	Average Annual Employer-Paid Insurance (s4)	FY22
+2027	2025	Base Cost	Average Annual Employer-Paid Insurance (s4)	FY22
+2027	2024	Base Cost	Average Base Cost Per-Pupil for s6a-s6g	FY24
+2027	2025	Base Cost	Average Base Cost Per-Pupil for s6a-s6g	FY24
+2027	2024	Base Cost	Base cost Enrolled ADM (b)	Greater of FY23 or average of (FY23, 22, 21)
+2027	2025	Base Cost	Base cost Enrolled ADM (b)	Greater of FY23 or average of (FY23, 23, 22)
+2027	2024	Base Cost	Number of School Buildings (a)	FY23
+2027	2025	Base Cost	Number of School Buildings (a)	FY23
+2027	2024	Base Cost	District/CS Athletic Eligibility (E1)	FY23
+2027	2025	Base Cost	District/CS Athletic Eligibility (E1)	FY23
+2027	2024	Detailed SFPR	Enrolled ADM (a)	FY23
+2027	2025	Detailed SFPR	Enrolled ADM (a)	FY23
+2027	2024	Detailed SFPR	Categorical FTEs (b-g)	FY23
+2027	2025	Detailed SFPR	Categorical FTEs (b-g)	FY23
+2027	2024	Detailed SFPR	Statewide Average Base Cost Per Pupil (s1)	FY24
+2027	2025	Detailed SFPR	Statewide Average Base Cost Per Pupil (s1)	FY24
+2027	2024	Detailed SFPR	Statewide Average CTE Base Cost Per  Pupil (s2)	FY24
+2027	2025	Detailed SFPR	Statewide Average CTE Base Cost Per  Pupil (s2)	FY24
+2027	2024	Detailed SFPR	Minimum State Share Percentage	0.1
+2027	2025	Detailed SFPR	Minimum State Share Percentage	0.1
+2027	2024	Detailed SFPR	SpEd, EL and CTE Weights	Same as FY22
+2027	2025	Detailed SFPR	SpEd, EL and CTE Weights	Same as FY22
+2027	2024	Detailed SFPR	Funding Base (H2-H3)	FY20 (same as FY23)
+2027	2025	Detailed SFPR	Funding Base (H2-H3)	FY20 (same as FY23)
+2027	2024	Detailed SFPR	FY21 Funding Base (L1)	FY21 (same as FY22)
+2027	2025	Detailed SFPR	FY21 Funding Base (L1)	FY21 (same as FY22)
+2027	2024	Detailed SFPR	Gifted PD	21
+2027	2025	Detailed SFPR	Gifted PD	28
+2027	2024	Local Capacity, Targeted Assistance	Property Valuation	TY22, 21, 20
+2027	2025	Local Capacity, Targeted Assistance	Property Valuation	TY23 (23 TAX projection for real property valuation + 2021 PUPP valuation), TY22, 21
+2027	2024	Local Capacity, Targeted Assistance	Income	TY21, 20, 19
+2027	2025	Local Capacity, Targeted Assistance	Income	TY22 adjusted, 21, 20
+2027	2024	Local Capacity, Targeted Assistance	Number of state returns filed	TY21
+2027	2025	Local Capacity, Targeted Assistance	Number of state returns filed	TY22 adjusted
+2027	2024	Local Capacity, Targeted Assistance	Median Weighted Wealth	TY22, 21, 20
+2027	2025	Local Capacity, Targeted Assistance	Median Weighted Wealth	TY23, 22, 21
+2027	2024	Supplemental Targeted Assistance	Enrolled and Total ADM (c and d)	FY19
+2027	2025	Supplemental Targeted Assistance	Enrolled and Total ADM (c and d)	FY19
+2027	2024	Summary SFPR	General phase-in % - TRAD	0.5
+2027	2025	Summary SFPR	General phase-in % - TRAD	0.66669999999999996
+2027	2024	Summary SFPR	DPIA phase-in % - TRAD	0.5
+2027	2025	Summary SFPR	DPIA phase-in % - TRAD	0.66669999999999996
+2027	2024	Transportation	Statewide Average  Per-Rider and Per-Mile PPA	FY22 with 5% inflationary increase.
+2027	2025	Transportation	Statewide Average  Per-Rider and Per-Mile PPA	FY22 with 5% and then another 5%.
+2027	2024	Transportation	Transportation T-1 data	FY23
+2027	2025	Transportation	Transportation T-1 data	FY23
+2027	2024	Transportation	Transportation T-2 data	FY22 with 5% inflationary increase.
+2027	2025	Transportation	Transportation T-2 data	FY22 with 5% and then another 5%.
+2027	2024	Transportation	Rider Capacity Target	FY23
+2027	2025	Transportation	Rider Capacity Target	FY23
+2027	2024	Transportation	Minimum State Share	0.375
+2027	2025	Transportation	Minimum State Share	0.41670000000000001
+2027	2024	Transportation	HB45 change - adding weighted miles	FY23
+2027	2025	Transportation	HB45 change - adding weighted miles	FY23

@@ -873,6 +873,81 @@ fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(cause) => Rebuilt::skipped(fixtures::CALCULATOR_SCALARS_FIXTURE, cause.to_string()),
     });
 
+    // Every count the plan multiplies, both years, and the department's own account of where
+    // each of its inputs came from. Four nodes recorded the career-technical and English learner
+    // counts as frozen at FY2021 on the strength of a column header; see `fixtures::counts`.
+    let counts = (|| -> Result<Vec<Vec<String>>, RebuildError> {
+        let mut books = Vec::new();
+        for (fiscal_year, key) in [(2026, "fy26-calculator"), (2027, "fy27-calculator")] {
+            let book = open_workbook(root, registered(key))?;
+            books.push((
+                fiscal_year,
+                book.rows(fixtures::counts::ADM_SHEET)?,
+                book.rows(fixtures::counts::CTE_SHEET)?,
+                book.rows(fixtures::counts::EL_SHEET)?,
+            ));
+        }
+        let years: Vec<fixtures::CountYear<'_>> = books
+            .iter()
+            .map(|(fiscal_year, adm, cte, el)| fixtures::CountYear {
+                fiscal_year: *fiscal_year,
+                adm,
+                cte,
+                el,
+            })
+            .collect();
+        fixtures::build_calculator_counts(&years).map_err(RebuildError::Layout)
+    })();
+    out.push(match counts {
+        Ok(rows) => csv_fixture(
+            root,
+            fixtures::CALCULATOR_COUNTS_FIXTURE,
+            fixtures::CALCULATOR_COUNTS_HEADER,
+            &rows,
+        )?,
+        Err(cause) => Rebuilt::skipped(fixtures::CALCULATOR_COUNTS_FIXTURE, cause.to_string()),
+    });
+
+    let vintages = (|| -> Result<Vec<Vec<String>>, RebuildError> {
+        let mut books = Vec::new();
+        for (workbook, key) in [(2026, "fy26-calculator"), (2027, "fy27-calculator")] {
+            let book = open_workbook(root, registered(key))?;
+            let directions = book.rows(fixtures::counts::DIRECTIONS_SHEET)?;
+            // Optional: a workbook that finally dropped the stale table should rebuild, not fail.
+            let notes = book.rows(fixtures::counts::NOTES_SHEET).unwrap_or_default();
+            books.push((workbook, directions, notes));
+        }
+        let years: Vec<fixtures::VintageYear<'_>> = books
+            .iter()
+            .map(|(workbook, directions, notes)| fixtures::VintageYear {
+                workbook: *workbook,
+                directions,
+                notes,
+            })
+            .collect();
+        fixtures::build_calculator_vintages(&years).map_err(RebuildError::Layout)
+    })();
+    out.push(match vintages {
+        Ok(rows) => {
+            // Tab-separated, like the catalog's legal basis and for the same reason: the
+            // department writes "average of (FY26, 25, 24)" and the commas are part of it.
+            let body = rows
+                .iter()
+                .map(|row| row.join("\t"))
+                .collect::<Vec<_>>()
+                .join("\n");
+            text_fixture(
+                root,
+                fixtures::CALCULATOR_VINTAGES_FIXTURE,
+                &format!(
+                    "{}\n{body}\n",
+                    fixtures::CALCULATOR_VINTAGES_HEADER.join("\t")
+                ),
+            )?
+        }
+        Err(cause) => Rebuilt::skipped(fixtures::CALCULATOR_VINTAGES_FIXTURE, cause.to_string()),
+    });
+
     // The same workbook's per-district tables, in the columns that say what moved between the two
     // years the plan can be observed over. The catalog entry for this file recorded a decision not
     // to take them — see `fixtures::fy26` for why that was wrong.

@@ -28,6 +28,18 @@ pub const FY26_FIXTURE: &str = "crates/project/fixtures/fy26-department-model.cs
 /// prior-year values are held" while two years of the calculator sat in the cache.
 pub const CALCULATOR_SCALARS_FIXTURE: &str = "crates/project/fixtures/calculator-parameters.csv";
 
+/// Every count the plan multiplies, both published years, one row per district per year.
+///
+/// Built to settle a claim four nodes carried on the strength of a column header: that the
+/// career-technical and English learner counts are frozen at FY2021. See [`super::counts`].
+pub const CALCULATOR_COUNTS_FIXTURE: &str = "crates/project/fixtures/calculator-counts.csv";
+
+/// The department's own table of where each of its inputs came from, both workbooks.
+///
+/// Tab-separated: a `data_from` reads "Greater of FY26 (Nov #2) or average of (FY26, 25, 24)"
+/// and the commas are the department's own.
+pub const CALCULATOR_VINTAGES_FIXTURE: &str = "crates/project/fixtures/calculator-vintages.tsv";
+
 /// Where the district-profile fixture is written, relative to the repository root.
 pub const PROFILE_FIXTURE: &str = "crates/dispersion/fixtures/cupp-fy24-district-data.csv";
 /// Where the grade-band headcount fixture is written, relative to the repository root.
@@ -208,6 +220,8 @@ pub const REBUILT: &[&str] = &[
     FY27_FIXTURE,
     FY26_FIXTURE,
     CALCULATOR_SCALARS_FIXTURE,
+    CALCULATOR_COUNTS_FIXTURE,
+    CALCULATOR_VINTAGES_FIXTURE,
     PROFILE_FIXTURE,
     GRADE_BANDS_FIXTURE,
     REPORT_CARD_FIXTURE,
