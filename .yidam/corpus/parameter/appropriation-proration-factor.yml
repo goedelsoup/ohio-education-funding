@@ -162,6 +162,18 @@ findings: |
 
   ### The residual claimant grew while its line shrank
 figures:
+  - key: project/preschool-proration-factor-fy2026
+    value: 0.96853811
+    field: kind
+    as_written: "the **0.96853811** the sheet states"
+  - key: project/preschool-proration-implied-fy2027
+    value: 1.0048867045823213
+    field: kind
+    as_written: "it gives **1.0049**"
+  - key: project/preschool-headroom-fy2027
+    value: 5568648.270000011
+    field: kind
+    as_written: "**$5,568,648 under**"
   - key: project/prek-sped-remainder-fy2027
     value: 153976832.0
     field: findings
@@ -210,22 +222,38 @@ properties:
     Uncodified is certain: no section of R.C. 3317 sets a proration factor, and the value exists
     because an appropriation was smaller than the entitlement computed against it. [verified]
 
-    What is not certain is who holds the pen. If the factor is arithmetic — the line divided by
-    the demand — then it is *measured*, and nobody decides it. If the department has any latitude
-    in setting it, or in choosing which entitlements a line is prorated against, then it is
-    *delegated*, and the choice is reviewable. The FY2027 preschool factor of 0.96854448 against
-    the $147,500,000 printed beside it is precise enough to look arithmetic, but that cell is the
-    FY2025 estimate rather than the FY2027 appropriation, so the arithmetic it appears to be does
-    not close — and a factor being computable does not establish that it was computed rather than
-    set. [open]
+    What was not certain is who holds the pen. If the factor is arithmetic — the line divided by
+    the demand — then it is *measured*, and nobody decides it. The FY2027 factor of 0.96854448
+    against the $147,500,000 printed beside it is precise enough to look arithmetic and does not
+    close, because that cell is the FY2025 estimate.
 
-    Deciding this needs the appropriation act's language, not the calculator's output, which is a
-    `lsc-budget` question rather than a `dew-foundation` one.
+    **The year before it closes exactly, and that settles it.** The FY2026 calculator prorates
+    the program to $153,976,835.57 against an appropriation of $153,976,832 — $3.57 over, on a
+    $154m line. Divide that appropriation by the demand the workbook implies and the factor comes
+    out **0.96853808**, against the **0.96853811** the sheet states: agreement to eight decimal
+    places. The factor is *measured*. Nobody decides it. [verified —
+    [`crates/project`](../../../crates/project/tests/the_parameters_that_said_they_had_no_prior_year.rs)]
+
+    **Which makes the FY2027 factor the anomaly rather than the puzzle.** Run the same arithmetic
+    on FY2027 and it gives **1.0049** — the program's demand is below its appropriation and no
+    proration arises at all. The calculator applies 0.96854448 anyway, within six millionths of
+    the prior year's, and the program lands **$5,568,648 under** the line it is paid from. A
+    factor that was computed in FY2026 was carried into a year whose own arithmetic does not
+    produce it. What produced the difference in the sixth decimal place is not established.
+    [open]
   series: |
     FY2027: special education transportation 0.91746; preschool special education 0.96854448,
     stated beside a $147,500,000 cell that is the **FY2025 estimate** — the FY2027 appropriation
     is $153,976,832 and the program does not reach it, so no proration arises; transportation
-    general 1.0. Earlier years are [open] — the calculator publishes one year and no history.
+    general 1.0.
+
+    FY2026, from the department's calculator a year earlier: special education transportation
+    **1.0**; preschool special education **0.96853811**; transportation general 1.0. [verified —
+    [`crates/project`](../../../crates/project/tests/the_parameters_that_said_they_had_no_prior_year.rs)]
+
+    So the FY2027 special education transportation proration is **the first one**, and this node
+    recorded earlier years as unheld while `crates/project/fixtures/transportation-rates.csv`
+    already carried both. [verified]
   statutory_basis: |
     Set by the appropriation rather than by R.C. 3317. Which budget line governs each, and whether
     the department's discretion in setting the factor is bounded, is [open].

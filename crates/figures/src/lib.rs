@@ -643,6 +643,18 @@ fn named_ratio(irn: &str) -> f64 {
 /// Nominal and real growth in the statewide base cost per pupil between two fiscal years.
 ///
 /// Both ends have to carry an amount; every year a figure here names does.
+/// One statewide calculator scalar in one fiscal year.
+///
+/// # Panics
+///
+/// If the scalar fixture holds no such column for that year, which means the fixture and this
+/// manifest have come apart.
+fn scalar_at(name: &str, fiscal_year: u16) -> f64 {
+    *project::prior_model::scalar(name)
+        .get(&fiscal_year)
+        .unwrap_or_else(|| panic!("no {name} for FY{fiscal_year}"))
+}
+
 fn base_cost_growth(from: u16, to: u16) -> (f64, f64) {
     project::base_cost::growth(from, to).expect("both years carry an amount")
 }
@@ -2913,6 +2925,100 @@ pub static FIGURES: &[Figure] = &[
         pinned: 0.089_008_069_370_486_44,
         tolerance: 0.000_001,
         compute: |_| -project::base_cost::deduction_real_change(),
+    },
+    // The statewide scalars both calculators state once. Several `parameter` nodes said no
+    // prior-year value was held; two years of the calculator were in the cache.
+    Figure {
+        key: "project/calculator-scalars-that-held",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Statewide scalars in the funding calculator that are the same number in FY2026 \
+                and FY2027 \u{2014} every weight and every base cost among them",
+        pinned: 23.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| project::prior_model::scalars_that_moved().1.len() as f64,
+    },
+    Figure {
+        key: "project/calculator-scalars-that-moved",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "And the ones that differ, every one of them downstream of a count or a valuation",
+        pinned: 10.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| project::prior_model::scalars_that_moved().0.len() as f64,
+    },
+    Figure {
+        key: "project/base-funding-supplement-per-pupil-fy2026",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The base funding supplement's per-pupil rate in the FY2026 model, against $40 in \
+                the FY2027 one",
+        pinned: 27.0,
+        tolerance: 0.01,
+        compute: |_| scalar_at("base_funding_supplement_per_pupil", 2026),
+    },
+    Figure {
+        key: "project/enrolment-growth-supplement-per-pupil-fy2026",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And the enrolment growth supplement's, against $250 a year later",
+        pinned: 225.0,
+        tolerance: 0.01,
+        compute: |_| scalar_at("enrolment_growth_supplement_per_pupil", 2026),
+    },
+    Figure {
+        key: "project/performance-supplement-per-pupil",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The performance supplement's per-pupil rate, which is the same in both years the \
+                calculator can be read for",
+        pinned: 13.0,
+        tolerance: 0.01,
+        compute: |_| scalar_at("performance_supplement_per_pupil", 2027),
+    },
+    Figure {
+        key: "project/preschool-proration-factor-fy2026",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The preschool special education proration factor in the FY2026 model, which is \
+                that year's appropriation over that year's demand",
+        pinned: 0.968_538_11,
+        tolerance: 0.000_000_1,
+        compute: |_| {
+            project::prior_model::preschool_proration(2026)
+                .expect("FY2026 is in the scalar fixture")
+                .0
+        },
+    },
+    Figure {
+        key: "project/preschool-proration-implied-fy2027",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "What the same arithmetic gives for FY2027, where the program's demand is below \
+                its appropriation and no proration arises",
+        pinned: 1.004_886_704_582_321_3,
+        tolerance: 0.000_001,
+        compute: |_| {
+            project::prior_model::preschool_proration(2027)
+                .expect("FY2027 is in the scalar fixture")
+                .1
+        },
+    },
+    Figure {
+        key: "project/preschool-headroom-fy2027",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "How far preschool special education falls short of its FY2027 appropriation \
+                after the factor the calculator applies",
+        pinned: 5_568_648.27,
+        tolerance: 0.01,
+        compute: |_| {
+            let (paid, appropriated) =
+                project::prior_model::preschool_headroom(2027).expect("FY2027 is in the fixture");
+            appropriated - paid
+        },
     },
     // The two clocks the Fair School Funding Plan runs on, measured over the one interval the
     // department has published two models for.
