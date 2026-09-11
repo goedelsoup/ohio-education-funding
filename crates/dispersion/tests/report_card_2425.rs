@@ -279,6 +279,164 @@ fn the_adm_weight_ratio_is_a_poverty_measure() {
     assert!(d.p05 > 1.0, "the weighting only ever adds pupils");
 }
 
+/// The schedule behind that ratio, which the department does not publish.
+///
+/// `metric/expenditure-per-equivalent-pupil` recorded "the weight schedule itself is not held in
+/// this corpus" and left it there. It is still not held — but the fixture carries the weighted
+/// count, the headcount and all three shares the weighting is said to respond to, so how much of
+/// the schedule is missing is a measurable quantity rather than an unknown one.
+///
+/// Three shares explain 91.4% of the cross-district variation in the weight. The coefficients are
+/// per *point* of each share: a district at 100% economic disadvantage carries 0.21 extra pupils
+/// per pupil on that account, and a point of disability is worth 5.7 points of economic
+/// disadvantage and 2.7 points of English learners. The mean district carries 0.283.
+///
+/// # What the missing 8.6% is not
+///
+/// It is not rounding. `weighted_adm` is published to whole pupils, and dividing the expenditure
+/// total by the published per-equivalent-pupil figure recovers it to a fraction of a pupil; the
+/// fit is identical either way. The residual is structural — it correlates +0.34 with log
+/// enrolment, and the 57 districts above 5,000 pupils are under-predicted by +0.021 against
+/// -0.005 for the rest. So the department's weighting is not an additive function of these three
+/// published rates, and no column here closes the gap: a disability count broken into the
+/// categories that carry different costs would, and the report card publishes one share.
+#[test]
+fn three_shares_recover_most_of_the_weight_the_department_applies() {
+    let rows = report_card();
+    let (mut excess, mut disadvantaged, mut english_learner, mut disability) =
+        (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+    let mut imputed = 0;
+
+    for row in &rows {
+        let (Some(ratio), Some(ed), Some(swd)) = (
+            row.weight_ratio(),
+            row.economically_disadvantaged,
+            row.students_with_disabilities,
+        ) else {
+            continue;
+        };
+        // The same convention `composition::frame` uses: the department suppresses the
+        // English-learner share for exactly half these districts, and zero is its floor rather
+        // than its value. The robustness half below is what keeps that from being load-bearing.
+        let el = row.english_learner.unwrap_or_else(|| {
+            imputed += 1;
+            0.0
+        });
+        excess.push(ratio - 1.0);
+        disadvantaged.push(ed);
+        english_learner.push(el);
+        disability.push(swd);
+    }
+
+    assert_eq!(
+        imputed, 303,
+        "English-learner shares the department suppressed"
+    );
+
+    let fit = least_squares(&[disadvantaged, english_learner, disability], &excess).unwrap();
+    assert_eq!(fit.n, 606);
+    close(
+        fit.r_squared,
+        0.914,
+        0.003,
+        "share of the weight ratio explained",
+    );
+    // `least_squares` centres its design, so `coefficients[0]` is the fitted value at the mean of
+    // every predictor — which for a centred fit is the outcome mean exactly, to ten decimals. It
+    // is NOT the value at zero: an uncentred fit of this model puts that at -0.039, and the
+    // difference between the two readings is larger than the whole English-learner term.
+    close(
+        fit.coefficients[0],
+        0.2829,
+        0.001,
+        "the weight the mean district carries",
+    );
+    close(
+        fit.coefficients[1],
+        0.00206,
+        0.0002,
+        "weight per point of economic disadvantage",
+    );
+    close(
+        fit.coefficients[2],
+        0.00442,
+        0.0004,
+        "weight per point of English learners",
+    );
+    close(
+        fit.coefficients[3],
+        0.01185,
+        0.0006,
+        "weight per point of disability",
+    );
+    for (i, what) in [
+        (1, "disadvantage"),
+        (2, "English learners"),
+        (3, "disability"),
+    ] {
+        assert!(
+            fit.t_statistics[i] > 9.0,
+            "{what} carries the weighting and should be unmistakable"
+        );
+    }
+}
+
+/// And the half of it that rests on an imputation, checked without the imputation.
+///
+/// The English-learner coefficient above is fitted over 303 suppressed shares read as zero, which
+/// is the one place this could be an artefact of the reading rather than a fact about the
+/// schedule. Refitting on the 303 districts whose share the department did publish moves it from
+/// 0.0044 to 0.0035 — smaller, as imputing a floor would predict, and nowhere near zero. The
+/// other two coefficients barely move and the fit improves.
+#[test]
+fn the_english_learner_weight_survives_dropping_the_suppressed_half() {
+    let rows = report_card();
+    let (mut excess, mut disadvantaged, mut english_learner, mut disability) =
+        (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+
+    for row in &rows {
+        let (Some(ratio), Some(ed), Some(el), Some(swd)) = (
+            row.weight_ratio(),
+            row.economically_disadvantaged,
+            row.english_learner,
+            row.students_with_disabilities,
+        ) else {
+            continue;
+        };
+        excess.push(ratio - 1.0);
+        disadvantaged.push(ed);
+        english_learner.push(el);
+        disability.push(swd);
+    }
+
+    let fit = least_squares(&[disadvantaged, english_learner, disability], &excess).unwrap();
+    assert_eq!(fit.n, 303);
+    close(
+        fit.r_squared,
+        0.925,
+        0.003,
+        "share explained, published shares only",
+    );
+    close(
+        fit.coefficients[2],
+        0.00346,
+        0.0004,
+        "weight per point of English learners",
+    );
+    close(
+        fit.coefficients[1],
+        0.00188,
+        0.0002,
+        "weight per point of economic disadvantage",
+    );
+    close(
+        fit.coefficients[3],
+        0.01287,
+        0.0006,
+        "weight per point of disability",
+    );
+}
+
 /// The result the paper's near-zero coefficient was standing in front of.
 #[test]
 fn disadvantage_explains_most_of_the_performance_index() {

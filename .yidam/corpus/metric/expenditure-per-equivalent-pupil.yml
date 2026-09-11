@@ -159,6 +159,43 @@ findings: |
   One guarantee finding does survive, and it corroborates the corpus: guaranteed districts
   average a Performance Index of 89.8 against 85.7 for on-formula districts. [verified] The
   guarantee holds up property-wealthy districts, and property-wealthy districts score higher.
+
+  ### The weight schedule, measured rather than missing
+
+  This node's definition records that DEW's weight schedule "is not held in this corpus". It
+  still is not. But the report card publishes the weighted count, the headcount and all three
+  shares the weighting is said to answer to, so how much of the schedule is missing is a
+  measurable quantity rather than an unknown one. Three shares explain 91.4% of the
+  cross-district variation in the weight, over the same 606 districts every model here fits.
+  [verified — [`crates/dispersion`](../../../crates/dispersion/tests/report_card_2425.rs)]
+
+      extra pupils per pupil, per point of share, FY2025
+        economically disadvantaged        +0.00206
+        English learners                  +0.00442
+        students with disabilities        +0.01185
+      carried by the mean district         0.283
+
+  A point of disability is worth 5.7 points of economic disadvantage, and a district at 100%
+  disadvantage carries 0.21 extra pupils per pupil on that account alone. The shape is the one
+  the definition asserts, so the definition's account of *what* the weighting responds to is now
+  corroborated rather than merely stated.
+
+  **The missing 8.6% is not rounding, and that is the interesting part.** `weighted_adm` is
+  published to whole pupils, but dividing the expenditure total by the published
+  per-equivalent-pupil figure recovers it to a fraction of a pupil, and the fit is identical
+  either way. [verified] The residual is structural: it correlates +0.34 with log enrollment, and
+  the 57 districts above 5,000 pupils are under-predicted by +0.021 against −0.005 for everyone
+  else. So the department's weighting is not an additive function of these three published rates.
+  [verified] The likeliest reason is one this corpus already documents elsewhere — disability is
+  priced in six categories that cost different amounts, and the report card publishes a single
+  share — but which of the three rates hides the structure is [open].
+
+  **Half the English-learner column is suppressed**, and reading the suppression as zero is doing
+  real work: 303 of the 606 districts carry no published share. Refitting on the 303 that do
+  moves the English-learner coefficient from 0.00442 to 0.00346 — smaller, as imputing a floor
+  would predict, and nowhere near zero — while the other two barely move and the fit improves to
+  92.5%. [verified — [`crates/dispersion`](../../../crates/dispersion/tests/report_card_2425.rs)]
+  The imputation is therefore a bound on that one coefficient, not a load-bearing assumption.
 figures:
   # The paper's own sensitivity table, both denominators. The sign flip in the third published
   # row is the finding, so each figure is a magnitude and the direction is in its key.
@@ -222,7 +259,10 @@ properties:
     Qualifying expenditures are organized through DEW's Expenditure Flow Model. Weighted ADM is
     average daily membership adjusted upward by DEW formulas intended to reflect the additional
     service costs associated with economically disadvantaged students, English learners, and
-    students with disabilities. The weight schedule itself is not held in this corpus. [open]
+    students with disabilities. The weight schedule itself is not held in this corpus — but 91.4%
+    of the weight it produces is recovered from three shares the report card does publish, and
+    the findings carry the coefficients and the bound on what is missing. [open — the schedule
+    itself, not its size]
 
     Reported all-funds and split into two components that sum to it exactly:
       - federal funds per equivalent pupil

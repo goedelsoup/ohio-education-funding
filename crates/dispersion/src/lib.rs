@@ -379,6 +379,12 @@ pub struct Regression {
     /// Number of observations.
     pub n: usize,
     /// Intercept, then one coefficient per predictor in the order given.
+    ///
+    /// The design is centred, so the intercept is the fitted value at the *mean* of every
+    /// predictor — which makes it the outcome mean exactly, not the fitted value at zero. The two
+    /// differ by however far the predictor means sit from the origin, which on shares in points is
+    /// most of the way: `report_card_2425.rs` fits a model whose centred intercept is 0.283 and
+    /// whose value at zero is -0.039.
     pub coefficients: Vec<f64>,
     /// Standard error of each coefficient, aligned to `coefficients`.
     pub standard_errors: Vec<f64>,
