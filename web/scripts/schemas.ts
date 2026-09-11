@@ -27,43 +27,14 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { z } from "astro/zod";
-
-import { NodeSchema, OntologyClassSchema } from "../src/lib/schema/corpus.ts";
+import { EMITTED_SCHEMAS, emitDocument } from "../src/lib/schema/emitted.ts";
 
 const OUT = join(process.cwd(), "..", ".yidam", "schemas");
 
-const SCHEMAS = [
-  {
-    file: "corpus-node.json",
-    title: "Ohio education funding — corpus node",
-    description:
-      "One node in .yidam/corpus/<class>/. Every node is an instance of its directory's " +
-      "ontology class, carries prose with inline [verified]/[inference]/[open] claim tags, and " +
-      "declares at least one outgoing link as a list — never as a paragraph.",
-    schema: NodeSchema,
-  },
-  {
-    file: "corpus-ontology.json",
-    title: "Ohio education funding — corpus ontology class",
-    description:
-      "One class definition, .yidam/corpus/<class>.ont.yml. Declares what a kind of node is, " +
-      "the properties it may carry, and the relationships it may enter into.",
-    schema: OntologyClassSchema,
-  },
-] as const;
-
 mkdirSync(OUT, { recursive: true });
 
-for (const entry of SCHEMAS) {
-  const json = z.toJSONSchema(entry.schema, { io: "input" }) as Record<string, unknown>;
-  const document = {
-    $schema: "https://json-schema.org/draft/2020-12/schema",
-    title: entry.title,
-    description: entry.description,
-    ...json,
-  };
+for (const entry of EMITTED_SCHEMAS) {
   // Trailing newline: these are committed, and a file without one is a diff every editor makes.
-  writeFileSync(join(OUT, entry.file), `${JSON.stringify(document, null, 2)}\n`);
+  writeFileSync(join(OUT, entry.file), `${JSON.stringify(emitDocument(entry), null, 2)}\n`);
   console.log(`wrote .yidam/schemas/${entry.file}`);
 }

@@ -6,10 +6,9 @@
  * "would this have been caught?" is answerable.
  */
 
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { readdirSync, readFileSync } from "node:fs";
+import { join, relative } from "node:path";
 
-import { z } from "astro/zod";
 import { expect, test } from "vitest";
 import YAML from "yaml";
 
@@ -20,7 +19,21 @@ import {
   OBSERVATION_PROPERTY,
   OntologyClassSchema,
 } from "../../src/lib/schema/corpus.ts";
+import { EMITTED_SCHEMAS, emitDocument } from "../../src/lib/schema/emitted.ts";
 import { BundleSchema } from "../../src/lib/schema/feed.ts";
+
+const SCHEMA_DIR = join(import.meta.dirname, "../../../.yidam/schemas");
+
+/**
+ * Both checks below fail the same way and for the same reason, so they say the same thing. The
+ * remedy is not "regenerate" — it is "you ran the other generator", and the directory has to be
+ * put back rather than rebuilt, because `pnpm schemas` does not delete what it did not write.
+ */
+const WRONG_GENERATOR =
+  "This directory has two generators: `pnpm schemas` (correct, from web/, also `mise run " +
+  "//web:schemas`) and `mise run schema` (the inherited `[schema]` task, which runs `yidam " +
+  "schema` — a generic ontology-compiled schema that does not belong here). If the second one " +
+  "was run: `git checkout .yidam/schemas` and delete any untracked files there.";
 
 const raw: unknown = JSON.parse(
   readFileSync(join(import.meta.dirname, "../../public/data/bundle.json"), "utf8"),
@@ -341,26 +354,43 @@ test("a target shape nothing recognises is reported rather than emitted", () => 
   expect(resolved.resolved).toBe(false);
 });
 
-test("the committed JSON Schemas match the zod definitions", () => {
+test("the committed JSON Schemas match the zod definitions, prose fields included", () => {
   // Generated and committed, so the editor can read them without a build. Which means they can go
   // stale, so they are checked like the feed is.
-  for (const [file, schema] of [
-    ["corpus-node.json", NodeSchema],
-    ["corpus-ontology.json", OntologyClassSchema],
-  ] as const) {
-    // The prose fields are added by the emitter, not by zod, so they are stripped from both sides
-    // rather than only from the committed copy.
-    const strip = (o: Record<string, unknown>) => {
-      const { $schema: _s, title: _t, description: _d, ...body } = o;
-      return body;
-    };
-    const committed = JSON.parse(
-      readFileSync(join(import.meta.dirname, "../../../.yidam/schemas", file), "utf8"),
-    ) as Record<string, unknown>;
-    expect(strip(committed), `${file} is stale — run \`pnpm schemas\``).toEqual(
-      strip(z.toJSONSchema(schema, { io: "input" }) as Record<string, unknown>),
+  //
+  // The whole document is compared, `title` and `description` included. They used to be stripped
+  // on the grounds that the emitter adds them and zod does not — true, and it made the check blind
+  // to the failure that actually happens here, which is not staleness at all: `yidam schema`
+  // writes into this same directory, and the first thing its documents differ in is the title.
+  // Stripping the prose fields meant the one cheap signal of "a different generator wrote this"
+  // was the one field not compared.
+  for (const entry of EMITTED_SCHEMAS) {
+    const committed: unknown = JSON.parse(
+      readFileSync(join(SCHEMA_DIR, entry.file), "utf8"),
+    );
+    expect(committed, `${entry.file} does not match \`pnpm schemas\` output. ${WRONG_GENERATOR}`).toEqual(
+      emitDocument(entry),
     );
   }
+});
+
+test("nothing else has written into .yidam/schemas/", () => {
+  // `.yidam/schemas/` has two generators. `mise run schema` — the inherited `[schema]` task, which
+  // runs `yidam schema` — overwrites both files above AND drops 21 more into the directory:
+  // `class/*.json`, `authorship.json`, `catalog-entry.json`, `corpus-universal.json`. Nothing in
+  // this repository refers to any of them, and a `git add .yidam` after a stray run commits them
+  // silently.
+  //
+  // Iterating the emitter's own file list cannot see those, because a file nobody emits is a file
+  // nobody iterates. So the directory is read instead: what is there must be exactly what
+  // `pnpm schemas` writes.
+  const present = readdirSync(SCHEMA_DIR, { recursive: true, withFileTypes: true })
+    .filter((e) => e.isFile())
+    .map((e) => relative(SCHEMA_DIR, join(e.parentPath, e.name)))
+    .sort();
+  expect(present, `unexpected file(s) in .yidam/schemas/. ${WRONG_GENERATOR}`).toEqual(
+    EMITTED_SCHEMAS.map((e) => e.file).sort(),
+  );
 });
 
 test("the feed the site builds from is the one the schema accepted", () => {
