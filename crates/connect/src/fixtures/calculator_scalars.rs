@@ -68,6 +68,8 @@ pub const CALCULATOR_SCALARS_HEADER: &[&str] = &[
     "median_weighted_wealth",
     "median_weighted_wealth_per_pupil",
     "fy2019_maximum_targeted_assistance",
+    "median_weighted_wealth_excluding_islands",
+    "median_weighted_wealth_per_pupil_excluding_islands",
     "preschool_total_funds",
 ];
 
@@ -112,6 +114,12 @@ const SCALARS: &[(&str, &str)] = &[
     ("Targeted_Assistance", "[s1] Median Weighted Wealth"),
     ("Targeted_Assistance", "[s2] Median Weighted Wealth Per Pu"),
     ("Targeted_Assistance", "[s3] FY19 Maximum Targeted Assista"),
+    // The department's own words, split across two rows of one label: the cell reading
+    // "Excluding North" sits above "and Middle Bass", and the number each wants is to its right.
+    // A second pair of statewide medians, computed without the two Lake Erie island districts,
+    // displayed beside the pair the formula uses and referenced by nothing.
+    ("Targeted_Assistance", "Excluding North"),
+    ("Targeted_Assistance", "and Middle Bass"),
 ];
 
 /// The sheets a year's scalars are spread across, in the order the scalar table names them.
