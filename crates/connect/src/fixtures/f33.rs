@@ -376,6 +376,7 @@ pub const F33_OHIO_PANEL_HEADER: &[&str] = &[
     "property_tax",
     "current_spending",
     "student_transportation",
+    "charter_payments",
 ];
 
 /// One year of the survey, paired with the fiscal year it reports.
@@ -453,6 +454,22 @@ fn panel_rows(
 /// kept whatever its flag** — as in the cross-section — but nothing outside Ohio is, and the year
 /// is carried on the row rather than in the filename.
 ///
+/// # The state column is not one basis across FY2016, and the fixture now says so
+///
+/// From FY2016 the Bureau subtracts a district's payments to charter schools — `V92` — from its
+/// general formula assistance, `C01`, and therefore from `TSTREV` and `TOTALREV`. Its own state
+/// notes carry the reason: Ohio's deduct puts the same state dollar in the community school's
+/// revenue *and* in the resident district's, and the subtraction removes the double count. The
+/// note is absent from the FY2015 documentation and present from the FY2016 documentation, and it
+/// is the only note of its kind for any state.
+///
+/// So `state_revenue` is gross of the deduct through FY2015 and net of it from FY2016, and a
+/// district's fall across that year is its charter deduct rather than anything Ohio did. `V92`
+/// travels beside it as `charter_payments` so a consumer can put the two eras on one basis, which
+/// is what `dispersion::survey_basis` does. It is written as reported, including where that is a
+/// zero the survey should not have accepted — FY2009 and FY2022 both carry unreported deducts as
+/// `0` rather than as `-1`, which is why the correction is only sound from FY2010 to FY2021.
+///
 /// # The join is to one directory, and that is a real limitation
 ///
 /// `LEAID` to IRN comes from the FY2022-23 CCD directory, because that is the directory this
@@ -513,6 +530,12 @@ pub fn build_f33_ohio_panel(
         } else {
             None
         };
+        // `V92` is the district's payments to charter schools, and it is carried in its own
+        // column in every era because from FY2016 the Bureau subtracts it from Ohio's general
+        // formula assistance and before FY2016 it does not. Without it the `state_revenue`
+        // column is two different quantities either side of that year and nothing in the fixture
+        // says so. See [`crate::fixtures::F33_OHIO_PANEL_HEADER`] and `dispersion::survey_basis`.
+        let charter_payments = at("V92")?;
         // Money is stated in thousands in the Bureau's file and in dollars in NCES's. Enrolment is
         // a headcount in both, so the scale is applied per column rather than per row.
         let scale: i64 = if census { 1_000 } else { 1 };
@@ -573,6 +596,7 @@ pub fn build_f33_ohio_panel(
             row.push(unreported_is_blank(number(property_tax)));
             row.push(unreported_is_blank(net_spending));
             row.push(unreported_is_blank(number(transportation)));
+            row.push(unreported_is_blank(number(charter_payments)));
             out.push(row);
             kept += 1;
         }

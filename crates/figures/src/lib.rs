@@ -255,6 +255,8 @@ pub struct Inputs {
     pub closed: Closed,
     /// What moved in the panel's state column at FY2016, and what it tracks.
     pub fy2016: Fy2016,
+    /// The break the same column has at that year, which belongs to the survey and not to Ohio.
+    pub basis: SurveyBasis,
     /// Every state's Education Finance Incentive Grant equity factor, widest spread first.
     ///
     /// Computed once because each call walks all 10,739 rows of the national district panel, and
@@ -282,6 +284,32 @@ pub struct Fy2016 {
     pub by_valuation: [f64; 5],
     /// The step on log total valuation, wealth per pupil and disadvantage together.
     pub model: dispersion::Regression,
+}
+
+/// Local and state revenue shares by fiscal year, over comparable districts.
+pub type ShareSeries = BTreeMap<u16, (f64, f64)>;
+
+/// The FY2016 break in the panel's state column, and the correction of it.
+///
+/// Held as a block because every figure in it walks the fifteen-year panel, and because a figure
+/// quoting the published measure beside the corrected one has to be sure both came from the same
+/// walk. See [`dispersion::survey_basis`].
+pub struct SurveyBasis {
+    /// Each consecutive pair of years, and how much of the move the deduct predicts.
+    pub transitions: Vec<dispersion::survey_basis::Transition>,
+    /// Districts falling more than a fifth and the pupils they hold, as published.
+    pub published_fallers: (usize, f64),
+    /// The same on one basis.
+    pub corrected_fallers: (usize, f64),
+    /// The FY2016 step on one basis, smallest first.
+    pub corrected_step: Vec<(String, f64, f64)>,
+    /// The districts' fall across FY2016 and the deduct that stopped being counted, in dollars.
+    pub fall_and_deduct: (f64, f64),
+    /// Local and state shares by year, as published and on one basis.
+    pub shares: (ShareSeries, ShareSeries),
+    /// The three exemplars' state revenue per pupil restated on one basis, FY2010 to FY2024 —
+    /// Toledo, Perrysburg and Cleveland, keyed by IRN. Each walks the whole panel once.
+    pub restated: BTreeMap<&'static str, dispersion::exemplars::Change>,
 }
 
 /// ECOT and Cleveland, on the series their nodes recorded as unpopulated.
@@ -463,6 +491,26 @@ impl Inputs {
                 by_valuation: dispersion::fy2016::quintiles_by(|d| d.total_valuation),
                 model: dispersion::fy2016::model(),
             },
+            basis: {
+                use dispersion::survey_basis::{self as sb, Basis};
+                SurveyBasis {
+                    transitions: sb::transitions(),
+                    published_fallers: sb::fallers(Basis::AsPublished, 0.20),
+                    corrected_fallers: sb::fallers(Basis::Gross, 0.20),
+                    corrected_step: sb::step(Basis::Gross),
+                    fall_and_deduct: dispersion::fy2016::fall_against_deduct(),
+                    shares: (sb::shares(Basis::AsPublished), sb::shares(Basis::Net)),
+                    restated: ["044909", "045583", "043786"]
+                        .into_iter()
+                        .map(|irn| {
+                            let change =
+                                dispersion::exemplars::state_change(irn, 2010, 2024, Basis::Net)
+                                    .expect("the panel holds all three in both years");
+                            (irn, change)
+                        })
+                        .collect(),
+                }
+            },
             closed: {
                 use dispersion::exemplars::{self, CLEVELAND, ECOT};
                 Closed {
@@ -539,6 +587,21 @@ impl Inputs {
             },
         }
     }
+}
+
+/// One district's FY2016 step on [`dispersion::fy2016::BASIS`].
+///
+/// # Panics
+///
+/// If the district is not in the step, which means the panel lost a year for it.
+fn step_of(inputs: &Inputs, irn: &str) -> f64 {
+    inputs
+        .basis
+        .corrected_step
+        .iter()
+        .find(|(key, _, _)| key == irn)
+        .unwrap_or_else(|| panic!("{irn} is not in the corrected step"))
+        .1
 }
 
 /// Toledo City, in both FY2025 fixtures.
@@ -2509,7 +2572,9 @@ pub static FIGURES: &[Figure] = &[
         tolerance: 0.0005,
         compute: |i| operating_dispersion(i).coefficient_of_variation,
     },
-    // What moved at FY2016. The correlations are exported as magnitudes with the direction in the
+    // What moved at FY2016. Every figure here is on `dispersion::fy2016::BASIS` — gross of the
+    // community-school deduct in both eras — because the published column is not one quantity
+    // across that year. The correlations are exported as magnitudes with the direction in the
     // key, per this manifest's convention.
     Figure {
         key: "dispersion/fy2016-step-against-total-valuation-negative",
@@ -2517,7 +2582,7 @@ pub static FIGURES: &[Figure] = &[
         unit: Unit::Ratio,
         label: "The FY2016 move in state revenue per pupil against log total assessed value \
                 \u{2014} negative, and the strongest correlate of it",
-        pinned: 0.3419,
+        pinned: 0.2691,
         tolerance: 0.0005,
         compute: |i| {
             let steps: Vec<f64> = i.fy2016.districts.iter().map(|d| d.step).collect();
@@ -2539,7 +2604,7 @@ pub static FIGURES: &[Figure] = &[
         unit: Unit::Ratio,
         label: "And against industrial property share \u{2014} positive, which is the wrong sign \
                 for a tangible personal property reading",
-        pinned: 0.0904,
+        pinned: 0.1175,
         tolerance: 0.0005,
         compute: |i| {
             let steps: Vec<f64> = i.fy2016.districts.iter().map(|d| d.step).collect();
@@ -2559,7 +2624,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "Mean FY2016 move for the fifth of districts with the smallest total assessed value",
-        pinned: 0.2412,
+        pinned: 0.2679,
         tolerance: 0.0005,
         compute: |i| i.fy2016.by_valuation[0],
     },
@@ -2568,7 +2633,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "And for the fifth with the largest",
-        pinned: 0.0416,
+        pinned: 0.1060,
         tolerance: 0.0005,
         compute: |i| i.fy2016.by_valuation[4],
     },
@@ -2578,7 +2643,7 @@ pub static FIGURES: &[Figure] = &[
         unit: Unit::Ratio,
         label: "Log total assessed value against the FY2016 move, standardised, holding wealth \
                 per pupil and disadvantage \u{2014} negative",
-        pinned: 0.2910,
+        pinned: 0.1994,
         tolerance: 0.0005,
         compute: |i| i.fy2016.model.standardized[0].abs(),
     },
@@ -2586,10 +2651,185 @@ pub static FIGURES: &[Figure] = &[
         key: "dispersion/fy2016-step-wealth-per-pupil-coefficient-negative",
         owner: "crates/dispersion",
         unit: Unit::Ratio,
-        label: "Wealth per pupil in the same model \u{2014} negative, and a third the size",
-        pinned: 0.1122,
+        label: "Wealth per pupil in the same model \u{2014} negative, and two thirds the size",
+        pinned: 0.1204,
         tolerance: 0.0005,
         compute: |i| i.fy2016.model.standardized[1].abs(),
+    },
+    // The break the same column has at FY2016, which is what put every figure above on a basis
+    // rather than on the column as published. `Ratio` for the correlations, so the prose bound to
+    // them carries no per-cent sign; magnitudes with the direction in the key, as everywhere here.
+    Figure {
+        key: "dispersion/state-column-break-year",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "The fiscal year the survey begins netting Ohio's community-school deduct out of \
+                district state revenue, located from the data alone",
+        pinned: 2016.0,
+        tolerance: 0.0,
+        compute: |_| f64::from(dispersion::survey_basis::break_year().expect("one break")),
+    },
+    Figure {
+        key: "dispersion/fy2016-deduct-against-move-negative",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "A district's community-school deduct against its FY2015-to-FY2016 change in \
+                state revenue per pupil, on the column as published \u{2014} negative",
+        pinned: 0.2506,
+        tolerance: 0.0005,
+        compute: |i| {
+            i.basis
+                .transitions
+                .iter()
+                .find(|t| t.to == 2016)
+                .expect("the break")
+                .as_published
+                .abs()
+        },
+    },
+    Figure {
+        key: "dispersion/fy2016-deduct-against-move-corrected-negative",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The same correlation with both years on one basis \u{2014} negative, and what is \
+                left of it",
+        pinned: 0.0183,
+        tolerance: 0.0005,
+        compute: |i| {
+            i.basis
+                .transitions
+                .iter()
+                .find(|t| t.to == 2016)
+                .expect("the break")
+                .corrected
+                .abs()
+        },
+    },
+    Figure {
+        key: "dispersion/deduct-against-move-loudest-other-year",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "And the largest the same correlation reaches in any of the other ten transitions \
+                the panel holds",
+        pinned: 0.1026,
+        tolerance: 0.0005,
+        compute: |i| {
+            i.basis
+                .transitions
+                .iter()
+                .filter(|t| t.to != 2016)
+                .map(|t| t.as_published.abs())
+                .fold(0.0_f64, f64::max)
+        },
+    },
+    Figure {
+        key: "dispersion/fy2016-step-districts-corrected",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts falling more than a fifth across FY2016 once both eras are on one \
+                basis, against the twenty-seven the published column shows",
+        pinned: 19.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |i| i.basis.corrected_fallers.0 as f64,
+    },
+    Figure {
+        key: "dispersion/fy2016-step-pupil-share-corrected",
+        owner: "crates/dispersion",
+        // A `Ratio` and not a `Share`: 0.0166 is under this manifest's share floor, so the prose
+        // bound to it carries the bare numeral and no per-cent sign.
+        unit: Unit::Ratio,
+        label: "And the share of the panel's pupils they hold \u{2014} a quarter of the published \
+                figure",
+        pinned: 0.0166,
+        tolerance: 0.0005,
+        compute: |i| i.basis.corrected_fallers.1,
+    },
+    Figure {
+        key: "dispersion/fy2016-step-median-corrected",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The median district's FY2016 step on one basis",
+        pinned: 0.1374,
+        tolerance: 0.0005,
+        compute: |i| i.basis.corrected_step[i.basis.corrected_step.len() / 2].1,
+    },
+    Figure {
+        key: "dispersion/columbus-fy2016-step-corrected",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Columbus City's FY2016 step on one basis, against the 29.22% fall the published \
+                column shows",
+        pinned: 0.1493,
+        tolerance: 0.0005,
+        compute: |i| step_of(i, "043802"),
+    },
+    Figure {
+        key: "dispersion/toledo-fy2016-step-corrected",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Toledo City's, against a published 20.49% fall",
+        pinned: 0.1388,
+        tolerance: 0.0005,
+        compute: |i| step_of(i, "044909"),
+    },
+    Figure {
+        key: "dispersion/dayton-fy2016-step-corrected",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "And Dayton City's, the largest gain among Ohio's fourteen largest districts",
+        pinned: 0.3214,
+        tolerance: 0.0005,
+        compute: |i| step_of(i, "043844"),
+    },
+    Figure {
+        key: "dispersion/fy2016-district-state-revenue-fall-negative",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "What Ohio's districts' state revenue fell across FY2016 on the published column \
+                \u{2014} negative, as a magnitude",
+        pinned: 849_921_000.0,
+        tolerance: 1000.0,
+        compute: |i| i.basis.fall_and_deduct.0.abs(),
+    },
+    Figure {
+        key: "dispersion/fy2016-community-school-deduct",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "And what those districts paid community schools that year, which the survey \
+                stopped crediting them with",
+        pinned: 919_992_000.0,
+        tolerance: 1000.0,
+        compute: |i| i.basis.fall_and_deduct.1,
+    },
+    Figure {
+        key: "dispersion/toledo-deduct-share-fy2015",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Toledo City's community-school deduct as a share of the state revenue the survey \
+                credited it with in FY2015",
+        pinned: 0.3529,
+        tolerance: 0.0005,
+        compute: |_| dispersion::survey_basis::deduct_share("044909", 2015).expect("FY2015"),
+    },
+    Figure {
+        key: "dispersion/ohio-local-share-fy2015-published",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Ohio districts' local revenue share in FY2015 on the column as published",
+        pinned: 0.5019,
+        tolerance: 0.0005,
+        compute: |i| i.basis.shares.0[&2015].0,
+    },
+    Figure {
+        key: "dispersion/ohio-local-share-fy2015-corrected",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "And on the same basis FY2016 is already on, which removes five sixths of the \
+                jump between them",
+        pinned: 0.5239,
+        tolerance: 0.0005,
+        compute: |i| i.basis.shares.1[&2015].0,
     },
     // ECOT and Cleveland, on the series their nodes said were unpopulated.
     Figure {
@@ -2677,11 +2917,11 @@ pub static FIGURES: &[Figure] = &[
         key: "dispersion/cleveland-state-revenue-real-change-negative",
         owner: "crates/dispersion",
         unit: Unit::Share,
-        label: "Cleveland Municipal state revenue per pupil, FY2009 to FY2024, in constant \
-                dollars \u{2014} negative",
-        pinned: 0.31915,
+        label: "Cleveland Municipal state revenue per pupil, FY2010 to FY2024, net of the \
+                community-school deduct in both years, in constant dollars \u{2014} negative",
+        pinned: 0.12912,
         tolerance: 0.0005,
-        compute: |i| i.closed.cleveland_state.real.abs(),
+        compute: |i| i.basis.restated["043786"].real.abs(),
     },
     Figure {
         key: "dispersion/cleveland-enrolment-change-negative",
@@ -2699,21 +2939,21 @@ pub static FIGURES: &[Figure] = &[
         key: "dispersion/toledo-state-revenue-real-change-negative",
         owner: "crates/dispersion",
         unit: Unit::Share,
-        label: "Toledo City state revenue per pupil, FY2009 to FY2024, in constant dollars \u{2014} \
-                negative",
-        pinned: 0.34329,
+        label: "Toledo City state revenue per pupil, FY2010 to FY2024, net of the \
+                community-school deduct in both years, in constant dollars \u{2014} negative",
+        pinned: 0.15062,
         tolerance: 0.0005,
-        compute: |i| i.pair.toledo_state.real.abs(),
+        compute: |i| i.basis.restated["044909"].real.abs(),
     },
     Figure {
         key: "dispersion/perrysburg-state-revenue-real-change-negative",
         owner: "crates/dispersion",
         unit: Unit::Share,
-        label: "Perrysburg Exempted Village state revenue per pupil over the same span \u{2014} \
-                also negative",
-        pinned: 0.22751,
+        label: "Perrysburg Exempted Village state revenue per pupil over the same span and on \
+                the same basis \u{2014} negative, and deeper than Toledo's",
+        pinned: 0.20286,
         tolerance: 0.0005,
-        compute: |i| i.pair.perrysburg_state.real.abs(),
+        compute: |i| i.basis.restated["045583"].real.abs(),
     },
     Figure {
         key: "dispersion/toledo-local-revenue-real-change-negative",
@@ -2795,7 +3035,8 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Districts whose state revenue per pupil fell more than a fifth across FY2016 and \
-                stayed down",
+                stayed down, on the column as published \u{2014} which charges each district its \
+                own community-school deduct",
         pinned: 27.0,
         tolerance: 0.0,
         compute: |i| i.pair.step.iter().filter(|s| s.1 < -0.20).count() as f64,
@@ -2804,7 +3045,8 @@ pub static FIGURES: &[Figure] = &[
         key: "dispersion/fy2016-step-pupil-share",
         owner: "crates/dispersion",
         unit: Unit::Share,
-        label: "The share of the panel's pupils those districts hold",
+        label: "The share of the panel's pupils those districts hold, on the same published \
+                column",
         pinned: 0.06700,
         tolerance: 0.0005,
         compute: |i| {

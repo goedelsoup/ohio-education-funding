@@ -25,7 +25,7 @@ pupil is $14,923 against a national $15,801 — twenty-fourth, unremarkable — 
 is within a point of the national figure. What distinguishes Ohio is not what its schools cost
 but who pays.
 
-## Two traps in this file, both of which produce a confident wrong answer
+## Three traps in this file, each of which produces a confident wrong answer
 
 **`STATE` is not a FIPS code.** Column 0 is the Census Bureau's own state ordering and column 4
 is FIPS. They agree for the alphabetically early states and diverge after: filtering column 0 for
@@ -38,6 +38,28 @@ Virginia have *dependent* school districts: the district is an agency of a city 
 property tax belongs to the parent government and reaches the school system as an appropriation
 (`LOCRPAR`). Virginia's parent contributions are 94% of its local school revenue, the District of
 Columbia's 99%.
+
+**Ohio's state revenue column changes definition at FY2016, and only Ohio's.** From the FY2016
+edition the Bureau subtracts each district's payments to community schools — `V92` — from its
+general formula assistance, `C01`, and therefore from `TSTREV` and `TOTALREV`. Its state notes give
+the reason: Ohio's deduct puts the same state dollar in the community school's revenue *and* in the
+resident district's, and the subtraction removes the double count. The note is absent from the
+FY2015 documentation, present from the FY2016 documentation, and written for no other state.
+
+Read across that year the column is two quantities, and a district's apparent fall is the size of
+its own deduct. It cost this corpus three published findings before anyone noticed — Toledo losing
+30% of its state money in a year, twenty-seven districts falling more than a fifth, and a poverty
+gradient among the largest districts that was the deduct wearing poverty's face. On one basis
+thirteen of Ohio's fourteen largest districts *gained* across FY2016. The fix is
+`dispersion::survey_basis`, and the panel now carries `V92` as its own `charter_payments` column so
+that the two eras can be put on one basis without going back to the archive.
+
+Two consequences beyond the series. Ohio's reported **local share** carries the same break in the
+other direction, since the adjustment reaches `TOTALREV`: districts appear to go from 50.19%
+locally funded in FY2015 to 52.84% in FY2016, and on one basis from 52.39% to 52.84%. And because
+the adjustment is Ohio's alone, the cross-state figures below are Ohio net of a pass-through that a
+state whose charters sit *inside* their districts still counts — worth about two and a half points
+of state share, in the direction that makes Ohio look more locally reliant rather than less.
 
 So `LOCRPROP / TOTALREV` is **not** a national ranking. It compares states that report their own
 levy against states structurally unable to, and puts two of the most property-tax-dependent

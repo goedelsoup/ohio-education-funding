@@ -59,6 +59,8 @@
 use crate::{composition, ohio_panel, profile};
 use edfund_core::FiscalYear;
 
+use crate::survey_basis::{self, Basis};
+
 /// Toledo City, IRN 044909 — the corpus's high-need exemplar.
 pub const TOLEDO: &str = "044909";
 
@@ -85,8 +87,15 @@ pub struct Year {
     pub fiscal_year: u16,
     /// Fall membership on the Bureau's count.
     pub enrolment: f64,
-    /// State revenue per pupil — every dollar the state sent, capital included.
+    /// State revenue per pupil **as the survey publishes it** — every dollar the state sent,
+    /// capital included.
+    ///
+    /// Not one quantity across FY2016: gross of the community-school deduct before it and net of
+    /// it afterwards. Read [`Self::state_on`] instead of this field for anything that spans that
+    /// year, and see [`crate::survey_basis`] for what reading it directly cost the corpus.
     pub state: f64,
+    /// What the district paid community schools, per pupil, where the survey reports it.
+    pub deduct: Option<f64>,
     /// Local revenue per pupil.
     pub local: f64,
     /// Federal revenue per pupil.
@@ -96,6 +105,28 @@ pub struct Year {
 }
 
 impl Year {
+    /// State revenue per pupil on one basis, `None` where this year cannot be put on it.
+    ///
+    /// [`Basis::Net`] is the money the district kept and reaches FY2024; [`Basis::Gross`] is the
+    /// formula amount before the deduct and stops at FY2021. Either is a series and
+    /// [`Self::state`] is not.
+    #[must_use]
+    pub fn state_on(&self, basis: Basis) -> Option<f64> {
+        let reported = || {
+            (survey_basis::DEDUCT_REPORTED[0]..=survey_basis::DEDUCT_REPORTED[1])
+                .contains(&self.fiscal_year)
+                .then_some(self.deduct)
+                .flatten()
+        };
+        match basis {
+            Basis::AsPublished => Some(self.state),
+            Basis::Net if self.fiscal_year >= survey_basis::ADJUSTED_FROM => Some(self.state),
+            Basis::Net => Some(self.state - reported()?),
+            Basis::Gross if self.fiscal_year < survey_basis::ADJUSTED_FROM => Some(self.state),
+            Basis::Gross => Some(self.state + reported()?),
+        }
+    }
+
     /// Total revenue over current spending, both per pupil.
     ///
     /// Above one for almost every district in almost every year, because the numerator carries
@@ -119,6 +150,7 @@ pub fn history(irn: &str) -> Vec<Year> {
             fiscal_year: row.fiscal_year,
             enrolment: row.enrollment,
             state: row.state_revenue / row.enrollment,
+            deduct: row.charter_payments.map(|paid| paid / row.enrollment),
             local: row.local_revenue / row.enrollment,
             federal: row.federal_revenue / row.enrollment,
             spending: row.current_spending.map(|s| s / row.enrollment),
@@ -155,6 +187,36 @@ pub struct Change {
 #[must_use]
 pub fn change(irn: &str, pick: fn(&Year) -> f64) -> Change {
     change_between(irn, SPAN[0], SPAN[1], pick).expect("the panel carries this district throughout")
+}
+
+/// How a district's state revenue per pupil moved between two years, on one basis.
+///
+/// The correction the corpus's fifteen-year state figures needed and did not have. `None` where
+/// either year is outside the basis — which for [`Basis::Net`] means FY2009, so a state-column
+/// change that starts at [`SPAN`]'s first year cannot be corrected at all and has to be restated
+/// from FY2010.
+#[must_use]
+pub fn state_change(irn: &str, from_year: u16, to_year: u16, basis: Basis) -> Option<Change> {
+    let years = history(irn);
+    let at = |year: u16| {
+        years
+            .iter()
+            .find(|y| y.fiscal_year == year)
+            .and_then(|y| y.state_on(basis))
+    };
+    let (from, to) = (at(from_year)?, at(to_year)?);
+    if from == 0.0 {
+        return None;
+    }
+    let real = deflator::CpiSeries::cpi_u_june()
+        .real_growth(from, FiscalYear(from_year), to, FiscalYear(to_year))
+        .ok()?;
+    Some(Change {
+        from,
+        to,
+        nominal: to / from - 1.0,
+        real: real.value,
+    })
 }
 
 /// The same between any two years the panel holds for `irn`.
@@ -302,48 +364,19 @@ pub fn standing(irn: &str) -> Option<Standing> {
 /// a fraction, ordered smallest first, over the comparable districts the panel carries in all
 /// seven years.
 ///
-/// This exists to bound the break rather than to explain it. The median entry is a *rise*; the
-/// falls are a tail.
+/// The FY2016 step **as the survey publishes it**, which is not one basis across that year.
+///
+/// Returned as `(irn, step, FY2016 pupils)`, smallest first. Kept under this name because it is
+/// the measure `education-agency/toledo-city` published — twenty-seven districts falling more
+/// than a fifth, holding 6.70% of the panel's pupils, against a median district rising 9.56% —
+/// and a withdrawal has to be able to quote what it withdraws.
+///
+/// **Do not read it as a funding change.** From FY2016 the Bureau nets each district's
+/// community-school deduct out of its state revenue and before FY2016 it does not, so this
+/// measure charges a district its own deduct. Every one of Ohio's big-city districts gained state
+/// money across the step and this shows four of the five losing a fifth. Use
+/// [`crate::survey_basis::step`] with [`Basis::Gross`] or [`Basis::Net`] instead.
 #[must_use]
 pub fn fy2016_step() -> Vec<(String, f64, f64)> {
-    let before = [2012u16, 2013, 2015];
-    let after = [2016u16, 2017, 2018, 2019];
-    let panel = ohio_panel::panel();
-
-    let mut by_district: std::collections::BTreeMap<String, Vec<(u16, f64, f64)>> =
-        std::collections::BTreeMap::new();
-    for row in panel
-        .iter()
-        .filter(|r| r.comparable && r.enrollment >= ohio_panel::MIN_ENROLMENT)
-    {
-        by_district.entry(row.irn.clone()).or_default().push((
-            row.fiscal_year,
-            row.state_revenue / row.enrollment,
-            row.enrollment,
-        ));
-    }
-
-    let mean = |rows: &[(u16, f64, f64)], years: &[u16]| -> Option<f64> {
-        let found: Vec<f64> = years
-            .iter()
-            .filter_map(|y| rows.iter().find(|r| r.0 == *y).map(|r| r.1))
-            .collect();
-        (found.len() == years.len())
-            .then(|| found.iter().sum::<f64>() / found.len() as f64)
-            .filter(|m| *m > 0.0)
-    };
-
-    let mut out: Vec<(String, f64, f64)> = by_district
-        .into_iter()
-        .filter_map(|(irn, rows)| {
-            let pupils = rows.iter().find(|r| r.0 == 2016)?.2;
-            Some((
-                irn,
-                mean(&rows, &after)? / mean(&rows, &before)? - 1.0,
-                pupils,
-            ))
-        })
-        .collect();
-    out.sort_by(|a, b| a.1.total_cmp(&b.1));
-    out
+    crate::survey_basis::step(crate::survey_basis::Basis::AsPublished)
 }
