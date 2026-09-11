@@ -129,8 +129,14 @@ impl PerformanceSupplement {
 pub struct Supplements {
     /// `L` — $40 a pupil, unconditional.
     pub base_funding: Dollars,
-    /// `M1a`/`M1B` — the two ends of the three-year comparison. FY2023 is a fourth ADM year the
-    /// panel does not otherwise hold.
+    /// `M1a`/`M1B` — the two ends of the three-year comparison.
+    ///
+    /// **Not the same FY2023 as the base cost window's.** `ADM Data` publishes a `[b1] FY23
+    /// Enrolled ADM` too, and the two disagree in 608 of 611 districts by up to 4.6%. This one is
+    /// the supplement's own base and is correct for the supplement; splicing it onto the
+    /// `[b1]`/`[b2]`/`[b3]` family to make a four-year series reverses the sign of the
+    /// year-over-year persistence that [`crate::series::DEFAULT_DAMPING`] parameterises. See
+    /// `crates/project/tests/the_two_columns_that_both_say_fy2023.rs`.
     pub adm_fy23: Adm,
     /// `M1` — the three-year change as a fraction.
     pub enrollment_change: f64,

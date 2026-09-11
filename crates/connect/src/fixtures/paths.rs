@@ -40,6 +40,13 @@ pub const CALCULATOR_COUNTS_FIXTURE: &str = "crates/project/fixtures/calculator-
 /// and the commas are the department's own.
 pub const CALCULATOR_VINTAGES_FIXTURE: &str = "crates/project/fixtures/calculator-vintages.tsv";
 
+/// Enrolled ADM as each workbook publishes it: three labelled prior years plus the model's own
+/// `[a]` column, long-form, both workbooks.
+///
+/// The two windows overlap by two years, which is what makes a fourth observation and a
+/// restatement measurable at once. See [`super::counts`].
+pub const CALCULATOR_ADM_FIXTURE: &str = "crates/project/fixtures/calculator-adm-series.csv";
+
 /// Where the district-profile fixture is written, relative to the repository root.
 pub const PROFILE_FIXTURE: &str = "crates/dispersion/fixtures/cupp-fy24-district-data.csv";
 /// Where the grade-band headcount fixture is written, relative to the repository root.
@@ -222,6 +229,7 @@ pub const REBUILT: &[&str] = &[
     CALCULATOR_SCALARS_FIXTURE,
     CALCULATOR_COUNTS_FIXTURE,
     CALCULATOR_VINTAGES_FIXTURE,
+    CALCULATOR_ADM_FIXTURE,
     PROFILE_FIXTURE,
     GRADE_BANDS_FIXTURE,
     REPORT_CARD_FIXTURE,

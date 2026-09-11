@@ -70,14 +70,25 @@ properties:
     which is the opposite of the usual assumption and matters most for the projection, since the
     trend is fitted from the endpoints.
 
-    **Three observations is not a time series.** Enough to fit a trend and nowhere near enough to
-    say how wrong the trend might be — a residual variance over three points has one degree of
-    freedom and means nothing. So a projection interval here does **not** come from the district's
-    own history. It comes from the **cross-sectional spread of district annual growth rates**
-    (sigma = 2.42% a year over FY2024-FY2026): we do not know how variable this district is, but
-    we know how much districts differ from one another, and that is a defensible floor. Every
-    interval records the prior that produced it, because an interval whose provenance is unstated
-    is decoration. [verified]
+    **Three observations is not a time series, and the department publishes four.** One model's
+    window is not the whole record: the FY2026 calculator's `ADM Data` sheet carries FY2023, FY2024
+    and FY2025 and the FY2027 one carries FY2024, FY2025 and FY2026. Read together they give four
+    years for all 611 districts, and the overlap is a check rather than a duplication — FY2024 is
+    identical in both files and FY2025 moves in **140 of 611 districts**, by 4.7 pupils statewide
+    and at most a third of a per cent in any one. So the caveat above is right and small: a year's ADM is a departmental
+    estimate when first published and it does not move much afterwards. [verified — `crates/project`]
+
+    A projection interval still does **not** come from the district's own history. It comes from
+    the **cross-sectional spread of district annual growth rates**: we do not know how variable
+    this district is, but we know how much districts differ from one another, and that is a
+    defensible floor. Every interval records the prior that produced it, because an interval whose
+    provenance is unstated is decoration. [verified]
+
+    **And the fourth year exists twice, under one name.** The `Base_Enrollment Growth` sheet heads
+    a column `M1B FY23 Enrolled ADM` — the enrolment growth supplement's base — and it is not the
+    `[b1] FY23 Enrolled ADM` the `ADM Data` sheet publishes. They disagree in **608 of the 609
+    districts** the panel carries, by up to 4.6%. Reading them as one series is the trap, and its
+    cost is measured in the findings below. [verified — `crates/project`]
 
     The interval widens with the **square root** of the horizon, not linearly — growth errors
     compound as a random walk, so a five-year projection is not five times as uncertain as a
@@ -316,7 +327,49 @@ findings: |
   A remedy would have to be a **horizon-dependent** damping: a change to the shape of
   `Method::Damped` and its TypeScript mirror, resting on a five-year backtest extrapolated to a
   ten-year horizon. Measured in `the_bias_no_single_damping_can_remove`.
+
+  ### The department's own series now checks the damping, and a splice would have failed it
+
+  `DEFAULT_DAMPING` is the share of a district's growth rate a projection carries into each further
+  year, and it was fitted out of sample on the F-33 panel's fall membership — a different survey
+  over a different population — because Ohio's own enrolled ADM had three observations and three
+  observations give one growth rate. Four give three, and three give two estimates of exactly the
+  quantity the constant is: the correlation between a district's growth rate and its next one, each
+  year demeaned.
+
+  They are **0.328** and **0.341**, over 609 districts. The fitted value is 0.30. A different
+  measure, a different population and a different method, landing within five hundredths.
+  [verified — `crates/project`]
+
+  **The check only works on one of the two FY2023 columns.** Splice the growth supplement's `M1B
+  FY23` onto the base cost window's FY2024, FY2025 and FY2026 — which is what the 162-column panel
+  invites, carrying it as `enrolled_adm_fy23` beside `_fy24`, `_fy25` and `_fy26` — and the earlier
+  correlation comes out **-0.049**: same districts, same years, one column swapped, and the sign
+  reversed. The later window pairs the growth into FY2025 with the growth into FY2026 and so
+  touches no FY2023 at all, which is why **0.341** stands whichever column a reader picks.
+  [verified — `crates/project`]
+
+  What the two columns measure differently is not established. `M1B` is right for the supplement it
+  belongs to and the supplement reproduces from it; whether the difference is a different pupil
+  basis, a different collection, or a restatement the `ADM Data` sheet never received is not
+  something either workbook says. [open]
 figures:
+  - key: project/adm-growth-persistence-earlier-window
+    value: 0.3279304724735254
+    field: findings
+    as_written: "They are **0.328**"
+  - key: project/adm-growth-persistence
+    value: 0.3412053124261576
+    field: findings
+    as_written: "and **0.341**, over 609 districts"
+  - key: project/adm-fy2025-restated-districts
+    value: 140
+    field: caveats
+    as_written: "FY2025 moves in **140 of 611 districts**"
+  - key: project/adm-fy2023-columns-that-disagree
+    value: 608
+    field: caveats
+    as_written: "They disagree in **608 of the 609\n    districts**"
   - key: project/districts-on-the-guarantee
     value: 294
     field: findings
