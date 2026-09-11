@@ -52,12 +52,15 @@ weights, and both are about the tax base rather than the pupil. And **gifted's p
 salary prices**, which move with the base cost build-up's staffing refresh rather than with any
 weight.
 
-**And Ohio holds districts harmless against FY2021 in three separate places.** The guarantee
+**And Ohio holds districts harmless in three separate places, against two years.** The guarantee
 compares foundation funding against `[H2] Funding Base`. The formula transition supplement compares
 *everything the formula pays* against a larger `[L1] FY21 Funding Base`. Transportation holds its
-own against FY2021 transportation funding alone. Three bases, three sets of districts — 294, 144
-and 38 — and none nested in another: 17 districts draw the supplement while drawing nothing from
-the guarantee.
+own against `[F1]`, which the calculator heads `FY21 Trans Funding Base` and which R.C.
+3317.019(A)(2) and five editions of the department's own line-by-line explanation both define as
+the FY2020 amount before Executive Order 2020-19D. So the guarantee and the transportation line are
+two divisions of one section on one FY2020 anchor, and only the supplement is on FY2021. Three
+bases, three sets of districts — 294, 144 and 38 — and none nested in another: 17 districts draw
+the supplement while drawing nothing from the guarantee.
 
 The guarantee is the component to read last and think about first. In FY2027 it governs the
 funding of 48.3% of Ohio districts, and its incidence rises with property wealth — so it

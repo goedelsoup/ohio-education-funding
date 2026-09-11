@@ -191,9 +191,14 @@ impl Supplements {
 /// base times 0.55. One rewards concentration and the other compensates for its absence, and 388
 /// districts draw the second while 406 draw the first.
 ///
-/// **And its own guarantee.** `[F]` holds 38 districts at their FY2021 transportation funding,
-/// $24.8m. This is a **second** transitional guarantee, separate from the one on foundation
-/// funding, and the corpus has a node for only one of them.
+/// **And its own guarantee.** `[F]` holds 38 districts at a fixed historical amount, $24.8m. The
+/// column is headed `[F1] FY21 Trans Funding Base` and the year in that heading is the only place
+/// FY2021 appears: R.C. 3317.019(A)(2) and five editions of the department's own line-by-line
+/// explanation both define the base as the **FY2020** payment before Executive Order 2020-19D,
+/// less FY2019 community and STEM transportation. See
+/// [`the_year_the_column_header_names`](../../tests/the_year_the_column_header_names.rs). This is
+/// a *second* transitional guarantee, separate from the one on foundation funding, and the corpus
+/// has a node for only one of them.
 ///
 /// # The proration factor is the finding a dollar total cannot carry
 ///
@@ -254,9 +259,14 @@ pub struct Transportation {
     pub efficiency: Dollars,
     /// And a payment for not being able to.
     pub density: Dollars,
-    /// `[F1]`/`[F]` — the FY2021 base and the guarantee it produces.
+    /// `[F1]`/`[F]` — the base and the guarantee it produces.
+    ///
+    /// Named for the column, which is headed `FY21 Trans Funding Base`. The base itself is the
+    /// FY2020 amount before the pandemic reductions; the field keeps the workbook's name so that
+    /// a reader comparing the two can find it, and this is the note saying the name is the
+    /// department's rather than the statute's.
     pub fy21_base: Dollars,
-    /// A second transitional guarantee, holding 38 districts at their FY2021 amount.
+    /// A second transitional guarantee, holding 38 districts at that base.
     pub guarantee: Dollars,
     /// `[G]`/`[J]` — the total, and special education transportation beside it.
     pub total: Dollars,
