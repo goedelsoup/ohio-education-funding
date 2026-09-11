@@ -110,11 +110,25 @@ properties:
     lines and the sentence naming them are identical in both. The *amounts* in that table are
     not — foundation aid was enacted $82m above the proposal — so nothing here quotes one.]
 
-    The Catalog of Budget Line Items would give each of these a per-line history with actuals and
-    a Legal Basis naming the establishing act, and is now retrievable — see
-    [`the-catalog-of-budget-line-items`](../../decisions/the-catalog-of-budget-line-items.yml).
-    Not yet extracted. [open]
+    **The Catalog of Budget Line Items is extracted**, into
+    crates/project/fixtures/catalog-line-items.csv and catalog-line-item-basis.tsv, eighteen
+    editions covering FY2002 through FY2027 — so each of the five lines has the per-line history
+    with actuals and the Legal Basis this field said were not held. [verified —
+    [`crates/project`](../../../crates/project/tests/the_chapter_that_reached_one_budget_line.rs)]
+
+    Reading them says something the list of five does not. **The five lines are anchored in three
+    different chapters of the Revised Code and were established across 42 years.** Pupil
+    Transportation (GRF 200502) was established by H.B. 191 of the 112th General Assembly, which
+    convened in 1977; Fund 5VS0's foundation line by H.B. 166 of the 133rd, in 2019. The lottery
+    fund's line, 200612, carries the same name as the general revenue fund's and is authorised
+    under R.C. 3770 — the lottery chapter — rather than under R.C. 3317; Fund 5YO0's support line
+    cites 3317 beside R.C. 5753, the casino wagering tax. A programme with no line of its own is
+    paid from five that do not share a statute, a fund or a decade. [verified]
 figures:
+  - key: project/scholarship-line-establishing-span
+    value: 42
+    field: appropriation_line
+    as_written: "established across 42 years"
   - key: project/jon-peterson-award-severest-category
     value: 39122.0
     field: amount
