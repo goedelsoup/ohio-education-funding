@@ -246,10 +246,13 @@ properties:
 unfilled:
   - field: whether the calculator's FY2021 label and the statute's FY2020 anchor are one number
     why: >-
-      The guarantee itself is no longer unfilled — it is R.C. 3317.019(A)(2), read and pinned.
-      What is not established is the identification: the department's line says FY2021 and the
-      section says FY2020 before the executive order's reductions. Confirming it needs a
-      per-district FY2020 or FY2021 transportation figure, which no committed source carries.
+      The guarantee itself is no longer unfilled — it is R.C. 3317.019(A)(2), read and pinned, and
+      the department's own line-by-line explanation now states the same two terms in five
+      consecutive editions, glossing them as FY2020 every time and never as FY2021. That is a
+      second definition rather than a settlement. Under H.B. 166 both years were held at FY2019,
+      so the column heading may name the same dollar the section reaches back for, and confirming
+      it still needs a per-district FY2020 or FY2021 transportation figure that no committed
+      source carries.
   - field: the rates before FY2026
     why: >-
       FY2026's are now committed, from an archived copy of that year's model — $1,275.000 per

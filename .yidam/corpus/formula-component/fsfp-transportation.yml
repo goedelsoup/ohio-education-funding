@@ -20,14 +20,14 @@ description: |
   gains nothing from carrying more children on the same routes; one paid on riders gains
   nothing from covering more ground. [verified]
 
-  ### Non-public riders count double
+  ### Non-public riders count double, and so do their miles
 
-  Weighted ridership is `public + 2 x non-public + 1.5 x community or STEM`. A district
-  transporting a private-school child is funded at twice the rate of its own pupil. Non-public
-  riders are 4.5% of riders and 8.5% of weighted ridership. Ohio requires districts to
-  transport non-public pupils and those routes are less efficient, so a premium is defensible;
-  the size of it is a policy choice sitting in a spreadsheet. [verified, and its justification
-  is [open]]
+  `public + 2 x non-public + 1.5 x community or STEM` weights the ridership, and R.C.
+  3317.0212(E)(1)(b) puts the same two multiples on *miles driven* — so the premium survives
+  whichever of the two bases wins. Non-public riders are 4.5% of riders and 8.5% of weighted
+  ridership. Ohio requires districts to transport non-public pupils and those routes are less
+  efficient, so a premium is defensible; the size of it is a policy choice sitting in a
+  spreadsheet. [verified, and its justification is [open]]
 
   ### The state minimum share is 50%, against the formula's 10%
 
@@ -76,7 +76,7 @@ figures:
   - key: project/districts-on-the-transportation-guarantee
     value: 38
     field: findings
-    as_written: "`[F]` holds **38 districts** at their FY2021 transportation funding"
+    as_written: "`[F]` holds **38 districts** at a fixed historical amount"
 
 findings: |
   ### The private and charter channel is wider than the weights, and one part of it is not
@@ -141,15 +141,34 @@ findings: |
   and outside every figure the crates compute. [verified —
   [`the_population_the_panel_speaks_for.rs`](../../../crates/project/tests/the_population_the_panel_speaks_for.rs)]
 
-  ### Its own guarantee
+  ### Its own guarantee, and not on the year its column says
 
-  `[F]` holds **38 districts** at their FY2021 transportation funding, $24.8m, where the
-  computed amount has fallen below it. That is a **third** mechanism anchored to FY2021,
-  distinct from the [guarantee](temporary-transitional-aid-guarantee.yml) and the [formula
-  transition supplement](fsfp-formula-transition-supplement.yml): a different base, a different
-  set of districts, and not nested in either. It is a clause of this formula rather than a
-  mechanism of its own — `max(FY21 transportation - the five payments, 0)`, with no inputs
-  besides the ones above. [verified]
+  `[F]` holds **38 districts** at a fixed historical amount, $24.8m, where the computed amount
+  has fallen below it. The calculator heads that amount `[F1] FY21 Trans Funding Base`, and the
+  heading is the only place in the record where FY2021 appears. The two sources that *define* the
+  base agree with each other instead: R.C. 3317.019(A)(2) pays it on the **FY2020** amount before
+  Executive Order 2020-19D's pandemic reductions, less the FY2019 community and STEM
+  transportation payment, and the department's own line-by-line explanation states the same two
+  terms in five consecutive editions — *"(FY 2019 Capped Transportation – Community/STEM School
+  Transportation)"*, ensuring a district *"does not receive less … than what it received in FY
+  2020"*. [verified —
+  [`crates/project`](../../../crates/project/tests/the_year_the_column_header_names.rs)]
+
+  So it is not a clause of this formula and it is not a third base. It is division (A)(2) of the
+  section that pays the [guarantee](temporary-transitional-aid-guarantee.yml) itself: the same
+  statute, the same FY2020 anchor, the same reach past the same executive order, floored at zero
+  the same way. Ohio holds districts harmless against **two** years across three places, not
+  three — only the [formula transition supplement](fsfp-formula-transition-supplement.yml) is on
+  FY2021, and LSC's greenbook names each base in one paragraph. The three sets of districts are
+  still distinct and still unnested: 294, 144 and 38. [verified — `crates/project`]
+
+  The heading is not thereby shown to be false. Under
+  [H.B. 166](../legislation/hb-166-2019.yml) both years were held at FY2019, so a FY2021
+  transportation payment may be the same dollar the section reaches back for — which
+  [transportation-cost-rates](../parameter/transportation-cost-rates.yml) keeps as unfilled,
+  because settling it needs a per-district figure for one of those years and no committed source
+  carries one. What is settled is what the base *is*: one definition, stated in two places, and
+  neither of them this formula. [verified for the definition; the identification is [open]]
 
   ### The general proration factor is an appropriation, not a dial
 
@@ -192,12 +211,44 @@ findings: |
   years in which the money changed purpose entirely. An appropriation series read by line item
   cannot see that, which is the general hazard
   [the line origins](../../../crates/project/tests/the_line_origins.rs) exists for. [verified]
+revisions:
+  - was: |
+      Transportation's own guarantee is "a **third** mechanism anchored to FY2021, distinct from
+      the guarantee and the formula transition supplement: a different base, a different set of
+      districts, and not nested in either. It is a clause of this formula rather than a mechanism
+      of its own."
+    now: |
+      The base is FY2020, and the mechanism is division (A)(2) of the section that pays the main
+      guarantee — the same statute, the same anchor, the same exclusion of Executive Order
+      2020-19D's reductions. The sets of districts are still distinct. Ohio holds districts
+      harmless against two years across three places, not three.
+    found_by: |
+      [`crates/project`](../../../crates/project/tests/the_year_the_column_header_names.rs), on
+      two sources that had been committed the whole time. R.C. 3317.019(A)(2) writes the base as
+      the FY2020 amount before the executive order, less the FY2019 community and STEM payment;
+      the department's line-by-line explanation gives the same two terms in five consecutive
+      editions and glosses them as FY2020. Nothing but the calculator's column heading,
+      `[F1] FY21 Trans Funding Base`, says 2021 — and that document's headings had already been
+      shown unreliable by
+      [`the_freeze_that_was_a_stale_column_header`](../../../crates/project/tests/the_freeze_that_was_a_stale_column_header.rs).
+    reach: |
+      The class [README](README.md) said Ohio holds districts harmless against FY2021 "in three
+      separate places"; the figure manifest labelled the district count "transportation's own
+      FY2021 guarantee"; `project::panel::Transportation` documented the field the same way. All
+      three are corrected. No amount moves — `[F1]` is the number the department publishes and
+      the panel reads, and what changes is what year it is a number *from*. The sibling
+      [transportation-cost-rates](../parameter/transportation-cost-rates.yml) had already found
+      the statute and recorded the remaining question as needing a per-district figure no source
+      carries. That question stays open, and narrows: the five editions give a second definition
+      rather than a reconciliation, and under H.B. 166 the two labels may name one dollar.
 properties:
   name: Transportation
   function: |
     [b] Weighted ridership = public + 2 x non-public + 1.5 x community/STEM
+    [e] Weighted miles     = public miles + 2 x non-public + 1.5 x community/STEM
+                             -- the same two multiples, R.C. 3317.0212(E)(1)(b)
     [A1] Per rider base    = [b] x 1337.175
-    [A2] Per mile base     = bus miles x 6.867 x 180
+    [A2] Per mile base     = [e] x 6.867 x 180
     [A] School bus         = ROUNDDOWN( max([A1],[A2]) x max(state share, 0.5), 1 )
     [B] Mass transit       = mass transit riders x 1337.175 x 0.35
     [C] Other types        = other riders x 1337.175 x 0.50
@@ -207,7 +258,8 @@ properties:
                              0                                 if [D2] < 1.0
     [E2] Density           = riders / square miles
     [E] Density supplement = max(0, (28 - [E2]) / 100) x [A2] x 0.55
-    [F] Guarantee          = max( [F1] FY21 transportation - ([A]+[B]+[C]+[D]+[E]), 0 )
+    [F] Guarantee          = max( [F1] - ([A]+[B]+[C]+[D]+[E]), 0 )
+                             -- [F1] is headed "FY21" and is the FY2020 base, R.C. 3317.019(A)(2)
     [G] Transportation     = ([A]+[B]+[C]+[D]+[E]+[F]) x general proration
     [J] SpEd transport     = max(state share, 0.5) x reported SpEd cost x 0.91746
 
@@ -217,8 +269,10 @@ properties:
     \begin{aligned}
     b &= \text{public} + 2 \times \text{non-public} + 1.5 \times \text{community/STEM}
       && \text{weighted ridership} \\
+    e &= \text{public miles} + 2 \times \text{non-public} + 1.5 \times \text{community/STEM}
+      && \text{weighted miles} \\
     A_1 &= b \times 1337.175 && \text{per rider base} \\
-    A_2 &= \text{bus miles} \times 6.867 \times 180 && \text{per mile base} \\
+    A_2 &= e \times 6.867 \times 180 && \text{per mile base} \\
     A &= \operatorname{ROUNDDOWN}\bigl( \max(A_1, A_2) \times \max(\text{state share},\ 0.5),\ 1 \bigr)
       && \text{school bus} \\
     B &= \text{mass transit riders} \times 1337.175 \times 0.35 && \text{mass transit} \\
@@ -232,7 +286,7 @@ properties:
     \end{cases} && \text{efficiency} \\
     E_2 &= \frac{\text{riders}}{\text{square miles}} && \text{density} \\
     E &= \max\biggl( 0,\ \frac{28 - E_2}{100} \biggr) \times A_2 \times 0.55 && \text{density supplement} \\
-    F_1 &= \text{FY21 transportation} && \text{guarantee base} \\
+    F_1 &= \text{FY2020 transportation, pre-reduction} && \text{guarantee base} \\
     F &= \max\bigl( F_1 - (A + B + C + D + E),\ 0 \bigr) && \text{guarantee} \\
     G &= (A + B + C + D + E + F) \times \text{general proration} && \text{transportation} \\
     J &= \max(\text{state share},\ 0.5) \times \text{reported SpEd cost} \times 0.91746
@@ -257,8 +311,16 @@ properties:
 
     The efficiency supplement's shape **is** statutory: division (F) states the 1.5 index threshold
     and the 0.15 multiplier the corpus carries. [verified] The 50% floor is in the section too.
-    Whether the rider weights and the guarantee are statutory has not been separated out here.
-    [open]
+
+    **So are the weights, and they sit on both bases.** Division (E)(1)(a) puts 1.5 on community
+    and STEM riders and 2.0 on non-public ones; division (E)(1)(b) puts the same two multiples on
+    *miles driven* for the same pupils. The crate had shown the department applies them — `[e]` is
+    `public miles + 2 x non-public + 1.5 x community`, exactly, on every district — without
+    matching that arithmetic to the clause that requires it. [verified — crates/project]
+
+    **The guarantee is statutory and it is one section away.** R.C. 3317.019(A)(2), under a name
+    that never uses the word: *temporary transitional transportation aid*. [verified —
+    crates/project]
 
     **The 50% floor is the last term of a schedule, not a standing rule.** LSC's H.B. 33 analysis:
     "The minimum state share for transportation increases from 33.33% in FY 2023 to 37.50% in

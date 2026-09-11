@@ -7186,8 +7186,9 @@ pub static FIGURES: &[Figure] = &[
         key: "project/districts-on-the-transportation-guarantee",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Districts held harmless by transportation's own FY2021 guarantee -- the third of \
-                the three mechanisms anchored to that year",
+        label: "Districts held harmless by transportation's own guarantee -- R.C. 3317.019(A)(2), \
+                on the same FY2020 base as the guarantee itself and not on the FY2021 its column \
+                is headed",
         pinned: 38.0,
         tolerance: 0.0,
         compute: |i| {
