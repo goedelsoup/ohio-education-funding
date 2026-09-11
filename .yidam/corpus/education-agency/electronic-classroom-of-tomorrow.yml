@@ -42,8 +42,8 @@ findings: |
 
   ECOT was a community school, so it is never `comparable` and every district measure in
   `crates/dispersion` looks past it. The Census F-33 Ohio panel carries it anyway, for 8 years —
-  FY2009 through FY2017, with FY2014 absent as it is for every Ohio agency. [verified —
-  [`crates/dispersion`](../../../crates/dispersion/tests/the_series_the_panel_already_held.rs)]
+  FY2009 through FY2017, with FY2014 absent as it is for every Ohio agency. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_series_the_panel_already_held.rs))
 
   **Enrollment peaked at 14,153 in FY2016**, nearly double its FY2009 count of 7,272. State
   revenue peaked in the same year at **$109,371,000** — which is the survey's independent reading
@@ -95,13 +95,13 @@ figures:
     field: findings
     as_written: "**0.0124 of everything Ohio's districts received in state money in\n  FY2016**"
 properties:
-  irn: 133413 [verified — `dispersion::lea_directory`, fifteen consecutive editions 2004-2018]
+  irn: 133413 [verified] (`dispersion::lea_directory`, fifteen consecutive editions 2004-2018)
   agency_type: community
   county: Statewide (chartered in Franklin County)
   typology: Not applicable; e-school.
   roles: |
     Statewide e-school [verified]. Subject to attendance-based funding recovery, FY2016 and
-    FY2017 [verified — amounts not yet established]. Deduct-funded from resident districts
+    FY2017 [verified] (amounts not yet established). Deduct-funded from resident districts
     throughout its operation [verified].
   series_path: |
     Per-agency series are held by IRN across four committed fixtures, not one path: [verified]

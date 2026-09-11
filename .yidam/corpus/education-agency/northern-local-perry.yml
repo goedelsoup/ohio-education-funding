@@ -23,11 +23,11 @@ description: |
   [charge-off](../formula-component/charge-off-local-share.yml) that saw property alone. **The
   substitution charges this district more.** At FY2027 inputs the charge-off would ask $5,922.24
   per pupil and local capacity asks $6,100.95, so the district loses **$178.71 per pupil** of
-  base cost aid to the change. [verified — `regime_diff`, pinned by test]
+  base cost aid to the change. [verified] (`regime_diff`, pinned by test)
 
   A measure blending property and income cannot lower a charge on a district that is low on
   neither, and this district's valuation per pupil is above the statewide median.
-  [verified — see findings]
+  [verified] (see findings)
 
   **It is at the 20-mill floor — exactly.** TY2023 effective Class 1 millage of 20.000 against
   31.35 voted operating mills. [verified] Reduction factors have absorbed more than a third of
@@ -59,12 +59,12 @@ findings: |
   Municipal](cleveland-municipal.yml), at $207.58 per pupil gained — an urban district whose
   resident income is low against a property base inflated by commercial value. Northern Local
   loses $178.71, [Toledo](toledo-city.yml) $56.75, and [Perrysburg](perrysburg-exempted-village.yml)
-  $1,435.26. [verified — `regime_diff`, pinned by test]
+  $1,435.26. [verified] (`regime_diff`, pinned by test)
 
   **Across all 606 districts the comparison reaches, the only quintile that gains is the
   richest.** Mean effect per pupil by valuation quintile: −$118, −$232, −$294, −$365, **+$632**.
   Losses deepen from the poorest quintile to the fourth and then reverse; 316 of the 606 lose.
-  [verified — `regime_diff`, pinned by test] So which districts the income term reaches is a
+  [verified] (`regime_diff`, pinned by test) So which districts the income term reaches is a
   different question from which districts are poor, and the answer is not that it reaches the
   poor: this district sits in the worst-hit quartile at the 63rd percentile of valuation, and
   Cleveland gains from inside a quintile whose mean is a loss. [inference]
@@ -97,9 +97,9 @@ properties:
     an anchor case for is more useful: a plaintiff district whose property base moved out from
     under the claim the case rested on.
   irn: |
-    049056 [verified — appears as "Northern Local" in the FY2021 IDEA Part B allocation list,
+    049056 [verified] (appears as "Northern Local" in the FY2021 IDEA Part B allocation list,
     and under that name and IRN in `crates/foundation/fixtures/fy27-department-model.csv`, which
-    also gives its county as Perry]. The department's own model carries 047498 separately as
+    also gives its county as Perry). The department's own model carries 047498 separately as
     "Hardin Northern Local", so the collision this field was written to warn about is closed
     rather than outstanding, and the crosswalk it asked for is not needed to key a series.
   agency_type: local
@@ -116,7 +116,7 @@ properties:
     Current operating millage (TY2023) 31.35; effective Class 1 millage 20.000 — AT THE FLOOR.
     Total operating expenditure per pupil $11,986.62.
     State revenue per pupil $6,423.28 (47.52% of total); local $5,277.43 (39.04%);
-    total revenue per pupil $13,517.67. [verified — FY2024 District Profile Report]
+    total revenue per pupil $13,517.67. [verified] (FY2024 District Profile Report)
   roles: |
     DeRolph plaintiff district (1991-2003) [verified]. Property-poor throughout the period
     covered [inference]. 20-mill floor status by fiscal period not yet determined and is a

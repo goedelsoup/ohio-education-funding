@@ -11,8 +11,8 @@ description: |
 
   **FY2025 in one line:** 21,160 pupils, $440.2 million of operating expenditure, **$20,805 per
   headcount pupil**, a Performance Index of 60.4, and a Progress effect size of −0.02.
-  [verified — computed; see
-  [`crates/dispersion/tests/expenditure_functions_fy25.rs`](../../../crates/dispersion/tests/expenditure_functions_fy25.rs)]
+  [verified] (computed; see
+  [`crates/dispersion/tests/expenditure_functions_fy25.rs`](../../../crates/dispersion/tests/expenditure_functions_fy25.rs))
 
   ### Where its extra spending goes, which is not where the argument assumed
 
@@ -50,11 +50,11 @@ findings: |
   student-need profile." Toledo's disability share is 21.9% against Perrysburg's 11.3% — nearly
   double, not modest. Normalised by the population actually served, Toledo spends roughly
   **$12,600 per student with a disability** against Perrysburg's **$18,000–$20,900**: about a
-  third less, not somewhat more. [inference — the special-education dollars are the
+  third less, not somewhat more. [inference] (the special-education dollars are the
   fact-check's, from audited statements this corpus does not hold; the shares are the report
   card's, so this is an order-of-magnitude normalisation rather than an audited per-pupil cost.
   A 1.94x population difference against a 1.36x spending difference leaves no room for the sign
-  to return.]
+  to return.)
 
   This is the corpus's denominator rule arriving a third time and from a new direction. The
   first two were about dividing spending by a need-weighted pupil count; this one is about
@@ -64,15 +64,15 @@ findings: |
   ### The years before FY2024, which the survey holds and this node did not read
 
   The Census F-33 Ohio panel runs from FY2009 and carries Toledo in every year it holds.
-  [verified — [`crates/dispersion`](../../../crates/dispersion/tests/the_pair_and_its_fifteen_years.rs)]
+  [verified] ([`crates/dispersion`](../../../crates/dispersion/tests/the_pair_and_its_fifteen_years.rs))
 
   **Toledo's state revenue per pupil lost 15.1% against prices between FY2010 and FY2024** —
   measured net of the community-school deduct in both years, which is the only way the survey's
   state column is one quantity across that span. Its local revenue per pupil fell 8.14% in real
   terms, while its enrolment fell 21%. Both of Toledo's revenue sources lost ground against
   prices for fourteen years. Beside it, [Perrysburg](perrysburg-exempted-village.yml) lost
-  **20.3%** of its state revenue on the same basis and gained 22.3% of its local. [verified —
-  [`crates/dispersion`](../../../crates/dispersion/tests/the_break_that_belonged_to_the_survey.rs)]
+  **20.3%** of its state revenue on the same basis and gained 22.3% of its local. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_break_that_belonged_to_the_survey.rs))
 
   The state figures here replace a published pair — Toledo 34.3%, Perrysburg 22.75% — that read
   the column as the survey prints it and so charged each district its own deduct. Correcting it
@@ -89,8 +89,8 @@ findings: |
   puts the same state dollar in the community school's revenue *and* in the resident district's,
   and the subtraction removes the double count — and the note is absent from the FY2015
   documentation and present from the FY2016 documentation. Ohio is the only state it is written
-  for. [verified —
-  [`crates/dispersion`](../../../crates/dispersion/tests/the_break_that_belonged_to_the_survey.rs)]
+  for. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_break_that_belonged_to_the_survey.rs))
 
   The data locates the same year without the note. Correlating each district's deduct per pupil
   against its change in state revenue per pupil, the deduct predicts the change at one transition
@@ -117,8 +117,8 @@ findings: |
   raise with one mill", "provided to districts that raise less than the median amount". One
   mill's yield is a measure of total valuation, and capacity aid is the only Ohio component that
   prefers a district's *total* valuation to its valuation per pupil — which is the comparison the
-  correction leaves standing, standardised −0.1994 against −0.1204. [verified —
-  [`crates/dispersion`](../../../crates/dispersion/tests/what_fell_out_of_the_state_column.rs)]
+  correction leaves standing, standardised −0.1994 against −0.1204. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/what_fell_out_of_the_state_column.rs))
 
   It is not the only thing in the step, and the published version said it was. On one basis a
   disadvantage term reaches t = +3.92 where the published column had it at +1.38, third of three
@@ -524,7 +524,7 @@ properties:
     made it the subject of a published fact-check, and the pair it forms with
     [Perrysburg](perrysburg-exempted-village.yml) is a sharper contrast than any this corpus
     previously held. [verified]
-  irn: 044909 [verified — report card district files]
+  irn: 044909 [verified] (report card district files)
   agency_type: city
   county: Lucas
   fy2025_profile: |

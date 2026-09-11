@@ -36,8 +36,8 @@ description: |
   **How many schools this could reach is now known.** 231 buildings are currently CSI, and **127
   of them were identified more than three years ago** — 100 in 2018 and 27 in 2022, holding 50,086
   pupils between them. That is the population the trigger above already describes, and it is more
-  than half the tier. [verified —
-  [`crates/dispersion`](../../../crates/dispersion/tests/the_list_the_report_card_does_not_explain.rs)]
+  than half the tier. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_list_the_report_card_does_not_explain.rs))
   Whether any has been subjected to a rung of this ladder is still not published in anything the
   corpus holds. [open]
 findings: |
@@ -47,8 +47,8 @@ findings: |
   the community-school sector. Most of the schools they could reach are there already. **Of the
   127 CSI schools past the three-year mark, 82 operate as their own local education agency** —
   their building IRN and their LEA IRN are the same number — and they hold 30,085 of the 50,086
-  pupils. [verified —
-  [`crates/dispersion`](../../../crates/dispersion/tests/the_list_the_report_card_does_not_explain.rs)]
+  pupils. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_list_the_report_card_does_not_explain.rs))
 
   Every one of the 64 dropout recovery schools in that population is its own agency, as are 18 of
   the 20 community schools; the 43 traditional district buildings are the only ones a conversion or

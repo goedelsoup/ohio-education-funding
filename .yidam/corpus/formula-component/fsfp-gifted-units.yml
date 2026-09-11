@@ -65,8 +65,8 @@ findings: |
 
   Both gradients are monotone across all five quintiles. **Poverty is much the stronger axis**
   — r = −0.67 against r = +0.35 for property wealth — which is not what the question as posed
-  expected, and is the more uncomfortable of the two answers. [verified —
-  `crates/project/tests/questions_the_corpus_left_open.rs`]
+  expected, and is the more uncomfortable of the two answers. [verified]
+  (`crates/project/tests/questions_the_corpus_left_open.rs`)
 
   ### Why is not established, and three explanations fit
 
@@ -74,8 +74,8 @@ findings: |
   differ, since screening costs money and staff; or the instruments used to identify may differ
   in what they measure. This data separates none of them and the corpus should not pick one.
   What it can say is that a funding stream keyed to identification pays most where
-  identification is highest, and that is where poverty is lowest. [open — the mechanism, not
-  the pattern]
+  identification is highest, and that is where poverty is lowest. [open] (the mechanism, not
+  the pattern)
 figures:
   - key: project/gifted-identification-falls-with-poverty
     value: 0.6726
@@ -158,7 +158,7 @@ properties:
     percentage" and referral at $2.50, then hands unit funding to R.C. 3317.051 — which carries all
     three prices, $85,776, $89,378 and $80,974, exactly as transcribed. The floors and the cap sit
     with the prices in permanent law rather than in the budget bill, so the worry that "the two
-    change on different cycles" does not arise. [verified — `ohio-laws`]
+    change on different cycles" does not arise. [verified] (`ohio-laws`)
   calculator: |
     Not a standalone crate. Reproduced for all 609 districts in
     `crates/project/tests/the_remaining_categoricals.rs`, including the floors and the cap;

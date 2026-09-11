@@ -29,7 +29,7 @@ findings: |
   The regime operated for two fiscal years, FY2010 and FY2011, and was repealed before the third.
   That makes it the shortest-lived regime in this corpus and, by one measure, the longest-acting:
   **FY2011 is the first term of the anchor chain that funds nearly half of Ohio's districts in
-  FY2027.** [verified — [`bridge-formula`](bridge-formula.yml)]
+  FY2027.** [verified] ([`bridge-formula`](bridge-formula.yml))
 
   H.B. 153 did not compute a new starting point. It took each district's FY2011 allocation, divided
   by a recalculated FY2011 ADM to get a per-pupil figure, and adjusted that figure by where the
@@ -47,8 +47,8 @@ findings: |
   The node states the *valuation* the local share used and never the rate. It was **22 mills, and
   the base depended on where the district sat against the twenty-mill floor** — total taxable
   valuation for a district whose class 1 effective current expense rate was 20.1 mills or lower,
-  recognized valuation for every other. [verified —
-  [`crates/project`](../../../crates/project/tests/the_charge_off_after_the_charge_off.rs)] Under
+  recognized valuation for every other. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_charge_off_after_the_charge_off.rs)) Under
   the law this regime replaced the rate was 23 mills of recognized valuation for all districts, so
   the model both cut the rate and moved the districts nearest the floor onto the larger base — the
   direction that surprises, since those are the districts least able to raise the revenue being
@@ -62,8 +62,8 @@ findings: |
   budget, in 3 editions of the Catalog of Budget Line Items, and appears nowhere else in the
   other 15** — GRF 200550, Foundation Funding, in 2009, 2010 and 2011. Every other education
   appropriation went on citing the chapter it had cited before.
-  [verified —
-  [`crates/project`](../../../crates/project/tests/the_chapter_that_reached_one_budget_line.rs)]
+  [verified]
+  ([`crates/project`](../../../crates/project/tests/the_chapter_that_reached_one_budget_line.rs))
 
   The displaced chapter moves with it. R.C. 3317 authorises **10** of the department's line items
   in the 2006 and 2008 editions and **6** in each of the model's three, does not reach ten again
@@ -88,8 +88,8 @@ findings: |
   its cost is the teacher compensation amount, which varies by district. Ohio then went four
   fiscal years without one — this regime's two, and the two of the
   [bridge formula](bridge-formula.yml) that replaced it, which pays each district its own FY2011
-  aid. [verified —
-  [`crates/project`](../../../crates/project/tests/the_series_that_needed_a_deflator.rs)]
+  aid. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_series_that_needed_a_deflator.rs))
 
   **Community schools kept theirs.** H.B. 1 sets a base cost formula amount of $5,718 for FY2010
   and $5,703 for FY2011 for community school payments, and multiplies their special education and
@@ -152,7 +152,7 @@ properties:
     valuation this regime used to compute a district's local share of the adequacy amount. Every
     later act re-anchored on the year before its own biennium, and the Fair School Funding Plan's
     guarantee has held at FY2020 since. See
-    [`bridge-formula`](bridge-formula.yml) for the full chain. [verified — the greenbook]
+    [`bridge-formula`](bridge-formula.yml) for the full chain. [verified] (the greenbook)
 links:
   - target: ../funding-regime.ont.yml
     relationship: instance-of

@@ -25,7 +25,7 @@ description: |
   — 180 school days or less — and the second as running until the student **achieves a
   proficient score** on the spring administration of the English language proficiency
   assessment. So the taper is keyed to a clock the district does not set and an exit event it
-  does not score. [verified — `ohio-laws`]
+  does not score. [verified] (`ohio-laws`)
 
   That is evidence against the reclassification-incentive reading and it is not proof: a
   district still influences how quickly a pupil reaches proficiency, and the money still falls
@@ -40,7 +40,7 @@ description: |
   between the department's two published models, and it moves the way the schedule says it
   should: Category 1, the most recently arrived, falls **22%**, while Category 3 — already
   scored proficient — rises 12.8% and the total barely moves. That is one year of a cohort
-  walking down the taper, visible in the counts. [verified — `crates/project`]
+  walking down the taper, visible in the counts. [verified] (`crates/project`)
 findings: |
   **All three multiples match the statute exactly** — 0.2104, 0.1577, 0.1053. [verified]
 
@@ -62,7 +62,7 @@ findings: |
   without leaving its population. Between the department's two published models **46 districts**
   held or grew their English learner headcount and saw their weighted count fall anyway, out of
   the 524 with any English learner at all. The statewide weighted count falls 3.3% against a
-  headcount that falls 1.2%. [verified — `crates/project`]
+  headcount that falls 1.2%. [verified] (`crates/project`)
 
   ### The vintage itself moved, and the department does not say why
 

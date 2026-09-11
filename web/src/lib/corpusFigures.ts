@@ -238,12 +238,35 @@ export function proseFields(node: Node): Map<string, string> {
  * spans, and returns markup; this needs the raw markdown a node was authored in, before any of
  * that. Two readers of one syntax is a real cost, and the alternative — rendering every node to
  * HTML to find out whether a paragraph says `[verified]` — is a worse one.
+ *
+ * # The justification sits beside the tag, not inside it
+ *
+ * `[verified] (crates/dispersion)`, not `[verified — crates/dispersion]`. The second form is what
+ * this corpus wrote for its first two years and it is not a tag: `yidam lint` matches the three
+ * tokens exactly, so a bracket with the citation folded in matches nothing and the claim is
+ * counted as untagged — 542 of them, which is what `claim-tag-malformed` reported and what #256
+ * sized. The rewrite that finding asks for cannot be done while `detail` is read only from inside
+ * the brackets, because {@link citedCrates} reads the crate attribution out of exactly there;
+ * emptying it is what threw 165 `unattributed` findings in `a09ffa8` and got reverted by
+ * `440e49e`.
+ *
+ * So both sides move. The corpus takes yidam's prescribed form and this reads the trailing
+ * parenthetical as part of the detail. **It is not a relaxation of the gate #157/#158/#218
+ * built** — the crate citation must still sit adjacent to its claim tag, in the same prose field,
+ * for {@link citedCrates} to see it. Only the delimiter changed.
+ *
+ * One level of parenthesis nesting is matched, which is what a markdown link inside the
+ * justification needs: `([the audit reports](../catalog/auditor-district-audits.md))` closes on
+ * the second `)`, not the first. Measured over the corpus, one level is also the deepest any
+ * justification goes. The gap before the `(` admits a single newline and no blank line, so a tag
+ * ending a paragraph does not reach forward into a parenthetical that opens the next one.
  */
 export function claimTags(text: string): { tag: string; detail: string }[] {
-  const pattern = /\[(verified|inference|open)((?:[^[\]]|\[[^[\]]*\])*)\]/g;
+  const pattern =
+    /\[(verified|inference|open)((?:[^[\]]|\[[^[\]]*\])*)\](?:[^\S\n]*\n?[^\S\n]*\(((?:[^()]|\([^()]*\))*)\))?/g;
   return [...text.matchAll(pattern)].map((match) => ({
     tag: match[1]!,
-    detail: match[2] ?? "",
+    detail: [match[2] ?? "", match[3] ?? ""].filter((part) => part !== "").join(" "),
   }));
 }
 

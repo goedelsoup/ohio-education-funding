@@ -50,9 +50,9 @@ findings: |
 
   ### Against the mechanism it replaced
 
-  [verified — [`crates/regime-diff`](../../../crates/regime-diff/), the corpus's only aligned
+  [verified] ([`crates/regime-diff`](../../../crates/regime-diff/), the corpus's only aligned
   component pair, run at FY2027 base cost with only the local share substituted and the
-  charge-off taken against recognized valuation at TY2024]
+  charge-off taken against recognized valuation at TY2024)
 
   The income terms do what they were built to do, and they do it in **both** directions. Ottawa
   Hills Local — high income, unremarkable valuation — is charged **101% more** by local
@@ -99,11 +99,11 @@ findings: |
 
   The two agree where both exist, to **0.46% at worst**, which is the retrospective check on
   the subtraction and the reason to trust the eleven phases of work built on it. The 138 are no
-  longer censored. [verified — `crates/project/tests/finances_and_the_guarantee.rs`]
+  longer censored. [verified] (`crates/project/tests/finances_and_the_guarantee.rs`)
 
   ### The calculator reproduces the department's figure exactly
 
-  [verified — `crates/local-capacity/tests/against_the_departments_own_capacity.rs`]
+  [verified] (`crates/local-capacity/tests/against_the_departments_own_capacity.rs`)
   `crates/local-capacity` was written from the statute and had never been run against anything.
   It is right.
 
@@ -134,8 +134,8 @@ findings: |
   FY2026 — and the catalog entry for the earlier one recorded a decision not to extract its
   per-district tables, on the ground that they "are the FY2027 model's a year earlier and the
   counts are very nearly identical". That was measured on bus miles and rider counts, which are
-  a survey a year apart and are stable. This column is not. [verified —
-  [`crates/project`](../../../crates/project/tests/the_two_clocks_the_plan_runs_on.rs)]
+  a survey a year apart and are stable. This column is not. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_two_clocks_the_plan_runs_on.rs))
 
   The decision — the fortieth-highest district's income ratio, `[C5]` — moves from **1.46670942
   to 1.46503636**, a tenth of a per cent. The rate `[C6]` it caps moves 0.13% at the median. And
@@ -185,8 +185,8 @@ findings: |
 
   The rule therefore never charges a district on the higher of its two measures. That makes it
   a floor on the state's share wearing the clothes of a smoothing device, and the asymmetry is
-  invisible in any one district's figures. [verified —
-  `crates/local-capacity/tests/against_the_departments_own_capacity.rs`]
+  invisible in any one district's figures. [verified]
+  (`crates/local-capacity/tests/against_the_departments_own_capacity.rs`)
 
   **And it is the charge-off's instinct in a new device.** The mechanism this replaced also
   lagged revaluation, through [recognized

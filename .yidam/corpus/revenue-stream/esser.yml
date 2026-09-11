@@ -25,8 +25,8 @@ findings: |
 
   FY2022 is the peak. In that year Ohio districts took **13.87% of school revenue from federal
   sources against a national 13.24%** — $2,466 per pupil against $2,493 — which places Ohio
-  25th of 51 and, unusually for this corpus, entirely unremarkable. [verified —
-  `crates/dispersion/src/census_states.rs`]
+  25th of 51 and, unusually for this corpus, entirely unremarkable. [verified]
+  (`crates/dispersion/src/census_states.rs`)
 
   All four of those figures are the **state-level** F-33 table, and the citation used to name
   `national_peers.rs`, which is the district panel and computes none of them. The two sources are
@@ -41,8 +41,8 @@ findings: |
   domestic levels, and the federal channel is a constant that does not explain it. [inference]
 
   **Federal money is compensatory in Ohio, monotonically, and it is small.** Quartiling the 611
-  comparable districts by local revenue per pupil in FY2022: [verified —
-  `dispersion::national_peers::ohio_by_local_wealth`, pinned by test]
+  comparable districts by local revenue per pupil in FY2022: [verified]
+  (`dispersion::national_peers::ohio_by_local_wealth`, pinned by test)
 
       quartile   local/pupil   state/pupil   federal/pupil
       Q1 poorest      $4,342        $8,970          $2,738
@@ -66,8 +66,8 @@ findings: |
   and the first thing the two together establish is that they never touched. Across 607
   districts, federal revenue went from **$1.579bn** in FY2019 to $3.776bn at the FY2022 peak, a
   rise of 139%; their general-fund revenue over the same span went $20.590bn to **$20.565bn**,
-  which is a fall. [verified —
-  [`crates/project`](../../../crates/project/tests/the_cliff_that_never_reached_the_general_fund.rs)]
+  which is a fall. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_cliff_that_never_reached_the_general_fund.rs))
 
   That is the control and not a limitation. Ohio districts received relief into special revenue
   funds, so a district that spent it on one-time costs leaves no general-fund trace at all. A
@@ -108,7 +108,7 @@ findings: |
   on what that district received: see
   [general fund cash balance](../metric/general-fund-cash-balance.yml). It says how much reached
   the general fund and still says nothing about what was bought with the rest.
-  [verified — crates/project]
+  [verified] (crates/project)
 properties:
   name: Elementary and Secondary School Emergency Relief Fund
   level: federal

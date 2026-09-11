@@ -51,7 +51,7 @@ findings: |
         No provision of this draft binds a lever, so there is no figure to give.
         That is not a cost of zero. It is the absence of a cost.
 
-  [verified — `crates/project/tests/a_draft_cannot_hide_what_it_did_not_price.rs`]
+  [verified] (`crates/project/tests/a_draft_cannot_hide_what_it_did_not_price.rs`)
 
   ### This bill found a defect in the machinery built to hold it
 
@@ -153,7 +153,7 @@ properties:
     `search-prod.lis.state.oh.us/api/v2/general_assembly_136/legislation/hb643/00_IN/html/` and
     re-retrieved 9 September 2026. Pinned at SHA-256
     `12d3a53247dea420f8210c2cc5daa9cc891500804c51b9c4494993b4d504bca8`, 11,828 bytes.
-    [verified — `crates/connect/source-digests.txt`]
+    [verified] (`crates/connect/source-digests.txt`)
 
     The digest is load-bearing rather than ceremonial. `00_IN` is stable, but a bill's *current*
     text moves under its own URL as it is amended, so a claim about "H.B. 643" that does not name

@@ -21,8 +21,8 @@ findings: |
   ### A need-weighted denominator is a need adjustment, and it runs one way
 
   This was recorded as an argument. It is now a measurement, and it is larger than the argument
-  predicted. [verified — computed; see
-  [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)]
+  predicted. [verified] (computed; see
+  [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs))
 
       Performance Index against FY2025 operating expenditures
         divided by WEIGHTED ADM      -0.0155    (the published measure)
@@ -69,15 +69,15 @@ findings: |
 
   ### Only one of the two estimates is stable, and it is not the published one
 
-  [verified —
-  [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)]
+  [verified]
+  ([`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs))
 
       scenario                              published    headcount
       all districts                          -0.0155      -0.3365
       excluding the highest per-pupil        -0.0042      -0.3546
       excluding enrollment under 582         +0.0358      -0.3371
 
-  [verified — crates/dispersion]
+  [verified] (crates/dispersion)
 
   The headcount coefficient moves by **0.018** across every check and never stops saying the
   same thing. The published coefficient **changes sign** — the scenarios do not agree on the
@@ -167,7 +167,7 @@ findings: |
   shares the weighting is said to answer to, so how much of the schedule is missing is a
   measurable quantity rather than an unknown one. Three shares explain 91.4% of the
   cross-district variation in the weight, over the same 606 districts every model here fits.
-  [verified — [`crates/dispersion`](../../../crates/dispersion/tests/report_card_2425.rs)]
+  [verified] ([`crates/dispersion`](../../../crates/dispersion/tests/report_card_2425.rs))
 
       extra pupils per pupil, per point of share, FY2025
         economically disadvantaged        +0.00206
@@ -194,7 +194,7 @@ findings: |
   real work: 303 of the 606 districts carry no published share. Refitting on the 303 that do
   moves the English-learner coefficient from 0.00442 to 0.00346 — smaller, as imputing a floor
   would predict, and nowhere near zero — while the other two barely move and the fit improves to
-  92.5%. [verified — [`crates/dispersion`](../../../crates/dispersion/tests/report_card_2425.rs)]
+  92.5%. [verified] ([`crates/dispersion`](../../../crates/dispersion/tests/report_card_2425.rs))
   The imputation is therefore a bound on that one coefficient, not a load-bearing assumption.
 figures:
   # The paper's own sensitivity table, both denominators. The sign flip in the third published
@@ -261,8 +261,8 @@ properties:
     service costs associated with economically disadvantaged students, English learners, and
     students with disabilities. The weight schedule itself is not held in this corpus — but 91.4%
     of the weight it produces is recovered from three shares the report card does publish, and
-    the findings carry the coefficients and the bound on what is missing. [open — the schedule
-    itself, not its size]
+    the findings carry the coefficients and the bound on what is missing. [open] (the schedule
+    itself, not its size)
 
     Reported all-funds and split into two components that sum to it exactly:
       - federal funds per equivalent pupil
@@ -285,8 +285,8 @@ properties:
     Both retrieved by the `dew-report-card` connector and committed at
     [`crates/dispersion/fixtures/report-card-2425-district-data.csv`](../../../crates/dispersion/fixtures/report-card-2425-district-data.csv).
   series: |
-    2024-2025, 607 rated traditional districts, as published [verified — computed from the
-    committed fixture, and reproducing OCG White Paper 013 exactly]:
+    2024-2025, 607 rated traditional districts, as published [verified] (computed from the
+    committed fixture, and reproducing OCG White Paper 013 exactly):
 
                           min      p25   median     mean      p75       max
       total            $8,913  $11,615  $12,856  $13,224  $14,254   $46,716

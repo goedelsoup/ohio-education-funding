@@ -66,8 +66,8 @@ findings: |
   printed beside it — $908,184 over that cell**, though the cell turns out to be the FY2025
   estimate rather than the FY2027 appropriation; see below. A third cell on the same sheet states
   $146,708,228.07, matching neither. The likeliest reading is a factor calibrated against an earlier ADM vintage
-  and never recalibrated after the counts were refreshed. [verified —
-  `crates/project/tests/the_supplements_outside_the_formula.rs`]
+  and never recalibrated after the counts were refreshed. [verified]
+  (`crates/project/tests/the_supplements_outside_the_formula.rs`)
 
   The FY2027 calculator is a projection published before the fiscal year, so a recalibration
   before payment is expected and this may never reach a district. But a parameter that has
@@ -135,8 +135,8 @@ findings: |
   headed `Appropriation` where the redbook's are headed `Introduced`. It existed at a sibling
   URL to the redbook the whole time and went unwired for four phases while this corpus quoted
   the proposal. Every earmark held from introduction to enactment, to the dollar, and the
-  remainder with them: **$153,976,832**. [verified —
-  `crates/project/fixtures/dew-greenbook.txt`]
+  remainder with them: **$153,976,832**. [verified]
+  (`crates/project/fixtures/dew-greenbook.txt`)
 
       ALI 200540 earmark                                FY2025 actual   FY2026 approp   FY2027 approp
       Special education at DD boards and institutions     $36,258,454     $33,945,594     $33,945,594
@@ -177,15 +177,15 @@ findings: |
 
   So a proration factor is the one number in this model that measures a population the model
   does not contain. A reader who divided the earmark by the districts it can see would get
-  **0.9787** — six points high, with nothing on the sheet to say so. [verified —
-  [`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs)]
+  **0.9787** — six points high, with nothing on the sheet to say so. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs))
 
   FY2026 bounds the same quantity from the other side. Its factor is 1.0, so the whole statewide
   allocation fitted inside a $176,897,678 earmark while the districts took $165,119,518 of it:
   everything outside the model came to at most **$11,778,160** that year, against the $13.3m
   FY2027 measures. That is what the year which does *not* prorate was worth extracting for.
-  [verified —
-  [`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs)]
+  [verified]
+  ([`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs))
 
   ### It prorates because the floor stepped, not because the line was cut
 
@@ -202,12 +202,12 @@ findings: |
   the statutory floor, which H.B. 96 steps by a twenty-fourth a year, added **$11,340,268** on
   its own. Hold that floor where it was and the districts sit **$7,100,095 inside** the earmark
   instead of $4,240,173 outside it. The proration is the price of a scheduled increase in the
-  state's share of a cost, arriving in a year the line had already been raised for. [verified —
-  [`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs)]
+  state's share of a cost, arriving in a year the line had already been raised for. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs))
 
   The floor now pays **411** of the 563 districts that report a cost, against 332 a year
-  earlier — so it is not only higher, it reaches further. [verified —
-  [`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs)]
+  earlier — so it is not only higher, it reaches further. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs))
 
   ### A factor of 1.0 is a measurement, and this is what it measured
 
@@ -218,8 +218,8 @@ findings: |
   So the FY2026 factor of 1.0 held by **$5,594,475** — eight tenths of one per cent of the line
   — and the FY2027 one by **$36,760,325**. The general formula came within a rounding of
   prorating in the year before the special education earmark did, out of the same appropriation.
-  [verified —
-  [`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs)]
+  [verified]
+  ([`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs))
 
   ### The earmark that binds is the one the legislature did not touch
 
@@ -234,8 +234,8 @@ findings: |
   the executive proposed these two figures and the act carries them unchanged. Everything around
   it moved — bus driver training lost $3.9m of its FY2027 proposal, two earmarks were added, and
   the unearmarked remainder was raised in both years. The conference committee was in this line
-  item and did not open the half of it that prorates. [verified —
-  [`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs)]
+  item and did not open the half of it that prorates. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs))
 
   ### The residual claimant grew while its line shrank
 figures:
@@ -360,8 +360,8 @@ properties:
     the program to $153,976,835.57 against an appropriation of $153,976,832 — $3.57 over, on a
     $154m line. Divide that appropriation by the demand the workbook implies and the factor comes
     out **0.96853808**, against the **0.96853811** the sheet states: agreement to eight decimal
-    places. The factor is *measured*. Nobody decides it. [verified —
-    [`crates/project`](../../../crates/project/tests/the_parameters_that_said_they_had_no_prior_year.rs)]
+    places. The factor is *measured*. Nobody decides it. [verified]
+    ([`crates/project`](../../../crates/project/tests/the_parameters_that_said_they_had_no_prior_year.rs))
 
     **Which makes the FY2027 factor the anomaly rather than the puzzle.** Run the same arithmetic
     on FY2027 and it gives **1.0049** — the program's demand is below its appropriation and no
@@ -383,8 +383,8 @@ properties:
     general 1.0.
 
     FY2026, from the department's calculator a year earlier: special education transportation
-    **1.0**; preschool special education **0.96853811**; transportation general 1.0. [verified —
-    [`crates/project`](../../../crates/project/tests/the_parameters_that_said_they_had_no_prior_year.rs)]
+    **1.0**; preschool special education **0.96853811**; transportation general 1.0. [verified]
+    ([`crates/project`](../../../crates/project/tests/the_parameters_that_said_they_had_no_prior_year.rs))
 
     So the FY2027 special education transportation proration is **the first one**, and this node
     recorded earlier years as unheld while `crates/project/fixtures/transportation-rates.csv`
@@ -394,8 +394,8 @@ properties:
     education earmark is $176,897,678 then $194,820,866, and the unearmarked remainder the
     general formula is paid from is $703,348,806 then $762,819,905. A factor without the line it
     divides is an unexplained multiplier, which is the argument `sensitivity` makes for three
-    properties rather than one. [verified —
-    [`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs)]
+    properties rather than one. [verified]
+    ([`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs))
   statutory_basis: |
     Set by the appropriation rather than by R.C. 3317, and each of the three divides a different
     half of a line:
@@ -408,8 +408,8 @@ properties:
     discretion. The budget's own language is *"DEW must prorate the payments so as not to exceed
     the amount appropriated"*, and LSC states the arithmetic that produces the number:
     *"Adjustment percentage = (Earmarked appropriation)/(Total statewide allocation)"*. Both
-    halves are observable for all three, and all three close. [verified —
-    [`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs)]
+    halves are observable for all three, and all three close. [verified]
+    ([`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs))
   simulation_key: proration_factor
   written_as: |
     general proration

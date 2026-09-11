@@ -103,8 +103,8 @@ findings: |
   ### What it replaces, which is one of the two candidates and not the other
 
   The charge-off era ran two components here, and the corpus had them as one question. They are
-  not alike. [verified —
-  [`crates/project`](../../../crates/project/tests/the_component_targeted_assistance_succeeded.rs)]
+  not alike. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_component_targeted_assistance_succeeded.rs))
 
   **Gap aid could not have had a successor.** LSC files it under the heading *"Charge-off
   Supplement (Gap Aid)"* and defines it as the payment made *"to districts whose actual operating
@@ -149,8 +149,8 @@ findings: |
   from $362,326,436.80 to $392,151,306.63, **+8.23%**; the per-pupil median from $253,337.38 to
   $276,708.97, **+9.23%**. Every weight and every base cost in the plan is the same number in both
   years, so the scale this component equalises to moves nine per cent in a year while the scale
-  the rest of the formula prices against does not move at all. [verified —
-  [`crates/project`](../../../crates/project/tests/the_exclusion_that_was_computed_once.rs)]
+  the rest of the formula prices against does not move at all. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_exclusion_that_was_computed_once.rs))
 
   ### And the exclusion was computed once, made no difference, and was left behind
 
@@ -158,8 +158,8 @@ findings: |
   published digit in the FY2026 model. Two districts out of 611 cannot move a median, which is
   what a median is for. In the FY2027 model those cells still hold the **FY2026** numbers, beside
   a main pair that has moved eight and nine per cent. So it is not an alternative calculation
-  maintained beside the live one; it is last year's value nothing recomputes. [verified —
-  `crates/project`]
+  maintained beside the live one; it is last year's value nothing recomputes. [verified]
+  (`crates/project`)
 
   That is the third stale cell found in this workbook, after the `-FY21` suffix on the
   [career-technical](fsfp-career-technical-weights.yml) and [English
@@ -223,12 +223,12 @@ properties:
     district's weighted wealth for that fiscal year X 0.008)", and the size brackets are statutory
     as well — "greater than or equal to 200 but less than or equal to 400" and the rest. The
     two-tier structure the corpus recovered from the sheet is the structure the section describes.
-    [verified — `ohio-laws`]
+    [verified] (`ohio-laws`)
   calculator: |
     Not a standalone crate. Verified against the department's published per-district amounts in
     `crates/project/tests/the_remaining_categoricals.rs`, which reproduces both tiers and the
     eligibility test for all 609 districts; the decomposition is carried in
-    `crates/project::panel::TargetedAssistance`. [verified — `crates/project`]
+    `crates/project::panel::TargetedAssistance`. [verified] (`crates/project`)
 figures:
   - key: project/median-weighted-wealth-rise
     value: 0.08231491496007992

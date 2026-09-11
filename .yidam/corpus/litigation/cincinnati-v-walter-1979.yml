@@ -20,8 +20,8 @@ description: |
 
   **And *DeRolph I* neither overruled this decision nor merely distinguished it. It applied it.**
   The word "overrule" does not appear in *DeRolph I* at all, in an opinion that names *Walter* 76
-  times. See `findings`. [verified —
-  [`crates/regime-diff`](../../../crates/regime-diff/tests/what_derolph_did_with_walter.rs)]
+  times. See `findings`. [verified]
+  ([`crates/regime-diff`](../../../crates/regime-diff/tests/what_derolph_did_with_walter.rs))
 findings: |
   ### One standard, two records, two answers
 

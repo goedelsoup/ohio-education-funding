@@ -6,49 +6,51 @@
 # reports what it measured and never comes due, which is where this repository
 # sat until 2026-08-31: four clocks, all decorative.
 #
-# `escalate_after` is deliberately NOT set. It turns a standing finding into an
-# error after N corpus-touching commits, and the great majority of this corpus's
-# findings are malformed claim tags awaiting an editorial pass. Arming the clock
-# before that pass lands schedules a red gate with no commit behind it. Set it
-# once the claim tags are uniform, not before.
+# `escalate_after` is still NOT set, and the reason has changed. It used to be
+# that the great majority of findings were malformed claim tags awaiting an
+# editorial pass, so arming the clock scheduled a red gate with no commit behind
+# it. **That pass has landed.** `claim-tag-malformed` went 579 -> 37 and lint
+# total 659 -> 117 when the corpus took the form yidam prescribes:
 #
-# Measured at 9f2c4cc under yidam 0.12.0 (20e7511): 562 of 642 findings. The
-# count moves with every corpus commit — it read 409 of 493 at 01cb592 under
-# 0.11.0 — so re-measure before quoting it; the ratio is the durable part.
+#   [verified] (crates/dispersion)      not   [verified — crates/dispersion]
 #
-# It is NOT one shape. That sentence stood here until 0.12.0 and was wrong in a
-# way nothing could see, because the check gave one piece of advice to two
-# populations (goedelsoup/yidam#d3b3496). Split:
+# 542 tags, 112 files, and the standoff that blocked it for two months resolved
+# by moving BOTH sides. The folded form was not a defect here — it is where
+# `citedCrates` in `web/src/lib/corpusFigures.ts` read the figure attribution
+# for gates #157/#158/#218, which is why the mechanical rewrite of `a09ffa8`
+# threw 165 `unattributed` findings and was reverted by `440e49e`. So
+# `claimTags` and `badgeClaims` were widened to read the justification from the
+# trailing parenthetical first. The citation still has to sit adjacent to its
+# tag in the same prose field; only the delimiter moved, and no rendered page
+# changed. See #256 for the sizing and the two options it put.
 #
-#   citation folded into the tag    524   the shape this repository argues about
-#   two standings in one tag         38   `[verified for FY2022; inference for FY2023]`
+# What stands, and why it is not backlog:
 #
-# The second population is not an editorial backlog. Upstream is explicit that
-# such a bracket is not a tag and that nothing on disk needs editing for it; the
-# repair, where anyone wants one, is to write two claims. So the pass that would
-# make the tags uniform is 524, and it will not take the other 38 with it.
+#   two standings in one tag   37   `[verified for FY2022; inference for FY2023]`
 #
-# 0.12.0 also moved 29 qualified tags into the claim counts (1416 -> 1445), and
-# only 17 of those had ever been reported. Twelve were counted as no claim and
-# flagged by nothing. Any figure here derived by a different reader — the 455
-# detail-carrying tags this paragraph used to quote against — predates that and
-# has to be re-derived by its own method before it is quoted again.
+# Upstream is explicit that such a bracket is not a tag and that nothing on disk
+# needs editing for it; the repair, where anyone wants one, is to write two
+# claims. No editorial pass will take these, so **whatever `escalate_after` is
+# eventually set to has to tolerate 37 standing findings indefinitely** — and
+# the same goes for the 26 `verified-unsourced` and 52 `missing-property`,
+# neither of which moved across the pass. That is the argument the clock now
+# needs, and it is a different one from "wait for the pass". Arming it is a real
+# decision about those three populations, not a formality.
 #
-# That count read 232 of 326 until yidam 0.10.0, and the corpus did not move:
-# the check was line-scoped, its code-span mask inverted on a span that wrapped,
-# and it never read a class's own prose — goedelsoup/yidam#601, #602 and #603,
-# all closed upstream. The residue the fixed check still cannot see is one shape
-# and one shape only: detail introduced by a plain space, which `TAG_SEPARATORS`
-# excludes deliberately, so no further fix upstream reaches it. It is 46 tags,
-# and it is uniform — 23 wrapped, 23 not, spread across all four prose fields
-# and `properties`. Neither wrapping nor field predicts it any more, which is
-# what closed #256's last open question about a suspected third cause.
+# History worth keeping, because it is the same lesson three times. The count
+# read 232 of 326 until yidam 0.10.0 and the corpus had not moved: the check was
+# line-scoped, its code-span mask inverted on a span that wrapped, and it never
+# read a class's own prose — goedelsoup/yidam#601, #602 and #603, all closed
+# upstream. Then 0.12.0 split one piece of advice into two and found 12 tags
+# that had been counted as no claim *and* flagged by nothing. A count that moves
+# on a re-vendor is the instrument being corrected; decompose by the message
+# before reading it as drift.
 #
-# The shape being reported is this repository's figure attribution: the citation
-# lives inside the tag, where `citedCrates` in `web/src/lib/corpusFigures.ts`
-# reads it. Doing the rewrite the finding asks for empties `detail` and takes
-# every binding's citation with it, which is what #256 records and what `440e49e`
-# reverted. A larger number is a better-calibrated check, not a worse corpus.
+# The pass also moved the README counters, by exactly 11 (+8 `[verified]`, +3
+# `[inference]`). `count_tag` in `crates/connect` requires `]` or a space after
+# the tag name, so the 6 comma-form and 5 wrapped-immediately tags in the 542
+# had never been counted. They are claims the headline number was missing, not
+# claims the pass created.
 
 [catalog]
 # Days, not commits, and that is the one place yidam's clocks disagree on units
