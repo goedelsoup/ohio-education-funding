@@ -640,6 +640,22 @@ fn named_ratio(irn: &str) -> f64 {
 /// # Panics
 ///
 /// If the edition is not in the basis fixture, which means the extract lost a year.
+/// Nominal and real growth in the statewide base cost per pupil between two fiscal years.
+///
+/// Both ends have to carry an amount; every year a figure here names does.
+fn base_cost_growth(from: u16, to: u16) -> (f64, f64) {
+    project::base_cost::growth(from, to).expect("both years carry an amount")
+}
+
+/// The current freeze, as `(the anchor amount restated in FY2026 dollars, what is paid, the loss)`.
+///
+/// The last of [`project::base_cost::freezes`], which is FY2024's and is still running.
+fn base_cost_freeze() -> (f64, f64, f64) {
+    let runs = project::base_cost::freezes();
+    let current = runs.last().expect("the series holds three freezes");
+    project::base_cost::erosion(current).expect("the anchor year deflates")
+}
+
 fn chapter_lines(edition: u16) -> f64 {
     #[allow(clippy::cast_precision_loss)]
     {
@@ -2869,6 +2885,133 @@ pub static FIGURES: &[Figure] = &[
         compute: |_| {
             let convened = project::ledger::line_origins::convened;
             f64::from(convened(133)) - f64::from(convened(112))
+        },
+    },
+    Figure {
+        key: "project/deduction-per-pupil-fall-through-the-gap",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "How far the per-pupil amount a district is charged for a pupil it does not teach \
+                fell across the four years Ohio had no statewide base cost per pupil",
+        pinned: 79.0,
+        tolerance: 0.01,
+        compute: |_| {
+            let first = 5_732.0;
+            let last = project::base_cost::DEDUCTION
+                .last()
+                .and_then(|row| row.stated.dollars)
+                .expect("the deduction series ends with an amount");
+            first - last
+        },
+    },
+    Figure {
+        key: "project/deduction-per-pupil-real-fall-through-the-gap-negative",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "And the same fall in constant dollars, across four years in which the formula had \
+                no price for a pupil and prices rose anyway",
+        pinned: 0.089_008_069_370_486_44,
+        tolerance: 0.000_001,
+        compute: |_| -project::base_cost::deduction_real_change(),
+    },
+    // The parameter the corpus calls the most consequential number in Ohio school funding, read
+    // off twelve committed greenbooks and put through the deflator this workspace has had all
+    // along. Every real figure is in FY2026 dollars, the last June the Bureau has published.
+    Figure {
+        key: "project/base-cost-real-peak",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The most Ohio's statewide base cost per pupil has ever been worth, in FY2026 \
+                dollars, which it reached in FY2003",
+        pinned: 8_996.888_666_303_757,
+        tolerance: 0.01,
+        compute: |_| project::base_cost::peak().1,
+    },
+    Figure {
+        key: "project/base-cost-nominal-rise-since-fy2002",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "How far the statewide base cost per pupil rises from FY2002 to FY2026 in the \
+                dollars of each year",
+        pinned: 0.712_089_738_263_398_4,
+        tolerance: 0.000_001,
+        compute: |_| base_cost_growth(2002, 2026).0,
+    },
+    Figure {
+        key: "project/base-cost-real-fall-since-fy2002-negative",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "And how far it falls across the same span once the change in prices is removed",
+        pinned: 0.077_696_962_696_479_19,
+        tolerance: 0.000_001,
+        compute: |_| -base_cost_growth(2002, 2026).1,
+    },
+    Figure {
+        key: "project/base-cost-years-with-no-statewide-amount",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Fiscal years in which Ohio's formula has no statewide base cost per pupil at all, \
+                which are FY2010 through FY2013",
+        pinned: 4.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| project::base_cost::gap().len() as f64,
+    },
+    Figure {
+        key: "project/base-cost-real-fall-across-the-gap-negative",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "How much less the base cost per pupil was worth when it returned in FY2014 than \
+                when it was abandoned in FY2009",
+        pinned: 0.092_978_668_972_085_07,
+        tolerance: 0.000_001,
+        compute: |_| -base_cost_growth(2009, 2014).1,
+    },
+    Figure {
+        key: "project/base-cost-opportunity-grant-era-real-fall-negative",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The real fall in the opportunity grant's formula amount from FY2014 to FY2021, \
+                across which the printed figure rose every year",
+        pinned: 0.080_766_982_747_163_98,
+        tolerance: 0.000_001,
+        compute: |_| -base_cost_growth(2014, 2021).1,
+    },
+    Figure {
+        key: "project/base-cost-fy2024-amount-in-fy2026-dollars",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the FY2024 statewide average base cost per pupil, which two acts have frozen \
+                through FY2027, is worth in FY2026 dollars",
+        pinned: 8_760.825_603_564_892,
+        tolerance: 0.01,
+        compute: |_| base_cost_freeze().0,
+    },
+    Figure {
+        key: "project/base-cost-freeze-shortfall-per-pupil",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And the gap between that and the frozen amount the formula actually pays in \
+                FY2026, per pupil",
+        pinned: 518.825_603_564_892,
+        tolerance: 0.01,
+        compute: |_| {
+            let (restated, paid, _) = base_cost_freeze();
+            restated - paid
+        },
+    },
+    Figure {
+        key: "project/base-cost-fy2022-estimate-miss",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "How far the Legislative Service Commission's estimate of the FY2022 statewide \
+                average was below the amount the year produced",
+        pinned: 0.020_827_547_903_360_178,
+        tolerance: 0.000_001,
+        compute: |_| {
+            let year = project::base_cost::year(2022).expect("FY2022 is in the series");
+            let estimate = year.stated.dollars.expect("an estimate is an amount");
+            project::base_cost::nominal(2022).expect("FY2022 has an amount") / estimate - 1.0
         },
     },
     // The metric Ohio publishes twice. Every figure on `dispersion::valuation::TAX_YEAR`, because

@@ -209,6 +209,10 @@ impl CpiSeries {
     pub fn cpi_u_june() -> Self {
         const VERIFIED: &[(u16, f64)] = &[(2000, 172.400), (2022, 296.311)];
         const TRANSCRIBED: &[(u16, f64)] = &[
+            // FY1999 came last of all, when `project::base_cost` reached back to the year Ohio's
+            // base cost was measured rather than indexed. Read from the same committed extract as
+            // FY2023 onward, and checked on the same run.
+            (1999, 166.200),
             (2001, 178.000),
             (2002, 179.900),
             (2003, 183.700),

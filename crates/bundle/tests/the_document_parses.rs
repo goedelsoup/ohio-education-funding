@@ -300,11 +300,13 @@ fn the_blocks_that_only_the_real_build_populates_are_in_it() {
     assert!(!deflator.points.is_empty(), "a deflator with no points");
 
     // The years the feed carries and the index cannot reach, which used to leave through a
-    // `filter_map` and be visible to nothing. CPI-U June runs FY2000-FY2026 and the
-    // appropriations series runs FY1998-FY2027, so it is the two ends of that series.
+    // `filter_map` and be visible to nothing. CPI-U June runs FY1999-FY2026 and the
+    // appropriations series runs FY1998-FY2027, so it is the two ends of that series. FY1999 was
+    // in this list until `project::base_cost` reached back to the one year Ohio measured its base
+    // cost rather than indexing it, and the index grew a point to meet it.
     assert_eq!(
         deflator.uncovered,
-        vec![1998, 1999, 2027],
+        vec![1998, 2027],
         "the deflator's gap against the feed changed"
     );
     assert!(
@@ -323,7 +325,7 @@ fn the_blocks_that_only_the_real_build_populates_are_in_it() {
         "the deflator block is not emitted"
     );
     assert!(
-        feed.contains("\"uncovered\": [1998, 1999, 2027]"),
+        feed.contains("\"uncovered\": [1998, 2027]"),
         "the deflator's uncovered years are not emitted"
     );
 }

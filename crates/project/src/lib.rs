@@ -57,6 +57,7 @@
 #![forbid(unsafe_code)]
 
 pub mod act;
+pub mod base_cost;
 pub mod cli;
 pub mod crosswalk;
 pub mod drafts;

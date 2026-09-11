@@ -20,8 +20,8 @@ fn every_committed_index_point_matches_the_published_series() {
 
     assert_eq!(
         checks.len(),
-        27,
-        "FY2000 through FY2026, less the years the Bureau has no June for"
+        28,
+        "FY1999 through FY2026, less the years the Bureau has no June for"
     );
     let disagreements: Vec<String> = checks
         .iter()

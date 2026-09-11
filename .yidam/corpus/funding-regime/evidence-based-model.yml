@@ -79,6 +79,29 @@ findings: |
   What this cannot say is how much money moved. A line item's legal basis is its authority, not
   its amount, and 200550 carries every district's foundation payment in every regime — so the
   chapter citation dates the model and measures nothing about it. [open]
+
+  ### It abolished the per-pupil base cost and went on paying one
+
+  The regime has no statewide base cost per pupil, and that is a fact about the model rather than
+  a gap in the record. LSC states it: the new model "is also largely based on the number of
+  students in a district, but there is no specific formula amount per pupil", because what drives
+  its cost is the teacher compensation amount, which varies by district. Ohio then went four
+  fiscal years without one — this regime's two, and the two of the
+  [bridge formula](bridge-formula.yml) that replaced it, which pays each district its own FY2011
+  aid. [verified —
+  [`crates/project`](../../../crates/project/tests/the_series_that_needed_a_deflator.rs)]
+
+  **Community schools kept theirs.** H.B. 1 sets a base cost formula amount of $5,718 for FY2010
+  and $5,703 for FY2011 for community school payments, and multiplies their special education and
+  career-technical weights by $5,732 — the repealed regime's last district figure, frozen. H.B.
+  153 then cut the transfer rate to $5,653. So the per-pupil amount survived in exactly the place
+  it was used to move money *out* of districts, and it fell $79 across the four years —
+  8.90% in constant dollars, because four years in which the formula had no price for a pupil
+  were four years of prices rising anyway. [verified]
+
+  A regime that replaced a per-pupil price with a resource build-up still needed a per-pupil price
+  to charge a district for a pupil it did not teach, and nobody rebuilt that one. See
+  [`base-cost-per-pupil`](../parameter/base-cost-per-pupil.yml) for the whole series. [inference]
 figures:
   - key: project/evidence-based-model-line-items
     value: 1
@@ -100,6 +123,14 @@ figures:
     value: 13
     field: findings
     as_written: "stands at **13** in\n  the 2025 edition"
+  - key: project/deduction-per-pupil-fall-through-the-gap
+    value: 79
+    field: findings
+    as_written: "it fell $79 across the four years"
+  - key: project/deduction-per-pupil-real-fall-through-the-gap-negative
+    value: 0.08900806937048644
+    field: findings
+    as_written: "8.90% in constant dollars"
 properties:
   name: Evidence-Based Model
   effective_from: FY2010

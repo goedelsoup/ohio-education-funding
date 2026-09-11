@@ -53,16 +53,119 @@ properties:
     legislated — as its pre-2021 series invites — makes the refresh look like a policy that sets
     a number, when it is a policy that chooses a measurement.
   series: |
-    FY2006  $5,283.00  statutory base cost, foundation formula    [inference]
-    FY2007  $5,403.00  statutory base cost, foundation formula    [inference]
-    FY2021  $6,020.00  pre-FSFP formula amount                    [inference, Fordham]
-    FY2022  $7,349.22  statewide average, FY2018 cost inputs      [verified, department]
-    FY2023  $7,352.00  statewide average, FY2018 cost inputs      [inference, Fordham]
-    FY2025  $8,240.00  statewide average, FY2022 cost inputs      [inference, Fordham]
-    FY2026  $8,242     the FY2024 statewide average, maintained  [verified — LSC greenbook]
-    FY2027  $8,242     the same FY2024 amount, maintained again  [verified — LSC greenbook]
-            $8,241.61  the calculator's stated multiplier          [verified, department model]
-            $8,257.55  aggregate / ADM, which is $15.94 higher     [verified, computed]
+    **Reconstructed from the Legislative Service Commission's analysis of every enacted budget
+    act since the 124th General Assembly, and deflated.** The greenbooks state the amount in
+    prose, biennium by biennium, and twelve of them have been committed in this repository since
+    before this node's series was written. Each row below carries LSC's own sentence in
+    `project::base_cost::SERIES`, and a test requires that sentence to be in the act's greenbook
+    and to contain that row's figure. [verified —
+    [`crates/project`](../../../crates/project/tests/the_series_that_needed_a_deflator.rs)]
+
+        FY     nominal    FY2026 $   how the amount came about
+        1999  $4,420.00  $8,881.27   measured: the average adjusted base expenditure of the 127
+                                     districts meeting at least twenty of twenty-seven
+                                     performance standards
+        2002  $4,814.00  $8,936.33   FY1999 indexed at 2.8% a year, plus $12 for the twentieth
+                                     graduation credit
+        2003  $4,949.00  $8,996.89   indexed 2.8%
+        2004  $5,058.00  $8,904.21   indexed 2.2%
+        2005  $5,169.00  $8,875.05   indexed 2.2%
+        2006  $5,283.00  $8,695.26   rebuilt from three priced components
+        2007  $5,403.00  $8,660.07   indexed 2.27%
+        2008  $5,565.00  $8,493.22   indexed 3.0%
+        2009  $5,732.00  $8,874.71   indexed 3.0%
+        2010          -          -   the Evidence-Based Model has no statewide per-pupil amount
+        2011          -          -
+        2012          -          -   the Bridge formula pays each district its own FY2011 aid
+        2013          -          -
+        2014  $5,745.00  $8,049.55   the opportunity grant's formula amount
+        2015  $5,800.00  $8,116.57
+        2016  $5,900.00  $8,174.98
+        2017  $6,000.00  $8,179.92
+        2018  $6,010.00  $7,964.84
+        2019  $6,020.00  $7,848.71
+        2020  $6,020.00  $7,798.35   held at FY2019
+        2021  $6,020.00  $7,399.41   held at FY2019
+        2022  $7,352.00  $8,285.94   the Fair School Funding Plan's computed average
+        2023  $7,352.00  $8,047.01   held at FY2022
+        2024  $8,242.00  $8,760.83   recomputed on FY2022 cost inputs
+        2025  $8,242.00  $8,533.06   held at FY2024
+        2026  $8,242.00  $8,242.00   held at FY2024
+        2027  $8,242.00          -   held at FY2024; June 2027 has no price index yet
+
+    **Nominally the amount rises 71.21% from FY2002 to FY2026.**
+    In constant dollars it falls 7.77% across the same span, and its high is FY2003,
+    at $8,996.89 in FY2026 dollars. Ohio's base cost per pupil is worth less today than it was
+    twenty-three years ago, and every figure in the left-hand column above says the opposite.
+    [verified]
+
+    Deflation settles the price half of the objection this node raises against cross-era
+    comparison and leaves the other half standing — a pre-2022 figure is a legislated amount and
+    a post-2022 one is the quotient of a district build-up, and no index makes those one
+    quantity. Within an era, where the two ends are the same kind of thing:
+
+    | era | span | nominal | real |
+    |---|---|---|---|
+    | base cost formula amount | FY2002-FY2009 | +19.07% | -0.69% |
+    | opportunity grant formula amount | FY2014-FY2021 | +4.79% | a fall of 8.08% |
+    | statewide average base cost per pupil | FY2022-FY2026 | +12.11% | -0.53% |
+
+    The opportunity grant era is the decline. Eight years in which the printed amount rose every
+    year and bought less every year but one. [verified]
+
+    ### 4 fiscal years have no value at all
+
+    Not an unrecorded value. None. The Evidence-Based Model replaced the per-pupil base with a
+    per-teacher compensation amount that varies by district, and LSC says so outright: "there is
+    no specific formula amount per pupil". The Bridge formula that replaced *it* paid each
+    district its own FY2011 aid per pupil. So FY2010 through FY2013 are a hole in the series, and
+    this node's request for "the Evidence-Based Model's computed adequacy amount for FY2010-11"
+    was a request for a number nobody ever computed. [verified]
+
+    When the parameter came back in FY2014 it came back **9.30% lower in real terms** than when
+    it was abandoned in FY2009, on a nominal figure $13 higher. [verified]
+
+    **And a statewide per-pupil amount did run through the hole — the deduction.** What a
+    district is charged for a pupil it does not teach, on a community school, STEM school, open
+    enrolment or Post-Secondary Enrolment Options transfer, was legislated in each of those acts
+    and fell in each: $5,732 in FY2009 when it was the base cost, then $5,718, $5,703 and $5,653.
+    Ohio stopped saying what a pupil costs without stopping saying what one is worth taking away.
+    [verified]
+
+    ### Every second year is a freeze, and the freezes are lengthening
+
+    The amount is recomputed once a biennium and held for the rest. H.B. 166 held FY2020 and
+    FY2021 at the FY2019 figure, H.B. 110 held FY2023 at FY2022, and H.B. 33 and H.B. 96 between
+    them have held FY2025, FY2026 and FY2027 at FY2024. A freeze is a nominal decision with a
+    real effect and nothing has to be cut for a district to receive less: the three cost 5.72%,
+    2.88% and, so far, 5.92%.
+
+    The current one is the largest in the series. **The FY2024 amount is worth $8,760.83 in
+    FY2026 dollars and the formula pays $8,242.00 — a shortfall of $518.83 per pupil**, with a
+    fourth frozen year still to run. [verified]
+
+    ### FY2024 through FY2027 are one number, and this node printed it as three
+
+    $8,240, $8,241 and $8,242 are not a rising series. They are $8,241.61 rounded by three
+    publishers: Fordham, LSC in the H.B. 33 greenbook, and LSC in H.B. 96's. H.B. 33 computed one
+    amount for FY2024 and required FY2025 fixed at it; H.B. 96 "maintains the use of the FY 2024
+    statewide average amounts ($8,242 and $9,856, respectively) in FY 2026 and FY 2027". Four
+    fiscal years, one figure. [verified — LSC greenbook]
+
+    The same thing happened at the other end of the plan and this node caught it there. FY2022's
+    $7,349.22 is the aggregate over the ADM; **$7,352 is the stated average**, and H.B. 110 fixed
+    FY2023 at the FY2022 amount, so the $2.78 between the node's FY2022 and FY2023 rows is the
+    quotient-against-multiplier gap the FY2027 paragraph below describes, not a year of growth.
+    [verified — LSC greenbook]
+
+    ### The estimate at enactment is not the amount that gets frozen
+
+    Under the plan the average is not knowable when the act passes: it is a quotient over data
+    the department has not collected. So the biennium's own greenbook estimates it and the next
+    biennium's states what it was. H.B. 110 estimated FY2022 at $7,202 and the year came in at
+    $7,352, so the estimate was low by 2.08% — and because FY2023 was then frozen at the realised
+    figure, it was wrong about two years rather than one. The career-technical companion missed
+    the same way in FY2024: $9,726 estimated, $9,855.62 used. [verified]
 
     FY2027 detail from the department's own FY27 calculator [verified]:
       statewide aggregate base cost     $11,767,054,639.44
@@ -107,9 +210,12 @@ properties:
       Districts receiving foundation aid  611
       Total state foundation funding      approximately $7.5 billion
 
-    Still missing: the FY1992-FY2009 statutory series, the Evidence-Based Model's computed
-    adequacy amount for FY2010-11, and the FY2024-FY2027 statewide averages. All figures need
-    a constant-dollar companion series before any cross-era comparison. [open]
+    Still missing: FY1992 through FY2001, which the greenbook series does not reach - LSC's
+    education analyses begin with the 124th General Assembly, and the H.B. 94 model's own FY1999
+    base year is the one earlier point it states. What the constant-dollar series cannot settle
+    is whether a consumer price index is the right deflator at all: base cost is majority
+    compensation, and the Employment Cost Index would be the better measure over a series this
+    long if it reached back far enough. [open]
   statutory_basis: R.C. 3317.011, with sub-components at 3317.011(D) through (H). [verified]
   simulation_key: base_cost_per_pupil
   written_as: |
@@ -148,6 +254,42 @@ properties:
     choice about the number itself. [verified for the arithmetic; inference for the claim
     about dominance]
 figures:
+  - key: project/base-cost-nominal-rise-since-fy2002
+    value: 0.7120897382633984
+    field: series
+    as_written: "rises 71.21% from FY2002 to FY2026"
+  - key: project/base-cost-real-fall-since-fy2002-negative
+    value: 0.07769696269647919
+    field: series
+    as_written: "it falls 7.77% across the same span"
+  - key: project/base-cost-real-peak
+    value: 8996.888666303757
+    field: series
+    as_written: "at $8,996.89 in FY2026 dollars"
+  - key: project/base-cost-opportunity-grant-era-real-fall-negative
+    value: 0.08076698274716398
+    field: series
+    as_written: "a fall of 8.08%"
+  - key: project/base-cost-years-with-no-statewide-amount
+    value: 4
+    field: series
+    as_written: "### 4 fiscal years have no value at all"
+  - key: project/base-cost-real-fall-across-the-gap-negative
+    value: 0.09297866897208507
+    field: series
+    as_written: "came back **9.30% lower in real terms**"
+  - key: project/base-cost-fy2024-amount-in-fy2026-dollars
+    value: 8760.825603564892
+    field: series
+    as_written: "The FY2024 amount is worth $8,760.83"
+  - key: project/base-cost-freeze-shortfall-per-pupil
+    value: 518.8256035648919
+    field: series
+    as_written: "a shortfall of $518.83 per pupil"
+  - key: project/base-cost-fy2022-estimate-miss
+    value: 0.020827547903360166
+    field: series
+    as_written: "the estimate was low by 2.08%"
   - key: project/districts-at-the-minimum-state-share
     value: 138
     field: sensitivity
