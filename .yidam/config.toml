@@ -8,14 +8,31 @@
 #
 # `escalate_after` is deliberately NOT set. It turns a standing finding into an
 # error after N corpus-touching commits, and the great majority of this corpus's
-# findings are one malformed-claim-tag shape awaiting a single editorial pass.
-# Arming the clock before that pass lands schedules a red gate with no commit
-# behind it. Set it once the claim tags are uniform, not before.
+# findings are malformed claim tags awaiting an editorial pass. Arming the clock
+# before that pass lands schedules a red gate with no commit behind it. Set it
+# once the claim tags are uniform, not before.
 #
-# Measured on `main` at 01cb592 under yidam 0.11.0 (2996286): 409 of 493
-# findings, against 455 detail-carrying tags. These three move with every corpus
-# commit — four extraction PRs carried them from 402 of 485 against 447 — so
-# re-measure before quoting them; the ratio is the durable part, not the count.
+# Measured at 9f2c4cc under yidam 0.12.0 (20e7511): 562 of 642 findings. The
+# count moves with every corpus commit — it read 409 of 493 at 01cb592 under
+# 0.11.0 — so re-measure before quoting it; the ratio is the durable part.
+#
+# It is NOT one shape. That sentence stood here until 0.12.0 and was wrong in a
+# way nothing could see, because the check gave one piece of advice to two
+# populations (goedelsoup/yidam#d3b3496). Split:
+#
+#   citation folded into the tag    524   the shape this repository argues about
+#   two standings in one tag         38   `[verified for FY2022; inference for FY2023]`
+#
+# The second population is not an editorial backlog. Upstream is explicit that
+# such a bracket is not a tag and that nothing on disk needs editing for it; the
+# repair, where anyone wants one, is to write two claims. So the pass that would
+# make the tags uniform is 524, and it will not take the other 38 with it.
+#
+# 0.12.0 also moved 29 qualified tags into the claim counts (1416 -> 1445), and
+# only 17 of those had ever been reported. Twelve were counted as no claim and
+# flagged by nothing. Any figure here derived by a different reader — the 455
+# detail-carrying tags this paragraph used to quote against — predates that and
+# has to be re-derived by its own method before it is quoted again.
 #
 # That count read 232 of 326 until yidam 0.10.0, and the corpus did not move:
 # the check was line-scoped, its code-span mask inverted on a span that wrapped,
