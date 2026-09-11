@@ -162,7 +162,14 @@ mod tests {
     #[test]
     fn the_committed_series_is_checkable_against_a_published_one() {
         let checks = check_committed_series(&parse_series(SAMPLE, ALL_ITEMS_NSA, JUNE));
-        assert_eq!(checks.len(), 27, "every point the series holds");
+        // Read off the series rather than typed. A literal here is the same mistake the doc
+        // comment on `check_committed_series` records: it said 27 while the series held 27, and
+        // would have gone on passing when FY1999 was added for `project::base_cost`.
+        assert_eq!(
+            checks.len(),
+            CpiSeries::cpi_u_june().points().len(),
+            "every point the series holds"
+        );
 
         let fy2000 = checks.iter().find(|c| c.fiscal_year.0 == 2000).unwrap();
         assert!(fy2000.agrees());
