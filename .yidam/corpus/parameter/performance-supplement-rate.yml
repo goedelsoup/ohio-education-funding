@@ -107,7 +107,16 @@ properties:
       least-poor fifth                                    94.2%
       poorest fifth                                       47.2%
 
-    No prior-year values are held. [open]
+    **The prior year is held, and the rate did not move.** $13 per pupil in the department's
+    FY2026 calculator and $13 in its FY2027 one, and H.B. 96's analysis states it once for both:
+    "Performance supplement for eligible district = Enrolled ADM x $13 x Report card rating
+    multiplier", with eligibility read off the 2024-2025 report card for FY2026 and the 2025-2026
+    one for FY2027. So the supplement's reach moves each year with the report card and its price
+    does not. [verified —
+    [`crates/project`](../../../crates/project/tests/the_parameters_that_said_they_had_no_prior_year.rs)]
+
+    FY2025 and earlier remain unheld: the FY2025 calculator is truncated at exactly one mebibyte
+    in every archived copy and FY2022 to FY2024 are not in the archive at all. [open]
   statutory_basis: |
     None. Not in R.C. 3317.022 and not in any other section of the Revised Code; the rate and the
     routes are transcribed from the department's sheet, where the supplement is line [O]. The
@@ -149,6 +158,10 @@ unfilled:
       compared with the FY2027 one. The department's payment reports for those years would settle
       whether equalising was enough to reverse it.
 figures:
+  - key: project/performance-supplement-per-pupil
+    value: 13
+    field: series
+    as_written: "$13 per pupil in the department's"
   - key: project/outcome-bonus-share-of-the-formula-amount
     value: 0.075
     field: findings

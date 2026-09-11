@@ -843,6 +843,36 @@ fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(cause) => Rebuilt::skipped(fixtures::SFPR_FIXTURE, cause),
     });
 
+    // The statewide scalars both models state once and multiply everywhere, two rows of them.
+    let scalars = (|| -> Result<Vec<Vec<String>>, RebuildError> {
+        let mut books = Vec::new();
+        for (fiscal_year, key) in [(2026, "fy26-calculator"), (2027, "fy27-calculator")] {
+            let book = open_workbook(root, registered(key))?;
+            let mut sheets = Vec::new();
+            for name in fixtures::SCALAR_SHEETS {
+                sheets.push((*name, book.rows(name)?));
+            }
+            books.push((fiscal_year, sheets));
+        }
+        let years: Vec<fixtures::ScalarYear<'_>> = books
+            .iter()
+            .map(|(fiscal_year, sheets)| fixtures::ScalarYear {
+                fiscal_year: *fiscal_year,
+                sheets,
+            })
+            .collect();
+        fixtures::build_calculator_scalars(&years).map_err(RebuildError::Layout)
+    })();
+    out.push(match scalars {
+        Ok(rows) => csv_fixture(
+            root,
+            fixtures::CALCULATOR_SCALARS_FIXTURE,
+            fixtures::CALCULATOR_SCALARS_HEADER,
+            &rows,
+        )?,
+        Err(cause) => Rebuilt::skipped(fixtures::CALCULATOR_SCALARS_FIXTURE, cause.to_string()),
+    });
+
     // The same workbook's per-district tables, in the columns that say what moved between the two
     // years the plan can be observed over. The catalog entry for this file recorded a decision not
     // to take them — see `fixtures::fy26` for why that was wrong.

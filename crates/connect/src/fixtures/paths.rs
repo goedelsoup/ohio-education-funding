@@ -22,6 +22,12 @@ pub const FY27_FIXTURE: &str = "crates/foundation/fixtures/fy27-department-model
 /// [`super::fy26`] for why the catalog's decision not to take these tables at all was wrong.
 pub const FY26_FIXTURE: &str = "crates/project/fixtures/fy26-department-model.csv";
 
+/// The statewide scalars each year's funding calculator states once, one row per fiscal year.
+///
+/// The file a `parameter` node's `series:` should be read off. Several of them said "no
+/// prior-year values are held" while two years of the calculator sat in the cache.
+pub const CALCULATOR_SCALARS_FIXTURE: &str = "crates/project/fixtures/calculator-parameters.csv";
+
 /// Where the district-profile fixture is written, relative to the repository root.
 pub const PROFILE_FIXTURE: &str = "crates/dispersion/fixtures/cupp-fy24-district-data.csv";
 /// Where the grade-band headcount fixture is written, relative to the repository root.
@@ -201,6 +207,7 @@ pub const CATALOG_BASIS_FIXTURE: &str = "crates/project/fixtures/catalog-line-it
 pub const REBUILT: &[&str] = &[
     FY27_FIXTURE,
     FY26_FIXTURE,
+    CALCULATOR_SCALARS_FIXTURE,
     PROFILE_FIXTURE,
     GRADE_BANDS_FIXTURE,
     REPORT_CARD_FIXTURE,

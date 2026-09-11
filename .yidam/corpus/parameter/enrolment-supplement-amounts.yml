@@ -123,7 +123,29 @@ properties:
       FY2020  $20     enrolment growth supplement, per pupil per point of average annual growth
       FY2021  $30     the same taper, admitting every district that grew at all
       FY2022  $0      ALI 200636 cut to nothing; the FY2021 payment frozen into the guarantee
-      FY2026  $40     base funding supplement, flat, unitemised, every district
+      FY2026  $27     base funding supplement, flat, unitemised, every district
+      FY2027  $40     the same, raised
+      FY2026  $225    enrolment growth supplement returns, at a 5% growth threshold
+      FY2027  $250    the same, raised, at a 3% threshold
+
+    **The FY2026 row read $40 and that is the FY2027 amount.** H.B. 96's own analysis states the
+    pair in one sentence — "$27 per pupil in FY 2026 and $40 per pupil in FY 2027" — and the
+    department's FY2026 calculator says $27 on the cell its FY2027 calculator says $40 on. Two
+    independent sources, one vintage error. [verified —
+    [`crates/project`](../../../crates/project/tests/the_parameters_that_said_they_had_no_prior_year.rs)]
+
+    **These two are the only per-pupil rates in the plan that rose.** Read every statewide scalar
+    both calculators state — 33 of them — and 23 hold to the digit across the two years: all six
+    special education weights, all five career-technical weights, all three English learner
+    weights, the $8,241.61 average base cost, the $9,855.62 career-technical one, the $422 DPIA
+    amount, the $13 performance supplement. The 10 that moved are every one downstream of a count
+    or a valuation, plus these two. [verified]
+
+    **And the growth supplement loosened while it rose.** FY2026 pays $225 to a district whose
+    enrolled ADM grew 5% between FY2022 and FY2025; FY2027 pays $250 at 3% between FY2023 and
+    FY2026 — a higher rate on an easier test, which the act's own analysis prices at $22.9m for
+    22 districts and then $45.0m for 40. The calculator carries an `EGS pct` cell reading 1 in
+    both years; it is not that threshold, and what it governs is not established. [open]
       FY2026  $250    growth supplement, on the whole enrolment, past a 3% threshold
   statutory_basis: |
     None. Not in R.C. 3317.022 and not in any other section this corpus cites; the two rates and
@@ -161,6 +183,22 @@ unfilled:
       connects them. The Fair School Funding Plan workgroup's materials, or the enrolled act's
       own drafting history, would settle whether the figure was carried or arrived at again.
 figures:
+  - key: project/base-funding-supplement-per-pupil-fy2026
+    value: 27
+    field: series
+    as_written: "FY2026  $27     base funding supplement"
+  - key: project/enrolment-growth-supplement-per-pupil-fy2026
+    value: 225
+    field: series
+    as_written: "FY2026  $225    enrolment growth supplement returns"
+  - key: project/calculator-scalars-that-held
+    value: 23
+    field: series
+    as_written: "23 hold to the digit across the two years"
+  - key: project/calculator-scalars-that-moved
+    value: 10
+    field: series
+    as_written: "The 10 that moved"
   - key: project/growth-supplement-appropriation-fy2021
     value: 23000000.0
     field: findings

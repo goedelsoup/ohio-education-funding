@@ -74,6 +74,121 @@ pub const DPIA_STATEWIDE_PERCENTAGE: f64 = 0.565_990_245;
 /// The ratio `[C5]` of the fortieth-highest district, which caps the local capacity percentage.
 pub const BENCHMARK_RATIO: f64 = 1.466_709_42;
 
+/// The statewide scalars each year's calculator states once and multiplies everywhere.
+const SCALARS: &str = include_str!("../fixtures/calculator-parameters.csv");
+
+/// The enacted FY2026 and FY2027 appropriation for preschool special education.
+///
+/// The remainder of GRF ALI 200540 after its five other earmarks, identical in both years and
+/// established from LSC's enacted analysis by
+/// `parameter/appropriation-proration-factor`. Repeated here as a constant because what it is
+/// wanted for is checking the department's proration factor against it, and a check whose
+/// expected value lives in prose is not a check.
+pub const PRESCHOOL_APPROPRIATION: Dollars = 153_976_832.0;
+
+/// Every statewide scalar both calculators state, by fiscal year and then by column name.
+///
+/// A map rather than a struct of thirty-odd fields because what a `parameter` node wants is one
+/// row of it across every year — [`scalar`] — and because a column added to the fixture should
+/// reach a caller without a type changing shape.
+///
+/// # Panics
+///
+/// If the fixture's first line is not a header, or a row's width differs from it.
+#[must_use]
+pub fn scalars() -> BTreeMap<u16, BTreeMap<String, f64>> {
+    let mut lines = SCALARS.lines();
+    let header: Vec<&str> = lines.next().unwrap_or_default().split(',').collect();
+    let mut out: BTreeMap<u16, BTreeMap<String, f64>> = BTreeMap::new();
+    for line in lines {
+        let cells: Vec<&str> = line.split(',').collect();
+        assert_eq!(
+            cells.len(),
+            header.len(),
+            "calculator-parameters.csv row is {} wide against a {}-wide header",
+            cells.len(),
+            header.len()
+        );
+        let Ok(fiscal_year) = cells[0].parse::<u16>() else {
+            continue;
+        };
+        let row = out.entry(fiscal_year).or_default();
+        for (name, cell) in header.iter().zip(&cells).skip(1) {
+            if let Ok(value) = cell.trim().parse::<f64>() {
+                row.insert((*name).to_string(), value);
+            }
+        }
+    }
+    out
+}
+
+/// One scalar across every year the calculators cover, oldest first.
+///
+/// The series a `parameter` node's `series:` field should be read off. `name` is a column of
+/// `crates/project/fixtures/calculator-parameters.csv`.
+#[must_use]
+pub fn scalar(name: &str) -> BTreeMap<u16, f64> {
+    scalars()
+        .into_iter()
+        .filter_map(|(fiscal_year, row)| Some((fiscal_year, *row.get(name)?)))
+        .collect()
+}
+
+/// The scalars that differ between the two years, and the ones that hold, by name.
+///
+/// Returned as `(moved, held)`. The second list is the longer one and is the finding: every
+/// weight and every base cost in the plan is the same number in both years.
+#[must_use]
+pub fn scalars_that_moved() -> (Vec<String>, Vec<String>) {
+    let by_year = scalars();
+    let mut moved = Vec::new();
+    let mut held = Vec::new();
+    let Some((first, rest)) = by_year.values().next().zip(by_year.values().last()) else {
+        return (moved, held);
+    };
+    for (name, value) in first {
+        match rest.get(name) {
+            Some(later) if (later - value).abs() < 1e-9 => held.push(name.clone()),
+            Some(_) => moved.push(name.clone()),
+            None => {}
+        }
+    }
+    (moved, held)
+}
+
+/// Whether a year's preschool proration factor is that year's appropriation over its demand.
+///
+/// Returned as `(the factor the workbook states, the factor its own year's arithmetic gives)`.
+/// The second is [`PRESCHOOL_APPROPRIATION`] divided by the demand the workbook implies — its
+/// published statewide total divided by the factor it applied.
+///
+/// **FY2026 closes and FY2027 does not.** In FY2026 the stated factor and the computed one agree
+/// to eight decimal places, which settles what
+/// `parameter/appropriation-proration-factor` records as open: the factor is *measured* — the
+/// line divided by the demand — and nobody decides it. In FY2027 the program's demand is 0.5%
+/// **below** its appropriation, so its own arithmetic gives no proration at all, and the
+/// workbook applies one anyway.
+#[must_use]
+pub fn preschool_proration(fiscal_year: u16) -> Option<(f64, f64)> {
+    let row = scalars().remove(&fiscal_year)?;
+    let stated = *row.get("preschool_proration_factor")?;
+    let total = *row.get("preschool_total_funds")?;
+    if stated <= 0.0 || total <= 0.0 {
+        return None;
+    }
+    Some((stated, PRESCHOOL_APPROPRIATION / (total / stated)))
+}
+
+/// What the preschool program is paid against what it is appropriated, for one year.
+///
+/// Returned as `(paid, appropriated)`. Negative headroom is a shortfall the proration exists to
+/// prevent; positive headroom means no proration should arise.
+#[must_use]
+pub fn preschool_headroom(fiscal_year: u16) -> Option<(Dollars, Dollars)> {
+    let row = scalars().remove(&fiscal_year)?;
+    Some((*row.get("preschool_total_funds")?, PRESCHOOL_APPROPRIATION))
+}
+
 /// One district, as the FY2026 model computes it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Prior {
