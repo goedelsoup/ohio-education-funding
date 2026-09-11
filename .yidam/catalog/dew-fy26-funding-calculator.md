@@ -58,15 +58,35 @@ against the committed digest like any other source.
   section.** In FY2026 the adjacent cell carries $63.75, which is 5% of $1,275; in FY2027 that
   cell is zero. What it does is not established. [open]
 
-**What is not taken.** The per-district tables. They are the FY2027 model's a year earlier and
-the counts are very nearly identical — bus miles are the same 825,828 in both, public riders the
-same 651,702 — so committing them would be four megabytes to restate a panel already held.
+**What is taken, and what this entry got wrong first.** It read:
+
+> **What is not taken.** The per-district tables. They are the FY2027 model's a year earlier and
+> the counts are very nearly identical — bus miles are the same 825,828 in both, public riders the
+> same 651,702 — so committing them would be four megabytes to restate a panel already held.
+
+Both facts are true and the conclusion does not follow from them. Bus miles and rider counts are a
+survey a year apart and they are stable. The columns two corpus nodes had recorded as unmeasurable
+"because the corpus holds one year of the calculator" are not: per-pupil local capacity moves
+**+9.34%** at the median and 2 districts of 609 are unchanged, and disadvantaged pupil impact aid
+moves **−8.58%** with none unchanged. Generalising from the one sheet that was opened to the
+thirty that were not is the error, and it foreclosed the question the file was closest to
+answering.
+
+Sixteen columns are taken now — the two sides of the state share, the local capacity build-up and
+the disadvantaged pupil blend — as `crates/project/fixtures/fy26-department-model.csv`, about a
+hundred kilobytes. Built by
+[`crates/connect/src/fixtures/fy26.rs`](../../crates/connect/src/fixtures/fy26.rs) and read by
+[`project::prior_model`](../../crates/project/src/prior_model.rs). The rest of the per-district
+tables genuinely do restate what FY2027 already holds, and are still not taken.
 
 ## Used by
 
 - [`parameter/transportation-cost-rates`](../corpus/parameter/transportation-cost-rates.yml)
+- [`formula-component/fsfp-local-capacity-measure`](../corpus/formula-component/fsfp-local-capacity-measure.yml)
+- [`formula-component/fsfp-disadvantaged-pupil-impact-aid`](../corpus/formula-component/fsfp-disadvantaged-pupil-impact-aid.yml)
 
 ## Feeds connector
 
 [`dew-foundation`](../../crates/connect/src/registry/dew.rs), built by
-[`crates/connect/src/fixtures/transport_rates.rs`](../../crates/connect/src/fixtures/transport_rates.rs).
+[`crates/connect/src/fixtures/transport_rates.rs`](../../crates/connect/src/fixtures/transport_rates.rs)
+and [`crates/connect/src/fixtures/fy26.rs`](../../crates/connect/src/fixtures/fy26.rs).

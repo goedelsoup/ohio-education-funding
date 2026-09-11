@@ -161,8 +161,25 @@ findings: |
   divides by is the sum of enrolled ADM for all city, local and exempted village districts,
   statewide community school enrolment, and statewide STEM school enrolment. So it is
   recomputed rather than carried forward, and its value moves when any of those three move.
-  [verified — `ohio-laws`] How far it has moved between biennia is still unrecorded here,
-  because the corpus holds one year of the calculator. [open]
+  [verified — `ohio-laws`]
+
+  **It moved, and so did the weights above it.** The corpus holds two years of the calculator —
+  FY2027 from the department and FY2026 from the Internet Archive — and between them the
+  statewide percentage goes **0.565990 to 0.533380**, while the blend that feeds it goes
+  **75/25 to 65/35**. Both changes push the same way, and a third pushes with them: the directly
+  certified count the weight moved *toward* was itself restated **16.80% lower** at the median,
+  under the same column label and from the same collection named on the `Directions` sheet.
+  [verified —
+  [`crates/project`](../../../crates/project/tests/the_two_clocks_the_plan_runs_on.rs)]
+
+  Statewide the program pays **$567,673,869 in the FY2026 model and $525,094,312 in the FY2027
+  one** — a fall of 7.50%, in 562 of 609 districts. The economically disadvantaged count is the
+  same input in both workbooks, identical in 593 districts of 609, so none of the fall is a
+  change in how many poor children Ohio has. It is the weights and the certification count.
+  [verified]
+
+  What is not established is why the direct-certification figure was restated, and the FY2026
+  workbook is the only other observation there is. [open]
 
   **What *is* delegated is narrower and more interesting.** R.C. 3317.03(B)(21) hands the
   department the **definition** of "economically disadvantaged", constrained only by "a student
@@ -230,6 +247,18 @@ description: |
   And the act names the **vintage**, which nothing else did: the first term is the **FY2025**
   count, not the year the aid is paid in.
 figures:
+  - key: project/dpia-statewide-percentage-fy2026
+    value: 0.565990245
+    field: findings
+    as_written: "statewide percentage goes **0.565990 to 0.533380**"
+  - key: project/directly-certified-adm-fall-fy2026-to-fy2027-negative
+    value: 0.1679887425401787
+    field: findings
+    as_written: "restated **16.80% lower** at the median"
+  - key: project/dpia-fall-fy2026-to-fy2027-negative
+    value: 0.07500707500066672
+    field: findings
+    as_written: "a fall of 7.50%"
   - key: project/dpia-economically-disadvantaged-adm-statewide
     value: 856236
     field: findings

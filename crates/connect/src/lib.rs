@@ -843,6 +843,28 @@ fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(cause) => Rebuilt::skipped(fixtures::SFPR_FIXTURE, cause),
     });
 
+    // The same workbook's per-district tables, in the columns that say what moved between the two
+    // years the plan can be observed over. The catalog entry for this file recorded a decision not
+    // to take them — see `fixtures::fy26` for why that was wrong.
+    let fy26_model = (|| -> Result<Vec<Vec<String>>, RebuildError> {
+        let book = open_workbook(root, registered("fy26-calculator"))?;
+        let detail = book.rows(fixtures::fy26::DETAIL_SHEET)?;
+        let base_cost = book.rows(fixtures::fy26::BASE_COST_SHEET)?;
+        let local_capacity = book.rows(fixtures::fy26::LOCAL_CAPACITY_SHEET)?;
+        let dpia = book.rows(fixtures::fy26::DPIA_SHEET)?;
+        fixtures::build_fy26_model(&fixtures::Fy26Sheets {
+            detail: &detail,
+            base_cost: &base_cost,
+            local_capacity: &local_capacity,
+            dpia: &dpia,
+        })
+        .map_err(RebuildError::Layout)
+    })();
+    out.push(match fy26_model {
+        Ok(rows) => csv_fixture(root, fixtures::FY26_FIXTURE, fixtures::FY26_HEADER, &rows)?,
+        Err(cause) => Rebuilt::skipped(fixtures::FY26_FIXTURE, cause.to_string()),
+    });
+
     // The one parameter in the plan that moves without an act, across the one interval it can be
     // observed over. FY2026 comes from the Internet Archive because the department serves no copy
     // of its own model a year later — see `decisions/an-archived-source-is-still-a-source`, which

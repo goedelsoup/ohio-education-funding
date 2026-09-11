@@ -14,6 +14,14 @@
 
 /// Where each fixture is written, relative to the repository root.
 pub const FY27_FIXTURE: &str = "crates/foundation/fixtures/fy27-department-model.csv";
+/// The FY2026 department model, in the sixteen columns that let it be compared to FY2027.
+///
+/// Narrow on purpose. [`FY27_FIXTURE`] is 162 columns because every calculator crate reads it;
+/// this is the two sides of the state share, the local capacity build-up and the disadvantaged
+/// pupil blend, because what it exists for is to say what moved. See
+/// [`super::fy26`] for why the catalog's decision not to take these tables at all was wrong.
+pub const FY26_FIXTURE: &str = "crates/project/fixtures/fy26-department-model.csv";
+
 /// Where the district-profile fixture is written, relative to the repository root.
 pub const PROFILE_FIXTURE: &str = "crates/dispersion/fixtures/cupp-fy24-district-data.csv";
 /// Where the grade-band headcount fixture is written, relative to the repository root.
@@ -192,6 +200,7 @@ pub const CATALOG_BASIS_FIXTURE: &str = "crates/project/fixtures/catalog-line-it
 /// and says nothing about whether the derivation from it still exists.
 pub const REBUILT: &[&str] = &[
     FY27_FIXTURE,
+    FY26_FIXTURE,
     PROFILE_FIXTURE,
     GRADE_BANDS_FIXTURE,
     REPORT_CARD_FIXTURE,

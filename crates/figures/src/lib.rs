@@ -2914,6 +2914,156 @@ pub static FIGURES: &[Figure] = &[
         tolerance: 0.000_001,
         compute: |_| -project::base_cost::deduction_real_change(),
     },
+    // The two clocks the Fair School Funding Plan runs on, measured over the one interval the
+    // department has published two models for.
+    Figure {
+        key: "project/capacity-per-pupil-rise-fy2026-to-fy2027",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the median district's per-pupil local capacity gains between the department's \
+                FY2026 model and its FY2027 one",
+        pinned: 472.440_7,
+        tolerance: 0.01,
+        compute: |_| project::prior_model::median_change(project::prior_model::Quantity::CapacityPerPupil).0,
+    },
+    Figure {
+        key: "project/base-cost-per-pupil-rise-fy2026-to-fy2027",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And what its base cost per pupil gains over the same interval, with the cost \
+                inputs held at FY2022 by act",
+        pinned: 4.11,
+        tolerance: 0.01,
+        compute: |_| project::prior_model::median_change(project::prior_model::Quantity::BaseCostPerPupil).0,
+    },
+    Figure {
+        key: "project/state-share-fall-fy2026-to-fy2027-negative",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The fall in the median district's state share of its base cost across that one \
+                year, in percentage points",
+        // Percentage points rather than a share, because that is the quantity: the difference of
+        // two shares is not one. Written bare in prose for the same reason — a `%` beside it
+        // would read as the relative fall, which is 8.57% and a different number.
+        pinned: 4.112_500_000_000_002,
+        tolerance: 0.000_1,
+        compute: |_| project::prior_model::state_share_fall().0 * 100.0,
+    },
+    Figure {
+        key: "project/districts-whose-state-share-fell",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts whose published state share of the base cost is lower in the FY2027 \
+                model than in the FY2026 one, of 609",
+        pinned: 540.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| project::prior_model::state_share_fall().1 as f64,
+    },
+    Figure {
+        key: "project/median-state-share-fy2026",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The median district's published state share of its base cost in the FY2026 model",
+        pinned: 0.414_003_3,
+        tolerance: 0.000_001,
+        compute: |_| project::prior_model::median_state_share().0,
+    },
+    Figure {
+        key: "project/median-state-share-fy2027",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "And in the FY2027 model, one year later",
+        pinned: 0.360_033_2,
+        tolerance: 0.000_001,
+        compute: |_| project::prior_model::median_state_share().1,
+    },
+    Figure {
+        key: "project/median-state-share-holding-capacity-still",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "What the FY2027 median would be if local capacity had stayed at its FY2026 value \
+                and only the base cost had moved",
+        pinned: 0.412_330_774_574_220_24,
+        tolerance: 0.000_001,
+        compute: |_| project::prior_model::holding_capacity_still().1,
+    },
+    Figure {
+        key: "project/aggregate-state-share-fy2026",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The state's share of the aggregate cost of Ohio's schools in the FY2026 model",
+        pinned: 0.353_501_488_959_158_7,
+        tolerance: 0.000_001,
+        compute: |_| project::prior_model::aggregate_state_share().0,
+    },
+    Figure {
+        key: "project/aggregate-state-share-fy2027",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "And in the FY2027 model, one year later",
+        pinned: 0.315_236_926_209_692_4,
+        tolerance: 0.000_001,
+        compute: |_| project::prior_model::aggregate_state_share().1,
+    },
+    Figure {
+        key: "project/districts-at-the-minimum-state-share-fy2026",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts the 10% minimum state share bound for in the FY2026 model, against 138 \
+                a year later",
+        pinned: 105.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| project::prior_model::at_the_floor().0 as f64,
+    },
+    Figure {
+        key: "project/districts-that-fell-onto-the-minimum-state-share",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts the minimum state share did not bind for in FY2026 and does in FY2027",
+        pinned: 33.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| project::prior_model::fell_onto_the_floor().len() as f64,
+    },
+    Figure {
+        key: "project/dpia-statewide-percentage-fy2026",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The statewide economically disadvantaged percentage the FY2026 model indexes each \
+                district against",
+        pinned: 0.565_990_245,
+        tolerance: 0.000_001,
+        compute: |_| project::prior_model::dpia_statewide_percentage().0,
+    },
+    Figure {
+        key: "project/dpia-fall-fy2026-to-fy2027-negative",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "How far statewide disadvantaged pupil impact aid falls between the two models",
+        pinned: 0.075_007_075_000_666_72,
+        tolerance: 0.000_001,
+        compute: |_| {
+            let (before, after) = project::prior_model::dpia_total();
+            1.0 - after / before
+        },
+    },
+    Figure {
+        key: "project/directly-certified-adm-fall-fy2026-to-fy2027-negative",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "How far the median district's directly certified count falls between the two \
+                models, under the same label in both",
+        pinned: 0.167_988_742_540_178_7,
+        tolerance: 0.000_001,
+        compute: |_| {
+            -project::prior_model::median_change(
+                project::prior_model::Quantity::DirectlyCertifiedAdm,
+            )
+            .1
+        },
+    },
     // The parameter the corpus calls the most consequential number in Ohio school funding, read
     // off twelve committed greenbooks and put through the deflator this workspace has had all
     // along. Every real figure is in FY2026 dollars, the last June the Bureau has published.
