@@ -28,30 +28,47 @@ description: |
   differ materially. [verified] Which denominator is used changes the answer.
 findings: |
   **How much it changes the answer, measured.** Two arms of the state publish this metric for
-  every district and they do not agree. The Department of Taxation's Table SD-1 and the
-  Department of Education's District Profile Report carry **identical numerators** — multiply
-  the profile's valuation per pupil by its enrolled ADM and SD-1's total taxable value comes
-  back to 1.000 for all 606 districts carrying both, so the two agencies value the same
-  property at the same dollar. [verified] They divide it by different pupil counts:
+  every district and they do not agree. The Department of Taxation's Table SD-1 and the Department
+  of Education's District Profile Report carry **identical numerators** — multiply the profile's
+  valuation per pupil by its enrolled ADM and SD-1's total taxable value comes back exactly, on
+  **all 606** districts that join. The two agencies value the same property at the same dollar, so
+  the whole gap between their per-pupil figures is the denominator and nothing else. [verified —
+  [`crates/dispersion`](../../../crates/dispersion/tests/the_metric_whose_table_was_two_tax_years.rs)]
+
+  They divide it by different pupil counts, on tax year 2023:
 
       district        Education (enrolled ADM)   Taxation (SD-1)    ratio
-      Columbus City   43,019                     73,746             1.71
-      Youngstown      4,322                      9,655              2.23
-      Dayton City     11,744                     22,628             1.93
+      Columbus City   43,019                     71,947             1.6725
+      Dayton City     11,744                     22,628             1.9267
+      Youngstown      4,322                       9,655             2.2337
 
   Taxation counts the children who live in the district; Education counts the ones it teaches.
   The gap is community school, scholarship and open-enrolment-out students — so it is widest in
   exactly the districts where this metric does the most work in the aid formula, and it runs
   the same direction every time: the urban districts with the largest scholarship populations
-  look **poorer** on Taxation's count and **wealthier** on Education's. Youngstown is $78,146
-  per pupil by one table and $172,999 by the other. [verified — TY2023]
+  look **poorer** on Taxation's count and **wealthier** on Education's. Youngstown is **$77,451**
+  per pupil by one table and **$172,999** by the other. [verified]
 
-  Only 78 of 606 districts have the two within 2% of each other. The statewide medians are
-  close ($251,661 against $248,097, a 1.4% difference) because the divergence is concentrated
-  rather than general, which makes it more dangerous and not less: a page comparing one table's
-  district figure against the other's median looks right for most of the state and is wrong by
-  a factor of two for the districts a reader is most likely to look up. This site did exactly
-  that until the divergence was measured. [verified]
+  Only **63 of 606** districts have the two within 2% of each other. The statewide medians are
+  **$248,097** on the enrolled count against **$233,320** on the resident one — six per cent
+  apart where the districts themselves are two to one apart, because the divergence is
+  concentrated rather than general. That makes it more dangerous and not less: a page comparing
+  one table's district figure against the other's median looks right for most of the state and is
+  wrong by a factor of two for the districts a reader is most likely to look up. This site did
+  exactly that until the divergence was measured. [verified]
+
+  ### And this node did the year version of the same thing
+
+  The table and the statistics above were published as `[verified — TY2023]` and were not all
+  TY2023. Table SD-1 gained a fourth tax year; Columbus's row was TY2024 and the other two rows
+  were TY2023; the "78 of 606" and one of the two medians reproduce only on TY2024; and the
+  numerator identity the whole finding rests on holds only on TY2023. Nothing was invented — every
+  figure was somewhere in the fixture — but no two of them had to be from the same year, and none
+  was bound to a figure that would have said so.
+
+  It is the trap [the SD-1 catalog entry](../../catalog/dot-sd1-school-district-taxes.md) records
+  as having caught four callers, and this node is the fifth. Everything above is now computed from
+  one constant, `dispersion::valuation::TAX_YEAR`, and pinned. [verified]
 
   **There is a third count.** Base cost ADM — funded rather than enrolled — is what base cost
   per pupil divides by, and it differs from enrolled ADM by a median of 1.6% and by 27% at the
@@ -77,6 +94,39 @@ findings: |
   measure](../formula-component/fsfp-local-capacity-measure.yml) was built to correct by adding
   resident income — and it is why a wealth-neutrality test run on this metric alone understates
   how much targeting Ohio's formula does. [inference]
+figures:
+  - key: dispersion/valuation-numerator-agreement
+    value: 606
+    field: findings
+    as_written: "comes back exactly, on\n  **all 606** districts that join"
+  - key: dispersion/columbus-denominator-ratio
+    value: 1.6725
+    field: findings
+    as_written: "Columbus City   43,019                     71,947             1.6725"
+  - key: dispersion/youngstown-denominator-ratio
+    value: 2.2337
+    field: findings
+    as_written: "Youngstown      4,322                       9,655             2.2337"
+  - key: dispersion/youngstown-valuation-per-pupil-resident
+    value: 77450.72
+    field: findings
+    as_written: "Youngstown is **$77,451**\n  per pupil by one table"
+  - key: dispersion/youngstown-valuation-per-pupil-enrolled
+    value: 172999.4
+    field: findings
+    as_written: "**$172,999** by the other"
+  - key: dispersion/valuation-agreement-within-two-per-cent
+    value: 63
+    field: findings
+    as_written: "Only **63 of 606** districts have the two within 2%"
+  - key: dispersion/valuation-median-enrolled
+    value: 248096.51
+    field: findings
+    as_written: "**$248,097** on the enrolled count"
+  - key: dispersion/valuation-median-resident
+    value: 233319.65
+    field: findings
+    as_written: "**$233,320** on the resident one"
 properties:
   name: Assessed valuation per pupil
   unit: dollars-per-pupil
@@ -95,7 +145,12 @@ properties:
     the H.B. 66 phase-out, so the series has a definitional break in the late 2000s that will
     look like a valuation collapse in industrial districts if not handled. [verified]
   calculator: |
-    Not yet implemented. [open] Target: a helper within `local-capacity`.
+    `local_capacity::valuation_per_pupil`, which returns a `ValuationPerPupil` carrying the
+    `PupilCount` it divided by — `Resident`, `Enrolled` or `Funded`. `ratio_to` refuses a
+    comparison across two bases and names both publishers in the error rather than returning a
+    plausible wrong number. [verified] The join and the divergence are `dispersion::valuation`.
+    What the type cannot do is choose: a caller still has to know which count its question is
+    about, and the formula's own count is a third one again.
 links:
   - target: enrolled-adm.yml
     relationship: derived-from

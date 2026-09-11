@@ -15,6 +15,10 @@ edfund-core = { path = "../edfund-core" }
 # true when the trough moved into the library so `crates/figures` could pin what the corpus
 # publishes about it — the test asserted bands where the corpus states values.
 deflator = { path = "../deflator" }
+# For `valuation::PupilCount`, which is where the denominator of this metric is named. The two
+# agencies' per-pupil figures differ by a factor of two in the districts that matter most, and the
+# type is what stops one being read against the other — see `metric/assessed-valuation-per-pupil`.
+local-capacity = { path = "../local-capacity" }
 
 [dev-dependencies]
 # For `tests/report_card_2425.rs`, which splits the report card on the FY2027 guarantee. The

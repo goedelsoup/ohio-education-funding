@@ -39,6 +39,105 @@
 
 use edfund_core::{Adm, Dollars};
 
+/// Which pupil count a per-pupil valuation is divided by.
+///
+/// Ohio publishes this metric twice and divides by different children. The Department of Taxation
+/// counts the pupils **resident** in the district; the Department of Education counts the ones it
+/// **teaches**; the formula funds a third count again. For a district with a large community
+/// school, scholarship or open-enrolment-out population the three differ by a factor of two, and
+/// they differ most in exactly the districts where the metric does the most work.
+///
+/// The basis therefore travels with the number. [`ValuationPerPupil::ratio_to`] refuses to compare
+/// across bases rather than returning a plausible wrong answer, because that comparison has already
+/// been made by mistake once — see `metric/assessed-valuation-per-pupil`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PupilCount {
+    /// Table SD-1's ADM: the children who live in the district.
+    Resident,
+    /// The District Profile Report's enrolled ADM: the children the district teaches.
+    Enrolled,
+    /// Base cost ADM: the count the formula funds, which is neither of the others.
+    Funded,
+}
+
+impl PupilCount {
+    /// The publisher whose count this is, for a message that has to name it.
+    #[must_use]
+    pub const fn publisher(self) -> &'static str {
+        match self {
+            Self::Resident => "the Department of Taxation",
+            Self::Enrolled => "the Department of Education and Workforce",
+            Self::Funded => "the funding formula",
+        }
+    }
+}
+
+/// A per-pupil valuation that knows which children it was divided by.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct ValuationPerPupil {
+    /// Assessed value per pupil, in dollars.
+    pub value: Dollars,
+    /// The count it was divided by.
+    pub basis: PupilCount,
+}
+
+/// Two per-pupil valuations were compared that do not divide by the same children.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct BasisMismatch {
+    /// The left figure's basis.
+    pub left: PupilCount,
+    /// And the right's.
+    pub right: PupilCount,
+}
+
+impl core::fmt::Display for BasisMismatch {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(
+            f,
+            "a per-pupil valuation on {}'s count cannot be read against one on {}'s",
+            self.left.publisher(),
+            self.right.publisher()
+        )
+    }
+}
+
+impl core::error::Error for BasisMismatch {}
+
+/// Assessed valuation per pupil, with the denominator named.
+///
+/// `None` where the pupil count is not positive, which for this metric means the district has no
+/// denominator rather than that its wealth is infinite.
+#[must_use]
+pub fn valuation_per_pupil(
+    valuation: Dollars,
+    pupils: Adm,
+    basis: PupilCount,
+) -> Option<ValuationPerPupil> {
+    (pupils > 0.0).then_some(ValuationPerPupil {
+        value: valuation / pupils,
+        basis,
+    })
+}
+
+impl ValuationPerPupil {
+    /// This figure over another, when both divide by the same children.
+    ///
+    /// # Errors
+    ///
+    /// [`BasisMismatch`] when they do not. The two Ohio publishes differ by a factor of 2.23 in
+    /// Youngstown and by 1.4% at the statewide median, so a comparison across bases is right for
+    /// most of the state and wrong where it matters.
+    pub fn ratio_to(&self, other: &Self) -> Result<f64, BasisMismatch> {
+        if self.basis != other.basis {
+            return Err(BasisMismatch {
+                left: self.basis,
+                right: other.basis,
+            });
+        }
+        Ok(self.value / other.value)
+    }
+}
+
 /// Property valuation and income inputs for one district, as the department compiles them.
 ///
 /// Tax years are offset from fiscal years and the offsets differ between the valuation and
