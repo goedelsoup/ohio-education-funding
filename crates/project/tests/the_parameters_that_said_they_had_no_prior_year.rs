@@ -78,7 +78,18 @@ fn every_weight_and_every_base_cost_holds_across_the_two_years() {
     // before the year the act names.
     let (moved, held) = prior::scalars_that_moved();
     assert_eq!(moved.len(), 10, "{moved:?}");
-    assert_eq!(held.len(), 23, "{held:?}");
+    assert_eq!(held.len(), 25, "{held:?}");
+
+    // Two of the twenty-five hold for a different reason, and the difference matters: the
+    // targeted assistance sheet's "excluding North and Middle Bass" pair is not a value the
+    // department recomputed and found unchanged, it is a value nothing recomputes. See
+    // `the_exclusion_that_was_computed_once.rs`.
+    for name in [
+        "median_weighted_wealth_excluding_islands",
+        "median_weighted_wealth_per_pupil_excluding_islands",
+    ] {
+        assert!(held.contains(&name.to_string()), "{name}");
+    }
 
     for name in held.iter().filter(|name| name.contains("weight")) {
         assert!(!moved.contains(name), "{name}");

@@ -143,12 +143,30 @@ findings: |
   one charged hard — is a distributional question this corpus can pose and has not run.
   [inference for the framing; the comparison is unmade]
 
-  ### Still open
+  ### The scale is recomputed every year, and it moves further than the cost side does
 
-  Whether the statewide medians are recomputed each year, and how far they move. Both are single
-  numbers that set the whole scale, and the sheet publishes a second pair **excluding North Bass
-  and Middle Bass** which no formula references. The exclusion is displayed and unused, which
-  suggests it was considered. [open]
+  Both medians move between the department's two published models. Median weighted wealth goes
+  from $362,326,436.80 to $392,151,306.63, **+8.23%**; the per-pupil median from $253,337.38 to
+  $276,708.97, **+9.23%**. Every weight and every base cost in the plan is the same number in both
+  years, so the scale this component equalises to moves nine per cent in a year while the scale
+  the rest of the formula prices against does not move at all. [verified —
+  [`crates/project`](../../../crates/project/tests/the_exclusion_that_was_computed_once.rs)]
+
+  ### And the exclusion was computed once, made no difference, and was left behind
+
+  The second pair — **excluding North Bass and Middle Bass** — equals the main pair to the last
+  published digit in the FY2026 model. Two districts out of 611 cannot move a median, which is
+  what a median is for. In the FY2027 model those cells still hold the **FY2026** numbers, beside
+  a main pair that has moved eight and nine per cent. So it is not an alternative calculation
+  maintained beside the live one; it is last year's value nothing recomputes. [verified —
+  `crates/project`]
+
+  That is the third stale cell found in this workbook, after the `-FY21` suffix on the
+  [career-technical](fsfp-career-technical-weights.yml) and [English
+  learner](fsfp-english-learner-weights.yml) counts and the `FY21` heading on
+  [transportation](fsfp-transportation.yml)'s guarantee base. A value in these files can be stale
+  in three distinct ways: a heading that no longer describes its column, a table of vintages two
+  biennia old, and a number nothing recomputes. [inference]
 
 properties:
   name: Targeted assistance
@@ -212,6 +230,14 @@ properties:
     eligibility test for all 609 districts; the decomposition is carried in
     `crates/project::panel::TargetedAssistance`. [verified — `crates/project`]
 figures:
+  - key: project/median-weighted-wealth-rise
+    value: 0.08231491496007992
+    field: findings
+    as_written: "**+8.23%**"
+  - key: project/median-weighted-wealth-per-pupil-rise
+    value: 0.09225480266670472
+    field: findings
+    as_written: "**+9.23%**"
   - key: project/parity-aid-millage-fy2002
     value: 9.5
     field: findings

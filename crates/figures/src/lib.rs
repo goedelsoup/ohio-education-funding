@@ -2934,7 +2934,7 @@ pub static FIGURES: &[Figure] = &[
         unit: Unit::Count,
         label: "Statewide scalars in the funding calculator that are the same number in FY2026 \
                 and FY2027 \u{2014} every weight and every base cost among them",
-        pinned: 23.0,
+        pinned: 25.0,
         tolerance: 0.0,
         #[allow(clippy::cast_precision_loss)]
         compute: |_| project::prior_model::scalars_that_moved().1.len() as f64,
@@ -3172,6 +3172,34 @@ pub static FIGURES: &[Figure] = &[
     },
     // The counts the plan multiplies, both published models. Four nodes read a vintage off a
     // column header -- `Category 1 Career Tech FTE-FY21` -- and the header is four years stale.
+    // The scale targeted assistance equalises to, and the second pair of medians beside it.
+    Figure {
+        key: "project/median-weighted-wealth-rise",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "How far statewide median weighted wealth moves between the two published models \
+                \u{2014} the quantity targeted assistance equalises to",
+        pinned: 0.082_314_914_960_079_92,
+        tolerance: 0.000_001,
+        compute: |_| {
+            scalar_at("median_weighted_wealth", 2027) / scalar_at("median_weighted_wealth", 2026)
+                - 1.0
+        },
+    },
+    Figure {
+        key: "project/median-weighted-wealth-per-pupil-rise",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "And the per-pupil median, which the capacity and wealth tiers are both charged \
+                against",
+        pinned: 0.092_254_802_666_704_72,
+        tolerance: 0.000_001,
+        compute: |_| {
+            scalar_at("median_weighted_wealth_per_pupil", 2027)
+                / scalar_at("median_weighted_wealth_per_pupil", 2026)
+                - 1.0
+        },
+    },
     // Four years of the department's enrolled ADM, and what the fourth one buys.
     Figure {
         key: "project/adm-growth-persistence",
