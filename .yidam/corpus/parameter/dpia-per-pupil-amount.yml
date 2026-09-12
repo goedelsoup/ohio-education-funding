@@ -51,6 +51,35 @@ findings: |
   funding base — and R.C. 3317.02(N)(2) anchors the DPIA slice to the district's **FY2019** DPIA
   payment rather than to FY2020. In FY2022 the general phase-in was 16.67% and DPIA's was 0%,
   which under an interpolation means DPIA was paid at 100% of its FY2019 amount. [verified]
+
+  ### $422 has not moved since FY2022, which is an 11.27% cut in real terms
+
+  H.B. 110 raised the amount from $272 to $422 for the plan's first year and no act has moved it
+  since; H.B. 96 carries it to FY2027. Deflated by CPI-U June, **$422 set in FY2022 is worth
+  $475.61 in FY2026 dollars** — the amount has lost **11.27%** of its value with the section that
+  prints it unchanged on the page.
+  [verified] ([`crates/project`](../../../crates/project/tests/the_parameters_that_do_not_index.rs))
+
+  That erosion is shared exactly with all five [gifted](gifted-funding-rates.yml) figures, because
+  it is a property of the year an amount was set and of nothing else. The
+  [preschool flat grant](preschool-special-education-amounts.yml), frozen since FY2014, has lost
+  28.63% the same way. [verified]
+
+  ### It is the largest single piece of what the freeze costs, and the reason is size
+
+  Across the FY2027 model, paying DPIA at the $422's FY2022 value would cost **$66.7m** more than
+  the formula pays — half of the $133.2m the three frozen components lose together, on the same
+  11.27% erosion the gifted rates carry. Gifted loses $6.9m on the identical factor. The
+  difference is that DPIA is ten times the money. [verified]
+
+  **Unlike the preschool grant, most of this is absorbed before it reaches a district.** DPIA sits
+  inside `[H] Foundation Funding`, so the guarantee's `max` catches it: of the $133.2m,
+  **$104.3m** would reach districts and **$28.9m** would not. A district the floor holds is paid
+  the same whether or not the rate keeps pace, which means the freeze is invisible to it now and
+  would be invisible to it if reversed. [verified]
+
+  That is the argument for reading this parameter through its incidence rather than its rate. The
+  $422 is a statewide number; what it is worth is not. [inference]
 properties:
   name: Disadvantaged pupil impact aid per-pupil amount
   unit: dollars-per-pupil
@@ -133,6 +162,22 @@ unfilled:
       The programme predates the Fair School Funding Plan under other names, and no analysis in
       the committed greenbook series discusses it under any of them.
 figures:
+  - key: project/dpia-per-pupil-real-fy2026
+    value: 475.61
+    field: findings
+    as_written: "$422 set in FY2022 is worth\n  $475.61 in FY2026 dollars"
+  - key: project/frozen-parameters-shortfall-dpia
+    value: 66703817.98
+    field: findings
+    as_written: "would cost **$66.7m** more"
+  - key: project/frozen-parameters-shortfall-delivered
+    value: 104298429.45
+    field: findings
+    as_written: "**$104.3m** would reach districts"
+  - key: project/frozen-parameters-shortfall-absorbed
+    value: 28854197.47
+    field: findings
+    as_written: "**$28.9m** would not"
   - key: project/dpia-amount-before-the-plan
     value: 272.0
     field: series

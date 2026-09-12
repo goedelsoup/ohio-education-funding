@@ -65,6 +65,7 @@ pub mod drafts;
 pub mod esser;
 pub mod finances;
 pub mod greenbook;
+pub mod indexation;
 pub mod joint_vocational;
 pub mod ledger;
 pub mod legislative_district;
