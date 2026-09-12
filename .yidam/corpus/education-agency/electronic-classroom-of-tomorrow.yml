@@ -67,8 +67,24 @@ findings: |
 
   The aggregate draw is **0.0124 of everything Ohio's districts received in state money in
   FY2016**, roughly double its FY2009 share. That is the total any per-district apportionment
-  would have to sum to. Which districts, and in what proportion, still needs the department's
-  deduct file and is not established here. [open]
+  would have to sum to.
+
+  ### The pool it drew from, which the survey had carried all along
+
+  The other side of the deduct is in the same panel and had never been read as a distribution.
+  `V92` is what each district paid community schools, and across the eleven years it can be read
+  in — FY2010 to FY2021 — Ohio's districts were credited with and paid straight out
+  **$9,285,168,000**. [verified] (crates/dispersion)
+
+  Against that pool ECOT drew a share of **0.10592**, rising from 8.4% in FY2010 to 11.9% in
+  FY2016. One school, against roughly three hundred. [verified] (crates/dispersion)
+
+  **This bounds the apportionment question rather than answering it**, and the difference matters.
+  The share above is a statewide average: it says what fraction of the whole pool ECOT took, not
+  what fraction of any particular district's deduct went to ECOT, and a district whose residents
+  enrolled with ECOT more often than average paid more of its own deduct to it. Decomposing a
+  district's payment by receiving school needs the department's deduct file, because the survey
+  asks each district for one number. That part is still not established here. [open]
 
   It opened in 2000 and closed in January 2018, but neither the charter date nor the closure
   date is established to the day, so the node carries no `established` date — the class
@@ -94,6 +110,14 @@ figures:
     value: 0.01241
     field: findings
     as_written: "**0.0124 of everything Ohio's districts received in state money in\n  FY2016**"
+  - key: dispersion/deduct-total
+    value: 9285168000.0
+    field: findings
+    as_written: "**$9,285,168,000**"
+  - key: dispersion/deduct-ecot-share-of-pool
+    value: 0.10592
+    field: findings
+    as_written: "ECOT drew a share of **0.10592**"
 properties:
   irn: 133413 [verified] (`dispersion::lea_directory`, fifteen consecutive editions 2004-2018)
   agency_type: community

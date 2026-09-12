@@ -102,6 +102,49 @@ findings: |
   This is also why FY2026 shows *three* lines titled `Foundation Funding - All Students` where
   FY2014 shows two titled `Foundation Funding`. The two-line reading above is over the 61 lines
   appropriated in both years, which 200604 is not. [verified] (the appropriation series)
+
+  ### A tenth of it was never kept, and ten districts bore most of that
+
+  Before the Fair School Funding Plan, a community school was paid by deducting its pupils'
+  funding from the district they lived in. The district was credited with the money in every
+  account that records foundation aid, and never held it. The federal survey collects the payment
+  separately, so the size of the pass-through can be read directly for the eleven years the column
+  is sound — FY2010 to FY2021.
+
+  At its peak in FY2015 the deduct was **0.09783 of the state aid Ohio's districts were credited
+  with**, and it never fell below a fourteenth of it in any year of that window. [verified]
+  (crates/dispersion)
+
+  **The incidence is the finding.** 604 of 615 districts paid something, so a statement that the
+  deduct was spread across the state is true of the count — and false of the money. The ten
+  districts that bore most of it bore **0.62799 of the whole pool** between them, and fifty bore
+  79.1%. [verified] (crates/dispersion)
+
+  They are Ohio's big-city districts, and the share of their own money is large enough to change
+  how their foundation payments should be read: Columbus paid on **0.35289 of every state dollar
+  it was credited with** across the window, with Cleveland, Toledo, Cincinnati and Dayton each
+  between a fifth and 30%. [verified] (crates/dispersion)
+
+  The column cannot say which *school* a district's payment went to, because the survey asks for
+  one number per district — see
+  [`electronic-classroom-of-tomorrow`](../education-agency/electronic-classroom-of-tomorrow.yml),
+  where that limit is what keeps one question open. It also cannot establish that the deduct ended:
+  FY2022 reads as a collapse to near zero in the year the mechanism changed, but an unreported
+  value and a zero are the same character in this column, and FY2009 carries zeros that are
+  demonstrably false. [open]
+figures:
+  - key: dispersion/deduct-peak-share-of-state-aid
+    value: 0.09783
+    field: findings
+    as_written: "**0.09783 of the state aid Ohio's districts were credited\n  with**"
+  - key: dispersion/deduct-top-ten-share
+    value: 0.62799
+    field: findings
+    as_written: "bore **0.62799 of the whole pool**"
+  - key: dispersion/deduct-columbus-share
+    value: 0.35289
+    field: findings
+    as_written: "**0.35289 of every state dollar\n  it was credited with**"
 revisions:
   - was: |
       "most of it in the two Foundation Funding items", written when two lines carried that title

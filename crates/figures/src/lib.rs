@@ -3965,6 +3965,75 @@ pub static FIGURES: &[Figure] = &[
         },
     },
     Figure {
+        key: "dispersion/deduct-total",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "State money Ohio's districts were credited with and paid straight to community \
+                schools, across the eleven years the survey reports it",
+        pinned: 9_285_168_000.0,
+        tolerance: 1000.0,
+        compute: |_| {
+            dispersion::deduct::cumulative()
+                .iter()
+                .map(|bearer| bearer.paid)
+                .sum()
+        },
+    },
+    Figure {
+        key: "dispersion/deduct-top-ten-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Share of the whole community-school deduct borne by the ten districts that bore \
+                most of it, FY2010 to FY2021",
+        pinned: 0.62799,
+        tolerance: 0.0005,
+        compute: |_| {
+            let cumulative = dispersion::deduct::cumulative();
+            dispersion::deduct::concentration(&cumulative, 10).expect("districts paid")
+        },
+    },
+    Figure {
+        key: "dispersion/deduct-columbus-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Share of the state money Columbus City was credited with that it paid on to \
+                community schools, FY2010 to FY2021",
+        pinned: 0.35289,
+        tolerance: 0.0005,
+        compute: |_| {
+            dispersion::deduct::cumulative()
+                .iter()
+                .find(|bearer| bearer.irn == "043802")
+                .expect("Columbus is in the panel")
+                .share()
+                .expect("credited with state money")
+        },
+    },
+    Figure {
+        key: "dispersion/deduct-peak-share-of-state-aid",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The community-school deduct at its peak, as a share of the state aid Ohio's \
+                districts were credited with, FY2015",
+        pinned: 0.09783,
+        tolerance: 0.0005,
+        compute: |_| {
+            dispersion::deduct::by_year()[&2015]
+                .share_of_gross()
+                .expect("districts are credited with something")
+        },
+    },
+    Figure {
+        key: "dispersion/deduct-ecot-share-of-pool",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "ECOT's draw as a share of every dollar Ohio's districts paid community schools, \
+                across the years the two overlap",
+        pinned: 0.10592,
+        tolerance: 0.0005,
+        compute: |_| dispersion::deduct::pool_share_across_window("133413").expect("ECOT is held"),
+    },
+    Figure {
         key: "dispersion/cleveland-state-revenue-real-change-negative",
         owner: "crates/dispersion",
         unit: Unit::Share,
