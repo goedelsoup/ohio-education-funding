@@ -1,0 +1,125 @@
+id: what-foundation-funding-means
+summary: >-
+  Two foundation-aid totals, on purpose. `budget_analysis` reads LSC's own table where LSC
+  publishes one; `appropriations` sums by line for the twenty-nine years no table covers. ALI
+  200604 joins the second from FY2022, by title rather than by year.
+context: |
+  This repository publishes a foundation aid figure in two places, and until now only one of them
+  had been reasoned about.
+
+  **`project::appropriations`** sums line items from the committed enacted series, FY1999 to
+  FY2027. Its `FOUNDATION_LINES` is `200501`, `200550`, `200612` — the GRF and Lottery halves of
+  the formula's own line, plus the pre-FY2006 predecessor carried at $0.00 through its overlap.
+  `AppropriationYear::foundation_funding` is built from it, reaches the feed, and the site renders
+  `foundation_funding / enacted` as a percentage.
+
+  **`project::budget_analysis`** reads LSC's published *Foundation Aid Appropriations* table
+  directly, whose bottom line `Total foundation aid` is $11,230,057,557 for FY2026 as enacted.
+  That table has five lines, and two corpus nodes quote LSC's description of them `[verified]`:
+  GRF `200550`, GRF `200502` Pupil Transportation, Fund 5VS0 `200604`, Fund 5YO0 `200491`, and
+  Lottery `200612`, which "are used to collectively support state foundation aid payments".
+
+  So the corpus said five and the crate summed two, and nothing reconciled them.
+
+  **The obvious reconciliation does not work.** Summing those five line items out of the committed
+  series gives $11,547,417,388 for FY2026 — $317m *above* LSC's own total, not equal to it. LSC
+  splits `200502` into `Earmarks` and `Remainder – Foundation aid` and counts only the foundation
+  half; `budget_analysis::PUPIL_TRANSPORTATION` already carries that split and says why. "Adopt
+  LSC's five lines" was therefore never available as a line-number sum. It would have produced a
+  third number agreeing with neither.
+
+  **One of the three exclusions is different from the other two, and is not definitional.** ALI
+  `200604` is titled `Foundation Funding - All Students` from FY2022, in the same fund and over the
+  same span as the two included lines, at $500m to $600m a year — 5.9% to 7.2% of what was
+  published. `200502` and `200491` are a real question about what the word means. `200604` is not:
+  it is foundation funding under that name in the enacting act.
+
+  The cause is legible and is the part worth recording. `FOUNDATION_LINES`' own doc comment cites
+  `200604` as its cautionary example — *"an appropriation line item is not a stable identifier
+  across this period — `200604` names three different programmes across three funds — so any
+  series built by line number needs its succession established before it means anything."* That is
+  right. But the succession was established for `200501` and used to **exclude** `200604` rather
+  than to resolve it, and its third programme is the one carrying the foundation-funding title.
+decision: |
+  **Two numbers, two spans, both published, each naming the other.**
+
+  `budget_analysis::FOUNDATION_AID` is the authority wherever LSC prints a table. It is read rather
+  than summed, it includes the pupil-transportation earmark split that a line sum cannot reproduce,
+  and it is what a reader comparing against LSC should be given.
+
+  `appropriations::foundation_history` is the only thing that reaches FY1999, because no such table
+  exists for most of that span. It is summed by line and it is not LSC's number. It is not an
+  approximation of LSC's number either — the difference is structural, not error.
+
+  **Resolve `200604`'s succession rather than excluding it, and resolve it by title.** A line
+  counts when it is titled `Foundation Funding - All Students`. The title is the evidence the
+  succession is established from; a year is the same fact with the evidence discarded. It also gets
+  the boundary right without being told: H.B. 110 retitles the line, so the FY2021 *actual* it
+  restates reads the new title while the FY2021 *enacted* row — H.B. 166's, which is what this
+  series is built from — still reads `Student Wellness and Success`. A year-based rule set to
+  FY2021 would have been wrong by $400m and would have looked correct.
+
+  **Leave `200502` and `200491` out, as a decision.** Pupil transportation and nonpublic education
+  support are paid alongside the formula, and a series that includes them answers "what does Ohio
+  appropriate that LSC groups with foundation aid" rather than "what does the formula cost". Where
+  the first question is wanted, LSC's own total already answers it and is already computed.
+
+  **Carry the widening in the type, not in a footnote.** `Basis::AsEnacted` is what the act
+  appropriated under that name; `Basis::FormulaLines` is the comparable subset. This follows
+  `dispersion::survey_basis::Basis`, which exists for the same shape — a published column whose
+  meaning changes partway along — and which resolves it by giving the comparable quantity its own
+  basis rather than by dropping the year the change happens.
+consequences: |
+  **The published series rises in six years and in no others.**
+
+      FY     was              now              share of enacted
+      2022   $8,202,198,712   $8,702,198,712   65.8% -> 69.8%
+      2023   $8,322,348,712   $8,922,348,712   65.8% -> 70.5%
+      2024   $9,242,195,000   $9,842,195,000   58.9% -> 62.7%
+      2025   $9,593,442,000  $10,193,442,000   66.9% -> 71.1%
+      2026   $9,894,181,974  $10,494,181,974   66.5% -> 70.6%
+      2027  $10,131,392,875  $10,731,392,875   66.4% -> 70.3%
+
+  FY2002 through FY2021 are untouched, which is the check that the title rule caught the
+  programme and not the line.
+
+  **No bound figure moved, and that is the design rather than luck.** Every summary statistic this
+  workspace publishes off the series — the noise floor in `what_the_series_cannot_settle`, the mean
+  and spread of annual movements, the FY2012 and FY2013 readings the casino null result rests on —
+  differences two years, so all of them run on `FormulaLines` and none of them changed.
+  `crates/figures.json` is byte-identical across this change.
+
+  Had they run on `AsEnacted` instead, FY2022's movement would have been $677.7m where $500.0m of
+  it is the channel arriving, and the median of exactly those magnitudes is the casino argument's
+  detection floor. The argument would have been weakened by a definition change.
+
+  **The corpus's five-line quotation stops being in tension with the crate.** It was `[verified]`
+  and correct; what was missing was that LSC's five is a description of LSC's table, which the
+  repository computes elsewhere and cannot reproduce by addition.
+alternatives: |
+  **Adopt LSC's five as a line sum.** Rejected because it does not work: $11,547,417,388 against
+  LSC's $11,230,057,557 for FY2026. The gap is the pupil-transportation earmark split, so the only
+  way to get LSC's number is to read LSC's table — which `budget_analysis` already does. Adopting
+  the five would have replaced a number that is honestly not LSC's with one that looks like LSC's
+  and is off by $317m, which is the worse of the two failures.
+
+  **Keep the narrow set and document the exclusion.** The issue's own "not attempted" position, and
+  defensible for `200502` and `200491`. Rejected for `200604`: excluding a line that the enacting
+  act titles `Foundation Funding - All Students`, in the same fund and span as the lines that are
+  included, is not a definition of foundation funding that can be stated without embarrassment.
+
+  **Include `200604` from FY2021.** Rejected, and it is the trap this decision exists to mark. The
+  line reads `Foundation Funding - All Students` in FY2021 in the *actual* column, because H.B. 110
+  restates the prior year under the new title. The enacted row for FY2021 is H.B. 166's and says
+  `Student Wellness and Success`, which is what it was: money paid alongside a frozen foundation
+  amount rather than through it. A year cutoff would have been wrong by $400m in the direction that
+  looks right.
+
+  **One series, switching to LSC's table where it exists.** Considered. Rejected because it makes
+  the published series change definition partway along its own length with nothing in the type to
+  say so — the exact defect `survey_basis` was written to correct, reintroduced deliberately.
+
+  **Make `foundation_movements` take a basis.** Rejected. Offering a basis implies both are
+  reasonable for a comparison and one is not; a caller who passed `AsEnacted` would get a number
+  that is a definition change wearing the shape of a funding change. The function takes no basis
+  and says why in its doc comment.

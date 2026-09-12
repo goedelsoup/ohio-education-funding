@@ -176,12 +176,12 @@
     {"fiscal_year": 2019, "enacted": 11317961018, "foundation_funding": 8024258845, "items": 93, "source": "workbook"},
     {"fiscal_year": 2020, "enacted": 11749502027, "foundation_funding": 8024280845, "items": 91, "source": "workbook"},
     {"fiscal_year": 2021, "enacted": 11984585129, "foundation_funding": 8024518845, "items": 91, "source": "workbook"},
-    {"fiscal_year": 2022, "enacted": 12469859650, "foundation_funding": 8202198712, "items": 90, "source": "workbook"},
-    {"fiscal_year": 2023, "enacted": 12653281910, "foundation_funding": 8322348712, "items": 90, "source": "workbook"},
-    {"fiscal_year": 2024, "enacted": 15701429139, "foundation_funding": 9242195000, "items": 85, "source": "workbook"},
-    {"fiscal_year": 2025, "enacted": 14346246968, "foundation_funding": 9593442000, "items": 85, "source": "workbook"},
-    {"fiscal_year": 2026, "enacted": 14869122733, "foundation_funding": 9894181974, "items": 79, "source": "workbook"},
-    {"fiscal_year": 2027, "enacted": 15268920085, "foundation_funding": 10131392875, "items": 79, "source": "workbook"}
+    {"fiscal_year": 2022, "enacted": 12469859650, "foundation_funding": 8702198712, "items": 90, "source": "workbook"},
+    {"fiscal_year": 2023, "enacted": 12653281910, "foundation_funding": 8922348712, "items": 90, "source": "workbook"},
+    {"fiscal_year": 2024, "enacted": 15701429139, "foundation_funding": 9842195000, "items": 85, "source": "workbook"},
+    {"fiscal_year": 2025, "enacted": 14346246968, "foundation_funding": 10193442000, "items": 85, "source": "workbook"},
+    {"fiscal_year": 2026, "enacted": 14869122733, "foundation_funding": 10494181974, "items": 79, "source": "workbook"},
+    {"fiscal_year": 2027, "enacted": 15268920085, "foundation_funding": 10731392875, "items": 79, "source": "workbook"}
   ],
   "appropriation_lines": [
     {"fund": "GRF", "ali": "200321", "name": "Operating Expenses", "established_by": "H.B. 487 of the 129th G.A.", "general_assembly": 129, "convened": 2011, "discontinued": false},

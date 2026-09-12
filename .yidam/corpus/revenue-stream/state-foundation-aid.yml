@@ -76,7 +76,49 @@ findings: |
   lines are federal pass-throughs — Title I, IDEA, Improving Teacher Quality, the child
   nutrition programmes. That is a federal story arriving in a state budget document, not a
   decision of the General Assembly's. [verified] (the appropriation series)
+
+  ### And one consolidation the table does show, because the line was renamed rather than dropped
+
+  The paragraphs above look for consolidation among the 48 lines that *disappear*, and conclude
+  the table cannot settle it. The case that settles cleanly is in the other list. ALI 200604 is
+  one of the 18 lines that **appear** across the window, and it is not a new programme: it is
+  Adult Basic Education through FY2011, the Student Wellness and Success funds
+  [H.B. 166](../legislation/hb-166-2019.yml) created for FY2020-21 *outside* the frozen foundation
+  amount, and then — from FY2022 — `Foundation Funding - All Students`, at $500m to $600m a year.
+  [verified] (the appropriation series)
+
+  So the Fair School Funding Plan pulled a channel that had been paid alongside the formula inside
+  it, and the appropriation table records the fold-in exactly: same line number, new title, no
+  disappearance anywhere. The distinction the open question turns on is abolition versus
+  consolidation, and this is consolidation with the receipt attached. [inference]
+
+  It generalises less far than it looks. What made it legible is that the General Assembly reused
+  the line number, and a fold-in that retires the old number and enlarges a different one leaves
+  the same table showing a disappearance and an unexplained increase — which is the shape of the 48
+  and the reason they stay open. The lesson is narrower and still useful: **the title column is
+  evidence and the line number alone is not**, so a disappearance should be checked against the
+  titles of the lines that grew before it is called an abolition. [inference]
+
+  This is also why FY2026 shows *three* lines titled `Foundation Funding - All Students` where
+  FY2014 shows two titled `Foundation Funding`. The two-line reading above is over the 61 lines
+  appropriated in both years, which 200604 is not. [verified] (the appropriation series)
 revisions:
+  - was: |
+      "most of it in the two Foundation Funding items", written when two lines carried that title
+      and read for some time afterwards as a count of the foundation lines in the budget.
+    now: |
+      Still correct, and now said where it can be checked: it is a statement about the 61 lines
+      appropriated in *both* FY2014 and FY2026. FY2026 itself carries three lines titled
+      `Foundation Funding - All Students` — ALI 200604 joined them in FY2022 and is one of the 18
+      lines that appear rather than survive.
+    found_by: |
+      Resolving ALI 200604's succession for `project::appropriations::Basis`, which had to decide
+      which years the line is foundation funding in. Counting the titles in FY2026 fell out of it.
+      See [`what-foundation-funding-means`](../../decisions/what-foundation-funding-means.yml).
+    reach: |
+      A count stated over one year when it was measured over an intersection of two. The
+      composition findings are unaffected; what changed is that the sentence now says which
+      population it is over, and the node gained the consolidation case above.
   - was: |
       The department's appropriation was reported as having shrunk by 7.9% across the window.
     now: |
