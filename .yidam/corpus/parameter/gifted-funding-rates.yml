@@ -54,6 +54,36 @@ findings: |
   identification and referral — with the referral payment carrying an additional condition, "if
   the general assembly authorizes such a payment". Referral funding is the one line in this
   parameter whose continuation the statute explicitly declines to assume. [verified]
+  ### The salary assumption in constant dollars, which is what this node asked for
+
+  All five figures were set by H.B. 110 for FY2022 and none has moved. Deflated by CPI-U June,
+  each has lost **11.27%** of its value by FY2026 — the coordinator's **$85,776 is $96,672.30 in
+  FY2026 dollars**, the K-8 specialist's $89,378 is $100,731.87 and the 9-12 specialist's $80,974
+  is $91,260.29; identification's $24.00 is $27.05 and referral's $2.50 is $2.82.
+  [verified] ([`crates/project`](../../../crates/project/tests/the_parameters_that_do_not_index.rs))
+
+  The erosion is identical across all five because it is a property of the vintage and not of the
+  figure, which is worth saying plainly: the ordering this node calls unexplained — K-8 above the
+  coordinator, 9-12 below both — is preserved exactly by the freeze. Inflation does not
+  re-rank them; it shrinks all three together. [verified]
+
+  **For a salary the comparison is sharper than for a price.** A per-pupil rate that falls 11.27%
+  buys 11.27% less of whatever it buys. A *post* priced at $85,776 has to be filled at whatever
+  the labour market charges, so a district funded for one coordinator unit is funded for a
+  declining fraction of one coordinator. The section calls it a unit either way. [inference]
+
+  ### What it costs, and why it is the smallest of the three
+
+  Across the FY2027 model, paying gifted at the FY2022 real value would cost **$6.9m** more than
+  the formula pays. That is the smallest share of the $133.2m the three frozen components lose,
+  on exactly the same 11.27% factor that costs [DPIA](dpia-per-pupil-amount.yml) $66.7m — the
+  difference is the size of the programme, not the depth of the freeze. [verified]
+
+  Gifted sits inside `[H] Foundation Funding`, so a district the guarantee holds absorbs its share
+  rather than feeling it. That is the opposite of the
+  [preschool grant](preschool-special-education-amounts.yml), which is paid outside `[H]` and
+  reaches every district in full. [verified]
+
 properties:
   name: Gifted funding rates
   unit: dollars-per-pupil
@@ -68,8 +98,8 @@ properties:
     The unit prices deserve a note of their own. A price on a post is a legislated *salary
     assumption*, and it does not move with the labour market — so it behaves like a legislated
     parameter in law and like a deteriorating one in substance, in the way a nominal figure
-    always does. The corpus's `deflator` is the tool for that and no constant-dollar companion
-    series exists here yet.
+    always does. That companion series now exists: see the findings, and
+    [`crates/project::indexation`](../../../crates/project/src/indexation.rs).
   series: |
     Before the plan, and the first two years of it — LSC's H.B. 110 analysis, which prints each
     new rate beside the one it replaced:
@@ -157,6 +187,18 @@ unfilled:
       the salary it associates with a unit changed, without printing the coordinator, K-8 and 9-12
       figures separately. Prior versions of R.C. 3317.051 would give them.
 figures:
+  - key: project/erosion-since-fy2022
+    value: 0.1127
+    field: findings
+    as_written: "each has lost **11.27%** of its value"
+  - key: project/gifted-coordinator-unit-real-fy2026
+    value: 96672.3
+    field: findings
+    as_written: "$85,776 is $96,672.30 in\n  FY2026 dollars"
+  - key: project/frozen-parameters-shortfall-gifted
+    value: 6916294.71
+    field: findings
+    as_written: "would cost **$6.9m** more"
   - key: project/gifted-identification-before-the-plan
     value: 5.5
     field: series

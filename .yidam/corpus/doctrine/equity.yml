@@ -149,6 +149,45 @@ findings: |
   [verified] (`dispersion::ohio_panel`, pinned by test; the full series is on
   [DeRolph I](../litigation/derolph-i-1997.yml))
 
+  ### A nominal freeze is a distributive act, and it runs the wrong way
+
+  Three of the plan's dollar parameters have not moved since they were set — the
+  [preschool flat grant](../parameter/preschool-special-education-amounts.yml) since FY2014, the
+  [DPIA amount](../parameter/dpia-per-pupil-amount.yml) and all five
+  [gifted](../parameter/gifted-funding-rates.yml) figures since FY2022. Across the FY2027 model
+  that costs districts $133.2m against what the same formula would pay at those amounts' real
+  value, and **$104.3m of it would reach them** once the guarantee is applied. [verified]
+
+  It does not land evenly. Ranked by economically disadvantaged percentage and cut into fifths,
+  the shortfall per pupil is:
+
+  | fifth | disadvantaged | shortfall per pupil |
+  |---|--:|--:|
+  | 1 (wealthiest) | 17.2% | **$34.69** |
+  | 2 | 33.0% | $43.17 |
+  | 3 | 43.7% | $53.03 |
+  | 4 | 70.1% | $94.95 |
+  | 5 (poorest) | 84.5% | **$141.66** |
+
+  Monotone, and **four to one** end to end.
+  [verified] ([`crates/project`](../../../crates/project/tests/the_parameters_that_do_not_index.rs))
+
+  The mechanism is not subtle and that is the point. DPIA is the largest of the three frozen
+  components and DPIA is paid on a poverty index, so letting its rate decay withdraws most from
+  the districts the index was written to reach. Nobody voted for the gradient; it is what a
+  nominal amount does when the formula around it is means-tested. [inference]
+
+  This is the state-side twin of [H.B. 920](../legislation/hb-920-1976.yml). That statute freezes
+  the *local* yield against inflation and the state's response was a formula; here the formula's
+  own parameters freeze, and there is no further mechanism behind them. Both erosions are silent
+  in the document that produces them, which is why both have to be measured to be seen.
+  [inference]
+
+  It also bears directly on the equalization reading above. The quartile table measures how much
+  of the local gap the state closes in one year; this measures a channel through which that share
+  falls on its own, with no vote and no line in any fiscal note. The two findings are about the
+  same trend at different resolutions. [inference]
+
   That bears on equity in a way the correlations cannot show. Targeting is a property of how a
   fixed pot is distributed; this is the pot.
 
@@ -423,6 +462,14 @@ properties:
     property and income together — the question the Fair School Funding Plan answered by
     including both. [open]
 figures:
+  - key: project/frozen-parameters-poorest-quintile-per-pupil
+    value: 141.66
+    field: findings
+    as_written: "5 (poorest) | 84.5% | **$141.66**"
+  - key: project/frozen-parameters-wealthiest-quintile-per-pupil
+    value: 34.69
+    field: findings
+    as_written: "1 (wealthiest) | 17.2% | **$34.69**"
   - key: dispersion/operating-expenditure-median
     value: 15646.03
     field: findings

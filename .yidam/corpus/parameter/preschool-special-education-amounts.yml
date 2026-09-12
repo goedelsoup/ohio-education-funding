@@ -64,6 +64,37 @@ findings: |
   justification supplied a biennium after the fact is a justification that was not the reason the
   rule was adopted, whatever its merits since. [inference]
 
+  ### Thirteen years unmoved is a 28.6% cut nobody voted for
+
+  The same six analyses that make the $4,000 well-sourced make it the longest nominal freeze in
+  the plan, and that is what a constant-dollar series is for. Deflated by CPI-U June — the
+  convention [`crates/deflator`](../../../crates/deflator/src/lib.rs) uses and the Ohio Auditor's
+  — **$4,000 set in FY2014 is worth $5,604.56 in FY2026 dollars.** The grant pays $4,000. It has
+  lost **28.63%** of its value, and every dollar of that was lost without a vote, because a
+  nominal figure that nobody amends requires no amendment.
+  [verified] ([`crates/project`](../../../crates/project/tests/the_parameters_that_do_not_index.rs))
+
+  It is the largest erosion among the plan's dollar parameters and it is largest for one reason:
+  it has been frozen three times as long as the rest. Everything set in FY2022 — DPIA's $422, all
+  five [gifted](gifted-funding-rates.yml) figures — has lost 11.27%, because erosion is a property
+  of *when* an amount was set and of nothing else. [verified]
+
+  ### And this is the one no guarantee floor can absorb
+
+  Across the FY2027 model the freeze costs this programme **$59.5m** against what the same formula
+  would pay at the grant's FY2014 value — 45% of the $133.2m the three frozen components lose
+  together, on a component that is a twentieth of the money. [verified]
+
+  All of it reaches districts. The guarantee is a `max` against `[H] Foundation Funding`, so a
+  shortfall inside the formula is absorbed for a district the floor holds — and preschool special
+  education sits **outside `[H]`**. Of the 294 districts the guarantee currently pays, the
+  in-formula part of this shortfall is absorbed in full for 282 and in part for 12; the preschool
+  part is absorbed for none of them. [verified]
+
+  So the parameter that has lost the most value is also the only one of the three that no floor
+  cushions, and the two facts are independent — one follows from how long it has been frozen, the
+  other from which side of `[H]` it is paid on. [inference]
+
 properties:
   name: Preschool special education amounts
   unit: dollars-per-pupil
@@ -128,6 +159,26 @@ unfilled:
       none before H.B. 59 mentions either, so FY2014 is where the *evidence* starts and not where
       the practice does. Prior versions of R.C. 3317.0213 would reach further.
 figures:
+  - key: project/preschool-grant-real-fy2026
+    value: 5604.561493310061
+    field: findings
+    as_written: "worth $5,604.56 in FY2026 dollars"
+  - key: project/preschool-grant-erosion
+    value: 0.2863
+    field: findings
+    as_written: "lost **28.63%** of its value"
+  - key: project/erosion-since-fy2022
+    value: 0.1127
+    field: findings
+    as_written: "has lost 11.27%"
+  - key: project/frozen-parameters-shortfall-preschool
+    value: 59532514.24
+    field: findings
+    as_written: "costs this programme **$59.5m**"
+  - key: project/frozen-parameters-shortfall-computed
+    value: 133152626.93
+    field: findings
+    as_written: "45% of the $133.2m the three frozen components lose"
   - key: project/analyses-stating-the-preschool-flat-grant
     value: 6
     field: findings

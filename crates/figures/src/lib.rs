@@ -144,6 +144,28 @@ pub struct Figure {
     pub compute: fn(&Inputs) -> f64,
 }
 
+/// One frozen parameter from `project::indexation`, by the name the table gives it.
+fn frozen(name: &str) -> &'static project::indexation::Parameter {
+    project::indexation::PARAMETERS
+        .iter()
+        .find(|parameter| parameter.name == name)
+        .expect("the figure names a parameter in the table")
+}
+
+/// The mean per-pupil shortfall in one quintile of districts ordered by poverty, 0 lowest.
+fn quintile_shortfall(panel: &[DistrictRecord], quintile: usize) -> f64 {
+    let rows = project::indexation::incidence(panel);
+    let mut paired: Vec<(f64, f64)> = panel
+        .iter()
+        .zip(&rows)
+        .map(|(record, row)| (record.dpia.percentage, row.per_pupil))
+        .collect();
+    paired.sort_by(|a, b| a.0.total_cmp(&b.0));
+    let n = paired.len();
+    let slice = &paired[quintile * n / 5..(quintile + 1) * n / 5];
+    slice.iter().map(|pair| pair.1).sum::<f64>() / slice.len() as f64
+}
+
 /// The shared inputs. Built once, because the FY2027 panel and the county abstract are read from
 /// fixtures and every regime-diff figure below wants the same two runs over them.
 pub struct Inputs {
@@ -7052,6 +7074,145 @@ pub static FIGURES: &[Figure] = &[
         pinned: 100_531_931.0,
         tolerance: 1.0,
         compute: |i| movement(i, 2013),
+    },
+    // ── the parameters that do not index ──────────────────────────────────
+    //
+    // `project::indexation`. Two freeze vintages, three components, and one gradient. The
+    // erosions are properties of the vintage alone, so one figure serves every FY2022 amount.
+    Figure {
+        key: "project/preschool-grant-real-fy2026",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The preschool special education flat grant in FY2026 dollars — $4,000 nominal, \
+                unmoved since FY2014",
+        pinned: 5_604.56,
+        tolerance: 0.01,
+        compute: |_| frozen("preschool flat grant").real().expect("frozen"),
+    },
+    Figure {
+        key: "project/preschool-grant-erosion",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "What the preschool flat grant has lost in real terms across thirteen years of \
+                nominal freeze",
+        pinned: 0.2863,
+        tolerance: 0.0001,
+        compute: |_| frozen("preschool flat grant").erosion().expect("frozen"),
+    },
+    Figure {
+        key: "project/dpia-per-pupil-real-fy2026",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Disadvantaged Pupil Impact Aid's $422 in FY2026 dollars",
+        pinned: 475.61,
+        tolerance: 0.01,
+        compute: |_| frozen("DPIA per pupil").real().expect("frozen"),
+    },
+    Figure {
+        key: "project/gifted-coordinator-unit-real-fy2026",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The gifted coordinator unit's legislated salary of $85,776 in FY2026 dollars",
+        pinned: 96_672.30,
+        tolerance: 0.01,
+        compute: |_| frozen("gifted coordinator unit").real().expect("frozen"),
+    },
+    Figure {
+        key: "project/erosion-since-fy2022",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "What every amount set in FY2022 and unmoved since has lost — DPIA, and all five \
+                gifted figures",
+        pinned: 0.1127,
+        tolerance: 0.0001,
+        compute: |_| frozen("DPIA per pupil").erosion().expect("frozen"),
+    },
+    Figure {
+        key: "project/frozen-parameters-shortfall-computed",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the three frozen components would pay across the FY2027 model had they held \
+                their real value, less what they pay — before the guarantee",
+        pinned: 133_152_626.93,
+        tolerance: 1.0,
+        compute: |i| project::indexation::statewide(&i.panel).computed,
+    },
+    Figure {
+        key: "project/frozen-parameters-shortfall-delivered",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And how much of it would reach districts once the guarantee is applied",
+        pinned: 104_298_429.45,
+        tolerance: 1.0,
+        compute: |i| project::indexation::statewide(&i.panel).delivered,
+    },
+    Figure {
+        key: "project/frozen-parameters-shortfall-absorbed",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The difference: what guarantee floors absorb, which is the part of the freeze a \
+                held district would not feel if it were reversed",
+        pinned: 28_854_197.47,
+        tolerance: 1.0,
+        compute: |i| {
+            let statewide = project::indexation::statewide(&i.panel);
+            statewide.computed - statewide.delivered
+        },
+    },
+    Figure {
+        key: "project/frozen-parameters-shortfall-dpia",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The DPIA share of the shortfall — half of it, on size rather than on erosion",
+        pinned: 66_703_817.98,
+        tolerance: 1.0,
+        compute: |i| {
+            project::indexation::by_component(&i.panel)
+                [&project::indexation::Component::Dpia]
+        },
+    },
+    Figure {
+        key: "project/frozen-parameters-shortfall-preschool",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The preschool share — 45% of the total, and the part no guarantee floor can \
+                absorb, because it sits outside [H] Foundation Funding",
+        pinned: 59_532_514.24,
+        tolerance: 1.0,
+        compute: |i| {
+            project::indexation::by_component(&i.panel)
+                [&project::indexation::Component::PreschoolSpecialEducation]
+        },
+    },
+    Figure {
+        key: "project/frozen-parameters-shortfall-gifted",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And the gifted share, the smallest of the three",
+        pinned: 6_916_294.71,
+        tolerance: 1.0,
+        compute: |i| {
+            project::indexation::by_component(&i.panel)
+                [&project::indexation::Component::Gifted]
+        },
+    },
+    Figure {
+        key: "project/frozen-parameters-poorest-quintile-per-pupil",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the freeze costs the poorest fifth of districts per pupil",
+        pinned: 141.66,
+        tolerance: 0.01,
+        compute: |i| quintile_shortfall(&i.panel, 4),
+    },
+    Figure {
+        key: "project/frozen-parameters-wealthiest-quintile-per-pupil",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And the wealthiest fifth — a four-to-one gradient nothing in the statute chose",
+        pinned: 34.69,
+        tolerance: 0.01,
+        compute: |i| quintile_shortfall(&i.panel, 0),
     },
     Figure {
         key: "dispersion/casino-distributed-fy2016",
