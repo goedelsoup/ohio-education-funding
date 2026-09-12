@@ -59,6 +59,16 @@ properties:
   general_assembly: 130th General Assembly
   signed: 2013-06-30
   effective: 2013-09-29
+  effective_note: |
+    Two dates, and `effective` above carries the codified one. Signed **30 June 2013**, with the
+    appropriation sections effective then; R.C. 3311.22, the one section this corpus still reads
+    from this act rather than from a later amendment, is dated **29 September 2013** in
+    `crates/project/fixtures/revised-code.txt`. [verified]
+    ([`crates/project`](../../../crates/project/fixtures/revised-code.txt))
+
+    One section is not the act. Every other provision of H.B. 59 that this corpus cites has since
+    been amended, so the fixture attributes those sections to the later act and this note can say
+    nothing about when they first took effect. [verified]
   subject: |
     Enacted the FY2014-15 operating budget. Replaced the Bridge formula's bare reference to prior
     amounts with a computed formula — state share index, Opportunity Grant, seven categoricals —

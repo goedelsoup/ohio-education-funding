@@ -37,6 +37,19 @@ properties:
   general_assembly: 135th General Assembly
   signed: 2023-07-04
   effective: 2023-07-04
+  effective_note: |
+    Two dates, and `effective` above carries the appropriation one. The act was signed
+    **4 July 2023** and the appropriation sections took effect then; the codified amendments took
+    effect ninety days later, and all ten sections this corpus reads from the act — R.C. 3302.01,
+    3302.10, 3310.01, 3310.03, 3310.032, 3310.08, 3313.975, 3317.03, 3327.02 and 5753.11 — are
+    dated **3 October 2023** in `crates/project/fixtures/revised-code.txt`. [verified]
+    ([`crates/project`](../../../crates/project/fixtures/revised-code.txt), which records the act
+    and the date per section)
+
+    That makes `effective` here the signing date, where
+    [H.B. 96](hb-96-2025.yml) sets it to the codified one on the reasoning that the sections the
+    formula is read from are what the field is for. The two nodes disagree about what the field
+    means, and this note records the disagreement rather than settling it. [open]
   subject: |
     Enacted the FY2024-25 operating budget. Updated Fair School Funding Plan cost inputs from
     FY2018 to FY2022; advanced the formula phase-in to 50% in FY2024 and 66.67% in FY2025;

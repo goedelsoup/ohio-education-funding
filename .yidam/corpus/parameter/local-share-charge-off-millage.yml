@@ -340,6 +340,8 @@ properties:
     law rather than the law. For a *parameter series* that is the right trade: session law states a
     rate inside an appropriation act's amending title, and an analysis states it in a sentence
     beside its base.
+  written_as: |
+    charge-off millage
   simulation_key: charge_off_millage
   sensitivity: |
     Raising the charge-off rate shifts cost from the state to districts, and shifts it most to

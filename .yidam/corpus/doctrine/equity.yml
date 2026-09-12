@@ -548,3 +548,21 @@ links:
     relationship: measured-against
   - target: ../revenue-stream/title-i.yml
     relationship: measured-against
+  - target: ../../catalog/census-f33-school-system-finances.md
+    relationship: sourced-from
+    note: >-
+      Every dispersion figure in this node's Ohio panel and every national comparison. The Census
+      Bureau's F-33 is what `dispersion::ohio_panel` reads as `f33-ohio-panel.csv` and what
+      `dispersion::national_peers` reads as `f33-districts-fy2022.csv` — the latter is not listed
+      on the catalog entry, which names only the panel and the state file.
+  - target: ../../catalog/cupp-district-profile-report.md
+    relationship: sourced-from
+    note: >-
+      The FY2024 cross-section — the medians, coefficients of variation and restricted range
+      ratios stated under "Dispersion, FY2024". `dispersion::profile` reads it as
+      `cupp-fy24-district-data.csv`.
+  - target: ../../catalog/dot-sd1-school-district-taxes.md
+    relationship: sourced-from
+    note: >-
+      The millage behind the reappraisal-incidence figures, which `regime-diff::millage` reads as
+      `sd1-district-taxes.csv` before `reappraisal_incidence` differences it against the panel.

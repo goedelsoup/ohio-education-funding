@@ -29,9 +29,9 @@ Sorted by: type, then slug.
 | [`auditor-longitudinal-school-finance`](auditor-longitudinal-school-finance.md) | Longitudinal School Finance Study — Ohio Auditor of State | 1 |
 | [`bls-cpi-u`](bls-cpi-u.md) | CPI-U all items — the Bureau of Labor Statistics flat file | 3 |
 | [`census-block-geography`](census-block-geography.md) | Census block geography: school districts, legislative districts, and population | 1 |
-| [`census-f33-school-system-finances`](census-f33-school-system-finances.md) | Annual Survey of School System Finances (F-33) | 8 |
-| [`cupp-district-profile-report`](cupp-district-profile-report.md) | District Profile Report — the "Cupp Report" | 5 |
-| [`derolph-litigation-record`](derolph-litigation-record.md) | DeRolph Litigation Record | 5 |
+| [`census-f33-school-system-finances`](census-f33-school-system-finances.md) | Annual Survey of School System Finances (F-33) | 10 |
+| [`cupp-district-profile-report`](cupp-district-profile-report.md) | District Profile Report — the "Cupp Report" | 6 |
+| [`derolph-litigation-record`](derolph-litigation-record.md) | DeRolph Litigation Record | 6 |
 | [`dew-academic-distress-commission`](dew-academic-distress-commission.md) | Academic Distress Commission — the department's commission page | 3 |
 | [`dew-education-landscape`](dew-education-landscape.md) | Ohio's Education Landscape — the department's own count of every school option | 1 |
 | [`dew-expenditure-expanded-list`](dew-expenditure-expanded-list.md) | FY2025 Expenditure Expanded List | 1 |
@@ -48,7 +48,7 @@ Sorted by: type, then slug.
 | [`dew-sfpr-line-by-line`](dew-sfpr-line-by-line.md) | School Finance Payment Report — Line by Line Explanation | 7 |
 | [`dot-casino-student-distribution`](dot-casino-student-distribution.md) | County Student Distribution — gross casino revenue county student fund | 1 |
 | [`dot-reappraisal-calendar`](dot-reappraisal-calendar.md) | Ohio's sexennial reappraisal and triennial update calendar | 1 |
-| [`dot-sd1-school-district-taxes`](dot-sd1-school-district-taxes.md) | Table SD-1 — School district taxable value and taxes charged | 3 |
+| [`dot-sd1-school-district-taxes`](dot-sd1-school-district-taxes.md) | Table SD-1 — School district taxable value and taxes charged | 4 |
 | [`eia-diesel-prices`](eia-diesel-prices.md) | Midwest No. 2 diesel retail prices — the EIA monthly series | 1 |
 | [`fordham-base-cost-critique`](fordham-base-cost-critique.md) | Fordham Institute — Ohio Base Cost Model Commentary | 2 |
 | [`fordham-house-bridge-commentary`](fordham-house-bridge-commentary.md) | Fordham Institute — "Ohio House puts the brakes on Cupp-Patterson" | 2 |

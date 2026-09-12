@@ -172,3 +172,9 @@ links:
     relationship: funds
   - target: ../litigation/derolph-i-1997.yml
     relationship: responds-to
+  - target: ../../catalog/census-f33-school-system-finances.md
+    relationship: sourced-from
+    note: >-
+      The construction money this node is about. `dispersion::facilities` computes every figure
+      here from `crate::ohio_panel`, which is the F-33 panel committed as `f33-ohio-panel.csv`;
+      `C35` is the F-33's own capital-outlay column.
