@@ -348,7 +348,86 @@ pub fn reimbursements(base: FiscalYear) -> Vec<Year> {
 /// succession established before it means anything.
 ///
 /// It lived in three places: `bundle`, and two integration tests that each restated it. One list.
+///
+/// It is not, on its own, what the General Assembly calls foundation funding — see [`Basis`].
 pub const FOUNDATION_LINES: [&str; 3] = ["200501", "200550", "200612"];
+
+/// The ALI whose succession the caution above named and never resolved.
+pub const FOLDED_CHANNEL: &str = "200604";
+
+/// The title `FOLDED_CHANNEL` carries once it is foundation funding.
+///
+/// The rule is the title rather than a year, because the title is the thing the succession is
+/// established *from*. A year would be the same fact with the evidence thrown away, and would go
+/// quietly wrong the next time a line is retitled.
+pub const FOUNDATION_FUNDING_TITLE: &str = "Foundation Funding - All Students";
+
+/// The first fiscal year the enacted series carries `FOLDED_CHANNEL` under that title.
+///
+/// Stated so the seam can be asserted rather than described. Note that it is FY2022 and not
+/// FY2021: H.B. 110 retitles the line, so the FY2021 *actual* it restates reads
+/// `Foundation Funding - All Students` while the FY2021 *enacted* row, H.B. 166's, still reads
+/// `Student Wellness and Success`. The enacted series is the one this module builds.
+pub const FOLDED_IN_FROM: u16 = 2022;
+
+/// Which set of lines a year's foundation figure is over.
+///
+/// # Why this is a basis and not a longer list
+///
+/// `FOLDED_CHANNEL` is ALI `200604`, and across this series it names three different programmes
+/// in three different funds: Adult Basic Education through FY2011, the Student Wellness and
+/// Success funds H.B. 166 created *outside* the frozen foundation amount in FY2020-21, and — from
+/// [`FOLDED_IN_FROM`] — `Foundation Funding - All Students`, at $500m to $600m a year.
+///
+/// Only the third is foundation funding, so the line cannot be added to [`FOUNDATION_LINES`] and
+/// cannot be left out either. Adding it wholesale would book two decades of adult education and
+/// two years of a wellness programme as foundation aid; leaving it out drops 5.9% to 7.2% of what
+/// the act appropriates under that name, which is what this module did until now. The caution
+/// directly above [`FOUNDATION_LINES`] is right and was applied in the wrong direction: it says a
+/// series built by line number needs its succession established, and the succession was
+/// established for `200501` and used to *exclude* `200604` rather than to resolve it.
+///
+/// # The seam, and why both bases exist
+///
+/// What changes at [`FOLDED_IN_FROM`] is not bookkeeping. H.B. 166 paid student wellness alongside
+/// a frozen foundation amount rather than through it; the Fair School Funding Plan pulled that
+/// channel inside the formula. So the money really did become foundation aid, and a *level* for
+/// FY2022 that omits it understates what the General Assembly appropriated.
+///
+/// But a *movement* across FY2021-FY2022 on that basis mixes the channel arriving with whatever
+/// else moved, and the noise floor in `what_the_series_cannot_settle` is a median of movements.
+/// Rather than drop the pair, this follows `dispersion::survey_basis::Basis`, which exists for the
+/// same shape: give the comparable quantity its own basis and run the analysis on that.
+/// [`Self::FormulaLines`] is a consistent series for all twenty-nine years; [`Self::AsEnacted`] is
+/// what the act says, and is not a series across the seam.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Basis {
+    /// The formula's own lines, [`FOUNDATION_LINES`], every year of the series.
+    ///
+    /// Comparable end to end, which is the whole of its job: every movement, spread and median
+    /// this module publishes is on it. Identical to [`Self::AsEnacted`] before [`FOLDED_IN_FROM`].
+    FormulaLines,
+    /// What the enacting act calls foundation funding in that year.
+    ///
+    /// [`FOUNDATION_LINES`] plus [`FOLDED_CHANNEL`] in the years it is titled
+    /// [`FOUNDATION_FUNDING_TITLE`]. The right answer to "what was appropriated for foundation
+    /// aid", and the series the site publishes. **Not comparable across [`FOLDED_IN_FROM`]** — the
+    /// definition widens there, so a difference spanning the seam is partly a definition change.
+    AsEnacted,
+}
+
+impl Basis {
+    /// Whether this basis counts `line` towards foundation funding.
+    #[must_use]
+    pub fn covers(self, line: &Line) -> bool {
+        if FOUNDATION_LINES.contains(&line.line_item.as_str()) {
+            return true;
+        }
+        matches!(self, Self::AsEnacted)
+            && line.line_item == FOLDED_CHANNEL
+            && line.title == FOUNDATION_FUNDING_TITLE
+    }
+}
 
 /// The **foundation aid** appropriation by year, restated into `base` dollars.
 ///
@@ -361,12 +440,15 @@ pub const FOUNDATION_LINES: [&str; 3] = ["200501", "200550", "200612"];
 /// Built from [`enacted_lines`] rather than [`lines`]: the workbook fixture alone is missing
 /// FY2006-07 and FY2012-13, and a noise floor computed over a series with holes in it is
 /// measuring the holes.
+///
+/// `basis` decides what counts — see [`Basis`]. [`Basis::FormulaLines`] for anything that
+/// compares two years, [`Basis::AsEnacted`] for what a given year's act appropriated.
 #[must_use]
-pub fn foundation_history(base: FiscalYear) -> Vec<Year> {
+pub fn foundation_history(basis: Basis, base: FiscalYear) -> Vec<Year> {
     let cpi = CpiSeries::cpi_u_june();
     let mut totals: BTreeMap<u16, (f64, usize)> = BTreeMap::new();
     for line in enacted_lines() {
-        if FOUNDATION_LINES.contains(&line.line_item.as_str()) {
+        if basis.covers(&line) {
             let entry = totals.entry(line.fiscal_year).or_insert((0.0, 0));
             entry.0 += line.amount;
             entry.1 += 1;
@@ -390,9 +472,15 @@ pub fn foundation_history(base: FiscalYear) -> Vec<Year> {
 ///
 /// Years the index cannot reach are dropped before the differencing, so a movement is always
 /// between two adjacent years that both have a real figure.
+///
+/// On [`Basis::FormulaLines`], and not by default — a movement is a comparison, and
+/// [`Basis::AsEnacted`] widens its definition at [`FOLDED_IN_FROM`]. Differencing that basis would
+/// book the Student Wellness channel arriving inside the formula as a half-billion-dollar move in
+/// foundation aid, in the middle of a series whose summary statistic is a median of exactly these
+/// magnitudes.
 #[must_use]
 pub fn foundation_movements(base: FiscalYear) -> Vec<(u16, f64)> {
-    let real: Vec<(u16, f64)> = foundation_history(base)
+    let real: Vec<(u16, f64)> = foundation_history(Basis::FormulaLines, base)
         .into_iter()
         .filter_map(|year| year.real.map(|value| (year.fiscal_year, value)))
         .collect();

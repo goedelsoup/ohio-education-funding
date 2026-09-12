@@ -55,7 +55,7 @@ use dispersion::profile::ProfileDistrict;
 use dispersion::{partial_correlation, wealth_neutrality};
 use edfund_core::{AgencyType, FiscalYear};
 use foundation::{aggregate_base_cost, StatewideFactors};
-use project::appropriations::{self, FOUNDATION_LINES};
+use project::appropriations::{self, Basis};
 use project::drafts::Lever;
 use project::finances::{finances, for_district, Finances};
 use project::legislative_district::{legislative_districts, overlaps, Chamber};
@@ -1011,7 +1011,10 @@ fn appropriation_block() -> Vec<AppropriationYear> {
         }
         let entry = totals.entry(line.fiscal_year).or_insert((0.0, 0.0));
         entry.0 += line.amount;
-        if FOUNDATION_LINES.contains(&line.line_item.as_str()) {
+        // `AsEnacted` and not `FormulaLines`: this is the level the site publishes and the
+        // numerator of the share it renders, so it should be what the act appropriated for
+        // foundation aid rather than the comparable subset. Nothing here differences it.
+        if Basis::AsEnacted.covers(&line) {
             entry.1 += line.amount;
         }
     }

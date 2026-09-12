@@ -78,6 +78,15 @@ properties:
     lines and the sentence naming them are identical in both. The *amounts* in that table are
     not — foundation aid was enacted $82m above the proposal — so nothing here quotes one.)
 
+    **The five are LSC's grouping, and this repository cannot reproduce their total by adding
+    them.** LSC's own `Total foundation aid` is $11,230,057,557 for FY2026 as enacted; summing the
+    five line items out of the committed series gives $11,547,417,388, because the table counts
+    only the foundation-aid earmark of GRF ALI 200502 and not the whole line. [verified]
+    (`project::budget_analysis`, which reads the table rather than summing it) So there are two
+    numbers here on purpose — LSC's, wherever LSC prints a table, and a line sum for the
+    twenty-nine years no table covers — and neither is an approximation of the other. See
+    [`what-foundation-funding-means`](../../decisions/what-foundation-funding-means.yml).
+
     That is a finding rather than a citation. The scholarship channel does not appear as a
     separate appropriation, so the budget document a reader would consult to size it shows it
     merged with the formula it diverts from — which is part of why this channel is as hard to see
