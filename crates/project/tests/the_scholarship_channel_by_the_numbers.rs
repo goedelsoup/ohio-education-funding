@@ -20,40 +20,7 @@
 //! disagreement instead of resolving it. If a later edition explains it, the explanation belongs
 //! in the catalog record and this file should stop describing it as unexplained.
 
-use std::collections::BTreeMap;
-
-/// The committed extract of the 2025 Scholarship Annual Report.
-const FIXTURE: &str = include_str!("../fixtures/scholarship-programs.csv");
-
-struct Programme {
-    students: f64,
-    expenditure: Option<f64>,
-    published_average: Option<f64>,
-}
-
-fn programmes() -> BTreeMap<String, Programme> {
-    let mut lines = FIXTURE.lines();
-    assert_eq!(
-        lines.next().unwrap_or_default().trim(),
-        "program,name,students,expenditure,published_average",
-        "the scholarship fixture header changed"
-    );
-    lines
-        .filter(|line| !line.trim().is_empty())
-        .map(|line| {
-            let f: Vec<&str> = line.split(',').map(str::trim).collect();
-            let num = |i: usize| f.get(i).and_then(|v| v.parse::<f64>().ok());
-            (
-                f[0].to_string(),
-                Programme {
-                    students: num(2).expect("every programme publishes participation"),
-                    expenditure: num(3),
-                    published_average: num(4),
-                },
-            )
-        })
-        .collect()
-}
+use project::scholarship::report::programmes;
 
 #[test]
 fn the_report_covers_the_five_programmes_the_deduction_calculator_names() {

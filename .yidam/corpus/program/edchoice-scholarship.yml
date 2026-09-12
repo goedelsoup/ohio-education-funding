@@ -32,6 +32,33 @@ description: |
   figures) The natural reading is a denominator: an average over students holding a full-year
   award rather than over everyone who used the programme at any point. Nothing in the report says
   so, and the reading is not adopted here on the source's silence. [open]
+findings: |
+  ### A third way the published average does not sit right, and this one is arithmetic
+
+  The two above are the report's own internal disagreements. This one is a constraint the award
+  schedule puts on the figure. Every award under R.C. 3317.022(A)(10) is the lesser of a tuition
+  and a per-grade ceiling of $5,500 for kindergarten through eight or $7,500 for nine through
+  twelve, and in FY2025 those are the operative amounts without indexing — the clause raising them
+  tracks the statewide average base cost per pupil, which H.B. 33 froze at its FY2024 level.
+  [verified]
+  ([`crates/project`](../../../crates/project/tests/the_gap_two_averages_cannot_decompose.rs))
+
+  So a published average of $6,808.75 requires a grade mix of at most **0.345625** in kindergarten
+  through eight — and that is before any tuition binds, since every student paying less than the
+  ceiling forces the share lower still. [verified] (crates/project) Grades K-8 are nine of thirteen
+  grade levels. A programme triggered by a building's performance index could plausibly skew
+  towards high schools, but a bound near a third is a long way from an even spread, and the
+  report's own implied average only moves it to 42.7%.
+
+  **Either this programme is overwhelmingly a high-school one, or the published average is on a
+  basis this arithmetic does not fit.** The corpus cannot tell which from what it holds, and the
+  participation split by grade band that would settle it is not published. [open]
+
+figures:
+  - key: project/traditional-greatest-k8-share
+    value: 0.345625
+    field: findings
+    as_written: "at most **0.345625** in kindergarten\n  through eight"
 properties:
   seeded_because: |
     Named in the [`deduction`](../../skills/deduction.md) calculator as one of the four programmes
