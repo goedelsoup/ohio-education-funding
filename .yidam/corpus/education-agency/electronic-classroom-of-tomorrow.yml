@@ -67,12 +67,72 @@ findings: |
 
   The aggregate draw is **0.0124 of everything Ohio's districts received in state money in
   FY2016**, roughly double its FY2009 share. That is the total any per-district apportionment
-  would have to sum to. Which districts, and in what proportion, still needs the department's
-  deduct file and is not established here. [open]
+  would have to sum to.
+
+  ### The pool it drew from, which the survey had carried all along
+
+  The other side of the deduct is in the same panel and had never been read as a distribution.
+  `V92` is what each district paid community schools, and across the eleven years it can be read
+  in — FY2010 to FY2021 — Ohio's districts were credited with and paid straight out
+  **$9,285,168,000**. [verified] (crates/dispersion)
+
+  Against that pool ECOT drew a share of **0.10592**, rising from 8.4% in FY2010 to 11.9% in
+  FY2016. One school, against roughly three hundred. [verified] (crates/dispersion)
+
+  **This bounds the apportionment question rather than answering it**, and the difference matters.
+  The share above is a statewide average: it says what fraction of the whole pool ECOT took, not
+  what fraction of any particular district's deduct went to ECOT, and a district whose residents
+  enrolled with ECOT more often than average paid more of its own deduct to it. Decomposing a
+  district's payment by receiving school needs the department's deduct file, because the survey
+  asks each district for one number. That part is still not established here. [open]
+
+  ### The sector it belonged to, once the agency type is made to name one thing
+
+  The federal directory files Ohio's community schools under CCD agency type 7, and in its early
+  editions the same code names twenty-four regional data-processing co-operatives instead. Resolved
+  — the two populations share no identifier, no IRN block, and no appearance in any fixture only a
+  school reaches — the directory holds **934 community schools**, of which **667 ever opened**.
+  [verified] (crates/dispersion)
+
+  **267 were announced and never opened.** They carry the status the directory reserves for an
+  agency scheduled to be operational within two years, and then stop appearing. Nearly three in ten
+  of the community schools Ohio's row counts include never taught anybody. [verified]
+  (crates/dispersion)
+
+  The sector's own peak is eight years later than the row count says: editions list most agencies
+  in 2005-06, and the number actually open peaks at **391** in 2013-14. [verified]
+  (crates/dispersion)
+
+  Against that population ECOT is an old school rather than a typical one. It ran eighteen open
+  editions where **0.60554 of schools that opened were still open after ten years**, and the median
+  closed school lasted five. [verified] (crates/dispersion)
 
   It opened in 2000 and closed in January 2018, but neither the charter date nor the closure
   date is established to the day, so the node carries no `established` date — the class
   declares that property a `date`, and a year is not one. [open]
+revisions:
+  - was: |
+      The node's `irn` property cited the federal directory as carrying ECOT for "fifteen
+      consecutive editions 2004-2018", and an `unfilled` entry said the committed editions
+      corroborate the closure and not the founding — the directory's first ECOT row being 2004-05,
+      four years after this node dates the opening.
+    now: |
+      The directory carries ECOT for **19 consecutive editions, 2000-01 through 2018-19**, and its
+      first row is filed under the status for a new agency. So the committed editions corroborate
+      the founding as well, in the year this node already gave it, and the open question about
+      whether the CCD carried Ohio's e-schools under some other type before 2004 does not arise.
+    found_by: |
+      Resolving CCD agency type 7's succession for `dispersion::community_schools`, which needed
+      every community school's first edition and so read ECOT's whole run rather than its last
+      years. See
+      [`the_sector_the_agency_type_did_not_name`](../../../crates/dispersion/tests/the_sector_the_agency_type_did_not_name.rs).
+    reach: |
+      The claim was true when written and went stale under the fixture rather than under the
+      source: `lea_directory` was later extended back from 2008-09 to 1994-95, and nothing
+      re-read the nodes that had cited its old span. The overpayment, closure and recovery
+      findings are untouched; what changed is that the founding is now corroborated and one
+      `unfilled` entry is answered rather than carried.
+
 figures:
   - key: dispersion/ecot-peak-enrolment
     value: 14153
@@ -94,8 +154,32 @@ figures:
     value: 0.01241
     field: findings
     as_written: "**0.0124 of everything Ohio's districts received in state money in\n  FY2016**"
+  - key: dispersion/deduct-total
+    value: 9285168000.0
+    field: findings
+    as_written: "**$9,285,168,000**"
+  - key: dispersion/deduct-ecot-share-of-pool
+    value: 0.10592
+    field: findings
+    as_written: "ECOT drew a share of **0.10592**"
+  - key: dispersion/community-schools-never-opened
+    value: 267
+    field: findings
+    as_written: "**267 were announced and never opened.**"
+  - key: dispersion/community-schools-operating-peak
+    value: 391
+    field: findings
+    as_written: "the number actually open peaks at **391** in\n  2013-14"
+  - key: dispersion/community-school-ten-year-survival
+    value: 0.60554
+    field: findings
+    as_written: "**0.60554 of schools that opened were still open after ten years**"
+  - key: dispersion/ecot-directory-editions
+    value: 19
+    field: irn
+    as_written: "19 consecutive editions 2000-2018"
 properties:
-  irn: 133413 [verified] (`dispersion::lea_directory`, fifteen consecutive editions 2004-2018)
+  irn: 133413 [verified] (`dispersion::lea_directory`, 19 consecutive editions 2000-2018)
   agency_type: community
   county: Statewide (chartered in Franklin County)
   typology: Not applicable; e-school.
@@ -112,12 +196,6 @@ properties:
 unfilled:
   - field: exact opening and closing dates
     why: The year it opened and the month it closed are held; the days are not.
-  - field: the years before 2004
-    why: >-
-      The directory's first ECOT row is 2004-05 and this node dates the opening to 2000, so the
-      committed editions corroborate the closure and not the founding. Whether the CCD carried
-      Ohio's e-schools under another agency type before then, or not at all, is not established
-      here.
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of

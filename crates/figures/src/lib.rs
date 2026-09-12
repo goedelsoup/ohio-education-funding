@@ -3965,6 +3965,134 @@ pub static FIGURES: &[Figure] = &[
         },
     },
     Figure {
+        key: "dispersion/deduct-total",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "State money Ohio's districts were credited with and paid straight to community \
+                schools, across the eleven years the survey reports it",
+        pinned: 9_285_168_000.0,
+        tolerance: 1000.0,
+        compute: |_| {
+            dispersion::deduct::cumulative()
+                .iter()
+                .map(|bearer| bearer.paid)
+                .sum()
+        },
+    },
+    Figure {
+        key: "dispersion/deduct-top-ten-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Share of the whole community-school deduct borne by the ten districts that bore \
+                most of it, FY2010 to FY2021",
+        pinned: 0.62799,
+        tolerance: 0.0005,
+        compute: |_| {
+            let cumulative = dispersion::deduct::cumulative();
+            dispersion::deduct::concentration(&cumulative, 10).expect("districts paid")
+        },
+    },
+    Figure {
+        key: "dispersion/deduct-columbus-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Share of the state money Columbus City was credited with that it paid on to \
+                community schools, FY2010 to FY2021",
+        pinned: 0.35289,
+        tolerance: 0.0005,
+        compute: |_| {
+            dispersion::deduct::cumulative()
+                .iter()
+                .find(|bearer| bearer.irn == "043802")
+                .expect("Columbus is in the panel")
+                .share()
+                .expect("credited with state money")
+        },
+    },
+    Figure {
+        key: "dispersion/deduct-peak-share-of-state-aid",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The community-school deduct at its peak, as a share of the state aid Ohio's \
+                districts were credited with, FY2015",
+        pinned: 0.09783,
+        tolerance: 0.0005,
+        compute: |_| {
+            dispersion::deduct::by_year()[&2015]
+                .share_of_gross()
+                .expect("districts are credited with something")
+        },
+    },
+    Figure {
+        key: "dispersion/deduct-ecot-share-of-pool",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "ECOT's draw as a share of every dollar Ohio's districts paid community schools, \
+                across the years the two overlap",
+        pinned: 0.10592,
+        tolerance: 0.0005,
+        compute: |_| dispersion::deduct::pool_share_across_window("133413").expect("ECOT is held"),
+    },
+    Figure {
+        key: "dispersion/community-schools-never-opened",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Ohio community schools the federal directory lists as scheduled to open and never \
+                records as open",
+        pinned: 267.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let never = dispersion::community_schools::never_opened().len();
+            f64::from(u32::try_from(never).unwrap_or(u32::MAX))
+        },
+    },
+    Figure {
+        key: "dispersion/community-schools-operating-peak",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Ohio community schools open at the sector\u{2019}s largest, in the 2013-14 \
+                directory edition",
+        pinned: 391.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let peak = dispersion::community_schools::sector_by_year()
+                .values()
+                .map(|year| year.open)
+                .max()
+                .unwrap_or_default();
+            f64::from(u32::try_from(peak).unwrap_or(u32::MAX))
+        },
+    },
+    Figure {
+        key: "dispersion/community-school-ten-year-survival",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Share of Ohio community schools that opened and were still open ten years later, \
+                over those the directory could observe that long",
+        pinned: 0.60554,
+        tolerance: 0.0005,
+        compute: |_| {
+            dispersion::community_schools::survival(10)
+                .rate()
+                .expect("schools are at risk")
+        },
+    },
+    Figure {
+        key: "dispersion/ecot-directory-editions",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Consecutive federal directory editions naming ECOT, 2000-01 through 2018-19",
+        pinned: 19.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let editions = dispersion::lea_directory::panel()
+                .iter()
+                .filter(|agency| agency.irn == "133413")
+                .count();
+            f64::from(u32::try_from(editions).unwrap_or(u32::MAX))
+        },
+    },
+    Figure {
         key: "dispersion/cleveland-state-revenue-real-change-negative",
         owner: "crates/dispersion",
         unit: Unit::Share,
