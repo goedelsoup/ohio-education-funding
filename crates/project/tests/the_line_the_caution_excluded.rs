@@ -177,7 +177,10 @@ fn the_seam_is_mostly_the_channel_arriving_rather_than_money_moving() {
 
     let widened = at(&enacted, FOLDED_IN_FROM) - at(&enacted, FOLDED_IN_FROM - 1);
     let moved = at(&formula, FOLDED_IN_FROM) - at(&formula, FOLDED_IN_FROM - 1);
-    assert!((widened - 677_679_867.0).abs() < 1.0, "widened by {widened}");
+    assert!(
+        (widened - 677_679_867.0).abs() < 1.0,
+        "widened by {widened}"
+    );
     assert!((moved - 177_679_867.0).abs() < 1.0, "moved by {moved}");
     assert!(
         (widened - moved - 500_000_000.0).abs() < 1.0,
