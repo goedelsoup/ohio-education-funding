@@ -826,15 +826,58 @@ const TAGS: [&str; 4] = ["[verified]", "[inference]", "[open]", "[unentered]"];
 ///
 /// A tag ends at `]` or continues into ` — reason`. Requiring one of those after the name is what
 /// keeps `[open]` from also matching a hypothetical `[opening]`.
+///
+/// # And the fourth: `[open enrolment clawback](…)`
+///
+/// The paragraph above is right about the shape and was not suspicious enough of its own fix.
+/// Accepting a space after the name admits **any** bracketed span beginning with a tag name, and
+/// markdown link text is a bracketed span. `formula-component/temporary-transitional-aid-guarantee`
+/// links twice to the open enrolment clawback, and both links were counted as open questions — so
+/// the generated blocks reported 193 open claims against 191 written.
+///
+/// Two is a small error and the shape is not: this is the same substring-for-a-structure bug in
+/// the code written to fix the third instance of it, and nothing would have caught it except
+/// counting by hand, which is what the audit these blocks replaced used to do.
+///
+/// The distinguishing feature is what follows the tag's **own** closing bracket. A markdown link
+/// is `[text](target)`; a claim tag is not followed by `(`. Matching brackets rather than taking
+/// the first `]` is what makes that test correct, because a tag's reason may itself contain a
+/// link — `[verified for the rates — [the FY2026 model](…)]` is a tag and three of the five spans
+/// that end in `](` are that shape.
 fn count_tag(text: &str, tag: &str) -> usize {
     let name = tag.trim_start_matches('[').trim_end_matches(']');
     let open = format!("[{name}");
     text.match_indices(&open)
         .filter(|(index, _)| {
             let rest = &text[index + open.len()..];
-            rest.starts_with(']') || rest.starts_with(' ')
+            if !(rest.starts_with(']') || rest.starts_with(' ')) {
+                return false;
+            }
+            !is_markdown_link(text, *index)
         })
         .count()
+}
+
+/// Whether the bracketed span starting at `index` is markdown link text rather than a claim tag.
+///
+/// Depth-aware, so a tag whose reason contains a link is still a tag. Returns `false` for an
+/// unterminated span, which is a malformed tag rather than a link and is counted as the tag it
+/// was trying to be.
+fn is_markdown_link(text: &str, index: usize) -> bool {
+    let mut depth = 0usize;
+    for (offset, character) in text[index..].char_indices() {
+        match character {
+            '[' => depth += 1,
+            ']' => {
+                depth -= 1;
+                if depth == 0 {
+                    return text[index + offset + 1..].starts_with('(');
+                }
+            }
+            _ => {}
+        }
+    }
+    false
 }
 
 /// Every claim tag in the corpus, counted, with no attention to where each one sits.
@@ -1416,6 +1459,50 @@ mod tests {
         // And the check that the reason form does not swallow a longer word.
         assert_eq!(count_tag("[opening remarks]", "[open]"), 0);
         assert_eq!(count_tag("[verifiedish]", "[verified]"), 0);
+    }
+
+    #[test]
+    fn markdown_link_text_beginning_with_a_tag_name_is_not_a_claim() {
+        // The defect that followed the one above. `[opening remarks]` was already rejected, by
+        // the `i` after `open` — but a space is accepted so the reason form works, and that
+        // admits any bracketed span starting with a tag name. Link text is such a span.
+        //
+        // `temporary-transitional-aid-guarantee` links twice to the open enrolment clawback and
+        // both were counted, so the README reported 193 open claims against 191 written.
+        assert_eq!(
+            count_tag(
+                "the [open enrolment clawback](guarantee.yml), a reduction",
+                "[open]"
+            ),
+            0
+        );
+        assert_eq!(count_tag("[verified data](x.yml)", "[verified]"), 0);
+
+        // A tag whose reason contains a link is still one tag. Three of the five spans in this
+        // corpus that end in `](` are this shape, so taking the first `]` would reject them.
+        assert_eq!(
+            count_tag(
+                "[verified for the rates — [the FY2026 model](cat.md)]",
+                "[verified]"
+            ),
+            1
+        );
+        assert_eq!(
+            count_tag(
+                "[inference — the chain is in [`bridge`](b.yml)]",
+                "[inference]"
+            ),
+            1
+        );
+
+        // And the two forms still count beside each other in one line.
+        assert_eq!(
+            count_tag(
+                "[open] but not the [open enrolment clawback](g.yml)",
+                "[open]"
+            ),
+            1
+        );
     }
 
     #[test]
