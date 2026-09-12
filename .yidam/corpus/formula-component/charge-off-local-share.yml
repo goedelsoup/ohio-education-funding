@@ -113,6 +113,11 @@ properties:
     district's own effective operating millage. Recognized valuation is total taxable value
     less the deferred part of the inflationary increase in carryover real property — two
     thirds in a reappraisal or update year, one third the year after, nothing by the third.
+  function_tex: |
+    \begin{aligned}
+    \text{local share} &= \text{charge-off millage} \times \text{district recognized valuation} \\
+    \text{state aid} &= \text{computed cost} - \text{local share}
+    \end{aligned}
   statutory_basis: |
     R.C. 3317.022, with the rate set by biennial session law. The 1991-1997 progression is
     recited with its Ohio Laws citations at DeRolph I, paragraph 97. Ohio Laws' online version

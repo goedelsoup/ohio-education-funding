@@ -107,6 +107,15 @@ properties:
 
     Included in [N] Total Formula Funding, so it is inside the formula rather than beside it —
     unlike the performance supplement and preschool special education, which sit in [R].
+  function_tex: |
+    \begin{aligned}
+    H &= \text{foundation funding} \\
+    I &= \text{temporary transitional aid guarantee} \\
+    J &= \text{supplemental targeted assistance} \\
+    K &= \text{transportation} \\
+    L_1 &= \text{FY21 funding base} && \text{a node of its own} \\
+    \text{formula transition supplement} &= \max\bigl( L_1 - (H + I + J + K),\ 0 \bigr)
+    \end{aligned}
   statutory_basis: |
     Not in R.C. 3317. The department computes it on `Detail_SFPR` and reports it as line [K].
     **Confirmed uncodified.** The statute audit searched R.C. 3317.022 — the section that assembles

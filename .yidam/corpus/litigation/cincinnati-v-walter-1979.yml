@@ -110,3 +110,9 @@ links:
     relationship: invokes
   - target: ../doctrine/thorough-and-efficient.yml
     relationship: invokes
+  - target: ../../catalog/derolph-litigation-record.md
+    relationship: sourced-from
+    note: >-
+      The opinions themselves. `regime-diff` reads them as `derolph-opinions.txt`, and
+      `what_derolph_did_with_walter.rs` is what pins this node's account of how the later court
+      treated the holding.

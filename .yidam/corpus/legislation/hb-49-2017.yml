@@ -56,6 +56,16 @@ properties:
   general_assembly: 132nd General Assembly
   signed: 2017-06-30
   effective: 2017-09-29
+  effective_note: |
+    Two dates, and `effective` above carries the codified one. Signed **30 June 2017**, with the
+    appropriation sections effective then; R.C. 3311.06, the one section this corpus still reads
+    from this act rather than from a later amendment, is dated **29 September 2017** in
+    `crates/project/fixtures/revised-code.txt`. [verified]
+    ([`crates/project`](../../../crates/project/fixtures/revised-code.txt))
+
+    One section is not the act. Every other provision of H.B. 49 that this corpus cites has since
+    been amended, so the fixture attributes those sections to the later act and this note can say
+    nothing about when they first took effect. [verified]
   subject: |
     Enacted the FY2018-19 operating budget. Re-anchored temporary transitional aid from FY2015 to
     FY2017 and made it conditional on enrolment: districts losing 10% or more of total ADM between
