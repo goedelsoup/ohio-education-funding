@@ -46,7 +46,7 @@ findings: |
   **North Bass Local receives $19,672.64, and every cent of it is this guarantee.** Zero base
   cost, zero categoricals, zero transportation, zero of everything the formula computes — a Lake
   Erie island district in Ottawa County that the department does not cost at all, funded because
-  it was funded in FY2020. [verified — the department's FY27 calculator, `Summary_SFPR`]
+  it was funded in FY2020. [verified] (the department's FY27 calculator, `Summary_SFPR`)
 
   It is what the mechanism looks like with the formula subtracted out. Every other guaranteed
   district is a comparison between two numbers; this one has only the historical number, and the
@@ -59,8 +59,8 @@ findings: |
 
   **Neither is in the committed panel**, because the extract is keyed on the base cost sheet and
   the department computes no base cost for either. So the $878,954,627 above is the 609-district
-  total and the department's is $878,974,300 — the whole difference is North Bass. [verified —
-  [`the_population_the_panel_speaks_for.rs`](../../../crates/project/tests/the_population_the_panel_speaks_for.rs)]
+  total and the department's is $878,974,300 — the whole difference is North Bass. [verified]
+  ([`the_population_the_panel_speaks_for.rs`](../../../crates/project/tests/the_population_the_panel_speaks_for.rs))
   Every statistical claim in this node is over the 609, and the district that would most sharply
   illustrate it is the one excluded.
 
@@ -69,8 +69,8 @@ findings: |
   Joining the funding model to the 2024-25 report card across the 606 districts every panel
   covers, guarantee status looks like it predicts achievement: districts on the guarantee score
   **+0.187** against the Performance Index, median 89.85 against 85.6. Holding economic
-  disadvantage constant the association is **+0.035**. [verified — see
-  [`crates/project/tests/guarantee_and_outcomes.rs`](../../../crates/project/tests/guarantee_and_outcomes.rs)]
+  disadvantage constant the association is **+0.035**. [verified] (see
+  [`crates/project/tests/guarantee_and_outcomes.rs`](../../../crates/project/tests/guarantee_and_outcomes.rs))
 
   The whole of it is poverty. Guaranteed districts are less poor — median economically
   disadvantaged share 42.8% against 51.9% — which is the same wealth gradient the description
@@ -124,10 +124,10 @@ findings: |
   For spending, less dispersion is more equitable. For state aid the sign flips: aid is
   compensatory, so a wide spread means strong targeting and a narrow one means weak targeting.
   Realized aid is measurably *more equal* than formula aid — coefficient of variation 0.563
-  against 0.695, restricted range ratio 9.66 against 12.27. [verified — recomputed over the 609
+  against 0.695, restricted range ratio 9.66 against 12.27. [verified] (recomputed over the 609
   districts of the committed feed with `dispersion::Dispersion::of`, which is R type 7 on
   `q * (n - 1)` and population variance; the figures this replaces (0.544, 0.677, 9.6, 12.3)
-  do not reproduce under any convention in the crate] That equality is the guarantee
+  do not reproduce under any convention in the crate) That equality is the guarantee
   flattening the compensation. Reporting it as an improvement, which the habit from spending
   analysis would invite, gets the direction exactly backwards. See
   [equity](../doctrine/equity.yml).
@@ -157,8 +157,8 @@ findings: |
 
   ### The real erosion, measured within one source
 
-  [verified — [dew-five-year-forecast](../../catalog/dew-five-year-forecast.md) both endpoints,
-  [bls-cpi-u](../../catalog/bls-cpi-u.md) deflator] The clearest statement available, because it
+  [verified] ([dew-five-year-forecast](../../catalog/dew-five-year-forecast.md) both endpoints,
+  [bls-cpi-u](../../catalog/bls-cpi-u.md) deflator) The clearest statement available, because it
   is measured entirely within one source on one definition and touches the calculator nowhere.
   Real change in booked state aid, FY2020 to FY2025, deflated by CPI-U June:
 
@@ -170,7 +170,7 @@ findings: |
 
   ### The incidence of removal, as a distribution rather than a total
 
-  [verified — [`crates/scenario-delta`](../../../crates/scenario-delta/)] Crossed against wealth,
+  [verified] ([`crates/scenario-delta`](../../../crates/scenario-delta/)) Crossed against wealth,
   per pupil:
 
       valuation quintile    per-pupil loss on removal
@@ -220,7 +220,7 @@ findings: |
   State aid tracks poverty (+0.632) more tightly than property wealth (−0.548), which reads as the
   formula's targeting working. The guarantee is part of why the wealth relationship is not
   stronger: it props up precisely the districts the local capacity measure would fund least.
-  [inference — see [equity](../doctrine/equity.yml)]
+  [inference] (see [equity](../doctrine/equity.yml))
 
   It is called temporary and transitional. In FY2027 — the terminal year of the six-year
   phase-in, the year the formula reaches 100% of its computed amount — **294 of 609 districts,
@@ -250,7 +250,7 @@ findings: |
   "unfunded statutory formula" standard for defunding. Set the FY2027 figures beside it:
 
       FY2024    180 districts     $181.2 million     [verified — as published, secondary]
-      FY2027    294 districts     $879.0 million     [verified — department FY2027 model]
+      FY2027    294 districts     $879.0 million     [verified] (department FY2027 model)
 
   Roughly fivefold in dollars, arriving *at* the terminal year, the year the formula reaches
   100%. The phase-in gap closes and the guarantee does not; the mechanism that carries
@@ -261,16 +261,16 @@ findings: |
   **The statute does not contemplate re-basing; it contemplates expiring.** R.C. 3317.019 is
   scoped to "fiscal years 2026 and 2027" in every division that pays anything, names no later
   year, and carries no provision for moving the base — the one adjustment it does allow runs the
-  other way, for a district joining a newly established joint vocational district. [verified —
-  [`crates/project`](../../../crates/project/tests/the_year_the_guarantee_holds_to.rs)] What
+  other way, for a district joining a newly established joint vocational district. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_year_the_guarantee_holds_to.rs)) What
   happens after FY2027 is not a re-basing rule but the absence of a section, which is the handover
   the whole plan is written with.
 
   **Subsequent budget acts contemplated it constantly, and then stopped.** Four consecutive acts
   each re-read the anchor onto the year before their own biennium — H.B. 59 onto FY2013, H.B. 64
   onto FY2015, H.B. 49 onto FY2017, H.B. 166 onto FY2019 — and the three plan-era budgets have
-  re-read it none. [verified — the anchor chain in
-  [`bridge-formula`](../funding-regime/bridge-formula.yml)] So re-basing is what Ohio did every
+  re-read it none. [verified] (the anchor chain in
+  [`bridge-formula`](../funding-regime/bridge-formula.yml)) So re-basing is what Ohio did every
   two years for a decade and has not done since FY2022. That is a fact about practice rather than
   about statutory design, and it is the answer to the question this node asked. [inference]
 

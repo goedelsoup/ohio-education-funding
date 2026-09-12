@@ -11,15 +11,15 @@ description: |
 
   **The answer, in the Legislative Service Commission's own words:** *"Generally, the majority
   of lottery profits in each year are combined with the GRF to provide foundation funding to
-  schools."* [verified — [LSC redbook](../../../crates/project/fixtures/dew-redbook.txt)]
+  schools."* [verified] ([LSC redbook](../../../crates/project/fixtures/dew-redbook.txt))
   Lottery profits are not added to foundation aid. They are one of the funds foundation aid is
   paid **from**.
 
   It is visible in the appropriation table. Five line items collectively support state
   foundation aid and scholarship payments, and one of them is the lottery — FY2026 **as
   enacted**, each line net of its own specific earmarks, which is the basis on which the
-  Legislative Service Commission strikes the total: [verified —
-  [`dew-greenbook.txt`](../../../crates/project/fixtures/dew-greenbook.txt)]
+  Legislative Service Commission strikes the total: [verified]
+  ([`dew-greenbook.txt`](../../../crates/project/fixtures/dew-greenbook.txt))
 
       GRF   ALI 200550  Foundation Funding — All Students      $8,318,925,549
       GRF   ALI 200502  Pupil Transportation                      $703,348,806
@@ -69,8 +69,8 @@ findings: |
   Between the redbook table and the greenbook table — the same five lines, the same year, the
   bill as introduced against the bill as enacted — Fund 7017 rose **$97,638,202** while the other
   four lines together **fell $15,575,916**, so the foundation aid total grew by $82,062,286,
-  which is less than the lottery line alone moved. [verified —
-  `crates/project/fixtures/dew-redbook.txt` against `dew-greenbook.txt`]
+  which is less than the lottery line alone moved. [verified]
+  (`crates/project/fixtures/dew-redbook.txt` against `dew-greenbook.txt`)
 
   That is the mechanism caught in a single table across a single bill. It does not show intent —
   the General Assembly was setting a total, and the four GRF and non-lottery lines move for their

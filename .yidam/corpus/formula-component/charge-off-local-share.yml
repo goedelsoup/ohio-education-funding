@@ -34,9 +34,9 @@ description: |
 findings: |
   ### The blindness, measured, running both ways
 
-  [verified — [`crates/regime-diff`](../../../crates/regime-diff/), holding the Fair School
+  [verified] ([`crates/regime-diff`](../../../crates/regime-diff/), holding the Fair School
   Funding Plan's own FY2027 base cost fixed and substituting only the local share mechanism,
-  with the charge-off run against recognized valuation at TY2024]
+  with the charge-off run against recognized valuation at TY2024)
 
       Ottawa Hills Local     valuation/pupil  $176,195   (below the state's 40th percentile)
         23-mill charge-off      $3,402.39/pupil

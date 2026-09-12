@@ -390,6 +390,32 @@ test("a claim tag is read out of markdown, in every form the corpus writes one",
   expect(claimTags("Reported as lines [L] and [M]")).toEqual([]);
 });
 
+test("the justification beside a tag is read as its detail", () => {
+  // The form the corpus writes since the 542-tag pass. `[verified — x]` is not a tag to
+  // `yidam lint` and never was; this is what it asks for, and the gate has to still see the
+  // citation or the pass empties every binding's attribution at once — which is what `a09ffa8`
+  // did and `440e49e` reverted.
+  expect(claimTags("[verified] (`crates/regime-diff`)")).toEqual([
+    { tag: "verified", detail: "`crates/regime-diff`" },
+  ]);
+
+  // Split across two source lines inside one paragraph — 138 of the 542 are written this way,
+  // because a citation that is a markdown link does not fit on the line its claim ends on.
+  expect(
+    claimTags("...districts [verified]\n  ([`crates/dispersion`](../../../crates/dispersion/))"),
+  ).toEqual([{ tag: "verified", detail: "[`crates/dispersion`](../../../crates/dispersion/)" }]);
+
+  // One level of nesting, which a markdown link needs and a statute citation needs twice over.
+  // Closing on the first `)` would truncate both.
+  expect(claimTags("[verified] (R.C. 3317.022(A)(12))")[0]!.detail).toBe("R.C. 3317.022(A)(12)");
+
+  // A blank line ends the reach. A tag that closes a paragraph must not annex a parenthetical
+  // that opens the next one.
+  expect(claimTags("[verified]\n\n(A separate aside.)")).toEqual([
+    { tag: "verified", detail: "" },
+  ]);
+});
+
 // --- The gate, broken on purpose in each position ---------------------------------------------
 
 /** A node that is correct in every position, and the manifest it is correct against. */

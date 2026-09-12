@@ -14,7 +14,7 @@ description: |
   ridership, then — after excluding districts that provide no bus service, the ten with the
   highest cost per student and the ten with the lowest — divide the remaining aggregate cost by
   the remaining aggregate ridership. Division (D) does the same per mile. Both rates are
-  **trimmed means of what districts reported spending**. [verified — the section]
+  **trimmed means of what districts reported spending**. [verified] (the section)
 
   So these are endogenous. A year in which districts spend more on buses raises the rate they
   are paid at the following year, and the twenty-district trim is the only thing bounding that.
@@ -43,8 +43,8 @@ findings: |
   states.
 
   So the three shares differ and are not interchangeable: non-district riders are **5.82% of
-  heads, 10.42% of weighted ridership, and 16.70% of weighted miles**. [verified —
-  [the FY2027 model](../../catalog/dew-fy27-funding-calculator.md), tested in `crates/project`]
+  heads, 10.42% of weighted ridership, and 16.70% of weighted miles**. [verified]
+  ([the FY2027 model](../../catalog/dew-fy27-funding-calculator.md), tested in `crates/project`)
 
   And the fuel arithmetic is not the payment arithmetic. Miles are what burns diesel, so
   non-district riders account for **9.64% of the fuel** and 13.5% of the payment; the weights are
@@ -70,8 +70,8 @@ findings: |
   [monthly series](../../catalog/eia-diesel-prices.md) over those two years gives **+39.6%**, under which the
   rider rate rose about an eighth as fast as fuel rather than a quarter. The convention is the
   right one — fuel is bought all year, so a flow is averaged where an index is read at a point —
-  but a comparison that rests on it should say so. [verified — `crates/dispersion` and
-  `crates/connect`]
+  but a comparison that rests on it should say so. [verified] (`crates/dispersion` and
+  `crates/connect`)
 
   ### Fuel is a cost the rates cannot be shown to track
 
@@ -93,7 +93,7 @@ findings: |
   so a district's bill moves further than the series does. The true coefficient is larger than
   any of these and still not identified. It is a statement about what fifteen annual
   observations of a survey can carry, and it is why the pass-through is carried here as
-  unquantified rather than as a number with a wide interval. [verified — `crates/dispersion`]
+  unquantified rather than as a number with a wide interval. [verified] (`crates/dispersion`)
 
   ### The appropriation began binding, and the year is known
 
@@ -101,23 +101,23 @@ findings: |
   FY2027**. It is the first year the line was cut to fit. The department's own FY2026
   explanation had added the same constraint to the density supplement a year earlier — "prorated
   to remain within amounts provided in the biennial budget" — so the pressure reached two
-  transportation lines in two consecutive years. [verified —
-  [the two models](../../catalog/dew-fy26-funding-calculator.md) and
-  [the explanations](../../catalog/dew-sfpr-line-by-line.md)]
+  transportation lines in two consecutive years. [verified]
+  ([the two models](../../catalog/dew-fy26-funding-calculator.md) and
+  [the explanations](../../catalog/dew-sfpr-line-by-line.md))
 
   ### The state share floor moved twice, and it is a floor on a floor
 
   The school bus payment is multiplied by the greater of the district's own state share
   percentage and a fixed minimum: **45.83% in FY2026 and 50% in FY2027**, both written into
   division (E)(1)(c). H.B. 96's own summary records the sequence as 41.67% → 45.83% → 50%.
-  [verified — the section for the two current values]
+  [verified] (the section for the two current values)
 
   That is a different floor from the [minimum state share](minimum-state-share.yml)'s 10%, five
   times higher, and it binds far more widely. The committed 609-district panel puts **438** on
   the transportation floor against 138 on the formula's; the department's own 611 give 440, and
   both are right about their own population. Transportation is therefore the component where the
   state pays the largest share of cost for the largest number of districts, and it is usually
-  discussed as a small line. [verified — crates/project]
+  discussed as a small line. [verified] (crates/project)
 
   ### Two constants in the calculator are not in the section
 
@@ -132,8 +132,8 @@ findings: |
   figure — one week's average, taken in the first full week of October — and 180 is the school
   year it is multiplied out over. So the multiplier is a convention of the department's rather
   than a constant of the statute's, which is what this node suspected and could not show.
-  [verified — [the department's own explanation](../../catalog/dew-sfpr-line-by-line.md),
-  FY2022 through FY2026, tested in `crates/project`]
+  [verified] ([the department's own explanation](../../catalog/dew-sfpr-line-by-line.md),
+  FY2022 through FY2026, tested in `crates/project`)
 
   The 0.91746 factor on special education transportation is likewise absent from the section, and
   behaves like the enrolment and performance supplements: alive in the calculator and not in
@@ -144,7 +144,7 @@ findings: |
   away, at **R.C. 3317.019(A)(2)** — which the corpus has held in its committed statute extract
   the whole time. The search missed it because the statute does not call it a guarantee: it is *"temporary
   transitional transportation aid"*, and the word **guarantee appears nowhere in the section**.
-  [verified — [`crates/project`](../../../crates/project/tests/the_year_the_guarantee_holds_to.rs)]
+  [verified] ([`crates/project`](../../../crates/project/tests/the_year_the_guarantee_holds_to.rs))
 
   What it pays is the FY2020 amount under H.B. 166's Section 265.220(A)(2) — *"prior to any
   funding reductions authorized by Executive Order 2020-19D"* — less the district's FY2019 payment
@@ -218,7 +218,7 @@ properties:
     R.C. 3317.0212, read. (C) and (D) define the two rates as trimmed means; (E) assembles the
     base payment and states the rider weights and the state share floor; (F) the efficiency
     adjustment; (G) hands non-bus transport to departmental rule; (H) the density supplement.
-    [verified — `ohio-laws`]
+    [verified] (`ohio-laws`)
   simulation_key: |
     `project::panel::supplements::TRANSPORT_PER_RIDER` and `TRANSPORT_PER_MILE`, with
     `TRANSPORT_SCHOOL_DAYS`, `TRANSPORT_NONPUBLIC_WEIGHT` and `TRANSPORT_COMMUNITY_WEIGHT`

@@ -10,8 +10,8 @@ description: |
   filed on his behalf in Perry County on 19 December 1991. [verified]
 
   **Thirty-four years later it is a four-star building with a Performance Index of 89.9**,
-  against a state where the highest exemplar here reaches 105.9 and the lowest 36.8. [verified
-  — `report-card-2425-buildings.csv`] It is neither failing nor comfortable, which is a more
+  against a state where the highest exemplar here reaches 105.9 and the lowest 36.8. [verified]
+  (`report-card-2425-buildings.csv`) It is neither failing nor comfortable, which is a more
   useful fact than either would have been.
 
   **And a quarter of its students are chronically absent** — 25.9% in 2024-25, against 2.5% at
@@ -25,7 +25,7 @@ description: |
   ### It is a Comprehensive Support and Improvement school
 
   Sheridan is on the federal identification list: **ATSI 2022, escalated to CSI 2025**.
-  [verified — `dispersion::identified`, pinned by test]
+  [verified] (`dispersion::identified`, pinned by test)
 
   The building Ohio's constitutional litigation is named for is federally identified as one of
   the state's schools needing comprehensive support, thirty-four years after the case was filed
@@ -56,8 +56,8 @@ findings: |
   Sheridan's 89.9 is the **highest Performance Index on the Comprehensive Support list**, so this
   building marks one edge of the range inside which the published rating stops predicting
   membership. The other edge is 30.3, the lowest index on none of the three lists, and **1,958 of
-  the 3,151 rated buildings sit between them**. [verified —
-  [`crates/dispersion`](../../../crates/dispersion/tests/the_list_the_report_card_does_not_explain.rs)]
+  the 3,151 rated buildings sit between them**. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_list_the_report_card_does_not_explain.rs))
 
   That the escalation route reaches this far up is not an artefact of one school. All 42
   escalations were checked against the same rank order, and **every one of the 11 CSI schools
@@ -108,7 +108,7 @@ properties:
   chronic_absenteeism: 25.9% in 2024-25. [verified]
   roles: |
     DeRolph plaintiff's school, 1991. [verified] **ATSI 2022; CSI 2025**, the latter by escalation
-    after failing to exit ATSI within three years. [verified — `dispersion::identified`] Title I
+    after failing to exit ATSI within three years. [verified] (`dispersion::identified`) Title I
     served status is not published on these lists and is not held.
   series_path: crates/dispersion/fixtures/report-card-2425-buildings.csv, keyed by building IRN 034363. [verified]
 unfilled:

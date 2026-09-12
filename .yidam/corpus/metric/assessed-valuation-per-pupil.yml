@@ -32,8 +32,8 @@ findings: |
   of Education's District Profile Report carry **identical numerators** — multiply the profile's
   valuation per pupil by its enrolled ADM and SD-1's total taxable value comes back exactly, on
   **all 606** districts that join. The two agencies value the same property at the same dollar, so
-  the whole gap between their per-pupil figures is the denominator and nothing else. [verified —
-  [`crates/dispersion`](../../../crates/dispersion/tests/the_metric_whose_table_was_two_tax_years.rs)]
+  the whole gap between their per-pupil figures is the denominator and nothing else. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_metric_whose_table_was_two_tax_years.rs))
 
   They divide it by different pupil counts, on tax year 2023:
 

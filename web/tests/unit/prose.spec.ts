@@ -58,6 +58,30 @@ test("every form the corpus writes a claim tag in becomes a badge", () => {
   );
 });
 
+test("the justification beside a tag badges exactly as one inside it did", () => {
+  // The point of the 542-tag pass: the corpus moved to the form `yidam lint` prescribes, and no
+  // rendered page changed. Both columns below are the same badge, which is what makes the move
+  // an editorial one rather than a redesign.
+  expect(shape(badgeClaims("[verified] (LSC)"))).toBe(shape(badgeClaims("[verified — LSC]")));
+  expect(shape(badgeClaims("[verified] (LSC)"))).toBe("‹verified›{LSC}");
+
+  // Wrapped between the tag and its justification — 138 of the 542 are authored this way.
+  expect(shape(badgeClaims("[verified]\n  (`dispersion::ohio_panel`, pinned by test)"))).toBe(
+    "‹verified›{`dispersion::ohio_panel`, pinned by test}",
+  );
+
+  // Closing on the first `)` would print "(A)(12))" as literal text after the badge.
+  expect(shape(badgeClaims("[verified] (R.C. 3317.022(A)(12))"))).toBe(
+    "‹verified›{R.C. 3317.022(A)(12)}",
+  );
+
+  // Reach stops at a blank line, and at a bracket that is not a tag.
+  expect(shape(badgeClaims("[verified]\n\n(An aside.)"))).toBe("‹verified›\n\n(An aside.)");
+  expect(badgeClaims("[opening the door] (a parenthetical)")).toBe(
+    "[opening the door] (a parenthetical)",
+  );
+});
+
 test("a claim tag inside a claim tag badges both, outermost first", () => {
   // The old pattern found the *inner* tag and badged it in the middle of a sentence, leaving the
   // outer brackets as literal punctuation around it.

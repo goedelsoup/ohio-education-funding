@@ -26,7 +26,7 @@ findings: |
   and a district at 2.99% receives nothing.
 
   The nearest miss cost **$430,477**, and 3 other districts sit between 2.7% and 3% growth.
-  [verified — crates/project]
+  [verified] (crates/project)
 
   A taper would have made the same total payment a continuous function of growth; a cliff makes
   it a step, and the step is where the money is largest relative to the difference in
@@ -39,8 +39,8 @@ findings: |
   least 50 that experienced an average annual percentage change in its enrollment between FY 2016
   and FY 2019 that is **greater than zero**"* — the payment being that percentage times 100 times
   FY2019 enrolment times $20 in FY2020 and $30 in FY2021. So the amount rose continuously with
-  growth and the eligibility test was zero rather than 3 per cent. [verified —
-  [`crates/project`](../../../crates/project/tests/the_supplements_before_this_biennium.rs)]
+  growth and the eligibility test was zero rather than 3 per cent. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_supplements_before_this_biennium.rs))
 
   That makes the cliff a choice rather than the only shape the payment has taken. The paragraph
   above prices the edge of the current threshold; the earlier version had no edge to price.
@@ -105,7 +105,7 @@ properties:
       $250    enrolment growth supplement, per pupil, whole enrolment   line [M]
       3%      three-year enrolment growth threshold for [M]
 
-    Scale, from the committed panel. [verified — crates/project]
+    Scale, from the committed panel. [verified] (crates/project)
       base funding supplement, statewide      $56,079,575.54
       per district                                $92,084.69
       growth supplement, statewide            $39,379,553.15
@@ -131,8 +131,8 @@ properties:
     **The FY2026 row read $40 and that is the FY2027 amount.** H.B. 96's own analysis states the
     pair in one sentence — "$27 per pupil in FY 2026 and $40 per pupil in FY 2027" — and the
     department's FY2026 calculator says $27 on the cell its FY2027 calculator says $40 on. Two
-    independent sources, one vintage error. [verified —
-    [`crates/project`](../../../crates/project/tests/the_parameters_that_said_they_had_no_prior_year.rs)]
+    independent sources, one vintage error. [verified]
+    ([`crates/project`](../../../crates/project/tests/the_parameters_that_said_they_had_no_prior_year.rs))
 
     **These two are the only per-pupil rates in the plan that rose.** Read every statewide scalar
     both calculators state — 35 of them — and 25 hold to the digit across the two years: all six
@@ -155,7 +155,7 @@ properties:
   statutory_basis: |
     None. Not in R.C. 3317.022 and not in any other section this corpus cites; the two rates and
     the threshold are transcribed from the calculator, where they appear as lines [L] and [M].
-    The authority is H.B. 96's temporary law. [verified — the statute audit]
+    The authority is H.B. 96's temporary law. [verified] (the statute audit)
   simulation_key: |
     `project::panel::supplements::BASE_FUNDING_SUPPLEMENT_PER_PUPIL`,
     `ENROLLMENT_GROWTH_SUPPLEMENT_PER_PUPIL` and `ENROLLMENT_GROWTH_THRESHOLD`.

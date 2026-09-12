@@ -27,7 +27,7 @@ description: |
   output. The comparison is only meaningful with the reference year of the cost inputs stated
   alongside — and the distribution matters as much as the average: districts under roughly 700
   students, about one-sixth of Ohio districts, carry base amounts above $8,000 per pupil
-  because minimum staffing floors apply regardless of enrollment. [inference, Fordham] The
+  because minimum staffing floors apply regardless of enrollment. [inference] (Fordham) The
   statewide average conceals a bimodal distribution driven by district size.
 properties:
   name: Base cost per pupil
@@ -58,8 +58,8 @@ properties:
     prose, biennium by biennium, and twelve of them have been committed in this repository since
     before this node's series was written. Each row below carries LSC's own sentence in
     `project::base_cost::SERIES`, and a test requires that sentence to be in the act's greenbook
-    and to contain that row's figure. [verified —
-    [`crates/project`](../../../crates/project/tests/the_series_that_needed_a_deflator.rs)]
+    and to contain that row's figure. [verified]
+    ([`crates/project`](../../../crates/project/tests/the_series_that_needed_a_deflator.rs))
 
         FY     nominal    FY2026 $   how the amount came about
         1999  $4,420.00  $8,881.27   measured: the average adjusted base expenditure of the 127
@@ -150,13 +150,13 @@ properties:
     publishers: Fordham, LSC in the H.B. 33 greenbook, and LSC in H.B. 96's. H.B. 33 computed one
     amount for FY2024 and required FY2025 fixed at it; H.B. 96 "maintains the use of the FY 2024
     statewide average amounts ($8,242 and $9,856, respectively) in FY 2026 and FY 2027". Four
-    fiscal years, one figure. [verified — LSC greenbook]
+    fiscal years, one figure. [verified] (LSC greenbook)
 
     The same thing happened at the other end of the plan and this node caught it there. FY2022's
     $7,349.22 is the aggregate over the ADM; **$7,352 is the stated average**, and H.B. 110 fixed
     FY2023 at the FY2022 amount, so the $2.78 between the node's FY2022 and FY2023 rows is the
     quotient-against-multiplier gap the FY2027 paragraph below describes, not a year of growth.
-    [verified — LSC greenbook]
+    [verified] (LSC greenbook)
 
     ### The estimate at enactment is not the amount that gets frozen
 
@@ -182,7 +182,7 @@ properties:
     **And the gap has an explanation, which the corpus recorded as a mystery.** The multiplier is
     not an FY2027 quantity at all. H.B. 96 holds the categorical multiplicands at their **FY2024**
     values: "The budget maintains the use of the FY 2024 statewide average amounts ($8,242 and
-    $9,856, respectively) in FY 2026 and FY 2027." [verified — LSC greenbook] So $8,241.61 is a
+    $9,856, respectively) in FY 2026 and FY 2027." [verified] (LSC greenbook) So $8,241.61 is a
     FY2024 average carried forward by statute, while $8,257.55 is what the FY2027 base cost model
     actually computes — two different years, which is why neither is recoverable from the other
     and why the difference is small but not zero.
@@ -195,8 +195,8 @@ properties:
     ([`project::panel::categoricals::AVERAGE_BASE_COST_PER_PUPIL`](../../../crates/project/src/panel/categoricals.rs))
     and what the open-enrolment clawback charges per FTE — so it is a *stated input* rather than a
     derived average, and it is not recoverable from the two figures above it. Any statement of the
-    form "aggregate ÷ ADM = the average the formula uses" is false here by $15.94. [verified —
-    summed from `crates/foundation/fixtures/fy27-department-model.csv`, 609 districts]
+    form "aggregate ÷ ADM = the average the formula uses" is false here by $15.94. [verified]
+    (summed from `crates/foundation/fixtures/fy27-department-model.csv`, 609 districts)
 
     Note the ADM trend: 1,499,918.26 in FY2022 against 1,425,005.53 projected for FY2027, a
     5% decline. Aggregate base cost still rises because the per-pupil figure rises faster than
@@ -229,13 +229,13 @@ properties:
     a dollar of extra state aid per pupil**, not the state's percentage of it: local capacity
     does not move when base cost does. Scaling the state share proportionally instead is the
     obvious-looking mistake, and it understates the cost of an increase by the whole local
-    share. [verified — `crates/project`]
+    share. [verified] (`crates/project`)
 
     The exception is the bottom of the wealth distribution, where the **minimum state share**
     floors the effect. That minimum is **10%**, not the 5% the plan was enacted with — it is
     set by each biennial budget and it doubled, and **138 of 609 districts sit exactly on it**
-    in the FY2027 model. [verified — the department's own Notes sheet states 0.1 for FY2026 and
-    FY2027]
+    in the FY2027 model. [verified] (the department's own Notes sheet states 0.1 for FY2026 and
+    FY2027)
 
     The aggregate response is therefore **not linear**. Each increment lifts districts off the
     [guarantee](../formula-component/temporary-transitional-aid-guarantee.yml) and onto a

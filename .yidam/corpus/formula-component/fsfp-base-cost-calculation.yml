@@ -28,8 +28,8 @@ description: |
   build-up is only a costing if the prices are current, and pricing FY2022 staffing at FY2018
   salaries produces a number that describes what the staffing would have cost four years
   earlier. Teacher salaries rose from $62,353 in 2018 to $67,654 in 2022 — 8.5% — while the
-  model kept using the earlier figure. [inference, Fordham — the department's own
-  pair is $62,696.18 and $68,022.22, an 8.5% rise either way] H.B. 33 updated the reference year
+  model kept using the earlier figure. [inference] (Fordham — the department's own
+  pair is $62,696.18 and $68,022.22, an 8.5% rise either way) H.B. 33 updated the reference year
   to FY2022; [H.B. 96](../legislation/hb-96-2025.yml) held it there. [inference] The reference
   year, not the phase-in percentage, is the parameter that decides whether this component means
   what its name says.
@@ -37,7 +37,7 @@ description: |
   The minimum staffing floors have a distributional consequence that is easy to miss: because a
   district gets at least six special teachers and five wellness staff regardless of size, small
   districts carry much higher per-pupil base costs — above $8,000 for the roughly one-sixth of
-  Ohio districts under about 700 students. [inference, Fordham]
+  Ohio districts under about 700 students. [inference] (Fordham)
 findings: |
   **What the stale input year looks like on the ground.** FY2022 base cost priced a teacher at
   the FY2018 statewide average of $62,696. By FY2024, the lowest-paying of this corpus's three

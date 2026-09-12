@@ -57,14 +57,14 @@ findings: |2
       none        FY2012-FY2021                           LSC, H.B. 59 greenbook, 130th G.A.
       0.5 mill    JVSDs, throughout and still             LSC, H.B. 110 greenbook, 134th G.A.
 
-  [verified — [DeRolph I](../litigation/derolph-i-1997.yml) at ¶97 recites the progression with
+  [verified] ([DeRolph I](../litigation/derolph-i-1997.yml) at ¶97 recites the progression with
   its session-law citations; the [LSC Complete
   Resource](../../catalog/lsc-school-funding-complete-resource.md) gives the rate and base
   still operative in FY2008; the last three rows are LSC's own budget analyses, committed at
   [`lsc-education-greenbooks.txt`](../../../crates/project/fixtures/lsc-education-greenbooks.txt)
   and read by
   [`crates/project`](../../../crates/project/tests/the_charge_off_after_the_charge_off.rs). Carried
-  in [`crates/regime-diff`](../../../crates/regime-diff/src/charge_off.rs).]
+  in [`crates/regime-diff`](../../../crates/regime-diff/src/charge_off.rs).)
 
   ### The rate stopped moving because a court stopped it
 
@@ -92,8 +92,8 @@ findings: |2
   flat by cutting the rate; recognized valuation holds its state aid flat by deferring the
   base. Two mechanisms answering the same event from opposite ends of the same multiplication —
   and LSC discusses them under one heading, "Provisions that Soften the Effect of H.B. 920 Tax
-  Reduction Factors", which is the likeliest way the conflation happened. [verified — [LSC
-  Complete Resource](../../catalog/lsc-school-funding-complete-resource.md), pp. 19 and 82]
+  Reduction Factors", which is the likeliest way the conflation happened. [verified] ([LSC
+  Complete Resource](../../catalog/lsc-school-funding-complete-resource.md), pp. 19 and 82)
 
   **The correction changes which districts are affected, not only by how much.** Under the old
   reading the districts overcharged were those with long-bitten reduction factors: a wealth and
@@ -114,8 +114,8 @@ findings: |2
 
   The separation is not marginal: the median county's real property rose **28.6%** in its event
   year against **1.5%** in its quiet ones, and all 88 counties' largest jump falls in the year
-  the calendar says. [verified — `crates/regime-diff/src/recognized_valuation.rs` and
-  `tests/recognized_valuation_against_the_abstract.rs`]
+  the calendar says. [verified] (`crates/regime-diff/src/recognized_valuation.rs` and
+  `tests/recognized_valuation_against_the_abstract.rs`)
 
   At TY2024 recognized valuation is **8.20% below total taxable value statewide — $34.5bn, or
   $793m of charge-off at 23 mills**. It falls entirely by calendar: 12.97% of value for the 184
@@ -126,7 +126,7 @@ findings: |2
   constant.** LSC put the long-run effect nearer $125m a year, about 2% of valuation; TY2024 is
   four times that because Ohio's 2023–24 revaluations were four times the size LSC's own worked
   example assumes. What is not cyclical is the direction — total taxable value always
-  overstates the charge-off. [verified, and the long-run figure is LSC's]
+  overstates the charge-off. [verified] (and the long-run figure is LSC's)
 
   **One component is still not modelled.** LSC records an **exempt property adjustment** to
   recognized valuation for about 13 districts holding large state-owned exempt property —
@@ -135,10 +135,10 @@ findings: |2
 
   **What the rate was doing to the system.** At 23 mills against a statewide operating rate of
   32.9 mills in TY2006, the base cost formula equalized about **69.9%** of local operating
-  revenue; a higher rate equalizes more and a lower rate less. [verified — LSC] And the phantom
+  revenue; a higher rate equalizes more and a lower rate less. [verified] (LSC) And the phantom
   revenue the mechanism generated was large enough to need its own program: the **charge-off
   supplement**, known as gap aid, reimbursed the difference and cost about **$73.5 million
-  across 145 districts in FY2008**. [verified — LSC] A mechanism requiring a supplement for a
+  across 145 districts in FY2008**. [verified] (LSC) A mechanism requiring a supplement for a
   quarter of the state is the argument for replacing it.
 
   ### The phantom revenue, counted — and it is not a minority case
@@ -161,15 +161,15 @@ findings: |2
   still gains: the bottom four lose by $118 to $365 per pupil, and the poorer the quintile the
   less it loses. The *shape* survives — the plan is genuinely more generous to property-rich
   districts than the charge-off was — but "every quintile gains" was an artifact of charging
-  every district about 8% too much on the counterfactual side. [verified —
-  `crates/regime-diff/tests/the_charge_off_against_local_capacity.rs`]
+  every district about 8% too much on the counterfactual side. [verified]
+  (`crates/regime-diff/tests/the_charge_off_against_local_capacity.rs`)
 
   A correction of this size from a definition is the argument for the node carrying the base
   beside the rate, which it did, and for it being right about what the base *is*, which it was
   not.
 
   **Joint vocational school districts were charged off at 0.5 mills**, not the district rate.
-  [verified — LSC] This is the one place the "uniform statewide" description is false, and a
+  [verified] (LSC) This is the one place the "uniform statewide" description is false, and a
   comparison run over JVSDs at the district rate is wrong by a factor of forty-six.
 
   ### What happened after FY2009, from a source the node had not considered
@@ -179,8 +179,8 @@ findings: |2
   There is a third route, committed here the whole time and never read: LSC's education analysis of
   every enacted budget act from the 124th General Assembly through the 135th — 12 documents
   covering FY2002 through FY2025 without a gap. One test opens the file to check that each act the
-  budget Catalog cites has a node; nothing had read a sentence of it. [verified —
-  [`crates/project`](../../../crates/project/tests/the_charge_off_after_the_charge_off.rs)] An
+  budget Catalog cites has a node; nothing had read a sentence of it. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_charge_off_after_the_charge_off.rs)) An
   analysis is not an act, and where the two differ the act governs; what an analysis gives that an
   act does not is a *rate and a base stated in prose*, which is the shape a parameter series needs.
 
@@ -335,7 +335,7 @@ properties:
     base in prose**, and twelve of them — the 124th General Assembly through the 135th — are
     committed at
     [`lsc-education-greenbooks.txt`](../../../crates/project/fixtures/lsc-education-greenbooks.txt).
-    [verified — [`crates/project`](../../../crates/project/src/greenbook.rs)] An analysis is not an
+    [verified] ([`crates/project`](../../../crates/project/src/greenbook.rs)) An analysis is not an
     act and the act governs where they differ, so a rate taken from here is LSC's account of the
     law rather than the law. For a *parameter series* that is the right trade: session law states a
     rate inside an appropriation act's amending title, and an analysis states it in a sentence
@@ -352,7 +352,7 @@ properties:
     Measured at FY2027 base cost on recognized valuation: **65 of 606 districts** would have a
     23-mill charge-off exceeding their entire computed base cost, and so would receive no base
     cost aid at all. The charge-off had no minimum state share — that is a Fair School Funding
-    Plan invention — so the mechanism simply truncated at zero. [verified — `crates/regime-diff`]
+    Plan invention — so the mechanism simply truncated at zero. [verified] (`crates/regime-diff`)
 
     The same count on total taxable value is 81, which is the measure of how much a wrong
     valuation base moves a distributional result: a fifth of this finding was the base.

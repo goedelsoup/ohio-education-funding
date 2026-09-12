@@ -10,7 +10,7 @@ description: |
 
   **The base cost formula amount** rises 3.0% a year to **$5,565 in FY2008 and $5,732 in FY2009**,
   still built from three components — base classroom teacher cost, and the two others the formula
-  had always carried. [verified — the greenbook]
+  had always carried. [verified] (the greenbook)
 
   ### Three structural changes, two of them removals
 
@@ -79,7 +79,7 @@ properties:
     current-year data; created Closing the Achievement Gap on an academic distress index.
   vetoes: |
     Three, and the first is a scholarship programme that would not exist for another four years.
-    [verified — the greenbook]
+    [verified] (the greenbook)
 
     **The Special Education Scholarship Pilot Program**, creating scholarships for children with
     disabilities to attend alternative public or private special education programmes, **funded by
@@ -104,7 +104,7 @@ properties:
     over the state's share. A district qualified only with **both** that index and its poverty
     index at 1.0 or above, and **31 districts** did; statewide 447 of 3,867 buildings
     (11.6%) carried one of the two ratings on the 2005-06 report card.
-    [verified — crates/project, `rating_payments`, pinned by test]
+    [verified] (crates/project, `rating_payments`, pinned by test)
 
     **It paid on failure, and in its second year it also paid on improvement.** A district that
     qualified in FY2008 and lowered its academic distress percentage received its FY2008 subsidy

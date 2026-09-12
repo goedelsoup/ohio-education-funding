@@ -26,6 +26,8 @@
  *
  * ```
  * [verified]                                     bare
+ * [verified] (LSC)                               justification beside the tag — the current form
+ * [verified] ([`ode-idea-part-b-allocations`](…)) …with a link in it
  * [verified — LSC]                               em dash
  * [inference, Fordham]                           comma
  * [verified as proposed]                         no punctuation at all — 13 occurrences
@@ -33,6 +35,12 @@
  * [verified — [`ode-idea-part-b-allocations`](…)] justification containing a link
  * [verified, and its intent is [open]]           a tag inside a tag
  * ```
+ *
+ * The first three are what the corpus writes now and the rest are what it used to; the folded
+ * forms are kept because a tag is only a tag to `yidam lint` when the three tokens stand alone,
+ * and the 37 that assert two standings at once are staying folded on upstream's own advice. The
+ * badge is identical either way — {@link trailingParenthetical} eats the parentheses — so the
+ * corpus-wide move from the fourth form to the second changed no rendered page.
  *
  * The last two are why this is a bracket scanner rather than a regular expression. A regex cannot
  * match balanced brackets, and the one that used to be here ran `[^\[\]]+` across a nested opening
@@ -178,6 +186,43 @@ function closingBracket(text: string, open: number, code: Span[]): number {
   return -1;
 }
 
+/**
+ * The justification written *beside* a tag, as `[start, end)` over `html`, or null.
+ *
+ * `[verified] (crates/dispersion)` is the form yidam prescribes and the form this corpus now
+ * writes; see {@link badgeClaims}. Scanned rather than matched, for the same reason
+ * {@link closingBracket} is: a justification may contain a rendered link, whose `href` and text
+ * are opaque here, and one that ends in `(A)(12)` — `[verified] (R.C. 3317.022(A)(12))` — closes
+ * on the last `)`, not the first.
+ *
+ * The gap admits one newline and no blank line. A tag ending a paragraph must not reach forward
+ * into a parenthetical opening the next one, and by this point the markdown processor has put a
+ * `</p>` between them anyway — the newline allowance is for a tag and its justification split
+ * across two source lines inside one paragraph, which is how 138 of them are written.
+ */
+function trailingParenthetical(html: string, from: number, code: Span[]): [number, number] | null {
+  const gap = /^[^\S\n]*\n?[^\S\n]*\(/.exec(html.slice(from));
+  if (!gap) return null;
+  const open = from + gap[0].length - 1;
+  if (spanAt(code, open)) return null;
+
+  let depth = 0;
+  for (let index = open; index < html.length; index += 1) {
+    const span = spanAt(code, index);
+    if (span) {
+      index = span[1] - 1;
+      continue;
+    }
+    const char = html[index];
+    if (char === "(") depth += 1;
+    else if (char === ")") {
+      depth -= 1;
+      if (depth === 0) return [open + 1, index];
+    }
+  }
+  return null;
+}
+
 /** The claim tag this bracket's contents open with, if they open with one. */
 function leadingTag(inner: string): (typeof TAGS)[number] | null {
   for (const tag of TAGS) {
@@ -246,10 +291,15 @@ export function badgeClaims(html: string): string {
       continue;
     }
 
-    const detail = inner.slice(tag.length).replace(/^\s*[—–,;:]?\s*/, "");
+    const inside = inner.slice(tag.length).replace(/^\s*[—–,;:]?\s*/, "");
+    const beside = trailingParenthetical(html, close + 1, code);
+    const detail = [inside, beside ? html.slice(beside[0], beside[1]) : ""]
+      .filter((part) => part !== "")
+      .join(" ");
+
     out += `<span class="claim ${tag}">${tag}</span>`;
     if (detail !== "") out += `<span class="claim-detail"> ${badgeClaims(detail)}</span>`;
-    index = close + 1;
+    index = beside ? beside[1] + 1 : close + 1;
   }
 
   return out;

@@ -6,7 +6,7 @@ summary: >-
   neither gate in the section is a separate decision.
 description: |
   Targeted assistance pays a district the sum of a capacity amount and a wealth amount, and the
-  two are built differently. [verified — R.C. 3317.0217]
+  two are built differently. [verified] (R.C. 3317.0217)
 
   **The capacity tier** takes the gap between statewide median weighted wealth and the
   district's own, at **0.008** on each side, and then scales it by district size: zero below 200
@@ -21,7 +21,7 @@ description: |
   0.0112)] × enrolled ADM`, and the two coefficients are not the same number. A district
   exactly at the median does not get zero: it gets `median × 0.0028 × ADM`. The tier pays
   something to every district down to a wealth index of 0.8, below which it pays nothing.
-  [verified — the section]
+  [verified] (the section)
 
   That asymmetry is easy to read as a transcription error and it is in the statute. Both figures
   appear in the same bracketed expression in division (C)(4)(b), to four and three decimals
@@ -32,8 +32,8 @@ description: |
   rates as *"multiplied by 14 mills"*, *"multiplied by 11.2 mills"* and *"equal to 8 mills"*, and
   so does every account of every ancestor this component has had. Read in mills the wealth tier
   says something plain: charge the median district 14, credit the district its own 11.2, pay the
-  difference. [verified —
-  [`crates/project`](../../../crates/project/tests/the_component_that_was_two_components.rs)]
+  difference. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_component_that_was_two_components.rs))
 findings: |
   ### Neither eligibility gate is a decision
 
@@ -45,8 +45,8 @@ findings: |
   The capacity tier's index test at 1.0 has the same shape: its bracket is `median − district`,
   which is zero at the median. Both gates prevent a negative payment; neither excludes a district
   that would otherwise have been paid. So the section states nine constants and has seven degrees
-  of freedom. [verified —
-  [`crates/project`](../../../crates/project/tests/the_component_that_was_two_components.rs)]
+  of freedom. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_component_that_was_two_components.rs))
 
   ### The size ramp is a cliff and a ramp, not one shape
 
@@ -72,8 +72,8 @@ findings: |
   to the wealth of the 80th percentile district on a blend of valuation with income — a millage
   instrument, a wealth blend and a rank threshold, which is what this parameter is.
   [`fsfp-targeted-assistance`](../formula-component/fsfp-targeted-assistance.yml) carries the
-  succession and the reason gap aid is not the ancestor. [verified —
-  [`crates/project`](../../../crates/project/tests/the_component_targeted_assistance_succeeded.rs)]
+  succession and the reason gap aid is not the ancestor. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_component_targeted_assistance_succeeded.rs))
 
   The rate has moved six times in twenty-five years and the *target* has moved once. Parity aid
   equalised to the 80th percentile; H.B. 59's tier one equalised to the 490th lowest district of
@@ -85,8 +85,8 @@ findings: |
 
   The `unfilled:` on this node sent the reader to Ohio Laws' version archive. The twelve LSC
   analyses this repository already holds carry more than a schedule of rates — they carry the
-  component's shape, biennium by biennium. [verified —
-  [`crates/project`](../../../crates/project/tests/the_component_that_was_two_components.rs)]
+  component's shape, biennium by biennium. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_component_that_was_two_components.rs))
 
   **FY2014-15, Am. Sub. H.B. 59.** Two tiers, neither of them these. Tier one blended valuation
   and income **50/50** rather than 60/40, indexed against the *statewide* wealth per pupil rather
@@ -117,7 +117,7 @@ findings: |
   LSC estimated targeted assistance at **$988.4 million** in FY2022 before guarantees and
   phase-ins — $738.5m of it the wealth amount, $250.0m the capacity amount. The FY2027 panel
   computes $1,364,333,154.32 for the same two tiers under the same nine constants, which is
-  **38%** more. [verified — crates/project]
+  **38%** more. [verified] (crates/project)
 
   The medians are what moved. Both tiers pay a *difference* between the median district's wealth
   and the district's own, so a statewide revaluation that lifts every district's property value
@@ -175,20 +175,20 @@ properties:
       FY2020-21  —         the Bridge formula computed neither
       FY2022     14 mills / 11.2 mills / 8 mills, and one payment instead of two
 
-    FY2027 medians, from the department's model rather than from statute. [verified —
-    crates/project]
+    FY2027 medians, from the department's model rather than from statute. [verified]
+    (crates/project)
       median weighted wealth            $392,151,306.63
       median weighted wealth per pupil     $276,708.97
 
-    What the two tiers pay together, summed over the panel's 609 districts: [verified —
-    crates/project]
+    What the two tiers pay together, summed over the panel's 609 districts: [verified]
+    (crates/project)
       targeted assistance, statewide  $1,364,333,154.32
 
     The medians are inputs and this is the outcome, which is why the node carried the first two
     for a year without the third.
 
     What LSC estimated the same two tiers at when the plan began, before guarantees or phase-ins:
-    [verified — crates/project]
+    [verified] (crates/project)
       FY2022  targeted assistance   $988.4 million
       FY2022  the wealth amount     $738.5 million
       FY2022  the capacity amount   $250.0 million
@@ -196,7 +196,7 @@ properties:
     R.C. 3317.0217, read. (B) for the capacity tier including the size brackets, (C) for the
     wealth tier and its two coefficients, and (B)(1) for the 60/40 weighted wealth blend that
     refers back to divisions (A)(1)(a) and (A)(2)(a) of R.C. 3317.017. Payment is made under
-    R.C. 3317.022(A). [verified — `ohio-laws`]
+    R.C. 3317.022(A). [verified] (`ohio-laws`)
   simulation_key: |
     `project::panel::categoricals::TA_CAPACITY_RATE`, `TA_WEALTH_RATE`,
     `TA_WEALTH_OFFSET_RATE`, `TA_WEALTH_BLEND`, `TA_CAPACITY_MINIMUM_ADM`,

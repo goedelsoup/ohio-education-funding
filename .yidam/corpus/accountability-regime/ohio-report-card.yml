@@ -30,9 +30,9 @@ description: |
   **The rating is built from six components and none of them is scored on a fixed standard.**
   The section names the components and weights them, delegates every threshold to administrative
   rule, and scores achievement against a maximum refitted annually — so a rating is a position in
-  a distribution rather than a level. What that costs is measured below. [verified — computed;
+  a distribution rather than a level. What that costs is measured below. [verified] (computed;
   see
-  [`crates/dispersion/tests/the_weights_behind_the_index.rs`](../../../crates/dispersion/tests/the_weights_behind_the_index.rs)]
+  [`crates/dispersion/tests/the_weights_behind_the_index.rs`](../../../crates/dispersion/tests/the_weights_behind_the_index.rs))
 
   Whether the 2022-23 change of scale moved any district across the distress trigger is not
   established and is exactly the kind of question the two-regime model exists to ask. [open]
@@ -78,14 +78,14 @@ findings: |
   The statute says "two per cent" and does not say how to round it; two per cent of 607 is
   12.14, and the file decides: the mean of the top 13 scores is 109.81 and rounds to what was
   published, while the top 12 give 109.9 and the top 14 give 109.7. The department takes the
-  ceiling. [verified — computed; see
-  [`crates/dispersion/tests/the_weights_behind_the_index.rs`](../../../crates/dispersion/tests/the_weights_behind_the_index.rs)]
+  ceiling. [verified] (computed; see
+  [`crates/dispersion/tests/the_weights_behind_the_index.rs`](../../../crates/dispersion/tests/the_weights_behind_the_index.rs))
 
   **So the rating is a share and the Index is a level, and they can move in opposite
   directions.** The denominator was 108.8 in 2022-23 and 109.8 in 2024-25 — a point, against a
   median district's whole three-year range of 2.1 points on the Index itself. **121 of 607
   districts improved on the Index over that window and declined as a share of the maximum.**
-  [verified — computed] One district in five went backwards on the measure the star rating is
+  [verified] (computed) One district in five went backwards on the measure the star rating is
   awarded on while going forwards on the measure the corpus quotes.
 
   **The count is exact and its edge is soft, so take the mechanism rather than the cut.** 28 of
@@ -93,7 +93,7 @@ findings: |
   direction, and the nearest changes by five millionths. What does not depend on where the cut
   falls is the denominator itself: it rose **0.919 per cent**, so every district's share fell by
   that much relative to its own Index, and the 121 are the subset whose gain did not cover it.
-  [verified — computed]
+  [verified] (computed)
 
   This is a second and stronger reason for the rule
   [performance-index](../metric/performance-index.yml) already states as "use the Index, not the
@@ -104,7 +104,7 @@ findings: |
 
   Division (D)(4)(b)'s requirement that "more than half of all districts or buildings do not
   earn the same performance rating" is satisfied on the achievement component with room to
-  spare — the modal rating is four stars at 227 of 607, or 37.4%. [verified — computed] It is a
+  spare — the modal rating is four stars at 227 of 607, or 37.4%. [verified] (computed) It is a
   weak constraint, and the same column shows why: on that component three districts hold one
   star and 91 hold five. Nothing in the section requires the scale to be centred, only that it
   not collapse, and the corpus holds no year in which any component came close to collapsing.
@@ -120,8 +120,8 @@ findings: |
   where one does — *academic distress index*, *graduation bonus*, *third grade reading bonus*,
   *performance bonus* — appear in four of the twelve greenbooks and no others: H.B. 119, H.B. 64,
   H.B. 49, and H.B. 166, which mentions them only to say what its freeze did to them. **8 of the 12
-  bienniums carry none at all.** [verified — crates/project, `rating_payments::quiet`, pinned by
-  test]
+  bienniums carry none at all.** [verified] (crates/project, `rating_payments::quiet`, pinned by
+  test)
 
       FY2004-05   H.B.  95   earmarks to academic emergency districts     on failure   outside the formula
       FY2006-07   H.B.  66   EdChoice eligibility on building ratings     on failure   deducted from the district
@@ -138,7 +138,7 @@ findings: |
   above — thirty-one qualified. The bonuses paid more where results were better, at fifty times
   the rate, and multiplied by the state share index, which makes a payment larger in a poorer
   district. The supplement now in force pays on results and multiplies by nothing.
-  [verified — crates/project, `rating_payments`, pinned by test]
+  [verified] (crates/project, `rating_payments`, pinned by test)
 
   **The un-equalised form is the one that survived.** H.B. 166's freeze held every district and
   JVSD at its FY2019 foundation aid, so a district's bonus stopped moving with its report card,

@@ -30,8 +30,8 @@ findings: |
 
   Across the 606 districts where both are held, the Performance Index correlates with the
   economically disadvantaged share at **−0.846**, which is 71.6% of the cross-district variance
-  in the Index. [verified — computed; see
-  [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)]
+  in the Index. [verified] (computed; see
+  [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs))
 
   Nothing else in this corpus comes close to that. It is the first thing to say about any
   district-level correlate of the Index, because almost every such correlate is partly this
@@ -194,8 +194,8 @@ properties:
     nowhere this corpus holds, so they are not transcribed; they are *recovered*. The department
     prints each district's Index beside the seven achievement-level shares it was computed from,
     607 times over, which is an overdetermined system in seven unknowns. Least squares on it
-    returns, taking proficient as the reference: [verified — computed; see
-    [`crates/dispersion/tests/the_weights_behind_the_index.rs`](../../../crates/dispersion/tests/the_weights_behind_the_index.rs)]
+    returns, taking proficient as the reference: [verified] (computed; see
+    [`crates/dispersion/tests/the_weights_behind_the_index.rs`](../../../crates/dispersion/tests/the_weights_behind_the_index.rs))
 
         not tested    0.0        accomplished  1.1
         limited       0.3        advanced      1.2
@@ -224,8 +224,8 @@ properties:
     the `dew-report-card` connector and committed at
     [`crates/dispersion/fixtures/report-card-2425-district-data.csv`](../../../crates/dispersion/fixtures/report-card-2425-district-data.csv).
   series: |
-    2024-2025, 607 rated traditional districts [verified — computed from the committed
-    fixture; the same figures appear in OCG White Paper 013 and reproduce exactly]:
+    2024-2025, 607 rated traditional districts [verified] (computed from the committed
+    fixture; the same figures appear in OCG White Paper 013 and reproduce exactly):
 
       minimum   53.1
       p25       81.5

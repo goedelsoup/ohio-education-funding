@@ -28,7 +28,7 @@ description: |
   required to produce a specified amount of tax money, including a tax levied under section
   5705.199 or 5748.09 of the Revised Code, or an amount to pay debt charges." R.C. 5705.199 is
   the emergency levy section. Fixed-sum levies are exempt from reduction as a matter of law.
-  [verified — `ohio-laws`, `crates/project/tests/the_statute_behind_the_weights.rs`]
+  [verified] (`ohio-laws`, `crates/project/tests/the_statute_behind_the_weights.rs`)
 
   An absence of an effect in one group is not an absence of the mechanism, and the correction
   is recorded rather than quietly replaced because the wrong reading was the more natural one.
@@ -36,8 +36,8 @@ findings: |
   **How much the reduction factors have actually taken: the median district has lost 42.4% of
   the millage its voters approved.** The median voted current operating rate is 42.31 mills
   against a median effective Class 1 rate of 23.40, and the largest reduction in the state is
-  74.7%. [verified — FY2024 District Profile Report, `current_operating_millage_ty23` against
-  `effective_class1_millage_ty23`] This is the magnitude of the mechanism the floor bounds, and
+  74.7%. [verified] (FY2024 District Profile Report, `current_operating_millage_ty23` against
+  `effective_class1_millage_ty23`) This is the magnitude of the mechanism the floor bounds, and
   it went unstated here for as long as it did because the voted-millage column was present in
   the fixture and never parsed. Note the figure is the median of the per-district ratio, not
   one minus the ratio of the two medians, which is a different and meaningless quantity.
@@ -53,9 +53,9 @@ findings: |
   decimals. [verified] Fixed, with `crates/millage/tests/against_published_tables.rs` holding
   the crate to 1,218 published district-years.
 
-  **How many districts sit at the floor: 170 of 606, or 28.1%, in TY2023.** [verified —
-  computed from the FY2024 District Profile Report; see
-  [`crates/dispersion`](../../../crates/dispersion/tests/cupp_fy24.rs)] A further 63 sit within
+  **How many districts sit at the floor: 170 of 606, or 28.1%, in TY2023.** [verified]
+  (computed from the FY2024 District Profile Report; see
+  [`crates/dispersion`](../../../crates/dispersion/tests/cupp_fy24.rs)) A further 63 sit within
   half a mill of it, so 233 districts — more than a third of the state — are at or effectively
   against the floor. The statewide median effective Class 1 rate is 23.40 mills and the maximum
   is 84.29. [verified]
@@ -83,8 +83,8 @@ findings: |
   for these districts would pin at 20 mills. It does not: on TY2024 it runs from 19.719 to
   21.562 across the fourteen, and three of them land within a hundredth of 20. Statewide the
   same measure puts **62 of 611** districts at 20.00 against **155** on the Class 1 rate, so
-  the Class 1 figure is the one the floor governs. [verified — TY2024 Table SD-1, all four
-  counts from the same year]
+  the Class 1 figure is the one the floor governs. [verified] (TY2024 Table SD-1, all four
+  counts from the same year)
 
   The TY2023 column of the same table says 76 of 611 on the combined measure against 172 on
   Class 1, with one of the fourteen within a hundredth of 20. Both years disconfirm the
@@ -109,7 +109,7 @@ findings: |
   taxes** against that class"* — defined at (E)(1) as the amount by which a joint vocational
   district's TY1981 current-expense taxes exceeded two-tenths of one per cent of value, floored
   at zero.
-  [verified — `crates/project/tests/the_term_the_floor_model_omits.rs`]
+  [verified] (`crates/project/tests/the_term_the_floor_model_omits.rs`)
 
   This is not the combined-base hypothesis above wearing a different hat. That one changed the
   denominator and was tested and failed; this adds to the numerator, and a district carrying a
@@ -123,7 +123,7 @@ findings: |
   twenty sits more than three tenths of a mill below the floor, and every district more than
   half a mill below is one whose voters never approved twenty — the two populations do not
   overlap. A floor being violated has no bound; an additive term left out of a model has a bound
-  the size of the term. [verified — computed]
+  the size of the term. [verified] (computed)
 
   Confirming it looked as though it needed TY1981 joint vocational current-expense rates by
   district, which no source the corpus holds carries. It did not. The next section disconfirms the
@@ -136,8 +136,8 @@ findings: |
   including them — and the difference is the joint vocational levy on that district's own parcels.
   **501 of 611 districts carry one in TY2024 and 110 carry none**, and the 110 concentrate where
   career-technical education is not delivered by a joint vocational district: Cuyahoga, Stark,
-  Hancock, Summit and Franklin hold 57 of them between them. [verified —
-  [`crates/dispersion`](../../../crates/dispersion/tests/the_neighbour_that_sits_at_exactly_twenty.rs)]
+  Hancock, Summit and Franklin hold 57 of them between them. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_neighbour_that_sits_at_exactly_twenty.rs))
 
   The rosters at [Eastland-Fairfield](../education-agency/eastland-fairfield-ctc.yml) are still
   unpopulated and none of this populates them. The abstract answers *whether a district is in a
@@ -206,8 +206,8 @@ findings: |
   **What two tax years establish that one could not.** Of the 416 districts that began TY2023
   above the floor, 301 saw their effective Class 1 rate fall by TY2024; of the 193 that began
   at it, 9 did. 97.1% of every effective-rate reduction in Ohio happens above the floor.
-  [verified — computed in `crates/bundle` from TY2023 and TY2024 Table SD-1, over the 609
-  districts of the FY2027 funding model, at `RATE_FALL_TOLERANCE`]
+  [verified] (computed in `crates/bundle` from TY2023 and TY2024 Table SD-1, over the 609
+  districts of the FY2027 funding model, at `RATE_FALL_TOLERANCE`)
 
   The split must be taken at the *start* of the interval. Classifying by the end year lets a
   district that fell *to* the floor be counted as a floor district with a falling rate, which
@@ -230,7 +230,7 @@ findings: |
   measure uses — Ohio's comparable districts cut into quartiles on local revenue per pupil — the
   answer is monotone and steep: **46.1% of the poorest quartile sits at the floor against 12.5% of
   the richest**, with 39.5% and 28.3% in between.
-  [verified — crates/regime-diff, `reappraisal_incidence::by_wealth`, pinned by test]
+  [verified] (crates/regime-diff, `reappraisal_incidence::by_wealth`, pinned by test)
 
   This is the general form of the observation already recorded above about the six districts that
   never voted twenty mills, all of them in Appalachian and southern counties. It is not six
@@ -241,7 +241,7 @@ findings: |
   for poor districts. Across FY2022 to FY2024 local revenue per pupil grew **22.5% in the poorest
   quartile and 11.3% in the richest**, and removing the reappraisals from the data — putting every
   district on its own quiet-year rate — makes the FY2024 gap between the two **$212 wider**, not
-  narrower. [verified — crates/regime-diff, `reappraisal_incidence::gap`, pinned by test]
+  narrower. [verified] (crates/regime-diff, `reappraisal_incidence::gap`, pinned by test)
 
   The identification is Ohio's own staggered cycle rather than an assumption: the 88 counties
   revalue in different years, Table SD-1 carries four of them, and a cohort's event year moves its
@@ -442,8 +442,8 @@ properties:
     **Confirmed against the current section.** The committed text of R.C. 319.301 is effective
     **20 March 2026**, amended by H.B. 186 and H.B. 129 of the 136th General Assembly, and still
     states two per cent and two-tenths of one per cent. Amendments to the surrounding provisions
-    have continued to this year and none has moved the floor. [verified —
-    `crates/project/tests/the_term_the_floor_model_omits.rs`] What one of them moved is the
+    have continued to this year and none has moved the floor. [verified]
+    (`crates/project/tests/the_term_the_floor_model_omits.rs`) What one of them moved is the
     *base*, which is in `findings`.
   statutory_basis: R.C. 319.301
   simulation_key: twenty_mill_floor

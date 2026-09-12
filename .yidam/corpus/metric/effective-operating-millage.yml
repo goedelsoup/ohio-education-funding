@@ -63,9 +63,9 @@ properties:
     0.0705 mills below, and six of the districts below the floor are in no joint vocational
     district at all. Rounding inside the reduction-factor computation fails for a separate
     reason: R.C. 319.301(D)(1) recomputes the percentage annually, and seventeen districts are
-    below the floor in all four tax years. [verified — see
+    below the floor in all four tax years. [verified] (see
     [twenty-mill-floor](../parameter/twenty-mill-floor.yml) and
-    `crates/dispersion/tests/the_neighbour_that_sits_at_exactly_twenty.rs`]
+    `crates/dispersion/tests/the_neighbour_that_sits_at_exactly_twenty.rs`)
 
     What holds is the bound: no district that voted twenty sits more than three tenths of a mill
     below it, and every district more than half a mill below never voted twenty. The cause is

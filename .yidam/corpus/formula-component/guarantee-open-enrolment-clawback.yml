@@ -39,8 +39,8 @@ findings: |
 
   **43 districts, $5.1 million withheld** in the FY2027 model. Columbus lost 106.2 FTE against
   a threshold of 24.3 and had **$674,561** taken off; Cuyahoga Falls lost 118.1 and had
-  $640,025. [verified —
-  [`crates/project/tests/the_supplements_outside_the_formula.rs`](../../../crates/project/tests/the_supplements_outside_the_formula.rs)]
+  $640,025. [verified]
+  ([`crates/project/tests/the_supplements_outside_the_formula.rs`](../../../crates/project/tests/the_supplements_outside_the_formula.rs))
 
   Small against the guarantee's $879 million, and not small for the districts it reaches: it is
   a reduction in the one line those districts are relying on precisely because the formula
