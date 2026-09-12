@@ -7075,6 +7075,64 @@ pub static FIGURES: &[Figure] = &[
         tolerance: 1.0,
         compute: |i| movement(i, 2013),
     },
+    // ── what the appropriation does to the self-correction ────────────────
+    //
+    // `project::transport::proration_under`. Parameterised by the rise in reported cost, not by
+    // a fuel price: the pass-through is not identified and `the_fuel_response_the_panel_cannot_identify`
+    // establishes that it cannot be from anything here.
+    Figure {
+        key: "project/sped-transport-factor-at-a-tenth-more-cost",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The special education transportation proration factor if reported costs rise a \
+                tenth, against the appropriation the act set",
+        pinned: 0.838_825_874_512_744_5,
+        tolerance: 1e-9,
+        compute: |_| {
+            project::transport::proration_under(2027, 0.10)
+                .expect("FY2027")
+                .factor_districts_only
+        },
+    },
+    // In dollars rather than as a share, because 1.05% is under `a_share_cannot_be_confused_with_a_
+    // percentage`'s floor — a rate that small would survive its own hundredfold typo. The
+    // percentage is derivable from this and the published payment, both of which are bound.
+    Figure {
+        key: "project/sped-transport-payment-increase-at-a-fifth-more-cost",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a fifth more reported cost adds to what districts are actually paid — the \
+                size of the cap on the formula's own correction",
+        pinned: 1_924_671.48,
+        tolerance: 1.0,
+        compute: |_| {
+            let base = project::transport::proration_under(2027, 0.0).expect("FY2027");
+            let risen = project::transport::proration_under(2027, 0.20).expect("FY2027");
+            risen.paid - base.paid
+        },
+    },
+    Figure {
+        key: "project/sped-transport-withheld-at-a-fifth-more-cost",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And what districts would then earn under (C) and (D) and not receive",
+        pinned: 54_318_085.94,
+        tolerance: 1.0,
+        compute: |_| {
+            project::transport::proration_under(2027, 0.20)
+                .expect("FY2027")
+                .withheld
+        },
+    },
+    Figure {
+        key: "project/sped-transport-rise-reaching-a-factor-of-eighty-five",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The rise in reported cost that carries the factor from 0.9175 down to 0.85",
+        pinned: 0.084_661_884_494_116_27,
+        tolerance: 1e-9,
+        compute: |_| project::transport::rise_reaching(2027, 0.85).expect("reachable"),
+    },
     // ── the parameters that do not index ──────────────────────────────────
     //
     // `project::indexation`. Two freeze vintages, three components, and one gradient. The
