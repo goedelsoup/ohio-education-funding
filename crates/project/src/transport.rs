@@ -250,6 +250,109 @@ pub fn special_education(fiscal_year: u16) -> Option<Allocation> {
     })
 }
 
+/// What a rise in reported cost does to the special education proration factor.
+///
+/// # Why this is parameterised by the cost rise and not by a fuel price
+///
+/// The obvious question is what a diesel shock does to this factor, and it cannot be asked that
+/// way. Neither rate in R.C. 3317.0212 is a price: both are **trimmed means of what districts
+/// reported spending in the prior year**, so a fuel shock reaches the payment only through
+/// districts' own books and only a year later. The size of that pass-through is not identified by
+/// anything this repository can reach —
+/// `dispersion::tests::the_fuel_response_the_panel_cannot_identify` fits eleven specifications and
+/// every one of them spans zero, and the blocker is not sample size but the absence of a mile
+/// column in the F-33 in any year.
+///
+/// So the coefficient is left where it is. `rise` is the fraction by which **reported cost**
+/// increases, whatever moved it, and the arithmetic below is exact given that. A reader who has a
+/// fuel-share estimate can compose the two; this module declines to supply one.
+///
+/// # The two bounds, and why there are two
+///
+/// The denominator LSC prorates against is larger than the calculator's districts: solving
+/// [`Allocation::implied_statewide`] leaves **$13.3m in FY2027** that the districts do not
+/// account for, which the greenbook attributes to county DD boards and educational service
+/// centres. Whether *their* reported costs rise with the districts' is not established here, so
+/// both ends are computed:
+///
+/// - [`Self::factor_districts_only`] holds that remainder fixed, which is the shallower proration.
+/// - [`Self::factor_uniform`] moves the whole denominator, which is the deeper one.
+///
+/// They are close — the remainder is about 6% of the denominator — and the gap is the honest width
+/// of the answer rather than a choice to be made.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Proration {
+    /// The year whose allocation is being re-prorated.
+    pub fiscal_year: u16,
+    /// The fractional rise in reported cost. `0.05` is five per cent.
+    pub rise: f64,
+    /// The factor if only the calculator's districts report more.
+    pub factor_districts_only: f64,
+    /// The factor if everything in LSC's denominator rises together.
+    pub factor_uniform: f64,
+    /// What the districts are allocated after the rise, before proration.
+    pub allocation: Dollars,
+    /// What they are paid at [`Self::factor_districts_only`].
+    pub paid: Dollars,
+    /// The allocation they earn and do not receive, at the same factor.
+    pub withheld: Dollars,
+}
+
+/// The proration factor at a given rise in reported cost, against a fixed appropriation.
+///
+/// At `rise` of zero this reproduces the year's published factor and its published payment, which
+/// is what makes the rest of the curve worth reading.
+///
+/// # In a year that does not prorate, the result is a lower bound
+///
+/// [`Allocation::outside_the_model`] solves the remainder out of a factor below 1.0. Where the
+/// factor *is* 1.0 — FY2026 — nothing is solved and the method returns the headroom instead, which
+/// is an **upper** bound on the remainder. A larger remainder means a larger denominator and so a
+/// smaller factor, so the curve this returns for such a year is the deepest proration consistent
+/// with what is known, and the true one is at or above it. FY2027 identifies the remainder and
+/// needs no such reading.
+///
+/// # The finding this exists to state
+///
+/// The plan's self-correction for a cost shock is capped by a number the plan does not contain.
+/// Divisions (C) and (D) of R.C. 3317.0212 earn a district more when its reported costs rise, and
+/// the earmark inside GRF ALI 200502 decides how much of that it actually receives — so a rate
+/// rise that is fully earned can still arrive scaled down, and the scaling appears nowhere in the
+/// published per-pupil amount.
+#[must_use]
+pub fn proration_under(fiscal_year: u16, rise: f64) -> Option<Proration> {
+    let allocation = special_education(fiscal_year)?;
+    let outside = allocation.outside_the_model();
+    let risen = allocation.districts * (1.0 + rise);
+    let factor_districts_only = (allocation.appropriation / (risen + outside)).min(1.0);
+    let factor_uniform =
+        (allocation.appropriation / (allocation.implied_statewide() * (1.0 + rise))).min(1.0);
+    Some(Proration {
+        fiscal_year,
+        rise,
+        factor_districts_only,
+        factor_uniform,
+        allocation: risen,
+        paid: risen * factor_districts_only,
+        withheld: risen * (1.0 - factor_districts_only),
+    })
+}
+
+/// The rise in reported cost that takes the factor down to `target`, on the shallower bound.
+///
+/// Inverts [`proration_under`]. `None` where the target is not reachable — above the year's
+/// current factor, or outside `(0, 1]`.
+#[must_use]
+pub fn rise_reaching(fiscal_year: u16, target: f64) -> Option<f64> {
+    if target <= 0.0 || target > 1.0 {
+        return None;
+    }
+    let allocation = special_education(fiscal_year)?;
+    let outside = allocation.outside_the_model();
+    let rise = (allocation.appropriation / target - outside) / allocation.districts - 1.0;
+    (rise >= 0.0).then_some(rise)
+}
+
 /// The allocation a set of districts produces under a stated floor.
 ///
 /// Separated from [`special_education`] because the counterfactual in [`Movement`] is the same

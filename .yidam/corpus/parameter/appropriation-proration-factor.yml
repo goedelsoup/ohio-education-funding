@@ -237,8 +237,65 @@ findings: |
   item and did not open the half of it that prorates. [verified]
   ([`crates/project`](../../../crates/project/tests/the_denominator_that_is_larger_than_the_model.rs))
 
-  ### The residual claimant grew while its line shrank
+  ### The cap on the formula's own self-correction, measured
+
+  R.C. 3317.0212 reimburses special education transportation on **reported cost** at the
+  district's state share, floored. So the section corrects for a cost shock by construction: a
+  district that spends more earns more the following year. The earmark inside GRF ALI 200502 is
+  what decides how much of that it receives, and in FY2027 it binds.
+
+  Re-prorating the year against a rise in reported cost, with the appropriation held where the act
+  put it: [verified]
+  ([`crates/project`](../../../crates/project/tests/the_proration_a_cost_rise_deepens.rs))
+
+  | rise in reported cost | factor | districts are paid | earned and withheld |
+  |---:|---:|---:|---:|
+  | 0% (as published) | 0.917460 | $182,630,489 | $16,430,550 |
+  | 5% | 0.876382 | $183,176,287 | $25,837,804 |
+  | 10% | **0.838826** | $183,675,305 | $35,291,838 |
+  | 20% | 0.772607 | $184,555,160 | **$54,318,086** |
+
+  **A fifth more reported cost raises what districts are actually paid by $1,924,671 — 1.05%.** Payments are
+  `allocation × appropriation ÷ (allocation + remainder)`, which climbs toward the appropriation
+  and never reaches it, so the earned entitlement and the received payment come apart as fast as
+  costs rise. Doubling every district's reported cost would raise the statewide payment 3.2%.
+  [verified]
+
+  That is the precise sense in which an appropriation caps a statutory formula. Divisions (C) and
+  (D) promise reimbursement at the state share; the line item decides what fraction of the promise
+  is kept; and a reader of either document alone cannot see the other, because the factor appears
+  in neither. [inference]
+
+  It takes an **8.47%** rise to carry the factor to 0.85 and 15.66% to reach 0.80. FY2026, which
+  did not prorate, bounds rather than measures the same quantity — its remainder cannot have
+  exceeded $11.78m where FY2027's is $13.29m — so its curve is the deepest proration consistent
+  with what is known rather than a measurement. [verified]
+
+  **This is deliberately not a fuel forecast.** Neither rate in R.C. 3317.0212 is a price: both
+  are trimmed means of what districts reported spending the prior year, so a diesel shock reaches
+  the payment only through districts' own books and only a year later. The size of that
+  pass-through is not identified by anything this repository can reach —
+  [`crates/dispersion`](../../../crates/dispersion/tests/the_fuel_response_the_panel_cannot_identify.rs)
+  fits eleven specifications and every one spans zero, and the blocker is the absence of a mile
+  column in the F-33 rather than sample size. So the table above is parameterised by cost and a
+  reader who holds a fuel share can compose the two. [verified]
 figures:
+  - key: project/sped-transport-factor-at-a-tenth-more-cost
+    value: 0.8388258745127445
+    field: findings
+    as_written: "| 10% | **0.838826**"
+  - key: project/sped-transport-payment-increase-at-a-fifth-more-cost
+    value: 1924671.4831831455
+    field: findings
+    as_written: "by $1,924,671 — 1.05%"
+  - key: project/sped-transport-withheld-at-a-fifth-more-cost
+    value: 54318085.94
+    field: findings
+    as_written: "**$54,318,086**"
+  - key: project/sped-transport-rise-reaching-a-factor-of-eighty-five
+    value: 0.08466188449411627
+    field: findings
+    as_written: "an **8.47%** rise to carry the factor to 0.85"
   - key: project/preschool-proration-factor-fy2026
     value: 0.96853811
     field: kind
@@ -328,6 +385,23 @@ figures:
     field: findings
     as_written: "the FY2027 one by **$36,760,325**"
 revisions:
+  - was: |
+      A heading, `### The residual claimant grew while its line shrank`, with no body under it —
+      the last line of `findings:` since 15 August 2026.
+    now: |
+      Replaced by a section that computes what the cap on the self-correction is worth. The
+      orphaned heading's own body was severed in `041e08b4`, the commit that split one prose field
+      into four: the paragraph it introduced began mid-sentence (", which is the clearest
+      illustration of…") and the first half went with the migration. Its substance — what a
+      residual claimant is and why this programme prorates when the others do not — survives in
+      `description:` under its own heading, so nothing was lost but the heading.
+    found_by: |
+      `git log -S` on the heading text while adding the section above it. A heading with an empty
+      body reads as a section a reader has scrolled past rather than as a defect, which is why it
+      lasted a month.
+    reach: |
+      Presentation only. No figure or claim depended on it, and the four-field migration's other
+      headings in this node all carry their bodies.
   - was: |
       The 0.96854448 factor was read against the $147,500,000 limit printed beside it, making
       the program $908,184 over its appropriation and prorated.
