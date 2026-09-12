@@ -75,6 +75,41 @@ findings: |
   ceilings and by tuition, and cannot be read as saying which of the three binds. [inference] A
   reader wanting to know how much of the ceiling is used needs tuition by school, which the corpus
   does not hold.
+
+  ### But it does establish that at least one of them binds
+
+  R.C. 3310.08(A)(2) makes this programme's base amount the *same* schedule the
+  [traditional programme](edchoice-scholarship.yml) pays — $5,500 and $7,500 by grade band — so the
+  smaller of the two is a floor on any full-award average whatever the grade mix. In FY2025 those
+  figures are the operative ones without indexing, because H.B. 33 froze the statewide average base
+  cost per pupil the ceiling is indexed to at its FY2024 level, and a ceiling indexed to a frozen
+  number does not move. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_gap_two_averages_cannot_decompose.rs))
+
+  The published average is **$541.59 below that floor**, which no grade mix can account for —
+  **$54,667,553.01** across the programme's recipients that the schedule directs and the year did
+  not pay. [verified] (crates/project) It holds on the report's other average too, at $617.18, and
+  it is made harder rather than easier by the students still paid the undecayed amount under R.C.
+  3317.022(A)(10)(a)(ii)(I): part of the programme is on the flat schedule, so whatever reduces the
+  rest reduces it further.
+
+  ### What the gap against the traditional programme cannot settle
+
+  Traditional EdChoice averaged $6,808.75 against this programme's $4,958.41, and the 27.2% gap
+  looks like a measurement of the income decay. It is not: three quantities move an average award —
+  grade mix, the decay, and a tuition below the ceiling — and two published averages cannot
+  separate three unknowns. **The two populations also push opposite ways**, since this programme is
+  universal and therefore richer, while the traditional programme is triggered by a building's
+  performance and plausibly sends its recipients to cheaper schools. [inference]
+
+  Attributing the whole gap to income — the largest the decay can be — puts the mean factor at
+  **0.72824** of the base amount, which the statute pays at **4.95751** times the federal poverty
+  guidelines; because the decay is convex, that is a floor on the mean family income under that
+  reading rather than an estimate of it. [verified] (crates/project)
+
+  Any one of three columns would close this and none is held: participation split by grade band,
+  the report's published maximum award per programme, or the income distribution of recipients.
+  The report links a per-district breakdown and the route returns 404. [open]
 figures:
   - key: project/edchoice-full-award-ceiling
     value: 4.5
@@ -92,6 +127,22 @@ figures:
     value: 550.0
     field: amount
     as_written: "782.19% and above      $550"
+  - key: project/expansion-shortfall-no-mix-explains
+    value: 541.59
+    field: findings
+    as_written: "**$541.59 below that floor**"
+  - key: project/expansion-shortfall-aggregate
+    value: 54667553.01
+    field: findings
+    as_written: "**$54,667,553.01**"
+  - key: project/expansion-decay-explaining-the-gap
+    value: 0.72824
+    field: findings
+    as_written: "the mean factor at\n  **0.72824** of the base amount"
+  - key: project/expansion-income-explaining-the-gap
+    value: 4.95751
+    field: findings
+    as_written: "**4.95751** times the federal poverty\n  guidelines"
 properties:
   name: EdChoice Expansion Scholarship
   mechanism: |

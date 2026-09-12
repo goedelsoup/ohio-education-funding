@@ -128,6 +128,150 @@ pub fn jon_peterson_award(category: usize) -> Dollars {
     (JON_PETERSON_BASE + JON_PETERSON_SUPPLEMENTS[category - 1]).min(JON_PETERSON_CEILING)
 }
 
+/// The department's own account of what the channel paid, and what it cannot settle.
+///
+/// # Why this lives beside the statute
+///
+/// Everything above computes what R.C. 3310.08 and 3317.022 *direct*. This reads what the
+/// department reports it *paid*, so the two can be held against each other — which is the only
+/// way to ask how much of the award schedule actually binds.
+pub mod report {
+    use std::collections::BTreeMap;
+
+    use edfund_core::Dollars;
+
+    /// The committed extract of the 2025 Scholarship Annual Report, covering 2024-25.
+    const FIXTURE: &str = include_str!("../fixtures/scholarship-programs.csv");
+
+    const EXPECTED_HEADER: &str = "program,name,students,expenditure,published_average";
+
+    /// One programme as the report gives it.
+    #[derive(Debug, Clone, PartialEq)]
+    pub struct Programme {
+        /// The report's own name for it.
+        pub name: String,
+        /// Participation. Every programme publishes one.
+        pub students: f64,
+        /// Statewide expenditure. Jon Peterson's is derived rather than published, and is the one
+        /// programme where this is `None` in the fixture.
+        pub expenditure: Option<Dollars>,
+        /// The average award the report prints, which for three of the four is **not**
+        /// [`Self::implied_average`].
+        pub published_average: Option<Dollars>,
+    }
+
+    impl Programme {
+        /// Expenditure over participation — the average with a denominator this corpus can see.
+        ///
+        /// Sits 1.5% to 3.4% below the published figure for every programme but autism, which
+        /// reconciles to the cent. The report does not explain the gap, so both are carried and
+        /// every reading below is computed on each.
+        #[must_use]
+        pub fn implied_average(&self) -> Option<Dollars> {
+            (self.students > 0.0).then(|| self.expenditure.map(|paid| paid / self.students))?
+        }
+    }
+
+    /// Every programme the report covers, keyed by the fixture's own slug.
+    ///
+    /// # Panics
+    ///
+    /// If the fixture's header is not the one this was written against, by way of
+    /// [`edfund_core::csv::rows`].
+    #[must_use]
+    pub fn programmes() -> BTreeMap<String, Programme> {
+        edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
+            .map(|row| {
+                (
+                    row.str(0).to_string(),
+                    Programme {
+                        name: row.str(1).to_string(),
+                        students: row.num(2).expect("every programme publishes participation"),
+                        expenditure: row.num(3),
+                        published_average: row.num(4),
+                    },
+                )
+            })
+            .collect()
+    }
+}
+
+/// Which of the report's two averages a reading is taken on.
+///
+/// They differ by 1.5% to 3.4% and the report does not say why, so nothing here picks one. Every
+/// finding is computed on both and is stated only where both agree.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Average {
+    /// The figure the report prints.
+    Published,
+    /// Expenditure over participation.
+    Implied,
+}
+
+impl Average {
+    /// One programme's average on this basis.
+    #[must_use]
+    pub fn of(self, programme: &report::Programme) -> Option<Dollars> {
+        match self {
+            Self::Published => programme.published_average,
+            Self::Implied => programme.implied_average(),
+        }
+    }
+}
+
+/// The largest share of pupils in grades K-8 consistent with an observed average award.
+///
+/// Both programmes pay the lesser of a tuition and a per-grade ceiling, and R.C. 3310.08(A)(2)
+/// makes the expansion's own base amount *the same* ceiling. So an average award is bounded above
+/// by the grade mix alone: `5,500w + 7,500(1 - w)`. Inverting it gives the most K-8-heavy mix that
+/// could produce the observed figure, and any tuition that binds pushes the true share lower
+/// still — so this is a ceiling on the K-8 share and not an estimate of it.
+///
+/// `None` where the average is outside the two ceilings, which for an average *below* the K-8
+/// amount is the interesting case: see [`shortfall_no_mix_explains`].
+#[must_use]
+pub fn greatest_k8_share(average: Dollars) -> Option<f64> {
+    ((EDCHOICE_BASE_K8..=EDCHOICE_BASE_9_12).contains(&average))
+        .then(|| (EDCHOICE_BASE_9_12 - average) / (EDCHOICE_BASE_9_12 - EDCHOICE_BASE_K8))
+}
+
+/// How far an average award falls below the lowest ceiling any grade mix could produce.
+///
+/// The K-8 amount is the floor of the schedule: a programme paying every student the full ceiling
+/// cannot average less than [`EDCHOICE_BASE_K8`] whatever its grade mix. An average below it is
+/// therefore evidence that something *other than* the mix is reducing awards — the income decay,
+/// a tuition below the ceiling, or both — and this is how much of it no mix can account for.
+///
+/// `None` where the average clears the floor, which is the ordinary case and not a finding.
+#[must_use]
+pub fn shortfall_no_mix_explains(average: Dollars) -> Option<Dollars> {
+    (average < EDCHOICE_BASE_K8).then_some(EDCHOICE_BASE_K8 - average)
+}
+
+/// The mean decay factor implied if income decay alone explained a programme's shortfall against
+/// a reference programme on the same grade mix.
+///
+/// **This is a reading and not a measurement**, and it is offered so that its size can be argued
+/// with rather than guessed at. Three quantities move an average award — grade mix, the R.C.
+/// 3310.08 decay, and a tuition below the ceiling — and two published averages cannot separate
+/// three unknowns. Holding the first equal and the third absent attributes the whole gap to the
+/// second, which is the largest the decay can possibly be.
+#[must_use]
+pub fn decay_explaining_the_whole_gap(expansion: Dollars, reference: Dollars) -> Option<f64> {
+    (reference > 0.0 && expansion > 0.0).then_some(expansion / reference)
+}
+
+/// The income ratio at which R.C. 3310.08 pays `factor` of the base amount.
+///
+/// The inverse of the decay in [`expansion_award`], for a factor between [`MINIMUM_SHARE`] and 1.
+/// Below the floor the award no longer varies with income, so no ratio is recoverable and this
+/// returns `None` rather than a number past where the statute stops distinguishing families.
+#[must_use]
+pub fn income_paying(factor: f64) -> Option<f64> {
+    ((MINIMUM_SHARE..=1.0).contains(&factor))
+        .then(|| FULL_AWARD_CEILING + factor.ln() / CONSTANT_MULTIPLIER.ln())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

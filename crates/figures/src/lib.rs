@@ -4093,6 +4093,98 @@ pub static FIGURES: &[Figure] = &[
         },
     },
     Figure {
+        key: "project/expansion-shortfall-no-mix-explains",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "How far the average EdChoice Expansion award falls below the lowest figure any \
+                grade mix could produce, 2024-25",
+        pinned: 541.59,
+        tolerance: 0.01,
+        compute: |_| {
+            let programmes = project::scholarship::report::programmes();
+            let average = programmes["edchoice-expansion"]
+                .published_average
+                .expect("the report publishes it");
+            project::scholarship::shortfall_no_mix_explains(average).expect("below the ceiling")
+        },
+    },
+    Figure {
+        key: "project/expansion-shortfall-aggregate",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "That shortfall across every EdChoice Expansion recipient, 2024-25",
+        pinned: 54_667_553.01,
+        tolerance: 1.0,
+        compute: |_| {
+            let programmes = project::scholarship::report::programmes();
+            let expansion = &programmes["edchoice-expansion"];
+            let average = expansion.published_average.expect("the report publishes it");
+            project::scholarship::shortfall_no_mix_explains(average).expect("below the ceiling")
+                * expansion.students
+        },
+    },
+    Figure {
+        key: "project/traditional-greatest-k8-share",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The largest share of Traditional EdChoice recipients that can be in grades \
+                kindergarten through eight, given the average award the report publishes",
+        pinned: 0.345_625,
+        tolerance: 0.0005,
+        compute: |_| {
+            let programmes = project::scholarship::report::programmes();
+            let average = programmes["traditional-edchoice"]
+                .published_average
+                .expect("the report publishes it");
+            project::scholarship::greatest_k8_share(average).expect("inside the schedule")
+        },
+    },
+    Figure {
+        key: "project/expansion-decay-explaining-the-gap",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The mean decay factor the income formula would have to apply if it explained the \
+                whole gap between the two EdChoice averages",
+        pinned: 0.72824,
+        tolerance: 0.0005,
+        compute: |_| {
+            let programmes = project::scholarship::report::programmes();
+            let average = |key: &str| {
+                programmes[key]
+                    .published_average
+                    .expect("the report publishes it")
+            };
+            project::scholarship::decay_explaining_the_whole_gap(
+                average("edchoice-expansion"),
+                average("traditional-edchoice"),
+            )
+            .expect("both are positive")
+        },
+    },
+    Figure {
+        key: "project/expansion-income-explaining-the-gap",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The multiple of the federal poverty guidelines at which the statute pays that \
+                factor \u{2014} a floor on the mean under that reading",
+        pinned: 4.95751,
+        tolerance: 0.005,
+        compute: |_| {
+            let programmes = project::scholarship::report::programmes();
+            let average = |key: &str| {
+                programmes[key]
+                    .published_average
+                    .expect("the report publishes it")
+            };
+            let factor = project::scholarship::decay_explaining_the_whole_gap(
+                average("edchoice-expansion"),
+                average("traditional-edchoice"),
+            )
+            .expect("both are positive");
+            project::scholarship::income_paying(factor).expect("inside the curve")
+        },
+    },
+    Figure {
         key: "dispersion/cleveland-state-revenue-real-change-negative",
         owner: "crates/dispersion",
         unit: Unit::Share,
