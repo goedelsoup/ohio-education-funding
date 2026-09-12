@@ -27,8 +27,8 @@ findings: |
 
   "The schedule has been revised more than once" is true and understates what happened. Three times
   the General Assembly wrote a protection against these losses into a budget act and the Governor
-  struck it out. Not once did one survive. [verified — the greenbooks, committed at
-  [`lsc-education-greenbooks.txt`](../../../crates/project/fixtures/lsc-education-greenbooks.txt)]
+  struck it out. Not once did one survive. [verified] (the greenbooks, committed at
+  [`lsc-education-greenbooks.txt`](../../../crates/project/fixtures/lsc-education-greenbooks.txt))
 
   - **[H.B. 1](../legislation/hb-1-2009.yml)** — the largest, and the earliest. The act as passed
     would have **reimbursed districts in full in perpetuity** rather than phasing the payments down

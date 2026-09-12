@@ -132,7 +132,7 @@ findings: |
   `total_revenue_and_sources` is every dollar that entered the fund and does. **Their difference is
   transfers, advances and note proceeds — the only route money received into a special revenue fund
   can take into the general fund.** Every consumer in the workspace read the first column and none
-  read the second. [verified — crates/project, `transfers::by_year`, pinned by test]
+  read the second. [verified] (crates/project, `transfers::by_year`, pinned by test)
 
   **The line has the shape relief would leave.** Statewide it more than doubles across the relief
   years and falls back when the grants end: **$0.28bn in FY2020, rising to $0.72bn in FY2024, then
@@ -142,7 +142,7 @@ findings: |
   between ESSER surge per pupil and the FY2021-FY2024 change in ending cash per pupil is **0.075**
   across 606 districts. If the balances were the grants, the districts that received more would
   hold more. They do not, and at the level the question was asked that is the answer.
-  [verified — crates/project, `transfers::build_up_against_relief`, pinned by test]
+  [verified] (crates/project, `transfers::build_up_against_relief`, pinned by test)
 
   **How much is attributable, bounded rather than pinned.** Sizing the relief share needs a level
   the transfers line would have run at without the grants, and the panel holds no clean one. FY2020
@@ -152,7 +152,7 @@ findings: |
   15.1% to 39.4% of it. Levelled against both years the excess is $0.57bn, 31.3%, and relief
   explains **6.4% to 8.8%**. The two ends of each range are a least-squares slope, which a handful
   of large districts pull, and the gap between the outer quartile medians, which they cannot.
-  [verified — crates/project, `transfers::attribution`, pinned by test]
+  [verified] (crates/project, `transfers::attribution`, pinned by test)
 
   **What survives every choice is the ceiling: under two fifths, and most plausibly under a tenth.**
   The spread is stated rather than resolved because the corpus cannot defend one baseline over the
@@ -162,7 +162,7 @@ findings: |
   all: federal revenue in these districts rose 139% across the peak while their general-fund
   revenue *fell*, which is what makes the transfers line the only remaining route and so what makes
   a small number here an answer rather than a gap. See
-  [ESSER](../revenue-stream/esser.yml). [verified — crates/project]
+  [ESSER](../revenue-stream/esser.yml). [verified] (crates/project)
 
   What the line cannot say is whether a given dollar was a permanent transfer or an advance later
   repaid — the filing reports one figure for transfers, advances and note proceeds together, and

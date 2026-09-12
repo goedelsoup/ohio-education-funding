@@ -11,8 +11,8 @@ description: |
   It is a better contrast case than [Upper Arlington](upper-arlington-city.yml) for one specific
   purpose: it is *not* extraordinary. Perrysburg spends **$14,632 per headcount pupil**, below
   the statewide median of $16,289, on 5,449 pupils with a 13.8% economically disadvantaged share
-  and an 11.3% disability share. [verified — computed; see
-  [`crates/dispersion/tests/expenditure_functions_fy25.rs`](../../../crates/dispersion/tests/expenditure_functions_fy25.rs)]
+  and an 11.3% disability share. [verified] (computed; see
+  [`crates/dispersion/tests/expenditure_functions_fy25.rs`](../../../crates/dispersion/tests/expenditure_functions_fy25.rs))
   It is an ordinary well-off Ohio suburb, which is exactly what makes it the right comparator
   when someone wants to know whether an urban district's spending is unusual.
 
@@ -26,8 +26,8 @@ description: |
   spending to special needs against Perrysburg's 14–16% was fact-checked and found false: the
   special-education instruction share is about 14–15% in *both*, and student support about 8% in
   both — 8.1% Toledo, 8.5% Perrysburg, reproducible to the tenth of a point from the
-  department's own file. [verified — see
-  [OCG fact-check RL-2026-021](../../catalog/ocg-fact-check-021.md)]
+  department's own file. [verified] (see
+  [OCG fact-check RL-2026-021](../../catalog/ocg-fact-check-021.md))
 
   The fact-check's verdict is right. Its gloss is not: it reads Toledo's higher
   special-education dollars per *total* pupil as a "modestly heavier student-need profile," when
@@ -44,8 +44,8 @@ findings: |
   taxing itself less to get there: its effective Class I operating rate is **39.15 mills** against
   Toledo's 35.5476, the higher of the two, and H.B. 920 has removed about the same fraction of
   each district's voted millage. Neither is on the twenty-mill floor. The disparity between the
-  pair is the base, not the rate. [verified —
-  [`crates/dispersion`](../../../crates/dispersion/tests/the_pair_and_its_fifteen_years.rs)]
+  pair is the base, not the rate. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_pair_and_its_fifteen_years.rs))
 
   **And the years the node could not see are the equity claim in miniature — though not in the
   column it first seemed to be.** From FY2010 to FY2024, measured net of the community-school
@@ -62,8 +62,8 @@ findings: |
   so the uncorrected measure charged Toledo a third of its state revenue and Perrysburg nothing.
   Correcting it **reverses the state half of the comparison**: the wealthy district's state
   revenue lost more ground against prices than the high-need one's. The local half, which is the
-  half the equity claim turns on, is untouched. [verified —
-  [`crates/dispersion`](../../../crates/dispersion/tests/the_break_that_belonged_to_the_survey.rs)]
+  half the equity claim turns on, is untouched. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_break_that_belonged_to_the_survey.rs))
 
   Three cautions travel with that series. The survey's state revenue column is every dollar the
   state sent, capital included, so one district-year of it is not that district's foundation aid —
@@ -238,7 +238,7 @@ properties:
   seeded_because: |
     The corpus's first exempted village district, closing one of the two agency-type gaps this
     class recorded at genesis. [verified]
-  irn: 045583 [verified — report card district files]
+  irn: 045583 [verified] (report card district files)
   agency_type: exempted-village
   county: Wood
   fy2025_profile: |

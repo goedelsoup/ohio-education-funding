@@ -36,8 +36,8 @@ findings: |
 
   LSC's greenbook states it in formula boxes. Aid in FY2012 and FY2013 is **a per-pupil amount
   carried from FY2011, adjusted for property wealth, applied to the current year's pupils** —
-  with a dollar floor beneath it. [verified — the greenbook, committed at
-  [`lsc-education-greenbooks.txt`](../../../crates/project/fixtures/lsc-education-greenbooks.txt)]
+  with a dollar floor beneath it. [verified] (the greenbook, committed at
+  [`lsc-education-greenbooks.txt`](../../../crates/project/fixtures/lsc-education-greenbooks.txt))
 
       FY2011 state aid per pupil  = actual FY2011 allocation / recalculated FY2011 ADM
                                     (recalculated on the FY2011 October count, whichever
@@ -111,7 +111,7 @@ properties:
     tangible personal property tax replacement payments. Signing date to be confirmed against
     the enrolled act. [open]
   vetoes: |
-    One, and it is not a funding provision. [verified — the greenbook]
+    One, and it is not a funding provision. [verified] (the greenbook)
 
     The act repealed the requirement that districts, community schools, STEM schools and chartered
     nonpublic schools conduct body mass index and weight status screenings for pupils in certain

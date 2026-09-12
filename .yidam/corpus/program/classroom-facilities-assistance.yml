@@ -29,8 +29,8 @@ findings: |
 
   **$12.65 billion of state capital money reached Ohio's school districts between FY2009 and
   FY2024**, against $33.28 billion those districts spent on buildings from every source — so the
-  state paid **38.0%** of Ohio's school construction bill across sixteen years. [verified —
-  [`crates/dispersion`](../../../crates/dispersion/tests/the_program_the_capital_act_hid.rs)]
+  state paid **38.0%** of Ohio's school construction bill across sixteen years. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_program_the_capital_act_hid.rs))
 
   This corpus recorded the amount as unpopulated and gave a reason: the appropriation sits in the
   capital act, which no connector retrieves. That is true of the paying side and it is not true of

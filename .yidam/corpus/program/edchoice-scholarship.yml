@@ -7,14 +7,14 @@ summary: >-
 description: |
   The original EdChoice: a scholarship for students assigned to a low-performing public school
   building, established by the General Assembly in 2005 and authorised under R.C. 3310.03.
-  [verified — R.C. 3310.03; 2025 Scholarship Annual Report] It is a distinct programme from the
+  [verified] (R.C. 3310.03; 2025 Scholarship Annual Report) It is a distinct programme from the
   [income-based expansion](edchoice-expansion.yml) of 2013, which is R.C. 3310.032, and the two
   run concurrently with different eligibility and — since October 2023 — different award rules.
   [verified]
 
   **Eligibility is a property of the building, not of the family.** A student qualifies by being
   enrolled in a building operated by the resident district that was ranked in the lowest twenty
-  per cent of all buildings statewide by performance index score. [verified — R.C. 3310.03(A)(1)]
+  per cent of all buildings statewide by performance index score. [verified] (R.C. 3310.03(A)(1))
   That is the design the corpus's central caution is about: the programme is triggered by a
   performance measure this site elsewhere shows to be substantially a composition proxy, so the
   buildings it designates are disproportionately the poorest ones. [inference]
@@ -28,8 +28,8 @@ description: |
   Its executive summary says the five programmes served "more than 175,000" students; the five
   programme counts it publishes sum to 166,587, a gap of 8,413. And its stated average awards
   disagree with expenditure divided by participation for this programme, the expansion, and
-  Cleveland — while matching exactly for Autism. [verified, by arithmetic on the report's own
-  figures] The natural reading is a denominator: an average over students holding a full-year
+  Cleveland — while matching exactly for Autism. [verified] (by arithmetic on the report's own
+  figures) The natural reading is a denominator: an average over students holding a full-year
   award rather than over everyone who used the programme at any point. Nothing in the report says
   so, and the reading is not adopted here on the source's silence. [open]
 properties:
@@ -60,16 +60,16 @@ properties:
   eligibility: |
     Enrollment in a building operated by the resident district that was ranked in the lowest twenty
     per cent of all buildings operated by city, local and exempted village districts by performance
-    index score, as determined by the department. [verified — R.C. 3310.03(A)(1)]
+    index score, as determined by the department. [verified] (R.C. 3310.03(A)(1))
 
     Students who held a scholarship for the 2020-2021 school year under the section as it stood
     before 2 March 2021 continue to receive it through grade twelve so long as they remain
     eligible under division (D) — a grandfather clause that keeps a cohort on the old rules.
-    [verified — R.C. 3310.03]
+    [verified] (R.C. 3310.03)
   amount: |
-    **FY2025: 42,607 students, $283,149,735.14, average award as published $6,808.75.** [verified —
-    2025 Scholarship Annual Report] Expenditure divided by participation is $6,645.62; see the
-    discrepancy noted in the description. [verified, by arithmetic] [open]
+    **FY2025: 42,607 students, $283,149,735.14, average award as published $6,808.75.** [verified]
+    (2025 Scholarship Annual Report) Expenditure divided by participation is $6,645.62; see the
+    discrepancy noted in the description. [verified] (by arithmetic) [open]
 
     **The statutory base and the published maximum are different numbers, and the gap is the
     index.** R.C. 3317.022(A)(10)(a)(ii)(I) bounds the award at the lesser of the school's base
@@ -83,10 +83,10 @@ properties:
     support foundation aid for all public school students and scholarship payments for students in
     state scholarship programmes: GRF ALI 200550 Foundation Funding, GRF ALI 200502 Pupil
     Transportation, Fund 5VS0 ALI 200604, Fund 5YO0 ALI 200491, and Lottery Fund 7017 ALI 200612.
-    [verified — LSC redbook and greenbook, `crates/project/fixtures/dew-redbook.txt` and
+    [verified] (LSC redbook and greenbook, `crates/project/fixtures/dew-redbook.txt` and
     `dew-greenbook.txt`. Checked against the act as enacted, not only as introduced: the five
     lines and the sentence naming them are identical in both. The *amounts* in that table are
-    not — foundation aid was enacted $82m above the proposal — so nothing here quotes one.]
+    not — foundation aid was enacted $82m above the proposal — so nothing here quotes one.)
 
     So the budget document a reader would consult to size this programme shows it merged with the
     formula it draws from. The department's annual report is the only committed source here that

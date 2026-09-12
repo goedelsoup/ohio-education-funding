@@ -6,15 +6,15 @@ summary: >-
   construction rather than a ranking.
 description: |
   Three multiples: 0.2104, 0.1577, 0.1053. Each multiplies the statewide average base cost per
-  pupil, the district's ADM in that category, and its state share percentage. [verified — R.C.
-  3317.016]
+  pupil, the district's ADM in that category, and its state share percentage. [verified] (R.C.
+  3317.016)
 
   **They descend, and what they descend with is time and proficiency.** Category 1 is a pupil
   enrolled in schools in the United States for 180 school days or less. Category 2 is a pupil
   past that threshold and not yet proficient on the spring English language proficiency
   assessment. Category 3 is the two school years *after* the pupil scores proficient. So the
   schedule is a taper: a pupil funded at 0.2104 in their first year is funded at half that two
-  years after they stop needing the service, and then at nothing. [verified — the section]
+  years after they stop needing the service, and then at nothing. [verified] (the section)
 
   That is a different object from the other two schedules. Special education's six ascend with
   severity and career-technical's five sort programme types; both price a standing condition.
@@ -41,7 +41,7 @@ findings: |
   [fsfp-english-learner-weights](../formula-component/fsfp-english-learner-weights.yml). What is
   true is the thing the mistaken reading was reaching for: between the department's two published
   models the category one count falls by more than a fifth while the headcount barely moves.
-  [verified — crates/project]
+  [verified] (crates/project)
 
   ### They are the 2015 dollars over a new denominator, and nothing else changed
 
@@ -51,8 +51,8 @@ findings: |
   of FY2017, and the Bridge formula computed no categoricals at all. The plan divided those
   amounts by the FY2022 statewide average base cost per pupil of $7,202 and called the quotients
   weights: 1515 ÷ 7202 is 0.2104, 1136 ÷ 7202 is 0.1577, 758 ÷ 7202 is 0.1053. Every one lands
-  inside forty cents of the amount it replaced. [verified —
-  [`crates/project`](../../../crates/project/tests/the_weights_that_were_dollar_amounts.rs)]
+  inside forty cents of the amount it replaced. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_weights_that_were_dollar_amounts.rs))
 
   So English learner funding was carried across the regime change at exactly its 2015 value. The
   conversion to weights is what made it move afterwards: a dollar amount stays where it is put,
@@ -69,7 +69,7 @@ findings: |
   say that for FY2028 and thereafter the pupil is one who "satisfies criteria specified by the
   general assembly". The multiples themselves are stated without a year — but two of the three
   categories they price cease to be defined, which is the same expiry arriving by a different
-  route. [verified — the section]
+  route. [verified] (the section)
 properties:
   name: English learner category multiples
   unit: ratio
@@ -98,7 +98,7 @@ properties:
   statutory_basis: |
     R.C. 3317.016, read. "English learner" takes its meaning from R.C. 3301.0731 and the
     proficiency assessment from R.C. 3301.0711(C)(3), so the categories are defined by
-    cross-reference and the multiples are here. [verified — `ohio-laws`]
+    cross-reference and the multiples are here. [verified] (`ohio-laws`)
   simulation_key: |
     `project::panel::categoricals::ENGLISH_LEARNER_WEIGHTS`.
 
@@ -112,7 +112,7 @@ properties:
     districts that held or grew their English learner population and saw their weighted count
     fall anyway are counted at
     [fsfp-english-learner-weights](../formula-component/fsfp-english-learner-weights.yml).
-    [verified — crates/project]
+    [verified] (crates/project)
 
     Priced in the general statewide average base cost per pupil, so
     [base-cost-per-pupil](base-cost-per-pupil.yml) moves all three together, and the scenario

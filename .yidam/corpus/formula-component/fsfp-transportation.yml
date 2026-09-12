@@ -91,11 +91,11 @@ findings: |
     impractical to transport, it pays the parent instead. Division (G) has non-public and
     community schools receiving these payments directly and either passing them to the parent or
     buying transportation with them. Historically a **$5,000,000** earmark, halved to
-    $2,500,000 in one biennium. [verified — the section and the greenbooks]
+    $2,500,000 in one biennium. [verified] (the section and the greenbooks)
   - **Nontraditional school transportation**, a **$650,000** earmark reimbursing districts for
     carrying community and chartered non-public pupils **on days the district itself is closed**.
-    It exists because the calendars differ, which no weight can express. [verified — the
-    greenbooks]
+    It exists because the calendars differ, which no weight can express. [verified] (the
+    greenbooks)
 
   **And R.C. 3327.02(D) pegs its ceiling to the same lagged statistic the rates are.** The
   payment is "not less than fifty per cent, and not more than the amount determined by the
@@ -108,7 +108,7 @@ findings: |
   The predecessor formula did it with a third device again: a **nontraditional rider
   adjustment** of `(nontraditional riders / total riders) × 0.1 × base payment`, a proportional
   uplift rather than a per-rider weight. Ohio has compensated this cost under every formula and
-  has never used the same instrument twice. [verified — the greenbooks]
+  has never used the same instrument twice. [verified] (the greenbooks)
 
   ### The appropriation does not cover the entitlement, and this is the arithmetic
 
@@ -138,8 +138,8 @@ findings: |
   committed panel holds **609** districts and gives **438**; the department pays 611 and gives
   440. Both are right about their own population — the two districts between them are Lake Erie
   islands the department computes no base cost for, so they are below the transportation floor
-  and outside every figure the crates compute. [verified —
-  [`the_population_the_panel_speaks_for.rs`](../../../crates/project/tests/the_population_the_panel_speaks_for.rs)]
+  and outside every figure the crates compute. [verified]
+  ([`the_population_the_panel_speaks_for.rs`](../../../crates/project/tests/the_population_the_panel_speaks_for.rs))
 
   ### Its own guarantee, and not on the year its column says
 
@@ -151,8 +151,8 @@ findings: |
   transportation payment, and the department's own line-by-line explanation states the same two
   terms in five consecutive editions — *"(FY 2019 Capped Transportation – Community/STEM School
   Transportation)"*, ensuring a district *"does not receive less … than what it received in FY
-  2020"*. [verified —
-  [`crates/project`](../../../crates/project/tests/the_year_the_column_header_names.rs)]
+  2020"*. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_year_the_column_header_names.rs))
 
   So it is not a clause of this formula and it is not a third base. It is division (A)(2) of the
   section that pays the [guarantee](temporary-transitional-aid-guarantee.yml) itself: the same
@@ -160,7 +160,7 @@ findings: |
   the same way. Ohio holds districts harmless against **two** years across three places, not
   three — only the [formula transition supplement](fsfp-formula-transition-supplement.yml) is on
   FY2021, and LSC's greenbook names each base in one paragraph. The three sets of districts are
-  still distinct and still unnested: 294, 144 and 38. [verified — `crates/project`]
+  still distinct and still unnested: 294, 144 and 38. [verified] (`crates/project`)
 
   The heading is not thereby shown to be false. Under
   [H.B. 166](../legislation/hb-166-2019.yml) both years were held at FY2019, so a FY2021
@@ -178,7 +178,7 @@ findings: |
   rather than what the state sent; and `district-finances` splits aid no finer than unrestricted
   against restricted. [verified] So the identification is not unasked — it is waiting on the
   department's per-district payment reports, the source behind `dew-payment-reports`, whose own
-  blocker is an authenticated portal rather than an absence. [open — pending that retrieval]
+  blocker is an authenticated portal rather than an absence. [open] (pending that retrieval)
 
   ### The general proration factor is an appropriation, not a dial
 
@@ -188,8 +188,8 @@ findings: |
   allocation)"*, applied so as *"to keep the total statewide payment to the amount earmarked for
   such purposes in item 200502"*. The instruction in the budget that revived the formula is
   plainer still — *"ODE is required to prorate the calculated amount for each district to fit
-  within the appropriation."* Nobody chooses it. [verified —
-  [`crates/project`](../../../crates/project/tests/the_dial_that_was_an_appropriation.rs)]
+  within the appropriation."* Nobody chooses it. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_dial_that_was_an_appropriation.rs))
 
   **It was below one in FY2010, FY2011, FY2014 and FY2015, and the proof is a payment that only
   exists when it is.** Each of those bienniums created a *supplemental transportation payment*
@@ -311,7 +311,7 @@ properties:
     in the previous fiscal year by its qualifying ridership in the previous fiscal year", then
     excluding "the ten districts with the highest transportation costs per student and the ten
     districts with the lowest". Division (D) does the same per mile. They are **trimmed means of
-    what districts themselves reported spending last year**. [verified — `ohio-laws`]
+    what districts themselves reported spending last year**. [verified] (`ohio-laws`)
 
     That makes them a fourth kind of parameter in this corpus, beside the legislated, the delegated
     and the uncodified: a rate that moves when districts' own behaviour moves, with no one deciding
@@ -326,17 +326,17 @@ properties:
     and STEM riders and 2.0 on non-public ones; division (E)(1)(b) puts the same two multiples on
     *miles driven* for the same pupils. The crate had shown the department applies them — `[e]` is
     `public miles + 2 x non-public + 1.5 x community`, exactly, on every district — without
-    matching that arithmetic to the clause that requires it. [verified — crates/project]
+    matching that arithmetic to the clause that requires it. [verified] (crates/project)
 
     **The guarantee is statutory and it is one section away.** R.C. 3317.019(A)(2), under a name
-    that never uses the word: *temporary transitional transportation aid*. [verified —
-    crates/project]
+    that never uses the word: *temporary transitional transportation aid*. [verified]
+    (crates/project)
 
     **The 50% floor is the last term of a schedule, not a standing rule.** LSC's H.B. 33 analysis:
     "The minimum state share for transportation increases from 33.33% in FY 2023 to 37.50% in
     FY 2024 and 41.67% in FY 2025", and [H.B. 96](../legislation/hb-96-2025.yml) carries it to
-    45.83% and then 50%. [verified —
-    [`crates/project`](../../../crates/project/tests/the_parameters_before_this_biennium.rs)] The
+    45.83% and then 50%. [verified]
+    ([`crates/project`](../../../crates/project/tests/the_parameters_before_this_biennium.rs)) The
     five published values are eight through twelve twenty-fourths rounded to two places, so the
     floor has climbed from 33.33 to 50 percentage points in equal annual steps of a twenty-fourth
     — one schedule set across two budget acts rather than five separate decisions. [inference]

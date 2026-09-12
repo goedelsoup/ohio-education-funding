@@ -53,8 +53,8 @@ findings: |
   been in both positions at once. It was checkable. **Youngstown City is under an academic
   distress commission today and the department's FY2027 model pays it $162,207.67** on the
   [performance supplement](../formula-component/fsfp-performance-supplement.yml). All three
-  districts that have had a commission are in that model: [verified — computed; see
-  [`crates/project/tests/the_supplements_outside_the_formula.rs`](../../../crates/project/tests/the_supplements_outside_the_formula.rs)]
+  districts that have had a commission are in that model: [verified] (computed; see
+  [`crates/project/tests/the_supplements_outside_the_formula.rs`](../../../crates/project/tests/the_supplements_outside_the_formula.rs))
 
       East Cleveland   3 stars    progress 4   released                 $55,029.14
       Lorain           2 stars    progress 2   dissolved by H.B. 33            $0
@@ -73,20 +73,20 @@ findings: |
   stars to *begin* a transition out. 59 districts sit below that — Youngstown among them at 2.5 —
   and **15 of them are paid, $3,036,977.90 between them, not one through the star route.** A
   district can be too poorly rated to start its own release and well enough rated to be paid for
-  its performance in the same year. [verified — computed]
+  its performance in the same year. [verified] (computed)
 
   In the trigger band itself — R.C. 3302.10(A)(1) establishes a commission after three
   consecutive years below two stars — 15 districts sit at two stars or fewer, and exactly one is
   paid: **Jefferson Township Local, $10,426.68**, on a progress rating of 3 against an overall of
-  2. [verified — computed] Two of the 59 are the department's own zero-fill rather than a rating:
+  2. [verified] (computed) Two of the 59 are the department's own zero-fill rather than a rating:
   College Corner Local and Kelleys Island Local read 0 stars, and Kelleys Island has an ADM of
   3.51. A report card cannot rate students it is forbidden to report.
 
   ### Who has actually been under one
 
-  Three districts, on the department's own page: [verified —
-  [`dew-academic-distress-commission`](../../catalog/dew-academic-distress-commission.md), read
-  10 August 2026]
+  Three districts, on the department's own page: [verified]
+  ([`dew-academic-distress-commission`](../../catalog/dew-academic-distress-commission.md), read
+  10 August 2026)
 
       East Cleveland City Schools   released; a Notice of Release is published
       Lorain City School District   dissolved by H.B. 33, signed 4 July 2023

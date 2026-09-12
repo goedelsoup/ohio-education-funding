@@ -47,8 +47,8 @@ findings: |
 
   R.C. 3317.022 does not fix $5,500 and $7,500. It directs both to "increase in future fiscal years
   by the same percentage that the statewide average base cost per pupil increases in future fiscal
-  years". [verified —
-  [`crates/project`](../../../crates/project/tests/the_award_the_statute_computes.rs)] Three
+  years". [verified]
+  ([`crates/project`](../../../crates/project/tests/the_award_the_statute_computes.rs)) Three
   amounts in the section carry that clause — these two and the [Jon Peterson
   base](jon-peterson-special-needs.yml) — and the two $34,000 special-needs ceilings carry none.
 
@@ -111,7 +111,7 @@ properties:
     districts, the community and STEM school unit, and four scholarship units, of which one is the
     **educational choice scholarship unit**. Division (E) distributes the scholarship to the parent
     "from the funds paid to the educational choice scholarship unit under this section", in monthly
-    partial payments. [verified — R.C. 3317.022]
+    partial payments. [verified] (R.C. 3317.022)
 
     So the earlier `[open]` here — "direct appropriation is the natural reading and is not
     established" — is closed, and closed differently from how it was framed. The mechanism is not
@@ -125,8 +125,8 @@ properties:
   amount: |
     **A ceiling of $5,500 for grades kindergarten through eight and $7,500 for grades nine
     through twelve, scaled down by family income above 450% of the federal poverty guidelines.**
-    [verified — R.C. 3317.022(A)(10)(a)(ii) and R.C. 3310.08, read by
-    [`crates/project`](../../../crates/project/tests/the_award_the_statute_computes.rs)]
+    [verified] (R.C. 3317.022(A)(10)(a)(ii) and R.C. 3310.08, read by
+    [`crates/project`](../../../crates/project/tests/the_award_the_statute_computes.rs))
 
     The scaling is a curve, not a schedule. R.C. 3310.08 defines a "constant multiplier" of 0.50
     and a "power equation" of the family's income-to-poverty multiple times its natural logarithm;
@@ -158,10 +158,10 @@ properties:
     "are used to collectively support state foundation aid payments for all public school students
     in the state **and scholarship payments for students enrolled in state scholarship
     programs**": GRF ALI 200550 Foundation Funding, GRF ALI 200502 Pupil Transportation, Fund 5VS0
-    ALI 200604, Fund 5YO0 ALI 200491, and Lottery Fund 7017 ALI 200612. [verified — LSC redbook and greenbook, `crates/project/fixtures/dew-redbook.txt` and
+    ALI 200604, Fund 5YO0 ALI 200491, and Lottery Fund 7017 ALI 200612. [verified] (LSC redbook and greenbook, `crates/project/fixtures/dew-redbook.txt` and
     `dew-greenbook.txt`. Checked against the act as enacted, not only as introduced: the five
     lines and the sentence naming them are identical in both. The *amounts* in that table are
-    not — foundation aid was enacted $82m above the proposal — so nothing here quotes one.]
+    not — foundation aid was enacted $82m above the proposal — so nothing here quotes one.)
 
     That is a finding rather than a citation. The scholarship channel does not appear as a
     separate appropriation, so the budget document a reader would consult to size it shows it

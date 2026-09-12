@@ -76,7 +76,7 @@ properties:
     years for all 611 districts, and the overlap is a check rather than a duplication — FY2024 is
     identical in both files and FY2025 moves in **140 of 611 districts**, by 4.7 pupils statewide
     and at most a third of a per cent in any one. So the caveat above is right and small: a year's ADM is a departmental
-    estimate when first published and it does not move much afterwards. [verified — `crates/project`]
+    estimate when first published and it does not move much afterwards. [verified] (`crates/project`)
 
     A projection interval still does **not** come from the district's own history. It comes from
     the **cross-sectional spread of district annual growth rates**: we do not know how variable
@@ -88,7 +88,7 @@ properties:
     a column `M1B FY23 Enrolled ADM` — the enrolment growth supplement's base — and it is not the
     `[b1] FY23 Enrolled ADM` the `ADM Data` sheet publishes. They disagree in **608 of the 609
     districts** the panel carries, by up to 4.6%. Reading them as one series is the trap, and its
-    cost is measured in the findings below. [verified — `crates/project`]
+    cost is measured in the findings below. [verified] (`crates/project`)
 
     The interval widens with the **square root** of the horizon, not linearly — growth errors
     compound as a random walk, so a five-year projection is not five times as uncertain as a
@@ -114,8 +114,8 @@ links:
     target: ../education-agency/upper-arlington-city.yml
 
 findings: |
-  **THE GUARANTEE MAKES A DISTRICT'S AID COMPLETELY INSENSITIVE TO ITS ENROLLMENT.** [verified —
-  `crates/project`]
+  **THE GUARANTEE MAKES A DISTRICT'S AID COMPLETELY INSENSITIVE TO ITS ENROLLMENT.** [verified]
+  (`crates/project`)
   The [temporary transitional aid guarantee](../formula-component/temporary-transitional-aid-guarantee.yml)
   pays a fixed dollar amount that enrollment does not enter. For the 294 districts it funds — very
   nearly half the state — running the FY2027 formula at FY2024, FY2025 or FY2026 enrolment
@@ -124,7 +124,7 @@ findings: |
   as enrollment does; the widening gap between the two is the guarantee.
 
   **REMOVING THE GUARANTEE NEARLY DOUBLES THE STATE'S EXPOSURE TO ENROLLMENT FORECAST ERROR.**
-  [inference — a forecast] At FY2032 enrollment, total state aid under current law is $7,233M in
+  [inference] (a forecast) At FY2032 enrollment, total state aid under current law is $7,233M in
   a band of $6,958M to $7,582M (±4.3%). With the guarantee removed the same forecast error
   produces ±7.8%, on a band 1.8 times as wide. The guarantee is a shock absorber for the *appropriation* as well as for the
   district, and that is not usually how it is argued about. Recorded in full at
@@ -135,7 +135,7 @@ findings: |
 
   See [dew-mr81-enrollment-archive](../../catalog/dew-mr81-enrollment-archive.md).
 
-  **THE METHOD IS RIGHT AND THE CONSTANT IS NOT.** [verified — `crates/project`]
+  **THE METHOD IS RIGHT AND THE CONSTANT IS NOT.** [verified] (`crates/project`)
   This was carried as open for want of an enrollment history longer than three points. The
   history arrived from a different direction than the one expected: not `nces-ccd`, but the F-33
   panel, once it was extended past FY2022 — `V33` fall membership for **602 districts across
@@ -162,10 +162,10 @@ findings: |
   about a year; 0.85 carries three-quarters of it into the third.
 
   A longer fitting window is the larger of the two available improvements and is free — the
-  observations are already committed. [verified — `crates/project`]
+  observations are already committed. [verified] (`crates/project`)
 
-  **AND THE GUARANTEE ABSORBS MOST OF THE ERROR, WHICH BOUNDS WHAT IT COSTS.** [verified —
-  `crates/project`]
+  **AND THE GUARANTEE ABSORBS MOST OF THE ERROR, WHICH BOUNDS WHAT IT COSTS.** [verified]
+  (`crates/project`)
   At the feed's FY2036 horizon, moving the damping from 0.85 to 0.30 moves statewide ADM by
   **+3.38%** — 45,294 pupils — and realized state aid by **+1.42%**, or $101.0m. The enrollment
   error is more than twice the aid error for the reason this node already gives: the guarantee
@@ -184,8 +184,8 @@ findings: |
   was decided on and a decision's evidence has to keep reproducing; the figures above are what
   the same question answers today, pinned in `the_trend_the_damping_discards`.
 
-  **THE LARGEST POPULATION OUTSIDE THE COUNT HAS NO PER-DISTRICT RECORD AT ALL.** [verified —
-  `crates/project`]
+  **THE LARGEST POPULATION OUTSIDE THE COUNT HAS NO PER-DISTRICT RECORD AT ALL.** [verified]
+  (`crates/project`)
   ADM counts children a district enrolls. The department's own annual fact sheet counts, in one
   table and one year, every way an Ohio child is schooled instead — 173,156 in chartered private
   schools, 150,914 on vouchers, 116,973 in community schools, 79,006 on inter-district open
@@ -224,7 +224,7 @@ findings: |
   question needs. Only the department can answer it — tracked at
   [#257](https://github.com/goedelsoup/ohio-education-funding/issues/257).
 
-  **AND THE CONSTANT MOVED.** [verified — `crates/project`]
+  **AND THE CONSTANT MOVED.** [verified] (`crates/project`)
   It was left at 0.85 while only the measurement existed, because changing it moves every
   projection in the published feed, which is a decision to record rather than a number to edit.
   The decision is recorded at
@@ -239,7 +239,7 @@ findings: |
   years of Ohio enrollment say it should do.
 
   **AND THE TWO QUESTIONS THAT DECISION LEFT OPEN ARE ANSWERED — ONE NO, ONE YES.**
-  [verified — `crates/project`]
+  [verified] (`crates/project`)
 
   *A damping per district is noise.* Fitted on each district's own history it looks **15.3%**
   better than the single constant and is **3.6% worse** out of sample. More than two thirds of
@@ -262,7 +262,7 @@ findings: |
   moves the optimum to 0.40 and buys a further 0.18%, which is not worth a second change to a
   published constant.
 
-  **AND THE BLEND IS NOW WHAT THE PROJECTIONS USE.** [verified — `crates/project`]
+  **AND THE BLEND IS NOW WHAT THE PROJECTIONS USE.** [verified] (`crates/project`)
   Recorded at [the-shrunk-rate](../../decisions/the-shrunk-rate.yml). Every district's rate is
   three-tenths its own FY2024-FY2026 history and seven-tenths its fourteen-year rate in the F-33
   panel. Statewide ADM at FY2032 moves from 1,376,970 to **1,384,245** and the count on the
@@ -277,7 +277,7 @@ findings: |
   mostly noise and the reason the substitution could not be made mechanically.
 
   **AND THE THING NEITHER FITTING DECISION COULD SEE IS THAT THE PROJECTIONS RUN HIGH.**
-  [verified — `crates/project`]
+  [verified] (`crates/project`)
   Both were scored on mean absolute log error, which is blind to sign. The five-year backtest
   bias falls monotonically as the damping rises — **+0.033** at a damping of zero, **+0.030** at
   the shipped 0.30, **+0.002** undamped — so the damping causes it, and the undamped trend pays
@@ -296,7 +296,7 @@ findings: |
   53.3%. The over-forecast therefore lands hardest where the guarantee is what pays, and the
   error runs toward under-stating guarantee reliance.
 
-  **AND AT THE PUBLISHED HORIZON THE TREND IS SIMPLY GONE.** [verified — `crates/project`]
+  **AND AT THE PUBLISHED HORIZON THE TREND IS SIMPLY GONE.** [verified] (`crates/project`)
   Statewide ADM projected by the shipped method falls 12,500 in the first year, 3,654 in the
   second, 127 in the seventh, and **12 pupils in total between FY2032 and FY2036** — the two
   years this repository publishes — across 609 districts, in a state whose F-33 panel records a
@@ -307,7 +307,7 @@ findings: |
   panel drawn this way carries about four years of demographic content and six years of the same
   number relabelled, and nothing said so. Measured in `the_trend_the_damping_discards`.
 
-  **AND IT CANNOT BE DE-BIASED BY CHOOSING A DIFFERENT DAMPING.** [verified — `crates/project`]
+  **AND IT CANNOT BE DE-BIASED BY CHOOSING A DIFFERENT DAMPING.** [verified] (`crates/project`)
   That was left open and the answer is no. **The damping that zeroes the bias rises with the
   horizon** — there is no crossing at all at one or two years, then 0.32 at three, 0.64 at four,
   0.79 at five — so any single value is over-damped for the near years and under-damped for the
@@ -339,7 +339,7 @@ findings: |
 
   They are **0.328** and **0.341**, over 609 districts. The fitted value is 0.30. A different
   measure, a different population and a different method, landing within five hundredths.
-  [verified — `crates/project`]
+  [verified] (`crates/project`)
 
   **The check only works on one of the two FY2023 columns.** Splice the growth supplement's `M1B
   FY23` onto the base cost window's FY2024, FY2025 and FY2026 — which is what the 162-column panel
@@ -347,7 +347,7 @@ findings: |
   correlation comes out **-0.049**: same districts, same years, one column swapped, and the sign
   reversed. The later window pairs the growth into FY2025 with the growth into FY2026 and so
   touches no FY2023 at all, which is why **0.341** stands whichever column a reader picks.
-  [verified — `crates/project`]
+  [verified] (`crates/project`)
 
   What the two columns measure differently is not established. `M1B` is right for the supplement it
   belongs to and the supplement reproduces from it; whether the difference is a different pupil

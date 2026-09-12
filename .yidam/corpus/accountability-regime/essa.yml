@@ -36,8 +36,8 @@ description: |
   is the channel the [`deduction`](../../skills/deduction.md) stub records as unmodellable — so
   the corpus can name the pathway and cannot yet follow the money along it. [inference]
 
-  **Who is in it, as of the current lists:** 231 CSI, 117 ATSI, 60 TSI. [verified —
-  `dispersion::identified`] Forty-two of the CSI schools arrived by escalation, having been ATSI
+  **Who is in it, as of the current lists:** 231 CSI, 117 ATSI, 60 TSI. [verified]
+  (`dispersion::identified`) Forty-two of the CSI schools arrived by escalation, having been ATSI
   and failed to exit within three years, which makes the subgroup route a sixth of the whole-school
   tier rather than an edge case. A hundred carry identifications from 2018, against exit criteria
   that allow three years.
@@ -51,9 +51,9 @@ findings: |
   The regime's coupling to Ohio's report card is this node's thesis, and both halves of it have
   been committed since the building extract was wired — 408 identifications keyed on building IRN,
   and 3,318 buildings on the 2024-25 report card. Nothing joined them until now, and every
-  identification names a building the report card carries. [verified —
-  [`crates/dispersion`](../../../crates/dispersion/tests/the_list_the_report_card_does_not_explain.rs),
-  which is also the first reader the building extract has had]
+  identification names a building the report card carries. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_list_the_report_card_does_not_explain.rs),
+  which is also the first reader the building extract has had)
 
   What the join cannot do is reproduce the department's cut. **Neither published building file
   carries the overall rating**, which is the measure the plan identifies on; what is published is
@@ -75,7 +75,7 @@ findings: |
        62  identified 2025, directly
        42  ATSI 2022, escalated to CSI 2025
 
-  [verified — `crates/dispersion`]
+  [verified] (`crates/dispersion`)
 
   **The 2018 cohort is an attendance population, not an achievement one.** Its median Performance
   Index sits within three points of the cohorts identified since, but its median chronic

@@ -23,8 +23,8 @@ findings: |
       FY2009   enacted $9.553bn   foundation $6.703bn   70.2%   real $10.378bn
 
   **$10.378bn in constant FY2026 dollars is the peak**, FY2002 through FY2027, and **70.2% is the
-  peak share.** Every later figure in the series is below both. [verified —
-  `appropriation-lines.csv`, `bundle::deflator`]
+  peak share.** Every later figure in the series is below both. [verified]
+  (`appropriation-lines.csv`, `bundle::deflator`)
 
   That is worth stating plainly because the decade is usually narrated as decline, and the decline
   does not begin where the narration puts it. It begins after FY2009, in the biennium that enacted
@@ -33,7 +33,7 @@ findings: |
   ### Poverty crossed 40% here
 
   **39.6% then 42.6%** approved for free or reduced-price meals, over 896 and 913 sponsors — up
-  **11.4 points from FY2002**, on one unbroken basis. [verified — `mr81-sponsor-panel.csv`] FY2009
+  **11.4 points from FY2002**, on one unbroken basis. [verified] (`mr81-sponsor-panel.csv`) FY2009
   is the last year of that basis; the department moves to a different one in FY2010 and the two
   cannot be compared directly.
 properties:
@@ -41,7 +41,7 @@ properties:
   kind: biennium
   start: 2007-07-01
   end: 2009-06-30
-  appropriating_bill: Am. Sub. H.B. 119 (127th General Assembly). [verified — the corpus holds this act]
+  appropriating_bill: Am. Sub. H.B. 119 (127th General Assembly). [verified] (the corpus holds this act)
   context: |
     Foundation base cost formula era, its final biennium. Enacted basis. The cost of doing
     business factor and the base cost guarantee are both abolished by the appropriating act.

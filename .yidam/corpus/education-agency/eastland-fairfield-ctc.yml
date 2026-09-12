@@ -37,8 +37,8 @@ findings: |
   service agency** — the same code Ohio's educational service centres carry. **100 agencies hold
   that code and 49 are joint vocational districts**; the other 51 are service centres. A reader
   filtering on district type gets none of them and a reader filtering on `4` gets half a list of
-  something else. [verified —
-  [`crates/project`](../../../crates/project/tests/the_joint_vocational_district_the_corpus_held_nothing_about.rs)]
+  something else. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_joint_vocational_district_the_corpus_held_nothing_about.rs))
 
   Two independent routes split the hundred and select the same forty-nine: the name, because a
   service centre says so, and the levy, because a joint vocational district charges property tax
@@ -102,8 +102,8 @@ properties:
     JVSDs are funded on rules that differ from traditional districts in ways easy to overlook and
     consequential to get wrong. [inference]
   irn: |
-    051003 [verified — `crates/dispersion/fixtures/mr81-sponsor-panel.csv`, where it reports as
-    "Eastland-Fairfield Career/Tech Jt Voc SD" in October 2001]. Absent from the FY2021 IDEA Part
+    051003 [verified] (`crates/dispersion/fixtures/mr81-sponsor-panel.csv`, where it reports as
+    "Eastland-Fairfield Career/Tech Jt Voc SD" in October 2001). Absent from the FY2021 IDEA Part
     B allocation list, because federal special education money reaches career-technical students
     through their member districts rather than through the JVSD — which is why this took a
     child-nutrition return to establish.
@@ -113,7 +113,7 @@ properties:
     Not applicable in the standard department typology, which classifies traditional districts.
     How JVSDs are grouped for peer comparison was recorded here as unresolved; the corpus's own
     F-33 panel had already resolved it by excluding every one of them from the comparable set.
-    [verified — see the findings]
+    [verified] (see the findings)
   roles: |
     Career-technical provider to member districts [verified]. Subject to the 2-mill JVSD
     reduction-factor floor rather than the 20-mill floor [verified].
