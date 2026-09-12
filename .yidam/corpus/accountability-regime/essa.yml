@@ -115,7 +115,65 @@ findings: |
   served schools and this is every building. What it bounds is what the **published** rating can
   support — which is what a corpus quoting the published rating needs to know, and what the corpus
   was assuming rather than measuring. [inference]
+
+  ### And the three lists do not tilt the same way by sector
+
+  Community schools operate 310 of the 3,318 buildings the report card carries, 9.3%, and hold
+  45.5% of the comprehensive support list — **4.86510 times their share**. Read alone it is a
+  finding about the sector. It is not, and what says so is in the same file: they are 4.3% of ATSI
+  and 5.0% of TSI, **under-represented at 0.45740** of their share. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_three_lists_that_do_not_tilt_the_same_way.rs))
+  A sector that simply performed worse would be over-represented on all three; two opposite signs
+  in one regime are a fact about the criteria rather than about what lies behind them.
+
+  **The comprehensive tilt is carried by a designation.** Ohio's plan identifies every high school
+  with a federal graduation rate at or below 67%, and that criterion carries no Title I gate.
+  Dropout recovery schools enrol pupils who have already left school once, and **73** of the 76
+  dropout recovery identifications in the state are community-operated. [verified]
+  (crates/dispersion) The designation is 75 of the 231 CSI schools, one of 60 TSI and none of 117
+  ATSI — the shape of a criterion only high schools can fail.
+
+  **It does not explain all of it.** With dropout recovery off both sides, community school
+  buildings are still identified at **0.13924** against 0.0409 — more than three times, and a floor
+  rather than a rate, because the designation is published only on the identification lists and the
+  unidentified dropout recovery schools cannot be taken out of the denominator. [verified]
+  (crates/dispersion)
+
+  **The reverse tilt is one subgroup.** `Students with Disabilities` alone puts **86** of the 177
+  subgroup-tier buildings on a list and not one of them is a community school. [verified]
+  (crates/dispersion) Holding the comprehensive list constant and closing that door on both sides
+  moves the comparison from 3.90% against 5.86% to 3.90% against 2.88% — the sector inverts from
+  under-represented to over, and the community figure does not move at all, because there is
+  nothing there to remove.
+
+  **Size is not the explanation, which was worth testing and is wrong.** Community school buildings
+  are half the size of the rest, a median of 206 pupils against 411, and a subgroup needs pupils to
+  be reportable. The under-representation nonetheless holds inside every enrolment band, including
+  buildings of 700 and over. [verified] (crates/dispersion) Whether these schools enrol fewer pupils
+  with disabilities or merely too few to make a reportable subgroup cannot be settled here: the
+  report card publishes those counts at district grain and only for the 607 traditional districts.
+  [open]
 figures:
+  - key: dispersion/community-school-comprehensive-tilt
+    value: 4.8651
+    field: findings
+    as_written: "**4.86510 times their share**"
+  - key: dispersion/community-school-additional-tilt
+    value: 0.4574
+    field: findings
+    as_written: "**under-represented at 0.45740** of their share"
+  - key: dispersion/dropout-recovery-community-operated
+    value: 73
+    field: findings
+    as_written: "**73** of the 76\n  dropout recovery identifications"
+  - key: dispersion/community-school-comprehensive-rate-floor
+    value: 0.13924
+    field: findings
+    as_written: "identified at **0.13924** against 0.0409"
+  - key: dispersion/subgroup-tier-disability-only
+    value: 86
+    field: findings
+    as_written: "**86** of the 177\n  subgroup-tier buildings"
   - key: dispersion/report-card-buildings
     value: 3318
     field: findings
