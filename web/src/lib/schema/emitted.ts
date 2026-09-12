@@ -19,8 +19,15 @@
  *
  * The inherited task cannot be removed — `[schema]` lives in `mise.yidam.toml`, which
  * `mise run yidam-vendor-update` replaces wholesale — and a `[tasks.schema]` in `mise.toml`
- * does not shadow it. So the damage cannot be prevented, only noticed, and noticing it needs
- * the emitter's intent in a form a test can read: the file list catches the 21 strays, and the
+ * does not shadow it, nor does a `mise-tasks/schema` file task. This used to read "so the
+ * damage cannot be prevented, only noticed", which was one precedence rule short: a *later
+ * include* does win, so `mise.guards.toml` overrides `[schema]` with a task that refuses and
+ * says what to run instead, and `mise.toml` orders it after the file it overrides.
+ *
+ * The two halves catch different things and both are worth keeping. The guard stops the usual
+ * path before the tree is dirty; the tests below catch every other path — a stray run from a
+ * different checkout, a script, or a future task under another name — and noticing it needs the
+ * emitter's intent in a form a test can read: the file list catches the 21 strays, and the
  * prose fields catch the overwrite of the two committed files.
  */
 

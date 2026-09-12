@@ -35,7 +35,14 @@ experimental = true
 # about an unknown field and carries on — and the failure looks like nothing at
 # all, every inherited task simply absent.
 [task_config]
-includes = ["mise.yidam.toml"]
+# Ordering is load-bearing. An inherited task cannot be overridden from this
+# file — neither `[tasks.<name>]` nor a `mise-tasks/<name>` file task shadows a
+# name an included task file defines; the include wins and the local definition
+# is invisible, absent from `mise tasks` entirely. A *later include* does win, so
+# `mise.guards.toml` is where an inherited task gets overridden, and it has to
+# stay after the file it overrides. Both this line and that file survive
+# `yidam-vendor-update`, which replaces only `mise.yidam.toml`.
+includes = ["mise.yidam.toml", "mise.guards.toml"]
 
 # Where the Rust toolchain lives, stated because leaving it unstated is not the
 # no-op it looks like.
