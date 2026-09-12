@@ -4034,6 +4034,65 @@ pub static FIGURES: &[Figure] = &[
         compute: |_| dispersion::deduct::pool_share_across_window("133413").expect("ECOT is held"),
     },
     Figure {
+        key: "dispersion/community-schools-never-opened",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Ohio community schools the federal directory lists as scheduled to open and never \
+                records as open",
+        pinned: 267.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let never = dispersion::community_schools::never_opened().len();
+            f64::from(u32::try_from(never).unwrap_or(u32::MAX))
+        },
+    },
+    Figure {
+        key: "dispersion/community-schools-operating-peak",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Ohio community schools open at the sector\u{2019}s largest, in the 2013-14 \
+                directory edition",
+        pinned: 391.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let peak = dispersion::community_schools::sector_by_year()
+                .values()
+                .map(|year| year.open)
+                .max()
+                .unwrap_or_default();
+            f64::from(u32::try_from(peak).unwrap_or(u32::MAX))
+        },
+    },
+    Figure {
+        key: "dispersion/community-school-ten-year-survival",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Share of Ohio community schools that opened and were still open ten years later, \
+                over those the directory could observe that long",
+        pinned: 0.60554,
+        tolerance: 0.0005,
+        compute: |_| {
+            dispersion::community_schools::survival(10)
+                .rate()
+                .expect("schools are at risk")
+        },
+    },
+    Figure {
+        key: "dispersion/ecot-directory-editions",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Consecutive federal directory editions naming ECOT, 2000-01 through 2018-19",
+        pinned: 19.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let editions = dispersion::lea_directory::panel()
+                .iter()
+                .filter(|agency| agency.irn == "133413")
+                .count();
+            f64::from(u32::try_from(editions).unwrap_or(u32::MAX))
+        },
+    },
+    Figure {
         key: "dispersion/cleveland-state-revenue-real-change-negative",
         owner: "crates/dispersion",
         unit: Unit::Share,
