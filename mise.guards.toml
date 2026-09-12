@@ -1,0 +1,56 @@
+# mise.guards.toml — local overrides of inherited tasks.
+#
+# This is a mise *task file*, like `mise.yidam.toml`: tables are task names
+# directly (`[schema]`, not `[tasks.schema]`).
+#
+# It exists because of a precedence rule that is easy to get backwards. An
+# inherited task cannot be overridden from `mise.toml` — neither a
+# `[tasks.<name>]` block nor a `mise-tasks/<name>` file task shadows a name
+# defined in an included task file; the include wins and the local definition is
+# not merely outranked but invisible, absent from `mise tasks` entirely. What
+# does win is a **later include**: with
+#
+#   includes = ["mise.yidam.toml", "mise.guards.toml"]
+#
+# the last file to define a name is the one that runs. So an override has to be
+# another task file, listed after the one it overrides, and the ordering in
+# `mise.toml` is load-bearing rather than cosmetic.
+#
+# That makes this file durable in the one way that matters: `mise run
+# yidam-vendor-update` replaces `mise.yidam.toml` wholesale, and touches neither
+# this file nor the `includes` line in `mise.toml` that orders it.
+
+[schema]
+description = "Refuses. `.yidam/schemas/` is this repository's — use `pnpm --dir web schemas`."
+# The inherited `[schema]` task runs `yidam schema`, which writes into
+# `.yidam/schemas/` — a directory this repository generates itself, from the zod
+# definitions in `web/src/lib/schema/`, via `pnpm --dir web schemas`.
+#
+# The two disagree, and ours is strictly the stricter one. Measured against
+# `yidam schema` at 0.12.0, running it costs `corpus-node.json` the entire figure
+# binding shape, `findings`, `revisions`, `unfilled`, and `summary` with both its
+# 450-character ceiling and its no-markdown-link pattern; `required` falls from
+# five fields to three; `additionalProperties` flips to `true`, so a misspelled
+# field stops being underlined at all. It then drops 21 further files nothing
+# here consumes, which a `git add .yidam` commits silently.
+#
+# It is not a version problem and no upgrade resolves it: 0.11.0 and 0.12.0
+# produce byte-identical output, and both diverge the same way.
+#
+# `web/tests/unit/schema.spec.ts` catches the damage after the fact — it compares
+# both documents whole, prose fields included, and asserts the directory holds
+# exactly the two files the emitter writes. This task is the half that stops it
+# happening, so the failure arrives before the tree is dirty rather than after.
+run = '''
+echo "error: \`mise run schema\` is refused in this repository." >&2
+echo >&2
+echo "  .yidam/schemas/ is generated from web/src/lib/schema/, not from the" >&2
+echo "  ontology. \`yidam schema\` overwrites both committed files with a" >&2
+echo "  weaker generic schema and drops 21 more that nothing here consumes." >&2
+echo >&2
+echo "  regenerate: pnpm --dir web schemas   (or mise run //web:schemas)" >&2
+echo >&2
+echo "  If it has already run: git checkout -- .yidam/schemas/" >&2
+echo "                        git clean -fd .yidam/schemas/" >&2
+exit 1
+'''
