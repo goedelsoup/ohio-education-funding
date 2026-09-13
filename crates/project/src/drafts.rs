@@ -48,7 +48,8 @@ use crate::report::{simulate, PolicyEffect};
 const FIXTURE: &str = include_str!("../fixtures/draft-provisions.tsv");
 
 const EXPECTED_HEADER: &str =
-    "draft\tordinal\ttitle\tauthority\tparameter\tlever\tbaseline\tproposed\tnote";
+    "draft\tordinal\ttitle\tauthority\tparameter\tlever\tbaseline\tproposed\tnote\t\
+     baseline_source";
 
 /// The columns of [`EXPECTED_HEADER`], named where they are read.
 ///
@@ -63,6 +64,92 @@ mod column {
     pub const BASELINE: usize = 6;
     pub const PROPOSED: usize = 7;
     pub const NOTE: usize = 8;
+    pub const BASELINE_SOURCE: usize = 9;
+}
+
+/// Where a provision's stated baseline can be checked against committed law.
+///
+/// # Why a draft needs this and the lever column does not supply it
+///
+/// [`Provision::is_priced`] says whether the model can run a provision. It says nothing about
+/// whether the provision is stated against law that is still in force, and the two failures are
+/// independent: a plank can price cleanly and be measured against a baseline three years out of
+/// date. That is the more dangerous of the two, because nothing about the output looks wrong.
+///
+/// Both of this fixture's stale baselines were found by hand rather than by the gate. The
+/// transportation floor was stated at 29.17% after H.B. 96 had raised it to 50%, which inverted
+/// the provision's sign — it reads as a rise and prices as a $118m cut. The scholarship
+/// hold-harmless is stated against a deduction the Revised Code describes in the past tense.
+///
+/// So every provision names the committed text its baseline rests on, and a test resolves it.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum Anchor {
+    /// A verbatim phrase that must appear in [`crate::statute::FIXTURE`].
+    ///
+    /// Present means the baseline is the law as committed. A phrase that stops matching is a
+    /// section that has been amended under a draft that still cites it.
+    Statute(String),
+    /// The baseline is real but is not in the Revised Code, with the reason.
+    ///
+    /// Temporary law is the case this exists for: the guarantee lives in the uncodified sections
+    /// of an appropriations act, so no statutory text states it and none can be quoted. Counted
+    /// rather than waved through, so the count cannot grow quietly.
+    Uncodified(String),
+    /// The baseline is **not** current law, and the phrase proves it.
+    ///
+    /// The quote must still resolve, because a repeal is established by text as much as a rule is.
+    /// `3310.41`'s deduction is described as having "existed prior to September 30, 2021", which
+    /// is the Revised Code stating its own repeal.
+    Superseded(String),
+}
+
+impl Anchor {
+    /// Read an anchor from the fixture's `baseline_source` column.
+    ///
+    /// # Errors
+    ///
+    /// If the kind is not one of the three, or the phrase is empty.
+    pub fn parse(field: &str) -> Result<Self, String> {
+        let (kind, rest) = field
+            .split_once(':')
+            .ok_or_else(|| format!("baseline_source {field:?} has no kind prefix"))?;
+        let phrase = rest.trim();
+        if phrase.is_empty() {
+            return Err(format!("baseline_source {field:?} names no text"));
+        }
+        match kind {
+            "statute" => Ok(Self::Statute(phrase.to_string())),
+            "uncodified" => Ok(Self::Uncodified(phrase.to_string())),
+            "superseded" => Ok(Self::Superseded(phrase.to_string())),
+            other => Err(format!(
+                "unknown baseline_source kind {other:?}; the three are statute, uncodified, \
+                 superseded"
+            )),
+        }
+    }
+
+    /// The phrase this anchor names, whichever kind it is.
+    #[must_use]
+    pub fn phrase(&self) -> &str {
+        match self {
+            Self::Statute(text) | Self::Uncodified(text) | Self::Superseded(text) => text,
+        }
+    }
+
+    /// Whether the phrase has to resolve in the committed statute extract.
+    ///
+    /// True for both [`Self::Statute`] and [`Self::Superseded`] — a repeal is proved by text the
+    /// same way a rule is. False only where there is no statutory text to quote.
+    #[must_use]
+    pub const fn is_quoted(&self) -> bool {
+        matches!(self, Self::Statute(_) | Self::Superseded(_))
+    }
+
+    /// Whether the baseline this anchors is still the law.
+    #[must_use]
+    pub const fn stands(&self) -> bool {
+        !matches!(self, Self::Superseded(_))
+    }
 }
 
 /// One lever a provision moves, already parsed.
@@ -175,6 +262,12 @@ pub struct Provision {
     pub proposed: String,
     /// Why it does not price, or what the run is sized against where it does.
     pub note: String,
+    /// Where the stated baseline can be checked against committed law.
+    ///
+    /// Separate from [`Self::is_priced`] on purpose: whether the model can run a provision and
+    /// whether the provision is stated against law still in force are independent questions, and
+    /// this fixture has carried a stale baseline on a provision that was already marked unpriced.
+    pub anchor: Anchor,
 }
 
 impl Provision {
@@ -394,6 +487,8 @@ pub fn drafts() -> BTreeMap<String, Draft> {
                 baseline: row.str(column::BASELINE).to_string(),
                 proposed: row.str(column::PROPOSED).to_string(),
                 note: row.str(column::NOTE).to_string(),
+                anchor: Anchor::parse(row.str(column::BASELINE_SOURCE))
+                    .unwrap_or_else(|why| panic!("{why}")),
             });
     }
     for draft in out.values_mut() {

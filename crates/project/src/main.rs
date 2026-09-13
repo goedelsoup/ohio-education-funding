@@ -273,6 +273,32 @@ fn price_draft(slug: &str, as_json: bool) -> Result<(), String> {
             println!("      {}", provision.note);
         }
     }
+
+    // Whether a baseline still stands is a separate question from whether the model can run the
+    // provision, and the two do not line up — the one stale baseline in this fixture sat on a
+    // provision already marked unpriced, which is how it went unread. See
+    // `tests/the_baseline_a_draft_is_stated_against.rs`.
+    let fallen: Vec<_> = found
+        .provisions
+        .iter()
+        .filter(|provision| !provision.anchor.stands())
+        .collect();
+    if !fallen.is_empty() {
+        println!();
+        let n = fallen.len();
+        println!(
+            "BASELINE SUPERSEDED — {n} provision{}, stated against law no longer in force",
+            if n == 1 { "" } else { "s" }
+        );
+        for provision in fallen {
+            println!("  {:>2}  {}", provision.ordinal, provision.title);
+            println!("      baseline: {}", provision.baseline);
+            println!(
+                "      the Revised Code describes it in the past tense: \"{}\"",
+                provision.anchor.phrase()
+            );
+        }
+    }
     Ok(())
 }
 
