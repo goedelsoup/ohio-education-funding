@@ -115,7 +115,7 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * over `figures`, and the nodes with a non-empty one — rather than incremented.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "742 bindings; raise this when you add one").toBeGreaterThanOrEqual(742);
+  expect(bindings.length, "745 bindings; raise this when you add one").toBeGreaterThanOrEqual(745);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "74 nodes carry bindings; raise this when a seventy-fifth does",

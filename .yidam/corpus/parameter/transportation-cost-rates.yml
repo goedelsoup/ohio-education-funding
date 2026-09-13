@@ -162,6 +162,23 @@ findings: |
   `fsfp-transportation` recorded that "whether the rider weights and the guarantee are statutory
   has not been separated out here". They separate: the weights are statutory, in division
   (E)(1); the guarantee is not in the section.
+  ### What the floor is worth, and which districts it pays
+
+  The floor is not a detail at the edge of the programme. Paying every district its own state share
+  instead would cost **$289,611,593.21** less — two fifths of Ohio's transportation aid is paid by
+  the floor rather than by the share. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_floor_that_pays_the_wealthy_districts.rs))
+
+  **And it runs up the wealth distribution.** A floor binds where a district's own share is low,
+  and a low state share is what high local capacity produces — so the payment is monotone in
+  wealth: **$3.18** per pupil in the least wealthy fifth of districts by assessed valuation against
+  **$405.92** in the wealthiest, and every district in the top two quintiles sits on it against
+  twelve of 120 in the bottom. [verified] (crates/project)
+
+  That is the opposite shape from the rest of the formula, and it is the fact any proposal to move
+  this floor needs stated beside it — raising it pays the districts with the most local capacity,
+  and lowering it falls on them.
+
 properties:
   name: Transportation cost rates
   unit: dollars-per-pupil
@@ -262,6 +279,18 @@ unfilled:
       explanations give the method for every one of those years and the rates for none of them,
       so what is missing is four values that no surviving document states.
 figures:
+  - key: project/transportation-floor-value
+    value: 289611593.21
+    field: findings
+    as_written: "**$289,611,593.21**"
+  - key: project/transportation-floor-poorest-quintile
+    value: 3.18
+    field: findings
+    as_written: "**$3.18** per pupil in the least wealthy fifth"
+  - key: project/transportation-floor-richest-quintile
+    value: 405.92
+    field: findings
+    as_written: "**$405.92** in the wealthiest"
   - key: project/panel-districts-under-the-transportation-floor
     value: 438
     field: findings

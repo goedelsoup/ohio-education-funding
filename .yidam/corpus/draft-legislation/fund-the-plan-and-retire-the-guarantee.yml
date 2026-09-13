@@ -157,7 +157,7 @@ properties:
     no lever expresses a categorical weight.
 
     **4. Transportation reimbursement floor raised to 37.5 percent.** R.C. 3317.0212. **Not
-    runnable** — outside the model.
+    runnable** — priceable but unlevered, and against current law a reduction. See `unpriced`.
 
     **5. Resident district held harmless for scholarship deductions.** R.C. 3310.41. **Not
     runnable** — outside the model.
@@ -174,8 +174,19 @@ properties:
     implementation in `web/src/lib/policy.ts`, because `verify.ts` refuses to render the scenario
     page until the browser reproduces every Rust checkpoint. [verified]
 
-    **Transportation reimbursement (provision 4, R.C. 3317.0212).** Outside the model. The panel carries no
-    transportation series, so there is nothing for a lever to move. [verified]
+    **Transportation reimbursement (provision 4, R.C. 3317.0212).** This said "outside the model —
+    the panel carries no transportation series, so there is nothing for a lever to move", and it
+    was wrong: the panel carries twenty-five per-district transportation columns and the provision
+    is fully priceable. It is **unlevered rather than unmodelled**, like provision 3. See
+    [`the_floor_that_pays_the_wealthy_districts`](../../../crates/project/tests/the_floor_that_pays_the_wealthy_districts.rs)
+    and `project::transport::floor`, which price it. [verified]
+
+    **And priced, it is a reduction.** The provision proposes 37.5% against a stated baseline of
+    29.17%, and H.B. 96 has since raised the floor 41.67% → 45.83% → **50%**. Against FY2027 law
+    the provision cuts the floor by 12.5 percentage points, worth **-$118,105,482**, and it falls
+    on the districts the floor pays — which are the wealthiest. The provision is left as written
+    and priced as written; a draft that silently acquires the number its author meant is not a
+    record of anything. [verified] (crates/project)
 
     **Scholarship hold-harmless (provision 5, R.C. 3310.41).** Outside the model, and the furthest out of the
     three. The deduct channel needs the per-agency participation series
