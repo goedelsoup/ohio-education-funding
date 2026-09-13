@@ -4185,6 +4185,89 @@ pub static FIGURES: &[Figure] = &[
         },
     },
     Figure {
+        key: "dispersion/community-school-comprehensive-tilt",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Community schools\u{2019} share of the comprehensive support list against their \
+                share of Ohio\u{2019}s report-card buildings",
+        pinned: 4.86510,
+        tolerance: 0.005,
+        compute: |_| {
+            dispersion::identified::tilt("csi", dispersion::identified::Sector::Community)
+                .expect("the list is not empty")
+        },
+    },
+    Figure {
+        key: "dispersion/community-school-additional-tilt",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The same against the additional targeted support list, where the sector is \
+                under-represented rather than over",
+        pinned: 0.45740,
+        tolerance: 0.005,
+        compute: |_| {
+            dispersion::identified::tilt("atsi", dispersion::identified::Sector::Community)
+                .expect("the list is not empty")
+        },
+    },
+    Figure {
+        key: "dispersion/dropout-recovery-community-operated",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Dropout recovery identifications operated by a community school, of 76 in Ohio",
+        pinned: 73.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let schools = dispersion::community_schools::schools();
+            let operated = dispersion::identified::identifications()
+                .into_iter()
+                .filter(|one| one.school_type == dispersion::identified::DROPOUT_RECOVERY)
+                .filter(|one| {
+                    dispersion::building::by_irn(&one.building_irn).is_some_and(|building| {
+                        schools.iter().any(|s| s.irn == building.district_irn)
+                    })
+                })
+                .count();
+            f64::from(u32::try_from(operated).unwrap_or(u32::MAX))
+        },
+    },
+    Figure {
+        key: "dispersion/community-school-comprehensive-rate-floor",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Community school buildings on the comprehensive support list once dropout \
+                recovery is taken off both sides \u{2014} a floor",
+        pinned: 0.13924,
+        tolerance: 0.0005,
+        compute: |_| {
+            dispersion::identified::comprehensive_without_dropout_recovery(
+                dispersion::identified::Sector::Community,
+            )
+            .rate()
+            .expect("the sector has buildings")
+        },
+    },
+    Figure {
+        key: "dispersion/subgroup-tier-disability-only",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Subgroup-tier buildings put there by the disability subgroup alone, of 177, none \
+                of them a community school",
+        pinned: 86.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let only = dispersion::identified::identifications()
+                .into_iter()
+                .filter(|one| one.status == "tsi" || one.status == "atsi")
+                .filter(|one| {
+                    one.subgroups.as_slice()
+                        == [dispersion::identified::DISABILITY_SUBGROUP.to_string()]
+                })
+                .count();
+            f64::from(u32::try_from(only).unwrap_or(u32::MAX))
+        },
+    },
+    Figure {
         key: "dispersion/cleveland-state-revenue-real-change-negative",
         owner: "crates/dispersion",
         unit: Unit::Share,
