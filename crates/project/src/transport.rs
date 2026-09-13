@@ -479,3 +479,188 @@ fn enacted_year(fiscal_year: u16, row: budget_analysis::Row) -> Option<Dollars> 
         _ => None,
     }
 }
+
+/// What the transportation floor is worth, and to whom.
+///
+/// # The floor, which is not the formula's floor
+///
+/// R.C. 3317.0212(E)(1)(c) pays a district's calculated transportation amount at the **greater of
+/// its own state share percentage and a fixed minimum**. H.B. 96 raised that minimum 41.67% →
+/// 45.83% → 50% across FY2025-FY2027, and [`Rates::minimum_state_share`] carries it. It is a
+/// different floor from the formula's 10% minimum state share, five times the size, and it binds
+/// on far more of the state: 438 of the 609 districts this panel costs sit on it, against 23% on
+/// the formula's.
+///
+/// # Why the gross has to be recovered rather than read
+///
+/// The department's model publishes transportation **net** — each of the five payment components
+/// already has the applied share inside it, and `[G] Total` is their sum plus the `[F]` guarantee,
+/// exactly, on every district. So a different floor cannot be priced by scaling the total: the
+/// share has to come back out first.
+///
+/// It comes out cleanly because the applied share is known. Dividing a component by
+/// `max(state_share, floor_in_force)` recovers the calculated amount, and the recovery is checked
+/// rather than assumed — the recovered `[A] School Bus` reproduces `max(weighted riders × the
+/// rider rate, bus miles × the mile rate × 180)` on **601 of 601** districts, and the statewide
+/// total at the floor in force reproduces the published $726.1M. See
+/// `the_floor_that_pays_the_wealthy_districts`.
+///
+/// # What it is worth, and to whom
+///
+/// **$289.6M**, which is 40% of Ohio's transportation aid — the floor pays more than the
+/// district's own share does for two fifths of the programme. And it runs **up** the wealth
+/// distribution, monotonically: $3.38 per pupil in the poorest fifth of districts by assessed
+/// valuation against **$398.01 in the richest**, a hundred and eighteen times. Every district in
+/// the top two quintiles is on it; thirteen of 120 in the bottom are.
+///
+/// That is the opposite shape from the rest of the formula, and it is the fact a proposal to move
+/// this floor needs stated beside it: raising it is a payment to the districts whose local capacity
+/// is highest, and lowering it falls on the same districts.
+pub mod floor {
+    use edfund_core::Dollars;
+
+    use crate::panel::{self, DistrictRecord};
+
+    /// One district's transportation aid, split so another floor can be priced.
+    #[derive(Debug, Clone, PartialEq)]
+    pub struct Paid {
+        /// The district.
+        pub irn: String,
+        /// `[b4]`, the district's own state share percentage.
+        pub state_share: f64,
+        /// The calculated amount before any share is applied.
+        pub gross: Dollars,
+        /// `[F]`, the transportation guarantee, which no share touches.
+        pub guarantee: Dollars,
+        /// Assessed valuation per pupil, for the incidence question.
+        pub valuation_per_pupil: Option<Dollars>,
+        /// Enrolled ADM, for a per-pupil reading.
+        pub enrolled_adm: f64,
+    }
+
+    impl Paid {
+        /// The share actually applied at a given floor.
+        #[must_use]
+        pub fn applied(&self, floor: f64) -> f64 {
+            self.state_share.max(floor)
+        }
+
+        /// What the district is paid at a given floor.
+        #[must_use]
+        pub fn under(&self, floor: f64) -> Dollars {
+            self.gross * self.applied(floor) + self.guarantee
+        }
+
+        /// Whether the floor binds — the district's own share is below it.
+        #[must_use]
+        pub fn on_floor(&self, floor: f64) -> bool {
+            self.state_share < floor
+        }
+
+        /// What the floor is worth to this district: the payment above its own share.
+        #[must_use]
+        pub fn floor_value(&self, floor: f64) -> Dollars {
+            self.gross * (floor - self.state_share).max(0.0)
+        }
+    }
+
+    /// Every district's transportation aid, decomposed against the floor in force that year.
+    ///
+    /// Districts reporting no transportation payment or no state share are left out rather than
+    /// carried at zero, because a zero here is an absence of the programme and not a district paid
+    /// nothing by it.
+    ///
+    /// `None` where the year has no published rates.
+    #[must_use]
+    pub fn paid(fiscal_year: u16) -> Option<Vec<Paid>> {
+        let in_force = super::rates_for(fiscal_year)?.minimum_state_share;
+        let recovered = |record: &DistrictRecord| {
+            let share = record.published_state_share?;
+            let components = record.transportation.components();
+            (share > 0.0 && components > 0.0).then(|| Paid {
+                irn: record.irn.clone(),
+                state_share: share,
+                gross: components / share.max(in_force),
+                guarantee: record.transportation.guarantee,
+                valuation_per_pupil: record.valuation_per_pupil,
+                enrolled_adm: record.current_year_adm,
+            })
+        };
+        Some(panel::panel().iter().filter_map(recovered).collect())
+    }
+
+    /// Statewide transportation aid at a given floor.
+    #[must_use]
+    pub fn statewide_under(fiscal_year: u16, floor: f64) -> Option<Dollars> {
+        Some(paid(fiscal_year)?.iter().map(|d| d.under(floor)).sum())
+    }
+
+    /// What the floor in force is worth statewide, against paying every district its own share.
+    #[must_use]
+    pub fn value_of_the_floor(fiscal_year: u16) -> Option<Dollars> {
+        let in_force = super::rates_for(fiscal_year)?.minimum_state_share;
+        Some(statewide_under(fiscal_year, in_force)? - statewide_under(fiscal_year, 0.0)?)
+    }
+
+    /// One band of the wealth distribution, and what the floor pays into it.
+    #[derive(Debug, Clone, Copy, PartialEq)]
+    pub struct Band {
+        /// `1` is the least wealthy fifth by assessed valuation per pupil.
+        pub quintile: usize,
+        /// Districts in it.
+        pub districts: usize,
+        /// Those the floor binds on.
+        pub on_floor: usize,
+        /// What the floor pays them.
+        pub value: Dollars,
+        /// Their enrolled ADM between them.
+        pub enrolled_adm: f64,
+    }
+
+    impl Band {
+        /// The floor's value per pupil in this band.
+        #[must_use]
+        pub fn per_pupil(&self) -> Option<Dollars> {
+            (self.enrolled_adm > 0.0).then(|| self.value / self.enrolled_adm)
+        }
+    }
+
+    /// The floor's incidence across valuation-per-pupil quintiles, least wealthy first.
+    ///
+    /// Districts publishing no valuation are dropped, because the axis is the valuation.
+    ///
+    /// `None` where the year has no published rates.
+    #[must_use]
+    pub fn incidence(fiscal_year: u16) -> Option<Vec<Band>> {
+        let floor = super::rates_for(fiscal_year)?.minimum_state_share;
+        let mut districts: Vec<Paid> = paid(fiscal_year)?
+            .into_iter()
+            .filter(|d| d.valuation_per_pupil.is_some())
+            .collect();
+        districts.sort_by(|a, b| {
+            a.valuation_per_pupil
+                .unwrap_or_default()
+                .total_cmp(&b.valuation_per_pupil.unwrap_or_default())
+        });
+
+        let width = districts.len() / 5;
+        Some(
+            (0..5)
+                .map(|index| {
+                    let band = if index == 4 {
+                        &districts[index * width..]
+                    } else {
+                        &districts[index * width..(index + 1) * width]
+                    };
+                    Band {
+                        quintile: index + 1,
+                        districts: band.len(),
+                        on_floor: band.iter().filter(|d| d.on_floor(floor)).count(),
+                        value: band.iter().map(|d| d.floor_value(floor)).sum(),
+                        enrolled_adm: band.iter().map(|d| d.enrolled_adm).sum(),
+                    }
+                })
+                .collect(),
+        )
+    }
+}

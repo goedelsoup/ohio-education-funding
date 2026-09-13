@@ -4268,6 +4268,43 @@ pub static FIGURES: &[Figure] = &[
         },
     },
     Figure {
+        key: "project/transportation-floor-value",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the transportation minimum state share pays above what districts\u{2019} own \
+                shares would, FY2027",
+        pinned: 289_611_593.21,
+        tolerance: 1.0,
+        compute: |_| project::transport::floor::value_of_the_floor(2027).expect("FY2027"),
+    },
+    Figure {
+        key: "project/transportation-floor-poorest-quintile",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The transportation floor per pupil in the least wealthy fifth of districts by \
+                assessed valuation, FY2027",
+        pinned: 3.18,
+        tolerance: 0.05,
+        compute: |_| {
+            project::transport::floor::incidence(2027).expect("FY2027")[0]
+                .per_pupil()
+                .expect("the band has pupils")
+        },
+    },
+    Figure {
+        key: "project/transportation-floor-richest-quintile",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same in the wealthiest fifth, FY2027",
+        pinned: 405.92,
+        tolerance: 0.5,
+        compute: |_| {
+            project::transport::floor::incidence(2027).expect("FY2027")[4]
+                .per_pupil()
+                .expect("the band has pupils")
+        },
+    },
+    Figure {
         key: "dispersion/cleveland-state-revenue-real-change-negative",
         owner: "crates/dispersion",
         unit: Unit::Share,

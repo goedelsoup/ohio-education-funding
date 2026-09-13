@@ -280,6 +280,18 @@ pub struct Transportation {
     pub special_education: Dollars,
 }
 
+impl Transportation {
+    /// `[A]` through `[E]` summed — the five payment components, net of the applied state share.
+    ///
+    /// `[G] Total` is this plus [`Self::guarantee`], exactly, on every district the panel carries.
+    /// Each component already has the share inside it, which is why
+    /// [`crate::transport::floor`] has to divide it back out before it can price another floor.
+    #[must_use]
+    pub fn components(&self) -> Dollars {
+        self.school_bus + self.mass_transit + self.other + self.efficiency + self.density
+    }
+}
+
 /// Per weighted rider, and per bus mile across a school year.
 pub const TRANSPORT_PER_RIDER: Dollars = 1337.175;
 /// The mile base, which more than half the state is actually paid on.
