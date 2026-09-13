@@ -160,7 +160,7 @@ properties:
     runnable** — priceable but unlevered, and against current law a reduction. See `unpriced`.
 
     **5. Resident district held harmless for scholarship deductions.** R.C. 3310.41. **Not
-    runnable** — outside the model.
+    runnable** — outside the model, and its baseline is superseded. See `unpriced`.
 
     The committed binding is
     [`draft-provisions.tsv`](../../../crates/project/fixtures/draft-provisions.tsv), which is
@@ -188,8 +188,17 @@ properties:
     and priced as written; a draft that silently acquires the number its author meant is not a
     record of anything. [verified] (crates/project)
 
-    **Scholarship hold-harmless (provision 5, R.C. 3310.41).** Outside the model, and the furthest out of the
-    three. The deduct channel needs the per-agency participation series
+    **Scholarship hold-harmless (provision 5, R.C. 3310.41).** Outside the model, and its
+    **baseline no longer stands**. The provision is stated against a deduction from the resident
+    district, and R.C. 3317.022 describes that deduction in the past tense — "division (C)(2) of
+    section 3310.41 of the Revised Code **as that division existed prior to September 30, 2021**".
+    The mechanism it proposes to repeal was repealed four years before the draft was written, so
+    the provision costs nothing and fixes nothing. [verified]
+    ([`crates/project`](../../../crates/project/tests/the_baseline_a_draft_is_stated_against.rs))
+    Left as written and reported as superseded rather than corrected, for the reason provision 4
+    is: a draft that quietly acquires the law its author meant is not a record of anything.
+
+    It is also outside the model, and the furthest out of the three. The deduct channel needs the per-agency participation series
     [`deduction`](../../skills/deduction.md) was declared for and never received; the connector
     that would carry it sits behind the department's authenticated reports portal. [open]
 links:
