@@ -66,6 +66,17 @@ district "is available here" — linking to a route that returns 404. The
 [`deduction`](../skills/deduction.md) stub records that route and one other, both cited in a
 current departmental document and both gone.
 
+The second of the two has a public substitute that is not the same file: the
+[EdChoice designated list](dew-edchoice-designated-list.md) is per district and per building, and
+is eligibility rather than participation. Nothing published answers which district a scholarship
+was charged against.
+
+**And it is not the only participation source any more.** The
+[historical archive](dew-scholarship-historical-data.md) carries FY1997 through FY2013 statewide,
+and counts applications and scholarships-paid separately — which is a second denominator for the
+same quantity, and the shape of evidence the guess above needs. It does not identify this report's
+denominator; it establishes that the department has long kept two.
+
 **It is not the deduct era.** Every figure is 2024-2025, under the Fair School Funding Plan, where
 each scholarship is its own funding unit paid directly. Nothing here bears on what a district lost
 when the mechanism was a deduction; that needs `dew-payment-reports`.

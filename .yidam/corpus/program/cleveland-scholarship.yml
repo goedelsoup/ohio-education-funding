@@ -37,6 +37,54 @@ revisions:
       about the law in force. Which era a scholarship's mechanism is described from decides
       whether the resident district loses the money, so the two must be dated rather than
       merged. The deduct-era mechanism is a separate question and still open.
+findings: |
+  ### The department's archive gives this programme seventeen years, and one of its columns
+  ### changes meaning in the middle
+
+  The 2025 annual report was the only participation figure the corpus held for this programme.
+  The department's *Historical Scholarship Data* workbook carries it from **FY1997**, the
+  programme's first year, and counts it two ways in every one of them: applications made, and
+  scholarships with at least one payment against them. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_renewal_that_was_last_years_payments.rs))
+
+  The two are far apart. FY1997 records 3.1 applications for every scholarship actually paid, and
+  even FY2013 records 1.1. [verified] (crates/project) So a participation figure taken off the
+  wrong column overstates the early programme threefold, and the report's own unexplained average
+  — recorded on [`edchoice-scholarship`](edchoice-scholarship.yml) — is a denominator question of
+  exactly this kind.
+
+  **The renewal column is not a count of applications before FY2010.** Renewal applications equal
+  the prior year's paid scholarships *exactly*, for 12 consecutive years, FY1998 through FY2009.
+  [verified] (crates/project) An identity holding twelve times running is an administrative
+  roll-forward — everyone paid last year carried forward whether or not a family did anything —
+  and not a fact about who applied.
+
+  It breaks at FY2010, the same year the low-income renewal column starts carrying values at all.
+  From FY2010 renewals are counted independently and land 10% to 14% below the prior year's
+  payments. [verified] (crates/project) That is attrition the earlier convention made
+  arithmetically invisible, and it means a renewal rate computed across the whole series is
+  computed across two different definitions. [open]
+
+  ### And the programme's existence is what keeps Cleveland off the EdChoice designated list
+
+  R.C. 3310.03 makes a student ineligible for traditional EdChoice whose "resident district is
+  not a school district in which the pilot project scholarship program is operating", and directs
+  that the building ranking behind the designated list "shall not include buildings operated by"
+  such a district. [verified] (R.C. 3310.03) The department's designated list for 2026-2027
+  covers 606 districts, and the one it does not cover is Cleveland Municipal. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_condition_the_designated_list_does_not_state.rs))
+  R.C. 3310.032 carries the same exclusion, so a Cleveland resident is outside both EdChoice
+  programmes rather than only the building-based one. [verified]
+
+figures:
+  - key: project/cleveland-roll-forward-years
+    value: 12
+    field: findings
+    as_written: "for 12 consecutive years"
+  - key: project/cleveland-applications-per-payment-fy1997
+    value: 3.125877632898696
+    field: findings
+    as_written: "FY1997 records 3.1 applications for every scholarship actually paid"
 properties:
   seeded_because: |
     The origin point of the scholarship channel, and the reference against which the statewide
@@ -108,3 +156,13 @@ links:
     note: >-
       The authorising sections this node cites by number — eligibility, the award, and the
       deduction that pays for it.
+  - target: ../../catalog/dew-scholarship-historical-data.md
+    relationship: sourced-from
+    note: >-
+      The department's archive of the deduct era, FY1997 through FY2013, and the only held source
+      that counts applications and payments separately.
+  - target: ../../catalog/dew-edchoice-designated-list.md
+    relationship: sourced-from
+    note: >-
+      The department's own determination of which buildings' students may claim the scholarship,
+      per district and per building IRN, with every criterion behind it.

@@ -85,9 +85,17 @@ would compute for the current era is therefore **zero per resident district, by 
 which is a result, not a gap.
 
 **What remains open is the pre-FSFP era**, which is a different question and a different source.
-Deduct-era amounts per resident district — and whether ECOT recovery money returned to the
+Deduct-era amounts *per resident district* — and whether ECOT recovery money returned to the
 districts it was deducted from — need the department's historical payment reports, which are not
 the FY2027 calculator and are not held here. That is a retrieval problem.
+
+**The statewide half of it is no longer a retrieval problem.** The department publishes an
+archived participation series, FY1997 through FY2013, by programme, counting applications and
+scholarships-actually-paid separately — see
+[the catalog record](../catalog/dew-scholarship-historical-data.md). It is committed and
+digest-pinned as `scholarship-historical`. It does not give amounts and does not give districts,
+so the calculator this skill describes still cannot be written from it; what it removes is the
+claim that the deduct era is unreachable, which was true of the search and not of the publisher.
 
 ### What was searched, and what was found
 
@@ -137,6 +145,19 @@ breakdown "is available here" and links to:
 The application's root answers 200; those two routes do not exist server-side. So the absence is
 not an artifact of searching badly: a per-district route was published, is cited in a current
 departmental document, and has been withdrawn.
+
+**One of the two has a public substitute, and this search missed it.** The department publishes
+the EdChoice designated list as a workbook on its own scholarship pages —
+`Designated-List-2026-2027-With-Criteria.xlsx` — per district and per building IRN, with every
+criterion behind the determination. It is committed as `edchoice-designated-2627` and catalogued
+[here](../catalog/dew-edchoice-designated-list.md). It is **eligibility and not participation**,
+so it answers a different question from the dead route's and does not lift this blocker; what it
+does is show that the route going 404 was not the end of the trail.
+
+That is the same lesson as MR-81 in #16, and this record is where it was not applied. The search
+above went to the portal the annual report names and stopped there. It did not enumerate the
+attachments on the CMS pages one hop away, where both this file and the historical series had been
+sitting the whole time.
 
 **What is actually missing is the scholarship side, not the community school side.** Under the
 Fair School Funding Plan community and STEM students are funded directly, so for them there is

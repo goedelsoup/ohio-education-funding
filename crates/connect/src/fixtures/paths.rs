@@ -210,6 +210,26 @@ pub const APPROPRIATION_FIXTURE: &str = "crates/project/fixtures/appropriation-l
 /// Where the scholarship programme summary is written, relative to the repository root.
 pub const SCHOLARSHIP_FIXTURE: &str = "crates/project/fixtures/scholarship-programs.csv";
 
+/// Where the archived scholarship participation series is written, relative to the repository
+/// root.
+///
+/// # Why this is a second file and not more rows in [`SCHOLARSHIP_FIXTURE`]
+///
+/// They are not the same table. That one is one row per programme for a single year, with
+/// dollars in it; this is one row per programme per fiscal year per *denominator*, with no
+/// dollars anywhere — the department's archive counts applications and payments and never
+/// prices them. Merging them would mean a column that is empty for seventeen years out of
+/// eighteen, in both directions.
+pub const SCHOLARSHIP_HISTORY_FIXTURE: &str = "crates/project/fixtures/scholarship-history.csv";
+
+/// Where the EdChoice designated list is written, relative to the repository root.
+///
+/// In `dispersion` rather than `project` because it is a per-building panel over every district,
+/// which is what the other files in that directory are and what a question about it will join
+/// against.
+pub const EDCHOICE_DESIGNATED_FIXTURE: &str =
+    "crates/dispersion/fixtures/edchoice-designated-2627.csv";
+
 /// Where the per-line-item money series is written, relative to the repository root.
 pub const CATALOG_FIXTURE: &str = "crates/project/fixtures/catalog-line-items.csv";
 
@@ -254,6 +274,7 @@ pub const REBUILT: &[&str] = &[
     TRANSFER_FIXTURE,
     BUILDING_FIXTURE,
     IDENTIFIED_FIXTURE,
+    EDCHOICE_DESIGNATED_FIXTURE,
     CROSSWALK_FIXTURE,
     STATUTE_FIXTURE,
     ENACTED_FIXTURE,
@@ -263,6 +284,7 @@ pub const REBUILT: &[&str] = &[
     EDCHOICE_FIXTURE,
     APPROPRIATION_FIXTURE,
     SCHOLARSHIP_FIXTURE,
+    SCHOLARSHIP_HISTORY_FIXTURE,
     CATALOG_FIXTURE,
     CATALOG_BASIS_FIXTURE,
 ];

@@ -391,33 +391,79 @@ pub(super) const PAYMENT_REPORTS: Connector = Connector {
 pub(super) const SCHOLARSHIP_REPORTS: Connector = Connector {
     key: "dew-scholarship-reports",
     publisher: "Ohio Department of Education and Workforce",
-    feeds: &["program"],
+    feeds: &["program", "education-agency", "school"],
     status: Status::Wired {
         still_blocked: Some(
-            "wired for the statewide and program-level aggregates, which is what the \
-             department publishes openly. Per-district participation is a different file and \
-             is not here: the annual report cites two routes for it and both 404, so the \
-             breakdown was published, is still referenced by a current departmental document, \
-             and has been withdrawn. See `dew-payment-reports` for the deduct-era half of the \
-             same gap",
+            "wired for everything the department publishes openly about this channel: the \
+             current statewide aggregates, the archived participation series FY1997-FY2013, \
+             and per-building eligibility for the current designated list. Two holes are \
+             left, and they are different in kind. Per-district *participation* is still a \
+             file nobody can fetch — the annual report cites two routes for it and both 404, \
+             so the breakdown was published, is still referenced by a current departmental \
+             document, and has been withdrawn; see `dew-payment-reports` for the deduct-era \
+             half of that gap. And the archived series stops at FY2013 while the annual \
+             report starts at 2024-25, so FY2014 through FY2023 has no participation series \
+             — LSC's greenbooks quote rounded counts for FY2014, FY2018 and FY2019 and \
+             nothing else, which bounds that hole rather than filling it. The designated \
+             list is current-edition-only: the four prior filenames its pattern implies all \
+             404",
         ),
     },
     note: "The department's own public account of the scholarship channel. It answers how \
-           large each programme is and how far it reaches; it does not answer which district \
-           a scholarship was charged against, and no public source does.",
-    sources: &[Source {
-        key: "scholarship-annual-2025",
-        title: Some("2025 Scholarship Annual Report"),
-        url: "https://education.ohio.gov/getattachment/About/Annual-Reports/\
-              2025-Scholarship-Annual-Report.pdf.aspx?lang=en-US",
-        filename: "scholarship-annual-2025.pdf",
-        format: Format::Pdf,
-        catalog: Some("dew-scholarship-annual-report"),
-        fixtures: &[crate::fixtures::SCHOLARSHIP_FIXTURE],
-        note: "Participation and award totals for all five scholarship programmes, 2024-25. \
-               The only committed source here that sizes the channel from the department \
-               rather than from statute.",
-    }],
+           large each programme is, how far it reaches, how many families applied against how \
+           many were ever paid, and which buildings' students may claim traditional EdChoice; \
+           it does not answer which district a scholarship was charged against, and no public \
+           source does.",
+    sources: &[
+        Source {
+            key: "scholarship-annual-2025",
+            title: Some("2025 Scholarship Annual Report"),
+            url: "https://education.ohio.gov/getattachment/About/Annual-Reports/\
+                  2025-Scholarship-Annual-Report.pdf.aspx?lang=en-US",
+            filename: "scholarship-annual-2025.pdf",
+            format: Format::Pdf,
+            catalog: Some("dew-scholarship-annual-report"),
+            fixtures: &[crate::fixtures::SCHOLARSHIP_FIXTURE],
+            note: "Participation and award totals for all five scholarship programmes, \
+                   2024-25. The only committed source here that sizes the channel from the \
+                   department rather than from statute.",
+        },
+        Source {
+            key: "scholarship-historical",
+            title: Some("Historical Scholarship Data"),
+            url: "https://education.ohio.gov/getattachment/Topics/Other-Resources/Scholarships/\
+                  Historical-Information/Historical-Scholarship-Data.xlsx.aspx?lang=en-US",
+            filename: "scholarship-historical.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-scholarship-historical-data"),
+            fixtures: &[crate::fixtures::SCHOLARSHIP_HISTORY_FIXTURE],
+            note: "The deduct era, statewide: Cleveland from FY1997, traditional EdChoice from \
+                   FY2007, Autism from FY2004, Jon Peterson from FY2013. Applications and \
+                   scholarships actually paid are separate columns, which is the distinction \
+                   the annual report's unreconciled averages need and no other held source \
+                   carries. Written once in October 2018 out of the system that preceded the \
+                   Enterprise Application System, so it is an archival snapshot rather than a \
+                   series anyone maintains.",
+        },
+        Source {
+            key: "edchoice-designated-2627",
+            title: Some("EdChoice Designated List 2026-2027, With Criteria"),
+            url: "https://education.ohio.gov/getattachment/Topics/Other-Resources/Scholarships/\
+                  EdChoice-Scholarship/EdChoice-Resources/\
+                  Designated-List-2026-2027-With-Criteria.xlsx.aspx?lang=en-US",
+            filename: "edchoice-designated-2627.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-edchoice-designated-list"),
+            fixtures: &[crate::fixtures::EDCHOICE_DESIGNATED_FIXTURE],
+            note: "Which buildings' students may claim traditional EdChoice for 2026-2027, and \
+                   under which of the two criteria, per district and per building IRN. The \
+                   public substitute for the withdrawn \
+                   `nonpublic-data-historical-ed-choice-designated-list` route — eligibility \
+                   rather than participation, so it answers a different question and answers \
+                   it per district. Only this edition is at this URL: the four prior filenames \
+                   the pattern implies all return the host's genuine 404.",
+        },
+    ],
 };
 
 pub(super) const CHILD_NUTRITION: Connector = Connector {

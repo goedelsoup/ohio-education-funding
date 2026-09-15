@@ -67,5 +67,53 @@ alternatives: |
   department's, in one document, and choosing between them would be this repository asserting
   something the publisher does not. It is recorded as a defect in the source, which is what the
   catalog is for.
+amendment: |
+  **Two more public workbooks, both kept under this connector rather than given their own.**
+  Found 2026-09-15 re-probing #10: the *Historical Scholarship Data* archive (FY1997-FY2013,
+  statewide, by programme) and the *EdChoice Designated List 2026-2027* (per district, per
+  building). Both are linked from pages this project had already read, both are plain fetches,
+  and neither was held.
+
+  **The criterion that splits a connector is the access regime, not the grain or the question.**
+  That is what the decision above actually turned on, and it is worth stating because the
+  designated list invites the other reading. It is per building where the annual report is
+  statewide; it is eligibility where the report is participation; its criteria columns are
+  Performance Index rankings and Title I shares, which look like `dew-report-card` and
+  `dew-school-improvement` material. None of that is a reason to split. All three files are
+  published openly by the same office on the same set of pages, every one is a fetch with no
+  credentials, and one `Wired` status with one remainder describes all three honestly. Splitting
+  on grain would have produced a connector whose status says exactly what this one's says, and
+  `dew-payment-reports` would then be sitting beside two neighbours instead of one, with its own
+  reason for separateness that much harder to read.
+
+  **The remainder gets larger and more specific, not smaller.** Before this the string said
+  per-district participation was withdrawn. It still is. What is added is a shape the earlier
+  string could not express: the archive stops at FY2013 and the annual report starts at 2024-25,
+  so **FY2014 through FY2023 has no participation series** — a hole in the middle rather than an
+  edge. It is not empty. The greenbooks already committed quote counts inside it, for FY2014 and
+  for FY2018-19, three of the four prefixed "about" and none naming a denominator; they bound the
+  hole and cannot be spliced onto the series. And the designated list is one edition, with the
+  four prior filenames its pattern implies all returning the host's genuine 404.
+
+  **What the archive settles that the report could not.** The 2025 report's three unreconciled
+  averages were recorded above as "a denominator the report does not name". This workbook
+  maintains two denominators for every programme-year — applications made against scholarships
+  with at least one payment — and they are far apart. It does not identify the report's
+  denominator, and it establishes that the department has long counted this channel two ways,
+  which was the part that had been a guess.
+
+  It also carries a definitional break nobody annotated. Cleveland's renewal *applications* equal
+  the prior year's *payments* exactly for twelve consecutive years and then stop doing so at
+  FY2010. Before FY2010 a renewal was an administrative roll-forward of everyone paid last year;
+  after it, renewals are counted and run 10-14% below. The fixture carries the published numbers
+  and the break is pinned in a test, on the same principle as the 175,000 above: the corpus
+  records what does not reconcile rather than choosing a reading.
+
+  **And the designated list turns out to be checkable against statute.** Its designation column
+  is exactly `Option A OR Option B`, its Title I column tests the three-year *average* that
+  R.C. 3310.03(A)(1)(b) requires rather than the each-year rule its own name suggests, and the
+  one district of 607 missing from it is Cleveland Municipal — which R.C. 3310.03 excludes by
+  name, because the pilot project scholarship programme operates there. That last one is the
+  first place in this corpus where a statutory exclusion is observable as a row count.
 connectors:
   - dew-scholarship-reports

@@ -29,6 +29,19 @@ description: |
   See [`deduction`](../../skills/deduction.md), which records the two dead routes and what would
   unblock them. The programme's own publisher points at the file and the file is not there.
   [verified] [open]
+findings: |
+  ### Its first year is in the archive, and applications ran a fifth above payments
+
+  The department's archive reaches this programme for **FY2013** alone — the year it began — and
+  is the only held source that splits it. 2,129 applications; 1,779 scholarships with at least one
+  payment made against them. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_renewal_that_was_last_years_payments.rs))
+
+  So 350 families applied in the programme's first year and were never paid, a sixth of everyone
+  who asked. The archive does not say why, and none of its four income-status definitions applies
+  to this programme. [open] Recorded because the annual report's participation figure is the
+  payment count alone, and a reader taking it for demand understates the first year by a fifth.
+
 properties:
   seeded_because: |
     Named in the [`deduction`](../../skills/deduction.md) calculator as one of the four programmes
@@ -162,3 +175,8 @@ links:
     note: >-
       The authorising sections this node cites by number — eligibility, the award, and the
       deduction that pays for it.
+  - target: ../../catalog/dew-scholarship-historical-data.md
+    relationship: sourced-from
+    note: >-
+      The department's archive of the deduct era, FY1997 through FY2013, and the only held source
+      that counts applications and payments separately.

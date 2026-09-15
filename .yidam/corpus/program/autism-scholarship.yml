@@ -27,6 +27,26 @@ description: |
   [`edchoice-scholarship`](edchoice-scholarship.yml), where the discrepancy is recorded. That this
   one is exact and the others are not suggests the difference is a denominator rather than an
   error, and nothing in the report says which. [inference] [open]
+findings: |
+  ### A ten-year series, and a greenbook figure it refutes
+
+  The department's archive carries this programme from **FY2004**, its first full year, at 70
+  students, to FY2013 at 2,622 — a thirty-sevenfold rise in a decade, which is the steepest growth
+  of any programme in the archive. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_renewal_that_was_last_years_payments.rs))
+  The sheet publishes payments only: its note says the system that wrote it "did not distinguish
+  between new and renewal applicants" for this programme, so the applications-against-payments
+  distinction the other sheets carry is absent here. [verified]
+
+  **It also settles a figure LSC published.** The greenbook for H.B. 59 of the 130th states that
+  "In FY 2012, 360 students received scholarships" under this programme. The department's archive
+  says 2,413, and the next greenbook says 2,623 for FY2014 — continuous with the department's
+  series and not with its own predecessor. So LSC's FY2012 figure is wrong by a factor of seven,
+  identified from two directions. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_counts_two_publishers_disagree_about.rs))
+  Recorded rather than corrected: both publishers' numbers are held as written, and what is
+  asserted is that they cannot both be read.
+
 properties:
   seeded_because: |
     Named in the [`deduction`](../../skills/deduction.md) calculator as one of the four programmes
@@ -93,3 +113,8 @@ links:
     note: >-
       The authorising sections this node cites by number — eligibility, the award, and the
       deduction that pays for it.
+  - target: ../../catalog/dew-scholarship-historical-data.md
+    relationship: sourced-from
+    note: >-
+      The department's archive of the deduct era, FY1997 through FY2013, and the only held source
+      that counts applications and payments separately.

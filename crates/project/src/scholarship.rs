@@ -196,6 +196,131 @@ pub mod report {
     }
 }
 
+pub mod history {
+    //! The department's archived participation series, FY1997 through FY2013.
+    //!
+    //! The deduct era, statewide, and the only source this repository holds that counts
+    //! applications and payments as separate quantities. [`super::report`] is the same channel eleven
+    //! years later under the Fair School Funding Plan; between FY2014 and FY2023 there is
+    //! nothing.
+    //!
+    //! # The two measures are not two views of one number
+    //!
+    //! [`Measure::Applications`] counts requests and [`Measure::Used`] counts scholarships with at
+    //! least one payment against them, which is the department's own phrase. The second is always
+    //! the smaller and often by a great deal, so a "participants" figure taken from the wrong one
+    //! overstates the channel — by 3.1x for Cleveland in FY1997.
+
+    use std::collections::BTreeMap;
+
+    use edfund_core::FiscalYear;
+
+    /// The committed extract of the department's *Historical Scholarship Data* workbook.
+    const FIXTURE: &str = include_str!("../fixtures/scholarship-history.csv");
+
+    const EXPECTED_HEADER: &str = "program,fiscal_year,measure,total,new,renewal,new_low_income,\
+renewal_low_income";
+
+    /// Which quantity a row counts.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+    pub enum Measure {
+        /// Requests made. Not a count of students served.
+        Applications,
+        /// Scholarships with at least one payment made against them.
+        Used,
+        /// Cleveland's tutoring grants, which are neither and which no other programme has.
+        Tutoring,
+    }
+
+    impl Measure {
+        /// The fixture's own spelling.
+        fn from(cell: &str) -> Option<Self> {
+            match cell {
+                "applications" => Some(Self::Applications),
+                "used" => Some(Self::Used),
+                "tutoring" => Some(Self::Tutoring),
+                _ => None,
+            }
+        }
+    }
+
+    /// One programme-year on one measure.
+    ///
+    /// Every field is optional because the workbook's coverage is ragged in both directions: the
+    /// low-income split is only populated from FY2010 for Cleveland, Autism publishes a total and
+    /// nothing else, and Jon Peterson has one year.
+    #[derive(Debug, Clone, Copy, PartialEq, Default)]
+    pub struct Counts {
+        /// Everyone on this measure.
+        pub total: Option<f64>,
+        /// First-time recipients or applicants.
+        pub new: Option<f64>,
+        /// Continuing ones. See [`Observation`] for what this meant before FY2010.
+        pub renewal: Option<f64>,
+        /// Of the new, those qualifying as low income.
+        pub new_low_income: Option<f64>,
+        /// Of the renewals, those qualifying as low income.
+        pub renewal_low_income: Option<f64>,
+    }
+
+    /// One row of the archive.
+    ///
+    /// # `renewal` changes meaning inside this series
+    ///
+    /// For Cleveland, applications-renewal in year *t* equals payments-total in year *t*-1
+    /// exactly, for the twelve years FY1998 through FY2009 — a roll-forward of everyone paid last
+    /// year rather than a count of anybody applying. From FY2010 it is counted independently and
+    /// runs 10-14% below the prior year's payments. The fixture carries what the department
+    /// published; the break is pinned in
+    /// `crates/project/tests/the_renewal_that_was_last_years_payments.rs`.
+    #[derive(Debug, Clone, PartialEq)]
+    pub struct Observation {
+        /// The programme slug, shared with [`super::report::programmes`] where both hold the
+        /// programme.
+        pub program: String,
+        /// The fiscal year.
+        pub year: FiscalYear,
+        /// Which quantity this row counts.
+        pub measure: Measure,
+        /// The counts themselves.
+        pub counts: Counts,
+    }
+
+    /// Every row of the archive.
+    ///
+    /// # Panics
+    ///
+    /// If the fixture's header is not the one this was written against, or if a row names a
+    /// measure this module does not know — both of which mean the extractor changed shape.
+    #[must_use]
+    pub fn observations() -> Vec<Observation> {
+        edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
+            .map(|row| Observation {
+                program: row.str(0).to_string(),
+                year: FiscalYear(row.num(1).expect("every row names a fiscal year") as u16),
+                measure: Measure::from(row.str(2)).expect("the fixture names a known measure"),
+                counts: Counts {
+                    total: row.num(3),
+                    new: row.num(4),
+                    renewal: row.num(5),
+                    new_low_income: row.num(6),
+                    renewal_low_income: row.num(7),
+                },
+            })
+            .collect()
+    }
+
+    /// One programme's series on one measure, by fiscal year.
+    #[must_use]
+    pub fn series(program: &str, measure: Measure) -> BTreeMap<FiscalYear, Counts> {
+        observations()
+            .into_iter()
+            .filter(|o| o.program == program && o.measure == measure)
+            .map(|o| (o.year, o.counts))
+            .collect()
+    }
+}
+
 /// Which of the report's two averages a reading is taken on.
 ///
 /// They differ by 1.5% to 3.4% and the report does not say why, so nothing here picks one. Every

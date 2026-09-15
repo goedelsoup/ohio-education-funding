@@ -8768,6 +8768,94 @@ pub static FIGURES: &[Figure] = &[
         tolerance: 0.0,
         compute: |_| hb643().priced().len() as f64,
     },
+    Figure {
+        key: "project/cleveland-roll-forward-years",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Consecutive years in which Cleveland's renewal applications equal the prior \
+                year's paid scholarships exactly",
+        pinned: 12.0,
+        tolerance: 0.0,
+        compute: |_| {
+            use project::scholarship::history::{self, Measure};
+            let applied = history::series("cleveland", Measure::Applications);
+            let paid = history::series("cleveland", Measure::Used);
+            applied
+                .iter()
+                .filter(|(year, counts)| {
+                    paid.get(&edfund_core::FiscalYear(year.0 - 1))
+                        .and_then(|before| before.total)
+                        .zip(counts.renewal)
+                        .is_some_and(|(before, renewals)| (before - renewals).abs() < f64::EPSILON)
+                })
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "project/cleveland-applications-per-payment-fy1997",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "Cleveland scholarship applications per scholarship actually paid, FY1997",
+        pinned: 3.12588,
+        tolerance: 0.0005,
+        compute: |_| {
+            use project::scholarship::history::{self, Measure};
+            let year = edfund_core::FiscalYear(1997);
+            let total = |measure| {
+                history::series("cleveland", measure)[&year]
+                    .total
+                    .expect("FY1997 publishes both totals")
+            };
+            total(Measure::Applications) / total(Measure::Used)
+        },
+    },
+    Figure {
+        key: "dispersion/edchoice-designated-buildings",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Buildings designated for traditional EdChoice, 2026-2027",
+        pinned: 513.0,
+        tolerance: 0.0,
+        compute: |_| {
+            dispersion::designated::buildings()
+                .iter()
+                .filter(|b| b.designated)
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/edchoice-designated-districts",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts holding at least one designated building, 2026-2027",
+        pinned: 78.0,
+        tolerance: 0.0,
+        compute: |_| {
+            dispersion::designated::by_district()
+                .values()
+                .filter(|(_, designated)| *designated > 0)
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/edchoice-title1-misread-buildings",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Buildings a reader misclassifies by taking the Title I column's name for its \
+                rule rather than the three-year average the statute requires",
+        pinned: 164.0,
+        tolerance: 0.0,
+        compute: |_| {
+            use dispersion::designated::TITLE1_THRESHOLD;
+            dispersion::designated::buildings()
+                .iter()
+                .filter(|b| {
+                    b.title1_at_least_20
+                        != b.title1_shares.iter().all(|s| *s >= TITLE1_THRESHOLD)
+                })
+                .count() as f64
+        },
+    },
 ];
 
 /// The narrowest and widest share of the local gap state aid closes across FY2012-FY2024.
