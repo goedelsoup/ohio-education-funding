@@ -49,9 +49,11 @@ pub mod mr81;
 pub mod national_peers;
 pub mod ohio_panel;
 pub mod profile;
+pub mod rankings;
 pub mod report_card;
 pub mod sd1;
 pub mod survey_basis;
+pub mod title1;
 pub mod valuation;
 
 use edfund_core::Dollars;

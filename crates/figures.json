@@ -597,6 +597,10 @@
     {"key": "project/cleveland-applications-per-payment-fy1997", "owner": "crates/project", "unit": "ratio", "value": 3.125877632898696, "label": "Cleveland scholarship applications per scholarship actually paid, FY1997"},
     {"key": "dispersion/edchoice-designated-buildings", "owner": "crates/dispersion", "unit": "count", "value": 513, "label": "Buildings designated for traditional EdChoice, 2026-2027"},
     {"key": "dispersion/edchoice-designated-districts", "owner": "crates/dispersion", "unit": "count", "value": 78, "label": "Districts holding at least one designated building, 2026-2027"},
-    {"key": "dispersion/edchoice-title1-misread-buildings", "owner": "crates/dispersion", "unit": "count", "value": 164, "label": "Buildings a reader misclassifies by taking the Title I column's name for its rule rather than the three-year average the statute requires"}
+    {"key": "dispersion/edchoice-title1-misread-buildings", "owner": "crates/dispersion", "unit": "count", "value": 164, "label": "Buildings a reader misclassifies by taking the Title I column's name for its rule rather than the three-year average the statute requires"},
+    {"key": "dispersion/edchoice-ranking-2025-excluded-rows", "owner": "crates/dispersion", "unit": "count", "value": 359, "label": "Buildings the 2025 Performance Index ranking sheet holds that R.C. 3310.03 excludes from the ranking"},
+    {"key": "dispersion/edchoice-naive-2025-cut-misses", "owner": "crates/dispersion", "unit": "count", "value": 163, "label": "Designated-list buildings a bottom-20% cut of the 2025 ranking sheet as published fails to flag"},
+    {"key": "dispersion/title1-census-poverty-share", "owner": "crates/dispersion", "unit": "share", "value": 0.9671208552087984, "label": "Share of Ohio's three-year Title I formula count that is Census Bureau poverty rather than a collection Ohio makes"},
+    {"key": "dispersion/edchoice-designations-on-ohio-collections", "owner": "crates/dispersion", "unit": "count", "value": 31, "label": "Designations that rest on the four components Ohio collects, their districts falling below twenty per cent on census poverty alone"}
   ]
 }

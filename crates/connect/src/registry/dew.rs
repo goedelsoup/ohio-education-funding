@@ -454,7 +454,11 @@ pub(super) const SCHOLARSHIP_REPORTS: Connector = Connector {
             filename: "edchoice-designated-2627.xlsx",
             format: Format::Xlsx,
             catalog: Some("dew-edchoice-designated-list"),
-            fixtures: &[crate::fixtures::EDCHOICE_DESIGNATED_FIXTURE],
+            fixtures: &[
+                crate::fixtures::EDCHOICE_DESIGNATED_FIXTURE,
+                crate::fixtures::PI_RANKING_FIXTURE,
+                crate::fixtures::TITLE1_FIXTURE,
+            ],
             note: "Which buildings' students may claim traditional EdChoice for 2026-2027, and \
                    under which of the two criteria, per district and per building IRN. The \
                    public substitute for the withdrawn \

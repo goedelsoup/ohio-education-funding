@@ -75,6 +75,62 @@ findings: |
   which is what the column implements and not what its name says. Reading the name literally
   misclassifies 164 buildings. [verified] (crates/dispersion)
 
+  ### The designation rebuilds from the raw counts, and the ranking sheet hides the population
+
+  The paragraph above checks the list against itself: it takes the department's bottom-20% flags
+  as given and asks whether the designation follows. The workbook's six other sheets are the
+  inputs to those flags — three years of building Performance Index rankings and three of district
+  Title I formula counts — and with them the flags are reproducible rather than given. **They
+  reproduce exactly: every yearly flag, the two-of-three column, the Title I threshold column,
+  Option B and the designation itself, in all 2,877 buildings, with no disagreement anywhere.**
+  [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_designation_rebuilt_from_its_inputs.rs))
+  Only the academic-distress route is read rather than derived, because it is a determination of
+  the state board's that this workbook records and does not compute.
+
+  The rule is one line and three of its readings are decided nowhere in the file. The cut rounds
+  **up**, not down — rounding down misses one flagged building in each of the two earlier years.
+  A building carrying no index leaves the population rather than sorting to the bottom of it. And
+  the population is the one R.C. 3310.03(A)(1)(a) names, not the one the sheet prints.
+
+  **That last reading is the finding.** The 2025 ranking sheet holds 359 buildings the statute
+  excludes from the ranking — 258 community schools, 8 STEM schools and 93 Cleveland buildings,
+  against none at all in the 2023 and 2024 sheets — and a community school holds rank 4. Cutting
+  the bottom fifth of the sheet as published flags 646 buildings and misses 163 of the 576 the
+  department flags. [verified] (crates/dispersion) The department's own flag is right: it is a
+  fifth of 2,877, the eligible population. So the arithmetic is the statute's and the sheet
+  published beside it is not the one the arithmetic was done on — the same shape of defect as the
+  Option B column above, a rule applied more narrowly than the file states.
+
+  ### The Title I criterion is a federal poverty estimate with an Ohio garnish
+
+  R.C. 3310.03(A)(1)(b) turns on how many of a district's children "were qualified to be included
+  in the formula to distribute funds under Title I". The `Title 1` sheets decompose that count for
+  611 districts over three years, and **96.7% of it is census poverty** — the Census Bureau's
+  estimate, which each sheet dates in its own column heading to two years before the school year
+  it decides. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/what_the_title_one_criterion_measures.rs))
+  The oldest of the three editions rests on a 2021 estimate, five years before the scholarship it
+  helps award.
+
+  The four categories Ohio collects each October come to 3.3% between them, and two of them are
+  barely there: the delinquent column is never once a positive number in three editions, and TANF
+  falls from 930 children statewide to none at all between the first edition and the second, with
+  no notice in the file. A reader averaging the three shares is averaging across that change.
+
+  The 3.3% is nonetheless decisive at the margin. The four can only add to a count, so they can
+  only move a district over the twenty per cent bar and never under it — and they move 16 of 611
+  districts over it, six of which hold designated buildings. **31 designations rest on them.**
+  [verified] (crates/dispersion)
+
+  **The sheets carry 611 districts against the list's 606, and the five extra are absent for two
+  different reasons.** Cleveland Municipal is ranked in 2025 and report-carded like any district,
+  and is off the list because R.C. 3310.03 puts it off — it stands sixth of 611 on the very
+  criterion it is excluded from. The other four are in no ranking sheet and on no report card at
+  all: three Lake Erie island districts and College Corner Local, whose children attend school in
+  Indiana. A Title I formula count is a count of resident children and needs no building, which is
+  why North Bass Local has a row and a 5-to-17 population of zero. [verified] (crates/dispersion)
+
 figures:
   - key: project/traditional-greatest-k8-share
     value: 0.345625
@@ -92,6 +148,22 @@ figures:
     value: 164
     field: findings
     as_written: "misclassifies 164 buildings"
+  - key: dispersion/edchoice-ranking-2025-excluded-rows
+    value: 359
+    field: findings
+    as_written: "holds 359 buildings the statute"
+  - key: dispersion/edchoice-naive-2025-cut-misses
+    value: 163
+    field: findings
+    as_written: "misses 163 of the 576"
+  - key: dispersion/title1-census-poverty-share
+    value: 0.9671
+    field: findings
+    as_written: "**96.7% of it is census poverty**"
+  - key: dispersion/edchoice-designations-on-ohio-collections
+    value: 31
+    field: findings
+    as_written: "**31 designations rest on them.**"
 properties:
   seeded_because: |
     Named in the [`deduction`](../../skills/deduction.md) calculator as one of the four programmes

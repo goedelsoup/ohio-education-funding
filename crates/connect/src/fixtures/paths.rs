@@ -1,6 +1,6 @@
 //! Where every committed fixture is written, and the manifest of the ones the rebuild produces.
 //!
-//! Thirty-two path constants and [`REBUILT`], which lists the subset a full rebuild regenerates.
+//! Thirty-four path constants and [`REBUILT`], which lists the subset a full rebuild regenerates.
 //!
 //! # Why they are together
 //!
@@ -230,6 +230,23 @@ pub const SCHOLARSHIP_HISTORY_FIXTURE: &str = "crates/project/fixtures/scholarsh
 pub const EDCHOICE_DESIGNATED_FIXTURE: &str =
     "crates/dispersion/fixtures/edchoice-designated-2627.csv";
 
+/// The three building-level Performance Index rankings the designation is cut from.
+///
+/// Beside [`EDCHOICE_DESIGNATED_FIXTURE`] because it is that file's first input, and in
+/// `dispersion` for the same reason: a building panel over every district. The corpus has a
+/// building Performance Index already, in [`REPORT_CARD_FIXTURE`]'s companion
+/// [`BUILDING_FIXTURE`] — for one year, at one decimal place. This is three years at the
+/// precision the ranking is actually decided on.
+pub const PI_RANKING_FIXTURE: &str = "crates/dispersion/fixtures/edchoice-pi-rankings.csv";
+
+/// The three years of district Title I formula counts the designation's other criterion is cut
+/// from, decomposed into the five categories the formula adds.
+///
+/// The first held source in this repository for Ohio's Title I formula counts. The corpus holds
+/// the *shares* these produce — [`EDCHOICE_DESIGNATED_FIXTURE`] carries three years of them —
+/// and nothing of the numerator or the denominator until now.
+pub const TITLE1_FIXTURE: &str = "crates/dispersion/fixtures/title1-formula-counts.csv";
+
 /// Where the per-line-item money series is written, relative to the repository root.
 pub const CATALOG_FIXTURE: &str = "crates/project/fixtures/catalog-line-items.csv";
 
@@ -275,6 +292,8 @@ pub const REBUILT: &[&str] = &[
     BUILDING_FIXTURE,
     IDENTIFIED_FIXTURE,
     EDCHOICE_DESIGNATED_FIXTURE,
+    PI_RANKING_FIXTURE,
+    TITLE1_FIXTURE,
     CROSSWALK_FIXTURE,
     STATUTE_FIXTURE,
     ENACTED_FIXTURE,

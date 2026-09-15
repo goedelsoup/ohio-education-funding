@@ -756,6 +756,46 @@ fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     );
 
+    // The criteria's own inputs, out of the same workbook and beside the flags they produce.
+    // Three years of building Performance Index rankings and three of district Title I formula
+    // counts, so the designation can be asked about rather than only recorded — and so the
+    // repository holds a Title I formula count for Ohio at all, which it did not.
+    for (fixture, header, sheets, build) in [
+        (
+            fixtures::PI_RANKING_FIXTURE,
+            fixtures::PI_RANKING_HEADER,
+            fixtures::PI_RANKING_SHEETS,
+            fixtures::build_pi_rankings as fn(&[(&str, &[Vec<String>])]) -> _,
+        ),
+        (
+            fixtures::TITLE1_FIXTURE,
+            fixtures::TITLE1_HEADER,
+            fixtures::TITLE1_SHEETS,
+            fixtures::build_title1_counts,
+        ),
+    ] {
+        out.push(
+            match (|| -> Result<Vec<Vec<String>>, String> {
+                let book = open_workbook(root, registered("edchoice-designated-2627"))
+                    .map_err(|e| e.to_string())?;
+                let read: Vec<(&str, Vec<Vec<String>>)> = sheets
+                    .iter()
+                    .map(|name| {
+                        book.rows(name)
+                            .map(|rows| (*name, rows))
+                            .map_err(|e| e.to_string())
+                    })
+                    .collect::<Result<_, String>>()?;
+                let borrowed: Vec<(&str, &[Vec<String>])> =
+                    read.iter().map(|(n, r)| (*n, r.as_slice())).collect();
+                build(&borrowed)
+            })() {
+                Ok(rows) => csv_fixture(root, fixture, header, &rows)?,
+                Err(cause) => Rebuilt::skipped(fixture, cause),
+            },
+        );
+    }
+
     // The DeRolph opinions. One record per case, same shape as the statute extract, so the two
     // sources a legal claim can rest on read alike.
     //
