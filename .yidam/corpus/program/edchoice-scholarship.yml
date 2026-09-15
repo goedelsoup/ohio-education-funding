@@ -54,11 +54,44 @@ findings: |
   basis this arithmetic does not fit.** The corpus cannot tell which from what it holds, and the
   participation split by grade band that would settle it is not published. [open]
 
+  ### Who may claim it is now a per-building fact, and the department publishes the criteria
+
+  The eligibility this node described from statute is published as a list. The department's
+  *Designated List 2026-2027* carries every building in the state that a district operates —
+  2,877 of them — with the designation and every input to it. **513 buildings are designated**,
+  and they sit in 78 districts, one in eight. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_condition_the_designated_list_does_not_state.rs))
+
+  This is eligibility and not participation, so it does not close the per-district question the
+  [`deduction`](../../skills/deduction.md) stub records as blocked. It is the public substitute
+  for one of the two routes that stub found withdrawn, answering a different question at the same
+  grain.
+
+  **Reproducing the determination finds two things the file does not say.** The designation is
+  exactly Option A or Option B, but Option B is not the two criteria it names: it is those two
+  *and* the building being open, which holds across all 2,877 rows and fails on four without it.
+  [verified] (crates/dispersion) And the Title I criterion is an average, not a floor in each
+  year — R.C. 3310.03(A)(1)(b) requires "an average of twenty per cent or more" over three years,
+  which is what the column implements and not what its name says. Reading the name literally
+  misclassifies 164 buildings. [verified] (crates/dispersion)
+
 figures:
   - key: project/traditional-greatest-k8-share
     value: 0.345625
     field: findings
     as_written: "at most **0.345625** in kindergarten\n  through eight"
+  - key: dispersion/edchoice-designated-buildings
+    value: 513
+    field: findings
+    as_written: "**513 buildings are designated**"
+  - key: dispersion/edchoice-designated-districts
+    value: 78
+    field: findings
+    as_written: "they sit in 78 districts"
+  - key: dispersion/edchoice-title1-misread-buildings
+    value: 164
+    field: findings
+    as_written: "misclassifies 164 buildings"
 properties:
   seeded_because: |
     Named in the [`deduction`](../../skills/deduction.md) calculator as one of the four programmes
@@ -139,3 +172,13 @@ links:
     note: >-
       The authorising sections this node cites by number — eligibility, the award, and the
       deduction that pays for it.
+  - target: ../../catalog/dew-edchoice-designated-list.md
+    relationship: sourced-from
+    note: >-
+      The department's own determination of which buildings' students may claim the scholarship,
+      per district and per building IRN, with every criterion behind it.
+  - target: ../../catalog/dew-scholarship-historical-data.md
+    relationship: sourced-from
+    note: >-
+      The department's archive of the deduct era, FY1997 through FY2013, and the only held source
+      that counts applications and payments separately.

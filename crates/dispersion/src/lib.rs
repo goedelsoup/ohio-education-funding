@@ -37,6 +37,7 @@ pub mod census_states;
 pub mod community_schools;
 pub mod composition;
 pub mod deduct;
+pub mod designated;
 pub mod equity_factor;
 pub mod exemplars;
 pub mod facilities;

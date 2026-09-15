@@ -113,13 +113,17 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * stops here: a running commentary on a number is what let the number go unchecked, and both
  * values below are now recomputed the way the test computes them — `loadCorpus().nodes` flattened
  * over `figures`, and the nodes with a non-empty one — rather than incremented.
+ *
+ * Recomputed the same way at **750/75** when the two scholarship workbooks on the department's own
+ * pages were extracted: `program/cleveland-scholarship` is the seventy-fifth carrier, binding the
+ * twelve-year identity that showed its renewal column was a roll-forward.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "745 bindings; raise this when you add one").toBeGreaterThanOrEqual(745);
+  expect(bindings.length, "750 bindings; raise this when you add one").toBeGreaterThanOrEqual(750);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "74 nodes carry bindings; raise this when a seventy-fifth does",
-  ).toBeGreaterThanOrEqual(74);
+    "75 nodes carry bindings; raise this when a seventy-sixth does",
+  ).toBeGreaterThanOrEqual(75);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

@@ -704,6 +704,58 @@ fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     );
 
+    // The same channel before the Fair School Funding Plan, and the only source here that
+    // counts applications and payments separately. An archival snapshot rather than a series:
+    // the department wrote it once in October 2018 out of the system the Enterprise Application
+    // System replaced, and it stops at FY2013.
+    out.push(
+        match (|| -> Result<Vec<Vec<String>>, String> {
+            let book = open_workbook(root, registered("scholarship-historical"))
+                .map_err(|e| e.to_string())?;
+            let sheets: Vec<(&str, Vec<Vec<String>>)> =
+                ["Cleveland", "EdChoice (Traditional)", "Autism", "JPSN"]
+                    .into_iter()
+                    .map(|name| {
+                        book.rows(name)
+                            .map(|rows| (name, rows))
+                            .map_err(|e| e.to_string())
+                    })
+                    .collect::<Result<_, String>>()?;
+            let borrowed: Vec<(&str, &[Vec<String>])> =
+                sheets.iter().map(|(n, r)| (*n, r.as_slice())).collect();
+            fixtures::build_scholarship_history(&borrowed)
+        })() {
+            Ok(rows) => csv_fixture(
+                root,
+                fixtures::SCHOLARSHIP_HISTORY_FIXTURE,
+                fixtures::SCHOLARSHIP_HISTORY_HEADER,
+                &rows,
+            )?,
+            Err(cause) => Rebuilt::skipped(fixtures::SCHOLARSHIP_HISTORY_FIXTURE, cause),
+        },
+    );
+
+    // Who may claim a traditional EdChoice scholarship for 2026-2027, per building. The
+    // `Overview` sheet alone: the workbook's six other sheets are the criteria's own inputs —
+    // three years of building Performance Index rankings and three of district Title I formula
+    // counts — and the Overview carries the flags those produce, which is what an eligibility
+    // question asks for.
+    out.push(
+        match (|| -> Result<Vec<Vec<String>>, String> {
+            let book = open_workbook(root, registered("edchoice-designated-2627"))
+                .map_err(|e| e.to_string())?;
+            fixtures::build_designated(&book.rows("Overview").map_err(|e| e.to_string())?)
+        })() {
+            Ok(rows) => csv_fixture(
+                root,
+                fixtures::EDCHOICE_DESIGNATED_FIXTURE,
+                fixtures::DESIGNATED_HEADER,
+                &rows,
+            )?,
+            Err(cause) => Rebuilt::skipped(fixtures::EDCHOICE_DESIGNATED_FIXTURE, cause),
+        },
+    );
+
     // The DeRolph opinions. One record per case, same shape as the statute extract, so the two
     // sources a legal claim can rest on read alike.
     //

@@ -40,6 +40,7 @@ pub mod cpi;
 pub mod crosswalk;
 pub mod dates;
 pub mod delimited;
+pub mod designated;
 mod diesel;
 pub mod enacted;
 pub mod f33;
@@ -54,6 +55,7 @@ pub mod mr81;
 pub mod paths;
 pub mod report_card;
 pub mod scholarship;
+pub mod scholarship_history;
 pub mod sd1;
 pub mod session_laws;
 pub mod statute;
@@ -85,6 +87,7 @@ pub use crosswalk::{
     build_legislative_crosswalk, pl_blocks, pl_counts, Crosswalk, CROSSWALK_HEADER,
 };
 pub use dates::{decided_on, published_on};
+pub use designated::{build_designated, DESIGNATED_HEADER};
 pub use diesel::{build_diesel_series, year_month_from_serial, DIESEL_HEADER, DIESEL_SHEET};
 pub use enacted::extract_school_funding;
 pub use f33::{
@@ -105,17 +108,19 @@ pub use paths::{
     APPROPRIATION_FIXTURE, BUILDING_FIXTURE, CALCULATOR_ADM_FIXTURE, CALCULATOR_COUNTS_FIXTURE,
     CALCULATOR_SCALARS_FIXTURE, CALCULATOR_VINTAGES_FIXTURE, CASINO_FIXTURE, CATALOG_BASIS_FIXTURE,
     CATALOG_FIXTURE, CCD_DIRECTORY_FIXTURE, CORRECTIONS_FIXTURE, CPI_FIXTURE, CROSSWALK_FIXTURE,
-    DIESEL_FIXTURE, EDCHOICE_FIXTURE, ENACTED_FIXTURE, F33_DISTRICTS_FIXTURE, F33_FIXTURE,
-    F33_FY2024_FIXTURE, F33_OHIO_PANEL_FIXTURE, FINANCE_FIXTURE, FUNCTIONS_FIXTURE, FY26_FIXTURE,
-    FY27_FIXTURE, GRADE_BANDS_FIXTURE, GREENBOOK_FIXTURE, IDENTIFIED_FIXTURE, LANDSCAPE_FIXTURE,
-    LSC_GREENBOOK_FIXTURE, MR81_FIXTURE, NOT_REGENERATED, OPINIONS_FIXTURE, PROFILE_FIXTURE,
-    REBUILT, REDBOOK_FIXTURE, REPORT_CARD_FIXTURE, SCHOLARSHIP_FIXTURE, SD1_FIXTURE,
+    DIESEL_FIXTURE, EDCHOICE_DESIGNATED_FIXTURE, EDCHOICE_FIXTURE, ENACTED_FIXTURE,
+    F33_DISTRICTS_FIXTURE, F33_FIXTURE, F33_FY2024_FIXTURE, F33_OHIO_PANEL_FIXTURE,
+    FINANCE_FIXTURE, FUNCTIONS_FIXTURE, FY26_FIXTURE, FY27_FIXTURE, GRADE_BANDS_FIXTURE,
+    GREENBOOK_FIXTURE, IDENTIFIED_FIXTURE, LANDSCAPE_FIXTURE, LSC_GREENBOOK_FIXTURE, MR81_FIXTURE,
+    NOT_REGENERATED, OPINIONS_FIXTURE, PROFILE_FIXTURE, REBUILT, REDBOOK_FIXTURE,
+    REPORT_CARD_FIXTURE, SCHOLARSHIP_FIXTURE, SCHOLARSHIP_HISTORY_FIXTURE, SD1_FIXTURE,
     SESSION_LAW_FIXTURE, SFPR_FIXTURE, STATUTE_FIXTURE, TRANSFER_FIXTURE, TRANSPORT_RATES_FIXTURE,
 };
 pub use report_card::{
     build_function_extract, build_report_card_extract, FUNCTIONS_HEADER, REPORT_CARD_HEADER,
 };
 pub use scholarship::scholarship_programmes;
+pub use scholarship_history::{build_scholarship_history, SCHOLARSHIP_HISTORY_HEADER};
 pub use sd1::{build_sd1_extract, Sd1Year, SD1_HEADER};
 pub use session_laws::{build_session_laws, ActText, SESSION_LAW_HEADER};
 pub use statute::{build_records, parse_statute, Record, RECORD_MARKER};
