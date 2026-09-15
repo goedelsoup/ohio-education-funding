@@ -17,11 +17,17 @@ open/closed status.
 **513 buildings in 78 districts are designated for 2026-2027.** So eligibility is concentrated:
 one district in eight has a designated building at all, and the other 528 have none.
 
-Six further sheets carry the criteria's own inputs, which this repository holds and does not yet
-extract: `PI Ranking 2023`, `2024` and `2025` rank every building in the state by Performance
-Index — a three-year building-level PI panel — and `Title 1 2024`, `2025` and `2026` give each
-district's Title I formula count decomposed into census poverty, neglected, delinquent, foster and
-TANF children against its 5-to-17 population.
+Six further sheets carry the criteria's own inputs, and all six are extracted. `PI Ranking 2023`,
+`2024` and `2025` rank every building the department ranks by Performance Index — **9,080 rows, a
+three-year building-level panel** at the precision the ranking is actually decided on, where the
+report card carries one year at one decimal place. `Title 1 2024`, `2025` and `2026` give each of
+**611 districts** a Title I formula count decomposed into census poverty, neglected, delinquent,
+foster and TANF children against its 5-to-17 population — **the first held source in this
+repository for Ohio's Title I formula counts at all**.
+
+Together they make the whole determination reproducible from raw counts rather than from the
+department's own flags. It reproduces, exactly, in all 2,877 rows. What that costs is three
+readings the file states nowhere, and the third of them is a finding about the file: see below.
 
 **Why it matters here.** It is the **public substitute for the withdrawn
 `nonpublic-data-historical-ed-choice-designated-list` route** recorded in
@@ -54,6 +60,51 @@ The workbook applies that third condition and states it nowhere. It is not in th
 statute lists either — it follows from the premise in front of them, that the student "is enrolled
 in a school building operated by the student's resident district", which a closed building has
 nobody to satisfy. Pinned in `crates/dispersion/tests/` rather than left as a reading.
+
+## The 2025 ranking sheet is not the population the 2025 flag was cut from
+
+The bottom-20% flag is `ceil(0.20 × N)` of the buildings R.C. 3310.03(A)(1)(a) admits — those
+"operated by city, local, and exempted village school districts", the pilot-project district's
+excluded. In 2023 and 2024 that is the sheet itself: neither holds a community school, a STEM
+school or a Cleveland building, so a fifth of the sheet is a fifth of the eligible population and
+the flags follow.
+
+The 2025 sheet is different. It ranks 3,237 buildings, **359 of which the statute excludes** —
+258 community schools, 8 STEM schools and Cleveland's other 93 — across 256 LEAs that appear in
+neither of the other two years, and a community school holds rank 4. A bottom fifth of it flags
+646 buildings and **misses 163 of the 576** the department flags.
+
+The department's flag is right all the same: 576 is a fifth of 2,877, which is exactly the sheet
+filtered to `Public School` outside Cleveland and carrying an index. So the ranking was done on
+the statutory population and published on a wider one. That is the same defect as the Option B
+column above — a rule applied more narrowly than the file shows — and it is the reason a reader
+taking the sheet at face value cannot reproduce the most recent of the three flags.
+
+## The Title I criterion is a census poverty rate under another name
+
+The `Title 1` sheets decompose the count R.C. 3310.03(A)(1)(b) tests, and **96.7% of it, across
+three years and 611 districts, is census poverty** — the Census Bureau's estimate, dated in each
+sheet's own column headings to two years before the school year it decides and paired with an
+October collection one year behind. The oldest of the three editions rests on a 2021 estimate.
+
+The four categories Ohio collects itself come to 3.3%. Two barely exist: the delinquent column is
+never a positive number in any of the three editions, and TANF falls from 930 children statewide
+to none at all between the first and the second, unannounced. But because they can only add, they
+can only move a district *over* the twenty per cent bar — and they move 16 districts over it, six
+of which hold designated buildings. **31 designations rest on the 3.3%.**
+
+## The Title I sheets carry five districts the list does not, for two different reasons
+
+611 against the Overview's 606 and the report card's 607. Cleveland Municipal accounts for one and
+is the statutory exclusion described below — it is ranked in 2025 and report-carded like any
+district, and stands sixth of 611 on the criterion it is excluded from.
+
+The other four are absent from every ranking sheet and from the report card as well: **Kelleys
+Island Local, Middle Bass Local, North Bass Local and College Corner Local**. That is not an
+exclusion. A Title I formula count is a count of resident children and needs no building, so a
+district that operates none the department rates still has a count — North Bass Local carries a
+row and a 5-to-17 population of zero. Reporting "five districts are missing" as one fact would
+merge a statutory exclusion with an absence of buildings.
 
 ## The Title I column tests an average, and its name says otherwise
 

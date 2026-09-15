@@ -117,9 +117,14 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * Recomputed the same way at **750/75** when the two scholarship workbooks on the department's own
  * pages were extracted: `program/cleveland-scholarship` is the seventy-fifth carrier, binding the
  * twelve-year identity that showed its renewal column was a roll-forward.
+ *
+ * Recomputed again at **754/75** when the designated list's six criteria sheets were extracted.
+ * No new carrier: all four bindings land on `program/edchoice-scholarship`, which the same
+ * workbook had already made a carrier. A count of carriers is a count of subjects, and this added
+ * depth to one rather than a new one.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "750 bindings; raise this when you add one").toBeGreaterThanOrEqual(750);
+  expect(bindings.length, "754 bindings; raise this when you add one").toBeGreaterThanOrEqual(754);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "75 nodes carry bindings; raise this when a seventy-sixth does",

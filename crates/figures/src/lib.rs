@@ -8856,6 +8856,95 @@ pub static FIGURES: &[Figure] = &[
                 .count() as f64
         },
     },
+    Figure {
+        key: "dispersion/edchoice-ranking-2025-excluded-rows",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Buildings the 2025 Performance Index ranking sheet holds that R.C. 3310.03 \
+                excludes from the ranking",
+        pinned: 359.0,
+        tolerance: 0.0,
+        compute: |_| {
+            dispersion::rankings::rankings()
+                .iter()
+                .filter(|r| r.year == 2025 && !r.statutorily_ranked())
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/edchoice-naive-2025-cut-misses",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Designated-list buildings a bottom-20% cut of the 2025 ranking sheet as \
+                published fails to flag",
+        pinned: 163.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let mut published: Vec<(f64, String)> = dispersion::rankings::rankings()
+                .into_iter()
+                .filter(|r| r.year == 2025)
+                .filter_map(|r| r.performance_index.map(|pi| (pi, r.building_irn)))
+                .collect();
+            published.sort_by(|left, right| left.0.total_cmp(&right.0).then(left.1.cmp(&right.1)));
+            let take = (published.len() as f64 * 0.20).ceil() as usize;
+            let cut: std::collections::BTreeSet<String> =
+                published.into_iter().take(take).map(|(_, irn)| irn).collect();
+            dispersion::designated::buildings()
+                .iter()
+                .filter(|b| b.bottom_20_by_year[2] && !cut.contains(&b.building_irn))
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/title1-census-poverty-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Share of Ohio's three-year Title I formula count that is Census Bureau poverty \
+                rather than a collection Ohio makes",
+        pinned: 0.9671,
+        tolerance: 0.0001,
+        compute: |_| {
+            let counts = dispersion::title1::formula_counts();
+            let sum = |field: fn(&dispersion::title1::FormulaCount) -> Option<f64>| {
+                counts.iter().filter_map(field).sum::<f64>()
+            };
+            sum(|c| c.census_poverty) / sum(|c| c.total)
+        },
+    },
+    Figure {
+        key: "dispersion/edchoice-designations-on-ohio-collections",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Designations that rest on the four components Ohio collects, their districts \
+                falling below twenty per cent on census poverty alone",
+        pinned: 31.0,
+        tolerance: 0.0,
+        compute: |_| {
+            use dispersion::designated::TITLE1_THRESHOLD;
+            let mut poverty: std::collections::BTreeMap<String, Vec<f64>> =
+                std::collections::BTreeMap::new();
+            for count in dispersion::title1::formula_counts() {
+                let share = match (count.census_poverty, count.population_5_to_17) {
+                    (Some(children), Some(population)) if population > 0.0 => children / population,
+                    _ => 0.0,
+                };
+                poverty.entry(count.district_irn).or_default().push(share);
+            }
+            let full = dispersion::title1::three_year_average();
+            let moved: std::collections::BTreeSet<String> = poverty
+                .into_iter()
+                .filter(|(irn, shares)| {
+                    let mean = shares.iter().sum::<f64>() / shares.len() as f64;
+                    (mean >= TITLE1_THRESHOLD) != (full[irn] >= TITLE1_THRESHOLD)
+                })
+                .map(|(irn, _)| irn)
+                .collect();
+            dispersion::designated::buildings()
+                .iter()
+                .filter(|b| b.designated && moved.contains(&b.district_irn))
+                .count() as f64
+        },
+    },
 ];
 
 /// The narrowest and widest share of the local gap state aid closes across FY2012-FY2024.

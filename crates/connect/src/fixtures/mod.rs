@@ -53,6 +53,7 @@ pub mod identified;
 pub mod landscape;
 pub mod mr81;
 pub mod paths;
+pub mod rankings;
 pub mod report_card;
 pub mod scholarship;
 pub mod scholarship_history;
@@ -60,6 +61,7 @@ pub mod sd1;
 pub mod session_laws;
 pub mod statute;
 pub mod text;
+pub mod title1;
 pub mod transfers;
 mod transport_rates;
 pub mod write;
@@ -112,10 +114,12 @@ pub use paths::{
     F33_DISTRICTS_FIXTURE, F33_FIXTURE, F33_FY2024_FIXTURE, F33_OHIO_PANEL_FIXTURE,
     FINANCE_FIXTURE, FUNCTIONS_FIXTURE, FY26_FIXTURE, FY27_FIXTURE, GRADE_BANDS_FIXTURE,
     GREENBOOK_FIXTURE, IDENTIFIED_FIXTURE, LANDSCAPE_FIXTURE, LSC_GREENBOOK_FIXTURE, MR81_FIXTURE,
-    NOT_REGENERATED, OPINIONS_FIXTURE, PROFILE_FIXTURE, REBUILT, REDBOOK_FIXTURE,
-    REPORT_CARD_FIXTURE, SCHOLARSHIP_FIXTURE, SCHOLARSHIP_HISTORY_FIXTURE, SD1_FIXTURE,
-    SESSION_LAW_FIXTURE, SFPR_FIXTURE, STATUTE_FIXTURE, TRANSFER_FIXTURE, TRANSPORT_RATES_FIXTURE,
+    NOT_REGENERATED, OPINIONS_FIXTURE, PI_RANKING_FIXTURE, PROFILE_FIXTURE, REBUILT,
+    REDBOOK_FIXTURE, REPORT_CARD_FIXTURE, SCHOLARSHIP_FIXTURE, SCHOLARSHIP_HISTORY_FIXTURE,
+    SD1_FIXTURE, SESSION_LAW_FIXTURE, SFPR_FIXTURE, STATUTE_FIXTURE, TITLE1_FIXTURE,
+    TRANSFER_FIXTURE, TRANSPORT_RATES_FIXTURE,
 };
+pub use rankings::{build_pi_rankings, PI_RANKING_HEADER, PI_RANKING_SHEETS};
 pub use report_card::{
     build_function_extract, build_report_card_extract, FUNCTIONS_HEADER, REPORT_CARD_HEADER,
 };
@@ -124,6 +128,7 @@ pub use scholarship_history::{build_scholarship_history, SCHOLARSHIP_HISTORY_HEA
 pub use sd1::{build_sd1_extract, Sd1Year, SD1_HEADER};
 pub use session_laws::{build_session_laws, ActText, SESSION_LAW_HEADER};
 pub use statute::{build_records, parse_statute, Record, RECORD_MARKER};
+pub use title1::{build_title1_counts, TITLE1_HEADER, TITLE1_SHEETS};
 pub use transfers::{build_transfers, AuditReport, TRANSFER_HEADER};
 pub use transport_rates::{
     build_transportation_rates, CalculatorYear, TRANSPORT_RATES_HEADER, TRANSPORT_SHEET,
