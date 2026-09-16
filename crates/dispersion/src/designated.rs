@@ -150,6 +150,39 @@ pub fn by_district() -> BTreeMap<String, (usize, usize)> {
     out
 }
 
+/// The date the designated list workbook was authored, from its own `docProps/core.xml`.
+///
+/// `dcterms:created` and `dcterms:modified` both fall on it, thirty-four minutes apart, so the
+/// file was made in one sitting and has not been revised since. Every other column in it is an
+/// arithmetic on the sheets beside it and carries no date of its own; the academic-distress column
+/// is a fact about the world on *this* date, which is why it can go stale while the rest cannot.
+/// See [`ACADEMIC_DISTRESS_DISTRICT_IRNS`].
+pub const AUTHORED: &str = "2025-11-13";
+
+/// The two districts this edition flags as subject to R.C. 3302.10.
+///
+/// East Cleveland City and Youngstown City. On [`AUTHORED`] both were. By the time the 2026-2027
+/// school year this list governs began, only Youngstown was: East Cleveland's commission ceased to
+/// exist in late December 2025, when the director released the district and R.C. 3302.10(N)(1)
+/// ended the commission with the transition period.
+pub const ACADEMIC_DISTRESS_DISTRICT_IRNS: [&str; 2] = [EAST_CLEVELAND_IRN, YOUNGSTOWN_IRN];
+
+/// East Cleveland City's IRN. Flagged, and released from its commission six weeks after
+/// [`AUTHORED`].
+pub const EAST_CLEVELAND_IRN: &str = "043901";
+
+/// Youngstown City's IRN. The one commission still in existence, and the only district with
+/// buildings resting on the academic-distress route alone.
+pub const YOUNGSTOWN_IRN: &str = "045161";
+
+/// Lorain City's IRN, which is `044263` — `047076` is Pettisville Local, a different district in a
+/// different county.
+///
+/// The third district ever to hold a commission, and the control on whether this column is
+/// maintained rather than carried forward: H.B. 33 dissolved Lorain's commission on 4 July 2023,
+/// and the flag is `no` in all fifteen of Lorain's rows.
+pub const LORAIN_IRN: &str = "044263";
+
 /// The IRN of the one district the designated list does not cover.
 ///
 /// Cleveland Municipal, and by statute rather than by omission: R.C. 3310.03 makes a student

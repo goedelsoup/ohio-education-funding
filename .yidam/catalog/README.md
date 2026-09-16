@@ -32,7 +32,7 @@ Sorted by: type, then slug.
 | [`census-f33-school-system-finances`](census-f33-school-system-finances.md) | Annual Survey of School System Finances (F-33) | 10 |
 | [`cupp-district-profile-report`](cupp-district-profile-report.md) | District Profile Report — the "Cupp Report" | 6 |
 | [`derolph-litigation-record`](derolph-litigation-record.md) | DeRolph Litigation Record | 6 |
-| [`dew-academic-distress-commission`](dew-academic-distress-commission.md) | Academic Distress Commission — the department's commission page | 3 |
+| [`dew-academic-distress-commission`](dew-academic-distress-commission.md) | Academic Distress Commission — the department's commission page | 4 |
 | [`dew-edchoice-designated-list`](dew-edchoice-designated-list.md) | EdChoice Designated List — which buildings' students may claim a scholarship | 2 |
 | [`dew-education-landscape`](dew-education-landscape.md) | Ohio's Education Landscape — the department's own count of every school option | 1 |
 | [`dew-expenditure-expanded-list`](dew-expenditure-expanded-list.md) | FY2025 Expenditure Expanded List | 1 |

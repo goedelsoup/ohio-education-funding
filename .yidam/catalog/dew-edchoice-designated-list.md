@@ -36,6 +36,43 @@ scholarship channel. It does not replace what that route carried: this is who *m
 did, so it answers a different question — but it answers it per district, which nothing else here
 does.
 
+## One column is a dated fact, and the date is in the file
+
+The workbook's own `docProps/core.xml` gives `dcterms:created` and `dcterms:modified` as
+**13 November 2025**, thirty-four minutes apart — made in one sitting, unrevised since, and the live
+file is still byte-identical to it as of 15 September 2026.
+
+That date matters for exactly one of the twenty columns. Every other is an arithmetic on the six
+sheets beside it, so it is as current as its inputs and cannot drift. `Academic Distress School`
+is not: R.C. 3310.03(C) makes a student eligible "if the student's resident district is subject to
+section 3302.10", so the column records whether a commission exists, and nothing in the file
+computes it.
+
+**It is maintained, and Lorain proves it.** Three districts have held a commission under the current
+R.C. 3302.10. Lorain City (IRN `044263`, fifteen buildings — not `047076`, which is Pettisville
+Local) is flagged `no`, its commission having been dissolved by H.B. 33 on 4 July 2023. So the
+department recomputes this column rather than carrying it forward.
+
+**And it went stale six weeks after it was written.** East Cleveland City (IRN `043901`, five
+buildings) is flagged `yes`. In late December 2025 the director released the district from
+commission oversight, and R.C. 3302.10(N)(1) ends the commission with the transition period — so
+R.C. 3310.03(E)(2) had already stopped first-time Option A awards there before the 2026-2027 school
+year this list governs opened. See
+[`dew-academic-distress-commission`](dew-academic-distress-commission.md) for the notice and its
+dating.
+
+**What the staleness costs is nothing, and that is worth stating as precisely as the defect.** All
+five East Cleveland buildings also satisfy Option B — bottom twenty per cent in two of three
+rankings, Title I average 48.9% — so they are designated on the derived route regardless. Recomputing
+the designation while honouring Option A only for Youngstown leaves all 513 designations standing.
+The entire load-bearing surface of the unreproduced column is **two buildings**, both Youngstown's
+Rayen Early College schools, and Youngstown's commission is the one that still exists.
+
+Pinned in `crates/dispersion/tests/the_one_column_the_designation_reads_is_a_dated_fact.rs`, which
+also records why reproducing R.C. 3302.10(A)(1)'s trigger would not audit this column: the trigger
+predicts *establishment* and the column reports *existence*. East Cleveland is the demonstration —
+released on an overall three stars, well above the trigger, and flagged `yes` anyway.
+
 ## The designation is checkable, and the check finds a rule the file does not state
 
 `DESIGNATED` is exactly `Option A OR Option B` — 2 buildings by Option A alone, 495 by Option B

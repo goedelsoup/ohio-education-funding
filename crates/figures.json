@@ -601,6 +601,8 @@
     {"key": "dispersion/edchoice-ranking-2025-excluded-rows", "owner": "crates/dispersion", "unit": "count", "value": 359, "label": "Buildings the 2025 Performance Index ranking sheet holds that R.C. 3310.03 excludes from the ranking"},
     {"key": "dispersion/edchoice-naive-2025-cut-misses", "owner": "crates/dispersion", "unit": "count", "value": 163, "label": "Designated-list buildings a bottom-20% cut of the 2025 ranking sheet as published fails to flag"},
     {"key": "dispersion/title1-census-poverty-share", "owner": "crates/dispersion", "unit": "share", "value": 0.9671208552087984, "label": "Share of Ohio's three-year Title I formula count that is Census Bureau poverty rather than a collection Ohio makes"},
-    {"key": "dispersion/edchoice-designations-on-ohio-collections", "owner": "crates/dispersion", "unit": "count", "value": 31, "label": "Designations that rest on the four components Ohio collects, their districts falling below twenty per cent on census poverty alone"}
+    {"key": "dispersion/edchoice-designations-on-ohio-collections", "owner": "crates/dispersion", "unit": "count", "value": 31, "label": "Designations that rest on the four components Ohio collects, their districts falling below twenty per cent on census poverty alone"},
+    {"key": "dispersion/edchoice-designations-on-the-read-column-alone", "owner": "crates/dispersion", "unit": "count", "value": 2, "label": "Designations resting on the academic-distress column, the one input to the determination this repository reads rather than derives"},
+    {"key": "dispersion/edchoice-buildings-flagged-on-a-ceased-commission", "owner": "crates/dispersion", "unit": "count", "value": 5, "label": "Buildings the designated list flags as under an academic distress commission that had ceased to exist before the school year the list governs"}
   ]
 }
