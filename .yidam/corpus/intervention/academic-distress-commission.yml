@@ -88,9 +88,33 @@ findings: |
   ([`dew-academic-distress-commission`](../../catalog/dew-academic-distress-commission.md), read
   10 August 2026)
 
-      East Cleveland City Schools   released; a Notice of Release is published
+      East Cleveland City Schools   released late December 2025; commission ceased under (N)(1)
       Lorain City School District   dissolved by H.B. 33, signed 4 July 2023
-      Youngstown City Schools       continuing; annual reports through 2024-25 and a plan extension
+      Youngstown City Schools       continuing; the sole district left under one as of January 2026
+
+  **Three commissions have ended three different ways, and only one of them by division (N).** The
+  release notice this node previously recorded without opening has now been read, and it dates East
+  Cleveland's exit — not on its face, because the letter carries no date line, but from the
+  department's own filename (`message-12_25`), the letter's closing promise to visit "in January",
+  and reporting of 2 January 2026 that it was sent in late December. **Late December 2025**, and no
+  finer. [verified]
+  ([`dew-academic-distress-commission`](../../catalog/dew-academic-distress-commission.md), notice
+  read 15 September 2026) The district had been under state control since 2018, so its commission
+  ran roughly seven years.
+
+  The letter's grounds are division (N)(1) exactly: 16 of 20 benchmarks met, the Performance Index
+  up more than 12 points, a 4-star Progress rating, and **an overall rating of 3 stars** — the
+  threshold that begins a transition. And "released" is not a softer status than the statute's: by
+  (N)(1) the chief executive officer relinquishes control "and the academic distress commission
+  shall cease to exist". [verified] So the department's word and R.C. 3310.03(E)(2)'s trigger for
+  cutting off first-time scholarships are the same event.
+
+  **The two-to-three star trap is no longer only an inference.** This node reasoned that a district
+  between two and three stars can neither re-trigger nor begin its exit. Youngstown sits at 2.5, and
+  in January 2026 the department told reporters that its removal "would have to be the result of
+  state legislation" — which is the trap described from the other side, by the office that would have
+  to apply (N)(1). [verified] Lorain's exit *was* legislation. So of the three, one left by rating,
+  one by statute, and the third can reach neither door. [inference]
 
   All three were under oversight when a 2021 change in state law required an academic
   improvement plan running three school years with annual benchmarks; revised plans were
@@ -138,9 +162,32 @@ findings: |
   operating no schools at all, the commission ceases to exist. [verified] An intervention whose
   most drastic power is closing schools terminates itself by exercising it.
 
-  **What is still not established.** When each commission was established — the department's
-  page gives the 2021 plan requirement and the 2023 dissolution and no start dates. [open]
-  Whether any commission changed outcomes, which is what the apparatus rests on. [open]
+  ### The flag has a per-building consequence, and it is a dated fact inside a computed file
+
+  Division (G)(3)'s EdChoice switch is now observable per building. The department's *Designated
+  List 2026-2027* carries an `Academic Distress School` column, and it is the **one input to the
+  designation that this repository reads rather than derives** — every other column rebuilds from
+  the raw counts, and this one cannot, because it records whether a commission exists rather than
+  any arithmetic. The workbook was authored 13 November 2025, when East Cleveland's commission
+  still did. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_one_column_the_designation_reads_is_a_dated_fact.rs))
+
+  So the list asserts an Option A eligibility for 2026-2027 that (N)(1) had already ended, and the
+  file is still unrevised. What that costs is nothing: East Cleveland's five buildings qualify on
+  the performance-and-poverty route as well, and **the only buildings resting on the distress route
+  alone are two of Youngstown's**, in the one district still under a commission. [verified]
+  (crates/dispersion) An intervention's end reaches the scholarship channel through a column in a
+  spreadsheet, and it reached it late.
+
+  **What is still not established.** When Lorain's and Youngstown's commissions were established —
+  the department's page gives the 2021 plan requirement and the 2023 dissolution and no start
+  dates, and only East Cleveland's is dated, to 2018 by the reporting around its release. [open]
+  Whether any commission changed outcomes, which is what the apparatus rests on. [open] And the
+  trigger itself is uncomputable from what is held: R.C. 3302.10(A)(1) needs three consecutive
+  years of the **overall** district rating, and the corpus holds one year of the Achievement
+  component star and no overall rating in any cached report card download. [open] That gap bounds
+  what any reproduction here could check — the trigger predicts establishment, not existence, so it
+  could not have audited the column above in any case. [inference]
 figures:
   - key: project/performance-supplement-to-youngstown
     value: 162207.67
@@ -227,7 +274,15 @@ unfilled:
   - field: the commissions' start dates
     why: >-
       The department's page gives the 2021 plan requirement and the 2023 dissolution and no
-      establishment dates, so no commission here can be placed on the fiscal-period axis.
+      establishment dates. East Cleveland's is now dated to 2018 from the reporting around its
+      release, so two of the three remain unplaceable on the fiscal-period axis rather than all
+      three.
+  - field: the overall district rating, three consecutive years
+    why: >-
+      R.C. 3302.10(A)(1)'s trigger needs it and no held source carries it: the report card fixture
+      has one year of the Achievement component star, and none of the six cached report card
+      downloads carries an overall rating at all. The department publishes an overall-rating
+      download the registry does not hold, and three consecutive years means three editions.
 links:
   - target: ../intervention.ont.yml
     relationship: instance-of

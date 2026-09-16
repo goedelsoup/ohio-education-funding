@@ -320,16 +320,16 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1593 | supported by a committed primary source |
-| `[inference]` | 325 | drawn from verified facts, not witnessed |
-| `[open]` | 197 | a live question — unknown, contested, or being worked |
+| `[verified]` | 1602 | supported by a committed primary source |
+| `[inference]` | 328 | drawn from verified facts, not witnessed |
+| `[open]` | 199 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-197 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+199 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 82 | 0 |
+| `findings` | 84 | 0 |
 | `description` | 43 | 0 |
 | `revisions` | 10 | 0 |
 | `series` | 7 | 0 |

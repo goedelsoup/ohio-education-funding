@@ -122,9 +122,15 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * No new carrier: all four bindings land on `program/edchoice-scholarship`, which the same
  * workbook had already made a carrier. A count of carriers is a count of subjects, and this added
  * depth to one rather than a new one.
+ *
+ * Recomputed at **756/75** when the one designated-list column that is read rather than derived was
+ * dated. Both bindings land on `program/edchoice-scholarship` again, and both measure the same
+ * thing from opposite ends: how many designations rest on that column, and how many buildings it
+ * flags on a commission that had already ceased to exist. A binding that bounds what a defect is
+ * worth is as much a binding as one that reports a quantity.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "754 bindings; raise this when you add one").toBeGreaterThanOrEqual(754);
+  expect(bindings.length, "756 bindings; raise this when you add one").toBeGreaterThanOrEqual(756);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "75 nodes carry bindings; raise this when a seventy-sixth does",

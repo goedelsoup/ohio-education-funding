@@ -8945,6 +8945,37 @@ pub static FIGURES: &[Figure] = &[
                 .count() as f64
         },
     },
+    Figure {
+        key: "dispersion/edchoice-designations-on-the-read-column-alone",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Designations resting on the academic-distress column, the one input to the \
+                determination this repository reads rather than derives",
+        pinned: 2.0,
+        tolerance: 0.0,
+        compute: |_| {
+            dispersion::designated::buildings()
+                .iter()
+                .filter(|b| b.option_a && !b.option_b)
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/edchoice-buildings-flagged-on-a-ceased-commission",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Buildings the designated list flags as under an academic distress commission that \
+                had ceased to exist before the school year the list governs",
+        pinned: 5.0,
+        tolerance: 0.0,
+        compute: |_| {
+            use dispersion::designated::EAST_CLEVELAND_IRN;
+            dispersion::designated::buildings()
+                .iter()
+                .filter(|b| b.academic_distress && b.district_irn == EAST_CLEVELAND_IRN)
+                .count() as f64
+        },
+    },
 ];
 
 /// The narrowest and widest share of the local gap state aid closes across FY2012-FY2024.

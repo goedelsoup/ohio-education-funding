@@ -88,6 +88,46 @@ findings: |
   Only the academic-distress route is read rather than derived, because it is a determination of
   the state board's that this workbook records and does not compute.
 
+  ### The one column that is read is also the one that can go stale, and it has
+
+  Every other column is an arithmetic on the sheets beside it, so it is exactly as current as its
+  inputs. `Academic Distress School` is not an arithmetic at all: R.C. 3310.03(C) makes a student
+  eligible "if the student's resident district is subject to section 3302.10", so the column
+  records whether a commission *exists* on some date. The workbook's own `docProps` gives that
+  date — **created and last modified 13 November 2025**, thirty-four minutes apart. [verified]
+  (crates/dispersion)
+
+  **The column is maintained rather than carried forward, and Lorain is the proof.** Of the three
+  districts ever under the current R.C. 3302.10, Lorain City is flagged `no` across all fifteen of
+  its buildings, its commission having been dissolved by H.B. 33 on 4 July 2023. [verified]
+  (crates/dispersion)
+
+  **East Cleveland's flag went stale six weeks after the file was written.** In late December 2025
+  the director released the district from commission oversight on an overall three-star rating, and
+  R.C. 3302.10(N)(1) ends the commission together with the transition period — so
+  R.C. 3310.03(E)(2)'s instruction to "cease awarding first-time scholarships pursuant to division
+  (C)" had already bitten before the 2026-2027 school year this list governs opened, (E)(3) leaving
+  prior-year holders eligible. The file at the department's URL is still byte-identical to the
+  November edition. [verified]
+  ([`dew-academic-distress-commission`](../../catalog/dew-academic-distress-commission.md))
+
+  **And the exposure is nil, which is the part worth measuring rather than asserting.** The stale
+  flag stands on 5 East Cleveland buildings and every one of them satisfies Option B as well —
+  bottom fifth in two of three rankings, Title I average 48.9% — so they are designated on the
+  derived route whatever the read one says. Honouring Option A only for the commission that still
+  exists leaves all 513 designations standing. **The whole load-bearing surface of the unreproduced
+  column is 2 buildings**, both Youngstown's Rayen Early College schools, in the one district still
+  under a commission. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_one_column_the_designation_reads_is_a_dated_fact.rs))
+
+  Reproducing R.C. 3302.10(A)(1)'s trigger would not close this, and East Cleveland is why: it was
+  released on an overall rating of three stars, well above the trigger, and was flagged `yes` all
+  the same. The trigger predicts *establishment*; the column reports *existence*, and divisions (N)
+  and (O) and the General Assembly separate the two. [inference] It is also not computable from
+  what is held — the trigger needs three consecutive years of the **overall** district rating, and
+  the corpus holds one year of the Achievement component star and no overall rating in any cached
+  report card download. [open]
+
   The rule is one line and three of its readings are decided nowhere in the file. The cut rounds
   **up**, not down — rounding down misses one flagged building in each of the two earlier years.
   A building carrying no index leaves the population rather than sorting to the bottom of it. And
@@ -148,6 +188,14 @@ figures:
     value: 164
     field: findings
     as_written: "misclassifies 164 buildings"
+  - key: dispersion/edchoice-designations-on-the-read-column-alone
+    value: 2
+    field: findings
+    as_written: "column is 2 buildings"
+  - key: dispersion/edchoice-buildings-flagged-on-a-ceased-commission
+    value: 5
+    field: findings
+    as_written: "stands on 5 East Cleveland buildings"
   - key: dispersion/edchoice-ranking-2025-excluded-rows
     value: 359
     field: findings
