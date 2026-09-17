@@ -635,7 +635,7 @@ export function renderChargeOff(d: District, statewide: Statewide, tax: TaxState
 
   return `
     <div class="card" id="charge-off" data-part="charge-off">
-      <h2>${anchor("charge-off")}What the mechanism this replaced would charge${yearChip("formula")}</h2>
+      <h2>${anchor("charge-off")}What the mechanism this replaced would charge${yearChipPair("formula", "profile", "profile")}</h2>
       <p class="note">Before the Fair School Funding Plan, a district's own share of its cost was
         a flat <strong>${r.charge_off_mills.toFixed(0)} mills</strong> against its valuation —
         the same rate for every district in Ohio, whatever it could actually levy. Holding this
@@ -649,8 +649,9 @@ export function renderChargeOff(d: District, statewide: Statewide, tax: TaxState
             <td class="tnum">${money(r.charge_off_local_share)}</td>
             <td class="n">${r.charge_off_mills.toFixed(0)} mills against
               ${money(d.valuation_per_pupil ?? 0)} of valuation per pupil — the Department of
-              Education's figure, on the funding formula's pupil count, because that is the
-              denominator the base cost it is subtracted from is expressed in.</td></tr>
+              Education's figure, per <strong>enrolled ADM</strong>, which is
+              <em>not</em> the count the base cost below it divides by. See the note under this
+              table.</td></tr>
           <tr><th>Local capacity, the plan</th>
             <td class="tnum">${
               r.local_capacity == null ? "—" : money(r.local_capacity)
@@ -702,6 +703,22 @@ export function renderChargeOff(d: District, statewide: Statewide, tax: TaxState
              levy what the mechanism deemed it able to. The other
              ${count(statewide.below_charge_off_rate)} could not.</p>`
       }
+
+      <p class="note"><strong>The two rows above divide by different pupils.</strong> The deemed
+        local share is the profile report's valuation over <strong>enrolled ADM</strong>; the base
+        cost it is subtracted from is the calculator's, over <strong>base cost ADM</strong>. Here
+        those counts are ${count(Math.round(d.adm_history[0] ?? 0))} and
+        ${count(Math.round(d.adm))}, so the residual on the right is
+        ${pct(Math.abs((d.adm_history[0] ?? d.adm) / d.adm - 1), 1)} out on that account alone —
+        before anything the comparison is actually about. The sentence in the first row used to
+        assert the opposite, that the valuation was on the formula's count; it is not.${
+          // Same guard as the dashboard's: 177 districts carry no `#denominators` card, and a
+          // fragment link to a section that is not in the document lands the reader at the top of
+          // the page with no sign anything went wrong. `check-dist` is what says so.
+          hasDenominators(d)
+            ? ` <a href="#denominators">The table below</a> is where the counts are set out.`
+            : ""
+        }</p>
 
       <p class="note"><strong>What this comparison is, and two things it is not.</strong> It is
         a counterfactual at FY2027 inputs — the plan's own computed base cost held fixed, with only
