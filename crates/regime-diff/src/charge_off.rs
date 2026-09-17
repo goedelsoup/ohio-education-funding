@@ -220,6 +220,20 @@ pub const JVSD_MILLS: f64 = 0.5;
 ///
 /// Per pupil on both sides, because that is the unit the FSFP local capacity measure is defined
 /// in and the only unit in which the two mechanisms can be set beside one another.
+///
+/// # "Per pupil" is the unit and not the denominator
+///
+/// The `valuation_per_pupil` handed in is the profile report's, over **enrolled ADM FY2024**.
+/// [`crate::at_fy2027`] subtracts the result from `base_cost_per_pupil`, which is the
+/// calculator's, over **base cost ADM**. Both are dollars per pupil and they are not per the same
+/// pupil — the two counts differ for every district, by a median of about 2% and by 27% at the
+/// extreme.
+///
+/// The sentence above was written about the unit and read, for a while, as though it settled the
+/// denominator. It does not. `the_charge_off_residual_mixes_enrolled_and_funded_pupil_counts`
+/// pins what the choice is worth so that closing it is a decision rather than a silent
+/// restatement; the web feed's `FIELD_DENOMINATORS` is where the same distinction is enforced for
+/// everything that reaches a page.
 #[must_use]
 pub fn local_share_per_pupil(valuation_per_pupil: Dollars, mills: f64) -> Dollars {
     valuation_per_pupil * mills / 1_000.0

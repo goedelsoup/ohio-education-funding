@@ -474,3 +474,87 @@ fn the_reform_charges_the_derolph_district_more_and_helps_cleveland_instead() {
         cleveland.valuation_per_pupil
     );
 }
+
+// ---------------------------------------------------------------------------------------
+// The denominators the subtraction mixes
+// ---------------------------------------------------------------------------------------
+
+/// **`predecessor_total` subtracts two per-pupil figures that divide by different pupils.**
+///
+/// [`at_fy2027`] computes the charge-off residual as `base_cost_per_pupil - local_share`, and the
+/// two terms are not on the same count:
+///
+/// - `base_cost_per_pupil` is the calculator's, over **base cost ADM**;
+/// - `local_share` is `valuation_per_pupil * mills / 1000`, and `valuation_per_pupil` is the
+///   profile report's, over **enrolled ADM FY2024** — which `bundle`'s `FIELD_DENOMINATORS`
+///   declares and which multiplies back to Table SD-1's total value for all 606 districts.
+///
+/// `charge_off::local_share_per_pupil` says "per pupil on both sides, because that is the unit the
+/// FSFP local capacity measure is defined in". That is true of the *unit* and not of the
+/// *denominator*, and the distinction is the one the web feed's denominator registry exists for.
+///
+/// # This test records the gap rather than closing it
+///
+/// Closing it means choosing a count and restating the other term onto it, which moves a published
+/// figure for 606 districts and the corpus claims that cite them — `median_regime_difference`,
+/// `below_charge_off_rate` and `charge_off_exceeds_base_cost` among them. That is a decision about
+/// what the comparison is for, not a typo to correct in passing.
+///
+/// So the size is pinned here. If someone restates the terms onto one count the numbers below move
+/// and this test fails, which is the point: the mismatch stops being latent and becomes something
+/// a change has to acknowledge.
+#[test]
+fn the_charge_off_residual_mixes_enrolled_and_funded_pupil_counts() {
+    let districts = panel();
+    let base = recognized();
+    let base = ChargeOffBase::Recognized(&base);
+
+    let mut moved = 0usize;
+    let mut compared = 0usize;
+    let mut worst = (0.0_f64, String::new());
+
+    for record in &districts {
+        // Enrolled ADM FY2024 is the first of `HISTORY_YEARS`; the funded count is not carried
+        // directly and is recovered the way `bundle` recovers it, from the aggregate over the
+        // per-pupil figure.
+        let enrolled = record.adm_history[0];
+        if enrolled <= 0.0 || record.base_cost_per_pupil <= 0.0 {
+            continue;
+        }
+        let funded = record.aggregate_base_cost / record.base_cost_per_pupil;
+        if funded <= 0.0 {
+            continue;
+        }
+        let diff = at_fy2027(record, TERMINAL_MILLS, base);
+        let (Some(as_is), Some(local)) = (diff.predecessor_total, diff.components[0].predecessor)
+        else {
+            continue;
+        };
+
+        // The same residual with the local share moved onto the count base cost divides by.
+        let restated = (record.base_cost_per_pupil - local * (enrolled / funded)).max(0.0);
+        let delta = (restated - as_is).abs();
+
+        compared += 1;
+        if delta > 100.0 {
+            moved += 1;
+        }
+        if delta > worst.0 {
+            worst = (delta, record.name.clone());
+        }
+    }
+
+    assert_eq!(
+        compared, 606,
+        "districts carrying both counts and both terms"
+    );
+    assert_eq!(
+        moved, 257,
+        "districts where the choice of count moves the residual by more than $100 a pupil"
+    );
+    assert_eq!(worst.1, "Vanlue Local");
+    assert!(
+        (worst.0 - 1131.0).abs() < 2.0,
+        "the widest district, in dollars per pupil: {worst:?}"
+    );
+}
