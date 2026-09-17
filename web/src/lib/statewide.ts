@@ -306,7 +306,8 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
             <td>${s.near_millage_floor} districts (${pct(s.near_millage_floor / s.districts, 0)})</td></tr>
         <tr><th>At the minimum state share of ${pct(s.minimum_state_share, 0)}</th>
             <td>${s.at_minimum_state_share} districts (${pct(s.at_minimum_state_share / s.districts, 0)})</td></tr>
-        <tr><th>Median operating expenditure per pupil</th>
+        <tr><th>Median operating expenditure per pupil,
+            ${yearOf("profile")}</th>
             <td>${money(s.median_operating_expenditure_per_pupil)}</td></tr>
       </tbody></table></div>
       <p class="note">At the <strong>20-mill floor</strong>, H.B. 920's tax reduction factors

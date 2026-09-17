@@ -45,6 +45,7 @@ import type { District, PropertyTaxYear, Statewide } from "./types.ts";
 import { seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
 import { term } from "./glossary.ts";
 import { anchor } from "./section.ts";
+import { pageDenominators } from "./denominators.ts";
 
 /**
  * The statutory reduction-factor floor, in mills — `millage::SCHOOL_DISTRICT_FLOOR`.
@@ -448,8 +449,8 @@ export function hasDenominators(d: District): boolean {
 }
 
 /**
- * Three publishers, three pupil counts — and three years, which is why the table carries a `Year`
- * column of its own.
+ * Every pupil count this page divides by, one row each — and every year, which is why the table
+ * carries a `Year` column of its own.
  *
  * The card's chip is a pair rather than a single because no one label is true of every row here.
  * That is the rule this table is the worst case of: where a table's rows or columns come from one
@@ -457,6 +458,19 @@ export function hasDenominators(d: District): boolean {
  * one **every** row says which. Half-labelling is worse than none, because it implies the
  * unlabelled rows share the labelled one's year — which is exactly the mistake this card exists to
  * stop a reader making about the pupil counts.
+ *
+ * # The rows are derived, because a hand-written list fell behind
+ *
+ * This card listed three counts under a heading reading "Two pupil counts", and the card three
+ * inches above it divided by a fourth — the report card's unweighted ADM — that appeared nowhere
+ * in the table and was labelled, in the SD-1 row's own `Used for` cell, "Everything on this page".
+ * Delphos City reads 824, 831, 898 and 1,034 across the four; a reader reconciling that page
+ * against a published property-tax share had no way to tell which denominator produced the 52%.
+ *
+ * So the rows come from {@link pageDenominators}, which derives them from the figures the route
+ * declares in {@link PAGE_FIGURES}. Adding a per-pupil figure to this page adds its count here.
+ * See `tests/unit/denominators.spec.ts`, which asserts the derived set and the rendered set are
+ * the same set.
  */
 export function renderDenominators(d: District): string {
   if (!hasDenominators(d)) return "";
@@ -466,37 +480,73 @@ export function renderDenominators(d: District): string {
 
   const wider = latest.adm > enrolled;
 
+  /*
+   * One row per count the page's figures divide by.
+   *
+   * `pupils: null` drops the row: the district carries no such count, and the figure that would
+   * have divided by it is not on the page either. `spending_by_function` is the live case —
+   * `renderTaxAgainstSpending` returns "" on exactly the same condition, so the row and the card
+   * that needs it appear and disappear together rather than by two separate tests.
+   */
+  const rows: Record<string, { publisher: string; year: string; pupils: number | null; valuePerPupil: number | null; usedFor: string }> = {
+    "sd1-adm": {
+      publisher: "Taxation, Table SD-1",
+      year: `${seriesYear("property_tax")?.label ?? "—"} tax year`,
+      pupils: latest.adm,
+      valuePerPupil: latest.value_per_pupil,
+      usedFor: `The tiles above, the tax base and the millage yield — every figure on this page
+        that Taxation publishes.`,
+    },
+    "enrolled-adm-fy24": {
+      publisher: "Education, District Profile Report",
+      year: seriesYear("profile")?.label ?? "—",
+      pupils: enrolled,
+      valuePerPupil: d.valuation_per_pupil ?? null,
+      usedFor: `Enrolled ${term("adm", "ADM")}. The funding formula's wealth measure — the
+        charge-off card's local capacity below, and every other page here.`,
+    },
+    "unweighted-adm-fy25": {
+      publisher: "Education, report card",
+      year: seriesYear("outcome.spending")?.label ?? "—",
+      pupils: d.spending_by_function?.adm ?? null,
+      valuePerPupil: null,
+      usedFor: `What <a href="#tax-effort">against what the district spends</a> divides by. A
+        different file and a later year than the row above, and not interchangeable with it.`,
+    },
+    "base-cost-adm": {
+      publisher: "Education, base cost ADM",
+      year: seriesYear("formula")?.label ?? "—",
+      pupils: d.adm,
+      valuePerPupil: null,
+      usedFor: `What ${term("base-cost", "base cost")} per pupil divides by — funded rather than
+        enrolled, so it is ${pct(Math.abs(d.adm / enrolled - 1), 1)} from the profile row.`,
+    },
+  };
+
+  const body = pageDenominators("district/[irn]/taxes")
+    .map((key) => ({ key, row: rows[key] }))
+    .filter((entry) => entry.row != null && entry.row.pupils != null)
+    .map(
+      ({ key, row }) => `
+          <tr${key === "sd1-adm" ? ' class="current"' : ""}>
+            <th>${row!.publisher}</th>
+            <td class="n">${row!.year}</td>
+            <td class="tnum">${count(Math.round(row!.pupils!))}</td>
+            <td class="tnum${row!.valuePerPupil == null ? " n" : ""}">${
+              row!.valuePerPupil == null ? "—" : money(row!.valuePerPupil)
+            }</td>
+            <td class="n">${row!.usedFor}</td>
+          </tr>`,
+    )
+    .join("");
+
   return `
     <div class="card" id="denominators" data-part="denominators">
-      <h2>${anchor("denominators")}Two pupil counts, and why this page shows one of them${yearChipPair("formula", "profile", "profile")}</h2>
+      <h2>${anchor("denominators")}The pupil counts on this page, and which figure uses which${yearChipPair("formula", "profile", "profile")}</h2>
       <div class="scroll"><table>
         <thead><tr><th>Published by</th><th>Year</th><th class="tnum">Pupils</th>
           <th class="tnum">Value per pupil</th><th>Used for</th></tr></thead>
-        <tbody>
-          <tr class="current">
-            <th>Taxation, Table SD-1</th>
-            <td class="n">${seriesYear("property_tax")?.label ?? "—"} tax year</td>
-            <td class="tnum">${count(Math.round(latest.adm))}</td>
-            <td class="tnum">${money(latest.value_per_pupil)}</td>
-            <td class="n">Everything on this page.</td>
-          </tr>
-          <tr>
-            <th>Education, District Profile Report</th>
-            <td class="n">${seriesYear("profile")?.label ?? "—"}</td>
-            <td class="tnum">${count(Math.round(enrolled))}</td>
-            <td class="tnum">${money(d.valuation_per_pupil)}</td>
-            <td class="n">Enrolled ${term("adm", "ADM")}. The funding formula's wealth measure,
-              and every other page here.</td>
-          </tr>
-          <tr>
-            <th>Education, base cost ADM</th>
-            <td class="n">${seriesYear("formula")?.label ?? "—"}</td>
-            <td class="tnum">${count(Math.round(d.adm))}</td>
-            <td class="tnum n">—</td>
-            <td class="n">A third count. What ${term("base-cost", "base cost")} per pupil divides
-              by — funded rather than enrolled, so it is
-              ${pct(Math.abs(d.adm / enrolled - 1), 1)} from the row above.</td>
-          </tr>
+        <tbody>${body}
         </tbody>
       </table></div>
       <p class="note"><strong>The valuations are the same to the dollar. The pupil counts are

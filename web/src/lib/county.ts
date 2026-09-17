@@ -37,7 +37,7 @@ import { count, escapeHtml, money, pct } from "./format.ts";
 import { compare } from "./order.ts";
 import * as routes from "./routes.ts";
 import { median } from "./stats.ts";
-import { yearChip, yearOf } from "./year.ts";
+import { yearChip, yearChipPair, yearOf } from "./year.ts";
 import { anchor } from "./section.ts";
 import { BOX_FROM, distributionSpec, type Drawing, draws } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
@@ -276,18 +276,27 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
     </div>`;
 }
 
-/** Every district in the county, on the measures a neighbour comparison turns on. */
+/**
+ * Every district in the county, on the measures a neighbour comparison turns on.
+ *
+ * Two of the four numeric columns are the calculator's and two are the profile report's, so the
+ * chip is a pair and the two profile columns name their year in the header. It was a single
+ * `formula` chip over all four, which told a reader that valuation and spending were FY2027
+ * figures when both are FY2024 — the same defect as the district dashboard's position card, and
+ * found the same way.
+ */
 function renderRoster(c: County, statewide: Statewide, statewideMedianAid: number): string {
   const medianAid = median(c.districts.map((d) => d.realized_aid_per_pupil));
 
   return `
     <div class="card" id="roster" data-part="roster">
-      <h2>${anchor("roster")}${count(c.districts.length)} district${c.districts.length === 1 ? "" : "s"}${yearChip("formula")}</h2>
+      <h2>${anchor("roster")}${count(c.districts.length)} district${c.districts.length === 1 ? "" : "s"}${yearChipPair("formula", "profile", "profile")}</h2>
       <div class="scroll"><table>
         <thead><tr>
           <th>District</th><th class="tnum">Pupils</th>
-          <th class="tnum">Valuation per pupil</th><th class="tnum">State aid per pupil</th>
-          <th class="tnum">Spending per pupil</th><th>Status</th>
+          <th class="tnum">Valuation per pupil, ${yearOf("profile")}</th>
+          <th class="tnum">State aid per pupil</th>
+          <th class="tnum">Spending per pupil, ${yearOf("profile")}</th><th>Status</th>
         </tr></thead>
         <tbody>
           ${c.districts

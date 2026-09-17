@@ -704,6 +704,19 @@ function renderHoldHarmless(d: District): string {
  * sit", which is one value against a range and not a series. Both labels link out to the corpus
  * node that defines the measure, because the percentile is only meaningful to a reader who knows
  * what is being divided by what.
+ *
+ * # The chip said FY2027 and neither figure was
+ *
+ * `valuation_per_pupil` and `operating_expenditure_per_pupil` are both the District Profile
+ * Report's, FY2024, per enrolled ADM — `FIELD_DENOMINATORS` declares both as `enrolled-adm-fy24`.
+ * The card was chipped `formula`, which is the FY2027 calculator, so a reader was told the year of
+ * a file neither number comes from. The chip gate could not see it: it checks that every figure
+ * can *reach* a year, not that the year it reaches is the figure's own.
+ *
+ * It matters for a specific reconciliation. The taxes route renders a second operating figure from
+ * the report card — FY2025, per unweighted ADM — so the site publishes two operating-expenditure
+ * numbers for one district, 4.4% apart for Delphos City, and the dashboard's carried the wrong
+ * year while the other carried no denominator. The note below names both.
  */
 export function renderPosition(
   bundle: Bundle,
@@ -713,7 +726,7 @@ export function renderPosition(
 ): string {
   return `
     <div class="card" id="position" data-part="position">
-      <h2>${anchor("position")}Position among Ohio's ${bundle.statewide.districts} districts${yearChip("formula")}</h2>
+      <h2>${anchor("position")}Position among Ohio's ${bundle.statewide.districts} districts${yearChip("profile")}</h2>
       <p class="note">The middle half of Ohio's districts is the shaded box, the line inside it is
         the median, and the whiskers reach the last district within one and a half times the
         box's width. Anything drawn past them is its own district. The coloured rule is this one.</p>
@@ -733,6 +746,19 @@ export function renderPosition(
         (other) => other.operating_expenditure_per_pupil,
         routes.metric("per-pupil-operating-expenditure"),
       )}
+      <p class="note">Both figures are the <strong>District Profile Report's</strong>, per
+        <strong>enrolled ADM</strong> — the pupils this district teaches. The
+        <a href="${routes.districtTaxes(d.irn)}">property tax page</a> carries a second operating
+        figure, from the report card, a year later and per <em>unweighted</em> ADM; the two are
+        neither the same year nor the same denominator and do not reconcile by arithmetic.${
+          // The pupil-count table is on the taxes page for the 432 districts that carry a Table
+          // SD-1 row whose valuation diverges enough to need one. For the other 177 there is no
+          // `#denominators` anchor to send a reader to, and `check-dist` is what says so.
+          hasDenominators(d)
+            ? ` Which count each figure on that page divides by is
+              <a href="${routes.districtTaxes(d.irn)}#denominators">tabulated there</a>.`
+            : ""
+        }</p>
       <p class="note">This card places the district against all ${bundle.statewide.districts} at
         once, which is the question "is this unusual". The other question — "unusual compared to
         <em>whom</em>" — is <a href="${routes.compare(d.irn)}">the comparison table</a>, which puts

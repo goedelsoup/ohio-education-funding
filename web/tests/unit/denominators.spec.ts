@@ -14,9 +14,13 @@ import { median } from "../../src/lib/stats.ts";
 import {
   BLOCK_DENOMINATORS,
   DENOMINATORS,
+  denominatorOf,
   FIELD_DENOMINATORS,
+  PAGE_FIGURES,
+  pageDenominators,
   RENDERED_PAIRS,
 } from "../../src/lib/denominators.ts";
+import { renderDenominators, renderTaxAgainstSpending } from "../../src/lib/tax.ts";
 import { admSeamGap, loadFeed } from "../../src/lib/feed.ts";
 
 /** Every path in the feed that looks like a per-pupil quantity or a pupil count. */
@@ -192,4 +196,88 @@ test("the pupil-count table's divergence figures are read, not typed", () => {
   const entry = DENOMINATORS["enrolled-adm-fy24"];
   expect("divergence" in entry).toBe(true);
   expect(entry.note).not.toMatch(/\d+(\.\d+)?%/);
+});
+
+/*
+ * The third guard, and the one the taxes page needed.
+ *
+ * `every per-pupil field declares its denominator` and `each pair rendered side by side shares a
+ * denominator` both passed while `/district/043885/taxes` divided by four different pupil counts
+ * and explained three. Every field was declared; every rendered pair was legitimate; the card
+ * whose whole job is to enumerate the counts simply omitted one, and told the reader in the
+ * SD-1 row that that row was used for "Everything on this page".
+ *
+ * Neither existing guard can see that, because neither asks what a page shows. These do.
+ */
+
+/** The data rows of the pupil-count card, with the header row left out. */
+function tbodyRows(html: string): string[] {
+  const body = /<tbody>([\s\S]*?)<\/tbody>/.exec(html);
+  if (!body) return [];
+  return [...body[1]!.matchAll(/<tr[^>]*>[\s\S]*?<\/tr>/g)].map((m) => m[0]);
+}
+
+/**
+ * The pupil count in one row: the first numeric cell.
+ *
+ * The second is value per pupil and carries the same class, so this takes the first rather than
+ * matching the class — three of the four rows have no valuation to show and render an em dash.
+ */
+function pupilsIn(row: string): number {
+  const cell = /<td class="tnum[^"]*">([\d,]+)<\/td>/.exec(row);
+  return cell ? Number(cell[1]!.replace(/,/g, "")) : Number.NaN;
+}
+
+test("every figure a route declares resolves to a denominator that exists", () => {
+  for (const [route, paths] of Object.entries(PAGE_FIGURES)) {
+    for (const path of paths) {
+      const key = denominatorOf(path);
+      expect(key, `${route} declares ${path}, which resolves to no denominator`).not.toBeNull();
+      expect(DENOMINATORS, `${route}: ${path} -> ${key}`).toHaveProperty(key!);
+    }
+  }
+});
+
+test("the taxes page's pupil-count card renders a row for every count the page divides by", () => {
+  const { bundle } = loadFeed();
+  const expected = pageDenominators("district/[irn]/taxes");
+
+  // Four counts, all four distinct, and the district the omission was found on: Delphos City
+  // reads 1,034 resident, 824 enrolled, 898 unweighted and 831 funded — a 25.6% spread, and the
+  // page showed a property-tax share over the third of them while naming the other three.
+  const delphos = bundle.districts.find((d) => d.irn === "043885");
+  expect(delphos, "Delphos City is in the feed").toBeDefined();
+
+  const rows = tbodyRows(renderDenominators(delphos!));
+  expect(rows).toHaveLength(expected.length);
+  expect(new Set(rows.map(pupilsIn))).toEqual(
+    new Set(
+      [
+        delphos!.property_tax[delphos!.property_tax.length - 1]!.adm,
+        delphos!.adm_history[0]!,
+        delphos!.spending_by_function!.adm,
+        delphos!.adm,
+      ].map(Math.round),
+    ),
+  );
+});
+
+test("the card drops a count only when the figure that uses it is off the page too", () => {
+  const { bundle, tax } = loadFeed();
+  const declared = pageDenominators("district/[irn]/taxes");
+
+  for (const d of bundle.districts) {
+    const html = renderDenominators(d);
+    if (html === "") continue;
+
+    /*
+     * `spending_by_function` is the one optional block among the four. `renderTaxAgainstSpending`
+     * returns "" on exactly the condition that drops this row, so the two move together — which is
+     * the property being asserted. A row that vanished while the card using it stayed would put
+     * the reader back where Delphos put them.
+     */
+    const spendingShown = renderTaxAgainstSpending(d, tax).includes("tax-effort");
+    const want = declared.length - (spendingShown ? 0 : 1);
+    expect(tbodyRows(html), `${d.irn} ${d.name}`).toHaveLength(want);
+  }
 });

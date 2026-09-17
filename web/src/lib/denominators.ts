@@ -422,3 +422,69 @@ export const DELIBERATELY_UNCOMPARABLE: [string, string][] = [
   // definition inside those three years.
   ["meal_program[].enrollment", "history[].poorest_local_per_pupil"],
 ];
+
+/**
+ * The denominator-bearing figures each route renders, by the path a walk of the feed produces.
+ *
+ * # Why a page needs its own declaration
+ *
+ * {@link RENDERED_PAIRS} checks that two figures shown *together* share a count, and
+ * {@link FIELD_DENOMINATORS} checks that every field declares one. Both passed while the taxes
+ * route rendered a ratio over the report card's unweighted ADM three inches above a card headed
+ * "Two pupil counts" that listed the other three and not that one — the figure was declared, the
+ * pairing was legitimate, and the card explaining the counts simply did not mention the count in
+ * use. Neither guard can see that, because neither asks what a *page* shows.
+ *
+ * So the page says which figures it renders, and `renderDenominators` derives its rows from the
+ * counts those figures divide by rather than carrying a hand-written list that can fall behind.
+ * Adding a per-pupil figure to the route means adding it here, which adds its count to the card.
+ * The omission is then not a thing you can forget; it is a thing you cannot express.
+ *
+ * Paths whose {@link FIELD_DENOMINATORS} entry is `null` are pupil counts rendered as counts —
+ * `districts[].adm` is on this page as the third row's headcount — and resolve through the
+ * {@link DENOMINATORS} entry that declares them as its `field`.
+ */
+export const PAGE_FIGURES: Record<string, string[]> = {
+  "district/[irn]/taxes": [
+    // The tiles and the tax-base card: Taxation's own valuation over Taxation's own count.
+    "districts[].property_tax[].value_per_pupil",
+    "districts[].millage.yield_per_mill_per_pupil",
+    // The charge-off card's local capacity, and the profile row of the card itself.
+    "districts[].valuation_per_pupil",
+    // "Against what the district spends" — the ratio this whole declaration was written for.
+    "districts[].spending_by_function.operating_per_pupil",
+    // The seam sentence, and the funded count the charge-off is computed against.
+    "districts[].adm",
+  ],
+};
+
+/**
+ * The count a rendered field divides by, whether it is a quantity over pupils or a count itself.
+ *
+ * `null` from {@link FIELD_DENOMINATORS} means "this *is* a pupil count", which is not the same as
+ * "this has no denominator to explain" — a count on the page still needs a row saying whose it is.
+ * Those resolve by finding the {@link DENOMINATORS} entry that names the path as its `field`.
+ */
+export function denominatorOf(path: string): DenominatorKey | null {
+  const declared = FIELD_DENOMINATORS[path];
+  if (declared) return declared;
+  // The block keys carry their trailing dot — `districts[].spending_by_function.` — so the leaf is
+  // stripped without it. Dropping the dot too would look up a key that is not there.
+  const block = BLOCK_DENOMINATORS[path.replace(/[^.]+$/, "")];
+  if (block) return block;
+  const asCount = (Object.keys(DENOMINATORS) as DenominatorKey[]).find(
+    (key) => DENOMINATORS[key].field === path,
+  );
+  return asCount ?? null;
+}
+
+/** The distinct counts a route's figures divide by, in the order the route declares them. */
+export function pageDenominators(route: string): DenominatorKey[] {
+  const paths = PAGE_FIGURES[route] ?? [];
+  const seen: DenominatorKey[] = [];
+  for (const path of paths) {
+    const key = denominatorOf(path);
+    if (key && !seen.includes(key)) seen.push(key);
+  }
+  return seen;
+}

@@ -123,7 +123,14 @@ export const ROWS: Row[] = [
   },
   {
     key: "spending",
-    label: () => "Operating expenditure per pupil",
+    // Labelled with its year for the same reason `valuation` above is, and from the same block:
+    // both are the profile report's, per enrolled ADM. This row carried no year while the two
+    // rows above it carried theirs, which is the half-labelling the taxes page's pupil-count card
+    // exists to stop — an unlabelled row reads as sharing the labelled one's year.
+    label: (y) =>
+      y.profile
+        ? `Operating expenditure per pupil, ${y.profile}`
+        : "Operating expenditure per pupil",
     pick: (d) => d.operating_expenditure_per_pupil,
     format: (v) => money(v),
     href: routes.metric("per-pupil-operating-expenditure"),
