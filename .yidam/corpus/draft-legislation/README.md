@@ -37,6 +37,8 @@ number is the one thing a reader will believe without checking.
 | [hb-96-with-refreshed-inputs](hb-96-with-refreshed-inputs.yml) | counterfactual | What would H.B. 96 have paid had it refreshed the cost inputs it froze? | 1 of 1 |
 | [fund-the-plan-and-retire-the-guarantee](fund-the-plan-and-retire-the-guarantee.yml) | hypothetical | What does a bill look like that does what both sides ask for, and how much of it can be priced? | 2 of 5 |
 | [hb-643-136-introduced](hb-643-136-introduced.yml) | introduced | What does a real pending bill look like when it reaches a model built around the foundation formula? | 0 of 1 |
+| [hb-96-136-as-introduced](hb-96-136-as-introduced.yml) | introduced | Did the executive proposal freeze base cost at FY2022, and did it propose a phase-in different from the one enacted? | 0 of 2 |
+| [hb-96-136-as-passed-house](hb-96-136-as-passed-house.yml) | introduced | What did the House actually pass, in its own words rather than in a commentator's summary? | 0 of 6 |
 
 The first draft is a counterfactual rather than an invention, and deliberately: the enacted act
 declined to do something an act two years earlier had done, so the alternative is a real road

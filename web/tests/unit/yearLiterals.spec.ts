@@ -120,6 +120,16 @@ const HISTORICAL: Record<string, Allowance> = {
     reason:
       "Lever names: the FY2022 cost inputs and the FY2020 floor are what the levers *are*, and renaming them with a derived year would make the control describe something else. FY2019 joins them as the DPIA phase-in's own anchor — R.C. 3317.02(N)(2) bases it on the FY2019 DPIA payment while the general term uses FY2020, and the note exists to say the two dials interpolate from different years.",
   },
+  "pages/scenario.astro": {
+    allowed: ["FY2022"],
+    reason:
+      "The vintage the enacted act prices base cost from, named in the card that says what this " +
+      "page's levers move away from. It is a property of H.B. 96 rather than of a fixture — the " +
+      "act holds the salary inputs at FY2022 through FY2027, so the year does not advance when " +
+      "the feed does, and there is no series to derive it from because the feed carries the " +
+      "model's output rather than the year its prices were read in. `lib/glossary.ts` declares " +
+      "the same literal for the same fact.",
+  },
   "pages/method.astro": {
     allowed: ["FY2018", "FY2022"],
     reason:

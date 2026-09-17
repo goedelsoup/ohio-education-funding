@@ -1,0 +1,174 @@
+class: draft-legislation
+label: H.B. 96 (136th G.A., as introduced)
+summary: >-
+  The executive budget as introduced — the stage the FY2026-27 act began at. It sets the
+  phase-in to 83.33% and 100%, which is exactly what was enacted, and freezes base cost at
+  FY2022 by extending the section's years without touching its data year.
+description: |
+  The Governor's executive budget for FY2026-27, introduced in the 136th General Assembly by
+  Representative **Brian Stewart** as H.B. 96 and enacted five months later, after two
+  substitutes and 67 line-item vetoes, as
+  [Am. Sub. H.B. 96](../legislation/hb-96-2025.yml). [verified]
+
+  It is here for one reason: the corpus described what this stage did to base cost as an
+  inference about the Governor's proposal, and the document settles it. [verified]
+
+  ### The phase-in it proposes is the phase-in that was enacted
+
+  `Section 265.220` of the introduced bill reads that the general phase-in percentage "for
+  fiscal year 2026 shall be **83.33 per cent**" and "for fiscal year 2027 shall be **100 per
+  cent**", and sets the disadvantaged pupil impact aid percentages to the same two figures.
+  [verified] Those are the enacted numbers, in the enacted section, at the first stage of the
+  bill. [verified]
+
+  So the phase-in is not what the budget disagreed about. Every stage of H.B. 96 that this
+  corpus holds proposes to complete the six-year schedule, and a reading that treats the
+  executive proposal as the one that abandoned it has the wrong dial. [inference] See
+  [as passed by the House](hb-96-136-as-passed-house.yml), where the percentages are identical
+  again and a different section stops them paying anything.
+
+  ### The base-cost freeze is an absence rather than a provision
+
+  R.C. 3317.011's salary definitions each price a funded position "using **fiscal year 2022
+  data**, as determined by the department". In the introduced bill those words are unstruck —
+  carried forward from existing law — while the section's applicable years are amended from
+  2025 to **2027**. [verified]
+
+  That is the whole mechanism. The proposal extends the years the section governs and leaves
+  the year its prices come from where it is, so base cost reaches FY2027 priced at FY2022
+  salaries without any clause saying so. [verified] A freeze that is written as the absence of
+  an amendment is not findable by reading what a bill changes, which is how it came to be
+  recorded here as an inference from the enacted act rather than as a fact about this stage.
+  [inference]
+
+  The precedent for the other choice is one budget old: [H.B. 33](../legislation/hb-33-2023.yml)
+  refreshed the reference year from FY2018 to FY2022. [verified]
+findings: |
+  ### Reading a budget act by what it amends misses what it declines to amend
+
+  The two facts above are the same fact seen twice. `Section 265.220` is a provision — a number
+  written down, findable by searching for it. The FY2022 freeze is a **non-amendment**, visible
+  only as strike-through markup that is not there, and it is the one with the larger effect on
+  what a district is paid. [inference]
+
+  A retrieval that pins a bill's text makes the second kind checkable, which a summary of
+  changes cannot: the act's own "school financing system calculation revisions" list is a list
+  of amendments, and the freeze is by construction not on it. [verified]
+
+  ### What this stage cannot be priced at
+
+  Nothing here binds a lever, and the reason is not that the provisions are exotic. The two that
+  matter are a phase-in percentage and a base-cost reference year, and `policy::Policy` carries
+  a lever for each. They do not price because **this stage and current law are the same on both
+  of them** — 83.33% and 100% are what R.C. 3317.022 is already run at here, and FY2022 is
+  already the reference year the FY2027 model prices from. [verified]
+
+  A draft whose levers sit where current law sits produces a delta of zero, and `Priced` refuses
+  to report that as a cost for the same reason it refuses it for
+  [H.B. 643](hb-643-136-introduced.yml): an identity run is not a free bill. [verified]
+  (`crates/project/tests/a_draft_cannot_hide_what_it_did_not_price.rs`)
+
+  ### The contemporaneous cost figure is a total this repository did not compute
+
+  Analysis of the three stages reports the executive proposal's FY2025 → FY2027 foundation
+  increase as **$149m**, against the House-passed stage's $297m and the enacted act's $339.7m.
+  [verified]
+  ([`fordham-house-bridge-commentary`](../../catalog/fordham-house-bridge-commentary.md))
+  That is a published sector total from a secondary source with a stated alignment, and it is
+  reported here as such rather than reproduced — see `unpriced`.
+properties:
+  provenance: introduced
+  designation: H.B. 96
+  general_assembly: 136th General Assembly
+  sponsors: |
+    Representative **Brian Stewart** (R, district 12), recorded active, with no cosponsors.
+    [verified] The executive budget is introduced by a member rather than by the Governor, and
+    the sponsoring member is ordinarily the House Finance chair; the document records the
+    sponsorship and not the reason for it. [inference]
+  status: |
+    **Superseded.** This is the first of eight versions the General Assembly published for this
+    bill: as introduced, as reported by House Finance, as passed by the House, as pending and
+    then reported in Senate Finance, as passed by the Senate, as reported by the Committee of
+    Conference, and as enrolled. [verified] The enrolled version carries
+    `governor_signed_date` and `effective_date` of **30 June 2025**. [verified]
+
+    A superseded stage is not a dead bill and not a live one. It is what the act said at a
+    point in its passage, which is the only thing this node claims about it.
+  text_read: |
+    `hb96_00_IN`, retrieved 17 September 2026 from
+    `search-prod.lis.state.oh.us/api/v2/general_assembly_136/legislation/hb96/00_IN/html/`.
+    Pinned at SHA-256
+    `9a0acde65eccfecac9c39b96b42ba97f5401dc8b4043c3e41c2f44193cd01ce8`, 22,087,612 bytes.
+    [verified] (`crates/connect/source-digests.txt`)
+
+    `00_IN` is stable — introduction is always a bill's first version and cannot be amended —
+    but the pin is what makes the two claims above checkable, because both rest on strike-through
+    and underline markup rather than on prose. A digest over office-suite HTML pins the renderer
+    as much as the document; see [H.B. 643](hb-643-136-introduced.yml), where a digest moved
+    eleven bytes because the department's LibreOffice went up a version. [verified]
+  question: |
+    Did the executive proposal freeze base cost at FY2022, and did it propose a phase-in
+    different from the one enacted? The corpus asserted the first as an inference and implied
+    the second by describing the act's phase-in as a choice the budget made.
+  provisions: |
+    Two provisions are read here. The bill amends more than two thousand sections and this node
+    does not enumerate them — for a budget act, enumerating the funding provisions is itself the
+    work, and what is claimed is what was read. [verified]
+
+    **1. Phase-in percentages.** `Section 265.220`, uncodified. Binds
+    [`fsfp-phase-in-percentage`](../parameter/fsfp-phase-in-percentage.yml). Baseline 66.67%
+    (FY2025); proposed 83.33% for FY2026 and 100% for FY2027. Lever `phase-in`. **Identical to
+    current law as this repository runs it, so it prices to nothing.** [verified]
+
+    **2. Base cost reference year.** R.C. 3317.011. Binds
+    [`base-cost-per-pupil`](../parameter/base-cost-per-pupil.yml). Baseline FY2022; proposed
+    FY2022, by extending the section's applicable years to 2027 and leaving the data year
+    unstruck. Lever `base-cost`. **Also an identity.** [verified]
+
+    What is *not* read here is the rest of the school financing system: the DPIA count rewrite,
+    the supplements, the JVSD charge-off method and the local capacity income term are all
+    changes the enacted act made, and whether this stage proposed them is not established.
+    [open]
+  unpriced: |
+    Two of two, and for a reason worth distinguishing from the ordinary one.
+
+    **Provision 1, the phase-in percentages (`uncodified`, `Section 265.220`), and provision 2,
+    the base cost reference year (`R.C. 3317.011`).**
+
+    Neither is outside the model. A lever exists for each, and each is set to the value **current
+    law already has** — this repository's baseline is the enacted act, whose phase-in and
+    reference year this stage proposes. [verified] So a run would return an identity.
+
+    The fixture leaves both unlevered rather than running them to zero, and the distinction is
+    the one [H.B. 643](hb-643-136-introduced.yml) forced into `Priced::cost`. A draft reporting
+    **$0.0M** says *this stage is free*; a draft reporting no figure says *this stage has not
+    been priced*. The second is true here and the first is not, because the two provisions read
+    are not the whole stage — the DPIA rewrite, the supplements and the local capacity income
+    term are `[open]` above, and a zero over two of an unknown number of funding provisions
+    would describe a different bill from the one introduced. [inference]
+
+    **The $149m figure is not this repository's.** It is a sector total reported by a secondary
+    source for the FY2025 → FY2027 window, on a population — traditional districts, community
+    and STEM schools, JVSDs — this repository's calculator does not span: the 609 here are the
+    traditional districts in the department's own model. Reproducing it would need the other two
+    sectors and the stage's own appropriation lines. [open]
+links:
+  - target: ../draft-legislation.ont.yml
+    relationship: instance-of
+  - target: ../legislation/hb-96-2025.yml
+    relationship: enacted-as
+    note: >-
+      The act this stage became, five months and two substitutes later. The edge is added rather
+      than the node being rewritten, on the class's own rule: what was introduced and what was
+      enacted stay separately readable.
+  - target: hb-96-136-as-passed-house.yml
+    relationship: superseded-by
+    note: >-
+      The next stage this corpus holds. Not the immediately following version — `01_RH`, the
+      House Finance report, sits between them and is not retrieved.
+  - target: ../parameter/fsfp-phase-in-percentage.yml
+    relationship: perturbs
+  - target: ../funding-regime/fair-school-funding-plan.yml
+    relationship: baselines-on
+  - target: ../../catalog/ohio-bills.md
+    relationship: sourced-from

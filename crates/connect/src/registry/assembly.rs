@@ -549,21 +549,70 @@ pub(super) const BILLS: Connector = Connector {
            listing endpoint reports a bill's *first* version rather than its current one, so \
            it cannot be used to tell a pending bill from an enacted one: H.B. 186 of the \
            136th appears there as `As Introduced` and was enrolled effective 20 March 2026.",
-    sources: &[Source {
-        key: "hb643-136-introduced",
-        title: Some("H.B. 643 of the 136th General Assembly, as introduced"),
-        url: "https://search-prod.lis.state.oh.us/api/v2/general_assembly_136/\
+    sources: &[
+        Source {
+            key: "hb643-136-introduced",
+            title: Some("H.B. 643 of the 136th General Assembly, as introduced"),
+            url: "https://search-prod.lis.state.oh.us/api/v2/general_assembly_136/\
                   legislation/hb643/00_IN/html/",
-        filename: "hb643-136-introduced.html",
-        format: Format::Html,
-        catalog: Some("ohio-bills"),
-        fixtures: &[],
-        note: "One section, amending R.C. 3310.032 to cap EdChoice expansion eligibility \
+            filename: "hb643-136-introduced.html",
+            format: Format::Html,
+            catalog: Some("ohio-bills"),
+            fixtures: &[],
+            note: "One section, amending R.C. 3310.032 to cap EdChoice expansion eligibility \
                    at $500,000 of federal adjusted gross income from the 2026-2027 school \
                    year, indexed to CPI. Chosen as the first pending bill here because every \
                    provision it has falls in the scholarship channel, which this workspace \
                    does not model at all — so it is the case that proves a draft can be real, \
                    current, and entirely unpriceable, and it is the one that found \
                    `project::drafts` reporting an unpriceable bill as costing zero.",
-    }],
+        },
+        // The two stages of H.B. 96 that are not the act. `ohio-session-laws` serves the
+        // enrolled text; these are what it was chosen over, and the pair exists because the
+        // corpus described the House stage from a secondary source's summary — accurately, as
+        // it turns out, but with no way to check the characterisation against the document.
+        Source {
+            key: "hb96-136-as-introduced",
+            title: Some("H.B. 96 of the 136th General Assembly, as introduced"),
+            url: "https://search-prod.lis.state.oh.us/api/v2/general_assembly_136/\
+                  legislation/hb96/00_IN/html/",
+            filename: "hb96-136-as-introduced.html",
+            format: Format::Html,
+            catalog: Some("ohio-bills"),
+            fixtures: &[],
+            note: "The executive budget as introduced — 22MB against H.B. 643's 11KB, which \
+                   is the difference between a bill and a budget act. Two things in it are \
+                   worth the retrieval. Its `Section 265.220` sets the general and DPIA \
+                   phase-in percentages to 83.33% for FY2026 and 100% for FY2027, which is \
+                   word-for-word what was enacted — so the phase-in was never the stage the \
+                   budget disagreed about. And R.C. 3317.011's salary definitions carry \
+                   \"using fiscal year 2022 data\" unstruck while the section's applicable \
+                   years are amended from 2025 to 2027, which is the base-cost freeze the \
+                   corpus had recorded as an inference about the Governor's proposal: the \
+                   freeze is the absence of an amendment to the data year beside an \
+                   amendment extending the years it governs.",
+        },
+        Source {
+            key: "hb96-136-as-passed-house",
+            title: Some("H.B. 96 of the 136th General Assembly, as passed by the House"),
+            url: "https://search-prod.lis.state.oh.us/api/v2/general_assembly_136/\
+                  legislation/hb96/02_PH/html/",
+            filename: "hb96-136-as-passed-house.html",
+            format: Format::Html,
+            catalog: Some("ohio-bills"),
+            fixtures: &[],
+            note: "The stage the enacted act was chosen over. It carries the same \
+                   `Section 265.220` phase-in percentages as the executive proposal and the \
+                   act — and then `Section 265.235`, which the other two do not have, and \
+                   which forbids the department to pay traditional districts under R.C. \
+                   3317.019, 3317.022 or 3317.0212 at all. R.C. 3317.022 *is* the phase-in \
+                   interpolation, so under this stage the phase-in percentages are on the page \
+                   and pay nothing; division (C) substitutes FY2025 foundation funding plus \
+                   half the distance to the computed amount, floored at zero. Reading 265.220 \
+                   alone would report that the House completed the phase-in, which is \
+                   backwards, and no secondary source here says which section to read. The \
+                   version code is positional — `02_PH`, with `01_RH` the House Finance \
+                   report between it and introduction.",
+        },
+    ],
 };

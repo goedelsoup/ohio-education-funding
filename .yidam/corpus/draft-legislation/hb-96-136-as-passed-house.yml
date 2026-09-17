@@ -1,0 +1,225 @@
+class: draft-legislation
+label: H.B. 96 (136th G.A., as passed by the House)
+summary: >-
+  The stage the enacted act was chosen over. It carries the same phase-in percentages as the
+  executive proposal and the act — and a section forbidding the department to pay under the
+  formula those percentages govern, substituting FY2025 aid plus half the distance.
+description: |
+  H.B. 96 as it left the House on its way to the Senate: the third of eight published versions,
+  and the one contemporaneous commentary calls a **bridge formula**. [verified] That name is not
+  the bill's. Every occurrence of "bridge" in this document is a road; the mechanism is
+  `Section 265.235`, headed `OPERATING FUNDING FOR FISCAL YEARS 2026 AND 2027`. [verified]
+
+  ### It completes the phase-in on paper and forbids it to pay
+
+  `Section 265.220` sets the general and DPIA phase-in percentages to **83.33%** for FY2026 and
+  **100%** for FY2027 — the same section, the same figures, as
+  [the introduced bill](hb-96-136-as-introduced.yml) and as
+  [the enacted act](../legislation/hb-96-2025.yml). [verified]
+
+  `Section 265.235(B)` then provides that, "notwithstanding any provision of law to the
+  contrary", the department **shall not make payments** to traditional districts under R.C.
+  3317.019, **3317.022** or 3317.0212, nor to JVSDs or community and STEM schools under their
+  equivalents. [verified] R.C. 3317.022 is the phase-in interpolation itself. [verified]
+
+  So the percentages stand and reach nothing. A reader who searches this document for the
+  phase-in finds it completed, and is wrong about what the House proposed. [inference]
+
+  ### What it pays instead
+
+  Division (C): each district and school receives its **FY2025 state foundation funding**, plus
+  **half** the distance from that to the amount computed for the year — negatives excluded.
+  [verified] Division (D) tops a district up to FY2025 funding plus its FY2025 supplemental
+  targeted assistance where (C) falls short. [verified]
+
+  Three additions sit above that floor. An **enrollment growth supplement** (E) paying per
+  enrolled pupil on a schedule that *falls* as growth rises — $150 at 3-5% growth in FY2026 and
+  $50 above 10% — a **base funding supplement** (F) of $20 then $30 a pupil, and (G) a freeze of
+  the statewide average base cost per pupil at its **FY2024** value for the categorical sections
+  that multiply it. [verified]
+
+  ### The shape it shares with the formula it replaces
+
+  `base + fraction × (computed − base)` is R.C. 3317.022's own arithmetic. The House stage keeps
+  the form and moves the base from the **FY2020** funding base to **FY2025 actual aid**, and the
+  fraction from a rising schedule to a flat one half. [inference]
+findings: |
+  ### The disagreement between the stages is not the dial anyone reads
+
+  Three stages of this budget are on file here and all three set the phase-in to 100% in FY2027.
+  [verified] The difference between them is whether R.C. 3317.022 pays at all, which is a
+  sentence in an uncodified section that names the statute by number and is findable only by
+  looking for it.
+
+  This is why the corpus could describe the House stage accurately from a secondary source and
+  still have no way to check the description: the summary said "held at FY2025 aid by a
+  guarantee, with prescribed increases halved", which is division (C) exactly, and nothing in
+  the corpus pointed at division (C). [verified]
+
+  ### A hold-harmless at a later base is not a smaller version of a phase-in
+
+  Both formulas interpolate. The plan pays `FY2020 base + pct × (computed − FY2020 base)` with
+  `pct` rising to 1; the House stage pays `FY2025 aid + 0.5 × (computed − FY2025 aid)`. At
+  `pct = 1` the first reaches the computed amount and the interpolation ends. The second never
+  does: one half is not a schedule, and a district's floor is its own prior payment rather than
+  a fixed year's. [inference]
+
+  The consequence is the one the guarantee already demonstrates. A hold-harmless whose base is
+  last year's payment reproduces the distribution that produced it, so a district held there is
+  funded by its own history rather than by its costed requirement — which is the property
+  [the plan](../funding-regime/fair-school-funding-plan.yml) was built to retire and which
+  already holds 294 of 609 districts in FY2027. [inference]
+
+  ### The name is not a nickname — it is the regime this corpus already holds
+
+  Ohio ran a formula of exactly this construction for a decade. The
+  [Bridge Formula](../funding-regime/bridge-formula.yml), enacted by
+  [H.B. 153](../legislation/hb-153-2011.yml) in 2011 as an explicit placeholder after the
+  Evidence-Based Model was repealed, "distributed aid largely by reference to what each district
+  had received previously, adjusted by caps limiting year-over-year gains and guarantees limiting
+  year-over-year losses". [verified]
+
+  Division (C) is that sentence with one cap and one guarantee: the guarantee is FY2025 aid, and
+  the cap is half the distance above it. [inference] So the commentary's name for this stage
+  identifies a mechanism Ohio had already used and replaced, rather than coining a label for a
+  new one — and the corpus's own account of that regime supplies the objection. Its warning is
+  that "when enough districts are on a cap or a guarantee, the operative distribution is the
+  prior year's distribution, and the formula becomes advisory"; under division (B) the formula is
+  not advisory but unpaid, which is the same end reached by a shorter route. [inference]
+
+  Whether the drafters intended the reference, or whether commentary reached for the word because
+  the mechanism is recognisable, is not in either document. [open]
+
+  ### The enrollment growth supplement pays less per pupil the faster a district grows
+
+  $150 a pupil at 3-5% growth, $100 above 5%, $50 above 10%, in FY2026. [verified] A district
+  growing 11% receives a third of the per-pupil rate of one growing 4%, and nothing below 3%
+  receives anything. Whether that is a cost-control on the total or a judgement about which
+  growth is real is not stated in the section. [open]
+properties:
+  provenance: introduced
+  designation: H.B. 96
+  general_assembly: 136th General Assembly
+  sponsors: |
+    Representative **Brian Stewart** (R, district 12), as for every version of this bill — a
+    bill's sponsor does not change when a chamber substitutes its text. [verified] The
+    substitute this stage carries is the work of the House Finance committee and the majority
+    that reported it, which the version index does not attribute. [open]
+  status: |
+    **Superseded.** Passed by the House as `02_PH`, then pending and reported in Senate Finance,
+    passed by the Senate, reported by the Committee of Conference, and enrolled with a
+    `governor_signed_date` of **30 June 2025**. [verified]
+
+    `Section 265.235` is not in the act. The enacted budget pays traditional districts under
+    R.C. 3317.022 at 83.33% and 100%, which division (B) of that section forbids, so the two
+    cannot both be in force. [inference] (the act's own change list and the LSC greenbook, both
+    already read by [`hb-96-2025`](../legislation/hb-96-2025.yml))
+  text_read: |
+    `hb96_02_PH`, retrieved 17 September 2026 from
+    `search-prod.lis.state.oh.us/api/v2/general_assembly_136/legislation/hb96/02_PH/html/`.
+    Pinned at SHA-256
+    `a4bd8bd46241d85a96ff0910df2b74d40fbc81ec7ef2cd16eb2f3cb85c9d167e`, 26,489,311 bytes.
+    [verified] (`crates/connect/source-digests.txt`)
+
+    The version code is **positional** and had to be read from the bill's version index: `00_IN`
+    introduced, `01_RH` reported by House Finance, `02_PH` passed by the House. [verified] Only
+    `00_IN` is guessable; every later stage needs the lookup, and a wrong guess returns a body
+    that reads exactly like a bill.
+  question: |
+    What did the House actually pass, in its own words rather than in a commentator's summary —
+    and is "the House abandoned the phase-in" a description of the document or of its effect?
+  provisions: |
+    Read here: `Section 265.220` and `Section 265.235`. The bill amends more than two thousand
+    sections and this node claims only what was read. [verified]
+
+    **1. Phase-in percentages.** `Section 265.220`, uncodified. Binds
+    [`fsfp-phase-in-percentage`](../parameter/fsfp-phase-in-percentage.yml). 83.33% FY2026,
+    100% FY2027 — identical to current law. **Inoperative under provision 2.** [verified]
+
+    **2. Formula payments suspended.** `Section 265.235(B)`, uncodified. No payments to
+    traditional districts under R.C. 3317.019, 3317.022 or 3317.0212. Binds no parameter: there
+    is no value to move, only a statute switched off. **Not runnable.** [verified]
+
+    **3. Temporary foundation funding.** `Section 265.235(C)-(D)`, uncodified. Binds
+    [`guarantee-funding-base`](../parameter/guarantee-funding-base.yml) — it is a hold-harmless
+    base, and that is the parameter it displaces. FY2025 foundation funding plus half the
+    distance to the computed amount, floored at zero, topped up to FY2025 funding plus FY2025
+    supplemental targeted assistance. **Not runnable** — see `unpriced`. [verified]
+
+    **4. Enrollment growth supplement.** `Section 265.235(E)`, uncodified. Binds
+    [`enrolment-supplement-amounts`](../parameter/enrolment-supplement-amounts.yml). Per enrolled
+    pupil, banded by growth: nothing below 3%, then $150/$100/$50 in FY2026 and $200/$150/$100 in
+    FY2027.
+    **Priceable in principle and not runnable here**: the panel carries enrolled ADM for the
+    years the bands compare, and no lever expresses a banded per-pupil grant. [verified]
+
+    **5. Base funding supplement.** `Section 265.235(F)`. $20 a pupil in FY2026, $30 in FY2027,
+    to every district and school. **Not runnable**, same reason. [verified]
+
+    **6. Statewide average base cost held at FY2024.** `Section 265.235(G)(2)`. Binds
+    [`base-cost-per-pupil`](../parameter/base-cost-per-pupil.yml) for the categorical sections
+    that multiply the statewide average. The enacted act does the same thing; this is the one
+    provision here that survived into law. [verified]
+  unpriced: |
+    Six of six — every provision read, all of them `uncodified` except the statewide average
+    base cost, and the reason is a single structural fact rather than six separate gaps.
+
+    **The base is the wrong year.** `policy::Policy` interpolates from each district's **FY2020
+    funding base** — [`guarantee-funding-base`](../parameter/guarantee-funding-base.yml) — which
+    is the quantity R.C. 3317.022 names and the panel carries. Division (C) interpolates from the
+    district's **FY2025 actual aid**, which is a different number for every district and is not a
+    lever position: it is not in `DistrictRecord` at all. [verified] So the closest thing the
+    model can do is a guarantee rebase, and a rebase to the wrong base under a banner naming this
+    bill would be a figure the House did not propose. It is not offered.
+
+    Provisions 4 and 5 are per-pupil grants with no lever; provision 2 switches a statute off,
+    which no lever expresses; provision 6 is already current law and so prices to nothing, the
+    same identity that leaves [the introduced stage](hb-96-136-as-introduced.yml) unpriced.
+
+    **What would be needed.** One field — FY2025 realized aid per district — and one lever that
+    interpolates from it. Both are small. Neither exists, and adding them to price a superseded
+    stage of a passed act is a cost this repository has not paid. [open]
+
+    **The $297m figure is not this repository's.** Contemporaneous analysis reports this stage's
+    FY2025 → FY2027 foundation increases as $179m for traditional districts, $80m for community
+    schools and $38m for JVSDs. [verified]
+    ([`fordham-house-bridge-commentary`](../../catalog/fordham-house-bridge-commentary.md))
+    Two of those three sectors are outside this calculator's population, and the total is
+    reported rather than reproduced.
+links:
+  - target: ../draft-legislation.ont.yml
+    relationship: instance-of
+  - target: ../legislation/hb-96-2025.yml
+    relationship: enacted-as
+    note: >-
+      The act this bill became after the Senate and the conference committee replaced this
+      stage's funding mechanism. `enacted-as` rather than `redrafts`: this is a version of the
+      bill that passed, not a counterfactual rewrite of it.
+  - target: hb-96-136-as-introduced.yml
+    relationship: supersedes
+    note: >-
+      The stage before this one that the corpus holds. `01_RH`, the House Finance report, sits
+      between them and is not retrieved.
+  - target: ../parameter/fsfp-phase-in-percentage.yml
+    relationship: perturbs
+    note: >-
+      Through `Section 265.235(B)` rather than through the percentage itself, which this stage
+      leaves where the act leaves it. The perturbation is to whether the parameter is read.
+  - target: ../funding-regime/fair-school-funding-plan.yml
+    relationship: baselines-on
+  - target: ../funding-regime/bridge-formula.yml
+    relationship: revives
+    note: >-
+      The regime whose construction division (C) reproduces: aid distributed by reference to what
+      each district received before, inside a guarantee and a cap. Ohio ran it from 2011 to 2021
+      as an acknowledged placeholder, and the Fair School Funding Plan replaced it. `revives`
+      rather than `parallels` — the class declares `parallels` for a published template, and this
+      is not a resemblance to a model but a return to a regime this state has already had.
+  - target: ../../catalog/ohio-bills.md
+    relationship: sourced-from
+  - target: ../../catalog/fordham-house-bridge-commentary.md
+    relationship: sourced-from
+    note: >-
+      The only committed account of what this stage would have paid each sector, and the source
+      of the name "bridge formula". Its summary of division (C) is accurate; what it does not
+      give is the section number, which is why this node exists beside it.

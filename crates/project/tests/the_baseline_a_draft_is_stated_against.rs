@@ -71,17 +71,26 @@ fn every_quoted_baseline_resolves_in_the_committed_statute() {
             quoted += 1;
         }
     }
-    assert_eq!(quoted, 6, "quoted baselines across every draft");
+    assert_eq!(quoted, 7, "quoted baselines across every draft");
 }
 
-/// And the one that quotes nothing says why, and is the only one.
+/// Every anchor that quotes nothing says what kind of law it rests on, and they are counted.
 ///
 /// Temporary law is the real case: the guarantee lives in the uncodified sections of an
 /// appropriations act, so there is no statutory text to cite and none can be invented. Counted
 /// here so the count cannot grow quietly — an `uncodified` anchor is the escape hatch, and an
 /// escape hatch nobody counts is how a fixture stops meaning anything.
+///
+/// # This was `only_the_guarantee_rests_on_law_that_is_not_in_the_revised_code`
+///
+/// It asserted the count was one, and that was true of a fixture holding one budget-act provision.
+/// The two stages of H.B. 96 falsify it honestly rather than by drift: a bill's phase-in
+/// percentages are set in `Section 265.220` and its bridge formula in `Section 265.235`, both
+/// uncodified, and a draft that *is* a stage of a budget act rests on temporary law almost
+/// everywhere. The escape hatch is still counted and every use still has to say why; what is no
+/// longer asserted is that the guarantee is the only thing behind it.
 #[test]
-fn only_the_guarantee_rests_on_law_that_is_not_in_the_revised_code() {
+fn every_uncodified_baseline_names_the_kind_of_law_it_rests_on() {
     let unquoted: Vec<(String, u16, String)> = drafts::drafts()
         .into_values()
         .flat_map(|draft| {
@@ -98,14 +107,23 @@ fn only_the_guarantee_rests_on_law_that_is_not_in_the_revised_code() {
         })
         .collect();
 
-    assert_eq!(unquoted.len(), 1, "uncodified baselines: {unquoted:?}");
-    let (slug, ordinal, why) = &unquoted[0];
-    assert_eq!(slug, "fund-the-plan-and-retire-the-guarantee");
-    assert_eq!(*ordinal, 2);
-    assert!(
-        why.contains("temporary law"),
-        "the reason should name what kind of law it is, not just that it is absent: {why}"
-    );
+    assert_eq!(unquoted.len(), 8, "uncodified baselines: {unquoted:?}");
+    for (slug, ordinal, why) in &unquoted {
+        assert!(
+            why.contains("temporary law") || why.contains("uncodified"),
+            "{slug} provision {ordinal}: the reason should name what kind of law it is, \
+             not just that it is absent: {why}"
+        );
+    }
+
+    // The original case, still asserted individually: it is the only one that is not a stage of a
+    // budget act, and the only one whose statute has been in force for two bienniums.
+    let guarantee = unquoted
+        .iter()
+        .find(|(slug, _, _)| slug == "fund-the-plan-and-retire-the-guarantee")
+        .expect("the guarantee provision is still here");
+    assert_eq!(guarantee.1, 2);
+    assert!(guarantee.2.contains("temporary law"));
 }
 
 /// The superseded one is superseded, and the Revised Code says so in its own words.
@@ -150,21 +168,23 @@ fn the_scholarship_baseline_is_refuted_by_the_statute_rather_than_by_silence() {
 
 /// Pricing and standing are independent, which is the reason this gate exists separately.
 ///
-/// Of the seven provisions across all three drafts, three price and four do not; one baseline has
-/// fallen and six stand. The
-/// two partitions do not line up, and a gate that checked only the first would have passed the
-/// fixture in the state that shipped both defects.
+/// Of the fifteen provisions across all five drafts, three price and twelve do not; one baseline
+/// has fallen and fourteen stand. The two partitions do not line up, and a gate that checked only
+/// the first would have passed the fixture in the state that shipped both defects.
+///
+/// The ratio moved when the two stages of H.B. 96 arrived, and in the direction the class predicts:
+/// a real budget act is mostly provisions no lever here expresses.
 #[test]
 fn whether_a_provision_prices_says_nothing_about_whether_its_baseline_stands() {
     let provisions: Vec<_> = drafts::drafts()
         .into_values()
         .flat_map(|draft| draft.provisions)
         .collect();
-    assert_eq!(provisions.len(), 7);
+    assert_eq!(provisions.len(), 15);
 
     let priced = provisions.iter().filter(|p| p.is_priced()).count();
     let standing = provisions.iter().filter(|p| p.anchor.stands()).count();
-    assert_eq!((priced, standing), (3, 6));
+    assert_eq!((priced, standing), (3, 14));
 
     // The one that does not stand is one the model could not run either, which is exactly how it
     // stayed invisible: nobody re-reads a provision the tool already declines to cost.
@@ -177,8 +197,10 @@ fn whether_a_provision_prices_says_nothing_about_whether_its_baseline_stands() {
 
 /// Every anchor is distinct where it should be, and shared where the provision is shared.
 ///
-/// The two base-cost provisions are the same clause in two drafts and rest on the same statutory
-/// text, so they share an anchor deliberately. Everything else is its own.
+/// Three groups share deliberately. The base-cost reference year is the same clause in three
+/// drafts and rests on the same statutory text. The phase-in percentages are the same uncodified
+/// section in both stages of H.B. 96. And the five provisions of `Section 265.235` are one section
+/// of one substitute, so they rest on one absence of statutory text rather than five.
 #[test]
 fn the_anchors_are_shared_only_where_the_provision_is() {
     let phrases: Vec<String> = drafts::drafts()
@@ -187,12 +209,20 @@ fn the_anchors_are_shared_only_where_the_provision_is() {
         .map(|provision| provision.anchor.phrase().to_string())
         .collect();
     let distinct: BTreeSet<&String> = phrases.iter().collect();
-    assert_eq!(phrases.len(), 7);
-    assert_eq!(distinct.len(), 6, "one anchor is shared by two drafts");
+    assert_eq!(phrases.len(), 15);
+    assert_eq!(
+        distinct.len(),
+        8,
+        "three anchors are shared by more than one provision"
+    );
 
     let shared = phrases
         .iter()
         .filter(|phrase| phrases.iter().filter(|other| other == phrase).count() > 1)
         .count();
-    assert_eq!(shared, 2, "the base cost reference year, in both drafts");
+    assert_eq!(
+        shared, 10,
+        "the base cost reference year in three drafts, the phase-in section in two, \
+         and Section 265.235 across five provisions of one"
+    );
 }
