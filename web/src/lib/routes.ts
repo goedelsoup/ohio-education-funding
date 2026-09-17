@@ -186,6 +186,8 @@ export const SECTIONS = {
 
   /** `/scenario`, and the cards its runner writes into the page. */
   scenario: {
+    /** What current law is, named — the act every figure on the page is a delta against. */
+    baseline: "baseline",
     heldFixed: "held-fixed",
     needsScript: "needs-script",
     levers: "levers",
