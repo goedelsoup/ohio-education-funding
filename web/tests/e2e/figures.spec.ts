@@ -125,6 +125,28 @@ const CONTAINERS: Exempt[] = [
   },
   {
     /*
+     * A lever's note describes the setting, not a measurement of Ohio.
+     *
+     * `ScenarioControls.astro` names each slider's ends and what they mean — "current law is $0
+     * and $750 is the schedule it was last paid on", "at 0 it is the count the formula used
+     * before H.B. 96". Those numbers are positions a reader can put the formula into, on the same
+     * footing as the slider that moves them, and a fiscal year on one would assert that the
+     * *setting* was measured in a year.
+     *
+     * `reach.html`'s `25%` already has this exemption, route-keyed, for the same reason and in
+     * the same words. A container is the right shape for it: the controls render on `/scenario`,
+     * `/reach` and all 609 district scenario routes, and the route-keyed form would need 611
+     * identical entries.
+     *
+     * What this does not exempt is the *result*. Every figure the run produces is outside
+     * `.levers` and still has to carry its year.
+     */
+    reason:
+      "A lever's note names the setting's ends, not a measurement — the same ground `reach.html`'s `25%` is exempt on, scoped to the control rather than to 611 routes.",
+    containers: [".levers .n"],
+  },
+  {
+    /*
      * A contents entry is an address, not an assertion, and the omission is deliberate.
      *
      * `words()` in `lib/contents.ts` strips the year chip out of the label it copies from the
