@@ -3078,6 +3078,44 @@ pub static FIGURES: &[Figure] = &[
             appropriated - paid
         },
     },
+    // R.C. 3317.017(A)(4)'s two statewide constants. Both were recorded in the corpus as the
+    // department's to publish and nobody else's to derive — the benchmark as outright
+    // discretionary — on the strength of one reconstruction run against the wrong income column.
+    // Both are functions of the panel's federal median income, and both reproduce exactly.
+    Figure {
+        key: "local-capacity/statewide-median-income-fy2027",
+        owner: "crates/local-capacity",
+        unit: Unit::Dollars,
+        label: "The median of the 609 district median federal incomes, which R.C. \
+                3317.017(A)(4)(a) makes the denominator of every district's income ratio",
+        pinned: 54_546.637_5,
+        tolerance: 0.000_1,
+        compute: |_| {
+            let medians: Vec<f64> = project::panel::panel()
+                .iter()
+                .filter_map(|r| r.median_income)
+                .collect();
+            local_capacity::statewide_median_income(&medians).expect("the panel has districts")
+        },
+    },
+    Figure {
+        key: "local-capacity/benchmark-ratio-fy2027",
+        owner: "crates/local-capacity",
+        unit: Unit::Ratio,
+        label: "The fortieth-highest district income ratio, which tops out the capacity rate \
+                scale — a rank under R.C. 3317.017(A)(4)(c), not a number anybody sets",
+        pinned: 1.465_036_364_5,
+        tolerance: 0.000_000_01,
+        compute: |_| {
+            let medians: Vec<f64> = project::panel::panel()
+                .iter()
+                .filter_map(|r| r.median_income)
+                .collect();
+            let statewide =
+                local_capacity::statewide_median_income(&medians).expect("the panel has districts");
+            local_capacity::benchmark_ratio(&medians, statewide).expect("609 districts")
+        },
+    },
     // The two clocks the Fair School Funding Plan runs on, measured over the one interval the
     // department has published two models for.
     Figure {

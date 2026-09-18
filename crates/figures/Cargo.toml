@@ -19,6 +19,9 @@ foundation = { path = "../foundation" }
 dispersion = { path = "../dispersion" }
 # For `FiscalYear`, which the appropriation series is deflated into.
 edfund-core = { path = "../edfund-core" }
+# For R.C. 3317.017(A)(4)'s two statewide constants, which the corpus recorded as published by
+# the department and not derivable, and which are both functions of the panel's income column.
+local-capacity = { path = "../local-capacity" }
 project = { path = "../project" }
 # For the reach of a base cost increase: who a refresh does not touch, and how many pupils they
 # hold. `scenario/fsfp-input-year-refresh` states both.

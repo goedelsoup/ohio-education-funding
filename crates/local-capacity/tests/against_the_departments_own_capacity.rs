@@ -11,17 +11,21 @@
 //!
 //! Cited by `corpus/formula-component/fsfp-local-capacity-measure.yml`.
 
-use local_capacity::{local_capacity, CapacityInputs};
+use local_capacity::{benchmark_ratio, local_capacity, statewide_median_income, CapacityInputs};
 use project::panel::{panel, DistrictRecord};
 
 /// The statute's arguments, every one of them read rather than reconstructed.
 ///
-/// Both the statewide median income and the benchmark ratio are published on the
-/// `Local_Capacity` sheet. Deriving them instead — the median of district medians, the 40th
-/// highest reconstructed ratio — gives 41,502 and 1.4151 against a published 54,546.64 and
-/// 1.46504, and leaves the whole calculation about 4% light. The benchmark in particular is a
-/// *discretionary* number that sets the top of the scale; there is no reason a reconstruction
-/// should recover it, and it did not.
+/// Reading them is the right habit and the reason given for it was wrong. Both the statewide
+/// median income and the benchmark ratio *are* published on the `Local_Capacity` sheet, and both
+/// are also exactly derivable from the 609 district medians beside them —
+/// [`both_statewide_constants_are_the_panel_reading_itself`] derives them. The earlier note here
+/// said a reconstruction gave 41,502 and 1.4151 against a published 54,546.64 and 1.46504, and
+/// called the benchmark "a *discretionary* number ... there is no reason a reconstruction should
+/// recover it". Neither half holds: the reconstruction was run on the *Ohio* median income column
+/// rather than the federal one, which is the same substitution this file's header records as the
+/// 4.4% error, and the benchmark is a **rank** — R.C. 3317.017(A)(4)(c) says so in as many words.
+/// A wrong input was read as evidence that the quantity was underivable.
 fn inputs(record: &DistrictRecord) -> Option<CapacityInputs> {
     Some(CapacityInputs {
         valuation_recent: record.valuation_three_year[0],
@@ -238,5 +242,85 @@ fn the_interpolated_rate_matches_the_published_one_district_by_district() {
         "{checked} districts sit on the interpolated part of the scale and the worst differs \
          from the department's published rate by {worst:.3e}. The slope of that interpolation \
          is what this pins; nothing else in the workspace asserts a value on it."
+    );
+}
+
+/// **Neither statewide constant is handed down; both are the panel reading itself.**
+///
+/// The two arguments this crate takes as given — `[I7]`, the statewide median income that is the
+/// income ratio's denominator, and `[C5]`, the benchmark ratio that tops out the sliding scale —
+/// were recorded here and in `project::panel::record` as published rather than derivable, the
+/// benchmark as outright "discretionary". R.C. 3317.017(A)(4) defines both as functions of the
+/// district medians the same fixture carries:
+///
+/// - **(A)(4)(a)** — "the median of the median federal adjusted gross incomes determined for all
+///   districts statewide". The median of the 609 district medians is **$54,546.6375**, which is
+///   `[I7]` to the last digit the fixture holds. Not close: equal.
+/// - **(A)(4)(c)–(d)** — rank the districts by their ratios and take the fortieth highest. That is
+///   **Westlake City** at **1.46503636**, which is `[C5]`.
+///
+/// So the whole measure is computable from one column, and nothing in it is a number somebody
+/// chose. The claim that it was rested on a single reconstruction run against the *Ohio* median
+/// income rather than the federal one — the same substitution that made this file's first
+/// attempt 4.4% light, counted twice because its second consequence was read as a fact about the
+/// statute rather than as the first consequence again.
+///
+/// Pinning it matters beyond the correction: a derivable benchmark moves when the income
+/// distribution moves, with nobody voting, which is a different kind of parameter from a rate
+/// somebody sets. It is also the check that the panel's income column is the one the department
+/// ranked, since a fixture holding any other column could not produce these two numbers.
+#[test]
+fn both_statewide_constants_are_the_panel_reading_itself() {
+    let records = panel();
+
+    let medians: Vec<f64> = records.iter().filter_map(|r| r.median_income).collect();
+    assert_eq!(
+        medians.len(),
+        609,
+        "every district carries a median income; the statute's (A)(4)(a) is a median over all of \
+         them and a partial column would silently give a different one"
+    );
+
+    // 609 is odd, so the statutory median is a district's own figure rather than an interpolation
+    // between two — which is why this reproduces exactly rather than approximately.
+    let derived = statewide_median_income(&medians).expect("609 districts");
+    let published = records
+        .iter()
+        .find_map(|r| r.statewide_median_income)
+        .expect("the sheet publishes it");
+    assert!(
+        (derived - published).abs() < 1e-9,
+        "R.C. 3317.017(A)(4)(a) makes the denominator the median of the district medians. \
+         Derived {derived:.4}, published {published:.4}. These agreed bit for bit when this was \
+         written; a difference means the panel's income column is no longer the one the \
+         department ranked."
+    );
+    assert!(
+        (derived - 54_546.637_5).abs() < 1e-4,
+        "and in absolute terms it is $54,546.6375, not the $41,502 an earlier pass reported \
+         from the Ohio median column; derived {derived:.4}"
+    );
+
+    let fortieth = benchmark_ratio(&medians, published).expect("609 districts and a denominator");
+    let benchmark = records
+        .iter()
+        .find_map(|r| r.benchmark_ratio)
+        .expect("the sheet publishes it");
+    assert!(
+        (fortieth - benchmark).abs() < 1e-8,
+        "R.C. 3317.017(A)(4)(c)-(d) makes the benchmark the fortieth highest ratio. Derived \
+         {fortieth:.8}, published {benchmark:.8}. The residual when this was written was 4.5e-9, \
+         which is the fixture storing the published figure to eight places."
+    );
+
+    // The rank is a rank: the districts on either side of the fortieth are not tied with it, so
+    // the benchmark is one district's ratio rather than a plateau that any of several would give.
+    let mut ratios: Vec<f64> = medians.iter().map(|m| m / published).collect();
+    ratios.sort_by(|a, b| b.partial_cmp(a).unwrap());
+    assert!(
+        ratios[38] > fortieth && fortieth > ratios[40],
+        "the fortieth highest is strictly between its neighbours at {:.8} and {:.8}",
+        ratios[38],
+        ratios[40]
     );
 }

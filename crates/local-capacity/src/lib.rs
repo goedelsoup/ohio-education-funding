@@ -18,6 +18,15 @@
 //! with concentration at the top) and a median term (which does not) is what lets the measure
 //! see a district whose totals look healthy because a few residents earn a great deal.
 //!
+//! **Both terms, and H.B. 96 did not change that.** The act's own list of changes says it
+//! requires the Tax Commissioner to certify a district's median federal AGI "instead of the
+//! total", which reads as a replacement and is not one: that item amends R.C. 3317.021, the
+//! certification duty, and R.C. 3317.017's income structure is word for word identical across
+//! H.B. 110, H.B. 33 and H.B. 96. The blend above is the statute at (A)(5) verbatim. What the
+//! substitution did do is leave the aggregate term citing a certification that no longer exists
+//! — see `project/tests/what_the_tax_commissioner_was_never_asked_to_certify.rs`, which is also
+//! where the four years in which the *median* term had no certification behind it are recorded.
+//!
 //! # The rate is a sliding scale, not a constant
 //!
 //! The scaling rate is set by the ratio of the district's federal median income to the state's,
@@ -32,8 +41,13 @@
 //! Deliberate protection: a district whose valuation spikes on a single reappraisal is not
 //! immediately charged for it.
 //!
-//! Not modelled here: how the 40th-highest-district benchmark moves over time. It is one
-//! discretionary number that sets the top of the entire scale.
+//! Neither the benchmark nor the statewide median it is measured against is a number anyone
+//! chooses. R.C. 3317.017(A)(4) makes both functions of the district medians: the denominator is
+//! their median and the benchmark is the fortieth highest ratio among them, so each moves
+//! whenever the income distribution moves and no vote is taken. Both are passed in here rather
+//! than derived, because this crate computes one district at a time and neither is a property of
+//! one district — `tests/against_the_departments_own_capacity.rs` derives them from the panel and
+//! checks them against the department's published figures.
 
 #![forbid(unsafe_code)]
 
@@ -255,6 +269,67 @@ pub const RATE_AT_STATE_MEDIAN: f64 = 0.0225;
 /// value and applied it to every year, which concealed that. Callers pass the year's value
 /// to [`state_share`]; these constants name the two that are known.
 pub use edfund_core::{MINIMUM_STATE_SHARE_FY2022, MINIMUM_STATE_SHARE_FY2027};
+
+/// The rank R.C. 3317.017(A)(4)(c)-(d) pins the top of the capacity rate scale to.
+///
+/// Forty, out of 609. Why forty and not some other rank is not stated in the section, and the
+/// corpus has it recorded as open.
+pub const BENCHMARK_RANK: usize = 40;
+
+/// **R.C. 3317.017(A)(4)(a)** — the denominator of every district's income ratio.
+///
+/// "Determine the median of the median federal adjusted gross incomes determined for all
+/// districts statewide". So it is a median over districts, each weighted the same however many
+/// residents it has, and not a median over Ohioans — which are different statistics and differ
+/// here by a wide margin.
+///
+/// This corpus took it as an input for eleven phases, recorded as published by the department
+/// and not derivable. It is derivable, and this is how: for FY2027 the 609 district medians give
+/// **$54,546.6375**, which is the department's `[I7]` to the last digit it publishes.
+///
+/// `None` for an empty slice. With an even count the two middle districts are averaged, which is
+/// the ordinary convention and not something the section states — Ohio's district count has been
+/// odd every year the plan has run, so the department has never had to choose.
+#[must_use]
+pub fn statewide_median_income(district_medians: &[Dollars]) -> Option<Dollars> {
+    if district_medians.is_empty() {
+        return None;
+    }
+    let mut sorted = district_medians.to_vec();
+    sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(core::cmp::Ordering::Equal));
+    let mid = sorted.len() / 2;
+    Some(if sorted.len() % 2 == 1 {
+        sorted[mid]
+    } else {
+        (sorted[mid - 1] + sorted[mid]) / 2.0
+    })
+}
+
+/// **R.C. 3317.017(A)(4)(c)-(d)** — the benchmark ratio, which is a rank and not a value.
+///
+/// Rank every district by its income ratio and take the [fortieth highest](BENCHMARK_RANK). For
+/// FY2027 that is Westlake City at **1.46503636**, reproducing the department's `[C5]`.
+///
+/// Nobody sets this number. It moves whenever a handful of districts near the fortieth rank
+/// change position, which makes it a different kind of parameter from the three rates the same
+/// division writes as digits — and it is why [`capacity_rate`] takes it as an argument rather
+/// than holding it as a constant.
+///
+/// `None` when there are fewer than forty districts, or when the statewide median is not
+/// positive.
+#[must_use]
+pub fn benchmark_ratio(district_medians: &[Dollars], statewide_median: Dollars) -> Option<f64> {
+    if district_medians.len() < BENCHMARK_RANK || statewide_median <= 0.0 {
+        return None;
+    }
+    let mut ratios: Vec<f64> = district_medians
+        .iter()
+        .map(|m| m / statewide_median)
+        .collect();
+    // Descending, so index 39 is the fortieth highest.
+    ratios.sort_by(|a, b| b.partial_cmp(a).unwrap_or(core::cmp::Ordering::Equal));
+    Some(ratios[BENCHMARK_RANK - 1])
+}
 
 /// The lesser of a district's most recent year and its three-year average.
 ///
@@ -541,6 +616,42 @@ mod tests {
     fn capacity_rate_caps_at_the_benchmark() {
         let far_above = capacity_rate(50.0, 1.5).unwrap();
         assert!((far_above - RATE_AT_BENCHMARK).abs() < 1e-12);
+    }
+
+    /// The median is over districts, one vote each, and the odd count makes it a real district's
+    /// figure rather than an interpolation.
+    #[test]
+    fn the_statewide_median_is_a_median_over_districts() {
+        assert_eq!(statewide_median_income(&[3.0, 1.0, 2.0]), Some(2.0));
+        // Even counts average the two middle districts. The section does not say so; Ohio has
+        // never had an even number of districts while the plan has run.
+        assert_eq!(statewide_median_income(&[4.0, 1.0, 2.0, 3.0]), Some(2.5));
+        assert_eq!(statewide_median_income(&[]), None);
+        // One very large district does not move it, which is the point of a median over
+        // districts: an aggregate measure would be dragged by exactly that case.
+        assert_eq!(
+            statewide_median_income(&[1.0, 2.0, 3.0, 4.0, 1_000_000.0]),
+            Some(3.0)
+        );
+    }
+
+    /// The benchmark is the fortieth *highest*, so it counts down from the top and needs forty
+    /// districts to exist at all.
+    #[test]
+    fn the_benchmark_is_the_fortieth_highest_ratio() {
+        // Medians 100, 99, ..., 51 against a statewide 50: the fortieth highest is 61.
+        let medians: Vec<f64> = (51..=100).rev().map(f64::from).collect();
+        let benchmark = benchmark_ratio(&medians, 50.0).expect("fifty districts");
+        assert!(
+            (benchmark - 61.0 / 50.0).abs() < 1e-12,
+            "fortieth highest of fifty is 61, giving {benchmark}"
+        );
+
+        // Exactly forty is the boundary, and it is the lowest of them.
+        let forty: Vec<f64> = (1..=40).map(f64::from).collect();
+        assert_eq!(benchmark_ratio(&forty, 1.0), Some(1.0));
+        assert_eq!(benchmark_ratio(&forty[..39], 1.0), None);
+        assert_eq!(benchmark_ratio(&forty, 0.0), None);
     }
 
     #[test]
