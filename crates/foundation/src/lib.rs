@@ -100,6 +100,67 @@ pub struct StatewideFactors {
     pub building_per_pupil: Dollars,
 }
 
+/// The two numbers behind a building operation amount, which the product hides.
+///
+/// # Why this is a type and not two more fields
+///
+/// [`StatewideFactors::building_per_pupil`] is a *product*: a statewide average square footage
+/// per pupil times a statewide average cost per square foot. The FY2022 factors carry its
+/// decomposition in a doc comment and the FY2027 factors carried only the product, so the
+/// workspace knew that Ohio funds buildings at 239.36 square feet a pupil and did not know it
+/// had become 278.07.
+///
+/// That matters because the two halves move for different reasons and were **refreshed at
+/// different times**. H.B. 96 froze the salary reference year at FY2022; the square footage
+/// assumption moved anyway, 239.36 to 278.07, a rise of 16.2%. A reader told only that the
+/// building amount went from $1,129.78 to $1,418.16 cannot see that most of it is floor area
+/// rather than price.
+///
+/// # And the quantity is statewide, which is the whole of what this measures
+///
+/// **No district's own square footage appears anywhere in R.C. 3317.011.** A district is funded
+/// for [`Self::square_feet_per_pupil`] times its ADM whether its buildings hold that much floor
+/// per pupil, half of it, or twice. Neither does building *age*: the section has no term for it
+/// at all. [`crate::building_leadership_base_cost`] does read a district's building **count**,
+/// through the support-staffing floor — so the formula sees how many buildings a district has
+/// open and never how large or how old they are.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct BuildingAllowance {
+    /// Statewide average building square feet per pupil.
+    pub square_feet_per_pupil: f64,
+    /// Statewide average cost per square foot.
+    pub cost_per_square_foot: Dollars,
+}
+
+impl BuildingAllowance {
+    /// The FY2022 payment report's figures: 239.36 square feet at $4.72.
+    #[must_use]
+    pub const fn fy2022() -> Self {
+        Self {
+            square_feet_per_pupil: 239.36,
+            cost_per_square_foot: 4.72,
+        }
+    }
+
+    /// The FY2027 calculator's: 278.07 square feet at $5.10.
+    ///
+    /// Both from the department's own line-by-line explanation of the payment report, which
+    /// states the multiplication rather than only its result.
+    #[must_use]
+    pub const fn fy2027() -> Self {
+        Self {
+            square_feet_per_pupil: 278.07,
+            cost_per_square_foot: 5.10,
+        }
+    }
+
+    /// The per-pupil building amount, rounded as the department prints it.
+    #[must_use]
+    pub fn per_pupil(&self) -> Dollars {
+        round_dp(self.square_feet_per_pupil * self.cost_per_square_foot, 2)
+    }
+}
+
 impl StatewideFactors {
     /// The FY2022 factors, priced from **FY2018** statewide averages.
     ///

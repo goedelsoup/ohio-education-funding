@@ -76,6 +76,7 @@ pub mod panel;
 pub mod policy;
 pub mod prior_model;
 pub mod rating_payments;
+pub mod refresh;
 pub mod report;
 pub mod scholarship;
 pub mod series;

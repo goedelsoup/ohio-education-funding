@@ -53,6 +53,7 @@ pub mod rankings;
 pub mod report_card;
 pub mod sd1;
 pub mod survey_basis;
+pub mod tax_base;
 pub mod title1;
 pub mod typology;
 pub mod valuation;
