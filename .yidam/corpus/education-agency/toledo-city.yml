@@ -562,3 +562,9 @@ links:
     relationship: illustrates
   - target: ../../catalog/ocg-fact-check-021.md
     relationship: sourced-from
+  - target: ../../catalog/dew-district-typology.md
+    relationship: sourced-from
+    note: >-
+      The department's 2013 typology roster, which is where this node's code comes from. The
+      prose characterisation was written before the roster was fetched, and for two of the five
+      nodes that carry a code the two disagreed.

@@ -19,7 +19,7 @@ import {
   matchesDraft,
   renderDraft,
 } from "../../src/lib/scenario.ts";
-import { applyAll, totals } from "../../src/lib/policy.ts";
+import { applyAll, totals, modelOf } from "../../src/lib/policy.ts";
 import { toPolicy } from "../../src/lib/scenario.ts";
 import type { Panel } from "../../src/lib/types.ts";
 
@@ -40,7 +40,7 @@ function panel(): Panel {
  */
 const flat = (html: string): string => html.replace(/\s+/g, " ");
 
-const MODEL = bundle.statewide.minimum_state_share;
+const MODEL = modelOf(bundle.statewide);
 const BASE_YEAR = bundle.projection?.base_year ?? 0;
 
 test("the feed carries every draft, unpriced provisions included", () => {
@@ -92,11 +92,17 @@ test("a multi-provision draft sets every lever its provisions name", () => {
   expect(levers.baseCostScale).toBeCloseTo(1.0395, 6);
   expect(levers.guarantee).toBe("phase-out");
   expect(levers.guaranteeArgument).toBeCloseTo(0.5, 6);
+  // The third priced provision, and the one this mapper used to drop. Its `case` read
+  // `phase-in-cat` for the DPIA phase-in — a misspelling of `project::drafts::Lever::key`, which
+  // was unreachable while no draft bound that lever and which took every *other* unrecognised
+  // key down the `default` branch with it. A transportation provision would have set nothing
+  // and the page would have shown the bill priced without it.
+  expect(levers.transportationFloor).toBeCloseTo(0.375, 6);
 
   const t = totals(applyAll(bundle.districts, toPolicy(levers), MODEL));
-  // -$143.9M, and the two provisions priced apart say -$219.0M. The web arrives at the combined
-  // figure because it applies both levers to one policy, which is the only arrangement that can.
-  expect(t.cost / 1e6).toBeCloseTo(-143.9, 0);
+  // -$262.0M against -$337.1M for the provisions priced apart. The web arrives at the combined
+  // figure because it applies every lever to one policy, which is the only arrangement that can.
+  expect(t.cost / 1e6).toBeCloseTo(-262.0, 0);
   expect(t.unmoved).toBe(0);
 });
 
@@ -317,5 +323,5 @@ test("a provision the schema would reject cannot reach the levers either", () =>
   const levers = draftLevers(draft, MODEL, BASE_YEAR);
   expect(Number.isFinite(levers.baseCostScale)).toBe(true);
   expect(levers.baseCostScale).toBe(1);
-  expect(levers.minimumStateShare).toBe(MODEL);
+  expect(levers.minimumStateShare).toBe(MODEL.minimumStateShare);
 });

@@ -892,7 +892,7 @@ const ROUTES_WITH_FIGURES = [
     // checkpoints and the forecasts, which are gated separately.
     await page.goto("/");
     await expect(page.locator("footer")).toContainText(
-      "Formula verified at build against 8 reference scenarios and 4 reference forecasts",
+      "Formula verified at build against 11 reference scenarios and 4 reference forecasts",
     );
   });
 
@@ -2988,7 +2988,7 @@ test.describe("the verification gate", () => {
   test("reports agreement and enables the scenario builder", async ({ page }) => {
     await page.goto("/scenario");
     await expect(page.locator("#scenario-status")).toContainText(
-      "Formula reproduced against 8 reference scenarios and 4 reference forecasts",
+      "Formula reproduced against 11 reference scenarios and 4 reference forecasts",
     );
     await expect(page.locator("#scenario-out .err")).toHaveCount(0);
     await expect(page.locator("#lv-guarantee")).toBeVisible();
@@ -6452,7 +6452,7 @@ test.describe("a draft opened in the runner", () => {
     const card = page.locator('.card[data-part="draft"]');
     await expect(card).toContainText("Opened from a draft");
     await expect(card).toContainText("not in any figure on this page");
-    await expect(page.locator('[data-part="draft-unpriced"] li')).toHaveCount(3);
+    await expect(page.locator('[data-part="draft-unpriced"] li')).toHaveCount(2);
 
     // First, not merely present: the placement the rule requires is a limit on what is about to be
     // read rather than a footnote on what was read.
@@ -6464,10 +6464,10 @@ test.describe("a draft opened in the runner", () => {
 
   test("the figure is the draft's even where a slider cannot express it", async ({ page }) => {
     /*
-     * `#lv-base` steps by 0.01 and the refresh provision is 1.0395, so the control can only get to
-     * 1.04 — which is a −$139.9M scenario reaching 357 districts, against the draft's −$143.9M
-     * reaching 356. The controls are set as near as they go and the first render is computed from
-     * the draft, so the number under the banner is the bill's rather than the slider's.
+     * `#lv-base` steps by 0.01 and the refresh provision is 1.0395, so the control can only get
+     * to 1.04, which is a different scenario from the bill's. The controls are set as near as
+     * they go and the first render is computed from the draft, so the number under the banner is
+     * the bill's rather than the slider's.
      */
     await page.goto("/scenario?draft=fund-the-plan-and-retire-the-guarantee");
     await expect(page.locator("#lv-guarantee")).toHaveValue("phase-out");
@@ -6475,8 +6475,8 @@ test.describe("a draft opened in the runner", () => {
     await expect(page.locator("#lv-base")).toHaveValue("1.04");
 
     // The combined figure, and not the one the rounded slider would give.
-    await expect(page.locator("#scenario-out")).toContainText("\u2212$143.9M");
-    await expect(page.locator("#scenario-out")).toContainText("356 up, 253 down");
+    await expect(page.locator("#scenario-out")).toContainText("\u2212$262.0M");
+    await expect(page.locator("#scenario-out")).toContainText("319 up, 290 down");
     await expect(page.locator('[data-part="draft-departed"]')).toHaveCount(0);
   });
 
@@ -6495,7 +6495,7 @@ test.describe("a draft opened in the runner", () => {
       "no longer match the draft",
     );
     // And the missing clauses stay put: a departed scenario is short the same three provisions.
-    await expect(page.locator('[data-part="draft-unpriced"] li')).toHaveCount(3);
+    await expect(page.locator('[data-part="draft-unpriced"] li')).toHaveCount(2);
   });
 
   test("a lever moved before the runner is live is undone, not obeyed", async ({ page }) => {
@@ -6508,7 +6508,7 @@ test.describe("a draft opened in the runner", () => {
      * where nothing is listening, and the assertions are that `boot` puts it back and renders the
      * *bill's* figure under the banner that says it is the bill's.
      *
-     * `−$143.9M` is what makes this worth a test rather than a comment. The control cannot express
+     * `−$262.0M` is what makes this worth a test rather than a comment. The control cannot express
      * the refresh provision's 1.0395 — it steps by 0.01 — so a runner that read its controls for
      * the first render would publish −$139.9M under "Opened from a draft". That is the one thing
      * `fromControls: false` exists to prevent, and it is invisible in every other test here
@@ -6533,7 +6533,7 @@ test.describe("a draft opened in the runner", () => {
     await expect(
       page.locator("#scenario-out"),
       "and the figure is the bill's, not the one the quantized slider can reach",
-    ).toContainText("\u2212$143.9M");
+    ).toContainText("\u2212$262.0M");
   });
 
   test("a draft that prices completely says so rather than staying silent", async ({ page }) => {
@@ -6552,7 +6552,7 @@ test.describe("a draft opened in the runner", () => {
     // meets.
     await page.goto("/wiki/draft-legislation/fund-the-plan-and-retire-the-guarantee");
     const card = page.locator('.card[data-part="runner"]');
-    await expect(card).toContainText("2 of this draft's 5 provisions");
+    await expect(card).toContainText("3 of this draft's 5 provisions");
     await expect(card).toContainText("not of the bill");
     await expect(card.locator("a.flag")).toHaveAttribute(
       "href",
@@ -6575,7 +6575,7 @@ test.describe("a draft opened in the runner", () => {
       "data-part",
       "draft",
     );
-    await expect(page.locator('[data-part="draft-unpriced"] li')).toHaveCount(3);
+    await expect(page.locator('[data-part="draft-unpriced"] li')).toHaveCount(2);
     // And the district figures are still there below it.
     await expect(page.locator("#scenario-out")).toContainText("What moved for this district");
   });

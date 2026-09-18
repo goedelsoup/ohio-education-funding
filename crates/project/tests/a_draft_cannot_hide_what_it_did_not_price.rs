@@ -212,15 +212,27 @@ fn the_parts_do_not_sum_to_the_whole() {
     /*
      * The finding that makes attribution a separate thing from cost.
      *
-     * `fund-the-plan-and-retire-the-guarantee` raises base cost and retires half the guarantee.
-     * Priced apart they say -$219.0M; run together they say -$143.9M. The difference is $75.1M —
-     * 52% of the combined figure — and it is not rounding, it is the guarantee's `max` counted
-     * twice. A district the refresh lifts off the floor is not standing on the floor for the
-     * phase-out to lower.
+     * `fund-the-plan-and-retire-the-guarantee` raises base cost, retires half the guarantee, and
+     * lowers the transportation floor. Priced apart they say -$337.1M; run together they say
+     * -$262.0M. The difference is $75.1M and it is not rounding, it is the guarantee's `max`
+     * counted twice. A district the refresh lifts off the floor is not standing on the floor for
+     * the phase-out to lower.
      *
      * The assertion is on the magnitude rather than the sign alone, because a residual that
      * quietly collapsed to a rounding error would mean the levers had stopped interacting, and
      * that is a change to the model worth failing on.
+     *
+     * # The third provision is priced and adds nothing to the residual
+     *
+     * $75.1M before the transportation floor became a lever and $75.1M after, **to the cent**.
+     * That is the arithmetic saying what the channels are: transportation is not inside core
+     * foundation funding, so it has no `max` to be counted twice against, and it composes with
+     * the other two additively where they do not compose with each other.
+     *
+     * It is also why the residual is a smaller *share* of the combined figure now — 29% against
+     * 52% — while being the same money. A draft that grows by a non-interacting provision dilutes
+     * the ratio without making its clauses any more separable, which is a reason to assert the
+     * residual in dollars and not only as a fraction.
      */
     let districts = panel();
     let priced = price(
@@ -232,17 +244,29 @@ fn the_parts_do_not_sum_to_the_whole() {
     let residual = priced.residual().expect("two provisions price");
     let apart: f64 = priced.attribution().iter().map(|a| a.cost).sum();
 
-    assert!((combined / 1e6 + 143.9).abs() < 1.0, "combined {combined}");
-    assert!((apart / 1e6 + 219.0).abs() < 1.0, "apart {apart}");
+    assert!((combined / 1e6 + 262.0).abs() < 1.0, "combined {combined}");
+    assert!((apart / 1e6 + 337.1).abs() < 1.0, "apart {apart}");
     assert!(
         residual / 1e6 > 70.0,
         "the residual is the whole reason attribution is reported apart; got {:.1}M",
         residual / 1e6
     );
+    // The foundation half is what it was, which is the check that levering transportation added
+    // a channel rather than changing one.
+    let foundation = priced.effect().foundation_cost();
     assert!(
-        residual / combined.abs() > 0.5,
-        "the residual is more than half the combined figure, which is why clauses cannot be \
-         priced independently and added"
+        (foundation / 1e6 + 143.9).abs() < 1.0,
+        "the core foundation funding half should be unchanged at -$143.9M; got {foundation}"
+    );
+    assert!(
+        (priced.effect().transportation_cost() / 1e6 + 118.1).abs() < 1.0,
+        "and the transportation half is the provision's own price"
+    );
+    assert!(
+        residual / foundation.abs() > 0.5,
+        "the residual is more than half the figure it is a residual *of* — the two provisions \
+         that share the guarantee's max. Against the combined total it is 29%, which is the same \
+         money over a larger draft and not a weaker interaction."
     );
 }
 

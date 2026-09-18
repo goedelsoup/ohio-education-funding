@@ -241,7 +241,12 @@ properties:
     `TRANSPORT_SCHOOL_DAYS`, `TRANSPORT_NONPUBLIC_WEIGHT` and `TRANSPORT_COMMUNITY_WEIGHT`
     beside them.
 
-    Constants, not levers.
+    The rates are constants, not levers. **The floor beside them is one** —
+    `Policy::transportation_floor`, the minimum state share the department applies to the
+    calculated amount whatever the district's own share, which H.B. 96 moved 41.67% → 45.83% →
+    50% inside one act. It is the only lever in this model that touches nothing in core
+    foundation funding: it moves `Outcome::transportation`, which is carried beside realized aid
+    rather than inside it, because the department publishes transportation as its own line.
   written_as: |
     per rider base
     per mile base

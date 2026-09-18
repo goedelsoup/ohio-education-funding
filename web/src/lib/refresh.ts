@@ -44,7 +44,7 @@
  * Build-time only. Nothing in the browser needs this.
  */
 
-import { applyAll, currentLaw, totals } from "./policy.ts";
+import { applyAll, currentLaw, totals, type Model } from "./policy.ts";
 import type { District, Draft, PanelDistrict } from "./types.ts";
 
 /** A refresh, priced. */
@@ -71,7 +71,7 @@ const effects = new WeakMap<object, WeakMap<object, RefreshEffect | null>>();
 const totalsByPanel = new WeakMap<object, HeldFixed>();
 
 /** Total realized aid across the panel at one base cost scale. */
-function delivered(districts: PanelDistrict[], scale: number, model: number): number {
+function delivered(districts: PanelDistrict[], scale: number, model: Model): number {
   return totals(applyAll(districts, { ...currentLaw(model), baseCostScale: scale }, model))
     .realizedAid;
 }
@@ -86,7 +86,7 @@ function delivered(districts: PanelDistrict[], scale: number, model: number): nu
 export function refreshEffect(
   districts: PanelDistrict[],
   drafts: Draft[],
-  model: number,
+  model: Model,
 ): RefreshEffect | null {
   // Keyed on both arguments. Keying on the panel alone was wrong the moment anything called this
   // twice with different drafts, and `null` is a real answer here — so `has`, not a truthy check.

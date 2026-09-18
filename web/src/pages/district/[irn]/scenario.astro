@@ -17,6 +17,7 @@ import ScenarioControls from "../../../components/ScenarioControls.astro";
 import Base from "../../../layouts/Base.astro";
 import { districtPaths, loadFeed, qualifiedName } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
+import { modelOf } from "../../../lib/policy.ts";
 import { refreshEffect } from "../../../lib/refresh.ts";
 import { currentRealizedAid } from "../../../lib/policy.ts";
 import * as routes from "../../../lib/routes.ts";
@@ -33,7 +34,7 @@ const s = bundle.statewide;
 const meta = bundle.projection;
 // The refresh the feed prices: named in the base cost lever's note and worked through in the
 // held-fixed card, on both routes that render them.
-const refresh = refreshEffect(bundle.districts, bundle.drafts, s.minimum_state_share);
+const refresh = refreshEffect(bundle.districts, bundle.drafts, modelOf(s));
 ---
 
 <Base

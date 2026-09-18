@@ -575,6 +575,44 @@ export const DistrictSchema = z
      */
     guarantee_floor: num,
     /**
+     * `d1a` — FY2025 economically disadvantaged ADM, the count the DPIA blend weighs 65%.
+     *
+     * Flat here rather than reached through the `dpia` block, which the slim panel omits. The
+     * blend is a lever, so the browser recomputes DPIA from its two counts instead of scaling
+     * the published column.
+     */
+    dpia_econ_disadvantaged_adm: num,
+    /** `d1b` — FY2026 directly certified ADM, the other 35%. */
+    dpia_directly_certified_adm: num,
+    /**
+     * `[b]` — the FY2019 targeted assistance wealth index the repealed supplemental tier is
+     * scaled on. Zero where the district has no FY2019 history, which is where the tier cannot
+     * reach it either.
+     */
+    supplemental_wealth_index: num,
+    /** `[H]` — whether the two FY2019 tests that tier gated on are met. */
+    supplement_eligible: z.boolean(),
+    /**
+     * Transportation's five payment components before any state share is applied.
+     *
+     * The department publishes transportation **net**, so a different floor cannot be priced by
+     * scaling the total. Recovered once in Rust — `components / max(own share, the floor in
+     * force)` — rather than in the browser.
+     */
+    transportation_gross: num,
+    /** `[F]` — the transportation guarantee, which no state share touches. */
+    transportation_guarantee: num,
+    /** `[b4]` — the district's own share, which the floor is a `max` against. */
+    transportation_state_share: num,
+    /**
+     * `[G] Total` — what the district was actually paid, at the floor in force.
+     *
+     * The fallback where a share or components are missing, and at the floor in force it must
+     * equal `gross × max(own share, floor) + guarantee` — which makes the recovery checkable
+     * from the feed rather than trusted.
+     */
+    transportation_paid: num,
+    /**
      * Special education's six weighted categories: ADM and the aid each produces.
      *
      * The weights span a factor of sixteen — 0.2435 for Category 1 against 3.9554 for Category 6
@@ -895,6 +933,22 @@ export const StatewideSchema = z
     /** Districts receiving nothing from targeted assistance — it is equalisation and switches off. */
     districts_without_targeted_assistance: z.number().int().nonnegative(),
     at_minimum_state_share: z.number().int().nonnegative(),
+    /**
+     * The statewide economically disadvantaged percentage the DPIA index divides by.
+     *
+     * Not a constant: R.C. 3317.02(I)(1)(a)(i) defines it as a computation over the counts, so
+     * the blend lever moves it. The browser rescales it the same closed-form way the Rust does.
+     */
+    dpia_statewide_percentage: num,
+    /**
+     * The highest FY2019 targeted assistance wealth index, which tops the supplemental scale.
+     *
+     * A rank rather than a value — Youngstown City's — so it cannot be computed from one
+     * district and the browser has to be told it.
+     */
+    supplemental_top_index: num,
+    /** The transportation minimum state share in force, 50% in FY2027. */
+    transportation_floor: num,
     median_valuation_per_pupil: num,
     median_operating_expenditure_per_pupil: num,
     wealth_neutrality_formula: num,
@@ -1009,6 +1063,12 @@ export const PolicyShapeSchema = z
     minimum_state_share: num,
     phase_in_general: num,
     phase_in_dpia: num,
+    /** Weight on directly certified ADM in the DPIA count. Current law is 0.35. */
+    dpia_directly_certified_weight: num,
+    /** Per-pupil rate at the top of the supplemental scale. Current law is zero. */
+    supplemental_top_rate: num,
+    /** Minimum state share applied to transportation. Current law is 0.5. */
+    transportation_floor: num,
   })
   .strict();
 
@@ -1023,8 +1083,17 @@ export const CheckpointSchema = z
   .object({
     label: z.string().min(1),
     policy: PolicyShapeSchema,
+    /**
+     * Change in **total state support** — realized aid and transportation together.
+     *
+     * Not realized aid alone. The transportation floor is a lever and moves a channel core
+     * foundation funding does not contain, so a checkpoint on realized aid would agree with a
+     * browser that had never implemented it.
+     */
     cost: num,
     realized_aid: num,
+    /** Total transportation aid under the policy, which is outside `realized_aid`. */
+    transportation: num,
     gainers: z.number().int().nonnegative(),
     losers: z.number().int().nonnegative(),
     unmoved: z.number().int().nonnegative(),
@@ -1077,7 +1146,25 @@ export const DraftProvisionSchema = z
     /** The corpus `parameter` node it binds. Empty where none exists. */
     parameter: z.string(),
     /** One of the five lever keys, or empty when nothing here can run it. */
-    lever: z.enum(["guarantee", "base-cost", "min-share", "phase-in", "phase-in-cat", ""]),
+    /*
+     * The lever vocabulary, which is `project::drafts::Lever::key` and has to stay it.
+     *
+     * This read `phase-in-cat` where the Rust has always emitted `phase-in-dpia`, and nothing
+     * caught it for as long as no draft bound that lever — a second hand-written copy of a closed
+     * vocabulary, disagreeing quietly, which is the failure the Rust's own `key()` doc warns
+     * about. It surfaced when `transport-floor` arrived and the feed stopped parsing.
+     */
+    lever: z.enum([
+      "guarantee",
+      "base-cost",
+      "min-share",
+      "phase-in",
+      "phase-in-dpia",
+      "dpia-blend",
+      "supplemental",
+      "transport-floor",
+      "",
+    ]),
     /** The lever's value, in the string form the query string carries. */
     proposed: z.string(),
     /**

@@ -14,7 +14,7 @@ import { expect, test } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { currentLaw } from "../../src/lib/policy.ts";
+import { currentLaw, modelOf } from "../../src/lib/policy.ts";
 import {
   advance,
   fit,
@@ -45,7 +45,7 @@ const bundle: Bundle = JSON.parse(
   ),
 );
 const meta = bundle.projection!;
-const model = bundle.statewide.minimum_state_share;
+const model = modelOf(bundle.statewide);
 
 const series = (start: number, values: number[]): Observation[] =>
   values.map((value, i) => ({ fiscalYear: start + i, value }));

@@ -789,6 +789,42 @@ pub struct District {
     pub general_funding_base: Dollars,
     /// `[H3]` — the DPIA slice, anchored to the district's FY2019 DPIA payment.
     pub dpia_funding_base: Dollars,
+    /// `d1a` — FY2025 economically disadvantaged ADM, the count the DPIA blend weighs 65%.
+    ///
+    /// Flat on the panel rather than reached through the `dpia` block, which the slim feed omits.
+    /// The blend is a lever, so the browser has to recompute DPIA from its two counts rather than
+    /// scale the published figure — and the two counts are the whole of what it needs.
+    pub dpia_econ_disadvantaged_adm: f64,
+    /// `d1b` — FY2026 directly certified ADM, the other 35%.
+    pub dpia_directly_certified_adm: f64,
+    /// `[b]` — the FY2019 targeted assistance wealth index the supplemental scale is read off.
+    ///
+    /// Zero where the district has no FY2019 history, which is also where the tier cannot reach
+    /// it.
+    pub supplemental_wealth_index: f64,
+    /// `[H]` — whether the two FY2019 tests the repealed supplemental tier gated on are met.
+    pub supplement_eligible: bool,
+    /// Transportation's five payment components before any state share is applied.
+    ///
+    /// The department publishes transportation **net**, with the applied share already inside
+    /// each component, so a different floor cannot be priced by scaling the total. Recovered
+    /// here — `components / max(own share, the floor in force)` — once, in Rust, so the browser
+    /// is not dividing a published figure by a constant it would have to know.
+    pub transportation_gross: Dollars,
+    /// `[F]` — the transportation guarantee, which no state share touches.
+    pub transportation_guarantee: Dollars,
+    /// `[b4]` — the district's own state share percentage, which the floor is a `max` against.
+    ///
+    /// Zero where the department publishes none, which is where the floor cannot be priced and
+    /// the district is held at what it was paid.
+    pub transportation_state_share: f64,
+    /// `[G] Total` — what the district was actually paid, at the floor in force.
+    ///
+    /// Two jobs. It is the fallback for a district whose share or components are missing, where
+    /// a floor cannot be applied and the published figure is all there is. And at the floor in
+    /// force it must equal `gross × max(own share, floor) + guarantee`, which makes the
+    /// recovery checkable from the feed alone rather than trusted.
+    pub transportation_paid: Dollars,
     /// `[H2] − [I1]`, floored at zero: the level the guarantee holds the district at.
     ///
     /// Emitted for **every** district rather than only the guaranteed ones. The browser used to

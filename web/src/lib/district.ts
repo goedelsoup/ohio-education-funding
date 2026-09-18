@@ -15,7 +15,7 @@ import type { FanPoint } from "./chart.ts";
 import { barSpec, distributionSpec, type Drawing, fanSpec, nearestRank } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import { count, escapeHtml, money, ordinal, pct, percentileOf, signedMoney } from "./format.ts";
-import { apply, currentLaw, currentRealizedAid } from "./policy.ts";
+import { apply, currentLaw, currentRealizedAid, modelOf, publishedStatewide } from "./policy.ts";
 import { forecastPath, growthPrior, observations, statuteNote } from "./project.ts";
 import { realChange, series, type Basis } from "./real.ts";
 import { hasDenominators } from "./tax.ts";
@@ -104,14 +104,14 @@ export function renderEnrollmentYears(
 ): string {
   const meta = bundle.projection;
   if (!meta) return "";
-  const model = bundle.statewide.minimum_state_share;
+  const model = modelOf(bundle.statewide);
   const law = currentLaw(model);
   const history = observations(d, meta.base_year);
 
   const rows = history.map((o) => ({
     year: o.fiscalYear,
     adm: o.value,
-    aid: apply(d, law, o.value, model).realizedAid,
+    aid: apply(d, law, publishedStatewide(model), o.value, model).realizedAid,
   }));
   const latest = rows[rows.length - 1]!;
   const prior = rows[rows.length - 2]!;
@@ -189,7 +189,7 @@ export function renderEnrollmentYears(
 function renderCarriedForward(bundle: Bundle, d: District): string {
   const meta = bundle.projection;
   if (!meta) return "";
-  const model = bundle.statewide.minimum_state_share;
+  const model = modelOf(bundle.statewide);
   const path = forecastPath(
     [d],
     currentLaw(model),

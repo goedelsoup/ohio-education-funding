@@ -91,7 +91,17 @@ test("every current-law default is inside its own bounds", () => {
    * The one direction a bounds table can be wrong in without any URL being involved: a `min` above
    * the value the page opens at would clamp the reset button's own target.
    */
-  const defaults = defaultLevers(0.1, HORIZON.base);
+  // The published model's constants: a 10% minimum state share and a 50% transportation
+  // floor, with the two statewide statistics at the values the feed carries.
+  const defaults = defaultLevers(
+    {
+      minimumStateShare: 0.1,
+      transportationFloor: 0.5,
+      dpiaPercentage: 0.5333803106067103,
+      supplementalTopIndex: 2.81996153,
+    },
+    HORIZON.base,
+  );
   for (const field of Object.keys(LEVER_BOUNDS) as (keyof typeof LEVER_BOUNDS)[]) {
     const { min, max } = LEVER_BOUNDS[field];
     expect(defaults[field], field).toBeGreaterThanOrEqual(min);

@@ -58,6 +58,19 @@ pub struct Statewide {
     pub districts_without_targeted_assistance: usize,
     /// Districts whose base cost aid is set by the minimum state share.
     pub at_minimum_state_share: usize,
+    /// The statewide economically disadvantaged percentage the DPIA index divides by.
+    ///
+    /// Sent because the browser recomputes DPIA when the blend lever moves, and the denominator
+    /// is not a constant: R.C. 3317.02(I)(1)(a)(i) defines it as a computation over the counts.
+    /// The browser rescales it the same closed-form way `project::policy::Statewide` does.
+    pub dpia_statewide_percentage: f64,
+    /// The highest FY2019 targeted assistance wealth index, which tops the supplemental scale.
+    ///
+    /// A rank rather than a value — Youngstown City's — so it cannot be computed from one
+    /// district and the browser must be told it.
+    pub supplemental_top_index: f64,
+    /// The transportation minimum state share in force, which is 50% in FY2027.
+    pub transportation_floor: f64,
     /// Median assessed valuation per pupil.
     pub median_valuation_per_pupil: Dollars,
     /// Median operating expenditure per pupil.
@@ -122,6 +135,13 @@ pub struct PolicyShape {
     pub phase_in_general: f64,
     /// Appropriated fraction of categorical aid.
     pub phase_in_dpia: f64,
+    /// Weight on directly certified ADM in the DPIA count. Current law is 0.35.
+    pub dpia_directly_certified_weight: f64,
+    /// Per-pupil rate at the top of the supplemental targeted assistance scale. Current law is
+    /// zero, the tier having been repealed.
+    pub supplemental_top_rate: f64,
+    /// Minimum state share applied to transportation. Current law is 50%.
+    pub transportation_floor: f64,
 }
 
 /// One clause of a draft bill, as the site needs it.
@@ -181,10 +201,16 @@ pub struct Checkpoint {
     /// The policy that produced it. Without this a consumer could verify a number while
     /// computing a different scenario from the one the number belongs to.
     pub policy: PolicyShape,
-    /// Change in total state aid against current law.
+    /// Change in total state support against current law — realized aid **and** transportation.
+    ///
+    /// Not realized aid alone. The transportation floor is a lever and moves a channel core
+    /// foundation funding does not contain, so a checkpoint on realized aid would agree with a
+    /// browser that had never implemented it.
     pub cost: Dollars,
     /// Total realized aid under the policy.
     pub realized_aid: Dollars,
+    /// Total transportation aid under the policy, which is outside `realized_aid`.
+    pub transportation: Dollars,
     /// Districts whose aid rises.
     pub gainers: usize,
     /// Districts whose aid falls.

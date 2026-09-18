@@ -154,8 +154,29 @@ impl Anchor {
 
 /// One lever a provision moves, already parsed.
 ///
-/// The five variants are the five fields of [`Policy`] and there is no sixth, which is the whole
-/// constraint this module operates under. A provision naming anything else is unpriced.
+/// The variants are the fields of [`Policy`], exactly, and a provision naming anything else is
+/// unpriced. That correspondence is the constraint this module operates under.
+///
+/// # It was five, and the sentence that said so was doing work
+///
+/// This doc read "the five variants are the five fields of [`Policy`] and **there is no sixth**",
+/// and that was a statement about the repository rather than about the formula: eight of H.B. 96's
+/// eleven funding changes reached no lever, so most of what the act did could be described here
+/// and not priced. Three of those eight are levers now, and each needed something the model did
+/// not have rather than a variant nobody had thought to add:
+///
+/// - **[`Self::DpiaBlend`]** needed DPIA recomputed from its two counts instead of read from the
+///   published column, and a statewide index that moves when the counts do.
+/// - **[`Self::SupplementalTopRate`]** needed a rate schedule for a repealed section whose text is
+///   not in the Revised Code. It was recovered from the FY2025 payment report, exactly.
+/// - **[`Self::TransportationFloor`]** needed transportation's applied share taken back out of a
+///   published net figure, and a channel on [`crate::policy::Outcome`] that is not core
+///   foundation funding.
+///
+/// So the constraint was real and it was a data constraint. What remains outside is the JVSD base
+/// cost method and the community school equity supplement, which need populations the 609-district
+/// panel does not contain, and career awareness funds, which appear in no crate — three of the
+/// eleven, and each unpriceable for a reason this module can state.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Lever {
     /// What happens to the temporary transitional aid guarantee.
@@ -169,6 +190,13 @@ pub enum Lever {
     PhaseInGeneral(f64),
     /// The same interpolation for DPIA, against its own FY2019 base.
     PhaseInDpia(f64),
+    /// The weight on directly certified ADM in the DPIA count. Current law is 0.35.
+    DpiaBlend(f64),
+    /// What the top of the supplemental targeted assistance scale pays per pupil. Current law
+    /// is zero, the tier having been repealed.
+    SupplementalTopRate(f64),
+    /// The minimum state share applied to transportation. Current law is 50%.
+    TransportationFloor(f64),
 }
 
 impl Lever {
@@ -189,9 +217,12 @@ impl Lever {
             "min-share" => Ok(Self::MinimumStateShare(number()?)),
             "phase-in" => Ok(Self::PhaseInGeneral(number()?)),
             "phase-in-dpia" => Ok(Self::PhaseInDpia(number()?)),
+            "dpia-blend" => Ok(Self::DpiaBlend(number()?)),
+            "supplemental" => Ok(Self::SupplementalTopRate(number()?)),
+            "transport-floor" => Ok(Self::TransportationFloor(number()?)),
             other => Err(format!(
-                "unknown lever {other:?}; the five are guarantee, base-cost, min-share, \
-                 phase-in, phase-in-dpia"
+                "unknown lever {other:?}; the eight are guarantee, base-cost, min-share, \
+                 phase-in, phase-in-dpia, dpia-blend, supplemental, transport-floor"
             )),
         }
     }
@@ -199,9 +230,9 @@ impl Lever {
     /// The key this lever is written as, in the fixture and in the site's query string.
     ///
     /// The inverse of [`Lever::parse`], and it exists so the vocabulary is written down once. The
-    /// five strings are load-bearing in three places — the committed fixture, the feed, and the
-    /// `?g=&base=&min=&pb=&pc=` the scenario page reads — and a second hand-written mapping is how
-    /// two of those would come to disagree.
+    /// strings are load-bearing in three places — the committed fixture, the feed, and the query
+    /// string the scenario page reads — and a second hand-written mapping is how two of those
+    /// would come to disagree.
     #[must_use]
     pub const fn key(self) -> &'static str {
         match self {
@@ -210,6 +241,9 @@ impl Lever {
             Self::MinimumStateShare(_) => "min-share",
             Self::PhaseInGeneral(_) => "phase-in",
             Self::PhaseInDpia(_) => "phase-in-dpia",
+            Self::DpiaBlend(_) => "dpia-blend",
+            Self::SupplementalTopRate(_) => "supplemental",
+            Self::TransportationFloor(_) => "transport-floor",
         }
     }
 
@@ -235,6 +269,18 @@ impl Lever {
             },
             Self::PhaseInDpia(fraction) => Policy {
                 phase_in_dpia: fraction,
+                ..policy
+            },
+            Self::DpiaBlend(weight) => Policy {
+                dpia_directly_certified_weight: weight,
+                ..policy
+            },
+            Self::SupplementalTopRate(rate) => Policy {
+                supplemental_top_rate: rate,
+                ..policy
+            },
+            Self::TransportationFloor(floor) => Policy {
+                transportation_floor: floor,
                 ..policy
             },
         }

@@ -10,7 +10,7 @@
  * absorb a real disagreement in a lever that only moves a few districts.
  */
 
-import { apply, totals, type GuaranteeRule, type Policy, currentLaw } from "./policy.ts";
+import { apply, totals, type GuaranteeRule, type Policy, currentLaw, modelOf, applyAll } from "./policy.ts";
 import { forecast, growthPrior } from "./project.ts";
 import type {
   Panel,
@@ -52,25 +52,27 @@ export function toPolicy(shape: PolicyShape): Policy {
     minimumStateShare: shape.minimum_state_share,
     phaseInGeneral: shape.phase_in_general,
     phaseInDpia: shape.phase_in_dpia,
+    dpiaDirectlyCertifiedWeight: shape.dpia_directly_certified_weight,
+    supplementalTopRate: shape.supplemental_top_rate,
+    transportationFloor: shape.transportation_floor,
   };
 }
 
 /** Run one checkpoint's policy and compare every reported field. */
 export function compare(bundle: Panel, checkpoint: Checkpoint): Comparison {
-  const model = bundle.statewide.minimum_state_share;
+  const model = modelOf(bundle.statewide);
   const policy = toPolicy(checkpoint.policy);
-  const outcomes = bundle.districts.map((d) =>
-    apply(d, policy, d.current_year_adm, model),
-  );
+  // Through `applyAll`, not a bare `map`: the DPIA blend moves a statewide denominator, and a
+  // per-district resolution would be a different number. The checkpoint that moves it is the one
+  // this would fail on, which is what it is there for.
+  const outcomes = applyAll(bundle.districts, policy, model);
   const t = totals(outcomes);
 
   // The baseline run, which the page did not previously need. `held_throughout`, `lifted_off`
   // and `pushed_on` are properties of the *pair* of runs, so reproducing them means computing
   // current law here rather than reading the feed's `on_guarantee` field — which is the same
   // thing computed by the Rust, and using it would check the page against itself.
-  const baseline = bundle.districts.map((d) =>
-    apply(d, currentLaw(model), d.current_year_adm, model),
-  );
+  const baseline = applyAll(bundle.districts, currentLaw(model), model);
   let heldThroughout = 0;
   let liftedOff = 0;
   let pushedOn = 0;
@@ -154,7 +156,7 @@ export function compareForecast(
     meta.damping,
     meta.shrink_weight,
     growthPrior(bundle.districts, meta.z),
-    bundle.statewide.minimum_state_share,
+    modelOf(bundle.statewide),
   );
 
   const near = (name: string, ours: number, theirs: number) => {

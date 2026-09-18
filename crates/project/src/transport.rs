@@ -56,6 +56,14 @@ const EXPECTED_HEADER: &str =
 /// The years both calculators cover, oldest first.
 pub const YEARS: (u16, u16) = (2026, 2027);
 
+/// The transportation minimum state share in force in FY2027.
+///
+/// H.B. 96 raised it 41.67% in FY2025 to 45.83% in FY2026 to **50%** here — one of the eleven
+/// changes the act's own list names. Duplicated from the rates fixture so
+/// [`crate::policy::Policy::current_law`] can stay `const`, and pinned against the fixture by
+/// `the_floor_that_pays_the_wealthy_districts`, which is where a divergence would be caught.
+pub const MINIMUM_STATE_SHARE_FY2027: f64 = 0.5;
+
 /// One fiscal year's statewide transportation factors, as its calculator states them.
 ///
 /// # Why this is in the library

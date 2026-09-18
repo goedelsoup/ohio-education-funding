@@ -61,6 +61,41 @@ findings: |
   135 of 609 districts**, which no payment for pupils ever does. Columbus receives none of it.
   [verified]
 
+  ### The rate the repealed tier paid at is recoverable, exactly
+
+  "A future biennium could fund the line without changing anything else" was true of the
+  spreadsheet and not of this corpus, which could name the districts and not the amount. R.C.
+  3317.0218 is repealed, so there is no statutory text to read, and the department's own
+  description gives a range and no formula — *"the amount of per-pupil funding is scaled to
+  increase based as the level of wealth decreases ... Districts who qualify for this supplemental
+  funding receive between an additional $85 and $750 per student educated."* The rate was the one
+  input the panel did not carry.
+
+  It is in the last payment. Against the FY2025 report's 36 districts the rate is **linear in the
+  FY2019 wealth index**, running from **$75.0000 at the eligibility threshold of 1.6** to
+  **$750.00 at the state's highest index** — Youngstown City, 2.81996153 — with a worst relative
+  residual of **6.4e-08** across all 36. That is not a fit; it is the schedule. [verified]
+  (`crates/project/tests/the_rate_a_repealed_tier_was_paid_at.rs`)
+
+  Two details had to be right together. The denominator is **current-year enrolled ADM** — "per
+  student educated" is the department's own phrase — and not either of the FY2019 counts the
+  eligibility test uses; fitted against FY2019 enrolled ADM the relation is only approximately
+  linear and East Cleveland misses by 35%. And **the $85 is not the floor**: it is what the lowest
+  *qualifying* district receives, Middletown City at index 1.6194, $85.76. The floor is $75, at a
+  threshold no district sits on. [verified]
+
+  **The top of the scale is a rank.** $750 is paid to whichever district holds the highest FY2019
+  wealth index, and everything below is interpolated toward $75. Nobody sets the number the scale
+  tops out at; one district's position does — the same shape as R.C. 3317.017(A)(4)'s benchmark,
+  which is the other parameter in this formula that reads as discretionary and is a statistic of a
+  distribution. See
+  [`fsfp-local-capacity-measure`](fsfp-local-capacity-measure.yml). [verified]
+
+  So the tier is a lever now, and restoring it is priceable. Run forward against the FY2027 panel
+  at the schedule it was last paid on it costs **less** than the $52.3m of FY2025, not more: the
+  eligibility test is frozen on FY2019 data so the population does not move, and the districts in
+  it have fewer pupils than they had. [verified]
+
   Statewide the split is **24% capacity and 76% wealth**, and per district it can be either,
   both, or neither: 299 draw the first, 438 the second, 135 nothing. Which tier a district is
   on is a statement about it that the total conceals. [verified]

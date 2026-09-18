@@ -158,6 +158,18 @@ use edfund_core::Dollars;
 /// consumer that rendered it beside the FY2027 calculator's output without saying which was
 /// which would present a measurement and a projection as the same kind of claim.
 ///
+/// `45.0.0` added the three levers Stage 3 was blocked on, and everything each needs to run in a
+/// browser. Per district: the two DPIA counts, because the blend is a lever and the browser has to
+/// recompute the aid rather than scale the published column; the FY2019 wealth index and
+/// eligibility flag the repealed supplemental tier is scaled on; and transportation's gross, its
+/// guarantee and its own state share, because the department publishes transportation **net** and
+/// a floor cannot be priced by scaling a net figure. Statewide: the DPIA index denominator, the
+/// top of the supplemental scale, and the transportation floor in force — the first two because
+/// they are statistics of the panel that a lever moves, the third because it is the identity.
+/// `Checkpoint` gains `transportation`, and `cost` changes meaning from realized aid to **total
+/// state support**: the transportation floor moves a channel core foundation funding does not
+/// contain, so the old figure would have agreed with a browser that never implemented it.
+///
 /// `44.0.0` added `typology` per district: the department's own similar-district grouping, which
 /// this repository declared as an ontology property and could not fill from anything committed.
 /// Four `[open]` items named the absence — five agency nodes, a skill that states "typology is not
@@ -199,7 +211,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "44.0.0";
+pub const CONTRACT_VERSION: &str = "45.0.0";
 
 mod model;
 mod serialize;

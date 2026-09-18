@@ -71,6 +71,39 @@ pub const DPIA_PER_PUPIL: Dollars = 422.0;
 /// The statewide economically disadvantaged percentage.
 pub const DPIA_STATEWIDE_PERCENTAGE: f64 = 0.533_380_310_606_710_3;
 
+impl Dpia {
+    /// The aid a blended count generates, at a stated statewide index denominator.
+    ///
+    /// `d1 x $422 x (d1 / enrolled ADM / statewide)²`, with `d1` capped at the district's own
+    /// enrolled ADM. The cap binds in exactly one district and is why Edgerton Local's published
+    /// blend is its enrolment rather than the weighted sum.
+    ///
+    /// Promoted out of `tests/what_direct_certification_moved.rs`, where it was written to price
+    /// H.B. 96's rewrite of the count and reproduced the department's published column for 607 of
+    /// 609 districts. A lever needs it, and a mechanism that only a test can run is a mechanism
+    /// the model does not have.
+    #[must_use]
+    pub fn aid_from_count(weighted_adm: Adm, enrolled_adm: Adm, statewide: f64) -> Dollars {
+        if enrolled_adm <= 0.0 || statewide <= 0.0 {
+            return 0.0;
+        }
+        let d1 = weighted_adm.min(enrolled_adm);
+        let d2 = d1 / enrolled_adm;
+        d1 * DPIA_PER_PUPIL * (d2 / statewide).powi(2)
+    }
+
+    /// The count at a given weight on directly certified ADM.
+    ///
+    /// [`DPIA_BLEND`]`.1` is current law's 0.35. Zero is the count the formula used before H.B. 96
+    /// rewrote it — the economically disadvantaged ADM alone — and one is direct certification
+    /// alone, which nobody has proposed and is the other end of the same dial.
+    #[must_use]
+    pub fn count_at(&self, directly_certified_weight: f64) -> Adm {
+        (1.0 - directly_certified_weight) * self.economically_disadvantaged_adm
+            + directly_certified_weight * self.directly_certified_adm
+    }
+}
+
 /// Ohio's six special education categories, for one district.
 ///
 /// # The weights are the policy
@@ -416,7 +449,87 @@ pub const TA_WEALTH_OFFSET_RATE: f64 = 0.0112;
 /// Its rate against the district's own, exactly 0.8 times the first.
 pub const TA_WEALTH_INDEX_FLOOR: f64 = 0.8;
 
+/// The FY2019 wealth index a district must exceed for the supplemental tier to reach it.
+///
+/// Paired with a second test — FY2019 enrolled ADM below 88% of FY2019 total ADM — so the tier
+/// finds districts that were poor *and* had already lost an eighth of their pupils to open
+/// enrolment and community schools.
+pub const TA_SUPPLEMENT_INDEX_THRESHOLD: f64 = 1.6;
+/// The share of enrolled ADM that must exceed total ADM for the second half of the test.
+pub const TA_SUPPLEMENT_RETENTION: f64 = 0.88;
+/// The per-pupil rate at the bottom of the supplemental scale, as a share of the rate at the top.
+///
+/// Exactly a tenth: the schedule ran $75 at the threshold to $750 at the top district, so one
+/// dial moves the whole scale without changing its shape.
+pub const TA_SUPPLEMENT_FLOOR_SHARE: f64 = 0.1;
+/// What the top of the supplemental scale paid in FY2025, its last year.
+pub const TA_SUPPLEMENT_TOP_RATE: Dollars = 750.0;
+
 impl TargetedAssistance {
+    /// The supplemental tier's per-pupil rate for this district, at a stated top of the scale.
+    ///
+    /// # The schedule, recovered rather than assumed
+    ///
+    /// R.C. 3317.0218 is repealed and its text is not in the Revised Code to read. The department
+    /// described the tier in prose — "the amount of per-pupil funding is scaled to increase based
+    /// as the level of wealth decreases ... between an additional $85 and $750 per student
+    /// educated" — which names a range and no formula, and this corpus recorded the rate as the
+    /// one input the panel did not carry.
+    ///
+    /// It is recoverable from the last payment, exactly. Against the FY2025 payment report's 36
+    /// districts the rate is **linear in the FY2019 wealth index**, and the line it fits runs
+    /// from **$75.0000 at the threshold of 1.6** to **$750.00 at the state's highest index** —
+    /// Youngstown City, 2.81996153. Worst relative residual across all 36: **6.4e-08**.
+    ///
+    /// The department's own "$85" is not the floor. It is what the *lowest qualifying* district
+    /// happened to receive: Middletown City at 1.6194 gets $85.76, because no district sits on
+    /// the threshold itself.
+    ///
+    /// **And the top of the scale is a rank, not a value** — the same shape as R.C.
+    /// 3317.017(A)(4)'s benchmark, which one district's position sets and no act names. See
+    /// `crates/local-capacity::benchmark_ratio`.
+    ///
+    /// `top_index` is the statewide maximum, which is why this cannot be computed from a district
+    /// alone; [`crate::policy::Statewide`] resolves it. Returns zero for a district the
+    /// eligibility test does not reach.
+    #[must_use]
+    pub fn supplemental_rate(&self, top_index: f64, top_rate: Dollars) -> Dollars {
+        if !self.supplement_eligible || top_index <= TA_SUPPLEMENT_INDEX_THRESHOLD {
+            return 0.0;
+        }
+        let span = (self.fy19_wealth_index - TA_SUPPLEMENT_INDEX_THRESHOLD)
+            / (top_index - TA_SUPPLEMENT_INDEX_THRESHOLD);
+        top_rate * (TA_SUPPLEMENT_FLOOR_SHARE + (1.0 - TA_SUPPLEMENT_FLOOR_SHARE) * span)
+    }
+
+    /// What the supplemental tier would pay this district, on the count it is paid against.
+    ///
+    /// The denominator is **current-year enrolled ADM** — "per student educated", in the
+    /// department's words — and not either of the FY2019 counts the eligibility test uses. That
+    /// distinction is what makes the reconstruction exact: fitted against FY2019 enrolled ADM the
+    /// schedule is only approximately linear, and two districts miss by more than a tenth.
+    #[must_use]
+    pub fn supplemental_under(
+        &self,
+        enrolled_adm: Adm,
+        top_index: f64,
+        top_rate: Dollars,
+    ) -> Dollars {
+        self.supplemental_rate(top_index, top_rate) * enrolled_adm
+    }
+
+    /// Whether the two FY2019 tests the tier gates on are met.
+    ///
+    /// Derived rather than read, so the flag the fixture carries can be checked against the rule
+    /// it encodes. Districts with no FY2019 history return `None` — there is nothing to test.
+    #[must_use]
+    pub fn qualifies(&self) -> Option<bool> {
+        (self.fy19_total_adm > 0.0 && self.fy19_wealth_index > 0.0).then_some(
+            self.fy19_wealth_index > TA_SUPPLEMENT_INDEX_THRESHOLD
+                && self.fy19_enrolled_adm < TA_SUPPLEMENT_RETENTION * self.fy19_total_adm,
+        )
+    }
+
     /// The two tiers, summed. Equal to [`Categoricals::targeted_assistance`].
     #[must_use]
     pub fn total(&self) -> Dollars {

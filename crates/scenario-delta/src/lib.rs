@@ -50,7 +50,7 @@ pub mod incidence;
 
 use edfund_core::{Adm, Dollars};
 use project::panel::DistrictRecord;
-use project::policy::{apply, Outcome, Policy};
+use project::policy::{apply, Outcome, Policy, Statewide};
 
 pub use incidence::{across, Axis, Incidence, Stratum};
 
@@ -265,11 +265,18 @@ impl ScenarioDelta {
     /// right and pairs the wrong districts.
     #[must_use]
     pub fn between(panel: &[DistrictRecord], baseline: &Policy, perturbed: &Policy) -> Self {
+        // One resolution per policy, over the whole panel. A lever that moves a statewide
+        // statistic — the DPIA index denominator is the one that does — would otherwise be
+        // resolved against a single district, which is a different number and a wrong one.
+        let (before_statewide, after_statewide) = (
+            Statewide::under(panel, baseline),
+            Statewide::under(panel, perturbed),
+        );
         let deltas = panel
             .iter()
             .map(|record| {
-                let before = apply(record, baseline, record.current_year_adm);
-                let after = apply(record, perturbed, record.current_year_adm);
+                let before = apply(record, baseline, &before_statewide, record.current_year_adm);
+                let after = apply(record, perturbed, &after_statewide, record.current_year_adm);
                 Delta {
                     irn: record.irn.clone(),
                     name: record.name.clone(),
