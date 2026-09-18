@@ -22,7 +22,9 @@
 
 use edfund_core::Dollars;
 
-use crate::panel::{DistrictRecord, MINIMUM_STATE_SHARE};
+use crate::panel::{
+    DistrictRecord, Dpia, DPIA_BLEND, DPIA_STATEWIDE_PERCENTAGE, MINIMUM_STATE_SHARE,
+};
 
 /// What happens to the temporary transitional aid guarantee.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -150,7 +152,156 @@ pub struct Policy {
     /// phases and concluded that high-poverty districts got less than the headline; they got
     /// their whole prior amount while everyone else moved a sixth of the way to a new one.
     pub phase_in_dpia: f64,
+    /// The weight on directly certified ADM in the DPIA count, against economically
+    /// disadvantaged ADM.
+    ///
+    /// Current law is **0.35** — H.B. 96's second-year blend, 65/35. Zero is the count the
+    /// formula used before the act rewrote it, and one is direct certification alone, which
+    /// nobody has proposed and is the far end of the same dial.
+    ///
+    /// # Moving it moves a statewide statistic, and that is handled outside this struct
+    ///
+    /// The index every district's aid is divided by is itself computed from the counts, so a
+    /// blend that raises them raises the denominator too. [`Statewide::under`] rescales it to
+    /// hold the statewide total fixed, which isolates redistribution; the *level* H.B. 96's
+    /// rewrite also changed is a greenbook figure this model cannot recompute.
+    pub dpia_directly_certified_weight: f64,
+    /// What the top of the supplemental targeted assistance scale pays, per pupil.
+    ///
+    /// **Current law is zero**, and that is the whole of what makes this lever unlike the others:
+    /// its identity is a programme that pays nothing. H.B. 96 repealed R.C. 3317.0218 while
+    /// leaving the eligibility test in the model, so the department still names the districts and
+    /// attaches no money. Restoring the tier at the schedule it was last paid on is
+    /// [`crate::panel::TA_SUPPLEMENT_TOP_RATE`] — $750 at the state's highest FY2019 wealth
+    /// index, a tenth of that at the threshold, linear between.
+    ///
+    /// The schedule was recovered from the FY2025 payment report rather than read from statute,
+    /// because the section is repealed. See `tests/the_rate_a_repealed_tier_was_paid_at.rs`.
+    pub supplemental_top_rate: Dollars,
+    /// The minimum state share percentage applied to transportation.
+    ///
+    /// H.B. 96 raised it 41.67% → 45.83% → **50%**, which is current law here. It is a separate
+    /// floor from [`Self::minimum_state_share`] and acts on a separate programme: transportation
+    /// sits outside core foundation funding, so this lever moves
+    /// [`Outcome::transportation`] and never [`Outcome::formula_aid`].
+    ///
+    /// # It runs up the wealth distribution, and a proposal to move it should say so
+    ///
+    /// The floor is worth $289.6M, two fifths of Ohio's transportation aid, and its incidence is
+    /// the opposite shape from the rest of the formula: $3.38 per pupil in the poorest fifth of
+    /// districts by valuation against **$398.01 in the richest**. See [`crate::transport::floor`].
+    pub transportation_floor: f64,
 }
+
+/// The quantities a lever needs that are properties of the panel rather than of a district.
+///
+/// # Why a lever cannot always be applied one district at a time
+///
+/// Three of the eight levers move a statewide statistic as a side effect of moving a district's
+/// inputs, and two of those statistics divide the thing they are computed from:
+///
+/// - **The DPIA index denominator.** R.C. 3317.02(I)(1)(a)(i) defines the statewide economically
+///   disadvantaged percentage as a *computation*, so under a different count it takes a different
+///   value. Holding it fixed while a blend moves the counts 17.6% prices a level change nobody
+///   proposed. `.yidam/decisions/scenario-models-ohio.yml` is the decision that says a provision
+///   moving all 609 districts at once may not hold a statewide average fixed and call the result
+///   a cost.
+/// - **The top of the supplemental targeted assistance scale**, which is the highest FY2019
+///   wealth index in the state — a rank, like R.C. 3317.017(A)(4)'s benchmark.
+///
+/// So [`apply`] takes this beside the policy, and [`apply_all`] resolves it once. Passing it
+/// rather than recomputing it per district is not an optimisation: a district's aid depends on
+/// every other district's, and a function that could compute the denominator from one record
+/// would be computing the wrong one.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Statewide {
+    /// The percentage `d3` indexes against, after any rescale the policy implies.
+    pub dpia_percentage: f64,
+    /// The highest FY2019 targeted assistance wealth index, which tops the supplemental scale.
+    pub supplemental_top_index: f64,
+}
+
+impl Statewide {
+    /// The published constants, which is what current law resolves to.
+    #[must_use]
+    pub const fn as_published() -> Self {
+        Self {
+            dpia_percentage: DPIA_STATEWIDE_PERCENTAGE,
+            supplemental_top_index: PUBLISHED_SUPPLEMENTAL_TOP_INDEX,
+        }
+    }
+
+    /// The highest FY2019 wealth index the panel carries.
+    ///
+    /// `None` for a panel in which no district has FY2019 history, which is not a panel this
+    /// model can run the supplemental tier against at all.
+    #[must_use]
+    pub fn supplemental_top_index(panel: &[DistrictRecord]) -> Option<f64> {
+        panel
+            .iter()
+            .map(|r| r.targeted_assistance.fy19_wealth_index)
+            .filter(|index| *index > 0.0)
+            .max_by(f64::total_cmp)
+    }
+
+    /// Resolve both against a panel and a policy.
+    ///
+    /// # The DPIA rescale is closed-form, not a search
+    ///
+    /// Aid scales as the inverse square of the denominator, so holding the statewide total fixed
+    /// while the count moves is `s' = s × √(total at s / target)`. No iteration, and no tolerance
+    /// to choose. It is exact by construction, which is why
+    /// `tests/what_direct_certification_moved.rs` can assert level-neutrality to the dollar.
+    ///
+    /// The target is the total the *published* blend produces, so the rescale isolates
+    /// redistribution and declines to price the level. The level is a greenbook figure — $84.5m
+    /// then $31.8m — and this model has no denominator with which to recompute it. Recorded
+    /// `[open]` on the component node.
+    #[must_use]
+    pub fn under(panel: &[DistrictRecord], policy: &Policy) -> Self {
+        let top = Self::supplemental_top_index(panel).unwrap_or(PUBLISHED_SUPPLEMENTAL_TOP_INDEX);
+
+        // Current law's weight needs no rescale, and asking for one would introduce a residual
+        // where the identity requires none.
+        if (policy.dpia_directly_certified_weight - DPIA_BLEND.1).abs() < f64::EPSILON {
+            return Self {
+                dpia_percentage: DPIA_STATEWIDE_PERCENTAGE,
+                supplemental_top_index: top,
+            };
+        }
+
+        let at = |weight: f64| -> Dollars {
+            panel
+                .iter()
+                .map(|r| {
+                    Dpia::aid_from_count(
+                        r.dpia.count_at(weight),
+                        r.current_year_adm,
+                        DPIA_STATEWIDE_PERCENTAGE,
+                    )
+                })
+                .sum()
+        };
+        let target = at(DPIA_BLEND.1);
+        let moved = at(policy.dpia_directly_certified_weight);
+        let dpia_percentage = if moved > 0.0 && target > 0.0 {
+            DPIA_STATEWIDE_PERCENTAGE * (moved / target).sqrt()
+        } else {
+            DPIA_STATEWIDE_PERCENTAGE
+        };
+
+        Self {
+            dpia_percentage,
+            supplemental_top_index: top,
+        }
+    }
+}
+
+/// Youngstown City's FY2019 targeted assistance wealth index, the highest in the state.
+///
+/// Named so [`Statewide::as_published`] can be `const`. Checked against the panel by
+/// `tests/the_rate_a_repealed_tier_was_paid_at.rs`, which is where it would be caught moving.
+pub const PUBLISHED_SUPPLEMENTAL_TOP_INDEX: f64 = 2.819_961_53;
 
 impl Policy {
     /// The identity. Reproduces the department's model exactly.
@@ -162,6 +313,11 @@ impl Policy {
             minimum_state_share: MINIMUM_STATE_SHARE,
             phase_in_general: 1.0,
             phase_in_dpia: 1.0,
+            dpia_directly_certified_weight: DPIA_BLEND.1,
+            // Zero, and not a rate: the tier is repealed, so current law pays it nothing. The
+            // only lever here whose identity is an absence.
+            supplemental_top_rate: 0.0,
+            transportation_floor: crate::transport::MINIMUM_STATE_SHARE_FY2027,
         }
     }
 
@@ -193,13 +349,38 @@ pub struct Outcome {
     pub on_guarantee: bool,
     /// Whether the minimum state share is what determines its base cost aid.
     pub at_minimum_state_share: bool,
+    /// Transportation aid under the policy's floor.
+    ///
+    /// **Outside [`Self::realized_aid`], deliberately.** Transportation is not core foundation
+    /// funding: `[G] Total` is its own line and the department publishes it net of an applied
+    /// share. Folding it into realized aid would change what every existing figure on this site
+    /// means and break the identity `current_law` rests on, so it is carried beside instead —
+    /// and [`Self::total_state_support`] is where the two are added.
+    pub transportation: Dollars,
+    /// Transportation aid under current law's floor, for the comparison.
+    pub baseline_transportation: Dollars,
 }
 
 impl Outcome {
     /// Change against current law, in dollars.
+    ///
+    /// Core foundation funding only. [`Self::total_delta`] is the figure that includes
+    /// transportation, and the two differ exactly when a policy moves the transportation floor.
     #[must_use]
     pub fn delta(&self) -> Dollars {
         self.realized_aid - self.baseline_realized_aid
+    }
+
+    /// Realized aid and transportation together.
+    #[must_use]
+    pub fn total_state_support(&self) -> Dollars {
+        self.realized_aid + self.transportation
+    }
+
+    /// Change against current law across both channels.
+    #[must_use]
+    pub fn total_delta(&self) -> Dollars {
+        self.total_state_support() - (self.baseline_realized_aid + self.baseline_transportation)
     }
 
     /// Change against current law, per pupil.
@@ -234,7 +415,12 @@ impl Outcome {
 /// gain if it is only just above. 138 districts are in that condition, and distinguishing them
 /// needs the `tax-abstract` connector rather than a better guess.
 #[must_use]
-pub fn apply(record: &DistrictRecord, policy: &Policy, current_year_adm: f64) -> Outcome {
+pub fn apply(
+    record: &DistrictRecord,
+    policy: &Policy,
+    statewide: &Statewide,
+    current_year_adm: f64,
+) -> Outcome {
     let base_cost_per_pupil = record.base_cost_per_pupil * policy.base_cost_scale;
     let floor_per_pupil = base_cost_per_pupil * policy.minimum_state_share;
 
@@ -302,6 +488,33 @@ pub fn apply(record: &DistrictRecord, policy: &Policy, current_year_adm: f64) ->
         + denominated * policy.base_cost_scale)
         * adm_ratio;
 
+    // DPIA, recomputed from the counts rather than read, so the blend is a lever.
+    //
+    // Current law's weight reproduces the published column to within a rounding artefact rather
+    // than exactly — 607 of 609 districts inside half a percent, statewide 0.02%. That residual
+    // would leak into `current_law` and stop it being the identity, so at current law the
+    // published figure is used and the recomputation only runs when the lever has moved. A
+    // recomputation that is nearly right is worse than one that is not asked for.
+    let published_dpia = record.categoricals.dpia * adm_ratio;
+    let moved_blend = (policy.dpia_directly_certified_weight - DPIA_BLEND.1).abs() >= f64::EPSILON;
+    let dpia_computed = if moved_blend {
+        Dpia::aid_from_count(
+            record.dpia.count_at(policy.dpia_directly_certified_weight),
+            current_year_adm,
+            statewide.dpia_percentage,
+        )
+    } else {
+        published_dpia
+    };
+
+    // The repealed supplemental tier, which pays nothing until a policy funds it. `[I]` is zero
+    // in the model for every district, so this adds rather than replaces.
+    let supplemental = record.targeted_assistance.supplemental_under(
+        current_year_adm,
+        statewide.supplemental_top_index,
+        policy.supplemental_top_rate,
+    );
+
     // The phase-in, as R.C. 3317.022 writes it:
     //
     //     funding base
@@ -315,8 +528,7 @@ pub fn apply(record: &DistrictRecord, policy: &Policy, current_year_adm: f64) ->
     //
     // At 100% on both dials the bases cancel and this is the department's own number to the
     // cent for all 609 districts, which is what keeps `current_law` the identity.
-    let dpia_computed = record.categoricals.dpia * adm_ratio;
-    let general_computed = base_cost_aid + (categoricals - dpia_computed);
+    let general_computed = base_cost_aid + (categoricals - published_dpia) + supplemental;
     let dpia_base = record.transition.funding_base_econ_dis;
     let general_base = record.transition.funding_base - dpia_base;
 
@@ -334,6 +546,20 @@ pub fn apply(record: &DistrictRecord, policy: &Policy, current_year_adm: f64) ->
     };
     let realized_aid = formula_aid.max(held_at);
 
+    // Transportation, priced against its own floor and kept out of the sum above.
+    //
+    // The department publishes this **net**: each component already has a share inside it, and
+    // the share applied is `max(the district's own, the floor in force)`. So a different floor
+    // cannot be priced by scaling the total — the share has to come back out first, which is
+    // what `transport::floor::Paid` is for and what makes the recovery checkable rather than
+    // assumed. The guarantee `[F]` is outside the share and is added after.
+    let transportation = transport_under(record, current_year_adm, policy.transportation_floor);
+    let baseline_transportation = transport_under(
+        record,
+        record.current_year_adm,
+        crate::transport::MINIMUM_STATE_SHARE_FY2027,
+    );
+
     Outcome {
         irn: record.irn.clone(),
         name: record.name.clone(),
@@ -344,15 +570,42 @@ pub fn apply(record: &DistrictRecord, policy: &Policy, current_year_adm: f64) ->
         baseline_realized_aid: record.realized_aid(),
         on_guarantee: realized_aid > formula_aid + 0.005,
         at_minimum_state_share: at_minimum,
+        transportation,
+        baseline_transportation,
     }
+}
+
+/// One district's transportation aid at a stated floor, at a stated enrollment.
+///
+/// The published total is recovered to its pre-share amount by dividing by the share actually
+/// applied in the model — `max(own share, the FY2027 floor)` — and then re-applied at the
+/// floor being priced. A district with no published share or no components is left at what it
+/// was paid: there is nothing to recover and no floor to apply.
+fn transport_under(record: &DistrictRecord, current_year_adm: f64, floor: f64) -> Dollars {
+    let components = record.transportation.components();
+    let Some(share) = record.published_state_share.filter(|s| *s > 0.0) else {
+        return record.transportation.total;
+    };
+    if components <= 0.0 {
+        return record.transportation.total;
+    }
+    let adm_ratio = if record.current_year_adm > 0.0 {
+        current_year_adm / record.current_year_adm
+    } else {
+        1.0
+    };
+    let in_force = crate::transport::MINIMUM_STATE_SHARE_FY2027;
+    let gross = components / share.max(in_force);
+    (gross * share.max(floor) + record.transportation.guarantee) * adm_ratio
 }
 
 /// Apply a policy across the panel at modelled enrollment.
 #[must_use]
 pub fn apply_all(panel: &[DistrictRecord], policy: &Policy) -> Vec<Outcome> {
+    let statewide = Statewide::under(panel, policy);
     panel
         .iter()
-        .map(|record| apply(record, policy, record.current_year_adm))
+        .map(|record| apply(record, policy, &statewide, record.current_year_adm))
         .collect()
 }
 
@@ -379,7 +632,12 @@ mod tests {
     fn current_law_reproduces_the_departments_model() {
         // The identity that makes every delta below meaningful.
         for record in panel() {
-            let outcome = apply(&record, &Policy::current_law(), record.current_year_adm);
+            let outcome = apply(
+                &record,
+                &Policy::current_law(),
+                &Statewide::as_published(),
+                record.current_year_adm,
+            );
             assert!(
                 (outcome.realized_aid - record.realized_aid()).abs() < 0.02,
                 "{}: {} vs {}",
@@ -405,6 +663,7 @@ mod tests {
                 guarantee: GuaranteeRule::Removed,
                 ..Policy::current_law()
             },
+            &Statewide::as_published(),
             record.current_year_adm,
         );
         assert_eq!(outcome.guarantee, 0.0);
@@ -422,6 +681,7 @@ mod tests {
                     guarantee: GuaranteeRule::PhasedOut { remaining },
                     ..Policy::current_law()
                 },
+                &Statewide::as_published(),
                 record.current_year_adm,
             )
             .realized_aid
@@ -432,6 +692,7 @@ mod tests {
                 guarantee: GuaranteeRule::Removed,
                 ..Policy::current_law()
             },
+            &Statewide::as_published(),
             record.current_year_adm,
         )
         .realized_aid;
@@ -455,6 +716,7 @@ mod tests {
                     guarantee: rule,
                     ..Policy::current_law()
                 },
+                &Statewide::as_published(),
                 record.current_year_adm,
             );
             assert!(
@@ -482,6 +744,7 @@ mod tests {
                 guarantee: GuaranteeRule::Removed,
                 ..Policy::current_law()
             },
+            &Statewide::as_published(),
             record.current_year_adm,
         );
         let gained = outcome.formula_aid - record.core_foundation_funding;
@@ -542,6 +805,7 @@ mod tests {
                 guarantee: GuaranteeRule::Removed,
                 ..Policy::current_law()
             },
+            &Statewide::as_published(),
             record.current_year_adm,
         );
         let gain = outcome.formula_aid - record.core_foundation_funding;
@@ -570,6 +834,7 @@ mod tests {
                 minimum_state_share: raised,
                 ..Policy::current_law()
             },
+            &Statewide::as_published(),
             record.current_year_adm,
         );
         let expected = raised * record.base_cost_per_pupil * record.current_year_adm
@@ -625,6 +890,7 @@ mod tests {
                 guarantee: GuaranteeRule::Removed,
                 ..Policy::current_law()
             },
+            &Statewide::as_published(),
             record.current_year_adm,
         );
         let dpia_only = apply(
@@ -634,6 +900,7 @@ mod tests {
                 guarantee: GuaranteeRule::Removed,
                 ..Policy::current_law()
             },
+            &Statewide::as_published(),
             record.current_year_adm,
         );
         assert!(
@@ -657,6 +924,7 @@ mod tests {
                     guarantee: GuaranteeRule::Removed,
                     ..Policy::current_law()
                 },
+                &Statewide::as_published(),
                 record.current_year_adm,
             )
             .formula_aid
@@ -777,6 +1045,7 @@ mod tests {
         let outcome = apply(
             &record,
             &Policy::current_law(),
+            &Statewide::as_published(),
             record.current_year_adm * 0.8,
         );
         assert!(outcome.formula_aid < record.core_foundation_funding);

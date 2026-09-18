@@ -7,10 +7,11 @@ use std::process::ExitCode;
 use edfund_core::FiscalYear;
 use project::cli;
 use project::drafts::{draft, drafts, price, Priced};
-use project::panel::{panel, MINIMUM_STATE_SHARE};
+use project::panel::{panel, DPIA_BLEND, MINIMUM_STATE_SHARE};
 use project::policy::{GuaranteeRule, Policy};
 use project::report::{run, Run};
 use project::series::{Method, DEFAULT_DAMPING, DEFAULT_SHRINK_WEIGHT};
+use project::transport::MINIMUM_STATE_SHARE_FY2027 as TRANSPORT_FLOOR;
 
 const USAGE: &str = "\
 edfund-project — what a policy change would do to Ohio school funding
@@ -117,12 +118,15 @@ fn execute(args: &[String]) -> Result<(), String> {
         // provisions are its policy, so accepting one would attribute a scenario to a bill that
         // does not contain it. The scenario *page* composes the two and reports the departure in
         // the banner; there is no equivalent in a line of output, so this refuses instead.
-        const LEVERS: [&str; 5] = [
+        const LEVERS: [&str; 8] = [
             "--guarantee",
             "--base-cost",
             "--min-share",
             "--phase-in",
             "--phase-in-dpia",
+            "--dpia-blend",
+            "--supplemental",
+            "--transport-floor",
         ];
         if let Some(flag) = LEVERS.into_iter().find(|f| args.iter().any(|a| a == f)) {
             return Err(format!(
@@ -141,6 +145,9 @@ fn execute(args: &[String]) -> Result<(), String> {
         minimum_state_share: number(args, "--min-share", MINIMUM_STATE_SHARE)?,
         phase_in_general: number(args, "--phase-in", 1.0)?,
         phase_in_dpia: number(args, "--phase-in-dpia", 1.0)?,
+        dpia_directly_certified_weight: number(args, "--dpia-blend", DPIA_BLEND.1)?,
+        supplemental_top_rate: number(args, "--supplemental", 0.0)?,
+        transportation_floor: number(args, "--transport-floor", TRANSPORT_FLOOR)?,
     };
     let through = match value(args, "--through") {
         Some(raw) => {
@@ -365,13 +372,27 @@ fn draft_json(priced: &Priced) -> String {
 fn print_report(result: &Run, listed: usize) {
     let effect = &result.policy_effect;
     println!("POLICY EFFECT — observed enrollment, exact");
+    // Total state support, which is realized aid **and** transportation: the transportation
+    // floor is a lever and it moves a channel core foundation funding does not contain. Printing
+    // realized aid beside a cost that includes transportation would show two levels whose
+    // difference is not the figure between them.
     println!(
         "  {:<34}${:.0}M -> ${:.0}M   {}",
-        "total state aid",
-        effect.baseline.realized_aid / 1_000_000.0,
-        effect.policy.realized_aid / 1_000_000.0,
+        "total state support",
+        effect.baseline.total_state_support() / 1_000_000.0,
+        effect.policy.total_state_support() / 1_000_000.0,
         millions(effect.cost())
     );
+    // Split whenever a lever has reached both, so the reader is never shown one number standing
+    // for two programmes without being told.
+    if effect.transportation_cost().abs() > 0.005 {
+        println!(
+            "  {:<34}{} foundation, {} transportation",
+            "  of which",
+            millions(effect.foundation_cost()),
+            millions(effect.transportation_cost())
+        );
+    }
     println!(
         "  {:<34}{} up, {} down, {} unmoved",
         "districts",

@@ -168,12 +168,16 @@ fn the_scholarship_baseline_is_refuted_by_the_statute_rather_than_by_silence() {
 
 /// Pricing and standing are independent, which is the reason this gate exists separately.
 ///
-/// Of the fifteen provisions across all five drafts, three price and twelve do not; one baseline
-/// has fallen and fourteen stand. The two partitions do not line up, and a gate that checked only
-/// the first would have passed the fixture in the state that shipped both defects.
+/// Of the fifteen provisions across all five drafts, **four** price and eleven do not; one
+/// baseline has fallen and fourteen stand. The two partitions do not line up, and a gate that
+/// checked only the first would have passed the fixture in the state that shipped both defects.
 ///
-/// The ratio moved when the two stages of H.B. 96 arrived, and in the direction the class predicts:
-/// a real budget act is mostly provisions no lever here expresses.
+/// The ratio moved when the two stages of H.B. 96 arrived, and in the direction the class
+/// predicts: a real budget act is mostly provisions no lever here expresses. It has now moved
+/// once in the other direction — the transportation floor became a lever, so provision 4 of
+/// `fund-the-plan-and-retire-the-guarantee` prices where it did not. That is the count moving
+/// because the model grew rather than because the fixture changed, which is the only reason it
+/// should ever move that way.
 #[test]
 fn whether_a_provision_prices_says_nothing_about_whether_its_baseline_stands() {
     let provisions: Vec<_> = drafts::drafts()
@@ -184,7 +188,7 @@ fn whether_a_provision_prices_says_nothing_about_whether_its_baseline_stands() {
 
     let priced = provisions.iter().filter(|p| p.is_priced()).count();
     let standing = provisions.iter().filter(|p| p.anchor.stands()).count();
-    assert_eq!((priced, standing), (3, 14));
+    assert_eq!((priced, standing), (4, 14));
 
     // The one that does not stand is one the model could not run either, which is exactly how it
     // stayed invisible: nobody re-reads a provision the tool already declines to cost.

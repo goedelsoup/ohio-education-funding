@@ -7,7 +7,7 @@
 //! 0.15`, one letter from the real `--min-share`, ran the model at current law and printed
 //!
 //! ```text
-//! total state aid                   $7281M -> $7281M   +0.0M
+//! total state support               $8007M -> $8007M   +0.0M
 //! districts                         0 up, 0 down, 609 unmoved
 //! ```
 //!

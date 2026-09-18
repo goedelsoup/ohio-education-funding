@@ -36,6 +36,12 @@ pub struct Totals {
     pub guarantee: Dollars,
     /// Total ADM.
     pub adm: f64,
+    /// Total transportation aid.
+    ///
+    /// Carried beside realized aid rather than inside it, because the department publishes
+    /// transportation as its own line and `[G] Total` is not part of core foundation funding.
+    /// [`Self::total_state_support`] is where the two meet.
+    pub transportation: Dollars,
 }
 
 impl Totals {
@@ -50,7 +56,14 @@ impl Totals {
             formula_aid: outcomes.iter().map(|o| o.formula_aid).sum(),
             guarantee: outcomes.iter().map(|o| o.guarantee).sum(),
             adm: outcomes.iter().map(|o| o.adm).sum(),
+            transportation: outcomes.iter().map(|o| o.transportation).sum(),
         }
+    }
+
+    /// Realized aid and transportation together.
+    #[must_use]
+    pub fn total_state_support(&self) -> Dollars {
+        self.realized_aid + self.transportation
     }
 }
 
@@ -66,22 +79,49 @@ pub struct PolicyEffect {
 }
 
 impl PolicyEffect {
-    /// Change in total state aid.
+    /// Change in total state aid, across every channel a lever reaches.
+    ///
+    /// # It is total state support and not realized aid, and the difference is a lever
+    ///
+    /// This read `policy.realized_aid - baseline.realized_aid` while every lever moved core
+    /// foundation funding and nothing else, so the two were the same figure. The transportation
+    /// floor is not in core foundation funding: a draft that moved it would have priced at
+    /// **exactly zero**, which in a cost column reads as *this bill is free* — the reading
+    /// [`crate::drafts::Priced::cost`] returns an `Option` to prevent, reintroduced underneath
+    /// it by an aggregate that could not see the channel.
     #[must_use]
     pub fn cost(&self) -> Dollars {
+        self.policy.total_state_support() - self.baseline.total_state_support()
+    }
+
+    /// The part of [`Self::cost`] that is core foundation funding.
+    #[must_use]
+    pub fn foundation_cost(&self) -> Dollars {
         self.policy.realized_aid - self.baseline.realized_aid
     }
 
-    /// Districts whose aid rises.
+    /// And the part that is transportation.
+    #[must_use]
+    pub fn transportation_cost(&self) -> Dollars {
+        self.policy.transportation - self.baseline.transportation
+    }
+
+    /// Districts whose aid rises, across every channel a lever reaches.
     #[must_use]
     pub fn gainers(&self) -> usize {
-        self.outcomes.iter().filter(|o| o.delta() > 0.005).count()
+        self.outcomes
+            .iter()
+            .filter(|o| o.total_delta() > 0.005)
+            .count()
     }
 
     /// Districts whose aid falls.
     #[must_use]
     pub fn losers(&self) -> usize {
-        self.outcomes.iter().filter(|o| o.delta() < -0.005).count()
+        self.outcomes
+            .iter()
+            .filter(|o| o.total_delta() < -0.005)
+            .count()
     }
 
     /// Districts the policy does not reach at all.
@@ -98,7 +138,7 @@ impl PolicyEffect {
     pub fn unmoved(&self) -> usize {
         self.outcomes
             .iter()
-            .filter(|o| (-0.005..=0.005).contains(&o.delta()))
+            .filter(|o| (-0.005..=0.005).contains(&o.total_delta()))
             .count()
     }
 }
@@ -188,6 +228,12 @@ pub fn forecast(
     let mut adm = 0.0;
     let mut on_guarantee = 0;
 
+    // Resolved once against the whole panel, because the two statewide statistics a lever can
+    // move are not properties of any one district. Resolved at modelled enrollment rather than
+    // projected: a forecast moves counts, and rebasing the DPIA denominator on projected ADM
+    // would price an enrollment change as a policy change.
+    let statewide = crate::policy::Statewide::under(panel, policy);
+
     for record in panel {
         // Per district, because `Method::Shrunk` carries a `toward` the feed cannot choose once.
         let method = record.projection_method(method);
@@ -198,7 +244,7 @@ pub fn forecast(
         else {
             continue;
         };
-        let at = |value: f64| apply(record, policy, value);
+        let at = |value: f64| apply(record, policy, &statewide, value);
         let central = at(projected.point);
         point += central.realized_aid;
         // A smaller district draws less aid, so the enrollment band's low end is the aid band's

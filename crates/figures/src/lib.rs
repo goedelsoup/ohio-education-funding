@@ -7809,21 +7809,44 @@ pub static FIGURES: &[Figure] = &[
         compute: |i| lifted_off_the_guarantee(&i.refresh),
     },
     Figure {
-        // Positive, direction in the key: the prose is "the bill cuts $143.9 million".
+        // Positive, direction in the key: the prose is "the bill cuts $262.0 million".
         key: "project/fund-the-plan-run-cut",
         owner: "crates/project",
         unit: Unit::Dollars,
-        label: "What the refresh and a half-retired guarantee cost when they are run together",
-        pinned: 143_877_698.81,
+        label: "What the refresh, a half-retired guarantee and a lowered transportation floor \
+                cost when they are run together",
+        pinned: 261_983_181.09,
         tolerance: 0.005,
         compute: |i| -i.fund_the_plan.cost().expect("the draft prices"),
+    },
+    Figure {
+        // The two channels of the figure above, because a lever now reaches each and a single
+        // total standing for two programmes is what the split exists to prevent.
+        key: "project/fund-the-plan-foundation-cut",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The core foundation funding half of that cut — what the draft cost before its \
+                transportation provision could be priced",
+        pinned: 143_877_698.81,
+        tolerance: 0.005,
+        compute: |i| -i.fund_the_plan.effect().foundation_cost(),
+    },
+    Figure {
+        key: "project/fund-the-plan-transportation-cut",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And the transportation half, which is the provision the draft could describe and \
+                not cost for eleven phases",
+        pinned: 118_105_482.288_4,
+        tolerance: 0.005,
+        compute: |i| -i.fund_the_plan.effect().transportation_cost(),
     },
     Figure {
         key: "project/fund-the-plan-provisions-costed-separately",
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the same two provisions come to when each is priced alone and the two are added",
-        pinned: 218_951_994.53,
+        pinned: 337_057_476.816_6,
         tolerance: 0.005,
         compute: |i| -i.fund_the_plan.attribution().iter().map(|a| a.cost).sum::<f64>(),
     },
