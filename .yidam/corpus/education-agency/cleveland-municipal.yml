@@ -105,7 +105,9 @@ properties:
     State revenue per pupil $10,026.96 (38.41% of total); local $8,204.61 (31.43%);
     total revenue per pupil $26,106.19. [verified] (FY2024 District Profile Report)
   typology: |
-    Urban, very high poverty. Exact department typology code not yet entered.
+    Urban, very high poverty. **Typology code 8** — the department's most urban and poorest
+    category, which holds eight districts. Its 2013 student poverty measure was 99.99%, the
+    highest in the state. [verified]
   roles: |
     Cleveland Scholarship resident district since the mid-1990s [verified]. Subject to state
     academic distress intervention **under the former R.C. 3302.10**, the pre-2015 regime — not
@@ -123,8 +125,6 @@ properties:
 unfilled:
   - field: established
     why: The department's district profile carries it; nobody has read it across.
-  - field: the department's typology code
-    why: The characterisation is entered; the department's own code is not.
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of

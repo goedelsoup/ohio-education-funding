@@ -69,11 +69,15 @@ Cleveland — the commentary's own example of a district funded through a freefa
 1,058.3 enrolled ADM across FY2024–FY2026 and carries a **$13.7m** guarantee in the model.
 [verified]
 
-**The typology figure cannot be checked here and should not be reported as though it could.** No
-typology assignment is committed anywhere in this repository, and the district-level distribution
-of the House plan was an LSC simulation of a bill that died; nothing reconstructs it. Assessed
-valuation per pupil is the nearest proxy the corpus holds and it is not the department's typology.
-[open]
+**The typology figure is now half checkable, and the half that is not is not about typology.**
+This read that no typology assignment was committed anywhere and that valuation per pupil was the
+nearest proxy the corpus held. The department's own assignment is committed —
+[`dew-district-typology`](dew-district-typology.md), on every district in the feed — so the
+grouping side of the claim can be reproduced. [verified]
+
+What still cannot be reconstructed is the other side: the district-level distribution of the House
+plan was an LSC simulation of a bill that died, and nothing here reconstructs it. So the figure
+remains uncheckable, for a reason that has nothing to do with typology. **[open]**
 
 ## The DPIA recommendation, which the enacted act adopted
 
