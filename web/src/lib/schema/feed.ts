@@ -733,6 +733,40 @@ export const DistrictSchema = z
         line_supplements: num,
       })
       .strict(),
+    /**
+     * What kind of district the department says this is — its 2013 similar-district grouping.
+     *
+     * Optional because the feed writes the key only where the department's roster carries the
+     * IRN. For this panel that is all 609; the five rows the roster has and the panel does not
+     * are districts closed or merged since 2013.
+     *
+     * # Two things this must not be read as
+     *
+     * **`code` is not a rank.** `0` is the department declining to classify — five districts
+     * *removed from the analysis*, three of them here — and not the bottom of a scale. That is
+     * why `locale` is absent exactly there, and never invented.
+     *
+     * **`code` is not a poverty band.** The scheme orders on urbanicity with poverty as the
+     * secondary term inside each locale, so median student poverty runs 46.4% at code 1, 36.7%
+     * at 2, 29.0% at 3 and back up to 51.5% at code 4. Anything that puts 1→8 on an ordered ramp
+     * is asserting a monotone four of the eight steps break.
+     *
+     * # The label is current and its evidence is eleven years old
+     *
+     * The scheme was last revised in 2013 and amended in January 2015. It is the classification
+     * in force — there is nothing newer — but a district labelled *High Student Poverty* was one
+     * then. The measures it was classified on stay in `dispersion::typology` rather than being
+     * fed, so nothing downstream can mistake a 2013 poverty share for a current one.
+     */
+    typology: z
+      .object({
+        code: num,
+        label: z.string(),
+        short: z.string(),
+        locale: z.string().optional(),
+      })
+      .strict()
+      .optional(),
     guarantee: num,
     on_guarantee: z.boolean(),
     /** At or below the statutory floor, so reduction factors have stopped operating. */

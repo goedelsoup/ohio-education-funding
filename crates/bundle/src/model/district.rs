@@ -637,6 +637,44 @@ pub struct NationalPosition {
     pub spending_per_pupil_percentile: f64,
 }
 
+/// What kind of district the department says this is.
+///
+/// # Why the code is carried beside the label
+///
+/// Because the two answer different questions and only one of them is stable. The label is the
+/// department's own wording and is what a reader is shown; the code is what a filter and a URL
+/// carry, and it survives the department rewording a category. `locale` is the four-way split the
+/// eight codes fall into — Rural, Small town, Suburban, Urban — which is the axis the scheme is
+/// actually ordered on.
+///
+/// # The two things that must not be inferred from this
+///
+/// **`code` is not a rank.** `0` is the department's refusal to classify — five districts
+/// *removed from the analysis*, three of them in this panel — and not the bottom of a scale. That
+/// is why `locale` is `None` there rather than "Rural".
+///
+/// **`code` is not a poverty band.** Poverty is the secondary term inside each locale, so the
+/// sequence is not monotone in it: median student poverty runs 46.4% at code 1, 36.7% at 2, 29.0%
+/// at 3 and back up to 51.5% at code 4. `dispersion::typology` asserts that against the fixture.
+///
+/// # The assignment is current; the measures behind it are eleven years old
+///
+/// The scheme was last revised in 2013 and the workbook amended in January 2015. There is nothing
+/// newer, so this is the classification in force — but a district labelled *High Student Poverty*
+/// was one in 2013. `dispersion::typology::District` carries the four measures it was classified
+/// on, under their own vintage, for a reader who wants to measure the drift rather than assume it.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Typology {
+    /// The department's code, 0 through 8.
+    pub code: u8,
+    /// The department's full category name, verbatim.
+    pub label: String,
+    /// A short name, for a legend that cannot hold the full one.
+    pub short: String,
+    /// Rural, Small town, Suburban or Urban. `None` for the districts it declines to classify.
+    pub locale: Option<String>,
+}
+
 /// The FY2025→FY2027 change split across the department's payment lines.
 ///
 /// Mirrors [`project::biennium::Lines`]. Exhaustive: the five sum to the change in
@@ -798,6 +836,11 @@ pub struct District {
     pub realized_aid_per_pupil: Dollars,
     /// The three observed years of the biennium, on both measures.
     pub biennium: Biennium,
+    /// What kind of district the department says this is. See [`Typology`].
+    ///
+    /// `None` only if the department's 2013 roster does not carry this IRN, which it does for all
+    /// 609 — the five rows it carries and this panel does not are districts closed since.
+    pub typology: Option<Typology>,
     /// Temporary transitional aid guarantee, total dollars.
     pub guarantee: Dollars,
     /// Whether the minimum state share is what sets this district's base cost aid.

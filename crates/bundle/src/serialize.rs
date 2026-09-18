@@ -810,6 +810,25 @@ impl Bundle {
                 o.num("general_funding_base", d.general_funding_base);
                 o.num("dpia_funding_base", d.dpia_funding_base);
                 o.num("guarantee_floor", d.guarantee_floor);
+                /*
+                 * The department's own grouping, written only where it has one.
+                 *
+                 * The key is absent rather than null for a district the 2013 roster does not
+                 * carry, which is how every other optional block here says "not published" — and
+                 * for this panel it is never absent, because all 609 are classified. `locale` is
+                 * the one field inside that legitimately goes missing: code 0 is the department
+                 * declining to classify, and a locale of "Rural" invented for an island would be
+                 * the exact error `dispersion::typology` refuses to let a `u8` make.
+                 */
+                if let Some(t) = &d.typology {
+                    let mut typology = o.obj("typology");
+                    typology.num("code", f64::from(t.code));
+                    typology.text("label", &t.label);
+                    typology.text("short", &t.short);
+                    if let Some(locale) = &t.locale {
+                        typology.text("locale", locale);
+                    }
+                }
                 // Both measures, flat, and the five lines. Named `baseline`/`middle`/`terminal`
                 // rather than by year: the years are in `series_years` under `biennium`, and a
                 // year written into a key here would be a second place to change when one moves.

@@ -1,0 +1,107 @@
+id: typology-connector
+summary: >-
+  dew-typology, for the department's own similar-district grouping — a property this ontology has
+  declared since it was written, that five agency nodes characterise in prose and record as
+  unfilled, and that a skill names as the axis it cannot have. One 79 KB workbook closes all four.
+context: |
+  The corpus has been asking for this longer than it has been able to answer.
+
+  `education-agency.ont.yml` declares a `typology` property — *"Department typology grouping
+  (rural, small town, suburban, urban) used for peer comparison"* — and an edge, `peer-of`, whose
+  description reads *"The agency is a comparison peer, by typology or by wealth position"*. Neither
+  could be filled from anything committed. Five agency nodes carry a prose characterisation and
+  then record the same absence in their own `unfilled:` block:
+
+      - field: the department's typology code
+        why: The characterisation is entered; the department's own code is not.
+
+  Cleveland Municipal, Toledo City, Upper Arlington City, Perrysburg Exempted Village and Northern
+  Local each say *"Exact department typology code not yet entered."*
+
+  Two more places record the cost rather than the absence.
+  [`scenario-delta`](../skills/scenario-delta.md) was written to cross funding incidence against
+  typology as well as wealth, and states that it cannot: **"Typology is not an available axis…
+  no committed fixture carries a typology code"**, `[open]`. And
+  [`fordham-house-bridge-commentary`](../catalog/fordham-house-bridge-commentary.md) warns that a
+  typology figure in that commentary **cannot be checked here and should not be reported as though
+  it could**, because *"assessed valuation per pupil is the nearest proxy the corpus holds and it
+  is not the department's typology"*.
+
+  So four recorded open items, all naming one missing file, while the department published it
+  openly the whole time.
+decision: |
+  Declare `dew-typology` as a connector in its own right, `Wired` with no remainder, feeding
+  `education-agency`, with the *2013 School District Typology* workbook as its single source, and
+  commit its `Typology By District` sheet as a rebuilt fixture beside the CUPP profile in
+  `dispersion`.
+
+  **The four classifying measures are carried, and named with their vintage.** Enrollment, median
+  income, student poverty and percent minority go into the extract as `enrollment_2013`,
+  `median_income_2013`, `student_poverty_2013` and `pct_minority_2013`. That is the argument
+  `dew-edchoice-designated-list` already makes for carrying the EdChoice criteria beside the
+  designation: a classification that cannot be interrogated is a label, and a label whose
+  derivation nothing records is exactly what this corpus objects to elsewhere.
+
+  The suffix is doing real work. The assignment is in force and the measures behind it are eleven
+  years old, and those two facts have to travel together or the second is lost.
+
+  **Kept apart from `dew-foundation` deliberately**, on the reasoning `facts-and-figures-connector`
+  established for the same choice. `dew-foundation` is per-agency state aid and every fixture it
+  produces answers "how much does this district get". This one answers "what kind of district is
+  this", which is a property rather than a payment, is not revised on a budget cycle, and is
+  published on a different page under a different regime.
+consequences: |
+  **Four open items close and one axis opens.** The five agency nodes can carry the department's
+  code; `scenario-delta`'s `[open]` on typology becomes answerable; and the Fordham commentary's
+  warning can name the file that settles it rather than a proxy that does not.
+
+  **The vintage becomes a standing caveat.** The scheme was set in 1996, revised in 2007 and again
+  in 2013, and the workbook's own `docProps/core.xml` gives `dcterms:modified` as 6 January 2015 —
+  untouched for eleven years. A district coded *High Student Poverty* was one **in 2013**. Every
+  use of this data has to carry that, which is why the measures are committed alongside: the drift
+  is measurable against the report card rather than merely suspected.
+
+  **The codes must not be read as an ordered poverty band.** The department orders them by a
+  location composite, least urban to most, with poverty as the secondary term inside each locale.
+  Median student poverty runs 46.4% at code 1, 36.7% at 2, 29.0% at 3 and then back **up to 51.5%
+  at code 4** — above codes 1, 2, 3 and 5 alike. Anything that bands 1→8 on an ordered ramp is
+  asserting a monotone that four of the eight steps break.
+
+  **Code zero is a refusal, not a ninth kind.** Five districts are *removed from the analysis* and
+  are the only rows with a suppressed measure; for the two Bass Island districts every measure is
+  suppressed. Three of the five are in the FY2027 panel. A reader must not take `0` as "least
+  urban".
+
+  **It joins the panel exactly.** All 609 districts in the FY2027 panel carry a code and none is
+  missing; the five surplus rows are districts closed or merged since 2013. That is the expected
+  shape of an eleven-year-old roster against a current one, and the reverse of the failure that
+  would matter.
+alternatives: |
+  **Derive a typology from poverty and enrolment, which the panel already carries.** Rejected, and
+  it is the alternative worth naming most loudly. The two axes are on the panel and a plausible
+  eight-way split is a few lines of arithmetic — and the result would be an invented classification
+  wearing the department's category names. `fordham-house-bridge-commentary` had already written
+  the objection down before the question was asked: the nearest proxy this corpus holds **is not
+  the department's typology**. Publishing a derived grouping under those labels is precisely the
+  defect that entry exists to prevent.
+
+  **Use the NCES urban-centric locale code instead.** Rejected. `ULOCAL` is in the cached CCD
+  members for 1994-95 through 2013-14 and `ccd.rs` knows where the byte sits; the modern 029 files
+  dropped it to a separate EDGE geocode file that is not cached. So it is both stale and a
+  different measure — a federal locale classification, not Ohio's composite — and neither derives
+  the other.
+
+  **Take the CUPP `Similar District Data` sheet, which is already cached.** Rejected because it
+  does not contain this. The sheet reports a district's similar-district *averages* and never names
+  the group; its `sharedStrings` carries no typology label at all. The two files are complements
+  rather than substitutes.
+
+  **Wait for a revision before committing an eleven-year-old assignment.** Rejected. It is the
+  assignment in force — there is nothing newer to wait for, and three revisions in thirty years
+  means waiting is indefinite. The vintage is recorded everywhere it is used instead.
+
+  **Extract the exemplar sheet too.** Rejected. Five illustrative districts per code, all of them
+  already on the assignment sheet. A fixture built for a question nobody has is a fixture nobody
+  checks.
+connectors:
+  - dew-typology

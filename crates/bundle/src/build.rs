@@ -47,7 +47,7 @@ use crate::{
     HistoryYear, HouseDistrictMember, HouseDistrictShare, MealProgramYear, MillageAnalysis,
     National, OutcomeStatewide, PolicyShape, Projection, PropertyTaxYear, RegimeCounterfactual,
     SeriesYear, SpecialEducation, SpendingByFunction, StateFinance, Statewide, TargetedAssistance,
-    YearKind, CONTRACT_VERSION,
+    Typology, YearKind, CONTRACT_VERSION,
 };
 use dispersion::census_states::StateFinance as CensusState;
 use dispersion::mr81::poverty_share_by_year;
@@ -528,6 +528,9 @@ struct Joins<'a> {
     /// Built once for the whole panel rather than looked up per district: `biennium::at` walks
     /// three fixtures per call, which over 609 districts is 1,827 fixture parses.
     biennium: Option<&'a project::biennium::Row>,
+    /// What kind of district the department says this is, or `None` for one its 2013 roster does
+    /// not carry. Built once for the whole panel: the fixture is 614 rows and is read per call.
+    typology: Option<&'a dispersion::typology::District>,
 }
 
 /// The biennium block, or zeroes for a district the payment files do not carry.
@@ -580,6 +583,7 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
         national,
         recognized,
         casino,
+        typology,
         biennium,
     } = *joins;
     let adm = record.base_cost_adm();
@@ -731,6 +735,12 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
         formula_aid_per_pupil: record.core_foundation_funding / adm,
         realized_aid_per_pupil: record.realized_aid() / adm,
         biennium: biennium_of(biennium),
+        typology: typology.map(|t| Typology {
+            code: t.typology.code(),
+            label: t.typology.label().to_string(),
+            short: t.typology.short().to_string(),
+            locale: t.typology.locale().map(|l| l.label().to_string()),
+        }),
         guarantee: record.guarantee,
         at_minimum_state_share: record.at_minimum_state_share(),
         valuation_per_pupil: record
@@ -1618,6 +1628,11 @@ pub fn build() -> Bundle {
 
     let casino_by_district = casino_by_district();
 
+    // The department's own similar-district grouping, joined once. Keyed on IRN rather than on
+    // name, because the typology roster is eleven years old and 28 of this panel's names are not
+    // unique — a name join would be wrong twice over.
+    let typology = dispersion::typology::by_irn();
+
     // The three observed payment years, joined once. See `Joins::biennium`.
     let biennium: HashMap<String, project::biennium::Row> = project::biennium::frame()
         .into_iter()
@@ -1639,6 +1654,7 @@ pub fn build() -> Bundle {
                     national: national_positions.get(&record.irn),
                     recognized: &recognized,
                     casino: casino_by_district.get(&record.irn),
+                    typology: typology.get(&record.irn),
                     biennium: biennium.get(&record.irn),
                 },
             )
