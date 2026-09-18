@@ -94,3 +94,9 @@ links:
     note: >-
       The FY2021 IDEA Part B allocation list, where this district appears by name. A separate
       federal channel from Ohio's special education weights, and cited here as such.
+  - target: ../../catalog/dew-district-typology.md
+    relationship: sourced-from
+    note: >-
+      The department's 2013 typology roster, which is where this node's code comes from. The
+      prose characterisation was written before the roster was fetched, and for two of the five
+      nodes that carry a code the two disagreed.

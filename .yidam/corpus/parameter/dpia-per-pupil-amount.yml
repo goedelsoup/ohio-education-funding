@@ -128,10 +128,12 @@ properties:
     `project::panel::categoricals::DPIA_PER_PUPIL`, with `DPIA_BLEND` and
     `DPIA_STATEWIDE_PERCENTAGE` beside it.
 
-    The amount is a constant with no lever. Its phase-in *is* a lever —
-    `Policy::phase_in_dpia`, separate from `phase_in_general` because the statute separates them
-    — so a scenario can move how much of the FY2019 base a district is held at and cannot move
-    the $422.
+    The amount is a constant with no lever, and two things around it are levers now.
+    `Policy::phase_in_dpia` moves how much of the FY2019 base a district is held at, separate
+    from `phase_in_general` because the statute separates them; and
+    `Policy::dpia_directly_certified_weight` moves the **count** — the 65/35 blend H.B. 96 wrote
+    — with the statewide index rescaled so the total holds and only the distribution moves. The
+    $422 itself still cannot be moved.
   written_as: |
     disadvantaged share
     index, squared

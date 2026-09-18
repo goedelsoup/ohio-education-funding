@@ -2,8 +2,8 @@ class: draft-legislation
 label: Fund the Plan and Retire the Guarantee
 summary: >-
   A hypothetical five-provision bill that refreshes the cost inputs, retires half the temporary
-  transitional aid guarantee, and does three further things no lever here reaches. Nobody
-  proposed it. It exists to be the case a single-provision draft cannot be.
+  transitional aid guarantee, lowers the transportation floor, and does two further things no
+  lever reaches. Nobody proposed it. It exists to be the case a single-provision draft cannot be.
 description: |
   The two halves of Ohio's school funding argument, put in one bill. Refreshing the base cost
   reference year is what advocates of the Fair School Funding Plan ask for; retiring the
@@ -16,20 +16,18 @@ description: |
   the floor, and a phase-out reaches only the districts standing on it. Each provision is
   approximately inert over the population the other one moves.
 
-  ### The five provisions, and why three of them are here
+  ### The five provisions, and why two of them are still here
 
-  Two bind to levers: the reference year moves from FY2022 to FY2024, and the guarantee closes
-  half the gap between its FY2020 baseline and the formula amount.
+  Three bind to levers: the reference year moves from FY2022 to FY2024, the guarantee closes half
+  the gap between its FY2020 baseline and the formula amount, and the transportation
+  reimbursement floor moves from 50% to 37.5%.
 
-  The other three are the point. A raise to the six special education category weights, a
-  transportation reimbursement floor, and holding a resident district harmless for its
-  scholarship deductions are all ordinary contents of an Ohio budget act — and none of the three
-  can be costed here. The first has no lever. The second and third are not merely unlevered but
-  outside the model altogether: no transportation series is carried, and the deduct channel needs
-  a per-agency participation series that does not exist.
+  The other two are the point. A raise to the six special education category weights and holding a
+  resident district harmless for its scholarship deductions are ordinary contents of an Ohio
+  budget act, and neither produces a number here. [verified]
 
-  A bill of five provisions where two produce numbers is closer to the normal case than a bill of
-  one provision that prices completely, which is the reason for authoring it.
+  A bill of five provisions where three produce numbers is closer to the normal case than a bill
+  of one provision that prices completely, which is the reason for authoring it.
 
   ### What it is not
 
@@ -41,25 +39,34 @@ description: |
   The provision values are also chosen rather than derived. A half phase-out and an 8% weight
   raise are round numbers picked to be legible, not positions anybody has taken. [inference]
 findings: |
-  **The bill cuts $143.9 million and its two priced provisions, costed separately, say $219.0
+  **The bill cuts $262.0 million and its three priced provisions, costed separately, say $337.1
   million.** Run with `cargo run -p project --bin edfund-project -- --draft
   fund-the-plan-and-retire-the-guarantee`.
 
-      total state aid       $7,281M  ->  $7,137M     -$143.9M
-      districts             356 up, 253 down, 0 unmoved
+      total state support   $8,007M  ->  $7,745M     -$262.0M
+        of which                                     -$143.9M foundation
+                                                     -$118.1M transportation
+      districts             319 up, 290 down, 0 unmoved
       on the guarantee      294      ->  253
       guarantee cost        $879M    ->  $364M
 
       provision 1  reference year FY2022 -> FY2024        +$220.5M
       provision 2  guarantee half retired                 -$439.5M
+      provision 4  transportation floor to 37.5 percent   -$118.1M
                    interaction residual                    +$75.1M
 
   [verified] (`crates/project/tests/a_draft_cannot_hide_what_it_did_not_price.rs`)
 
-  ### The residual is half the answer
+  The headline is against **total state support** rather than realized aid, because the third
+  provision moves a channel core foundation funding does not contain. Run against realized aid
+  alone it would have priced at exactly **zero** — which in a cost column reads as *this bill is
+  free*, the reading this draft's own type returns an `Option` to prevent, reintroduced
+  underneath it by an aggregate that could not see the channel. [verified]
 
-  Pricing the two provisions apart and adding them gives −$219.0M. Running them together gives
-  −$143.9M. **The separate figures overstate the cut by $75.1 million, 52% of the true number.**
+  ### The residual is half the answer, and it is half of the half that interacts
+
+  Pricing the provisions apart and adding them gives −$337.1M. Running them together gives
+  −$262.0M. **The separate figures overstate the cut by $75.1 million.**
 
   The mechanism is the guarantee's `max`, and it double-counts in both directions. Run alone, the
   refresh lifts 41 districts off the floor and the state pays their formula amount; run alone, the
@@ -71,13 +78,29 @@ findings: |
   only. Any process that prices clauses independently and sums them — which is the natural way to
   read a bill — is wrong by an amount that grows with how much the clauses interact. [verified]
 
+  **The third provision is priced and adds nothing to the residual** — $75.1M before the
+  transportation floor became a lever and $75.1M after, to the cent. Transportation is not inside
+  core foundation funding, so it has no `max` to be counted twice against, and it composes with
+  the other two additively where they do not compose with each other. [verified]
+
+  That is why the residual is now 29% of the combined figure where it was 52%, while being the
+  same money: it is 52% of the −$143.9M it is a residual *of*. A draft that grows by a
+  non-interacting provision dilutes the ratio without making its clauses any more separable, which
+  is a reason to read the residual in dollars rather than as a share. [inference]
+
   ### No district is untouched, and the two populations overlap by exactly the districts that move
 
   Zero unmoved, against 253 for the refresh alone and 315 for the guarantee alone:
 
       refresh alone          356 up,   253 unmoved
       half phase-out alone   294 down, 315 unmoved
-      both                   356 up, 253 down, 0 unmoved
+      the two together       356 up, 253 down, 0 unmoved
+      all three              319 up, 290 down, 0 unmoved
+
+  The third provision moves the counts without moving the conclusion. A transportation cut reaches
+  every district the floor pays, and 37 of the districts the first two leave better off are cut by
+  more than they gained — so the split moves from 356/253 to 319/290 while the number reached by
+  nothing stays zero. [verified]
 
   The two moved sets are **not** disjoint. 356 and 294 sum to 650 against 609 districts, so **41
   are moved by both** — and they are the same 41 the refresh lifts off the guarantee, named above.
@@ -104,13 +127,21 @@ findings: |
   its priced subset.
 figures:
   - key: project/fund-the-plan-run-cut
+    value: 261983181.094388
+    field: findings
+    as_written: "The bill cuts $262.0 million"
+  - key: project/fund-the-plan-foundation-cut
     value: 143877698.80599117
     field: findings
-    as_written: "The bill cuts $143.9 million"
-  - key: project/fund-the-plan-provisions-costed-separately
-    value: 218951994.52816582
+    as_written: "-$143.9M foundation"
+  - key: project/fund-the-plan-transportation-cut
+    value: 118105482.28839648
     field: findings
-    as_written: "costed separately, say $219.0\n  million"
+    as_written: "-$118.1M transportation"
+  - key: project/fund-the-plan-provisions-costed-separately
+    value: 337057476.81656265
+    field: findings
+    as_written: "costed separately, say $337.1\n  million"
   - key: project/fund-the-plan-interaction-residual
     value: 75074295.72217464
     field: findings
@@ -157,7 +188,11 @@ properties:
     no lever expresses a categorical weight.
 
     **4. Transportation reimbursement floor raised to 37.5 percent.** R.C. 3317.0212. **Not
-    runnable** — priceable but unlevered, and against current law a reduction. See `unpriced`.
+    runnable**, against
+    [`transportation-cost-rates`](../parameter/transportation-cost-rates.yml);
+    `transport-floor` at 0.375 against current law's 0.50. It is a **reduction** of 12.5
+    percentage points, worth −$118.1M, because H.B. 96 raised the floor after the draft was
+    written. [verified]
 
     **5. Resident district held harmless for scholarship deductions.** R.C. 3310.41. **Not
     runnable** — outside the model, and its baseline is superseded. See `unpriced`.
@@ -166,7 +201,7 @@ properties:
     [`draft-provisions.tsv`](../../../crates/project/fixtures/draft-provisions.tsv), which is
     authoritative; a test fails if this list departs from it.
   unpriced: |
-    Three of five, and the $143.9M figure does not include any of them.
+    Two of five, and the $262.0M figure does not include either of them.
 
     **Special education category weights (provision 3, R.C. 3317.014).** Unlevered rather than unmodelled — the
     six weights are carried and the categorical total is computed, but nothing scales one weight.
@@ -174,19 +209,10 @@ properties:
     implementation in `web/src/lib/policy.ts`, because `verify.ts` refuses to render the scenario
     page until the browser reproduces every Rust checkpoint. [verified]
 
-    **Transportation reimbursement (provision 4, R.C. 3317.0212).** This said "outside the model —
-    the panel carries no transportation series, so there is nothing for a lever to move", and it
-    was wrong: the panel carries twenty-five per-district transportation columns and the provision
-    is fully priceable. It is **unlevered rather than unmodelled**, like provision 3. See
-    [`the_floor_that_pays_the_wealthy_districts`](../../../crates/project/tests/the_floor_that_pays_the_wealthy_districts.rs)
-    and `project::transport::floor`, which price it. [verified]
-
-    **And priced, it is a reduction.** The provision proposes 37.5% against a stated baseline of
-    29.17%, and H.B. 96 has since raised the floor 41.67% → 45.83% → **50%**. Against FY2027 law
-    the provision cuts the floor by 12.5 percentage points, worth **-$118,105,482**, and it falls
-    on the districts the floor pays — which are the wealthiest. The provision is left as written
-    and priced as written; a draft that silently acquires the number its author meant is not a
-    record of anything. [verified] (crates/project)
+    That price was quoted here as a reason, and it has since been paid three times over — for the
+    transportation floor below and for two levers this draft does not use. It is the cost of a
+    lever and not an obstacle to one; this provision is unlevered because nobody has done it.
+    [inference]
 
     **Scholarship hold-harmless (provision 5, R.C. 3310.41).** Outside the model, and its
     **baseline no longer stands**. The provision is stated against a deduction from the resident
@@ -212,6 +238,8 @@ links:
   - target: ../parameter/base-cost-per-pupil.yml
     relationship: perturbs
   - target: ../parameter/guarantee-funding-base.yml
+    relationship: perturbs
+  - target: ../parameter/transportation-cost-rates.yml
     relationship: perturbs
   - target: ../scenario/guarantee-phase-out.yml
     relationship: simulated-by
