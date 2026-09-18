@@ -215,6 +215,17 @@ pub const CORRECTIONS_FIXTURE: &str = "crates/project/fixtures/hb583-corrections
 /// Where the Ohio slice of the CCD agency directory is written, relative to the repository root.
 pub const CCD_DIRECTORY_FIXTURE: &str = "crates/dispersion/fixtures/ccd-lea-directory.csv";
 
+/// The department's similar-district classification, one row per district.
+///
+/// Beside the CUPP profile in `dispersion` because that is where this repository's peer
+/// comparison lives, and because the typology is the peer grouping the department itself uses —
+/// the CUPP workbook's `Similar District Data` sheet reports a district's group *averages* and
+/// never names the group.
+///
+/// The assignment is 2013 and has not been revised since, so the four measures it was made on are
+/// carried beside it under their own vintage. See [`super::typology`].
+pub const TYPOLOGY_FIXTURE: &str = "crates/dispersion/fixtures/district-typology.csv";
+
 /// Where the MR-81 sponsor panel is written, relative to the repository root.
 pub const MR81_FIXTURE: &str = "crates/dispersion/fixtures/mr81-sponsor-panel.csv";
 
@@ -307,6 +318,7 @@ pub const REBUILT: &[&str] = &[
     F33_OHIO_PANEL_FIXTURE,
     MR81_FIXTURE,
     CCD_DIRECTORY_FIXTURE,
+    TYPOLOGY_FIXTURE,
     SESSION_LAW_FIXTURE,
     CORRECTIONS_FIXTURE,
     TRANSFER_FIXTURE,

@@ -135,6 +135,43 @@ test("a small multiple can be put on one horizontal scale", () => {
   expect(own.options.x!.domain).not.toEqual(b.options.x!.domain);
 });
 
+test("a fixed domain holds against an outlier rather than being widened by one", () => {
+  /*
+   * The defect this closes, which was mine and which I shipped once.
+   *
+   * `/reach` redraws on every slider tick, so its axes are fixed across the whole reachable lever
+   * space — otherwise dragging base cost holds the cloud still and moves the frame, and a reader
+   * cannot tell which of the two happened. The first version treated the caller's domain as a
+   * *floor* and unioned it with the points' own range, on the theory that a bound which turned out
+   * too small should grow rather than clip silently.
+   *
+   * That defeated the entire purpose. Kelleys Island Local has four pupils and $26,700 of aid per
+   * pupil, so the union put the axis back on the outlier at every tick and the frame moved exactly
+   * as before. A supplied domain is authoritative; `clip: true` on the marks is what makes that
+   * safe, and the caller counting what it clipped is what makes it honest.
+   */
+  const points = cloud([...Array.from({ length: 20 }, (_, i) => 1_000 + i * 100), 26_700]);
+  const fixed: [number, number] = [0, 3_000];
+
+  const spec = scatterSpec(points, AXES, [], { ...W, xDomain: fixed, yDomain: fixed })!;
+  expect(spec.options.x!.domain).toEqual(fixed);
+  expect(spec.options.y!.domain).toEqual(fixed);
+
+  // Removing the outlier must not move it either, which is the same property stated from the
+  // other side: the frame is a function of the caller's bound and of nothing in the data.
+  const without = scatterSpec(points.slice(0, -1), AXES, [], {
+    ...W,
+    xDomain: fixed,
+    yDomain: fixed,
+  })!;
+  expect(without.options.x!.domain).toEqual(spec.options.x!.domain);
+
+  // And the marks are clipped, or the outlier is painted over the card instead of the plot.
+  // Plot normalises `clip: true` to `"frame"`, which is the clip this wants: to the plot area.
+  const marks = spec.options.marks as { className?: string; clip?: unknown }[];
+  expect(marks.find((m) => m.className === "scatter-dot")?.clip).toBe("frame");
+});
+
 test("a fan chart does not stretch its axis to fit a reference it will not draw", () => {
   /*
    * The reference line is drawn only when every year carries one — a partial line would bridge the

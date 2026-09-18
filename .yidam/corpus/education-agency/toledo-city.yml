@@ -536,7 +536,8 @@ properties:
     Performance Index 60.4 (2024-25), 57.9 (2023-24), 58.8 (2022-23).
     Progress effect size −0.02; composite −5.07. [verified]
   typology: |
-    Urban, very high poverty. Exact department typology code not yet entered.
+    Urban, very high poverty. **Typology code 8**, one of the eight districts in the department's
+    most urban and poorest category. Student poverty at classification was 76.6%. [verified]
   roles: |
     Major urban district throughout the period held [verified]. Subject of OCG fact-check
     RL-2026-021 [verified]. **Not on the guarantee**: its `temp_transitional_aid_guarantee` in
@@ -550,8 +551,6 @@ properties:
 unfilled:
   - field: established
     why: The department's district profile carries it; nobody has read it across.
-  - field: the department's typology code
-    why: The characterisation is entered; the department's own code is not.
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of

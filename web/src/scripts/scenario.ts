@@ -1,12 +1,15 @@
 /**
  * The scenario builder, in the browser.
  *
- * # Why these two routes still compute client-side when nothing else does
+ * # Why these three routes still compute client-side when nothing else does
  *
  * Every other page on this site is baked: its figures are written into the HTML at build time and
- * no formula runs in the browser. These two cannot be. A lever has a continuum of positions, and
+ * no formula runs in the browser. These three cannot be. A lever has a continuum of positions, and
  * a static page per position is not a page — so the formula runs here, over the whole
  * 609-district panel, on every slider tick.
+ *
+ * The three are `/scenario`, `/district/[irn]/scenario` and `/reach`, and which one this is comes
+ * off the page rather than out of the URL — see `irn` and `view`.
  *
  * # The verification gate, which is why that is allowed
  *
@@ -41,6 +44,13 @@ import {
 import { pct } from "../lib/format.ts";
 import type { Panel } from "../lib/types.ts";
 import { REQUIRED_CONTRACT } from "../lib/types.ts";
+import {
+  DEFAULT_VIEW,
+  PRESET_FIELDS,
+  renderReach,
+  viewFromQuery,
+  type View,
+} from "../lib/reach.ts";
 import { isForecastVerified, isVerified, verify, type Verification } from "../lib/verify.ts";
 import { heading } from "../lib/section.ts";
 import { saying, tileSummary } from "../lib/status.ts";
@@ -59,8 +69,22 @@ const changed = $("#changed");
 const say = changed ? saying(changed) : () => {};
 
 const root = $("#scenario-root");
-/** Present on the district route, absent on the statewide one. That is the only difference. */
+/** Present on the district route, absent on the other two. */
 const irn = root?.dataset.irn;
+
+/**
+ * Which of the three views this script is driving, from the page that carries it.
+ *
+ * `/scenario` is the default and names nothing. `/reach` sets `data-view="reach"` and renders the
+ * cloud alone: it asks which districts a lever reaches rather than by how much, which is a
+ * different question on a formula that pays the larger of two numbers, and it is the one view
+ * that still says something at rest — the guarantee wall is there before any lever moves.
+ *
+ * A page attribute rather than a `location.pathname` test, for the reason `irn` is one: this file
+ * is the runner for whatever page imports it, and a runner that reads the URL to find out which
+ * page it is on cannot be put on a third without being edited.
+ */
+const view = root?.dataset.view ?? "";
 
 /**
  * The draft this page was opened from, if any.
@@ -76,7 +100,7 @@ const draftSlug = new URLSearchParams(location.search).get("draft") ?? "";
  * The year chip, rendered into a `<template>` by the page that carries this script.
  *
  * `yearChip` reads the feed through `loadFeed`, which touches the filesystem, so nothing rendered
- * in the browser could build one — which is why every card on these two routes carried figures
+ * in the browser could build one — which is why every card on these routes carried figures
  * under no year at all. The chip rule never caught it: `/scenario` is not in the sweep's route
  * list, and the district route passes it in a state where the only card rendered has no figures in
  * it.
@@ -89,6 +113,15 @@ interface State {
   panel: Panel;
   verification: Verification;
   levers: Levers;
+  /**
+   * How the reach view draws, which is not lever state.
+   *
+   * Choosing an axis changes what is plotted, not what is computed — the formula runs the same
+   * either way — so these travel with the levers in the query string but never reach `toPolicy`.
+   * The distinction is worth keeping in the type: a dimension that could reach the model would be
+   * a chooser that changes the answer.
+   */
+  view: View;
 }
 
 let state: State | null = null;
@@ -148,12 +181,55 @@ function toQuery(): void {
   // Only where a horizon can be set. The district route has no such control, draws no band, and
   // reads nothing from `h` — so every URL it minted carried `h=2032` for a reader to copy and send.
   if ($("#lv-horizon")) params.set("h", String(l.horizon));
+  /*
+   * The view, only where there is one to read.
+   *
+   * These name what is plotted rather than what is computed, so they are not lever state — but a
+   * cloud is worth sending someone in the pair of axes it was read in, and on a static host the
+   * query string is the only place that can live. Written only on the page that has the controls,
+   * for the same reason `h` is.
+   */
+  if (view === "reach") {
+    const v = state.view;
+    params.set("vx", v.x);
+    params.set("vy", v.y);
+    params.set("c", v.shading);
+    // Only where it means something. A `g=` on a cloud coloured by regime is a parameter the page
+    // is not using, and a link carrying it would suggest otherwise.
+    if (v.shading === "type") params.set("g", String(v.highlight));
+    if (!v.trails) params.set("t", "0");
+  }
   // `draft` survives every lever move. It is not lever state — see `draftSlug` — and dropping it
   // here would make the URL in the bar stop being the one that opened the bill, while the page
   // was still explaining that these figures came from one.
   if (draftSlug) params.set("draft", draftSlug);
   const next = `${location.pathname}?${params.toString()}`;
   if (location.pathname + location.search !== next) history.replaceState(null, "", next);
+}
+
+/**
+ * Hand the reader's lever positions to the other view.
+ *
+ * `/scenario` and `/reach` run the same levers and ask different questions of them, so a link
+ * between the two that dropped the settings would be offering the reader the other question about
+ * a scenario they are no longer looking at. `toQuery` has just written the levers into the address
+ * bar, so the current search string is exactly the state to hand over.
+ *
+ * Marked on the anchor rather than composed where the anchor is written: both links are inside
+ * containers this script replaces wholesale on every render, so the href has to be re-applied
+ * afterwards anyway, and an attribute is what survives being re-rendered.
+ *
+ * `link.pathname` rather than the stored href, so this is idempotent — a pathname carries no
+ * query, and re-running it replaces the search rather than appending a second one.
+ *
+ * The horizon does not cross. `/reach` draws no band and carries no horizon control, so `toQuery`
+ * omits `h` there exactly as it does on the district route; a reader who had set a forecast year
+ * gets it back by setting it again. The alternative is carrying a lever the page cannot show.
+ */
+function carryLevers(): void {
+  for (const link of document.querySelectorAll<HTMLAnchorElement>("a[data-carry-levers]")) {
+    link.href = `${link.pathname}${location.search}`;
+  }
 }
 
 function readLevers(fallbackHorizon: number): Levers {
@@ -167,6 +243,64 @@ function readLevers(fallbackHorizon: number): Levers {
     phaseInDpia: number("#lv-phase-dpia"),
     horizon: $("#lv-horizon") ? number("#lv-horizon") : fallbackHorizon,
   };
+}
+
+/**
+ * Mark the preset whose settings the levers are currently sitting on.
+ *
+ * Derived from the lever values on every render rather than remembered from the click, so a
+ * slider dragged by hand onto a preset's position reads as that preset, and one nudged a step off
+ * it stops reading as any — which is the honest report. A preset names only the fields it sets, so
+ * the comparison is over those fields alone: "Retire half the floor" is still in force when the
+ * reader has also moved base cost, because it never said anything about base cost.
+ */
+function syncPresets(levers: Levers): void {
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-preset]")) {
+    const wanted = JSON.parse(button.dataset.preset ?? "{}") as Levers;
+    const on = PRESET_FIELDS.every((field) => {
+      const a = levers[field];
+      const b = wanted[field];
+      /*
+       * Within half a step, not equal.
+       *
+       * The sliders are quantized — base cost steps by 0.01 from 0.8 — and a preset's value need
+       * not land on a step: the refresh the feed prices is 1.0395, which the control rounds to
+       * 1.04. An equality here would leave "Fund the plan" reading unpressed the instant it was
+       * pressed, which is the same rounding the draft path already documents at `fromControls`.
+       */
+      return typeof a === "number" && typeof b === "number" ? Math.abs(a - b) < 0.005 : a === b;
+    });
+    button.setAttribute("aria-pressed", String(on));
+  }
+}
+
+/** The reach view, off its own controls. Absent controls mean the defaults, as on every route. */
+function readView(): View {
+  const pick = <T extends string>(id: string, fallback: T): T => {
+    const control = $<HTMLSelectElement>(id);
+    return control ? (control.value as T) : fallback;
+  };
+  const lit = Number($<HTMLSelectElement>("#rv-group")?.value);
+  return {
+    x: pick("#rv-x", DEFAULT_VIEW.x),
+    y: pick("#rv-y", DEFAULT_VIEW.y),
+    shading: pick("#rv-shading", DEFAULT_VIEW.shading),
+    highlight: Number.isFinite(lit) ? lit : DEFAULT_VIEW.highlight,
+    trails: $<HTMLInputElement>("#rv-trails")?.checked ?? DEFAULT_VIEW.trails,
+  };
+}
+
+/**
+ * Show the group picker only when the colour is the department's grouping.
+ *
+ * Hidden rather than disabled: a select offering nine categories that change nothing is worse than
+ * no select, because it looks like a control whose effect the reader has failed to notice. This is
+ * the same rule `syncLabels` applies to the retained-share slider, which means nothing for two of
+ * the four guarantee rules.
+ */
+function syncView(view: View): void {
+  const pick = $("#rv-group-pick");
+  if (pick) pick.hidden = view.shading !== "type";
 }
 
 function syncLabels(levers: Levers, baseYear: number): void {
@@ -222,7 +356,12 @@ function render(): void {
    * first version of this wrote the banner only in the statewide branch.
    */
   const banner = draftSlug ? renderDraft(state.panel, state.levers, draftSlug) : "";
-  if (irn) {
+  if (view === "reach") {
+    // No projection container on this page and no detail half: the forecast is a different claim
+    // and the cloud is the whole of this one.
+    if (out) out.innerHTML = banner + renderReach(state.panel, state.levers, state.view, chip);
+    if (detail) detail.innerHTML = "";
+  } else if (irn) {
     // One district, one container. There is no forecast on that route — the band is drawn once,
     // statewide, where it is the subject — so there is nothing for a detail half to sit below.
     if (out) out.innerHTML = banner + renderDistrictScenario(state.panel, state.levers, irn, chip);
@@ -364,7 +503,12 @@ function boot(panel: Panel): void {
     base: baseYear,
     max: panel.projection?.horizon ?? baseYear,
   };
-  state = { panel, verification, levers: defaultLevers(panel.statewide.minimum_state_share, baseYear) };
+  state = {
+    panel,
+    verification,
+    levers: defaultLevers(panel.statewide.minimum_state_share, baseYear),
+    view: viewFromQuery(new URLSearchParams(location.search)),
+  };
 
   const status = $("#scenario-status");
   if (!isVerified(verification)) {
@@ -409,6 +553,24 @@ function boot(panel: Panel): void {
   put("#lv-phase-dpia", initial.phaseInDpia);
   put("#lv-horizon", initial.horizon);
 
+  /*
+   * And the view's controls, from the same query string, before the first render.
+   *
+   * Set on the DOM rather than kept only in `state` because `update()` reads the controls back on
+   * every tick: a view applied to `state` alone would be overwritten by the selects' defaults the
+   * first time a reader touched a slider, silently returning them to formula-against-realized.
+   */
+  const select = (id: string, value: string) => {
+    const control = $<HTMLSelectElement>(id);
+    if (control) control.value = value;
+  };
+  select("#rv-x", state.view.x);
+  select("#rv-y", state.view.y);
+  select("#rv-shading", state.view.shading);
+  select("#rv-group", String(state.view.highlight));
+  const trails = $<HTMLInputElement>("#rv-trails");
+  if (trails) trails.checked = state.view.trails;
+
   const fallback = defaultLevers(panel.statewide.minimum_state_share, baseYear).horizon;
 
   /*
@@ -427,13 +589,47 @@ function boot(panel: Panel): void {
   const update = (fromControls = true) => {
     if (!state) return;
     if (fromControls) state.levers = readLevers(fallback);
+    // Always from the controls. Unlike the levers there is no path that renders a view the reader
+    // cannot see — a draft sets lever positions and says nothing about axes.
+    state.view = readView();
+    syncView(state.view);
     syncLabels(state.levers, baseYear);
+    syncPresets(state.levers);
     toQuery();
     render();
+    // After `render`, which replaces the containers both cross-links live in, and after `toQuery`,
+    // which is what put the levers in the search string being handed over.
+    carryLevers();
   };
 
-  for (const control of document.querySelectorAll("#scenario-controls input, #scenario-controls select")) {
+  for (const control of document.querySelectorAll(
+    "#scenario-controls input, #scenario-controls select, #reach-view input, #reach-view select",
+  )) {
     control.addEventListener("input", () => update());
+  }
+
+  /*
+   * The presets, which are lever positions with names.
+   *
+   * Each button carries its whole lever state as JSON, written by the page from `presets()` — so
+   * the scale behind "Fund the plan" is the one the feed's own draft prices rather than a number
+   * typed into a script.
+   *
+   * A preset is a position and not a patch, which is why it sets every field. The partial version
+   * composed, and the row then reported three buttons pressed at once under a heading reading
+   * "Start from" — see `Preset.levers`. A reader who wants two of these at once has the sliders.
+   */
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-preset]")) {
+    button.addEventListener("click", () => {
+      const settings = JSON.parse(button.dataset.preset ?? "{}") as Levers;
+      $<HTMLSelectElement>("#lv-guarantee")!.value = settings.guarantee;
+      put("#lv-arg", settings.guaranteeArgument);
+      put("#lv-base", settings.baseCostScale);
+      put("#lv-min", settings.minimumStateShare);
+      put("#lv-phase", settings.phaseInGeneral);
+      put("#lv-phase-dpia", settings.phaseInDpia);
+      update();
+    });
   }
   $("#scenario-reset")?.addEventListener("click", () => {
     const defaults = defaultLevers(panel.statewide.minimum_state_share, baseYear);

@@ -65,6 +65,7 @@ pub mod text;
 pub mod title1;
 pub mod transfers;
 mod transport_rates;
+pub mod typology;
 pub mod write;
 
 pub use appropriations::{
@@ -119,7 +120,7 @@ pub use paths::{
     LSC_GREENBOOK_FIXTURE, MR81_FIXTURE, NOT_REGENERATED, OPINIONS_FIXTURE, PI_RANKING_FIXTURE,
     PROFILE_FIXTURE, REBUILT, REDBOOK_FIXTURE, REPORT_CARD_FIXTURE, SCHOLARSHIP_FIXTURE,
     SCHOLARSHIP_HISTORY_FIXTURE, SD1_FIXTURE, SESSION_LAW_FIXTURE, SFPR_FIXTURE, STATUTE_FIXTURE,
-    TITLE1_FIXTURE, TRANSFER_FIXTURE, TRANSPORT_RATES_FIXTURE,
+    TITLE1_FIXTURE, TRANSFER_FIXTURE, TRANSPORT_RATES_FIXTURE, TYPOLOGY_FIXTURE,
 };
 pub use rankings::{build_pi_rankings, PI_RANKING_HEADER, PI_RANKING_SHEETS};
 pub use report_card::{
@@ -135,4 +136,5 @@ pub use transfers::{build_transfers, AuditReport, TRANSFER_HEADER};
 pub use transport_rates::{
     build_transportation_rates, CalculatorYear, TRANSPORT_RATES_HEADER, TRANSPORT_SHEET,
 };
+pub use typology::{build_typology, TYPOLOGY_HEADER, TYPOLOGY_SHEET};
 pub use write::{write_csv, write_text};

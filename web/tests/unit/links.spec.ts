@@ -501,6 +501,63 @@ test("a scatter draws one mark per district and never a colour the theme cannot 
   expect(svg.replace(/<style>[\s\S]*?<\/style>/g, "")).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(/i);
 });
 
+test("a displacement is drawn only for the points that moved, and the frame holds both ends", () => {
+  /*
+   * The flat trail is the finding this mark exists for. A district held by Ohio's guarantee has
+   * its formula amount raised by a base cost lever and its payment left exactly where it was, so
+   * it draws a segment that runs horizontally — and a district the lever does not touch at all
+   * draws nothing. Both cases are asserted here because the *absence* of a mark is doing the
+   * talking, and an absence is what no snapshot notices going missing.
+   */
+  const points = [
+    // Moved on both axes: paid by the formula, climbing the identity line.
+    ...Array.from({ length: 10 }, (_, i) => ({
+      x: 100 + i, y: 100 + i, from: { x: 90 + i, y: 90 + i }, hover: `climb ${i}`,
+    })),
+    // Moved on x only: held, so the formula rose and the payment did not.
+    ...Array.from({ length: 10 }, (_, i) => ({
+      x: 200 + i, y: 500, from: { x: 150 + i, y: 500 }, hover: `held ${i}`,
+    })),
+    // Did not move at all.
+    ...Array.from({ length: 10 }, (_, i) => ({
+      x: 300 + i, y: 700, from: { x: 300 + i, y: 700 }, hover: `pinned ${i}`,
+    })),
+  ];
+  const spec = scatterSpec(
+    points,
+    { x: { label: "x", format: String }, y: { label: "y", format: String } },
+    [],
+    W,
+  );
+  expect(spec).not.toBeNull();
+  const marks = spec!.options.marks!;
+  const trail = marks.find(
+    (m) => (m as { className?: string }).className === "scatter-trail",
+  ) as { data?: unknown[] } | undefined;
+  expect(trail).toBeDefined();
+  // Twenty moved, ten did not.
+  expect(trail?.data?.length).toBe(20);
+
+  // The domain has to contain where a district came from, or its trail leaves the frame. The
+  // earliest `from` is x = 90, well below the smallest plotted x of 100.
+  const domain = spec!.options.x!.domain as [number, number];
+  expect(domain[0]).toBeLessThanOrEqual(90);
+
+  // And a scatter with no `from` anywhere draws no displacement layer at all.
+  const plain = scatterSpec(
+    points.map(({ x, y, hover }) => ({ x, y, hover })),
+    { x: { label: "x", format: String }, y: { label: "y", format: String } },
+    [],
+    W,
+  );
+  expect(plain).not.toBeNull();
+  expect(
+    plain!.options.marks!.some(
+      (m) => (m as { className?: string }).className === "scatter-trail",
+    ),
+  ).toBe(false);
+});
+
 test("a scatter refuses to draw a population it does not have", () => {
   // Same rule the line forms use: too few points is not a cloud, and an axis with four marks on
   // it would read as a finding about something that has not been measured.

@@ -33,6 +33,7 @@ Sorted by: type, then slug.
 | [`cupp-district-profile-report`](cupp-district-profile-report.md) | District Profile Report — the "Cupp Report" | 6 |
 | [`derolph-litigation-record`](derolph-litigation-record.md) | DeRolph Litigation Record | 6 |
 | [`dew-academic-distress-commission`](dew-academic-distress-commission.md) | Academic Distress Commission — the department's commission page | 4 |
+| [`dew-district-typology`](dew-district-typology.md) | Typology of Ohio School Districts — the department's own similar-district grouping | 0 |
 | [`dew-edchoice-designated-list`](dew-edchoice-designated-list.md) | EdChoice Designated List — which buildings' students may claim a scholarship | 2 |
 | [`dew-education-landscape`](dew-education-landscape.md) | Ohio's Education Landscape — the department's own count of every school option | 1 |
 | [`dew-expenditure-expanded-list`](dew-expenditure-expanded-list.md) | FY2025 Expenditure Expanded List | 1 |
@@ -71,7 +72,7 @@ Sorted by: type, then slug.
 | [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 19 |
 | [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 3 |
 
-48 entries, 0 not yet cited by any corpus node. 235 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+49 entries, 1 not yet cited by any corpus node. 236 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

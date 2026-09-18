@@ -26,6 +26,15 @@ export const scenarioDraft = (slug: string): string =>
   `/scenario?draft=${encodeURIComponent(slug)}`;
 
 /**
+ * The same levers, asked which districts they reach rather than by how much.
+ *
+ * A constant rather than a literal because three files name it — the bar, the scenario runner's
+ * cross-link, and the page itself — and because the two runner views have to be able to hand each
+ * other a reader's lever positions, which is a link built from this plus `location.search`.
+ */
+export const REACH = "/reach";
+
+/**
  * The addressable sections of every route.
  *
  * # Why there is a vocabulary rather than a fragment written where it is needed
@@ -209,6 +218,28 @@ export const SECTIONS = {
     /* The banner a `?draft=` opens the runner with, naming the provisions no lever reaches. Also
        runtime-written, and addressable for a reason the others are not: it is the part of the page
        somebody quoting a draft's cost should be able to link a reader straight to. */
+    draft: "draft",
+  },
+
+  /**
+   * `/reach` — the same levers, asked the other question.
+   *
+   * `/scenario` answers *how much* a lever moves; this answers *which districts it reaches*, and
+   * the two are not the same question on a formula that pays `max(formula, floor)`. It is the
+   * scenario runner's third view, so it carries the runner's own names — `levers`, `needs-script`,
+   * `disabled`, `panel-unreachable` are the same cards rendered by the same code. Only `positions`
+   * is its own, and it is the one card that is the page.
+   */
+  reach: {
+    whatThisIs: "what-this-is",
+    heldFixed: "held-fixed",
+    baseline: "baseline",
+    levers: "levers",
+    needsScript: "needs-script",
+    /** The cloud, written at runtime: every district's place, and the trail it travelled. */
+    positions: "positions",
+    disabled: "disabled",
+    panelUnreachable: "panel-unreachable",
     draft: "draft",
   },
 

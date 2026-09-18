@@ -121,11 +121,23 @@ districts with no modelled floor hold **46% of Ohio's students**. Any scenario t
 formula aid must carry this caveat. [verified] Closing it needs FY2020 per-district payments for
 the districts *not* on the guarantee, which no committed source holds. **[open]**
 
-**Typology is not an available axis.** The skill was written to cross incidence against
-department typology as well as wealth; no committed fixture carries a typology code, and
-[Cleveland Municipal](../corpus/education-agency/cleveland-municipal.yml) records the code as
-not yet established. Wealth and state share are implemented; typology is **[open]** pending a
-source, and the description above was narrowed to say so rather than promise it.
+**Typology is an available axis now.** This read "not an available axis" for as long as no
+committed fixture carried a typology code. The department's own assignment is committed —
+`crates/dispersion/fixtures/district-typology.csv`, read by `dispersion::typology`, and on every
+district in the feed — so incidence can be crossed against it beside wealth and state share.
+[verified]
+
+Two conditions come with it and neither is optional. **The code is not a rank**: `0` is the
+department declining to classify five districts, three of them in this panel, and is not the
+bottom of the scale — `Typology::urbanicity` returns `None` there and `Typology::poverty_rank`
+deliberately does not exist. **The code is not a poverty band**: the scheme orders on urbanicity
+with poverty as the secondary term inside each locale, so median student poverty runs 46.4% at
+code 1, 36.7% at 2, 29.0% at 3 and back up to 51.5% at code 4. `the_codes_are_not_ordered_by_poverty`
+asserts that against the fixture.
+
+And the assignment is **2013**, amended January 2015 and unrevised since. It is the classification
+in force; the measures behind it are eleven years old. A crossing reported against it is a crossing
+against how Ohio's districts were grouped then.
 
 **A delta is computed at modelled enrollment only.** Running the comparison at projected
 enrollment would fold forecast error into a policy effect, and [`project`](project.md) keeps

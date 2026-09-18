@@ -735,6 +735,30 @@ fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     );
 
+    // Which of the department's eight kinds of district each district is. The `Typology By
+    // District` sheet alone: the workbook's other sheet is five exemplars per code, which is
+    // editorial illustration rather than an assignment, and every district on it is already on
+    // this one.
+    out.push(
+        match (|| -> Result<Vec<Vec<String>>, String> {
+            let book = open_workbook(root, registered("district-typology-2013"))
+                .map_err(|e| e.to_string())?;
+            fixtures::build_typology(
+                &book
+                    .rows(fixtures::TYPOLOGY_SHEET)
+                    .map_err(|e| e.to_string())?,
+            )
+        })() {
+            Ok(rows) => csv_fixture(
+                root,
+                fixtures::TYPOLOGY_FIXTURE,
+                fixtures::TYPOLOGY_HEADER,
+                &rows,
+            )?,
+            Err(cause) => Rebuilt::skipped(fixtures::TYPOLOGY_FIXTURE, cause),
+        },
+    );
+
     // Who may claim a traditional EdChoice scholarship for 2026-2027, per building. The
     // `Overview` sheet alone: the workbook's six other sheets are the criteria's own inputs —
     // three years of building Performance Index rankings and three of district Title I formula

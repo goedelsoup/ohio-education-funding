@@ -392,6 +392,31 @@ pub(super) const FIVE_YEAR_FORECAST: Connector = Connector {
     ],
 };
 
+pub(super) const TYPOLOGY: Connector = Connector {
+    key: "dew-typology",
+    publisher: "Ohio Department of Education and Workforce",
+    feeds: &["education-agency"],
+    status: Status::Wired {
+        still_blocked: None,
+    },
+    note: "The department's own similar-district grouping, which this corpus declared as a \
+           property, characterised in prose on five agency nodes, and recorded as unfilled on \
+           every one of them.",
+    sources: &[Source {
+        key: "district-typology-2013",
+        title: Some("Typology of Ohio School Districts"),
+        url: "https://education.ohio.gov/getattachment/Topics/Data/Frequently-Requested-Data/\
+              Typology-of-Ohio-School-Districts/2013-School-District-Typology.xlsx.aspx",
+        filename: "district-typology-2013.xlsx",
+        format: Format::Xlsx,
+        catalog: Some("dew-district-typology"),
+        fixtures: &[crate::fixtures::TYPOLOGY_FIXTURE],
+        note: "Eight codes ordered by urbanicity, plus a zero for the districts the department \
+               removes from the analysis. The assignment is 2013 and has not been revised since, \
+               so the four measures it was made on are carried beside it under their own vintage.",
+    }],
+};
+
 pub(super) const PAYMENT_REPORTS: Connector = Connector {
     key: "dew-payment-reports",
     publisher: "Ohio Department of Education and Workforce",

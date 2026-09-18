@@ -86,6 +86,20 @@ export interface ScatterPoint {
    * poverty scatter by poverty would repaint the x axis in a gradient and say nothing.
    */
   band?: number;
+  /**
+   * Where this district sat before the change being drawn — its position under current law.
+   *
+   * Present only on a scatter whose subject is **movement**, where the pair of positions is the
+   * finding and neither one alone is. `scatterSpec` draws a segment from here to `{x, y}`, so a
+   * district that did not move draws nothing and reads as a dot with no tail.
+   *
+   * A **flat** tail is the point. Under Ohio's guarantee a district is paid `max(formula, floor)`,
+   * so raising what the formula computes moves what the guarantee absorbs and not what the
+   * district receives: the district travels along the x axis and its payment does not change.
+   * 253 of 609 are paid the same under a $220M base cost refresh, and a chart of after-positions
+   * alone cannot show that they are the same 253 every time.
+   */
+  from?: { x: number; y: number };
 }
 
 /**

@@ -158,6 +158,16 @@ use edfund_core::Dollars;
 /// consumer that rendered it beside the FY2027 calculator's output without saying which was
 /// which would present a measurement and a projection as the same kind of claim.
 ///
+/// `44.0.0` added `typology` per district: the department's own similar-district grouping, which
+/// this repository declared as an ontology property and could not fill from anything committed.
+/// Four `[open]` items named the absence — five agency nodes, a skill that states "typology is not
+/// an available axis", and a catalog entry warning that valuation per pupil **is not** the
+/// department's typology. The code is carried beside the label because only one of them is stable,
+/// and `locale` is nullable for a reason that matters: code `0` is the department declining to
+/// classify five districts, not the bottom of its scale. The assignment is 2013 and has not been
+/// revised since, so the four measures it was made on stay in `dispersion::typology` under their
+/// own vintage rather than being fed as though current.
+///
 /// `43.0.0` added `biennium` per district: three observed years on **two measures**, plus the
 /// five payment lines the change on the wide measure is made of. Two measures rather than one
 /// because they disagree in sign statewide over these years — total state support rises $145.0M
@@ -189,7 +199,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "43.0.0";
+pub const CONTRACT_VERSION: &str = "44.0.0";
 
 mod model;
 mod serialize;

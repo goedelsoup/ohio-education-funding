@@ -181,6 +181,12 @@ fn sample() -> District {
         },
         formula_aid_per_pupil: 6_400.0,
         realized_aid_per_pupil: 6_400.0,
+        typology: Some(bundle::Typology {
+            code: 1,
+            label: "Rural — High Student Poverty & Small Student Population".into(),
+            short: "Rural, high poverty".into(),
+            locale: Some("Rural".into()),
+        }),
         biennium: Biennium {
             years: [2025, 2026, 2027],
             total_state_support: [9_100_000.0, 9_250_000.0, 9_400_000.0],
@@ -688,6 +694,9 @@ fn the_fy2020_baseline_is_only_recoverable_on_the_guarantee() {
     let guaranteed = District {
         guarantee: 1_000_000.0,
         realized_aid_per_pupil: 7_100.0,
+        // No typology, which the feed writes as an absent key rather than a null — the shape a
+        // district the department's 2013 roster does not carry takes.
+        typology: None,
         biennium: Biennium {
             years: [2025, 2026, 2027],
             total_state_support: [4_050_000.0, 4_100_000.0, 4_160_000.0],

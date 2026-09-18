@@ -249,7 +249,10 @@ properties:
     Performance Index 103.5 (2024-25), 102.8 (2023-24), 102.7 (2022-23).
     Progress effect size +0.17; composite +23.76. [verified]
   typology: |
-    Suburban, low poverty. Exact department typology code not yet entered.
+    Suburban. **Typology code 6** — suburban, *very* low student poverty, large student
+    population. This node previously read "low poverty", which is the department's code 5; its
+    2013 student poverty measure was 12.0% and the department places it a step below that.
+    [verified]
   roles: |
     Comparator district in OCG fact-check RL-2026-021 [verified]. First exempted village
     district in this corpus [verified].
@@ -259,8 +262,6 @@ properties:
 unfilled:
   - field: established
     why: The department's district profile carries it; nobody has read it across.
-  - field: the department's typology code
-    why: The characterisation is entered; the department's own code is not.
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of
