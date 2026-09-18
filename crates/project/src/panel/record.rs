@@ -110,13 +110,20 @@ pub struct DistrictRecord {
     pub median_income: Option<Dollars>,
     /// `[I7] TY23 Statewide Federal Median Income` — the denominator of the income ratio.
     ///
-    /// $54,546.64, published on the sheet rather than derivable. The median of district medians
-    /// is $41,502 and is a different quantity.
+    /// $54,546.6375, and it is exactly **the median of the 609 district medians in
+    /// [`median_income`](Self::median_income) beside it**, which is what R.C. 3317.017(A)(4)(a)
+    /// defines it as. This field said the opposite — "published on the sheet rather than
+    /// derivable. The median of district medians is $41,502 and is a different quantity" — on
+    /// the strength of a reconstruction run against the Ohio median column rather than the
+    /// federal one. Same substitution as the note on `median_income` above, second consequence.
+    /// See `local-capacity/tests/against_the_departments_own_capacity.rs`.
     pub statewide_median_income: Option<Dollars>,
     /// `[C5]` — the income ratio of the 40th highest district, which tops out the sliding scale.
     ///
-    /// Published rather than reconstructed. Reconstructing it from the panel gave 1.4151 against
-    /// a published 1.46504, and it is a discretionary number rather than a derived one.
+    /// A **rank**, per R.C. 3317.017(A)(4)(c)-(d), and derivable from this panel like the
+    /// denominator above: Westlake City's 1.46503636 is the fortieth highest ratio. Recorded
+    /// here as "a discretionary number rather than a derived one", which it is not — nobody sets
+    /// it, and it moves whenever the income distribution does.
     pub benchmark_ratio: Option<f64>,
     /// `[C6] Local Capacity Percentage` — the rate, as the department computes it.
     pub published_capacity_rate: Option<f64>,

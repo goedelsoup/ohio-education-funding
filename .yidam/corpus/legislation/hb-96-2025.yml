@@ -37,8 +37,9 @@ description: |
     awareness funds from $10 a pupil to $3.
   - **Rewrites the JVSD base cost state share** onto the district method, replacing an aggregate
     0.5-mill charge-off that did not depend on enrollment at all.
-  - **Changes the income term in local capacity** from residents' total federal adjusted gross
-    income to their **median**.
+  - **Changes what the Tax Commissioner certifies** — the median federal adjusted gross income of
+    a district's residents in place of the total. Recorded here as a change to the local capacity
+    blend; it is not one, and the blend still reads both. [verified]
   - **Codifies the community school equity supplement**, cutting it $650 → $500 → $400.
 
   All are in the act's own "school financing system calculation revisions" list. [verified]
@@ -53,6 +54,36 @@ findings: |
   separately addressable values with their own series, which is what
   [`fsfp-phase-in-percentage`](../parameter/fsfp-phase-in-percentage.yml) and
   [`fsfp-base-cost-calculation`](../formula-component/fsfp-base-cost-calculation.yml) are.
+
+  ### Item 9 amends a certification duty, and this node read it as amending a formula
+
+  The act's ninth listed change *"[r]equires the Tax Commissioner to certify the median federal
+  adjusted gross income of a district's residents ... instead of the total federal adjusted gross
+  income of residents as under prior law"*, which reads as replacing one income term with another
+  and is not that. The section it amends is **R.C. 3317.021**, the certification duty. R.C.
+  3317.017, which is where the local capacity blend lives, is **word for word identical on its
+  income terms across all three enactments of the plan** — H.B. 110, H.B. 33 and this act each
+  carry an aggregate term at (A)(2) and a median-times-returns term at (A)(3), each weighted 0.20
+  against valuation's 0.60. [verified]
+  (`crates/project/tests/what_the_tax_commissioner_was_never_asked_to_certify.rs`)
+
+  Reading the certification section turns the item around. R.C. 3317.017(A)(3) has required, since
+  the plan was enacted, the district's **median federal** AGI and the **number of state tax
+  returns** filed in it, both "as certified under section 3317.021". Until this act, R.C. 3317.021
+  certified **neither**: its division (A)(5) named the *total* federal AGI and the *median Ohio*
+  AGI, and no division named a count of returns. **For four years and two budget cycles a fifth of
+  the local capacity blend rested on a certification that did not exist in law**, and what item 9
+  does is supply it. [verified]
+
+  It supplies it by substitution rather than addition, so the gap moves rather than closing. R.C.
+  3317.017(A)(2) still takes the *total* federal AGI "as certified under section 3317.021", and
+  R.C. 3317.021 no longer certifies one. The new returns count at (A)(6) is also dated to FY2026
+  and FY2027 where (A)(5) beside it is permanent, so the two halves of one product expire on
+  different schedules. [verified]
+
+  Nothing in what districts were paid turns on any of this: the department computes both terms and
+  [`crates/local-capacity`](../../../crates/local-capacity/) reproduces its published per-pupil
+  capacity for 609 of 609 districts. The item is a fact about what the text authorises. [verified]
 
   ### The enacted foundation totals
 
@@ -93,6 +124,26 @@ findings: |
   completing a six-year implementation for districts moved money away from them relative to the
   proposal that was described as abandoning it. [inference]
 revisions:
+  - was: |
+      Item 9 was recorded as "**Changes the income term in local capacity** from residents' total
+      federal adjusted gross income to their **median**", which put the enacted blend at odds with
+      `crates/local-capacity`'s 60/20/20 and left the crate looking a biennium out of date.
+    now: |
+      The item amends **R.C. 3317.021**, the Tax Commissioner's certification duty. R.C. 3317.017's
+      income terms are identical across H.B. 110, H.B. 33 and this act, and the blend reads both an
+      aggregate and a median figure in each. The crate was right.
+    found_by: |
+      The three enacted versions of R.C. 3317.017 beside one another, and R.C. 3317.021 — a section
+      R.C. 3317.017 names four times and this corpus had never fetched. It is committed now, and
+      `crates/project/tests/what_the_tax_commissioner_was_never_asked_to_certify.rs` holds the
+      comparison.
+    reach: |
+      The wrong reading was the more consequential one and it was nearly acted on: state share is a
+      subtraction against base cost, so dropping the aggregate term would have moved every figure
+      downstream of it. What the section actually says is larger than the correction — the median
+      term had **no certification behind it for four years**, which is also the explanation for an
+      error this corpus recorded against itself without accounting for it, having once inferred the
+      term from Ohio median income. That is the figure R.C. 3317.021 was certifying.
   - was: |
       The node recorded H.B. 96 as a phase-in decision and an input-year freeze, with the enacted
       appropriation totals and everything else the act did marked "not yet established" and

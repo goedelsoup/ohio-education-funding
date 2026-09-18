@@ -40,6 +40,30 @@ findings: |
   it. A reader told "the rate is 2.5%" has a legislated constant in mind; the rate that actually
   binds at the top is defined by where the fortieth district happens to fall. [verified]
 
+  ### The measured one has a value, and it was in the extract all along
+
+  **1.46503636 in FY2027 — Westlake City.** This node recorded the benchmark's value as unheld,
+  on the ground that the section defines a rank and "the department's certified income data under
+  R.C. 3317.021 is what would settle it". Neither half was needed. The FY2027 model carries every
+  district's federal median income, so the ranking R.C. 3317.017(A)(4)(c) prescribes can simply be
+  performed: the fortieth highest ratio is Westlake City's, and it reproduces the department's own
+  `[C5]` to the eight places the fixture stores. The denominator those ratios are taken against is
+  derivable the same way — the median of the 609 district medians, **$54,546.6375**, which is the
+  department's `[I7]` exactly. [verified]
+  (`crates/local-capacity/tests/against_the_departments_own_capacity.rs`)
+
+  The rank is a strict one. The districts on either side of the fortieth sit at 1.47060496 and
+  1.46495024, so the benchmark is one district's ratio rather than a plateau several would give —
+  which is what makes it move when a handful of districts near that rank change position, and is
+  the sensitivity this node describes further up. [verified]
+
+  R.C. 3317.021 turned out to answer a different question than the one it was named for here. It
+  is the Tax Commissioner's certification duty, and what it settles is that the median federal
+  income this ranking runs on **was not certified at all** until H.B. 96 amended it — see
+  [`fsfp-local-capacity-measure`](../formula-component/fsfp-local-capacity-measure.yml). A rank
+  computed over an uncertified column is the same rank; it is the authority for the column that
+  was missing. [verified]
+
   ### And it stops mattering for 138 districts
 
   The [minimum state share](minimum-state-share.yml) floors the state share at 10%, which means
@@ -104,17 +128,40 @@ properties:
     The benchmark's sensitivity is different in kind from the rates'. Nothing has to be enacted
     for the top of the scale to move — it moves when the fortieth district's income ratio moves,
     which is to say when a handful of districts near that rank change position. [inference]
+revisions:
+  - was: |
+      The fortieth-highest income ratio was recorded as a field this corpus could not fill: "the
+      section defines the benchmark as a rank and the department computes the value. It is not in
+      the committed FY2027 calculator extract; the department's certified income data under R.C.
+      3317.021 is what would settle it."
+    now: |
+      **1.46503636 — Westlake City.** The extract carries every district's federal median income,
+      so the ranking the section prescribes can be performed on it, and the result reproduces the
+      department's `[C5]` exactly.
+    found_by: |
+      `crates/local-capacity::benchmark_ratio`, checked against the published figure in
+      `tests/against_the_departments_own_capacity.rs`.
+    reach: |
+      A rank was recorded as unfillable because it had been looked for as a value. The two things
+      named as what would settle it were both already held — the income column was in the extract,
+      and R.C. 3317.021 turned out to answer a different question entirely, which is that the
+      column had no certification behind it until H.B. 96. A missing field is worth re-reading
+      against what arrived after it was written; see
+      [`fsfp-local-capacity-measure`](../formula-component/fsfp-local-capacity-measure.yml).
 unfilled:
-  - field: the fortieth-highest income ratio itself
-    why: >-
-      The section defines the benchmark as a rank and the department computes the value. It is
-      not in the committed FY2027 calculator extract; the department's certified income data
-      under R.C. 3317.021 is what would settle it.
   - field: why the fortieth rank
     why: >-
       Neither the section nor the plan's published rationale in this corpus says. The Fair
       School Funding Plan workgroup's own documentation is where a reason would be.
 figures:
+  - key: local-capacity/benchmark-ratio-fy2027
+    value: 1.4650363645238444
+    field: findings
+    as_written: "**1.46503636 in FY2027 — Westlake City.**"
+  - key: local-capacity/statewide-median-income-fy2027
+    value: 54546.6375
+    field: findings
+    as_written: "the median of the 609 district medians, **$54,546.6375**"
   - key: project/districts-at-the-minimum-state-share
     value: 138
     field: findings
