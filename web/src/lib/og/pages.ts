@@ -173,6 +173,28 @@ export function pageCards(): Record<string, Card> {
       meta: `Checked against ${verification.comparisons.length} reference scenarios · ${fy}`,
     },
 
+    /*
+     * The runner's other question, and the card says which half it is.
+     *
+     * The figure is the count of held districts rather than a dollar total on purpose: this page's
+     * subject is who a change cannot reach, and the guarantee is the reason. It is the same
+     * quantity `/districts` leads with, under a headline that says what it does to a lever.
+     */
+    reach: {
+      eyebrow: SITE,
+      headline: "Who a lever actually reaches",
+      figure: count(s.on_guarantee),
+      figureTone: "guarantee",
+      figureNote:
+        "districts are paid the guarantee rather than the formula, so a more generous formula reaches them last or not at all",
+      bar: {
+        share: guaranteeOfDistricts,
+        label: `${pct(guaranteeOfDistricts, 0)} of the state's districts`,
+        tone: "guarantee",
+      },
+      meta: `Every district against what its formula computes · ${fy}`,
+    },
+
     method: {
       eyebrow: SITE,
       headline: "How these figures are made",

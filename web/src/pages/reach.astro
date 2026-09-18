@@ -1,0 +1,268 @@
+---
+/**
+ * Where every district stands, and which of them a lever actually moves.
+ *
+ * # Why this is its own route and not a card on `/scenario`
+ *
+ * It was a card there, under the histogram, and the two were answering different questions in the
+ * same breath. `/scenario` answers *how much*: a total, a distribution, a ranking of the districts
+ * that moved furthest. This answers *which*, and on a formula that pays the larger of a district's
+ * formula amount and its guarantee those are not the same question — a lever can cost the state
+ * two hundred million dollars and reach fewer than half its districts, and no figure on the other
+ * page says so.
+ *
+ * It also reads at rest, which nothing else the runner draws does. Under current law the histogram
+ * is empty and the ranking is blank, because nothing has moved; the cloud is still the shape of the
+ * state, with the guarantee wall in it.
+ *
+ * # Why the layout is not the site's card stack
+ *
+ * Every other page here is a column of cards, because every other page is a set of findings a
+ * reader works down. This page has one finding and it is a picture: the cards are apparatus around
+ * it. So the picture takes the whole stage, the controls sit in a rail beside it where a reader can
+ * hold the plot and the sliders in one view, and the prose that explains the geometry goes
+ * *underneath* — which is where an explanation belongs once the thing it explains is on screen.
+ *
+ * The rail's controls are the scenario runner's own component, unchanged. What differs is the
+ * frame around them: `.reach-rail` drops the card chrome so a reader sees levers rather than a box
+ * containing levers. Restyling rather than reimplementing is what keeps the two views' levers from
+ * drifting apart.
+ */
+import HeldFixed from "../components/HeldFixed.astro";
+import ScenarioControls from "../components/ScenarioControls.astro";
+import Base from "../layouts/Base.astro";
+import SectionAnchor from "../components/SectionAnchor.astro";
+import { loadFeed } from "../lib/feed.ts";
+import { count, millions, pct } from "../lib/format.ts";
+import { DEFAULT_VIEW, DIMENSIONS, DIMENSION_KEYS, groups, presets } from "../lib/reach.ts";
+import { LEVER_BOUNDS } from "../lib/scenario.ts";
+import { refreshEffect } from "../lib/refresh.ts";
+import * as routes from "../lib/routes.ts";
+import { yearChip } from "../lib/year.ts";
+
+const { bundle } = loadFeed();
+const s = bundle.statewide;
+
+/* The same worked example the scenario page's held-fixed card uses, priced from the feed's own
+   base-cost provision rather than typed. Null where the feed prices none. */
+const refresh = refreshEffect(bundle.districts, bundle.drafts, s.minimum_state_share);
+
+const heldShare = s.districts > 0 ? s.on_guarantee / s.districts : 0;
+
+/*
+ * The named lever positions, derived from the feed here and carried to the browser as data.
+ *
+ * `presets` reads the priced refresh out of the drafts, which means "Fund the plan" is the bill's
+ * own multiplier rather than a number typed into a script — and where the feed prices no refresh
+ * the button is not rendered at all. The full bundle is passed rather than the slim panel because
+ * this runs at build time and the two agree on every field `presets` touches.
+ */
+const named = presets(bundle);
+
+/* The axis menus, from the one table that also formats and labels them. */
+const axes = DIMENSION_KEYS.map((key) => ({ key, label: DIMENSIONS[key].label }));
+
+/*
+ * The department's own groups, derived from the feed so the picker and the cloud cannot disagree
+ * about what a code is called. Code 0 is offered like any other: three districts in this panel are
+ * ones the department declines to classify, and being able to see where they sit is the point.
+ */
+const types = groups(bundle.districts);
+---
+
+<Base
+  title="Reach"
+  description={`Which of Ohio's ${s.districts} school districts a change in the funding formula actually reaches, and which the guarantee holds still — every district plotted against the aid its formula computes for it.`}
+  image={routes.og.page("reach")}
+  imageAlt="Every Ohio school district plotted against what the formula computes for it, with the guarantee wall"
+  section="reach"
+>
+  <h1>Reach</h1>
+  <p class="sub">
+    Move a lever and see which of Ohio's {count(s.districts)} districts it reaches — and which it
+    passes over. In the department's FY{bundle.fiscal_year} model {count(s.on_guarantee)} of
+    them, {pct(heldShare, 0)}, are paid by the guarantee rather than by the formula, and a
+    formula change reaches those districts last or not at all.
+  </p>
+
+  <div id="scenario-root" data-view="reach">
+    {/* The year chip, rendered here because the client cannot build one. See `scenario.astro`. */}
+    <template id="scenario-chip" set:html={yearChip("formula")} />
+
+    <div class="reach">
+      <div class="reach-stage">
+        {/*
+          What is plotted, over the plot.
+
+          These are not levers and are deliberately not in the rail with them: choosing an axis
+          changes what the picture shows, not what the formula computes, and a reader who cannot
+          tell those apart will read a change of axis as a change of policy. Sitting on the plot's
+          own frame is what says "this describes the drawing below".
+        */}
+        <form id="reach-view" class="reach-axes">
+          <label class="axis-pick">
+            <span>Across</span>
+            <select id="rv-x">
+              {axes.map((a) => <option value={a.key} selected={a.key === DEFAULT_VIEW.x}>{a.label}</option>)}
+            </select>
+          </label>
+          <label class="axis-pick">
+            <span>Up</span>
+            <select id="rv-y">
+              {axes.map((a) => <option value={a.key} selected={a.key === DEFAULT_VIEW.y}>{a.label}</option>)}
+            </select>
+          </label>
+          <label class="axis-pick">
+            <span>Colour</span>
+            <select id="rv-shading">
+              <option value="regime" selected>How it is paid</option>
+              <option value="change">Gained or lost</option>
+              <option value="type">District type</option>
+            </select>
+          </label>
+          {/*
+            Which group is lit, offered only when the colour is the department's grouping.
+
+            One group at a time against the rest, rather than nine colours at once. That is the
+            palette's own limit and not a shortcut — `plot/tokens.ts` carries two hues and a
+            three-step ramp, and the three steps are a measured result — but it is also the better
+            answer to the question actually being asked, which is *where do the poor rural
+            districts sit* rather than *decode nine categories*.
+          */}
+          <label class="axis-pick" id="rv-group-pick" hidden>
+            <span>Which type</span>
+            <select id="rv-group">
+              {
+                types.map((t) => (
+                  <option value={t.code} selected={t.code === DEFAULT_VIEW.highlight}>
+                    {t.short} ({t.districts})
+                  </option>
+                ))
+              }
+            </select>
+          </label>
+          <label class="axis-check">
+            <input type="checkbox" id="rv-trails" checked />
+            <span>Trails</span>
+          </label>
+        </form>
+
+        <noscript>
+          <div class="card err" id="needs-script" data-part="needs-script">
+            <h2><SectionAnchor id="needs-script" />This page needs JavaScript</h2>
+            <p class="note">
+              Every other page on this site carries its figures in the document and reads correctly
+              without any script. This one re-derives Ohio's funding formula over all {
+                count(s.districts)
+              } districts as you move a slider, and plots the result, which is not something a
+              pre-rendered page can do.
+            </p>
+            <p class="note">
+              The underlying data is still available: <a href="/data">the feed and a CSV of the
+              panel</a>, and <a href="/districts">every district's published figures</a>.
+            </p>
+          </div>
+        </noscript>
+
+        {/*
+          One container, unlike `/scenario`'s three. There is no forecast here — the band is a
+          different claim, gated on different checks, and it is drawn once on the page where it is
+          the subject — and no detail half, because the cloud is the whole of this view.
+        */}
+        <div id="scenario-out"></div>
+      </div>
+
+      <aside class="reach-rail">
+        <div class="presets">
+          <h2 class="rail-hd">Start from</h2>
+          <div class="preset-row">
+            {
+              named.map((p) => (
+                <button
+                  type="button"
+                  class="preset"
+                  aria-pressed={p.key === "law" ? "true" : "false"}
+                  data-preset={JSON.stringify(p.levers)}
+                >
+                  <span class="preset-label">{p.label}</span>
+                  <span class="preset-note">{p.note}</span>
+                </button>
+              ))
+            }
+          </div>
+          <p class="note">
+            Every one of these is a position the sliders below can hold. That is a real
+            constraint rather than a note about the buttons: base cost stops at {
+              LEVER_BOUNDS.baseCostScale.max
+            }×, and some districts do not clear their own guarantee anywhere inside that range. A
+            preset for one of them would name a setting this model cannot be put in.
+          </p>
+        </div>
+
+        <ScenarioControls
+          model={s.minimum_state_share}
+          onGuarantee={s.on_guarantee}
+          projection={{ available: false, baseYear: 0, maxYear: 0 }}
+          refresh={refresh}
+        />
+      </aside>
+    </div>
+
+    <p class="note" id="scenario-status"></p>
+  </div>
+
+  {/*
+    The apparatus, under the thing it is apparatus for.
+
+    The geometry has to be stated in prose somewhere — the diagonal is a law and not a trend line,
+    and a reader who does not know that reads the picture as a correlation — but stating it above
+    the picture puts three paragraphs between a reader and the only thing on the page.
+  */}
+  <div class="card" id="what-this-is" data-part="what-this-is">
+    <h2><SectionAnchor id="what-this-is" />What you are looking at</h2>
+    <p class="note">
+      Each district is one point. On the pair the page opens with, that is what the formula computes
+      for it across the bottom and what it is actually paid up the side, both per pupil — and{" "}
+      <strong>nothing can fall below the diagonal</strong>. That is not a trend in the data, it is
+      the rule. A district receives the larger of its formula amount and its guarantee, so a point
+      on the line is paid by the formula and a point above it is held above the formula, with the
+      vertical distance being the guarantee itself.
+    </p>
+    <p class="note">
+      That is what makes the picture worth having. A district <strong>on</strong> the line travels{" "}
+      <em>up</em> it when the formula gets more generous. A district <strong>above</strong> it
+      travels <em>sideways</em> — its formula amount rises, its payment does not, because the
+      guarantee absorbs the difference — until it reaches the line, and only then does another
+      dollar of base cost reach it. <strong>A flat trail is a district your settings do not
+      reach.</strong>
+    </p>
+    <p class="note">
+      The other axes answer the next question, which is <em>who</em> those districts are. Valuation
+      per pupil, the disadvantaged share and enrolment are properties of the district that no lever
+      here moves, so against one of them a district can only travel in the aid direction — which is
+      exactly what makes the pattern legible. Base cost per pupil does move with its lever; state
+      share and local capacity are as the department published them.
+    </p>
+  </div>
+
+  {/* The same limits as the scenario runner, because these are the same levers. */}
+  <HeldFixed districts={bundle.districts} total={s.districts} refresh={refresh} />
+
+  <div class="card" id="baseline" data-part="baseline">
+    <h2><SectionAnchor id="baseline" />What the levers move away from</h2>
+    <p class="note">
+      <strong>Current law here is <a href={routes.wikiNode("legislation", "hb-96-2025")}>Am. Sub.
+      H.B. 96 as enacted</a></strong>, which pays {
+        millions(s.realized_aid_total).replace("+", "")
+      } across {count(s.districts)} districts in FY{bundle.fiscal_year}, {
+        millions(s.guarantee_total).replace("+", "")
+      } of it guarantee money. Every trail starts at that act's own position for the district, so
+      with the controls untouched there is nothing to see moving — which is the correct answer, and
+      the shape of the state is there either way.
+    </p>
+  </div>
+
+  <script>
+    import "../scripts/scenario.ts";
+  </script>
+</Base>

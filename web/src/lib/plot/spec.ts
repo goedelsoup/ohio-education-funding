@@ -677,27 +677,60 @@ export function scatterSpec(
      * distance. Fitted to their own ranges those two axes differed by **1.64×**, so part of the
      * separation the sentence points at was the scale rather than the data.
      *
-     * The y axis needs no equivalent: it is already shared wherever it matters, because the two
-     * charts plot the same measure and their ranges coincide. This exists for the axis where the
-     * two denominators genuinely differ, which is the one a reader must not read as data.
+     * The y axis needs an equivalent now, and the second reason is stronger than the first. On
+     * `/reach` the cloud is redrawn on every slider tick, and an axis fitted to the run it is
+     * drawing refits with it — so dragging base cost holds the points still and moves the *frame*,
+     * which is the exact reading a movement chart must not produce. A domain the caller has fixed
+     * across the whole reachable lever space makes a district that did not move look like a
+     * district that did not move.
+     *
+     * A supplied domain is **authoritative**, and the marks are clipped to it. The first version
+     * made it a floor unioned with the data, on the theory that a bound which turned out too small
+     * should grow rather than clip silently — and that defeated the whole purpose: Kelleys Island
+     * Local has four pupils and $26,700 of aid per pupil, so the union put the axis back on the
+     * outlier at every tick and the frame moved exactly as before. Clipping is not silent where
+     * the caller counts what it clipped, which is what `/reach` does.
+     *
+     * `identity` shares the two across both axes, for the reason its own note gives.
      */
     xDomain?: [number, number];
+    /** As `xDomain`, for the vertical axis. */
+    yDomain?: [number, number];
   },
 ): Spec | null {
   // Two points are not a cloud. Same rule as the line forms, for the same reason: a scatter of
   // three districts would read as a finding about a population that has not been measured.
   if (points.length < 12) return null;
 
-  const xs = points.map((p) => p.x);
-  const ys = points.map((p) => p.y);
+  // Both ends of a displacement, so a trail cannot run out of the frame it is drawn in.
+  const xs = points.flatMap((p) => (p.from ? [p.x, p.from.x] : [p.x]));
+  const ys = points.flatMap((p) => (p.from ? [p.y, p.from.y] : [p.y]));
   const pad = (lo: number, hi: number) => (hi - lo) * 0.04 || Math.abs(hi) * 0.02 || 1;
+  /* A supplied domain wins outright; the marks are clipped to it. See `xDomain`. */
+  const xLo = options.xDomain?.[0] ?? Math.min(...xs);
+  const xHi = options.xDomain?.[1] ?? Math.max(...xs);
+  const yLo = options.yDomain?.[0] ?? Math.min(...ys);
+  const yHi = options.yDomain?.[1] ?? Math.max(...ys);
   const both = options.identity != null;
-  const xMin = both ? Math.min(...xs, ...ys) : (options.xDomain?.[0] ?? Math.min(...xs));
-  const xMax = both ? Math.max(...xs, ...ys) : (options.xDomain?.[1] ?? Math.max(...xs));
-  const yMin = both ? xMin : Math.min(...ys);
-  const yMax = both ? xMax : Math.max(...ys);
-  const xPad = pad(xMin, xMax);
-  const yPad = pad(yMin, yMax);
+  const xMin = both ? Math.min(xLo, yLo) : xLo;
+  const xMax = both ? Math.max(xHi, yHi) : xHi;
+  const yMin = both ? xMin : yLo;
+  const yMax = both ? xMax : yHi;
+  /*
+   * A fitted axis is padded so the extreme points are not on the frame. A supplied one is not.
+   *
+   * The padding is a tenth of the reason a fitted axis reads well and the whole of the reason a
+   * supplied one would not: a caller who asks for `[0, 19175]` because a dollar figure is read as
+   * a height above zero gets `[-767, 19942]` instead, and the baseline floats above the axis line
+   * under a label still reading `$0`. The caller chose the bound; this draws it.
+   *
+   * With `identity` the two axes are one domain, so a domain supplied for either end fixes both.
+   */
+  const supplied = both
+    ? options.xDomain != null || options.yDomain != null
+    : options.xDomain != null;
+  const xPad = supplied ? 0 : pad(xMin, xMax);
+  const yPad = (both ? supplied : options.yDomain != null) ? 0 : pad(yMin, yMax);
 
   const hue = (p: ScatterPoint) =>
     p.band != null
@@ -714,6 +747,14 @@ export function scatterSpec(
    * legend those cards carry is relieving.
    */
   const banded = points.some((p) => p.band != null);
+  /*
+   * The displaced. Compared in the data's own units rather than in pixels, because the scale is
+   * not built yet here — and a district whose movement is under a cent is one the run did not
+   * move, which is a fact about the formula and not about the rendering.
+   */
+  const moved = points.filter(
+    (p) => p.from != null && (Math.abs(p.from.x - p.x) > 0.005 || Math.abs(p.from.y - p.y) > 0.005),
+  );
   const traceHue = (t: Trace) =>
     t.band != null
       ? (ORDINAL[Math.min(ORDINAL.length - 1, Math.max(0, t.band))] as string)
@@ -801,6 +842,39 @@ export function scatterSpec(
             ]
           : []),
 
+        /*
+         * Displacement, where the caller supplied a before position.
+         *
+         * Drawn under the cloud and over the identity line: a trail is where a district came
+         * from, and the dot is where it is now. Only the moved are drawn — a zero-length segment
+         * is 609 invisible marks and, more to the point, a district that did not move should look
+         * like one that did not move.
+         *
+         * This is the second reference geometry this form draws and the note on `identity` says
+         * why there is not a general one: an arbitrary line through a cloud is a claim. A
+         * displacement is not that. It is per-point, it is computed from the same run that placed
+         * the dot, and it is the subject rather than an assertion laid over it — the whole reason
+         * the chart exists is that some of these segments have zero length.
+         */
+        ...(moved.length > 0
+          ? [
+              Plot.link(moved, {
+                x1: (p: ScatterPoint) => p.from?.x ?? p.x,
+                y1: (p: ScatterPoint) => p.from?.y ?? p.y,
+                x2: "x",
+                y2: "y",
+                stroke: hue,
+                strokeWidth: 1,
+                strokeOpacity: 0.45,
+                className: "scatter-trail",
+                /* See `xDomain`. Where a caller has fixed the frame, a point beyond it must be
+                   held at the edge rather than drawn over the card — and where the domain is
+                   fitted to the data, as on every baked chart, nothing is outside to clip. */
+                clip: true,
+              }),
+            ]
+          : []),
+
         Plot.dot(points, {
           x: "x",
           y: "y",
@@ -809,6 +883,9 @@ export function scatterSpec(
           fillOpacity: banded ? 0.62 : 0.45,
           stroke: "none",
           className: "scatter-dot",
+          // As the trails: a fixed frame holds an outlier at the edge rather than painting it
+          // over the card, and a fitted one has nothing outside to clip.
+          clip: true,
         }),
 
         ...traces.flatMap((trace) => [

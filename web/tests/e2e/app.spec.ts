@@ -697,6 +697,13 @@ const ROUTES_WITH_FIGURES = [
    * default state, and "Most affected".
    */
   "/scenario",
+  /*
+   * And the runner's other view. It contributes nothing to the `.tnum`/`.v` filter today — its one
+   * card states its figures in prose, inside a chart's own description — so it is listed for the
+   * same reason `/scenario` was added rather than because it currently catches anything: the
+   * moment a tile lands on it, it is covered.
+   */
+  "/reach",
 ];
 
   test("a card with figures says what year they are on", async ({ page }) => {
@@ -715,7 +722,7 @@ const ROUTES_WITH_FIGURES = [
     const missing: string[] = [];
     for (const route of ROUTES_WITH_FIGURES) {
       await page.goto(route);
-      if (route.endsWith("/scenario")) {
+      if (route.endsWith("/scenario") || route === "/reach") {
         /*
          * Past a lever, not merely past the first render.
          *
@@ -729,7 +736,13 @@ const ROUTES_WITH_FIGURES = [
          */
         await page.locator("#lv-base").fill("1.05");
         await page.locator("#lv-base").dispatchEvent("input");
-        await expect(page.locator('[data-part="outcome"]')).toBeVisible();
+        // `/reach` renders one card and it is not the scenario's headline. It is the only one of
+        // the three views whose card is there before a lever moves — the guarantee wall does not
+        // depend on the levers — but it is waited for past the lever anyway, so the sweep sees the
+        // card the reader sees rather than the one the page opened with.
+        await expect(
+          page.locator(route === "/reach" ? '[data-part="positions"]' : '[data-part="outcome"]'),
+        ).toBeVisible();
         if (route === "/scenario") {
           await expect(page.locator('#projection-out [data-part="projection"]')).toBeVisible();
         }
@@ -951,6 +964,9 @@ const ROUTES_WITH_FIGURES = [
     // slider moves, so it is the one place a charting library earns its download.
     expect(await weigh(`/district/${CLEVELAND}`)).toBe(1);
     expect(await weigh("/scenario")).toBe(2);
+    // And on the reach view, for the same reason and the same one extra script: its cloud is
+    // redrawn on every lever tick.
+    expect(await weigh("/reach")).toBe(2);
   });
 
   test("the CSV has one row per district and a header", async ({ request }) => {
@@ -1324,12 +1340,13 @@ test.describe("routes", () => {
     const hrefs = await page
       .locator("header.site nav a")
       .evaluateAll((nodes) => nodes.map((n) => (n as HTMLAnchorElement).getAttribute("href")!));
-    // Thirty-one across five groups. An exact count rather than a floor, so that dropping an
+    // Thirty-two across five groups. An exact count rather than a floor, so that dropping an
     // entry fails here and adding one is an acknowledged change — and so that a derivation which
     // quietly stops selecting anything cannot pass by returning an empty menu. It went from
-    // thirty to thirty-one when `/legislation` joined the `Law` panel, which is the mechanism
-    // working: the count had to be changed on purpose by somebody who knew why.
-    expect(hrefs).toHaveLength(31);
+    // thirty to thirty-one when `/legislation` joined the `Law` panel, and to thirty-two when
+    // `/reach` joined `Research` beside the scenario runner it splits the second question off.
+    // Which is the mechanism working: the count is changed on purpose by somebody who knew why.
+    expect(hrefs).toHaveLength(32);
     for (const href of hrefs) {
       await page.goto(href);
       await expect(page.locator("h1"), `${href} has no heading`).toBeVisible();
@@ -2529,6 +2546,7 @@ test.describe("axe", () => {
     ["a district's outcomes", `/district/${CLEVELAND}/outcome`],
     ["a district's taxes", `/district/${CLEVELAND}/taxes`],
     ["the scenario runner, which rewrites itself", "/scenario"],
+    ["the reach view, which is the runner asking who rather than how much", "/reach"],
     ["the comparison", `/compare?a=${CLEVELAND}&b=${NORTHERN}`],
     ["a county", "/county/cuyahoga"],
     ["the counties index", "/counties"],
@@ -2548,7 +2566,7 @@ test.describe("axe", () => {
       await page.goto(route);
       // The scenario and comparison routes compute in the browser; scanning before they have
       // rendered would be scanning an empty container and calling it clean.
-      if (route.startsWith("/scenario")) {
+      if (route.startsWith("/scenario") || route.startsWith("/reach")) {
         await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
       }
       if (route.startsWith("/compare")) await expect(page.locator("#compare-out table")).toBeVisible();
@@ -2732,6 +2750,237 @@ test.describe("the section menus", () => {
     const last = law.locator(".menu-panel a").last();
     await last.scrollIntoViewIfNeeded();
     await expect(last).toBeInViewport();
+  });
+});
+
+/*
+ * The runner's two views, and the one thing that has to be true of a split.
+ *
+ * `/scenario` and `/reach` run the same levers over the same panel and ask different questions of
+ * the answer — how much, and who. That only pays for itself if each page asks one of them and the
+ * reader can cross between them without losing their settings, which is what these assert.
+ */
+test.describe("reach", () => {
+  /**
+   * Wait for the runner to have booted before touching a control.
+   *
+   * The scenario routes fetch the panel, verify it against the Rust checkpoints, and only then
+   * attach their listeners — so a click or a drag that lands before that is an input event with
+   * nothing listening, and the page afterwards looks exactly as if the reader had never touched
+   * it. On the preset row it is worse than a no-op: the pressed state is server-rendered on
+   * "Current law", so a swallowed click leaves exactly one button pressed and it is the wrong one,
+   * which passes a count assertion and fails a text one.
+   *
+   * The cloud is the signal because it is written by the same `render()` the controls call.
+   */
+  const booted = (page: Page) =>
+    expect(page.locator('#scenario-out [data-part="positions"], #scenario-out .card')).not.toHaveCount(0);
+
+  test("the cloud is drawn before any lever moves, and the scenario's is gone", async ({ page }) => {
+    /*
+     * The case for the page being a page. Every other thing the runner draws is blank at rest —
+     * under current law nothing has moved, so there is no distribution to bin and no ranking to
+     * make — and this one is not, because the guarantee wall is a property of the formula rather
+     * than of a lever position. A reader who lands here from the bar sees the shape of the state.
+     */
+    await page.goto("/reach");
+    await booted(page);
+    await expect(page.locator('#scenario-out [data-part="positions"]')).toBeVisible();
+    // `:visible` because every chart is drawn twice, at both container widths, and the stylesheet
+    // picks one. See `renderToString`.
+    await expect(page.locator('[data-chart="positions"] svg.plot:visible')).toBeVisible();
+
+    // And it is not on both pages. A split that leaves the card behind is two copies to keep true.
+    await page.goto("/scenario");
+    await booted(page);
+    await page.locator("#lv-base").fill("1.05");
+    await page.locator("#lv-base").dispatchEvent("input");
+    await expect(page.locator('[data-part="distribution"]')).toBeVisible();
+    await expect(page.locator('[data-part="positions"]')).toHaveCount(0);
+  });
+
+  test("crossing between the two views keeps the levers", async ({ page }) => {
+    /*
+     * The failure this closes is silent: a link to the other question that drops the settings
+     * offers the reader that question about a scenario they are no longer looking at, and the page
+     * it lands on looks perfectly correct — it is just answering about current law.
+     */
+    await page.goto("/scenario");
+    await booted(page);
+    await page.locator("#lv-base").fill("1.12");
+    await page.locator("#lv-base").dispatchEvent("input");
+    await page.locator('[data-part="distribution"] a[data-carry-levers]').click();
+
+    await expect(page).toHaveURL(/\/reach\?.*base=1\.12/);
+    await expect(page.locator("#lv-base")).toHaveValue("1.12");
+    await expect(page.locator('#scenario-out [data-part="positions"]')).toBeVisible();
+
+    // And back the other way, from the lever position the first leg arrived at.
+    await page.locator('[data-part="positions"] a[data-carry-levers]').click();
+    await expect(page).toHaveURL(/\/scenario\?.*base=1\.12/);
+    await expect(page.locator("#lv-base")).toHaveValue("1.12");
+    await expect(page.locator('[data-part="outcome"]')).toBeVisible();
+  });
+
+  test("the axes hold still while the levers move", async ({ page }) => {
+    /*
+     * The defect this closes, which is the one a movement chart cannot have.
+     *
+     * The axes were fitted to the run being drawn, so dragging base cost held the cloud still and
+     * moved the *frame* underneath it — and a reader cannot tell from that whether the districts
+     * moved or the ruler did. It also made the trails meaningless: a segment between two positions
+     * only says something if the two are measured on one scale.
+     *
+     * Read off the drawn labels rather than off the domain, because the label is what the reader
+     * actually compares between ticks.
+     */
+    const ends = async () => {
+      const html = await page.locator('[data-chart="positions"]').innerHTML();
+      return [...html.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]).join("|");
+    };
+
+    await page.goto("/reach");
+    await booted(page);
+    const frame = await ends();
+    expect(frame).toContain("$0");
+
+    for (const value of ["0.8", "1.3"]) {
+      await page.locator("#lv-base").fill(value);
+      await page.locator("#lv-base").dispatchEvent("input");
+      expect(await ends(), `base cost ${value} moved the frame`).toBe(frame);
+    }
+    // And the two levers that reshape the picture hardest: the floor removed, and the floor under
+    // the state share raised to its ceiling.
+    await page.locator("#lv-guarantee").selectOption("removed");
+    await page.locator("#lv-guarantee").dispatchEvent("input");
+    expect(await ends(), "removing the guarantee moved the frame").toBe(frame);
+    await page.locator("#lv-min").fill("0.3");
+    await page.locator("#lv-min").dispatchEvent("input");
+    expect(await ends(), "the minimum state share moved the frame").toBe(frame);
+  });
+
+  test("the districts the frame cannot hold are counted, not fitted to", async ({ page }) => {
+    /*
+     * Kelleys Island Local has four pupils. Its aid per pupil is $26,700 against a 99th percentile
+     * of $15,305 and its base cost per pupil is $371,449 against $12,221 — so an axis fitted to it
+     * makes the other six hundred districts a smudge against the left edge. The frame is a
+     * quantile and the marks are clipped to it, which is only honest if the page says how many it
+     * clipped.
+     */
+    await page.goto("/reach");
+    await booted(page);
+    const notes = page.locator('[data-part="positions"] .note');
+    await expect(notes.filter({ hasText: "sit outside the frame" })).toHaveCount(1);
+    await expect(notes.filter({ hasText: "Kelleys Island" })).toHaveCount(1);
+
+    // A share cannot leave 0–1, so that frame holds everybody and the note is absent rather than
+    // reading "0 districts" — an absence stated is worse than an absence.
+    await page.locator("#rv-x").selectOption("poverty");
+    await page.locator("#rv-y").selectOption("stateShare");
+    await expect(notes.filter({ hasText: "sit outside the frame" })).toHaveCount(0);
+  });
+
+  test("choosing an axis changes the drawing and takes the wall with it", async ({ page }) => {
+    /*
+     * The identity line asserts `y ≥ x` as a law, and that is true of realized against formula aid
+     * and of no other pair the menu can make. Left drawn on, say, valuation against poverty it
+     * would be a reference line through a cloud that means nothing — which is the one thing
+     * `scatterSpec`'s own note on `identity` says this form must never do. So it is gated on the
+     * pair rather than on a flag, and this is the check that the gate is on the pair.
+     */
+    await page.goto("/reach");
+    await booted(page);
+    await expect(page.locator(".scatter-identity")).not.toHaveCount(0);
+
+    await page.locator("#rv-x").selectOption("valuation");
+    await page.locator("#rv-y").selectOption("poverty");
+    await expect(page.locator(".scatter-identity")).toHaveCount(0);
+    await expect(page.locator('[data-chart="positions"] svg.plot:visible circle')).not.toHaveCount(0);
+    // And the pair travels, so a cloud is worth sending somebody in the axes it was read in.
+    await expect(page).toHaveURL(/vx=valuation/);
+    await expect(page).toHaveURL(/vy=poverty/);
+
+    await page.locator("#rv-x").selectOption("formula");
+    await page.locator("#rv-y").selectOption("realized");
+    await expect(page.locator(".scatter-identity")).not.toHaveCount(0);
+  });
+
+  test("a preset is a position, so exactly one of them is ever pressed", async ({ page }) => {
+    /*
+     * They were patches first — each naming only the fields it changed, so two could compose — and
+     * the row then reported three buttons pressed at once under a heading reading "Start from".
+     * Three simultaneous selections is a lie about what the reader is looking at.
+     *
+     * "Fund the plan" is also the one whose value the sliders cannot hold exactly: the feed prices
+     * the refresh at 1.0395 and the control steps by 0.01, so a preset compared by equality would
+     * read unpressed the instant it was pressed.
+     */
+    await page.goto("/reach");
+    await booted(page);
+    const pressed = page.locator('[data-preset][aria-pressed="true"]');
+    await expect(pressed).toHaveCount(1);
+    await expect(pressed).toContainText("Current law");
+
+    await page.locator('.preset:has-text("Fund the plan")').click();
+    await expect(pressed).toHaveCount(1);
+    await expect(pressed).toContainText("Fund the plan");
+    expect(Number(await page.locator("#lv-base").inputValue())).toBeGreaterThan(1);
+
+    await page.locator('.preset:has-text("Retire half the floor")').click();
+    await expect(pressed).toHaveCount(1);
+    await expect(pressed).toContainText("Retire half the floor");
+    // A position, not a patch: the base cost the previous preset set is back at current law.
+    await expect(page.locator("#lv-base")).toHaveValue("1");
+    await expect(page.locator("#lv-guarantee")).toHaveValue("phase-out");
+
+    // And a slider nudged off a preset stops reading as one, because the state is derived.
+    await page.locator("#lv-min").fill("0.2");
+    await page.locator("#lv-min").dispatchEvent("input");
+    await expect(pressed).toHaveCount(0);
+  });
+
+  test("turning the trails off leaves the cloud and removes the segments", async ({ page }) => {
+    await page.goto("/reach");
+    await booted(page);
+    await page.locator("#lv-base").fill("1.12");
+    await page.locator("#lv-base").dispatchEvent("input");
+    await expect(page.locator(".scatter-trail path")).not.toHaveCount(0);
+
+    await page.locator("#rv-trails").uncheck();
+    await expect(page.locator(".scatter-trail path")).toHaveCount(0);
+    await expect(page.locator('[data-chart="positions"] svg.plot:visible circle')).not.toHaveCount(0);
+    await expect(page).toHaveURL(/t=0/);
+  });
+
+  test("a district that the guarantee holds draws a trail that runs flat", async ({ page }) => {
+    /*
+     * The finding the page exists for, asserted on the drawing rather than on the model.
+     *
+     * `scatterSpec` emits a displacement segment only for the points that moved, so under a base
+     * cost rise there is one per district whose formula amount changed — which is every district,
+     * held or not. What separates the two is whether the segment is level: a held district's
+     * payment does not move, so `y1 === y2`. If that ever stopped being true the picture would
+     * still look plausible and would be claiming the guarantee reaches people it does not.
+     */
+    await page.goto("/reach");
+    await booted(page);
+    await page.locator("#lv-base").fill("1.12");
+    await page.locator("#lv-base").dispatchEvent("input");
+    // Plot's `className` lands on the mark's `<g>`; the segments themselves are `<path>`, one per
+    // district that moved, each a two-point `M…L…`.
+    await expect(page.locator(".scatter-trail path")).not.toHaveCount(0);
+
+    const flat = await page.locator(".scatter-trail path").evaluateAll((nodes) =>
+      nodes.filter((n) => {
+        const pairs = [...(n.getAttribute("d") ?? "").matchAll(/(-?[\d.]+),(-?[\d.]+)/g)];
+        if (pairs.length < 2) return false;
+        const first = pairs[0]!;
+        const last = pairs[pairs.length - 1]!;
+        return Math.abs(Number(first[2]) - Number(last[2])) < 0.5;
+      }).length,
+    );
+    expect(flat, "a base-cost rise has to leave some held district exactly where it was")
+      .toBeGreaterThan(0);
   });
 });
 

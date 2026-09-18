@@ -146,6 +146,16 @@ const CONTAINERS: Exempt[] = [
  * than about Ohio in a year.
  */
 const NOT_A_MEASUREMENT: Record<string, Allowance> = {
+  "reach.html": {
+    figures: ["25%"],
+    reason:
+      "A lever position, not a measurement. `Minimum share at 25%` names one of the presets on " +
+      "that page — a setting a reader can put the formula into, on the same footing as the " +
+      "slider it moves — and a fiscal year on it would assert that the *setting* was measured in " +
+      "a year. The minimum state share Ohio actually pays is on the page beside it, dated, in " +
+      "cards that carry the chip. `ScenarioControls.astro` has the same exemption from the year " +
+      "rule for the same reason: the levers are named for what they are, not for when.",
+  },
   "method.html": {
     figures: ["60%", "2.5%", "$4.7", "4.4%", "$7.13B", "3.4%"],
     reason:

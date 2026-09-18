@@ -1118,6 +1118,10 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: var(--space-2); vertical-align: baseline; }
 .sw.formula, .sw.gain { background: var(--series-formula); }
 .sw.guarantee, .sw.loss { background: var(--series-guarantee); }
+/* The third state of a two-hue split: a district the levers did not move. Not a hue, deliberately
+   — an unmoved district has no polarity, and `SERIES.neutral` is the mark the charts already use
+   for it. */
+.sw.neutral { background: var(--neutral-mark); }
 /* The ordinal ramp, for a chart grouping districts into ordered bands. Its legend is not
    optional: the lightest step light and the darkest step dark sit near 2.2:1 against their
    surface, and this is the relief that buys. */
@@ -1689,6 +1693,84 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
 .lever .n { font-size: var(--text-xs); color: var(--text-muted); margin-top: .25rem; }
 
 /*
+ * `/reach`: one picture, and the controls for it.
+ *
+ * Every other page on this site is a column of cards, because every other page is a set of
+ * findings a reader works down. This one has a single finding and it is a drawing — so the
+ * drawing takes the stage and the controls sit beside it, where a reader can hold the plot and
+ * the slider they are dragging in one view. A card stack would put the levers a scroll away from
+ * the thing they move, which on a control surface is the whole cost.
+ *
+ * The rail carries the scenario runner's own `ScenarioControls`, unchanged. What changes is the
+ * frame: the card chrome comes off so a reader sees levers rather than a box containing levers,
+ * and the lever grid collapses to one column because the rail is 260px and not a page.
+ */
+.reach { display: grid; gap: var(--space-6); align-items: start; }
+@media (min-width: 60rem) {
+  /* Rail second in the source so the picture is first for a screen reader and on a phone, and
+     placed first here because a control surface reads left-to-right. */
+  .reach { grid-template-columns: 17rem minmax(0, 1fr); }
+  .reach-stage { order: 2; }
+  .reach-rail { order: 1; position: sticky; top: var(--space-6); }
+}
+.reach-stage { min-width: 0; }
+
+/* The stage's own card: the plot is the page, so it loses the inner padding that would inset a
+   640px drawing inside a box inside a column. */
+.stage { padding: var(--space-4) var(--space-4) var(--space-5); }
+
+/* What is plotted, stated on the plot's own frame rather than among the levers — these change the
+   drawing and not the model, and a reader must not read an axis change as a policy change. */
+.reach-axes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-5);
+  align-items: end;
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+.axis-pick { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; flex: 1 1 13rem; }
+/* `display` in a class rule beats the UA stylesheet's `[hidden] { display: none }`, so a control
+   the runner hides stays on screen. The group picker is hidden whenever the colour is not the
+   department's grouping, and without this it was visible and inert at every other setting. */
+.axis-pick[hidden] { display: none; }
+.axis-pick > span,
+.rail-hd {
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.axis-pick select { width: 100%; }
+.axis-check { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); }
+
+.rail-hd { margin: 0 0 var(--space-3); font-weight: var(--weight-semibold); }
+.preset-row { display: grid; gap: var(--space-2); }
+/* A preset is a lever position with a name, so the button carries the name and what the setting
+   is — the second line is the figure, never decoration. */
+.preset {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--space-3);
+  border: 1px solid var(--border-control);
+  border-radius: var(--radius-md);
+  background: var(--surface-1);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+.preset:hover { border-color: var(--accent-rule); }
+.preset[aria-pressed="true"] { border-color: var(--accent-rule); background: var(--surface-2); }
+.preset-label { display: block; font-weight: var(--weight-semibold); font-size: var(--text-sm); }
+.preset-note { display: block; font-size: var(--text-xs); color: var(--text-muted); margin-top: .15rem; }
+
+.reach-rail .presets { margin-bottom: var(--space-6); }
+/* The card chrome off, the levers to one column: see the note above. */
+.reach-rail > .card { border: 0; background: none; padding: 0; margin: 0; }
+.reach-rail .levers { grid-template-columns: 1fr; gap: var(--space-4); }
+
+/*
  * The wiki.
  *
  * Corpus prose is long-form and argumentative in a way nothing else on this site is, so it gets a
@@ -2208,6 +2290,7 @@ tr.series-break > td {
   }
   .sw.formula, .sw.gain { border-style: solid; }
   .sw.guarantee, .sw.loss { border-style: dashed; }
+  .sw.neutral { border-style: dotted; }
   /* The ordinal ramp is ordered, so its second channel is ordered too: sparse to solid, running
      the same direction as light to dark. */
   .sw.ordinal-1 { border-style: dotted; }

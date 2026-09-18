@@ -50,6 +50,7 @@ export type Section =
   | "outcomes"
   | "history"
   | "scenario"
+  | "reach"
   | "wiki"
   | "method"
   | "data";
@@ -426,6 +427,9 @@ export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavGroup[] {
             },
             { key: "history", href: "/history", label: "History", note: "the Census long view" },
             { key: "scenario", href: "/scenario", label: "Scenario", note: "re-run the formula" },
+            /* Beside the runner rather than under it: they drive the same levers and ask
+               different questions of them — how much, and who. */
+            { key: "reach", href: routes.REACH, label: "Reach", note: "who the guarantee holds still" },
           ],
         },
       ],

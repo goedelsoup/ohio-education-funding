@@ -632,7 +632,10 @@ export function renderScenario(bundle: Panel, levers: Levers, chip = ""): Render
           <span><i class="sw gain"></i> Aid rises</span>
         </div>
         <p class="note">Districts by change in state aid per pupil. Bars are counts, not
-          dollars — a tall bar near zero is many districts barely affected.</p>`
+          dollars — a tall bar near zero is many districts barely affected. This is
+          <em>how much</em>; <a href="${routes.REACH}" data-carry-levers>which districts these
+          settings reach</a> is a different question, and on a formula that pays the larger of two
+          numbers it has a different answer.</p>`
           : `<p class="note">No district's funding changes under these settings.</p>`
       }
     </div>
