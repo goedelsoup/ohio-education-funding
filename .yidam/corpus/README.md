@@ -320,8 +320,8 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1669 | supported by a committed primary source |
-| `[inference]` | 342 | drawn from verified facts, not witnessed |
+| `[verified]` | 1676 | supported by a committed primary source |
+| `[inference]` | 344 | drawn from verified facts, not witnessed |
 | `[open]` | 205 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
@@ -379,7 +379,7 @@ leave the corpus and are not counted.
 -->
 | Measure | Count |
 |---|--:|
-| edges between nodes | 575 |
+| edges between nodes | 576 |
 | distinct relationships in use | 166 |
 | relationships declared across every class | 70 |
 | edges whose relationship its class does not declare | 296 |
@@ -414,7 +414,7 @@ Sorted by: kind, then alphabetically.
 | [`adequacy`](doctrine/adequacy.yml) | doctrine | Adequacy | 8 | 25 |
 | [`equity`](doctrine/equity.yml) | doctrine | Equity | 12 | 32 |
 | [`thorough-and-efficient`](doctrine/thorough-and-efficient.yml) | doctrine | Thorough and Efficient | 5 | 14 |
-| [`fund-the-plan-and-retire-the-guarantee`](draft-legislation/fund-the-plan-and-retire-the-guarantee.yml) | draft-legislation | Fund the Plan and Retire the Guarantee | 8 | 0 |
+| [`fund-the-plan-and-retire-the-guarantee`](draft-legislation/fund-the-plan-and-retire-the-guarantee.yml) | draft-legislation | Fund the Plan and Retire the Guarantee | 9 | 0 |
 | [`hb-643-136-introduced`](draft-legislation/hb-643-136-introduced.yml) | draft-legislation | H.B. 643 (136th G.A., as introduced) | 3 | 1 |
 | [`hb-96-136-as-introduced`](draft-legislation/hb-96-136-as-introduced.yml) | draft-legislation | H.B. 96 (136th G.A., as introduced) | 7 | 1 |
 | [`hb-96-136-as-passed-house`](draft-legislation/hb-96-136-as-passed-house.yml) | draft-legislation | H.B. 96 (136th G.A., as passed by the House) | 9 | 1 |
@@ -515,7 +515,7 @@ Sorted by: kind, then alphabetically.
 | [`preschool-special-education-amounts`](parameter/preschool-special-education-amounts.yml) | parameter | Preschool Special Education Amounts | 6 | 5 |
 | [`special-education-category-multiples`](parameter/special-education-category-multiples.yml) | parameter | Special Education Category Multiples | 6 | 5 |
 | [`targeted-assistance-rates`](parameter/targeted-assistance-rates.yml) | parameter | Targeted Assistance Rates | 6 | 1 |
-| [`transportation-cost-rates`](parameter/transportation-cost-rates.yml) | parameter | Transportation Cost Rates | 6 | 1 |
+| [`transportation-cost-rates`](parameter/transportation-cost-rates.yml) | parameter | Transportation Cost Rates | 6 | 2 |
 | [`twenty-mill-floor`](parameter/twenty-mill-floor.yml) | parameter | Twenty-Mill Floor | 5 | 8 |
 | [`autism-scholarship`](program/autism-scholarship.yml) | program | Autism Scholarship | 4 | 1 |
 | [`classroom-facilities-assistance`](program/classroom-facilities-assistance.yml) | program | Classroom Facilities Assistance Program | 3 | 2 |
