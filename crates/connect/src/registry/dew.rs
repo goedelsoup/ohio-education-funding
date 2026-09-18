@@ -63,6 +63,31 @@ pub(super) const FOUNDATION: Connector = Connector {
                    third of seven sheets.",
         },
         Source {
+            key: "fy25-payment-report",
+            title: Some("FY2025 Final Traditional District Foundation Payment Report"),
+            // Openly served, and the only complete FY2025 artefact there is. The FY2025
+            // calculator was replaced in place like FY2026's, but its archive captures are
+            // truncated at exactly 1 MiB — 1,033,192 bytes stored against FY2026's 4,187,092 —
+            // so the workbook cannot be read from the Wayback Machine at all.
+            url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
+                  School-Payment-Reports/State-Funding-For-Schools/\
+                  Traditional-School-Districts/Districts-Payment-Reports-in-Excel/\
+                  2025-11-07_TRAD_Foundation_Payment-1.xlsx.aspx?lang=en-US",
+            filename: "fy25-payment-report.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-sfpr-line-by-line"),
+            fixtures: &[crate::fixtures::FY25_FIXTURE],
+            note: "`Final #2`, published 7 November 2025 — what districts were actually paid \
+                   for FY2025, after the year closed, rather than what a calculator projected \
+                   before it. That makes it the right baseline for a biennium comparison and \
+                   not merely the available one. It also carries `[J] Supplemental Targeted \
+                   Assistance` per district: the tier H.B. 96 repealed, which \
+                   `fsfp-targeted-assistance` records as a live zero whose payment was never \
+                   computed from its rate. This is the last year it was paid. Its bracketed \
+                   column letters are **not** FY2026's — the scheme shifted when the act \
+                   removed one line and added two — so the extractor matches label text.",
+        },
+        Source {
             key: "fy26-calculator",
             title: Some("FY26 TRAD State Foundation Funding Calculator"),
             // The only address this file still has. The department replaced it in place when the

@@ -637,6 +637,52 @@ pub struct NationalPosition {
     pub spending_per_pupil_percentile: f64,
 }
 
+/// The FY2025→FY2027 change split across the department's payment lines.
+///
+/// Mirrors [`project::biennium::Lines`]. Exhaustive: the five sum to the change in
+/// [`Biennium::total_state_support`] between its first and last year.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct BienniumLines {
+    /// Core foundation funding plus the guarantee — zero for a district held at its base
+    /// throughout, which is 273 of the 609.
+    pub foundation: Dollars,
+    /// Transportation.
+    pub transportation: Dollars,
+    /// Special education transportation.
+    pub special_education_transportation: Dollars,
+    /// Preschool special education.
+    pub preschool_special_education: Dollars,
+    /// Everything else, as a residual so the five are exhaustive whatever an act does to the
+    /// supplements.
+    pub supplements: Dollars,
+}
+
+/// What this district was paid across the biennium, on **two measures that disagree**.
+///
+/// Statewide the two point opposite ways over these years — total state support rises $145.0M and
+/// foundation aid falls $114.5M — so a page showing one of them without saying which has told the
+/// reader that Ohio's school funding went up, or that it went down, by a choice nobody wrote down.
+/// Both are carried here for that reason, and [`crate::SeriesYear`]'s `biennium` row is what dates
+/// them.
+///
+/// Every year is observed. The model projects `foundation_aid` only, so this does not extend past
+/// the terminal year and no consumer should append a forecast to it — see
+/// [`mod@project::biennium`].
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Biennium {
+    /// The three fiscal years these figures are for, oldest first.
+    ///
+    /// Carried as data so no page writes a year. `series_years`' `biennium` row dates the card as
+    /// a span; these date its three columns, and a year that moves in the model moves both.
+    pub years: [u16; 3],
+    /// `[R] Total State Support` in each year, oldest first.
+    pub total_state_support: [Dollars; 3],
+    /// Core foundation funding plus the guarantee in each year — the narrow measure.
+    pub foundation_aid: [Dollars; 3],
+    /// What the change in the wide measure is made of.
+    pub lines: BienniumLines,
+}
+
 /// One district, as the web layer needs it.
 #[derive(Debug, Clone, PartialEq)]
 pub struct District {
@@ -750,6 +796,8 @@ pub struct District {
     pub formula_aid_per_pupil: Dollars,
     /// State aid per pupil as the district receives it.
     pub realized_aid_per_pupil: Dollars,
+    /// The three observed years of the biennium, on both measures.
+    pub biennium: Biennium,
     /// Temporary transitional aid guarantee, total dollars.
     pub guarantee: Dollars,
     /// Whether the minimum state share is what sets this district's base cost aid.

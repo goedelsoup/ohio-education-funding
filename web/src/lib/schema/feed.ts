@@ -700,6 +700,39 @@ export const DistrictSchema = z
       .strict(),
     formula_aid_per_pupil: num,
     realized_aid_per_pupil: num,
+    /**
+     * The three observed years of the biennium, on two measures that disagree.
+     *
+     * `total_*` is the department's `[R] Total State Support`; `foundation_*` is core foundation
+     * funding plus the guarantee, which is the narrow measure `crates/project` computes and the
+     * only one it can project. Statewide over these years the two move in opposite directions —
+     * total state support up $145.0M, foundation aid down $114.5M — so a figure drawn from here
+     * has to say which it is. `web/src/lib/biennium.ts` is the only module that reads them.
+     *
+     * `year_*` are the three fiscal years as data, so no page writes one. `series_years`'
+     * `biennium` row dates the card as a span; these date its three columns.
+     *
+     * `line_*` splits the change on the wide measure across the department's payment lines and is
+     * exhaustive: the five sum to `total_terminal - total_baseline` to the cent.
+     */
+    biennium: z
+      .object({
+        year_baseline: num,
+        year_middle: num,
+        year_terminal: num,
+        total_baseline: num,
+        total_middle: num,
+        total_terminal: num,
+        foundation_baseline: num,
+        foundation_middle: num,
+        foundation_terminal: num,
+        line_foundation: num,
+        line_transportation: num,
+        line_special_education_transportation: num,
+        line_preschool_special_education: num,
+        line_supplements: num,
+      })
+      .strict(),
     guarantee: num,
     on_guarantee: z.boolean(),
     /** At or below the statutory floor, so reduction factors have stopped operating. */

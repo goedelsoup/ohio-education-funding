@@ -22,6 +22,26 @@ pub const FY27_FIXTURE: &str = "crates/foundation/fixtures/fy27-department-model
 /// [`super::fy26`] for why the catalog's decision not to take these tables at all was wrong.
 pub const FY26_FIXTURE: &str = "crates/project/fixtures/fy26-department-model.csv";
 
+/// The FY2025 baseline: what each district was actually paid, from the department's final
+/// payment report rather than from a calculator.
+///
+/// # Why the baseline is a payment report and not a model
+///
+/// Every other year here comes from a `State Foundation Funding Calculator`. FY2025's is archived
+/// only in captures truncated at exactly 1 MiB — 1,033,192 bytes stored against FY2026's
+/// 4,187,092 — so the workbook cannot be read from the archive at all. The department's **final**
+/// payment report is open, complete, and is in one respect the better source: it is what was
+/// paid, after the year closed, rather than what a model projected before it.
+///
+/// # And its letters are not the other years' letters
+///
+/// `Summary SFPR` labels its columns `[Aa]`…`[T]`, and the scheme **shifted** when H.B. 96
+/// removed supplemental targeted assistance and added two supplements. In FY2025 `[M]` is
+/// `Total Formula Funding`; in FY2026 `[M]` is the enrollment growth supplement and `[N]` is the
+/// total. A reader keyed on the letter takes the wrong column and reports a plausible number, so
+/// [`super::fy25`] reads by the label's **text** and errors on a tag it cannot find.
+pub const FY25_FIXTURE: &str = "crates/project/fixtures/fy25-payment-report.csv";
+
 /// The statewide scalars each year's funding calculator states once, one row per fiscal year.
 ///
 /// The file a `parameter` node's `series:` should be read off. Several of them said "no
@@ -263,6 +283,7 @@ pub const CATALOG_BASIS_FIXTURE: &str = "crates/project/fixtures/catalog-line-it
 pub const REBUILT: &[&str] = &[
     FY27_FIXTURE,
     FY26_FIXTURE,
+    FY25_FIXTURE,
     CALCULATOR_SCALARS_FIXTURE,
     CALCULATOR_COUNTS_FIXTURE,
     CALCULATOR_VINTAGES_FIXTURE,

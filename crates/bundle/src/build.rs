@@ -41,12 +41,13 @@
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 use crate::{
-    AppropriationLine, AppropriationYear, BaseCostBuildUp, Bundle, CareerTechnical, CasinoYear,
-    Categoricals, Checkpoint, Deflator, District, DistrictOutcome, Dpia, Draft, DraftProvision,
-    EnglishLearners, FinanceYear, ForecastCheckpoint, Gifted, HistoryYear, HouseDistrictMember,
-    HouseDistrictShare, MealProgramYear, MillageAnalysis, National, OutcomeStatewide, PolicyShape,
-    Projection, PropertyTaxYear, RegimeCounterfactual, SeriesYear, SpecialEducation,
-    SpendingByFunction, StateFinance, Statewide, TargetedAssistance, YearKind, CONTRACT_VERSION,
+    AppropriationLine, AppropriationYear, BaseCostBuildUp, Biennium, BienniumLines, Bundle,
+    CareerTechnical, CasinoYear, Categoricals, Checkpoint, Deflator, District, DistrictOutcome,
+    Dpia, Draft, DraftProvision, EnglishLearners, FinanceYear, ForecastCheckpoint, Gifted,
+    HistoryYear, HouseDistrictMember, HouseDistrictShare, MealProgramYear, MillageAnalysis,
+    National, OutcomeStatewide, PolicyShape, Projection, PropertyTaxYear, RegimeCounterfactual,
+    SeriesYear, SpecialEducation, SpendingByFunction, StateFinance, Statewide, TargetedAssistance,
+    YearKind, CONTRACT_VERSION,
 };
 use dispersion::census_states::StateFinance as CensusState;
 use dispersion::mr81::poverty_share_by_year;
@@ -522,6 +523,50 @@ struct Joins<'a> {
     /// The casino county student fund by fiscal year, and the county funds the district was last
     /// paid out of. Absent for a district the Department of Taxation's sheets do not name.
     casino: Option<&'a (Vec<CasinoYear>, Option<usize>)>,
+    /// The district's three observed years, or `None` for one the payment files do not carry.
+    ///
+    /// Built once for the whole panel rather than looked up per district: `biennium::at` walks
+    /// three fixtures per call, which over 609 districts is 1,827 fixture parses.
+    biennium: Option<&'a project::biennium::Row>,
+}
+
+/// The biennium block, or zeroes for a district the payment files do not carry.
+///
+/// Zeroes rather than `Option` because every district in the committed panel is in all three
+/// files — `the_biennium_a_district_was_paid_across.rs` asserts the join is 609 of 609 — so the
+/// absent case is unreachable and a nullable field would be a shape the web has to handle and
+/// never sees.
+fn biennium_of(row: Option<&project::biennium::Row>) -> Biennium {
+    use project::biennium::{BASELINE_YEAR, MIDDLE_YEAR};
+    let Some(row) = row else {
+        return Biennium {
+            years: [BASELINE_YEAR.0, MIDDLE_YEAR.0, MODEL_YEAR.0],
+            total_state_support: [0.0; 3],
+            foundation_aid: [0.0; 3],
+            lines: BienniumLines {
+                foundation: 0.0,
+                transportation: 0.0,
+                special_education_transportation: 0.0,
+                preschool_special_education: 0.0,
+                supplements: 0.0,
+            },
+        };
+    };
+    let years = [BASELINE_YEAR, MIDDLE_YEAR, MODEL_YEAR];
+    let read =
+        |change: &project::biennium::Change| years.map(|year| change.at(year).unwrap_or_default());
+    Biennium {
+        years: years.map(|year| year.0),
+        total_state_support: read(&row.total),
+        foundation_aid: read(&row.foundation),
+        lines: BienniumLines {
+            foundation: row.lines.foundation,
+            transportation: row.lines.transportation,
+            special_education_transportation: row.lines.special_education_transportation,
+            preschool_special_education: row.lines.preschool_special_education,
+            supplements: row.lines.supplements,
+        },
+    }
 }
 
 fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
@@ -535,6 +580,7 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
         national,
         recognized,
         casino,
+        biennium,
     } = *joins;
     let adm = record.base_cost_adm();
     District {
@@ -684,6 +730,7 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
         },
         formula_aid_per_pupil: record.core_foundation_funding / adm,
         realized_aid_per_pupil: record.realized_aid() / adm,
+        biennium: biennium_of(biennium),
         guarantee: record.guarantee,
         at_minimum_state_share: record.at_minimum_state_share(),
         valuation_per_pupil: record
@@ -810,6 +857,14 @@ fn series_years(
             kind: YearKind::Fiscal,
             label: format!("FY{PROFILE_YEAR}"),
             source: "DEW District Profile Report".into(),
+        },
+        // The span, derived from the module's own endpoints rather than written. Three files and
+        // three years; the label is a range because no single year is the figure's year.
+        SeriesYear {
+            series: "biennium".into(),
+            kind: YearKind::Fiscal,
+            label: label_span(project::biennium::BASELINE_YEAR.0, MODEL_YEAR.0, "FY"),
+            source: "DEW FY25 final payment report, FY26 and FY27 funding calculators".into(),
         },
     ];
 
@@ -1563,6 +1618,12 @@ pub fn build() -> Bundle {
 
     let casino_by_district = casino_by_district();
 
+    // The three observed payment years, joined once. See `Joins::biennium`.
+    let biennium: HashMap<String, project::biennium::Row> = project::biennium::frame()
+        .into_iter()
+        .map(|row| (row.total.irn.clone(), row))
+        .collect();
+
     let districts: Vec<District> = records
         .iter()
         .map(|record| {
@@ -1578,6 +1639,7 @@ pub fn build() -> Bundle {
                     national: national_positions.get(&record.irn),
                     recognized: &recognized,
                     casino: casino_by_district.get(&record.irn),
+                    biennium: biennium.get(&record.irn),
                 },
             )
         })

@@ -59,7 +59,13 @@ const EXPECTED_HEADER: &str = "irn,district,enrolled_adm,base_cost_enrolled_adm,
                                local_capacity_percentage,benchmark_ratio,\
                                dpia_econ_disadvantaged_adm,dpia_directly_certified_adm,\
                                dpia_weighted_adm,dpia_percentage,dpia_aid,\
-                               trans_reported_sped_cost,trans_special_education,trans_total";
+                               trans_reported_sped_cost,trans_special_education,trans_total,\
+                               funding_base,foundation_calculated,foundation_phase_in,\
+                               foundation_funding,temp_transitional_aid_guarantee,transportation,\
+                               formula_transition_supplement,base_funding_supplement,\
+                               enrollment_growth_supplement,total_formula_funding,\
+                               performance_supplement,preschool_special_education,\
+                               special_education_transportation,total_state_support";
 
 /// The disadvantaged pupil blend weights the FY2026 model uses.
 ///
@@ -231,6 +237,39 @@ pub struct Prior {
     pub special_education_transportation: Dollars,
     /// `[G]` the whole of the district's transportation funding.
     pub transportation_total: Dollars,
+    /// `[Ha]` the FY2020 funding base, identical to the FY2025 report's.
+    pub funding_base: Dollars,
+    /// `[Hb]` the formula's own output: after the state share, before the phase-in and before the
+    /// guarantee.
+    pub foundation_calculated: Dollars,
+    /// `[Hc]` the interpolated step from [`Self::funding_base`] toward
+    /// [`Self::foundation_calculated`], at this year's 83.33%.
+    pub foundation_phase_in: Dollars,
+    /// `[Hd]` foundation funding as paid, equal to base plus phase-in.
+    pub foundation_funding: Dollars,
+    /// `[I]` the temporary transitional aid guarantee.
+    pub guarantee: Dollars,
+    /// `[J]` transportation, on the summary sheet. The same quantity as
+    /// [`Self::transportation_total`], which is `[G]` on the transportation sheet — carried twice
+    /// because a disagreement between them would be a reading error worth seeing.
+    pub transportation: Dollars,
+    /// `[K]` the formula transition supplement, on an FY2021 base.
+    pub formula_transition_supplement: Dollars,
+    /// `[L]` the base funding supplement, which H.B. 96 created and FY2025 has no column for.
+    pub base_funding_supplement: Dollars,
+    /// `[M]` the enrollment growth supplement, likewise new.
+    pub enrollment_growth_supplement: Dollars,
+    /// `[N]` total formula funding. Note the letter: in FY2025 this quantity is `[M]`.
+    pub total_formula_funding: Dollars,
+    /// `[O]` the performance supplement.
+    pub performance_supplement: Dollars,
+    /// `[P]` preschool special education.
+    pub preschool_special_education: Dollars,
+    /// `[Q]` special education transportation, as the summary sheet states it.
+    pub summary_special_education_transportation: Dollars,
+    /// `[R]` total state support — the widest measure, and the one a "change in funding" claim is
+    /// ordinarily about.
+    pub total_state_support: Dollars,
 }
 
 /// The FY2026 model, in IRN order.
@@ -262,6 +301,20 @@ pub fn frame() -> Vec<Prior> {
             reported_sped_transport_cost: row.num(16).unwrap_or(0.0),
             special_education_transportation: row.num(17).unwrap_or(0.0),
             transportation_total: row.num(18).unwrap_or(0.0),
+            funding_base: row.num(19).unwrap_or(0.0),
+            foundation_calculated: row.num(20).unwrap_or(0.0),
+            foundation_phase_in: row.num(21).unwrap_or(0.0),
+            foundation_funding: row.num(22).unwrap_or(0.0),
+            guarantee: row.num(23).unwrap_or(0.0),
+            transportation: row.num(24).unwrap_or(0.0),
+            formula_transition_supplement: row.num(25).unwrap_or(0.0),
+            base_funding_supplement: row.num(26).unwrap_or(0.0),
+            enrollment_growth_supplement: row.num(27).unwrap_or(0.0),
+            total_formula_funding: row.num(28).unwrap_or(0.0),
+            performance_supplement: row.num(29).unwrap_or(0.0),
+            preschool_special_education: row.num(30).unwrap_or(0.0),
+            summary_special_education_transportation: row.num(31).unwrap_or(0.0),
+            total_state_support: row.num(32).unwrap_or(0.0),
         })
         .collect()
 }

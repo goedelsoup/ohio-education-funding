@@ -66,6 +66,7 @@ export const SECTIONS = {
     baseCost: "base-cost",
     categoricals: "categoricals",
     supplements: "supplements",
+    biennium: "biennium",
     position: "position",
     national: "national",
     specialEducation: "special-education",

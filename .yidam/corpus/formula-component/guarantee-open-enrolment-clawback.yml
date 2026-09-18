@@ -46,6 +46,29 @@ findings: |
   a reduction in the one line those districts are relying on precisely because the formula
   computes less for them than they used to receive.
 
+  ### Carrying a clawback is not the same as losing money to one
+
+  The guarantee is `max([H2] - [I1] - [H], 0)`, and the floor at zero is the whole of the
+  difference: a district the formula already pays has no guarantee for the clawback to come out
+  of, so its `[I1]` is computed, published, and takes nothing.
+
+  In the FY2025 payment report **41 districts carry a clawback and 16 of them are on the
+  guarantee**. [verified]
+  (`crates/project/tests/the_interpolation_the_terminal_year_cannot_show.rs`, against the
+  department's final FY2025 payment report) Those 16 are exactly the districts paid **less than
+  their funding base** that year, and for every one of them the shortfall is the clawback to the
+  cent — which is how the term was found at all: the summary sheet carries `[Ha]` and `[I]` and
+  not `[I1]`, so the gap is visible there and unexplained.
+
+  The distinction matters because the intersection is not predictable from either side. 25 of the
+  41 lose nothing, and a count of clawbacks would have named them all.
+
+  **The FY2027 figures above are stated on the wider reading and have not been corrected.** The
+  same test over the FY2027 model gives 43 carrying a clawback, **22** actually reduced by one,
+  and **$3,037,537** withheld against the $5,110,050 this node reports — the difference being the
+  21 districts whose `[I1]` meets no guarantee. Changing the bound figures is a separate edit
+  from recording the mechanism, and the mechanism is what this section is for. [open]
+
   ### Why it is a node rather than a paragraph
 
   Because it is a mechanism with its own trigger, its own threshold, its own rate and its own
@@ -84,6 +107,14 @@ properties:
     (Columbus City, 106.2 FTE against a 24.3 threshold); next $640,025 (Cuyahoga Falls, 118.1
     FTE). [verified]
 figures:
+  - key: project/fy2025-open-enrolment-clawback-districts
+    value: 41
+    field: findings
+    as_written: "**41 districts carry a clawback and 16 of them are on the\n  guarantee**"
+  - key: project/fy2025-open-enrolment-clawback-reduces
+    value: 16
+    field: findings
+    as_written: "**41 districts carry a clawback and 16 of them are on the\n  guarantee**"
   - key: project/open-enrolment-clawback-districts
     value: 43
     field: summary

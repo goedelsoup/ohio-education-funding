@@ -10,6 +10,7 @@
 import DistrictNav from "../../components/DistrictNav.astro";
 import Base from "../../layouts/Base.astro";
 import { renderBaseCostBuildUp } from "../../lib/basecost.ts";
+import { renderBiennium } from "../../lib/biennium.ts";
 import {
   renderAidSource,
   renderEnrollmentYears,
@@ -154,6 +155,9 @@ const description = district.on_guarantee
   <Fragment set:html={renderCategoricals(district, bundle.statewide)} />
   {/* Everything above is foundation funding, which the guarantee holds. This is not. */}
   <Fragment set:html={renderSupplements(district, bundle.statewide)} />
+  {/* Everything above is one year. This is the three the budget actually covers, on both
+      measures, because they disagree in sign statewide. */}
+  <Fragment set:html={renderBiennium(district)} />
   <Fragment set:html={renderPosition(bundle, district, valuations, expenditures)} />
   {/* Ohio describing itself cannot say whether Ohio is unusual. This is the one card that can. */}
   <Fragment set:html={renderNationalPosition(district)} />
