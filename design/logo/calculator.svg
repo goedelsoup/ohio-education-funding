@@ -5,13 +5,9 @@
   (The flag that runs it cannot be named in this comment. XML forbids a double hyphen inside one,
   which this file learned by failing to render rather than by failing to build.)
 
-  The state, with the Indiana meridian drawn as a pencil. The silhouette is still Ohio: the
-  pencil occupies the meridian strip rather than sitting beside it, and only the point leaves
-  the boundary.
-
-  This file is the site's icon at every size: `src/lib/og/mark.ts` reads it, and
-  `icon-32.png` and `apple-touch-icon.png` are rasterized from it. `mise run //:generated`
-  fails if it drifts from its source.
+  The state as the calculator the funding plan actually is. The display and keypad are placed
+  rather than positioned: the largest rectangle at a calculator's proportion that fits inside
+  the outline, centred on the state's own area centroid.
 
   The prefers-color-scheme block is the dark face. resvg does not evaluate media queries, so
   anything rasterizing this gets the light one, which is correct for a home screen whose background
@@ -22,16 +18,17 @@
     @media (prefers-color-scheme: dark) {
       .surface { fill: #1a1a19; }
       .state { fill: #3987e5; }
-      .keyline { fill: #1a1a19; }
-      .pencil { fill: #d95926; }
-      .facet { fill: #1a1a19; }
-      .graphite { fill: #ffffff; }
+      .display { fill: #d95926; }
+      .key { fill: #1a1a19; }
     }
   </style>
   <rect class="surface" width="64" height="64" rx="12" fill="#fcfcfb"/>
   <path class="state" d="M8.24 10.04 L23.31 9.56 L25.20 10.19 L27.21 11.49 L28.99 12.77 L31.44 13.38 L34.44 14.25 L37.45 13.53 L42.79 12.95 L47.47 9.17 L51.14 7.86 L52.92 7.13 L55.49 6.26 L55.94 6.00 L55.94 25.47 L54.71 29.37 L53.37 31.99 L53.93 33.73 L52.26 35.91 L49.25 38.53 L47.25 41.29 L45.58 43.18 L42.24 46.08 L39.12 48.84 L37.78 50.73 L37.23 52.04 L35.33 55.67 L33.78 58.00 L31.88 56.26 L28.43 53.20 L24.98 54.66 L19.75 54.66 L18.86 53.06 L14.96 52.33 L11.62 47.97 L8.06 47.72Z" fill="#2a78d6"/>
-  <rect class="keyline" x="15.24" y="6.00" width="0.90" height="41.72" fill="#fcfcfb"/>
-  <path class="pencil" d="M8.24 6.00 H15.24 V47.72 L11.74 56.97 L8.24 47.72Z" fill="#eb6834"/>
-  <rect class="facet" x="10.55" y="6.00" width="0.75" height="41.72" fill="#fcfcfb"/>
-  <path class="graphite" d="M9.92 50.31 L11.74 56.97 L13.56 50.31Z" fill="#0b0b0b"/>
+  <rect class="display" x="17.07" y="14.00" width="26.38" height="9.31" rx="2" fill="#eb6834"/>
+  <rect class="key" x="17.07" y="25.81" width="7.13" height="8.36" rx="1.6" fill="#fcfcfb"/>
+  <rect class="key" x="26.70" y="25.81" width="7.13" height="8.36" rx="1.6" fill="#fcfcfb"/>
+  <rect class="key" x="36.32" y="25.81" width="7.13" height="8.36" rx="1.6" fill="#fcfcfb"/>
+  <rect class="key" x="17.07" y="36.67" width="7.13" height="8.36" rx="1.6" fill="#fcfcfb"/>
+  <rect class="key" x="26.70" y="36.67" width="7.13" height="8.36" rx="1.6" fill="#fcfcfb"/>
+  <rect class="key" x="36.32" y="36.67" width="7.13" height="8.36" rx="1.6" fill="#fcfcfb"/>
 </svg>
