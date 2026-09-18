@@ -752,9 +752,28 @@ export function draftLevers(draft: Draft, model: Model, baseYear: number): Lever
         if (value != null) levers.phaseInGeneral = value;
         break;
       }
-      case "phase-in-cat": {
+      // `phase-in-dpia`, which is what `project::drafts::Lever::key` has always emitted. This
+      // read `phase-in-cat`, and so did the feed schema's enum beside it — one misspelling in
+      // two hand-written copies of a closed vocabulary, unreachable for as long as no draft
+      // bound the lever, and therefore never wrong in a way anything could see.
+      case "phase-in-dpia": {
         const value = leverValue(provision.proposed);
         if (value != null) levers.phaseInDpia = value;
+        break;
+      }
+      case "dpia-blend": {
+        const value = leverValue(provision.proposed);
+        if (value != null) levers.dpiaBlend = value;
+        break;
+      }
+      case "supplemental": {
+        const value = leverValue(provision.proposed);
+        if (value != null) levers.supplementalTopRate = value;
+        break;
+      }
+      case "transport-floor": {
+        const value = leverValue(provision.proposed);
+        if (value != null) levers.transportationFloor = value;
         break;
       }
       default:

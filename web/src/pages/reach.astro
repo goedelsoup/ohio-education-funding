@@ -36,6 +36,7 @@ import { loadFeed } from "../lib/feed.ts";
 import { count, millions, pct } from "../lib/format.ts";
 import { DEFAULT_VIEW, DIMENSIONS, DIMENSION_KEYS, groups, presets } from "../lib/reach.ts";
 import { LEVER_BOUNDS } from "../lib/scenario.ts";
+import { modelOf } from "../lib/policy.ts";
 import { refreshEffect } from "../lib/refresh.ts";
 import * as routes from "../lib/routes.ts";
 import { yearChip } from "../lib/year.ts";
@@ -45,7 +46,7 @@ const s = bundle.statewide;
 
 /* The same worked example the scenario page's held-fixed card uses, priced from the feed's own
    base-cost provision rather than typed. Null where the feed prices none. */
-const refresh = refreshEffect(bundle.districts, bundle.drafts, s.minimum_state_share);
+const refresh = refreshEffect(bundle.districts, bundle.drafts, modelOf(s));
 
 const heldShare = s.districts > 0 ? s.on_guarantee / s.districts : 0;
 

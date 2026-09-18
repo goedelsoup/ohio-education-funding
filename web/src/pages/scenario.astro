@@ -15,6 +15,7 @@ import ScenarioControls from "../components/ScenarioControls.astro";
 import Base from "../layouts/Base.astro";
 import { loadFeed } from "../lib/feed.ts";
 import { count, millions } from "../lib/format.ts";
+import { modelOf } from "../lib/policy.ts";
 import { refreshEffect } from "../lib/refresh.ts";
 import * as routes from "../lib/routes.ts";
 import { yearChip } from "../lib/year.ts";
@@ -37,7 +38,7 @@ const meta = bundle.projection;
  * `refresh` is null only if the feed carries no priced base-cost provision, in which case the card
  * drops the worked example rather than inventing a scale for it.
  */
-const refresh = refreshEffect(bundle.districts, bundle.drafts, s.minimum_state_share);
+const refresh = refreshEffect(bundle.districts, bundle.drafts, modelOf(s));
 
 /*
  * The stages of the act this page baselines on: drafts that are versions of it rather than
