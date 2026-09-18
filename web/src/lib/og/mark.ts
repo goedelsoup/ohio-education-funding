@@ -37,3 +37,28 @@ export function mark(): string {
       `${process.cwd()}. The icon routes rasterize it, so it is not optional.`,
   );
 }
+
+/**
+ * The same drawing, prepared to be inlined into a page rather than served as a file.
+ *
+ * Two things are removed, and both would be bugs in a document.
+ *
+ * The XML comment, because it says "edit the generator, not this file" to whoever opens
+ * `favicon.svg` — and repeating that in the `<head>`-adjacent markup of 3,493 pages says it to
+ * nobody.
+ *
+ * The `<style>` block, which matters more. It carries the dark face behind
+ * `prefers-color-scheme`, which answers the operating system — and this site's rule is that
+ * `data-theme` beats the operating system in BOTH directions. Inlined as-is, a reader who chose
+ * light on a dark machine would get a light page with a dark mark in the corner of it. Stripped,
+ * the fills fall to `app.css`, which styles them from the theme tokens and is therefore right in
+ * all three states. Its class selectors would also have leaked into the document, where `.state`
+ * and `.key` are names another rule could plausibly want.
+ *
+ * What is kept is `role="img"` and the label, which is what gives the brand link its accessible
+ * name now that it has no text: the same words the link used to spell out.
+ */
+export function inlineMark(): string {
+  const raw = mark();
+  return raw.slice(raw.indexOf("<svg")).replace(/[ \t]*<style>[\s\S]*?<\/style>\n?/, "");
+}

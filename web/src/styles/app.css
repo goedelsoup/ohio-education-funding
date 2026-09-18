@@ -160,7 +160,29 @@ header.site {
   gap: 1rem;
   flex-wrap: wrap;
 }
-.brand { font-weight: var(--weight-bold); letter-spacing: var(--tracking-tight); color: var(--text-primary); text-decoration: none; }
+/*
+ * The brand, which is the mark rather than the site's name in words.
+ *
+ * The fills are set HERE and not in the file, which is the whole reason the inlined copy has its
+ * `<style>` stripped: `favicon.svg` carries its dark face behind `prefers-color-scheme`, and that
+ * answers the operating system, while this site's rule is that `data-theme` wins in both
+ * directions. Driven from the tokens, the mark is right in all three theme states.
+ *
+ * `.surface` is the mark's own rounded ground and it takes `--surface-1`, which is exactly what
+ * `header.site` above is painted in — so the tile is invisible and the mark reads as sitting
+ * directly on the bar. The keyline and the facet are the same token for the same reason: they are
+ * the ground showing through the pencil, and the ground here is the header.
+ *
+ * 30px against a 52px bar, sized to the theme button's line box like the repository mark.
+ */
+.brand { display: inline-flex; align-items: center; flex: none; }
+.brand svg { display: block; width: 30px; height: 30px; }
+.brand .surface,
+.brand .keyline,
+.brand .facet { fill: var(--surface-1); }
+.brand .state { fill: var(--series-formula); }
+.brand .pencil { fill: var(--series-guarantee); }
+.brand .graphite { fill: var(--text-primary); }
 header.site nav { display: flex; gap: .15rem; margin-right: auto; }
 
 /*
@@ -216,16 +238,29 @@ header.site nav { display: flex; gap: .15rem; margin-right: auto; }
 /*
  * # Why 820 and not 700
  *
- * The loose nav is 427px wide on the machine that runs the end-to-end suite. With the brand at
- * 166, the theme button at 31 and three 16px gaps, the bar wanted 656 of the 660px inside a
- * 700px viewport — four pixels spare, which is not a margin, it is a coincidence. The repository
- * mark asked for 48 more and the row wrapped: 92px of header instead of 52.
+ * The loose nav is 427px wide on the machine that runs the end-to-end suite. With the brand as
+ * WORDS at 166, the theme button at 31 and three 16px gaps, the bar wanted 656 of the 660px
+ * inside a 700px viewport — four pixels spare, which is not a margin, it is a coincidence. The
+ * repository mark asked for 48 more and the row wrapped: 92px of header instead of 52.
  *
- * Those numbers are the runner's, and the point of them is that they are not this machine's —
- * the same measurement on a Mac gives the brand 142px and 44px of room where the runner has
+ * Those numbers were the runner's, and the point of them was that they were not this machine's —
+ * the same measurement on a Mac gave the brand 142px and 44px of room where the runner had
  * none. `system-ui` is not a typeface, and a breakpoint chosen against one rendering of it is
- * chosen against one reader. 820 leaves 76px at the runner's metrics, which is slack rather than
- * a fit, and the header test prints what the row was holding when it stops being enough.
+ * chosen against one reader.
+ *
+ * # The brand is no longer words, and that term stopped varying
+ *
+ * It is a 30px mark, and 30px on every machine: an SVG at a fixed size has no `system-ui` in it.
+ * Measured at all seven widths above, the brand is 30px at each. So the one term in this row that
+ * differed between the runner and a Mac is now a constant, and the same sum at 700px reads
+ * 30 + 427 + 31 + 32 = 520 of 660 — a hundred and forty spare where there were four. The
+ * repository mark's 48 fits inside that with 92 left, which is what the four pixels could not
+ * hold.
+ *
+ * **820 is kept anyway, and is now conservative rather than tight.** Lowering it would hand the
+ * loose nav to readers between 700 and 819px, which is a change to what those readers get and not
+ * a consequence of this one; it wants its own measurement of the nav at those widths and its own
+ * decision. The header test prints what the row was holding when it stops being enough.
  *
  * The cost is that a reader between 700 and 819px gets the phone's disclosure. That is one click
  * further to a section, on a window nobody's phone has and few laptops open to.
@@ -424,16 +459,26 @@ td.year { font-family: var(--font-mono); color: var(--text-annotation); white-sp
  *
  * # And why it is not on the narrowest phones
  *
- * There is no room, and no arrangement of this row makes room. At 360px the bar has 320px inside
- * its padding and already spends 297 of them on the runner's metrics — the brand at 166, the
- * collapsed nav at 68, the theme button at 31 and two gaps. Twenty-three spare; the mark wants
- * 32 and a gap. Closing the gaps and trimming the padding could buy it a pixel or two, at the
- * price of a smaller tap target on exactly the devices that are touched, and it would wrap again
- * on the next machine whose `system-ui` is a little wider than this one's.
+ * There was no room, and no arrangement of this row made room. At 360px the bar has 320px inside
+ * its padding and it spent 297 of them on the runner's metrics — the brand as WORDS at 166, the
+ * collapsed nav at 68, the theme button at 31 and two gaps. Twenty-three spare; the mark wants 32
+ * and a gap. Closing the gaps and trimming the padding could have bought a pixel or two, at the
+ * price of a smaller tap target on exactly the devices that are touched, and it would have wrapped
+ * again on the next machine whose `system-ui` was a little wider.
  *
- * So it appears at 480px, where the same row has 95px spare. Below that the header is what it
- * was before this link existed. A phone reader still reaches the repository — every figure's
- * attribution and every corpus page links into it — just not from the chrome.
+ * So it appears at 480px, where the same row had 95px spare.
+ *
+ * # That arithmetic is now obsolete, and the rule is kept on purpose
+ *
+ * The brand is a 30px mark rather than 166px of words, so the same row at 360px now holds
+ * 30 + 68 + 31 + 32 = 161 of its 320px and has 159 spare. The mark wants 48 of that and would
+ * fit three times over.
+ *
+ * It stays hidden below 480 anyway, and the reason has changed rather than disappeared: a phone's
+ * chrome is worth keeping to what a phone reader needs, and this link is not it. `app.spec.ts`
+ * asserts the 360/480 split, so it is now a decision the suite holds rather than a measurement it
+ * records. A phone reader still reaches the repository — every figure's attribution and every
+ * corpus page links into it.
  */
 .mark {
   display: none;

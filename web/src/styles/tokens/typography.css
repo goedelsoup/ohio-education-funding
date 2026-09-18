@@ -175,7 +175,7 @@
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
-  --weight-bold: 650; /* the brand, and a tile's figure. Nothing else. */
+  --weight-bold: 650; /* a tile's figure, and nothing else — the brand is a mark now. */
 
   /* Uppercase apparatus labels — column heads, eyebrows, contents label, claim marks. */
   --tracking-caps: 0.04em;
