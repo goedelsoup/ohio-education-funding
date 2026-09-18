@@ -1670,16 +1670,52 @@ fn median_difference(diffs: &[RegimeDiff]) -> f64 {
 }
 
 /// Every district carrying an open-enrolment clawback, as `(count, total, largest, second)`.
-fn clawback(panel: &[DistrictRecord]) -> (usize, f64, f64, f64) {
-    let mut amounts: Vec<f64> = panel
+/// The open-enrolment clawback, on both of the quantities it has.
+///
+/// # Why two and not one
+///
+/// Because a district can be *charged* the adjustment without *losing* anything to it.
+/// `[I] = max([H2] − [I1] − [H], 0)` clamps at zero, so an adjustment that meets a district with
+/// no guarantee takes nothing: **43 are charged and 22 lose**, and the two totals differ by $2.07
+/// million. A single figure reported as "withheld" was the wider one, which is the incidence of
+/// the mechanism rather than its cost.
+///
+/// `largest` and `second` are the largest amounts actually withheld, not the largest charged. On
+/// this panel they are the same two districts either way — Columbus City and Cuyahoga Falls City
+/// are both on the guarantee and both lose the whole charge — but the figures are labelled as
+/// reductions, so they are computed as reductions.
+struct Clawback {
+    charged: usize,
+    adjustment: f64,
+    reduced: usize,
+    withheld: f64,
+    largest: f64,
+    second: f64,
+}
+
+fn clawback(panel: &[DistrictRecord]) -> Clawback {
+    let charged: Vec<&DistrictRecord> = panel
         .iter()
-        .map(|r| r.transition.open_enrollment_adjustment)
-        .filter(|a| *a > 0.0)
+        .filter(|r| r.transition.open_enrollment_adjustment > 0.0)
         .collect();
-    amounts.sort_by(|a, b| b.partial_cmp(a).expect("no NaN in a clawback"));
-    let total = amounts.iter().sum();
-    let at = |i: usize| amounts.get(i).copied().unwrap_or(0.0);
-    (amounts.len(), total, at(0), at(1))
+    let mut taken: Vec<f64> = charged
+        .iter()
+        .map(|r| r.open_enrollment_withheld())
+        .filter(|w| *w > 0.005)
+        .collect();
+    taken.sort_by(|a, b| b.partial_cmp(a).expect("no NaN in a clawback"));
+    let at = |i: usize| taken.get(i).copied().unwrap_or(0.0);
+    Clawback {
+        charged: charged.len(),
+        adjustment: charged
+            .iter()
+            .map(|r| r.transition.open_enrollment_adjustment)
+            .sum(),
+        reduced: taken.len(),
+        withheld: taken.iter().sum(),
+        largest: at(0),
+        second: at(1),
+    }
 }
 
 /// Every figure this repository exports for the corpus to be checked against.
@@ -6407,23 +6443,42 @@ pub static FIGURES: &[Figure] = &[
                 .count() as f64
         },
     },
+    // The mechanism's incidence and its cost, which are different figures and were one.
+    Figure {
+        key: "project/open-enrolment-clawback-carrying",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts charged an open-enrolment adjustment, FY2027",
+        pinned: 43.0,
+        tolerance: 0.0,
+        compute: |i| clawback(&i.panel).charged as f64,
+    },
+    Figure {
+        key: "project/open-enrolment-clawback-adjustment",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Total open-enrolment adjustment charged, FY2027 — gross of the guarantee it meets",
+        pinned: 5_110_050.0,
+        tolerance: 0.5,
+        compute: |i| clawback(&i.panel).adjustment,
+    },
     Figure {
         key: "project/open-enrolment-clawback-districts",
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose guarantee is reduced by the open-enrolment clawback, FY2027",
-        pinned: 43.0,
+        pinned: 22.0,
         tolerance: 0.0,
-        compute: |i| clawback(&i.panel).0 as f64,
+        compute: |i| clawback(&i.panel).reduced as f64,
     },
     Figure {
         key: "project/open-enrolment-clawback-withheld",
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "Total withheld by the open-enrolment clawback, FY2027",
-        pinned: 5_100_000.0,
-        tolerance: 50_000.0,
-        compute: |i| clawback(&i.panel).1,
+        pinned: 3_037_537.0,
+        tolerance: 0.5,
+        compute: |i| clawback(&i.panel).withheld,
     },
     Figure {
         key: "project/open-enrolment-clawback-largest",
@@ -6432,7 +6487,7 @@ pub static FIGURES: &[Figure] = &[
         label: "The largest single open-enrolment clawback, FY2027 — Columbus City",
         pinned: 674_561.0,
         tolerance: 0.5,
-        compute: |i| clawback(&i.panel).2,
+        compute: |i| clawback(&i.panel).largest,
     },
     Figure {
         key: "project/open-enrolment-clawback-second-largest",
@@ -6441,7 +6496,7 @@ pub static FIGURES: &[Figure] = &[
         label: "The second largest open-enrolment clawback, FY2027 — Cuyahoga Falls",
         pinned: 640_025.0,
         tolerance: 0.5,
-        compute: |i| clawback(&i.panel).3,
+        compute: |i| clawback(&i.panel).second,
     },
     Figure {
         key: "project/statewide-average-base-cost-per-pupil",
