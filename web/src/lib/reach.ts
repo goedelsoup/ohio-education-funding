@@ -30,8 +30,8 @@
  * why the trails read the way they do.
  */
 
-import type { Outcome } from "./policy.ts";
-import { MOVED, applyAll, currentLaw } from "./policy.ts";
+import type { Outcome, Model } from "./policy.ts";
+import { MOVED, applyAll, currentLaw, modelOf } from "./policy.ts";
 import { count, escapeHtml, money, pct, signedMoney } from "./format.ts";
 import { heading } from "./section.ts";
 import { renderToString } from "./plot/client.ts";
@@ -228,6 +228,9 @@ export const PRESET_FIELDS = [
   "minimumStateShare",
   "phaseInGeneral",
   "phaseInDpia",
+  "dpiaBlend",
+  "supplementalTopRate",
+  "transportationFloor",
 ] as const satisfies readonly (keyof Levers)[];
 
 /** Menu order, which is declaration order — see the note on `DIMENSIONS`. */
@@ -409,7 +412,7 @@ function quantile(values: number[], q: number): number {
  * guarantee gone, which maximises the formula and removes the floor under it, and base cost at its
  * floor with the guarantee intact, where the guarantee is carrying the most districts.
  */
-function corners(model: number): Levers[] {
+function corners(model: Model): Levers[] {
   const law = defaultLevers(model);
   const b = LEVER_BOUNDS;
   return [
@@ -439,7 +442,7 @@ export function envelope(panel: Panel, key: DimensionKey): [number, number] | nu
   let cached = envelopes.get(panel);
   if (!cached) {
     cached = new Map();
-    const model = panel.statewide.minimum_state_share;
+    const model = modelOf(panel.statewide);
     const runs = corners(model).map((levers) => ({
       levers,
       outcomes: applyAll(panel.districts, toPolicy(levers), model),
@@ -526,7 +529,7 @@ export interface Preset {
  * not offered at all rather than being offered at an invented scale.
  */
 export function presets(panel: Panel): Preset[] {
-  const model = panel.statewide.minimum_state_share;
+  const model = modelOf(panel.statewide);
   const refresh = refreshEffect(panel.districts, panel.drafts, model);
   const law = defaultLevers(model);
   const from = (over: Partial<Levers>): Levers => ({ ...law, ...over });
@@ -601,7 +604,7 @@ export function presets(panel: Panel): Preset[] {
  * `SERIES` documents as doubling for "gain".
  */
 export function renderReach(panel: Panel, levers: Levers, view: View, chip = ""): string {
-  const model = panel.statewide.minimum_state_share;
+  const model = modelOf(panel.statewide);
   const outcomes = applyAll(panel.districts, toPolicy(levers), model);
   const law = applyAll(panel.districts, currentLaw(model), model);
 

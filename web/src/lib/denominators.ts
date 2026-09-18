@@ -297,6 +297,11 @@ export const FIELD_DENOMINATORS: Record<string, DenominatorKey | null> = {
   "districts[].dpia.directly_certified_adm": null,
   "districts[].dpia.weighted_adm": null,
 
+  // The same two counts again, flat on the panel, because the slim feed drops the `dpia` block
+  // and the DPIA blend is a lever the browser has to run. Counts, not per-pupil quantities.
+  "districts[].dpia_econ_disadvantaged_adm": null,
+  "districts[].dpia_directly_certified_adm": null,
+
   // Category counts for the three remaining weighted programs. Counts, not quantities over one,
   // and the aid beside each is a dollar total per category rather than a per-pupil figure.
   "districts[].english_learners.adm": null,

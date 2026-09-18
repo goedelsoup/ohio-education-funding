@@ -38,7 +38,7 @@ interface Props {
 const { model, onGuarantee, projection, refresh } = Astro.props;
 
 /*
- * The five sliders. Their ends come from `LEVER_BOUNDS` rather than being written here.
+ * The eight sliders. Their ends come from `LEVER_BOUNDS` rather than being written here.
  *
  * They used to be written here, and that made this file the only validator: `readLevers` reads
  * `input.value`, which a browser has already clamped against these attributes. The `?draft=` path
@@ -85,6 +85,27 @@ const SLIDERS = [
     ...LEVER_BOUNDS.phaseInDpia,
     value: 1,
     note: "Separate because R.C. 3317.022 writes two terms: in FY2022 the general percentage was 16.67% while DPIA's was 0%, which paid DPIA at its whole FY2019 amount.",
+  },
+  {
+    id: "lv-dpia-blend",
+    label: "DPIA, directly certified",
+    ...LEVER_BOUNDS.dpiaBlend,
+    value: 0.35,
+    note: "How much of the poverty count is direct certification rather than the reported disadvantaged figure. At 0 it is the count the formula used before H.B. 96. The statewide total is held fixed, so this moves who gets it and not how much there is.",
+  },
+  {
+    id: "lv-supplemental",
+    label: "Supplemental targeted assistance",
+    ...LEVER_BOUNDS.supplementalTopRate,
+    value: 0,
+    note: "Per pupil at the top of the scale, a tenth of that at the eligibility threshold. H.B. 96 repealed the tier and left its test running, so current law is $0 and $750 is the schedule it was last paid on.",
+  },
+  {
+    id: "lv-transport",
+    label: "Transportation floor",
+    ...LEVER_BOUNDS.transportationFloor,
+    value: 0.5,
+    note: `The minimum share of the calculated amount the state pays, whatever the district's own share. ${yearOf("formula")} is 50%, and the floor runs up the wealth distribution rather than down it.`,
   },
 ];
 ---

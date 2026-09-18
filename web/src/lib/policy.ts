@@ -40,6 +40,80 @@ export interface Policy {
   phaseInGeneral: number;
   /** The same interpolation for DPIA, against its own FY2019 base. */
   phaseInDpia: number;
+  /**
+   * Weight on directly certified ADM in the DPIA count, against economically disadvantaged ADM.
+   * Current law is 0.35 — H.B. 96's second-year blend. Zero is the count the formula used before
+   * the act rewrote it.
+   */
+  dpiaDirectlyCertifiedWeight: number;
+  /**
+   * What the top of the supplemental targeted assistance scale pays, per pupil. **Current law is
+   * zero**: R.C. 3317.0218 is repealed and the tier pays nothing while its eligibility test still
+   * runs. Restoring it at the schedule it was last paid on is 750.
+   */
+  supplementalTopRate: number;
+  /**
+   * The minimum state share applied to transportation. Current law is 0.5. Separate from
+   * `minimumStateShare` and acting on a separate programme — transportation sits outside core
+   * foundation funding, so this moves `Outcome.transportation` and never `formulaAid`.
+   */
+  transportationFloor: number;
+}
+
+/**
+ * Quantities a lever needs that are properties of the panel rather than of a district.
+ *
+ * Two of the three levers added for Stage 3 move a statewide statistic as a side effect of moving
+ * a district's inputs, and one of those statistics divides the thing it is computed from. Mirrors
+ * `project::policy::Statewide`.
+ */
+export interface Statewide {
+  /** The percentage the DPIA index divides by, after any rescale the policy implies. */
+  dpiaPercentage: number;
+  /** The highest FY2019 targeted assistance wealth index, which tops the supplemental scale. */
+  supplementalTopIndex: number;
+}
+
+/**
+ * The constants the *published model* was computed under, as opposed to the ones being proposed.
+ *
+ * One object rather than four positional arguments. It began as a single `modelMinimumStateShare`
+ * and grew three siblings when the Stage 3 levers arrived; four bare numbers of the same type in
+ * a row is a place to transpose two of them and get a plausible wrong answer at every call site
+ * at once.
+ */
+export interface Model {
+  /** The minimum state share the published model used — 10% for FY2027. */
+  minimumStateShare: number;
+  /** The transportation floor in force — 50% for FY2027. */
+  transportationFloor: number;
+  /** The published statewide economically disadvantaged percentage. */
+  dpiaPercentage: number;
+  /** The published top of the supplemental scale. */
+  supplementalTopIndex: number;
+}
+
+/** The two statewide quantities at their published values, which is current law's resolution. */
+export function publishedStatewide(m: Model): Statewide {
+  return {
+    dpiaPercentage: m.dpiaPercentage,
+    supplementalTopIndex: m.supplementalTopIndex,
+  };
+}
+
+/** Read the model constants off a feed's statewide block. */
+export function modelOf(w: {
+  minimum_state_share: number;
+  transportation_floor: number;
+  dpia_statewide_percentage: number;
+  supplemental_top_index: number;
+}): Model {
+  return {
+    minimumStateShare: w.minimum_state_share,
+    transportationFloor: w.transportation_floor,
+    dpiaPercentage: w.dpia_statewide_percentage,
+    supplementalTopIndex: w.supplemental_top_index,
+  };
 }
 
 /** What a policy does to one district. */
@@ -53,10 +127,21 @@ export interface Outcome {
   baselineRealizedAid: number;
   onGuarantee: boolean;
   atMinimumStateShare: boolean;
-  /** Change against current law, in dollars. */
+  /**
+   * Transportation aid under the policy's floor.
+   *
+   * Outside `realizedAid`, deliberately: transportation is not core foundation funding, and
+   * folding it in would change what every other figure on this site means.
+   */
+  transportation: number;
+  /** Transportation under current law's floor, for the comparison. */
+  baselineTransportation: number;
+  /** Change in core foundation funding against current law, in dollars. */
   delta: number;
   /** Change against current law, per current-year pupil. */
   deltaPerPupil: number;
+  /** Change across both channels — the figure a cost column should show. */
+  totalDelta: number;
 }
 
 /**
@@ -83,7 +168,9 @@ export interface Totals {
   realizedAid: number;
   formulaAid: number;
   guarantee: number;
-  /** Change in total state aid against current law. */
+  /** Total transportation aid, which is outside `realizedAid`. */
+  transportation: number;
+  /** Change in total state support — realized aid and transportation — against current law. */
   cost: number;
   gainers: number;
   losers: number;
@@ -91,14 +178,147 @@ export interface Totals {
 }
 
 /** Current law: the identity, which reproduces the department's own FY2027 model. */
-export function currentLaw(modelMinimumStateShare: number): Policy {
+export function currentLaw(m: Model): Policy {
   return {
     guarantee: { kind: "as-enacted" },
     baseCostScale: 1,
-    minimumStateShare: modelMinimumStateShare,
+    minimumStateShare: m.minimumStateShare,
     phaseInGeneral: 1,
     phaseInDpia: 1,
+    dpiaDirectlyCertifiedWeight: DPIA_BLEND,
+    // Zero, and not a rate: the tier is repealed, so current law pays it nothing. The only lever
+    // here whose identity is an absence.
+    supplementalTopRate: 0,
+    transportationFloor: m.transportationFloor,
   };
+}
+
+/** H.B. 96's second-year DPIA blend: 65% economically disadvantaged, 35% directly certified. */
+export const DPIA_BLEND = 0.35;
+
+/** What each weighted disadvantaged pupil generates. */
+export const DPIA_PER_PUPIL = 422;
+
+/** The FY2019 wealth index the supplemental tier requires a district to exceed. */
+export const TA_SUPPLEMENT_INDEX_THRESHOLD = 1.6;
+
+/** The rate at the bottom of the supplemental scale, as a share of the rate at the top. */
+export const TA_SUPPLEMENT_FLOOR_SHARE = 0.1;
+
+/**
+ * DPIA from a blended count, at a stated statewide index denominator.
+ *
+ * `d1 × $422 × (d1 / enrolled ADM / statewide)²`, with `d1` capped at the district's own enrolled
+ * ADM. Mirrors `project::panel::Dpia::aid_from_count`.
+ */
+export function dpiaFromCount(
+  weightedAdm: number,
+  enrolledAdm: number,
+  statewide: number,
+): number {
+  if (enrolledAdm <= 0 || statewide <= 0) return 0;
+  const d1 = Math.min(weightedAdm, enrolledAdm);
+  const d2 = d1 / enrolledAdm;
+  return d1 * DPIA_PER_PUPIL * (d2 / statewide) ** 2;
+}
+
+/** The DPIA count at a given weight on directly certified ADM. */
+export function dpiaCountAt(d: PanelDistrict, weight: number): number {
+  return (
+    (1 - weight) * d.dpia_econ_disadvantaged_adm +
+    weight * d.dpia_directly_certified_adm
+  );
+}
+
+/**
+ * Resolve the two statewide quantities against a panel and a policy.
+ *
+ * The DPIA rescale is closed-form: aid scales as the inverse square of the denominator, so
+ * holding the statewide total fixed while the count moves is `s' = s × √(total at s / target)`.
+ * No search, and no tolerance to choose. Mirrors `project::policy::Statewide::under`.
+ */
+export function statewideUnder(
+  districts: PanelDistrict[],
+  p: Policy,
+  m: Model,
+): Statewide {
+  // Current law's weight needs no rescale, and asking for one would introduce a residual where
+  // the identity requires none.
+  if (p.dpiaDirectlyCertifiedWeight === DPIA_BLEND) {
+    return {
+      dpiaPercentage: m.dpiaPercentage,
+      supplementalTopIndex: m.supplementalTopIndex,
+    };
+  }
+
+  const at = (weight: number): number => {
+    let total = 0;
+    for (const d of districts) {
+      total += dpiaFromCount(
+        dpiaCountAt(d, weight),
+        d.current_year_adm,
+        m.dpiaPercentage,
+      );
+    }
+    return total;
+  };
+  const target = at(DPIA_BLEND);
+  const moved = at(p.dpiaDirectlyCertifiedWeight);
+  return {
+    dpiaPercentage:
+      moved > 0 && target > 0
+        ? m.dpiaPercentage * Math.sqrt(moved / target)
+        : m.dpiaPercentage,
+    supplementalTopIndex: m.supplementalTopIndex,
+  };
+}
+
+/**
+ * The supplemental tier's per-pupil rate for one district, at a stated top of the scale.
+ *
+ * Linear from a tenth of `topRate` at the eligibility threshold of 1.6 to `topRate` at the
+ * state's highest FY2019 wealth index. Mirrors
+ * `project::panel::TargetedAssistance::supplemental_rate`.
+ */
+export function supplementalRate(
+  d: PanelDistrict,
+  topIndex: number,
+  topRate: number,
+): number {
+  if (!d.supplement_eligible || topIndex <= TA_SUPPLEMENT_INDEX_THRESHOLD) {
+    return 0;
+  }
+  const span =
+    (d.supplemental_wealth_index - TA_SUPPLEMENT_INDEX_THRESHOLD) /
+    (topIndex - TA_SUPPLEMENT_INDEX_THRESHOLD);
+  return (
+    topRate * (TA_SUPPLEMENT_FLOOR_SHARE + (1 - TA_SUPPLEMENT_FLOOR_SHARE) * span)
+  );
+}
+
+/**
+ * One district's transportation aid at a stated floor and enrollment.
+ *
+ * The gross is recovered in Rust and carried on the feed, because the department publishes
+ * transportation net and dividing a published figure by a constant the browser would have to be
+ * told separately is how two implementations come to disagree. Mirrors
+ * `project::policy::transport_under`.
+ */
+export function transportUnder(
+  d: PanelDistrict,
+  currentYearAdm: number,
+  floor: number,
+): number {
+  if (d.transportation_state_share <= 0 || d.transportation_gross <= 0) {
+    return d.transportation_paid;
+  }
+  const admRatio =
+    d.current_year_adm > 0 ? currentYearAdm / d.current_year_adm : 1;
+  return (
+    (d.transportation_gross * Math.max(d.transportation_state_share, floor) +
+      d.transportation_guarantee) *
+    admRatio
+  );
 }
 
 /** Formula aid under current law: base cost share plus every categorical. */
@@ -119,15 +339,16 @@ export function currentRealizedAid(d: PanelDistrict): number {
 /**
  * Apply a policy to one district at a given current-year enrolled ADM.
  *
- * `modelMinimumStateShare` is the minimum the *published model* was computed under — 10% for
- * FY2027 — and is distinct from `policy.minimumStateShare`, which is the one being proposed.
- * The two are only equal under current law.
+ * `m` carries the constants the *published model* was computed under — a 10% minimum state share
+ * and a 50% transportation floor for FY2027 — which are distinct from the ones on `p` being
+ * proposed. They are only equal under current law.
  */
 export function apply(
   d: PanelDistrict,
   p: Policy,
+  w: Statewide,
   currentYearAdm: number,
-  modelMinimumStateShare: number,
+  m: Model,
 ): Outcome {
   const baseCostPerPupil = d.base_cost_per_pupil * p.baseCostScale;
   const floorPerPupil = baseCostPerPupil * p.minimumStateShare;
@@ -151,7 +372,7 @@ export function apply(
       d.base_cost_state_share *
       admRatio *
       p.baseCostScale *
-      (p.minimumStateShare / modelMinimumStateShare);
+      (p.minimumStateShare / m.minimumStateShare);
   } else if (residualPerPupil < floorPerPupil) {
     baseCostAid = floorPerPupil * currentYearAdm;
   } else {
@@ -180,9 +401,28 @@ export function apply(
   // Two interpolations against two slices of one published base, not two multipliers on
   // computed aid. At 100% on both dials the bases cancel and this is the department's own
   // number, which is what keeps `currentLaw` the identity.
-  const dpiaComputed = d.dpia_funding * admRatio;
+  // DPIA, recomputed from the counts rather than read, so the blend is a lever. At current law
+  // the published figure is used instead: the recomputation reproduces the department's column to
+  // a rounding artefact rather than exactly, and that residual would leak into `currentLaw` and
+  // stop it being the identity. Mirrors the same guard in `project::policy::apply`.
+  const publishedDpia = d.dpia_funding * admRatio;
+  const dpiaComputed =
+    p.dpiaDirectlyCertifiedWeight === DPIA_BLEND
+      ? publishedDpia
+      : dpiaFromCount(
+          dpiaCountAt(d, p.dpiaDirectlyCertifiedWeight),
+          currentYearAdm,
+          w.dpiaPercentage,
+        );
+
+  // The repealed supplemental tier, which pays nothing until a policy funds it. `[I]` is zero in
+  // the model for every district, so this adds rather than replaces.
+  const supplemental =
+    supplementalRate(d, w.supplementalTopIndex, p.supplementalTopRate) *
+    currentYearAdm;
+
   const generalComputed =
-    baseCostAid + (categoricals * admRatio - dpiaComputed);
+    baseCostAid + (categoricals * admRatio - publishedDpia) + supplemental;
 
   const formulaAid =
     d.general_funding_base +
@@ -211,6 +451,14 @@ export function apply(
   const baselineRealizedAid = currentRealizedAid(d);
   const delta = realizedAid - baselineRealizedAid;
 
+  // Transportation, priced against its own floor and kept out of the sum above.
+  const transportation = transportUnder(d, currentYearAdm, p.transportationFloor);
+  const baselineTransportation = transportUnder(
+    d,
+    d.current_year_adm,
+    m.transportationFloor,
+  );
+
   return {
     irn: d.irn,
     name: d.name,
@@ -221,8 +469,12 @@ export function apply(
     baselineRealizedAid,
     onGuarantee: realizedAid > formulaAid + 0.005,
     atMinimumStateShare: atMinimum,
+    transportation,
+    baselineTransportation,
     delta,
     deltaPerPupil: currentYearAdm > 0 ? delta / currentYearAdm : 0,
+    totalDelta:
+      transportation + realizedAid - (baselineTransportation + baselineRealizedAid),
   };
 }
 
@@ -230,11 +482,12 @@ export function apply(
 export function applyAll(
   districts: PanelDistrict[],
   p: Policy,
-  modelMinimumStateShare: number,
+  m: Model,
 ): Outcome[] {
-  return districts.map((d) =>
-    apply(d, p, d.current_year_adm, modelMinimumStateShare),
-  );
+  // Resolved once against the whole panel: the DPIA index denominator is not a property of any
+  // one district, and a per-district resolution would be a different number and a wrong one.
+  const w = statewideUnder(districts, p, m);
+  return districts.map((d) => apply(d, p, w, d.current_year_adm, m));
 }
 
 /** Aggregate a set of outcomes. */
@@ -247,15 +500,21 @@ export function totals(outcomes: Outcome[]): Totals {
   let atMinimumStateShare = 0;
   let gainers = 0;
   let losers = 0;
+  let transportation = 0;
+  let baselineTransportation = 0;
   for (const o of outcomes) {
     realizedAid += o.realizedAid;
     formulaAid += o.formulaAid;
     guarantee += o.guarantee;
     baseline += o.baselineRealizedAid;
+    transportation += o.transportation;
+    baselineTransportation += o.baselineTransportation;
     if (o.onGuarantee) onGuarantee++;
     if (o.atMinimumStateShare) atMinimumStateShare++;
-    if (o.delta > MOVED) gainers++;
-    else if (o.delta < -MOVED) losers++;
+    // Across both channels. Counting on `delta` alone would report a transportation-only policy
+    // as moving nobody, which is the same defect as reporting its cost as zero.
+    if (o.totalDelta > MOVED) gainers++;
+    else if (o.totalDelta < -MOVED) losers++;
   }
   return {
     districts: outcomes.length,
@@ -264,7 +523,11 @@ export function totals(outcomes: Outcome[]): Totals {
     realizedAid,
     formulaAid,
     guarantee,
-    cost: realizedAid - baseline,
+    transportation,
+    // Total state support, not realized aid: the transportation floor moves a channel core
+    // foundation funding does not contain, and a cost that could not see it would agree with a
+    // browser that had never implemented the lever.
+    cost: realizedAid + transportation - (baseline + baselineTransportation),
     gainers,
     losers,
     unmoved: outcomes.length - gainers - losers,

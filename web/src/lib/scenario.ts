@@ -17,8 +17,7 @@ import {
   currentLaw,
   totals,
   type Outcome,
-  type Policy,
-} from "./policy.ts";
+  type Policy, modelOf, type Model, DPIA_BLEND } from "./policy.ts";
 import { forecastPath, growthPrior, statuteNote } from "./project.ts";
 import type { Draft, Panel, PanelDistrict } from "./types.ts";
 import * as routes from "./routes.ts";
@@ -40,6 +39,18 @@ export interface Levers {
   minimumStateShare: number;
   phaseInGeneral: number;
   phaseInDpia: number;
+  /** Weight on directly certified ADM in the DPIA count. Current law is 0.35. */
+  dpiaBlend: number;
+  /**
+   * What the top of the supplemental targeted assistance scale pays, per pupil.
+   *
+   * The only lever whose current-law position is **zero**: R.C. 3317.0218 is repealed and the
+   * tier pays nothing while its eligibility test still runs. $750 restores the schedule it was
+   * last paid on.
+   */
+  supplementalTopRate: number;
+  /** The minimum state share applied to transportation. Current law is 0.5. */
+  transportationFloor: number;
   /**
    * The fiscal year to project enrollment to. Equal to the base year means "do not project".
    *
@@ -73,6 +84,15 @@ export const LEVER_BOUNDS = {
   minimumStateShare: { min: 0.05, max: 0.3, step: 0.01 },
   phaseInGeneral: { min: 0, max: 1, step: 0.05 },
   phaseInDpia: { min: 0, max: 1, step: 0.05 },
+  // 0 is the count the formula used before H.B. 96 and 1 is direct certification alone. Both
+  // ends are real readings of the provision rather than headroom.
+  dpiaBlend: { min: 0, max: 1, step: 0.05 },
+  // 0 is current law. $750 is the top of the schedule as last paid; the range reaches past it
+  // because restoring a repealed tier at more than it last paid is an ordinary proposal.
+  supplementalTopRate: { min: 0, max: 1500, step: 25 },
+  // 0 pays every district its own share and 1 pays every district in full. H.B. 96 moved it
+  // 41.67% → 45.83% → 50% inside one act, so the plausible range is wide.
+  transportationFloor: { min: 0, max: 1, step: 0.0125 },
 } as const;
 
 /** The two ends of the horizon, which are a property of the feed rather than of the control. */
@@ -85,16 +105,19 @@ export interface HorizonBound {
 
 /** The levers at their current-law positions. */
 export function defaultLevers(
-  modelMinimumStateShare: number,
+  model: Model,
   baseYear = 2026,
 ): Levers {
   return {
     guarantee: "as-enacted",
     guaranteeArgument: 0.5,
     baseCostScale: 1,
-    minimumStateShare: modelMinimumStateShare,
+    minimumStateShare: model.minimumStateShare,
     phaseInGeneral: 1,
     phaseInDpia: 1,
+    dpiaBlend: DPIA_BLEND,
+    supplementalTopRate: 0,
+    transportationFloor: model.transportationFloor,
     horizon: baseYear + DEFAULT_HORIZON_YEARS,
   };
 }
@@ -149,6 +172,9 @@ export function toPolicy(levers: Levers): Policy {
     minimumStateShare: levers.minimumStateShare,
     phaseInGeneral: levers.phaseInGeneral,
     phaseInDpia: levers.phaseInDpia,
+    dpiaDirectlyCertifiedWeight: levers.dpiaBlend,
+    supplementalTopRate: levers.supplementalTopRate,
+    transportationFloor: levers.transportationFloor,
   };
 }
 
@@ -201,7 +227,7 @@ function samePolicy(a: Levers, b: Levers): boolean {
   );
 }
 
-function isCurrentLaw(levers: Levers, model: number): boolean {
+function isCurrentLaw(levers: Levers, model: Model): boolean {
   return samePolicy(levers, defaultLevers(model));
 }
 
@@ -289,7 +315,7 @@ function range(low: number, high: number): string {
 export function renderProjection(bundle: Panel, levers: Levers, chip = ""): string {
   const meta = bundle.projection;
   if (!meta) return "";
-  const model = bundle.statewide.minimum_state_share;
+  const model = modelOf(bundle.statewide);
   if (levers.horizon <= meta.base_year) {
     return `<div class="card" id="projection" data-part="projection">
       <h2>${heading("projection", "At projected enrollment", chip)}</h2>
@@ -417,7 +443,7 @@ export function renderDistrictScenario(
   irn: string,
   chip = "",
 ): string {
-  const model = bundle.statewide.minimum_state_share;
+  const model = modelOf(bundle.statewide);
   const district = bundle.districts.find((d) => d.irn === irn);
   if (!district) {
     return `<div class="card err" id="unknown-district" data-part="unknown-district"><p>No district with IRN ${escapeHtml(irn)} is in this feed.</p></div>`;
@@ -561,7 +587,7 @@ export interface RenderedScenario {
 
 /** Run the levers and render the result. */
 export function renderScenario(bundle: Panel, levers: Levers, chip = ""): RenderedScenario {
-  const model = bundle.statewide.minimum_state_share;
+  const model = modelOf(bundle.statewide);
   if (isCurrentLaw(levers, model)) {
     return {
       summary: `<div class="card" id="current-law" data-part="current-law">
@@ -691,7 +717,7 @@ function leverValue(proposed: string): number | null {
   return Number.isFinite(value) ? value : null;
 }
 
-export function draftLevers(draft: Draft, model: number, baseYear: number): Levers {
+export function draftLevers(draft: Draft, model: Model, baseYear: number): Levers {
   /*
    * Every numeric lever is checked for finiteness, not just the guarantee's argument.
    *
@@ -747,7 +773,7 @@ export function draftLevers(draft: Draft, model: number, baseYear: number): Leve
  * disagreeing about which fields count — they did, and the disagreement was visible as a departure
  * banner over figures identical to the bill's.
  */
-export function matchesDraft(levers: Levers, draft: Draft, model: number, baseYear: number): boolean {
+export function matchesDraft(levers: Levers, draft: Draft, model: Model, baseYear: number): boolean {
   return samePolicy(levers, draftLevers(draft, model, baseYear));
 }
 
@@ -794,7 +820,7 @@ export function renderDraft(panel: Panel, levers: Levers, slug: string): string 
     </div>`;
   }
 
-  const model = panel.statewide.minimum_state_share;
+  const model = modelOf(panel.statewide);
   const baseYear = panel.projection?.base_year ?? 0;
   const unpriced = draft.provisions.filter((p) => p.lever === "");
   const priced = draft.provisions.length - unpriced.length;

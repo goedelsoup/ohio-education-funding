@@ -196,6 +196,16 @@ impl Bundle {
                     st.count(key, value);
                 }
                 st.count("at_minimum_state_share", w.at_minimum_state_share);
+                // The DPIA index divides by this and then squares, so a relative error
+                // here is doubled in every district's aid. Eight places leaves about a dollar
+                // across the programme, which is the whole of the reproduction tolerance; the
+                // full float is what the browser has to rescale from.
+                st.raw(
+                    "dpia_statewide_percentage",
+                    &format!("{}", w.dpia_statewide_percentage),
+                );
+                st.share("supplemental_top_index", w.supplemental_top_index);
+                st.num("transportation_floor", w.transportation_floor);
                 st.num("median_valuation_per_pupil", w.median_valuation_per_pupil);
                 st.num(
                     "median_operating_expenditure_per_pupil",
@@ -300,9 +310,16 @@ impl Bundle {
                         policy.num("minimum_state_share", c.policy.minimum_state_share);
                         policy.num("phase_in_general", c.policy.phase_in_general);
                         policy.num("phase_in_dpia", c.policy.phase_in_dpia);
+                        policy.num(
+                            "dpia_directly_certified_weight",
+                            c.policy.dpia_directly_certified_weight,
+                        );
+                        policy.num("supplemental_top_rate", c.policy.supplemental_top_rate);
+                        policy.num("transportation_floor", c.policy.transportation_floor);
                     }
                     o.num("cost", c.cost);
                     o.num("realized_aid", c.realized_aid);
+                    o.num("transportation", c.transportation);
                     o.count("gainers", c.gainers);
                     o.count("losers", c.losers);
                     o.count("unmoved", c.unmoved);
@@ -363,6 +380,12 @@ impl Bundle {
                             policy.num("minimum_state_share", c.policy.minimum_state_share);
                             policy.num("phase_in_general", c.policy.phase_in_general);
                             policy.num("phase_in_dpia", c.policy.phase_in_dpia);
+                            policy.num(
+                                "dpia_directly_certified_weight",
+                                c.policy.dpia_directly_certified_weight,
+                            );
+                            policy.num("supplemental_top_rate", c.policy.supplemental_top_rate);
+                            policy.num("transportation_floor", c.policy.transportation_floor);
                         }
                         o.count("fiscal_year", c.fiscal_year);
                         o.num("realized_aid", c.realized_aid);
@@ -809,6 +832,19 @@ impl Bundle {
                 o.num("dpia_funding", d.dpia_funding);
                 o.num("general_funding_base", d.general_funding_base);
                 o.num("dpia_funding_base", d.dpia_funding_base);
+                o.num("dpia_econ_disadvantaged_adm", d.dpia_econ_disadvantaged_adm);
+                o.num("dpia_directly_certified_adm", d.dpia_directly_certified_adm);
+                // Eight places, not four. The index is read off a scale whose top is the
+                // state maximum, and rounding Youngstown's 2.81996153 to 2.82 would move the top
+                // of the scale — every district's rate with it.
+                o.share("supplemental_wealth_index", d.supplemental_wealth_index);
+                o.flag("supplement_eligible", d.supplement_eligible);
+                o.num("transportation_gross", d.transportation_gross);
+                o.num("transportation_guarantee", d.transportation_guarantee);
+                // Likewise: this is a rate multiplied by a gross, so four places is $60
+                // of drift across the programme — well past the reproduction check's dollar.
+                o.share("transportation_state_share", d.transportation_state_share);
+                o.num("transportation_paid", d.transportation_paid);
                 o.num("guarantee_floor", d.guarantee_floor);
                 /*
                  * The department's own grouping, written only where it has one.

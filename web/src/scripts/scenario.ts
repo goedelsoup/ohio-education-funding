@@ -1,3 +1,4 @@
+import { modelOf } from "../lib/policy.ts";
 /**
  * The scenario builder, in the browser.
  *
@@ -146,6 +147,9 @@ function fromQuery(horizon: HorizonBound): Partial<Levers> {
     ["min", "minimumStateShare"],
     ["pb", "phaseInGeneral"],
     ["pc", "phaseInDpia"],
+    ["dc", "dpiaBlend"],
+    ["sta", "supplementalTopRate"],
+    ["tf", "transportationFloor"],
     ["h", "horizon"],
   ] as const) {
     const raw = params.get(key);
@@ -177,6 +181,9 @@ function toQuery(): void {
     min: String(l.minimumStateShare),
     pb: String(l.phaseInGeneral),
     pc: String(l.phaseInDpia),
+    dc: String(l.dpiaBlend),
+    sta: String(l.supplementalTopRate),
+    tf: String(l.transportationFloor),
   });
   // Only where a horizon can be set. The district route has no such control, draws no band, and
   // reads nothing from `h` — so every URL it minted carried `h=2032` for a reader to copy and send.
@@ -241,6 +248,9 @@ function readLevers(fallbackHorizon: number): Levers {
     minimumStateShare: number("#lv-min"),
     phaseInGeneral: number("#lv-phase"),
     phaseInDpia: number("#lv-phase-dpia"),
+    dpiaBlend: number("#lv-dpia-blend"),
+    supplementalTopRate: number("#lv-supplemental"),
+    transportationFloor: number("#lv-transport"),
     horizon: $("#lv-horizon") ? number("#lv-horizon") : fallbackHorizon,
   };
 }
@@ -506,7 +516,7 @@ function boot(panel: Panel): void {
   state = {
     panel,
     verification,
-    levers: defaultLevers(panel.statewide.minimum_state_share, baseYear),
+    levers: defaultLevers(modelOf(panel.statewide), baseYear),
     view: viewFromQuery(new URLSearchParams(location.search)),
   };
 
@@ -536,7 +546,7 @@ function boot(panel: Panel): void {
    */
   const opened = panel.drafts.find((d) => d.slug === draftSlug);
   const fromDraft = opened
-    ? draftLevers(opened, panel.statewide.minimum_state_share, baseYear)
+    ? draftLevers(opened, modelOf(panel.statewide), baseYear)
     : null;
   const initial: Partial<Levers> = fromDraft
     ? { ...fromDraft, ...fromQuery(horizonBound) }
@@ -571,7 +581,7 @@ function boot(panel: Panel): void {
   const trails = $<HTMLInputElement>("#rv-trails");
   if (trails) trails.checked = state.view.trails;
 
-  const fallback = defaultLevers(panel.statewide.minimum_state_share, baseYear).horizon;
+  const fallback = defaultLevers(modelOf(panel.statewide), baseYear).horizon;
 
   /*
    * `fromControls: false` is for the first render of a draft, and it is not a convenience.
@@ -632,7 +642,7 @@ function boot(panel: Panel): void {
     });
   }
   $("#scenario-reset")?.addEventListener("click", () => {
-    const defaults = defaultLevers(panel.statewide.minimum_state_share, baseYear);
+    const defaults = defaultLevers(modelOf(panel.statewide), baseYear);
     $<HTMLSelectElement>("#lv-guarantee")!.value = defaults.guarantee;
     put("#lv-arg", defaults.guaranteeArgument);
     put("#lv-base", defaults.baseCostScale);

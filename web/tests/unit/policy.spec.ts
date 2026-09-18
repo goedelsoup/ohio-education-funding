@@ -13,7 +13,7 @@ import { expect, test } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { apply, applyAll, currentLaw, currentRealizedAid, totals } from "../../src/lib/policy.ts";
+import { apply, applyAll, currentLaw, currentRealizedAid, totals, modelOf, publishedStatewide } from "../../src/lib/policy.ts";
 import { compare, isVerified, toPolicy, verify } from "../../src/lib/verify.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
 import { bin } from "../../src/lib/chart.ts";
@@ -30,7 +30,7 @@ import { REQUIRED_CONTRACT, type Bundle } from "../../src/lib/types.ts";
 const bundle: Bundle = JSON.parse(
   readFileSync(join(import.meta.dirname, "../../public/data/bundle.json"), "utf8"),
 );
-const model = bundle.statewide.minimum_state_share;
+const model = modelOf(bundle.statewide);
 
 test("the committed feed is the contract this page reads", () => {
   expect(bundle.contract_version).toBe(REQUIRED_CONTRACT);
@@ -48,7 +48,13 @@ test("every Rust-computed checkpoint is reproduced by the browser formula", () =
 test("current law is the identity, district by district", () => {
   // Not just in aggregate: an error that cancels across 609 districts is still an error.
   for (const d of bundle.districts) {
-    const outcome = apply(d, currentLaw(model), d.current_year_adm, model);
+    const outcome = apply(
+      d,
+      currentLaw(model),
+      publishedStatewide(model),
+      d.current_year_adm,
+      model,
+    );
     expect(Math.abs(outcome.delta), `${d.name} moved by ${outcome.delta} under current law`)
       .toBeLessThan(0.02);
     expect(outcome.onGuarantee, d.name).toBe(d.on_guarantee);
@@ -317,13 +323,13 @@ test("outcomes: spending per enrolled pupil is never below spending per weighted
  */
 test("the minimum-state-share count can rise and cannot fall", () => {
   const { bundle } = loadFeed();
-  const model = bundle.statewide.minimum_state_share;
+  const model = modelOf(bundle.statewide);
   const at = (minimumStateShare: number) =>
     totals(applyAll(bundle.districts, { ...currentLaw(model), minimumStateShare }, model))
       .atMinimumStateShare;
 
   const published = bundle.statewide.at_minimum_state_share;
-  expect(at(model)).toBe(published);
+  expect(at(model.minimumStateShare)).toBe(published);
 
   // Below the model's minimum: cannot fall, however far down the lever goes.
   for (const lower of [0.09, 0.07, 0.05]) {

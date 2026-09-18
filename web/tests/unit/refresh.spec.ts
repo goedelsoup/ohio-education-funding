@@ -30,11 +30,11 @@
 import { expect, test } from "vitest";
 
 import { loadFeed } from "../../src/lib/feed.ts";
-import { applyAll, currentLaw, totals } from "../../src/lib/policy.ts";
+import { applyAll, currentLaw, totals, modelOf } from "../../src/lib/policy.ts";
 import { heldFixed, refreshEffect } from "../../src/lib/refresh.ts";
 
 const { bundle } = loadFeed();
-const MODEL = bundle.statewide.minimum_state_share;
+const MODEL = modelOf(bundle.statewide);
 
 const effect = refreshEffect(bundle.districts, bundle.drafts, MODEL)!;
 

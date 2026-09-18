@@ -121,6 +121,14 @@ fn sample() -> District {
         dpia_funding: 1_204_311.0,
         general_funding_base: 5_100_000.0,
         dpia_funding_base: 900_000.0,
+        dpia_econ_disadvantaged_adm: 0.0,
+        dpia_directly_certified_adm: 0.0,
+        supplemental_wealth_index: 0.0,
+        supplement_eligible: false,
+        transportation_gross: 0.0,
+        transportation_guarantee: 0.0,
+        transportation_state_share: 0.0,
+        transportation_paid: 0.0,
         guarantee_floor: 5_950_000.0,
         special_education: SpecialEducation {
             adm: [10.9, 105.2, 6.0, 1.0, 10.8, 7.1],
@@ -284,6 +292,9 @@ fn sample() -> District {
 
 fn zero_statewide() -> Statewide {
     Statewide {
+        dpia_statewide_percentage: 0.5333803106067103,
+        supplemental_top_index: 2.819_961_53,
+        transportation_floor: 0.5,
         districts: 1,
         on_guarantee: 0,
         at_millage_floor: 1,
@@ -573,8 +584,12 @@ fn projection() -> Projection {
 
 fn checkpoint() -> Checkpoint {
     Checkpoint {
+        transportation: 0.0,
         label: "guarantee removed".into(),
         policy: PolicyShape {
+            dpia_directly_certified_weight: 0.35,
+            supplemental_top_rate: 0.0,
+            transportation_floor: 0.5,
             guarantee: "removed",
             guarantee_argument: 0.0,
             base_cost_scale: 1.0,

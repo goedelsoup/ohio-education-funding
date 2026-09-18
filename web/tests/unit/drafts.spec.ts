@@ -19,7 +19,7 @@ import {
   matchesDraft,
   renderDraft,
 } from "../../src/lib/scenario.ts";
-import { applyAll, totals } from "../../src/lib/policy.ts";
+import { applyAll, totals, modelOf } from "../../src/lib/policy.ts";
 import { toPolicy } from "../../src/lib/scenario.ts";
 import type { Panel } from "../../src/lib/types.ts";
 
@@ -40,7 +40,7 @@ function panel(): Panel {
  */
 const flat = (html: string): string => html.replace(/\s+/g, " ");
 
-const MODEL = bundle.statewide.minimum_state_share;
+const MODEL = modelOf(bundle.statewide);
 const BASE_YEAR = bundle.projection?.base_year ?? 0;
 
 test("the feed carries every draft, unpriced provisions included", () => {
@@ -317,5 +317,5 @@ test("a provision the schema would reject cannot reach the levers either", () =>
   const levers = draftLevers(draft, MODEL, BASE_YEAR);
   expect(Number.isFinite(levers.baseCostScale)).toBe(true);
   expect(levers.baseCostScale).toBe(1);
-  expect(levers.minimumStateShare).toBe(MODEL);
+  expect(levers.minimumStateShare).toBe(MODEL.minimumStateShare);
 });

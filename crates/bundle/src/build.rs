@@ -64,11 +64,15 @@ use project::line_origins;
 use project::outcomes::{joined, Joined};
 use project::panel::categoricals::{TA_MEDIAN_WEALTH_PER_PUPIL, TA_MEDIAN_WEIGHTED_WEALTH};
 use project::panel::supplements::{PREK_SPED_APPROPRIATION, PREK_SPED_PRORATION};
-use project::panel::{panel, DistrictRecord, HISTORY_YEARS, MINIMUM_STATE_SHARE, MODEL_YEAR};
+use project::panel::{
+    panel, DistrictRecord, DPIA_BLEND, HISTORY_YEARS, MINIMUM_STATE_SHARE, MODEL_YEAR,
+    TA_SUPPLEMENT_TOP_RATE,
+};
 use project::policy::{GuaranteeRule, Policy};
 use project::report::{enrollment_growth_prior, forecast, simulate};
 use project::series::{Method, DEFAULT_DAMPING, DEFAULT_SHRINK_WEIGHT, ONE_SIGMA};
 use project::session_laws;
+use project::transport::MINIMUM_STATE_SHARE_FY2027 as TRANSPORT_FLOOR;
 use scenario_delta::ScenarioDelta;
 
 /// The furthest year the page will offer, ten past the last observation.
@@ -154,7 +158,41 @@ fn draft_export() -> Vec<Draft> {
 /// Chosen to exercise every lever and both sides of the guarantee's `max`: removal and a
 /// partial phase-out take different paths through it, and a base cost increase moves districts
 /// across the threshold in a way no purely linear scenario would.
+/// Transportation's calculated amount, before any state share is applied.
+///
+/// The department publishes each component net of `max(the district's own share, the floor in
+/// force)`, so recovering the gross is a division by that same maximum. Districts with no
+/// published share or no components have nothing to recover and report zero — the browser holds
+/// them at what they were paid, as `project::policy` does.
+fn transport_gross(record: &project::panel::DistrictRecord) -> f64 {
+    let components = record.transportation.components();
+    let Some(share) = record.published_state_share.filter(|s| *s > 0.0) else {
+        return 0.0;
+    };
+    if components <= 0.0 {
+        return 0.0;
+    }
+    components / share.max(project::transport::MINIMUM_STATE_SHARE_FY2027)
+}
+
+/// The shapes alone, for the test that every lever is exercised by one.
+///
+/// Exposed rather than the whole list because a `Policy` is not comparable field by field from
+/// outside this crate, and the shape is what the feed carries and the browser reads — a lever
+/// that reaches `Policy` and not the shape is as invisible to the browser as one that reaches
+/// neither. See `tests/every_lever_is_checkpointed.rs`.
+#[must_use]
+pub fn checkpoint_shapes() -> Vec<PolicyShape> {
+    checkpoint_policies()
+        .into_iter()
+        .map(|(_, _, shape)| shape)
+        .collect()
+}
+
 fn checkpoint_policies() -> Vec<(&'static str, Policy, PolicyShape)> {
+    // The five original levers positionally, the three added ones by `..`: eight positional
+    // arguments is where a shape helper stops being readable and starts being a place to
+    // transpose two numbers.
     let shape = |guarantee, argument, base_cost_scale, minimum_state_share, base, categorical| {
         PolicyShape {
             guarantee,
@@ -163,6 +201,9 @@ fn checkpoint_policies() -> Vec<(&'static str, Policy, PolicyShape)> {
             minimum_state_share,
             phase_in_general: base,
             phase_in_dpia: categorical,
+            dpia_directly_certified_weight: DPIA_BLEND.1,
+            supplemental_top_rate: 0.0,
+            transportation_floor: TRANSPORT_FLOOR,
         }
     };
     vec![
@@ -228,6 +269,49 @@ fn checkpoint_policies() -> Vec<(&'static str, Policy, PolicyShape)> {
                 ..Policy::current_law()
             },
             shape("as-enacted", 0.0, 1.0, MINIMUM_STATE_SHARE, 0.5, 0.0),
+        ),
+        // The three levers added when Stage 3 was worked. Each is here because the browser can
+        // reproduce every checkpoint above it without having implemented any of them.
+        (
+            // Zero is the count the formula used before H.B. 96: economically disadvantaged ADM
+            // alone. It exercises the statewide rescale, which is the part of this lever a
+            // per-district implementation would get wrong.
+            "DPIA on the disadvantaged count alone",
+            Policy {
+                dpia_directly_certified_weight: 0.0,
+                ..Policy::current_law()
+            },
+            PolicyShape {
+                dpia_directly_certified_weight: 0.0,
+                ..shape("as-enacted", 0.0, 1.0, MINIMUM_STATE_SHARE, 1.0, 1.0)
+            },
+        ),
+        (
+            // The repealed tier restored at the schedule it was last paid on, which is the only
+            // checkpoint whose baseline is a programme paying nothing.
+            "supplemental targeted assistance restored",
+            Policy {
+                supplemental_top_rate: TA_SUPPLEMENT_TOP_RATE,
+                ..Policy::current_law()
+            },
+            PolicyShape {
+                supplemental_top_rate: TA_SUPPLEMENT_TOP_RATE,
+                ..shape("as-enacted", 0.0, 1.0, MINIMUM_STATE_SHARE, 1.0, 1.0)
+            },
+        ),
+        (
+            // The one lever that moves no core foundation funding at all. A browser that had
+            // implemented nothing would reproduce `realized_aid` here exactly and fail on cost,
+            // which is the disagreement the checkpoint exists to surface.
+            "transportation floor at 37.5%",
+            Policy {
+                transportation_floor: 0.375,
+                ..Policy::current_law()
+            },
+            PolicyShape {
+                transportation_floor: 0.375,
+                ..shape("as-enacted", 0.0, 1.0, MINIMUM_STATE_SHARE, 1.0, 1.0)
+            },
         ),
     ]
 }
@@ -675,6 +759,18 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
         general_funding_base: record.transition.funding_base
             - record.transition.funding_base_econ_dis,
         dpia_funding_base: record.transition.funding_base_econ_dis,
+        dpia_econ_disadvantaged_adm: record.dpia.economically_disadvantaged_adm,
+        dpia_directly_certified_adm: record.dpia.directly_certified_adm,
+        supplemental_wealth_index: record.targeted_assistance.fy19_wealth_index,
+        supplement_eligible: record.targeted_assistance.supplement_eligible,
+        // Recovered once, here, rather than in the browser: the share that was applied is
+        // `max(the district's own, the floor in force)`, and dividing a published net figure by
+        // a constant the browser would have to be told separately is how the two implementations
+        // come to disagree.
+        transportation_gross: transport_gross(record),
+        transportation_guarantee: record.transportation.guarantee,
+        transportation_state_share: record.published_state_share.unwrap_or(0.0),
+        transportation_paid: record.transportation.total,
         guarantee_floor: record.guarantee_floor(),
         special_education: SpecialEducation {
             adm: record.special_education.adm,
@@ -1683,6 +1779,10 @@ pub fn build() -> Bundle {
         .collect();
 
     let statewide = Statewide {
+        dpia_statewide_percentage: project::panel::DPIA_STATEWIDE_PERCENTAGE,
+        supplemental_top_index: project::policy::Statewide::supplemental_top_index(&records)
+            .unwrap_or(project::policy::PUBLISHED_SUPPLEMENTAL_TOP_INDEX),
+        transportation_floor: project::transport::MINIMUM_STATE_SHARE_FY2027,
         districts: districts.len(),
         on_guarantee: districts.iter().filter(|d| d.on_guarantee()).count(),
         at_millage_floor: districts.iter().filter(|d| d.at_millage_floor()).count(),
@@ -1805,6 +1905,7 @@ pub fn build() -> Bundle {
                 at_minimum_state_share: effect.policy.at_minimum_state_share,
                 guarantee: effect.policy.guarantee,
                 formula_aid: effect.policy.formula_aid,
+                transportation: effect.policy.transportation,
             }
         })
         .collect();

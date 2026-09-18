@@ -18,7 +18,7 @@
  * another, and that is a defensible floor. See {@link growthPrior}.
  */
 
-import { apply, type Policy } from "./policy.ts";
+import { apply, type Policy, type Model, statewideUnder } from "./policy.ts";
 import type { PanelDistrict } from "./types.ts";
 
 /** One observed value in a fiscal year. */
@@ -310,7 +310,7 @@ export function forecast(
   damping: number,
   shrinkWeight: number,
   prior: Prior,
-  modelMinimumStateShare: number,
+  model: Model,
 ): EnrollmentEffect {
   let point = 0;
   let formula = 0;
@@ -318,6 +318,11 @@ export function forecast(
   let high = 0;
   let adm = 0;
   let onGuarantee = 0;
+
+  // Resolved once over the whole panel, at modelled enrollment. A forecast moves counts, and
+  // rebasing the DPIA denominator on projected ADM would price an enrollment change as a policy
+  // change. Mirrors `project::report::forecast`.
+  const w = statewideUnder(districts, policy, model);
 
   for (const d of districts) {
     const series = projectSeries(
@@ -331,7 +336,7 @@ export function forecast(
     );
     const projected = series.find((p) => p.fiscalYear === through && !p.observed);
     if (!projected) continue;
-    const at = (value: number) => apply(d, policy, value, modelMinimumStateShare);
+    const at = (value: number) => apply(d, policy, w, value, model);
     const central = at(projected.point);
     point += central.realizedAid;
     formula += central.formulaAid;
@@ -382,7 +387,7 @@ export function forecastPath(
   damping: number,
   shrinkWeight: number,
   prior: Prior,
-  modelMinimumStateShare: number,
+  model: Model,
 ): EnrollmentEffect[] {
   const path: EnrollmentEffect[] = [];
 
@@ -392,9 +397,10 @@ export function forecastPath(
     let formula = 0;
     let adm = 0;
     let onGuarantee = 0;
+    const w = statewideUnder(districts, policy, model);
     for (const d of districts) {
       const value = d.adm_history[index] ?? 0;
-      const outcome = apply(d, policy, value, modelMinimumStateShare);
+      const outcome = apply(d, policy, w, value, model);
       aid += outcome.realizedAid;
       formula += outcome.formulaAid;
       adm += value;
@@ -425,7 +431,7 @@ export function forecastPath(
         damping,
         shrinkWeight,
         prior,
-        modelMinimumStateShare,
+        model,
       ),
     );
   }
