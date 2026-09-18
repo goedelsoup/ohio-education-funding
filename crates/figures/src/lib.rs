@@ -7788,6 +7788,59 @@ pub static FIGURES: &[Figure] = &[
         tolerance: 0.0,
         compute: |i| on_the_guarantee(i).len() as f64,
     },
+    // The clawback, which is why the same node's own identity does not close for sixteen FY2025
+    // districts. Bound because the first reading of that shortfall here was a wrong mechanism
+    // invented to explain it, when the node already wrote the right one down.
+    Figure {
+        key: "project/fy2025-open-enrolment-clawback-districts",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts carrying an open-enrolment clawback in the FY2025 payment report -- more \
+                than it reduces, because the guarantee is a floor at zero",
+        pinned: 41.0,
+        tolerance: 0.0,
+        compute: |_| {
+            project::baseline::frame()
+                .iter()
+                .filter(|row| row.open_enrollment_adjustment > 0.0)
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "project/fy2025-open-enrolment-clawback-reduces",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of those, the districts also on the guarantee -- the only ones the clawback takes \
+                anything from, and exactly the districts paid less than their funding base",
+        pinned: 16.0,
+        tolerance: 0.0,
+        compute: |_| {
+            project::baseline::frame()
+                .iter()
+                .filter(|row| row.open_enrollment_adjustment > 0.0 && row.on_guarantee())
+                .count() as f64
+        },
+    },
+    // The interpolation weight, recovered per district rather than read off the header cell that
+    // states it. The FY2027 panel is at 1.0, where a wrong multiplier is invisible.
+    Figure {
+        key: "project/fy2026-general-phase-in",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The FY2026 general phase-in, solved from each district's own base, computed and \
+                step columns -- identical on all 610 districts with a span wide enough to divide",
+        pinned: 0.8333,
+        tolerance: 0.0000005,
+        compute: |_| {
+            let mut weights: Vec<f64> = project::prior_model::frame()
+                .iter()
+                .filter(|row| (row.foundation_calculated - row.funding_base).abs() >= 1_000.0)
+                .map(|row| row.foundation_phase_in / (row.foundation_calculated - row.funding_base))
+                .collect();
+            weights.sort_by(f64::total_cmp);
+            weights[weights.len() / 2]
+        },
+    },
     // The projected block. `tolerance` is how far the calculator may drift from the pin, not how
     // precisely the corpus writes the figure — the prose comparison is a separate half-step check
     // in `corpusFigures.ts`. `report::forecast` is deterministic over a committed panel, so the

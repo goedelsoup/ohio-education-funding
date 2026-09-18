@@ -47,7 +47,18 @@ findings: |
   The department's own `Summary_SFPR` gives the guarantee as $878,974,300 over the 611 rows that
   sheet holds, against $878,954,627 across the committed 609. The $19,673 between them is two
   districts the extract does not carry, and pairing the workbook total with a 609-district count
-  was a mismatch that survived because both numbers are right about something. [open — which two]
+  was a mismatch that survived because both numbers are right about something.
+
+  **The two are Middle Bass Local and North Bass Local**, Lake Erie island districts in Ottawa
+  County, and the money is one of them: the FY2027 workbook states **$19,672.64** for North Bass
+  and **$0.00** for Middle Bass. [verified]
+  (`crates/project/tests/the_year_the_biennium_is_measured_from.rs`, against the department's
+  final FY2025 payment report, which carries all 611)
+
+  They are the same districts the property-tax replication drops for want of a Cupp report row,
+  and the reason is the same one: a district of a few dozen pupils on an island is absent from
+  half the department's files. [inference] What closed the question was a source that carries
+  every row — the payment report — rather than a better reading of the model.
 
   The cost inputs tell a different story. Base cost was priced from FY2018 salaries for the
   first two years, refreshed to FY2022 by [H.B. 33](../legislation/hb-33-2023.yml), and held at

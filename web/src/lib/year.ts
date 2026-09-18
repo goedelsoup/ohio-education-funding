@@ -56,6 +56,7 @@ export type SeriesKey =
   | "national"
   | "appropriations"
   | "meal_program"
+  | "biennium"
   | "casino";
 
 /**

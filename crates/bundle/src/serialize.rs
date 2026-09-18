@@ -810,6 +810,37 @@ impl Bundle {
                 o.num("general_funding_base", d.general_funding_base);
                 o.num("dpia_funding_base", d.dpia_funding_base);
                 o.num("guarantee_floor", d.guarantee_floor);
+                // Both measures, flat, and the five lines. Named `baseline`/`middle`/`terminal`
+                // rather than by year: the years are in `series_years` under `biennium`, and a
+                // year written into a key here would be a second place to change when one moves.
+                fields(
+                    &mut o,
+                    "biennium",
+                    &[
+                        ("year_baseline", f64::from(d.biennium.years[0])),
+                        ("year_middle", f64::from(d.biennium.years[1])),
+                        ("year_terminal", f64::from(d.biennium.years[2])),
+                        ("total_baseline", d.biennium.total_state_support[0]),
+                        ("total_middle", d.biennium.total_state_support[1]),
+                        ("total_terminal", d.biennium.total_state_support[2]),
+                        ("foundation_baseline", d.biennium.foundation_aid[0]),
+                        ("foundation_middle", d.biennium.foundation_aid[1]),
+                        ("foundation_terminal", d.biennium.foundation_aid[2]),
+                        ("line_foundation", d.biennium.lines.foundation),
+                        ("line_transportation", d.biennium.lines.transportation),
+                        (
+                            "line_special_education_transportation",
+                            d.biennium.lines.special_education_transportation,
+                        ),
+                        (
+                            "line_preschool_special_education",
+                            d.biennium.lines.preschool_special_education,
+                        ),
+                        ("line_supplements", d.biennium.lines.supplements),
+                    ],
+                    &[],
+                    &[],
+                );
                 // Special education, then the other five, then the six totals. Emitted once —
                 // this block and the categoricals beside it were pasted twice, so every district
                 // in the shipped feed carried both keys twice. JSON takes the last, so nothing

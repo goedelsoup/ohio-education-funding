@@ -162,7 +162,28 @@ findings: |
   range, which is the aggregate distance between computed and base for the districts above
   theirs. That is the whole of what the phase-in decides, and it is an eighth of the aid it is
   usually described as governing. [verified]
+  ### The multiplier is checkable in FY2026 and nowhere else in this workspace
+
+  The FY2027 panel is at 100%, where `base + pct x (computed - base)` collapses to `computed` and
+  a wrong multiplier is invisible — the panel would reproduce the department's model under any
+  implementation that returned the computed amount. FY2026 is not at 100%, and the department's
+  workbook publishes the base, the computed amount and the step as separate columns, so the weight
+  can be solved per district rather than read off the header cell that states it.
+
+  Solved that way it is **0.8333 on every one of the 610 districts** whose span is wide enough to
+  divide — minimum, median and maximum identical. [verified]
+  (`crates/project/tests/the_interpolation_the_terminal_year_cannot_show.rs`, against
+  `crates/project/fixtures/fy26-department-model.csv`)
+
+  That is what makes FY2026 worth carrying beyond its own year. FY2025's report is on a different
+  schedule and FY2027 has no such columns at all — at 100% the department dropped them, because
+  the computed column is the funded column.
+
 figures:
+  - key: project/fy2026-general-phase-in
+    value: 0.8333
+    field: findings
+    as_written: "**0.8333 on every one of the 610 districts**"
   - key: project/districts-on-the-guarantee
     value: 294
     field: findings

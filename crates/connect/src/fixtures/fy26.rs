@@ -1,6 +1,6 @@
 //! The department's FY2026 calculator, in the columns that answer what moved.
 //!
-//! # Why a second year, and why only nineteen columns of it
+//! # Why a second year, and why only thirty-three columns of it
 //!
 //! [`super::fy27`] turns eleven sheets of the department's FY2027 workbook into the 162-column
 //! fixture every calculator crate reads. This is the same workbook a year earlier, and the
@@ -21,12 +21,27 @@
 //! - per-pupil local capacity moves **+9.34% at the median**, and 2 districts of 609 are unchanged;
 //! - disadvantaged pupil impact aid moves **-8.57%**, and none is unchanged.
 //!
-//! So this takes nineteen columns rather than 162 — the two sides of the state share, the local
-//! capacity build-up, and the disadvantaged pupil blend — which is about seventy kilobytes and
-//! answers the questions. Everything else on those sheets is either already held for FY2027 or
-//! genuinely does restate it.
+//! So this takes thirty-three columns rather than 162 — the two sides of the state share, the
+//! local capacity build-up, the disadvantaged pupil blend, and the payment lines — which is about
+//! a hundred kilobytes and answers the questions. Everything else on those sheets is either
+//! already held for FY2027 or genuinely does restate it.
 //!
-//! # And three of the nineteen are transportation, for a reason the count does not show
+//! # Fourteen of the thirty-three are the payment lines, and they came later
+//!
+//! The first nineteen columns answer *why* a district's formula amount moved. They cannot say
+//! whether the district was paid any of it, because the guarantee sits between the two and is on
+//! neither `Detail_SFPR` nor `Base_Cost`. `Summary_SFPR` carries the whole run-up — the `[Ha]`
+//! `[Hb]` `[Hc]` `[Hd]` foundation quadruple, the guarantee, transportation, the three
+//! supplements and the totals — and a district fully on the guarantee satisfies
+//! `[Hd] + [I] = [Ha]` to the cent, which is what makes the offset visible rather than merely
+//! absent. [`super::fy25`]'s module comment states why that identity is the point.
+//!
+//! This is also the **only** year where the quadruple can be read against a partial phase-in:
+//! FY2025's sheet has it at 100% of a different schedule and FY2027's does not have it at all,
+//! because at 100% the calculated column is the funded column and the department dropped the
+//! other three.
+//!
+//! # And three of the first nineteen are transportation, for a reason the count does not show
 //!
 //! `[j] Reported Spec Ed Trans Cost`, `[J] Special Education Transportation` and
 //! `[G] Transportation Funding` are here because a **proration factor is a quotient and neither
@@ -71,6 +86,22 @@ pub const FY26_HEADER: &[&str] = &[
     "trans_reported_sped_cost",
     "trans_special_education",
     "trans_total",
+    // `Summary_SFPR`, the payment lines. Sheet order, so the quadruple reads base, calculated,
+    // phase-in, funding the way the department prints it.
+    "funding_base",
+    "foundation_calculated",
+    "foundation_phase_in",
+    "foundation_funding",
+    "temp_transitional_aid_guarantee",
+    "transportation",
+    "formula_transition_supplement",
+    "base_funding_supplement",
+    "enrollment_growth_supplement",
+    "total_formula_funding",
+    "performance_supplement",
+    "preschool_special_education",
+    "special_education_transportation",
+    "total_state_support",
 ];
 
 /// The sheets this reads, by the name the workbook gives them.
@@ -81,6 +112,11 @@ pub const BASE_COST_SHEET: &str = "Base_Cost";
 pub const LOCAL_CAPACITY_SHEET: &str = "Local_Capacity";
 /// The disadvantaged pupil blend, one row per district.
 pub const DPIA_SHEET: &str = "DPIA";
+/// The payment lines, one row per district.
+///
+/// Underscored. The workbook carries `Summary SFPR` as a separate sheet and the two are not the
+/// same shape, so the name is not interchangeable with [`super::fy25::SUMMARY_SHEET`].
+pub const SUMMARY_SHEET: &str = "Summary_SFPR";
 
 /// The five sheets, as the rebuild reads them.
 pub struct Fy26Sheets<'a> {
@@ -94,6 +130,8 @@ pub struct Fy26Sheets<'a> {
     pub dpia: &'a [Vec<String>],
     /// `Transportation`, for the three columns a proration factor is checked against.
     pub transportation: &'a [Vec<String>],
+    /// `Summary_SFPR`, the payment lines the biennium comparison is made of.
+    pub summary: &'a [Vec<String>],
 }
 
 /// The first row whose first cell is the department's IRN header, and the rows after it.
@@ -153,9 +191,10 @@ pub fn build_fy26_model(sheets: &Fy26Sheets<'_>) -> Result<Vec<Vec<String>>, Str
     let (capacity_header, capacity) = table(sheets.local_capacity, LOCAL_CAPACITY_SHEET)?;
     let (dpia_header, dpia) = table(sheets.dpia, DPIA_SHEET)?;
     let (transport_header, transport) = table(sheets.transportation, TRANSPORT_SHEET)?;
+    let (summary_header, summary) = table(sheets.summary, SUMMARY_SHEET)?;
 
     let name_at = column(detail_header, "District Names", DETAIL_SHEET)?;
-    let joins: [Join<'_>; 17] = [
+    let joins: [Join<'_>; 31] = [
         (detail, detail_header, "[a] Enrolled ADM", DETAIL_SHEET),
         (
             base,
@@ -188,6 +227,23 @@ pub fn build_fy26_model(sheets: &Fy26Sheets<'_>) -> Result<Vec<Vec<String>>, Str
             "[G] Transportation",
             TRANSPORT_SHEET,
         ),
+        // `Summary_SFPR`. The tags here are this sheet's own and are unique within it; the
+        // collision risk is across sheets — `[G]` and `[J]` mean different things on
+        // `Transportation` — which is why every join names the header it reads.
+        (summary, summary_header, "[Ha]", SUMMARY_SHEET),
+        (summary, summary_header, "[Hb]", SUMMARY_SHEET),
+        (summary, summary_header, "[Hc]", SUMMARY_SHEET),
+        (summary, summary_header, "[Hd]", SUMMARY_SHEET),
+        (summary, summary_header, "[I]", SUMMARY_SHEET),
+        (summary, summary_header, "[J]", SUMMARY_SHEET),
+        (summary, summary_header, "[K]", SUMMARY_SHEET),
+        (summary, summary_header, "[L]", SUMMARY_SHEET),
+        (summary, summary_header, "[M]", SUMMARY_SHEET),
+        (summary, summary_header, "[N]", SUMMARY_SHEET),
+        (summary, summary_header, "[O]", SUMMARY_SHEET),
+        (summary, summary_header, "[P]", SUMMARY_SHEET),
+        (summary, summary_header, "[Q]", SUMMARY_SHEET),
+        (summary, summary_header, "[R]", SUMMARY_SHEET),
     ];
 
     let mut columns: Vec<HashMap<&str, f64>> = Vec::with_capacity(joins.len());
@@ -197,7 +253,11 @@ pub fn build_fy26_model(sheets: &Fy26Sheets<'_>) -> Result<Vec<Vec<String>>, Str
 
     // Places per column, matching how `fy27` writes the same quantity. Shares and ratios carry
     // more than dollars because a share rounded to two places is not a share any more.
-    const PLACES: [usize; 17] = [4, 4, 2, 2, 2, 10, 2, 12, 10, 4, 4, 4, 12, 2, 2, 12, 12];
+    const PLACES: [usize; 31] = [
+        4, 4, 2, 2, 2, 10, 2, 12, 10, 4, 4, 4, 12, 2, 2, 12, 12, //
+        // Every `Summary_SFPR` column is dollars.
+        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+    ];
 
     let mut out = Vec::new();
     for (irn, row) in rows_by_key(detail, 0).filter(|(_, row)| !is_statewide_row(row, 1)) {

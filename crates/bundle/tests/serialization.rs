@@ -181,6 +181,18 @@ fn sample() -> District {
         },
         formula_aid_per_pupil: 6_400.0,
         realized_aid_per_pupil: 6_400.0,
+        biennium: Biennium {
+            years: [2025, 2026, 2027],
+            total_state_support: [9_100_000.0, 9_250_000.0, 9_400_000.0],
+            foundation_aid: [7_700_000.0, 7_700_000.0, 7_700_000.0],
+            lines: BienniumLines {
+                foundation: 0.0,
+                transportation: 185_000.0,
+                special_education_transportation: 12_000.0,
+                preschool_special_education: 3_000.0,
+                supplements: 100_000.0,
+            },
+        },
         guarantee: 0.0,
         at_minimum_state_share: false,
         valuation_per_pupil: Some(279_983.24),
@@ -676,6 +688,18 @@ fn the_fy2020_baseline_is_only_recoverable_on_the_guarantee() {
     let guaranteed = District {
         guarantee: 1_000_000.0,
         realized_aid_per_pupil: 7_100.0,
+        biennium: Biennium {
+            years: [2025, 2026, 2027],
+            total_state_support: [4_050_000.0, 4_100_000.0, 4_160_000.0],
+            foundation_aid: [3_300_000.0, 3_340_000.0, 3_380_000.0],
+            lines: BienniumLines {
+                foundation: 80_000.0,
+                transportation: 20_000.0,
+                special_education_transportation: 12_000.0,
+                preschool_special_education: 3_000.0,
+                supplements: -5_000.0,
+            },
+        },
         ..sample()
     };
     assert_eq!(

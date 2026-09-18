@@ -158,6 +158,13 @@ use edfund_core::Dollars;
 /// consumer that rendered it beside the FY2027 calculator's output without saying which was
 /// which would present a measurement and a projection as the same kind of claim.
 ///
+/// `43.0.0` added `biennium` per district: three observed years on **two measures**, plus the
+/// five payment lines the change on the wide measure is made of. Two measures rather than one
+/// because they disagree in sign statewide over these years — total state support rises $145.0M
+/// and foundation aid falls $114.5M — so a single unnamed "funding" figure would have been a
+/// coin toss between two true sentences. Observed only: the model projects the narrow measure
+/// alone, so nothing here may be extended with a forecast.
+///
 /// `42.0.0` moved the enrollment forecast from `damped` to `shrunk`: each district's three-point
 /// rate is now weighted against a long-run one before it is carried. Two new fields — a
 /// `shrink_weight` on the projection block and a nullable `long_run_enrollment_rate` on every
@@ -182,7 +189,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "42.0.0";
+pub const CONTRACT_VERSION: &str = "43.0.0";
 
 mod model;
 mod serialize;
