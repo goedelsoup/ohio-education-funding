@@ -14,6 +14,7 @@ import { loadFeed } from "../lib/feed.ts";
 import { nav, type Section } from "../lib/nav.ts";
 import { canonicalPath, og } from "../lib/routes.ts";
 import { HEIGHT, WIDTH } from "../lib/og/card.ts";
+import { inlineMark } from "../lib/og/mark.ts";
 import "../styles/app.css";
 
 interface Props {
@@ -236,7 +237,21 @@ const body = applySemantics(listed).html;
     <a class="skip" href="#main">Skip to content</a>
     <header class="site">
       <div class="site-inner">
-        <a class="brand" href="/">Ohio school funding</a>
+        {/*
+          The brand is the mark, and the mark is the file the browser tab is already showing.
+
+          Inlined rather than fetched, which is the same call `.mark` makes below and for the same
+          two reasons — the content security policy admits no third-party origin, and a request per
+          page buys nothing a cached path already has. It is NOT a second copy of the drawing:
+          `inlineMark()` reads `public/favicon.svg`, the file `design/logo/outline.ts` emits and
+          `//:generated` holds current, so the header and the tab cannot come to disagree.
+
+          Its accessible name is the `aria-label` the SVG carries — the same four words the link
+          used to spell out — so a screen reader hears no change. The focus ring is the browser's,
+          unlike `.mark` below: `a:focus-visible` thickens an underline and leaves the outline
+          alone, so a link with no word still keeps a ring around its box.
+        */}
+        <a class="brand" href="/"><Fragment set:html={inlineMark()} /></a>
         <nav aria-label="Sections">
           {/*
             One outer disclosure holding the five, rather than five in a row.
