@@ -3,7 +3,7 @@ label: Guarantee Open Enrolment Clawback
 summary: >-
   Line [I1]: a reduction in a district's guarantee for every open-enrolment pupil it has stopped
   accepting beyond a threshold, charged at the full statewide average base cost rather than at the
-  district's share of it. 43 districts, $5.1 million withheld in FY2027.
+  district's share of it. Charged to 43 districts in FY2027; 22 of them lose anything to it.
 description: |
   A term inside the [temporary transitional aid
   guarantee](temporary-transitional-aid-guarantee.yml), and the only part of the hold-harmless
@@ -37,9 +37,18 @@ description: |
 findings: |
   ### Scale
 
-  **43 districts, $5.1 million withheld** in the FY2027 model. Columbus lost 106.2 FTE against
-  a threshold of 24.3 and had **$674,561** taken off; Cuyahoga Falls lost 118.1 and had
-  $640,025. [verified]
+  **43 districts are charged $5,110,050** in the FY2027 model, and **22 of them lose
+  $3,037,537**. The two figures are two thirds of the way apart and only the second is money: for
+  21 districts the adjustment meets a guarantee that was already zero, and a term subtracted from
+  nothing takes nothing. Columbus lost 106.2 FTE against a threshold of 24.3 and had **$674,561**
+  taken off; Cuyahoga Falls lost 118.1 and had $640,025 — both are on the guarantee and both lose
+  the whole charge. [verified]
+
+  The twenty-second district is the one a guarantee test cannot find. **West Muskingum Local** is
+  charged $146,074.11 and loses **$7,105.69**, because $7,105.69 is all the guarantee it had; the
+  clamp in `[I] = max([H2] − [I1] − [H], 0)` leaves it at exactly zero, so it reads afterwards as
+  not on the guarantee at all. `Transition::guarantee_before_clawback` tests `guarantee > 0` and
+  returns twenty-one. [verified]
   ([`crates/project/tests/the_supplements_outside_the_formula.rs`](../../../crates/project/tests/the_supplements_outside_the_formula.rs))
 
   Small against the guarantee's $879 million, and not small for the districts it reaches: it is
@@ -63,11 +72,17 @@ findings: |
   The distinction matters because the intersection is not predictable from either side. 25 of the
   41 lose nothing, and a count of clawbacks would have named them all.
 
-  **The FY2027 figures above are stated on the wider reading and have not been corrected.** The
-  same test over the FY2027 model gives 43 carrying a clawback, **22** actually reduced by one,
-  and **$3,037,537** withheld against the $5,110,050 this node reports — the difference being the
-  21 districts whose `[I1]` meets no guarantee. Changing the bound figures is a separate edit
-  from recording the mechanism, and the mechanism is what this section is for. [open]
+  **The FY2027 figures above were stated on the wider reading and have been corrected.** This node
+  reported `43 districts, $5.1 million withheld`, and the arithmetic behind it was right: the
+  figure summed `[I1]` across every district carrying one. What was wrong was the word. That sum
+  is the adjustment *charged*, and `withheld` is the amount the guarantee actually loses, which is
+  $3,037,537 across 22 districts.
+
+  Both are now computed and bound separately —
+  `project/open-enrolment-clawback-carrying` and `-adjustment` for the charge,
+  `-districts` and `-withheld` for the loss — because both are real and they answer different
+  questions. The charge is the mechanism's incidence: 43 districts are subject to it whether or
+  not it reaches them. The loss is its cost. [verified]
 
   ### Why it is a node rather than a paragraph
 
@@ -103,9 +118,9 @@ properties:
     `crates/project/tests/the_supplements_outside_the_formula.rs`; the threshold and both FTE
     counts are carried in `crates/project::panel::Transition`. [verified]
   fy2027_scale: |
-    43 districts affected; $5,110,050 withheld in aggregate. Largest single reduction $674,561
-    (Columbus City, 106.2 FTE against a 24.3 threshold); next $640,025 (Cuyahoga Falls, 118.1
-    FTE). [verified]
+    43 districts charged; $5,110,050 in adjustments. 22 districts reduced; $3,037,537 actually
+    withheld. Largest single reduction $674,561 (Columbus City, 106.2 FTE against a 24.3
+    threshold); next $640,025 (Cuyahoga Falls, 118.1 FTE). [verified]
 figures:
   - key: project/fy2025-open-enrolment-clawback-districts
     value: 41
@@ -115,22 +130,30 @@ figures:
     value: 16
     field: findings
     as_written: "**41 districts carry a clawback and 16 of them are on the\n  guarantee**"
-  - key: project/open-enrolment-clawback-districts
+  - key: project/open-enrolment-clawback-carrying
     value: 43
     field: summary
-    as_written: "43 districts, $5.1 million withheld in FY2027"
-  - key: project/open-enrolment-clawback-withheld
-    value: 5110049.66
-    field: summary
-    as_written: "43 districts, $5.1 million withheld in FY2027"
+    as_written: "Charged to 43 districts in FY2027; 22 of them lose anything to it"
   - key: project/open-enrolment-clawback-districts
+    value: 22
+    field: summary
+    as_written: "Charged to 43 districts in FY2027; 22 of them lose anything to it"
+  - key: project/open-enrolment-clawback-carrying
     value: 43
     field: findings
-    as_written: "43 districts, $5.1 million withheld"
-  - key: project/open-enrolment-clawback-withheld
+    as_written: "**43 districts are charged $5,110,050**"
+  - key: project/open-enrolment-clawback-adjustment
     value: 5110049.66
     field: findings
-    as_written: "43 districts, $5.1 million withheld"
+    as_written: "**43 districts are charged $5,110,050**"
+  - key: project/open-enrolment-clawback-districts
+    value: 22
+    field: findings
+    as_written: "**22 of them lose\n  $3,037,537**"
+  - key: project/open-enrolment-clawback-withheld
+    value: 3037536.64
+    field: findings
+    as_written: "**22 of them lose\n  $3,037,537**"
   - key: project/open-enrolment-clawback-largest
     value: 674560.81
     field: findings
@@ -143,14 +166,22 @@ figures:
     value: 8241.61
     field: description
     as_written: "$8,241.61 is the statewide average base cost per pupil"
-  - key: project/open-enrolment-clawback-districts
+  - key: project/open-enrolment-clawback-carrying
     value: 43
     field: fy2027_scale
-    as_written: "43 districts affected"
-  - key: project/open-enrolment-clawback-withheld
+    as_written: "43 districts charged"
+  - key: project/open-enrolment-clawback-adjustment
     value: 5110049.66
     field: fy2027_scale
-    as_written: "$5,110,050 withheld in aggregate"
+    as_written: "$5,110,050 in adjustments"
+  - key: project/open-enrolment-clawback-districts
+    value: 22
+    field: fy2027_scale
+    as_written: "22 districts reduced"
+  - key: project/open-enrolment-clawback-withheld
+    value: 3037536.64
+    field: fy2027_scale
+    as_written: "$3,037,537 actually\n    withheld"
   - key: project/open-enrolment-clawback-largest
     value: 674560.81
     field: fy2027_scale

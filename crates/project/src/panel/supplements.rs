@@ -579,10 +579,20 @@ impl Transition {
         (self.open_enrollment_lost() - self.open_enrollment_threshold).max(0.0)
     }
 
-    /// What the guarantee would have been without the clawback.
+    /// What the guarantee would have been without the clawback, **where the clamp did not bind**.
     ///
-    /// `None` where no clawback applied. The difference is the point: a district's guarantee is
-    /// reported as one number and is two, and only one of them is about its funding.
+    /// `None` where no adjustment was charged, and `None` where the district is left with no
+    /// guarantee at all — which is not the same thing, and is why this is no longer the function
+    /// to ask. `[I] = max([H2] − [I1] − [H], 0)` clamps at zero, so a district can be charged and
+    /// left at exactly zero: **West Muskingum Local** is charged $146,074.11 and loses $7,105.69,
+    /// and a `guarantee > 0` test after the fact cannot see it. That test finds twenty-one
+    /// districts and the answer is twenty-two.
+    ///
+    /// Use [`DistrictRecord::guarantee_before_clawback`](super::record::DistrictRecord) and
+    /// [`DistrictRecord::open_enrollment_withheld`](super::record::DistrictRecord) instead: they
+    /// read the published `funding_base` rather than inferring backwards from a figure the clamp
+    /// has already flattened. This is kept because `Transition` alone cannot compute the clamped
+    /// case — it does not carry foundation funding — and saying so is worth more than deleting it.
     #[must_use]
     pub fn guarantee_before_clawback(&self, guarantee: Dollars) -> Option<Dollars> {
         (self.open_enrollment_adjustment > 0.0 && guarantee > 0.0)
@@ -594,11 +604,13 @@ impl Transition {
 mod tests {
     use crate::panel::panel;
 
-    /// The guarantee a clawback reduced is two numbers, and this returns the other one.
+    /// The guarantee a clawback reduced is two numbers, and this returns the other one — for the
+    /// districts it can see.
     ///
     /// Kept and tested rather than deleted: nothing called it, but its doc makes a claim about
     /// how a district's guarantee is reported, and an untested public function whose doc makes a
-    /// claim is a claim nobody checks.
+    /// claim is a claim nobody checks. The claim has since been narrowed — see the function — and
+    /// `the_clamp_is_the_twenty_second_district` below is what found the gap.
     #[test]
     fn a_clawed_back_guarantee_reports_the_amount_before_the_charge() {
         let districts = panel();

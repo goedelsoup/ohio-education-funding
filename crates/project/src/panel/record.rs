@@ -233,6 +233,38 @@ impl DistrictRecord {
         (self.transition.funding_base - self.transition.open_enrollment_adjustment).max(0.0)
     }
 
+    /// The guarantee this district would have been paid had it accepted no fewer open-enrolment
+    /// pupils — that is, before line `[I1]` was taken off.
+    ///
+    /// [`Self::guarantee_floor`] is already net of the clawback, because the published
+    /// `funding_base` is gross and the floor subtracts `[I1]` from it. So the gross guarantee is
+    /// the floor with the adjustment added back, compared against foundation funding exactly as
+    /// the net one is.
+    #[must_use]
+    pub fn guarantee_before_clawback(&self) -> Dollars {
+        (self.transition.funding_base - self.core_foundation_funding).max(0.0)
+    }
+
+    /// What the open-enrolment clawback actually took off this district's guarantee.
+    ///
+    /// # Why this is not the adjustment
+    ///
+    /// Because `[I] = max([H2] − [I1] − [H], 0)` clamps at zero, and the clamp binds. **43
+    /// districts are charged an adjustment and 22 lose anything to it**: for the other 21 the
+    /// adjustment meets a guarantee that was already nothing, and a term subtracted from zero
+    /// takes nothing. The charge is real and its effect is not, which is the distinction a single
+    /// figure called "withheld" was eliding — the two differ by $2.07 million.
+    ///
+    /// The clamp also binds *partially*, which is the case a guarantee-positive test misses.
+    /// **West Muskingum Local** is charged $146,074.11 and loses $7,105.69, because $7,105.69 is
+    /// all the guarantee it had; it is left at exactly zero and so reads as not on the guarantee
+    /// at all. It is the twenty-second district, and a test of `guarantee > 0` after the fact
+    /// finds twenty-one.
+    #[must_use]
+    pub fn open_enrollment_withheld(&self) -> Dollars {
+        (self.guarantee_before_clawback() - self.guarantee).max(0.0)
+    }
+
     /// Everything in formula aid that is not base cost: the categoricals.
     ///
     /// Held apart because they respond to different levers. Raising base cost moves the first
