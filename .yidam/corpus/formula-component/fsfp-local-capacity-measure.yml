@@ -125,7 +125,48 @@ findings: |
   On the published inputs the residual is zero. **The 4.4% gap was not a finding about Ohio; it
   was the cost of not opening a sheet.** [verified]
 
+  The bottom two rows are one error, not two, and both said something about the measure that is
+  not true. Substituting the Ohio median for the federal one moves every district's figure, so it
+  also moves their median and the ranking built on it — the 41,502 and the 1.4151 are the 31,555
+  propagating, counted a second and third time. Read from the federal column both statewide
+  constants come back **exactly**: the median of the 609 district medians is **$54,546.6375**,
+  which is `[I7]` to the last digit, and the fortieth-highest ratio is **Westlake City's
+  1.46503636**, which is `[C5]`. [verified]
+  (`crates/local-capacity/tests/against_the_departments_own_capacity.rs`)
+
+  So nothing in this measure is a number anybody chooses, and the entry above recording `[I7]` as
+  "published rather than derivable" and `[C5]` as discretionary was a wrong input read as a fact
+  about the statute. R.C. 3317.017(A)(4)(a) defines the denominator as the median of the district
+  medians and (A)(4)(c)-(d) defines the benchmark as a rank over them; both are what the text says
+  they are. That also closes the question of the fortieth ratio's *value* — what remains open is
+  only why the fortieth. [verified]
+
   Why the fortieth, out of 609, is not stated in the section. [open]
+
+  ### The section names a certification the state was not making
+
+  R.C. 3317.017 takes every income term "as certified under section 3317.021 of the Revised Code"
+  — four times, once for each income input it uses, and those four are the section's *only*
+  citations of it; the valuation term cites nothing. This corpus had never fetched that section.
+
+  It certifies less than the formula asks for, and did so from the day the plan was enacted: until
+  30 September 2025 division (A)(5) named the district's **total federal** AGI and its **median
+  Ohio** AGI, where (A)(3) of the capacity blend needs the **median federal** AGI and a **count of
+  returns**. Neither was certified, for four years. [verified]
+  (`crates/project/tests/what_the_tax_commissioner_was_never_asked_to_certify.rs`)
+
+  That is the account this node has been missing for its own recorded error. An earlier pass did
+  not guess Ohio median income out of the air; it is the median the state's certification
+  statute actually produces, and reading the formula section's requirement against the
+  certification section's supply is how the substitution became plausible. [inference]
+
+  **H.B. 96 moved the gap instead of closing it.** Item 9 of the act substituted the median for
+  the total at (A)(5) rather than adding it, so the aggregate term at R.C. 3317.017(A)(2) now
+  cites a certification that no longer exists; and the returns count it added at (A)(6) is limited
+  to FY2026 and FY2027 while (A)(5) beside it is permanent, so the two halves of one product
+  expire on different schedules. None of it reaches a payment — the department computes both terms
+  and this corpus reproduces its answer for 609 of 609 districts — but a blend whose inputs have
+  never all been certified is a different object from one whose inputs have. [verified]
 
   ### The decision is stable. The distribution is not.
 
@@ -195,6 +236,42 @@ findings: |
   state aid all at once, and two different implementations. A reader told only that the plan
   "uses a three-year average" would not see that it is the successor to something. [verified]
 revisions:
+  - was: |
+      The statewide median income `[I7]` was recorded as "published on the sheet rather than
+      derivable", and the 40th-highest benchmark `[C5]` as a discretionary number a reconstruction
+      had no reason to recover — on the strength of a run that gave 41,502 and 1.4151 against a
+      published 54,546.64 and 1.46504.
+    now: |
+      Both are exactly derivable from the district medians the same fixture carries, as R.C.
+      3317.017(A)(4) defines them: the median of the 609 is **$54,546.6375** and the fortieth
+      highest ratio is **Westlake City's 1.46503636**. Neither is a number anybody sets.
+    found_by: |
+      `crates/local-capacity/tests/against_the_departments_own_capacity.rs`, which derives both
+      from the panel and checks them against the published figures.
+    reach: |
+      The failed reconstruction was run on the Ohio median income column rather than the federal
+      one — the same substitution this node already records as the 4.4% error — so the two
+      "underivable" constants were that one wrong input propagating, counted twice more. An error
+      already corrected in one place went on being cited as evidence in two others, and what it
+      was taken as evidence *for* was a claim about the statute: that the top of the scale is
+      discretionary. It is a rank, which this node says four paragraphs further down.
+  - was: |
+      Nothing recorded what R.C. 3317.021 certifies, though R.C. 3317.017 names it for every
+      income term the blend uses.
+    now: |
+      It certifies less than the blend asks for. Until 30 September 2025 it named the **total
+      federal** and **median Ohio** AGI, where the capacity measure needs the **median federal**
+      AGI and a **count of returns** — so two of the blend's inputs had no certification behind
+      them for four years. H.B. 96 supplied them by substitution, and left the aggregate term
+      citing a certification that no longer exists.
+    found_by: |
+      R.C. 3317.021 itself, now committed to the statute extract, in
+      `crates/project/tests/what_the_tax_commissioner_was_never_asked_to_certify.rs`.
+    reach: |
+      It explains this node's own recorded error rather than adding one. The Ohio median income an
+      earlier pass inferred the third term from is exactly what the certification statute produces,
+      so the guess was the certification section answering the formula section's question. A
+      citation that is never followed can conceal that the two sections disagree.
   - was: |
       The comparison against the charge-off was run on **total taxable value**: Ottawa Hills
       charged 69% more and Jefferson Township 26% less, 413 of 606 districts better off under
@@ -317,6 +394,14 @@ properties:
   statutory_basis: R.C. 3317.017; state share and state share percentage at 3317.017(B) and (C). [verified]
   calculator: local-capacity
 figures:
+  - key: local-capacity/statewide-median-income-fy2027
+    value: 54546.6375
+    field: findings
+    as_written: "the median of the 609 district medians is **$54,546.6375**"
+  - key: local-capacity/benchmark-ratio-fy2027
+    value: 1.4650363645238444
+    field: findings
+    as_written: "the fortieth-highest ratio is **Westlake City's 1.46503636**"
   - key: project/capacity-per-pupil-rise-fy2026-to-fy2027
     value: 472.44069999999965
     field: findings
