@@ -91,6 +91,19 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
                rather than from the section; gifted units are R.C. 3317.051.",
     },
     Source {
+        key: "rc-3317-021",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3317.021",
+        filename: "rc-3317-021.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3317.021. What the Tax Commissioner certifies. Fetched because R.C. 3317.017 \
+               names it four times — once for each income input the capacity blend uses, and \
+               nowhere else — and the corpus had never read it. Until H.B. 96 it certified \
+               neither of the two figures the median term needs.",
+    },
+    Source {
         key: "rc-3311-22",
         title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-3311.22",

@@ -38,6 +38,12 @@ const CITED: &[&str] = &[
     "3317.014",
     "3317.016",
     "3317.017",
+    // What the Tax Commissioner certifies, and the section R.C. 3317.017 names for every income
+    // term in the local capacity blend. Fetched last of the chapter, on the assumption that a
+    // certification duty could not settle anything the formula section did not already say. It
+    // settles what the blend's inputs actually are — see
+    // `what_the_tax_commissioner_was_never_asked_to_certify.rs`.
+    "3317.021",
     "3317.019",
     "3317.022",
     "3317.051",
