@@ -58,7 +58,7 @@ import {
   toLab,
   toOklch,
 } from "../../src/lib/plot/palette.ts";
-import { barSpec } from "../../src/lib/plot/spec.ts";
+import { DOT, barSpec } from "../../src/lib/plot/spec.ts";
 import { renderToString } from "../../src/lib/plot/ssr.ts";
 
 const TOKENS = resolve(process.cwd(), "src/styles/tokens/colors.css");
@@ -598,8 +598,12 @@ describe("the focus ring", () => {
    * comment should have carried, and the reason the scatter was never the problem.
    */
   test("and does clear it against the ramp as a chart actually paints it", () => {
-    /** `fillOpacity` for a banded scatter in `plot/spec.ts` — the most opaque the ramp is drawn. */
-    const BANDED = 0.62;
+    /*
+     * `fillOpacity` for a banded scatter, imported rather than written down. It was a local `0.62`
+     * with a comment naming where the real value lives, which is a second copy of a number that
+     * has since gained a third sibling — see `DOT`.
+     */
+    const BANDED = DOT.opacity.banded;
     const over = (mark: string, surface: string, alpha: number) => {
       const [f, b] = [parseHex(mark), parseHex(surface)];
       return {
@@ -617,6 +621,69 @@ describe("the focus ring", () => {
           `${mode} ink ring on ${step} as painted`,
         ).toBeGreaterThanOrEqual(3);
       }
+    }
+  });
+
+  /**
+   * And the de-emphasised mark, which is the one case where 3:1 is the wrong bar.
+   *
+   * `ScatterPoint.muted` says *this point is context, not subject*, and it exists because hue had
+   * nothing left to spend: under `/reach`'s "gained or lost" colouring neutral already means
+   * *unmoved*, so a second fact needed a second channel.
+   *
+   * Nothing in this cloud meets 3:1 and nothing ever did. `--neutral-mark` is 2.35:1 light against
+   * `--surface-1` at **full** opacity, before the 0.45 the form draws it at, and that is the
+   * design: small partly-transparent marks are what make density legible as density, and the relief
+   * is the legend. So the bar here is not a ratio against the surface. It is two orderings and a
+   * measured floor.
+   *
+   * The orderings are what would rot. A muted mark that stopped being the fainter or the smaller of
+   * the two would be a de-emphasis that emphasised, and the figures below are what says a token
+   * change has closed the gap rather than leaving it quietly closed.
+   */
+  test("a muted mark is the fainter and the smaller of the two, on both channels", () => {
+    expect(DOT.opacity.muted, "muted is fainter than the cloud").toBeLessThan(DOT.opacity.plain);
+    expect(DOT.opacity.muted, "and fainter than a banded dot").toBeLessThan(DOT.opacity.banded);
+    expect(DOT.radius.muted, "and smaller").toBeLessThan(DOT.radius.plain);
+    /*
+     * Alpha alone is not enough, which is why there are two channels. 0.22 against 0.45 separates
+     * a neutral dot from a neutral dot by 1.20:1 light and 1.32:1 dark — not a difference a reader
+     * picks out of six hundred overlapping marks. The area does the rest: 44% of it, leaving about
+     * a fifth of the ink in total.
+     */
+    const area = (DOT.radius.muted / DOT.radius.plain) ** 2;
+    expect(area, "the radius carries its share of the de-emphasis").toBeLessThan(0.6);
+    expect((DOT.opacity.muted / DOT.opacity.plain) * area, "ink against an un-muted dot")
+      .toBeLessThan(0.3);
+  });
+
+  test("and is still visible against the card it is drawn on", () => {
+    /*
+     * The floor on the other side. A muted mark a reader cannot see at all is not context, it is a
+     * district removed from the picture without the page saying so — and `/reach` keeps the whole
+     * state drawn precisely so that it is saying something.
+     *
+     * Measured over `--neutral-mark`, which is what an out-of-scope district wears, composited onto
+     * the tightest surface a chart sits on.
+     */
+    const over = (mark: string, surface: string, alpha: number) => {
+      const [f, b] = [parseHex(mark), parseHex(surface)];
+      return {
+        r: Math.round(alpha * f.r + (1 - alpha) * b.r),
+        g: Math.round(alpha * f.g + (1 - alpha) * b.g),
+        b: Math.round(alpha * f.b + (1 - alpha) * b.b),
+      };
+    };
+    for (const mode of ["light", "dark"] as const) {
+      const tokens = PALETTE[mode].tokens;
+      const surface = tokens.get("--surface-1")!;
+      const neutral = tokens.get("--neutral-mark")!;
+      const muted = contrast(over(neutral, surface, DOT.opacity.muted), parseHex(surface));
+      const plain = contrast(over(neutral, surface, DOT.opacity.plain), parseHex(surface));
+      expect(muted, `${mode} muted neutral against the card`).toBeGreaterThan(1.1);
+      expect(muted, `${mode} muted is fainter than the cloud it is drawn behind`).toBeLessThan(
+        plain,
+      );
     }
   });
 });

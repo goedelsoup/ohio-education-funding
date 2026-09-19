@@ -11,6 +11,7 @@ import { expect, test } from "vitest";
 
 import type { Bar, FanPoint, ScatterPoint, Trace } from "../../src/lib/chart.ts";
 import {
+  DOT,
   barSpec,
   distributionSpec,
   fanSpec,
@@ -216,3 +217,49 @@ const AXES = {
   x: { label: "spending per pupil", format: (v: number) => `$${v}` },
   y: { label: "Performance Index", format: (v: number) => v.toFixed(0) },
 };
+
+test("a muted point is drawn smaller and fainter, and the radius is a pixel count", () => {
+  /*
+   * `ScatterPoint.muted` is the de-emphasis channel — see its own note for why hue could not carry
+   * it — and it spends radius as well as alpha, because on `--neutral-mark` alpha alone separates
+   * the two populations by 1.20:1 and that is not a difference a reader finds in six hundred
+   * overlapping dots.
+   *
+   * # The half that is not obvious
+   *
+   * Making `r` a function makes it a **channel**, and a channel goes through a scale. Plot's
+   * default `r` scale is a square root fitted to the values it is handed, so `2.4` and `1.6` were
+   * rendered as **3.67 and 3**: the ordering survived, the picture still looked right, and the area
+   * ratio the whole de-emphasis rests on had silently gone from 44% to 67%. `r: { type: "identity"
+   * }` is what says these are already pixels, and this is the assertion that says it is still said.
+   *
+   * Read off rendered SVG rather than off the spec, because the spec is where it looked correct.
+   */
+  /* Built rather than spread from `cloud`, which bands its points: a banded cloud draws the plain
+     dots at `DOT.opacity.banded`, and the pair this is about is plain against muted. */
+  const points: ScatterPoint[] = Array.from({ length: 14 }, (_, i) => ({
+    x: i + 1,
+    y: 50 + (i % 7),
+    hover: `d${i}`,
+    muted: i % 2 === 0,
+  }));
+  const svg = renderToString((width) => scatterSpec(points, AXES, [], { width }), {
+    label: "a cloud with half of it muted",
+    description: "half the districts drawn as context",
+  });
+
+  const radii = new Set([...svg.matchAll(/<circle[^>]*\sr="([\d.]+)"/g)].map((m) => m[1]!));
+  expect(radii, "both dot radii are the literal pixel values, plus the hit layer's").toEqual(
+    new Set([String(DOT.radius.plain), String(DOT.radius.muted), "7"]),
+  );
+
+  const alphas = new Set([...svg.matchAll(/fill-opacity="([\d.]+)"/g)].map((m) => m[1]!));
+  expect(alphas).toEqual(new Set([String(DOT.opacity.plain), String(DOT.opacity.muted)]));
+
+  /* The hit layer does not shrink: a muted district is still something a reader can point at, and
+     still carries its whole tooltip. That is what keeps this emphasis rather than removal. */
+  expect(
+    [...svg.matchAll(/<circle[^>]*\sr="7"/g)].length,
+    "one full-size hit target per district, muted or not",
+  ).toBe(points.length * 2);
+});
