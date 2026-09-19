@@ -20,7 +20,6 @@ import {
   renderSupplements,
   renderWhatThisIsNot,
 } from "../../lib/district.ts";
-import { slugify } from "../../lib/county.ts";
 import { districtPaths, loadFeed, qualifiedName } from "../../lib/feed.ts";
 import * as routes from "../../lib/routes.ts";
 import { fig, money, pct } from "../../lib/format.ts";
@@ -83,7 +82,7 @@ const description = district.on_guarantee
     <div><dt>IRN</dt><dd>{district.irn}</dd></div>
     <div>
       <dt>County</dt>
-      <dd><a href={routes.county(slugify(district.county))}>{district.county}</a></dd>
+      <dd><a href={routes.county(routes.slugify(district.county))}>{district.county}</a></dd>
     </div>
     {/* Every seat this district lies in, linked individually rather than counted: the reverse
         question — who represents these schools — is the one a reader arriving from a legislative

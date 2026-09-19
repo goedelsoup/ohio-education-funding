@@ -66,15 +66,6 @@ export interface County {
   poorest: District | null;
 }
 
-/** The middle value. Module-level because two renderers need it and a duplicate would drift. */
-/** `Van Wert` becomes `van-wert`; the slug is the URL and must round-trip through the router. */
-export function slugify(county: string): string {
-  return county
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
 /** Group the feed by the department's county attribution, richest county first by district count. */
 export function counties(districts: District[]): County[] {
   const groups = new Map<string, District[]>();
@@ -95,7 +86,7 @@ export function counties(districts: District[]): County[] {
 
       return {
         name,
-        slug: slugify(name),
+        slug: routes.slugify(name),
         districts: sorted,
         adm: sorted.reduce((a, d) => a + d.adm, 0),
         onGuarantee: sorted.filter((d) => d.on_guarantee).length,

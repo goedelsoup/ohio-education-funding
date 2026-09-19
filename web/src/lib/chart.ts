@@ -100,6 +100,30 @@ export interface ScatterPoint {
    * alone cannot show that they are the same 253 every time.
    */
   from?: { x: number; y: number };
+  /**
+   * Draw this district as context rather than as subject.
+   *
+   * A second channel for a second fact, and the reason it is not a third hue: the palette has two
+   * and a three-step ordinal ramp, and the three steps are a measured limit rather than a
+   * stylistic one. Where a caller needs to say *this point is outside the population you asked
+   * about* **alongside** what it is already saying with colour, hue has nothing left to spend.
+   *
+   * `/reach`'s scope is the case. Under its regime and typology colourings an out-of-scope
+   * district could be left neutral and read correctly, but under "gained or lost" neutral already
+   * means *unmoved* — so one fill would be carrying two unrelated claims and the legend would have
+   * to pick which one to name.
+   *
+   * Drawn on `r` **and** opacity, because either alone is too weak here. `--neutral-mark` is close
+   * to its surface by design — 1.42:1 at the cloud's own 0.45, which is what makes density legible
+   * as density — so muting it further separates the two populations by only 1.20:1, and that is not
+   * a difference a reader picks out of six hundred overlapping dots. Halving the area as well takes
+   * the ink to roughly a fifth. See `DOT` in `plot/spec.ts` for the figures.
+   *
+   * The hit layer does not shrink. It is a separate mark at `r: 7` for every point, so a muted
+   * district is still something a reader can point at and still carries its whole tooltip — which
+   * is what keeps this a change of emphasis rather than a removal.
+   */
+  muted?: boolean;
 }
 
 /**
