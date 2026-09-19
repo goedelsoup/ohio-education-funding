@@ -11,5 +11,13 @@ description = "Winners and losers between two funding runs, with incidence and t
 edfund-core = { path = "../edfund-core" }
 project = { path = "../project" }
 
+[dev-dependencies]
+# For `tests/the_minimum_share_the_guarantee_has_already_paid_past.rs`, which measures how far
+# the guarantee weakens the formula's wealth neutrality. Wealth neutrality is `dispersion`'s
+# metric and its estimator is `dispersion`'s; a hand-rolled Pearson in a test file would be a
+# second definition of the one number this workspace argues equity from. `project` depends on
+# this crate already, so it is in the tree either way.
+dispersion = { path = "../dispersion" }
+
 [lints]
 workspace = true
