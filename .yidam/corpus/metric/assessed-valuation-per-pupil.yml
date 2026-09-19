@@ -75,6 +75,14 @@ findings: |
   extreme. Any per-pupil subtraction that takes a local share from a cost is crossing that
   seam. [verified]
 
+  **Where it crosses, and where it does not.** The Fair School Funding Plan's own subtraction does
+  not: R.C. 3317.017 divides base cost per pupil and local capacity per pupil by the *same* count,
+  so the seam is at the multiply rather than the subtract, and the pupil count cancels out of the
+  dollars entirely. Where the denominator does reach money is the four categoricals R.C. 3317.022
+  multiplies by the state share *percentage*, which is a ratio and cancels nothing. The measurement
+  is at [the local capacity
+  measure](../formula-component/fsfp-local-capacity-measure.yml). [verified] (`crates/project`)
+
   **Statewide distribution, FY2023, 606 traditional districts** [verified]: 5th percentile
   $129,894, median $248,097, 95th percentile $465,615. A district at the top of the range has
   about 3.6 times the taxable base per student of one at the bottom.

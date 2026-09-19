@@ -14,6 +14,12 @@ deflator = { path = "../deflator" }
 dispersion = { path = "../dispersion" }
 edfund-core = { path = "../edfund-core" }
 foundation = { path = "../foundation" }
+# For `capacity_denominator`, which runs R.C. 3317.017(B) over three different denominators and
+# needs the minimum-state-share floor applied the way the calculator applies it. `local-capacity`
+# was deliberately kept out of this crate when all it would have supplied was one `f64` — see the
+# note on `MINIMUM_STATE_SHARE_FY2022` — and that reasoning ends where this crate starts calling
+# it. No crate enters the graph: `dispersion` already depends on it.
+local-capacity = { path = "../local-capacity" }
 
 [[bin]]
 name = "edfund-project"

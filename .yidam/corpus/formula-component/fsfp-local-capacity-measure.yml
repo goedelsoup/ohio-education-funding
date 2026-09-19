@@ -235,6 +235,87 @@ findings: |
   inflationary increase. Two regimes, the same judgement that a reappraisal should not reach
   state aid all at once, and two different implementations. A reader told only that the plan
   "uses a three-year average" would not see that it is the successor to something. [verified]
+
+  ### What it divides by, and where that lands
+
+  The measure's numerator is unambiguously resident. Assessed valuation is the district's whole tax
+  base and federal adjusted gross income is its residents' income; neither moves when a child leaves
+  for a community school. The denominator does. Table SD-1 counts **222,923** children resident in a
+  district that its base cost enrolled ADM does not — Youngstown's resident count is 2.30 times the
+  one it teaches and Columbus's 1.69 — so the measure appears to charge a district for wealth
+  supporting children it does not teach. [verified] (`crates/project`)
+
+  **Against base cost it does not, and the reason is arithmetic rather than policy.**
+  R.C. 3317.017 divides all three wealth terms by base cost enrolled ADM — (A)(1)(b), (A)(2)(b) and
+  (A)(3)(c), in as many words — and division (B) multiplies the residual back by enrolled ADM. The
+  count cancels. What Ohio charges is `(0.6 V + 0.2 AGI + 0.2 M × R) × rate`, a number of dollars
+  set by wealth alone, and it comes to **$8.894bn** across the 609. A departing pupil costs a
+  district exactly one base cost per pupil and never more: the residual is zero for the 80 districts
+  whose two pupil counts coincide and positive — in the district's favour — for every other, because
+  base cost enrolled ADM is a three-year maximum that takes a year to follow a departure down.
+  [verified] (`crates/project`)
+
+  Nor is the departed child funded twice. R.C. 3317.022 makes the community and STEM school unit
+  and the four scholarship units **funding units of their own**, and gives the first of them *the
+  aggregate base cost* at (A)(1)(b) with no state share term at all. Every community-school, STEM
+  and scholarship deduction left in the committed extract reads "as that division existed prior to
+  September 30, 2021" and survives only inside the FY2020 funding base R.C. 3317.02(N)(1)
+  reconstructs. The chapter still deducts for two things — a county DD board's preschool services
+  at R.C. 3317.0213(C) and an enforcement remedy at R.C. 3327.02(F)(2) — and neither is this
+  channel. So there is no deduct to net against, which is what makes the question answerable rather
+  than merely arguable; the department's own transfer lines bound the same conclusion from the
+  other end, at
+  [`DistrictRecord::total_transfers`](../../../crates/project/src/panel/record.rs). [verified]
+
+  ### The categorical channel is where the denominator lands instead
+
+  Four of the six categoricals — special education, English learners, gifted and career-technical —
+  are multiplied by the district's **state share percentage**, which R.C. 3317.022(A)(3), (5) and
+  (6) attach to districts by name and to no other funding unit. A percentage is a ratio of two
+  per-pupil figures, so nothing cancels and the denominator passes straight through it.
+
+  **$2.432bn** of special education, English learner and career-technical entitlement is computed
+  for the 609 districts, and the local share takes **66.6%** of it. The community and STEM school
+  unit is charged none. Columbus City's state share percentage is 10.25%, so the state pays a
+  community school nearly ten times what it pays Columbus for the same category-six pupil — and
+  Columbus's percentage is what it is because two in every five of its resident children are in
+  neither the numerator nor the denominator of the measure that sets it. [verified] (`crates/project`)
+
+  ### The plan already reaches for a resident count, one section away
+
+  R.C. 3317.0217(C)(1) builds targeted assistance's wealth per pupil from **the same two certified
+  numerators** this section supplies at (A)(1)(a) and (A)(2)(a), and divides them by enrolled ADM
+  less those open-enrolling in plus those open-enrolling out. The department's published `[D]`
+  reproduces from exactly that, for all 609. So the plan does have a resident denominator — and it
+  takes exactly one of the nine channels R.C. 3317.03(A)(2) lists. It moves **2,098** pupils
+  statewide against the 222,923 above, which is nine-tenths of one per cent of it. Community school,
+  STEM and scholarship students are corrected for in neither measure. [verified] (`crates/project`)
+
+  ### The exposure, priced in both directions
+
+  Divide local capacity by Table SD-1's resident count instead and the aid this measure reaches
+  moves from **$4.513bn** to **$5.355bn** — **$842.5m**. That is not a re-basing anyone should want:
+  it would credit a district with a lower capacity per pupil on account of children the state
+  already funds in full through another funding unit. What it measures is how much of the charge the
+  denominator is carrying, and where. [verified] (`crates/project`)
+
+  **119 districts would lose by it, $57.5m in total** and up to $2,671 a pupil. They are the net
+  open-enrolment-in districts, whose resident count is *smaller* than the one they teach; the
+  divergence has two signs and a correction priced on the gainers alone does not see them. **33** of
+  the 138 districts on the 10% floor would come off it. [verified] (`crates/project`)
+
+  **And the divergence orders nothing.** The correlation between a district's resident-to-funded
+  ratio and its published state share percentage is **0.0657** over 609. Youngstown has the largest
+  divergence in the state and a 71.0% state share; Columbus has the ninth and a 10.2% one. The
+  hypothesis that the denominator is what makes the poorest urban districts' shares low is refuted
+  on its own terms — what it does instead is ride on top of the progressivity, and land on the
+  categoricals. [verified] (`crates/project`)
+
+  **[open]** Whether the General Assembly intends the state share percentage to discount a
+  district's special education and English learner funding by a ratio computed on a pupil count
+  that excludes the children it has lost, when the schools those children went to are charged no
+  local share at all. Nothing in R.C. 3317.022 says either way, and the two treatments are one
+  division apart.
 revisions:
   - was: |
       The statewide median income `[I7]` was recorded as "published on the sheet rather than
@@ -394,6 +475,54 @@ properties:
   statutory_basis: R.C. 3317.017; state share and state share percentage at 3317.017(B) and (C). [verified]
   calculator: local-capacity
 figures:
+  - key: project/resident-less-enrolled-gap
+    value: 222922.71080000012
+    field: findings
+    as_written: "Table SD-1 counts **222,923** children resident in a"
+  - key: project/capacity-local-charge-statewide
+    value: 8894277590.48588
+    field: findings
+    as_written: "it comes to **$8.894bn** across the 609"
+  - key: project/weighted-categorical-entitlement
+    value: 2432327661.000712
+    field: findings
+    as_written: "**$2.432bn** of special education, English learner and career-technical entitlement"
+  - key: project/weighted-categorical-local-share
+    value: 0.6659674724310255
+    field: findings
+    as_written: "the local share takes **66.6%** of it"
+  - key: project/the-plans-own-resident-adjustment
+    value: 2098.1963139999957
+    field: findings
+    as_written: "It moves **2,098** pupils"
+  - key: project/capacity-aid-on-base-cost-enrolled-adm
+    value: 4512585439.121697
+    field: findings
+    as_written: "moves from **$4.513bn** to"
+  - key: project/capacity-aid-on-the-resident-count
+    value: 5355046940.892493
+    field: findings
+    as_written: "to **$5.355bn**"
+  - key: project/capacity-denominator-exposure
+    value: 842461501.7708048
+    field: findings
+    as_written: "\u2014 **$842.5m**"
+  - key: project/capacity-denominator-losers
+    value: 119
+    field: findings
+    as_written: "**119 districts would lose by it"
+  - key: project/capacity-denominator-exposure-loss
+    value: 57464582.255979516
+    field: findings
+    as_written: "$57.5m in total**"
+  - key: project/capacity-denominator-districts-leaving-the-floor
+    value: 33
+    field: findings
+    as_written: "**33** of\n  the 138 districts on the 10% floor"
+  - key: project/capacity-divergence-correlation
+    value: 0.0656832383537445
+    field: findings
+    as_written: "percentage is **0.0657** over 609"
   - key: local-capacity/statewide-median-income-fy2027
     value: 54546.6375
     field: findings

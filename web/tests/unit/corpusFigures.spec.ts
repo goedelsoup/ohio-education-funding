@@ -142,9 +142,15 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * `+$11.2M` of categorical scaling from 2026-08-09 and `-$5.0M` of backstop clawback from
  * 2026-09-18, and reads within $6.3M of a figure that predates both. A ratchet counting nets is
  * not a ratchet either.
+ *
+ * Recomputed at **820/75** when the local capacity measure's denominator was run over the three
+ * pupil counts the plan itself uses. No new carrier: all twelve land on
+ * `formula-component/fsfp-local-capacity-measure`, which is where the question belongs. Two of them
+ * are a *loss* and a *count of losers* — the second sign of a divergence whose first sign is the
+ * only one a re-basing argument tends to price.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "808 bindings; raise this when you add one").toBeGreaterThanOrEqual(808);
+  expect(bindings.length, "820 bindings; raise this when you add one").toBeGreaterThanOrEqual(820);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "75 nodes carry bindings; raise this when a seventy-sixth does",
