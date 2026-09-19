@@ -142,9 +142,20 @@ breakdown "is available here" and links to:
     reports.education.ohio.gov/report/nonpublic-data-jon-peterson-special-needs-report      404
     reports.education.ohio.gov/report/nonpublic-data-historical-ed-choice-designated-list   404
 
-The application's root answers 200; those two routes do not exist server-side. So the absence is
-not an artifact of searching badly: a per-district route was published, is cited in a current
-departmental document, and has been withdrawn.
+**No conclusion may be drawn from either status code, and this record drew one.** It read: *the
+application's root answers 200, those two routes do not exist server-side, so a per-district route
+was published, is cited in a current departmental document, and has been withdrawn.* Probed
+2026-09-15 and recorded on #10, every path on that host returns the **byte-identical Angular
+shell** — `/`, both routes above, an invented path, and `/robots.txt` alike. A `/robots.txt` that
+404s cannot mean "withdrawn". The app's route table is `path:"report/:reportName"`, one
+client-side parameterised route, so there were never per-report server routes to withdraw; and the
+sibling `nonpublic-data-scholarship-provider-directory` is linked from the live scholarship page
+today, which the withdrawal reading would require the department to be doing for a report it had
+removed.
+
+What remains true is narrower and is the part that matters here: the annual report cites a
+per-district breakdown, and **this project has not found it**. Whether it was withdrawn, moved, or
+is served from a route nobody has enumerated is unsettled.
 
 **One of the two has a public substitute, and this search missed it.** The department publishes
 the EdChoice designated list as a workbook on its own scholarship pages —
@@ -175,8 +186,14 @@ other than a fetch:
 
 - **Credentials** for `scholarship.ode.state.oh.us` or `paymentdetail.ode.state.oh.us`.
 - **A public records request**, for the SFPR payment reports, which are not published as files.
-- **Asking the department to restore the withdrawn route**, which is the cheapest of the three
-  and the only one with evidence the file once existed in public form.
+- **Enumerating the CMS attachments one hop from the scholarship pages**, which is where the
+  EdChoice designated list was sitting while this search was reading status codes off a single-page
+  application. Cheapest of the three, and the only one a phase can actually run.
+
+This list previously ended with *asking the department to restore the withdrawn route, the only
+one with evidence the file once existed in public form*. That option rested entirely on the 404
+reading above and goes with it: there is no evidence of a withdrawal, so there is nothing
+identified to ask for.
 
 None of them is a URL, which is a different kind of blocker from the six recorded against the
 connectors. A phase cannot clear it, and a phase that tries will repeat the searches above.
