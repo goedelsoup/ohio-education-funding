@@ -152,16 +152,48 @@ impl PolicyEffect {
 }
 
 /// The forecast half: the same policy at projected enrollment.
+///
+/// # Two measures, and the projection has to carry both
+///
+/// Every field here came in a pair once [`PolicyEffect::cost`] widened to total state support.
+/// A projection reported on [`Self::realized_aid`] alone is a projection of
+/// [`crate::biennium::Measure::FoundationAid`], and `[K]` is outside that — so a policy whose
+/// whole effect is to move money into `[K]` projects as though the money had gone.
+///
+/// That is not a rounding difference. `scenario/guarantee-phase-out` published *"removing the
+/// guarantee nearly doubles the state's exposure to enrollment forecast error"* on the foundation
+/// band — 4.31% against 7.77% — and on total state support the same two runs are 4.23% against
+/// **4.16%**: the exposure does not widen at all, because `[K]` is itself a floor against a fixed
+/// FY2021 total and inherits the shock-absorber role the guarantee gave up. The claim is true of
+/// the hold-harmless *system* and false of the guarantee alone, and one measure cannot tell those
+/// apart.
 #[derive(Debug, Clone, PartialEq)]
 pub struct EnrollmentEffect {
     /// The fiscal year projected to.
     pub fiscal_year: FiscalYear,
-    /// Central estimate of total realized aid.
+    /// Central estimate of total realized aid — `[H] + [I]`, the narrow measure.
     pub realized_aid: Dollars,
     /// Low end, from the projection interval.
     pub low: Dollars,
     /// High end.
     pub high: Dollars,
+    /// Central estimate of total state support — realized aid, transportation and `[K]`.
+    pub total_state_support: Dollars,
+    /// Low end of the same band.
+    ///
+    /// Still the low end, and that is a property of the construction rather than a hope: a
+    /// district `[K]` insulates is held at `[L1]` in total, so its contribution is *flat* in
+    /// enrollment, and every other district's is increasing. `[K]` damps the band and cannot
+    /// invert it. Asserted by `the_backstop_damps_the_band_without_inverting_it` in this module.
+    pub total_low: Dollars,
+    /// High end.
+    pub total_high: Dollars,
+    /// `[K]` at projected enrollment, central estimate.
+    ///
+    /// Carried because it is the interesting quantity in a projection of a guarantee retirement:
+    /// it is $926.8m at FY2032 against $63.6m at FY2027, which is the state's exposure arriving
+    /// somewhere else rather than going away.
+    pub transition_supplement: Dollars,
     /// Projected total ADM.
     pub adm: f64,
     /// Districts on the guarantee at projected enrollment.
@@ -170,6 +202,29 @@ pub struct EnrollmentEffect {
     pub method: Method,
     /// The dispersion the interval rests on.
     pub prior: Prior,
+}
+
+impl EnrollmentEffect {
+    /// Half the foundation-aid band's width, as a share of the central estimate.
+    ///
+    /// The quantity the corpus writes as `(+/-4.3%)`. Zero when the central estimate is, which is
+    /// not a band of zero width but a panel nothing projected.
+    #[must_use]
+    pub fn half_width(&self) -> f64 {
+        if self.realized_aid == 0.0 {
+            return 0.0;
+        }
+        (self.high - self.low) / 2.0 / self.realized_aid
+    }
+
+    /// The same on total state support, which is the measure a cost is quoted in.
+    #[must_use]
+    pub fn total_half_width(&self) -> f64 {
+        if self.total_state_support == 0.0 {
+            return 0.0;
+        }
+        (self.total_high - self.total_low) / 2.0 / self.total_state_support
+    }
 }
 
 /// A scenario run: a policy, its deterministic effect, and optionally its forecast effect.
@@ -233,6 +288,13 @@ pub fn forecast(
     let mut point = 0.0;
     let mut low = 0.0;
     let mut high = 0.0;
+    // The same three on total state support, accumulated beside rather than derived after: `[K]`
+    // is a function of each district's own projected aid, so a statewide supplement cannot be
+    // recovered from a statewide total.
+    let mut total = 0.0;
+    let mut total_low = 0.0;
+    let mut total_high = 0.0;
+    let mut supplement = 0.0;
     let mut adm = 0.0;
     let mut on_guarantee = 0;
 
@@ -255,10 +317,18 @@ pub fn forecast(
         let at = |value: f64| apply(record, policy, &statewide, value);
         let central = at(projected.point);
         point += central.realized_aid;
+        total += central.total_state_support();
+        supplement += central.transition_supplement;
         // A smaller district draws less aid, so the enrollment band's low end is the aid band's
-        // low end. That holds because every lever here is monotone in ADM.
-        low += at(projected.low).realized_aid;
-        high += at(projected.high).realized_aid;
+        // low end. That holds because every lever here is monotone in ADM — and it survives `[K]`,
+        // which is flat in ADM for an insulated district and so damps the band without reordering
+        // its ends.
+        let at_low = at(projected.low);
+        let at_high = at(projected.high);
+        low += at_low.realized_aid;
+        high += at_high.realized_aid;
+        total_low += at_low.total_state_support();
+        total_high += at_high.total_state_support();
         adm += projected.point;
         if central.on_guarantee {
             on_guarantee += 1;
@@ -270,6 +340,10 @@ pub fn forecast(
         realized_aid: point,
         low,
         high,
+        total_state_support: total,
+        total_low,
+        total_high,
+        transition_supplement: supplement,
         adm,
         on_guarantee,
         method,
@@ -463,6 +537,104 @@ mod tests {
         assert!(
             aid_width < enrollment_width,
             "aid band {aid_width:.4} should be tighter than enrollment band {enrollment_width:.4}"
+        );
+    }
+
+    /// `[K]` damps the projected band and does not reorder its ends.
+    ///
+    /// Stated as a test rather than assumed in a comment because the two quantities pull opposite
+    /// ways: realized aid falls with enrollment and `[K]` rises to fill the gap it leaves. What
+    /// makes the ordering safe is that `[K]` is a top-up to a *ceiling* — a district it insulates
+    /// contributes a flat `[L1]` at every enrollment, so the worst it can do is remove a district
+    /// from the band rather than invert it.
+    #[test]
+    fn the_backstop_damps_the_band_without_inverting_it() {
+        let panel = panel();
+        let method = Method::Damped {
+            rate: 0.0,
+            damping: DEFAULT_DAMPING,
+        };
+        let prior = enrollment_growth_prior(&panel, ONE_SIGMA);
+        for policy in [
+            Policy::current_law(),
+            Policy {
+                guarantee: GuaranteeRule::Removed,
+                ..Policy::current_law()
+            },
+        ] {
+            let effect = forecast(&panel, &policy, FiscalYear(2032), method, prior);
+            assert!(
+                effect.total_low < effect.total_state_support
+                    && effect.total_state_support < effect.total_high,
+                "band {} .. {} .. {}",
+                effect.total_low,
+                effect.total_state_support,
+                effect.total_high
+            );
+            assert!(
+                effect.total_half_width() < effect.half_width() + f64::EPSILON,
+                "the wide measure is wider: {} vs {}",
+                effect.total_half_width(),
+                effect.half_width()
+            );
+        }
+    }
+
+    /// Retiring the guarantee does **not** widen the state's exposure to enrollment error.
+    ///
+    /// The corpus published the opposite — *"removing the guarantee nearly doubles the state's
+    /// exposure to enrollment forecast error"* — on a band measured in foundation aid, where the
+    /// claim is true: 4.31% becomes 7.77%. On total state support the same two runs are 4.23% and
+    /// 4.16%, because `[K]` is a floor against a fixed FY2021 total and takes over the absorbing
+    /// the guarantee stops doing. The budget-stability argument belongs to the hold-harmless system
+    /// and not to the guarantee, and repealing both is what recovers the doubling.
+    #[test]
+    fn the_backstop_inherits_the_guarantees_budget_stability() {
+        let panel = panel();
+        let method = Method::Damped {
+            rate: 0.0,
+            damping: DEFAULT_DAMPING,
+        };
+        let prior = enrollment_growth_prior(&panel, ONE_SIGMA);
+        let at = |policy: Policy| forecast(&panel, &policy, FiscalYear(2032), method, prior);
+
+        let current = at(Policy::current_law());
+        let removed = at(Policy {
+            guarantee: GuaranteeRule::Removed,
+            ..Policy::current_law()
+        });
+        let both = at(Policy {
+            guarantee: GuaranteeRule::Removed,
+            backstop: Backstop::Repealed,
+            ..Policy::current_law()
+        });
+
+        // The claim as published, on the narrow measure: it nearly doubles.
+        assert!(
+            removed.half_width() > current.half_width() * 1.7,
+            "{:.4} against {:.4}",
+            removed.half_width(),
+            current.half_width()
+        );
+        // And on the measure a cost is quoted in, it does not widen at all.
+        assert!(
+            removed.total_half_width() < current.total_half_width(),
+            "{:.4} against {:.4}",
+            removed.total_half_width(),
+            current.total_half_width()
+        );
+        // The doubling is recovered only when the backstop goes too.
+        assert!(
+            both.total_half_width() > current.total_half_width() * 1.6,
+            "{:.4} against {:.4}",
+            both.total_half_width(),
+            current.total_half_width()
+        );
+        // `[K]` is where the exposure went: $63.6m at FY2027, an order of magnitude more here.
+        assert!(
+            removed.transition_supplement > 900_000_000.0,
+            "{}",
+            removed.transition_supplement
         );
     }
 

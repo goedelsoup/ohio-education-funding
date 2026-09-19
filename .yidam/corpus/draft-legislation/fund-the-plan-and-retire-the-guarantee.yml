@@ -36,7 +36,7 @@ description: |
   Not a proposal, not introduced, and not attributable to anyone. Ohio legislates school funding
   inside the operating budget, so a real version of this would arrive as a few dozen sections of
   a bill that also carries Medicaid and highway appropriations, and its provisions would not
-  arrive as a tidy list of five.
+  arrive as a tidy list of six.
 
   The provision values are also chosen rather than derived. A half phase-out and an 8% weight
   raise are round numbers picked to be legible, not positions anybody has taken. [inference]
@@ -170,7 +170,7 @@ properties:
     What does a bill look like when it does the thing both sides of Ohio's funding argument ask
     for, and how much of such a bill can actually be priced?
   provisions: |
-    Five provisions; two price.
+    Six provisions; four price.
 
     **1. Base cost reference year: FY2022 → FY2024.** R.C. 3317.011. Binds
     [`base-cost-per-pupil`](../parameter/base-cost-per-pupil.yml); `base_cost_scale = 1.0395`.
