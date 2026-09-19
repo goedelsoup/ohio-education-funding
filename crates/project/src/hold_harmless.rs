@@ -495,3 +495,190 @@ where
     }
     out
 }
+
+/// Who a guarantee retirement reaches once `[K]` has absorbed what it can.
+///
+/// # Why the incidence has to be recomputed and not inherited
+///
+/// `crates/scenario-delta` builds its winners-and-losers table from
+/// [`crate::policy::Outcome::realized_aid`], which is `[H] + [I]` and excludes the backstop. That
+/// is the right measure for asking what the *guarantee* pays and the wrong one for asking whom
+/// retiring it *cuts*, and the two answers are not near each other: on foundation aid every one of
+/// the 294 guaranteed districts loses, and on total state support **167** do.
+///
+/// The 127 that do not are exactly the 127 already drawing `[K]`, and that is not a coincidence —
+/// a district at its `[L1]` ceiling is held at a *total*, so anything taken off the guarantee is
+/// put back pound for pound. Which makes the retirement's incidence run **up** the wealth
+/// distribution rather than down it: the districts `[K]` catches are the poorer half of the
+/// guaranteed population, so the cut lands on the richer half. See
+/// `scenario/guarantee-phase-out`, whose published largest-per-pupil-loser was East Cleveland City
+/// — a district that on this measure loses **nothing at all**.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Retirement {
+    /// Districts whose total state support falls.
+    pub losers: usize,
+    /// Guaranteed districts whose total state support does not move at all.
+    pub made_whole: usize,
+    /// Of those, how many were already drawing `[K]` before the retirement.
+    pub made_whole_already_drawing: usize,
+    /// What `[K]` puts back, in dollars.
+    pub absorbed: Dollars,
+    /// The part of that going to districts the backstop makes whole.
+    ///
+    /// The remainder is the interesting half: it is absorbed on districts that still lose, so most
+    /// of the backstop's reach is partial rather than total.
+    pub absorbed_making_whole: Dollars,
+    /// Median assessed valuation per pupil of the districts that lose.
+    pub median_loser_valuation: f64,
+    /// And of the districts the backstop makes whole.
+    pub median_made_whole_valuation: f64,
+    /// The largest per-pupil loss in total state support, and whose it is.
+    pub largest_per_pupil_loss: (String, Dollars),
+}
+
+/// Measure [`Retirement`] for a guarantee rule, with `[K]` left standing.
+///
+/// The rule is a parameter because removal, a half phase-out and a rebase to 90% produce the *same
+/// 167 districts* — a floor that stops holding somebody cannot start holding somebody else, and
+/// `[K]` catches the same set however far the floor drops. Only the dollars differ.
+#[must_use]
+pub fn retirement(panel: &[DistrictRecord], guarantee: crate::policy::GuaranteeRule) -> Retirement {
+    let policy = crate::policy::Policy {
+        guarantee,
+        ..crate::policy::Policy::current_law()
+    };
+    let outcomes = crate::policy::apply_all(panel, &policy);
+
+    let mut out = Retirement {
+        losers: 0,
+        made_whole: 0,
+        made_whole_already_drawing: 0,
+        absorbed: 0.0,
+        absorbed_making_whole: 0.0,
+        median_loser_valuation: 0.0,
+        median_made_whole_valuation: 0.0,
+        largest_per_pupil_loss: (String::new(), 0.0),
+    };
+    let (mut losing, mut whole) = (Vec::new(), Vec::new());
+
+    for (record, outcome) in panel.iter().zip(&outcomes) {
+        let put_back = outcome.transition_supplement - outcome.baseline_transition_supplement;
+        out.absorbed += put_back;
+        let cut = outcome.total_delta();
+        if cut < -CENT {
+            out.losers += 1;
+            if let Some(valuation) = record.valuation_per_pupil {
+                losing.push(valuation);
+            }
+            let per_pupil = if outcome.adm > 0.0 {
+                cut / outcome.adm
+            } else {
+                0.0
+            };
+            if per_pupil < out.largest_per_pupil_loss.1 {
+                out.largest_per_pupil_loss = (record.name.clone(), per_pupil);
+            }
+        } else if record.on_guarantee() {
+            out.made_whole += 1;
+            out.absorbed_making_whole += put_back;
+            if record.transition.transition_supplement > 0.0 {
+                out.made_whole_already_drawing += 1;
+            }
+            if let Some(valuation) = record.valuation_per_pupil {
+                whole.push(valuation);
+            }
+        }
+    }
+
+    out.median_loser_valuation = median(losing);
+    out.median_made_whole_valuation = median(whole);
+    out
+}
+
+/// The median of a sample, at the upper middle of an even count.
+///
+/// Local for the reason [`crate::prior_model`]'s is: the convention has to be the one every figure
+/// in this repository reports, and Python's `statistics.median` averages the two middles and
+/// disagrees on a subgroup this small.
+fn median(mut values: Vec<f64>) -> f64 {
+    values.sort_by(f64::total_cmp);
+    values.get(values.len() / 2).copied().unwrap_or(0.0)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::panel::panel;
+    use crate::policy::GuaranteeRule;
+
+    /// The three guarantee rules cut the same districts, and the dollars are what differ.
+    #[test]
+    fn every_rule_applied_to_the_guarantee_reaches_the_same_167_districts() {
+        let panel = panel();
+        for rule in [
+            GuaranteeRule::Removed,
+            GuaranteeRule::PhasedOut { remaining: 0.5 },
+            GuaranteeRule::Rebased { factor: 0.9 },
+        ] {
+            let measured = retirement(&panel, rule);
+            assert_eq!(measured.losers, 167, "{rule:?}");
+            assert_eq!(measured.made_whole, 127, "{rule:?}");
+        }
+    }
+
+    /// A guaranteed district is made whole exactly when it was already drawing `[K]`.
+    #[test]
+    fn the_districts_the_backstop_makes_whole_are_the_ones_it_was_already_paying() {
+        let measured = retirement(&panel(), GuaranteeRule::Removed);
+        assert_eq!(measured.made_whole, measured.made_whole_already_drawing);
+        // And they are 127 of the 144 `[K]` draws: the other 17 are never on the guarantee.
+        assert_eq!(insulated(&panel()) - measured.made_whole, 17);
+    }
+
+    /// The retirement's incidence runs up the wealth distribution, not down it.
+    ///
+    /// This is the finding that inverts once the backstop is in the model. The corpus published
+    /// East Cleveland City — valuation $141,623 per pupil against a statewide median of $248,097 —
+    /// as the largest per-pupil loser of a half phase-out, and on total state support it loses
+    /// nothing: `[K]` holds it at `[L1]` to the cent.
+    #[test]
+    fn the_cut_lands_on_the_wealthier_half_of_the_guaranteed_districts() {
+        let panel = panel();
+        let measured = retirement(&panel, GuaranteeRule::Removed);
+        assert!(
+            measured.median_loser_valuation > measured.median_made_whole_valuation,
+            "losers {:.0}, made whole {:.0}",
+            measured.median_loser_valuation,
+            measured.median_made_whole_valuation
+        );
+        assert!(
+            !measured.largest_per_pupil_loss.0.contains("East Cleveland"),
+            "East Cleveland is held at [L1] and cannot be the largest loser"
+        );
+        let east_cleveland = panel
+            .iter()
+            .position(|r| r.name.contains("East Cleveland"))
+            .expect("in the panel");
+        let outcomes = crate::policy::apply_all(
+            &panel,
+            &crate::policy::Policy {
+                guarantee: GuaranteeRule::Removed,
+                ..crate::policy::Policy::current_law()
+            },
+        );
+        assert!(
+            outcomes[east_cleveland].total_delta().abs() < CENT,
+            "East Cleveland moves by {}",
+            outcomes[east_cleveland].total_delta()
+        );
+        // And on the narrow measure it loses $12,978 per pupil, which is what the corpus quoted.
+        assert!((outcomes[east_cleveland].delta_per_pupil() + 12_978.0).abs() < 1.0);
+    }
+
+    /// Most of what the backstop absorbs is absorbed on districts that still lose.
+    #[test]
+    fn the_backstops_reach_is_mostly_partial_rather_than_total() {
+        let measured = retirement(&panel(), GuaranteeRule::Removed);
+        assert!(measured.absorbed > measured.absorbed_making_whole * 2.0);
+    }
+}

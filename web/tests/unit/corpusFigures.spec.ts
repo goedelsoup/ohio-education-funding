@@ -128,9 +128,16 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * thing from opposite ends: how many designations rest on that column, and how many buildings it
  * flags on a commission that had already ceased to exist. A binding that bounds what a defect is
  * worth is as much a binding as one that reports a quantity.
+ *
+ * Recomputed at **804/75** when `scenario/guarantee-phase-out` was restated against the model that
+ * contains `[K]`. The largest single move this ratchet has taken, and no new carrier: 48 bindings
+ * land on nodes that already had some. They are all **deltas** — savings, reaches, incidence,
+ * marginal costs — and that is the reason for the size of the jump. Every level on that node was
+ * bound and not one of its differences was, so its three savings tables went stale under two
+ * calculator changes while this file stayed green. A ratchet counting levels is not a ratchet.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "756 bindings; raise this when you add one").toBeGreaterThanOrEqual(756);
+  expect(bindings.length, "804 bindings; raise this when you add one").toBeGreaterThanOrEqual(804);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "75 nodes carry bindings; raise this when a seventy-sixth does",

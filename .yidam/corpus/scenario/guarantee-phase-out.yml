@@ -2,13 +2,13 @@ class: scenario
 label: Phasing Out the Temporary Transitional Aid Guarantee
 summary: >-
   What Ohio's FY2027 model pays if the temporary transitional aid guarantee is removed or wound
-  down. A re-run of the department's own model with one lever moved, at observed enrollment — a
-  simulation, not a forecast.
+  down — priced twice, because the guarantee has a backstop and repealing one does not touch the
+  other. The department's own model re-run with one lever moved, at observed enrollment.
 description: |
-  **RUN.** Reproduce with `cargo run -p project --bin edfund-project -- --guarantee <rule>`.
-  Every figure below is a **simulation**, not a forecast: it re-runs the department's own
-  FY2027 model with one lever moved, at observed enrollment. Where a projection is used it is
-  labelled and reported separately, per [`skills/project`](../../skills/project.md).
+  **RUN.** Reproduce with `cargo run -p project --bin edfund-project -- --guarantee <rule>
+  [--backstop repealed]`. Every figure below is a **simulation**, not a forecast: it re-runs the
+  department's own FY2027 model with one lever moved, at observed enrollment. Where a projection is
+  used it is labelled and reported separately, per [`skills/project`](../../skills/project.md).
 
   Ohio's FY2027 model pays **$7,281 million** in state foundation aid to 609 districts. **$879
   million of it — 12.1% — is the temporary transitional aid guarantee**, paid to **294
@@ -17,6 +17,15 @@ description: |
   rather than computed. [verified — `crates/project`, which reproduces the department's model to
   the cent]
 
+  **Retiring it is two bills.** `[K]`, the formula transition supplement of uncodified Section
+  265.225, tops a district up to its FY2021 base from a total that *already contains the
+  guarantee* — so a guarantee that stops being paid becomes a shortfall `[K]` makes good. Left
+  standing it absorbs most of the apparent saving; repealed alongside, it does not. R.C. 3317.019
+  and Section 265.225 are separate instruments in separate law, and a bill could plainly do either
+  without the other, so both are priced below as a pair. See
+  [`fsfp-formula-transition-supplement`](../formula-component/fsfp-formula-transition-supplement.yml)
+  for the device.
+
   This scenario generalises [fsfp-input-year-refresh](fsfp-input-year-refresh.yml) from the
   single district that node refreshes to the whole state.
 figures:
@@ -24,11 +33,138 @@ figures:
     value: 294
     field: description
     as_written: "paid to **294\n  districts**"
-  # The projection leg, on `findings`. The `results` property states the same six numbers and
-  # cannot be bound: `crossCheck` refuses a binding into a field that asserts no verified claim,
-  # and no property block in this corpus asserts one. See the carrier test for why that hole is
-  # left open rather than closed by inventing the convention. The tag is spelled out rather than
-  # written here because the claim-tag counter reads comments too.
+  # The savings tables, on `findings`. These carried NO bindings until the node was restated
+  # against the model that contains `[K]`, which is the whole reason they could go stale in
+  # silence: the crate moved, the prose did not, and no gate in this repository could see it.
+  #
+  # The manifest holds magnitudes, because `corpusFigures.ts`'s numeral regex captures no sign.
+  # Direction is in each key and each sign is pinned in
+  # `crates/project/tests/what_retiring_the_guarantee_actually_saves.rs`.
+  #
+  # The `results` property states the same numbers a third time and cannot be bound: `crossCheck`
+  # refuses a binding into a field that asserts no verified claim, and no property block in this
+  # corpus asserts one. See the carrier test for why that hole is left open rather than closed by
+  # inventing the convention. The tag is spelled out rather than written there because the
+  # claim-tag counter reads comments too.
+  - key: project/guarantee-removal-saving
+    value: 79813629.47
+    field: findings
+    as_written: "-$79.8M"
+  - key: project/guarantee-removal-saving-with-the-backstop-repealed
+    value: 942533256.86
+    field: findings
+    as_written: "-$942.5M"
+  - key: project/guarantee-half-phase-out-saving
+    value: 70818745.25
+    field: findings
+    as_written: "-$70.8M"
+  - key: project/guarantee-half-phase-out-saving-with-the-backstop-repealed
+    value: 503055943.17
+    field: findings
+    as_written: "-$503.1M"
+  - key: project/guarantee-rebase-saving
+    value: 66211485.88
+    field: findings
+    as_written: "-$66.2M"
+  - key: project/guarantee-rebase-saving-with-the-backstop-repealed
+    value: 311801221.99
+    field: findings
+    as_written: "-$311.8M"
+  - key: project/guarantee-rebase-foundation-fall
+    value: 248222592.51
+    field: findings
+    as_written: "-$248.2M"
+  - key: project/guarantee-retirement-absorbed-by-the-backstop
+    value: 799140997.91
+    field: findings
+    as_written: "absorbs **$799.1M**"
+  - key: project/guarantee-rules-gross-range
+    value: 3.54099366
+    field: findings
+    as_written: "a gross range of **3.54** to one"
+  - key: project/guarantee-rules-net-range
+    value: 1.2054348
+    field: findings
+    as_written: "**1.21** to one"
+  - key: project/guarantee-retirement-districts-cut
+    value: 167
+    field: findings
+    as_written: "that set is **167** districts"
+  - key: project/guaranteed-districts-the-backstop-makes-whole
+    value: 127
+    field: findings
+    as_written: "The other **127** are made whole"
+  - key: project/guarantee-retirement-districts-unreachable
+    value: 442
+    field: findings
+    as_written: "reaches the **442** districts it does not decide"
+  - key: project/guarantee-retirement-districts-cut-with-the-backstop-repealed
+    value: 311
+    field: findings
+    as_written: "the reach is **311**"
+  - key: project/transition-supplement-districts-off-the-guarantee
+    value: 17
+    field: findings
+    as_written: "by the **17** districts that draw `[K]`"
+  - key: project/guarantee-retirement-largest-per-pupil-loss
+    value: 796.7397
+    field: findings
+    as_written: "at **$797** per pupil"
+  - key: project/guarantee-retirement-median-loser-valuation
+    value: 318480.4
+    field: findings
+    as_written: "the median loser sits at **$318,480**"
+  - key: project/guarantee-retirement-median-made-whole-valuation
+    value: 257277.99
+    field: findings
+    as_written: "the median district it makes whole at **$257,278**"
+  # The base cost sweep, on total state support. Its `on guarantee` column was wrong on every row
+  # and its dollars were a vintage of the model that has since moved, so each of the eight cells is
+  # bound rather than only the ends.
+  - key: project/base-cost-plus-two-total-cost
+    value: 101670377.70
+    field: findings
+    as_written: "+$101.7M"
+  - key: project/base-cost-plus-five-total-cost
+    value: 267111423.43
+    field: findings
+    as_written: "+$267.1M"
+  - key: project/base-cost-plus-ten-total-cost
+    value: 597262120.94
+    field: findings
+    as_written: "+$597.3M"
+  - key: project/base-cost-plus-twenty-total-cost
+    value: 1391843058.40
+    field: findings
+    as_written: "+$1,391.8M"
+  - key: project/districts-on-the-guarantee-at-two-per-cent-more-base-cost
+    value: 269
+    field: findings
+    as_written: "+2%          +$106.6M          -$5.0M          +$101.7M               269"
+  - key: project/districts-on-the-guarantee-at-five-per-cent-more-base-cost
+    value: 243
+    field: findings
+    as_written: "+5%          +$288.1M         -$20.9M          +$267.1M               243"
+  - key: project/districts-on-the-guarantee-at-ten-per-cent-more-base-cost
+    value: 204
+    field: findings
+    as_written: "+10%         +$639.7M         -$42.4M          +$597.3M               204"
+  - key: project/districts-on-the-guarantee-at-twenty-per-cent-more-base-cost
+    value: 153
+    field: findings
+    as_written: "+20%       +$1,443.3M         -$51.4M        +$1,391.8M               153"
+  - key: project/base-cost-first-two-points-per-point
+    value: 50835188.85
+    field: findings
+    as_written: "the first two points cost **$50.8M** each"
+  - key: project/base-cost-last-ten-points-per-point
+    value: 79458093.7466
+    field: findings
+    as_written: "the last ten cost **$79.5M** each"
+  # The projection leg. The six foundation-aid figures did NOT move when `[K]` entered the model —
+  # `forecast` reported realized aid only, and `[K]` is outside that measure. Which is the defect
+  # the six beside them close: the savings table was in total state support and the projection was
+  # in foundation aid, and the paragraph joining them read as one measure.
   - key: project/fy2032-aid-current-law
     value: 7233134576.709653
     field: findings
@@ -53,70 +189,149 @@ figures:
     value: 6809351272.337828
     field: findings
     as_written: "**$6,301M, in a band of $5,831M to $6,809M**"
+  - key: project/fy2032-total-support-current-law
+    value: 8020850995.576105
+    field: findings
+    as_written: "Current law is **$8,021M**"
+  - key: project/fy2032-total-support-guarantee-removed
+    value: 7943354523.772846
+    field: findings
+    as_written: "the guarantee removed is **$7,943M**"
+  - key: project/fy2032-total-support-band-current-law
+    value: 0.0423100971
+    field: findings
+    as_written: "a half-width of **4.23%**"
+  - key: project/fy2032-total-support-band-guarantee-removed
+    value: 0.0416318322
+    field: findings
+    as_written: "at **4.16%**"
+  - key: project/fy2032-total-support-band-both-repealed
+    value: 0.0776537916
+    field: findings
+    as_written: "the half-width is **7.77%**"
+  - key: project/fy2032-backstop-guarantee-removed
+    value: 926812049.920604
+    field: findings
+    as_written: "**$926.8M** at FY2032"
+  - key: project/transition-supplement-total
+    value: 63578629.47
+    field: findings
+    as_written: "against $63.6M at FY2027"
   - key: project/districts-on-the-guarantee-fy2032
     value: 312
     field: findings
     as_written: "under current law, 294 to 312"
 
 findings: |
-  ### The three policies are not variants of each other
+  ### Retiring the guarantee is two bills, and they price an order of magnitude apart
 
-      removal              -$879.0M    294 districts cut, 315 untouched
-      half phase-out       -$439.5M    294 districts cut, 315 untouched
-      rebase to 90%        -$87.9M     294 districts cut, 315 untouched
+  Section 265.225 decides what a guarantee retirement costs, and no lever over the guarantee contains the
+  answer. Both, against the FY2027 model:
 
-  Removal and phase-out reach exactly the same districts and differ only in depth, because the
-  guarantee is a floor and lowering a floor cannot catch anyone the floor was not already
-  holding. **No policy applied to the guarantee can reach the 315 districts the formula already
-  pays.** [verified] That is the structural fact underneath every distributional argument about
-  it: the guarantee question and the adequacy question are disjoint, and a proposal framed as
-  fixing the formula by reforming the guarantee changes nothing for half the state.
+                       foundation aid   Sec. 265.225 stands   repealed alongside
+      removal                -$879.0M               -$79.8M             -$942.5M
+      half phase-out         -$439.5M               -$70.8M             -$503.1M
+      rebase to 90%          -$248.2M               -$66.2M             -$311.8M
 
-  ### The largest per-pupil loser is one of Ohio's poorest districts
+  [verified] Left standing, `[K]` absorbs **$799.1M** of the $879.0M a removal takes off
+  foundation aid, and the three policies stop being three policies: a gross range of **3.54** to
+  one collapses to **1.21** to one. The middle column is current law, and it says a guarantee
+  retirement is nearly free and very nearly rule-invariant. The right column is what *retiring the
+  guarantee* means as a policy rather than as a lever. Neither alone is the answer.
 
-  Under a half phase-out, East Cleveland City loses **$6,489 per pupil** — more than twice the
-  next district. Its guarantee is $13.7 million against $13.3 million of formula aid: **50.7%
-  of everything it receives**, $12,978 per pupil, on assessed valuation of $141,623 per pupil
-  against a statewide median of $248,097. [verified]
+  The left column is the one this node published as the cost for eleven phases. It is the right
+  number for the wrong quantity — what comes off `[H] + [I]` — and no district's cheque falls by
+  it. The measure matters more than the model here: `biennium::Measure` separates foundation aid
+  from total state support, and these two columns differ by nothing else.
 
-  This does not overturn the finding that the guarantee is a wealth mechanism — see
-  [`temporary-transitional-aid-guarantee`](../formula-component/temporary-transitional-aid-guarantee.yml).
-  It refines it. *Whether* a district is on the guarantee is predicted by property wealth. *How
-  much it depends on the guarantee* is a different distribution, driven by how far enrollment
-  has fallen since FY2020 — and the 50 most dependent districts still have a median valuation
-  of $349,582, well above the state's. East Cleveland is the exception that shows the two
-  questions are not the same question. [inference]
+  ### A guarantee-only lever reaches 167 districts, and 442 are out of reach
 
-  ### The guarantee is a shock absorber that wears out
+  Removal, a half phase-out and a rebase reach **exactly the same districts** — a floor that stops
+  holding somebody cannot start holding somebody else — and that set is **167** districts, not the
+  294 the guarantee pays. The other **127** are made whole by `[K]`, and they are precisely the 127
+  guaranteed districts *already drawing* it: a district at its `[L1]` ceiling is held at a **total**,
+  so anything taken off its guarantee is put back pound for pound. [verified]
 
-  Raising base cost costs the state more per point the higher it goes, because each increment
-  lifts more districts off the guarantee and onto a formula that then has to pay them:
+  **No policy applied to the guarantee alone reaches the **442** districts it does not decide.**
+  That is this node's structural claim and the scope is the correction: it was published
+  as 315 — the districts the formula pays — which left out the 127 the backstop catches. Extend the
+  bill to Section 265.225 and the reach is **311**, past the 294 the guarantee pays, by the **17**
+  districts that draw `[K]` and were never on the guarantee. [verified] So the guarantee question
+  and the adequacy question are disjoint, and the *hold-harmless* question and the adequacy
+  question are not: one of the two devices reaches districts the formula pays.
 
-      base cost   state cost    on guarantee    marginal cost per point
-      +2%          +$95.4M          272            $47.7M
-      +5%         +$255.3M          247            $53.3M
-      +10%        +$569.7M          207            $62.9M
-      +20%       +$1,294.6M         156            $72.5M
+  ### The largest per-pupil loser is a wealthy suburb, and the poorest district loses nothing
 
-  [verified] The first two points of a base cost increase are half-price. The state is buying
-  back its own guarantee. A fiscal note scoring a large increase by extrapolating from a small
-  one **understates the cost**, and the error grows with the size of the proposal — which is
-  the direction that matters, since it is the large proposals that get scored this way.
+  This is the finding that inverted. Under a half phase-out East Cleveland City loses **$6,489 per
+  pupil** of foundation aid — more than twice the next district, on assessed valuation of $141,623
+  per pupil against a statewide median of $248,097. Its total state support falls by **zero**:
+  `[K]` holds it at `[L1]` to the cent, under a half phase-out and under outright removal alike,
+  where the narrow measure says $12,978 per pupil. [verified]
 
-  ### It makes the state's cost predictable
+  The largest real per-pupil loss on a removal belongs to **West Geauga Local**, at **$797** per
+  pupil on valuation of $604,523 — two and a half times the state's median. Across the set the
+  median loser sits at **$318,480** of valuation per pupil and the median district it makes whole
+  at **$257,278**. [verified] The backstop therefore filters a guarantee retirement **up** the
+  wealth distribution: the districts it catches are the poorer half of the guaranteed population,
+  so what is left to cut is the richer half.
 
-  This is the projection leg and is reported apart from everything above. Carrying each
-  district's enrollment forward to **FY2032** by a damped trend from its own FY2024-FY2026
-  history — statewide ADM falls 1.3% — state aid under current law is **$7,233M, in a band of
-  $6,958M to $7,582M** (±4.3%). With the guarantee removed the same enrollment forecast gives
-  **$6,301M, in a band of $5,831M to $6,809M** (±7.8%). [inference] (a forecast, with the
-  caveats below)
-
-  **Removing the guarantee nearly doubles the state's exposure to enrollment forecast error.**
-  That is an argument for the guarantee that has nothing to do with equity or adequacy: it is a
-  budget-stability instrument, and it works by transferring enrollment risk from the state's
-  appropriation to the districts' own planning. Nobody appears to defend it on those grounds.
+  That does not overturn the finding that the guarantee is a wealth mechanism — see
+  [`temporary-transitional-aid-guarantee`](../formula-component/temporary-transitional-aid-guarantee.yml),
+  whose own quintile table already had the per-pupil loss rising with wealth. It strengthens it,
+  and it withdraws the exception this node had recorded against it. *Whether* a district is on the
+  guarantee is predicted by property wealth; *how much of a retirement it actually bears* is
+  predicted by property wealth too, once the device standing behind it is in the model. The 50 most
+  guarantee-dependent districts still have a median valuation of $349,582, well above the state's.
   [inference]
+
+  ### The guarantee is a shock absorber that wears out, and the backstop bills for it up front
+
+  Raising base cost costs the state more per point the higher it goes, because each increment lifts
+  more districts off the guarantee and onto a formula that then has to pay them:
+
+      base cost   foundation aid   [K] clawback   total state support   on guarantee   $/point
+      +2%          +$106.6M          -$5.0M          +$101.7M               269         $50.8M
+      +5%          +$288.1M         -$20.9M          +$267.1M               243         $55.1M
+      +10%         +$639.7M         -$42.4M          +$597.3M               204         $66.0M
+      +20%       +$1,443.3M         -$51.4M        +$1,391.8M               153         $79.5M
+
+  [verified] The gradient is monotone and steep: the first two points cost **$50.8M** each and
+  the last ten cost **$79.5M** each. A fiscal note scoring a large increase by extrapolating from a
+  small one **understates the cost**, and the error grows with the size of the proposal — which is
+  the direction that matters, since it is the large proposals that get scored this way. The state is
+  buying back its own guarantee, and the price rises as it does.
+
+  Here `[K]` runs the *other* way from a guarantee cut. Raising base cost raises realized aid,
+  which reduces the supplement, so the clawback makes an increase cheaper than the foundation
+  column says — and because it is proportionally largest on the smallest increase (4.7% of +2%
+  against 3.6% of +20%), it makes the gradient **steeper** rather than flatter. The warning is
+  therefore stronger on the measure a cost is quoted in than on foundation aid alone, which is the
+  one place in this node where the correction went that way. What it is not is *half-price*: the
+  first two points are about two thirds the price of the last ten, which was true of the figures
+  this node published as well and was overstated in the sentence beneath them.
+
+  ### It makes the state's cost predictable — and so does the backstop, on its own
+
+  This is the projection leg and is reported apart from everything above. Carrying each district's
+  enrollment forward to **FY2032** by a damped trend from its own FY2024-FY2026 history — statewide
+  ADM falls 1.3% — foundation aid under current law is **$7,233M, in a band of $6,958M to $7,582M**
+  (±4.3%). With the guarantee removed the same enrollment forecast gives **$6,301M, in a band of
+  $5,831M to $6,809M** (±7.8%). [inference] (a forecast, with the caveats below)
+
+  Those are foundation aid, and on total state support the comparison **disappears**. Current law is
+  **$8,021M** at a half-width of **4.23%**; the guarantee removed is **$7,943M** at **4.16%** — not
+  wider, slightly narrower. `[K]` is itself a floor against a fixed FY2021 total, so it inherits the
+  absorbing the guarantee gives up: it is **$926.8M** at FY2032 against $63.6M at FY2027. Repeal
+  Section 265.225 beside the guarantee and the half-width is **7.77%**, which is where the doubling
+  actually lives. [verified]
+
+  **Retiring the hold-harmless system nearly doubles the state's exposure to enrollment forecast
+  error. Retiring the guarantee alone does not.** That is an argument with nothing to do with
+  equity or adequacy — it is a budget-stability instrument, working by transferring enrollment risk
+  from the state's appropriation to the districts' own planning — and what is new is that the
+  instrument is not the guarantee. A device paying $63.6m to 144 districts delivers nearly all of
+  it, latently, because what it guarantees is a total. Nobody appears to defend either device on
+  these grounds. [inference]
 
   **18** districts move onto the guarantee between FY2027 and FY2032 under current law, 294 to
   312 — enrollment decline moves the count by about three percentage points of the state, because
@@ -127,14 +342,17 @@ findings: |
   and the direction word contradicted its own numbers. It was the one figure on this node that no
   test pinned, which is why it could be wrong in two ways at once and stay that way — it is bound
   now, as `project/districts-on-the-guarantee-fy2032`, along with the six band figures beside it
-  that were in the same position.
+  that were in the same position. Every delta on this node is bound now too, which is the other
+  half of the same lesson and took two more corrections to learn.
 properties:
   name: Phasing out the temporary transitional aid guarantee
   question: |
     What does removing, re-basing, or phasing out the temporary transitional aid guarantee do
-    to Ohio's districts, and what does raising base cost cost while it is in place?
+    to Ohio's districts — under each of the two things the uncodified section that backstops it
+    could do — and what does raising base cost cost while it is in place?
   perturbations: |
     guarantee            as-enacted -> removed | rebase:<factor> | phase-out:<remaining>
+    backstop             as-enacted -> repealed     (Section 265.225, priced against every rule)
     base_cost_scale      1.00 -> 1.02, 1.05, 1.10, 1.20
     minimum_state_share  0.10 as enacted for FY2026-27, not the 0.05 the plan began with
     phase_in             base cost and categoricals separately, both 1.00 at baseline
@@ -142,6 +360,10 @@ properties:
     Every run is a simulation at observed enrollment against the department's own FY2027 model,
     which `project::policy::current_law` reproduces to the cent for all 609 districts. Only the
     FY2032 block projects anything.
+
+    `backstop` is a second dial rather than part of the guarantee rule because the two are separate
+    instruments in separate law: R.C. 3317.019 names its own years, Section 265.225 is uncodified law of
+    H.B. 110 extended by H.B. 96, and a bill could plainly do either.
   input_projections: |
     One leg only, and it is reported apart from every other figure. Enrolled ADM is carried to
     FY2032 by a damped trend (damping 0.30, fitted — see
@@ -150,30 +372,58 @@ properties:
     Census F-33 panel (see [the-shrunk-rate](../../decisions/the-shrunk-rate.yml)), and the
     whole formula is re-run at the low, central, and high end of each district's band rather
     than scaling a central answer — the guarantee is a `max`, so the aid curve has a kink that
-    scaling cannot reproduce.
+    scaling cannot reproduce. `[K]` is a second kink, in the other direction, and is re-derived at
+    each end of the band rather than carried across from the central run.
 
     Assessed valuation is held fixed. It cannot be projected: the corpus has one observation per
     district and Ohio valuation steps on a county reappraisal cycle rather than moving smoothly.
     Local capacity is 60% valuation, so the local side of every projection here is an assumption.
   horizon: FY2027, with one projected leg to FY2032
   results_path: |
-    crates/project — `cargo run -p project --bin edfund-project -- --guarantee <rule>`.
-    Pinned by crates/project/tests/ and by the checkpoints in crates/bundle, which the web
-    layer re-derives and must reproduce before it will render a scenario.
+    crates/project — `cargo run -p project --bin edfund-project -- --guarantee <rule>
+    [--backstop repealed]`. Pinned by crates/project/tests/ — the savings table by
+    `what_retiring_the_guarantee_actually_saves.rs` — and by the checkpoints in crates/bundle,
+    which the web layer re-derives and must reproduce before it will render a scenario.
   results: |
-    removal              -$879.0M    294 districts cut, 315 untouched
-    half phase-out       -$439.5M    294 districts cut, 315 untouched
-    rebase to 90%        -$248.2M    294 districts cut, 315 untouched
+    total state support, 609 districts, FY2027        Sec. 265.225 stands   repealed alongside
+    removal                                                       -$79.8M             -$942.5M
+    half phase-out                                                -$70.8M             -$503.1M
+    rebase to 90%                                                 -$66.2M             -$311.8M
+    districts cut                                                     167                  311
+    districts unmoved                                                 442                  298
 
-    base cost   state cost    on guarantee    marginal cost per point
-    +2%          +$95.4M          272            $47.7M
-    +5%         +$255.3M          247            $53.3M
-    +10%        +$569.7M          207            $62.9M
-    +20%       +$1,294.6M         156            $72.5M
+    foundation aid, the same three rules: -$879.0M, -$439.5M, -$248.2M. Districts cut on that
+    measure: 294 under all three. The difference between the two blocks is `[K]`.
 
-    FY2032 at projected enrollment, current law: $7,233M in a band of $6,958M to $7,582M.
-    The same with the guarantee removed: $6,301M in a band of $5,831M to $6,809M.
+    base cost   foundation aid   [K] clawback   total state support   on guarantee   $/point
+    +2%          +$106.6M          -$5.0M          +$101.7M               269         $50.8M
+    +5%          +$288.1M         -$20.9M          +$267.1M               243         $55.1M
+    +10%         +$639.7M         -$42.4M          +$597.3M               204         $66.0M
+    +20%       +$1,443.3M         -$51.4M        +$1,391.8M               153         $79.5M
+
+    FY2032 at projected enrollment, foundation aid — current law: $7,233M in a band of $6,958M to
+    $7,582M. With the guarantee removed: $6,301M in a band of $5,831M to $6,809M.
+    The same on total state support: $8,021M at +/-4.23%, and $7,943M at +/-4.16%. With Section 265.225
+    repealed as well, +/-7.77%.
   confidence: |
+    **This node reports two answers to one question, and the pair is deliberate.** `[I]` is a term
+    in `[K]`'s own subtrahend, so what Section 265.225 does is not a detail of a guarantee retirement — it
+    is most of its cost. Three answers are coherent:
+
+    - **(a) `[K]` stays as enacted.** The honest model of current law, and why removal saves about a
+      tenth of the headline. **Reported.**
+    - **(b) `[K]` is repealed alongside.** What "retiring the guarantee" means as a policy rather
+      than as a lever. **Reported.**
+    - **(c) `[K]` is recomputed against an FY2021 base that excludes `[I]`.** **Not reported**, and
+      not for want of a lever: `[L1]` is a single published column per district, and splitting it
+      into its guarantee and non-guarantee halves needs FY2021 per-district guarantee payments that
+      no committed source carries. The same gap that makes `[H2]` unobservable for a formula
+      district makes this unobservable for every district. [open]
+
+    Reporting only one of (a) and (b) re-creates the defect this node was corrected for: (a) alone
+    says a guarantee retirement is nearly free, (b) alone says it saves $942.5M, and a reader given
+    either would be wrong about the other. [inference]
+
     The simulation figures are exact against the department's model and carry no interval.
 
     **"Current law" at FY2032 is not a law, and this node says it because the band is drawn under
@@ -181,7 +431,9 @@ properties:
     their own terms, and forty divisions of five further sections hand their values to a General
     Assembly that has not met. [verified] The FY2032 figures are this formula continued unchanged
     — the only tractable assumption for a five-year question about a two-year statute, and not a
-    forecast of what the law will say. See
+    forecast of what the law will say. Section 265.225 is on weaker ground still: it is uncodified, its
+    newest committed text names FY2022 and FY2023, and it survives to FY2027 only because H.B. 96
+    extended both devices in one clause. See
     [`the-plan-expires-and-the-projection-does-not`](../../decisions/the-plan-expires-and-the-projection-does-not.yml).
 
     The FY2032 band is not this district's uncertainty. Three observations cannot estimate a
@@ -212,7 +464,93 @@ properties:
 
     138 districts sit at the minimum state share and their response to a base cost increase
     cannot be computed, because the floor censors the quantity it would be computed from. They
-    are held at the floor, which makes the marginal-cost table a lower bound. [inference]
+    are held at the floor, which makes the base cost table a lower bound. [inference]
+
+    **`[K]` reaches further than this panel does.** H.B. 96 extends the supplement to community
+    schools and STEM schools as well as districts, and every figure here is over the 609 city,
+    local and exempted village districts the FY2027 model carries. A statewide cost of repealing
+    Section 265.225 is larger than the $63.6m column (b) is priced against, by an amount this model cannot
+    bound. [verified]
+revisions:
+  - was: |
+      The savings table stated **-$879.0M** for removal, **-$439.5M** for a half phase-out and
+      **-$87.9M** for a rebase to 90% — with the `results` property giving **-$248.2M** for that
+      same third row — and put **294 districts cut, 315 untouched** against every one of them.
+    now: |
+      Those are falls in foundation aid, not savings, and only for the first two rows. On total
+      state support, which is the measure a cost is quoted in, the three rules save **$79.8M**,
+      **$70.8M** and **$66.2M** with Section 265.225 standing, and **$942.5M**, **$503.1M** and
+      **$311.8M** with it repealed. **167** districts are cut, not 294, and **442** are untouched,
+      not 315.
+
+      The **-$87.9M** was never computed: it is a tenth of $879.0M, reasoned from a tenth off the
+      floor. The guarantee is a `max`, so a tenth off the floor pushes **64** districts off it
+      altogether and takes their whole top-up — 28.2% of the guarantee. The `results` property's
+      **-$248.2M** was the model's own answer to that, and right about the fall in foundation aid.
+    found_by: |
+      `crates/project::hold_harmless`, which inventoried four hold-harmless devices where the
+      corpus had recorded one, and `PolicyEffect::cost` widening to `[R] Total State Support` so
+      that `[K]` is inside the figure a lever is priced at. Pinned in
+      `crates/project/tests/what_retiring_the_guarantee_actually_saves.rs`.
+    reach: |
+      The savings table carried no `figures:` entries, so nothing in this repository could see it go
+      stale: the crate moved twice and the prose did not move at all, while every gate stayed green.
+      That is the #120 shape with nothing on the crate side to disagree with. Every delta on this
+      node is bound now, and the manifest holds them as magnitudes because it cannot hold a sign.
+  - was: |
+      "**No policy applied to the guarantee can reach the 315 districts the formula already
+      pays.**" [verified] — offered as the structural fact underneath every distributional argument
+      about the guarantee, and as grounds that "a proposal framed as fixing the formula by
+      reforming the guarantee changes nothing for half the state".
+    now: |
+      True of a guarantee-only lever and understated: the unreachable population is **442**, because
+      `[K]` makes 127 of the 294 guaranteed districts whole as well. False of the hold-harmless
+      system — repealing Section 265.225 alongside reaches **311** districts, including **17** that draw
+      `[K]` and were never on the guarantee.
+    found_by: |
+      `repealing_the_backstop_beside_it_saves_what_both_cost` in `crates/project/src/report.rs`, and
+      `a_guarantee_only_lever_reaches_167_districts_and_both_devices_reach_311`.
+    reach: |
+      The scoped claim is sharper than the unscoped one was, and it changes what the node concludes:
+      the guarantee question and the adequacy question are disjoint, and the hold-harmless question
+      and the adequacy question are not.
+  - was: |
+      "The largest per-pupil loser is one of Ohio's poorest districts" — East Cleveland City at
+      **$6,489 per pupil** under a half phase-out, offered as the exception showing that dependence
+      on the guarantee and wealth are different distributions.
+    now: |
+      That is its fall in foundation aid. Its total state support does not move at all: `[K]` holds
+      it at `[L1]` to the cent. The largest per-pupil loss on a removal is **West Geauga Local** at
+      **$797** per pupil, on valuation of $604,523 against the statewide median of $248,097, and the
+      median district the retirement cuts sits at **$318,480** against **$257,278** for the median
+      district the backstop makes whole.
+    found_by: |
+      `hold_harmless::retirement`, and
+      `the_largest_per_pupil_loser_is_a_wealthy_district_once_the_backstop_is_in_the_model`.
+    reach: |
+      The exception is withdrawn rather than refined, and the wealth finding it was an exception to
+      is stronger without it: the backstop filters a guarantee retirement up the wealth
+      distribution. `temporary-transitional-aid-guarantee`'s quintile table already pointed this
+      way — Q4 and Q5 losing most per pupil — and the two nodes were in tension until `[K]` was
+      modelled.
+  - was: |
+      "**Removing the guarantee nearly doubles the state's exposure to enrollment forecast
+      error.**" [inference] — from a foundation-aid band of ±4.3% under current law against ±7.8%
+      with the guarantee removed.
+    now: |
+      True of foundation aid and false of total state support, where the same two runs are **4.23%**
+      and **4.16%** — no wider. `[K]` is a floor against a fixed FY2021 total, so it inherits the
+      absorbing the guarantee gives up, reaching **$926.8M** at FY2032. The doubling is recovered
+      only when Section 265.225 is repealed as well: **7.77%**.
+    found_by: |
+      `the_backstop_inherits_the_guarantees_budget_stability`, after `report::forecast` was widened
+      to accumulate total state support beside realized aid. The six bound FY2032 figures did not
+      move, because they are foundation aid and `[K]` is outside it — which is how a node whose
+      savings table was in one measure and whose projection was in the other stayed green.
+    reach: |
+      The budget-stability argument survives and changes owner. It is an argument for the
+      hold-harmless system, and the device that delivers nearly all of it is the one paying $63.6m
+      to 144 districts rather than the one paying $879.0m to 294.
 links:
   - target: ../scenario.ont.yml
     relationship: instance-of
@@ -225,6 +563,10 @@ links:
   - target: ../formula-component/fsfp-base-cost-calculation.yml
     relationship: perturbs-within
   - target: ../formula-component/temporary-transitional-aid-guarantee.yml
+    relationship: perturbs-within
+  # The device that backstops the guarantee, and the second lever this scenario moves. Without it
+  # every saving on this node was a gross figure published as a net one.
+  - target: ../formula-component/fsfp-formula-transition-supplement.yml
     relationship: perturbs-within
   - target: ../funding-regime/fair-school-funding-plan.yml
     relationship: baselines-on

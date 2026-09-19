@@ -185,6 +185,15 @@ findings: |
   formula supports most. The guarantee pays most, per pupil, to the districts the formula says
   need it least. [verified]
 
+  **That table is foundation aid, and it is the guarantee's own incidence rather than a
+  retirement's.** `crates/scenario-delta` builds it from `[H] + [I]`, which excludes `[K]` — so it
+  states what the guarantee pays each quintile and not what any quintile would actually lose if the
+  guarantee stopped being paid. On total state support the answer is different in shape as well as
+  in size: the formula transition supplement makes 127 of the 294 whole, and the cut that survives
+  runs further up the wealth distribution than this table does. See
+  [guarantee-phase-out](../scenario/guarantee-phase-out.yml), whose largest per-pupil loser moved
+  from the poorest district in the state to one of the wealthiest once `[K]` was modelled. [verified]
+
   Two things this does *not* say. The gradient is **not monotone** — Q4 loses more per pupil than
   Q5, because the wealthiest districts are small and already floored, so less distance separates
   their formula amount from their baseline. Any claim that the guarantee's benefit rises without

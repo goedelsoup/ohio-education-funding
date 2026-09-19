@@ -237,6 +237,8 @@ pub struct Inputs {
     /// The same refresh run together with a half-retired guarantee — the draft whose whole point
     /// is that the two provisions do not add.
     pub fund_the_plan: project::drafts::Priced,
+    /// The guarantee scenario, every run of it, on both answers to what §265.225 does.
+    pub guarantee: Guarantee,
     /// Total taxable value as Table SD-1 publishes it, summed over the districts the county
     /// abstract can recognize.
     pub actual_total: f64,
@@ -424,6 +426,57 @@ pub struct Forecasts {
     /// FY2032 with the guarantee removed — the other half of `scenario/guarantee-phase-out`'s
     /// central comparison, and the run its "nearly doubles the state's exposure" rests on.
     pub fy2032_guarantee_removed: project::report::EnrollmentEffect,
+    /// FY2032 with the guarantee removed **and** §265.225 repealed beside it.
+    ///
+    /// The run that recovers the doubling. On foundation aid it is indistinguishable from the one
+    /// above — `[K]` is outside that measure — and on total state support the two are 4.16% and
+    /// 7.77%, which is the whole of why this third forecast exists.
+    pub fy2032_guarantee_and_backstop_removed: project::report::EnrollmentEffect,
+}
+
+/// `scenario/guarantee-phase-out`, every run of it.
+///
+/// # Why each guarantee rule is priced twice
+///
+/// `[I]` is a term in `[K]`'s own subtrahend, so uncodified §265.225 **backstops the guarantee**
+/// and decides what retiring it costs. Left standing it absorbs 90.9% of the apparent saving; the
+/// same rule therefore prices an order of magnitude apart depending on an answer the lever does not
+/// contain. The node states both columns, so this block holds both.
+///
+/// Every run is [`project::report::simulate`] at observed enrollment against the department's own
+/// FY2027 model, which `Policy::current_law` reproduces to the cent.
+pub struct Guarantee {
+    /// Removal, §265.225 standing — the honest model of current law.
+    pub removal: project::report::PolicyEffect,
+    /// Removal, §265.225 repealed alongside — what "retiring the guarantee" means as a policy.
+    pub removal_and_backstop: project::report::PolicyEffect,
+    /// A half phase-out, §265.225 standing.
+    pub half: project::report::PolicyEffect,
+    /// A half phase-out, §265.225 repealed alongside.
+    pub half_and_backstop: project::report::PolicyEffect,
+    /// A rebase of the floor to 90%, §265.225 standing.
+    pub rebase: project::report::PolicyEffect,
+    /// A rebase of the floor to 90%, §265.225 repealed alongside.
+    pub rebase_and_backstop: project::report::PolicyEffect,
+    /// Whom a guarantee-only retirement reaches, and whom the backstop makes whole.
+    ///
+    /// Measured on total state support rather than on `scenario-delta`'s table, which is built from
+    /// realized aid and therefore cannot see the backstop at all.
+    pub retirement: project::hold_harmless::Retirement,
+    /// The base cost sweep the same node states, at +2%, +5%, +10% and +20%.
+    pub base_cost: [project::report::PolicyEffect; 4],
+}
+
+impl Guarantee {
+    /// Marginal cost per point of base cost increase, between two of the four runs.
+    ///
+    /// The node's fourth column, and it is genuinely marginal rather than average — a difference of
+    /// two runs over the points between them. `from` of `None` is the increase from current law.
+    #[must_use]
+    pub fn marginal_per_point(&self, from: Option<usize>, to: usize, points: f64) -> f64 {
+        let at = |index: Option<usize>| index.map_or(0.0, |i| self.base_cost[i].cost());
+        (at(Some(to)) - at(from)) / points
+    }
 }
 
 impl Inputs {
@@ -441,6 +494,7 @@ impl Inputs {
         let panel_for_drafts = panel.clone();
         let panel_for_reach = panel.clone();
         let panel_for_forecasts = panel.clone();
+        let panel_for_guarantee = panel.clone();
         let recognized: HashMap<String, Recognition> = recognized_valuation::from_abstract(2024);
         let at_recognized = panel_at_fy2027(
             &panel,
@@ -492,6 +546,43 @@ impl Inputs {
             ),
             refresh: priced("hb-96-with-refreshed-inputs", &panel_for_drafts),
             fund_the_plan: priced("fund-the-plan-and-retire-the-guarantee", &panel_for_drafts),
+            guarantee: {
+                use project::policy::{Backstop, GuaranteeRule};
+                let at = |guarantee: GuaranteeRule, backstop: Backstop| {
+                    project::report::simulate(
+                        &panel_for_guarantee,
+                        &project::policy::Policy {
+                            guarantee,
+                            backstop,
+                            ..project::policy::Policy::current_law()
+                        },
+                    )
+                };
+                let scaled = |base_cost_scale: f64| {
+                    project::report::simulate(
+                        &panel_for_guarantee,
+                        &project::policy::Policy {
+                            base_cost_scale,
+                            ..project::policy::Policy::current_law()
+                        },
+                    )
+                };
+                let half = GuaranteeRule::PhasedOut { remaining: 0.5 };
+                let rebase = GuaranteeRule::Rebased { factor: 0.9 };
+                Guarantee {
+                    removal: at(GuaranteeRule::Removed, Backstop::AsEnacted),
+                    removal_and_backstop: at(GuaranteeRule::Removed, Backstop::Repealed),
+                    half: at(half, Backstop::AsEnacted),
+                    half_and_backstop: at(half, Backstop::Repealed),
+                    rebase: at(rebase, Backstop::AsEnacted),
+                    rebase_and_backstop: at(rebase, Backstop::Repealed),
+                    retirement: project::hold_harmless::retirement(
+                        &panel_for_guarantee,
+                        GuaranteeRule::Removed,
+                    ),
+                    base_cost: [scaled(1.02), scaled(1.05), scaled(1.10), scaled(1.20)],
+                }
+            },
             actual_total,
             recognized_total,
             // Computed once here rather than per figure: each of the three walks the whole
@@ -634,6 +725,17 @@ impl Inputs {
                         &panel_for_forecasts,
                         &project::policy::Policy {
                             guarantee: project::policy::GuaranteeRule::Removed,
+                            ..project::policy::Policy::current_law()
+                        },
+                        FiscalYear(2032),
+                        shrunk(project::series::DEFAULT_DAMPING),
+                        prior,
+                    ),
+                    fy2032_guarantee_and_backstop_removed: project::report::forecast(
+                        &panel_for_forecasts,
+                        &project::policy::Policy {
+                            guarantee: project::policy::GuaranteeRule::Removed,
+                            backstop: project::policy::Backstop::Repealed,
                             ..project::policy::Policy::current_law()
                         },
                         FiscalYear(2032),
@@ -8116,6 +8218,368 @@ pub static FIGURES: &[Figure] = &[
         pinned: 312.0,
         tolerance: 0.0,
         compute: |i| i.forecasts.fy2032.on_guarantee as f64,
+    },
+    // ---- scenario/guarantee-phase-out, restated against the model that contains `[K]` ---------
+    //
+    // The node's savings tables were written when `[K]` was not modelled, and they carried NO
+    // `figures:` entries — so the whole restatement below rotted invisibly while every gate stayed
+    // green. That is the #120 shape with nothing at all on the crate side, which is why the deltas
+    // are bound here and not only the levels.
+    //
+    // Signs: the manifest cannot hold a negative, because `corpusFigures.ts`'s numeral regex
+    // captures none. Each of these is a magnitude with the direction in the key, the convention
+    // `fund-the-plan-run-cut` set, and the signs are pinned in
+    // `crates/project/tests/what_retiring_the_guarantee_actually_saves.rs`.
+    Figure {
+        key: "project/guarantee-removal-saving",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What removing the temporary transitional aid guarantee saves in total state \
+                support with Section 265.225 left standing -- a tenth of what the guarantee \
+                costs, because `[K]` makes the rest good",
+        pinned: 79_813_629.47,
+        tolerance: 0.005,
+        compute: |i| -i.guarantee.removal.cost(),
+    },
+    Figure {
+        key: "project/guarantee-removal-saving-with-the-backstop-repealed",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same removal with Section 265.225 repealed alongside, which saves what both \
+                devices cost",
+        pinned: 942_533_256.86,
+        tolerance: 0.005,
+        compute: |i| -i.guarantee.removal_and_backstop.cost(),
+    },
+    Figure {
+        key: "project/guarantee-half-phase-out-saving",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a half phase-out of the guarantee saves in total state support with \
+                Section 265.225 left standing",
+        pinned: 70_818_745.25,
+        tolerance: 0.005,
+        compute: |i| -i.guarantee.half.cost(),
+    },
+    Figure {
+        key: "project/guarantee-half-phase-out-saving-with-the-backstop-repealed",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same half phase-out with Section 265.225 repealed alongside, which reaches 311 \
+                districts instead of 167",
+        pinned: 503_055_943.17,
+        tolerance: 0.005,
+        compute: |i| -i.guarantee.half_and_backstop.cost(),
+    },
+    Figure {
+        key: "project/guarantee-rebase-saving",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What rebasing the guarantee's floor to 90% of its FY2020 level saves in total \
+                state support with Section 265.225 left standing",
+        pinned: 66_211_485.88,
+        tolerance: 0.005,
+        compute: |i| -i.guarantee.rebase.cost(),
+    },
+    Figure {
+        key: "project/guarantee-rebase-saving-with-the-backstop-repealed",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same rebase of the floor with Section 265.225 repealed alongside",
+        pinned: 311_801_221.99,
+        tolerance: 0.005,
+        compute: |i| -i.guarantee.rebase_and_backstop.cost(),
+    },
+    Figure {
+        // The node stated this figure as a *saving* in one field and $87.9m -- a tenth of the
+        // guarantee, derived by hand and never computed -- in another. It is neither: it is the
+        // fall in foundation aid, and the guarantee is a `max`, so cutting the floor a tenth takes
+        // the whole top-up from the districts it pushes off rather than a tenth from everybody.
+        key: "project/guarantee-rebase-foundation-fall",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The fall in foundation aid when the guarantee's floor is rebased to 90% -- 28.2% \
+                of the guarantee, not the tenth the floor moved",
+        pinned: 248_222_592.51,
+        tolerance: 0.005,
+        compute: |i| -i.guarantee.rebase.foundation_cost(),
+    },
+    Figure {
+        key: "project/guarantee-retirement-absorbed-by-the-backstop",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What `[K]` puts back when the guarantee is removed and Section 265.225 stands -- \
+                of the $879.0m taken off foundation aid",
+        pinned: 799_140_997.91,
+        tolerance: 0.005,
+        compute: |i| i.guarantee.retirement.absorbed,
+    },
+    Figure {
+        // The two ratios are the finding. Bound rather than left derivable because the whole
+        // defect being corrected here was a table of deltas nothing checked.
+        key: "project/guarantee-rules-gross-range",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "How far apart the three guarantee rules are on foundation aid -- removal against a \
+                rebase to 90%, as a multiple",
+        pinned: 3.540_993_664_162_903,
+        tolerance: 0.000_1,
+        compute: |i| {
+            i.guarantee.removal.foundation_cost() / i.guarantee.rebase.foundation_cost()
+        },
+    },
+    Figure {
+        key: "project/guarantee-rules-net-range",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "And how far apart they are in what the state actually saves, once the backstop has \
+                answered -- the same two rules, as a multiple",
+        pinned: 1.205_434_803_481_864,
+        tolerance: 0.000_1,
+        compute: |i| i.guarantee.removal.cost() / i.guarantee.rebase.cost(),
+    },
+    Figure {
+        key: "project/guarantee-retirement-districts-cut",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts whose total state support falls when the guarantee is retired and \
+                Section 265.225 stands -- of the 294 the guarantee pays, and the same set under \
+                all three rules",
+        pinned: 167.0,
+        tolerance: 0.0,
+        compute: |i| i.guarantee.removal.losers() as f64,
+    },
+    Figure {
+        key: "project/guarantee-retirement-districts-unreachable",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts no policy applied to the guarantee alone moves at all -- published as \
+                315, which counted only the ones the formula pays and not the 127 the backstop \
+                makes whole",
+        pinned: 442.0,
+        tolerance: 0.0,
+        compute: |i| i.guarantee.removal.unmoved() as f64,
+    },
+    Figure {
+        key: "project/guarantee-retirement-districts-cut-with-the-backstop-repealed",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts cut when Section 265.225 goes too -- past the 294 the guarantee pays, \
+                because 17 draw `[K]` and were never on the guarantee",
+        pinned: 311.0,
+        tolerance: 0.0,
+        compute: |i| i.guarantee.removal_and_backstop.losers() as f64,
+    },
+    Figure {
+        key: "project/guaranteed-districts-the-backstop-makes-whole",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Guaranteed districts whose cheque does not move when the guarantee is retired -- \
+                exactly the ones already drawing `[K]`, which holds them at a total",
+        pinned: 127.0,
+        tolerance: 0.0,
+        compute: |i| i.guarantee.retirement.made_whole as f64,
+    },
+    Figure {
+        // The incidence that inverted. The corpus published East Cleveland City -- $141,623 of
+        // valuation per pupil -- as the largest per-pupil loser of a phase-out, and on total state
+        // support it loses nothing at all.
+        key: "project/guarantee-retirement-largest-per-pupil-loss",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The largest per-pupil fall in total state support when the guarantee is removed, \
+                as a magnitude -- West Geauga Local, at $604,523 of valuation per pupil",
+        pinned: 796.739_711_9,
+        tolerance: 0.005,
+        compute: |i| -i.guarantee.retirement.largest_per_pupil_loss.1,
+    },
+    Figure {
+        key: "project/guarantee-retirement-median-loser-valuation",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Median assessed valuation per pupil of the districts a guarantee retirement cuts \
+                -- above the statewide median of $248,097, which is the direction the backstop \
+                filters the cut in",
+        pinned: 318_480.4,
+        tolerance: 0.005,
+        compute: |i| i.guarantee.retirement.median_loser_valuation,
+    },
+    Figure {
+        key: "project/guarantee-retirement-median-made-whole-valuation",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And of the districts the backstop makes whole, which are the poorer half of the \
+                guaranteed population",
+        pinned: 257_277.99,
+        tolerance: 0.005,
+        compute: |i| i.guarantee.retirement.median_made_whole_valuation,
+    },
+    Figure {
+        // The base cost sweep, on total state support. The node's old table was on realized aid at
+        // a vintage of the model that has since moved twice, and its `on guarantee` column was
+        // wrong on every row.
+        key: "project/base-cost-plus-two-total-cost",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a 2% rise in statewide base cost costs in total state support, net of the \
+                $5.0m it claws back out of `[K]`",
+        pinned: 101_670_377.70,
+        tolerance: 0.005,
+        compute: |i| i.guarantee.base_cost[0].cost(),
+    },
+    Figure {
+        key: "project/base-cost-plus-five-total-cost",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a 5% rise in statewide base cost costs in total state support",
+        pinned: 267_111_423.43,
+        tolerance: 0.005,
+        compute: |i| i.guarantee.base_cost[1].cost(),
+    },
+    Figure {
+        key: "project/base-cost-plus-ten-total-cost",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a 10% rise in statewide base cost costs in total state support",
+        pinned: 597_262_120.94,
+        tolerance: 0.005,
+        compute: |i| i.guarantee.base_cost[2].cost(),
+    },
+    Figure {
+        key: "project/base-cost-plus-twenty-total-cost",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a 20% rise in statewide base cost costs in total state support",
+        pinned: 1_391_843_058.40,
+        tolerance: 0.005,
+        compute: |i| i.guarantee.base_cost[3].cost(),
+    },
+    Figure {
+        key: "project/districts-on-the-guarantee-at-two-per-cent-more-base-cost",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts the guarantee still pays after a 2% base cost rise, of 294 -- the \
+                mechanism by which a large enough increase buys the guarantee back",
+        pinned: 269.0,
+        tolerance: 0.0,
+        compute: |i| i.guarantee.base_cost[0].policy.on_guarantee as f64,
+    },
+    Figure {
+        key: "project/districts-on-the-guarantee-at-five-per-cent-more-base-cost",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts the guarantee still pays after a 5% base cost rise, of 294",
+        pinned: 243.0,
+        tolerance: 0.0,
+        compute: |i| i.guarantee.base_cost[1].policy.on_guarantee as f64,
+    },
+    Figure {
+        key: "project/districts-on-the-guarantee-at-ten-per-cent-more-base-cost",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts the guarantee still pays after a 10% base cost rise, of 294",
+        pinned: 204.0,
+        tolerance: 0.0,
+        compute: |i| i.guarantee.base_cost[2].policy.on_guarantee as f64,
+    },
+    Figure {
+        key: "project/districts-on-the-guarantee-at-twenty-per-cent-more-base-cost",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts the guarantee still pays after a 20% base cost rise, of 294",
+        pinned: 153.0,
+        tolerance: 0.0,
+        compute: |i| i.guarantee.base_cost[3].policy.on_guarantee as f64,
+    },
+    Figure {
+        // The fiscal-note warning, as the two ends of the gradient. Marginal and not average: a
+        // difference of two runs over the points between them, which is what the node's fourth
+        // column has always been despite reading like an average.
+        key: "project/base-cost-first-two-points-per-point",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the first two points of a base cost increase cost the state per point",
+        pinned: 50_835_188.85,
+        tolerance: 0.005,
+        compute: |i| i.guarantee.marginal_per_point(None, 0, 2.0),
+    },
+    Figure {
+        key: "project/base-cost-last-ten-points-per-point",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And what the tenth to twentieth points cost per point -- the gradient a fiscal \
+                note extrapolating from a small increase misses",
+        pinned: 79_458_093.746,
+        tolerance: 0.005,
+        compute: |i| i.guarantee.marginal_per_point(Some(2), 3, 10.0),
+    },
+    Figure {
+        // The projection leg on the wide measure. The six figures above it are foundation aid and
+        // did NOT move when `[K]` entered the model -- `forecast` reported realized aid only, and
+        // `[K]` is outside that. Which is the defect: the node's savings table was in total state
+        // support and its projection leg was in foundation aid, and the paragraph joining them read
+        // as one measure.
+        key: "project/fy2032-total-support-current-law",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Total state support at FY2032 enrollment under current law, central estimate -- \
+                realized aid, transportation and `[K]` together",
+        pinned: 8_020_850_995.576_105,
+        tolerance: 0.01,
+        compute: |i| i.forecasts.fy2032.total_state_support,
+    },
+    Figure {
+        key: "project/fy2032-total-support-guarantee-removed",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Total state support at FY2032 with the guarantee removed and Section 265.225 standing",
+        pinned: 7_943_354_523.772_846,
+        tolerance: 0.01,
+        compute: |i| i.forecasts.fy2032_guarantee_removed.total_state_support,
+    },
+    Figure {
+        key: "project/fy2032-total-support-band-current-law",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "Half the width of the FY2032 total-state-support band under current law, as a \
+                share of the central estimate -- the state's exposure to enrollment forecast error",
+        pinned: 0.042_310_097_1,
+        tolerance: 0.000_000_1,
+        compute: |i| i.forecasts.fy2032.total_half_width(),
+    },
+    Figure {
+        key: "project/fy2032-total-support-band-guarantee-removed",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The same with the guarantee removed -- NOT wider, because `[K]` is a floor against \
+                a fixed FY2021 total and inherits the absorbing the guarantee gives up",
+        pinned: 0.041_631_832_2,
+        tolerance: 0.000_000_1,
+        compute: |i| i.forecasts.fy2032_guarantee_removed.total_half_width(),
+    },
+    Figure {
+        key: "project/fy2032-total-support-band-both-repealed",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "And with Section 265.225 repealed beside it, which is where the corpus's claim that \
+                retirement nearly doubles the state's exposure actually holds",
+        pinned: 0.077_653_791_6,
+        tolerance: 0.000_000_1,
+        compute: |i| {
+            i.forecasts
+                .fy2032_guarantee_and_backstop_removed
+                .total_half_width()
+        },
+    },
+    Figure {
+        key: "project/fy2032-backstop-guarantee-removed",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "`[K]` at FY2032 enrollment with the guarantee removed, against $63.6m at FY2027 \
+                -- the state's exposure arriving somewhere else rather than going away",
+        pinned: 926_812_049.920_604,
+        tolerance: 0.01,
+        compute: |i| i.forecasts.fy2032_guarantee_removed.transition_supplement,
     },
     // `formula-component/fsfp-formula-transition-supplement`. The second hold-harmless, and the
     // node's point is that it is not nested inside the first.
