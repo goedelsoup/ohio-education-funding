@@ -41,7 +41,7 @@ use std::collections::BTreeMap;
 use edfund_core::Dollars;
 
 use crate::panel::DistrictRecord;
-use crate::policy::{GuaranteeRule, Policy};
+use crate::policy::{Backstop, GuaranteeRule, Policy};
 use crate::report::{simulate, PolicyEffect};
 
 /// The committed extract: one row per provision per draft.
@@ -181,6 +181,11 @@ impl Anchor {
 pub enum Lever {
     /// What happens to the temporary transitional aid guarantee.
     Guarantee(GuaranteeRule),
+    /// What happens to the device that backstops it, Section 265.225.
+    ///
+    /// A separate lever because it is separate law: a draft that retires the guarantee and is
+    /// silent here repeals the codified section alone, and `[K]` makes 90.9% of it good.
+    Backstop(Backstop),
     /// Multiplier on aggregate base cost.
     BaseCostScale(f64),
     /// The minimum state share of base cost.
@@ -213,6 +218,7 @@ impl Lever {
         };
         match key {
             "guarantee" => Ok(Self::Guarantee(GuaranteeRule::parse(proposed)?)),
+            "backstop" => Ok(Self::Backstop(Backstop::parse(proposed)?)),
             "base-cost" => Ok(Self::BaseCostScale(number()?)),
             "min-share" => Ok(Self::MinimumStateShare(number()?)),
             "phase-in" => Ok(Self::PhaseInGeneral(number()?)),
@@ -221,8 +227,8 @@ impl Lever {
             "supplemental" => Ok(Self::SupplementalTopRate(number()?)),
             "transport-floor" => Ok(Self::TransportationFloor(number()?)),
             other => Err(format!(
-                "unknown lever {other:?}; the eight are guarantee, base-cost, min-share, \
-                 phase-in, phase-in-dpia, dpia-blend, supplemental, transport-floor"
+                "unknown lever {other:?}; the nine are guarantee, backstop, base-cost, \
+                 min-share, phase-in, phase-in-dpia, dpia-blend, supplemental, transport-floor"
             )),
         }
     }
@@ -237,6 +243,7 @@ impl Lever {
     pub const fn key(self) -> &'static str {
         match self {
             Self::Guarantee(_) => "guarantee",
+            Self::Backstop(_) => "backstop",
             Self::BaseCostScale(_) => "base-cost",
             Self::MinimumStateShare(_) => "min-share",
             Self::PhaseInGeneral(_) => "phase-in",
@@ -255,6 +262,7 @@ impl Lever {
                 guarantee: rule,
                 ..policy
             },
+            Self::Backstop(backstop) => Policy { backstop, ..policy },
             Self::BaseCostScale(scale) => Policy {
                 base_cost_scale: scale,
                 ..policy

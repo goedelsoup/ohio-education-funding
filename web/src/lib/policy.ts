@@ -58,6 +58,18 @@ export interface Policy {
    * foundation funding, so this moves `Outcome.transportation` and never `formulaAid`.
    */
   transportationFloor: number;
+  /**
+   * What happens to the formula transition supplement, `[K]`, when the guarantee moves.
+   *
+   * A second dial because they are different instruments in different law: the guarantee is
+   * codified at R.C. 3317.019 and `[K]` is uncodified Section 265.225 of H.B. 110, extended to
+   * FY2027 by H.B. 96. `[K]` tops a district up to its FY2021 base from a total that already
+   * contains the guarantee, so retiring the guarantee with this left `"as-enacted"` moves 90.9%
+   * of the apparent saving onto `[K]` rather than saving it.
+   *
+   * Mirrors `project::policy::Backstop`.
+   */
+  backstop: "as-enacted" | "repealed";
 }
 
 /**
@@ -136,6 +148,15 @@ export interface Outcome {
   transportation: number;
   /** Transportation under current law's floor, for the comparison. */
   baselineTransportation: number;
+  /**
+   * `[K]` the formula transition supplement, re-derived against this policy's own output.
+   *
+   * Outside `realizedAid` for the same reason transportation is, and inside total state support.
+   * A lever that cuts realized aid or transportation is partly offset by this rising.
+   */
+  transitionSupplement: number;
+  /** The same under current law, for the comparison. */
+  baselineTransitionSupplement: number;
   /** Change in core foundation funding against current law, in dollars. */
   delta: number;
   /** Change against current law, per current-year pupil. */
@@ -170,6 +191,8 @@ export interface Totals {
   guarantee: number;
   /** Total transportation aid, which is outside `realizedAid`. */
   transportation: number;
+  /** Total formula transition supplement, also outside `realizedAid`. */
+  transitionSupplement: number;
   /** Change in total state support — realized aid and transportation — against current law. */
   cost: number;
   gainers: number;
@@ -190,6 +213,7 @@ export function currentLaw(m: Model): Policy {
     // here whose identity is an absence.
     supplementalTopRate: 0,
     transportationFloor: m.transportationFloor,
+    backstop: "as-enacted",
   };
 }
 
@@ -459,6 +483,22 @@ export function apply(
     m.transportationFloor,
   );
 
+  // `[K]`, which R.C. 3317.019 does not govern: Section 265.225 tops the district up to its
+  // FY2021 base from a total that already contains the guarantee, so it is computed after
+  // realized aid and transportation and is what absorbs a cut to either.
+  //
+  // Both sides come from the same construction rather than one being read from the published
+  // column, so the cent of drift in recovering transportation cancels instead of registering as
+  // movement. Mirrors `project::policy::apply`.
+  const transitionSupplement =
+    p.backstop === "repealed"
+      ? 0
+      : Math.max(0, d.fy21_funding_base - (realizedAid + transportation));
+  const baselineTransitionSupplement = Math.max(
+    0,
+    d.fy21_funding_base - (baselineRealizedAid + baselineTransportation),
+  );
+
   return {
     irn: d.irn,
     name: d.name,
@@ -471,10 +511,15 @@ export function apply(
     atMinimumStateShare: atMinimum,
     transportation,
     baselineTransportation,
+    transitionSupplement,
+    baselineTransitionSupplement,
     delta,
     deltaPerPupil: currentYearAdm > 0 ? delta / currentYearAdm : 0,
     totalDelta:
-      transportation + realizedAid - (baselineTransportation + baselineRealizedAid),
+      transportation +
+      realizedAid +
+      transitionSupplement -
+      (baselineTransportation + baselineRealizedAid + baselineTransitionSupplement),
   };
 }
 
@@ -502,6 +547,8 @@ export function totals(outcomes: Outcome[]): Totals {
   let losers = 0;
   let transportation = 0;
   let baselineTransportation = 0;
+  let transitionSupplement = 0;
+  let baselineTransitionSupplement = 0;
   for (const o of outcomes) {
     realizedAid += o.realizedAid;
     formulaAid += o.formulaAid;
@@ -509,6 +556,8 @@ export function totals(outcomes: Outcome[]): Totals {
     baseline += o.baselineRealizedAid;
     transportation += o.transportation;
     baselineTransportation += o.baselineTransportation;
+    transitionSupplement += o.transitionSupplement;
+    baselineTransitionSupplement += o.baselineTransitionSupplement;
     if (o.onGuarantee) onGuarantee++;
     if (o.atMinimumStateShare) atMinimumStateShare++;
     // Across both channels. Counting on `delta` alone would report a transportation-only policy
@@ -527,7 +576,12 @@ export function totals(outcomes: Outcome[]): Totals {
     // Total state support, not realized aid: the transportation floor moves a channel core
     // foundation funding does not contain, and a cost that could not see it would agree with a
     // browser that had never implemented the lever.
-    cost: realizedAid + transportation - (baseline + baselineTransportation),
+    transitionSupplement,
+    cost:
+      realizedAid +
+      transportation +
+      transitionSupplement -
+      (baseline + baselineTransportation + baselineTransitionSupplement),
     gainers,
     losers,
     unmoved: outcomes.length - gainers - losers,

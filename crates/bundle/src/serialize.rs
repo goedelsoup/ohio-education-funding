@@ -316,6 +316,7 @@ impl Bundle {
                         );
                         policy.num("supplemental_top_rate", c.policy.supplemental_top_rate);
                         policy.num("transportation_floor", c.policy.transportation_floor);
+                        policy.text("backstop", c.policy.backstop);
                     }
                     o.num("cost", c.cost);
                     o.num("realized_aid", c.realized_aid);
@@ -386,6 +387,7 @@ impl Bundle {
                             );
                             policy.num("supplemental_top_rate", c.policy.supplemental_top_rate);
                             policy.num("transportation_floor", c.policy.transportation_floor);
+                            policy.text("backstop", c.policy.backstop);
                         }
                         o.count("fiscal_year", c.fiscal_year);
                         o.num("realized_aid", c.realized_aid);
@@ -832,6 +834,7 @@ impl Bundle {
                 o.num("dpia_funding", d.dpia_funding);
                 o.num("general_funding_base", d.general_funding_base);
                 o.num("dpia_funding_base", d.dpia_funding_base);
+                o.num("fy21_funding_base", d.fy21_funding_base);
                 o.num("dpia_econ_disadvantaged_adm", d.dpia_econ_disadvantaged_adm);
                 o.num("dpia_directly_certified_adm", d.dpia_directly_certified_adm);
                 // Eight places, not four. The index is read off a scale whose top is the

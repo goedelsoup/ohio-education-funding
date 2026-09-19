@@ -107,7 +107,7 @@ fn every_uncodified_baseline_names_the_kind_of_law_it_rests_on() {
         })
         .collect();
 
-    assert_eq!(unquoted.len(), 8, "uncodified baselines: {unquoted:?}");
+    assert_eq!(unquoted.len(), 9, "uncodified baselines: {unquoted:?}");
     for (slug, ordinal, why) in &unquoted {
         assert!(
             why.contains("temporary law") || why.contains("uncodified"),
@@ -184,11 +184,11 @@ fn whether_a_provision_prices_says_nothing_about_whether_its_baseline_stands() {
         .into_values()
         .flat_map(|draft| draft.provisions)
         .collect();
-    assert_eq!(provisions.len(), 15);
+    assert_eq!(provisions.len(), 16);
 
     let priced = provisions.iter().filter(|p| p.is_priced()).count();
     let standing = provisions.iter().filter(|p| p.anchor.stands()).count();
-    assert_eq!((priced, standing), (4, 14));
+    assert_eq!((priced, standing), (5, 15));
 
     // The one that does not stand is one the model could not run either, which is exactly how it
     // stayed invisible: nobody re-reads a provision the tool already declines to cost.
@@ -213,10 +213,10 @@ fn the_anchors_are_shared_only_where_the_provision_is() {
         .map(|provision| provision.anchor.phrase().to_string())
         .collect();
     let distinct: BTreeSet<&String> = phrases.iter().collect();
-    assert_eq!(phrases.len(), 15);
+    assert_eq!(phrases.len(), 16);
     assert_eq!(
         distinct.len(),
-        8,
+        9,
         "three anchors are shared by more than one provision"
     );
 

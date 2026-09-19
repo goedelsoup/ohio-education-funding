@@ -137,6 +137,13 @@ pub struct PolicyShape {
     pub phase_in_dpia: f64,
     /// Weight on directly certified ADM in the DPIA count. Current law is 0.35.
     pub dpia_directly_certified_weight: f64,
+    /// What happens to the formula transition supplement: `as-enacted` or `repealed`.
+    ///
+    /// Serialized even though every checkpoint holds it at `as-enacted`, so the browser's mirror
+    /// reads it rather than assuming it. A lever the feed does not carry is a lever the two
+    /// implementations can come to disagree about silently, which is what happened to
+    /// `phase-in-dpia`.
+    pub backstop: &'static str,
     /// Per-pupil rate at the top of the supplemental targeted assistance scale. Current law is
     /// zero, the tier having been repealed.
     pub supplemental_top_rate: f64,

@@ -789,6 +789,13 @@ pub struct District {
     pub general_funding_base: Dollars,
     /// `[H3]` — the DPIA slice, anchored to the district's FY2019 DPIA payment.
     pub dpia_funding_base: Dollars,
+    /// `[L1]` — the FY2021 funding base, which includes transportation unlike `[H2]`.
+    ///
+    /// Flat on the panel rather than reached through the `transition` block, which the slim feed
+    /// omits. The browser needs it because the formula transition supplement `[K]` is a lever:
+    /// `[K]` tops a district up to this total, so it responds to every other lever and cannot be
+    /// carried as a published constant.
+    pub fy21_funding_base: Dollars,
     /// `d1a` — FY2025 economically disadvantaged ADM, the count the DPIA blend weighs 65%.
     ///
     /// Flat on the panel rather than reached through the `dpia` block, which the slim feed omits.

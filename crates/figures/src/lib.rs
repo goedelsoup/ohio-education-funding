@@ -7793,8 +7793,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What moving the base cost reference year from FY2022 to FY2024 costs across the FY2027 \
-                model — the draft's only provision, so the draft's cost is its cost",
-        pinned: 220_525_319.16,
+                model, net of the formula transition supplement it reduces — the draft's only \
+                provision, so the draft's cost is its cost",
+        pinned: 207_501_066.63,
         tolerance: 0.005,
         compute: |i| i.refresh.cost().expect("the refresh prices"),
     },
@@ -7815,7 +7816,7 @@ pub static FIGURES: &[Figure] = &[
         unit: Unit::Dollars,
         label: "What the refresh, a half-retired guarantee and a lowered transportation floor \
                 cost when they are run together",
-        pinned: 261_983_181.09,
+        pinned: 325_561_810.57,
         tolerance: 0.005,
         compute: |i| -i.fund_the_plan.cost().expect("the draft prices"),
     },
@@ -7846,7 +7847,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the same two provisions come to when each is priced alone and the two are added",
-        pinned: 337_057_476.816_6,
+        pinned: 7_390_970.88,
         tolerance: 0.005,
         compute: |i| -i.fund_the_plan.attribution().iter().map(|a| a.cost).sum::<f64>(),
     },
@@ -7854,11 +7855,13 @@ pub static FIGURES: &[Figure] = &[
         key: "project/fund-the-plan-interaction-residual",
         owner: "crates/project",
         unit: Unit::Dollars,
-        label: "The difference between those two — what the guarantee's `max` double-counts, and the \
-                reason a draft's cost is one combined run",
-        pinned: 75_074_295.72,
+        label: "The difference between those two, as a magnitude — the separate figures now \
+                UNDERSTATE the cut by this much, where they used to overstate it, because \
+                provisions 2 and 6 are inert apart and compound together. The sign is pinned in \
+                `a_draft_cannot_hide_what_it_did_not_price.rs`; this manifest carries magnitudes",
+        pinned: 318_170_839.69,
         tolerance: 0.005,
-        compute: |i| i.fund_the_plan.residual().expect("the draft prices"),
+        compute: |i| -i.fund_the_plan.residual().expect("the draft prices"),
     },
     Figure {
         key: "project/school-districts-in-two-or-more-house-districts",

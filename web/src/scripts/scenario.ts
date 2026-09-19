@@ -239,7 +239,16 @@ function carryLevers(): void {
   }
 }
 
-function readLevers(fallbackHorizon: number): Levers {
+/*
+ * `backstop` has no control and is carried rather than read.
+ *
+ * It is a draft-only lever: Section 265.225 either stands or is repealed, which is a clause of a
+ * bill rather than a dial a reader would sweep. Reading it from the DOM would reset a draft's
+ * position the moment any other control was touched, and `renderDraft` would report a departure
+ * the reader did not make — the failure the comment on `update` describes. So it falls back the
+ * way `horizon` does when its control is absent.
+ */
+function readLevers(fallbackHorizon: number, fallbackBackstop: Levers["backstop"]): Levers {
   const number = (id: string) => Number($<HTMLInputElement>(id)!.value);
   return {
     guarantee: $<HTMLSelectElement>("#lv-guarantee")!.value as Levers["guarantee"],
@@ -252,6 +261,7 @@ function readLevers(fallbackHorizon: number): Levers {
     supplementalTopRate: number("#lv-supplemental"),
     transportationFloor: number("#lv-transport"),
     horizon: $("#lv-horizon") ? number("#lv-horizon") : fallbackHorizon,
+    backstop: fallbackBackstop,
   };
 }
 
@@ -598,7 +608,7 @@ function boot(panel: Panel): void {
    */
   const update = (fromControls = true) => {
     if (!state) return;
-    if (fromControls) state.levers = readLevers(fallback);
+    if (fromControls) state.levers = readLevers(fallback, state.levers.backstop);
     // Always from the controls. Unlike the levers there is no path that renders a view the reader
     // cannot see — a draft sets lever positions and says nothing about axes.
     state.view = readView();

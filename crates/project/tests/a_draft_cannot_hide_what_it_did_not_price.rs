@@ -15,7 +15,7 @@ use std::path::{Path, PathBuf};
 use project::drafts::{draft, drafts, price, Lever};
 use project::panel::panel;
 use project::policy::{GuaranteeRule, Policy};
-use project::report::simulate;
+use project::report::{simulate, PolicyEffect};
 
 /// The repository root. `CARGO_MANIFEST_DIR` is `<repo>/crates/project`, so the root is two up.
 fn root() -> PathBuf {
@@ -172,23 +172,44 @@ fn a_cost_arrives_with_the_count_it_does_not_include() {
     }
 }
 
+/// The draft and the scenario it cites agree, on the measure they share — and the number they do
+/// not share is the formula transition supplement.
+///
+/// `hb-96-with-refreshed-inputs` links to `scenario/fsfp-input-year-refresh`, pinned in
+/// `scenario-delta` at $220.6M. That is a **foundation aid** figure. A draft's cost is total state
+/// support, which since `[K]` entered the model is $13.0M smaller: raising base cost lifts a
+/// district toward its FY2021 base, and the supplement that was topping it up there falls by the
+/// same sum. Both numbers are right and they are not the same quantity.
 #[test]
-fn the_single_provision_draft_reproduces_the_run_it_is_linked_to() {
-    // `hb-96-with-refreshed-inputs` links to `scenario/fsfp-input-year-refresh`, whose figure is
-    // pinned in `scenario-delta` at $220.6M delivered against 356 gainers. If the draft machinery
-    // resolves the provision correctly it lands on the same number by a different route.
+fn the_single_provision_draft_agrees_with_its_scenario_on_foundation_aid_alone() {
     let districts = panel();
     let priced = price(&draft("hb-96-with-refreshed-inputs").unwrap(), &districts);
     let cost = priced
         .cost()
         .expect("one provision prices, so there is a figure");
+    let foundation = priced.effect().foundation_cost();
 
+    // The shared measure reproduces the cited scenario exactly.
     assert!(
-        (cost / 1e6 - 220.6).abs() < 1.0,
-        "the refresh draft delivers {:.1}M, and the scenario it cites says 220.6M",
+        (foundation / 1e6 - 220.5).abs() < 1.0,
+        "the foundation half is {:.1}M, and the scenario it cites says 220.6M",
+        foundation / 1e6
+    );
+    // The draft's own cost is net of the backstop it reduces.
+    assert!(
+        (cost / 1e6 - 207.5).abs() < 1.0,
+        "the refresh draft delivers {:.1}M net",
         cost / 1e6
     );
-    assert_eq!(priced.effect().gainers(), 356);
+    assert!(
+        (foundation - cost) / 1e6 > 12.0,
+        "the gap between the two measures is the supplement, and it is {:.1}M",
+        (foundation - cost) / 1e6
+    );
+
+    // Fourteen districts that gained before are now insulated: `[K]` held them at their FY2021
+    // base already, so a larger base cost changes which line pays them and not how much.
+    assert_eq!(priced.effect().gainers(), 342);
     assert!(priced.unpriced().is_empty());
 }
 
@@ -244,10 +265,14 @@ fn the_parts_do_not_sum_to_the_whole() {
     let residual = priced.residual().expect("two provisions price");
     let apart: f64 = priced.attribution().iter().map(|a| a.cost).sum();
 
-    assert!((combined / 1e6 + 262.0).abs() < 1.0, "combined {combined}");
-    assert!((apart / 1e6 + 337.1).abs() < 1.0, "apart {apart}");
+    assert!((combined / 1e6 + 325.6).abs() < 1.0, "combined {combined}");
+    assert!((apart / 1e6 + 7.4).abs() < 1.0, "apart {apart}");
+    // The residual is now larger than the combined figure and points the other way, because
+    // provisions 2 and 6 are nearly inert apart and compound together: retiring half the
+    // guarantee saves $70.8M while `[K]` stands, and repealing `[K]` alone saves $63.6M, but
+    // doing both saves far more than their sum. An interaction is what a residual is for.
     assert!(
-        residual / 1e6 > 70.0,
+        residual / 1e6 < -300.0,
         "the residual is the whole reason attribution is reported apart; got {:.1}M",
         residual / 1e6
     );
@@ -263,29 +288,30 @@ fn the_parts_do_not_sum_to_the_whole() {
         "and the transportation half is the provision's own price"
     );
     assert!(
-        residual / foundation.abs() > 0.5,
-        "the residual is more than half the figure it is a residual *of* — the two provisions \
-         that share the guarantee's max. Against the combined total it is 29%, which is the same \
-         money over a larger draft and not a weaker interaction."
+        residual.abs() / foundation.abs() > 2.0,
+        "the residual is twice the figure it is a residual *of* — three provisions now share the \
+         guarantee's max, and the two that retire it and its backstop are worth almost nothing \
+         until they are taken together."
     );
 }
 
+/// The two levers no longer reach the state between them, and the draft does — because the draft
+/// repeals the thing that stops them.
+///
+/// The old version of this test asserted that the two *unmoved* sets are disjoint: districts held
+/// on the guarantee cannot be reached by a formula change, and districts paid by the formula
+/// cannot be reached by lowering a floor they are not standing on. 253 + 315 = 568 and nobody was
+/// in both.
+///
+/// `[K]` breaks that. A district the supplement holds at its FY2021 base is untouched by *either*
+/// lever — base cost rises and `[K]` falls; the guarantee falls and `[K]` rises — so the unmoved
+/// sets now **overlap in 113 districts**, and 267 + 442 = 709 against a panel of 609.
+///
+/// The combined draft still reaches everybody, and that is now a fact about provision 6 rather
+/// than about the arithmetic of two levers. Retiring the backstop is what lets the other
+/// provisions land.
 #[test]
-fn the_two_priced_provisions_cover_the_state_without_partitioning_it() {
-    /*
-     * Why the combination touches every district, and why that is a weaker result than it looks.
-     *
-     * The two *unmoved* sets are disjoint: 253 held on the guarantee throughout cannot be reached
-     * by a formula change, and 315 paid by the formula cannot be reached by lowering a floor they
-     * are not standing on. 253 + 315 = 568, and no district is in both.
-     *
-     * The two *moved* sets are not. 356 and 294 sum to 650 against 609 districts, so 41 move under
-     * both — the districts the refresh lifts off the guarantee, which were also standing on the
-     * floor the phase-out lowers. An earlier version of this test was named
-     * `..._reach_disjoint_populations` and asserted `568` as though it proved a partition, when
-     * 568 < 609 is the arithmetic disproof of one. The overlap is asserted here so the claim
-     * cannot drift back.
-     */
+fn the_backstop_shelters_a_district_from_both_levers_until_the_draft_repeals_it() {
     let districts = panel();
     let refresh = simulate(
         &districts,
@@ -308,34 +334,51 @@ fn the_two_priced_provisions_cover_the_state_without_partitioning_it() {
 
     let total = districts.len();
     assert_eq!(total, 609);
-    assert_eq!(refresh.unmoved(), 253);
-    assert_eq!(phase_out.unmoved(), 315);
+    assert_eq!(refresh.unmoved(), 267);
+    assert_eq!(phase_out.unmoved(), 442);
 
-    // Disjoint where it is claimed: no district is unmoved by both, so the union of what they
-    // reach is everybody.
-    assert_eq!(refresh.unmoved() + phase_out.unmoved(), total - 41);
+    // The counts alone disprove the old partition: they sum past the panel.
+    assert!(
+        refresh.unmoved() + phase_out.unmoved() > total,
+        "the two unmoved sets still fit inside the panel, so nothing overlaps"
+    );
+
+    // Computed rather than asserted as a literal, so the count and the claim cannot come apart.
+    fn untouched(effect: &PolicyEffect) -> BTreeSet<&str> {
+        effect
+            .outcomes
+            .iter()
+            .filter(|outcome| outcome.total_delta().abs() <= 0.005)
+            .map(|outcome| outcome.irn.as_str())
+            .collect()
+    }
+    let sheltered: BTreeSet<&str> = untouched(&refresh)
+        .intersection(&untouched(&phase_out))
+        .copied()
+        .collect();
+    assert_eq!(
+        sheltered.len(),
+        113,
+        "the districts neither lever reaches are the ones `[K]` holds at their FY2021 base"
+    );
+
+    // Every one of them draws the supplement. That is what makes this a fact about `[K]` rather
+    // than a coincidence of two levers.
+    let drawing: BTreeSet<&str> = districts
+        .iter()
+        .filter(|record| record.transition.transition_supplement > 0.005)
+        .map(|record| record.irn.as_str())
+        .collect();
+    assert!(
+        sheltered.is_subset(&drawing),
+        "a district neither lever reaches that draws no supplement"
+    );
+
+    // And the draft reaches all 609, because provision 6 takes the shelter away.
     assert_eq!(
         both.effect().unmoved(),
         0,
-        "between them the two levers should leave nobody untouched"
-    );
-
-    // And overlapping where it is not. Computed rather than asserted as a literal, so the count
-    // and the claim cannot come apart.
-    let moved_by_both = (refresh.gainers() + phase_out.losers()).saturating_sub(total);
-    assert_eq!(
-        moved_by_both, 41,
-        "the two levers move an overlapping set, not a partition"
-    );
-    assert_eq!(
-        moved_by_both,
-        refresh
-            .policy
-            .on_guarantee
-            .abs_diff(phase_out.policy.on_guarantee)
-            - 41
-            + 41,
-        "the overlap is the districts the refresh lifts off the floor the phase-out lowers"
+        "between them the draft's provisions should leave nobody untouched"
     );
 }
 

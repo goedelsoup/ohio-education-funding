@@ -55,6 +55,31 @@
 //! Supplement` are outside the closure — the 144 are paid $13.3m of the first two on top of a
 //! total that is otherwise frozen.
 //!
+//! # Two of the four are uncodified, and one act carries them both
+//!
+//! `[I]` and `[F]` are codified at R.C. 3317.019, and the section **names its own years**: as
+//! amended by H.B. 96 it reads "for fiscal years 2026 and 2027" at both (A)(1) and (A)(2), so the
+//! guarantee is temporary in the Revised Code rather than merely in practice.
+//!
+//! `[K]` is not codified at all. Section 265.225 is uncodified law of H.B. 110, and the newest
+//! text this repository holds — H.B. 583's amendment — reads "for fiscal years 2022 and 2023".
+//! What pays it in FY2027 is H.B. 96, whose own analysis extends **both** devices in a single
+//! clause: it "extends to FY 2026 and FY 2027 the payment of temporary transitional aid to school
+//! districts based on an FY 2020 funding base *and a formula transition supplement based on an FY
+//! 2021 funding base*". The department's payment report cites only the originating section, which
+//! is why [`Device::authority`] names the act that keeps each one alive as well.
+//!
+//! That single clause is the legislative fact behind [`absorption`]: the two devices the backstop
+//! links have now been carried forward together, twice, by the same acts.
+//!
+//! # `[K]` reaches further than this inventory does
+//!
+//! H.B. 96 extends the supplement "to districts, community schools, and STEM schools". Every
+//! figure here is over the **609 city, local and exempted village districts the FY2027 model
+//! carries**, so the $63,578,629.47 is the district share and not the programme. The community
+//! school and STEM school halves are paid under the same section and are not in this fixture; a
+//! statewide cost of repealing `[K]` would be larger than anything computed here.
+//!
 //! # Three anchor years, not one
 //!
 //! Two of the four bases carry a `FY21` heading and only one of those headings is right.
@@ -157,7 +182,8 @@ pub struct Device {
     pub direction: Direction,
     /// What [`crate::policy::apply`] does with it.
     pub modelled: Modelled,
-    /// The section or uncodified item that authorises it.
+    /// The section or uncodified item that authorises it, and — where the section is temporary
+    /// law that names its own years — the act that extends it to FY2027.
     pub authority: &'static str,
 }
 
@@ -184,7 +210,7 @@ pub const fn bases() -> [Base; 4] {
             column: "[L1]",
             label: "FY21 funding base, which includes transportation",
             anchor: Anchor::Fiscal2021,
-            authority: "Am. Sub. H.B. 110 Section 265.225",
+            authority: "H.B. 110 Section 265.225, extended to FY2027 by H.B. 96",
         },
         Base {
             column: "[F1]",
@@ -220,7 +246,7 @@ pub const fn inventory() -> [Device; 4] {
             placement: Placement::FormulaFunding,
             direction: Direction::HoldsUp,
             modelled: Modelled::Omitted,
-            authority: "Am. Sub. H.B. 110 Section 265.225",
+            authority: "H.B. 110 Section 265.225, extended to FY2027 by H.B. 96",
         },
         Device {
             line: "[F]",
@@ -238,7 +264,7 @@ pub const fn inventory() -> [Device; 4] {
             placement: Placement::FoundationAid,
             direction: Direction::ClawsBack,
             modelled: Modelled::PassedThrough,
-            authority: "R.C. 3317.019(B)",
+            authority: "R.C. 3317.019(C)",
         },
     ]
 }

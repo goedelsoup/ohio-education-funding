@@ -53,6 +53,7 @@ export function toPolicy(shape: PolicyShape): Policy {
     phaseInGeneral: shape.phase_in_general,
     phaseInDpia: shape.phase_in_dpia,
     dpiaDirectlyCertifiedWeight: shape.dpia_directly_certified_weight,
+    backstop: shape.backstop === "repealed" ? "repealed" : "as-enacted",
     supplementalTopRate: shape.supplemental_top_rate,
     transportationFloor: shape.transportation_floor,
   };

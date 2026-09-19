@@ -204,6 +204,7 @@ fn checkpoint_policies() -> Vec<(&'static str, Policy, PolicyShape)> {
             dpia_directly_certified_weight: DPIA_BLEND.1,
             supplemental_top_rate: 0.0,
             transportation_floor: TRANSPORT_FLOOR,
+            backstop: "as-enacted",
         }
     };
     vec![
@@ -759,6 +760,7 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
         general_funding_base: record.transition.funding_base
             - record.transition.funding_base_econ_dis,
         dpia_funding_base: record.transition.funding_base_econ_dis,
+        fy21_funding_base: record.transition.fy21_funding_base,
         dpia_econ_disadvantaged_adm: record.dpia.economically_disadvantaged_adm,
         dpia_directly_certified_adm: record.dpia.directly_certified_adm,
         supplemental_wealth_index: record.targeted_assistance.fy19_wealth_index,

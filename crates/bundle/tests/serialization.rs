@@ -121,6 +121,7 @@ fn sample() -> District {
         dpia_funding: 1_204_311.0,
         general_funding_base: 5_100_000.0,
         dpia_funding_base: 900_000.0,
+        fy21_funding_base: 0.0,
         dpia_econ_disadvantaged_adm: 0.0,
         dpia_directly_certified_adm: 0.0,
         supplemental_wealth_index: 0.0,
@@ -587,6 +588,7 @@ fn checkpoint() -> Checkpoint {
         transportation: 0.0,
         label: "guarantee removed".into(),
         policy: PolicyShape {
+            backstop: "as-enacted",
             dpia_directly_certified_weight: 0.35,
             supplemental_top_rate: 0.0,
             transportation_floor: 0.5,

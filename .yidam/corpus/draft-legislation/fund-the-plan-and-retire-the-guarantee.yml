@@ -1,9 +1,10 @@
 class: draft-legislation
 label: Fund the Plan and Retire the Guarantee
 summary: >-
-  A hypothetical five-provision bill that refreshes the cost inputs, retires half the temporary
-  transitional aid guarantee, lowers the transportation floor, and does two further things no
-  lever reaches. Nobody proposed it. It exists to be the case a single-provision draft cannot be.
+  A hypothetical six-provision bill that refreshes the cost inputs, retires half the temporary
+  transitional aid guarantee and the supplement that backstops it, lowers the transportation
+  floor, and does two further things no lever reaches. Nobody proposed it. It exists to be the
+  case a single-provision draft cannot be.
 description: |
   The two halves of Ohio's school funding argument, put in one bill. Refreshing the base cost
   reference year is what advocates of the Fair School Funding Plan ask for; retiring the
@@ -16,17 +17,18 @@ description: |
   the floor, and a phase-out reaches only the districts standing on it. Each provision is
   approximately inert over the population the other one moves.
 
-  ### The five provisions, and why two of them are still here
+  ### The six provisions, and why two of them are still here
 
-  Three bind to levers: the reference year moves from FY2022 to FY2024, the guarantee closes half
-  the gap between its FY2020 baseline and the formula amount, and the transportation
-  reimbursement floor moves from 50% to 37.5%.
+  Four bind to levers: the reference year moves from FY2022 to FY2024, the guarantee closes half
+  the gap between its FY2020 baseline and the formula amount, Section 265.225 is repealed
+  alongside it, and the transportation reimbursement floor moves from 50% to 37.5%.
+
 
   The other two are the point. A raise to the six special education category weights and holding a
   resident district harmless for its scholarship deductions are ordinary contents of an Ohio
   budget act, and neither produces a number here. [verified]
 
-  A bill of five provisions where three produce numbers is closer to the normal case than a bill
+  A bill of six provisions where four produce numbers is closer to the normal case than a bill
   of one provision that prices completely, which is the reason for authoring it.
 
   ### What it is not
@@ -39,97 +41,92 @@ description: |
   The provision values are also chosen rather than derived. A half phase-out and an 8% weight
   raise are round numbers picked to be legible, not positions anybody has taken. [inference]
 findings: |
-  **The bill cuts $262.0 million and its three priced provisions, costed separately, say $337.1
+  **The bill cuts $325.6 million and its four priced provisions, costed separately, say $7.4
   million.** Run with `cargo run -p project --bin edfund-project -- --draft
   fund-the-plan-and-retire-the-guarantee`.
 
-      total state support   $8,007M  ->  $7,745M     -$262.0M
+      total state support   $8,071M  ->  $7,745M     -$325.6M
         of which                                     -$143.9M foundation
                                                      -$118.1M transportation
-      districts             319 up, 290 down, 0 unmoved
+                                                     -$63.6M  transition supplement
+      districts             297 up, 312 down, 0 unmoved
       on the guarantee      294      ->  253
       guarantee cost        $879M    ->  $364M
 
-      provision 1  reference year FY2022 -> FY2024        +$220.5M
-      provision 2  guarantee half retired                 -$439.5M
-      provision 4  transportation floor to 37.5 percent   -$118.1M
-                   interaction residual                    +$75.1M
+      provision 1  reference year FY2022 -> FY2024        +$207.5M
+      provision 2  guarantee half retired                  -$70.8M
+      provision 4  transportation floor to 37.5 percent    -$80.5M
+      provision 6  Section 265.225 repealed                -$63.6M
+                   interaction residual                   -$318.2M
 
   [verified] (`crates/project/tests/a_draft_cannot_hide_what_it_did_not_price.rs`)
 
-  The headline is against **total state support** rather than realized aid, because the third
-  provision moves a channel core foundation funding does not contain. Run against realized aid
-  alone it would have priced at exactly **zero** — which in a cost column reads as *this bill is
-  free*, the reading this draft's own type returns an `Option` to prevent, reintroduced
-  underneath it by an aggregate that could not see the channel. [verified]
+  The headline is against **total state support** rather than realized aid, because two of the
+  four priced provisions move channels core foundation funding does not contain. Run against
+  realized aid alone it would have priced at −$143.9M, which omits more than half of what the
+  bill does. [verified]
 
-  ### The residual is half the answer, and it is half of the half that interacts
+  ### Why there is a sixth provision
 
-  Pricing the provisions apart and adding them gives −$337.1M. Running them together gives
-  −$262.0M. **The separate figures overstate the cut by $75.1 million.**
+  It was added after the hold-harmless inventory found that the guarantee has a backstop.
+  Retiring the guarantee without repealing Section 265.225 makes this bill a **net spend of
+  $92.6M** rather than a cut, because the formula transition supplement tops a district up to its
+  FY2021 base from a total that already contains the guarantee. The provision is stated rather
+  than implied so the choice is visible, and so a reader can price the other reading by dropping
+  it. [verified]
 
-  The mechanism is the guarantee's `max`, and it double-counts in both directions. Run alone, the
-  refresh lifts 41 districts off the floor and the state pays their formula amount; run alone, the
-  phase-out cuts those same districts. Run together, a district lifted off by the refresh is no
-  longer standing on the floor for the phase-out to lower. A district cannot be taken off the
-  guarantee twice.
+  ### The residual is now larger than the bill, and it has changed sign
+
+  Pricing the provisions apart and adding them gives −$7.4M. Running them together gives
+  −$325.6M. **The separate figures understate the cut by $318.2 million**, where they used to
+  overstate it by $75.1M — the residual has not merely grown, it has changed sign.
+
+  The reason is provisions 2 and 6, which are nearly inert apart and compound together. The
+  mechanism is recorded at `formula-component/fsfp-formula-transition-supplement`: the guarantee
+  is a term in the formula transition supplement's own subtrahend, so
+  retiring half the guarantee while Section 265.225 stands saves $70.8M of an apparent $439.5M —
+  the supplement rises to make 90.9% of it good. Repealing the supplement alone saves $63.6M.
+  Doing both saves far more than their sum, because neither is any longer absorbing the other.
+
+  The guarantee's `max` still double-counts in the direction it always did — a district lifted
+  off the floor by the refresh cannot be lifted off it again by the phase-out — and that effect
+  is now the smaller half of the residual. [verified]
 
   This is why a draft's cost is one combined run and the per-provision figures are attribution
   only. Any process that prices clauses independently and sums them — which is the natural way to
-  read a bill — is wrong by an amount that grows with how much the clauses interact. [verified]
+  read a bill — is wrong by an amount that grows with how much the clauses interact, and two
+  clauses that cancel each other apart can be most of a bill together. [verified]
 
-  **The third provision is priced and adds nothing to the residual** — $75.1M before the
-  transportation floor became a lever and $75.1M after, to the cent. Transportation is not inside
-  core foundation funding, so it has no `max` to be counted twice against, and it composes with
-  the other two additively where they do not compose with each other. [verified]
+  ### The backstop shelters 113 districts from both levers until provision 6 removes it
 
-  That is why the residual is now 29% of the combined figure where it was 52%, while being the
-  same money: it is 52% of the −$143.9M it is a residual *of*. A draft that grows by a
-  non-interacting provision dilutes the ratio without making its clauses any more separable, which
-  is a reason to read the residual in dollars rather than as a share. [inference]
+  Zero unmoved for the bill, against 267 for the refresh alone and 442 for the guarantee alone:
 
-  ### No district is untouched, and the two populations overlap by exactly the districts that move
+      refresh alone          342 up,   267 unmoved
+      half phase-out alone   167 down, 442 unmoved
+      all four together      297 up, 312 down, 0 unmoved
 
-  Zero unmoved, against 253 for the refresh alone and 315 for the guarantee alone:
+  267 + 442 = 709 against 609 districts, so the two *unmoved* sets now **overlap in 113
+  districts** — and every one of them draws the formula transition supplement. A district the
+  supplement holds at its FY2021 base is untouched by either lever: base cost rises and `[K]`
+  falls; the guarantee falls and `[K]` rises. [verified]
 
-      refresh alone          356 up,   253 unmoved
-      half phase-out alone   294 down, 315 unmoved
-      the two together       356 up, 253 down, 0 unmoved
-      all three              319 up, 290 down, 0 unmoved
+  That overturns what this node previously recorded. The old reading was that the two unmoved
+  sets are disjoint — 253 held on the guarantee throughout and 315 paid by the formula, summing
+  to 568 with nobody in both — and it was true of a model that had no `[K]` in it. What made the
+  combination reach every district was never the arithmetic of two levers; it is provision 6
+  taking the shelter away. [verified]
 
-  The third provision moves the counts without moving the conclusion. A transportation cut reaches
-  every district the floor pays, and 37 of the districts the first two leave better off are cut by
-  more than they gained — so the split moves from 356/253 to 319/290 while the number reached by
-  nothing stays zero. [verified]
-
-  The two moved sets are **not** disjoint. 356 and 294 sum to 650 against 609 districts, so **41
-  are moved by both** — and they are the same 41 the refresh lifts off the guarantee, named above.
-  A district on the floor whose formula amount the refresh raises past it is moved by the refresh;
-  it was also standing on the floor the phase-out lowers. [verified]
-
-  What *is* disjoint is narrower and still worth having: the 253 the refresh cannot reach are held
-  on the guarantee throughout, and the 315 the phase-out cannot reach are paid by the formula, and
-  those two sets do not intersect. That is the structure
-  [guarantee-phase-out](../scenario/guarantee-phase-out.yml) records — no policy applied to the
-  guarantee reaches a district the formula already pays — and it is why the combination leaves
-  nobody unmoved even though the levers overlap. 253 + 315 = 568, and the 41 in neither set are
-  the overlap. [verified]
-
-  The stronger claim is the one worth not making. Two levers that partition the state would be a
-  tidy result; these two cover it, which is a different and weaker thing.
-
-  ### Three of five provisions are not in any of these numbers
+  ### Two of six provisions are not in any of these numbers
 
   Stated here rather than only in the property, because a figure and its caveat separated by a
-  page are a figure. The special education weights, the transportation floor, and the scholarship
-  hold-harmless are absent from the −$143.9M entirely. Two of the three would move money in the
-  opposite direction to the headline, so the sign of this bill's net effect is not established by
-  its priced subset.
+  page are a figure. The special education weights and the scholarship hold-harmless are absent
+  from every figure above. Both would move money in the opposite direction to the headline, so
+  the sign of this bill's net effect is not established by its priced subset.
 figures:
   - key: project/fund-the-plan-run-cut
-    value: 261983181.094388
+    value: 325561810.574388
     field: findings
-    as_written: "The bill cuts $262.0 million"
+    as_written: "The bill cuts $325.6 million"
   - key: project/fund-the-plan-foundation-cut
     value: 143877698.80599117
     field: findings
@@ -139,17 +136,17 @@ figures:
     field: findings
     as_written: "-$118.1M transportation"
   - key: project/fund-the-plan-provisions-costed-separately
-    value: 337057476.81656265
+    value: 7390970.881782
     field: findings
-    as_written: "costed separately, say $337.1\n  million"
+    as_written: "costed separately, say $7.4\n  million"
   - key: project/fund-the-plan-interaction-residual
-    value: 75074295.72217464
+    value: 318170839.692606
     field: findings
-    as_written: "overstate the cut by $75.1 million"
+    as_written: "understate the cut by $318.2 million"
   - key: project/districts-on-the-guarantee
     value: 294
     field: findings
-    as_written: "356 and 294 sum to 650 against 609 districts"
+    as_written: "on the guarantee      294"
 properties:
   provenance: hypothetical
   designation: |

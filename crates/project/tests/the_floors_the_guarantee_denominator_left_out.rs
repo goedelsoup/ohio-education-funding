@@ -81,6 +81,9 @@ use project::policy::{apply_all, GuaranteeRule, Outcome, Policy};
 /// The department's own account of its own method, five editions of it.
 const SFPR: &str = include_str!("../fixtures/dew-sfpr-line-by-line.txt");
 
+/// LSC's analysis of H.B. 96 as enacted — the act that pays all four devices in FY2027.
+const ENACTED: &str = include_str!("../fixtures/enacted-school-funding.txt");
+
 /// A cent, which is what the published columns are stated to.
 const CENT: f64 = 0.02;
 
@@ -875,4 +878,114 @@ fn the_flat_supplements_are_need_adjustments_and_not_floors() {
             == 3,
         "three devices pay and one claws back"
     );
+}
+
+/// **The authority each device is paid under, which is not always the act that wrote it.**
+///
+/// Two corrections live here. The clawback cites division `(C)` and not `(B)` — `(B)` is the joint
+/// vocational adjustment — and `[K]`'s section is uncodified law of H.B. 110 whose newest committed
+/// text stops at FY2023, so naming only that section leaves the reader unable to see what pays it
+/// in FY2027.
+#[test]
+fn the_act_that_keeps_each_device_alive_is_named_beside_the_one_that_wrote_it() {
+    let section = project::statute::section("3317.019");
+    let body = project::act::flat(section.body);
+
+    // The section this repository holds is H.B. 96's, and it names its own years: the guarantee
+    // is temporary in the Revised Code rather than only in practice.
+    assert!(
+        section.legislation.contains("House Bill 96"),
+        "the extract's 3317.019 is {} rather than H.B. 96's",
+        section.legislation
+    );
+    assert!(
+        body.contains(
+            "for fiscal years 2026 and 2027, the department of education and workforce \
+shall pay temporary transitional aid"
+        ),
+        "R.C. 3317.019(A)(1) no longer names its own years"
+    );
+
+    // (B) is the joint vocational adjustment and (C) is the clawback, which is why the inventory
+    // cites (C). Reading the divisions in order is what settles it.
+    let b = body.find(
+        "(B) If a local school district participates in the establishment of a joint \
+vocational school district",
+    );
+    let c = body.find(
+        r#"(C)(1) For purposes of division (C) of this section, a district's "decrease threshold""#,
+    );
+    assert!(
+        b.is_some(),
+        "R.C. 3317.019(B) is no longer the joint vocational adjustment"
+    );
+    assert!(
+        c.is_some(),
+        "R.C. 3317.019(C) is no longer the decrease threshold"
+    );
+    assert!(b < c, "the divisions are out of order");
+
+    let clawback = hh::inventory()
+        .iter()
+        .find(|device| device.direction == Direction::ClawsBack)
+        .copied()
+        .expect("the inventory has a clawback");
+    assert_eq!(clawback.authority, "R.C. 3317.019(C)");
+
+    // And the threshold it is measured against counts open-enrolment students received — R.C.
+    // 3317.03(A)(1)(b) — which is what makes the department's column name right.
+    let counted = project::act::flat(project::statute::section("3317.03").body);
+    assert!(
+        counted.contains(
+            "(b) Adjacent or other district students enrolled in the district under \
+an open enrollment policy"
+        ),
+        "3317.03(A)(1)(b) is no longer the open-enrolment count the clawback is keyed on"
+    );
+}
+
+/// **One clause of H.B. 96 extends both devices the backstop links.**
+///
+/// The legislative fact behind `absorption`: `[I]` and `[K]` are not independently maintained
+/// instruments that happen to interact. The same act has carried them forward together.
+#[test]
+fn one_clause_extends_the_guarantee_and_its_backstop_together() {
+    let enacted = project::act::flat(ENACTED);
+    assert!(
+        enacted.contains(
+            "extends to FY 2026 and FY 2027 the payment of temporary transitional \
+aid to school districts based on an FY 2020 funding base and a formula transition supplement \
+based on an FY 2021 funding base"
+        ),
+        "H.B. 96 no longer extends both devices in one clause"
+    );
+
+    // Both authorities say so, so a reader of the table cannot take H.B. 110 for the payer.
+    let supplement = hh::inventory()
+        .iter()
+        .find(|device| device.line == "[K]")
+        .copied()
+        .expect("the inventory has the supplement");
+    assert!(
+        supplement.authority.contains("265.225") && supplement.authority.contains("H.B. 96"),
+        "the supplement's authority is {}, which names no act that pays it in FY2027",
+        supplement.authority
+    );
+}
+
+/// **`[K]` reaches further than this fixture does, so its total is a share and not a programme.**
+#[test]
+fn the_supplement_is_paid_to_schools_this_panel_does_not_carry() {
+    let enacted = project::act::flat(ENACTED);
+    assert!(
+        enacted.contains(
+            "based on an FY 2021 funding base to districts, community schools, and \
+STEM schools"
+        ),
+        "H.B. 96 no longer pays the supplement beyond districts"
+    );
+
+    // The panel is districts only, so every figure in this file is the district share. Asserting
+    // the population here keeps the caveat attached to the number rather than to the prose.
+    assert_eq!(panel().len(), 609);
 }
