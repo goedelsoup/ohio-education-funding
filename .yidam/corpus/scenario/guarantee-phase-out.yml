@@ -118,9 +118,26 @@ figures:
     value: 257277.99
     field: findings
     as_written: "the median district it makes whole at **$257,278**"
-  # The base cost sweep, on total state support. Its `on guarantee` column was wrong on every row
-  # and its dollars were a vintage of the model that has since moved, so each of the eight cells is
-  # bound rather than only the ends.
+  # The base cost sweep. Its `on guarantee` column was wrong on every row and its dollars were a
+  # vintage of the model that has since moved twice, in opposite directions and for unrelated
+  # reasons, so all twelve cells are bound rather than only the ends. The foundation column carries
+  # its own keys because binding only the net would leave the 2026-08-09 move invisible again.
+  - key: project/base-cost-plus-two-foundation-cost
+    value: 106645239.28
+    field: findings
+    as_written: "+2%          +$106.6M          -$5.0M          +$101.7M               269"
+  - key: project/base-cost-plus-five-foundation-cost
+    value: 288057862.14
+    field: findings
+    as_written: "+5%          +$288.1M         -$20.9M          +$267.1M               243"
+  - key: project/base-cost-plus-ten-foundation-cost
+    value: 639701359.86
+    field: findings
+    as_written: "+10%         +$639.7M         -$42.4M          +$597.3M               204"
+  - key: project/base-cost-plus-twenty-foundation-cost
+    value: 1443268152.36
+    field: findings
+    as_written: "+20%       +$1,443.3M         -$51.4M        +$1,391.8M               153"
   - key: project/base-cost-plus-two-total-cost
     value: 101670377.70
     field: findings
@@ -309,6 +326,16 @@ findings: |
   one place in this node where the correction went that way. What it is not is *half-price*: the
   first two points are about two thirds the price of the last ten, which was true of the figures
   this node published as well and was overstated in the sentence beneath them.
+
+  The foundation column moved too, and `[K]` is not why. It reads **+$106.6M** at two per cent
+  where this node published **+$95.4M**, because `base_cost_scale` was given the categoricals
+  priced in base cost on 2026-08-09 — recorded at
+  [`the-scenario-models-ohio`](../../decisions/scenario-models-ohio.yml), forty days before the
+  backstop was modelled at all. The two corrections run opposite ways and nearly cancel:
+  **+$11.2M** of categorical scaling against **-$5.0M** of clawback, which is the whole of the
+  $6.3M between the figure this node published and the one it now reports. That is the hazard in
+  a net figure, and the reason the foundation column is bound here beside the total: a table
+  carrying only the net could absorb two unrelated corrections and look very nearly unchanged.
 
   ### It makes the state's cost predictable — and so does the backstop, on its own
 
@@ -551,6 +578,43 @@ revisions:
       The budget-stability argument survives and changes owner. It is an argument for the
       hold-harmless system, and the device that delivers nearly all of it is the one paying $63.6m
       to 144 districts rather than the one paying $879.0m to 294.
+  - was: |
+      The base cost sweep read **+$95.4M** at two per cent against **272** districts still on the
+      guarantee, rising to **+$1,294.6M** at twenty against **156**, at **$47.7M** a point for the
+      first two and **$72.5M** for the last ten. The restatement that put `[K]` into this node
+      replaced all eight cells and recorded the movement as the backstop's.
+    now: |
+      Only part of it was. The foundation column is **+$106.6M** at two per cent against **269**,
+      and it has read that since **2026-08-09** — forty days before `[K]` entered the model.
+      `base_cost_scale` was given the base-cost-denominated categoricals that day: special
+      education, English learners and career-technical are each priced as a weight times the
+      statewide average base cost per pupil, so a lever that moves the average moves them too.
+      That is $812.5m of exposure, it delivered **+$11.2M** more at two per cent, and it lifted
+      three more districts off the guarantee — the same **+3** that commit reported for its own
+      refresh scenario, 41 lifted rather than 38.
+
+      `[K]` then took **-$5.0M** back out of the same row, in the opposite direction. The $6.3M
+      between what this node published and what it now reports is the net of two unrelated
+      corrections, and the first restatement attributed all of it to the second one.
+    found_by: |
+      `git bisect` over the 351 commits between the table's own commit and its restatement, run on
+      the `on guarantee` count because that column is decided inside realized aid and so cannot be
+      reached by a device paid downstream of it. First bad commit `66e2312`, whose own message
+      states the mechanism and whose decision is recorded at
+      [`the-scenario-models-ohio`](../../decisions/scenario-models-ohio.yml). Probing its tree
+      directly returns $106,645,239.28, to the cent what the crate returns today, so nothing in
+      the intervening forty days moved the column again.
+    reach: |
+      The conclusions are unharmed — the gradient was monotone on the published figures and is
+      monotone now, and the fiscal-note warning holds on both. What was wrong was the causation,
+      and it was wrong in the entry written to correct exactly this class of error.
+
+      The lesson is not about `[K]`. A table left unbound does not go stale once and get caught;
+      it accumulates, and the first correction to reach it inherits every earlier drift as though
+      it were part of what the correction found. This node's savings tables were unbound for the
+      same reason and for longer. The foundation column is bound now, separately from the total,
+      because a figure bound only on the net of two opposing corrections can absorb both and still
+      match.
 links:
   - target: ../scenario.ont.yml
     relationship: instance-of

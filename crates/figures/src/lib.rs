@@ -8418,6 +8418,13 @@ pub static FIGURES: &[Figure] = &[
         // The base cost sweep, on total state support. The node's old table was on realized aid at
         // a vintage of the model that has since moved twice, and its `on guarantee` column was
         // wrong on every row.
+        //
+        // The two moves are independent and run in opposite directions, which is why the
+        // foundation column is bound beside this one rather than left to the row's `as_written`.
+        // `base_cost_scale` was given the base-cost-denominated categoricals on 2026-08-09, which
+        // raised the foundation column and lifted three more districts off the guarantee; `[K]`
+        // entered the measure on 2026-09-18, which lowered the total. A figure bound only on the
+        // net of the two cannot say that either happened.
         key: "project/base-cost-plus-two-total-cost",
         owner: "crates/project",
         unit: Unit::Dollars,
@@ -8453,6 +8460,46 @@ pub static FIGURES: &[Figure] = &[
         pinned: 1_391_843_058.40,
         tolerance: 0.005,
         compute: |i| i.guarantee.base_cost[3].cost(),
+    },
+    Figure {
+        // The foundation-aid half of the same sweep, bound because it is the half that drifted
+        // unseen. It moved on 2026-08-09 and no gate could see it: the column was prose with no
+        // figure behind it, and the first restatement recorded the movement as the backstop's.
+        key: "project/base-cost-plus-two-foundation-cost",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a 2% rise in statewide base cost costs in foundation aid, before `[K]` \
+                claws any of it back",
+        pinned: 106_645_239.28,
+        tolerance: 0.005,
+        compute: |i| i.guarantee.base_cost[0].foundation_cost(),
+    },
+    Figure {
+        key: "project/base-cost-plus-five-foundation-cost",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a 5% rise in statewide base cost costs in foundation aid",
+        pinned: 288_057_862.14,
+        tolerance: 0.005,
+        compute: |i| i.guarantee.base_cost[1].foundation_cost(),
+    },
+    Figure {
+        key: "project/base-cost-plus-ten-foundation-cost",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a 10% rise in statewide base cost costs in foundation aid",
+        pinned: 639_701_359.86,
+        tolerance: 0.005,
+        compute: |i| i.guarantee.base_cost[2].foundation_cost(),
+    },
+    Figure {
+        key: "project/base-cost-plus-twenty-foundation-cost",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a 20% rise in statewide base cost costs in foundation aid",
+        pinned: 1_443_268_152.36,
+        tolerance: 0.005,
+        compute: |i| i.guarantee.base_cost[3].foundation_cost(),
     },
     Figure {
         key: "project/districts-on-the-guarantee-at-two-per-cent-more-base-cost",

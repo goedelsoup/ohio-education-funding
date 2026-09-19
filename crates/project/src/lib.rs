@@ -64,6 +64,7 @@ pub mod cli;
 pub mod counts;
 pub mod crosswalk;
 pub mod drafts;
+pub mod enrollment_decline;
 pub mod esser;
 pub mod finances;
 pub mod greenbook;
