@@ -67,6 +67,7 @@ pub mod drafts;
 pub mod esser;
 pub mod finances;
 pub mod greenbook;
+pub mod guarantee_origin;
 pub mod hold_harmless;
 pub mod indexation;
 pub mod joint_vocational;

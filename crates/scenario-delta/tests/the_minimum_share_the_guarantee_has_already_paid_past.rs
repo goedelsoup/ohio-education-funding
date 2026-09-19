@@ -69,17 +69,22 @@
 //! `project/tests/the_floor_that_pays_the_wealthy_districts.rs`. Medians are the upper-middle
 //! value, agreeing with [`dispersion::median`] here because every subgroup taken is odd.
 //!
-//! # What does not reproduce
+//! # What did not reproduce, and where it went
 //!
 //! A prior session's quartile table — median base cost per pupil $8,231 / $8,231 / $8,163 /
-//! $8,136 against median state share 58.9% / 38.0% / 21.2% / 10.0% — does not reproduce at
-//! those figures under any binning tried: equal-count on valuation gives 59.6 / 42.7 / 23.8 /
-//! 10.0, equal-count on state share 61.0 / 43.5 / 24.6 / 10.0, equal-*pupil* on valuation 59.2
-//! / 39.5 / 20.1 / 10.0. Its shape reproduces on all three and is asserted below; its exact
-//! values are not pinned, because the axis and weighting behind them were never stated. Its
-//! "multiple held above formula" column reproduces under none of them: a median over every
-//! district in a quartile is **1.000x** in the bottom two, since most districts there are not on
-//! the guarantee at all.
+//! $8,136 against median state share 58.9% / 38.0% / 21.2% / 10.0% — did not reproduce under any
+//! binning tried here: equal-count on valuation gives 59.6 / 42.7 / 23.8 / 10.0, equal-count on
+//! state share 61.0 / 43.5 / 24.6 / 10.0, equal-*pupil* on valuation 59.2 / 39.5 / 20.1 / 10.0.
+//! Its shape reproduces on all three and is asserted below.
+//!
+//! **It reproduces exactly on a fourth, and the note above pointed at the reason without taking
+//! it.** The axis is [`DistrictRecord::published_capacity_per_pupil`], cut into quartiles over the
+//! whole 609, and the medians are taken over **only the guaranteed districts** in each band — not
+//! over every district, which is what makes the "multiple held above formula" column read 1.000x
+//! here. On that recipe every figure lands to the digit, the multiple column included:
+//! 1.05 / 1.12 / 1.46 / 2.36 over 21 / 47 / 109 / 117 districts. See
+//! `project/tests/the_other_half_of_the_guarantee_and_the_two_things_it_pays_for.rs`, which is
+//! where the axis mattered enough to try.
 
 use dispersion::wealth_neutrality;
 use project::biennium::Measure;
