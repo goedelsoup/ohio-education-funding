@@ -937,18 +937,27 @@ fn the_guarantee_reproduces_only_with_the_clawback_in_it() {
     );
 }
 
-/// Three mechanisms anchored to FY2021, on three different bases, holding three different sets.
+/// Three mechanisms on three different bases, holding three different sets.
 ///
 /// The corpus has one node for a "temporary transitional aid guarantee". There are three:
 ///
-/// - `[I]` holds a district at its FY2021 **funding base**, less the open-enrolment clawback;
-/// - `[K]` holds it at a FY2021 base that **includes transportation**;
-/// - transportation's own `[F]` holds it at FY2021 **transportation funding** alone.
+/// - `[I]` holds a district at its **FY2020** funding base, less the open-enrolment clawback;
+/// - `[K]` holds it at a **FY2021** base that includes transportation;
+/// - transportation's own `[F]` holds it at its **FY2020** transportation funding alone.
 ///
 /// They reach overlapping but different districts, which is what makes them three mechanisms
 /// rather than one applied three times.
+///
+/// **This doc said "three mechanisms anchored to FY2021" until
+/// [`the_floors_the_guarantee_denominator_left_out`](the_floors_the_guarantee_denominator_left_out.rs).**
+/// [`the_year_the_column_header_names`](the_year_the_column_header_names.rs) retired that reading
+/// for `[F1]` and [`the_year_the_guarantee_holds_to`](the_year_the_guarantee_holds_to.rs) for
+/// `[H2]` — both are the FY2020 amount before Executive Order 2020-19D, under the two divisions
+/// of R.C. 3317.019 — and only `[L1]` is FY2021. That correction reached `fsfp-transportation`
+/// and the class README and not this file, which is the blast-radius failure the `figures` crate
+/// exists to prevent and does not cover prose.
 #[test]
-fn three_separate_mechanisms_are_anchored_to_fiscal_2021() {
+fn three_separate_mechanisms_hold_against_two_different_years() {
     let panel = panel::panel();
     let on =
         |pick: fn(&panel::DistrictRecord) -> f64| panel.iter().filter(|r| pick(r) > 0.0).count();

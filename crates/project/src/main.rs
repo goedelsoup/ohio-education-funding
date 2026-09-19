@@ -8,7 +8,7 @@ use edfund_core::FiscalYear;
 use project::cli;
 use project::drafts::{draft, drafts, price, Priced};
 use project::panel::{panel, DPIA_BLEND, MINIMUM_STATE_SHARE};
-use project::policy::{GuaranteeRule, Policy};
+use project::policy::{Backstop, GuaranteeRule, Policy};
 use project::report::{run, Run};
 use project::series::{Method, DEFAULT_DAMPING, DEFAULT_SHRINK_WEIGHT};
 use project::transport::MINIMUM_STATE_SHARE_FY2027 as TRANSPORT_FLOOR;
@@ -118,10 +118,11 @@ fn execute(args: &[String]) -> Result<(), String> {
         // provisions are its policy, so accepting one would attribute a scenario to a bill that
         // does not contain it. The scenario *page* composes the two and reports the departure in
         // the banner; there is no equivalent in a line of output, so this refuses instead.
-        const LEVERS: [&str; 8] = [
+        const LEVERS: [&str; 9] = [
             "--guarantee",
             "--base-cost",
             "--min-share",
+            "--backstop",
             "--phase-in",
             "--phase-in-dpia",
             "--dpia-blend",
@@ -140,6 +141,10 @@ fn execute(args: &[String]) -> Result<(), String> {
         guarantee: match value(args, "--guarantee") {
             Some(raw) => GuaranteeRule::parse(raw)?,
             None => GuaranteeRule::AsEnacted,
+        },
+        backstop: match value(args, "--backstop") {
+            Some(raw) => Backstop::parse(raw)?,
+            None => Backstop::AsEnacted,
         },
         base_cost_scale: number(args, "--base-cost", 1.0)?,
         minimum_state_share: number(args, "--min-share", MINIMUM_STATE_SHARE)?,

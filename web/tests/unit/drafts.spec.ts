@@ -19,7 +19,7 @@ import {
   matchesDraft,
   renderDraft,
 } from "../../src/lib/scenario.ts";
-import { applyAll, totals, modelOf } from "../../src/lib/policy.ts";
+import { applyAll, totals, modelOf, currentLaw } from "../../src/lib/policy.ts";
 import { toPolicy } from "../../src/lib/scenario.ts";
 import type { Panel } from "../../src/lib/types.ts";
 
@@ -67,6 +67,11 @@ test("every unpriced provision says what it would need", () => {
   }
 });
 
+/** Realized aid under current law, for the foundation-aid half of a draft's two figures. */
+function baselineRealizedAid(): number {
+  return totals(applyAll(bundle.districts, currentLaw(MODEL), MODEL)).realizedAid;
+}
+
 test("a draft's levers reproduce the policy its provisions describe", () => {
   // The web's `draftLevers` is a third implementation of the binding — after the fixture and the
   // Rust — so it gets the same treatment `policy.ts` gets: it has to agree with a figure computed
@@ -79,10 +84,13 @@ test("a draft's levers reproduce the policy its provisions describe", () => {
 
   const outcomes = applyAll(bundle.districts, toPolicy(levers), MODEL);
   const t = totals(outcomes);
-  // The same $220.5M `crates/project` prints for `--draft hb-96-with-refreshed-inputs`, and the
-  // same figure `scenario-delta` pins at 356 gainers.
-  expect(t.cost / 1e6).toBeCloseTo(220.5, 0);
-  expect(t.gainers).toBe(356);
+  // $207.5M of total state support, which is what `crates/project` prints for `--draft
+  // hb-96-with-refreshed-inputs`. `scenario-delta` pins $220.6M on foundation aid alone; the
+  // $13.0M between them is the formula transition supplement, which falls as districts are
+  // lifted toward the FY2021 base it was topping them up to.
+  expect(t.cost / 1e6).toBeCloseTo(207.5, 0);
+  expect(t.realizedAid - baselineRealizedAid()).toBeCloseTo(220525319, -3);
+  expect(t.gainers).toBe(342);
 });
 
 test("a multi-provision draft sets every lever its provisions name", () => {
@@ -99,10 +107,14 @@ test("a multi-provision draft sets every lever its provisions name", () => {
   // and the page would have shown the bill priced without it.
   expect(levers.transportationFloor).toBeCloseTo(0.375, 6);
 
+  // The sixth provision, which repeals the device that backstops the guarantee. Without it the
+  // bill is a net spend rather than a cut.
+  expect(levers.backstop).toBe("repealed");
+
   const t = totals(applyAll(bundle.districts, toPolicy(levers), MODEL));
-  // -$262.0M against -$337.1M for the provisions priced apart. The web arrives at the combined
+  // -$325.6M against -$7.4M for the provisions priced apart. The web arrives at the combined
   // figure because it applies every lever to one policy, which is the only arrangement that can.
-  expect(t.cost / 1e6).toBeCloseTo(-262.0, 0);
+  expect(t.cost / 1e6).toBeCloseTo(-325.6, 0);
   expect(t.unmoved).toBe(0);
 });
 

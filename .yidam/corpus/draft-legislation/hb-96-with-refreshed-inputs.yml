@@ -46,17 +46,29 @@ findings: |
   one that reproduces the department's own FY2027 model for a classroom-teacher refresh to
   FY2024 — a $465.0M statewide computed increase in base cost alone.
 
-      total state aid       $7,281M  ->  $7,502M     +$220.5M
-      districts             356 up, 0 down, 253 unmoved
+      foundation aid        $7,281M  ->  $7,502M     +$220.5M
+      total state support   $8,071M  ->  $8,278M     +$207.5M
+      districts             342 up, 0 down, 267 unmoved
       on the guarantee      294      ->  253
       guarantee cost        $879M    ->  $729M
 
   [verified] (`crates/project/tests/a_draft_cannot_hide_what_it_did_not_price.rs`. The figure is
-  $220,525,319; `crates/scenario-delta` pins the same run at $220.6M within a $1M tolerance, from
-  a uniform scale rather than this one, so the two agree to the significant figures either
-  supports)
+  $207,501,067 on total state support and $220,525,319 on foundation aid;
+  `crates/scenario-delta` pins the same run at $220.6M within a $1M tolerance, from a uniform
+  scale rather than this one, so the two agree to the significant figures either supports)
 
-  ### The bill computes $497.1M and delivers $220.5M
+  ### Two figures, because a refresh reduces the supplement it lifts districts toward
+
+  The provision is worth **$220.5M of foundation aid and $207.5M of total state support**, and
+  the $13.0M between them is the formula transition supplement `[K]`. That device tops a district
+  up to its FY2021 base from a total that already contains its foundation aid, so raising base
+  cost moves a district toward the base `[K]` was holding it at and `[K]` falls by the same sum.
+  Fourteen districts are held there entirely and gain nothing at all. [verified]
+
+  Both numbers are right and they are not the same quantity. A cost to the state is the second;
+  a change in what the formula pays is the first.
+
+  ### The bill computes $497.1M and delivers $207.5M
 
   Base cost alone rises $465.0M; the categoricals priced in the statewide average carry it to
   $497.1M. Counting them is a deliberate divergence from the department's own simulator, which
@@ -64,7 +76,7 @@ findings: |
   district, and wrong here, where a provision of a budget act moves all 609 at once. Recorded at
   [`scenario-models-ohio`](../../decisions/scenario-models-ohio.yml).
 
-  **44% of the computed increase reaches a district.** The rest is absorbed by three mechanisms
+  **42% of the computed increase reaches a district.** The rest is absorbed by four mechanisms
   that are not interchangeable and must be reported apart:
 
   - **The guarantee**, which is most of it. 253 districts are held above their formula amount
@@ -74,6 +86,10 @@ findings: |
     state aid is the residual after local capacity and their residual is floored.
   - **The ADM denominators.** Base cost averages three years of enrollment while the state share
     is paid on the current one, which costs a shrinking state a further $7.6M.
+  - **The formula transition supplement**, which falls by $13.0M as districts are lifted toward
+    the FY2021 base it was topping them up to. This is the only one of the four that is a
+    *payment* rather than a limit on one, and it was absent from the model entirely until the
+    hold-harmless inventory found it.
 
   ### Forty-one districts change which mechanism pays them
 
@@ -102,9 +118,9 @@ findings: |
   none of which the five levers reach.
 figures:
   - key: project/hb-96-refresh-run-cost
-    value: 220525319.161829
+    value: 207501066.627068
     field: findings
-    as_written: "The figure is\n  $220,525,319"
+    as_written: "The figure is\n  $207,501,067"
   - key: project/hb-96-refresh-districts-lifted-off-the-guarantee
     value: 41
     field: findings

@@ -52,6 +52,15 @@ export interface Levers {
   /** The minimum state share applied to transportation. Current law is 0.5. */
   transportationFloor: number;
   /**
+   * What happens to the formula transition supplement, `[K]`.
+   *
+   * A word rather than a number: Section 265.225 either stands or is repealed. It is a separate
+   * instrument from the guarantee — codified law against uncodified — and `[K]` backstops the
+   * guarantee, so retiring the guarantee with this left `"as-enacted"` saves a tenth of what the
+   * headline says.
+   */
+  backstop: "as-enacted" | "repealed";
+  /**
    * The fiscal year to project enrollment to. Equal to the base year means "do not project".
    *
    * Not a policy lever, and deliberately not one: it changes what is being *asked*, not what
@@ -111,6 +120,7 @@ export function defaultLevers(
   return {
     guarantee: "as-enacted",
     guaranteeArgument: 0.5,
+    backstop: "as-enacted",
     baseCostScale: 1,
     minimumStateShare: model.minimumStateShare,
     phaseInGeneral: 1,
@@ -168,6 +178,7 @@ export function toPolicy(levers: Levers): Policy {
         : levers.guarantee === "phase-out"
           ? { kind: "phase-out", remaining: levers.guaranteeArgument }
           : { kind: levers.guarantee },
+    backstop: levers.backstop,
     baseCostScale: levers.baseCostScale,
     minimumStateShare: levers.minimumStateShare,
     phaseInGeneral: levers.phaseInGeneral,
@@ -774,6 +785,14 @@ export function draftLevers(draft: Draft, model: Model, baseYear: number): Lever
       case "transport-floor": {
         const value = leverValue(provision.proposed);
         if (value != null) levers.transportationFloor = value;
+        break;
+      }
+      // `backstop` takes a word rather than a number: Section 265.225 either stands or is
+      // repealed, and there is no fraction of a repeal.
+      case "backstop": {
+        if (provision.proposed === "repealed" || provision.proposed === "as-enacted") {
+          levers.backstop = provision.proposed;
+        }
         break;
       }
       default:

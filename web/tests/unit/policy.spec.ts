@@ -61,17 +61,42 @@ test("current law is the identity, district by district", () => {
   }
 });
 
-test("removing the guarantee saves exactly what the guarantee costs", () => {
+/*
+ * Removing the guarantee does NOT save what the guarantee costs, and this test asserted for
+ * several phases that it did.
+ *
+ * `[K]`, the formula transition supplement, tops a district up to its FY2021 base from a total
+ * that already contains the guarantee, so a guarantee that stops being paid is a shortfall `[K]`
+ * makes good. Mirrors `project::report`'s test of the same name.
+ */
+test("removing the guarantee alone saves a tenth of what it costs", () => {
   const outcomes = applyAll(
     bundle.districts,
     { ...currentLaw(model), guarantee: { kind: "removed" } },
     model,
   );
   const t = totals(outcomes);
-  expect(Math.abs(t.cost + bundle.statewide.guarantee_total)).toBeLessThan(1);
+  const headline = -bundle.statewide.guarantee_total;
+  expect(t.cost).toBeGreaterThan(headline * 0.2);
+  expect(1 - t.cost / headline).toBeCloseTo(0.909, 2);
   expect(t.onGuarantee).toBe(0);
   expect(t.gainers).toBe(0);
-  expect(t.losers).toBe(bundle.statewide.on_guarantee);
+  expect(t.losers).toBeLessThan(bundle.statewide.on_guarantee);
+});
+
+test("repealing the backstop beside it saves what both cost", () => {
+  const outcomes = applyAll(
+    bundle.districts,
+    { ...currentLaw(model), guarantee: { kind: "removed" }, backstop: "repealed" },
+    model,
+  );
+  const t = totals(outcomes);
+  const baseline = totals(applyAll(bundle.districts, currentLaw(model), model));
+  expect(
+    Math.abs(t.cost + bundle.statewide.guarantee_total + baseline.transitionSupplement),
+  ).toBeLessThan(1);
+  expect(t.onGuarantee).toBe(0);
+  expect(t.losers).toBeGreaterThan(bundle.statewide.on_guarantee);
 });
 
 test("no guarantee policy reaches a district the formula already pays", () => {
@@ -99,8 +124,16 @@ test("a phase-out at zero is removal and at one is current law", () => {
       ),
     ).cost;
   expect(Math.abs(at(1) - 0)).toBeLessThan(1);
-  expect(Math.abs(at(0) + bundle.statewide.guarantee_total)).toBeLessThan(1);
-  expect(Math.abs(at(0.5) + bundle.statewide.guarantee_total / 2)).toBeLessThan(1);
+  // At zero a phase-out is removal — the same run, so the same figure, and both are net of the
+  // backstop that absorbs most of it rather than the guarantee's headline.
+  const removal = totals(
+    applyAll(bundle.districts, { ...currentLaw(model), guarantee: { kind: "removed" } }, model),
+  ).cost;
+  expect(Math.abs(at(0) - removal)).toBeLessThan(1);
+  // And the schedule between them is monotone rather than proportional: `[K]` rises to meet each
+  // step down, so halving the guarantee does not cost half of removing it.
+  expect(at(0.5)).toBeGreaterThan(at(0));
+  expect(at(0.5)).toBeLessThan(0);
 });
 
 test("raising base cost cannot cut any district", () => {

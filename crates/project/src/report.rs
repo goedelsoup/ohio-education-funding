@@ -42,6 +42,13 @@ pub struct Totals {
     /// transportation as its own line and `[G] Total` is not part of core foundation funding.
     /// [`Self::total_state_support`] is where the two meet.
     pub transportation: Dollars,
+    /// Total formula transition supplement, `[K]`.
+    ///
+    /// The third channel, carried for the reason transportation is: it is outside core foundation
+    /// funding and inside `[R] Total State Support`. It is also the one that **responds to the
+    /// others** — a lever that cuts realized aid or transportation is partly offset by this
+    /// rising, so a cost quoted without it is the gross movement rather than the net.
+    pub transition_supplement: Dollars,
 }
 
 impl Totals {
@@ -57,13 +64,14 @@ impl Totals {
             guarantee: outcomes.iter().map(|o| o.guarantee).sum(),
             adm: outcomes.iter().map(|o| o.adm).sum(),
             transportation: outcomes.iter().map(|o| o.transportation).sum(),
+            transition_supplement: outcomes.iter().map(|o| o.transition_supplement).sum(),
         }
     }
 
-    /// Realized aid and transportation together.
+    /// Realized aid, transportation and the transition supplement together.
     #[must_use]
     pub fn total_state_support(&self) -> Dollars {
-        self.realized_aid + self.transportation
+        self.realized_aid + self.transportation + self.transition_supplement
     }
 }
 
@@ -296,7 +304,7 @@ pub fn run(
 mod tests {
     use super::*;
     use crate::panel::panel;
-    use crate::policy::GuaranteeRule;
+    use crate::policy::{Backstop, GuaranteeRule};
     use crate::series::DEFAULT_DAMPING;
 
     #[test]
@@ -309,8 +317,15 @@ mod tests {
         assert_eq!(effect.unmoved(), panel.len());
     }
 
+    /// Removing the guarantee does **not** save what the guarantee costs, and this test asserted
+    /// for several phases that it did.
+    ///
+    /// `[K]`, the formula transition supplement, tops a district up to its FY2021 base from a
+    /// total that already contains the guarantee — so a guarantee that stops being paid is a
+    /// shortfall `[K]` makes good. The saving is a tenth of the headline and 127 of the 294
+    /// guaranteed districts are made whole. See `crate::hold_harmless` and [`Backstop`].
     #[test]
-    fn removing_the_guarantee_saves_exactly_what_the_guarantee_costs() {
+    fn removing_the_guarantee_alone_saves_a_tenth_of_what_it_costs() {
         let panel = panel();
         let effect = simulate(
             &panel,
@@ -319,10 +334,61 @@ mod tests {
                 ..Policy::current_law()
             },
         );
-        assert!((effect.cost() + effect.baseline.guarantee).abs() < 1.0);
+        assert_eq!(effect.policy.on_guarantee, 0);
+        assert_eq!(
+            effect.gainers(),
+            0,
+            "retiring a floor cannot pay anyone more"
+        );
+
+        // The saving is far short of the guarantee, and the shortfall is the backstop rising.
+        let headline = -effect.baseline.guarantee;
+        assert!(
+            effect.cost() > headline * 0.2,
+            "removing the guarantee saved ${:.1}m against a guarantee of ${:.1}m",
+            effect.cost() / 1e6,
+            effect.baseline.guarantee / 1e6
+        );
+        let absorbed = 1.0 - effect.cost() / headline;
+        assert!(
+            (absorbed - 0.909).abs() < 0.01,
+            "the backstop absorbs {:.1}%, not 90.9%",
+            absorbed * 100.0
+        );
+
+        // And it is the same districts: the ones `[K]` makes whole stop being losers.
+        assert!(
+            effect.losers() < effect.baseline.on_guarantee,
+            "every guaranteed district still loses, so nothing was absorbed"
+        );
+        assert_eq!(effect.losers(), 167);
+    }
+
+    /// Repealing both devices saves what both cost, which is the run the old test meant.
+    #[test]
+    fn repealing_the_backstop_beside_it_saves_what_both_cost() {
+        let panel = panel();
+        let effect = simulate(
+            &panel,
+            &Policy {
+                guarantee: GuaranteeRule::Removed,
+                backstop: Backstop::Repealed,
+                ..Policy::current_law()
+            },
+        );
+        let both = effect.baseline.guarantee + effect.baseline.transition_supplement;
+        assert!(
+            (effect.cost() + both).abs() < 1.0,
+            "saved ${:.2} against ${both:.2}",
+            -effect.cost()
+        );
         assert_eq!(effect.policy.on_guarantee, 0);
         assert_eq!(effect.gainers(), 0);
-        assert_eq!(effect.losers(), effect.baseline.on_guarantee);
+
+        // Seventeen districts draw `[K]` without being on the guarantee, so more districts lose
+        // here than the guarantee alone ever reached.
+        assert_eq!(effect.losers(), 311);
+        assert!(effect.losers() > effect.baseline.on_guarantee);
     }
 
     #[test]

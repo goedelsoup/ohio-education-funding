@@ -26,13 +26,14 @@
 /// Exhaustive on purpose: [`check`] refuses anything absent from it, so a flag added to the
 /// binary and not added here is rejected rather than silently ignored — the loud direction of
 /// the two.
-pub const FLAGS: [(&str, bool); 13] = [
+pub const FLAGS: [(&str, bool); 14] = [
     ("-h", false),
     ("--help", false),
     ("--json", false),
     ("--drafts", false),
     ("--draft", true),
     ("--guarantee", true),
+    ("--backstop", true),
     ("--base-cost", true),
     ("--min-share", true),
     ("--phase-in", true),

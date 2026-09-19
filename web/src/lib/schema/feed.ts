@@ -567,6 +567,7 @@ export const DistrictSchema = z
     general_funding_base: num,
     /** `[H3]` — the DPIA slice, anchored to the district's FY2019 DPIA payment. */
     dpia_funding_base: num,
+    fy21_funding_base: num,
     /**
      * `[H2] − [I1]` floored at zero: the level the guarantee holds the district at.
      *
@@ -1069,6 +1070,7 @@ export const PolicyShapeSchema = z
     supplemental_top_rate: num,
     /** Minimum state share applied to transportation. Current law is 0.5. */
     transportation_floor: num,
+    backstop: z.enum(["as-enacted", "repealed"]),
   })
   .strict();
 
@@ -1163,6 +1165,7 @@ export const DraftProvisionSchema = z
       "dpia-blend",
       "supplemental",
       "transport-floor",
+      "backstop",
       "",
     ]),
     /** The lever's value, in the string form the query string carries. */
@@ -1196,6 +1199,9 @@ export const DraftProvisionSchema = z
     (p) =>
       p.lever === "" ||
       p.lever === "guarantee" ||
+      // `backstop` is a word too: Section 265.225 either stands or is repealed, and there is no
+      // fraction of a repeal.
+      p.lever === "backstop" ||
       (p.proposed.trim() !== "" && Number.isFinite(Number(p.proposed))),
     { message: "a numeric lever's `proposed` must parse as a finite number", path: ["proposed"] },
   )

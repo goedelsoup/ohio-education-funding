@@ -3060,12 +3060,20 @@ test.describe("the scenario builder", () => {
     await expect(page.locator("#scenario-out")).toContainText("nothing moves");
   });
 
-  test("removing the guarantee reaches exactly the guaranteed districts", async ({ page }) => {
+  test("removing the guarantee reaches only the districts its backstop does not catch", async ({
+    page,
+  }) => {
+    /*
+     * This asserted 294 — every guaranteed district — and that was true of a model with no `[K]`
+     * in it. The formula transition supplement tops a district up to its FY2021 base from a total
+     * that already contains the guarantee, so retiring the guarantee is a shortfall `[K]` makes
+     * good for 127 of the 294. See `project::hold_harmless`.
+     */
     await page.goto("/scenario");
     await setGuarantee(page, "removed");
     const tiles = page.locator("#scenario-out .tile");
-    await expect(tiles.nth(1).locator(".v")).toHaveText("294");
-    await expect(tiles.nth(1).locator(".n")).toHaveText("0 up, 294 down");
+    await expect(tiles.nth(1).locator(".v")).toHaveText("167");
+    await expect(tiles.nth(1).locator(".n")).toHaveText("0 up, 167 down");
   });
 
   test("the tiles stay under the levers and the rest goes below the forecast", async ({ page }) => {
@@ -3325,7 +3333,7 @@ test.describe("the scenario builder", () => {
     await page.goto("/scenario?draft=hb-96-with-refreshed-inputs");
     await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
     await expect(page.locator('[data-part="draft-departed"]')).toHaveCount(0);
-    await expect(page.locator("#scenario-out .tile .v").first()).toHaveText("+$220.5M");
+    await expect(page.locator("#scenario-out .tile .v").first()).toHaveText("+$207.5M");
   });
 });
 
@@ -6107,8 +6115,19 @@ test.describe("what the scenario holds fixed", () => {
     await expect(page.locator('[data-part="draft-departed"]')).toHaveCount(0);
     const tile = (await page.locator("#scenario-out .tile .v").first().innerText()).trim();
 
+    /*
+     * The card's two channels are both foundation aid; the tile is total state support, which
+     * since `[K]` entered the model is smaller by the formula transition supplement the refresh
+     * reduces. Both are right and they are not the same quantity — so the assertion is the
+     * relationship rather than equality, and the gap is named.
+     */
     const sum = Number(throughBase) + Number(throughCategoricals);
-    expect(tile, `card says $${sum.toFixed(1)}M, tile says ${tile}`).toBe(`+$${sum.toFixed(1)}M`);
+    const shown = Number(tile.replace(/[^0-9.]/g, ""));
+    expect(tile, "the tile is a gain").toMatch(/^\+\$/);
+    expect(
+      sum - shown,
+      `card says $${sum.toFixed(1)}M of foundation aid, tile says ${tile} of total state support`,
+    ).toBeCloseTo(13.0, 0);
   });
 
   test("the three things still held fixed are given three different reasons", async ({ page }) => {
@@ -6475,8 +6494,8 @@ test.describe("a draft opened in the runner", () => {
     await expect(page.locator("#lv-base")).toHaveValue("1.04");
 
     // The combined figure, and not the one the rounded slider would give.
-    await expect(page.locator("#scenario-out")).toContainText("\u2212$262.0M");
-    await expect(page.locator("#scenario-out")).toContainText("319 up, 290 down");
+    await expect(page.locator("#scenario-out")).toContainText("\u2212$325.6M");
+    await expect(page.locator("#scenario-out")).toContainText("297 up, 312 down");
     await expect(page.locator('[data-part="draft-departed"]')).toHaveCount(0);
   });
 
@@ -6508,7 +6527,7 @@ test.describe("a draft opened in the runner", () => {
      * where nothing is listening, and the assertions are that `boot` puts it back and renders the
      * *bill's* figure under the banner that says it is the bill's.
      *
-     * `−$262.0M` is what makes this worth a test rather than a comment. The control cannot express
+     * `−$325.6M` is what makes this worth a test rather than a comment. The control cannot express
      * the refresh provision's 1.0395 — it steps by 0.01 — so a runner that read its controls for
      * the first render would publish −$139.9M under "Opened from a draft". That is the one thing
      * `fromControls: false` exists to prevent, and it is invisible in every other test here
@@ -6533,7 +6552,7 @@ test.describe("a draft opened in the runner", () => {
     await expect(
       page.locator("#scenario-out"),
       "and the figure is the bill's, not the one the quantized slider can reach",
-    ).toContainText("\u2212$262.0M");
+    ).toContainText("\u2212$325.6M");
   });
 
   test("a draft that prices completely says so rather than staying silent", async ({ page }) => {
@@ -6552,7 +6571,7 @@ test.describe("a draft opened in the runner", () => {
     // meets.
     await page.goto("/wiki/draft-legislation/fund-the-plan-and-retire-the-guarantee");
     const card = page.locator('.card[data-part="runner"]');
-    await expect(card).toContainText("3 of this draft's 5 provisions");
+    await expect(card).toContainText("4 of this draft's 6 provisions");
     await expect(card).toContainText("not of the bill");
     await expect(card.locator("a.flag")).toHaveAttribute(
       "href",

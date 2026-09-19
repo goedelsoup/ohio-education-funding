@@ -592,22 +592,92 @@ fn scenario_delta_and_simulate_agree_on_who_moved() {
         ),
     ];
 
+    // The two crates measure different money, and since `[K]` entered the model that difference
+    // is visible rather than latent. `ScenarioDelta` compares realized aid — `Measure::
+    // FoundationAid`, `[H] + [I]` — while `PolicyEffect::gainers` counts movement in total state
+    // support, which also carries transportation and the formula transition supplement. So the
+    // comparison is made on the shared measure, taken from the same outcomes.
+    let counts = |effect: &project::report::PolicyEffect| {
+        let moved = |f: fn(f64) -> bool| {
+            effect
+                .outcomes
+                .iter()
+                .filter(|outcome| f(outcome.delta()))
+                .count()
+        };
+        (
+            moved(|d| d > 0.005),
+            moved(|d| d < -0.005),
+            moved(|d| (-0.005..=0.005).contains(&d)),
+        )
+    };
+
     for (label, policy) in policies {
         let effect = simulate(&records, &policy);
         let reach = ScenarioDelta::between(&records, &baseline, &policy)
             .total()
             .reach;
+        let (gainers, losers, unmoved) = counts(&effect);
 
         assert_eq!(reach.districts, records.len(), "{label}: panel size");
-        assert_eq!(reach.gainers, effect.gainers(), "{label}: gainers");
-        assert_eq!(reach.losers, effect.losers(), "{label}: losers");
-        assert_eq!(reach.unmoved, effect.unmoved(), "{label}: unmoved");
+        assert_eq!(reach.gainers, gainers, "{label}: gainers");
+        assert_eq!(reach.losers, losers, "{label}: losers");
+        assert_eq!(reach.unmoved, unmoved, "{label}: unmoved");
         assert_eq!(
             reach.gainers + reach.losers + reach.unmoved,
             records.len(),
             "{label}: the three classes must partition the panel"
         );
     }
+}
+
+/// Where the two crates' measures come apart, which is the guarantee and nothing else.
+///
+/// Retiring the guarantee moves 294 districts on foundation aid and 167 on total state support:
+/// `[K]` makes 127 of them whole, and the supplement is outside the measure `ScenarioDelta`
+/// reports on. A reader taking a reach from one crate and a dollar figure from the other would be
+/// describing two populations. Pinned so the gap is a documented property rather than a surprise.
+#[test]
+fn the_two_measures_disagree_on_the_guarantee_and_agree_everywhere_else() {
+    use project::policy::{GuaranteeRule, Policy};
+    use project::report::simulate;
+
+    let records = project::panel::panel();
+    let baseline = Policy::current_law();
+
+    let removed = Policy {
+        guarantee: GuaranteeRule::Removed,
+        ..baseline
+    };
+    let effect = simulate(&records, &removed);
+    let reach = ScenarioDelta::between(&records, &baseline, &removed)
+        .total()
+        .reach;
+
+    assert_eq!(
+        reach.losers, 294,
+        "foundation aid reaches every guaranteed district"
+    );
+    assert_eq!(
+        effect.losers(),
+        167,
+        "total state support reaches only those the supplement does not make whole"
+    );
+
+    // A base cost change moves both measures the same way, because `[K]` responds to it in the
+    // same direction for every district it touches. The guarantee is the lever that splits them.
+    let raised = Policy {
+        base_cost_scale: 1.05,
+        ..baseline
+    };
+    let raised_effect = simulate(&records, &raised);
+    let raised_reach = ScenarioDelta::between(&records, &baseline, &raised)
+        .total()
+        .reach;
+    assert!(
+        raised_reach.gainers > raised_effect.gainers(),
+        "a base cost rise should reach fewer districts net of the supplement it reduces"
+    );
 }
 
 /// Removing the guarantee moves districts off it and puts none on it.

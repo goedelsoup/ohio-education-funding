@@ -87,6 +87,48 @@ impl GuaranteeRule {
     }
 }
 
+/// What happens to the formula transition supplement, `[K]`, when the guarantee moves.
+///
+/// # Why this is a second dial and not part of [`GuaranteeRule`]
+///
+/// They are different instruments in different law. The guarantee is codified at R.C. 3317.019,
+/// which names its own years; `[K]` is **uncodified** — Section 265.225 of H.B. 110, extended to
+/// FY2027 by H.B. 96. Repealing one does not touch the other, and a bill could plainly do either.
+///
+/// It matters because `[I]` is a term in `[K]`'s own subtrahend, so the supplement **backstops
+/// the guarantee**: `[K]` tops a district up to its FY2021 base, and a guarantee that stops being
+/// paid is a shortfall `[K]` makes good. Retiring the guarantee with this left [`Self::AsEnacted`]
+/// moves **90.9%** of the apparent saving onto `[K]` rather than saving it, and 127 of the 294
+/// guaranteed districts are made whole.
+///
+/// Before this existed, [`GuaranteeRule::Removed`] silently meant *"repeal R.C. 3317.019(A)(1)
+/// and leave Section 265.225 standing"* — a real policy, and not the one anyone quoting its
+/// saving had in mind. See [`crate::hold_harmless::absorption`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Backstop {
+    /// Section 265.225 stands. A guarantee a district stops drawing is made good by `[K]`.
+    AsEnacted,
+    /// Section 265.225 repealed alongside whatever [`GuaranteeRule`] does to the guarantee.
+    Repealed,
+}
+
+impl Backstop {
+    /// Read a backstop from the string form the CLI and a draft provision both use.
+    ///
+    /// # Errors
+    ///
+    /// If the value is neither `as-enacted` nor `repealed`.
+    pub fn parse(raw: &str) -> Result<Self, String> {
+        match raw {
+            "as-enacted" => Ok(Self::AsEnacted),
+            "repealed" => Ok(Self::Repealed),
+            other => Err(format!(
+                "unknown backstop {other:?}; try as-enacted or repealed"
+            )),
+        }
+    }
+}
+
 /// A set of levers, together with what they are relative to.
 ///
 /// The identity is [`Policy::current_law`]: applied to the panel it reproduces the department's
@@ -95,6 +137,13 @@ impl GuaranteeRule {
 pub struct Policy {
     /// What happens to the guarantee.
     pub guarantee: GuaranteeRule,
+    /// What happens to the device that backstops it.
+    ///
+    /// Separate from [`Self::guarantee`] because they are separate instruments in separate law.
+    /// A run that moves the guarantee and leaves this at [`Backstop::AsEnacted`] is pricing a
+    /// repeal of the codified section alone, which is a coherent policy and is rarely the one
+    /// intended — see [`Backstop`].
+    pub backstop: Backstop,
     /// Multiplier on aggregate base cost.
     ///
     /// This is how an input-year refresh is expressed. Refreshing the cost inputs from FY2018
@@ -309,6 +358,7 @@ impl Policy {
     pub const fn current_law() -> Self {
         Self {
             guarantee: GuaranteeRule::AsEnacted,
+            backstop: Backstop::AsEnacted,
             base_cost_scale: 1.0,
             minimum_state_share: MINIMUM_STATE_SHARE,
             phase_in_general: 1.0,
@@ -359,6 +409,19 @@ pub struct Outcome {
     pub transportation: Dollars,
     /// Transportation aid under current law's floor, for the comparison.
     pub baseline_transportation: Dollars,
+    /// `[K]` the formula transition supplement, re-derived against this policy's own output.
+    ///
+    /// **Outside [`Self::realized_aid`]**, like transportation and for the same reason: `[K]` is
+    /// outside `[H] + [I]`, which is what [`crate::biennium::Measure::FoundationAid`] names and
+    /// what every published share on this site is computed against. Folding it in would change
+    /// the meaning of every existing figure.
+    ///
+    /// It was omitted from this model entirely until the hold-harmless inventory found it. That
+    /// omission was not a constant offset: `[K]` is a function of the model's own output, so a
+    /// cut overstated its saving and an increase was partly clawed back.
+    pub transition_supplement: Dollars,
+    /// The same under current law, for the comparison.
+    pub baseline_transition_supplement: Dollars,
 }
 
 impl Outcome {
@@ -371,16 +434,23 @@ impl Outcome {
         self.realized_aid - self.baseline_realized_aid
     }
 
-    /// Realized aid and transportation together.
+    /// Realized aid, transportation and the transition supplement together.
+    ///
+    /// The three channels the department's `[R] Total State Support` adds, which is why `[K]` is
+    /// here: dropping it breaks the `[R]` identity by up to $12.4m on a single district. It was
+    /// missing from this sum for as long as the model had no `[K]` at all.
     #[must_use]
     pub fn total_state_support(&self) -> Dollars {
-        self.realized_aid + self.transportation
+        self.realized_aid + self.transportation + self.transition_supplement
     }
 
-    /// Change against current law across both channels.
+    /// Change against current law across all three channels.
     #[must_use]
     pub fn total_delta(&self) -> Dollars {
-        self.total_state_support() - (self.baseline_realized_aid + self.baseline_transportation)
+        self.total_state_support()
+            - (self.baseline_realized_aid
+                + self.baseline_transportation
+                + self.baseline_transition_supplement)
     }
 
     /// Change against current law, per pupil.
@@ -560,6 +630,19 @@ pub fn apply(
         crate::transport::MINIMUM_STATE_SHARE_FY2027,
     );
 
+    // `[K]`, which R.C. 3317.019 does not govern: Section 265.225 tops the district up to its
+    // FY2021 base from a total that already contains the guarantee. So it is computed *after*
+    // realized aid and transportation, and it is what absorbs a cut to either of them.
+    //
+    // At current law this reproduces the department's published column for all 609 districts,
+    // which is what keeps `current_law` the identity.
+    let transition_supplement = match policy.backstop {
+        Backstop::AsEnacted => {
+            crate::hold_harmless::transition_supplement_under(record, realized_aid, transportation)
+        }
+        Backstop::Repealed => 0.0,
+    };
+
     Outcome {
         irn: record.irn.clone(),
         name: record.name.clone(),
@@ -572,6 +655,17 @@ pub fn apply(
         at_minimum_state_share: at_minimum,
         transportation,
         baseline_transportation,
+        transition_supplement,
+        // Recomputed from the baseline's own aid and transportation rather than read from the
+        // department's column. Both sides of a delta then come from one construction, so the
+        // cent of drift that recovering transportation through its state share introduces on
+        // fifteen districts cancels instead of registering as movement. `hold_harmless::CENT`
+        // records the same trap; mixing the two here put five phantom gainers into an identity run.
+        baseline_transition_supplement: crate::hold_harmless::transition_supplement_under(
+            record,
+            record.realized_aid(),
+            baseline_transportation,
+        ),
     }
 }
 
