@@ -9659,6 +9659,150 @@ pub static FIGURES: &[Figure] = &[
                 .count() as f64
         },
     },
+    // The capacity measure's denominator. `project::capacity_denominator`, which runs
+    // R.C. 3317.017(B) over the three counts the plan itself uses.
+    Figure {
+        key: "project/capacity-local-charge-statewide",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The local capacity charge across the 609 districts, with the pupil count \
+                multiplied back out \u{2014} the blend times the rate, and nothing else",
+        pinned: 8_894_277_590.485_88,
+        tolerance: 1.0,
+        compute: |_| project::capacity_denominator::statewide_local_charge(),
+    },
+    Figure {
+        key: "project/capacity-aid-on-base-cost-enrolled-adm",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "State aid the capacity measure reaches on the statute's own denominator: the \
+                state share of base cost plus the four categoricals that ride on its percentage",
+        pinned: 4_512_585_439.121_697,
+        tolerance: 1.0,
+        compute: |_| {
+            project::capacity_denominator::statewide(
+                project::capacity_denominator::Basis::BaseCostEnrolled,
+            )
+        },
+    },
+    Figure {
+        key: "project/capacity-aid-on-the-resident-count",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same aid with local capacity divided by Table SD-1's resident count instead",
+        pinned: 5_355_046_940.892_493,
+        tolerance: 1.0,
+        compute: |_| {
+            project::capacity_denominator::statewide(project::capacity_denominator::Basis::Resident)
+        },
+    },
+    Figure {
+        key: "project/capacity-denominator-exposure",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What re-basing local capacity to the resident count would cost the state, net",
+        pinned: 842_461_501.770_804_8,
+        tolerance: 1.0,
+        compute: |_| {
+            project::capacity_denominator::exposure(project::capacity_denominator::Basis::Resident)
+                .net()
+        },
+    },
+    Figure {
+        key: "project/capacity-denominator-exposure-loss",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And what it would take off the districts that lose by it \u{2014} the second sign, \
+                which a correction priced on the gainers alone does not see",
+        pinned: 57_464_582.255_979_516,
+        tolerance: 1.0,
+        compute: |_| {
+            project::capacity_denominator::exposure(project::capacity_denominator::Basis::Resident)
+                .loss
+        },
+    },
+    Figure {
+        key: "project/capacity-denominator-losers",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts whose aid would fall if local capacity were divided by the resident \
+                count \u{2014} the net open-enrolment-in districts",
+        pinned: 119.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| {
+            project::capacity_denominator::exposure(project::capacity_denominator::Basis::Resident)
+                .losers as f64
+        },
+    },
+    Figure {
+        key: "project/capacity-denominator-districts-leaving-the-floor",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts on the 10% minimum state share under the statute's denominator and off \
+                it under the resident count, of 138",
+        pinned: 33.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| {
+            project::capacity_denominator::exposure(project::capacity_denominator::Basis::Resident)
+                .leave_the_floor as f64
+        },
+    },
+    Figure {
+        key: "project/the-plans-own-resident-adjustment",
+        owner: "crates/project",
+        unit: Unit::Pupils,
+        label: "Pupils R.C. 3317.0217(C)(1)'s open-enrolment adjustment moves statewide",
+        pinned: 2_098.196_313_999_995_7,
+        tolerance: 0.01,
+        compute: |_| project::capacity_denominator::resident_gap().0,
+    },
+    Figure {
+        key: "project/resident-less-enrolled-gap",
+        owner: "crates/project",
+        unit: Unit::Pupils,
+        label: "Pupils Table SD-1 counts as resident in a district that its base cost enrolled \
+                ADM does not \u{2014} every channel of R.C. 3317.03(A)(2) together",
+        pinned: 222_922.710_800_000_12,
+        tolerance: 1.0,
+        compute: |_| project::capacity_denominator::resident_gap().1,
+    },
+    Figure {
+        key: "project/weighted-categorical-entitlement",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Special education, English learner and career-technical entitlement for the 609 \
+                districts at a state share of one",
+        pinned: 2_432_327_661.000_712,
+        tolerance: 1.0,
+        compute: |_| project::capacity_denominator::weighted_categorical_entitlement().0,
+    },
+    Figure {
+        key: "project/weighted-categorical-local-share",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The share of that entitlement the local capacity measure takes off, which the \
+                community and STEM school unit is charged none of",
+        pinned: 0.665_967_472_431_025_5,
+        tolerance: 1e-9,
+        compute: |_| {
+            let (entitlement, paid) =
+                project::capacity_denominator::weighted_categorical_entitlement();
+            (entitlement - paid) / entitlement
+        },
+    },
+    Figure {
+        key: "project/capacity-divergence-correlation",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "Correlation between a district's resident-to-funded pupil ratio and its published \
+                state share percentage, over 609 \u{2014} the divergence orders nothing",
+        pinned: 0.065_683_238_353_744_5,
+        tolerance: 1e-9,
+        compute: |_| project::capacity_denominator::divergence_correlation(),
+    },
+
 ];
 
 /// The narrowest and widest share of the local gap state aid closes across FY2012-FY2024.
