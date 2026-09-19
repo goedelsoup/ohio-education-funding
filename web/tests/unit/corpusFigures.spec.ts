@@ -135,9 +135,16 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * marginal costs — and that is the reason for the size of the jump. Every level on that node was
  * bound and not one of its differences was, so its three savings tables went stale under two
  * calculator changes while this file stayed green. A ratchet counting levels is not a ratchet.
+ *
+ * Recomputed at **808/75** when the second of those two changes was identified by bisect. The
+ * four new bindings are the foundation-aid half of the same base cost sweep whose total was bound
+ * at 804, and they exist because binding a net is not binding its terms: the total had absorbed
+ * `+$11.2M` of categorical scaling from 2026-08-09 and `-$5.0M` of backstop clawback from
+ * 2026-09-18, and reads within $6.3M of a figure that predates both. A ratchet counting nets is
+ * not a ratchet either.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "804 bindings; raise this when you add one").toBeGreaterThanOrEqual(804);
+  expect(bindings.length, "808 bindings; raise this when you add one").toBeGreaterThanOrEqual(808);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "75 nodes carry bindings; raise this when a seventy-sixth does",
