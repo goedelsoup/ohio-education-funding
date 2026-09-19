@@ -2982,6 +2982,155 @@ test.describe("reach", () => {
     expect(flat, "a base-cost rise has to leave some held district exactly where it was")
       .toBeGreaterThan(0);
   });
+
+  /*
+   * The scope, which is the reader's own question: not *which districts does this reach* but *does
+   * it reach mine*.
+   *
+   * A selection lights rather than subsets, and the reason is measured rather than preferred.
+   * `scatterSpec` refuses fewer than twelve points — a scatter of three districts reads as a finding
+   * about a population nobody measured — and 79 of Ohio's 88 counties hold fewer than twelve
+   * districts, so a filter that drew only the selection would draw a blank card for almost every
+   * county in the state. `reach.spec.ts` holds that measurement; these hold what a reader gets.
+   */
+  test("a county selection lights its districts and leaves the state drawn behind them", async ({
+    page,
+  }) => {
+    await page.goto("/reach");
+    await booted(page);
+    const drawn = page.locator('[data-chart="positions"] .chart-at[data-at="wide"] .scatter-dot circle');
+    const before = await drawn.count();
+    expect(before, "the whole state is in the cloud at rest").toBeGreaterThan(600);
+
+    await page.locator("#rv-counties > summary").click();
+    await page.locator('#reach-scope input[name="co"][value="athens"]').check();
+
+    // Every district is still plotted. This is the assertion a subsetting filter fails.
+    expect(await drawn.count(), "a selection must not remove districts from the cloud").toBe(before);
+    /*
+     * Two radii, because opacity alone could not carry this: `--neutral-mark` is close to its
+     * surface by design, so muting it separates the two populations by 1.20:1 — not a difference a
+     * reader finds in six hundred overlapping dots. See `DOT` in `plot/spec.ts`.
+     */
+    const lit = page.locator('[data-chart="positions"] .chart-at[data-at="wide"] .scatter-dot circle[r="2.4"]');
+    const context = page.locator('[data-chart="positions"] .chart-at[data-at="wide"] .scatter-dot circle[r="1.6"]');
+    expect(await lit.count(), "the county's districts are the subject").toBeGreaterThan(0);
+    expect(await lit.count()).toBeLessThan(12);
+    expect(await context.count(), "and the rest are context").toBeGreaterThan(500);
+
+    // The legend says which, and it says it on the channel the dots actually use.
+    await expect(page.locator('[data-part="positions"] .legend')).toContainText(
+      "Outside Athens County",
+    );
+    await expect(page.locator('[data-part="positions"] .legend .sw.muted')).toHaveCount(1);
+  });
+
+  test("every count a reader reads as an answer is restated against the selection", async ({
+    page,
+  }) => {
+    /*
+     * The prose cost of a spotlight, and the thing it would be easy to skip. "253 of 609 are paid
+     * the same" and "4 of 6 in Athens County are" are different claims, and a page that narrowed the
+     * picture without narrowing the sentence would be answering about a population the reader is not
+     * looking at.
+     *
+     * The clipped count stays global on purpose: it is a fact about the drawing, and the whole state
+     * is still drawn.
+     */
+    await page.goto("/reach");
+    await booted(page);
+    const notes = page.locator('[data-part="positions"] .note');
+    await expect(notes.first()).toContainText("districts are");
+
+    await page.locator("#rv-counties > summary").click();
+    await page.locator('#reach-scope input[name="co"][value="athens"]').check();
+
+    await expect(notes.first()).toContainText("districts in Athens County are");
+    await expect(
+      notes.filter({ hasText: "muted, and they are not in any count above" }),
+      "the districts not in scope are accounted for rather than quietly dropped",
+    ).toHaveCount(1);
+    await expect(notes.filter({ hasText: "sit outside the frame" })).toContainText("of 609");
+  });
+
+  test("a selection of one district still gets a cloud, and the state's own frame", async ({
+    page,
+  }) => {
+    /*
+     * The case that decided the design twice over. One district is not twelve points, so a filter
+     * would have rendered nothing here; and the frame is the state's, so the one lit dot sits where
+     * the state puts it rather than alone on an axis fitted to itself.
+     */
+    await page.goto("/reach");
+    await booted(page);
+    const ends = async () => {
+      const html = await page.locator('[data-chart="positions"]').innerHTML();
+      return [...html.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]).join("|");
+    };
+    const frame = await ends();
+
+    await page.locator("#rv-add").selectOption("043786");
+    await expect(page.locator('[data-chart="positions"] svg.plot:visible circle')).not.toHaveCount(0);
+    expect(await ends(), "a selection moved the frame").toBe(frame);
+    await expect(
+      page.locator('[data-chart="positions"] .chart-at[data-at="wide"] .scatter-dot circle[r="2.4"]'),
+    ).toHaveCount(1);
+  });
+
+  test("a selection travels in the query string and comes back as chips", async ({ page }) => {
+    await page.goto("/reach");
+    await booted(page);
+    await page.locator("#rv-counties > summary").click();
+    await page.locator('#reach-scope input[name="co"][value="athens"]').check();
+    await page.locator("#rv-add").selectOption("043786");
+
+    await expect(page).toHaveURL(/co=athens/);
+    await expect(page).toHaveURL(/d=043786/);
+    /* The picker returns to its placeholder. Left showing the last choice it would read as *the*
+       selection while the chips said otherwise. */
+    await expect(page.locator("#rv-add")).toHaveValue("");
+
+    await page.reload();
+    await booted(page);
+    await expect(page.locator('#reach-scope input[name="co"][value="athens"]')).toBeChecked();
+    await expect(page.locator("#rv-chips button[data-county='athens']")).toHaveCount(1);
+    await expect(page.locator("#rv-chips button[data-district='043786']")).toContainText(
+      "Cleveland",
+    );
+
+    // A chip is a thing you can take off, and taking the last one off is the whole state again.
+    await page.locator("#rv-chips button[data-district='043786']").click();
+    await expect(page).not.toHaveURL(/d=043786/);
+    await page.locator("#rv-clear").click();
+    await expect(page.locator("#rv-chips")).toBeHidden();
+    await expect(page).not.toHaveURL(/co=athens/);
+    await expect(page.locator('#reach-scope input[name="co"][value="athens"]')).not.toBeChecked();
+  });
+
+  test("the selection survives a lever move and a preset", async ({ page }) => {
+    /*
+     * A scope is not lever state — it says who the picture is about, not what the formula computes —
+     * so a preset, which is a whole lever position, must not take it with it. The two are read from
+     * different controls and this is what says they stay that way.
+     */
+    await page.goto("/reach");
+    await booted(page);
+    await page.locator("#rv-counties > summary").click();
+    await page.locator('#reach-scope input[name="co"][value="athens"]').check();
+
+    await page.locator("#lv-base").fill("1.12");
+    await page.locator("#lv-base").dispatchEvent("input");
+    await expect(page.locator("#rv-chips button[data-county='athens']")).toHaveCount(1);
+
+    await page.locator('.preset:has-text("Retire half the floor")').click();
+    await expect(page.locator("#lv-guarantee")).toHaveValue("phase-out");
+    await expect(
+      page.locator("#rv-chips button[data-county='athens']"),
+      "a preset is a lever position and says nothing about who is in scope",
+    ).toHaveCount(1);
+    await expect(page).toHaveURL(/co=athens/);
+  });
+
 });
 
 test.describe("the verification gate", () => {

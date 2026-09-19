@@ -36,9 +36,13 @@ import {
   FRAME_QUANTILE,
   envelope,
   groups,
+  inScope,
   presets,
+  scopeCounties,
   viewFromQuery,
 } from "../../src/lib/reach.ts";
+import { MIN_CLOUD } from "../../src/lib/plot/spec.ts";
+import { compare } from "../../src/lib/order.ts";
 import { applyAll, currentLaw, modelOf } from "../../src/lib/policy.ts";
 import { LEVER_BOUNDS, defaultLevers } from "../../src/lib/scenario.ts";
 import type { Panel } from "../../src/lib/types.ts";
@@ -285,4 +289,96 @@ test("an absent highlight is the default, not code 0", () => {
   expect(viewFromQuery(new URLSearchParams("ty=")).highlight).toBe(DEFAULT_VIEW.highlight);
   // And 0 still reaches the highlight when a link actually names it.
   expect(viewFromQuery(new URLSearchParams("ty=0")).highlight).toBe(0);
+});
+
+/*
+ * The scope: which districts the reader is asking about.
+ *
+ * `inScope` carries the argument for why a selection lights rather than subsets, and the two facts
+ * it rests on are measurable here rather than assertable only by eye.
+ *
+ * What is **not** here is anything that calls `renderReach`. It renders through `plot/client.ts`,
+ * which needs a real DOM because it is the browser half of the pair — `plot/ssr.ts` is the one that
+ * carries its own. So the drawn consequences of a scope (the frame holding still across selections,
+ * the counts restated against it, a single district still getting a cloud) are asserted in
+ * `tests/e2e/app.spec.ts`'s `reach` describe, against the page. Standing up a fake document here to
+ * run the browser renderer in node would be testing a fiction.
+ */
+
+test("no selection is the whole state, and an unresolvable one is no selection", () => {
+  expect(inScope(panel.districts, { counties: [], districts: [] })).toBeNull();
+  /*
+   * `?co=nowhere` is a link to a county that does not exist, and the honest answer to it is the page
+   * a bare `/reach` draws — not an empty cloud. The control cannot produce such a selection, since
+   * every option comes off this panel, so this is the query-string path.
+   */
+  expect(inScope(panel.districts, { counties: ["nowhere"], districts: [] })).toBeNull();
+  expect(inScope(panel.districts, { counties: [], districts: ["999999"] })).toBeNull();
+});
+
+test("a county scope is its districts, and a named district is added to them", () => {
+  const counties = scopeCounties(panel.districts);
+  const athens = counties.find((c) => c.slug === "athens")!;
+  const scope = inScope(panel.districts, { counties: ["athens"], districts: [] })!;
+  expect(scope.size, "every district the department attributes to the county").toBe(athens.districts);
+
+  /*
+   * Union, not intersection. The department attributes each district to exactly one county, so
+   * intersecting a county with a district outside it would make the scope empty — and a reader who
+   * picks Athens County and then names Cleveland has asked for both.
+   */
+  const cleveland = panel.districts.find((d) => d.name.startsWith("Cleveland Municipal"))!;
+  expect(cleveland.county).not.toBe("Athens");
+  const both = inScope(panel.districts, {
+    counties: ["athens"],
+    districts: [cleveland.irn],
+  })!;
+  expect(both.size).toBe(athens.districts + 1);
+  expect(both.has(cleveland.irn)).toBe(true);
+});
+
+test("a district named inside a county it is already in is not counted twice", () => {
+  const inside = panel.districts.find((d) => d.county === "Athens")!;
+  const scope = inScope(panel.districts, { counties: ["athens"], districts: [inside.irn] })!;
+  const alone = inScope(panel.districts, { counties: ["athens"], districts: [] })!;
+  expect(scope.size).toBe(alone.size);
+});
+
+test("the counties are every one the feed carries, by name, with their district counts", () => {
+  const counties = scopeCounties(panel.districts);
+  expect(counties.length).toBe(new Set(panel.districts.map((d) => d.county)).size);
+  expect(counties.reduce((n, c) => n + c.districts, 0)).toBe(panel.districts.length);
+  expect(counties.map((c) => c.name)).toEqual([...counties.map((c) => c.name)].sort(compare));
+  // Every slug round-trips through the router, and no two counties share one.
+  expect(new Set(counties.map((c) => c.slug)).size).toBe(counties.length);
+  for (const county of counties) expect(county.slug).toMatch(/^[a-z0-9-]+$/);
+});
+
+test("most of Ohio's counties hold too few districts to be a cloud", () => {
+  /*
+   * The measurement the whole design turns on, asserted so it cannot quietly stop being true. A
+   * selection that *subsetted* the cloud would render nothing at all for these — `scatterSpec`
+   * refuses fewer than `MIN_CLOUD` points and a null spec renders to the empty string — so the card
+   * would come out as a heading, a legend and nothing between them.
+   */
+  const counties = scopeCounties(panel.districts);
+  const small = counties.filter((c) => c.districts < MIN_CLOUD);
+  expect(small.length, "a subsetting filter would blank the card for this many counties")
+    .toBeGreaterThan(counties.length / 2);
+  expect(counties.filter((c) => c.districts === 1).length, "and some hold exactly one")
+    .toBeGreaterThan(0);
+});
+
+test("a scope is carried in the query string and held to shape", () => {
+  const read = viewFromQuery(new URLSearchParams("co=athens,van-wert&d=043786,045237"));
+  expect(read.counties).toEqual(["athens", "van-wert"]);
+  expect(read.districts).toEqual(["043786", "045237"]);
+
+  // An IRN is six digits, always — 28 district names in the feed are not unique, so it is the only
+  // safe key and a five-digit one is not a district.
+  expect(viewFromQuery(new URLSearchParams("d=43786,043786")).districts).toEqual(["043786"]);
+  expect(viewFromQuery(new URLSearchParams("co=Athens County")).counties).toEqual([]);
+  // A set written twice is a set.
+  expect(viewFromQuery(new URLSearchParams("co=athens,athens")).counties).toEqual(["athens"]);
+  expect(viewFromQuery(new URLSearchParams("")).counties).toEqual([]);
 });

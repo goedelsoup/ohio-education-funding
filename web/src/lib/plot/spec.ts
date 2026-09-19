@@ -603,6 +603,39 @@ export function barSpec(bars: Bar[], options: { width: number; max?: number }): 
 }
 
 /**
+ * The fewest points this form will draw a cloud of.
+ *
+ * Exported because callers reason about it. `/reach` cannot subset its cloud to a county — 79 of
+ * Ohio's 88 counties hold fewer districts than this — and the page says so in prose, so the number
+ * it says has to be this number rather than a second copy of it.
+ */
+export const MIN_CLOUD = 12;
+
+/**
+ * How a scatter's dots are drawn, and the one place the three alphas are written down.
+ *
+ * `banded` is more opaque than `plain` because banded dots carry a third measure and have to be
+ * legible one against another, where the neutral cloud only has to be legible against the card.
+ *
+ * `muted` is the de-emphasised mark — see `ScatterPoint.muted` — and it spends **two** channels
+ * rather than one. Measured against `--surface-1`, a neutral dot is 1.42:1 light and 1.65:1 dark at
+ * `plain`; at the muted alpha it is 1.18 and 1.25, which separates the two populations by only 1.20
+ * and 1.32. That is not a difference a reader picks out of six hundred overlapping dots, so the
+ * radius comes down too: 1.6 against 2.4 is 44% of the area, and alpha and area together leave
+ * about a fifth of the ink. `palette.spec.ts` holds those figures, and holds the ordering — a muted
+ * mark that stopped being the fainter of the two would be a de-emphasis that emphasised.
+ *
+ * The bar is separation from the un-muted mark and visibility above the surface, not 3:1. Nothing
+ * in this cloud has ever met 3:1: `--neutral-mark` is 2.35:1 light against `--surface-1` at full
+ * opacity, before the 0.45 the form draws it at. Small, partly transparent marks are what make
+ * density legible as density here, and the relief for that is the legend the banded forms carry.
+ */
+export const DOT = {
+  radius: { plain: 2.4, muted: 1.6 },
+  opacity: { banded: 0.62, plain: 0.45, muted: 0.22 },
+} as const;
+
+/**
  * Two measures of every district, one dot each.
  *
  * # Why this form had to exist
@@ -638,30 +671,6 @@ export function barSpec(bars: Bar[], options: { width: number; max?: number }): 
  * scales stated where a line chart can get away with the ends, so both ends of both axes are
  * labelled and the exact pair for any one district is in its tooltip.
  */
-/**
- * How a scatter's dots are drawn, and the one place the three alphas are written down.
- *
- * `banded` is more opaque than `plain` because banded dots carry a third measure and have to be
- * legible one against another, where the neutral cloud only has to be legible against the card.
- *
- * `muted` is the de-emphasised mark — see `ScatterPoint.muted` — and it spends **two** channels
- * rather than one. Measured against `--surface-1`, a neutral dot is 1.42:1 light and 1.65:1 dark at
- * `plain`; at the muted alpha it is 1.18 and 1.25, which separates the two populations by only 1.20
- * and 1.32. That is not a difference a reader picks out of six hundred overlapping dots, so the
- * radius comes down too: 1.6 against 2.4 is 44% of the area, and alpha and area together leave
- * about a fifth of the ink. `palette.spec.ts` holds those figures, and holds the ordering — a muted
- * mark that stopped being the fainter of the two would be a de-emphasis that emphasised.
- *
- * The bar is separation from the un-muted mark and visibility above the surface, not 3:1. Nothing
- * in this cloud has ever met 3:1: `--neutral-mark` is 2.35:1 light against `--surface-1` at full
- * opacity, before the 0.45 the form draws it at. Small, partly transparent marks are what make
- * density legible as density here, and the relief for that is the legend the banded forms carry.
- */
-export const DOT = {
-  radius: { plain: 2.4, muted: 1.6 },
-  opacity: { banded: 0.62, plain: 0.45, muted: 0.22 },
-} as const;
-
 export function scatterSpec(
   points: ScatterPoint[],
   axes: {
@@ -724,7 +733,7 @@ export function scatterSpec(
 ): Spec | null {
   // Two points are not a cloud. Same rule as the line forms, for the same reason: a scatter of
   // three districts would read as a finding about a population that has not been measured.
-  if (points.length < 12) return null;
+  if (points.length < MIN_CLOUD) return null;
 
   // Both ends of a displacement, so a trail cannot run out of the frame it is drawn in.
   const xs = points.flatMap((p) => (p.from ? [p.x, p.from.x] : [p.x]));

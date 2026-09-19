@@ -35,11 +35,13 @@ import { MOVED, applyAll, currentLaw, modelOf } from "./policy.ts";
 import { count, escapeHtml, money, pct, signedMoney } from "./format.ts";
 import { heading } from "./section.ts";
 import { renderToString } from "./plot/client.ts";
-import { scatterSpec } from "./plot/spec.ts";
+import { MIN_CLOUD, scatterSpec } from "./plot/spec.ts";
 import type { ScatterPoint } from "./chart.ts";
 import type { Levers } from "./scenario.ts";
 import { LEVER_BOUNDS, defaultLevers, toPolicy } from "./scenario.ts";
 import { refreshEffect } from "./refresh.ts";
+import { slugify } from "./routes.ts";
+import { compare } from "./order.ts";
 import type { Panel, PanelDistrict } from "./types.ts";
 
 /** One quantity a district can be placed on. */
@@ -311,6 +313,14 @@ export interface View {
   highlight: number;
   /** Draw each district's displacement from its position under current law. */
   trails: boolean;
+  /**
+   * The counties whose districts the reader is asking about, by slug. Empty is the whole state.
+   *
+   * See {@link inScope} for what a scope does to the drawing, and why it does not subset it.
+   */
+  counties: string[];
+  /** Districts named one at a time, by IRN. Unioned with `counties`, not intersected with it. */
+  districts: string[];
 }
 
 export const DEFAULT_VIEW: View = {
@@ -319,6 +329,8 @@ export const DEFAULT_VIEW: View = {
   shading: "regime",
   highlight: 1,
   trails: true,
+  counties: [],
+  districts: [],
 };
 
 /**
@@ -366,7 +378,107 @@ export function viewFromQuery(params: URLSearchParams): View {
       Number.isInteger(lit) && lit >= 0 && lit <= 8 ? lit : DEFAULT_VIEW.highlight,
     // Absent means the default, which is on. Only an explicit `0` turns them off.
     trails: params.get("t") !== "0",
+    /*
+     * The scope, validated for *shape* here and against the panel in `inScope`.
+     *
+     * Two stages because this function has no panel to check against, and inventing one would make
+     * a parser depend on a feed. A slug or an IRN that no district carries is simply not in the
+     * union — which is the same answer a reader gets for a county the department reattributed, and
+     * is why it is dropped there rather than rejected here.
+     *
+     * Deduplicated, because `?co=allen,allen` is a set written twice and the chips are a set.
+     */
+    counties: list(params.get("co"), (v) => /^[a-z0-9-]+$/.test(v)),
+    districts: list(params.get("d"), (v) => /^\d{6}$/.test(v)),
   };
+}
+
+/** One comma-separated query parameter as a set of well-shaped values, in the order given. */
+function list(raw: string | null, shaped: (value: string) => boolean): string[] {
+  if (raw == null) return [];
+  return [...new Set(raw.split(",").map((v) => v.trim()).filter((v) => v !== "" && shaped(v)))];
+}
+
+/** One county, as the scope picker offers it. */
+export interface ScopeCounty {
+  slug: string;
+  /** The department's own attribution, as the feed spells it. */
+  name: string;
+  /** How many districts in this panel it holds. */
+  districts: number;
+}
+
+/**
+ * The counties, derived from the panel rather than listed.
+ *
+ * Eighty-eight of them, and none written here: a county the department reattributes a district to
+ * arrives in the control without this file being edited, and the slug comes from the same
+ * `slugify` that builds `/county/…` so the two cannot disagree about what a county is called.
+ *
+ * Ordered by name, because that is how a reader looks for one. `counties()` in `county.ts` orders
+ * by district count for a different page with a different question.
+ */
+export function scopeCounties(districts: Pick<PanelDistrict, "county">[]): ScopeCounty[] {
+  const found = new Map<string, ScopeCounty>();
+  for (const district of districts) {
+    const seen = found.get(district.county);
+    if (seen) seen.districts += 1;
+    else found.set(district.county, { slug: slugify(district.county), name: district.county, districts: 1 });
+  }
+  return [...found.values()].sort((a, b) => compare(a.name, b.name));
+}
+
+/**
+ * Which districts the reader is asking about, or `null` for all of them.
+ *
+ * # Why a scope lights rather than subsets
+ *
+ * Because a filter that drew only the selection would draw nothing at all for most of Ohio.
+ * `scatterSpec` refuses fewer than twelve points — *"a scatter of three districts would read as a
+ * finding about a population that has not been measured"* — and a null spec renders to the empty
+ * string, so the card would come out as a heading, a legend and nothing between them. Counted
+ * against this feed: 88 counties, 609 districts, a median of 6 districts per county, and **only 9
+ * counties hold 12 or more**. Four hold exactly one. A subsetting filter would be blank for 79 of
+ * 88 counties, and for every selection of a single district.
+ *
+ * The frame is the second reason and the stronger one. `envelope` is measured over all 609
+ * districts across five corner lever runs precisely so that a district which did not move looks
+ * like a district which did not move. A scope that reached it would refit the axes to a county and
+ * reintroduce the moving ruler this route was rebuilt to remove — invisibly, because a refitted
+ * axis looks like an axis.
+ *
+ * So the whole state stays drawn and the scope decides what is *lit*: in-scope districts keep their
+ * shading and their trails, out-of-scope districts are muted and draw none. That is also the move
+ * this page already makes for the typology, deliberately — one group against the rest rather than
+ * nine hues — and it keeps the shape of the state, which is the thing the cloud says at rest.
+ *
+ * # Union, not intersection
+ *
+ * The department attributes each district to exactly one county, so intersecting a county with a
+ * district would make *Cuyahoga and Upper Arlington* empty. A scope is a set of districts arrived
+ * at two ways: every district in a named county, plus every district named outright.
+ *
+ * # An unresolvable selection is no selection
+ *
+ * `null` where nothing matched, which draws the whole state rather than an empty cloud. The control
+ * cannot produce such a selection — every option comes off this panel — so this is the query-string
+ * path: `?co=nowhere` is a link to a county that does not exist, and the honest answer to it is the
+ * page a bare `/reach` draws.
+ */
+export function inScope(
+  districts: Pick<PanelDistrict, "irn" | "county">[],
+  view: Pick<View, "counties" | "districts">,
+): Set<string> | null {
+  if (view.counties.length === 0 && view.districts.length === 0) return null;
+  const wantedCounties = new Set(view.counties);
+  const wantedDistricts = new Set(view.districts);
+  const scope = new Set<string>();
+  for (const district of districts) {
+    if (wantedCounties.has(slugify(district.county)) || wantedDistricts.has(district.irn)) {
+      scope.add(district.irn);
+    }
+  }
+  return scope.size > 0 ? scope : null;
 }
 
 /**
@@ -599,6 +711,47 @@ export function presets(panel: Panel): Preset[] {
 }
 
 /**
+ * What the reader asked about, in words.
+ *
+ * The scope has to be *named* wherever a count is stated against it. "4 of 6 districts are paid the
+ * same" is a sentence about a population, and a reader who has forgotten which six — or who has
+ * been sent the link by somebody else — is reading a statistic with no subject. The chips above the
+ * plot say what is selected; this is what says it inside the claim.
+ *
+ * Counties by name and districts by number. Three counties are named outright and the fourth turns
+ * the phrase into a count, because a legend entry listing eleven counties is a paragraph. A district
+ * named individually *and* covered by a selected county is already in that county's count and is
+ * not counted twice.
+ */
+function scopeLabel(
+  districts: Pick<PanelDistrict, "irn" | "county">[],
+  view: Pick<View, "counties" | "districts">,
+): string {
+  const wantedCounties = new Set(view.counties);
+  const wantedDistricts = new Set(view.districts);
+  const named = [...new Set(districts.map((d) => d.county))]
+    .filter((name) => wantedCounties.has(slugify(name)))
+    .sort(compare);
+  const parts: string[] = [];
+  if (named.length > 0) {
+    parts.push(
+      named.length <= 3
+        ? `${named.join(", ")} ${named.length === 1 ? "County" : "counties"}`
+        : `${named.slice(0, 3).join(", ")} and ${count(named.length - 3)} more counties`,
+    );
+  }
+  const alone = districts.filter(
+    (d) => wantedDistricts.has(d.irn) && !wantedCounties.has(slugify(d.county)),
+  ).length;
+  if (alone > 0) {
+    parts.push(`${count(alone)} district${alone === 1 ? "" : "s"} named on its own`);
+  }
+  /* Only where nothing resolved, which `inScope` turns into no scope at all — so this is the
+     phrase no caller should ever be able to print. Stated rather than left as an empty string. */
+  return parts.length === 0 ? "the selection" : parts.join(", plus ");
+}
+
+/**
  * Every district in one picture, and the wall it is paid against.
  *
  * # The geometry, where the axes are the default pair
@@ -628,6 +781,14 @@ export function presets(panel: Panel): Preset[] {
  * an ordered fact — unconstrained, held, held twice over — so it takes the ordinal ramp. The other
  * shading is a genuine two-way split and takes the validated pair, where `formula` is the hue
  * `SERIES` documents as doubling for "gain".
+ *
+ * # The scope, which changes what is lit and not what is drawn
+ *
+ * See {@link inScope} for why. Every district stays in the cloud; an out-of-scope one is muted,
+ * loses its shading and draws no trail. What that costs is prose: every count a reader reads as an
+ * *answer* has to be restated against the scope, because "253 of 609 are paid the same" is a
+ * different claim from "4 of 6 in Athens County are". The two counts that stay global are the
+ * clipped and the unplaced — both are facts about the drawing, and all 609 are still drawn.
  */
 export function renderReach(panel: Panel, levers: Levers, view: View, chip = ""): string {
   const model = modelOf(panel.statewide);
@@ -639,12 +800,16 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
   const wall = view.x === "formula" && view.y === "realized";
 
   const zero = defaultLevers(model);
+  const scope = inScope(panel.districts, view);
   const points: ScatterPoint[] = [];
   let unplaced = 0;
   let pinned = 0;
+  /* Drawn and in scope, which is the denominator of every count a reader reads as an answer. */
+  let scoped = 0;
 
   for (const [i, o] of outcomes.entries()) {
     const d = panel.districts[i]!;
+    const inside = scope == null || scope.has(d.irn);
     // Falls back to the district's own position, which draws no trail — the honest answer if the
     // two runs ever disagreed about the population, rather than a silently missing segment.
     const before = law[i] ?? o;
@@ -665,6 +830,22 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
           : "paid by the formula"
       }${Math.abs(o.delta) > MOVED ? `, ${signedMoney(o.deltaPerPupil)} per pupil` : ", unmoved"}`,
     };
+    /*
+     * Out of scope is drawn as context: muted, unshaded, and with no trail.
+     *
+     * Unshaded rather than shaded-and-muted because the shading answers a question that was asked
+     * about a different population. A muted ordinal band would still be saying *this district is
+     * held twice over* in a legend the reader is reading about their own county.
+     *
+     * The trail is withheld here rather than drawn faintly, which is why `muted` has to reach the
+     * dot: 600 faint segments across a cloud of six is not context, it is the cloud back again.
+     */
+    if (!inside) {
+      point.muted = true;
+      points.push(point);
+      continue;
+    }
+    scoped += 1;
     if (view.shading === "regime") {
       point.band = o.onGuarantee ? (o.atMinimumStateShare ? 2 : 1) : 0;
     } else if (view.shading === "type") {
@@ -734,23 +915,50 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
       (yFixed != null && (p.y < yFixed[0] || p.y > yFixed[1])),
   ).length;
 
-  /* How many districts the highlighted group has, counted from what is actually drawn. */
+  /*
+   * How many districts the highlighted group has, counted from what is actually drawn — and within
+   * the scope, because a legend reading "302" beside a cloud of six lit districts is a count of a
+   * population the reader is not looking at.
+   */
   const lit =
     view.shading === "type"
-      ? panel.districts.filter((d) => d.typology?.code === view.highlight).length
+      ? panel.districts.filter(
+          (d) => d.typology?.code === view.highlight && (scope == null || scope.has(d.irn)),
+        ).length
       : 0;
   const litLabel =
     panel.districts.find((d) => d.typology?.code === view.highlight)?.typology?.short ?? "";
 
+  /* What the reader asked about, in words, for the note and the chart's spoken label. */
+  const asked = scope == null ? "" : scopeLabel(panel.districts, view);
+  /*
+   * The two figures the scope note argues from, read off the panel rather than written into the
+   * sentence. A county the department reattributes moves them; a feed that gained a county moves
+   * them; and `MIN_CLOUD` is the form's own floor rather than a second copy of it.
+   */
+  const allCounties = scope == null ? [] : scopeCounties(panel.districts);
+  const small = allCounties.filter((c) => c.districts < MIN_CLOUD).length;
+
   const legend =
-    view.shading === "regime"
+    (view.shading === "regime"
       ? REGIMES.map((label, i) => `<span><i class="sw ordinal-${i + 1}"></i> ${label}</span>`).join("")
       : view.shading === "type"
         ? `<span><i class="sw gain"></i> ${escapeHtml(litLabel)} (${count(lit)})</span>
            <span><i class="sw neutral"></i> Every other district</span>`
         : `<span><i class="sw gain"></i> Paid more</span>
            <span><i class="sw loss"></i> Paid less</span>
-           <span><i class="sw neutral"></i> Unmoved</span>`;
+           <span><i class="sw neutral"></i> Unmoved</span>`) +
+    /*
+     * The scope's own entry, and the reason `muted` exists.
+     *
+     * Under the regime and typology colourings an out-of-scope district could have been left
+     * neutral and this entry would still have been needed to say so. Under "Gained or lost" neutral
+     * already means *unmoved*, and one swatch cannot mean two things — so the channel is opacity
+     * and size, and the swatch says which.
+     */
+    (scope == null
+      ? ""
+      : `<span><i class="sw neutral muted"></i> Outside ${escapeHtml(asked)}, drawn for context</span>`);
 
   return `
     <div class="card stage" id="positions" data-part="positions">
@@ -777,8 +985,8 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
             },
           ),
         {
-          label: `${unplaced === 0 ? `Every one of Ohio's ${count(placed)} districts` : `${count(placed)} of Ohio's ${count(panel.statewide.districts)} districts`}, ${dx.label.toLowerCase()} against ${dy.label.toLowerCase()}${view.trails ? ", with a trail from its position under current law" : ""}`,
-          description: `${count(placed - pinned)} districts are paid differently under these settings and ${count(pinned)} are paid the same.${wall ? " No district can fall below the diagonal, where realized aid equals formula aid; a district drawn above it is held by the guarantee and the vertical distance is what the guarantee pays it. A trail that runs flat is a district whose formula amount moved and whose payment did not." : ""}`,
+          label: `${unplaced === 0 ? `Every one of Ohio's ${count(placed)} districts` : `${count(placed)} of Ohio's ${count(panel.statewide.districts)} districts`}, ${dx.label.toLowerCase()} against ${dy.label.toLowerCase()}${view.trails ? ", with a trail from its position under current law" : ""}${scope == null ? "" : `, of which ${count(scoped)} in ${asked} are drawn as the subject and the rest as context`}`,
+          description: `${count(scoped - pinned)} ${scope == null ? "districts" : `of the ${count(scoped)} districts in scope`} are paid differently under these settings and ${count(pinned)} are paid the same.${wall ? " No district can fall below the diagonal, where realized aid equals formula aid; a district drawn above it is held by the guarantee and the vertical distance is what the guarantee pays it. A trail that runs flat is a district whose formula amount moved and whose payment did not." : ""}`,
         },
       )}</div>
       <div class="legend">${legend}</div>
@@ -789,7 +997,9 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
              itself. A held district travels <em>sideways</em> until it reaches the line, and only
              then does a further dollar of base cost reach it. `
           : ""
-      }<strong>${count(pinned)} of ${count(placed)}</strong> districts are paid
+      }<strong>${count(pinned)} of ${count(scoped)}</strong> ${
+        scope == null ? "districts are" : `districts in ${escapeHtml(asked)} are`
+      } paid
         exactly what current law pays them under these settings.${
           view.trails
             ? " Each district is drawn from where current law puts it to where these levers do, so a trail with no vertical component is a district whose payment did not move."
@@ -797,6 +1007,24 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
         } This is <em>which</em> districts move;
         <a href="/scenario" data-carry-levers>how much they move</a> is on the scenario runner, at
         the same lever positions.</p>
+      ${
+        scope == null
+          ? ""
+          : `<p class="note"><strong>The other ${count(placed - scoped)} districts are still
+             drawn</strong>, muted, and they are not in any count above. A selection here changes
+             what is <em>lit</em> rather than what is plotted, for two reasons. The frame is measured
+             across every setting these levers can reach and over all ${
+               count(panel.statewide.districts)
+             } districts, so that a district which did not move looks like one that did not
+             move — fitting it to a county instead would put the ruler back on the move. And most
+             selections are not a cloud: this form refuses fewer than ${MIN_CLOUD} points, because a
+             scatter of three districts reads as a finding about a population nobody measured, and ${
+               count(small)
+             } of Ohio's ${count(allCounties.length)} counties hold fewer than ${
+               MIN_CLOUD
+             } districts. The shape of the state behind your selection is what makes a position in
+             it legible.</p>`
+      }
       ${
         outside > 0
           ? `<p class="note"><strong>${count(outside)} of ${count(placed)} districts sit outside

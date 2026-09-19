@@ -9,7 +9,8 @@
 
 import { expect, test } from "vitest";
 
-import { counties, medianRealizedAid, slugify } from "../../src/lib/county.ts";
+import { counties, medianRealizedAid } from "../../src/lib/county.ts";
+import { slugify } from "../../src/lib/routes.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
 
 const { bundle } = loadFeed();
