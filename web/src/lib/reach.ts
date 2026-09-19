@@ -321,12 +321,38 @@ export const DEFAULT_VIEW: View = {
   trails: true,
 };
 
-/** Read a view out of a query string, falling back per field rather than all-or-nothing. */
+/**
+ * Read a view out of a query string, falling back per field rather than all-or-nothing.
+ *
+ * # `ty`, and why it is not `g`
+ *
+ * The highlight was read from `g`, which is also the guarantee rule's parameter — and `toQuery`
+ * wrote both, the second write overwriting the first. So a reader who retired half the guarantee
+ * and then coloured the cloud by district type got a URL carrying `g=1`: the code, in place of the
+ * rule. Reading it back, `fromQuery` accepts `g` only as one of the four rule names, so `g=1`
+ * matched none and the guarantee fell through to `as-enacted`. The lever was silently dropped from
+ * every link that page minted, and the picture it drew was plausible.
+ *
+ * A key per meaning. `g` is the lever's, because it was the lever's first and because a link to a
+ * scenario is the thing the runner exists to be able to send someone; `ty` is the highlight's. An
+ * old link carrying the overloaded key resolves to the default highlight rather than reading a
+ * guarantee rule as a typology code.
+ */
 export function viewFromQuery(params: URLSearchParams): View {
   const dim = (raw: string | null, fallback: DimensionKey): DimensionKey =>
     raw != null && raw in DIMENSIONS ? (raw as DimensionKey) : fallback;
   const shading = params.get("c");
-  const lit = Number(params.get("g"));
+  /*
+   * The raw string first, because `Number(null)` is `0` and `0` is a code the department assigns.
+   *
+   * This was `Number(params.get(…))` straight into the range check, and a bare `/reach` carries no
+   * highlight parameter at all — so the absent case parsed as code 0, which is the department
+   * *declining to classify*, cleared `0 <= lit <= 8`, and won against the default. Three districts
+   * were lit where the default names the 300-odd rural high-poverty ones, and the page's own prose
+   * said otherwise. An empty value is treated the same way: `Number("")` is also 0.
+   */
+  const named = params.get("ty");
+  const lit = named ? Number(named) : NaN;
   return {
     x: dim(params.get("vx"), DEFAULT_VIEW.x),
     y: dim(params.get("vy"), DEFAULT_VIEW.y),

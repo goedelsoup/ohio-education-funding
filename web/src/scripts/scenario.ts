@@ -201,9 +201,17 @@ function toQuery(): void {
     params.set("vx", v.x);
     params.set("vy", v.y);
     params.set("c", v.shading);
-    // Only where it means something. A `g=` on a cloud coloured by regime is a parameter the page
-    // is not using, and a link carrying it would suggest otherwise.
-    if (v.shading === "type") params.set("g", String(v.highlight));
+    /*
+     * Only where it means something. A `ty=` on a cloud coloured by regime is a parameter the page
+     * is not using, and a link carrying it would suggest otherwise.
+     *
+     * `ty` and not `g`. This was `params.set("g", …)`, and `g` is the guarantee rule's key two
+     * dozen lines above — `set` overwrites, so colouring the cloud by district type replaced the
+     * lever in the URL with a typology code, and `fromQuery` then read `g=1` as no rule at all and
+     * fell back to `as-enacted`. Every link this page minted under that colouring silently dropped
+     * the reader's guarantee setting. See `viewFromQuery` for the whole account.
+     */
+    if (v.shading === "type") params.set("ty", String(v.highlight));
     if (!v.trails) params.set("t", "0");
   }
   // `draft` survives every lever move. It is not lever state — see `draftSlug` — and dropping it
