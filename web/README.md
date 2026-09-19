@@ -18,6 +18,7 @@ Roughly 3,500 pages, all of them static files:
 | `/outcomes` | Statewide: how little of attainment the funding side explains. |
 | `/history` | FY2009–FY2022 on the federal survey: where the money came from, and whom it reached. The only route that reaches before FY2020. |
 | `/scenario` | Move a lever and see who it reaches, across all 609, in the browser. |
+| `/reach` | The same levers asked the other question: *which* districts move, all 609 plotted against what the formula computes for them, with the guarantee wall drawn as the law it is. Scopeable to a county or to named districts. |
 | `/compare` | Two districts side by side. |
 | `/legislation` | Every act behind the formula, in the order it was signed: five regimes across fifty fiscal years, what each act did, and which biennium it paid for. Generated from the corpus. |
 | `/wiki` | The corpus — regimes, statutes, litigation, parameters, metric definitions — rendered from `.yidam/` directly. |
@@ -504,6 +505,36 @@ The vertical spread on the dots is index-based, not random: this module is pure,
 moved between builds would redraw one county two ways. Whiskers stop at the last value inside 1.5
 IQR and anything past them is its own mark, which is what keeps Ohio's one $1.35M district from
 being drawn as the end of a continuum it is nowhere near.
+
+### A selection lights the cloud rather than filtering it
+
+`/reach` can be scoped to counties and to individually named districts, and the scope decides what is
+**lit**: the whole state stays plotted, in-scope districts keep their shading and their trails, and
+the rest are muted. That is not a softer version of a filter. It is the only version that works, for
+two reasons that are both measurements.
+
+`scatterSpec` refuses fewer than twelve points — a scatter of three districts reads as a finding about
+a population nobody measured — and a null spec renders to the empty string. Ohio has **88 counties and
+a median of 6 districts in one; only 9 hold 12 or more, and 4 hold exactly one**. A filter that drew
+only the selection would have produced a card with a heading, a legend and nothing between them for
+**79 of 88 counties**, and for every selection of a single district.
+
+The frame is the stronger reason. It is measured over all 609 districts across five corner lever runs
+so that a district which did not move looks like one that did not move; refitting it to a county would
+put the ruler back on the move, and a refitted axis looks exactly like an axis. So the selection never
+reaches `envelope`.
+
+**The de-emphasis spends two channels, because one was not enough.** `--neutral-mark` is close to its
+surface by design — 1.42:1 light at the cloud's own `fill-opacity: 0.45`, which is what makes density
+legible as density — so muting a neutral dot separates it from a neutral dot by only 1.20:1. The
+radius comes down with the alpha: 1.6 against 2.4 is 44% of the area, and the two together leave about
+a fifth of the ink. Hue could not carry it at all, since under the *gained or lost* colouring neutral
+already means *unmoved*.
+
+What it costs is prose. Every count a reader reads as an answer is restated against the scope and
+names it, because "253 of 609 are paid the same" and "5 of 5 in Athens County are" are different
+claims. The clipped and the unplaced stay global — both are facts about the drawing, and all 609 are
+still drawn.
 
 ## Preview cards are the same idea, rasterized
 

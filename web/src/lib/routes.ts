@@ -327,6 +327,22 @@ export const at = (route: string, id: Section): string => `${route}#${id}`;
 export const county = (slug: string): string => `/county/${slug}`;
 
 /**
+ * `Van Wert` becomes `van-wert`. The slug is the URL and must round-trip through the router.
+ *
+ * Here rather than in `county.ts`, which is where it was, because `county.ts` renders charts and so
+ * imports `plot/ssr.ts` and through it `linkedom` — a second DOM implementation, 200 KB, which has
+ * no business in a browser and which `app.spec.ts` fails the build over if it reaches the client
+ * bundle. `/reach` names counties in a control the browser reads, so it needs the slug and cannot
+ * afford the module it lived in. This one imports nothing, which is the property that makes it safe
+ * to reach for from either side.
+ */
+export const slugify = (county: string): string =>
+  county
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+/**
  * An Ohio House district, by its number.
  *
  * Zero-padded to three characters, as the Census files number them: `/house/024`. Unpadded would

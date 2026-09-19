@@ -201,9 +201,26 @@ function toQuery(): void {
     params.set("vx", v.x);
     params.set("vy", v.y);
     params.set("c", v.shading);
-    // Only where it means something. A `g=` on a cloud coloured by regime is a parameter the page
-    // is not using, and a link carrying it would suggest otherwise.
-    if (v.shading === "type") params.set("g", String(v.highlight));
+    /*
+     * The scope, only when there is one. A bare `/reach` is the whole state and says so by carrying
+     * nothing, the way the trails do.
+     *
+     * Keys of their own rather than a share of an existing one — see the account just below of what
+     * happened the last time two meanings were written to one parameter on this page.
+     */
+    if (v.counties.length > 0) params.set("co", v.counties.join(","));
+    if (v.districts.length > 0) params.set("d", v.districts.join(","));
+    /*
+     * Only where it means something. A `ty=` on a cloud coloured by regime is a parameter the page
+     * is not using, and a link carrying it would suggest otherwise.
+     *
+     * `ty` and not `g`. This was `params.set("g", …)`, and `g` is the guarantee rule's key two
+     * dozen lines above — `set` overwrites, so colouring the cloud by district type replaced the
+     * lever in the URL with a typology code, and `fromQuery` then read `g=1` as no rule at all and
+     * fell back to `as-enacted`. Every link this page minted under that colouring silently dropped
+     * the reader's guarantee setting. See `viewFromQuery` for the whole account.
+     */
+    if (v.shading === "type") params.set("ty", String(v.highlight));
     if (!v.trails) params.set("t", "0");
   }
   // `draft` survives every lever move. It is not lever state — see `draftSlug` — and dropping it
@@ -307,7 +324,37 @@ function readView(): View {
     shading: pick("#rv-shading", DEFAULT_VIEW.shading),
     highlight: Number.isFinite(lit) ? lit : DEFAULT_VIEW.highlight,
     trails: $<HTMLInputElement>("#rv-trails")?.checked ?? DEFAULT_VIEW.trails,
+    /*
+     * The scope, from the DOM on every tick like everything else in this function.
+     *
+     * The counties are the checked boxes. The named districts are a hidden field rather than a set
+     * held in this module, and that is not a shortcut: `update` re-reads the controls on every
+     * `input`, so a selection kept only in `state` would be overwritten by whatever the DOM said the
+     * first time a reader touched a slider — the failure the note on the view's restore describes.
+     */
+    /*
+     * Both are interpolated into attribute selectors below, which is safe because both are held to a
+     * shape at every entrance: a slug is `[a-z0-9-]+` because `slugify` built it, an IRN is six
+     * digits because that is the only key a district has, and `viewFromQuery` holds a query string
+     * to the same two. Nothing here needs escaping and nothing here may stop being shaped.
+     */
+    counties: [...document.querySelectorAll<HTMLInputElement>('#reach-scope input[name="co"]:checked')].map(
+      (box) => box.value,
+    ),
+    districts: named(),
   };
+}
+
+/** The individually named districts, as the hidden field carries them. */
+function named(): string[] {
+  const raw = $<HTMLInputElement>("#rv-districts")?.value ?? "";
+  return raw.split(",").filter((irn) => irn !== "");
+}
+
+/** Write the named districts back, and hand authority to the same field `readView` reads. */
+function setNamed(irns: string[]): void {
+  const field = $<HTMLInputElement>("#rv-districts");
+  if (field) field.value = [...new Set(irns)].join(",");
 }
 
 /**
@@ -321,6 +368,97 @@ function readView(): View {
 function syncView(view: View): void {
   const pick = $("#rv-group-pick");
   if (pick) pick.hidden = view.shading !== "type";
+  syncScope(view);
+}
+
+/**
+ * The scope, as the reader sees it: a chip per selection and a count on the disclosure.
+ *
+ * Rendered from the view rather than remembered from the click, the way `syncPresets` is and for the
+ * same reason — a scope that arrived in the query string has to look exactly like one a reader built
+ * by hand, and there is only one code path if the state is derived.
+ *
+ * The chip row is hidden when there is no scope rather than showing a row that says "Every
+ * district". A chip is a thing you can take off; one that cannot be is a label pretending to be a
+ * control.
+ *
+ * A county's label comes off its own checkbox and a district's off the picker's option, so neither
+ * is spelled twice. Both were written at build time from the feed, which is what that `<label>` text
+ * and that `<option>` text are: the department's own names, with `qualifiedName`'s county qualifier
+ * on the 28 districts whose name is shared.
+ *
+ * # Why it does not rebuild on every tick
+ *
+ * `update` runs on every `input`, and a slider drag is fifty of them. The chip row is an
+ * `aria-live` region, and `replaceChildren` is a change to it whether or not anything differs — so
+ * rebuilding unconditionally would announce the whole selection fifty times to a screen reader while
+ * the reader dragged a lever that has nothing to do with it. The same reason `saying` is debounced.
+ *
+ * Compared as a string because that is what the row is a function of. Two selections that print the
+ * same print the same.
+ */
+let drawnScope = "";
+
+function syncScope(view: View): void {
+  const chips = $("#rv-chips");
+  const summary = $("#rv-county-count");
+  if (summary) {
+    summary.textContent =
+      view.counties.length === 0
+        ? `all ${document.querySelectorAll('#reach-scope input[name="co"]').length}`
+        : `${view.counties.length} selected`;
+  }
+  if (!chips) return;
+  const key = `${view.counties.join(",")}|${view.districts.join(",")}`;
+  if (key === drawnScope) return;
+  drawnScope = key;
+  const empty = view.counties.length === 0 && view.districts.length === 0;
+  chips.hidden = empty;
+  if (empty) {
+    chips.replaceChildren();
+    return;
+  }
+
+  const chip = (label: string, kind: "county" | "district", value: string): HTMLButtonElement => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "chip";
+    button.dataset[kind] = value;
+    button.append(label);
+    /* A mark that says it comes off, and out of the accessibility tree — the whole action is on
+       `aria-label`, because "Allen County" alone says nothing about what pressing it does. */
+    const off = document.createElement("span");
+    off.className = "chip-off";
+    off.setAttribute("aria-hidden", "true");
+    off.textContent = "\u00d7";
+    button.append(off);
+    button.setAttribute("aria-label", `Remove ${label} from the selection`);
+    return button;
+  };
+
+  const label = (selector: string, fallback: string): string =>
+    $(selector)?.textContent?.trim() ?? fallback;
+
+  chips.replaceChildren(
+    ...view.counties.map((slug) =>
+      chip(
+        `${label(`#reach-scope input[name="co"][value="${slug}"] + span`, slug)} County`,
+        "county",
+        slug,
+      ),
+    ),
+    ...view.districts.map((irn) =>
+      chip(label(`#rv-add option[value="${irn}"]`, irn), "district", irn),
+    ),
+  );
+
+  const clear = document.createElement("button");
+  clear.type = "button";
+  clear.className = "chip chip-clear";
+  clear.id = "rv-clear";
+  clear.textContent = "Every district";
+  clear.setAttribute("aria-label", "Clear the selection and light every district");
+  chips.append(clear);
 }
 
 function syncLabels(levers: Levers, baseYear: number): void {
@@ -590,6 +728,20 @@ function boot(panel: Panel): void {
   select("#rv-group", String(state.view.highlight));
   const trails = $<HTMLInputElement>("#rv-trails");
   if (trails) trails.checked = state.view.trails;
+  /*
+   * And the scope, into the same two places `readView` reads it back out of.
+   *
+   * The counties are checked here rather than held in `state` for exactly the reason above: the
+   * first `input` event would otherwise read the unchecked boxes and quietly discard a selection a
+   * reader had been sent. A slug the panel does not carry is dropped by `inScope` and so cannot be
+   * checked here either — `?co=nowhere` leaves every box clear, which is the whole state, which is
+   * what that link actually asks for.
+   */
+  for (const slug of state.view.counties) {
+    const box = $<HTMLInputElement>(`#reach-scope input[name="co"][value="${slug}"]`);
+    if (box) box.checked = true;
+  }
+  setNamed(state.view.districts);
 
   const fallback = defaultLevers(modelOf(panel.statewide), baseYear).horizon;
 
@@ -623,10 +775,56 @@ function boot(panel: Panel): void {
   };
 
   for (const control of document.querySelectorAll(
-    "#scenario-controls input, #scenario-controls select, #reach-view input, #reach-view select",
+    "#scenario-controls input, #scenario-controls select, #reach-view input, #reach-view select, " +
+      '#reach-scope input[name="co"]',
   )) {
     control.addEventListener("input", () => update());
   }
+
+  /*
+   * The scope's two controls that are actions rather than values.
+   *
+   * `#rv-add` is a picker, not a selection: it names one district, that district joins the set, and
+   * the control returns to its placeholder so it can name another. Left showing the last choice it
+   * would read as *the* selection while the chips said otherwise.
+   *
+   * Registered outside the loop above because neither of these is a field `readView` reads. The
+   * chips are delegated rather than bound per chip, since `syncScope` rebuilds the row on every
+   * tick and a listener attached to a chip would be thrown away with it.
+   */
+  const add = $<HTMLSelectElement>("#rv-add");
+  add?.addEventListener("change", () => {
+    const irn = add.value;
+    if (irn === "") return;
+    setNamed([...named(), irn]);
+    add.value = "";
+    update();
+  });
+
+  $("#rv-chips")?.addEventListener("click", (event) => {
+    const chip = (event.target as HTMLElement).closest<HTMLButtonElement>("button.chip");
+    if (!chip) return;
+    if (chip.classList.contains("chip-clear")) {
+      for (const box of document.querySelectorAll<HTMLInputElement>(
+        '#reach-scope input[name="co"]',
+      )) {
+        box.checked = false;
+      }
+      setNamed([]);
+    } else if (chip.dataset.county != null) {
+      const box = $<HTMLInputElement>(
+        `#reach-scope input[name="co"][value="${chip.dataset.county}"]`,
+      );
+      if (box) box.checked = false;
+    } else if (chip.dataset.district != null) {
+      setNamed(named().filter((irn) => irn !== chip.dataset.district));
+    }
+    update();
+  });
+
+  /* Enter in the scope form must not navigate. Same rule as the district index's filters, and the
+     same reason it cannot be an inline handler: `script-src 'self'` blocks one. */
+  $<HTMLFormElement>("#reach-scope")?.addEventListener("submit", (event) => event.preventDefault());
 
   /*
    * The presets, which are lever positions with names.

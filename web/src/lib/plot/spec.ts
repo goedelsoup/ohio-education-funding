@@ -603,6 +603,39 @@ export function barSpec(bars: Bar[], options: { width: number; max?: number }): 
 }
 
 /**
+ * The fewest points this form will draw a cloud of.
+ *
+ * Exported because callers reason about it. `/reach` cannot subset its cloud to a county — 79 of
+ * Ohio's 88 counties hold fewer districts than this — and the page says so in prose, so the number
+ * it says has to be this number rather than a second copy of it.
+ */
+export const MIN_CLOUD = 12;
+
+/**
+ * How a scatter's dots are drawn, and the one place the three alphas are written down.
+ *
+ * `banded` is more opaque than `plain` because banded dots carry a third measure and have to be
+ * legible one against another, where the neutral cloud only has to be legible against the card.
+ *
+ * `muted` is the de-emphasised mark — see `ScatterPoint.muted` — and it spends **two** channels
+ * rather than one. Measured against `--surface-1`, a neutral dot is 1.42:1 light and 1.65:1 dark at
+ * `plain`; at the muted alpha it is 1.18 and 1.25, which separates the two populations by only 1.20
+ * and 1.32. That is not a difference a reader picks out of six hundred overlapping dots, so the
+ * radius comes down too: 1.6 against 2.4 is 44% of the area, and alpha and area together leave
+ * about a fifth of the ink. `palette.spec.ts` holds those figures, and holds the ordering — a muted
+ * mark that stopped being the fainter of the two would be a de-emphasis that emphasised.
+ *
+ * The bar is separation from the un-muted mark and visibility above the surface, not 3:1. Nothing
+ * in this cloud has ever met 3:1: `--neutral-mark` is 2.35:1 light against `--surface-1` at full
+ * opacity, before the 0.45 the form draws it at. Small, partly transparent marks are what make
+ * density legible as density here, and the relief for that is the legend the banded forms carry.
+ */
+export const DOT = {
+  radius: { plain: 2.4, muted: 1.6 },
+  opacity: { banded: 0.62, plain: 0.45, muted: 0.22 },
+} as const;
+
+/**
  * Two measures of every district, one dot each.
  *
  * # Why this form had to exist
@@ -700,7 +733,7 @@ export function scatterSpec(
 ): Spec | null {
   // Two points are not a cloud. Same rule as the line forms, for the same reason: a scatter of
   // three districts would read as a finding about a population that has not been measured.
-  if (points.length < 12) return null;
+  if (points.length < MIN_CLOUD) return null;
 
   // Both ends of a displacement, so a trail cannot run out of the frame it is drawn in.
   const xs = points.flatMap((p) => (p.from ? [p.x, p.from.x] : [p.x]));
@@ -812,6 +845,19 @@ export function scatterSpec(
       marginRight,
       marginTop,
       marginBottom,
+      /*
+       * The radius is a pixel count, not a measure — which has to be said, because `r` became a
+       * channel when `muted` arrived and a channel goes through a scale.
+       *
+       * With `r` a constant Plot takes it as a literal radius. With `r` a function it is data, and
+       * the default `r` scale is a square-root one fitted to the values it is given: 2.4 and 1.6
+       * came out of the renderer as **3.67 and 3**. The ordering survived, so the picture still
+       * looked right, and every figure written down about it was wrong — the area ratio the
+       * de-emphasis is built on went from 44% to 67%.
+       *
+       * `identity` is what says these are already in the units the mark wants.
+       */
+      r: { type: "identity" },
       x: {
         axis: null,
         type: axes.x.log ? "log" : "linear",
@@ -865,7 +911,11 @@ export function scatterSpec(
                 y2: "y",
                 stroke: hue,
                 strokeWidth: 1,
-                strokeOpacity: 0.45,
+                /* A muted district normally draws no trail at all — `/reach` withholds the before
+                   position rather than drawing a faint segment — but a caller that supplies one
+                   gets it at the muted alpha rather than at the cloud's. */
+                strokeOpacity: (p: ScatterPoint) =>
+                  p.muted ? DOT.opacity.muted : DOT.opacity.plain,
                 className: "scatter-trail",
                 /* See `xDomain`. Where a caller has fixed the frame, a point beyond it must be
                    held at the edge rather than drawn over the card — and where the domain is
@@ -878,9 +928,12 @@ export function scatterSpec(
         Plot.dot(points, {
           x: "x",
           y: "y",
-          r: 2.4,
+          /* Both as channels rather than constants, so a muted point can be drawn as context. The
+             radius carries as much of that as the alpha does — see `DOT`. */
+          r: (p: ScatterPoint) => (p.muted ? DOT.radius.muted : DOT.radius.plain),
           fill: hue,
-          fillOpacity: banded ? 0.62 : 0.45,
+          fillOpacity: (p: ScatterPoint) =>
+            p.muted ? DOT.opacity.muted : banded ? DOT.opacity.banded : DOT.opacity.plain,
           stroke: "none",
           className: "scatter-dot",
           // As the trails: a fixed frame holds an outlier at the edge rather than painting it

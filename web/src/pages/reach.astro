@@ -32,16 +32,23 @@ import HeldFixed from "../components/HeldFixed.astro";
 import ScenarioControls from "../components/ScenarioControls.astro";
 import Base from "../layouts/Base.astro";
 import SectionAnchor from "../components/SectionAnchor.astro";
-import { loadFeed } from "../lib/feed.ts";
+import { loadFeed, qualifiedName } from "../lib/feed.ts";
 import { count, millions, pct } from "../lib/format.ts";
-import { DEFAULT_VIEW, DIMENSIONS, DIMENSION_KEYS, groups, presets } from "../lib/reach.ts";
+import {
+  DEFAULT_VIEW,
+  DIMENSIONS,
+  DIMENSION_KEYS,
+  groups,
+  presets,
+  scopeCounties,
+} from "../lib/reach.ts";
 import { LEVER_BOUNDS } from "../lib/scenario.ts";
 import { modelOf } from "../lib/policy.ts";
 import { refreshEffect } from "../lib/refresh.ts";
 import * as routes from "../lib/routes.ts";
 import { yearChip } from "../lib/year.ts";
 
-const { bundle } = loadFeed();
+const { bundle, alphabetical } = loadFeed();
 const s = bundle.statewide;
 
 /* The same worked example the scenario page's held-fixed card uses, priced from the feed's own
@@ -69,6 +76,17 @@ const axes = DIMENSION_KEYS.map((key) => ({ key, label: DIMENSIONS[key].label })
  * ones the department declines to classify, and being able to see where they sit is the point.
  */
 const types = groups(bundle.districts);
+
+/*
+ * The counties, derived from the feed like the typology groups beside them, so the picker and the
+ * cloud cannot disagree about what a county is called or which districts are in it. Eighty-eight,
+ * by name, because that is how a reader looks for one.
+ *
+ * Both lists are rendered here at build rather than fetched, which is what makes this control part
+ * of the document: a reader with no script sees the whole selection surface and it does nothing,
+ * exactly as the axis menus above it do.
+ */
+const counties = scopeCounties(bundle.districts);
 ---
 
 <Base
@@ -146,6 +164,78 @@ const types = groups(bundle.districts);
             <input type="checkbox" id="rv-trails" checked />
             <span>Trails</span>
           </label>
+        </form>
+
+        {/*
+          Which districts the reader is asking about.
+
+          Beside the axis menus rather than in the lever rail, and for the same reason they are: a
+          scope changes who the picture is *about* and not what the formula computes for them. Its
+          own form because the two are read differently — every control in `#reach-view` is a value
+          the view carries, and one of these is an action that adds to a set.
+
+          # Why it is a spotlight and not a filter
+
+          The whole state stays plotted and the selection decides what is lit. `inScope` in
+          `lib/reach.ts` carries the argument: the frame is measured over all 609 districts so that a
+          district which did not move looks like one that did not move, and a cloud of six is not a
+          cloud — `scatterSpec` refuses fewer than twelve points, and 79 of Ohio's 88 counties hold
+          fewer than twelve districts. A filter that drew only the selection would draw a blank card
+          for almost every county in the state.
+
+          # Two controls, because they are two questions
+
+          A reader browsing counties does not have one in mind and wants to see the list; a reader
+          naming a district already knows which. So the counties are checkboxes in a disclosure and
+          the districts are a picker that adds one at a time — the same control `/compare` uses for
+          the same task, rather than 609 checkboxes and 73 KB of markup.
+
+          The chips are the selection, and `#rv-districts` is where the named half of it actually
+          lives: a hidden field rather than a store in the script, because `readView` reads the DOM
+          on every tick and a set kept anywhere else would be overwritten by the controls the first
+          time a reader touched a slider.
+        */}
+        <form id="reach-scope" class="reach-scope">
+          <div class="scope-picks">
+            <label class="axis-pick">
+              <span>Add a district</span>
+              <select id="rv-add">
+                <option value="">Choose a district…</option>
+                {alphabetical.map((d) => <option value={d.irn}>{qualifiedName(d)}</option>)}
+              </select>
+            </label>
+
+            <details class="scope-counties" id="rv-counties">
+              <summary>
+                <span class="scope-hd">Counties</span>
+                <span class="scope-count" id="rv-county-count">all {counties.length}</span>
+              </summary>
+              <div class="scope-list">
+                {
+                  counties.map((c) => (
+                    <label class="scope-county">
+                      <input type="checkbox" name="co" value={c.slug} />
+                      <span>{c.name}</span>
+                      <span class="n">{c.districts}</span>
+                    </label>
+                  ))
+                }
+              </div>
+            </details>
+          </div>
+
+          {/*
+            The named districts, as a value the DOM carries. Written by the script, never by a
+            reader, and read back by `readView` — see the note above.
+          */}
+          <input type="hidden" id="rv-districts" value="" />
+
+          {/*
+            What is selected, and the only way to unselect it. Empty and hidden until there is a
+            scope: a row reading "Every district" beside a control that already says so is a chip
+            that never does anything.
+          */}
+          <div class="chips" id="rv-chips" aria-live="polite" hidden></div>
         </form>
 
         <noscript>
