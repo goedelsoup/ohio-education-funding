@@ -14,15 +14,27 @@ description: |
   formula pays** against `[L1] FY21 Funding Base`:
 
       [K] = max( [L1]  -  ( [H] Foundation Funding + [I] Guarantee
-                            + [J] Supplemental Targeted Assistance + [K] Transportation ),
+                            + [J] Transportation ),
                  0 )
 
-  ### Three mechanisms anchored to one year
+  Supplemental targeted assistance is a fourth term in the department's formula and pays zero
+  for every district in FY2027, so it drops out of the reproduction rather than being dropped.
+
+  ### Three mechanisms, two years, and a line outside the measure
 
   With this and [transportation's own guarantee](fsfp-transportation.yml), Ohio holds districts
-  harmless against FY2021 in three places, on three bases, over three overlapping-but-distinct
-  sets of districts. A reader asking "what is a district held at?" has three answers and needs
-  to know which one is operating.
+  harmless in three places, on four bases, over three overlapping-but-distinct sets of
+  districts. A reader asking "what is a district held at?" has three answers and needs to know
+  which one is operating.
+
+  Two of those bases are **FY2020**, not FY2021: `[H2]` and `[F1]` both reach past Executive
+  Order 2020-19D under the two divisions of R.C. 3317.019, and `[H3]` — the slice that
+  partitions `[H2]` — reaches to FY2019. Only `[L1]` is what its heading says.
+
+  And this line sits **outside** `[H] Foundation Funding` *and* outside foundation aid: `[N]`
+  adds it to `[H]` alongside the guarantee, so it is absent from `realized_aid` and present in
+  `[R]`. Every share the corpus has stated "of the guarantee" has a denominator $63.6m narrower
+  than the hold-harmless money actually is.
 findings: |
   So a district whose foundation funding has held up but whose *transportation* has fallen can
   draw this while drawing nothing from the guarantee — and **17 of the 144 do exactly that**.
@@ -70,6 +82,23 @@ figures:
     as_written: "38 on transportation's**"
 
 revisions:
+  - was: |
+      The heading read "Three mechanisms anchored to one year", and the body "Ohio holds
+      districts harmless against FY2021 in three places, on three bases".
+    now: |
+      Two of the three reach back to FY2020 and one of the bases to FY2019. The corpus retired
+      the FY2021 reading for `[F1]` and `[H2]` in `the_year_the_column_header_names.rs` and
+      `the_year_the_guarantee_holds_to.rs`; that correction reached `fsfp-transportation` and
+      the class README and not this node. The `[K]` formula also carried the FY2022 edition's
+      lettering, in which `[J]` was supplemental targeted assistance and `[K]` transportation.
+    found_by: |
+      [`crates/project/tests/the_floors_the_guarantee_denominator_left_out.rs`](../../../crates/project/tests/the_floors_the_guarantee_denominator_left_out.rs),
+      enumerating all four devices and pinning each base to its anchor year.
+    reach: |
+      Two further carriers of the retired reading survived the correction that settled it:
+      this node and `the_supplements_outside_the_formula.rs`, whose test was named
+      `three_separate_mechanisms_are_anchored_to_fiscal_2021`. Both are fixed in the same
+      commit. The figure gate does not read prose, so nothing caught either.
   - was: |
       The statutory home of this payment was recorded as unreadable: "Reading the enacted bill
       text is `lsc-budget`, still blocked on PDFs", with the bill section marked `[open]`.
