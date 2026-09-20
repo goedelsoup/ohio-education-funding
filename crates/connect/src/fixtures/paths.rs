@@ -212,6 +212,26 @@ pub const SESSION_LAW_FIXTURE: &str = "crates/project/fixtures/session-law-lines
 /// ones are a few pages against ninety-four.
 pub const CORRECTIONS_FIXTURE: &str = "crates/project/fixtures/hb583-corrections.txt";
 
+/// Where the text of the bill the Fair School Funding Plan was drafted in is written, relative to
+/// the repository root.
+///
+/// # Why an un-enacted bill is committed at all
+///
+/// H.B. 1 of the 134th General Assembly never became law. H.B. 110 did, and where the two differ
+/// the act governs — nothing here is authority for what the law *is*. What it is authority for is
+/// what the plan's own drafters wrote, which is a different question and the one
+/// [issue #399](https://github.com/goedelsoup/ohio-education-funding/issues/399) asks: whether a
+/// choice visible in the enacted text was made in the workgroup bill or in the budget.
+///
+/// A budget act cannot answer that, because it carries the provision without its history. This
+/// bill enacts R.C. 3317.0217 and R.C. 3317.03 in the same document, which makes the two readable
+/// against each other at the moment they were written.
+///
+/// Committed whole, on the same ground [`CORRECTIONS_FIXTURE`] is: it is an education bill by its
+/// own title — "Create new school financing system" — and its non-education sections are a few
+/// pages against three hundred.
+pub const PLAN_BILL_FIXTURE: &str = "crates/project/fixtures/hb1-134-as-introduced.txt";
+
 /// Where the Ohio slice of the CCD agency directory is written, relative to the repository root.
 pub const CCD_DIRECTORY_FIXTURE: &str = "crates/dispersion/fixtures/ccd-lea-directory.csv";
 
@@ -320,6 +340,7 @@ pub const REBUILT: &[&str] = &[
     CCD_DIRECTORY_FIXTURE,
     TYPOLOGY_FIXTURE,
     SESSION_LAW_FIXTURE,
+    PLAN_BILL_FIXTURE,
     CORRECTIONS_FIXTURE,
     TRANSFER_FIXTURE,
     BUILDING_FIXTURE,

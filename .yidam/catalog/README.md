@@ -67,12 +67,13 @@ Sorted by: type, then slug.
 | [`ocg-white-paper-013`](ocg-white-paper-013.md) | OCG White Paper No. 013 — Does Per-Pupil Spending Track Academic Performance? | 4 |
 | [`ocg-white-paper-015`](ocg-white-paper-015.md) | OCG White Paper No. 015 — Has Ohio Been Defunding Public Education? | 2 |
 | [`ode-idea-part-b-allocations`](ode-idea-part-b-allocations.md) | IDEA Part B Allocations to Districts | 4 |
+| [`ohio-bill-versions`](ohio-bill-versions.md) | Ohio bill versions — what was proposed, not what was enacted | 0 |
 | [`ohio-bills`](ohio-bills.md) | Ohio bills before enactment — the text as introduced | 3 |
 | [`ohio-essa-state-plan`](ohio-essa-state-plan.md) | Ohio's Consolidated State Plan under ESSA, and the April 2026 School Improvement amendment | 5 |
 | [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 19 |
 | [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 3 |
 
-49 entries, 0 not yet cited by any corpus node. 237 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+50 entries, 1 not yet cited by any corpus node. 238 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

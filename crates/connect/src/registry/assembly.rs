@@ -451,6 +451,47 @@ pub(super) const LAWS: Connector = Connector {
     sources: OHIO_LAWS_SECTIONS,
 };
 
+pub(super) const PLAN_BILL: Connector = Connector {
+    key: "ohio-bill-versions",
+    publisher: "Ohio General Assembly",
+    feeds: &["formula-component", "legislation"],
+    status: Status::Wired {
+        still_blocked: None,
+    },
+    note: "A bill version, which is neither an act nor an analysis. Kept apart from \
+           `ohio-session-laws` because that connector's whole warrant is that an enrolled act is \
+           what the legislature *enacted*; these documents are what somebody *proposed*, and a \
+           single connector would carry one status for two kinds of authority. An un-enacted \
+           bill cannot establish what the law is and this corpus must never read one that way. \
+           What it establishes is drafting: which provisions were written together, by whom, and \
+           in what order — questions the enacted text carries no trace of.",
+    sources: &[Source {
+        key: "hb1-134-introduced",
+        title: Some("H.B. 1 of the 134th General Assembly, as introduced"),
+        url: "https://search-prod.lis.state.oh.us/api/v2/general_assembly_134/\
+              legislation/hb1/00_IN/pdf/",
+        filename: "hb1-134-introduced.pdf",
+        format: Format::Pdf,
+        catalog: Some("ohio-bill-versions"),
+        fixtures: &[crate::fixtures::PLAN_BILL_FIXTURE],
+        note: "The Fair School Funding Plan as Cupp-Patterson's successors introduced it — \
+               Callender and Sweeney, February 2021 — under the title \"Create new school \
+               financing system\". It never passed the Senate, and H.B. 110 enacted the formula \
+               four months later.\n\n\
+               It enacts R.C. 3317.0217 and amends R.C. 3317.03 in one document, fifty-five \
+               lines apart, which is what makes it evidence rather than background: \
+               R.C. 3317.0217(C)(1)'s denominator already reads exactly as it does in force \
+               today, adjusting for one of the channels the section it cross-references lists. \
+               That list has **ten** entries here, (a) through (j); current law has nine, \
+               college-preparatory boarding schools having since dropped out. So the choice of \
+               one channel was made by the plan's own drafters and not by the budget, which is \
+               the only thing this document is committed to settle.\n\n\
+               Version code `00_IN`. The legislature's own document index is client-rendered and \
+               lists no LSC analysis for this bill — there is none, because LSC writes greenbooks \
+               for enacted budgets — so the bill text is the whole of what is retrievable.",
+    }],
+};
+
 pub(super) const SESSION_LAWS: Connector = Connector {
     key: "ohio-session-laws",
     publisher: "Ohio General Assembly",

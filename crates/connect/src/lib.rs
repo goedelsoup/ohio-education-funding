@@ -1506,6 +1506,15 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(cause) => Rebuilt::skipped(fixtures::CORRECTIONS_FIXTURE, cause),
     });
 
+    // The bill the plan was drafted in. Committed whole and skipped rather than fatal on the
+    // same two counts the corrective act is: the PDF may not be cached, and `pdftotext` may not
+    // be installed.
+    let plan_bill = registered("hb1-134-introduced");
+    out.push(match cache::pdf_text(root, plan_bill) {
+        Ok(text) => text_fixture(root, fixtures::PLAN_BILL_FIXTURE, text.trim())?,
+        Err(cause) => Rebuilt::skipped(fixtures::PLAN_BILL_FIXTURE, cause),
+    });
+
     // The one statewide table here. Skipped rather than fatal on the same two counts the
     // corrective act is: the PDF may not be cached, and `pdftotext` may not be installed.
     let landscape = registered("education-landscape-2024");
