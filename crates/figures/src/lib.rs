@@ -239,6 +239,8 @@ pub struct Inputs {
     pub fund_the_plan: project::drafts::Priced,
     /// The guarantee scenario, every run of it, on both answers to what §265.225 does.
     pub guarantee: Guarantee,
+    /// What the formula pays a district to do, at the margin.
+    pub margins: Margins,
     /// Total taxable value as Table SD-1 publishes it, summed over the districts the county
     /// abstract can recognize.
     pub actual_total: f64,
@@ -479,6 +481,116 @@ impl Guarantee {
     }
 }
 
+/// What the formula pays a district **to do**, from [`project::margin`].
+///
+/// Built once because every member walks the 609-district panel at least twice — a margin is the
+/// difference between two runs of `policy::apply` — and ten figures below read them.
+///
+/// The one thing to hold while reading these: three of the margins are priced at zero or at
+/// transportation alone, and they are the ones no district chooses. `project::margin`'s own docs
+/// carry the ordering.
+pub struct Margins {
+    /// One pupil fewer, per district, at current law.
+    pub pupil: Vec<project::margin::Pupil>,
+    /// Every district's enrolment down one per cent at once, which is where the floors show.
+    pub statewide: project::margin::Aggregate,
+    /// Each formula district's distance to its own guarantee floor.
+    pub headroom: Vec<project::margin::Headroom>,
+    /// The districts short of `[M]`'s threshold, and what clearing it would pay.
+    pub cliff: Vec<project::margin::Cliff>,
+    /// The clawback margin, for every district `[I1]` is charged against.
+    pub clawback: Vec<project::margin::OpenEnrolment>,
+    /// The charge on a dollar of assessed valuation, where no floor already zeroes it.
+    pub wealth: Vec<project::margin::Wealth>,
+}
+
+impl Margins {
+    /// How many districts are in one marginal regime.
+    #[must_use]
+    pub fn districts(&self, response: project::margin::Response) -> f64 {
+        self.pupil.iter().filter(|p| p.response == response).count() as f64
+    }
+
+    /// The median marginal pupil in one regime, on total state support.
+    #[must_use]
+    pub fn median_marginal(&self, response: project::margin::Response) -> f64 {
+        median(
+            self.pupil
+                .iter()
+                .filter(|p| p.response == response)
+                .map(|p| p.marginal)
+                .collect(),
+        )
+    }
+
+    /// Districts that lose no foundation aid at all when a pupil leaves.
+    ///
+    /// The guaranteed ones, both regimes together — the guarantee holds `[H] + [I]` level, and it is
+    /// `[J]`, outside the measure, that separates the two.
+    #[must_use]
+    pub fn no_foundation_aid(&self) -> f64 {
+        self.pupil
+            .iter()
+            .filter(|p| p.foundation.abs() < project::margin::CENT)
+            .count() as f64
+    }
+
+    /// Formula districts whose own enrolment trend reaches their floor inside a year.
+    #[must_use]
+    pub fn within_a_year(&self) -> f64 {
+        self.headroom
+            .iter()
+            .filter(|h| h.years.is_some_and(|years| years <= 1.0))
+            .count() as f64
+    }
+
+    /// What the pupil at the top of `[M]`'s cliff is worth.
+    ///
+    /// The supplement pays on the whole roll and tests on the increment, so the district closest to
+    /// the threshold carries every dollar the other pupils do not.
+    #[must_use]
+    pub fn steepest_cliff(&self) -> f64 {
+        self.cliff
+            .iter()
+            .map(project::margin::Cliff::per_pupil)
+            .fold(0.0, f64::max)
+    }
+
+    /// Districts for which one open-enrolment FTE is worth the whole statewide average base cost.
+    ///
+    /// The guaranteed districts `[I1]` reaches that `[K]` does not backstop.
+    #[must_use]
+    pub fn clawback_exposed(&self) -> f64 {
+        self.clawback
+            .iter()
+            .filter(|m| m.marginal.abs() > project::margin::CENT)
+            .count() as f64
+    }
+
+    /// Districts charged for valuation that H.B. 920 lets them collect nothing on.
+    #[must_use]
+    pub fn charged_for_nothing(&self) -> f64 {
+        self.wealth
+            .iter()
+            .filter(|w| !w.status.valuation_growth_reaches_revenue())
+            .count() as f64
+    }
+
+    /// The median share of a new valuation dollar's local yield the state takes back.
+    ///
+    /// Over the districts at the twenty-mill floor, which are the only ones the dollar yields
+    /// anything to at all.
+    #[must_use]
+    pub fn recapture(&self) -> f64 {
+        median(
+            self.wealth
+                .iter()
+                .filter_map(project::margin::Wealth::recapture)
+                .collect(),
+        )
+    }
+}
+
 impl Inputs {
     /// Read the fixtures and run both counterfactuals.
     #[must_use]
@@ -495,6 +607,7 @@ impl Inputs {
         let panel_for_reach = panel.clone();
         let panel_for_forecasts = panel.clone();
         let panel_for_guarantee = panel.clone();
+        let panel_for_margins = panel.clone();
         let recognized: HashMap<String, Recognition> = recognized_valuation::from_abstract(2024);
         let at_recognized = panel_at_fy2027(
             &panel,
@@ -581,6 +694,21 @@ impl Inputs {
                         GuaranteeRule::Removed,
                     ),
                     base_cost: [scaled(1.02), scaled(1.05), scaled(1.10), scaled(1.20)],
+                }
+            },
+            margins: {
+                let law = project::policy::Policy::current_law();
+                Margins {
+                    pupil: project::margin::pupil(&panel_for_margins, &law),
+                    statewide: project::margin::statewide(
+                        &panel_for_margins,
+                        &law,
+                        project::margin::SHOCK,
+                    ),
+                    headroom: project::margin::headroom(&panel_for_margins, &law),
+                    cliff: project::margin::growth_cliff(&panel_for_margins),
+                    clawback: project::margin::open_enrolment(&panel_for_margins, &law),
+                    wealth: project::margin::wealth(&panel_for_margins),
                 }
             },
             actual_total,
@@ -8500,6 +8628,124 @@ pub static FIGURES: &[Figure] = &[
         pinned: 1_443_268_152.36,
         tolerance: 0.005,
         compute: |i| i.guarantee.base_cost[3].foundation_cost(),
+    },
+    Figure {
+        // The four margins #388 asked for. Every one of these is a difference between two runs of
+        // `policy::apply`, and the finding is the ORDERING rather than any single number: the
+        // margins no district chooses are priced at zero, and the two a board votes on are priced
+        // at the statewide average base cost and at half a million dollars.
+        key: "project/marginal-pupil-insulated-districts",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts whose total state support does not move at all when they lose one pupil \
+                -- the ones `[K]` holds at a total rather than at a level",
+        pinned: 144.0,
+        tolerance: 0.0,
+        compute: |i| i.margins.districts(project::margin::Response::Insulated),
+    },
+    Figure {
+        key: "project/marginal-pupil-no-foundation-aid-districts",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts that lose no foundation aid whatever when they lose one pupil -- every \
+                district the guarantee pays",
+        pinned: 294.0,
+        tolerance: 0.0,
+        compute: |i| i.margins.no_foundation_aid(),
+    },
+    Figure {
+        key: "project/marginal-pupil-guaranteed-median",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What one pupil costs the median guaranteed district drawing no `[K]` -- exactly \
+                its transportation aid, because `[J]` is outside the measure the guarantee holds",
+        pinned: 503.40,
+        tolerance: 0.005,
+        compute: |i| {
+            i.margins
+                .median_marginal(project::margin::Response::TransportationOnly)
+        },
+    },
+    Figure {
+        key: "project/marginal-pupil-formula-median",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And what one pupil costs the median district on formula, which is seventeen times \
+                as much",
+        pinned: 8_516.08,
+        tolerance: 0.005,
+        compute: |i| i.margins.median_marginal(project::margin::Response::Full),
+    },
+    Figure {
+        key: "project/statewide-marginal-share-of-average",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "How much of Ohio's per-pupil funding follows a pupil: the state's saving per pupil \
+                when every district's roll falls one per cent, over its average per pupil",
+        pinned: 0.566_3,
+        tolerance: 0.000_05,
+        compute: |i| i.margins.statewide.share(),
+    },
+    Figure {
+        key: "project/formula-districts-a-year-from-the-floor",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Formula districts whose own enrolment trend reaches their FY2020 floor inside one \
+                year -- the boundary measured in time rather than in dollars",
+        pinned: 17.0,
+        tolerance: 0.0,
+        compute: |i| i.margins.within_a_year(),
+    },
+    Figure {
+        key: "project/wealth-charge-districts",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts a dollar of new assessed valuation actually costs state aid, of 609 -- \
+                the rest are held, backstopped, or on the minimum state share",
+        pinned: 268.0,
+        tolerance: 0.0,
+        compute: |i| i.margins.wealth.len() as f64,
+    },
+    Figure {
+        key: "project/wealth-charge-districts-collecting-nothing",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of those, the ones above the twenty-mill floor, where H.B. 920 reduction factors \
+                mean the valuation they are charged for yields them no revenue at all",
+        pinned: 181.0,
+        tolerance: 0.0,
+        compute: |i| i.margins.charged_for_nothing(),
+    },
+    Figure {
+        key: "project/wealth-charge-recapture-at-the-twenty-mill-floor",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "At the twenty-mill floor the valuation does yield revenue -- and this is the \
+                median share of it the state takes back through a lower state share of base cost",
+        pinned: 0.632_6,
+        tolerance: 0.000_05,
+        compute: |i| i.margins.recapture(),
+    },
+    Figure {
+        key: "project/clawback-margin-exposed-districts",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts for which one open-enrolment FTE is worth the whole statewide average \
+                base cost -- the guaranteed districts `[I1]` reaches that `[K]` does not backstop",
+        pinned: 9.0,
+        tolerance: 0.0,
+        compute: |i| i.margins.clawback_exposed(),
+    },
+    Figure {
+        key: "project/growth-supplement-cliff-per-pupil",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the pupil at the top of `[M]`'s cliff is worth -- the supplement pays on the \
+                whole roll and tests on the increment, so the last pupil before the test passes \
+                carries every dollar the others do not",
+        pinned: 516_984.45,
+        tolerance: 0.005,
+        compute: |i| i.margins.steepest_cliff(),
     },
     Figure {
         key: "project/districts-on-the-guarantee-at-two-per-cent-more-base-cost",

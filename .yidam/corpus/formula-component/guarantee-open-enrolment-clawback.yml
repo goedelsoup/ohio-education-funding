@@ -90,6 +90,29 @@ findings: |
   direction, and because a guarantee described without it reproduces correctly for 566
   districts and wrongly for 43 — an error rate low enough to read as rounding. Naming it
   separately is what makes its absence from an account visible. [inference]
+
+  ### What an open-enrolment FTE is worth beside one of the district's own children
+
+  The description above compares the charge against what the state was paying for the departing
+  pupil. Compare it instead against what the district actually loses at the margin, and the gap is
+  both wider and differently shaped. A guaranteed district loses **no foundation aid at all** when
+  one of its own pupils leaves, because the guarantee holds that line level — so its resident margin
+  is its transportation aid alone, between $319.46 and $1,902.03, while the open-enrolment margin is
+  the undiminished $8,241.61. [verified] (crates/project)
+
+  That is between **4.33 and 25.80 times** as much for another district's child as for one of its
+  own. [verified] (crates/project)
+
+  And the exposed population is smaller than either count above, for a reason neither carries:
+  [`[K]`](fsfp-formula-transition-supplement.yml) holds 12 of the 21 guaranteed districts at a
+  *total*, so for them the clawback comes off a line the supplement immediately restores. **9
+  districts** are actually exposed to it. [verified] (crates/project) Repeal Section 265.225 and all
+  21 are.
+
+  None of this settles the open question above about intent — a price is not a purpose. What it does
+  settle is the magnitude: "roughly ten times what the departing pupil was costing the state" is the
+  right order and the wrong comparison, because at the margin the state was costing itself nothing
+  for that pupil. [inference]
 properties:
   name: Open enrolment adjustment
   function: |
@@ -122,6 +145,10 @@ properties:
     withheld. Largest single reduction $674,561 (Columbus City, 106.2 FTE against a 24.3
     threshold); next $640,025 (Cuyahoga Falls, 118.1 FTE). [verified]
 figures:
+  - key: project/clawback-margin-exposed-districts
+    value: 9
+    field: findings
+    as_written: "**9\n  districts** are actually exposed to it"
   - key: project/fy2025-open-enrolment-clawback-districts
     value: 41
     field: findings

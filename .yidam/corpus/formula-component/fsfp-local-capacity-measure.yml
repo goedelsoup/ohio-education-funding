@@ -446,6 +446,39 @@ findings: |
   name is keyed on residence against attendance and reaches, in LSC's words, *"primarily lower
   wealth, urban districts"*. The name is continuous across the greenbooks and the programme is not.
   [verified] (`crates/project`)
+
+  ### There is no millage term, so the measure cannot see a levy
+
+  The blend is valuation and income, and the rate that scales it is computed from income. Nothing in
+  it is a tax rate anybody votes on: the department's FY2027 model carries 165 columns and the only
+  one of them that is a rate at all is `capacity_rate`, R.C. 3317.017(A)(4)'s sliding scale.
+  [verified] (crates/project) Two districts with the same tax base and twenty mills between their
+  effective rates are charged the same local capacity to the cent.
+
+  **So a district is charged for its tax base and never for its tax rate.** Passing a levy costs it
+  no state aid and failing to pass one gains it none, which dissolves rather than answers the
+  question of whether the plan rewards low local effort: effort is not an input. What the measure
+  does charge for is assessed value, and that charge is real — about 1.2 cents of state aid per
+  dollar of taxable value once the rise has worked through (A)(1)(a)'s three-year average. It is
+  `0.6 x capacity rate`, amplified by the four categoricals R.C. 3317.022 multiplies by the state
+  share percentage. [verified] (crates/project)
+
+  It reaches **268 districts** of 609. For the other 341 it is exactly zero: 138 sit on the
+  [minimum state share](../parameter/minimum-state-share.yml), where the floor censors the whole
+  quantity the charge would come out of, and the rest are held by the
+  [guarantee](temporary-transitional-aid-guarantee.yml) or by
+  [`[K]`](fsfp-formula-transition-supplement.yml), which puts the loss straight back. [verified]
+  (crates/project)
+
+  Of the 268, **181** are above the twenty-mill floor, where H.B. 920's reduction factors mean the
+  value they are charged for yields them no revenue whatever — see [that
+  parameter](../parameter/twenty-mill-floor.yml) for what the two sides of the boundary collect.
+  [verified] (crates/project)
+
+  Where any agency exists is a school board's part in consenting to property tax exemptions, an
+  exemption being the one instrument that lowers the base this charge is levied on. **[open]**
+  Nothing in this repository models abatement and no catalog record reaches district-level exempt
+  value, so whether 1.2 cents is large enough to move a consent vote is not answered here.
 revisions:
   - was: |
       R.C. 3317.03(A)(2) was recorded as listing **nine** channels, and the open-enrolment
@@ -687,6 +720,14 @@ properties:
   statutory_basis: R.C. 3317.017; state share and state share percentage at 3317.017(B) and (C). [verified]
   calculator: local-capacity
 figures:
+  - key: project/wealth-charge-districts
+    value: 268
+    field: findings
+    as_written: "It reaches **268 districts** of 609"
+  - key: project/wealth-charge-districts-collecting-nothing
+    value: 181
+    field: findings
+    as_written: "Of the 268, **181** are above the twenty-mill floor"
   - key: project/resident-less-enrolled-gap
     value: 222922.71080000012
     field: findings

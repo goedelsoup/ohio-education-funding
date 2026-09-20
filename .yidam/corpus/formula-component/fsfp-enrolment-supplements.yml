@@ -47,7 +47,36 @@ description: |
 
   Why 3% and why three years. Both are single numbers with a cliff behind them and
   neither is explained in the calculator. [open]
+findings: |
+  ### The cliff, priced in children rather than in dollars
+
+  "$430,477 for three hundredths of a percentage point" states the cliff in money. Stated in
+  children it is sharper: on the supplement's own measure New Lexington is **0.83 of one pupil**
+  short of the threshold, which prices the marginal child there at **$516,984.45**. [verified]
+  (crates/project) Two thousand times the $250 a pupil the rule is written at, for one enrolment.
+
+  Two districts sit within one pupil of the threshold and fifteen within ten, of 566 short of it at
+  all. [verified] (crates/project)
+
+  ### And it is one of only two margins in this formula a board can act on
+
+  Almost everything the plan prices hangs on something nobody chooses. A district's resident
+  enrolment and its assessed valuation are not board decisions, and for the 294 districts the
+  [guarantee](temporary-transitional-aid-guarantee.yml) pays, the marginal resident pupil is worth
+  nothing whatever. Whom a district *admits* is a board decision, taken under an open-enrolment
+  policy adopted pursuant to R.C. 3313.98 — and both of the formula's largest marginal prices hang
+  on it: this cliff, and the [open-enrolment clawback](guarantee-open-enrolment-clawback.yml)'s
+  $8,241.61 an FTE. [inference]
+
+  Nothing here claims any board has acted on either. The claim is that these two are the only prices
+  in the formula a board could act on inside a year, and that they are the largest by three orders of
+  magnitude — the inverse of how an incentive would be designed, and a side effect of paying on a
+  level while testing on an increment. [inference]
 figures:
+  - key: project/growth-supplement-cliff-per-pupil
+    value: 516984.4527662955
+    field: findings
+    as_written: "prices the marginal child there at **$516,984.45**"
   - key: project/base-funding-supplement-total
     value: 56079575.54
     field: description
