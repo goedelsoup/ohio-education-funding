@@ -406,15 +406,37 @@ findings: |
   Peterson and 75% of non-e-school community schools — and **open enrolment is not in it**.
   [verified] (`crates/project`)
 
-  So the two corrections were a matched pair, and H.B. 110 kept one. Its denominator adjustment
-  covers open enrolment, which is exactly the channel prior law's multiplier adjustment did not
-  reach; the other eight lost their correction when the deduct architecture that hosted it was
-  abolished, and gained none on the denominator side. The choice children went from being in the
-  denominator and out of the multiplier to being out of both. [inference]
+  The two corrections are **not** complements, though. Prior law's netting list names three of the
+  nine channels R.C. 3317.03(A)(2) lists — community school, EdChoice, Jon Peterson — and the new
+  denominator adjustment reaches one, open enrolment. Together they reach four. Alternative schools,
+  College Credit Plus, educational service centers, compact districts and STEM schools are reached
+  by **neither**. [verified] (`crates/project`)
 
-  **[open]** Whether that complementarity is by construction or by coincidence, and if by
-  construction, whether anyone traced the denominator-side consequence when the multiplier-side
-  correction was removed. See [issue #399](https://github.com/goedelsoup/ohio-education-funding/issues/399).
+  What is continuous is narrower and exact: **the one channel prior law let a district keep targeted
+  assistance for is the one channel the new denominator adds back.** Open enrolment's deduct was
+  computed on the formula amount and career-technical weight, so targeted assistance never followed
+  an open-enrolling child, and prior law did not net one out. R.C. 3317.0217(C)(1) reproduces that
+  treatment in a regime where the count changed from residence to attendance. [inference]
+
+  ### And this is the component the denominator reaches furthest into
+
+  R.C. 3317.0217(C)(1) is the one place the plan already concedes the principle. It divides weighted
+  wealth by a residence-flavoured count and multiplies the resulting rate by **enrolled** ADM — so
+  targeted assistance already measures wealth against the children a district is responsible for and
+  pays against the children it teaches. The question it leaves is only how far that count reaches.
+
+  Run the same denominator out to Table SD-1's resident count, holding the enrolled-ADM multiplier
+  fixed, and the wealth tier moves from **$1.030bn** to **$1.463bn** — **$433.1m**, to 489 districts,
+  against $0.3m off seven. That is **2.4 times** what the four categoricals carry, and it is a
+  channel neither this node nor #384 had priced. [verified] (`crates/project`)
+
+  The reconstruction is checked against the department's published `[F]` before the counterfactual
+  is run on it, because the failure mode is silent: `[D]` divides by the adjusted count and `[F]`
+  multiplies by enrolled ADM, and using the adjusted count for both overstates the tier by a factor
+  of **38** while still returning a plausible number. [verified] (`crates/project`)
+
+  **[open]** Whether the General Assembly weighed the reach of R.C. 3317.0217(C)(1)'s denominator
+  when it wrote it. See [issue #399](https://github.com/goedelsoup/ohio-education-funding/issues/399).
 
   ### A hazard for anyone reading the supplement's name backwards
 
@@ -425,6 +447,24 @@ findings: |
   wealth, urban districts"*. The name is continuous across the greenbooks and the programme is not.
   [verified] (`crates/project`)
 revisions:
+  - was: |
+      The open-enrolment adjustment and prior law's multiplier netting were recorded as "a matched
+      pair, and H.B. 110 kept one" — the half that "had no home on the payment side" once the
+      deduct architecture was abolished.
+    now: |
+      They are not complements. Prior law's netting reaches three of the nine channels of
+      R.C. 3317.03(A)(2) and the new adjustment reaches one; **five are reached by neither**. What
+      is continuous is exact but narrower: open enrolment is the one channel prior law let a
+      district keep targeted assistance for, and it is the one the new denominator adds back.
+    found_by: |
+      `prior_laws_netting_reaches_three_channels_and_the_new_adjustment_reaches_one`, which counts
+      the netting list against the nine channels rather than reading it as a set.
+    reach: |
+      "Complement" was inferred from one absence — open enrolment missing from the netting list —
+      without checking the other eight channels against it. One matching absence is not a partition,
+      and a tidy story about two halves of a design is the kind that survives because it is
+      pleasant. Neither regime ever had a principled denominator; the error was supposing the old
+      one did.
   - was: |
       The open-enrolment adjustment in R.C. 3317.0217(C)(1) was left as a question about drafting —
       "why H.B. 110 reconstructed the open-enrolment channel of the old residence count and not the
@@ -666,6 +706,14 @@ figures:
     value: 57464582.255979516
     field: findings
     as_written: "$57.5m in total**"
+  - key: project/targeted-assistance-wealth-tier-as-written
+    value: 1030296442.0664958
+    field: findings
+    as_written: "moves from **$1.030bn** to"
+  - key: project/targeted-assistance-wealth-tier-on-the-resident-count
+    value: 1463407246.0778303
+    field: findings
+    as_written: "to **$1.463bn**"
   - key: project/capacity-denominator-charge-relief
     value: 659062635.5073502
     field: findings

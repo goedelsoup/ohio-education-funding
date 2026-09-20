@@ -9709,6 +9709,26 @@ pub static FIGURES: &[Figure] = &[
         },
     },
     Figure {
+        key: "project/targeted-assistance-wealth-tier-as-written",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Targeted assistance's wealth tier on the residence-flavoured count the statute \
+                itself uses",
+        pinned: 1_030_296_442.066_495_8,
+        tolerance: 200.0,
+        compute: |_| project::capacity_denominator::targeted_assistance_on_the_resident_count().0,
+    },
+    Figure {
+        key: "project/targeted-assistance-wealth-tier-on-the-resident-count",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And on Table SD-1's full resident count, with the enrolled-ADM multiplier held \
+                fixed \u{2014} the eight channels the statute's own adjustment does not reach",
+        pinned: 1_463_407_246.077_830_3,
+        tolerance: 200.0,
+        compute: |_| project::capacity_denominator::targeted_assistance_on_the_resident_count().1,
+    },
+    Figure {
         key: "project/capacity-denominator-charge-relief",
         owner: "crates/project",
         unit: Unit::Dollars,

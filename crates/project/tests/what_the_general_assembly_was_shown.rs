@@ -300,6 +300,73 @@ fn open_enrolment_is_the_channel_prior_laws_multiplier_did_not_reach() {
     );
 }
 
+/// The two corrections are not complements, and five channels are reached by neither.
+///
+/// #399 asked whether prior law's multiplier netting and R.C. 3317.0217(C)(1)'s denominator
+/// adjustment are complementary by construction. They are not. Prior law's netting list names
+/// **three** of the nine channels R.C. 3317.03(A)(2) now lists — community school (e-schools
+/// called out separately, the rest at 75%), the EdChoice nonpublic scholarship, and the Jon
+/// Peterson provider scholarship. H.B. 110's adjustment reaches **one**, open enrolment. Together
+/// they reach four, and alternative schools, College Credit Plus, educational service centers,
+/// compact districts and STEM schools are reached by neither.
+///
+/// So the neat story — two halves of one design, one surviving the deduct's abolition — is wrong.
+/// What survives is narrower: the one channel prior law let a district keep targeted assistance
+/// for is the one channel the new denominator adds back.
+#[test]
+fn prior_laws_netting_reaches_three_channels_and_the_new_adjustment_reaches_one() {
+    let hb59 = greenbook("hb59").flat();
+    let netting = hb59
+        .split_once("Tier one targeted assistance = Tier one targeted assistance per pupil x ")
+        .expect("the tier one formula is in the analysis")
+        .1
+        .split_once(')')
+        .expect("the netting list is parenthesised")
+        .0
+        .to_lowercase();
+
+    // The channels of R.C. 3317.03(A)(2), and the word prior law's netting list would name each
+    // by. `None` means the list has no term for it at all.
+    let channels: [(&str, Option<&str>); 9] = [
+        ("(a) community school", Some("community school")),
+        ("(b) alternative school", None),
+        ("(c) college, under College Credit Plus", None),
+        ("(d) open enrolment", None),
+        ("(e) educational service center", None),
+        ("(f) another district by compact", None),
+        (
+            "(g) chartered nonpublic with a scholarship",
+            Some("edchoice"),
+        ),
+        ("(h) provider with a scholarship", Some("jon peterson")),
+        ("(i) STEM school", None),
+    ];
+
+    let reached: Vec<&str> = channels
+        .iter()
+        .filter(|(_, term)| term.is_some_and(|t| netting.contains(t)))
+        .map(|(name, _)| *name)
+        .collect();
+    assert_eq!(
+        reached.len(),
+        3,
+        "prior law's netting list reaches {reached:?} of the nine channels, in: {netting}"
+    );
+
+    assert!(
+        !netting.contains("open enrollment") && !netting.contains("open enrolment"),
+        "open enrolment is the channel R.C. 3317.0217(C)(1) adds back, and prior law did not net \
+         it out — which is the whole of the continuity between the two regimes: {netting}"
+    );
+
+    let unreached = channels.len() - reached.len() - 1; // less open enrolment
+    assert_eq!(
+        unreached, 5,
+        "five channels are corrected by neither regime, so neither the old formula nor the new \
+         one ever had a principled denominator — it is not that H.B. 110 broke one"
+    );
+}
+
 /// The same name covered a different programme two regimes earlier.
 ///
 /// H.B. 64's supplemental targeted assistance was agricultural and rural. H.B. 110's is urban and
