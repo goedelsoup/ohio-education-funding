@@ -78,6 +78,7 @@ pub mod ledger;
 pub mod legislative_district;
 pub mod outcomes;
 pub mod panel;
+pub mod plan_bill;
 pub mod policy;
 pub mod prior_model;
 pub mod rating_payments;

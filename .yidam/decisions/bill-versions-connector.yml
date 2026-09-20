@@ -1,0 +1,73 @@
+id: bill-versions-connector
+summary: >-
+  ohio-bill-versions, kept apart from ohio-session-laws because an enrolled act and an introduced
+  bill are two kinds of authority — and committed for what it shows about drafting, never for a
+  number.
+context: |
+  `formula-component/fsfp-local-capacity-measure` has asked the same question three times and got
+  it wrong twice. R.C. 3317.0217(C)(1) divides targeted assistance's weighted wealth by enrolled
+  ADM adjusted for **one** of the ten channels R.C. 3317.03(A)(2) lists — open enrolment — and
+  leaves the other nine. That adjustment reaches 2,098 pupils against a gap of 222,923, and #402
+  measured the channel it sits in at **$433.1m**.
+
+  The node first recorded this as possibly an artefact of the section predating school choice.
+  That was refuted: the section's text is H.B. 110's. It then recorded the adjustment as the
+  surviving half of a matched pair with prior law's multiplier netting. That was refuted too: the
+  two reach three channels and one, and six are reached by neither.
+
+  What neither refutation could reach is whether the choice was **made** in the budget or carried
+  into it. The Revised Code cannot say — an act carries its provisions without their history — and
+  LSC cannot say either, because LSC analyses enacted budgets and executive proposals, and the
+  Fair School Funding Plan's own bill was neither.
+decision: |
+  Declare `ohio-bill-versions` as a connector in its own right, `Wired`, feeding
+  `formula-component` and `legislation`, with H.B. 1 of the 134th General Assembly as introduced
+  as its single source, committed whole as a text fixture.
+
+  **Kept apart from `ohio-session-laws` deliberately.** Same publisher, same API, same URL shape,
+  and folding them together was the obvious economy. It is the wrong one. That connector's entire
+  warrant is that an enrolled act is the text the legislature *enacted*; these documents are what
+  somebody *proposed*. One connector would carry one status and one note for two kinds of
+  authority, and the thing a reader must never conclude from a bill version is that it states the
+  law.
+
+  **Committed for structure, not for quantity.** The claim this source is admitted to support is
+  that R.C. 3317.0217 and R.C. 3317.03 were written in one document, with the denominator already
+  in its current form and the channel list already enumerated at ten. No figure, rate or threshold
+  is taken from it.
+consequences: |
+  **The question is answered, and against the reading the corpus had been reaching for.** The
+  open-enrolment-only adjustment is not a budget artefact, not an inheritance and not an
+  incomplete reconstruction. It was drafted by the plan's own authors — Callender and Sweeney,
+  February 2021 — in the bill that also wrote the list it cites.
+
+  **And it caught a miscount this corpus had been repeating.** R.C. 3317.03(A)(2) lists **ten**
+  channels, (a) through (j) — in H.B. 1 and in force today, unchanged. The corpus had been saying
+  nine since #384, from a truncated print of the section, and the figure had reached node prose, a
+  test asserting how many channels neither regime corrects, and an issue body. Setting the bill's
+  list against the statute's is what surfaced it; neither document alone would have.
+
+  **A standing hazard, recorded rather than mitigated.** This repository has already published a
+  proposal as though it were an appropriation — six claims across five nodes cited LSC's redbook,
+  two of them carrying figures, and `ledger::budget_analysis::Edition` exists because of it. A
+  bill-version connector is the same trap with a wider mouth, because a bill version looks exactly
+  like statute. The catalog entry says so at length, and no gate enforces it.
+alternatives: |
+  **Fold it into `ohio-session-laws`.** Rejected above: one status cannot describe two kinds of
+  authority, and the cost of the confusion is asymmetric.
+
+  **Extract only the two sections rather than committing the bill.** Rejected. The finding *is*
+  that the two sections are in one document, and an extract that lifts them out destroys the
+  evidence it was made to carry. The precedent is `hb583-corrections.txt`, committed whole for the
+  same reason.
+
+  **Cite the URL from the node without committing anything.** Rejected — that is the failure mode
+  `unbound-prose-figures` and the unpinned home-education figure already record. A `[verified]`
+  claim in this corpus rests on a committed primary source or it is not one.
+
+  **Leave it open.** Tempting, since the node survives without it. But the question had already
+  produced two wrong answers, and both were wrong in the same direction: inferring drafting
+  history from the shape of the surviving text. A third inference was not going to be better than
+  the document.
+connectors:
+  - ohio-bill-versions

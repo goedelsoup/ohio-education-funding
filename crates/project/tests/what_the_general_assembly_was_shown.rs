@@ -36,7 +36,7 @@
 //!
 //! # The adjustment H.B. 110 kept was half of a pair
 //!
-//! A later reading of this node asked why H.B. 110 reconstructed one of the nine channels of
+//! A later reading of this node asked why H.B. 110 reconstructed one of the ten channels of
 //! R.C. 3317.03(A)(2) and not the other eight. That supposes a partial residence count, and prior
 //! law had a complete one: **formula ADM was total ADM less 80% of JVSD ADM**, where total ADM is
 //! *"the number of all students who reside in the district"*, and the single carve-out is there
@@ -263,7 +263,7 @@ fn prior_laws_denominator_counted_residents_and_its_multiplier_did_not() {
 /// And open enrolment is the one channel that netting list leaves out.
 ///
 /// Which is the channel R.C. 3317.0217(C)(1) adjusts for. The complementarity is what makes
-/// "H.B. 110 took one of nine arbitrarily" the wrong reading and
+/// "H.B. 110 took one of ten arbitrarily" the wrong reading and
 /// <https://github.com/goedelsoup/ohio-education-funding/issues/399> the right question: the
 /// surviving correction is the one that had no home on the payment side.
 ///
@@ -304,11 +304,12 @@ fn open_enrolment_is_the_channel_prior_laws_multiplier_did_not_reach() {
 ///
 /// #399 asked whether prior law's multiplier netting and R.C. 3317.0217(C)(1)'s denominator
 /// adjustment are complementary by construction. They are not. Prior law's netting list names
-/// **three** of the nine channels R.C. 3317.03(A)(2) now lists — community school (e-schools
+/// **three** of the ten channels R.C. 3317.03(A)(2) lists — community school (e-schools
 /// called out separately, the rest at 75%), the EdChoice nonpublic scholarship, and the Jon
 /// Peterson provider scholarship. H.B. 110's adjustment reaches **one**, open enrolment. Together
 /// they reach four, and alternative schools, College Credit Plus, educational service centers,
-/// compact districts and STEM schools are reached by neither.
+/// compact districts, STEM schools and college-preparatory boarding schools are reached by
+/// neither.
 ///
 /// So the neat story — two halves of one design, one surviving the deduct's abolition — is wrong.
 /// What survives is narrower: the one channel prior law let a district keep targeted assistance
@@ -327,7 +328,7 @@ fn prior_laws_netting_reaches_three_channels_and_the_new_adjustment_reaches_one(
 
     // The channels of R.C. 3317.03(A)(2), and the word prior law's netting list would name each
     // by. `None` means the list has no term for it at all.
-    let channels: [(&str, Option<&str>); 9] = [
+    let channels: [(&str, Option<&str>); 10] = [
         ("(a) community school", Some("community school")),
         ("(b) alternative school", None),
         ("(c) college, under College Credit Plus", None),
@@ -340,6 +341,7 @@ fn prior_laws_netting_reaches_three_channels_and_the_new_adjustment_reaches_one(
         ),
         ("(h) provider with a scholarship", Some("jon peterson")),
         ("(i) STEM school", None),
+        ("(j) college-preparatory boarding school", None),
     ];
 
     let reached: Vec<&str> = channels
@@ -350,7 +352,7 @@ fn prior_laws_netting_reaches_three_channels_and_the_new_adjustment_reaches_one(
     assert_eq!(
         reached.len(),
         3,
-        "prior law's netting list reaches {reached:?} of the nine channels, in: {netting}"
+        "prior law's netting list reaches {reached:?} of the ten channels, in: {netting}"
     );
 
     assert!(
@@ -361,7 +363,7 @@ fn prior_laws_netting_reaches_three_channels_and_the_new_adjustment_reaches_one(
 
     let unreached = channels.len() - reached.len() - 1; // less open enrolment
     assert_eq!(
-        unreached, 5,
+        unreached, 6,
         "five channels are corrected by neither regime, so neither the old formula nor the new \
          one ever had a principled denominator — it is not that H.B. 110 broke one"
     );

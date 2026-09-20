@@ -202,6 +202,7 @@ pub const CONNECTORS: &[Connector] = &[
     lsc::BUDGET,
     assembly::LAWS,
     assembly::SESSION_LAWS,
+    assembly::PLAN_BILL,
     assembly::BILLS,
     auditor::REPORTS,
     courts::OPINIONS,

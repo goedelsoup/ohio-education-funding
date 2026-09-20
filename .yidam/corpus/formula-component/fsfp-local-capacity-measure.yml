@@ -287,7 +287,7 @@ findings: |
   numerators** this section supplies at (A)(1)(a) and (A)(2)(a), and divides them by enrolled ADM
   less those open-enrolling in plus those open-enrolling out. The department's published `[D]`
   reproduces from exactly that, for all 609. So the plan does have a resident denominator — and it
-  takes exactly one of the nine channels R.C. 3317.03(A)(2) lists. It moves **2,098** pupils
+  takes exactly one of the ten channels R.C. 3317.03(A)(2) lists. It moves **2,098** pupils
   statewide against the 222,923 above, which is nine-tenths of one per cent of it. Community school,
   STEM and scholarship students are corrected for in neither measure. [verified] (`crates/project`)
 
@@ -379,10 +379,10 @@ findings: |
   ### The open-enrolment adjustment is a choice, not an inheritance
 
   R.C. 3317.0217(C)(1) subtracts the students of R.C. 3317.03(A)(1)(b) and adds those of (A)(2)(d):
-  open enrolment in and out. (A)(2) runs (a) through **(i)** — community school, alternative school,
+  open enrolment in and out. (A)(2) runs (a) through **(j)** — community school, alternative school,
   college, open enrolment, educational service center, compact district, nonpublic scholarship,
-  provider scholarship, STEM school. The adjustment takes one of nine **from the subsection it is
-  citing**. [verified] (`crates/project`)
+  provider scholarship, STEM school, college-preparatory boarding school. The adjustment takes one
+  of **ten**, from the subsection it is citing. [verified] (`crates/project`)
 
   It cannot be an artefact of the section predating the choice channels. R.C. 3317.0217's current
   text was written by H.B. 110, the same act that replaced the residence count with the attendance
@@ -407,10 +407,10 @@ findings: |
   [verified] (`crates/project`)
 
   The two corrections are **not** complements, though. Prior law's netting list names three of the
-  nine channels R.C. 3317.03(A)(2) lists — community school, EdChoice, Jon Peterson — and the new
+  ten channels R.C. 3317.03(A)(2) lists — community school, EdChoice, Jon Peterson — and the new
   denominator adjustment reaches one, open enrolment. Together they reach four. Alternative schools,
-  College Credit Plus, educational service centers, compact districts and STEM schools are reached
-  by **neither**. [verified] (`crates/project`)
+  College Credit Plus, educational service centers, compact districts, STEM schools and
+  college-preparatory boarding schools are reached by **neither**. [verified] (`crates/project`)
 
   What is continuous is narrower and exact: **the one channel prior law let a district keep targeted
   assistance for is the one channel the new denominator adds back.** Open enrolment's deduct was
@@ -448,17 +448,38 @@ findings: |
   [verified] (`crates/project`)
 revisions:
   - was: |
+      R.C. 3317.03(A)(2) was recorded as listing **nine** channels, and the open-enrolment
+      adjustment as taking "one of nine". The count reached four paragraphs of this node, a test
+      asserting how many channels neither regime corrects, the body of issue #399 and a decision
+      record.
+    now: |
+      It lists **ten**, (a) through (j) — the tenth is a college-preparatory boarding school under
+      Chapter 3328 — and it has listed ten since H.B. 1 of the 134th was introduced. The
+      adjustment takes one of ten, and **six** channels are reached by neither regime rather than
+      five.
+    found_by: |
+      `crates/project/tests/the_bill_the_plan_was_drafted_in.rs`, which counts the list in the
+      bill and in force and asserts the two are equal.
+    reach: |
+      The nine came from reading the section through a fixed-width slice that ended inside item
+      (i), so the last entry was never on screen. Nothing downstream could catch it: every later
+      reader took the count from this node's prose rather than from the statute, and a test was
+      written that asserted a figure derived from it. **A count taken off a truncated print is
+      indistinguishable from a count**, and the only thing that surfaced it was setting two
+      independent copies of the same list side by side and requiring them to agree — which was
+      done for a different reason entirely.
+  - was: |
       The open-enrolment adjustment and prior law's multiplier netting were recorded as "a matched
       pair, and H.B. 110 kept one" — the half that "had no home on the payment side" once the
       deduct architecture was abolished.
     now: |
-      They are not complements. Prior law's netting reaches three of the nine channels of
-      R.C. 3317.03(A)(2) and the new adjustment reaches one; **five are reached by neither**. What
+      They are not complements. Prior law's netting reaches three of the ten channels of
+      R.C. 3317.03(A)(2) and the new adjustment reaches one; **six are reached by neither**. What
       is continuous is exact but narrower: open enrolment is the one channel prior law let a
       district keep targeted assistance for, and it is the one the new denominator adds back.
     found_by: |
       `prior_laws_netting_reaches_three_channels_and_the_new_adjustment_reaches_one`, which counts
-      the netting list against the nine channels rather than reading it as a set.
+      the netting list against the ten channels rather than reading it as a set.
     reach: |
       "Complement" was inferred from one absence — open enrolment missing from the netting list —
       without checking the other eight channels against it. One matching absence is not a partition,

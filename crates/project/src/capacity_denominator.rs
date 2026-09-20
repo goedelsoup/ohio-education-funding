@@ -67,7 +67,7 @@
 //! each other.
 //!
 //! The middle one is the finding. Targeted assistance reaches for a resident count and takes
-//! exactly one of the nine channels R.C. 3317.03(A)(2) lists — **2,098 pupils statewide against a
+//! exactly one of the ten channels R.C. 3317.03(A)(2) lists — **2,098 pupils statewide against a
 //! resident-less-enrolled gap of 222,923, which is 0.9% of it**. See
 //! `the_plans_own_resident_count_reaches_almost_none_of_the_gap`.
 
@@ -426,8 +426,8 @@ pub fn divergence_correlation() -> f64 {
 /// against the children it teaches. That is exactly the correction this module's other functions
 /// have to argue for; here it is the statute's own design.
 ///
-/// It reaches one of the nine channels R.C. 3317.03(A)(2) lists. This measures what the other
-/// eight would move if the same denominator ran to the full resident count and nothing else
+/// It reaches one of the ten channels R.C. 3317.03(A)(2) lists. This measures what the other
+/// nine would move if the same denominator ran to the full resident count and nothing else
 /// changed — the multiplier stays enrolled ADM, because moving that would be a different
 /// counterfactual and a much larger one.
 ///
@@ -756,7 +756,7 @@ mod tests {
 
     /// The plan's own resident adjustment reaches 0.9% of the divergence.
     ///
-    /// R.C. 3317.0217(C)(1) takes exactly one of the nine channels R.C. 3317.03(A)(2) lists —
+    /// R.C. 3317.0217(C)(1) takes exactly one of the ten channels R.C. 3317.03(A)(2) lists —
     /// open enrolment — and leaves community school, STEM and every scholarship student in
     /// neither the numerator nor the denominator of either measure.
     #[test]
@@ -1030,7 +1030,7 @@ mod tests {
     ///
     /// This is the component that already concedes the principle. R.C. 3317.0217(C)(1) divides by
     /// a residence-flavoured count *by design*; the question it leaves is only how far that count
-    /// reaches, and the answer is one of nine channels and 2,098 pupils against 222,923.
+    /// reaches, and the answer is one of ten channels and 2,098 pupils against 222,923.
     #[test]
     fn the_component_that_already_uses_a_resident_denominator_carries_the_most() {
         let (statute, rebased, gainers) = targeted_assistance_on_the_resident_count();
