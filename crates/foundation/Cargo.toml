@@ -9,11 +9,15 @@ publish.workspace = true
 
 [dependencies]
 edfund-core = { path = "../edfund-core" }
+# For `state_share`, which `refresh_worked_example` calls. Was a dev-dependency, reachable only
+# from `examples/input_year_refresh.rs` — and that is precisely why the example was free to floor
+# its incidence table at the wrong biennium's minimum (#412). The run is a library function now,
+# so `crates/figures` can bind what it publishes. No crate enters the graph: `project` already
+# depends on both of these, and `local-capacity` reaches `foundation` only through its own
+# dev-dependencies.
+local-capacity = { path = "../local-capacity" }
 
 [dev-dependencies]
-# For examples/input_year_refresh.rs, not for the tests. Cargo resolves dev-dependencies
-# for examples/ too, which is the only reason this compiles.
-local-capacity = { path = "../local-capacity" }
 dispersion = { path = "../dispersion" }
 
 [lints]

@@ -255,6 +255,9 @@ pub struct Inputs {
     pub decile: dispersion::ohio_panel::trough::DeepestDecile,
     /// What refreshing the classroom teacher salary input to FY2024 does, across the state.
     pub refresh_incidence: foundation::Refresh,
+    /// The same refresh on the department's published worked-example district — the one the
+    /// scenario's incidence table sweeps capacity across.
+    pub refresh_worked_example: foundation::WorkedExampleRefresh,
     /// The same increase run as a uniform base cost scale, so the guarantee can be applied to
     /// it. A DIFFERENT run from `refresh_incidence` — that one perturbs one salary per district
     /// and this one scales the department's published aggregate — which the corpus states.
@@ -726,6 +729,7 @@ impl Inputs {
             decile: dispersion::ohio_panel::trough::deepest_decile(),
             sensitivity: dispersion::report_card::sensitivity(),
             refresh_incidence: foundation::refresh(),
+            refresh_worked_example: foundation::refresh_worked_example(),
             refresh_reach: {
                 // The department's own FY2027 computed increase, applied as a uniform scale.
                 const COMPUTED_INCREASE: f64 = 465.0e6;
@@ -2771,6 +2775,70 @@ pub static FIGURES: &[Figure] = &[
         pinned: 68_022.22,
         tolerance: 0.0,
         compute: |_| foundation::StatewideFactors::fy2027().teacher_salary,
+    },
+    // The same refresh on the department's published worked-example district, which is where the
+    // scenario's incidence table comes from. `foundation::refresh_worked_example` is a library
+    // function so that these are bindable at all: the run used to live only in an example, and
+    // an example is reachable by no gate — which is how it went on flooring its incidence at the
+    // FY2022 5% minimum over an FY2026-FY2027 horizon. See #412.
+    Figure {
+        key: "foundation/refresh-worked-example-frozen-per-pupil",
+        owner: "crates/foundation",
+        unit: Unit::Dollars,
+        label: "Base cost per pupil on the worked example, priced at the FY2022 inputs H.B. 96 \
+                carries forward",
+        pinned: 8_198.404_992_881,
+        tolerance: 0.01,
+        compute: |i| i.refresh_worked_example.frozen_per_pupil,
+    },
+    Figure {
+        key: "foundation/refresh-worked-example-refreshed-per-pupil",
+        owner: "crates/foundation",
+        unit: Unit::Dollars,
+        label: "And on the FY2024 teacher salary, which is the only term the refresh moves",
+        pinned: 8_529.547_941_616,
+        tolerance: 0.01,
+        compute: |i| i.refresh_worked_example.refreshed_per_pupil,
+    },
+    Figure {
+        key: "foundation/refresh-worked-example-floor-binds-frozen",
+        owner: "crates/foundation",
+        unit: Unit::Dollars,
+        label: "Local capacity per pupil above which the 10% minimum state share binds before \
+                the refresh — the bottom of the band that straddles the floor",
+        pinned: 7_378.564_493_593,
+        tolerance: 0.01,
+        compute: |i| i.refresh_worked_example.floor_binds_above_frozen,
+    },
+    Figure {
+        key: "foundation/refresh-worked-example-floor-binds-refreshed",
+        owner: "crates/foundation",
+        unit: Unit::Dollars,
+        label: "And after it, which is the top of that band — the floor is a share OF base cost \
+                per pupil, so a refresh moves it",
+        pinned: 7_676.593_147_455,
+        tolerance: 0.01,
+        compute: |i| i.refresh_worked_example.floor_binds_above_refreshed,
+    },
+    Figure {
+        key: "foundation/refresh-worked-example-straddling-band-width",
+        owner: "crates/foundation",
+        unit: Unit::Dollars,
+        label: "How wide that band is in capacity per pupil, which is what the published \
+                incidence grid stepped over",
+        pinned: 298.028_653_862,
+        tolerance: 0.01,
+        compute: |i| i.refresh_worked_example.straddling_band_width(),
+    },
+    Figure {
+        key: "foundation/refresh-worked-example-captured-at-band-midpoint",
+        owner: "crates/foundation",
+        unit: Unit::Share,
+        label: "The share of the increase a district at the band's midpoint captures — strictly \
+                between the floor rate and 100%, which is why the transition is a gradient",
+        pinned: 0.55,
+        tolerance: 0.000_01,
+        compute: |i| i.refresh_worked_example.captured_at_band_midpoint,
     },
     // ---- crates/scenario-delta ---------------------------------------------------------------
     //

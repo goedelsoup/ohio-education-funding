@@ -51,13 +51,13 @@ findings: |
   reference of $68,022.22 to an FY2024 refresh of $73,777.08 — an 8.46% rise:
   [verified] (crates/foundation)
 
-      base cost per pupil    $7,629.24  ->  $7,960.38     +$331.14   (+4.34%)
-      aggregate base cost  $155,194,925 -> $161,931,078  +$6,736,153
+      base cost per pupil    $8,198.40  ->  $8,529.55     +$331.14   (+4.04%)
+      aggregate base cost  $166,773,020 -> $173,509,173  +$6,736,153
 
   Only the teacher sub-component moves; student support, district leadership, building
   operations, and athletics are unchanged by construction, because the perturbation touches one
-  price term. An 8.46% salary rise produces a 4.34% base cost rise — teacher cost is roughly
-  half of base cost for a district this size. [verified]
+  price term. An 8.46% salary rise produces a 4.04% base cost rise — the salary-driven part of
+  teacher cost is just under half of base cost for a district this size. [verified]
 
   Scaled to Ohio's FY2022 base cost enrolled ADM of 1,499,918.26, a comparable refresh raises
   **computed base cost statewide by roughly $497 million a year, from the teacher salary term
@@ -71,14 +71,31 @@ findings: |
   holds capture none of an increase at any capacity on this scale, so the table is incidence
   across wealth and not coverage across Ohio. [verified] (crates/foundation)
 
-      local capacity/pupil     share of the increase a formula-paid district receives
-      $500 - $7,000            100%
-      $12,000 (at 5% floor)      5%
+      local capacity/pupil        share of the increase a formula-paid district receives
+      $500 - $7,378.56            100%     the formula pays the whole residual
+      $7,527.58                    55.0%   floored before the refresh, on formula after it
+      $7,676.59 and above          10.0%   the minimum state share holds it in both runs
 
   Because state aid is the residual after local capacity, a district on formula receives the
-  **entire** base cost increase, whatever its wealth. A district whose capacity has pushed it
-  to the 10% minimum state share receives 10% of it. There is no gradient between the two — the
-  transition is the floor itself. [verified]
+  **entire** base cost increase, whatever its wealth, and a district the 10% minimum state share
+  holds in both runs receives 10% of it. [verified]
+
+  ### Between those two there is a band, and it is a gradient
+
+  The floor is a share **of** base cost per pupil, and this perturbation moves base cost per
+  pupil. So the frozen run and the refreshed run reach the floor at *different* capacities —
+  **$7,378.56** and **$7,676.59** — and the **$298.03** between them is a band where a district
+  is floored before the refresh and paid by the formula after it. Across that band the share it
+  captures falls continuously from 100% to 10%; at the midpoint it is **55.0%**. [verified]
+  (crates/foundation)
+
+  Nobody falls off the floor, because
+  [it is a `max`](../formula-component/fsfp-local-capacity-measure.yml) rather than a cut-off.
+  One part of the band is structural rather than a fact about this district: at its midpoint the
+  captured share is exactly `(1 + floor) / 2`, whatever the two base costs are. The width is not
+  — it is `(1 - floor)` times the base cost increase, so it scales with the perturbation. The
+  runner derives its grid from the two thresholds rather than listing capacities, so a later
+  factor vintage cannot move the band out from under the table.
 
   So refreshing the input year is progressive and freezing it is regressive, and the mechanism
   is not that poorer districts gain proportionally more but that wealthier districts are cut
@@ -246,6 +263,34 @@ figures:
     value: 322.87251100527686
     field: findings
     as_written: "against $322.87 for everyone else"
+  # The worked example's own levels and the band the minimum state share opens across it. The
+  # run was an example before #412 — reachable by no gate, which is how it went on flooring its
+  # incidence at the FY2022 5% minimum over an FY2026-FY2027 horizon. It is
+  # `foundation::refresh_worked_example` now, so these are bindable.
+  - key: foundation/refresh-worked-example-frozen-per-pupil
+    value: 8198.404992880605
+    field: findings
+    as_written: "base cost per pupil    $8,198.40"
+  - key: foundation/refresh-worked-example-refreshed-per-pupil
+    value: 8529.547941616485
+    field: findings
+    as_written: "->  $8,529.55"
+  - key: foundation/refresh-worked-example-floor-binds-frozen
+    value: 7378.564493592545
+    field: findings
+    as_written: "**$7,378.56** and"
+  - key: foundation/refresh-worked-example-floor-binds-refreshed
+    value: 7676.593147454837
+    field: findings
+    as_written: "and **$7,676.59** —"
+  - key: foundation/refresh-worked-example-straddling-band-width
+    value: 298.02865386229223
+    field: findings
+    as_written: "the **$298.03** between them"
+  - key: foundation/refresh-worked-example-captured-at-band-midpoint
+    value: 0.5499999999999984
+    field: findings
+    as_written: "at the midpoint it is **55.0%**"
   - key: foundation/fy2022-classroom-teacher-salary
     value: 68022.22
     field: findings
@@ -283,6 +328,54 @@ figures:
     as_written: "The 294 of 609 districts the guarantee"
 
 revisions:
+  - was: |
+      An incidence table computed at `MINIMUM_STATE_SHARE_FY2022` — **5%** — over an
+      FY2026-FY2027 horizon, reporting "$500 - $7,000 100%" and "$12,000 (at 5% floor) 5%", and
+      the sentence under it, under the strongest claim tag: "there is no gradient between the
+      two — the transition is the floor itself."
+    now: |
+      Two defects with one cause, and neither survives.
+
+      The floor is **10%** over this horizon, not 5%: the department's FY2027 calculator states
+      `0.1` for both FY2026 and FY2027 on its `Notes` sheet, and 138 of 609 districts sit exactly
+      on it. The node already said 10% twice — in the prediction it stated in advance, and in the
+      statewide decomposition's "138 districts keep a tenth of it" — so the crate answering this
+      statewide and the example answering it for one district disagreed about which year they
+      were in.
+
+      And there is a gradient. The floor is a share *of* base cost per pupil and this
+      perturbation moves base cost per pupil, so the frozen and refreshed runs reach it at
+      **$7,378.56** and **$7,676.59** of capacity: a **$298.03** band where a district is floored
+      before the refresh and on formula after it, capturing 100% at one end and 10% at the other
+      and everything between. "No gradient" was not a property of the mechanism. It was the
+      choice of sample points — $7,000 then $12,000, which straddles the band without landing in
+      it. [verified]
+    found_by: |
+      #412, reading the runner's `MINIMUM_STATE_SHARE_FY2022` against the `horizon:` and
+      `question:` this node states — both of which name FY2026-FY2027 — and then asking what a
+      floor defined as a share of a quantity the perturbation moves does between two runs.
+    reach: |
+      The single-district illustration and the four prose sites quoting it, here and in
+      [`scenario/README.md`](README.md). Nothing statewide moves:
+      `crates/scenario-delta/tests/who_a_change_reaches.rs` already priced the floor at 10% —
+      $118.7 million over 138 districts — and the statewide panel was already at the FY2027
+      factor set throughout.
+
+      The levels move and the delta does not. Settled in the same pass was which year the run is
+      in at all: it priced the FY2027 teacher salary into the **FY2022** factor set, so its base
+      cost per pupil was a mongrel of two vintages. Both runs are `StatewideFactors::fy2027()`
+      now — the prices H.B. 96 carries forward, which is what "frozen" means here — and base cost
+      per pupil reads $8,198.40 rather than $7,629.24. The increase is $331.14 per pupil either
+      way: it is funded positions times the salary gap times the benefit multiplier, and none of
+      those three moved.
+
+      Two structural changes so this cannot recur by sampling. The run is
+      `foundation::refresh_worked_example` rather than an example's `main` — an example is
+      reachable by no gate, which is why six figures of it are bound now and none were before.
+      And the runner derives its grid from the two thresholds instead of listing capacities, so a
+      later factor vintage moves the samples with the band rather than out from under it.
+      `local-capacity` asserts the shape directly: continuous, monotone, 100% at one end and the
+      floor rate at the other.
   - was: |
       A recorded and unresolved sensitivity: the single-district runner does not model the
       guarantee population at all, so its "100%" column overstates coverage by however many
@@ -431,16 +524,30 @@ properties:
     deterministic and dependency-free. Re-running it reproduces the figures exactly; there is no
     separate output artifact to drift from the code that made it.
   results: |
-    Worked example district, 20,342.13 base cost enrolled ADM:
-      teacher salary input      $68,022.22 -> $73,777.08   (+8.46%)
-      teacher base cost        $94,218,372 -> $100,954,525
-      aggregate base cost     $155,194,925 -> $161,931,078  (+$6,736,153)
-      base cost per pupil        $7,629.24 -> $7,960.38     (+$331.14, +4.34%)
+    Worked example district, 20,342.13 base cost enrolled ADM, priced at the FY2027 factor set
+    — the FY2022 averages H.B. 96 carries forward, which is what "frozen" means over this
+    horizon. Only the enrollment is the FY2022 payment report's; the prices are not, so these
+    are not that report's totals.
+      teacher salary input      $68,022.22 -> $73,777.08    (+8.46%)
+      teacher base cost        $97,068,364 -> $103,804,517
+      aggregate base cost     $166,773,020 -> $173,509,173  (+$6,736,153)
+      base cost per pupil        $8,198.40 -> $8,529.55     (+$331.14, +4.04%)
     All other sub-components unchanged. [verified]
+
+    The minimum state share is [`MINIMUM_STATE_SHARE_FY2027`](../../../crates/edfund-core/src/lib.rs),
+    10%, which the department's FY2027 calculator states for both FY2026 and FY2027 on its
+    `Notes` sheet. It binds above $7,378.56 of local capacity per pupil frozen and $7,676.59
+    refreshed. [verified]
   confidence: |
     The direction and the incidence structure are robust: they follow from the residual
-    definition of state share and the 5% floor, both of which are statutory and both of which
-    are verified against the department's published calculation.
+    definition of state share and the 10% minimum state share in force over FY2026-FY2027, both
+    of which are statutory and both of which are verified against the department's published
+    calculation.
+
+    The structure is a gradient and not a binary, which is a correction rather than a caveat:
+    the floor is a share *of* base cost per pupil, so the two runs reach it at different
+    capacities and a $298.03 band of capacity straddles it. The band is derived in the runner
+    rather than sampled, because sampling is how it was missed. [verified]
 
     The magnitude is a lower bound and should be quoted as one. Perturbing one salary of ten
     understates a real refresh; the other nine categories would each add to it.

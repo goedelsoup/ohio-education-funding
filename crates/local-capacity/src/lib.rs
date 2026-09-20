@@ -436,9 +436,10 @@ pub fn local_capacity(inputs: &CapacityInputs) -> Result<CapacityResult, Capacit
 pub struct StateShare {
     /// Total state share of base cost, in dollars.
     pub amount: Dollars,
-    /// State share as a fraction of base cost per pupil, floored at 5%.
+    /// State share as a fraction of base cost per pupil, floored at the `minimum_share` the
+    /// caller passed — 5% in FY2022, 10% in FY2026 and FY2027.
     pub percentage: f64,
-    /// Whether the 5% floor was binding — that is, whether this district's computed share
+    /// Whether that floor was binding — that is, whether this district's computed share
     /// would have been lower without it.
     pub at_minimum: bool,
 }
@@ -477,7 +478,7 @@ pub fn state_share(
     })
 }
 
-/// State share percentage alone, floored at 5%.
+/// State share percentage alone, floored at the caller's `minimum_share`.
 ///
 /// # Errors
 ///
@@ -790,5 +791,74 @@ mod minimum_share_tests {
         assert!(new.at_minimum);
         assert!((old.percentage - 0.07).abs() < 1e-12);
         assert!((new.percentage - 0.10).abs() < 1e-12);
+    }
+
+    /// There is no cliff at the floor when the perturbation moves base cost per pupil.
+    ///
+    /// The floor is a share **of** base cost per pupil, so a perturbation that raises base cost
+    /// raises the capacity at which the floor binds. Between the two thresholds lies a band
+    /// where the floor holds the district in the unperturbed run and the formula pays it in the
+    /// perturbed one, and across that band the share of the increase it captures falls
+    /// *continuously* from 100% to the floor rate.
+    ///
+    /// This is the shape a sampled incidence table can miss: pick capacities either side of the
+    /// band and the table reads as a clean binary, 100% or the floor rate, which is what
+    /// `foundation`'s `input_year_refresh` example published before #412. The mechanism is a
+    /// kink, not a step — every R.C. 3317.011 floor is a `max`.
+    ///
+    /// The example samples the band because it derives its own grid from these two thresholds.
+    /// What is asserted here is the shape the grid was derived to catch.
+    #[test]
+    fn the_band_that_straddles_the_floor_is_a_gradient_not_a_step() {
+        // Round numbers on purpose. This is a property of the floor meeting a base cost
+        // perturbation, not a fact about any one district, so pinning it to a fixture's base
+        // cost per pupil would make it go stale when the fixture moved. The worked example is
+        // `foundation::refresh_worked_example`, and `crates/figures` pins that one.
+        let m = MINIMUM_STATE_SHARE_FY2027;
+        let (frozen_base, refreshed_base) = (10_000.0, 10_400.0);
+        let delta = refreshed_base - frozen_base;
+
+        // The floor binds above `base * (1 - m)`, so the perturbation moves it up.
+        let lower = frozen_base * (1.0 - m);
+        let upper = refreshed_base * (1.0 - m);
+        assert!(upper > lower, "a rise in base cost moves the threshold up");
+
+        let captured = |capacity: f64| {
+            let f = state_share(frozen_base, capacity, 1.0, m).unwrap();
+            let r = state_share(refreshed_base, capacity, 1.0, m).unwrap();
+            (r.percentage * refreshed_base - f.percentage * frozen_base) / delta
+        };
+
+        // Inside the band the frozen run is floored and the refreshed one is not — which is what
+        // makes the captured share something other than 100% or the floor rate.
+        let inside = f64::midpoint(lower, upper);
+        assert!(state_share(frozen_base, inside, 1.0, m).unwrap().at_minimum);
+        assert!(
+            !state_share(refreshed_base, inside, 1.0, m)
+                .unwrap()
+                .at_minimum
+        );
+        let mid = captured(inside);
+        assert!(
+            mid > m && mid < 1.0,
+            "captured share inside the band: {mid}"
+        );
+
+        // Continuous and monotone across it, meeting 100% at one end and the floor rate at the
+        // other. A step would break one of these.
+        assert!((captured(lower) - 1.0).abs() < 1e-9);
+        assert!((captured(upper) - m).abs() < 1e-9);
+        let mut previous = f64::INFINITY;
+        for i in 0..=100 {
+            let capacity = lower + (upper - lower) * f64::from(i) / 100.0;
+            let here = captured(capacity);
+            assert!(here <= previous + 1e-9, "captured rose at ${capacity:.2}");
+            assert!(here >= m - 1e-9 && here <= 1.0 + 1e-9);
+            previous = here;
+        }
+
+        // Outside it, the binary the published table showed is the truth.
+        assert!((captured(lower - 1.0) - 1.0).abs() < 1e-9);
+        assert!((captured(upper + 1.0) - m).abs() < 1e-9);
     }
 }

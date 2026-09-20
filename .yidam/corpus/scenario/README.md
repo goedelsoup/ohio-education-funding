@@ -39,13 +39,16 @@ beside it took nearly eight points more off what was left.
 
 Two incidence findings, both structural rather than chosen:
 
-- Districts on formula receive **100%** of any base cost increase and districts at the 5% state
-  share floor receive **5%** — a binary split, not a gradient, and the transition *is* the
-  floor. That is a share among the districts the formula pays: the 294 on the guarantee receive
-  nothing at any wealth, so it is incidence across wealth and not coverage across Ohio. The
-  runner prints that population beside the column rather than leaving it to be carried in. The
-  node predicted "disproportionate"; the run showed something sharper, and both the prediction
-  and the correction are recorded.
+- Districts on formula receive **100%** of any base cost increase and districts the 10% minimum
+  state share holds in both runs receive **10%** — and between them a **$298.03** band of local
+  capacity straddles the floor, where a district is floored before the refresh and on formula
+  after it, capturing everything in between. The floor is a share *of* base cost per pupil, so a
+  perturbation that moves base cost moves the floor; published as a binary, it was an artifact of
+  the sample points. That is a share among the districts the formula pays: the 294 on the
+  guarantee receive nothing at any wealth, so it is incidence across wealth and not coverage
+  across Ohio. The runner prints that population beside the column rather than leaving it to be
+  carried in. The node predicted "disproportionate"; the run showed something sharper, and both
+  the prediction and the correction are recorded.
 - The per-pupil gain ranges from $318.26 to $442.77, a 1.4× spread, driven entirely by the
   six-teacher special minimum binding in **155 of 604** districts.
 
