@@ -20,6 +20,11 @@ foundation = { path = "../foundation" }
 # note on `MINIMUM_STATE_SHARE_FY2022` — and that reasoning ends where this crate starts calling
 # it. No crate enters the graph: `dispersion` already depends on it.
 local-capacity = { path = "../local-capacity" }
+# For `margin`, which needs the twenty-mill floor and the predicate that says what being on it
+# means — `FloorStatus::valuation_growth_reaches_revenue` is the whole of why the valuation charge
+# is a pure loss for one half of the state and a recapture for the other. A leaf crate on
+# `edfund-core` alone, so nothing enters the graph but the semantics.
+millage = { path = "../millage" }
 
 [[bin]]
 name = "edfund-project"
