@@ -34,6 +34,24 @@
 //! corpus models — see [`project::capacity_denominator::against_the_repealed_supplement`] for what
 //! a denominator correction confined to the categoricals would give the same 36 districts.
 //!
+//! # The adjustment H.B. 110 kept was half of a pair
+//!
+//! A later reading of this node asked why H.B. 110 reconstructed one of the nine channels of
+//! R.C. 3317.03(A)(2) and not the other eight. That supposes a partial residence count, and prior
+//! law had a complete one: **formula ADM was total ADM less 80% of JVSD ADM**, where total ADM is
+//! *"the number of all students who reside in the district"*, and the single carve-out is there
+//! because JVSDs are paid by a separate formula rather than by deduction.
+//!
+//! The choice channels were corrected on the **multiplier** — *"an adjustment is made to the
+//! formula ADM of each district so as to not credit the district with targeted assistance for
+//! students educated through these programs"* — and open enrolment is the one channel that list
+//! omits. It is the one R.C. 3317.0217(C)(1) adjusts for. So the two corrections sat on opposite
+//! sides of the same product and H.B. 110 kept the half that had no home on the payment side,
+//! at the point the deduct architecture hosting the other was abolished.
+//!
+//! Whether that is construction or coincidence is #399. What these tests settle is only that
+//! "incomplete reconstruction" is not available as a reading.
+//!
 //! # A hazard, because the name was reused
 //!
 //! "Supplemental targeted assistance" under H.B. 64 was an **agricultural** payment: a district's
@@ -196,6 +214,89 @@ fn the_general_assembly_priced_this_effect_and_then_repealed_the_price() {
              36 districts in FY 2025"
         ),
         "with the last year's amount"
+    );
+}
+
+/// Prior law put the choice children in the denominator and took them out of the multiplier.
+///
+/// This is what rules out reading R.C. 3317.0217(C)(1) as an incomplete reconstruction. There was
+/// no partial residence count to rebuild: prior law's **formula ADM** was total ADM — *"the number
+/// of all students who reside in the district"* — less 80% of JVSD ADM, and that single carve-out
+/// exists only because JVSDs are paid by a separate formula rather than by deduction.
+///
+/// The choice channels were handled on the **multiplier** instead, and LSC gives the reason. So
+/// the two corrections were a matched pair sitting on opposite sides of the same product, and
+/// H.B. 110 kept one of them.
+#[test]
+fn prior_laws_denominator_counted_residents_and_its_multiplier_did_not() {
+    let hb59 = greenbook("hb59").flat();
+
+    assert!(
+        hb59.contains("Total ADM is the number of all students who reside in the district"),
+        "prior law's total ADM is a residence count"
+    );
+    assert!(
+        hb59.contains("Formula ADM = Total ADM - 80% x JVSD ADM"),
+        "and formula ADM carves out one channel, not nine"
+    );
+    assert!(
+        hb59.contains("So that these students are not double counted"),
+        "for a reason that is about the JVSD's separate formula rather than about school choice"
+    );
+
+    assert!(
+        hb59.contains(
+            "an adjustment is made to the formula ADM of each district so as to not credit the \
+             district with targeted assistance for students educated through these programs"
+        ),
+        "and the choice channels are corrected on the multiplier, with the reason stated"
+    );
+    assert!(
+        hb59.contains(
+            "(Formula ADM - e-school ADM - EdChoice ADM - Jon Peterson Special Needs ADM - 75% of \
+             non-e-school community school ADM)"
+        ),
+        "in the tier one formula itself"
+    );
+}
+
+/// And open enrolment is the one channel that netting list leaves out.
+///
+/// Which is the channel R.C. 3317.0217(C)(1) adjusts for. The complementarity is what makes
+/// "H.B. 110 took one of nine arbitrarily" the wrong reading and
+/// <https://github.com/goedelsoup/ohio-education-funding/issues/399> the right question: the
+/// surviving correction is the one that had no home on the payment side.
+///
+/// Asserted narrowly. That the two lists are complements **over all of R.C. 3317.03(A)(2)** is a
+/// stronger claim than this checks, and it is (2) on that issue rather than a fact yet.
+#[test]
+fn open_enrolment_is_the_channel_prior_laws_multiplier_did_not_reach() {
+    let hb59 = greenbook("hb59").flat();
+    let netting = hb59
+        .split_once("Tier one targeted assistance = Tier one targeted assistance per pupil x ")
+        .expect("the tier one formula is in the analysis")
+        .1
+        .split_once(')')
+        .expect("the netting list is parenthesised")
+        .0;
+
+    for channel in [
+        "e-school ADM",
+        "EdChoice ADM",
+        "Jon Peterson Special Needs ADM",
+        "community school ADM",
+    ] {
+        assert!(
+            netting.contains(channel),
+            "the netting list omits {channel}, so the pair this reading rests on is not the pair \
+             prior law wrote: {netting}"
+        );
+    }
+    assert!(
+        !netting.to_lowercase().contains("open enrollment")
+            && !netting.to_lowercase().contains("open enrolment"),
+        "open enrolment is absent from prior law's multiplier correction, which is what makes \
+         R.C. 3317.0217(C)(1)'s choice of that one channel worth a question: {netting}"
     );
 }
 

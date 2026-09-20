@@ -391,9 +391,30 @@ findings: |
   [H.B. 94](../legislation/hb-94-2001.yml) — but the number is not the provision. [verified]
   (`crates/project`)
 
-  **[open]** What remains open is narrower and is a question about drafting rather than about
-  arithmetic: why H.B. 110 reconstructed the open-enrolment channel of the old residence count and
-  not the other eight, when all nine were on the page of the section it cross-referenced.
+  ### Prior law put those children in the denominator and out of the multiplier
+
+  There was no partial residence count for H.B. 110 to rebuild badly. Under the H.B. 59 regime
+  **total ADM** was *"the number of all students who reside in the district"* and **formula ADM was
+  total ADM less 80% of JVSD ADM** — a residence count for every channel but one, and that one
+  carved out only because JVSDs are paid by a separate formula rather than by deduction, *"so that
+  these students are not double counted"*. Targeted assistance's wealth per pupil divided by formula
+  ADM, so the choice children were in the denominator. [verified] (`crates/project`)
+
+  They were taken out of the **multiplier** instead, and LSC states the reason: *"an adjustment is
+  made to the formula ADM of each district so as to not credit the district with targeted assistance
+  for students educated through these programs."* The netting list is e-schools, EdChoice, Jon
+  Peterson and 75% of non-e-school community schools — and **open enrolment is not in it**.
+  [verified] (`crates/project`)
+
+  So the two corrections were a matched pair, and H.B. 110 kept one. Its denominator adjustment
+  covers open enrolment, which is exactly the channel prior law's multiplier adjustment did not
+  reach; the other eight lost their correction when the deduct architecture that hosted it was
+  abolished, and gained none on the denominator side. The choice children went from being in the
+  denominator and out of the multiplier to being out of both. [inference]
+
+  **[open]** Whether that complementarity is by construction or by coincidence, and if by
+  construction, whether anyone traced the denominator-side consequence when the multiplier-side
+  correction was removed. See [issue #399](https://github.com/goedelsoup/ohio-education-funding/issues/399).
 
   ### A hazard for anyone reading the supplement's name backwards
 
@@ -404,6 +425,25 @@ findings: |
   wealth, urban districts"*. The name is continuous across the greenbooks and the programme is not.
   [verified] (`crates/project`)
 revisions:
+  - was: |
+      The open-enrolment adjustment in R.C. 3317.0217(C)(1) was left as a question about drafting —
+      "why H.B. 110 reconstructed the open-enrolment channel of the old residence count and not the
+      other eight, when all nine were on the page of the section it cross-referenced."
+    now: |
+      There was no partial count to reconstruct. Prior law's formula ADM was a **residence** count
+      for every channel but the JVSD carve-out, and the choice children were netted out of targeted
+      assistance's **multiplier** rather than its denominator. H.B. 110's adjustment covers open
+      enrolment, which is the one channel that netting list omits — so the question is not why one
+      of nine, but whether the surviving half of a matched pair was kept deliberately.
+    found_by: |
+      `crates/project/tests/what_the_general_assembly_was_shown.rs`, against `hb59-greenbook`,
+      which states the whole prior-law architecture in one page.
+    reach: |
+      The framing was written from the current section and the current cross-reference, and both
+      were read correctly — the error was in supposing the old formula had the same *shape*. A
+      count that is nine-tenths short of a gap invites "incomplete" as the explanation, and
+      incompleteness is the one reading the predecessor rules out. When a provision looks like a
+      partial version of an older one, read the older one rather than inferring it from the gap.
   - was: |
       Whether the General Assembly intends the state share percentage to discount a district's
       special education and English learner funding by a ratio computed on a pupil count that
