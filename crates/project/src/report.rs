@@ -13,11 +13,13 @@
 //! interval attached to only one of them, because a combined figure inherits the forecast's
 //! error while looking like the simulation's precision.
 
+use std::borrow::Cow;
+
 use edfund_core::{Dollars, FiscalYear};
 
 use crate::panel::DistrictRecord;
 use crate::policy::{apply, apply_all, Outcome, Policy};
-use crate::series::{project, standard_deviation, Basis, Method, Prior, ONE_SIGMA};
+use crate::series::{project, standard_deviation, Basis, Method, Prior, Projection, ONE_SIGMA};
 
 /// Statewide totals for one set of outcomes.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -277,6 +279,22 @@ pub fn simulate(panel: &[DistrictRecord], policy: &Policy) -> PolicyEffect {
 /// district's enrollment band rather than by scaling the central answer. That matters because
 /// the guarantee is a `max`: a district can be on formula at high enrollment and on the
 /// guarantee at low enrollment, and the aid curve has a kink there that no scaling reproduces.
+///
+/// # What it holds per pupil, and what that is worth
+///
+/// [`apply`] scales base cost aid by the ratio of enrolments, which holds **base cost per pupil
+/// and local capacity per pupil at their FY2027 values**. Neither is constant in the pupil count:
+/// R.C. 3317.011's staffing floors do not follow a roll down, and R.C. 3317.017's wealth terms are
+/// a dollar amount over a shrinking denominator. [`crate::projected_base_cost`] recomputes both
+/// from their own inputs at the projected count and measures the difference — **$31.7m at
+/// FY2032, two thirds of the enrollment effect this function reports, and an interval two fifths
+/// wider**.
+///
+/// This function is not corrected for it, and the reason is stated where the measurement is:
+/// the linear path holds the district's *wealth per pupil* fixed and the corrected one holds its
+/// *wealth* fixed, and neither is a forecast of a tax base. The difference between them is a
+/// bound on a quantity nothing here can project, which is a thing to publish rather than to pick
+/// a side of. [`forecast_with`] is how the other side is run.
 #[must_use]
 pub fn forecast(
     panel: &[DistrictRecord],
@@ -285,6 +303,35 @@ pub fn forecast(
     method: Method,
     prior: Prior,
 ) -> EnrollmentEffect {
+    forecast_with(panel, policy, through, method, prior, |record, _| {
+        Cow::Borrowed(record)
+    })
+}
+
+/// [`forecast`], with every district restated at the enrolment it is projected to.
+///
+/// `restate` is handed the record and the three-year window of projected enrolled ADM ending at
+/// `through` — the window R.C. 3317.011's base cost count is computed over, so a restatement can
+/// reach the averaged denominator as well as the current-year one. It is called once per band
+/// end, on that end's own window, because a quantity that is not linear in the count cannot have
+/// its interval scaled from its centre.
+///
+/// The default is [`Cow::Borrowed`] and allocates nothing, so [`forecast`] is this function with
+/// the hook inert rather than a second copy of the loop. That is the whole reason it exists:
+/// the corrected run in [`crate::projected_base_cost`] has to be the *same* construction, or a
+/// difference between them is a difference between two loops.
+#[must_use]
+pub fn forecast_with<'a, F>(
+    panel: &'a [DistrictRecord],
+    policy: &Policy,
+    through: FiscalYear,
+    method: Method,
+    prior: Prior,
+    restate: F,
+) -> EnrollmentEffect
+where
+    F: Fn(&'a DistrictRecord, [f64; 3]) -> Cow<'a, DistrictRecord>,
+{
     let mut point = 0.0;
     let mut low = 0.0;
     let mut high = 0.0;
@@ -305,17 +352,18 @@ pub fn forecast(
     let statewide = crate::policy::Statewide::under(panel, policy);
 
     for record in panel {
-        // Per district, because `Method::Shrunk` carries a `toward` the feed cannot choose once.
-        let method = record.projection_method(method);
-        let series = project(&record.adm_observations(), through, method, prior);
+        let series = projected_series(record, through, method, prior);
         let Some(projected) = series
             .iter()
             .find(|p| p.fiscal_year == through && p.basis == Basis::Projected)
         else {
             continue;
         };
-        let at = |value: f64| apply(record, policy, &statewide, value);
-        let central = at(projected.point);
+        let at = |end: fn(&Projection) -> f64| {
+            let window = window_ending_at(&series, through, end);
+            apply(&restate(record, window), policy, &statewide, window[2])
+        };
+        let central = at(|p| p.point);
         point += central.realized_aid;
         total += central.total_state_support();
         supplement += central.transition_supplement;
@@ -323,8 +371,8 @@ pub fn forecast(
         // low end. That holds because every lever here is monotone in ADM — and it survives `[K]`,
         // which is flat in ADM for an insulated district and so damps the band without reordering
         // its ends.
-        let at_low = at(projected.low);
-        let at_high = at(projected.high);
+        let at_low = at(|p| p.low);
+        let at_high = at(|p| p.high);
         low += at_low.realized_aid;
         high += at_high.realized_aid;
         total_low += at_low.total_state_support();
@@ -349,6 +397,53 @@ pub fn forecast(
         method,
         prior,
     }
+}
+
+/// One district's enrolled ADM carried forward exactly as [`forecast`] carries it.
+///
+/// The per-district method resolution is the part worth having in one place:
+/// [`Method::Shrunk`] names a weight and cannot name what to shrink toward, and
+/// [`DistrictRecord::projection_method`] fills that in from the district's own long-run rate.
+#[must_use]
+pub fn projected_series(
+    record: &DistrictRecord,
+    through: FiscalYear,
+    method: Method,
+    prior: Prior,
+) -> Vec<Projection> {
+    project(
+        &record.adm_observations(),
+        through,
+        record.projection_method(method),
+        prior,
+    )
+}
+
+/// The three-year window of projected enrolled ADM ending at `through`, on one end of the band.
+///
+/// R.C. 3317.011 funds base cost on `max(mean of three years, the current year)`, so a
+/// restatement that wants the averaged denominator needs three values and not one. A year the
+/// series does not reach repeats the earliest it does, which happens only for a `through` inside
+/// the observed window — where every value is an observation and the repeat changes nothing that
+/// [`forecast`] would report anyway, since it projects nothing there.
+#[must_use]
+pub fn window_ending_at(
+    series: &[Projection],
+    through: FiscalYear,
+    end: fn(&Projection) -> f64,
+) -> [f64; 3] {
+    let at = |year: u16| {
+        series
+            .iter()
+            .find(|p| p.fiscal_year == FiscalYear(year))
+            .map(end)
+    };
+    let last = at(through.0).unwrap_or_default();
+    [
+        at(through.0.saturating_sub(2)).unwrap_or(last),
+        at(through.0.saturating_sub(1)).unwrap_or(last),
+        last,
+    ]
 }
 
 /// Run a policy, deterministically and — if `through` is given — as a forecast too.

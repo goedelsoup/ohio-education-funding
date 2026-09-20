@@ -437,6 +437,20 @@ pub struct Forecasts {
     /// above — `[K]` is outside that measure — and on total state support the two are 4.16% and
     /// 7.77%, which is the whole of why this third forecast exists.
     pub fy2032_guarantee_and_backstop_removed: project::report::EnrollmentEffect,
+    /// FY2032 with both of the per-pupil terms `policy::apply` freezes recomputed at the
+    /// projected count, which is the other end of the interval a projected local share sits in.
+    pub fy2032_two_terms_recomputed: project::report::EnrollmentEffect,
+    /// The same, with R.C. 3317.011's staffing floors recomputed and the wealth denominator left
+    /// frozen. The smaller term, and the one it pays more aid for.
+    pub fy2032_base_cost_recomputed: project::report::EnrollmentEffect,
+    /// And with the wealth denominator alone, which is the term that carries the sign.
+    pub fy2032_capacity_recomputed: project::report::EnrollmentEffect,
+    /// Every district's movement between the linear run and the recomputed one, at FY2032.
+    pub fy2032_movements: Vec<project::projected_base_cost::Movement>,
+    /// Realized state aid at **observed** enrollment, which is what every projected total above
+    /// is a movement from. Carried here rather than recomputed at each call site so that a
+    /// forecast's effect and a correction to it are differences against one number.
+    pub observed_realized_aid: edfund_core::Dollars,
 }
 
 /// `scenario/guarantee-phase-out`, every run of it.
@@ -848,6 +862,22 @@ impl Inputs {
                         prior,
                     )
                 };
+                // The same run with the per-pupil terms `apply` freezes recomputed at the
+                // projected count. `Terms::NEITHER` would reproduce `fy2032` exactly, which is
+                // what `what_a_linear_projection_holds_per_pupil` asserts, so it is not exported.
+                let recomputed =
+                    |panel: &[project::panel::DistrictRecord],
+                     prior: project::series::Prior,
+                     terms: project::projected_base_cost::Terms| {
+                        project::projected_base_cost::forecast(
+                            panel,
+                            &project::policy::Policy::current_law(),
+                            FiscalYear(2032),
+                            shrunk(project::series::DEFAULT_DAMPING),
+                            prior,
+                            terms,
+                        )
+                    };
                 Forecasts {
                     fy2032: run(2032, project::series::DEFAULT_DAMPING),
                     fy2036: run(2036, project::series::DEFAULT_DAMPING),
@@ -874,6 +904,35 @@ impl Inputs {
                         shrunk(project::series::DEFAULT_DAMPING),
                         prior,
                     ),
+                    fy2032_two_terms_recomputed: recomputed(
+                        &panel_for_forecasts,
+                        prior,
+                        project::projected_base_cost::Terms::BOTH,
+                    ),
+                    fy2032_base_cost_recomputed: recomputed(
+                        &panel_for_forecasts,
+                        prior,
+                        project::projected_base_cost::Terms::BASE_COST,
+                    ),
+                    fy2032_capacity_recomputed: recomputed(
+                        &panel_for_forecasts,
+                        prior,
+                        project::projected_base_cost::Terms::CAPACITY,
+                    ),
+                    fy2032_movements: project::projected_base_cost::movements(
+                        &panel_for_forecasts,
+                        &project::policy::Policy::current_law(),
+                        FiscalYear(2032),
+                        shrunk(project::series::DEFAULT_DAMPING),
+                        prior,
+                    ),
+                    observed_realized_aid: project::report::Totals::of(
+                        &project::policy::apply_all(
+                            &panel_for_forecasts,
+                            &project::policy::Policy::current_law(),
+                        ),
+                    )
+                    .realized_aid,
                 }
             },
         }
@@ -8420,6 +8479,131 @@ pub static FIGURES: &[Figure] = &[
     // own guarantee count that it "is the one figure on this node that no test pinned", having
     // already been corrected once from a wrong number nobody caught. The band beside it was in
     // exactly the same position.
+    // What `report::forecast` holds per pupil when it substitutes a projected count, measured
+    // rather than argued: the band above is the linear run, and these are the same run with the
+    // two terms R.C. 3317.011 and R.C. 3317.017 say are not constant in the count recomputed at
+    // it. The signs live in the keys, because `figures::Unit` has no sign and prose writes a
+    // magnitude beside a word.
+    Figure {
+        key: "project/fy2032-aid-the-linear-projection-overstates",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the linear projection pays above the run with base cost per pupil and \
+                local capacity per pupil recomputed at the projected count, FY2032",
+        pinned: 31_675_951.207_2,
+        tolerance: 0.01,
+        compute: |i| i.forecasts.fy2032.realized_aid - i.forecasts.fy2032_two_terms_recomputed.realized_aid,
+    },
+    Figure {
+        key: "project/fy2032-linearity-base-cost-term",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What recomputing base cost per pupil alone adds to projected FY2032 aid \u{2014} \
+                the staffing floors not following a roll down",
+        pinned: 11_254_806.448_6,
+        tolerance: 0.01,
+        compute: |i| i.forecasts.fy2032_base_cost_recomputed.realized_aid - i.forecasts.fy2032.realized_aid,
+    },
+    Figure {
+        key: "project/fy2032-linearity-capacity-term",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What recomputing local capacity per pupil alone takes off projected FY2032 aid \
+                \u{2014} a wealth charge over a shrinking denominator",
+        pinned: 40_995_630.932_4,
+        tolerance: 0.01,
+        compute: |i| i.forecasts.fy2032.realized_aid - i.forecasts.fy2032_capacity_recomputed.realized_aid,
+    },
+    Figure {
+        key: "project/fy2032-linearity-against-the-enrollment-effect",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The linearity correction as a share of the enrollment effect the FY2032 forecast \
+                reports \u{2014} the comparison that decides whether the approximation is fine",
+        pinned: 0.658_639_331_4,
+        tolerance: 1e-9,
+        compute: |i| {
+            (i.forecasts.fy2032.realized_aid - i.forecasts.fy2032_two_terms_recomputed.realized_aid)
+                / (i.forecasts.observed_realized_aid - i.forecasts.fy2032.realized_aid)
+        },
+    },
+    Figure {
+        key: "project/fy2032-aid-two-terms-recomputed-low",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The low end of the FY2032 aid band with both per-pupil terms recomputed at the \
+                projected count",
+        pinned: 6_853_439_138.804_0,
+        tolerance: 0.01,
+        compute: |i| i.forecasts.fy2032_two_terms_recomputed.low,
+    },
+    Figure {
+        key: "project/fy2032-aid-two-terms-recomputed-high",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And the high end, which moves further than the low one because a district \
+                projected to grow reverses every sign",
+        pinned: 7_739_639_450.055_0,
+        tolerance: 0.01,
+        compute: |i| i.forecasts.fy2032_two_terms_recomputed.high,
+    },
+    Figure {
+        key: "project/districts-on-formula-fy2032",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts the guarantee does not pay at FY2032 enrollment \u{2014} the population \
+                the linearity correction reaches, and it reaches all of them",
+        pinned: 297.0,
+        tolerance: 0.0,
+        compute: |i| i.forecasts.fy2032_movements.iter().filter(|m| !m.on_guarantee).count() as f64,
+    },
+    Figure {
+        key: "project/districts-the-linear-projection-overstates",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts the linear projection pays more than the recomputed one at FY2032",
+        pinned: 233.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.forecasts
+                .fy2032_movements
+                .iter()
+                .filter(|m| m.restated - m.linear < -1.0)
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "project/districts-the-linear-projection-understates",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "And the ones it pays less \u{2014} where the wedge opens faster than the \
+                denominator shrinks, or the district is projected to grow",
+        pinned: 65.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.forecasts
+                .fy2032_movements
+                .iter()
+                .filter(|m| m.restated - m.linear > 1.0)
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "project/districts-the-correction-sends-onto-the-guarantee",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts on formula under the linear FY2032 projection and on the guarantee \
+                under the recomputed one",
+        pinned: 15.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.forecasts
+                .fy2032_movements
+                .iter()
+                .filter(|m| !m.on_guarantee && m.on_guarantee_restated)
+                .count() as f64
+        },
+    },
     Figure {
         key: "project/fy2032-aid-current-law",
         owner: "crates/project",

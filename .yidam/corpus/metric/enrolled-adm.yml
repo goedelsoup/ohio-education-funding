@@ -28,6 +28,13 @@ properties:
     The `max` is a one-way ratchet: it protects a district losing enrollment from losing funding
     at the same rate, and gives a growing district its growth immediately. **105 of 609 districts
     are funded on the current year** rather than the average — the growing ones. [verified]
+    (`crates/project`)
+
+    That is an identity and not a description of one: run against the FY2024, FY2025 and FY2026
+    columns the `ADM Data` sheet publishes, it reproduces the department's own base cost enrolled
+    ADM for every district in the model, to the grain of the two-decimal counts the workbook
+    rounds to. So the rule can be carried forward onto a projected series, which is what
+    `project::projected_base_cost` does with it. [verified] (`crates/project`)
 
     **Current-year enrolled ADM** is the last observation alone. R.C. 3317.017 pays the state
     share of base cost on *this* denominator, not the averaged one, so the two appear in adjacent
@@ -83,6 +90,15 @@ properties:
     this district is, but we know how much districts differ from one another, and that is a
     defensible floor. Every interval records the prior that produced it, because an interval whose
     provenance is unstated is decoration. [verified]
+
+    **And one district's state share is computed on the other count.** Akron City is the only
+    district in the FY2027 model whose `[a] Enrolled ADM` and `[b3] FY26 Enrolled ADM` differ at
+    all — 18,892.45 against 18,842.45 — and its published base cost state share divides out to the
+    first, which is not the count R.C. 3317.017(B) names. Every other district reconstructs on
+    `[b3]` to within a hundredth of a per cent; Akron is 0.27% out. Fifty pupils on one district is
+    not a finding about Ohio, and it is the only place in the model where the two counts can be
+    told apart at all, which is worth recording next to a definition that has been distinguishing
+    them in the abstract since it was written. [verified] (`crates/project`)
 
     **And the fourth year exists twice, under one name.** The `Base_Enrollment Growth` sheet heads
     a column `M1B FY23 Enrolled ADM` — the enrolment growth supplement's base — and it is not the
@@ -353,6 +369,59 @@ findings: |
   belongs to and the supplement reproduces from it; whether the difference is a different pupil
   basis, a different collection, or a restatement the `ADM Data` sheet never received is not
   something either workbook says. [open]
+
+  **AND THE PROJECTION IS LINEAR IN A COUNT THAT TWO PER-PUPIL TERMS ARE NOT.** [verified]
+  (`crates/project`)
+  A forecast substitutes a projected enrollment into the formula by scaling the department's
+  published base cost state share by the ratio of the two counts. That holds **base cost per pupil
+  and local capacity per pupil** at their FY2027 values, and neither is constant in the count:
+  R.C. 3317.011's staffing floors are a `max` that does not follow a roll down, and R.C. 3317.017's
+  wealth blend is a dollar amount over a shrinking denominator. Base cost aid is the *difference*
+  of those two, so the errors compete rather than cancel.
+
+  Recomputed from their own inputs at the projected count, at FY2032 and current law, the two
+  terms are **$11,254,806** the state's way and **$40,995,631** the district's. The net is
+  **$31,675,951** of aid the linear projection pays that the recomputed one does not — 0.44% of
+  the level, and **65.9%** of the enrollment effect the forecast exists to report. The capacity
+  term is three and a half times the base cost term and carries the sign; the issue that opened
+  this named the base cost one, on the strength of the staffing-minimum wedge having just been
+  measured, and it is the smaller of the two and points the other way.
+
+  **The interval moves further than the point does.** Both terms are convex in the count, so the
+  correction is largest at the low end of the enrollment band and smallest at the high end: the
+  FY2032 band goes from $6,958M–$7,582M to **$6,853M to $7,740M**, and the ±4.3% stated above
+  becomes ±6.2%. A forecast that scales a curved function from its centre understates its own
+  interval.
+
+  **The exposed population is exactly the formula population.** The guarantee is a `max`, so a
+  guaranteed district is inert. At FY2032 the linear path leaves **297 districts** on formula and
+  every one of them moves, against one of the 312 it pays. **120** move by more than 1% of their
+  aid; **233** are overstated and **65** understated, and the sign is the difference of the two
+  per-pupil terms for every district those terms can reach, with no exceptions. The correction
+  then sends **15 districts** the other way onto the guarantee, which is the same absorption the
+  staffing floors show, arriving from a second direction.
+
+  **Neither run is a forecast of a tax base, which is why the published one is unchanged.** The
+  linear path holds a district's wealth *per pupil* fixed — the arithmetic of a tax base that
+  shrinks exactly as fast as its children leave. The recomputed path holds its wealth fixed in
+  nominal dollars for the whole horizon. Sixty per cent of the capacity blend is assessed
+  valuation and this repository cannot project valuation, so the figure above is the width of an
+  interval a projected local share sits inside rather than a correction waiting to be applied.
+  Measured in `what_a_linear_projection_holds_per_pupil`, and recorded at
+  [what a projection holds per pupil](../../decisions/what-a-projection-holds-per-pupil.yml).
+
+  **AND THE THREE-YEAR COUNT IS A CUSHION THE PROJECTION SPENDS.** [verified] (`crates/project`)
+  Base cost enrolled ADM is the greater of the three-year average and the current year, so a
+  district in decline is funded on more pupils than it teaches — statewide, 1.65% more in the
+  FY2027 model. By FY2032 the shipped projection has that at nothing: the damping flattens the
+  series, and a flat series has no average to sit above. So base cost enrolled ADM falls 2.86% over
+  the horizon against enrolled ADM's 1.26%, and more than half of the correction above is the
+  cushion closing rather than children leaving.
+
+  It is the same fact as *at the published horizon the trend is simply gone*, read through the
+  statute rather than through the count, and it cuts both ways: a district really would lose the
+  cushion if its decline really did flatten. What cannot be said is that the averaging absorbs the
+  error. At this horizon it more than doubles it.
 figures:
   - key: project/adm-growth-persistence-earlier-window
     value: 0.3279304724735254
@@ -421,3 +490,44 @@ figures:
     value: 7581865913.570096
     field: findings
     as_written: "current law is $7,233M in a band of $6,958M to $7,582M"
+  # What the linear projection holds per pupil, and the two terms that say it should not.
+  - key: project/fy2032-linearity-base-cost-term
+    value: 11254806.44860363
+    field: findings
+    as_written: "**$11,254,806** the state's way"
+  - key: project/fy2032-linearity-capacity-term
+    value: 40995630.932414055
+    field: findings
+    as_written: "**$40,995,631** the district's"
+  - key: project/fy2032-aid-the-linear-projection-overstates
+    value: 31675951.20716286
+    field: findings
+    as_written: "**$31,675,951** of aid the linear projection pays"
+  - key: project/fy2032-linearity-against-the-enrollment-effect
+    value: 0.658639331438
+    field: findings
+    as_written: "**65.9%** of the enrollment effect"
+  - key: project/fy2032-aid-two-terms-recomputed-low
+    value: 6853439138.803958
+    field: findings
+    as_written: "**$6,853M to $7,740M**"
+  - key: project/fy2032-aid-two-terms-recomputed-high
+    value: 7739639450.05505
+    field: findings
+    as_written: "**$6,853M to $7,740M**"
+  - key: project/districts-on-formula-fy2032
+    value: 297
+    field: findings
+    as_written: "leaves **297 districts** on formula"
+  - key: project/districts-the-linear-projection-overstates
+    value: 233
+    field: findings
+    as_written: "**233** are overstated"
+  - key: project/districts-the-linear-projection-understates
+    value: 65
+    field: findings
+    as_written: "and **65** understated"
+  - key: project/districts-the-correction-sends-onto-the-guarantee
+    value: 15
+    field: findings
+    as_written: "sends **15 districts** the other way"
