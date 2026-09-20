@@ -66,7 +66,12 @@ findings: |
 
   ### The incidence result is sharper than predicted
 
-      local capacity/pupil     share of the increase the district receives
+  A share **among the districts the formula pays**, which is what the column says for itself
+  rather than leaving to be carried in from further down. The 294 of 609 districts the guarantee
+  holds capture none of an increase at any capacity on this scale, so the table is incidence
+  across wealth and not coverage across Ohio. [verified] (crates/foundation)
+
+      local capacity/pupil     share of the increase a formula-paid district receives
       $500 - $7,000            100%
       $12,000 (at 5% floor)      5%
 
@@ -269,8 +274,37 @@ figures:
     value: 294
     field: findings
     as_written: "districts on the guarantee in FY2027   294 of 609"
+  # Twice in one field, because the incidence table now names the population it excludes and
+  # the guarantee section still reports it. A number written twice and bound once is the shape
+  # the revision below was filed against.
+  - key: project/districts-on-the-guarantee
+    value: 294
+    field: findings
+    as_written: "The 294 of 609 districts the guarantee"
 
 revisions:
+  - was: |
+      A recorded and unresolved sensitivity: the single-district runner does not model the
+      guarantee population at all, so its "100%" column overstates coverage by however many
+      districts are guaranteed. Disclosed rather than hidden, and no less wrong for it.
+    now: |
+      The column states its own population. It is a share among the districts the formula pays,
+      and the runner counts the other half off the department's own FY2027 model — the districts
+      the guarantee holds, and the share of ADM they carry — and prints it beside the table. The
+      two halves of this node answer the same question the same way. [verified]
+    found_by: |
+      #393, which read the `confidence` block against the `findings` block and found them
+      disagreeing about the same quantity — and observed that `project::refresh` had since made
+      the statewide computation available, which it was not when the sensitivity was recorded.
+    reach: |
+      The incidence table and the sentence above it, here and in the runner. Nothing computed
+      moves: every share in the column is unchanged and was always correct for the population it
+      describes. What was missing was the population, which is the failure a coverage figure can
+      have while every number in it is right.
+
+      The runner counts rather than restating. `foundation::department_model` is the fixture the
+      base cost check already runs against, so the guarantee population arrives by the same route
+      as everything else the runner prints, and a later vintage of that file moves both.
   - was: |
       A four-line decomposition of a $465.0 million computed base cost increase, delivering
       $197.1 million as state aid — 42.4% — with the guarantee absorbing $141.6 million and 256
@@ -418,11 +452,17 @@ properties:
     computed from the secondary salary sat 6.3% apart and were presented as two unreconciled
     answers.
 
-    One sensitivity remains. Districts held on a guarantee are off-formula entirely and would
-    receive none of the increase — the guarantee population is not modelled in the
-    single-district run above at all, so its "100%" column overstates coverage by however many
-    districts are guaranteed. The guarantee section of the findings quantifies this on the
-    department's model; the runner has not been rewritten to carry it. [open]
+    The guarantee is no longer a sensitivity of this run. It is a population, and the run states
+    it: the incidence column is a share among the districts the formula pays, and
+    [`crates/foundation/examples/input_year_refresh.rs`](../../../crates/foundation/examples/input_year_refresh.rs)
+    counts the other half — the districts the guarantee holds, and their share of ADM — off the
+    department's own FY2027 model beside the table. It counts rather than restates, so a later
+    vintage of that fixture moves the column's population with it. [verified]
+
+    What the runner still cannot do is say which side of the guarantee floor its worked-example
+    district falls on. It has one district's capacity and no guarantee status, so it prices the
+    incidence and not the coverage; the coverage question is statewide, and the decomposition in
+    the findings is where it is answered. [verified]
 links:
   - target: ../../catalog/dew-october-enrollment.md
     relationship: sourced-from
