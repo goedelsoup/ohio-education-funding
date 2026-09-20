@@ -79,7 +79,8 @@ use local_capacity::StateShare;
 use crate::panel::{
     panel, DistrictRecord, AVERAGE_BASE_COST_PER_PUPIL, CTE_ASSOCIATED_WEIGHT,
     CTE_BASE_COST_PER_PUPIL, CTE_WEIGHTS, ENGLISH_LEARNER_WEIGHTS, MINIMUM_STATE_SHARE,
-    SPECIAL_EDUCATION_WEIGHTS,
+    SPECIAL_EDUCATION_WEIGHTS, TA_MEDIAN_WEALTH_PER_PUPIL, TA_WEALTH_INDEX_FLOOR,
+    TA_WEALTH_OFFSET_RATE, TA_WEALTH_RATE,
 };
 
 /// The tax year of Table SD-1 whose ADM is read as the resident count.
@@ -410,6 +411,81 @@ pub fn divergence_correlation() -> f64 {
     let sx: f64 = pairs.iter().map(|p| (p.0 - mx).powi(2)).sum::<f64>().sqrt();
     let sy: f64 = pairs.iter().map(|p| (p.1 - my).powi(2)).sum::<f64>().sqrt();
     covariance / (sx * sy)
+}
+
+/// What re-basing targeted assistance's **own** denominator would move.
+///
+/// Returned as `(on the statute's adjusted count, on the resident count, districts that gain)`.
+///
+/// # Why this is the component that matters most
+///
+/// R.C. 3317.0217(C)(1) is the one place the plan already concedes the principle. It divides
+/// weighted wealth by a **residence-flavoured** count — enrolled ADM less open enrolment in plus
+/// open enrolment out — and then multiplies the resulting rate by **enrolled** ADM. So targeted
+/// assistance already measures wealth against the children a district is responsible for and pays
+/// against the children it teaches. That is exactly the correction this module's other functions
+/// have to argue for; here it is the statute's own design.
+///
+/// It reaches one of the nine channels R.C. 3317.03(A)(2) lists. This measures what the other
+/// eight would move if the same denominator ran to the full resident count and nothing else
+/// changed — the multiplier stays enrolled ADM, because moving that would be a different
+/// counterfactual and a much larger one.
+///
+/// # The two counts are one line apart and mixing them is a factor of 38
+///
+/// `[D]` divides by the adjusted count; `[F]` multiplies by enrolled ADM. Dividing *and*
+/// multiplying by the adjusted count reproduces nothing — it misses the published wealth tier by
+/// 38x — which is why `the_wealth_tier_reproduces_before_it_is_re_based` checks the reconstruction
+/// against the department's own published `[F]` before the counterfactual is allowed to mean
+/// anything. `[D]` is published rounded to the cent and `[E]` and `[F]` are computed from the
+/// rounded figure, so the reconstruction rounds too.
+#[must_use]
+pub fn targeted_assistance_on_the_resident_count() -> (Dollars, Dollars, usize) {
+    let resident: BTreeMap<String, Adm> = dispersion::sd1::rows()
+        .into_iter()
+        .filter(|row| row.tax_year == RESIDENT_TAX_YEAR)
+        .filter_map(|row| row.adm.map(|adm| (row.irn, adm)))
+        .collect();
+
+    let (mut here, mut there, mut gainers) = (0.0, 0.0, 0);
+    for record in &panel() {
+        let Some(&resident_adm) = resident.get(&record.irn) else {
+            continue;
+        };
+        let assistance = &record.targeted_assistance;
+        if assistance.weighted_wealth <= 0.0 {
+            continue;
+        }
+        let enrolled = record.categorical_enrolled_adm;
+        let statute = wealth_tier(
+            assistance.weighted_wealth,
+            assistance.resident_adm(enrolled),
+            enrolled,
+        );
+        let rebased = wealth_tier(assistance.weighted_wealth, resident_adm, enrolled);
+        here += statute;
+        there += rebased;
+        if rebased - statute > MATERIAL {
+            gainers += 1;
+        }
+    }
+    (here, there, gainers)
+}
+
+/// The wealth tier of targeted assistance, on a denominator and a multiplier that need not agree.
+///
+/// R.C. 3317.0217(C)(1) through (C)(4). The rounding is the department's: `[D]` is published to
+/// the cent and the index and amount are computed from the rounded figure, so a reconstruction
+/// that keeps full precision does not reproduce.
+fn wealth_tier(weighted_wealth: Dollars, denominator: Adm, multiplier: Adm) -> Dollars {
+    if denominator <= 0.0 {
+        return 0.0;
+    }
+    let per_pupil = (weighted_wealth / denominator * 100.0).round() / 100.0;
+    if per_pupil <= 0.0 || TA_MEDIAN_WEALTH_PER_PUPIL / per_pupil < TA_WEALTH_INDEX_FLOOR {
+        return 0.0;
+    }
+    (TA_MEDIAN_WEALTH_PER_PUPIL * TA_WEALTH_RATE - per_pupil * TA_WEALTH_OFFSET_RATE) * multiplier
 }
 
 /// The two different things re-basing the denominator does, separated.
@@ -905,6 +981,78 @@ mod tests {
             Some(false),
             "and fails the supplement on the wealth test alone, at an FY2019 index of {:.4}",
             columbus.fy19_wealth_index
+        );
+    }
+
+    /// The wealth tier reproduces from the statute before any counterfactual is run on it.
+    ///
+    /// The guard on the measurement below, and it was earned: a first attempt divided *and*
+    /// multiplied by the adjusted count and came out **38 times** the published figure, which is
+    /// large enough to look like a finding rather than a mistake. `[D]` divides by the adjusted
+    /// count and `[F]` multiplies by enrolled ADM, and the two are one line apart in the section.
+    #[test]
+    fn the_wealth_tier_reproduces_before_it_is_re_based() {
+        let mut worst: f64 = 0.0;
+        let mut checked = 0;
+        for record in &panel() {
+            let assistance = &record.targeted_assistance;
+            if assistance.wealth_amount <= 1.0 {
+                continue;
+            }
+            let enrolled = record.categorical_enrolled_adm;
+            let computed = wealth_tier(
+                assistance.weighted_wealth,
+                assistance.resident_adm(enrolled),
+                enrolled,
+            );
+            worst =
+                worst.max((computed - assistance.wealth_amount).abs() / assistance.wealth_amount);
+            checked += 1;
+        }
+        assert!(
+            checked > 400,
+            "only {checked} districts carry a wealth tier"
+        );
+        assert!(
+            worst < 1e-5,
+            "the wealth tier reconstruction is off by {worst:.3e} at worst. Until it reproduces \
+             the department's own [F], nothing computed from it means anything — and the failure \
+             mode is silent: using the adjusted count as the multiplier as well as the divisor \
+             overstates the tier by a factor of 38 and still returns a plausible-looking number."
+        );
+    }
+
+    /// Targeted assistance carries more of the denominator than the categoricals do.
+    ///
+    /// **$433.1m**, against the $183.4m the four categoricals carry — and it lands almost entirely
+    /// on one side: $433.4m to 489 districts against $0.3m off 7, because only the divisor moves
+    /// and the multiplier stays enrolled ADM.
+    ///
+    /// This is the component that already concedes the principle. R.C. 3317.0217(C)(1) divides by
+    /// a residence-flavoured count *by design*; the question it leaves is only how far that count
+    /// reaches, and the answer is one of nine channels and 2,098 pupils against 222,923.
+    #[test]
+    fn the_component_that_already_uses_a_resident_denominator_carries_the_most() {
+        let (statute, rebased, gainers) = targeted_assistance_on_the_resident_count();
+        assert!(
+            (statute / 1e6 - 1030.3).abs() < 0.2,
+            "the wealth tier on the statute's own count is {statute}"
+        );
+        assert!(
+            (rebased / 1e6 - 1463.4).abs() < 0.2,
+            "and on the resident count {rebased}"
+        );
+        assert_eq!(gainers, 489);
+
+        let moved = rebased - statute;
+        assert!((moved / 1e6 - 433.1).abs() < 0.2, "moved {moved}");
+        assert!(
+            moved > categorical_exposure(Basis::Resident).net() * 2.0,
+            "targeted assistance carries {:.1}m against the categoricals' {:.1}m. The channel the \
+             plan already equalises on a resident count is the one the denominator reaches \
+             furthest into, which is the opposite of what a reading confined to R.C. 3317.022 sees.",
+            moved / 1e6,
+            categorical_exposure(Basis::Resident).net() / 1e6
         );
     }
 
