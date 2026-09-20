@@ -8170,6 +8170,80 @@ pub static FIGURES: &[Figure] = &[
                 .count() as f64
         },
     },
+    // R.C. 3317.011's staffing floors, priced. The base cost node had carried their
+    // distributional consequence on a think-tank's account and as an inference for as long as it
+    // has existed; #389 asked what they are worth and these are the four numbers that answer it.
+    Figure {
+        key: "project/staffing-floors-in-base-cost",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What R.C. 3317.011's seven staffing floors add to Ohio's aggregate base cost in \
+                FY2027, net of the two ceilings beside them",
+        pinned: 187_146_074.83,
+        tolerance: 0.01,
+        compute: |i| {
+            let floors: f64 = project::staffing_minimums::census(&i.panel)
+                .iter()
+                .map(project::staffing_minimums::Census::total)
+                .sum();
+            let ceilings: f64 = project::staffing_minimums::ceilings(&i.panel)
+                .iter()
+                .map(|c| c.2)
+                .sum();
+            floors - ceilings
+        },
+    },
+    Figure {
+        key: "project/staffing-floors-in-state-aid",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the same floors are worth in state aid -- more than five sixths of the base \
+                cost, because local capacity does not move when base cost does",
+        pinned: 156_371_577.58,
+        tolerance: 0.01,
+        compute: |i| {
+            -project::staffing_minimums::without_the_floors(&i.panel)
+                .iter()
+                .map(|row| row.aid_delta)
+                .sum::<f64>()
+        },
+    },
+    Figure {
+        key: "project/districts-the-staffing-floors-keep-off-the-guarantee",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts that would fall onto the temporary transitional aid guarantee if the \
+                staffing floors were struck out of R.C. 3317.011",
+        pinned: 46.0,
+        tolerance: 0.0,
+        compute: |i| {
+            project::staffing_minimums::without_the_floors(&i.panel)
+                .iter()
+                .filter(|row| row.newly_guaranteed())
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "project/districts-whose-marginal-pupil-is-below-their-average",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts whose marginal pupil costs less than 95% of their average pupil -- the \
+                wedge the floors open, measured at each district\u{2019}s own enrolment",
+        pinned: 313.0,
+        tolerance: 0.0,
+        compute: |i| {
+            let factors = foundation::StatewideFactors::fy2027();
+            i.panel
+                .iter()
+                .filter(|d| d.base_cost_adm() > project::staffing_minimums::HALF_WINDOW)
+                .filter(|d| {
+                    project::staffing_minimums::wedge(&d.enrollment, d.base_cost_adm(), &factors)
+                        .ratio()
+                        < 0.95
+                })
+                .count() as f64
+        },
+    },
     // The interpolation weight, recovered per district rather than read off the header cell that
     // states it. The FY2027 panel is at 1.0, where a wrong multiplier is invisible.
     Figure {

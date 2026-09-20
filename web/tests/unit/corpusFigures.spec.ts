@@ -161,13 +161,23 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * ratchet had none of: every one of those five nodes stated what its mechanism pays and none stated
  * what it pays for one more of anything. A node can bind every level, every difference between two
  * levels, and still not have bound a slope.
+ *
+ * Recomputed at **843/76** when R.C. 3317.011's staffing floors were priced. All four are the new
+ * work and nothing had drifted in between, which is the first time that has been true here — the
+ * recount is still the instruction and it is now also a check that the last one held.
+ *
+ * The seventy-sixth carrier is `formula-component/fsfp-base-cost-calculation`, and what it had
+ * been carrying is the reason to note it: the node had stated the staffing floors' distributional
+ * consequence since it was written, on a think-tank's account and as an inference, with **no
+ * `figures:` block at all**. A node can be the corpus's account of a mechanism and have nothing
+ * in it that any crate checks.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "839 bindings; raise this when you add one").toBeGreaterThanOrEqual(839);
+  expect(bindings.length, "843 bindings; raise this when you add one").toBeGreaterThanOrEqual(843);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "75 nodes carry bindings; raise this when a seventy-sixth does",
-  ).toBeGreaterThanOrEqual(75);
+    "76 nodes carry bindings; raise this when a seventy-seventh does",
+  ).toBeGreaterThanOrEqual(76);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

@@ -51,6 +51,79 @@ findings: |
   A district is funded for the staff the ratios say it needs, at a price no district in the
   sample pays. That gap is not a criticism of the model's structure — the build-up is sound —
   but it is the difference between a costing and a costing-shaped number. [inference]
+
+  ### What the staffing floors are worth, now that something computes them
+
+  The description above records the floors' distributional consequence on Fordham's account and
+  as an inference. It is measurable, and the measurement is larger than the account.
+
+  Seven divisions of R.C. 3317.011 take the greater of a funded position count and a fixed
+  number. Across the department's FY2027 model those floors add $189,474,883 to aggregate base
+  cost and the two ceilings beside them take $2,328,808 back, for a net **$187,146,075** — and
+  because R.C. 3317.017 computes local capacity from valuation and income rather than from base
+  cost, the state pays five sixths of it rather than its state share of it: **$156,371,578** of
+  aid. [verified — crates/project] The largest single floor is not the six special teachers the
+  description names but the five student wellness and success staff, at $47.3m; the most widely
+  felt is the one EMIS support employee, which binds for **554 of 609 districts** and is
+  therefore not a small-district provision at all. [verified — crates/project]
+
+  ### They are why the smallest districts are not on the guarantee
+
+  Strike every floor out of the section and **46** more districts fall onto the [temporary
+  transitional aid guarantee](temporary-transitional-aid-guarantee.yml), 294 becoming 340, of
+  which 42 are in the smallest two enrolment sextiles. [verified — crates/project] The asymmetry
+  that makes this work is that the guarantee's anchor is a FY2020 figure produced under the
+  [Bridge formula](../funding-regime/bridge-formula.yml) and contains no part of a section
+  enacted for FY2022: the floors sit on one side of the comparison only.
+
+  This is most of an answer to something the corpus had measured and not explained — the
+  guarantee rate by enrolment sextile is non-monotone, lowest among the smallest districts and
+  highest in the third sextile. The floors account for about half of that shape and the other
+  half is not size. [inference]
+
+  ### The shape is a decay and not a cliff, and one floor cannot bind
+
+  Every floor is the greater of a quotient and a number, which meets the quotient exactly at the
+  threshold, so nothing steps. The jump in aggregate base cost at each threshold is inside the
+  grain of the department's own two-decimal rounding of funded position counts. [verified —
+  crates/foundation] What the floors do instead is separate the **marginal** pupil from the
+  average one: in the smallest enrolment sextile one more pupil adds 0.64 of what the average
+  pupil costs, rising to parity at about 2,000 pupils, and **313 of 608** districts are funded
+  for a marginal pupil worth less than 95% of their average. [verified — crates/project]
+
+  And R.C. 3317.011(F)(6)(c) states a floor of one leadership support staff member that **can
+  never be the operative term** — its own input at (F)(6)(a) is already floored at two
+  administrators, so the quotient it is compared against is never below one, at any enrolment.
+  [verified — crates/foundation] Small districts' leadership support is nonetheless raised, by
+  $6.1m, and that is the administrator floor at (F)(3) flowing through rather than this
+  provision.
+
+  ### Nothing committed says where the numbers came from
+
+  The section states each floor as a bare integer inside the division that applies it. LSC's
+  greenbook for [H.B. 110](../legislation/hb-110-2021.yml), the act that enacted it, restates
+  all seven in a parameter table and derives none of them. [verified — crates/project] The
+  drafting tradition had the other shape available: the [Evidence-Based
+  Model](../funding-regime/evidence-based-model.yml)'s school nurse wellness coordinator factor
+  was zero below 418 pupils — a size cut-off written to exclude small districts rather than to
+  protect them. [verified — crates/project]
+figures:
+  - key: project/staffing-floors-in-base-cost
+    value: 187146074.82726616
+    field: findings
+    as_written: "for a net **$187,146,075**"
+  - key: project/staffing-floors-in-state-aid
+    value: 156371577.57647225
+    field: findings
+    as_written: "**$156,371,578** of\n  aid"
+  - key: project/districts-the-staffing-floors-keep-off-the-guarantee
+    value: 46
+    field: findings
+    as_written: "Strike every floor out of the section and **46** more districts fall"
+  - key: project/districts-whose-marginal-pupil-is-below-their-average
+    value: 313
+    field: findings
+    as_written: "**313 of 608** districts are funded"
 properties:
   name: FSFP base cost calculation
   function: |

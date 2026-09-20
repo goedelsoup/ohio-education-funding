@@ -37,6 +37,7 @@
 
 pub mod department_model;
 pub mod grade_bands;
+pub mod minimums;
 
 use edfund_core::{round_dp, Adm, Dollars};
 
