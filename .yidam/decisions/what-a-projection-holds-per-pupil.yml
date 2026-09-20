@@ -1,0 +1,121 @@
+id: what-a-projection-holds-per-pupil
+summary: >-
+  `report::forecast` scales base cost aid linearly in enrolment, which holds base cost per pupil
+  and local capacity per pupil at their FY2027 values. Both move with the count, they move against
+  each other, and the net is $31.7m at FY2032 — two thirds of the enrollment effect the forecast
+  reports. The published figure is left alone, because the two runs are the ends of an interval
+  rather than a wrong answer and a right one.
+context: |
+  `policy::apply` takes a substituted enrolment and computes base cost aid as the department's
+  published state share times the ratio of the two counts. Its own note says what that is worth:
+  *"the defensible approximation: it is exact at modelled enrollment, which is where every
+  deterministic result in this crate is computed."*
+
+  [`report::forecast`](../../crates/project/src/report.rs) is the one caller for which that
+  sentence is false. It substitutes a count no other input in the model was computed at, out to a
+  FY2036 horizon, and every band the site draws comes through it.
+
+  Two per-pupil quantities are frozen by that scaling and neither is constant in the count:
+
+  - **Base cost per pupil.** R.C. 3317.011's staffing floors are a `max` and do not follow a roll
+    down, so a shrinking district's base cost per pupil *rises*.
+    [`fsfp-base-cost-calculation`](../corpus/formula-component/fsfp-base-cost-calculation.yml)
+    carries the measurement: a marginal pupil is worth 0.642 of the average one in the smallest
+    ADM sextile, and 313 of 608 districts are below 0.95.
+  - **Local capacity per pupil.** R.C. 3317.017 blends valuation, income and a median-income term
+    and divides all three by base cost enrolled ADM, so what the section charges is a **dollar
+    amount set by wealth alone** — which
+    [`fsfp-local-capacity-measure`](../corpus/formula-component/fsfp-local-capacity-measure.yml)
+    establishes and `capacity_denominator` proves against the department's own intermediates. Over
+    a shrinking denominator it rises too.
+
+  Base cost aid is the *difference* of the two, so the errors compete rather than cancel. #407
+  opened the question and named the first term; it is the smaller.
+decision: |
+  **Measure both terms, publish the width, and leave `report::forecast` computing what it
+  computes.**
+
+  [`project::projected_base_cost`](../../crates/project/src/projected_base_cost.rs) recomputes
+  each from its own inputs at the projected count — aggregate base cost from `foundation` on the
+  enrolment scaled to it, and capacity from the published wealth charge over the projected
+  denominator — and runs the correction through `report::forecast_with`, which is
+  `report::forecast` with a restatement hook rather than a second copy of the loop.
+  `Terms::NEITHER` reproduces the committed path exactly, and that is asserted rather than
+  assumed.
+
+  **Why not correct it.** The linear path holds a district's wealth **per pupil** fixed, which is
+  the arithmetic of a tax base that shrinks exactly as fast as its children leave. The recomputed
+  path holds its wealth fixed in nominal dollars for ten years. Neither is a forecast of an Ohio
+  tax base, and this repository does not have one: 60% of the capacity blend is assessed
+  valuation, and `crates/project`'s own note records that valuation cannot be projected from the
+  committed data — one observation per district, stepping on a county reappraisal cycle.
+
+  So the $31.7m is the **width of an interval a projected local share sits inside**, not a
+  correction waiting to be applied. Applying it would move every band in the published feed on the
+  strength of an assumption about Ohio property values that nothing here has measured, and the
+  direction of that assumption is the whole of the answer.
+
+  **Why not correct the base cost half alone**, which is not in that condition — R.C. 3317.011
+  says what aggregate base cost is at any enrolment and `foundation` computes it. Because it is
+  the smaller of the two terms and points the opposite way: correcting it alone moves the
+  published figure **up** by $11.3m, in the direction the larger term says is wrong. A partial
+  correction that moves a number the wrong way is worse than no correction, and it would look like
+  a more careful answer.
+consequences: |
+  **The size of what is now on the record.** At FY2032, current law, the shipped method:
+
+      projected realized aid, linear — what the feed publishes     $7,233.1m
+        base cost per pupil recomputed alone                       $7,244.4m   +$11.3m
+        local capacity per pupil recomputed alone                  $7,192.1m   -$41.0m
+        both                                                       $7,201.5m   -$31.7m
+
+  $31.7m is 0.44% of the level and **65.9% of the -$48.1m enrollment effect the forecast exists
+  to report**. Against the level it looks negligible; against the movement it is reporting it is
+  two thirds. The second comparison is the one that decides.
+
+  **The interval moves further than the point.** Both terms are convex in the count, so the
+  correction is largest at the low end of the enrollment band and smallest at the high end. The
+  FY2032 band goes from $6,958M–$7,582M to $6,853M to $7,740M — the ±4.3% this corpus publishes
+  becomes ±6.2%. A forecast that scales a curved function from its centre understates its own
+  interval, and that is the part of this a wider band would not have absorbed.
+
+  **The exposed population is exactly the formula population.** 297 districts are off the
+  guarantee at FY2032 and every one of them moves; one of the 312 the guarantee pays does. 233 are
+  overstated and 65 understated, and the sign of each is the difference of the two per-pupil terms
+  with no exceptions. The correction then sends 15 districts onto the guarantee, which is the same
+  absorption R.C. 3317.011's floors show from the other side.
+
+  **And a second finding came out of carrying the count forward.** Base cost enrolled ADM is
+  `max(three-year mean, current year)`, so a district in decline is funded on 1.65% more pupils
+  than it teaches statewide. The shipped projection has that at nothing by FY2032, because the
+  damping flattens the series and a flat series has no average to sit above — so the funded count
+  falls 2.86% against the taught count's 1.26%, and more than half the correction above is that
+  cushion closing. It is [`the-fitted-damping`](the-fitted-damping.yml)'s horizon behaviour
+  showing up inside the statute.
+
+  **`report::forecast` gained a seam and no behaviour.** `forecast_with` takes a restatement hook
+  and `forecast` passes an inert one that allocates nothing. The published numbers are unchanged
+  to the cent, which the figure manifest's pins hold.
+alternatives: |
+  **Correct `report::forecast` and move the feed.** Rejected on the reasoning above: it would
+  substitute one unmeasured assumption about Ohio property values for another and publish the
+  result as an improvement. This is the alternative to revisit if a valuation projection ever
+  exists — `regime_diff::recognized_valuation` holds the Department of Taxation's reappraisal
+  calendar and the abstract now carries four tax years, so the reason recorded for not having one
+  is no longer the reason.
+
+  **Correct `policy::apply` instead.** Rejected. It is deliberately a one-year function, and the
+  three-year average in `DistrictRecord::base_cost_adm` means a district's loss reaches base cost
+  over three years. That is the forecast's clock, not `apply`'s, and R.C. 3317.017(B) genuinely
+  multiplies a per-pupil residual by current-year enrolled ADM — so `margin`'s one-year prices are
+  right where they are, and nothing about the deterministic half of this crate is affected.
+
+  **Widen the published interval instead of reporting the correction.** Rejected as the wrong
+  shape. The correction is not symmetric noise: it has a sign per district that is exactly
+  predictable from the two terms, and burying that in a wider band would report a measured
+  systematic movement as uncertainty.
+
+  **Carry the base cost count forward one-for-one with enrolled ADM** rather than re-applying
+  R.C. 3317.011's three-year rule to the projected series. Rejected because it is wrong about the
+  statute, and measuring it is what found the cushion: it gives $13.3m rather than $31.7m, and the
+  $18.4m difference is the averaged count catching up rather than anything about pupils.

@@ -82,6 +82,7 @@ pub mod panel;
 pub mod plan_bill;
 pub mod policy;
 pub mod prior_model;
+pub mod projected_base_cost;
 pub mod rating_payments;
 pub mod refresh;
 pub mod report;

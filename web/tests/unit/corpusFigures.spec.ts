@@ -184,9 +184,16 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * band that straddles the floor — a gradient the published table had reported as a binary, because
  * its sample points fell either side of it. A ratchet cannot count what the corpus quotes out of an
  * unreachable target, and an example is an unreachable target.
+ *
+ * Recomputed at **860/76** when the enrollment projection's own linearity was measured. Ten
+ * bindings, no new carrier, and all ten land on `metric/enrolled-adm`, which had bound the FY2032
+ * band and nothing about how the band is *formed*. Six of the ten are a **term** — what one of two
+ * competing approximations is worth on its own — which is a fourth thing this ratchet had none of.
+ * A node can bind a level, a difference, a slope, and still not have bound either half of an
+ * approximation whose halves point opposite ways.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "850 bindings; raise this when you add one").toBeGreaterThanOrEqual(850);
+  expect(bindings.length, "860 bindings; raise this when you add one").toBeGreaterThanOrEqual(860);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "76 nodes carry bindings; raise this when a seventy-seventh does",

@@ -484,6 +484,20 @@ impl Outcome {
 /// floor here, which is right if its capacity is well above the threshold and understates its
 /// gain if it is only just above. 138 districts are in that condition, and distinguishing them
 /// needs the `tax-abstract` connector rather than a better guess.
+///
+/// # And where `current_year_adm` is a projection rather than a substitution
+///
+/// Base cost aid is scaled by the ratio of the two counts, which holds **base cost per pupil and
+/// local capacity per pupil** at their FY2027 values. That is exact at modelled enrollment and it
+/// is not a small thing anywhere else: R.C. 3317.011's staffing floors do not follow a roll down
+/// and R.C. 3317.017's wealth blend is a dollar amount over a shrinking denominator, so both
+/// per-pupil terms move and they move against each other.
+///
+/// [`crate::projected_base_cost`] measures it — **$31.7m at FY2032, two thirds of the enrollment
+/// effect [`crate::report::forecast`] reports, and an aid band two fifths wider** — and does not
+/// correct it here. This function is deliberately a one-year function: the averaged count in
+/// [`DistrictRecord::base_cost_adm`] means the loss phases in over three years, which is the
+/// forecast's clock and not this one.
 #[must_use]
 pub fn apply(
     record: &DistrictRecord,
@@ -513,6 +527,14 @@ pub fn apply(
     // does not carry separately. Scaling them by the change in enrolled ADM is the defensible
     // approximation: it is exact at modelled enrollment, which is where every deterministic
     // result in this crate is computed.
+    //
+    // `report::forecast` is the caller for which that sentence is false, and the scope note on
+    // this function says what it costs there. The short form: scaling the *product* holds base
+    // cost per pupil and local capacity per pupil fixed, neither is constant in the count, and
+    // at FY2032 the two together are worth $31.7m — two thirds of the enrollment effect the
+    // forecast reports. Measured in `crate::projected_base_cost`, which restates a record rather
+    // than changing anything here, because this function is a one-year function and the loss
+    // phases in over three.
     let adm_ratio = if record.current_year_adm > 0.0 {
         current_year_adm / record.current_year_adm
     } else {
