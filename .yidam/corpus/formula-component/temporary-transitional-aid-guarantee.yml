@@ -283,7 +283,83 @@ findings: |
   two years for a decade and has not done since FY2022. That is a fact about practice rather than
   about statutory design, and it is the answer to the question this node asked. [inference]
 
+  ### What it pays at the margin, which is nothing
+
+  Every figure above is a level. Ask instead what the guarantee pays a district *to do* — one pupil
+  fewer, everything else held, priced on total state support — and the instrument turns out to
+  charge nothing for the marginal pupil. [verified] (crates/project)
+
+      [K] holds the district    144 districts    23.5% of ADM    nothing at all
+      the guarantee alone       167 districts    31.7% of ADM    transportation only
+      on formula                298 districts    44.8% of ADM    the whole entitlement
+
+  **294 districts lose no foundation aid whatever when a pupil leaves.** [verified]
+  (crates/project) **144 lose nothing at all**, because [`[K]`](fsfp-formula-transition-supplement.yml)
+  holds them at a *total* rather than at a level, so a dollar the departing pupil takes off
+  foundation funding or off transportation is a dollar the supplement puts back. [verified]
+  (crates/project) For the 167 the guarantee alone holds, the marginal pupil costs *exactly* the
+  district's transportation aid and nothing else — a median **$503.40** against **$8,516** for a
+  district on formula — because `[J]` sits outside the measure `[I]` holds level, and the residual
+  across all 167 is four billionths of a dollar rather than an approximation. [verified]
+  (crates/project)
+
+  Statewide the floors absorb two fifths of the response. Take one per cent off every district's
+  roll at once — 14,019 pupils — and the state gives up $3,260.09 a pupil against an average of
+  $5,756.93, so **56.63% of Ohio's per-pupil funding is what actually follows a pupil.** [verified]
+  (crates/project)
+
+  ### A zero margin is not a payment for shrinking, and the difference is the finding
+
+  `enrollment_decline` measured the median member of its cluster drawing $464.06 a pupil for
+  enrolment lost. That is an average, and the margin beside it is zero; the two are consistent
+  precisely because the guarantee pays a level, and a district cannot act on an average. [verified]
+  (crates/project)
+
+  So the honest reading is not that Ohio pays a district to shed children. It is that a held
+  district is paid **nothing for the marginal child**, so every additional one it teaches is a pure
+  cost against a cheque that does not move. Which of the two readings is the incentive depends on
+  whether anyone can act on it, and nobody chooses how many children live in their district.
+  [inference]
+
+  ### The boundary is a kink, not a cliff — and in children it is thin
+
+  A district one dollar below its base is held and one dollar above is not, and that boundary pays
+  nothing to stand on either side of: realized aid is `max([H], [H2] - [I1])`, which is continuous.
+  No district is better off for sitting under its base. What changes at the edge is the *slope*,
+  from one to zero. [verified] (crates/project)
+
+  Measured from above, in the unit a district actually loses, the edge is sparsely populated: the
+  median formula district is 206.6 pupils clear of its own floor and six of 315 are inside ten,
+  Waynesfield-Goshen Local closest at 2.3 pupils. Measured in time at each district's own
+  FY2024-FY2026 trend it is much nearer — of 238 formula districts with a falling roll, **17 of
+  them** reach their floor within a year. [verified] (crates/project) That is the same clock the
+  cluster crossing this instrument was measured on, seen from outside rather than inside it.
+
 figures:
+  - key: project/marginal-pupil-no-foundation-aid-districts
+    value: 294
+    field: findings
+    as_written: "**294 districts lose no foundation aid whatever when a pupil leaves.**"
+  - key: project/marginal-pupil-insulated-districts
+    value: 144
+    field: findings
+    as_written: "**144 lose nothing at all**"
+  - key: project/marginal-pupil-guaranteed-median
+    value: 503.4003547541797
+    field: findings
+    as_written: "a median **$503.40**"
+  - key: project/marginal-pupil-formula-median
+    value: 8516.075226996094
+    field: findings
+    as_written: "**$8,516** for a\n  district on formula"
+  - key: project/statewide-marginal-share-of-average
+    value: 0.5663
+    field: findings
+    as_written: "**56.63% of Ohio's per-pupil funding is what actually follows a pupil.**"
+  - key: project/formula-districts-a-year-from-the-floor
+    value: 17
+    field: findings
+    as_written: "**17 of\n  them** reach their floor within a year"
   - key: project/guarantee-predicts-achievement-raw
     value: 0.18686
     field: findings

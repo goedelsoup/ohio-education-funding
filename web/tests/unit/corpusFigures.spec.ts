@@ -148,9 +148,22 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * `formula-component/fsfp-local-capacity-measure`, which is where the question belongs. Two of them
  * are a *loss* and a *count of losers* — the second sign of a divergence whose first sign is the
  * only one a re-basing argument tends to price.
+ *
+ * Recomputed at **839/75** when `project::margin` priced what the formula pays a district *to do*.
+ * Eleven of those nineteen are that work; the other **eight had arrived without the floor moving**,
+ * so the drift this section keeps describing had happened again, smaller, between 820 and here.
+ * Recompute, never increment — that is the whole instruction and it is the second time it has been
+ * ignored in this file's own history.
+ *
+ * No new carrier: the eleven land on five nodes that all had bindings already — the guarantee, the
+ * local capacity measure, the twenty-mill floor, the open-enrolment clawback and the enrolment
+ * supplements. They are **margins** rather than levels or deltas, which is a third thing this
+ * ratchet had none of: every one of those five nodes stated what its mechanism pays and none stated
+ * what it pays for one more of anything. A node can bind every level, every difference between two
+ * levels, and still not have bound a slope.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "820 bindings; raise this when you add one").toBeGreaterThanOrEqual(820);
+  expect(bindings.length, "839 bindings; raise this when you add one").toBeGreaterThanOrEqual(839);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "75 nodes carry bindings; raise this when a seventy-sixth does",
