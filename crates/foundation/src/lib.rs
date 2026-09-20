@@ -40,6 +40,7 @@ pub mod grade_bands;
 pub mod minimums;
 
 use edfund_core::{round_dp, Adm, Dollars};
+use local_capacity::MINIMUM_STATE_SHARE_FY2027;
 
 /// Statewide average cost inputs for a reference year.
 ///
@@ -545,6 +546,142 @@ pub fn refresh() -> Refresh {
         bound_mean_per_pupil: mean(&bound),
         free_mean_per_pupil: mean(&free),
     }
+}
+
+/// The department's published worked-example district, as enrollment alone.
+///
+/// The FY2022 School Finance Payment Report's line-by-line explanation works one district all
+/// the way through the base cost build-up. Only its *enrollment* is used here; which price
+/// vector it is run against is the caller's choice and the difference between two fiscal years.
+#[must_use]
+pub fn published_worked_example() -> DistrictEnrollment {
+    DistrictEnrollment {
+        kindergarten: 1_630.68,
+        grades_1_3: 4_797.69,
+        grades_4_8: 7_559.90,
+        grades_9_12: 5_075.82,
+        career_technical: 1_278.03,
+        grades_9_12_total: 6_090.96,
+        base_cost_enrolled_adm: 20_342.13,
+        open_buildings: 43.0,
+        athletics_eligible: true,
+    }
+}
+
+/// One district's refresh, and where the minimum state share falls across it.
+///
+/// # Why the floor thresholds are results rather than settings
+///
+/// The minimum state share is a share **of** base cost per pupil, and this perturbation moves
+/// base cost per pupil. So the frozen run and the refreshed run reach the floor at *different*
+/// capacities, and between the two lies a band where a district is floored before the refresh
+/// and paid by the formula after it — capturing something strictly between the floor rate and
+/// 100%. Sampling the incidence either side of that band makes the mechanism look like a step.
+/// It is a kink: every R.C. 3317.011 floor is a `max`, so nobody falls off one. See #412.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct WorkedExampleRefresh {
+    /// Aggregate base cost on the frozen price vector.
+    pub frozen_aggregate: Dollars,
+    /// And on the refreshed one.
+    pub refreshed_aggregate: Dollars,
+    /// Base cost per pupil, frozen.
+    pub frozen_per_pupil: Dollars,
+    /// Base cost per pupil, refreshed.
+    pub refreshed_per_pupil: Dollars,
+    /// The capacity per pupil above which the floor binds in the frozen run — the bottom of the
+    /// straddling band.
+    pub floor_binds_above_frozen: Dollars,
+    /// The same for the refreshed run, which is the top of it.
+    pub floor_binds_above_refreshed: Dollars,
+    /// The share of the increase a district at the band's midpoint captures — strictly between
+    /// the floor rate and 1.0, which is the whole of why the band is not a step.
+    pub captured_at_band_midpoint: f64,
+    /// The floor this run is computed at, so a reader cannot mistake which biennium it answers.
+    pub minimum_state_share: f64,
+}
+
+impl WorkedExampleRefresh {
+    /// The base cost increase per pupil, which is what the share column is a share of.
+    #[must_use]
+    pub fn delta_per_pupil(&self) -> Dollars {
+        self.refreshed_per_pupil - self.frozen_per_pupil
+    }
+
+    /// How wide the straddling band is, in capacity per pupil.
+    #[must_use]
+    pub fn straddling_band_width(&self) -> Dollars {
+        self.floor_binds_above_refreshed - self.floor_binds_above_frozen
+    }
+
+    /// The share of the increase a district at `capacity` per pupil captures, if the formula
+    /// pays it at all.
+    ///
+    /// # Panics
+    ///
+    /// Never for a positive base cost per pupil, which [`refresh_worked_example`] guarantees.
+    #[must_use]
+    pub fn captured_at(&self, capacity_per_pupil: Dollars) -> f64 {
+        let floor = self.minimum_state_share;
+        let frozen =
+            local_capacity::state_share(self.frozen_per_pupil, capacity_per_pupil, 1.0, floor)
+                .expect("base cost per pupil is positive");
+        let refreshed =
+            local_capacity::state_share(self.refreshed_per_pupil, capacity_per_pupil, 1.0, floor)
+                .expect("base cost per pupil is positive");
+        (refreshed.percentage * self.refreshed_per_pupil
+            - frozen.percentage * self.frozen_per_pupil)
+            / self.delta_per_pupil()
+    }
+}
+
+/// The capacity per pupil above which the minimum state share binds, at a given base cost.
+///
+/// The floor holds where the residual `base - capacity` falls below `base * minimum_share`,
+/// which is above `base * (1 - minimum_share)`.
+#[must_use]
+pub fn floor_binds_above(base_cost_per_pupil: Dollars, minimum_share: f64) -> Dollars {
+    base_cost_per_pupil * (1.0 - minimum_share)
+}
+
+/// Run the input-year refresh across the published worked example.
+///
+/// Both runs are priced at [`StatewideFactors::fy2027`] — the FY2022 averages H.B. 96 carries
+/// forward, which is what "frozen" means over the FY2026–FY2027 horizon — and floored at
+/// [`MINIMUM_STATE_SHARE_FY2027`], the minimum the department's own calculator states for both
+/// those years. One vintage throughout: the run this replaced priced the FY2027 teacher salary
+/// into the FY2022 factor set and floored the result at the FY2022 5% minimum.
+///
+/// # Panics
+///
+/// If the worked example's ADM is not positive, which the fixture rules out.
+#[must_use]
+pub fn refresh_worked_example() -> WorkedExampleRefresh {
+    let district = published_worked_example();
+    let frozen_factors = StatewideFactors::fy2027();
+    let refreshed_factors = StatewideFactors {
+        teacher_salary: FY2024_TEACHER_SALARY,
+        ..StatewideFactors::fy2027()
+    };
+
+    let frozen = aggregate_base_cost(&district, &frozen_factors);
+    let refreshed = aggregate_base_cost(&district, &refreshed_factors);
+    let floor = MINIMUM_STATE_SHARE_FY2027;
+
+    let mut out = WorkedExampleRefresh {
+        frozen_aggregate: frozen.aggregate,
+        refreshed_aggregate: refreshed.aggregate,
+        frozen_per_pupil: frozen.per_pupil,
+        refreshed_per_pupil: refreshed.per_pupil,
+        floor_binds_above_frozen: floor_binds_above(frozen.per_pupil, floor),
+        floor_binds_above_refreshed: floor_binds_above(refreshed.per_pupil, floor),
+        captured_at_band_midpoint: 0.0,
+        minimum_state_share: floor,
+    };
+    out.captured_at_band_midpoint = out.captured_at(f64::midpoint(
+        out.floor_binds_above_frozen,
+        out.floor_binds_above_refreshed,
+    ));
+    out
 }
 
 /// The base cost effect of refreshing the classroom teacher salary input, per district.

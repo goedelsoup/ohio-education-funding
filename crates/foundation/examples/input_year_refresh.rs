@@ -19,12 +19,24 @@
 //!
 //! # Inputs and their provenance
 //!
-//! - District: the worked example published in the FY2022 payment report — 20,342.13 base cost
-//!   enrolled ADM, 43 open buildings. `[verified]`
-//! - FY2022 reference salary $68,022.22 — the department's own `FY27 TRAD State Foundation
-//!   Funding Calculator`, read through [`StatewideFactors::fy2027`]. `[verified]`
+//! - Enrollment: the worked example published in the FY2022 payment report — 20,342.13 base cost
+//!   enrolled ADM, 43 open buildings. `[verified]` Only the enrollment is that report's; the
+//!   prices below are not, so the frozen totals here are **not** the FY2022 report's totals.
+//!   Those are reproduced in `foundation`'s own unit tests, against
+//!   [`StatewideFactors::fy2022`].
+//! - Price vector: [`StatewideFactors::fy2027`] — the FY2022 averages H.B. 96 carries forward,
+//!   which is what "frozen" means for this scenario's FY2026–FY2027 horizon. `[verified]`
+//! - FY2022 reference salary $68,022.22 — that same factor set's `teacher_salary`, read off the
+//!   department's own `FY27 TRAD State Foundation Funding Calculator`. `[verified]`
 //! - FY2024 refreshed salary $73,777.08 — ADM-weighted average of classroom teachers' average
 //!   salary across all 606 districts in the FY2024 District Profile Report. `[verified]`
+//! - Minimum state share: `local_capacity::MINIMUM_STATE_SHARE_FY2027`, 10%. The department's FY2027
+//!   calculator states `0.1` for both FY2026 and FY2027 on its `Notes` sheet. `[verified]`
+//!
+//! One vintage throughout, which this run did not previously have: it priced the FY2027 teacher
+//! salary into the FY2022 factor set and floored the result at the FY2022 5% minimum. The
+//! *delta* is unaffected — it is positions times the salary gap times the benefit multiplier,
+//! and none of those moved — but the levels are, and so is where the floor binds.
 //!
 //! # The population the incidence table answers for
 //!
@@ -42,39 +54,60 @@
 //! and cannot say which side of the floor that district falls on.
 
 use foundation::department_model;
-use foundation::{aggregate_base_cost, DistrictEnrollment, StatewideFactors};
-use local_capacity::{state_share, MINIMUM_STATE_SHARE_FY2022};
+use foundation::{
+    aggregate_base_cost, published_worked_example, refresh_worked_example, StatewideFactors,
+    FY2024_TEACHER_SALARY,
+};
+use local_capacity::state_share;
 
 /// The FY2022 reference-year teacher salary carried forward by H.B. 96. [verified]
 const FY2022_TEACHER_SALARY: f64 = StatewideFactors::fy2027().teacher_salary;
-/// ADM-weighted statewide average classroom teacher salary, FY2024. [verified]
-const FY2024_TEACHER_SALARY: f64 = 73_777.08;
 
-fn published_district() -> DistrictEnrollment {
-    DistrictEnrollment {
-        kindergarten: 1_630.68,
-        grades_1_3: 4_797.69,
-        grades_4_8: 7_559.90,
-        grades_9_12: 5_075.82,
-        career_technical: 1_278.03,
-        grades_9_12_total: 6_090.96,
-        base_cost_enrolled_adm: 20_342.13,
-        open_buildings: 43.0,
-        athletics_eligible: true,
-    }
+/// The capacities the incidence table is sampled at.
+///
+/// The illustrative points are a fixed sweep across the wealth scale. The three derived ones are
+/// the band this perturbation opens: the frozen run's floor threshold, the refreshed run's, and
+/// the midpoint between them. They are **computed** rather than written down because the
+/// published table's headline — a clean jump from 100% to the floor rate — was an artifact of a
+/// grid that stepped over that band. A grid that names its own thresholds cannot step over them
+/// again when a later factor vintage moves base cost per pupil.
+fn capacity_grid(run: &foundation::WorkedExampleRefresh) -> Vec<f64> {
+    let (lower, upper) = (
+        run.floor_binds_above_frozen,
+        run.floor_binds_above_refreshed,
+    );
+    let mut grid = vec![
+        500.0,
+        1_500.0,
+        2_027.0,
+        4_000.0,
+        6_000.0,
+        7_000.0,
+        lower,
+        f64::midpoint(lower, upper),
+        upper,
+        12_000.0,
+    ];
+    grid.sort_by(f64::total_cmp);
+    grid
 }
 
 fn main() {
-    let district = published_district();
+    // The run itself is `foundation::refresh_worked_example`, so `crates/figures` binds exactly
+    // what this prints. What is left here is the printing, and the component build-up that only
+    // the table needs.
+    let run = refresh_worked_example();
+    let floor = run.minimum_state_share;
+    let district = published_worked_example();
     let adm = district.base_cost_enrolled_adm;
 
-    let frozen = StatewideFactors {
-        teacher_salary: FY2022_TEACHER_SALARY,
-        ..StatewideFactors::fy2022()
-    };
+    // Both runs are priced at the FY2027 factor set, which *is* the frozen policy: it is the
+    // FY2022 price vector H.B. 96 carries forward, and its `teacher_salary` is the reference
+    // this scenario perturbs away from. The frozen run therefore needs no splice at all.
+    let frozen = StatewideFactors::fy2027();
     let refreshed = StatewideFactors {
         teacher_salary: FY2024_TEACHER_SALARY,
-        ..StatewideFactors::fy2022()
+        ..StatewideFactors::fy2027()
     };
 
     let a = aggregate_base_cost(&district, &frozen);
@@ -145,22 +178,19 @@ fn main() {
         "{:>14} {:>14} {:>14} {:>16} {:>20}",
         "capacity/pupil", "state frozen", "state refreshed", "gain/pupil", "share, if on formula"
     );
-    for capacity in [
-        500.0_f64, 1_500.0, 2_027.0, 4_000.0, 6_000.0, 7_000.0, 12_000.0,
-    ] {
-        let s_frozen = state_share(a.per_pupil, capacity, adm, MINIMUM_STATE_SHARE_FY2022).unwrap();
-        let s_refreshed =
-            state_share(b.per_pupil, capacity, adm, MINIMUM_STATE_SHARE_FY2022).unwrap();
+    for capacity in capacity_grid(&run) {
+        let s_frozen = state_share(a.per_pupil, capacity, adm, floor).unwrap();
+        let s_refreshed = state_share(b.per_pupil, capacity, adm, floor).unwrap();
         let gain = s_refreshed.percentage * b.per_pupil - s_frozen.percentage * a.per_pupil;
-        let captured = gain / (b.per_pupil - a.per_pupil);
-        let marker = if s_frozen.at_minimum {
-            "  (5% floor)"
-        } else {
-            ""
+        let captured = run.captured_at(capacity);
+        let marker = match (s_frozen.at_minimum, s_refreshed.at_minimum) {
+            (true, true) => format!("  ({:.0}% floor)", floor * 100.0),
+            (true, false) => "  (straddles)".to_string(),
+            _ => String::new(),
         };
         println!(
-            "{:>14} {:>14} {:>14} {:>16} {:>19.0}%{marker}",
-            format!("${capacity:>12.0}"),
+            "{:>14} {:>14} {:>14} {:>16} {:>19.1}%{marker}",
+            format!("${capacity:>12.2}"),
             format!("${:>12.0}", s_frozen.percentage * a.per_pupil),
             format!("${:>12.0}", s_refreshed.percentage * b.per_pupil),
             format!("${gain:>+14.2}"),
@@ -171,11 +201,19 @@ fn main() {
     println!();
     println!(
         "The state pays the residual, so a district on formula receives 100% of any base cost\n\
-         increase. A district held at the {:.0}% floor receives {:.0}% of it. Refreshing the\n\
-         input year is therefore progressive, and freezing it is regressive — uniform in method,\n\
-         not in effect.",
-        MINIMUM_STATE_SHARE_FY2022 * 100.0,
-        MINIMUM_STATE_SHARE_FY2022 * 100.0
+         increase, and a district the floor holds in both runs receives {:.0}% of it. Between\n\
+         them lies a band ${:.2} wide — ${:.2} to ${:.2} of capacity per pupil — where the floor\n\
+         binds before the refresh and the formula pays after it. A district there captures\n\
+         something strictly between the two, falling continuously from 100% to {:.0}% across the\n\
+         band. The transition is not the floor itself: the floor is a share OF base cost per\n\
+         pupil, and this perturbation moves base cost per pupil, so the two runs reach it at\n\
+         different capacities. Refreshing the input year is progressive and freezing it is\n\
+         regressive — uniform in method, not in effect.",
+        floor * 100.0,
+        run.straddling_band_width(),
+        run.floor_binds_above_frozen,
+        run.floor_binds_above_refreshed,
+        floor * 100.0
     );
 
     guarantee_population();
@@ -191,10 +229,12 @@ fn main() {
     );
     println!(
         "The state's share of that is NOT the same number: it is the full amount for districts on\n\
-         formula, 5% for districts at the floor, and nothing at all for the ones the guarantee\n\
-         holds, before the phase-in percentage is applied. Converting it to a state appropriation\n\
-         needs per-district capacity and guarantee status; this run sweeps the first across one\n\
-         district and has the second for none of them."
+         formula, {:.0}% for districts the floor holds in both runs, a share between the two for\n\
+         the band that straddles it, and nothing at all for the ones the guarantee holds, before\n\
+         the phase-in percentage is applied. Converting it to a state appropriation needs\n\
+         per-district capacity and guarantee status; this run sweeps the first across one district\n\
+         and has the second for none of them.",
+        floor * 100.0
     );
 }
 

@@ -44,7 +44,12 @@ properties:
         else (Base Cost Per-Pupil - Local Capacity Per-Pupil) x current-year Enrolled ADM
 
     State Share Percentage =
-      max( (State Share of Base Cost Per-Pupil / Base Cost Per-Pupil), 0.05 )
+      max( (State Share of Base Cost Per-Pupil / Base Cost Per-Pupil), minimum state share )
+
+    The minimum is a biennial parameter, not a constant: **0.05** in FY2022 and **0.10** for
+    FY2026 and FY2027, which the department's FY2027 calculator states on its `Notes` sheet.
+    [verified] Computing a year at the other year's floor is a live defect class — see
+    [`scenario/fsfp-input-year-refresh`](../scenario/fsfp-input-year-refresh.yml).
 
     Note the ADM asymmetry: base cost per pupil and local capacity per pupil are computed from
     prior-year or three-year-average ADM, while the state share of base cost is multiplied by
@@ -59,10 +64,11 @@ properties:
     SFPR where already computed.
     Current-year and prior-year enrolled ADM — from `dew-foundation`.
   caveats: |
-    Hard floor at 5%, so it does not discriminate among high-wealth districts at all — the top
-    of the distribution compresses onto a single value and correlation measures against wealth
-    will understate the relationship unless floored districts are identified and handled.
-    [inference]
+    Hard floor — 5% in FY2022, 10% from FY2026 — so it does not discriminate among high-wealth
+    districts at all: the top of the distribution compresses onto a single value and correlation
+    measures against wealth will understate the relationship unless floored districts are
+    identified and handled. [inference] The compression is twice as deep from FY2026, and in the
+    FY2027 model 138 of 609 districts sit exactly on the floor. [verified]
 
     Computed before phase-in; diverges from realized state share by the phase-in gap. Districts
     held on a guarantee are off-formula and their computed share is not meaningful. Mixes

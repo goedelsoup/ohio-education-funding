@@ -176,9 +176,17 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * population. One binding, no new carrier, and the number it binds was already bound in the same
  * node — the point being that a figure written twice and bound once is the shape #393 reported,
  * and this ratchet counts the writings rather than the numbers.
+ *
+ * Recomputed at **850/76** when that same runner's incidence table was recomputed at the floor its
+ * own horizon runs under. Six bindings, no new carrier, and all six are figures that **could not**
+ * have been bound before: the run lived in `examples/`, which no gate reaches, and that is how it
+ * went on flooring an FY2026-FY2027 question at the FY2022 5% minimum. Four of the six are the
+ * band that straddles the floor — a gradient the published table had reported as a binary, because
+ * its sample points fell either side of it. A ratchet cannot count what the corpus quotes out of an
+ * unreachable target, and an example is an unreachable target.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "844 bindings; raise this when you add one").toBeGreaterThanOrEqual(844);
+  expect(bindings.length, "850 bindings; raise this when you add one").toBeGreaterThanOrEqual(850);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "76 nodes carry bindings; raise this when a seventy-seventh does",
