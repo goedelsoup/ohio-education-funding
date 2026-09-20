@@ -320,12 +320,12 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1735 | supported by a committed primary source |
+| `[verified]` | 1739 | supported by a committed primary source |
 | `[inference]` | 353 | drawn from verified facts, not witnessed |
-| `[open]` | 208 | a live question — unknown, contested, or being worked |
+| `[open]` | 207 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-208 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+207 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
@@ -342,11 +342,11 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `restriction` | 3 | 0 |
 | `eligibility` | 3 | 0 |
 | `contested` | 3 | 0 |
-| `confidence` | 3 | 0 |
 | `subject` | 2 | 0 |
 | `legal_basis` | 2 | 0 |
 | `holding` | 2 | 0 |
 | `definition` | 2 | 0 |
+| `confidence` | 2 | 0 |
 | `caveats` | 2 | 0 |
 | `boundary_note` | 2 | 0 |
 | `adoption_evidence` | 2 | 0 |
@@ -364,7 +364,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `calculator` | 1 | 0 |
 | `appropriating_bill` | 1 | 0 |
 
-**99 recorded withdrawals across 44 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**100 recorded withdrawals across 44 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Relationship vocabulary

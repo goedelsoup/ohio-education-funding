@@ -171,9 +171,14 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * consequence since it was written, on a think-tank's account and as an inference, with **no
  * `figures:` block at all**. A node can be the corpus's account of a mechanism and have nothing
  * in it that any crate checks.
+ *
+ * Recomputed at **844/76** when the refresh runner's incidence column was made to state its own
+ * population. One binding, no new carrier, and the number it binds was already bound in the same
+ * node — the point being that a figure written twice and bound once is the shape #393 reported,
+ * and this ratchet counts the writings rather than the numbers.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "843 bindings; raise this when you add one").toBeGreaterThanOrEqual(843);
+  expect(bindings.length, "844 bindings; raise this when you add one").toBeGreaterThanOrEqual(844);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "76 nodes carry bindings; raise this when a seventy-seventh does",
