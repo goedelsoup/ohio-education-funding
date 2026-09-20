@@ -311,12 +311,123 @@ findings: |
   on its own terms — what it does instead is ride on top of the progressivity, and land on the
   categoricals. [verified] (`crates/project`)
 
-  **[open]** Whether the General Assembly intends the state share percentage to discount a
-  district's special education and English learner funding by a ratio computed on a pupil count
-  that excludes the children it has lost, when the schools those children went to are charged no
-  local share at all. Nothing in R.C. 3317.022 says either way, and the two treatments are one
-  division apart.
+  ### The two treatments are not one division apart
+
+  This node left as a live question whether the General Assembly intends the state share percentage to
+  discount a district's special education and English learner funding by a ratio computed on a
+  count that excludes the children it has lost, on the ground that "nothing in R.C. 3317.022 says
+  either way". **It says so nine times.** The section does not state the qualifier once in a
+  general provision; it repeats *"if the funding unit is a city, local, or exempted village school
+  district, the district's state share percentage"* inside each of the six special education
+  categories at (A)(3)(a) and each of the three English learner categories at (A)(5)(a). [verified]
+  (`crates/project`, `what_the_general_assembly_was_shown`)
+
+  And LSC put it in front of legislators in every biennium of the plan's life, with a reason
+  attached. H.B. 110's analysis says the categoricals for community and STEM schools are computed
+  as they are for districts *"except that a state share percentage is not applied"*; H.B. 33 and
+  H.B. 96 give the ground — *"since these schools do not have taxing authority"* — and H.B. 96 puts
+  the consequence in a sentence: *"the state share for community and STEM schools is effectively
+  100%"*. [verified] (`crates/project`)
+
+  That reason is about the recipient. It answers why a community school is charged nothing and says
+  nothing whatever about which children the **district's** percentage is divided by. The
+  denominator gets one sentence in fourteen analyses, in the ADM section rather than beside the
+  percentage it sets: the budget *"replaces 'Formula ADM' with 'Enrolled ADM' which counts the
+  number of students being educated in a district or school"*, against a prior-law count that began
+  with students *residing* in the district. [verified] (`crates/project`) The only reason LSC ever
+  gives for the denominator is the three-year maximum, which is about the count's vintage and not
+  about who is in it. **So the two treatments are not symmetric unknowns.** One is written out nine
+  times and explained three times; the other is a definitional consequence that no document
+  connects to it.
+
+  ### The General Assembly priced this effect, and then repealed the price
+
+  H.B. 110 created **supplemental targeted assistance** for the 36 districts whose enrolled ADM was
+  under **88%** of their total residential ADM and whose FY2019 wealth index exceeded 1.6 —
+  **$56.4m** in FY2022. H.B. 96 eliminated it, and the repeal paragraph states this node's own
+  unanswered question as the thing being eliminated: those districts *"might appear relatively wealthier on a per-pupil
+  basis because of changes in how the formula in place since FY 2022 counts students relative to
+  the previous formula and thus receive less state aid"*, **$52.5m to 36 districts in FY2025**.
+  [verified] (`crates/project`)
+
+  The question was therefore not unasked. It was asked, priced, and the price struck in the
+  biennium this corpus models.
+
+  ### What a correction confined to the categoricals would cost, and who it would reach
+
+  Re-basing is two operations and the $842.5m above is their sum. **$659.1m** of it is relief on the
+  local charge itself — the part that credits a district for children another funding unit already
+  pays for in full, which is the part nobody should want. **$183.4m** is the categorical channel,
+  where the percentage is a ratio and nothing cancels. Confining the correction there leaves
+  R.C. 3317.017 untouched and re-computes only the ratio R.C. 3317.022 multiplies by. [verified]
+  (`crates/project`)
+
+  It costs a fifth of the wholesale figure and harms a tenth as much: **$191.2m** to 385 districts
+  against **$7.8m** off the same 119, where wholesale re-basing took $57.5m off them. The losers
+  lose through the charge, not through the percentage, so the caveat this node attached to the
+  wholesale number — that a correction priced on the gainers alone does not see them — very nearly
+  dissolves once the correction is confined. [verified] (`crates/project`)
+
+  **And it lands almost exactly on the repealed supplement, for the districts that supplement
+  reached.** The 36 qualifiers would take **$48.7m** of it, against the $52.5m they were being paid
+  until FY2026. But **$142.6m** would go to districts the supplement never covered, because its
+  second gate was a wealth test: Columbus City teaches 65.6% of its resident children and would take
+  **$41.7m** on its own, and its FY2019 wealth index is 1.197, under the 1.6 threshold. Cincinnati
+  fails the same gate at 1.044. The instrument aimed at this effect excluded the two districts
+  carrying the most of it. [verified] (`crates/project`)
+
+  ### The open-enrolment adjustment is a choice, not an inheritance
+
+  R.C. 3317.0217(C)(1) subtracts the students of R.C. 3317.03(A)(1)(b) and adds those of (A)(2)(d):
+  open enrolment in and out. (A)(2) runs (a) through **(i)** — community school, alternative school,
+  college, open enrolment, educational service center, compact district, nonpublic scholarship,
+  provider scholarship, STEM school. The adjustment takes one of nine **from the subsection it is
+  citing**. [verified] (`crates/project`)
+
+  It cannot be an artefact of the section predating the choice channels. R.C. 3317.0217's current
+  text was written by H.B. 110, the same act that replaced the residence count with the attendance
+  one, twenty-four years after Ohio's first community school. The section *number* is older and
+  belonged to parity aid in 2001, which is a trap this corpus already records —
+  [H.B. 94](../legislation/hb-94-2001.yml) — but the number is not the provision. [verified]
+  (`crates/project`)
+
+  **[open]** What remains open is narrower and is a question about drafting rather than about
+  arithmetic: why H.B. 110 reconstructed the open-enrolment channel of the old residence count and
+  not the other eight, when all nine were on the page of the section it cross-referenced.
+
+  ### A hazard for anyone reading the supplement's name backwards
+
+  "Supplemental targeted assistance" under H.B. 64 was an **agricultural** payment — a district's
+  agricultural real property percentage less 10%, times 40% of the formula amount, and *"only
+  districts with more than 10% agricultural real property qualify"*. H.B. 110's payment of the same
+  name is keyed on residence against attendance and reaches, in LSC's words, *"primarily lower
+  wealth, urban districts"*. The name is continuous across the greenbooks and the programme is not.
+  [verified] (`crates/project`)
 revisions:
+  - was: |
+      Whether the General Assembly intends the state share percentage to discount a district's
+      special education and English learner funding by a ratio computed on a pupil count that
+      excludes the children it has lost was left unanswered, on the ground that "nothing in
+      R.C. 3317.022 says either way, and the two treatments are one division apart".
+    now: |
+      R.C. 3317.022 says so **nine times** — the conditional is written into each of the six
+      special education categories and each of the three English learner ones rather than stated
+      once — and LSC restated the exemption to legislators in three consecutive bienniums with a
+      reason attached. The General Assembly then built **supplemental targeted assistance**
+      against the denominator half, priced it at $56.4m for 36 districts, and H.B. 96 repealed it
+      at $52.5m while leaving the discount in place. The two treatments are not symmetric
+      unknowns: one is deliberate and documented, the other is a definitional consequence no
+      document connects to it.
+    found_by: |
+      `crates/project/tests/what_the_general_assembly_was_shown.rs`, which checks each quotation
+      against the committed statute extract and the fourteen committed LSC analyses.
+    reach: |
+      The question was written from the section's operative formula rather than from its
+      subdivisions, and from the absence of a general provision rather than from the presence of
+      nine specific ones — a qualifier repeated nine times reads as boilerplate on a skim and is
+      the opposite of silence. The greenbooks were never asked, though this corpus already records
+      them as the route for a question the current code cannot answer. Both halves of a "nothing
+      says either way" are claims about documents, and neither had been run against the documents.
   - was: |
       The statewide median income `[I7]` was recorded as "published on the sheet rather than
       derivable", and the 40th-highest benchmark `[C5]` as a discretionary number a reconstruction
@@ -515,6 +626,30 @@ figures:
     value: 57464582.255979516
     field: findings
     as_written: "$57.5m in total**"
+  - key: project/capacity-denominator-charge-relief
+    value: 659062635.5073502
+    field: findings
+    as_written: "**$659.1m** of it is relief on the"
+  - key: project/capacity-denominator-categorical-half
+    value: 183398866.2634548
+    field: findings
+    as_written: "**$183.4m** is the categorical channel"
+  - key: project/categorical-correction-gain
+    value: 191246083.61432296
+    field: findings
+    as_written: "**$191.2m** to 385 districts"
+  - key: project/categorical-correction-loss
+    value: 7847217.350868164
+    field: findings
+    as_written: "against **$7.8m** off the same 119"
+  - key: project/categorical-correction-to-the-repealed-supplements-districts
+    value: 48688914.297595255
+    field: findings
+    as_written: "would take **$48.7m** of it"
+  - key: project/categorical-correction-beyond-the-repealed-supplement
+    value: 142557169.31672785
+    field: findings
+    as_written: "But **$142.6m** would go to districts"
   - key: project/capacity-denominator-districts-leaving-the-floor
     value: 33
     field: findings

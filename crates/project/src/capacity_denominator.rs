@@ -412,6 +412,141 @@ pub fn divergence_correlation() -> f64 {
     covariance / (sx * sy)
 }
 
+/// The two different things re-basing the denominator does, separated.
+///
+/// Re-basing is not one operation. It divides the local charge by a larger count — which reduces
+/// the charge itself, crediting a district for children the state funds in full through another
+/// funding unit — **and** it raises the state share percentage, which R.C. 3317.022 multiplies
+/// four categoricals by. Only the second is a channel where the statute's own arithmetic fails to
+/// cancel, and only the second is a correction anyone has argued for.
+///
+/// [`exposure`] reports the two together, because that is what the counterfactual costs. This
+/// splits them, and `the_exposure_is_two_operations_and_only_one_is_arguable` checks that they
+/// add back to it.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Decomposition {
+    /// What dividing the charge by a larger count takes off the local share of base cost.
+    ///
+    /// The part #384 priced and said nobody should want: it credits a district with lower capacity
+    /// per pupil on account of children already funded elsewhere.
+    pub charge_relief: Dollars,
+    /// What re-computing the **percentage** alone moves through the four categoricals.
+    ///
+    /// The charge is untouched; only the ratio R.C. 3317.022(A)(3), (5) and (6) multiply by
+    /// changes. This is the correction confined to the channel that does not cancel.
+    pub categorical: Dollars,
+}
+
+impl Decomposition {
+    /// The two halves summed, which is [`exposure`]'s net.
+    #[must_use]
+    pub fn total(&self) -> Dollars {
+        self.charge_relief + self.categorical
+    }
+}
+
+/// [`Decomposition`] for one denominator, over [`frame`].
+#[must_use]
+pub fn decompose(basis: Basis) -> Decomposition {
+    let mut out = Decomposition {
+        charge_relief: 0.0,
+        categorical: 0.0,
+    };
+    for district in &frame() {
+        let here = district.state_share_on(basis);
+        let published = district.state_share_on(Basis::BaseCostEnrolled);
+        out.charge_relief += here.amount - published.amount;
+        if published.percentage > 0.0 {
+            out.categorical +=
+                district.weighted_categoricals * (here.percentage / published.percentage - 1.0);
+        }
+    }
+    out
+}
+
+/// What a denominator correction **confined to the categoricals** would move, and over how many.
+///
+/// The local charge, and therefore every district's state share of base cost, is left exactly as
+/// R.C. 3317.017 computes it. Only the state share *percentage* — the ratio R.C. 3317.022(A)(3),
+/// (5) and (6) attach to districts and to no other funding unit — is re-computed on `basis`.
+///
+/// This is the counterfactual the wholesale re-basing in [`exposure`] cannot stand in for. It is
+/// smaller, and its loss side is smaller by more: the 119 net open-enrolment-in districts lose
+/// through the charge, not through the percentage, so confining the correction very nearly
+/// removes them from it.
+#[must_use]
+pub fn categorical_exposure(basis: Basis) -> Exposure {
+    let mut out = Exposure {
+        gainers: 0,
+        gain: 0.0,
+        losers: 0,
+        loss: 0.0,
+        leave_the_floor: 0,
+    };
+    for district in &frame() {
+        let here = district.state_share_on(basis);
+        let published = district.state_share_on(Basis::BaseCostEnrolled);
+        let delta = if published.percentage > 0.0 {
+            district.weighted_categoricals * (here.percentage / published.percentage - 1.0)
+        } else {
+            0.0
+        };
+        if delta > MATERIAL {
+            out.gainers += 1;
+            out.gain += delta;
+        } else if delta < -MATERIAL {
+            out.losers += 1;
+            out.loss -= delta;
+        }
+        if published.at_minimum && !here.at_minimum {
+            out.leave_the_floor += 1;
+        }
+    }
+    out
+}
+
+/// What the correction confined to the categoricals would give the districts the repealed
+/// supplement covered, and what it would give the rest.
+///
+/// Returned as `(to the qualifiers, to everyone else, how many qualifiers)`. Eligibility is
+/// [`crate::panel::TargetedAssistance::qualifies`] — H.B. 110's own two FY2019 tests, an enrolled
+/// ADM below 88% of total ADM and a wealth index above 1.6.
+///
+/// Supplemental targeted assistance was the General Assembly's own instrument against this effect
+/// and H.B. 96 repealed it. The comparison is what says whether the repeal removed something the
+/// size of the problem, and for whom.
+#[must_use]
+pub fn against_the_repealed_supplement(basis: Basis) -> (Dollars, Dollars, usize) {
+    let qualifies: BTreeMap<String, bool> = panel()
+        .iter()
+        .map(|record| {
+            (
+                record.irn.clone(),
+                record.targeted_assistance.qualifies().unwrap_or(false),
+            )
+        })
+        .collect();
+
+    let (mut covered, mut uncovered, mut qualifiers) = (0.0, 0.0, 0);
+    for district in &frame() {
+        let here = district.state_share_on(basis);
+        let published = district.state_share_on(Basis::BaseCostEnrolled);
+        if published.percentage <= 0.0 {
+            continue;
+        }
+        let delta = district.weighted_categoricals * (here.percentage / published.percentage - 1.0);
+        if qualifies.get(&district.irn).copied().unwrap_or(false) {
+            qualifiers += 1;
+            if delta > MATERIAL {
+                covered += delta;
+            }
+        } else if delta > MATERIAL {
+            uncovered += delta;
+        }
+    }
+    (covered, uncovered, qualifiers)
+}
+
 /// How many resident children the plan's own open-enrolment adjustment reaches, against how many
 /// Table SD-1 counts that base cost enrolled ADM does not.
 ///
@@ -435,6 +570,7 @@ pub fn resident_gap() -> (Adm, Adm) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::panel::TA_SUPPLEMENT_RETENTION;
     use local_capacity::{local_capacity, CapacityInputs};
 
     /// The charge is the blend before any division, and this checks it against the calculator.
@@ -648,6 +784,127 @@ mod tests {
         assert!(
             (taken - 0.666).abs() < 1e-3,
             "the local share takes {taken:.4}"
+        );
+    }
+
+    /// Re-basing is two operations, and only one of them is a correction anyone has argued for.
+    ///
+    /// The $842.5m divides exactly: **$659.1m** of relief on the local charge itself, which is
+    /// what #384 priced and said nobody should want, and **$183.4m** in the categorical channel,
+    /// where the statute's own arithmetic does not cancel. The sum is the check — if these were
+    /// two views of one quantity rather than two halves of it, they would not add up.
+    #[test]
+    fn the_exposure_is_two_operations_and_only_one_is_arguable() {
+        let split = decompose(Basis::Resident);
+        assert!(
+            (split.charge_relief / 1e6 - 659.1).abs() < 0.1,
+            "charge relief {}",
+            split.charge_relief
+        );
+        assert!(
+            (split.categorical / 1e6 - 183.4).abs() < 0.1,
+            "categorical {}",
+            split.categorical
+        );
+        assert!(
+            (split.total() - exposure(Basis::Resident).net()).abs() < 1.0,
+            "the two halves come to {} and the exposure is {}. They are the same counterfactual \
+             priced two ways, so a gap here means one of them is measuring something else.",
+            split.total(),
+            exposure(Basis::Resident).net()
+        );
+    }
+
+    /// Confining the correction to the categoricals costs a fifth as much and harms a tenth as
+    /// much.
+    ///
+    /// $183.4m against the wholesale $842.5m — and the loss side falls from $57.5m to **$7.8m**,
+    /// by a factor of 7.4, because the 119 net open-enrolment-in districts lose through the
+    /// charge and not through the percentage. The caveat #384 attached to the wholesale figure —
+    /// that a correction priced on the gainers alone does not see the losers — very nearly
+    /// dissolves once the correction is confined to the channel that does not cancel.
+    #[test]
+    fn the_correction_confined_to_the_categoricals_is_a_fifth_of_the_wholesale_one() {
+        let confined = categorical_exposure(Basis::Resident);
+        let wholesale = exposure(Basis::Resident);
+
+        assert_eq!(confined.gainers, 385);
+        assert_eq!(confined.losers, 119);
+        assert_eq!(
+            confined.leave_the_floor, 33,
+            "the floor is what lifts a percentage that the charge cannot move"
+        );
+        assert!(
+            (confined.gain / 1e6 - 191.2).abs() < 0.1,
+            "gain {}",
+            confined.gain
+        );
+        assert!(
+            (confined.loss / 1e6 - 7.8).abs() < 0.1,
+            "loss {}",
+            confined.loss
+        );
+        assert!(
+            (confined.net() / 1e6 - 183.4).abs() < 0.1,
+            "net {}",
+            confined.net()
+        );
+        assert!(
+            wholesale.loss / confined.loss > 7.0,
+            "the wholesale loss is {:.1} times the confined one, and the point of confining it is \
+             that the losers lose through the charge rather than through the percentage",
+            wholesale.loss / confined.loss
+        );
+    }
+
+    /// The instrument H.B. 96 repealed was the size of the problem for the districts it reached,
+    /// and reached a fifteenth of them.
+    ///
+    /// Supplemental targeted assistance paid **$52.5m to 36 districts** in FY2025 — H.B. 110's own
+    /// answer to a district whose count excludes the children it has lost, gated on an FY2019
+    /// enrolled ADM below 88% of total ADM and a wealth index above 1.6. A correction confined to
+    /// the categoricals would give those same 36 districts **$48.7m**, within 8% of it.
+    ///
+    /// But it would give **$142.6m** to districts the supplement never covered, because the
+    /// wealth gate excluded them. Columbus City teaches 65.6% of its resident children and would
+    /// take $41.7m on its own — more than three quarters of what the supplement paid everyone —
+    /// and its FY2019 wealth index is 1.197, under the 1.6 threshold.
+    #[test]
+    fn the_repealed_supplement_was_gated_on_a_wealth_test_that_excluded_the_largest_exposure() {
+        let (covered, uncovered, qualifiers) = against_the_repealed_supplement(Basis::Resident);
+        assert_eq!(qualifiers, 36, "H.B. 110's own two FY2019 tests");
+        assert!(
+            (covered / 1e6 - 48.7).abs() < 0.1,
+            "to the 36 the supplement covered: {covered}"
+        );
+        assert!(
+            (uncovered / 1e6 - 142.6).abs() < 0.1,
+            "to the districts it never covered: {uncovered}"
+        );
+        assert!(
+            uncovered > covered * 2.0,
+            "the correction reaches {:.1}m outside the supplement's 36 districts against {:.1}m \
+             inside it. An instrument aimed at this effect that misses three quarters of it is \
+             aimed at something else as well.",
+            uncovered / 1e6,
+            covered / 1e6
+        );
+
+        let assistance: BTreeMap<String, _> = panel()
+            .iter()
+            .map(|record| (record.irn.clone(), record.targeted_assistance))
+            .collect();
+        let columbus = &assistance["043802"];
+        assert!(
+            columbus.fy19_enrolled_adm < TA_SUPPLEMENT_RETENTION * columbus.fy19_total_adm,
+            "Columbus passes the count test at {:.4}",
+            columbus.fy19_enrolled_adm / columbus.fy19_total_adm
+        );
+        assert_eq!(
+            columbus.qualifies(),
+            Some(false),
+            "and fails the supplement on the wealth test alone, at an FY2019 index of {:.4}",
+            columbus.fy19_wealth_index
         );
     }
 

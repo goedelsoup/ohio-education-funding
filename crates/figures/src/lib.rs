@@ -9709,6 +9709,93 @@ pub static FIGURES: &[Figure] = &[
         },
     },
     Figure {
+        key: "project/capacity-denominator-charge-relief",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The half of re-basing that is relief on the local charge itself \u{2014} what a \
+                district would be credited for children the state funds through another unit",
+        pinned: 659_062_635.507_350_2,
+        tolerance: 1.0,
+        compute: |_| {
+            project::capacity_denominator::decompose(project::capacity_denominator::Basis::Resident)
+                .charge_relief
+        },
+    },
+    Figure {
+        key: "project/capacity-denominator-categorical-half",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And the half that moves through the categoricals \u{2014} a denominator \
+                correction confined to the channel the statute's arithmetic does not cancel",
+        pinned: 183_398_866.263_454_8,
+        tolerance: 1.0,
+        compute: |_| {
+            project::capacity_denominator::categorical_exposure(
+                project::capacity_denominator::Basis::Resident,
+            )
+            .net()
+        },
+    },
+    Figure {
+        key: "project/categorical-correction-gain",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a categorical-confined correction would add for the districts that gain by it",
+        pinned: 191_246_083.614_322_96,
+        tolerance: 1.0,
+        compute: |_| {
+            project::capacity_denominator::categorical_exposure(
+                project::capacity_denominator::Basis::Resident,
+            )
+            .gain
+        },
+    },
+    Figure {
+        key: "project/categorical-correction-loss",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And what it would take off the 119 that lose by it, against $57.5m on the \
+                wholesale re-basing \u{2014} they lose through the charge, not the percentage",
+        pinned: 7_847_217.350_868_164,
+        tolerance: 1.0,
+        compute: |_| {
+            project::capacity_denominator::categorical_exposure(
+                project::capacity_denominator::Basis::Resident,
+            )
+            .loss
+        },
+    },
+    Figure {
+        key: "project/categorical-correction-to-the-repealed-supplements-districts",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the correction would give the 36 districts supplemental targeted assistance \
+                covered, against the $52.5m H.B. 96 repealed",
+        pinned: 48_688_914.297_595_255,
+        tolerance: 1.0,
+        compute: |_| {
+            project::capacity_denominator::against_the_repealed_supplement(
+                project::capacity_denominator::Basis::Resident,
+            )
+            .0
+        },
+    },
+    Figure {
+        key: "project/categorical-correction-beyond-the-repealed-supplement",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And what it would give the districts that supplement never reached, because its \
+                second gate was a wealth test",
+        pinned: 142_557_169.316_727_85,
+        tolerance: 1.0,
+        compute: |_| {
+            project::capacity_denominator::against_the_repealed_supplement(
+                project::capacity_denominator::Basis::Resident,
+            )
+            .1
+        },
+    },
+    Figure {
         key: "project/capacity-denominator-exposure-loss",
         owner: "crates/project",
         unit: Unit::Dollars,
