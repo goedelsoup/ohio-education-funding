@@ -64,6 +64,7 @@ pub mod capacity_denominator;
 pub mod cli;
 pub mod counts;
 pub mod crosswalk;
+pub mod decline_adjustment;
 pub mod drafts;
 pub mod enrollment_decline;
 pub mod esser;
