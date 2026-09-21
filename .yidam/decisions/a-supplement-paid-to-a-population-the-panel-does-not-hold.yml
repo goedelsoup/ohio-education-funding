@@ -1,0 +1,137 @@
+id: a-supplement-paid-to-a-population-the-panel-does-not-hold
+summary: >-
+  The community school equity supplement is extracted and reported, not added as a ninth Policy
+  lever — its 324 recipients are disjoint from the 609 districts every lever is priced over — and
+  the workbook that supplies it refutes the published account of who receives it.
+context: |
+  Issue #369 landed three of H.B. 96's eleven funding changes as levers and recorded three as
+  still outside. The equity supplement was one of the three, on the stated ground that it "needs a
+  population the 609-district panel does not contain". The first half of that is exactly right.
+  The second half was read as a blocker and is not one: **the department publishes a community and
+  STEM school simulator at a live URL, and it is openly retrievable** — 1,583,358 bytes, HTTP 200,
+  no credentials, one directory across from the traditional calculator this repository already
+  reads.
+
+  So the question stopped being whether the supplement could be reached and became what to do with
+  it once it was. Those are different questions and the second is the one worth a record.
+
+  **`Policy` is eight fields over one population.** Every lever is priced through
+  `project::policy::apply`, over the 609 districts of `foundation`'s panel, against an `Outcome`
+  whose channels are that panel's. The supplement's recipients are **324 site-based community
+  schools**. Not a subset of the 609 and not an extension of them: a community school has no IRN in
+  that panel, no valuation, no charge-off and no local share, because it has no taxing authority.
+  The two populations intersect in nothing.
+
+  **What a lever would therefore have to be.** Not a ninth field beside the eight, but a third
+  `Outcome` channel — the way transportation got a second one in #369 — carrying a total over a
+  population none of the site's figures describe. The scenario page would then report a statewide
+  number that is the sum of two disjoint populations, and no existing view distinguishes them. That
+  is not a bigger version of what the levers do. It is a second model wearing the first one's
+  interface.
+
+  **And the extraction found something that changes what the corpus should say.** The published
+  analysis this repository already holds disagrees with itself about who is paid, in a way that is
+  invisible unless the two editions are read apart. The **redbook** — which describes the budget
+  *as introduced* — says the executive proposal "codifies the equity supplement into permanent law
+  and **expands eligibility to STEM schools**", at $58.0 million a year. Issue #370 quoted it as
+  the mechanism. The **enacted** act did not keep it. Item 10 of the act's own list pays "community
+  schools **that are not internet- or computer-based**"; the greenbook says "site-based community
+  schools"; and the department's own model pays the **eight STEM schools and twenty-three e-schools
+  exactly zero**, over 4,585.5 and 35,501.5 enrolled ADM respectively. Three enacted sources and
+  the working model against one document about a bill that changed.
+decision: |
+  **Extract it, report it, and do not make it a lever.**
+
+  One `Source`, `fy27-cs-calculator`, under the existing `dew-foundation` connector — not a new
+  connector. Same publisher, same office, same page family, same release calendar, same epistemic
+  status: a projection of the same statutory formula published by the people who administer it.
+  What differs is the population, and the registry already carries that difference at source level
+  rather than connector level — `dew-foundation` retrieves the district calculator, the profile
+  report and the October headcount, three populations under one key. This record therefore carries
+  **no `connectors:` block**. `dew-foundation` is already approved, in
+  [`proposals`](proposals.yml), and declaring it again would fail
+  `every_connector_in_the_registry_was_approved_in_a_decision_record` on its third check — the one
+  that exists because two records claiming the same key would let a dropped connector pass on the
+  count. It is the shape `an-archived-source-is-still-a-source` established for `fy26-calculator`.
+
+  **The fixture is seventeen columns per school and lives in `dispersion`**, not beside the
+  district models in `foundation` and `project`. That placement is the decision restated as a
+  path: nothing in the calculator crates can join this file, and putting it where they look would
+  invite the join that this record exists to refuse. `dispersion` already holds this population as
+  a *history* — who opened, who never did, who lasted — and this gives it the money.
+
+  **The builder enforces the eligibility rule rather than recording it.**
+  `connect::fixtures::community_schools` refuses the workbook if a site-based school's payment is
+  not its enrolled ADM times the rate the file publishes in its own header cell, **and** if an
+  e-school or STEM school is paid anything at all. The second check is the one worth arguing for.
+  It is not defensive programming; it is the corpus's claim about the enacted law, placed where the
+  department's next file has to agree with it. If eligibility is ever extended — which is precisely
+  what the introduced budget would have done — the rebuild fails and names the school, instead of
+  quietly restating a rule the corpus has written down as settled.
+
+  **The rate is read, never assumed.** It is the one term H.B. 96 moved twice in two years — $650
+  to $500 to $400 — so a constant in the builder would keep checking a later year's payments
+  against FY2027's rate and passing. Only the FY2027 rate is verified against a department model;
+  FY2026 and FY2025 are carried from the enacted act and the greenbook, which state all three in a
+  single sentence each, and the corpus node says which of the three has a model behind it.
+consequences: |
+  **The corpus can now state the divergence it has been asserting.** `hb-96-2025` records that
+  community and STEM schools rise 4.8% and 5.0% against traditional districts' 0.4% and 1.3%, and
+  until now nothing in this repository could compute either side of that comparison's second half.
+  The supplement is $34,650,906.26 of it, over 86,627.3 enrolled ADM, and it is now a bound figure
+  rather than a number in prose.
+
+  **A published LSC document is contradicted in the record, and that is a finding rather than an
+  erratum.** The redbook is not wrong about anything; it describes a bill that was amended. What
+  was wrong was reading it as describing the law. The corpus already had the rule for this — the
+  greenbook is the as-enacted edition — and applied it to phase-in percentages and not to this.
+  Issue #370's own framing carried the error forward, which is the useful part: it shows the
+  failure survives being written down by someone who had both documents.
+
+  **The eight STEM schools are now a named population with a zero, not an absence.** A reader
+  counting recipients off the money would get 324 and no way to tell the 31 zeros from schools
+  that were simply not in the file. `Designation` carries `site-based`, `e-school` and `stem` as
+  three values because `E-School Designation` answers two questions in one column, and a STEM
+  school is a creature of R.C. 3326 that this formula happens to fund alongside community schools
+  rather than a kind of community school.
+
+  **One year, and the gap is stated rather than papered.** The FY2026 sibling of this workbook has
+  not been sought, so the $500 rate has the act behind it and no department model. The catalog
+  entry says so.
+
+  **The three-of-eleven sentence in `project::drafts` is now wrong in one of its two halves.** It
+  says the supplement "needs a population the 609-district panel does not contain", which is true,
+  and files it with the JVSD base cost method as unreachable, which is not. The population is held;
+  the supplement is outside the lever set for the reason this record gives, which is a stronger
+  statement and a different one. Corrected in the same change.
+alternatives: |
+  **Make it a ninth `Policy` lever with a third `Outcome` channel.** Rejected on the population,
+  not on the effort. The levers are eight ways of moving one model's inputs and reading one
+  panel's outputs; this would be a second panel behind the same call, and `apply`'s signature
+  would stop meaning what it means. The transportation channel added in #369 is not the precedent
+  it looks like — it is a second *channel* over the **same** 609 districts, which is what let the
+  scenario page keep reporting a total a reader could locate.
+
+  **A new connector, `dew-community-schools`.** Rejected: separateness has to be argued, and here
+  the argument runs the other way. `payment-reports-connector` and `facts-and-figures-connector`
+  were split from `dew-foundation` because an actual is not a projection and a statistical
+  abstract is not a model — one status cannot cover two kinds of authority. This is the same
+  office's projection of the same formula under the same release model. A second key would assert
+  a distinction that does not exist and would need its own `Status`, which would then have to be
+  kept in step with a connector it cannot diverge from.
+
+  **Extract the whole workbook, as `fy27-calculator` is extracted.** Rejected for now as scope
+  without a reader. The file carries eleven sheets of formula detail and this takes the twelve
+  funding lines and the ADM behind them, which is what the supplement, its rate schedule and its
+  recipients need. The base cost build-up is extractable the day something asks it a question;
+  committing 160 columns nothing reads is the shape `unbound-prose-figures-are-unchecked` warns
+  about, one level down.
+
+  **Take the supplement from the `Summary_SFPR (2)` sheet, which is headed for it.** Rejected, and
+  it is recorded here because it is the plausible mistake rather than a hypothetical one. That
+  sheet is a hidden leftover of the FY2026 model — phase-in `0.8333` against this year's `1`, 358
+  rows against 356 — and its column headed `H. Equity Supplement` holds **total state support** on
+  352 of the 353 schools the two sheets share, and the supplement on **none** of them. A reader
+  locating the column by its heading reports $1.5 billion where $34.7 million belongs, row by
+  plausible row. The sheet names are constants in the builder for this reason, and the arithmetic
+  check would catch it anyway — which is the point of having both.

@@ -1,0 +1,167 @@
+class: formula-component
+label: FSFP Community School Equity Supplement
+summary: >-
+  A flat per-pupil payment to site-based community schools, and the only formula line no school
+  district receives: $34.65 million to 324 schools in FY2027. E-schools and STEM schools are paid
+  nothing.
+description: |
+  A flat per-pupil payment, outside the phase-in and outside the district formula entirely. It is
+  the one line of the Fair School Funding Plan that **no school district receives**: its recipients
+  are community schools, which Ohio funds directly rather than through the district they draw from.
+
+  [H.B. 33](../legislation/hb-33-2023.yml) of the 135th General Assembly established it at $650 a
+  pupil in uncodified law. [H.B. 96](../legislation/hb-96-2025.yml) codified it into R.C. 3317.022
+  and cut the rate: **$500 in FY2026 and $400 in FY2027**. [verified]
+  (`crates/project/fixtures/enacted-school-funding.txt`, item 10 of the act's own list of school
+  financing system revisions)
+
+      equity supplement = enrolled ADM  ×  rate,  for a site-based community school
+                        = 0,                      otherwise
+
+  The department's FY2027 simulator states the rate in a header cell of its own — `Detail SFPR`
+  row 2, *Equity Suplement per pupil*, against `400` — and pays every recipient that rate times
+  its enrolled ADM to the cent, on all **324** of them. [verified — FY2027]
+  (`crates/dispersion/src/community_school_funding.rs`)
+
+  ### It is paid after the phase-in and before the transition supplement
+
+  The redbook places it precisely: the supplement is *"calculated after the formula's phase-in,
+  but before the formula transition supplement"*. [verified] (`lsc-dew-redbook`) That ordering is
+  what makes it a supplement rather than a weight — it does not enter the base the phase-in scales,
+  and it does enter the sum the [transition
+  supplement](fsfp-formula-transition-supplement.yml) is measured against.
+findings: |
+  ### Who is paid is not who the introduced budget would have paid
+
+  Of the 355 community and STEM schools the department models, **324 receive the supplement and 31
+  do not**. The 31 are exactly the **23 e-schools and 8 STEM schools**, paid zero against 35,501
+  and 4,586 enrolled ADM between them — so they are not unpaid for being small. [verified — FY2027]
+  (`crates/dispersion/src/community_school_funding.rs`)
+
+  **The redbook says the opposite, and it is describing a different bill.** Its account of the
+  executive proposal is that it *"codifies the equity supplement into permanent law and expands
+  eligibility to STEM schools"*, at an estimated $58.0 million in each year. The enacted act did
+  not do the second half. Three enacted sources agree against that one: item 10 pays community
+  schools *"that are not internet- or computer-based"*, the greenbook says *"site-based community
+  schools"*, and the department's own model pays the eight STEM schools nothing. [verified]
+  (`crates/dispersion/src/community_school_funding.rs`)
+
+  The rule for this was already in the corpus — the greenbook is the as-enacted edition and the
+  redbook is not — and this is the line it had not been applied to. A reader taking the redbook
+  for the law overstates the population by eight schools.
+
+  ### The cut is the rate, not the population
+
+  Almost all of what separates the enacted supplement from the introduced one is the rate rather
+  than eligibility. Over the same 324 recipients, the $650 H.B. 33 set would pay
+  **$56.3 million** against the enacted **$34,650,906** — a difference of **$21.66 million**,
+  against the **$1.8 million** that extending to the eight STEM schools at the enacted rate would
+  have added. The rate term is larger by more than an order of magnitude. [verified — FY2027]
+  (`crates/dispersion/src/community_school_funding.rs`)
+
+  And the redbook's own $58.0 million estimate is consistent with that reading: $650 applied to
+  site-based plus STEM enrolled ADM gives $59.3 million on this year's projections, within 2.2% of
+  the figure LSC published for a different year's. [inference]
+
+  ### Two per-pupil lines, one eligibility rule between them
+
+  The same workbook pays a **base funding supplement of $40 a pupil to all 355 schools**, e-schools
+  and STEM schools included, and funds STEM schools' facilities at the brick-and-mortar rate rather
+  than the e-school one. So the file does not treat "not a site-based community school" as a
+  general disqualification; it disqualifies on this line and no other. [verified — FY2027]
+  (`crates/dispersion/src/community_school_funding.rs`)
+  A finding that STEM schools are funded differently, stated generally, would be wrong in both
+  directions.
+
+  ### What the supplement is, in scale
+
+  $34,650,906 is **2.29%** of the $1.51 billion of total state support these 355 schools receive.
+  [verified — FY2027] (`crates/dispersion/src/community_school_funding.rs`) It is a small line on
+  a large one, and the reason it is worth its own node is not its size: it is the only line in the
+  plan computed over a population other than the 609-district panel, and it has no district
+  analogue to be compared against.
+figures:
+  - key: dispersion/community-school-equity-supplement-total
+    value: 34650906.27
+    field: findings
+    as_written: "the enacted **$34,650,906**"
+  - key: dispersion/community-school-equity-supplement-recipients
+    value: 324
+    field: findings
+    as_written: "**324 receive the supplement and 31\n  do not**"
+  - key: dispersion/community-school-equity-supplement-stem-schools
+    value: 8
+    field: findings
+    as_written: "**23 e-schools and 8 STEM schools**"
+  - key: dispersion/community-school-equity-supplement-at-the-former-rate
+    value: 56307722.6757
+    field: findings
+    as_written: "would pay\n  **$56.3 million**"
+  - key: dispersion/community-school-equity-supplement-rate-cut
+    value: 21656816.4057
+    field: findings
+    as_written: "a difference of **$21.66 million**"
+  - key: dispersion/community-school-equity-supplement-extending-to-stem
+    value: 1834208.52
+    field: findings
+    as_written: "the **$1.8 million** that extending to the eight STEM schools"
+  - key: dispersion/community-school-equity-share-of-state-support
+    value: 0.02292
+    field: findings
+    as_written: "**2.29%** of the $1.51 billion"
+properties:
+  name: Community school equity supplement
+  function: |
+    equity supplement = enrolled ADM  ×  rate,  for a site-based community school
+                      = 0,                      for an e-school or a STEM school
+
+    rate = $650 (FY2025, H.B. 33)
+           $500 (FY2026, H.B. 96)
+           $400 (FY2027, H.B. 96)
+
+    Calculated after the formula's phase-in and before the formula transition supplement, so it is
+    outside the base the phase-in scales and inside the sum the transition supplement is measured
+    against.
+
+    No local share term: community and STEM schools have no taxing authority, so the state share
+    is 100% by construction rather than by formula.
+  statutory_basis: |
+    **R.C. 3317.022**, as H.B. 96 of the 136th General Assembly codified it. That is the change —
+    under H.B. 33 the supplement was uncodified temporary law, and the act's own list describes
+    itself as codifying it: *"Codifies and incorporates into the system the equity supplement for
+    community schools that are not internet- or computer-based community schools with each such
+    school receiving a per student payment of $500 in FY 2026 and $400 in FY 2027"*. [verified]
+    (`crates/project/fixtures/enacted-school-funding.txt`)
+
+    The exclusion is written into the eligibility clause rather than into a rate: an
+    internet- or computer-based community school is named and excluded. **STEM schools are outside
+    for a different reason** — they are creatures of R.C. 3326 and are not community schools at
+    all, which is why the act's phrase does not need to mention them and why the department's
+    model pays them nothing. [inference]
+  calculator: |
+    `crates/dispersion::community_school_funding`, over the department's FY2027 simulator. Not a
+    calculator crate: nothing in `foundation` or `project` can join this population, and
+    `decisions/a-supplement-paid-to-a-population-the-panel-does-not-hold` records why it is a
+    reported figure rather than a ninth `project::policy` lever.
+
+    The identity is enforced twice — `connect::fixtures::community_schools` refuses the workbook
+    if a recipient's payment is not rate times ADM or if an e-school or STEM school is paid at all,
+    and the reader holds the same two checks against the committed fixture.
+  fy2027_scale: |
+    $34,650,906 to 324 site-based community schools, over 86,627 enrolled ADM. 2.29% of the $1.51
+    billion these schools receive in total state support. [verified]
+links:
+  - target: ../formula-component.ont.yml
+    relationship: instance-of
+  - target: ../revenue-stream/state-foundation-aid.yml
+    relationship: distributes
+  - target: fsfp-formula-transition-supplement.yml
+    relationship: precedes
+  - target: ../parameter/fsfp-phase-in-percentage.yml
+    relationship: governed-by
+  - target: ../legislation/hb-96-2025.yml
+    relationship: established-by
+  - target: ../../catalog/dew-fy27-community-school-calculator.md
+    relationship: sourced-from
+  - target: ../../catalog/lsc-hb96-analysis.md
+    relationship: sourced-from

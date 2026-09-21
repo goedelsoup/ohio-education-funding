@@ -173,10 +173,29 @@ impl Anchor {
 ///   published net figure, and a channel on [`crate::policy::Outcome`] that is not core
 ///   foundation funding.
 ///
-/// So the constraint was real and it was a data constraint. What remains outside is the JVSD base
-/// cost method and the community school equity supplement, which need populations the 609-district
-/// panel does not contain, and career awareness funds — three of the eleven, and each unpriceable
-/// for a reason this module can state.
+/// So the constraint was real and it was a data constraint. Three of the eleven remain outside —
+/// the JVSD base cost method, the community school equity supplement, and career awareness funds —
+/// and they are outside for three different reasons, which this module used to state as one.
+///
+/// # The equity supplement is outside for its population, not for want of data
+///
+/// This doc filed it with the JVSD method under "needs a population the 609-district panel does
+/// not contain". Half of that is right and the half that matters is not. **The population is
+/// held**: the department publishes a community and STEM school simulator, it is openly
+/// retrievable, and `dispersion::community_school_funding` reads all 355 schools out of it —
+/// $34.7m to 324 site-based community schools, at $400 times enrolled ADM.
+///
+/// What it cannot be is a lever *here*. Every field of [`crate::policy::Policy`] is priced by
+/// `apply` over the 609 districts, and the supplement's recipients intersect that panel in
+/// nothing — a community school has no IRN in it, no valuation, and no local share, having no
+/// taxing authority. A ninth field would need a third [`crate::policy::Outcome`] channel carrying
+/// a total over a second population, which is not what the transportation channel added in #369
+/// did: that was a second channel over the *same* districts. So the supplement is a reported
+/// figure rather than a lever, and
+/// `decisions/a-supplement-paid-to-a-population-the-panel-does-not-hold` is the record.
+///
+/// The JVSD method is the one that is still a data constraint: those districts are a population
+/// this repository does not hold at all.
 ///
 /// # Career awareness is outside for the base, not for the rate
 ///

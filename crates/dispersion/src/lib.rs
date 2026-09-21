@@ -34,6 +34,7 @@
 pub mod building;
 pub mod casino;
 pub mod census_states;
+pub mod community_school_funding;
 pub mod community_schools;
 pub mod composition;
 pub mod deduct;
