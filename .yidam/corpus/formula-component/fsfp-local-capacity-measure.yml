@@ -141,7 +141,52 @@ findings: |
   they are. That also closes the question of the fortieth ratio's *value* — what remains open is
   only why the fortieth. [verified]
 
-  Why the fortieth, out of 609, is not stated in the section. [open]
+  Why the fortieth, out of 609, is not stated in the section — and no budget analysis states it
+  either. Of the twelve committed LSC greenbooks and both editions of H.B. 96's, exactly one
+  mentions the benchmark: H.B. 110's, which sets it out twice in a formula box inside an account
+  of the capacity percentage that carries no justifying word anywhere in it. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_threshold_that_was_always_a_rank.rs))
+
+  That absence is informative rather than empty, because LSC argues for the threshold this one
+  replaced. H.B. 94 does not merely state parity aid's 80th percentile; it spends two paragraphs
+  and a chart on it — "the use of the 80th percentile as the threshold helps reduce disparities
+  in local spending above the adequacy level", against the fact that "the top wealthiest 20
+  percent of school districts ... consistently have much higher per pupil revenues" — and H.B. 95
+  restates the reason the following biennium. Giving the reason is what LSC does when the act
+  supplies one. [verified]
+
+  ### A threshold written as a rank is the house convention, and this one reversed its direction
+
+  The rank itself is not the novelty. Every Ohio equalisation formula this corpus can reach names
+  a district rather than a dollar figure: equity aid at its FY1998 peak equalised to the 48th
+  percentile district, H.B. 94's own equity aid to the 118th lowest-wealth district and its parity
+  aid to the 490th, H.B. 119 narrowed who qualified for parity aid while leaving that 490th in
+  place, and tier one targeted assistance was still on the 490th under H.B. 59 twelve years later.
+  [verified]
+
+  What changed is which end the count starts from, and that follows from what the two devices do.
+  A rank counted from the bottom names the districts that qualify — parity aid paid the 490
+  poorest and nobody else. A rank counted from the top names the districts that are capped:
+  every district is charged local capacity, and the fortieth is where the charge stops being
+  progressive. So the earlier answer does not carry over, and LSC's own conversion is what says
+  so: it puts parity aid's 490th of 612 at the 80th percentile, where the fortieth highest of 609
+  leaves 569 districts below it and sits at the 93rd. [verified]
+
+  ### It was never a budget decision, which is why no budget analysis explains it
+
+  The empty trace is structural rather than accidental. [H.B. 1 of the
+  134th](../../../crates/project/src/plan_bill.rs) — the bill the plan was drafted in, which
+  passed the House and died in the Senate four months before H.B. 110 enacted the formula —
+  already writes "the fortieth highest ratio", three times, in the division that survives verbatim
+  in force today. A greenbook explains what a *budget* changed; this budget did not choose the
+  number, it adopted a drafted plan whole. The absence is not LSC declining to explain a choice.
+  There was no choice in front of it to explain. [verified]
+
+  **What this does not say.** Not that the number was arbitrary. Whatever work chose forty sits
+  upstream of H.B. 1, in the plan workgroup's own documentation, and no budget analysis would
+  carry it. The claim is that the fourteen analyses do not answer it, that the one place Ohio's
+  greenbooks do justify a rank threshold is the regime this measure replaced, and that the
+  question has to be put to the plan rather than to the budget. [inference]
 
   ### The section names a certification the state was not making
 
@@ -212,8 +257,34 @@ findings: |
   **What this does not say.** Not that state aid fell. FY2026 ran at an 83.33% phase-in and
   FY2027 at 100%, so foundation funding rises across the same interval; what falls is the
   fraction of a district's costed education that the state's formula assigns to the state.
-  Whether the General Assembly intends the two clocks to run at different speeds, or has ever
-  been shown this comparison, is not established by anything here. [open]
+  **It has been shown the comparison, and this node recorded otherwise for want of reading the
+  other edition.** LSC's analysis of H.B. 96 *as introduced* carries a section headed "State share
+  of the base cost, property values, and local capacity" that names both clocks — base cost inputs
+  held "at FY 2022 levels", the statewide weighted capacity per pupil projected to rise 8.2% then
+  7.2% — attributes the falling state share to "increases in property values and income levels
+  used in computing district per-pupil local contributions", states the consequence as a series of
+  statewide averages running 38.4% in FY2025 to 35.0% and then 32.2%, and says in the next
+  sentence that this "in turn reduces projected funding for the categorical components". [verified]
+  ([`crates/project`](../../../crates/project/tests/the_two_clocks_the_plan_runs_on.rs))
+
+  Those are LSC's projections for a bill as introduced and this corpus's are computed from the
+  department's two enacted models, and they agree: 35.0% against the 35.35% above, 32.2% against
+  31.52%, and a one-year fall of 2.8 points against 3.8. Two methods, two vintages and two
+  editions of the bill land within a point of each other, which makes the finding a reconciliation
+  as well as an answer about awareness. The series has a published beginning too — H.B. 110 put
+  the statewide average state share percentage at 42.8% in FY2022. [verified]
+
+  ### The edition that describes the law is the one that is silent
+
+  That section appears in the redbook and nowhere else. H.B. 96's greenbook keeps the phase-in
+  table and one clause of its Quick look, "while maintaining FY 2022 base cost inputs", and
+  carries neither the capacity growth rates nor the state share percentages nor the sentence
+  joining them. A reader who goes to the analysis of the act as passed — the document about the
+  law — gets one clock and no account of what runs against it. [verified]
+
+  **Awareness is not intent.** The legislature was told what holding the cost side still would do
+  to the state's share and enacted the freeze; no analysis says the divergence was the object of
+  the exercise, and this node does not claim it was. [inference]
 
   ### The valuation is the lesser of two, and the rule is one-sided
 
@@ -480,6 +551,25 @@ findings: |
   Nothing in this repository models abatement and no catalog record reaches district-level exempt
   value, so whether 1.2 cents is large enough to move a consent vote is not answered here.
 revisions:
+  - was: |
+      Whether the General Assembly had ever been shown the comparison between the rising phase-in
+      and the rolling capacity window was recorded as "not established by anything here".
+    now: |
+      It was shown it. LSC's analysis of H.B. 96 **as introduced** devotes a section to exactly
+      this comparison, names both clocks, and states the falling statewide state share percentage
+      as a series — 38.4%, 35.0%, 32.2% — whose middle two figures land within a point of what
+      this corpus computes from the department's own two models.
+    found_by: |
+      `crates/project/tests/the_two_clocks_the_plan_runs_on.rs`, reading both editions of the
+      analysis rather than the enacted one alone.
+    reach: |
+      "Not established by anything here" was true of this node and was read as a fact about the
+      documents. The reason it survived is that the finding is in the **redbook** and not the
+      greenbook: the enacted analysis drops the section entirely, so every search that went to
+      the document about the law came back empty and the emptiness looked like an answer.
+      `ledger::budget_analysis::Edition` exists because the two editions differ in three words of
+      column heading; here they differ by a whole finding, and the edition that describes a bill
+      nobody enacted is the one that holds it.
   - was: |
       R.C. 3317.03(A)(2) was recorded as listing **nine** channels, and the open-enrolment
       adjustment as taking "one of nine". The count reached four paragraphs of this node, a test
