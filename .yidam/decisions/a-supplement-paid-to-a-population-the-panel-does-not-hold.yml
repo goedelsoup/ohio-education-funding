@@ -104,6 +104,12 @@ consequences: |
   and files it with the JVSD base cost method as unreachable, which is not. The population is held;
   the supplement is outside the lever set for the reason this record gives, which is a stronger
   statement and a different one. Corrected in the same change.
+
+  **The JVSD method it was filed beside turned out the same way**, one issue later: the department
+  publishes six years of per-district payment reports for that population too, filed under
+  Career-Technical Funding where nothing names them. Both members of the pair were reachable, and
+  both stay outside the lever set on the population rather than on the data. See
+  [`the-jvsd-rewrite-that-changed-no-percentage`](the-jvsd-rewrite-that-changed-no-percentage.yml).
 alternatives: |
   **Make it a ninth `Policy` lever with a third `Outcome` channel.** Rejected on the population,
   not on the effort. The levers are eight ways of moving one model's inputs and reading one

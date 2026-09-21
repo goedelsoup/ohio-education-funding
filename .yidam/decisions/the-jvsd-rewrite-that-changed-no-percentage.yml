@@ -1,0 +1,144 @@
+id: the-jvsd-rewrite-that-changed-no-percentage
+summary: >-
+  Six years of the department's JVSD payment reports are extracted and reported, not added as a
+  ninth Policy lever. Item 7 of H.B. 96 turns out to leave the state share percentage exactly as
+  it was — what it moves is the enrolment count the percentage multiplies — and the lever the
+  population's own amendment points at, a minimum state share, sits below every district in it.
+context: |
+  Issue #369 recorded the JVSD base cost method as outside the lever set because it "needs a
+  population the 609-district panel does not contain". Issue #371 argued the second half was too
+  weak a statement — the population is identified, its finances are committed, and the new method
+  is written out in a committed greenbook — and that what was actually missing was narrower: each
+  district's base cost and base cost enrolled ADM, "as the department computes them". It also
+  recorded, from three probes, that the department publishes no JVSD calculator where it publishes
+  its others.
+
+  **The probes were right and the conclusion from them was wrong.** There is no page at
+  `.../State-Funding-For-Schools/Joint-Vocational-School-Districts`, and there is no JVSD
+  *calculator* anywhere. But the department publishes **payment reports** for this population —
+  what it paid, per district, after the year closed — and files them under **Career-Technical
+  Funding**. No path on the department's site contains the words "Joint Vocational" at all, so
+  every guess at one returns a 404 that reads exactly like an absence. The archive runs FY2014 to
+  FY2027.
+
+  For FY2022 through FY2026 a payment report is the better artefact than a calculator would have
+  been, not a lesser one: it is an actual rather than a projection. Six years are now extracted,
+  spanning the amendment — FY2022-FY2025 under prior law and FY2026-FY2027 under item 7.
+
+  **And what was "actually missing" was never the hard part.** Base cost, base cost enrolled ADM,
+  the two valuations, the charged one, per-pupil base cost, per-pupil local capacity and the state
+  share percentage are all published per district, and the `Base Cost` sheet carries the whole
+  76-column build-up #371 called unreconstructable.
+
+  **And the extraction found what this record exists for: item 7 does not change the state share
+  percentage.** Base cost per pupil is aggregate base cost over the same base cost enrolled ADM
+  that divides the half-mill charge, so the ADM cancels and the per-pupil form computes the number
+  prior law computed. That is not an argument from
+  algebra alone: `1 − (charged valuation × 0.0005) / aggregate base cost` reproduces the
+  **published** percentage on all 49 districts in all six years, on both sides of the amendment,
+  to a part in a million.
+
+  **What it changes is the ADM the percentage multiplies** — from the three-year average built
+  into aggregate base cost to the current year's enrolled ADM. Prior law was a subtraction with no
+  enrolment term anywhere; item 7 is a multiplication over a live count. Worth $10.2m in FY2026,
+  36 of 49 districts better off.
+
+  Neither the act's own list nor the greenbook's statement of the formula says this. Both describe
+  the per-pupil restatement, which is the half that cancels.
+decision: |
+  **Reported, not levered** — the same disposition as
+  [`a-supplement-paid-to-a-population-the-panel-does-not-hold`](a-supplement-paid-to-a-population-the-panel-does-not-hold.yml),
+  and for the same structural reason, with a second reason this population adds.
+
+  **The structural reason: `Policy` is eight fields over one population.** Every lever is priced
+  through `project::policy::apply` over the 609 districts of `foundation`'s panel. A JVSD has no
+  IRN among them. Unlike a community school it does have taxing authority, a valuation and a local
+  share — so its formula is far closer in shape to a district's, and the absence of a join is a
+  fact about the panel rather than about the formula. A lever would still need a third `Outcome`
+  channel carrying a total over a second population, which is what that record rejected and
+  rejects here.
+
+  **The second reason is specific to this population: the lever it would most obviously take is
+  dead over most of its range.** A **`MinimumStateShare`** lever is the natural one, since item 7
+  explicitly maintains the 10% minimum and `project::policy` already carries that field for
+  districts. **No joint vocational district has been on that floor in any of the six years** —
+  the lowest share observed is 0.10923, in FY2027. Dialling the floor down therefore moves exactly
+  zero dollars, and dialling it up moves money only once it passes a district's actual share. The
+  corpus would be shipping a control whose null region it had measured and not mentioned.
+
+  This is not an argument that *no* lever over JVSDs could do anything — a base cost scale would,
+  and not merely proportionally, since scaling aggregate base cost moves the state share
+  percentage as well as the amount it multiplies. It is an argument that the lever this
+  population's own amendment points at is the one with nothing behind it, which is a poor reason
+  to open a second population inside `Outcome`.
+
+  The thing that *is* worth reporting is the one no lever would have shown: that a rewrite
+  described as a change of method changes no percentage, and that its real effect is a change of
+  enrolment vintage which neither published account names.
+
+  **Six years rather than two**, because a before and an after inside one fixture is what makes
+  that statement checkable. `dispersion::jvsd_funding` reproduces the department's own payments
+  under prior law's subtraction on FY2022-FY2025 and under item 7's multiplication on
+  FY2026-FY2027, to the cent, on every district.
+
+  **FY2026 is the only year item 7 is priced in.** FY2027's report is a September payment whose
+  enrolled ADM is FY2026's on 43 of 49 districts, because FY2027 enrolment does not exist in
+  September 2026. Under prior law that would have been harmless; under item 7 the provisional
+  count reaches the money. `item_7_incidence` returns `None` for every year but FY2026 rather than
+  returning a number that would mostly measure a placeholder.
+
+  **One connector, not a new one.** `dew-foundation`, six new sources. Same office, same release
+  model, same epistemic status, a different population — the argument
+  `a-supplement-paid-to-a-population-the-panel-does-not-hold` made for the community school
+  simulator, unchanged.
+alternatives: |
+  **A ninth `Policy` lever with a third `Outcome` channel.** Rejected on the population and now
+  also on the payoff: see the decision. The population argument alone would have left this a close
+  call, since a JVSD's formula has the valuation and local share a community school's lacks. The
+  measured null region on the minimum state share is what makes it not close.
+
+  **Take only FY2026 and FY2027, the two years item 7 governs.** Rejected. It is the cheaper
+  extraction and it cannot state the finding: "the rewrite computes the same percentage" is a
+  claim about both sides of an amendment, and with only the after side the identity reads as a
+  restatement of the new formula rather than as a measurement across the change. The prior-law
+  years are what make it falsifiable.
+
+  **Take the whole archive, FY2014-FY2027.** Rejected as scope without a question. FY2014-FY2021
+  precede the Fair School Funding Plan and are a different formula with different columns, and
+  nothing in the corpus currently asks them anything. The span here is the plan's own era.
+
+  **Read the bracketed column tags, as a reader of one year's file naturally would.** Rejected,
+  and recorded because it is the plausible mistake rather than a hypothetical one. The tags are
+  not stable across the series: `[I]` is *Total State Support* in FY2024 and FY2025 and the *Base
+  Funding Supplement* in FY2026 and FY2027 — a $559m column and a $1.4m one under one letter —
+  and `[A1]` is *Aggregate Base Cost* in FY2024-25 and *Base Cost Per-Pupil* in FY2026-27, dollars
+  against dollars-per-pupil. This is the same shift `dew-sfpr-line-by-line` records for the
+  traditional district reports, made by the same act. Columns are found by the label text after
+  the tag, and an ambiguous match is an error rather than a first-wins.
+
+  **Take base cost enrolled ADM from `Detailed SFPR`, where the rest of the state share is.**
+  Rejected: it is the wrong column of two that are spelled identically. `Detailed SFPR` `[i]` and
+  `Base Cost` `[b]` are both `Base Cost Enrolled ADM` and they disagree on **five of the
+  forty-nine** FY2026 districts; the department's own local capacity is computed from the second.
+  Using the first reproduces 44 of 49 and misses the rest by 1-5% — close enough to read as
+  rounding, and it is not.
+
+  **Take per-pupil base cost at full precision from the `Base Cost` sheet.** Rejected, and this is
+  the subtlest of the three. `Base Cost` `[F]` carries `9612.6462793433` where `Detailed SFPR`
+  `[A1]` carries `9612.65`, and **the department pays on the rounded one**: the full-precision
+  copy misses Apollo's FY2026 base cost payment by $3.42. The two agree to a cent, so a check
+  written at cent tolerance passes while discarding the only thing that distinguishes them.
+
+  **Carry local capacity as a column of the fixture.** Rejected as a second copy of a determined
+  number: it is the charged valuation times 0.0005 exactly, on all 49 districts in all six years,
+  against both the dollar column prior law publishes and the per-pupil column item 7 publishes.
+  The identity lives in the builder, where a changed millage is a named failure rather than a
+  column nobody re-derives.
+
+  **Price item 7 as `base_cost_aid_under_item_7` less `base_cost_aid_under_prior_law`.** Rejected
+  as the noisier of two correct framings. Those two expressions are rounded differently — one off
+  a per-pupil figure the department rounds to the cent, the other off a full-precision aggregate —
+  so their difference carries a residue of several dollars on a district the amendment does not
+  move at all. Holding the share and the per-pupil cost fixed and varying only the ADM isolates
+  the mechanism exactly, and makes a district enrolling its own average move zero rather than
+  nearly zero.

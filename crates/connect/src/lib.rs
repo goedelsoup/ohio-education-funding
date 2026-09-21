@@ -168,6 +168,30 @@ fn registered_connector(key: &str) -> &'static registry::Connector {
     registry::connector(key).unwrap_or_else(|| panic!("{key} is not a registered connector"))
 }
 
+/// One JVSD payment report's two data sheets, as rows.
+///
+/// A named pair rather than the tuple written inline, because the tuple is four levels of `Vec`
+/// deep and says nothing about which half is which.
+type JvsdSheets = (Vec<Vec<String>>, Vec<Vec<String>>);
+
+/// The rows of whichever of `sheets` a workbook actually has.
+///
+/// For a series whose publisher renamed its sheets partway through. Trying each name in turn is
+/// not a fallback to a near-enough sheet: the names are alternatives of one sheet across editions
+/// — `Base Cost` and `JVSD_BaseCost` — and a workbook matching none of them is an error naming
+/// all of them, because that is a layout change somebody has to look at.
+fn rows_of_any(book: &AnyWorkbook, sheets: &[&str]) -> Result<Vec<Vec<String>>, RebuildError> {
+    sheets
+        .iter()
+        .find_map(|sheet| book.rows(sheet).ok())
+        .ok_or_else(|| {
+            RebuildError::Layout(format!(
+                "the workbook has none of the sheets {sheets:?}; it holds {:?}",
+                book.sheet_names()
+            ))
+        })
+}
+
 /// The rows of one sheet of a cached workbook, or the reason its fixture must be skipped.
 ///
 /// Both failures here — the workbook is not cached, the sheet is not in it — mean the source
@@ -1158,6 +1182,45 @@ fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
             fixtures::COMMUNITY_SCHOOL_FUNDING_FIXTURE,
             cause.to_string(),
         ),
+    });
+
+    // The third population the same office funds by formula, and the one with no calculator: for
+    // joint vocational districts the department publishes payment reports instead. Six years,
+    // spanning item 7 of H.B. 96, which rewrote their state share of base cost into per-pupil
+    // form. The sheet names move once and the column spellings move twice across that span — see
+    // `fixtures::jvsd`, and in particular why `[I]` cannot be trusted to mean what it meant.
+    let jvsd = (|| -> Result<Vec<Vec<String>>, RebuildError> {
+        let books = [2022, 2023, 2024, 2025, 2026, 2027]
+            .map(|year| open_workbook(root, registered(&format!("jvsd-payment-fy{}", year % 100))));
+        let books: Vec<_> = books.into_iter().collect::<Result<_, _>>()?;
+        let sheets: Vec<JvsdSheets> = books
+            .iter()
+            .map(|book| {
+                Ok((
+                    rows_of_any(book, fixtures::JVSD_DETAIL_SHEETS)?,
+                    rows_of_any(book, fixtures::JVSD_BASE_COST_SHEETS)?,
+                ))
+            })
+            .collect::<Result<_, RebuildError>>()?;
+        let years: Vec<fixtures::JvsdYear<'_>> = sheets
+            .iter()
+            .zip(2022..)
+            .map(|((detail, base_cost), fiscal_year)| fixtures::JvsdYear {
+                fiscal_year,
+                detail,
+                base_cost,
+            })
+            .collect();
+        fixtures::build_jvsd_funding(&years).map_err(RebuildError::Layout)
+    })();
+    out.push(match jvsd {
+        Ok(rows) => csv_fixture(
+            root,
+            fixtures::JVSD_FUNDING_FIXTURE,
+            fixtures::JVSD_FUNDING_HEADER,
+            &rows,
+        )?,
+        Err(cause) => Rebuilt::skipped(fixtures::JVSD_FUNDING_FIXTURE, cause.to_string()),
     });
 
     // The one parameter in the plan that moves without an act, across the one interval it can be

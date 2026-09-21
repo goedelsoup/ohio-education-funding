@@ -220,6 +220,105 @@ pub(super) const FOUNDATION: Connector = Connector {
             fixtures: &[crate::fixtures::SFPR_FIXTURE],
             note: "States the 180 days of service that annualise reported daily miles, and that the density supplement is prorated to fit the biennial appropriation.",
         },
+        Source {
+            key: "jvsd-payment-fy22",
+            title: Some("FY22 JVSD Foundation Payment Report (final #3)"),
+            url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
+                  School-Payment-Reports/State-Funding-For-Schools/\
+                  Career-Tech-Planning-and-Funding/Career-Tech-Payment-Reports/\
+                  Career-Tech-Payment-Reports-in-Excel-Format/\
+                  FY22_final-3_JVSD_Foundation_Payment.xlsx.aspx?lang=en-US",
+            filename: "jvsd-fy22.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-jvsd-foundation-payments"),
+            fixtures: &[crate::fixtures::JVSD_FUNDING_FIXTURE],
+            note: "Paid February 15, 2023. The plan's opening year, and the only one whose `Base Cost` sheet omits per-pupil base \
+                   cost: 72 columns where every later year has 76. Prior law never divided by a \
+                   pupil, so the column had nothing to do until H.B. 96 gave it a job.",
+        },
+        Source {
+            key: "jvsd-payment-fy23",
+            title: Some("FY23 JVSD Foundation Payment Report (final #2)"),
+            url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
+                  School-Payment-Reports/State-Funding-For-Schools/\
+                  Career-Tech-Planning-and-Funding/Career-Tech-Payment-Reports/\
+                  Career-Tech-Payment-Reports-in-Excel-Format/\
+                  FY23_Final2_JVSD_Foundation_Payment.xlsx.aspx?lang=en-US",
+            filename: "jvsd-fy23.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-jvsd-foundation-payments"),
+            fixtures: &[crate::fixtures::JVSD_FUNDING_FIXTURE],
+            note: "Paid November 15, 2023. The one year written in plain labels — `State Share Percentage`, no bracket tag and no \
+                   CamelCase. Both neighbours tag their columns and FY2022 runs them together, so \
+                   no single spelling reads the series.",
+        },
+        Source {
+            key: "jvsd-payment-fy24",
+            title: Some("FY24 JVSD Foundation Payment Report (final #2)"),
+            url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
+                  School-Payment-Reports/State-Funding-For-Schools/\
+                  Career-Tech-Planning-and-Funding/Career-Tech-Payment-Reports/\
+                  Career-Tech-Payment-Reports-in-Excel-Format/\
+                  FY24_Final2_JVSD_Foundation_Payment-1.xlsx.aspx?lang=en-US",
+            filename: "jvsd-fy24.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-jvsd-foundation-payments"),
+            fixtures: &[crate::fixtures::JVSD_FUNDING_FIXTURE],
+            note: "Paid November 15, 2024. The first year tagged `[A1]`…`[I]`, and the reason the tags cannot be trusted across \
+                   the series: here `[I]` is total state support and in FY2026 `[I]` is the base \
+                   funding supplement, a $559m column and a $1.4m one under one letter.",
+        },
+        Source {
+            key: "jvsd-payment-fy25",
+            title: Some("FY25 JVSD Foundation Payment Report (final #2)"),
+            url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
+                  School-Payment-Reports/State-Funding-For-Schools/\
+                  Career-Tech-Planning-and-Funding/Career-Tech-Payment-Reports/\
+                  Career-Tech-Payment-Reports-in-Excel-Format/\
+                  FY25_Final-2_JVSD_Foundation_Payment.xlsx.aspx?lang=en-US",
+            filename: "jvsd-fy25.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-jvsd-foundation-payments"),
+            fixtures: &[crate::fixtures::JVSD_FUNDING_FIXTURE],
+            note: "Paid November 14, 2025. The last year under prior law, which is what makes it the baseline item 7 moved from. \
+                   Its `Detailed SFPR` has no per-pupil base cost, no local capacity per-pupil and \
+                   no base cost enrolled ADM: those three columns appear in FY2026 and are the \
+                   schema's record of the amendment.",
+        },
+        Source {
+            key: "jvsd-payment-fy26",
+            title: Some("FY26 JVSD Foundation Payment Report (final #1)"),
+            url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
+                  School-Payment-Reports/State-Funding-For-Schools/\
+                  Career-Tech-Planning-and-Funding/Career-Tech-Payment-Reports/\
+                  Career-Tech-Payment-Reports-in-Excel-Format/\
+                  FY26_Final-1_JVSD_FL1_Foundation_Payment.xlsx.aspx?lang=en-US",
+            filename: "jvsd-fy26.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-jvsd-foundation-payments"),
+            fixtures: &[crate::fixtures::JVSD_FUNDING_FIXTURE],
+            note: "Paid August 14, 2026. The first year under H.B. 96 and the only closed one, which makes it the single year \
+                   the new method can be priced against its own counterfactual. Its enrolled ADM \
+                   is this year's, unlike FY2027's.",
+        },
+        Source {
+            key: "jvsd-payment-fy27",
+            title: Some("FY27 JVSD Foundation Payment Report (September)"),
+            url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
+                  School-Payment-Reports/State-Funding-For-Schools/\
+                  Career-Tech-Planning-and-Funding/Career-Tech-Payment-Reports/\
+                  Career-Tech-Payment-Reports-in-Excel-Format/\
+                  FY27_JVSD_SEP_Foundation_Payment.xlsx.aspx?lang=en-US",
+            filename: "jvsd-fy27.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-jvsd-foundation-payments"),
+            fixtures: &[crate::fixtures::JVSD_FUNDING_FIXTURE],
+            note: "Paid September 15, 2026. The first payment of an open year, not a final. **Its `[a] Enrolled ADM` is FY2026's \
+                   on 43 of the 49 districts** and equals base cost enrolled ADM on 39, because \
+                   FY2027 enrolment does not exist in September 2026. Every level here reads, and \
+                   any quantity the current-year ADM multiplies is provisional — which under item \
+                   7, and not under prior law, is the state share of base cost itself.",
+        },
     ],
 };
 

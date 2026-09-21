@@ -212,7 +212,9 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * the finding precisely because it does not move. A ratchet that counts bindings of quantities
  * that changed would not have asked for it.
  *
- * Recomputed at **883/77** when the community school equity supplement was extracted. Seven
+ * Recomputed at **890/78** when six years of the joint vocational districts' payment reports
+ * were extracted — seven more figures on one more node. Before that, **883/77** when the
+ * community school equity supplement was extracted. Seven
  * bindings and the seventy-seventh carrier —
  * `formula-component/fsfp-community-school-equity-supplement`, the first node in the corpus whose
  * figures are computed over a population that is **not** the 609-district panel. Every binding
@@ -237,11 +239,11 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * counts bindings cannot see a wrong sentence, which is the standing limitation of it.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "883 bindings; raise this when you add one").toBeGreaterThanOrEqual(883);
+  expect(bindings.length, "890 bindings; raise this when you add one").toBeGreaterThanOrEqual(890);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "77 nodes carry bindings; raise this when a seventy-eighth does",
-  ).toBeGreaterThanOrEqual(77);
+    "78 nodes carry bindings; raise this when a seventy-ninth does",
+  ).toBeGreaterThanOrEqual(78);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

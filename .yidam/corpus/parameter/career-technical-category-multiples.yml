@@ -198,11 +198,22 @@ unfilled:
       department publishes with IRNs. What is missing is which schools belong to which planning
       district, and the one portal that published it no longer resolves. Without it the career
       awareness payment has a statewide total and no recipient.
-  - field: the career-technical base cost as the department computes it
+  - field: the career-technical base cost as the department computes it, in FY2022
     why: >-
-      The FY2022 figure above is recovered from the weights rather than read. The department
-      publishes a JVSD base cost build-up somewhere in its model; the extract this corpus takes
-      of the FY2027 calculator carries the FY2027 result and not the method or the earlier years.
+      Narrower than it was. This said the department "publishes a JVSD base cost build-up
+      somewhere in its model" and the corpus could not reach it. It is reachable and now held:
+      the JVSD foundation payment reports carry a 76-column `Base Cost` sheet for each of FY2022
+      through FY2027, and among its statewide scalars is the average career-technical base cost
+      per pupil — read rather than recovered from the weights. See
+      [`dew-jvsd-foundation-payments`](../../catalog/dew-jvsd-foundation-payments.md) and
+      [`fsfp-jvsd-state-share-of-base-cost`](../formula-component/fsfp-jvsd-state-share-of-base-cost.yml).
+
+      What is still missing is one year. The FY2022 report predates the column — that year's
+      sheet is 72 columns where the later five are 76 — so the FY2022 figure above is still
+      recovered from the weights rather than read, and it is the only one that is. The scalar is
+      not extracted into the committed fixture either: `jvsd_funding` takes the state share and
+      its terms, not the build-up's statewide inputs, so a claim about the series still has to be
+      read off the workbook.
 figures:
   - key: project/career-technical-base-cost-implied-fy2022
     value: 8333.115691651989
