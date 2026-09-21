@@ -24,9 +24,22 @@ description: |
   **The top of the scale is a rank, not a value.** R.C. 3317.017(A)(4)(c) and (d) direct the
   department to order all districts by that income ratio and take the fortieth highest. Nothing
   in the section says what ratio that is, and the value therefore moves when the distribution of
-  district incomes moves, with no act and no departmental decision. Why the fortieth and not
-  some other rank is not stated in the section. [verified for the mechanism; open for the
-  choice of forty]
+  district incomes moves, with no act and no departmental decision. [verified]
+
+  Why the fortieth and not some other rank is not stated in the section, and the budget analyses
+  do not supply it either: of the twelve committed LSC greenbooks and both editions of H.B. 96's,
+  one mentions the benchmark at all, and its account of this percentage carries no reason of any
+  kind. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_threshold_that_was_always_a_rank.rs))
+
+  A rank is the house convention rather than this plan's invention — equity aid equalised to the
+  48th percentile district, parity aid to the 490th lowest-wealth, targeted assistance to the same
+  490th twelve years on — and LSC argued for parity aid's threshold in as many words while saying
+  nothing for this one. What is new here is the direction: earlier ranks counted from the bottom
+  and named who qualified, and this one counts from the top and names who is capped. The 490th of
+  612 is LSC's own 80th percentile; the fortieth of 609 is the 93rd. See
+  [`fsfp-local-capacity-measure`](../formula-component/fsfp-local-capacity-measure.yml) for the
+  lineage in full. [inference]
 findings: |
   ### Three of the four kinds, in one parameter
 
@@ -151,8 +164,12 @@ revisions:
 unfilled:
   - field: why the fortieth rank
     why: >-
-      Neither the section nor the plan's published rationale in this corpus says. The Fair
-      School Funding Plan workgroup's own documentation is where a reason would be.
+      Not in the section, and not in the fourteen budget analyses either — that route has been
+      run and is recorded in `crates/project/tests/the_threshold_that_was_always_a_rank.rs`.
+      It is also the wrong route: H.B. 1 of the 134th already writes the fortieth, so the
+      budget never chose it and a document that explains what a budget changed was never going
+      to say. The Fair School Funding Plan workgroup's own documentation, upstream of that
+      bill, is where a reason would be.
 figures:
   - key: local-capacity/benchmark-ratio-fy2027
     value: 1.4650363645238444

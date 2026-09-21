@@ -4,7 +4,40 @@
 //!
 //! Two corpus nodes recorded their versions of this as unanswerable "because the corpus holds one
 //! year of the calculator". The cache held both workbooks the whole time.
+//!
+//! # And the General Assembly was shown it
+//!
+//! `fsfp-local-capacity-measure` left a second `[open]` beside the arithmetic: "Whether the
+//! General Assembly intends the two clocks to run at different speeds, or has ever been shown this
+//! comparison, is not established by anything here." It is established by LSC, in the document
+//! legislators were given when the bill was introduced.
+//!
+//! H.B. 96's **redbook** carries a section headed *State share of the base cost, property values,
+//! and local capacity*. It names both clocks — base cost inputs held "at FY 2022 levels", the
+//! statewide weighted capacity per pupil rising 8.2% then 7.2% — states the consequence as a
+//! series, **38.4% to 35.0% to 32.2%**, and names the knock-on onto the categoricals. LSC's
+//! projection sits within a point of what this file computes from the department's own two
+//! workbooks, which is a reconciliation of the finding against an independent estimate as well as
+//! an answer about awareness.
+//!
+//! # The enacted analysis drops it
+//!
+//! That section is in the redbook and in no other document. H.B. 96's **greenbook** — the analysis
+//! of the act as passed, and the one a later reader reaches for — keeps the phase-in table and one
+//! clause of the Quick look, "while maintaining FY 2022 base cost inputs", and carries neither the
+//! capacity growth rates nor the state share series nor the sentence joining them. So the record
+//! of what the General Assembly was told is in the edition that describes a bill nobody enacted,
+//! and the edition that describes the law is silent. That is [`Edition`] earning its keep a second
+//! time: the two documents differ here by a whole finding, not by three words of column heading.
+//!
+//! **What this does not settle.** Awareness is not intent. LSC told the legislature what holding
+//! the cost side still would do to the state share and the legislature enacted the freeze; that is
+//! as far as the documents go, and no analysis says the divergence was the point.
 
+mod common;
+
+use project::greenbook::greenbook;
+use project::ledger::budget_analysis::Edition;
 use project::panel;
 use project::prior_model::{self, Quantity};
 
@@ -175,4 +208,131 @@ fn the_fy2026_blend_reproduces_its_own_published_count() {
         worst = worst.max((computed - row.dpia_weighted_adm).abs());
     }
     assert!(worst < 0.01, "worst residual {worst}");
+}
+
+/// LSC published the series, and its cause, in the analysis of the bill as introduced.
+///
+/// Four figures and one sentence of mechanism. The mechanism is the corpus's own: capacity inputs
+/// rise, cost inputs do not, and the difference between the two is the state's share.
+#[test]
+fn the_analysis_of_the_introduced_bill_states_the_falling_state_share_and_why() {
+    let redbook = common::flat(Edition::Introduced.text());
+
+    assert!(
+        redbook.contains(
+            "base cost inputs, primarily the salaries and related costs that drive most school \
+             operating expenses, at FY 2022 levels"
+        ),
+        "the cost clock, stated as a freeze"
+    );
+    assert!(
+        redbook.contains("the statewide weighted capacity per pupil")
+            && redbook.contains("is projected to increase by 8.2% in FY 2026 and 7.2% in FY 2027"),
+        "the capacity clock, stated as a rate of increase"
+    );
+    assert!(
+        redbook.contains(
+            "largely due to increases in property values and income levels used in computing \
+             district per-pupil local contributions"
+        ),
+        "and the two joined: the state share falls because the capacity side moved"
+    );
+    assert!(
+        redbook.contains(
+            "averaging 35.0% statewide in FY 2026 and 32.2% in FY 2027, which are progressively \
+             lower than the estimated statewide average of 38.4% for FY 2025"
+        ),
+        "with the consequence as a three-year series"
+    );
+    assert!(
+        redbook.contains("This in turn reduces projected funding for the categorical components"),
+        "and the knock-on onto every component the percentage multiplies"
+    );
+}
+
+/// The series has a published start, in the analysis that enacted the plan.
+///
+/// 42.8% in FY2022 against 32.2% projected for FY2027. Both are LSC's, five bienniums apart, so
+/// the decline is visible in the Legislative Service Commission's own numbers without this corpus
+/// computing anything.
+#[test]
+fn the_enacting_analysis_published_the_percentage_the_series_starts_from() {
+    assert!(
+        greenbook("hb110").flat().contains(
+            "The average state share percentage for all traditional districts is estimated to be \
+             42.8% in FY 2022"
+        ),
+        "H.B. 110 states the statewide average state share percentage for the plan's first year"
+    );
+}
+
+/// LSC's projection and the department's two workbooks agree to within a point.
+///
+/// Not an identity, and the test does not assert one. LSC projected the introduced bill before
+/// either calculator existed and says "averaging ... statewide"; this crate divides the aggregate
+/// state share by the aggregate base cost across 609 districts of the enacted models. Two methods,
+/// two vintages, two editions of the bill — and 35.0% against 35.35%, 32.2% against 31.52%.
+#[test]
+fn the_redbooks_projection_and_the_published_models_are_within_a_point() {
+    let (fy2026, fy2027) = prior_model::aggregate_state_share();
+
+    assert!(
+        (fy2026 - 0.350).abs() < 0.01,
+        "FY2026 {fy2026} against LSC's 35.0%"
+    );
+    assert!(
+        (fy2027 - 0.322).abs() < 0.01,
+        "FY2027 {fy2027} against LSC's 32.2%"
+    );
+
+    // The fall over the same year is what has to agree, and it does to about a point: LSC
+    // projected 2.8 points, the two published models give 3.8, and both are an order of magnitude
+    // more than the 0.05% the cost side moves across the same interval.
+    let theirs = 0.350 - 0.322;
+    let ours = fy2026 - fy2027;
+    assert!(ours > 0.02 && theirs > 0.02, "{ours} against {theirs}");
+    assert!((ours - theirs).abs() < 0.011, "{ours} against {theirs}");
+
+    let (_, cost) = prior_model::median_change(Quantity::BaseCostPerPupil);
+    assert!(
+        ours > cost * 50.0,
+        "state share fell {ours}, base cost moved {cost}"
+    );
+}
+
+/// The enacted analysis keeps the phase-in and drops the comparison.
+///
+/// One clause survives — the freeze, in the Quick look — and the capacity side, the percentages,
+/// and the sentence joining them do not. A reader who goes to the greenbook because it is the
+/// document about the law gets the phase-in table and no account of what runs against it.
+#[test]
+fn the_enacted_analysis_keeps_one_clock_and_drops_the_other() {
+    let greenbook = common::flat(Edition::Enacted.text());
+
+    assert!(
+        greenbook.contains(
+            "The budget completes the phase-in of the school funding formula, known as the Fair \
+             School Funding Plan, in FY 2026 and FY 2027, while maintaining FY 2022 base cost \
+             inputs"
+        ),
+        "the freeze survives into the enacted analysis, in one clause of the Quick look"
+    );
+    assert!(
+        greenbook.contains("increasing the phase-in percentages to 83.33% and 100%, respectively"),
+        "and so does the phase-in, with its own table"
+    );
+
+    for absent in [
+        "statewide weighted capacity",
+        "35.0%",
+        "32.2%",
+        "38.4",
+        "property values and income",
+    ] {
+        assert!(
+            !greenbook.contains(absent),
+            "the enacted analysis carries {absent:?}, so the comparison did not drop out of it \
+             and this file's claim needs rereading"
+        );
+    }
 }

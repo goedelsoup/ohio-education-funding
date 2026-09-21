@@ -84,7 +84,9 @@ and it sat on a different axis: whether there is a claim at all.
 
 - `[open]` — a live question. Why the fortieth-ranked district is the local capacity benchmark and
   not some other rank is not stated in the section, and reading more of the section will not say.
-  Somebody has to find out.
+  Somebody has to find out — and the honest end of that work is often "the committed documents do
+  not say", recorded as an answer rather than left standing. That is where this one landed: the
+  fourteen budget analyses were read, one of them mentions the benchmark, and none gives a reason.
 - **A field nobody has filled in** — a knowable value, a source open, and nothing typed. No
   investigation required.
 
@@ -320,16 +322,16 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1749 | supported by a committed primary source |
-| `[inference]` | 353 | drawn from verified facts, not witnessed |
-| `[open]` | 207 | a live question — unknown, contested, or being worked |
+| `[verified]` | 1758 | supported by a committed primary source |
+| `[inference]` | 356 | drawn from verified facts, not witnessed |
+| `[open]` | 205 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-207 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+205 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 87 | 0 |
+| `findings` | 85 | 0 |
 | `description` | 43 | 0 |
 | `revisions` | 10 | 0 |
 | `series` | 7 | 0 |
@@ -364,7 +366,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `calculator` | 1 | 0 |
 | `appropriating_bill` | 1 | 0 |
 
-**101 recorded withdrawals across 44 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**102 recorded withdrawals across 44 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Relationship vocabulary
