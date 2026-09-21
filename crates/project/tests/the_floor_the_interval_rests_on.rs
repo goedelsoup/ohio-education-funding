@@ -52,12 +52,17 @@
 //! This was stable rather than an artefact of one period. Under the square root at five years, by
 //! origin: FY2013 1.34x, FY2015 1.44x, FY2018 1.36x, FY2019 1.36x.
 //!
-//! # The published horizons are still past where this can see
+//! # The published horizons are past where the *fit* looked, which is not the same as past the panel
 //!
-//! Five years is as far as six origins across fifteen surveyed years will reach. The FY2032 leg
-//! in [`scenario/guarantee-phase-out`] is **six** and the feed's horizon is FY2036, which is
-//! **ten**. The fit is extrapolated there either way — but from an exponent the data supports
-//! rather than one it contradicts inside the measured range.
+//! The FY2032 leg in [`scenario/guarantee-phase-out`] is **six** years and the feed's horizon is
+//! FY2036, which is **ten**. The fit above uses one to five.
+//!
+//! This file said that five years *"is as far as six origins across fifteen surveyed years will
+//! reach"*, and that was wrong about its own `ORIGINS`: FY2013 plus eleven is FY2024. The
+//! five-year ceiling was a choice. `the_horizons_the_backtest_stopped_short_of` takes the same
+//! method out to **thirteen** years, finds the exponent holds the cross-district spread the whole
+//! way, and finds that what fails past five is the *centre* rather than the width — the section
+//! below is where that begins.
 //!
 //! # A bias the mean absolute error could not show
 //!

@@ -79,7 +79,7 @@
 //! # What this does not do
 //!
 //! It does not move the constant. 0.30 minimises the error the decisions were made on, the
-//! backtest reaches five years and the feed publishes ten, and an undamped projection would trade
+//! backtest reaches thirteen years and the feed publishes ten, and an undamped projection would trade
 //! a known bias for 41% more dispersion. Whether the point estimate should be de-biased is a
 //! decision with a record. What is settled here is its size and its cause.
 //!

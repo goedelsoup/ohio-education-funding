@@ -16,9 +16,11 @@
 //! held 67.3% of out-of-sample forecasts at one year and **55.8%** at five, against the 68.3% a
 //! one-sigma interval claims, because it widened as `horizon^0.50` while the error grew faster.
 //! [`HORIZON_EXPONENT`] is the fix and is fitted to that coverage; the shortfall is now under
-//! three points at every horizon the backtest reaches. The horizons this crate publishes are
-//! further out than that, so the fit is extrapolated where it matters most — but extrapolated
-//! from an exponent the data supports rather than one it contradicts.
+//! three points at every horizon the backtest reaches — which
+//! `tests/the_horizons_the_backtest_stopped_short_of.rs` establishes is **thirteen** years, past
+//! every horizon this crate publishes. What is not measured out there is the point the band is
+//! drawn around: the mean log error reaches +0.056 at ten years, and an interval centred on a
+//! biased point inherits the bias whatever its width.
 
 use edfund_core::FiscalYear;
 
@@ -209,6 +211,13 @@ pub const ONE_SIGMA: f64 = 1.0;
 /// would give 0.60 and still leave the band mis-covering. At 0.65 coverage runs 67.3%, 70.4%,
 /// 71.2%, 68.4%, 66.5% over horizons one to five — never more than **2.9 points** from 68.3%,
 /// against 12.5 at 0.50.
+///
+/// The fit was taken over five years and holds over **thirteen**. `the_horizons_the_backtest_stopped_short_of`
+/// runs the same method to the panel's own limit: coverage of the cross-district error stays
+/// within three points of 68.3% at every horizon out to thirteen, and refitting to coverage over
+/// the longer range returns 0.65 again. The 0.60 that matches dispersion turns out to be partly
+/// the window — refit, it climbs from 0.573 over one to five to 0.650 over one to thirteen — so
+/// the gap between the two targets is smaller than five years made it look.
 ///
 /// The surface is flat from about 0.63 to 0.66 and the third digit is not identified. 0.64
 /// minimises the worst horizon and 0.65 the average one; the rounder value is taken, the same
