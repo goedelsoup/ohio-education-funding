@@ -88,6 +88,7 @@ pub mod refresh;
 pub mod report;
 pub mod scholarship;
 pub mod series;
+pub mod size_terms;
 pub mod staffing_minimums;
 pub mod statute;
 pub mod supplement_reach;

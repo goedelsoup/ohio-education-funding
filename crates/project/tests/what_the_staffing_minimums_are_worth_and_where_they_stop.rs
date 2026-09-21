@@ -21,8 +21,10 @@
 //! | with the floors struck out | **48** | 51 | 74 | 61 | 49 | 57 |
 //!
 //! The first-to-third gap is 53 districts with the floors and 26 without, so they account for
-//! about **half** of the non-monotonicity. The other half is not size and this file does not
-//! claim it.
+//! about **half** of the non-monotonicity. This file read the other half as "not size" and it is:
+//! it is targeted assistance's capacity tier, which measures size outside base cost, and
+//! `the_second_size_term_the_plan_keeps_outside_base_cost.rs` closes the gap to zero by striking
+//! both out.
 //!
 //! # Why there is no cliff, and what there is instead
 //!

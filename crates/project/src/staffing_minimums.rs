@@ -26,7 +26,13 @@
 //!
 //! So the floors are doing exactly the job the issue credits them with, and they account for
 //! **about half** of the non-monotonicity: the gap between the first and third sextile is 53
-//! districts with them and 26 without. The other half is not size.
+//! districts with them and 26 without.
+//!
+//! This file read the residual 26 as "not size", on the reasoning that base cost's only
+//! size-dependent terms are the floors and the two banded salaries. The reasoning holds and the
+//! conclusion does not: **base cost is not the only place the plan measures size**. The residual
+//! is targeted assistance's capacity tier, which compares two whole-district totals and so reads
+//! enrolment — see [`crate::size_terms`], where striking both out closes the gap to zero.
 //!
 //! The sextiles are ordered on base cost enrolled ADM, which is the count every threshold in the
 //! section is against. `the_other_half_of_the_guarantee_and_the_two_things_it_pays_for.rs` orders
