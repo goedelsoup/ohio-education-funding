@@ -212,6 +212,24 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * the finding precisely because it does not move. A ratchet that counts bindings of quantities
  * that changed would not have asked for it.
  *
+ * Recomputed at **883/77** when the community school equity supplement was extracted. Seven
+ * bindings and the seventy-seventh carrier —
+ * `formula-component/fsfp-community-school-equity-supplement`, the first node in the corpus whose
+ * figures are computed over a population that is **not** the 609-district panel. Every binding
+ * above this line is a district or a statewide total over districts; these are 355 community and
+ * STEM schools, and no district appears in any of them.
+ *
+ * That is the seventh kind, and it is a gap in the ratchet's *reach* rather than in a node's
+ * coverage: a corpus can bind every property of every mechanism it models and still be silent
+ * about a payment made to somebody it does not model. Nothing here could have counted that,
+ * because the manifest had no figure whose inputs were not the panel.
+ *
+ * **The floor was three under when this was written** — 873 stated against 876 actual. It has
+ * drifted before and the comment says so; both assertions are `toBeGreaterThanOrEqual`, so a stale
+ * floor passes silently and forever. The narrative above is a record of re-counting only if each
+ * entry was actually measured. Re-measure with the expressions the test itself uses rather than
+ * adding your own count to the last stated one.
+ *
  * The corrected node is the one not counted here. `fsfp-base-cost-calculation` was the
  * seventy-sixth carrier two recounts ago for the staffing floors, and the claim it added then —
  * that the residual half of this shape "is not size" — is the claim this work overturns. It gains
@@ -219,11 +237,11 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * counts bindings cannot see a wrong sentence, which is the standing limitation of it.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "873 bindings; raise this when you add one").toBeGreaterThanOrEqual(873);
+  expect(bindings.length, "883 bindings; raise this when you add one").toBeGreaterThanOrEqual(883);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "76 nodes carry bindings; raise this when a seventy-seventh does",
-  ).toBeGreaterThanOrEqual(76);
+    "77 nodes carry bindings; raise this when a seventy-eighth does",
+  ).toBeGreaterThanOrEqual(77);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

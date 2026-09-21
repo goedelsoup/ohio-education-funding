@@ -1137,6 +1137,29 @@ fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(cause) => Rebuilt::skipped(fixtures::FY26_FIXTURE, cause.to_string()),
     });
 
+    // The other population the same office models, and the only per-school formula source here.
+    // Read for the community school equity supplement, which no district receives and no district
+    // panel can carry — see `fixtures::community_schools` for the hidden sheet next to these two
+    // whose `H. Equity Supplement` column holds total state support instead.
+    let community_schools = (|| -> Result<Vec<Vec<String>>, RebuildError> {
+        let book = open_workbook(root, registered("fy27-cs-calculator"))?;
+        let detail = book.rows(fixtures::CS_DETAIL_SHEET)?;
+        let summary = book.rows(fixtures::CS_SUMMARY_SHEET)?;
+        fixtures::build_community_school_funding(&detail, &summary).map_err(RebuildError::Layout)
+    })();
+    out.push(match community_schools {
+        Ok(rows) => csv_fixture(
+            root,
+            fixtures::COMMUNITY_SCHOOL_FUNDING_FIXTURE,
+            fixtures::COMMUNITY_SCHOOL_FUNDING_HEADER,
+            &rows,
+        )?,
+        Err(cause) => Rebuilt::skipped(
+            fixtures::COMMUNITY_SCHOOL_FUNDING_FIXTURE,
+            cause.to_string(),
+        ),
+    });
+
     // The one parameter in the plan that moves without an act, across the one interval it can be
     // observed over. FY2026 comes from the Internet Archive because the department serves no copy
     // of its own model a year later — see `decisions/an-archived-source-is-still-a-source`, which

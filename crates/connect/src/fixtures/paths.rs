@@ -42,6 +42,16 @@ pub const FY26_FIXTURE: &str = "crates/project/fixtures/fy26-department-model.cs
 /// [`super::fy25`] reads by the label's **text** and errors on a tag it cannot find.
 pub const FY25_FIXTURE: &str = "crates/project/fixtures/fy25-payment-report.csv";
 
+/// The FY2027 community and STEM school model, per school.
+///
+/// In `dispersion` rather than beside the district models in `foundation` and `project` because
+/// it is a different population, not a further year of the same one. Nothing in the calculator
+/// crates can join it: a community school has no IRN in the 609-district panel, no valuation and
+/// no local share, and the one line it carries that no district does — the equity supplement —
+/// is paid to 324 of its 355 schools and to nobody else in Ohio.
+pub const COMMUNITY_SCHOOL_FUNDING_FIXTURE: &str =
+    "crates/dispersion/fixtures/fy27-community-school-funding.csv";
+
 /// The statewide scalars each year's funding calculator states once, one row per fiscal year.
 ///
 /// The file a `parameter` node's `series:` should be read off. Several of them said "no
@@ -319,6 +329,7 @@ pub const REBUILT: &[&str] = &[
     CALCULATOR_COUNTS_FIXTURE,
     CALCULATOR_VINTAGES_FIXTURE,
     CALCULATOR_ADM_FIXTURE,
+    COMMUNITY_SCHOOL_FUNDING_FIXTURE,
     PROFILE_FIXTURE,
     GRADE_BANDS_FIXTURE,
     REPORT_CARD_FIXTURE,

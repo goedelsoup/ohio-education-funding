@@ -40,7 +40,9 @@ description: |
   - **Changes what the Tax Commissioner certifies** — the median federal adjusted gross income of
     a district's residents in place of the total. Recorded here as a change to the local capacity
     blend; it is not one, and the blend still reads both. [verified]
-  - **Codifies the community school equity supplement**, cutting it $650 → $500 → $400.
+  - **Codifies the community school equity supplement**, cutting it $650 → $500 → $400. It is
+    paid to site-based community schools only. See
+    [`fsfp-community-school-equity-supplement`](../formula-component/fsfp-community-school-equity-supplement.yml).
 
   All are in the act's own "school financing system calculation revisions" list. [verified]
 
@@ -211,6 +213,12 @@ links:
     relationship: appropriates-for
   - target: ../parameter/fsfp-phase-in-percentage.yml
     relationship: sets
+  - target: ../formula-component/fsfp-community-school-equity-supplement.yml
+    relationship: codifies
+    note: >-
+      Codifies it into R.C. 3317.022, where H.B. 33 had it as temporary law, and cuts the rate
+      $650 to $500 to $400. The act's own list is where the eligibility clause is written: community
+      schools that are not internet- or computer-based.
   - target: ../funding-regime/fair-school-funding-plan.yml
     relationship: continues
   - target: ../../catalog/lsc-hb96-analysis.md

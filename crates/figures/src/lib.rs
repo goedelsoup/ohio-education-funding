@@ -180,6 +180,16 @@ pub struct Inputs {
     /// Ohio's comparable districts quartiled by local revenue per pupil, FY2022, with what each
     /// level of government pays into each quartile.
     pub quartiles: [dispersion::national_peers::WealthQuartile; 4],
+    /// What the community school equity supplement costs, and what the two rules it was measured
+    /// against would have cost. The only figure block here computed over a population that is not
+    /// the 609-district panel, and the only one no district appears in.
+    pub community_school_equity: dispersion::community_school_funding::EquityCost,
+    /// The same 355 schools split site-based, e-school and STEM — which is the split the
+    /// supplement's eligibility rule makes and the money cannot show, since two of the three are
+    /// zero.
+    pub community_school_segments: Vec<dispersion::community_school_funding::Segment>,
+    /// Total state support across those 355 schools, which is what the supplement is a share of.
+    pub community_school_state_support: f64,
     /// The Census Bureau's state-level survey, FY2022 — the only source here that can say whether
     /// Ohio is unusual, and the one the corpus quotes for every national comparison.
     ///
@@ -677,6 +687,10 @@ impl Inputs {
             at_recognized,
             at_total_taxable,
             quartiles: dispersion::national_peers::ohio_by_local_wealth(),
+            community_school_equity: dispersion::community_school_funding::equity_cost(),
+            community_school_segments: dispersion::community_school_funding::segments(),
+            community_school_state_support:
+                dispersion::community_school_funding::total_state_support(),
             states: dispersion::census_states::states(),
             profile: dispersion::profile::districts(),
             sd1: dispersion::sd1::rows(),
@@ -4652,6 +4666,98 @@ pub static FIGURES: &[Figure] = &[
                 .rate()
                 .expect("schools are at risk")
         },
+    },
+    // The community school equity supplement, from the department's FY2027 simulator. These are
+    // the only figures in the manifest computed over a population that is not the 609-district
+    // panel — no school district receives this line, which is why it is reported here rather than
+    // priced as a `project::policy` lever.
+    Figure {
+        key: "dispersion/community-school-equity-supplement-total",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Community school equity supplement paid in the department\u{2019}s FY2027 model",
+        pinned: 34_650_906.27,
+        tolerance: 1.0,
+        compute: |i| i.community_school_equity.enacted,
+    },
+    Figure {
+        key: "dispersion/community-school-equity-supplement-recipients",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Site-based community schools paid the equity supplement in FY2027, of 355 \
+                community and STEM schools the department models",
+        pinned: 324.0,
+        tolerance: 0.0,
+        compute: |i| {
+            let paid = i
+                .community_school_segments
+                .iter()
+                .filter(|segment| segment.equity_supplement > 0.0)
+                .map(|segment| segment.schools)
+                .sum::<usize>();
+            f64::from(u32::try_from(paid).unwrap_or(u32::MAX))
+        },
+    },
+    Figure {
+        key: "dispersion/community-school-equity-supplement-stem-schools",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "STEM schools paid no equity supplement in FY2027, against a redbook that has the \
+                introduced budget extending it to them",
+        pinned: 8.0,
+        tolerance: 0.0,
+        compute: |i| {
+            let stem = i
+                .community_school_segments
+                .iter()
+                .filter(|segment| {
+                    segment.designation
+                        == dispersion::community_school_funding::Designation::Stem
+                })
+                .map(|segment| segment.schools)
+                .sum::<usize>();
+            f64::from(u32::try_from(stem).unwrap_or(u32::MAX))
+        },
+    },
+    Figure {
+        key: "dispersion/community-school-equity-supplement-at-the-former-rate",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "What the same 324 recipients would be paid at the $650 H.B. 33 set, which H.B. 96 \
+                cut to $400",
+        pinned: 56_307_722.68,
+        tolerance: 1.0,
+        compute: |i| i.community_school_equity.at_the_former_rate,
+    },
+    Figure {
+        key: "dispersion/community-school-equity-supplement-rate-cut",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "What the cut from $650 to $400 takes out of the equity supplement, over an \
+                unchanged population",
+        pinned: 21_656_816.41,
+        tolerance: 1.0,
+        compute: |i| i.community_school_equity.at_the_former_rate - i.community_school_equity.enacted,
+    },
+    Figure {
+        key: "dispersion/community-school-equity-supplement-extending-to-stem",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "What extending the equity supplement to the eight STEM schools would add at the \
+                enacted FY2027 rate \u{2014} the change the act did not make",
+        pinned: 1_834_208.52,
+        tolerance: 1.0,
+        compute: |i| i.community_school_equity.extending_to_stem,
+    },
+    Figure {
+        key: "dispersion/community-school-equity-share-of-state-support",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The equity supplement as a share of total state support to community and STEM \
+                schools, FY2027",
+        pinned: 0.02292,
+        tolerance: 0.0005,
+        compute: |i| i.community_school_equity.enacted / i.community_school_state_support,
     },
     Figure {
         key: "dispersion/ecot-directory-editions",

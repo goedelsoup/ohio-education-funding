@@ -40,6 +40,7 @@ Sorted by: type, then slug.
 | [`dew-expenditure-expanded-list`](dew-expenditure-expanded-list.md) | FY2025 Expenditure Expanded List | 1 |
 | [`dew-five-year-forecast`](dew-five-year-forecast.md) | Five-year forecast filings — the department's republished submissions | 3 |
 | [`dew-fy26-funding-calculator`](dew-fy26-funding-calculator.md) | FY26 TRAD State Foundation Funding Calculator — recovered from the archive | 1 |
+| [`dew-fy27-community-school-calculator`](dew-fy27-community-school-calculator.md) | FY27 Community/STEM School State Foundation Funding Simulator | 1 |
 | [`dew-fy27-funding-calculator`](dew-fy27-funding-calculator.md) | FY27 TRAD State Foundation Funding Calculator | 28 |
 | [`dew-mr81-enrollment-archive`](dew-mr81-enrollment-archive.md) | MR-81 free and reduced-price lunch reports, 1998–2025 | 1 |
 | [`dew-october-enrollment`](dew-october-enrollment.md) | October headcount by grade | 2 |
@@ -61,7 +62,7 @@ Sorted by: type, then slug.
 | [`lsc-appropriation-spreadsheet`](lsc-appropriation-spreadsheet.md) | LSC appropriation spreadsheet | 3 |
 | [`lsc-catalog-of-budget-line-items`](lsc-catalog-of-budget-line-items.md) | Catalog of Budget Line Items — what each appropriation line was given | 10 |
 | [`lsc-dew-redbook`](lsc-dew-redbook.md) | LSC Redbook — Ohio Department of Education and Workforce | 7 |
-| [`lsc-hb96-analysis`](lsc-hb96-analysis.md) | LSC Budget Analysis — H.B. 96 (FY2026-27) | 6 |
+| [`lsc-hb96-analysis`](lsc-hb96-analysis.md) | LSC Budget Analysis — H.B. 96 (FY2026-27) | 7 |
 | [`lsc-school-funding-complete-resource`](lsc-school-funding-complete-resource.md) | LSC School Funding Complete Resource | 2 |
 | [`nces-ccd-lea-directory`](nces-ccd-lea-directory.md) | Common Core of Data: local education agency directory | 1 |
 | [`ocg-fact-check-021`](ocg-fact-check-021.md) | OCG Ground Truth Fact-Check RL-2026-021 — Toledo–Perrysburg Special-Needs Spending | 3 |
@@ -74,7 +75,7 @@ Sorted by: type, then slug.
 | [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 19 |
 | [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 3 |
 
-51 entries, 1 not yet cited by any corpus node. 238 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+52 entries, 1 not yet cited by any corpus node. 239 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

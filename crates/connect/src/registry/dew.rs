@@ -33,6 +33,30 @@ pub(super) const FOUNDATION: Connector = Connector {
                    through its cached formula results.",
         },
         Source {
+            key: "fy27-cs-calculator",
+            title: Some("FY27 Community/STEM School State Foundation Funding Simulator"),
+            url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
+                  School-Payment-Reports/State-Funding-For-Schools/\
+                  Community-School-Funding/\
+                  FY27-CS-State-Foundation-Funding-Calculator-12-24-2025.xlsx.aspx\
+                  ?lang=en-US",
+            filename: "fy27-cs-calculator.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-fy27-community-school-calculator"),
+            fixtures: &[crate::fixtures::COMMUNITY_SCHOOL_FUNDING_FIXTURE],
+            note: "The sibling of `fy27-calculator`, one directory across, and the only \
+                   per-*school* formula source in this registry. Same office, same release \
+                   calendar, same workbook shape; a different population, which is why it is a \
+                   source here and not a wider version of the district model. Read for the \
+                   community school equity supplement — R.C. 3317.022 as H.B. 96 codified it — \
+                   which no district panel can carry because no district receives it. Its two \
+                   data sheets are `Detail SFPR` and `Summary_SFPR`, and the space-versus- \
+                   underscore rule that tells display sheets from data sheets in the district \
+                   workbook does **not** hold here: see the catalog entry, and \
+                   `fixtures::community_schools` for the hidden sheet whose \
+                   `H. Equity Supplement` column holds total state support instead.",
+        },
+        Source {
             key: "cupp-fy24",
             title: None,
             url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
