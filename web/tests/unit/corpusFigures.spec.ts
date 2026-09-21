@@ -200,6 +200,18 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * two of them, a slope, and both halves of an approximation, and still have bound nothing about
  * whether the quantity it names is the quantity it reads.
  *
+ * Recomputed at **873/76** when a rolling anchor for the guarantee was priced. Eight bindings, no
+ * new carrier, all on `formula-component/temporary-transitional-aid-guarantee` — a node that had
+ * bound what the instrument pays, who it pays and what the marginal pupil is worth to them, and
+ * nothing about **what the obvious alternative to it costs**. That is the sixth kind: a node can
+ * bind every property of the rule in force and have bound nothing about the rule a reader would
+ * reach for next, and a priced alternative quoted only in prose goes stale exactly as the savings
+ * table on `scenario/guarantee-phase-out` did.
+ *
+ * Two of the eight are a **non-difference** — the held share at 26.81% against 26.94%, which is
+ * the finding precisely because it does not move. A ratchet that counts bindings of quantities
+ * that changed would not have asked for it.
+ *
  * The corrected node is the one not counted here. `fsfp-base-cost-calculation` was the
  * seventy-sixth carrier two recounts ago for the staffing floors, and the claim it added then —
  * that the residual half of this shape "is not size" — is the claim this work overturns. It gains
@@ -207,7 +219,7 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * counts bindings cannot see a wrong sentence, which is the standing limitation of it.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "865 bindings; raise this when you add one").toBeGreaterThanOrEqual(865);
+  expect(bindings.length, "873 bindings; raise this when you add one").toBeGreaterThanOrEqual(873);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "76 nodes carry bindings; raise this when a seventy-seventh does",

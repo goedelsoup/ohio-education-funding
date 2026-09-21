@@ -305,6 +305,34 @@ pub struct Inputs {
     /// decided on. Binding them is what makes the next change to a projection constant redden the
     /// corpus rather than silently restate it.
     pub forecasts: Forecasts,
+    /// The guarantee's anchor replaced, at the modelled year and walked forward.
+    ///
+    /// Here for the same reason `forecasts` is: `formula-component/temporary-transitional-aid-guarantee`
+    /// states what a rolling anchor costs, and a rule whose price is quoted in prose and computed
+    /// nowhere the corpus can see is the #120 shape.
+    pub anchors: Anchors,
+}
+
+/// `rolling_anchor`'s runs, computed once because each walks all 609 districts for five years.
+pub struct Anchors {
+    /// FY2027 as enacted — the control, and the published guarantee.
+    pub fy2027_as_enacted: project::rolling_anchor::Held,
+    /// FY2027 with the floor set to each district's own FY2026 realized aid.
+    pub fy2027_prior_year: project::rolling_anchor::Held,
+    /// FY2032 as enacted, walked rather than computed in one step.
+    pub fy2032_as_enacted: project::rolling_anchor::Held,
+    /// FY2032 under a prior-year ratchet.
+    pub fy2032_prior_year: project::rolling_anchor::Held,
+    /// FY2032 with each district's annual fall capped at 2%.
+    pub fy2032_capped: project::rolling_anchor::Held,
+    /// The 89 of `enrollment_decline`'s cluster, at FY2032 as enacted.
+    pub fy2032_cluster_as_enacted: project::rolling_anchor::Held,
+    /// And under the 2% cap — the pair the absorption share is taken over.
+    pub fy2032_cluster_capped: project::rolling_anchor::Held,
+    /// The 89 at FY2036 undamped as enacted, which is where the held share is quoted.
+    pub fy2036_cluster_as_enacted: project::rolling_anchor::Held,
+    /// And under the 2% cap, which holds the same share on a different line.
+    pub fy2036_cluster_capped: project::rolling_anchor::Held,
 }
 
 /// The FY2016 move, measured against the tax base and the formula that arrived that year.
@@ -933,6 +961,58 @@ impl Inputs {
                         ),
                     )
                     .realized_aid,
+                }
+            },
+            anchors: {
+                use project::rolling_anchor::{self, Anchor, Observed};
+                // `shrunk` is local to the `forecasts` block above; the same construction, so
+                // that a walk and a forecast are the same projection at the same parameters.
+                let shrunk = |damping: f64| project::series::Method::Shrunk {
+                    rate: 0.0,
+                    damping,
+                    weight: project::series::DEFAULT_SHRINK_WEIGHT,
+                    toward: 0.0,
+                };
+                let cluster: std::collections::BTreeSet<String> =
+                    project::enrollment_decline::cluster(&panel_for_forecasts)
+                        .into_iter()
+                        .map(|record| record.irn.clone())
+                        .collect();
+                let walk = |through: u16, damping: f64, anchor: Anchor| {
+                    let year = FiscalYear(through);
+                    let standings =
+                        rolling_anchor::walk(&panel_for_forecasts, year, shrunk(damping), anchor);
+                    let all = rolling_anchor::summarize(year, standings.values());
+                    let mine = rolling_anchor::summarize(
+                        year,
+                        standings.values().filter(|s| cluster.contains(&s.irn)),
+                    );
+                    (all, mine)
+                };
+                let capped = Anchor::Decayed { factor: 0.98 };
+                let damping = project::series::DEFAULT_DAMPING;
+                let (fy2032_as_enacted, fy2032_cluster_as_enacted) =
+                    walk(2032, damping, Anchor::Fixed);
+                let (fy2032_prior_year, _) = walk(2032, damping, Anchor::PriorYear);
+                let (fy2032_capped, fy2032_cluster_capped) = walk(2032, damping, capped);
+                let (_, fy2036_cluster_as_enacted) = walk(2036, 1.0, Anchor::Fixed);
+                let (_, fy2036_cluster_capped) = walk(2036, 1.0, capped);
+                Anchors {
+                    fy2027_as_enacted: rolling_anchor::at_the_modelled_year(
+                        &panel_for_forecasts,
+                        Observed::Fy2020Base,
+                    ),
+                    fy2027_prior_year: rolling_anchor::at_the_modelled_year(
+                        &panel_for_forecasts,
+                        Observed::PriorYearRealized,
+                    ),
+                    fy2032_as_enacted,
+                    fy2032_prior_year,
+                    fy2032_capped,
+                    fy2032_cluster_as_enacted,
+                    fy2032_cluster_capped,
+                    fy2036_cluster_as_enacted,
+                    fy2036_cluster_capped,
                 }
             },
         }
@@ -8612,6 +8692,92 @@ pub static FIGURES: &[Figure] = &[
         pinned: 356.0,
         tolerance: 0.0,
         compute: |i| i.forecasts.fy2036_at_the_old_convention.on_guarantee as f64,
+    },
+    // ---- the guarantee's anchor, and what a rolling one costs ------------------------------
+    // `formula-component/temporary-transitional-aid-guarantee` says a fixed anchor "erodes by
+    // construction" and now says what the obvious alternative costs. Every figure that sentence
+    // rests on is here, because a priced alternative quoted only in prose is the #120 shape.
+    Figure {
+        key: "project/guarantee-on-a-prior-year-anchor",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the guarantee writes in FY2027 if its floor is each district's own prior \
+                year rather than FY2020 \u{2014} a ratchet, so dearer and not cheaper",
+        pinned: 1_025_415_233.33,
+        tolerance: 0.01,
+        compute: |i| i.anchors.fy2027_prior_year.guarantee,
+    },
+    Figure {
+        key: "project/districts-held-on-a-prior-year-anchor",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts it holds, against the 294 the enacted anchor holds",
+        pinned: 455.0,
+        tolerance: 0.0,
+        compute: |i| i.anchors.fy2027_prior_year.on_the_floor as f64,
+    },
+    Figure {
+        key: "project/guarantee-at-fy2032-as-enacted",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The guarantee walked to FY2032 under the anchor R.C. 3317.019 names",
+        pinned: 932_058_575.71,
+        tolerance: 0.01,
+        compute: |i| i.anchors.fy2032_as_enacted.guarantee,
+    },
+    Figure {
+        key: "project/guarantee-at-fy2032-on-a-prior-year-anchor",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same under a prior-year ratchet, which holds 565 districts against 312",
+        pinned: 989_357_266.79,
+        tolerance: 0.01,
+        compute: |i| i.anchors.fy2032_prior_year.guarantee,
+    },
+    Figure {
+        key: "project/guarantee-at-fy2032-with-the-annual-fall-capped",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And with each district's annual fall capped at 2% instead \u{2014} the only \
+                rolling shape that follows a district down",
+        pinned: 665_088_656.83,
+        tolerance: 0.01,
+        compute: |i| i.anchors.fy2032_capped.guarantee,
+    },
+    Figure {
+        key: "project/districts-held-with-the-annual-fall-capped",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts the 2% cap holds at FY2032",
+        pinned: 246.0,
+        tolerance: 0.0,
+        compute: |i| i.anchors.fy2032_capped.on_the_floor as f64,
+    },
+    Figure {
+        key: "project/the-anchors-shape-absorbed-by-the-backstop",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The share of what a 2% cap takes off the enrollment cluster's guarantee that \
+                `[K]` puts straight back \u{2014} the anchor's shape is not a saving either",
+        pinned: 0.960_269_710_2,
+        tolerance: 1e-9,
+        compute: |i| {
+            project::rolling_anchor::absorbed(
+                &i.anchors.fy2032_cluster_as_enacted,
+                &i.anchors.fy2032_cluster_capped,
+            )
+        },
+    },
+    Figure {
+        key: "project/the-clusters-held-share-under-a-capped-anchor",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The share of the 89 districts' total state support arriving through a \
+                hold-harmless at FY2036 under the 2% cap, against 26.94% as enacted \u{2014} the \
+                quantity no anchor shape moves",
+        pinned: 0.268_1,
+        tolerance: 0.0005,
+        compute: |i| i.anchors.fy2036_cluster_capped.held_share(),
     },
     // The FY2032 aid band, which two nodes state and three paragraphs carry. It is the shape the
     // whole mechanism was built for and it had no key: `scenario/guarantee-phase-out` says of its

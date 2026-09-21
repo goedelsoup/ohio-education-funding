@@ -335,7 +335,99 @@ findings: |
   them** reach their floor within a year. [verified] (crates/project) That is the same clock the
   cluster crossing this instrument was measured on, seen from outside rather than inside it.
 
+  ### The obvious alternative to a receding anchor is a larger instrument, not a cheaper one
+
+  The description above says a nominal floor anchored to a fixed historical year erodes by
+  construction, and a **rolling** anchor — prior year, or a multi-year average — is what that
+  observation points at. Priced, it goes the other way.
+
+  `realized = max([H], anchor)`, so last year's realized aid is at or above last year's computed
+  amount by construction. An anchor set to it is a **ratchet**: aid can never fall, for any
+  district, for any reason, in any year. The enacted anchor catches districts that have fallen
+  below a level chosen once in FY2020; a rolling one catches every district whose computed amount
+  falls at all, and with the cost side frozen at FY2022 and FY2024 averages against a rolling
+  three-tax-year capacity window, most of Ohio's do most years. Replacing the floor in the FY2027
+  model and changing nothing else, a prior-year anchor writes **$1,025,415,233.33** to **455**
+  districts against $878,954,627 to 294. [verified] (crates/project)
+
+  **And for the 89 districts the guarantee is still recruiting it is the same number to the cent.**
+  Every member of [`enrollment_decline`](../../../crates/project/src/enrollment_decline.rs)'s
+  cluster is on the floor in FY2027, so a ratchet started from FY2027 realized aid *is* the FY2020
+  base: walked to FY2032 the two rules give that cluster $144,560,557.55, 89 districts held, and
+  the same total state support. The crossing that motivated the question does not translate,
+  because a `max` only ever moves an anchor **up**. [verified] (crates/project)
+
+  ### What does follow a district down is a cap on the fall
+
+  `realized = max([H], factor x last year's realized)` — "no district's foundation aid falls more
+  than a stated percentage in a year" — is date-free, reaches a district that crosses in any year,
+  and extinguishes itself for one whose enrolment settles. Walked to FY2032:
+
+      anchor                          [I] statewide    districts    [I] to the 89    of the 89
+      the FY2020 base, as enacted     $932,058,576          312       $144,560,558           89
+      the district's own prior year   $989,357,267          565       $144,560,558           89
+      annual fall capped at 2%        $665,088,657          246        $45,151,279           47
+
+  It is a different population rather than a weaker floor: a cap is anchored on *current* aid, so a
+  district well above its FY2020 base gets a higher floor from it than the statute gives. At
+  FY2036 a 1% cap holds **more** districts than the enacted rule while writing $220m less
+  guarantee, and statewide total state support is higher under it. [verified] (crates/project)
+
+  ### And the backstop absorbs the anchor's shape, as it absorbed every adjustment
+
+  [`[K]`](fsfp-formula-transition-supplement.yml) is this cluster's real payer, which
+  [`the_adjustment_the_floors_absorb.rs`](../../../crates/project/tests/the_adjustment_the_floors_absorb.rs)
+  established for four candidate supplements. The same is true of the anchor. Cutting the
+  cluster's guarantee from $144.6m to $45.2m with a 2% cap takes $3,949,559 of total state support:
+  **96.0%** of it comes straight back on `[K]`. [verified] (crates/project)
+
+  So the quantity a re-shaped anchor was supposed to move does not move. The share of what this
+  cluster receives that arrives through a hold-harmless is 26.94% at FY2036 as enacted and
+  **26.81%** under the 2% cap — and under 1% and 5% caps as well. **Changing the anchor changes
+  which hold-harmless pays, not whether one does**, and it moves the money off R.C. 3317.019 and
+  onto Section 265.225, which is uncodified and renewed a biennium at a time. That is an argument
+  against re-shaping the anchor on its own, and not an argument for any particular shape.
+  [verified] (crates/project)
+
+  **[open]** Who a cap reaches outside the cluster. 565 districts are held under a ratchet and 246
+  under a 2% cap; their incidence by wealth or poverty is the question
+  `the_adjustment_the_floors_absorb.rs` left open about its own four shapes and it is still open
+  about these three. The statewide sign flipping at a 1% cap — more districts held, more total
+  support, less guarantee — is the visible edge of it.
+
 figures:
+  - key: project/guarantee-on-a-prior-year-anchor
+    value: 1025415233.33
+    field: findings
+    as_written: "**$1,025,415,233.33**"
+  - key: project/districts-held-on-a-prior-year-anchor
+    value: 455
+    field: findings
+    as_written: "**455**"
+  - key: project/guarantee-at-fy2032-as-enacted
+    value: 932058575.71
+    field: findings
+    as_written: "$932,058,576"
+  - key: project/guarantee-at-fy2032-on-a-prior-year-anchor
+    value: 989357266.79
+    field: findings
+    as_written: "$989,357,267"
+  - key: project/guarantee-at-fy2032-with-the-annual-fall-capped
+    value: 665088656.83
+    field: findings
+    as_written: "$665,088,657"
+  - key: project/districts-held-with-the-annual-fall-capped
+    value: 246
+    field: findings
+    as_written: "246"
+  - key: project/the-anchors-shape-absorbed-by-the-backstop
+    value: 0.9602697102
+    field: findings
+    as_written: "**96.0%**"
+  - key: project/the-clusters-held-share-under-a-capped-anchor
+    value: 0.2680664690
+    field: findings
+    as_written: "**26.81%**"
   - key: project/marginal-pupil-no-foundation-aid-districts
     value: 294
     field: findings
