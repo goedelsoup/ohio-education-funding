@@ -86,6 +86,7 @@ pub mod projected_base_cost;
 pub mod rating_payments;
 pub mod refresh;
 pub mod report;
+pub mod rolling_anchor;
 pub mod scholarship;
 pub mod series;
 pub mod size_terms;
