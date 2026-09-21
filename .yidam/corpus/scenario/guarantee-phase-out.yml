@@ -483,11 +483,36 @@ properties:
     only the shape in the horizon was wrong. The bands above are the widened ones. Recorded at
     [the-widening-rule](../../decisions/the-widening-rule.yml).
 
-    **[open]** Whether the exponent holds past five years. The fit uses horizons one to five,
-    which is as far as six origins across fifteen surveyed years reach; this node's leg is six and
-    the feed's horizon is ten. It is extrapolated there either way, and what changed is that it is
-    extrapolated from a value the data supports rather than one it contradicts inside the measured
-    range.
+    [verified] **The exponent holds to thirteen years, and five was never the panel's limit.**
+    The fit's own six origins reach eleven years — FY2013 plus eleven is FY2024 — and the two the
+    panel supports but the fit did not use, FY2011 and FY2012, take it to thirteen. Run there,
+    coverage of the **cross-district** error stays within **3.0 points** of 68.3% at every horizon
+    from one to thirteen, and refitting to coverage over the longer range returns **0.65** again.
+    This node's six-year leg and the feed's ten-year horizon are inside the measured range now
+    rather than past it. Measured in
+    `crates/project/tests/the_horizons_the_backtest_stopped_short_of.rs`.
+
+    [verified] **What fails past five years is the centre, not the width.** Pooled across origins
+    the band's coverage does sink — 67.1% at five years to 60.1% at thirteen — and removing each
+    origin's own mean puts the whole of that back. At a fixed horizon every origin runs the same
+    method over the same districts for the same span, so an origin effect is a year effect, and
+    the years are the shutdown: at five years the four origins landing on FY2020 or earlier average
+    +0.002 to +0.014 while the two landing on FY2023 and FY2024 average +0.035 and +0.038. Cut every
+    target at FY2020 and the pooled band holds within 3.8 points to **nine** years with nothing
+    removed. `sigma` is a cross-sectional spread, so it prices cross-district error and a statewide
+    level break is not in it at any exponent.
+
+    [verified] **And `horizon^0.60` was partly the window.** The dispersion exponent refits to
+    0.573, 0.600 and 0.623 over one to five, seven and nine pre-closure years, and 0.650 over the
+    whole reach — it climbs toward the coverage exponent as the range grows. The two targets do
+    differ, because the errors are not normal, but the size of the gap was a property of the
+    five-year fit rather than of the distribution.
+
+    **[open]** What to do about the bias, which is now the binding limit on a long projection
+    rather than the band. Mean log error reaches **+0.056** at the feed's ten-year horizon, so the
+    point sits about 5.8% high, and `the_bias_no_single_damping_can_remove` establishes that no
+    value of the damping takes it out. De-biasing the point estimate is a decision with a record
+    and has not been taken.
 
     138 districts sit at the minimum state share and their response to a base cost increase
     cannot be computed, because the floor censors the quantity it would be computed from. They

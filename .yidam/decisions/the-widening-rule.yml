@@ -84,13 +84,30 @@ alternatives: |
   about 0.63 to 0.66 and the third digit is not identified, so the rounder value is taken — the
   same tie-break `the-fitted-damping` records.
 open: |
-  The fit uses horizons one to five, which is as far as six origins across fifteen surveyed years
-  reach. The FY2032 leg is **six** years out and the feed's horizon is **ten**. The exponent is
-  extrapolated there under both rules; what changed is that it is now extrapolated from a value
-  the data supports rather than one it contradicts inside the measured range.
+  **Settled, by #391.** The fit used horizons one to five, and that was a choice rather than the
+  panel's limit: the same six origins reach **eleven** years, and the two the panel supports but
+  the fit did not use — FY2011 and FY2012 — take it to **thirteen**. Run out there, coverage of
+  the cross-district error stays within **3.0 points** of 68.3% at every horizon from one to
+  thirteen, and refitting to coverage over the longer clean range returns **0.65** again. The
+  FY2032 leg and the feed's ten-year horizon are inside the measured range now. Measured in
+  `crates/project/tests/the_horizons_the_backtest_stopped_short_of.rs`.
+
+  The alternative this record rejected as "the obvious move and the wrong target" turns out to
+  have been partly a window effect as well. The dispersion exponent refits to 0.573, 0.600 and
+  0.623 over one to five, seven and nine pre-closure years and 0.650 over the whole reach — it
+  climbs toward the coverage exponent as the range extends. The two targets still differ, and for
+  the reason given, but 0.60 was never a measurement of anything past five years.
+
+  What is left open is the sentence below, which turns out to be the binding one.
 
   Whether the band should be asymmetric is not addressed. It is multiplicative, so it already is
   in dollars, but the *log* error has a growing positive mean — see
   `the_bias_no_single_damping_can_remove` — and an interval centred on a biased point estimate
-  inherits that bias whatever its width.
+  inherits that bias whatever its width. **That is now the whole of the long-horizon defect.**
+  Pooled across origins the band's coverage sinks from 67.1% at five years to 60.1% at thirteen,
+  and removing each origin's own mean restores all of it: the width is right and the level is not.
+  The origin effect is the shutdown — at five years the origins landing on FY2020 or earlier are
+  very nearly unbiased while the two landing on FY2023 and FY2024 run +0.035 and +0.038 — and
+  `sigma`, being a cross-sectional spread, cannot price a statewide level break at any exponent.
+  Mean log error reaches +0.056 at the feed's ten-year horizon, so the point sits about 5.8% high.
 supersedes: []
