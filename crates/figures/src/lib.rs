@@ -3124,6 +3124,71 @@ pub static FIGURES: &[Figure] = &[
         },
     },
     Figure {
+        key: "dispersion/fy2016-step-against-mineral-share-negative",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "And against mineral property share \u{2014} negative, the opposite sign to \
+                industrial, which is what a summed business share averages away",
+        pinned: 0.0321,
+        tolerance: 0.0005,
+        compute: |i| {
+            let steps: Vec<f64> = i.fy2016.districts.iter().map(|d| d.step).collect();
+            let mineral: Vec<f64> = i
+                .fy2016
+                .districts
+                .iter()
+                .map(|d| d.mineral_share)
+                .collect();
+            dispersion::wealth_neutrality(&mineral, &steps)
+                .expect("paired")
+                .correlation
+                .abs()
+        },
+    },
+    Figure {
+        key: "dispersion/fy2016-step-against-public-utility-share-negative",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "And against public utility property share \u{2014} the largest of the three \
+                classes by value and the third sign of three",
+        pinned: 0.0159,
+        tolerance: 0.0005,
+        compute: |i| {
+            let steps: Vec<f64> = i.fy2016.districts.iter().map(|d| d.step).collect();
+            let utility: Vec<f64> = i
+                .fy2016
+                .districts
+                .iter()
+                .map(|d| d.public_utility_share)
+                .collect();
+            dispersion::wealth_neutrality(&utility, &steps)
+                .expect("paired")
+                .correlation
+                .abs()
+        },
+    },
+    Figure {
+        key: "dispersion/fy2016-step-against-summed-business-share",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "The three business classes added together \u{2014} a near-zero that is a \
+                cancellation of the three above rather than an absence",
+        pinned: 0.0164,
+        tolerance: 0.0005,
+        compute: |i| {
+            let steps: Vec<f64> = i.fy2016.districts.iter().map(|d| d.step).collect();
+            let business: Vec<f64> = i
+                .fy2016
+                .districts
+                .iter()
+                .map(dispersion::fy2016::District::summed_business_share)
+                .collect();
+            dispersion::wealth_neutrality(&business, &steps)
+                .expect("paired")
+                .correlation
+        },
+    },
+    Figure {
         key: "dispersion/fy2016-step-lowest-valuation-quintile",
         owner: "crates/dispersion",
         unit: Unit::Share,
