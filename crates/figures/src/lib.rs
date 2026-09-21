@@ -8436,6 +8436,80 @@ pub static FIGURES: &[Figure] = &[
                 .count() as f64
         },
     },
+    // Targeted assistance's capacity tier, which is the plan's second size-dependent term and
+    // the one nothing had named. #389 accounted for half of the guarantee's size curve with the
+    // staffing floors and read the residual as "not size"; these four say what it is.
+    Figure {
+        key: "project/targeted-assistance-capacity-tier",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What R.C. 3317.0217's capacity tier pays in FY2027 -- eight mills of the \
+                shortfall of a district's total weighted wealth below the median district's",
+        pinned: 334_036_712.23,
+        tolerance: 0.01,
+        compute: |i| {
+            i.panel
+                .iter()
+                .map(|d| d.targeted_assistance.capacity_amount)
+                .sum()
+        },
+    },
+    Figure {
+        key: "project/capacity-tier-index-on-enrolment",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The slope of ln(total weighted wealth) on ln(base cost enrolled ADM) -- the tier \
+                indexes a total, and a total is proportional to the pupils under it",
+        pinned: 0.985_481,
+        tolerance: 0.000_001,
+        compute: |i| project::size_terms::what_the_index_measures(&i.panel).total.coefficients[1],
+    },
+    Figure {
+        key: "project/districts-the-capacity-tier-keeps-off-the-guarantee",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts that would fall onto the temporary transitional aid guarantee if the \
+                capacity tier were struck out of R.C. 3317.0217",
+        pinned: 87.0,
+        tolerance: 0.0,
+        compute: |i| {
+            project::size_terms::striking_out(
+                &i.panel,
+                &[project::size_terms::Change::CapacityTierStruckOut],
+            )
+            .iter()
+            .filter(|row| row.newly_guaranteed())
+            .count() as f64
+        },
+    },
+    Figure {
+        key: "project/guarantee-first-to-third-gap",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "The guarantee's non-monotonicity as one number: districts the third ADM sextile \
+                holds above the smallest, which is 0 once both size-dependent terms are struck out",
+        pinned: 53.0,
+        tolerance: 0.0,
+        compute: |i| {
+            project::size_terms::first_to_third_gap(project::size_terms::guaranteed_by_sextile(
+                &i.panel,
+                &[],
+            )) as f64
+        },
+    },
+    Figure {
+        key: "project/guarantee-anchor-per-pupil-gradient",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "[H2] per FY2020 pupil in the smallest ADM sextile over the largest -- the \
+                anchor's own gradient in district size, monotone across all six bands",
+        pinned: 2.039_6,
+        tolerance: 0.000_1,
+        compute: |i| {
+            let bands = project::size_terms::anchor_per_pupil(&i.panel);
+            bands[0] / bands[5]
+        },
+    },
     // The interpolation weight, recovered per district rather than read off the header cell that
     // states it. The FY2027 panel is at 1.0, where a wrong multiplier is invisible.
     Figure {

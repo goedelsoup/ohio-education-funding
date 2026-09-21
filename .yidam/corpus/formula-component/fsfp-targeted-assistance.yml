@@ -203,6 +203,73 @@ findings: |
   in three distinct ways: a heading that no longer describes its column, a table of vintages two
   biennia old, and a number nothing recomputes. [inference]
 
+  ### The capacity tier's index is a measurement of enrolment
+
+  The description above records that the tier "is about the size of the tax base, full stop", and
+  reads the department's 200/400/600 ramp as the guard against that. Both are right and neither
+  is the measurement. The tier compares two **whole-district totals** — the median district's
+  weighted wealth against this district's — so what its index varies with is how many pupils the
+  base is under.
+
+  Across all 609 districts, `ln(total weighted wealth)` regressed on `ln(base cost enrolled ADM)`
+  has a slope of **0.9855** and an r-squared of **0.8126**. The same districts' weighted wealth
+  **per resident pupil** on the same predictor has a slope of **-0.0429** and an r-squared of
+  **0.0085**. [verified — crates/project] A slope of one and four fifths of the variance on the
+  quantity the tier reads; no gradient at all on the quantity it names. Ohio's small districts are
+  not poorer per pupil than its large ones, and this tier pays them as though they were.
+
+  So the tier's **$334,036,712.23** reaches **299 districts at a median 876 pupils and no
+  district above 3,259.83**, which is the first district of the largest ADM sextile. Per pupil,
+  by sextile, it is $2,349, $1,616, $433, and then nothing. [verified — crates/project]
+
+  ### It is the half of the guarantee's size curve nothing had accounted for
+
+  The statewide guarantee rate by ADM sextile is non-monotone — lowest among the smallest
+  districts, highest in the third — and
+  [base cost](fsfp-base-cost-calculation.yml)'s staffing floors are half of it. The residual was
+  recorded as "not size", on the reasoning that base cost has no other size-dependent term. The
+  reasoning holds; the conclusion does not, because this tier measures size outside base cost.
+
+      ordered on base cost enrolled ADM    1   2   3   4   5   6   gap
+      as the plan stands                  18  39  71  60  49  57    53
+      staffing floors struck out          48  51  74  61  49  57    26
+      capacity tier struck out            52  72  88  63  49  57    36
+      both struck out                     89  82  89  64  49  57     0
+
+  **Strike both out and the first-to-third gap closes to zero.** [verified — crates/project]
+  ([`crates/project`](../../../crates/project/tests/the_second_size_term_the_plan_keeps_outside_base_cost.rs))
+  The tier alone keeps **87** districts off the
+  [guarantee](temporary-transitional-aid-guarantee.yml), against the floors' 46, and unlike that
+  counterfactual this one needs no bound: `[C]` is paid in full rather than at a state share, it
+  feeds no statewide average, and FY2027's phase-in is 100%, so a dollar off it is a dollar off
+  foundation funding exactly. [verified — crates/project]
+
+  ### The size cliff the corpus recorded is the part of the tier that pushes the other way
+
+  It is natural to read the 200/400/600 ramp as the mechanism. It is its opposite. The ramp
+  **withholds $91,859,433** from the 73 districts it touches; pay them in full and the smallest
+  sextile's guarantee count falls from 48 back to 20 — **28 of the 30 districts the floors'
+  removal added to that band go straight back off the guarantee**. [verified — crates/project]
+  The drafters bounded the tier's size dependence with the one provision visibly about size, and
+  left the rest of it in the index, where nothing names it. [inference]
+
+  ### And it is the denominator rather than the rate
+
+  Take the same eight mills against the shortfall of weighted wealth **per resident pupil** below
+  $276,708.97 — the published median the tier's own sibling `[F]` already indexes against — and
+  multiply by enrolled ADM. Same section, same rate, same published median, and **$24.2 million
+  less** in aggregate. The sextile row reads `86 / 74 / 86 / 56 / 45 / 56`, first-to-third gap
+  zero. [verified — crates/project]
+
+  That is an attribution and not a proposal: it holds the rate and very nearly the money fixed and
+  changes only what the shortfall is measured against, which locates the whole residual in the
+  comparison division (B) makes. Whether the total is the wrong measure is a different question —
+  the per-pupil restatement is `[F]`'s own form at a third rate, and two measurements of the same
+  tax base at different rates may be what the General Assembly wanted. **Why division (B) is
+  written against a total is not established.** The section states the comparison with no recital
+  and LSC's analysis of H.B. 110 restates the arithmetic and derives nothing, both of which are
+  asserted against the committed documents rather than left as silence. [open]
+
 properties:
   name: Targeted assistance
   function: |
@@ -297,6 +364,22 @@ figures:
     value: 276708.97
     field: function
     as_written: "median weighted wealth per pupil $276,708.97"
+  - key: project/capacity-tier-index-on-enrolment
+    value: 0.9854808925762097
+    field: findings
+    as_written: "has a slope of **0.9855**"
+  - key: project/targeted-assistance-capacity-tier
+    value: 334036712.23
+    field: findings
+    as_written: "the tier's **$334,036,712.23** reaches"
+  - key: project/districts-the-capacity-tier-keeps-off-the-guarantee
+    value: 87
+    field: findings
+    as_written: "keeps **87** districts off the"
+  - key: project/guarantee-first-to-third-gap
+    value: 53
+    field: findings
+    as_written: "as the plan stands                  18  39  71  60  49  57    53"
 revisions:
   - was: |
       The zeroed line was read as a dormancy: "a **live zero rather than an absence**: a future

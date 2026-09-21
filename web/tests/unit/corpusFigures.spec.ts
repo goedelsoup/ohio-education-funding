@@ -191,9 +191,23 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * competing approximations is worth on its own — which is a fourth thing this ratchet had none of.
  * A node can bind a level, a difference, a slope, and still not have bound either half of an
  * approximation whose halves point opposite ways.
+ *
+ * Recomputed at **865/76** when the guarantee's size curve was finished. Five bindings, no new
+ * carrier, and three of them land on `formula-component/fsfp-targeted-assistance` — a node that
+ * had bound its two medians, its two rate changes and its inherited threshold, and nothing about
+ * **what its own index is a measurement of**. The slope that answers that is the fifth kind this
+ * ratchet had none of: a node can bind every level its mechanism pays, every difference between
+ * two of them, a slope, and both halves of an approximation, and still have bound nothing about
+ * whether the quantity it names is the quantity it reads.
+ *
+ * The corrected node is the one not counted here. `fsfp-base-cost-calculation` was the
+ * seventy-sixth carrier two recounts ago for the staffing floors, and the claim it added then —
+ * that the residual half of this shape "is not size" — is the claim this work overturns. It gains
+ * prose and no binding, because what changed is a conclusion rather than a figure. A ratchet that
+ * counts bindings cannot see a wrong sentence, which is the standing limitation of it.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "860 bindings; raise this when you add one").toBeGreaterThanOrEqual(860);
+  expect(bindings.length, "865 bindings; raise this when you add one").toBeGreaterThanOrEqual(865);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "76 nodes carry bindings; raise this when a seventy-seventh does",

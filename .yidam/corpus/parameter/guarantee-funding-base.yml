@@ -131,7 +131,27 @@ findings: |
   large enough to be worth excluding, which is the part a reader of `[H2]` needs to know: the
   number half of Ohio is funded at is larger than the number Ohio paid. [inference]
 
+  ### Its own shape in district size, which is why the guarantee stops climbing
+
+  `[H2]` per FY2020 pupil declines **monotonically** across the six ADM sextiles — $6,478,
+  $5,877, $4,960, $4,589, $3,812, $3,176, the smallest band at **2.04 times** the largest.
+  [verified — crates/project]
+  ([`crates/project`](../../../crates/project/tests/the_second_size_term_the_plan_keeps_outside_base_cost.rs))
+  Measured against current-year pupils instead, which needs no enrolment index at all, the shape
+  is the same: $7,257 to $3,334, a ratio of 2.18. [verified — crates/project]
+
+  That gradient is a property of the [Bridge formula](../funding-regime/bridge-formula.yml) and
+  of the [Evidence-Based Model](../funding-regime/evidence-based-model.yml) run beneath it, not of
+  the plan the anchor is compared against — and it is the whole of what pulls the guarantee rate
+  back down above the third sextile, where the plan's two size-dependent terms have stopped
+  binding. Because it is monotone it cannot produce the peak at the third sextile, which is how
+  it was separated from the terms that do. [inference]
+
 figures:
+  - key: project/guarantee-anchor-per-pupil-gradient
+    value: 2.03958414436709
+    field: findings
+    as_written: "the smallest band at **2.04 times** the largest"
   - key: project/foundation-funding-missed-in-fy2020
     value: 254956619.56
     field: findings

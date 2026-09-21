@@ -76,10 +76,17 @@ findings: |
   [Bridge formula](../funding-regime/bridge-formula.yml) and contains no part of a section
   enacted for FY2022: the floors sit on one side of the comparison only.
 
-  This is most of an answer to something the corpus had measured and not explained — the
+  This is half of an answer to something the corpus had measured and not explained — the
   guarantee rate by enrolment sextile is non-monotone, lowest among the smallest districts and
-  highest in the third sextile. The floors account for about half of that shape and the other
-  half is not size. [inference]
+  highest in the third sextile. The floors account for about half of that shape.
+
+  The residual was recorded here as "not size", on the reasoning that this section holds base
+  cost's only size-dependent terms. **The reasoning holds and the conclusion did not: base cost
+  is not the only place the plan measures size.** The other half is [targeted
+  assistance](fsfp-targeted-assistance.yml)'s capacity tier, which compares two whole-district
+  totals and so reads enrolment — strike both terms out and the first-to-third gap closes from 53
+  districts to zero. [verified — crates/project]
+  ([`crates/project`](../../../crates/project/tests/the_second_size_term_the_plan_keeps_outside_base_cost.rs))
 
   ### The shape is a decay and not a cliff, and one floor cannot bind
 
