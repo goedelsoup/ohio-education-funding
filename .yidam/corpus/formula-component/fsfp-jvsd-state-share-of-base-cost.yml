@@ -1,0 +1,217 @@
+class: formula-component
+label: FSFP JVSD State Share of Base Cost
+summary: >-
+  How Ohio's forty-nine joint vocational districts are charged a local share: a half-mill against
+  the lesser of two valuations. H.B. 96 restated it per pupil, which leaves the percentage exactly
+  as it was and moves the aid onto a live enrolment count.
+description: |
+  The local share of the third population the state funds by formula. Ohio has 49 joint vocational
+  school districts, and every one of them is funded through this component.
+
+  A joint vocational district has taxing authority, unlike a [community
+  school](fsfp-community-school-equity-supplement.yml), so it has a valuation and a state share —
+  but the plan charges it **half a mill**, not the twenty-mill local capacity measure it applies
+  to city, local and exempted village districts. That is the one place the plan's "uniform
+  statewide" description is false, and it is recorded in
+  [`local-share-charge-off-millage`](../parameter/local-share-charge-off-millage.yml) as the rate
+  that was never retired.
+
+  **Prior law, FY2022–FY2025.** Aggregate base cost less the charge-off, floored at a 10% minimum
+  state share. A subtraction, with no enrolment in it anywhere:
+
+      state share $ = aggregate base cost  −  (charged valuation × 0.0005)
+      charged valuation = lesser of the most recent annual value and the three-year average
+
+  **Item 7 of [H.B. 96](../legislation/hb-96-2025.yml), FY2026 onward.** The same charge, restated
+  per pupil, and then multiplied rather than subtracted:
+
+      local capacity per pupil = (charged valuation × 0.0005) / base cost enrolled ADM
+      state share %            = (base cost per pupil − local capacity per pupil)
+                                  / base cost per pupil,   floored at 10%
+      state share $            = base cost per pupil  ×  enrolled ADM  ×  state share %
+
+  Both statements reproduce the department's own payments on all forty-nine districts in every
+  year of the span, to the cent. [verified] (`crates/dispersion/src/jvsd_funding.rs`)
+
+  ### The department publishes this, under a name that does not say so
+
+  There is no JVSD calculator. For traditional districts and for community and STEM schools the
+  department publishes a forward-looking simulator; for these forty-nine it publishes **payment
+  reports** — what was paid, after the year closed. They are filed under *Career-Technical
+  Funding*, and no path on the department's site contains the words "Joint Vocational" at all.
+  [verified] ([`dew-jvsd-foundation-payments`](../../catalog/dew-jvsd-foundation-payments.md))
+findings: |
+  ### The rewrite does not change the state share percentage
+
+  Item 7 reads as a change of method and is, at the level of the percentage, an algebraic
+  restatement. Base cost per pupil is aggregate base cost over the same base cost enrolled ADM
+  that divides the charge, so the ADM cancels out of numerator and denominator alike and item 7's
+  share is prior law's share:
+
+      (valuation × 0.0005) / ADM         valuation × 0.0005
+      --------------------------    =    ------------------
+       aggregate base cost / ADM         aggregate base cost
+
+  That is not only algebra. The right-hand expression reproduces the **published** state share
+  percentage on all 49 districts in all six years, on both sides of the amendment, to a part in a
+  million. [verified] (`crates/dispersion/src/jvsd_funding.rs`) A reader who priced item 7 by
+  recomputing the share would find it had done nothing, and would be right about the share.
+
+  ### The department's forty-nine are the forty-nine the directory gives
+
+  Ohio's joint vocational districts are typed `4` by the federal directory — *regional education
+  service agency*, the code educational service centres also carry — so a hundred agencies hold
+  that code and forty-nine of them are JVSDs. Two routes split them and agree: the agency name,
+  and the property levy a JVSD charges and a service centre does not. The department's own payment
+  reports match that set exactly, member for member, which makes them a third route arriving at
+  the same answer from the other direction. [verified]
+  (`crates/dispersion/src/jvsd_funding.rs`)
+
+  ### What it changes is which enrolment count the share multiplies
+
+  Prior law applied the share to aggregate base cost, which is built on **base cost enrolled ADM**
+  — a three-year average. Item 7 applies it to **enrolled ADM**, the current year. The amendment
+  moves JVSD base cost aid from a smoothed enrolment count onto a live one, and it moves money
+  only for districts whose enrolment is not flat. Neither the act's own list nor the greenbook's
+  statement of the formula says this; both describe the per-pupil restatement, which is the half
+  that cancels. [inference]
+
+  In FY2026, the one year that is both under item 7 and closed, that is worth **$10,249,747** on a
+  $365.7m base — **2.80%** — with **36 of the 49 districts better off** and 13 worse. The largest
+  single gain is Great Oaks Career Campuses at $1.33m, enrolling 4,769 against a 4,564 average;
+  the largest loss Pioneer Career & Technology at $343,339. [verified] (FY2026 payment report, via
+  `crates/dispersion/src/jvsd_funding.rs`)
+
+  ### FY2027 cannot price it, because the term item 7 introduced has not been counted
+
+  The FY2027 report is a September payment, the first of an open year. Its enrolled ADM is
+  FY2026's on **43 of the 49 districts**, and equal to base cost enrolled ADM on 39, because
+  FY2027 enrolment does not exist in September 2026. [verified]
+  (`crates/dispersion/src/jvsd_funding.rs`)
+
+  Under prior law that would have been harmless: the share multiplied an average already known.
+  Under item 7 it multiplies the current year, so **the provisional count now reaches the money**
+  — the amendment converted a placeholder that used to sit outside the state share into one that
+  sits inside it. Every level in the FY2027 file reads; the state share of base cost is
+  provisional in a way no earlier year's is. [inference]
+
+  ### Nobody is on the minimum state share, and the approach to it is not the amendment
+
+  Item 7 maintains prior law's 10% minimum, and **no joint vocational district has been on it in
+  any of the six years**. [verified] (`crates/dispersion/src/jvsd_funding.rs`) The same district
+  holds the minimum throughout — Cuyahoga Valley Career Center — and its share bounces rather than
+  slides: 0.20730, 0.13695, 0.23689, 0.22018, 0.13739, **0.10923**.
+
+  The direction predates item 7 by four years and is not it: this district's charged valuation
+  rises 35.7% across the span while its aggregate base cost rises 20.8%, and the share is one less
+  their ratio. The bounce on top is aggregate base cost moving year to year, which a single
+  staffing threshold can do on a district this small. The lesser-of rule explains none of it — the
+  three-year average binds in all six years here. [verified]
+  (`crates/dispersion/src/jvsd_funding.rs`) A floor's population and a floor's reach are different
+  questions, and on this population the floor's population is nobody.
+
+  ### The department's totals are not the greenbook's
+
+  [`hb-96-2025`](../legislation/hb-96-2025.yml) records JVSD foundation funding at $539.1m in
+  FY2026 and $566.9m in FY2027 from the greenbook. The department's own payment reports carry
+  **$559,089,218** and **$591,155,954** — 3.7% and 4.3% above. [verified]
+  (`crates/dispersion/src/jvsd_funding.rs`) That is a budget-time estimate against a payment
+  report dated August and September 2026, not a disagreement: the greenbook figure is what the act
+  was scored at and the department's is what it paid. Both are right about different questions,
+  and a total quoted without saying which is neither.
+figures:
+  - key: dispersion/jvsd-districts
+    value: 49
+    field: description
+    as_written: "Ohio has 49 joint vocational"
+  - key: dispersion/jvsd-item-7-delta-fy2026
+    value: 10249746.61
+    field: findings
+    as_written: "worth **$10,249,747** on a"
+  - key: dispersion/jvsd-item-7-better-off-fy2026
+    value: 36
+    field: findings
+    as_written: "**36 of the 49 districts better off**"
+  - key: dispersion/jvsd-carried-forward-enrolment-fy2027
+    value: 43
+    field: findings
+    as_written: "FY2026's on **43 of the 49 districts**"
+  - key: dispersion/jvsd-lowest-state-share-fy2027
+    value: 0.10923
+    field: findings
+    as_written: "0.13739, **0.10923**"
+  - key: dispersion/jvsd-total-state-support-fy2026
+    value: 559089218.26
+    field: findings
+    as_written: "**$559,089,218**"
+  - key: dispersion/jvsd-total-state-support-fy2027
+    value: 591155954.03
+    field: findings
+    as_written: "**$591,155,954**"
+properties:
+  name: JVSD state share of base cost
+  function: |
+    charged valuation      = lesser of (most recent annual value, three-year average value)
+    local capacity         = charged valuation  ×  0.0005
+
+    Prior law, FY2022-FY2025 — a subtraction, with no enrolment term:
+
+      state share $        = aggregate base cost  −  local capacity
+      state share %        = 1 − local capacity / aggregate base cost,  floored at 0.10
+                             (reported, not applied)
+
+    H.B. 96 item 7, FY2026 onward — the same charge per pupil, then a multiplication:
+
+      base cost per pupil  = aggregate base cost / base cost enrolled ADM   (3-year average)
+      capacity per pupil   = local capacity      / base cost enrolled ADM
+      state share %        = (base cost per pupil − capacity per pupil) / base cost per pupil,
+                             floored at 0.10
+      state share $        = base cost per pupil  ×  enrolled ADM  ×  state share %
+                                                     (current year)
+
+    The two state share percentages are the same number: the base cost enrolled ADM cancels. What
+    the rewrite changes is the ADM the percentage multiplies — from the three-year average built
+    into aggregate base cost, to the current year's enrolled ADM.
+  statutory_basis: |
+    **R.C. 3317.16**, as item 7 of H.B. 96 of the 136th General Assembly rewrote it. The act's own
+    list of school financing system calculation revisions carries it. [verified]
+    (`crates/project/fixtures/enacted-school-funding.txt`)
+
+    The **0.5-mill rate is not in the amendment** and was not changed by it: it is the charge-off
+    rate for joint vocational districts that has stood since before the Fair School Funding Plan,
+    and which the plan retired for every other kind of district. See
+    [`local-share-charge-off-millage`](../parameter/local-share-charge-off-millage.yml).
+
+    The **10% minimum state share is maintained** from prior law, which the greenbook states
+    explicitly. [verified] ([`lsc-hb96-analysis`](../../catalog/lsc-hb96-analysis.md))
+  calculator: |
+    `crates/dispersion::jvsd_funding`, over six years of the department's own payment reports.
+    Not a calculator crate: a JVSD has no IRN in the 609-district panel `project::policy` prices
+    its levers over, so nothing in `foundation` or `project` can join it.
+
+    Both methods are enforced twice — `connect::fixtures::jvsd` refuses a report whose charged
+    valuation is not the lesser of the two published, whose local capacity is not that valuation
+    at half a mill, whose published percentage its own inputs do not reproduce, or whose base cost
+    dollars do not reproduce under the method that year's law prescribes; and the reader holds the
+    same identities against the committed fixture.
+  fy2026_scale: |
+    $559,089,218 in total state support to 49 districts, of which $375,986,135 is the state share
+    of base cost. Item 7 accounts for $10,249,747 of that — 2.80% more than prior law's
+    arithmetic would have paid the same districts in the same year. [verified]
+links:
+  - target: ../formula-component.ont.yml
+    relationship: instance-of
+  - target: ../revenue-stream/state-foundation-aid.yml
+    relationship: distributes
+  - target: ../parameter/local-share-charge-off-millage.yml
+    relationship: governed-by
+  - target: fsfp-local-capacity-measure.yml
+    relationship: parallels
+  - target: fsfp-base-cost-calculation.yml
+    relationship: governed-by
+  - target: ../legislation/hb-96-2025.yml
+    relationship: established-by
+  - target: ../../catalog/dew-jvsd-foundation-payments.md
+    relationship: sourced-from
+  - target: ../../catalog/lsc-hb96-analysis.md
+    relationship: sourced-from

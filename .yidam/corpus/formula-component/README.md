@@ -32,6 +32,7 @@ See the class definition: [formula-component.ont.yml](../formula-component.ont.y
 | [fsfp-formula-transition-supplement](fsfp-formula-transition-supplement.yml) | Fair School Funding Plan | A second hold-harmless, on a FY2021 base that includes transportation |
 | [guarantee-open-enrolment-clawback](guarantee-open-enrolment-clawback.yml) | Fair School Funding Plan | A reduction *inside* the guarantee, charged at statewide base cost per pupil shed |
 | [fsfp-community-school-equity-supplement](fsfp-community-school-equity-supplement.yml) | Fair School Funding Plan | A flat per-pupil payment to site-based community schools, and to no district |
+| [fsfp-jvsd-state-share-of-base-cost](fsfp-jvsd-state-share-of-base-cost.yml) | Fair School Funding Plan | A half-mill charge-off over the 49 joint vocational districts, restated per pupil by H.B. 96 without changing the percentage |
 
 **The six categoricals are one class of node and four kinds of mechanism.** They were a single
 residual for eight phases — core foundation funding less the state share of base cost, exact and

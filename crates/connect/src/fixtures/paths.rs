@@ -1,6 +1,6 @@
 //! Where every committed fixture is written, and the manifest of the ones the rebuild produces.
 //!
-//! Thirty-four path constants and [`REBUILT`], which lists the subset a full rebuild regenerates.
+//! Thirty-five path constants and [`REBUILT`], which lists the subset a full rebuild regenerates.
 //!
 //! # Why they are together
 //!
@@ -51,6 +51,30 @@ pub const FY25_FIXTURE: &str = "crates/project/fixtures/fy25-payment-report.csv"
 /// is paid to 324 of its 355 schools and to nobody else in Ohio.
 pub const COMMUNITY_SCHOOL_FUNDING_FIXTURE: &str =
     "crates/dispersion/fixtures/fy27-community-school-funding.csv";
+
+/// Six years of the department's joint vocational school district foundation payment reports,
+/// one row per district per year.
+///
+/// In `dispersion` beside the community school extract rather than in `foundation` or `project`
+/// for the same reason that one is: a second population, not a further year of the 609-district
+/// panel. The 49 JVSDs are typed `4` by the federal directory — *regional education service
+/// agency*, the code Ohio's educational service centres also carry — and none of them appears in
+/// the panel the calculator crates read.
+///
+/// # Why six years of payment reports and not a calculator
+///
+/// There is no JVSD calculator. The department publishes a simulator for traditional districts
+/// and another for community and STEM schools, and for this population it publishes payment
+/// reports instead — what was paid, after the year closed. For FY2022 through FY2026 that is the
+/// better artefact, and for FY2027 it is the only one.
+///
+/// # What the series is for
+///
+/// Item 7 of H.B. 96's list rewrote the JVSD state share of base cost into per-pupil form. The
+/// span is chosen so the amendment has a before and an after inside one fixture: FY2022-FY2025
+/// under prior law, FY2026-FY2027 under item 7. See [`super::jvsd`] for what the rewrite turns
+/// out to change, which is not the percentage.
+pub const JVSD_FUNDING_FIXTURE: &str = "crates/dispersion/fixtures/jvsd-foundation-payments.csv";
 
 /// The statewide scalars each year's funding calculator states once, one row per fiscal year.
 ///
@@ -330,6 +354,7 @@ pub const REBUILT: &[&str] = &[
     CALCULATOR_VINTAGES_FIXTURE,
     CALCULATOR_ADM_FIXTURE,
     COMMUNITY_SCHOOL_FUNDING_FIXTURE,
+    JVSD_FUNDING_FIXTURE,
     PROFILE_FIXTURE,
     GRADE_BANDS_FIXTURE,
     REPORT_CARD_FIXTURE,

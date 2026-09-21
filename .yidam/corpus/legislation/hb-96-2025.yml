@@ -35,8 +35,9 @@ description: |
   - **Establishes three supplements**: base funding, enrollment growth, and per-pupil performance.
   - **Raises the minimum transportation state share** 41.67% → 45.83% → 50%, and cuts career
     awareness funds from $10 a pupil to $3.
-  - **Rewrites the JVSD base cost state share** onto the district method, replacing an aggregate
-    0.5-mill charge-off that did not depend on enrollment at all.
+  - **Rewrites the JVSD base cost state share** into per-pupil form — not onto the district
+    method, and it changes no percentage. See
+    [`fsfp-jvsd-state-share-of-base-cost`](../formula-component/fsfp-jvsd-state-share-of-base-cost.yml).
   - **Changes what the Tax Commissioner certifies** — the median federal adjusted gross income of
     a district's residents in place of the total. Recorded here as a change to the local capacity
     blend; it is not one, and the blend still reads both. [verified]
@@ -91,7 +92,22 @@ findings: |
 
   Traditional districts **$8.15bn in FY2026 and $8.26bn in FY2027** — annual increases of $32.5m
   (0.4%) and $109.0m (1.3%). Community and STEM schools $1.33bn and $1.40bn, up 4.8% and 5.0%.
-  JVSDs $539.1m and $566.9m, up 8.4% and 5.2%. [verified] (LSC greenbook)
+  JVSDs $539.1m and $566.9m, up 8.4% and 5.2%. [verified] (LSC greenbook) The department's own
+  payment reports carry $559.1m and $591.2m for the JVSDs — 3.7% and 4.3% above the greenbook,
+  which is a budget-time score against a payment report and not a disagreement. [verified]
+  (`crates/dispersion/src/jvsd_funding.rs`)
+
+  ### Item 7 rewrites the JVSD state share and changes no percentage
+
+  The act's list describes item 7 as a change of method, and at the level of the percentage it is
+  a restatement. It does not put JVSDs onto the district method: the half-mill charge-off stands,
+  against the districts' twenty-mill local capacity measure. And because base cost per pupil is
+  aggregate base cost over the same base cost enrolled ADM that divides the charge, the ADM
+  cancels — the per-pupil form computes the number prior law computed, on all 49 districts in six
+  years on both sides of the amendment. What it moves is the ADM the share multiplies: from that
+  three-year average onto current-year enrolled ADM, worth $10.2m in FY2026 with 36 of 49
+  districts better off. [verified] (`crates/dispersion/src/jvsd_funding.rs`) See
+  [`fsfp-jvsd-state-share-of-base-cost`](../formula-component/fsfp-jvsd-state-share-of-base-cost.yml).
 
   The traditional-district growth rate is the number to hold beside the phase-in. A budget that
   completes a six-year implementation raises the districts' foundation aid by 0.4% and then 1.3%,
@@ -219,6 +235,12 @@ links:
       Codifies it into R.C. 3317.022, where H.B. 33 had it as temporary law, and cuts the rate
       $650 to $500 to $400. The act's own list is where the eligibility clause is written: community
       schools that are not internet- or computer-based.
+  - target: ../formula-component/fsfp-jvsd-state-share-of-base-cost.yml
+    relationship: rewrites
+    note: >-
+      Item 7. Restates the joint vocational state share of base cost per pupil, which leaves the
+      percentage exactly as prior law computed it — the base cost enrolled ADM cancels — and moves
+      the aid onto current-year enrolled ADM instead of that three-year average. $10.2m in FY2026.
   - target: ../funding-regime/fair-school-funding-plan.yml
     relationship: continues
   - target: ../../catalog/lsc-hb96-analysis.md

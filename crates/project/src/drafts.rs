@@ -175,7 +175,9 @@ impl Anchor {
 ///
 /// So the constraint was real and it was a data constraint. Three of the eleven remain outside —
 /// the JVSD base cost method, the community school equity supplement, and career awareness funds —
-/// and they are outside for three different reasons, which this module used to state as one.
+/// and they are outside for three different reasons, which this module used to state as one. Two
+/// of the three have since turned out to be reachable: only career awareness is still short of a
+/// source.
 ///
 /// # The equity supplement is outside for its population, not for want of data
 ///
@@ -194,8 +196,27 @@ impl Anchor {
 /// figure rather than a lever, and
 /// `decisions/a-supplement-paid-to-a-population-the-panel-does-not-hold` is the record.
 ///
-/// The JVSD method is the one that is still a data constraint: those districts are a population
-/// this repository does not hold at all.
+/// # The JVSD method is outside for the panel, and it is no longer a data constraint
+///
+/// This doc said "those districts are a population this repository does not hold at all", which
+/// was a statement about the repository rather than about the formula, and is no longer true of
+/// either. The department publishes
+/// six years of per-district **payment reports** for the forty-nine — no calculator, which is why
+/// they were looked for under the wrong kind of name, and filed under *Career-Technical Funding*,
+/// which is why they were looked for under the wrong path. `dispersion::jvsd_funding` reads them,
+/// and both methods reproduce the department's own payments to the cent on every district in
+/// every year.
+///
+/// It also turns out to be a smaller change than the act's list makes it sound. Item 7's
+/// per-pupil rewrite cancels: base cost per pupil is aggregate base cost over the same base cost
+/// enrolled ADM that divides the charge, so **the state share percentage is exactly what it was**,
+/// on all 49 districts on both sides of the amendment. What the rewrite moves is the ADM the
+/// share multiplies — from a three-year average to the current year — which is worth $10.2m in
+/// FY2026, with 36 of the 49 better off.
+///
+/// What keeps it outside [`Lever`] is the same thing that keeps the equity supplement outside,
+/// and it is the panel rather than the data: a JVSD has no IRN among the 609, so pricing one here
+/// would need a third [`crate::policy::Outcome`] channel over a second population.
 ///
 /// # Career awareness is outside for the base, not for the rate
 ///

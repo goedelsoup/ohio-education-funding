@@ -45,6 +45,7 @@ pub mod facilities;
 pub mod functions;
 pub mod fy2016;
 pub mod identified;
+pub mod jvsd_funding;
 pub mod lea_directory;
 pub mod mr81;
 pub mod national_peers;

@@ -322,8 +322,8 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1791 | supported by a committed primary source |
-| `[inference]` | 360 | drawn from verified facts, not witnessed |
+| `[verified]` | 1805 | supported by a committed primary source |
+| `[inference]` | 362 | drawn from verified facts, not witnessed |
 | `[open]` | 207 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
@@ -381,13 +381,13 @@ leave the corpus and are not counted.
 -->
 | Measure | Count |
 |---|--:|
-| edges between nodes | 582 |
-| distinct relationships in use | 168 |
+| edges between nodes | 588 |
+| distinct relationships in use | 169 |
 | relationships declared across every class | 70 |
-| edges whose relationship its class does not declare | 300 |
+| edges whose relationship its class does not declare | 303 |
 | relationships used exactly once | 82 |
 
-**51% of edges use a relationship the class does not declare**, and 82 of the 168 relationships in use are used a single time. That is the case for `edge_policy: characteristic`: closing the vocabulary would reject those edges or require 82 declarations that each describe one link.
+**51% of edges use a relationship the class does not declare**, and 82 of the 169 relationships in use are used a single time. That is the case for `edge_policy: characteristic`: closing the vocabulary would reject those edges or require 82 declarations that each describe one link.
 <!-- /REGEN -->
 
 This was a hand-written sentence in fifteen ontology files, in the paragraph above, and in
@@ -445,15 +445,16 @@ Sorted by: kind, then alphabetically.
 | [`fy2026-27`](fiscal-period/fy2026-27.yml) | fiscal-period | FY2026-27 Biennium | 5 | 18 |
 | [`fy2027`](fiscal-period/fy2027.yml) | fiscal-period | Fiscal Year 2027 | 6 | 3 |
 | [`charge-off-local-share`](formula-component/charge-off-local-share.yml) | formula-component | Charge-Off Local Share | 6 | 8 |
-| [`fsfp-base-cost-calculation`](formula-component/fsfp-base-cost-calculation.yml) | formula-component | FSFP Base Cost Calculation | 12 | 10 |
+| [`fsfp-base-cost-calculation`](formula-component/fsfp-base-cost-calculation.yml) | formula-component | FSFP Base Cost Calculation | 12 | 11 |
 | [`fsfp-career-technical-weights`](formula-component/fsfp-career-technical-weights.yml) | formula-component | FSFP Career-Technical Weights | 6 | 5 |
-| [`fsfp-community-school-equity-supplement`](formula-component/fsfp-community-school-equity-supplement.yml) | formula-component | FSFP Community School Equity Supplement | 5 | 1 |
+| [`fsfp-community-school-equity-supplement`](formula-component/fsfp-community-school-equity-supplement.yml) | formula-component | FSFP Community School Equity Supplement | 5 | 2 |
 | [`fsfp-disadvantaged-pupil-impact-aid`](formula-component/fsfp-disadvantaged-pupil-impact-aid.yml) | formula-component | FSFP Disadvantaged Pupil Impact Aid | 3 | 7 |
 | [`fsfp-english-learner-weights`](formula-component/fsfp-english-learner-weights.yml) | formula-component | FSFP English Learner Weights | 5 | 5 |
 | [`fsfp-enrolment-supplements`](formula-component/fsfp-enrolment-supplements.yml) | formula-component | FSFP Base and Enrollment Growth Supplements | 7 | 4 |
 | [`fsfp-formula-transition-supplement`](formula-component/fsfp-formula-transition-supplement.yml) | formula-component | FSFP Formula Transition Supplement | 8 | 8 |
 | [`fsfp-gifted-units`](formula-component/fsfp-gifted-units.yml) | formula-component | FSFP Gifted Identification and Units | 4 | 3 |
-| [`fsfp-local-capacity-measure`](formula-component/fsfp-local-capacity-measure.yml) | formula-component | FSFP Local Capacity Measure | 11 | 12 |
+| [`fsfp-jvsd-state-share-of-base-cost`](formula-component/fsfp-jvsd-state-share-of-base-cost.yml) | formula-component | FSFP JVSD State Share of Base Cost | 6 | 2 |
+| [`fsfp-local-capacity-measure`](formula-component/fsfp-local-capacity-measure.yml) | formula-component | FSFP Local Capacity Measure | 11 | 13 |
 | [`fsfp-performance-supplement`](formula-component/fsfp-performance-supplement.yml) | formula-component | FSFP Performance Supplement | 10 | 7 |
 | [`fsfp-preschool-special-education`](formula-component/fsfp-preschool-special-education.yml) | formula-component | FSFP Preschool Special Education | 6 | 4 |
 | [`fsfp-special-education-weights`](formula-component/fsfp-special-education-weights.yml) | formula-component | FSFP Special Education Weights | 6 | 10 |
@@ -483,7 +484,7 @@ Sorted by: kind, then alphabetically.
 | [`hb-920-1976`](legislation/hb-920-1976.yml) | legislation | Am. Sub. H.B. 920 (1976) — Tax Reduction Factors | 5 | 13 |
 | [`hb-94-2001`](legislation/hb-94-2001.yml) | legislation | Am. Sub. H.B. 94 (2001) — FY2002-03 Budget; the post-DeRolph II formula | 10 | 5 |
 | [`hb-95-2003`](legislation/hb-95-2003.yml) | legislation | Am. Sub. H.B. 95 (2003) — FY2004-05 Budget; the First After DeRolph | 5 | 2 |
-| [`hb-96-2025`](legislation/hb-96-2025.yml) | legislation | Am. Sub. H.B. 96 (2025) — FY2026-27 Budget | 10 | 27 |
+| [`hb-96-2025`](legislation/hb-96-2025.yml) | legislation | Am. Sub. H.B. 96 (2025) — FY2026-27 Budget | 11 | 28 |
 | [`ohio-constitution-article-vi-section-2`](legislation/ohio-constitution-article-vi-section-2.yml) | legislation | Ohio Constitution, Article VI, Section 2 (1851) | 2 | 5 |
 | [`cincinnati-v-walter-1979`](litigation/cincinnati-v-walter-1979.yml) | litigation | Cincinnati City School District Board of Education v. Walter (1979) | 6 | 4 |
 | [`derolph-i-1997`](litigation/derolph-i-1997.yml) | litigation | DeRolph v. State (DeRolph I, 1997) | 6 | 14 |
@@ -504,7 +505,7 @@ Sorted by: kind, then alphabetically.
 | [`parental-choice-scholarship-act`](model-policy/parental-choice-scholarship-act.yml) | model-policy | Parental Choice Scholarship Program Act (Universal Eligibility) | 5 | 1 |
 | [`appropriation-proration-factor`](parameter/appropriation-proration-factor.yml) | parameter | Appropriation Proration Factor | 2 | 4 |
 | [`base-cost-per-pupil`](parameter/base-cost-per-pupil.yml) | parameter | Base Cost Per Pupil | 9 | 26 |
-| [`career-technical-category-multiples`](parameter/career-technical-category-multiples.yml) | parameter | Career-Technical Category Multiples | 6 | 2 |
+| [`career-technical-category-multiples`](parameter/career-technical-category-multiples.yml) | parameter | Career-Technical Category Multiples | 7 | 2 |
 | [`dpia-per-pupil-amount`](parameter/dpia-per-pupil-amount.yml) | parameter | Disadvantaged Pupil Impact Aid Per-Pupil Amount | 6 | 3 |
 | [`english-learner-category-multiples`](parameter/english-learner-category-multiples.yml) | parameter | English Learner Category Multiples | 5 | 3 |
 | [`enrolment-supplement-amounts`](parameter/enrolment-supplement-amounts.yml) | parameter | Enrolment Supplement Amounts | 4 | 3 |
@@ -512,7 +513,7 @@ Sorted by: kind, then alphabetically.
 | [`gifted-funding-rates`](parameter/gifted-funding-rates.yml) | parameter | Gifted Funding Rates | 5 | 4 |
 | [`guarantee-funding-base`](parameter/guarantee-funding-base.yml) | parameter | Guarantee Funding Base | 6 | 8 |
 | [`local-capacity-percentage`](parameter/local-capacity-percentage.yml) | parameter | Local Capacity Percentage | 5 | 3 |
-| [`local-share-charge-off-millage`](parameter/local-share-charge-off-millage.yml) | parameter | Local Share Charge-Off Millage | 8 | 8 |
+| [`local-share-charge-off-millage`](parameter/local-share-charge-off-millage.yml) | parameter | Local Share Charge-Off Millage | 8 | 9 |
 | [`minimum-state-share`](parameter/minimum-state-share.yml) | parameter | Minimum State Share | 9 | 3 |
 | [`performance-supplement-rate`](parameter/performance-supplement-rate.yml) | parameter | Performance Supplement Rate | 5 | 4 |
 | [`preschool-special-education-amounts`](parameter/preschool-special-education-amounts.yml) | parameter | Preschool Special Education Amounts | 6 | 5 |
@@ -531,7 +532,7 @@ Sorted by: kind, then alphabetically.
 | [`idea-part-b`](revenue-stream/idea-part-b.yml) | revenue-stream | IDEA Part B | 5 | 3 |
 | [`local-property-tax`](revenue-stream/local-property-tax.yml) | revenue-stream | Local Property Tax | 6 | 8 |
 | [`lottery-profits`](revenue-stream/lottery-profits.yml) | revenue-stream | Lottery Profits Education Fund | 4 | 1 |
-| [`state-foundation-aid`](revenue-stream/state-foundation-aid.yml) | revenue-stream | State Foundation Aid | 7 | 22 |
+| [`state-foundation-aid`](revenue-stream/state-foundation-aid.yml) | revenue-stream | State Foundation Aid | 7 | 23 |
 | [`title-i`](revenue-stream/title-i.yml) | revenue-stream | Title I, Part A | 5 | 5 |
 | [`tpp-replacement-payments`](revenue-stream/tpp-replacement-payments.yml) | revenue-stream | Tangible Personal Property Tax Replacement Payments | 6 | 7 |
 | [`fsfp-input-year-refresh`](scenario/fsfp-input-year-refresh.yml) | scenario | FSFP Cost Input Refresh vs. Freeze | 10 | 10 |
@@ -540,7 +541,7 @@ Sorted by: kind, then alphabetically.
 | [`barrington-road-elementary`](school/barrington-road-elementary.yml) | school | Barrington Road Elementary School | 4 | 2 |
 | [`sheridan-high-school`](school/sheridan-high-school.yml) | school | Sheridan High School | 6 | 2 |
 
-132 nodes across 18 classes, and **1 with nothing pointing at them** — counting a citation in somebody's prose as pointing. Whether that is a gap depends on the class: `web/tests/unit/reachability.spec.ts` holds every node to having an inbound *edge* and exempts `draft-legislation`, where a node with nothing pointing at it is the design.
+133 nodes across 18 classes, and **1 with nothing pointing at them** — counting a citation in somebody's prose as pointing. Whether that is a gap depends on the class: `web/tests/unit/reachability.spec.ts` holds every node to having an inbound *edge* and exempts `draft-legislation`, where a node with nothing pointing at it is the design.
 <!-- /REGEN -->
 
 ## Semantic index status
@@ -550,5 +551,5 @@ Regenerated by: `edfund-connect index`
 Fields: total nodes indexed, embedding model, index freshness (last indexed commit vs HEAD),
         stale node count.
 -->
-No semantic index is built. The corpus is 132 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
+No semantic index is built. The corpus is 133 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
 <!-- /REGEN -->

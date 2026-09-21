@@ -190,6 +190,17 @@ pub struct Inputs {
     pub community_school_segments: Vec<dispersion::community_school_funding::Segment>,
     /// Total state support across those 355 schools, which is what the supplement is a share of.
     pub community_school_state_support: f64,
+    /// Six years of the department's joint vocational district payment reports, FY2022-FY2027.
+    ///
+    /// The second population here outside the 609-district panel, and the only one the corpus
+    /// holds across an amendment to its own method: H.B. 96 item 7 rewrote the JVSD state share
+    /// of base cost, and FY2022-FY2025 sit under the law it replaced.
+    pub jvsd: Vec<dispersion::jvsd_funding::District>,
+    /// What item 7 moved in FY2026, the one year that is both under the amendment and closed.
+    ///
+    /// `None` would mean the fixture had stopped carrying a priceable FY2026, which is a fixture
+    /// failure rather than a figure of zero.
+    pub jvsd_item_7: Option<dispersion::jvsd_funding::Item7Incidence>,
     /// The Census Bureau's state-level survey, FY2022 — the only source here that can say whether
     /// Ohio is unusual, and the one the corpus quotes for every national comparison.
     ///
@@ -689,6 +700,10 @@ impl Inputs {
             quartiles: dispersion::national_peers::ohio_by_local_wealth(),
             community_school_equity: dispersion::community_school_funding::equity_cost(),
             community_school_segments: dispersion::community_school_funding::segments(),
+            jvsd: dispersion::jvsd_funding::districts(),
+            jvsd_item_7: dispersion::jvsd_funding::item_7_incidence(
+                dispersion::jvsd_funding::FIRST_ITEM_7_YEAR,
+            ),
             community_school_state_support:
                 dispersion::community_school_funding::total_state_support(),
             states: dispersion::census_states::states(),
@@ -1774,6 +1789,18 @@ fn sd1_class1_rate(row: &dispersion::sd1::TaxRow) -> Option<f64> {
 ///
 /// The difference between Table SD-1's two taxes-charged columns is the joint vocational levy on
 /// a district's own parcels, so it is also the membership list the abstract never states.
+/// Total state support to the joint vocational districts in one fiscal year.
+///
+/// Summed from the per-district rows rather than carried as a scalar, so a year that lost a
+/// district would move the figure instead of leaving a stale total in place.
+fn jvsd_total_state_support(i: &Inputs, fiscal_year: u16) -> f64 {
+    i.jvsd
+        .iter()
+        .filter(|district| district.fiscal_year == fiscal_year)
+        .map(|district| district.total_state_support)
+        .sum()
+}
+
 fn joint_vocational_membership(i: &Inputs, tax_year: u16) -> (usize, usize) {
     let rows: Vec<&dispersion::sd1::TaxRow> = i
         .sd1
@@ -4758,6 +4785,115 @@ pub static FIGURES: &[Figure] = &[
         pinned: 0.02292,
         tolerance: 0.0005,
         compute: |i| i.community_school_equity.enacted / i.community_school_state_support,
+    },
+    // The joint vocational districts, from six years of the department's payment reports. The
+    // second population in this manifest outside the 609-district panel, and the only one the
+    // corpus can watch across an amendment to its own method — see
+    // `corpus/formula-component/fsfp-jvsd-state-share-of-base-cost`.
+    Figure {
+        key: "dispersion/jvsd-districts",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Joint vocational school districts the department funds, agreed by its payment \
+                reports and by the federal directory",
+        pinned: 49.0,
+        tolerance: 0.0,
+        compute: |i| {
+            let latest = i
+                .jvsd
+                .iter()
+                .filter(|d| d.fiscal_year == dispersion::jvsd_funding::LAST_YEAR)
+                .count();
+            f64::from(u32::try_from(latest).unwrap_or(u32::MAX))
+        },
+    },
+    Figure {
+        key: "dispersion/jvsd-item-7-delta-fy2026",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "What H.B. 96 item 7 adds to JVSD base cost aid in FY2026, against prior law\u{2019}s \
+                arithmetic over the same districts and year",
+        pinned: 10_249_746.61,
+        tolerance: 1.0,
+        compute: |i| i.jvsd_item_7.map_or(f64::NAN, |incidence| incidence.delta()),
+    },
+    Figure {
+        key: "dispersion/jvsd-item-7-better-off-fy2026",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Joint vocational districts better off under item 7 in FY2026 \u{2014} the ones \
+                enrolling above their three-year average",
+        pinned: 36.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.jvsd_item_7.map_or(f64::NAN, |incidence| {
+                f64::from(u32::try_from(incidence.better_off).unwrap_or(u32::MAX))
+            })
+        },
+    },
+    Figure {
+        key: "dispersion/jvsd-carried-forward-enrolment-fy2027",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Joint vocational districts whose FY2027 enrolled ADM is FY2026\u{2019}s exactly, \
+                which under item 7 is the count the state share multiplies",
+        pinned: 43.0,
+        tolerance: 0.0,
+        compute: |i| {
+            let prior: std::collections::BTreeMap<String, f64> = i
+                .jvsd
+                .iter()
+                .filter(|d| d.fiscal_year == dispersion::jvsd_funding::FIRST_ITEM_7_YEAR)
+                .map(|d| (d.irn.clone(), d.enrolled_adm))
+                .collect();
+            let repeated = i
+                .jvsd
+                .iter()
+                .filter(|d| d.fiscal_year == dispersion::jvsd_funding::LAST_YEAR)
+                .filter(|d| {
+                    prior
+                        .get(&d.irn)
+                        .is_some_and(|was| (was - d.enrolled_adm).abs() < f64::EPSILON)
+                })
+                .count();
+            f64::from(u32::try_from(repeated).unwrap_or(u32::MAX))
+        },
+    },
+    Figure {
+        key: "dispersion/jvsd-lowest-state-share-fy2027",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The lowest JVSD state share of base cost in FY2027, against a 10% minimum no \
+                district has reached in six years",
+        pinned: 0.10923,
+        tolerance: 0.0001,
+        compute: |i| {
+            i.jvsd
+                .iter()
+                .filter(|d| d.fiscal_year == dispersion::jvsd_funding::LAST_YEAR)
+                .map(|d| d.state_share_percentage)
+                .fold(f64::INFINITY, f64::min)
+        },
+    },
+    Figure {
+        key: "dispersion/jvsd-total-state-support-fy2026",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Total state support to the 49 joint vocational districts in FY2026, as the \
+                department paid it rather than as the greenbook scored it",
+        pinned: 559_089_218.26,
+        tolerance: 1.0,
+        compute: |i| jvsd_total_state_support(i, dispersion::jvsd_funding::FIRST_ITEM_7_YEAR),
+    },
+    Figure {
+        key: "dispersion/jvsd-total-state-support-fy2027",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Total state support to the 49 joint vocational districts in FY2027, from the \
+                September payment report",
+        pinned: 591_155_954.03,
+        tolerance: 1.0,
+        compute: |i| jvsd_total_state_support(i, dispersion::jvsd_funding::LAST_YEAR),
     },
     Figure {
         key: "dispersion/ecot-directory-editions",
