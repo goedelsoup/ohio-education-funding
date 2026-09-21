@@ -23,6 +23,30 @@
 //! tangible personal property revenue, and the quintile gradient on business property spans six
 //! points with no order to it. See [`against`] and [`quintiles_by`].
 //!
+//! # The summed share is three signs, which is why the three are kept apart here too
+//!
+//! That `+0.02` is a *cancellation* rather than a smallness. Separated at [`BASE_YEAR`] the three
+//! classes run `+0.1175` on industrial, `-0.0321` on mineral and `-0.0159` on public utility, so
+//! the summed near-zero is opposite signs averaging out and is not a measure of anything.
+//! [`crate::tax_base`] established at TY2024 that the three are three different sets of districts
+//! behaving three different ways; they are three different *signs* here as well, a decade
+//! earlier and against a different outcome. The sum is kept, as
+//! [`District::summed_business_share`], because it is the measure the withdrawal was published
+//! against — but [`District::share`] is what a new question should ask.
+//!
+//! Separating them makes the refutation stronger rather than weaker. The tangible-personal-
+//! property reading needs industrial districts to have *fallen*: the 30 districts above
+//! [`crate::tax_base::CONCENTRATED`] in industrial value gained **24.11%** against the frame's
+//! 15.38%, the largest of the three gaps and the wrong way round.
+//!
+//! And the population #374 found — the ten districts whose Utica shale mineral value carries a
+//! 90% FY2027 guarantee rate — has no FY2016 signature at all. Eleven of them are in this frame,
+//! their steps run from `-17.33%` to `+55.80%`, and their gap against the rest of it is
+//! `-5.62` points at `t = -0.90`. Nothing here is significant once the classes are separated,
+//! which is the honest form of "the tail was never there". The two findings are also a decade
+//! apart and the constants say so: [`BASE_YEAR`] is 2021, [`crate::tax_base::TAX_YEAR`] is 2024,
+//! and neither is FY2016. See [`concentrated_in`].
+//!
 //! # What the step does track, and what that no longer isolates
 //!
 //! The strongest correlate is still the **log of a district's total assessed value**, at
@@ -58,6 +82,7 @@
 use std::collections::BTreeMap;
 
 use crate::survey_basis::{Basis, ADJUSTED_FROM};
+use crate::tax_base::Base;
 use crate::{ohio_panel, profile, sd1, Regression};
 
 /// The basis every measure here is computed on.
@@ -103,16 +128,47 @@ pub struct District {
     pub valuation_per_pupil: f64,
     /// Economically disadvantaged share, in points.
     pub disadvantaged: f64,
-    /// Industrial value as a fraction of total.
+    /// Industrial value as a fraction of total, at [`BASE_YEAR`].
     pub industrial_share: f64,
-    /// Industrial, mineral and public-utility value together, as a fraction of total.
-    pub business_share: f64,
+    /// Mineral value as a fraction of total. Oil and gas: zero for more than half of Ohio's
+    /// districts, and the class [`crate::tax_base`] found the guarantee population in.
+    pub mineral_share: f64,
+    /// Public-utility value as a fraction of total. The largest of the three by an order of
+    /// magnitude, and therefore what a summed share mostly measures.
+    pub public_utility_share: f64,
+}
+
+impl District {
+    /// The share in one named business class, at [`BASE_YEAR`].
+    ///
+    /// Keyed on [`crate::tax_base::Base`] rather than a local enum so that a caller holding one
+    /// class cannot be holding a different three here than there — the tax years differ and the
+    /// classes do not.
+    #[must_use]
+    pub const fn share(&self, base: Base) -> f64 {
+        match base {
+            Base::Industrial => self.industrial_share,
+            Base::Mineral => self.mineral_share,
+            Base::PublicUtility => self.public_utility_share,
+        }
+    }
+
+    /// Industrial, mineral and public utility together, as a fraction of total.
+    ///
+    /// The measure this module published before [`crate::tax_base`] separated the classes, kept
+    /// because the near-zero it produces is a result — and named `summed` for the reason
+    /// [`crate::tax_base::TaxBase::summed`] is, so that reaching for it is a decision rather
+    /// than the field that happened to exist.
+    #[must_use]
+    pub fn summed_business_share(&self) -> f64 {
+        self.industrial_share + self.mineral_share + self.public_utility_share
+    }
 }
 
 /// Every district the step and the tax base can both be computed for.
 #[must_use]
 pub fn frame() -> Vec<District> {
-    let mut base: BTreeMap<String, (f64, f64, f64)> = BTreeMap::new();
+    let mut base: BTreeMap<String, (f64, [f64; 3])> = BTreeMap::new();
     for row in sd1::rows().iter().filter(|r| r.tax_year == BASE_YEAR) {
         let Some(total) = row.total_value.filter(|t| *t > 0.0) else {
             continue;
@@ -122,10 +178,11 @@ pub fn frame() -> Vec<District> {
             row.irn.clone(),
             (
                 total,
-                share(row.industrial_value),
-                share(row.industrial_value)
-                    + share(row.mineral_value)
-                    + share(row.public_utility_value),
+                [
+                    share(row.industrial_value),
+                    share(row.mineral_value),
+                    share(row.public_utility_value),
+                ],
             ),
         );
     }
@@ -137,7 +194,7 @@ pub fn frame() -> Vec<District> {
     crate::survey_basis::step(BASIS)
         .into_iter()
         .filter_map(|(irn, step, pupils)| {
-            let (total, industrial, business) = *base.get(&irn)?;
+            let (total, [industrial, mineral, public_utility]) = *base.get(&irn)?;
             let district = profiles.get(&irn)?;
             Some(District {
                 name: district.name.clone(),
@@ -148,7 +205,8 @@ pub fn frame() -> Vec<District> {
                 valuation_per_pupil: district.valuation_per_pupil?,
                 disadvantaged: district.economically_disadvantaged? * 100.0,
                 industrial_share: industrial,
-                business_share: business,
+                mineral_share: mineral,
+                public_utility_share: public_utility,
             })
         })
         .collect()
@@ -173,6 +231,11 @@ pub fn against(pick: fn(&District) -> f64) -> f64 {
 ///
 /// A correlation says whether a relationship exists and a monotone gradient says it is not two
 /// tails pulling against each other.
+///
+/// **Not for a measure that is mostly zero.** 316 of the frame's 604 districts have exactly no
+/// mineral value, so quintiles on [`Base::Mineral`] put three fifths inside one tie and order
+/// them by IRN; the gradient that comes back is an artifact of the sort. Use
+/// [`concentrated_in`] for that class.
 ///
 /// # Panics
 ///
@@ -274,6 +337,24 @@ pub fn fall_against_deduct() -> (f64, f64) {
         .filter_map(|r| r.charter_payments)
         .sum();
     (total(ADJUSTED_FROM) - total(2015), deduct)
+}
+
+/// The frame's districts above [`crate::tax_base::CONCENTRATED`] in one business class at
+/// [`BASE_YEAR`], most concentrated first.
+///
+/// The join [`crate::tax_base`] asks for, made on this module's side rather than merged: the
+/// threshold is that module's so it is written once, and the tax year is this one's because the
+/// step is read against composition near the event. The two populations are therefore close but
+/// not equal — 30, 11 and 219 districts here against 27, 10 and 197 there, which is TY2021
+/// against TY2024 and 604 districts with a computable step against the abstract's 611.
+#[must_use]
+pub fn concentrated_in(base: Base) -> Vec<District> {
+    let mut out: Vec<District> = frame()
+        .into_iter()
+        .filter(|d| d.share(base) > crate::tax_base::CONCENTRATED)
+        .collect();
+    out.sort_by(|a, b| b.share(base).total_cmp(&a.share(base)));
+    out
 }
 
 /// The `n` largest districts by FY2016 enrolment, largest first.

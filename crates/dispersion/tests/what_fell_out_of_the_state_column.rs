@@ -21,12 +21,13 @@
 
 use dispersion::fy2016::{self, District};
 use dispersion::survey_basis::Basis;
+use dispersion::tax_base::{self, Base};
 
 /// **The first withdrawal.** The step has no relationship to industrial property.
 #[test]
 fn the_step_does_not_track_industrial_property_at_all() {
     let industrial = fy2016::against(|d| d.industrial_share);
-    let business = fy2016::against(|d| d.business_share);
+    let business = fy2016::against(|d| d.summed_business_share());
     assert!(
         (industrial - 0.1175).abs() < 0.0005 && (business - 0.0164).abs() < 0.0005,
         "industrial {industrial:+.4}, business {business:+.4}"
@@ -40,7 +41,7 @@ fn the_step_does_not_track_industrial_property_at_all() {
 
     // And the gradient has no order to it, so the near-zero correlation is not two tails
     // cancelling: the business-heaviest fifth sits between the second and the fourth.
-    let gradient = fy2016::quintiles_by(|d| d.business_share);
+    let gradient = fy2016::quintiles_by(|d| d.summed_business_share());
     let (low, high) = (
         gradient.iter().copied().fold(f64::INFINITY, f64::min),
         gradient.iter().copied().fold(f64::NEG_INFINITY, f64::max),
@@ -54,6 +55,104 @@ fn the_step_does_not_track_industrial_property_at_all() {
         gradient[4] < gradient[3],
         "the gradient is monotone after all: {gradient:?}"
     );
+}
+
+/// **The first withdrawal, separated.** The summed share is opposite signs, not a small one.
+///
+/// #374 established at TY2024 that industrial, mineral and public utility are three different
+/// populations behaving three different ways, and that adding them hides the finding. They are
+/// three different signs here too — so the `+0.0164` above is a cancellation, and the sum is the
+/// one measure of the four that is not about anything.
+#[test]
+fn the_summed_business_share_is_three_signs_averaged() {
+    let industrial = fy2016::against(|d| d.share(Base::Industrial));
+    let mineral = fy2016::against(|d| d.share(Base::Mineral));
+    let utility = fy2016::against(|d| d.share(Base::PublicUtility));
+    assert!(
+        (industrial - 0.1175).abs() < 0.0005
+            && (mineral + 0.0321).abs() < 0.0005
+            && (utility + 0.0159).abs() < 0.0005,
+        "industrial {industrial:+.4}, mineral {mineral:+.4}, public utility {utility:+.4}"
+    );
+    assert!(
+        industrial > 0.0 && mineral < 0.0 && utility < 0.0,
+        "if the three shared a sign the sum would be a measure of it"
+    );
+
+    // And the sum sits inside them rather than beyond any: it is an average of a disagreement.
+    let summed = fy2016::against(|d| d.summed_business_share());
+    assert!(
+        summed < industrial && summed > mineral,
+        "the summed {summed:+.4} is not between {mineral:+.4} and {industrial:+.4}"
+    );
+}
+
+/// **And separating them strengthens the withdrawal rather than softening it.**
+///
+/// The tangible-personal-property reading needs industrial districts to have fallen. Concentrated
+/// industrial districts gained *more* than the frame, by the largest margin of the three — and
+/// the shale districts #374 found carry no FY2016 signature at all, which is what makes that a
+/// finding about FY2027 and this one about FY2016.
+#[test]
+fn no_business_class_carries_the_step_once_they_are_separated() {
+    let frame = fy2016::frame();
+    let mean = |rows: &[District]| rows.iter().map(|d| d.step).sum::<f64>() / rows.len() as f64;
+    let all = mean(&frame);
+    assert!(
+        (all - 0.1538).abs() < 0.0005,
+        "the frame's mean step is {all:+.4}"
+    );
+
+    let industrial = fy2016::concentrated_in(Base::Industrial);
+    let mineral = fy2016::concentrated_in(Base::Mineral);
+    let utility = fy2016::concentrated_in(Base::PublicUtility);
+    assert_eq!(
+        (industrial.len(), mineral.len(), utility.len()),
+        (30, 11, 219),
+        "TY2021 over the 604 districts with a step, against tax_base's 27/10/197 at TY2024"
+    );
+
+    // The wrong way round, and by more than either other class moves.
+    let gap = |rows: &[District]| mean(rows) - all;
+    assert!(
+        gap(&industrial) > 0.0 && gap(&industrial).abs() > gap(&mineral).abs(),
+        "industrial {:+.4}, mineral {:+.4}, public utility {:+.4}",
+        gap(&industrial),
+        gap(&mineral),
+        gap(&utility)
+    );
+
+    // None of the three is distinguishable from the rest of the frame. Welch against the
+    // complement, and the largest of the three reaches 1.43.
+    for base in Base::ALL {
+        let inside: Vec<f64> = fy2016::concentrated_in(base)
+            .iter()
+            .map(|d| d.step)
+            .collect();
+        let outside: Vec<f64> = frame
+            .iter()
+            .filter(|d| d.share(base) <= tax_base::CONCENTRATED)
+            .map(|d| d.step)
+            .collect();
+        let t = welch(&inside, &outside);
+        assert!(
+            t.abs() < 2.0,
+            "{} reaches t = {t:+.2} against the rest of the frame",
+            base.label()
+        );
+    }
+}
+
+/// Welch's t for the difference of two means, which is the comparison a 30-district cut needs.
+fn welch(a: &[f64], b: &[f64]) -> f64 {
+    let moments = |v: &[f64]| {
+        let n = v.len() as f64;
+        let mean = v.iter().sum::<f64>() / n;
+        let variance = v.iter().map(|x| (x - mean).powi(2)).sum::<f64>() / (n - 1.0);
+        (mean, variance / n)
+    };
+    let ((mean_a, error_a), (mean_b, error_b)) = (moments(a), moments(b));
+    (mean_a - mean_b) / (error_a + error_b).sqrt()
 }
 
 /// **The finding.** What it tracks is total valuation, which is what capacity aid keys on.

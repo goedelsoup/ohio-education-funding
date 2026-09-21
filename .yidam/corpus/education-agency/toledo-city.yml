@@ -137,6 +137,17 @@ findings: |
   the step correlates +0.1175 with a district's industrial property share, which is the wrong sign
   for that reading. [verified]
 
+  **And that holds class by class, which the summed measure it was first taken on could not
+  show.** Table SD-1 carries business property in three columns — industrial, mineral and public
+  utility — and they are three different populations, which the withdrawal below did not separate.
+  Added together at TY2021 they give +0.0164, and that near-zero is opposite signs cancelling
+  rather than an absence: the step runs −0.0321 on mineral and −0.0159 on public utility against
+  the positive industrial reading. Separated, no class separates its concentrated districts from
+  the rest of the frame at two standard errors — the mineral one included, so the oil and gas
+  districts that dominate the same three columns a decade later carry no FY2016 signature either.
+  [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/what_fell_out_of_the_state_column.rs))
+
   The equalization series was checked against the published step and is untouched by the
   correction as well: it cuts by quartile and takes an unweighted mean over about 152 districts,
   so the poorest quartile's state revenue per pupil rises across FY2016 either way and the band
@@ -338,6 +349,18 @@ figures:
     value: 0.1175
     field: findings
     as_written: "correlates +0.1175 with a district's industrial property share"
+  - key: dispersion/fy2016-step-against-summed-business-share
+    value: 0.0164
+    field: findings
+    as_written: "Added together at TY2021 they give +0.0164"
+  - key: dispersion/fy2016-step-against-mineral-share-negative
+    value: 0.0321
+    field: findings
+    as_written: "the step runs −0.0321 on mineral"
+  - key: dispersion/fy2016-step-against-public-utility-share-negative
+    value: 0.0159
+    field: findings
+    as_written: "−0.0159 on public utility"
   - key: dispersion/fy2016-step-pupil-share-corrected
     value: 0.0166
     field: findings

@@ -10,9 +10,17 @@
 //!
 //! What neither the claim nor its refutation did was *separate the bases*. Table SD-1 carries
 //! industrial, mineral and public utility value in three columns, and a measure that adds them —
-//! which is what [`crate::fy2016::District::business_share`] does, deliberately and under its own
-//! caveat — is dominated by whichever is largest. In Ohio that is public utility, by an order of
-//! magnitude, and it is not the column anybody arguing about industry means.
+//! which is what [`crate::fy2016::District::summed_business_share`] was, deliberately and under
+//! its own caveat — is dominated by whichever is largest. In Ohio that is public utility, by an
+//! order of magnitude, and it is not the column anybody arguing about industry means.
+//!
+//! [`crate::fy2016`] now carries the three separately as well, at its own tax year, and the sum
+//! turns out to be hiding opposite signs there rather than only a dominant class: `+0.12`
+//! industrial against `-0.03` mineral and `-0.02` public utility, summing to the `+0.02` the
+//! withdrawal was published against. See [`crate::fy2016::concentrated_in`], which is the same
+//! cut as [`concentrated_in`] on a different tax year and a different population — the two are
+//! cross-referenced rather than merged, because a composition near FY2016 and the newest
+//! composition are answers to different questions.
 //!
 //! # They are three different sets of districts
 //!
@@ -157,9 +165,10 @@ impl TaxBase {
 
     /// Industrial, mineral and public utility together.
     ///
-    /// The measure [`crate::fy2016`] uses, provided here so that the comparison this module is
-    /// about can be made rather than only described — and named `summed` rather than `business`
-    /// so that reaching for it is a decision.
+    /// The measure [`crate::fy2016`] published its withdrawal against, provided here so that the
+    /// comparison this module is about can be made rather than only described — and named
+    /// `summed` rather than `business` so that reaching for it is a decision. That module's
+    /// [`crate::fy2016::District::summed_business_share`] is the same sum at its own tax year.
     #[must_use]
     pub fn summed(&self) -> f64 {
         self.industrial + self.mineral + self.public_utility
