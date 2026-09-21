@@ -175,8 +175,28 @@ impl Anchor {
 ///
 /// So the constraint was real and it was a data constraint. What remains outside is the JVSD base
 /// cost method and the community school equity supplement, which need populations the 609-district
-/// panel does not contain, and career awareness funds, which appear in no crate — three of the
-/// eleven, and each unpriceable for a reason this module can state.
+/// panel does not contain, and career awareness funds — three of the eleven, and each unpriceable
+/// for a reason this module can state.
+///
+/// # Career awareness is outside for the base, not for the rate
+///
+/// This doc used to say it "appears in no crate", which named a symptom. R.C. 3317.014(E)(1)(a)
+/// pays the lead district of each career technical planning district $3 for every pupil in the
+/// summed enrolled ADM of that planning district's members. The rate is a digit in the section,
+/// and the recipient is a district like any other — the department publishes all 92 leads with
+/// their IRNs.
+///
+/// What no lever could compute is the base. A planning district's members are the traditional
+/// districts, community schools and STEM schools affiliated with it, so the sum spans two
+/// populations this panel does not carry and needs a membership map no source this corpus has
+/// found publishes. The statewide total survives that, because every district belongs to a planning
+/// district and a population with no non-members sums to the whole — but a statewide total is not
+/// a lever, and the department states it anyway: the earmark inside GRF line item 200545 falls
+/// from $16,255,125 in FY2025 to $5,000,000 in each of FY2026 and FY2027.
+///
+/// Note also that it is not foundation funding, which is why no sheet of the FY2026 or FY2027
+/// calculator mentions it and why pricing it here would have put a second appropriation inside a
+/// total that means core foundation aid.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Lever {
     /// What happens to the temporary transitional aid guarantee.
