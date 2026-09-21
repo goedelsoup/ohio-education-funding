@@ -32,17 +32,67 @@ description: |
   through five rather than to any category, so it is the one part of the programme that does
   not vary with which category a pupil is in. [verified]
 findings: |
-  ### The section prices a third thing this corpus does not hold
+  ### The section prices a third thing, and it is missing for a reason that is not the rate
 
   R.C. 3317.014(E)(1)(a) pays the lead district of each career technical planning district
   **$3 times the summed enrolled ADM of every district and school in that planning district**,
   for career awareness and exploration. It is a statutory per-pupil rate in the same section as
-  the six multiples, and nothing in this repository models it: no component, no crate constant,
-  no column in the committed FY2027 calculator extract. [verified] (the section; and searched)
+  the six multiples, and no crate models it: no component, no constant, no column in the
+  committed FY2027 calculator extract. [verified] (the section; and searched)
 
-  It is not clear whether the payment is absent from the department's model, absent from the
-  extract this corpus took, or paid on a sheet the extract does not cover. Those are three
-  different facts and the corpus cannot presently distinguish them. [open]
+  **It is absent from the calculator and present in the payment report**, which is none of the
+  three possibilities an earlier reading of this node offered. Both cached workbooks were
+  searched whole this time — every string of every sheet rather than the columns the extract
+  reads — and neither holds the words: 2,936 strings over 32 sheets in the FY2027 workbook and
+  2,320 over 28 in the FY2026 one, with no occurrence of *aware*, *explor*, *planning*, *CTPD*
+  or *lead district* in either, the sole match on the first of those being Delaware. The
+  department's line-by-line explanation of the *payment report* then states the formula
+  outright, on the Other Adjustments report under "Career Technical Planning District
+  Payment": `Career Awareness and Exploration Funding = $3 * Enrolled ADM of member schools and
+  districts`. [verified] (`crates/project/fixtures/dew-sfpr-line-by-line.txt`, and both cached
+  workbooks)
+
+  The two facts are one fact. The calculator simulates the foundation formula, and this is not
+  foundation funding: it is an earmark of GRF line item 200545, Career-Technical Education
+  Enhancements — whose legal basis the redbook gives as R.C. 3317.014 together with Sections
+  265.10 and 265.260 of H.B. 33 — and not of 200550, Foundation Funding. The omission is a
+  boundary between two appropriations rather than a gap in anyone's model, and this repository
+  already reads across it: `fixtures/appropriation-lines.csv` carries 200545's totals back to
+  FY1999. [verified] (`dew-redbook.txt`, `dew-greenbook.txt`)
+
+  **So the money can be stated rather than estimated, and the cut is bigger than the rate.**
+  The earmark falls from $16,255,125 actually spent in FY2025 to $5,000,000 appropriated in
+  each of FY2026 and FY2027. The executive budget had proposed $16,325,000 for both years at an
+  unchanged $10 per pupil, so the reduction is the General Assembly's rather than the
+  Governor's — a distinction the enacted-act summary, which lists only the rate, does not
+  carry. The rate's own history is in the same sources, in five editions: $2.50 in FY2022,
+  $5.00 in FY2023, $7.50 in FY2024, $10 in FY2025, $3 in FY2026 and FY2027. [verified]
+
+  ### Its recipient is a population nothing here names, and the roster is not the obstacle
+
+  Placing the payment on a district needs two tables: which schools belong to each planning
+  district, and which district leads it. **The second is published.**
+  [The department's CTPD table](../../catalog/dew-career-technical-planning-districts.md) gives
+  each planning district's lead by name and by IRN, with its county, its city and whether it is
+  a comprehensive district, a JVSD, a compact or a correctional institution — 92 rows, keyed on
+  the identifier this panel already uses, against a legend on the same page whose own total
+  reads 91. [verified]
+
+  **The first is not.** That table names leads and not members; the portal that published the
+  member rosters no longer resolves in DNS; and the report card site returns one identical
+  shell for every path, `/robots.txt` included, so a 200 from it is not evidence that a route
+  exists. [verified]
+
+  Whether a membership roster is published anywhere else has not been established — three
+  places were tried and the negative result from the third is not a result. It is a live
+  question rather than a settled absence. [open]
+
+  What membership actually costs is narrower than it looks, because the department says that
+  "every school district belongs to or serves as a Career Technical Planning District". A
+  population with no non-members sums to the whole, so the statewide figure needs no roster —
+  it is the rate times statewide enrolled ADM, and the greenbook already states it. Only
+  attribution to a *recipient* needs membership, and only a lever moving money between
+  districts would need that. [inference] (on a sentence that is the department's own)
 
   ### All six are the FY2017 amounts over one divisor, and that divisor is not published
 
@@ -142,11 +192,12 @@ properties:
     that moves career-technical aid with enrolment is modelling something the calculator does
     not do. [verified for the freeze; inference for the consequence]
 unfilled:
-  - field: the $3 career awareness and exploration rate
+  - field: career technical planning district membership
     why: >-
-      R.C. 3317.014(E)(1)(a) sets it and this repository models nothing that pays it. The
-      department's career technical planning district payments, if they are published, are
-      where the value and its recipients would come from.
+      Not the $3 rate, which is in the section, and not the lead districts, whose table the
+      department publishes with IRNs. What is missing is which schools belong to which planning
+      district, and the one portal that published it no longer resolves. Without it the career
+      awareness payment has a statewide total and no recipient.
   - field: the career-technical base cost as the department computes it
     why: >-
       The FY2022 figure above is recovered from the weights rather than read. The department
