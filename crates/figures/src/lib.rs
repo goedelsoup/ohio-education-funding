@@ -481,6 +481,32 @@ pub struct Reach {
     pub mirror_inside: Vec<project::anchor_incidence::Movement>,
     /// `[M]` mirrored beside `[L]`, `[M]` and `[O]`.
     pub mirror_beside: Vec<project::anchor_incidence::Movement>,
+    /// The FY2027 guarantee list rolled down on a date -- the shape keyed to the floor.
+    pub dated_phase_down: Vec<project::anchor_incidence::Movement>,
+    /// The 64 siblings, the second population every row of #436 is read over.
+    pub siblings: BTreeSet<String>,
+    /// The cluster and the siblings unioned: the arc's 153.
+    pub union: BTreeSet<String>,
+    /// Districts shrinking at the cluster's median rate or faster: a different 169.
+    pub shrinking: BTreeSet<String>,
+    /// The mirror inside `[H]`, gross against what arrives -- the siblings, then the cluster.
+    pub absorbed_inside: (
+        project::decline_reach::Absorption,
+        project::decline_reach::Absorption,
+    ),
+    /// The siblings split at the median years-to-the-floor, nearest half first, inside `[H]`.
+    ///
+    /// Here rather than per figure because each half re-prices the whole panel, and because the
+    /// pair only means anything together: one half's absorbed share against the other's is the
+    /// measurement, and a figure holding one alone would read as a level.
+    pub absorbed_by_headroom: (
+        project::decline_reach::Absorption,
+        project::decline_reach::Absorption,
+    ),
+    /// The siblings' clock to their own guarantee floors.
+    pub sibling_clock: project::decline_reach::Clock,
+    /// Siblings on the floor by FY2036, at the shipped damping and undamped.
+    pub siblings_on_the_floor_fy2036: (usize, usize),
 }
 
 impl Reach {
@@ -494,6 +520,28 @@ impl Reach {
         project::anchor_incidence::by(frame, axis, 5, &self.cluster)
             .into_iter()
             .find(|band| band.rank == rank)
+            .expect("five bands, ranks 1 to 5")
+    }
+
+    /// One frame summed over one population -- the 64, the 89, the 153 or the 169.
+    fn on(
+        &self,
+        frame: &[project::anchor_incidence::Movement],
+        population: &BTreeSet<String>,
+    ) -> project::decline_reach::Reach {
+        project::decline_reach::over(frame, population)
+    }
+
+    /// One band of one frame cut into the siblings and everyone else.
+    fn split(
+        &self,
+        frame: &[project::anchor_incidence::Movement],
+        axis: project::anchor_incidence::Axis,
+        rank: usize,
+    ) -> project::decline_reach::Split {
+        project::decline_reach::split_by(frame, axis, 5, &self.cluster, &self.siblings)
+            .into_iter()
+            .find(|split| split.rank == rank)
             .expect("five bands, ranks 1 to 5")
     }
 
@@ -901,6 +949,22 @@ impl Inputs {
                 };
             let under =
                 |shape: Supplement| anchor_incidence::under_supplement(&panel_for_forecasts, shape);
+            // #436 reads every frame above over a second population as well. The standings are
+            // recomputed here rather than shared with the `lost_pupils` block below because a
+            // `Reach` that borrowed them would tie two blocks' lifetimes together for one set of
+            // IRNs.
+            let (siblings, union, shrinking) = {
+                let (rows, _) = project::lost_pupils::standings(&panel_for_forecasts);
+                (
+                    project::decline_reach::irns(&project::lost_pupils::siblings(&rows)),
+                    project::decline_reach::irns(&project::size_incidence::cluster_and_siblings(
+                        &rows,
+                    )),
+                    project::decline_reach::irns(
+                        &project::size_incidence::shrinking_at_the_cluster_rate(&rows),
+                    ),
+                )
+            };
             (
                 Anchors {
                     fy2027_as_enacted: rolling_anchor::at_the_modelled_year(
@@ -926,6 +990,52 @@ impl Inputs {
                     rolling_count: under(Supplement::RollingCount),
                     mirror_inside: under(Supplement::Mirror(Line::Foundation)),
                     mirror_beside: under(Supplement::Mirror(Line::Beside)),
+                    dated_phase_down: under(Supplement::DatedPhaseDown),
+                    absorbed_inside: (
+                        project::decline_reach::absorption(
+                            &panel_for_forecasts,
+                            Line::Foundation,
+                            &siblings,
+                        ),
+                        project::decline_reach::absorption(
+                            &panel_for_forecasts,
+                            Line::Foundation,
+                            &cluster,
+                        ),
+                    ),
+                    absorbed_by_headroom: project::decline_reach::by_headroom(
+                        &panel_for_forecasts,
+                        Line::Foundation,
+                        &siblings,
+                    ),
+                    sibling_clock: project::decline_reach::clock(&panel_for_forecasts, &siblings),
+                    siblings_on_the_floor_fy2036: (
+                        project::decline_reach::on_the_floor(
+                            &panel_for_forecasts,
+                            edfund_core::FiscalYear(2036),
+                            project::series::Method::Shrunk {
+                                rate: 0.0,
+                                damping,
+                                weight: project::series::DEFAULT_SHRINK_WEIGHT,
+                                toward: 0.0,
+                            },
+                            &siblings,
+                        ),
+                        project::decline_reach::on_the_floor(
+                            &panel_for_forecasts,
+                            edfund_core::FiscalYear(2036),
+                            project::series::Method::Shrunk {
+                                rate: 0.0,
+                                damping: 1.0,
+                                weight: project::series::DEFAULT_SHRINK_WEIGHT,
+                                toward: 0.0,
+                            },
+                            &siblings,
+                        ),
+                    ),
+                    siblings,
+                    union,
+                    shrinking,
                     cluster,
                 },
                 fy2032_enacted,
@@ -12262,6 +12372,233 @@ pub static FIGURES: &[Figure] = &[
         pinned: 169.0,
         tolerance: 0.0,
         compute: |i| i.lost_pupils.shrinking_at_the_cluster_rate as f64,
+    },
+    Figure {
+        key: "project/decline-response-mirror-beside-to-the-siblings",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the mirrored `[M]` written beside `[L]`, `[M]` and `[O]` pays the 64 \
+                siblings -- the districts that lost pupils and the floor does not hold",
+        pinned: 19_692_848.91,
+        tolerance: 0.005,
+        compute: |i| i.reach.on(&i.reach.mirror_beside, &i.reach.siblings).delta,
+    },
+    Figure {
+        key: "project/decline-response-mirror-beside-to-the-siblings-per-pupil",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same, per pupil of the siblings' own ADM, against $233.76 to the cluster",
+        pinned: 241.95,
+        tolerance: 0.005,
+        compute: |i| {
+            i.reach
+                .on(&i.reach.mirror_beside, &i.reach.siblings)
+                .per_pupil()
+        },
+    },
+    Figure {
+        key: "project/decline-response-mirror-beside-to-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the same mirror pays the 89 the floor caught -- the population every \
+                earlier pricing of a decline response was against",
+        pinned: 46_020_643.67,
+        tolerance: 0.005,
+        compute: |i| i.reach.on(&i.reach.mirror_beside, &i.reach.cluster).delta,
+    },
+    Figure {
+        key: "project/decline-response-mirror-inside-h-to-the-siblings",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the same mirror pays the 64 when it is written inside `[H]` instead, where \
+                `[L1]`'s subtrahend can reach it",
+        pinned: 19_112_356.87,
+        tolerance: 0.005,
+        compute: |i| i.reach.on(&i.reach.mirror_inside, &i.reach.siblings).delta,
+    },
+    Figure {
+        key: "project/decline-response-mirror-inside-h-to-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What it pays the 89 written inside `[H]` -- the same choice of line, an order of \
+                magnitude for them and almost nothing for the siblings",
+        pinned: 4_195_897.42,
+        tolerance: 0.005,
+        compute: |i| i.reach.on(&i.reach.mirror_inside, &i.reach.cluster).delta,
+    },
+    Figure {
+        key: "project/decline-response-rolling-count-to-the-siblings",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What recomputing the formula on a rolling pupil count pays the 64 siblings",
+        pinned: 22_359_204.12,
+        tolerance: 0.005,
+        compute: |i| i.reach.on(&i.reach.rolling_count, &i.reach.siblings).delta,
+    },
+    Figure {
+        key: "project/decline-response-rolling-count-to-the-siblings-per-pupil",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same per pupil, against $19.82 to the cluster -- the shape's ratio between \
+                the two populations is the widest of the four",
+        pinned: 274.71,
+        tolerance: 0.005,
+        compute: |i| {
+            i.reach
+                .on(&i.reach.rolling_count, &i.reach.siblings)
+                .per_pupil()
+        },
+    },
+    Figure {
+        key: "project/decline-response-ratchet-to-the-siblings",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a prior-year ratchet walked to FY2032 at the shipped damping pays the 64 \
+                siblings, against nothing at all to the 89",
+        pinned: 14_794_631.13,
+        tolerance: 0.005,
+        compute: |i| i.reach.on(&i.reach.ratchet_fy2032, &i.reach.siblings).delta,
+    },
+    Figure {
+        key: "project/decline-response-ratchet-moves-siblings",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "How many of the 64 a prior-year ratchet moves by more than half a cent",
+        pinned: 59.0,
+        tolerance: 0.0,
+        compute: |i| i.reach.on(&i.reach.ratchet_fy2032, &i.reach.siblings).moved as f64,
+    },
+    Figure {
+        key: "project/decline-response-ratchet-moves-cluster-districts",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "How many of the 89 it moves -- a second floor under a floor that already holds \
+                every one of them is slack",
+        pinned: 0.0,
+        tolerance: 0.0,
+        compute: |i| i.reach.on(&i.reach.ratchet_fy2032, &i.reach.cluster).moved as f64,
+    },
+    Figure {
+        key: "project/decline-response-dated-phase-down-moves-siblings",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "How many of the 64 a dated phase-down of the FY2027 guarantee list moves -- they \
+                are not on the list, and the date is why",
+        pinned: 0.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.reach
+                .on(&i.reach.dated_phase_down, &i.reach.siblings)
+                .moved as f64
+        },
+    },
+    Figure {
+        key: "project/decline-response-dated-phase-down-moves-cluster-districts",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "How many of the 89 it moves, which is the whole of its reach",
+        pinned: 7.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.reach
+                .on(&i.reach.dated_phase_down, &i.reach.cluster)
+                .moved as f64
+        },
+    },
+    Figure {
+        key: "project/the-siblings-share-of-the-least-wealthy-fifths-rolling-count",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The 64 siblings' share of the dollars the rolling count sends the least-wealthy \
+                fifth outside the cluster -- 22 of that fifth's 103 districts",
+        pinned: 0.385_485,
+        tolerance: 0.000_005,
+        compute: |i| {
+            i.reach
+                .split(
+                    &i.reach.rolling_count,
+                    project::anchor_incidence::Axis::Valuation,
+                    1,
+                )
+                .inside_share()
+        },
+    },
+    Figure {
+        key: "project/the-rolling-counts-least-wealthy-fifth-per-pupil-without-the-siblings",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the rolling count pays the least-wealthy fifth per pupil with the siblings \
+                taken out of it, against $166.55 with them and $8.76 to the wealthiest fifth",
+        pinned: 119.285_3,
+        tolerance: 0.005,
+        compute: |i| {
+            i.reach
+                .split(
+                    &i.reach.rolling_count,
+                    project::anchor_incidence::Axis::Valuation,
+                    1,
+                )
+                .outside_per_pupil()
+        },
+    },
+    Figure {
+        key: "project/the-mirror-inside-h-absorbed-on-the-siblings",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The share of the mirror written inside `[H]` that the floors take back from the \
+                64 siblings, who are not on one",
+        pinned: 0.029_477,
+        tolerance: 0.000_005,
+        compute: |i| i.reach.absorbed_inside.0.absorbed_share(),
+    },
+    Figure {
+        key: "project/the-mirror-inside-h-absorbed-on-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The share it takes back from the 89, who are -- the same shape, the same line, \
+                and thirty times the absorption",
+        pinned: 0.908_826,
+        tolerance: 0.000_005,
+        compute: |i| i.reach.absorbed_inside.1.absorbed_share(),
+    },
+    Figure {
+        key: "project/the-mirror-inside-h-absorbed-on-the-siblings-nearest-the-floor",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The share it takes back from the half of the 64 nearest their own floors, \
+                against nothing at all from the further half",
+        pinned: 0.075_963,
+        tolerance: 0.000_005,
+        compute: |i| i.reach.absorbed_by_headroom.0.absorbed_share(),
+    },
+    Figure {
+        key: "project/the-siblings-on-the-floor-by-fy2036-undamped",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "How many of the 64 the enacted anchor has caught by FY2036 with the damping off, \
+                against 5 at the damping that ships",
+        pinned: 38.0,
+        tolerance: 0.0,
+        compute: |i| i.reach.siblings_on_the_floor_fy2036.1 as f64,
+    },
+    Figure {
+        key: "project/decline-response-mirror-beside-over-the-153",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the mirror beside the floors pays the cluster and the siblings unioned",
+        pinned: 65_713_492.58,
+        tolerance: 0.005,
+        compute: |i| i.reach.on(&i.reach.mirror_beside, &i.reach.union).delta,
+    },
+    Figure {
+        key: "project/decline-response-mirror-beside-over-the-169",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What it pays every district shrinking at the cluster's median rate or faster, \
+                which is a different population and a larger sum",
+        pinned: 69_915_878.09,
+        tolerance: 0.005,
+        compute: |i| i.reach.on(&i.reach.mirror_beside, &i.reach.shrinking).delta,
     },
     Figure {
         key: "project/fitted-partition-best-cluster-ceiling",

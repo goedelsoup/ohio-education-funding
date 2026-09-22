@@ -565,6 +565,72 @@ findings: |
   half and 60 guaranteed districts outside the cluster shrink at least that fast. Both are
   defensible populations; they are not the same one. [verified] (crates/project)
 
+  **Priced on the 64 siblings, every shape that reaches them at all reaches them harder than it
+  reaches the 89.** Each pricing above was against the enrollment cluster; read the same frames
+  over the siblings and nothing is recomputed, because the frames are `anchor_incidence`'s and the
+  population is `lost_pupils`'. The mirror written beside `[L]`, `[M]` and `[O]` pays the siblings
+  **$19,692,848.91**, **$241.95** a pupil, against **$46,020,643.67** and $233.76 a pupil to the
+  cluster. Written inside `[H]` instead the same mirror pays them **$19,112,356.87** against
+  **$4,195,897.42**. A rolling pupil count pays them **$22,359,204.12**, **$274.71** a pupil
+  against $19.82. A prior-year ratchet walked to FY2032 at the shipped damping pays them
+  **$14,794,631.13**. [verified] (crates/project)
+
+  **Two of the seven instruments are blind, and each is blind to one of the two populations.** A
+  prior-year ratchet moves **59** of the 64 and **0** of the 89 — the enacted guarantee already
+  holds every cluster district, so a second floor under a floor is slack. A dated phase-down of
+  the FY2027 guarantee list moves **7** of the 89 and **0** of the 64, because the 64 are not on
+  that list. Neither zero is a rounding: no district of the blind population moves by so much as a
+  cent. [verified] (crates/project)
+
+  So the design question does not decompose into "the districts the floor caught" against "the
+  districts that lost pupils". It decomposes into what a rule is keyed to. A rule keyed to a list
+  on a date reaches the cluster and can never reach the siblings, whatever its generosity. A rule
+  keyed to aid that falls reaches the siblings and is slack against a district the guarantee
+  already holds. Only a rule keyed to pupils that leave — the mirror, the rolling count — reaches
+  both, and it reaches both because its eligibility test is the one thing the two populations
+  share. Which population a decline response is for is a choice this corpus does not make; what is
+  established is that a rule keyed to a date decides it silently, and that the difference between
+  the two populations is wealth. [inference]
+
+  **Where the mirror sits is a question about the 89 and almost not a question about the 64.**
+  The order of magnitude between the two placements is absorption, and absorption needs a floor.
+  Inside `[H]` the floors take back **0.9088** of the cluster's gross and **0.0295** of the
+  siblings'; **67** of the 81 cluster districts the mirror is payable to receive nothing at all,
+  against **4** of 60 siblings that lose anything. A debate about `[L1]`'s subtrahend is a debate
+  about districts the floor already holds. [verified] (crates/project)
+
+  **About a third of the progressive gradient is the siblings, and the gradient survives taking
+  them out.** Of the dollars the rolling count sends the least-wealthy fifth outside the cluster,
+  the siblings hold **0.3855** on 22 of that fifth's 103 districts. Take them out and the fifth
+  still pays **$119.29** a pupil against $8.76 to the wealthiest — a ratio of 13.6 where the ratio
+  with them is 14.6. Under the mirror inside `[H]` the siblings are paid flat, $244.06, $247.35,
+  $222.89, $189.68 and $242.77 across the five fifths, so the whole of that shape's gradient is a
+  property of the districts around them. [verified] (crates/project)
+
+  The gradient is therefore this population's neighbourhood and not this population. The siblings
+  sit at the poor end — 22, 17, 11, 6 and 7 of them across the wealth fifths — and raise it; what
+  makes it a gradient is the 81 other districts in the poorest fifth, whose $119.29 a pupil is
+  already fourteen times the wealthiest fifth's. [inference]
+
+  **A shape written inside `[H]` is self-extinguishing for the siblings, and the statutory date
+  arrives before they do.** Split the 64 at their median years-to-the-floor and the inside-`[H]`
+  mirror's absorbed share is **0.0760** on the half nearest their floors and nothing at all on the
+  further half: the shape pays a district until the district arrives, and the 89 are what the 64
+  become. Beside the floors it absorbs nothing for either population, by construction, because
+  `[L]`, `[M]` and `[O]` are the three lines outside `[L1]`'s subtrahend. The clock is the other
+  half of the answer. The median sibling reaches its own floor in 4.14 years, about FY2031; at the
+  damping that ships 5 of the 64 are on the floor by FY2036 and undamped **38** are. R.C. 3317.019
+  anchors the guarantee at FY2027, four years before the median arrival, which is why a dated
+  phase-down pays them nothing here and would pay them nothing in any year. [verified]
+  (crates/project)
+
+  **The 153 and the 169 price differently, so both are reported.** The mirror beside the floors is
+  worth **$65,713,492.58** over the cluster and the siblings unioned and **$69,915,878.09** over
+  every district shrinking at the cluster's median rate or faster. Neither population contains the
+  other, and a shape's per-pupil figure differs between them by enough to change which one looks
+  generous: the 2% cap costs the union $14.65 a pupil and the rate-defined population $57.61.
+  [verified] (crates/project)
+
   **A fitted partition finds the cluster at no k.** A k-means on six standardized profile
   variables — log enrolled ADM, the enrollment term, log capacity per pupil, the DPIA share, base
   cost per pupil and the fourteen-year enrollment rate, none of them a formula output — was run
@@ -961,6 +1027,86 @@ figures:
     value: 169
     field: findings
     as_written: "cluster's median rate or faster are **169**"
+  - key: project/decline-response-mirror-beside-to-the-siblings
+    value: 19692848.91400001
+    field: findings
+    as_written: "**$19,692,848.91**"
+  - key: project/decline-response-mirror-beside-to-the-siblings-per-pupil
+    value: 241.95074141209057
+    field: findings
+    as_written: "**$241.95** a pupil"
+  - key: project/decline-response-mirror-beside-to-the-cluster
+    value: 46020643.66949997
+    field: findings
+    as_written: "against **$46,020,643.67** and"
+  - key: project/decline-response-mirror-inside-h-to-the-siblings
+    value: 19112356.872500006
+    field: findings
+    as_written: "pays them **$19,112,356.87** against"
+  - key: project/decline-response-mirror-inside-h-to-the-cluster
+    value: 4195897.4244999995
+    field: findings
+    as_written: "**$4,195,897.42**"
+  - key: project/decline-response-rolling-count-to-the-siblings
+    value: 22359204.11601005
+    field: findings
+    as_written: "pays them **$22,359,204.12**"
+  - key: project/decline-response-rolling-count-to-the-siblings-per-pupil
+    value: 274.7101771245985
+    field: findings
+    as_written: "**$274.71** a pupil"
+  - key: project/decline-response-ratchet-to-the-siblings
+    value: 14794631.127869152
+    field: findings
+    as_written: "pays them **$14,794,631.13**"
+  - key: project/decline-response-ratchet-moves-siblings
+    value: 59
+    field: findings
+    as_written: "moves **59** of the 64"
+  - key: project/decline-response-ratchet-moves-cluster-districts
+    value: 0
+    field: findings
+    as_written: "**59** of the 64 and **0** of the 89"
+  - key: project/decline-response-dated-phase-down-moves-cluster-districts
+    value: 7
+    field: findings
+    as_written: "moves **7** of the 89"
+  - key: project/decline-response-dated-phase-down-moves-siblings
+    value: 0
+    field: findings
+    as_written: "**7** of the 89 and **0** of the 64"
+  - key: project/the-mirror-inside-h-absorbed-on-the-cluster
+    value: 0.9088257553581152
+    field: findings
+    as_written: "take back **0.9088** of the cluster"
+  - key: project/the-mirror-inside-h-absorbed-on-the-siblings
+    value: 0.02947730133080484
+    field: findings
+    as_written: "**0.0295** of the siblings"
+  - key: project/the-siblings-share-of-the-least-wealthy-fifths-rolling-count
+    value: 0.38548492470357265
+    field: findings
+    as_written: "the siblings hold **0.3855** on 22"
+  - key: project/the-rolling-counts-least-wealthy-fifth-per-pupil-without-the-siblings
+    value: 119.28531096924164
+    field: findings
+    as_written: "still pays **$119.29** a pupil"
+  - key: project/the-mirror-inside-h-absorbed-on-the-siblings-nearest-the-floor
+    value: 0.07596254515046685
+    field: findings
+    as_written: "absorbed share is **0.0760** on the half nearest"
+  - key: project/the-siblings-on-the-floor-by-fy2036-undamped
+    value: 38
+    field: findings
+    as_written: "undamped **38** are"
+  - key: project/decline-response-mirror-beside-over-the-153
+    value: 65713492.583499946
+    field: findings
+    as_written: "worth **$65,713,492.58** over the cluster"
+  - key: project/decline-response-mirror-beside-over-the-169
+    value: 69915878.086
+    field: findings
+    as_written: "**$69,915,878.09** over"
 revisions:
   - was: |
       A hold-harmless and nothing else: computed funding below a baseline, pay the difference.

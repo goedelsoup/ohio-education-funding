@@ -410,6 +410,49 @@ impl Band {
     }
 }
 
+/// A district's position on an axis, or `None` where it publishes nothing to be placed on.
+fn position(movement: &Movement, axis: Axis) -> Option<f64> {
+    match axis {
+        Axis::Valuation => movement.valuation_per_pupil,
+        Axis::Poverty => Some(movement.poverty),
+    }
+}
+
+/// The bands themselves, before anything is summed over them.
+///
+/// [`by`] is this function plus a sum, and [`crate::decline_reach::split_by`] is this function
+/// plus a different sum — so a band there and a band here hold the same districts by
+/// construction rather than by two sorts agreeing.
+///
+/// Bands are equal in count, not in width: `width` is the placed districts over `bands` and the
+/// last band takes the remainder, so with 520 placed and five bands the last holds 105.
+pub fn banded<'a>(
+    movements: &'a [Movement],
+    axis: Axis,
+    bands: usize,
+    exclude: &BTreeSet<String>,
+) -> Vec<Vec<&'a Movement>> {
+    assert!(bands > 0, "at least one band");
+    let mut placed: Vec<(f64, &Movement)> = movements
+        .iter()
+        .filter(|movement| !exclude.contains(&movement.irn))
+        .filter_map(|movement| Some((position(movement, axis)?, movement)))
+        .collect();
+    placed.sort_by(|a, b| a.0.total_cmp(&b.0));
+
+    let width = placed.len() / bands;
+    (0..bands)
+        .map(|index| {
+            let slice = if index + 1 == bands {
+                &placed[index * width..]
+            } else {
+                &placed[index * width..(index + 1) * width]
+            };
+            slice.iter().map(|(_, movement)| *movement).collect()
+        })
+        .collect()
+}
+
 /// Cut a set of movements into equal bands on an axis.
 ///
 /// Districts publishing nothing on the axis are dropped, as [`crate::transport::floor::incidence`]
@@ -422,28 +465,10 @@ pub fn by(
     bands: usize,
     exclude: &BTreeSet<String>,
 ) -> Vec<Band> {
-    assert!(bands > 0, "at least one band");
-    let mut placed: Vec<(f64, &Movement)> = movements
-        .iter()
-        .filter(|movement| !exclude.contains(&movement.irn))
-        .filter_map(|movement| {
-            let position = match axis {
-                Axis::Valuation => movement.valuation_per_pupil?,
-                Axis::Poverty => movement.poverty,
-            };
-            Some((position, movement))
-        })
-        .collect();
-    placed.sort_by(|a, b| a.0.total_cmp(&b.0));
-
-    let width = placed.len() / bands;
-    (0..bands)
-        .map(|index| {
-            let slice = if index + 1 == bands {
-                &placed[index * width..]
-            } else {
-                &placed[index * width..(index + 1) * width]
-            };
+    banded(movements, axis, bands, exclude)
+        .into_iter()
+        .enumerate()
+        .map(|(index, slice)| {
             let mut out = Band {
                 rank: index + 1,
                 districts: slice.len(),
@@ -456,9 +481,12 @@ pub fn by(
                 held_as_enacted: 0,
                 held_under_alternative: 0,
                 guarantee_delta: 0.0,
-                median_position: slice.get(slice.len() / 2).map_or(0.0, |(p, _)| *p),
+                median_position: slice
+                    .get(slice.len() / 2)
+                    .and_then(|movement| position(movement, axis))
+                    .unwrap_or(0.0),
             };
-            for (_, movement) in slice {
+            for movement in slice {
                 out.adm += movement.adm;
                 out.delta += movement.delta();
                 out.guarantee_delta +=
