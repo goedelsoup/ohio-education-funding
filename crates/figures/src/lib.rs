@@ -8961,6 +8961,55 @@ pub static FIGURES: &[Figure] = &[
                 .count() as f64
         },
     },
+    // The one staffing floor a published count can be set against. #408 opened the profile
+    // report's personnel block and found one count, administrators; these three are the level
+    // and the gradient of employed against funded for it.
+    Figure {
+        key: "project/districts-employing-fewer-administrators-than-funded",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts whose FY2024 FTE administrators are fewer than the four administrator \
+                elements of R.C. 3317.011 fund at their own enrolment",
+        pinned: 47.0,
+        tolerance: 0.0,
+        compute: |i| {
+            project::administrator_staffing::districts(&i.profile, &i.panel)
+                .iter()
+                .filter(|d| d.employed < d.funded.total())
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "project/administrator-multiple-below-the-floor-threshold",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "Median employed-to-funded administrators among the districts under 1,500 ADM, \
+                where the two-administrator floor binds",
+        pinned: 1.5156,
+        tolerance: 0.0005,
+        compute: |i| {
+            let rows = project::administrator_staffing::districts(&i.profile, &i.panel);
+            project::administrator_staffing::band(
+                &rows.iter().filter(|d| d.floored()).collect::<Vec<_>>(),
+            )
+            .multiple
+        },
+    },
+    Figure {
+        key: "project/administrator-multiple-above-the-floor-threshold",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The same median among the districts at or above 1,500 ADM, where it does not",
+        pinned: 1.8354,
+        tolerance: 0.0005,
+        compute: |i| {
+            let rows = project::administrator_staffing::districts(&i.profile, &i.panel);
+            project::administrator_staffing::band(
+                &rows.iter().filter(|d| !d.floored()).collect::<Vec<_>>(),
+            )
+            .multiple
+        },
+    },
     // Targeted assistance's capacity tier, which is the plan's second size-dependent term and
     // the one nothing had named. #389 accounted for half of the guarantee's size curve with the
     // staffing floors and read the residual as "not size"; these four say what it is.

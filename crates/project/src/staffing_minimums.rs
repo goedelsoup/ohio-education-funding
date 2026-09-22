@@ -130,6 +130,12 @@
 //! Which is what a threshold nobody can manipulate their enrolment against should look like, and
 //! is worth saying because the counterfactual in §1 would read very differently if districts were
 //! choosing which side to sit on.
+//!
+//! # Whether the floors are in the right places
+//!
+//! Not answerable here, and answerable for one of them elsewhere. [`crate::administrator_staffing`]
+//! sets the (F)(3) floor against the one staff count a committed source carries, the District
+//! Profile Report's FTE administrators; the other six floors have no count to be set against.
 
 use std::collections::BTreeMap;
 

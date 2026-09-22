@@ -109,11 +109,15 @@
 //!
 //! # What is not established here
 //!
-//! Whether the floors are set in the right places. Nothing in this repository carries a
-//! district's actual staffing, so "six special teachers" cannot be compared against six special
-//! teachers. What can be said is what the floors cost, who they reach, and that their shape is a
-//! decay rather than a cliff — and that the one genuine discontinuity in the whole section, the
-//! athletics eligibility test at (A)(11), is dormant: all 609 districts are eligible.
+//! Whether the floors are set in the right places. When this was written nothing in the
+//! repository carried a district's actual staffing, so "six special teachers" could not be
+//! compared against six special teachers. `the_one_staffing_floor_the_profile_report_can_see.rs`
+//! since found the one count a committed source has — FTE administrators, from the District
+//! Profile Report — and set the (F)(3) floor against it; the other six still cannot be compared
+//! against anything, for want of a count rather than for want of looking. What can be said here
+//! is what the floors cost, who they reach, and that their shape is a decay rather than a cliff
+//! — and that the one genuine discontinuity in the whole section, the athletics eligibility test
+//! at (A)(11), is dormant: all 609 districts are eligible.
 
 use foundation::minimums::Minimum;
 use foundation::{aggregate_base_cost, ratios, DistrictEnrollment, StatewideFactors};

@@ -30,7 +30,7 @@ Sorted by: type, then slug.
 | [`bls-cpi-u`](bls-cpi-u.md) | CPI-U all items — the Bureau of Labor Statistics flat file | 3 |
 | [`census-block-geography`](census-block-geography.md) | Census block geography: school districts, legislative districts, and population | 1 |
 | [`census-f33-school-system-finances`](census-f33-school-system-finances.md) | Annual Survey of School System Finances (F-33) | 10 |
-| [`cupp-district-profile-report`](cupp-district-profile-report.md) | District Profile Report — the "Cupp Report" | 6 |
+| [`cupp-district-profile-report`](cupp-district-profile-report.md) | District Profile Report — the "Cupp Report" | 7 |
 | [`derolph-litigation-record`](derolph-litigation-record.md) | DeRolph Litigation Record | 6 |
 | [`dew-academic-distress-commission`](dew-academic-distress-commission.md) | Academic Distress Commission — the department's commission page | 4 |
 | [`dew-career-technical-planning-districts`](dew-career-technical-planning-districts.md) | Ohio Career-Technical Planning Districts | 1 |
