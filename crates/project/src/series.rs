@@ -18,9 +18,14 @@
 //! [`HORIZON_EXPONENT`] is the fix and is fitted to that coverage; the shortfall is now under
 //! three points at every horizon the backtest reaches — which
 //! `tests/the_horizons_the_backtest_stopped_short_of.rs` establishes is **thirteen** years, past
-//! every horizon this crate publishes. What is not measured out there is the point the band is
-//! drawn around: the mean log error reaches +0.056 at ten years, and an interval centred on a
-//! biased point inherits the bias whatever its width.
+//! every horizon this crate publishes. The point the band is drawn around runs high out there —
+//! the mean district's log error reaches +0.056 at ten years, the statewide total's +0.032 —
+//! and `tests/the_bias_that_belongs_to_the_years.rs` establishes that it is a year effect and
+//! not a district one: sorted on anything a forecast could see at its origin, every quarter of
+//! districts is forecast high by about the same amount, and a district's own rate persists at
+//! three tenths however long it is measured, which is what [`DEFAULT_DAMPING`] already carries.
+//! Neither the rate nor the level is a lever, so the bias is published beside the point rather
+//! than corrected out of it.
 
 use edfund_core::FiscalYear;
 
@@ -161,6 +166,18 @@ impl Method {
 /// worse than the optimum, and a least-squares straight line is worse still and gets worse with
 /// more history — it projects a district through zero, which is the failure damping exists to
 /// prevent.
+///
+/// # And the persistence is the same at every horizon, so there is no longer trend to carry
+///
+/// The fair objection to a damping of 0.30 is that it discards a district's trend after about
+/// 1.43 years, and a district that has shrunk for a decade might be expected to keep shrinking.
+/// `tests/the_bias_that_belongs_to_the_years.rs` measures that expectation: a district's long-run
+/// rate to an origin predicts its rate over the next three, five, seven or nine years at a
+/// correlation of **0.30, 0.29, 0.29 and 0.27** — the same three tenths as year on year — and
+/// relative to the state's rate it is no more persistent. Decaying the rate toward a share of
+/// the long-run rate rather than toward zero over-corrects at every share above five hundredths,
+/// and five hundredths is worth a third of a percent. What this constant discards is what the
+/// panel says does not persist.
 ///
 /// # And the department's own series now agrees, which it could not before
 ///

@@ -508,11 +508,23 @@ properties:
     differ, because the errors are not normal, but the size of the gap was a property of the
     five-year fit rather than of the distribution.
 
-    **[open]** What to do about the bias, which is now the binding limit on a long projection
-    rather than the band. Mean log error reaches **+0.056** at the feed's ten-year horizon, so the
-    point sits about 5.8% high, and `the_bias_no_single_damping_can_remove` establishes that no
-    value of the damping takes it out. De-biasing the point estimate is a decision with a record
-    and has not been taken.
+    [verified] **The bias is the binding limit on a long projection, and it is a year effect
+    that no correction keyed on a district can reach.** Mean log error reaches **+0.056** at the
+    feed's ten-year horizon, so the mean district's point sits about 5.8% high; the statewide
+    total's sits **3.2%** high there and was within 0.7% at every horizon to seven years before
+    the closure, with a sign that changes from origin to origin. Sorted on anything a forecast
+    could see at its origin every quarter of districts is forecast high by about the same amount,
+    and a district's long-run rate persists into its next three to nine years at **0.27 to
+    0.30** — the three tenths the damping already carries. Decaying the rate toward a share of
+    the long-run rate over-corrects at every share above five hundredths, a drift fitted before
+    the closure removes half of what crosses it and puts the total a point low before it, and an
+    asymmetric band holds less than shifting the centre by the same amount. Neither the centre
+    nor the band is corrected. Measured in
+    `crates/project/tests/the_bias_that_belongs_to_the_years.rs`.
+
+    [inference] The remedy is to publish the bias beside the projection: two figures per
+    horizon, the mean district's and the total's, before the closure and across it. That is a
+    feed field, and a decision of its own.
 
     138 districts sit at the minimum state share and their response to a base cost increase
     cannot be computed, because the floor censors the quantity it would be computed from. They

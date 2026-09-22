@@ -46,13 +46,23 @@
 //! fifteen-year rate this table sorts on — the gap between them is largest where the long rate
 //! is smallest.
 //!
-//! **The fastest-declining quarter of Ohio districts are forecast 8% too high at five years.**
+//! **The table sorts on the whole panel, which includes the target years.** A district that
+//! shrank fastest over FY2009–FY2024 was shrinking during the years these forecasts are scored
+//! on, so the gradient above is what the arithmetic predicts *given the outcome*. Sorted on the
+//! rate a forecast could see at its origin, the quarters do not order — +0.002, +0.021, +0.030,
+//! +0.015 on this same population — and every one is forecast high. The bias is shared across
+//! districts, which is what a period effect looks like; `the_bias_that_belongs_to_the_years`
+//! measures it that way and finds that a district's rate to the origin predicts its next
+//! decade at three tenths, however long the decade.
+//!
+//! **The fastest-declining quarter of Ohio districts were forecast 8% too high at five years.**
 //! Those are disproportionately the districts the guarantee protects — 57.2% of that quarter are
-//! on the guarantee at observed enrolment against 34.2% of the flattest quarter — so the
-//! over-forecast lands hardest where the guarantee is what pays, and the error runs in the
-//! direction that under-states guarantee reliance. The gradient is not clean: the two middle
-//! quarters sit at 48.7% and 53.3%, so this is a difference between the flattest quarter and the
-//! rest rather than a rate-by-rate relationship.
+//! on the guarantee at observed enrolment against 34.2% of the flattest quarter — so in the
+//! backtest the over-forecast landed hardest where the guarantee is what pays, in the direction
+//! that under-states guarantee reliance. Whether it lands there in the feed's own decade is a
+//! claim about persistence, and persistence is three tenths. The gradient is not clean either:
+//! the two middle quarters sit at 48.7% and 53.3%, so this is a difference between the flattest
+//! quarter and the rest rather than a rate-by-rate relationship.
 //!
 //! # At the published horizon the trend is simply gone
 //!
@@ -80,8 +90,10 @@
 //!
 //! It does not move the constant. 0.30 minimises the error the decisions were made on, the
 //! backtest reaches thirteen years and the feed publishes ten, and an undamped projection would trade
-//! a known bias for 41% more dispersion. Whether the point estimate should be de-biased is a
-//! decision with a record. What is settled here is its size and its cause.
+//! a known bias for 41% more dispersion. Whether the point estimate should be de-biased was left
+//! to a decision with a record; `the_bias_that_belongs_to_the_years` answers it no, on the rate
+//! and on the level, and the bias is published beside the point instead. What is settled here
+//! is its size and its arithmetic.
 //!
 //! [`the-fitted-damping`]: ../../../.yidam/decisions/the-fitted-damping.yml
 //! [`the-shrunk-rate`]: ../../../.yidam/decisions/the-shrunk-rate.yml
@@ -267,9 +279,13 @@ fn the_undamped_trend_pays_for_its_lack_of_bias_in_dispersion() {
 
 /// The bias tracks the district's own long-run rate, and changes sign where the rate does.
 ///
-/// A period artefact would show as a bias shared across districts. This is not that: it is
-/// proportional to how fast a district is shrinking, which is what a mechanical explanation
-/// predicts and a period explanation does not.
+/// Sorted on the rate over the **whole panel**, FY2009 to FY2024 — which includes the years the
+/// forecasts are scored on. This is the arithmetic of damping given the outcome: a district that
+/// kept shrinking was forecast high by the trend it kept. It is not a statement about what a
+/// forecast could have corrected. Sorted on the rate to the origin the quarters do not order and
+/// every one is forecast high, so the bias is shared across districts — a period effect after
+/// all. `the_bias_that_belongs_to_the_years::sorted_on_what_the_forecast_could_see_the_bias_has_no_gradient`
+/// holds both sorts on this population.
 #[test]
 fn the_bias_is_proportional_to_how_fast_a_district_is_shrinking() {
     let histories = complete_histories();
