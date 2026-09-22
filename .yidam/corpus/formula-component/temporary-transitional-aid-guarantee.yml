@@ -389,11 +389,78 @@ findings: |
   against re-shaping the anchor on its own, and not an argument for any particular shape.
   [verified] (crates/project)
 
-  **[open]** Who a cap reaches outside the cluster. 565 districts are held under a ratchet and 246
-  under a 2% cap; their incidence by wealth or poverty is the question
-  `the_adjustment_the_floors_absorb.rs` left open about its own four shapes and it is still open
-  about these three. The statewide sign flipping at a 1% cap — more districts held, more total
-  support, less guarantee — is the visible edge of it.
+  ### Who every alternative reaches outside the cluster, and why they all run the same way
+
+  Outside the 89, the enacted floor holds the wealthy and not the poor. Cut the 520 other
+  districts into fifths by assessed valuation per pupil and the FY2027 guarantee holds none of the
+  103 least wealthy and **77** of the 105 wealthiest — the 13%, 37%, 68%, 76% quartile gradient
+  above with the enrollment cluster taken out. Every rule below is a *change* from that one, so a
+  rule that narrows the floor takes money from the wealthy, and a rule that reaches districts the
+  floor does not — the ones the formula pays — gives money to the poor. Measured on total state
+  support throughout, because `[K]` stands behind the line every rule moves. [verified]
+  (crates/project)
+
+  **A ratchet adds money, and adds it at the bottom.** A prior-year anchor catches every district
+  whose computed amount falls, and the districts with the most formula aid a pupil to lose are the
+  poor ones. Walked to FY2032 it adds **$138.58** a pupil to the least-wealthy fifth and **$3.75**
+  to the wealthiest, monotone across the five; by economically disadvantaged share, $4.06 to the
+  least-poor fifth and **$108.08** to the poorest. **253** districts outside the cluster gain and
+  none loses, and the ten largest gainers hold a quarter of it. [verified] (crates/project)
+
+  **A cap takes money, and takes it at the top — and the backstop decides how much lands.** A cap
+  on the annual fall lets a held district's floor decline, so it is a cut to the districts the
+  enacted anchor holds. At FY2032 a 2% cap takes nothing from the least-wealthy fifth, whose two
+  held districts are fully backstopped, and **$83.51** a pupil from the fourth; by disadvantaged
+  share it takes $101.52 from the second-least-poor fifth and **$5.33** from the poorest. **145**
+  districts lose and one gains. [verified] (crates/project)
+
+  The poorest fifth's small loss is `[K]` rather than the cap: its guarantee falls $24.7m and its
+  total state support $1.6m, so **93.4%** of the cut comes straight back, against **35.9%** in the
+  least-poor fifth. The absorption the cap showed for the cluster has a gradient of its own outside
+  it, and the gradient runs the same way as everything else here — the backstop catches the poor
+  and not the wealthy, which is what [guarantee-phase-out](../scenario/guarantee-phase-out.yml)
+  found about retiring the guarantee outright. On `[I]` the cap's cut to the poorest fifth reads
+  $24.7m; on the measure a district is paid on, it is $1.6m. [verified] (crates/project)
+
+  **The 1% cap's aggregate increase is a transfer, broad on both sides.** At FY2036 undamped the
+  cap raises statewide total state support $7.7m while holding more districts for less guarantee.
+  Outside the cluster that is **112** districts gaining **$53,969,540** and **119** losing
+  **$43,682,097** — a net a fifth the size of either side. The poor gain and the wealthy lose:
+  **$141.73** a pupil more in the least-wealthy fifth against **$55.40** less in the wealthiest,
+  $123.40 more in the poorest against $68.15 less in the least poor. The ten largest gainers hold
+  **36.5%** of the gain, the largest is Maple Heights City at $3.8m, and 77 of the 112 are in the
+  two least-wealthy fifths: a general shift down the wealth distribution, not a few large
+  districts. [verified] (crates/project)
+
+  A cap can give because by FY2036 a formula district's aid has fallen far enough that 99% of
+  last year's stands above its FY2020 base, and the districts in that condition are the ones the
+  formula has been paying. At 2% the same rule is a net cut again, $5.0m gained against $54.6m
+  lost, because fewer districts fall faster than 2% a year. The rate decides the sign and never
+  the direction. [verified] (crates/project)
+
+  **And the four supplements agree.** The same cut of what
+  [`the_adjustment_the_floors_absorb.rs`](../../../crates/project/tests/the_adjustment_the_floors_absorb.rs)
+  priced, at the modelled year, outside the cluster, per pupil:
+
+      shape                              least wealthy   wealthiest   poorest   least poor
+      rolling pupil count                      $166.55       $11.43   $109.79       $11.68
+      mirror [M], inside [H]                   $114.22       $20.42    $78.69       $25.40
+      mirror [M], beside [L], [M], [O]         $114.22       $96.88    $99.10       $91.36
+      dated phase-down                           $0.00        $0.00     $0.00        $0.00
+
+  The rolling count and the mirror inside `[H]` are progressive for the reason the ratchet is:
+  they are written inside the floors, and the floors absorb them where the wealthy are held. The
+  mirror written beside every floor is the one shape with no gradient — $114 against $97 by
+  wealth, hump-shaped by poverty — because it pays on the roll of any district past its threshold
+  whatever its wealth, and no floor reads the line. The dated phase-down reaches nobody outside
+  the cluster by construction. [verified] (crates/project)
+
+  So the shapes do not disagree about who they reach. Every one of the seven is progressive
+  against the enacted anchor or flat, and none is regressive. The choice between them is not
+  distributional in direction; it is the sign and the size — add money at the bottom, with a
+  ratchet, the rolling count or either mirror, or take it at the top, with a cap — and at a long
+  enough horizon the 1% cap does both. That is the fiscal framing the two pricings used, and it
+  survives the cut. [inference]
 
 figures:
   - key: project/guarantee-on-a-prior-year-anchor
@@ -428,6 +495,90 @@ figures:
     value: 0.2680664690
     field: findings
     as_written: "**26.81%**"
+  - key: project/wealthiest-fifth-held-by-the-enacted-anchor-outside-the-cluster
+    value: 77
+    field: findings
+    as_written: "**77** of the 105 wealthiest"
+  - key: project/a-ratchets-gain-per-pupil-in-the-least-wealthy-fifth
+    value: 138.58305999480032
+    field: findings
+    as_written: "**$138.58** a pupil to the least-wealthy fifth"
+  - key: project/a-ratchets-gain-per-pupil-in-the-wealthiest-fifth
+    value: 3.749657007435183
+    field: findings
+    as_written: "**$3.75**\n  to the wealthiest"
+  - key: project/a-ratchets-gain-per-pupil-in-the-poorest-fifth
+    value: 108.07914793556802
+    field: findings
+    as_written: "**$108.08** to the poorest"
+  - key: project/districts-outside-the-cluster-a-ratchet-reaches
+    value: 253
+    field: findings
+    as_written: "**253** districts outside the cluster gain"
+  - key: project/a-caps-cut-per-pupil-in-the-fourth-wealth-fifth
+    value: 83.51133553785604
+    field: findings
+    as_written: "**$83.51** a pupil from the fourth"
+  - key: project/a-caps-cut-per-pupil-in-the-poorest-fifth
+    value: 5.327190881204195
+    field: findings
+    as_written: "**$5.33** from the poorest"
+  - key: project/the-caps-cut-to-the-poorest-fifth-returned-by-the-backstop
+    value: 0.9340
+    field: findings
+    as_written: "**93.4%** of the cut comes straight back"
+  - key: project/the-caps-cut-to-the-least-poor-fifth-returned-by-the-backstop
+    value: 0.3590
+    field: findings
+    as_written: "**35.9%** in the\n  least-poor fifth"
+  - key: project/districts-outside-the-cluster-a-cap-cuts
+    value: 145
+    field: findings
+    as_written: "**145**\n  districts lose and one gains"
+  - key: project/the-gentle-caps-gainers-outside-the-cluster
+    value: 112
+    field: findings
+    as_written: "**112** districts gaining"
+  - key: project/the-gentle-caps-losers-outside-the-cluster
+    value: 119
+    field: findings
+    as_written: "**119** losing"
+  - key: project/what-the-gentle-caps-gainers-gain
+    value: 53969540.18710709
+    field: findings
+    as_written: "**$53,969,540**"
+  - key: project/what-the-gentle-caps-losers-lose
+    value: 43682096.55613594
+    field: findings
+    as_written: "**$43,682,097**"
+  - key: project/the-gentle-caps-gain-per-pupil-in-the-least-wealthy-fifth
+    value: 141.73005392214026
+    field: findings
+    as_written: "**$141.73** a pupil more in the least-wealthy fifth"
+  - key: project/the-gentle-caps-cut-per-pupil-in-the-wealthiest-fifth
+    value: 55.399558136849734
+    field: findings
+    as_written: "**$55.40** less in the wealthiest"
+  - key: project/the-gentle-caps-ten-largest-gainers-share
+    value: 0.3649
+    field: findings
+    as_written: "**36.5%** of the gain"
+  - key: project/the-rolling-counts-gain-per-pupil-in-the-least-wealthy-fifth
+    value: 166.55179362304244
+    field: findings
+    as_written: "$166.55"
+  - key: project/the-rolling-counts-gain-per-pupil-in-the-wealthiest-fifth
+    value: 11.432868049938424
+    field: findings
+    as_written: "$11.43"
+  - key: project/the-mirror-inside-h-per-pupil-in-the-wealthiest-fifth
+    value: 20.42079939473348
+    field: findings
+    as_written: "$20.42"
+  - key: project/the-mirror-beside-per-pupil-in-the-wealthiest-fifth
+    value: 96.88157074038864
+    field: findings
+    as_written: "$96.88"
   - key: project/marginal-pupil-no-foundation-aid-districts
     value: 294
     field: findings

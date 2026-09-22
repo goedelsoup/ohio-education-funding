@@ -332,6 +332,12 @@ pub struct Inputs {
     /// states what a rolling anchor costs, and a rule whose price is quoted in prose and computed
     /// nowhere the corpus can see is the #120 shape.
     pub anchors: Anchors,
+    /// Who each anchor rule and each of #400's shapes reaches outside the enrollment cluster.
+    ///
+    /// Here because the same node states a gradient on every one of them, and a gradient quoted
+    /// in prose from a walk nobody re-runs is the #120 shape twice over: it is a delta, and the
+    /// measure it is taken on has already widened once under a bound level.
+    pub reach: Reach,
 }
 
 /// `rolling_anchor`'s runs, computed once because each walks all 609 districts for five years.
@@ -354,6 +360,50 @@ pub struct Anchors {
     pub fy2036_cluster_as_enacted: project::rolling_anchor::Held,
     /// And under the 2% cap, which holds the same share on a different line.
     pub fy2036_cluster_capped: project::rolling_anchor::Held,
+}
+
+/// `anchor_incidence`'s frames, one per rule, each against the rule in force.
+///
+/// A frame is every district's movement in total state support; the figures cut it into fifths
+/// on an axis at compute time, which is cheap, and leave the cluster out, which is the question.
+pub struct Reach {
+    /// The 89, as the set every cut leaves out.
+    pub cluster: BTreeSet<String>,
+    /// A prior-year ratchet against the enacted anchor, walked to FY2032 at the shipped damping.
+    pub ratchet_fy2032: Vec<project::anchor_incidence::Movement>,
+    /// A 2% cap on the annual fall against the enacted anchor, the same walk.
+    pub capped_fy2032: Vec<project::anchor_incidence::Movement>,
+    /// A 1% cap against the enacted anchor, walked to FY2036 undamped — where the sign flips.
+    pub gentle_cap_fy2036: Vec<project::anchor_incidence::Movement>,
+    /// The rolling pupil count against current law, at the modelled year.
+    pub rolling_count: Vec<project::anchor_incidence::Movement>,
+    /// `[M]` mirrored inside `[H]`.
+    pub mirror_inside: Vec<project::anchor_incidence::Movement>,
+    /// `[M]` mirrored beside `[L]`, `[M]` and `[O]`.
+    pub mirror_beside: Vec<project::anchor_incidence::Movement>,
+}
+
+impl Reach {
+    /// One fifth of one frame on one axis, outside the cluster. `rank` is 1 to 5, lowest first.
+    fn fifth(
+        &self,
+        frame: &[project::anchor_incidence::Movement],
+        axis: project::anchor_incidence::Axis,
+        rank: usize,
+    ) -> project::anchor_incidence::Band {
+        project::anchor_incidence::by(frame, axis, 5, &self.cluster)
+            .into_iter()
+            .find(|band| band.rank == rank)
+            .expect("five bands, ranks 1 to 5")
+    }
+
+    /// The spread of one frame outside the cluster.
+    fn spread(
+        &self,
+        frame: &[project::anchor_incidence::Movement],
+    ) -> project::anchor_incidence::Spread {
+        project::anchor_incidence::spread(frame, &self.cluster)
+    }
 }
 
 /// The FY2016 move, measured against the tax base and the formula that arrived that year.
@@ -693,6 +743,93 @@ impl Inputs {
         ordered.sort_by(|a, b| a.0.cmp(b.0));
         let actual_total = ordered.iter().map(|(_, r)| r.actual).sum();
         let recognized_total = ordered.iter().map(|(_, r)| r.recognized).sum();
+        let (anchors, reach) = {
+            use project::anchor_incidence::{self, Supplement};
+            use project::decline_adjustment::Line;
+            use project::rolling_anchor::{self, Anchor, Observed};
+            // `shrunk` is local to the `forecasts` block below; the same construction, so that a
+            // walk and a forecast are the same projection at the same parameters.
+            let shrunk = |damping: f64| project::series::Method::Shrunk {
+                rate: 0.0,
+                damping,
+                weight: project::series::DEFAULT_SHRINK_WEIGHT,
+                toward: 0.0,
+            };
+            let cluster: BTreeSet<String> =
+                project::enrollment_decline::cluster(&panel_for_forecasts)
+                    .into_iter()
+                    .map(|record| record.irn.clone())
+                    .collect();
+            // Every walk is kept as its standings, because the incidence frames are joins of two
+            // of them and a walk is the expensive half of a figure here.
+            let walk = |through: u16, damping: f64, anchor: Anchor| {
+                rolling_anchor::walk(
+                    &panel_for_forecasts,
+                    FiscalYear(through),
+                    shrunk(damping),
+                    anchor,
+                )
+            };
+            let summarize =
+                |through: u16, standings: &BTreeMap<String, rolling_anchor::Standing>| {
+                    let year = FiscalYear(through);
+                    (
+                        rolling_anchor::summarize(year, standings.values()),
+                        rolling_anchor::summarize(
+                            year,
+                            standings.values().filter(|s| cluster.contains(&s.irn)),
+                        ),
+                    )
+                };
+            let capped = Anchor::Decayed { factor: 0.98 };
+            let damping = project::series::DEFAULT_DAMPING;
+            let fy2032_enacted = walk(2032, damping, Anchor::Fixed);
+            let fy2032_ratchet = walk(2032, damping, Anchor::PriorYear);
+            let fy2032_capped = walk(2032, damping, capped);
+            let fy2036_enacted = walk(2036, 1.0, Anchor::Fixed);
+            let fy2036_capped = walk(2036, 1.0, capped);
+            let fy2036_gentle = walk(2036, 1.0, Anchor::Decayed { factor: 0.99 });
+            let (fy2032_as_enacted, fy2032_cluster_as_enacted) = summarize(2032, &fy2032_enacted);
+            let (fy2032_prior_year, _) = summarize(2032, &fy2032_ratchet);
+            let (fy2032_capped_all, fy2032_cluster_capped) = summarize(2032, &fy2032_capped);
+            let (_, fy2036_cluster_as_enacted) = summarize(2036, &fy2036_enacted);
+            let (_, fy2036_cluster_capped) = summarize(2036, &fy2036_capped);
+            let between =
+                |enacted: &BTreeMap<String, rolling_anchor::Standing>,
+                 alternative: &BTreeMap<String, rolling_anchor::Standing>| {
+                    anchor_incidence::between_walks(&panel_for_forecasts, enacted, alternative)
+                };
+            let under =
+                |shape: Supplement| anchor_incidence::under_supplement(&panel_for_forecasts, shape);
+            (
+                Anchors {
+                    fy2027_as_enacted: rolling_anchor::at_the_modelled_year(
+                        &panel_for_forecasts,
+                        Observed::Fy2020Base,
+                    ),
+                    fy2027_prior_year: rolling_anchor::at_the_modelled_year(
+                        &panel_for_forecasts,
+                        Observed::PriorYearRealized,
+                    ),
+                    fy2032_as_enacted,
+                    fy2032_prior_year,
+                    fy2032_capped: fy2032_capped_all,
+                    fy2032_cluster_as_enacted,
+                    fy2032_cluster_capped,
+                    fy2036_cluster_as_enacted,
+                    fy2036_cluster_capped,
+                },
+                Reach {
+                    ratchet_fy2032: between(&fy2032_enacted, &fy2032_ratchet),
+                    capped_fy2032: between(&fy2032_enacted, &fy2032_capped),
+                    gentle_cap_fy2036: between(&fy2036_enacted, &fy2036_gentle),
+                    rolling_count: under(Supplement::RollingCount),
+                    mirror_inside: under(Supplement::Mirror(Line::Foundation)),
+                    mirror_beside: under(Supplement::Mirror(Line::Beside)),
+                    cluster,
+                },
+            )
+        };
         Self {
             panel,
             at_recognized,
@@ -992,58 +1129,8 @@ impl Inputs {
                     .realized_aid,
                 }
             },
-            anchors: {
-                use project::rolling_anchor::{self, Anchor, Observed};
-                // `shrunk` is local to the `forecasts` block above; the same construction, so
-                // that a walk and a forecast are the same projection at the same parameters.
-                let shrunk = |damping: f64| project::series::Method::Shrunk {
-                    rate: 0.0,
-                    damping,
-                    weight: project::series::DEFAULT_SHRINK_WEIGHT,
-                    toward: 0.0,
-                };
-                let cluster: std::collections::BTreeSet<String> =
-                    project::enrollment_decline::cluster(&panel_for_forecasts)
-                        .into_iter()
-                        .map(|record| record.irn.clone())
-                        .collect();
-                let walk = |through: u16, damping: f64, anchor: Anchor| {
-                    let year = FiscalYear(through);
-                    let standings =
-                        rolling_anchor::walk(&panel_for_forecasts, year, shrunk(damping), anchor);
-                    let all = rolling_anchor::summarize(year, standings.values());
-                    let mine = rolling_anchor::summarize(
-                        year,
-                        standings.values().filter(|s| cluster.contains(&s.irn)),
-                    );
-                    (all, mine)
-                };
-                let capped = Anchor::Decayed { factor: 0.98 };
-                let damping = project::series::DEFAULT_DAMPING;
-                let (fy2032_as_enacted, fy2032_cluster_as_enacted) =
-                    walk(2032, damping, Anchor::Fixed);
-                let (fy2032_prior_year, _) = walk(2032, damping, Anchor::PriorYear);
-                let (fy2032_capped, fy2032_cluster_capped) = walk(2032, damping, capped);
-                let (_, fy2036_cluster_as_enacted) = walk(2036, 1.0, Anchor::Fixed);
-                let (_, fy2036_cluster_capped) = walk(2036, 1.0, capped);
-                Anchors {
-                    fy2027_as_enacted: rolling_anchor::at_the_modelled_year(
-                        &panel_for_forecasts,
-                        Observed::Fy2020Base,
-                    ),
-                    fy2027_prior_year: rolling_anchor::at_the_modelled_year(
-                        &panel_for_forecasts,
-                        Observed::PriorYearRealized,
-                    ),
-                    fy2032_as_enacted,
-                    fy2032_prior_year,
-                    fy2032_capped,
-                    fy2032_cluster_as_enacted,
-                    fy2032_cluster_capped,
-                    fy2036_cluster_as_enacted,
-                    fy2036_cluster_capped,
-                }
-            },
+            anchors,
+            reach,
         }
     }
 }
@@ -9073,6 +9160,335 @@ pub static FIGURES: &[Figure] = &[
         pinned: 0.268_1,
         tolerance: 0.0005,
         compute: |i| i.anchors.fy2036_cluster_capped.held_share(),
+    },
+    // ---- who each rule reaches outside the cluster ----------------------------------------
+    // The same node states, for every anchor rule and every one of #400's shapes, who the money
+    // reaches outside the 89 by wealth and by poverty. Each of these is a difference between two
+    // runs on total state support, cut into fifths, and every one is stated against the enacted
+    // anchor's own population — which holds none of the least-wealthy fifth and 77 of the
+    // wealthiest. Bound because a gradient is a delta, and a delta on a measure that has already
+    // widened once is exactly what `bound-levels-do-not-protect-deltas` is about.
+    Figure {
+        key: "project/wealthiest-fifth-held-by-the-enacted-anchor-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of the 105 wealthiest districts outside the enrollment cluster, how many the \
+                FY2027 guarantee holds \u{2014} against none of the 103 least wealthy",
+        pinned: 77.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.reach
+                .fifth(
+                    &i.reach.rolling_count,
+                    project::anchor_incidence::Axis::Valuation,
+                    5,
+                )
+                .held_as_enacted as f64
+        },
+    },
+    Figure {
+        key: "project/a-ratchets-gain-per-pupil-in-the-least-wealthy-fifth",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a prior-year ratchet adds per pupil to the least-wealthy fifth of districts \
+                outside the cluster at FY2032, on total state support",
+        pinned: 138.58,
+        tolerance: 0.005,
+        compute: |i| {
+            i.reach
+                .fifth(
+                    &i.reach.ratchet_fy2032,
+                    project::anchor_incidence::Axis::Valuation,
+                    1,
+                )
+                .per_pupil()
+        },
+    },
+    Figure {
+        key: "project/a-ratchets-gain-per-pupil-in-the-wealthiest-fifth",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And to the wealthiest fifth \u{2014} thirty-seven times less",
+        pinned: 3.75,
+        tolerance: 0.005,
+        compute: |i| {
+            i.reach
+                .fifth(
+                    &i.reach.ratchet_fy2032,
+                    project::anchor_incidence::Axis::Valuation,
+                    5,
+                )
+                .per_pupil()
+        },
+    },
+    Figure {
+        key: "project/a-ratchets-gain-per-pupil-in-the-poorest-fifth",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same ratchet by economically disadvantaged share: what it adds per pupil to \
+                the poorest fifth, against $4.06 to the least poor",
+        pinned: 108.08,
+        tolerance: 0.005,
+        compute: |i| {
+            i.reach
+                .fifth(
+                    &i.reach.ratchet_fy2032,
+                    project::anchor_incidence::Axis::Poverty,
+                    5,
+                )
+                .per_pupil()
+        },
+    },
+    Figure {
+        key: "project/districts-outside-the-cluster-a-ratchet-reaches",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts outside the cluster whose total state support a ratchet raises at \
+                FY2032; none falls",
+        pinned: 253.0,
+        tolerance: 0.0,
+        compute: |i| i.reach.spread(&i.reach.ratchet_fy2032).gainers as f64,
+    },
+    Figure {
+        key: "project/a-caps-cut-per-pupil-in-the-fourth-wealth-fifth",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a 2% cap on the annual fall takes per pupil from the fourth fifth of \
+                districts by valuation at FY2032, on total state support \u{2014} against \
+                nothing from the least wealthy",
+        pinned: 83.51,
+        tolerance: 0.005,
+        compute: |i| {
+            -i.reach
+                .fifth(
+                    &i.reach.capped_fy2032,
+                    project::anchor_incidence::Axis::Valuation,
+                    4,
+                )
+                .per_pupil()
+        },
+    },
+    Figure {
+        key: "project/a-caps-cut-per-pupil-in-the-poorest-fifth",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And from the poorest fifth by disadvantaged share \u{2014} against $101.52 from \
+                the second-least-poor",
+        pinned: 5.33,
+        tolerance: 0.005,
+        compute: |i| {
+            -i.reach
+                .fifth(
+                    &i.reach.capped_fy2032,
+                    project::anchor_incidence::Axis::Poverty,
+                    5,
+                )
+                .per_pupil()
+        },
+    },
+    Figure {
+        key: "project/the-caps-cut-to-the-poorest-fifth-returned-by-the-backstop",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The share of what the 2% cap takes off the poorest fifth\u{2019}s guarantee that \
+                `[K]` puts straight back",
+        pinned: 0.934,
+        tolerance: 0.001,
+        compute: |i| {
+            i.reach
+                .fifth(
+                    &i.reach.capped_fy2032,
+                    project::anchor_incidence::Axis::Poverty,
+                    5,
+                )
+                .absorbed_share()
+        },
+    },
+    Figure {
+        key: "project/the-caps-cut-to-the-least-poor-fifth-returned-by-the-backstop",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The same for the least-poor fifth \u{2014} the backstop catches the poor and not \
+                the wealthy",
+        pinned: 0.3589,
+        tolerance: 0.001,
+        compute: |i| {
+            i.reach
+                .fifth(
+                    &i.reach.capped_fy2032,
+                    project::anchor_incidence::Axis::Poverty,
+                    1,
+                )
+                .absorbed_share()
+        },
+    },
+    Figure {
+        key: "project/districts-outside-the-cluster-a-cap-cuts",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts outside the cluster whose total state support the 2% cap lowers at \
+                FY2032; one rises",
+        pinned: 145.0,
+        tolerance: 0.0,
+        compute: |i| i.reach.spread(&i.reach.capped_fy2032).losers as f64,
+    },
+    Figure {
+        key: "project/the-gentle-caps-gainers-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts outside the cluster a 1% cap raises at FY2036 undamped \u{2014} the \
+                aggregate increase #390 found is these against the 119 it lowers",
+        pinned: 112.0,
+        tolerance: 0.0,
+        compute: |i| i.reach.spread(&i.reach.gentle_cap_fy2036).gainers as f64,
+    },
+    Figure {
+        key: "project/the-gentle-caps-losers-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "And the districts it lowers",
+        pinned: 119.0,
+        tolerance: 0.0,
+        compute: |i| i.reach.spread(&i.reach.gentle_cap_fy2036).losers as f64,
+    },
+    Figure {
+        key: "project/what-the-gentle-caps-gainers-gain",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the 112 gain between them, in total state support",
+        pinned: 53_969_540.19,
+        tolerance: 0.005,
+        compute: |i| i.reach.spread(&i.reach.gentle_cap_fy2036).gained,
+    },
+    Figure {
+        key: "project/what-the-gentle-caps-losers-lose",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the 119 lose between them \u{2014} the net is the difference of two \
+                numbers several times its size",
+        pinned: 43_682_096.56,
+        tolerance: 0.005,
+        compute: |i| i.reach.spread(&i.reach.gentle_cap_fy2036).lost,
+    },
+    Figure {
+        key: "project/the-gentle-caps-gain-per-pupil-in-the-least-wealthy-fifth",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the 1% cap adds per pupil to the least-wealthy fifth at FY2036",
+        pinned: 141.73,
+        tolerance: 0.005,
+        compute: |i| {
+            i.reach
+                .fifth(
+                    &i.reach.gentle_cap_fy2036,
+                    project::anchor_incidence::Axis::Valuation,
+                    1,
+                )
+                .per_pupil()
+        },
+    },
+    Figure {
+        key: "project/the-gentle-caps-cut-per-pupil-in-the-wealthiest-fifth",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And what it takes per pupil from the wealthiest fifth in the same year",
+        pinned: 55.40,
+        tolerance: 0.005,
+        compute: |i| {
+            -i.reach
+                .fifth(
+                    &i.reach.gentle_cap_fy2036,
+                    project::anchor_incidence::Axis::Valuation,
+                    5,
+                )
+                .per_pupil()
+        },
+    },
+    Figure {
+        key: "project/the-gentle-caps-ten-largest-gainers-share",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The share of the 1% cap\u{2019}s gain held by its ten largest gainers \u{2014} \
+                broad, not a few large districts",
+        pinned: 0.3649,
+        tolerance: 0.001,
+        compute: |i| {
+            i.reach
+                .spread(&i.reach.gentle_cap_fy2036)
+                .top_ten_share_of_gains
+        },
+    },
+    Figure {
+        key: "project/the-rolling-counts-gain-per-pupil-in-the-least-wealthy-fifth",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What paying on the rolling pupil count adds per pupil to the least-wealthy fifth \
+                outside the cluster, on total state support",
+        pinned: 166.55,
+        tolerance: 0.005,
+        compute: |i| {
+            i.reach
+                .fifth(
+                    &i.reach.rolling_count,
+                    project::anchor_incidence::Axis::Valuation,
+                    1,
+                )
+                .per_pupil()
+        },
+    },
+    Figure {
+        key: "project/the-rolling-counts-gain-per-pupil-in-the-wealthiest-fifth",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And to the wealthiest fifth \u{2014} the same gradient as the ratchet, for the \
+                same reason",
+        pinned: 11.43,
+        tolerance: 0.005,
+        compute: |i| {
+            i.reach
+                .fifth(
+                    &i.reach.rolling_count,
+                    project::anchor_incidence::Axis::Valuation,
+                    5,
+                )
+                .per_pupil()
+        },
+    },
+    Figure {
+        key: "project/the-mirror-inside-h-per-pupil-in-the-wealthiest-fifth",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the mirrored `[M]` written inside `[H]` delivers per pupil to the wealthiest \
+                fifth, against $114.22 to the least wealthy",
+        pinned: 20.42,
+        tolerance: 0.005,
+        compute: |i| {
+            i.reach
+                .fifth(
+                    &i.reach.mirror_inside,
+                    project::anchor_incidence::Axis::Valuation,
+                    5,
+                )
+                .per_pupil()
+        },
+    },
+    Figure {
+        key: "project/the-mirror-beside-per-pupil-in-the-wealthiest-fifth",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same mirror written beside `[L]`, `[M]` and `[O]`: what it delivers per pupil \
+                to the wealthiest fifth \u{2014} the one shape with no gradient",
+        pinned: 96.88,
+        tolerance: 0.005,
+        compute: |i| {
+            i.reach
+                .fifth(
+                    &i.reach.mirror_beside,
+                    project::anchor_incidence::Axis::Valuation,
+                    5,
+                )
+                .per_pupil()
+        },
     },
     // The FY2032 aid band, which two nodes state and three paragraphs carry. It is the shape the
     // whole mechanism was built for and it had no key: `scenario/guarantee-phase-out` says of its
