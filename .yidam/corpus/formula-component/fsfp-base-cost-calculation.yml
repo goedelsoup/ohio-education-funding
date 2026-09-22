@@ -103,7 +103,9 @@ findings: |
   administrators, so the quotient it is compared against is never below one, at any enrolment.
   [verified — crates/foundation] Small districts' leadership support is nonetheless raised, by
   $6.1m, and that is the administrator floor at (F)(3) flowing through rather than this
-  provision.
+  provision. It is the only bound in the whole modelled formula that cannot bind, and no other
+  is reachable and unreached — the census is on the [Fair School Funding
+  Plan](../funding-regime/fair-school-funding-plan.yml) node. [verified — crates/project]
 
   ### Nothing committed says where the numbers came from
 

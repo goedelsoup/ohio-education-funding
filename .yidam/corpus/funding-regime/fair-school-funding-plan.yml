@@ -105,11 +105,69 @@ findings: |
   So the answer is both causes and neither framing. Three-quarters of Ohio's wealthiest districts
   are held above what the plan computes for them, and a floor inherited from the regime the plan
   replaced is doing most of its work for the districts the plan would fund least. [inference]
+
+  ### Which of the plan's bounds are ever the operative term
+
+  The plan is written in floors, ceilings and clamps, and the question of which of them ever
+  decide a district's number has two answers that must not be confused: a bound can be
+  *unreachable by construction*, which is a drafting fact provable without data, or *reachable
+  and reached by nobody*, which is a policy fact about Ohio. Across [base
+  cost](../formula-component/fsfp-base-cost-calculation.yml), [local
+  capacity](../formula-component/fsfp-local-capacity-measure.yml), the categoricals, the
+  [guarantee](../formula-component/temporary-transitional-aid-guarantee.yml) and
+  [transportation](../formula-component/fsfp-transportation.yml) the modelled formula contains
+  **38** such bounds, and exactly **1** of them cannot bind: R.C. 3317.011(F)(6)(c)'s floor of
+  one leadership support staff member, whose own input is already floored past it. [verified —
+  crates/project] Every other bound is reached by at least one district in the department's
+  FY2027 model, so the second list is empty — there is no provision in the plan that Ohio has
+  written and never applied, only one sentence with no force. [verified — crates/project]
+  ([`crates/project`](../../../crates/project/tests/the_bounds_that_cannot_bind_and_the_ones_that_never_have.rs))
+
+  Three rows of that census are worth stating on their own. Two bounds are reached by exactly one
+  district: the department's cap of the DPIA blended count at enrolled ADM, which only Edgerton
+  Local reaches, and the guarantee's clamp of its own floor at zero, which only Richmond Heights
+  Local reaches, because its FY2020 funding base is negative. [verified — crates/project] One
+  bound's population is fixed by the statute rather than by the state: R.C. 3317.017(A)(4)(d)(i)
+  caps the local capacity percentage at 0.025 for every district at or above the fortieth-ranked
+  income ratio, so the ceiling is on **40** districts whatever Ohio's incomes are — a rank
+  wearing a ceiling. [verified — crates/project] And the two zeroes in [targeted
+  assistance](../formula-component/fsfp-targeted-assistance.yml) reach half the state between
+  them: the capacity tier pays nothing to the **304** districts at or above the median district's
+  weighted wealth, and the wealth tier pays nothing to the **171** whose wealth index is under
+  0.8. [verified — crates/project]
+
+  The census counts districts *on* a bound, which is not the count a bound *moves* — 138 sit on
+  the minimum state share and 31 move when it is lowered — and the [open enrolment
+  clawback](../formula-component/guarantee-open-enrolment-clawback.yml) node records the one new
+  instance the census priced. Steps are not in it: the athletics eligibility test, the enrolment
+  growth supplement's gate, the performance supplement's rating gates and the repealed
+  supplemental tier's gates are two-branch tests rather than bounds, and each is measured where
+  it lives. [inference]
 figures:
   - key: project/districts-on-the-guarantee
     value: 294
     field: description
     as_written: "**294 of 609 districts —"
+  - key: project/bounds-in-the-modelled-formula
+    value: 38
+    field: findings
+    as_written: "the modelled formula contains\n  **38** such bounds"
+  - key: project/bounds-that-cannot-bind
+    value: 1
+    field: findings
+    as_written: "and exactly **1** of them cannot bind"
+  - key: project/districts-on-the-capacity-rate-ceiling
+    value: 40
+    field: findings
+    as_written: "so the ceiling is on **40** districts whatever"
+  - key: project/districts-the-capacity-tier-pays-nothing-for-wealth
+    value: 304
+    field: findings
+    as_written: "the capacity tier pays nothing to the **304** districts"
+  - key: project/districts-the-wealth-tier-pays-nothing
+    value: 171
+    field: findings
+    as_written: "the wealth tier pays nothing to the **171** whose wealth index"
 
 properties:
   name: Fair School Funding Plan

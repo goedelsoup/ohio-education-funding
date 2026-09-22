@@ -11081,7 +11081,112 @@ pub static FIGURES: &[Figure] = &[
         tolerance: 1e-9,
         compute: |_| project::capacity_denominator::divergence_correlation(),
     },
-
+    // Issue #410: which bounds in the modelled formula cannot bind, or never have. One cannot
+    // and none never has; the figures below are the census's shape and the counts in it the
+    // corpus had not held before. The clawback clamp's 22 is already
+    // `project/open-enrolment-clawback-districts` and is not exported twice. Computed by `project::bounds`, pinned in
+    // `crates/project/tests/the_bounds_that_cannot_bind_and_the_ones_that_never_have.rs`.
+    Figure {
+        key: "project/bounds-in-the-modelled-formula",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Floors, ceilings, clamps at zero, greater-ofs and lesser-ofs the modelled formula \
+                contains, across base cost, local capacity, the categoricals, the guarantee and \
+                transportation",
+        pinned: 38.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| project::bounds::Bound::all().len() as f64,
+    },
+    Figure {
+        key: "project/bounds-that-cannot-bind",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of those, the bounds no input can put in force as the section stands \u{2014} \
+                R.C. 3317.011(F)(6)(c), whose input (F)(3)(c) has already floored past it",
+        pinned: 1.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |_| project::bounds::cannot_bind().len() as f64,
+    },
+    Figure {
+        key: "project/districts-on-the-capacity-rate-ceiling",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts whose local capacity percentage is capped at 0.025 \u{2014} the \
+                fortieth rank R.C. 3317.017(A)(4)(d)(i) states the ceiling against, so the count \
+                is fixed by construction",
+        pinned: 40.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |i| {
+            i.panel
+                .iter()
+                .filter(|r| project::bounds::Bound::CapacityRateCeiling.binds(r))
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "project/districts-the-decrease-threshold-floor-governs",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts for which R.C. 3317.019(C)(1)'s floor of twenty pupils, rather than \
+                ten per cent of last year's count, sets the open-enrolment decrease threshold",
+        pinned: 499.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |i| {
+            i.panel
+                .iter()
+                .filter(|r| project::bounds::Bound::DecreaseThresholdFloor.binds(r))
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "project/districts-the-decrease-threshold-floor-spares",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts that lost more than ten per cent of their open-enrolment count and not \
+                more than twenty pupils \u{2014} charged under the percentage alone, charged \
+                nothing under the floor",
+        pinned: 71.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |i| project::bounds::spared_by_the_decrease_threshold_floor(&i.panel) as f64,
+    },
+    Figure {
+        key: "project/districts-the-capacity-tier-pays-nothing-for-wealth",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts whose capacity index is under 1 \u{2014} at or above the median \
+                district's weighted wealth \u{2014} and so paid nothing by targeted assistance's \
+                capacity tier under R.C. 3317.0217(B)(4)(a)(i)",
+        pinned: 304.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |i| {
+            i.panel
+                .iter()
+                .filter(|r| project::bounds::Bound::CapacityTierZero.binds(r))
+                .count() as f64
+        },
+    },
+    Figure {
+        key: "project/districts-the-wealth-tier-pays-nothing",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts whose wealth index is under 0.8 and so paid nothing by targeted \
+                assistance's wealth tier under R.C. 3317.0217(C)(4)(a)",
+        pinned: 171.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |i| {
+            i.panel
+                .iter()
+                .filter(|r| project::bounds::Bound::WealthTierZero.binds(r))
+                .count() as f64
+        },
+    },
 ];
 
 /// The narrowest and widest share of the local gap state aid closes across FY2012-FY2024.
