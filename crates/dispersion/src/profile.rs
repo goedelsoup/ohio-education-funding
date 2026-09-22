@@ -24,6 +24,20 @@
 //! **Its per-pupil denominators are ADM, not headcount and not weighted ADM.** A figure from
 //! this file must not be shown beside one from [`crate::report_card`] without saying which
 //! denominator each used.
+//!
+//! # What its personnel block is, and is not
+//!
+//! Seven of the report's sixty columns are personnel, and the extract has carried them since
+//! #408: a teachers' average salary, three experience shares, and three administrator figures.
+//! **One of the seven is a count.** `FTE Number of Administrators` sums twelve EMIS position
+//! codes — superintendent, deputy superintendent, treasurer, principal, assistant principal,
+//! director, supervisor, coordinator, education administration specialist, administrative
+//! assistant (the licensed 101 code, not clerical), community school administrator, and other
+//! officials. There is no teacher FTE, no counselor, no wellness, fiscal, EMIS or clerical
+//! count, and no category finer than "administrator". So the report can be set against the
+//! administrator elements of R.C. 3317.011 and against nothing else in that section; a floor on
+//! six special teachers meets no column here. Where the category detail would live is EMIS staff
+//! reporting, which the corpus has not catalogued.
 
 use std::sync::OnceLock;
 
@@ -34,7 +48,9 @@ pub const FIXTURE: &str = include_str!("../fixtures/cupp-fy24-district-data.csv"
 pub const EXPECTED_HEADER: &str = "irn,district,enrolled_adm_fy24,econ_disadvantaged_pct_fy24,\
 assessed_valuation_per_pupil_fy23,current_operating_millage_ty23,\
 effective_class1_millage_ty23,operating_expenditure_per_pupil_fy24,\
-state_revenue_per_pupil_fy24,local_revenue_per_pupil_fy24";
+state_revenue_per_pupil_fy24,local_revenue_per_pupil_fy24,teacher_average_salary_fy24,\
+teachers_0_4_years_pct_fy24,teachers_4_10_years_pct_fy24,teachers_10_plus_years_pct_fy24,\
+fte_administrators_fy24,administrator_average_salary_fy24,pupil_administrator_ratio_fy24";
 
 /// What the profile report publishes for one district.
 ///
@@ -67,6 +83,22 @@ pub struct ProfileDistrict {
     pub state_revenue_per_pupil: Option<f64>,
     /// Local revenue per pupil, FY2024.
     pub local_revenue_per_pupil: Option<f64>,
+    /// Classroom teachers' average salary, FY2024.
+    pub teacher_average_salary: Option<f64>,
+    /// Share of teachers with 0-4 years' experience, FY2024, as a fraction.
+    pub teachers_0_4_years: Option<f64>,
+    /// Share of teachers with 4-10 years' experience, FY2024, as a fraction.
+    pub teachers_4_10_years: Option<f64>,
+    /// Share of teachers with more than 10 years' experience, FY2024, as a fraction.
+    pub teachers_10_plus_years: Option<f64>,
+    /// Full-time-equivalent administrators, FY2024 — the one **count** of staff the report
+    /// carries. See the module note on what it sums and what it cannot say.
+    pub fte_administrators: Option<f64>,
+    /// Administrators' average salary, FY2024.
+    pub administrator_average_salary: Option<f64>,
+    /// Enrolled ADM per FTE administrator, FY2024. The department's own quotient of two columns
+    /// above, and asserted to be that below.
+    pub pupil_administrator_ratio: Option<f64>,
 }
 
 impl ProfileDistrict {
@@ -141,6 +173,13 @@ fn parse() -> Vec<ProfileDistrict> {
                 operating_expenditure_per_pupil: row.num(7),
                 state_revenue_per_pupil: row.num(8),
                 local_revenue_per_pupil: row.num(9),
+                teacher_average_salary: row.num(10),
+                teachers_0_4_years: row.num(11),
+                teachers_4_10_years: row.num(12),
+                teachers_10_plus_years: row.num(13),
+                fte_administrators: row.num(14),
+                administrator_average_salary: row.num(15),
+                pupil_administrator_ratio: row.num(16),
             })
         })
         .collect()
@@ -199,6 +238,42 @@ mod tests {
         let shares = column(&districts(), |d| d.economically_disadvantaged);
         assert_eq!(shares.len(), 606, "every district publishes one");
         assert!(shares.iter().all(|s| (0.0..=1.0).contains(s)));
+    }
+
+    /// The one staff count is complete, and the department's ratio column is its quotient with
+    /// enrolled ADM — so a reader who wants the ratio can take either and get the same number.
+    #[test]
+    fn every_district_reports_administrators_and_the_ratio_is_their_quotient() {
+        let ds = districts();
+        let counted = column(&ds, |d| d.fte_administrators);
+        assert_eq!(counted.len(), 606);
+        assert!(counted.iter().all(|c| *c > 0.0));
+        for d in &ds {
+            let (adm, fte, ratio) = (
+                d.enrolled_adm.expect("every district has ADM"),
+                d.fte_administrators
+                    .expect("every district has administrators"),
+                d.pupil_administrator_ratio
+                    .expect("every district has the ratio"),
+            );
+            assert!(
+                (adm / fte - ratio).abs() < 0.01,
+                "{}: {adm} / {fte} is not {ratio}",
+                d.name
+            );
+        }
+    }
+
+    /// The personnel block carries exactly one count, which is the whole of what #408 found
+    /// when it opened the sheet. If the department adds a teacher FTE this fails, and the
+    /// question that issue moved to EMIS staff reporting comes back here.
+    #[test]
+    fn the_personnel_block_has_one_count_and_it_is_administrators() {
+        let counts: Vec<&str> = EXPECTED_HEADER
+            .split(',')
+            .filter(|column| column.starts_with("fte_"))
+            .collect();
+        assert_eq!(counts, vec!["fte_administrators_fy24"]);
     }
 
     /// An absent figure is absent. The parser this replaced read it as `0.0` in one of its four

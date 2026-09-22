@@ -708,6 +708,26 @@ pub(super) mod profile_columns {
     pub const IRN: usize = 1;
     pub const ENROLLED_ADM: usize = 4;
     pub const ECON_DISADVANTAGED: usize = 11;
+    /// The personnel block, columns O through U of `District Data`. Seven columns, and only one
+    /// of them is a **count**: the report carries no teacher FTE and no position category
+    /// finer than "administrator", so R.C. 3317.011's floors on special teachers, counselors,
+    /// wellness staff, fiscal support, EMIS and clerical staff meet nothing here. See #408.
+    pub const TEACHER_AVERAGE_SALARY: usize = 14;
+    pub const TEACHERS_0_4_YEARS: usize = 15;
+    pub const TEACHERS_4_10_YEARS: usize = 16;
+    pub const TEACHERS_10_PLUS_YEARS: usize = 17;
+    /// `FTE Number of Administrators FY24`. The department's definition on the report's page
+    /// lists the EMIS position codes it sums: administrative assistant (101), deputy
+    /// superintendent (103), assistant principal (104), principal (108), superintendent (109),
+    /// supervisor/manager (110), treasurer (112), coordinator (113), education administration
+    /// specialist (114), director (115), community school administrator (116) and other
+    /// officials/administrators (199). That is the superintendent, the treasurer, every other
+    /// district administrator and every building leader — the four administrator elements of
+    /// R.C. 3317.011(F)(1)-(3) and (G)(1) — and not (F)(6)'s leadership support, whose
+    /// statutory salary band tops out at $65,000.
+    pub const FTE_ADMINISTRATORS: usize = 18;
+    pub const ADMINISTRATOR_AVERAGE_SALARY: usize = 19;
+    pub const PUPIL_ADMINISTRATOR_RATIO: usize = 20;
     pub const VALUATION_PER_PUPIL: usize = 21;
     pub const CURRENT_OPERATING_MILLAGE: usize = 33;
     pub const EFFECTIVE_CLASS1_MILLAGE: usize = 34;
@@ -1276,9 +1296,20 @@ pub const PROFILE_HEADER: &[&str] = &[
     "operating_expenditure_per_pupil_fy24",
     "state_revenue_per_pupil_fy24",
     "local_revenue_per_pupil_fy24",
+    "teacher_average_salary_fy24",
+    "teachers_0_4_years_pct_fy24",
+    "teachers_4_10_years_pct_fy24",
+    "teachers_10_plus_years_pct_fy24",
+    "fte_administrators_fy24",
+    "administrator_average_salary_fy24",
+    "pupil_administrator_ratio_fy24",
 ];
 
-/// Reduce the District Profile Report's sixty columns to the ten the corpus uses.
+/// Reduce the District Profile Report's sixty columns to the seventeen the corpus uses.
+///
+/// Ten of them since #157, and the personnel block since #408 — which asked what the report
+/// carries about staffing and found one count: `FTE Number of Administrators`. The header names
+/// each column's own year, because the report mixes them within a row.
 #[must_use]
 pub fn build_profile_extract(profile_rows: &[Vec<String>]) -> Vec<Vec<String>> {
     use profile_columns as p;
@@ -1291,6 +1322,13 @@ pub fn build_profile_extract(profile_rows: &[Vec<String>]) -> Vec<Vec<String>> {
         p::OPERATING_EXPENDITURE,
         p::STATE_REVENUE,
         p::LOCAL_REVENUE,
+        p::TEACHER_AVERAGE_SALARY,
+        p::TEACHERS_0_4_YEARS,
+        p::TEACHERS_4_10_YEARS,
+        p::TEACHERS_10_PLUS_YEARS,
+        p::FTE_ADMINISTRATORS,
+        p::ADMINISTRATOR_AVERAGE_SALARY,
+        p::PUPIL_ADMINISTRATOR_RATIO,
     ];
     profile_rows
         .iter()

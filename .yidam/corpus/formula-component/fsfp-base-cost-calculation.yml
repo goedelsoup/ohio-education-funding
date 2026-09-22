@@ -116,6 +116,40 @@ findings: |
   Model](../funding-regime/evidence-based-model.yml)'s school nurse wellness coordinator factor
   was zero below 418 pupils — a size cut-off written to exclude small districts rather than to
   protect them. [verified — crates/project]
+
+  ### The one floor a published count can be set against
+
+  Whether the floors are set in the right places was left open above for want of a district's
+  actual staffing. The [District Profile Report](../../catalog/cupp-district-profile-report.md)
+  names personnel as one of its five families, and opening it settles how much of the question
+  it can carry: its personnel block is seven columns and **one of them is a count** — FTE
+  administrators, which the department defines as twelve EMIS position codes that together are
+  the section's superintendent, treasurer, other district administrators and building leaders,
+  and nothing else. [verified] There is no teacher FTE and no category finer than that, so six
+  of the seven floors meet no column, and the question for them moves to EMIS staff reporting,
+  which the corpus has not catalogued. [inference]
+
+  For the one floor it can see, both sides are FY2024 — the report's count against the four
+  administrator elements funded at the report's own enrolled ADM. Ohio's 606 traditional
+  districts employ about twice the administrators the build-up counts, and **47** employ fewer
+  than it funds, 44 of them under the 1,500 ADM threshold at which the two-administrator floor
+  stops binding. [verified — crates/project] The gradient runs against a cliff story: the
+  median employed-to-funded multiple is **1.52** below the threshold and **1.84** above it, and
+  1.23 in the smallest enrolment sextile against about 1.8 from the fourth up. [verified —
+  crates/project] The floor does not put small districts above their funded count; it brings the
+  funded count closest to payroll exactly where it binds, and employed administrators per
+  thousand pupils fall monotonically from 12.3 in the smallest sextile to 7.2 in the largest,
+  so real staffing has the fixed component the section models. [verified — crates/project]
+
+  The height of that component is about right and its shape is not. A line through the districts
+  under the threshold has an intercept between 2.6 and 3.8 administrators depending on where it
+  stops, every one under the section's four; but the section funds exactly two other
+  administrators at every enrolment under 1,500, and what districts employ beyond a
+  superintendent, a treasurer and their funded building leaders doubles across that range, from
+  about three to about six. [verified — crates/project] The plateau the floor writes has no
+  counterpart on payroll. Funded is not employed, and none of this is an audit: the finding is the
+  gradient, not the level, and why the smallest districts sit closest to their funded count the
+  report cannot say. [inference]
 figures:
   - key: project/staffing-floors-in-base-cost
     value: 187146074.82726616
@@ -133,6 +167,18 @@ figures:
     value: 313
     field: findings
     as_written: "**313 of 608** districts are funded"
+  - key: project/districts-employing-fewer-administrators-than-funded
+    value: 47
+    field: findings
+    as_written: "and **47** employ fewer"
+  - key: project/administrator-multiple-below-the-floor-threshold
+    value: 1.5156482861400895
+    field: findings
+    as_written: "is **1.52** below the threshold"
+  - key: project/administrator-multiple-above-the-floor-threshold
+    value: 1.8353726362625138
+    field: findings
+    as_written: "and **1.84** above it"
 properties:
   name: FSFP base cost calculation
   function: |
@@ -208,3 +254,9 @@ links:
     relationship: sourced-from
   - target: ../../catalog/fordham-base-cost-critique.md
     relationship: sourced-from
+  - target: ../../catalog/cupp-district-profile-report.md
+    relationship: sourced-from
+    note: >-
+      The FTE administrator count the section's four administrator elements are set against
+      under "The one floor a published count can be set against". `dispersion::profile` reads it
+      as `cupp-fy24-district-data.csv`, and `project::administrator_staffing` makes the join.
