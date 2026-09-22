@@ -57,7 +57,19 @@ findings: |
   the schedule; inference for the reading]
 
   Whether the 200 floor is an administrative de minimis or a policy about very small districts
-  is not stated in the section. [open]
+  is not stated in the section, and what it does is not in doubt. The capacity tier pays a
+  millage on a shortfall between two **whole-district totals**, so its amount per pupil has no
+  bound at all as enrolment falls: Kelleys Island Local's 3.51 pupils would draw **$701,208.49
+  each**, and all 17 districts at or below 400 enrolled ADM would draw more per pupil than the
+  **$3,773.82** that is the most any full-rate district draws. The floor and the shelf are what
+  stand between that and the payment file. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_pupil_count_the_capacity_tier_never_had.rs))
+
+  The component this tier absorbed needed no such provision. Capacity aid multiplied by formula
+  ADM, so it went to zero with the pupil count, and its **2.5 cap** bounded generosity per pupil
+  absolutely — `per-pupil amount x multiplier x 2.5`, one statewide ceiling. The plan dropped both
+  the multiplier and the cap when it restated the comparison as a difference rather than a ratio,
+  and the size brackets are what took their place. [inference]
 
   ### Two blends of the same wealth terms, in two sections
 

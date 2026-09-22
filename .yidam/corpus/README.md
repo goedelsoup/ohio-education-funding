@@ -322,16 +322,16 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1805 | supported by a committed primary source |
-| `[inference]` | 362 | drawn from verified facts, not witnessed |
-| `[open]` | 207 | a live question — unknown, contested, or being worked |
+| `[verified]` | 1812 | supported by a committed primary source |
+| `[inference]` | 365 | drawn from verified facts, not witnessed |
+| `[open]` | 205 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-207 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+205 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 87 | 0 |
+| `findings` | 85 | 0 |
 | `description` | 43 | 0 |
 | `revisions` | 10 | 0 |
 | `series` | 7 | 0 |
@@ -458,7 +458,7 @@ Sorted by: kind, then alphabetically.
 | [`fsfp-performance-supplement`](formula-component/fsfp-performance-supplement.yml) | formula-component | FSFP Performance Supplement | 10 | 7 |
 | [`fsfp-preschool-special-education`](formula-component/fsfp-preschool-special-education.yml) | formula-component | FSFP Preschool Special Education | 6 | 4 |
 | [`fsfp-special-education-weights`](formula-component/fsfp-special-education-weights.yml) | formula-component | FSFP Special Education Weights | 6 | 10 |
-| [`fsfp-targeted-assistance`](formula-component/fsfp-targeted-assistance.yml) | formula-component | FSFP Targeted Assistance | 12 | 7 |
+| [`fsfp-targeted-assistance`](formula-component/fsfp-targeted-assistance.yml) | formula-component | FSFP Targeted Assistance | 13 | 7 |
 | [`fsfp-transportation`](formula-component/fsfp-transportation.yml) | formula-component | FSFP Transportation | 9 | 6 |
 | [`guarantee-open-enrolment-clawback`](formula-component/guarantee-open-enrolment-clawback.yml) | formula-component | Guarantee Open Enrolment Clawback | 4 | 3 |
 | [`temporary-transitional-aid-guarantee`](formula-component/temporary-transitional-aid-guarantee.yml) | formula-component | Temporary Transitional Aid Guarantee | 12 | 19 |
@@ -512,7 +512,7 @@ Sorted by: kind, then alphabetically.
 | [`fsfp-phase-in-percentage`](parameter/fsfp-phase-in-percentage.yml) | parameter | FSFP Phase-In Percentage | 5 | 21 |
 | [`gifted-funding-rates`](parameter/gifted-funding-rates.yml) | parameter | Gifted Funding Rates | 5 | 4 |
 | [`guarantee-funding-base`](parameter/guarantee-funding-base.yml) | parameter | Guarantee Funding Base | 6 | 8 |
-| [`local-capacity-percentage`](parameter/local-capacity-percentage.yml) | parameter | Local Capacity Percentage | 5 | 3 |
+| [`local-capacity-percentage`](parameter/local-capacity-percentage.yml) | parameter | Local Capacity Percentage | 5 | 4 |
 | [`local-share-charge-off-millage`](parameter/local-share-charge-off-millage.yml) | parameter | Local Share Charge-Off Millage | 8 | 9 |
 | [`minimum-state-share`](parameter/minimum-state-share.yml) | parameter | Minimum State Share | 9 | 3 |
 | [`performance-supplement-rate`](parameter/performance-supplement-rate.yml) | parameter | Performance Supplement Rate | 5 | 4 |
