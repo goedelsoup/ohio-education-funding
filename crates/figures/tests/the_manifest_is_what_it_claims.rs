@@ -255,6 +255,40 @@ fn every_string_is_safe_to_write_unescaped() {
     }
 }
 
+/// A label wrapped across source lines keeps the space the continuation eats.
+///
+/// Rust's `\`-at-end-of-line strips the newline **and every space after it**, so a label written
+/// as `"... staffing floors\` / `                alone hold ..."` ships as `floorsalone`. Nothing
+/// downstream can see it: `cargo fmt` does not touch string contents, the manifest writer has no
+/// opinion about spaces, and the corpus cross-check reads values rather than labels. Eight labels
+/// went out that way, and the run of whitespace that produced them had also left a second set
+/// reading `floors                 alone` — the same edit, failing in both directions.
+///
+/// So both directions are checked, and the first is checked against the **source** rather than
+/// the manifest, because by the time it reaches a `&'static str` the evidence is gone.
+#[test]
+fn a_wrapped_label_keeps_the_space_the_continuation_eats() {
+    let source = include_str!("../src/lib.rs");
+    for (number, line) in source.lines().enumerate() {
+        let Some(head) = line.strip_suffix('\\') else {
+            continue;
+        };
+        assert!(
+            head.ends_with(' ') || head.ends_with("\\"),
+            "crates/figures/src/lib.rs:{}: a continuation with no space before the backslash \
+             glues two words together, because `\\` eats the newline and the indent after it",
+            number + 1
+        );
+    }
+    for f in FIGURES {
+        assert!(
+            !f.label.contains("  "),
+            "{}: the label carries a run of whitespace a source line break left behind",
+            f.key
+        );
+    }
+}
+
 /// The document parses as JSON, declares its contract, and carries every figure once.
 ///
 /// A hand-rolled writer that emits something no consumer can read is the failure this forecloses,
