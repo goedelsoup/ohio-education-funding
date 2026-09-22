@@ -41,6 +41,39 @@ pub const CONTACT_ENV: &str = "EDFUND_CONTACT";
 /// Agent string with no contact. Enough for the department's servers; refused by the Bureau's.
 pub const ANONYMOUS_AGENT: &str = "ohio-education-funding-corpus/0.1 (research)";
 
+/// The placeholder a source URL carries where the report card's API key belongs.
+///
+/// The key is not in this repository, and that is deliberate. It is the department's Azure
+/// Functions key, shipped to every visitor in the report card's `main.<hash>.js`, and a read
+/// through it is equivalent to loading the public page — but it is still somebody else's
+/// credential, and committing 137 copies of it to a public repository's permanent history is a
+/// different act from it being findable in a minified bundle. GitHub's push protection says the
+/// same thing, and it is right.
+pub const KEY_PLACEHOLDER: &str = "{REPORT_CARD_KEY}";
+
+/// The environment variable that fills [`KEY_PLACEHOLDER`].
+///
+/// Same shape as [`CONTACT_ENV`]: absent, the affected sources cannot be refreshed and everything
+/// else works, because the fixtures built from them are committed. See
+/// `decisions/an-endpoint-can-be-a-source` and the catalog entry for where to read the key.
+pub const REPORT_CARD_KEY_ENV: &str = "EDFUND_REPORT_CARD_KEY";
+
+/// A source's URL with [`KEY_PLACEHOLDER`] resolved, or the reason it cannot be.
+///
+/// # Errors
+///
+/// [`FetchError::MissingKey`] if the URL wants the key and the environment does not carry it.
+pub fn resolved_url(source: &Source) -> Result<String, FetchError> {
+    if !source.url.contains(KEY_PLACEHOLDER) {
+        return Ok(source.url.to_string());
+    }
+    let key = std::env::var(REPORT_CARD_KEY_ENV).map_err(|_| FetchError::MissingKey {
+        key: source.key.to_string(),
+        variable: REPORT_CARD_KEY_ENV,
+    })?;
+    Ok(source.url.replace(KEY_PLACEHOLDER, key.trim()))
+}
+
 /// The `User-Agent` to send, incorporating [`CONTACT_ENV`] if it is set.
 #[must_use]
 pub fn user_agent() -> String {
@@ -86,6 +119,13 @@ pub enum FetchError {
         /// What is on disk.
         actual: String,
     },
+    /// The URL needs the report card's API key and the environment does not carry it.
+    MissingKey {
+        /// Which source.
+        key: String,
+        /// The environment variable that would supply it.
+        variable: &'static str,
+    },
     /// A filesystem operation failed.
     Io(io::Error),
 }
@@ -111,6 +151,12 @@ impl core::fmt::Display for FetchError {
                 f,
                 "{key} has changed: manifest {expected}, on disk {actual}. The publication was \
                  revised — rebuild the fixtures and read the diff before committing it."
+            ),
+            Self::MissingKey { key, variable } => write!(
+                f,
+                "{key} is served by the report card's API, whose key this repository does not \
+                 commit. Read it from the `x-functions-key` in the site's main.<hash>.js and set \
+                 {variable}. The committed fixture does not need it; only a refresh does."
             ),
             Self::Io(cause) => write!(f, "{cause}"),
         }
@@ -160,6 +206,7 @@ pub fn fetch(root: &Path, source: &Source, refresh: bool) -> Result<PathBuf, Fet
     // Download beside the target and rename on success, so an interrupted transfer never
     // leaves a truncated file that later runs would treat as cached.
     let partial = destination.with_extension("partial");
+    let resolved = resolved_url(source)?;
     let output = Command::new("curl")
         .args([
             "--fail",
@@ -173,7 +220,7 @@ pub fn fetch(root: &Path, source: &Source, refresh: bool) -> Result<PathBuf, Fet
         .arg(user_agent())
         .args(["--output"])
         .arg(&partial)
-        .arg(source.url)
+        .arg(&resolved)
         .output()
         .map_err(|cause| {
             if cause.kind() == io::ErrorKind::NotFound {

@@ -2200,6 +2200,12 @@ pub struct Inputs {
     pub community_school_segments: Vec<dispersion::community_school_funding::Segment>,
     /// Total state support across those 355 schools, which is what the supplement is a share of.
     pub community_school_state_support: f64,
+    /// Who belongs to each career-technical planning district, FY2025.
+    ///
+    /// The third population outside the 609-district panel in this manifest, and the only one
+    /// that *contains* the panel: a planning district's members are the districts plus community
+    /// and STEM schools.
+    pub ctpd: dispersion::ctpd_membership::OutsideThePanel,
     /// Six years of the department's joint vocational district payment reports, FY2022-FY2027.
     ///
     /// The second population here outside the 609-district panel, and the only one the corpus
@@ -3190,6 +3196,7 @@ impl Inputs {
             quartiles: dispersion::national_peers::ohio_by_local_wealth(),
             community_school_equity: dispersion::community_school_funding::equity_cost(),
             community_school_segments: dispersion::community_school_funding::segments(),
+            ctpd: dispersion::ctpd_membership::outside_the_panel(),
             jvsd: dispersion::jvsd_funding::districts(),
             jvsd_item_7: dispersion::jvsd_funding::item_7_incidence(
                 dispersion::jvsd_funding::FIRST_ITEM_7_YEAR,
@@ -7729,6 +7736,52 @@ pub static FIGURES: &[Figure] = &[
         pinned: 591_155_954.03,
         tolerance: 1.0,
         compute: |i| jvsd_total_state_support(i, dispersion::jvsd_funding::LAST_YEAR),
+    },
+    // The career-technical planning districts. Counts and a share of career-technical enrolment;
+    // no dollars, because the statute pays on enrolled ADM and this source publishes a different
+    // measure — see `corpus/parameter/career-technical-category-multiples`.
+    Figure {
+        key: "dispersion/ctpd-members-outside-the-panel",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Career-technical planning district members that are not districts \u{2014} \
+                community and STEM schools, FY2025",
+        pinned: 347.0,
+        tolerance: 0.0,
+        compute: |i| f64::from(u32::try_from(i.ctpd.other).unwrap_or(u32::MAX)),
+    },
+    Figure {
+        key: "dispersion/ctpd-share-of-members-outside-the-panel",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Share of planning district members that the 609-district panel cannot carry, \
+                FY2025",
+        pinned: 0.36373,
+        tolerance: 0.0005,
+        compute: |i| i.ctpd.share_of_members(),
+    },
+    Figure {
+        key: "dispersion/ctpd-share-of-career-technical-enrolment-outside-the-panel",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The same population as a share of career-technical enrolment rather than of \
+                members \u{2014} not of enrolled ADM, which the statute pays on and this source \
+                does not publish",
+        pinned: 0.04749,
+        tolerance: 0.0005,
+        compute: |i| i.ctpd.share_of_career_technical_enrolment(),
+    },
+    Figure {
+        key: "dispersion/ctpd-members-outside-the-panel-with-no-enrolment",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Non-district planning district members carrying no career-technical enrolment at \
+                all, FY2025",
+        pinned: 277.0,
+        tolerance: 0.0,
+        compute: |i| {
+            f64::from(u32::try_from(i.ctpd.other_with_no_enrolment).unwrap_or(u32::MAX))
+        },
     },
     Figure {
         key: "dispersion/ecot-directory-editions",

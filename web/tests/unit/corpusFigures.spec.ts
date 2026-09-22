@@ -322,10 +322,20 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * pre-closure figure at the same six years and bound it, and the reason to add its twin is the
  * populations rather than the horizon: the two differ by a factor of two where the fan ends, so a
  * node that bound one of them had bound the half a reader would have to know was a choice.
+ *
+ * Recounted at **1076/78** when the career-technical planning districts' membership was
+ * extracted. Four bindings, no new carrier, all on `parameter/career-technical-category-multiples`
+ * — and again the floor had drifted, 1072 actual against 1063 declared, so nine arrived without
+ * it moving. Recomputed with this test's own expression rather than added to the last number.
+ *
+ * Three of the four are a population the panel does not carry, and the fourth is why they are
+ * worth binding: 36.4% of the members are community and STEM schools, 4.75% of the enrolment,
+ * and 277 of the 347 report none at all. A share of members and a share of pupils that far apart
+ * is a claim each number alone would misstate, and prose stating both had been carrying it.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1063 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1063,
+  expect(bindings.length, "1076 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1076,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,

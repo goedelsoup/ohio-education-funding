@@ -175,9 +175,9 @@ impl Anchor {
 ///
 /// So the constraint was real and it was a data constraint. Three of the eleven remain outside —
 /// the JVSD base cost method, the community school equity supplement, and career awareness funds —
-/// and they are outside for three different reasons, which this module used to state as one. Two
-/// of the three have since turned out to be reachable: only career awareness is still short of a
-/// source.
+/// and they are outside for three different reasons, which this module used to state as one. All
+/// three have since turned out to be reachable; what keeps each outside is the panel, or a
+/// measure the publisher does not state, rather than a source nobody had found.
 ///
 /// # The equity supplement is outside for its population, not for want of data
 ///
@@ -228,11 +228,23 @@ impl Anchor {
 ///
 /// What no lever could compute is the base. A planning district's members are the traditional
 /// districts, community schools and STEM schools affiliated with it, so the sum spans two
-/// populations this panel does not carry and needs a membership map no source this corpus has
-/// found publishes. The statewide total survives that, because every district belongs to a planning
-/// district and a population with no non-members sums to the whole — but a statewide total is not
-/// a lever, and the department states it anyway: the earmark inside GRF line item 200545 falls
-/// from $16,255,125 in FY2025 to $5,000,000 in each of FY2026 and FY2027.
+/// populations this panel does not carry. The statewide total survives that, because every
+/// district belongs to a planning district and a population with no non-members sums to the whole
+/// — but a statewide total is not a lever, and the department states it anyway: the earmark
+/// inside GRF line item 200545 falls from $16,255,125 in FY2025 to $5,000,000 in each of FY2026
+/// and FY2027.
+///
+/// This doc also said the base "needs a membership map no source this corpus has found
+/// publishes", which has stopped being true. [`dispersion::ctpd_membership`] holds all 954 FY2025
+/// members of all 90 rated planning districts, from the report card's data API — every one of the
+/// 607 districts placed in exactly one, cross-checked against each district's own record.
+/// **347 of those members are not districts**, which is the two-population claim above measured
+/// rather than asserted: 36.4% of the membership, and 4.75% of career-technical enrolment.
+///
+/// The base is still not computable, and now for one reason rather than two. The map exists; the
+/// **measure** does not. The statute pays on summed *enrolled ADM*, and the only per-member
+/// quantity published is career-technical enrolment — a subset of ADM, and not a constant
+/// fraction of it across the two populations.
 ///
 /// Note also that it is not foundation funding, which is why no sheet of the FY2026 or FY2027
 /// calculator mentions it and why pricing it here would have put a second appropriation inside a

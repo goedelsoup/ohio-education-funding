@@ -1,6 +1,6 @@
 //! Where every committed fixture is written, and the manifest of the ones the rebuild produces.
 //!
-//! Thirty-five path constants and [`REBUILT`], which lists the subset a full rebuild regenerates.
+//! Thirty-six path constants and [`REBUILT`], which lists the subset a full rebuild regenerates.
 //!
 //! # Why they are together
 //!
@@ -75,6 +75,23 @@ pub const COMMUNITY_SCHOOL_FUNDING_FIXTURE: &str =
 /// under prior law, FY2026-FY2027 under item 7. See [`super::jvsd`] for what the rewrite turns
 /// out to change, which is not the percentage.
 pub const JVSD_FUNDING_FIXTURE: &str = "crates/dispersion/fixtures/jvsd-foundation-payments.csv";
+
+/// Who belongs to each career-technical planning district, one row per member.
+///
+/// The only published roster of a CTPD's membership, and the only fixture here built from a
+/// JSON API rather than a file. See [`super::ctpd`] for why the department's static download
+/// catalogue cannot answer this — it publishes twenty-four CTPD files back to 2013 and every one
+/// of them is ratings.
+///
+/// # Both populations on one table
+///
+/// A row is a member, and `district_irn` is filled for the 607 that are districts and blank for
+/// the ones that are not. That single column is the measurement the fixture exists for:
+/// R.C. 3317.014(E)(1)(a) pays on the summed enrolled ADM of a planning district's members, and
+/// its members are **not** the 609-district panel — they are that panel plus community and STEM
+/// schools, which is the population `project::drafts` names as the reason the payment reaches no
+/// lever.
+pub const CTPD_MEMBERSHIP_FIXTURE: &str = "crates/dispersion/fixtures/ctpd-membership.csv";
 
 /// The statewide scalars each year's funding calculator states once, one row per fiscal year.
 ///
@@ -355,6 +372,7 @@ pub const REBUILT: &[&str] = &[
     CALCULATOR_ADM_FIXTURE,
     COMMUNITY_SCHOOL_FUNDING_FIXTURE,
     JVSD_FUNDING_FIXTURE,
+    CTPD_MEMBERSHIP_FIXTURE,
     PROFILE_FIXTURE,
     GRADE_BANDS_FIXTURE,
     REPORT_CARD_FIXTURE,

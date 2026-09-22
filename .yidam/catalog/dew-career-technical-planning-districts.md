@@ -22,9 +22,10 @@ than a district, and
 had recorded the recipient as unknown and its availability as unprobed. This table answers half of
 it: the leads are published, they are named, and they carry the identifier the panel is keyed on.
 
-**What it does not contain, and what that costs.** Membership. The table names the lead of each
-planning district and not the districts, community schools and STEM schools affiliated with it, so
-it cannot produce the ADM the payment is computed on. That matters less than it looks, because the
+**What it does not contain.** Membership. The table names the lead of each planning district and
+not the districts, community schools and STEM schools affiliated with it. That is published
+elsewhere — see [`dew-ctpd-membership`](dew-ctpd-membership.md) — though the ADM the payment is
+computed on is not published by either. That matters less than it looks, because the
 department states that "every school district belongs to or serves as a Career Technical Planning
 District" — a population with no non-members sums to the whole, so a statewide total needs no
 roster at all. Only attribution to a recipient does.
@@ -37,13 +38,17 @@ first, while the IRN column does not.
 
 **Caveats.**
 
-- **The two portals that published membership are gone.** `webapp2.ode.state.oh.us/ctpd_region/`,
-  the map whose per-CTPD pages listed each planning district's associate and member schools, no
-  longer resolves in DNS. The report card site's CTPD pages
-  (`reportcard.education.ohio.gov/ctpd/...`) return one identical 11,166-byte application shell
-  for **every** path, `/robots.txt` included, so a 200 from it is not evidence that a route exists
-  and nothing can be concluded from it without a browser. A membership roster is a live question,
-  not a settled absence. [open]
+- **Membership is published after all, by the site whose pages say nothing.**
+  `webapp2.ode.state.oh.us/ctpd_region/` is indeed gone from DNS, and the report card's CTPD pages
+  do return one identical 11,166-byte application shell for **every** path, `/robots.txt`
+  included — so nothing can be concluded from that site's *pages*. Its **data API** is a different
+  matter: `reportcarddataapi.education.ohio.gov/api/GetByIrn/{irn}/{year}` returns each planning
+  district's roster, and 954 FY2025 members are now committed. [verified]
+  ([`dew-ctpd-membership`](dew-ctpd-membership.md))
+
+  The caveat this replaces read "a membership roster is a live question, not a settled absence",
+  which was the right conclusion from what had been tried and was still two probes short of the
+  answer.
 - **This is a designation list, not a payment file.** It says who leads each planning district. It
   does not say what any of them was paid, and the department's career awareness payments are not
   published per recipient anywhere this corpus has found. The money is visible only in aggregate,

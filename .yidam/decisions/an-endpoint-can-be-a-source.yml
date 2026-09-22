@@ -1,0 +1,131 @@
+id: an-endpoint-can-be-a-source
+summary: >-
+  Career-technical planning district membership is retrieved from the report card's data API —
+  138 pinned URLs under the existing dew-report-card connector rather than a new one, because the
+  Azure key is accepted as a query parameter and the responses are byte-stable. The forty-seven
+  districts whose names collide are retrieved individually rather than matched by name.
+context: |
+  #419 closed #372 by establishing what the career awareness payment is: an earmark of GRF line
+  item 200545 rather than foundation funding, paid to the lead of each career-technical planning
+  district on the summed enrolled ADM of its members. It left one thing open —
+  [`career-technical-category-multiples`](../corpus/parameter/career-technical-category-multiples.yml)
+  recorded that "whether a membership roster is published anywhere else has not been established
+  — three places were tried and the negative result from the third is not a result."
+
+  It is published. The report card's **data API** returns each planning district's roster at
+  `reportcarddataapi.education.ohio.gov/api/GetByIrn/{irn}/{schYear}`, and
+  `detail.enrollmentDist` is the membership.
+
+  **#420 set two premises for this record and neither survived. The first: "a retrieval that
+  cannot be pinned by URL alone."** The endpoint's Azure Functions key — which the site ships to
+  every visitor in its hash-named `main.js` — is accepted as a **`?code=` query parameter** as
+  well as an `x-functions-key` header. That makes each roster a plain URL of
+  exactly the shape the report-card downloads already in this registry have, where the SAS token
+  rides in the query string. Nothing about `Source` needed changing, and the fragility the issue
+  wanted argued about is the ordinary fragility of any URL.
+
+  **"Three places were tried."** A fourth was: the report card's entire static download
+  catalogue. It publishes a `Career Technical Planning District` category of **twenty-four files
+  going back to 2013** — grades, ratings, and two 2013 files split by JVSD type. Membership is in
+  none of them. So "the API is the only route" is checked rather than assumed, which is what the
+  earlier note could not say about its own three probes.
+
+  **Two things the sweep found on the way. First, the 92 that were 90.** The catalog's CTPD table
+  has 92 rows and a map legend that "disagrees with itself". Ninety planning districts answer;
+  the two that do not are the correctional institutions `200600` and `200602`, which return
+  **HTTP 204** and appear in no organisation index because nobody rates them. 90 + 2 = 92, and the discrepancy the catalog recorded as
+  unresolved was a population boundary rather than a counting error.
+
+  **The join inverts.** A roster names its members and gives no identifier. But every *district's*
+  own record on the same endpoint carries `ctpd` and `ctpdIrn`, which state its planning district
+  directly — so the membership is knowable exactly, by IRN, with no name matching at all. That is
+  what this work used to verify the roster-side resolution rather than trusting it.
+decision: |
+  **The API is a source, under `dew-report-card`, not a new connector.** Same publisher, same
+  product, same release model — the argument
+  [`a-supplement-paid-to-a-population-the-panel-does-not-hold`](a-supplement-paid-to-a-population-the-panel-does-not-hold.yml)
+  made for putting the community school simulator under `dew-foundation` rather than beside it.
+  A tenth connector would assert a distinction that does not exist.
+
+  **138 pinned URLs**, which is more than this registry has ever spent on one question:
+
+  - **90 rosters**, one per rated planning district. Each note says how many districts and how
+    many community or STEM schools that planning district has, so the block is readable as data
+    rather than as ninety copies of one entry.
+  - **1 organisation index**, `live-search.json` — every organisation the report card rates, with
+    IRN, kind and name. This is what resolves a roster's names, and it is the publisher's own
+    table rather than a match against this repository's panel.
+  - **47 placements**, and they are the substance of this record. See below.
+
+  **Digests are worth taking on API responses here, which is not generally true.** Each document
+  carries Cosmos metadata — `_ts`, `_etag`, `_rid` — and `_ts` is the document's last *write*
+  rather than the time of the read, so two fetches are byte-identical. Pinning holds, and a
+  changed digest means the department rewrote the record rather than that a timestamp moved.
+
+  **The forty-seven are retrieved because a name cannot place them.** Normalised for the two
+  styles the publisher writes, Ohio's 607 rated district names collapse to **579 keys**:
+  nineteen keys are shared by forty-seven districts — three `Perry Local`s, three `Buckeye
+  Local`s, three `Madison Local`s. The organisation index disambiguates them with a ` - County`
+  tail that a roster entry does not carry, and `enrollmentDist` entries carry `distName` and
+  `enrlCtpd` and nothing else. So each of those forty-seven districts is retrieved on its own,
+  for the `ctpdIrn` its record states. No two same-named districts share a planning district —
+  checked against the other side, not assumed — so the placement is unique.
+
+  The builder **refuses** a shared name it cannot place, rather than choosing a candidate. That
+  is the whole point: `district-names-are-not-unique` is this repository's record of what a
+  name key costs, and the failure mode it warns about is a count that is wrong and plausible.
+
+  **The key is not committed, and that was not this record's idea.** GitHub's push protection
+  refused the first attempt: 137 copies of an Azure Functions key in a public repository. It is
+  right, and the reasoning is worth keeping. The key is shipped to every visitor in the
+  department's own bundle and a read through it is equivalent to loading the public page — so it
+  is not *secret*. But findable in a minified bundle and committed to a public repository's
+  permanent history under a name a scanner recognises are different acts, and it is somebody
+  else's credential either way. The URLs carry `{REPORT_CARD_KEY}` and `cache::resolved_url`
+  fills it from `EDFUND_REPORT_CARD_KEY`, on the same pattern as `EDFUND_CONTACT`: absent, these
+  sources cannot be refreshed and everything else works, because the fixture is committed.
+
+  This is what #420 meant by "any extractor has to re-read the key from the current bundle rather
+  than pin it" — correct advice reached for the wrong reason. The obstacle is not that the URL
+  cannot carry the key. It is that this repository should not.
+
+  **What is committed is what the source states.** `enrlCtpd` is career-technical enrolment; the
+  statute pays on enrolled ADM, which this source does not publish. The fixture carries the
+  published measure, the reader says which it is, and nothing built on it returns a dollar.
+alternatives: |
+  **Sweep all 607 district records instead of 47.** Exact IRN-to-IRN, no name matching anywhere,
+  no collision logic to review — and genuinely the simplest thing that is obviously correct.
+  Rejected on two counts. It is 607 near-identical registry entries against 137, which is where
+  "the registry is data a reader can check" stops being true; and it loses the 347 non-district
+  members entirely, because only a roster names them. That population is the measurement this
+  fixture exists for.
+
+  **Take only the 90 rosters and the index — 91 URLs.** This was the plan until it was tried. It
+  cannot place the forty-seven districts whose names collide, and the builder's own population
+  check is what caught it: it refused to write a fixture with 579 plausible rows where 607 belong.
+  Recorded here because the option looked sufficient right up to the point of being run, and the
+  thing that made it look sufficient was a cross-check that had the district sweep available.
+
+  **New sweep machinery: one retrieval step, one cached archive, one digest.** Conceptually the
+  cleanest — 138 URLs is a lot of registry for one question. Rejected because it is new machinery
+  in `connect` that nothing else uses, and because the `?code=` finding removed its main
+  justification: these are ordinary URLs, and the existing path fetches and pins them without
+  knowing they came from an API.
+
+  **Commit the fixtures and leave the connector `Retrievable`.** Rejected: the fixture would stop
+  being reproducible by `edfund-connect rebuild`, which is the property that makes every other
+  number in this repository traceable to a published byte.
+
+  **Resolve collisions by elimination — each district belongs to one planning district, so assign
+  greedily.** Rejected as order-dependent and unfalsifiable. It would produce an answer for every
+  input, including inputs where the answer is not determined, and nothing downstream could tell
+  the two cases apart.
+
+  **Bypass GitHub's push protection and commit the key.** Offered by the block message and
+  rejected. The key is already public in the department's bundle, so the marginal exposure is
+  small — but it is not ours, git history is not erasable by deleting a line, and a scanner
+  hit that a maintainer waved through is a worse precedent than an environment variable.
+
+  **Take FY2026, the site's current year.** Rejected in favour of FY2025, which is the year whose
+  roster-derived placement was cross-checked against every district's own `ctpdIrn` — all 607
+  agreed. FY2026 answers on the same endpoint and is a re-retrieval away.
