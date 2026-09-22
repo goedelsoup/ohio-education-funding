@@ -185,6 +185,50 @@ jobs:
       - name: The README indexes
         run: cargo run --manifest-path crates/Cargo.toml -p connect --bin edfund-connect -- index --check
 
+  # The corpus's own gate: `yidam lint`, against the baseline ratchet in `.yidam/`.
+  #
+  # It ran nowhere but a developer's shell until #437. An `edge-target-class` finding reached
+  # `main` in #427 and sat there across at least one more merge, and because the ratchet reports
+  # anything outside the baseline as "introduced by this change", every branch cut afterwards read
+  # someone else's finding as its own. Establishing that it was not cost a `git worktree`.
+  #
+  # That ratchet behaviour is the argument people reach for AGAINST gating on the lint, and it has
+  # it backwards: reading a pre-existing finding as new is only possible while `main` is red, which
+  # is the state this job exists to make unreachable. The cost it does carry is real but small — a
+  # branch that deliberately introduces an error-severity finding has to `mise run //:graph-lint-
+  # bless` in the same PR, with the reason in the commit, which is the ratchet working.
+  #
+  # `deploy` deliberately does NOT list this job in `needs`. The three gates it does wait on are
+  # the ones that decide whether the built site is *correct*; a lint finding about a corpus edge
+  # does not make a deployed page wrong, and holding a good build behind one would be a different
+  # policy than the one written below.
+  graph-lint:
+    name: corpus lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      # `install: false` on purpose. mise-action's default is `mise install`, which provisions the
+      # pinned Rust toolchain for a job that never compiles anything: `//:yidam-build` downloads an
+      # already-built binary for the commit in `.yidam.toml`, and only hands off to a compile when
+      # no release matches — which is why that task carries no `tools` of its own.
+      - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
+        with:
+          install: false
+          cache: false
+
+      # A fresh checkout trusts none of the three `mise.toml` files, and an untrusted config is
+      # silently an empty one — `mise run //:graph-lint` would fail as an unknown task rather than
+      # as a lint finding.
+      - name: Trust the configs
+        run: mise trust --all
+
+      - name: Install the pinned yidam
+        run: mise run //:yidam-build
+
+      - name: lint
+        run: mise run //:graph-lint
+
   # The site goes live from here, and from nowhere else that anyone should be relying on: a push
   # to `main` that cleared all three gates above. `mise run //:deploy` still exists and is still
   # occasionally the right thing, but it is no longer how production changes.

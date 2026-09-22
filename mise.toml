@@ -8,8 +8,10 @@
 # It was written when there was no git remote, so `.github/workflows/ci.yml` had
 # never executed once and this file was the only thing running the gates. There
 # is a remote now and that workflow runs on every push, so the two are peers:
-# this is what you run before pushing, and it runs the same nine gates in the
-# same order, so that a green local gate means something about the remote one.
+# this is what you run before pushing, and it runs the same gates in the same
+# order, so that a green local gate means something about the remote one. The
+# count used to be written out here as "nine"; it is not, because a hand-written
+# figure beside a list that changes is a figure that goes stale unread.
 #
 # Worth remembering why it was needed at all. `cargo doc -D warnings` was red for
 # at least two phases and nothing said so, because a workflow with nowhere to
@@ -159,11 +161,20 @@ pnpm = "11"
 # lives in the documents, so a re-vendor cannot reach it.
 
 [tasks.ci]
-description = "Everything CI runs: the crate gate, the web gate, and the generated-file check."
+description = "Everything CI runs: the crate gate, the web gate, the generated-file check, the corpus lint."
+# `//:graph-lint` runs last, and that is the only reason it is not first. It is by
+# far the cheapest of the four, so ordering it here costs a developer who breaks it
+# the whole gate — but it is also the one whose failure is a *finding* rather than a
+# broken build, and putting a finding ahead of `cargo test` would bury the build.
+#
+# It joined this list with the CI job of the same name (#437), and the two have to
+# move together: it was outside CI for long enough that `main` went red and stayed
+# red across a merge, which is the whole argument for gating on it.
 run = [
   "mise run //crates:gate",
   "mise run //web:gate",
   "mise run //:generated",
+  "mise run //:graph-lint",
 ]
 
 [tasks.generated]
