@@ -117,24 +117,37 @@ findings: |
   [guarantee](../formula-component/temporary-transitional-aid-guarantee.yml) and
   [transportation](../formula-component/fsfp-transportation.yml) the modelled formula contains
   **38** such bounds, and exactly **1** of them cannot bind: R.C. 3317.011(F)(6)(c)'s floor of
-  one leadership support staff member, whose own input is already floored past it. [verified —
-  crates/project] Every other bound is reached by at least one district in the department's
-  FY2027 model, so the second list is empty — there is no provision in the plan that Ohio has
-  written and never applied, only one sentence with no force. [verified — crates/project]
+  one leadership support staff member, whose own input is already floored past it. [verified]
+  (crates/project) Every other bound is reached by at least one district in the department's
+  FY2027 model, so the count of bounds that can bind and never have is **0** — there is no
+  provision in the plan that Ohio has written and never applied, only one sentence with no force.
+  [verified]
   ([`crates/project`](../../../crates/project/tests/the_bounds_that_cannot_bind_and_the_ones_that_never_have.rs))
+
+  Where those 38 sit, and how far each one reaches. Base cost carries **13** of them, the
+  categoricals **9**, transportation **7**, the guarantee **5** and local capacity **4** — which
+  is a fact about drafting rather than about which part of the plan is most hedged, since R.C.
+  3317.011 states each of its staffing elements as a minimum of its own. [verified]
+  (crates/project) The widest-reaching bound in the plan is that section's floor of one EMIS
+  support employee at (F)(5)(b), which is the operative term for **554** of the 609 districts —
+  more than five hundred districts funded for an EMIS employee they are too small to generate.
+  The leadership support floor above it is the operative term for **0**, which is what
+  unreachability looks like counted from the other end: the two are the ends of one ranking, and
+  the thirty-six bounds between them run from 499 districts down to one. [verified]
+  (crates/project)
 
   Three rows of that census are worth stating on their own. Two bounds are reached by exactly one
   district: the department's cap of the DPIA blended count at enrolled ADM, which only Edgerton
   Local reaches, and the guarantee's clamp of its own floor at zero, which only Richmond Heights
-  Local reaches, because its FY2020 funding base is negative. [verified — crates/project] One
+  Local reaches, because its FY2020 funding base is negative. [verified] (crates/project) One
   bound's population is fixed by the statute rather than by the state: R.C. 3317.017(A)(4)(d)(i)
   caps the local capacity percentage at 0.025 for every district at or above the fortieth-ranked
   income ratio, so the ceiling is on **40** districts whatever Ohio's incomes are — a rank
-  wearing a ceiling. [verified — crates/project] And the two zeroes in [targeted
+  wearing a ceiling. [verified] (crates/project) And the two zeroes in [targeted
   assistance](../formula-component/fsfp-targeted-assistance.yml) reach half the state between
   them: the capacity tier pays nothing to the **304** districts at or above the median district's
   weighted wealth, and the wealth tier pays nothing to the **171** whose wealth index is under
-  0.8. [verified — crates/project]
+  0.8. [verified] (crates/project)
 
   The census counts districts *on* a bound, which is not the count a bound *moves* — 138 sit on
   the minimum state share and 31 move when it is lowered — and the [open enrolment
@@ -168,6 +181,38 @@ figures:
     value: 171
     field: findings
     as_written: "the wealth tier pays nothing to the **171** whose wealth index"
+  - key: project/bounds-that-have-never-bound
+    value: 0
+    field: findings
+    as_written: "never have is **0**"
+  - key: project/bounds-in-base-cost
+    value: 13
+    field: findings
+    as_written: "Base cost carries **13** of them"
+  - key: project/bounds-in-the-categoricals
+    value: 9
+    field: findings
+    as_written: "categoricals **9**"
+  - key: project/bounds-in-transportation
+    value: 7
+    field: findings
+    as_written: "transportation **7**"
+  - key: project/bounds-in-the-guarantee
+    value: 5
+    field: findings
+    as_written: "the guarantee **5**"
+  - key: project/bounds-in-local-capacity
+    value: 4
+    field: findings
+    as_written: "local capacity **4**"
+  - key: project/bounds-the-most-reached-is-operative-for
+    value: 554
+    field: findings
+    as_written: "the operative term for **554** of the 609 districts"
+  - key: project/bounds-the-least-reached-is-operative-for
+    value: 0
+    field: findings
+    as_written: "above it is the operative term for **0**"
 
 properties:
   name: Fair School Funding Plan

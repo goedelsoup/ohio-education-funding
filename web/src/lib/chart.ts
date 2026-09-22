@@ -190,6 +190,33 @@ export interface Range {
 }
 
 /**
+ * One item of a long ranking: a name, a count, and whether it is the row the chart is about.
+ *
+ * A {@link Bar} with two of its fields renamed would have done for a short column. It is its own
+ * shape because of what {@link marked} is for. `Bar.current` is a flag — *this row is the
+ * subject* — and a flag is enough when the subject is one of six bars a reader can already see.
+ * On thirty-eight rows drawn on a log axis, the subject of the census of the plan's bounds is the
+ * row at **zero**, which is the one position a log axis cannot draw and a length cannot encode.
+ * So the mark carries a phrase rather than a boolean: it is drawn at the axis floor with that
+ * phrase printed beside it, which is the only way a null result appears on a chart of magnitudes
+ * as something other than an absence.
+ */
+export interface Rank {
+  label: string;
+  /** The count. Zero is a legitimate value here and is the one this form was written for. */
+  value: number;
+  hover: string;
+  /**
+   * Why this row is the one the chart was drawn to point at, in two or three words.
+   *
+   * At most one row of a ranking may carry it, for {@link Bar.current}'s reason: a chart with two
+   * subjects has none. Printed beside the mark, so the phrase is read rather than inferred from
+   * a colour, and the colour is the second channel rather than the only one.
+   */
+  marked?: string;
+}
+
+/**
  * One value in a distribution, with the text shown when a reader points at it.
  *
  * Carried as a pair rather than as a bare number because the populations these draw are small

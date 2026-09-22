@@ -17,6 +17,7 @@
  * by about ten minutes and now names the route it always claimed to.
  */
 
+import { census } from "../bounds.ts";
 import { loadCorpus } from "../corpus.ts";
 import { loadFeed } from "../feed.ts";
 import { acts, regimes } from "../legislation.ts";
@@ -39,6 +40,8 @@ export function pageCards(): Record<string, Card> {
      here: a card claiming five regimes that a sixth node makes wrong travels without the page
      beside it to correct it. `loadCorpus` is the same cached disk read the wiki's own cards use. */
   const corpus = loadCorpus();
+  /* The bounds card's figures, off the same series the page draws. See the card below. */
+  const bounds = census();
   const spans = regimes(corpus);
   const statutes = acts(corpus);
   const spanEnd =
@@ -193,6 +196,24 @@ export function pageCards(): Record<string, Card> {
         tone: "guarantee",
       },
       meta: `Every district against what its formula computes · ${fy}`,
+    },
+
+    /*
+     * The one card whose figure counts the formula rather than the state.
+     *
+     * Derived from the series manifest for the reason every figure here is derived from the feed:
+     * a card saying "38 bounds" that a thirty-ninth makes wrong travels onward without the page
+     * beside it to correct it. The note carries the finding rather than the count, because the
+     * count is already the figure and a card has one thing to say.
+     */
+    bounds: {
+      eyebrow: SITE,
+      headline: "Where the formula stops computing",
+      figure: `${count(bounds.rows.length)} bounds`,
+      figureNote: `floors, ceilings and clamps in Ohio's funding formula — ${
+        bounds.cannotBind.length === 1 ? "one of which" : `${count(bounds.cannotBind.length)} of which`
+      } can never be the operative term for any district in the state`,
+      meta: `Ranked by the districts each one decides · ${fy}`,
     },
 
     method: {

@@ -41,17 +41,18 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import type { Bar, Fit, ScatterPoint } from "./chart.ts";
+import type { Bar, Fit, Rank, ScatterPoint } from "./chart.ts";
 import type { Node } from "./corpus.ts";
 import { citedCrates, proseFields, type Manifest, type Unit } from "./corpusFigures.ts";
 import { count, money, pct } from "./format.ts";
+import * as routes from "./routes.ts";
 
 /**
  * The series manifest contract this module reads. Versioned apart from the figure manifest's:
  * the two documents have different shapes and different readers, and a field added to a row is no
  * reason for the scalar check to refuse a document it still reads correctly.
  */
-export const READS_SERIES_CONTRACT = "2.0.0";
+export const READS_SERIES_CONTRACT = "3.0.0";
 
 /** One row of a series: a category and its signed value. */
 export interface SeriesRow {
@@ -59,6 +60,24 @@ export interface SeriesRow {
   value: number;
   /** What the mark says on hover, when the label and the value are not enough on their own. */
   hover?: string;
+  /**
+   * The run of rows this one belongs to, where the axis has a second level — a family, a class.
+   * A table drawn from the series heads its rows with it.
+   */
+  group?: string;
+  /**
+   * The denominator, where the value is a count out of a population that is not the whole. `212`
+   * against `604` and `212` against `609` are different claims and the manifest makes the
+   * difference sayable; see the crate-side field for the census this exists for.
+   */
+  of?: number;
+  /** The authority this row's value rests on, where the row is a claim with a source of its own. */
+  cites?: string;
+  /**
+   * Why this row is the one the chart was drawn to point at, in a phrase, when one of them is the
+   * finding. At most one row a series carries. Becomes {@link Rank.marked}.
+   */
+  marked?: string;
   /** The `crates/figures.json` key whose pin this row reproduces in magnitude. */
   figure?: string;
 }
@@ -205,6 +224,71 @@ export function endpoints(series: ManifestSeries): SeriesRow[] {
  * for a chart to go.
  */
 export const DRAWABLE_FIELDS: readonly string[] = ["description", "findings"];
+
+/**
+ * The series a **page** draws rather than a node, and the node each one's endpoints are bound on.
+ *
+ * # Why a series can belong to a page at all
+ *
+ * A `series:` binding sits on a corpus node, and for most charts that is exactly right: a column
+ * of four correlations is a claim about property classes, and the node about property classes is
+ * where it belongs. The census of the plan's bounds is not a claim about any one component. It is
+ * thirty-eight edges of one plan seen at once — the shape of the whole instrument — and there is
+ * no node it is *about* that is not simply "the plan". Drawing it on a node would be filing a map
+ * of a country under one of its provinces.
+ *
+ * # What is given up, and what replaces it
+ *
+ * A page has no `figures:` block, so the endpoint rule has nothing on the page to hold to. This
+ * table is what replaces it: it names, per series, the route that draws it and **the node whose
+ * prose states its endpoints**. {@link crossCheckSeries} then holds that node to the same
+ * requirement a drawing node is held to — it must bind the figures at the series' ends — and the
+ * page links to it as the chart's provenance, so a reader who wants the numbers checked is one
+ * click from the prose that states them and the claim tags behind it.
+ *
+ * Declared here rather than in the corpus because it is a fact about the *site*: which route
+ * renders which computation is not something a node knows, and `routes.ts` is the module that
+ * says where things live.
+ */
+export const PAGE_SERIES: Readonly<Record<string, { route: string; node: string }>> = {
+  "project/bounds-census": { route: routes.BOUNDS, node: "funding-regime/fair-school-funding-plan" },
+};
+
+/**
+ * A series as the ranked rows {@link rankSpec} draws.
+ *
+ * The counterpart of {@link barsOf} for a long column on one count. Where that form has no
+ * subject, this one may: the manifest's `marked` is carried straight through, because the row a
+ * census is drawn for can be the row at zero and a length cannot encode that.
+ *
+ * The hover is composed rather than taken from the manifest's `hover`, which these rows mostly do
+ * not carry: the count, the population it is out of where that is not the whole, and the
+ * provision. That is the row of the table beside the chart, said once.
+ */
+export function ranksOf(series: ManifestSeries): Rank[] {
+  return series.rows.map((row) => {
+    const rank: Rank = { label: row.label, value: row.value, hover: hoverForRow(series, row) };
+    return row.marked == null ? rank : { ...rank, marked: row.marked };
+  });
+}
+
+/**
+ * What a census row says when a reader points at it: the count, the population it is counted out
+ * of, and the authority it rests on.
+ *
+ * The denominator is printed wherever the manifest gives one, including where it is the whole
+ * model. A tooltip is read one row at a time with nothing beside it, so a bare count is a figure
+ * the reader has to supply the basis for — and the rows where the basis is *not* the whole are
+ * exactly the ones a reader would not think to check.
+ */
+function hoverForRow(series: ManifestSeries, row: SeriesRow): string {
+  const value = formatValue(series.unit, row.value);
+  const head =
+    row.of === undefined
+      ? `${row.label}: ${value}`
+      : `${row.label}: ${value} of ${formatValue(series.unit, row.of)}`;
+  return [head, row.hover, row.cites].filter(Boolean).join(" — ");
+}
 
 /**
  * A row's value, written the way its unit is read: signed, because the chart is.
@@ -357,7 +441,9 @@ export type SeriesDiscrepancyKind =
   /** A number printed on a panel of a cloud is a figure this node does not bind. */
   | "fit-unbound"
   /** The manifest exports a series or a cloud no node draws. */
-  | "uncited-series";
+  | "uncited-series"
+  /** A series {@link PAGE_SERIES} says a page draws names a node the corpus does not hold. */
+  | "page-source-missing";
 
 /** One thing wrong between a node's `series:` block and the manifests. */
 export interface SeriesDiscrepancy {
@@ -473,6 +559,17 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
     }
   }
 
+  /*
+   * A series a page draws is drawn.
+   *
+   * The rest of the page's obligation — that the key exists and that the node it names binds the
+   * figures at its ends — is {@link crossCheckPageSeries}, because it is a question about
+   * {@link PAGE_SERIES} and not about the nodes and manifest handed in here. Only this one line
+   * belongs in this function: without it every page-drawn series is reported as computed for
+   * nobody, which is the one thing it is not.
+   */
+  for (const key of Object.keys(PAGE_SERIES)) drawn.add(key);
+
   const exported = [
     ...manifest.series.map((series) => [series.key, "column"] as const),
     ...manifest.scatters.map((cloud) => [cloud.key, "cloud"] as const),
@@ -485,11 +582,89 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
         kind: "uncited-series",
         message:
           `exports ${key} and no node draws it. A ${what} computed for nobody is a ${what} ` +
-          `nothing checks; bind it or remove it.`,
+          `nothing checks; bind it on a node, declare the page that draws it in PAGE_SERIES, ` +
+          `or remove it.`,
       });
     }
   }
 
+  return found;
+}
+
+/**
+ * The series a page draws, held on the node that states their ends.
+ *
+ * The endpoint rule, moved rather than waived: a node that draws a series must bind the figures at
+ * its largest and smallest rows, and a page has no `figures:` block to bind anything with — so
+ * {@link PAGE_SERIES} names the node that answers for it, and that node is held to exactly what a
+ * drawing node would be.
+ *
+ * Separate from {@link crossCheckSeries} because it asks a different question. That one is pure
+ * over the nodes and manifest it is given, and every test of it hands over a two-node fixture;
+ * this one is about a table in this module, so asking it of a fixture would report the whole of
+ * `PAGE_SERIES` as missing from every fixture manifest ever written. Both are run over the real
+ * corpus by the same test.
+ */
+export function crossCheckPageSeries(
+  nodes: Node[],
+  manifest: SeriesManifest,
+): SeriesDiscrepancy[] {
+  const byKey = new Map(manifest.series.map((series) => [series.key, series]));
+  const byId = new Map(nodes.map((node) => [node.id, node]));
+  const found: SeriesDiscrepancy[] = [];
+
+  for (const [key, source] of Object.entries(PAGE_SERIES)) {
+    const series = byKey.get(key);
+    if (!series) {
+      found.push({
+        node: source.node,
+        key,
+        kind: "unknown-key",
+        message:
+          `is declared in PAGE_SERIES as drawn by ${source.route}, and crates/series.json does ` +
+          `not carry it. Either the key was renamed in crates/figures/src/lib.rs or the page no ` +
+          `longer draws it.`,
+      });
+      continue;
+    }
+    const node = byId.get(source.node);
+    if (!node) {
+      found.push({
+        node: source.node,
+        key,
+        kind: "page-source-missing",
+        message:
+          `is drawn by ${source.route}, which names this node as where its endpoints are stated ` +
+          `— and the corpus has no such node. A page's chart is held by the node it cites; ` +
+          `without one it is held by nothing.`,
+      });
+      continue;
+    }
+    const bound = new Set(node.figures.map((figure) => figure.key));
+    for (const end of endpoints(series)) {
+      if (end.figure === undefined) {
+        found.push({
+          node: source.node,
+          key,
+          kind: "endpoints-unbound",
+          message:
+            `has "${end.label}" at ${end.value} as an endpoint and the manifest names no figure ` +
+            `for it. crates/figures/tests/ should have refused this; the manifest is stale.`,
+        });
+      } else if (!bound.has(end.figure)) {
+        found.push({
+          node: source.node,
+          key,
+          kind: "endpoints-unbound",
+          message:
+            `is drawn by ${source.route}, whose endpoint "${end.label}" at ${end.value} is ` +
+            `${end.figure}, and this node does not bind that figure. Bind it in figures: first — ` +
+            `a page has no figures: block of its own, so the node it cites is what holds the ` +
+            `numbers a reader takes off the chart.`,
+        });
+      }
+    }
+  }
   return found;
 }
 

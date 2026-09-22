@@ -121,6 +121,60 @@ pub enum Family {
     Transportation,
 }
 
+impl Family {
+    /// The five, in the order the plan computes them.
+    pub const ALL: [Self; 5] = [
+        Self::BaseCost,
+        Self::LocalCapacity,
+        Self::Categoricals,
+        Self::Guarantee,
+        Self::Transportation,
+    ];
+
+    /// What the family is called, in words — a heading rather than a citation.
+    #[must_use]
+    pub const fn label(self) -> &'static str {
+        match self {
+            Self::BaseCost => "Base cost",
+            Self::LocalCapacity => "Local capacity",
+            Self::Categoricals => "Categoricals",
+            Self::Guarantee => "Guarantee",
+            Self::Transportation => "Transportation",
+        }
+    }
+
+    /// The sections the family's bounds are stated in.
+    ///
+    /// Every member's own [`Bound::authority`] is inside one of these, which
+    /// `the_bounds_that_cannot_bind_and_the_ones_that_never_have.rs` asserts rather than trusts:
+    /// a bound filed under the wrong family would otherwise be a heading that is quietly wrong
+    /// about which instrument a reader is looking at.
+    #[must_use]
+    pub const fn authority(self) -> &'static str {
+        match self {
+            Self::BaseCost => "R.C. 3317.011, 3317.02",
+            Self::LocalCapacity => "R.C. 3317.017",
+            Self::Categoricals => "R.C. 3317.022, 3317.051, 3317.0217",
+            Self::Guarantee => "R.C. 3317.019, H.B. 110 Section 265.225",
+            // R.C. 3317.019(A)(2) is here and not under the guarantee because the bound it
+            // states is transportation's: the section that holds a district harmless holds
+            // its transportation payment harmless in its own division, and the family a
+            // bound belongs to is the instrument it bounds rather than the section it is
+            // printed in.
+            Self::Transportation => "R.C. 3317.0212, R.C. 3317.019(A)(2)",
+        }
+    }
+
+    /// How many of the modelled formula's bounds sit in this family.
+    #[must_use]
+    pub fn size(self) -> usize {
+        Bound::all()
+            .into_iter()
+            .filter(|b| b.family() == self)
+            .count()
+    }
+}
+
 /// Whether any input at all can put a bound in force — a property of the function.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Reach {
@@ -442,6 +496,69 @@ impl Bound {
             Self::SpecialEducationTransportFloor => {
                 "special education transportation state share, paid at the 50% floor"
             }
+        }
+    }
+
+    /// The same bound named short enough to sit in a chart's gutter.
+    ///
+    /// # Why there are two names and not one
+    ///
+    /// [`Self::label`] is written to be read in a sentence — it says which *side* of the
+    /// comparison the census counts, because a row read the other way is a row read backwards.
+    /// That makes it up to seventy characters, and thirty-eight of those down the left of one
+    /// chart is a name gutter wider than the chart. This is the same bound named for a reader who
+    /// already has the axis above it telling them what the count is of.
+    ///
+    /// Held to forty characters and to uniqueness by
+    /// `the_bounds_that_cannot_bind_and_the_ones_that_never_have.rs`, because a short name that
+    /// collides with another short name is two rows of a chart a reader cannot tell apart — and
+    /// the two gifted unit floors, the two staffing support ceilings and the two 50% transport
+    /// floors are all near enough to collide if nobody is checking.
+    #[must_use]
+    pub const fn short(self) -> &'static str {
+        match self {
+            Self::StaffingFloor(Minimum::SpecialTeachers) => "Six special teachers",
+            Self::StaffingFloor(Minimum::Counselors) => "One guidance counselor",
+            Self::StaffingFloor(Minimum::Wellness) => "Five wellness and success staff",
+            Self::StaffingFloor(Minimum::OtherAdministrators) => {
+                "Two other district administrators"
+            }
+            Self::StaffingFloor(Minimum::FiscalSupport) => "Two fiscal support staff",
+            Self::StaffingFloor(Minimum::Emis) => "One EMIS support employee",
+            Self::StaffingFloor(Minimum::LeadershipSupport) => "One leadership support staff",
+            Self::StaffingFloor(Minimum::BuildingSupport) => {
+                "One building support staff per building"
+            }
+            Self::StaffingCeiling(Ceiling::FiscalSupport) => "Thirty-five fiscal support staff",
+            Self::StaffingCeiling(Ceiling::BuildingSupport) => "Three building support staff each",
+            Self::SizeBandSmall => "Size-banded salaries, under 500 ADM",
+            Self::SizeBandLarge => "Size-banded salaries, over 4,000 ADM",
+            Self::BaseCostEnrolledAdm => "Enrolled ADM, the single year",
+            Self::ValuationLesserOf => "Capacity valuation, the recent year",
+            Self::IncomeLesserOf => "Capacity income, the recent year",
+            Self::CapacityRateCeiling => "Capacity percentage capped at 0.025",
+            Self::MinimumStateShare => "Minimum state share of base cost",
+            Self::DpiaCountCap => "DPIA count capped at enrolled ADM",
+            Self::GiftedCoordinatorFloor => "Gifted coordinator units, floor",
+            Self::GiftedCoordinatorCeiling => "Gifted coordinator units, ceiling",
+            Self::GiftedSpecialistK8Floor => "K-8 gifted specialist units, floor",
+            Self::GiftedSpecialist912Floor => "9-12 gifted specialist units, floor",
+            Self::CapacityTierZero => "Capacity tier zero at median wealth",
+            Self::CapacityTierSizeCutoff => "Capacity tier zero under 200 ADM",
+            Self::CapacityTierSizeRamp => "Capacity tier ramped to 600 ADM",
+            Self::WealthTierZero => "Wealth tier zero under an index of 0.8",
+            Self::FundingBaseClampAtZero => "Guarantee floor clamped at zero",
+            Self::Guarantee => "The guarantee itself",
+            Self::DecreaseThresholdFloor => "Decrease threshold, floor of twenty",
+            Self::ClawbackClampAtZero => "Clawback clamped by the guarantee",
+            Self::TransitionSupplement => "Formula transition supplement",
+            Self::TransportationFloor => "Transportation share at the 50% floor",
+            Self::MileBase => "Mile base over rider base",
+            Self::EfficiencyZero => "Efficiency zero under an index of 1.0",
+            Self::EfficiencyCeiling => "Efficiency held at 15%",
+            Self::DensityZero => "Density zero at 28 riders a square mile",
+            Self::TransportationGuarantee => "Transportation's own guarantee",
+            Self::SpecialEducationTransportFloor => "Special education transport, 50% floor",
         }
     }
 
