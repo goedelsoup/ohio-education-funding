@@ -208,10 +208,6 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
-      # `install: false` on purpose. mise-action's default is `mise install`, which provisions the
-      # pinned Rust toolchain for a job that never compiles anything: `//:yidam-build` downloads an
-      # already-built binary for the commit in `.yidam.toml`, and only hands off to a compile when
-      # no release matches — which is why that task carries no `tools` of its own.
       - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
         with:
           install: false
@@ -223,8 +219,26 @@ jobs:
       - name: Trust the configs
         run: mise trust --all
 
+      # `[tools]` in mise.toml, NOT `mise run //:yidam-build`. Both install the pin in
+      # `.yidam.toml` — the `github:goedelsoup/yidam` line is written from it by
+      # `yidam-vendor-update` — but only one of them works on a runner.
+      #
+      # `//:yidam-build` resolves "is this commit tagged?" with `git ls-remote` against the
+      # `origin` recorded in `.yidam.toml`, which is an **SSH** URL. A developer has a key, so the
+      # tag resolves and the release downloads; a runner has none, `git ls-remote` fails into
+      # `2>/dev/null || true`, and an empty tag is indistinguishable from "no release exists". It
+      # then falls through to the source build, which clones that same SSH URL and dies on
+      # `Permission denied (publickey)` after provisioning a second Rust toolchain. That is what
+      # the first run of this job did, and the local rehearsal could not have caught it: the thing
+      # that differs is the key.
+      #
+      # mise's own github backend fetches the release tarball over anonymous HTTPS. `_.path`
+      # puts `.yidam/bin` ahead of the shims, so a developer with a `//:yidam-build` install still
+      # runs that one and this changes nothing locally; in CI the directory does not exist
+      # (gitignored) and the shim answers, with the same `yidam 0.13.0 (a8fead4)` and the same
+      # feature set.
       - name: Install the pinned yidam
-        run: mise run //:yidam-build
+        run: mise install "github:goedelsoup/yidam"
 
       - name: lint
         run: mise run //:graph-lint
