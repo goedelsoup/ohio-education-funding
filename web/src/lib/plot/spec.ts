@@ -436,7 +436,7 @@ export function barSpec(bars: Bar[], options: { width: number; max?: number }): 
   const max = options.max ?? Math.max(...bars.map((b) => Math.abs(b.value)), 1);
   const labelled = bars.filter((b) => b.direct != null);
   /*
-   * A negative value is drawn as a negative value, on the one chart in the build that has one.
+   * A negative value is drawn as a negative value, on the charts in the build that have one.
    *
    * This mark took `Math.abs(b.value)` and filled every bar with the same colour, so a deficit
    * and a surplus of the same size were the same picture. Springfield Local held
@@ -494,8 +494,9 @@ export function barSpec(bars: Bar[], options: { width: number; max?: number }): 
    * weight. Weight survives a monochrome print and a forced-colours mode, which is the point.
    *
    * In signed mode the fill already carries polarity — a deficit against a surplus — and a hue
-   * cannot mean two things at once, so there the subject bar keeps the label channel alone. Only
-   * one chart in the build is signed and none of its bars is a subject.
+   * cannot mean two things at once, so there the subject bar keeps the label channel alone. Two
+   * charts in the build are signed — Springfield's balance, and the correlation-by-class column a
+   * corpus node draws from `crates/series.json` — and none of their bars is a subject.
    */
   const marked = bars.filter((b) => b.current);
   const plain = bars.filter((b) => !b.current);

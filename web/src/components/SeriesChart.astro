@@ -1,0 +1,29 @@
+---
+/**
+ * One series a corpus node draws, at the end of the prose field its `series:` entry names.
+ *
+ * The chart is `crates/series.json`'s column rendered by `barSpec`, server-side, twice — see
+ * `renderToString` — and the node's own `figures:` block holds its endpoints to the prose it sits
+ * under (the endpoint rule, in `corpusSeries.ts`). Nothing here reads the corpus: the route
+ * resolves the binding and hands over what to draw, so this is a placement and not a lookup.
+ *
+ * `level` is the heading depth the card puts the chart at. A findings card opens with its own
+ * `<h2>`, so its chart is an `<h3>`; a description card has no heading of its own and its prose
+ * opens at `<h2>` — see `levelHeadings` in `semantics.ts` — so a chart there is an `<h2>` too, or
+ * the page would skip a level and the dist scan for that would fail the build. The heading
+ * carries no `id`, deliberately: that is how `levelHeadings` tells a template heading from a
+ * prose one, and the address is on the card.
+ */
+interface Props {
+  chart: { key: string; label: string; axis: string; html: string };
+  level: "h2" | "h3";
+}
+const { chart, level } = Astro.props;
+const Heading = level;
+---
+
+<div class="series" data-series={chart.key}>
+  <Heading>{chart.label}</Heading>
+  <div class="chartwrap" data-chart={chart.key} set:html={chart.html} />
+  <p class="note">By {chart.axis.charAt(0).toLowerCase()}{chart.axis.slice(1)}. Hover or focus a bar for its value.</p>
+</div>
