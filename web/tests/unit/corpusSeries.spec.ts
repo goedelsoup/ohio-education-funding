@@ -13,11 +13,15 @@ import { loadCorpus, type Node } from "../../src/lib/corpus.ts";
 import { loadFigureManifest, READS_CONTRACT, type Manifest } from "../../src/lib/corpusFigures.ts";
 import {
   barsOf,
+  crossCheckPageSeries,
   crossCheckSeries,
   endpoints,
+  PAGE_SERIES,
+  ranksOf,
   fitsAgainstFigures,
   formatRow,
   loadSeriesManifest,
+  type ManifestSeries,
   panelsOf,
   READS_SERIES_CONTRACT,
   rowsAgainstFigures,
@@ -37,6 +41,14 @@ test("every series a node draws is one the crate exports, bound at both ends", (
   ).toEqual([]);
 });
 
+test("every series a page draws exists, and its ends are bound on the node it names", () => {
+  const found = crossCheckPageSeries(corpus.nodes, manifest);
+  expect(
+    found.map((entry) => `[${entry.kind}] ${entry.node} — ${entry.message}`),
+    "a page's chart has come apart from the node that answers for its figures",
+  ).toEqual([]);
+});
+
 test("the two committed manifests agree on every row that names a figure", () => {
   expect(rowsAgainstFigures(manifest, figures)).toEqual([]);
 });
@@ -51,6 +63,11 @@ test("the two committed manifests agree on every number printed on a panel", () 
  *
  * One series and one carrier: `dispersion/fy2016-step-by-business-class` on
  * `education-agency/toledo-city`, which is #416's finding drawn as the four bars it was found by.
+ *
+ * Every computation the manifest exports is drawn *somewhere*, and there are two somewheres: a
+ * node's `series:` block, and a page declared in `PAGE_SERIES`. The sum is the assertion, because
+ * the defect it exists to catch — a column computed for nobody — is the same defect whichever of
+ * the two is meant to be drawing it.
  */
 test("the corpus draws no fewer series than it did", () => {
   const drawn = corpus.nodes.flatMap((node) => node.series);
@@ -60,8 +77,8 @@ test("the corpus draws no fewer series than it did", () => {
     "1 node draws a series; raise this when a second does",
   ).toBeGreaterThanOrEqual(1);
   expect(
-    new Set(drawn.map((binding) => binding.key)).size,
-    "every series and cloud the manifest exports is drawn by some node",
+    new Set([...drawn.map((binding) => binding.key), ...Object.keys(PAGE_SERIES)]).size,
+    "every series and cloud the manifest exports is drawn by some node or page",
   ).toBe(manifest.series.length + manifest.scatters.length);
   expect(
     manifest.scatters.length,
@@ -83,6 +100,64 @@ test("the endpoints of a series are its largest and smallest rows by signed valu
   // Industrial is the top of the chart and mineral the bottom; the summed share sits between,
   // which is the cancellation the chart exists to show.
   expect(endpoints(series!).map((row) => row.label)).toEqual(["Industrial", "Mineral"]);
+});
+
+// --- The page-drawn series, broken on purpose in each position it can fail in -----------------
+
+/**
+ * These three mutate the **real** corpus and manifest rather than a fixture, which is the
+ * opposite of the convention below and is deliberate: `crossCheckPageSeries` reads `PAGE_SERIES`
+ * out of the module, so a fixture manifest would report every page-drawn series as missing no
+ * matter what the fixture said. Taking the real inputs and removing exactly one thing is the only
+ * way to produce one kind at a time here.
+ */
+const kindsOfPages = (nodes: Node[], series: SeriesManifest): SeriesDiscrepancyKind[] =>
+  crossCheckPageSeries(nodes, series).map((entry) => entry.kind);
+
+/** The nodes `PAGE_SERIES` names as answering for a page's endpoints. */
+const pageSources = new Set(Object.values(PAGE_SERIES).map((source) => source.node));
+
+test("PAGE_SERIES is not empty, and every entry names a route and a corpus id", () => {
+  // A check over an empty table passes against any corpus. One page draws a series today:
+  // `project/bounds-census` on `/bounds`. Raise this when a second does.
+  const entries = Object.entries(PAGE_SERIES);
+  expect(entries.length, "1 page draws a series; raise this when a second does").toBeGreaterThanOrEqual(1);
+  for (const [key, source] of entries) {
+    expect(source.route, key).toMatch(/^\//);
+    expect(source.node, key).toMatch(/^[a-z0-9-]+\/[a-z0-9-]+$/);
+  }
+});
+
+test("unknown-key: a page declares a series crates/series.json does not carry", () => {
+  const without: SeriesManifest = {
+    ...manifest,
+    series: manifest.series.filter((series) => !(series.key in PAGE_SERIES)),
+  };
+  const found = kindsOfPages(corpus.nodes, without);
+  expect(found).toEqual(Object.keys(PAGE_SERIES).map(() => "unknown-key"));
+});
+
+test("page-source-missing: the node a page cites for its endpoints is not in the corpus", () => {
+  const without = corpus.nodes.filter((node) => !pageSources.has(node.id));
+  expect(kindsOfPages(without, manifest)).toEqual([...pageSources].map(() => "page-source-missing"));
+});
+
+test("endpoints-unbound: the node a page cites binds nothing at the chart's ends", () => {
+  const stripped = corpus.nodes.map((node) =>
+    pageSources.has(node.id) ? { ...node, figures: [] } : node,
+  );
+  const found = kindsOfPages(stripped, manifest);
+  expect(found.length, "a stripped source node reports every endpoint").toBeGreaterThan(0);
+  expect(new Set(found)).toEqual(new Set(["endpoints-unbound"]));
+});
+
+test("a page-drawn series is not also reported as computed for nobody", () => {
+  // The two checks are halves of one rule, and the half that lives in `crossCheckSeries` is a
+  // single `drawn.add`. Drop it and every page's chart is reported as a column nothing draws.
+  const found = crossCheckSeries(corpus.nodes, manifest).filter(
+    (entry) => entry.kind === "uncited-series",
+  );
+  expect(found.map((entry) => entry.key)).toEqual([]);
 });
 
 // --- The gate, broken on purpose in each position ---------------------------------------------
@@ -204,6 +279,50 @@ test("a series becomes the bars the chart draws, signed and with a spoken value"
   expect(formatRow("dollars", 5_100_000)).toBe("+$5,100,000");
   expect(formatRow("count", 65)).toBe("+65");
   expect(formatRow("ratio", 0)).toBe("0.0000");
+});
+
+test("a census becomes the ranked rows the log chart draws, with its marked row kept", () => {
+  /*
+   * The four members contract 3.0.0 added, in the one place they are all read. The hover is
+   * composed here rather than taken from the manifest — the count, the population it is out of,
+   * and the provision — because a census row's `hover` is mostly empty and what a reader wants
+   * pointed at is the row of the table beside the chart. The denominator is printed on every row
+   * that has one, including the rows where it is the whole model: a tooltip is read one at a
+   * time, so "554" with the 609 left off is a figure a reader has to supply the basis for.
+   */
+  const series: ManifestSeries = {
+    key: "project/example-census",
+    owner: "crates/project",
+    unit: "count",
+    axis: "Bound",
+    label: "Every bound",
+    rows: [
+      { label: "A floor that binds", value: 554, group: "Base cost", of: 609, cites: "R.C. 1" },
+      { label: "A floor on a subset", value: 12, group: "Transport", of: 604, cites: "R.C. 2" },
+      {
+        label: "A floor that cannot",
+        value: 0,
+        group: "Base cost",
+        of: 609,
+        cites: "R.C. 3",
+        marked: "cannot bind",
+      },
+    ],
+  };
+  expect(ranksOf(series)).toEqual([
+    { label: "A floor that binds", value: 554, hover: "A floor that binds: 554 of 609 — R.C. 1" },
+    {
+      label: "A floor on a subset",
+      value: 12,
+      hover: "A floor on a subset: 12 of 604 — R.C. 2",
+    },
+    {
+      label: "A floor that cannot",
+      value: 0,
+      hover: "A floor that cannot: 0 of 609 — R.C. 3",
+      marked: "cannot bind",
+    },
+  ]);
 });
 
 test("unattributed: the node cites the owning crate in no claim tag", () => {

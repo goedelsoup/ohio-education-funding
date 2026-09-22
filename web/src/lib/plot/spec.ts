@@ -35,6 +35,7 @@ import type {
   FanPoint,
   Fit,
   Range,
+  Rank,
   ScatterPoint,
   SeriesPoint,
   Trace,
@@ -1293,6 +1294,203 @@ export function rangeSpec(
       selector: ".range-hit > *",
       text: rows.map((r) => escapeHtml(r.hover)),
       cursor: { second: "paired marks", layers: [".range-low", ".range-high"] },
+    },
+  };
+}
+
+/**
+ * Many items on one count, ranked, on a logarithmic axis — with the item at zero drawn.
+ *
+ * # Why this is not `barSpec`
+ *
+ * The census of the modelled formula's bounds is thirty-eight rows running from 554 districts to
+ * one, and one row at **nought**. On a linear axis the bottom third of that is a row of stubs
+ * indistinguishable from each other and from zero: the two bounds reached by exactly one district
+ * — the cap on the DPIA blended count and the clamp of the guarantee's floor — are the finding
+ * at that end of the sort, and a bar 0.18% of the frame long does not state a finding. A log axis
+ * gives every one of the thirty-eight a length its own eye can compare, which is the whole reason
+ * the axis is logarithmic and is the same argument {@link rangeSpec} makes for `/counties`.
+ *
+ * # The row a log axis cannot draw
+ *
+ * Zero is nowhere on a log scale, and a zero-length bar says nothing on any scale — but the bound
+ * that **cannot bind** is the most interesting row in the census and dropping it would be a chart
+ * that reports thirty-seven bounds and calls itself a map of thirty-eight. So a row at zero is
+ * drawn at the axis floor, half a decade below the smallest value that can be placed, in the
+ * contrasting hue and with its own phrase printed beside it — see {@link Rank.marked}. It is
+ * visibly outside the run of the data rather than being the shortest member of it, which is what
+ * a reader has to understand about it.
+ *
+ * # Dot and stem, not a bar
+ *
+ * A bar's *length* encodes its value, and on a log axis a length is a ratio to wherever the frame
+ * happens to start — so a bar drawn from an arbitrary floor would be a magnitude a reader could
+ * read off it and would be wrong. The datum is therefore the **dot**, at its own position, and
+ * the stem behind it is drawn in rule ink as a guide across the row rather than as a measure.
+ * The same vocabulary, and for the same reason, as `rangeSpec`'s span and ends.
+ */
+export function rankSpec(
+  rows: Rank[],
+  axis: { label: string; format: (v: number) => string },
+  options: { width: number },
+): Spec | null {
+  if (rows.length < 2) return null;
+  if (rows.some((r) => r.value < 0)) return null;
+
+  const values = rows.map((r) => r.value);
+  const max = Math.max(...values);
+  const smallest = Math.min(...values);
+  const positive = values.filter((v) => v > 0);
+  if (positive.length === 0 || max <= 0) return null;
+  /*
+   * The left end of the drawn domain.
+   *
+   * Where nothing is at zero it is simply the smallest value. Where something is, it is half the
+   * smallest value that *can* be drawn — a clear step below the axis's own bottom mark, so the
+   * zero row reads as off the scale rather than as the last rung of it.
+   */
+  const floor = smallest > 0 ? smallest : Math.min(...positive) / 2;
+  const at = (r: Rank) => (r.value > 0 ? r.value : floor);
+
+  const longest = Math.max(...rows.map((r) => r.label.length));
+  const { width } = options;
+  // Sized to the longest name, like `barSpec`'s, and to 260 rather than `rangeSpec`'s 150: these
+  // names are sentences about a provision and not county names. Where the cap bites, the row
+  // grows to hold two lines rather than the name being cut — the 14px row `rangeSpec` draws
+  // cannot, which is why that form truncates and this one wraps.
+  const wanted = Math.max(90, Math.min(260, Math.round(longest * 6.2) + 12));
+  const marginLeft = gutter(width, wanted);
+  const rowHeight = marginLeft < wanted ? 28 : 16;
+
+  const marked = rows.filter((r) => r.marked != null);
+  const plain = rows.filter((r) => r.marked == null);
+  /*
+   * Room at the right for the marked row's phrase, which is the one direct label this form draws.
+   *
+   * Not simply the phrase's width. It is printed outward from its own mark, so what it needs
+   * *past the frame* is its width less whatever empty plot already lies to the right of that
+   * mark — and the row this form exists for sits at the axis floor, where the whole width of the
+   * plot is empty to its right and the reserve is nothing at all. Reserving for it anyway cost
+   * 95px of a 320px frame: a third of the narrow drawing, held blank, for text drawn at the
+   * opposite edge.
+   *
+   * Measured against a first pass with no reserve, which is the smaller frame, so the answer errs
+   * toward leaving room rather than toward cutting the phrase.
+   */
+  const phrase = Math.max(0, ...marked.map((r) => textPx(r.marked ?? "", 10)));
+  const inner = Math.max(1, width - marginLeft - gutter(width, 16));
+  const decades = Math.log(max / floor);
+  const rightmost = Math.max(floor, ...marked.map(at));
+  const beyond = inner * (1 - (decades > 0 ? Math.log(rightmost / floor) / decades : 0));
+  const marginRight = gutter(width, 16 + Math.max(0, 8 + phrase - beyond));
+
+  const foot = axisFoot({
+    width,
+    marginLeft,
+    marginRight,
+    dy: 16,
+    low: axis.format(smallest),
+    says: `${axis.label} (log scale)`,
+    high: axis.format(max),
+  });
+
+  return {
+    options: {
+      width,
+      height: rows.length * rowHeight,
+      marginLeft,
+      marginRight,
+      marginTop: 0,
+      marginBottom: 22 + foot.extraBottom,
+      x: { axis: null, type: "log", domain: [floor, max] },
+      y: { axis: null, domain: rows.map((r) => r.label), padding: 0.2 },
+      marks: [
+        // The guide, not the measure. Under the dot, and absent from the zero row, which has no
+        // distance to cover and whose position is the claim.
+        Plot.ruleY(plain, {
+          y: "label",
+          x1: floor,
+          x2: at,
+          stroke: INK.rule,
+          strokeWidth: 1,
+          className: "rank-stem",
+        }),
+        /*
+         * One dot mark for every row, with the hue as a channel.
+         *
+         * Split by subject the way the labels below are and `attachHovers` would index the wrong
+         * tooltip onto it: the cursor pairs `.rank-hit`'s children with `.rank-dot`'s by
+         * position, and `declareCursor` refuses a chart where the two layers disagree in count.
+         * `barSpec` takes the same channel for the same reason.
+         */
+        Plot.dot(rows, {
+          y: "label",
+          x: at,
+          r: DOT_RADIUS,
+          fill:
+            marked.length > 0
+              ? (r: Rank) => (r.marked == null ? SERIES.formula : SERIES.guarantee)
+              : SERIES.formula,
+          stroke: "none",
+          className: "rank-dot",
+        }),
+        Plot.text(plain, {
+          y: "label",
+          frameAnchor: "left",
+          dx: -8,
+          text: "label",
+          textAnchor: "end",
+          fill: INK.secondary,
+          fontSize: 10,
+          lineWidth: lineWidth(marginLeft),
+          className: "rank-label",
+        }),
+        // The subject's second channel. Weight and ink survive a monochrome print and a
+        // forced-colours mode; the hue above does not, and colour is never the only channel.
+        ...(marked.length > 0
+          ? [
+              Plot.text(marked, {
+                y: "label",
+                frameAnchor: "left",
+                dx: -8,
+                text: "label",
+                textAnchor: "end",
+                fill: INK.primary,
+                fontSize: 10,
+                fontWeight: 600,
+                lineWidth: lineWidth(marginLeft),
+                className: "rank-label current",
+              }),
+              Plot.text(marked, {
+                y: "label",
+                x: at,
+                dx: 8,
+                text: "marked",
+                textAnchor: "start",
+                fill: INK.primary,
+                fontSize: 10,
+                className: "rank-mark",
+              }),
+            ]
+          : []),
+        ...foot.marks,
+        // The hit target is the row rather than the dot, and overhangs the ends by the dot's
+        // radius — `rangeSpec`'s insets, for the defect recorded there.
+        Plot.rect(rows, {
+          y: "label",
+          x1: floor,
+          x2: max,
+          insetLeft: -DOT_RADIUS,
+          insetRight: -DOT_RADIUS,
+          fill: "transparent",
+          className: "rank-hit",
+        }),
+      ],
+    },
+    hovers: {
+      selector: ".rank-hit > *",
+      text: rows.map((r) => escapeHtml(r.hover)),
+      cursor: { second: "paired marks", layers: [".rank-dot"] },
     },
   };
 }

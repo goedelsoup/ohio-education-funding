@@ -110,11 +110,13 @@ pub const CONTRACT_VERSION: &str = "1.1.0";
 /// separately from it: the two documents are read by two consumers, and a field added to a row
 /// is not a reason for the scalar check to refuse a manifest it still reads correctly.
 ///
-/// 2.0.0 is the second drawing, [`SCATTERS`], arriving beside the first. Its consumer compares
-/// the version exactly, so this is breaking whether or not the columns' own shape moved — which
-/// is the behaviour wanted: a reader that has not been taught what a `scatters` array is should
-/// stop rather than render half a document.
-pub const SERIES_CONTRACT_VERSION: &str = "2.0.0";
+/// 2.0.0 was the second drawing, [`SCATTERS`], arriving beside the first. 3.0.0 is the four
+/// optional members a row gained for the census of the plan's bounds — [`Row::group`],
+/// [`Row::of`], [`Row::cites`] and [`Row::marked`] — which are what let a long ranked column be
+/// read as a table as well as a chart. Its consumer compares the version exactly, so both were
+/// breaking whether or not any existing entry moved, which is the behaviour wanted: a reader
+/// that has not been taught what a member means should stop rather than draw half of one.
+pub const SERIES_CONTRACT_VERSION: &str = "3.0.0";
 
 /// What a figure is measured in, which decides how prose is allowed to write it.
 ///
@@ -208,6 +210,34 @@ pub struct Row {
     /// What a reader hovering the mark should be told, when the label and the value are not
     /// enough on their own. Absent, the chart says `label: value`.
     pub hover: Option<&'static str>,
+    /// The run of rows this one belongs to, where the axis has a second level — a family, a
+    /// class, a year. A chart may band the rows by it; a table under the chart may head them.
+    ///
+    /// Absent on a column of four bars that are simply four things. Present where the axis is
+    /// long enough that a reader needs to be told which part of the subject they are inside of.
+    pub group: Option<&'static str>,
+    /// The denominator, where the value is a count out of a population that is not the whole.
+    ///
+    /// A census of bounds is the case this exists for: most of the modelled formula's bounds are
+    /// defined for all 609 districts, seven of them for the 604 that run buses, and one for the
+    /// 43 that are charged. `212` against `604` and `212` against `609` are different claims,
+    /// and a chart that draws the numerator alone cannot tell a reader which it made.
+    pub of: Option<f64>,
+    /// The authority this row's value rests on, where the row is a claim with a source of its
+    /// own rather than a slice of the series' one computation.
+    ///
+    /// Not the same thing as [`Self::hover`]: a hover is what to say about a mark, and this is
+    /// where the row came from. A table drawn from the series prints it as a column.
+    pub cites: Option<&'static str>,
+    /// Why this row is the one the chart was drawn to point at, in a phrase, when one of them is
+    /// the finding.
+    ///
+    /// A chart with a subject draws it in the contrasting hue with this as a direct label — see
+    /// `Bar.current` and `Bar.direct` in `web/src/lib/chart.ts`, which are the same two ideas.
+    /// It exists because the finding a series is sometimes drawn for is a row at *zero*, and a
+    /// zero-length mark says nothing: the bound that cannot bind has to be marked rather than
+    /// dropped, and at most one row a series carries may be.
+    pub marked: Option<&'static str>,
     /// The [`Figure`] in [`FIGURES`] whose pin this row reproduces in magnitude, when there is
     /// one. Required on the largest and smallest row of every series — the endpoint rule in the
     /// module docs — and welcome on any other.
@@ -2035,6 +2065,47 @@ fn fy2016_step_against(i: &Inputs, share: fn(&dispersion::fy2016::District) -> f
         .correlation
 }
 
+/// How many of the modelled formula's bounds one instrument states.
+#[allow(clippy::cast_precision_loss)]
+fn family_size(family: project::bounds::Family) -> f64 {
+    family.size() as f64
+}
+
+/// Which end of the ranked census a figure stands at.
+#[derive(Clone, Copy)]
+enum Extreme {
+    /// The bound the most districts are on.
+    Most,
+    /// The bound the fewest are on, which is zero and is the finding.
+    Least,
+}
+
+/// The census's rows, ranked by how many districts each bound is the operative term for.
+///
+/// Descending, and stably, so a tie keeps the statutory order [`project::bounds::Bound::all`]
+/// returns — which is the order the corpus's table is written in, and the order a reader who
+/// went looking for one of these bounds in the Revised Code would find them.
+fn census_ranked(i: &Inputs) -> Vec<project::bounds::Row> {
+    let mut rows = project::bounds::census(&i.panel);
+    rows.sort_by_key(|row| core::cmp::Reverse(row.operative));
+    rows
+}
+
+/// The count at one end of the ranked census.
+///
+/// # Panics
+///
+/// If the census is empty, which would mean the modelled formula has no bounds in it.
+fn census_extreme(i: &Inputs, end: Extreme) -> usize {
+    let ranked = census_ranked(i);
+    match end {
+        Extreme::Most => ranked.first(),
+        Extreme::Least => ranked.last(),
+    }
+    .expect("the modelled formula has bounds")
+    .operative
+}
+
 /// The columns the wiki draws. See the module docs for the endpoint rule every entry obeys.
 pub static SERIES: &[Series] = &[
     // #416's finding, as the four bars it was found by: the summed business share is a near-zero
@@ -2054,18 +2125,30 @@ pub static SERIES: &[Series] = &[
                     label: "Industrial",
                     value: fy2016_step_against(i, |d| d.industrial_share),
                     hover: None,
+                    group: None,
+                    of: None,
+                    cites: None,
+                    marked: None,
                     figure: Some("dispersion/fy2016-step-against-industrial-share"),
                 },
                 Row {
                     label: "Mineral",
                     value: fy2016_step_against(i, |d| d.mineral_share),
                     hover: None,
+                    group: None,
+                    of: None,
+                    cites: None,
+                    marked: None,
                     figure: Some("dispersion/fy2016-step-against-mineral-share-negative"),
                 },
                 Row {
                     label: "Public utility",
                     value: fy2016_step_against(i, |d| d.public_utility_share),
                     hover: None,
+                    group: None,
+                    of: None,
+                    cites: None,
+                    marked: None,
                     figure: Some("dispersion/fy2016-step-against-public-utility-share-negative"),
                 },
                 Row {
@@ -2075,9 +2158,71 @@ pub static SERIES: &[Series] = &[
                         dispersion::fy2016::District::summed_business_share,
                     ),
                     hover: None,
+                    group: None,
+                    of: None,
+                    cites: None,
+                    marked: None,
                     figure: Some("dispersion/fy2016-step-against-summed-business-share"),
                 },
             ]
+        },
+    },
+    // #410's census, as the chart it was always a table of: every bound the modelled formula
+    // states, ranked by how many of the 609 districts it is the operative term for. The long
+    // column this manifest was extended for — `group`, `of`, `cites` and `marked` all exist
+    // because thirty-eight rows on one count is a table as much as it is a chart, and because
+    // the row that matters most is at zero.
+    Series {
+        key: "project/bounds-census",
+        owner: "crates/project",
+        unit: Unit::Count,
+        axis: "Bound, ranked by the districts it is the operative term for",
+        label: "Every bound in the modelled formula, and how many districts each one is the \
+                operative term for",
+        compute: |i| {
+            census_ranked(i)
+                .into_iter()
+                .map(|row| {
+                    let bound = row.bound;
+                    Row {
+                        label: bound.short(),
+                        #[allow(clippy::cast_precision_loss)]
+                        value: row.operative as f64,
+                        hover: match bound.reach() {
+                            // The one row whose count is not a fact about Ohio. R.C.
+                            // 3317.017(A)(4)(d)(i) states its ceiling against the fortieth
+                            // highest district, so forty are on it whatever the incomes are.
+                            project::bounds::Reach::Fixed(_) => {
+                                Some("Fixed by construction: the ceiling is stated against a rank")
+                            }
+                            _ => None,
+                        },
+                        group: Some(bound.family().label()),
+                        #[allow(clippy::cast_precision_loss)]
+                        of: Some(row.population as f64),
+                        cites: Some(bound.authority()),
+                        marked: match bound.reach() {
+                            project::bounds::Reach::Unreachable => Some("cannot bind"),
+                            _ => None,
+                        },
+                        figure: None,
+                    }
+                })
+                .enumerate()
+                .map(|(at, row)| Row {
+                    // The endpoint rule, bound to the ranking rather than to a bound's name: the
+                    // top and the bottom of the chart are the two numbers a reader quotes off it,
+                    // and `census_extreme` computes those two figures the same positional way.
+                    figure: match at {
+                        0 => Some("project/bounds-the-most-reached-is-operative-for"),
+                        at if at + 1 == project::bounds::Bound::all().len() => {
+                            Some("project/bounds-the-least-reached-is-operative-for")
+                        }
+                        _ => None,
+                    },
+                    ..row
+                })
+                .collect()
         },
     },
 ];
@@ -12315,6 +12460,98 @@ pub static FIGURES: &[Figure] = &[
         tolerance: 0.0,
         #[allow(clippy::cast_precision_loss)]
         compute: |_| project::bounds::cannot_bind().len() as f64,
+    },
+    Figure {
+        key: "project/bounds-that-have-never-bound",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Bounds the modelled formula states that could be reached and that no Ohio \
+                district in the department's FY2027 model reaches \u{2014} the null result issue \
+                #410 asked to be reported as one",
+        pinned: 0.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |i| project::bounds::never_bound(&i.panel).len() as f64,
+    },
+    // The census's two ends, which are the two numbers a reader takes off the ranked chart on
+    // `/bounds`. Positional and not named after a bound on purpose: if some other bound became
+    // the most-reached, these would follow it and the series' endpoint rule would still hold,
+    // while `thirty_eight_bounds_and_where_each_one_is_the_operative_term` — which pins the
+    // whole table, bound by bound — is what would say the labels below had gone stale.
+    Figure {
+        key: "project/bounds-the-most-reached-is-operative-for",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts on the most-reached bound in the modelled formula, which is R.C. \
+                3317.011(F)(5)(b)'s floor of one EMIS support employee",
+        pinned: 554.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |i| census_extreme(i, Extreme::Most) as f64,
+    },
+    Figure {
+        key: "project/bounds-the-least-reached-is-operative-for",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts on the least-reached bound in the modelled formula, which is R.C. \
+                3317.011(F)(6)(c)'s floor of one leadership support staff \u{2014} the one no \
+                input can put in force",
+        pinned: 0.0,
+        tolerance: 0.0,
+        #[allow(clippy::cast_precision_loss)]
+        compute: |i| census_extreme(i, Extreme::Least) as f64,
+    },
+    Figure {
+        key: "project/bounds-in-base-cost",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of the modelled formula's bounds, the ones R.C. 3317.011 and 3317.02 state over \
+                base cost \u{2014} the staffing floors and ceilings, the size bands and the \
+                single-year enrolled ADM",
+        pinned: 13.0,
+        tolerance: 0.0,
+        compute: |_| family_size(project::bounds::Family::BaseCost),
+    },
+    Figure {
+        key: "project/bounds-in-local-capacity",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of the modelled formula's bounds, the ones R.C. 3317.017 states over local \
+                capacity and the state share it produces",
+        pinned: 4.0,
+        tolerance: 0.0,
+        compute: |_| family_size(project::bounds::Family::LocalCapacity),
+    },
+    Figure {
+        key: "project/bounds-in-the-categoricals",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of the modelled formula's bounds, the ones R.C. 3317.022, 3317.051 and 3317.0217 \
+                state over the categorical payments \u{2014} disadvantaged pupil impact aid, \
+                gifted units and targeted assistance",
+        pinned: 9.0,
+        tolerance: 0.0,
+        compute: |_| family_size(project::bounds::Family::Categoricals),
+    },
+    Figure {
+        key: "project/bounds-in-the-guarantee",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of the modelled formula's bounds, the ones R.C. 3317.019 and the uncodified \
+                transition supplement state over the guarantee and the clawback beside it",
+        pinned: 5.0,
+        tolerance: 0.0,
+        compute: |_| family_size(project::bounds::Family::Guarantee),
+    },
+    Figure {
+        key: "project/bounds-in-transportation",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of the modelled formula's bounds, the ones R.C. 3317.0212 and the special \
+                education transportation line state over the transportation payment",
+        pinned: 7.0,
+        tolerance: 0.0,
+        compute: |_| family_size(project::bounds::Family::Transportation),
     },
     Figure {
         key: "project/districts-on-the-capacity-rate-ceiling",

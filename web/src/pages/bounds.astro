@@ -1,0 +1,114 @@
+---
+/**
+ * Every floor, ceiling and clamp in the modelled formula, and who is standing on each one.
+ *
+ * # Why this is a route rather than a card
+ *
+ * The site's other drawings sit under the thing they are about: a chart of base cost goes on the
+ * base cost component, a chart of the guarantee on the guarantee. The census of the plan's bounds
+ * is about the *whole* plan — thirty-eight edges at once, across five parts of R.C. 3317 — and
+ * filing it under any one of them would be filing a map of a country under one of its provinces.
+ * So it is a page, and `corpusSeries.ts`'s `PAGE_SERIES` is the small table that says a series can
+ * be drawn by one, with the plan's own corpus node still answering for the figures at its ends.
+ *
+ * It sits in `Research` beside Outcomes, History, Scenario and Reach. Those four ask what the
+ * formula did to somebody. This one asks what shape the formula is, which is the question a reader
+ * has to have answered before any of the other four means very much.
+ *
+ * # The layout is the site's card stack, not `/reach`'s stage
+ *
+ * `/reach` gives its picture the whole frame because the picture is interactive and the prose is
+ * apparatus around it. This chart does not move: it is one of a series of findings a reader works
+ * down, and the two null results at the bottom are as much of the answer as the ranking at the
+ * top. So it is cards, in order, like every other static page here.
+ */
+import Base from "../layouts/Base.astro";
+import SectionAnchor from "../components/SectionAnchor.astro";
+import {
+  census,
+  renderCensus,
+  renderFamilies,
+  renderNulls,
+  renderTable,
+} from "../lib/bounds.ts";
+import { loadFeed } from "../lib/feed.ts";
+import { count } from "../lib/format.ts";
+import * as routes from "../lib/routes.ts";
+
+const { bundle } = loadFeed();
+const c = census();
+---
+
+<Base
+  title="Bounds"
+  description={`Every floor, ceiling and clamp in Ohio's school funding formula — ${count(c.rows.length)} of them — ranked by how many of the state's districts each one is actually the operative term for, with the one that cannot bind for any district at all.`}
+  image={routes.og.page("bounds")}
+  imageAlt="Every bound in Ohio's school funding formula, ranked by the number of districts it is the operative term for"
+  section="bounds"
+>
+  <h1>Bounds</h1>
+  <p class="sub">
+    Ohio's funding formula is written in floors and ceilings: a district is funded for at least one
+    EMIS employee, its capacity percentage is capped, its guarantee cannot fall below zero. There
+    are {count(c.rows.length)} such bounds in the model, and for any given district most of them do
+    nothing at all. This is the census of which ones actually decide an amount, and for how many of
+    the state's {count(c.whole)} districts.
+  </p>
+
+  <Fragment set:html={renderCensus(c)} />
+
+  {/*
+    The apparatus, under the thing it is apparatus for — `/reach`'s ordering, and for its reason.
+    A reader arriving here can read the picture before the definition; a reader who wants the
+    definition has not had to scroll past three paragraphs to reach the picture.
+  */}
+  <div class="card" id="what-this-is" data-part="what-this-is">
+    <h2><SectionAnchor id="what-this-is" />What counts as a bound, and what "operative" means</h2>
+    <p class="note">
+      A <strong>bound</strong> here is a place where the statute takes a maximum or a minimum — a
+      floor, a ceiling, or a clamp to a range — rather than computing straight through. R.C.
+      3317.011(F)(5)(b) funds "one EMIS support employee, or the district's enrolled ADM divided by
+      one thousand, whichever is greater": that <em>whichever is greater</em> is one bound.
+    </p>
+    <p class="note">
+      A bound is <strong>operative</strong> for a district when it is the side that wins. For a
+      district with 400 pupils the EMIS floor is operative, because one employee is more than 0.4;
+      for a district with 4,000 it is not, and the bound is present in the arithmetic and decides
+      nothing. <strong>The count beside each bound is how many districts it decides something
+      for</strong>, and it is not a measure of how much money moves — a bound can be operative for
+      five hundred districts and be worth a few thousand dollars in each.
+    </p>
+    <p class="note">
+      This is the FY{bundle.fiscal_year} model as this repository runs it, over{" "}
+      {count(c.whole)} districts. It counts the side a provision <em>produces</em>, so a district
+      exactly on a bound is counted as being on it.
+    </p>
+  </div>
+
+  <Fragment set:html={renderFamilies(c)} />
+  <Fragment set:html={renderNulls(c)} />
+  <Fragment set:html={renderTable(c)} />
+
+  <div class="card" id="not-here" data-part="not-here">
+    <h2><SectionAnchor id="not-here" />What this census does not count</h2>
+    <p class="note">
+      <strong>Steps and brackets are not bounds.</strong> A schedule that pays one rate below a
+      threshold and another above it is a piecewise function, not a maximum, and a district is
+      always in exactly one of its pieces. The capacity tiers of targeted assistance are the
+      largest example: they are in the formula, they change what a district is paid, and no row
+      above names them.
+    </p>
+    <p class="note">
+      <strong>Prorations are not bounds either.</strong> Where an appropriation is insufficient the
+      statute scales every payment by a common factor; that is a multiplier applied to everyone,
+      not a term that wins for some districts and loses for others.
+    </p>
+    <p class="note">
+      <strong>And a count of districts is not a count of dollars.</strong> The ranking above says
+      how often a bound is the deciding term, not what turns on it. The one place where those two
+      come apart most sharply is the guarantee, which is operative for roughly half the state and
+      carries about an eighth of the money — see <a href={routes.REACH}>Reach</a> for who it holds
+      still, and <a href="/scenario">Scenario</a> for what moving a lever costs.
+    </p>
+  </div>
+</Base>

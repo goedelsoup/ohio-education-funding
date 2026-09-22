@@ -455,3 +455,64 @@ fn every_bound_names_its_authority_and_the_statute_states_each_one() {
         );
     }
 }
+
+/// The chart names: unique, short enough for a gutter, and not the long ones.
+///
+/// Issue #443 draws the census as thirty-eight rows on one chart, and a row's name is all a
+/// reader has to tell it from the row above. [`Bound::label`] is written for a sentence and runs
+/// to seventy characters; [`Bound::short`] is the same bound named for the gutter. Two short
+/// names that collide are two rows a reader cannot distinguish — and the two gifted unit floors,
+/// the two staffing support ceilings and the two fifty-per-cent transport floors are each near
+/// enough to collide if nobody is checking.
+#[test]
+fn every_bound_has_a_distinct_short_name_that_fits_a_chart_gutter() {
+    /// What `rankSpec`'s name gutter is sized for — `web/src/lib/plot/spec.ts`. A name past this
+    /// is not truncated by the chart, it wraps, and a wrapped row is a taller row for all 38.
+    const GUTTER: usize = 40;
+
+    let mut seen = std::collections::BTreeSet::new();
+    for bound in Bound::all() {
+        let short = bound.short();
+        assert!(!short.is_empty(), "{bound:?} has no short name");
+        assert!(
+            short.chars().count() <= GUTTER,
+            "{bound:?} is {} characters short-named ({short:?}); the chart gutter holds {GUTTER}",
+            short.chars().count()
+        );
+        assert!(
+            short.chars().count() < bound.label().chars().count(),
+            "{bound:?}'s short name is no shorter than its long one; one of the two is wrong"
+        );
+        assert!(
+            seen.insert(short),
+            "{bound:?} shares the short name {short:?} with another bound"
+        );
+    }
+}
+
+/// Each family holds the bounds it says it does, and the five partition the census.
+///
+/// `Family::authority` is printed as a heading over that family's rows, so it is a claim about
+/// every member: a bound filed under the wrong family gives a reader the wrong instrument for a
+/// row and nothing else on the page contradicts it. Checked by asking whether each member's own
+/// authority names a section the family's heading lists.
+#[test]
+fn the_five_families_partition_the_census_and_each_names_its_own_sections() {
+    let sized: Vec<usize> = Family::ALL.iter().map(|f| f.size()).collect();
+    assert_eq!(sized, vec![13, 4, 9, 5, 7]);
+    assert_eq!(sized.iter().sum::<usize>(), Bound::all().len());
+
+    for family in Family::ALL {
+        assert!(!family.label().is_empty());
+        let sections: Vec<&str> = family.authority().split(", ").collect();
+        for bound in Bound::all().into_iter().filter(|b| b.family() == family) {
+            assert!(
+                sections.iter().any(|s| bound.authority().contains(s)),
+                "{bound:?} is filed under {} ({}) and cites {:?}",
+                family.label(),
+                family.authority(),
+                bound.authority()
+            );
+        }
+    }
+}

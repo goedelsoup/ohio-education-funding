@@ -94,13 +94,19 @@ pub fn manifest() -> String {
 
 /// One row of a series, as a line of the document.
 ///
-/// The two optional members are written only when present, so a row that says nothing beyond
-/// its label and value is the short line a reader expects, and the consumer reads their absence
-/// as absence rather than as an empty string.
+/// The optional members are written only when present, so a row that says nothing beyond its
+/// label and value is the short line a reader expects, and the consumer reads their absence as
+/// absence rather than as an empty string. `of` is written the way the row's own value is: a
+/// denominator of a count is a count.
 fn row(unit: Unit, r: &Row) -> String {
     assert!(
-        writable(r.label) && r.hover.is_none_or(writable),
-        "{:?}: a row label or hover carries a character this writer cannot escape",
+        writable(r.label)
+            && r.hover.is_none_or(writable)
+            && r.group.is_none_or(writable)
+            && r.cites.is_none_or(writable)
+            && r.marked.is_none_or(writable),
+        "{:?}: a row label, hover, group, citation or mark carries a character this writer \
+         cannot escape",
         r.label
     );
     let mut line = format!(
@@ -110,6 +116,18 @@ fn row(unit: Unit, r: &Row) -> String {
     );
     if let Some(hover) = r.hover {
         let _ = write!(line, ", \"hover\": \"{hover}\"");
+    }
+    if let Some(group) = r.group {
+        let _ = write!(line, ", \"group\": \"{group}\"");
+    }
+    if let Some(of) = r.of {
+        let _ = write!(line, ", \"of\": {}", number(unit, of));
+    }
+    if let Some(cites) = r.cites {
+        let _ = write!(line, ", \"cites\": \"{cites}\"");
+    }
+    if let Some(marked) = r.marked {
+        let _ = write!(line, ", \"marked\": \"{marked}\"");
     }
     if let Some(figure) = r.figure {
         assert!(
@@ -312,6 +330,10 @@ mod tests {
             label: "Industrial",
             value: -0.0321,
             hover: None,
+            group: None,
+            of: None,
+            cites: None,
+            marked: None,
             figure: None,
         };
         assert_eq!(
@@ -322,6 +344,10 @@ mod tests {
             label: "Mineral",
             value: 12.0,
             hover: Some("Mineral, which is mostly gas wells"),
+            group: None,
+            of: None,
+            cites: None,
+            marked: None,
             figure: Some("dispersion/a-key"),
         };
         assert_eq!(
@@ -329,6 +355,33 @@ mod tests {
             "{\"label\": \"Mineral\", \"value\": 12, \"hover\": \"Mineral, which is mostly gas \
              wells\", \"figure\": \"dispersion/a-key\"}"
         );
+        // The members a census row carries, in the order the writer emits them.
+        let census = Row {
+            label: "Mile base over rider base",
+            value: 350.0,
+            hover: None,
+            group: Some("Transportation"),
+            of: Some(604.0),
+            cites: Some("R.C. 3317.0212(C)"),
+            marked: None,
+            figure: None,
+        };
+        assert_eq!(
+            row(Unit::Count, &census),
+            "{\"label\": \"Mile base over rider base\", \"value\": 350, \"group\": \
+             \"Transportation\", \"of\": 604, \"cites\": \"R.C. 3317.0212(C)\"}"
+        );
+        let nothing = Row {
+            label: "One leadership support staff",
+            value: 0.0,
+            hover: None,
+            group: Some("Base cost"),
+            of: Some(609.0),
+            cites: Some("R.C. 3317.011(F)(6)(c)"),
+            marked: Some("cannot bind"),
+            figure: Some("project/a-key"),
+        };
+        assert!(row(Unit::Count, &nothing).contains("\"marked\": \"cannot bind\""));
     }
 
     #[test]

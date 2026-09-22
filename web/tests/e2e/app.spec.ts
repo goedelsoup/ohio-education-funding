@@ -1343,10 +1343,13 @@ test.describe("routes", () => {
     // Thirty-two across five groups. An exact count rather than a floor, so that dropping an
     // entry fails here and adding one is an acknowledged change — and so that a derivation which
     // quietly stops selecting anything cannot pass by returning an empty menu. It went from
-    // thirty to thirty-one when `/legislation` joined the `Law` panel, and to thirty-two when
-    // `/reach` joined `Research` beside the scenario runner it splits the second question off.
+    // thirty to thirty-one when `/legislation` joined the `Law` panel, to thirty-two when
+    // `/reach` joined `Research` beside the scenario runner it splits the second question off,
+    // and to thirty-three when `/bounds` joined the same panel — the census of the plan's own
+    // edges, which is the only page here whose subject is the shape of the whole formula rather
+    // than a quantity it produces.
     // Which is the mechanism working: the count is changed on purpose by somebody who knew why.
-    expect(hrefs).toHaveLength(32);
+    expect(hrefs).toHaveLength(33);
     for (const href of hrefs) {
       await page.goto(href);
       await expect(page.locator("h1"), `${href} has no heading`).toBeVisible();

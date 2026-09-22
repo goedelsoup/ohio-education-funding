@@ -35,6 +35,15 @@ export const scenarioDraft = (slug: string): string =>
 export const REACH = "/reach";
 
 /**
+ * The census of the modelled formula's bounds.
+ *
+ * A constant for the reason `REACH` is one: three files name it — the bar, the page itself, and
+ * `corpusSeries.ts`'s table of which series a page rather than a node draws, which has to be able
+ * to say where `project/bounds-census` is rendered.
+ */
+export const BOUNDS = "/bounds";
+
+/**
  * The addressable sections of every route.
  *
  * # Why there is a vocabulary rather than a fragment written where it is needed
@@ -243,6 +252,24 @@ export const SECTIONS = {
     draft: "draft",
   },
 
+  /**
+   * `/bounds` — every floor, ceiling and clamp in the modelled formula, and who is on each.
+   *
+   * The one page on the site whose subject is the *shape* of the plan rather than a quantity it
+   * produces. Its two null-result cards are addressed for the reason the district routes' `not`
+   * and `no-filing` are: a result that is an absence is still a section a reader can be sent to,
+   * and "nothing has never bound" is the harder half of the finding to find by scrolling.
+   */
+  bounds: {
+    whatThisIs: "what-this-is",
+    census: "census",
+    families: "families",
+    table: "table",
+    cannotBind: "cannot-bind",
+    neverBound: "never-bound",
+    notHere: "not-here",
+  },
+
   /** `/wiki` and its four sub-families. */
   wiki: {
     whatThisIs: "what-this-is",
@@ -296,7 +323,7 @@ export const SECTIONS = {
  *
  * Written as a mapped type indexed by its own keys rather than the shorter
  * `(typeof SECTIONS)[keyof typeof SECTIONS][keyof …]`: `keyof` over a union of object types is the
- * *intersection* of their keys, which for these ten families is empty, so the shorter spelling
+ * *intersection* of their keys, which for these fifteen families is empty, so the shorter spelling
  * silently evaluates to `never` and every call to `at()` stops type-checking.
  */
 export type Section = {

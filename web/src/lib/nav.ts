@@ -51,6 +51,7 @@ export type Section =
   | "history"
   | "scenario"
   | "reach"
+  | "bounds"
   | "wiki"
   | "method"
   | "data";
@@ -430,6 +431,14 @@ export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavGroup[] {
             /* Beside the runner rather than under it: they drive the same levers and ask
                different questions of them — how much, and who. */
             { key: "reach", href: routes.REACH, label: "Reach", note: "who the guarantee holds still" },
+            /* Last in the run because it is the widest: the other four ask what the formula did
+               to somebody, and this one asks what shape the formula is. */
+            {
+              key: "bounds",
+              href: routes.BOUNDS,
+              label: "Bounds",
+              note: "every floor and ceiling, and who is on it",
+            },
           ],
         },
       ],

@@ -9,14 +9,16 @@
 
 import { expect, test } from "vitest";
 
-import type { Bar, FanPoint, Fit, ScatterPoint, Trace } from "../../src/lib/chart.ts";
+import type { Bar, FanPoint, Fit, Rank, ScatterPoint, Trace } from "../../src/lib/chart.ts";
 import {
   DOT,
   barSpec,
   distributionSpec,
   fanSpec,
   panelWidth,
+  rankSpec,
   scatterSpec,
+  type Spec,
   truncatedDomain,
   WIDTHS,
 } from "../../src/lib/plot/spec.ts";
@@ -387,4 +389,90 @@ test("two panels share the wide frame, and one panel is the whole of it", () => 
   // The gap is `--space-6`, 1.1rem at the 16px root, which is what `.panels` lays them out with.
   expect(panelWidth(2) * 2 + 18).toBe(WIDTHS.wide);
   expect(panelWidth(1)).toBe(WIDTHS.wide);
+});
+
+/**
+ * How many rows reached one named mark layer of a spec.
+ *
+ * Plot's `Markish` is a union wide enough to admit a bare render function, so a mark's own
+ * `className` and `data` are not on the static type even though every mark these specs build — a
+ * `dot`, a `ruleY`, a `text`, a `rect` — carries both. The cast is narrow and deliberate: which
+ * rows reach which layer is exactly what the assertions below are about, and the rendered SVG
+ * shows it only as a count of anonymous `<g>` children, twice over for the chart pair.
+ */
+function layerRows(spec: Spec, className: string): number {
+  const marks = (spec.options.marks ?? []) as unknown as {
+    className?: string;
+    data?: readonly unknown[];
+  }[];
+  const found = marks.filter((mark) => mark.className === className);
+  expect(found, `the spec draws a ${className} layer`).toHaveLength(1);
+  return found[0]!.data!.length;
+}
+
+/** The axis `/bounds` draws its census on: a count of districts, printed plainly. */
+const COUNT = { label: "districts the bound is operative for", format: (v: number) => String(v) };
+
+/** A ranking shaped like the bound census — a long tail, and a row at zero carrying the finding. */
+function census(values: number[]): Rank[] {
+  return values.map((value, i) => ({
+    label: `bound ${i}`,
+    value,
+    hover: `bound ${i} — ${value}`,
+    ...(value === 0 ? { marked: "cannot bind" } : {}),
+  }));
+}
+
+test("the row at zero is drawn at the axis floor with its phrase, not dropped", () => {
+  /*
+   * #443's requirement, and the reason this form exists at all: one of the thirty-eight bounds is
+   * the operative term for nobody, and "a bound with no force is the finding". A log axis cannot
+   * hold zero, so the two ways a chart usually deals with one — drop the row, or draw a bar of no
+   * length — both erase the result. The row is placed a clear step below the smallest drawable
+   * value instead, and the phrase is printed beside it so the position is read rather than
+   * guessed at.
+   */
+  const spec = rankSpec(census([554, 499, 43, 1, 0]), COUNT, W)!;
+  const [floor, max] = spec.options.x!.domain as [number, number];
+  expect(floor).toBe(0.5); // half of 1, the smallest value that can be drawn
+  expect(max).toBe(554);
+
+  const rows = (name: string) => layerRows(spec, name);
+
+  // Every row has a dot, the zero row included, and its own phrase beside it.
+  expect(rows("rank-dot")).toBe(5);
+  expect(rows("rank-mark")).toBe(1);
+
+  // But no stem: a rule from the floor to the floor is a zero-length bar by another name, which
+  // is what the row was drawn off the scale to avoid.
+  expect(rows("rank-stem")).toBe(4);
+
+  // And the hit layer matches the dot layer row for row, or `declareCursor` indexes the wrong
+  // tooltip onto the one row a reader is most likely to point at.
+  expect(rows("rank-hit")).toBe(rows("rank-dot"));
+});
+
+test("the marked row's phrase is reserved for where it is drawn, not where it is longest", () => {
+  /*
+   * The phrase prints outward from its own mark, so what it needs past the frame is its width
+   * less the empty plot already to the right of that mark. Reserved as a flat width it cost 95px
+   * of the 320px frame — a third of the narrow drawing held blank for text drawn hard against the
+   * opposite edge, because the row this form exists for sits at the axis *floor*.
+   */
+  const narrow = { width: WIDTHS.narrow };
+  const atFloor = rankSpec(census([554, 499, 43, 1, 0]), COUNT, narrow)!;
+
+  // The same chart with the phrase on the widest row instead, where it really does overhang.
+  const rows: Rank[] = census([554, 499, 43, 1, 0]).map(({ label, value, hover }) => ({
+    label,
+    value,
+    hover,
+  }));
+  rows[0] = { ...rows[0]!, marked: "cannot bind" };
+  const atMax = rankSpec(rows, COUNT, narrow)!;
+
+  expect(atFloor.options.marginRight!).toBeLessThan(atMax.options.marginRight!);
+  // At the floor the whole plot lies to the phrase's right, so nothing is held back for it.
+  // 16px, which is `gutter`'s answer for the bare axis overhang every form reserves.
+  expect(atFloor.options.marginRight).toBe(16);
 });
