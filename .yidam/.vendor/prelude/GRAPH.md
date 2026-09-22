@@ -146,6 +146,80 @@ still `edge-target-class`'s question, and that check does not read the policy at
 declares them, so the licensing checks read only links landing on another corpus instance.
 A link that resolves to nothing is `dangling-edge`'s finding and is not reported twice.
 
+### What an edge rests on
+
+Everything above asks whether an edge is *well-formed*. None of it asks whether it is **true**,
+and `guidelines/agent-conduct.md` is explicit that an edge is a claim written as structure,
+asserted in the form a reader is least likely to check. A link may say so:
+
+```yaml
+links:
+  - target: ../place/ward-nine.yml
+    relationship: resided-in
+    claim_tag: inference
+  - target: ../place/city-hall.yml
+    relationship: worked-at
+    claim_tag: verified
+    source: 1889-municipal-register
+```
+
+`claim_tag` is graded by the same reader that grades a `type: claim` property, so `verified`,
+`[verified]` and `[verified — as proposed]` all read, and so does a list of standings.
+
+It is also **reported**. `yidam status` and `yidam corpus-index` count tagged edges in a figure
+beside the node one — beside and not added to it, because a node's claims are measured over its
+text and an edge is in no node's text — and both render it only where a corpus tags edges. An
+edge tagged `open` is listed by `yidam open-questions` in its own right, addressed by its triple,
+rather than promoting the node that authors it. The MCP `claims` and `open_questions` tools
+answer the same way. A link's tag is the *edge's* claim throughout: the node's own counters skip
+the `links:` block, so writing `claim_tag: "[open]"` on a link no longer reads as an `[open]` in
+the node's prose.
+
+| Check | Finding | Gates |
+|---|---|---|
+| `edge-verified-unsourced` | an edge asserting `verified` and naming no `source:` | no — Warn |
+| `edge-untagged` | an empirical edge declaring no standing, or one spelling none | no — Warn, and only where the corpus asked |
+| `edge-standing-unheld` | an edge asserting a standing **stronger** than one its endpoints declare | no — Warn |
+
+The first needs no declaration: its population is empty in a corpus that tags no edges, because
+writing `claim_tag: verified` is itself the opt-in. The second cannot be that — its population is
+every edge — so it runs only where the corpus says so, once, for the whole graph:
+
+```yaml
+# .yidam/corpus/universal.yml
+edge_claims:
+  required: true
+  structural:
+    - instance-of
+    - concerns
+    - subject-of
+```
+
+`structural:` names the relationships that are **bookkeeping**: they file a node rather than
+assert something about the world, and a standing on one of them would grade nothing. They are
+authored by many classes at once, which is why this is declared corpus-wide rather than per class
+— the argument `universal.yml` already makes about a property every class carries.
+
+The two keys are separate deliberately. Recording which verbs are bookkeeping is a fact about a
+vocabulary; `required: true` is a request for a gate over every other edge in the corpus, and one
+must not arrive as a side effect of the other.
+
+The third also needs no declaration, and it reads an edge's standing against the ones its **own
+endpoints** declare: an edge asserting `verified` between two nodes this corpus grades `[open]`
+claims more about the relationship than the corpus claims about what it relates.
+
+A node's standing here is a property its class declared `type: claim` — the node's own grade, not
+the weakest marker in its prose, because a synthesis node carries all three tags by design and is
+meant to. A node that declares no such property has no standing and is compared to nothing. The
+end an edge is measured against is the **weaker** of the two that declare one, and the edge's own
+standing is the **strongest** it spells.
+
+It is one-directional, like every check in this family. An `open` edge between two `verified`
+nodes is not a defect: that is a corpus saying it knows both things and not that they are
+related, which is what the vocabulary is for. And it never gates — both sides of the comparison
+are opted into separately, so a corpus can adopt edge tags on a graph whose nodes were graded
+years earlier and inherit findings it did not create.
+
 ### Which keys hold prose
 
 `description` was the only key anything read as prose, and corpora write more than one.
@@ -207,6 +281,42 @@ flagging 14 property declarations took it from 58 findings to 94, which is the l
 always were. `missing-description` stops reporting a node whose whole substance is a
 transcription in a property. And `yidam embed` composes it, so **re-run `yidam index-build`**:
 on that same corpus the flag adds 10.4% more prose and changes the text of 380 nodes of 694.
+
+### Retrievable without being prose
+
+`prose:` is the right question for `node-too-long` and for `missing-description`. For `embed`
+it is nearly the right question and not the same one.
+
+`examples/streamflow`'s gage declares `parameter: "00060"` and `units: cubic feet per second`.
+Neither string was in the node's vector, so a query for the units could not reach the node that
+writes the phrase, and a query for the parameter code could not reach the node the catalog
+entry for that source is *organised around*. **Identifiers, codes and units are the part of a
+corpus most likely to be typed verbatim into a query**, and they were the part excluded.
+
+Flagging them `prose: true` would have fixed the embedding and broken two reports along the
+way: `node-too-long` would count `00060` toward the node's length, and `missing-description`
+would accept a node that says nothing but `00060` as a node with something said about it. So
+retrievability is declared on its own:
+
+```yaml
+# <class>.ont.yml
+properties:
+  - name: parameter
+    type: string
+    retrievable: true
+    description: The measured quantity, by its publisher's parameter code.
+```
+
+**Prose is already retrievable.** `embed` composes every declared prose field, so flagging a
+`prose: true` property `retrievable` as well is redundant rather than wrong — it is composed
+once either way. The implication runs one way only: a retrievable identifier is not thereby
+prose.
+
+**`embed` is the only reader**, which is the whole shape of the flag. Flagging a property
+changes what is retrievable and changes no report — so **re-run `yidam index-build`**, because
+node text is what an index is built from. **Absent means false**, for `required:`'s reason, so
+a class that flags nothing emits byte-identical embeddings to a corpus written before the
+field existed.
 
 **`description` is always in the set**, including for a class that declares `prose:` and omits
 it. Silence is not a contract, here as everywhere: naming `findings` says findings is prose,
@@ -454,6 +564,22 @@ repository that has to live with it.
 An escalated finding is ordinary debt: `yidam lint --bless` records it like any other, and
 the gate is quiet until something new ages past the line.
 
+**It reaches the checks that date their findings, and today that is `orphan-in` alone.** The
+first paragraph above is the reason: a finding about an immutable event has no clock, so no
+threshold can act on it. Most of the report is in that position, which means arming this
+number changes less than its prose suggests — and a corpus reading the prose alone has
+declined it on the strength of a risk that did not apply.
+
+So the declaration is on the check rather than in this document, where it would go stale:
+
+```
+$ yidam lint --format json | jq -r '.checks[] | select(.escalation_eligible) | .id'
+orphan-in
+```
+
+Every check that ran is in that array, including the ones that found nothing — which is the
+case that matters, because the question is asked before adopting rather than after.
+
 ## The baseline, and its own clock
 
 `.yidam/lint-baseline.yml` records the error-severity findings that were already true when
@@ -494,7 +620,7 @@ They are named apart because they are different questions:
 
 | Declaration | Where | Counts | Asks |
 |---|---|---|---|
-| `escalate_after` | `.yidam/config.toml` | commits | how long a **finding** may hold before it becomes an error |
+| `escalate_after` | `.yidam/config.toml` | commits | how long a **dated finding** may hold before it becomes an error |
 | `expire_after` | `.yidam/lint-baseline.yml` | commits | how long an **accepted entry** may stand before it gates again |
 | `ttl_days` | a catalog entry, or `[catalog]` in `.yidam/config.toml` | **days** | how long a **source record** may stand before it is worth looking at again |
 
