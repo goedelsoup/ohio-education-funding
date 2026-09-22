@@ -1,0 +1,11 @@
+{
+  "contract": "1.0.0",
+  "series": [
+    {"key": "dispersion/fy2016-step-by-business-class", "owner": "crates/dispersion", "unit": "ratio", "axis": "Property class, TY2021 share of assessed value", "label": "Correlation of the FY2016 move in state revenue per pupil with each business property class", "rows": [
+      {"label": "Industrial", "value": 0.11752209551359827, "figure": "dispersion/fy2016-step-against-industrial-share"},
+      {"label": "Mineral", "value": -0.03211427134692308, "figure": "dispersion/fy2016-step-against-mineral-share-negative"},
+      {"label": "Public utility", "value": -0.015924725729688064, "figure": "dispersion/fy2016-step-against-public-utility-share-negative"},
+      {"label": "All three summed", "value": 0.01639987724589519, "figure": "dispersion/fy2016-step-against-summed-business-share"}
+    ]}
+  ]
+}

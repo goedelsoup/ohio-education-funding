@@ -1,10 +1,11 @@
-//! Writing the manifest.
+//! Writing the two manifests.
 //!
 //! Hand-rolled for the reason the feed's serializer is: the workspace has no external
 //! dependencies, deliberately, so that a committed result is reproducible years from now without
-//! a dependency resolution succeeding first. This document is flatter than the feed — one array
-//! of six-field objects — so it does not need [`bundle`'s `Obj`/`Arr`
-//! machinery](../../bundle/index.html), and it does not need an escaper either.
+//! a dependency resolution succeeding first. Both documents are flatter than the feed — one array
+//! of six-field objects, and one array of objects each holding a short array of rows — so they
+//! do not need [`bundle`'s `Obj`/`Arr` machinery](../../bundle/index.html), and they do not need
+//! an escaper either.
 //!
 //! It needs the *absence* of an escaper to be checked rather than assumed. Every string here is a
 //! `&'static str` written in `lib.rs`, so a quote or a backslash in one is a compile-time-fixable
@@ -14,7 +15,9 @@
 
 use core::fmt::Write;
 
-use crate::{compute_all, Unit, CONTRACT_VERSION};
+use crate::{
+    compute_all, compute_all_series, Row, Unit, CONTRACT_VERSION, SERIES_CONTRACT_VERSION,
+};
 
 /// The characters that would need escaping, and therefore may not appear in a key or a label.
 pub(crate) const UNWRITABLE: &[char] = &['"', '\\'];
@@ -83,9 +86,108 @@ pub fn manifest() -> String {
     out
 }
 
+/// One row of a series, as a line of the document.
+///
+/// The two optional members are written only when present, so a row that says nothing beyond
+/// its label and value is the short line a reader expects, and the consumer reads their absence
+/// as absence rather than as an empty string.
+fn row(unit: Unit, r: &Row) -> String {
+    assert!(
+        writable(r.label) && r.hover.is_none_or(writable),
+        "{:?}: a row label or hover carries a character this writer cannot escape",
+        r.label
+    );
+    let mut line = format!(
+        "{{\"label\": \"{}\", \"value\": {}",
+        r.label,
+        number(unit, r.value)
+    );
+    if let Some(hover) = r.hover {
+        let _ = write!(line, ", \"hover\": \"{hover}\"");
+    }
+    if let Some(figure) = r.figure {
+        assert!(
+            writable(figure),
+            "{:?}: names a figure key this writer cannot escape",
+            r.label
+        );
+        let _ = write!(line, ", \"figure\": \"{figure}\"");
+    }
+    line.push('}');
+    line
+}
+
+/// The series manifest, as it is committed to `crates/series.json`.
+///
+/// One series per object and one row per line inside it, for the same reason [`manifest`] is one
+/// figure per line: a bar that moved should be one changed line in the diff the gate prints.
+#[must_use]
+pub fn series_manifest() -> String {
+    let computed = compute_all_series();
+    let mut out = String::new();
+    out.push_str("{\n");
+    let _ = writeln!(out, "  \"contract\": \"{SERIES_CONTRACT_VERSION}\",");
+    let _ = writeln!(out, "  \"series\": [");
+    for (at, entry) in computed.iter().enumerate() {
+        let s = entry.series;
+        assert!(
+            writable(s.key) && writable(s.owner) && writable(s.axis) && writable(s.label),
+            "{}: a key, owner, axis or label carries a character this writer cannot escape",
+            s.key
+        );
+        let _ = writeln!(
+            out,
+            "    {{\"key\": \"{}\", \"owner\": \"{}\", \"unit\": \"{}\", \"axis\": \"{}\", \
+             \"label\": \"{}\", \"rows\": [",
+            s.key,
+            s.owner,
+            s.unit.name(),
+            s.axis,
+            s.label,
+        );
+        for (row_at, r) in entry.rows.iter().enumerate() {
+            let comma = if row_at + 1 == entry.rows.len() {
+                ""
+            } else {
+                ","
+            };
+            let _ = writeln!(out, "      {}{comma}", row(s.unit, r));
+        }
+        let comma = if at + 1 == computed.len() { "" } else { "," };
+        let _ = writeln!(out, "    ]}}{comma}");
+    }
+    out.push_str("  ]\n}\n");
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_row_writes_its_optional_members_only_when_it_has_them() {
+        let bare = Row {
+            label: "Industrial",
+            value: -0.0321,
+            hover: None,
+            figure: None,
+        };
+        assert_eq!(
+            row(Unit::Ratio, &bare),
+            "{\"label\": \"Industrial\", \"value\": -0.0321}"
+        );
+        let full = Row {
+            label: "Mineral",
+            value: 12.0,
+            hover: Some("Mineral, which is mostly gas wells"),
+            figure: Some("dispersion/a-key"),
+        };
+        assert_eq!(
+            row(Unit::Count, &full),
+            "{\"label\": \"Mineral\", \"value\": 12, \"hover\": \"Mineral, which is mostly gas \
+             wells\", \"figure\": \"dispersion/a-key\"}"
+        );
+    }
 
     #[test]
     fn a_count_is_written_as_an_integer_and_everything_else_round_trips() {

@@ -178,16 +178,18 @@ run = [
 ]
 
 [tasks.generated]
-description = "Fail if the committed feed, the figure manifest, the site icon, or any REGEN block is stale."
-# All three artifacts are committed and all three are easy to forget. If any
-# drifts the repository is describing itself wrongly and nothing else would
+description = "Fail if the committed feed, the figure manifest, the series manifest, the site icon, or any REGEN block is stale."
+# Every one of these artifacts is committed and every one is easy to forget. If
+# any drifts the repository is describing itself wrongly and nothing else would
 # notice — which is exactly what happened to the connector table and the corpus
 # node count.
 #
 # `crates/figures.json` is the corpus-to-crate cross-check's crate half (#131):
 # the figures a corpus node quotes, computed from the crates that own them. Stale
 # here means `//web:test-unit` is comparing this month's prose against last
-# month's calculators and calling it agreement.
+# month's calculators and calling it agreement. `crates/series.json` is the same
+# thing for the columns the wiki draws (#441): stale here means a chart on a node
+# page is drawing last month's bars under this month's figures.
 run = '''
 set -e
 stale() {
@@ -208,6 +210,12 @@ if ! diff -q /tmp/edfund-figures.json crates/figures.json > /dev/null; then
     "cargo run --manifest-path crates/Cargo.toml -p figures > crates/figures.json" \
     /tmp/edfund-figures.json
 fi
+cargo run --quiet --manifest-path crates/Cargo.toml -p figures series > /tmp/edfund-series.json
+if ! diff -q /tmp/edfund-series.json crates/series.json > /dev/null; then
+  stale crates/series.json \
+    "cargo run --manifest-path crates/Cargo.toml -p figures series > crates/series.json" \
+    /tmp/edfund-series.json
+fi
 cargo run --quiet --manifest-path crates/Cargo.toml -p connect --bin edfund-connect -- index --check
 # The site icon, and the four other files that share its geometry. `web/public/favicon.svg` is the
 # single source for the icon at every size — `src/lib/og/mark.ts` reads it and the two PNG routes
@@ -216,7 +224,7 @@ cargo run --quiet --manifest-path crates/Cargo.toml -p connect --bin edfund-conn
 # comment at the top of it, and the drift would show up as the tab icon and the home screen icon
 # disagreeing, which is invisible to whoever caused it.
 node design/logo/outline.ts --check
-echo "the feed, the figure manifest, the site icon and every REGEN block are current"
+echo "the feed, both manifests, the site icon and every REGEN block are current"
 '''
 
 [tasks.deploy]
