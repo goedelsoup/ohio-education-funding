@@ -208,7 +208,7 @@ links:
   - target: fsfp-local-capacity-measure.yml
     relationship: parallels
   - target: fsfp-base-cost-calculation.yml
-    relationship: governed-by
+    relationship: consumes
   - target: ../legislation/hb-96-2025.yml
     relationship: established-by
   - target: ../../catalog/dew-jvsd-foundation-payments.md

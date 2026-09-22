@@ -1,0 +1,28 @@
+{
+  // Validate corpus YAML while it is being written, rather than when a page renders wrong.
+  //
+  // These schemas are generated from the same zod definitions the build validates against
+  // (`web/src/lib/schema/corpus.ts`, written by `pnpm --dir web schemas`), so the editor and the
+  // build cannot disagree about what a node is.
+  //
+  // Read by `yaml-language-server`, which ships inside the Red Hat YAML extension for VS Code and
+  // is available to Neovim and Helix over LSP. Editors that use neither still get the build check.
+  //
+  // Committed deliberately, and `.gitignore` carries a negation for it: `.vscode/` sits in a lot of
+  // people's ~/.gitignore_global, which is where this file spent its first months — present on one
+  // machine, absent from every checkout, while `.yidam/corpus/README.md` described it as the reason
+  // a malformed node is underlined as it is typed. Keep machine-specific settings (interpreter
+  // paths, personal debug configuration) OUT of it; they are what made it look unshareable.
+  "yaml.schemas": {
+    "./.yidam/schemas/corpus-node.json": ".yidam/corpus/*/*.yml",
+    "./.yidam/schemas/corpus-ontology.json": ".yidam/corpus/*.ont.yml"
+  },
+  "files.associations": {
+    "*.ont.yml": "yaml"
+  },
+  // `.yidam/.vendor/` is imported unmodified from the yidam prelude and adopted by re-vendoring.
+  // Editing it in place falsifies the provenance record, so the editor refuses the keystroke.
+  "files.readonlyInclude": {
+    "**/.yidam/.vendor/**": true
+  }
+}

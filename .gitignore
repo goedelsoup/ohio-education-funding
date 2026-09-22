@@ -45,3 +45,16 @@ target/
 # argument `.yidam/bin/` above is ignored under: build output, cheap to remake, obsolete the
 # moment the thing it was built from moves.
 .yidam/embeddings/
+
+# `.vscode/settings.json` is committed, and this negation is what makes it visible.
+#
+# It is not ignored by anything in this file — it is ignored by `.vscode/` in a personal
+# `~/.gitignore_global`, which is common enough that the file existed for months on one machine
+# and in no checkout. `.yidam/corpus/README.md` linked it as the mechanism that underlines a
+# malformed node as it is typed, and `yidam lint` reported that link as broken on every clean
+# checkout while passing on the one machine that had the file — the shape of defect the corpus
+# lint job in CI was added to catch (#437).
+#
+# A repository `.gitignore` outranks `core.excludesFile`, so this re-includes it for everyone.
+!.vscode/
+!.vscode/settings.json

@@ -384,7 +384,7 @@ leave the corpus and are not counted.
 | edges between nodes | 588 |
 | distinct relationships in use | 169 |
 | relationships declared across every class | 70 |
-| edges whose relationship its class does not declare | 303 |
+| edges whose relationship its class does not declare | 304 |
 | relationships used exactly once | 82 |
 
 **51% of edges use a relationship the class does not declare**, and 82 of the 169 relationships in use are used a single time. That is the case for `edge_policy: characteristic`: closing the vocabulary would reject those edges or require 82 declarations that each describe one link.
