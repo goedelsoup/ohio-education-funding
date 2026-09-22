@@ -226,6 +226,17 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * about a payment made to somebody it does not model. Nothing here could have counted that,
  * because the manifest had no figure whose inputs were not the panel.
  *
+ * Recomputed at **922/78** when who each anchor rule reaches outside the enrollment cluster was
+ * cut by wealth and by poverty. Twenty-one bindings, no new carrier, all on
+ * `formula-component/temporary-transitional-aid-guarantee` again — a node that had bound what
+ * the alternative rules cost and who they hold, and nothing about **who the money reaches**.
+ * Every one of the twenty-one is a difference between two runs, on the wide measure, cut into
+ * fifths: a gradient is a delta, and eight of the twenty-one are a sign the manifest cannot hold,
+ * pinned as magnitudes with the direction in the key.
+ *
+ * Three of the twenty-one had already drifted in before this was measured: the floor read 898
+ * against an actual 901. Recounted, not incremented.
+ *
  * **The floor was three under when this was written** — 873 stated against 876 actual. It has
  * drifted before and the comment says so; both assertions are `toBeGreaterThanOrEqual`, so a stale
  * floor passes silently and forever. The narrative above is a record of re-counting only if each
@@ -246,7 +257,7 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * asserts it instead.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "898 bindings; raise this when you add one").toBeGreaterThanOrEqual(898);
+  expect(bindings.length, "922 bindings; raise this when you add one").toBeGreaterThanOrEqual(922);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "78 nodes carry bindings; raise this when a seventy-ninth does",

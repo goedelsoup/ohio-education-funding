@@ -57,6 +57,7 @@
 #![forbid(unsafe_code)]
 
 pub mod act;
+pub mod anchor_incidence;
 pub mod base_cost;
 pub mod baseline;
 pub mod biennium;
