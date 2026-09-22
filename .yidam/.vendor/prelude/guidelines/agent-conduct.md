@@ -113,6 +113,65 @@ Prefer a weaker relationship you can defend to a stronger one you cannot. `relat
 two things that genuinely relate is worth more than `causes` between two things that might not,
 because the first is honest about how much it knows.
 
+**The tag belongs on the edge, and the link carries two keys for it.** Saying what an edge rests
+on *in the node body* was the only remedy this section could offer for as long as a link had
+nowhere to put one, and it puts the tag where nothing associates it with the edge it is about — a
+node whose description says in so many words that a `resided-in` edge is a legal inference, with
+the edge two lines below saying nothing at all. So a link may declare `claim_tag:`, read by the
+same rule a `type: claim` property is read by, and `source:` where the standing is `verified`:
+
+```yaml
+# person/aldermanic-clerk.yml
+links:
+  - target: ../place/ward-nine.yml
+    relationship: resided-in
+    claim_tag: inference       # the roster states an address, not a residence
+  - target: ../place/city-hall.yml
+    relationship: worked-at
+    claim_tag: verified
+    source: 1889-municipal-register
+```
+
+Three checks read them, and all three are named in `GRAPH.md`. `edge-verified-unsourced` reports an
+edge asserting `verified` with no `source:` — the edge half of `verified-unsourced`, and it needs
+no declaration, because writing the tag is what opts an edge in. `edge-untagged` reports an
+empirical edge that declares no standing, or one whose `claim_tag` spells none, and it runs only
+where the corpus asked for it:
+
+```yaml
+# .yidam/corpus/universal.yml
+edge_claims:
+  required: true
+  structural:              # bookkeeping — these assert nothing, so nothing is asked of them
+    - instance-of
+    - concerns
+    - subject-of
+```
+
+Unconditionally that check would open with one finding per edge in the graph, which is a gate
+arriving in a corpus that never agreed to it. The two keys are separate on purpose: naming the
+verbs that are bookkeeping is a fact about a vocabulary, and recording it must not switch a gate
+on as a side effect.
+
+**And an edge cannot outrank what it relates.** `edge-standing-unheld` reports an edge asserting a
+standing stronger than one its own endpoints declare — `verified` across a relation between two
+nodes this corpus grades `[open]` claims more about the relationship than the corpus claims about
+either end of it. A node's standing there is the field the section below documents, not the weakest
+marker in its prose: a synthesis node carries all three tags by design, and a node that declares
+no claim-typed field has no standing and is compared to nothing. The check is one-directional, so
+an `open` edge between two `verified` nodes is not a defect — it says the corpus knows both things
+and not that they are related, which is what the vocabulary is for. Prefer the demotion to the
+promotion, for the reason the whole section gives.
+
+**And the tag is read, not only graded.** `open-questions`, `status`, `corpus-index` and the MCP
+`claims` and `open_questions` tools all see a tagged edge, exactly as the section below promises
+for a node's declared field. An edge tagged `open` is an open question in its own right, listed
+beside the node ones and addressed by its triple, because the triple is what it asserted. The
+counts are reported **beside** the node ones rather than added to them: a node's claims are
+measured over its text, an edge is in no node's text, and one figure over two denominators
+answers a question nobody asked. The structural exemption above is an exemption from being
+*asked* for a standing — an edge that writes one is read on it either way.
+
 ### A tag may be a field rather than a sentence
 
 Inline tags are the default and stay the default: a claim is usually a sentence, and the tag
@@ -312,6 +371,39 @@ investigating, not an identity.
 
 **A stale dependency is a normal state, not a finding.** It is pinned deliberately. Where its
 currency bears on a conclusion, say which pin you read.
+
+## When a claim rests on a node beside it
+
+The same grammar, with `package` left off. **A `cites:` entry with no `package` names a node in
+this corpus**, and it is the form most claims actually need. Measured across seventeen derived
+corpora, 86% of the markdown links that reach a corpus node are written from one node to
+another — and until this shape was given a meaning, none of that could be said in a form a
+gate could read.
+
+```yaml
+cites:
+  - node: reach/tailwater      # <class>/<name> in this corpus; `.yml` may be written or not
+    tag: inference             # the standing this corpus holds that span at, and it must agree
+    span: >-                   # verbatim text from that node
+      Discharge below the dam tracks the release schedule within a day
+```
+
+`commit` has no meaning here and is not read: the node is in this tree, so git already records
+which state it was in. What is different is `tag`. Across a boundary a foreign tag is the
+producer's, recorded and never transferred, and no gate can check it. **Inside one corpus the
+producer is you.** A citation declaring `[verified]` over a paragraph this corpus tags
+`[inference]` says something its own corpus denies, and `local-citation-tag-drift` refuses it.
+Citing an `[open]` span is legal and declaring it as anything else is not — the corpus said it
+does not know, and a citation may rest on that as long as it says so.
+
+**Writing one is opt-in and writing none is a normal state.** Four checks read these and every
+one of them has an empty population in a corpus that writes no `cites:` at all, which is the
+whole of why they can be errors. Prose already links nodes to each other constantly; a link is
+not a citation, and nothing turns one into a finding.
+
+**A citation is still not an edge.** It sits beside `links:` and never inside it, for the same
+reason the external form does: a citation is not a relationship and must never enter a
+traversal.
 
 ## The safeguards were built against carelessness, not against interest
 
