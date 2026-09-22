@@ -16,17 +16,32 @@
  * reader takes off a chart are its extremes, and the extremes are then numbers the prose states,
  * the crate pins, and the figure gate checks three ways.
  *
+ * # What a cloud is, and what holds it
+ *
+ * The same document carries a second array. A **cloud** is a population drawn as it is rather than
+ * summarised — six hundred districts under one or more panels sharing a predictor — and it has no
+ * rows, so it has no endpoints. What a reader can take off it is the pair of numbers printed on
+ * each panel: the **slope** of the line the crate fitted through it and that line's **r-squared**.
+ * So those are what the rule holds. Every panel names the figure that pins each, the crate asserts
+ * it (`crates/figures/tests/`), and a node drawing the cloud must bind all of them here.
+ *
+ * It is the same rule. A bar chart's extremes and a scatter's fit are both "the numbers a reader
+ * quotes off the picture", and both end up as ordinary figures the prose states and the figure
+ * gate checks three ways. Nothing else on a panel is a claim: the four corner numbers are the
+ * frame, which the crate computes so that a slope is drawn as an angle.
+ *
  * # Sign
  *
- * Rows are signed, because a bar below the zero rule is what a chart is for. The figure manifest
- * exports a correlation as a magnitude with the direction in its key, so {@link rowsAgainstFigures}
- * compares a row's magnitude to the figure it names.
+ * Rows are signed, because a bar below the zero rule is what a chart is for, and so are slopes —
+ * −0.0429 is the finding on the second panel of the first cloud. The figure manifest exports a
+ * signed quantity as a magnitude with the direction in its key, so {@link rowsAgainstFigures} and
+ * {@link fitsAgainstFigures} compare a magnitude to the figure it names.
  */
 
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import type { Bar } from "./chart.ts";
+import type { Bar, Fit, ScatterPoint } from "./chart.ts";
 import type { Node } from "./corpus.ts";
 import { citedCrates, proseFields, type Manifest, type Unit } from "./corpusFigures.ts";
 import { count, money, pct } from "./format.ts";
@@ -36,7 +51,7 @@ import { count, money, pct } from "./format.ts";
  * the two documents have different shapes and different readers, and a field added to a row is no
  * reason for the scalar check to refuse a document it still reads correctly.
  */
-export const READS_SERIES_CONTRACT = "1.0.0";
+export const READS_SERIES_CONTRACT = "2.0.0";
 
 /** One row of a series: a category and its signed value. */
 export interface SeriesRow {
@@ -59,10 +74,67 @@ export interface ManifestSeries {
   rows: SeriesRow[];
 }
 
+/** One continuous axis of a cloud: what it measures, and the domain the crate drew it on. */
+export interface ManifestAxis {
+  label: string;
+  unit: Unit;
+  min: number;
+  max: number;
+  /** Every axis of the first cloud is: the fits are in logs, and a line fitted in logs is a line
+      only where the axes are. */
+  log: boolean;
+}
+
+/**
+ * A fitted line, as two endpoints in the data's own units plus the two numbers it is a line of.
+ *
+ * See {@link Fit} in `chart.ts` for why it arrives as a segment rather than as a model, and why a
+ * fitted line is allowed on this site at all when {@link Bar}'s sibling `Trace` forbids one.
+ */
+export interface ManifestFit {
+  from: [number, number];
+  to: [number, number];
+  slope: number;
+  rSquared: number;
+  /** The `crates/figures.json` key whose pin the slope reproduces in magnitude. */
+  slopeFigure: string;
+  /** As `slopeFigure`, for the r-squared, which is never negative and so is pinned as it stands. */
+  rSquaredFigure: string;
+}
+
+/** One outcome drawn against the cloud's shared predictor. */
+export interface ManifestPanel {
+  label: string;
+  y: ManifestAxis;
+  fit: ManifestFit;
+}
+
+/** One subject of a cloud: where it sits on the predictor, and under every panel. */
+export interface ManifestPoint {
+  label: string;
+  x: number;
+  /** Aligned to the cloud's `panels`, one value each. */
+  ys: number[];
+}
+
+/** One population drawn as itself, computed from the crate that owns it. */
+export interface ManifestScatter {
+  key: string;
+  owner: string;
+  /** What one point is, singular and lower case — "district". */
+  subject: string;
+  label: string;
+  /** The shared predictor. Every panel is drawn against it, at its own span. */
+  x: ManifestAxis;
+  panels: ManifestPanel[];
+  points: ManifestPoint[];
+}
+
 /** `crates/series.json`, as written by `cargo run -p figures series`. */
 export interface SeriesManifest {
   contract: string;
   series: ManifestSeries[];
+  scatters: ManifestScatter[];
 }
 
 /** Where `crates/figures series` writes, from `web/` and from the repository root. */
@@ -106,6 +178,9 @@ export function loadSeriesManifest(): SeriesManifest {
   if (!Array.isArray(parsed.series) || parsed.series.length === 0) {
     throw new Error(`${path} carries no series, so this check would pass against any corpus.`);
   }
+  if (!Array.isArray(parsed.scatters) || parsed.scatters.length === 0) {
+    throw new Error(`${path} carries no clouds, so this check would pass against any corpus.`);
+  }
   cached = parsed;
   return parsed;
 }
@@ -140,18 +215,37 @@ export const DRAWABLE_FIELDS: readonly string[] = ["description", "findings"];
  */
 export function formatRow(unit: Unit, value: number): string {
   const sign = value > 0 ? "+" : value < 0 ? "−" : "";
-  const magnitude = Math.abs(value);
+  return `${sign}${formatValue(unit, Math.abs(value))}`;
+}
+
+/** A pupil count: one decimal place, because ADM has one, and separated, because it reaches five
+    figures. */
+const PUPILS = new Intl.NumberFormat("en-US", {
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+});
+
+/**
+ * A value written the way the site writes that unit, unsigned.
+ *
+ * Split out of {@link formatRow} when the clouds arrived: an axis end and a tooltip coordinate are
+ * positions rather than changes, and a `+` on one would read as a claim about direction that a
+ * coordinate is not making. A ratio is written to four places because that is the precision the
+ * slopes and correlations these charts carry are pinned at, and a reader quoting one off a chart
+ * should be quoting the figure rather than a rounding of it.
+ */
+export function formatValue(unit: Unit, value: number): string {
   switch (unit) {
     case "count":
-      return `${sign}${count(magnitude)}`;
+      return count(value);
     case "dollars":
-      return `${sign}${money(magnitude)}`;
+      return money(value);
     case "share":
-      return `${sign}${pct(magnitude)}`;
+      return pct(value);
     case "pupils":
-      return `${sign}${magnitude.toFixed(1)}`;
+      return PUPILS.format(value);
     case "ratio":
-      return `${sign}${magnitude.toFixed(4)}`;
+      return value.toFixed(4);
   }
 }
 
@@ -170,6 +264,86 @@ export function barsOf(series: ManifestSeries): Bar[] {
   }));
 }
 
+/**
+ * One panel of a cloud, as `scatterSpec` wants it.
+ *
+ * The frame is the crate's — `xDomain` and `yDomain` come straight out of the manifest, and
+ * `scatterSpec` refuses a fit without both, because a y axis fitted to its own points would redraw
+ * the slope that is the whole claim. The panels of one cloud therefore share an x domain and span
+ * the same number of log units on y, which is what makes them comparable to each other and a slope
+ * of one a diagonal.
+ *
+ * No `series` and no `band` on the points: the cloud is one population with nothing to split it
+ * into, and a second channel drawn where there is no second fact is decoration. #376's `muted` is
+ * for saying *this point is outside the population you asked about* alongside a colouring, and
+ * these panels keep every district, so hue alone carries them.
+ */
+export interface CloudPanel {
+  label: string;
+  points: ScatterPoint[];
+  x: { label: string; format: (v: number) => string; log: boolean };
+  y: { label: string; format: (v: number) => string; log: boolean };
+  fit: Fit;
+  /** Handed to `scatterSpec` as `xDomain`/`yDomain`. */
+  xDomain: [number, number];
+  yDomain: [number, number];
+}
+
+/** The hover a point carries: which subject it is, and where it sits on both axes. */
+function hoverFor(cloud: ManifestScatter, panel: ManifestPanel, point: ManifestPoint, at: number) {
+  const y = point.ys[at];
+  return (
+    `${point.label}: ${cloud.x.label} ${formatValue(cloud.x.unit, point.x)}, ` +
+    `${panel.y.label} ${y === undefined ? "—" : formatValue(panel.y.unit, y)}`
+  );
+}
+
+/**
+ * A cloud as the panels a card draws left to right.
+ *
+ * @throws if a point carries no value under some panel. The crate refuses to write such a
+ * document — every point is asserted to carry one value per panel on both sides of the manifest —
+ * so this fires only on a hand-edited or truncated file, and a dot silently dropped from one panel
+ * and not the other is the one defect that would make the pair say something false.
+ */
+export function panelsOf(cloud: ManifestScatter): CloudPanel[] {
+  return cloud.panels.map((panel, at) => {
+    const points = cloud.points.map((point) => {
+      const y = point.ys[at];
+      if (y === undefined) {
+        throw new Error(
+          `${cloud.key}: "${point.label}" carries no value under "${panel.label}". Regenerate ` +
+            `crates/series.json; a cloud missing a point from one panel and not the other would ` +
+            `compare two different populations.`,
+        );
+      }
+      return { x: point.x, y, hover: hoverFor(cloud, panel, point, at) };
+    });
+    return {
+      label: panel.label,
+      points,
+      x: {
+        label: cloud.x.label,
+        format: (v: number) => formatValue(cloud.x.unit, v),
+        log: cloud.x.log,
+      },
+      y: {
+        label: panel.y.label,
+        format: (v: number) => formatValue(panel.y.unit, v),
+        log: panel.y.log,
+      },
+      fit: {
+        from: { x: panel.fit.from[0], y: panel.fit.from[1] },
+        to: { x: panel.fit.to[0], y: panel.fit.to[1] },
+        slope: panel.fit.slope,
+        rSquared: panel.fit.rSquared,
+      },
+      xDomain: [cloud.x.min, cloud.x.max],
+      yDomain: [panel.y.min, panel.y.max],
+    };
+  });
+}
+
 /** Each position the check can fail in. Every one is produced on purpose in the spec. */
 export type SeriesDiscrepancyKind =
   /** The node binds a key the series manifest does not carry. */
@@ -180,7 +354,9 @@ export type SeriesDiscrepancyKind =
   | "unattributed"
   /** An endpoint of the series is a figure this node does not bind. */
   | "endpoints-unbound"
-  /** The manifest exports a series no node draws. */
+  /** A number printed on a panel of a cloud is a figure this node does not bind. */
+  | "fit-unbound"
+  /** The manifest exports a series or a cloud no node draws. */
   | "uncited-series";
 
 /** One thing wrong between a node's `series:` block and the manifests. */
@@ -201,6 +377,7 @@ export interface SeriesDiscrepancy {
  */
 export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): SeriesDiscrepancy[] {
   const byKey = new Map(manifest.series.map((series) => [series.key, series]));
+  const cloudByKey = new Map(manifest.scatters.map((cloud) => [cloud.key, cloud]));
   const found: SeriesDiscrepancy[] = [];
   const drawn = new Set<string>();
 
@@ -214,8 +391,17 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
       const at = (kind: SeriesDiscrepancyKind, message: string) =>
         found.push({ node: node.id, key: entry.key, kind, message });
 
+      /*
+       * One `series:` block, two shapes behind it.
+       *
+       * A node binds what it draws by key and does not say which array the key is in — a binding
+       * is "draw this computation under this field", and whether the crate answered with a column
+       * or a cloud is the crate's business. The two differ in what has to be bound with them, and
+       * that is the whole of the difference below.
+       */
       const series = byKey.get(entry.key);
-      if (!series) {
+      const cloud = cloudByKey.get(entry.key);
+      if (!series && !cloud) {
         at(
           "unknown-key",
           `draws "${entry.key}", which crates/series.json does not carry. Either the key was ` +
@@ -223,7 +409,8 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
         );
         continue;
       }
-      drawn.add(series.key);
+      const owner = (series ?? cloud)!.owner;
+      drawn.add(entry.key);
 
       if (!DRAWABLE_FIELDS.includes(entry.field)) {
         at(
@@ -239,15 +426,35 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
         );
       }
 
-      if (!cited.has(series.owner)) {
+      if (!cited.has(owner)) {
         at(
           "unattributed",
-          `draws a ${series.owner} column and cites ${series.owner} in no claim tag. A chart ` +
-            `from a crate the node never names is a chart nobody reading the page could trace.`,
+          `draws a ${owner} chart and cites ${owner} in no claim tag. A chart from a crate the ` +
+            `node never names is a chart nobody reading the page could trace.`,
         );
       }
 
-      for (const end of endpoints(series)) {
+      if (cloud) {
+        for (const panel of cloud.panels) {
+          for (const [what, key] of [
+            ["slope", panel.fit.slopeFigure],
+            ["r-squared", panel.fit.rSquaredFigure],
+          ] as const) {
+            if (!bound.has(key)) {
+              at(
+                "fit-unbound",
+                `prints the ${what} of "${panel.label}" on the panel, which is ${key}, and this ` +
+                  `node does not bind that figure. Bind it in figures: first — the slope and the ` +
+                  `r-squared are the only numbers a reader can take off a cloud, so they are the ` +
+                  `cloud's endpoints.`,
+              );
+            }
+          }
+        }
+        continue;
+      }
+
+      for (const end of endpoints(series!)) {
         if (end.figure === undefined) {
           at(
             "endpoints-unbound",
@@ -266,15 +473,19 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
     }
   }
 
-  for (const series of manifest.series) {
-    if (!drawn.has(series.key)) {
+  const exported = [
+    ...manifest.series.map((series) => [series.key, "column"] as const),
+    ...manifest.scatters.map((cloud) => [cloud.key, "cloud"] as const),
+  ];
+  for (const [key, what] of exported) {
+    if (!drawn.has(key)) {
       found.push({
         node: "crates/series.json",
-        key: series.key,
+        key,
         kind: "uncited-series",
         message:
-          `exports ${series.key} and no node draws it. A column computed for nobody is a ` +
-          `column nothing checks; bind it or remove it.`,
+          `exports ${key} and no node draws it. A ${what} computed for nobody is a ${what} ` +
+          `nothing checks; bind it or remove it.`,
       });
     }
   }
@@ -310,6 +521,48 @@ export function rowsAgainstFigures(manifest: SeriesManifest, figures: Manifest):
           `${series.key}: "${row.label}" is ${row.value} and ${row.figure} is ${figure.value}; ` +
             `one of the two manifests is stale`,
         );
+      }
+    }
+  }
+  return out;
+}
+
+/**
+ * Every panel's two numbers reproduce the figures they name, manifest against manifest.
+ *
+ * {@link rowsAgainstFigures}'s sibling and the same check: the crate holds a fit to the figure's
+ * *pin*, this holds the committed series document to the committed figure document, which is the
+ * staleness two artefacts from one generator can have between them. They are one computation, so
+ * they agree to the bit or not at all.
+ *
+ * A slope is compared in magnitude and an r-squared as it stands. That asymmetry is the sign
+ * convention rather than a leniency: the figure manifest exports a signed quantity unsigned with
+ * the direction in its key, because the corpus's numeral reader has no sign group, and an
+ * r-squared has no direction to put there.
+ */
+export function fitsAgainstFigures(manifest: SeriesManifest, figures: Manifest): string[] {
+  const byKey = new Map(figures.figures.map((figure) => [figure.key, figure]));
+  const out: string[] = [];
+  for (const cloud of manifest.scatters) {
+    for (const panel of cloud.panels) {
+      for (const [what, key, value] of [
+        ["slope", panel.fit.slopeFigure, Math.abs(panel.fit.slope)],
+        ["r-squared", panel.fit.rSquaredFigure, panel.fit.rSquared],
+      ] as const) {
+        const figure = byKey.get(key);
+        if (!figure) {
+          out.push(`${cloud.key}: "${panel.label}" names ${key}, which figures.json lacks`);
+          continue;
+        }
+        if (figure.unit !== "ratio") {
+          out.push(`${cloud.key}: "${panel.label}" has a ${what} and ${key} is a ${figure.unit}`);
+        }
+        if (Math.abs(value - figure.value) > Number.EPSILON) {
+          out.push(
+            `${cloud.key}: "${panel.label}" has ${what} ${value} and ${key} is ${figure.value}; ` +
+              `one of the two manifests is stale`,
+          );
+        }
       }
     }
   }

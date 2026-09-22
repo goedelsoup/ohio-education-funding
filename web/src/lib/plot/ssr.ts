@@ -116,6 +116,27 @@ function draw(build: Drawing, naming: Naming, width: number): string {
  * about the data and never about the width, so it is taken once, on the wide drawing, and the
  * narrow one is not asked.
  */
+/**
+ * Render a chart to one SVG, at a width the caller has chosen.
+ *
+ * For a **panel of a small multiple**, which is the one drawing on this site whose width is not
+ * the page's. Two panels share the wide frame and stack on a phone, so a panel is about 300px in
+ * both layouts — near enough {@link WIDTHS.narrow} that the second drawing {@link renderToString}
+ * makes would be a copy shown to nobody. That is worth saying out loud because the cloud these
+ * draw is 609 dots and 609 hit targets: the pair mechanism exists to stop a chart being scaled to
+ * illegibility, not to be applied where one layout already serves both.
+ *
+ * The SVG is `width: 100%` over a `viewBox`, so a panel drawn at 312 fits a 293px phone column by
+ * shrinking, exactly as every other chart here does.
+ *
+ * Returns the empty string where the builder returns null, on {@link renderToString}'s rule: a
+ * form the data cannot support draws nothing rather than an axis with a mark on it.
+ */
+export function renderPanelToString(build: Drawing, naming: Naming, width: number): string {
+  const svg = draw(build, naming, width);
+  return svg ? `<div class="chart-pair"><div class="chart-at" data-at="panel">${svg}</div></div>` : "";
+}
+
 export function renderToString(build: Drawing, naming: Naming): string {
   const wide = draw(build, naming, WIDTHS.wide);
   if (!wide) return "";

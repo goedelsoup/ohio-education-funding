@@ -1,11 +1,11 @@
 ---
 /**
- * One series a corpus node draws, at the end of the prose field its `series:` entry names.
+ * One chart a corpus node draws, at the end of the prose field its `series:` entry names.
  *
- * The chart is `crates/series.json`'s column rendered by `barSpec`, server-side, twice — see
- * `renderToString` — and the node's own `figures:` block holds its endpoints to the prose it sits
- * under (the endpoint rule, in `corpusSeries.ts`). Nothing here reads the corpus: the route
- * resolves the binding and hands over what to draw, so this is a placement and not a lookup.
+ * The chart is one of `crates/series.json`'s computations rendered server-side — see
+ * `renderToString` — and the node's own `figures:` block holds what a reader can quote off it to
+ * the prose it sits under (`corpusSeries.ts`). Nothing here reads the corpus: the route resolves
+ * the binding and hands over what to draw, so this is a placement and not a lookup.
  *
  * `level` is the heading depth the card puts the chart at. A findings card opens with its own
  * `<h2>`, so its chart is an `<h3>`; a description card has no heading of its own and its prose
@@ -13,9 +13,19 @@
  * the page would skip a level and the dist scan for that would fail the build. The heading
  * carries no `id`, deliberately: that is how `levelHeadings` tells a template heading from a
  * prose one, and the address is on the card.
+ *
+ * A **cloud** arrives as more than one panel. Its panel labels are captions rather than headings:
+ * a panel is not a section of the document, it is one of a pair a reader is looking at together,
+ * and giving each a heading would put two entries in the outline for one figure — as well as
+ * pushing the next real heading a level down for no structural reason.
  */
 interface Props {
-  chart: { key: string; label: string; axis: string; html: string };
+  chart: {
+    key: string;
+    label: string;
+    note: string;
+    panels: { label: string | null; html: string }[];
+  };
   level: "h2" | "h3";
 }
 const { chart, level } = Astro.props;
@@ -24,6 +34,15 @@ const Heading = level;
 
 <div class="series" data-series={chart.key}>
   <Heading>{chart.label}</Heading>
-  <div class="chartwrap" data-chart={chart.key} set:html={chart.html} />
-  <p class="note">By {chart.axis.charAt(0).toLowerCase()}{chart.axis.slice(1)}. Hover or focus a bar for its value.</p>
+  <div class="panels">
+    {
+      chart.panels.map((panel) => (
+        <div class="panel">
+          {panel.label && <p class="panel-label">{panel.label}</p>}
+          <div class="chartwrap" data-chart={chart.key} set:html={panel.html} />
+        </div>
+      ))
+    }
+  </div>
+  <p class="note">{chart.note}</p>
 </div>

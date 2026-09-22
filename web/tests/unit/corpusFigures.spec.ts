@@ -290,9 +290,19 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * wrong quantity and got zero anyway reads the same as one that is right. The crate test carries
  * what the manifest cannot: that no district of either blind population moves by so much as a
  * cent, which is a statement about 89 and 64 arms rather than about a sum.
+ *
+ * Recounted at **1001/78** when #442 drew #417's four-number table as the two clouds it was found
+ * by. Three bindings, no new carrier, and all three were already *written* — the prose on the
+ * targeted assistance node has stated both slopes and both r-squareds since #417 and bound one of
+ * the four. That is the gap worth naming: a sentence can state four numbers, carry `[verified]`,
+ * and have a quarter of it checked, and nothing about the node looks any different. What closed
+ * it was needing them for a chart, because the chart prints them and a printed number has to be
+ * pinned — the endpoint rule reaching backwards into prose that was already there.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "998 bindings; raise this when you add one").toBeGreaterThanOrEqual(998);
+  expect(bindings.length, "1001 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1001,
+  );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "78 nodes carry bindings; raise this when a seventy-ninth does",

@@ -146,6 +146,33 @@ export interface Trace {
 }
 
 /**
+ * A fitted line through a scatter, and the two numbers it is the line of.
+ *
+ * The exception {@link Trace} says does not exist, and it exists on exactly the terms that note
+ * lays down: "a regression line is a claim about a model and would belong in `crates/` with a
+ * checkpoint behind it". So this one does. `crates/figures` fits it, `crates/series.json` carries
+ * it, and the slope and r-squared are ordinary pinned figures the corpus node quotes in prose and
+ * the figure gate checks three ways. Nothing in the web layer fits anything.
+ *
+ * It is carried as **two endpoints in the data's own units** rather than as a slope and an
+ * intercept, and that is not a convenience. A line given as a model has to be evaluated somewhere,
+ * and evaluating it here would be this layer computing a claim again — in a different language,
+ * against a centred design it cannot see (the intercept of `dispersion::least_squares` is the mean
+ * of the outcome, not the value at zero, which is a mistake already made once). Two points are a
+ * segment. There is nothing to get wrong.
+ *
+ * `slope` and `rSquared` are the only numbers printed on the panel, which is the cloud's form of
+ * the endpoint rule: what a reader can quote off a chart has to be a number the corpus states and
+ * a figure pins. They are signed, because a slope of −0.0429 is the finding.
+ */
+export interface Fit {
+  from: { x: number; y: number };
+  to: { x: number; y: number };
+  slope: number;
+  rSquared: number;
+}
+
+/**
  * One item with two values on the same measure — a low end and a high end.
  *
  * The shape a ratio compresses. `/counties` ranked its 88 counties by richest ÷ poorest valuation

@@ -386,11 +386,52 @@ pub struct WhatTheIndexMeasures {
     pub per_pupil: Regression,
 }
 
-/// Fit the pair.
+/// One district as the pair of fits sees it: the predictor, and both outcomes.
+///
+/// A regression reports a line and discards the cloud it was fitted through, and for this pair
+/// the cloud is the argument — a slope of one is only worth stating beside the flat one, and
+/// what makes "flat" legible is six hundred dots that do not climb. Returned so that the same
+/// filter, in the same order, serves both the fit and anything drawn under it.
+#[derive(Debug, Clone, PartialEq)]
+pub struct IndexPoint {
+    /// The district, by the only key that identifies one — 607 of the 609 names are distinct.
+    pub irn: String,
+    /// What a reader hovering the dot should be told it is.
+    pub name: String,
+    /// Base cost enrolled ADM: the predictor, in pupils rather than in logs.
+    pub adm: f64,
+    /// `[A]`, the whole-district total the capacity tier compares against the median district's.
+    pub weighted_wealth: f64,
+    /// `[D]`, the same tax base over resident ADM — what the section's own name says it reads.
+    pub wealth_per_pupil: f64,
+}
+
+/// The districts both fits are over, in panel order.
 ///
 /// Districts with a non-positive value on any of the three columns are dropped rather than
 /// floored; there are none in the FY2027 panel, and a zero would be a log of negative infinity
-/// rather than a small number.
+/// rather than a small number. [`what_the_index_measures`] fits through exactly this set, so a
+/// chart of these points and the line through it are one computation and not two that agree.
+#[must_use]
+pub fn index_points(panel: &[DistrictRecord]) -> Vec<IndexPoint> {
+    panel
+        .iter()
+        .filter(|record| {
+            record.base_cost_adm() > 0.0
+                && record.targeted_assistance.weighted_wealth > 0.0
+                && record.targeted_assistance.wealth_per_pupil > 0.0
+        })
+        .map(|record| IndexPoint {
+            irn: record.irn.clone(),
+            name: record.name.clone(),
+            adm: record.base_cost_adm(),
+            weighted_wealth: record.targeted_assistance.weighted_wealth,
+            wealth_per_pupil: record.targeted_assistance.wealth_per_pupil,
+        })
+        .collect()
+}
+
+/// Fit the pair, through the points [`index_points`] returns.
 ///
 /// # Panics
 ///
@@ -398,27 +439,14 @@ pub struct WhatTheIndexMeasures {
 /// has changed shape.
 #[must_use]
 pub fn what_the_index_measures(panel: &[DistrictRecord]) -> WhatTheIndexMeasures {
-    let rows: Vec<&DistrictRecord> = panel
-        .iter()
-        .filter(|record| {
-            record.base_cost_adm() > 0.0
-                && record.targeted_assistance.weighted_wealth > 0.0
-                && record.targeted_assistance.wealth_per_pupil > 0.0
-        })
-        .collect();
-    let adm: Vec<f64> = rows.iter().map(|r| r.base_cost_adm().ln()).collect();
+    let rows = index_points(panel);
+    let adm: Vec<f64> = rows.iter().map(|r| r.adm.ln()).collect();
     let fit = |outcome: Vec<f64>| {
         least_squares(std::slice::from_ref(&adm), &outcome).expect("609 rows, one predictor")
     };
     WhatTheIndexMeasures {
-        total: fit(rows
-            .iter()
-            .map(|r| r.targeted_assistance.weighted_wealth.ln())
-            .collect()),
-        per_pupil: fit(rows
-            .iter()
-            .map(|r| r.targeted_assistance.wealth_per_pupil.ln())
-            .collect()),
+        total: fit(rows.iter().map(|r| r.weighted_wealth.ln()).collect()),
+        per_pupil: fit(rows.iter().map(|r| r.wealth_per_pupil.ln()).collect()),
     }
 }
 

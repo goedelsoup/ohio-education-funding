@@ -9,12 +9,13 @@
 
 import { expect, test } from "vitest";
 
-import type { Bar, FanPoint, ScatterPoint, Trace } from "../../src/lib/chart.ts";
+import type { Bar, FanPoint, Fit, ScatterPoint, Trace } from "../../src/lib/chart.ts";
 import {
   DOT,
   barSpec,
   distributionSpec,
   fanSpec,
+  panelWidth,
   scatterSpec,
   truncatedDomain,
   WIDTHS,
@@ -300,4 +301,90 @@ test("a muted point is drawn smaller and fainter, and the radius is a pixel coun
     [...svg.matchAll(/<circle[^>]*\sr="7"/g)].length,
     "one full-size hit target per district, muted or not",
   ).toBe(points.length * 2);
+});
+
+/**
+ * The fitted-line panels, whose whole claim is an angle.
+ *
+ * #442 draws two clouds side by side under a sentence saying one lies on the diagonal and the
+ * other lies flat. That sentence is only true of a frame where a unit of the outcome is drawn as
+ * long as a unit of the predictor, and the first version of the pair was not: the shared y span
+ * came out at 0.7604 of the x span, which drew a slope of 0.9855 at 1.296 — a superlinear picture
+ * under a sentence saying "a slope of one".
+ */
+const FIT: Fit = {
+  from: { x: 100, y: 1_000 },
+  to: { x: 10_000, y: 100_000 },
+  slope: 0.9855,
+  rSquared: 0.8126,
+};
+const LOG_AXES = {
+  x: { label: "Base cost enrolled ADM", format: (v: number) => String(v), log: true },
+  y: { label: "Total weighted wealth", format: (v: number) => `$${v}`, log: true },
+};
+
+test("a fitted panel is squared, so that a slope of one is drawn as a diagonal", () => {
+  const width = panelWidth(2);
+  const points = cloud(Array.from({ length: 30 }, (_, i) => 100 + i * 300));
+  const spec = scatterSpec(points, LOG_AXES, [], {
+    width,
+    xDomain: [50, 20_000],
+    yDomain: [500, 200_000],
+    fit: FIT,
+  })!;
+  const { height, marginLeft, marginRight, marginTop, marginBottom } = spec.options;
+  expect(height! - marginTop! - marginBottom!).toBe(width - marginLeft! - marginRight!);
+  // The frame is the caller's, drawn as given: a padded log domain would move both ends of it.
+  expect(spec.options.x!.domain).toEqual([50, 20_000]);
+  expect(spec.options.y!.domain).toEqual([500, 200_000]);
+});
+
+test("a fitted line without the frame it was fitted in is refused", () => {
+  const points = cloud(Array.from({ length: 30 }, (_, i) => 100 + i * 300));
+  const missing = { width: WIDTHS.wide, xDomain: [50, 20_000] as [number, number], fit: FIT };
+  // Half a frame is the dangerous case: the x axis is the crate's and the y axis is fitted to
+  // whatever these points happen to span, which is exactly how a slope gets redrawn.
+  expect(() => scatterSpec(points, LOG_AXES, [], missing)).toThrow(/without both domains/);
+  expect(() => scatterSpec(points, LOG_AXES, [], { width: WIDTHS.wide, fit: FIT })).toThrow();
+});
+
+test("a fitted panel prints its slope and its r-squared, and nothing else of the fit", () => {
+  const width = panelWidth(2);
+  const points = cloud(Array.from({ length: 30 }, (_, i) => 100 + i * 300));
+  const draw = (fit: Fit) =>
+    renderToString(
+      () =>
+        scatterSpec(points, LOG_AXES, [], {
+          width,
+          xDomain: [50, 20_000],
+          yDomain: [500, 200_000],
+          fit,
+        }),
+      "presentational",
+    );
+
+  const rising = draw(FIT);
+  // Four places, which is where the corpus writes them and where crates/figures.json pins them:
+  // a reader quoting 0.9855 off the picture is quoting the figure, not a rounding of it.
+  expect(rising).toContain("slope 0.9855 · r² 0.8126");
+  expect(rising).toContain("scatter-fit");
+
+  // A negative slope carries the typographic minus, and a positive one carries no plus — the line
+  // already says which way it goes.
+  const flat = draw({ ...FIT, slope: -0.0429, rSquared: 0.0085 });
+  expect(flat).toContain("slope −0.0429 · r² 0.0085");
+
+  // And a cloud with no fit draws neither the line nor the numbers.
+  const bare = renderToString(
+    () => scatterSpec(points, LOG_AXES, [], { width, xDomain: [50, 20_000] }),
+    "presentational",
+  );
+  expect(bare).not.toContain("scatter-fit");
+  expect(bare).not.toContain("slope");
+});
+
+test("two panels share the wide frame, and one panel is the whole of it", () => {
+  // The gap is `--space-6`, 1.1rem at the 16px root, which is what `.panels` lays them out with.
+  expect(panelWidth(2) * 2 + 18).toBe(WIDTHS.wide);
+  expect(panelWidth(1)).toBe(WIDTHS.wide);
 });

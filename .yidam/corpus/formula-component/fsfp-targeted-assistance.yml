@@ -435,6 +435,18 @@ figures:
     value: 0.9854808925762097
     field: findings
     as_written: "has a slope of **0.9855**"
+  - key: project/capacity-tier-index-on-enrolment-fit
+    value: 0.8125996817867742
+    field: findings
+    as_written: "an r-squared of **0.8126**"
+  - key: project/wealth-per-pupil-index-on-enrolment-negative
+    value: 0.042899242576993984
+    field: findings
+    as_written: "has a slope of **-0.0429**"
+  - key: project/wealth-per-pupil-index-on-enrolment-fit
+    value: 0.008525600893647178
+    field: findings
+    as_written: "an r-squared of\n  **0.0085**"
   - key: project/targeted-assistance-capacity-tier
     value: 334036712.23
     field: findings
@@ -459,6 +471,9 @@ figures:
     value: 17
     field: findings
     as_written: "All **17** districts the cliff"
+series:
+  - key: project/what-the-capacity-tiers-index-measures
+    field: findings
 revisions:
   - was: |
       The zeroed line was read as a dormancy: "a **live zero rather than an absence**: a future

@@ -337,6 +337,22 @@ where one does not — and a node that draws the series must bind those two figu
 off a chart are its extremes; the rule makes the extremes numbers the prose states, the crate
 pins, and the figure gate checks. The rows between may go unbound.
 
+A key can also name a **cloud**, which is the same block and the same `field` rule:
+
+```yaml
+series:
+  - key: project/what-the-capacity-tiers-index-measures
+    field: findings
+```
+
+A cloud is a population drawn as itself — one dot per district — under one panel per outcome, all
+on one predictor and one scale. It has no rows, so the rule falls on what *is* printed on it: the
+**slope** and **r-squared** of the line the crate fitted through each panel. Every panel names the
+ordinary figure that pins each, and a node drawing the cloud must bind all of them. The one above
+carries four, which is the whole of #417's table — the capacity tier's index runs at a slope of
+0.9855 on enrolment and −0.0429 on the wealth per pupil it names — drawn as the two pictures the
+finding was found by rather than as four numbers nobody checks.
+
 Two conventions differ from `figures:`. A series row is **signed**, because a bar below the zero
 rule is what the chart is for, where a figure exports a correlation as a magnitude with its
 direction in the key — so the row `Mineral` is `−0.0321` and names
