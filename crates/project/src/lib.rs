@@ -93,6 +93,7 @@ pub mod report;
 pub mod rolling_anchor;
 pub mod scholarship;
 pub mod series;
+pub mod size_incidence;
 pub mod size_terms;
 pub mod staffing_minimums;
 pub mod statute;

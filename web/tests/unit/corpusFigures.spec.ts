@@ -274,9 +274,17 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * census exists for is a count of zero — reachable bounds reached by nobody — and a zero cannot be
  * bound, so the claim that matters most here is the one the ratchet cannot see; the crate test
  * asserts it instead.
+ *
+ * Recomputed at **978/78** when #435 joined the size-term counterfactuals to the enrollment
+ * cluster's siblings. Fifteen bindings, no new carrier, all on the guarantee node: the pair's
+ * reach statewide and on the 64, the per-pupil worth either side of the cluster boundary, the
+ * band-for-band prediction that says size rather than decline is what catches them, and the
+ * profile of the 29 the terms leave. The claim the ratchet cannot hold is again a negative and
+ * again the load-bearing one — that a component larger than a district's distance from the floor
+ * is not the component that pays it — which the crate test states beside the counts.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "963 bindings; raise this when you add one").toBeGreaterThanOrEqual(963);
+  expect(bindings.length, "978 bindings; raise this when you add one").toBeGreaterThanOrEqual(978);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "78 nodes carry bindings; raise this when a seventy-ninth does",

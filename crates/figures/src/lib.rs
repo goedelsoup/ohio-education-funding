@@ -377,6 +377,29 @@ pub struct LostPupils {
     pub seeded: project::lost_pupils::Fitted,
     /// The nearest-neighbour question, nothing fitted.
     pub neighbours: project::lost_pupils::Neighbours,
+    /// What the plan's two size-dependent terms do to the siblings — [`project::size_incidence`],
+    /// for #435.
+    ///
+    /// Here rather than computed per figure because each row re-runs
+    /// `size_terms::striking_out` over the whole panel, and because the same node states the
+    /// counts, the per-pupil worth and the size prediction together: three numbers from one
+    /// counterfactual, which is exactly the shape that goes stale in halves.
+    pub size_terms: Vec<project::size_incidence::Row>,
+    /// The newly guaranteed by ADM band, siblings against the rest, with both terms struck out.
+    pub size_bands: [project::size_incidence::Band; project::size_terms::BANDS],
+    /// What those bands predict for the siblings from size alone.
+    pub expected_from_size: f64,
+    /// The siblings the two terms leave off the floor, against each component of `[H]`.
+    pub unmoved: Vec<project::size_incidence::Carried>,
+    /// Their median base cost enrolled ADM, and the moved siblings' — the 29 are the larger ones.
+    pub unmoved_median_adm: f64,
+    /// The same for the 35 the terms move.
+    pub moved_median_adm: f64,
+    /// The cluster and the siblings unioned: the arc's "153".
+    pub cluster_and_siblings: usize,
+    /// Every district shrinking at the cluster's median rate or faster, which is a different
+    /// population and holds 169.
+    pub shrinking_at_the_cluster_rate: usize,
 }
 
 impl LostPupils {
@@ -916,6 +939,16 @@ impl Inputs {
                 .filter(|s| s.population == Population::Formula)
                 .collect();
             let siblings = lost_pupils::siblings(&rows);
+            // Both terms struck out, computed once: every reader of it re-runs the whole panel.
+            let both = [
+                project::size_terms::Change::StaffingFloorsStruckOut,
+                project::size_terms::Change::CapacityTierStruckOut,
+            ];
+            let size_bands =
+                project::size_incidence::by_sextile(&panel_for_forecasts, &rows, &both);
+            let unmoved = project::size_incidence::unmoved(&panel_for_forecasts, &rows, &both);
+            let left_behind: std::collections::BTreeSet<String> =
+                unmoved.iter().map(|s| s.irn.clone()).collect();
             let held_by_fy2032 = |set: &[&lost_pupils::Standing]| {
                 set.iter()
                     .filter(|s| fy2032_enacted.get(&s.irn).is_some_and(|w| w.on_the_floor()))
@@ -943,6 +976,21 @@ impl Inputs {
                 typology: lost_pupils::typology_ceilings(&rows),
                 seeded: lost_pupils::fitted_from_typology(&rows),
                 neighbours: lost_pupils::neighbours(&rows),
+                size_terms: project::size_incidence::table(&panel_for_forecasts, &rows),
+                size_bands,
+                expected_from_size: project::size_incidence::expected_from_size(&size_bands),
+                unmoved: project::size_incidence::carried(&panel_for_forecasts, &unmoved),
+                unmoved_median_adm: median(unmoved.iter().map(|s| s.adm).collect()),
+                moved_median_adm: median(
+                    siblings
+                        .iter()
+                        .filter(|s| !left_behind.contains(&s.irn))
+                        .map(|s| s.adm)
+                        .collect(),
+                ),
+                cluster_and_siblings: project::size_incidence::cluster_and_siblings(&rows).len(),
+                shrinking_at_the_cluster_rate:
+                    project::size_incidence::shrinking_at_the_cluster_rate(&rows).len(),
             }
         };
         Self {
@@ -2362,6 +2410,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/bundle",
         unit: Unit::Share,
         label: "The highest federal share in the state \u{2014} the most exposed district in \
+\
                 Ohio to a decision Ohio does not make",
         pinned: 0.290_419_691_9,
         tolerance: 0.000_01,
@@ -2394,6 +2443,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/bundle",
         unit: Unit::Ratio,
         label: "The same, holding economic disadvantage constant \u{2014} the figure that says \
+\
                 anything, and a fifth the size of the one that does not",
         pinned: 0.114_562_368_9,
         tolerance: 0.000_01,
@@ -2405,6 +2455,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/bundle",
         unit: Unit::Count,
         label: "Districts printing a non-zero value on both the one-year and three-year growth \
+\
                 measures \u{2014} the denominator the disagreement is counted over",
         pinned: 534.0,
         tolerance: 0.0,
@@ -2424,6 +2475,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/bundle",
         unit: Unit::Count,
         label: "How many disagree with both magnitudes past 0.05 \u{2014} it is zero, which is \
+\
                 what makes the disagreement readable as noise around a district sitting on zero",
         pinned: 0.0,
         tolerance: 0.0,
@@ -2434,6 +2486,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/bundle",
         unit: Unit::Ratio,
         label: "The correlation between the one-year and three-year growth measures across the \
+\
                 districts determinate on both",
         pinned: 0.903_134_341_1,
         tolerance: 0.000_01,
@@ -2452,6 +2505,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/deflator",
         unit: Unit::Share,
         label: "Real growth in Ohio operating expenditure per pupil, FY2000 to FY2022, \
+\
                 including federal relief",
         pinned: 0.261_147_73,
         tolerance: 0.000_01,
@@ -2471,6 +2525,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/deflator",
         unit: Unit::Share,
         label: "The same span undeflated \u{2014} the figure the same record supports and which \
+\
                 reads four times larger",
         pinned: 1.167_586_69,
         tolerance: 0.000_01,
@@ -2504,6 +2559,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/deflator",
         unit: Unit::Share,
         label: "How far the real series fell from FY2010 to FY2014 \u{2014} the decline the \
+\
                 nominal series conceals entirely",
         pinned: 0.069_168_25,
         tolerance: 0.000_01,
@@ -2584,6 +2640,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "LSC greenbooks from FY2002 to FY2024 carrying no rating-driven formula payment \
+\
                 at all, of twelve",
         pinned: 8.0,
         tolerance: 0.0,
@@ -2594,6 +2651,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Points at which an Ohio accountability rating has determined a formula payment, \
+\
                 FY2002 to FY2027",
         pinned: 5.0,
         tolerance: 0.0,
@@ -2604,6 +2662,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The share of the formula amount Closing the Achievement Gap paid per pupil in \
+\
                 FY2008, in percentage points — Ohio's first rating-driven formula payment",
         pinned: 0.15,
         tolerance: 0.0001,
@@ -2618,6 +2677,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts qualifying for it — those with both an academic distress index and a \
+\
                 poverty index of 1.0 or above",
         pinned: 31.0,
         tolerance: 0.0,
@@ -2634,6 +2694,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "Transfers, advances and note proceeds into Ohio districts' general funds, FY2020 \
+\
                 — the year before the relief window",
         pinned: 281_900_000.0,
         tolerance: 500_000.0,
@@ -2662,6 +2723,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "How closely a district's FY2021-FY2024 cash build-up tracks the federal relief it \
+\
                 received — the correlation, across 606 districts",
         pinned: 0.0751,
         tolerance: 0.0005,
@@ -2672,6 +2734,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "Transfers into the general fund across FY2021-FY2024 above both baseline years' \
+\
                 level, as a share of the cash build-up — the ceiling on what relief can explain",
         pinned: 0.3131,
         tolerance: 0.0005,
@@ -2682,6 +2745,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "And the share the relief itself explains on that baseline, by the slope a few \
+\
                 large districts cannot pull",
         pinned: 0.0638,
         tolerance: 0.0005,
@@ -2692,6 +2756,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "The largest share any baseline and slope the corpus can defend attributes to the \
+\
                 relief — the FY2020 baseline read by least squares",
         pinned: 0.3938,
         tolerance: 0.0005,
@@ -2702,6 +2767,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Dollars,
         label: "Kelleys Island Local SD's local revenue per pupil, FY2023 — four times the next \
+\
                 district in Ohio, and the whole of the break the corpus recorded at FY2023",
         pinned: 214_400.0,
         tolerance: 50.0,
@@ -2735,6 +2801,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "The share of the local gap state aid closes in FY2024, the last year the survey \
+\
                 reaches",
         pinned: 0.4390,
         tolerance: 0.0005,
@@ -2745,6 +2812,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/regime-diff",
         unit: Unit::Share,
         label: "The poorest quartile of Ohio districts sitting at the twenty-mill floor, TY2023, \
+\
                 where a reappraisal reaches revenue",
         // Not 0.4605: written as 46.1% that sits exactly on the corpus's rounding tolerance and
         // the phrase check fails on the last bit of the float.
@@ -2784,6 +2852,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/regime-diff",
         unit: Unit::Dollars,
         label: "How much wider the FY2024 quartile gap would be with the reappraisals removed and \
+\
                 every district left on its own quiet-year rate",
         pinned: 212.0,
         tolerance: 5.0,
@@ -2794,6 +2863,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Dollars,
         label: "The local revenue gap the two higher levels are read against — richest quartile \
+\
                 less poorest, per pupil, FY2022",
         pinned: 9_590.0,
         tolerance: 1.0,
@@ -2865,6 +2935,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "Performance Index against spending per weighted pupil, all rated districts \
+\
                 \u{2014} negative, and too small to have a direction",
         pinned: 0.015_450_670_9,
         tolerance: 0.000_01,
@@ -2875,6 +2946,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The same less the single highest per-pupil spender \u{2014} still negative, and \
+\
                 a quarter the size",
         pinned: 0.004_216_665_8,
         tolerance: 0.000_01,
@@ -2885,6 +2957,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The same less districts under 582 pupils \u{2014} and now POSITIVE. The paper \
+\
                 calls this range robustness; a measure that changes sign has none to report",
         pinned: 0.035_822_857_6,
         tolerance: 0.000_01,
@@ -2904,6 +2977,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The same on a headcount divisor, less the top spender \u{2014} the scenario \
+\
                 that moves the published measure most and this one least",
         pinned: 0.354_553_510_9,
         tolerance: 0.000_01,
@@ -2914,6 +2988,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "Less the small districts \u{2014} the three move by 0.018 in total and never \
+\
                 leave the same conclusion, which is what stability looks like",
         pinned: 0.337_137_690_2,
         tolerance: 0.000_01,
@@ -2928,6 +3003,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Districts the F-33 panel carries in BOTH FY2010 and FY2013 — the population a \
+\
                 change can be computed over, and smaller than either year alone",
         pinned: 610.0,
         tolerance: 0.0,
@@ -2947,6 +3023,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "The same, as a share — the contraction was broad rather than a few districts cut \
+\
                 hard enough to move an average",
         pinned: 0.803_278_69,
         tolerance: 0.000_01,
@@ -2975,6 +3052,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "Enrollment-weighted, which is the figure comparable to the Auditor's statewide \
+\
                 series — a different survey over a different entity set, same shape",
         pinned: 0.067_952_36,
         tolerance: 0.000_01,
@@ -2987,6 +3065,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "FY2010 state revenue share against the depth of the fall — the hypothesis this \
+\
                 refutes, and the one that should have held",
         pinned: 0.020_299_20,
         tolerance: 0.000_01,
@@ -3015,6 +3094,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "Log enrollment against the depth of the fall — the strongest of the five, and \
+\
                 still far smaller than the spread it is trying to explain",
         pinned: 0.196_980_44,
         tolerance: 0.000_01,
@@ -3025,6 +3105,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "FY2010 real spending per pupil against the depth of the fall, which is partly \
+\
                 mechanical: a district starting higher has more room to fall",
         pinned: 0.167_893_44,
         tolerance: 0.000_01,
@@ -3053,6 +3134,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "The share of the panel's pupils they hold — which is why the deepest decile is a \
+\
                 tail rather than the story",
         pinned: 0.119_861_53,
         tolerance: 0.000_01,
@@ -3077,6 +3159,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/foundation",
         unit: Unit::Dollars,
         label: "The statewide base cost increase from refreshing the classroom teacher salary \
+\
                 input to FY2024 — computed cost, before any state-share or guarantee reduction",
         pinned: 466_233_428.14,
         tolerance: 1.0,
@@ -3105,6 +3188,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/foundation",
         unit: Unit::Dollars,
         label: "The most-affected district's, which is about 1.4 times the least — with no \
+\
                 policy choice anywhere in the difference",
         pinned: 442.771_078_440,
         tolerance: 0.01,
@@ -3115,6 +3199,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/foundation",
         unit: Unit::Count,
         label: "Districts small enough that the six-teacher special minimum binds — the single \
+\
                 cause of the spread above",
         pinned: 155.0,
         tolerance: 0.0,
@@ -3134,6 +3219,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/foundation",
         unit: Unit::Dollars,
         label: "Everyone else's mean increase per pupil, which is the comparison that makes the \
+\
                 staffing minimum the cause rather than a correlate",
         pinned: 322.872_511_005,
         tolerance: 0.01,
@@ -3144,6 +3230,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/foundation",
         unit: Unit::Dollars,
         label: "The FY2024 statewide average classroom teacher salary — the year a refresh reads, \
+\
                 and the number the whole perturbation runs to",
         pinned: 73_777.08,
         tolerance: 0.0,
@@ -3154,6 +3241,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/foundation",
         unit: Unit::Dollars,
         label: "The FY2022 reference salary it runs from, as the department's FY2027 calculator \
+\
                 carries it",
         pinned: 68_022.22,
         tolerance: 0.0,
@@ -3169,6 +3257,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/foundation",
         unit: Unit::Dollars,
         label: "Base cost per pupil on the worked example, priced at the FY2022 inputs H.B. 96 \
+\
                 carries forward",
         pinned: 8_198.404_992_881,
         tolerance: 0.01,
@@ -3188,6 +3277,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/foundation",
         unit: Unit::Dollars,
         label: "Local capacity per pupil above which the 10% minimum state share binds before \
+\
                 the refresh — the bottom of the band that straddles the floor",
         pinned: 7_378.564_493_593,
         tolerance: 0.01,
@@ -3198,6 +3288,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/foundation",
         unit: Unit::Dollars,
         label: "And after it, which is the top of that band — the floor is a share OF base cost \
+\
                 per pupil, so a refresh moves it",
         pinned: 7_676.593_147_455,
         tolerance: 0.01,
@@ -3208,6 +3299,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/foundation",
         unit: Unit::Dollars,
         label: "How wide that band is in capacity per pupil, which is what the published \
+\
                 incidence grid stepped over",
         pinned: 298.028_653_862,
         tolerance: 0.01,
@@ -3218,6 +3310,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/foundation",
         unit: Unit::Share,
         label: "The share of the increase a district at the band's midpoint captures — strictly \
+\
                 between the floor rate and 100%, which is why the transition is a gradient",
         pinned: 0.55,
         tolerance: 0.000_01,
@@ -3233,6 +3326,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/scenario-delta",
         unit: Unit::Count,
         label: "Districts a base cost increase of the department's own size does not move at \
+\
                 all, because the guarantee pays them under both policies",
         pinned: 253.0,
         tolerance: 0.0,
@@ -3243,6 +3337,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/scenario-delta",
         unit: Unit::Count,
         label: "Guaranteed districts an increase this size lifts off the guarantee and onto the \
+\
                 formula — the mechanism by which a large enough increase shrinks the guarantee",
         pinned: 41.0,
         tolerance: 0.0,
@@ -3262,6 +3357,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/scenario-delta",
         unit: Unit::Share,
         label: "The share of Ohio's modelled enrollment held by the districts an increase does \
+\
                 not reach — the figure that says whether the unmoved count is a large fact",
         pinned: 0.430_474_04,
         tolerance: 0.000_01,
@@ -3409,6 +3505,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The FY2016 move in state revenue per pupil against log total assessed value \
+\
                 \u{2014} negative, and the strongest correlate of it",
         pinned: 0.2691,
         tolerance: 0.0005,
@@ -3431,6 +3528,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "And against industrial property share \u{2014} positive, which is the wrong sign \
+\
                 for a tangible personal property reading",
         pinned: 0.1175,
         tolerance: 0.0005,
@@ -3452,6 +3550,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "And against mineral property share \u{2014} negative, the opposite sign to \
+\
                 industrial, which is what a summed business share averages away",
         pinned: 0.0321,
         tolerance: 0.0005,
@@ -3474,6 +3573,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "And against public utility property share \u{2014} the largest of the three \
+\
                 classes by value and the third sign of three",
         pinned: 0.0159,
         tolerance: 0.0005,
@@ -3496,6 +3596,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The three business classes added together \u{2014} a near-zero that is a \
+\
                 cancellation of the three above rather than an absence",
         pinned: 0.0164,
         tolerance: 0.0005,
@@ -3535,6 +3636,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "Log total assessed value against the FY2016 move, standardised, holding wealth \
+\
                 per pupil and disadvantage \u{2014} negative",
         pinned: 0.1994,
         tolerance: 0.0005,
@@ -3556,6 +3658,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose place in the order of state support per pupil changes when the \
+\
                 performance supplement is removed, of 609",
         pinned: 370.0,
         tolerance: 0.0,
@@ -3595,6 +3698,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The same with the performance supplement removed \u{2014} wider, so the \
+\
                 supplement narrows Ohio's equalisation rather than widening it",
         pinned: 0.5281,
         tolerance: 0.0005,
@@ -3607,6 +3711,7 @@ pub static FIGURES: &[Figure] = &[
         // the bare numeral and no per-cent sign.
         unit: Unit::Ratio,
         label: "The supplement as a share of the state aid the least-poor quartile of districts \
+\
                 already receives",
         pinned: 0.011408,
         tolerance: 0.0005,
@@ -3618,6 +3723,7 @@ pub static FIGURES: &[Figure] = &[
         // Under this manifest's share floor, so the prose bound to it carries no per-cent sign.
         unit: Unit::Ratio,
         label: "And of the aid the poorest quartile receives \u{2014} a fifth as much, against a \
+\
                 per-pupil gradient of 2.56",
         pinned: 0.002173,
         tolerance: 0.0005,
@@ -3628,6 +3734,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts on the guarantee that are paid a performance supplement on top of it, \
+\
                 of 294 \u{2014} the supplement is line [O] and the guarantee is computed on [H]",
         pinned: 217.0,
         tolerance: 0.0,
@@ -3641,6 +3748,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Line items of the state budget authorised under R.C. 3306, the Evidence-Based \
+\
                 Model's chapter, across eighteen editions of the Catalog",
         pinned: 1.0,
         tolerance: 0.0,
@@ -3695,6 +3803,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Years between the oldest and newest establishing acts of the five line items that \
+\
                 pay Ohio's foundation aid and its scholarships",
         pinned: 42.0,
         tolerance: 0.0,
@@ -3708,6 +3817,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "How far the per-pupil amount a district is charged for a pupil it does not teach \
+\
                 fell across the four years Ohio had no statewide base cost per pupil",
         pinned: 79.0,
         tolerance: 0.01,
@@ -3725,6 +3835,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "And the same fall in constant dollars, across four years in which the formula had \
+\
                 no price for a pupil and prices rose anyway",
         pinned: 0.089_008_069_370_486_44,
         tolerance: 0.000_001,
@@ -3737,6 +3848,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Statewide scalars in the funding calculator that are the same number in FY2026 \
+\
                 and FY2027 \u{2014} every weight and every base cost among them",
         pinned: 25.0,
         tolerance: 0.0,
@@ -3758,6 +3870,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The base funding supplement's per-pupil rate in the FY2026 model, against $40 in \
+\
                 the FY2027 one",
         pinned: 27.0,
         tolerance: 0.01,
@@ -3777,6 +3890,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The performance supplement's per-pupil rate, which is the same in both years the \
+\
                 calculator can be read for",
         pinned: 13.0,
         tolerance: 0.01,
@@ -3787,6 +3901,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The preschool special education proration factor in the FY2026 model, which is \
+\
                 that year's appropriation over that year's demand",
         pinned: 0.968_538_11,
         tolerance: 0.000_000_1,
@@ -3801,6 +3916,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "What the same arithmetic gives for FY2027, where the program's demand is below \
+\
                 its appropriation and no proration arises",
         pinned: 1.004_886_704_582_321_3,
         tolerance: 0.000_001,
@@ -3815,6 +3931,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "How far preschool special education falls short of its FY2027 appropriation \
+\
                 after the factor the calculator applies",
         pinned: 5_568_648.27,
         tolerance: 0.01,
@@ -3833,6 +3950,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/local-capacity",
         unit: Unit::Dollars,
         label: "The median of the 609 district median federal incomes, which R.C. \
+\
                 3317.017(A)(4)(a) makes the denominator of every district's income ratio",
         pinned: 54_546.637_5,
         tolerance: 0.000_1,
@@ -3849,6 +3967,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/local-capacity",
         unit: Unit::Ratio,
         label: "The fortieth-highest district income ratio, which tops out the capacity rate \
+\
                 scale — a rank under R.C. 3317.017(A)(4)(c), not a number anybody sets",
         pinned: 1.465_036_364_5,
         tolerance: 0.000_000_01,
@@ -3869,6 +3988,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the median district's per-pupil local capacity gains between the department's \
+\
                 FY2026 model and its FY2027 one",
         pinned: 472.440_7,
         tolerance: 0.01,
@@ -3879,6 +3999,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "And what its base cost per pupil gains over the same interval, with the cost \
+\
                 inputs held at FY2022 by act",
         pinned: 4.11,
         tolerance: 0.01,
@@ -3889,6 +4010,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The fall in the median district's state share of its base cost across that one \
+\
                 year, in percentage points",
         // Percentage points rather than a share, because that is the quantity: the difference of
         // two shares is not one. Written bare in prose for the same reason — a `%` beside it
@@ -3902,6 +4024,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose published state share of the base cost is lower in the FY2027 \
+\
                 model than in the FY2026 one, of 609",
         pinned: 540.0,
         tolerance: 0.0,
@@ -3931,6 +4054,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "What the FY2027 median would be if local capacity had stayed at its FY2026 value \
+\
                 and only the base cost had moved",
         pinned: 0.412_330_774_574_220_24,
         tolerance: 0.000_001,
@@ -3959,6 +4083,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts the 10% minimum state share bound for in the FY2026 model, against 138 \
+\
                 a year later",
         pinned: 105.0,
         tolerance: 0.0,
@@ -3980,6 +4105,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "The statewide economically disadvantaged percentage the FY2026 model indexes each \
+\
                 district against",
         pinned: 0.565_990_245,
         tolerance: 0.000_001,
@@ -4002,6 +4128,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "How far the median district's directly certified count falls between the two \
+\
                 models, under the same label in both",
         pinned: 0.167_988_742_540_178_7,
         tolerance: 0.000_001,
@@ -4020,6 +4147,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "How far statewide median weighted wealth moves between the two published models \
+\
                 \u{2014} the quantity targeted assistance equalises to",
         pinned: 0.082_314_914_960_079_92,
         tolerance: 0.000_001,
@@ -4033,6 +4161,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "And the per-pupil median, which the capacity and wealth tiers are both charged \
+\
                 against",
         pinned: 0.092_254_802_666_704_72,
         tolerance: 0.000_001,
@@ -4048,6 +4177,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "How much of a district's enrolment growth rate carries into the next year, \
+\
                 FY2025 to FY2026 \u{2014} the quantity the projection's damping parameterises",
         pinned: 0.341_205,
         tolerance: 0.000_01,
@@ -4067,6 +4197,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts where the growth supplement's FY2023 enrolled ADM differs from the base \
+\
                 cost window's \u{2014} two columns of one workbook under one name",
         pinned: 608.0,
         tolerance: 0.0,
@@ -4089,6 +4220,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose FY2025 enrolled ADM the department restated between its two \
+\
                 published models \u{2014} of 611, and by at most a third of a per cent",
         pinned: 140.0,
         tolerance: 0.0,
@@ -4103,6 +4235,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose English learner count differs between the two published models, \
+\
                 under the column header that calls the count FY2021",
         pinned: 512.0,
         tolerance: 0.0,
@@ -4127,6 +4260,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "How far the most recently arrived English learners fall between the two models \
+\
                 \u{2014} a cohort ageing through the taper, not a file nobody refreshed",
         pinned: 0.219_738_035_205_238_6,
         tolerance: 0.000_001,
@@ -4137,6 +4271,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose English learner headcount held or grew between the two models \
+\
                 and whose weighted count fell anyway \u{2014} the taper, not the population",
         pinned: 46.0,
         tolerance: 0.0,
@@ -4148,6 +4283,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts carrying an identical career-technical FTE across the two models \
+\
                 \u{2014} stable, which is not the same as held",
         pinned: 559.0,
         tolerance: 0.0,
@@ -4172,6 +4308,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Pupils,
         label: "Career-technical full-time equivalents statewide in the FY2027 model, against \
+\
                 28,558 in the FY2026 one",
         pinned: 28_641.919_504,
         tolerance: 0.001,
@@ -4187,6 +4324,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose school building count is identical across the two models \
+\
                 \u{2014} every one of them, and the only column on the sheet that manages it",
         pinned: 611.0,
         tolerance: 0.0,
@@ -4203,6 +4341,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The most Ohio's statewide base cost per pupil has ever been worth, in FY2026 \
+\
                 dollars, which it reached in FY2003",
         pinned: 8_996.888_666_303_757,
         tolerance: 0.01,
@@ -4213,6 +4352,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "How far the statewide base cost per pupil rises from FY2002 to FY2026 in the \
+\
                 dollars of each year",
         pinned: 0.712_089_738_263_398_4,
         tolerance: 0.000_001,
@@ -4232,6 +4372,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Fiscal years in which Ohio's formula has no statewide base cost per pupil at all, \
+\
                 which are FY2010 through FY2013",
         pinned: 4.0,
         tolerance: 0.0,
@@ -4243,6 +4384,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "How much less the base cost per pupil was worth when it returned in FY2014 than \
+\
                 when it was abandoned in FY2009",
         pinned: 0.092_978_668_972_085_07,
         tolerance: 0.000_001,
@@ -4253,6 +4395,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "The real fall in the opportunity grant's formula amount from FY2014 to FY2021, \
+\
                 across which the printed figure rose every year",
         pinned: 0.080_766_982_747_163_98,
         tolerance: 0.000_001,
@@ -4263,6 +4406,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the FY2024 statewide average base cost per pupil, which two acts have frozen \
+\
                 through FY2027, is worth in FY2026 dollars",
         pinned: 8_760.825_603_564_892,
         tolerance: 0.01,
@@ -4273,6 +4417,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "And the gap between that and the frozen amount the formula actually pays in \
+\
                 FY2026, per pupil",
         pinned: 518.825_603_564_892,
         tolerance: 0.01,
@@ -4286,6 +4431,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "How far the Legislative Service Commission's estimate of the FY2022 statewide \
+\
                 average was below the amount the year produced",
         pinned: 0.020_827_547_903_360_178,
         tolerance: 0.000_001,
@@ -4302,6 +4448,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Districts on which the Department of Taxation's total taxable value and the \
+\
                 District Profile Report's valuation per pupil reproduce each other exactly, of 606",
         pinned: 606.0,
         tolerance: 0.0,
@@ -4313,6 +4460,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "And districts whose two published per-pupil figures agree within 2% \u{2014} the \
+\
                 numerators are identical, so the rest is the pupil count",
         pinned: 63.0,
         tolerance: 0.0,
@@ -4333,6 +4481,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Dollars,
         label: "And on the count of children resident in it \u{2014} six per cent apart at the \
+\
                 median, and more than two to one in the districts that matter",
         pinned: 233_319.65,
         tolerance: 0.01,
@@ -4352,6 +4501,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "Resident pupils per pupil taught, Columbus City \u{2014} the largest district \
+\
                 with the divergence",
         pinned: 1.6725,
         tolerance: 0.0005,
@@ -4362,6 +4512,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Dollars,
         label: "Youngstown City's assessed valuation per pupil on the Department of Education's \
+\
                 count",
         pinned: 172_999.40,
         tolerance: 0.01,
@@ -4425,6 +4576,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "The state's share for the fifth of districts with the least assessed value per \
+\
                 pupil",
         pinned: 0.5756,
         tolerance: 0.0005,
@@ -4435,6 +4587,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "And for the fifth with the most, which is the program's own rule measured rather \
+\
                 than described",
         pinned: 0.1895,
         tolerance: 0.0005,
@@ -4445,6 +4598,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "A district's fifteen-year state share against the log of its assessed value per \
+\
                 pupil \u{2014} negative",
         pinned: 0.4405,
         tolerance: 0.0005,
@@ -4455,6 +4609,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Dollars,
         label: "What the least-funded of the 606 districts received across the whole span \u{2014} \
+\
                 the program is a queue ordered by poverty and it still reached every district",
         pinned: 730_000.0,
         tolerance: 1000.0,
@@ -4489,6 +4644,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The weakest of fifteen yearly correlations between nonspecified state revenue and \
+\
                 capital outlay per pupil",
         pinned: 0.4733,
         tolerance: 0.0005,
@@ -4505,6 +4661,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "And the strongest the same correlation reaches for general formula assistance, \
+\
                 which is the control the identification rests on",
         pinned: 0.1122,
         tolerance: 0.0005,
@@ -4521,6 +4678,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "Districts whose largest year of state capital money is a year their own capital \
+\
                 spending beat their own median",
         pinned: 0.818,
         tolerance: 0.0005,
@@ -4535,6 +4693,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "The fiscal year the survey begins netting Ohio's community-school deduct out of \
+\
                 district state revenue, located from the data alone",
         pinned: 2016.0,
         tolerance: 0.0,
@@ -4545,6 +4704,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "A district's community-school deduct against its FY2015-to-FY2016 change in \
+\
                 state revenue per pupil, on the column as published \u{2014} negative",
         pinned: 0.2506,
         tolerance: 0.0005,
@@ -4563,6 +4723,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The same correlation with both years on one basis \u{2014} negative, and what is \
+\
                 left of it",
         pinned: 0.0183,
         tolerance: 0.0005,
@@ -4581,6 +4742,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "And the largest the same correlation reaches in any of the other ten transitions \
+\
                 the panel holds",
         pinned: 0.1026,
         tolerance: 0.0005,
@@ -4598,6 +4760,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Districts falling more than a fifth across FY2016 once both eras are on one \
+\
                 basis, against the twenty-seven the published column shows",
         pinned: 19.0,
         tolerance: 0.0,
@@ -4611,6 +4774,7 @@ pub static FIGURES: &[Figure] = &[
         // bound to it carries the bare numeral and no per-cent sign.
         unit: Unit::Ratio,
         label: "And the share of the panel's pupils they hold \u{2014} a quarter of the published \
+\
                 figure",
         pinned: 0.0166,
         tolerance: 0.0005,
@@ -4630,6 +4794,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "Columbus City's FY2016 step on one basis, against the 29.22% fall the published \
+\
                 column shows",
         pinned: 0.1493,
         tolerance: 0.0005,
@@ -4658,6 +4823,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Dollars,
         label: "What Ohio's districts' state revenue fell across FY2016 on the published column \
+\
                 \u{2014} negative, as a magnitude",
         pinned: 849_921_000.0,
         tolerance: 1000.0,
@@ -4668,6 +4834,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Dollars,
         label: "And what those districts paid community schools that year, which the survey \
+\
                 stopped crediting them with",
         pinned: 919_992_000.0,
         tolerance: 1000.0,
@@ -4678,6 +4845,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "Toledo City's community-school deduct as a share of the state revenue the survey \
+\
                 credited it with in FY2015",
         pinned: 0.3529,
         tolerance: 0.0005,
@@ -4697,6 +4865,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "And on the same basis FY2016 is already on, which removes five sixths of the \
+\
                 jump between them",
         pinned: 0.5239,
         tolerance: 0.0005,
@@ -4741,6 +4910,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Dollars,
         label: "State money ECOT received across the eight years the survey holds it, FY2009 to \
+\
                 FY2017",
         pinned: 666_576_000.0,
         tolerance: 1000.0,
@@ -4789,6 +4959,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Dollars,
         label: "State money Ohio's districts were credited with and paid straight to community \
+\
                 schools, across the eleven years the survey reports it",
         pinned: 9_285_168_000.0,
         tolerance: 1000.0,
@@ -4804,6 +4975,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "Share of the whole community-school deduct borne by the ten districts that bore \
+\
                 most of it, FY2010 to FY2021",
         pinned: 0.62799,
         tolerance: 0.0005,
@@ -4817,6 +4989,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "Share of the state money Columbus City was credited with that it paid on to \
+\
                 community schools, FY2010 to FY2021",
         pinned: 0.35289,
         tolerance: 0.0005,
@@ -4834,6 +5007,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "The community-school deduct at its peak, as a share of the state aid Ohio's \
+\
                 districts were credited with, FY2015",
         pinned: 0.09783,
         tolerance: 0.0005,
@@ -4848,6 +5022,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "ECOT's draw as a share of every dollar Ohio's districts paid community schools, \
+\
                 across the years the two overlap",
         pinned: 0.10592,
         tolerance: 0.0005,
@@ -4858,6 +5033,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Ohio community schools the federal directory lists as scheduled to open and never \
+\
                 records as open",
         pinned: 267.0,
         tolerance: 0.0,
@@ -4871,6 +5047,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Ohio community schools open at the sector\u{2019}s largest, in the 2013-14 \
+\
                 directory edition",
         pinned: 391.0,
         tolerance: 0.0,
@@ -4888,6 +5065,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "Share of Ohio community schools that opened and were still open ten years later, \
+\
                 over those the directory could observe that long",
         pinned: 0.60554,
         tolerance: 0.0005,
@@ -4915,6 +5093,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Site-based community schools paid the equity supplement in FY2027, of 355 \
+\
                 community and STEM schools the department models",
         pinned: 324.0,
         tolerance: 0.0,
@@ -4933,6 +5112,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "STEM schools paid no equity supplement in FY2027, against a redbook that has the \
+\
                 introduced budget extending it to them",
         pinned: 8.0,
         tolerance: 0.0,
@@ -4954,6 +5134,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Dollars,
         label: "What the same 324 recipients would be paid at the $650 H.B. 33 set, which H.B. 96 \
+\
                 cut to $400",
         pinned: 56_307_722.68,
         tolerance: 1.0,
@@ -4964,6 +5145,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Dollars,
         label: "What the cut from $650 to $400 takes out of the equity supplement, over an \
+\
                 unchanged population",
         pinned: 21_656_816.41,
         tolerance: 1.0,
@@ -4974,6 +5156,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Dollars,
         label: "What extending the equity supplement to the eight STEM schools would add at the \
+\
                 enacted FY2027 rate \u{2014} the change the act did not make",
         pinned: 1_834_208.52,
         tolerance: 1.0,
@@ -4984,6 +5167,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "The equity supplement as a share of total state support to community and STEM \
+\
                 schools, FY2027",
         pinned: 0.02292,
         tolerance: 0.0005,
@@ -4998,6 +5182,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Joint vocational school districts the department funds, agreed by its payment \
+\
                 reports and by the federal directory",
         pinned: 49.0,
         tolerance: 0.0,
@@ -5015,6 +5200,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Dollars,
         label: "What H.B. 96 item 7 adds to JVSD base cost aid in FY2026, against prior law\u{2019}s \
+\
                 arithmetic over the same districts and year",
         pinned: 10_249_746.61,
         tolerance: 1.0,
@@ -5025,6 +5211,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Joint vocational districts better off under item 7 in FY2026 \u{2014} the ones \
+\
                 enrolling above their three-year average",
         pinned: 36.0,
         tolerance: 0.0,
@@ -5039,6 +5226,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Joint vocational districts whose FY2027 enrolled ADM is FY2026\u{2019}s exactly, \
+\
                 which under item 7 is the count the state share multiplies",
         pinned: 43.0,
         tolerance: 0.0,
@@ -5067,6 +5255,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "The lowest JVSD state share of base cost in FY2027, against a 10% minimum no \
+\
                 district has reached in six years",
         pinned: 0.10923,
         tolerance: 0.0001,
@@ -5083,6 +5272,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Dollars,
         label: "Total state support to the 49 joint vocational districts in FY2026, as the \
+\
                 department paid it rather than as the greenbook scored it",
         pinned: 559_089_218.26,
         tolerance: 1.0,
@@ -5093,6 +5283,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Dollars,
         label: "Total state support to the 49 joint vocational districts in FY2027, from the \
+\
                 September payment report",
         pinned: 591_155_954.03,
         tolerance: 1.0,
@@ -5118,6 +5309,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "How far the average EdChoice Expansion award falls below the lowest figure any \
+\
                 grade mix could produce, 2024-25",
         pinned: 541.59,
         tolerance: 0.01,
@@ -5149,6 +5341,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "The largest share of Traditional EdChoice recipients that can be in grades \
+\
                 kindergarten through eight, given the average award the report publishes",
         pinned: 0.345_625,
         tolerance: 0.0005,
@@ -5165,6 +5358,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "The mean decay factor the income formula would have to apply if it explained the \
+\
                 whole gap between the two EdChoice averages",
         pinned: 0.72824,
         tolerance: 0.0005,
@@ -5187,6 +5381,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The multiple of the federal poverty guidelines at which the statute pays that \
+\
                 factor \u{2014} a floor on the mean under that reading",
         pinned: 4.95751,
         tolerance: 0.005,
@@ -5210,6 +5405,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "Community schools\u{2019} share of the comprehensive support list against their \
+\
                 share of Ohio\u{2019}s report-card buildings",
         pinned: 4.86510,
         tolerance: 0.005,
@@ -5223,6 +5419,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The same against the additional targeted support list, where the sector is \
+\
                 under-represented rather than over",
         pinned: 0.45740,
         tolerance: 0.005,
@@ -5257,6 +5454,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "Community school buildings on the comprehensive support list once dropout \
+\
                 recovery is taken off both sides \u{2014} a floor",
         pinned: 0.13924,
         tolerance: 0.0005,
@@ -5273,6 +5471,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Subgroup-tier buildings put there by the disability subgroup alone, of 177, none \
+\
                 of them a community school",
         pinned: 86.0,
         tolerance: 0.0,
@@ -5293,6 +5492,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the transportation minimum state share pays above what districts\u{2019} own \
+\
                 shares would, FY2027",
         pinned: 289_611_593.21,
         tolerance: 1.0,
@@ -5303,6 +5503,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The transportation floor per pupil in the least wealthy fifth of districts by \
+\
                 assessed valuation, FY2027",
         pinned: 3.18,
         tolerance: 0.05,
@@ -5330,6 +5531,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "Cleveland Municipal state revenue per pupil, FY2010 to FY2024, net of the \
+\
                 community-school deduct in both years, in constant dollars \u{2014} negative",
         pinned: 0.12912,
         tolerance: 0.0005,
@@ -5352,6 +5554,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "Toledo City state revenue per pupil, FY2010 to FY2024, net of the \
+\
                 community-school deduct in both years, in constant dollars \u{2014} negative",
         pinned: 0.15062,
         tolerance: 0.0005,
@@ -5362,6 +5565,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "Perrysburg Exempted Village state revenue per pupil over the same span and on \
+\
                 the same basis \u{2014} negative, and deeper than Toledo's",
         pinned: 0.20286,
         tolerance: 0.0005,
@@ -5372,6 +5576,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "Toledo City local revenue per pupil over the same span, in constant dollars \
+\
                 \u{2014} negative",
         pinned: 0.08141,
         tolerance: 0.0005,
@@ -5382,6 +5587,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "Perrysburg Exempted Village local revenue per pupil over the same span \u{2014} \
+\
                 the one series of the four that rises",
         pinned: 0.22336,
         tolerance: 0.0005,
@@ -5419,6 +5625,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "Perrysburg Exempted Village effective Class I operating millage, TY2023 \u{2014} \
+\
                 the higher of the two",
         pinned: 39.15,
         tolerance: 0.0005,
@@ -5447,7 +5654,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Districts whose state revenue per pupil fell more than a fifth across FY2016 and \
+\
                 stayed down, on the column as published \u{2014} which charges each district its \
+\
                 own community-school deduct",
         pinned: 27.0,
         tolerance: 0.0,
@@ -5458,6 +5667,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "The share of the panel's pupils those districts hold, on the same published \
+\
                 column",
         pinned: 0.06700,
         tolerance: 0.0005,
@@ -5482,6 +5692,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "Classroom instruction per pupil against the Progress effect size, standardised, \
+\
                 with non-classroom spending and five controls",
         pinned: 0.2432,
         tolerance: 0.0005,
@@ -5492,6 +5703,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "Non-classroom spending per pupil against the Progress effect size in the same \
+\
                 model \u{2014} negative, and not distinguishable from zero",
         pinned: 0.0320,
         tolerance: 0.0005,
@@ -5502,6 +5714,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "Classroom share of operating spending against the Progress effect size, holding \
+\
                 total spending and five controls fixed",
         pinned: 0.1215,
         tolerance: 0.0005,
@@ -5512,6 +5725,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The same share against the Performance Index, where the level of spending runs \
+\
                 the other way",
         pinned: 0.0948,
         tolerance: 0.0005,
@@ -5522,6 +5736,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "Operating spending per pupil against the Performance Index in the model that also \
+\
                 carries the classroom share \u{2014} negative",
         pinned: 0.0562,
         tolerance: 0.0005,
@@ -5532,6 +5747,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "Instruction per pupil against the Progress effect size, all nine published \
+\
                 functions entered at once",
         pinned: 0.1944,
         tolerance: 0.0005,
@@ -5542,6 +5758,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "Operations and maintenance of plant in the same model \u{2014} negative, and the \
+\
                 only function that is reliably so",
         pinned: 0.1259,
         tolerance: 0.0005,
@@ -5552,6 +5769,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "Pupil transportation in the same model \u{2014} the corpus's own example, and not \
+\
                 distinguishable from zero",
         pinned: 0.0346,
         tolerance: 0.0005,
@@ -5584,6 +5802,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "Correlation between the classroom share and operating spending per pupil \
+\
                 \u{2014} negative: spending more buys a smaller classroom fraction",
         pinned: 0.3371,
         tolerance: 0.0005,
@@ -5648,6 +5867,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "How far Ohio's equity factor sits below the 0.20 edge where the within-state \
+\
                 poverty ladder steepens",
         pinned: 0.00127,
         tolerance: 0.0005,
@@ -5658,6 +5878,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "Ohio's equity factor with the statutory 1.4 poverty weight over-applied to its \
+\
                 economically disadvantaged count — the low end of the bracket",
         pinned: 0.16840,
         tolerance: 0.0005,
@@ -5668,6 +5889,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "How far Ohio's `1.30 minus equity factor` per-child rate falls below a median \
+\
                 jurisdiction's",
         pinned: 0.0355,
         tolerance: 0.0005,
@@ -5683,6 +5905,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "P95 over P5 of operating expenditure per pupil, FY2024 — the restricted range \
+\
                 ratio, which is the federal range ratio plus one",
         pinned: 1.8436,
         tolerance: 0.0005,
@@ -5693,6 +5916,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "How strongly state aid per pupil falls as valuation per pupil rises, FY2024 — \
+\
                 the magnitude of a negative correlation",
         pinned: 0.5483,
         tolerance: 0.0005,
@@ -5713,6 +5937,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "How strongly state aid per pupil rises with the economically disadvantaged \
+\
                 share, FY2024 — the finding that Ohio targets poverty better than property",
         pinned: 0.6323,
         tolerance: 0.0005,
@@ -5735,6 +5960,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "How strongly the Performance Index falls with the profile report's economically \
+\
                 disadvantaged share — the magnitude of a negative correlation",
         pinned: 0.84596,
         tolerance: 0.0005,
@@ -5751,6 +5977,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "The share of cross-district variance in the Performance Index that the \
+\
                 disadvantaged share accounts for",
         pinned: 0.71564,
         tolerance: 0.0005,
@@ -5768,6 +5995,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The same against the report card's own disadvantaged share, which community \
+\
                 eligibility top-codes — the weaker association censoring predicts",
         pinned: 0.73434,
         tolerance: 0.0005,
@@ -5788,6 +6016,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The statewide achievement denominator for 2024-25 \u{2014} the average of the \
+\
                 highest two per cent of district Performance Index scores, as published",
         pinned: 109.8,
         tolerance: 0.05,
@@ -5808,6 +6037,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The same denominator two years earlier, recomputed because the department \
+\
                 publishes the maximum for the current year alone",
         pinned: 108.8,
         tolerance: 0.05,
@@ -5825,7 +6055,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "How many districts the statute\u{2019}s highest two per cent resolves to \u{2014} \
+\
                 the ceiling of two per cent of 607, and the only count that reproduces the \
+\
                 published maximum",
         pinned: 13.0,
         tolerance: 0.0,
@@ -5836,7 +6068,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Districts that improved on the Performance Index between 2022-23 and 2024-25 and \
+\
                 declined as a share of the year's maximum \u{2014} the cost of an annually \
+\
                 refitted denominator",
         pinned: 121.0,
         tolerance: 0.0,
@@ -5881,7 +6115,9 @@ pub static FIGURES: &[Figure] = &[
         // than a third comment like this one.
         unit: Unit::Ratio,
         label: "How far the achievement denominator rose between 2022-23 and 2024-25, in per \
+\
                 cent \u{2014} the amount every district\u{2019}s share fell relative to its own \
+\
                 index, and the robust half of the finding the 121 counts",
         pinned: 0.919,
         tolerance: 0.005,
@@ -5902,6 +6138,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Districts holding the most common achievement star rating \u{2014} the number \
+\
                 R.C. 3302.03(D)(4)(b) requires stay under half the state",
         pinned: 227.0,
         tolerance: 0.0,
@@ -5912,6 +6149,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "The same as a share of the rated districts \u{2014} how much room the statute's \
+\
                 distributional constraint actually has",
         pinned: 0.37397,
         tolerance: 0.0005,
@@ -5925,6 +6163,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Buildings on the 2024-25 report card \u{2014} the population federal \
+\
                 identification selects from, and the denominator every share below is taken over",
         pinned: 3318.0,
         tolerance: 0.0,
@@ -5935,6 +6174,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Buildings the department gave a Performance Index and a star \u{2014} 167 fewer \
+\
                 than it lists, and the population a rank order can be taken over",
         pinned: 3151.0,
         tolerance: 0.0,
@@ -5945,6 +6185,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Federal identifications across the three tiers, every one of which names a \
+\
                 building the report card carries",
         pinned: 408.0,
         tolerance: 0.0,
@@ -5955,6 +6196,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Comprehensive Support schools still carrying a 2018 identification \u{2014} \
+\
                 seven years against exit criteria that allow three",
         pinned: 100.0,
         tolerance: 0.0,
@@ -5970,6 +6212,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "Median chronic absenteeism in that cohort, in percentage points \u{2014} what \
+\
                 distinguishes the schools that have not exited, and it is not the index",
         pinned: 80.7,
         tolerance: 0.05,
@@ -5988,6 +6231,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "Median chronic absenteeism across every building in the state, in percentage \
+\
                 points \u{2014} the comparison the cohort figure is only meaningful against",
         pinned: 20.8,
         tolerance: 0.05,
@@ -6005,6 +6249,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Comprehensive Support schools rated three stars or better \u{2014} every one of \
+\
                 which arrived through a subgroup rather than by performing in the bottom 5%",
         pinned: 11.0,
         tolerance: 0.0,
@@ -6020,7 +6265,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Buildings between the lowest Performance Index on no federal list and the \
+\
                 highest on the Comprehensive Support list \u{2014} the band inside which the \
+\
                 published rating does not say who is identified",
         pinned: 1958.0,
         tolerance: 0.0,
@@ -6047,7 +6294,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Published Performance Index values carrying both a Comprehensive Support school \
+\
                 and a building on no federal list \u{2014} exact agreement no threshold on the \
+\
                 index can separate",
         pinned: 113.0,
         tolerance: 0.0,
@@ -6074,6 +6323,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Buildings Ohio rates one star on achievement \u{2014} the state's own \
+\
                 worst-rated population, and not the population the federal list holds",
         pinned: 347.0,
         tolerance: 0.0,
@@ -6089,6 +6339,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "One-star buildings on none of the three federal lists \u{2014} nearly half the \
+\
                 state's worst-rated buildings, outside the regime that identifies on that rating",
         pinned: 164.0,
         tolerance: 0.0,
@@ -6105,6 +6356,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Where the corpus's worst-performing exemplar building ranks on the published \
+\
                 Performance Index \u{2014} the bottom one per cent, and on no federal list",
         pinned: 23.0,
         tolerance: 0.0,
@@ -6121,6 +6373,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "How many of the 22 buildings scoring below it are federally identified \u{2014} \
+\
                 what makes its own absence a question about eligibility rather than performance",
         pinned: 18.0,
         tolerance: 0.0,
@@ -6139,6 +6392,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Comprehensive Support schools identified more than three years ago \u{2014} the \
+\
                 population the sixteen-rung intervention ladder can reach today",
         pinned: 127.0,
         tolerance: 0.0,
@@ -6149,6 +6403,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Pupils enrolled in those schools \u{2014} a headcount off the report card, not an \
+\
                 average daily membership",
         pinned: 50086.0,
         tolerance: 0.0,
@@ -6161,6 +6416,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "How many of them are their own local education agency \u{2014} already outside a \
+\
                 school district, so the conversion and merger rungs have nowhere to move them",
         pinned: 82.0,
         tolerance: 0.0,
@@ -6176,6 +6432,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Pupils in those self-operating schools \u{2014} three fifths of the population \
+\
                 the ladder reaches",
         pinned: 30085.0,
         tolerance: 0.0,
@@ -6192,7 +6449,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "LSC education analyses committed \u{2014} one per enacted budget act from the \
+\
                 124th General Assembly to the 135th, and the only source the charge-off's last \
+\
                 two eras are stated in",
         pinned: 12.0,
         tolerance: 0.0,
@@ -6203,6 +6462,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The local share the Evidence-Based Model charged, in mills \u{2014} one rate \
+\
                 against two bases, split by whether a district sits at the twenty-mill floor",
         pinned: 22.0,
         tolerance: 0.0005,
@@ -6218,6 +6478,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The second charge-off before FY2010, in mills \u{2014} special education, \
+\
                 career-technical education and transportation, which the corpus's series omits",
         pinned: 3.3,
         tolerance: 0.0005,
@@ -6233,6 +6494,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The lowest charge-off rate the Bridge formula's state share index implies, in \
+\
                 mills, at FY2014 \u{2014} the bottom of a spread that replaced a uniform rate",
         pinned: 11.3,
         tolerance: 0.0005,
@@ -6243,6 +6505,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The highest, excluding outlier districts \u{2014} twice the lowest, which is what \
+\
                 stops the average below from being a rate",
         pinned: 22.9,
         tolerance: 0.0005,
@@ -6258,6 +6521,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The statewide average of that spread at FY2014, in mills \u{2014} the number \
+\
                 secondary reporting rounds to twenty and states as though it were legislated",
         pinned: 20.6,
         tolerance: 0.0005,
@@ -6268,6 +6532,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "Family income, as a multiple of the federal poverty guidelines, at or below which \
+\
                 the EdChoice Expansion pays its full base amount",
         pinned: 4.5,
         tolerance: 0.0,
@@ -6278,6 +6543,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "And where the award stops falling \u{2014} 7.82 times poverty, derived from the \
+\
                 statute's own decay rate and its ten per cent floor, and stated nowhere in it",
         pinned: 7.82193,
         tolerance: 0.00001,
@@ -6288,6 +6554,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What a kindergarten-through-eight student at 550% of poverty is awarded \u{2014} \
+\
                 half the base, because the curve halves for every further hundred points",
         pinned: 2750.0,
         tolerance: 0.005,
@@ -6300,6 +6567,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The smallest EdChoice Expansion award for grades kindergarten through eight \
+\
                 \u{2014} a tenth of the base, and what every family above 782% of poverty gets",
         pinned: 550.0,
         tolerance: 0.005,
@@ -6312,6 +6580,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the Jon Peterson formula computes for a category six student before its own \
+\
                 ceiling \u{2014} $7,190 plus the largest supplement",
         pinned: 39122.0,
         tolerance: 0.005,
@@ -6324,6 +6593,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "How much the unindexed $34,000 ceiling takes off that award \u{2014} the ceiling \
+\
                 already binds the severest category, before any year of indexing",
         pinned: 5122.0,
         tolerance: 0.005,
@@ -6338,7 +6608,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The per-pupil economically disadvantaged amount the Fair School Funding Plan \
+\
                 replaced \u{2014} what $422 was raised from, and the only prior value the corpus \
+\
                 holds",
         pinned: 272.0,
         tolerance: 0.005,
@@ -6354,6 +6626,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The per-pupil gifted identification rate before the plan raised it to $24 \
+\
                 \u{2014} a more-than-fourfold increase, and the rate a series would start from",
         pinned: 5.5,
         tolerance: 0.005,
@@ -6369,6 +6642,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts the minimum state share reached in FY2024, the first year at ten per \
+\
                 cent \u{2014} what makes the floor a live parameter rather than a formality",
         pinned: 55.0,
         tolerance: 0.0,
@@ -6384,6 +6658,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "And in FY2025 \u{2014} thirteen more districts in one year, on a floor that did \
+\
                 not move",
         pinned: 68.0,
         tolerance: 0.0,
@@ -6399,6 +6674,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The minimum transportation state share in FY2023, in percentage points \u{2014} \
+\
                 the first term of a schedule that reaches fifty per cent in FY2027",
         pinned: 33.33,
         tolerance: 0.005,
@@ -6414,7 +6690,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Consecutive enacted budget analyses stating the $4,000 preschool grant and its \
+\
                 half-day multiplier \u{2014} FY2014 through FY2025, across a change of funding \
+\
                 regime",
         pinned: 6.0,
         tolerance: 0.0,
@@ -6430,6 +6708,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "How far foundation funding fell below its enacted FY2020 appropriation \u{2014} \
+\
                 the year the guarantee's base is defined to exclude the reductions from",
         pinned: 254956619.56,
         tolerance: 0.005,
@@ -6443,6 +6722,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The same as a share of the appropriation, in percentage points \u{2014} against a \
+\
                 band of one point either way in every ordinary year of the two formula regimes",
         pinned: 3.67,
         tolerance: 0.005,
@@ -6456,6 +6736,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "How closely Ohio's two economically-disadvantaged shares track each other — \
+\
                 closely enough to look interchangeable and not closely enough to be",
         pinned: 0.82273,
         tolerance: 0.0005,
@@ -6486,6 +6767,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Districts the profile report places at 100% — the same ceiling on the \
+\
                 uncensored measure, and a third as many",
         pinned: 37.0,
         tolerance: 0.0,
@@ -6501,6 +6783,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "How strongly the Performance Index falls with the weighted-over-headcount ADM \
+\
                 ratio — which is why dividing spending by the weighted count removes the signal",
         pinned: 0.74455,
         tolerance: 0.0005,
@@ -6511,6 +6794,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The Performance Index against FY2025 operating expenditure per *headcount* \
+\
                 pupil — the divisor that leaves the association visible",
         pinned: 0.33652,
         tolerance: 0.0005,
@@ -6521,6 +6805,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The same on the department's published divisor, the weighted count — near zero, \
+\
                 which is the published finding this corpus disagrees with",
         pinned: 0.01552,
         tolerance: 0.0005,
@@ -6531,6 +6816,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The Performance Index against federal expenditure per equivalent pupil — OCG \
+\
                 White Paper 013's strongest reported finding",
         pinned: 0.55764,
         tolerance: 0.0005,
@@ -6547,6 +6833,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The Performance Index against the value-added effect size — related, and far \
+\
                 from interchangeable",
         pinned: 0.37525,
         tolerance: 0.0005,
@@ -6569,6 +6856,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Districts whose effective Class I rate sits exactly on the twenty-mill floor, \
+\
                 TY2023",
         pinned: 170.0,
         tolerance: 0.0,
@@ -6604,6 +6892,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Districts whose effective Class I rate is below 20.5 mills — at the floor or \
+\
                 close enough that reduction factors barely operate",
         pinned: 233.0,
         tolerance: 0.0,
@@ -6633,6 +6922,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Districts below the floor because their voters never approved twenty mills — the \
+\
                 condition `millage`'s own guard encodes",
         pinned: 6.0,
         tolerance: 0.0,
@@ -6648,6 +6938,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Districts that voted well above twenty mills and still report a Class I rate just \
+\
                 under it — the anomaly the corpus's model of the floor does not explain",
         pinned: 14.0,
         tolerance: 0.0,
@@ -6694,6 +6985,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "How much of its voted millage the median district has lost to H.B. 920 reduction \
+\
                 factors — the median of the per-district ratio",
         pinned: 0.4245,
         tolerance: 0.0001,
@@ -6720,6 +7012,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Districts in one tax year of Table SD-1 — a different population from the \
+\
                 profile report's 606 and from the funding model's 609",
         pinned: 611.0,
         tolerance: 0.0,
@@ -6744,6 +7037,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The smallest TY1981 joint vocational current-expense rate, in mills, implied by \
+\
                 a district sitting under the twenty-mill floor having voted past it",
         pinned: 2.006,
         tolerance: 0.0005,
@@ -6754,6 +7048,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The largest of the same \u{2014} Bradford Exempted Village, the district a \
+\
                 rounding account of the shortfalls cannot reach",
         pinned: 2.278,
         tolerance: 0.0005,
@@ -6772,6 +7067,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "Federal revenue to the 607 districts the relief join reaches, FY2019 \u{2014} the \
+\
                 last year before the pandemic grants",
         pinned: 1_579_183_000.0,
         tolerance: 1.0,
@@ -6791,6 +7087,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "Their general fund revenue in the same year \u{2014} below what it was in FY2020, \
+\
                 which is how the relief money is known never to have entered it",
         pinned: 20_564_598_850.0,
         tolerance: 1.0,
@@ -6801,6 +7098,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "Correlation between a district's relief per pupil and its general fund spending \
+\
                 growth after the cliff \u{2014} the recurring-cost reading's prediction, tested",
         pinned: 0.0274,
         tolerance: 0.000_05,
@@ -6811,6 +7109,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts the Census panel and the five-year forecasts both reach in every year \
+\
                 the comparison needs",
         pinned: 607.0,
         tolerance: 0.0,
@@ -6821,6 +7120,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Of those, the ones spending less from the general fund in FY2025 than FY2023 \
+\
                 \u{2014} spread across every exposure quartile, not concentrated in the exposed one",
         pinned: 27.0,
         tolerance: 0.0,
@@ -6836,6 +7136,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Ohio agencies the federal directory types as regional education service agencies \
+\
                 \u{2014} joint vocational districts and educational service centres together",
         pinned: 100.0,
         tolerance: 0.0,
@@ -6846,6 +7147,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Of those, the joint vocational school districts \u{2014} the same 49 whether they \
+\
                 are picked out by name or by whether they levy property tax",
         pinned: 49.0,
         tolerance: 0.0,
@@ -6856,6 +7158,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Joint vocational rows in the F-33 Ohio panel, every one of them marked outside \
+\
                 the comparable set \u{2014} the peer-grouping question, already answered",
         pinned: 121.0,
         tolerance: 0.0,
@@ -6866,6 +7169,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Eastland-Fairfield's enrolment on the Census count, FY2023 \u{2014} a head count \
+\
                 and not a full-time equivalent, which is what makes a ratio off it a trap",
         pinned: 1_160.0,
         tolerance: 0.0,
@@ -6876,6 +7180,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Dollars,
         label: "Its current spending over that count, FY2024 \u{2014} the double count the node's \
+\
                 own description warns about, in one number",
         pinned: 20_869.0,
         tolerance: 1.0,
@@ -6899,6 +7204,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "Eastland-Fairfield's property tax in FY2025, the last closed year of the \
+\
                 Auditor's finances \u{2014} the funding series the node recorded as unpopulated",
         pinned: 25_891_768.0,
         tolerance: 1.0,
@@ -6909,6 +7215,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "Its unrestricted state aid in the same year, which more than doubled over the six \
+\
                 while the levy rose by three fifths",
         pinned: 12_088_067.0,
         tolerance: 1.0,
@@ -6919,6 +7226,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Joint vocational districts whose own name contains exactly one Ohio county, which \
+\
                 is the only candidate roster a name gives you",
         pinned: 24.0,
         tolerance: 0.0,
@@ -6929,6 +7237,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Of those, the ones whose levies reconcile against the district's own books \
+\
                 \u{2014} the county is their whole membership and for the other twelve it is not",
         pinned: 12.0,
         tolerance: 0.0,
@@ -6939,6 +7248,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Districts carrying a joint vocational operating levy in Table SD-1, TY2024 \u{2014} \
+\
                 the membership the abstract never names and the column pair settles",
         pinned: 501.0,
         tolerance: 0.0,
@@ -6949,6 +7259,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Districts carrying none, TY2024 \u{2014} for which R.C. 319.301(E)(1) has no \
+\
                 referent at all",
         pinned: 110.0,
         tolerance: 0.0,
@@ -6959,6 +7270,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The Class I rate, in mills, that Shelby County's eight districts jointly fit in \
+\
                 TY2024 \u{2014} two numbers explaining eight levies, which is co-membership",
         pinned: 2.672_22,
         tolerance: 0.000_005,
@@ -6971,6 +7283,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "The Class II rate of the same fit, in mills \u{2014} both far enough above the \
+\
                 two-mill floor that the fit is not the trivial one",
         pinned: 4.693_03,
         tolerance: 0.000_005,
@@ -6983,6 +7296,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "How far Botkins Local sits below the twenty-mill floor, TY2024 \u{2014} in the \
+\
                 same joint vocational district as Anna Local, which sits on it",
         pinned: 0.0705,
         tolerance: 0.000_05,
@@ -6993,6 +7307,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Ratio,
         label: "How far McComb Local sits below it \u{2014} the second largest shortfall of the \
+\
                 fourteen, in a district that is part of no joint vocational district",
         pinned: 0.1076,
         tolerance: 0.000_05,
@@ -7003,7 +7318,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Districts below the twenty-mill floor on the computed Class I rate in all four \
+\
                 tax years \u{2014} a shortfall that survives four annual recomputations is not a \
+\
                 rounding residual",
         pinned: 17.0,
         tolerance: 0.0,
@@ -7014,6 +7331,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Districts at exactly twenty mills on the value-weighted real property rate, \
+\
                 TY2024 — the combined-base hypothesis, disconfirmed",
         pinned: 62.0,
         tolerance: 0.0,
@@ -7051,6 +7369,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The enrolment growth supplement statewide — $250 a pupil on the whole roll, for \
+\
                 a district whose enrolment rose 3% over three years",
         pinned: 39_379_553.0,
         tolerance: 1.0,
@@ -7075,6 +7394,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The same, per district that draws it — the comparison that makes the two \
+\
                 supplements different in kind rather than in size",
         pinned: 915_803.56,
         tolerance: 0.01,
@@ -7094,6 +7414,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "How far the median district's enrolment fell over the three years the growth \
+\
                 supplement measures",
         pinned: 0.048417,
         tolerance: 0.00001,
@@ -7112,6 +7433,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What three hundredths of a percentage point cost the district that came closest \
+\
                 to the cliff and missed",
         pinned: 430_476.80,
         tolerance: 0.01,
@@ -7129,6 +7451,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts between 2.7% and 3% enrolment growth besides the nearest miss — near \
+\
                 the cliff, and paid nothing for it",
         pinned: 3.0,
         tolerance: 0.0,
@@ -7152,6 +7475,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the FY2027 model pays the one district still under an academic distress \
+\
                 commission",
         pinned: 162_207.67,
         tolerance: 0.01,
@@ -7167,6 +7491,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts rated below the three stars R.C. 3302.10(N)(1) requires to begin a \
+\
                 transition out of an academic distress commission",
         pinned: 59.0,
         tolerance: 0.0,
@@ -7177,6 +7502,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "How many of those are paid a performance supplement anyway \u{2014} none of them \
+\
                 through the star route",
         pinned: 15.0,
         tolerance: 0.0,
@@ -7271,6 +7597,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "How strongly the share of pupils a district identifies as gifted falls as its \
+\
                 disadvantaged share rises — the magnitude of a negative correlation",
         pinned: 0.6726,
         tolerance: 0.0005,
@@ -7290,6 +7617,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The same against valuation per pupil — real, monotone, and half the strength of \
+\
                 the poverty gradient",
         pinned: 0.3483,
         tolerance: 0.0005,
@@ -7315,6 +7643,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "`d1a` summed over the panel — the FY2025 economically disadvantaged ADM the \
+\
                 FY2027 model is still funding on",
         pinned: 856_236.0,
         tolerance: 0.0,
@@ -7331,6 +7660,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "`d1b` summed over the panel — the directly certified ADM, which the workbook \
+\
                 heads FY26 and the act would have on FY2027",
         pinned: 474_197.0,
         tolerance: 0.0,
@@ -7350,6 +7680,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "How strongly being on the guarantee predicts a district's Performance Index, \
+\
                 before any control",
         pinned: 0.18686,
         tolerance: 0.0005,
@@ -7365,6 +7696,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The same, holding economic disadvantage constant — what is left of it, which is \
+\
                 nothing",
         pinned: 0.03457,
         tolerance: 0.0005,
@@ -7400,6 +7732,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "Median Performance Index among districts the formula funds — the raw gap the \
+\
                 control above dissolves",
         pinned: 85.6,
         tolerance: 0.005,
@@ -7931,7 +8264,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The statewide special education transportation allocation FY2027\u{2019}s \
+\
                 proration factor implies \u{2014} the enacted earmark divided by the factor the \
+\
                 calculator states",
         pinned: 212_348_136.16,
         tolerance: 0.01,
@@ -7946,6 +8281,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the 611 districts in the FY2027 calculator are allocated before proration \
+\
                 \u{2014} the part of that denominator the model can see",
         pinned: 199_061_038.65,
         tolerance: 0.01,
@@ -7960,6 +8296,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The part of the FY2027 denominator no district in the calculator accounts for, \
+\
                 which the greenbook attributes to county DD boards and ESCs",
         pinned: 13_287_097.51,
         tolerance: 0.01,
@@ -7987,6 +8324,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "The FY2027 proration factor a reader would get by dividing the earmark by the \
+\
                 districts the calculator holds, against the 0.91746 it states",
         pinned: 0.978_699_133,
         tolerance: 0.000_000_5,
@@ -8001,6 +8339,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What FY2026\u{2019}s factor of 1.0 leaves for everything outside the calculator \
+\
                 \u{2014} the earmark less what its districts are allocated",
         pinned: 11_778_159.68,
         tolerance: 0.01,
@@ -8015,6 +8354,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the prior year\u{2019}s reported costs add to the special education \
+\
                 transportation allocation between FY2026 and FY2027",
         pinned: 26_808_906.80,
         tolerance: 0.01,
@@ -8029,6 +8369,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What falling state share percentages take back off that allocation over the same \
+\
                 interval \u{2014} the one term of the three that moves against the proration",
         pinned: 4_207_654.26,
         tolerance: 0.01,
@@ -8043,6 +8384,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the floor under the state share adds by stepping from 45.83% to 50%, the \
+\
                 term that puts the allocation past its earmark",
         pinned: 11_340_267.79,
         tolerance: 0.01,
@@ -8057,6 +8399,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What would have been left of the FY2027 earmark if the floor had stayed at \
+\
                 45.83% \u{2014} against the $4.2m it is short at 50%",
         pinned: 7_100_095.14,
         tolerance: 0.01,
@@ -8073,6 +8416,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "How much of ALI 200502\u{2019}s unearmarked remainder the general transportation \
+\
                 formula left unspent in FY2026 \u{2014} the width of a proration factor of 1.0",
         pinned: 5_594_475.23,
         tolerance: 0.01,
@@ -8098,6 +8442,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose FY2027 special education transportation is paid at the statutory \
+\
                 floor rather than at their own state share, of the 563 that report a cost",
         pinned: 411.0,
         tolerance: 0.0,
@@ -8178,6 +8523,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/regime-diff",
         unit: Unit::Count,
         label: "Districts whose local capacity the minimum state share censors, so the component \
+\
                 row is absent while the total is not",
         pinned: 138.0,
         tolerance: 0.0,
@@ -8193,6 +8539,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/regime-diff",
         unit: Unit::Count,
         label: "Districts a 23-mill charge-off on recognized valuation would leave with no base \
+\
                 cost aid at all",
         pinned: 65.0,
         tolerance: 0.0,
@@ -8203,6 +8550,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/regime-diff",
         unit: Unit::Count,
         label: "The same count on total taxable value — the base the corpus wrongly assumed, and \
+\
                 the measure of how much of that finding was the base",
         pinned: 81.0,
         tolerance: 0.0,
@@ -8246,6 +8594,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/regime-diff",
         unit: Unit::Dollars,
         label: "How much less the median district receives per pupil under the plan than it would \
+\
                 have under a 23-mill charge-off on recognized valuation",
         pinned: 44.62,
         tolerance: 0.005,
@@ -8283,6 +8632,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The FY2027 appropriation for preschool special education — the residual earmark of GRF \
+\
                 ALI 200540, and the limit its proration is set against",
         pinned: 153_976_832.0,
         tolerance: 0.0,
@@ -8302,6 +8652,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The same line in FY2025, as an actual rather than an appropriation — the year the \
+\
                 calculator's stale limit came from",
         pinned: 195_160_040.0,
         tolerance: 0.0,
@@ -8312,6 +8663,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What preschool special education totals across the FY2027 model at the department's own \
+\
                 stated proration factor",
         pinned: 148_408_183.76,
         tolerance: 0.005,
@@ -8322,6 +8674,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "How far that total sits under the appropriation that governs it — the reason no proration \
+\
                 arises, against a calculator cell that says one does",
         pinned: 5_568_648.24,
         tolerance: 0.005,
@@ -8332,6 +8685,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "And how far it sits over the $147,500,000 the calculator prints beside the factor, which \
+\
                 is the FY2025 estimate carried into an FY2027 sheet",
         pinned: 908_183.76,
         tolerance: 0.005,
@@ -8342,6 +8696,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "Total foundation aid appropriated for FY2026, as enacted — not the $11.15 billion the \
+\
                 redbook proposed, which two nodes published under [verified]",
         pinned: 11_230_057_557.0,
         tolerance: 0.0,
@@ -8370,6 +8725,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "How much the whole foundation aid total rose over the same passage — less than the \
+\
                 lottery line alone did",
         pinned: 82_062_286.0,
         tolerance: 0.0,
@@ -8383,6 +8739,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "And how much the other four lines fell, which is the difference between those two: the \
+\
                 substitution argument as one subtraction",
         pinned: 15_575_916.0,
         tolerance: 0.0,
@@ -8393,6 +8750,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Year-over-year movements in the foundation aid appropriation — the length of the series \
+\
                 every figure below is a summary of",
         pinned: 24.0,
         tolerance: 0.0,
@@ -8403,6 +8761,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The median absolute annual movement in foundation aid, in constant FY2025 dollars — the \
+\
                 floor below which a substitution cannot be read off the total at all",
         pinned: 235_900_000.0,
         tolerance: 100_000.0,
@@ -8413,6 +8772,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The mean of the same movements, which two years dominate and which is why the floor is \
+\
                 stated as a median",
         pinned: 349_300_000.0,
         tolerance: 100_000.0,
@@ -8441,6 +8801,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "How much foundation aid moved in FY2012, the year the county student fund began \
+\
                 distributing casino money",
         pinned: 182_809_660.0,
         tolerance: 1.0,
@@ -8465,6 +8826,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The special education transportation proration factor if reported costs rise a \
+\
                 tenth, against the appropriation the act set",
         pinned: 0.838_825_874_512_744_5,
         tolerance: 1e-9,
@@ -8482,6 +8844,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What a fifth more reported cost adds to what districts are actually paid — the \
+\
                 size of the cap on the formula's own correction",
         pinned: 1_924_671.48,
         tolerance: 1.0,
@@ -8522,6 +8885,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The preschool special education flat grant in FY2026 dollars — $4,000 nominal, \
+\
                 unmoved since FY2014",
         pinned: 5_604.56,
         tolerance: 0.01,
@@ -8532,6 +8896,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "What the preschool flat grant has lost in real terms across thirteen years of \
+\
                 nominal freeze",
         pinned: 0.2863,
         tolerance: 0.0001,
@@ -8560,6 +8925,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "What every amount set in FY2022 and unmoved since has lost — DPIA, and all five \
+\
                 gifted figures",
         pinned: 0.1127,
         tolerance: 0.0001,
@@ -8570,6 +8936,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the three frozen components would pay across the FY2027 model had they held \
+\
                 their real value, less what they pay — before the guarantee",
         pinned: 133_152_626.93,
         tolerance: 1.0,
@@ -8589,6 +8956,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The difference: what guarantee floors absorb, which is the part of the freeze a \
+\
                 held district would not feel if it were reversed",
         pinned: 28_854_197.47,
         tolerance: 1.0,
@@ -8614,6 +8982,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The preschool share — 45% of the total, and the part no guarantee floor can \
+\
                 absorb, because it sits outside [H] Foundation Funding",
         pinned: 59_532_514.24,
         tolerance: 1.0,
@@ -8657,6 +9026,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Dollars,
         label: "The casino channel distributed to school districts in FY2016, the first complete \
+\
                 state fiscal year the per-district series reaches",
         pinned: 90_832_043.0,
         tolerance: 1.0,
@@ -8712,6 +9082,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Dollars,
         label: "The same for FY2022, the first year the channel exceeds the lottery movement that \
+\
                 was legible",
         pinned: 109_385_275.0,
         tolerance: 1.0,
@@ -8740,7 +9111,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What moving the base cost reference year from FY2022 to FY2024 costs across the FY2027 \
+\
                 model, net of the formula transition supplement it reduces — the draft's only \
+\
                 provision, so the draft's cost is its cost",
         pinned: 207_501_066.63,
         tolerance: 0.005,
@@ -8751,6 +9124,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts the refresh lifts onto the formula — the only districts for which it changes \
+\
                 the kind of thing that determines their aid rather than the amount",
         pinned: 41.0,
         tolerance: 0.0,
@@ -8762,6 +9136,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the refresh, a half-retired guarantee and a lowered transportation floor \
+\
                 cost when they are run together",
         pinned: 325_561_810.57,
         tolerance: 0.005,
@@ -8774,6 +9149,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The core foundation funding half of that cut — what the draft cost before its \
+\
                 transportation provision could be priced",
         pinned: 143_877_698.81,
         tolerance: 0.005,
@@ -8784,6 +9160,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "And the transportation half, which is the provision the draft could describe and \
+\
                 not cost for eleven phases",
         pinned: 118_105_482.288_4,
         tolerance: 0.005,
@@ -8803,8 +9180,11 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The difference between those two, as a magnitude — the separate figures now \
+\
                 UNDERSTATE the cut by this much, where they used to overstate it, because \
+\
                 provisions 2 and 6 are inert apart and compound together. The sign is pinned in \
+\
                 `a_draft_cannot_hide_what_it_did_not_price.rs`; this manifest carries magnitudes",
         pinned: 318_170_839.69,
         tolerance: 0.005,
@@ -8815,6 +9195,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "School districts with population in more than one House district — the reason there is no \
+\
                 published crosswalk and no clean one to publish",
         pinned: 339.0,
         tolerance: 0.0,
@@ -8834,7 +9215,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "Ohio's under-18 share of population, which is the weight school funding is apportioned \
+\
                 across House seats by — not total population, which would weight a seat full of \
+\
                 retirees the same as one full of families",
         pinned: 0.2197,
         tolerance: 0.00005,
@@ -8849,6 +9232,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts the temporary transitional aid guarantee pays in FY2027 -- the terminal \
+\
                 year, at a phase-in of 100%",
         pinned: 294.0,
         tolerance: 0.0,
@@ -8862,6 +9246,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts carrying an open-enrolment clawback in the FY2025 payment report -- more \
+\
                 than it reduces, because the guarantee is a floor at zero",
         pinned: 41.0,
         tolerance: 0.0,
@@ -8877,6 +9262,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Of those, the districts also on the guarantee -- the only ones the clawback takes \
+\
                 anything from, and exactly the districts paid less than their funding base",
         pinned: 16.0,
         tolerance: 0.0,
@@ -8895,6 +9281,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What R.C. 3317.011's seven staffing floors add to Ohio's aggregate base cost in \
+\
                 FY2027, net of the two ceilings beside them",
         pinned: 187_146_074.83,
         tolerance: 0.01,
@@ -8915,6 +9302,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the same floors are worth in state aid -- more than five sixths of the base \
+\
                 cost, because local capacity does not move when base cost does",
         pinned: 156_371_577.58,
         tolerance: 0.01,
@@ -8930,6 +9318,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts that would fall onto the temporary transitional aid guarantee if the \
+\
                 staffing floors were struck out of R.C. 3317.011",
         pinned: 46.0,
         tolerance: 0.0,
@@ -8945,6 +9334,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose marginal pupil costs less than 95% of their average pupil -- the \
+\
                 wedge the floors open, measured at each district\u{2019}s own enrolment",
         pinned: 313.0,
         tolerance: 0.0,
@@ -8969,6 +9359,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose FY2024 FTE administrators are fewer than the four administrator \
+\
                 elements of R.C. 3317.011 fund at their own enrolment",
         pinned: 47.0,
         tolerance: 0.0,
@@ -8984,6 +9375,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "Median employed-to-funded administrators among the districts under 1,500 ADM, \
+\
                 where the two-administrator floor binds",
         pinned: 1.5156,
         tolerance: 0.0005,
@@ -9018,6 +9410,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What R.C. 3317.0217's capacity tier pays in FY2027 -- eight mills of the \
+\
                 shortfall of a district's total weighted wealth below the median district's",
         pinned: 334_036_712.23,
         tolerance: 0.01,
@@ -9033,6 +9426,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The slope of ln(total weighted wealth) on ln(base cost enrolled ADM) -- the tier \
+\
                 indexes a total, and a total is proportional to the pupils under it",
         pinned: 0.985_481,
         tolerance: 0.000_001,
@@ -9043,6 +9437,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts that would fall onto the temporary transitional aid guarantee if the \
+\
                 capacity tier were struck out of R.C. 3317.0217",
         pinned: 87.0,
         tolerance: 0.0,
@@ -9061,6 +9456,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "The guarantee's non-monotonicity as one number: districts the third ADM sextile \
+\
                 holds above the smallest, which is 0 once both size-dependent terms are struck out",
         pinned: 53.0,
         tolerance: 0.0,
@@ -9076,6 +9472,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "[H2] per FY2020 pupil in the smallest ADM sextile over the largest -- the \
+\
                 anchor's own gradient in district size, monotone across all six bands",
         pinned: 2.039_6,
         tolerance: 0.000_1,
@@ -9092,6 +9489,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "Eight mills of the median district's weighted wealth -- what R.C. 3317.0217(B) \
+\
                 approaches for a district of no wealth whatever, however few pupils it has",
         pinned: 3_137_210.45,
         tolerance: 0.01,
@@ -9105,6 +9503,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The most the capacity tier draws per enrolled pupil in any district it pays in \
+\
                 full -- the bar every district on the cliff or the 5% shelf clears unramped",
         pinned: 3_773.82,
         tolerance: 0.01,
@@ -9125,6 +9524,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts at or below 400 enrolled ADM -- the ones R.C. 3317.0217(B)(4) pays \
+\
                 nothing or five per cent of the capacity amount",
         pinned: 17.0,
         tolerance: 0.0,
@@ -9144,6 +9544,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "The FY2026 general phase-in, solved from each district's own base, computed and \
+\
                 step columns -- identical on all 610 districts with a span wide enough to divide",
         pinned: 0.8333,
         tolerance: 0.0000005,
@@ -9176,6 +9577,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Pupils,
         label: "Statewide enrolled ADM projected to FY2036, the feed's horizon \u{2014} twelve \
+\
                 pupils below the FY2032 figure, four years earlier",
         pinned: 1_384_232.417_4,
         tolerance: 0.01,
@@ -9204,6 +9606,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Pupils,
         label: "Pupils that moving the damping from 0.85 to 0.30 adds to the FY2036 projection, \
+\
                 under the shrunk rate the feed runs",
         pinned: 45_293.897_0,
         tolerance: 0.01,
@@ -9214,6 +9617,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the same move does to realized state aid at FY2036 \u{2014} proportionally \
+\
                 about two fifths of the enrollment move, because the guarantee absorbs most of it",
         pinned: 101_033_524.939_1,
         tolerance: 0.01,
@@ -9235,6 +9639,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "The same count at the 0.85 damping, which is the other end of the corpus's \
+\
                 44-district move",
         pinned: 356.0,
         tolerance: 0.0,
@@ -9249,6 +9654,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the guarantee writes in FY2027 if its floor is each district's own prior \
+\
                 year rather than FY2020 \u{2014} a ratchet, so dearer and not cheaper",
         pinned: 1_025_415_233.33,
         tolerance: 0.01,
@@ -9286,6 +9692,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "And with each district's annual fall capped at 2% instead \u{2014} the only \
+\
                 rolling shape that follows a district down",
         pinned: 665_088_656.83,
         tolerance: 0.01,
@@ -9305,6 +9712,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "The share of what a 2% cap takes off the enrollment cluster's guarantee that \
+\
                 `[K]` puts straight back \u{2014} the anchor's shape is not a saving either",
         pinned: 0.960_269_710_2,
         tolerance: 1e-9,
@@ -9320,7 +9728,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "The share of the 89 districts' total state support arriving through a \
+\
                 hold-harmless at FY2036 under the 2% cap, against 26.94% as enacted \u{2014} the \
+\
                 quantity no anchor shape moves",
         pinned: 0.268_1,
         tolerance: 0.0005,
@@ -9338,6 +9748,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Of the 105 wealthiest districts outside the enrollment cluster, how many the \
+\
                 FY2027 guarantee holds \u{2014} against none of the 103 least wealthy",
         pinned: 77.0,
         tolerance: 0.0,
@@ -9356,6 +9767,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What a prior-year ratchet adds per pupil to the least-wealthy fifth of districts \
+\
                 outside the cluster at FY2032, on total state support",
         pinned: 138.58,
         tolerance: 0.005,
@@ -9391,6 +9803,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The same ratchet by economically disadvantaged share: what it adds per pupil to \
+\
                 the poorest fifth, against $4.06 to the least poor",
         pinned: 108.08,
         tolerance: 0.005,
@@ -9409,6 +9822,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts outside the cluster whose total state support a ratchet raises at \
+\
                 FY2032; none falls",
         pinned: 253.0,
         tolerance: 0.0,
@@ -9419,7 +9833,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What a 2% cap on the annual fall takes per pupil from the fourth fifth of \
+\
                 districts by valuation at FY2032, on total state support \u{2014} against \
+\
                 nothing from the least wealthy",
         pinned: 83.51,
         tolerance: 0.005,
@@ -9438,6 +9854,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "And from the poorest fifth by disadvantaged share \u{2014} against $101.52 from \
+\
                 the second-least-poor",
         pinned: 5.33,
         tolerance: 0.005,
@@ -9456,6 +9873,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "The share of what the 2% cap takes off the poorest fifth\u{2019}s guarantee that \
+\
                 `[K]` puts straight back",
         pinned: 0.934,
         tolerance: 0.001,
@@ -9474,6 +9892,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "The same for the least-poor fifth \u{2014} the backstop catches the poor and not \
+\
                 the wealthy",
         pinned: 0.3589,
         tolerance: 0.001,
@@ -9492,6 +9911,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts outside the cluster whose total state support the 2% cap lowers at \
+\
                 FY2032; one rises",
         pinned: 145.0,
         tolerance: 0.0,
@@ -9502,6 +9922,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts outside the cluster a 1% cap raises at FY2036 undamped \u{2014} the \
+\
                 aggregate increase #390 found is these against the 119 it lowers",
         pinned: 112.0,
         tolerance: 0.0,
@@ -9530,6 +9951,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the 119 lose between them \u{2014} the net is the difference of two \
+\
                 numbers several times its size",
         pinned: 43_682_096.56,
         tolerance: 0.005,
@@ -9574,6 +9996,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "The share of the 1% cap\u{2019}s gain held by its ten largest gainers \u{2014} \
+\
                 broad, not a few large districts",
         pinned: 0.3649,
         tolerance: 0.001,
@@ -9588,6 +10011,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What paying on the rolling pupil count adds per pupil to the least-wealthy fifth \
+\
                 outside the cluster, on total state support",
         pinned: 166.55,
         tolerance: 0.005,
@@ -9606,6 +10030,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "And to the wealthiest fifth \u{2014} the same gradient as the ratchet, for the \
+\
                 same reason",
         pinned: 11.43,
         tolerance: 0.005,
@@ -9624,6 +10049,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the mirrored `[M]` written inside `[H]` delivers per pupil to the wealthiest \
+\
                 fifth, against $114.22 to the least wealthy",
         pinned: 20.42,
         tolerance: 0.005,
@@ -9642,6 +10068,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The same mirror written beside `[L]`, `[M]` and `[O]`: what it delivers per pupil \
+\
                 to the wealthiest fifth \u{2014} the one shape with no gradient",
         pinned: 96.88,
         tolerance: 0.005,
@@ -9670,6 +10097,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the linear projection pays above the run with base cost per pupil and \
+\
                 local capacity per pupil recomputed at the projected count, FY2032",
         pinned: 31_675_951.207_2,
         tolerance: 0.01,
@@ -9680,6 +10108,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What recomputing base cost per pupil alone adds to projected FY2032 aid \u{2014} \
+\
                 the staffing floors not following a roll down",
         pinned: 11_254_806.448_6,
         tolerance: 0.01,
@@ -9690,6 +10119,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What recomputing local capacity per pupil alone takes off projected FY2032 aid \
+\
                 \u{2014} a wealth charge over a shrinking denominator",
         pinned: 40_995_630.932_4,
         tolerance: 0.01,
@@ -9700,6 +10130,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "The linearity correction as a share of the enrollment effect the FY2032 forecast \
+\
                 reports \u{2014} the comparison that decides whether the approximation is fine",
         pinned: 0.658_639_331_4,
         tolerance: 1e-9,
@@ -9713,6 +10144,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The low end of the FY2032 aid band with both per-pupil terms recomputed at the \
+\
                 projected count",
         pinned: 6_853_439_138.804_0,
         tolerance: 0.01,
@@ -9723,6 +10155,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "And the high end, which moves further than the low one because a district \
+\
                 projected to grow reverses every sign",
         pinned: 7_739_639_450.055_0,
         tolerance: 0.01,
@@ -9733,6 +10166,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts the guarantee does not pay at FY2032 enrollment \u{2014} the population \
+\
                 the linearity correction reaches, and it reaches all of them",
         pinned: 297.0,
         tolerance: 0.0,
@@ -9758,6 +10192,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "And the ones it pays less \u{2014} where the wedge opens faster than the \
+\
                 denominator shrinks, or the district is projected to grow",
         pinned: 65.0,
         tolerance: 0.0,
@@ -9774,6 +10209,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts on formula under the linear FY2032 projection and on the guarantee \
+\
                 under the recomputed one",
         pinned: 15.0,
         tolerance: 0.0,
@@ -9799,6 +10235,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The low end of the FY2032 current-law aid band, from the enrollment \
+\
                 projection interval",
         pinned: 6_957_859_359.941_2,
         tolerance: 0.01,
@@ -9809,7 +10246,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The high end of the FY2032 current-law aid band \u{2014} asymmetric against \
+\
                 the low end because the interval is multiplicative, which is why the corpus \
+\
                 writes the half-width. Widened when `HORIZON_EXPONENT` was fitted",
         pinned: 7_581_865_913.570_1,
         tolerance: 0.01,
@@ -9820,6 +10259,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "Total realized state aid at FY2032 enrollment with the guarantee removed, \
+\
                 central estimate",
         pinned: 6_301_076_001.003_5,
         tolerance: 0.01,
@@ -9830,6 +10270,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The low end of the FY2032 guarantee-removed aid band, which the corpus \
+\
                 reports as nearly twice as wide as the current-law one",
         pinned: 5_830_740_283.837_9,
         tolerance: 0.01,
@@ -9849,6 +10290,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts the guarantee pays at FY2032 enrollment \u{2014} 294 at FY2027, so \
+\
                 eighteen move onto it",
         pinned: 312.0,
         tolerance: 0.0,
@@ -9870,7 +10312,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What removing the temporary transitional aid guarantee saves in total state \
+\
                 support with Section 265.225 left standing -- a tenth of what the guarantee \
+\
                 costs, because `[K]` makes the rest good",
         pinned: 79_813_629.47,
         tolerance: 0.005,
@@ -9881,6 +10325,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The same removal with Section 265.225 repealed alongside, which saves what both \
+\
                 devices cost",
         pinned: 942_533_256.86,
         tolerance: 0.005,
@@ -9891,6 +10336,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What a half phase-out of the guarantee saves in total state support with \
+\
                 Section 265.225 left standing",
         pinned: 70_818_745.25,
         tolerance: 0.005,
@@ -9901,6 +10347,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The same half phase-out with Section 265.225 repealed alongside, which reaches 311 \
+\
                 districts instead of 167",
         pinned: 503_055_943.17,
         tolerance: 0.005,
@@ -9911,6 +10358,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What rebasing the guarantee's floor to 90% of its FY2020 level saves in total \
+\
                 state support with Section 265.225 left standing",
         pinned: 66_211_485.88,
         tolerance: 0.005,
@@ -9934,6 +10382,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The fall in foundation aid when the guarantee's floor is rebased to 90% -- 28.2% \
+\
                 of the guarantee, not the tenth the floor moved",
         pinned: 248_222_592.51,
         tolerance: 0.005,
@@ -9944,6 +10393,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What `[K]` puts back when the guarantee is removed and Section 265.225 stands -- \
+\
                 of the $879.0m taken off foundation aid",
         pinned: 799_140_997.91,
         tolerance: 0.005,
@@ -9956,6 +10406,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "How far apart the three guarantee rules are on foundation aid -- removal against a \
+\
                 rebase to 90%, as a multiple",
         pinned: 3.540_993_664_162_903,
         tolerance: 0.000_1,
@@ -9968,6 +10419,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "And how far apart they are in what the state actually saves, once the backstop has \
+\
                 answered -- the same two rules, as a multiple",
         pinned: 1.205_434_803_481_864,
         tolerance: 0.000_1,
@@ -9978,7 +10430,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose total state support falls when the guarantee is retired and \
+\
                 Section 265.225 stands -- of the 294 the guarantee pays, and the same set under \
+\
                 all three rules",
         pinned: 167.0,
         tolerance: 0.0,
@@ -9989,7 +10443,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts no policy applied to the guarantee alone moves at all -- published as \
+\
                 315, which counted only the ones the formula pays and not the 127 the backstop \
+\
                 makes whole",
         pinned: 442.0,
         tolerance: 0.0,
@@ -10000,6 +10456,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts cut when Section 265.225 goes too -- past the 294 the guarantee pays, \
+\
                 because 17 draw `[K]` and were never on the guarantee",
         pinned: 311.0,
         tolerance: 0.0,
@@ -10010,6 +10467,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Guaranteed districts whose cheque does not move when the guarantee is retired -- \
+\
                 exactly the ones already drawing `[K]`, which holds them at a total",
         pinned: 127.0,
         tolerance: 0.0,
@@ -10023,6 +10481,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The largest per-pupil fall in total state support when the guarantee is removed, \
+\
                 as a magnitude -- West Geauga Local, at $604,523 of valuation per pupil",
         pinned: 796.739_711_9,
         tolerance: 0.005,
@@ -10033,7 +10492,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "Median assessed valuation per pupil of the districts a guarantee retirement cuts \
+\
                 -- above the statewide median of $248,097, which is the direction the backstop \
+\
                 filters the cut in",
         pinned: 318_480.4,
         tolerance: 0.005,
@@ -10044,6 +10505,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "And of the districts the backstop makes whole, which are the poorer half of the \
+\
                 guaranteed population",
         pinned: 257_277.99,
         tolerance: 0.005,
@@ -10064,6 +10526,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What a 2% rise in statewide base cost costs in total state support, net of the \
+\
                 $5.0m it claws back out of `[K]`",
         pinned: 101_670_377.70,
         tolerance: 0.005,
@@ -10104,6 +10567,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What a 2% rise in statewide base cost costs in foundation aid, before `[K]` \
+\
                 claws any of it back",
         pinned: 106_645_239.28,
         tolerance: 0.005,
@@ -10145,6 +10609,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose total state support does not move at all when they lose one pupil \
+\
                 -- the ones `[K]` holds at a total rather than at a level",
         pinned: 144.0,
         tolerance: 0.0,
@@ -10155,6 +10620,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts that lose no foundation aid whatever when they lose one pupil -- every \
+\
                 district the guarantee pays",
         pinned: 294.0,
         tolerance: 0.0,
@@ -10165,6 +10631,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What one pupil costs the median guaranteed district drawing no `[K]` -- exactly \
+\
                 its transportation aid, because `[J]` is outside the measure the guarantee holds",
         pinned: 503.40,
         tolerance: 0.005,
@@ -10178,6 +10645,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "And what one pupil costs the median district on formula, which is seventeen times \
+\
                 as much",
         pinned: 8_516.08,
         tolerance: 0.005,
@@ -10188,6 +10656,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "How much of Ohio's per-pupil funding follows a pupil: the state's saving per pupil \
+\
                 when every district's roll falls one per cent, over its average per pupil",
         pinned: 0.566_3,
         tolerance: 0.000_05,
@@ -10198,6 +10667,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Formula districts whose own enrolment trend reaches their FY2020 floor inside one \
+\
                 year -- the boundary measured in time rather than in dollars",
         pinned: 17.0,
         tolerance: 0.0,
@@ -10208,6 +10678,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts a dollar of new assessed valuation actually costs state aid, of 609 -- \
+\
                 the rest are held, backstopped, or on the minimum state share",
         pinned: 268.0,
         tolerance: 0.0,
@@ -10218,6 +10689,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Of those, the ones above the twenty-mill floor, where H.B. 920 reduction factors \
+\
                 mean the valuation they are charged for yields them no revenue at all",
         pinned: 181.0,
         tolerance: 0.0,
@@ -10228,6 +10700,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "At the twenty-mill floor the valuation does yield revenue -- and this is the \
+\
                 median share of it the state takes back through a lower state share of base cost",
         pinned: 0.632_6,
         tolerance: 0.000_05,
@@ -10238,6 +10711,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts for which one open-enrolment FTE is worth the whole statewide average \
+\
                 base cost -- the guaranteed districts `[I1]` reaches that `[K]` does not backstop",
         pinned: 9.0,
         tolerance: 0.0,
@@ -10248,7 +10722,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the pupil at the top of `[M]`'s cliff is worth -- the supplement pays on the \
+\
                 whole roll and tests on the increment, so the last pupil before the test passes \
+\
                 carries every dollar the others do not",
         pinned: 516_984.45,
         tolerance: 0.005,
@@ -10259,6 +10735,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts the guarantee still pays after a 2% base cost rise, of 294 -- the \
+\
                 mechanism by which a large enough increase buys the guarantee back",
         pinned: 269.0,
         tolerance: 0.0,
@@ -10308,6 +10785,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "And what the tenth to twentieth points cost per point -- the gradient a fiscal \
+\
                 note extrapolating from a small increase misses",
         pinned: 79_458_093.746,
         tolerance: 0.005,
@@ -10323,6 +10801,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "Total state support at FY2032 enrollment under current law, central estimate -- \
+\
                 realized aid, transportation and `[K]` together",
         pinned: 8_020_850_995.576_105,
         tolerance: 0.01,
@@ -10342,6 +10821,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "Half the width of the FY2032 total-state-support band under current law, as a \
+\
                 share of the central estimate -- the state's exposure to enrollment forecast error",
         pinned: 0.042_310_097_1,
         tolerance: 0.000_000_1,
@@ -10352,6 +10832,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "The same with the guarantee removed -- NOT wider, because `[K]` is a floor against \
+\
                 a fixed FY2021 total and inherits the absorbing the guarantee gives up",
         pinned: 0.041_631_832_2,
         tolerance: 0.000_000_1,
@@ -10362,6 +10843,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "And with Section 265.225 repealed beside it, which is where the corpus's claim that \
+\
                 retirement nearly doubles the state's exposure actually holds",
         pinned: 0.077_653_791_6,
         tolerance: 0.000_000_1,
@@ -10376,6 +10858,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "`[K]` at FY2032 enrollment with the guarantee removed, against $63.6m at FY2027 \
+\
                 -- the state's exposure arriving somewhere else rather than going away",
         pinned: 926_812_049.920_604,
         tolerance: 0.01,
@@ -10414,6 +10897,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts drawing line [K] that the guarantee does not pay -- the two \
+\
                 hold-harmlesses are not nested",
         pinned: 17.0,
         tolerance: 0.0,
@@ -10432,6 +10916,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts of the 609-row panel whose base cost state share sits below the 50% \
+\
                 transportation minimum -- the department's 611-row count is 440",
         pinned: 438.0,
         tolerance: 0.0,
@@ -10447,7 +10932,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts held harmless by transportation's own guarantee -- R.C. 3317.019(A)(2), \
+\
                 on the same FY2020 base as the guarantee itself and not on the FY2021 its column \
+\
                 is headed",
         pinned: 38.0,
         tolerance: 0.0,
@@ -10482,6 +10969,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts the guarantee does not pay that carry a positive [H2] anyway -- being \
+\
                 held at the floor is not what reveals the figure",
         pinned: 314.0,
         tolerance: 0.0,
@@ -10499,6 +10987,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "How far below zero the one negative [H2] sits -- Richmond Heights Local, where the \
+\
                 FY2020 deductions R.C. 3317.02(N)(1)(b) subtracts exceeded the funding",
         pinned: 40_179.23,
         tolerance: 0.01,
@@ -10514,6 +11003,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The [H2] base summed over the districts the guarantee pays -- what Ohio is \
+\
                 committed to for them regardless of what the formula computes",
         pinned: 3_032_797_430.41,
         tolerance: 0.01,
@@ -10524,6 +11014,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the formula computes for those same districts -- the quantity the base is \
+\
                 compared against and found larger than",
         pinned: 2_150_812_372.08,
         tolerance: 0.01,
@@ -10539,6 +11030,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "The formula amount as a share of the base, over the guaranteed districts -- 70.9%, \
+\
                 where the node published 71.0% from dividing the two rounded billions",
         pinned: 0.7092,
         tolerance: 0.00005,
@@ -10585,6 +11077,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "Category 2's share of special education pupils -- the opposite shape, many pupils \
+\
                 at a low weight",
         pinned: 0.6500,
         tolerance: 0.00005,
@@ -10604,6 +11097,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "What the two together are of the programme, by money -- the pair is 82% of the \
+\
                 spending and 80% of the pupils, which is why the sentence has to say which",
         pinned: 0.8195,
         tolerance: 0.00005,
@@ -10643,6 +11137,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The sixth weight, applied to total FTE rather than to any category -- services \
+\
                 rather than instruction",
         pinned: 3_234_233.67,
         tolerance: 0.01,
@@ -10658,7 +11153,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "How far the career-technical base cost per pupil sits above the statewide average \
+\
                 the other weighted categoricals multiply -- a CTE pupil starts higher before any \
+\
                 weight is applied",
         pinned: 0.1958,
         tolerance: 0.00005,
@@ -11209,6 +11706,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Consecutive years in which Cleveland's renewal applications equal the prior \
+\
                 year's paid scholarships exactly",
         pinned: 12.0,
         tolerance: 0.0,
@@ -11278,6 +11776,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Buildings a reader misclassifies by taking the Title I column's name for its \
+\
                 rule rather than the three-year average the statute requires",
         pinned: 164.0,
         tolerance: 0.0,
@@ -11297,6 +11796,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Buildings the 2025 Performance Index ranking sheet holds that R.C. 3310.03 \
+\
                 excludes from the ranking",
         pinned: 359.0,
         tolerance: 0.0,
@@ -11312,6 +11812,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Designated-list buildings a bottom-20% cut of the 2025 ranking sheet as \
+\
                 published fails to flag",
         pinned: 163.0,
         tolerance: 0.0,
@@ -11336,6 +11837,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Share,
         label: "Share of Ohio's three-year Title I formula count that is Census Bureau poverty \
+\
                 rather than a collection Ohio makes",
         pinned: 0.9671,
         tolerance: 0.0001,
@@ -11352,6 +11854,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Designations that rest on the four components Ohio collects, their districts \
+\
                 falling below twenty per cent on census poverty alone",
         pinned: 31.0,
         tolerance: 0.0,
@@ -11386,6 +11889,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Designations resting on the academic-distress column, the one input to the \
+\
                 determination this repository reads rather than derives",
         pinned: 2.0,
         tolerance: 0.0,
@@ -11401,6 +11905,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Buildings the designated list flags as under an academic distress commission that \
+\
                 had ceased to exist before the school year the list governs",
         pinned: 5.0,
         tolerance: 0.0,
@@ -11419,6 +11924,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The local capacity charge across the 609 districts, with the pupil count \
+\
                 multiplied back out \u{2014} the blend times the rate, and nothing else",
         pinned: 8_894_277_590.485_88,
         tolerance: 1.0,
@@ -11429,6 +11935,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "State aid the capacity measure reaches on the statute's own denominator: the \
+\
                 state share of base cost plus the four categoricals that ride on its percentage",
         pinned: 4_512_585_439.121_697,
         tolerance: 1.0,
@@ -11466,6 +11973,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "Targeted assistance's wealth tier on the residence-flavoured count the statute \
+\
                 itself uses",
         pinned: 1_030_296_442.066_495_8,
         tolerance: 200.0,
@@ -11476,6 +11984,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "And on Table SD-1's full resident count, with the enrolled-ADM multiplier held \
+\
                 fixed \u{2014} the eight channels the statute's own adjustment does not reach",
         pinned: 1_463_407_246.077_830_3,
         tolerance: 200.0,
@@ -11486,6 +11995,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The half of re-basing that is relief on the local charge itself \u{2014} what a \
+\
                 district would be credited for children the state funds through another unit",
         pinned: 659_062_635.507_350_2,
         tolerance: 1.0,
@@ -11499,6 +12009,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "And the half that moves through the categoricals \u{2014} a denominator \
+\
                 correction confined to the channel the statute's arithmetic does not cancel",
         pinned: 183_398_866.263_454_8,
         tolerance: 1.0,
@@ -11528,6 +12039,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "And what it would take off the 119 that lose by it, against $57.5m on the \
+\
                 wholesale re-basing \u{2014} they lose through the charge, not the percentage",
         pinned: 7_847_217.350_868_164,
         tolerance: 1.0,
@@ -11543,6 +12055,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What the correction would give the 36 districts supplemental targeted assistance \
+\
                 covered, against the $52.5m H.B. 96 repealed",
         pinned: 48_688_914.297_595_255,
         tolerance: 1.0,
@@ -11558,6 +12071,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "And what it would give the districts that supplement never reached, because its \
+\
                 second gate was a wealth test",
         pinned: 142_557_169.316_727_85,
         tolerance: 1.0,
@@ -11573,6 +12087,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "And what it would take off the districts that lose by it \u{2014} the second sign, \
+\
                 which a correction priced on the gainers alone does not see",
         pinned: 57_464_582.255_979_516,
         tolerance: 1.0,
@@ -11586,6 +12101,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose aid would fall if local capacity were divided by the resident \
+\
                 count \u{2014} the net open-enrolment-in districts",
         pinned: 119.0,
         tolerance: 0.0,
@@ -11600,6 +12116,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts on the 10% minimum state share under the statute's denominator and off \
+\
                 it under the resident count, of 138",
         pinned: 33.0,
         tolerance: 0.0,
@@ -11623,6 +12140,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Pupils,
         label: "Pupils Table SD-1 counts as resident in a district that its base cost enrolled \
+\
                 ADM does not \u{2014} every channel of R.C. 3317.03(A)(2) together",
         pinned: 222_922.710_800_000_12,
         tolerance: 1.0,
@@ -11633,6 +12151,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "Special education, English learner and career-technical entitlement for the 609 \
+\
                 districts at a state share of one",
         pinned: 2_432_327_661.000_712,
         tolerance: 1.0,
@@ -11643,6 +12162,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "The share of that entitlement the local capacity measure takes off, which the \
+\
                 community and STEM school unit is charged none of",
         pinned: 0.665_967_472_431_025_5,
         tolerance: 1e-9,
@@ -11657,6 +12177,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "Correlation between a district's resident-to-funded pupil ratio and its published \
+\
                 state share percentage, over 609 \u{2014} the divergence orders nothing",
         pinned: 0.065_683_238_353_744_5,
         tolerance: 1e-9,
@@ -11672,7 +12193,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Floors, ceilings, clamps at zero, greater-ofs and lesser-ofs the modelled formula \
+\
                 contains, across base cost, local capacity, the categoricals, the guarantee and \
+\
                 transportation",
         pinned: 38.0,
         tolerance: 0.0,
@@ -11684,6 +12207,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Of those, the bounds no input can put in force as the section stands \u{2014} \
+\
                 R.C. 3317.011(F)(6)(c), whose input (F)(3)(c) has already floored past it",
         pinned: 1.0,
         tolerance: 0.0,
@@ -11695,7 +12219,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose local capacity percentage is capped at 0.025 \u{2014} the \
+\
                 fortieth rank R.C. 3317.017(A)(4)(d)(i) states the ceiling against, so the count \
+\
                 is fixed by construction",
         pinned: 40.0,
         tolerance: 0.0,
@@ -11712,6 +12238,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts for which R.C. 3317.019(C)(1)'s floor of twenty pupils, rather than \
+\
                 ten per cent of last year's count, sets the open-enrolment decrease threshold",
         pinned: 499.0,
         tolerance: 0.0,
@@ -11728,7 +12255,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts that lost more than ten per cent of their open-enrolment count and not \
+\
                 more than twenty pupils \u{2014} charged under the percentage alone, charged \
+\
                 nothing under the floor",
         pinned: 71.0,
         tolerance: 0.0,
@@ -11740,7 +12269,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose capacity index is under 1 \u{2014} at or above the median \
+\
                 district's weighted wealth \u{2014} and so paid nothing by targeted assistance's \
+\
                 capacity tier under R.C. 3317.0217(B)(4)(a)(i)",
         pinned: 304.0,
         tolerance: 0.0,
@@ -11757,6 +12288,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose wealth index is under 0.8 and so paid nothing by targeted \
+\
                 assistance's wealth tier under R.C. 3317.0217(C)(4)(a)",
         pinned: 171.0,
         tolerance: 0.0,
@@ -11778,6 +12310,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Of the 314 formula districts the identity reaches, how many have fewer pupils \
+\
                 than in FY2020",
         pinned: 252.0,
         tolerance: 0.0,
@@ -11788,6 +12321,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Of the 314, how many the FY2027 formula pays more per pupil than the FY2020 \
+\
                 regime did -- the four exceptions all grew",
         pinned: 310.0,
         tolerance: 0.0,
@@ -11798,6 +12332,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts with fewer pupils than in FY2020, held or not, of the 607 the identity \
+\
                 reaches",
         pinned: 514.0,
         tolerance: 0.0,
@@ -11808,6 +12343,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Of the 102 least-wealthy districts that lost pupils, how many the FY2027 \
+\
                 guarantee holds",
         pinned: 15.0,
         tolerance: 0.0,
@@ -11854,6 +12390,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "How many of the enrollment cluster's 89 sit in the third wealth fifth of the \
+\
                 districts that lost pupils",
         pinned: 40.0,
         tolerance: 0.0,
@@ -11867,6 +12404,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "How many of the capacity cluster's 98 sit in the fourth wealth fifth of the \
+\
                 districts that lost pupils",
         pinned: 67.0,
         tolerance: 0.0,
@@ -11880,6 +12418,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "How many of the 106 minimum-share districts the identity reaches sit in the \
+\
                 wealthiest fifth of the districts that lost pupils",
         pinned: 75.0,
         tolerance: 0.0,
@@ -11893,7 +12432,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The median per-pupil term in the least-wealthy fifth of the districts that lost \
+\
                 pupils: the FY2027 formula pays a quarter more per pupil than the FY2020 regime. \
+\
                 Negative; pinned as a magnitude",
         pinned: 0.274,
         tolerance: 0.0005,
@@ -11904,6 +12445,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The same in the third fifth, where it is nearly zero. Negative; pinned as a \
+\
                 magnitude",
         pinned: 0.074,
         tolerance: 0.0005,
@@ -11914,6 +12456,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The same in the fourth fifth, where it has crossed: capacity outran a frozen \
+\
                 cost side",
         pinned: 0.344,
         tolerance: 0.0005,
@@ -11933,6 +12476,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Of the 21 wealthiest districts that did NOT lose pupils, how many the guarantee \
+\
                 holds -- against none of the 18 least wealthy",
         pinned: 14.0,
         tolerance: 0.0,
@@ -11943,6 +12487,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Formula districts that lost pupils at the enrollment cluster's median rate or \
+\
                 faster -- 11.9% since FY2020 -- and are not on the guarantee",
         pinned: 64.0,
         tolerance: 0.0,
@@ -11962,6 +12507,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "The enrollment cluster's median economically disadvantaged share, on the \
+\
                 profile report's measure",
         pinned: 0.5215,
         tolerance: 0.00005,
@@ -11972,6 +12518,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "The siblings' median economically disadvantaged share, on the same measure -- \
+\
                 poorer than the cluster",
         pinned: 0.5817,
         tolerance: 0.00005,
@@ -11982,6 +12529,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "The siblings' median published local capacity per pupil, against the cluster's \
+\
                 $5,184",
         pinned: 4235.15,
         tolerance: 0.005,
@@ -12001,7 +12549,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The siblings' median per-pupil term, against the cluster's -0.043: the plan's \
+\
                 per-pupil raise is what carried them over the floor. Negative; pinned as a \
+\
                 magnitude",
         pinned: 0.316,
         tolerance: 0.0005,
@@ -12048,6 +12598,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "How far above its floor the median sibling's formula aid sits, as a fraction of \
+\
                 the floor",
         pinned: 0.1794,
         tolerance: 0.00005,
@@ -12058,6 +12609,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "Years until the median sibling reaches its floor at its own FY2024-FY2026 rate, \
+\
                 undamped, over the 62 still falling",
         pinned: 4.14,
         tolerance: 0.005,
@@ -12073,11 +12625,156 @@ pub static FIGURES: &[Figure] = &[
         compute: |i| i.lost_pupils.siblings_held_fy2032 as f64,
     },
     Figure {
+        key: "project/staffing-floors-newly-guaranteed-siblings",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of the enrollment cluster's 64 siblings, how many R.C. 3317.011's staffing floors\
+                alone hold off the guarantee",
+        pinned: 16.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.size_terms[0].siblings.newly_guaranteed as f64,
+    },
+    Figure {
+        key: "project/capacity-tier-newly-guaranteed-siblings",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of the same 64, how many targeted assistance's capacity tier alone holds off it",
+        pinned: 23.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.size_terms[1].siblings.newly_guaranteed as f64,
+    },
+    Figure {
+        key: "project/size-terms-newly-guaranteed-siblings",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of the same 64, how many the two size-dependent terms hold off it together --\
+                against the 136 the pair moves statewide",
+        pinned: 35.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.size_terms[2].siblings.newly_guaranteed as f64,
+    },
+    Figure {
+        key: "project/size-terms-newly-guaranteed-statewide",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts the two size-dependent terms hold off the guarantee statewide, of which\
+                the siblings are 35",
+        pinned: 136.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.size_terms[2].statewide as f64,
+    },
+    Figure {
+        key: "project/size-terms-worth-to-the-siblings-per-pupil",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the two terms pay the 64 siblings per base cost enrolled pupil",
+        pinned: 1054.0,
+        tolerance: 0.5,
+        compute: |i| i.lost_pupils.size_terms[2].siblings.per_pupil(),
+    },
+    Figure {
+        key: "project/size-terms-worth-to-the-cluster-per-pupil",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What they pay the enrollment cluster's 89 on the same denominator -- the\
+                comparison, since the cluster is already on the floor",
+        pinned: 384.0,
+        tolerance: 0.5,
+        compute: |i| i.lost_pupils.size_terms[2].cluster.per_pupil(),
+    },
+    Figure {
+        key: "project/size-terms-siblings-expected-from-size",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "How many of the 64 the two terms would move if each ADM band's siblings moved at\
+                that band's non-sibling rate -- against the 35 observed",
+        pinned: 34.6,
+        tolerance: 0.005,
+        compute: |i| i.lost_pupils.expected_from_size,
+    },
+    Figure {
+        key: "project/siblings-the-size-terms-leave",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Siblings the two size-dependent terms leave off the guarantee -- the larger ones",
+        pinned: 29.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.unmoved.len() as f64,
+    },
+    Figure {
+        key: "project/siblings-the-size-terms-leave-median-adm",
+        owner: "crates/project",
+        unit: Unit::Pupils,
+        label: "Their median current-year enrolled ADM, against 635.6 for the 35 the terms move",
+        pinned: 1846.0071,
+        tolerance: 0.01,
+        compute: |i| i.lost_pupils.unmoved_median_adm,
+    },
+    Figure {
+        key: "project/siblings-the-size-terms-move-median-adm",
+        owner: "crates/project",
+        unit: Unit::Pupils,
+        label: "The median current-year enrolled ADM of the 35 the two terms do move",
+        pinned: 635.5645,
+        tolerance: 0.01,
+        compute: |i| i.lost_pupils.moved_median_adm,
+    },
+    Figure {
+        key: "project/siblings-the-size-terms-leave-headroom",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the 29 stand above their FY2020 base, summed",
+        pinned: 68_572_895.0,
+        tolerance: 0.5,
+        compute: |i| i.lost_pupils.unmoved.iter().map(|row| row.gap).sum(),
+    },
+    Figure {
+        key: "project/siblings-the-size-terms-leave-base-cost-share-covers",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of the 29, how many have a base cost state share larger than their whole distance\
+                from the floor",
+        pinned: 28.0,
+        tolerance: 0.0,
+        compute: |i| project::size_incidence::covering(&i.lost_pupils.unmoved)[0] as f64,
+    },
+    Figure {
+        key: "project/siblings-the-size-terms-leave-dpia-covers",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of the 29, how many have a DPIA payment larger than that distance -- the same\
+                test, on the categorical the cluster's poverty would suggest",
+        pinned: 4.0,
+        tolerance: 0.0,
+        compute: |i| project::size_incidence::covering(&i.lost_pupils.unmoved)[3] as f64,
+    },
+    Figure {
+        key: "project/cluster-and-siblings",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "The enrollment cluster and its siblings unioned -- 89 and 64",
+        pinned: 153.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.cluster_and_siblings as f64,
+    },
+    Figure {
+        key: "project/shrinking-at-the-clusters-median-rate",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts shrinking at the cluster's median rate or faster, whatever the\
+                guarantee does for them -- a different population from the 153",
+        pinned: 169.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.shrinking_at_the_cluster_rate as f64,
+    },
+    Figure {
         key: "project/fitted-partition-best-cluster-ceiling",
         owner: "crates/project",
         unit: Unit::Count,
         label: "The most districts any k-means on six profile variables, at k from 2 to 9 or \
+\
                 seeded from the typology, can label right on the enrollment cluster against the \
+\
                 rest -- one more than the 518 a single cell scores",
         pinned: 519.0,
         tolerance: 0.0,
@@ -12097,6 +12794,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "The most a nine-cell k-means on six profile variables can label right on \
+\
                 guarantee membership, of 607",
         pinned: 432.0,
         tolerance: 0.0,
@@ -12116,6 +12814,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "And on the cluster against the rest, where the typology scores exactly what one \
+\
                 cell scores",
         pinned: 518.0,
         tolerance: 0.0,
@@ -12135,6 +12834,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Of the 89, how many have a nearest neighbour on the six profile variables that \
+\
                 is also in the cluster -- against 89 of 607 by chance",
         pinned: 31.0,
         tolerance: 0.0,
@@ -12149,6 +12849,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose nearest neighbour on the six variables is held if and only if \
+\
                 they are, of 607",
         pinned: 449.0,
         tolerance: 0.0,
