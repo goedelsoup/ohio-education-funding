@@ -282,9 +282,17 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * profile of the 29 the terms leave. The claim the ratchet cannot hold is again a negative and
  * again the load-bearing one — that a component larger than a district's distance from the floor
  * is not the component that pays it — which the crate test states beside the counts.
+ *
+ * Recounted at **998/78** when #436 priced the same node's seven decline responses on the
+ * siblings as well as on the cluster. Twenty bindings, again no new carrier. Two of them are
+ * **zero** — a prior-year ratchet moves no cluster district, a dated phase-down moves no sibling
+ * — and a zero is the one value this ratchet protects badly, because a binding that computed the
+ * wrong quantity and got zero anyway reads the same as one that is right. The crate test carries
+ * what the manifest cannot: that no district of either blind population moves by so much as a
+ * cent, which is a statement about 89 and 64 arms rather than about a sum.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "978 bindings; raise this when you add one").toBeGreaterThanOrEqual(978);
+  expect(bindings.length, "998 bindings; raise this when you add one").toBeGreaterThanOrEqual(998);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "78 nodes carry bindings; raise this when a seventy-ninth does",
