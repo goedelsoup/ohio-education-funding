@@ -237,6 +237,16 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * Three of the twenty-one had already drifted in before this was measured: the floor read 898
  * against an actual 901. Recounted, not incremented.
  *
+ * Recomputed at **960/78** when the multivariate partition #396 asked about was run once and
+ * declined. Thirty-eight bindings, no new carrier, all on
+ * `formula-component/temporary-transitional-aid-guarantee` a third time. Twenty-nine are a cut
+ * the reader can reproduce with a sort — the guarantee's reach among the districts that lost
+ * pupils, by wealth fifth, and the cluster's siblings outside it. The other nine are the
+ * **ceilings a fitted partition reached**, which is a kind this ratchet had not held: a negative
+ * result. "A k-means finds the cluster at no k" is a sentence until the most any run scored is
+ * a bound figure a gate re-computes; bound, it is a claim that fails the day a panel refresh
+ * makes it false. Measured with this test's own expression: 922 stated, 922 actual, 960 after.
+ *
  * **The floor was three under when this was written** — 873 stated against 876 actual. It has
  * drifted before and the comment says so; both assertions are `toBeGreaterThanOrEqual`, so a stale
  * floor passes silently and forever. The narrative above is a record of re-counting only if each
@@ -257,7 +267,7 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * asserts it instead.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "922 bindings; raise this when you add one").toBeGreaterThanOrEqual(922);
+  expect(bindings.length, "960 bindings; raise this when you add one").toBeGreaterThanOrEqual(960);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "78 nodes carry bindings; raise this when a seventy-ninth does",

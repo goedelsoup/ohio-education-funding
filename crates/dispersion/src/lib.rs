@@ -50,6 +50,7 @@ pub mod lea_directory;
 pub mod mr81;
 pub mod national_peers;
 pub mod ohio_panel;
+pub mod partition;
 pub mod profile;
 pub mod rankings;
 pub mod report_card;
