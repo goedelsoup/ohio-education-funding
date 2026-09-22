@@ -1378,6 +1378,8 @@ test.describe("charts on a phone", () => {
     `/district/${CLEVELAND}`,
     `/district/${CLEVELAND}/finances`,
     `/district/${CLEVELAND}/outcome`,
+    // The one wiki node that draws a series, and the only wiki route with a chart on it.
+    "/wiki/education-agency/toledo-city",
   ];
 
   /** Every text mark in a chart the reader can actually see, with the size it is painted at. */
@@ -3740,6 +3742,26 @@ test.describe("the wiki", () => {
     await expect(card).toBeVisible();
     await card.getByRole("link", { name: "Dashboard" }).click();
     await expect(page.locator("h1")).toHaveText("Upper Arlington City");
+  });
+
+  test("draws the series a node binds, at the end of the field it names", async ({ page }) => {
+    /*
+     * #441's seam: the Toledo node binds `dispersion/fy2016-step-by-business-class` under its
+     * findings, so the chart is the last thing in the findings card and nowhere else. Four bars
+     * because the column has four rows, and the endpoints of the column — +0.1175 on industrial,
+     * −0.0321 on mineral — are numbers the same card states in prose, which is the rule that
+     * makes a chart checkable at all.
+     */
+    await page.goto("/wiki/education-agency/toledo-city");
+    const card = page.locator("#findings");
+    const chart = card.locator('[data-chart="dispersion/fy2016-step-by-business-class"] svg.plot:visible');
+    await expect(chart).toBeVisible();
+    await expect(chart).toHaveAttribute("role", "img");
+    await expect(chart.locator(".bar-fill > *")).toHaveCount(4);
+    await expect(card.locator(".series h3")).toContainText("Correlation of the FY2016 move");
+    await expect(card).toContainText("+0.1175");
+    await expect(card).toContainText("−0.0321");
+    expect(await page.locator("[data-chart]").count(), "one chart on the page").toBe(1);
   });
 
   test("a class page is also the schema for its class", async ({ page }) => {

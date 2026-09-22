@@ -461,7 +461,7 @@ function halfStep(value: number): number {
  * place a node writes prose — including `revisions:`, since a citation that survives only in a
  * withdrawal is still the node naming its authority.
  */
-function citedCrates(node: Node): Set<string> {
+export function citedCrates(node: Node): Set<string> {
   const prose = [node.summary, node.description, node.linkText].join("\n\n");
   const crates = new Set<string>();
   for (const claim of claimTags(prose)) {

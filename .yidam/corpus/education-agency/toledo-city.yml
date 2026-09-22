@@ -541,6 +541,9 @@ figures:
     value: 5.07
     field: fy2025_profile
     as_written: "composite −5.07"
+series:
+  - key: dispersion/fy2016-step-by-business-class
+    field: findings
 properties:
   seeded_because: |
     The corpus's second urban exemplar. A circulating claim about its special-education spending

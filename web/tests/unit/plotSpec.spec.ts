@@ -63,6 +63,44 @@ test("the bar a chart was built to locate is marked, on two channels", () => {
   expect(plain).not.toContain('font-weight="600"');
 });
 
+test("a column with bars on both sides of zero draws its rule at both widths", () => {
+  /*
+   * The first chart a corpus node draws — `dispersion/fy2016-step-by-business-class`, on the
+   * Toledo node — is four correlations, two of them negative and none of them a subject. Signed
+   * mode was written for one bar on one page; this holds it for a whole column, at the narrow
+   * width as well as the wide one, because the narrow drawing is a second call and not a scaling.
+   *
+   * The zero rule is what a reader takes the sign off, so it is the mark asserted on: Plot writes
+   * a rule as a `<line>` and the bars as `<rect>`s, and an unsigned column has no `<line>` at all.
+   */
+  const bars: Bar[] = [
+    { label: "Industrial", value: 0.1175, hover: "Industrial: +0.1175" },
+    { label: "Mineral", value: -0.0321, hover: "Mineral: −0.0321" },
+    { label: "Public utility", value: -0.0159, hover: "Public utility: −0.0159" },
+    { label: "All three summed", value: 0.0164, hover: "All three summed: +0.0164" },
+  ];
+  const pair = renderToString((w) => barSpec(bars, { width: w }), { label: "The column" });
+  const drawings = pair.split("<svg").slice(1);
+  expect(drawings).toHaveLength(2);
+  for (const drawing of drawings) {
+    expect((drawing.match(/<rect/g) ?? []).length).toBe(4);
+    expect((drawing.match(/<line/g) ?? []).length).toBe(1);
+    // Both halves of the polarity pair, and no subject mark.
+    expect(drawing).toContain("var(--series-guarantee)");
+    expect(drawing).toContain("var(--series-formula)");
+    expect(drawing).not.toContain('font-weight="600"');
+    // The hover is the spoken value the caller gave, not the bare float.
+    expect(drawing).toContain("Industrial: +0.1175");
+    expect(drawing).not.toContain("0.11752");
+  }
+  // And a column of the same shape with nothing below zero draws no rule.
+  const unsigned = renderToString(
+    (w) => barSpec(bars.map((b) => ({ ...b, value: Math.abs(b.value) })), { width: w }),
+    "presentational",
+  );
+  expect(unsigned).not.toContain("<line");
+});
+
 test("a signed distribution draws its zero, and an unsigned one is unchanged", () => {
   /*
    * The enrollment-change strip on `/districts` is the site's one signed distribution and drew no

@@ -50,6 +50,22 @@
 //! the bound count at its value, so the next figure exported is a figure that cannot quietly go
 //! unbound — and `uncited-figure` makes an export no node binds a failure, so the manifest cannot
 //! grow ahead of the corpus either.
+//!
+//! # The series manifest
+//!
+//! A figure is a scalar, and a chart is a column. [`SERIES`] is the second registry: each entry
+//! is a short column of labelled values the wiki draws rather than quotes, computed from the same
+//! [`Inputs`] and written as [`series_manifest`] to `crates/series.json`. It has its own contract
+//! version, [`SERIES_CONTRACT_VERSION`], because its consumer (`web/src/lib/corpusSeries.ts`) reads
+//! a different shape and should refuse a document it does not recognise on its own terms.
+//!
+//! What keeps a chart honest is the **endpoint rule**: the largest and smallest row of every
+//! series name an ordinary figure in [`FIGURES`], and that figure reproduces the row. A reader
+//! quotes a chart by its extremes, so the extremes are the values the corpus already binds and
+//! pins, and a series cannot draw a number the figure manifest has not stood behind. Rows are
+//! **signed** — a chart needs the sign to draw a bar below the zero rule — while the figure
+//! manifest's correlations are magnitudes with the direction in the key, so the rule compares the
+//! row's magnitude against the figure's pin.
 
 #![forbid(unsafe_code)]
 
@@ -65,7 +81,7 @@ use regime_diff::{panel_at_fy2027, ChargeOffBase, RegimeDiff, TERMINAL_MILLS};
 
 mod json;
 
-pub use json::manifest;
+pub use json::{manifest, series_manifest};
 
 /// The damping `DEFAULT_DAMPING` replaced, restated rather than remembered.
 ///
@@ -82,6 +98,11 @@ const THE_DAMPING_BEFORE_IT_WAS_FITTED: f64 = 0.85;
 /// silently passes because it could not find what it was looking for is the failure mode #125
 /// catalogued sixteen times.
 pub const CONTRACT_VERSION: &str = "1.1.0";
+
+/// The series manifest's schema version, on the same rule as [`CONTRACT_VERSION`] and versioned
+/// separately from it: the two documents are read by two consumers, and a field added to a row
+/// is not a reason for the scalar check to refuse a manifest it still reads correctly.
+pub const SERIES_CONTRACT_VERSION: &str = "1.0.0";
 
 /// What a figure is measured in, which decides how prose is allowed to write it.
 ///
@@ -142,6 +163,43 @@ pub struct Figure {
     pub tolerance: f64,
     /// The computation, over inputs built once for the whole manifest.
     pub compute: fn(&Inputs) -> f64,
+}
+
+/// One column the wiki draws: a short list of labelled values on one unit and one axis.
+///
+/// Where a [`Figure`] carries a pin, a series carries none of its own. Its endpoints name figures
+/// (see [`Row::figure`]), and those figures are pinned; the rest of the column is held by
+/// `mise run //:generated` diffing the committed document, which is enough for values that no
+/// prose quotes.
+pub struct Series {
+    /// `<crate-directory>/<what-it-is>`, in the same namespace as a figure key and never equal
+    /// to one: a corpus node binds series and figures in separate lists.
+    pub key: &'static str,
+    /// The crate that owns the computation, as the corpus cites it.
+    pub owner: &'static str,
+    /// What every row's value is measured in.
+    pub unit: Unit,
+    /// What the rows are indexed by, in words — the categorical axis of the chart.
+    pub axis: &'static str,
+    /// What the column is, in words; the chart's title.
+    pub label: &'static str,
+    /// The computation, over the same inputs the figures use.
+    pub compute: fn(&Inputs) -> Vec<Row>,
+}
+
+/// One row of a [`Series`].
+pub struct Row {
+    /// The category this row is, as the axis writes it.
+    pub label: &'static str,
+    /// The value, **signed**. A chart draws direction; the figure manifest states it in a key.
+    pub value: f64,
+    /// What a reader hovering the mark should be told, when the label and the value are not
+    /// enough on their own. Absent, the chart says `label: value`.
+    pub hover: Option<&'static str>,
+    /// The [`Figure`] in [`FIGURES`] whose pin this row reproduces in magnitude, when there is
+    /// one. Required on the largest and smallest row of every series — the endpoint rule in the
+    /// module docs — and welcome on any other.
+    pub figure: Option<&'static str>,
 }
 
 /// One frozen parameter from `project::indexation`, by the name the table gives it.
@@ -1608,6 +1666,90 @@ pub fn compute_all() -> Vec<Computed> {
         })
         .collect()
 }
+
+/// A series and the rows it came out with on this run.
+pub struct ComputedSeries {
+    /// The registry entry.
+    pub series: &'static Series,
+    /// What [`Series::compute`] returned.
+    pub rows: Vec<Row>,
+}
+
+/// Run every series in [`SERIES`], in registry order.
+///
+/// Builds [`Inputs`] a second time when both manifests are written in one process. That is a
+/// fixture read repeated, not a result that can differ, and cheaper than threading one build
+/// through two binaries' worth of call sites.
+#[must_use]
+pub fn compute_all_series() -> Vec<ComputedSeries> {
+    let inputs = Inputs::build();
+    SERIES
+        .iter()
+        .map(|series| ComputedSeries {
+            series,
+            rows: (series.compute)(&inputs),
+        })
+        .collect()
+}
+
+/// The correlation of the FY2016 step with one district property share, signed.
+///
+/// Shared by the four `fy2016-step-against-*` figures and the series that draws them, so the
+/// bars and the numbers under them are one computation rather than two that agree today.
+fn fy2016_step_against(i: &Inputs, share: fn(&dispersion::fy2016::District) -> f64) -> f64 {
+    let steps: Vec<f64> = i.fy2016.districts.iter().map(|d| d.step).collect();
+    let against: Vec<f64> = i.fy2016.districts.iter().map(share).collect();
+    dispersion::wealth_neutrality(&against, &steps)
+        .expect("paired")
+        .correlation
+}
+
+/// The columns the wiki draws. See the module docs for the endpoint rule every entry obeys.
+pub static SERIES: &[Series] = &[
+    // #416's finding, as the four bars it was found by: the summed business share is a near-zero
+    // because industrial runs one way and mineral and public utility the other. The chart is
+    // signed so that the cancellation is visible, and the figures it names are the magnitudes
+    // the corpus quotes.
+    Series {
+        key: "dispersion/fy2016-step-by-business-class",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        axis: "Property class, TY2021 share of assessed value",
+        label: "Correlation of the FY2016 move in state revenue per pupil with each business \
+                property class",
+        compute: |i| {
+            vec![
+                Row {
+                    label: "Industrial",
+                    value: fy2016_step_against(i, |d| d.industrial_share),
+                    hover: None,
+                    figure: Some("dispersion/fy2016-step-against-industrial-share"),
+                },
+                Row {
+                    label: "Mineral",
+                    value: fy2016_step_against(i, |d| d.mineral_share),
+                    hover: None,
+                    figure: Some("dispersion/fy2016-step-against-mineral-share-negative"),
+                },
+                Row {
+                    label: "Public utility",
+                    value: fy2016_step_against(i, |d| d.public_utility_share),
+                    hover: None,
+                    figure: Some("dispersion/fy2016-step-against-public-utility-share-negative"),
+                },
+                Row {
+                    label: "All three summed",
+                    value: fy2016_step_against(
+                        i,
+                        dispersion::fy2016::District::summed_business_share,
+                    ),
+                    hover: None,
+                    figure: Some("dispersion/fy2016-step-against-summed-business-share"),
+                },
+            ]
+        },
+    },
+];
 
 /// One row of the enacted earmark table for ALI 200540.
 fn enacted_200540(label: &str) -> f64 {
@@ -3592,18 +3734,7 @@ pub static FIGURES: &[Figure] = &[
                 for a tangible personal property reading",
         pinned: 0.1175,
         tolerance: 0.0005,
-        compute: |i| {
-            let steps: Vec<f64> = i.fy2016.districts.iter().map(|d| d.step).collect();
-            let industrial: Vec<f64> = i
-                .fy2016
-                .districts
-                .iter()
-                .map(|d| d.industrial_share)
-                .collect();
-            dispersion::wealth_neutrality(&industrial, &steps)
-                .expect("paired")
-                .correlation
-        },
+        compute: |i| fy2016_step_against(i, |d| d.industrial_share),
     },
     Figure {
         key: "dispersion/fy2016-step-against-mineral-share-negative",
@@ -3613,19 +3744,7 @@ pub static FIGURES: &[Figure] = &[
                 industrial, which is what a summed business share averages away",
         pinned: 0.0321,
         tolerance: 0.0005,
-        compute: |i| {
-            let steps: Vec<f64> = i.fy2016.districts.iter().map(|d| d.step).collect();
-            let mineral: Vec<f64> = i
-                .fy2016
-                .districts
-                .iter()
-                .map(|d| d.mineral_share)
-                .collect();
-            dispersion::wealth_neutrality(&mineral, &steps)
-                .expect("paired")
-                .correlation
-                .abs()
-        },
+        compute: |i| fy2016_step_against(i, |d| d.mineral_share).abs(),
     },
     Figure {
         key: "dispersion/fy2016-step-against-public-utility-share-negative",
@@ -3635,19 +3754,7 @@ pub static FIGURES: &[Figure] = &[
                 classes by value and the third sign of three",
         pinned: 0.0159,
         tolerance: 0.0005,
-        compute: |i| {
-            let steps: Vec<f64> = i.fy2016.districts.iter().map(|d| d.step).collect();
-            let utility: Vec<f64> = i
-                .fy2016
-                .districts
-                .iter()
-                .map(|d| d.public_utility_share)
-                .collect();
-            dispersion::wealth_neutrality(&utility, &steps)
-                .expect("paired")
-                .correlation
-                .abs()
-        },
+        compute: |i| fy2016_step_against(i, |d| d.public_utility_share).abs(),
     },
     Figure {
         key: "dispersion/fy2016-step-against-summed-business-share",
@@ -3657,18 +3764,7 @@ pub static FIGURES: &[Figure] = &[
                 cancellation of the three above rather than an absence",
         pinned: 0.0164,
         tolerance: 0.0005,
-        compute: |i| {
-            let steps: Vec<f64> = i.fy2016.districts.iter().map(|d| d.step).collect();
-            let business: Vec<f64> = i
-                .fy2016
-                .districts
-                .iter()
-                .map(dispersion::fy2016::District::summed_business_share)
-                .collect();
-            dispersion::wealth_neutrality(&business, &steps)
-                .expect("paired")
-                .correlation
-        },
+        compute: |i| fy2016_step_against(i, dispersion::fy2016::District::summed_business_share),
     },
     Figure {
         key: "dispersion/fy2016-step-lowest-valuation-quintile",

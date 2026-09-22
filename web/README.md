@@ -723,6 +723,17 @@ Where a corpus node names a district with an IRN in the feed — five of the sev
 — the two are joined in both directions: the corpus says what the district illustrates, the
 district page says what it is currently paid.
 
+A node can also draw a chart. A `series:` entry names a column in `crates/series.json` — the
+scalar manifest's sibling, written by the same crate — and the prose field to put it under, and
+the node route (`src/pages/wiki/[class]/[node].astro`) renders it at the end of that card
+through `barSpec`, server-side, both widths, like every other chart on the site.
+[`src/lib/corpusSeries.ts`](src/lib/corpusSeries.ts) is the reader and the check, beside
+`corpusFigures.ts`: it refuses a manifest on a contract it does not read, and holds each binding
+to the **endpoint rule** — the largest and smallest row of the series name a figure the same node
+binds in `figures:`, so the two numbers a reader takes off the chart are numbers the prose states
+and the figure gate checks. The first is the four correlations by business property class on the
+Toledo node, which is #416's cancellation drawn as bars on both sides of zero. See #441.
+
 ### Three corpus defects this surfaced
 
 Building the wiki required parsing all 62 nodes, which nothing had done before. Three were not

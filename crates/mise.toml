@@ -51,6 +51,13 @@ description = "Regenerate the figure manifest the corpus is cross-checked agains
 # what fails if you forget.
 run = "cargo run --quiet -p figures > figures.json"
 
+[tasks.series]
+description = "Regenerate the series manifest the wiki's charts are drawn from."
+# The other half of `web/tests/unit/corpusSeries.spec.ts`, on the same terms as
+# `figures`: run it after any change that moves a row in `figures::SERIES`, and
+# `mise run //:generated` is what fails if you forget.
+run = "cargo run --quiet -p figures series > series.json"
+
 [tasks.connectors]
 description = "What is retrievable, and how far each connector got."
 run = "cargo run --quiet -p connect --bin edfund-connect -- list"

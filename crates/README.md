@@ -80,6 +80,15 @@ used the first only worked because the heading they wanted has no table-of-conte
 `project::budget_analysis` is the one reader, and `Edition` is why a caller has to say which
 document it is quoting.
 
+`figures` writes a second document beside the first, [`series.json`](series.json): short labelled
+columns the wiki draws as charts, computed from the same `Inputs` by `cargo run -p figures series`.
+A figure is a scalar and 802 of them could not show a shape — the summed business share that was
+a cancellation of three opposite-signed correlations, not a null — so a series is the column
+itself, signed, with its own contract version. What binds it is the endpoint rule in
+`tests/a_series_is_bound_at_its_ends.rs`: the largest and smallest row of every series name an
+ordinary figure and reproduce its pin in magnitude, so the numbers a reader takes off a chart are
+numbers the figure gate already checks. See #441.
+
 **`deduction` is declared and not built.** It was listed here as though it existed for long enough
 that the web layer's "what is not modelled" note was written from this file rather than from the
 workspace. There is a [skill describing what it would compute](../.yidam/skills/deduction.md) —
@@ -208,7 +217,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`deflator`](deflator/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 17 |
 | [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 370 |
 | [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 35 |
-| [`figures`](figures/) | The figures the corpus quotes, computed from the crates that own them | 12 |
+| [`figures`](figures/) | The figures the corpus quotes, computed from the crates that own them | 19 |
 | [`foundation`](foundation/) | Fair School Funding Plan base cost build-up, per R.C. 3317.011 | 58 |
 | [`local-capacity`](local-capacity/) | Fair School Funding Plan local capacity and state share, per R.C. 3317.017 | 27 |
 | [`millage`](millage/) | Effective operating millage under H.B. 920 reduction factors, and 20-mill floor status | 19 |
@@ -217,7 +226,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 37 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 79 |
 
-13 crates, 1758 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+13 crates, 1765 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status
