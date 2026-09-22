@@ -80,6 +80,15 @@ used the first only worked because the heading they wanted has no table-of-conte
 `project::budget_analysis` is the one reader, and `Edition` is why a caller has to say which
 document it is quoting.
 
+`figures` writes a second document beside the first, [`series.json`](series.json): short labelled
+columns the wiki draws as charts, computed from the same `Inputs` by `cargo run -p figures series`.
+A figure is a scalar and 802 of them could not show a shape — the summed business share that was
+a cancellation of three opposite-signed correlations, not a null — so a series is the column
+itself, signed, with its own contract version. What binds it is the endpoint rule in
+`tests/a_series_is_bound_at_its_ends.rs`: the largest and smallest row of every series name an
+ordinary figure and reproduce its pin in magnitude, so the numbers a reader takes off a chart are
+numbers the figure gate already checks. See #441.
+
 **`deduction` is declared and not built.** It was listed here as though it existed for long enough
 that the web layer's "what is not modelled" note was written from this file rather than from the
 workspace. There is a [skill describing what it would compute](../.yidam/skills/deduction.md) —

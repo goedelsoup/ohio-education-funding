@@ -313,6 +313,42 @@ A figure computed by hand beside a test that does not compute it is the thing th
 for — and so is a figure computed twice, by two definitions, with a band wide enough to hide the
 difference.
 
+### `series:` — the columns a node draws
+
+`figures.json` carries scalars only, so a finding that is a *shape* — the summed business share
+of +0.0164 that turned out to be +0.1175 on industrial against −0.0321 on mineral and −0.0159 on
+public utility, a cancellation rather than a null — could be quoted number by number and never
+shown. `crates/figures` now writes a second document from the same inputs,
+[`crates/series.json`](../../crates/series.json): short labelled columns, each owned by a crate,
+each row signed. A node draws one with a `series:` entry naming the key and the prose field the
+chart goes at the end of:
+
+```yaml
+series:
+  - key: dispersion/fy2016-step-by-business-class
+    field: findings
+```
+
+A chart is not a phrase, so none of the three-way checks above can hold it to the prose. What
+holds it instead is the **endpoint rule**: the largest and smallest row of every series must name
+an ordinary figure — `crates/figures/tests/a_series_is_bound_at_its_ends.rs` refuses a manifest
+where one does not — and a node that draws the series must bind those two figures in its own
+`figures:` block, which `web/tests/unit/corpusSeries.spec.ts` refuses. The numbers a reader takes
+off a chart are its extremes; the rule makes the extremes numbers the prose states, the crate
+pins, and the figure gate checks. The rows between may go unbound.
+
+Two conventions differ from `figures:`. A series row is **signed**, because a bar below the zero
+rule is what the chart is for, where a figure exports a correlation as a magnitude with its
+direction in the key — so the row `Mineral` is `−0.0321` and names
+`dispersion/fy2016-step-against-mineral-share-negative`, whose pin is `0.0321`, and the two
+checks compare in magnitude. And `field` must be `description` or `findings`: each is its own card
+on the node's page and the chart is the last thing in it, whereas a property is a row of a table
+and a summary is a lead, and neither has anywhere for a chart to go.
+
+The series manifest carries its own contract version, apart from the figure manifest's, and the
+web reader refuses one it does not recognise. `mise run //:generated` holds both documents
+current. See #441 for the design and #442–#447 for the charts it was built to carry.
+
 ## Claim inventory
 
 <!-- REGEN: edfund-connect claim-audit
