@@ -1561,6 +1561,25 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
   .chart-at[data-at="narrow"] { display: none; }
   .chart-at[data-at="wide"] { display: block; }
 }
+/* A panel of a small multiple is drawn once and shown in both layouts — see
+   `renderPanelToString`. Named rather than left unqualified so that a drawing with no pair is
+   visibly a decision and not a missing sibling. */
+.chart-at[data-at="panel"] { display: block; }
+
+/*
+ * A cloud's panels, laid out against each other.
+ *
+ * Side by side where the card can hold two — the finding these were built for *is* the comparison,
+ * and "the left cloud lies on the diagonal and the right one lies flat" is a sentence about two
+ * things a reader is looking at together. `flex-wrap` stacks them below that, which is the only
+ * thing a phone column can do with them, and the shared scale means stacked panels still compare
+ * correctly; they just compare one after the other.
+ */
+.panels { display: flex; flex-wrap: wrap; gap: var(--space-6); }
+/* 280px rather than the 311 a panel is drawn at: a pair that cannot quite fit should
+   stack, and one that fits with a little shrinking should not. */
+.panel { flex: 1 1 280px; min-width: 0; }
+.panel-label { margin: 0; font-size: var(--text-sm); color: var(--text-muted); }
 
 /*
  * What Plot used to inline into every SVG it drew.

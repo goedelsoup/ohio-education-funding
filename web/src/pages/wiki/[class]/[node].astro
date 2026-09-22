@@ -19,9 +19,9 @@ import { isBlockProperty, isListProperty, isMathProperty, renderListProperty, re
 import * as routes from "../../../lib/routes.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
 import SeriesChart from "../../../components/SeriesChart.astro";
-import { barsOf, loadSeriesManifest } from "../../../lib/corpusSeries.ts";
-import { barSpec } from "../../../lib/plot/spec.ts";
-import { renderToString } from "../../../lib/plot/ssr.ts";
+import { barsOf, loadSeriesManifest, panelsOf } from "../../../lib/corpusSeries.ts";
+import { barSpec, panelWidth, scatterSpec } from "../../../lib/plot/spec.ts";
+import { renderPanelToString, renderToString } from "../../../lib/plot/ssr.ts";
 
 export function getStaticPaths() {
   return loadCorpus().nodes.map((node) => ({
@@ -39,30 +39,75 @@ const findings = node.findings
   : null;
 
 /*
- * The columns this node draws, each at the end of the prose field its `series:` entry names.
+ * The charts this node draws, each at the end of the prose field its `series:` entry names.
  *
- * A `figures:` binding quotes a scalar the crate pins; a `series:` binding draws a column the
- * crate computes, and the two documents come from one generator (`crates/figures`, #441). The
- * route throws on a key the manifest lacks rather than skipping it, for the reason the figure
+ * A `figures:` binding quotes a scalar the crate pins; a `series:` binding draws a computation the
+ * crate ran, and the two documents come from one generator (`crates/figures`, #441). A binding
+ * names a key and not a shape: the manifest answers with a **column**, drawn as bars, or with a
+ * **cloud**, drawn as one squared panel per outcome over a shared predictor (#442). What differs
+ * between them is what the node has to bind alongside — a column's two extremes, a cloud's slopes
+ * and r-squareds — and `corpusSeries.ts` holds both.
+ *
+ * The route throws on a key the manifest lacks rather than skipping it, for the reason the figure
  * gate throws on an empty manifest: a chart that silently fails to appear looks like a node that
  * never drew one. `corpusSeries.spec.ts` refuses the same binding first, so this fires only on a
  * build from a stale manifest, and the message says how to regenerate it.
  */
-const seriesByKey = new Map(loadSeriesManifest().series.map((series) => [series.key, series]));
+const manifest = loadSeriesManifest();
+const seriesByKey = new Map(manifest.series.map((series) => [series.key, series]));
+const cloudByKey = new Map(manifest.scatters.map((cloud) => [cloud.key, cloud]));
 const charts = node.series.map((binding) => {
   const series = seriesByKey.get(binding.key);
-  if (!series) {
+  const cloud = cloudByKey.get(binding.key);
+  if (!series && !cloud) {
     throw new Error(
       `${node.id} draws ${binding.key}, which crates/series.json does not carry. Regenerate it ` +
         `with: cargo run --manifest-path crates/Cargo.toml -p figures series > crates/series.json`,
     );
   }
+  if (cloud) {
+    const panels = panelsOf(cloud);
+    /* One width, drawn once: see `renderPanelToString`. The frame is the manifest's own, which is
+       what makes the fitted line's angle a statement rather than an artefact of the range. */
+    const width = panelWidth(panels.length);
+    return {
+      field: binding.field,
+      key: cloud.key,
+      label: cloud.label,
+      note:
+        `One dot per ${cloud.subject}, ${cloud.points.length} of them, on the same scale in both ` +
+        `panels. Hover or focus a dot for its ${cloud.subject}.`,
+      panels: panels.map((panel) => ({
+        label: panel.label,
+        html: renderPanelToString(
+          () =>
+            scatterSpec(panel.points, { x: panel.x, y: panel.y }, [], {
+              width,
+              xDomain: panel.xDomain,
+              yDomain: panel.yDomain,
+              fit: panel.fit,
+            }),
+          { label: `${cloud.label} — ${panel.label}` },
+          width,
+        ),
+      })),
+    };
+  }
   return {
     field: binding.field,
-    key: series.key,
-    label: series.label,
-    axis: series.axis,
-    html: renderToString((w) => barSpec(barsOf(series), { width: w }), { label: series.label }),
+    key: series!.key,
+    label: series!.label,
+    note:
+      `By ${series!.axis.charAt(0).toLowerCase()}${series!.axis.slice(1)}. ` +
+      `Hover or focus a bar for its value.`,
+    panels: [
+      {
+        label: null,
+        html: renderToString((w) => barSpec(barsOf(series!), { width: w }), {
+          label: series!.label,
+        }),
+      },
+    ],
   };
 });
 const chartsUnder = (field: string) => charts.filter((chart) => chart.field === field);

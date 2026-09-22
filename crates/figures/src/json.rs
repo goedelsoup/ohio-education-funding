@@ -3,9 +3,14 @@
 //! Hand-rolled for the reason the feed's serializer is: the workspace has no external
 //! dependencies, deliberately, so that a committed result is reproducible years from now without
 //! a dependency resolution succeeding first. Both documents are flatter than the feed — one array
-//! of six-field objects, and one array of objects each holding a short array of rows — so they
-//! do not need [`bundle`'s `Obj`/`Arr` machinery](../../bundle/index.html), and they do not need
-//! an escaper either.
+//! of six-field objects, and one document holding two arrays, of short labelled columns and of
+//! clouds whose every member is a number or a name — so they do not need [`bundle`'s `Obj`/`Arr`
+//! machinery](../../bundle/index.html), and they do not need an escaper either.
+//!
+//! A cloud is the first thing either manifest writes that is not a `&'static str`: a point's
+//! label is a district's name, read from a fixture. So the escaping check is no longer only a
+//! guard against a typo in this repository, and `scatters` asserts on every one of them rather
+//! than on the registry's own strings alone.
 //!
 //! It needs the *absence* of an escaper to be checked rather than assumed. Every string here is a
 //! `&'static str` written in `lib.rs`, so a quote or a backslash in one is a compile-time-fixable
@@ -16,7 +21,8 @@
 use core::fmt::Write;
 
 use crate::{
-    compute_all, compute_all_series, Row, Unit, CONTRACT_VERSION, SERIES_CONTRACT_VERSION,
+    compute_all, compute_all_scatters, compute_all_series, Axis, Cloud, Fit, Row, Unit,
+    CONTRACT_VERSION, SERIES_CONTRACT_VERSION,
 };
 
 /// The characters that would need escaping, and therefore may not appear in a key or a label.
@@ -156,8 +162,144 @@ pub fn series_manifest() -> String {
         let comma = if at + 1 == computed.len() { "" } else { "," };
         let _ = writeln!(out, "    ]}}{comma}");
     }
-    out.push_str("  ]\n}\n");
+    out.push_str("  ],\n");
+    scatters(&mut out);
+    out.push_str("}\n");
     out
+}
+
+/// A number on a continuous axis, at the shortest precision that round-trips.
+///
+/// No [`Unit`] here, and so no integer case: a cloud's axes are dollars and pupils at once and
+/// neither is the other's. `{:?}` is what the figure manifest already writes everything that is
+/// not a count as.
+fn coordinate(value: f64) -> String {
+    assert!(
+        value.is_finite(),
+        "a cloud carries {value}, which is not a number JSON can carry"
+    );
+    format!("{value:?}")
+}
+
+/// One axis, as a member of the object that holds it.
+fn axis(name: &str, a: &Axis) -> String {
+    assert!(
+        writable(a.label),
+        "{:?}: an axis label carries a character this writer cannot escape",
+        a.label
+    );
+    format!(
+        "\"{name}\": {{\"label\": \"{}\", \"unit\": \"{}\", \"min\": {}, \"max\": {}, \
+         \"log\": {}}}",
+        a.label,
+        a.unit.name(),
+        coordinate(a.min),
+        coordinate(a.max),
+        a.log,
+    )
+}
+
+/// One fitted line: its two ends, its two numbers, and the two figures those are pinned by.
+fn fit(f: &Fit) -> String {
+    assert!(
+        writable(f.slope_figure) && writable(f.r_squared_figure),
+        "a fit names a figure key this writer cannot escape"
+    );
+    format!(
+        "\"fit\": {{\"from\": [{}, {}], \"to\": [{}, {}], \"slope\": {}, \"rSquared\": {}, \
+         \"slopeFigure\": \"{}\", \"rSquaredFigure\": \"{}\"}}",
+        coordinate(f.from.0),
+        coordinate(f.from.1),
+        coordinate(f.to.0),
+        coordinate(f.to.1),
+        coordinate(f.slope),
+        coordinate(f.r_squared),
+        f.slope_figure,
+        f.r_squared_figure,
+    )
+}
+
+/// The clouds, as the second array of the series manifest.
+///
+/// One point per line, like every other row this writer emits: six hundred districts is a long
+/// diff, and a district whose wealth moved should be one changed line of it rather than a
+/// re-flowed paragraph.
+fn scatters(out: &mut String) {
+    let computed = compute_all_scatters();
+    let _ = writeln!(out, "  \"scatters\": [");
+    for (at, entry) in computed.iter().enumerate() {
+        let s = entry.scatter;
+        assert!(
+            writable(s.key) && writable(s.owner) && writable(s.label) && writable(s.subject),
+            "{}: a key, owner, label or subject carries a character this writer cannot escape",
+            s.key
+        );
+        let Cloud { x, points, panels } = &entry.cloud;
+        let _ = writeln!(
+            out,
+            "    {{\"key\": \"{}\", \"owner\": \"{}\", \"subject\": \"{}\", \"label\": \"{}\", {},",
+            s.key,
+            s.owner,
+            s.subject,
+            s.label,
+            axis("x", x),
+        );
+        let _ = writeln!(out, "     \"panels\": [");
+        for (panel_at, panel) in panels.iter().enumerate() {
+            assert!(
+                writable(panel.label),
+                "{}: a panel label carries a character this writer cannot escape",
+                s.key
+            );
+            let comma = if panel_at + 1 == panels.len() {
+                ""
+            } else {
+                ","
+            };
+            let _ = writeln!(
+                out,
+                "       {{\"label\": \"{}\", {}, {}}}{comma}",
+                panel.label,
+                axis("y", &panel.y),
+                fit(&panel.fit),
+            );
+        }
+        let _ = writeln!(out, "     ],");
+        let _ = writeln!(out, "     \"points\": [");
+        for (point_at, point) in points.iter().enumerate() {
+            assert!(
+                writable(&point.label),
+                "{}: the point {:?} carries a character this writer cannot escape",
+                s.key,
+                point.label
+            );
+            assert_eq!(
+                point.ys.len(),
+                panels.len(),
+                "{}: the point {:?} carries {} value(s) under {} panel(s)",
+                s.key,
+                point.label,
+                point.ys.len(),
+                panels.len()
+            );
+            let ys: Vec<String> = point.ys.iter().map(|y| coordinate(*y)).collect();
+            let comma = if point_at + 1 == points.len() {
+                ""
+            } else {
+                ","
+            };
+            let _ = writeln!(
+                out,
+                "       {{\"label\": \"{}\", \"x\": {}, \"ys\": [{}]}}{comma}",
+                point.label,
+                coordinate(point.x),
+                ys.join(", "),
+            );
+        }
+        let comma = if at + 1 == computed.len() { "" } else { "," };
+        let _ = writeln!(out, "     ]}}{comma}");
+    }
+    out.push_str("  ]\n");
 }
 
 #[cfg(test)]

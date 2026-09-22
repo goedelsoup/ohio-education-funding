@@ -89,6 +89,23 @@ itself, signed, with its own contract version. What binds it is the endpoint rul
 ordinary figure and reproduce its pin in magnitude, so the numbers a reader takes off a chart are
 numbers the figure gate already checks. See #441.
 
+The same document carries a second array, of **clouds** — a population drawn as itself rather than
+summarised, under one or more panels sharing a predictor. A cloud has no rows and so no endpoints,
+and what a reader quotes off it is the line through it: each panel carries a fitted segment, its
+slope and its r-squared, and the keys of the two ordinary figures that pin them. Those two are the
+only numbers printed on a panel, which makes them the cloud's endpoints and puts it under the same
+rule. Two properties are asserted rather than left to a caller: a point carries one value under
+every panel, and **every panel's vertical axis spans exactly as many log units as the predictor
+does**, so a slope is drawn as an angle and the panels are comparable to each other. The first is
+`project/what-the-capacity-tiers-index-measures`, which is R.C. 3317.0217's capacity tier reading
+enrolment rather than the wealth per pupil it names — a slope of 0.9855 beside a slope of −0.0429.
+See #442.
+
+The line is fitted here and nowhere else. `crates/series.json` carries its two **endpoints in the
+data's own units** rather than a slope and an intercept, so no consumer evaluates a model: the web
+layer draws a segment between two points it was given, and `chart.ts`'s standing prohibition on a
+fitted line in that layer stands unamended.
+
 **`deduction` is declared and not built.** It was listed here as though it existed for long enough
 that the web layer's "what is not modelled" note was written from this file rather than from the
 workspace. There is a [skill describing what it would compute](../.yidam/skills/deduction.md) —
@@ -217,16 +234,16 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`deflator`](deflator/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 17 |
 | [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 370 |
 | [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 35 |
-| [`figures`](figures/) | The figures the corpus quotes, computed from the crates that own them | 19 |
+| [`figures`](figures/) | The figures the corpus quotes, computed from the crates that own them | 24 |
 | [`foundation`](foundation/) | Fair School Funding Plan base cost build-up, per R.C. 3317.011 | 58 |
 | [`local-capacity`](local-capacity/) | Fair School Funding Plan local capacity and state share, per R.C. 3317.017 | 27 |
 | [`millage`](millage/) | Effective operating millage under H.B. 920 reduction factors, and 20-mill floor status | 19 |
-| [`project`](project/) | Forward projection of funding inputs, and policy simulation over them | 819 |
+| [`project`](project/) | Forward projection of funding inputs, and policy simulation over them | 820 |
 | [`regime-diff`](regime-diff/) | Difference two funding regimes at component level, with the residual the decomposition does not explain | 51 |
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 37 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 79 |
 
-13 crates, 1765 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+13 crates, 1771 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status

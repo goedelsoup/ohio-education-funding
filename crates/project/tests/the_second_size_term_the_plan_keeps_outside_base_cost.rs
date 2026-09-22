@@ -83,13 +83,14 @@
 
 mod common;
 
+use dispersion::least_squares;
 use project::panel::categoricals::{
     TA_CAPACITY_MINIMUM_ADM, TA_MEDIAN_WEALTH_PER_PUPIL, TA_MEDIAN_WEIGHTED_WEALTH,
 };
 use project::panel::{panel, DistrictRecord, TargetedAssistance};
 use project::size_terms::{
     anchor_per_pupil, capacity_growth_by_sextile, capacity_tier_per_pupil, capacity_tier_unramped,
-    first_to_third_gap, guaranteed_by_sextile, profile, sextiles, striking_out,
+    first_to_third_gap, guaranteed_by_sextile, index_points, profile, sextiles, striking_out,
     what_the_index_measures, with_a_side_flattened, Change, Side,
 };
 use project::statute;
@@ -242,6 +243,56 @@ fn the_capacity_tiers_index_is_a_measurement_of_enrolment() {
         (total_slope - 1.0).abs() < 0.02,
         "a slope of one is what makes it proportional rather than merely correlated"
     );
+}
+
+/// **The cloud the pair is fitted through is the cloud a chart draws.**
+///
+/// The two panels #442 puts on the targeted assistance node are `index_points` drawn and
+/// `what_the_index_measures` laid over them. That is only an argument if the dots and the line
+/// come out of one filter: a line fitted through 609 districts over a cloud of some other 600
+/// would be a picture of a claim nobody made. So the count is the fits' own `n`, the order is the
+/// panel's, and refitting by hand through the returned points reproduces both slopes exactly.
+#[test]
+fn the_points_the_chart_draws_are_the_points_the_fit_is_over() {
+    let districts = panel();
+    let points = index_points(&districts);
+    let fits = what_the_index_measures(&districts);
+
+    assert_eq!(
+        points.len(),
+        fits.total.n,
+        "one point per fitted observation"
+    );
+    assert_eq!(points.len(), fits.per_pupil.n);
+    assert_eq!(
+        points.iter().map(|p| p.irn.clone()).collect::<Vec<_>>(),
+        districts.iter().map(|d| d.irn.clone()).collect::<Vec<_>>(),
+        "in panel order, and nothing dropped — no district in FY2027 is non-positive on any of \
+         the three columns"
+    );
+
+    let adm: Vec<f64> = points.iter().map(|p| p.adm.ln()).collect();
+    let refit = |outcome: Vec<f64>| {
+        least_squares(std::slice::from_ref(&adm), &outcome)
+            .expect("the same cross-section, refitted")
+            .coefficients[1]
+    };
+    assert_eq!(
+        refit(points.iter().map(|p| p.weighted_wealth.ln()).collect()),
+        fits.total.coefficients[1],
+        "to the bit: the chart cannot draw a line the crate did not fit"
+    );
+    assert_eq!(
+        refit(points.iter().map(|p| p.wealth_per_pupil.ln()).collect()),
+        fits.per_pupil.coefficients[1]
+    );
+
+    // Every district carries a name a tooltip can say, and every value is one a log axis can
+    // place. A zero here would be a dot at negative infinity rather than a dot at the bottom.
+    for point in &points {
+        assert!(!point.name.is_empty(), "{} has no name", point.irn);
+        assert!(point.adm > 0.0 && point.weighted_wealth > 0.0 && point.wealth_per_pupil > 0.0);
+    }
 }
 
 /// **What the tier is worth, and how far up the size distribution it reaches.**

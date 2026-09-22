@@ -33,6 +33,7 @@ import type {
   Bin,
   DistributionValue,
   FanPoint,
+  Fit,
   Range,
   ScatterPoint,
   SeriesPoint,
@@ -295,6 +296,23 @@ export const WIDTHS = {
   /** What every chart in this file was drawn at before there were two, and still is. */
   wide: 640,
 } as const;
+
+/** The interval between two panels of a small multiple: `--space-6`, 1.1rem, at the 16px root. */
+const PANEL_GAP = 18;
+
+/**
+ * The width one panel of an `n`-panel small multiple is drawn at.
+ *
+ * A panel is laid out against its sibling rather than against the page: two of them share the
+ * wide frame, so each is a little under half of it, and on a phone they stack and each is the
+ * narrow frame. Both of those are near enough {@link WIDTHS.narrow} that a panel is drawn **once**
+ * rather than at two widths — which is the reason this is a function and not a call to
+ * `renderToString`. The cloud these draw is 609 dots; a second copy for a layout it is never shown
+ * in would be the largest dead mark in the built HTML.
+ */
+export function panelWidth(panels: number): number {
+  return Math.floor((WIDTHS.wide - PANEL_GAP * (panels - 1)) / panels);
+}
 
 /**
  * A chart, as a function of the width it is drawn at.
@@ -672,6 +690,19 @@ export const DOT = {
  * scales stated where a line chart can get away with the ends, so both ends of both axes are
  * labelled and the exact pair for any one district is in its tooltip.
  */
+/**
+ * The two numbers a fitted panel prints, and the only two it does.
+ *
+ * Four places, because that is where the corpus writes them and where `crates/figures.json` pins
+ * them — a reader taking `0.9855` off the picture is taking the figure, not a rounding of it. The
+ * typographic minus rather than the hyphen, as the rest of the site's numerals use, and no plus:
+ * a positive slope is the unmarked case and the line already says which way it goes.
+ */
+function printedFit(fit: Fit): string {
+  const slope = `${fit.slope < 0 ? "\u2212" : ""}${Math.abs(fit.slope).toFixed(4)}`;
+  return `slope ${slope} \u00b7 r\u00b2 ${fit.rSquared.toFixed(4)}`;
+}
+
 export function scatterSpec(
   points: ScatterPoint[],
   axes: {
@@ -730,6 +761,30 @@ export function scatterSpec(
     xDomain?: [number, number];
     /** As `xDomain`, for the vertical axis. */
     yDomain?: [number, number];
+    /**
+     * Draw a line the crates fitted, and print its slope and r-squared.
+     *
+     * The second reference line this form draws, and the note on `identity` above is the argument
+     * for why there is not a third: an arbitrary line through a cloud is a claim, and the claims
+     * on this site are computed in `crates/` with a checkpoint behind them. This one is. The
+     * segment arrives in the data's own units from `crates/series.json`, its two numbers are
+     * ordinary pinned figures the corpus node quotes, and nothing here fits anything — see
+     * {@link Fit}.
+     *
+     * Both domains must be supplied, and this **throws** when they are not. A fitted line is an
+     * angle, and an angle is a statement only if the frame is the one the slope was computed in:
+     * a y axis fitted to its own points redraws a slope of one at whatever angle the data's range
+     * happens to give, which was measured at 1.296 on the first version of the pair this was
+     * written for. The frame is the crate's, and the plot area is squared for the same reason
+     * `identity` squares it, so that the units per pixel are equal on the two axes.
+     *
+     * The slope and the r-squared are the only quantities printed *on* the cloud, which is the
+     * scatter's form of the endpoint rule the bars have: what a reader can take off a chart has to
+     * be a number the prose states and a figure pins. The four corner numbers are the frame rather
+     * than the finding — they say where the cloud sits, and a reader who quotes one has quoted an
+     * axis end.
+     */
+    fit?: Fit;
   },
 ): Spec | null {
   // Two points are not a cloud. Same rule as the line forms, for the same reason: a scatter of
@@ -745,6 +800,13 @@ export function scatterSpec(
   const xHi = options.xDomain?.[1] ?? Math.max(...xs);
   const yLo = options.yDomain?.[0] ?? Math.min(...ys);
   const yHi = options.yDomain?.[1] ?? Math.max(...ys);
+  if (options.fit && (options.xDomain == null || options.yDomain == null)) {
+    throw new Error(
+      `A fitted line was given without both domains. The line was fitted in a frame the crate ` +
+        `computed and drawing it in a frame fitted to these points would redraw its slope; pass ` +
+        `the manifest's own x and y bounds. See the note on scatterSpec's fit option.`,
+    );
+  }
   const both = options.identity != null;
   const xMin = both ? Math.min(xLo, yLo) : xLo;
   const xMax = both ? Math.max(xHi, yHi) : xHi;
@@ -832,12 +894,18 @@ export function scatterSpec(
   const marginBottom = 40 + foot.extraBottom;
 
   /*
-   * Square where the identity line is drawn, so that y = x is drawn at 45°. Everywhere else the
-   * caller's height, or a default that suits a wide cloud.
+   * Square where a reference line's *angle* is the claim — `identity`, so that y = x is drawn at
+   * 45°, and `fit`, so that a slope of one is. Everywhere else the caller's height, or a default
+   * that suits a wide cloud.
+   *
+   * The two get there differently and end in the same place. `identity` puts both axes on one
+   * domain here; `fit` is handed two domains the crate has already given the same span, and a
+   * square plot area is then what makes a unit of the outcome as long as a unit of the predictor.
    */
-  const height = options.identity
-    ? width - marginLeft - marginRight + marginTop + marginBottom
-    : (options.height ?? 420);
+  const height =
+    options.identity || options.fit
+      ? width - marginLeft - marginRight + marginTop + marginBottom
+      : (options.height ?? 420);
   return {
     options: {
       width,
@@ -886,6 +954,22 @@ export function scatterSpec(
                 ],
                 { x: "x", y: "y", stroke: INK.rule, strokeWidth: 1.5, className: "scatter-identity" },
               ),
+            ]
+          : []),
+
+        // The fitted line, drawn where the identity line is drawn and for the same reason: it is
+        // what the cloud is read against rather than a mark in it. Neutral, and asserting no
+        // polarity — the polarity is the slope printed beside it.
+        ...(options.fit
+          ? [
+              Plot.line([options.fit.from, options.fit.to], {
+                x: "x",
+                y: "y",
+                stroke: INK.rule,
+                strokeWidth: 1.5,
+                className: "scatter-fit",
+                clip: true,
+              }),
             ]
           : []),
 
@@ -973,6 +1057,28 @@ export function scatterSpec(
                 }),
               ]),
         ]),
+
+        /*
+         * The two numbers, in the one corner of a fitted panel that is empty in both of them.
+         *
+         * Bottom-right: a cloud whose slope is one leaves the corner under its own diagonal
+         * clear, and a cloud with no slope sits in a band across the middle and leaves the floor
+         * clear. Top-right is empty in the second and is exactly where the first one's line ends.
+         */
+        ...(options.fit
+          ? [
+              Plot.text([0], {
+                frameAnchor: "bottom-right",
+                dx: -6,
+                dy: -6,
+                text: () => printedFit(options.fit!),
+                textAnchor: "end",
+                fill: INK.muted,
+                fontSize: 11,
+                className: "scatter-fit-label",
+              }),
+            ]
+          : []),
 
         ...(options.identity
           ? [

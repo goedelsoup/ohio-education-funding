@@ -734,6 +734,21 @@ binds in `figures:`, so the two numbers a reader takes off the chart are numbers
 and the figure gate checks. The first is the four correlations by business property class on the
 Toledo node, which is #416's cancellation drawn as bars on both sides of zero. See #441.
 
+A binding names a key and not a shape, and the manifest answers with a column or with a **cloud**:
+six hundred districts drawn as themselves, under one squared panel per outcome over a shared
+predictor. A cloud's version of the endpoint rule is its **fit** — each panel prints the slope and
+the r-squared of the line the crate fitted through it, and the node must bind both figures — for
+the same reason and to the same end: those two are the only numbers a reader can take off the
+picture. Everything else on a panel is the frame.
+
+The line is the one exception to `chart.ts`'s rule that this layer never draws a fitted model, and
+it is the exception that note already wrote: "a regression line is a claim about a model and would
+belong in `crates/` with a checkpoint behind it". It does. It arrives as two endpoints in the
+data's own units, and the panel's frame arrives with it, because `scatterSpec` refuses a fit
+without both domains — a y axis fitted to its own points redraws the slope, which is the claim.
+The first cloud is #442's pair on the targeted assistance node: total weighted wealth on enrolment
+lies on the diagonal, weighted wealth per pupil on the same predictor lies flat.
+
 ### Three corpus defects this surfaced
 
 Building the wiki required parsing all 62 nodes, which nothing had done before. Three were not
