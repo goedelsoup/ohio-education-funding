@@ -237,9 +237,16 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * that the residual half of this shape "is not size" — is the claim this work overturns. It gains
  * prose and no binding, because what changed is a conclusion rather than a figure. A ratchet that
  * counts bindings cannot see a wrong sentence, which is the standing limitation of it.
+ *
+ * Recomputed at **898/78** when every bound in the modelled formula was censused for #410. Eight
+ * bindings, no new carrier: five on the regime node, which had bound one figure before, and three
+ * on the clawback node, one of them a second phrase against a key it already bound. The figure the
+ * census exists for is a count of zero — reachable bounds reached by nobody — and a zero cannot be
+ * bound, so the claim that matters most here is the one the ratchet cannot see; the crate test
+ * asserts it instead.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "890 bindings; raise this when you add one").toBeGreaterThanOrEqual(890);
+  expect(bindings.length, "898 bindings; raise this when you add one").toBeGreaterThanOrEqual(898);
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
     "78 nodes carry bindings; raise this when a seventy-ninth does",
