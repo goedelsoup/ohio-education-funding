@@ -617,6 +617,7 @@ function fixture(): { node: Node; manifest: Manifest } {
         as_written: "65 of 606 districts",
       },
     ],
+    series: [],
     out: [],
     in: [],
   };

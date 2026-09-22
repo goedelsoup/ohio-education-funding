@@ -191,6 +191,14 @@ export interface Node {
    * `schema/corpus.ts` for why an entry carries both a value and a phrase.
    */
   figures: BoundFigure[];
+  /**
+   * Columns from `crates/series.json` this node draws as charts, and the field each is drawn under.
+   *
+   * Checked against the series manifest, and against this node's own `figures`, by
+   * `tests/unit/corpusSeries.spec.ts`: the figures at a series' ends must be bound here as
+   * ordinary figures, so a chart never shows a number the prose has not stated.
+   */
+  series: BoundSeries[];
   /** Edges this node declares plus the ones it only mentions. */
   out: Edge[];
   /** Populated after every node is read. */
@@ -497,6 +505,7 @@ function readNode(className: string, file: string, report: Diagnostic[]): Node {
   const revisions = readRevisions(parsed.revisions);
   const unfilled = readUnfilled(parsed.unfilled);
   const figures = readFigures(parsed.figures);
+  const series = readSeries(parsed.series);
   const rawLinks = parsed.links;
 
   report.push(...lintProse(relative, summary, description));
@@ -573,9 +582,36 @@ function readNode(className: string, file: string, report: Diagnostic[]): Node {
     revisions,
     unfilled,
     figures,
+    series,
     out: [...stated, ...inline],
     in: [],
   };
+}
+
+/** One column in `crates/series.json` this node draws, and the field it is drawn under. */
+export interface BoundSeries {
+  /** The `crates/series.json` key. */
+  key: string;
+  /** Which prose field the chart follows — `description`, `findings`, or a property name. */
+  field: string;
+}
+
+/**
+ * The `series:` block, read the same defensive way `figures:` is: an entry missing either of its
+ * two strings is dropped, and the schema is what rejects it at build time.
+ */
+function readSeries(raw: unknown): BoundSeries[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.flatMap((entry) => {
+    if (typeof entry !== "object" || entry === null) return [];
+    const record = entry as Record<string, unknown>;
+    const text = (key: string): string =>
+      typeof record[key] === "string" ? (record[key] as string).trim() : "";
+    const key = text("key");
+    const field = text("field");
+    if (key === "" || field === "") return [];
+    return [{ key, field }];
+  });
 }
 
 /** One number in this node's prose, bound to the crate that computes it. */

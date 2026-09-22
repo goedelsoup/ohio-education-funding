@@ -182,6 +182,29 @@ export const FigureSchema = z
   })
   .strict();
 
+/**
+ * One column in `crates/series.json` this node draws as a chart, and the field it draws it under.
+ *
+ * No value and no phrase, because a series is not quoted: it is rendered, at the end of the named
+ * field, from the manifest directly. What holds it to the prose is the **endpoint rule** —
+ * `tests/unit/corpusSeries.spec.ts` requires the node to bind the figures at the series' largest
+ * and smallest rows as ordinary {@link FigureSchema} entries, so the numbers a reader would take
+ * off the chart are the numbers the prose already states and the crate already pins.
+ */
+export const SeriesBindingSchema = z
+  .object({
+    /** The series manifest key, `<crate-directory>/<what-it-is>`. */
+    key: z
+      .string()
+      .regex(
+        /^[a-z0-9-]+\/[a-z0-9-]+$/,
+        "a series key is `<crate-directory>/<what-it-is>`, lower-case kebab",
+      ),
+    /** Which prose field the chart is drawn under — `description`, `findings`, or a property. */
+    field: z.string().min(1, "a series names the field it is drawn under"),
+  })
+  .strict();
+
 /** What a `summary` may not be longer than, in words. See {@link NodeSchema}. */
 export const SUMMARY_MAX_WORDS = 50;
 
@@ -255,6 +278,7 @@ export const NodeSchema = z
     revisions: z.array(RevisionSchema).optional(),
     unfilled: z.array(UnfilledSchema).optional(),
     figures: z.array(FigureSchema).optional(),
+    series: z.array(SeriesBindingSchema).optional(),
   })
   .strict();
 
