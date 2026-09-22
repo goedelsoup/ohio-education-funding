@@ -138,8 +138,8 @@ pub fn cluster(panel: &[DistrictRecord]) -> Vec<&DistrictRecord> {
     guarantee_origin::above_the_minimum(panel)
         .into_iter()
         .filter(|record| {
-            guarantee_origin::decompose(record, &index)
-                .is_some_and(|d| d.origin() == Origin::EnrollmentLoss)
+            guarantee_origin::decompose(record, &index).and_then(|d| d.origin())
+                == Some(Origin::EnrollmentLoss)
         })
         .collect()
 }

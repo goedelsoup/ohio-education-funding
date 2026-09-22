@@ -78,6 +78,7 @@ pub mod indexation;
 pub mod joint_vocational;
 pub mod ledger;
 pub mod legislative_district;
+pub mod lost_pupils;
 pub mod margin;
 pub mod outcomes;
 pub mod panel;

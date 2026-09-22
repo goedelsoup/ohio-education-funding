@@ -26,7 +26,7 @@ fn of(rows: &[DistrictRecord], origin: Origin) -> Vec<&DistrictRecord> {
     let index = guarantee_origin::enrollment_index(rows);
     guarantee_origin::above_the_minimum(rows)
         .into_iter()
-        .filter(|r| guarantee_origin::decompose(r, &index).is_some_and(|d| d.origin() == origin))
+        .filter(|r| guarantee_origin::decompose(r, &index).and_then(|d| d.origin()) == Some(origin))
         .collect()
 }
 

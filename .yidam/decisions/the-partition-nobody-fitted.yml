@@ -1,0 +1,114 @@
+id: the-partition-nobody-fitted
+summary: >-
+  No fitted partition of Ohio's districts is a reasoning tool of this corpus. The multivariate
+  clustering #396 asked about was run once, against known answers first, and it holds a majority
+  of the enrollment cluster in no cell at any size; what it recovers, the identity from
+  `guarantee_origin` had already placed on a wealth axis. The estimator stays in the workspace so
+  that negative result can be re-computed, and no claim rests on its output.
+context: |
+  The framing this arc started from asked for clusters of similarly profiled districts on
+  numerous independent variables, as a way of finding the formula's blind spots. What was built
+  at #381 instead was an identity plus a majority: a guaranteed district's multiple over formula
+  aid factors exactly into an enrollment term and a per-pupil term, and the 187 the minimum state
+  share does not explain split on which term carries the majority. No estimator, no feature
+  scaling, no seed. The partition beat the department's typology and survived the one measurement
+  choice it is sensitive to.
+
+  [#396](https://github.com/goedelsoup/ohio-education-funding/issues/396) recorded what that
+  left undone, so that the omission would be deliberate rather than forgotten: the multivariate
+  version across all 609 districts, unconditioned on guarantee membership. Its case was real.
+  Every partition in the arc — the 107, the 187, the two clusters, the sextile shape, the
+  incidence cuts — starts from the guarantee, and a blind spot that does not put a district on
+  the floor would be invisible to all of them. Its case against was that the guarantee's 294 had
+  since been partitioned into three mechanically defined populations with opposite policy
+  responses, and that the thing a clustering run would have found might already be found, by
+  methods a fitted partition could not match for interpretability. Neither case had been
+  measured, and "not worth building" with nothing measured is a finding scoped to where it
+  looked.
+
+  Two things could be measured without deciding in advance. The identity does not need the
+  guarantee: `[H2] − [I1]` is published for 608 districts, so the same two terms exist for every
+  district, below a multiple of one where the formula pays more than the FY2020 base. And a
+  fitted partition can be run once, on variables that are not formula outputs, and scored
+  against the populations the arc already names — not to reason from it, but to see whether it
+  finds anything the identity does not.
+decision: |
+  **Extend the identity to every district, run the fitted partition once, and reason only from
+  the first.**
+
+  [`crates/project/src/lost_pupils.rs`](../../crates/project/src/lost_pupils.rs) carries both.
+  The identity reaches 607 of 609 and agrees with the 187's split on all 293 guaranteed
+  districts both reach. Among the 514 districts with fewer pupils than in FY2020, the guarantee
+  holds 15 of the least-wealthy fifth and 81 of the wealthiest, the per-pupil term crosses zero
+  between the third and fourth fifths, and the enrollment cluster is the third fifth: not the
+  shrinking districts, but the shrinking districts at the wealth where the plan's per-pupil raise
+  ran out. Sixty-four formula districts lost pupils at the cluster's own rate and are poorer than
+  it; the plan's per-pupil raise carried them over the floor. That is the blind spot outside the
+  guarantee, and it is the cluster's own, at a wealth where a different line pays for it.
+
+  [`crates/dispersion/src/partition.rs`](../../crates/dispersion/src/partition.rs) is the
+  estimator: Lloyd's algorithm from farthest-first seeds, no random number anywhere, no
+  crates.io dependency, and known-answer tests — three separated blobs recovered exactly, a
+  six-point line yielding the centres and inertia arithmetic gives — before it was pointed at
+  Ohio. On six standardized profile variables, at every `k` from 2 to 9 and started from the
+  department's typology's own centres, the most any run labels right on the enrollment cluster
+  against the rest is 519 of 607, where a single cell scores 518. A cluster member's nearest
+  neighbour on the six variables is a member 31 of 89 times, so the cluster is a region of the
+  profile — a thin one that no cell of any partition tried holds a majority of. What the fit does
+  find is guarantee membership, weakly: a nine-cell k-means describes it 48 districts better
+  than the 2013 typology, and neither reaches three quarters. That is the wealth gradient,
+  rediscovered without the axis that explains it.
+
+  **What follows for the corpus.** Every claim written from this work is a count or a median on
+  a cut the reader can reproduce against the calculator with a sort — the identity, wealth
+  fifths, a threshold that is the cluster's own median. The ceilings the fit reached are bound as
+  figures so the negative result is re-computed by the gate rather than remembered, and the
+  estimator stays in the workspace for that reason alone. No corpus claim reasons from a cell it
+  produced, and none will: a cluster is not a mechanism, and this repository has a rule that a
+  partition reported has to come with a statement of what the formula fails to measure for it.
+  The identity supplies that statement and a fit cannot.
+consequences: |
+  **The workspace has a clustering estimator, and the sentence "no clustering machinery" is
+  retired.** `guarantee_origin`'s note that no estimator was added stands for the 187 and now
+  points here. `Decomposition::origin` became fallible — `None` below a multiple of one, where
+  there is no majority to take — so that the identity could reach formula districts without
+  silently assigning them a side.
+
+  **The blind spot the arc named has a size and an axis.** The enrollment cluster's 89 and its 64
+  siblings are 153 districts shrinking at 11.9% or more since FY2020, and which of them the floor
+  holds is decided by wealth: the third fifth on the floor, the poorer fifths lifted over it by
+  the per-pupil raise. A response to decline designed for the cluster alone reaches the middle of
+  a gradient and not its bottom, which is the finding
+  [temporary-transitional-aid-guarantee](../corpus/formula-component/temporary-transitional-aid-guarantee.yml)
+  now states beside the incidence of every alternative anchor.
+
+  **The 2013 typology has a second baseline beside it.** It scores 384 of 607 on guarantee
+  membership; a nine-cell fit on six current variables scores 432. Neither is a partition the
+  corpus reasons from, and the comparison is recorded so that "beats the typology" has a number
+  on both sides.
+
+  **What was not built.** No decision tree, which the issue named as likelier defensible than a
+  k-means. The mechanism partition — pupils lost, cut by wealth — is the explicit partition the
+  issue asked for in its place, and a tree fitted to membership would have had to rediscover the
+  same two axes with an extra layer of choices between the data and the claim.
+alternatives: |
+  **Close the issue as not worth building, with the existing partitions listed.** The issue named
+  this as a legitimate outcome. Rejected because it would have been a finding scoped to where it
+  looked: the case for the run was that every existing partition is conditioned on the guarantee,
+  and no list of them answers that. Measuring cost a module and a day.
+
+  **Build the clustering as the partition, and report its cells.** Rejected on the issue's own
+  terms — a cluster is not a mechanism — and then on the result: the cells do not hold the
+  population the arc cares about, and the one thing they describe is explained by an axis the
+  identity supplies for free. A partition reported from them would have been a description of
+  wealth with the word "cluster" on it.
+
+  **A decision tree fitted to guarantee membership.** Not built. It would be interpretable, which
+  is why the issue preferred it, but membership is `floor > formula`, and a tree on profile
+  variables would be fitting a rule the identity states exactly. The explicit mechanism partition
+  is the tree with the splits chosen by the formula rather than by an impurity criterion.
+
+  **Seed the k-means randomly, with a fixed seed.** Rejected because a stated seed is still a
+  choice between the data and the claim. Farthest-first seeding is deterministic and has a known
+  weakness — it starts at the extremes, and Kelleys Island is a cell to itself at every `k` — so
+  the run is repeated from the typology's own centres, and both are reported.

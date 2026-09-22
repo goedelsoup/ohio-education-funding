@@ -338,6 +338,83 @@ pub struct Inputs {
     /// in prose from a walk nobody re-runs is the #120 shape twice over: it is a delta, and the
     /// measure it is taken on has already widened once under a bound level.
     pub reach: Reach,
+    /// The two terms for every district, the wealth gradient among the ones that lost pupils, and
+    /// what a fitted partition recovers — [`project::lost_pupils`], for #396.
+    ///
+    /// Here because `formula-component/temporary-transitional-aid-guarantee` states the gradient
+    /// and the siblings' distance from the floor, and because the fitted partition's ceilings are
+    /// the evidence for a decision record: a negative result quoted from a run nobody re-runs is
+    /// a number that cannot go stale and cannot be checked either.
+    pub lost_pupils: LostPupils,
+}
+
+/// What `project::lost_pupils` establishes, computed once over the 607 districts the identity
+/// reaches.
+pub struct LostPupils {
+    /// Formula districts the identity reaches.
+    pub formula: usize,
+    /// Of them, the ones with fewer pupils than in FY2020.
+    pub formula_that_lost_pupils: usize,
+    /// Of them, the ones the FY2027 formula pays more per pupil than the FY2020 regime did.
+    pub formula_paid_more_per_pupil: usize,
+    /// Every district that lost pupils, held or not, cut into fifths by capacity per pupil.
+    pub lost_by_capacity: [project::lost_pupils::Fifth; 5],
+    /// Every district that did not, the same cut.
+    pub grew_by_capacity: [project::lost_pupils::Fifth; 5],
+    /// The enrollment cluster, described on the axes the siblings are compared on.
+    pub cluster: project::lost_pupils::Profile,
+    /// The formula districts that lost pupils at the cluster's median rate or faster.
+    pub siblings: project::lost_pupils::Siblings,
+    /// How many of the siblings the enacted anchor holds by FY2032, at the shipped damping.
+    pub siblings_held_fy2032: usize,
+    /// How many formula districts it holds by then — the 18 that make the corpus's 312.
+    pub formula_held_fy2032: usize,
+    /// The fitted partition at every `k` from 2 to 9, from farthest-first seeds.
+    pub fitted: Vec<project::lost_pupils::Fitted>,
+    /// The typology scored as a partition.
+    pub typology: project::lost_pupils::Ceilings,
+    /// The fitted partition started from the typology's own centres.
+    pub seeded: project::lost_pupils::Fitted,
+    /// The nearest-neighbour question, nothing fitted.
+    pub neighbours: project::lost_pupils::Neighbours,
+}
+
+impl LostPupils {
+    /// The most any of the fitted partitions scored on the cluster against the rest.
+    #[must_use]
+    pub fn best_cluster_ceiling(&self) -> usize {
+        self.fitted
+            .iter()
+            .map(|f| f.ceilings.cluster)
+            .chain(std::iter::once(self.seeded.ceilings.cluster))
+            .max()
+            .unwrap_or(0)
+    }
+
+    /// What one cell scores on the cluster: everyone who is not in it.
+    #[must_use]
+    pub fn trivial_cluster_ceiling(&self) -> usize {
+        self.typology.districts - self.typology.cluster_members
+    }
+
+    /// The fitted partition at `k`.
+    ///
+    /// # Panics
+    ///
+    /// If `k` was not run.
+    #[must_use]
+    pub fn at(&self, k: usize) -> &project::lost_pupils::Fitted {
+        self.fitted
+            .iter()
+            .find(|f| f.k == k)
+            .unwrap_or_else(|| panic!("k = {k} was run"))
+    }
+
+    /// One fifth of the districts that lost pupils, 1 the least wealthy.
+    #[must_use]
+    pub fn lost_fifth(&self, rank: usize) -> &project::lost_pupils::Fifth {
+        &self.lost_by_capacity[rank - 1]
+    }
 }
 
 /// `rolling_anchor`'s runs, computed once because each walks all 609 districts for five years.
@@ -743,7 +820,7 @@ impl Inputs {
         ordered.sort_by(|a, b| a.0.cmp(b.0));
         let actual_total = ordered.iter().map(|(_, r)| r.actual).sum();
         let recognized_total = ordered.iter().map(|(_, r)| r.recognized).sum();
-        let (anchors, reach) = {
+        let (anchors, reach, fy2032_enacted) = {
             use project::anchor_incidence::{self, Supplement};
             use project::decline_adjustment::Line;
             use project::rolling_anchor::{self, Anchor, Observed};
@@ -828,7 +905,45 @@ impl Inputs {
                     mirror_beside: under(Supplement::Mirror(Line::Beside)),
                     cluster,
                 },
+                fy2032_enacted,
             )
+        };
+        let lost_pupils = {
+            use project::lost_pupils::{self, Population};
+            let (rows, _) = lost_pupils::standings(&panel_for_forecasts);
+            let formula: Vec<&lost_pupils::Standing> = rows
+                .iter()
+                .filter(|s| s.population == Population::Formula)
+                .collect();
+            let siblings = lost_pupils::siblings(&rows);
+            let held_by_fy2032 = |set: &[&lost_pupils::Standing]| {
+                set.iter()
+                    .filter(|s| fy2032_enacted.get(&s.irn).is_some_and(|w| w.on_the_floor()))
+                    .count()
+            };
+            LostPupils {
+                formula: formula.len(),
+                formula_that_lost_pupils: formula.iter().filter(|s| s.lost_pupils()).count(),
+                formula_paid_more_per_pupil: formula
+                    .iter()
+                    .filter(|s| s.terms.per_pupil_term < 0.0)
+                    .count(),
+                lost_by_capacity: lost_pupils::by_capacity(&lost_pupils::who(&rows, true)),
+                grew_by_capacity: lost_pupils::by_capacity(&lost_pupils::who(&rows, false)),
+                cluster: lost_pupils::profile(
+                    &rows
+                        .iter()
+                        .filter(|s| s.population == Population::EnrollmentLoss)
+                        .collect::<Vec<_>>(),
+                ),
+                siblings_held_fy2032: held_by_fy2032(&siblings),
+                formula_held_fy2032: held_by_fy2032(&formula),
+                siblings: lost_pupils::siblings_headroom(&panel_for_forecasts, &siblings),
+                fitted: (2..=9).map(|k| lost_pupils::fitted(&rows, k)).collect(),
+                typology: lost_pupils::typology_ceilings(&rows),
+                seeded: lost_pupils::fitted_from_typology(&rows),
+                neighbours: lost_pupils::neighbours(&rows),
+            }
         };
         Self {
             panel,
@@ -1131,6 +1246,7 @@ impl Inputs {
             },
             anchors,
             reach,
+            lost_pupils,
         }
     }
 }
@@ -11602,6 +11718,392 @@ pub static FIGURES: &[Figure] = &[
                 .filter(|r| project::bounds::Bound::WealthTierZero.binds(r))
                 .count() as f64
         },
+    },
+    // #396: the partition that did not need fitting. `project::lost_pupils` extends the identity
+    // to every district and runs a k-means once to show what it recovers. What the corpus
+    // quotes from it is a wealth gradient among the districts that lost pupils, the cluster's
+    // siblings outside the guarantee, and the ceilings the fit reached — the last so that a
+    // negative result rests on a number a gate re-computes rather than on a sentence.
+    Figure {
+        key: "project/formula-districts-that-lost-pupils",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of the 314 formula districts the identity reaches, how many have fewer pupils \
+                than in FY2020",
+        pinned: 252.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.formula_that_lost_pupils as f64,
+    },
+    Figure {
+        key: "project/formula-districts-paid-more-per-pupil-than-fy2020",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of the 314, how many the FY2027 formula pays more per pupil than the FY2020 \
+                regime did -- the four exceptions all grew",
+        pinned: 310.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.formula_paid_more_per_pupil as f64,
+    },
+    Figure {
+        key: "project/districts-that-lost-pupils-since-fy2020",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts with fewer pupils than in FY2020, held or not, of the 607 the identity \
+                reaches",
+        pinned: 514.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.lost_by_capacity.iter().map(|f| f.districts).sum::<usize>() as f64,
+    },
+    Figure {
+        key: "project/lost-pupils-least-wealthy-fifth-held",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of the 102 least-wealthy districts that lost pupils, how many the FY2027 \
+                guarantee holds",
+        pinned: 15.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.lost_fifth(1).held as f64,
+    },
+    Figure {
+        key: "project/lost-pupils-second-fifth-held",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "The second fifth by capacity per pupil, of 102",
+        pinned: 26.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.lost_fifth(2).held as f64,
+    },
+    Figure {
+        key: "project/lost-pupils-third-fifth-held",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "The third fifth, of 102 -- where the per-pupil term crosses zero",
+        pinned: 56.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.lost_fifth(3).held as f64,
+    },
+    Figure {
+        key: "project/lost-pupils-fourth-fifth-held",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "The fourth fifth, of 102",
+        pinned: 84.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.lost_fifth(4).held as f64,
+    },
+    Figure {
+        key: "project/lost-pupils-wealthiest-fifth-held",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of the 106 wealthiest districts that lost pupils, how many the guarantee holds",
+        pinned: 81.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.lost_fifth(5).held as f64,
+    },
+    Figure {
+        key: "project/enrollment-cluster-in-the-third-fifth-of-those-that-lost-pupils",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "How many of the enrollment cluster's 89 sit in the third wealth fifth of the \
+                districts that lost pupils",
+        pinned: 40.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.lost_pupils.lost_fifth(3).by_population
+                [project::lost_pupils::Population::EnrollmentLoss.index()] as f64
+        },
+    },
+    Figure {
+        key: "project/capacity-cluster-in-the-fourth-fifth-of-those-that-lost-pupils",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "How many of the capacity cluster's 98 sit in the fourth wealth fifth of the \
+                districts that lost pupils",
+        pinned: 67.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.lost_pupils.lost_fifth(4).by_population
+                [project::lost_pupils::Population::CapacityGrowth.index()] as f64
+        },
+    },
+    Figure {
+        key: "project/minimum-share-in-the-wealthiest-fifth-of-those-that-lost-pupils",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "How many of the 106 minimum-share districts the identity reaches sit in the \
+                wealthiest fifth of the districts that lost pupils",
+        pinned: 75.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.lost_pupils.lost_fifth(5).by_population
+                [project::lost_pupils::Population::MinimumShare.index()] as f64
+        },
+    },
+    Figure {
+        key: "project/per-pupil-term-least-wealthy-fifth-of-those-that-lost-pupils-negative",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The median per-pupil term in the least-wealthy fifth of the districts that lost \
+                pupils: the FY2027 formula pays a quarter more per pupil than the FY2020 regime. \
+                Negative; pinned as a magnitude",
+        pinned: 0.274,
+        tolerance: 0.0005,
+        compute: |i| i.lost_pupils.lost_fifth(1).median_per_pupil_term.abs(),
+    },
+    Figure {
+        key: "project/per-pupil-term-third-fifth-of-those-that-lost-pupils-negative",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The same in the third fifth, where it is nearly zero. Negative; pinned as a \
+                magnitude",
+        pinned: 0.074,
+        tolerance: 0.0005,
+        compute: |i| i.lost_pupils.lost_fifth(3).median_per_pupil_term.abs(),
+    },
+    Figure {
+        key: "project/per-pupil-term-fourth-fifth-of-those-that-lost-pupils",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The same in the fourth fifth, where it has crossed: capacity outran a frozen \
+                cost side",
+        pinned: 0.344,
+        tolerance: 0.0005,
+        compute: |i| i.lost_pupils.lost_fifth(4).median_per_pupil_term,
+    },
+    Figure {
+        key: "project/per-pupil-term-wealthiest-fifth-of-those-that-lost-pupils",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The same in the wealthiest fifth",
+        pinned: 0.572,
+        tolerance: 0.0005,
+        compute: |i| i.lost_pupils.lost_fifth(5).median_per_pupil_term,
+    },
+    Figure {
+        key: "project/grew-wealthiest-fifth-held",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of the 21 wealthiest districts that did NOT lose pupils, how many the guarantee \
+                holds -- against none of the 18 least wealthy",
+        pinned: 14.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.grew_by_capacity[4].held as f64,
+    },
+    Figure {
+        key: "project/enrollment-clusters-siblings",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Formula districts that lost pupils at the enrollment cluster's median rate or \
+                faster -- 11.9% since FY2020 -- and are not on the guarantee",
+        pinned: 64.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.siblings.profile.districts as f64,
+    },
+    Figure {
+        key: "project/enrollment-clusters-siblings-adm",
+        owner: "crates/project",
+        unit: Unit::Pupils,
+        label: "Their current-year enrolled ADM",
+        pinned: 81_391.98,
+        tolerance: 0.005,
+        compute: |i| i.lost_pupils.siblings.profile.adm,
+    },
+    Figure {
+        key: "project/enrollment-cluster-median-disadvantaged",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The enrollment cluster's median economically disadvantaged share, on the \
+                profile report's measure",
+        pinned: 0.5215,
+        tolerance: 0.00005,
+        compute: |i| i.lost_pupils.cluster.median_disadvantaged,
+    },
+    Figure {
+        key: "project/enrollment-clusters-siblings-median-disadvantaged",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The siblings' median economically disadvantaged share, on the same measure -- \
+                poorer than the cluster",
+        pinned: 0.5817,
+        tolerance: 0.00005,
+        compute: |i| i.lost_pupils.siblings.profile.median_disadvantaged,
+    },
+    Figure {
+        key: "project/enrollment-clusters-siblings-median-capacity-per-pupil",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The siblings' median published local capacity per pupil, against the cluster's \
+                $5,184",
+        pinned: 4235.15,
+        tolerance: 0.005,
+        compute: |i| i.lost_pupils.siblings.profile.median_capacity,
+    },
+    Figure {
+        key: "project/enrollment-clusters-siblings-median-state-share",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The siblings' median state share of base cost, against the cluster's 39.6%",
+        pinned: 0.497,
+        tolerance: 0.0005,
+        compute: |i| i.lost_pupils.siblings.profile.median_state_share,
+    },
+    Figure {
+        key: "project/enrollment-clusters-siblings-median-per-pupil-term-negative",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The siblings' median per-pupil term, against the cluster's -0.043: the plan's \
+                per-pupil raise is what carried them over the floor. Negative; pinned as a \
+                magnitude",
+        pinned: 0.316,
+        tolerance: 0.0005,
+        compute: |i| i.lost_pupils.siblings.profile.median_per_pupil_term.abs(),
+    },
+    Figure {
+        key: "project/enrollment-clusters-siblings-formula-per-pupil",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the FY2027 formula pays the median sibling per current pupil",
+        pinned: 8542.0,
+        tolerance: 0.5,
+        compute: |i| i.lost_pupils.siblings.median_formula_per_pupil,
+    },
+    Figure {
+        key: "project/enrollment-clusters-siblings-base-per-pupil",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The median sibling's FY2020 base per FY2020 pupil",
+        pinned: 5776.0,
+        tolerance: 0.5,
+        compute: |i| i.lost_pupils.siblings.median_base_per_pupil,
+    },
+    Figure {
+        key: "project/enrollment-clusters-siblings-headroom",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The siblings' formula aid over their floors, summed",
+        pinned: 100_805_627.62,
+        tolerance: 0.005,
+        compute: |i| i.lost_pupils.siblings.headroom,
+    },
+    Figure {
+        key: "project/enrollment-clusters-siblings-median-headroom",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The median sibling's formula aid over its floor",
+        pinned: 1_201_355.45,
+        tolerance: 0.005,
+        compute: |i| i.lost_pupils.siblings.median_headroom,
+    },
+    Figure {
+        key: "project/enrollment-clusters-siblings-median-margin-over-floor",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "How far above its floor the median sibling's formula aid sits, as a fraction of \
+                the floor",
+        pinned: 0.1794,
+        tolerance: 0.00005,
+        compute: |i| i.lost_pupils.siblings.median_formula_over_floor - 1.0,
+    },
+    Figure {
+        key: "project/enrollment-clusters-siblings-median-years-to-floor",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "Years until the median sibling reaches its floor at its own FY2024-FY2026 rate, \
+                undamped, over the 62 still falling",
+        pinned: 4.14,
+        tolerance: 0.005,
+        compute: |i| i.lost_pupils.siblings.median_years_to_floor,
+    },
+    Figure {
+        key: "project/enrollment-clusters-siblings-held-by-fy2032",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "How many of the 64 the enacted anchor holds by FY2032 at the shipped damping",
+        pinned: 5.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.siblings_held_fy2032 as f64,
+    },
+    Figure {
+        key: "project/fitted-partition-best-cluster-ceiling",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "The most districts any k-means on six profile variables, at k from 2 to 9 or \
+                seeded from the typology, can label right on the enrollment cluster against the \
+                rest -- one more than the 518 a single cell scores",
+        pinned: 519.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.best_cluster_ceiling() as f64,
+    },
+    Figure {
+        key: "project/one-cell-cluster-ceiling",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "What one cell scores on the cluster: everyone outside it, 607 less 89",
+        pinned: 518.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.trivial_cluster_ceiling() as f64,
+    },
+    Figure {
+        key: "project/fitted-partition-membership-ceiling-at-nine",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "The most a nine-cell k-means on six profile variables can label right on \
+                guarantee membership, of 607",
+        pinned: 432.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.at(9).ceilings.membership as f64,
+    },
+    Figure {
+        key: "project/typology-membership-ceiling",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "The same for the department's 2013 typology, nine categories, of 607",
+        pinned: 384.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.typology.membership as f64,
+    },
+    Figure {
+        key: "project/typology-cluster-ceiling",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "And on the cluster against the rest, where the typology scores exactly what one \
+                cell scores",
+        pinned: 518.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.typology.cluster as f64,
+    },
+    Figure {
+        key: "project/typology-seeded-partition-membership-ceiling",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "A k-means started from the typology's own nine centres, on membership",
+        pinned: 415.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.seeded.ceilings.membership as f64,
+    },
+    Figure {
+        key: "project/enrollment-cluster-nearest-neighbours-in-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of the 89, how many have a nearest neighbour on the six profile variables that \
+                is also in the cluster -- against 89 of 607 by chance",
+        pinned: 31.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.lost_pupils.neighbours.by_population
+                [project::lost_pupils::Population::EnrollmentLoss.index()]
+                .0 as f64
+        },
+    },
+    Figure {
+        key: "project/nearest-neighbours-agreeing-on-membership",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts whose nearest neighbour on the six variables is held if and only if \
+                they are, of 607",
+        pinned: 449.0,
+        tolerance: 0.0,
+        compute: |i| i.lost_pupils.neighbours.membership as f64,
     },
 ];
 

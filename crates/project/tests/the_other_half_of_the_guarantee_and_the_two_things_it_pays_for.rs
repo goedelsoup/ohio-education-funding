@@ -75,7 +75,7 @@ fn of(panel: &[DistrictRecord], origin: Origin) -> Vec<&DistrictRecord> {
     let index = enrollment_index(panel);
     above_the_minimum(panel)
         .into_iter()
-        .filter(|r| decompose(r, &index).map(|s| s.origin()) == Some(origin))
+        .filter(|r| decompose(r, &index).and_then(|s| s.origin()) == Some(origin))
         .collect()
 }
 
@@ -271,7 +271,7 @@ fn sixty_one_districts_are_held_up_by_nothing_but_their_missing_children() {
     // the sign rule agree about the districts that matter most to the argument.
     for record in &bare {
         assert_eq!(
-            decompose(record, &index).map(|s| s.origin()),
+            decompose(record, &index).and_then(|s| s.origin()),
             Some(Origin::EnrollmentLoss),
             "{} has a negative per-pupil term and is not in the enrollment cluster",
             record.irn
@@ -325,7 +325,7 @@ fn the_two_clusters_sit_at_opposite_ends_of_the_state_share_distribution() {
             } else {
                 Origin::CapacityGrowth
             };
-            decompose(r, &index).map(|s| s.origin()) == Some(by_cut)
+            decompose(r, &index).and_then(|s| s.origin()) == Some(by_cut)
         })
         .count();
     assert_eq!(
@@ -474,7 +474,8 @@ fn size_typology_and_the_resident_count_do_not_separate_the_population() {
         let code = assignments
             .get(&record.irn)
             .map_or(u8::MAX, |t| t.typology.code());
-        table.entry(code).or_default()[usize::from(split.origin() == Origin::CapacityGrowth)] += 1;
+        table.entry(code).or_default()
+            [usize::from(split.origin() == Some(Origin::CapacityGrowth))] += 1;
     }
     let ceiling: usize = table.values().map(|counts| counts[0].max(counts[1])).sum();
     assert_eq!(
@@ -566,13 +567,15 @@ fn the_split_moves_eight_districts_on_the_funded_count_and_twenty_nine_on_a_shor
         let moved = population
             .iter()
             .filter(|r| {
-                decompose(r, index).map(|s| s.origin())
-                    != decompose(r, &published).map(|s| s.origin())
+                decompose(r, index).and_then(|s| s.origin())
+                    != decompose(r, &published).and_then(|s| s.origin())
             })
             .count();
         let loss = population
             .iter()
-            .filter(|r| decompose(r, index).map(|s| s.origin()) == Some(Origin::EnrollmentLoss))
+            .filter(|r| {
+                decompose(r, index).and_then(|s| s.origin()) == Some(Origin::EnrollmentLoss)
+            })
             .count();
         (loss, population.len() - loss, moved)
     };

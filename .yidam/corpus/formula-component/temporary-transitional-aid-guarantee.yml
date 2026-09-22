@@ -462,6 +462,84 @@ findings: |
   enough horizon the 1% cap does both. That is the fiscal framing the two pricings used, and it
   survives the cut. [inference]
 
+  ### The partition that did not need fitting
+
+  Every partition above starts from the guarantee, and #396 asked whether a multivariate
+  partition of all 609 districts — clusters of similarly profiled districts on numerous
+  variables, unconditioned on membership — would find a blind spot none of them can see. Both
+  halves of that were measured in
+  [`crates/project/src/lost_pupils.rs`](../../../crates/project/src/lost_pupils.rs), and the
+  decision that followed is
+  [the-partition-nobody-fitted](../../decisions/the-partition-nobody-fitted.yml).
+
+  **The identity does not need the guarantee.** `[H2] − [I1]` is published for 608 districts, so
+  the FY2020 base over the FY2027 formula is a multiple for every one of them, below one where the
+  formula pays more, and its logarithm still splits into an enrollment term and a per-pupil term
+  that reconstruct it exactly. It reaches 607 of 609 — Richmond Heights publishes no base, and
+  Buckeye Local is the one district the chained enrollment index does not reach — and agrees with
+  the 187's split on all 293 guaranteed districts both reach. Of the 314 formula districts,
+  **252** have fewer pupils than in FY2020, and the formula pays more per pupil than the FY2020
+  regime did for **310**; the four exceptions all grew. Nobody is off the floor because the
+  formula pays less per child. They are off it because the per-pupil raise outran the pupils they
+  lost. [verified] (crates/project)
+
+  **Among the districts that lost pupils, the guarantee's reach is a wealth gradient.** **514** of
+  the 607 have fewer pupils than in FY2020. Cut into fifths by published capacity per pupil, the
+  FY2027 guarantee holds **15** of the least-wealthy 102, **26** of the second fifth, **56** of
+  the third, **84** of the fourth and **81** of the wealthiest 106. The per-pupil term crosses
+  zero between the third and fourth fifths — a median **−0.274** in the least wealthy,
+  **−0.074** in the third, **+0.344** in the fourth, **+0.572** in the wealthiest — and the
+  crossing is the whole shape. Below it the plan raised per-pupil aid by a quarter or more, for
+  the districts it was written to reach, and the raise absorbed the lost pupils. Above it capacity
+  outran a frozen cost side and the per-pupil term alone puts a district on the floor, lost pupils
+  or not: the same fifths of the 93 districts that did *not* lose pupils read 0, 1, 2, 14 and
+  **14** held. The enrollment cluster is the third fifth — **40** of its 89 sit there, against
+  **67** of the capacity cluster's 98 in the fourth and **75** of the minimum-share districts in
+  the wealthiest. [verified] (crates/project)
+
+  So the cluster is not "the shrinking districts". It is the shrinking districts at the wealth
+  where the plan's per-pupil raise ran out — the ones for which the raise was just too small to
+  cover the decline, so that the lost pupils tip them onto the floor. [inference]
+
+  **The cluster has siblings the floor does not hold, and they are poorer.** **64** formula
+  districts lost pupils at the cluster's own median rate or faster — 11.9% since FY2020 — and are
+  not on the guarantee. They teach **81,392** pupils. Their median economically disadvantaged
+  share on the profile report's measure is **58.17%** against the cluster's **52.15%**, their
+  median capacity per pupil **$4,235** against $5,184, their median state share **49.7%** against
+  39.6%, and their median per-pupil term **−0.316** against −0.043: the formula pays the median
+  sibling **$8,542** a pupil against **$5,776** in its FY2020 base. Their formula aid sits a
+  median **17.9%** above the floor — **$1,201,355** a district, **$100,805,628** in all — and at
+  its own FY2024–FY2026 rate of decline, undamped, the median one reaches it in **4.14** years;
+  at the shipped damping the enacted anchor holds **5** of the 64 by FY2032. [verified]
+  (crates/project)
+
+  They are the same population as the cluster on every axis but wealth. The mechanism the cluster
+  was named for — costs that cannot follow enrollment down, adjusted for by no component of the
+  plan — is present in them and absorbed by a component that was not designed to absorb it. That
+  is the blind spot outside the guarantee the multivariate partition was meant to find, and it is
+  not a new one: it is the cluster's, at a wealth where a different line pays for it. [inference]
+
+  **A fitted partition finds the cluster at no k.** A k-means on six standardized profile
+  variables — log enrolled ADM, the enrollment term, log capacity per pupil, the DPIA share, base
+  cost per pupil and the fourteen-year enrollment rate, none of them a formula output — was run
+  once, from deterministic seeds, at every k from 2 to 9, after known-answer tests in
+  `crates/dispersion`. Scored as a ceiling, with every cell assigned to its majority, the most any
+  of them labels right on the cluster against the rest is **519** of 607, where a single cell
+  scores **518**; started from the typology's own nine centres instead, 518 exactly. The 2013
+  typology itself scores **518** on the cluster and **384** on guarantee membership; a nine-cell
+  k-means reaches **432** on membership and the typology-seeded run **415**, so a fit beats the
+  baseline at describing who is held, and neither reaches three quarters. With nothing fitted, a
+  cluster member's nearest neighbour on the six variables is a member **31** of 89 times, against
+  89 of 607 by chance, and **449** of 607 districts have a neighbour that is held if and only if
+  they are. The cluster is a region of the profile, a thin one, and no cell of any partition tried
+  holds a majority of it. [verified] (crates/project)
+
+  The multivariate partition was therefore run, and what it recovers — membership, weakly — is
+  the wealth gradient above, rediscovered without the axis that explains it. No clustering
+  estimator is a reasoning tool of this corpus; `dispersion::partition` stays in the workspace so
+  the ceilings are reproducible, and every claim here rests on the identity and a sort.
+  [inference]
+
 figures:
   - key: project/guarantee-on-a-prior-year-anchor
     value: 1025415233.33
@@ -624,6 +702,159 @@ figures:
     value: 294
     field: findings
     as_written: "**294 of 609 districts"
+
+  - key: project/formula-districts-that-lost-pupils
+    value: 252
+    field: findings
+    as_written: "**252** have fewer pupils than in FY2020"
+  - key: project/formula-districts-paid-more-per-pupil-than-fy2020
+    value: 310
+    field: findings
+    as_written: "regime did for **310**"
+  - key: project/districts-that-lost-pupils-since-fy2020
+    value: 514
+    field: findings
+    as_written: "**514** of\n  the 607 have fewer pupils"
+  - key: project/lost-pupils-least-wealthy-fifth-held
+    value: 15
+    field: findings
+    as_written: "holds **15** of the least-wealthy 102"
+  - key: project/lost-pupils-second-fifth-held
+    value: 26
+    field: findings
+    as_written: "**26** of the second fifth"
+  - key: project/lost-pupils-third-fifth-held
+    value: 56
+    field: findings
+    as_written: "**56** of\n  the third"
+  - key: project/lost-pupils-fourth-fifth-held
+    value: 84
+    field: findings
+    as_written: "**84** of the fourth"
+  - key: project/lost-pupils-wealthiest-fifth-held
+    value: 81
+    field: findings
+    as_written: "**81** of the wealthiest 106"
+  - key: project/per-pupil-term-least-wealthy-fifth-of-those-that-lost-pupils-negative
+    value: 0.274
+    field: findings
+    as_written: "a median **−0.274** in the least wealthy"
+  - key: project/per-pupil-term-third-fifth-of-those-that-lost-pupils-negative
+    value: 0.074
+    field: findings
+    as_written: "**−0.074** in the third"
+  - key: project/per-pupil-term-fourth-fifth-of-those-that-lost-pupils
+    value: 0.344
+    field: findings
+    as_written: "**+0.344** in the fourth"
+  - key: project/per-pupil-term-wealthiest-fifth-of-those-that-lost-pupils
+    value: 0.572
+    field: findings
+    as_written: "**+0.572** in the wealthiest"
+  - key: project/grew-wealthiest-fifth-held
+    value: 14
+    field: findings
+    as_written: "and\n  **14** held"
+  - key: project/enrollment-cluster-in-the-third-fifth-of-those-that-lost-pupils
+    value: 40
+    field: findings
+    as_written: "**40** of its 89 sit there"
+  - key: project/capacity-cluster-in-the-fourth-fifth-of-those-that-lost-pupils
+    value: 67
+    field: findings
+    as_written: "**67** of the capacity cluster's 98 in the fourth"
+  - key: project/minimum-share-in-the-wealthiest-fifth-of-those-that-lost-pupils
+    value: 75
+    field: findings
+    as_written: "**75** of the minimum-share districts"
+  - key: project/enrollment-clusters-siblings
+    value: 64
+    field: findings
+    as_written: "**64** formula\n  districts lost pupils"
+  - key: project/enrollment-clusters-siblings-adm
+    value: 81392
+    field: findings
+    as_written: "They teach **81,392** pupils"
+  - key: project/enrollment-clusters-siblings-median-disadvantaged
+    value: 0.5817
+    field: findings
+    as_written: "is **58.17%** against"
+  - key: project/enrollment-cluster-median-disadvantaged
+    value: 0.5215
+    field: findings
+    as_written: "the cluster's **52.15%**"
+  - key: project/enrollment-clusters-siblings-median-capacity-per-pupil
+    value: 4235
+    field: findings
+    as_written: "median capacity per pupil **$4,235** against $5,184"
+  - key: project/enrollment-clusters-siblings-median-state-share
+    value: 0.497
+    field: findings
+    as_written: "their median state share **49.7%** against\n  39.6%"
+  - key: project/enrollment-clusters-siblings-median-per-pupil-term-negative
+    value: 0.316
+    field: findings
+    as_written: "their median per-pupil term **−0.316** against −0.043"
+  - key: project/enrollment-clusters-siblings-formula-per-pupil
+    value: 8542
+    field: findings
+    as_written: "sibling **$8,542** a pupil"
+  - key: project/enrollment-clusters-siblings-base-per-pupil
+    value: 5776
+    field: findings
+    as_written: "against **$5,776** in its FY2020 base"
+  - key: project/enrollment-clusters-siblings-median-margin-over-floor
+    value: 0.179
+    field: findings
+    as_written: "median **17.9%** above the floor"
+  - key: project/enrollment-clusters-siblings-median-headroom
+    value: 1201355
+    field: findings
+    as_written: "**$1,201,355** a district"
+  - key: project/enrollment-clusters-siblings-headroom
+    value: 100805628
+    field: findings
+    as_written: "**$100,805,628** in all"
+  - key: project/enrollment-clusters-siblings-median-years-to-floor
+    value: 4.14
+    field: findings
+    as_written: "reaches it in **4.14** years"
+  - key: project/enrollment-clusters-siblings-held-by-fy2032
+    value: 5
+    field: findings
+    as_written: "holds **5** of the 64 by FY2032"
+  - key: project/fitted-partition-best-cluster-ceiling
+    value: 519
+    field: findings
+    as_written: "is **519** of 607"
+  - key: project/one-cell-cluster-ceiling
+    value: 518
+    field: findings
+    as_written: "where a single cell\n  scores **518**"
+  - key: project/typology-cluster-ceiling
+    value: 518
+    field: findings
+    as_written: "typology itself scores **518** on the cluster"
+  - key: project/typology-membership-ceiling
+    value: 384
+    field: findings
+    as_written: "**384** on guarantee membership"
+  - key: project/fitted-partition-membership-ceiling-at-nine
+    value: 432
+    field: findings
+    as_written: "k-means reaches **432** on membership"
+  - key: project/typology-seeded-partition-membership-ceiling
+    value: 415
+    field: findings
+    as_written: "the typology-seeded run **415**"
+  - key: project/enrollment-cluster-nearest-neighbours-in-the-cluster
+    value: 31
+    field: findings
+    as_written: "is a member **31** of 89 times"
+  - key: project/nearest-neighbours-agreeing-on-membership
+    value: 449
+    field: findings
+    as_written: "**449** of 607 districts have a neighbour"
 revisions:
   - was: |
       A hold-harmless and nothing else: computed funding below a baseline, pay the difference.

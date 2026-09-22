@@ -141,6 +141,15 @@
 //! What was checked instead is that the partition beats the baseline the corpus already holds,
 //! which is the typology above, and that it survives the measurement choice below.
 //!
+//! Issue #396 then asked the statewide form of the question: whether a multivariate partition
+//! across all 609 districts, unconditioned on the guarantee, would find a blind spot none of the
+//! guarantee-based partitions can see. [`crate::lost_pupils`] answers it — the identity extends
+//! to 607 districts through [`terms`], the candidate blind spot above turns out to be the third
+//! wealth fifth of the districts that lost pupils, with 64 poorer siblings the plan's per-pupil
+//! raise carried over the floor, and a fitted partition run once on six profile variables holds
+//! a majority of the cluster in no cell at any `k`. The estimator that showed so is
+//! [`dispersion::partition`], and no claim reasons from its output.
+//!
 //! # The enrollment index, and why it is chained
 //!
 //! The anchor is FY2020 and the department's own enrolled ADM series
@@ -320,29 +329,41 @@ impl Decomposition {
     }
 
     /// Which term carries the majority.
+    ///
+    /// `None` where the district is not held above the formula: a log multiple at or below zero
+    /// has no majority to take, and [`terms`] reaches such districts. [`decompose`] never
+    /// returns one, so on its output this is always `Some`.
     #[must_use]
-    pub fn origin(&self) -> Origin {
-        if self.enrollment_share() >= 0.5 {
-            Origin::EnrollmentLoss
+    pub fn origin(&self) -> Option<Origin> {
+        if self.total() <= 0.0 {
+            None
+        } else if self.enrollment_share() >= 0.5 {
+            Some(Origin::EnrollmentLoss)
         } else {
-            Origin::CapacityGrowth
+            Some(Origin::CapacityGrowth)
         }
     }
 }
 
-/// Split one district's multiple.
+/// The same two terms for **any** district, held above the formula or not.
 ///
-/// `None` where the district is not held above the formula — there is no multiple to divide — or
-/// where [`enrollment_index`] does not reach it.
+/// The identity does not need the guarantee: `[H2] − [I1]` is published for 608 of 609 districts
+/// ([`DistrictRecord::guarantee_floor`]), so `floor / formula` is a multiple for every one of
+/// them, below 1.0 where the formula pays more than the FY2020 base and the guarantee owes
+/// nothing. Its logarithm still splits into the enrollment term and the per-pupil term, and the
+/// split still reconstructs it exactly. For a guaranteed district the floor *is* its realized
+/// aid, so this agrees with [`decompose`] wherever both are defined.
+///
+/// `None` where the floor is unpublished, the formula computes nothing, or [`enrollment_index`]
+/// does not reach the district. The negative of [`Decomposition::total`] is then the district's
+/// headroom above its floor, in logs. [`crate::lost_pupils`] is the caller.
 #[must_use]
-pub fn decompose(record: &DistrictRecord, index: &BTreeMap<String, f64>) -> Option<Decomposition> {
-    if record.core_foundation_funding <= 0.0 {
+pub fn terms(record: &DistrictRecord, index: &BTreeMap<String, f64>) -> Option<Decomposition> {
+    let floor = record.guarantee_floor();
+    if floor <= 0.0 || record.core_foundation_funding <= 0.0 {
         return None;
     }
-    let multiple = record.realized_aid() / record.core_foundation_funding;
-    if multiple <= 1.0 {
-        return None;
-    }
+    let multiple = floor / record.core_foundation_funding;
     let enrollment_index = *index.get(&record.irn)?;
     if enrollment_index <= 0.0 {
         return None;
@@ -355,6 +376,15 @@ pub fn decompose(record: &DistrictRecord, index: &BTreeMap<String, f64>) -> Opti
         enrollment_term,
         per_pupil_term: multiple.ln() - enrollment_term,
     })
+}
+
+/// Split one district's multiple.
+///
+/// `None` where the district is not held above the formula — there is no multiple to divide — or
+/// where [`enrollment_index`] does not reach it. [`terms`] without the first condition.
+#[must_use]
+pub fn decompose(record: &DistrictRecord, index: &BTreeMap<String, f64>) -> Option<Decomposition> {
+    terms(record, index).filter(|split| split.multiple > 1.0)
 }
 
 /// One cluster of the population, with what it holds.
@@ -393,7 +423,11 @@ pub fn clusters(panel: &[DistrictRecord]) -> (Vec<Cluster>, Vec<String>) {
     for record in above_the_minimum(panel) {
         match decompose(record, &index) {
             Some(split) => members
-                .entry(split.origin())
+                .entry(
+                    split
+                        .origin()
+                        .expect("decompose only returns a multiple above one"),
+                )
                 .or_default()
                 .push((record, split)),
             None => unreached.push(record.irn.clone()),
