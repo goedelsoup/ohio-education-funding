@@ -8832,6 +8832,59 @@ pub static FIGURES: &[Figure] = &[
             bands[0] / bands[5]
         },
     },
+    // What the capacity tier does at the small end, which is what its 200/400/600 ramp is for.
+    // The tier pays a millage on a shortfall between two whole-district totals, so its amount has
+    // a positive limit as enrolment falls and no pupil count divides it. #418.
+    Figure {
+        key: "project/capacity-tier-limit-at-no-wealth",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Eight mills of the median district's weighted wealth -- what R.C. 3317.0217(B) \
+                approaches for a district of no wealth whatever, however few pupils it has",
+        pinned: 3_137_210.45,
+        tolerance: 0.01,
+        compute: |_| {
+            project::panel::categoricals::TA_CAPACITY_RATE
+                * project::panel::categoricals::TA_MEDIAN_WEIGHTED_WEALTH
+        },
+    },
+    Figure {
+        key: "project/capacity-tier-full-rate-ceiling-per-pupil",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The most the capacity tier draws per enrolled pupil in any district it pays in \
+                full -- the bar every district on the cliff or the 5% shelf clears unramped",
+        pinned: 3_773.82,
+        tolerance: 0.01,
+        compute: |i| {
+            i.panel
+                .iter()
+                .filter(|d| {
+                    project::panel::categoricals::TargetedAssistance::capacity_size_share(
+                        d.current_year_adm,
+                    ) >= 1.0
+                })
+                .map(|d| project::size_terms::capacity_tier_unramped(d) / d.current_year_adm)
+                .fold(0.0_f64, f64::max)
+        },
+    },
+    Figure {
+        key: "project/districts-on-the-capacity-cliff-or-shelf",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts at or below 400 enrolled ADM -- the ones R.C. 3317.0217(B)(4) pays \
+                nothing or five per cent of the capacity amount",
+        pinned: 17.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.panel
+                .iter()
+                .filter(|d| {
+                    d.current_year_adm <= project::panel::categoricals::TA_CAPACITY_RAMP_START
+                })
+                .count() as f64
+        },
+    },
     // The interpolation weight, recovered per district rather than read off the header cell that
     // states it. The FY2027 panel is at 1.0, where a wrong multiplier is invisible.
     Figure {

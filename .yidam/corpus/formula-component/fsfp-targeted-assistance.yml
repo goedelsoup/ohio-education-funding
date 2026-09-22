@@ -265,10 +265,77 @@ findings: |
   changes only what the shortfall is measured against, which locates the whole residual in the
   comparison division (B) makes. Whether the total is the wrong measure is a different question —
   the per-pupil restatement is `[F]`'s own form at a third rate, and two measurements of the same
-  tax base at different rates may be what the General Assembly wanted. **Why division (B) is
-  written against a total is not established.** The section states the comparison with no recital
-  and LSC's analysis of H.B. 110 restates the arithmetic and derives nothing, both of which are
-  asserted against the committed documents rather than left as silence. [open]
+  tax base at different rates may be what the General Assembly wanted.
+
+  ### The total is inherited, and the biennium that chose it says what it is for
+
+  Why division (B) compares two whole-district totals was recorded as unestablished, on the
+  reasoning that the section carries no recital and H.B. 110's analysis derives nothing. Both of
+  those hold. The question was put to the wrong act.
+
+  **Capacity aid's own comparison was already total against total.** The component H.B. 110
+  absorbed was charged on *"the amount a district can raise with one mill"* — `District capacity
+  amount = Three-year average valuation x 0.001` — and its ratio divided the statewide median of
+  that quantity by the district's. A one-mill yield is a whole-district dollar amount by
+  construction, which is what a property tax raises. So (B) did not choose a total; it kept one.
+  [verified]
+
+  And the act that created it states the purpose the current section omits: capacity aid *"targets
+  funding to smaller districts with relatively low total property valuation"* — LSC, in H.B. 64's
+  analysis, restated verbatim in H.B. 49's, and in no other biennium. The size dependence recorded
+  above as sitting "in the index, where nothing names it" **is named**, two regimes back, by the
+  document arguing for the instrument the index came from. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_pupil_count_the_capacity_tier_never_had.rs))
+
+  ### The pupil count follows the shortfall, so it was never dropped
+
+  The premise that made this look like a drafting choice — that the predecessor was per-pupil and
+  the plan removed its ADM multiplier — is true of capacity aid's *payment* and false of its
+  *comparison*. And the removal is not a decision about size.
+
+  Both predecessors computed an index and **multiplied the payment by it**: H.B. 59's tier one by
+  its wealth index, capacity aid by its capacity ratio. R.C. 3317.0217 computes both indices, at
+  (B)(3) and (C)(3), and multiplies by neither — each survives only as a gate, at 1.0 and at 0.8.
+  One transformation, applied to both tiers: index demoted to a threshold, payment restated as a
+  flat millage on a shortfall. [verified]
+
+  Once that is the form the pupil count follows from the shortfall. `[F]` multiplies by enrolled
+  ADM because a per-pupil shortfall is not money until it does; `[C]` does not, because a
+  difference of two whole-district totals already is. Capacity aid's ADM multiplier was what turned
+  a *dimensionless ratio* into dollars, and a difference needs no such conversion. [inference —
+  the uniformity is verified, the drafters' reasoning is not recorded anywhere]
+
+  ### What it costs, and what stands where the cap stood
+
+  The restatement is not free, because the two forms differ in the limit. Capacity aid was `x
+  Formula ADM`, so it vanished with the pupil count, and its generosity per pupil was bounded
+  absolutely — `per-pupil amount x multiplier x 2.5`, one statewide ceiling for every district.
+  `[C]` has neither factor, so as weighted wealth falls it approaches **$3,137,210.45** — eight
+  mills of the median district's — with no pupil count dividing it.
+
+  Kelleys Island Local has **3.51** enrolled pupils and (B)(4)(b)(i) computes **$2,461,241.79** for
+  it: **$701,208.49 a pupil**. All **17** districts the cliff and the 5% shelf reach would draw
+  more per pupil than **$3,773.82**, the most any district the tier pays in full draws. [verified]
+
+  So the 200/400/600 ramp stands where capacity aid's **2.5 cap** stood, not where its ADM
+  multiplier stood. Both bound the same divergence, and only the older one is written as a bound on
+  generosity rather than as a bracket on a pupil count. [inference]
+
+  ### And nothing committed records the change
+
+  H.B. 110's analysis names capacity aid **once** in its whole length, in the sentence replacing
+  it, and never states what it did — no multiplier, no cap, no mill. The third instance of a shape
+  this corpus keeps finding: a change presented as a new formula rather than as a moved part, after
+  the threshold above and the benchmark rank on
+  [local capacity](fsfp-local-capacity-measure.yml). [verified]
+
+  Nor was there a budget choice to explain. H.B. 1 of the 134th repeals R.C. 3317.0218 — capacity
+  aid's section — and enacts a *new* R.C. 3317.0218 under the same number for the supplemental
+  tier, in one document, with (B) already reading as it reads in force. The plan arrived drafted;
+  a greenbook explains what a budget changed. The remaining question belongs to the plan
+  workgroup's own papers and not to any act, which is where
+  [`local-capacity-percentage`](../parameter/local-capacity-percentage.yml) left the benchmark
+  rank. [verified]
 
 properties:
   name: Targeted assistance
@@ -380,6 +447,18 @@ figures:
     value: 53
     field: findings
     as_written: "as the plan stands                  18  39  71  60  49  57    53"
+  - key: project/capacity-tier-limit-at-no-wealth
+    value: 3137210.453063846
+    field: findings
+    as_written: "it approaches **$3,137,210.45**"
+  - key: project/capacity-tier-full-rate-ceiling-per-pupil
+    value: 3773.8160657363574
+    field: findings
+    as_written: "more per pupil than **$3,773.82**"
+  - key: project/districts-on-the-capacity-cliff-or-shelf
+    value: 17
+    field: findings
+    as_written: "All **17** districts the cliff"
 revisions:
   - was: |
       The zeroed line was read as a dormancy: "a **live zero rather than an absence**: a future
