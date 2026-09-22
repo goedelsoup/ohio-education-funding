@@ -98,16 +98,34 @@ open: |
   climbs toward the coverage exponent as the range extends. The two targets still differ, and for
   the reason given, but 0.60 was never a measurement of anything past five years.
 
-  What is left open is the sentence below, which turns out to be the binding one.
+  The sentence below was the binding one, and it is settled too, by #423.
 
-  Whether the band should be asymmetric is not addressed. It is multiplicative, so it already is
+  Whether the band should be asymmetric was not addressed. It is multiplicative, so it already is
   in dollars, but the *log* error has a growing positive mean — see
   `the_bias_no_single_damping_can_remove` — and an interval centred on a biased point estimate
-  inherits that bias whatever its width. **That is now the whole of the long-horizon defect.**
+  inherits that bias whatever its width. **That was the whole of the long-horizon defect.**
   Pooled across origins the band's coverage sinks from 67.1% at five years to 60.1% at thirteen,
   and removing each origin's own mean restores all of it: the width is right and the level is not.
   The origin effect is the shutdown — at five years the origins landing on FY2020 or earlier are
   very nearly unbiased while the two landing on FY2023 and FY2024 run +0.035 and +0.038 — and
   `sigma`, being a cross-sectional spread, cannot price a statewide level break at any exponent.
   Mean log error reaches +0.056 at the feed's ten-year horizon, so the point sits about 5.8% high.
+
+  **Neither the centre nor the band moves, and the bias is published instead.**
+  `crates/project/tests/the_bias_that_belongs_to_the_years.rs` measured the four remedies #423
+  named. The 5.8% is the mean *district's*; the statewide total's is 3.2% across the closure and
+  within 0.7% at every horizon to seven years before it, with a sign that changes from origin to
+  origin, so one correction cannot serve the two figures the feed publishes from the same
+  projections. Sorted on anything a forecast could see at its origin — the rate to the origin,
+  the district's size — every quarter of districts is forecast high by about the same amount: the
+  bias is a year effect. A district's long-run rate persists into its next three to nine years at
+  0.27 to 0.30, the three tenths the damping already carries, so decaying the rate toward a share
+  of the long-run rate over-corrects at every share above five hundredths and five hundredths is
+  worth a third of a percent; relative to the state the error-minimising share is zero. A drift
+  fitted on the pre-closure mean district removes half of what crosses the closure and puts the
+  total a point low before it. An asymmetric band is that correction drawn as a band, and holds
+  less — 62.5% against 65.6% at ten years — than shifting the centre by the same amount. What
+  remains is to publish two bias figures per horizon beside the projection, the mean district's
+  and the total's, before the closure and across it; that is a feed field and a decision of its
+  own.
 supersedes: []

@@ -344,6 +344,31 @@ findings: |
   `Method::Damped` and its TypeScript mirror, resting on a five-year backtest extrapolated to a
   ten-year horizon. Measured in `the_bias_no_single_damping_can_remove`.
 
+  **AND THE BIAS BELONGS TO THE YEARS, NOT TO THE DISTRICTS.** [verified] (`crates/project`)
+  The backtest reaches thirteen years, and at the feed's ten the mean district's log error is
+  **+0.056** while the statewide total's is **+0.032**: the two figures the feed publishes from
+  the same projections carry different biases, and before the closure the total's was within 0.7%
+  at every horizon to seven years with a sign that changed from origin to origin. The mean
+  district's pre-closure drift is stable — a third of a point a year past the 1.43 years the
+  damping carries, within a fifth of itself across five independent origins — and it is shared:
+  sorted on the rate a forecast could see at its origin, or on the district's size, the quarters
+  neither order nor spread, and every one is forecast high. The gradient reported above, from
+  +8.0% to −2.0% across the quarters, sorts on the fifteen-year rate, which includes the target
+  years.
+
+  The reason no rate-side correction reaches it is one number. A district's long-run rate to an
+  origin predicts its rate over the next three, five, seven or nine years at **0.30, 0.29, 0.29
+  and 0.27** — the same three tenths as year on year — and relative to the state's rate it is no
+  more persistent. Decaying the rate toward a share of the long-run rate rather than toward zero
+  over-corrects at every share above five hundredths, because the statewide decline of 1.7% a
+  year to FY2013 had become 0.3% a year by FY2015–FY2020; five hundredths is worth a third of a
+  percent, and the share that zeroes the bias rises with the horizon as the damping's did. A
+  drift fitted on the pre-closure mean district removes half of what crosses the closure and
+  puts the total a point low before it. An asymmetric band is that correction drawn as a band
+  and holds less. Neither the centre nor the band moves; the bias is to be published beside the
+  projection, two figures per horizon, which is a feed field and a decision of its own. Measured
+  in `the_bias_that_belongs_to_the_years`.
+
   ### The department's own series now checks the damping, and a splice would have failed it
 
   `DEFAULT_DAMPING` is the share of a district's growth rate a projection carries into each further
@@ -422,6 +447,31 @@ findings: |
   statute rather than through the count, and it cuts both ways: a district really would lose the
   cushion if its decline really did flatten. What cannot be said is that the averaging absorbs the
   error. At this horizon it more than doubles it.
+revisions:
+  - was: |
+      "The mechanism is arithmetic rather than anything about Ohio … Sorted by their own
+      fifteen-year rate, the fastest-declining quarter of districts are forecast **8.0% high** at
+      five years and the flattest quarter 2.0% low; the sign flips exactly where the growth rate
+      does" — offered, in `the_trend_the_damping_discards`, as the reason the bias is *not* a
+      period effect: "a period artefact would show as a bias shared across districts."
+    now: |
+      The quartile figures stand, and the inference drawn from them does not. The sort is on the
+      rate over FY2009–FY2024, which includes the years the forecasts are scored on; a district
+      that kept shrinking was forecast high by the trend it kept. Sorted on the rate to the
+      origin — what a forecast could see — the same population's quarters run +0.002, +0.021,
+      +0.030, +0.015: unordered, and all high. The bias **is** shared across districts, and it
+      is a period effect. [verified] (`crates/project`)
+    found_by: |
+      `sorted_on_what_the_forecast_could_see_the_bias_has_no_gradient` in
+      `crates/project/tests/the_bias_that_belongs_to_the_years.rs`, which holds both sorts on
+      the population the earlier file used, while asking #423's question of whether the bias
+      could be corrected on the rate.
+    reach: |
+      The claim that the over-forecast "lands hardest where the guarantee is what pays" is true of
+      the backtest and was read as a property of the feed's projection. Whether it holds in the
+      feed's own decade is a claim about persistence, and persistence is three tenths at every
+      horizon. Nothing bound moves: the arithmetic of the 1.43-year carry, the guarantee shares by
+      quarter and the statewide FY2036 figures are all as they were.
 figures:
   - key: project/adm-growth-persistence-earlier-window
     value: 0.3279304724735254

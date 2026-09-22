@@ -73,10 +73,13 @@
 //!
 //! So the feed's ten-year horizon does not need cutting, which was the third thing
 //! [#391](https://github.com/goedelsoup/ohio-education-funding/issues/391) offered to do. The
-//! **width** is measured there now. What is not measured there is the **centre**: mean log error
-//! at ten years is +0.056, so the point sits about 5.8% high, and `the_bias_no_single_damping_can_remove`
+//! **width** is measured there now. What was not measured there was the **centre**: mean log
+//! error at ten years is +0.056, so the point sits about 5.8% high, and `the_bias_no_single_damping_can_remove`
 //! already says no damping takes it out. An interval centred on a biased point inherits the bias
 //! whatever its width, which is what [`the-widening-rule`]'s own open note said it did not know.
+//! `the_bias_that_belongs_to_the_years` takes it from here: the 5.8% is the mean district's and
+//! the total's is 3.2%, the bias is a year effect with no gradient on anything the forecast could
+//! see, and it is published rather than corrected.
 //!
 //! # And the dispersion exponent was never a second opinion
 //!
