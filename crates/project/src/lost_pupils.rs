@@ -112,6 +112,12 @@
 //! built on the identity — a cut on wealth among the districts that lost pupils, which a reader
 //! can check against the calculator with a sort. The multivariate partition #396 described was
 //! run, and what it recovers the identity had already placed on an axis.
+//!
+//! # What holds the siblings off the floor
+//!
+//! [`crate::size_incidence`] answers it with [`crate::size_terms`]'s counterfactuals. The two
+//! size-dependent terms hold 35 of the 64 off the guarantee — because they are small, not
+//! because they are shrinking — and the base cost state share carries the other 29.
 
 use std::collections::BTreeMap;
 

@@ -129,6 +129,13 @@
 //! What every row here holds is the anchor. `[H2]` is a FY2020 figure and contains no part of
 //! either term: R.C. 3317.011 was enacted for FY2022 and R.C. 3317.0217's merged tiers for the
 //! same year. That asymmetry is the whole mechanism — both terms sit on one side of a `max`.
+//!
+//! # Where the two terms land
+//!
+//! [`crate::size_incidence`] joins the counterfactuals here to the population
+//! [`crate::lost_pupils`] owns: the pair holds 35 of the enrollment cluster's 64 siblings off
+//! the guarantee, and band for band on base cost ADM it is their size rather than their decline
+//! that puts them in reach. The sextiles below already contain them.
 
 use std::collections::BTreeMap;
 

@@ -519,6 +519,52 @@ findings: |
   is the blind spot outside the guarantee the multivariate partition was meant to find, and it is
   not a new one: it is the cluster's, at a wealth where a different line pays for it. [inference]
 
+  **The size terms are what hold 35 of the 64 off the floor.** R.C. 3317.011's staffing minima
+  and R.C. 3317.0217's capacity tier are the plan's two size-dependent terms, and striking them
+  out of the panel newly guarantees **136** districts statewide, **35** of them siblings: **16**
+  for the minima alone, **23** for the capacity tier alone. Per base cost enrolled pupil the pair
+  is worth **$1,054** to the 64 against **$384** to the cluster's 89. Both counterfactuals were
+  priced for a different question and both populations were already committed, so this is a join
+  and not a new measurement. [verified] (crates/project)
+
+  The share to read is 35 of the 136 and not 35 of the 64. Striking a term out is a different
+  formula for every district in the state rather than a measurement of these, and a counterfactual
+  is not a mechanism: a quarter of what the pair does statewide is what it does here. [inference]
+
+  **What reaches them is size, not decline.** Unconditionally the siblings look singled out: 35 of
+  64 move against **101** of the 251 other formula districts. Band for band on base cost enrolled
+  ADM they do not. The siblings move 22 of 25 in the smallest sextile, 7 of 10, 6 of 10, and none
+  of the 19 above it, against 49 of 58, 36 of 52, 12 of 20 and 4 of 36 for every other formula
+  district — the fourth band runs the other way. Give each band's siblings that band's non-sibling
+  rate and the prediction is **34.60** against the 35 observed. [verified] (crates/project)
+
+  So the sextile view the size-term arc already reports contains them, and the sibling axis adds
+  nothing to it. What a cut on size alone cannot see is which of its small districts are
+  shrinking, not whether the terms reach them: the siblings are a population because they are poor
+  and shrinking, and the two terms reach the 35 because they are small. [inference]
+
+  **The 29 the size terms leave are carried by the state share of base cost, not by DPIA.** They
+  are the larger siblings — a median **1,846** enrolled ADM against **635.6** for the 35 — so
+  neither size term binds on them. Their formula aid stands **$68,572,895** above their FY2020
+  base, $1,144 a pupil, and taken component by component against that distance the base cost state
+  share alone exceeds it for **28** of the 29 and DPIA for **4**; targeted assistance covers 14,
+  special education 9, gifted 1, and English learner and career-technical funding none. In
+  aggregate the state share of base cost is 3.04 times the gap and DPIA 0.53 times it. [verified]
+  (crates/project)
+
+  A component larger than the gap is not a component that pays it — the whole of `[H]` holds each
+  of these districts above its floor and no line of it is the marginal one. The column is a reach,
+  and what it establishes is which lines are even in the running: for the 29 it is the per-pupil
+  raise itself rather than any weight. [inference]
+
+  **The cluster and its siblings are 153, and that is a union rather than a rate.** The 89 and the
+  64 share no district, so the population the arc has been naming is **153**, and it is the one
+  any threshold change should be reported on beside the sextiles. The districts shrinking at the
+  cluster's median rate or faster are **169** — the 64, 45 of the cluster's own 89, 31 at the
+  minimum state share and 29 of the capacity cluster — because a median cuts its own population in
+  half and 60 guaranteed districts outside the cluster shrink at least that fast. Both are
+  defensible populations; they are not the same one. [verified] (crates/project)
+
   **A fitted partition finds the cluster at no k.** A k-means on six standardized profile
   variables — log enrolled ADM, the enrollment term, log capacity per pupil, the DPIA share, base
   cost per pupil and the fourteen-year enrollment rate, none of them a formula output — was run
@@ -855,6 +901,66 @@ figures:
     value: 449
     field: findings
     as_written: "**449** of 607 districts have a neighbour"
+  - key: project/size-terms-newly-guaranteed-statewide
+    value: 136
+    field: findings
+    as_written: "newly guarantees **136** districts statewide"
+  - key: project/size-terms-newly-guaranteed-siblings
+    value: 35
+    field: findings
+    as_written: "**35** of them siblings"
+  - key: project/staffing-floors-newly-guaranteed-siblings
+    value: 16
+    field: findings
+    as_written: "**16** for the minima alone"
+  - key: project/capacity-tier-newly-guaranteed-siblings
+    value: 23
+    field: findings
+    as_written: "**23** for the capacity tier alone"
+  - key: project/size-terms-worth-to-the-siblings-per-pupil
+    value: 1054
+    field: findings
+    as_written: "worth **$1,054** to the 64"
+  - key: project/size-terms-worth-to-the-cluster-per-pupil
+    value: 384
+    field: findings
+    as_written: "**$384** to the cluster's 89"
+  - key: project/size-terms-siblings-expected-from-size
+    value: 34.6
+    field: findings
+    as_written: "the prediction is **34.60**"
+  - key: project/siblings-the-size-terms-leave
+    value: 29
+    field: findings
+    as_written: "The 29 the size terms leave are carried by the state share of base cost"
+  - key: project/siblings-the-size-terms-leave-median-adm
+    value: 1846.0
+    field: findings
+    as_written: "a median **1,846** enrolled ADM"
+  - key: project/siblings-the-size-terms-move-median-adm
+    value: 635.6
+    field: findings
+    as_written: "against **635.6** for the 35"
+  - key: project/siblings-the-size-terms-leave-headroom
+    value: 68572895
+    field: findings
+    as_written: "stands **$68,572,895** above their FY2020 base"
+  - key: project/siblings-the-size-terms-leave-base-cost-share-covers
+    value: 28
+    field: findings
+    as_written: "exceeds it for **28** of the 29"
+  - key: project/siblings-the-size-terms-leave-dpia-covers
+    value: 4
+    field: findings
+    as_written: "DPIA for **4**"
+  - key: project/cluster-and-siblings
+    value: 153
+    field: findings
+    as_written: "the population the arc has been naming is **153**"
+  - key: project/shrinking-at-the-clusters-median-rate
+    value: 169
+    field: findings
+    as_written: "cluster's median rate or faster are **169**"
 revisions:
   - was: |
       A hold-harmless and nothing else: computed funding below a baseline, pay the difference.
