@@ -148,6 +148,17 @@ refused outright below two points, which most of these are. The manifest holds n
 two negative first points are pinned as magnitudes with `-negative` in the key and the minus
 carried by the prose. See #431 and #445.
 
+A thirteenth pin joined them when the per-district fan started stating the level too, and it is
+the case the endpoint rule does not reach twice. The fan ends on the **same** six-year leg the
+scenario node projects, so the six-year pre-closure figures were already pinned — but the card
+prints *both* populations, and at six years they differ by a factor of two. So
+`project/the-mean-district-bias-at-six-years-across-the-closure` is a second interior point, pinned
+for the same reason the first one was and against a different reader: the choice of population is
+the thing a six-year statement has to name, and a manifest carrying one side of it had pinned the
+half nobody would know was a choice. Its twin on the total is deliberately absent — the fan states
+`mean_district` only, and pinning a figure no artifact prints is what the endpoint rule exists to
+stop. See #458.
+
 A **spread** is the fifth array, and the only one whose rule is a census rather than a set of
 endpoints. The other four are each read at named places — the ends of a column, the slope printed
 on a panel, a plane's positions, a line's two ends and its worst departure — and a spread has no

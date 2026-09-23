@@ -19,7 +19,7 @@
  */
 
 import { apply, type Policy, type Model, statewideUnder } from "./policy.ts";
-import type { PanelDistrict } from "./types.ts";
+import type { PanelDistrict, ProjectionBias } from "./types.ts";
 
 /** One observed value in a fiscal year. */
 export interface Observation {
@@ -475,4 +475,41 @@ export function statuteNote(horizon: number, statuteEnds: number): string {
     `a General Assembly that has not met. FY${horizon} here is this formula continued unchanged, ` +
     `which is the only tractable assumption and is not a forecast of what the law will say.</p>`
   );
+}
+
+/**
+ * What the projection has been wrong by, at the horizon a drawing actually ends on.
+ *
+ * # The horizon is derived, not stated
+ *
+ * `projection.bias` is indexed by years ahead, and a card that wants the figure belonging to its
+ * own picture has to compute those years from the picture rather than write them down. A drawing
+ * moved a year deeper would otherwise go on printing the old horizon's bias under the new label,
+ * which is the one failure the two populations exist to prevent — see
+ * `.yidam/decisions/the-bias-published-beside-the-point.yml`.
+ *
+ * # Both populations or nothing
+ *
+ * The pre-closure pair is `null` from ten years on, because no origin reaches that far without a
+ * pandemic school closure inside the forecast. Where either is missing this returns `null` rather
+ * than the half it has: a single bias figure whose population is unstated is worse than none,
+ * because the two differ by a factor of two at the horizon the district fan ends on.
+ *
+ * # Mean district, never the total
+ *
+ * `total` is deliberately not returned. The two quantities carry different biases and at five
+ * years different *signs*, so the statewide total's figure under one district's chart would be the
+ * exact substitution #431 exists to prevent. A caller that wants the total can read the row.
+ *
+ * @param bias the feed's `projection.bias` table, ordered by horizon.
+ * @param horizon years ahead of the base year, so `1` for the first forecast year.
+ * @returns the mean district's log error in both populations, or `null` if either is absent.
+ */
+export function meanDistrictBias(
+  bias: ProjectionBias[],
+  horizon: number,
+): { beforeTheClosure: number; acrossIt: number } | null {
+  const row = bias.find((r) => r.horizon === horizon);
+  if (!row || row.mean_district_pre_closure == null) return null;
+  return { beforeTheClosure: row.mean_district_pre_closure, acrossIt: row.mean_district };
 }

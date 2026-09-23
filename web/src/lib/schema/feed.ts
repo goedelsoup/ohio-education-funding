@@ -1536,6 +1536,7 @@ export type Checkpoint = z.infer<typeof CheckpointSchema>;
 export type Draft = z.infer<typeof DraftSchema>;
 export type DraftProvision = z.infer<typeof DraftProvisionSchema>;
 export type ForecastCheckpoint = z.infer<typeof ForecastCheckpointSchema>;
+export type ProjectionBias = z.infer<typeof ProjectionBiasSchema>;
 export type ProjectionMeta = z.infer<typeof ProjectionMetaSchema>;
 export type SeriesYear = z.infer<typeof SeriesYearSchema>;
 export type Bundle = z.infer<typeof BundleSchema>;

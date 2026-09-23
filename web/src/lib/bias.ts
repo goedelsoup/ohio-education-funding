@@ -54,7 +54,7 @@ import {
   type ManifestLine,
   type ManifestReference,
 } from "./corpusSeries.ts";
-import { escapeHtml } from "./format.ts";
+import { escapeHtml, logError } from "./format.ts";
 import { panelWidth, seriesSpec } from "./plot/spec.ts";
 import { renderPanelToString } from "./plot/ssr.ts";
 import * as routes from "./routes.ts";
@@ -184,17 +184,6 @@ export function bias(): Bias {
 /** `nine years`, or `one year` — the horizon written the way the prose around it reads. */
 function years(at: number): string {
   return at === 1 ? "one year" : `${at} years`;
-}
-
-/**
- * A log error, with the sign on the front and a true minus rather than a hyphen.
- *
- * Written as a log error rather than converted to a percentage, which is the decision record's
- * call: these are means and sums of `ln(point / actual)`, a percentage would be right only to
- * first order, and the first order is where all the small ones live.
- */
-export function logError(v: number): string {
-  return `${v < 0 ? "−" : "+"}${Math.abs(v).toFixed(4)}`;
 }
 
 /** The corpus address of the node that states the twelve figures. See `coverage.ts`. */

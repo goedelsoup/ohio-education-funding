@@ -3625,6 +3625,13 @@ test.describe("one district's own band", () => {
     await expect(page.locator('[data-part="enrollment"]')).toContainText(
       "flat by construction",
     );
+    // And no bias figure on this side. A guaranteed district's aid is a fixed dollar amount that
+    // enrollment does not enter, so the bias of an enrollment forecast says nothing about what it
+    // receives — and a card that printed one anyway would be attaching a measurement to a line the
+    // measurement cannot reach.
+    await expect(page.locator('[data-part="enrollment"]')).not.toContainText(
+      "centred high",
+    );
   });
 
   test("a formula-funded district gets a band and no second line", async ({ page }) => {
@@ -3632,9 +3639,16 @@ test.describe("one district's own band", () => {
     const chart = page.locator('[data-chart="district-fan"] svg.plot:visible');
     await expect(chart.locator(".fan-band")).toHaveCount(1);
     await expect(chart.locator(".fan-reference")).toHaveCount(0);
-    await expect(page.locator('[data-part="enrollment"]')).toContainText(
-      "The range, not the line, is the finding",
-    );
+    const card = page.locator('[data-part="enrollment"]');
+    await expect(card).toContainText("The range, not the line, is the finding");
+    // The level, beside the width. Read off the painted text rather than asserted as a figure: the
+    // numbers come from the feed at the fan's own horizon, and what this checks is that both
+    // populations reach the page and that neither is presented as this district's own error.
+    await expect(card).toContainText("The band is centred high, on the average district");
+    await expect(card).toContainText("forecast 6 years out");
+    await expect(card).toContainText("before the pandemic school closures");
+    await expect(card).toContainText("closures included");
+    await expect(card).toContainText("not a figure for this one");
   });
 
   test("compares enrollment years without inventing a published one", async ({ page }) => {

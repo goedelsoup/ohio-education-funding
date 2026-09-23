@@ -79,6 +79,23 @@ export function pct(v: number | null | undefined, decimals = 1): string {
   return (n < 0 && Number(text) !== 0 ? "−" : "") + text + "%";
 }
 
+/**
+ * A log error, with the sign on the front and a true minus rather than a hyphen.
+ *
+ * Written as a log error rather than converted to a percentage, which is
+ * `.yidam/decisions/the-bias-published-beside-the-point.yml`'s call: these are means and sums of
+ * `ln(point / actual)`, a percentage would be right only to first order, and the first order is
+ * where all the small ones live.
+ *
+ * Four decimal places, because the smallest of the published figures is +0.00057 and `pct` would
+ * render it as 0.1% — a figure a reader cannot tell from zero. It lives here rather than in
+ * `bias.ts`, which is where it was written, because the district fan states one of these too and a
+ * per-district card has no business importing /method's card to format a number.
+ */
+export function logError(v: number): string {
+  return `${v < 0 ? "−" : "+"}${Math.abs(v).toFixed(4)}`;
+}
+
 /** A count with thousands separators. */
 export function count(v: number): string {
   return WHOLE.format(v);
