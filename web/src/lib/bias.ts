@@ -209,7 +209,14 @@ function panel(p: Population, width: number, panelText: string): string {
     () =>
       seriesSpec(
         p.points,
-        { a: "mean district", b: "state total" },
+        /*
+         * Short, because the gutter that holds them is capped at 0.45 of a 311px panel and
+         * `mean district +0.0272` is painted 135px wide on the runner against the 132 it has.
+         * These two words are the card's own framing of the pair — "a statewide total, and six
+         * hundred district figures" — and every place with room for the longer form says the
+         * longer form: the hover, the alternative text, and the paragraph under the panels.
+         */
+        { a: "district", b: "statewide" },
         logError,
         (point) =>
           `${years(point.at)} ahead: the mean district ran ${logError(point.a ?? 0)} in logs, ` +
