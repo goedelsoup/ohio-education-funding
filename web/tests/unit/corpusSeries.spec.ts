@@ -146,11 +146,12 @@ const kindsOfPages = (nodes: Node[], series: SeriesManifest): SeriesDiscrepancyK
 const pageSources = new Set(Object.values(PAGE_SERIES).map((source) => source.node));
 
 test("PAGE_SERIES is not empty, and every entry names a route and a corpus id", () => {
-  // A check over an empty table passes against any corpus. Two pages draw one today:
-  // `project/bounds-census` on `/bounds`, and the coverage curve on `/method`. Raise this when a
-  // third does.
+  // A check over an empty table passes against any corpus. Four curves are drawn today:
+  // `project/bounds-census` on `/bounds`, and three on `/method` — the coverage profile and the
+  // two bias populations, the last two of which share the one node that answers for them. Raise
+  // this when a fifth is drawn.
   const entries = Object.entries(PAGE_SERIES);
-  expect(entries.length, "2 pages draw a series; raise this when a third does").toBeGreaterThanOrEqual(2);
+  expect(entries.length, "4 curves are drawn; raise this when a fifth is").toBeGreaterThanOrEqual(4);
   for (const [key, source] of entries) {
     expect(source.route, key).toMatch(/^\//);
     expect(source.node, key).toMatch(/^[a-z0-9-]+\/[a-z0-9-]+$/);
@@ -169,7 +170,11 @@ test("unknown-key: a page declares a series crates/series.json does not carry", 
 
 test("page-source-missing: the node a page cites for its endpoints is not in the corpus", () => {
   const without = corpus.nodes.filter((node) => !pageSources.has(node.id));
-  expect(kindsOfPages(without, manifest)).toEqual([...pageSources].map(() => "page-source-missing"));
+  // One discrepancy per *entry*, not per node: two curves may name the same answering node, and
+  // both of them lose their answer when it goes. `pageSources` is a set and would undercount.
+  expect(kindsOfPages(without, manifest)).toEqual(
+    Object.keys(PAGE_SERIES).map(() => "page-source-missing"),
+  );
 });
 
 test("the node a page cites binds nothing at the chart's ends", () => {

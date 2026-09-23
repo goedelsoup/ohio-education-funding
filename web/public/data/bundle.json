@@ -1,5 +1,5 @@
 {
-  "contract_version": "45.0.0",
+  "contract_version": "46.0.0",
   "provenance": "Ohio DEW TRAD State Foundation Funding Calculator (a projection, not an actual) joined with the District Profile Report, the Department of Taxation's Table SD-1, and the Ohio School Report Card on IRN across the 606 districts every panel covers. Enrolled ADM spans three years, of which the last is partly departmental estimate. Each block states the year it is measured in beside its own figures; see .yidam/catalog/ for what each source can be trusted for.",
   "fiscal_year": 2027,
   "series_years": [
@@ -104,6 +104,21 @@
     "z": 1,
     "prior_source": "cross-sectional spread of district annual enrolled-ADM growth, FY2024-FY2026",
     "statute_ends": 2027,
+    "bias": [
+      {"horizon": 1, "mean_district": -0.00706595, "total": -0.0052052, "mean_district_pre_closure": -0.00706595, "total_pre_closure": -0.0052052},
+      {"horizon": 2, "mean_district": -0.00552126, "total": -0.00553269, "mean_district_pre_closure": -0.00552126, "total_pre_closure": -0.00553269},
+      {"horizon": 3, "mean_district": -0.00070625, "total": -0.00503031, "mean_district_pre_closure": -0.00070625, "total_pre_closure": -0.00503031},
+      {"horizon": 4, "mean_district": 0.00704783, "total": 0.00288086, "mean_district_pre_closure": 0.00271988, "total_pre_closure": -0.00175364},
+      {"horizon": 5, "mean_district": 0.01711028, "total": 0.01065506, "mean_district_pre_closure": 0.00750517, "total_pre_closure": 0.00057445},
+      {"horizon": 6, "mean_district": 0.02369853, "total": 0.01513437, "mean_district_pre_closure": 0.01171967, "total_pre_closure": 0.00361997},
+      {"horizon": 7, "mean_district": 0.02942645, "total": 0.01716909, "mean_district_pre_closure": 0.01785462, "total_pre_closure": 0.00614289},
+      {"horizon": 8, "mean_district": 0.03780053, "total": 0.02326445, "mean_district_pre_closure": 0.02338363, "total_pre_closure": 0.01192349},
+      {"horizon": 9, "mean_district": 0.0434002, "total": 0.0277911, "mean_district_pre_closure": 0.02719782, "total_pre_closure": 0.01713987},
+      {"horizon": 10, "mean_district": 0.05622791, "total": 0.03222844, "mean_district_pre_closure": null, "total_pre_closure": null},
+      {"horizon": 11, "mean_district": 0.06405045, "total": 0.04073401, "mean_district_pre_closure": null, "total_pre_closure": null},
+      {"horizon": 12, "mean_district": 0.06792407, "total": 0.04930014, "mean_district_pre_closure": null, "total_pre_closure": null},
+      {"horizon": 13, "mean_district": 0.07339254, "total": 0.05693158, "mean_district_pre_closure": null, "total_pre_closure": null}
+    ],
     "checkpoints": [
       {"label": "current law, FY2028", "policy": {"guarantee": "as-enacted", "guarantee_argument": 0, "base_cost_scale": 1, "minimum_state_share": 0.1, "phase_in_general": 1, "phase_in_dpia": 1, "dpia_directly_certified_weight": 0.35, "supplemental_top_rate": 0, "transportation_floor": 0.5, "backstop": "as-enacted"}, "fiscal_year": 2028, "realized_aid": 7237143602.6628, "low": 7093280685.3595, "high": 7399685366.306, "adm": 1385785.2276, "on_guarantee": 310},
       {"label": "current law, FY2032", "policy": {"guarantee": "as-enacted", "guarantee_argument": 0, "base_cost_scale": 1, "minimum_state_share": 0.1, "phase_in_general": 1, "phase_in_dpia": 1, "dpia_directly_certified_weight": 0.35, "supplemental_top_rate": 0, "transportation_floor": 0.5, "backstop": "as-enacted"}, "fiscal_year": 2032, "realized_aid": 7233134576.7097, "low": 6957859359.9412, "high": 7581865913.5701, "adm": 1384244.8625, "on_guarantee": 312},

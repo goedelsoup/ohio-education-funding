@@ -14,6 +14,7 @@ import { DENOMINATORS, denominatorSource, denominatorSpan } from "../lib/denomin
 import * as routes from "../lib/routes.ts";
 import { yearChip, yearOf } from "../lib/year.ts";
 import { coverage, renderCoverage } from "../lib/coverage.ts";
+import { bias, renderBias } from "../lib/bias.ts";
 import { scatterSpec } from "../lib/plot/spec.ts";
 import { renderToString } from "../lib/plot/ssr.ts";
 import { pairs } from "../lib/relationships.ts";
@@ -23,6 +24,7 @@ const { bundle, verification, forecastable, tax } = loadFeed();
 const corpus = loadCorpus();
 // What the band actually held, backtested. Read off the series manifest — see `coverage.ts`.
 const held = coverage();
+const drift = bias();
 const s = bundle.statewide;
 const meta = bundle.projection;
 // The MR-81 endpoints, read rather than typed — the pair that went stale twice. See
@@ -438,6 +440,7 @@ const millageScatter = renderToString(
       formula at one end of the band and on the guarantee at the other.
     </p>
     <Fragment set:html={renderCoverage(held)} />
+    <Fragment set:html={renderBias(drift)} />
     <p class="note">
       The forecast card is always below the simulation and is never merged with it, and there is
       deliberately no figure anywhere on this site that adds them together. Re-running the formula

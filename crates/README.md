@@ -127,6 +127,27 @@ makes silently. The reference is the one quantity in either document that names 
 `Traces::framed` holds it inside the vertical axis so the distances the lines mean are drawn
 rather than implied. See #421 and #445.
 
+The second family of curves is the same backtest's *other* half, and it is where the rule's cost
+shows. `project/the-bias-before-the-closure` and `project/the-bias-across-the-closure` draw the
+level the band is centred on rather than its width: the mean district's log error and the state
+total's, at every horizon, over the forecasts that stay clear of a school closure and over all of
+them. Four lines over two populations, because a `Traces` carries exactly two and the pair that
+has to be read against each other is the two published quantities — the total's sign changes four
+years deeper than the mean district's, so a level correction right for one has the wrong *sign*
+for the other. Three figures a line is twelve, and the endpoint rule fills ten of them: horizons
+one to three are the same forecasts in both populations, so the two curves legitimately name one
+pair of first-point figures. The eleventh and twelfth are not endpoints at all — the FY2032 leg
+the scenario node projects is six years long, and an interior point gets pinned because the
+alternative is a reader standing at that band with figures for one, nine and thirteen years and
+none for six. Four of the ten duplicate a value some other pin already names, because every
+line here runs monotonically away from zero and each one's worst departure *is* its last point.
+That is the rule answering rather than the rule idling — a line that turned back would make those
+four different numbers, and the pin that looks redundant today is the one that would catch it. The
+unit is `Ratio`: a log error is dimensionless and is not a fraction of one, and `Share` is
+refused outright below two points, which most of these are. The manifest holds no signs, so the
+two negative first points are pinned as magnitudes with `-negative` in the key and the minus
+carried by the prose. See #431 and #445.
+
 The line is fitted here and nowhere else. `crates/series.json` carries its two **endpoints in the
 data's own units** rather than a slope and an intercept, so no consumer evaluates a model: the web
 layer draws a segment between two points it was given, and `chart.ts`'s standing prohibition on a
@@ -255,7 +276,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 -->
 | Crate | Description | `#[test]` fns |
 |---|---|--:|
-| [`bundle`](bundle/) | Export a versioned JSON feed of the corpus's district-level findings for the web layer | 51 |
+| [`bundle`](bundle/) | Export a versioned JSON feed of the corpus's district-level findings for the web layer | 52 |
 | [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 183 |
 | [`deflator`](deflator/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 17 |
 | [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 370 |
@@ -264,12 +285,12 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`foundation`](foundation/) | Fair School Funding Plan base cost build-up, per R.C. 3317.011 | 58 |
 | [`local-capacity`](local-capacity/) | Fair School Funding Plan local capacity and state share, per R.C. 3317.017 | 27 |
 | [`millage`](millage/) | Effective operating millage under H.B. 920 reduction factors, and 20-mill floor status | 19 |
-| [`project`](project/) | Forward projection of funding inputs, and policy simulation over them | 825 |
+| [`project`](project/) | Forward projection of funding inputs, and policy simulation over them | 826 |
 | [`regime-diff`](regime-diff/) | Difference two funding regimes at component level, with the residual the decomposition does not explain | 51 |
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 37 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 79 |
 
-13 crates, 1788 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+13 crates, 1790 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status

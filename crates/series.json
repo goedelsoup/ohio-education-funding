@@ -790,6 +790,74 @@
           {"x": 12.0, "y": 0.7001661129568106},
           {"x": 13.0, "y": 0.6943521594684385}
         ]}
+     ]},
+    {"key": "project/the-bias-before-the-closure", "owner": "crates/project", "subject": "horizon", "label": "How far each of the two published quantities sat from the truth at every horizon, over the forecasts whose target year is FY2020 or earlier — the mean district’s log error and the whole state’s, which are not one number", "x": {"label": "Years ahead", "unit": "count", "min": 1.0, "max": 9.0, "log": false}, "y": {"label": "Bias, as a log error", "unit": "ratio", "min": -0.008436502224047068, "max": 0.028568366699636378, "log": false},
+     "reference": {"label": "No bias", "value": 0.0},
+     "lines": [
+       {"label": "The mean district", "firstFigure": "project/the-mean-district-bias-at-one-year-negative", "lastFigure": "project/the-mean-district-bias-at-nine-years-before-the-closure",
+        "worst": {"at": 9.0, "gap": 0.027197815998759214, "figure": "project/the-worst-mean-district-bias-before-the-closure"},
+        "points": [
+          {"x": 1.0, "y": -0.007065951523169902},
+          {"x": 2.0, "y": -0.005521259946520018},
+          {"x": 3.0, "y": -0.0007062477561749845},
+          {"x": 4.0, "y": 0.0027198848472588955},
+          {"x": 5.0, "y": 0.007505168782146471},
+          {"x": 6.0, "y": 0.01171967102855504},
+          {"x": 7.0, "y": 0.017854617344129416},
+          {"x": 8.0, "y": 0.023383631612689786},
+          {"x": 9.0, "y": 0.027197815998759214}
+        ]},
+       {"label": "The state total", "firstFigure": "project/the-total-bias-at-one-year-negative", "lastFigure": "project/the-total-bias-at-nine-years-before-the-closure",
+        "worst": {"at": 9.0, "gap": 0.017139865033606896, "figure": "project/the-worst-total-bias-before-the-closure"},
+        "points": [
+          {"x": 1.0, "y": -0.0052051981695586955},
+          {"x": 2.0, "y": -0.005532687404458049},
+          {"x": 3.0, "y": -0.005030314629226344},
+          {"x": 4.0, "y": -0.0017536383988907092},
+          {"x": 5.0, "y": 0.0005744472466969641},
+          {"x": 6.0, "y": 0.0036199719206653634},
+          {"x": 7.0, "y": 0.006142887873663904},
+          {"x": 8.0, "y": 0.01192348733353467},
+          {"x": 9.0, "y": 0.017139865033606896}
+        ]}
+     ]},
+    {"key": "project/the-bias-across-the-closure", "owner": "crates/project", "subject": "horizon", "label": "The same two quantities over every scored forecast, the school closures included — four horizons deeper than the panel reaches without them, and further from zero at every one of them", "x": {"label": "Years ahead", "unit": "count", "min": 1.0, "max": 13.0, "log": false}, "y": {"label": "Bias, as a log error", "unit": "ratio", "min": -0.010284291123200706, "max": 0.07661087807763098, "log": false},
+     "reference": {"label": "No bias", "value": 0.0},
+     "lines": [
+       {"label": "The mean district", "firstFigure": "project/the-mean-district-bias-at-one-year-negative", "lastFigure": "project/the-mean-district-bias-at-thirteen-years",
+        "worst": {"at": 13.0, "gap": 0.07339253847760017, "figure": "project/the-worst-mean-district-bias-across-the-closure"},
+        "points": [
+          {"x": 1.0, "y": -0.007065951523169902},
+          {"x": 2.0, "y": -0.005521259946520018},
+          {"x": 3.0, "y": -0.0007062477561749845},
+          {"x": 4.0, "y": 0.0070478326740881165},
+          {"x": 5.0, "y": 0.017110277346017208},
+          {"x": 6.0, "y": 0.023698527725655654},
+          {"x": 7.0, "y": 0.029426445178084785},
+          {"x": 8.0, "y": 0.03780052966810026},
+          {"x": 9.0, "y": 0.043400195780783295},
+          {"x": 10.0, "y": 0.05622790639443781},
+          {"x": 11.0, "y": 0.06405045047616295},
+          {"x": 12.0, "y": 0.06792406793457836},
+          {"x": 13.0, "y": 0.07339253847760017}
+        ]},
+       {"label": "The state total", "firstFigure": "project/the-total-bias-at-one-year-negative", "lastFigure": "project/the-total-bias-at-thirteen-years",
+        "worst": {"at": 13.0, "gap": 0.05693157713445436, "figure": "project/the-worst-total-bias-across-the-closure"},
+        "points": [
+          {"x": 1.0, "y": -0.0052051981695586955},
+          {"x": 2.0, "y": -0.005532687404458049},
+          {"x": 3.0, "y": -0.005030314629226344},
+          {"x": 4.0, "y": 0.0028808564470267934},
+          {"x": 5.0, "y": 0.010655061665857233},
+          {"x": 6.0, "y": 0.0151343730073622},
+          {"x": 7.0, "y": 0.017169093235156644},
+          {"x": 8.0, "y": 0.023264452095982498},
+          {"x": 9.0, "y": 0.027791096021269928},
+          {"x": 10.0, "y": 0.03222844374446529},
+          {"x": 11.0, "y": 0.04073400720357606},
+          {"x": 12.0, "y": 0.04930013543719578},
+          {"x": 13.0, "y": 0.05693157713445436}
+        ]}
      ]}
   ]
 }

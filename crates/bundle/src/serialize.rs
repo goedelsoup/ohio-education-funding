@@ -369,6 +369,21 @@ impl Bundle {
                     pr.num("z", p.z);
                     pr.text("prior_source", &p.prior_source);
                     pr.num("statute_ends", f64::from(p.statute_ends));
+                    {
+                        // Eight places and not four. These are log errors around a thousandth,
+                        // and `num` would round the one figure the whole block turns on — the
+                        // total's +0.0006 at five years before the closure — to a value a reader
+                        // could not distinguish from zero. See `Obj::opt_share`.
+                        let mut biases = pr.block_arr("bias", "      ");
+                        for b in &p.bias {
+                            let mut o = biases.obj();
+                            o.count("horizon", b.horizon);
+                            o.share("mean_district", b.mean_district);
+                            o.share("total", b.total);
+                            o.opt_share("mean_district_pre_closure", b.mean_district_pre_closure);
+                            o.opt_share("total_pre_closure", b.total_pre_closure);
+                        }
+                    }
                     let mut list = pr.block_arr("checkpoints", "      ");
                     for c in &p.checkpoints {
                         let mut o = list.obj();

@@ -917,3 +917,86 @@ fn a_level_correction_fitted_before_the_closure_removes_half_of_what_crosses_it_
         );
     }
 }
+
+/// The library's published profile is this file's table, horizon by horizon and both ways of
+/// summing.
+///
+/// #431 asked for the computation to be hoisted out of here so the feed could bind it, and a
+/// hoist is only a hoist if the thing hoisted is the same thing. Everything above measures the
+/// shipped method through the reimplementation at the top of this file — pinned constants, its
+/// own projection, its own two bias definitions — for the reason `SHIPPING_DAMPING` gives. This
+/// is the one test that puts the two side by side, which makes `project::backtest::bias_profile`
+/// answerable to an independent implementation rather than to itself.
+///
+/// Compared to a tolerance rather than to the bit. Both sides sum the same forecasts, but they
+/// reach them in different orders — the library over `scored_at`'s per-origin groups, this file
+/// over a flat filter — and floating-point addition is not associative. A part in a trillion is
+/// four orders of magnitude tighter than the smallest figure either side publishes.
+#[test]
+fn the_library_reproduces_this_files_table_at_every_horizon() {
+    /// Tight enough that a different *method* cannot pass, loose enough for summation order.
+    const CLOSE: f64 = 1e-12;
+
+    let all = forecasts(&complete_histories());
+    let rows = project::backtest::bias_profile(
+        project::backtest::DEEPEST_HORIZON,
+        *PANEL_YEARS.last().expect("the panel names its years"),
+    );
+    assert_eq!(
+        rows.len(),
+        usize::from(project::backtest::DEEPEST_HORIZON),
+        "the profile should carry one row per horizon"
+    );
+
+    for row in &rows {
+        let across = at_horizon(&all, row.horizon, *PANEL_YEARS.last().unwrap());
+        for (what, library, here) in [
+            (
+                "the mean district across the closure",
+                row.across_it.mean_district,
+                mean_district_bias(&across),
+            ),
+            (
+                "the total across the closure",
+                row.across_it.total,
+                total_bias(&across),
+            ),
+        ] {
+            assert!(
+                (library - here).abs() < CLOSE,
+                "{what} at {} years: the library gives {library:+.12} and this file \
+                 {here:+.12}",
+                row.horizon
+            );
+        }
+
+        let before = at_horizon(&all, row.horizon, BEFORE_THE_CLOSURE);
+        match (row.before_the_closure, before.is_empty()) {
+            (None, true) => {}
+            (Some(bias), false) => {
+                assert!(
+                    (bias.mean_district - mean_district_bias(&before)).abs() < CLOSE
+                        && (bias.total - total_bias(&before)).abs() < CLOSE,
+                    "before the closure at {} years: the library gives \
+                     {:+.12}/{:+.12} and this file {:+.12}/{:+.12}",
+                    row.horizon,
+                    bias.mean_district,
+                    bias.total,
+                    mean_district_bias(&before),
+                    total_bias(&before)
+                );
+            }
+            (None, false) => panic!(
+                "the library says no forecast reaches {} years without crossing the closure, \
+                 and this file scores {}",
+                row.horizon,
+                before.len()
+            ),
+            (Some(_), true) => panic!(
+                "the library carries a pre-closure bias at {} years and this file scores no \
+                 forecast there",
+                row.horizon
+            ),
+        }
+    }
+}

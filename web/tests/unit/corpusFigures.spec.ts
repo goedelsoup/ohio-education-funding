@@ -291,6 +291,18 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * what the manifest cannot: that no district of either blind population moves by so much as a
  * cent, which is a statement about 89 and 64 arms rather than about a sum.
  *
+ * Recounted at **1046/78** when #431 and #445 published the projection's bias beside it.
+ * Twelve bindings on one node, and the shape of them is the reason the count moved so far in one change:
+ * a curve owes three figures per line — where it starts, where it ends, and its worst departure
+ * from the reference — and there are four lines here, over two populations. Four of the ten name
+ * a value some other binding already names, because every line runs monotonically away from zero
+ * and so each one's worst departure *is* its last point. That duplication is not slack in the
+ * rule; it is the rule's answer being interesting. A line that turned back would make those four
+ * different numbers, and the binding that would have caught it is the one that looks redundant
+ * today. The last two are not endpoints at all: the node projects a six-year leg to FY2032 and
+ * had been stating that horizon's bias in prose, in the decision record, unpinned — which is the
+ * defect the whole change exists to remove, one artifact short of the artifacts it was fixing.
+ *
  * Recounted at **1001/78** when #442 drew #417's four-number table as the two clouds it was found
  * by. Three bindings, no new carrier, and all three were already *written* — the prose on the
  * targeted assistance node has stated both slopes and both r-squareds since #417 and bound one of
@@ -300,8 +312,8 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * pinned — the endpoint rule reaching backwards into prose that was already there.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1001 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1001,
+  expect(bindings.length, "1046 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1046,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,

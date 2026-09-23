@@ -1241,6 +1241,28 @@ export const ForecastCheckpointSchema = z
   })
   .strict();
 
+/**
+ * What the projection has actually been wrong by at one horizon.
+ *
+ * Two figures and not one: the feed publishes a statewide total and six hundred district figures
+ * from the same projections, and they do not carry the same bias. A correction that serves the
+ * mean district is wrong for the total, which is why both are published and neither is applied.
+ *
+ * The pre-closure pair is `null` at the horizons no origin reaches without crossing the pandemic
+ * shutdown — an absence, not a zero, and not the crossing figure wearing the other label.
+ *
+ * Positive means the projection ran high. These are log errors: a percentage is `exp(bias) - 1`.
+ */
+export const ProjectionBiasSchema = z
+  .object({
+    horizon: z.number().int().positive(),
+    mean_district: num,
+    total: num,
+    mean_district_pre_closure: num.nullable(),
+    total_pre_closure: num.nullable(),
+  })
+  .strict();
+
 /** How this feed's forecasts were made, and what their interval rests on. */
 export const ProjectionMetaSchema = z
   .object({
@@ -1265,6 +1287,8 @@ export const ProjectionMetaSchema = z
      * stops naming a law, and a surface drawing a year beyond it has to say so.
      */
     statute_ends: num,
+    /** Ordered by horizon, one to the deepest the Census panel scores. Empty if it is absent. */
+    bias: z.array(ProjectionBiasSchema),
     checkpoints: z.array(ForecastCheckpointSchema),
   })
   .strict();

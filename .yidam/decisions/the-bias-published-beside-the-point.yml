@@ -1,0 +1,132 @@
+id: the-bias-published-beside-the-point
+summary: >-
+  The projection's growing positive bias is published rather than corrected — two figures per
+  horizon and not one, because the statewide total and the six hundred district figures come from
+  the same projections and do not carry the same bias, and the total's sign changes at five years
+  where the mean district's has already turned.
+context: |
+  [`the-widening-rule`](the-widening-rule.yml) fitted the band's shape and left its level alone,
+  and its `open:` block named what remained: the log error has a growing positive mean, and an
+  interval centred on a biased point inherits that bias whatever its width. #423 asked whether to
+  correct it and on what. `crates/project/tests/the_bias_that_belongs_to_the_years.rs` measured
+  the four remedies it named and every one of them failed, for reasons recorded there and
+  summarised in that block — the bias is a **year** effect with no gradient on anything a forecast
+  can see at its origin, so there is nothing to correct it *on*.
+
+  What that file also found is the reason this is a decision rather than a note. The 5.8% the
+  earlier work quoted is the mean **district's**. The feed publishes a statewide total from the
+  same projections, and it is a different number:
+
+      horizon   mean district, pre-closure   total, pre-closure   mean district, all   total, all
+      1                 -0.0071                  -0.0052              -0.0071            -0.0052
+      3                 -0.0007                  -0.0050              -0.0007            -0.0050
+      4                 +0.0027                  -0.0018              +0.0070            +0.0029
+      5                 +0.0075                  +0.0006              +0.0171            +0.0107
+      7                 +0.0179                  +0.0061              +0.0294            +0.0172
+      9                 +0.0272                  +0.0171              +0.0434            +0.0278
+      10                     —                        —               +0.0562            +0.0322
+      13                     —                        —               +0.0734            +0.0569
+
+  **The two lines cross zero in different years.** Before the closure the mean district has turned
+  positive by four years and is 0.75% high at five; the total is still 0.18% *low* at four and
+  0.06% high at five — inside a tenth of a point of unbiased at the horizon where the district
+  figure is already drifting. A correction that serves one is wrong for the other, and a reader
+  holding one of these numbers cannot tell which one they have.
+decision: |
+  **Publish both, at every horizon, and correct neither.** A `bias` array on the feed's
+  `projection` block, one row per horizon from one to thirteen, carrying four figures: the mean
+  district's and the total's, each across the pandemic closure and restricted to targets before
+  it.
+
+  `project::backtest::bias_profile` computes it, on the same scored forecasts
+  [`profile`](../../crates/project/src/backtest.rs) scores the band against — one projection path,
+  so a band measured against one set of forecasts and a bias measured against another cannot
+  happen. The harness that produced the table above lived in a test file and is hoisted for the
+  reason `an-example-is-reachable-by-no-gate` records: a number no artifact can reach is a number
+  that moves when the method moves and says nothing about it.
+
+  **Four figures per horizon rather than two.** The mean-district/total split is the finding, and
+  the pre-closure restriction is not a sample of the same question — it is a different one. A
+  forecast whose target is FY2021 or later is scored across a statewide level break that no method
+  fitted before it could see. Both populations are published and neither is labelled the corrected
+  one.
+
+  **Absent rather than zero at the deep horizons.** No origin reaches ten years without crossing
+  the closure, so the pre-closure pair is `null` from ten to thirteen. The panel cannot say what
+  this method does at ten years in a decade that did not contain a school closure, and the
+  alternative — printing the crossing figure under the pre-closure label — is the one thing that
+  would make the two columns incomparable.
+
+  **Log errors, not percentages.** The field is `ln(point / actual)`, and a consumer wanting a
+  percentage takes `exp(bias) - 1`. Log errors average without the asymmetry that makes a mean of
+  ratios depend on which way round the ratio is written, and the total's figure is a log of a
+  ratio of sums, which has no percentage form that survives being averaged with the others.
+consequences: |
+  **The feed contract breaks to 46.0.0.** One new array on the projection block. Breaking rather
+  than additive by the rule `the-shrunk-rate` set: a consumer reproducing the projection block
+  should be told that what the block says about its own reliability has changed, and the version
+  is where it finds out.
+
+  **Eight places, not four.** `num` rounds to four, which renders the pivotal figure — the total's
+  +0.00057 at five years before the closure — as `0.0006`, a value a reader cannot distinguish
+  from zero and a consumer cannot reproduce. The bias rows go through `share`/`opt_share`, which
+  is the trap `the-shrunk-rate` recorded and the second field to fall into it.
+
+  **The FY2032 leg states its own, which is #431's fourth question answered.**
+  `scenario/guarantee-phase-out` carries both the FY2032 band and this backtest, so the bias is
+  stated in the property that qualifies the projection rather than on a node of its own. Its leg
+  is six years, an interior point of a curve whose other pins are its ends — pinned anyway,
+  because the alternative was a reader standing at the FY2032 band with figures for one, nine and
+  thirteen years and none for six. This record stated those two numbers in prose before they were
+  pinned, which is exactly the defect `an-example-is-reachable-by-no-gate` names.
+
+  **`/method` states it beside the point rather than in the band.** The forecast card's footnote
+  carried the 5.8% as a sentence; it now draws all four lines against zero, and the two panels are
+  the two populations. The band itself does not move, and the centre does not move.
+
+  **Twelve pins, in `ratio` and not `share`.** Two curves at three figures a line is twelve, and
+  the document carries ten of them plus the two the FY2032 leg needs: horizons one to three are
+  the same forecasts in both populations, so the two curves name one pair of first-point figures
+  between them. The unit is `Unit::Ratio` — a log error is dimensionless and is not a fraction of
+  one — and that is also the only unit available, because `Unit::Share` is refused below two
+  points and most of these are under it. `ratio` renders bare, so the prose that states them
+  carries no `%` and no scale word, which is the same discipline as **Log errors, not
+  percentages** above, enforced by a gate rather than by care.
+
+  **The two negative figures are pinned as magnitudes.** `crates/figures.json` cannot bind a
+  negative — its numeral regex captures no sign — so the one-year pair takes `-negative` in its
+  key, `.abs()` in its `compute`, and a U+2212 in the prose beside it. That is a limitation of
+  the binding mechanism and not a judgement about the figures, and it is recorded here because
+  the sign is the whole of what this record is about.
+
+  **Four of the twelve name a value another pin already names.** Every line here runs
+  monotonically away from zero, so each one's worst departure *is* its last point. That is the
+  endpoint rule answering rather than idling: a line that turned back would make those four
+  different numbers, and the pin that looks redundant today is the one that would catch it.
+alternatives: |
+  **Correct the point.** The question #423 asked, and every version of it failed on measurement —
+  the file that measured them is the context above. The shortest statement of why: sorted on the
+  rate to the origin or on the district's size, every quarter of districts is forecast high by
+  about the same amount, so there is nothing a forecast could condition a correction on.
+
+  **Publish one figure per horizon.** The obvious simplification, and it is the one thing the
+  measurement forbids: the two published quantities differ in sign at four years and by an order
+  of magnitude at five. Whichever one was published, some reader would apply it to the other.
+
+  **Publish only the pre-closure figures, as the "clean" ones.** Rejected. They stop at nine
+  years and the feed forecasts to ten, so the horizon the feed actually publishes would have no
+  figure at all. The closure is in the record and a projection made today runs through it.
+
+  **Publish percentages rather than log errors.** Friendlier and lossy; see the decision. A
+  percentage per horizon is a derived view and the page computes it.
+
+  **Leave it in the test file and quote the numbers.** What was already happening, and what the
+  first half of this work was undoing on the coverage side: three artifacts quoted figures a test
+  produced and nothing recomputed them.
+open: |
+  **The per-district fan does not carry this yet.** `/district/<irn>` draws a projection fan per
+  district and says nothing about bias; #445 names that as a third delivery and it is not done
+  here. The figures published are statewide — a mean over districts and a total across them — and
+  neither is a statement about any one district, which is the thing a per-district surface would
+  have to be careful about.
+supersedes: []

@@ -124,8 +124,16 @@ open: |
   worth a third of a percent; relative to the state the error-minimising share is zero. A drift
   fitted on the pre-closure mean district removes half of what crosses the closure and puts the
   total a point low before it. An asymmetric band is that correction drawn as a band, and holds
-  less — 62.5% against 65.6% at ten years — than shifting the centre by the same amount. What
-  remains is to publish two bias figures per horizon beside the projection, the mean district's
-  and the total's, before the closure and across it; that is a feed field and a decision of its
-  own.
+  less — 62.5% against 65.6% at ten years — than shifting the centre by the same amount.
+
+  **Done, by #431, and recorded in
+  [`the-bias-published-beside-the-point`](the-bias-published-beside-the-point.yml).** The feed
+  publishes the bias beside the projection: four figures per horizon rather than the two the
+  sentence this replaces asked for. The mean district's and the total's, each across the closure
+  and restricted to targets before it — the restriction changes which origins are scored, so it is
+  a different question rather than a cleaner sample of one. The computation is hoisted into
+  `project::backtest::bias_profile`, on the same scored forecasts the band above is measured
+  against, and `/method` draws all four against zero beside the point they describe. Nothing in
+  this record moves: the exponent is 0.65, `sigma` is unchanged, and the centre of every published
+  interval is where it was.
 supersedes: []
