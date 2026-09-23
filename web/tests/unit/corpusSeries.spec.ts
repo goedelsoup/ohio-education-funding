@@ -13,6 +13,7 @@ import { loadCorpus, type Node } from "../../src/lib/corpus.ts";
 import { loadFigureManifest, READS_CONTRACT, type Manifest } from "../../src/lib/corpusFigures.ts";
 import {
   barsOf,
+  censusAgainstFigures,
   crossCheckPageSeries,
   crossCheckSeries,
   endpoints,
@@ -24,6 +25,7 @@ import {
   type ManifestCurve,
   type ManifestSeries,
   type ManifestPlane,
+  type ManifestSpread,
   multiplesOf,
   panelsOf,
   linesAgainstFigures,
@@ -31,6 +33,7 @@ import {
   pointsOf,
   positionsAgainstFigures,
   READS_SERIES_CONTRACT,
+  regionsOf,
   rowsAgainstFigures,
   type SeriesDiscrepancyKind,
   type SeriesManifest,
@@ -68,6 +71,10 @@ test("the two committed manifests agree on both coordinates of every position", 
   expect(positionsAgainstFigures(manifest, figures)).toEqual([]);
 });
 
+test("the two committed manifests agree on every row of every spread's census", () => {
+  expect(censusAgainstFigures(manifest, figures)).toEqual([]);
+});
+
 /**
  * The coverage floor, at the value and not under it, on the figure ratchet's standing rule:
  * recount with the expressions below rather than incrementing the last stated number.
@@ -91,12 +98,14 @@ test("the corpus draws no fewer series than it did", () => {
   ).toBeGreaterThanOrEqual(2);
   expect(
     new Set([...drawn.map((binding) => binding.key), ...Object.keys(PAGE_SERIES)]).size,
-    "every series, cloud, plane and curve the manifest exports is drawn by some node or page",
+    "every series, cloud, plane, curve and spread the manifest exports is drawn by some node or " +
+      "page",
   ).toBe(
     manifest.series.length +
       manifest.scatters.length +
       manifest.planes.length +
-      manifest.curves.length,
+      manifest.curves.length +
+      manifest.spreads.length,
   );
   expect(
     manifest.scatters.length,
@@ -113,6 +122,11 @@ test("the corpus draws no fewer series than it did", () => {
     "1 curve: project/what-the-band-held-at-every-horizon, drawn by /method; raise this when you " +
       "add one",
   ).toBeGreaterThanOrEqual(1);
+  expect(
+    manifest.spreads.length,
+    "2 spreads, both on formula-component/temporary-transitional-aid-guarantee: the two terms of " +
+      "every district's multiple, and the same terms cut by wealth; raise this when you add one",
+  ).toBeGreaterThanOrEqual(2);
 });
 
 test("the manifest declares the contract this module reads", () => {
@@ -236,6 +250,7 @@ function fixture(): { node: Node; series: SeriesManifest; figures: Manifest } {
     scatters: [],
     planes: [],
     curves: [],
+    spreads: [],
     series: [
       {
         key: "dispersion/by-class",
@@ -462,6 +477,7 @@ function cloudFixture(): { node: Node; series: SeriesManifest; figures: Manifest
     series: [],
     planes: [],
     curves: [],
+    spreads: [],
     scatters: [
       {
         key: "project/what-it-measures",
@@ -706,6 +722,7 @@ function planeFixture(): { node: Node; series: SeriesManifest; figures: Manifest
     series: [],
     scatters: [],
     curves: [],
+    spreads: [],
     planes: [plane],
   };
   const dollars = (key: string, value: number, label: string) =>
@@ -926,6 +943,7 @@ function curveFixture(): { node: Node; series: SeriesManifest; figures: Manifest
     scatters: [],
     planes: [],
     curves: [curve],
+    spreads: [],
   };
   const share = (key: string, value: number, label: string) =>
     ({ key, owner: "crates/project", unit: "share", value, label }) as const;
@@ -1137,4 +1155,259 @@ test("the two inert anchor rules are labelled on both axes, and only they are", 
     }
     expect(multiples.labelChars).toBe(2);
   }
+});
+
+// --- The spread, whose whole reading is its census ---------------------------------------------
+
+/**
+ * A spread correct in every position, for the mutations below to be cut from.
+ *
+ * Two panels over one frame, three classes, one boundary, and a census that counts the whole, each
+ * panel and the one region neither term carries. The panels are deliberately different sizes: a
+ * fixture whose two panels are the same length cannot tell a check that counts panels from one that
+ * counts the whole. One subject is unreached, which is the state the fixture exists to hold — a
+ * census of 6 under a picture of 5 is the defect, and it is only visible if the sixth is named.
+ */
+function spreadFixture(): { node: Node; series: SeriesManifest; figures: Manifest } {
+  const prose =
+    "Of the 5 drawn, 3 lost pupils and 2 did not; 1 sits below the boundary where there is no " +
+    "majority to take. [verified] (`crates/project`)";
+  const bind = (key: string, value: number, as_written: string) =>
+    ({ key, value, field: "description", as_written }) as const;
+  const node: Node = {
+    id: "scenario/example-spread",
+    className: "scenario",
+    name: "example-spread",
+    label: "Example spread",
+    summary: "Which term carries the majority.",
+    description: prose,
+    linkText: prose,
+    properties: [],
+    findings: null,
+    revisions: [],
+    unfilled: [],
+    figures: [
+      bind("project/drawn", 5, "Of the 5 drawn"),
+      bind("project/lost", 3, "3 lost pupils"),
+      bind("project/kept", 2, "2 did not"),
+      bind("project/neither", 1, "1 sits below the boundary"),
+    ],
+    series: [{ key: "project/which-term-carries", field: "description" }],
+    out: [],
+    in: [],
+  };
+  const mark = (label: string, x: number, y: number, klass: number) => ({
+    label,
+    x,
+    y,
+    class: klass,
+  });
+  const spread: ManifestSpread = {
+    key: "project/which-term-carries",
+    owner: "crates/project",
+    subject: "district",
+    label: "Which of the two terms carries the majority",
+    x: { label: "Enrollment term", unit: "ratio", min: -1, max: 1, log: false },
+    y: { label: "Per-pupil term", unit: "ratio", min: -1, max: 1, log: false },
+    classes: ["Neither: the multiple is at or below one", "Enrollment", "Per pupil"],
+    boundaries: [{ label: "A multiple of one", from: [-1, 1], to: [1, -1] }],
+    census: [
+      { label: "Drawn", subjects: 5, figure: "project/drawn" },
+      { label: "Lost pupils", subjects: 3, figure: "project/lost" },
+      { label: "Kept pupils", subjects: 2, figure: "project/kept" },
+      { label: "Neither term carries", subjects: 1, figure: "project/neither" },
+    ],
+    unreached: [{ label: "Elsewhere Local (IRN 000001)", why: "no funding base published" }],
+    panels: [
+      {
+        label: "Lost pupils",
+        marks: [mark("A", 0.4, 0.5, 1), mark("B", -0.6, -0.7, 0), mark("E", -0.1, 0.9, 2)],
+      },
+      { label: "Kept pupils", marks: [mark("C", 0.2, 0.6, 2), mark("D", 0.5, 0.1, 1)] },
+    ],
+  };
+  const series: SeriesManifest = {
+    contract: READS_SERIES_CONTRACT,
+    series: [],
+    scatters: [],
+    planes: [],
+    curves: [],
+    spreads: [spread],
+  };
+  const count = (key: string, value: number, label: string) =>
+    ({ key, owner: "crates/project", unit: "count", value, label }) as const;
+  const figures: Manifest = {
+    contract: READS_CONTRACT,
+    figures: [
+      count("project/drawn", 5, "Districts the identity reaches"),
+      count("project/lost", 3, "Districts that lost pupils"),
+      count("project/kept", 2, "Districts that did not"),
+      count("project/neither", 1, "Districts below the multiple of one"),
+    ],
+  };
+  return { node, series, figures };
+}
+
+test("the spread fixture the mutations are cut from is itself clean", () => {
+  const { node, series, figures: mine } = spreadFixture();
+  expect(kinds(node, series)).toEqual([]);
+  expect(censusAgainstFigures(series, mine)).toEqual([]);
+});
+
+test("census-unbound: the node does not bind the count of one region", () => {
+  const { node, series } = spreadFixture();
+  node.figures = node.figures.filter((f) => f.key !== "project/neither");
+  expect(kinds(node, series)).toEqual(["census-unbound"]);
+});
+
+test("census-unbound: the node does not bind the whole of the population", () => {
+  // The one that matters most and reads least like an omission: every region is bound and the
+  // denominator they are all read against is not.
+  const { node, series } = spreadFixture();
+  node.figures = node.figures.filter((f) => f.key !== "project/drawn");
+  expect(kinds(node, series)).toEqual(["census-unbound"]);
+});
+
+test("census-unbound: a census bound nowhere is one finding per region", () => {
+  const { node, series } = spreadFixture();
+  node.figures = [];
+  expect(kinds(node, series)).toEqual([
+    "census-unbound",
+    "census-unbound",
+    "census-unbound",
+    "census-unbound",
+  ]);
+});
+
+test("unknown-key: the node draws a spread the manifest does not carry", () => {
+  const { node, series } = spreadFixture();
+  node.series[0]!.key = "project/which-term-carries-renamed";
+  expect(kinds(node, series)).toEqual(["unknown-key", "uncited-series"]);
+});
+
+test("unattributed: the node draws a crate's spread and cites that crate nowhere", () => {
+  const { node, series } = spreadFixture();
+  node.description = node.description.replace(" (`crates/project`)", "");
+  node.linkText = node.description;
+  expect(kinds(node, series)).toEqual(["unattributed"]);
+});
+
+test("uncited-series: the manifest exports a spread no node draws", () => {
+  const { node, series } = spreadFixture();
+  series.spreads.push({ ...series.spreads[0]!, key: "project/which-term-carries-again" });
+  expect(kinds(node, series)).toEqual(["uncited-series"]);
+});
+
+test("the two manifests are held to each other, region by figure", () => {
+  const { series, figures: mine } = spreadFixture();
+  expect(censusAgainstFigures(series, mine)).toEqual([]);
+  // A count is an integer, so the comparison is exact rather than to the figure's tolerance: a
+  // tolerance here would only be a place for a district to hide.
+  series.spreads[0]!.census[3]!.subjects = 2;
+  expect(censusAgainstFigures(series, mine)).toHaveLength(1);
+  series.spreads[0]!.census[3]!.subjects = 1;
+  // A figure the other document lacks, and one on a unit that is not a count of anything.
+  series.spreads[0]!.census[1]!.figure = "project/absent";
+  expect(censusAgainstFigures(series, mine)).toHaveLength(1);
+  series.spreads[0]!.census[1]!.figure = "project/lost";
+  mine.figures[1] = { ...mine.figures[1]!, unit: "share" };
+  expect(censusAgainstFigures(series, mine)).toHaveLength(1);
+});
+
+test("a panel whose size no region counts is a caption nothing pins", () => {
+  const { series, figures: mine } = spreadFixture();
+  // The whole is checked apart from the panels, because a panel can land on some other region's
+  // count by coincidence and be wrong anyway. Drop one mark from the first panel and it draws 2,
+  // which "Kept pupils" still counts — but the population is now 4, which nothing counts.
+  series.spreads[0]!.panels[0]!.marks.pop();
+  expect(censusAgainstFigures(series, mine)).toHaveLength(1);
+  // And the other way: empty the second panel and it draws 0, which no region counts, while the
+  // population falls to 2, which "Kept pupils" does. One finding again, from the other leg.
+  series.spreads[0]!.panels[0]!.marks.push(mark0());
+  series.spreads[0]!.panels[1]!.marks = [];
+  expect(censusAgainstFigures(series, mine)).toHaveLength(1);
+});
+
+/** The mark the test above puts back, so the second leg is measured against a whole population. */
+function mark0() {
+  return { label: "E", x: -0.1, y: 0.9, class: 2 };
+}
+
+test("a spread that names nobody it could not place is refused", () => {
+  const { series, figures: mine } = spreadFixture();
+  series.spreads[0]!.unreached = [];
+  expect(censusAgainstFigures(series, mine)).toHaveLength(1);
+});
+
+test("a spread becomes one panel per region, on one frame, with the boundaries on every panel", () => {
+  const { series } = spreadFixture();
+  const panels = regionsOf(series.spreads[0]!);
+  expect(panels.map((panel) => panel.label)).toEqual(["Lost pupils", "Kept pupils"]);
+  // One frame, because the panels are two views of one plane and a per-panel domain would move a
+  // district between them without moving the district.
+  for (const panel of panels) {
+    expect(panel.xDomain).toEqual([-1, 1]);
+    expect(panel.yDomain).toEqual([-1, 1]);
+    expect(panel.rules.map((rule) => rule.label)).toEqual(["A multiple of one"]);
+  }
+  // The unclassified state is a hue of its own and not an absence — `tokens.ts` keeps the slot.
+  expect(panels[0]!.points.map((point) => point.series)).toEqual([
+    "formula",
+    "neutral",
+    "guarantee",
+  ]);
+  expect(panels[0]!.points[1]!.hover).toContain("Neither: the multiple is at or below one");
+});
+
+test("a mark in a hue the legend does not name is refused rather than drawn", () => {
+  const { series } = spreadFixture();
+  series.spreads[0]!.panels[0]!.marks[0]!.class = 3;
+  expect(() => regionsOf(series.spreads[0]!)).toThrow(/is class 3 and the spread declares 3/);
+});
+
+test("the committed spreads are the guarantee's two terms, and the empty region is the finding", () => {
+  const plane = manifest.spreads.find(
+    (spread) => spread.key === "project/the-two-terms-of-every-districts-multiple",
+  );
+  expect(plane).toBeDefined();
+  // Three states, not two: below a multiple of one there is no majority to take, and `origin` is
+  // an Option for exactly that reason.
+  expect(plane!.classes).toHaveLength(3);
+  expect(plane!.panels).toHaveLength(1);
+  expect(plane!.panels[0]!.marks).toHaveLength(607);
+  // The two the identity does not reach, named by IRN because district names are not unique.
+  expect(plane!.unreached).toHaveLength(2);
+  for (const missing of plane!.unreached) expect(missing.label).toMatch(/\(IRN \d{6}\)/);
+  // Both terms are signed the way the axis labels read them: positive x is fewer pupils than in
+  // FY2020, positive y is the FY2027 formula paying less per pupil than the FY2020 regime did.
+  const below = plane!.panels[0]!.marks.filter((mark) => mark.class === 0);
+  expect(below).toHaveLength(314);
+  // Class 0 is the region below the boundary, and it is that region exactly: the sum of the two
+  // terms is the log of the multiple, so `class === 0` and `x + y <= 0` are the same 314.
+  expect(below.every((mark) => mark.x + mark.y <= 0)).toBe(true);
+  // The empty corner, which is the finding: a formula district that both lost pupils and is paid
+  // less per pupil than FY2020. The four that are paid less all grew, so all four sit left of the
+  // enrollment axis and none of them here.
+  expect(below.filter((mark) => mark.y > 0)).toHaveLength(4);
+  expect(below.filter((mark) => mark.y > 0 && mark.x > 0)).toHaveLength(0);
+
+  const wealth = manifest.spreads.find(
+    (spread) => spread.key === "project/the-two-terms-by-wealth-among-those-that-lost-pupils",
+  );
+  expect(wealth).toBeDefined();
+  // Five fifths of the 514, and the same frame as the plane above — two views of one scatter.
+  expect(wealth!.panels).toHaveLength(5);
+  expect(wealth!.panels.reduce((sum, panel) => sum + panel.marks.length, 0)).toBe(514);
+  // Two views of one scatter: the same axes, the same three classes, and one frame across all
+  // five panels — a per-panel frame would move a district between fifths without moving it.
+  expect(wealth!.classes).toEqual(plane!.classes);
+  expect(wealth!.x.label).toBe(plane!.x.label);
+  expect(wealth!.y.label).toBe(plane!.y.label);
+  const drawn = regionsOf(wealth!);
+  for (const panel of drawn) {
+    expect(panel.xDomain).toEqual([wealth!.x.min, wealth!.x.max]);
+    expect(panel.yDomain).toEqual([wealth!.y.min, wealth!.y.max]);
+  }
+  // Every district in this spread lost pupils, which is the population its census counts.
+  expect(wealth!.panels.every((panel) => panel.marks.every((mark) => mark.x > 0))).toBe(true);
 });

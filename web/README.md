@@ -812,6 +812,24 @@ read the crossing off the painted path with `getPointAtLength` rather than off t
 the reason the coverage test gives: a chart drawing one line twice would satisfy every number in
 the prose.
 
+The manifest's fifth answer is a **spread**, drawn by `scatterSpec` one panel at a time.
+`regionsOf` turns one into `SpreadPanel`s that share the crate's own frame — a per-panel domain
+would move a district between wealth fifths without moving the district — and hands each panel the
+same boundaries, which `scatterSpec` draws dashed under the cloud as `rules`. The class a mark
+carries becomes a hue positionally, `["neutral", "formula", "guarantee"]`, because `tokens.ts`
+keeps a neutral for exactly this: "any mark with no polarity". Both of the guarantee's hued classes
+are guaranteed districts and neither has a claim on either token name, so what makes a hue mean
+anything is the legend, and the legend is built from the crate's own `classes`.
+
+Its endpoint rule is the census, and `SeriesChart.astro` renders it as a table rather than a
+caption: a spread has no extreme and no fitted line, so how many are in a region is the whole of
+what the picture asserts, and every row of it is a figure the node binds. `censusAgainstFigures`
+holds each tally to `figures.json` exactly rather than to a tolerance, holds every panel size and
+the total to being counted regions, and refuses a spread that names nobody it could not place —
+an empty `unreached` list is also what a dropped filter looks like. The unreached are printed under
+the chart, by IRN: a scatter of 607 labelled 609 is a small lie that is easy to ship, and district
+names are not unique. See #446.
+
 A **grouped** series is the last shape, and it is not a new form: rows carrying a `group` become
 one `barSpec` panel per group, on one scale across the set, which is what makes a monotonicity
 readable from panel to panel rather than only within one. The scale is shared inside a set and

@@ -271,6 +271,15 @@ test.describe("the cursor's second channel", () => {
       hit: ".plane-hit",
       mark: ".plane-dot",
     },
+    // The same route twice, because the same page carries two chart forms and the second is a
+    // spread: `scatterSpec` marks in a panel the node builds, rather than the `/outcomes` cloud
+    // this file already drives. A layer class is shared; the code path that stamps the pairing
+    // onto it is not.
+    {
+      route: "/wiki/formula-component/temporary-transitional-aid-guarantee",
+      hit: ".scatter-hit",
+      mark: ".scatter-dot",
+    },
   ]) {
     test(`brightens the ${mark.slice(1)} under the ring on ${route}`, async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 900 });

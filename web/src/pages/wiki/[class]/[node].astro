@@ -19,7 +19,8 @@ import { isBlockProperty, isListProperty, isMathProperty, renderListProperty, re
 import * as routes from "../../../lib/routes.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
 import SeriesChart from "../../../components/SeriesChart.astro";
-import { barsOf, formatValue, loadSeriesManifest, multiplesOf, panelsOf, placesOf } from "../../../lib/corpusSeries.ts";
+import { barsOf, formatValue, loadSeriesManifest, multiplesOf, panelsOf, placesOf, regionsOf } from "../../../lib/corpusSeries.ts";
+import { count } from "../../../lib/format.ts";
 import { barSpec, panelWidth, planeSpec, scatterSpec } from "../../../lib/plot/spec.ts";
 import { renderPanelToString, renderToString } from "../../../lib/plot/ssr.ts";
 
@@ -46,9 +47,11 @@ const findings = node.findings
  * names a key and not a shape: the manifest answers with a **column**, drawn as bars — as one
  * chart, or as small multiples on a shared scale where its rows carry a second level — or with a
  * **cloud**, drawn as one squared panel per outcome over a shared predictor (#442), or with a
- * **plane**, a handful of named things on two signed measures at once (#444). What differs between
- * them is what the node has to bind alongside — a column's two extremes, a cloud's slopes and
- * r-squareds, a plane's every coordinate — and `corpusSeries.ts` holds all three.
+ * **plane**, a handful of named things on two signed measures at once (#444), or with a
+ * **spread**, a whole population on two signed axes cut into regions whose counts are the claim
+ * (#446). What differs between them is what the node has to bind alongside — a column's two
+ * extremes, a cloud's slopes and r-squareds, a plane's every coordinate, a spread's whole census
+ * — and `corpusSeries.ts` holds all four.
  *
  * The route throws on a key the manifest lacks rather than skipping it, for the reason the figure
  * gate throws on an empty manifest: a chart that silently fails to appear looks like a node that
@@ -59,11 +62,17 @@ const manifest = loadSeriesManifest();
 const seriesByKey = new Map(manifest.series.map((series) => [series.key, series]));
 const cloudByKey = new Map(manifest.scatters.map((cloud) => [cloud.key, cloud]));
 const planeByKey = new Map(manifest.planes.map((plane) => [plane.key, plane]));
+const spreadByKey = new Map(manifest.spreads.map((spread) => [spread.key, spread]));
+/* Neutral first, then the two hues — the order `CLASS_HUES` maps a spread's classes onto, and the
+   order the crate writes them in. The legend is not optional on a classed chart: hue alone is
+   never identity here. */
+const CLASS_SWATCHES = ["neutral", "formula", "guarantee"];
 const charts = node.series.map((binding) => {
   const series = seriesByKey.get(binding.key);
   const cloud = cloudByKey.get(binding.key);
   const plane = planeByKey.get(binding.key);
-  if (!series && !cloud && !plane) {
+  const spread = spreadByKey.get(binding.key);
+  if (!series && !cloud && !plane && !spread) {
     throw new Error(
       `${node.id} draws ${binding.key}, which crates/series.json does not carry. Regenerate it ` +
         `with: cargo run --manifest-path crates/Cargo.toml -p figures series > crates/series.json`,
@@ -126,6 +135,51 @@ const charts = node.series.map((binding) => {
           ),
         },
       ],
+    };
+  }
+
+  if (spread) {
+    const panels = regionsOf(spread);
+    /* One width for every panel, and the manifest's own frame handed to each: a small multiple
+       whose panels were framed separately would make "the cloud climbs across the boundary from
+       one panel to the next" a statement about the scales rather than about the districts. */
+    const width = panelWidth(panels.length);
+    const drawn = panels.reduce((sum, panel) => sum + panel.points.length, 0);
+    return {
+      field: binding.field,
+      key: spread.key,
+      label: spread.label,
+      note:
+        `One dot per ${spread.subject}, ${count(drawn)} of them, on one frame across ` +
+        `${panels.length === 1 ? "the panel" : `all ${panels.length} panels`}. The counts below ` +
+        `are regions of this picture and each is a figure the prose states. Hover or focus a dot ` +
+        `for its ${spread.subject}.`,
+      legend: [
+        ...spread.classes.map((what, at) => ({
+          swatch: CLASS_SWATCHES[Math.min(at, CLASS_SWATCHES.length - 1)]!,
+          label: what,
+        })),
+        ...spread.boundaries.map((boundary) => ({ swatch: "rule", label: boundary.label })),
+      ],
+      census: spread.census.map((region) => ({
+        label: region.label,
+        subjects: count(region.subjects),
+      })),
+      unreached: spread.unreached.map((missing) => ({ label: missing.label, why: missing.why })),
+      panels: panels.map((panel) => ({
+        label: panels.length === 1 ? null : panel.label,
+        html: renderPanelToString(
+          () =>
+            scatterSpec(panel.points, { x: panel.x, y: panel.y }, [], {
+              width,
+              xDomain: panel.xDomain,
+              yDomain: panel.yDomain,
+              rules: panel.rules,
+            }),
+          { label: `${spread.label} — ${panel.label}` },
+          width,
+        ),
+      })),
     };
   }
 

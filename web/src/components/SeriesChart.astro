@@ -18,6 +18,20 @@
  * a panel is not a section of the document, it is one of a pair a reader is looking at together,
  * and giving each a heading would put two entries in the outline for one figure — as well as
  * pushing the next real heading a level down for no structural reason.
+ *
+ * A **spread** arrives with three things a column and a cloud do not have, and each is a rule
+ * rather than a decoration:
+ *
+ * - a **legend**, because its marks are coloured by a classification. Hue alone is never identity
+ *   on this site, and a hue whose meaning is only in the prose is a hue a reader has to hold in
+ *   their head across five panels.
+ * - a **census**, because a spread has no extreme and no fitted line: how many are in a region is
+ *   the only number a reader can take off one, and every row of it is a figure the node binds and
+ *   the figure gate checks three ways. It is a table rather than a caption because it is the whole
+ *   of what the picture asserts.
+ * - the **unreached**, because a count is a count of a population. A subject the computation could
+ *   not place is named here rather than dropped out of the denominator — a spread of 607 captioned
+ *   609 is a small lie that is easy to ship.
  */
 interface Props {
   chart: {
@@ -25,6 +39,12 @@ interface Props {
     label: string;
     note: string;
     panels: { label: string | null; html: string }[];
+    /** What each hue means, and the lines drawn under the marks. Present on a classed chart. */
+    legend?: { swatch: string; label: string }[];
+    /** One region of the picture and how many subjects are in it. */
+    census?: { label: string; subjects: string }[];
+    /** Named, because the alternative is a denominator nobody can reproduce. */
+    unreached?: { label: string; why: string }[];
   };
   level: "h2" | "h3";
 }
@@ -34,6 +54,18 @@ const Heading = level;
 
 <div class="series" data-series={chart.key}>
   <Heading>{chart.label}</Heading>
+  {
+    chart.legend && chart.legend.length > 0 && (
+      <div class="legend">
+        {chart.legend.map((key) => (
+          <span>
+            <i class={`sw ${key.swatch}`} />
+            {key.label}
+          </span>
+        ))}
+      </div>
+    )
+  }
   <div class="panels">
     {
       chart.panels.map((panel) => (
@@ -45,4 +77,42 @@ const Heading = level;
     }
   </div>
   <p class="note">{chart.note}</p>
+  {
+    chart.census && chart.census.length > 0 && (
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Region of the picture</th>
+              <th scope="col" class="tnum">
+                Districts
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {chart.census.map((region) => (
+              <tr>
+                <th scope="row">{region.label}</th>
+                <td class="tnum">{region.subjects}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+  {
+    chart.unreached && chart.unreached.length > 0 && (
+      <p class="note">
+        Not drawn, and not in any count above:{" "}
+        {chart.unreached.map((missing, at) => (
+          <>
+            {at > 0 && "; "}
+            <strong>{missing.label}</strong> — {missing.why}
+          </>
+        ))}
+        .
+      </p>
+    )
+  }
 </div>

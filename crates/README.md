@@ -148,6 +148,25 @@ refused outright below two points, which most of these are. The manifest holds n
 two negative first points are pinned as magnitudes with `-negative` in the key and the minus
 carried by the prose. See #431 and #445.
 
+A **spread** is the fifth array, and the only one whose rule is a census rather than a set of
+endpoints. The other four are each read at named places — the ends of a column, the slope printed
+on a panel, a plane's positions, a line's two ends and its worst departure — and a spread has no
+such place: what a reader takes off it is how many subjects are in a region. So `Regions` ships a
+`Tally` per region naming a `Count` figure, and the tests hold three things at once. Every tally
+reproduces the figure it names **exactly** rather than within its tolerance, because a count is an
+unsigned integer and a tolerance would only be somewhere for a district to hide. Every panel's
+size, and the size of the whole, is itself a counted region, which is what catches a caption or a
+denominator drifting from the population under it. And `Missing` names everyone the computation
+could not place, **by IRN as well as by name** — district names are not unique, there are three
+Buckeye Locals, and the one the chained enrollment index misses is 047787.
+
+The two spreads are the guarantee's two terms, from `project::guarantee::Decomposition`. Its
+`origin` is an `Option` on purpose: below a multiple of one the floor is at or under the formula
+and there is no majority to take, so the 314 formula districts are a third state and are drawn as
+one. `Boundary` carries the lines where that happens — the anti-diagonal where the terms sum to
+zero, and the per-pupil axis — as whole-frame segments in the data's own units, and they name no
+figures for the `Reference`'s reason. See #446.
+
 The line is fitted here and nowhere else. `crates/series.json` carries its two **endpoints in the
 data's own units** rather than a slope and an intercept, so no consumer evaluates a model: the web
 layer draws a segment between two points it was given, and `chart.ts`'s standing prohibition on a
@@ -281,7 +300,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`deflator`](deflator/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 17 |
 | [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 370 |
 | [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 35 |
-| [`figures`](figures/) | The figures the corpus quotes, computed from the crates that own them | 36 |
+| [`figures`](figures/) | The figures the corpus quotes, computed from the crates that own them | 44 |
 | [`foundation`](foundation/) | Fair School Funding Plan base cost build-up, per R.C. 3317.011 | 58 |
 | [`local-capacity`](local-capacity/) | Fair School Funding Plan local capacity and state share, per R.C. 3317.017 | 27 |
 | [`millage`](millage/) | Effective operating millage under H.B. 920 reduction factors, and 20-mill floor status | 19 |
@@ -290,7 +309,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 37 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 79 |
 
-13 crates, 1790 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+13 crates, 1798 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status

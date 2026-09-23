@@ -851,6 +851,28 @@ export function scatterSpec(
      * axis end.
      */
     fit?: Fit;
+    /**
+     * Draw the lines where a classification stops being defined, under the cloud.
+     *
+     * The third and last reference geometry, and the note on `identity` is still the argument for
+     * why this is not a general draw-a-line API: an arbitrary line through a cloud is a claim, and
+     * the claims on this site are computed in `crates/`. A rule here is not a claim — it is a
+     * **definition**, and one the axes make arithmetically. On two terms that sum to a log
+     * multiple, "the multiple is one" is `y = -x` and "the formula pays per pupil what the prior
+     * regime did" is `y = 0`. Nothing about either goes stale when a district moves, which is why
+     * neither names a figure where a fit names two.
+     *
+     * Segments in the data's own units, for {@link Fit}'s reason: evaluating a slope and an
+     * intercept here would be a second arithmetic in a second language for one crate computation.
+     * `crates/figures` constrains them to whole-frame lines on the way in, so a caller cannot
+     * smuggle a claim through as a definition.
+     *
+     * **The labels go in the legend, not on the picture.** A spread carries more than one rule and
+     * draws its panels as small multiples 280px wide; an end label on each would cross the cloud
+     * at every width, and a spread is classed so it carries a legend already. They are set as each
+     * segment's `ariaLabel` so the line is named where a legend cannot be read.
+     */
+    rules?: { label: string; from: { x: number; y: number }; to: { x: number; y: number } }[];
   },
 ): Spec | null {
   // Two points are not a cloud. Same rule as the line forms, for the same reason: a scatter of
@@ -894,6 +916,12 @@ export function scatterSpec(
   const xPad = supplied ? 0 : pad(xMin, xMax);
   const yPad = (both ? supplied : options.yDomain != null) ? 0 : pad(yMin, yMax);
 
+  /*
+   * `"neutral"` and no series at all land in the same place and mean different things: one is an
+   * unsplit population drawn in one colour, the other is a point a split does not classify. See
+   * {@link ScatterPoint.series}. There is no branch for it because there is nothing to branch to —
+   * the palette's neutral is what both are drawn in.
+   */
   const hue = (p: ScatterPoint) =>
     p.band != null
       ? (ORDINAL[Math.min(ORDINAL.length - 1, Math.max(0, p.band))] as string)
@@ -1038,6 +1066,27 @@ export function scatterSpec(
               }),
             ]
           : []),
+
+        // The boundaries, drawn where the identity and the fit are drawn and read the same way:
+        // under the cloud, because they are what it is read against. Dashed, which is the one
+        // thing separating them from those two — a definition is not a measurement, and a spread
+        // may carry several where a cloud carries one fitted line.
+        ...(options.rules ?? []).map((rule) =>
+          Plot.line([rule.from, rule.to], {
+            x: "x",
+            y: "y",
+            stroke: INK.rule,
+            strokeWidth: 1.5,
+            strokeDasharray: "4 3",
+            // A function, not the string: Plot reads a string `ariaLabel` as a field name, finds
+            // nothing on either end point, and drops the whole segment as undefined. The line
+            // then renders as an empty `<g>` — a boundary that is silently not there, which is
+            // the one failure this mark must not have.
+            ariaLabel: () => rule.label,
+            className: "scatter-rule",
+            clip: true,
+          }),
+        ),
 
         /*
          * Displacement, where the caller supplied a before position.

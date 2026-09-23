@@ -529,10 +529,27 @@ findings: |
   formula pays less per child. They are off it because the per-pupil raise outran the pupils they
   lost. [verified] (crates/project)
 
+  **The two terms are a plane, and the empty part of it is the finding.** Drawn one district to a
+  mark — the enrollment term across, the per-pupil term up — the 607 fall into three states and
+  not two. Below the anti-diagonal where the multiple is one, the floor is at or under the formula
+  and there is no majority to take: that is every one of the 314 formula districts and no others,
+  because a multiple at or below one is the same predicate the guarantee's own membership test
+  uses, so the line is not an approximation of the boundary but the boundary itself. Above it the
+  enrollment term carries the majority for **96** districts and the per-pupil term for **197**,
+  which is the 293 both splits reach. The second rule crosses at zero on the per-pupil term, and
+  the side of it where the FY2027 formula pays less per pupil than the FY2020 regime did holds
+  **4** of the 314 — Marysville, Southwest Licking, St Henry and West Muskingum, every one of them
+  left of the enrollment axis, which is to say every one of them grew. The corner where a district
+  both lost pupils and lost ground per pupil holds no formula district at all, and that empty
+  corner is what the paragraph above looks like when it is drawn rather than asserted. A list can
+  say a region is empty; only a picture can show it. [verified] (crates/project)
+
   **Among the districts that lost pupils, the guarantee's reach is a wealth gradient.** **514** of
   the 607 have fewer pupils than in FY2020. Cut into fifths by published capacity per pupil, the
   FY2027 guarantee holds **15** of the least-wealthy 102, **26** of the second fifth, **56** of
-  the third, **84** of the fourth and **81** of the wealthiest 106. The per-pupil term crosses
+  the third, **84** of the fourth and **81** of the wealthiest 106. The bands are equal counts
+  with the remainder in the top one: 102 districts in the least wealthy fifth, 102 in the second,
+  102 in the third, 102 in the fourth and 106 in the wealthiest. The per-pupil term crosses
   zero between the third and fourth fifths — a median **−0.274** in the least wealthy,
   **−0.074** in the third, **+0.344** in the fourth, **+0.572** in the wealthiest — and the
   crossing is the whole shape. Below it the plan raised per-pupil aid by a quarter or more, for
@@ -893,6 +910,46 @@ figures:
     value: 81
     field: findings
     as_written: "**81** of the wealthiest 106"
+  - key: project/districts-off-the-guarantee-with-a-positive-funding-base
+    value: 314
+    field: findings
+    as_written: "the 314 formula districts and no others"
+  - key: project/districts-the-identity-reaches
+    value: 607
+    field: findings
+    as_written: "It reaches 607 of 609"
+  - key: project/districts-the-enrollment-term-carries
+    value: 96
+    field: findings
+    as_written: "the majority for **96** districts"
+  - key: project/districts-the-per-pupil-term-carries
+    value: 197
+    field: findings
+    as_written: "the per-pupil term for **197**"
+  - key: project/formula-districts-paid-less-per-pupil-than-fy2020
+    value: 4
+    field: findings
+    as_written: "holds **4** of the 314"
+  - key: project/lost-pupils-least-wealthy-fifth-districts
+    value: 102
+    field: findings
+    as_written: "102 districts in the least wealthy fifth"
+  - key: project/lost-pupils-second-fifth-districts
+    value: 102
+    field: findings
+    as_written: "102 in the second"
+  - key: project/lost-pupils-third-fifth-districts
+    value: 102
+    field: findings
+    as_written: "102 in the third"
+  - key: project/lost-pupils-fourth-fifth-districts
+    value: 102
+    field: findings
+    as_written: "102 in the fourth"
+  - key: project/lost-pupils-wealthiest-fifth-districts
+    value: 106
+    field: findings
+    as_written: "106 in the wealthiest"
   - key: project/per-pupil-term-least-wealthy-fifth-of-those-that-lost-pupils-negative
     value: 0.274
     field: findings
@@ -1235,6 +1292,10 @@ series:
   - key: project/what-each-anchor-rule-pays-by-wealth
     field: findings
   - key: project/what-each-anchor-rule-pays-by-disadvantaged-share
+    field: findings
+  - key: project/the-two-terms-of-every-districts-multiple
+    field: findings
+  - key: project/the-two-terms-by-wealth-among-those-that-lost-pupils
     field: findings
 revisions:
   - was: |

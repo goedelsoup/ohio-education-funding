@@ -22,7 +22,8 @@ use core::fmt::Write;
 
 use crate::{
     compute_all, compute_all_curves, compute_all_planes, compute_all_scatters, compute_all_series,
-    Axis, Cloud, Fit, Positions, Row, Traces, Unit, CONTRACT_VERSION, SERIES_CONTRACT_VERSION,
+    compute_all_spreads, Axis, Cloud, Fit, Positions, Regions, Row, Traces, Unit, CONTRACT_VERSION,
+    SERIES_CONTRACT_VERSION,
 };
 
 /// The characters that would need escaping, and therefore may not appear in a key or a label.
@@ -186,6 +187,8 @@ pub fn series_manifest() -> String {
     planes(&mut out);
     out.push_str(",\n");
     curves(&mut out);
+    out.push_str(",\n");
+    spreads(&mut out);
     out.push_str("}\n");
     out
 }
@@ -467,6 +470,157 @@ fn curves(out: &mut String) {
             }
             let comma = if line_at + 1 == lines.len() { "" } else { "," };
             let _ = writeln!(out, "        ]}}{comma}");
+        }
+        let comma = if at + 1 == computed.len() { "" } else { "," };
+        let _ = writeln!(out, "     ]}}{comma}");
+    }
+    out.push_str("  ]");
+}
+
+/// The fifth array: every spread, its frame, its classes, its boundaries, its panels, and the
+/// census that stands in for the endpoint rule.
+///
+/// A boundary is written as the **segment it makes across this frame** rather than as the slope
+/// and intercept it was declared by, because the consumer draws a line and evaluating the same
+/// arithmetic twice in two languages is how the two come to disagree about where the line goes.
+///
+/// Every [`Tally`](super::Tally) writes its figure key unconditionally, on the rule the plane and
+/// the curve writers already state: the census *is* this shape's binding rule, so an unpinned
+/// region is a bug rather than a shape the document may take. `unreached` carries no key and
+/// cannot — it is a list of subjects the computation could not place, and there is no number in
+/// it to pin.
+fn spreads(out: &mut String) {
+    let computed = compute_all_spreads();
+    let _ = writeln!(out, "  \"spreads\": [");
+    for (at, entry) in computed.iter().enumerate() {
+        let s = entry.spread;
+        assert!(
+            writable(s.key) && writable(s.owner) && writable(s.label) && writable(s.subject),
+            "{}: a key, owner, label or subject carries a character this writer cannot escape",
+            s.key
+        );
+        let Regions {
+            x,
+            y,
+            classes,
+            boundaries,
+            panels,
+            census,
+            unreached,
+        } = &entry.regions;
+        let _ = writeln!(
+            out,
+            "    {{\"key\": \"{}\", \"owner\": \"{}\", \"subject\": \"{}\", \"label\": \"{}\", \
+             {}, {},",
+            s.key,
+            s.owner,
+            s.subject,
+            s.label,
+            axis("x", x),
+            axis("y", y),
+        );
+        assert!(
+            classes.iter().all(|c| writable(c)),
+            "{}: a class name carries a character this writer cannot escape",
+            s.key
+        );
+        let named: Vec<String> = classes.iter().map(|c| format!("\"{c}\"")).collect();
+        let _ = writeln!(out, "     \"classes\": [{}],", named.join(", "));
+        let _ = writeln!(out, "     \"boundaries\": [");
+        for (line_at, line) in boundaries.iter().enumerate() {
+            assert!(
+                writable(line.label),
+                "{}: a boundary label carries a character this writer cannot escape",
+                s.key
+            );
+            let (from, to) = line.across(x);
+            let comma = if line_at + 1 == boundaries.len() {
+                ""
+            } else {
+                ","
+            };
+            let _ = writeln!(
+                out,
+                "       {{\"label\": \"{}\", \"from\": [{}, {}], \"to\": [{}, {}]}}{comma}",
+                line.label,
+                coordinate(from.0),
+                coordinate(from.1),
+                coordinate(to.0),
+                coordinate(to.1),
+            );
+        }
+        let _ = writeln!(out, "     ],");
+        let _ = writeln!(out, "     \"census\": [");
+        for (row_at, tally) in census.iter().enumerate() {
+            assert!(
+                writable(&tally.label) && writable(tally.figure),
+                "{}: the census row {:?} carries a character this writer cannot escape",
+                s.key,
+                tally.label
+            );
+            let comma = if row_at + 1 == census.len() { "" } else { "," };
+            let _ = writeln!(
+                out,
+                "       {{\"label\": \"{}\", \"subjects\": {}, \"figure\": \"{}\"}}{comma}",
+                tally.label, tally.subjects, tally.figure,
+            );
+        }
+        let _ = writeln!(out, "     ],");
+        let _ = writeln!(out, "     \"unreached\": [");
+        for (row_at, missing) in unreached.iter().enumerate() {
+            assert!(
+                writable(&missing.label) && writable(&missing.why),
+                "{}: the unreached subject {:?} carries a character this writer cannot escape",
+                s.key,
+                missing.label
+            );
+            let comma = if row_at + 1 == unreached.len() {
+                ""
+            } else {
+                ","
+            };
+            let _ = writeln!(
+                out,
+                "       {{\"label\": \"{}\", \"why\": \"{}\"}}{comma}",
+                missing.label, missing.why,
+            );
+        }
+        let _ = writeln!(out, "     ],");
+        let _ = writeln!(out, "     \"panels\": [");
+        for (panel_at, panel) in panels.iter().enumerate() {
+            assert!(
+                writable(&panel.label),
+                "{}: a panel label carries a character this writer cannot escape",
+                s.key
+            );
+            let _ = writeln!(out, "       {{\"label\": \"{}\", \"marks\": [", panel.label);
+            for (mark_at, mark) in panel.marks.iter().enumerate() {
+                assert!(
+                    writable(&mark.label),
+                    "{}: the mark {:?} carries a character this writer cannot escape",
+                    s.key,
+                    mark.label
+                );
+                let comma = if mark_at + 1 == panel.marks.len() {
+                    ""
+                } else {
+                    ","
+                };
+                let _ = writeln!(
+                    out,
+                    "         {{\"label\": \"{}\", \"x\": {}, \"y\": {}, \"class\": {}}}{comma}",
+                    mark.label,
+                    coordinate(mark.x),
+                    coordinate(mark.y),
+                    mark.class,
+                );
+            }
+            let comma = if panel_at + 1 == panels.len() {
+                ""
+            } else {
+                ","
+            };
+            let _ = writeln!(out, "       ]}}{comma}");
         }
         let comma = if at + 1 == computed.len() { "" } else { "," };
         let _ = writeln!(out, "     ]}}{comma}");

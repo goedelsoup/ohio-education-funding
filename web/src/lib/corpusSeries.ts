@@ -57,6 +57,30 @@
  * normal curve inside one standard deviation, which no crate computes and nothing could make
  * stale.
  *
+ * # What a spread is, and what holds it
+ *
+ * A fifth array, and the first whose claim is about a region of the picture being **empty**. A
+ * **spread** is a whole population on two signed axes that sum to a third quantity — the
+ * guarantee's two terms, six hundred districts, one mark each — cut into regions by a
+ * classification drawn as hue and by boundaries where that classification stops being defined.
+ *
+ * It has no extremes worth quoting, no fitted line, and no coordinate anybody reads off. What a
+ * reader takes off it is **how many are in that part of it**, so that is the rule: a **census**,
+ * one row per region, each naming an ordinary figure, and a node drawing the spread must bind all
+ * of them. "Nobody is off the floor because the formula pays less per child" is a count of four
+ * out of three hundred and fourteen in one wedge, and a reader will take a full region on trust
+ * from prose long before they take an empty one.
+ *
+ * The second half of that rule is **unreached**: a count is a count of a population, and a
+ * population is the thing that silently changes when a fixture is extended. So a subject the
+ * computation could not place is carried to the drawing and named under it rather than dropped
+ * out of the denominator. A spread of 607 captioned 609 is a small lie that is easy to ship.
+ *
+ * Boundaries name no figure, on the same argument the curve's reference does not: "the multiple
+ * is one" is the line `y = -x` on two terms that sum to a log multiple, which is arithmetic and
+ * not a measurement. They arrive as **two endpoints in the axes' own units** for the reason
+ * {@link Fit} does — evaluating a line in this layer would be this layer computing a claim again.
+ *
  * # Sign
  *
  * Rows are signed, because a bar below the zero rule is what a chart is for, and so are slopes —
@@ -81,7 +105,7 @@ import * as routes from "./routes.ts";
  * the two documents have different shapes and different readers, and a field added to a row is no
  * reason for the scalar check to refuse a document it still reads correctly.
  */
-export const READS_SERIES_CONTRACT = "5.0.0";
+export const READS_SERIES_CONTRACT = "6.0.0";
 
 /** One row of a series: a category and its signed value. */
 export interface SeriesRow {
@@ -268,6 +292,80 @@ export interface ManifestCurve {
   lines: ManifestLine[];
 }
 
+/** One subject of a spread: where it sits, and which class it is drawn in. */
+export interface ManifestMark {
+  label: string;
+  x: number;
+  y: number;
+  /** An index into {@link ManifestSpread.classes}. */
+  class: number;
+}
+
+/** One panel of a spread: a sub-population, drawn on the frame every panel shares. */
+export interface ManifestSlice {
+  label: string;
+  marks: ManifestMark[];
+}
+
+/**
+ * A line on a spread where a definition changes, as the segment across the frame.
+ *
+ * Two endpoints rather than a slope and an intercept, for {@link Fit}'s reason: a line given as a
+ * model has to be evaluated somewhere, and evaluating it here would be a second arithmetic in a
+ * second language for the crate's one claim. The crate constrains it to a whole-frame line on the
+ * way in — a caller able to supply two points could draw one through part of a cloud, and an
+ * arbitrary line through a cloud is a claim rather than a definition.
+ *
+ * It names no figure. See the module note on spreads for why a definition is not pinned.
+ */
+export interface ManifestBoundary {
+  label: string;
+  from: [number, number];
+  to: [number, number];
+}
+
+/** One region of a spread's census: what it is, how many are in it, and its pin. */
+export interface ManifestTally {
+  label: string;
+  subjects: number;
+  /** The `crates/figures.json` key whose pin `subjects` reproduces. */
+  figure: string;
+}
+
+/**
+ * A subject the computation could not place, named under the drawing rather than dropped.
+ *
+ * It carries no figure because there is no number in it to pin — the point is the name. It is
+ * named unambiguously enough that a reader cannot look for it in the cloud and find something
+ * else: district names are not unique, so the crate writes the IRN alongside.
+ */
+export interface ManifestMissing {
+  label: string;
+  why: string;
+}
+
+/** A whole population on two signed axes, cut into regions the census counts. */
+export interface ManifestSpread {
+  key: string;
+  owner: string;
+  /** What one mark is, singular and lower case — "district". */
+  subject: string;
+  label: string;
+  /** Linear: both axes are signed logarithms already, which a log scale cannot place. */
+  x: ManifestAxis;
+  y: ManifestAxis;
+  /**
+   * What each hue means, in the order the marks index. Three at most, and **the first is drawn
+   * neutral** — a spread whose classification has a "neither" state puts it first.
+   */
+  classes: string[];
+  boundaries: ManifestBoundary[];
+  census: ManifestTally[];
+  unreached: ManifestMissing[];
+  /** All framed together, which is what makes a difference between them a difference. */
+  panels: ManifestSlice[];
+}
+
 /** `crates/series.json`, as written by `cargo run -p figures series`. */
 export interface SeriesManifest {
   contract: string;
@@ -275,6 +373,7 @@ export interface SeriesManifest {
   scatters: ManifestScatter[];
   planes: ManifestPlane[];
   curves: ManifestCurve[];
+  spreads: ManifestSpread[];
 }
 
 /** Where `crates/figures series` writes, from `web/` and from the repository root. */
@@ -326,6 +425,9 @@ export function loadSeriesManifest(): SeriesManifest {
   }
   if (!Array.isArray(parsed.curves) || parsed.curves.length === 0) {
     throw new Error(`${path} carries no curves, so this check would pass against any corpus.`);
+  }
+  if (!Array.isArray(parsed.spreads) || parsed.spreads.length === 0) {
+    throw new Error(`${path} carries no spreads, so this check would pass against any corpus.`);
   }
   cached = parsed;
   return parsed;
@@ -714,6 +816,87 @@ export function pointsOf(curve: ManifestCurve): SeriesPoint[] {
   }));
 }
 
+/**
+ * Which hue each class of a spread is drawn in, by index.
+ *
+ * Positional, and it has to be: the palette's two hues are named for the site's one canonical
+ * split — formula against guarantee — and a spread classifies by whatever its own subject is.
+ * Both of the guarantee's origins are districts the *guarantee* pays, so neither has a claim on
+ * either name. What makes a hue mean something here is the legend, which the crate supplies as
+ * {@link ManifestSpread.classes} and the page must render.
+ *
+ * Neutral leads, because the crate's contract puts the unclassified state first — "any mark with
+ * no polarity. Never a hue," which is exactly what a subject outside a classification is. The two
+ * hues follow in the order `plot/tokens.ts` declares them.
+ */
+const CLASS_HUES = ["neutral", "formula", "guarantee"] as const;
+
+/** One panel of a spread, as a card draws it. */
+export interface SpreadPanel {
+  label: string;
+  points: ScatterPoint[];
+  x: { label: string; format: (v: number) => string; log: boolean };
+  y: { label: string; format: (v: number) => string; log: boolean };
+  /** Handed to `scatterSpec` as `xDomain`/`yDomain`, and the same pair for every panel. */
+  xDomain: [number, number];
+  yDomain: [number, number];
+  /** Handed to `scatterSpec` as `rules`. The same lines on every panel, for the same reason. */
+  rules: { label: string; from: { x: number; y: number }; to: { x: number; y: number } }[];
+}
+
+/**
+ * A spread as the panels a card draws.
+ *
+ * Every panel carries the whole spread's frame and the whole spread's boundaries, because that is
+ * the only thing that makes a difference between two panels a difference in the data. The crate
+ * computes the frame across all of them together; this hands the same pair to each.
+ *
+ * @throws if a mark names a class the spread does not have. The crate asserts it on the way in, so
+ * this fires only on a hand-edited or truncated file — and a mark silently drawn in the wrong hue
+ * is the one defect that would make the picture say the opposite of what the census counts.
+ */
+export function regionsOf(spread: ManifestSpread): SpreadPanel[] {
+  const rules = spread.boundaries.map((boundary) => ({
+    label: boundary.label,
+    from: { x: boundary.from[0], y: boundary.from[1] },
+    to: { x: boundary.to[0], y: boundary.to[1] },
+  }));
+  return spread.panels.map((panel) => ({
+    label: panel.label,
+    points: panel.marks.map((mark) => {
+      const what = spread.classes[mark.class];
+      if (what === undefined) {
+        throw new Error(
+          `${spread.key}: "${mark.label}" is class ${mark.class} and the spread declares ` +
+            `${spread.classes.length}. Regenerate crates/series.json; a mark drawn in a hue the ` +
+            `legend does not name is a mark saying something nothing counted.`,
+        );
+      }
+      return {
+        x: mark.x,
+        y: mark.y,
+        series: CLASS_HUES[Math.min(mark.class, CLASS_HUES.length - 1)]!,
+        hover:
+          `${mark.label}: ${spread.x.label} ${formatRow(spread.x.unit, mark.x)}, ` +
+          `${spread.y.label} ${formatRow(spread.y.unit, mark.y)} — ${what}`,
+      } satisfies ScatterPoint;
+    }),
+    x: {
+      label: spread.x.label,
+      format: (v: number) => formatRow(spread.x.unit, v),
+      log: spread.x.log,
+    },
+    y: {
+      label: spread.y.label,
+      format: (v: number) => formatRow(spread.y.unit, v),
+      log: spread.y.log,
+    },
+    xDomain: [spread.x.min, spread.x.max],
+    yDomain: [spread.y.min, spread.y.max],
+    rules,
+  }));
+}
+
 /** Each position the check can fail in. Every one is produced on purpose in the spec. */
 export type SeriesDiscrepancyKind =
   /** The node binds a key the series manifest does not carry. */
@@ -730,7 +913,9 @@ export type SeriesDiscrepancyKind =
   | "position-unbound"
   /** An end or the worst departure of a line on a curve is a figure this node does not bind. */
   | "line-unbound"
-  /** The manifest exports a series, a cloud, a plane or a curve no node draws. */
+  /** A region of a spread's census is a figure this node does not bind. */
+  | "census-unbound"
+  /** The manifest exports a series, a cloud, a plane, a curve or a spread no node draws. */
   | "uncited-series"
   /** A series {@link PAGE_SERIES} says a page draws names a node the corpus does not hold. */
   | "page-source-missing";
@@ -756,6 +941,7 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
   const cloudByKey = new Map(manifest.scatters.map((cloud) => [cloud.key, cloud]));
   const planeByKey = new Map(manifest.planes.map((plane) => [plane.key, plane]));
   const curveByKey = new Map(manifest.curves.map((curve) => [curve.key, curve]));
+  const spreadByKey = new Map(manifest.spreads.map((spread) => [spread.key, spread]));
   const found: SeriesDiscrepancy[] = [];
   const drawn = new Set<string>();
 
@@ -770,18 +956,19 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
         found.push({ node: node.id, key: entry.key, kind, message });
 
       /*
-       * One `series:` block, four shapes behind it.
+       * One `series:` block, five shapes behind it.
        *
        * A node binds what it draws by key and does not say which array the key is in — a binding
        * is "draw this computation under this field", and whether the crate answered with a column,
-       * a cloud, a plane or a curve is the crate's business. The four differ in what has to be
-       * bound with them, and that is the whole of the difference below.
+       * a cloud, a plane, a curve or a spread is the crate's business. The five differ in what has
+       * to be bound with them, and that is the whole of the difference below.
        */
       const series = byKey.get(entry.key);
       const cloud = cloudByKey.get(entry.key);
       const plane = planeByKey.get(entry.key);
       const curve = curveByKey.get(entry.key);
-      if (!series && !cloud && !plane && !curve) {
+      const spread = spreadByKey.get(entry.key);
+      if (!series && !cloud && !plane && !curve && !spread) {
         at(
           "unknown-key",
           `draws "${entry.key}", which crates/series.json does not carry. Either the key was ` +
@@ -789,7 +976,7 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
         );
         continue;
       }
-      const owner = (series ?? cloud ?? plane ?? curve)!.owner;
+      const owner = (series ?? cloud ?? plane ?? curve ?? spread)!.owner;
       drawn.add(entry.key);
 
       if (!DRAWABLE_FIELDS.includes(entry.field)) {
@@ -872,6 +1059,21 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
         continue;
       }
 
+      if (spread) {
+        for (const tally of spread.census) {
+          if (!bound.has(tally.figure)) {
+            at(
+              "census-unbound",
+              `counts ${tally.subjects} in "${tally.label}", which is ${tally.figure}, a figure ` +
+                `this node does not bind. Bind it in figures: first — a spread has no extreme ` +
+                `and no fitted line, so how many are in a region is the only number a reader ` +
+                `can take off one, and an empty region is what the picture exists to show.`,
+            );
+          }
+        }
+        continue;
+      }
+
       for (const end of endpoints(series!)) {
         if (end.figure === undefined) {
           at(
@@ -907,6 +1109,7 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
     ...manifest.scatters.map((cloud) => [cloud.key, "cloud"] as const),
     ...manifest.planes.map((plane) => [plane.key, "plane"] as const),
     ...manifest.curves.map((curve) => [curve.key, "curve"] as const),
+    ...manifest.spreads.map((spread) => [spread.key, "spread"] as const),
   ];
   for (const [key, what] of exported) {
     if (!drawn.has(key)) {
@@ -1185,6 +1388,74 @@ export function linesAgainstFigures(manifest: SeriesManifest, figures: Manifest)
           );
         }
       }
+    }
+  }
+  return out;
+}
+
+/**
+ * Every region of every spread reproduces the figure it names, and every panel is a region.
+ *
+ * The staleness leg of the spread rule, beside {@link rowsAgainstFigures} and the three like it.
+ * Compared **exactly** where those compare in magnitude: a count is unsigned already and it is an
+ * integer, so there is no rounding to tolerate and no direction that could have been dropped into
+ * the key. A tolerance here would only be somewhere for a district to hide.
+ *
+ * The panel half is the cheap failure this exists to stop: a panel drawing a hundred and two
+ * marks under a caption saying a hundred and three. A panel's size is the first number a reader
+ * takes off a small multiple, so it has to be one of the counts the figure manifest stands behind
+ * rather than whatever the loop happened to produce — and so does the total, which is the
+ * denominator every other region is read against.
+ *
+ * The boundaries are not checked, because they name no figure. See {@link ManifestBoundary}.
+ */
+export function censusAgainstFigures(manifest: SeriesManifest, figures: Manifest): string[] {
+  const byKey = new Map(figures.figures.map((figure) => [figure.key, figure]));
+  const out: string[] = [];
+  for (const spread of manifest.spreads) {
+    for (const tally of spread.census) {
+      const figure = byKey.get(tally.figure);
+      if (!figure) {
+        out.push(
+          `${spread.key}: "${tally.label}" names ${tally.figure}, which figures.json lacks`,
+        );
+        continue;
+      }
+      if (figure.unit !== "count") {
+        out.push(
+          `${spread.key}: "${tally.label}" counts ${spread.subject}s and ${tally.figure} is a ` +
+            `${figure.unit}`,
+        );
+      }
+      if (Math.abs(tally.subjects - figure.value) >= 0.5) {
+        out.push(
+          `${spread.key}: "${tally.label}" holds ${tally.subjects} and ${tally.figure} is ` +
+            `${figure.value}; one of the two manifests is stale`,
+        );
+      }
+    }
+
+    const counted = new Set(spread.census.map((tally) => tally.subjects));
+    for (const panel of spread.panels) {
+      if (!counted.has(panel.marks.length)) {
+        out.push(
+          `${spread.key}: the panel "${panel.label}" draws ${panel.marks.length} and no region ` +
+            `of the census counts that many, so its caption is a number nothing pins`,
+        );
+      }
+    }
+    const drawn = spread.panels.reduce((sum, panel) => sum + panel.marks.length, 0);
+    if (!counted.has(drawn)) {
+      out.push(
+        `${spread.key}: draws ${drawn} ${spread.subject}s and no region counts the whole of ` +
+          `them, which is the denominator every other region is read against`,
+      );
+    }
+    if (spread.unreached.length === 0) {
+      out.push(
+        `${spread.key}: names nobody it could not place. A count is a count of a population, ` +
+          `and an empty list is also what a dropped filter looks like`,
+      );
     }
   }
   return out;
