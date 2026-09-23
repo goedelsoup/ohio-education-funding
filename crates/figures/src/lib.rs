@@ -73,6 +73,14 @@
 //! is the **fit** — a panel names the figures that pin its slope and its r-squared, and those two
 //! numbers are the only ones printed on it. The rule underneath is the same one in both cases:
 //! whatever a reader could quote off the picture is a number the figure manifest has pinned.
+//!
+//! And a third. [`PLANES`] is a registry of *planes*: a handful of named alternatives placed on
+//! two signed axes at once, where the finding is that the axes **disagree**. A cloud is six
+//! hundred subjects whose shape is the claim and no one of which a reader quotes; a plane is
+//! seven policies, each of which a reader quotes by name and by both coordinates. So neither the
+//! endpoint rule nor the fit rule fits it, and what stands in for them is the strictest form of
+//! the same rule: **every** position names a figure for each of its two coordinates. Seven points
+//! is few enough that all fourteen numbers can be pinned, so all fourteen are.
 
 #![forbid(unsafe_code)]
 
@@ -113,10 +121,11 @@ pub const CONTRACT_VERSION: &str = "1.1.0";
 /// 2.0.0 was the second drawing, [`SCATTERS`], arriving beside the first. 3.0.0 is the four
 /// optional members a row gained for the census of the plan's bounds — [`Row::group`],
 /// [`Row::of`], [`Row::cites`] and [`Row::marked`] — which are what let a long ranked column be
-/// read as a table as well as a chart. Its consumer compares the version exactly, so both were
-/// breaking whether or not any existing entry moved, which is the behaviour wanted: a reader
-/// that has not been taught what a member means should stop rather than draw half of one.
-pub const SERIES_CONTRACT_VERSION: &str = "3.0.0";
+/// read as a table as well as a chart. 4.0.0 is the third drawing, [`PLANES`]. Its consumer
+/// compares the version exactly, so all three were breaking whether or not any existing entry
+/// moved, which is the behaviour wanted: a reader that has not been taught what a member means
+/// should stop rather than draw half of one.
+pub const SERIES_CONTRACT_VERSION: &str = "4.0.0";
 
 /// What a figure is measured in, which decides how prose is allowed to write it.
 ///
@@ -453,6 +462,103 @@ impl Cloud {
     }
 }
 
+/// One plane the wiki draws: a few named alternatives, each placed on two signed axes at once.
+///
+/// The third drawing, and a different shape again. A [`Series`] is one measure of several things;
+/// a [`Scatter`] is one population under one predictor. A plane is *two measures of the same few
+/// things*, drawn together because the finding is that the two measures disagree — a rule can
+/// write less guarantee than the rule in force and still pay more total state support, and no
+/// table that reports one column at a time can show it.
+///
+/// Both axes are **signed** and both carry a rule at zero, so the reading is by quadrant: a point
+/// below and left is cheaper on both measures, a point above and left is the disagreement. There
+/// is no fitted line, because seven policy alternatives are not a sample of anything.
+///
+/// What stands in for the endpoint rule is stricter than either of its siblings: every
+/// [`Position`] names a [`Figure`] for **both** of its coordinates. A cloud may pin two numbers
+/// out of twelve hundred because no single point is the claim; here every point is quotable by
+/// name, so every coordinate is pinned.
+pub struct Plane {
+    /// `<crate-directory>/<what-it-is>`, in the one key namespace the other registries share.
+    pub key: &'static str,
+    /// The crate that owns the computation, as the corpus cites it.
+    pub owner: &'static str,
+    /// What the whole drawing is, in words; its title.
+    pub label: &'static str,
+    /// What one point is, singular and lower case — "anchor rule". Written into the caption.
+    pub subject: &'static str,
+    /// The computation, over the same inputs the figures use.
+    pub compute: fn(&Inputs) -> Positions,
+}
+
+/// One subject of a [`Plane`], placed on both axes, with both coordinates pinned.
+pub struct Position {
+    /// What the point is called, on the chart and in its tooltip. Carries the frame it was
+    /// measured in, because the subjects here were not all priced at the same horizon.
+    pub label: String,
+    /// Its place on the horizontal axis, signed.
+    pub x: f64,
+    /// Its place on the vertical axis, signed.
+    pub y: f64,
+    /// The [`Figure`] whose pin [`Self::x`] reproduces in magnitude.
+    pub x_figure: &'static str,
+    /// And the one [`Self::y`] reproduces.
+    pub y_figure: &'static str,
+}
+
+/// The subjects of a [`Plane`] and the frame they are drawn in.
+pub struct Positions {
+    /// The horizontal axis.
+    pub x: Axis,
+    /// The vertical axis.
+    pub y: Axis,
+    /// The subjects, in the order the owning crate returned them.
+    pub points: Vec<Position>,
+}
+
+impl Positions {
+    /// Frame a set of positions around their own extremes, with **zero inside both axes**.
+    ///
+    /// Zero is not a data value here and it is the most important place on the picture: it is the
+    /// rule in force, the line each axis is read against, and the boundary between the quadrant
+    /// where a rule is cheaper and the quadrant where it is dearer. A domain fitted to the points
+    /// alone would drop it whenever every rule falls on one side, and then the chart would draw a
+    /// spread where the claim is a sign.
+    ///
+    /// Both axes are padded by the same `CLOUD_PAD` the other drawings leave, and neither is
+    /// matched to the other: they measure different quantities, they are not being compared as
+    /// lengths, and a shared scale would flatten whichever of them is smaller.
+    ///
+    /// # Panics
+    ///
+    /// If there are no points, or a coordinate is not finite.
+    #[must_use]
+    pub fn framed(x: &'static str, y: &'static str, unit: Unit, points: Vec<Position>) -> Self {
+        assert!(!points.is_empty(), "a plane with no points");
+        let frame = |values: &[f64], label: &'static str| {
+            let (low, high) = values.iter().fold((0.0_f64, 0.0_f64), |(lo, hi), v| {
+                assert!(v.is_finite(), "{label}: {v} cannot be placed");
+                (lo.min(*v), hi.max(*v))
+            });
+            let pad = (high - low) * CLOUD_PAD;
+            Axis {
+                label,
+                unit,
+                min: low - pad,
+                max: high + pad,
+                log: false,
+            }
+        };
+        let xs: Vec<f64> = points.iter().map(|p| p.x).collect();
+        let ys: Vec<f64> = points.iter().map(|p| p.y).collect();
+        Self {
+            x: frame(&xs, x),
+            y: frame(&ys, y),
+            points,
+        }
+    }
+}
+
 /// The clouds the wiki draws. See [`Scatter`] for what stands in for the endpoint rule here.
 pub static SCATTERS: &[Scatter] = &[
     // #417's four-number table, as the two pictures it was found by. The left cloud lies on a
@@ -542,6 +648,73 @@ pub static SCATTERS: &[Scatter] = &[
     },
 ];
 
+/// What the seven rules cost on both axes at once. See [`Plane`] for why this is its own shape.
+///
+/// #444's first drawing, and the one it said should exist even if nothing else here did. Three of
+/// the seven sit in the upper-left quadrant — less guarantee written, more total state support
+/// paid — and that disagreement is invisible in any table that reports one column at a time.
+pub static PLANES: &[Plane] = &[Plane {
+    key: "project/what-each-anchor-rule-costs-on-both-axes",
+    owner: "crates/project",
+    label: "What each anchor rule costs outside the enrollment cluster, on the guarantee it \
+            writes and on the total state support it pays",
+    subject: "anchor rule",
+    compute: |i| {
+        let coordinates: [(&'static str, &'static str); 7] = [
+            (
+                "project/a-ratchets-guarantee-written-outside-the-cluster",
+                "project/a-ratchets-total-state-support-outside-the-cluster",
+            ),
+            (
+                "project/a-caps-guarantee-cut-outside-the-cluster",
+                "project/a-caps-total-state-support-cut-outside-the-cluster",
+            ),
+            (
+                "project/the-gentle-caps-guarantee-cut-outside-the-cluster",
+                "project/the-gentle-caps-total-state-support-gain-outside-the-cluster",
+            ),
+            (
+                "project/the-rolling-counts-guarantee-cut-outside-the-cluster",
+                "project/the-rolling-counts-total-state-support-gain-outside-the-cluster",
+            ),
+            (
+                "project/the-mirror-inside-h-guarantee-cut-outside-the-cluster",
+                "project/the-mirror-inside-h-total-state-support-gain-outside-the-cluster",
+            ),
+            (
+                "project/the-mirror-beside-guarantee-written-outside-the-cluster",
+                "project/the-mirror-beside-total-state-support-gain-outside-the-cluster",
+            ),
+            (
+                "project/the-dated-phase-downs-guarantee-written-outside-the-cluster",
+                "project/the-dated-phase-downs-total-state-support-outside-the-cluster",
+            ),
+        ];
+        let points = i
+            .reach
+            .rules()
+            .into_iter()
+            .zip(coordinates)
+            .map(|((label, frame), (x_figure, y_figure))| {
+                let totalled = i.reach.aggregate(frame);
+                Position {
+                    label: label.to_string(),
+                    x: totalled.guarantee_delta,
+                    y: totalled.delta,
+                    x_figure,
+                    y_figure,
+                }
+            })
+            .collect();
+        Positions::framed(
+            "Guarantee written, against the enacted anchor",
+            "Total state support, against the enacted anchor",
+            Unit::Dollars,
+            points,
+        )
+    },
+}];
+
 /// A cloud and the shape it came out with on this run.
 pub struct ComputedCloud {
     /// The registry entry.
@@ -559,6 +732,27 @@ pub fn compute_all_scatters() -> Vec<ComputedCloud> {
         .map(|scatter| ComputedCloud {
             scatter,
             cloud: (scatter.compute)(&inputs),
+        })
+        .collect()
+}
+
+/// A plane and the positions it came out with on this run.
+pub struct ComputedPlane {
+    /// The registry entry.
+    pub plane: &'static Plane,
+    /// What [`Plane::compute`] returned.
+    pub positions: Positions,
+}
+
+/// Run every plane in [`PLANES`], in registry order.
+#[must_use]
+pub fn compute_all_planes() -> Vec<ComputedPlane> {
+    let inputs = Inputs::build();
+    PLANES
+        .iter()
+        .map(|plane| ComputedPlane {
+            plane,
+            positions: (plane.compute)(&inputs),
         })
         .collect()
 }
@@ -970,6 +1164,33 @@ impl Reach {
         frame: &[project::anchor_incidence::Movement],
     ) -> project::anchor_incidence::Spread {
         project::anchor_incidence::spread(frame, &self.cluster)
+    }
+
+    /// One frame totalled on both axes at once, outside the cluster.
+    fn aggregate(
+        &self,
+        frame: &[project::anchor_incidence::Movement],
+    ) -> project::anchor_incidence::Aggregate {
+        project::anchor_incidence::aggregate(frame, &self.cluster)
+    }
+
+    /// The seven rules, in the order `who_a_capped_or_rolling_anchor_reaches` compares them.
+    ///
+    /// Each label carries the frame it was priced in, because they were not all priced at one
+    /// horizon: three are anchor rules walked to a year and four are #400's supplements at the
+    /// modelled year. A drawing that hid that would be comparing four things and calling them
+    /// seven. The crate's own test already asserts a direction across exactly this list, which
+    /// is the precedent for treating them as one comparable set.
+    fn rules(&self) -> [(&'static str, &[project::anchor_incidence::Movement]); 7] {
+        [
+            ("A ratchet, FY2032", &self.ratchet_fy2032),
+            ("A 2% cap, FY2032", &self.capped_fy2032),
+            ("A 1% cap, FY2036 undamped", &self.gentle_cap_fy2036),
+            ("A rolling pupil count", &self.rolling_count),
+            ("[M] mirrored inside [H]", &self.mirror_inside),
+            ("[M] mirrored beside [L], [M], [O]", &self.mirror_beside),
+            ("A dated phase-down", &self.dated_phase_down),
+        ]
     }
 }
 
@@ -2065,6 +2286,45 @@ fn fy2016_step_against(i: &Inputs, share: fn(&dispersion::fy2016::District) -> f
         .correlation
 }
 
+/// The five wealth fifths of #444's small multiples, least wealthy first.
+const WEALTH_FIFTHS: [&str; 5] = ["Least wealthy", "Second", "Third", "Fourth", "Wealthiest"];
+
+/// And the five disadvantage fifths, least poor first.
+const POVERTY_FIFTHS: [&str; 5] = ["Least poor", "Second", "Third", "Fourth", "Poorest"];
+
+/// One axis of #444's small multiples: seven rules, five fifths each, per pupil.
+///
+/// One grouped series rather than seven, because seven separate documents would each need their
+/// own pair of endpoint figures and the thing a reader is being shown is the comparison between
+/// them. `figures` is aligned to [`Reach::rules`] and then to `labels`, so a binding sits at the
+/// rule and the fifth it belongs to.
+fn by_fifths(
+    i: &Inputs,
+    axis: project::anchor_incidence::Axis,
+    labels: [&'static str; 5],
+    figures: [[Option<&'static str>; 5]; 7],
+) -> Vec<Row> {
+    i.reach
+        .rules()
+        .into_iter()
+        .zip(figures)
+        .flat_map(move |((group, frame), binds)| {
+            project::anchor_incidence::by(frame, axis, 5, &i.reach.cluster)
+                .into_iter()
+                .map(move |band| Row {
+                    label: labels[band.rank - 1],
+                    value: band.per_pupil(),
+                    hover: None,
+                    group: Some(group),
+                    of: None,
+                    cites: None,
+                    marked: None,
+                    figure: binds[band.rank - 1],
+                })
+        })
+        .collect()
+}
+
 /// How many of the modelled formula's bounds one instrument states.
 #[allow(clippy::cast_precision_loss)]
 fn family_size(family: project::bounds::Family) -> f64 {
@@ -2223,6 +2483,116 @@ pub static SERIES: &[Series] = &[
                     ..row
                 })
                 .collect()
+        },
+    },
+    // #444's second and third drawings: the same seven rules, cut into fifths on each of the two
+    // axes #433 cut and only one of which is usually shown. Two documents rather than one,
+    // because the per-pupil figures differ by two orders of magnitude between the axes — $138.58
+    // against $4.06 in the ratchet's first fifth — and one scale across both would flatten the
+    // second into nothing. Separate series make the separate scale structural rather than a
+    // promise in a caption.
+    Series {
+        key: "project/what-each-anchor-rule-pays-by-wealth",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        axis: "Fifth of districts by assessed valuation per pupil, outside the cluster",
+        label: "What each anchor rule pays per pupil by wealth, on total state support, against \
+                the enacted anchor",
+        compute: |i| {
+            by_fifths(
+                i,
+                project::anchor_incidence::Axis::Valuation,
+                WEALTH_FIFTHS,
+                [
+                    [
+                        Some("project/a-ratchets-gain-per-pupil-in-the-least-wealthy-fifth"),
+                        None,
+                        None,
+                        None,
+                        Some("project/a-ratchets-gain-per-pupil-in-the-wealthiest-fifth"),
+                    ],
+                    [
+                        None,
+                        None,
+                        None,
+                        Some("project/a-caps-cut-per-pupil-in-the-fourth-wealth-fifth"),
+                        None,
+                    ],
+                    [
+                        Some("project/the-gentle-caps-gain-per-pupil-in-the-least-wealthy-fifth"),
+                        None,
+                        None,
+                        None,
+                        Some("project/the-gentle-caps-cut-per-pupil-in-the-wealthiest-fifth"),
+                    ],
+                    [
+                        Some(
+                            "project/the-rolling-counts-gain-per-pupil-in-the-least-wealthy-fifth",
+                        ),
+                        None,
+                        None,
+                        None,
+                        Some("project/the-rolling-counts-gain-per-pupil-in-the-wealthiest-fifth"),
+                    ],
+                    [
+                        None,
+                        None,
+                        None,
+                        None,
+                        Some("project/the-mirror-inside-h-per-pupil-in-the-wealthiest-fifth"),
+                    ],
+                    [
+                        None,
+                        None,
+                        None,
+                        None,
+                        Some("project/the-mirror-beside-per-pupil-in-the-wealthiest-fifth"),
+                    ],
+                    [None, None, None, None, None],
+                ],
+            )
+        },
+    },
+    Series {
+        key: "project/what-each-anchor-rule-pays-by-disadvantaged-share",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        axis: "Fifth of districts by economically disadvantaged share, outside the cluster",
+        label: "What each anchor rule pays per pupil by disadvantaged share, on total state \
+                support, against the enacted anchor",
+        compute: |i| {
+            by_fifths(
+                i,
+                project::anchor_incidence::Axis::Poverty,
+                POVERTY_FIFTHS,
+                [
+                    [
+                        None,
+                        None,
+                        None,
+                        None,
+                        Some("project/a-ratchets-gain-per-pupil-in-the-poorest-fifth"),
+                    ],
+                    [
+                        None,
+                        Some("project/a-caps-cut-per-pupil-in-the-second-poverty-fifth"),
+                        None,
+                        None,
+                        Some("project/a-caps-cut-per-pupil-in-the-poorest-fifth"),
+                    ],
+                    [None, None, None, None, None],
+                    [None, None, None, None, None],
+                    [None, None, None, None, None],
+                    [
+                        None,
+                        None,
+                        Some("project/the-mirror-beside-gain-per-pupil-in-the-third-poverty-fifth"),
+                        None,
+                        None,
+                    ],
+                    [None, None, None, None, None],
+                ],
+            )
         },
     },
 ];
@@ -10407,6 +10777,253 @@ pub static FIGURES: &[Figure] = &[
                 )
                 .per_pupil()
         },
+    },
+    // ---- #444: the baseline the small multiples are read against -------------------------
+    // The enacted anchor's own population, stated as three numbers rather than one, because a
+    // panel of seven rules is read against it and a caption that names a band has to name its
+    // size. The 77 above is the fourth of them.
+    Figure {
+        key: "project/least-wealthy-fifth-held-by-the-enacted-anchor-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Of the 103 least-wealthy districts outside the enrollment cluster, how many the \
+                FY2027 guarantee holds \u{2014} the zero every alternative rule is a change from",
+        pinned: 0.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.reach
+                .fifth(
+                    &i.reach.rolling_count,
+                    project::anchor_incidence::Axis::Valuation,
+                    1,
+                )
+                .held_as_enacted as f64
+        },
+    },
+    Figure {
+        key: "project/districts-in-the-least-wealthy-fifth-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts in the least-wealthy fifth by valuation per pupil, outside the cluster",
+        pinned: 103.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.reach
+                .fifth(
+                    &i.reach.rolling_count,
+                    project::anchor_incidence::Axis::Valuation,
+                    1,
+                )
+                .districts as f64
+        },
+    },
+    Figure {
+        key: "project/districts-in-the-wealthiest-fifth-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts in the wealthiest fifth by valuation per pupil, outside the cluster \
+                \u{2014} two more than the least wealthy, because 520 does not divide by five",
+        pinned: 105.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.reach
+                .fifth(
+                    &i.reach.rolling_count,
+                    project::anchor_incidence::Axis::Valuation,
+                    5,
+                )
+                .districts as f64
+        },
+    },
+    // ---- #444: the two ends of the disadvantaged-share panel ------------------------------
+    // The endpoint rule over `project/what-each-anchor-rule-pays-by-disadvantaged-share`, whose
+    // extremes are not the extremes of the wealth panel: the widest payment on this axis is the
+    // mirror beside every floor in the middle fifth, and the deepest cut is the 2% cap in the
+    // second-least-poor, neither of which is an end of the column it sits in.
+    Figure {
+        key: "project/the-mirror-beside-gain-per-pupil-in-the-third-poverty-fifth",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The most any rule here pays per pupil on the disadvantaged-share axis: what \
+                `[M]` mirrored beside every floor adds to the middle fifth",
+        pinned: 144.27,
+        tolerance: 0.005,
+        compute: |i| {
+            i.reach
+                .fifth(
+                    &i.reach.mirror_beside,
+                    project::anchor_incidence::Axis::Poverty,
+                    3,
+                )
+                .per_pupil()
+        },
+    },
+    Figure {
+        key: "project/a-caps-cut-per-pupil-in-the-second-poverty-fifth",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And the deepest cut on that axis: what a 2% cap takes per pupil from the \
+                second-least-poor fifth \u{2014} nineteen times what it takes from the poorest",
+        pinned: 101.52,
+        tolerance: 0.005,
+        compute: |i| {
+            -i.reach
+                .fifth(
+                    &i.reach.capped_fy2032,
+                    project::anchor_incidence::Axis::Poverty,
+                    2,
+                )
+                .per_pupil()
+        },
+    },
+    // ---- #444: what each rule costs on both axes at once -----------------------------------
+    // The fourteen coordinates of `project/what-each-anchor-rule-costs-on-both-axes`, summed
+    // over the 520 districts outside the cluster. Every one is pinned because a plane of seven
+    // named points is quoted point by point, and because the finding is a *pair* of signs: three
+    // of these rules write less guarantee than the enacted anchor and pay more total state
+    // support, which is a sentence about both numbers and neither alone.
+    //
+    // Direction is in the key, as everywhere else here — `-cut` where the rule takes and
+    // `-gain` where it adds, with `compute` negating so the pin is a magnitude. The two rules
+    // that move the guarantee by nothing are written `-written` and pinned at zero, because
+    // there is no direction to name.
+    Figure {
+        key: "project/a-ratchets-guarantee-written-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a prior-year ratchet adds to the guarantee written outside the cluster at \
+                FY2032, against the enacted anchor",
+        pinned: 57298691.08,
+        tolerance: 0.01,
+        compute: |i| i.reach.aggregate(&i.reach.ratchet_fy2032).guarantee_delta,
+    },
+    Figure {
+        key: "project/a-ratchets-total-state-support-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And what it adds to total state support there \u{2014} the one rule priced here \
+                whose two axes agree in sign and in size",
+        pinned: 52907613.45,
+        tolerance: 0.01,
+        compute: |i| i.reach.aggregate(&i.reach.ratchet_fy2032).delta,
+    },
+    Figure {
+        key: "project/a-caps-guarantee-cut-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a 2% cap on the annual fall takes off the guarantee written outside the \
+                cluster at FY2032",
+        pinned: 167560640.40,
+        tolerance: 0.01,
+        compute: |i| -i.reach.aggregate(&i.reach.capped_fy2032).guarantee_delta,
+    },
+    Figure {
+        key: "project/a-caps-total-state-support-cut-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And what it takes off total state support there \u{2014} a third of the \
+                guarantee it cut, because `[K]` puts the rest back",
+        pinned: 59356083.89,
+        tolerance: 0.01,
+        compute: |i| -i.reach.aggregate(&i.reach.capped_fy2032).delta,
+    },
+    Figure {
+        key: "project/the-gentle-caps-guarantee-cut-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a 1% cap takes off the guarantee written outside the cluster at FY2036 \
+                undamped",
+        pinned: 107611728.73,
+        tolerance: 0.01,
+        compute: |i| -i.reach.aggregate(&i.reach.gentle_cap_fy2036).guarantee_delta,
+    },
+    Figure {
+        key: "project/the-gentle-caps-total-state-support-gain-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And what it *adds* to total state support there \u{2014} the disagreement #444 \
+                was opened for, cheaper on the headline and dearer in aggregate",
+        pinned: 10287443.63,
+        tolerance: 0.01,
+        compute: |i| i.reach.aggregate(&i.reach.gentle_cap_fy2036).delta,
+    },
+    Figure {
+        key: "project/the-rolling-counts-guarantee-cut-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a rolling pupil count takes off the guarantee written outside the cluster",
+        pinned: 14740751.65,
+        tolerance: 0.01,
+        compute: |i| -i.reach.aggregate(&i.reach.rolling_count).guarantee_delta,
+    },
+    Figure {
+        key: "project/the-rolling-counts-total-state-support-gain-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And what it adds to total state support there \u{2014} four and a half times \
+                the guarantee it cut, in the opposite direction",
+        pinned: 66202848.00,
+        tolerance: 0.01,
+        compute: |i| i.reach.aggregate(&i.reach.rolling_count).delta,
+    },
+    Figure {
+        key: "project/the-mirror-inside-h-guarantee-cut-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What `[M]` mirrored inside `[H]` takes off the guarantee written outside the \
+                cluster",
+        pinned: 70536484.89,
+        tolerance: 0.01,
+        compute: |i| -i.reach.aggregate(&i.reach.mirror_inside).guarantee_delta,
+    },
+    Figure {
+        key: "project/the-mirror-inside-h-total-state-support-gain-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And what it adds to total state support there \u{2014} the third rule whose two \
+                axes disagree in sign",
+        pinned: 62189117.28,
+        tolerance: 0.01,
+        compute: |i| i.reach.aggregate(&i.reach.mirror_inside).delta,
+    },
+    Figure {
+        key: "project/the-mirror-beside-guarantee-written-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What `[M]` mirrored beside `[L]`, `[M]` and `[O]` moves the guarantee written \
+                outside the cluster by: nothing, because it is paid outside every floor",
+        pinned: 0.0,
+        tolerance: 0.01,
+        compute: |i| i.reach.aggregate(&i.reach.mirror_beside).guarantee_delta,
+    },
+    Figure {
+        key: "project/the-mirror-beside-total-state-support-gain-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And what it adds to total state support there \u{2014} the dearest rule priced, \
+                and the one the guarantee column cannot see at all",
+        pinned: 135300935.56,
+        tolerance: 0.01,
+        compute: |i| i.reach.aggregate(&i.reach.mirror_beside).delta,
+    },
+    Figure {
+        key: "project/the-dated-phase-downs-guarantee-written-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What a dated phase-down moves the guarantee written outside the cluster by",
+        pinned: 0.0,
+        tolerance: 0.01,
+        compute: |i| i.reach.aggregate(&i.reach.dated_phase_down).guarantee_delta,
+    },
+    Figure {
+        key: "project/the-dated-phase-downs-total-state-support-outside-the-cluster",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And total state support \u{2014} also nothing: the shape keyed to the floor \
+                reaches nobody outside the cluster, which is the origin of the plane",
+        pinned: 0.0,
+        tolerance: 0.01,
+        compute: |i| i.reach.aggregate(&i.reach.dated_phase_down).delta,
     },
     Figure {
         key: "project/the-mirror-beside-per-pupil-in-the-wealthiest-fifth",

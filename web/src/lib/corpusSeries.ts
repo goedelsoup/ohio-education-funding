@@ -30,6 +30,18 @@
  * gate checks three ways. Nothing else on a panel is a claim: the four corner numbers are the
  * frame, which the crate computes so that a slope is drawn as an angle.
  *
+ * # What a plane is, and what holds it
+ *
+ * A third array, and the strictest form of the same rule. A **plane** is a handful of named things
+ * placed on two measures at once — seven anchor rules on (guarantee written, total state support)
+ * — and it exists because the two axes disagree for three of the seven, which is a finding no
+ * column reporting one of them at a time can carry.
+ *
+ * A cloud pins two numbers per panel because two is what a reader can quote off six hundred dots.
+ * A plane is seven dots with their names printed on them, so every coordinate is quotable and
+ * **every coordinate is pinned**: each position names a figure for its x and a figure for its y,
+ * the crate asserts that both reproduce, and a node drawing the plane must bind all fourteen.
+ *
  * # Sign
  *
  * Rows are signed, because a bar below the zero rule is what a chart is for, and so are slopes —
@@ -41,7 +53,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import type { Bar, Fit, Rank, ScatterPoint } from "./chart.ts";
+import type { Bar, Fit, Place, Rank, ScatterPoint } from "./chart.ts";
 import type { Node } from "./corpus.ts";
 import { citedCrates, proseFields, type Manifest, type Unit } from "./corpusFigures.ts";
 import { count, money, pct } from "./format.ts";
@@ -52,7 +64,7 @@ import * as routes from "./routes.ts";
  * the two documents have different shapes and different readers, and a field added to a row is no
  * reason for the scalar check to refuse a document it still reads correctly.
  */
-export const READS_SERIES_CONTRACT = "3.0.0";
+export const READS_SERIES_CONTRACT = "4.0.0";
 
 /** One row of a series: a category and its signed value. */
 export interface SeriesRow {
@@ -149,11 +161,43 @@ export interface ManifestScatter {
   points: ManifestPoint[];
 }
 
+/**
+ * One named thing on a plane: where it sits on both measures, and the figure pinning each.
+ *
+ * Both figures, not one and not the extremes. A cloud's points are anonymous and only its fit is
+ * quotable; these carry their names on the picture, so every number on it is a number a reader
+ * will write down — and the rule the whole manifest is built on is that such a number is pinned.
+ */
+export interface ManifestPosition {
+  label: string;
+  x: number;
+  y: number;
+  /** The `crates/figures.json` key whose pin the x coordinate reproduces in magnitude. */
+  xFigure: string;
+  /** As `xFigure`, for the y coordinate. */
+  yFigure: string;
+}
+
+/** A handful of named things on two measures at once, computed from the crate that owns it. */
+export interface ManifestPlane {
+  key: string;
+  owner: string;
+  /** What one position is, singular and lower case — "anchor rule". */
+  subject: string;
+  label: string;
+  /** Both axes hold zero, which the crate computes them to and `planeSpec` refuses a plane without:
+      zero is the rule in force and the boundary the quadrant reading turns on. */
+  x: ManifestAxis;
+  y: ManifestAxis;
+  points: ManifestPosition[];
+}
+
 /** `crates/series.json`, as written by `cargo run -p figures series`. */
 export interface SeriesManifest {
   contract: string;
   series: ManifestSeries[];
   scatters: ManifestScatter[];
+  planes: ManifestPlane[];
 }
 
 /** Where `crates/figures series` writes, from `web/` and from the repository root. */
@@ -199,6 +243,9 @@ export function loadSeriesManifest(): SeriesManifest {
   }
   if (!Array.isArray(parsed.scatters) || parsed.scatters.length === 0) {
     throw new Error(`${path} carries no clouds, so this check would pass against any corpus.`);
+  }
+  if (!Array.isArray(parsed.planes) || parsed.planes.length === 0) {
+    throw new Error(`${path} carries no planes, so this check would pass against any corpus.`);
   }
   cached = parsed;
   return parsed;
@@ -348,6 +395,88 @@ export function barsOf(series: ManifestSeries): Bar[] {
   }));
 }
 
+/** One small multiple of a grouped series: the run's name, and its rows as bars. */
+export interface SeriesMultiple {
+  label: string;
+  bars: Bar[];
+}
+
+/**
+ * A grouped series as small multiples drawn on one scale, or `null` where it has no second level.
+ *
+ * # What the shared scale is for
+ *
+ * `Row.group` is a second level of the axis, and a series carrying one is seven charts of five
+ * bars rather than one chart of thirty-five: the rows within a run are comparable and the runs are
+ * comparable to each other, which a single column of thirty-five bars with its categories repeated
+ * seven times says neither of. Small multiples say both — but only if they share a scale, because
+ * a panel fitted to its own rows draws its largest bar at full width whatever that bar is worth.
+ *
+ * So both ends are computed over **every** row of the series and handed to every panel. That is
+ * also why they are computed here rather than in the route: the scale is a property of the series,
+ * and a caller who worked one out per panel would have drawn exactly the picture this prevents.
+ *
+ * # Why not one scale across two series
+ *
+ * Because the two this was written for differ by two orders of magnitude — the first fifth of one
+ * anchor rule is $138.58 on the wealth axis and $4.06 on the disadvantaged-share axis — and a
+ * scale wide enough for both flattens the second into a row of hairlines. They are separate
+ * documents so that "scale per axis" is structural rather than a caller's discipline, and the
+ * prose that draws them says the scales differ.
+ *
+ * # The panel where every bar is zero
+ *
+ * One of the seven anchor rules does nothing at all, on either axis, so each of the two sets has a
+ * panel of five zeros in it: five row names against a zero rule and no ink whatsoever. That is the
+ * correct picture and it reads as a broken one — the reader's question is *did this fail to
+ * render*, not *is this rule inert* — and the shared scale that makes the other six panels legible
+ * is exactly what guarantees the zeros have nowhere to show.
+ *
+ * So a panel whose every bar is zero direct-labels all of them. `Bar.direct` says never a number
+ * on every mark, and that rule is about a chart where the bars already carry the quantity; here
+ * there are no bars, so the number is the only thing the panel has to say. It is the one panel in
+ * a set that can want this, because a panel with a single non-zero bar draws that bar and the
+ * emptiness beside it is then a comparison rather than an absence.
+ *
+ * `null` where any row carries no group: a multiple of one panel is a bar chart with a heading on
+ * it, and the route draws that with {@link barsOf} instead.
+ */
+export function multiplesOf(
+  series: ManifestSeries,
+): { panels: SeriesMultiple[]; max: number; min: number; labelChars: number } | null {
+  if (series.rows.length === 0 || series.rows.some((row) => row.group === undefined)) return null;
+  const panels: SeriesMultiple[] = [];
+  for (const row of series.rows) {
+    const label = row.group!;
+    let panel = panels.find((p) => p.label === label);
+    if (!panel) {
+      panel = { label, bars: [] };
+      panels.push(panel);
+    }
+    panel.bars.push({
+      label: row.label,
+      value: row.value,
+      // The run's name as well as the row's, because a tooltip is read with nothing beside it and
+      // the name of the panel it belongs to is above the chart rather than in it.
+      hover: row.hover ?? `${label} — ${row.label}: ${formatRow(series.unit, row.value)}`,
+    });
+  }
+  for (const panel of panels) {
+    if (panel.bars.every((bar) => bar.value === 0)) {
+      for (const bar of panel.bars) bar.direct = formatRow(series.unit, bar.value);
+    }
+  }
+  return {
+    panels,
+    max: Math.max(...series.rows.map((row) => Math.abs(row.value)), 1),
+    min: Math.min(0, ...series.rows.map((row) => row.value)),
+    // Part of the shared scale rather than a detail of the panels that happen to carry a label:
+    // a panel reserving label room its siblings do not draws zero at a different pixel from
+    // theirs. See `barSpec`'s `labelChars`.
+    labelChars: Math.max(0, ...panels.flatMap((p) => p.bars.map((b) => b.direct?.length ?? 0))),
+  };
+}
+
 /**
  * One panel of a cloud, as `scatterSpec` wants it.
  *
@@ -428,6 +557,24 @@ export function panelsOf(cloud: ManifestScatter): CloudPanel[] {
   });
 }
 
+/**
+ * A plane's positions as `planeSpec` draws them.
+ *
+ * Signed, through {@link formatRow} rather than {@link formatValue}: a cloud's coordinates are
+ * positions and a plus on one would assert a direction it is not claiming, where every coordinate
+ * here is a difference against the rule in force and its sign is the finding.
+ */
+export function placesOf(plane: ManifestPlane): Place[] {
+  return plane.points.map((point) => ({
+    label: point.label,
+    x: point.x,
+    y: point.y,
+    hover:
+      `${point.label}: ${plane.x.label} ${formatRow(plane.x.unit, point.x)}, ` +
+      `${plane.y.label} ${formatRow(plane.y.unit, point.y)}`,
+  }));
+}
+
 /** Each position the check can fail in. Every one is produced on purpose in the spec. */
 export type SeriesDiscrepancyKind =
   /** The node binds a key the series manifest does not carry. */
@@ -440,7 +587,9 @@ export type SeriesDiscrepancyKind =
   | "endpoints-unbound"
   /** A number printed on a panel of a cloud is a figure this node does not bind. */
   | "fit-unbound"
-  /** The manifest exports a series or a cloud no node draws. */
+  /** A coordinate of a position on a plane is a figure this node does not bind. */
+  | "position-unbound"
+  /** The manifest exports a series, a cloud or a plane no node draws. */
   | "uncited-series"
   /** A series {@link PAGE_SERIES} says a page draws names a node the corpus does not hold. */
   | "page-source-missing";
@@ -464,6 +613,7 @@ export interface SeriesDiscrepancy {
 export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): SeriesDiscrepancy[] {
   const byKey = new Map(manifest.series.map((series) => [series.key, series]));
   const cloudByKey = new Map(manifest.scatters.map((cloud) => [cloud.key, cloud]));
+  const planeByKey = new Map(manifest.planes.map((plane) => [plane.key, plane]));
   const found: SeriesDiscrepancy[] = [];
   const drawn = new Set<string>();
 
@@ -478,16 +628,17 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
         found.push({ node: node.id, key: entry.key, kind, message });
 
       /*
-       * One `series:` block, two shapes behind it.
+       * One `series:` block, three shapes behind it.
        *
        * A node binds what it draws by key and does not say which array the key is in — a binding
-       * is "draw this computation under this field", and whether the crate answered with a column
-       * or a cloud is the crate's business. The two differ in what has to be bound with them, and
-       * that is the whole of the difference below.
+       * is "draw this computation under this field", and whether the crate answered with a column,
+       * a cloud or a plane is the crate's business. The three differ in what has to be bound with
+       * them, and that is the whole of the difference below.
        */
       const series = byKey.get(entry.key);
       const cloud = cloudByKey.get(entry.key);
-      if (!series && !cloud) {
+      const plane = planeByKey.get(entry.key);
+      if (!series && !cloud && !plane) {
         at(
           "unknown-key",
           `draws "${entry.key}", which crates/series.json does not carry. Either the key was ` +
@@ -495,7 +646,7 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
         );
         continue;
       }
-      const owner = (series ?? cloud)!.owner;
+      const owner = (series ?? cloud ?? plane)!.owner;
       drawn.add(entry.key);
 
       if (!DRAWABLE_FIELDS.includes(entry.field)) {
@@ -540,6 +691,27 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
         continue;
       }
 
+      if (plane) {
+        for (const position of plane.points) {
+          for (const [which, axis, key] of [
+            ["x", plane.x, position.xFigure],
+            ["y", plane.y, position.yFigure],
+          ] as const) {
+            if (!bound.has(key)) {
+              at(
+                "position-unbound",
+                `places "${position.label}" at ${which} = ${which === "x" ? position.x : position.y} ` +
+                  `on "${axis.label}", which is ${key}, and this node does not bind that figure. ` +
+                  `Bind it in figures: first — a plane prints its subjects' names on the picture, ` +
+                  `so every coordinate on it is a number a reader will quote by name and every ` +
+                  `coordinate is pinned.`,
+              );
+            }
+          }
+        }
+        continue;
+      }
+
       for (const end of endpoints(series!)) {
         if (end.figure === undefined) {
           at(
@@ -573,6 +745,7 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
   const exported = [
     ...manifest.series.map((series) => [series.key, "column"] as const),
     ...manifest.scatters.map((cloud) => [cloud.key, "cloud"] as const),
+    ...manifest.planes.map((plane) => [plane.key, "plane"] as const),
   ];
   for (const [key, what] of exported) {
     if (!drawn.has(key)) {
@@ -735,6 +908,49 @@ export function fitsAgainstFigures(manifest: SeriesManifest, figures: Manifest):
         if (Math.abs(value - figure.value) > Number.EPSILON) {
           out.push(
             `${cloud.key}: "${panel.label}" has ${what} ${value} and ${key} is ${figure.value}; ` +
+              `one of the two manifests is stale`,
+          );
+        }
+      }
+    }
+  }
+  return out;
+}
+
+/**
+ * Every position reproduces both figures it names, manifest against manifest.
+ *
+ * {@link rowsAgainstFigures}'s and {@link fitsAgainstFigures}'s third sibling and the same check:
+ * the crate holds a coordinate to the figure's *pin*, this holds the committed series document to
+ * the committed figure document, which is the staleness two artefacts from one generator can have
+ * between them. They are one computation, so they agree to the bit or not at all.
+ *
+ * Both coordinates in magnitude, because both are signed: a rule that writes $107,611,728.73 less
+ * guarantee than the anchor in force is pinned as a cut, with the direction in the key, on the
+ * convention the corpus's numeral reader forces and the rest of this module already follows.
+ */
+export function positionsAgainstFigures(manifest: SeriesManifest, figures: Manifest): string[] {
+  const byKey = new Map(figures.figures.map((figure) => [figure.key, figure]));
+  const out: string[] = [];
+  for (const plane of manifest.planes) {
+    for (const point of plane.points) {
+      for (const [which, axis, key, value] of [
+        ["x", plane.x, point.xFigure, point.x],
+        ["y", plane.y, point.yFigure, point.y],
+      ] as const) {
+        const figure = byKey.get(key);
+        if (!figure) {
+          out.push(`${plane.key}: "${point.label}" names ${key} for ${which}, which figures.json lacks`);
+          continue;
+        }
+        if (figure.unit !== axis.unit) {
+          out.push(
+            `${plane.key}: "${point.label}" has a ${which} in ${axis.unit} and ${key} is a ${figure.unit}`,
+          );
+        }
+        if (Math.abs(Math.abs(value) - figure.value) > Number.EPSILON) {
+          out.push(
+            `${plane.key}: "${point.label}" is at ${which} = ${value} and ${key} is ${figure.value}; ` +
               `one of the two manifests is stale`,
           );
         }

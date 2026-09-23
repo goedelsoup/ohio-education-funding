@@ -392,8 +392,8 @@ findings: |
   ### Who every alternative reaches outside the cluster, and why they all run the same way
 
   Outside the 89, the enacted floor holds the wealthy and not the poor. Cut the 520 other
-  districts into fifths by assessed valuation per pupil and the FY2027 guarantee holds none of the
-  103 least wealthy and **77** of the 105 wealthiest — the 13%, 37%, 68%, 76% quartile gradient
+  districts into fifths by assessed valuation per pupil and the FY2027 guarantee holds **0** of the
+  **103** least wealthy and **77** of the **105** wealthiest — the 13%, 37%, 68%, 76% quartile gradient
   above with the enrollment cluster taken out. Every rule below is a *change* from that one, so a
   rule that narrows the floor takes money from the wealthy, and a rule that reaches districts the
   floor does not — the ones the formula pays — gives money to the poor. Measured on total state
@@ -411,7 +411,7 @@ findings: |
   on the annual fall lets a held district's floor decline, so it is a cut to the districts the
   enacted anchor holds. At FY2032 a 2% cap takes nothing from the least-wealthy fifth, whose two
   held districts are fully backstopped, and **$83.51** a pupil from the fourth; by disadvantaged
-  share it takes $101.52 from the second-least-poor fifth and **$5.33** from the poorest. **145**
+  share it takes **$101.52** from the second-least-poor fifth and **$5.33** from the poorest. **145**
   districts lose and one gains. [verified] (crates/project)
 
   The poorest fifth's small loss is `[K]` rather than the cap: its guarantee falls $24.7m and its
@@ -461,6 +461,52 @@ findings: |
   ratchet, the rolling count or either mirror, or take it at the top, with a cap — and at a long
   enough horizon the 1% cap does both. That is the fiscal framing the two pricings used, and it
   survives the cut. [inference]
+
+  ### The two axes disagree for three of the seven, and the guarantee column shows none of it
+
+  Every pricing above reports one column at a time, and the two columns are not versions of each
+  other. A rule is written into R.C. 3317.019 as a guarantee and paid out of total state support,
+  and `[K]` stands between them: a cut to the guarantee is a cut to the money only so far as the
+  backstop does not put it back, and a payment written outside every floor is money with no
+  guarantee behind it at all. Priced on both axes at once, outside the cluster and against the
+  enacted anchor, **three of the seven rules write less guarantee and pay more money** — and a
+  fourth is the dearest of them all while moving the guarantee column by nothing.
+
+  **The three that disagree.** A 1% cap at FY2036 undamped takes **$107,611,728.73** off the
+  guarantee written and adds **$10,287,443.63** to total state support. A rolling pupil count takes
+  **$14,740,751.65** off the guarantee and adds **$66,202,848.00** — four and a half times the cut,
+  in the opposite direction. `[M]` mirrored inside `[H]` takes **$70,536,484.89** and adds
+  **$62,189,117.28**. Nothing here runs the other way: no rule priced writes more guarantee while
+  paying less. [verified] (crates/project)
+
+  **The two that agree, and the one the column cannot see.** A prior-year ratchet walked to FY2032
+  adds **$57,298,691.08** of guarantee and **$52,907,613.45** of support — the one rule whose two
+  axes agree in size as well as in sign, because a ratchet writes its money into the floor and the
+  floor is what gets paid. A 2% cap takes **$167,560,640.40** off the guarantee and
+  **$59,356,083.89** off the support, near a third of what it cut, which is the absorption already
+  measured above seen whole. `[M]` mirrored beside `[L]`, `[M]` and `[O]` moves the guarantee
+  column by **$0.00** and pays **$135,300,935.56**, more than any other rule here — it is paid
+  outside every floor, so there is no guarantee for it to be written into. A dated phase-down of
+  the FY2027 list moves **$0.00** of guarantee outside the cluster and **$0.00** of total state
+  support, because outside the cluster there is nobody on the list. [verified] (crates/project)
+
+  So a reader given the guarantee column alone would rank the seven nearly backwards. The dearest
+  rule reads as no rule at all. Three of the four that cost money read as cuts. And the only rule
+  whose guarantee figure is a fair proxy for what it costs is the ratchet, which is the rule that
+  needs the proxy least. The plane below is that table drawn once: the vertical rule is no change
+  to the guarantee written, the horizontal is no change to the support paid, and the quadrant above
+  and to the left — writes less, pays more — holds three of the seven points. [inference]
+
+  **And the per-pupil incidence, by both axes, one panel a rule.** The two sets of panels below
+  are thirty-five numbers each: five fifths of the 520 districts outside the cluster, for every one
+  of the seven rules. The scale is shared across all seven panels of a set and deliberately **not**
+  across the two sets, because the two axes are two orders of magnitude apart — the ratchet's first
+  fifth is $138.58 a pupil by wealth and $4.06 by disadvantaged share — and one scale wide enough
+  for the first flattens the second into a row of hairlines. Read inside each set, the shapes are
+  the gradients already stated: monotone down the wealth fifths for the ratchet and the rolling
+  count, and hump-shaped by poverty for the mirror written beside the floors, whose **$144.27** a
+  pupil in the middle poverty fifth is the most any rule here pays on that axis. [verified]
+  (crates/project)
 
   ### The partition that did not need fitting
 
@@ -688,7 +734,7 @@ figures:
   - key: project/wealthiest-fifth-held-by-the-enacted-anchor-outside-the-cluster
     value: 77
     field: findings
-    as_written: "**77** of the 105 wealthiest"
+    as_written: "**77** of the **105** wealthiest"
   - key: project/a-ratchets-gain-per-pupil-in-the-least-wealthy-fifth
     value: 138.58305999480032
     field: findings
@@ -1107,6 +1153,89 @@ figures:
     value: 69915878.086
     field: findings
     as_written: "**$69,915,878.09** over"
+  - key: project/least-wealthy-fifth-held-by-the-enacted-anchor-outside-the-cluster
+    value: 0
+    field: findings
+    as_written: "guarantee holds **0** of the"
+  - key: project/districts-in-the-least-wealthy-fifth-outside-the-cluster
+    value: 103
+    field: findings
+    as_written: "**103** least wealthy"
+  - key: project/districts-in-the-wealthiest-fifth-outside-the-cluster
+    value: 105
+    field: findings
+    as_written: "**105** wealthiest"
+  - key: project/the-gentle-caps-guarantee-cut-outside-the-cluster
+    value: 107611728.73008639
+    field: findings
+    as_written: "takes **$107,611,728.73** off the"
+  - key: project/the-gentle-caps-total-state-support-gain-outside-the-cluster
+    value: 10287443.630971175
+    field: findings
+    as_written: "adds **$10,287,443.63** to total state support"
+  - key: project/the-rolling-counts-guarantee-cut-outside-the-cluster
+    value: 14740751.650550755
+    field: findings
+    as_written: "**$14,740,751.65** off the guarantee"
+  - key: project/the-rolling-counts-total-state-support-gain-outside-the-cluster
+    value: 66202848.00230269
+    field: findings
+    as_written: "adds **$66,202,848.00**"
+  - key: project/the-mirror-inside-h-guarantee-cut-outside-the-cluster
+    value: 70536484.89175005
+    field: findings
+    as_written: "takes **$70,536,484.89** and adds"
+  - key: project/the-mirror-inside-h-total-state-support-gain-outside-the-cluster
+    value: 62189117.28474995
+    field: findings
+    as_written: "and adds **$62,189,117.28**"
+  - key: project/a-ratchets-guarantee-written-outside-the-cluster
+    value: 57298691.08055354
+    field: findings
+    as_written: "adds **$57,298,691.08** of guarantee"
+  - key: project/a-ratchets-total-state-support-outside-the-cluster
+    value: 52907613.44880489
+    field: findings
+    as_written: "**$52,907,613.45** of support"
+  - key: project/a-caps-guarantee-cut-outside-the-cluster
+    value: 167560640.40268108
+    field: findings
+    as_written: "takes **$167,560,640.40** off the guarantee"
+  - key: project/a-caps-total-state-support-cut-outside-the-cluster
+    value: 59356083.89264195
+    field: findings
+    as_written: "**$59,356,083.89** off the support"
+  - key: project/the-mirror-beside-guarantee-written-outside-the-cluster
+    value: 0.0
+    field: findings
+    as_written: "moves the guarantee column by **$0.00**"
+  - key: project/the-mirror-beside-total-state-support-gain-outside-the-cluster
+    value: 135300935.56425
+    field: findings
+    as_written: "pays **$135,300,935.56**"
+  - key: project/the-dated-phase-downs-guarantee-written-outside-the-cluster
+    value: 0.0
+    field: findings
+    as_written: "moves **$0.00** of guarantee outside the cluster"
+  - key: project/the-dated-phase-downs-total-state-support-outside-the-cluster
+    value: 0.0
+    field: findings
+    as_written: "**$0.00** of total state support"
+  - key: project/the-mirror-beside-gain-per-pupil-in-the-third-poverty-fifth
+    value: 144.26626501405502
+    field: findings
+    as_written: "whose **$144.27** a"
+  - key: project/a-caps-cut-per-pupil-in-the-second-poverty-fifth
+    value: 101.51772328886412
+    field: findings
+    as_written: "takes **$101.52** from the second-least-poor fifth"
+series:
+  - key: project/what-each-anchor-rule-costs-on-both-axes
+    field: findings
+  - key: project/what-each-anchor-rule-pays-by-wealth
+    field: findings
+  - key: project/what-each-anchor-rule-pays-by-disadvantaged-share
+    field: findings
 revisions:
   - was: |
       A hold-harmless and nothing else: computed funding below a baseline, pay the difference.

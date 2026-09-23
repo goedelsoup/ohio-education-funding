@@ -19,8 +19,8 @@ import { isBlockProperty, isListProperty, isMathProperty, renderListProperty, re
 import * as routes from "../../../lib/routes.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
 import SeriesChart from "../../../components/SeriesChart.astro";
-import { barsOf, loadSeriesManifest, panelsOf } from "../../../lib/corpusSeries.ts";
-import { barSpec, panelWidth, scatterSpec } from "../../../lib/plot/spec.ts";
+import { barsOf, formatValue, loadSeriesManifest, multiplesOf, panelsOf, placesOf } from "../../../lib/corpusSeries.ts";
+import { barSpec, panelWidth, planeSpec, scatterSpec } from "../../../lib/plot/spec.ts";
 import { renderPanelToString, renderToString } from "../../../lib/plot/ssr.ts";
 
 export function getStaticPaths() {
@@ -43,10 +43,12 @@ const findings = node.findings
  *
  * A `figures:` binding quotes a scalar the crate pins; a `series:` binding draws a computation the
  * crate ran, and the two documents come from one generator (`crates/figures`, #441). A binding
- * names a key and not a shape: the manifest answers with a **column**, drawn as bars, or with a
- * **cloud**, drawn as one squared panel per outcome over a shared predictor (#442). What differs
- * between them is what the node has to bind alongside — a column's two extremes, a cloud's slopes
- * and r-squareds — and `corpusSeries.ts` holds both.
+ * names a key and not a shape: the manifest answers with a **column**, drawn as bars — as one
+ * chart, or as small multiples on a shared scale where its rows carry a second level — or with a
+ * **cloud**, drawn as one squared panel per outcome over a shared predictor (#442), or with a
+ * **plane**, a handful of named things on two signed measures at once (#444). What differs between
+ * them is what the node has to bind alongside — a column's two extremes, a cloud's slopes and
+ * r-squareds, a plane's every coordinate — and `corpusSeries.ts` holds all three.
  *
  * The route throws on a key the manifest lacks rather than skipping it, for the reason the figure
  * gate throws on an empty manifest: a chart that silently fails to appear looks like a node that
@@ -56,10 +58,12 @@ const findings = node.findings
 const manifest = loadSeriesManifest();
 const seriesByKey = new Map(manifest.series.map((series) => [series.key, series]));
 const cloudByKey = new Map(manifest.scatters.map((cloud) => [cloud.key, cloud]));
+const planeByKey = new Map(manifest.planes.map((plane) => [plane.key, plane]));
 const charts = node.series.map((binding) => {
   const series = seriesByKey.get(binding.key);
   const cloud = cloudByKey.get(binding.key);
-  if (!series && !cloud) {
+  const plane = planeByKey.get(binding.key);
+  if (!series && !cloud && !plane) {
     throw new Error(
       `${node.id} draws ${binding.key}, which crates/series.json does not carry. Regenerate it ` +
         `with: cargo run --manifest-path crates/Cargo.toml -p figures series > crates/series.json`,
@@ -93,6 +97,67 @@ const charts = node.series.map((binding) => {
       })),
     };
   }
+  if (plane) {
+    /* Full width and both of them, unlike a cloud's panels: this is one chart on the page rather
+       than one of a row, and its labels are laid out against the frame they are drawn in — see
+       `placeLabels`, which is why the narrow drawing is not the wide one scaled. */
+    return {
+      field: binding.field,
+      key: plane.key,
+      label: plane.label,
+      note:
+        `One dot per ${plane.subject}, ${plane.points.length} of them. The two rules are zero on ` +
+        `each axis — the rule in force — so which quadrant a dot sits in is what it does on both ` +
+        `measures at once. Hover or focus a dot for both of its numbers.`,
+      panels: [
+        {
+          label: null,
+          html: renderToString(
+            (w) =>
+              planeSpec(
+                placesOf(plane),
+                {
+                  x: { label: plane.x.label, format: (v: number) => formatValue(plane.x.unit, v) },
+                  y: { label: plane.y.label, format: (v: number) => formatValue(plane.y.unit, v) },
+                },
+                { width: w, xDomain: [plane.x.min, plane.x.max], yDomain: [plane.y.min, plane.y.max] },
+              ),
+            { label: plane.label },
+          ),
+        },
+      ],
+    };
+  }
+
+  /* A column whose rows carry a second level is seven charts and not one — see `multiplesOf` for
+     why the scale is computed over every row and handed to each panel. */
+  const multiples = multiplesOf(series!);
+  if (multiples) {
+    const width = panelWidth(multiples.panels.length);
+    return {
+      field: binding.field,
+      key: series!.key,
+      label: series!.label,
+      note:
+        `By ${series!.axis.charAt(0).toLowerCase()}${series!.axis.slice(1)}, one panel each and ` +
+        `one scale across all ${multiples.panels.length}. Hover or focus a bar for its value.`,
+      panels: multiples.panels.map((panel) => ({
+        label: panel.label,
+        html: renderPanelToString(
+          () =>
+            barSpec(panel.bars, {
+              width,
+              max: multiples.max,
+              min: multiples.min,
+              labelChars: multiples.labelChars,
+            }),
+          { label: `${series!.label} — ${panel.label}` },
+          width,
+        ),
+      })),
+    };
+  }
+
   return {
     field: binding.field,
     key: series!.key,

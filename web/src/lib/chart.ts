@@ -173,6 +173,26 @@ export interface Fit {
 }
 
 /**
+ * One named thing at a point on two measures at once.
+ *
+ * A {@link ScatterPoint} without the population around it, and the difference is what may be
+ * drawn. Six hundred districts are a texture and a dot in one carries its name only in a tooltip;
+ * seven named policies are a *list*, every one of which a reader will want to quote by name, so
+ * the name is printed beside the mark and the mark is drawn at a size a reader can point at.
+ *
+ * Both coordinates are signed and zero is a position rather than a floor — the two zero rules are
+ * what divide the frame into the four quadrants the form is read in. Which is why this is its own
+ * shape rather than a flag on `ScatterPoint`: that one's `muted`, `band` and `series` channels
+ * are for saying which part of a population a dot is in, and a plane of seven has no parts.
+ */
+export interface Place {
+  label: string;
+  x: number;
+  y: number;
+  hover: string;
+}
+
+/**
  * One item with two values on the same measure — a low end and a high end.
  *
  * The shape a ratio compresses. `/counties` ranked its 88 counties by richest ÷ poorest valuation

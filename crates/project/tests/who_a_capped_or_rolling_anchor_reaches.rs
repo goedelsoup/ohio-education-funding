@@ -27,6 +27,15 @@
 //! is not incidence, which is the constraint #424 set and the reason the measure here is the wide
 //! one.
 //!
+//! # The guarantee column gets the sign of three of the seven backwards
+//!
+//! `anchor_incidence::aggregate` totals a rule on both axes at once, and outside the cluster the
+//! **1% cap at FY2036**, the **rolling pupil count** and **`[M]` mirrored inside `[H]`** all
+//! write less guarantee than the enacted anchor and pay more total state support — the rolling
+//! count by $66.2m against a $14.7m cut. Nothing runs the other way. And the dearest rule here,
+//! the mirror beside every floor, moves the guarantee by nothing at all while paying $135.3m, so
+//! a reader with the headline column alone would rank it last.
+//!
 //! # And #400's shapes agree
 //!
 //! The rolling count and the mirror inside `[H]` are progressive by the same mechanism; the
@@ -537,4 +546,96 @@ fn the_four_supplements_run_the_same_way_or_flat_and_none_runs_the_other_way() {
             per_pupil(&bands)
         );
     }
+}
+
+/// **The two axes disagree, for three of the seven rules.**
+///
+/// [#444](https://github.com/goedelsoup/ohio-education-funding/issues/444) asked for the picture
+/// this test is the table of: every rule at once on (guarantee written, total state support),
+/// outside the cluster. The disagreement the module docs state for the 1% cap is not one rule's
+/// oddity. A **1% cap at FY2036**, a **rolling pupil count** and **`[M]` mirrored inside `[H]`**
+/// all write *less* guarantee than the enacted anchor and pay *more* total state support, and the
+/// rolling count does it at four and a half times the size of the guarantee it cut.
+///
+/// The mechanism is the one `[K]` has all through this module: a district the alternative floor
+/// drops falls back onto a formula amount larger than the guarantee it lost, so the guarantee
+/// column and the money column are not two views of one quantity. A table that reports the
+/// headline alone gets the sign of three of these seven backwards.
+#[test]
+fn three_of_the_seven_rules_write_less_guarantee_and_pay_more_support() {
+    let districts = panel::panel();
+    let mine = cluster(&districts);
+    let ratchet = against_enacted(&districts, 2032, shipped(), Anchor::PriorYear);
+    let capped = against_enacted(
+        &districts,
+        2032,
+        shipped(),
+        Anchor::Decayed { factor: 0.98 },
+    );
+    let gentle = against_enacted(
+        &districts,
+        2036,
+        undamped(),
+        Anchor::Decayed { factor: 0.99 },
+    );
+    let rolling = incidence::under_supplement(&districts, Supplement::RollingCount);
+    let inside = incidence::under_supplement(&districts, Supplement::Mirror(Line::Foundation));
+    let beside = incidence::under_supplement(&districts, Supplement::Mirror(Line::Beside));
+    let dated = incidence::under_supplement(&districts, Supplement::DatedPhaseDown);
+
+    // (guarantee written, total state support), both against the enacted anchor, both signed.
+    let expected: [(&str, &Vec<Movement>, f64, f64); 7] = [
+        ("ratchet", &ratchet, 57_298_691.08, 52_907_613.45),
+        ("2% cap", &capped, -167_560_640.40, -59_356_083.89),
+        ("1% cap at FY2036", &gentle, -107_611_728.73, 10_287_443.63),
+        ("rolling count", &rolling, -14_740_751.65, 66_202_848.00),
+        ("mirror inside [H]", &inside, -70_536_484.89, 62_189_117.28),
+        ("mirror beside", &beside, 0.00, 135_300_935.56),
+        ("dated phase-down", &dated, 0.00, 0.00),
+    ];
+    let mut disagreeing: Vec<&str> = Vec::new();
+    for (label, frame, guarantee, support) in expected {
+        let totalled = incidence::aggregate(frame, &mine);
+        assert_eq!(
+            totalled.districts, 520,
+            "{label}: 609 less the 89 of the cluster"
+        );
+        assert!(
+            (totalled.guarantee_delta - guarantee).abs() < CENT,
+            "{label}: ${:.2} of guarantee against ${guarantee:.2}",
+            totalled.guarantee_delta
+        );
+        assert!(
+            (totalled.delta - support).abs() < CENT,
+            "{label}: ${:.2} of support against ${support:.2}",
+            totalled.delta
+        );
+        if totalled.axes_disagree() {
+            disagreeing.push(label);
+        }
+    }
+    assert_eq!(
+        disagreeing,
+        vec!["1% cap at FY2036", "rolling count", "mirror inside [H]"],
+        "the rules whose guarantee column and money column point opposite ways"
+    );
+
+    // And the direction is always the same one. Nothing here writes *more* guarantee while
+    // paying less, which is what a rule that cut the formula to pay the floor would look like.
+    for (label, frame, _, _) in expected {
+        let totalled = incidence::aggregate(frame, &mine);
+        assert!(
+            !(totalled.guarantee_delta > CENT && totalled.delta < -CENT),
+            "{label} writes more guarantee and pays less support, which nothing here does"
+        );
+    }
+
+    // The mirror beside every floor is the case that makes the second axis necessary rather than
+    // interesting: it is the dearest rule priced, and the guarantee column cannot see it at all.
+    let beside_totalled = incidence::aggregate(&beside, &mine);
+    assert!(beside_totalled.guarantee_delta.abs() < CENT);
+    assert!(
+        beside_totalled.delta > incidence::aggregate(&ratchet, &mine).delta * 2.0,
+        "the rule that writes no guarantee pays more than twice what the ratchet pays"
+    );
 }

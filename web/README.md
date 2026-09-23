@@ -303,7 +303,7 @@ Schema on its own.
 
 ## Charts are Observable Plot, rendered at build time
 
-[`src/lib/plot/`](src/lib/plot/) holds three chart forms as Plot specifications, and two renderers
+[`src/lib/plot/`](src/lib/plot/) holds the nine chart forms as Plot specifications, and two renderers
 that share them: [`ssr.ts`](src/lib/plot/ssr.ts) draws into a `linkedom` document during the build,
 and [`client.ts`](src/lib/plot/client.ts) draws into the browser's own. One description of what a
 chart looks like, so the interactive copy cannot drift from the static one.
@@ -748,6 +748,23 @@ data's own units, and the panel's frame arrives with it, because `scatterSpec` r
 without both domains — a y axis fitted to its own points redraws the slope, which is the claim.
 The first cloud is #442's pair on the targeted assistance node: total weighted wealth on enrolment
 lies on the diagonal, weighted wealth per pupil on the same predictor lies flat.
+
+The manifest's third answer is a **plane**, drawn by `planeSpec`: a handful of named things at a
+point on two signed measures, each dot labelled on the picture and the only frame a rule through
+zero on each axis. Its version of the rule is that every position binds a figure for **both**
+coordinates, because on a plane there is no row a reader cannot quote. #444 draws the seven anchor
+rules on (guarantee written, total state support), where three sit up and to the left — cheaper on
+the headline, dearer in aggregate — which is the finding, and is invisible in any table reporting
+one column at a time. The quadrant is the encoding, so the marks carry no hue and there is no
+legend; `placeLabels` puts each name on the side of its dot that collides with nothing, which is
+what lets seven direct labels survive the narrow frame.
+
+A **grouped** series is the last shape, and it is not a new form: rows carrying a `group` become
+one `barSpec` panel per group, on one scale across the set, which is what makes a monotonicity
+readable from panel to panel rather than only within one. The scale is shared inside a set and
+never across two — #444's two axes differ by two orders of magnitude in the first fifth, $138.58
+against $4.06 — so the two panels are two series, and the separation is structural rather than a
+rule a caller has to keep.
 
 ### Three corpus defects this surfaced
 

@@ -1,5 +1,5 @@
 /**
- * The seven chart forms, as Observable Plot specifications.
+ * The nine chart forms, as Observable Plot specifications.
  *
  * # Why the spec is separate from the rendering
  *
@@ -34,6 +34,7 @@ import type {
   DistributionValue,
   FanPoint,
   Fit,
+  Place,
   Range,
   Rank,
   ScatterPoint,
@@ -302,6 +303,15 @@ export const WIDTHS = {
 const PANEL_GAP = 18;
 
 /**
+ * The narrowest a panel is laid out at before the row wraps: `.panel`'s flex basis in `app.css`.
+ *
+ * The two numbers have to agree. This function works out the width a panel is *drawn* at and the
+ * stylesheet works out the width it is *shown* at, and a drawing wider than its box is scaled down
+ * by the same `width: 100%` that {@link WIDTHS} exists to stop.
+ */
+const PANEL_MIN = 280;
+
+/**
  * The width one panel of an `n`-panel small multiple is drawn at.
  *
  * A panel is laid out against its sibling rather than against the page: two of them share the
@@ -310,9 +320,21 @@ const PANEL_GAP = 18;
  * rather than at two widths — which is the reason this is a function and not a call to
  * `renderToString`. The cloud these draw is 609 dots; a second copy for a layout it is never shown
  * in would be the largest dead mark in the built HTML.
+ *
+ * # Why `n` is not the divisor
+ *
+ * `.panels` wraps, and it wraps at {@link PANEL_MIN}. Seven panels do not share one row — they
+ * make four — so dividing the frame by seven would draw each at 76px and the stylesheet would
+ * then show it at 311, scaled up by four and blurred, with its 11px type at 45. The divisor is
+ * therefore how many actually fit on a row, which for one and for two panels is one and two: the
+ * cloud drawn before there was a third form is unchanged to the pixel.
  */
 export function panelWidth(panels: number): number {
-  return Math.floor((WIDTHS.wide - PANEL_GAP * (panels - 1)) / panels);
+  const perRow = Math.max(
+    1,
+    Math.min(panels, Math.floor((WIDTHS.wide + PANEL_GAP) / (PANEL_MIN + PANEL_GAP))),
+  );
+  return Math.floor((WIDTHS.wide - PANEL_GAP * (perRow - 1)) / perRow);
 }
 
 /**
@@ -449,8 +471,23 @@ function axisFoot(options: {
  * Horizontal because the categories are text and vertical bars would need rotated labels, which
  * are harder to read than they are worth. Direct labels are selective — Plot is given only the
  * bars that asked for one, never a number on every mark.
+ *
+ * # `max` and `min`, which exist for small multiples and for nothing else
+ *
+ * A single chart fits its domain to its own bars and neither option is passed. Seven panels of
+ * one grouped series are a different object: the shared axis is the whole reason they are drawn
+ * side by side rather than as seven charts, and a panel scaled to itself says its largest bar is
+ * as large as the largest bar anywhere. So a caller drawing a small multiple computes both ends
+ * over **every** panel's rows and hands the same pair to each.
+ *
+ * `min` also decides signed mode, which is why it is a floor rather than a clamp: one panel of
+ * the anchor-rule multiple is all zeroes, and fitted to itself it would draw an unsigned frame
+ * with no zero rule in it — the one panel of seven whose baseline is not where the others' is.
  */
-export function barSpec(bars: Bar[], options: { width: number; max?: number }): Spec {
+export function barSpec(
+  bars: Bar[],
+  options: { width: number; max?: number; min?: number; labelChars?: number },
+): Spec {
   const { width } = options;
   const max = options.max ?? Math.max(...bars.map((b) => Math.abs(b.value)), 1);
   const labelled = bars.filter((b) => b.direct != null);
@@ -470,13 +507,24 @@ export function barSpec(bars: Bar[], options: { width: number; max?: number }): 
    * of. The rounded data end goes, because with two directions a single `rx2` would round the
    * baseline of a negative bar and square its data end — the opposite of what the rounding means.
    */
-  const lowest = Math.min(0, ...bars.map((b) => b.value));
+  const lowest = Math.min(options.min ?? 0, 0, ...bars.map((b) => b.value));
   const signed = lowest < 0;
   const negativeLabelled = labelled.filter((b) => b.value < 0);
   // A direct label on a negative bar is written leftwards from the bar's end, so the domain gets
   // room for it rather than letting it collide with the category names outside the frame.
   const floor = signed ? lowest - (negativeLabelled.length > 0 ? (max - lowest) * 0.08 : 0) : 0;
-  const longest = Math.max(0, ...bars.map((b) => b.direct?.length ?? 0));
+  /*
+   * How much room the direct labels get at the right — this chart's own longest, or the set's.
+   *
+   * A set of panels shares a scale, and a scale is a domain *and* a frame. The right gutter is
+   * sized to the labels a panel actually carries, so a panel that direct-labels its rows when its
+   * siblings do not gets ten pixels less frame than they do, and everything inside it — the zero
+   * rule most visibly — lands at a different pixel from the same value in the panel beside it.
+   * The baselines of panels drawn side by side then fail to line up, which is the one thing the
+   * shared scale exists to guarantee. So a caller drawing a set passes the widest label anywhere
+   * in the set and every panel reserves the same room, whether it has a label in it or not.
+   */
+  const longest = options.labelChars ?? Math.max(0, ...bars.map((b) => b.direct?.length ?? 0));
   // Sized to the longest category name, as the right gutter is sized to the longest direct label.
   // This was a fixed 160, which silently clipped anything longer — "Building leadership and
   // operation" rendered as "g leadership and operation", which reads as a rendering fault rather
@@ -1145,6 +1193,304 @@ export function scatterSpec(
       selector: ".scatter-hit > *",
       text: points.map((p) => escapeHtml(p.hover)),
       cursor: { second: "paired marks", layers: [".scatter-dot"] },
+    },
+  };
+}
+
+/**
+ * Where a direct label may go beside its mark, in the order the placer tries them.
+ *
+ * Right first because that is where a label reads from — the eye is already moving that way — and
+ * left second because it is the same line of type. Above and below cost a change of line and are
+ * what a crowded frame falls back to.
+ *
+ * Each of `dx`, `dy` and `textAnchor` is a Plot *constant* rather than a channel, which is why
+ * this is a small closed table and the marks are drawn one per entry: `barSpec` learned the same
+ * thing two forms above.
+ */
+const LABEL_AT = {
+  right: { dx: 9, dy: 0, textAnchor: "start" },
+  left: { dx: -9, dy: 0, textAnchor: "end" },
+  above: { dx: 0, dy: -13, textAnchor: "middle" },
+  below: { dx: 0, dy: 13, textAnchor: "middle" },
+} as const;
+
+type LabelAt = keyof typeof LABEL_AT;
+
+/** The order {@link placeLabels} tries them in. Fixed, so the placement is deterministic. */
+const LABEL_ORDER: readonly LabelAt[] = ["right", "left", "above", "below"];
+
+/** One line of annotation type, in pixels. `axisFoot`'s `line` less the clear space it leaves. */
+const LABEL_LINE = 13;
+
+/** Half a dot's keep-out square, in pixels: the mark's radius plus its ring. */
+const DOT_KEEP_OUT = 6;
+
+/** A rectangle in the frame's pixel coordinates. */
+interface Box {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
+/** Where a label drawn at `at` would land, given its mark's position and its text. */
+function labelBox(at: LabelAt, px: number, py: number, text: string): Box {
+  const { dx, dy, textAnchor } = LABEL_AT[at];
+  const w = textPx(text);
+  const left = px + dx + (textAnchor === "start" ? 0 : textAnchor === "end" ? -w : -w / 2);
+  const top = py + dy - LABEL_LINE / 2;
+  return { left, top, right: left + w, bottom: top + LABEL_LINE };
+}
+
+/** How much of each other two boxes cover, in square pixels. Zero where they merely touch. */
+function overlap(a: Box, b: Box): number {
+  const w = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+  const h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+  return w > 0 && h > 0 ? w * h : 0;
+}
+
+/**
+ * Where each mark's direct label goes, so that no two collide and none leaves the frame.
+ *
+ * # Why this is computed rather than chosen
+ *
+ * Every other direct label on this site is drawn at a fixed offset, and that works because those
+ * forms lay their subjects out on a grid the offset was chosen against: a bar's label is beside
+ * its row and rows do not move. A plane places its marks wherever the measurement puts them, so a
+ * fixed offset is a bet that the data will not put two of them near each other — and the two this
+ * form was written for, a rolling pupil count and `[M]` mirrored inside `[H]`, sit 4 pixels apart
+ * on the outcome axis at `WIDTHS.narrow`. Their labels were drawn through each other.
+ *
+ * So the offsets are a closed set of four and the choice between them is greedy: take the first
+ * that lands wholly inside the frame and touches neither another label already placed nor **any**
+ * mark, including marks not yet labelled. Where none is clear, take the one that overlaps least,
+ * which degrades a crowded frame rather than dropping a name out of it — a plane of seven named
+ * policies with one unlabelled dot on it is worse than a tight one.
+ *
+ * Deterministic in the order the marks arrive, which is the manifest's order, so the same document
+ * draws the same picture on every build.
+ */
+function placeLabels(
+  marks: readonly { label: string; px: number; py: number }[],
+  frame: Box,
+): LabelAt[] {
+  const taken: Box[] = marks.map((m) => ({
+    left: m.px - DOT_KEEP_OUT,
+    top: m.py - DOT_KEEP_OUT,
+    right: m.px + DOT_KEEP_OUT,
+    bottom: m.py + DOT_KEEP_OUT,
+  }));
+  const out: LabelAt[] = [];
+  for (const mark of marks) {
+    let best: LabelAt = LABEL_ORDER[0]!;
+    let least = Infinity;
+    for (const at of LABEL_ORDER) {
+      const box = labelBox(at, mark.px, mark.py, mark.label);
+      if (
+        box.left < frame.left ||
+        box.right > frame.right ||
+        box.top < frame.top ||
+        box.bottom > frame.bottom
+      ) {
+        continue;
+      }
+      const cost = taken.reduce((sum, b) => sum + overlap(box, b), 0);
+      if (cost < least) {
+        least = cost;
+        best = at;
+      }
+      if (cost === 0) break;
+    }
+    out.push(best);
+    taken.push(labelBox(best, mark.px, mark.py, mark.label));
+  }
+  return out;
+}
+
+/**
+ * A handful of named things, each at a point on two signed measures at once.
+ *
+ * # Why this is not `scatterSpec` with fewer dots
+ *
+ * A cloud is a population. Its subject is the *shape* six hundred districts make, no one dot is
+ * quotable, and what a reader takes off it is the fitted line's two numbers. A plane is a **list**:
+ * seven anchor rules, every one of which a reader will name and quote, and the finding is which
+ * quadrant each one is in. Nothing is fitted, because a line through seven policies chosen by a
+ * legislature is not a relationship — it is a shape read into a list.
+ *
+ * That difference runs all the way down. The marks are large rather than small, because density is
+ * not the information and there is nothing to overplot. Every one carries its name on the picture
+ * rather than in a tooltip. And the frame is drawn as **two rules through the origin** rather than
+ * as edges at the domain's corners: on this form zero is not a floor but the boundary the reading
+ * turns on — left of the vertical is *less than the rule in force*, above the horizontal is *more*
+ * — so the four quadrants are the chart, and a bounding box would draw attention to the extent,
+ * which means nothing here.
+ *
+ * # Why the marks carry no hue
+ *
+ * The quadrant is the encoding. Colouring the three points that disagree between their axes would
+ * state in a second channel exactly what their position already states, and this site's two series
+ * mean formula aid and guarantee — a third meaning hung on them would be a third meaning on every
+ * other chart too.
+ *
+ * @throws if either domain excludes zero. The crate computes these domains from `(0, 0)` outwards
+ * for that reason; a plane whose origin is off the picture has no quadrants and would draw the
+ * disagreement as agreement.
+ */
+export function planeSpec(
+  places: Place[],
+  axes: {
+    x: { label: string; format: (v: number) => string };
+    y: { label: string; format: (v: number) => string };
+  },
+  options: {
+    width: number;
+    height?: number;
+    /** The crate's frame, taken as given: see {@link scatterSpec}'s `xDomain` for why. */
+    xDomain: [number, number];
+    yDomain: [number, number];
+  },
+): Spec | null {
+  if (places.length === 0) return null;
+  const { width } = options;
+  const [xLo, xHi] = options.xDomain;
+  const [yLo, yHi] = options.yDomain;
+  for (const [which, lo, hi] of [
+    ["x", xLo, xHi],
+    ["y", yLo, yHi],
+  ] as const) {
+    if (!(lo <= 0 && hi >= 0)) {
+      throw new Error(
+        `planeSpec was given a ${which} domain of [${lo}, ${hi}], which does not hold zero. ` +
+          `The two zero rules are this form's axes; without the origin on the picture there are ` +
+          `no quadrants to read it in.`,
+      );
+    }
+  }
+
+  const marginLeft = 62;
+  const marginTop = 28;
+  const marginRight = gutter(width, 40);
+  const foot = axisFoot({
+    width,
+    marginLeft,
+    marginRight,
+    dy: 20,
+    low: axes.x.format(xLo),
+    says: axes.x.label,
+    high: axes.x.format(xHi),
+  });
+  const marginBottom = 40 + foot.extraBottom;
+  const height = options.height ?? 420;
+
+  const frame: Box = {
+    left: marginLeft,
+    top: marginTop,
+    right: width - marginRight,
+    bottom: height - marginBottom,
+  };
+  const at = places.map((place) => ({
+    label: place.label,
+    px: frame.left + ((place.x - xLo) / (xHi - xLo)) * (frame.right - frame.left),
+    py: frame.bottom - ((place.y - yLo) / (yHi - yLo)) * (frame.bottom - frame.top),
+  }));
+  const placed = placeLabels(at, frame);
+
+  return {
+    options: {
+      width,
+      height,
+      marginLeft,
+      marginRight,
+      marginTop,
+      marginBottom,
+      // As `scatterSpec`: a radius is a pixel count, and a channel would send it through a scale.
+      r: { type: "identity" },
+      x: { axis: null, type: "linear", domain: [xLo, xHi] },
+      y: { axis: null, type: "linear", domain: [yLo, yHi] },
+      marks: [
+        // The two axes, through the origin. Recessive like every other rule on the site, and the
+        // only frame this form draws — see the note above on why there is no bounding box.
+        Plot.ruleX([0], { stroke: INK.rule, className: "plane-zero" }),
+        Plot.ruleY([0], { stroke: INK.rule, className: "plane-zero" }),
+
+        Plot.dot(places, {
+          x: "x",
+          y: "y",
+          r: 4.5,
+          fill: SERIES.neutral,
+          // The ring the mark-size guidance asks for on anything that can overlap. Two of these
+          // seven share an x of exactly zero, which is a fact about the rules rather than an
+          // accident of scale, so the pair has to stay countable where the scale brings them near.
+          stroke: INK.surface,
+          strokeWidth: 1.5,
+          className: "plane-dot",
+        }),
+
+        // One text mark per placement, because `dx`, `dy` and `textAnchor` are constants in Plot.
+        // Text is not in the hover selector, so splitting these reorders nothing that is indexed.
+        ...LABEL_ORDER.flatMap((which) => {
+          const mine = places.filter((_, i) => placed[i] === which);
+          if (mine.length === 0) return [];
+          return [
+            Plot.text(mine, {
+              x: "x",
+              y: "y",
+              ...LABEL_AT[which],
+              text: "label",
+              fill: INK.primary,
+              fontSize: 11,
+              className: "plane-label",
+            }),
+          ];
+        }),
+
+        // Both ends of both scales, as a cloud carries them: a frame with no numbers on it is a
+        // texture, and here the numbers are what say how far from the rule in force these get.
+        ...foot.marks,
+        Plot.text([0], {
+          frameAnchor: "top-left",
+          dx: -marginLeft + 4,
+          dy: 3,
+          text: () => axes.y.format(yHi),
+          textAnchor: "start",
+          fill: INK.muted,
+          fontSize: 11,
+        }),
+        Plot.text([0], {
+          frameAnchor: "bottom-left",
+          dx: -marginLeft + 4,
+          text: () => axes.y.format(yLo),
+          textAnchor: "start",
+          fill: INK.muted,
+          fontSize: 11,
+        }),
+        Plot.text([0], {
+          frameAnchor: "top-left",
+          dx: -marginLeft + 4,
+          dy: -12,
+          text: () => axes.y.label,
+          textAnchor: "start",
+          fill: INK.muted,
+          fontSize: 11,
+        }),
+
+        // The hit layer, above everything, as every pointed-at form here draws one.
+        Plot.dot(places, {
+          x: "x",
+          y: "y",
+          r: 10,
+          fill: "transparent",
+          stroke: "none",
+          className: "plane-hit",
+        }),
+      ],
+    },
+    hovers: {
+      selector: ".plane-hit > *",
+      text: places.map((p) => escapeHtml(p.hover)),
+      cursor: { second: "paired marks", layers: [".plane-dot"] },
     },
   };
 }

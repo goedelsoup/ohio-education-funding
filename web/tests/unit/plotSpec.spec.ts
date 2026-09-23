@@ -9,13 +9,14 @@
 
 import { expect, test } from "vitest";
 
-import type { Bar, FanPoint, Fit, Rank, ScatterPoint, Trace } from "../../src/lib/chart.ts";
+import type { Bar, FanPoint, Fit, Place, Rank, ScatterPoint, Trace } from "../../src/lib/chart.ts";
 import {
   DOT,
   barSpec,
   distributionSpec,
   fanSpec,
   panelWidth,
+  planeSpec,
   rankSpec,
   scatterSpec,
   type Spec,
@@ -391,6 +392,20 @@ test("two panels share the wide frame, and one panel is the whole of it", () => 
   expect(panelWidth(1)).toBe(WIDTHS.wide);
 });
 
+test("a set of panels is drawn at the width the stylesheet will give it, not at its share", () => {
+  /*
+   * `.panel` is `flex: 1 1 280px`, so `.panels` wraps rather than shrinking past that. #444 draws
+   * seven, and dividing the wide frame seven ways would have laid each out at 76px — which the
+   * stylesheet would then have scaled back up to 311, taking the 11px axis text to 45px. The row
+   * is what the width has to be computed against, not the set.
+   */
+  for (const panels of [3, 4, 5, 6, 7]) {
+    expect(panelWidth(panels), `${panels} panels wrap to two per row`).toBe(panelWidth(2));
+  }
+  // And a panel is never drawn narrower than the flex basis the stylesheet would honour.
+  for (const panels of [1, 2, 3, 7, 35]) expect(panelWidth(panels)).toBeGreaterThanOrEqual(280);
+});
+
 /**
  * How many rows reached one named mark layer of a spec.
  *
@@ -475,4 +490,158 @@ test("the marked row's phrase is reserved for where it is drawn, not where it is
   // At the floor the whole plot lies to the phrase's right, so nothing is held back for it.
   // 16px, which is `gutter`'s answer for the bare axis overhang every form reserves.
   expect(atFloor.options.marginRight).toBe(16);
+});
+
+/**
+ * The plane, whose reading is which quadrant a dot is in.
+ *
+ * #444's finding is that three of seven anchor rules write *less* guarantee and cost *more* money,
+ * and that no table reporting one column at a time can show it. What makes the picture say it is
+ * the pair of zero rules: the origin is the rule in force, so "up and to the left" is the whole
+ * claim. Every assertion below is about keeping that readable.
+ */
+const PLANE_AXES = {
+  x: { label: "Guarantee written", format: (v: number) => `$${Math.round(v / 1e6)}m` },
+  y: { label: "Total state support", format: (v: number) => `$${Math.round(v / 1e6)}m` },
+};
+
+/** Seven rules, positioned as the committed plane positions them: three in the upper left. */
+function rules(): Place[] {
+  return [
+    { label: "A ratchet from FY2027", x: 57.3e6, y: 52.9e6, hover: "ratchet" },
+    { label: "A 2% cap, FY2032 undamped", x: -167.6e6, y: -59.4e6, hover: "2% cap" },
+    { label: "A 1% cap, FY2036 undamped", x: -107.6e6, y: 10.3e6, hover: "1% cap" },
+    { label: "A rolling pupil count", x: -14.7e6, y: 66.2e6, hover: "rolling" },
+    { label: "[M] mirrored inside [H]", x: -70.5e6, y: 62.2e6, hover: "mirror inside" },
+    { label: "[M] mirrored beside [H]", x: 0, y: 135.3e6, hover: "mirror beside" },
+    { label: "A dated phase-down", x: 0, y: 0, hover: "phase-down" },
+  ];
+}
+
+const PLANE_FRAME: { xDomain: [number, number]; yDomain: [number, number] } = {
+  xDomain: [-176.6e6, 66.3e6],
+  yDomain: [-67.2e6, 143.1e6],
+};
+const PLANE = { width: WIDTHS.wide, ...PLANE_FRAME };
+
+test("the plane draws its two rules through the origin, and no frame besides", () => {
+  const spec = planeSpec(rules(), PLANE_AXES, PLANE)!;
+  // Two `plane-zero` marks, one per axis — so `layerRows` is not the tool here.
+  const marks = (spec.options.marks ?? []) as unknown as { className?: string }[];
+  expect(marks.filter((mark) => mark.className === "plane-zero")).toHaveLength(2);
+  // The scales themselves print nothing. A boxed frame with ticks would draw four lines as
+  // emphatic as the two that carry the reading, and the quadrant is the encoding.
+  expect(spec.options.x!.axis).toBeNull();
+  expect(spec.options.y!.axis).toBeNull();
+  const svg = renderToString(() => spec, "presentational");
+  expect(svg).not.toContain("plot-frame");
+});
+
+test("the plane refuses a frame that does not hold zero, on either axis", () => {
+  // A domain fitted to the points alone would do this the moment every rule fell one side of the
+  // rule in force — which is most of what a later axis might measure.
+  expect(() =>
+    planeSpec(rules(), PLANE_AXES, { width: WIDTHS.wide, xDomain: [10e6, 60e6], yDomain: [-1, 1] }),
+  ).toThrow(/does not hold zero/);
+  expect(() =>
+    planeSpec(rules(), PLANE_AXES, { width: WIDTHS.wide, xDomain: [-1, 1], yDomain: [10e6, 60e6] }),
+  ).toThrow(/does not hold zero/);
+  // And nothing to draw draws nothing, on `renderToString`'s standing rule.
+  expect(planeSpec([], PLANE_AXES, PLANE)).toBeNull();
+});
+
+test("every dot is named on the picture, and no two names are drawn on top of each other", () => {
+  /*
+   * Seven rules and no hue: the quadrant is the encoding, so a legend would send a reader back and
+   * forth for the one thing the chart is about. Direct labels instead — which collide, because the
+   * rolling count and the mirror inside `[H]` sit four pixels apart on the outcome axis at the
+   * narrow width. `placeLabels` is what resolves that, and this is the assertion that it does.
+   */
+  for (const width of [WIDTHS.narrow, WIDTHS.wide]) {
+    const spec = planeSpec(rules(), PLANE_AXES, { width, ...PLANE_FRAME })!;
+    const svg = renderToString(() => spec, "presentational");
+    const labels = [...svg.matchAll(/class="plane-label"[^>]*>([\s\S]*?)<\/g>/g)];
+    const drawn = labels.flatMap((match) => [...match[1]!.matchAll(/<text[^>]*>([^<]*)<\/text>/g)]);
+    expect(drawn.map((m) => m[1]), `${width}px draws all seven names once`).toHaveLength(
+      rules().length * 2,
+    );
+  }
+});
+
+test("the placement is a function of the positions, not of the order they are drawn in", () => {
+  // The placer is greedy, so it depends on order — which is the manifest's order, and stable.
+  // What must not vary is the answer for the same input, since the SVG is committed to `dist`.
+  const once = renderToString(() => planeSpec(rules(), PLANE_AXES, PLANE), "presentational");
+  const again = renderToString(() => planeSpec(rules(), PLANE_AXES, PLANE), "presentational");
+  expect(once).toBe(again);
+});
+
+test("the hit layer matches the dot layer place for place", () => {
+  const spec = planeSpec(rules(), PLANE_AXES, PLANE)!;
+  expect(layerRows(spec, "plane-hit")).toBe(layerRows(spec, "plane-dot"));
+  expect(spec.hovers!.text).toHaveLength(rules().length);
+  // The dot is what lights up under the cursor, and the hit target is the invisible thing the
+  // pointer actually finds. `declareCursor` checks the pairing; this checks it was declared.
+  expect(spec.hovers!.cursor).toEqual({ second: "paired marks", layers: [".plane-dot"] });
+});
+
+test("a signed panel with nothing in it still draws its zero, so the empty rule is legible", () => {
+  /*
+   * The dated phase-down moves neither axis by a cent, so its panel in #444's small multiples is
+   * five bars of zero. Without `min` that panel is unsigned, draws no rule, and reads as a chart
+   * that failed rather than as a rule that does nothing — beside six panels that all have one.
+   */
+  const flat: Bar[] = ["Least wealthy", "Second", "Third", "Fourth", "Wealthiest"].map((label) => ({
+    label,
+    value: 0,
+    hover: `${label} — $0.00`,
+  }));
+  const width = panelWidth(7);
+  // The rule carries no class of its own — it is Plot's `ruleX`, drawn only in signed mode — so
+  // it is counted off the drawn SVG, where `--accent-rule` is the one stroke that names it.
+  const rules = (spec: Spec) =>
+    [...renderToString(() => spec, "presentational").matchAll(/stroke="var\(--accent-rule\)"/g)]
+      .length;
+  expect(rules(barSpec(flat, { width })), "no rule without a signed scale").toBe(0);
+  // Two, because `renderToString` lays the drawing out twice. One rule per drawing.
+  expect(rules(barSpec(flat, { width, max: 166.55, min: -83.51 }))).toBe(2);
+  // And the panel is drawn on the set's scale, not on its own nothing.
+  expect(barSpec(flat, { width, max: 166.55, min: -83.51 }).options.x!.domain).toEqual([
+    -83.51, 166.55,
+  ]);
+});
+
+test("a shared scale is the same scale: two panels of one set draw a value at one length", () => {
+  // What makes the monotonicity readable across seven panels is that the axis does not move.
+  const of = (bars: Bar[]) =>
+    barSpec(bars, { width: panelWidth(7), max: 166.55, min: -83.51 }).options.x!.domain;
+  const big: Bar[] = [{ label: "Least wealthy", value: 166.55, hover: "a" }];
+  const small: Bar[] = [{ label: "Least wealthy", value: 4.06, hover: "b" }];
+  expect(of(big)).toEqual(of(small));
+  // And the shared domain spans both signs, because one of the seven runs negative.
+  expect(of(small)).toEqual([-83.51, 166.55]);
+});
+
+test("a set shares its frame as well as its domain, so a labelled panel keeps its siblings' zero", () => {
+  /*
+   * The domain being equal is not enough. The right gutter is sized to the direct labels a panel
+   * carries, and in #444's set exactly one panel carries any — the inert rule, which prints its
+   * zeros because it has no bars to print them on. That panel's frame came out ten pixels
+   * narrower than the six beside it, which moves every pixel inside it, the zero rule included.
+   */
+  const set = { width: panelWidth(7), max: 166.55, min: -83.51, labelChars: 2 };
+  const drawn: Bar[] = [{ label: "Least wealthy", value: 166.55, hover: "a" }];
+  const zeros: Bar[] = [{ label: "Least wealthy", value: 0, direct: "$0", hover: "b" }];
+  const frame = (spec: Spec) => [spec.options.marginLeft, spec.options.marginRight];
+  expect(frame(barSpec(zeros, set))).toEqual(frame(barSpec(drawn, set)));
+  // And the option is doing the work: left to its own labels the panel reserves room the others
+  // have not, which is the fault itself.
+  const { labelChars: _shared, ...own } = set;
+  expect(barSpec(zeros, own).options.marginRight).not.toBe(
+    barSpec(drawn, own).options.marginRight,
+  );
+  // A chart that is not part of a set still sizes its own gutter, which is every other caller.
+  expect(barSpec(drawn, { width: WIDTHS.wide }).options.marginRight).toBe(
+    barSpec(zeros, { width: WIDTHS.wide, labelChars: 0 }).options.marginRight,
+  );
 });

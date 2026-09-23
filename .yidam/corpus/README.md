@@ -353,9 +353,24 @@ carries four, which is the whole of #417's table — the capacity tier's index r
 0.9855 on enrolment and −0.0429 on the wealth per pupil it names — drawn as the two pictures the
 finding was found by rather than as four numbers nobody checks.
 
-Two conventions differ from `figures:`. A series row is **signed**, because a bar below the zero
-rule is what the chart is for, where a figure exports a correlation as a magnitude with its
-direction in the key — so the row `Mineral` is `−0.0321` and names
+A key can also name a **plane**, on the same block and the same `field` rule again. A plane is a
+set of named things at a point on **two** signed measures — one dot per anchor rule, at the
+guarantee it writes against the total state support it pays — with a rule drawn through zero on
+each axis and no other frame, so which quadrant a dot sits in is the reading. It exists because
+#444's finding is a *disagreement between two columns*: three of the seven rules write less
+guarantee and cost more money, and a table reporting one column at a time shows none of it.
+
+Its rule is the strictest of the three, because everything on a plane is quotable: **every
+position names an ordinary figure for both of its coordinates**, and the node drawing it must
+bind all of them. Seven points is fourteen figures. `crates/figures/tests/` refuses a manifest
+where a position is short one, and `web/tests/unit/corpusSeries.spec.ts` refuses a node that
+draws one without binding both. Zero is on the picture by construction — the crate folds the
+frame from the origin and the web spec throws on a domain that excludes it — because a plane
+whose axes are off the edge has quadrants nobody can find.
+
+Two conventions differ from `figures:`. A series row is **signed**, as is a coordinate, because
+a bar below the zero rule is what the chart is for, where a figure exports a correlation as a
+magnitude with its direction in the key — so the row `Mineral` is `−0.0321` and names
 `dispersion/fy2016-step-against-mineral-share-negative`, whose pin is `0.0321`, and the two
 checks compare in magnitude. And `field` must be `description` or `findings`: each is its own card
 on the node's page and the chart is the last thing in it, whereas a property is a row of a table
@@ -364,6 +379,15 @@ and a summary is a lead, and neither has anywhere for a chart to go.
 The series manifest carries its own contract version, apart from the figure manifest's, and the
 web reader refuses one it does not recognise. `mise run //:generated` holds both documents
 current. See #441 for the design and #442–#447 for the charts it was built to carry.
+
+One more convention belongs to the panels a **grouped** series draws. A series whose rows all
+carry a `group` is a small multiple — one panel per group, drawn on one scale across the set, so
+that the shape of each panel can be read against the others rather than against itself. The scale
+is shared *within* a set and never across two: #444 draws the same seven rules by wealth fifth and
+by disadvantaged-share fifth, and the first fifth of the two differs by two orders of magnitude
+($138.58 against $4.06), so one scale over both would flatten the second panel into nothing. The
+two are separate series for that reason, which makes "scale per axis" a property of the documents
+rather than a discipline the caller has to remember.
 
 ## Claim inventory
 
@@ -374,8 +398,8 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1852 | supported by a committed primary source |
-| `[inference]` | 378 | drawn from verified facts, not witnessed |
+| `[verified]` | 1855 | supported by a committed primary source |
+| `[inference]` | 379 | drawn from verified facts, not witnessed |
 | `[open]` | 203 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
