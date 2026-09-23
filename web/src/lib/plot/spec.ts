@@ -412,8 +412,9 @@ function textPx(text: string, fontSize = 11): number {
  * smear of overlapping type.
  *
  * So the row measures itself. Where the three fit, nothing changes and the wide drawings are
- * byte-identical to what they were. Where they do not, the centre drops to its own line under the
- * two ends, and the caller is told how much more bottom margin that costs.
+ * byte-identical to what they were. Where they do not, the centre drops to a line of its own under
+ * the two ends — and stops being a centre, for the reason given where it is drawn — and the caller
+ * is told how much more bottom margin that costs.
  */
 function axisFoot(options: {
   width: number;
@@ -455,11 +456,27 @@ function axisFoot(options: {
       fill: INK.muted,
       fontSize: 11,
     });
+  /*
+   * The dropped line starts at the axis rather than staying centred, and that is not cosmetic.
+   *
+   * `frameAnchor: "bottom"` is the centre of the *plot frame*, which is only the centre of the
+   * drawing where the two margins match. `seriesSpec` draws its direct labels in a right gutter
+   * and nothing in a left one, so on a 311px panel the frame is 0..171 and a centred annotation
+   * hangs 2px off the left edge of the SVG — measured on the runner, where `system-ui` is wider
+   * than it is here, and invisible on this machine.
+   *
+   * Nudging it by half the margin difference would fix that panel and leave the next asymmetric
+   * one to be discovered the same way, because the correction would be sized on an estimate of
+   * painted width and the estimate is the thing that was wrong. A line of its own has the whole
+   * width available and no reason to be centred in anything: anchored to the frame's left edge it
+   * sits under the low end of the scale it is talking about, and where it starts stops depending
+   * on which font the reader has.
+   */
   return {
     marks: [
       at("bottom-left", dy, low),
       at("bottom-right", dy, high),
-      at("bottom", fits ? dy : dy + line, says),
+      fits ? at("bottom", dy, says) : at("bottom-left", dy + line, says),
     ],
     extraBottom: fits ? 0 : line,
   };

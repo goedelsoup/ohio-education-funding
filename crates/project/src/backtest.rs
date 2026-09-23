@@ -185,27 +185,51 @@ pub fn deepest_horizon(origins: &[u16], latest_target: u16) -> u16 {
         .expect("at least one horizon is scored")
 }
 
-/// Log forecast errors at one horizon, grouped by the origin that produced them.
+/// One scored forecast, kept as its two levels rather than as the log error alone.
+///
+/// The two biases the feed publishes come from the same forecasts and differ only in where the
+/// summing happens: the mean district's is the mean of the logs of the ratios, and the total's is
+/// the log of the ratio of the sums. A forecast already collapsed to its log error can produce
+/// the first and not the second, which is why this carries both levels.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Scored {
+    /// What the shipped method projected for the target year.
+    pub point: f64,
+    /// What the panel recorded there.
+    pub actual: f64,
+}
+
+impl Scored {
+    /// The log forecast error, positive where the projection ran high.
+    #[must_use]
+    pub fn log_error(self) -> f64 {
+        (self.point / self.actual).ln()
+    }
+}
+
+/// Every scored forecast at one horizon, grouped by the origin that produced it.
 ///
 /// Grouped rather than pooled because the grouping is the finding: a pooled standard deviation
 /// cannot tell a band that is the wrong width from a set of origins that disagree about the
 /// level, and at these horizons it is always the second.
+///
+/// An origin contributing a single forecast is dropped, so every group below carries a spread.
 #[must_use]
-pub fn errors_by_origin(
+pub fn scored_at(
     histories: &[History],
     origins: &[u16],
     horizon: u16,
     latest_target: u16,
-) -> Vec<(u16, Vec<f64>)> {
+) -> Vec<(u16, Vec<Scored>)> {
     let mut out = Vec::new();
     for origin in origins {
         let Some(target) = scored(*origin, horizon, latest_target) else {
             continue;
         };
-        let errors: Vec<f64> = histories
+        let forecasts: Vec<Scored> = histories
             .iter()
             .filter_map(|history| {
-                let actual = history.get(&target)?;
+                let actual = *history.get(&target)?;
                 let point = series::project(
                     &observed_to(history, *origin),
                     FiscalYear(target),
@@ -215,14 +239,36 @@ pub fn errors_by_origin(
                 .into_iter()
                 .find(|p| p.fiscal_year == FiscalYear(target))?
                 .point;
-                Some((point / actual).ln())
+                Some(Scored { point, actual })
             })
             .collect();
-        if errors.len() > 1 {
-            out.push((*origin, errors));
+        if forecasts.len() > 1 {
+            out.push((*origin, forecasts));
         }
     }
     out
+}
+
+/// Log forecast errors at one horizon, grouped by the origin that produced them.
+///
+/// [`scored_at`] with the levels discarded. One projection path serves both, so a band scored
+/// against one set of forecasts and a bias measured against another cannot happen.
+#[must_use]
+pub fn errors_by_origin(
+    histories: &[History],
+    origins: &[u16],
+    horizon: u16,
+    latest_target: u16,
+) -> Vec<(u16, Vec<f64>)> {
+    scored_at(histories, origins, horizon, latest_target)
+        .into_iter()
+        .map(|(origin, forecasts)| {
+            (
+                origin,
+                forecasts.into_iter().map(Scored::log_error).collect(),
+            )
+        })
+        .collect()
 }
 
 /// Every error at one horizon, origins pooled.
@@ -367,4 +413,121 @@ pub fn worst_gap(rows: &[Held], of: fn(&Held) -> f64) -> (u16, f64) {
             other => other,
         })
         .expect("a profile with no horizons in it")
+}
+
+/// The bias carried by each of the two quantities the feed publishes from one set of forecasts.
+///
+/// The feed publishes a statewide total and six hundred district figures from the same
+/// projections, and a reader who has only one of these numbers cannot tell which of the two the
+/// correction they are contemplating would serve. They are not two estimates of one thing.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Bias {
+    /// The mean district's: the mean log error, which weights every district alike.
+    pub mean_district: f64,
+    /// The total's: the log of summed points over summed actuals, which weights by size.
+    pub total: f64,
+}
+
+/// What one horizon's forecasts were biased by, before the closure and across it.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Drift {
+    /// Years ahead, one-based.
+    pub horizon: u16,
+    /// Restricted to targets of [`BEFORE_THE_CLOSURE`] or earlier.
+    ///
+    /// `None` where no origin reaches this horizon without crossing the shutdown, which is what
+    /// the deeper horizons are: the panel cannot say what this method does at ten years in a
+    /// decade that did not contain a school closure, and an absence is the honest answer rather
+    /// than the figure that crosses it wearing the other label.
+    pub before_the_closure: Option<Bias>,
+    /// Every scored forecast at this horizon, the closure included.
+    pub across_it: Bias,
+}
+
+/// The mean district's bias over a set of forecasts.
+///
+/// # Panics
+///
+/// Never; an empty slice gives `NaN`, and [`bias_profile`] does not produce one.
+#[must_use]
+pub fn mean_district_bias(forecasts: &[Scored]) -> f64 {
+    mean(&forecasts.iter().map(|f| f.log_error()).collect::<Vec<_>>())
+}
+
+/// The total's bias over a set of forecasts — the log of summed points over summed actuals.
+#[must_use]
+pub fn total_bias(forecasts: &[Scored]) -> f64 {
+    let points: f64 = forecasts.iter().map(|f| f.point).sum();
+    let actuals: f64 = forecasts.iter().map(|f| f.actual).sum();
+    (points / actuals).ln()
+}
+
+/// Both biases at every horizon from one to `deepest`, over every origin and district.
+///
+/// The profile the feed publishes beside the projection and `/method` draws. The two columns are
+/// the same forecasts summed differently; the two rows are two populations of forecasts, since
+/// restricting targets to [`BEFORE_THE_CLOSURE`] drops origins rather than reweighting them.
+///
+/// Pass [`DEEPEST_HORIZON`] and the panel's last year for the published profile.
+///
+/// **Empty where the Census panel is absent**, rather than a panic. [`profile`] may assert its
+/// way out of that because nothing builds without it; this one is written into the feed, which a
+/// contributor can build from a checkout that has no F-33 fixture in it, and an empty list is how
+/// every other block of the feed says the same thing.
+///
+/// # Panics
+///
+/// If the panel is present and a horizon in the range still scores no forecast against
+/// `latest_target`, which would mean `deepest` reaches past what the origins support —
+/// [`deepest_horizon`] answers that.
+#[must_use]
+pub fn bias_profile(deepest: u16, latest_target: u16) -> Vec<Drift> {
+    let histories = complete_histories();
+    if histories.is_empty() {
+        return Vec::new();
+    }
+    let at = |horizon: u16, until: u16| -> Option<Bias> {
+        let forecasts: Vec<Scored> = scored_at(&histories, &ORIGINS, horizon, until)
+            .into_iter()
+            .flat_map(|(_, group)| group)
+            .collect();
+        (!forecasts.is_empty()).then(|| Bias {
+            mean_district: mean_district_bias(&forecasts),
+            total: total_bias(&forecasts),
+        })
+    };
+    (1..=deepest)
+        .map(|horizon| Drift {
+            horizon,
+            before_the_closure: at(horizon, BEFORE_THE_CLOSURE),
+            across_it: at(horizon, latest_target).unwrap_or_else(|| {
+                panic!(
+                    "horizon {horizon} scores no forecast against a target no later than \
+                     FY{latest_target}"
+                )
+            }),
+        })
+        .collect()
+}
+
+/// The horizon whose bias is furthest from zero on a drawn line, and by how much.
+///
+/// The curve's third figure, and the same shape as [`worst_gap`]: a line read only at its ends is
+/// read least well where its finding lives. Ties go to the shallower horizon.
+///
+/// Returns the **signed** bias at that horizon rather than its magnitude, because the sign is the
+/// whole of what separates these four lines — see `the-bias-published-beside-the-point`.
+///
+/// # Panics
+///
+/// If no row in `rows` carries the line `of` selects.
+#[must_use]
+pub fn worst_drift(rows: &[Drift], of: impl Fn(&Drift) -> Option<f64>) -> (u16, f64) {
+    rows.iter()
+        .filter_map(|row| of(row).map(|value| (row.horizon, value)))
+        .max_by(|a, b| match a.1.abs().total_cmp(&b.1.abs()) {
+            Ordering::Equal => b.0.cmp(&a.0),
+            other => other,
+        })
+        .expect("a profile with no rows carrying this line")
 }

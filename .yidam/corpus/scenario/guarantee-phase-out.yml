@@ -267,6 +267,58 @@ figures:
     value: 0.0302890365
     field: confidence
     as_written: "stays within **3.0%** of the 68.3% the band claims"
+  # The bias, which is the other half of the same backtest: the six above check the band's width
+  # and these ten check its level. Magnitudes, because `crates/figures.json` cannot bind a sign —
+  # the two one-year figures are negative, and the prose carries the minus. See
+  # `.yidam/decisions/the-bias-published-beside-the-point.yml`.
+  - key: project/the-mean-district-bias-at-one-year-negative
+    value: 0.0070659515
+    field: confidence
+    as_written: "−0.0071 at one year"
+  - key: project/the-total-bias-at-one-year-negative
+    value: 0.0052051982
+    field: confidence
+    as_written: "−0.0052 at one year"
+  - key: project/the-mean-district-bias-at-six-years-before-the-closure
+    value: 0.0117196710
+    field: confidence
+    as_written: "+0.0117 for the mean district"
+  - key: project/the-total-bias-at-six-years-before-the-closure
+    value: 0.0036199719
+    field: confidence
+    as_written: "+0.0036 for the total"
+  - key: project/the-mean-district-bias-at-thirteen-years
+    value: 0.0733925385
+    field: confidence
+    as_written: "+0.0734 at thirteen"
+  - key: project/the-total-bias-at-thirteen-years
+    value: 0.0569315771
+    field: confidence
+    as_written: "+0.0569 at thirteen"
+  - key: project/the-mean-district-bias-at-nine-years-before-the-closure
+    value: 0.0271978160
+    field: confidence
+    as_written: "the mean district ends at +0.0272"
+  - key: project/the-total-bias-at-nine-years-before-the-closure
+    value: 0.0171398650
+    field: confidence
+    as_written: "the total at +0.0171"
+  - key: project/the-worst-mean-district-bias-before-the-closure
+    value: 0.0271978160
+    field: confidence
+    as_written: "0.0272 and 0.0171 before the closure"
+  - key: project/the-worst-total-bias-before-the-closure
+    value: 0.0171398650
+    field: confidence
+    as_written: "0.0272 and 0.0171 before the closure"
+  - key: project/the-worst-mean-district-bias-across-the-closure
+    value: 0.0733925385
+    field: confidence
+    as_written: "0.0734 and 0.0569 across it"
+  - key: project/the-worst-total-bias-across-the-closure
+    value: 0.0569315771
+    field: confidence
+    as_written: "0.0734 and 0.0569 across it"
 
 findings: |
   ### Retiring the guarantee is two bills, and they price an order of magnitude apart
@@ -554,9 +606,30 @@ properties:
     nor the band is corrected. Measured in
     `crates/project/tests/the_bias_that_belongs_to_the_years.rs`.
 
-    [inference] The remedy is to publish the bias beside the projection: two figures per
-    horizon, the mean district's and the total's, before the closure and across it. That is a
-    feed field, and a decision of its own.
+    [verified] **The bias is published now, beside the projection and as four numbers per
+    horizon rather than as a correction.** Over every scored forecast the mean district's log
+    error runs −0.0071 at one year and +0.0734 at thirteen, while the state total's — the
+    same forecasts summed by size rather than averaged over districts — runs −0.0052 at one
+    year and +0.0569 at thirteen. Restricted to forecasts whose target is FY2020 or earlier the
+    panel reaches nine years, and there the mean district ends at +0.0272 and the total at
+    +0.0171. This node's own projection runs a six-year leg to FY2032, and at six years those
+    figures are +0.0117 for the mean district and +0.0036 for the total — so the FY2032 band
+    above is centred high on both counts, by roughly three times as much on the district average
+    as on the state total, and nothing above is adjusted for it. Both quantities start under the
+    truth and end over it, and they do not turn
+    together: before the closure the mean district crosses zero at four years and the total not
+    until five, so there is a horizon where the average district is already being over-forecast
+    and the statewide figure is still low. Neither line on either population turns back — the
+    furthest any of the four ever sits from zero is its own last point, 0.0272 and 0.0171 before
+    the closure and 0.0734 and 0.0569 across it — so the drift is not a middle-distance
+    artefact that washes out, and the deepest horizon is the one where a correction would matter
+    most and is trusted least. A level correction sized on one of the two quantities is the wrong
+    size for the other, which is why both are published and neither is applied. Computed by
+    `crates/project`'s `backtest::bias_profile` and checked against the independent table in
+    [`crates/project/tests/the_bias_that_belongs_to_the_years.rs`](../../../crates/project/tests/the_bias_that_belongs_to_the_years.rs),
+    carried on the feed's `projection.bias` table, drawn on `/method` beside the coverage profile,
+    and decided at
+    [the-bias-published-beside-the-point](../../decisions/the-bias-published-beside-the-point.yml).
 
     138 districts sit at the minimum state share and their response to a base cost increase
     cannot be computed, because the floor censors the quantity it would be computed from. They

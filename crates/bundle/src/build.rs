@@ -45,9 +45,9 @@ use crate::{
     CareerTechnical, CasinoYear, Categoricals, Checkpoint, Deflator, District, DistrictOutcome,
     Dpia, Draft, DraftProvision, EnglishLearners, FinanceYear, ForecastCheckpoint, Gifted,
     HistoryYear, HouseDistrictMember, HouseDistrictShare, MealProgramYear, MillageAnalysis,
-    National, OutcomeStatewide, PolicyShape, Projection, PropertyTaxYear, RegimeCounterfactual,
-    SeriesYear, SpecialEducation, SpendingByFunction, StateFinance, Statewide, TargetedAssistance,
-    Typology, YearKind, CONTRACT_VERSION,
+    National, OutcomeStatewide, PolicyShape, Projection, ProjectionBias, PropertyTaxYear,
+    RegimeCounterfactual, SeriesYear, SpecialEducation, SpendingByFunction, StateFinance,
+    Statewide, TargetedAssistance, Typology, YearKind, CONTRACT_VERSION,
 };
 use dispersion::census_states::StateFinance as CensusState;
 use dispersion::mr81::poverty_share_by_year;
@@ -1934,6 +1934,25 @@ pub fn build() -> Bundle {
         z: prior.z,
         prior_source: prior.source.to_string(),
         statute_ends: project::statute::LAST_STATUTORY_YEAR.0,
+        // Published beside the projection rather than folded into it. The two columns are the
+        // same forecasts summed two ways and the two rows are two populations of them; the
+        // decision record is `the-bias-published-beside-the-point`, and the reason none of it
+        // corrects the point is `the-widening-rule`.
+        bias: project::backtest::bias_profile(
+            project::backtest::DEEPEST_HORIZON,
+            *project::backtest::PANEL_YEARS
+                .last()
+                .expect("the panel names its years"),
+        )
+        .into_iter()
+        .map(|d| ProjectionBias {
+            horizon: d.horizon,
+            mean_district: d.across_it.mean_district,
+            total: d.across_it.total,
+            mean_district_pre_closure: d.before_the_closure.map(|b| b.mean_district),
+            total_pre_closure: d.before_the_closure.map(|b| b.total),
+        })
+        .collect(),
         checkpoints: forecast_years()
             .into_iter()
             .map(|(label, index, year)| {

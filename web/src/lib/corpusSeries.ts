@@ -383,6 +383,14 @@ export const PAGE_SERIES: Readonly<Record<string, { route: string; node: string 
     route: routes.METHOD,
     node: "scenario/guarantee-phase-out",
   },
+  "project/the-bias-before-the-closure": {
+    route: routes.METHOD,
+    node: "scenario/guarantee-phase-out",
+  },
+  "project/the-bias-across-the-closure": {
+    route: routes.METHOD,
+    node: "scenario/guarantee-phase-out",
+  },
 };
 
 /**

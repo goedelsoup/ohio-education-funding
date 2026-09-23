@@ -5509,6 +5509,123 @@ test.describe("what the forecast band actually held", () => {
   });
 });
 
+test.describe("the bias beside the band", () => {
+  const PANELS = '#forecast-range [data-chart="projection-bias"] svg.plot:visible';
+
+  test("the level is drawn beside the width, as two populations and four lines", async ({
+    page,
+  }) => {
+    /*
+     * The card above draws the band's *width* and holds. This draws its *level*, which is a
+     * different question with a different answer, and it is two panels rather than one chart
+     * because `seriesSpec` draws exactly two lines and there are four series: the mean district
+     * and the state total, over the forecasts that stay clear of the school closures and over all
+     * of them.
+     *
+     * The horizon counts are exact rather than floors for the reason the coverage test gives, and
+     * because the *difference* between them is a claim: the pre-closure population stops four
+     * years shallower, and the card says so in words.
+     */
+    await page.goto("/method");
+    const panels = page.locator(PANELS);
+    await expect(panels).toHaveCount(2);
+    for (const at of [0, 1]) {
+      await expect(panels.nth(at).locator(".series-a path")).toHaveCount(1);
+      await expect(panels.nth(at).locator(".series-b path")).toHaveCount(1);
+    }
+    await expect(panels.nth(0).locator(".series-hit [data-hover]")).toHaveCount(9);
+    await expect(panels.nth(1).locator(".series-hit [data-hover]")).toHaveCount(13);
+    // And the two panels are labelled, because "which population" is the axis between them.
+    const labels = await page.locator("#forecast-range .panel .panel-label").allInnerTexts();
+    expect(labels).toHaveLength(2);
+    expect(new Set(labels).size, "the two panels are told apart by their captions").toBe(2);
+  });
+
+  test("the two quantities do not change sign together, which is why there are two", async ({
+    page,
+  }) => {
+    /*
+     * The finding #445 asks for, measured off the paint rather than off the sentence.
+     *
+     * Both quantities start under the truth and end over it, so both cross zero — but not at the
+     * same horizon. On the forecasts that stay clear of the closures the mean district turns
+     * first and the state total does not turn until five years, and in the gap between them the
+     * average district is already being over-forecast while the statewide figure is still low.
+     * That is the whole reason a single correction cannot be right: it would have the wrong
+     * *sign*, not merely the wrong size, for one of the two published quantities.
+     *
+     * Read as the x of each path's first point above the "No bias" rule, walking the drawn
+     * geometry. A test that read the paragraph instead would pass on a chart drawing one line
+     * twice.
+     */
+    await page.goto("/method");
+    const crossings = await page
+      .locator(PANELS)
+      .first()
+      .evaluate((svg) => {
+        const rule = (svg.querySelector(".series-reference line") as SVGGraphicsElement).getBBox().y;
+        /** The x at which a path first rises above the rule, or null if it never does. */
+        const crosses = (selector: string): number | null => {
+          const path = svg.querySelector(selector) as SVGPathElement;
+          const total = path.getTotalLength();
+          for (let at = 0; at <= total; at += total / 2000) {
+            const point = path.getPointAtLength(at);
+            // SVG y grows downward, so "above the rule" is a smaller y, and a smaller y is a
+            // bias above zero: the quantity has turned from under the truth to over it.
+            if (point.y < rule) return point.x;
+          }
+          return null;
+        };
+        return { meanDistrict: crosses(".series-a path"), total: crosses(".series-b path") };
+      });
+
+    expect(crossings.meanDistrict, "the mean district crosses zero somewhere").not.toBeNull();
+    expect(crossings.total, "the state total crosses zero somewhere").not.toBeNull();
+    expect(
+      crossings.meanDistrict!,
+      "the mean district turns positive before the state total does",
+    ).toBeLessThan(crossings.total!);
+  });
+
+  test("the drift does not wash out: every line ends at its own furthest point", async ({
+    page,
+  }) => {
+    /*
+     * The other half of the shape. A bias that peaked in the middle distance and came back would
+     * be a different finding — an artefact of one set of origins rather than a horizon effect —
+     * and the card states the opposite in as many words. Measured as: the deepest drawn point of
+     * each line is also the one furthest from the rule.
+     */
+    await page.goto("/method");
+    for (const at of [0, 1]) {
+      const ends = await page
+        .locator(PANELS)
+        .nth(at)
+        .evaluate((svg) => {
+          const rule = (svg.querySelector(".series-reference line") as SVGGraphicsElement).getBBox()
+            .y;
+          return [".series-a path", ".series-b path"].map((selector) => {
+            const path = svg.querySelector(selector) as SVGPathElement;
+            const total = path.getTotalLength();
+            let worst = 0;
+            for (let along = 0; along <= total; along += total / 2000) {
+              worst = Math.max(worst, Math.abs(path.getPointAtLength(along).y - rule));
+            }
+            return { last: Math.abs(path.getPointAtLength(total).y - rule), worst };
+          });
+        });
+      for (const [line, end] of ends.entries()) {
+        // A pixel of slack: `getPointAtLength` walks a polyline in even steps and need not land
+        // exactly on the last vertex.
+        expect(
+          end.last,
+          `panel ${at}, line ${line}: the last point is the furthest from zero`,
+        ).toBeGreaterThan(end.worst - 1);
+      }
+    }
+  });
+});
+
 test.describe("where a district sits among the others", () => {
   test("the position card draws the distribution, not a bar with a pin in it", async ({ page }) => {
     /*

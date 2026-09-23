@@ -318,8 +318,54 @@ pub struct Projection {
     pub z: f64,
     /// What produced [`Projection::sigma`]. Printed wherever the band is.
     pub prior_source: String,
+    /// What the projection has actually been wrong by, horizon by horizon.
+    ///
+    /// Published rather than corrected: see `the-bias-published-beside-the-point`. Ordered by
+    /// horizon, one to the deepest the Census panel scores. Empty where the panel is absent,
+    /// which is the same condition that empties [`Bundle::history`].
+    pub bias: Vec<ProjectionBias>,
     /// Forecasts the consumer must reproduce.
     pub checkpoints: Vec<ForecastCheckpoint>,
+}
+
+/// What the projection was biased by at one horizon, measured against the years it has lived
+/// through.
+///
+/// # Two figures and not one
+///
+/// The feed publishes a statewide total and six hundred district figures from the same
+/// projections, and they do not carry the same bias: the mean district's weights every district
+/// alike, the total's weights by size. At five years before the closure the mean district ran
+/// 0.75% high and the total 0.06% — a correction that serves one is wrong for the other, which is
+/// the reason both are here and neither is applied.
+///
+/// # And two populations
+///
+/// The pandemic closure moved enrolment as a level, statewide, in a way no method fitted before
+/// it could see. A forecast whose target year is FY2021 or later is scored across that break and
+/// one whose target is FY2020 or earlier is not, so the two are different questions rather than
+/// different samples of one. Both are published; neither is the "corrected" one.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct ProjectionBias {
+    /// Years ahead, one-based. The feed's own horizon is inside this range.
+    pub horizon: u16,
+    /// Mean log error over every scored forecast, the closure included.
+    ///
+    /// Positive means the projection ran high. A consumer wanting a percentage takes
+    /// `exp(bias) - 1`, which is why this is a log error and not a percentage already: log errors
+    /// average without the asymmetry that makes a mean of ratios depend on which way round it is
+    /// written.
+    pub mean_district: f64,
+    /// The same forecasts as a statewide total — the log of summed points over summed actuals.
+    pub total: f64,
+    /// [`Self::mean_district`] restricted to targets of FY2020 or earlier.
+    ///
+    /// `None` at the horizons no origin reaches without crossing the closure. An absence rather
+    /// than the crossing figure wearing this label: the panel cannot say what this method does at
+    /// ten years in a decade that did not contain a school closure.
+    pub mean_district_pre_closure: Option<f64>,
+    /// [`Self::total`] on the same restriction, and `None` under the same condition.
+    pub total_pre_closure: Option<f64>,
 }
 
 /// The exported feed.

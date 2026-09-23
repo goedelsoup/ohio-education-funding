@@ -866,72 +866,201 @@ impl Traces {
     }
 }
 
+/// One of the two bias curves: what the two published quantities were off by, over one population.
+///
+/// Both curves are this function with a different `of`, because the pair of *lines* is the
+/// finding — the mean district’s bias and the whole state’s are two numbers rather
+/// than two estimates of one — and the pair of *curves* is the population axis #431 put under it.
+///
+/// Zero is the reference, and like the 68.3% the coverage curve is read against it is a
+/// definition rather than a measurement, so it is pinned nowhere: a forecast on the line is right
+/// on average and one off it is wrong in a *direction*.
+///
+/// The worst departure each line names is a magnitude, which is all [`Departure`] holds and all
+/// `crates/figures.json` can carry. Every one of these four lines starts below zero, crosses it,
+/// and ends further from it than it has been at any horizon before — so the sign is not lost by
+/// the line, it is stated by the first point and by the prose that quotes it.
+///
+/// # Panics
+///
+/// If no row carries the population `of` selects.
+fn bias_traces(
+    rows: &[project::backtest::Drift],
+    of: fn(&project::backtest::Drift) -> Option<project::backtest::Bias>,
+    y: &'static str,
+    mean_district: [&'static str; 3],
+    total: [&'static str; 3],
+) -> Traces {
+    let line = |label: &'static str,
+                measure: fn(&project::backtest::Bias) -> f64,
+                keys: [&'static str; 3]| {
+        let value = |d: &project::backtest::Drift| of(d).map(|b| measure(&b));
+        let (at, drift) = project::backtest::worst_drift(rows, value);
+        Line {
+            label,
+            points: rows
+                .iter()
+                .filter_map(|d| {
+                    value(d).map(|y| Coordinate {
+                        x: f64::from(d.horizon),
+                        y,
+                    })
+                })
+                .collect(),
+            first_figure: keys[0],
+            last_figure: keys[1],
+            worst: Departure {
+                at: f64::from(at),
+                gap: drift.abs(),
+                figure: keys[2],
+            },
+        }
+    };
+    let deepest = rows
+        .iter()
+        .filter(|d| of(d).is_some())
+        .map(|d| d.horizon)
+        .max()
+        .expect("a bias profile carrying no row for this population");
+    Traces::framed(
+        Axis {
+            label: "Years ahead",
+            unit: Unit::Count,
+            min: 1.0,
+            max: f64::from(deepest),
+            log: false,
+        },
+        y,
+        Unit::Ratio,
+        Some(Reference {
+            label: "No bias",
+            value: 0.0,
+        }),
+        vec![
+            line("The mean district", |b| b.mean_district, mean_district),
+            line("The state total", |b| b.total, total),
+        ],
+    )
+}
+
 /// The curves the wiki draws. See [`Curve`] for what stands in for the endpoint rule here.
-pub static CURVES: &[Curve] = &[Curve {
-    key: "project/what-the-band-held-at-every-horizon",
-    owner: "crates/project",
-    label: "What the ±1σ band actually held, at every horizon the panel reaches, over every \
+pub static CURVES: &[Curve] = &[
+    Curve {
+        key: "project/what-the-band-held-at-every-horizon",
+        owner: "crates/project",
+        label: "What the ±1σ band actually held, at every horizon the panel reaches, over every \
             origin and district it admits",
-    subject: "horizon",
-    compute: |i| {
-        let line = |label: &'static str,
-                    of: fn(&project::backtest::Held) -> f64,
+        subject: "horizon",
+        compute: |i| {
+            let line = |label: &'static str,
+                        of: fn(&project::backtest::Held) -> f64,
+                        first_figure,
+                        last_figure,
+                        worst_figure| {
+                let (at, gap) = project::backtest::worst_gap(&i.coverage, of);
+                Line {
+                    label,
+                    points: i
+                        .coverage
+                        .iter()
+                        .map(|held| Coordinate {
+                            x: f64::from(held.horizon),
+                            y: of(held),
+                        })
+                        .collect(),
                     first_figure,
                     last_figure,
-                    worst_figure| {
-            let (at, gap) = project::backtest::worst_gap(&i.coverage, of);
-            Line {
-                label,
-                points: i
-                    .coverage
-                    .iter()
-                    .map(|held| Coordinate {
-                        x: f64::from(held.horizon),
-                        y: of(held),
-                    })
-                    .collect(),
-                first_figure,
-                last_figure,
-                worst: Departure {
-                    at: f64::from(at),
-                    gap,
-                    figure: worst_figure,
+                    worst: Departure {
+                        at: f64::from(at),
+                        gap,
+                        figure: worst_figure,
+                    },
+                }
+            };
+            Traces::framed(
+                Axis {
+                    label: "Years ahead",
+                    unit: Unit::Count,
+                    min: 1.0,
+                    max: f64::from(project::backtest::DEEPEST_HORIZON),
+                    log: false,
                 },
-            }
-        };
-        Traces::framed(
-            Axis {
-                label: "Years ahead",
-                unit: Unit::Count,
-                min: 1.0,
-                max: f64::from(project::backtest::DEEPEST_HORIZON),
-                log: false,
-            },
-            "Share of forecasts inside the band",
-            Unit::Share,
-            Some(Reference {
-                label: "What ±1σ claims to hold",
-                value: project::backtest::NOMINAL_ONE_SIGMA_COVERAGE,
-            }),
-            vec![
-                line(
-                    "Every error, origins pooled",
-                    |held| held.pooled,
-                    "project/pooled-coverage-at-one-year",
-                    "project/pooled-coverage-at-thirteen-years",
-                    "project/the-pooled-bands-worst-gap-from-nominal",
-                ),
-                line(
-                    "The same errors, each origin's mean removed",
-                    |held| held.within_origin,
-                    "project/cross-district-coverage-at-one-year",
-                    "project/cross-district-coverage-at-thirteen-years",
-                    "project/the-cross-district-bands-worst-gap-from-nominal",
-                ),
-            ],
-        )
+                "Share of forecasts inside the band",
+                Unit::Share,
+                Some(Reference {
+                    label: "What ±1σ claims to hold",
+                    value: project::backtest::NOMINAL_ONE_SIGMA_COVERAGE,
+                }),
+                vec![
+                    line(
+                        "Every error, origins pooled",
+                        |held| held.pooled,
+                        "project/pooled-coverage-at-one-year",
+                        "project/pooled-coverage-at-thirteen-years",
+                        "project/the-pooled-bands-worst-gap-from-nominal",
+                    ),
+                    line(
+                        "The same errors, each origin's mean removed",
+                        |held| held.within_origin,
+                        "project/cross-district-coverage-at-one-year",
+                        "project/cross-district-coverage-at-thirteen-years",
+                        "project/the-cross-district-bands-worst-gap-from-nominal",
+                    ),
+                ],
+            )
+        },
     },
-}];
+    Curve {
+        key: "project/the-bias-before-the-closure",
+        owner: "crates/project",
+        label: "How far each of the two published quantities sat from the truth at every horizon, \
+            over the forecasts whose target year is FY2020 or earlier \u{2014} the mean \
+            district\u{2019}s log error and the whole state\u{2019}s, which are not one number",
+        subject: "horizon",
+        compute: |i| {
+            bias_traces(
+                &i.bias,
+                |d| d.before_the_closure,
+                "Bias, as a log error",
+                [
+                    "project/the-mean-district-bias-at-one-year-negative",
+                    "project/the-mean-district-bias-at-nine-years-before-the-closure",
+                    "project/the-worst-mean-district-bias-before-the-closure",
+                ],
+                [
+                    "project/the-total-bias-at-one-year-negative",
+                    "project/the-total-bias-at-nine-years-before-the-closure",
+                    "project/the-worst-total-bias-before-the-closure",
+                ],
+            )
+        },
+    },
+    Curve {
+        key: "project/the-bias-across-the-closure",
+        owner: "crates/project",
+        label: "The same two quantities over every scored forecast, the school closures included \
+            \u{2014} four horizons deeper than the panel reaches without them, and further from \
+            zero at every one of them",
+        subject: "horizon",
+        compute: |i| {
+            bias_traces(
+                &i.bias,
+                |d| Some(d.across_it),
+                "Bias, as a log error",
+                [
+                    "project/the-mean-district-bias-at-one-year-negative",
+                    "project/the-mean-district-bias-at-thirteen-years",
+                    "project/the-worst-mean-district-bias-across-the-closure",
+                ],
+                [
+                    "project/the-total-bias-at-one-year-negative",
+                    "project/the-total-bias-at-thirteen-years",
+                    "project/the-worst-total-bias-across-the-closure",
+                ],
+            )
+        },
+    },
+];
 
 /// A curve and the lines it came out with on this run.
 pub struct ComputedCurve {
@@ -1207,6 +1336,16 @@ pub struct Inputs {
     /// file, which is the #120 shape exactly. [`project::backtest::profile`] runs it once for the
     /// six pinned figures and the curve alike.
     pub coverage: Vec<project::backtest::Held>,
+    /// The bias in the two published quantities, at every horizon, in both populations.
+    ///
+    /// Beside [`Self::coverage`] because it is the other half of the same question and the other
+    /// half of the same backtest: the band is checked for its *width* there and for its *level*
+    /// here, and a reader told the band holds what it claims is owed the second answer too. Four
+    /// lines rather than two, because the mean district's bias and the whole state's are
+    /// different numbers with different signs — see
+    /// `.yidam/decisions/the-bias-published-beside-the-point.yml`. Run once, like the coverage
+    /// profile, so the ten pins and the two curves are one computation.
+    pub bias: Vec<project::backtest::Drift>,
 }
 
 /// What `project::lost_pupils` establishes, computed once over the 607 districts the identity
@@ -1768,6 +1907,12 @@ impl Inputs {
                 .last()
                 .expect("the panel carries years"),
         );
+        let bias = project::backtest::bias_profile(
+            project::backtest::DEEPEST_HORIZON,
+            *project::backtest::PANEL_YEARS
+                .last()
+                .expect("the panel carries years"),
+        );
         let recognized: HashMap<String, Recognition> = recognized_valuation::from_abstract(2024);
         let at_recognized = panel_at_fy2027(
             &panel,
@@ -2302,6 +2447,7 @@ impl Inputs {
             reach,
             lost_pupils,
             coverage,
+            bias,
         }
     }
 }
@@ -12075,6 +12221,174 @@ pub static FIGURES: &[Figure] = &[
         pinned: 0.030_289_036_5,
         tolerance: 0.000_000_1,
         compute: |i| project::backtest::worst_gap(&i.coverage, |held| held.within_origin).1,
+    },
+    Figure {
+        key: "project/the-mean-district-bias-at-one-year-negative",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The mean district\u{2019}s bias at one year, as a log error \u{2014} negative, so \
+                the method starts by under-forecasting, which is the opposite of what it does at \
+                every horizon past four",
+        pinned: 0.007_065_951_5,
+        tolerance: 0.000_000_1,
+        compute: |i| i.bias[0].across_it.mean_district.abs(),
+    },
+    Figure {
+        key: "project/the-total-bias-at-one-year-negative",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "And the state total\u{2019}s at one year \u{2014} negative too, and smaller: the \
+                same forecasts summed by size rather than averaged over districts",
+        pinned: 0.005_205_198_2,
+        tolerance: 0.000_000_1,
+        compute: |i| i.bias[0].across_it.total.abs(),
+    },
+    Figure {
+        key: "project/the-mean-district-bias-at-six-years-before-the-closure",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The mean district\u{2019}s bias six years out, over forecasts targeting FY2020 or \
+                earlier \u{2014} the horizon this node\u{2019}s own FY2032 leg runs to, which is \
+                why an interior point of the curve is pinned at all",
+        pinned: 0.011_719_671_0,
+        tolerance: 0.000_000_1,
+        compute: |i| {
+            i.bias[5]
+                .before_the_closure
+                .expect("six years is inside the pre-closure panel")
+                .mean_district
+        },
+    },
+    Figure {
+        key: "project/the-total-bias-at-six-years-before-the-closure",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "And the state total\u{2019}s at the same six years \u{2014} a third of the mean \
+                district\u{2019}s, which is the whole argument for publishing both rather than \
+                one figure a reader would apply to either",
+        pinned: 0.003_619_971_9,
+        tolerance: 0.000_000_1,
+        compute: |i| {
+            i.bias[5]
+                .before_the_closure
+                .expect("six years is inside the pre-closure panel")
+                .total
+        },
+    },
+    Figure {
+        key: "project/the-mean-district-bias-at-nine-years-before-the-closure",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The mean district\u{2019}s bias at nine years over forecasts targeting FY2020 or \
+                earlier \u{2014} positive, and the deep end of the only line the panel can draw \
+                without a school closure in it",
+        pinned: 0.027_197_816_0,
+        tolerance: 0.000_000_1,
+        compute: |i| {
+            i.bias[8]
+                .before_the_closure
+                .expect("nine years is inside the pre-closure panel")
+                .mean_district
+        },
+    },
+    Figure {
+        key: "project/the-worst-mean-district-bias-before-the-closure",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The furthest that line ever sits from zero, over the nine horizons \u{2014} a \
+                maximum along the curve, and it falls at the deep end because the bias never \
+                comes back",
+        pinned: 0.027_197_816_0,
+        tolerance: 0.000_000_1,
+        compute: |i| {
+            project::backtest::worst_drift(&i.bias, |d| {
+                d.before_the_closure.map(|b| b.mean_district)
+            })
+            .1
+            .abs()
+        },
+    },
+    Figure {
+        key: "project/the-total-bias-at-nine-years-before-the-closure",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The state total\u{2019}s bias at nine years on the same forecasts \u{2014} well \
+                under the mean district\u{2019}s, which is why a correction sized on one of them \
+                is wrong for the other",
+        pinned: 0.017_139_865_0,
+        tolerance: 0.000_000_1,
+        compute: |i| {
+            i.bias[8]
+                .before_the_closure
+                .expect("nine years is inside the pre-closure panel")
+                .total
+        },
+    },
+    Figure {
+        key: "project/the-worst-total-bias-before-the-closure",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "And the furthest the total\u{2019}s line sits from zero over those nine horizons, \
+                which is at the deep end as well \u{2014} but it crosses zero a year later than \
+                the mean district does, at five rather than four",
+        pinned: 0.017_139_865_0,
+        tolerance: 0.000_000_1,
+        compute: |i| {
+            project::backtest::worst_drift(&i.bias, |d| d.before_the_closure.map(|b| b.total))
+                .1
+                .abs()
+        },
+    },
+    Figure {
+        key: "project/the-mean-district-bias-at-thirteen-years",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The mean district\u{2019}s bias at thirteen years over every scored forecast, the \
+                closures included \u{2014} nearly three times what the same line reaches at the \
+                deepest horizon the panel answers for without them",
+        pinned: 0.073_392_538_5,
+        tolerance: 0.000_000_1,
+        compute: |i| i.bias[12].across_it.mean_district,
+    },
+    Figure {
+        key: "project/the-worst-mean-district-bias-across-the-closure",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The furthest that line sits from zero over the thirteen horizons \u{2014} the \
+                same maximum-along-the-curve the coverage lines carry, and again at the deep end",
+        pinned: 0.073_392_538_5,
+        tolerance: 0.000_000_1,
+        compute: |i| {
+            project::backtest::worst_drift(&i.bias, |d| Some(d.across_it.mean_district))
+                .1
+                .abs()
+        },
+    },
+    Figure {
+        key: "project/the-total-bias-at-thirteen-years",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The state total\u{2019}s bias at thirteen years \u{2014} the number a correction \
+                to the published statewide projection would have to be sized on, and it is not \
+                the one above it",
+        pinned: 0.056_931_577_1,
+        tolerance: 0.000_000_1,
+        compute: |i| i.bias[12].across_it.total,
+    },
+    Figure {
+        key: "project/the-worst-total-bias-across-the-closure",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "And the furthest the total\u{2019}s line sits from zero across the thirteen \
+                horizons, which is the last of the four ends that is also a worst \u{2014} all \
+                four lines run away from zero and none of them turns back",
+        pinned: 0.056_931_577_1,
+        tolerance: 0.000_000_1,
+        compute: |i| {
+            project::backtest::worst_drift(&i.bias, |d| Some(d.across_it.total))
+                .1
+                .abs()
+        },
     },
     Figure {
         key: "project/fy2032-backstop-guarantee-removed",

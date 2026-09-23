@@ -570,6 +570,24 @@ fn projection() -> Projection {
         z: 1.0,
         prior_source: "cross-sectional spread of district annual enrolled-ADM growth".into(),
         statute_ends: 2027,
+        // Two rows and not thirteen: one that carries the pre-closure pair and one that does not,
+        // which is the only distinction the writer can get wrong.
+        bias: vec![
+            ProjectionBias {
+                horizon: 1,
+                mean_district: -0.007_123_45,
+                total: -0.005_2,
+                mean_district_pre_closure: Some(-0.007_123_45),
+                total_pre_closure: Some(-0.005_2),
+            },
+            ProjectionBias {
+                horizon: 10,
+                mean_district: 0.056_2,
+                total: 0.032_2,
+                mean_district_pre_closure: None,
+                total_pre_closure: None,
+            },
+        ],
         checkpoints: vec![ForecastCheckpoint {
             label: "current law, FY2032".into(),
             policy: checkpoint().policy,
@@ -995,6 +1013,27 @@ fn sigma_keeps_six_places_because_four_would_move_a_ten_year_band() {
     }
     .to_json();
     assert!(json.contains("\"sigma\": 0.023457"), "{json}");
+}
+
+#[test]
+fn the_bias_rows_keep_eight_places_and_say_null_where_the_panel_cannot_answer() {
+    // Four places would round the figure the block turns on. The total's pre-closure bias at five
+    // years is +0.0006, which `num` renders as 0.0006 and a reader cannot tell from zero; and the
+    // mean district's -0.00712345 would come back -0.0071, which is a different number from the
+    // one the page reproduces.
+    let json = Bundle {
+        projection: Some(projection()),
+        ..bundle(vec![], vec![])
+    }
+    .to_json();
+    assert!(json.contains("\"mean_district\": -0.00712345"), "{json}");
+    // And the deep horizons say so rather than borrowing the crossing figure: no origin reaches
+    // ten years without crossing the closure, so the pre-closure pair is absent and not zero.
+    assert!(
+        json.contains("\"mean_district_pre_closure\": null"),
+        "{json}"
+    );
+    assert!(json.contains("\"total_pre_closure\": null"), "{json}");
 }
 
 #[test]

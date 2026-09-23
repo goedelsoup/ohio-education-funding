@@ -778,6 +778,40 @@ node whose prose states its figures, the same one `/bounds`'s census uses — an
 `scenario/guarantee-phase-out`, which is where the band was argued before it was drawn. The check
 does not weaken when the chart leaves the wiki; only the place the prose lives moves.
 
+The second curve on that page is where the form met its limit, and the answer was panels rather
+than a wider `seriesSpec`. `bias.ts` draws the *level* the band is centred on, where `coverage.ts`
+draws its width, and the level is four series: the mean district's log error and the state total's,
+over the forecasts that stay clear of a school closure and over all of them. `seriesSpec` takes
+exactly two lines and will not be widened to four — four lines over one frame is the chart that
+made a legend necessary everywhere else here — so the *population* became the two panels and the
+two published quantities stayed inside each one, which is the pair a reader has to compare. The
+panels are `.panels` and `panelWidth(2)`, the same grid `/wiki`'s plane sets use.
+
+A panel is 311px, which is a **third** frame width, and both gutters in `seriesSpec` were sized
+against the other two. Neither failure showed here; both showed on the runner, where `system-ui`
+resolves to a wider face, and both were two or three pixels. The direct labels ask the right gutter
+for more than `gutter()`'s cap will give at 311, and the cap is silent — it hands back less and the
+label is painted over the edge — so `mean district +0.0272` became `district +0.0272` and the card
+says the long form everywhere it has room for it. The foot annotation was worse in kind: it is
+centred on the *plot frame*, and `seriesSpec` puts its whole margin on the right, so on a panel the
+centre of the frame is 70px left of the centre of the drawing. It now anchors to the left edge when
+it drops to a line of its own, which it does at every narrow width on this site — the position no
+longer depends on how wide the reader's font paints it, which is the only version of this fix that
+does not have to be made again at the next frame width.
+
+The two entries that adds to `PAGE_SERIES` both name `scenario/guarantee-phase-out`, and that is
+the first time two curves have shared an answering node. Nothing in `crossCheckPageSeries` needed
+to change; `tests/unit/corpusSeries.spec.ts` did, because it had been counting discrepancies per
+*node* where the check emits one per entry, and the two had been the same number until now.
+
+Nothing on the card is typed, the turns least of all. The sentence that says the mean district
+turns positive four years before the state total does is built from `turningPoint()`, which walks
+the drawn points for the first one whose sign differs from the first's, and the whole card degrades
+to its endpoints if a future panel ever produces a line that does not turn at all. The e2e tests
+read the crossing off the painted path with `getPointAtLength` rather than off that sentence, for
+the reason the coverage test gives: a chart drawing one line twice would satisfy every number in
+the prose.
+
 A **grouped** series is the last shape, and it is not a new form: rows carrying a `group` become
 one `barSpec` panel per group, on one scale across the set, which is what makes a monotonicity
 readable from panel to panel rather than only within one. The scale is shared inside a set and
@@ -949,11 +983,11 @@ Fields: bundle contract version, feed list, last export timestamp, node counts p
 -->
 | Field | Value |
 |---|---|
-| Contract version | `45.0.0` |
+| Contract version | `46.0.0` |
 | Districts in the feed | 609 |
 | Reference checkpoints | 11 |
 | Reference forecasts | 4 |
-| Size | 6717 KB |
+| Size | 6719 KB |
 | Deployment target | Cloudflare Pages, static, with a CSP in `web/public/_headers` |
 
 Regenerate with `cargo run --manifest-path crates/Cargo.toml -p bundle > web/public/data/bundle.json`. CI fails if the committed feed and a fresh one differ.
