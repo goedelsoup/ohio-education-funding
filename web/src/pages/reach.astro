@@ -236,6 +236,47 @@ const counties = scopeCounties(bundle.districts);
             that never does anything.
           */}
           <div class="chips" id="rv-chips" aria-live="polite" hidden></div>
+
+          {/*
+            What the selection does to everything outside it — see `ScopeMode` in `lib/reach.ts`.
+
+            # Why there are two modes at all
+
+            The spotlight answers *where do my districts sit in the state*, and it is the only mode
+            that can answer anything for a selection of six: `scatterSpec` refuses fewer than
+            `MIN_CLOUD` points, and `cloudCounties` finds that only a ninth of Ohio's counties hold
+            that many districts. It is the default for that reason and it is forced.
+
+            It cannot answer the other question. Six marks among six hundred in a 640×420 frame are
+            six dots in a crowd however they are shaded, so *how are my districts arranged among
+            themselves* — within-county dispersion, the quantity the litigation was about — needs
+            the rest of the state gone. On the state's own fixed frame that is a genuinely
+            different and legible picture, and it is the one `/county/[slug]` asks for without a
+            lever in hand.
+
+            # Why it is here and hidden
+
+            Here rather than beside the axis menus because this is a third category again: those
+            change what is plotted, the levers change what is computed, and this changes who the
+            picture is about. Hidden until there is a selection for the same reason the typology
+            picker is hidden when the colouring is not the typology — a control that changes
+            nothing is worse than no control, because it reads as one whose effect the reader has
+            failed to notice.
+
+            Under twelve drawn districts the card refuses rather than drawing a cloud that is not
+            one, and says so in the terms that rule is written in. `renderReach` carries that.
+          */}
+          <fieldset class="scope-mode" id="rv-mode-pick" hidden>
+            <legend>Show</legend>
+            <label>
+              <input type="radio" name="mode" value="spotlight" checked />
+              <span>The whole state, selection lit</span>
+            </label>
+            <label>
+              <input type="radio" name="mode" value="subset" />
+              <span>Only the selection</span>
+            </label>
+          </fieldset>
         </form>
 
         <noscript>

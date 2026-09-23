@@ -691,9 +691,10 @@ export function barSpec(
 /**
  * The fewest points this form will draw a cloud of.
  *
- * Exported because callers reason about it. `/reach` cannot subset its cloud to a county — 79 of
- * Ohio's 88 counties hold fewer districts than this — and the page says so in prose, so the number
- * it says has to be this number rather than a second copy of it.
+ * Exported because callers reason about it. `/reach` subsets its cloud to a selection only on
+ * request and only above this — 79 of Ohio's 88 counties hold fewer districts than it — and both
+ * the page's default and its refusal are argued from the figure in prose, so the number those
+ * sentences say has to be this number rather than a second copy of it.
  */
 export const MIN_CLOUD = 12;
 

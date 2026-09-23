@@ -1947,6 +1947,72 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
    ground the selections do. */
 .chip-clear { background: none; }
 
+/*
+ * What the selection does to everything outside it — see `ScopeMode` in `lib/reach.ts`.
+ *
+ * In the scope form and under the chips, because it modifies the selection above it and is
+ * meaningless without one. Not in `.reach-axes` with the menus: those change what is *plotted* and
+ * this changes who the picture is *about*, which is the same distinction that keeps the levers out
+ * of both.
+ *
+ * A fieldset of two radios rather than a checkbox, because both modes have to be nameable: the
+ * refusal under twelve districts sends the reader to the spotlight by name, and "not only the
+ * selection" is not a name for anything.
+ *
+ * The `display` is in the class rule so it beats the UA stylesheet's `[hidden]`, the same way
+ * `.axis-pick[hidden]` does and for the same reason — the runner hides this whenever there is no
+ * selection, and without this it would sit there inert.
+ */
+.scope-mode {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.scope-mode[hidden] { display: none; }
+.scope-mode > legend {
+  padding: 0;
+  float: left;
+  margin-right: var(--space-4);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.scope-mode label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+/*
+ * An action inside a sentence.
+ *
+ * The scope notes and the refusal card both end in a way out — draw the state behind this, or draw
+ * only this — and the way out has to be the control rather than an instruction to go and find one.
+ * It is a `<button>` because it changes the page rather than navigating, and it is dressed as a
+ * link because that is what an action in the middle of a paragraph reads as.
+ */
+.linkish {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  text-align: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--link);
+  text-decoration-thickness: 1px;
+  text-underline-offset: .18em;
+  cursor: pointer;
+}
+.linkish:hover,
+.linkish:focus-visible { color: var(--link); text-decoration-thickness: 2px; }
+
 .rail-hd { margin: 0 0 var(--space-3); font-weight: var(--weight-semibold); }
 .preset-row { display: grid; gap: var(--space-2); }
 /* A preset is a lever position with a name, so the button carries the name and what the setting

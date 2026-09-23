@@ -34,6 +34,7 @@ import {
   DIMENSIONS,
   DIMENSION_KEYS,
   FRAME_QUANTILE,
+  cloudCounties,
   envelope,
   groups,
   inScope,
@@ -300,8 +301,9 @@ test("an absent highlight is the default, not code 0", () => {
  * What is **not** here is anything that calls `renderReach`. It renders through `plot/client.ts`,
  * which needs a real DOM because it is the browser half of the pair — `plot/ssr.ts` is the one that
  * carries its own. So the drawn consequences of a scope (the frame holding still across selections,
- * the counts restated against it, a single district still getting a cloud) are asserted in
- * `tests/e2e/app.spec.ts`'s `reach` describe, against the page. Standing up a fake document here to
+ * the counts restated against it, a single district still getting a cloud under the spotlight, and
+ * the refusal it gets under the subset) are asserted in `tests/e2e/app.spec.ts`'s `reach` describe,
+ * against the page. Standing up a fake document here to
  * run the browser renderer in node would be testing a fiction.
  */
 
@@ -357,9 +359,10 @@ test("the counties are every one the feed carries, by name, with their district 
 test("most of Ohio's counties hold too few districts to be a cloud", () => {
   /*
    * The measurement the whole design turns on, asserted so it cannot quietly stop being true. A
-   * selection that *subsetted* the cloud would render nothing at all for these — `scatterSpec`
-   * refuses fewer than `MIN_CLOUD` points and a null spec renders to the empty string — so the card
-   * would come out as a heading, a legend and nothing between them.
+   * selection that *subsetted* the cloud renders nothing at all for these — `scatterSpec` refuses
+   * fewer than `MIN_CLOUD` points and a null spec renders to the empty string — so the card would
+   * come out as a heading, a legend and nothing between them. That is why the spotlight is the
+   * default and why the subset mode has a refusal path rather than a blank one.
    */
   const counties = scopeCounties(panel.districts);
   const small = counties.filter((c) => c.districts < MIN_CLOUD);
@@ -367,6 +370,38 @@ test("most of Ohio's counties hold too few districts to be a cloud", () => {
     .toBeGreaterThan(counties.length / 2);
   expect(counties.filter((c) => c.districts === 1).length, "and some hold exactly one")
     .toBeGreaterThan(0);
+});
+
+test("the counties a subset can be drawn for are the ones that hold enough districts", () => {
+  /*
+   * `cloudCounties` is what both the refusal and the spotlight's note count from, so the figure
+   * they print — nine of eighty-eight on this feed — must be the complement of the measurement
+   * above rather than a second reading of it.
+   */
+  const counties = scopeCounties(panel.districts);
+  const enough = cloudCounties(panel.districts);
+  expect(enough).toEqual(counties.filter((c) => c.districts >= MIN_CLOUD));
+  for (const county of enough) expect(county.districts).toBeGreaterThanOrEqual(MIN_CLOUD);
+  /* The subset is the minority mode, which is the reason it is not the default. If this ever
+     stopped being true the page's argument for the spotlight would have to be rewritten. */
+  expect(enough.length, "the mode that has to be asked for").toBeLessThan(counties.length / 2);
+  expect(enough.length, "but it is reachable, and the control is not decoration").toBeGreaterThan(0);
+});
+
+test("a selection lights by default, and only an explicit `only=1` removes the rest", () => {
+  /*
+   * The spotlight is forced: it is the only mode that can draw a selection of six, so a link that
+   * says nothing about the mode must not arrive at a refusal. Read whether or not a scope came with
+   * it — `?only=1` alone is the whole state, because `inScope` finds no scope to subset.
+   */
+  expect(DEFAULT_VIEW.mode).toBe("spotlight");
+  expect(viewFromQuery(new URLSearchParams("co=athens")).mode).toBe("spotlight");
+  expect(viewFromQuery(new URLSearchParams("co=athens&only=1")).mode).toBe("subset");
+  expect(viewFromQuery(new URLSearchParams("only=1")).mode).toBe("subset");
+  expect(inScope(panel.districts, viewFromQuery(new URLSearchParams("only=1")))).toBeNull();
+  // Anything that is not the one value is the default, the way `t` reads in the other direction.
+  expect(viewFromQuery(new URLSearchParams("only=yes")).mode).toBe("spotlight");
+  expect(viewFromQuery(new URLSearchParams("only=0")).mode).toBe("spotlight");
 });
 
 test("a scope is carried in the query string and held to shape", () => {

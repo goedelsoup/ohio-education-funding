@@ -50,6 +50,7 @@ import {
   PRESET_FIELDS,
   renderReach,
   viewFromQuery,
+  type ScopeMode,
   type View,
 } from "../lib/reach.ts";
 import { isForecastVerified, isVerified, verify, type Verification } from "../lib/verify.ts";
@@ -211,6 +212,16 @@ function toQuery(): void {
     if (v.counties.length > 0) params.set("co", v.counties.join(","));
     if (v.districts.length > 0) params.set("d", v.districts.join(","));
     /*
+     * And what the selection does to the rest of the state, only where there is a selection and
+     * only where it is not the default — the rule `ty` and `t` are written to by.
+     *
+     * A subset is the half of this page worth sending someone: "here is my county on the state's
+     * own ruler" is a picture the spotlight cannot produce, so the link has to be able to carry it.
+     * A bare `only=1` with nothing selected would name a mode the page is not in.
+     */
+    const selected = v.counties.length > 0 || v.districts.length > 0;
+    if (selected && v.mode === "subset") params.set("only", "1");
+    /*
      * Only where it means something. A `ty=` on a cloud coloured by regime is a parameter the page
      * is not using, and a link carrying it would suggest otherwise.
      *
@@ -342,6 +353,20 @@ function readView(): View {
       (box) => box.value,
     ),
     districts: named(),
+    /*
+     * And the mode, from the same DOM on the same tick.
+     *
+     * The radio's own state rather than `state.view.mode`, for the reason every other field here is
+     * read off a control: `update` re-reads on every `input`, so a mode held anywhere else would be
+     * overwritten the first time a reader touched a slider.
+     *
+     * Absent controls mean the default, which is the spotlight — the mode that can draw any
+     * selection. That covers `/scenario`, where none of this exists.
+     */
+    mode:
+      $<HTMLInputElement>('#reach-scope input[name="mode"]:checked')?.value === "subset"
+        ? "subset"
+        : DEFAULT_VIEW.mode,
   };
 }
 
@@ -355,6 +380,12 @@ function named(): string[] {
 function setNamed(irns: string[]): void {
   const field = $<HTMLInputElement>("#rv-districts");
   if (field) field.value = [...new Set(irns)].join(",");
+}
+
+/** Put the scope mode into the radio `readView` reads it back out of. */
+function setMode(mode: ScopeMode): void {
+  const radio = $<HTMLInputElement>(`#reach-scope input[name="mode"][value="${mode}"]`);
+  if (radio) radio.checked = true;
 }
 
 /**
@@ -402,6 +433,16 @@ let drawnScope = "";
 function syncScope(view: View): void {
   const chips = $("#rv-chips");
   const summary = $("#rv-county-count");
+  /*
+   * The mode control, offered only once there is a selection for it to mean something to.
+   *
+   * Same rule as the group picker above: hidden rather than disabled, because a control that
+   * changes nothing reads as one whose effect the reader has failed to notice. Unlike the chips
+   * this is set on every tick — it is one boolean, not an `aria-live` region being rebuilt, so
+   * there is nothing here for a screen reader to announce fifty times during a slider drag.
+   */
+  const mode = $("#rv-mode-pick");
+  if (mode) mode.hidden = view.counties.length === 0 && view.districts.length === 0;
   if (summary) {
     summary.textContent =
       view.counties.length === 0
@@ -742,6 +783,13 @@ function boot(panel: Panel): void {
     if (box) box.checked = true;
   }
   setNamed(state.view.districts);
+  /* And the mode, into the radio `readView` reads it back out of. A `?only=1` that arrived with no
+     selection leaves the pair alone: `inScope` finds no scope, the control stays hidden, and the
+     page draws the whole state — which is what that link actually asks for. */
+  const chosen = $<HTMLInputElement>(
+    `#reach-scope input[name="mode"][value="${state.view.mode}"]`,
+  );
+  if (chosen) chosen.checked = true;
 
   const fallback = defaultLevers(modelOf(panel.statewide), baseYear).horizon;
 
@@ -776,7 +824,7 @@ function boot(panel: Panel): void {
 
   for (const control of document.querySelectorAll(
     "#scenario-controls input, #scenario-controls select, #reach-view input, #reach-view select, " +
-      '#reach-scope input[name="co"]',
+      '#reach-scope input[name="co"], #reach-scope input[name="mode"]',
   )) {
     control.addEventListener("input", () => update());
   }
@@ -811,6 +859,16 @@ function boot(panel: Panel): void {
         box.checked = false;
       }
       setNamed([]);
+      /*
+       * And back to the spotlight, because that is what this chip says it does: its name is "Every
+       * district" and its spoken name is *clear the selection and light every district*. Leaving
+       * the mode on `subset` would mean the next county a reader picked was silently subsetted —
+       * and for 79 of 88 counties that is a refusal card arriving unasked-for.
+       *
+       * Removing a single chip does not reset it. That is narrowing a selection the reader built,
+       * not starting over, and a mode that snapped back mid-edit would be a control undoing itself.
+       */
+      setMode("spotlight");
     } else if (chip.dataset.county != null) {
       const box = $<HTMLInputElement>(
         `#reach-scope input[name="co"][value="${chip.dataset.county}"]`,
@@ -819,6 +877,26 @@ function boot(panel: Panel): void {
     } else if (chip.dataset.district != null) {
       setNamed(named().filter((irn) => irn !== chip.dataset.district));
     }
+    update();
+  });
+
+  /*
+   * The way out of each mode, offered inside the card that is in it.
+   *
+   * The subset's note ends in *draw the whole state behind it*, the spotlight's in *draw only this
+   * selection*, and the refusal under twelve districts sends the reader to the spotlight by name.
+   * Each of those is the control rather than an instruction to go and find the control, and each
+   * sets the same radio a reader would have clicked — so there is one source of truth and one code
+   * path, the way the chips are rendered from the view rather than remembered from the click.
+   *
+   * Delegated from `#scenario-out` because `render` replaces everything inside it on every lever
+   * tick, and a listener bound to a button in there would be thrown away with the button.
+   */
+  $("#scenario-out")?.addEventListener("click", (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>("[data-scope-mode]");
+    const mode = button?.dataset.scopeMode;
+    if (mode !== "spotlight" && mode !== "subset") return;
+    setMode(mode);
     update();
   });
 

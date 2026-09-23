@@ -299,6 +299,38 @@ export function groups(districts: Pick<PanelDistrict, "typology">[]): Group[] {
   return [...found.values()].sort((a, b) => a.code - b.code);
 }
 
+/**
+ * What a selection does to the cloud: light the rest, or remove it.
+ *
+ * # Two modes because they answer two questions
+ *
+ * `spotlight` — the default, and the only one until #379 — draws all 609 districts and lets the
+ * selection decide which are shaded and trailed. It answers *where do my districts sit in the
+ * state*, which is the question a reader arrives with, and it is the only mode that can answer
+ * anything at all for a selection of six: see {@link inScope} for why a subset is refused there.
+ *
+ * `subset` removes the rest. It answers the other question — *how are my districts arranged among
+ * themselves* — which the spotlight genuinely cannot, because six marks among six hundred in a
+ * 640×420 frame are six dots in a crowd however they are shaded. That is the `/county/[slug]`
+ * question, within-county dispersion, asked with a lever in hand.
+ *
+ * # Why this is not a third axis menu
+ *
+ * The axis menus change what is *plotted* and the levers change what is *computed*; the page is
+ * already careful that a reader must not read one as the other. This is a third category again: it
+ * changes who the picture is *about*. So it lives in the scope form with the selection it modifies
+ * rather than beside the axes, and it is not offered at all until there is a selection for it to
+ * mean something to — inert controls are the same defect the typology picker is hidden for.
+ *
+ * # What the frame does not do
+ *
+ * Neither mode refits the axes. `envelope` is measured over all 609 districts across five corner
+ * lever runs, and a subset keeps that frame: a county drawn on the state's ruler is comparable with
+ * the next county and with itself at another lever position, where one fitted to its own six points
+ * would not be. A subset is a smaller population, never a smaller scale.
+ */
+export type ScopeMode = "spotlight" | "subset";
+
 /** How the cloud is drawn, as against what is being drawn. None of this touches the model. */
 export interface View {
   x: DimensionKey;
@@ -321,6 +353,13 @@ export interface View {
   counties: string[];
   /** Districts named one at a time, by IRN. Unioned with `counties`, not intersected with it. */
   districts: string[];
+  /**
+   * What the selection does to everything outside it. Means nothing where there is no selection.
+   *
+   * See {@link ScopeMode}. The default is the spotlight, which is the mode that can draw any
+   * selection at all.
+   */
+  mode: ScopeMode;
 }
 
 export const DEFAULT_VIEW: View = {
@@ -331,6 +370,7 @@ export const DEFAULT_VIEW: View = {
   trails: true,
   counties: [],
   districts: [],
+  mode: "spotlight",
 };
 
 /**
@@ -390,6 +430,17 @@ export function viewFromQuery(params: URLSearchParams): View {
      */
     counties: list(params.get("co"), (v) => /^[a-z0-9-]+$/.test(v)),
     districts: list(params.get("d"), (v) => /^\d{6}$/.test(v)),
+    /*
+     * A key of its own, like every other meaning on this page — see the account above of what
+     * happened when the highlight shared the guarantee rule's `g`.
+     *
+     * Absent is the spotlight, and only an explicit `1` is the subset, which is the rule `t` uses
+     * in the other direction. It is read whether or not a scope came with it: a `?only=1` with no
+     * selection draws exactly what a bare `/reach` draws, because `inScope` returns no scope and a
+     * mode with nothing to subset subsets nothing. Held that way rather than rejected here so the
+     * parser stays a parser, the way an unmatched county slug is.
+     */
+    mode: params.get("only") === "1" ? "subset" : DEFAULT_VIEW.mode,
   };
 }
 
@@ -429,9 +480,27 @@ export function scopeCounties(districts: Pick<PanelDistrict, "county">[]): Scope
 }
 
 /**
+ * The counties that hold enough districts to be drawn on their own.
+ *
+ * The measurement the subset mode turns on, and the one every sentence about it argues from. A
+ * county with fewer than {@link MIN_CLOUD} districts cannot be a cloud, so asking for it alone gets
+ * a refusal rather than a picture — and the refusal has to be able to say how rare that is without
+ * a number typed into the prose. On this feed it is nine of eighty-eight.
+ *
+ * Counted off the panel for the reason {@link scopeCounties} is: a county the department
+ * reattributes a district to moves this figure, and a page that spelled it out would go quietly
+ * stale. It is a *necessary* condition and not a sufficient one — a district with no valuation is
+ * not a drawn point, so a county of twelve can still fall under the floor on the axes actually
+ * chosen, and `renderReach` counts what it drew rather than trusting this.
+ */
+export function cloudCounties(districts: Pick<PanelDistrict, "county">[]): ScopeCounty[] {
+  return scopeCounties(districts).filter((county) => county.districts >= MIN_CLOUD);
+}
+
+/**
  * Which districts the reader is asking about, or `null` for all of them.
  *
- * # Why a scope lights rather than subsets
+ * # Why a scope lights by default, and subsets only on request
  *
  * Because a filter that drew only the selection would draw nothing at all for most of Ohio.
  * `scatterSpec` refuses fewer than twelve points — *"a scatter of three districts would read as a
@@ -451,6 +520,15 @@ export function scopeCounties(districts: Pick<PanelDistrict, "county">[]): Scope
  * shading and their trails, out-of-scope districts are muted and draw none. That is also the move
  * this page already makes for the typology, deliberately — one group against the rest rather than
  * nine hues — and it keeps the shape of the state, which is the thing the cloud says at rest.
+ *
+ * What the second mode changes is only that: {@link ScopeMode}`.subset` removes the context rather
+ * than muting it, for the nine counties and the hand-built selections that hold enough districts to
+ * be a cloud on their own — and `renderReach` refuses below {@link MIN_CLOUD} with the reason
+ * stated rather than drawing a card with a heading, a legend and nothing between them. The frame
+ * does not move either way, which is why a subset is still a comparable picture. Neither the
+ * argument above nor the set this function computes depends on the mode: this is the same set of
+ * districts, drawn against a different background. See {@link cloudCounties} for which counties can
+ * support the second mode at all.
  *
  * # Union, not intersection
  *
@@ -782,13 +860,36 @@ function scopeLabel(
  * shading is a genuine two-way split and takes the validated pair, where `formula` is the hue
  * `SERIES` documents as doubling for "gain".
  *
- * # The scope, which changes what is lit and not what is drawn
+ * # The scope, which changes what is lit and — on request — what is drawn
  *
- * See {@link inScope} for why. Every district stays in the cloud; an out-of-scope one is muted,
- * loses its shading and draws no trail. What that costs is prose: every count a reader reads as an
- * *answer* has to be restated against the scope, because "253 of 609 are paid the same" is a
- * different claim from "4 of 6 in Athens County are". The two counts that stay global are the
- * clipped and the unplaced — both are facts about the drawing, and all 609 are still drawn.
+ * See {@link inScope} for why the default lights rather than subsets. Under the spotlight every
+ * district stays in the cloud; an out-of-scope one is muted, loses its shading and draws no trail.
+ * What that costs is prose: every count a reader reads as an *answer* has to be restated against
+ * the scope, because "253 of 609 are paid the same" is a different claim from "4 of 6 in Athens
+ * County are". The two counts that stay global under the spotlight are the clipped and the
+ * unplaced — both are facts about the drawing, and all 609 are still drawn.
+ *
+ * Under {@link ScopeMode}`.subset` the rest of the state is not drawn at all, and then *those two
+ * become scope-relative as well*. That is the whole of what the second mode costs here, and it is
+ * the part worth being careful about: the unplaced note explains why a district is missing — no
+ * valuation, no report-card share, no typology assigned — and under a subset it must not have to
+ * compete with a fourth reason that is only "you did not select it". It does not, because an
+ * out-of-scope district is dropped before the axes are read, so it is neither drawn nor counted as
+ * unplaced, and the denominator is the selection.
+ *
+ * # The refusal
+ *
+ * A subset that drew fewer than {@link MIN_CLOUD} points would render to the empty string —
+ * `scatterSpec` returns `null` there and `renderToString` draws nothing — so the card would come
+ * out as a heading, a legend and a gap. It refuses instead, in that rule's own terms, and sends the
+ * reader to the spotlight, which can draw any selection.
+ *
+ * # The identity line
+ *
+ * Unchanged, and deliberately. It is a law — a district is paid the larger of its formula amount
+ * and its guarantee — so it holds for six districts exactly as it holds for six hundred, and it is
+ * the one mark on this chart that is not data. A subset gets it on the same gate as the whole
+ * state: the pair of axes, not the population.
  */
 export function renderReach(panel: Panel, levers: Levers, view: View, chip = ""): string {
   const model = modelOf(panel.statewide);
@@ -801,6 +902,14 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
 
   const zero = defaultLevers(model);
   const scope = inScope(panel.districts, view);
+  /*
+   * Whether the rest of the state is removed rather than muted.
+   *
+   * Gated on there *being* a scope, not on the mode alone. A mode with nothing to subset is not a
+   * subset of anything — `?only=1` on a bare `/reach` is the whole state — and deriving it here
+   * once keeps every branch below from having to remember that.
+   */
+  const subset = scope != null && view.mode === "subset";
   const points: ScatterPoint[] = [];
   let unplaced = 0;
   let pinned = 0;
@@ -810,6 +919,15 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
   for (const [i, o] of outcomes.entries()) {
     const d = panel.districts[i]!;
     const inside = scope == null || scope.has(d.irn);
+    /*
+     * Dropped before its coordinates are read, which is what keeps the unplaced count honest.
+     *
+     * Under a subset a district outside the selection is not drawn, and it must not be counted as
+     * *not drawn* either: the note below that accounts for the undrawn is about districts the feed
+     * carries no figure for, and a county's worth of selections would otherwise bury that in six
+     * hundred districts the reader simply did not ask about.
+     */
+    if (subset && !inside) continue;
     // Falls back to the district's own position, which draws no trail — the honest answer if the
     // two runs ever disagreed about the population, rather than a silently missing segment.
     const before = law[i] ?? o;
@@ -880,6 +998,70 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
    */
   const placed = points.length;
 
+  /* What the reader asked about, in words, for the notes and the chart's spoken label. */
+  const asked = scope == null ? "" : scopeLabel(panel.districts, view);
+  /*
+   * The figures the scope notes argue from, read off the panel rather than written into the
+   * sentence. A county the department reattributes moves them; a feed that gained a county moves
+   * them; and `MIN_CLOUD` is the form's own floor rather than a second copy of it.
+   */
+  const allCounties = scope == null ? [] : scopeCounties(panel.districts);
+  const enough = scope == null ? [] : cloudCounties(panel.districts);
+
+  /*
+   * Who every count on this card is about.
+   *
+   * The state under the spotlight, because all 609 are drawn there and a denominator of 609 is what
+   * a reader can check against the picture. The selection under a subset, because nothing else is
+   * on the chart — "3 of 609 districts are not drawn" beside a cloud of Athens County would be a
+   * sentence about a population the reader removed on purpose.
+   */
+  const population = subset ? scope.size : panel.statewide.districts;
+
+  /*
+   * The refusal, and why it is a card rather than a smaller cloud.
+   *
+   * `scatterSpec` returns `null` under `MIN_CLOUD` points and `renderToString` draws nothing for a
+   * null spec, so the alternative to saying this is a heading with a gap under it. The floor is not
+   * a rendering limit and the refusal says so in the rule's own words: at six marks the eye still
+   * takes a shape off the cloud, and the shape it takes is whichever districts happen to be in the
+   * county rather than anything that was measured.
+   *
+   * Counted on what was actually drawn, not on the size of the selection. A county of twelve whose
+   * axes include valuation per pupil can still fall under the floor, because a district the feed
+   * carries no valuation for is not a point — so the two figures are stated separately where they
+   * differ, or the reader is told a number the picture does not have.
+   *
+   * The spotlight is the way out, and it is offered as a control rather than described: it can draw
+   * this selection, and it is one click from here. `data-scope-mode` is delegated from
+   * `#scenario-out` in `scripts/scenario.ts`, because this card is replaced on every lever tick.
+   */
+  if (subset && placed < MIN_CLOUD) {
+    return `
+    <div class="card stage" id="positions" data-part="positions">
+      <h2>${heading("positions", "Where every district stands", chip)}</h2>
+      <p class="note"><strong>${escapeHtml(asked)} is too small to draw on its own.</strong> ${
+        placed === scoped
+          ? `${count(scoped)} district${scoped === 1 ? " is" : "s are"} in the selection`
+          : `${count(scoped)} districts are in the selection and ${count(placed)} of them carry a
+             value on both axes`
+      }, against the ${MIN_CLOUD} points this form will not go below.</p>
+      <p class="note">That floor is not a limit of the drawing. ${
+        placed === 1
+          ? "A single mark still reads as a position"
+          : `A scatter of ${count(placed)} marks still reads as a shape`
+      }, and what it reads as is whichever districts happen to be in the selection — a finding
+        about a population nobody measured. Only <strong>${count(enough.length)} of
+        Ohio's ${count(allCounties.length)} counties</strong> hold ${MIN_CLOUD} districts or more,
+        which is why this is the mode that has to be asked for.</p>
+      <p class="note">The other view answers what this selection can support: every district drawn,
+        ${escapeHtml(asked)} lit, on the frame the whole state is measured on — which is where a
+        position becomes legible in the first place. <button type="button" class="linkish"
+        data-scope-mode="spotlight">Light the selection instead</button>, or select more
+        districts.</p>
+    </div>`;
+  }
+
   /*
    * The fixed frame. See `envelope`: the axes are the same on every lever position, so a district
    * that did not move looks like a district that did not move.
@@ -929,15 +1111,30 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
   const litLabel =
     panel.districts.find((d) => d.typology?.code === view.highlight)?.typology?.short ?? "";
 
-  /* What the reader asked about, in words, for the note and the chart's spoken label. */
-  const asked = scope == null ? "" : scopeLabel(panel.districts, view);
   /*
-   * The two figures the scope note argues from, read off the panel rather than written into the
-   * sentence. A county the department reattributes moves them; a feed that gained a county moves
-   * them; and `MIN_CLOUD` is the form's own floor rather than a second copy of it.
+   * What the chart is spoken as, which is the one place both counts and the scope meet.
+   *
+   * Built here rather than inline because it is now four sentences crossed with two modes, and the
+   * thing that must not drift is the denominator: `population` is the state under the spotlight and
+   * the selection under a subset, so "3 of 6 districts" and "3 of 609" are each said where they are
+   * true. See `population`.
    */
-  const allCounties = scope == null ? [] : scopeCounties(panel.districts);
-  const small = allCounties.filter((c) => c.districts < MIN_CLOUD).length;
+  const drawnLabel =
+    subset
+      ? `${
+          unplaced === 0
+            ? `All ${count(placed)} districts`
+            : `${count(placed)} of the ${count(population)} districts`
+        } in ${asked}`
+      : unplaced === 0
+        ? `Every one of Ohio's ${count(placed)} districts`
+        : `${count(placed)} of Ohio's ${count(population)} districts`;
+  const scopeClause =
+    scope == null
+      ? ""
+      : subset
+        ? ", on the frame the whole state is measured on"
+        : `, of which ${count(scoped)} in ${asked} are drawn as the subject and the rest as context`;
 
   const legend =
     (view.shading === "regime"
@@ -955,8 +1152,11 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
      * neutral and this entry would still have been needed to say so. Under "Gained or lost" neutral
      * already means *unmoved*, and one swatch cannot mean two things — so the channel is opacity
      * and size, and the swatch says which.
+     *
+     * Gone under a subset, where there is no out-of-scope mark on the chart for it to name. A
+     * legend entry for a population that is not drawn is a legend entry a reader looks for.
      */
-    (scope == null
+    (scope == null || subset
       ? ""
       : `<span><i class="sw neutral muted"></i> Outside ${escapeHtml(asked)}, drawn for context</span>`);
 
@@ -985,7 +1185,7 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
             },
           ),
         {
-          label: `${unplaced === 0 ? `Every one of Ohio's ${count(placed)} districts` : `${count(placed)} of Ohio's ${count(panel.statewide.districts)} districts`}, ${dx.label.toLowerCase()} against ${dy.label.toLowerCase()}${view.trails ? ", with a trail from its position under current law" : ""}${scope == null ? "" : `, of which ${count(scoped)} in ${asked} are drawn as the subject and the rest as context`}`,
+          label: `${drawnLabel}, ${dx.label.toLowerCase()} against ${dy.label.toLowerCase()}${view.trails ? ", with a trail from its position under current law" : ""}${scopeClause}`,
           description: `${count(scoped - pinned)} ${scope == null ? "districts" : `of the ${count(scoped)} districts in scope`} are paid differently under these settings and ${count(pinned)} are paid the same.${wall ? " No district can fall below the diagonal, where realized aid equals formula aid; a district drawn above it is held by the guarantee and the vertical distance is what the guarantee pays it. A trail that runs flat is a district whose formula amount moved and whose payment did not." : ""}`,
         },
       )}</div>
@@ -998,8 +1198,8 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
              then does a further dollar of base cost reach it. `
           : ""
       }<strong>${count(pinned)} of ${count(scoped)}</strong> ${
-        scope == null ? "districts are" : `districts in ${escapeHtml(asked)} are`
-      } paid
+        scope == null ? "districts" : `districts in ${escapeHtml(asked)}`
+      } ${pinned === 1 ? "is" : "are"} paid
         exactly what current law pays them under these settings.${
           view.trails
             ? " Each district is drawn from where current law puts it to where these levers do, so a trail with no vertical component is a district whose payment did not move."
@@ -1010,7 +1210,22 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
       ${
         scope == null
           ? ""
-          : `<p class="note"><strong>The other ${count(placed - scoped)} districts are still
+          : subset
+            ? `<p class="note"><strong>Only ${escapeHtml(asked)} is drawn.</strong> The other ${
+                count(panel.statewide.districts - scope.size)
+              } districts are not on this chart and not in any count on it. <strong>The frame is
+               still the state's</strong>: the axes are measured across every setting these levers
+               can reach and over all ${
+                 count(panel.statewide.districts)
+               } districts, so this selection sits where the state puts it rather than filling a
+               ruler fitted to its own points — which is what lets you compare it with another
+               county, and with itself at another lever position.${
+                 wall
+                   ? " The diagonal is the law rather than a fit, so it is drawn for any population: nothing can sit below it here either."
+                   : ""
+               } <button type="button" class="linkish" data-scope-mode="spotlight">Draw the whole
+               state behind it</button> to put the selection back in its context.</p>`
+            : `<p class="note"><strong>The other ${count(placed - scoped)} districts are still
              drawn</strong>, muted, and they are not in any count above. A selection here changes
              what is <em>lit</em> rather than what is plotted, for two reasons. The frame is measured
              across every setting these levers can reach and over all ${
@@ -1019,15 +1234,24 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
              move — fitting it to a county instead would put the ruler back on the move. And most
              selections are not a cloud: this form refuses fewer than ${MIN_CLOUD} points, because a
              scatter of three districts reads as a finding about a population nobody measured, and ${
-               count(small)
+               count(allCounties.length - enough.length)
              } of Ohio's ${count(allCounties.length)} counties hold fewer than ${
                MIN_CLOUD
              } districts. The shape of the state behind your selection is what makes a position in
-             it legible.</p>`
+             it legible.${
+               scoped >= MIN_CLOUD
+                 ? ` This selection is large enough to stand on its own: <button type="button"
+                    class="linkish" data-scope-mode="subset">draw only ${
+                      escapeHtml(asked)
+                    }</button> to see how its districts are arranged among themselves.`
+                 : ""
+             }</p>`
       }
       ${
         outside > 0
-          ? `<p class="note"><strong>${count(outside)} of ${count(placed)} districts sit outside
+          ? `<p class="note"><strong>${count(outside)} of ${count(placed)} ${
+              subset ? `drawn districts in ${escapeHtml(asked)}` : "districts"
+            } ${outside === 1 ? "sits" : "sit"} outside
              the frame.</strong> The axes are fixed across every setting the levers can reach, so
              that a district which did not move looks like one that did not move — and they are
              sized to hold ${pct(FRAME_QUANTILE, 0)} of districts rather than all of them.
@@ -1039,9 +1263,14 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
       }
       ${
         unplaced > 0
-          ? `<p class="note"><strong>${count(unplaced)} of ${count(panel.statewide.districts)}
-             districts are not drawn.</strong> The feed carries no value for at least one of the
-             two axes chosen. Three quantities here can be missing: valuation per pupil and the
+          ? `<p class="note"><strong>${count(unplaced)} of ${count(population)} ${
+              subset ? `districts in ${escapeHtml(asked)}` : "districts"
+            } ${unplaced === 1 ? "is" : "are"} not drawn.</strong> The feed carries no value
+             for at least one of the two axes chosen${
+               subset
+                 ? " — not because you did not select them, which is a different absence and is accounted for above"
+                 : ""
+             }. Three quantities here can be missing: valuation per pupil and the
              report card's disadvantaged share, which the feed does not always carry, and the
              department's typology, which it declines to assign to five districts — three of them
              in this panel. A district placed at zero for want of a figure would be a point
