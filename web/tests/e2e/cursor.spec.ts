@@ -245,6 +245,7 @@ test("every invisible hover target names the mark it brightens, or is named as h
   const declared = [...layers].filter(([, l]) => l.paired).map(([cls]) => cls);
   expect(declared.sort(), "the layers that pair").toEqual([
     "dist-hit",
+    "plane-hit",
     "range-hit",
     "rank-hit",
     "scatter-hit",
@@ -265,6 +266,11 @@ test.describe("the cursor's second channel", () => {
     { route: "/counties", hit: ".range-hit", mark: ".range-high" },
     { route: "/district/043786", hit: ".dist-hit", mark: ".dist-dot" },
     { route: "/bounds", hit: ".rank-hit", mark: ".rank-dot" },
+    {
+      route: "/wiki/formula-component/temporary-transitional-aid-guarantee",
+      hit: ".plane-hit",
+      mark: ".plane-dot",
+    },
   ]) {
     test(`brightens the ${mark.slice(1)} under the ring on ${route}`, async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 900 });

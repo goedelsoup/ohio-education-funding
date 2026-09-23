@@ -22,7 +22,11 @@ import {
   formatRow,
   loadSeriesManifest,
   type ManifestSeries,
+  type ManifestPlane,
+  multiplesOf,
   panelsOf,
+  placesOf,
+  positionsAgainstFigures,
   READS_SERIES_CONTRACT,
   rowsAgainstFigures,
   type SeriesDiscrepancyKind,
@@ -57,12 +61,18 @@ test("the two committed manifests agree on every number printed on a panel", () 
   expect(fitsAgainstFigures(manifest, figures)).toEqual([]);
 });
 
+test("the two committed manifests agree on both coordinates of every position", () => {
+  expect(positionsAgainstFigures(manifest, figures)).toEqual([]);
+});
+
 /**
  * The coverage floor, at the value and not under it, on the figure ratchet's standing rule:
  * recount with the expressions below rather than incrementing the last stated number.
  *
- * One series and one carrier: `dispersion/fy2016-step-by-business-class` on
- * `education-agency/toledo-city`, which is #416's finding drawn as the four bars it was found by.
+ * Four series over two carriers: `dispersion/fy2016-step-by-business-class` on
+ * `education-agency/toledo-city`, which is #416's finding drawn as the four bars it was found by,
+ * and #444's three on `formula-component/temporary-transitional-aid-guarantee` — the plane the two
+ * axes disagree on, and one grouped series per axis drawn as seven panels each.
  *
  * Every computation the manifest exports is drawn *somewhere*, and there are two somewheres: a
  * node's `series:` block, and a page declared in `PAGE_SERIES`. The sum is the assertion, because
@@ -71,19 +81,24 @@ test("the two committed manifests agree on every number printed on a panel", () 
  */
 test("the corpus draws no fewer series than it did", () => {
   const drawn = corpus.nodes.flatMap((node) => node.series);
-  expect(drawn.length, "1 series binding; raise this when you add one").toBeGreaterThanOrEqual(1);
+  expect(drawn.length, "4 series bindings; raise this when you add one").toBeGreaterThanOrEqual(4);
   expect(
     corpus.nodes.filter((node) => node.series.length > 0).length,
-    "1 node draws a series; raise this when a second does",
-  ).toBeGreaterThanOrEqual(1);
+    "2 nodes draw a series; raise this when a third does",
+  ).toBeGreaterThanOrEqual(2);
   expect(
     new Set([...drawn.map((binding) => binding.key), ...Object.keys(PAGE_SERIES)]).size,
-    "every series and cloud the manifest exports is drawn by some node or page",
-  ).toBe(manifest.series.length + manifest.scatters.length);
+    "every series, cloud and plane the manifest exports is drawn by some node or page",
+  ).toBe(manifest.series.length + manifest.scatters.length + manifest.planes.length);
   expect(
     manifest.scatters.length,
     "1 cloud: project/what-the-capacity-tiers-index-measures on formula-component/" +
       "fsfp-targeted-assistance; raise this when you add one",
+  ).toBeGreaterThanOrEqual(1);
+  expect(
+    manifest.planes.length,
+    "1 plane: project/what-each-anchor-rule-costs-on-both-axes on formula-component/" +
+      "temporary-transitional-aid-guarantee; raise this when you add one",
   ).toBeGreaterThanOrEqual(1);
 });
 
@@ -197,6 +212,7 @@ function fixture(): { node: Node; series: SeriesManifest; figures: Manifest } {
   const series: SeriesManifest = {
     contract: READS_SERIES_CONTRACT,
     scatters: [],
+    planes: [],
     series: [
       {
         key: "dispersion/by-class",
@@ -421,6 +437,7 @@ function cloudFixture(): { node: Node; series: SeriesManifest; figures: Manifest
   const series: SeriesManifest = {
     contract: READS_SERIES_CONTRACT,
     series: [],
+    planes: [],
     scatters: [
       {
         key: "project/what-it-measures",
@@ -580,4 +597,271 @@ test("the committed cloud is drawn at one scale, so a slope is an angle", () => 
       expect(end[1]).toBeLessThanOrEqual(panel.y.max);
     }
   }
+});
+
+// --- The plane, which is held at every position on both of its axes ----------------------------
+
+/**
+ * A node drawing a plane, correct in every position, and the manifests it is correct against.
+ *
+ * Cut separately from {@link fixture} and {@link cloudFixture} for the reason given above the
+ * second of those: a node binding two shapes reports every owner-level defect once per binding,
+ * and each mutation below would then assert a count rather than a kind.
+ *
+ * Three positions rather than the committed seven, and both axes signed, because the property the
+ * plane exists for is that a rule can be *cheaper* on one axis and *dearer* on the other. One
+ * point in each of the two quadrants that says so, and one that agrees with itself.
+ */
+function planeFixture(): { node: Node; series: SeriesManifest; figures: Manifest } {
+  const prose =
+    "The cap takes $107,611,728.73 off the guarantee and adds $10,287,443.63 to total state " +
+    "support; the ratchet adds $57,298,691.08 of guarantee and $52,907,613.45 of support; the " +
+    "mirror beside moves the guarantee column by $0.00 and pays $135,300,935.56. [verified] " +
+    "(`crates/project`)";
+  const bind = (key: string, value: number, as_written: string) =>
+    ({ key, value, field: "description", as_written }) as const;
+  const node: Node = {
+    id: "formula-component/example-plane",
+    className: "formula-component",
+    name: "example-plane",
+    label: "Example plane",
+    summary: "The two axes disagree.",
+    description: prose,
+    linkText: prose,
+    properties: [],
+    findings: null,
+    revisions: [],
+    unfilled: [],
+    figures: [
+      bind("project/cap-guarantee-cut", 107_611_728.73, "$107,611,728.73"),
+      bind("project/cap-support-gain", 10_287_443.63, "$10,287,443.63"),
+      bind("project/ratchet-guarantee", 57_298_691.08, "$57,298,691.08"),
+      bind("project/ratchet-support", 52_907_613.45, "$52,907,613.45"),
+      bind("project/mirror-guarantee", 0, "$0.00"),
+      bind("project/mirror-support-gain", 135_300_935.56, "$135,300,935.56"),
+    ],
+    series: [{ key: "project/what-each-rule-costs", field: "description" }],
+    out: [],
+    in: [],
+  };
+  const axis = (label: string, min: number, max: number) =>
+    ({ label, unit: "dollars", min, max, log: false }) as const;
+  const plane: ManifestPlane = {
+    key: "project/what-each-rule-costs",
+    owner: "crates/project",
+    subject: "anchor rule",
+    label: "What each rule costs on both axes",
+    x: axis("Guarantee written", -1.2e8, 6.3e7),
+    y: axis("Total state support", -1e7, 1.4e8),
+    points: [
+      {
+        label: "1% cap at FY2036",
+        x: -107_611_728.73,
+        y: 10_287_443.63,
+        xFigure: "project/cap-guarantee-cut",
+        yFigure: "project/cap-support-gain",
+      },
+      {
+        label: "the ratchet",
+        x: 57_298_691.08,
+        y: 52_907_613.45,
+        xFigure: "project/ratchet-guarantee",
+        yFigure: "project/ratchet-support",
+      },
+      {
+        label: "mirror beside",
+        x: 0,
+        y: 135_300_935.56,
+        xFigure: "project/mirror-guarantee",
+        yFigure: "project/mirror-support-gain",
+      },
+    ],
+  };
+  const series: SeriesManifest = {
+    contract: READS_SERIES_CONTRACT,
+    series: [],
+    scatters: [],
+    planes: [plane],
+  };
+  const dollars = (key: string, value: number, label: string) =>
+    ({ key, owner: "crates/project", unit: "dollars", value, label }) as const;
+  const figures: Manifest = {
+    contract: READS_CONTRACT,
+    figures: [
+      dollars("project/cap-guarantee-cut", 107_611_728.73, "The cap's guarantee cut"),
+      dollars("project/cap-support-gain", 10_287_443.63, "The cap's support gain"),
+      dollars("project/ratchet-guarantee", 57_298_691.08, "The ratchet's guarantee"),
+      dollars("project/ratchet-support", 52_907_613.45, "The ratchet's support"),
+      dollars("project/mirror-guarantee", 0, "The mirror beside's guarantee"),
+      dollars("project/mirror-support-gain", 135_300_935.56, "The mirror beside's support gain"),
+    ],
+  };
+  return { node, series, figures };
+}
+
+test("the plane fixture the mutations are cut from is itself clean", () => {
+  const { node, series, figures: mine } = planeFixture();
+  expect(kinds(node, series)).toEqual([]);
+  expect(positionsAgainstFigures(series, mine)).toEqual([]);
+});
+
+test("position-unbound: the node does not bind the x of a point the plane prints", () => {
+  const { node, series } = planeFixture();
+  node.figures = node.figures.filter((f) => f.key !== "project/cap-guarantee-cut");
+  expect(kinds(node, series)).toEqual(["position-unbound"]);
+});
+
+test("position-unbound: the node does not bind the y of a point the plane prints", () => {
+  const { node, series } = planeFixture();
+  node.figures = node.figures.filter((f) => f.key !== "project/mirror-support-gain");
+  expect(kinds(node, series)).toEqual(["position-unbound"]);
+});
+
+test("position-unbound: a point bound on neither axis is two findings, not one", () => {
+  const { node, series } = planeFixture();
+  node.figures = node.figures.filter((f) => !f.key.startsWith("project/ratchet-"));
+  expect(kinds(node, series)).toEqual(["position-unbound", "position-unbound"]);
+});
+
+test("unknown-key: the node draws a plane the manifest does not carry", () => {
+  const { node, series } = planeFixture();
+  node.series[0]!.key = "project/what-each-rule-costs-renamed";
+  expect(kinds(node, series)).toEqual(["unknown-key", "uncited-series"]);
+});
+
+test("unattributed: the node draws a crate's plane and cites that crate nowhere", () => {
+  const { node, series } = planeFixture();
+  node.description = node.description.replace(" (`crates/project`)", "");
+  node.linkText = node.description;
+  expect(kinds(node, series)).toEqual(["unattributed"]);
+});
+
+test("uncited-series: the manifest exports a plane no node draws", () => {
+  const { node, series } = planeFixture();
+  series.planes.push({ ...series.planes[0]!, key: "project/what-each-rule-costs-again" });
+  expect(kinds(node, series)).toEqual(["uncited-series"]);
+});
+
+test("the two manifests are held to each other, coordinate by figure", () => {
+  const { series, figures: mine } = planeFixture();
+  // A sign is not a disagreement: the coordinate is signed and the figure is a magnitude, which
+  // is why the cap's x is negative and its key says `-cut`.
+  expect(positionsAgainstFigures(series, mine)).toEqual([]);
+  // A different magnitude is, on either axis, and one point can be wrong on both at once.
+  series.planes[0]!.points[0]!.x = -107_611_728.74;
+  expect(positionsAgainstFigures(series, mine)).toHaveLength(1);
+  series.planes[0]!.points[0]!.y = 10_287_443.64;
+  expect(positionsAgainstFigures(series, mine)).toHaveLength(2);
+  series.planes[0]!.points[0]!.x = -107_611_728.73;
+  series.planes[0]!.points[0]!.y = 10_287_443.63;
+  // As is a figure the other document lacks, or one on the wrong unit.
+  series.planes[0]!.points[1]!.yFigure = "project/absent";
+  expect(positionsAgainstFigures(series, mine)).toHaveLength(1);
+  series.planes[0]!.points[1]!.yFigure = "project/ratchet-support";
+  // The unit is the axis', so changing it puts every point on that axis on the wrong one.
+  series.planes[0]!.y.unit = "pupils";
+  expect(positionsAgainstFigures(series, mine)).toHaveLength(3);
+});
+
+test("a plane becomes one named place per rule, both coordinates signed and spoken", () => {
+  const { series } = planeFixture();
+  const places = placesOf(series.planes[0]!);
+  expect(places.map((place) => place.label)).toEqual([
+    "1% cap at FY2036",
+    "the ratchet",
+    "mirror beside",
+  ]);
+  expect(places.map((place) => [place.x, place.y])).toEqual([
+    [-107_611_728.73, 10_287_443.63],
+    [57_298_691.08, 52_907_613.45],
+    [0, 135_300_935.56],
+  ]);
+  // The hover carries both axes by name, because a dot on a plane says nothing on its own about
+  // which measure is which — and it carries the sign, which is the finding.
+  expect(places[0]!.hover).toBe(
+    "1% cap at FY2036: Guarantee written −$107,611,729, Total state support +$10,287,444",
+  );
+});
+
+test("the committed plane holds zero on both axes, and every position inside the frame", () => {
+  const plane = manifest.planes.find(
+    (p) => p.key === "project/what-each-anchor-rule-costs-on-both-axes",
+  );
+  expect(plane).toBeDefined();
+  for (const axis of [plane!.x, plane!.y]) {
+    // Zero is the rule in force. A frame that excludes it would put every rule on the same side
+    // of nothing and lose the only reading the picture is for.
+    expect(axis.min).toBeLessThanOrEqual(0);
+    expect(axis.max).toBeGreaterThanOrEqual(0);
+    expect(axis.log).toBe(false);
+  }
+  for (const point of plane!.points) {
+    expect(point.x).toBeGreaterThanOrEqual(plane!.x.min);
+    expect(point.x).toBeLessThanOrEqual(plane!.x.max);
+    expect(point.y).toBeGreaterThanOrEqual(plane!.y.min);
+    expect(point.y).toBeLessThanOrEqual(plane!.y.max);
+  }
+});
+
+test("the committed plane is the finding: three rules cheaper on one axis and dearer on the other", () => {
+  const plane = manifest.planes.find(
+    (p) => p.key === "project/what-each-anchor-rule-costs-on-both-axes",
+  )!;
+  const disagreeing = plane.points.filter((p) => p.x < 0 && p.y > 0).map((p) => p.label);
+  expect(disagreeing).toEqual([
+    "A 1% cap, FY2036 undamped",
+    "A rolling pupil count",
+    "[M] mirrored inside [H]",
+  ]);
+  // And nothing runs the other way. That asymmetry is what the two-column table cannot show.
+  expect(plane.points.filter((p) => p.x > 0 && p.y < 0)).toEqual([]);
+});
+
+// --- The small multiples, which share one scale inside a set and none across two ---------------
+
+test("a grouped series becomes one panel per group, on a scale that spans every panel", () => {
+  const { series } = fixture();
+  const rows = series.series[0]!.rows;
+  series.series[0]!.rows = [
+    { ...rows[0]!, group: "A", label: "Least wealthy", value: 166.55 },
+    { ...rows[1]!, group: "A", label: "Wealthiest", value: -83.51 },
+    { ...rows[2]!, group: "B", label: "Least wealthy", value: 4.06 },
+  ];
+  const multiples = multiplesOf(series.series[0]!)!;
+  expect(multiples.panels.map((panel) => panel.label)).toEqual(["A", "B"]);
+  expect(multiples.panels.map((panel) => panel.bars.length)).toEqual([2, 1]);
+  // One scale across the set, taken over every row and not over the panel it lands in: B's lone
+  // 4.06 is drawn against A's 166.55, which is what makes the panels comparable at a glance.
+  expect(multiples.max).toBe(166.55);
+  expect(multiples.min).toBe(-83.51);
+  // The panel's own name is in the tooltip, because the tooltip is read with nothing beside it.
+  expect(multiples.panels[1]!.bars[0]!.hover).toContain("B — Least wealthy");
+});
+
+test("an ungrouped series is not a small multiple, and says so rather than drawing one panel", () => {
+  const { series } = fixture();
+  expect(multiplesOf(series.series[0]!)).toBeNull();
+  // Nor is a series grouped in part: a panel with no name is not a panel.
+  series.series[0]!.rows[0]!.group = "A";
+  expect(multiplesOf(series.series[0]!)).toBeNull();
+});
+
+test("the committed panels are grouped seven ways and scaled once per axis", () => {
+  const keys = [
+    "project/what-each-anchor-rule-pays-by-wealth",
+    "project/what-each-anchor-rule-pays-by-disadvantaged-share",
+  ];
+  const scales = keys.map((key) => {
+    const series = manifest.series.find((s) => s.key === key);
+    expect(series, `${key} is not in the manifest`).toBeDefined();
+    const multiples = multiplesOf(series!);
+    expect(multiples, `${key} is not grouped, so it cannot be drawn as panels`).not.toBeNull();
+    expect(multiples!.panels).toHaveLength(7);
+    for (const panel of multiples!.panels) expect(panel.bars).toHaveLength(5);
+    return multiples!.max;
+  });
+  // #444's care note: the two axes differ by two orders of magnitude in the first fifth, so one
+  // scale across both would flatten the second panel into nothing. They are separate documents
+  // precisely so that the scale cannot be shared — asserted here so a later merge cannot.
+  expect(scales[0]).not.toBe(scales[1]);
 });

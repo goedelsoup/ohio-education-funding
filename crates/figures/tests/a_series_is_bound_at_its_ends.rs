@@ -16,8 +16,8 @@
 use std::collections::BTreeSet;
 
 use figures::{
-    compute_all, compute_all_scatters, compute_all_series, Row, FIGURES, SCATTERS, SERIES,
-    SERIES_CONTRACT_VERSION,
+    compute_all, compute_all_planes, compute_all_scatters, compute_all_series, Row, FIGURES,
+    PLANES, SCATTERS, SERIES, SERIES_CONTRACT_VERSION,
 };
 
 /// The rows a reader would quote: the top of the chart and the bottom of it.
@@ -161,13 +161,18 @@ fn every_string_is_safe_to_write_unescaped() {
             s.label
         );
         assert!(!s.axis.is_empty(), "{}: the axis is unnamed", s.key);
+        // Distinct within a group rather than within the series, because `Row::group` is a
+        // second level of the axis: a panel of seven rules with five wealth fifths each is
+        // thirty-five rows and five labels, and the pair is what names one of them. Where a
+        // series has no groups this is the old assertion unchanged.
         let mut labels = BTreeSet::new();
         for r in &entry.rows {
             assert!(!r.label.is_empty(), "{}: a row has no label", s.key);
             assert!(
-                labels.insert(r.label),
-                "{}: two rows are labelled {:?}",
+                labels.insert((r.group, r.label)),
+                "{}: two rows of {:?} are labelled {:?}",
                 s.key,
+                r.group.unwrap_or("the series"),
                 r.label
             );
             assert!(
@@ -224,8 +229,8 @@ fn the_document_is_readable_and_complete() {
     );
     assert_eq!(
         json.matches("{\"key\": ").count(),
-        SERIES.len() + SCATTERS.len(),
-        "every series and every cloud is written exactly once"
+        SERIES.len() + SCATTERS.len() + PLANES.len(),
+        "every series, every cloud and every plane is written exactly once"
     );
     let rows: usize = compute_all_series().iter().map(|e| e.rows.len()).sum();
     // Per cloud: every point, every panel, and every axis, which is the shared x and one y per
@@ -234,15 +239,21 @@ fn the_document_is_readable_and_complete() {
         .iter()
         .map(|e| e.cloud.points.len() + 2 * e.cloud.panels.len() + 1)
         .sum();
+    // And per plane: every position, and its two axes. No panels, because a plane is one frame.
+    let placed: usize = compute_all_planes()
+        .iter()
+        .map(|e| e.positions.points.len() + 2)
+        .sum();
     assert_eq!(
         json.matches("{\"label\": ").count(),
-        rows + drawn,
-        "every row, panel, axis and point is written exactly once"
+        rows + drawn + placed,
+        "every row, panel, axis, point and position is written exactly once"
     );
     for key in SERIES
         .iter()
         .map(|s| s.key)
         .chain(SCATTERS.iter().map(|s| s.key))
+        .chain(PLANES.iter().map(|p| p.key))
     {
         assert!(
             json.contains(&format!("\"key\": \"{key}\"")),
@@ -485,6 +496,214 @@ fn every_cloud_key_is_unique_and_names_its_owner() {
                 !text.contains(['"', '\\']) && !text.chars().any(char::is_control),
                 "{}: {text:?} carries a character the manifest writer cannot escape",
                 s.key
+            );
+        }
+    }
+}
+
+/// The endpoint rule as a plane has it, which is the strictest form: **every** position names a
+/// figure for each of its two coordinates.
+///
+/// A series binds its ends and a cloud binds its fit, because in both cases those are the numbers
+/// a reader can actually quote. A plane of seven named policies is different: every point is
+/// labelled, every point is quotable by name, and both of its coordinates are readable off the
+/// frame. So there is no end to bind and no line to pin — there is only all of them.
+#[test]
+fn every_position_names_a_figure_for_both_of_its_coordinates() {
+    for entry in compute_all_planes() {
+        let p = entry.plane;
+        assert!(
+            !entry.positions.points.is_empty(),
+            "{}: a plane with no positions",
+            p.key
+        );
+        for point in &entry.positions.points {
+            for (what, key) in [("x", point.x_figure), ("y", point.y_figure)] {
+                assert!(
+                    !key.is_empty(),
+                    "{}: the position {:?} is placed on {what} and names no figure for it. Bind \
+                     it as an ordinary figure in FIGURES first; a plane names its points, so \
+                     every coordinate on it is a number a reader can quote.",
+                    p.key,
+                    point.label
+                );
+            }
+        }
+    }
+}
+
+/// Every figure a position names exists, is measured in its axis' unit, and reproduces the
+/// coordinate in magnitude.
+///
+/// Magnitude for the reason a row and a fit are compared that way: the figure manifest exports a
+/// signed quantity unsigned with the direction in its key, because the corpus' numeral reader
+/// cannot see a minus. Here that is not a technicality — the sign of each coordinate *is* the
+/// finding, so it is drawn rather than written, and the key says which way it went.
+#[test]
+fn a_position_reproduces_the_figures_it_names() {
+    let figures = compute_all();
+    for entry in compute_all_planes() {
+        let p = entry.plane;
+        for point in &entry.positions.points {
+            for (what, key, value, unit) in [
+                ("x", point.x_figure, point.x, entry.positions.x.unit),
+                ("y", point.y_figure, point.y, entry.positions.y.unit),
+            ] {
+                let figure = figures
+                    .iter()
+                    .find(|c| c.figure.key == key)
+                    .unwrap_or_else(|| {
+                        panic!(
+                            "{}: the position {:?} names {key} for its {what}, which FIGURES \
+                             does not carry",
+                            p.key, point.label
+                        )
+                    });
+                assert_eq!(
+                    figure.figure.unit, unit,
+                    "{}: the {what} axis is measured in {unit:?} and {key} in {:?}",
+                    p.key, figure.figure.unit
+                );
+                let drift = (value.abs() - figure.figure.pinned).abs();
+                assert!(
+                    drift <= figure.figure.tolerance,
+                    "{}: the position {:?} is at {what} = {value} and names {key}, pinned at {} \
+                     \u{2014} {drift} apart in magnitude, tolerating {}. The two are meant to be \
+                     one computation; if they have diverged, the plane is drawing something the \
+                     corpus does not quote.",
+                    p.key,
+                    point.label,
+                    figure.figure.pinned,
+                    figure.figure.tolerance
+                );
+            }
+        }
+    }
+}
+
+/// Both axes of every plane are linear, hold every position, and hold **zero**.
+///
+/// Zero is not a data value here and it is the most important place on the picture: it is the
+/// rule in force, and a plane exists to say which side of it a policy falls on for each of two
+/// measures at once. An axis fitted to the points alone would drop it the moment every point
+/// landed on one side, and then the drawing would show a spread where the claim is a sign.
+#[test]
+fn every_axis_of_every_plane_holds_zero_and_every_position() {
+    for entry in compute_all_planes() {
+        let p = entry.plane;
+        let axes = [("x", &entry.positions.x), ("y", &entry.positions.y)];
+        for (what, axis) in axes {
+            assert!(
+                !axis.log,
+                "{}: the {what} axis is signed, and a log axis cannot place a negative",
+                p.key
+            );
+            assert!(
+                axis.min <= 0.0 && axis.max >= 0.0,
+                "{}: the {what} axis runs {} to {} and does not hold zero, which is the rule in \
+                 force and the line the whole plane is read against",
+                p.key,
+                axis.min,
+                axis.max
+            );
+        }
+        for point in &entry.positions.points {
+            for (what, axis, value) in [
+                ("x", &entry.positions.x, point.x),
+                ("y", &entry.positions.y, point.y),
+            ] {
+                assert!(
+                    value.is_finite() && value >= axis.min && value <= axis.max,
+                    "{}: the position {:?} is at {what} = {value}, outside the drawn {} to {}",
+                    p.key,
+                    point.label,
+                    axis.min,
+                    axis.max
+                );
+            }
+        }
+    }
+}
+
+/// Plane keys are unique, name their owner's directory, and collide with nothing already keyed.
+#[test]
+fn every_plane_key_is_unique_and_names_its_owner() {
+    let taken: BTreeSet<&str> = FIGURES
+        .iter()
+        .map(|f| f.key)
+        .chain(SERIES.iter().map(|s| s.key))
+        .chain(SCATTERS.iter().map(|s| s.key))
+        .collect();
+    let mut seen = BTreeSet::new();
+    for p in PLANES {
+        assert!(seen.insert(p.key), "{}: two planes share this key", p.key);
+        assert!(
+            !taken.contains(p.key),
+            "{}: is also a figure, series or cloud key, and a corpus node could not say which it \
+             bound",
+            p.key
+        );
+        let directory = p
+            .owner
+            .strip_prefix("crates/")
+            .unwrap_or_else(|| panic!("{}: owner {:?} is not under crates/", p.key, p.owner));
+        assert!(
+            p.key.starts_with(&format!("{directory}/")),
+            "{}: owned by {} and so should be keyed `{directory}/…`",
+            p.key,
+            p.owner
+        );
+        assert!(
+            p.key
+                .chars()
+                .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-' || c == '/'),
+            "{}: keys are lower-case kebab so a corpus node can hold one without quoting",
+            p.key
+        );
+        assert!(
+            p.label.len() > 20,
+            "{}: {:?} does not say what the plane is",
+            p.key,
+            p.label
+        );
+        assert!(
+            !p.subject.is_empty() && p.subject == p.subject.to_lowercase(),
+            "{}: the subject is what one point is, singular and lower case",
+            p.key
+        );
+    }
+}
+
+/// Every position is labelled, and distinctly, so the two coordinates belong to a named thing.
+#[test]
+fn every_position_is_named_and_writable() {
+    for entry in compute_all_planes() {
+        let p = entry.plane;
+        let mut seen = BTreeSet::new();
+        for point in &entry.positions.points {
+            assert!(
+                !point.label.is_empty(),
+                "{}: a position has no label, and a plane is quoted by name",
+                p.key
+            );
+            assert!(
+                seen.insert(point.label.as_str()),
+                "{}: two positions are labelled {:?}",
+                p.key,
+                point.label
+            );
+        }
+        let strings = [p.key, p.owner, p.label, p.subject]
+            .into_iter()
+            .chain(entry.positions.points.iter().map(|q| q.label.as_str()))
+            .chain(entry.positions.points.iter().map(|q| q.x_figure))
+            .chain(entry.positions.points.iter().map(|q| q.y_figure))
+            .chain([entry.positions.x.label, entry.positions.y.label]);
+        for text in strings {
+            assert!(
+                !text.contains(['"', '\\']) && !text.chars().any(char::is_control),
+                "{}: {text:?} carries a character the manifest writer cannot escape",
+                p.key
             );
         }
     }

@@ -95,6 +95,31 @@
 //! long enough horizon the 1% cap does both. That is the fiscal framing #390 and #400 used, and
 //! it survives the cut.
 //!
+//! # Three of the seven write less guarantee and pay more money
+//!
+//! [`aggregate`] totals a rule on both axes at once, and the two do not have to agree in sign.
+//! Outside the cluster, over the 520:
+//!
+//! | rule | guarantee written | total state support |
+//! |---|--:|--:|
+//! | a ratchet, FY2032 | +$57.3m | +$52.9m |
+//! | a 2% cap, FY2032 | −$167.6m | −$59.4m |
+//! | **a 1% cap, FY2036 undamped** | **−$107.6m** | **+$10.3m** |
+//! | **a rolling pupil count** | **−$14.7m** | **+$66.2m** |
+//! | **`[M]` mirrored inside `[H]`** | **−$70.5m** | **+$62.2m** |
+//! | `[M]` mirrored beside `[L]`, `[M]`, `[O]` | $0 | +$135.3m |
+//! | a dated phase-down | $0 | $0 |
+//!
+//! The three in bold are cheaper on the headline and dearer in aggregate, by the mechanism `[K]`
+//! supplies all through this module: a district the alternative floor drops falls back onto a
+//! formula amount larger than the guarantee it lost. Nothing here runs the other way — no rule
+//! writes more guarantee and pays less — so the guarantee column is not merely noisy about the
+//! money, it is biased in one direction, and the bias is largest where the rule is gentlest.
+//!
+//! The mirror beside every floor is the case that settles whether the second axis is necessary
+//! or merely interesting: it is the dearest rule priced here, at more than twice the ratchet,
+//! and the guarantee column cannot see it at all.
+//!
 //! # What this rests on
 //!
 //! The supplement arms of [`under_supplement`] are the per-district form of the aggregates
@@ -578,6 +603,64 @@ pub fn spread(movements: &[Movement], exclude: &BTreeSet<String>) -> Spread {
     if out.gained > 0.0 {
         out.top_ten_share_of_gains =
             gains.iter().take(10).map(|g| g.1).sum::<Dollars>() / out.gained;
+    }
+    out
+}
+
+/// What a rule costs on each of the two axes at once, over the districts not excluded.
+///
+/// The guarantee written and the total state support paid are different measures and they do not
+/// have to agree in sign: a rule that writes *less* guarantee than the enacted anchor can still
+/// raise total support, because a district the alternative floor drops falls back onto a formula
+/// amount that is larger than the guarantee it lost. A table that reports one column at a time
+/// cannot show that; a point at ([`Aggregate::guarantee_delta`], [`Aggregate::delta`]) can.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Aggregate {
+    /// Districts measured — those not excluded.
+    pub districts: usize,
+    /// The change in guarantee written, against the enacted anchor.
+    pub guarantee_delta: Dollars,
+    /// The change in total state support, against the enacted anchor.
+    pub delta: Dollars,
+    /// Districts the enacted anchor holds.
+    pub held_as_enacted: usize,
+    /// Districts the alternative holds.
+    pub held_under_alternative: usize,
+}
+
+impl Aggregate {
+    /// Whether the two axes disagree in sign — the finding this measure exists to find.
+    #[must_use]
+    pub fn axes_disagree(&self) -> bool {
+        self.guarantee_delta * self.delta < 0.0
+            && self.guarantee_delta.abs() > HELD
+            && self.delta.abs() > HELD
+    }
+}
+
+/// Total a movement set on both axes at once, over the districts not excluded.
+#[must_use]
+pub fn aggregate(movements: &[Movement], exclude: &BTreeSet<String>) -> Aggregate {
+    let mut out = Aggregate {
+        districts: 0,
+        guarantee_delta: 0.0,
+        delta: 0.0,
+        held_as_enacted: 0,
+        held_under_alternative: 0,
+    };
+    for movement in movements
+        .iter()
+        .filter(|movement| !exclude.contains(&movement.irn))
+    {
+        out.districts += 1;
+        out.delta += movement.delta();
+        out.guarantee_delta += movement.guarantee_under_alternative - movement.guarantee_as_enacted;
+        if movement.held_as_enacted {
+            out.held_as_enacted += 1;
+        }
+        if movement.held_under_alternative {
+            out.held_under_alternative += 1;
+        }
     }
     out
 }

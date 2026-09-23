@@ -101,6 +101,17 @@ does**, so a slope is drawn as an angle and the panels are comparable to each ot
 enrolment rather than the wealth per pupil it names — a slope of 0.9855 beside a slope of −0.0429.
 See #442.
 
+A **plane** is the third array, and the strictest. It is a set of named things at a point on two
+signed measures — #444's seven anchor rules, each at the guarantee it writes against the total
+state support it pays — with zero on both axes by construction: `Positions::framed` folds the
+frame from the origin rather than from the data, because the reading is which quadrant a rule
+falls in and a frame that excludes zero has no quadrants. A plane has neither rows nor a fit, and
+*everything* on it is quotable, so the rule is the whole of it: every position names an ordinary
+figure for **both** of its coordinates and reproduces each in magnitude. Seven rules is fourteen
+figures. `project/what-each-anchor-rule-costs-on-both-axes` is the first, and what it draws is a
+finding no single column carries — three of the seven write less guarantee *and* pay more money,
+and nothing runs the other way. See #444.
+
 The line is fitted here and nowhere else. `crates/series.json` carries its two **endpoints in the
 data's own units** rather than a slope and an intercept, so no consumer evaluates a model: the web
 layer draws a segment between two points it was given, and `chart.ts`'s standing prohibition on a
@@ -234,16 +245,16 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`deflator`](deflator/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 17 |
 | [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 370 |
 | [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 35 |
-| [`figures`](figures/) | The figures the corpus quotes, computed from the crates that own them | 24 |
+| [`figures`](figures/) | The figures the corpus quotes, computed from the crates that own them | 29 |
 | [`foundation`](foundation/) | Fair School Funding Plan base cost build-up, per R.C. 3317.011 | 58 |
 | [`local-capacity`](local-capacity/) | Fair School Funding Plan local capacity and state share, per R.C. 3317.017 | 27 |
 | [`millage`](millage/) | Effective operating millage under H.B. 920 reduction factors, and 20-mill floor status | 19 |
-| [`project`](project/) | Forward projection of funding inputs, and policy simulation over them | 822 |
+| [`project`](project/) | Forward projection of funding inputs, and policy simulation over them | 823 |
 | [`regime-diff`](regime-diff/) | Difference two funding regimes at component level, with the residual the decomposition does not explain | 51 |
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 37 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 79 |
 
-13 crates, 1773 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+13 crates, 1779 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status

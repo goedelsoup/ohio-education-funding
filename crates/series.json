@@ -1,5 +1,5 @@
 {
-  "contract": "3.0.0",
+  "contract": "4.0.0",
   "series": [
     {"key": "dispersion/fy2016-step-by-business-class", "owner": "crates/dispersion", "unit": "ratio", "axis": "Property class, TY2021 share of assessed value", "label": "Correlation of the FY2016 move in state revenue per pupil with each business property class", "rows": [
       {"label": "Industrial", "value": 0.11752209551359827, "figure": "dispersion/fy2016-step-against-industrial-share"},
@@ -46,6 +46,80 @@
       {"label": "DPIA count capped at enrolled ADM", "value": 1, "group": "Categoricals", "of": 609, "cites": "the department's DPIA sheet; R.C. 3317.022(A)(4) states no cap"},
       {"label": "Guarantee floor clamped at zero", "value": 1, "group": "Guarantee", "of": 609, "cites": "R.C. 3317.019(A)(1)"},
       {"label": "One leadership support staff", "value": 0, "group": "Base cost", "of": 609, "cites": "R.C. 3317.011(F)(6)(c)", "marked": "cannot bind", "figure": "project/bounds-the-least-reached-is-operative-for"}
+    ]},
+    {"key": "project/what-each-anchor-rule-pays-by-wealth", "owner": "crates/project", "unit": "dollars", "axis": "Fifth of districts by assessed valuation per pupil, outside the cluster", "label": "What each anchor rule pays per pupil by wealth, on total state support, against the enacted anchor", "rows": [
+      {"label": "Least wealthy", "value": 138.58305999480032, "group": "A ratchet, FY2032", "figure": "project/a-ratchets-gain-per-pupil-in-the-least-wealthy-fifth"},
+      {"label": "Second", "value": 77.15527518572783, "group": "A ratchet, FY2032"},
+      {"label": "Third", "value": 26.333476606469304, "group": "A ratchet, FY2032"},
+      {"label": "Fourth", "value": 5.147011846593501, "group": "A ratchet, FY2032"},
+      {"label": "Wealthiest", "value": 3.749657007435183, "group": "A ratchet, FY2032", "figure": "project/a-ratchets-gain-per-pupil-in-the-wealthiest-fifth"},
+      {"label": "Least wealthy", "value": 0.0, "group": "A 2% cap, FY2032"},
+      {"label": "Second", "value": -2.7962460207644146, "group": "A 2% cap, FY2032"},
+      {"label": "Third", "value": -62.87919805483238, "group": "A 2% cap, FY2032"},
+      {"label": "Fourth", "value": -83.51133553785604, "group": "A 2% cap, FY2032", "figure": "project/a-caps-cut-per-pupil-in-the-fourth-wealth-fifth"},
+      {"label": "Wealthiest", "value": -76.99836333760602, "group": "A 2% cap, FY2032"},
+      {"label": "Least wealthy", "value": 141.73005392214026, "group": "A 1% cap, FY2036 undamped", "figure": "project/the-gentle-caps-gain-per-pupil-in-the-least-wealthy-fifth"},
+      {"label": "Second", "value": 92.63016312232713, "group": "A 1% cap, FY2036 undamped"},
+      {"label": "Third", "value": -24.498440506829073, "group": "A 1% cap, FY2036 undamped"},
+      {"label": "Fourth", "value": -56.69403031735381, "group": "A 1% cap, FY2036 undamped"},
+      {"label": "Wealthiest", "value": -55.399558136849734, "group": "A 1% cap, FY2036 undamped", "figure": "project/the-gentle-caps-cut-per-pupil-in-the-wealthiest-fifth"},
+      {"label": "Least wealthy", "value": 166.55179362304244, "group": "A rolling pupil count", "figure": "project/the-rolling-counts-gain-per-pupil-in-the-least-wealthy-fifth"},
+      {"label": "Second", "value": 83.43701130827858, "group": "A rolling pupil count"},
+      {"label": "Third", "value": 35.67309275724987, "group": "A rolling pupil count"},
+      {"label": "Fourth", "value": 10.037150386951197, "group": "A rolling pupil count"},
+      {"label": "Wealthiest", "value": 11.432868049938424, "group": "A rolling pupil count", "figure": "project/the-rolling-counts-gain-per-pupil-in-the-wealthiest-fifth"},
+      {"label": "Least wealthy", "value": 114.21762753520329, "group": "[M] mirrored inside [H]"},
+      {"label": "Second", "value": 84.7722275329467, "group": "[M] mirrored inside [H]"},
+      {"label": "Third", "value": 50.09143461246561, "group": "[M] mirrored inside [H]"},
+      {"label": "Fourth", "value": 14.03214349359553, "group": "[M] mirrored inside [H]"},
+      {"label": "Wealthiest", "value": 20.42079939473348, "group": "[M] mirrored inside [H]", "figure": "project/the-mirror-inside-h-per-pupil-in-the-wealthiest-fifth"},
+      {"label": "Least wealthy", "value": 114.21762753520336, "group": "[M] mirrored beside [L], [M], [O]"},
+      {"label": "Second", "value": 101.68517389483874, "group": "[M] mirrored beside [L], [M], [O]"},
+      {"label": "Third", "value": 132.64283258724518, "group": "[M] mirrored beside [L], [M], [O]"},
+      {"label": "Fourth", "value": 115.44059282644429, "group": "[M] mirrored beside [L], [M], [O]"},
+      {"label": "Wealthiest", "value": 96.88157074038864, "group": "[M] mirrored beside [L], [M], [O]", "figure": "project/the-mirror-beside-per-pupil-in-the-wealthiest-fifth"},
+      {"label": "Least wealthy", "value": 0.0, "group": "A dated phase-down"},
+      {"label": "Second", "value": 0.0, "group": "A dated phase-down"},
+      {"label": "Third", "value": 0.0, "group": "A dated phase-down"},
+      {"label": "Fourth", "value": 0.0, "group": "A dated phase-down"},
+      {"label": "Wealthiest", "value": 0.0, "group": "A dated phase-down"}
+    ]},
+    {"key": "project/what-each-anchor-rule-pays-by-disadvantaged-share", "owner": "crates/project", "unit": "dollars", "axis": "Fifth of districts by economically disadvantaged share, outside the cluster", "label": "What each anchor rule pays per pupil by disadvantaged share, on total state support, against the enacted anchor", "rows": [
+      {"label": "Least poor", "value": 4.061935272677196, "group": "A ratchet, FY2032"},
+      {"label": "Second", "value": 11.339349955460346, "group": "A ratchet, FY2032"},
+      {"label": "Third", "value": 31.71646870258504, "group": "A ratchet, FY2032"},
+      {"label": "Fourth", "value": 51.87365566566556, "group": "A ratchet, FY2032"},
+      {"label": "Poorest", "value": 108.07914793556802, "group": "A ratchet, FY2032", "figure": "project/a-ratchets-gain-per-pupil-in-the-poorest-fifth"},
+      {"label": "Least poor", "value": -83.83813023745485, "group": "A 2% cap, FY2032"},
+      {"label": "Second", "value": -101.51772328886412, "group": "A 2% cap, FY2032", "figure": "project/a-caps-cut-per-pupil-in-the-second-poverty-fifth"},
+      {"label": "Third", "value": -40.02009796277841, "group": "A 2% cap, FY2032"},
+      {"label": "Fourth", "value": -21.97774777662668, "group": "A 2% cap, FY2032"},
+      {"label": "Poorest", "value": -5.327190881204195, "group": "A 2% cap, FY2032", "figure": "project/a-caps-cut-per-pupil-in-the-poorest-fifth"},
+      {"label": "Least poor", "value": -68.15071928634443, "group": "A 1% cap, FY2036 undamped"},
+      {"label": "Second", "value": -64.11546930601337, "group": "A 1% cap, FY2036 undamped"},
+      {"label": "Third", "value": 8.730546185828699, "group": "A 1% cap, FY2036 undamped"},
+      {"label": "Fourth", "value": 40.07907008687351, "group": "A 1% cap, FY2036 undamped"},
+      {"label": "Poorest", "value": 123.39626208012464, "group": "A 1% cap, FY2036 undamped"},
+      {"label": "Least poor", "value": 11.684920541562937, "group": "A rolling pupil count"},
+      {"label": "Second", "value": 21.144418249348945, "group": "A rolling pupil count"},
+      {"label": "Third", "value": 49.09761633531979, "group": "A rolling pupil count"},
+      {"label": "Fourth", "value": 73.66555042230812, "group": "A rolling pupil count"},
+      {"label": "Poorest", "value": 109.79049867301967, "group": "A rolling pupil count"},
+      {"label": "Least poor", "value": 25.396362560043748, "group": "[M] mirrored inside [H]"},
+      {"label": "Second", "value": 16.185125975732777, "group": "[M] mirrored inside [H]"},
+      {"label": "Third", "value": 48.89869503351556, "group": "[M] mirrored inside [H]"},
+      {"label": "Fourth", "value": 87.00913855724077, "group": "[M] mirrored inside [H]"},
+      {"label": "Poorest", "value": 78.68864603294884, "group": "[M] mirrored inside [H]"},
+      {"label": "Least poor", "value": 91.36351142563154, "group": "[M] mirrored beside [L], [M], [O]"},
+      {"label": "Second", "value": 110.96767130637083, "group": "[M] mirrored beside [L], [M], [O]"},
+      {"label": "Third", "value": 144.26626501405502, "group": "[M] mirrored beside [L], [M], [O]", "figure": "project/the-mirror-beside-gain-per-pupil-in-the-third-poverty-fifth"},
+      {"label": "Fourth", "value": 135.28457642049486, "group": "[M] mirrored beside [L], [M], [O]"},
+      {"label": "Poorest", "value": 99.10240080646753, "group": "[M] mirrored beside [L], [M], [O]"},
+      {"label": "Least poor", "value": 0.0, "group": "A dated phase-down"},
+      {"label": "Second", "value": 0.0, "group": "A dated phase-down"},
+      {"label": "Third", "value": 0.0, "group": "A dated phase-down"},
+      {"label": "Fourth", "value": 0.0, "group": "A dated phase-down"},
+      {"label": "Poorest", "value": 0.0, "group": "A dated phase-down"}
     ]}
   ],
   "scatters": [
@@ -664,6 +738,18 @@
        {"label": "East Guernsey Local", "x": 919.7758, "ys": [326849804.7767, 398066.39]},
        {"label": "Tri-County North Local", "x": 668.2619, "ys": [197895913.4479, 306658.74]},
        {"label": "Monroe Local", "x": 2685.6069, "ys": [567461581.0461, 212239.23]}
+     ]}
+  ],
+  "planes": [
+    {"key": "project/what-each-anchor-rule-costs-on-both-axes", "owner": "crates/project", "subject": "anchor rule", "label": "What each anchor rule costs outside the enrollment cluster, on the guarantee it writes and on the total state support it pays", "x": {"label": "Guarantee written, against the enacted anchor", "unit": "dollars", "min": -176555013.66201046, "max": 66293064.339882925, "log": false}, "y": {"label": "Total state support, against the enacted anchor", "unit": "dollars", "min": -67142364.67091763, "max": 143087216.34252566, "log": false},
+     "points": [
+       {"label": "A ratchet, FY2032", "x": 57298691.08055354, "y": 52907613.44880489, "xFigure": "project/a-ratchets-guarantee-written-outside-the-cluster", "yFigure": "project/a-ratchets-total-state-support-outside-the-cluster"},
+       {"label": "A 2% cap, FY2032", "x": -167560640.40268108, "y": -59356083.89264195, "xFigure": "project/a-caps-guarantee-cut-outside-the-cluster", "yFigure": "project/a-caps-total-state-support-cut-outside-the-cluster"},
+       {"label": "A 1% cap, FY2036 undamped", "x": -107611728.73008639, "y": 10287443.630971175, "xFigure": "project/the-gentle-caps-guarantee-cut-outside-the-cluster", "yFigure": "project/the-gentle-caps-total-state-support-gain-outside-the-cluster"},
+       {"label": "A rolling pupil count", "x": -14740751.650550755, "y": 66202848.00230269, "xFigure": "project/the-rolling-counts-guarantee-cut-outside-the-cluster", "yFigure": "project/the-rolling-counts-total-state-support-gain-outside-the-cluster"},
+       {"label": "[M] mirrored inside [H]", "x": -70536484.89175005, "y": 62189117.28474995, "xFigure": "project/the-mirror-inside-h-guarantee-cut-outside-the-cluster", "yFigure": "project/the-mirror-inside-h-total-state-support-gain-outside-the-cluster"},
+       {"label": "[M] mirrored beside [L], [M], [O]", "x": 0.0, "y": 135300935.56425, "xFigure": "project/the-mirror-beside-guarantee-written-outside-the-cluster", "yFigure": "project/the-mirror-beside-total-state-support-gain-outside-the-cluster"},
+       {"label": "A dated phase-down", "x": 0.0, "y": 0.0, "xFigure": "project/the-dated-phase-downs-guarantee-written-outside-the-cluster", "yFigure": "project/the-dated-phase-downs-total-state-support-outside-the-cluster"}
      ]}
   ]
 }

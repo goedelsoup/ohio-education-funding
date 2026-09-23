@@ -21,8 +21,8 @@
 use core::fmt::Write;
 
 use crate::{
-    compute_all, compute_all_scatters, compute_all_series, Axis, Cloud, Fit, Row, Unit,
-    CONTRACT_VERSION, SERIES_CONTRACT_VERSION,
+    compute_all, compute_all_planes, compute_all_scatters, compute_all_series, Axis, Cloud, Fit,
+    Positions, Row, Unit, CONTRACT_VERSION, SERIES_CONTRACT_VERSION,
 };
 
 /// The characters that would need escaping, and therefore may not appear in a key or a label.
@@ -182,6 +182,8 @@ pub fn series_manifest() -> String {
     }
     out.push_str("  ],\n");
     scatters(&mut out);
+    out.push_str(",\n");
+    planes(&mut out);
     out.push_str("}\n");
     out
 }
@@ -312,6 +314,63 @@ fn scatters(out: &mut String) {
                 point.label,
                 coordinate(point.x),
                 ys.join(", "),
+            );
+        }
+        let comma = if at + 1 == computed.len() { "" } else { "," };
+        let _ = writeln!(out, "     ]}}{comma}");
+    }
+    out.push_str("  ]");
+}
+
+/// The third array: every plane, its two axes, and its positions with both figure keys.
+///
+/// Every position writes both of its figure keys, without the `Option` the row writer carries:
+/// a plane's rule is that all of them are bound, so a missing one is a bug rather than a shape
+/// the document is allowed to take.
+fn planes(out: &mut String) {
+    let computed = compute_all_planes();
+    let _ = writeln!(out, "  \"planes\": [");
+    for (at, entry) in computed.iter().enumerate() {
+        let p = entry.plane;
+        assert!(
+            writable(p.key) && writable(p.owner) && writable(p.label) && writable(p.subject),
+            "{}: a key, owner, label or subject carries a character this writer cannot escape",
+            p.key
+        );
+        let Positions { x, y, points } = &entry.positions;
+        let _ = writeln!(
+            out,
+            "    {{\"key\": \"{}\", \"owner\": \"{}\", \"subject\": \"{}\", \"label\": \"{}\", \
+             {}, {},",
+            p.key,
+            p.owner,
+            p.subject,
+            p.label,
+            axis("x", x),
+            axis("y", y),
+        );
+        let _ = writeln!(out, "     \"points\": [");
+        for (point_at, point) in points.iter().enumerate() {
+            assert!(
+                writable(&point.label) && writable(point.x_figure) && writable(point.y_figure),
+                "{}: the position {:?} carries a character this writer cannot escape",
+                p.key,
+                point.label
+            );
+            let comma = if point_at + 1 == points.len() {
+                ""
+            } else {
+                ","
+            };
+            let _ = writeln!(
+                out,
+                "       {{\"label\": \"{}\", \"x\": {}, \"y\": {}, \"xFigure\": \"{}\", \
+                 \"yFigure\": \"{}\"}}{comma}",
+                point.label,
+                coordinate(point.x),
+                coordinate(point.y),
+                point.x_figure,
+                point.y_figure,
             );
         }
         let comma = if at + 1 == computed.len() { "" } else { "," };
