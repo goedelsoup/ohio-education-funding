@@ -59,10 +59,14 @@ pub(super) const FOUNDATION: Connector = Connector {
         Source {
             key: "cupp-fy24",
             title: None,
+            // The department's **revised** FY2024 edition, adopted by #439 a year after the
+            // original was connected. `...-Final-12-12-2024.xlsx` still resolves and still
+            // serves its pinned bytes; it is not kept because the revision corrects a real
+            // defect rather than reissuing the file. See the catalog entry for what moved.
             url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
                   School-Payment-Reports/District-Profile-Reports/\
                   FY2024-District-Profile-Report/\
-                  FY24-District-Profile-Report-Final-12-12-2024.xlsx.aspx?lang=en-US",
+                  FY24-District-Profile-Report-Revised-12-18-2025.xlsx.aspx?lang=en-US",
             filename: "cupp-fy24.xlsx",
             format: Format::Xlsx,
             catalog: Some("cupp-district-profile-report"),
@@ -71,7 +75,9 @@ pub(super) const FOUNDATION: Connector = Connector {
                 crate::fixtures::PROFILE_FIXTURE,
                 crate::fixtures::GRADE_BANDS_FIXTURE,
             ],
-            note: "60 variables per district. Fiscal and tax years are mixed within a row.",
+            note: "60 variables per district. Fiscal and tax years are mixed within a row. \
+                   The connected edition is the department's 12-18-2025 revision, adopted \
+                   by #439 over the original 12-12-2024 file.",
         },
         Source {
             key: "enrollment-fy24",

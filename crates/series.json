@@ -2054,7 +2054,7 @@
      "markers": [
        {"label": "1,500 pupils: under it R.C. 3317.011(F)(3) funds two other administrators whatever the enrolment. It falls 16 districts into the fourth band.", "value": 1500.0, "at": 3.1584158415841586, "figure": "project/the-administrator-floors-adm-threshold"}
      ],
-     "whole": {"label": "606 districts employ 12,938 FTE administrators against the 6,580 the four administrator elements fund at their own FY2024 enrolment: 1.9664 employed for every one funded.", "value": 1.966403426379351, "figure": "project/administrators-employed-for-every-one-funded"},
+     "whole": {"label": "606 districts employ 12,938 FTE administrators against the 6,580 the four administrator elements fund at their own FY2024 enrolment: 1.9664 employed for every one funded.", "value": 1.9664034263793537, "figure": "project/administrators-employed-for-every-one-funded"},
      "unreached": [
        {"label": "R.C. 3317.011(D)(2), special teachers", "why": "a floor of 6 positions under 900 ADM; no column of the report counts it"},
        {"label": "R.C. 3317.011(E)(1), guidance counselors", "why": "a floor of 1 position, on grades 9-12 rather than on enrolled ADM; no column of the report counts it"},

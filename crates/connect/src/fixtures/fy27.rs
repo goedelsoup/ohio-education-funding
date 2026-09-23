@@ -1310,6 +1310,16 @@ pub const PROFILE_HEADER: &[&str] = &[
 /// Ten of them since #157, and the personnel block since #408 — which asked what the report
 /// carries about staffing and found one count: `FTE Number of Administrators`. The header names
 /// each column's own year, because the report mixes them within a row.
+///
+/// # The rows are sorted here, and were not always
+///
+/// Until #439 the extract was written in sheet order, which is the publisher's sort and not a
+/// property of the data. The department's revised FY2024 edition re-sorted `District Data` from
+/// district name to IRN, and that alone moved **all 606 rows** — a whole-file churn in which the
+/// three columns that actually changed could not be seen. Sorting on IRN here makes the fixture's
+/// order this repository's rather than the department's, so the next re-sort upstream is a
+/// no-op in the diff. IRN and not name, because the corpus keys districts on IRN throughout and
+/// district names are not unique — 580 distinct names over 607 districts.
 #[must_use]
 pub fn build_profile_extract(profile_rows: &[Vec<String>]) -> Vec<Vec<String>> {
     use profile_columns as p;
@@ -1330,7 +1340,7 @@ pub fn build_profile_extract(profile_rows: &[Vec<String>]) -> Vec<Vec<String>> {
         p::ADMINISTRATOR_AVERAGE_SALARY,
         p::PUPIL_ADMINISTRATOR_RATIO,
     ];
-    profile_rows
+    let mut rows: Vec<Vec<String>> = profile_rows
         .iter()
         .skip(1)
         .filter(|row| !cell(row, p::IRN).trim().is_empty())
@@ -1345,7 +1355,9 @@ pub fn build_profile_extract(profile_rows: &[Vec<String>]) -> Vec<Vec<String>> {
             );
             record
         })
-        .collect()
+        .collect();
+    rows.sort_by(|a, b| a[0].cmp(&b[0]));
+    rows
 }
 
 #[cfg(test)]
@@ -1614,7 +1626,8 @@ mod tests {
             ..Default::default()
         });
         assert!(!rows[1][1].contains(','));
-        assert_eq!(rows[1][1], "Northern Local  Perry");
+        // One space, not two: the substitution used to leave the comma's own space behind.
+        assert_eq!(rows[1][1], "Northern Local Perry");
     }
 
     #[test]
@@ -1629,6 +1642,26 @@ mod tests {
             ..Default::default()
         });
         assert_eq!(rows[1][1], "Bellefontaine City");
+    }
+
+    #[test]
+    fn the_profile_extract_is_sorted_by_irn_whatever_the_sheet_order() {
+        // The revised FY2024 edition re-sorted `District Data` from name to IRN. The fixture's
+        // order must be this repository's, so that a publisher's re-sort is not a 606-row diff.
+        let mut shuffled = profile_rows();
+        shuffled[1..].reverse();
+        let rows = build_profile_extract(&shuffled);
+        let irns: Vec<&str> = rows.iter().map(|r| r[0].as_str()).collect();
+        let mut sorted = irns.clone();
+        sorted.sort_unstable();
+        assert_eq!(irns, sorted);
+        assert_eq!(
+            irns,
+            build_profile_extract(&profile_rows())
+                .iter()
+                .map(|r| r[0].clone())
+                .collect::<Vec<_>>()
+        );
     }
 
     #[test]

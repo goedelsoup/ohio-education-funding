@@ -499,7 +499,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2023,2392,047928,Dawson-Bryant Local,008219,Dawson-Bryant High School,Public School,70
 2023,1713,047928,Dawson-Bryant Local,008227,Dawson-Bryant Middle School,Public School,83.801
 2023,2183,048009,Licking Heights Local,008242,LICKING HEIGHTS CENTRAL INTERMEDIATE SCHOOL,Public School,76.082
-2023,2103,043851,Deer Park Community City,008250,Deer Park  Jr/Sr High School,Public School,77.903
+2023,2103,043851,Deer Park Community City,008250,Deer Park Jr/Sr High School,Public School,77.903
 2023,565,050013,Green Local,008252,Green Primary School,Public School,98.028
 2023,116,047027,Dublin City,008257,Glacier Ridge Elementary,Public School,106.19
 2023,2806,044909,Toledo City,008262,Jesup W. Scott High School,Public School,49.857
@@ -738,7 +738,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2023,269,046896,Pickerington Local,011369,Toll Gate Middle School,Public School,102.963
 2023,169,046896,Pickerington Local,011370,Toll Gate Elementary,Public School,104.764
 2023,1428,048744,Valley View Local,011395,Valley View Intermediate School,Public School,87.075
-2023,1704,044602,Oregon City,011429,Fassett Junior High  School,Public School,83.945
+2023,1704,044602,Oregon City,011429,Fassett Junior High School,Public School,83.945
 2023,1652,043869,Defiance City,011430,Defiance Elementary School,Public School,84.643
 2023,1182,046045,Fayetteville-Perry Local,011452,Fayetteville-Perry Elementary School,Public School,90.073
 2023,1521,046045,Fayetteville-Perry Local,011460,Fayetteville-Perry High School,Public School,86.021
@@ -750,11 +750,11 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2023,1508,044107,Hamilton City,011484,Ridgeway Elementary School,Public School,86.21
 2023,2361,044107,Hamilton City,011485,Bridgeport Elementary School,Public School,71.028
 2023,1985,045161,Youngstown City,011493,Rayen Early College Middle School,Public School,80.191
-2023,619,046334,Felicity-Franklin Local,011494,Felicity-Franklin Local  Elementary School,Public School,97.097
-2023,2261,046334,Felicity-Franklin Local,011502,Felicity-Franklin Local  High School,Public School,74.334
+2023,619,046334,Felicity-Franklin Local,011494,Felicity-Franklin Local Elementary School,Public School,97.097
+2023,2261,046334,Felicity-Franklin Local,011502,Felicity-Franklin Local High School,Public School,74.334
 2023,2405,043513,Ashtabula Area City,011518,Superior Intermediate School,Public School,69.58
 2023,642,047241,Beavercreek City,011528,Jacob Coy Middle School,Public School,96.692
-2023,1425,043489,Akron City,011532,National Inventors Hall of Fame School  Center for STEM,Public School,87.082
+2023,1425,043489,Akron City,011532,National Inventors Hall of Fame School Center for STEM,Public School,87.082
 2023,1107,044750,Shaker Heights City,011536,Fernway Elementary School,Public School,90.678
 2023,1303,049197,Field Local,011551,Field High School,Public School,88.592
 2023,1058,049197,Field Local,011569,Field Middle School,Public School,91.394
@@ -940,7 +940,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2023,1279,044180,Kettering City School District,014563,Greenmont Elementary School,Public School,88.922
 2023,1737,046235,Greenon Local,014571,Greenon High School,Public School,83.554
 2023,68,044933,Upper Arlington City,014597,Greensview Elementary School,Public School,107.846
-2023,197,044503,North Canton City,014605,Greentown Intermediate  School,Public School,104.315
+2023,197,044503,North Canton City,014605,Greentown Intermediate School,Public School,104.315
 2023,2311,044792,South Euclid-Lyndhurst City,014613,Greenview Upper Elementary School,Public School,73.109
 2023,1732,044099,Greenville City,014621,Greenville Senior High School,Public School,83.567
 2023,1832,044099,Greenville City,014639,Greenville Middle School,Public School,82.509
@@ -1444,7 +1444,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2023,1169,049882,Marlington Local,022947,Marlington High School,Public School,90.163
 2023,457,045625,Upper Sandusky Exempted Village,022954,Union Elementary School,Public School,100.075
 2023,2838,044909,Toledo City,022970,Marshall STEMM Academy,Public School,47.991
-2023,681,050559,Green Local,022996,Green  Elementary School,Public School,96.055
+2023,681,050559,Green Local,022996,Green Elementary School,Public School,96.055
 2023,2325,044347,Martins Ferry City,023036,Martins Ferry High School,Public School,72.532
 2023,1029,049890,Minerva Local,023077,Minerva Elementary School,Public School,91.69
 2023,402,043620,Bexley City,023093,Maryland Elementary School,Public School,100.937
@@ -1640,7 +1640,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2023,1089,047720,New London Local,026823,New London High School,Public School,90.952
 2023,514,046680,Tri-Village Local,026849,Tri-Village High School,Public School,98.763
 2023,2416,046136,New Miami Local,026864,New Miami Elementary School,Public School,69.302
-2023,2455,046136,New Miami Local,026872,New Miami  High School,Public School,67.955
+2023,2455,046136,New Miami Local,026872,New Miami High School,Public School,67.955
 2023,329,048371,Springfield Local,026880,Springfield Elementary School,Public School,102.079
 2023,1868,044487,New Philadelphia City,026906,New Philadelphia High School,Public School,82.088
 2023,1607,045559,New Richmond Exempted Village,026922,New Richmond High School,Public School,85.227
@@ -1714,7 +1714,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2023,1214,047373,Oak Hills Local,028217,Oak Hills High School,Public School,89.717
 2023,2674,044909,Toledo City,028258,Oakdale Elementary School,Public School,56.889
 2023,2668,043802,Columbus City Schools District,028290,Oakland Park Alternative Elementary,Public School,57.143
-2023,2488,043802,Columbus City Schools District,028316,Oakmont  Elementary School,Public School,66.974
+2023,2488,043802,Columbus City Schools District,028316,Oakmont Elementary School,Public School,66.974
 2023,419,044180,Kettering City School District,028324,Oakview Elementary School,Public School,100.667
 2023,1878,049932,Plain Local,028365,GlenOak High School,Public School,81.96
 2023,50,044586,Oakwood City,028373,Oakwood High School,Public School,108.838
@@ -1730,7 +1730,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2023,1500,069682,East Guernsey Local,028522,Buckeye Trail Middle School,Public School,86.357
 2023,2300,043802,Columbus City Schools District,028530,Olde Orchard Alt Elementary School,Public School,73.409
 2023,309,046763,Olentangy Local,028548,Olentangy High School,Public School,102.329
-2023,2211,046243,Tecumseh Local,028555,Tecumseh  Middle School,Public School,75.413
+2023,2211,046243,Tecumseh Local,028555,Tecumseh Middle School,Public School,75.413
 2023,2602,048694,Trotwood-Madison City,028571,Trotwood-Madison Early Learning Center,Public School,61.304
 2023,1387,046573,Olmsted Falls City,028605,Olmsted Falls High School,Public School,87.627
 2023,972,046573,Olmsted Falls City,028613,Olmsted Falls Middle School,Public School,92.36
@@ -1870,7 +1870,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2023,614,045476,Marysville Exempted Village,031179,Raymond Elementary School,Public School,97.156
 2023,1957,044693,Reading Community City,031187,Reading Junior Senior High School,Public School,80.545
 2023,1687,047019,Hilliard City,031195,J W Reason Elementary School,Public School,84.176
-2023,1024,047886,Madison Local,031203,South  Elementary School,Public School,91.734
+2023,1024,047886,Madison Local,031203,South Elementary School,Public School,91.734
 2023,43,048124,Avon Lake City,031211,Redwood Elementary School,Public School,109.211
 2023,1452,045427,Hubbard Exempted Village,031245,Hubbard Middle School,Public School,86.817
 2023,1047,045377,Georgetown Exempted Village,031252,Georgetown Elementary School,Public School,91.532
@@ -1920,7 +1920,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2023,24,044701,Rocky River City,032243,Rocky River High School,Public School,110.949
 2023,2713,044909,Toledo City,032276,Rogers High School,Public School,55.142
 2023,330,044198,Lakewood City,032359,Roosevelt Elementary School,Public School,102.063
-2023,702,045427,Hubbard Exempted Village,032391,Hubbard  Elementary School,Public School,95.731
+2023,702,045427,Hubbard Exempted Village,032391,Hubbard Elementary School,Public School,95.731
 2023,281,044826,Steubenville City,032433,East Garfield Elementary School,Public School,102.773
 2023,2667,044909,Toledo City,032441,Martin Luther King Academy for Boys Elementary School,Public School,57.181
 2023,2238,050062,Springfield Local,032482,Spring Hill Elementary,Public School,74.755
@@ -2053,7 +2053,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2023,2319,045344,Crestline Exempted Village,035154,Crestline Elementary School,Public School,72.815
 2023,1409,049221,Southeast Local,035170,Southeast High School,Public School,87.31
 2023,1909,043588,Bellefontaine City,035188,Bellefontaine Elementary School,Public School,81.378
-2023,1218,046276,Southeastern Local,035196,Southeastern  Sr. High School,Public School,89.654
+2023,1218,046276,Southeastern Local,035196,Southeastern Sr. High School,Public School,89.654
 2023,1671,049528,Southeastern Local,035204,Southeastern High School,Public School,84.44
 2023,1899,048538,Southern Local,035220,Southern High School,Public School,81.536
 2023,788,050237,Southington Local,035238,Southington Elementary School,Public School,94.612
@@ -2243,7 +2243,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2023,2874,043901,East Cleveland City School District,038679,W.H. Kirk Middle School,Public School,44.133
 2023,932,045591,Rittman Exempted Village,038687,Rittman Elementary School,Public School,92.89
 2023,1367,047696,West Holmes Local,038695,West Holmes High School,Public School,87.831
-2023,1870,048256,Jefferson Local,038729,West Jefferson  Middle School,Public School,82.056
+2023,1870,048256,Jefferson Local,038729,West Jefferson Middle School,Public School,82.056
 2023,1939,048256,Jefferson Local,038737,West Jefferson High School,Public School,80.885
 2023,238,046219,West Liberty-Salem Local,038752,West Liberty-Salem Elementary School,Public School,103.547
 2023,670,046219,West Liberty-Salem Local,038760,West Liberty-Salem High School,Public School,96.167
@@ -2265,7 +2265,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2023,1817,046904,Walnut Township Local,039065,Millersport Elementary School,Public School,82.632
 2023,37,043752,Cincinnati Public Schools,039073,Walnut Hills High School,Public School,109.52
 2023,1567,046904,Walnut Township Local,039081,Millersport Jr/Sr High School,Public School,85.529
-2023,2522,044628,Painesville City Local,039099,Heritage  Middle School,Public School,65.702
+2023,2522,044628,Painesville City Local,039099,Heritage Middle School,Public School,65.702
 2023,2805,043802,Columbus City Schools District,039107,Walnut Ridge High School,Public School,49.95
 2023,2080,045047,Westerville City,039115,Walnut Springs Middle School,Public School,78.257
 2023,1790,044396,Miamisburg City,039156,Miamisburg Middle School,Public School,82.983
@@ -2432,7 +2432,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2023,1387,045674,Yellow Springs Exempted Village,042416,Yellow Springs/McKinney High School,Public School,87.627
 2023,543,043596,Bellevue City,042424,Bellevue Elementary School,Public School,98.371
 2023,2144,044446,Nelsonville-York City,042440,Nelsonville-York Elementary School,Public School,77.095
-2023,436,048470,Buckeye Local,042457,Buckeye  Primary School,Public School,100.412
+2023,436,048470,Buckeye Local,042457,Buckeye Primary School,Public School,100.412
 2023,1811,044487,New Philadelphia City,042465,York Elementary School,Public School,82.697
 2023,2765,043802,Columbus City Schools District,042499,Yorktown Middle School,Public School,52.27
 2023,1943,047787,Buckeye Local,042515,Buckeye South Elementary School,Public School,80.817
@@ -2519,7 +2519,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2023,2245,044800,South-Western City,062190,Beulah Park Middle School,Public School,74.582
 2023,2257,044800,South-Western City,062208,Finland Middle School,Public School,74.383
 2023,2529,044800,South-Western City,062216,Norton Middle School,Public School,65.49
-2023,2375,048843,Franklin Local,062224,Roseville Elementary  School,Public School,70.584
+2023,2375,048843,Franklin Local,062224,Roseville Elementary School,Public School,70.584
 2023,2247,048850,Maysville Local,062232,Maysville Middle School,Public School,74.542
 2023,2368,048520,Meigs Local,062307,Meigs Middle School,Public School,70.801
 2023,1935,044008,Franklin City,062331,Franklin Junior High School,Public School,80.941
@@ -2590,7 +2590,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2023,653,048322,Jackson-Milton Local,066746,Jackson-Milton Elementary School,Public School,96.475
 2023,218,044867,Sycamore Community City,066761,Sycamore Junior High School,Public School,103.986
 2023,2487,044081,Winton Woods City,066787,Winton Woods Elementary School,Public School,66.993
-2023,2751,043844,Dayton City,066795,David H. Ponitz Career Technology  Center,Public School,53.051
+2023,2751,043844,Dayton City,066795,David H. Ponitz Career Technology Center,Public School,53.051
 2023,207,049171,Aurora City,066803,Harmon Middle School,Public School,104.145
 2023,484,045047,Westerville City,066811,Mark Twain Elementary School,Public School,99.434
 2023,660,045047,Westerville City,066829,Robert Frost Elementary School,Public School,96.416
@@ -2660,7 +2660,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2023,2022,046359,West Clermont Local,089565,Holly Hill Elementary School,Public School,79.493
 2023,1711,044255,London City,089599,London Elementary School,Public School,83.868
 2023,1547,044917,Toronto City,089631,Toronto Elementary School,Public School,85.729
-2023,1070,048801,Highland Local,089649,Highland  Elementary School,Public School,91.218
+2023,1070,048801,Highland Local,089649,Highland Elementary School,Public School,91.218
 2023,1463,048900,Noble Local,091363,Shenandoah Elementary School,Public School,86.727
 2023,794,050328,Fairbanks Local,091371,Fairbanks Middle School,Public School,94.55
 2023,2514,045914,Federal Hocking Local,091389,Federal Hocking Middle School,Public School,65.979
@@ -2668,7 +2668,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2023,82,044586,Oakwood City,093195,Oakwood Junior High School,Public School,107.369
 2023,2705,043752,Cincinnati Public Schools,094623,Academy Of World Languages School,Public School,55.528
 2023,1001,044123,Hillsboro City,095661,Hillsboro Early Childhood Center,Public School,92.042
-2023,1033,044214,Lebanon City,095679,Donovan  Elementary School,Public School,91.644
+2023,1033,044214,Lebanon City,095679,Donovan Elementary School,Public School,91.644
 2023,889,045138,Worthington City,095794,Mccord Middle School,Public School,93.325
 2023,2206,045609,Rossford Exempted Village,095828,Rossford Junior High School,Public School,75.714
 2023,2277,047308,Rolling Hills Local,096396,Secrest Elementary School,Public School,73.857
@@ -2741,7 +2741,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2023,177,047027,Dublin City,120212,Willard Grizzell Middle School,Public School,104.675
 2023,2023,049635,Northwest Local,120261,Northwest Middle School,Public School,79.471
 2023,1190,049635,Northwest Local,120279,Northwest Elementary School,Public School,90
-2023,1364,046060,Western Brown Local,120337,Mt  Orab Middle School,Public School,87.881
+2023,1364,046060,Western Brown Local,120337,Mt Orab Middle School,Public School,87.881
 2023,908,046961,Gahanna-Jefferson City,120360,Blacklick Elementary School,Public School,93.152
 2023,1808,047027,Dublin City,120485,Dublin Scioto High School,Public School,82.713
 2023,1104,046078,Ripley-Union-Lewis-Huntington Local,121434,Ripley Union Lewis Huntington Elementary School,Public School,90.735
@@ -3431,7 +3431,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2024,2397,047928,Dawson-Bryant Local,008219,Dawson-Bryant High School,Public School,69.777
 2024,1852,047928,Dawson-Bryant Local,008227,Dawson-Bryant Middle School,Public School,81.906
 2024,1750,048009,Licking Heights Local,008242,LICKING HEIGHTS CENTRAL INTERMEDIATE SCHOOL,Public School,83.407
-2024,1883,043851,Deer Park Community City,008250,Deer Park  Jr/Sr High School,Public School,81.406
+2024,1883,043851,Deer Park Community City,008250,Deer Park Jr/Sr High School,Public School,81.406
 2024,692,050013,Green Local,008252,Green Primary School,Public School,96.093
 2024,203,047027,Dublin City,008257,Glacier Ridge Elementary,Public School,104.006
 2024,2836,044909,Toledo City,008262,Jesup W. Scott High School,Public School,45.977
@@ -3666,7 +3666,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2024,228,046896,Pickerington Local,011369,Toll Gate Middle School,Public School,103.557
 2024,126,046896,Pickerington Local,011370,Toll Gate Elementary,Public School,105.901
 2024,1681,048744,Valley View Local,011395,Valley View Intermediate School,Public School,84.253
-2024,1711,044602,Oregon City,011429,Fassett Junior High  School,Public School,83.923
+2024,1711,044602,Oregon City,011429,Fassett Junior High School,Public School,83.923
 2024,1475,043869,Defiance City,011430,Defiance Elementary School,Public School,86.608
 2024,1288,046045,Fayetteville-Perry Local,011452,Fayetteville-Perry Elementary School,Public School,88.911
 2024,1482,046045,Fayetteville-Perry Local,011460,Fayetteville-Perry High School,Public School,86.527
@@ -3678,11 +3678,11 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2024,1374,044107,Hamilton City,011484,Ridgeway Elementary School,Public School,87.904
 2024,2129,044107,Hamilton City,011485,Bridgeport Elementary School,Public School,76.806
 2024,2268,045161,Youngstown City,011493,Rayen Early College Middle School,Public School,73.73
-2024,643,046334,Felicity-Franklin Local,011494,Felicity-Franklin Local  Elementary School,Public School,96.803
-2024,2120,046334,Felicity-Franklin Local,011502,Felicity-Franklin Local  High School,Public School,76.964
+2024,643,046334,Felicity-Franklin Local,011494,Felicity-Franklin Local Elementary School,Public School,96.803
+2024,2120,046334,Felicity-Franklin Local,011502,Felicity-Franklin Local High School,Public School,76.964
 2024,2616,043513,Ashtabula Area City,011518,Superior Intermediate School,Public School,59.606
 2024,654,047241,Beavercreek City,011528,Jacob Coy Middle School,Public School,96.669
-2024,1542,043489,Akron City,011532,National Inventors Hall of Fame School  Center for STEM,Public School,85.803
+2024,1542,043489,Akron City,011532,National Inventors Hall of Fame School Center for STEM,Public School,85.803
 2024,447,044750,Shaker Heights City,011536,Fernway Elementary School,Public School,99.948
 2024,1262,049197,Field Local,011551,Field High School,Public School,89.14
 2024,1315,049197,Field Local,011569,Field Middle School,Public School,88.56
@@ -4193,7 +4193,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2024,2306,045880,Pymatuning Valley Local,019743,Pymatuning Valley Local Schools Online,Public School,72.759
 2024,2001,049569,Lakota Local,019745,Lakota High School,Public School,79.641
 2024,2154,044206,Lancaster City,019752,Lancaster High School,Public School,76.267
-2024,2617,046441,Southern Local,019753,Southern Online  Academy,Public School,59.545
+2024,2617,046441,Southern Local,019753,Southern Online Academy,Public School,59.545
 2024,2618,044818,Springfield City School District,019761,Springfield City Online,Public School,59.5
 2024,820,044370,Mayfield City,019778,Lander Elementary,Public School,94.465
 2024,2700,044891,Tiffin City Schools,019784,Tornado Academy,Public School,55.179
@@ -4364,7 +4364,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2024,1593,049882,Marlington Local,022947,Marlington High School,Public School,85.346
 2024,159,045625,Upper Sandusky Exempted Village,022954,Union Elementary School,Public School,105.3
 2024,2817,044909,Toledo City,022970,Marshall STEMM Academy,Public School,46.942
-2024,585,050559,Green Local,022996,Green  Elementary School,Public School,97.715
+2024,585,050559,Green Local,022996,Green Elementary School,Public School,97.715
 2024,2195,044347,Martins Ferry City,023036,Martins Ferry High School,Public School,75.559
 2024,976,049890,Minerva Local,023077,Minerva Elementary School,Public School,92.441
 2024,452,043620,Bexley City,023093,Maryland Elementary School,Public School,99.876
@@ -4560,7 +4560,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2024,1562,047720,New London Local,026823,New London High School,Public School,85.635
 2024,235,046680,Tri-Village Local,026849,Tri-Village High School,Public School,103.297
 2024,2368,046136,New Miami Local,026864,New Miami Elementary School,Public School,70.877
-2024,2479,046136,New Miami Local,026872,New Miami  High School,Public School,66.727
+2024,2479,046136,New Miami Local,026872,New Miami High School,Public School,66.727
 2024,465,048371,Springfield Local,026880,Springfield Elementary School,Public School,99.692
 2024,1415,044487,New Philadelphia City,026906,New Philadelphia High School,Public School,87.402
 2024,1462,045559,New Richmond Exempted Village,026922,New Richmond High School,Public School,86.674
@@ -4634,7 +4634,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2024,972,047373,Oak Hills Local,028217,Oak Hills High School,Public School,92.451
 2024,2671,044909,Toledo City,028258,Oakdale Elementary School,Public School,56.52
 2024,2637,043802,Columbus City Schools District,028290,Oakland Park Alternative Elementary,Public School,58.444
-2024,2466,043802,Columbus City Schools District,028316,Oakmont  Elementary School,Public School,67.049
+2024,2466,043802,Columbus City Schools District,028316,Oakmont Elementary School,Public School,67.049
 2024,377,044180,Kettering City School District,028324,Oakview Elementary School,Public School,100.891
 2024,1448,049932,Plain Local,028365,GlenOak High School,Public School,86.94
 2024,32,044586,Oakwood City,028373,Oakwood High School,Public School,110.022
@@ -4650,7 +4650,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2024,2059,069682,East Guernsey Local,028522,Buckeye Trail Middle School,Public School,78.368
 2024,2161,043802,Columbus City Schools District,028530,Olde Orchard Alt Elementary School,Public School,76.178
 2024,194,046763,Olentangy Local,028548,Olentangy High School,Public School,104.337
-2024,2231,046243,Tecumseh Local,028555,Tecumseh  Middle School,Public School,74.757
+2024,2231,046243,Tecumseh Local,028555,Tecumseh Middle School,Public School,74.757
 2024,2547,048694,Trotwood-Madison City,028571,Trotwood-Madison Early Learning Center,Public School,63.728
 2024,1154,046573,Olmsted Falls City,028605,Olmsted Falls High School,Public School,90.307
 2024,1139,046573,Olmsted Falls City,028613,Olmsted Falls Middle School,Public School,90.481
@@ -4787,7 +4787,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2024,521,045476,Marysville Exempted Village,031179,Raymond Elementary School,Public School,98.632
 2024,2067,044693,Reading Community City,031187,Reading Junior Senior High School,Public School,78.214
 2024,1902,047019,Hilliard City,031195,J W Reason Elementary School,Public School,81.092
-2024,750,047886,Madison Local,031203,South  Elementary School,Public School,95.333
+2024,750,047886,Madison Local,031203,South Elementary School,Public School,95.333
 2024,137,048124,Avon Lake City,031211,Redwood Elementary School,Public School,105.744
 2024,1935,045427,Hubbard Exempted Village,031245,Hubbard Middle School,Public School,80.656
 2024,1183,045377,Georgetown Exempted Village,031252,Georgetown Elementary School,Public School,89.967
@@ -4835,7 +4835,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2024,27,044701,Rocky River City,032243,Rocky River High School,Public School,110.794
 2024,2667,044909,Toledo City,032276,Rogers High School,Public School,56.643
 2024,383,044198,Lakewood City,032359,Roosevelt Elementary School,Public School,100.813
-2024,786,045427,Hubbard Exempted Village,032391,Hubbard  Elementary School,Public School,94.831
+2024,786,045427,Hubbard Exempted Village,032391,Hubbard Elementary School,Public School,94.831
 2024,195,044826,Steubenville City,032433,East Garfield Elementary School,Public School,104.321
 2024,2687,044909,Toledo City,032441,Martin Luther King Academy for Boys Elementary School,Public School,55.759
 2024,1937,050062,Springfield Local,032482,Spring Hill Elementary,Public School,80.647
@@ -4967,7 +4967,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2024,2398,045344,Crestline Exempted Village,035154,Crestline Elementary School,Public School,69.745
 2024,1801,049221,Southeast Local,035170,Southeast High School,Public School,82.654
 2024,1860,043588,Bellefontaine City,035188,Bellefontaine Elementary School,Public School,81.796
-2024,1033,046276,Southeastern Local,035196,Southeastern  Sr. High School,Public School,91.667
+2024,1033,046276,Southeastern Local,035196,Southeastern Sr. High School,Public School,91.667
 2024,1372,049528,Southeastern Local,035204,Southeastern High School,Public School,87.92
 2024,1716,048538,Southern Local,035220,Southern High School,Public School,83.849
 2024,1279,050237,Southington Local,035238,Southington Elementary School,Public School,88.989
@@ -5156,7 +5156,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2024,2874,043901,East Cleveland City School District,038679,W.H. Kirk Middle School,Public School,40.612
 2024,1229,045591,Rittman Exempted Village,038687,Rittman Elementary School,Public School,89.498
 2024,1426,047696,West Holmes Local,038695,West Holmes High School,Public School,87.258
-2024,1951,048256,Jefferson Local,038729,West Jefferson  Middle School,Public School,80.404
+2024,1951,048256,Jefferson Local,038729,West Jefferson Middle School,Public School,80.404
 2024,1875,048256,Jefferson Local,038737,West Jefferson High School,Public School,81.525
 2024,282,046219,West Liberty-Salem Local,038752,West Liberty-Salem Elementary School,Public School,102.703
 2024,442,046219,West Liberty-Salem Local,038760,West Liberty-Salem High School,Public School,99.981
@@ -5178,7 +5178,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2024,1606,046904,Walnut Township Local,039065,Millersport Elementary School,Public School,85.221
 2024,18,043752,Cincinnati Public Schools,039073,Walnut Hills High School,Public School,111.953
 2024,1636,046904,Walnut Township Local,039081,Millersport Jr/Sr High School,Public School,84.784
-2024,2513,044628,Painesville City Local,039099,Heritage  Middle School,Public School,65.293
+2024,2513,044628,Painesville City Local,039099,Heritage Middle School,Public School,65.293
 2024,2780,043802,Columbus City Schools District,039107,Walnut Ridge High School,Public School,50.037
 2024,1869,045047,Westerville City,039115,Walnut Springs Middle School,Public School,81.645
 2024,2047,044396,Miamisburg City,039156,Miamisburg Middle School,Public School,78.593
@@ -5343,7 +5343,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2024,1149,045674,Yellow Springs Exempted Village,042416,Yellow Springs/McKinney High School,Public School,90.34
 2024,551,043596,Bellevue City,042424,Bellevue Elementary School,Public School,98.137
 2024,1807,044446,Nelsonville-York City,042440,Nelsonville-York Elementary School,Public School,82.566
-2024,272,048470,Buckeye Local,042457,Buckeye  Primary School,Public School,102.78
+2024,272,048470,Buckeye Local,042457,Buckeye Primary School,Public School,102.78
 2024,2035,044487,New Philadelphia City,042465,York Elementary School,Public School,78.839
 2024,2765,043802,Columbus City Schools District,042499,Yorktown Middle School,Public School,51.172
 2024,2038,047787,Buckeye Local,042515,Buckeye South Elementary School,Public School,78.743
@@ -5430,7 +5430,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2024,2285,044800,South-Western City,062190,Beulah Park Middle School,Public School,73.327
 2024,2401,044800,South-Western City,062208,Finland Middle School,Public School,69.623
 2024,2601,044800,South-Western City,062216,Norton Middle School,Public School,60.687
-2024,2307,048843,Franklin Local,062224,Roseville Elementary  School,Public School,72.727
+2024,2307,048843,Franklin Local,062224,Roseville Elementary School,Public School,72.727
 2024,2234,048850,Maysville Local,062232,Maysville Middle School,Public School,74.695
 2024,2471,048520,Meigs Local,062307,Meigs Middle School,Public School,66.938
 2024,1683,044008,Franklin City,062331,Franklin Junior High School,Public School,84.228
@@ -5498,7 +5498,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2024,772,048322,Jackson-Milton Local,066746,Jackson-Milton Elementary School,Public School,95.036
 2024,215,044867,Sycamore Community City,066761,Sycamore Junior High School,Public School,103.854
 2024,2462,044081,Winton Woods City,066787,Winton Woods Elementary School,Public School,67.147
-2024,2738,043844,Dayton City,066795,David H. Ponitz Career Technology  Center,Public School,52.79
+2024,2738,043844,Dayton City,066795,David H. Ponitz Career Technology Center,Public School,52.79
 2024,185,049171,Aurora City,066803,Harmon Middle School,Public School,104.617
 2024,423,045047,Westerville City,066811,Mark Twain Elementary School,Public School,100.188
 2024,540,045047,Westerville City,066829,Robert Frost Elementary School,Public School,98.273
@@ -5568,7 +5568,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2024,1345,046359,West Clermont Local,089565,Holly Hill Elementary School,Public School,88.233
 2024,1728,044255,London City,089599,London Elementary School,Public School,83.676
 2024,1506,044917,Toronto City,089631,Toronto Elementary School,Public School,86.233
-2024,1152,048801,Highland Local,089649,Highland  Elementary School,Public School,90.326
+2024,1152,048801,Highland Local,089649,Highland Elementary School,Public School,90.326
 2024,1611,048900,Noble Local,091363,Shenandoah Elementary School,Public School,85.16
 2024,506,050328,Fairbanks Local,091371,Fairbanks Middle School,Public School,98.872
 2024,2475,045914,Federal Hocking Local,091389,Federal Hocking Middle School,Public School,66.829
@@ -5576,7 +5576,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2024,85,044586,Oakwood City,093195,Oakwood Junior High School,Public School,107.137
 2024,2707,043752,Cincinnati Public Schools,094623,Academy Of World Languages School,Public School,54.621
 2024,916,044123,Hillsboro City,095661,Hillsboro Early Childhood Center,Public School,93.297
-2024,1046,044214,Lebanon City,095679,Donovan  Elementary School,Public School,91.55
+2024,1046,044214,Lebanon City,095679,Donovan Elementary School,Public School,91.55
 2024,932,045138,Worthington City,095794,Mccord Middle School,Public School,92.969
 2024,2060,045609,Rossford Exempted Village,095828,Rossford Junior High School,Public School,78.36
 2024,1972,047308,Rolling Hills Local,096396,Secrest Elementary School,Public School,80
@@ -5649,7 +5649,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2024,217,047027,Dublin City,120212,Willard Grizzell Middle School,Public School,103.823
 2024,2141,049635,Northwest Local,120261,Northwest Middle School,Public School,76.672
 2024,1217,049635,Northwest Local,120279,Northwest Elementary School,Public School,89.671
-2024,1365,046060,Western Brown Local,120337,Mt  Orab Middle School,Public School,88.058
+2024,1365,046060,Western Brown Local,120337,Mt Orab Middle School,Public School,88.058
 2024,978,046961,Gahanna-Jefferson City,120360,Blacklick Elementary School,Public School,92.422
 2024,1269,047027,Dublin City,120485,Dublin Scioto High School,Public School,89.082
 2024,1489,046078,Ripley-Union-Lewis-Huntington Local,121434,Ripley Union Lewis Huntington Elementary School,Public School,86.463
@@ -5863,7 +5863,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,1413,049536,Union-Scioto Local,000231,Unioto Elementary,Public School,88.087
 2025,473,044792,South Euclid-Lyndhurst City,000232,Adrian Elementary School,Public School,99.844
 2025,2515,044909,Toledo City,000234,Ella P. Stewart Academy for Girls,Public School,69.825
-2025,2510,000236,Ohio Connections Academy  Inc,000236,Ohio Connections Academy  Inc,Community School,69.92
+2025,2510,000236,Ohio Connections Academy Inc,000236,Ohio Connections Academy Inc,Community School,69.92
 2025,1128,050336,North Union Local School District,000242,North Union Elementary School,Public School,91.469
 2025,1571,045906,Alexander Local,000257,Alexander Elementary School,Public School,86.391
 2025,335,044545,North Royalton City,000265,North Royalton Elementary School,Public School,102.008
@@ -5933,7 +5933,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,2437,000543,Pinnacle Academy,000543,Pinnacle Academy,Community School,71.857
 2025,2916,000546,Winterfield Venture Academy,000546,Winterfield Venture Academy,Community School,56.639
 2025,2663,044404,Middletown City,000547,Amanda Elementary School,Public School,65.145
-2025,2824,000553,Columbus Humanities  Arts and Technology Academy,000553,Columbus Humanities  Arts and Technology Academy,Community School,59.884
+2025,2824,000553,Columbus Humanities Arts and Technology Academy,000553,Columbus Humanities Arts and Technology Academy,Community School,59.884
 2025,3175,000556,A+ Arts Academy,000556,A+ Arts Academy,Community School,42.797
 2025,2811,000557,Columbus Arts & Technology Academy,000557,Columbus Arts & Technology Academy,Community School,60.272
 2025,1663,000558,Columbus Preparatory Academy,000558,Columbus Preparatory Academy,Community School,85.363
@@ -5967,7 +5967,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,102,049759,Anna Local,000745,Anna Elementary School,Public School,106.997
 2025,556,049759,Anna Local,000752,Anna High School,Public School,98.454
 2025,555,046623,Ansonia Local,000760,Ansonia Elementary School,Public School,98.468
-2025,3008,000770,Maritime Academy of Toledo  The,000770,Maritime Academy of Toledo  The,Community School,52.804
+2025,3008,000770,Maritime Academy of Toledo The,000770,Maritime Academy of Toledo The,Community School,52.804
 2025,947,046623,Ansonia Local,000778,Ansonia High School,Public School,93.529
 2025,2228,000779,Educational Academy for Boys & Girls,000779,Educational Academy for Boys & Girls,Community School,76.765
 2025,2173,000780,Midnimo Cross Cultural Middle School,000780,Midnimo Cross Cultural Middle School,Community School,77.874
@@ -6417,7 +6417,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,2080,047928,Dawson-Bryant Local,008219,Dawson-Bryant High School,Public School,79.828
 2025,957,047928,Dawson-Bryant Local,008227,Dawson-Bryant Middle School,Public School,93.384
 2025,1611,048009,Licking Heights Local,008242,Summit Station Intermediate,Public School,85.907
-2025,1630,043851,Deer Park Community City,008250,Deer Park  Jr/Sr High School,Public School,85.749
+2025,1630,043851,Deer Park Community City,008250,Deer Park Jr/Sr High School,Public School,85.749
 2025,472,050013,Green Local,008252,Green Primary School,Public School,99.85
 2025,171,047027,Dublin City,008257,Glacier Ridge Elementary,Public School,104.937
 2025,2899,044909,Toledo City,008262,Jesup W. Scott High School,Public School,57.056
@@ -6530,7 +6530,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,141,044420,Mount Vernon City,009258,East Elementary School,Public School,105.842
 2025,1226,043893,Dover City,009274,East Elementary School,Public School,90.4
 2025,1860,043935,Eaton Community City,009282,Hollingsworth East Elementary School,Public School,83.009
-2025,1358,009283,Dayton Early College Academy  Inc,009283,Dayton Early College Academy  Inc,Community School,88.82
+2025,1358,009283,Dayton Early College Academy Inc,009283,Dayton Early College Academy Inc,Community School,88.82
 2025,1450,043786,Cleveland Municipal,009285,Douglas MacArthur,Public School,87.646
 2025,359,046763,Olentangy Local,009286,Orange High School,Public School,101.605
 2025,1090,044727,St Marys City,009308,St. Marys East Primary School,Public School,91.866
@@ -6679,7 +6679,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,227,011381,Greater Summit County Early Learning Center,011381,Greater Summit County Early Learning Center,Community School,103.906
 2025,2787,011390,Bella Academy of Excellence,011390,Bella Academy of Excellence,Community School,61.301
 2025,954,048744,Valley View Local,011395,Valley View Elementary School,Public School,93.453
-2025,1576,044602,Oregon City,011429,Fassett Junior High  School,Public School,86.355
+2025,1576,044602,Oregon City,011429,Fassett Junior High School,Public School,86.355
 2025,1816,043869,Defiance City,011430,Defiance Elementary School,Public School,83.59
 2025,3218,011439,Renaissance Academy dba Bessie Sherrod Price Preparatory Aca,011439,Renaissance Academy dba Bessie Sherrod Price Preparatory Aca,Community School,36.384
 2025,1728,046045,Fayetteville-Perry Local,011452,Fayetteville-Perry Elementary School,Public School,84.597
@@ -6693,13 +6693,13 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,1454,044107,Hamilton City,011484,Ridgeway Elementary School,Public School,87.633
 2025,2135,044107,Hamilton City,011485,Bridgeport Elementary School,Public School,78.696
 2025,2447,045161,Youngstown City,011493,Rayen Early College Middle School,Public School,71.631
-2025,785,046334,Felicity-Franklin Local,011494,Felicity-Franklin Local  Elementary School,Public School,95.491
-2025,2210,046334,Felicity-Franklin Local,011502,Felicity-Franklin Local  High School,Public School,77.102
+2025,785,046334,Felicity-Franklin Local,011494,Felicity-Franklin Local Elementary School,Public School,95.491
+2025,2210,046334,Felicity-Franklin Local,011502,Felicity-Franklin Local High School,Public School,77.102
 2025,313,011506,Dayton Regional STEM Schools,011506,Dayton Regional STEM Schools,STEM,102.355
 2025,2883,011511,Lakeland Academy Community School,011511,Lakeland Academy Community School,Community School,57.532
 2025,2647,043513,Ashtabula Area City,011518,Superior Intermediate School,Public School,65.773
 2025,532,047241,Beavercreek City,011528,Jacob Coy Middle School,Public School,98.863
-2025,1159,043489,Akron City,011532,National Inventors Hall of Fame School  Center for STEM,Public School,91.074
+2025,1159,043489,Akron City,011532,National Inventors Hall of Fame School Center for STEM,Public School,91.074
 2025,2557,011533,Horizon Science Academy Lorain,011533,Horizon Science Academy Lorain,Community School,68.454
 2025,3020,011534,Horizon Science Academy Dayton High School,011534,Horizon Science Academy Dayton High School,Community School,52.3
 2025,906,044750,Shaker Heights City,011536,Fernway Elementary School,Public School,93.919
@@ -6894,7 +6894,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,1846,046961,Gahanna-Jefferson City,013938,Goshen Lane Elementary School,Public School,83.223
 2025,1375,046342,Goshen Local,013946,Goshen Middle School,Public School,88.627
 2025,3039,048694,Trotwood-Madison City,013957,Trotwood-Madison Middle School,Public School,51.455
-2025,2586,013994,Albert Einstein Academy for Letters  Arts and Sciences-Ohio,013994,Albert Einstein Academy for Letters  Arts and Sciences-Ohio,Community School,67.644
+2025,2586,013994,Albert Einstein Academy for Letters Arts and Sciences-Ohio,013994,Albert Einstein Academy for Letters Arts and Sciences-Ohio,Community School,67.644
 2025,3084,048736,Northridge Local,013995,NORTHRIDGE MIDDLE SCHOOL,Public School,49.056
 2025,2490,013999,Rise & Shine Academy,013999,Rise & Shine Academy,Community School,70.463
 2025,1043,043661,Brunswick City,014001,Walter Kidder Elementary School,Public School,92.53
@@ -7342,7 +7342,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,432,044560,Norwalk City,019968,League Elementary School,Public School,100.377
 2025,2260,050245,LaBrae Local,019992,LaBrae Middle School,Public School,76.414
 2025,143,044578,Norwood City,019994,The Norwood Montessori School,Public School,105.833
-2025,3007,020007,IDEA Greater Cincinnati  Inc,020007,IDEA Greater Cincinnati  Inc,Community School,52.806
+2025,3007,020007,IDEA Greater Cincinnati Inc,020007,IDEA Greater Cincinnati Inc,Community School,52.806
 2025,1492,050245,LaBrae Local,020008,LaBrae High School,Public School,87.173
 2025,2880,043802,Columbus City Schools District,020024,Leawood Elementary School,Public School,57.566
 2025,910,044214,Lebanon City,020032,Lebanon High School,Public School,93.86
@@ -7443,7 +7443,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,2851,044784,Sidney City,021337,Longfellow Primary School,Public School,58.571
 2025,1678,045104,Willoughby-Eastlake City,021378,Longfellow Elementary School,Public School,85.214
 2025,2914,044909,Toledo City,021386,Longfellow Elementary School,Public School,56.73
-2025,681,021440,Mater Academy Preparatory  Inc.,021440,Mater Academy Preparatory  Inc.,Community School,96.875
+2025,681,021440,Mater Academy Preparatory Inc.,021440,Mater Academy Preparatory Inc.,Community School,96.875
 2025,3210,021442,Legacy Academy of Excellence Mansfield,021442,Legacy Academy of Excellence Mansfield,Community School,38.739
 2025,2963,021446,ACE Community Academy,021446,ACE Community Academy,Community School,54.39
 2025,1857,021447,Heart of Ohio Classical Academy,021447,Heart of Ohio Classical Academy,Community School,83.056
@@ -7529,7 +7529,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,1411,049882,Marlington Local,022947,Marlington High School,Public School,88.115
 2025,519,045625,Upper Sandusky Exempted Village,022954,Union Elementary School,Public School,99.014
 2025,3117,044909,Toledo City,022970,Marshall STEMM Academy,Public School,47.059
-2025,789,050559,Green Local,022996,Green  Elementary School,Public School,95.382
+2025,789,050559,Green Local,022996,Green Elementary School,Public School,95.382
 2025,2175,044347,Martins Ferry City,023036,Martins Ferry High School,Public School,77.84
 2025,3144,043786,Cleveland Municipal,023069,Mary B Martin School,Public School,45.616
 2025,930,049890,Minerva Local,023077,Minerva Elementary School,Public School,93.702
@@ -7731,7 +7731,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,1368,047720,New London Local,026823,New London High School,Public School,88.667
 2025,339,046680,Tri-Village Local,026849,Tri-Village High School,Public School,101.947
 2025,2726,046136,New Miami Local,026864,New Miami Elementary School,Public School,63.285
-2025,2501,046136,New Miami Local,026872,New Miami  High School,Public School,70.115
+2025,2501,046136,New Miami Local,026872,New Miami High School,Public School,70.115
 2025,499,048371,Springfield Local,026880,Springfield Elementary School,Public School,99.377
 2025,1760,044487,New Philadelphia City,026906,New Philadelphia High School,Public School,84.294
 2025,1475,045559,New Richmond Exempted Village,026922,New Richmond High School,Public School,87.375
@@ -7806,7 +7806,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,991,047373,Oak Hills Local,028217,Oak Hills High School,Public School,92.963
 2025,2846,044909,Toledo City,028258,Oakdale Elementary School,Public School,58.703
 2025,2965,043802,Columbus City Schools District,028290,Oakland Park Alternative Elementary,Public School,54.331
-2025,2736,043802,Columbus City Schools District,028316,Oakmont  Elementary School,Public School,62.799
+2025,2736,043802,Columbus City Schools District,028316,Oakmont Elementary School,Public School,62.799
 2025,403,044180,Kettering City School District,028324,Oakview Elementary School,Public School,100.979
 2025,1380,049932,Plain Local,028365,GlenOak High School,Public School,88.51
 2025,41,044586,Oakwood City,028373,Oakwood High School,Public School,110.14
@@ -7822,7 +7822,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,1973,069682,East Guernsey Local,028522,Buckeye Trail Middle School,Public School,81.354
 2025,2374,043802,Columbus City Schools District,028530,Olde Orchard Alt Elementary School,Public School,73.835
 2025,106,046763,Olentangy Local,028548,Olentangy High School,Public School,106.91
-2025,2211,046243,Tecumseh Local,028555,Tecumseh  Middle School,Public School,77.074
+2025,2211,046243,Tecumseh Local,028555,Tecumseh Middle School,Public School,77.074
 2025,2684,048694,Trotwood-Madison City,028571,Trotwood-Madison Early Learning Center,Public School,64.511
 2025,3108,043786,Cleveland Municipal,028589,Oliver Hazard Perry Elementary School,Public School,47.765
 2025,790,046573,Olmsted Falls City,028605,Olmsted Falls High School,Public School,95.378
@@ -7960,7 +7960,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,782,045476,Marysville Exempted Village,031179,Raymond Elementary School,Public School,95.534
 2025,2042,044693,Reading Community City,031187,Reading Junior Senior High School,Public School,80.421
 2025,2105,047019,Hilliard City,031195,J W Reason Elementary School,Public School,79.299
-2025,833,047886,Madison Local,031203,South  Elementary School,Public School,94.795
+2025,833,047886,Madison Local,031203,South Elementary School,Public School,94.795
 2025,86,048124,Avon Lake City,031211,Redwood Elementary School,Public School,107.973
 2025,1789,045427,Hubbard Exempted Village,031245,Hubbard Middle School,Public School,83.87
 2025,1239,045377,Georgetown Exempted Village,031252,Georgetown Elementary School,Public School,90.263
@@ -8010,7 +8010,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,57,044701,Rocky River City,032243,Rocky River High School,Public School,109.128
 2025,2958,044909,Toledo City,032276,Rogers High School,Public School,54.564
 2025,621,044198,Lakewood City,032359,Roosevelt Elementary School,Public School,97.55
-2025,748,045427,Hubbard Exempted Village,032391,Hubbard  Elementary School,Public School,95.923
+2025,748,045427,Hubbard Exempted Village,032391,Hubbard Elementary School,Public School,95.923
 2025,447,044826,Steubenville City,032433,East Garfield Elementary School,Public School,100.168
 2025,3086,044909,Toledo City,032441,Martin Luther King Academy for Boys Elementary School,Public School,48.852
 2025,2542,050062,Springfield Local,032482,Spring Hill Elementary,Public School,68.864
@@ -8143,7 +8143,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,2443,045344,Crestline Exempted Village,035154,Crestline Elementary School,Public School,71.684
 2025,1734,049221,Southeast Local,035170,Southeast High School,Public School,84.558
 2025,1941,043588,Bellefontaine City,035188,Bellefontaine Elementary School,Public School,81.928
-2025,1109,046276,Southeastern Local,035196,Southeastern  Sr. High School,Public School,91.643
+2025,1109,046276,Southeastern Local,035196,Southeastern Sr. High School,Public School,91.643
 2025,1649,049528,Southeastern Local,035204,Southeastern High School,Public School,85.542
 2025,1766,048538,Southern Local,035220,Southern High School,Public School,84.209
 2025,1750,050237,Southington Local,035238,Southington Elementary School,Public School,84.427
@@ -8337,7 +8337,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,3094,043901,East Cleveland City School District,038679,W.H. Kirk Middle School,Public School,48.444
 2025,1310,045591,Rittman Exempted Village,038687,Rittman Elementary School,Public School,89.415
 2025,1467,047696,West Holmes Local,038695,West Holmes High School,Public School,87.461
-2025,1885,048256,Jefferson Local,038729,West Jefferson  Middle School,Public School,82.758
+2025,1885,048256,Jefferson Local,038729,West Jefferson Middle School,Public School,82.758
 2025,1830,048256,Jefferson Local,038737,West Jefferson High School,Public School,83.43
 2025,323,046219,West Liberty-Salem Local,038752,West Liberty-Salem Elementary School,Public School,102.206
 2025,632,046219,West Liberty-Salem Local,038760,West Liberty-Salem High School,Public School,97.407
@@ -8360,7 +8360,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,1256,046904,Walnut Township Local,039065,Millersport Elementary School,Public School,90.039
 2025,18,043752,Cincinnati Public Schools,039073,Walnut Hills High School,Public School,112.413
 2025,2194,046904,Walnut Township Local,039081,Millersport Jr/Sr High School,Public School,77.368
-2025,2743,044628,Painesville City Local,039099,Heritage  Middle School,Public School,62.572
+2025,2743,044628,Painesville City Local,039099,Heritage Middle School,Public School,62.572
 2025,2822,043802,Columbus City Schools District,039107,Walnut Ridge High School,Public School,59.949
 2025,1496,045047,Westerville City,039115,Walnut Springs Middle School,Public School,87.156
 2025,3041,043786,Cleveland Municipal,039149,Walton School,Public School,51.4
@@ -8527,7 +8527,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,973,045674,Yellow Springs Exempted Village,042416,Yellow Springs/McKinney High School,Public School,93.23
 2025,650,043596,Bellevue City,042424,Bellevue Elementary School,Public School,97.247
 2025,1815,044446,Nelsonville-York City,042440,Nelsonville-York Elementary School,Public School,83.602
-2025,411,048470,Buckeye Local,042457,Buckeye  Primary School,Public School,100.808
+2025,411,048470,Buckeye Local,042457,Buckeye Primary School,Public School,100.808
 2025,1037,044487,New Philadelphia City,042465,York Elementary School,Public School,92.593
 2025,3036,043802,Columbus City Schools District,042499,Yorktown Middle School,Public School,51.543
 2025,2026,047787,Buckeye Local,042515,Buckeye South Elementary School,Public School,80.616
@@ -8613,7 +8613,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,2326,044800,South-Western City,062190,Beulah Park Middle School,Public School,74.887
 2025,2457,044800,South-Western City,062208,Finland Middle School,Public School,71.272
 2025,2756,044800,South-Western City,062216,Norton Middle School,Public School,62.153
-2025,2202,048843,Franklin Local,062224,Roseville Elementary  School,Public School,77.241
+2025,2202,048843,Franklin Local,062224,Roseville Elementary School,Public School,77.241
 2025,2402,048850,Maysville Local,062232,Maysville Middle School,Public School,73.034
 2025,2596,048520,Meigs Local,062307,Meigs Middle School,Public School,67.286
 2025,2234,044008,Franklin City,062331,Franklin Junior High School,Public School,76.669
@@ -8687,7 +8687,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,762,048322,Jackson-Milton Local,066746,Jackson-Milton Elementary School,Public School,95.749
 2025,234,044867,Sycamore Community City,066761,Sycamore Junior High School,Public School,103.738
 2025,2449,044081,Winton Woods City,066787,Winton Woods Elementary School,Public School,71.541
-2025,2885,043844,Dayton City,066795,David H. Ponitz Career Technology  Center,Public School,57.473
+2025,2885,043844,Dayton City,066795,David H. Ponitz Career Technology Center,Public School,57.473
 2025,198,049171,Aurora City,066803,Harmon Middle School,Public School,104.393
 2025,456,045047,Westerville City,066811,Mark Twain Elementary School,Public School,100.061
 2025,468,045047,Westerville City,066829,Robert Frost Elementary School,Public School,99.893
@@ -8757,7 +8757,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,1972,046359,West Clermont Local,089565,Holly Hill Elementary School,Public School,81.381
 2025,1673,044255,London City,089599,London Elementary School,Public School,85.249
 2025,1627,044917,Toronto City,089631,Toronto Elementary School,Public School,85.798
-2025,1215,048801,Highland Local,089649,Highland  Elementary School,Public School,90.503
+2025,1215,048801,Highland Local,089649,Highland Elementary School,Public School,90.503
 2025,1473,048900,Noble Local,091363,Shenandoah Elementary School,Public School,87.4
 2025,540,050328,Fairbanks Local,091371,Fairbanks Middle School,Public School,98.73
 2025,2562,045914,Federal Hocking Local,091389,Federal Hocking Middle School,Public School,68.346
@@ -8765,7 +8765,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,157,044586,Oakwood City,093195,Oakwood Junior High School,Public School,105.463
 2025,2904,043752,Cincinnati Public Schools,094623,Academy Of World Languages School,Public School,56.919
 2025,1390,044123,Hillsboro City,095661,Hillsboro Early Childhood Center,Public School,88.333
-2025,1036,044214,Lebanon City,095679,Donovan  Elementary School,Public School,92.605
+2025,1036,044214,Lebanon City,095679,Donovan Elementary School,Public School,92.605
 2025,946,045138,Worthington City,095794,Mccord Middle School,Public School,93.567
 2025,2137,045609,Rossford Exempted Village,095828,Rossford Junior High School,Public School,78.666
 2025,2578,047308,Rolling Hills Local,096396,Secrest Elementary School,Public School,67.813
@@ -8837,7 +8837,7 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,175,047027,Dublin City,120212,Willard Grizzell Middle School,Public School,104.858
 2025,2102,049635,Northwest Local,120261,Northwest Middle School,Public School,79.339
 2025,1004,049635,Northwest Local,120279,Northwest Elementary School,Public School,92.843
-2025,1225,046060,Western Brown Local,120337,Mt  Orab Middle School,Public School,90.406
+2025,1225,046060,Western Brown Local,120337,Mt Orab Middle School,Public School,90.406
 2025,835,046961,Gahanna-Jefferson City,120360,Blacklick Elementary School,Public School,94.785
 2025,1214,047027,Dublin City,120485,Dublin Scioto High School,Public School,90.519
 2025,1683,046078,Ripley-Union-Lewis-Huntington Local,121434,Ripley Union Lewis Huntington Elementary School,Public School,85.166
@@ -8897,25 +8897,25 @@ ranking_year,rank,lea_irn,lea_name,building_irn,building_name,building_org_type,
 2025,3183,132951,Constellation Schools: Lorain Community Elementary,132951,Constellation Schools: Lorain Community Elementary,Community School,42.115
 2025,2667,132969,Constellation Schools: Elyria Community,132969,Constellation Schools: Elyria Community,Community School,65.03
 2025,2087,132993,Constellation Schools: Westpark Community Elementary,132993,Constellation Schools: Westpark Community Elementary,Community School,79.578
-2025,2852,133215,Intergenerational School  The,133215,Intergenerational School  The,Community School,58.552
+2025,2852,133215,Intergenerational School The,133215,Intergenerational School The,Community School,58.552
 2025,2634,133256,Constellation Schools: Parma Community,133256,Constellation Schools: Parma Community,Community School,66.29
 2025,2797,133280,Washington Park Community School,133280,Washington Park Community School,Community School,60.705
 2025,3023,133306,Summit Academy Community School for Alternative Learn-Canton,133306,Summit Academy Community School for Alternative Learn-Canton,Community School,52.105
 2025,3205,133322,Summit Academy Community School Alternative Learners-Lorain,133322,Summit Academy Community School Alternative Learners-Lorain,Community School,39.541
 2025,2106,133330,T.C.P. World Academy,133330,T.C.P. World Academy,Community School,79.293
 2025,3018,133348,Richard Allen Preparatory,133348,Richard Allen Preparatory,Community School,52.328
-2025,2794,133421,Graham School  The,133421,Graham School  The,Community School,60.816
+2025,2794,133421,Graham School The,133421,Graham School The,Community School,60.816
 2025,1751,133439,Cornerstone Academy Community School,133439,Cornerstone Academy Community School,Community School,84.414
-2025,3061,133454,Alliance Community Schools  Inc. dba Dayton Leadership Acade,133454,Alliance Community Schools  Inc. dba Dayton Leadership Acade,Community School,50.468
+2025,3061,133454,Alliance Community Schools Inc. dba Dayton Leadership Acade,133454,Alliance Community Schools Inc. dba Dayton Leadership Acade,Community School,50.468
 2025,3051,133504,ReGeneration Schools Avondale Elementary,133504,ReGeneration Schools Avondale Elementary,Community School,50.854
 2025,2524,133512,Cincinnati College Preparatory Academy,133512,Cincinnati College Preparatory Academy,Community School,69.578
 2025,2829,133538,Edge Learning,133538,Edge Learning,Community School,59.444
-2025,2760,133561,Ohio Achievement Charter Schools  Inc. dba Millennium Commun,133561,Ohio Achievement Charter Schools  Inc. dba Millennium Commun,Community School,62.029
+2025,2760,133561,Ohio Achievement Charter Schools Inc. dba Millennium Commun,133561,Ohio Achievement Charter Schools Inc. dba Millennium Commun,Community School,62.029
 2025,2863,133587,Summit Academy Akron Elementary School,133587,Summit Academy Akron Elementary School,Community School,58.112
 2025,3016,043844,Dayton City,133603,Roosevelt Elementary School,Public School,52.384
 2025,2701,043786,Cleveland Municipal,133629,Horizon Science Acad Cleveland,Community School,64.087
 2025,2051,133660,Horizon Science Academy Columbus,133660,Horizon Science Academy Columbus,Community School,80.364
-2025,2984,133678,Riverside Community School  Inc. dba Riverside Academy,133678,Riverside Community School  Inc. dba Riverside Academy,Community School,53.522
+2025,2984,133678,Riverside Community School Inc. dba Riverside Academy,133678,Riverside Community School Inc. dba Riverside Academy,Community School,53.522
 2025,2686,133736,Richard Allen Academy,133736,Richard Allen Academy,Community School,64.444
 2025,1978,133942,Toledo School For The Arts,133942,Toledo School For The Arts,Community School,81.318
 2025,2902,134072,Youngstown Community School,134072,Youngstown Community School,Community School,56.984

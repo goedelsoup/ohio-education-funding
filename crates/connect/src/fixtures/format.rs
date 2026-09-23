@@ -20,14 +20,47 @@ pub fn format_value(value: Option<f64>, places: usize) -> String {
 }
 
 /// District names go into a comma-separated file, so commas are replaced rather than quoted.
+///
+/// The replacement is what makes the collapse necessary, and that is the third bug this file
+/// exists because of. A publisher writes `EDGE ACADEMY, THE ELEMENTARY`; substituting a space
+/// for the comma leaves `EDGE ACADEMY  THE ELEMENTARY`, because the comma already had a space
+/// after it. So the function manufactured the doubled space it then preserved, in five
+/// committed fixtures — the CCD directory, the casino distributions, both EdChoice extracts and
+/// the community school model.
+///
+/// #439 is what made it worth fixing rather than noting: the department's revised FY2024
+/// profile report restates 25 district names with a doubled space of the publisher's own, and
+/// a rule that collapses one kind and not the other would have to explain which.
 #[must_use]
 pub fn clean_name(raw: &str) -> String {
-    raw.replace(',', " ").trim().to_string()
+    raw.replace(',', " ")
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_substituted_comma_does_not_leave_a_doubled_space() {
+        // The publisher's spelling, and the one `replace` alone produced from it.
+        assert_eq!(
+            clean_name("EDGE ACADEMY, THE ELEMENTARY"),
+            "EDGE ACADEMY THE ELEMENTARY"
+        );
+        // A doubled space the publisher wrote, which the revised FY2024 profile report has in
+        // 25 district names. Same rule, so there is nothing to tell apart.
+        assert_eq!(
+            clean_name("Arcanum-Butler Local  (046631) - Darke County"),
+            "Arcanum-Butler Local (046631) - Darke County"
+        );
+        assert_eq!(
+            clean_name("  Ada Exempted Village  "),
+            "Ada Exempted Village"
+        );
+    }
 
     #[test]
     fn formats_trim_only_past_a_decimal_point() {
