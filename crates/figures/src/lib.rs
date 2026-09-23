@@ -1269,7 +1269,7 @@ pub struct Regions {
     pub y: Axis,
     /// What each hue means, in the order the marks index.
     ///
-    /// At most [`CLASSES`], because the palette carries two hues and a neutral and generates no
+    /// At most `CLASSES`, because the palette carries two hues and a neutral and generates no
     /// others. **The first class is drawn neutral**, so a spread whose classification has a
     /// "neither" state puts it first: `web/src/lib/plot/tokens.ts` calls the neutral slot "any
     /// mark with no polarity, never a hue", which is what a subject outside a classification is.
@@ -1307,7 +1307,7 @@ impl Regions {
     ///
     /// # Panics
     ///
-    /// If there are no panels, a panel is empty, there are no classes or more than [`CLASSES`],
+    /// If there are no panels, a panel is empty, there are no classes or more than `CLASSES`,
     /// a mark names a class that does not exist, or a coordinate is not finite.
     #[must_use]
     pub fn framed(
@@ -14519,7 +14519,8 @@ pub static FIGURES: &[Figure] = &[
         key: "project/lost-pupils-second-fifth-districts",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "The second fifth of the districts that lost pupils",
+        label: "The second fifth of the districts that lost pupils, by published capacity per \
+                pupil",
         pinned: 102.0,
         tolerance: 0.0,
         compute: |i| i.lost_pupils.lost_fifth(2).districts as f64,
@@ -14537,7 +14538,8 @@ pub static FIGURES: &[Figure] = &[
         key: "project/lost-pupils-third-fifth-districts",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "The third fifth -- where the per-pupil term crosses zero",
+        label: "The third fifth of the districts that lost pupils -- the one the per-pupil term \
+                crosses zero in",
         pinned: 102.0,
         tolerance: 0.0,
         compute: |i| i.lost_pupils.lost_fifth(3).districts as f64,
@@ -14555,7 +14557,8 @@ pub static FIGURES: &[Figure] = &[
         key: "project/lost-pupils-fourth-fifth-districts",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "The fourth fifth",
+        label: "The fourth fifth of the districts that lost pupils, by published capacity per \
+                pupil",
         pinned: 102.0,
         tolerance: 0.0,
         compute: |i| i.lost_pupils.lost_fifth(4).districts as f64,
@@ -14573,7 +14576,8 @@ pub static FIGURES: &[Figure] = &[
         key: "project/lost-pupils-wealthiest-fifth-districts",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "The wealthiest fifth, which carries the remainder of the 514",
+        label: "The wealthiest fifth of the districts that lost pupils, which carries the \
+                remainder of the 514",
         pinned: 106.0,
         tolerance: 0.0,
         compute: |i| i.lost_pupils.lost_fifth(5).districts as f64,
