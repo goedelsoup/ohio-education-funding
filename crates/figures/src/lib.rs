@@ -13410,6 +13410,17 @@ pub static FIGURES: &[Figure] = &[
         },
     },
     Figure {
+        key: "project/the-mean-district-bias-at-six-years-across-the-closure",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "The mean district\u{2019}s bias at the same six years over every scored forecast, \
+                the closures included \u{2014} twice the pre-closure figure at the identical \
+                horizon, so the two sit beside each other wherever one of them is stated",
+        pinned: 0.023_698_527_7,
+        tolerance: 0.000_000_1,
+        compute: |i| i.bias[5].across_it.mean_district,
+    },
+    Figure {
         key: "project/the-mean-district-bias-at-nine-years-before-the-closure",
         owner: "crates/project",
         unit: Unit::Ratio,

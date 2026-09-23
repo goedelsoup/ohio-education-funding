@@ -21,6 +21,7 @@ import {
   forecast,
   forecastPath,
   growthPrior,
+  meanDistrictBias,
   observations,
   projectSeries,
   spread,
@@ -453,4 +454,62 @@ test("shrinking to a weight of one reproduces the damped rate exactly", () => {
     damped.kind === "damped" ? damped.rate : NaN,
     12,
   );
+});
+
+/*
+ * The bias table, and the horizon the district fan reads out of it.
+ *
+ * `/method` draws this table from `crates/series.json`, so until the district fan landed nothing on
+ * the site read it off the feed at all — a published field with no reader is a field whose shape
+ * only the Rust serializer has ever agreed with. These are the four properties the card depends on.
+ */
+
+/** Where the district fan ends, as `district.ts` computes it — `meta.base_year + 6`. */
+const FAN_HORIZON = 6;
+
+test("the bias table runs from one year and is ordered by horizon", () => {
+  expect(meta.bias.length).toBeGreaterThan(0);
+  expect(meta.bias.map((r) => r.horizon)).toEqual(meta.bias.map((_, i) => i + 1));
+});
+
+test("the pre-closure columns are null from exactly the horizon the panel stops at", () => {
+  // Both pre-closure columns are absent together or present together: they are two readings of one
+  // set of forecasts, and a horizon with one of them would mean the set was scored for the mean
+  // district and not for the total.
+  const deepest = Math.max(
+    ...meta.bias.filter((r) => r.mean_district_pre_closure != null).map((r) => r.horizon),
+  );
+  expect(deepest).toBe(9);
+  for (const row of meta.bias) {
+    const inside = row.horizon <= deepest;
+    expect(row.mean_district_pre_closure != null, `horizon ${row.horizon}`).toBe(inside);
+    expect(row.total_pre_closure != null, `horizon ${row.horizon}`).toBe(inside);
+    // Never a zero standing in for an absence. A bias of exactly zero is a forecast right on
+    // average, which is the one reading a missing population must not be given.
+    if (!inside) expect(row.mean_district_pre_closure).toBeNull();
+  }
+  // And the fan's own horizon is inside it, which is why the card can state both populations.
+  expect(FAN_HORIZON).toBeLessThanOrEqual(deepest);
+});
+
+test("the district fan's horizon has both populations, and they differ", () => {
+  const at = meanDistrictBias(meta.bias, FAN_HORIZON);
+  expect(at).not.toBeNull();
+  // Both positive at six years: the projection runs high on the average district on either
+  // population, which is the whole claim the card's footnote makes.
+  expect(at!.beforeTheClosure).toBeGreaterThan(0);
+  expect(at!.acrossIt).toBeGreaterThan(at!.beforeTheClosure);
+  // Roughly twice, which is why the card refuses to print one of them alone.
+  expect(at!.acrossIt / at!.beforeTheClosure).toBeGreaterThan(1.5);
+});
+
+test("meanDistrictBias returns nothing rather than half a pair", () => {
+  // Past the pre-closure panel, where `mean_district` is present and its population is not. Half a
+  // pair is the failure: the deeper figure would be printed under whichever label the prose had.
+  const deep = meta.bias[meta.bias.length - 1]!;
+  expect(deep.mean_district_pre_closure).toBeNull();
+  expect(meanDistrictBias(meta.bias, deep.horizon)).toBeNull();
+  // And a horizon the table does not carry at all.
+  expect(meanDistrictBias(meta.bias, deep.horizon + 1)).toBeNull();
+  expect(meanDistrictBias(meta.bias, 0)).toBeNull();
 });

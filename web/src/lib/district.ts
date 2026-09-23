@@ -14,9 +14,24 @@
 import type { FanPoint } from "./chart.ts";
 import { barSpec, distributionSpec, type Drawing, fanSpec, nearestRank } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
-import { count, escapeHtml, money, ordinal, pct, percentileOf, signedMoney } from "./format.ts";
+import {
+  count,
+  escapeHtml,
+  logError,
+  money,
+  ordinal,
+  pct,
+  percentileOf,
+  signedMoney,
+} from "./format.ts";
 import { apply, currentLaw, currentRealizedAid, modelOf, publishedStatewide } from "./policy.ts";
-import { forecastPath, growthPrior, observations, statuteNote } from "./project.ts";
+import {
+  forecastPath,
+  growthPrior,
+  meanDistrictBias,
+  observations,
+  statuteNote,
+} from "./project.ts";
 import { realChange, series, type Basis } from "./real.ts";
 import { hasDenominators } from "./tax.ts";
 import * as routes from "./routes.ts";
@@ -178,6 +193,51 @@ export function renderEnrollmentYears(
 }
 
 /**
+ * What the band above is centred on, which is not the truth.
+ *
+ * # The level, next to the width
+ *
+ * The footnote above this one argues the band — its width is the finding, and that width is checked
+ * against the Census panel on `/method`. A band can hold the share it claims and have every
+ * forecast inside it sitting high, so the width holding says nothing at all about the centre. This
+ * is the centre, and until #458 the district fan was the one place on the site where a reader met a
+ * projection with the level unstated.
+ *
+ * # Two populations, not one figure
+ *
+ * Both are printed because at this horizon they differ by a factor of two, and a single bias figure
+ * whose population went unnamed would be the more misleading of the two whichever one was chosen.
+ * Restricting the backtest's targets to before the pandemic school closures is the cleaner
+ * population and resembles this forecast, which contains no closure; across them is the larger
+ * figure and the full record. `scenario/guarantee-phase-out` states the same pair for the same
+ * six-year leg, and {@link meanDistrictBias} returns nothing rather than half a pair.
+ *
+ * # It is a mean over districts and the prose has to keep saying so
+ *
+ * These are the same two numbers on every page that draws a band — 350 of the 609, the rest having
+ * collapsed. The backtest measures the average district's error and supports no statement about
+ * which side of it any one district falls on, so the sentence names the average twice and never
+ * this district, which is the one way a per-district page can carry a statewide mean without being
+ * read as a claim about its own subject.
+ *
+ * The percentage is `expm1` rather than the log error scaled, so it is exact rather than right to
+ * first order — the objection that keeps the log error itself in front.
+ */
+function biasNote(bias: { beforeTheClosure: number; acrossIt: number }, horizon: number): string {
+  return `<p class="note"><strong>The band is centred high, on the average district.</strong> The
+    width above is checked and holds; the <em>level</em> is a separate question and the answer is
+    not zero. Backtested against the Census panel, the average district's forecast ${horizon} years
+    out ran ${logError(bias.beforeTheClosure)} in logs — about ${pct(Math.expm1(bias.beforeTheClosure))}
+    over — against targets before the pandemic school closures, and
+    ${logError(bias.acrossIt)} at the same ${horizon} years over every forecast the panel scores,
+    closures included. That is a mean <em>over</em> districts and not a figure for this one: it is
+    the same pair wherever this card draws a band, and nothing in the backtest says which side of
+    it this district falls on. Neither the band above nor the line through it is adjusted for either number
+    — <a href="${routes.METHOD}#${routes.SECTIONS.method.forecastRange}">both populations are drawn at
+    every horizon on the method page</a>.</p>`;
+}
+
+/**
  * This district's aid carried forward to its own enrollment band.
  *
  * The same verified path the statewide fan uses, over one district instead of 606. For a district
@@ -220,6 +280,23 @@ function renderCarriedForward(bundle: Bundle, d: District): string {
   const widening =
     gapNow && end.realizedAid - end.formulaAid - (gapNow.realizedAid - gapNow.formulaAid);
 
+  /*
+   * What the same forecast has been wrong by, at this drawing's own horizon.
+   *
+   * The horizon is `end.fiscalYear - meta.base_year` rather than a number written here, because
+   * this card's `through` argument above is the only thing that decides how deep the picture goes
+   * and the bias belonging to it has to move when that does. Six years today, which is the leg
+   * `scenario/guarantee-phase-out` projects and the last horizon both populations reach.
+   *
+   * Absent on the guaranteed side. `insensitive` means the band has collapsed to a line because a
+   * fixed dollar amount does not respond to enrollment at all, so an enrollment-forecast bias says
+   * nothing about what this district receives; the branch's own footnote already says why. The
+   * falling reference line is enrollment-sensitive, but it is what the formula computes rather than
+   * what is paid, and #445 is explicit that nothing here corrects anything.
+   */
+  const horizon = end.fiscalYear - meta.base_year;
+  const bias = insensitive ? null : meanDistrictBias(meta.bias, horizon);
+
   return `
     <h3>Carried forward</h3>
     <div class="chartwrap" data-chart="district-fan">${renderToString((w) => fanSpec(
@@ -254,6 +331,7 @@ function renderCarriedForward(bundle: Bundle, d: District): string {
            band is the cross-sectional spread of district enrollment growth, not this
            district's own history — three observations cannot give that.`
     }</p>
+    ${bias ? biasNote(bias, horizon) : ""}
     ${statuteNote(end.fiscalYear, meta.statute_ends)}`;
 }
 

@@ -812,6 +812,40 @@ read the crossing off the painted path with `getPointAtLength` rather than off t
 the reason the coverage test gives: a chart drawing one line twice would satisfy every number in
 the prose.
 
+### The district fan reads the same bias off the feed, and the horizon is derived
+
+`/method` draws that card from `crates/series.json`, so `projection.bias` shipped on the feed with
+nothing reading it. The district fan is its first reader, and it is where the level matters most:
+until it landed, one district's projection was the only place on the site where a reader met a band
+whose width was argued and whose centre was not.
+
+The figure is `mean_district` and never `total`. The two quantities carry different biases and at
+five years different signs, so the statewide total's number under one district's chart is the exact
+substitution #431 exists to prevent — and `meanDistrictBias` in `project.ts` does not return the
+total at all, rather than returning it and trusting the caller.
+
+The horizon is **computed from the drawing**. `renderCarriedForward` passes `base_year + 6` to
+`forecastPath`, so the card asks for `end.fiscalYear - meta.base_year` rather than a 6 written into
+the prose: a fan moved a year deeper would otherwise go on printing the old horizon's bias under the
+new label. Six years is also where both populations still answer — the pre-closure pair is `null`
+from ten — and `meanDistrictBias` returns `null` rather than half a pair, because a bias figure whose
+population is unstated is worse than none where the two differ by a factor of two.
+
+So the card prints **both**, which is the difference between choosing a population and hiding that
+there was a choice. It is `logError`, moved out of `bias.ts` into `format.ts` for this: a
+per-district card has no business importing /method's card to format a number.
+
+Absent on the collapsed side, which is **259 of the 609** districts rather than the guarantee's own
+count — the branch is on whether there is a band to be biased about, not on `on_guarantee`, and 35
+districts are on the guarantee and still get both. Where the band has collapsed the aid is a fixed
+dollar amount that enrollment does not enter, so the bias of an enrollment forecast says nothing
+about what is received, and that branch's own footnote already says why.
+
+The prose names the average district twice and this district never. These are the same two numbers
+on all 350 pages that draw a band; the backtest measures the mean over districts and supports no
+statement about which side of it any one district falls on, and a per-district page is where a
+reader is most likely to take a statewide mean personally.
+
 The manifest's fifth answer is a **spread**, drawn by `scatterSpec` one panel at a time.
 `regionsOf` turns one into `SpreadPanel`s that share the crate's own frame — a per-panel domain
 would move a district between wealth fifths without moving the district — and hands each panel the

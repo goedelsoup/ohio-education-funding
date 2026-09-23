@@ -287,6 +287,10 @@ figures:
     value: 0.0036199719
     field: confidence
     as_written: "+0.0036 for the total"
+  - key: project/the-mean-district-bias-at-six-years-across-the-closure
+    value: 0.0236985277
+    field: confidence
+    as_written: "+0.0237 for the mean district"
   - key: project/the-mean-district-bias-at-thirteen-years
     value: 0.0733925385
     field: confidence
@@ -615,7 +619,11 @@ properties:
     +0.0171. This node's own projection runs a six-year leg to FY2032, and at six years those
     figures are +0.0117 for the mean district and +0.0036 for the total — so the FY2032 band
     above is centred high on both counts, by roughly three times as much on the district average
-    as on the state total, and nothing above is adjusted for it. Both quantities start under the
+    as on the state total, and nothing above is adjusted for it. The same six years across the
+    closure read +0.0237 for the mean district — twice the pre-closure figure at the identical
+    horizon, which is why the population a six-year statement rests on has to be named rather
+    than assumed. The district route's own fan runs this same six-year leg over one district
+    instead of 606, and it states both. Both quantities start under the
     truth and end over it, and they do not turn
     together: before the closure the mean district crosses zero at four years and the total not
     until five, so there is a horizon where the average district is already being over-forecast

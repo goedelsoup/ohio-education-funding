@@ -37,6 +37,7 @@ export type {
   ForecastCheckpoint,
   OutcomeStatewide,
   PolicyShape,
+  ProjectionBias,
   ProjectionMeta,
   Statewide,
 } from "./schema/feed.ts";
