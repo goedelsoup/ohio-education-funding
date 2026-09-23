@@ -353,22 +353,43 @@ pub struct Fifth {
     pub median_state_share: f64,
 }
 
-/// Cut a population into fifths by published capacity per pupil, least wealthy first.
+/// The names the five bands are written by, least wealthy first.
+///
+/// Here rather than in each caller because a band is quoted by name — `figures.json` pins
+/// `lost-pupils-third-fifth-held`, the prose says "the third fifth", and a drawing captions its
+/// panel — and three spellings of one cut is how two of them come to disagree.
+pub const FIFTHS: [&str; 5] = ["least wealthy", "second", "third", "fourth", "wealthiest"];
+
+/// Cut a population into fifths by published capacity per pupil, least wealthy first, and keep
+/// the **membership** rather than only what each band aggregates to.
 ///
 /// Equal counts with the remainder in the wealthiest band, which is how
 /// [`crate::anchor_incidence::by`] cuts its bands, so a fifth here and a fifth there are the same
-/// fifth.
+/// fifth. [`by_capacity`] is this function summarised, and goes through it rather than beside it:
+/// a drawing that cut its own fifths would be a second cut nobody could see disagreeing with the
+/// first.
 #[must_use]
-pub fn by_capacity(rows: &[&Standing]) -> [Fifth; 5] {
-    let mut sorted: Vec<&Standing> = rows.to_vec();
+pub fn fifths<'a>(rows: &[&'a Standing]) -> [Vec<&'a Standing>; 5] {
+    let mut sorted: Vec<&'a Standing> = rows.to_vec();
     sorted.sort_by(|a, b| a.capacity_per_pupil.total_cmp(&b.capacity_per_pupil));
     let width = sorted.len() / 5;
     std::array::from_fn(|index| {
-        let slice = if index == 4 {
-            &sorted[index * width..]
+        if index == 4 {
+            sorted[index * width..].to_vec()
         } else {
-            &sorted[index * width..(index + 1) * width]
-        };
+            sorted[index * width..(index + 1) * width].to_vec()
+        }
+    })
+}
+
+/// What each fifth of a population aggregates to, least wealthy first.
+///
+/// The cut is [`fifths`]'s.
+#[must_use]
+pub fn by_capacity(rows: &[&Standing]) -> [Fifth; 5] {
+    let bands = fifths(rows);
+    std::array::from_fn(|index| {
+        let slice = &bands[index];
         let mut by_population = [0usize; 4];
         for s in slice {
             by_population[s.population.index()] += 1;

@@ -75,9 +75,17 @@ export interface ScatterPoint {
    *
    * There is one split worth drawing on this site and it is `on_guarantee`, which is near enough
    * balanced — 294 against 312 — that neither half is a rounding error on the other. A third
-   * category is not available and would not be drawn if it were: the palette is two hues.
+   * *category* is not available: the palette is two hues and generates no others.
+   *
+   * `"neutral"` is not a third category. It is a point the split does not classify, and it is
+   * spelled out rather than left as an absence because the two are different claims: a scatter
+   * with no `series` at all is an unsplit population drawn in one colour, whereas a `"neutral"`
+   * point sits in a split population that has nothing to say about *this* one. The guarantee's
+   * two terms are the case — below a multiple of one there is no majority to take, so those
+   * districts are a third state — and `plot/tokens.ts` has the slot waiting: "any mark with no
+   * polarity. Never a hue."
    */
-  series?: "formula" | "guarantee";
+  series?: "formula" | "guarantee" | "neutral";
   /**
    * Which ordered band of a *third* measure this district falls in, 0 lowest.
    *

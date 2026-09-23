@@ -20,7 +20,8 @@ use std::collections::BTreeSet;
 
 use figures::{
     compute_all, compute_all_curves, compute_all_planes, compute_all_scatters, compute_all_series,
-    Row, CURVES, FIGURES, PLANES, SCATTERS, SERIES, SERIES_CONTRACT_VERSION,
+    compute_all_spreads, Row, CURVES, FIGURES, PLANES, SCATTERS, SERIES, SERIES_CONTRACT_VERSION,
+    SPREADS,
 };
 
 /// The rows a reader would quote: the top of the chart and the bottom of it.
@@ -215,10 +216,10 @@ fn the_manifest_is_stable() {
 /// The document parses as JSON, declares its contract, and carries every member of every array
 /// exactly once.
 ///
-/// All four arrays: a cloud, a plane and a curve are keyed the same way a series is and each
-/// draws one line per point for the same reason a series draws one per row, so the counts below
-/// are over the four registries together and a drawing silently dropped would fail the first of
-/// them.
+/// All five arrays: a cloud, a plane, a curve and a spread are keyed the same way a series is
+/// and each draws one line per point for the same reason a series draws one per row, so the
+/// counts below are over the five registries together and a drawing silently dropped would fail
+/// the first of them.
 #[test]
 fn the_document_is_readable_and_complete() {
     let json = figures::series_manifest();
@@ -233,8 +234,8 @@ fn the_document_is_readable_and_complete() {
     );
     assert_eq!(
         json.matches("{\"key\": ").count(),
-        SERIES.len() + SCATTERS.len() + PLANES.len() + CURVES.len(),
-        "every series, cloud, plane and curve is written exactly once"
+        SERIES.len() + SCATTERS.len() + PLANES.len() + CURVES.len() + SPREADS.len(),
+        "every series, cloud, plane, curve and spread is written exactly once"
     );
     let rows: usize = compute_all_series().iter().map(|e| e.rows.len()).sum();
     // Per cloud: every point, every panel, and every axis, which is the shared x and one y per
@@ -256,10 +257,29 @@ fn the_document_is_readable_and_complete() {
         .iter()
         .map(|e| e.traces.lines.len() + 2 + usize::from(e.traces.reference.is_some()))
         .sum();
+    // Per spread: every mark, every panel, every boundary, every census row, everyone
+    // unreached, and its two axes. A boundary is written as its two endpoints and they carry no
+    // labels of their own, for the reason a curve's points do not: the line is the named thing.
+    let spread: usize = compute_all_spreads()
+        .iter()
+        .map(|e| {
+            e.regions
+                .panels
+                .iter()
+                .map(|p| p.marks.len())
+                .sum::<usize>()
+                + e.regions.panels.len()
+                + e.regions.boundaries.len()
+                + e.regions.census.len()
+                + e.regions.unreached.len()
+                + 2
+        })
+        .sum();
     assert_eq!(
         json.matches("{\"label\": ").count(),
-        rows + drawn + placed + traced,
-        "every row, panel, axis, point, position and line is written exactly once"
+        rows + drawn + placed + traced + spread,
+        "every row, panel, axis, point, position, line, mark, boundary, region and absence is \
+         written exactly once"
     );
     for key in SERIES
         .iter()
@@ -267,6 +287,7 @@ fn the_document_is_readable_and_complete() {
         .chain(SCATTERS.iter().map(|s| s.key))
         .chain(PLANES.iter().map(|p| p.key))
         .chain(CURVES.iter().map(|c| c.key))
+        .chain(SPREADS.iter().map(|s| s.key))
     {
         assert!(
             json.contains(&format!("\"key\": \"{key}\"")),
@@ -1033,6 +1054,411 @@ fn every_line_is_named_and_writable() {
                 !text.contains(['"', '\\']) && !text.chars().any(char::is_control),
                 "{}: {text:?} carries a character the manifest writer cannot escape",
                 c.key
+            );
+        }
+    }
+}
+
+/// The endpoint rule as a spread has it: **every region of the census names a figure**.
+///
+/// A series binds its two extreme rows, a cloud its fit, a plane every coordinate, a curve each
+/// line's two ends and its worst departure. None of those is available here — there is no
+/// extreme worth quoting among six hundred anonymous districts, no fitted line, and a coordinate
+/// nobody reads off. What a reader takes off this picture is *how many are in that part of it*,
+/// and so that is what is pinned: a count per region, each an ordinary figure.
+#[test]
+fn every_region_of_every_spread_names_a_figure() {
+    for entry in compute_all_spreads() {
+        let s = entry.spread;
+        assert!(
+            !entry.regions.census.is_empty(),
+            "{}: a spread with no census is a picture whose regions nothing stands behind",
+            s.key
+        );
+        for tally in &entry.regions.census {
+            assert!(
+                !tally.figure.is_empty(),
+                "{}: the region {:?} holds {} subject(s) and names no figure for it. Bind it as \
+                 an ordinary figure in FIGURES first; a count off a spread is the only number a \
+                 reader can quote from one.",
+                s.key,
+                tally.label,
+                tally.subjects
+            );
+        }
+    }
+}
+
+/// Every figure a census row names exists, is a count, and reproduces the region exactly.
+///
+/// Exactly, and not in magnitude the way a row, a fit, a position and a line are all compared: a
+/// count is unsigned already and it is an integer, so there is no rounding to tolerate and no
+/// direction to have dropped. A tolerance here would only be a place for a district to hide.
+#[test]
+fn a_region_reproduces_the_figure_it_names() {
+    let figures = compute_all();
+    for entry in compute_all_spreads() {
+        let s = entry.spread;
+        for tally in &entry.regions.census {
+            let figure = figures
+                .iter()
+                .find(|f| f.figure.key == tally.figure)
+                .unwrap_or_else(|| {
+                    panic!(
+                        "{}: the region {:?} names {}, which FIGURES does not carry",
+                        s.key, tally.label, tally.figure
+                    )
+                });
+            assert_eq!(
+                figure.figure.unit,
+                figures::Unit::Count,
+                "{}: {} counts districts in {:?} and so is a count",
+                s.key,
+                tally.figure,
+                tally.label
+            );
+            #[allow(clippy::cast_precision_loss)]
+            let subjects = tally.subjects as f64;
+            assert!(
+                (subjects - figure.figure.pinned).abs() < 0.5,
+                "{}: the region {:?} holds {} and names {}, pinned at {} \u{2014} the two are \
+                 meant to be one computation, and a spread whose regions have drifted from the \
+                 figures is a picture the corpus does not quote.",
+                s.key,
+                tally.label,
+                tally.subjects,
+                tally.figure,
+                figure.figure.pinned
+            );
+        }
+    }
+}
+
+/// Every panel's own population is a census row, and so is the whole picture's.
+///
+/// The failure this exists to stop is the cheap one: a panel drawing a hundred and two marks
+/// under a caption saying a hundred and three. A panel is a sub-population and its size is the
+/// first number a reader takes off it, so it has to be one of the counts the figure manifest
+/// stands behind rather than whatever the loop happened to produce. The same for the total,
+/// which is the denominator every other region is read against.
+#[test]
+fn every_panel_of_every_spread_and_the_whole_of_it_is_a_counted_region() {
+    for entry in compute_all_spreads() {
+        let s = entry.spread;
+        let counted: BTreeSet<usize> = entry.regions.census.iter().map(|t| t.subjects).collect();
+        for panel in &entry.regions.panels {
+            assert!(
+                counted.contains(&panel.marks.len()),
+                "{}: the panel {:?} draws {} mark(s) and no region of the census counts that \
+                 many, so its caption is a number nothing pins",
+                s.key,
+                panel.label,
+                panel.marks.len()
+            );
+        }
+        let drawn: usize = entry.regions.panels.iter().map(|p| p.marks.len()).sum();
+        assert!(
+            counted.contains(&drawn),
+            "{}: {drawn} subject(s) are drawn and no region counts the whole of them \u{2014} \
+             the total is the denominator every other region is read against",
+            s.key
+        );
+    }
+}
+
+/// Every spread names the subjects it could not place, and draws none of them.
+///
+/// The second half of the binding rule, and the half about the denominator. A count is a count of
+/// a population, and a population is what silently changes when a fixture is extended — so a
+/// subject the computation could not reach is carried to the picture and named on it. The
+/// crossing check is on the names as drawn, and it caught a real one: district names are not
+/// unique, and the Buckeye Local the chained index misses is one of three. A note saying a name
+/// is absent, under a cloud in which a reader can find that name, is worse than no note — so an
+/// absence is named by something the marks do not answer to.
+#[test]
+fn every_spread_names_the_subjects_it_could_not_place() {
+    for entry in compute_all_spreads() {
+        let s = entry.spread;
+        assert!(
+            !entry.regions.unreached.is_empty(),
+            "{}: nothing is unreached. If the identity now places its whole population, say so \
+             by leaving this test failing until someone has checked it: an empty list is also \
+             what a dropped `filter` looks like.",
+            s.key
+        );
+        let drawn: BTreeSet<&str> = entry
+            .regions
+            .panels
+            .iter()
+            .flat_map(|p| p.marks.iter())
+            .map(|m| m.label.as_str())
+            .collect();
+        for missing in &entry.regions.unreached {
+            assert!(
+                !missing.label.is_empty(),
+                "{}: a subject is unreached and unnamed, which is the same as being dropped",
+                s.key
+            );
+            assert!(
+                !missing.why.is_empty(),
+                "{}: {:?} is unreached for no stated reason, and the note on the picture is \
+                 what makes the absence something a reader can act on",
+                s.key,
+                missing.label
+            );
+            assert!(
+                !drawn.contains(missing.label.as_str()),
+                "{}: {:?} is both drawn and unreached. Either the two lists were assembled \
+                 from different populations, or \u{2014} district names not being unique \
+                 \u{2014} the absence is named by something a reader can find in the cloud \
+                 instead.",
+                s.key,
+                missing.label
+            );
+        }
+    }
+}
+
+/// Every mark is named, classed, and inside the frame the whole spread shares.
+///
+/// The frame is computed across every panel together, which is the only thing that makes "the
+/// cloud climbs across the boundary from one panel to the next" a statement about the data
+/// rather than about five separately-scaled pictures. A mark outside it is a frame computed from
+/// something other than these marks.
+#[test]
+fn every_mark_of_every_spread_is_named_classed_and_framed() {
+    for entry in compute_all_spreads() {
+        let s = entry.spread;
+        let r = &entry.regions;
+        assert!(!r.classes.is_empty(), "{}: a spread with no classes", s.key);
+        assert!(
+            r.classes.len() <= 3,
+            "{}: {} classes, and the palette carries two hues and a neutral",
+            s.key,
+            r.classes.len()
+        );
+        assert!(!r.panels.is_empty(), "{}: a spread with no panels", s.key);
+        for (what, axis) in [("x", &r.x), ("y", &r.y)] {
+            assert!(
+                !axis.log,
+                "{}: the {what} axis is a signed logarithm already, which a log scale cannot \
+                 place",
+                s.key
+            );
+            assert!(
+                axis.min < axis.max,
+                "{}: the {what} axis runs {} to {}",
+                s.key,
+                axis.min,
+                axis.max
+            );
+        }
+        for panel in &r.panels {
+            assert!(
+                !panel.marks.is_empty(),
+                "{}: the panel {:?} draws nothing",
+                s.key,
+                panel.label
+            );
+            for mark in &panel.marks {
+                assert!(
+                    !mark.label.is_empty(),
+                    "{}: a mark in {:?} has no label, and a tooltip is the only way a reader \
+                     asks which district that is",
+                    s.key,
+                    panel.label
+                );
+                assert!(
+                    mark.class < r.classes.len(),
+                    "{}: {:?} is class {} of {} \u{2014} it would arrive in the manifest, find \
+                     no colour waiting for it, and be drawn as one of the others",
+                    s.key,
+                    mark.label,
+                    mark.class,
+                    r.classes.len()
+                );
+                for (what, axis, value) in [("x", &r.x, mark.x), ("y", &r.y, mark.y)] {
+                    assert!(
+                        value.is_finite() && value >= axis.min && value <= axis.max,
+                        "{}: {:?} is at {what} = {value}, outside the drawn {} to {}",
+                        s.key,
+                        mark.label,
+                        axis.min,
+                        axis.max
+                    );
+                }
+            }
+        }
+    }
+}
+
+/// Every boundary is a line the reader can actually see, drawn across the frame it belongs to.
+///
+/// A boundary is where a classification stops being defined, so a boundary that misses the frame
+/// is a definition the picture has not shown — the reader is left to take the empty side of it
+/// on trust, which is the one thing a spread exists not to ask of them. Checked on the segment
+/// the manifest writes rather than on the slope, because that segment is what the web draws.
+#[test]
+fn every_boundary_crosses_the_frame_it_is_drawn_on() {
+    for entry in compute_all_spreads() {
+        let s = entry.spread;
+        let r = &entry.regions;
+        let mut seen = BTreeSet::new();
+        for line in &r.boundaries {
+            assert!(
+                !line.label.is_empty(),
+                "{}: a boundary with no label is a rule through a cloud, which reads as a claim",
+                s.key
+            );
+            assert!(
+                seen.insert(line.label),
+                "{}: two boundaries are labelled {:?}",
+                s.key,
+                line.label
+            );
+            assert!(
+                line.slope.is_finite() && line.intercept.is_finite(),
+                "{}: the boundary {:?} is y = {}x + {}, which cannot be placed",
+                s.key,
+                line.label,
+                line.slope,
+                line.intercept
+            );
+            let ((_, low), (_, high)) = line.across(&r.x);
+            let (low, high) = (low.min(high), low.max(high));
+            assert!(
+                high >= r.y.min && low <= r.y.max,
+                "{}: the boundary {:?} runs from {low} to {high} across a frame drawn {} to {}, \
+                 so none of it is on the picture",
+                s.key,
+                line.label,
+                r.y.min,
+                r.y.max
+            );
+        }
+    }
+}
+
+/// Spread keys are unique, name their owner's directory, and collide with nothing already keyed.
+#[test]
+fn every_spread_key_is_unique_and_names_its_owner() {
+    let taken: BTreeSet<&str> = FIGURES
+        .iter()
+        .map(|f| f.key)
+        .chain(SERIES.iter().map(|s| s.key))
+        .chain(SCATTERS.iter().map(|s| s.key))
+        .chain(PLANES.iter().map(|p| p.key))
+        .chain(CURVES.iter().map(|c| c.key))
+        .collect();
+    let mut seen = BTreeSet::new();
+    for s in SPREADS {
+        assert!(seen.insert(s.key), "{}: two spreads share this key", s.key);
+        assert!(
+            !taken.contains(s.key),
+            "{}: is also a figure, series, cloud, plane or curve key, and a corpus node could \
+             not say which it bound",
+            s.key
+        );
+        let directory = s
+            .owner
+            .strip_prefix("crates/")
+            .unwrap_or_else(|| panic!("{}: owner {:?} is not under crates/", s.key, s.owner));
+        assert!(
+            s.key.starts_with(&format!("{directory}/")),
+            "{}: owned by {} and so should be keyed `{directory}/…`",
+            s.key,
+            s.owner
+        );
+        assert!(
+            s.key
+                .chars()
+                .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-' || c == '/'),
+            "{}: keys are lower-case kebab so a corpus node can hold one without quoting",
+            s.key
+        );
+        assert!(
+            s.label.len() > 20,
+            "{}: {:?} does not say what the spread is",
+            s.key,
+            s.label
+        );
+        assert!(
+            !s.subject.is_empty() && s.subject == s.subject.to_lowercase(),
+            "{}: the subject is what one mark is, singular and lower case",
+            s.key
+        );
+    }
+}
+
+/// Every panel, class and region of a spread is named, distinctly, and writable unescaped.
+///
+/// A panel label and a census label are the two captions a spread is read by, and the marks'
+/// labels are district names out of a fixture — data rather than registry text, which is the
+/// case the escaping check was written for.
+#[test]
+fn every_region_and_panel_of_a_spread_is_named_and_writable() {
+    for entry in compute_all_spreads() {
+        let s = entry.spread;
+        let r = &entry.regions;
+        let mut panels = BTreeSet::new();
+        for panel in &r.panels {
+            assert!(
+                !panel.label.is_empty(),
+                "{}: a panel has no caption, and a small multiple is read by which one it is",
+                s.key
+            );
+            assert!(
+                panels.insert(panel.label.as_str()),
+                "{}: two panels are captioned {:?}",
+                s.key,
+                panel.label
+            );
+        }
+        let mut regions = BTreeSet::new();
+        for tally in &r.census {
+            assert!(
+                !tally.label.is_empty(),
+                "{}: a region has no caption, and a count with no sentence attached is a number \
+                 a reader cannot check",
+                s.key
+            );
+            assert!(
+                regions.insert(tally.label.as_str()),
+                "{}: two regions are captioned {:?}",
+                s.key,
+                tally.label
+            );
+        }
+        let mut classes = BTreeSet::new();
+        for class in &r.classes {
+            assert!(
+                classes.insert(*class),
+                "{}: two classes are named {class:?}, and the legend is what makes a hue mean \
+                 anything",
+                s.key
+            );
+        }
+        let strings = [s.key, s.owner, s.label, s.subject]
+            .into_iter()
+            .chain(r.classes.iter().copied())
+            .chain(r.boundaries.iter().map(|b| b.label))
+            .chain(r.census.iter().map(|t| t.label.as_str()))
+            .chain(r.census.iter().map(|t| t.figure))
+            .chain(r.unreached.iter().map(|u| u.label.as_str()))
+            .chain(r.unreached.iter().map(|u| u.why.as_str()))
+            .chain(r.panels.iter().map(|p| p.label.as_str()))
+            .chain(
+                r.panels
+                    .iter()
+                    .flat_map(|p| p.marks.iter())
+                    .map(|m| m.label.as_str()),
+            )
+            .chain([r.x.label, r.y.label]);
+        for text in strings {
+            assert!(
+                !text.contains(['"', '\\']) && !text.chars().any(char::is_control),
+                "{}: {text:?} carries a character the manifest writer cannot escape",
+                s.key
             );
         }
     }

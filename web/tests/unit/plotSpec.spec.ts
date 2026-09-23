@@ -225,6 +225,51 @@ test("a fixed domain holds against an outlier rather than being widened by one",
   expect(marks.find((m) => m.className === "scatter-dot")?.clip).toBe("frame");
 });
 
+test("a boundary is drawn under the cloud and does not move the frame it crosses", () => {
+  /*
+   * The third reference geometry, and the one that is a definition rather than a measurement.
+   *
+   * The guarantee's two terms are a plane whose multiple-of-one line is where `Decomposition::
+   * origin` stops being defined — the districts below it are a third state, not a third category.
+   * A reader has to be able to see where that line is, and the line is not fitted to anything: it
+   * is `y = -x`, and it would be the same line on an empty chart.
+   *
+   * Which is exactly why it must not be allowed to size the frame. A boundary runs corner to
+   * corner by construction, so a frame widened to contain it is a frame decided by a definition
+   * instead of by the districts. It is clipped for the same reason the outlier above is.
+   */
+  const points = cloud(Array.from({ length: 20 }, (_, i) => 1_000 + i * 100));
+  const rules = [
+    { label: "A multiple of one", from: { x: -50_000, y: 53 }, to: { x: 50_000, y: 53 } },
+  ];
+
+  const without = scatterSpec(points, AXES, [], W)!;
+  const withRule = scatterSpec(points, AXES, [], { ...W, rules })!;
+  expect(withRule.options.x!.domain).toEqual(without.options.x!.domain);
+  expect(withRule.options.y!.domain).toEqual(without.options.y!.domain);
+
+  const marks = withRule.options.marks as { className?: string; clip?: unknown }[];
+  const drawn = marks.filter((mark) => mark.className === "scatter-rule");
+  expect(drawn).toHaveLength(1);
+  expect(drawn[0]!.clip).toBe("frame");
+  // Under the cloud, because it is what the cloud is read against — the same order the identity
+  // and the fitted line are drawn in.
+  expect(marks.indexOf(drawn[0]!)).toBeLessThan(
+    marks.findIndex((mark) => mark.className === "scatter-dot"),
+  );
+
+  // Dashed, which is the one thing separating a definition from the two measured lines. And the
+  // label is not painted: five panels of a spread share these, and an end label on a line that
+  // crosses corner to corner crosses the cloud at every width. The legend carries the names.
+  const svg = renderToString((width) => scatterSpec(points, AXES, [], { ...W, width, rules }), {
+    label: "a cloud with a boundary on it",
+    description: "the line where the two terms are equal",
+  });
+  expect(svg).toContain('stroke-dasharray="4 3"');
+  expect(svg).toContain('aria-label="A multiple of one"');
+  expect(svg).not.toContain(">A multiple of one<");
+});
+
 test("a fan chart does not stretch its axis to fit a reference it will not draw", () => {
   /*
    * The reference line is drawn only when every year carries one — a partial line would bridge the

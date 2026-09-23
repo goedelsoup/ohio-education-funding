@@ -386,6 +386,26 @@ in `web/src/lib/corpusSeries.ts` names the route that draws it and the node that
 six sit in `figures:` against the `confidence` property, which is where the claims are; the
 `field` rule below governs where a *chart* is placed, and this node carries none.
 
+A key can also name a **spread**, and a spread inverts the rule. A column, a cloud, a plane and a
+curve are each read at a few named places, so each binds those places; a spread has no extreme and
+no fitted line, and the only number a reader can take off one is *how many are in this region*. So
+it binds its whole **census** — every region, every panel, and the population the rest are read
+against. `temporary-transitional-aid-guarantee` draws two of them, both on the guarantee's two
+terms: the enrollment term and the per-pupil term, which sum to the log of the multiple the floor
+is. The first is one panel of 607 districts coloured by which term carries the majority, the second
+is the 514 that lost pupils cut into wealth fifths — two views of one scatter, not two findings.
+
+Three things follow from that and each is checked. A spread is **classed**, so it carries a legend,
+and the class a mark is drawn in is one of at most three: `Decomposition::origin` is an `Option`
+and below a multiple of one there is no majority to take, which is a third state rather than a
+third category. It carries its **boundaries** — `y = -x` where the multiple is one, `y = 0` where
+the formula pays per pupil what the prior regime did — and neither names a figure, for the
+reference's reason: they are arithmetic on the axes, not measurements. And it names the subjects it
+could not place, **by IRN as well as by name**: Richmond Heights publishes no base and Buckeye Local
+is the one district the chained enrollment index misses, and there are three districts called
+Buckeye Local. A note saying a name is absent, beside a picture containing two districts of that
+name, is worse than no note. See #446.
+
 Two conventions differ from `figures:`. A series row is **signed**, as is a coordinate, because
 a bar below the zero rule is what the chart is for, where a figure exports a correlation as a
 magnitude with its direction in the key — so the row `Mineral` is `−0.0321` and names
@@ -416,7 +436,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1856 | supported by a committed primary source |
+| `[verified]` | 1857 | supported by a committed primary source |
 | `[inference]` | 378 | drawn from verified facts, not witnessed |
 | `[open]` | 203 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |

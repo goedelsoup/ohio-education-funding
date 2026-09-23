@@ -1180,6 +1180,23 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
   width: 7px;
   height: 7px;
 }
+/*
+ * A boundary on a spread: the line where a classification stops being defined.
+ *
+ * The stroke itself rather than a filled square, because a square would read as a fourth class
+ * beside the three above it — and a boundary is not something a mark can be. Dashed, which is
+ * what separates it on the picture from the identity and fitted lines the clouds draw: those are
+ * measurements and this is arithmetic. `scatterSpec`'s `rules` option is the drawing half.
+ */
+.sw.rule {
+  background: none;
+  width: 16px;
+  height: 0;
+  border-radius: 0;
+  border-top: 1.5px dashed var(--accent-rule);
+  vertical-align: middle;
+}
+
 /* The ordinal ramp, for a chart grouping districts into ordered bands. Its legend is not
    optional: the lightest step light and the darkest step dark sit near 2.2:1 against their
    surface, and this is the relief that buys. */
