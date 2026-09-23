@@ -2630,6 +2630,15 @@ test.describe("axe", () => {
     ["a district's taxes", `/district/${CLEVELAND}/taxes`],
     ["the scenario runner, which rewrites itself", "/scenario"],
     ["the reach view, which is the runner asking who rather than how much", "/reach"],
+    /*
+     * The mode control is `hidden` until there is a selection, and axe does not scan what is
+     * hidden — so a bare `/reach` leaves the one fieldset on the site unexamined. This is the same
+     * route with a selection large enough to draw on its own, which shows the control, the subset
+     * card and the in-prose button that switches back.
+     */
+    ["the reach view subsetted to a county, where the mode control is", "/reach?co=cuyahoga&only=1"],
+    /* And the refusal, which is a card with no chart in it and its own way out. */
+    ["the reach view refusing a selection too small to draw", "/reach?co=athens&only=1"],
     ["the comparison", `/compare?a=${CLEVELAND}&b=${NORTHERN}`],
     ["a county", "/county/cuyahoga"],
     ["the counties index", "/counties"],
@@ -3212,6 +3221,139 @@ test.describe("reach", () => {
       "a preset is a lever position and says nothing about who is in scope",
     ).toHaveCount(1);
     await expect(page).toHaveURL(/co=athens/);
+  });
+
+  test("the mode control appears with a selection and not before it", async ({ page }) => {
+    /*
+     * A control that changes nothing is worse than no control, because it reads as one whose effect
+     * the reader has failed to notice. The same rule the typology picker is hidden by, and the
+     * reason the mode lives in the scope form rather than beside the axis menus: it modifies the
+     * selection above it and means nothing without one.
+     */
+    await page.goto("/reach");
+    await booted(page);
+    await expect(page.locator("#rv-mode-pick")).toBeHidden();
+
+    await page.locator("#rv-counties > summary").click();
+    await page.locator('#reach-scope input[name="co"][value="cuyahoga"]').check();
+    await expect(page.locator("#rv-mode-pick")).toBeVisible();
+    await expect(
+      page.locator('#reach-scope input[name="mode"][value="spotlight"]'),
+      "the spotlight is forced, because it is the only mode that can draw any selection",
+    ).toBeChecked();
+
+    /* "Every district" says it lights every district, so it puts the mode back too — otherwise the
+       next county a reader picked would be silently subsetted, and for 79 of 88 that is a refusal. */
+    await page.locator('#reach-scope input[name="mode"][value="subset"]').check();
+    await page.locator("#rv-clear").click();
+    await expect(page.locator("#rv-mode-pick")).toBeHidden();
+    await expect(page.locator('#reach-scope input[name="mode"][value="spotlight"]')).toBeChecked();
+  });
+
+  test("a subset drops the rest of the state and keeps the state's frame", async ({ page }) => {
+    /*
+     * The second picture, and the one the spotlight cannot draw: 31 districts among 609 are 31 dots
+     * in a crowd however they are shaded, so *how are these arranged among themselves* needs the
+     * rest gone. What must not go with them is the ruler — a frame fitted to one county would make
+     * two counties incomparable, and silently, because a refitted axis looks like an axis.
+     */
+    await page.goto("/reach");
+    await booted(page);
+    const dots = page.locator('[data-chart="positions"] .chart-at[data-at="wide"] .scatter-dot circle');
+    const ends = async () => {
+      const html = await page.locator('[data-chart="positions"]').innerHTML();
+      return [...html.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]).join("|");
+    };
+    const frame = await ends();
+    expect(await dots.count()).toBeGreaterThan(600);
+
+    await page.locator("#rv-counties > summary").click();
+    await page.locator('#reach-scope input[name="co"][value="cuyahoga"]').check();
+    await page.locator('#reach-scope input[name="mode"][value="subset"]').check();
+
+    expect(await dots.count(), "only the county is drawn").toBe(31);
+    expect(await ends(), "and on the frame the whole state is measured on").toBe(frame);
+    // Nothing is out of scope on the chart, so the legend must not name a population that is gone.
+    await expect(page.locator('[data-part="positions"] .legend .sw.muted')).toHaveCount(0);
+    await expect(page.locator('[data-part="positions"] .legend')).not.toContainText("for context");
+
+    /*
+     * The identity line is a law and not a fit — a district is paid the larger of its formula
+     * amount and its guarantee — so it holds for 31 districts exactly as for 609 and is gated on
+     * the pair of axes rather than on the population.
+     */
+    await expect(page.locator(".scatter-identity")).not.toHaveCount(0);
+
+    // Every count restated against the selection, including the two the spotlight leaves global.
+    const card = page.locator('[data-part="positions"]');
+    const notes = page.locator('[data-part="positions"] .note');
+    await expect(notes.first()).toContainText("districts in Cuyahoga County are");
+    await expect(notes.filter({ hasText: "Only Cuyahoga County is drawn" })).toHaveCount(1);
+    await expect(notes.filter({ hasText: "muted, and they are not in any count above" })).toHaveCount(0);
+    await expect(card, "no count on this card is against a population it does not draw")
+      .not.toContainText("of 609");
+
+    // And it is a link worth sending, so it travels.
+    await expect(page).toHaveURL(/only=1/);
+    await page.reload();
+    await booted(page);
+    await expect(page.locator('#reach-scope input[name="mode"][value="subset"]')).toBeChecked();
+    expect(await dots.count()).toBe(31);
+  });
+
+  test("a subset too small to be a cloud refuses, and offers the spotlight", async ({ page }) => {
+    /*
+     * The case the whole design turns on. Athens County holds five districts; `scatterSpec` returns
+     * null under twelve points and a null spec renders to the empty string, so the alternative to
+     * refusing is a heading with a gap under it. The refusal has to say why in that rule's own
+     * terms and has to have somewhere to send the reader — which is what the spotlight is for.
+     */
+    await page.goto("/reach?co=athens&only=1");
+    await booted(page);
+    const card = page.locator('[data-part="positions"]');
+    await expect(card).toContainText("Athens County is too small to draw on its own");
+    await expect(card, "the floor, said as the reason it is a floor").toContainText(
+      "a population nobody measured",
+    );
+    await expect(card, "and how rare that is, counted rather than typed").toContainText(
+      "9 of Ohio's 88 counties",
+    );
+    await expect(
+      page.locator('[data-chart="positions"]'),
+      "a refusal, not a blank card with a legend over it",
+    ).toHaveCount(0);
+
+    /* The way out is the control, not an instruction to go and find one. */
+    await page.locator('[data-part="positions"] button[data-scope-mode="spotlight"]').click();
+    await expect(page.locator('#reach-scope input[name="mode"][value="spotlight"]')).toBeChecked();
+    await expect(page).not.toHaveURL(/only=1/);
+    await expect(
+      page.locator('[data-chart="positions"] .chart-at[data-at="wide"] .scatter-dot circle[r="2.4"]'),
+      "and the selection the subset refused is lit in the mode that can draw it",
+    ).toHaveCount(5);
+  });
+
+  test("the spotlight offers the subset only where the selection can support one", async ({
+    page,
+  }) => {
+    /*
+     * The mode radio can be set at any selection; this sentence is the answer to *can I?*, which
+     * the radio cannot give. So it appears under a county that holds enough districts and not under
+     * one that does not — a reader must not be invited into a refusal.
+     */
+    await page.goto("/reach?co=athens");
+    await booted(page);
+    const offer = page.locator('[data-part="positions"] button[data-scope-mode="subset"]');
+    await expect(offer).toHaveCount(0);
+
+    await page.goto("/reach?co=cuyahoga");
+    await booted(page);
+    await expect(offer).toHaveCount(1);
+    await offer.click();
+    await expect(page.locator('#reach-scope input[name="mode"][value="subset"]')).toBeChecked();
+    await expect(
+      page.locator('[data-chart="positions"] .chart-at[data-at="wide"] .scatter-dot circle'),
+    ).toHaveCount(31);
   });
 
 });
