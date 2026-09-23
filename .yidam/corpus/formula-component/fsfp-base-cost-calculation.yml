@@ -213,7 +213,7 @@ figures:
     field: findings
     as_written: "and employs **39.00**"
   - key: project/administrators-employed-for-every-one-funded
-    value: 1.966403426379351
+    value: 1.9664034263793537
     field: findings
     as_written: "**1.9664** are employed for every one"
   - key: project/the-administrator-floors-adm-threshold

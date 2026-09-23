@@ -5,8 +5,9 @@ annually. Named after Bob Cupp — the same legislator who later co-authored the
 [Fair School Funding Plan](../corpus/funding-regime/fair-school-funding-plan.yml).
 **Type.** Primary source — machine-readable per-district finance data.
 **Location.** `education.ohio.gov`, Finance and Funding → School Payment Reports → District
-Profile Reports. The FY2024 edition is `FY24-District-Profile-Report-Final-12-12-2024.xlsx`,
-about 1 MB.
+Profile Reports. The connected FY2024 edition is
+`FY24-District-Profile-Report-Revised-12-18-2025.xlsx`, about 1 MB — the department's revision
+of the original `...-Final-12-12-2024.xlsx`, adopted by #439. The caveat below says what moved.
 
 **What it contains.** Sixty variables for each of Ohio's **606 traditional school districts**,
 on five worksheets — District Data, Similar District Data, Statewide Data, and a formatted
@@ -60,17 +61,46 @@ plus `xml.etree` — an XLSX is a zip of XML — with no third-party library req
   check with too tight a tolerance will reject good data.
 - **Traditional districts only.** No community schools, no STEM schools, and no JVSDs, which is
   why the corpus's JVSD exemplar cannot be populated from here.
-- **The department revised the FY2024 edition a year after publishing it.** The cached and
-  connected file is `FY24-District-Profile-Report-Final-12-12-2024.xlsx` (workbook modified
-  2024-12-27). The report's page now serves
+- **The department revised the FY2024 edition a year after publishing it, and the revision is
+  the connected file.** The original `FY24-District-Profile-Report-Final-12-12-2024.xlsx`
+  (workbook modified 2024-12-27) was connected until #439; the page now serves
   `FY24-District-Profile-Report-Revised-12-18-2025.xlsx` (modified 2025-12-18), and the original
-  URL still resolves. Compared cell by cell on 2026-09-22: the revision rewrites the teachers'
-  salary and three experience-share columns for about 300-540 districts and the administrators'
-  salary for 439, restates 25 district names with a doubled space, and moves nothing else beyond
-  float noise past the fourth decimal. **`FTE Number of Administrators` is identical in both**,
-  as are the ten columns the equity findings read, so the extract is taken from the connected
-  edition and the personnel findings do not depend on which. A re-vendor to the revised edition
-  would move the four salary and experience columns and nothing the corpus binds.
+  URL still resolves and **still serves its pinned bytes** — re-fetched 2026-09-23, digest
+  unchanged. So the original was not kept out of necessity and is not lost by moving.
+
+  **Why the revision was adopted.** It is not a reissue. The department corrected a genuine
+  defect on the aggregate sheets: every figure on `Statewide Data` changed from an **unweighted
+  mean of district values** to an **enrolled-ADM-weighted mean**, reproduced exactly here on
+  eight of the columns. The original's "statewide" Black enrollment share was 10.5%, which is
+  the average of 606 district shares; Ohio's share is the revision's 17.3%. Its "statewide"
+  `FTE Number of Administrators` was 21.35, which is the mean district's count and not a state
+  total. A source whose publisher has withdrawn its own aggregates for cause is the wrong file
+  to keep as the corpus's statement of FY2024, even where the corpus does not read those cells.
+  **The corpus does not read `Statewide Data` at all** — `rebuild` reads `District Data` only,
+  and computes its own statewide statistics from district rows. Which convention those use is
+  a separate question, filed as #463.
+
+  **What moved in what the corpus reads.** Compared cell by cell, joined on IRN — the revision
+  also re-sorts `District Data` from district name to IRN, so a positional comparison is
+  meaningless. At the extract's own precision the answer is **three columns**: the shares of
+  teachers with 0-4, 4-10 and 10+ years' experience, for 293, 292 and 293 districts. The
+  teachers' average salary (538 districts) and the administrators' average salary (439) differ
+  only below the fourth decimal — `68412.482997679996` against `68412.482997689003` — and do not
+  reach the fixture at all, so the earlier reading that a re-vendor moves "four salary and
+  experience columns" overstated it by two. **`FTE Number of Administrators` is identical in
+  both**, as are the ten columns the equity findings read. No crate reads the three experience
+  shares, no figure binds one, and the full crate suite is green on the rebuilt fixtures.
+
+  **The 25 doubled-space names cost nothing in the end.** The revision restates 25 district
+  names as `Orange City  (046581)`. `clean_name` now collapses internal whitespace, which it
+  had to anyway — substituting a space for a comma in `EDGE ACADEMY, THE` was manufacturing the
+  same defect in five other fixtures — so the committed names are unchanged and still match the
+  calculator's spelling.
+
+- **The extract's row order is this repository's, not the publisher's.** `build_profile_extract`
+  sorts on IRN since #439. It wrote rows in sheet order until then, so the revision's re-sort
+  moved all 606 rows and the three that changed could not be seen in the diff. The one-time
+  churn of adopting the sort is in that commit; a future re-sort upstream is now a no-op.
 
 ## Used by
 

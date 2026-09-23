@@ -149,7 +149,7 @@ Brown,046045,Fayetteville-Perry Local,082578,Fayetteville-Perry Middle School,6-
 Brown,046060,Western Brown Local,014886,Hamersville Elementary School,K-8,Open,no,no,no,no,no,no,no,no,yes,0.197784294558488,0.196780551905388,0.217818539141828,0.204127795201901
 Brown,046060,Western Brown Local,025866,Western Brown High School,9-12,Open,no,no,no,no,no,no,no,no,yes,0.197784294558488,0.196780551905388,0.217818539141828,0.204127795201901
 Brown,046060,Western Brown Local,043224,Mt Orab Primary Elementary School,K-4,Open,no,no,no,no,no,no,no,no,yes,0.197784294558488,0.196780551905388,0.217818539141828,0.204127795201901
-Brown,046060,Western Brown Local,120337,Mt  Orab Middle School,5-8,Open,no,no,no,no,no,no,no,no,yes,0.197784294558488,0.196780551905388,0.217818539141828,0.204127795201901
+Brown,046060,Western Brown Local,120337,Mt Orab Middle School,5-8,Open,no,no,no,no,no,no,no,no,yes,0.197784294558488,0.196780551905388,0.217818539141828,0.204127795201901
 Brown,046078,Ripley-Union-Lewis-Huntington Local,000501,Ripley Union Lewis Huntington Junior High School,7-8,Inactive,no,no,no,no,yes,no,yes,yes,yes,0.301486199575372,0.248394004282655,0.321237993596585,0.290372732484871
 Brown,046078,Ripley-Union-Lewis-Huntington Local,031815,Ripley-Union-Lewis-Huntington Junior/Senior High School,7-12;PS;SN,Open,yes,no,yes,no,yes,yes,no,yes,yes,0.301486199575372,0.248394004282655,0.321237993596585,0.290372732484871
 Brown,046078,Ripley-Union-Lewis-Huntington Local,121434,Ripley Union Lewis Huntington Elementary School,K-6,Open,no,no,no,no,no,no,no,no,yes,0.301486199575372,0.248394004282655,0.321237993596585,0.290372732484871
@@ -216,7 +216,7 @@ Butler,046128,Madison Local,022087,Madison High School,9-12,Open,no,no,no,no,no,
 Butler,046128,Madison Local,030437,Madison Elementary School,K-5;P,Open,no,no,no,no,no,no,no,no,no,0.096339113680154,0.105813193990856,0.096277278562259,0.099476528744423
 Butler,046136,New Miami Local,010134,New Miami Middle School,6-8,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.215088282504013,0.241435562805873,0.242375601926164,0.232966482412016
 Butler,046136,New Miami Local,026864,New Miami Elementary School,K-5;P,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.215088282504013,0.241435562805873,0.242375601926164,0.232966482412016
-Butler,046136,New Miami Local,026872,New Miami  High School,9-12,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.215088282504013,0.241435562805873,0.242375601926164,0.232966482412016
+Butler,046136,New Miami Local,026872,New Miami High School,9-12,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.215088282504013,0.241435562805873,0.242375601926164,0.232966482412016
 Butler,046144,Ross Local,010157,Elda Elementary School,K-3,Open,no,no,no,no,no,no,no,no,no,0.06422893481717,0.069835111542192,0.071473951715375,0.068512666024912
 Butler,046144,Ross Local,019462,Ross Intermediate School,4-5,Open,no,no,no,no,no,no,no,no,no,0.06422893481717,0.069835111542192,0.071473951715375,0.068512666024912
 Butler,046144,Ross Local,025502,Morgan Elementary School,K-3;P,Open,no,no,no,no,no,no,no,no,no,0.06422893481717,0.069835111542192,0.071473951715375,0.068512666024912
@@ -272,7 +272,7 @@ Clark,046235,Greenon Local,010611,Greenon Elementary School,K-6,Open,no,no,no,no
 Clark,046235,Greenon Local,014571,Greenon High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.111604938271605,0.12462311557789,0.096230158730159,0.110819404193218
 Clark,046235,Greenon Local,017400,Greenon Jr. High School,7-8,Open,no,no,no,no,no,no,no,no,no,0.111604938271605,0.12462311557789,0.096230158730159,0.110819404193218
 Clark,046243,Tecumseh Local,008615,Donnelsville Elementary School,2-5,Open,no,no,no,no,no,no,no,no,no,0.188010043942247,0.175287356321839,0.152585119798235,0.171960840020774
-Clark,046243,Tecumseh Local,028555,Tecumseh  Middle School,6-8,Open,no,no,no,no,no,no,no,no,no,0.188010043942247,0.175287356321839,0.152585119798235,0.171960840020774
+Clark,046243,Tecumseh Local,028555,Tecumseh Middle School,6-8,Open,no,no,no,no,no,no,no,no,no,0.188010043942247,0.175287356321839,0.152585119798235,0.171960840020774
 Clark,046243,Tecumseh Local,029140,Park Layne Elementary School,K-1,Open,no,no,no,no,no,no,no,no,no,0.188010043942247,0.175287356321839,0.152585119798235,0.171960840020774
 Clark,046243,Tecumseh Local,036988,Tecumseh High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.188010043942247,0.175287356321839,0.152585119798235,0.171960840020774
 Clark,046243,Tecumseh Local,040741,New Carlisle Elementary School,2-5,Open,no,no,no,no,no,no,no,no,no,0.188010043942247,0.175287356321839,0.152585119798235,0.171960840020774
@@ -283,7 +283,7 @@ Clark,046250,Northeastern Local,068577,Kenton Ridge Middle/High School,6-12,Open
 Clark,046268,Northwestern Local,027870,Northwestern Elementary School,K-6;P,Open,no,no,no,no,no,no,no,no,no,0.13031914893617,0.125067677314564,0.103153393907002,0.119513406719245
 Clark,046268,Northwestern Local,027896,Northwestern Junior/Senior High School,7-12,Open,no,no,no,no,no,no,no,no,no,0.13031914893617,0.125067677314564,0.103153393907002,0.119513406719245
 Clark,046276,Southeastern Local,030106,Miami View Elementary School,K-6,Open,no,no,no,no,no,no,no,no,no,0.127937336814621,0.134130146082337,0.090670170827858,0.117579217908272
-Clark,046276,Southeastern Local,035196,Southeastern  Sr. High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.127937336814621,0.134130146082337,0.090670170827858,0.117579217908272
+Clark,046276,Southeastern Local,035196,Southeastern Sr. High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.127937336814621,0.134130146082337,0.090670170827858,0.117579217908272
 Clark,046276,Southeastern Local,139022,Southeastern Jr. High School,7-8,Open,no,no,no,no,no,no,no,no,no,0.127937336814621,0.134130146082337,0.090670170827858,0.117579217908272
 Clark,046284,Clark-Shawnee Local,030593,Shawnee Elementary School,K-6;P,Open,no,no,no,no,no,no,no,no,no,0.157149829184968,0.133134624937904,0.157430112800392,0.149238188974421
 Clark,046284,Clark-Shawnee Local,034256,Shawnee High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.157149829184968,0.133134624937904,0.157430112800392,0.149238188974421
@@ -310,8 +310,8 @@ Clermont,046318,Bethel-Tate Local,145300,Bick Primary Elementary School,K-2;P,Op
 Clermont,046326,Clermont Northeastern Local,006635,Clermont Northeastern High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.112,0.112302194997448,0.111281265952016,0.111861153649821
 Clermont,046326,Clermont Northeastern Local,027664,Clermont Northeastern Middle School,6-8,Open,no,no,no,no,no,no,no,yes,no,0.112,0.112302194997448,0.111281265952016,0.111861153649821
 Clermont,046326,Clermont Northeastern Local,028985,Clermont Northeastern Elementary School,K-5,Open,no,no,no,no,no,no,no,no,no,0.112,0.112302194997448,0.111281265952016,0.111861153649821
-Clermont,046334,Felicity-Franklin Local,011494,Felicity-Franklin Local  Elementary School,H;K;1-6,Open,no,no,no,no,no,no,no,no,no,0.182440136830103,0.165501165501166,0.143356643356643,0.16376598189597
-Clermont,046334,Felicity-Franklin Local,011502,Felicity-Franklin Local  High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.182440136830103,0.165501165501166,0.143356643356643,0.16376598189597
+Clermont,046334,Felicity-Franklin Local,011494,Felicity-Franklin Local Elementary School,H;K;1-6,Open,no,no,no,no,no,no,no,no,no,0.182440136830103,0.165501165501166,0.143356643356643,0.16376598189597
+Clermont,046334,Felicity-Franklin Local,011502,Felicity-Franklin Local High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.182440136830103,0.165501165501166,0.143356643356643,0.16376598189597
 Clermont,046334,Felicity-Franklin Local,125351,Felicity-Franklin Local Junior High School,7-8,Open,no,no,no,no,no,no,no,no,no,0.182440136830103,0.165501165501166,0.143356643356643,0.16376598189597
 Clermont,046342,Goshen Local,013912,Marr/Cook Elementary School,K-2;P,Open,no,no,no,no,no,no,no,no,no,0.11899237653298,0.13362652232747,0.135948596550558,0.129522498470336
 Clermont,046342,Goshen Local,013920,Goshen High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.11899237653298,0.13362652232747,0.135948596550558,0.129522498470336
@@ -780,7 +780,7 @@ Franklin,043802,Columbus City Schools District,026542,Special Education Center,K
 Franklin,043802,Columbus City Schools District,027680,Northland High School,9-12,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.300344479266492,0.350180505415162,0.318159663434406,0.322894882705353
 Franklin,043802,Columbus City Schools District,027813,Northtowne Elementary School,K-5;P,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.300344479266492,0.350180505415162,0.318159663434406,0.322894882705353
 Franklin,043802,Columbus City Schools District,028290,Oakland Park Alternative Elementary,K-5;P,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.300344479266492,0.350180505415162,0.318159663434406,0.322894882705353
-Franklin,043802,Columbus City Schools District,028316,Oakmont  Elementary School,K-5;P,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.300344479266492,0.350180505415162,0.318159663434406,0.322894882705353
+Franklin,043802,Columbus City Schools District,028316,Oakmont Elementary School,K-5;P,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.300344479266492,0.350180505415162,0.318159663434406,0.322894882705353
 Franklin,043802,Columbus City Schools District,028423,Ohio Avenue Elementary School,K-5;P,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.300344479266492,0.350180505415162,0.318159663434406,0.322894882705353
 Franklin,043802,Columbus City Schools District,028530,Olde Orchard Alt Elementary School,K-5;P,Open,no,no,no,no,no,no,no,no,yes,0.300344479266492,0.350180505415162,0.318159663434406,0.322894882705353
 Franklin,043802,Columbus City Schools District,029181,Parkmoor Elementary School,K-5;P,Open,no,no,no,no,no,no,no,no,yes,0.300344479266492,0.350180505415162,0.318159663434406,0.322894882705353
@@ -1160,7 +1160,7 @@ Hamilton,043752,Cincinnati Public Schools,147520,Woodward Career Technical High 
 Hamilton,043752,Cincinnati Public Schools,147538,Aiken New Tech High School,9-12,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.335973810774765,0.286369149176722,0.269236216489631,0.297193058813706
 Hamilton,043752,Cincinnati Public Schools,148320,Roll Hill School,K-6;P,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.335973810774765,0.286369149176722,0.269236216489631,0.297193058813706
 Hamilton,043851,Deer Park Community City,000653,Amity Elementary School,K-6;P,Open,no,no,no,no,no,no,no,no,no,0.154114365411437,0.126241134751773,0.111731843575419,0.13069578124621
-Hamilton,043851,Deer Park Community City,008250,Deer Park  Jr/Sr High School,7-12,Open,no,no,no,no,no,no,no,no,no,0.154114365411437,0.126241134751773,0.111731843575419,0.13069578124621
+Hamilton,043851,Deer Park Community City,008250,Deer Park Jr/Sr High School,7-12,Open,no,no,no,no,no,no,no,no,no,0.154114365411437,0.126241134751773,0.111731843575419,0.13069578124621
 Hamilton,044081,Winton Woods City,002055,Early Childhood Center,K;P,Open,no,no,no,no,yes,yes,yes,no,no,0.211916583912612,0.178217821782178,0.170280485378954,0.186804963691248
 Hamilton,044081,Winton Woods City,011973,Winton Woods Intermediate School,5-6,Open,no,no,no,no,yes,yes,yes,yes,no,0.211916583912612,0.178217821782178,0.170280485378954,0.186804963691248
 Hamilton,044081,Winton Woods City,014548,Winton Woods Middle School,7-8,Open,no,no,no,no,yes,yes,yes,yes,no,0.211916583912612,0.178217821782178,0.170280485378954,0.186804963691248
@@ -1443,7 +1443,7 @@ Lake,044628,Painesville City Local,005157,Chestnut Elementary School,K-5,Open,no
 Lake,044628,Painesville City Local,015560,Harvey High School,7-12,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.274089206673476,0.255660048763497,0.338834269662921,0.289527841699965
 Lake,044628,Painesville City Local,017152,Elm Street Elementary School,K-5,Open,no,no,no,no,no,no,no,yes,yes,0.274089206673476,0.255660048763497,0.338834269662921,0.289527841699965
 Lake,044628,Painesville City Local,019877,Maple Elementary School,K-5;P,Open,yes,no,yes,no,yes,no,yes,yes,yes,0.274089206673476,0.255660048763497,0.338834269662921,0.289527841699965
-Lake,044628,Painesville City Local,039099,Heritage  Middle School,6-8,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.274089206673476,0.255660048763497,0.338834269662921,0.289527841699965
+Lake,044628,Painesville City Local,039099,Heritage Middle School,6-8,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.274089206673476,0.255660048763497,0.338834269662921,0.289527841699965
 Lake,045088,Wickliffe City,020776,Wickliffe Lower School,K-6;P,Open,no,no,no,no,no,no,no,no,no,0.119088319088319,0.139521307647402,0.174370977179637,0.144326867971786
 Lake,045088,Wickliffe City,041202,Wickliffe Upper School,7-12,Open,no,no,no,no,no,no,no,no,no,0.119088319088319,0.139521307647402,0.174370977179637,0.144326867971786
 Lake,045104,Willoughby-Eastlake City,009621,Eastlake Middle School,6-8,Open,no,no,no,no,no,no,no,no,no,0.083304205988582,0.12,0.154380086165629,0.119228097384737
@@ -1476,7 +1476,7 @@ Lake,047878,Kirtland Local,019224,Kirtland Middle School,6-8,Open,no,no,no,no,no
 Lake,047886,Madison Local,022038,Madison Middle School,6-8,Open,no,no,no,no,no,no,no,no,no,0.097826086956522,0.123521224773834,0.168410041841004,0.12991911785712
 Lake,047886,Madison Local,022111,Madison High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.097826086956522,0.123521224773834,0.168410041841004,0.12991911785712
 Lake,047886,Madison Local,026252,North Elementary School,K-5,Open,no,no,no,no,no,no,no,no,no,0.097826086956522,0.123521224773834,0.168410041841004,0.12991911785712
-Lake,047886,Madison Local,031203,South  Elementary School,K-5,Open,no,no,no,no,no,no,no,no,no,0.097826086956522,0.123521224773834,0.168410041841004,0.12991911785712
+Lake,047886,Madison Local,031203,South Elementary School,K-5,Open,no,no,no,no,no,no,no,no,no,0.097826086956522,0.123521224773834,0.168410041841004,0.12991911785712
 Lake,047894,Riverside Local,004101,Buckeye Elementary School,K-4;P,Open,no,no,no,no,no,no,no,no,no,0.063365650969529,0.066702146531843,0.091571834992888,0.073879877498087
 Lake,047894,Riverside Local,014845,Riverview Elementary School,K-5,Open,no,no,no,no,no,no,no,no,no,0.063365650969529,0.066702146531843,0.091571834992888,0.073879877498087
 Lake,047894,Riverside Local,020180,Parkside Elementary School,K-5,Open,no,no,no,no,no,no,no,no,no,0.063365650969529,0.066702146531843,0.091571834992888,0.073879877498087
@@ -1651,7 +1651,7 @@ Lucas,044362,Maumee City,023242,Maumee High School,9-12,Open,no,no,no,no,no,no,n
 Lucas,044362,Maumee City,040063,Maumee Intermediate School,4-5,Open,no,no,no,no,no,no,no,no,no,0.136670216542421,0.125998547567175,0.128798842257598,0.130489202122398
 Lucas,044602,Oregon City,006494,Clay High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.142348754448399,0.12517502100252,0.119977678571429,0.129167151340783
 Lucas,044602,Oregon City,007559,Coy Elementary School,K-4,Open,no,no,no,no,no,no,no,no,no,0.142348754448399,0.12517502100252,0.119977678571429,0.129167151340783
-Lucas,044602,Oregon City,011429,Fassett Junior High  School,7-8,Open,no,no,no,no,no,no,no,no,no,0.142348754448399,0.12517502100252,0.119977678571429,0.129167151340783
+Lucas,044602,Oregon City,011429,Fassett Junior High School,7-8,Open,no,no,no,no,no,no,no,no,no,0.142348754448399,0.12517502100252,0.119977678571429,0.129167151340783
 Lucas,044602,Oregon City,014259,Eisenhower Intermediate School,5-6,Open,no,no,no,no,no,no,no,no,no,0.142348754448399,0.12517502100252,0.119977678571429,0.129167151340783
 Lucas,044602,Oregon City,018291,Jerusalem Elementary School,K-4,Open,no,no,no,no,no,no,no,no,no,0.142348754448399,0.12517502100252,0.119977678571429,0.129167151340783
 Lucas,044602,Oregon City,035832,Starr Elementary School,K-4,Open,no,no,no,no,no,no,no,no,no,0.142348754448399,0.12517502100252,0.119977678571429,0.129167151340783
@@ -1751,7 +1751,7 @@ Madison,044255,London City,005348,London MIddle School,6-8,Open,no,no,no,no,no,n
 Madison,044255,London City,021287,London High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.179640718562874,0.142040457343887,0.131428571428571,0.151036582445111
 Madison,044255,London City,089599,London Elementary School,K-5,Open,no,no,no,no,no,no,no,no,no,0.179640718562874,0.142040457343887,0.131428571428571,0.151036582445111
 Madison,048256,Jefferson Local,017970,Norwood Elementary School,K-5,Open,no,no,no,no,no,no,no,no,no,0.175043327556326,0.13713268032057,0.127337488869101,0.146504498915332
-Madison,048256,Jefferson Local,038729,West Jefferson  Middle School,6-8,Open,no,no,no,no,no,no,no,no,no,0.175043327556326,0.13713268032057,0.127337488869101,0.146504498915332
+Madison,048256,Jefferson Local,038729,West Jefferson Middle School,6-8,Open,no,no,no,no,no,no,no,no,no,0.175043327556326,0.13713268032057,0.127337488869101,0.146504498915332
 Madison,048256,Jefferson Local,038737,West Jefferson High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.175043327556326,0.13713268032057,0.127337488869101,0.146504498915332
 Madison,048264,Jonathan Alder Local,000883,Canaan Middle School,5-6,Open,no,no,no,no,no,no,no,no,no,0.09822934232715,0.075471698113208,0.065594583157004,0.079765207865787
 Madison,048264,Jonathan Alder Local,004747,Jonathan Alder Junior High,7-8,Open,no,no,no,no,no,no,no,no,no,0.09822934232715,0.075471698113208,0.065594583157004,0.079765207865787
@@ -1868,7 +1868,7 @@ Medina,048462,Black River Local,035311,Black River Education Center Middle Schoo
 Medina,048462,Black River Local,036384,Black River Education Center Elementary School,K-5;P,Open,no,no,no,no,no,no,no,no,no,0.138844727080021,0.122383252818035,0.161756829137654,0.140994936345237
 Medina,048470,Buckeye Local,004127,Buckeye High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.070499370541334,0.077983627746661,0.092281155670548,0.080254717986181
 Medina,048470,Buckeye Local,021139,Buckeye Intermediate School,P;4-6,Open,no,no,no,no,no,no,no,no,no,0.070499370541334,0.077983627746661,0.092281155670548,0.080254717986181
-Medina,048470,Buckeye Local,042457,Buckeye  Primary School,K-3,Open,no,no,no,no,no,no,no,no,no,0.070499370541334,0.077983627746661,0.092281155670548,0.080254717986181
+Medina,048470,Buckeye Local,042457,Buckeye Primary School,K-3,Open,no,no,no,no,no,no,no,no,no,0.070499370541334,0.077983627746661,0.092281155670548,0.080254717986181
 Medina,048470,Buckeye Local,065383,Buckeye Junior High School,7-8,Open,no,no,no,no,no,no,no,no,no,0.070499370541334,0.077983627746661,0.092281155670548,0.080254717986181
 Medina,048488,Cloverleaf Local,006759,Cloverleaf High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.108201240523777,0.10611956137248,0.104815864022663,0.10637888863964
 Medina,048488,Cloverleaf Local,034041,Cloverleaf Elementary School,K-5;P,Open,no,no,no,no,no,no,no,no,no,0.108201240523777,0.10611956137248,0.104815864022663,0.10637888863964
@@ -1981,7 +1981,7 @@ Montgomery,043844,Dayton City,036152,Stivers School For The Arts,7-12,Open,no,no
 Montgomery,043844,Dayton City,038257,Edwin Joel Brown Middle School,7-8,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.366300366300366,0.343649287007196,0.373154362416107,0.36103467190789
 Montgomery,043844,Dayton City,040121,Kiser Elementary School,K-6;P,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.366300366300366,0.343649287007196,0.373154362416107,0.36103467190789
 Montgomery,043844,Dayton City,041921,Wogaman Middle School,7-8,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.366300366300366,0.343649287007196,0.373154362416107,0.36103467190789
-Montgomery,043844,Dayton City,066795,David H. Ponitz Career Technology  Center,9-12,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.366300366300366,0.343649287007196,0.373154362416107,0.36103467190789
+Montgomery,043844,Dayton City,066795,David H. Ponitz Career Technology Center,9-12,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.366300366300366,0.343649287007196,0.373154362416107,0.36103467190789
 Montgomery,043844,Dayton City,133603,Roosevelt Elementary School,K-6;P,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.366300366300366,0.343649287007196,0.373154362416107,0.36103467190789
 Montgomery,044180,Kettering City School District,001982,Beavertown Elementary School,K-5;P,Open,no,no,no,no,no,no,no,no,no,0.140800719748088,0.117399225688909,0.130153055524522,0.129451000320507
 Montgomery,044180,Kettering City School District,014563,Greenmont Elementary School,K-5;P,Open,no,no,no,no,no,no,no,no,no,0.140800719748088,0.117399225688909,0.130153055524522,0.129451000320507
@@ -2075,7 +2075,7 @@ Morrow,048793,Cardington-Lincoln Local,004879,Cardington-Lincoln Elementary Scho
 Morrow,048793,Cardington-Lincoln Local,110007,Cardington-Lincoln Middle School,5-8,Open,no,no,no,no,no,no,no,no,no,0.163284132841328,0.13760603204524,0.155060352831941,0.15198350590617
 Morrow,048801,Highland Local,016162,Highland High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.118900729108245,0.141709695926563,0.09841628959276,0.119675571542523
 Morrow,048801,Highland Local,035295,Highland Middle School,6-8,Open,no,no,no,no,no,no,no,no,no,0.118900729108245,0.141709695926563,0.09841628959276,0.119675571542523
-Morrow,048801,Highland Local,089649,Highland  Elementary School,K-5;P,Open,no,no,no,no,no,no,no,no,no,0.118900729108245,0.141709695926563,0.09841628959276,0.119675571542523
+Morrow,048801,Highland Local,089649,Highland Elementary School,K-5;P,Open,no,no,no,no,no,no,no,no,no,0.118900729108245,0.141709695926563,0.09841628959276,0.119675571542523
 Morrow,048819,Northmor Local,017269,Northmor Elementary School,K-6;P,Open,no,no,no,no,no,no,no,no,no,0.144631117604091,0.142002989536622,0.136229749631811,0.140954618924175
 Morrow,048819,Northmor Local,027722,Northmor High School,7-12,Open,no,no,no,no,no,no,no,no,no,0.144631117604091,0.142002989536622,0.136229749631811,0.140954618924175
 Muskingum,045179,Zanesville City,000831,National Road,K-6,Open,no,no,no,no,no,no,no,no,yes,0.328029948525971,0.286810551558753,0.36147135109644,0.325437283727055
@@ -2091,7 +2091,7 @@ Muskingum,048835,East Muskingum Local,152280,Larry Miller Intermediate Elementar
 Muskingum,048843,Franklin Local,008839,Duncan Falls Elementary School,K-5;P,Open,no,no,no,no,no,no,no,no,no,0.177434030937216,0.151318833873207,0.177220956719818,0.16865794051008
 Muskingum,048843,Franklin Local,008847,Philo Junior High School,6-8,Open,no,no,no,no,no,no,no,yes,no,0.177434030937216,0.151318833873207,0.177220956719818,0.16865794051008
 Muskingum,048843,Franklin Local,029843,Philo High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.177434030937216,0.151318833873207,0.177220956719818,0.16865794051008
-Muskingum,048843,Franklin Local,062224,Roseville Elementary  School,K-5;P,Open,no,no,no,no,no,yes,no,no,no,0.177434030937216,0.151318833873207,0.177220956719818,0.16865794051008
+Muskingum,048843,Franklin Local,062224,Roseville Elementary School,K-5;P,Open,no,no,no,no,no,yes,no,no,no,0.177434030937216,0.151318833873207,0.177220956719818,0.16865794051008
 Muskingum,048850,Maysville Local,023358,Maysville High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.166380789022299,0.151338766006985,0.18213058419244,0.166616713073908
 Muskingum,048850,Maysville Local,062232,Maysville Middle School,6-8,Open,no,no,no,no,no,no,no,yes,no,0.166380789022299,0.151338766006985,0.18213058419244,0.166616713073908
 Muskingum,048850,Maysville Local,145352,Maysville Elementary School,D;P;K;1-5,Open,no,no,no,no,no,no,no,no,no,0.166380789022299,0.151338766006985,0.18213058419244,0.166616713073908
@@ -2495,7 +2495,7 @@ Summit,043489,Akron City,009145,Akron Early College High School,9-12,Open,no,no,
 Summit,043489,Akron City,009498,East Community Learning Center,6-12,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.300711485407289,0.309109746170355,0.382160693301998,0.330660641626547
 Summit,043489,Akron City,010272,Ellet Community Learning Center,9-12,Open,yes,no,yes,no,yes,yes,yes,no,yes,0.300711485407289,0.309109746170355,0.382160693301998,0.330660641626547
 Summit,043489,Akron City,011130,Judith A Resnik Community Learning Center,K-5,Open,no,no,no,no,no,no,no,no,yes,0.300711485407289,0.309109746170355,0.382160693301998,0.330660641626547
-Summit,043489,Akron City,011532,National Inventors Hall of Fame School  Center for STEM,5-8,Open,no,no,no,no,no,no,no,no,yes,0.300711485407289,0.309109746170355,0.382160693301998,0.330660641626547
+Summit,043489,Akron City,011532,National Inventors Hall of Fame School Center for STEM,5-8,Open,no,no,no,no,no,no,no,no,yes,0.300711485407289,0.309109746170355,0.382160693301998,0.330660641626547
 Summit,043489,Akron City,011635,Findley Community Learning Center,K-5,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.300711485407289,0.309109746170355,0.382160693301998,0.330660641626547
 Summit,043489,Akron City,011692,Firestone Community Learning Center,9-12,Open,yes,no,yes,no,yes,yes,yes,no,yes,0.300711485407289,0.309109746170355,0.382160693301998,0.330660641626547
 Summit,043489,Akron City,011932,Forest Hill Community Learning Center,K-5,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.300711485407289,0.309109746170355,0.382160693301998,0.330660641626547
@@ -2616,7 +2616,7 @@ Trumbull,044990,Warren City,009113,McGuffey PK-8 School,P;K-8,Open,yes,no,yes,no
 Trumbull,044990,Warren City,015222,Warren G Harding High School,9-12,Open,yes,no,yes,no,yes,yes,yes,yes,yes,0.402080886054707,0.459666439754935,0.494855793557092,0.452201039788912
 Trumbull,045427,Hubbard Exempted Village,017046,Hubbard High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.128734383487235,0.163916391639164,0.180229382850901,0.157626719325767
 Trumbull,045427,Hubbard Exempted Village,031245,Hubbard Middle School,5-8,Open,no,no,no,no,no,no,no,no,no,0.128734383487235,0.163916391639164,0.180229382850901,0.157626719325767
-Trumbull,045427,Hubbard Exempted Village,032391,Hubbard  Elementary School,K-4,Open,no,no,no,no,no,no,no,no,no,0.128734383487235,0.163916391639164,0.180229382850901,0.157626719325767
+Trumbull,045427,Hubbard Exempted Village,032391,Hubbard Elementary School,K-4,Open,no,no,no,no,no,no,no,no,no,0.128734383487235,0.163916391639164,0.180229382850901,0.157626719325767
 Trumbull,045567,Newton Falls Exempted Village,000950,Newton Falls Elementary School,K-3,Open,no,no,no,no,no,no,yes,no,no,0.166533864541833,0.203389830508475,0.199359487590072,0.189761060880126
 Trumbull,045567,Newton Falls Exempted Village,005256,Newton Falls Middle School,4-5,Open,no,no,no,no,no,no,no,no,no,0.166533864541833,0.203389830508475,0.199359487590072,0.189761060880126
 Trumbull,045567,Newton Falls Exempted Village,027151,Newton Falls High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.166533864541833,0.203389830508475,0.199359487590072,0.189761060880126
@@ -2738,7 +2738,7 @@ Warren,044214,Lebanon City,000491,Bowman Primary School,K-2;P,Open,no,no,no,no,n
 Warren,044214,Lebanon City,000493,Lebanon Junior High,7-8,Open,no,no,no,no,no,no,no,no,no,0.076365250850969,0.069057895520167,0.070925110132159,0.072116085501098
 Warren,044214,Lebanon City,002519,Berry Intermediate School,5-6,Open,no,no,no,no,no,no,no,no,no,0.076365250850969,0.069057895520167,0.070925110132159,0.072116085501098
 Warren,044214,Lebanon City,020032,Lebanon High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.076365250850969,0.069057895520167,0.070925110132159,0.072116085501098
-Warren,044214,Lebanon City,095679,Donovan  Elementary School,3-4,Open,no,no,no,no,no,no,no,no,no,0.076365250850969,0.069057895520167,0.070925110132159,0.072116085501098
+Warren,044214,Lebanon City,095679,Donovan Elementary School,3-4,Open,no,no,no,no,no,no,no,no,no,0.076365250850969,0.069057895520167,0.070925110132159,0.072116085501098
 Warren,050419,Carlisle Local,004911,Carlisle High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.086752637749121,0.088704908338261,0.091598599766628,0.08901871528467
 Warren,050419,Carlisle Local,004929,Carlisle Primary Elementary School,K-3;P,Open,no,no,no,no,no,no,no,no,no,0.086752637749121,0.088704908338261,0.091598599766628,0.08901871528467
 Warren,050419,Carlisle Local,004937,Carlisle Intermediate Elementary School,4-6,Open,no,no,no,no,no,no,no,no,no,0.086752637749121,0.088704908338261,0.091598599766628,0.08901871528467
@@ -2806,7 +2806,7 @@ Wayne,050542,Dalton Local,007997,Dalton Elementary School,K-4,Open,no,no,no,no,n
 Wayne,050542,Dalton Local,008003,Dalton High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.10941475826972,0.113636363636364,0.111182519280206,0.111411213728763
 Wayne,050542,Dalton Local,066845,Dalton Middle School,5-8,Open,no,no,no,no,no,no,no,no,no,0.10941475826972,0.113636363636364,0.111182519280206,0.111411213728763
 Wayne,050559,Green Local,014456,Green Middle School,6-8,Open,no,no,no,no,no,no,no,no,no,0.100910470409712,0.092176607281177,0.110429447852761,0.101172175181217
-Wayne,050559,Green Local,022996,Green  Elementary School,K-5,Open,no,no,no,no,no,no,no,no,no,0.100910470409712,0.092176607281177,0.110429447852761,0.101172175181217
+Wayne,050559,Green Local,022996,Green Elementary School,K-5,Open,no,no,no,no,no,no,no,no,no,0.100910470409712,0.092176607281177,0.110429447852761,0.101172175181217
 Wayne,050559,Green Local,034793,Smithville High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.100910470409712,0.092176607281177,0.110429447852761,0.101172175181217
 Wayne,050567,Norwayne Local,007625,Norwayne Middle School,6-8,Open,no,no,no,no,no,no,no,no,no,0.111409395973154,0.197945205479452,0.122795115332429,0.144049905595012
 Wayne,050567,Norwayne Local,028076,Norwayne High School,9-12,Open,no,no,no,no,no,no,no,no,no,0.111409395973154,0.197945205479452,0.122795115332429,0.144049905595012

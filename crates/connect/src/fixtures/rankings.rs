@@ -258,7 +258,7 @@ mod tests {
         assert!(rows
             .iter()
             .all(|r| r.iter().all(|cell| !cell.contains(','))));
-        assert_eq!(rows[0][5], "Roxbury  Grace L");
+        assert_eq!(rows[0][5], "Roxbury Grace L");
     }
 
     #[test]
