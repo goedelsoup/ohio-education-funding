@@ -12,16 +12,19 @@ import { expect, test } from "vitest";
 import { loadCorpus, type Node } from "../../src/lib/corpus.ts";
 import { loadFigureManifest, READS_CONTRACT, type Manifest } from "../../src/lib/corpusFigures.ts";
 import {
+  bandsAgainstFigures,
   barsOf,
   censusAgainstFigures,
   crossCheckPageSeries,
   crossCheckSeries,
   endpoints,
   PAGE_SERIES,
+  rangesOf,
   ranksOf,
   fitsAgainstFigures,
   formatRow,
   loadSeriesManifest,
+  type ManifestBand,
   type ManifestCurve,
   type ManifestSeries,
   type ManifestPlane,
@@ -75,14 +78,19 @@ test("the two committed manifests agree on every row of every spread's census", 
   expect(censusAgainstFigures(manifest, figures)).toEqual([]);
 });
 
+test("the two committed manifests agree on both ends of every band chart's end rows", () => {
+  expect(bandsAgainstFigures(manifest, figures)).toEqual([]);
+});
+
 /**
  * The coverage floor, at the value and not under it, on the figure ratchet's standing rule:
  * recount with the expressions below rather than incrementing the last stated number.
  *
- * Four series over two carriers: `dispersion/fy2016-step-by-business-class` on
+ * Five series over three carriers: `dispersion/fy2016-step-by-business-class` on
  * `education-agency/toledo-city`, which is #416's finding drawn as the four bars it was found by,
- * and #444's three on `formula-component/temporary-transitional-aid-guarantee` — the plane the two
- * axes disagree on, and one grouped series per axis drawn as seven panels each.
+ * #444's three on `formula-component/temporary-transitional-aid-guarantee` — the plane the two
+ * axes disagree on, and one grouped series per axis drawn as seven panels each — and #447's band
+ * chart on `formula-component/fsfp-base-cost-calculation`.
  *
  * Every computation the manifest exports is drawn *somewhere*, and there are two somewheres: a
  * node's `series:` block, and a page declared in `PAGE_SERIES`. The sum is the assertion, because
@@ -91,21 +99,22 @@ test("the two committed manifests agree on every row of every spread's census", 
  */
 test("the corpus draws no fewer series than it did", () => {
   const drawn = corpus.nodes.flatMap((node) => node.series);
-  expect(drawn.length, "4 series bindings; raise this when you add one").toBeGreaterThanOrEqual(4);
+  expect(drawn.length, "5 series bindings; raise this when you add one").toBeGreaterThanOrEqual(5);
   expect(
     corpus.nodes.filter((node) => node.series.length > 0).length,
-    "2 nodes draw a series; raise this when a third does",
-  ).toBeGreaterThanOrEqual(2);
+    "3 nodes draw a series; raise this when a fourth does",
+  ).toBeGreaterThanOrEqual(3);
   expect(
     new Set([...drawn.map((binding) => binding.key), ...Object.keys(PAGE_SERIES)]).size,
-    "every series, cloud, plane, curve and spread the manifest exports is drawn by some node or " +
-      "page",
+    "every series, cloud, plane, curve, spread and band chart the manifest exports is drawn by " +
+      "some node or page",
   ).toBe(
     manifest.series.length +
       manifest.scatters.length +
       manifest.planes.length +
       manifest.curves.length +
-      manifest.spreads.length,
+      manifest.spreads.length +
+      manifest.bands.length,
   );
   expect(
     manifest.scatters.length,
@@ -127,6 +136,11 @@ test("the corpus draws no fewer series than it did", () => {
     "2 spreads, both on formula-component/temporary-transitional-aid-guarantee: the two terms of " +
       "every district's multiple, and the same terms cut by wealth; raise this when you add one",
   ).toBeGreaterThanOrEqual(2);
+  expect(
+    manifest.bands.length,
+    "1 band chart: project/administrators-employed-against-administrators-funded on " +
+      "formula-component/fsfp-base-cost-calculation; raise this when you add one",
+  ).toBeGreaterThanOrEqual(1);
 });
 
 test("the manifest declares the contract this module reads", () => {
@@ -251,6 +265,7 @@ function fixture(): { node: Node; series: SeriesManifest; figures: Manifest } {
     planes: [],
     curves: [],
     spreads: [],
+    bands: [],
     series: [
       {
         key: "dispersion/by-class",
@@ -478,6 +493,7 @@ function cloudFixture(): { node: Node; series: SeriesManifest; figures: Manifest
     planes: [],
     curves: [],
     spreads: [],
+    bands: [],
     scatters: [
       {
         key: "project/what-it-measures",
@@ -723,6 +739,7 @@ function planeFixture(): { node: Node; series: SeriesManifest; figures: Manifest
     scatters: [],
     curves: [],
     spreads: [],
+    bands: [],
     planes: [plane],
   };
   const dollars = (key: string, value: number, label: string) =>
@@ -944,6 +961,7 @@ function curveFixture(): { node: Node; series: SeriesManifest; figures: Manifest
     planes: [],
     curves: [curve],
     spreads: [],
+    bands: [],
   };
   const share = (key: string, value: number, label: string) =>
     ({ key, owner: "crates/project", unit: "share", value, label }) as const;
@@ -1233,6 +1251,7 @@ function spreadFixture(): { node: Node; series: SeriesManifest; figures: Manifes
     planes: [],
     curves: [],
     spreads: [spread],
+    bands: [],
   };
   const count = (key: string, value: number, label: string) =>
     ({ key, owner: "crates/project", unit: "count", value, label }) as const;
@@ -1410,4 +1429,273 @@ test("the committed spreads are the guarantee's two terms, and the empty region 
   }
   // Every district in this spread lost pupils, which is the population its census counts.
   expect(wealth!.panels.every((panel) => panel.marks.every((mark) => mark.x > 0))).toBe(true);
+});
+
+// --- The band chart, read at its two ends and at the marker ------------------------------------
+
+/**
+ * A band chart correct in every position, for the mutations below to be cut from.
+ *
+ * Four rows, one marker and an aggregate, which is the smallest fixture that can tell the rules
+ * apart: a two-row chart is all ends and cannot show that the middle is deliberately unpinned, and
+ * a chart with no marker cannot show that a marker is pinned while a boundary never is. The
+ * unreached list is the shape #447 gives it — a floor the source has no column for, rather than a
+ * subject the computation failed to place — and it is populated because an empty one is refused.
+ */
+function bandFixture(): { node: Node; series: SeriesManifest; figures: Manifest } {
+  const prose =
+    "The smallest fifth is funded for 5.23 and employs 6.25; the largest is funded for 20.69 " +
+    "and employs 39.00. The floor binds under 1,500 pupils, and across the state 1.9664 are " +
+    "employed for every one funded. [verified] (`crates/project`)";
+  const bind = (key: string, value: number, as_written: string) =>
+    ({ key, value, field: "description", as_written }) as const;
+  const node: Node = {
+    id: "scenario/example-band",
+    className: "scenario",
+    name: "example-band",
+    label: "Example band",
+    summary: "What is employed against what is funded.",
+    description: prose,
+    linkText: prose,
+    properties: [],
+    findings: null,
+    revisions: [],
+    unfilled: [],
+    figures: [
+      bind("project/funded-small", 5.23, "funded for 5.23"),
+      bind("project/employed-small", 6.25, "employs 6.25"),
+      bind("project/funded-large", 20.69, "funded for 20.69"),
+      bind("project/employed-large", 39, "employs 39.00"),
+      bind("project/threshold", 1500, "under 1,500 pupils"),
+      bind("project/multiple", 1.9664, "1.9664 are employed for every one funded"),
+    ],
+    series: [{ key: "project/employed-against-funded", field: "description" }],
+    out: [],
+    in: [],
+  };
+  const span = (label: string, low: number, high: number) => ({
+    label,
+    hover: `${label}: funded for ${low}, employing ${high}`,
+    low,
+    high,
+  });
+  const band: ManifestBand = {
+    key: "project/employed-against-funded",
+    owner: "crates/project",
+    subject: "sextile",
+    label: "What districts employ against what the plan funds",
+    ends: ["What the plan funds", "What the district employs"],
+    measure: {
+      label: "Administrators, in full-time equivalents",
+      unit: "positions",
+      min: 5.23,
+      max: 39,
+      log: true,
+    },
+    spans: [
+      {
+        ...span("552 pupils", 5.23, 6.25),
+        lowFigure: "project/funded-small",
+        highFigure: "project/employed-small",
+      },
+      span("886 pupils", 5.97, 9.7),
+      span("1,663 pupils", 7.91, 15),
+      {
+        ...span("5,256 pupils", 20.69, 39),
+        lowFigure: "project/funded-large",
+        highFigure: "project/employed-large",
+      },
+    ],
+    markers: [
+      {
+        label: "1,500 pupils: under it the floor funds two administrators at any enrolment.",
+        value: 1500,
+        at: 2.25,
+        figure: "project/threshold",
+      },
+    ],
+    whole: {
+      label: "1.9664 employed for every one funded.",
+      value: 1.9664,
+      figure: "project/multiple",
+    },
+    unreached: [
+      { label: "R.C. 3317.011(E)(1), guidance counselors", why: "no column of the report counts it" },
+    ],
+  };
+  const series: SeriesManifest = {
+    contract: READS_SERIES_CONTRACT,
+    series: [],
+    scatters: [],
+    planes: [],
+    curves: [],
+    spreads: [],
+    bands: [band],
+  };
+  const at = (key: string, unit: "positions" | "count" | "ratio", value: number, label: string) =>
+    ({ key, owner: "crates/project", unit, value, label }) as const;
+  const figures: Manifest = {
+    contract: READS_CONTRACT,
+    figures: [
+      at("project/funded-small", "positions", 5.23, "Funded in the smallest sextile"),
+      at("project/employed-small", "positions", 6.25, "Employed in the smallest sextile"),
+      at("project/funded-large", "positions", 20.69, "Funded in the largest sextile"),
+      at("project/employed-large", "positions", 39, "Employed in the largest sextile"),
+      at("project/threshold", "count", 1500, "The floor's own threshold in pupils"),
+      at("project/multiple", "ratio", 1.9664, "Employed for every one funded"),
+    ],
+  };
+  return { node, series, figures };
+}
+
+test("the band fixture the mutations are cut from is itself clean", () => {
+  const { node, series, figures: mine } = bandFixture();
+  expect(kinds(node, series)).toEqual([]);
+  expect(bandsAgainstFigures(series, mine)).toEqual([]);
+});
+
+test("band-unbound: the node does not bind one value of one end row", () => {
+  const { node, series } = bandFixture();
+  node.figures = node.figures.filter((f) => f.key !== "project/employed-large");
+  expect(kinds(node, series)).toEqual(["band-unbound"]);
+});
+
+test("band-unbound: an end row is two numbers, so dropping the row is two findings", () => {
+  const { node, series } = bandFixture();
+  node.figures = node.figures.filter(
+    (f) => f.key !== "project/funded-small" && f.key !== "project/employed-small",
+  );
+  expect(kinds(node, series)).toEqual(["band-unbound", "band-unbound"]);
+});
+
+test("band-unbound: the middle rows are not bound and are not meant to be", () => {
+  // The rule is the first and last row, not every row. A chart of six rows bound twelve times
+  // would put ten numbers in the prose that nothing is read off.
+  const { node, series } = bandFixture();
+  series.bands[0]!.spans[1] = {
+    ...series.bands[0]!.spans[1]!,
+    lowFigure: "project/nothing-binds-this",
+    highFigure: "project/nor-does-anything-bind-this",
+  };
+  expect(kinds(node, series)).toEqual([]);
+});
+
+test("band-unbound: the marker is a statutory parameter and is pinned", () => {
+  const { node, series } = bandFixture();
+  node.figures = node.figures.filter((f) => f.key !== "project/threshold");
+  expect(kinds(node, series)).toEqual(["band-unbound"]);
+});
+
+test("band-unbound: the aggregate is on no row, so nothing else could pin it", () => {
+  const { node, series } = bandFixture();
+  node.figures = node.figures.filter((f) => f.key !== "project/multiple");
+  expect(kinds(node, series)).toEqual(["band-unbound"]);
+});
+
+test("band-unbound: an end row the manifest left unpinned is reported, not skipped", () => {
+  const { node, series } = bandFixture();
+  const last = series.bands[0]!.spans[3]!;
+  series.bands[0]!.spans[3] = {
+    label: last.label,
+    hover: last.hover,
+    low: last.low,
+    high: last.high,
+    lowFigure: last.lowFigure!,
+  };
+  expect(kinds(node, series)).toEqual(["band-unbound"]);
+});
+
+test("unknown-key: the node draws a band chart the manifest does not carry", () => {
+  const { node, series } = bandFixture();
+  node.series[0]!.key = "project/employed-against-funded-renamed";
+  expect(kinds(node, series)).toEqual(["unknown-key", "uncited-series"]);
+});
+
+test("unattributed: the node draws a crate's band chart and cites that crate nowhere", () => {
+  const { node, series } = bandFixture();
+  node.description = node.description.replace(" (`crates/project`)", "");
+  node.linkText = node.description;
+  expect(kinds(node, series)).toEqual(["unattributed"]);
+});
+
+test("uncited-series: the manifest exports a band chart no node draws", () => {
+  const { node, series } = bandFixture();
+  series.bands.push({ ...series.bands[0]!, key: "project/employed-against-funded-again" });
+  expect(kinds(node, series)).toEqual(["uncited-series"]);
+});
+
+test("the two manifests are held to each other at both ends, the marker and the caption", () => {
+  const { series, figures: mine } = bandFixture();
+  expect(bandsAgainstFigures(series, mine)).toEqual([]);
+  // A value that has moved on one side and not the other, at each of the four positions the rule
+  // names: an end row's low, an end row's high, the marker, and the aggregate.
+  series.bands[0]!.spans[0]!.low = 5.24;
+  expect(bandsAgainstFigures(series, mine)).toHaveLength(1);
+  series.bands[0]!.spans[0]!.low = 5.23;
+  series.bands[0]!.spans[3]!.high = 39.5;
+  expect(bandsAgainstFigures(series, mine)).toHaveLength(1);
+  series.bands[0]!.spans[3]!.high = 39;
+  series.bands[0]!.markers[0]!.value = 1250;
+  expect(bandsAgainstFigures(series, mine)).toHaveLength(1);
+  series.bands[0]!.markers[0]!.value = 1500;
+  series.bands[0]!.whole.value = 1.97;
+  expect(bandsAgainstFigures(series, mine)).toHaveLength(1);
+});
+
+test("an end of a band drawn on a unit the figure is not is refused", () => {
+  const { series, figures: mine } = bandFixture();
+  // A figure the other document lacks, and one whose unit is not the axis's.
+  series.bands[0]!.spans[0]!.lowFigure = "project/absent";
+  expect(bandsAgainstFigures(series, mine)).toHaveLength(1);
+  series.bands[0]!.spans[0]!.lowFigure = "project/funded-small";
+  mine.figures[0] = { ...mine.figures[0]!, unit: "count" };
+  expect(bandsAgainstFigures(series, mine)).toHaveLength(1);
+});
+
+test("a band chart that names nothing its source cannot see is refused", () => {
+  const { series, figures: mine } = bandFixture();
+  series.bands[0]!.unreached = [];
+  expect(bandsAgainstFigures(series, mine)).toHaveLength(1);
+});
+
+test("a band becomes one row per span, with the marker carried beside them", () => {
+  const { series } = bandFixture();
+  const drawn = rangesOf(series.bands[0]!);
+  expect(drawn.rows.map((row) => row.label)).toEqual([
+    "552 pupils",
+    "886 pupils",
+    "1,663 pupils",
+    "5,256 pupils",
+  ]);
+  expect(drawn.rows[0]!.low).toBe(5.23);
+  expect(drawn.rows[0]!.high).toBe(6.25);
+  // The axis is logarithmic and says so, which is the whole argument for the form: a row's length
+  // is the ratio between its ends only where the scale is.
+  expect(drawn.axis.log).toBe(true);
+  expect(drawn.axis.format(6.25)).toBe("6.25");
+  // The marker's position is in rows and fractional, because "16 districts into the fourth band"
+  // is not a row boundary and rounding it to one would move the claim.
+  expect(drawn.markers).toHaveLength(1);
+  expect(drawn.markers[0]!.at).toBe(2.25);
+});
+
+test("the committed band chart is the administrator floor, drawn against what is employed", () => {
+  const band = manifest.bands.find(
+    (entry) => entry.key === "project/administrators-employed-against-administrators-funded",
+  );
+  expect(band).toBeDefined();
+  // Six sextiles of the ADM distribution, and one marker: the floor's own threshold.
+  expect(band!.spans).toHaveLength(6);
+  expect(band!.markers).toHaveLength(1);
+  expect(band!.markers[0]!.value).toBe(1500);
+  // The finding, in the two numbers it is made of: districts employ about twice what the build-up
+  // funds, and the gap is narrowest in the smallest sextile, where the floor binds.
+  expect(band!.whole.value).toBeGreaterThan(1.9);
+  expect(band!.whole.value).toBeLessThan(2);
+  const multiple = (span: { low: number; high: number }) => span.high / span.low;
+  expect(multiple(band!.spans[0]!)).toBeLessThan(multiple(band!.spans[5]!));
+  // Six of R.C. 3317.011's seven binding floors meet no column of the District Profile Report, and
+  // they are named beside the chart rather than left out of it — #447's more careful half.
+  expect(band!.unreached).toHaveLength(6);
+  for (const missing of band!.unreached) expect(missing.label).toMatch(/^R\.C\. 3317\.011\(/);
 });

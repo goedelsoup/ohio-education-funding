@@ -19,9 +19,9 @@
 use std::collections::BTreeSet;
 
 use figures::{
-    compute_all, compute_all_curves, compute_all_planes, compute_all_scatters, compute_all_series,
-    compute_all_spreads, Row, CURVES, FIGURES, PLANES, SCATTERS, SERIES, SERIES_CONTRACT_VERSION,
-    SPREADS,
+    compute_all, compute_all_bands, compute_all_curves, compute_all_planes, compute_all_scatters,
+    compute_all_series, compute_all_spreads, Row, BANDS, CURVES, FIGURES, PLANES, SCATTERS, SERIES,
+    SERIES_CONTRACT_VERSION, SPREADS,
 };
 
 /// The rows a reader would quote: the top of the chart and the bottom of it.
@@ -216,10 +216,10 @@ fn the_manifest_is_stable() {
 /// The document parses as JSON, declares its contract, and carries every member of every array
 /// exactly once.
 ///
-/// All five arrays: a cloud, a plane, a curve and a spread are keyed the same way a series is
-/// and each draws one line per point for the same reason a series draws one per row, so the
-/// counts below are over the five registries together and a drawing silently dropped would fail
-/// the first of them.
+/// All six arrays: a cloud, a plane, a curve, a spread and a band chart are keyed the same way a
+/// series is and each draws one line per point for the same reason a series draws one per row, so
+/// the counts below are over the six registries together and a drawing silently dropped would
+/// fail the first of them.
 #[test]
 fn the_document_is_readable_and_complete() {
     let json = figures::series_manifest();
@@ -234,8 +234,8 @@ fn the_document_is_readable_and_complete() {
     );
     assert_eq!(
         json.matches("{\"key\": ").count(),
-        SERIES.len() + SCATTERS.len() + PLANES.len() + CURVES.len() + SPREADS.len(),
-        "every series, cloud, plane, curve and spread is written exactly once"
+        SERIES.len() + SCATTERS.len() + PLANES.len() + CURVES.len() + SPREADS.len() + BANDS.len(),
+        "every series, cloud, plane, curve, spread and band chart is written exactly once"
     );
     let rows: usize = compute_all_series().iter().map(|e| e.rows.len()).sum();
     // Per cloud: every point, every panel, and every axis, which is the shared x and one y per
@@ -275,11 +275,18 @@ fn the_document_is_readable_and_complete() {
                 + 2
         })
         .sum();
+    // And per band chart: every row, every marker, the aggregate, everything unreached, and its
+    // one axis. A band chart has no panels — it is one frame of ordered rows — and its markers
+    // carry no coordinates of their own, only a position along the index.
+    let banded: usize = compute_all_bands()
+        .iter()
+        .map(|e| e.ranges.spans.len() + e.ranges.markers.len() + e.ranges.unreached.len() + 2)
+        .sum();
     assert_eq!(
         json.matches("{\"label\": ").count(),
-        rows + drawn + placed + traced + spread,
-        "every row, panel, axis, point, position, line, mark, boundary, region and absence is \
-         written exactly once"
+        rows + drawn + placed + traced + spread + banded,
+        "every row, panel, axis, point, position, line, mark, boundary, region, span, marker and \
+         absence is written exactly once"
     );
     for key in SERIES
         .iter()
@@ -288,6 +295,7 @@ fn the_document_is_readable_and_complete() {
         .chain(PLANES.iter().map(|p| p.key))
         .chain(CURVES.iter().map(|c| c.key))
         .chain(SPREADS.iter().map(|s| s.key))
+        .chain(BANDS.iter().map(|b| b.key))
     {
         assert!(
             json.contains(&format!("\"key\": \"{key}\"")),
@@ -1459,6 +1467,397 @@ fn every_region_and_panel_of_a_spread_is_named_and_writable() {
                 !text.contains(['"', '\\']) && !text.chars().any(char::is_control),
                 "{}: {text:?} carries a character the manifest writer cannot escape",
                 s.key
+            );
+        }
+    }
+}
+
+/// The endpoint rule as a band chart has it: the **first and last row, both ends**.
+///
+/// A series binds its largest and smallest row, a cloud its fit, a plane every coordinate, a
+/// curve each line's two ends, a spread every region of its census. A band chart is a curve's
+/// case with two values per step: reordering its index destroys what it says, so its extremes are
+/// first and last rather than largest and smallest — and each of those rows carries *two* numbers
+/// a reader quotes, because the whole picture is the pair. Six hundred districts funded for 5.23
+/// administrators and employing 6.25 is two quotable numbers, not one.
+///
+/// `Ranges::framed` asserts the same thing on the way in. This is the assertion restated on the
+/// way out, where a reader of the manifest can see it.
+#[test]
+fn the_two_ends_of_every_band_chart_name_a_figure_for_both_of_their_values() {
+    for entry in compute_all_bands() {
+        let b = entry.band;
+        assert!(
+            entry.ranges.spans.len() >= 2,
+            "{}: a band chart of {} row(s) is a value rather than a shape",
+            b.key,
+            entry.ranges.spans.len()
+        );
+        for end in ["first", "last"] {
+            let span = if end == "first" {
+                entry.ranges.spans.first()
+            } else {
+                entry.ranges.spans.last()
+            }
+            .expect("the row count is asserted above");
+            assert!(
+                span.low_figure.is_some() && span.high_figure.is_some(),
+                "{}: {:?} is the {end} row and leaves one of its two values unpinned. Bind it as \
+                 an ordinary figure in FIGURES first; both ends of an end row are numbers a \
+                 reader takes straight off the picture.",
+                b.key,
+                span.label
+            );
+        }
+    }
+}
+
+/// Every figure a span names exists, is measured in the axis' unit, and reproduces the value.
+///
+/// Not in magnitude, unlike a row, a fit, a position and a line: those compare that way because
+/// the figure manifest exports a signed quantity unsigned with the direction in its key, and a
+/// band chart has no signed quantity to export. Its axis is logarithmic, so every value on it is
+/// above zero by construction and a comparison in magnitude would be the same comparison with a
+/// place for a sign error to hide.
+#[test]
+fn a_span_reproduces_the_figures_it_names() {
+    let figures = compute_all();
+    for entry in compute_all_bands() {
+        let b = entry.band;
+        let unit = entry.ranges.measure.unit;
+        for span in &entry.ranges.spans {
+            for (end, key, value) in [
+                ("low", span.low_figure, span.low),
+                ("high", span.high_figure, span.high),
+            ] {
+                let Some(key) = key else { continue };
+                let figure = figures
+                    .iter()
+                    .find(|c| c.figure.key == key)
+                    .unwrap_or_else(|| {
+                        panic!(
+                            "{}: the {end} end of {:?} names {key}, which FIGURES does not carry",
+                            b.key, span.label
+                        )
+                    });
+                assert_eq!(
+                    figure.figure.unit, unit,
+                    "{}: the {end} end of {:?} is drawn on an axis measured in {unit:?} and names \
+                     a figure measured in {:?}",
+                    b.key, span.label, figure.figure.unit
+                );
+                let drift = (value - figure.figure.pinned).abs();
+                assert!(
+                    drift <= figure.figure.tolerance,
+                    "{}: the {end} end of {:?} is {value} and names {key}, pinned at {} \u{2014} \
+                     {drift} apart, tolerating {}. The two are meant to be one computation; if \
+                     they have diverged, the chart is drawing something the corpus does not quote.",
+                    b.key,
+                    span.label,
+                    figure.figure.pinned,
+                    figure.figure.tolerance
+                );
+            }
+        }
+    }
+}
+
+/// Every marker and every aggregate names a figure that exists and reproduces it.
+///
+/// The other two thirds of the rule, and the two that have no analogue in the five families
+/// before this one. A marker is a *parameter of the plan* drawn on the index — not an arithmetic
+/// definition the way a curve's reference or a spread's boundary is, which is why those name no
+/// figure and this one must. An aggregate is the caption's number, which is on none of the rows
+/// and is therefore the one quantity on the picture that nothing else could pin.
+#[test]
+fn every_marker_and_aggregate_of_a_band_names_a_figure_it_reproduces() {
+    let figures = compute_all();
+    for entry in compute_all_bands() {
+        let b = entry.band;
+        #[allow(clippy::cast_precision_loss)]
+        let rows = entry.ranges.spans.len() as f64;
+        let marked = entry
+            .ranges
+            .markers
+            .iter()
+            .map(|m| (m.label.as_str(), m.figure, m.value))
+            .chain(core::iter::once((
+                entry.ranges.whole.label.as_str(),
+                entry.ranges.whole.figure,
+                entry.ranges.whole.value,
+            )));
+        for (label, key, value) in marked {
+            let figure = figures
+                .iter()
+                .find(|c| c.figure.key == key)
+                .unwrap_or_else(|| {
+                    panic!(
+                        "{}: {label:?} names {key}, which FIGURES does not carry",
+                        b.key
+                    )
+                });
+            let drift = (value - figure.figure.pinned).abs();
+            assert!(
+                drift <= figure.figure.tolerance,
+                "{}: {label:?} is {value} and names {key}, pinned at {} \u{2014} {drift} apart, \
+                 tolerating {}. A threshold the prose quotes and a caption nothing else pins are \
+                 exactly the two numbers this rule exists for.",
+                b.key,
+                figure.figure.pinned,
+                figure.figure.tolerance
+            );
+        }
+        for marker in &entry.ranges.markers {
+            assert!(
+                marker.at >= 0.0 && marker.at <= rows,
+                "{}: {:?} is drawn at row {} of {rows}, which is off the picture",
+                b.key,
+                marker.label,
+                marker.at
+            );
+        }
+    }
+}
+
+/// Every band chart names what its source cannot see, and none of it is drawn.
+///
+/// The same second half of the rule a spread carries, put to the other use the shape allows.
+/// There, an absence is a subject the computation could not place; here it is a *floor the source
+/// has no column for*. One of R.C. 3317.011's seven binding staffing floors meets a column of the
+/// District Profile Report and six meet none, so a picture of the one captioned as a picture of
+/// staffing overstates what the report supports — and the negative is the more careful half of
+/// the finding. An empty list is also what a dropped filter looks like, which is why this fails
+/// rather than passing quietly when one appears.
+#[test]
+fn every_band_chart_names_what_its_source_cannot_see() {
+    for entry in compute_all_bands() {
+        let b = entry.band;
+        assert!(
+            !entry.ranges.unreached.is_empty(),
+            "{}: nothing is unreached. If the source now reaches everything the chart is about, \
+             say so by leaving this failing until someone has checked it.",
+            b.key
+        );
+        let drawn: BTreeSet<&str> = entry
+            .ranges
+            .spans
+            .iter()
+            .map(|s| s.label.as_str())
+            .collect();
+        for missing in &entry.ranges.unreached {
+            assert!(
+                !missing.label.is_empty(),
+                "{}: something is unreached and unnamed, which is the same as being dropped",
+                b.key
+            );
+            assert!(
+                !missing.why.is_empty(),
+                "{}: {:?} is unreached for no stated reason, and the note beside the chart is \
+                 what makes the absence something a reader can act on",
+                b.key,
+                missing.label
+            );
+            assert!(
+                !drawn.contains(missing.label.as_str()),
+                "{}: {:?} is both drawn and unreached",
+                b.key,
+                missing.label
+            );
+        }
+    }
+}
+
+/// Every span sits inside a logarithmic frame that is exactly the span of the spans.
+///
+/// The axis is the argument. A band chart exists because on a log axis a row's *length* is its
+/// ratio and its position is its level — so a linear one would turn a set of gaps into a
+/// statement about district size, which is the thing the picture is drawn to avoid saying. And
+/// the domain is the data's own extremes with no padding, because padding a log domain by a share
+/// of its span is not a thing the span means.
+#[test]
+fn every_band_is_framed_on_its_own_extremes_in_logs() {
+    for entry in compute_all_bands() {
+        let b = entry.band;
+        let measure = &entry.ranges.measure;
+        assert!(
+            measure.log,
+            "{}: the measure is linear, and then a row's length is a difference rather than the \
+             ratio the chart is for",
+            b.key
+        );
+        assert!(
+            !measure.label.is_empty(),
+            "{}: the measure is unnamed",
+            b.key
+        );
+        let low = entry
+            .ranges
+            .spans
+            .iter()
+            .fold(f64::MAX, |seen, s| seen.min(s.low));
+        let high = entry
+            .ranges
+            .spans
+            .iter()
+            .fold(f64::MIN, |seen, s| seen.max(s.high));
+        assert_eq!(
+            (measure.min, measure.max),
+            (low, high),
+            "{}: the frame is {} to {} and the rows run {low} to {high}",
+            b.key,
+            measure.min,
+            measure.max
+        );
+        for span in &entry.ranges.spans {
+            assert!(
+                span.low > 0.0 && span.high.is_finite(),
+                "{}: {:?} runs {} to {}, which a log axis cannot place",
+                b.key,
+                span.label,
+                span.low,
+                span.high
+            );
+            assert!(
+                span.low <= span.high,
+                "{}: {:?} has its low end {} above its high end {}",
+                b.key,
+                span.label,
+                span.low,
+                span.high
+            );
+        }
+    }
+}
+
+/// Band keys are unique, name their owner's directory, and collide with nothing already keyed.
+#[test]
+fn every_band_key_is_unique_and_names_its_owner() {
+    let taken: BTreeSet<&str> = FIGURES
+        .iter()
+        .map(|f| f.key)
+        .chain(SERIES.iter().map(|s| s.key))
+        .chain(SCATTERS.iter().map(|s| s.key))
+        .chain(PLANES.iter().map(|p| p.key))
+        .chain(CURVES.iter().map(|c| c.key))
+        .chain(SPREADS.iter().map(|s| s.key))
+        .collect();
+    let mut seen = BTreeSet::new();
+    for b in BANDS {
+        assert!(
+            seen.insert(b.key),
+            "{}: two band charts share this key",
+            b.key
+        );
+        assert!(
+            !taken.contains(b.key),
+            "{}: is also a figure, series, cloud, plane, curve or spread key, and a corpus node \
+             could not say which it bound",
+            b.key
+        );
+        let directory = b
+            .owner
+            .strip_prefix("crates/")
+            .unwrap_or_else(|| panic!("{}: owner {:?} is not under crates/", b.key, b.owner));
+        assert!(
+            b.key.starts_with(&format!("{directory}/")),
+            "{}: owned by {} and so should be keyed `{directory}/…`",
+            b.key,
+            b.owner
+        );
+        assert!(
+            b.key
+                .chars()
+                .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-' || c == '/'),
+            "{}: keys are lower-case kebab so a corpus node can hold one without quoting",
+            b.key
+        );
+        assert!(
+            b.label.len() > 20,
+            "{}: {:?} does not say what the band chart is",
+            b.key,
+            b.label
+        );
+        assert!(
+            !b.subject.is_empty() && b.subject == b.subject.to_lowercase(),
+            "{}: the subject is what one row is, singular and lower case",
+            b.key
+        );
+    }
+}
+
+/// Every span, marker and absence is named, distinctly, and writable unescaped.
+///
+/// The first family whose every label is *composed* rather than written in `lib.rs` — a row is
+/// "552 pupils" out of a fixture's median, and a hover is a sentence built around six of them. So
+/// the escaping check is a check on data here, the way a cloud's district names made it one, and
+/// the row labels are additionally held short: `rangeSpec` draws them into a gutter capped at 150
+/// pixels and clips rather than wraps, so a label that says too much says less.
+#[test]
+fn every_span_and_marker_of_a_band_is_named_and_writable() {
+    /// What the widest gutter `rangeSpec` will open holds, at the ~6.2px per character it
+    /// estimates with.
+    const LABEL_CEILING: usize = 22;
+
+    for entry in compute_all_bands() {
+        let b = entry.band;
+        let mut labels = BTreeSet::new();
+        for span in &entry.ranges.spans {
+            assert!(!span.label.is_empty(), "{}: a row has no label", b.key);
+            assert!(
+                labels.insert(span.label.as_str()),
+                "{}: two rows are labelled {:?}",
+                b.key,
+                span.label
+            );
+            assert!(
+                span.label.chars().count() <= LABEL_CEILING,
+                "{}: {:?} is {} characters and the gutter holds about {LABEL_CEILING}, so it \
+                 would be drawn cut",
+                b.key,
+                span.label,
+                span.label.chars().count()
+            );
+            assert!(
+                !span.hover.is_empty(),
+                "{}: the row {:?} says nothing on hover, where both of its values and their \
+                 ratio are what a reader came for",
+                b.key,
+                span.label
+            );
+        }
+        assert!(
+            !entry.ranges.whole.label.is_empty(),
+            "{}: the aggregate is the caption and has none",
+            b.key
+        );
+        assert!(
+            b.ends.iter().all(|end| !end.is_empty()) && b.ends[0] != b.ends[1],
+            "{}: the two ends of a row are {:?}, and they are the whole legend of a chart drawn              in two shades of one hue",
+            b.key,
+            b.ends
+        );
+        let strings = [
+            b.key,
+            b.owner,
+            b.label,
+            b.subject,
+            b.ends[0],
+            b.ends[1],
+            entry.ranges.measure.label,
+        ]
+        .into_iter()
+        .chain(entry.ranges.spans.iter().map(|s| s.label.as_str()))
+        .chain(entry.ranges.spans.iter().map(|s| s.hover.as_str()))
+        .chain(entry.ranges.markers.iter().map(|m| m.label.as_str()))
+        .chain(entry.ranges.markers.iter().map(|m| m.figure))
+        .chain(core::iter::once(entry.ranges.whole.label.as_str()))
+        .chain(entry.ranges.unreached.iter().map(|m| m.label.as_str()))
+        .chain(entry.ranges.unreached.iter().map(|m| m.why.as_str()));
+        for text in strings {
+            assert!(
+                !text.contains(['"', '\\']) && !text.chars().any(char::is_control),
+                "{}: {text:?} carries a character the manifest writer cannot escape",
+                b.key
             );
         }
     }

@@ -150,6 +150,23 @@ findings: |
   counterpart on payroll. Funded is not employed, and none of this is an audit: the finding is the
   gradient, not the level, and why the smallest districts sit closest to their funded count the
   report cannot say. [inference]
+
+  ### The two sides by sextile
+
+  The medians above are a summary of a shape, and the shape is the finding. Drawn as one band per
+  sextile of enrolled ADM, the smallest sixth is funded for **5.23** administrators and employs
+  **6.25**; the largest is funded for **20.69** and employs **39.00**; and over the 606 districts
+  **1.9664** are employed for every one the four elements fund. [verified — crates/project] The
+  band is narrowest at the bottom and widens upward, which is the gradient stated as a picture:
+  the ends of a row are one measure at two points, so on a logarithmic axis the row's length is
+  the multiple and its position is the level.
+
+  The chart marks **1,500** pupils on the enrolment axis, because "narrowest where the floor
+  binds" is a claim about a position on that axis rather than about the picture as a whole. It
+  draws one of the seven floors, and the six the report has no column for are named beside it
+  rather than left out: a chart of one floor captioned as a chart of staffing would overstate
+  what the profile report supports, and the negative is the more careful half of this section.
+  [inference]
 figures:
   - key: project/staffing-floors-in-base-cost
     value: 187146074.82726616
@@ -179,6 +196,33 @@ figures:
     value: 1.8353726362625138
     field: findings
     as_written: "and **1.84** above it"
+  - key: project/administrators-funded-in-the-smallest-sextile
+    value: 5.23
+    field: findings
+    as_written: "smallest sixth is funded for **5.23**"
+  - key: project/administrators-employed-in-the-smallest-sextile
+    value: 6.25
+    field: findings
+    as_written: "administrators and employs\n  **6.25**"
+  - key: project/administrators-funded-in-the-largest-sextile
+    value: 20.689999999999998
+    field: findings
+    as_written: "largest is funded for **20.69**"
+  - key: project/administrators-employed-in-the-largest-sextile
+    value: 39.0
+    field: findings
+    as_written: "and employs **39.00**"
+  - key: project/administrators-employed-for-every-one-funded
+    value: 1.966403426379351
+    field: findings
+    as_written: "**1.9664** are employed for every one"
+  - key: project/the-administrator-floors-adm-threshold
+    value: 1500
+    field: findings
+    as_written: "chart marks **1,500** pupils"
+series:
+  - key: project/administrators-employed-against-administrators-funded
+    field: findings
 properties:
   name: FSFP base cost calculation
   function: |

@@ -19,9 +19,9 @@ import { isBlockProperty, isListProperty, isMathProperty, renderListProperty, re
 import * as routes from "../../../lib/routes.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
 import SeriesChart from "../../../components/SeriesChart.astro";
-import { barsOf, formatValue, loadSeriesManifest, multiplesOf, panelsOf, placesOf, regionsOf } from "../../../lib/corpusSeries.ts";
+import { barsOf, formatValue, loadSeriesManifest, multiplesOf, panelsOf, placesOf, rangesOf, regionsOf } from "../../../lib/corpusSeries.ts";
 import { count } from "../../../lib/format.ts";
-import { barSpec, panelWidth, planeSpec, scatterSpec } from "../../../lib/plot/spec.ts";
+import { barSpec, panelWidth, planeSpec, rangeSpec, scatterSpec } from "../../../lib/plot/spec.ts";
 import { renderPanelToString, renderToString } from "../../../lib/plot/ssr.ts";
 
 export function getStaticPaths() {
@@ -49,9 +49,11 @@ const findings = node.findings
  * **cloud**, drawn as one squared panel per outcome over a shared predictor (#442), or with a
  * **plane**, a handful of named things on two signed measures at once (#444), or with a
  * **spread**, a whole population on two signed axes cut into regions whose counts are the claim
- * (#446). What differs between them is what the node has to bind alongside — a column's two
- * extremes, a cloud's slopes and r-squareds, a plane's every coordinate, a spread's whole census
- * — and `corpusSeries.ts` holds all four.
+ * (#446), or with a **band chart**, an ordered index with two values at every step drawn on a log
+ * axis so that a row's length is the ratio between them (#447). What differs between them is what
+ * the node has to bind alongside — a column's two extremes, a cloud's slopes and r-squareds, a
+ * plane's every coordinate, a spread's whole census, a band chart's two end rows plus every
+ * marker and its caption — and `corpusSeries.ts` holds all five.
  *
  * The route throws on a key the manifest lacks rather than skipping it, for the reason the figure
  * gate throws on an empty manifest: a chart that silently fails to appear looks like a node that
@@ -63,6 +65,7 @@ const seriesByKey = new Map(manifest.series.map((series) => [series.key, series]
 const cloudByKey = new Map(manifest.scatters.map((cloud) => [cloud.key, cloud]));
 const planeByKey = new Map(manifest.planes.map((plane) => [plane.key, plane]));
 const spreadByKey = new Map(manifest.spreads.map((spread) => [spread.key, spread]));
+const bandByKey = new Map(manifest.bands.map((band) => [band.key, band]));
 /* Neutral first, then the two hues — the order `CLASS_HUES` maps a spread's classes onto, and the
    order the crate writes them in. The legend is not optional on a classed chart: hue alone is
    never identity here. */
@@ -72,7 +75,8 @@ const charts = node.series.map((binding) => {
   const cloud = cloudByKey.get(binding.key);
   const plane = planeByKey.get(binding.key);
   const spread = spreadByKey.get(binding.key);
-  if (!series && !cloud && !plane && !spread) {
+  const band = bandByKey.get(binding.key);
+  if (!series && !cloud && !plane && !spread && !band) {
     throw new Error(
       `${node.id} draws ${binding.key}, which crates/series.json does not carry. Regenerate it ` +
         `with: cargo run --manifest-path crates/Cargo.toml -p figures series > crates/series.json`,
@@ -180,6 +184,40 @@ const charts = node.series.map((binding) => {
           width,
         ),
       })),
+    };
+  }
+
+  if (band) {
+    const drawn = rangesOf(band);
+    /* Full width and one frame, like a plane: the rows are ordered and the whole of what the
+       chart says is how the lengths change down that order, which splitting it into panels would
+       destroy. The legend is not optional — the two ends are two steps of one hue, and a reader
+       cannot be expected to know which shade is which — and it is also where the markers'
+       sentences go, because a 14px row has nowhere to put one. */
+    return {
+      field: binding.field,
+      key: band.key,
+      label: band.label,
+      note:
+        `One row per ${band.subject}, ${band.spans.length} of them, on a logarithmic axis — so a ` +
+        `row's length is the ratio between its two ends and its position is the level. ` +
+        `${band.whole.label} Hover or focus a row for both of its values.`,
+      legend: [
+        { swatch: "ordinal-1", label: band.ends[0] },
+        { swatch: "ordinal-3", label: band.ends[1] },
+        ...band.markers.map((marker) => ({ swatch: "rule", label: marker.label })),
+      ],
+      unreached: band.unreached.map((missing) => ({ label: missing.label, why: missing.why })),
+      unreachedSays: "Drawn on no row of this chart, because the source has no column for it",
+      panels: [
+        {
+          label: null,
+          html: renderToString(
+            (w) => rangeSpec(drawn.rows, drawn.axis, { width: w, markers: drawn.markers }),
+            { label: band.label },
+          ),
+        },
+      ],
     };
   }
 

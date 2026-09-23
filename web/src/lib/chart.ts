@@ -218,6 +218,25 @@ export interface Range {
 }
 
 /**
+ * A position along a set of {@link Range} rows where a rule changes, drawn across them.
+ *
+ * {@link at} is in **rows**, and fractional: the y-scale of a range chart is categorical, so a
+ * threshold in the underlying measure almost never lands on a row boundary. R.C. 3317.011's
+ * 1,500 ADM falls sixteen districts into the fourth of six equally-sized bands, and `3.158` is
+ * where it goes; rounding it to the nearest boundary would move it past sixteen districts to make
+ * a tidier picture, which is the one thing a threshold drawn on a chart must not do. An integer
+ * falls exactly in the gap between two rows, which is what an even division should look like.
+ *
+ * The label is not drawn on the chart. A row is fourteen pixels tall and the rule lands between
+ * two of them, so there is nowhere to put a sentence — it goes in the legend, beside the swatch
+ * for the rule, the way a spread's boundaries do.
+ */
+export interface RangeMarker {
+  label: string;
+  at: number;
+}
+
+/**
  * One item of a long ranking: a name, a count, and whether it is the row the chart is about.
  *
  * A {@link Bar} with two of its fields renamed would have done for a short column. It is its own
