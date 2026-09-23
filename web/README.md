@@ -759,6 +759,25 @@ one column at a time. The quadrant is the encoding, so the marks carry no hue an
 legend; `placeLabels` puts each name on the side of its dot that collides with nothing, which is
 what lets seven direct labels survive the narrow frame.
 
+The manifest's fourth answer is a **curve**, drawn by `seriesSpec`: two lines over one index,
+read for their distance from a **reference** drawn as a dashed rule across the frame. The first is
+#421's backtest — what the projection's plus-or-minus one sigma band actually held at every horizon
+from one year to thirteen, pooled across origins and again with each origin's own mean removed,
+against the 68.3% such a band claims. Its version of the endpoint rule takes **three** figures per
+line rather than two: the first point, the last point, and the worst departure from the reference.
+A column is read at its extremes, but a line over an index is read at both ends *and* at the place
+it is furthest from what it claims, which on the pooled line is neither end — 8.9 points short at
+eleven years, between a 64.5% that starts and a 60.1% that finishes. The reference names no figure
+at all: 68.3% is the area of a normal distribution inside one standard deviation, a definition
+rather than a measurement, and pinning it to a crate would assert that something computed it.
+
+The curve is drawn on `/method`, and a page has no `figures:` block to bind anything in.
+`PAGE_SERIES` is the redirection — a table from a key to the route that draws it and the corpus
+node whose prose states its figures, the same one `/bounds`'s census uses — and
+`crossCheckPageSeries` holds that node to exactly the rule a drawing node is held to. Here it is
+`scenario/guarantee-phase-out`, which is where the band was argued before it was drawn. The check
+does not weaken when the chart leaves the wiki; only the place the prose lives moves.
+
 A **grouped** series is the last shape, and it is not a new form: rows carrying a `group` become
 one `barSpec` panel per group, on one scale across the set, which is what makes a monotonicity
 readable from panel to panel rather than only within one. The scale is shared inside a set and

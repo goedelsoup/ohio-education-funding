@@ -139,8 +139,8 @@ test("the two eras are two series with nothing joining them", () => {
   const points = splitByBasis(meal);
   expect(points.length).toBe(singleStream(meal).length);
   for (const p of points) {
-    expect(p.a == null || p.b == null, `FY${p.year} is in both eras`).toBe(true);
-    expect(p.a != null || p.b != null, `FY${p.year} is in neither`).toBe(true);
+    expect(p.a == null || p.b == null, `FY${p.at} is in both eras`).toBe(true);
+    expect(p.a != null || p.b != null, `FY${p.at} is in neither`).toBe(true);
   }
   // And each era is contiguous, so "two lines" is two lines rather than a dashed one.
   const eras = points.map((p) => (p.a != null ? "a" : "b")).join("");
@@ -150,7 +150,7 @@ test("the two eras are two series with nothing joining them", () => {
 test("the split years are not on the chart at all", () => {
   // Neither bound is plottable: drawing the floor asserts poverty fell, drawing the ceiling
   // asserts it rose, and drawing their midpoint asserts a precision nothing supports.
-  const years = splitByBasis(meal).map((p) => p.year);
+  const years = splitByBasis(meal).map((p) => p.at);
   expect(years.at(-1)).toBe(2011);
   for (const y of splitStream(meal)) expect(years).not.toContain(y.fiscal_year);
 });

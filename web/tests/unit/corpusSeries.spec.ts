@@ -21,11 +21,14 @@ import {
   fitsAgainstFigures,
   formatRow,
   loadSeriesManifest,
+  type ManifestCurve,
   type ManifestSeries,
   type ManifestPlane,
   multiplesOf,
   panelsOf,
+  linesAgainstFigures,
   placesOf,
+  pointsOf,
   positionsAgainstFigures,
   READS_SERIES_CONTRACT,
   rowsAgainstFigures,
@@ -88,8 +91,13 @@ test("the corpus draws no fewer series than it did", () => {
   ).toBeGreaterThanOrEqual(2);
   expect(
     new Set([...drawn.map((binding) => binding.key), ...Object.keys(PAGE_SERIES)]).size,
-    "every series, cloud and plane the manifest exports is drawn by some node or page",
-  ).toBe(manifest.series.length + manifest.scatters.length + manifest.planes.length);
+    "every series, cloud, plane and curve the manifest exports is drawn by some node or page",
+  ).toBe(
+    manifest.series.length +
+      manifest.scatters.length +
+      manifest.planes.length +
+      manifest.curves.length,
+  );
   expect(
     manifest.scatters.length,
     "1 cloud: project/what-the-capacity-tiers-index-measures on formula-component/" +
@@ -99,6 +107,11 @@ test("the corpus draws no fewer series than it did", () => {
     manifest.planes.length,
     "1 plane: project/what-each-anchor-rule-costs-on-both-axes on formula-component/" +
       "temporary-transitional-aid-guarantee; raise this when you add one",
+  ).toBeGreaterThanOrEqual(1);
+  expect(
+    manifest.curves.length,
+    "1 curve: project/what-the-band-held-at-every-horizon, drawn by /method; raise this when you " +
+      "add one",
   ).toBeGreaterThanOrEqual(1);
 });
 
@@ -133,10 +146,11 @@ const kindsOfPages = (nodes: Node[], series: SeriesManifest): SeriesDiscrepancyK
 const pageSources = new Set(Object.values(PAGE_SERIES).map((source) => source.node));
 
 test("PAGE_SERIES is not empty, and every entry names a route and a corpus id", () => {
-  // A check over an empty table passes against any corpus. One page draws a series today:
-  // `project/bounds-census` on `/bounds`. Raise this when a second does.
+  // A check over an empty table passes against any corpus. Two pages draw one today:
+  // `project/bounds-census` on `/bounds`, and the coverage curve on `/method`. Raise this when a
+  // third does.
   const entries = Object.entries(PAGE_SERIES);
-  expect(entries.length, "1 page draws a series; raise this when a second does").toBeGreaterThanOrEqual(1);
+  expect(entries.length, "2 pages draw a series; raise this when a third does").toBeGreaterThanOrEqual(2);
   for (const [key, source] of entries) {
     expect(source.route, key).toMatch(/^\//);
     expect(source.node, key).toMatch(/^[a-z0-9-]+\/[a-z0-9-]+$/);
@@ -147,6 +161,7 @@ test("unknown-key: a page declares a series crates/series.json does not carry", 
   const without: SeriesManifest = {
     ...manifest,
     series: manifest.series.filter((series) => !(series.key in PAGE_SERIES)),
+    curves: manifest.curves.filter((curve) => !(curve.key in PAGE_SERIES)),
   };
   const found = kindsOfPages(corpus.nodes, without);
   expect(found).toEqual(Object.keys(PAGE_SERIES).map(() => "unknown-key"));
@@ -157,13 +172,15 @@ test("page-source-missing: the node a page cites for its endpoints is not in the
   expect(kindsOfPages(without, manifest)).toEqual([...pageSources].map(() => "page-source-missing"));
 });
 
-test("endpoints-unbound: the node a page cites binds nothing at the chart's ends", () => {
+test("the node a page cites binds nothing at the chart's ends", () => {
   const stripped = corpus.nodes.map((node) =>
     pageSources.has(node.id) ? { ...node, figures: [] } : node,
   );
   const found = kindsOfPages(stripped, manifest);
   expect(found.length, "a stripped source node reports every endpoint").toBeGreaterThan(0);
-  expect(new Set(found)).toEqual(new Set(["endpoints-unbound"]));
+  // Two kinds, because a page can draw either shape and they are read at different places: a
+  // column at its largest and smallest row, a curve at each line's two ends and worst departure.
+  expect(new Set(found)).toEqual(new Set(["endpoints-unbound", "line-unbound"]));
 });
 
 test("a page-drawn series is not also reported as computed for nobody", () => {
@@ -213,6 +230,7 @@ function fixture(): { node: Node; series: SeriesManifest; figures: Manifest } {
     contract: READS_SERIES_CONTRACT,
     scatters: [],
     planes: [],
+    curves: [],
     series: [
       {
         key: "dispersion/by-class",
@@ -438,6 +456,7 @@ function cloudFixture(): { node: Node; series: SeriesManifest; figures: Manifest
     contract: READS_SERIES_CONTRACT,
     series: [],
     planes: [],
+    curves: [],
     scatters: [
       {
         key: "project/what-it-measures",
@@ -681,6 +700,7 @@ function planeFixture(): { node: Node; series: SeriesManifest; figures: Manifest
     contract: READS_SERIES_CONTRACT,
     series: [],
     scatters: [],
+    curves: [],
     planes: [plane],
   };
   const dollars = (key: string, value: number, label: string) =>
@@ -815,6 +835,210 @@ test("the committed plane is the finding: three rules cheaper on one axis and de
   ]);
   // And nothing runs the other way. That asymmetry is what the two-column table cannot show.
   expect(plane.points.filter((p) => p.x > 0 && p.y < 0)).toEqual([]);
+});
+
+// --- The curve, which is held at both ends of every line and at its worst departure ------------
+
+/**
+ * A node drawing a curve, correct in every position, and the manifests it is correct against.
+ *
+ * Cut separately from the three fixtures above for the reason each of those was: a node binding
+ * two shapes reports every owner-level defect once per binding, and each mutation below would
+ * then assert a count rather than a kind.
+ *
+ * Three positions rather than the committed thirteen, and two lines rather than one, because the
+ * property the curve exists for is that two lines over one index can depart from a reference by
+ * different amounts — and the departure is a maximum over the whole index, so it needs an index
+ * long enough for its worst point not to be an end.
+ */
+function curveFixture(): { node: Node; series: SeriesManifest; figures: Manifest } {
+  const prose =
+    "Pooled, the band held 64.5% at one year and 60.1% at thirteen, at worst 8.9% short; with " +
+    "each origin's mean removed it held 66.1% and 69.4%, within 3.0% throughout. [verified] " +
+    "(`crates/project`)";
+  const bind = (key: string, value: number, as_written: string) =>
+    ({ key, value, field: "description", as_written }) as const;
+  const node: Node = {
+    id: "scenario/example-curve",
+    className: "scenario",
+    name: "example-curve",
+    label: "Example curve",
+    summary: "What the band held.",
+    description: prose,
+    linkText: prose,
+    properties: [],
+    findings: null,
+    revisions: [],
+    unfilled: [],
+    figures: [
+      bind("project/pooled-first", 0.645, "64.5%"),
+      bind("project/pooled-last", 0.601, "60.1%"),
+      bind("project/pooled-worst", 0.089, "8.9%"),
+      bind("project/cross-first", 0.661, "66.1%"),
+      bind("project/cross-last", 0.694, "69.4%"),
+      bind("project/cross-worst", 0.03, "3.0%"),
+    ],
+    series: [{ key: "project/what-the-band-held", field: "description" }],
+    out: [],
+    in: [],
+  };
+  const curve: ManifestCurve = {
+    key: "project/what-the-band-held",
+    owner: "crates/project",
+    subject: "horizon",
+    label: "What the band held at every horizon",
+    x: { label: "Years ahead", unit: "count", min: 1, max: 3, log: false },
+    y: { label: "Share of forecasts inside the band", unit: "share", min: 0.55, max: 0.72, log: false },
+    reference: { label: "What ±1σ claims to hold", value: 0.683 },
+    lines: [
+      {
+        label: "Every error, origins pooled",
+        points: [
+          { x: 1, y: 0.645 },
+          { x: 2, y: 0.594 },
+          { x: 3, y: 0.601 },
+        ],
+        firstFigure: "project/pooled-first",
+        lastFigure: "project/pooled-last",
+        worst: { at: 2, gap: 0.089, figure: "project/pooled-worst" },
+      },
+      {
+        label: "The same errors, each origin's mean removed",
+        points: [
+          { x: 1, y: 0.661 },
+          { x: 2, y: 0.713 },
+          { x: 3, y: 0.694 },
+        ],
+        firstFigure: "project/cross-first",
+        lastFigure: "project/cross-last",
+        worst: { at: 2, gap: 0.03, figure: "project/cross-worst" },
+      },
+    ],
+  };
+  const series: SeriesManifest = {
+    contract: READS_SERIES_CONTRACT,
+    series: [],
+    scatters: [],
+    planes: [],
+    curves: [curve],
+  };
+  const share = (key: string, value: number, label: string) =>
+    ({ key, owner: "crates/project", unit: "share", value, label }) as const;
+  const figures: Manifest = {
+    contract: READS_CONTRACT,
+    figures: [
+      share("project/pooled-first", 0.645, "Pooled coverage at one year"),
+      share("project/pooled-last", 0.601, "Pooled coverage at three years"),
+      share("project/pooled-worst", 0.089, "The pooled band's worst gap"),
+      share("project/cross-first", 0.661, "Cross-district coverage at one year"),
+      share("project/cross-last", 0.694, "Cross-district coverage at three years"),
+      share("project/cross-worst", 0.03, "The cross-district band's worst gap"),
+    ],
+  };
+  return { node, series, figures };
+}
+
+test("the curve fixture the mutations are cut from is itself clean", () => {
+  const { node, series, figures: mine } = curveFixture();
+  expect(kinds(node, series)).toEqual([]);
+  expect(linesAgainstFigures(series, mine)).toEqual([]);
+});
+
+test("line-unbound: the node does not bind where a line starts", () => {
+  const { node, series } = curveFixture();
+  node.figures = node.figures.filter((f) => f.key !== "project/pooled-first");
+  expect(kinds(node, series)).toEqual(["line-unbound"]);
+});
+
+test("line-unbound: the node does not bind where a line ends", () => {
+  const { node, series } = curveFixture();
+  node.figures = node.figures.filter((f) => f.key !== "project/cross-last");
+  expect(kinds(node, series)).toEqual(["line-unbound"]);
+});
+
+test("line-unbound: the node binds both ends and not the worst departure", () => {
+  // The one an endpoint rule written for a column would miss. "Within three points at every
+  // horizon" is the claim, and no coordinate on the line states it.
+  const { node, series } = curveFixture();
+  node.figures = node.figures.filter((f) => f.key !== "project/cross-worst");
+  expect(kinds(node, series)).toEqual(["line-unbound"]);
+});
+
+test("line-unbound: a line bound nowhere is three findings, not one", () => {
+  const { node, series } = curveFixture();
+  node.figures = node.figures.filter((f) => !f.key.startsWith("project/pooled-"));
+  expect(kinds(node, series)).toEqual(["line-unbound", "line-unbound", "line-unbound"]);
+});
+
+test("unknown-key: the node draws a curve the manifest does not carry", () => {
+  const { node, series } = curveFixture();
+  node.series[0]!.key = "project/what-the-band-held-renamed";
+  expect(kinds(node, series)).toEqual(["unknown-key", "uncited-series"]);
+});
+
+test("unattributed: the node draws a crate's curve and cites that crate nowhere", () => {
+  const { node, series } = curveFixture();
+  node.description = node.description.replace(" (`crates/project`)", "");
+  node.linkText = node.description;
+  expect(kinds(node, series)).toEqual(["unattributed"]);
+});
+
+test("uncited-series: the manifest exports a curve no node draws", () => {
+  const { node, series } = curveFixture();
+  series.curves.push({ ...series.curves[0]!, key: "project/what-the-band-held-again" });
+  expect(kinds(node, series)).toEqual(["uncited-series"]);
+});
+
+test("the two manifests are held to each other, line end by figure", () => {
+  const { series, figures: mine } = curveFixture();
+  expect(linesAgainstFigures(series, mine)).toEqual([]);
+  // Each of the three is checked, and one line can be wrong at all three at once.
+  series.curves[0]!.lines[0]!.points[0]!.y = 0.646;
+  expect(linesAgainstFigures(series, mine)).toHaveLength(1);
+  series.curves[0]!.lines[0]!.points[2]!.y = 0.602;
+  series.curves[0]!.lines[0]!.worst.gap = 0.088;
+  expect(linesAgainstFigures(series, mine)).toHaveLength(3);
+  series.curves[0]!.lines[0]!.points[0]!.y = 0.645;
+  series.curves[0]!.lines[0]!.points[2]!.y = 0.601;
+  series.curves[0]!.lines[0]!.worst.gap = 0.089;
+  // As is a figure the other document lacks, or one on the wrong unit. The unit is the y axis',
+  // so changing it puts every one of the six on the wrong one.
+  series.curves[0]!.lines[1]!.lastFigure = "project/absent";
+  expect(linesAgainstFigures(series, mine)).toHaveLength(1);
+  series.curves[0]!.lines[1]!.lastFigure = "project/cross-last";
+  series.curves[0]!.y.unit = "pupils";
+  expect(linesAgainstFigures(series, mine)).toHaveLength(6);
+});
+
+test("a curve becomes two lines over one index, and a third is refused rather than dropped", () => {
+  const { series } = curveFixture();
+  const points = pointsOf(series.curves[0]!);
+  expect(points).toEqual([
+    { at: 1, a: 0.645, b: 0.661 },
+    { at: 2, a: 0.594, b: 0.713 },
+    { at: 3, a: 0.601, b: 0.694 },
+  ]);
+  // `seriesSpec` draws a validated pair and there is no third hue to give a third line. Silently
+  // drawing two of three would be a picture that omits a finding without saying so.
+  series.curves[0]!.lines.push({ ...series.curves[0]!.lines[0]!, label: "A third" });
+  expect(() => pointsOf(series.curves[0]!)).toThrow(/has 3 lines and seriesSpec draws two/);
+});
+
+test("the committed curve is flat where the claim is flat, and sags where it sags", () => {
+  const curve = manifest.curves.find(
+    (c) => c.key === "project/what-the-band-held-at-every-horizon",
+  );
+  expect(curve).toBeDefined();
+  // The reference is the whole reading, and it is not a figure. See `ManifestReference`.
+  expect(curve!.reference?.value).toBeCloseTo(0.683, 10);
+  const [pooled, cross] = curve!.lines;
+  // Both lines over the same index, or the second is drawn against positions the first does not
+  // have and the pairing `seriesSpec` needs is a coincidence.
+  expect(cross!.points.map((p) => p.x)).toEqual(pooled!.points.map((p) => p.x));
+  expect(pooled!.points).toHaveLength(13);
+  // The claim: removing each origin's mean is what makes it flat. Three points against nine.
+  expect(cross!.worst.gap).toBeLessThan(0.031);
+  expect(pooled!.worst.gap).toBeGreaterThan(0.08);
 });
 
 // --- The small multiples, which share one scale inside a set and none across two ---------------

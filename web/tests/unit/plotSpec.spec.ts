@@ -9,7 +9,16 @@
 
 import { expect, test } from "vitest";
 
-import type { Bar, FanPoint, Fit, Place, Rank, ScatterPoint, Trace } from "../../src/lib/chart.ts";
+import type {
+  Bar,
+  FanPoint,
+  Fit,
+  Place,
+  Rank,
+  ScatterPoint,
+  SeriesPoint,
+  Trace,
+} from "../../src/lib/chart.ts";
 import {
   DOT,
   barSpec,
@@ -19,6 +28,7 @@ import {
   planeSpec,
   rankSpec,
   scatterSpec,
+  seriesSpec,
   type Spec,
   truncatedDomain,
   WIDTHS,
@@ -644,4 +654,84 @@ test("a set shares its frame as well as its domain, so a labelled panel keeps it
   expect(barSpec(drawn, { width: WIDTHS.wide }).options.marginRight).toBe(
     barSpec(zeros, { width: WIDTHS.wide, labelChars: 0 }).options.marginRight,
   );
+});
+
+// --- The two-series line chart, whose index is not necessarily a year -------------------------
+
+/** Two shares over three positions, none of them a fiscal year. */
+const HELD: SeriesPoint[] = [
+  { at: 1, a: 0.645, b: 0.661 },
+  { at: 2, a: 0.594, b: 0.713 },
+  { at: 3, a: 0.601, b: 0.694 },
+];
+
+const share = (v: number) => `${(v * 100).toFixed(0)}%`;
+
+test("a reference the lines are measured against is inside the frame they are drawn in", () => {
+  /*
+   * The counterpart of the fan chart's rule above, and its opposite case. There, a reference not
+   * every year carries is kept *out* of the domain because it will not be drawn. Here it is drawn
+   * on every position by construction — it is one value, not a series — and the lines mean their
+   * distance from it, so a frame that excluded it would ask for a comparison and then omit one
+   * side of it.
+   */
+  const plain = seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", {
+    width: WIDTHS.wide,
+    tick: (at) => `${at}`,
+  })!;
+  const [, high] = plain.options.y!.domain as number[];
+  expect(high).toBeLessThan(0.75);
+
+  const held = seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", {
+    width: WIDTHS.wide,
+    tick: (at) => `${at}`,
+    reference: { value: 0.9, label: "what it claims" },
+  })!;
+  const [, withReference] = held.options.y!.domain as number[];
+  expect(withReference).toBeGreaterThan(0.9);
+});
+
+test("the reference is drawn muted and once, not as a third series", () => {
+  const svg = renderToString(
+    (w) =>
+      seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", {
+        width: w,
+        tick: (at) => `${at}`,
+        reference: { value: 0.683, label: "what ±1σ claims" },
+      }),
+    "presentational",
+  );
+  expect(svg).toContain("what ±1σ claims");
+  // The categorical pair is the two quantities. A reference in a third hue would read as a third.
+  expect(svg).not.toContain("var(--series-c)");
+  // Once per drawing, and the pair is drawn at both widths — see `WIDTHS`.
+  for (const drawing of svg.split("<svg").slice(1)) {
+    expect((drawing.match(/what ±1σ claims/g) ?? []).length).toBe(1);
+  }
+});
+
+test("both corner labels are the caller's, so a horizon is not written as a fiscal year", () => {
+  const svg = renderToString(
+    (w) =>
+      seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", {
+        width: w,
+        tick: (at) => (at === 1 ? "one year" : `${at} years`),
+      }),
+    "presentational",
+  );
+  expect(svg).toContain("one year");
+  expect(svg).toContain("3 years");
+  // The `FY` prefix used to be written here rather than passed in, which is what made this form
+  // unusable for the one caller whose index counts something else.
+  expect(svg).not.toContain("FY");
+});
+
+test("the hit layer is one full-height column per position on the index", () => {
+  const spec = seriesSpec(HELD, { a: "pooled", b: "cross" }, share, (p) => `at ${p.at}`, {
+    width: WIDTHS.wide,
+    tick: (at) => `${at}`,
+  })!;
+  expect(spec.hovers!.text).toEqual(["at 1", "at 2", "at 3"]);
+  const marks = (spec.options.marks ?? []) as unknown as { className?: string }[];
+  expect(marks.filter((mark) => mark.className === "series-hit")).toHaveLength(1);
 });

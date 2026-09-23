@@ -11,13 +11,16 @@
 //! A cloud has no rows, so it has no endpoints; what a reader quotes off a fitted panel is its
 //! slope and its r-squared, and those are what the same rule holds. The assertions below are the
 //! same three in the same order — every panel names figures, the figures exist and reproduce the
-//! line, and the keys are unique across both registries and the figure manifest.
+//! line, and the keys are unique across both registries and the figure manifest. A plane binds
+//! every coordinate of every position, and a curve binds three numbers per line: both ends and
+//! the worst departure from its reference. Four shapes, one rule — whatever a reader can quote
+//! off the picture is a number the figure manifest has stood behind.
 
 use std::collections::BTreeSet;
 
 use figures::{
-    compute_all, compute_all_planes, compute_all_scatters, compute_all_series, Row, FIGURES,
-    PLANES, SCATTERS, SERIES, SERIES_CONTRACT_VERSION,
+    compute_all, compute_all_curves, compute_all_planes, compute_all_scatters, compute_all_series,
+    Row, CURVES, FIGURES, PLANES, SCATTERS, SERIES, SERIES_CONTRACT_VERSION,
 };
 
 /// The rows a reader would quote: the top of the chart and the bottom of it.
@@ -209,12 +212,13 @@ fn the_manifest_is_stable() {
     );
 }
 
-/// The document parses as JSON, declares its contract, and carries every member of both arrays
+/// The document parses as JSON, declares its contract, and carries every member of every array
 /// exactly once.
 ///
-/// Both arrays, since the document gained a second: a cloud is keyed the same way a series is and
+/// All four arrays: a cloud, a plane and a curve are keyed the same way a series is and each
 /// draws one line per point for the same reason a series draws one per row, so the counts below
-/// are over the two registries together and a cloud silently dropped would fail the first of them.
+/// are over the four registries together and a drawing silently dropped would fail the first of
+/// them.
 #[test]
 fn the_document_is_readable_and_complete() {
     let json = figures::series_manifest();
@@ -229,8 +233,8 @@ fn the_document_is_readable_and_complete() {
     );
     assert_eq!(
         json.matches("{\"key\": ").count(),
-        SERIES.len() + SCATTERS.len() + PLANES.len(),
-        "every series, every cloud and every plane is written exactly once"
+        SERIES.len() + SCATTERS.len() + PLANES.len() + CURVES.len(),
+        "every series, cloud, plane and curve is written exactly once"
     );
     let rows: usize = compute_all_series().iter().map(|e| e.rows.len()).sum();
     // Per cloud: every point, every panel, and every axis, which is the shared x and one y per
@@ -244,16 +248,25 @@ fn the_document_is_readable_and_complete() {
         .iter()
         .map(|e| e.positions.points.len() + 2)
         .sum();
+    // Per curve: every line, its two axes, and the reference when it has one. A curve's *points*
+    // are bare coordinates and carry no label, which is why they are not counted here — the index
+    // position is the label, and repeating it thirteen times per line would be a longer diff
+    // saying nothing.
+    let traced: usize = compute_all_curves()
+        .iter()
+        .map(|e| e.traces.lines.len() + 2 + usize::from(e.traces.reference.is_some()))
+        .sum();
     assert_eq!(
         json.matches("{\"label\": ").count(),
-        rows + drawn + placed,
-        "every row, panel, axis, point and position is written exactly once"
+        rows + drawn + placed + traced,
+        "every row, panel, axis, point, position and line is written exactly once"
     );
     for key in SERIES
         .iter()
         .map(|s| s.key)
         .chain(SCATTERS.iter().map(|s| s.key))
         .chain(PLANES.iter().map(|p| p.key))
+        .chain(CURVES.iter().map(|c| c.key))
     {
         assert!(
             json.contains(&format!("\"key\": \"{key}\"")),
@@ -704,6 +717,322 @@ fn every_position_is_named_and_writable() {
                 !text.contains(['"', '\\']) && !text.chars().any(char::is_control),
                 "{}: {text:?} carries a character the manifest writer cannot escape",
                 p.key
+            );
+        }
+    }
+}
+
+/// The endpoint rule as a curve has it: every line names a figure for both ends and for its worst
+/// departure from the reference.
+///
+/// A series binds its two extreme rows, a cloud its fit, a plane every coordinate. A curve is
+/// none of those: reordering its index would destroy what it says, so its extremes are not
+/// "largest and smallest" but *first and last*, per line, and the claim it is usually drawn for —
+/// that one line stays flat against the reference while the other falls away — is a maximum over
+/// the whole index and not a value at any point on it. Three figures per line is what it takes to
+/// put all of that behind the figure manifest.
+#[test]
+fn every_line_of_every_curve_names_a_figure_for_both_ends_and_its_worst_departure() {
+    for entry in compute_all_curves() {
+        let c = entry.curve;
+        assert!(
+            entry.traces.lines.len() > 1,
+            "{}: a curve with one line is a series with a continuous axis; what makes it a curve \
+             is the comparison between the lines at the same position",
+            c.key
+        );
+        for line in &entry.traces.lines {
+            assert!(
+                line.points.len() > 2,
+                "{}: the line {:?} has {} point(s), which is a pair of bars rather than a shape",
+                c.key,
+                line.label,
+                line.points.len()
+            );
+            for (what, key) in [
+                ("its first point", line.first_figure),
+                ("its last point", line.last_figure),
+                ("its worst departure", line.worst.figure),
+            ] {
+                assert!(
+                    !key.is_empty(),
+                    "{}: the line {:?} names no figure for {what}. Bind it as an ordinary figure \
+                     in FIGURES first; all three are numbers a reader takes off the picture.",
+                    c.key,
+                    line.label
+                );
+            }
+        }
+    }
+}
+
+/// Every figure a line names exists, is on the vertical axis' unit, and reproduces the number.
+///
+/// In magnitude, for the reason a row, a fit and a position are all compared that way. A worst
+/// departure is already unsigned — it is a distance from the reference, and a line above and a
+/// line below by the same amount have departed equally — so for that one the two comparisons
+/// coincide, which is what makes the figure quotable as "within three points" without a sign.
+#[test]
+fn a_line_reproduces_the_figures_it_names() {
+    let figures = compute_all();
+    for entry in compute_all_curves() {
+        let c = entry.curve;
+        for line in &entry.traces.lines {
+            let first = line.points.first().expect("a line with points").y;
+            let last = line.points.last().expect("a line with points").y;
+            for (what, key, value) in [
+                ("its first point", line.first_figure, first),
+                ("its last point", line.last_figure, last),
+                ("its worst departure", line.worst.figure, line.worst.gap),
+            ] {
+                let figure = figures
+                    .iter()
+                    .find(|f| f.figure.key == key)
+                    .unwrap_or_else(|| {
+                        panic!(
+                            "{}: the line {:?} names {key} for {what}, which FIGURES does not \
+                             carry",
+                            c.key, line.label
+                        )
+                    });
+                assert_eq!(
+                    figure.figure.unit, entry.traces.y.unit,
+                    "{}: the vertical axis is measured in {:?} and {key} in {:?}",
+                    c.key, entry.traces.y.unit, figure.figure.unit
+                );
+                let drift = (value.abs() - figure.figure.pinned).abs();
+                assert!(
+                    drift <= figure.figure.tolerance,
+                    "{}: the line {:?} has {what} at {value} and names {key}, pinned at {} \
+                     \u{2014} {drift} apart in magnitude, tolerating {}. The two are meant to be \
+                     one computation; if they have diverged, the curve is drawing something the \
+                     corpus does not quote.",
+                    c.key,
+                    line.label,
+                    figure.figure.pinned,
+                    figure.figure.tolerance
+                );
+            }
+        }
+    }
+}
+
+/// The worst departure each line names is the worst one it actually has, and it is where it says.
+///
+/// The figure is a *maximum over the index*, which is the one number on a curve that no
+/// coordinate states and so the one a registry entry could get wrong without any point moving.
+/// Recomputed here from the drawn points rather than taken on trust from the owning crate.
+#[test]
+fn the_worst_departure_is_the_worst_one_on_the_drawn_line() {
+    for entry in compute_all_curves() {
+        let c = entry.curve;
+        let Some(reference) = &entry.traces.reference else {
+            continue;
+        };
+        for line in &entry.traces.lines {
+            let (at, gap) = line
+                .points
+                .iter()
+                .map(|p| (p.x, (p.y - reference.value).abs()))
+                .fold((f64::NAN, f64::MIN), |worst, here| {
+                    if here.1 > worst.1 {
+                        here
+                    } else {
+                        worst
+                    }
+                });
+            assert!(
+                (line.worst.gap - gap).abs() < 1e-12,
+                "{}: the line {:?} claims a worst departure of {} and the drawn points give {gap}",
+                c.key,
+                line.label,
+                line.worst.gap
+            );
+            assert!(
+                (line.worst.at - at).abs() < 1e-12,
+                "{}: the line {:?} puts its worst departure at {} and the drawn points put it at \
+                 {at}",
+                c.key,
+                line.label,
+                line.worst.at
+            );
+        }
+    }
+}
+
+/// Every curve is drawn on a linear index that holds every point, and a vertical axis that holds
+/// the **reference** as well as every value.
+///
+/// The reference inside the frame is the whole of what makes the picture an argument: the lines
+/// are not read for their level but for their distance from it, and a reference outside the drawn
+/// domain is a comparison the reader has been asked to make and not shown.
+#[test]
+fn every_curve_frames_its_reference_as_well_as_its_lines() {
+    for entry in compute_all_curves() {
+        let c = entry.curve;
+        for (what, axis) in [("x", &entry.traces.x), ("y", &entry.traces.y)] {
+            assert!(
+                !axis.log,
+                "{}: the {what} axis is read for distances along it, which a log axis distorts",
+                c.key
+            );
+            assert!(
+                axis.min < axis.max,
+                "{}: the {what} axis runs {} to {}",
+                c.key,
+                axis.min,
+                axis.max
+            );
+        }
+        if let Some(reference) = &entry.traces.reference {
+            assert!(
+                reference.value >= entry.traces.y.min && reference.value <= entry.traces.y.max,
+                "{}: the reference sits at {} and the drawn range is {} to {}",
+                c.key,
+                reference.value,
+                entry.traces.y.min,
+                entry.traces.y.max
+            );
+        }
+        for line in &entry.traces.lines {
+            let mut previous = f64::MIN;
+            for point in &line.points {
+                assert!(
+                    point.x > previous,
+                    "{}: the line {:?} steps from {previous} to {} — a curve's index is ordered, \
+                     and a chart that joined its points in any other order would be drawing a \
+                     shape the data does not have",
+                    c.key,
+                    line.label,
+                    point.x
+                );
+                previous = point.x;
+                assert!(
+                    point.x >= entry.traces.x.min && point.x <= entry.traces.x.max,
+                    "{}: the line {:?} has a point at {}, outside the drawn {} to {}",
+                    c.key,
+                    line.label,
+                    point.x,
+                    entry.traces.x.min,
+                    entry.traces.x.max
+                );
+                assert!(
+                    point.y.is_finite()
+                        && point.y >= entry.traces.y.min
+                        && point.y <= entry.traces.y.max,
+                    "{}: the line {:?} has a value of {}, outside the drawn {} to {}",
+                    c.key,
+                    line.label,
+                    point.y,
+                    entry.traces.y.min,
+                    entry.traces.y.max
+                );
+            }
+        }
+    }
+}
+
+/// Every line of a curve runs over the same index, so the comparison between them is a comparison.
+#[test]
+fn every_line_of_a_curve_is_drawn_over_the_same_index() {
+    for entry in compute_all_curves() {
+        let c = entry.curve;
+        let first = entry.traces.lines.first().expect("a curve with lines");
+        let index: Vec<f64> = first.points.iter().map(|p| p.x).collect();
+        for line in &entry.traces.lines {
+            let here: Vec<f64> = line.points.iter().map(|p| p.x).collect();
+            assert_eq!(
+                here, index,
+                "{}: the line {:?} runs over a different index from {:?}, and a curve exists to \
+                 be read across its lines at one position",
+                c.key, line.label, first.label
+            );
+        }
+    }
+}
+
+/// Curve keys are unique, name their owner's directory, and collide with nothing already keyed.
+#[test]
+fn every_curve_key_is_unique_and_names_its_owner() {
+    let taken: BTreeSet<&str> = FIGURES
+        .iter()
+        .map(|f| f.key)
+        .chain(SERIES.iter().map(|s| s.key))
+        .chain(SCATTERS.iter().map(|s| s.key))
+        .chain(PLANES.iter().map(|p| p.key))
+        .collect();
+    let mut seen = BTreeSet::new();
+    for c in CURVES {
+        assert!(seen.insert(c.key), "{}: two curves share this key", c.key);
+        assert!(
+            !taken.contains(c.key),
+            "{}: is also a figure, series, cloud or plane key, and a corpus node could not say \
+             which it bound",
+            c.key
+        );
+        let directory = c
+            .owner
+            .strip_prefix("crates/")
+            .unwrap_or_else(|| panic!("{}: owner {:?} is not under crates/", c.key, c.owner));
+        assert!(
+            c.key.starts_with(&format!("{directory}/")),
+            "{}: owned by {} and so should be keyed `{directory}/…`",
+            c.key,
+            c.owner
+        );
+        assert!(
+            c.key
+                .chars()
+                .all(|ch| ch.is_ascii_lowercase() || ch.is_ascii_digit() || ch == '-' || ch == '/'),
+            "{}: keys are lower-case kebab so a corpus node can hold one without quoting",
+            c.key
+        );
+        assert!(
+            c.label.len() > 20,
+            "{}: {:?} does not say what the curve is",
+            c.key,
+            c.label
+        );
+        assert!(
+            !c.subject.is_empty() && c.subject == c.subject.to_lowercase(),
+            "{}: the subject is what one step along the index is, singular and lower case",
+            c.key
+        );
+    }
+}
+
+/// Every line and reference is labelled, distinctly, and writable unescaped.
+#[test]
+fn every_line_is_named_and_writable() {
+    for entry in compute_all_curves() {
+        let c = entry.curve;
+        let mut seen = BTreeSet::new();
+        for line in &entry.traces.lines {
+            assert!(
+                !line.label.is_empty(),
+                "{}: a line has no label, and a curve is read by which line is which",
+                c.key
+            );
+            assert!(
+                seen.insert(line.label),
+                "{}: two lines are labelled {:?}",
+                c.key,
+                line.label
+            );
+        }
+        let strings = [c.key, c.owner, c.label, c.subject]
+            .into_iter()
+            .chain(entry.traces.lines.iter().map(|l| l.label))
+            .chain(entry.traces.lines.iter().map(|l| l.first_figure))
+            .chain(entry.traces.lines.iter().map(|l| l.last_figure))
+            .chain(entry.traces.lines.iter().map(|l| l.worst.figure))
+            .chain(entry.traces.reference.iter().map(|r| r.label))
+            .chain([entry.traces.x.label, entry.traces.y.label]);
+        for text in strings {
+            assert!(
+                !text.contains(['"', '\\']) && !text.chars().any(char::is_control),
+                "{}: {text:?} carries a character the manifest writer cannot escape",
+                c.key
             );
         }
     }

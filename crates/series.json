@@ -1,5 +1,5 @@
 {
-  "contract": "4.0.0",
+  "contract": "5.0.0",
   "series": [
     {"key": "dispersion/fy2016-step-by-business-class", "owner": "crates/dispersion", "unit": "ratio", "axis": "Property class, TY2021 share of assessed value", "label": "Correlation of the FY2016 move in state revenue per pupil with each business property class", "rows": [
       {"label": "Industrial", "value": 0.11752209551359827, "figure": "dispersion/fy2016-step-against-industrial-share"},
@@ -750,6 +750,46 @@
        {"label": "[M] mirrored inside [H]", "x": -70536484.89175005, "y": 62189117.28474995, "xFigure": "project/the-mirror-inside-h-guarantee-cut-outside-the-cluster", "yFigure": "project/the-mirror-inside-h-total-state-support-gain-outside-the-cluster"},
        {"label": "[M] mirrored beside [L], [M], [O]", "x": 0.0, "y": 135300935.56425, "xFigure": "project/the-mirror-beside-guarantee-written-outside-the-cluster", "yFigure": "project/the-mirror-beside-total-state-support-gain-outside-the-cluster"},
        {"label": "A dated phase-down", "x": 0.0, "y": 0.0, "xFigure": "project/the-dated-phase-downs-guarantee-written-outside-the-cluster", "yFigure": "project/the-dated-phase-downs-total-state-support-outside-the-cluster"}
+     ]}
+  ],
+  "curves": [
+    {"key": "project/what-the-band-held-at-every-horizon", "owner": "crates/project", "subject": "horizon", "label": "What the ±1σ band actually held, at every horizon the panel reaches, over every origin and district it admits", "x": {"label": "Years ahead", "unit": "count", "min": 1.0, "max": 13.0, "log": false}, "y": {"label": "Share of forecasts inside the band", "unit": "share", "min": 0.5890764119601328, "max": 0.7180664451827243, "log": false},
+     "reference": {"label": "What ±1σ claims to hold", "value": 0.683},
+     "lines": [
+       {"label": "Every error, origins pooled", "firstFigure": "project/pooled-coverage-at-one-year", "lastFigure": "project/pooled-coverage-at-thirteen-years",
+        "worst": {"at": 11.0, "gap": 0.08914617940199343, "figure": "project/the-pooled-bands-worst-gap-from-nominal"},
+        "points": [
+          {"x": 1.0, "y": 0.6449928808732796},
+          {"x": 2.0, "y": 0.6910299003322259},
+          {"x": 3.0, "y": 0.7129568106312293},
+          {"x": 4.0, "y": 0.6871539313399778},
+          {"x": 5.0, "y": 0.6713732004429679},
+          {"x": 6.0, "y": 0.6684385382059801},
+          {"x": 7.0, "y": 0.6465116279069767},
+          {"x": 8.0, "y": 0.6324750830564784},
+          {"x": 9.0, "y": 0.6162790697674418},
+          {"x": 10.0, "y": 0.6029900332225914},
+          {"x": 11.0, "y": 0.5938538205980066},
+          {"x": 12.0, "y": 0.6021594684385382},
+          {"x": 13.0, "y": 0.6013289036544851}
+        ]},
+       {"label": "The same errors, each origin's mean removed", "firstFigure": "project/cross-district-coverage-at-one-year", "lastFigure": "project/cross-district-coverage-at-thirteen-years",
+        "worst": {"at": 3.0, "gap": 0.03028903654485049, "figure": "project/the-cross-district-bands-worst-gap-from-nominal"},
+        "points": [
+          {"x": 1.0, "y": 0.6613668723303274},
+          {"x": 2.0, "y": 0.7007198228128461},
+          {"x": 3.0, "y": 0.7132890365448505},
+          {"x": 4.0, "y": 0.6954595791805094},
+          {"x": 5.0, "y": 0.696843853820598},
+          {"x": 6.0, "y": 0.7019933554817276},
+          {"x": 7.0, "y": 0.695016611295681},
+          {"x": 8.0, "y": 0.6794019933554817},
+          {"x": 9.0, "y": 0.6769102990033222},
+          {"x": 10.0, "y": 0.6960132890365448},
+          {"x": 11.0, "y": 0.6918604651162791},
+          {"x": 12.0, "y": 0.7001661129568106},
+          {"x": 13.0, "y": 0.6943521594684385}
+        ]}
      ]}
   ]
 }

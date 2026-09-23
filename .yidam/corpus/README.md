@@ -368,6 +368,24 @@ draws one without binding both. Zero is on the picture by construction — the c
 frame from the origin and the web spec throws on a domain that excludes it — because a plane
 whose axes are off the edge has quadrants nobody can find.
 
+A key can also name a **curve**, and a curve is the one shape no node draws. It is two lines over
+an index that is not a year — the share of district forecasts that fell inside the projection's
+plus-or-minus one sigma band, at every horizon from one year to thirteen, pooled across origins
+and again with each origin's own mean removed — read against a **reference**, the 68.3% such a
+band claims to hold. Its endpoint rule is **three** figures per line rather than two: the first
+point, the last point, and the worst departure from the reference. A line is read where it starts,
+where it ends, and where it is furthest from what it claims, and on the pooled line that last one
+is neither end — 8.9 points short at eleven years. The reference itself names no figure, because
+68.3% is the area under a normal curve inside one standard deviation: a definition, where a figure
+is a measurement.
+
+The curve is drawn on `/method`, so there is no `series:` entry for it on any node. `PAGE_SERIES`
+in `web/src/lib/corpusSeries.ts` names the route that draws it and the node that answers for it —
+`scenario/guarantee-phase-out`, which argued the band in prose before anything drew it — and
+`crossCheckPageSeries` holds that node to the same six bindings a drawing node would owe. Those
+six sit in `figures:` against the `confidence` property, which is where the claims are; the
+`field` rule below governs where a *chart* is placed, and this node carries none.
+
 Two conventions differ from `figures:`. A series row is **signed**, as is a coordinate, because
 a bar below the zero rule is what the chart is for, where a figure exports a correlation as a
 magnitude with its direction in the key — so the row `Mineral` is `−0.0321` and names

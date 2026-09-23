@@ -44,6 +44,16 @@ export const REACH = "/reach";
 export const BOUNDS = "/bounds";
 
 /**
+ * How the model is built, and what it does not claim.
+ *
+ * A constant for the reason `BOUNDS` is one, and reached the list the same way: `corpusSeries.ts`
+ * has to be able to say where `project/what-the-band-held-at-every-horizon` is drawn, and a page
+ * that draws a series is a page whose address is a fact about the site rather than about any one
+ * card on it.
+ */
+export const METHOD = "/method";
+
+/**
  * The addressable sections of every route.
  *
  * # Why there is a vocabulary rather than a fragment written where it is needed
