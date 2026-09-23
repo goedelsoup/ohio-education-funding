@@ -1,5 +1,5 @@
 {
-  "contract": "1.1.0",
+  "contract": "1.2.0",
   "figures": [
     {"key": "bundle/median-federal-share-of-operating-spending", "owner": "crates/bundle", "unit": "share", "value": 0.04203840156654025, "label": "The median district's federal share of operating spending, 2024-25"},
     {"key": "bundle/max-federal-share-of-operating-spending", "owner": "crates/bundle", "unit": "share", "value": 0.29041969187179034, "label": "The highest federal share in the state — the most exposed district in Ohio to a decision Ohio does not make"},
@@ -536,6 +536,12 @@
     {"key": "project/districts-employing-fewer-administrators-than-funded", "owner": "crates/project", "unit": "count", "value": 47, "label": "Districts whose FY2024 FTE administrators are fewer than the four administrator elements of R.C. 3317.011 fund at their own enrolment"},
     {"key": "project/administrator-multiple-below-the-floor-threshold", "owner": "crates/project", "unit": "ratio", "value": 1.5156482861400895, "label": "Median employed-to-funded administrators among the districts under 1,500 ADM, where the two-administrator floor binds"},
     {"key": "project/administrator-multiple-above-the-floor-threshold", "owner": "crates/project", "unit": "ratio", "value": 1.8353726362625138, "label": "The same median among the districts at or above 1,500 ADM, where it does not"},
+    {"key": "project/administrators-funded-in-the-smallest-sextile", "owner": "crates/project", "unit": "positions", "value": 5.23, "label": "What the four administrator elements of R.C. 3317.011 fund at the median enrolment of the smallest sixth of districts by FY2024 enrolled ADM"},
+    {"key": "project/administrators-employed-in-the-smallest-sextile", "owner": "crates/project", "unit": "positions", "value": 6.25, "label": "The median FY2024 FTE administrators the District Profile Report counts in the smallest sixth of districts by enrolled ADM"},
+    {"key": "project/administrators-funded-in-the-largest-sextile", "owner": "crates/project", "unit": "positions", "value": 20.689999999999998, "label": "What the same four elements fund at the median enrolment of the largest sixth of districts by FY2024 enrolled ADM"},
+    {"key": "project/administrators-employed-in-the-largest-sextile", "owner": "crates/project", "unit": "positions", "value": 39.0, "label": "The median FY2024 FTE administrators the report counts in the largest sixth of districts by enrolled ADM"},
+    {"key": "project/the-administrator-floors-adm-threshold", "owner": "crates/project", "unit": "count", "value": 1500, "label": "The base cost enrolled ADM below which R.C. 3317.011(F)(3) funds two other district administrators whatever the enrolment"},
+    {"key": "project/administrators-employed-for-every-one-funded", "owner": "crates/project", "unit": "ratio", "value": 1.966403426379351, "label": "FY2024 FTE administrators employed statewide for every one the four administrator elements of R.C. 3317.011 fund at districts' own enrolment"},
     {"key": "project/targeted-assistance-capacity-tier", "owner": "crates/project", "unit": "dollars", "value": 334036712.2299998, "label": "What R.C. 3317.0217's capacity tier pays in FY2027 -- eight mills of the shortfall of a district's total weighted wealth below the median district's"},
     {"key": "project/capacity-tier-index-on-enrolment", "owner": "crates/project", "unit": "ratio", "value": 0.9854808925762097, "label": "The slope of ln(total weighted wealth) on ln(base cost enrolled ADM) -- the tier indexes a total, and a total is proportional to the pupils under it"},
     {"key": "project/capacity-tier-index-on-enrolment-fit", "owner": "crates/project", "unit": "ratio", "value": 0.8125996817867742, "label": "How much of the variance in ln(total weighted wealth) enrolled ADM alone accounts for -- four fifths of it"},

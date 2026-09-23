@@ -1,5 +1,5 @@
 {
-  "contract": "6.0.0",
+  "contract": "7.0.0",
   "series": [
     {"key": "dispersion/fy2016-step-by-business-class", "owner": "crates/dispersion", "unit": "ratio", "axis": "Property class, TY2021 share of assessed value", "label": "Correlation of the FY2016 move in state revenue per pupil with each business property class", "rows": [
       {"label": "Industrial", "value": 0.11752209551359827, "figure": "dispersion/fy2016-step-against-industrial-share"},
@@ -2039,6 +2039,29 @@
          {"label": "Danbury Local", "x": 0.026770047403118738, "y": -0.22837000221846376, "class": 0},
          {"label": "Kelleys Island Local", "x": 0.7184649885442354, "y": -3.331698349079933, "class": 0}
        ]}
+     ]}
+  ],
+  "bands": [
+    {"key": "project/administrators-employed-against-administrators-funded", "owner": "crates/project", "subject": "sextile", "label": "What districts employ against what the four administrator elements of R.C. 3317.011 fund, by sextile of enrolled ADM", "ends": ["What the four administrator elements fund", "What the district employs"], "measure": {"label": "Administrators, in full-time equivalents", "unit": "positions", "min": 5.23, "max": 39.0, "log": true},
+     "spans": [
+       {"label": "552 pupils", "low": 5.23, "high": 6.25, "hover": "The first band by enrolment: 101 districts around 552 pupils, funded for 5.23 administrators and employing 6.25 — 1.23×, or 12.3 per thousand pupils", "lowFigure": "project/administrators-funded-in-the-smallest-sextile", "highFigure": "project/administrators-employed-in-the-smallest-sextile"},
+       {"label": "886 pupils", "low": 5.97, "high": 9.7, "hover": "The second band by enrolment: 101 districts around 886 pupils, funded for 5.97 administrators and employing 9.70 — 1.61×, or 10.8 per thousand pupils"},
+       {"label": "1,229 pupils", "low": 6.73, "high": 11.0, "hover": "The third band by enrolment: 101 districts around 1,229 pupils, funded for 6.73 administrators and employing 11.00 — 1.64×, or 9.0 per thousand pupils"},
+       {"label": "1,663 pupils", "low": 7.91, "high": 15.0, "hover": "The fourth band by enrolment: 101 districts around 1,663 pupils, funded for 7.91 administrators and employing 15.00 — 1.85×, or 8.8 per thousand pupils"},
+       {"label": "2,548 pupils", "low": 11.06, "high": 20.0, "hover": "The fifth band by enrolment: 101 districts around 2,548 pupils, funded for 11.06 administrators and employing 20.00 — 1.80×, or 7.8 per thousand pupils"},
+       {"label": "5,256 pupils", "low": 20.689999999999998, "high": 39.0, "hover": "The sixth band by enrolment: 101 districts around 5,256 pupils, funded for 20.69 administrators and employing 39.00 — 1.82×, or 7.2 per thousand pupils", "lowFigure": "project/administrators-funded-in-the-largest-sextile", "highFigure": "project/administrators-employed-in-the-largest-sextile"}
+     ],
+     "markers": [
+       {"label": "1,500 pupils: under it R.C. 3317.011(F)(3) funds two other administrators whatever the enrolment. It falls 16 districts into the fourth band.", "value": 1500.0, "at": 3.1584158415841586, "figure": "project/the-administrator-floors-adm-threshold"}
+     ],
+     "whole": {"label": "606 districts employ 12,938 FTE administrators against the 6,580 the four administrator elements fund at their own FY2024 enrolment: 1.9664 employed for every one funded.", "value": 1.966403426379351, "figure": "project/administrators-employed-for-every-one-funded"},
+     "unreached": [
+       {"label": "R.C. 3317.011(D)(2), special teachers", "why": "a floor of 6 positions under 900 ADM; no column of the report counts it"},
+       {"label": "R.C. 3317.011(E)(1), guidance counselors", "why": "a floor of 1 position, on grades 9-12 rather than on enrolled ADM; no column of the report counts it"},
+       {"label": "R.C. 3317.011(E)(3), student wellness and success staff", "why": "a floor of 5 positions under 1,250 ADM; no column of the report counts it"},
+       {"label": "R.C. 3317.011(F)(4), fiscal support staff", "why": "a floor of 2 positions under 1,700 ADM; no column of the report counts it"},
+       {"label": "R.C. 3317.011(F)(5), EMIS support employees", "why": "a floor of 1 position under 5,000 ADM; no column of the report counts it"},
+       {"label": "R.C. 3317.011(G)(2), building leadership support staff", "why": "a floor of one per open building at any enrolment; no column of the report counts it"}
      ]}
   ]
 }

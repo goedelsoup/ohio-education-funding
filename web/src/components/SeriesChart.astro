@@ -32,6 +32,12 @@
  * - the **unreached**, because a count is a count of a population. A subject the computation could
  *   not place is named here rather than dropped out of the denominator — a spread of 607 captioned
  *   609 is a small lie that is easy to ship.
+ *
+ * A **band chart** arrives with a legend and an unreached list and no census, which is why
+ * `unreachedSays` exists. The spread's phrase presumes one — "not in any count above" is a
+ * sentence about the table — and a band chart's absences are not subjects it failed to place but
+ * *floors its source has no column for*. Same rule, different sentence, and the caller supplies
+ * the sentence rather than this template guessing from the shape of the props.
  */
 interface Props {
   chart: {
@@ -45,6 +51,8 @@ interface Props {
     census?: { label: string; subjects: string }[];
     /** Named, because the alternative is a denominator nobody can reproduce. */
     unreached?: { label: string; why: string }[];
+    /** What the unreached list is, in a phrase. Defaults to the census's sentence. */
+    unreachedSays?: string;
   };
   level: "h2" | "h3";
 }
@@ -104,7 +112,7 @@ const Heading = level;
   {
     chart.unreached && chart.unreached.length > 0 && (
       <p class="note">
-        Not drawn, and not in any count above:{" "}
+        {chart.unreachedSays ?? "Not drawn, and not in any count above"}:{" "}
         {chart.unreached.map((missing, at) => (
           <>
             {at > 0 && "; "}

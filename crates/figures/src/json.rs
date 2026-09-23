@@ -21,9 +21,9 @@
 use core::fmt::Write;
 
 use crate::{
-    compute_all, compute_all_curves, compute_all_planes, compute_all_scatters, compute_all_series,
-    compute_all_spreads, Axis, Cloud, Fit, Positions, Regions, Row, Traces, Unit, CONTRACT_VERSION,
-    SERIES_CONTRACT_VERSION,
+    compute_all, compute_all_bands, compute_all_curves, compute_all_planes, compute_all_scatters,
+    compute_all_series, compute_all_spreads, Axis, Cloud, Fit, Positions, Ranges, Regions, Row,
+    Traces, Unit, CONTRACT_VERSION, SERIES_CONTRACT_VERSION,
 };
 
 /// The characters that would need escaping, and therefore may not appear in a key or a label.
@@ -189,6 +189,8 @@ pub fn series_manifest() -> String {
     curves(&mut out);
     out.push_str(",\n");
     spreads(&mut out);
+    out.push_str(",\n");
+    bands(&mut out);
     out.push_str("}\n");
     out
 }
@@ -621,6 +623,141 @@ fn spreads(out: &mut String) {
                 ","
             };
             let _ = writeln!(out, "       ]}}{comma}");
+        }
+        let comma = if at + 1 == computed.len() { "" } else { "," };
+        let _ = writeln!(out, "     ]}}{comma}");
+    }
+    out.push_str("  ]");
+}
+
+/// The band charts, which is the second array to write an `unreached` block and the first whose
+/// every label is computed rather than written in `lib.rs`.
+///
+/// A span's label and hover are `format!`ed out of the fixtures, so the writability check is on
+/// the same footing `scatters` put it on: it is guarding a real input, not a typo. The escape
+/// hatch if one ever fails is the same one — the composing code gains a word.
+fn bands(out: &mut String) {
+    let computed = compute_all_bands();
+    let _ = writeln!(out, "  \"bands\": [");
+    for (at, entry) in computed.iter().enumerate() {
+        let b = entry.band;
+        assert!(
+            writable(b.key)
+                && writable(b.owner)
+                && writable(b.label)
+                && writable(b.subject)
+                && b.ends.iter().all(|end| writable(end)),
+            "{}: a key, owner, label, subject or end name carries a character this writer cannot \
+             escape",
+            b.key
+        );
+        let Ranges {
+            measure,
+            spans,
+            markers,
+            whole,
+            unreached,
+        } = &entry.ranges;
+        let _ = writeln!(
+            out,
+            "    {{\"key\": \"{}\", \"owner\": \"{}\", \"subject\": \"{}\", \"label\": \"{}\", \
+             \"ends\": [\"{}\", \"{}\"], {},",
+            b.key,
+            b.owner,
+            b.subject,
+            b.label,
+            b.ends[0],
+            b.ends[1],
+            axis("measure", measure),
+        );
+        let _ = writeln!(out, "     \"spans\": [");
+        for (span_at, span) in spans.iter().enumerate() {
+            assert!(
+                writable(&span.label) && writable(&span.hover),
+                "{}: the span {:?} carries a character this writer cannot escape",
+                b.key,
+                span.label
+            );
+            let comma = if span_at + 1 == spans.len() { "" } else { "," };
+            let _ = write!(
+                out,
+                "       {{\"label\": \"{}\", \"low\": {}, \"high\": {}, \"hover\": \"{}\"",
+                span.label,
+                number(measure.unit, span.low),
+                number(measure.unit, span.high),
+                span.hover,
+            );
+            for (name, key) in [
+                ("lowFigure", span.low_figure),
+                ("highFigure", span.high_figure),
+            ] {
+                if let Some(key) = key {
+                    assert!(
+                        writable(key),
+                        "{}: the span {:?} names a figure key this writer cannot escape",
+                        b.key,
+                        span.label
+                    );
+                    let _ = write!(out, ", \"{name}\": \"{key}\"");
+                }
+            }
+            let _ = writeln!(out, "}}{comma}");
+        }
+        let _ = writeln!(out, "     ],");
+        let _ = writeln!(out, "     \"markers\": [");
+        for (marker_at, marker) in markers.iter().enumerate() {
+            assert!(
+                writable(&marker.label) && writable(marker.figure),
+                "{}: the marker {:?} carries a character this writer cannot escape",
+                b.key,
+                marker.label
+            );
+            let comma = if marker_at + 1 == markers.len() {
+                ""
+            } else {
+                ","
+            };
+            let _ = writeln!(
+                out,
+                "       {{\"label\": \"{}\", \"value\": {}, \"at\": {}, \"figure\": \
+                 \"{}\"}}{comma}",
+                marker.label,
+                coordinate(marker.value),
+                coordinate(marker.at),
+                marker.figure,
+            );
+        }
+        let _ = writeln!(out, "     ],");
+        assert!(
+            writable(&whole.label) && writable(whole.figure),
+            "{}: the aggregate carries a character this writer cannot escape",
+            b.key
+        );
+        let _ = writeln!(
+            out,
+            "     \"whole\": {{\"label\": \"{}\", \"value\": {}, \"figure\": \"{}\"}},",
+            whole.label,
+            coordinate(whole.value),
+            whole.figure,
+        );
+        let _ = writeln!(out, "     \"unreached\": [");
+        for (row_at, missing) in unreached.iter().enumerate() {
+            assert!(
+                writable(&missing.label) && writable(&missing.why),
+                "{}: the unreached floor {:?} carries a character this writer cannot escape",
+                b.key,
+                missing.label
+            );
+            let comma = if row_at + 1 == unreached.len() {
+                ""
+            } else {
+                ","
+            };
+            let _ = writeln!(
+                out,
+                "       {{\"label\": \"{}\", \"why\": \"{}\"}}{comma}",
+                missing.label, missing.why,
+            );
         }
         let comma = if at + 1 == computed.len() { "" } else { "," };
         let _ = writeln!(out, "     ]}}{comma}");

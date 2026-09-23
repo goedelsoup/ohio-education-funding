@@ -54,10 +54,16 @@ import type { Node } from "./corpus.ts";
  * version check forecloses is the worst kind available to a gate — passing because it found
  * nothing to check. #125 catalogued sixteen of those.
  */
-export const READS_CONTRACT = "1.1.0";
+export const READS_CONTRACT = "1.2.0";
 
 /** What a figure is measured in. Mirrors `figures::Unit`. */
-export type Unit = "count" | "dollars" | "share" | "ratio" | "pupils";
+export type Unit =
+  | "count"
+  | "dollars"
+  | "share"
+  | "ratio"
+  | "pupils"
+  | "positions";
 
 /** One figure, computed from the crate that owns it. */
 export interface ManifestFigure {
@@ -177,7 +183,13 @@ export function numerals(phrase: string, unit: Unit): Numeral[] {
 
     // `pupils` is bare like a count — prose writes "1,384,232", never "$1.4m" or "138%" — but it
     // is compared like dollars, because ADM is an average and a projection of one is fractional.
-    const bare = unit === "count" || unit === "ratio" || unit === "pupils";
+    // `positions` is the same case: prose writes "6.25 administrators", and the fraction is a
+    // share of a person's time rather than a share of anything the reader should see a % on.
+    const bare =
+      unit === "count" ||
+      unit === "ratio" ||
+      unit === "pupils" ||
+      unit === "positions";
     if (bare && (dollar || percent || scale !== 0)) continue;
     if (unit === "share" && (dollar || scale !== 0)) continue;
     if (unit === "dollars" && percent) continue;

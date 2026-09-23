@@ -167,6 +167,30 @@ one. `Boundary` carries the lines where that happens — the anti-diagonal where
 zero, and the per-pupil axis — as whole-frame segments in the data's own units, and they name no
 figures for the `Reference`'s reason. See #446.
 
+A **band chart** is the sixth array, and its rule is the ordinary one read twice: a `Span` is one
+subject at two points of one measure, so the first and last row bind **four** figures rather than
+two, and the rows between them bind none. `Ranges::framed` refuses a set whose ends are not both
+pinned, refuses a non-positive low — the axis is logarithmic without exception, because a row's
+length is the ratio between its ends only where the scale makes it so — and frames the domain on
+the data's own extremes with no padding, so the longest row runs the width of the frame.
+
+Two things ride beside the rows and neither is a row. A `Marker` is a position on the *ordering*
+axis rather than a value of the measure, held in fractional rows because "1,500 pupils" falls
+sixteen districts into the fourth sextile and rounding it to a row boundary would move the claim;
+it is pinned, unlike a `Boundary` or a `Reference`, because it is a parameter of the plan the
+prose quotes rather than arithmetic on the axes. An `Aggregate` is the caption, pinned for the
+opposite reason: it is on none of the rows, so nothing else on the picture could hold it.
+
+The one band chart is `project/administrator_staffing`, and it carries `Missing` to a second use.
+On a spread the unreached are subjects the computation could not place; here they are the six of
+R.C. 3317.011's seven binding staffing floors that meet **no column** of the District Profile
+Report, derived from `foundation::minimums::Minimum::ALL` rather than typed, and asserted to be
+six. A chart of one floor captioned as a chart of staffing would overstate what the report
+supports, and the negative is the more careful half of the result. `Band::ends` names the two
+shades, because a row is two shades of one hue rather than two hues and nothing on the picture
+says which is which; `Unit::Positions` is an FTE rather than a head, which is why it is written
+with a fraction and why a tolerance is required of it. See #447.
+
 The line is fitted here and nowhere else. `crates/series.json` carries its two **endpoints in the
 data's own units** rather than a slope and an intercept, so no consumer evaluates a model: the web
 layer draws a segment between two points it was given, and `chart.ts`'s standing prohibition on a
@@ -300,7 +324,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`deflator`](deflator/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 17 |
 | [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 370 |
 | [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 35 |
-| [`figures`](figures/) | The figures the corpus quotes, computed from the crates that own them | 44 |
+| [`figures`](figures/) | The figures the corpus quotes, computed from the crates that own them | 52 |
 | [`foundation`](foundation/) | Fair School Funding Plan base cost build-up, per R.C. 3317.011 | 58 |
 | [`local-capacity`](local-capacity/) | Fair School Funding Plan local capacity and state share, per R.C. 3317.017 | 27 |
 | [`millage`](millage/) | Effective operating millage under H.B. 920 reduction factors, and 20-mill floor status | 19 |
@@ -309,7 +333,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 37 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 79 |
 
-13 crates, 1798 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+13 crates, 1806 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status

@@ -36,6 +36,7 @@ import type {
   Fit,
   Place,
   Range,
+  RangeMarker,
   Rank,
   ScatterPoint,
   SeriesPoint,
@@ -1592,11 +1593,21 @@ const DOT_RADIUS = 3;
  * The ends of a range are the same measure at two points, not two series, so they take one hue in
  * steps — the ordinal ramp's first and last, already validated all-pairs. Two categorical hues
  * would say the low end and the high end are different kinds of thing.
+ *
+ * # Markers, and why they are placed in pixels
+ *
+ * `options.markers` draws a dashed rule **across** the rows at a fractional row position, for a
+ * threshold in the plan that the ordering is supposed to vary with. The y-scale here is
+ * categorical, so there is no scale to ask for the position of "3.16 rows down" — and reaching
+ * into d3's band scale for its step and padding would be reading Plot's internals to re-derive a
+ * number the layout already knows. `Plot.frame({ anchor: "top", insetTop })` is the first-class
+ * form: the frame mark draws its top edge at `marginTop + insetTop`, so the offset is computed
+ * against the plot area's own height and the rule lands where it should at any width.
  */
 export function rangeSpec(
   rows: Range[],
   axis: { label: string; format: (v: number) => string; log?: boolean },
-  options: { width: number },
+  options: { width: number; markers?: RangeMarker[] },
 ): Spec | null {
   if (rows.length < 2) return null;
 
@@ -1608,7 +1619,7 @@ export function rangeSpec(
   const longest = Math.max(...rows.map((r) => r.label.length));
   // A 14px row cannot hold a second line, so this gutter is capped rather than wrapped: a name
   // too long for a phone's frame is drawn shorter, not folded into the row below it.
-  const { width } = options;
+  const { width, markers = [] } = options;
   const marginLeft = gutter(width, Math.max(70, Math.min(150, Math.round(longest * 6.2) + 10)));
   const foot = axisFoot({
     width,
@@ -1620,14 +1631,26 @@ export function rangeSpec(
     high: axis.format(max),
   });
 
+  const marginTop = 0;
+  const marginBottom = 22 + foot.extraBottom;
+  const height = rows.length * rowHeight;
+  // The rows' own band, which is what a marker's row position is a fraction of. `at` is clamped
+  // rather than dropped: a threshold past the end of the ordering is a real thing to say, and
+  // saying it at the last edge is truer than saying nothing.
+  const area = height - marginTop - marginBottom;
+  const across = markers.map((marker) => ({
+    label: marker.label,
+    at: Math.min(Math.max(marker.at, 0), rows.length),
+  }));
+
   return {
     options: {
       width,
-      height: rows.length * rowHeight,
+      height,
       marginLeft,
       marginRight: 16,
-      marginTop: 0,
-      marginBottom: 22 + foot.extraBottom,
+      marginTop,
+      marginBottom,
       x: {
         axis: null,
         type: axis.log ? "log" : "linear",
@@ -1671,6 +1694,18 @@ export function rangeSpec(
           fontSize: 10,
           className: "range-label",
         }),
+        // Across the rows, under the foot and over the spans: it is a position in the plan
+        // rather than a value of any row, so it is dashed, and it carries no text of its own —
+        // a 14px row has nowhere to put one, and the legend says what it is.
+        ...across.map((marker) =>
+          Plot.frame({
+            anchor: "top",
+            insetTop: (marker.at / rows.length) * area,
+            stroke: INK.rule,
+            strokeDasharray: "3,3",
+            className: "range-marker",
+          }),
+        ),
         ...foot.marks,
         /*
          * One band per row, above everything: the hit target is the row, not the 3px dot at

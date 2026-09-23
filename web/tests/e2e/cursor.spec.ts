@@ -280,6 +280,14 @@ test.describe("the cursor's second channel", () => {
       hit: ".scatter-hit",
       mark: ".scatter-dot",
     },
+    // And `range-hit` twice, for the same reason: `/counties` above is a page that calls
+    // `rangeSpec` itself, and this is the band chart a corpus node binds and the wiki route
+    // draws. Same form, different caller, and the caller is what stamps the pairing.
+    {
+      route: "/wiki/formula-component/fsfp-base-cost-calculation",
+      hit: ".range-hit",
+      mark: ".range-high",
+    },
   ]) {
     test(`brightens the ${mark.slice(1)} under the ring on ${route}`, async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 900 });

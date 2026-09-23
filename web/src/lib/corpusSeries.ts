@@ -94,7 +94,16 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import type { Bar, Fit, Place, Rank, ScatterPoint, SeriesPoint } from "./chart.ts";
+import type {
+  Bar,
+  Fit,
+  Place,
+  Range,
+  RangeMarker,
+  Rank,
+  ScatterPoint,
+  SeriesPoint,
+} from "./chart.ts";
 import type { Node } from "./corpus.ts";
 import { citedCrates, proseFields, type Manifest, type Unit } from "./corpusFigures.ts";
 import { count, money, pct } from "./format.ts";
@@ -105,7 +114,7 @@ import * as routes from "./routes.ts";
  * the two documents have different shapes and different readers, and a field added to a row is no
  * reason for the scalar check to refuse a document it still reads correctly.
  */
-export const READS_SERIES_CONTRACT = "6.0.0";
+export const READS_SERIES_CONTRACT = "7.0.0";
 
 /** One row of a series: a category and its signed value. */
 export interface SeriesRow {
@@ -366,6 +375,88 @@ export interface ManifestSpread {
   panels: ManifestSlice[];
 }
 
+/**
+ * One row of a band chart: a step of an ordered index, and the two values whose ratio it draws.
+ *
+ * The figure keys are present on the **first and last row** and absent between them, which is
+ * this shape's form of the endpoint rule: an ordered picture is quoted by where it starts and
+ * where it finishes, and each of those rows carries two numbers rather than one. The rows between
+ * are held by `mise run //:generated` diffing this document, the way a column's middle rows are.
+ */
+export interface ManifestSpan {
+  label: string;
+  low: number;
+  high: number;
+  hover: string;
+  /** The `crates/figures.json` key whose pin `low` reproduces. On the end rows. */
+  lowFigure?: string;
+  /** And `high`'s. */
+  highFigure?: string;
+}
+
+/**
+ * A position along a band chart's ordered index where a rule in the plan changes.
+ *
+ * Unlike a {@link ManifestBoundary} this names a figure, and the difference is what the number
+ * is. A boundary is arithmetic — `y = -x` is where a multiple is one — and a pin duplicating a
+ * definition checks nothing. A marker is a *parameter of the plan*, held in a crate and quoted in
+ * the prose the chart sits under, so pinning it is what makes the prose's copy checkable.
+ *
+ * {@link at} is in rows and fractional; see {@link RangeMarker} for why it is not rounded.
+ */
+export interface ManifestMarker {
+  label: string;
+  /** Where it sits on the index, in the index's own units. */
+  value: number;
+  /** Where it sits along the rows, in rows. `3.158` is sixteen per cent into the fourth. */
+  at: number;
+  figure: string;
+}
+
+/**
+ * The one number a band chart is captioned with, which is on none of its rows.
+ *
+ * A band chart's rows are medians of sub-populations and the sentence it is drawn for is usually
+ * about the whole one — "districts employ about twice what the build-up funds" is a ratio of two
+ * sums. Stated beside the picture rather than drawn on it: on this measure the whole population's
+ * two values are three orders of magnitude above the rows', and a seventh row holding them would
+ * leave the other six in a corner of the axis.
+ */
+export interface ManifestAggregate {
+  label: string;
+  value: number;
+  figure: string;
+}
+
+/** An ordered index with two values at every step, drawn as rows on a logarithmic measure. */
+export interface ManifestBand {
+  key: string;
+  owner: string;
+  /** What one row is, singular and lower case — "sextile". */
+  subject: string;
+  label: string;
+  /**
+   * What the two ends of a row are, low first — the legend, which a band chart cannot do
+   * without. A row is two shades of one hue rather than two hues, so nothing on the picture
+   * says which shade is which, and the crate names them rather than the route composing a
+   * phrase out of the axis label.
+   */
+  ends: [string, string];
+  /** Always logarithmic: a row's length is its ratio only where the axis is. */
+  measure: ManifestAxis;
+  spans: ManifestSpan[];
+  markers: ManifestMarker[];
+  whole: ManifestAggregate;
+  /**
+   * What the picture cannot show, named under it rather than dropped — here the **floors the
+   * source has no column for**, which is {@link ManifestMissing} put to the second use the rule
+   * covers. One of R.C. 3317.011's seven binding staffing floors meets a column of the District
+   * Profile Report and six meet none, so a chart of the one captioned as a chart of staffing
+   * would overstate what the report supports.
+   */
+  unreached: ManifestMissing[];
+}
+
 /** `crates/series.json`, as written by `cargo run -p figures series`. */
 export interface SeriesManifest {
   contract: string;
@@ -374,6 +465,7 @@ export interface SeriesManifest {
   planes: ManifestPlane[];
   curves: ManifestCurve[];
   spreads: ManifestSpread[];
+  bands: ManifestBand[];
 }
 
 /** Where `crates/figures series` writes, from `web/` and from the repository root. */
@@ -428,6 +520,11 @@ export function loadSeriesManifest(): SeriesManifest {
   }
   if (!Array.isArray(parsed.spreads) || parsed.spreads.length === 0) {
     throw new Error(`${path} carries no spreads, so this check would pass against any corpus.`);
+  }
+  if (!Array.isArray(parsed.bands) || parsed.bands.length === 0) {
+    throw new Error(
+      `${path} carries no band charts, so this check would pass against any corpus.`,
+    );
   }
   cached = parsed;
   return parsed;
@@ -550,6 +647,15 @@ const PUPILS = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 1,
 });
 
+/** A count of FTE positions: two decimal places, because both sides of #447's comparison are
+    stated to the hundredth — the profile report's column and a division of an ADM by a ratio. The
+    trailing zeros are the point, so "39.00" says the report counts thirty-nine and not that the
+    number was rounded to reach the row. */
+const POSITIONS = new Intl.NumberFormat("en-US", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 /**
  * A value written the way the site writes that unit, unsigned.
  *
@@ -569,6 +675,8 @@ export function formatValue(unit: Unit, value: number): string {
       return pct(value);
     case "pupils":
       return PUPILS.format(value);
+    case "positions":
+      return POSITIONS.format(value);
     case "ratio":
       return value.toFixed(4);
   }
@@ -897,6 +1005,36 @@ export function regionsOf(spread: ManifestSpread): SpreadPanel[] {
   }));
 }
 
+/** A band chart as `rangeSpec` draws it: its rows, the rules across them, and its axis. */
+export interface BandChart {
+  rows: Range[];
+  markers: RangeMarker[];
+  axis: { label: string; format: (v: number) => string; log: boolean };
+}
+
+/**
+ * A band chart as the rows a card draws.
+ *
+ * The hover comes off the manifest rather than being composed here, which is the opposite of
+ * {@link barsOf}'s fallback and deliberate: a row of this chart is a median of a hundred and one
+ * districts, and the sentence a reader needs — both values, their ratio, and how many subjects
+ * stand behind them — is arithmetic the crate has already done. Composing a second version of it
+ * in TypeScript would be a second source for the same claim.
+ */
+export function rangesOf(band: ManifestBand): BandChart {
+  const format = (v: number) => formatValue(band.measure.unit, v);
+  return {
+    rows: band.spans.map((span) => ({
+      label: span.label,
+      low: span.low,
+      high: span.high,
+      hover: span.hover,
+    })),
+    markers: band.markers.map((marker) => ({ label: marker.label, at: marker.at })),
+    axis: { label: band.measure.label, format, log: band.measure.log },
+  };
+}
+
 /** Each position the check can fail in. Every one is produced on purpose in the spec. */
 export type SeriesDiscrepancyKind =
   /** The node binds a key the series manifest does not carry. */
@@ -915,7 +1053,9 @@ export type SeriesDiscrepancyKind =
   | "line-unbound"
   /** A region of a spread's census is a figure this node does not bind. */
   | "census-unbound"
-  /** The manifest exports a series, a cloud, a plane, a curve or a spread no node draws. */
+  /** An end of a band chart, a marker on it, or its caption is a figure this node does not bind. */
+  | "band-unbound"
+  /** The manifest exports a drawing of any of the six families no node draws. */
   | "uncited-series"
   /** A series {@link PAGE_SERIES} says a page draws names a node the corpus does not hold. */
   | "page-source-missing";
@@ -942,6 +1082,7 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
   const planeByKey = new Map(manifest.planes.map((plane) => [plane.key, plane]));
   const curveByKey = new Map(manifest.curves.map((curve) => [curve.key, curve]));
   const spreadByKey = new Map(manifest.spreads.map((spread) => [spread.key, spread]));
+  const bandByKey = new Map(manifest.bands.map((band) => [band.key, band]));
   const found: SeriesDiscrepancy[] = [];
   const drawn = new Set<string>();
 
@@ -956,19 +1097,20 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
         found.push({ node: node.id, key: entry.key, kind, message });
 
       /*
-       * One `series:` block, five shapes behind it.
+       * One `series:` block, six shapes behind it.
        *
        * A node binds what it draws by key and does not say which array the key is in — a binding
        * is "draw this computation under this field", and whether the crate answered with a column,
-       * a cloud, a plane, a curve or a spread is the crate's business. The five differ in what has
-       * to be bound with them, and that is the whole of the difference below.
+       * a cloud, a plane, a curve, a spread or a band chart is the crate's business. The six
+       * differ in what has to be bound with them, and that is the whole of the difference below.
        */
       const series = byKey.get(entry.key);
       const cloud = cloudByKey.get(entry.key);
       const plane = planeByKey.get(entry.key);
       const curve = curveByKey.get(entry.key);
       const spread = spreadByKey.get(entry.key);
-      if (!series && !cloud && !plane && !curve && !spread) {
+      const band = bandByKey.get(entry.key);
+      if (!series && !cloud && !plane && !curve && !spread && !band) {
         at(
           "unknown-key",
           `draws "${entry.key}", which crates/series.json does not carry. Either the key was ` +
@@ -976,7 +1118,7 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
         );
         continue;
       }
-      const owner = (series ?? cloud ?? plane ?? curve ?? spread)!.owner;
+      const owner = (series ?? cloud ?? plane ?? curve ?? spread ?? band)!.owner;
       drawn.add(entry.key);
 
       if (!DRAWABLE_FIELDS.includes(entry.field)) {
@@ -1074,6 +1216,53 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
         continue;
       }
 
+      if (band) {
+        for (const span of [band.spans[0], band.spans[band.spans.length - 1]]) {
+          if (!span) continue;
+          for (const [end, key] of [
+            ["low", span.lowFigure],
+            ["high", span.highFigure],
+          ] as const) {
+            if (key === undefined) {
+              at(
+                "band-unbound",
+                `draws "${span.label}" at an end of the chart and the manifest names no figure ` +
+                  `for its ${end} value. crates/figures/tests/ should have refused this; the ` +
+                  `manifest is stale.`,
+              );
+            } else if (!bound.has(key)) {
+              at(
+                "band-unbound",
+                `draws "${span.label}" at an end of the chart with its ${end} value at ` +
+                  `${end === "low" ? span.low : span.high}, which is ${key}, and this node does ` +
+                  `not bind that figure. Bind it in figures: first — an ordered picture is read ` +
+                  `at its first and last row, and each of those rows is two numbers.`,
+              );
+            }
+          }
+        }
+        for (const marker of band.markers) {
+          if (!bound.has(marker.figure)) {
+            at(
+              "band-unbound",
+              `marks ${marker.value} on the index, which is ${marker.figure}, and this node does ` +
+                `not bind that figure. Bind it in figures: first — a marker is a parameter of ` +
+                `the plan the prose quotes, not an arithmetic definition, so pinning it is what ` +
+                `makes the prose's copy of it checkable.`,
+            );
+          }
+        }
+        if (!bound.has(band.whole.figure)) {
+          at(
+            "band-unbound",
+            `is captioned ${band.whole.value}, which is ${band.whole.figure}, and this node does ` +
+              `not bind that figure. Bind it in figures: first — the aggregate is on none of the ` +
+              `rows, so nothing else on the picture could pin it.`,
+          );
+        }
+        continue;
+      }
+
       for (const end of endpoints(series!)) {
         if (end.figure === undefined) {
           at(
@@ -1110,6 +1299,7 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
     ...manifest.planes.map((plane) => [plane.key, "plane"] as const),
     ...manifest.curves.map((curve) => [curve.key, "curve"] as const),
     ...manifest.spreads.map((spread) => [spread.key, "spread"] as const),
+    ...manifest.bands.map((band) => [band.key, "band chart"] as const),
   ];
   for (const [key, what] of exported) {
     if (!drawn.has(key)) {
@@ -1455,6 +1645,96 @@ export function censusAgainstFigures(manifest: SeriesManifest, figures: Manifest
       out.push(
         `${spread.key}: names nobody it could not place. A count is a count of a population, ` +
           `and an empty list is also what a dropped filter looks like`,
+      );
+    }
+  }
+  return out;
+}
+
+/**
+ * Every figure a band chart's ends, markers and caption name exists, is on the right unit, and
+ * reproduces the value.
+ *
+ * The staleness check for the sixth family, on the same terms as {@link rowsAgainstFigures}: a
+ * span's value is compared against the figure's own value to the precision the manifest writes,
+ * and the units are compared because a chart formatting positions as dollars is a chart lying
+ * about what it drew.
+ *
+ * The markers and the aggregate are checked against the figure's value and **not** against the
+ * axis' unit, because neither is on the axis. A marker is a position on the *index* — 1,500 ADM
+ * on a chart whose measure is FTE positions — and the aggregate is a ratio of two sums. Asserting
+ * a unit on either would be asserting the wrong one.
+ *
+ * The rows between the ends are not checked, because they name no figure. That is the endpoint
+ * rule rather than a gap in it: they are held by `mise run //:generated` diffing this document.
+ */
+export function bandsAgainstFigures(manifest: SeriesManifest, figures: Manifest): string[] {
+  const byKey = new Map(figures.figures.map((figure) => [figure.key, figure]));
+  const out: string[] = [];
+  const agrees = (stated: number, computed: number) =>
+    Math.abs(stated - computed) <= Math.max(Math.abs(stated), 1) * 1e-9;
+
+  for (const band of manifest.bands) {
+    for (const span of band.spans) {
+      for (const [end, key, value] of [
+        ["low", span.lowFigure, span.low],
+        ["high", span.highFigure, span.high],
+      ] as const) {
+        if (key === undefined) continue;
+        const figure = byKey.get(key);
+        if (!figure) {
+          out.push(
+            `${band.key}: the ${end} end of "${span.label}" names ${key}, which figures.json ` +
+              `lacks`,
+          );
+          continue;
+        }
+        if (figure.unit !== band.measure.unit) {
+          out.push(
+            `${band.key}: "${span.label}" is drawn on a ${band.measure.unit} axis and ${key} is ` +
+              `a ${figure.unit}`,
+          );
+        }
+        if (!agrees(value, figure.value)) {
+          out.push(
+            `${band.key}: the ${end} end of "${span.label}" is ${value} and ${key} is ` +
+              `${figure.value}; one of the two manifests is stale`,
+          );
+        }
+      }
+    }
+
+    for (const [what, key, value] of [
+      ...band.markers.map((marker) => ["the marker", marker.figure, marker.value] as const),
+      ["the aggregate", band.whole.figure, band.whole.value] as const,
+    ]) {
+      const figure = byKey.get(key);
+      if (!figure) {
+        out.push(`${band.key}: ${what} names ${key}, which figures.json lacks`);
+        continue;
+      }
+      if (!agrees(value, figure.value)) {
+        out.push(
+          `${band.key}: ${what} is ${value} and ${key} is ${figure.value}; one of the two ` +
+            `manifests is stale`,
+        );
+      }
+    }
+
+    const ends = [band.spans[0], band.spans[band.spans.length - 1]];
+    for (const span of ends) {
+      if (span && (span.lowFigure === undefined || span.highFigure === undefined)) {
+        out.push(
+          `${band.key}: "${span.label}" is an end of the chart and leaves one of its two values ` +
+            `unpinned`,
+        );
+      }
+    }
+    if (band.unreached.length === 0) {
+      out.push(
+        `${band.key}: names nothing its source cannot see. A chart of one of seven floors ` +
+          `captioned as a chart of staffing overstates what the source supports, and an empty ` +
+          `list is also what a dropped filter looks like`,
       );
     }
   }

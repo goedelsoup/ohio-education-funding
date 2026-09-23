@@ -956,6 +956,45 @@ test("the ratio and the level are nearly independent orderings", () => {
   expect(disjoint, "two counties at one ratio with non-overlapping wealth").toBe(true);
 });
 
+test("a marker on a range is a dashed rule at a fraction of the rows, and it is clamped", () => {
+  /*
+   * #447's threshold: "narrowest where the floor binds" is a claim about a position on the
+   * ordering axis, so the position has to be drawn. `at` is in rows and fractional — the
+   * administrator floor falls 16 districts into the fourth of six sextiles — and there is no
+   * scale to ask where "3.16 rows down" is on a categorical band, so the offset is computed
+   * against the plot area and handed to `Plot.frame`.
+   */
+  const rows = [1, 2, 3, 4].map((i) => ({
+    label: `r${i}`,
+    low: i,
+    high: i * 2,
+    hover: `row ${i}`,
+  }));
+  const axis = { label: "x", format: String, log: true };
+  const draw = (at: number) =>
+    renderToString(
+      () => rangeSpec(rows, axis, { ...W, markers: [{ label: "the floor", at }] }),
+      { label: "test" },
+    );
+
+  // Four rows over a 34px band — 56 tall less the 22 the foot takes — so half way down is 17.
+  const half = draw(2);
+  expect(half).toContain('class="range-marker"');
+  expect(half).toMatch(/<line y2="17" y1="17"[^>]*stroke-dasharray="3,3"/);
+  // A quarter of the way is a quarter of the band, not a row boundary: the fraction is the point.
+  expect(draw(1.5)).toMatch(/<line y2="12.75" y1="12.75"/);
+
+  // Clamped rather than dropped at either end. A threshold past the last row is a real thing to
+  // say about the ordering, and saying it at the edge is truer than saying nothing at all.
+  expect(draw(-3)).toMatch(/<line y2="0" y1="0"/);
+  expect(draw(9)).toMatch(/<line y2="34" y1="34"/);
+
+  // And no marker is no rule: the form is shared with `/counties`, which marks nothing.
+  expect(renderToString(() => rangeSpec(rows, axis, W), { label: "test" })).not.toContain(
+    "range-marker",
+  );
+});
+
 test("a range refuses a single item", () => {
   // One row is not a comparison, and four of Ohio's 88 counties have a single reporting district
   // and no internal spread to draw.

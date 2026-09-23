@@ -406,6 +406,26 @@ is the one district the chained enrollment index misses, and there are three dis
 Buckeye Local. A note saying a name is absent, beside a picture containing two districts of that
 name, is worse than no note. See #446.
 
+A key can also name a **band chart**, which is the ordinary endpoint rule read twice. A row is one
+subject at two points of one measure — what R.C. 3317.011's four administrator elements fund, and
+what the district employs — so the first and last row are four figures rather than two, and the
+rows between them are bound nowhere: a six-row chart bound twelve times would put ten numbers in
+the prose that nothing is read off. `fsfp-base-cost-calculation` draws the one there is, by sextile
+of enrolled ADM.
+
+Two things beside the rows are bound and one pointedly is not. The **marker** is, because it is a
+position in the plan rather than arithmetic on the axes: 1,500 ADM is where (F)(3) stops funding
+two other administrators whatever the enrolment, and "narrowest where the floor binds" is a claim
+about that position. The **aggregate** is, because it is the caption and sits on none of the rows,
+so nothing else on the picture could hold it. The axis's own frame is not, for the boundary's and
+the reference's reason.
+
+And the chart names what its source **cannot see**, on the spread's `unreached` rule put to a
+second use. Six of the section's seven binding staffing floors meet no column of the District
+Profile Report — its personnel block is seven columns and one of them is a count — so a chart of
+the one, captioned as a chart of staffing, would overstate what the report supports. The six are
+printed beside the picture rather than left out of it, and an empty list is refused. See #447.
+
 Two conventions differ from `figures:`. A series row is **signed**, as is a coordinate, because
 a bar below the zero rule is what the chart is for, where a figure exports a correlation as a
 magnitude with its direction in the key — so the row `Mineral` is `−0.0321` and names
@@ -436,8 +456,8 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1857 | supported by a committed primary source |
-| `[inference]` | 378 | drawn from verified facts, not witnessed |
+| `[verified]` | 1858 | supported by a committed primary source |
+| `[inference]` | 379 | drawn from verified facts, not witnessed |
 | `[open]` | 203 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 

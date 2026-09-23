@@ -830,6 +830,28 @@ an empty `unreached` list is also what a dropped filter looks like. The unreache
 the chart, by IRN: a scatter of 607 labelled 609 is a small lie that is easy to ship, and district
 names are not unique. See #446.
 
+The manifest's sixth answer is a **band chart**, and it is drawn by `rangeSpec` — the form
+`/counties` already used for the wealth spread inside a county, taking a second caller rather than
+a second form. `rangesOf` turns a `ManifestBand` into rows and markers; `SeriesChart.astro` places
+the legend, the caption and the unreached list around it. The legend is not optional here and does
+not come from the route: a row is two shades of one hue, because its ends are one measure at two
+points rather than two kinds of thing, so nothing on the picture says which shade is which. The
+crate names them, in `Band::ends`.
+
+A marker is the one new piece of geometry. Its position is in **rows and fractional** — #447's
+threshold falls sixteen districts into the fourth of six sextiles — and the y-scale is categorical,
+so there is no scale to ask where 3.16 rows down is. Reaching into d3's band scale for its step and
+padding would be re-deriving a number the layout already holds, so `rangeSpec` computes the offset
+against the plot area and hands it to `Plot.frame({ anchor: "top", insetTop })`, whose top edge is
+drawn at `marginTop + insetTop` by definition. It carries no text: a 14px row has nowhere to put a
+sentence, so the sentence goes in the legend.
+
+`bandsAgainstFigures` is the staleness leg, and it holds four positions rather than a census: both
+values of both end rows, every marker, and the aggregate. It also refuses a band that names nothing
+its source cannot see — `SeriesChart.astro`'s `unreachedSays` exists because the spread's phrase
+presumes a census table ("not in any count above") and a band chart's absences are floors the
+source has no column for, which is a different sentence about the same rule. See #447.
+
 A **grouped** series is the last shape, and it is not a new form: rows carrying a `group` become
 one `barSpec` panel per group, on one scale across the set, which is what makes a monotonicity
 readable from panel to panel rather than only within one. The scale is shared inside a set and

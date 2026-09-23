@@ -183,6 +183,48 @@ fn a_pupil_figure_is_measured_rather_than_counted() {
     );
 }
 
+/// A staffing figure is a share of a person's time, and is compared to the hundredth.
+///
+/// The sibling of the test above, on the unit that arrived with #447, and it needs to be a sibling
+/// rather than a branch because `Unit::Pupils`'s first assertion is wrong here. A pupil count is
+/// never whole, so a whole pin is proof that unit is misapplied. An FTE position count very often
+/// is whole — the largest sixth of districts employ thirty-nine administrators, and thirty-nine is
+/// thirty-nine — so what marks this unit out is not the fraction but the *tolerance*. Both sides
+/// of the comparison are stated to the hundredth, one by the District Profile Report and one by a
+/// division that divides an ADM by a ratio, so an exact comparison would be pinning the last bit
+/// of a quotient and a loose one would stop pinning the build-up at all.
+#[test]
+fn a_position_is_an_fte_rather_than_a_head() {
+    /// Half a step of the hundredth the report states, which is the grain both sides share.
+    const TOLERANCE_CEILING: f64 = 0.01;
+
+    let mut seen = 0;
+    for f in FIGURES {
+        if f.unit != Unit::Positions {
+            continue;
+        }
+        seen += 1;
+        assert!(
+            f.tolerance > 0.0 && f.tolerance <= TOLERANCE_CEILING,
+            "{}: a position figure with a tolerance of {} \u{2014} zero makes it a count of \
+             heads, and past {TOLERANCE_CEILING} it stops pinning the hundredth both sides are \
+             stated to",
+            f.key,
+            f.tolerance
+        );
+        assert!(
+            f.pinned > 0.0,
+            "{}: pinned at {}, and no division of R.C. 3317.011 funds a negative position count",
+            f.key,
+            f.pinned
+        );
+    }
+    assert_eq!(
+        seen, 4,
+        "the ends of #447's band chart are four position figures; {seen} found"
+    );
+}
+
 /// Keys are unique, and each names the directory of the crate that owns it.
 ///
 /// The prefix is not decoration. It is what lets the consumer report "this node cites
