@@ -1567,18 +1567,41 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 .chart-at[data-at="panel"] { display: block; }
 
 /*
- * A cloud's panels, laid out against each other.
+ * A set of panels, laid out against each other.
  *
  * Side by side where the card can hold two — the finding these were built for *is* the comparison,
  * and "the left cloud lies on the diagonal and the right one lies flat" is a sentence about two
- * things a reader is looking at together. `flex-wrap` stacks them below that, which is the only
- * thing a phone column can do with them, and the shared scale means stacked panels still compare
- * correctly; they just compare one after the other.
+ * things a reader is looking at together. They stack below that, which is the only thing a phone
+ * column can do with them, and the shared scale means stacked panels still compare correctly;
+ * they just compare one after the other.
+ *
+ * # Why a grid rather than wrapped flex
+ *
+ * This was `flex: 1 1 280px`, which is the same layout for two panels and a **broken** one for an
+ * odd number of them. `flex-grow` is per row, so the last panel of seven sits alone on the fourth
+ * row and grows to the full card — 804px against the 393 its six siblings get. The SVG is
+ * `width: 100%` over a `viewBox`, so it does not draw bigger, it is *scaled* bigger: #444's
+ * seventh panel came out at 2.58× with its 10px axis type rendered at 26px, beside six panels at
+ * 1.26×. A reader sees one enormous panel and six normal ones and reads the big one as broken.
+ *
+ * `auto-fill` is what fixes it, and the word matters: it keeps the empty track at the end of a
+ * short row, where `auto-fit` would collapse it and hand the space back to the lone panel —
+ * exactly the bug again. The one panel that *should* fill the card is the one with no siblings,
+ * and that is said directly below rather than left to a growth factor to infer.
+ *
+ * 280px rather than the 311 a panel is drawn at: a pair that cannot quite fit should stack, and
+ * one that fits with a little shrinking should not. It is the same number as `PANEL_MIN` in
+ * `plot/spec.ts`, which is how `panelWidth` predicts the column count this rule produces; the two
+ * have to move together.
  */
-.panels { display: flex; flex-wrap: wrap; gap: var(--space-6); }
-/* 280px rather than the 311 a panel is drawn at: a pair that cannot quite fit should
-   stack, and one that fits with a little shrinking should not. */
-.panel { flex: 1 1 280px; min-width: 0; }
+.panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: var(--space-6);
+}
+.panel { min-width: 0; }
+/* A drawing with no siblings is not a small multiple: it takes the card, as it did before. */
+.panel:only-child { grid-column: 1 / -1; }
 .panel-label { margin: 0; font-size: var(--text-sm); color: var(--text-muted); }
 
 /*

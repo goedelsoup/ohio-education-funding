@@ -621,3 +621,27 @@ test("a shared scale is the same scale: two panels of one set draw a value at on
   // And the shared domain spans both signs, because one of the seven runs negative.
   expect(of(small)).toEqual([-83.51, 166.55]);
 });
+
+test("a set shares its frame as well as its domain, so a labelled panel keeps its siblings' zero", () => {
+  /*
+   * The domain being equal is not enough. The right gutter is sized to the direct labels a panel
+   * carries, and in #444's set exactly one panel carries any — the inert rule, which prints its
+   * zeros because it has no bars to print them on. That panel's frame came out ten pixels
+   * narrower than the six beside it, which moves every pixel inside it, the zero rule included.
+   */
+  const set = { width: panelWidth(7), max: 166.55, min: -83.51, labelChars: 2 };
+  const drawn: Bar[] = [{ label: "Least wealthy", value: 166.55, hover: "a" }];
+  const zeros: Bar[] = [{ label: "Least wealthy", value: 0, direct: "$0", hover: "b" }];
+  const frame = (spec: Spec) => [spec.options.marginLeft, spec.options.marginRight];
+  expect(frame(barSpec(zeros, set))).toEqual(frame(barSpec(drawn, set)));
+  // And the option is doing the work: left to its own labels the panel reserves room the others
+  // have not, which is the fault itself.
+  const { labelChars: _shared, ...own } = set;
+  expect(barSpec(zeros, own).options.marginRight).not.toBe(
+    barSpec(drawn, own).options.marginRight,
+  );
+  // A chart that is not part of a set still sizes its own gutter, which is every other caller.
+  expect(barSpec(drawn, { width: WIDTHS.wide }).options.marginRight).toBe(
+    barSpec(zeros, { width: WIDTHS.wide, labelChars: 0 }).options.marginRight,
+  );
+});

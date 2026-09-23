@@ -865,3 +865,47 @@ test("the committed panels are grouped seven ways and scaled once per axis", () 
   // precisely so that the scale cannot be shared — asserted here so a later merge cannot.
   expect(scales[0]).not.toBe(scales[1]);
 });
+
+test("a panel with nothing in it prints its zeros, and the set reserves the room for them", () => {
+  const { series } = fixture();
+  const rows = series.series[0]!.rows;
+  series.series[0]!.rows = [
+    { ...rows[0]!, group: "Does something", label: "Least wealthy", value: 166.55 },
+    { ...rows[1]!, group: "Does something", label: "Wealthiest", value: -83.51 },
+    { ...rows[2]!, group: "Does nothing", label: "Least wealthy", value: 0 },
+  ];
+  series.series[0]!.unit = "dollars";
+  const multiples = multiplesOf(series.series[0]!)!;
+  // The panel that draws bars is not labelled: the bars carry the quantity, and a number on every
+  // mark is what `Bar.direct` warns against.
+  expect(multiples.panels[0]!.bars.map((bar) => bar.direct)).toEqual([undefined, undefined]);
+  // The panel that draws nothing is, because otherwise it draws row names against a zero rule and
+  // reads as a chart that failed to render — which is exactly how #444's two inert rules shipped.
+  expect(multiples.panels[1]!.bars.map((bar) => bar.direct)).toEqual(["$0"]);
+  // And the room those labels want belongs to the set, not to the panel carrying them: a panel
+  // with a narrower frame than its siblings draws zero at a different pixel. See `barSpec`.
+  expect(multiples.labelChars).toBe(2);
+});
+
+test("the two inert anchor rules are labelled on both axes, and only they are", () => {
+  for (const key of [
+    "project/what-each-anchor-rule-pays-by-wealth",
+    "project/what-each-anchor-rule-pays-by-disadvantaged-share",
+  ]) {
+    const multiples = multiplesOf(manifest.series.find((s) => s.key === key)!)!;
+    const labelled = multiples.panels
+      .filter((panel) => panel.bars.some((bar) => bar.direct != null))
+      .map((panel) => panel.label);
+    // `A dated phase-down` pays nothing to any fifth on either axis — the rule is dated out before
+    // the year the panel measures — and a panel of five zeros has no ink of its own to show it.
+    expect(labelled, key).toEqual(["A dated phase-down"]);
+    for (const panel of multiples.panels) {
+      const zeroed = panel.bars.every((bar) => bar.value === 0);
+      expect(
+        panel.bars.every((bar) => (bar.direct != null) === zeroed),
+        `${key} — ${panel.label} labels some bars and not others`,
+      ).toBe(true);
+    }
+    expect(multiples.labelChars).toBe(2);
+  }
+});

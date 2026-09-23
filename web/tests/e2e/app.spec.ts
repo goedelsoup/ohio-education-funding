@@ -1513,6 +1513,84 @@ test.describe("charts on a phone", () => {
 });
 
 /*
+ * A set of panels, and the one that is alone on its row.
+ *
+ * Every drawing on this site is an SVG at `width: 100%` over a fixed `viewBox`, so the layout does
+ * not decide how large a chart is drawn — it decides what that drawing is *scaled by*, and the
+ * type scales with it. `.panels` was wrapped flex with `flex: 1 1 280px`, which grows per row: the
+ * seventh panel of #444's small multiples sat alone on the fourth row and took the whole card,
+ * 804px of it against the 311 it was drawn at, while its six siblings sat at 393. It arrived as
+ * one enormous panel with 26px type beside six normal ones, and the rule it was drawing does
+ * nothing, so it had no bars either. It read exactly like a chart that had failed to render, and
+ * that is how it was reported.
+ *
+ * Nothing in the unit tests can see this: `panelWidth` is asserted there and it was right. The
+ * fault is entirely in how the page lays the drawing out, so it is measured on the page.
+ */
+test.describe("panels laid out against each other", () => {
+  // The node that draws seven of them — an odd number, which is what it takes to leave one alone
+  // on the last row. A set of two or six would have passed the whole time.
+  const PANELLED = "/wiki/formula-component/temporary-transitional-aid-guarantee";
+
+  /** Each set of panels on the page, as the widths its visible drawings are painted at. */
+  const sets = (page: Page) =>
+    page.evaluate(() =>
+      [...document.querySelectorAll(".panels")].map((set) => ({
+        key: set.closest("[data-series]")?.getAttribute("data-series") ?? "unnamed",
+        panels: [...set.querySelectorAll("svg.plot")]
+          // One of the two drawings is `display: none` at any width — see `renderToString`.
+          .filter((svg) => svg.getClientRects().length > 0)
+          .map((svg) => ({
+            width: Math.round(svg.getBoundingClientRect().width),
+            drawn: (svg as SVGSVGElement).viewBox.baseVal.width,
+          })),
+      })),
+    );
+
+  test("every panel of a set is painted at the width of every other", async ({ page }) => {
+    for (const width of [1440, 1024, 768, 420]) {
+      await page.setViewportSize({ width, height: 1200 });
+      await page.goto(PANELLED);
+      const drawn = await sets(page);
+      // A set of one is a chart with a heading on it — the plane on this same node is drawn
+      // through the same component — so what is asserted below has to have a set with siblings
+      // in it to be asserting anything.
+      expect(
+        drawn.filter((set) => set.panels.length > 1).length,
+        `${width}px draws no set of more than one panel`,
+      ).toBeGreaterThan(0);
+      for (const set of drawn) {
+        // Exactly equal, not nearly: the panels of a set share a scale, and two panels of one set
+        // scaled differently draw the same dollar at two lengths.
+        expect(
+          [...new Set(set.panels.map((panel) => panel.width))],
+          `${set.key} at ${width}px paints its panels at different widths`,
+        ).toHaveLength(1);
+      }
+    }
+  });
+
+  test("no panel is blown up to fill a row it is alone on", async ({ page }) => {
+    for (const width of [1440, 1024, 768, 420]) {
+      await page.setViewportSize({ width, height: 1200 });
+      await page.goto(PANELLED);
+      for (const set of await sets(page)) {
+        for (const panel of set.panels) {
+          // 1.4 leaves room for the ordinary case — a panel drawn at 311 in a 393px column is
+          // 1.26 — and is nowhere near the 2.58 the stretched one arrived at. The ceiling is on
+          // the scale factor rather than on the type size because it is the scale factor that the
+          // layout chooses; the type only follows it.
+          expect(
+            panel.width / panel.drawn,
+            `${set.key} at ${width}px: a panel drawn at ${panel.drawn} is painted at ${panel.width}`,
+          ).toBeLessThan(1.4);
+        }
+      }
+    }
+  });
+});
+
+/*
  * The tables that run off the side of a phone.
  *
  * `.scroll` is `overflow-x: auto` and was nothing else: 14,767 boxes in the build, almost all

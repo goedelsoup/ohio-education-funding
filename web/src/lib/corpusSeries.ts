@@ -424,12 +424,26 @@ export interface SeriesMultiple {
  * documents so that "scale per axis" is structural rather than a caller's discipline, and the
  * prose that draws them says the scales differ.
  *
+ * # The panel where every bar is zero
+ *
+ * One of the seven anchor rules does nothing at all, on either axis, so each of the two sets has a
+ * panel of five zeros in it: five row names against a zero rule and no ink whatsoever. That is the
+ * correct picture and it reads as a broken one — the reader's question is *did this fail to
+ * render*, not *is this rule inert* — and the shared scale that makes the other six panels legible
+ * is exactly what guarantees the zeros have nowhere to show.
+ *
+ * So a panel whose every bar is zero direct-labels all of them. `Bar.direct` says never a number
+ * on every mark, and that rule is about a chart where the bars already carry the quantity; here
+ * there are no bars, so the number is the only thing the panel has to say. It is the one panel in
+ * a set that can want this, because a panel with a single non-zero bar draws that bar and the
+ * emptiness beside it is then a comparison rather than an absence.
+ *
  * `null` where any row carries no group: a multiple of one panel is a bar chart with a heading on
  * it, and the route draws that with {@link barsOf} instead.
  */
 export function multiplesOf(
   series: ManifestSeries,
-): { panels: SeriesMultiple[]; max: number; min: number } | null {
+): { panels: SeriesMultiple[]; max: number; min: number; labelChars: number } | null {
   if (series.rows.length === 0 || series.rows.some((row) => row.group === undefined)) return null;
   const panels: SeriesMultiple[] = [];
   for (const row of series.rows) {
@@ -447,10 +461,19 @@ export function multiplesOf(
       hover: row.hover ?? `${label} — ${row.label}: ${formatRow(series.unit, row.value)}`,
     });
   }
+  for (const panel of panels) {
+    if (panel.bars.every((bar) => bar.value === 0)) {
+      for (const bar of panel.bars) bar.direct = formatRow(series.unit, bar.value);
+    }
+  }
   return {
     panels,
     max: Math.max(...series.rows.map((row) => Math.abs(row.value)), 1),
     min: Math.min(0, ...series.rows.map((row) => row.value)),
+    // Part of the shared scale rather than a detail of the panels that happen to carry a label:
+    // a panel reserving label room its siblings do not draws zero at a different pixel from
+    // theirs. See `barSpec`'s `labelChars`.
+    labelChars: Math.max(0, ...panels.flatMap((p) => p.bars.map((b) => b.direct?.length ?? 0))),
   };
 }
 

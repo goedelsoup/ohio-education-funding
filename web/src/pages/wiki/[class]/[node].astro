@@ -144,7 +144,13 @@ const charts = node.series.map((binding) => {
       panels: multiples.panels.map((panel) => ({
         label: panel.label,
         html: renderPanelToString(
-          () => barSpec(panel.bars, { width, max: multiples.max, min: multiples.min }),
+          () =>
+            barSpec(panel.bars, {
+              width,
+              max: multiples.max,
+              min: multiples.min,
+              labelChars: multiples.labelChars,
+            }),
           { label: `${series!.label} — ${panel.label}` },
           width,
         ),

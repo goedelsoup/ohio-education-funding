@@ -486,7 +486,7 @@ function axisFoot(options: {
  */
 export function barSpec(
   bars: Bar[],
-  options: { width: number; max?: number; min?: number },
+  options: { width: number; max?: number; min?: number; labelChars?: number },
 ): Spec {
   const { width } = options;
   const max = options.max ?? Math.max(...bars.map((b) => Math.abs(b.value)), 1);
@@ -513,7 +513,18 @@ export function barSpec(
   // A direct label on a negative bar is written leftwards from the bar's end, so the domain gets
   // room for it rather than letting it collide with the category names outside the frame.
   const floor = signed ? lowest - (negativeLabelled.length > 0 ? (max - lowest) * 0.08 : 0) : 0;
-  const longest = Math.max(0, ...bars.map((b) => b.direct?.length ?? 0));
+  /*
+   * How much room the direct labels get at the right — this chart's own longest, or the set's.
+   *
+   * A set of panels shares a scale, and a scale is a domain *and* a frame. The right gutter is
+   * sized to the labels a panel actually carries, so a panel that direct-labels its rows when its
+   * siblings do not gets ten pixels less frame than they do, and everything inside it — the zero
+   * rule most visibly — lands at a different pixel from the same value in the panel beside it.
+   * The baselines of panels drawn side by side then fail to line up, which is the one thing the
+   * shared scale exists to guarantee. So a caller drawing a set passes the widest label anywhere
+   * in the set and every panel reserves the same room, whether it has a label in it or not.
+   */
+  const longest = options.labelChars ?? Math.max(0, ...bars.map((b) => b.direct?.length ?? 0));
   // Sized to the longest category name, as the right gutter is sized to the longest direct label.
   // This was a fixed 160, which silently clipped anything longer — "Building leadership and
   // operation" rendered as "g leadership and operation", which reads as a rendering fault rather
