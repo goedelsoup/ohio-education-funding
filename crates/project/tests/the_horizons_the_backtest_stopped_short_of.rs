@@ -2,20 +2,21 @@
 //!
 //! [`the_floor_the_interval_rests_on`] fitted [`series::HORIZON_EXPONENT`] over horizons one to
 //! five and said that five years *"is as far as six origins across fifteen surveyed years will
-//! reach"*. That sentence is wrong, and it is wrong about the file's own constants: `ORIGINS`
-//! carries FY2013, and FY2013 plus eleven is FY2024. The five-year ceiling was a **choice**, not
-//! the panel's limit, and it was the choice that left the feed's ten-year horizon extrapolated.
+//! reach"*. That sentence is wrong, and it is wrong about the file's own constants: that file's
+//! `ORIGINS` carries FY2013, and FY2013 plus eleven is FY2024. The five-year ceiling was a
+//! **choice**, not the panel's limit, and it was the choice that left the feed's ten-year horizon
+//! extrapolated.
 //!
 //! # The panel reaches thirteen years, and two more origins were sitting in it
 //!
-//! `ORIGINS` starts at FY2013 because a production caller fits on three observations, and the
-//! panel starts at FY2009 — so FY2011 and FY2012 are origins too. Eight origins rather than six,
+//! `FITTED_ORIGINS` starts at FY2013 because a production caller fits on three observations, and
+//! the panel starts at FY2009 — so FY2011 and FY2012 are origins too. Eight origins rather than six,
 //! and **thirteen years** rather than five:
 //!
 //! | | origins | deepest horizon |
 //! |---|--:|--:|
-//! | `ORIGINS` as the fit used them | 6 | **11** |
-//! | with FY2011 and FY2012 added | **8** | **13** |
+//! | `FITTED_ORIGINS`, as the fit used them | 6 | **11** |
+//! | [`backtest::ORIGINS`], with FY2011 and FY2012 added | **8** | **13** |
 //!
 //! # The exponent holds the whole way, across districts
 //!
@@ -120,19 +121,16 @@
 //! it. Nine years is the deepest horizon with two origins on the pre-closure set and eight is the
 //! deepest with two that do not share a target.
 //!
+//! [`backtest::ORIGINS`]: project::backtest::ORIGINS
 //! [`the_floor_the_interval_rests_on`]: ./the_floor_the_interval_rests_on.rs
 //! [`the-widening-rule`]: ../../../.yidam/decisions/the-widening-rule.yml
 
-use dispersion::ohio_panel::{self, PanelRow};
-use edfund_core::FiscalYear;
-use project::series::{self, Method, Observation, Prior, ONE_SIGMA};
-use project::{panel, report};
-use std::collections::BTreeMap;
-
-/// Every fiscal year the panel carries, oldest first. FY2014 is absent from the archive.
-const PANEL_YEARS: [u16; 15] = [
-    2009, 2010, 2011, 2012, 2013, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024,
-];
+use project::backtest::{
+    complete_histories, coverage, deepest_horizon, dispersion_exponent, errors_by_origin, mean,
+    observed_to, pooled, prior, profile, within_origin, Held, BEFORE_THE_CLOSURE, DEEPEST_HORIZON,
+    NOMINAL_ONE_SIGMA_COVERAGE, ORIGINS, SCORED_DAMPING, SCORED_WEIGHT,
+};
+use project::series;
 
 /// The origins the exponent was fitted over, pinned rather than imported.
 ///
@@ -141,212 +139,8 @@ const PANEL_YEARS: [u16; 15] = [
 /// whatever that file later decides, which is the one thing it must not do.
 const FITTED_ORIGINS: [u16; 6] = [2013, 2015, 2016, 2017, 2018, 2019];
 
-/// The same, plus the two the panel's first three years already support.
-///
-/// A production caller fits on three observations. The panel starts at FY2009, so FY2011 is the
-/// first year one can be assembled for, and FY2011 and FY2012 are origins the fit did not use.
-const EVERY_ORIGIN: [u16; 8] = [2011, 2012, 2013, 2015, 2016, 2017, 2018, 2019];
-
-/// Targets no method is scored on: the year enrolment fell 54,777 in one step, and the rebound.
-const PANDEMIC: [u16; 2] = [2021, 2022];
-
-/// The last target year reachable without the forecast spanning the closure.
-///
-/// FY2020's count is taken in October 2019. `PANDEMIC` keeps a forecast from *landing* on the
-/// shutdown; this keeps one from crossing it, which is a different exclusion and the one the
-/// long horizons turn on.
-const BEFORE_THE_CLOSURE: u16 = 2020;
-
-/// The damping and shrink weight these figures were measured at, pinned rather than imported.
-///
-/// The same reasoning as `THE_CONVENTION` in `the_damping_nobody_fitted`: a file that followed
-/// the constants would turn a finding about the shipped method into a tautology about whatever
-/// ships.
-const SHIPPING_DAMPING: f64 = 0.30;
-const SHIPPING_WEIGHT: f64 = 0.30;
-
-/// The fraction of a normal distribution inside ±1σ, which is what the band claims to draw.
-const NORMAL_ONE_SIGMA_COVERAGE: f64 = 0.683;
-
-/// One district's enrolment history, keyed by fiscal year.
-type History = BTreeMap<u16, f64>;
-
-/// Districts with an observation in every year of the panel, keyed on `LEAID`.
-fn complete_histories() -> Vec<History> {
-    let mut by_district: BTreeMap<String, History> = BTreeMap::new();
-    for row in ohio_panel::panel()
-        .into_iter()
-        .filter(|r: &PanelRow| r.comparable)
-    {
-        if row.enrollment > 0.0 {
-            by_district
-                .entry(row.leaid.clone())
-                .or_default()
-                .insert(row.fiscal_year, row.enrollment);
-        }
-    }
-    by_district
-        .into_values()
-        .filter(|h| PANEL_YEARS.iter().all(|y| h.contains_key(y)))
-        .collect()
-}
-
-fn compound_rate(from: f64, to: f64, years: f64) -> f64 {
-    if from <= 0.0 || to <= 0.0 || years <= 0.0 {
-        return 0.0;
-    }
-    (to / from).powf(1.0 / years) - 1.0
-}
-
-/// The long-run rate as of `origin` — computed from panel start to the origin only.
-fn long_run_to(history: &History, origin: u16) -> f64 {
-    let years: Vec<u16> = PANEL_YEARS
-        .iter()
-        .copied()
-        .filter(|y| *y <= origin)
-        .collect();
-    let (first, last) = (years[0], *years.last().expect("an origin is in the panel"));
-    compound_rate(history[&first], history[&last], f64::from(last - first))
-}
-
-/// The three observations a production caller fits on, as of `origin`.
-fn observed_to(history: &History, origin: u16) -> Vec<Observation> {
-    let mut observed: Vec<Observation> = PANEL_YEARS
-        .iter()
-        .filter(|y| **y <= origin)
-        .filter_map(|y| {
-            history.get(y).map(|value| Observation {
-                fiscal_year: FiscalYear(*y),
-                value: *value,
-            })
-        })
-        .collect();
-    let drop = observed.len().saturating_sub(3);
-    observed.drain(..drop);
-    observed
-}
-
-/// The shipped method, fitted as of `origin` so no rate has seen its own target.
-fn method(history: &History, origin: u16) -> Method {
-    Method::Shrunk {
-        rate: 0.0,
-        damping: SHIPPING_DAMPING,
-        weight: SHIPPING_WEIGHT,
-        toward: long_run_to(history, origin),
-    }
-}
-
-/// Whether a forecast from `origin` at `horizon` is scored at all.
-fn scored(origin: u16, horizon: u16, latest_target: u16) -> Option<u16> {
-    let target = origin + horizon;
-    (target <= latest_target && PANEL_YEARS.contains(&target) && !PANDEMIC.contains(&target))
-        .then_some(target)
-}
-
-/// Log forecast errors at one horizon, grouped by the origin that produced them.
-///
-/// Grouped rather than pooled because the grouping is the finding: a pooled standard deviation
-/// cannot tell a band that is the wrong width from a set of origins that disagree about the
-/// level, and at these horizons it is always the second.
-fn errors_by_origin(
-    histories: &[History],
-    origins: &[u16],
-    horizon: u16,
-    latest_target: u16,
-) -> Vec<(u16, Vec<f64>)> {
-    let mut out = Vec::new();
-    for origin in origins {
-        let Some(target) = scored(*origin, horizon, latest_target) else {
-            continue;
-        };
-        let errors: Vec<f64> = histories
-            .iter()
-            .filter_map(|history| {
-                let actual = history.get(&target)?;
-                let point = series::project(
-                    &observed_to(history, *origin),
-                    FiscalYear(target),
-                    method(history, *origin),
-                    Prior::none(),
-                )
-                .into_iter()
-                .find(|p| p.fiscal_year == FiscalYear(target))?
-                .point;
-                Some((point / actual).ln())
-            })
-            .collect();
-        if errors.len() > 1 {
-            out.push((*origin, errors));
-        }
-    }
-    out
-}
-
-/// Every error at one horizon, origins pooled.
-fn pooled(groups: &[(u16, Vec<f64>)]) -> Vec<f64> {
-    groups.iter().flat_map(|(_, e)| e.iter().copied()).collect()
-}
-
-/// The same errors with each origin's own mean removed — the cross-district component alone.
-fn within_origin(groups: &[(u16, Vec<f64>)]) -> Vec<f64> {
-    groups
-        .iter()
-        .flat_map(|(_, errors)| {
-            let m = mean(errors);
-            errors.iter().map(move |e| e - m)
-        })
-        .collect()
-}
-
-fn mean(values: &[f64]) -> f64 {
-    values.iter().sum::<f64>() / values.len() as f64
-}
-
-/// Sample standard deviation.
-fn stdev(values: &[f64]) -> f64 {
-    let m = mean(values);
-    let n = values.len() as f64;
-    (values.iter().map(|v| (v - m).powi(2)).sum::<f64>() / (n - 1.0)).sqrt()
-}
-
-/// The share of errors a band of `width` holds.
-fn coverage(errors: &[f64], width: f64) -> f64 {
-    errors.iter().filter(|e| e.abs() <= width).count() as f64 / errors.len() as f64
-}
-
-/// The production prior, taken from the path the feed takes.
-fn prior() -> Prior {
-    report::enrollment_growth_prior(&panel::panel(), ONE_SIGMA)
-}
-
-/// The deepest horizon a set of origins scores at least one forecast at.
-fn deepest_horizon(origins: &[u16], latest_target: u16) -> u16 {
-    (1..=20u16)
-        .filter(|h| {
-            origins
-                .iter()
-                .any(|o| scored(*o, *h, latest_target).is_some())
-        })
-        .max()
-        .expect("at least one horizon is scored")
-}
-
-/// The exponent that best fits the dispersion over `1..=deepest`, by least squares on the logs.
-fn dispersion_exponent(histories: &[History], origins: &[u16], deepest: u16, cap: u16) -> f64 {
-    let points: Vec<(f64, f64)> = (1..=deepest)
-        .filter_map(|h| {
-            let errors = pooled(&errors_by_origin(histories, origins, h, cap));
-            (errors.len() > 1).then(|| (f64::from(h).ln(), stdev(&errors).ln()))
-        })
-        .collect();
-    let (xs, ys): (Vec<f64>, Vec<f64>) = points.iter().copied().unzip();
-    let (mx, my) = (mean(&xs), mean(&ys));
-    xs.iter()
-        .zip(&ys)
-        .map(|(x, y)| (x - mx) * (y - my))
-        .sum::<f64>()
-        / xs.iter().map(|x| (x - mx).powi(2)).sum::<f64>()
-}
+/// The last target year the panel carries, which is the cap every unrestricted claim here uses.
+const LATEST_TARGET: u16 = 2024;
 
 /// The five-year ceiling was the file's own choice: `ORIGINS` reaches eleven years, not five.
 ///
@@ -356,12 +150,12 @@ fn dispersion_exponent(histories: &[History], origins: &[u16], deepest: u16, cap
 #[test]
 fn the_fitted_origins_already_reached_eleven_years_and_two_more_reach_thirteen() {
     assert_eq!(
-        deepest_horizon(&FITTED_ORIGINS, 2024),
+        deepest_horizon(&FITTED_ORIGINS, LATEST_TARGET),
         11,
         "the six origins the exponent was fitted over reach eleven years, not five"
     );
     assert_eq!(
-        deepest_horizon(&EVERY_ORIGIN, 2024),
+        deepest_horizon(&ORIGINS, LATEST_TARGET),
         13,
         "adding FY2011 and FY2012 — both of which have three observations behind them — reaches \
          thirteen"
@@ -387,7 +181,7 @@ fn the_shipped_exponent_holds_the_cross_district_spread_out_to_thirteen_years() 
     let prior = prior();
     let held: Vec<f64> = (1..=13u16)
         .map(|h| {
-            let groups = errors_by_origin(&histories, &EVERY_ORIGIN, h, 2024);
+            let groups = errors_by_origin(&histories, &ORIGINS, h, LATEST_TARGET);
             coverage(&within_origin(&groups), prior.spread(h))
         })
         .collect();
@@ -395,12 +189,12 @@ fn the_shipped_exponent_holds_the_cross_district_spread_out_to_thirteen_years() 
 
     let worst = held
         .iter()
-        .map(|c| (c - NORMAL_ONE_SIGMA_COVERAGE).abs())
+        .map(|c| (c - NOMINAL_ONE_SIGMA_COVERAGE).abs())
         .fold(0.0f64, f64::max);
     assert!(
         worst < 0.032,
         "the cross-district coverage should stay within three points of \
-         {NORMAL_ONE_SIGMA_COVERAGE} at every horizon; worst is {:.1} points, from {held:?}",
+         {NOMINAL_ONE_SIGMA_COVERAGE} at every horizon; worst is {:.1} points, from {held:?}",
         worst * 100.0
     );
     assert!(
@@ -428,7 +222,7 @@ fn pooled_coverage_sinks_to_sixty_percent_and_de_meaning_puts_all_of_it_back() {
     let histories = complete_histories();
     let prior = prior();
     let at = |h: u16| {
-        let groups = errors_by_origin(&histories, &EVERY_ORIGIN, h, 2024);
+        let groups = errors_by_origin(&histories, &ORIGINS, h, LATEST_TARGET);
         (
             coverage(&pooled(&groups), prior.spread(h)),
             coverage(&within_origin(&groups), prior.spread(h)),
@@ -460,7 +254,7 @@ fn pooled_coverage_sinks_to_sixty_percent_and_de_meaning_puts_all_of_it_back() {
 #[test]
 fn the_origin_effect_is_the_closure_and_nothing_else() {
     let histories = complete_histories();
-    let groups = errors_by_origin(&histories, &EVERY_ORIGIN, 5, 2024);
+    let groups = errors_by_origin(&histories, &ORIGINS, 5, LATEST_TARGET);
     let means: Vec<(u16, f64)> = groups
         .iter()
         .map(|(origin, errors)| (origin + 5, mean(errors)))
@@ -501,19 +295,19 @@ fn before_the_closure_the_pooled_band_holds_to_nine_years() {
     let histories = complete_histories();
     let prior = prior();
     assert_eq!(
-        deepest_horizon(&EVERY_ORIGIN, BEFORE_THE_CLOSURE),
+        deepest_horizon(&ORIGINS, BEFORE_THE_CLOSURE),
         9,
         "FY2011 to FY2020 is the deepest pre-closure span the panel carries"
     );
     let held: Vec<f64> = (1..=9u16)
         .map(|h| {
-            let groups = errors_by_origin(&histories, &EVERY_ORIGIN, h, BEFORE_THE_CLOSURE);
+            let groups = errors_by_origin(&histories, &ORIGINS, h, BEFORE_THE_CLOSURE);
             coverage(&pooled(&groups), prior.spread(h))
         })
         .collect();
     let worst = held
         .iter()
-        .map(|c| (c - NORMAL_ONE_SIGMA_COVERAGE).abs())
+        .map(|c| (c - NOMINAL_ONE_SIGMA_COVERAGE).abs())
         .fold(0.0f64, f64::max);
     assert!(
         worst < 0.04,
@@ -532,27 +326,20 @@ fn before_the_closure_the_pooled_band_holds_to_nine_years() {
 #[test]
 fn the_bias_keeps_growing_and_the_closure_doubles_its_rate() {
     let histories = complete_histories();
-    let bias = |h: u16, cap: u16| {
-        mean(&pooled(&errors_by_origin(
-            &histories,
-            &EVERY_ORIGIN,
-            h,
-            cap,
-        )))
-    };
+    let bias = |h: u16, cap: u16| mean(&pooled(&errors_by_origin(&histories, &ORIGINS, h, cap)));
 
     let clean_nine = bias(9, BEFORE_THE_CLOSURE);
     assert!(
         (clean_nine - 0.0272).abs() < 0.004,
         "pre-closure the nine-year bias should be about +0.027, is {clean_nine:+.4}"
     );
-    let spanning_ten = bias(10, 2024);
+    let spanning_ten = bias(10, LATEST_TARGET);
     assert!(
         (spanning_ten - 0.0562).abs() < 0.006,
         "at the feed's ten-year horizon it is about +0.056 — the point sits some 5.8% high — \
          is {spanning_ten:+.4}"
     );
-    let spanning_thirteen = bias(13, 2024);
+    let spanning_thirteen = bias(13, LATEST_TARGET);
     assert!(
         spanning_thirteen > spanning_ten,
         "and it is still growing at thirteen: {spanning_ten:+.4} then {spanning_thirteen:+.4}"
@@ -577,7 +364,7 @@ fn the_dispersion_exponent_climbs_with_the_range_it_is_measured_over() {
     let histories = complete_histories();
     let clean: Vec<f64> = [5u16, 7, 9]
         .iter()
-        .map(|d| dispersion_exponent(&histories, &EVERY_ORIGIN, *d, BEFORE_THE_CLOSURE))
+        .map(|d| dispersion_exponent(&histories, &ORIGINS, *d, BEFORE_THE_CLOSURE))
         .collect();
     for pair in clean.windows(2) {
         assert!(
@@ -591,7 +378,7 @@ fn the_dispersion_exponent_climbs_with_the_range_it_is_measured_over() {
         (clean[0] - 0.573).abs() < 0.02 && (clean[2] - 0.623).abs() < 0.02,
         "over one to five and one to nine it should be about 0.573 and 0.623, is {clean:?}"
     );
-    let everything = dispersion_exponent(&histories, &EVERY_ORIGIN, 13, 2024);
+    let everything = dispersion_exponent(&histories, &ORIGINS, 13, LATEST_TARGET);
     assert!(
         (everything - 0.650).abs() < 0.02,
         "and over the whole reach about 0.650, is {everything:.3}"
@@ -615,7 +402,7 @@ fn the_coverage_fit_over_nine_clean_years_returns_the_exponent_that_ships() {
         .map(|h| {
             pooled(&errors_by_origin(
                 &histories,
-                &EVERY_ORIGIN,
+                &ORIGINS,
                 h,
                 BEFORE_THE_CLOSURE,
             ))
@@ -629,7 +416,7 @@ fn the_coverage_fit_over_nine_clean_years_returns_the_exponent_that_ships() {
             .map(|(i, e)| {
                 let horizon = u16::try_from(i + 1).expect("nine horizons fit in a u16");
                 let width = prior.z * prior.sigma * f64::from(horizon).powf(exponent);
-                (coverage(e, width) - NORMAL_ONE_SIGMA_COVERAGE).abs()
+                (coverage(e, width) - NOMINAL_ONE_SIGMA_COVERAGE).abs()
             })
             .collect()
     };
@@ -669,12 +456,12 @@ fn one_year_coverage_falls_with_the_older_origins_and_the_exponent_cannot_be_why
     let prior = prior();
     let held = |origins: &[u16]| {
         coverage(
-            &pooled(&errors_by_origin(&histories, origins, 1, 2024)),
+            &pooled(&errors_by_origin(&histories, origins, 1, LATEST_TARGET)),
             prior.spread(1),
         )
     };
     let fitted = held(&FITTED_ORIGINS);
-    let every = held(&EVERY_ORIGIN);
+    let every = held(&ORIGINS);
     assert!(
         (fitted - 0.673).abs() < 0.01,
         "the six origins hold 67.3% at one year, hold {fitted:.3}"
@@ -687,4 +474,61 @@ fn one_year_coverage_falls_with_the_older_origins_and_the_exponent_cannot_be_why
         (prior.spread(1) - prior.z * prior.sigma).abs() < 1e-12,
         "and the exponent is not in either figure: the band at one year is z times sigma"
     );
+}
+
+/// The method the profile was scored at is still the method that ships.
+///
+/// [`SCORED_DAMPING`] and [`SCORED_WEIGHT`] are written out in [`project::backtest`] rather than
+/// read from [`series`], so that every number in this file stays a finding about a method rather
+/// than a tautology about whatever the constants currently say. That is only safe while someone
+/// checks; this is the check. When it fails the profile has to be re-run and this file's tables
+/// re-read, not the pins edited to match.
+#[test]
+fn the_constants_the_profile_was_scored_at_are_the_ones_that_ship() {
+    assert!(
+        (SCORED_DAMPING - series::DEFAULT_DAMPING).abs() < f64::EPSILON,
+        "the backtest scored damping {SCORED_DAMPING}, the feed ships {}",
+        series::DEFAULT_DAMPING
+    );
+    assert!(
+        (SCORED_WEIGHT - series::DEFAULT_SHRINK_WEIGHT).abs() < f64::EPSILON,
+        "the backtest scored a shrink weight of {SCORED_WEIGHT}, the feed ships {}",
+        series::DEFAULT_SHRINK_WEIGHT
+    );
+}
+
+/// The profile `/method` draws is this file's table, row for row.
+///
+/// The two columns above were a table in a doc comment that nothing recomputed, quoted in three
+/// places that nothing recomputed either. [`profile`] is the same arithmetic assembled once so a
+/// figure can pin its ends; this asserts the assembly did not change any of it, which is the
+/// whole of what hoisting owed.
+#[test]
+fn the_drawn_profile_is_the_table_this_file_scores() {
+    let drawn = profile(DEEPEST_HORIZON, LATEST_TARGET);
+    assert_eq!(
+        drawn.len(),
+        usize::from(DEEPEST_HORIZON),
+        "one row per horizon to thirteen"
+    );
+
+    let histories = complete_histories();
+    let prior = prior();
+    for Held {
+        horizon,
+        pooled: drawn_pooled,
+        within_origin: drawn_within,
+    } in drawn
+    {
+        let groups = errors_by_origin(&histories, &ORIGINS, horizon, LATEST_TARGET);
+        let width = prior.spread(horizon);
+        assert!(
+            (drawn_pooled - coverage(&pooled(&groups), width)).abs() < f64::EPSILON,
+            "horizon {horizon} pooled"
+        );
+        assert!(
+            (drawn_within - coverage(&within_origin(&groups), width)).abs() < f64::EPSILON,
+            "horizon {horizon} within origin"
+        );
+    }
 }

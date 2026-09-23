@@ -248,10 +248,19 @@ export interface DistributionValue {
   hover: string;
 }
 
-/** One year of a two-series time series. */
+/**
+ * One position of a two-series line chart, and the pair of values there.
+ *
+ * The index is a bare number and is deliberately not called a year. It is a fiscal year on
+ * `/history`, `/appropriations` and `/data`, and a **horizon** on `/method`'s coverage curve — the
+ * form is the same in both cases (two quantities in one unit over one ordered index) and what
+ * differs is only how the ends are written, which the caller supplies. A field called `year`
+ * would have made the one non-year caller read as a bug.
+ */
 export interface SeriesPoint {
-  year: number;
-  /** The first series. `null` is a year the source does not publish — see {@link seriesSpec}. */
+  /** Where on the index this point sits. Ordered, ascending, and evenly spaced. */
+  at: number;
+  /** The first series. `null` is a position the source does not publish — see {@link seriesSpec}. */
   a: number | null;
   /** The second, in the same units. There is no third and no second axis. */
   b: number | null;

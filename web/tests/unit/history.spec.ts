@@ -56,7 +56,7 @@ test("FY2014 is a break in the series rather than a bridge across it", () => {
     (y) => y.local_share,
     (y) => y.state_share,
   );
-  const missing = points.find((p) => p.year === 2014);
+  const missing = points.find((p) => p.at === 2014);
   expect(missing).toBeDefined();
   expect(missing!.a).toBeNull();
   expect(missing!.b).toBeNull();

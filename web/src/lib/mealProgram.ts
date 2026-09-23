@@ -98,12 +98,12 @@ export function basisChange(meal: MealProgramYear[]): number | null {
  * them would be the assertion this whole module refuses to make.
  */
 export function splitByBasis(meal: MealProgramYear[]): {
-  year: number;
+  at: number;
   a: number | null;
   b: number | null;
 }[] {
   return singleStream(meal).map((y) => ({
-    year: y.fiscal_year,
+    at: y.fiscal_year,
     a: y.basis === "adm" ? y.share! * 100 : null,
     b: y.basis === "ce" ? y.share! * 100 : null,
   }));
@@ -130,10 +130,10 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
         (v) => `${v.toFixed(0)}%`,
         (p) => {
           const value = p.a ?? p.b;
-          if (value == null) return `FY${p.year}`;
-          return `FY${p.year}: ${value.toFixed(1)}% ${p.a != null ? "of ADM" : "of CE count"}`;
+          if (value == null) return `FY${p.at}`;
+          return `FY${p.at}: ${value.toFixed(1)}% ${p.a != null ? "of ADM" : "of CE count"}`;
         },
-        { width: w },
+        { width: w, tick: (year) => `FY${year}` },
       ),
   { label: `Free and reduced-price lunch applications approved as a share of meal-program enrollment, FY${first.fiscal_year} to FY${last.fiscal_year}, across every public sponsor in the MR-81`, description: `${change == null ? "" : `Drawn as two unjoined lines because the denominator changes in FY${change}, so the step across it is partly the definition moving`}` },
   );

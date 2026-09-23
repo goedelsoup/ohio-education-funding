@@ -112,6 +112,21 @@ figures. `project/what-each-anchor-rule-costs-on-both-axes` is the first, and wh
 finding no single column carries — three of the seven write less guarantee *and* pay more money,
 and nothing runs the other way. See #444.
 
+A **curve** is the fourth array, and the first whose index is neither a category nor a fiscal
+year. It is two lines over one shared index — #421's backtest, the share of district forecasts
+that fell inside the projection's plus-or-minus one sigma band at every horizon from one year to
+thirteen, pooled across origins and again with each origin's own mean removed — with a
+`Reference` the lines are read for their distance from. Its rule is three figures per line rather
+than two: both ends, because a line is quoted by where it starts and where it finishes, and
+`Departure`, because the claim a curve is drawn for is usually about the whole line and not any
+point on it. That third one is computed rather than declared —
+`the_worst_departure_is_the_worst_one_on_the_drawn_line` refuses a curve whose stated worst point
+is not the worst one on the coordinates it ships, which is the mistake a hand-written maximum
+makes silently. The reference is the one quantity in either document that names no figure at all:
+68.3% is the area under a normal curve inside one standard deviation, which is a definition, and
+`Traces::framed` holds it inside the vertical axis so the distances the lines mean are drawn
+rather than implied. See #421 and #445.
+
 The line is fitted here and nowhere else. `crates/series.json` carries its two **endpoints in the
 data's own units** rather than a slope and an intercept, so no consumer evaluates a model: the web
 layer draws a segment between two points it was given, and `chart.ts`'s standing prohibition on a
@@ -245,16 +260,16 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`deflator`](deflator/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 17 |
 | [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 370 |
 | [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 35 |
-| [`figures`](figures/) | The figures the corpus quotes, computed from the crates that own them | 29 |
+| [`figures`](figures/) | The figures the corpus quotes, computed from the crates that own them | 36 |
 | [`foundation`](foundation/) | Fair School Funding Plan base cost build-up, per R.C. 3317.011 | 58 |
 | [`local-capacity`](local-capacity/) | Fair School Funding Plan local capacity and state share, per R.C. 3317.017 | 27 |
 | [`millage`](millage/) | Effective operating millage under H.B. 920 reduction factors, and 20-mill floor status | 19 |
-| [`project`](project/) | Forward projection of funding inputs, and policy simulation over them | 823 |
+| [`project`](project/) | Forward projection of funding inputs, and policy simulation over them | 825 |
 | [`regime-diff`](regime-diff/) | Difference two funding regimes at component level, with the residual the decomposition does not explain | 51 |
 | [`scenario-delta`](scenario-delta/) | Winners and losers between two funding runs, with incidence and the off-formula count | 37 |
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 79 |
 
-13 crates, 1779 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+13 crates, 1788 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status

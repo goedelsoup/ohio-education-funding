@@ -238,6 +238,35 @@ figures:
     value: 312
     field: findings
     as_written: "under current law, 294 to 312"
+  # The six the coverage curve on /method is read off. The page has no figures: block of its own,
+  # so PAGE_SERIES in web/src/lib/corpusSeries.ts names this node as the one that answers for the
+  # numbers a reader takes off that chart: each line's two ends and its worst departure from the
+  # 68.3% a plus-or-minus one sigma band claims. The 68.3% itself is pinned by nothing and cannot
+  # be — it is the area under a normal curve inside one standard deviation, not a measurement.
+  - key: project/pooled-coverage-at-one-year
+    value: 0.6449928809
+    field: confidence
+    as_written: "**64.5%** held at one year"
+  - key: project/pooled-coverage-at-thirteen-years
+    value: 0.6013289037
+    field: confidence
+    as_written: "**60.1%** at thirteen"
+  - key: project/the-pooled-bands-worst-gap-from-nominal
+    value: 0.0891461794
+    field: confidence
+    as_written: "at its worst **8.9%** of forecasts short of the target at eleven"
+  - key: project/cross-district-coverage-at-one-year
+    value: 0.6613668723
+    field: confidence
+    as_written: "**66.1%** held at one year"
+  - key: project/cross-district-coverage-at-thirteen-years
+    value: 0.6943521595
+    field: confidence
+    as_written: "**69.4%** at thirteen"
+  - key: project/the-cross-district-bands-worst-gap-from-nominal
+    value: 0.0302890365
+    field: confidence
+    as_written: "stays within **3.0%** of the 68.3% the band claims"
 
 findings: |
   ### Retiring the guarantee is two bills, and they price an order of magnitude apart
@@ -486,16 +515,19 @@ properties:
     [verified] **The exponent holds to thirteen years, and five was never the panel's limit.**
     The fit's own six origins reach eleven years — FY2013 plus eleven is FY2024 — and the two the
     panel supports but the fit did not use, FY2011 and FY2012, take it to thirteen. Run there,
-    coverage of the **cross-district** error stays within **3.0 points** of 68.3% at every horizon
-    from one to thirteen, and refitting to coverage over the longer range returns **0.65** again.
+    coverage of the **cross-district** error stays within **3.0%** of the 68.3% the band claims at
+    every horizon from one to thirteen — **66.1%** held at one year and **69.4%** at thirteen, so
+    the line crosses the target rather than drifting off it — and refitting to coverage over the
+    longer range returns **0.65** again.
     This node's six-year leg and the feed's ten-year horizon are inside the measured range now
     rather than past it. Measured in
     `crates/project/tests/the_horizons_the_backtest_stopped_short_of.rs`.
 
     [verified] **What fails past five years is the centre, not the width.** Pooled across origins
-    the band's coverage does sink — 67.1% at five years to 60.1% at thirteen — and removing each
-    origin's own mean puts the whole of that back. At a fixed horizon every origin runs the same
-    method over the same districts for the same span, so an origin effect is a year effect, and
+    the band's coverage does sink — **64.5%** held at one year, 67.1% at five, **60.1%** at
+    thirteen, and at its worst **8.9%** of forecasts short of the target at eleven — and removing
+    each origin's own mean puts the whole of that back. At a fixed horizon every origin runs the
+    same method over the same districts for the same span, so an origin effect is a year effect, and
     the years are the shutdown: at five years the four origins landing on FY2020 or earlier average
     +0.002 to +0.014 while the two landing on FY2023 and FY2024 average +0.035 and +0.038. Cut every
     target at FY2020 and the pooled band holds within 3.8 points to **nine** years with nothing

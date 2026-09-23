@@ -74,6 +74,21 @@
 //! numbers are the only ones printed on it. The rule underneath is the same one in both cases:
 //! whatever a reader could quote off the picture is a number the figure manifest has pinned.
 //!
+//! And a fourth. [`CURVES`] is a registry of *curves*: two or more named lines over one ordered
+//! index, drawn against a **reference** the reader is asked to compare them to. A column's
+//! categories can be reordered without changing what it says and a cloud's points have no order at
+//! all; a curve's index is monotone and the claim is a *shape* along it — that one line sinks and
+//! the other stays flat. So neither extreme of a curve is the thing a reader quotes: both ends of
+//! *each line* are, and so is the worst departure from the reference, which is a maximum over the
+//! index rather than a value at any point on it. The rule is therefore **three figures per line**
+//! — first point, last point, worst departure — and that is what makes "flat the whole way" a
+//! claim the figure manifest has stood behind rather than an impression from a picture.
+//!
+//! The reference itself names no figure, and cannot: 68.3% is the area under a normal curve
+//! inside one standard deviation. No crate computes it, nothing would go stale if it moved, and a
+//! pin duplicating a definition checks nothing. It is the one number on a curve that is not a
+//! measurement, which is exactly why the lines are read against it.
+//!
 //! And a third. [`PLANES`] is a registry of *planes*: a handful of named alternatives placed on
 //! two signed axes at once, where the finding is that the axes **disagree**. A cloud is six
 //! hundred subjects whose shape is the claim and no one of which a reader quotes; a plane is
@@ -121,11 +136,11 @@ pub const CONTRACT_VERSION: &str = "1.1.0";
 /// 2.0.0 was the second drawing, [`SCATTERS`], arriving beside the first. 3.0.0 is the four
 /// optional members a row gained for the census of the plan's bounds — [`Row::group`],
 /// [`Row::of`], [`Row::cites`] and [`Row::marked`] — which are what let a long ranked column be
-/// read as a table as well as a chart. 4.0.0 is the third drawing, [`PLANES`]. Its consumer
-/// compares the version exactly, so all three were breaking whether or not any existing entry
-/// moved, which is the behaviour wanted: a reader that has not been taught what a member means
-/// should stop rather than draw half of one.
-pub const SERIES_CONTRACT_VERSION: &str = "4.0.0";
+/// read as a table as well as a chart. 4.0.0 is the third drawing, [`PLANES`], and 5.0.0 the
+/// fourth, [`CURVES`]. Its consumer compares the version exactly, so all four were breaking
+/// whether or not any existing entry moved, which is the behaviour wanted: a reader that has not
+/// been taught what a member means should stop rather than draw half of one.
+pub const SERIES_CONTRACT_VERSION: &str = "5.0.0";
 
 /// What a figure is measured in, which decides how prose is allowed to write it.
 ///
@@ -715,6 +730,230 @@ pub static PLANES: &[Plane] = &[Plane {
     },
 }];
 
+/// One curve the wiki draws: named lines over one ordered index, against a reference.
+///
+/// The fourth drawing, and a different shape from all three of the others. A [`Series`] is
+/// categories, which could be reordered without changing what the chart says; a [`Scatter`] is a
+/// population with no order at all; a [`Plane`] is a handful of named alternatives on two axes.
+/// A curve's index is **monotone** and the claim lives along it — that the one line falls away
+/// and the other does not. Drawing that as thirteen pairs of bars would put the reader in front
+/// of the one presentation a shape survives least well.
+///
+/// What stands in for the endpoint rule is three figures per line rather than two per chart: see
+/// [`Line`], and the module docs for why the reference is the one number here that is not pinned.
+pub struct Curve {
+    /// `<crate-directory>/<what-it-is>`, in the one key namespace the other registries share.
+    pub key: &'static str,
+    /// The crate that owns the computation, as the corpus cites it.
+    pub owner: &'static str,
+    /// What the whole drawing is, in words; its title.
+    pub label: &'static str,
+    /// What one step along the index is, singular and lower case — "horizon". Written into the
+    /// caption, and into the tick labels, so a reader is told what the lines run over.
+    pub subject: &'static str,
+    /// The computation, over the same inputs the figures use.
+    pub compute: fn(&Inputs) -> Traces,
+}
+
+/// One point on a [`Line`].
+pub struct Coordinate {
+    /// Its place on the shared index.
+    pub x: f64,
+    /// Its value.
+    pub y: f64,
+}
+
+/// The worst a [`Line`] departs from its curve's reference, and where.
+///
+/// A maximum over the index rather than a value at a point on it, which is why it is computed
+/// here and pinned as a figure of its own: "within three points the whole way" is the sentence
+/// the flat line is drawn to support, and no single coordinate states it. Ties go to the
+/// shallower end of the index, which is the one a reader would quote.
+pub struct Departure {
+    /// The index position the worst gap is at.
+    pub at: f64,
+    /// Its size, unsigned — a distance from the reference, so a line above and a line below by
+    /// the same amount have departed equally.
+    pub gap: f64,
+    /// The [`Figure`] that pins [`Self::gap`].
+    pub figure: &'static str,
+}
+
+/// One line of a [`Curve`]: a value at every position on the shared index.
+///
+/// Its three pinned numbers are the ones a reader can take off the picture. Both ends, because a
+/// line is quoted by where it starts and where it finishes; and [`Self::worst`], because the
+/// claim a curve is drawn for is usually about the whole line rather than any point on it.
+pub struct Line {
+    /// What this line is, in words — the legend entry.
+    pub label: &'static str,
+    /// The points, in index order.
+    pub points: Vec<Coordinate>,
+    /// The [`Figure`] whose pin the first point's value reproduces.
+    pub first_figure: &'static str,
+    /// And the one the last point's value reproduces.
+    pub last_figure: &'static str,
+    /// The worst departure from [`Traces::reference`].
+    pub worst: Departure,
+}
+
+/// The line a [`Curve`]'s lines are read against, which is not one of them.
+pub struct Reference {
+    /// What the line means, in words.
+    pub label: &'static str,
+    /// Where it sits, in the vertical axis' units.
+    pub value: f64,
+}
+
+/// The lines of a [`Curve`] and the frame they are drawn in.
+pub struct Traces {
+    /// The shared index. One axis for every line, because the comparison between the lines at the
+    /// same position is the whole of what a curve is for.
+    pub x: Axis,
+    /// The vertical axis, framed to hold every line **and** the reference: a reference drawn
+    /// outside the frame is a comparison the reader is asked to make and not shown.
+    pub y: Axis,
+    /// The line the others are read against, where there is one.
+    pub reference: Option<Reference>,
+    /// The lines, in the order the owning crate returned them.
+    pub lines: Vec<Line>,
+}
+
+impl Traces {
+    /// Frame a set of lines around their own extremes **and** the reference.
+    ///
+    /// The reference is inside the domain by construction rather than by luck. A vertical axis
+    /// fitted to the values alone would drop it the moment every line sat on one side of it, and
+    /// then the chart would be drawing a set of lines where the claim is a set of distances.
+    ///
+    /// # Panics
+    ///
+    /// If there are no lines, a line has no points, or a value is not finite.
+    #[must_use]
+    pub fn framed(
+        x: Axis,
+        y: &'static str,
+        unit: Unit,
+        reference: Option<Reference>,
+        lines: Vec<Line>,
+    ) -> Self {
+        assert!(!lines.is_empty(), "a curve with no lines");
+        assert!(
+            lines.iter().all(|line| !line.points.is_empty()),
+            "a curve with an empty line"
+        );
+        let values = lines
+            .iter()
+            .flat_map(|line| line.points.iter().map(|p| p.y))
+            .chain(reference.iter().map(|r| r.value));
+        let (low, high) = values.fold((f64::MAX, f64::MIN), |(lo, hi), v| {
+            assert!(v.is_finite(), "{y}: {v} cannot be drawn");
+            (lo.min(v), hi.max(v))
+        });
+        let pad = (high - low) * CLOUD_PAD;
+        Self {
+            x,
+            y: Axis {
+                label: y,
+                unit,
+                min: low - pad,
+                max: high + pad,
+                log: false,
+            },
+            reference,
+            lines,
+        }
+    }
+}
+
+/// The curves the wiki draws. See [`Curve`] for what stands in for the endpoint rule here.
+pub static CURVES: &[Curve] = &[Curve {
+    key: "project/what-the-band-held-at-every-horizon",
+    owner: "crates/project",
+    label: "What the ±1σ band actually held, at every horizon the panel reaches, over every \
+            origin and district it admits",
+    subject: "horizon",
+    compute: |i| {
+        let line = |label: &'static str,
+                    of: fn(&project::backtest::Held) -> f64,
+                    first_figure,
+                    last_figure,
+                    worst_figure| {
+            let (at, gap) = project::backtest::worst_gap(&i.coverage, of);
+            Line {
+                label,
+                points: i
+                    .coverage
+                    .iter()
+                    .map(|held| Coordinate {
+                        x: f64::from(held.horizon),
+                        y: of(held),
+                    })
+                    .collect(),
+                first_figure,
+                last_figure,
+                worst: Departure {
+                    at: f64::from(at),
+                    gap,
+                    figure: worst_figure,
+                },
+            }
+        };
+        Traces::framed(
+            Axis {
+                label: "Years ahead",
+                unit: Unit::Count,
+                min: 1.0,
+                max: f64::from(project::backtest::DEEPEST_HORIZON),
+                log: false,
+            },
+            "Share of forecasts inside the band",
+            Unit::Share,
+            Some(Reference {
+                label: "What ±1σ claims to hold",
+                value: project::backtest::NOMINAL_ONE_SIGMA_COVERAGE,
+            }),
+            vec![
+                line(
+                    "Every error, origins pooled",
+                    |held| held.pooled,
+                    "project/pooled-coverage-at-one-year",
+                    "project/pooled-coverage-at-thirteen-years",
+                    "project/the-pooled-bands-worst-gap-from-nominal",
+                ),
+                line(
+                    "The same errors, each origin's mean removed",
+                    |held| held.within_origin,
+                    "project/cross-district-coverage-at-one-year",
+                    "project/cross-district-coverage-at-thirteen-years",
+                    "project/the-cross-district-bands-worst-gap-from-nominal",
+                ),
+            ],
+        )
+    },
+}];
+
+/// A curve and the lines it came out with on this run.
+pub struct ComputedCurve {
+    /// The registry entry.
+    pub curve: &'static Curve,
+    /// What [`Curve::compute`] returned.
+    pub traces: Traces,
+}
+
+/// Run every curve in [`CURVES`], in registry order.
+#[must_use]
+pub fn compute_all_curves() -> Vec<ComputedCurve> {
+    let inputs = Inputs::build();
+    CURVES
+        .iter()
+        .map(|curve| ComputedCurve {
+            curve,
+            traces: (curve.compute)(&inputs),
+        })
+        .collect()
+}
+
 /// A cloud and the shape it came out with on this run.
 pub struct ComputedCloud {
     /// The registry entry.
@@ -959,6 +1198,15 @@ pub struct Inputs {
     /// the evidence for a decision record: a negative result quoted from a run nobody re-runs is
     /// a number that cannot go stale and cannot be checked either.
     pub lost_pupils: LostPupils,
+    /// What the published band held at every horizon the panel reaches, both ways of asking.
+    ///
+    /// Here because the shape is the claim and the shape was a table in a doc comment. `/method`
+    /// argued in prose that the band's width is right out to thirteen years while the level is
+    /// not, and the evidence was thirteen pairs of percentages nothing recomputed — quoted into
+    /// `scenario/guarantee-phase-out` and `.yidam/decisions/the-widening-rule.yml` from a test
+    /// file, which is the #120 shape exactly. [`project::backtest::profile`] runs it once for the
+    /// six pinned figures and the curve alike.
+    pub coverage: Vec<project::backtest::Held>,
 }
 
 /// What `project::lost_pupils` establishes, computed once over the 607 districts the identity
@@ -1512,6 +1760,14 @@ impl Inputs {
         let panel_for_forecasts = panel.clone();
         let panel_for_guarantee = panel.clone();
         let panel_for_margins = panel.clone();
+        // Eight origins over 602 complete histories, thirteen times: about two seconds in debug,
+        // and run here rather than per figure so the six pins and the curve are one backtest.
+        let coverage = project::backtest::profile(
+            project::backtest::DEEPEST_HORIZON,
+            *project::backtest::PANEL_YEARS
+                .last()
+                .expect("the panel carries years"),
+        );
         let recognized: HashMap<String, Recognition> = recognized_valuation::from_abstract(2024);
         let at_recognized = panel_at_fy2027(
             &panel,
@@ -2045,6 +2301,7 @@ impl Inputs {
             anchors,
             reach,
             lost_pupils,
+            coverage,
         }
     }
 }
@@ -11758,6 +12015,66 @@ pub static FIGURES: &[Figure] = &[
                 .fy2032_guarantee_and_backstop_removed
                 .total_half_width()
         },
+    },
+    Figure {
+        key: "project/pooled-coverage-at-one-year",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "Share of one-year forecasts the ±1σ band held, over every origin and district the \
+                panel admits, origins pooled",
+        pinned: 0.644_992_880_9,
+        tolerance: 0.000_000_1,
+        compute: |i| i.coverage[0].pooled,
+    },
+    Figure {
+        key: "project/pooled-coverage-at-thirteen-years",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The same at thirteen years — the deep end of the pooled line, and the number that \
+                looks like a band widening too slowly until the other line is drawn beside it",
+        pinned: 0.601_328_903_7,
+        tolerance: 0.000_000_1,
+        compute: |i| i.coverage[12].pooled,
+    },
+    Figure {
+        key: "project/the-pooled-bands-worst-gap-from-nominal",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The furthest the pooled line falls from the 68.3% a ±1σ band claims, over the \
+                thirteen horizons — a maximum along the curve, not a value at any one horizon",
+        pinned: 0.089_146_179_4,
+        tolerance: 0.000_000_1,
+        compute: |i| project::backtest::worst_gap(&i.coverage, |held| held.pooled).1,
+    },
+    Figure {
+        key: "project/cross-district-coverage-at-one-year",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "Share of one-year forecasts the same band held once each origin's own mean is \
+                removed — the cross-district spread alone, which is the only thing sigma prices",
+        pinned: 0.661_366_872_3,
+        tolerance: 0.000_000_1,
+        compute: |i| i.coverage[0].within_origin,
+    },
+    Figure {
+        key: "project/cross-district-coverage-at-thirteen-years",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The same at thirteen years — above the one-year figure rather than below it, \
+                which is what makes the horizon exponent as right at thirteen as at five",
+        pinned: 0.694_352_159_5,
+        tolerance: 0.000_000_1,
+        compute: |i| i.coverage[12].within_origin,
+    },
+    Figure {
+        key: "project/the-cross-district-bands-worst-gap-from-nominal",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The furthest the cross-district line falls from 68.3% over the thirteen horizons \
+                — the number the flat line is drawn to state, and it is a maximum over all of it",
+        pinned: 0.030_289_036_5,
+        tolerance: 0.000_000_1,
+        compute: |i| project::backtest::worst_gap(&i.coverage, |held| held.within_origin).1,
     },
     Figure {
         key: "project/fy2032-backstop-guarantee-removed",

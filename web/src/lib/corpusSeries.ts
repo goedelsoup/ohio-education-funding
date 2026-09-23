@@ -42,18 +42,35 @@
  * **every coordinate is pinned**: each position names a figure for its x and a figure for its y,
  * the crate asserts that both reproduce, and a node drawing the plane must bind all fourteen.
  *
+ * # What a curve is, and what holds it
+ *
+ * A fourth array, and the one shape here whose index is **ordered**. A **curve** is two or more
+ * named lines over one monotone index — the thirteen horizons a backtest reaches — drawn against
+ * a **reference** the reader is asked to measure them by. Its claim is a shape along the index:
+ * that the pooled line sinks away from 68.3% while the cross-district line stays flat beside it.
+ *
+ * So its extremes are not "largest and smallest": reordering the index would destroy what the
+ * chart says, and the numbers a reader quotes are each line's **first and last** point, plus the
+ * **worst departure** from the reference — which is a maximum over the whole index and not a
+ * value at any position on it. Three figures per line, and a node drawing a curve must bind all
+ * of them. The reference itself is pinned by nothing, and cannot be: 68.3% is the area under a
+ * normal curve inside one standard deviation, which no crate computes and nothing could make
+ * stale.
+ *
  * # Sign
  *
  * Rows are signed, because a bar below the zero rule is what a chart is for, and so are slopes —
  * −0.0429 is the finding on the second panel of the first cloud. The figure manifest exports a
  * signed quantity as a magnitude with the direction in its key, so {@link rowsAgainstFigures} and
- * {@link fitsAgainstFigures} compare a magnitude to the figure it names.
+ * {@link fitsAgainstFigures} compare a magnitude to the figure it names. A curve's departure is
+ * the one quantity here that is unsigned before it starts — it is a distance from the reference —
+ * so for it the two comparisons coincide.
  */
 
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import type { Bar, Fit, Place, Rank, ScatterPoint } from "./chart.ts";
+import type { Bar, Fit, Place, Rank, ScatterPoint, SeriesPoint } from "./chart.ts";
 import type { Node } from "./corpus.ts";
 import { citedCrates, proseFields, type Manifest, type Unit } from "./corpusFigures.ts";
 import { count, money, pct } from "./format.ts";
@@ -64,7 +81,7 @@ import * as routes from "./routes.ts";
  * the two documents have different shapes and different readers, and a field added to a row is no
  * reason for the scalar check to refuse a document it still reads correctly.
  */
-export const READS_SERIES_CONTRACT = "4.0.0";
+export const READS_SERIES_CONTRACT = "5.0.0";
 
 /** One row of a series: a category and its signed value. */
 export interface SeriesRow {
@@ -192,12 +209,72 @@ export interface ManifestPlane {
   points: ManifestPosition[];
 }
 
+/** One point of a line: a position on the shared index and a value there. */
+export interface ManifestCoordinate {
+  x: number;
+  y: number;
+}
+
+/**
+ * The worst a line departs from its curve's reference, and where along the index.
+ *
+ * Unsigned, and a maximum over the whole index rather than a value at any position on it — which
+ * is why it is pinned separately from the ends. "Within three points at every horizon" is a claim
+ * no coordinate states.
+ */
+export interface ManifestDeparture {
+  at: number;
+  gap: number;
+  /** The `crates/figures.json` key whose pin the gap reproduces. */
+  figure: string;
+}
+
+/** One line of a curve: a value at every position on the shared index, with its three pins. */
+export interface ManifestLine {
+  label: string;
+  points: ManifestCoordinate[];
+  /** The `crates/figures.json` key whose pin the first point's value reproduces in magnitude. */
+  firstFigure: string;
+  /** As `firstFigure`, for the last point. */
+  lastFigure: string;
+  worst: ManifestDeparture;
+}
+
+/**
+ * The line a curve's lines are read against, which is not one of them.
+ *
+ * It names no figure, and that absence is deliberate rather than an omission: a reference is a
+ * definition — the share of a normal distribution inside ±1σ — and a pin duplicating a definition
+ * checks nothing. It is the one number on a curve that is not a measurement, which is exactly why
+ * the lines are measured against it.
+ */
+export interface ManifestReference {
+  label: string;
+  value: number;
+}
+
+/** Named lines over one ordered index, computed from the crate that owns them. */
+export interface ManifestCurve {
+  key: string;
+  owner: string;
+  /** What one step along the index is, singular and lower case — "horizon". */
+  subject: string;
+  label: string;
+  /** The shared index, always linear: a curve is read for distances along it. */
+  x: ManifestAxis;
+  /** Framed to hold every line *and* the reference, which the crate computes it to. */
+  y: ManifestAxis;
+  reference?: ManifestReference;
+  lines: ManifestLine[];
+}
+
 /** `crates/series.json`, as written by `cargo run -p figures series`. */
 export interface SeriesManifest {
   contract: string;
   series: ManifestSeries[];
   scatters: ManifestScatter[];
   planes: ManifestPlane[];
+  curves: ManifestCurve[];
 }
 
 /** Where `crates/figures series` writes, from `web/` and from the repository root. */
@@ -246,6 +323,9 @@ export function loadSeriesManifest(): SeriesManifest {
   }
   if (!Array.isArray(parsed.planes) || parsed.planes.length === 0) {
     throw new Error(`${path} carries no planes, so this check would pass against any corpus.`);
+  }
+  if (!Array.isArray(parsed.curves) || parsed.curves.length === 0) {
+    throw new Error(`${path} carries no curves, so this check would pass against any corpus.`);
   }
   cached = parsed;
   return parsed;
@@ -299,6 +379,10 @@ export const DRAWABLE_FIELDS: readonly string[] = ["description", "findings"];
  */
 export const PAGE_SERIES: Readonly<Record<string, { route: string; node: string }>> = {
   "project/bounds-census": { route: routes.BOUNDS, node: "funding-regime/fair-school-funding-plan" },
+  "project/what-the-band-held-at-every-horizon": {
+    route: routes.METHOD,
+    node: "scenario/guarantee-phase-out",
+  },
 };
 
 /**
@@ -575,6 +659,53 @@ export function placesOf(plane: ManifestPlane): Place[] {
   }));
 }
 
+/**
+ * The three numbers one line of a curve owes a figure, in the order they are read.
+ *
+ * A column's endpoint rule picks the largest and smallest row, which on a curve would pick two
+ * positions nobody quotes: what a reader takes off a line drawn over an index is where it starts,
+ * where it ends, and how far it ever gets from the reference. That is the rule, and it is per
+ * line rather than per curve — two lines on one picture are two claims.
+ */
+function endsOf(line: ManifestLine): { what: string; value: number; figure: string }[] {
+  const first = line.points[0];
+  const last = line.points[line.points.length - 1];
+  return [
+    { what: `starts at ${first?.y ?? "nothing"}`, value: first?.y ?? 0, figure: line.firstFigure },
+    { what: `ends at ${last?.y ?? "nothing"}`, value: last?.y ?? 0, figure: line.lastFigure },
+    {
+      what: `departs from the reference by ${line.worst.gap} at ${line.worst.at}`,
+      value: line.worst.gap,
+      figure: line.worst.figure,
+    },
+  ];
+}
+
+/**
+ * A curve's two lines as {@link seriesSpec} draws them.
+ *
+ * The same pairing the historical charts use, which is why the form is reused rather than added
+ * to: two quantities in one unit over one ordered index. What differs is only that the index is a
+ * horizon, and `SeriesPoint.at` is the field that stopped assuming otherwise.
+ *
+ * Exactly two lines, because that is what the form admits. A curve carrying a third would be a
+ * crate change the caller cannot paper over, so this throws rather than silently dropping one.
+ */
+export function pointsOf(curve: ManifestCurve): SeriesPoint[] {
+  const [a, b] = curve.lines;
+  if (!a || !b || curve.lines.length !== 2) {
+    throw new Error(
+      `${curve.key} has ${curve.lines.length} lines and seriesSpec draws two. A third quantity ` +
+        `goes in the table under the chart, which is what the table is for.`,
+    );
+  }
+  return a.points.map((point, index) => ({
+    at: point.x,
+    a: point.y,
+    b: b.points[index]?.y ?? null,
+  }));
+}
+
 /** Each position the check can fail in. Every one is produced on purpose in the spec. */
 export type SeriesDiscrepancyKind =
   /** The node binds a key the series manifest does not carry. */
@@ -589,7 +720,9 @@ export type SeriesDiscrepancyKind =
   | "fit-unbound"
   /** A coordinate of a position on a plane is a figure this node does not bind. */
   | "position-unbound"
-  /** The manifest exports a series, a cloud or a plane no node draws. */
+  /** An end or the worst departure of a line on a curve is a figure this node does not bind. */
+  | "line-unbound"
+  /** The manifest exports a series, a cloud, a plane or a curve no node draws. */
   | "uncited-series"
   /** A series {@link PAGE_SERIES} says a page draws names a node the corpus does not hold. */
   | "page-source-missing";
@@ -614,6 +747,7 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
   const byKey = new Map(manifest.series.map((series) => [series.key, series]));
   const cloudByKey = new Map(manifest.scatters.map((cloud) => [cloud.key, cloud]));
   const planeByKey = new Map(manifest.planes.map((plane) => [plane.key, plane]));
+  const curveByKey = new Map(manifest.curves.map((curve) => [curve.key, curve]));
   const found: SeriesDiscrepancy[] = [];
   const drawn = new Set<string>();
 
@@ -628,17 +762,18 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
         found.push({ node: node.id, key: entry.key, kind, message });
 
       /*
-       * One `series:` block, three shapes behind it.
+       * One `series:` block, four shapes behind it.
        *
        * A node binds what it draws by key and does not say which array the key is in — a binding
        * is "draw this computation under this field", and whether the crate answered with a column,
-       * a cloud or a plane is the crate's business. The three differ in what has to be bound with
-       * them, and that is the whole of the difference below.
+       * a cloud, a plane or a curve is the crate's business. The four differ in what has to be
+       * bound with them, and that is the whole of the difference below.
        */
       const series = byKey.get(entry.key);
       const cloud = cloudByKey.get(entry.key);
       const plane = planeByKey.get(entry.key);
-      if (!series && !cloud && !plane) {
+      const curve = curveByKey.get(entry.key);
+      if (!series && !cloud && !plane && !curve) {
         at(
           "unknown-key",
           `draws "${entry.key}", which crates/series.json does not carry. Either the key was ` +
@@ -646,7 +781,7 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
         );
         continue;
       }
-      const owner = (series ?? cloud ?? plane)!.owner;
+      const owner = (series ?? cloud ?? plane ?? curve)!.owner;
       drawn.add(entry.key);
 
       if (!DRAWABLE_FIELDS.includes(entry.field)) {
@@ -712,6 +847,23 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
         continue;
       }
 
+      if (curve) {
+        for (const line of curve.lines) {
+          for (const end of endsOf(line)) {
+            if (!bound.has(end.figure)) {
+              at(
+                "line-unbound",
+                `draws "${line.label}", which ${end.what}, and that is ${end.figure}, a figure ` +
+                  `this node does not bind. Bind it in figures: first — a line over an index is ` +
+                  `read at its two ends and at its worst departure from the reference, so those ` +
+                  `three are the numbers a reader will quote off it.`,
+              );
+            }
+          }
+        }
+        continue;
+      }
+
       for (const end of endpoints(series!)) {
         if (end.figure === undefined) {
           at(
@@ -746,6 +898,7 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
     ...manifest.series.map((series) => [series.key, "column"] as const),
     ...manifest.scatters.map((cloud) => [cloud.key, "cloud"] as const),
     ...manifest.planes.map((plane) => [plane.key, "plane"] as const),
+    ...manifest.curves.map((curve) => [curve.key, "curve"] as const),
   ];
   for (const [key, what] of exported) {
     if (!drawn.has(key)) {
@@ -783,12 +936,14 @@ export function crossCheckPageSeries(
   manifest: SeriesManifest,
 ): SeriesDiscrepancy[] {
   const byKey = new Map(manifest.series.map((series) => [series.key, series]));
+  const curveByKey = new Map(manifest.curves.map((curve) => [curve.key, curve]));
   const byId = new Map(nodes.map((node) => [node.id, node]));
   const found: SeriesDiscrepancy[] = [];
 
   for (const [key, source] of Object.entries(PAGE_SERIES)) {
     const series = byKey.get(key);
-    if (!series) {
+    const curve = curveByKey.get(key);
+    if (!series && !curve) {
       found.push({
         node: source.node,
         key,
@@ -814,7 +969,28 @@ export function crossCheckPageSeries(
       continue;
     }
     const bound = new Set(node.figures.map((figure) => figure.key));
-    for (const end of endpoints(series)) {
+
+    if (curve) {
+      for (const line of curve.lines) {
+        for (const end of endsOf(line)) {
+          if (!bound.has(end.figure)) {
+            found.push({
+              node: source.node,
+              key,
+              kind: "line-unbound",
+              message:
+                `is drawn by ${source.route}, whose line "${line.label}" ${end.what}, and that ` +
+                `is ${end.figure}, a figure this node does not bind. Bind it in figures: first ` +
+                `— a page has no figures: block of its own, so the node it cites is what holds ` +
+                `the numbers a reader takes off the chart.`,
+            });
+          }
+        }
+      }
+      continue;
+    }
+
+    for (const end of endpoints(series!)) {
       if (end.figure === undefined) {
         found.push({
           node: source.node,
@@ -951,6 +1127,52 @@ export function positionsAgainstFigures(manifest: SeriesManifest, figures: Manif
         if (Math.abs(Math.abs(value) - figure.value) > Number.EPSILON) {
           out.push(
             `${plane.key}: "${point.label}" is at ${which} = ${value} and ${key} is ${figure.value}; ` +
+              `one of the two manifests is stale`,
+          );
+        }
+      }
+    }
+  }
+  return out;
+}
+
+/**
+ * Every line reproduces the three figures it names, manifest against manifest.
+ *
+ * The fourth sibling of {@link rowsAgainstFigures}, {@link fitsAgainstFigures} and
+ * {@link positionsAgainstFigures}, and the same check: the crate holds a line to the figures'
+ * *pins*, this holds the committed series document to the committed figure document, which is the
+ * staleness two artefacts from one generator can have between them. They are one computation, so
+ * they agree to the bit or not at all.
+ *
+ * In magnitude, as the others are, though nothing on a curve is signed today: a share is a share
+ * and a departure is a distance. Written the same way regardless, because the convention is the
+ * figure manifest's — it exports magnitudes with the direction in the key — and a check that
+ * happens to be right because its inputs are all positive is a check that breaks on the first
+ * curve over a signed quantity.
+ *
+ * The reference is not checked here, because it names no figure. See {@link ManifestReference}.
+ */
+export function linesAgainstFigures(manifest: SeriesManifest, figures: Manifest): string[] {
+  const byKey = new Map(figures.figures.map((figure) => [figure.key, figure]));
+  const out: string[] = [];
+  for (const curve of manifest.curves) {
+    for (const line of curve.lines) {
+      for (const end of endsOf(line)) {
+        const figure = byKey.get(end.figure);
+        if (!figure) {
+          out.push(`${curve.key}: "${line.label}" names ${end.figure}, which figures.json lacks`);
+          continue;
+        }
+        if (figure.unit !== curve.y.unit) {
+          out.push(
+            `${curve.key}: "${line.label}" is drawn in ${curve.y.unit} and ${end.figure} is a ` +
+              `${figure.unit}`,
+          );
+        }
+        if (Math.abs(Math.abs(end.value) - figure.value) > Number.EPSILON) {
+          out.push(
+            `${curve.key}: "${line.label}" ${end.what} and ${end.figure} is ${figure.value}; ` +
               `one of the two manifests is stale`,
           );
         }

@@ -59,6 +59,7 @@
 pub mod act;
 pub mod administrator_staffing;
 pub mod anchor_incidence;
+pub mod backtest;
 pub mod base_cost;
 pub mod baseline;
 pub mod biennium;

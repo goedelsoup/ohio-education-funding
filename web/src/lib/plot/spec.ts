@@ -2393,39 +2393,74 @@ export function truncatedDomain(values: number[]): [number, number] {
   return [low - pad, high + pad];
 }
 
+/** What a caller tells {@link seriesSpec} beyond the points themselves. */
+export interface SeriesOptions {
+  width: number;
+  /**
+   * How to write a position on the index, for the two corner labels under the axis.
+   *
+   * Required rather than defaulted, because every default here would be a guess about what the
+   * index counts and the wrong one prints `FY13` under a thirteen-year horizon.
+   */
+  tick: (at: number) => string;
+  /** A value the lines are measured against, drawn as a rule and held inside the frame. */
+  reference?: { value: number; label: string };
+}
+
 /**
- * Two quantities in the same units, over years.
+ * Two quantities in the same units, over one ordered index.
  *
  * The fourth form, and the one the historical view needed: a fan chart draws an interval and a
  * bar chart draws categories, and neither says what a pair of series did across fourteen years.
  *
- * The rules it inherits, and the two it adds:
+ * The rules it inherits, and the three it adds:
  *
  * - **Two series, and there cannot be a third.** The categorical palette is a validated pair and
  *   nothing here generates beyond it. A page needing a third quantity puts it in the table
  *   underneath, which is what the table is for.
  * - **One axis.** Both series are in the same units by construction — the caller passes shares or
  *   dollars, never one of each — so there is no second scale to mislead with.
- * - **A missing year is a break, not a bridge.** FY2014 is absent from the Census archive, and a
- *   line drawn straight through it would assert a measurement nobody made. Plot breaks a line at
- *   a null, and passing `null` rather than omitting the year is what keeps the gap on the x axis
- *   where a reader can see it.
+ * - **A missing position is a break, not a bridge.** FY2014 is absent from the Census archive,
+ *   and a line drawn straight through it would assert a measurement nobody made. Plot breaks a
+ *   line at a null, and passing `null` rather than omitting the position is what keeps the gap on
+ *   the x axis where a reader can see it.
  * - The axis is truncated to the data's own range and says so, as the fan chart does, because a
  *   share moving from 46% to 34% is invisible against a zero baseline.
+ *
+ * # The index is not necessarily a year
+ *
+ * It was, for the three years this form existed for the three pages that draw fiscal years, and
+ * `FY${'{'}point.year{'}'}` was written into the axis foot here rather than supplied by the caller. The
+ * coverage curve on `/method` runs over **horizons**, so the caller now writes both end labels
+ * through {@link SeriesOptions.tick} and this function makes no claim about what the index
+ * counts. The rename of `SeriesPoint.year` to `at` is the same change said in the type.
+ *
+ * # The reference line
+ *
+ * A curve may be drawn against a value the lines are *measured by* rather than compared to each
+ * other — 68.3% is what a ±1σ band claims to hold, and what the two coverage lines mean is their
+ * distance from it. Passed as {@link SeriesOptions.reference}, it is drawn as a labelled rule and,
+ * more importantly, **included in the truncated domain**: a reference outside the frame would be
+ * a comparison the reader has been asked to make and not shown. It is not a third series — it has
+ * no per-position value, takes the muted ink rather than a categorical hue, and nothing hovers it.
  */
 export function seriesSpec(
   points: SeriesPoint[],
   labels: { a: string; b: string },
   format: (v: number) => string,
   hover: (p: SeriesPoint) => string,
-  options: { width: number },
+  options: SeriesOptions,
 ): Spec | null {
   // One point is not a series, exactly as in `fanSpec`.
   if (points.length < 2) return null;
   const values = points.flatMap((p) => [p.a, p.b]).filter((v): v is number => v != null);
   if (values.length === 0) return null;
 
-  const [min, max] = truncatedDomain(values);
+  // The reference is inside the domain by construction rather than by luck: the lines are read
+  // for their distance from it, and a rule drawn off the frame states no distance at all.
+  const [min, max] = truncatedDomain(
+    options.reference ? [...values, options.reference.value] : values,
+  );
 
   const first = points[0]!;
   const last = points[points.length - 1]!;
@@ -2441,7 +2476,7 @@ export function seriesSpec(
 
   const line = (key: "a" | "b", stroke: string, className: string) =>
     Plot.line(points, {
-      x: "year",
+      x: "at",
       y: key,
       stroke,
       strokeWidth: 2,
@@ -2454,7 +2489,7 @@ export function seriesSpec(
     point
       ? [
           Plot.text([point], {
-            x: point.year,
+            x: point.at,
             y: point[key] ?? 0,
             dx: 8,
             text: () => endText(point, key),
@@ -2464,6 +2499,33 @@ export function seriesSpec(
           }),
         ]
       : [];
+
+  /*
+   * Under everything, because it is what the two lines are read against rather than a third line
+   * among them. Muted and dashed for the same reason: the categorical pair is the quantities, and
+   * a reference in a third hue would read as a quantity that has no per-position value.
+   */
+  const ref = options.reference;
+  const reference = ref
+    ? [
+        Plot.ruleY([ref.value], {
+          stroke: INK.muted,
+          strokeDasharray: "3 3",
+          className: "series-reference",
+        }),
+        Plot.text([ref.value], {
+          x: first.at,
+          y: ref.value,
+          dx: 2,
+          dy: -6,
+          text: () => ref.label,
+          textAnchor: "start",
+          fill: INK.muted,
+          fontSize: 11,
+          className: "series-reference",
+        }),
+      ]
+    : [];
 
   /*
    * Room for the longer of the two direct labels, which carry the series identity.
@@ -2479,9 +2541,9 @@ export function seriesSpec(
     marginLeft: 0,
     marginRight,
     dy: 18,
-    low: `FY${first.year}`,
+    low: options.tick(first.at),
     says: `axis starts at ${format(min)}, not zero`,
-    high: `FY${last.year}`,
+    high: options.tick(last.at),
   });
 
   return {
@@ -2492,9 +2554,10 @@ export function seriesSpec(
       marginBottom: 26 + foot.extraBottom,
       marginLeft: 0,
       marginRight,
-      x: { axis: null, domain: [first.year, last.year] },
+      x: { axis: null, domain: [first.at, last.at] },
       y: { axis: null, domain: [min, max] },
       marks: [
+        ...reference,
         line("a", SERIES.formula, "series-a"),
         line("b", SERIES.guarantee, "series-b"),
         ...endLabel(endA, "a", SERIES.formula),
@@ -2503,8 +2566,8 @@ export function seriesSpec(
         ...foot.marks,
         // One full-height column per year, above every mark, as the fan chart does.
         Plot.rect(points, {
-          x1: (p: SeriesPoint) => p.year - 0.5,
-          x2: (p: SeriesPoint) => p.year + 0.5,
+          x1: (p: SeriesPoint) => p.at - 0.5,
+          x2: (p: SeriesPoint) => p.at + 0.5,
           y1: min,
           y2: max,
           fill: "transparent",

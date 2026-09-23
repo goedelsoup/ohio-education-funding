@@ -5445,6 +5445,70 @@ test.describe("the reduction factors, against what was charged", () => {
   });
 });
 
+test.describe("what the forecast band actually held", () => {
+  test("the band's coverage is drawn at every horizon, not asserted for the reader", async ({
+    page,
+  }) => {
+    /*
+     * `#forecast-range` used to argue this in prose: the band is backtested, and it holds. Two
+     * lines are the check — every error with the origins pooled, and the same errors with each
+     * origin's own mean removed — over every horizon the F-33 panel reaches.
+     */
+    await page.goto("/method");
+    const chart = page.locator('#forecast-range [data-chart="band-coverage"] svg.plot:visible');
+    await expect(chart).toBeVisible();
+    await expect(chart.locator(".series-a path")).toHaveCount(1);
+    await expect(chart.locator(".series-b path")).toHaveCount(1);
+    /*
+     * Thirteen hoverable columns, one per horizon, as an exact count rather than a floor: the
+     * depth of the backtest is a claim the corpus states in words — "every horizon from one to
+     * thirteen" — so a panel that grew or lost a year should fail here and be changed on purpose.
+     */
+    await expect(chart.locator(".series-hit [data-hover]")).toHaveCount(13);
+  });
+
+  test("the sag is drawn: one line holds the target and the other falls away from it", async ({
+    page,
+  }) => {
+    /*
+     * The finding is a shape, and the shape is two distances from one dashed rule. Both lines
+     * cross the 68.3% a ±1σ band claims — neither sits to one side of it — and what separates
+     * them is how far they fall under it: the cross-district line by two points at its deepest,
+     * the pooled line by nearly nine, in the middle distance where neither end shows it.
+     *
+     * Measured off the painted geometry rather than the numbers in the paragraph, because a
+     * cross-district line that drifted steadily away from the rule would satisfy every number
+     * that paragraph states and would not be the finding.
+     */
+    await page.goto("/method");
+    const box = await page
+      .locator('#forecast-range [data-chart="band-coverage"] svg.plot:visible')
+      .evaluate((svg) => {
+        const span = (selector: string) => {
+          const r = (svg.querySelector(selector) as SVGGraphicsElement).getBBox();
+          return { top: r.y, bottom: r.y + r.height };
+        };
+        const rule = (svg.querySelector(".series-reference line") as SVGGraphicsElement).getBBox();
+        return { pooled: span(".series-a path"), cross: span(".series-b path"), target: rule.y };
+      });
+    // SVG y grows downward, so a horizon that held more than the target is drawn above the rule.
+    for (const [what, line] of [
+      ["the pooled line", box.pooled],
+      ["the cross-district line", box.cross],
+    ] as const) {
+      expect(line.top, `${what} rises past the target somewhere`).toBeLessThan(box.target);
+      expect(line.bottom, `${what} falls under it somewhere, so it crosses`).toBeGreaterThan(
+        box.target,
+      );
+    }
+    // The one asymmetry, which is the whole of the claim: 8.9 points under against 2.2.
+    expect(
+      box.pooled.bottom - box.target,
+      "the pooled line sags far further under the target than the flat one",
+    ).toBeGreaterThan(3 * (box.cross.bottom - box.target));
+  });
+});
+
 test.describe("where a district sits among the others", () => {
   test("the position card draws the distribution, not a bar with a pin in it", async ({ page }) => {
     /*

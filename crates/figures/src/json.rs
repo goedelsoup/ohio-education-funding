@@ -21,8 +21,8 @@
 use core::fmt::Write;
 
 use crate::{
-    compute_all, compute_all_planes, compute_all_scatters, compute_all_series, Axis, Cloud, Fit,
-    Positions, Row, Unit, CONTRACT_VERSION, SERIES_CONTRACT_VERSION,
+    compute_all, compute_all_curves, compute_all_planes, compute_all_scatters, compute_all_series,
+    Axis, Cloud, Fit, Positions, Row, Traces, Unit, CONTRACT_VERSION, SERIES_CONTRACT_VERSION,
 };
 
 /// The characters that would need escaping, and therefore may not appear in a key or a label.
@@ -184,6 +184,8 @@ pub fn series_manifest() -> String {
     scatters(&mut out);
     out.push_str(",\n");
     planes(&mut out);
+    out.push_str(",\n");
+    curves(&mut out);
     out.push_str("}\n");
     out
 }
@@ -372,6 +374,99 @@ fn planes(out: &mut String) {
                 point.x_figure,
                 point.y_figure,
             );
+        }
+        let comma = if at + 1 == computed.len() { "" } else { "," };
+        let _ = writeln!(out, "     ]}}{comma}");
+    }
+    out.push_str("  ]");
+}
+
+/// The fourth array: every curve, its frame, its reference, and its lines with their three keys.
+///
+/// A line writes all three of its figure keys unconditionally, on the same rule the plane writer
+/// states: a curve's binding rule is that both ends and the worst departure are pinned, so a
+/// missing one is a bug rather than a shape the document may take. The **reference** carries no
+/// key, and that absence is the one thing here a reader has to be told rather than infer — see
+/// the `CURVES` docs for why a definition is not a figure.
+fn curves(out: &mut String) {
+    let computed = compute_all_curves();
+    let _ = writeln!(out, "  \"curves\": [");
+    for (at, entry) in computed.iter().enumerate() {
+        let c = entry.curve;
+        assert!(
+            writable(c.key) && writable(c.owner) && writable(c.label) && writable(c.subject),
+            "{}: a key, owner, label or subject carries a character this writer cannot escape",
+            c.key
+        );
+        let Traces {
+            x,
+            y,
+            reference,
+            lines,
+        } = &entry.traces;
+        let _ = writeln!(
+            out,
+            "    {{\"key\": \"{}\", \"owner\": \"{}\", \"subject\": \"{}\", \"label\": \"{}\", \
+             {}, {},",
+            c.key,
+            c.owner,
+            c.subject,
+            c.label,
+            axis("x", x),
+            axis("y", y),
+        );
+        if let Some(reference) = reference {
+            assert!(
+                writable(reference.label),
+                "{}: a reference label carries a character this writer cannot escape",
+                c.key
+            );
+            let _ = writeln!(
+                out,
+                "     \"reference\": {{\"label\": \"{}\", \"value\": {}}},",
+                reference.label,
+                coordinate(reference.value),
+            );
+        }
+        let _ = writeln!(out, "     \"lines\": [");
+        for (line_at, line) in lines.iter().enumerate() {
+            assert!(
+                writable(line.label)
+                    && writable(line.first_figure)
+                    && writable(line.last_figure)
+                    && writable(line.worst.figure),
+                "{}: the line {:?} carries a character this writer cannot escape",
+                c.key,
+                line.label
+            );
+            let _ = writeln!(
+                out,
+                "       {{\"label\": \"{}\", \"firstFigure\": \"{}\", \"lastFigure\": \"{}\",",
+                line.label, line.first_figure, line.last_figure,
+            );
+            let _ = writeln!(
+                out,
+                "        \"worst\": {{\"at\": {}, \"gap\": {}, \"figure\": \"{}\"}},",
+                coordinate(line.worst.at),
+                coordinate(line.worst.gap),
+                line.worst.figure,
+            );
+            let _ = writeln!(out, "        \"points\": [");
+            for (point_at, point) in line.points.iter().enumerate() {
+                let comma = if point_at + 1 == line.points.len() {
+                    ""
+                } else {
+                    ","
+                };
+                let _ = writeln!(
+                    out,
+                    "          {{\"x\": {}, \"y\": {}}}{comma}",
+                    coordinate(point.x),
+                    coordinate(point.y),
+                );
+            }
+            let comma = if line_at + 1 == lines.len() { "" } else { "," };
+            let _ = writeln!(out, "        ]}}{comma}");
         }
         let comma = if at + 1 == computed.len() { "" } else { "," };
         let _ = writeln!(out, "     ]}}{comma}");

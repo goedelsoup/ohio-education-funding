@@ -13,6 +13,7 @@ import { count, millions, pct } from "../lib/format.ts";
 import { DENOMINATORS, denominatorSource, denominatorSpan } from "../lib/denominators.ts";
 import * as routes from "../lib/routes.ts";
 import { yearChip, yearOf } from "../lib/year.ts";
+import { coverage, renderCoverage } from "../lib/coverage.ts";
 import { scatterSpec } from "../lib/plot/spec.ts";
 import { renderToString } from "../lib/plot/ssr.ts";
 import { pairs } from "../lib/relationships.ts";
@@ -20,6 +21,8 @@ import SectionAnchor from "../components/SectionAnchor.astro";
 
 const { bundle, verification, forecastable, tax } = loadFeed();
 const corpus = loadCorpus();
+// What the band actually held, backtested. Read off the series manifest — see `coverage.ts`.
+const held = coverage();
 const s = bundle.statewide;
 const meta = bundle.projection;
 // The MR-81 endpoints, read rather than typed — the pair that went stale twice. See
@@ -427,11 +430,14 @@ const millageScatter = renderToString(
     <p class="note">
       The band is <strong>not</strong> any district's own historical variability; three
       observations cannot give that. It is the {meta ? meta.prior_source : "cross-sectional spread"}
-      {meta ? `, σ = ${pct(meta.sigma, 2)} a year` : ""}, widened by the square root of the horizon
-      because growth errors compound. Both ends are computed by re-running the whole formula at
-      that enrollment rather than by scaling the middle: the guarantee is a <code>max</code>, and a
-      district can be on formula at one end of the band and on the guarantee at the other.
+      {meta ? `, σ = ${pct(meta.sigma, 2)} a year` : ""}, widened with the horizon because growth
+      errors compound — at an exponent fitted to the backtest below rather than the square root a
+      random walk would give, which is what shipped first and under-covered at every horizon past
+      the second. Both ends are computed by re-running the whole formula at that enrollment rather
+      than by scaling the middle: the guarantee is a <code>max</code>, and a district can be on
+      formula at one end of the band and on the guarantee at the other.
     </p>
+    <Fragment set:html={renderCoverage(held)} />
     <p class="note">
       The forecast card is always below the simulation and is never merged with it, and there is
       deliberately no figure anywhere on this site that adds them together. Re-running the formula
