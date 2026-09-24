@@ -54,6 +54,13 @@ findings: |
   closes **$4,448 of it, 46%**. The federal channel closes **$913, or 9.5%**. Together they
   leave **$4,229 per pupil** of the local gap standing. [verified]
 
+  Every cell above is a mean over the districts in its quartile, not over their pupils, and on
+  enrolled ADM the federal channel's share of the gap is the smaller number rather than the
+  larger. The two readings and the rule for choosing between them are on
+  [`equity`](../doctrine/equity.yml) and in
+  [a district mean is not a state figure](../../decisions/a-district-mean-is-not-a-state-figure.yml).
+  [inference]
+
   **And FY2022 is the most favourable year that will ever be measured for this**, because the
   federal column is at its ESSER peak. The offset shown here is an upper bound on a channel
   that has since contracted to its pre-pandemic level. Whatever the answer to "does the system

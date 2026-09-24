@@ -1,0 +1,167 @@
+id: a-district-mean-is-not-a-state-figure
+summary: >-
+  A mean over districts and a mean over pupils are different objects, and the corpus may state
+  either but not one while answering the other's question. Sixty-two summation sites audited, five
+  families reaching published figures, one published finding wrong — `doctrine/equity`'s "the rate
+  holds" is flat only on the unweighted reading and rises by seven to ten points on both aggregate
+  ones. Where both objects are wanted they are two figures, not a recomputation.
+context: |
+  The department revised its own FY2024 District Profile Report for exactly this defect. Every
+  figure on the `Statewide Data` sheet changed from an unweighted mean of 606 district values to
+  an enrolled-ADM-weighted mean: the "statewide" Black enrollment share went from 10.5% — the
+  average of 606 district shares — to **17.3%**, which is Ohio's. Its "statewide" administrator
+  count went from 21.35, the mean district's, to a state total. #439 adopted the revision and
+  filed the obvious follow-up: **the corpus does not read that sheet. It computes its own
+  statewide statistics from district rows. Which convention do those use?**
+
+  **What the audit covered.** Every `sum::<f64>() / n` in the workspace — 62 sites. Most are internal: variance and
+  correlation terms, k-means centroids, three-year averages over *years* rather than districts,
+  a regression intercept being un-centred. Four are correct by construction and already say so —
+  `census_states::national_share` and `figures::national_share` are ratios of sums,
+  `achievement_denominator` is the department's own published definition of the top 2% of
+  buildings, `implied_divisor` averages six schedule-implied divisors and no districts at all.
+
+  **Five families of unweighted district mean reach a published figure.** For each, the question
+  is not whether the number is right but whether the sentence around it is about districts:
+
+  - **Quantile means of a per-district statistic.** `fy2016::step_by_quintile`,
+    `facilities::share_by_quintile`, `figures::performance_quintiles`,
+    `figures::quintile_shortfall`, `project::supplement_reach::by_poverty_quartile`,
+    `regime_diff::reappraisal_incidence::quartile_gap`. Every one of these is measuring spread
+    across districts on purpose. Weighting them would destroy the finding.
+  - **Group comparisons derived from those.** The performance-supplement gradient, the
+    share-of-aid ratio, the frozen-parameter gradient.
+  - **A decile mean with its weighted twin already published.**
+    `ohio_panel::deepest_decile` — `dispersion/trough-median-decline` beside
+    `dispersion/trough-weighted-decline`, and `trough-deepest-decile-pupil-share` saying how many
+    pupils the decile holds. This is the practice the rule below generalizes; it was already here.
+  - **A model comparison already aggregated correctly.** `foundation::refresh`'s
+    `average_per_pupil` is a ratio of sums; its `bound_mean_per_pupil` and `free_mean_per_pupil`
+    are group means used only against each other.
+  - **Quartile levels in dollars per pupil.** `national_peers::ohio_by_local_wealth` and
+    `ohio_panel::equalization_by_year`. **This is the family that bites**, because the figures are
+    dollars per pupil and read as statements about Ohio's pupils.
+
+  **Every group comparison survives the weighting, and most strengthen.** Measured, not assumed,
+  because the non-goal of this audit was a sweep and the sweep had to be shown unnecessary rather
+  than asserted to be:
+
+      finding                              unweighted   ADM-weighted
+      performance-supplement gradient          2.5605        2.5983
+      share of aid, least-poor / poorest        5.251         7.090
+      frozen-parameter shortfall gradient       4.084         4.573
+      frozen-parameter statewide level         $73.56        $73.19
+      foundation::refresh, bound / free   346.28/322.87  341.64/322.65
+
+  Not one changes sign, and the two that carry the strongest claims get stronger. So the levels
+  are where the convention shows, and only where a level is stated as a fact about Ohio.
+
+  **One published finding is wrong rather than unlabelled.** `doctrine/equity` published, on
+  `ohio_panel::equalization_by_year`: *"The state's share of the
+  gap it closes does not move: 42.4% at the start, 43.9% at the end, and never outside 40.0% to
+  48.8% in any of the thirteen years. There is no trend inside that window, and the absence of one
+  is the finding rather than a null result."*
+
+  Same panel, same population, same quartile membership, summed over pupils instead of over
+  districts:
+
+      statistic                              FY2012   FY2024   slope/yr   R2    band
+      unweighted district mean (published)    42.4%    43.9%     +0.26   0.17   40.0-48.8
+      ADM-weighted, district quartiles        46.6%    53.6%     +0.79   0.44   45.2-59.5
+      ADM-weighted, pupil quartiles           40.4%    50.0%     +1.06   0.60   36.5-52.5
+
+  **Both aggregate readings rise by seven to ten points across the window. Only the district mean
+  is flat.** The published sentence makes the absence of a trend the finding, and that absence
+  belongs to the statistic. This is a different kind of defect from a level that is correct and
+  unlabelled: relabelling it does not repair it, because the claim is about movement over time and
+  the movement is real.
+
+  The FY2022 single year is the ordinary, milder case. The gap of $9,590 is $8,928 on ADM, state
+  equalization closes $4,922 rather than $4,448, and the headline **46%** is **55.1%**. The
+  residual falls from $4,229 to $3,214 — a quarter smaller. Every one of those numbers is a
+  correct unweighted mean; each is stated as a fact about Ohio.
+decision: |
+  **A dispersion statistic and an aggregate are different objects, and the corpus does not
+  re-decide per figure.**
+
+  - A mean over districts answers *what does the average district do*. It is the right statistic
+    for spread, for gradients, for group comparisons, and for anything whose subject is districts.
+    Most of `crates/dispersion` is this on purpose.
+  - An aggregate — a ratio of sums, equivalently an enrolment-weighted mean — answers *what does
+    the average pupil's district do*. It is the right statistic for any sentence whose subject is
+    Ohio, its pupils, or its money.
+  - **Where both are wanted, they are two figures.** Not one figure with a caveat, and not a
+    recomputation of the first into the second. `dispersion/trough-median-decline` and
+    `dispersion/trough-weighted-decline` were already this shape before the audit found the rule.
+
+  Applied here:
+
+  - `Equalization` gains `weighted_gap`, `weighted_state_closes`, `weighted_federal_closes` and
+    `weighted_state_share`, computed over the *same* quartile membership so that aggregation is
+    the only thing that differs between the pair. Eight new figures publish them, mirroring the
+    four the unweighted reading already had.
+  - `doctrine/equity` states both series and **withdraws "the rate holds" as a finding about
+    Ohio**, keeping it as a property of the district mean. The FY2022 quartile table says in its
+    heading that its columns are district means and carries the weighted line beneath it.
+  - `dispersion::weighted_mean` and `ohio_panel::Equalization` carry the rule in their own docs,
+    so a reader reaching either from code finds it without the corpus.
+  - Nothing else is recomputed. The other four families are dispersion statistics doing their job.
+consequences: |
+  **The corrected finding is stronger than the one it replaces, which is why it had to be
+  checked.** "The rate holds and the gap grows" is a bleak, tidy result. What is actually there is
+  that Ohio's equalization of the local gap has been *rising* on every reading that weights by
+  pupils — from 47% to 54% on one cut, 40% to 50% on the other — while the gap grows faster still,
+  so the residual grows anyway. The gloomy half survives; the stable half does not.
+
+  **A third convention exists and is named rather than adopted.** Cutting quartiles so each holds
+  a quarter of Ohio's *pupils* is a different object again from weighting district-cut quartiles.
+  It is computed in `the_rate_that_holds_only_on_the_unweighted_reading` and published nowhere:
+  its job is to show the trend is not an artefact of holding the district cut fixed. Two published
+  objects is the rule; three would be the caveat this decision exists to refuse.
+
+  **The published unweighted figures do not move.** `dispersion/equalization-band-narrowest` is
+  still 0.4002, `dispersion/local-revenue-gap-per-pupil` still $9,590. A reader who cited them
+  cited a true thing about districts, and the citation survives. Only the sentence that made one
+  of them a sentence about Ohio is withdrawn.
+
+  **The department's correction is now readable as a warning rather than a curiosity.** Its
+  10.5%-against-17.3% is the same arithmetic as our 46%-against-55%: a publisher averaging six
+  hundred district values and calling the result a statewide figure. The corpus was doing it in
+  one place, and that place was its central equity claim.
+
+  **The federal channel's numbers move least and matter least.** $913 becomes $792 and 9.5%
+  becomes 8.9% — inside the noise of a year the corpus already labels as the ESSER peak.
+
+  **The audit's non-goal held.** Sixty-two sites, five families, one repair. A sweep that
+  ADM-weighted every statistic would have moved the performance-supplement gradient from 2.5605 to
+  2.5983 and told a reader nothing, while destroying the quintile findings that exist to measure
+  spread.
+alternatives: |
+  **Recompute the equalization series on ADM and retire the unweighted one.** Rejected, and it was
+  the tempting option because the weighted reading is the one the disputed sentence wanted. But
+  `ohio_panel` is a dispersion module: the distance between what the rich and poor quarters of
+  Ohio's *districts* receive is a real quantity that `national_peers::ohio_by_local_wealth` pins
+  and `doctrine/equity` uses for its correlations. Retiring it to fix a sentence would break the
+  figures the sentence sits among.
+
+  **Label the figures and change no number.** Rejected on the evidence. It is the right treatment
+  for the FY2022 level — $9,590 is a correct district mean and a label fixes it — and it does not
+  reach a claim about a trend. "There is no trend" cannot be repaired by noting which mean it is
+  the absence of a trend in; the reader's question is whether Ohio's equalization is improving,
+  and on the statistic that answers that question it is.
+
+  **Weight by district count rather than choosing.** Not a real alternative but worth recording as
+  the mistake available: averaging the two conventions, or presenting the unweighted one with the
+  weighted in parentheses, produces a number that is neither object and invites exactly the
+  re-decision per figure this record exists to stop.
+
+  **Cut the quartiles by pupils everywhere.** Rejected as the published convention. It is the more
+  coherent aggregate — a quarter of Ohio's children rather than a quarter of its districts — but
+  it changes the quartile *membership*, so the weighted and unweighted figures would no longer be
+  two readings of one partition and could not be set side by side. Holding the membership fixed is
+  what makes the pair informative. The pupil cut is computed in the test as a robustness check and
+  stays there.
+
+  **File it as an open question instead of repairing it.** Rejected per
+  `finding-an-error-is-not-repairing-it`: #463 was itself the filed question, and a second filing
+  would leave the wrong sentence published against a measurement that had already been taken.

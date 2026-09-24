@@ -321,6 +321,20 @@ pub fn spending_by_year() -> BTreeMap<u16, YearOfSpending> {
 }
 
 /// How much of the local gap each level of government closed, in one year.
+///
+/// # Two statistics, kept as two
+///
+/// Each quantity here is published twice: once as a mean over the districts in a quartile, and
+/// once as that quartile's revenue over that quartile's pupils. They are different objects. The
+/// first says what the average *district* in the poorest quarter of Ohio receives; the second
+/// says what the average *pupil* in it does, and a quartile holding Cleveland weighs the same as
+/// one holding four hundred village districts only on the first reading.
+///
+/// The corpus keeps both rather than choosing, because it publishes findings of both kinds — a
+/// dispersion statistic is about the spread across districts and is supposed to be unweighted.
+/// What it may not do is state one and answer the other's question, which is what
+/// [`equalization_by_year`]'s "the rate holds" did until #463. The rule is in
+/// `.yidam/decisions/a-district-mean-is-not-a-state-figure.yml`.
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct Equalization {
     /// Comparable districts the quartiles are cut over.
@@ -335,6 +349,17 @@ pub struct Equalization {
     pub state_closes: f64,
     /// And by federal aid.
     pub federal_closes: f64,
+    /// The same gap weighted by enrolled ADM: each quartile's revenue summed and divided by
+    /// its pupils, rather than its districts' per-pupil ratios averaged.
+    ///
+    /// The quartile *membership* is the one above — cut by district on unweighted local revenue
+    /// per pupil — so the only thing that differs between the two is how the quartile is summed
+    /// to a number. See the type's own documentation for why both are kept.
+    pub weighted_gap: f64,
+    /// Dollars per pupil of the weighted gap closed by state aid.
+    pub weighted_state_closes: f64,
+    /// And by federal aid.
+    pub weighted_federal_closes: f64,
 }
 
 impl Equalization {
@@ -345,10 +370,24 @@ impl Equalization {
     }
 
     /// State aid's share of the gap, as a fraction.
+    ///
+    /// This is the **unweighted** reading: a statement about the average district in each
+    /// quartile. [`Self::weighted_state_share`] is the statement about the average pupil, and
+    /// the two do not agree in level or in trend.
     #[must_use]
     pub fn state_share(&self) -> f64 {
         if self.gap > 0.0 {
             self.state_closes / self.gap
+        } else {
+            0.0
+        }
+    }
+
+    /// State aid's share of the gap on enrolled ADM.
+    #[must_use]
+    pub fn weighted_state_share(&self) -> f64 {
+        if self.weighted_gap > 0.0 {
+            self.weighted_state_closes / self.weighted_gap
         } else {
             0.0
         }
@@ -402,12 +441,29 @@ pub const MIN_ENROLMENT: f64 = 40.0;
 /// say whether that is Ohio getting better or worse at equalizing, and `doctrine/equity` carried
 /// the question as open.
 ///
-/// It answers it in a way neither "better" nor "worse" captures. **The rate holds and the gap
-/// grows.** The state's share of the gap it closes stays between 0.400 and 0.488 across all
-/// thirteen years from FY2012 to FY2024, while the gap itself grows from $5,727 to $10,527 per
-/// pupil, so the residual — the part no level closes — grows with it from $2,713 to $4,772. A
-/// formula doing the same proportional job against a larger problem leaves districts further
-/// apart every year, and the percentage is the thing that looks stable.
+/// It answers it in a way neither "better" nor "worse" captures. **The gap grows**, from $5,727
+/// to $10,527 per pupil, so the residual — the part no level closes — grows with it from $2,713
+/// to $4,772. A formula doing the same proportional job against a larger problem leaves districts
+/// further apart every year.
+///
+/// # Whether the rate holds depends on which mean, and that was the finding
+///
+/// On the unweighted reading — [`Equalization::state_share`], the average *district* in each
+/// quartile — the state's share stays between 0.400 and 0.488 across all thirteen years and
+/// begins and ends within a point and a half of itself. The corpus published that as "the rate
+/// holds", and the absence of a trend as the finding.
+///
+/// It is not a fact about Ohio. It is a property of the statistic. On
+/// [`Equalization::weighted_state_share`] — the same quartiles, summed over enrolled ADM instead
+/// of over districts — the share runs 0.466 in FY2012 to 0.536 in FY2024, peaks at 0.595 in
+/// FY2019, and fits a trend of +0.79 points a year against the unweighted series' +0.26. Cut the
+/// quartiles by pupils as well and it runs 0.404 to 0.500 at +1.06 a year. **Both aggregate
+/// readings rise by seven to ten points across the window; only the district mean is flat.**
+///
+/// Neither statistic is wrong and this module publishes both. What could not stand was one of
+/// them answering a question about Ohio's pupils. See
+/// `.yidam/decisions/a-district-mean-is-not-a-state-figure.yml`, and
+/// `the_rate_that_holds_only_on_the_unweighted_reading`.
 ///
 /// # The band used to stop at FY2022, and that was an artefact
 ///
@@ -424,7 +480,8 @@ pub const MIN_ENROLMENT: f64 = 40.0;
 /// federal figure and the whole window for the state one.
 #[must_use]
 pub fn equalization_by_year() -> BTreeMap<u16, Equalization> {
-    let mut by_year: BTreeMap<u16, Vec<(f64, f64, f64)>> = BTreeMap::new();
+    // (local, state, federal) per pupil, and the pupils they are per.
+    let mut by_year: BTreeMap<u16, Vec<(f64, f64, f64, f64)>> = BTreeMap::new();
     for row in panel()
         .iter()
         .filter(|r| r.comparable && r.enrollment >= MIN_ENROLMENT)
@@ -433,6 +490,7 @@ pub fn equalization_by_year() -> BTreeMap<u16, Equalization> {
             row.local_revenue / row.enrollment,
             row.state_revenue / row.enrollment,
             row.federal_revenue / row.enrollment,
+            row.enrollment,
         ));
     }
 
@@ -443,17 +501,25 @@ pub fn equalization_by_year() -> BTreeMap<u16, Equalization> {
         if n < 4 {
             continue;
         }
-        // Cut by position, as the single-year measure does, so the two are comparable.
+        // Cut by position, as the single-year measure does, so the two are comparable. The
+        // quartile membership is shared by both statistics below; only the summation differs.
         let mut sums = [[0.0f64; 3]; 4];
         let mut counts = [0usize; 4];
-        for (i, (local, state, federal)) in rows.iter().enumerate() {
+        let mut weighted = [[0.0f64; 4]; 4];
+        for (i, (local, state, federal, pupils)) in rows.iter().enumerate() {
             let q = ((i * 4) / n).min(3);
             sums[q][0] += local;
             sums[q][1] += state;
             sums[q][2] += federal;
             counts[q] += 1;
+            weighted[q][0] += local * pupils;
+            weighted[q][1] += state * pupils;
+            weighted[q][2] += federal * pupils;
+            weighted[q][3] += pupils;
         }
         let mean = |q: usize, k: usize| sums[q][k] / counts[q] as f64;
+        // A ratio of sums, which is the same thing as the quartile's revenue over its pupils.
+        let per_pupil = |q: usize, k: usize| weighted[q][k] / weighted[q][3];
         let (poorest_local, richest_local) = (mean(0, 0), mean(3, 0));
         out.insert(
             year,
@@ -464,6 +530,9 @@ pub fn equalization_by_year() -> BTreeMap<u16, Equalization> {
                 gap: richest_local - poorest_local,
                 state_closes: mean(0, 1) - mean(3, 1),
                 federal_closes: mean(0, 2) - mean(3, 2),
+                weighted_gap: per_pupil(3, 0) - per_pupil(0, 0),
+                weighted_state_closes: per_pupil(0, 1) - per_pupil(3, 1),
+                weighted_federal_closes: per_pupil(0, 2) - per_pupil(3, 2),
             },
         );
     }

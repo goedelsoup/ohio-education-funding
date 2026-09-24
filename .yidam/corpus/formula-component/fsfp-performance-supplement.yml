@@ -108,7 +108,10 @@ findings: |
   **0.5281** without it, so the supplement *compresses* the distribution of state aid by 0.0040 —
   0.0075 of the dispersion. That sign is easy to state backwards. Ohio disperses state aid on
   purpose: the poorest quartile of districts receives **$10,265** per pupil against the least-poor
-  quartile's **$4,851**, and that gap is the equalisation. A payment that falls with need therefore
+  quartile's **$4,851** — each the mean over the districts in that quartile rather than over their
+  pupils, per
+  [a district mean is not a state figure](../../decisions/a-district-mean-is-not-a-state-figure.yml)
+  — and that gap is the equalisation. A payment that falls with need therefore
   rises as a *share of aid*, and compresses the gap. [verified]
 
   Against the aid a district already has, the supplement is worth **0.011408** of the least-poor
