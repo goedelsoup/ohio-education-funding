@@ -283,13 +283,14 @@ test("citations are counted from both the forms the corpus writes them in", () =
   const count = (slug: string) =>
     corpus.sources.find((s) => s.slug === slug)?.citedBy.length ?? -1;
 
-  // Cited only through structured `sourced-from` edges. Seven until the two nonpublic support
-  // programmes were written; the redbook is where Category 3 is grouped, so both cite it.
-  expect(count("lsc-dew-redbook")).toBe(9);
-  // Cited both ways: six structured edges and one markdown link, in the claim tag that closed
-  // the transportation parameter's 180-day question. One number that a reader dropping either
-  // form gets wrong.
-  expect(count("dew-sfpr-line-by-line")).toBe(7);
+  // Cited nine ways through structured `sourced-from` edges and, in the transportation
+  // component, through both a structured edge and a markdown link at once — so the tenth entry
+  // only appears if the two forms are unioned rather than added.
+  expect(count("lsc-dew-redbook")).toBe(10);
+  // Cited both ways: seven structured edges and two markdown links, overlapping in the
+  // transportation component, which cites the line-by-line editions for the department's
+  // rationale for the rider weights. One number that a reader dropping either form gets wrong.
+  expect(count("dew-sfpr-line-by-line")).toBe(8);
   // Cited only inline, in prose.
   expect(count("ocg-white-paper-013")).toBeGreaterThanOrEqual(4);
 
