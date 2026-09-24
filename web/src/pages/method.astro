@@ -10,10 +10,16 @@ import Base from "../layouts/Base.astro";
 import { loadCorpus } from "../lib/corpus.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { count, millions, pct } from "../lib/format.ts";
-import { DENOMINATORS, denominatorSource, denominatorSpan } from "../lib/denominators.ts";
+import {
+  DENOMINATORS,
+  denominatorContrast,
+  denominatorSource,
+  denominatorSpan,
+} from "../lib/denominators.ts";
 import * as routes from "../lib/routes.ts";
 import { yearChip, yearOf } from "../lib/year.ts";
 import { coverage, renderCoverage } from "../lib/coverage.ts";
+import { pinnedSources } from "../lib/digests.ts";
 import { bias, renderBias } from "../lib/bias.ts";
 import { scatterSpec } from "../lib/plot/spec.ts";
 import { renderToString } from "../lib/plot/ssr.ts";
@@ -30,6 +36,50 @@ const meta = bundle.projection;
 // The MR-81 endpoints, read rather than typed — the pair that went stale twice. See
 // `denominatorSpan`.
 const span = denominatorSpan(bundle, "meal_program");
+// One district counted by both departments, with the tax year of the resident count. Read rather
+// than typed: the page carried Taxation's figure for Columbus as 71,947 in one card and 73,746 in
+// two others, which are two tax years of the same quantity. See `denominatorContrast`.
+const seam = denominatorContrast(bundle);
+/*
+ * The districts every panel reaches, which is not the districts in the model.
+ *
+ * `bundle.provenance` renders directly above the table and says the sources are joined "across the
+ * 606 districts every panel covers"; the table's first row says the model holds 609. Both are
+ * right and a reader met them two lines apart with nothing saying so. Counted here rather than
+ * typed, and the three panels are the three the provenance sentence names.
+ */
+const joined = bundle.districts.filter(
+  (d) => d.property_tax?.length && d.outcome != null && d.valuation_per_pupil != null,
+).length;
+// Counted from the manifest, because the sentence that said "Thirteen" was written when it was
+// thirteen and the manifest now holds several hundred. See `digests.ts`.
+const pinned = pinnedSources();
+/*
+ * The tax years Table SD-1 carries, and what the two growth measures do when set beside each
+ * other. Both sentences below used to carry these as literals, and both literals had gone quietly
+ * wrong in the same way.
+ *
+ * "Two tax years" was written when SD-1 carried two; it carries four. And the growth sentence
+ * bounded the disagreement at 0.04 without saying which measure the bound was on — the districts
+ * it bounds reach 0.06 on the three-year figure and 0.10 on the one-year. What is inside 0.04 is
+ * the smaller of each district's pair, so that is what the sentence says now, at a bound read off
+ * the panel rather than asserted about it.
+ */
+const taxYears = new Set(bundle.districts.flatMap((d) => d.property_tax.map((p) => p.tax_year)))
+  .size;
+const growth = (() => {
+  const both = bundle.districts.flatMap((d) =>
+    d.outcome?.progress_effect_size && d.outcome.progress_effect_size_one_year
+      ? [[d.outcome.progress_effect_size, d.outcome.progress_effect_size_one_year] as const]
+      : [],
+  );
+  const opposed = both.filter(([three, one]) => Math.sign(three) !== Math.sign(one));
+  return {
+    both: both.length,
+    opposed: opposed.length,
+    bound: Math.max(...opposed.map(([three, one]) => Math.min(Math.abs(three), Math.abs(one)))),
+  };
+})();
 
 /*
  * The reduction-factor model against the rates county auditors actually charged.
@@ -110,7 +160,7 @@ const millageScatter = renderToString(
   </p>
 
   <div class="card" id="computed-twice" data-part="computed-twice">
-    <h2><SectionAnchor id="computed-twice" />The formula is computed twice, on purpose</h2>
+    <h2><SectionAnchor id="computed-twice" />The formula is computed twice</h2>
     <p class="note">
       Ohio's Fair School Funding Plan is implemented in this repository twice: once in Rust, in{" "}
       <code>crates/foundation</code> and <code>crates/project</code>, and once in TypeScript, in{" "}
@@ -150,7 +200,14 @@ const millageScatter = renderToString(
       wrong — they count different things, for different purposes, in different years. The
       Department of Taxation counts children who live in the district; the Department of Education
       counts the ones it teaches, and separately the ones it funds, and separately again a
-      need-weighted count. For Columbus those range from 43,019 to 73,746.
+      need-weighted count.{
+        seam && (
+          <>
+            {" "}For {seam.name} they run from {count(seam.enrolled)} to {count(seam.resident)},
+            the wider of the two being Taxation's on tax year {seam.taxYear}.
+          </>
+        )
+      }
     </p>
     <div class="scroll">
       <table class="prose">
@@ -174,6 +231,12 @@ const millageScatter = renderToString(
                       {count(span.last)} in FY{span.lastYear}.
                     </>
                   )}
+                  {"contrast" in d && seam && (
+                    <>
+                      {" "}{count(seam.resident)} for {seam.name} on tax year {seam.taxYear},
+                      against Education's {count(seam.enrolled)}.
+                    </>
+                  )}
                 </td>
               </tr>
             ))
@@ -190,6 +253,13 @@ const millageScatter = renderToString(
       likely to open. <code>src/lib/denominators.ts</code> now declares the denominator of every
       per-pupil field in the feed, and a test fails the build if a new one arrives undeclared or
       if a pair the site renders side by side stops matching.
+    </p>
+    <p class="note">
+      Which count a page uses is therefore a stated choice rather than a default. The property tax
+      route divides by Taxation's, because the valuation it is dividing is Taxation's — the two
+      departments agree on that valuation to the dollar, so the whole gap between their per-pupil
+      figures is the denominator and nothing else. Everywhere else divides by Education's, because
+      that is the count the formula reads. Each page names the one it is on.
     </p>
   </div>
 
@@ -212,9 +282,9 @@ const millageScatter = renderToString(
             <th>The five-year forecast figures</th>
             <td>
               A <strong>record</strong>. Audited actuals from each district's own filing — money
-              that changed hands. These are the only figures on this site that are not computed,
-              which is why they have <a href="/districts">their own route per district</a> and are
-              never placed as a check on the model. The two are differently constructed and are not
+              that changed hands. Nothing here recomputes them, which is why they have{" "}
+              <a href="/districts">their own route per district</a> and are never placed as a check
+              on the model. The two are differently constructed and are not
               comparable line for line.
             </td>
           </tr>
@@ -226,17 +296,26 @@ const millageScatter = renderToString(
                 s.outcomes ? count(s.outcomes.districts) : "—"
               } districts and none of them identifies an effect. <a href="/outcomes">Why that
               matters here in particular</a>.
+              <div class="n">
+                Growth is published twice over — value-added across three years and across one.
+                This site uses the three-year figure everywhere, which is the department's own
+                default, but it is a choice and the district pages show both. They never
+                substantively disagree: of the {count(growth.both)} districts printing non-zero on
+                both, {count(growth.opposed)} point opposite ways, and in every one of them the
+                smaller of the two is within {growth.bound.toFixed(2)} of zero.
+              </div>
             </td>
           </tr>
           <tr>
             <th>The property tax figures</th>
             <td>
               A <strong>record</strong>, and from a different department. Table SD-1 is published
-              by the Ohio Department of Taxation rather than the Department of Education, which
-              makes it the one place two arms of the state describe the same district
-              independently — and where they overlap they agree, to 0.01 mills across all 606
-              districts carrying both. Two tax years, because H.B. 920 is a mechanism that only
-              exists as a change.
+              by the Ohio Department of Taxation rather than the Department of Education, so two
+              arms of the state describe the same district independently — and where they overlap
+              they agree, to 0.01 mills across all 606
+              districts carrying both. The record spans {count(taxYears)} tax years, because H.B. 920
+              is a mechanism that only exists as a change; the reduction-factor comparison runs on
+              the last two of them.
             </td>
           </tr>
           <tr>
@@ -250,15 +329,9 @@ const millageScatter = renderToString(
           <tr>
             <th>The H.B. 920 figures</th>
             <td>
-              <strong>Computed</strong> — the one block on the property tax page that is. The
-              predicted rate, the residual against it, and what one mill raises come from{" "}
-              <code>crates/millage</code> applied to the two tax years, not from any published
-              column. Running it against the tables found a defect in each direction: the crate
-              reduced rates below the twenty-mill floor for the six districts that never voted
-              twenty mills, and this site reported those districts as being <em>above</em> the
-              floor with reduction factors operative. Both are fixed, and{" "}
-              <code>crates/millage/tests/against_published_tables.rs</code> now holds the
-              calculator to 1,218 published district-years.
+              <strong>Computed</strong>, from <code>crates/millage</code> rather than from any
+              published column — the predicted rate, the residual against it, and what one mill
+              raises. <a href="#reduction-factors">What the prediction gets right, and where</a>.
             </td>
           </tr>
           <tr>
@@ -271,7 +344,7 @@ const millageScatter = renderToString(
               own published answer for <strong>all 609 districts, on both the capacity and the
               rate, to within a hundredth of a percent</strong>.
               <div class="n">
-                It was got wrong first. Reconstructing four of the inputs rather than reading them
+                It was wrong the first time. Reconstructing four of the inputs rather than reading them
                 left the calculation 4.4% light — a near-uniform error that correlated with none
                 of the three terms, which is what a shared wrong input looks like rather than a
                 wrong formula. The department publishes all four; the residual is now zero.
@@ -285,35 +358,25 @@ const millageScatter = renderToString(
               the plan's own base cost fixed and substitutes the mechanism it replaced — a flat 23
               statutory mills against valuation — for the local capacity measure. It is not a
               reconstruction of any year the charge-off governed, and it reaches one row of the
-              calculation, because that is the only pair of components the corpus declares
-              comparable. Every figure is on the pre-2008 total-taxable base and so overstates
+              calculation, because that is the pair of components the corpus declares
+              comparable and it declares no others. Every figure is on the pre-2008 total-taxable base and so overstates
               what the charge-off would have taken.
             </td>
           </tr>
           <tr>
             <th>The federal spending share</th>
             <td>
-              A <strong>record</strong>, from the report card, and the only figure here that
-              measures exposure to a decision Ohio does not make. Reported as a share rather than
-              as dollars because both its parts divide by a need-weighted pupil count and their
-              ratio does not — the one spending statistic on this site that can be set beside
-              another district's without asking which denominator either uses.
-            </td>
-          </tr>
-          <tr>
-            <th>Growth</th>
-            <td>
-              Two published measures, not one: value-added over three years and over one. This
-              site uses the three-year figure everywhere, which is the department's own default
-              and the right one — but it is a choice, and the district pages now show both. They
-              never substantively disagree; of the 534 districts printing non-zero on both, the 44
-              that point opposite ways are all within 0.04 of zero.
+              A <strong>record</strong>, from the report card, and a measure of exposure to a
+              decision Ohio does not make. Reported as a share rather than as dollars because both
+              its parts divide by a need-weighted pupil count and their ratio does not — which is
+              what lets it be set beside another district's without asking which denominator
+              either uses.
             </td>
           </tr>
           <tr>
             <th>The interstate comparison</th>
             <td>
-              A <strong>measurement</strong>, and the only federal source here. The Census
+              A <strong>measurement</strong>, and the one source here from outside Ohio. The Census
               Bureau's Annual Survey of School System Finances counts every school system in the
               country on one set of definitions, which is what lets this site say whether Ohio is
               unusual rather than only what Ohio does. FY2022, the peak year of pandemic relief —
@@ -322,20 +385,10 @@ const millageScatter = renderToString(
             </td>
           </tr>
           <tr>
-            <th>Valuation per pupil</th>
-            <td>
-              Two published figures, not one. Taxation and Education agree on the valuation to the
-              dollar and divide it by different pupil counts — 43,019 against 73,746 for Columbus.
-              A third count, base cost ADM, is what base cost per pupil divides by. Each page
-              names which it is using; the property tax route uses Taxation's and everything else
-              uses Education's, because that is the one the formula reads.
-            </td>
-          </tr>
-          <tr>
             <th>The projection</th>
             <td>
-              A <strong>forecast</strong>, and the only thing on this site that is. Enrollment is
-              carried forward by a damped trend and the formula is re-run at it; nothing projects
+              A <strong>forecast</strong>. Enrollment is carried forward by a damped trend and
+              the formula is re-run at it; nothing else here projects
               the formula, the appropriation, or assessed valuation. Its interval is drawn as the
               headline rather than as a disclaimer, for reasons below.
             </td>
@@ -346,20 +399,19 @@ const millageScatter = renderToString(
   </div>
 
   <div class="card" id="base-cost" data-part="base-cost">
-    <h2><SectionAnchor id="base-cost" />The one thing here that is computed</h2>
+    <h2><SectionAnchor id="base-cost" />Base cost, and how the build-up is reconciled</h2>
     <p class="note">
-      Base cost is the exception to the row above. It is not a rate the state sets: R.C. 3317.011
-      assembles it for each district from statutory staffing ratios applied to that district's own
-      grade-band enrollment, priced at statewide average salaries — twenty-two elements in five
-      sub-components. <code>crates/foundation</code> runs that statute, and every district page
+      Base cost is the exception the funding-figures row names. It is not a rate the state sets:
+      R.C. 3317.011 assembles it for each district from statutory staffing ratios applied to that
+      district's own grade-band enrollment, priced at statewide average salaries — twenty-two
+      elements in five sub-components. <code>crates/foundation</code> runs that statute, and every district page
       shows the result rather than the total.
     </p>
     <p class="note">
-      Which is a claim, so it is reconciled rather than asserted. The department publishes its own
+      That is a claim, so it is reconciled rather than asserted. The department publishes its own
       aggregate for every district; the build-up is shown beside it with the difference stated. The
       worst of the {count(s.districts)} in {yearOf("formula")} is <strong>$1.09</strong> on figures
-      in the millions, and
-      the residuals cancel to nothing statewide — twenty-two elements each rounded at the point the
+      in the millions, and the residuals cancel to nothing statewide — twenty-two elements each rounded at the point the
       department rounds them. The reproduction is checked across the whole panel in{" "}
       <code>crates/foundation</code>'s tests before this site is allowed to build.
     </p>
@@ -374,7 +426,7 @@ const millageScatter = renderToString(
   </div>
 
   <div class="card" id="reduction-factors" data-part="reduction-factors">
-    <h2><SectionAnchor id="reduction-factors" />And the second, checked the same way<Fragment set:html={yearChip("millage")} /></h2>
+    <h2><SectionAnchor id="reduction-factors" />H.B. 920's reduction factors, against what was charged<Fragment set:html={yearChip("millage")} /></h2>
     <p class="note">
       The card above says base cost is the exception on the <em>funding</em> side. There is one
       more on the property-tax side: <code>crates/millage</code> runs H.B. 920's reduction factors
@@ -401,7 +453,7 @@ const millageScatter = renderToString(
       are what sets the rate, and that is where the model is approximate.
     </p>
     <p class="note">
-      Which the picture understates, because agreement has one coordinate and disagreement has
+      The picture understates that, because agreement has one coordinate and disagreement has
       many. <strong>{millage.stacked} of the districts at the floor are the single dot at
       (20.00, 20.00)</strong>, and the visible orange spike above it is the {millage.atFloor -
       millage.floorExact} that the floor does not account for. Read the counts here rather than the
@@ -415,6 +467,14 @@ const millageScatter = renderToString(
       know nothing of a levy passed since or a building put up since. Each district's own page
       says which of the two its residual is consistent with; this repository does not hold the levy
       histories that would settle it.
+    </p>
+    <p class="note">
+      Drawing the crate against the tables is also how its defects were found, one in each
+      direction. It reduced rates below the twenty-mill floor for the six districts that never
+      voted twenty mills; this site then reported those same districts as sitting <em>above</em>
+      the floor with reduction factors operative. Both are fixed, and{" "}
+      <code>crates/millage/tests/against_published_tables.rs</code> now holds the calculator to
+      every district-year the two tables publish.
     </p>
   </div>
 
@@ -450,13 +510,25 @@ const millageScatter = renderToString(
   </div>
 
   <div class="card" id="provenance" data-part="provenance">
-    <h2><SectionAnchor id="provenance" />Provenance</h2>
+    <h2><SectionAnchor id="provenance" />Provenance and the source manifest</h2>
     <p class="note">{bundle.provenance}</p>
     <div class="scroll">
       <table class="prose">
         <tbody>
           <tr><th>Bundle contract</th><td>{bundle.contract_version}</td></tr>
-          <tr><th>Districts in the model</th><td>{count(s.districts)}</td></tr>
+          <tr>
+            <th>Districts in the model</th>
+            <td>
+              {count(s.districts)}
+              {/* The provenance sentence directly above says "the 606 districts every panel
+                  covers", and a reader met the two numbers two lines apart with nothing
+                  reconciling them. Both are right: 606 is the join, 609 is the model. */}
+              <div class="n">
+                Of which the {count(joined)} that carry every panel are the population any
+                cross-source figure is computed on.
+              </div>
+            </td>
+          </tr>
           <tr>
             <th>Reference scenarios reproduced</th>
             <td>{verification.comparisons.length} of {verification.comparisons.length}</td>
@@ -470,6 +542,21 @@ const millageScatter = renderToString(
             </td>
           </tr>
           <tr><th>Price index</th><td>{bundle.deflator?.label ?? "none"}</td></tr>
+          {
+            pinned != null && (
+              <tr>
+                <th>Sources pinned by digest</th>
+                <td>
+                  {count(pinned)}
+                  <div class="n">
+                    SHA-256 and byte length, in <code>crates/connect/source-digests.txt</code>. A
+                    changed digest means the publication was revised rather than that the fetch
+                    failed.
+                  </div>
+                </td>
+              </tr>
+            )
+          }
           <tr>
             <th>Corpus</th>
             <td>
@@ -482,9 +569,9 @@ const millageScatter = renderToString(
     </div>
     <p class="note">
       Every source the corpus draws on is listed at <a href="/wiki/source">/wiki/source</a>, and
-      the feed itself is downloadable at <a href="/data">/data</a>. Thirteen of the retrieved files
-      are pinned by SHA-256 in the repository, so a claim can be traced to a byte-identical copy of
-      the publication it came from.
+      the feed itself is downloadable at <a href="/data">/data</a>. The retrieved files are pinned
+      by content hash in the repository, so a claim can be traced to a byte-identical copy of the
+      publication it came from.
     </p>
   </div>
 
@@ -529,8 +616,8 @@ const millageScatter = renderToString(
               the following calendar year in two settlements, so a levy passed in November is
               charged in full and arrives across two fiscal years. Every ratio here that puts a
               charge over a year's spending inherits that gap, and it is largest exactly where a
-              levy has just passed — which is one of the three districts charged more than it
-              spends.
+              levy has just passed — which is what the {count(tax.chargedMoreThanSpent.length)}{" "}
+              districts charged more than they spend have in common.
             </td>
           </tr>
           <tr>
