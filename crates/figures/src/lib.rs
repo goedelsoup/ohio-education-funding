@@ -2388,6 +2388,89 @@ pub struct Inputs {
     /// `.yidam/decisions/the-bias-published-beside-the-point.yml`. Run once, like the coverage
     /// profile, so the ten pins and the two curves are one computation.
     pub bias: Vec<project::backtest::Drift>,
+    /// The three Category 3 lines that pay the chartered nonpublic schools outside the
+    /// scholarships, and what the department's scholarship report puts beside them.
+    ///
+    /// Here because the two nodes for those lines are the corpus's only account of a quarter of a
+    /// billion dollars a year, and a node with no `figures:` block has verified nothing. Computed
+    /// once because every figure below reads one of four series off the same catalog fixture.
+    pub nonpublic: Nonpublic,
+}
+
+/// Category 3 of the department's budget, as [`project::ledger::nonpublic_support`] reads it.
+pub struct Nonpublic {
+    /// GRF 200511 Auxiliary Services, newest vintage per year, deflated to FY2025 dollars.
+    pub auxiliary: Vec<NonpublicYear>,
+    /// GRF 200532 Nonpublic Administrative Cost Reimbursement, the same.
+    pub administrative: Vec<NonpublicYear>,
+    /// 5980 200659 Auxiliary Services Reimbursement — the mobile unit line, the same.
+    pub reimbursement: Vec<NonpublicYear>,
+    /// The three of them summed.
+    pub category: Vec<NonpublicYear>,
+    /// FY2020 to FY2025 on 200511, nominal and real. The window ends at FY2025 because the CPI
+    /// series cannot reach FY2027 and a growth rate wants both endpoints on one footing.
+    pub auxiliary_growth: (f64, f64),
+    /// The same window on 200532.
+    pub administrative_growth: (f64, f64),
+    /// And on the category.
+    pub category_growth: (f64, f64),
+    /// What the four scholarship programmes that publish an expenditure paid in 2024-25.
+    ///
+    /// The denominator of the scale claim, and short by one programme: Jon Peterson's
+    /// expenditure is not published, so the ratio built on this is an upper bound.
+    pub scholarship_expenditure: f64,
+}
+
+/// One year of one line, as this manifest holds it.
+pub type NonpublicYear = project::ledger::nonpublic_support::Year;
+
+impl Nonpublic {
+    /// Read the four series and the scholarship report.
+    #[must_use]
+    pub fn build() -> Self {
+        use project::ledger::nonpublic_support as nonpublic;
+
+        let base = edfund_core::FiscalYear(2025);
+        let auxiliary = nonpublic::series(nonpublic::AUXILIARY_SERVICES, base);
+        let administrative = nonpublic::series(nonpublic::ADMINISTRATIVE_COST_REIMBURSEMENT, base);
+        let reimbursement = nonpublic::series(nonpublic::AUXILIARY_SERVICES_REIMBURSEMENT, base);
+        let category = nonpublic::category_three(base);
+
+        let window = |history: &[NonpublicYear]| -> (f64, f64) {
+            let span: Vec<NonpublicYear> = history
+                .iter()
+                .filter(|year| (2020..=2025).contains(&year.fiscal_year))
+                .cloned()
+                .collect();
+            nonpublic::growth(&span).expect("FY2020 and FY2025 both deflate")
+        };
+
+        Self {
+            auxiliary_growth: window(&auxiliary),
+            administrative_growth: window(&administrative),
+            category_growth: window(&category),
+            scholarship_expenditure: project::scholarship::report::programmes()
+                .values()
+                .filter_map(|programme| programme.expenditure)
+                .sum(),
+            auxiliary,
+            administrative,
+            reimbursement,
+            category,
+        }
+    }
+
+    /// The nominal amount one series carries for one year.
+    ///
+    /// Panics rather than returning an option: every year these figures ask for is inside the
+    /// catalog's span, and a missing one is a fixture that stopped carrying a line rather than a
+    /// figure of zero.
+    #[must_use]
+    pub fn nominal(history: &[NonpublicYear], fiscal_year: u16) -> f64 {
+        project::ledger::nonpublic_support::at(history, fiscal_year)
+            .unwrap_or_else(|| panic!("the catalog no longer carries FY{fiscal_year}"))
+            .nominal
+    }
 }
 
 /// What `project::lost_pupils` establishes, computed once over the 607 districts the identity
@@ -3306,6 +3389,7 @@ impl Inputs {
             // Computed once here rather than per figure: each of the three walks the whole
             // ten-year panel and deflates it, and fourteen figures below read them.
             transfers: project::transfers::by_year(),
+            nonpublic: Nonpublic::build(),
             attribution_before: project::transfers::attribution(false),
             attribution_both: project::transfers::attribution(true),
             equalization: dispersion::ohio_panel::equalization_by_year(),
@@ -16078,6 +16162,301 @@ pub static FIGURES: &[Figure] = &[
         pinned: 449.0,
         tolerance: 0.0,
         compute: |i| i.lost_pupils.neighbours.membership as f64,
+    },
+    Figure {
+        key: "project/nonpublic-support-fy2025",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What Ohio paid the chartered nonpublic schools through Category 3 in FY2025 \
+                — auxiliary services, the administrative cost reimbursement and the mobile unit \
+                line, outside the five scholarship programmes",
+        pinned: 242_688_919.0,
+        tolerance: 0.5,
+        compute: |i| Nonpublic::nominal(&i.nonpublic.category, 2025),
+    },
+    Figure {
+        key: "project/nonpublic-support-fy2027",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same three lines as appropriated for FY2027",
+        pinned: 250_737_573.0,
+        tolerance: 0.5,
+        compute: |i| Nonpublic::nominal(&i.nonpublic.category, 2027),
+    },
+    Figure {
+        key: "project/nonpublic-support-real-decline-fy2020-fy2025",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "What Category 3 lost in purchasing power across FY2020-FY2025, in constant \
+                FY2025 dollars — a fall, against a nominal rise over the same years",
+        pinned: 0.1039,
+        tolerance: 0.0005,
+        compute: |i| -i.nonpublic.category_growth.1,
+    },
+    Figure {
+        key: "project/nonpublic-support-nominal-growth-fy2020-fy2025",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "And what it gained in cash over the same five years, which is the number a \
+                budget document states",
+        pinned: 0.1212,
+        tolerance: 0.0005,
+        compute: |i| i.nonpublic.category_growth.0,
+    },
+    Figure {
+        key: "project/nonpublic-support-against-the-scholarship-channel",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "Category 3 in FY2025 as a share of what the four scholarship programmes that \
+                publish an expenditure paid in 2024-25 — an upper bound, since Jon Peterson's is \
+                not published",
+        pinned: 0.2448,
+        tolerance: 0.0005,
+        compute: |i| {
+            Nonpublic::nominal(&i.nonpublic.category, 2025) / i.nonpublic.scholarship_expenditure
+        },
+    },
+    Figure {
+        key: "project/scholarship-expenditure-2024-25",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The denominator of that ratio: traditional EdChoice, EdChoice Expansion, \
+                Cleveland and Autism as the department's 2025 Scholarship Annual Report states \
+                them",
+        pinned: 991_191_150.12,
+        tolerance: 0.005,
+        compute: |i| i.nonpublic.scholarship_expenditure,
+    },
+    Figure {
+        key: "project/auxiliary-services-fy2025",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "GRF 200511 Auxiliary Services, FY2025 actual — the largest of the three lines \
+                and the one R.C. 3317.06 governs the uses of",
+        pinned: 166_816_769.0,
+        tolerance: 0.5,
+        compute: |i| Nonpublic::nominal(&i.nonpublic.auxiliary, 2025),
+    },
+    Figure {
+        key: "project/auxiliary-services-fy2027",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same line as appropriated for FY2027",
+        pinned: 172_262_613.0,
+        tolerance: 0.5,
+        compute: |i| Nonpublic::nominal(&i.nonpublic.auxiliary, 2027),
+    },
+    Figure {
+        key: "project/auxiliary-services-share-of-nonpublic-support",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "And its share of Category 3 in FY2025",
+        pinned: 0.6874,
+        tolerance: 0.0005,
+        compute: |i| {
+            Nonpublic::nominal(&i.nonpublic.auxiliary, 2025)
+                / Nonpublic::nominal(&i.nonpublic.category, 2025)
+        },
+    },
+    Figure {
+        key: "project/auxiliary-services-nominal-growth-fy2020-fy2025",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "What auxiliary services gained in cash across FY2020-FY2025",
+        pinned: 0.0825,
+        tolerance: 0.0005,
+        compute: |i| i.nonpublic.auxiliary_growth.0,
+    },
+    Figure {
+        key: "project/auxiliary-services-real-decline-fy2020-fy2025",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "And what it lost in purchasing power over the same years, in constant FY2025 \
+                dollars — the line grew by a twelfth and fell by an eighth",
+        pinned: 0.1348,
+        tolerance: 0.0005,
+        compute: |i| -i.nonpublic.auxiliary_growth.1,
+    },
+    Figure {
+        key: "project/auxiliary-services-per-pupil-upper-bound-fy2025",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "FY2025 auxiliary services over the 173,156 chartered nonpublic pupils the \
+                department's 2023-24 landscape sheet counts — an upper bound on the rate, since \
+                the denominator is a year early and short of both of LSC's school counts",
+        pinned: 963.39,
+        tolerance: 0.005,
+        compute: |_| {
+            project::ledger::nonpublic_support::per_pupil(
+                project::ledger::nonpublic_support::AUXILIARY_SERVICES,
+                2025,
+            )
+            .expect("the catalog carries FY2025")
+        },
+    },
+    Figure {
+        key: "project/auxiliary-services-published-rate-fy2025",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What LSC publishes as the FY2025 auxiliary services rate per pupil, in both the \
+                redbook and the greenbook — the figure the computation above does not reproduce",
+        pinned: 913.0,
+        tolerance: 0.005,
+        compute: |_| project::ledger::nonpublic_support::PUBLISHED_AUXILIARY_RATE_FY2025,
+    },
+    Figure {
+        key: "project/auxiliary-services-implied-membership-fy2025",
+        owner: "crates/project",
+        unit: Unit::Pupils,
+        label: "The membership that published rate implies, on the appropriation net of the \
+                College Credit Plus earmark — against 173,156 counted",
+        pinned: 179_712.76,
+        tolerance: 0.5,
+        compute: |i| {
+            project::ledger::nonpublic_support::implied_membership(
+                Nonpublic::nominal(&i.nonpublic.auxiliary, 2025)
+                    - project::ledger::nonpublic_support::COLLEGE_CREDIT_PLUS_FY2025,
+                project::ledger::nonpublic_support::PUBLISHED_AUXILIARY_RATE_FY2025,
+            )
+            .expect("a positive rate")
+        },
+    },
+    Figure {
+        key: "project/chartered-nonpublic-enrolment",
+        owner: "crates/project",
+        // A `Count` rather than `Pupils`, and the contrast with the two implied memberships
+        // beside it is the point: the landscape sheet tallies enrolled children and reports a
+        // whole number, while an average daily membership is a measurement and comes out
+        // fractional. The corpus divides by the first because it does not hold the second.
+        unit: Unit::Count,
+        label: "Pupils in Ohio's 711 chartered nonpublic schools, 2023-24 — the only nonpublic \
+                enrolment the corpus holds, and not the October average daily membership \
+                R.C. 3317.024(E)(2)(d) divides by",
+        pinned: 173_156.0,
+        tolerance: 0.0,
+        compute: |_| project::ledger::nonpublic_support::chartered_nonpublic_enrolment(),
+    },
+    Figure {
+        key: "project/college-credit-plus-earmark-fy2025",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The College Credit Plus earmark inside auxiliary services, FY2025 actual — the \
+                part of the line that is not divided among nonpublic pupils",
+        pinned: 2_739_015.0,
+        tolerance: 0.5,
+        compute: |_| project::ledger::nonpublic_support::COLLEGE_CREDIT_PLUS_FY2025,
+    },
+    Figure {
+        key: "project/auxiliary-services-reimbursement-fy2025",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "5980 200659 Auxiliary Services Reimbursement, FY2025 actual — the mobile unit \
+                line, spent out of a fund that has received no transfer since FY2013",
+        pinned: 534_753.0,
+        tolerance: 0.5,
+        compute: |i| Nonpublic::nominal(&i.nonpublic.reimbursement, 2025),
+    },
+    Figure {
+        key: "project/auxiliary-services-reimbursement-fy2027",
+        owner: "crates/project",
+        // Its share of the category is 0.22%, and that is not a figure this manifest can carry:
+        // a share small enough to be mistaken for its own percentage fits neither unit, and
+        // `a_share_cannot_be_confused_with_a_percentage` says so. The two dollar amounts say it
+        // anyway — $534,753 against $242.7 million — and both of those are bound.
+        unit: Unit::Dollars,
+        label: "The mobile unit line as appropriated for FY2027 — a round number, which is what \
+                an appropriation looks like when it is sized to a fund balance rather than to a \
+                count of anything",
+        pinned: 650_000.0,
+        tolerance: 0.5,
+        compute: |i| Nonpublic::nominal(&i.nonpublic.reimbursement, 2027),
+    },
+    Figure {
+        key: "project/nonpublic-administrative-reimbursement-fy2025",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "GRF 200532 Nonpublic Administrative Cost Reimbursement, FY2025 actual — what \
+                R.C. 3317.063 repaid the schools for the previous year's mandated administrative \
+                and clerical costs",
+        pinned: 75_337_397.0,
+        tolerance: 0.5,
+        compute: |i| Nonpublic::nominal(&i.nonpublic.administrative, 2025),
+    },
+    Figure {
+        key: "project/nonpublic-administrative-reimbursement-fy2027",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same line as appropriated for FY2027",
+        pinned: 77_824_960.0,
+        tolerance: 0.5,
+        compute: |i| Nonpublic::nominal(&i.nonpublic.administrative, 2027),
+    },
+    Figure {
+        key: "project/nonpublic-administrative-nominal-growth-fy2020-fy2025",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "What the reimbursement gained in cash across FY2020-FY2025",
+        pinned: 0.2108,
+        tolerance: 0.0005,
+        compute: |i| i.nonpublic.administrative_growth.0,
+    },
+    Figure {
+        key: "project/nonpublic-administrative-real-decline-fy2020-fy2025",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "And what it lost in purchasing power over the same years — a fall a fifth the \
+                depth of auxiliary services', because the rate was raised twice in the window",
+        pinned: 0.0323,
+        tolerance: 0.0005,
+        compute: |i| -i.nonpublic.administrative_growth.1,
+    },
+    Figure {
+        key: "project/nonpublic-administrative-rate-fy2025",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the FY2025 appropriation permitted the department to reimburse per student, \
+                as LSC states it",
+        pinned: 440.0,
+        tolerance: 0.005,
+        compute: |_| project::ledger::nonpublic_support::PUBLISHED_ADMINISTRATIVE_RATE_FY2025,
+    },
+    Figure {
+        key: "project/nonpublic-administrative-rate-authorized",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And what the General Assembly authorised per student for FY2024 through FY2027 \
+                — the ceiling R.C. 3317.063 pays up to and the appropriation did not reach",
+        pinned: 475.0,
+        tolerance: 0.005,
+        compute: |_| project::ledger::nonpublic_support::AUTHORIZED_ADMINISTRATIVE_RATE,
+    },
+    Figure {
+        key: "project/nonpublic-administrative-rationing-fy2025",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "How far below the authorised rate FY2025 was paid — the gap a reimbursement can \
+                have and a direct appropriation cannot, because the second sets its rate by \
+                dividing",
+        pinned: 0.0737,
+        tolerance: 0.0005,
+        compute: |_| project::ledger::nonpublic_support::rationing_fy2025().1,
+    },
+    Figure {
+        key: "project/nonpublic-administrative-implied-membership-fy2025",
+        owner: "crates/project",
+        unit: Unit::Pupils,
+        label: "The membership the $440 implies on its own appropriation — five per cent below \
+                what the auxiliary services rate implies, because a reimbursement of actual \
+                costs against a ceiling is not a quotient and its denominator is not a count",
+        pinned: 171_221.36,
+        tolerance: 0.5,
+        compute: |i| {
+            project::ledger::nonpublic_support::implied_membership(
+                Nonpublic::nominal(&i.nonpublic.administrative, 2025),
+                project::ledger::nonpublic_support::PUBLISHED_ADMINISTRATIVE_RATE_FY2025,
+            )
+            .expect("a positive rate")
+        },
     },
 ];
 

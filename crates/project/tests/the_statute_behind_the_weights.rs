@@ -93,6 +93,23 @@ const CITED: &[&str] = &[
     // governing board, with the State Board of Education reachable only on appeal.
     "3311.06",
     "3311.22",
+    // Category 3 of the department's budget: the auxiliary services entitlement, its two payment
+    // routes, its two lists of permitted uses, and the administrative cost reimbursement. Cited by
+    // `auxiliary-services` and `nonpublic-administrative-cost-reimbursement` for the whole of what
+    // separates them — 3317.024(E)(2)(d) divides an appropriation by a membership and 3317.063
+    // repays actual prior-year costs against a ceiling. 3317.06 is here despite naming no amount,
+    // because its absence of one is the finding: the line is named for a section that only says
+    // what the money may be spent on.
+    "3317.024",
+    "3317.06",
+    "3317.062",
+    "3317.063",
+    "3317.064",
+    // And where the mobile unit line's money comes from. 4141.47 is the auxiliary services
+    // personnel unemployment compensation fund, whose excess 3317.064 transfers — and whose own
+    // revenue is 3317.06's unspent balances, which is what makes ALI 200659 a reflux rather than
+    // a third appropriation.
+    "4141.47",
     // Payment in lieu of transportation. Cited by `fsfp-transportation` for a channel that
     // reaches non-district pupils outside the weights entirely, and for division (D)'s ceiling:
     // the department's average cost of pupil transportation for the previous school year, which

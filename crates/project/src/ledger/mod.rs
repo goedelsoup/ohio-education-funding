@@ -1,6 +1,6 @@
 //! The appropriations ledger: what the General Assembly set aside, line by line and year by year.
 //!
-//! Four modules, and the boundary they sit behind is the point of the directory.
+//! Five modules, and the boundary they sit behind is the point of the directory.
 //!
 //! | Module | Question it answers |
 //! |---|---|
@@ -8,6 +8,7 @@
 //! | [`session_laws`] | the same, FY1998 to FY2001, from a different publisher |
 //! | [`line_origins`] | how old a line is, and which act established it |
 //! | [`budget_analysis`] | what a line's earmarks are, and whether they survived the legislature |
+//! | [`nonpublic_support`] | what the three Category 3 lines pay the chartered nonpublic schools |
 //!
 //! # The invariant: the ledger knows nothing about districts
 //!
@@ -41,6 +42,7 @@
 pub mod appropriations;
 pub mod budget_analysis;
 pub mod line_origins;
+pub mod nonpublic_support;
 pub mod session_laws;
 
 #[cfg(test)]
@@ -61,12 +63,13 @@ mod tests {
     /// already contains and costs the library nothing.
     #[test]
     fn the_ledger_reaches_nothing_outside_itself() {
-        const SOURCES: [(&str, &str); 5] = [
+        const SOURCES: [(&str, &str); 6] = [
             ("mod.rs", include_str!("mod.rs")),
             ("appropriations.rs", include_str!("appropriations.rs")),
             ("budget_analysis.rs", include_str!("budget_analysis.rs")),
             ("session_laws.rs", include_str!("session_laws.rs")),
             ("line_origins.rs", include_str!("line_origins.rs")),
+            ("nonpublic_support.rs", include_str!("nonpublic_support.rs")),
         ];
         const ABSOLUTE: &str = concat!("crate", "::");
         const OWN: &str = concat!("ledger", "::");

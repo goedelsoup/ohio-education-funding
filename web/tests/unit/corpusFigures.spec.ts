@@ -332,15 +332,25 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * worth binding: 36.4% of the members are community and STEM schools, 4.75% of the enrolment,
  * and 277 of the 347 report none at all. A share of members and a share of pupils that far apart
  * is a claim each number alone would misstate, and prose stating both had been carrying it.
+ *
+ * Recomputed at **1105/80** when Category 3 of the department's budget got its first reader.
+ * `program/auxiliary-services` is the seventy-ninth carrier and
+ * `program/nonpublic-administrative-cost-reimbursement` the eightieth — the first two nodes in
+ * this corpus for state money reaching private schooling that is not a scholarship, a quarter of
+ * a billion dollars a year across three appropriation lines committed since the 2006 catalog
+ * edition. Twenty-six of the twenty-nine are theirs, and the other three are the drift again:
+ * 1079 actual against 1076 declared. Third recount in a row to find the floor under its count,
+ * which is what a hand-maintained exact ratchet does and why both numbers here are read off this
+ * test's own expressions rather than added to the last pair.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1076 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1076,
+  expect(bindings.length, "1105 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1105,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "78 nodes carry bindings; raise this when a seventy-ninth does",
-  ).toBeGreaterThanOrEqual(78);
+    "80 nodes carry bindings; raise this when an eighty-first does",
+  ).toBeGreaterThanOrEqual(80);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",
