@@ -1,0 +1,65 @@
+program	fiscal_year	measure	value	denominator	precision	source	quote
+cleveland	2005	average_award	2325	unstated	exact	hb66-greenbook	the average scholarship was $2,325
+cleveland	2005	average_tutoring_grant	298	unstated	exact	hb66-greenbook	the average tutoring grant was $298
+cleveland	2005	participation	5710	students	exact	hb66-greenbook	In FY 2005, 5,710 students received scholarships
+cleveland	2005	tutoring	2982	students	exact	hb66-greenbook	2,982 students received tutoring grants
+autism	2012	participation	360	students	exact	hb59-greenbook	In FY 2012, 360 students received scholarships
+cleveland	2012	average_award	3273	unstated	estimated	hb59-greenbook	an estimated average scholarship of $3,273
+cleveland	2012	participation	5128	students	about	hb59-greenbook	approximately 5,128 students participated in the program
+traditional-edchoice	2012	participation	15219	scholarships	exact	hb59-greenbook	In FY 2012, 15,219 scholarships were awarded
+autism	2014	participation	2623	students	exact	hb64-greenbook	In FY 2014, 2,623 students received scholarships
+cleveland	2014	average_award	4552	unstated	estimated	hb64-greenbook	an estimated average scholarship of $4,552
+cleveland	2014	participation	6337	students	exact	hb64-greenbook	In FY 2014, 6,337 students participated in the program
+cleveland	2014	schools	35	unstated	exact	hb59-greenbook	For FY 2014, there are 35 chartered nonpublic schools
+edchoice-expansion	2014	participation	992	kindergarten	exact	hb64-greenbook	992 kindergarten students were awarded income-based scholarships
+jon-peterson	2014	participation	2103	students	exact	hb64-greenbook	In FY 2014, 2,103 students received scholarships
+traditional-edchoice	2014	participation	16987	scholarships	exact	hb64-greenbook	In FY 2014, 16,987 scholarships were awarded
+cleveland	2016	schools	39	unstated	exact	hb64-greenbook	For FY 2016, there are 39 chartered nonpublic schools
+cleveland	2018	participation	8362	students	exact	hb166-greenbook	In FY 2018, 8,362 students participated in the program
+cleveland	2018	schools	42	unstated	exact	hb49-greenbook	For FY 2018, there are 42 chartered nonpublic schools
+edchoice-combined	2018	schools	480	unstated	over	hb49-greenbook	For FY 2018, there are over 480 chartered nonpublic schools
+autism	2019	participation	3500	students	about	hb166-greenbook	about 3,500 students received scholarships
+autism	2019	payments	87000000	unstated	about	hb166-greenbook	amounting to about $87.0 million
+autism	2019	providers	297	unstated	exact	hb166-greenbook	In FY 2019, 297 providers were registered to participate
+cleveland	2019	schools	42	unstated	exact	hb166-greenbook	For FY 2019, there were 42 chartered nonpublic schools
+edchoice-expansion	2019	participation	10800	k5	over	hb166-greenbook	over 10,800 K-5 students receive income-based scholarships
+jon-peterson	2019	participation	6000	students	about	hb166-greenbook	about 6,000 students received scholarships
+jon-peterson	2019	payments	64400000	unstated	about	hb166-greenbook	amounting to about $64.4 million
+jon-peterson	2019	providers	413	unstated	exact	hb166-greenbook	In FY 2019, 413 providers were registered to participate
+traditional-edchoice	2019	participation	23000	students	about	hb166-greenbook	In FY 2019, about 23,000 students received scholarships
+traditional-edchoice	2019	payments	113400000	unstated	about	hb166-greenbook	amounting to about $113.4 million
+nonpublic-sector	2023	schools	714	operating	exact	hb33-greenbook	In FY 2023, 714 chartered nonpublic schools operated in Ohio
+autism	2024	participation	4600	students	about	dew-redbook	about 4,600 students received scholarships
+autism	2024	payments	136500000	unstated	about	dew-redbook	amounting to about $136.5 million
+autism	2024	providers	311	unstated	exact	dew-redbook	from 311 providers
+cleveland	2024	participation	7800	students	about	dew-redbook	about 7,800 students participated in the program
+cleveland	2024	payments	53400000	unstated	exact	dew-redbook	with scholarships totaling $53.4 million
+cleveland	2024	schools	84	unstated	exact	dew-redbook	84 participating schools
+edchoice-expansion	2024	participation	87000	fte	about	dew-redbook	about 87,000 FTE students received EdChoice Expansion scholarships
+edchoice-expansion	2024	payments	405300000	unstated	exact	dew-redbook	totaling $405.3 million
+edchoice-expansion	2024	schools	585	unstated	exact	dew-redbook	to attend 585 chartered nonpublic schools
+jon-peterson	2024	participation	7800	students	about	dew-redbook	about 7,800 students received scholarships
+jon-peterson	2024	payments	95400000	unstated	about	dew-redbook	amounting to about $95.4 million
+jon-peterson	2024	providers	454	unstated	exact	dew-redbook	from 454 providers
+traditional-edchoice	2024	participation	40300	fte	about	dew-redbook	about 40,300 FTE students received scholarships
+traditional-edchoice	2024	payments	272300000	unstated	about	dew-redbook	amounting to about $272.3 million
+traditional-edchoice	2024	schools	527	unstated	exact	dew-redbook	to attend 527 chartered nonpublic schools
+autism	2025	payments	150700000	unstated	estimated	dew-redbook-table-5	Autism $150.7 $161.4 $172.8
+channel	2025	payments	1074400000	unstated	estimated	dew-redbook-table-5	Total $1,074.4 $1,163.0 $1,251.1
+cleveland	2025	payments	54400000	unstated	estimated	dew-redbook-table-5	Cleveland $54.4 $56.6 $58.9
+edchoice-expansion	2025	payments	475400000	unstated	estimated	dew-redbook-table-5	EdChoice expansion $475.4 $521.2 $563.5
+jon-peterson	2025	payments	101100000	unstated	estimated	dew-redbook-table-5	Jon Peterson Special Needs $101.1 $107.3 $113.7
+nonpublic-sector	2025	schools	725	operating	exact	dew-greenbook	In FY 2025, 725 chartered nonpublic schools operated in Ohio
+traditional-edchoice	2025	payments	292700000	unstated	estimated	dew-redbook-table-5	Traditional EdChoice $292.7 $316.5 $342.2
+autism	2026	payments	161400000	unstated	estimated	dew-redbook-table-5	Autism $150.7 $161.4 $172.8
+channel	2026	payments	1163000000	unstated	estimated	dew-redbook-table-5	Total $1,074.4 $1,163.0 $1,251.1
+cleveland	2026	payments	56600000	unstated	estimated	dew-redbook-table-5	Cleveland $54.4 $56.6 $58.9
+edchoice-expansion	2026	payments	521200000	unstated	estimated	dew-redbook-table-5	EdChoice expansion $475.4 $521.2 $563.5
+jon-peterson	2026	payments	107300000	unstated	estimated	dew-redbook-table-5	Jon Peterson Special Needs $101.1 $107.3 $113.7
+traditional-edchoice	2026	payments	316500000	unstated	estimated	dew-redbook-table-5	Traditional EdChoice $292.7 $316.5 $342.2
+autism	2027	payments	172800000	unstated	estimated	dew-redbook-table-5	Autism $150.7 $161.4 $172.8
+channel	2027	payments	1251100000	unstated	estimated	dew-redbook-table-5	Total $1,074.4 $1,163.0 $1,251.1
+cleveland	2027	payments	58900000	unstated	estimated	dew-redbook-table-5	Cleveland $54.4 $56.6 $58.9
+edchoice-expansion	2027	payments	563500000	unstated	estimated	dew-redbook-table-5	EdChoice expansion $475.4 $521.2 $563.5
+jon-peterson	2027	payments	113700000	unstated	estimated	dew-redbook-table-5	Jon Peterson Special Needs $101.1 $107.3 $113.7
+traditional-edchoice	2027	payments	342200000	unstated	estimated	dew-redbook-table-5	Traditional EdChoice $292.7 $316.5 $342.2

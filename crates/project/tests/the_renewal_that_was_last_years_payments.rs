@@ -36,7 +36,9 @@ fn the_archive_covers_the_deduct_era_and_stops_before_the_plan() {
     assert_eq!(last, 2013);
 
     // The hole this source does not close, stated as an assertion so it cannot quietly go away.
-    // The annual report is 2024-25; nothing here or anywhere else committed covers between.
+    // The annual report is 2024-25, and no committed series covers between — only the quoted
+    // points `project::scholarship::bounds` holds, which
+    // `the_points_that_bound_the_participation_hole` asserts are joinable to neither end.
     assert!(
         !years.contains(&2014) && !years.contains(&2020),
         "the archive has grown a year it did not have; the FY2014-FY2023 gap may have moved"

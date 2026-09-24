@@ -113,6 +113,64 @@ amendment: |
   > longer says it. The hole this paragraph describes — FY2014 through FY2023, bounded by the
   > greenbooks and unfilled — stands.
 
+  > **CORRECTED by [#472](https://github.com/goedelsoup/ohio-education-funding/issues/472),
+  > censused 2026-09-24.** "Counts inside it, for FY2014 and for FY2018-19, three of the four
+  > prefixed 'about' and none naming a denominator" undercounts the quotes and misstates them.
+  > Reading all eight committed budget analyses — six greenbooks of enacted acts, and both editions
+  > of the FY2026-27 analysis — gives **twenty-two quoted quantities inside the hole**
+  > — FY2014, FY2016, FY2018, FY2019 and FY2023 — and sixty-four across the census as a whole.
+  > "None naming a denominator" is wrong in the direction that matters: LSC names three different
+  > ones inside the hole (students participating, scholarships awarded, kindergarteners) and the
+  > FY2026-27 redbook names two more in one sequence of paragraphs (students for three programmes,
+  > FTE students for the two EdChoice ones). The hedging is also wider than "three of four" —
+  > thirty-seven of sixty-four rows carry the publisher's own qualifier. None of that weakens the
+  > conclusion; it is why the conclusion now has a fixture behind it rather than a count.
+
+  **"They bound the hole; they do not fill it" is a fixture.** `scholarship-bounds.tsv` holds the
+  census, one row per quoted quantity, carrying the programme, the fiscal year, the measure, the
+  value, the **denominator** it is over, the publisher's own **precision**, the source document,
+  and the publisher's **words**. `project::scholarship::bounds` reads it through the uniform-width
+  reader; `the_points_that_bound_the_participation_hole` asserts the claim this record had been
+  making in prose. It is tab-delimited rather than comma-delimited for the reason every TSV here
+  is: the quotes are prose, and LSC's numerals carry thousands separators.
+
+  **The guard is a predicate, not a sentence.** `Bound::spliceable` answers which committed series
+  a row could be appended to without a reader noticing — the archive's own denominator in a year it
+  reaches or is one short of, or an unhedged student count in the report's year — and the test
+  asserts it is `None` for all sixty-four rows, with a second test doctoring two rows to show the
+  predicate can say otherwise. A later extraction that adds a genuinely joinable row fails the gate
+  and forces the question rather than answering it by arriving. The archive's two denominators are
+  in the vocabulary for exactly that reason, though no row uses either.
+
+  **And the census gives the argument its third leg, which is the strongest one.** The two reasons
+  this record already gave — the hedges and the missing denominators — are properties of single
+  rows. The third is a property of pairs: **eight of the quotes fall inside the archive's own span,
+  five of them on a measure the archive publishes, and where both speak they disagree without a
+  rule.** Cleveland's
+  FY2005 count reproduces the payments column exactly; its FY2012 count runs 0.98% above; the
+  traditional programme's FY2012 count runs 2.28% *below*; and LSC's FY2012 autism count is
+  **85% below** the department's — 360 students against 2,413, in the same analysis whose other two
+  counts are within two points. A transcription that is exact once and out by a factor of seven
+  elsewhere cannot be extrapolated into years with nothing to check it against. That is the
+  sentence the fixture replaces, and it could not have been written without the overlap rows.
+
+  **What the FY2014 quotes do bound.** For each of the three programmes the archive covers with
+  both denominators, LSC's FY2014 count falls strictly between that programme's FY2013 payments and
+  its FY2013 applications — Cleveland 5,964 < 6,337 < 6,602, traditional EdChoice
+  16,065 < 16,987 < 17,516, Jon Peterson 1,779 < 2,103 < 2,129. The quoted figure is consistent
+  with either column having grown and inconsistent with being either one, which is the precise
+  sense in which these are bounds. Autism is the warning case: its FY2014 quote is 2,623 against a
+  FY2013 payments figure of 2,622, one student apart and no applications column to bracket it, so
+  it reads as a series continuing. It is the most tempting splice in the census and it is refused
+  on the same terms as the other sixty-three.
+
+  **The FY2024 redbook sits below the 2024-25 report on every programme, which is the check that
+  both documents are right.** In dollars for the four that publish a total — $405.3m against
+  $492.9m for the expansion, $272.3m against $283.1m, $136.5m against $160.0m, $53.4m against
+  $55.2m — and in counts for all five, by between 5.7% and 31%. The spread is itself a reminder
+  that these are not five measurements of one year of growth: two of the five counts are FTE and
+  three are students.
+
   **What the archive settles that the report could not.** The 2025 report's three unreconciled
   averages were recorded above as "a denominator the report does not name". This workbook
   maintains two denominators for every programme-year — applications made against scholarships

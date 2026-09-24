@@ -5033,6 +5033,25 @@ fn clawback(panel: &[DistrictRecord]) -> Clawback {
     }
 }
 
+/// One cell of Table 5 of the FY2026-27 redbook: LSC's estimate of a scholarship programme's
+/// payments in a fiscal year, or the channel's where `program` is `channel`.
+///
+/// An **estimate** and not an appropriation. The executive proposal allocates no amount to any
+/// individual scholarship programme, so this table is the only committed statement of the channel
+/// by programme and fiscal period, and it is LSC's arithmetic rather than the bill's.
+///
+/// # Panics
+///
+/// If the census holds no Table 5 row for that programme and year.
+fn table_five(program: &str, year: u16) -> f64 {
+    use project::scholarship::bounds;
+    bounds::of(program, bounds::Measure::Payments)
+        .into_iter()
+        .find(|b| b.source == "dew-redbook-table-5" && b.year.0 == year)
+        .unwrap_or_else(|| panic!("Table 5 has no {program} row for FY{year}"))
+        .value
+}
+
 /// Every figure this repository exports for the corpus to be checked against.
 ///
 /// Ordered by owning crate, then by what the figure is about. The order is the manifest's order,
@@ -8039,6 +8058,24 @@ pub static FIGURES: &[Figure] = &[
             .expect("both are positive");
             project::scholarship::income_paying(factor).expect("inside the curve")
         },
+    },
+    Figure {
+        key: "project/expansion-estimated-payments-fy2027",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "LSC\u{2019}s estimate of EdChoice Expansion scholarship payments, FY2027",
+        pinned: 563_500_000.0,
+        tolerance: 1.0,
+        compute: |_| table_five("edchoice-expansion", 2027),
+    },
+    Figure {
+        key: "project/scholarship-channel-estimated-payments-fy2027",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "LSC\u{2019}s estimate of all five scholarship programmes\u{2019} payments, FY2027",
+        pinned: 1_251_100_000.0,
+        tolerance: 1.0,
+        compute: |_| table_five("channel", 2027),
     },
     Figure {
         key: "dispersion/community-school-comprehensive-tilt",
