@@ -54,6 +54,19 @@ consequences: |
   file: the annual report cites two routes to it and both 404. The breakdown *was* published, is
   still referenced by a current departmental document, and has been taken down. `still_blocked`
   says that, so a refresh that finds nothing is not read as a failure to look.
+
+  > **CORRECTED by [#10](https://github.com/goedelsoup/ohio-education-funding/issues/10), probed
+  > 2026-09-15.** The two paragraphs above draw a conclusion from a status code that cannot carry
+  > one. Every path on `reports.education.ohio.gov` — the root, both cited routes, an invented path
+  > and `/robots.txt` — returns the byte-identical Angular shell, and the app's route table is a
+  > single client-side `report/:reportName`, so there were never per-report server routes to
+  > withdraw. The reports behind it are Power BI embeds, served through a gateway whose anonymous
+  > token authenticates and carries no entitlement, and that probe cannot tell "de-provisioned"
+  > from "not entitled". So the remainder is an absence after all, and a narrower one than "taken
+  > down": the breakdown is cited by a current departmental document and this project has not
+  > found it. "A withdrawn route restored" is not an unblock — nothing identified exists to ask
+  > for — and `still_blocked` now says unreached rather than withdrawn. Propagated to every copy
+  > by [#467](https://github.com/goedelsoup/ohio-education-funding/issues/467).
 alternatives: |
   **Fold the annual report into `dew-payment-reports` as a second source.** Rejected, above. The
   cost of the separate connector is one more row in the registry table; the cost of folding is a
@@ -94,6 +107,11 @@ amendment: |
   for FY2018-19, three of the four prefixed "about" and none naming a denominator; they bound the
   hole and cannot be spliced onto the series. And the designated list is one edition, with the
   four prior filenames its pattern implies all returning the host's genuine 404.
+
+  > **CORRECTED by [#10](https://github.com/goedelsoup/ohio-education-funding/issues/10).** "It
+  > still is" repeats the withdrawal reading corrected under `consequences`, and the string no
+  > longer says it. The hole this paragraph describes — FY2014 through FY2023, bounded by the
+  > greenbooks and unfilled — stands.
 
   **What the archive settles that the report could not.** The 2025 report's three unreconciled
   averages were recorded above as "a denominator the report does not name". This workbook

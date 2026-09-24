@@ -28,6 +28,16 @@ See the class definition: [program.ont.yml](../program.ont.yml).
 
 ## Known gaps
 
-The Jon Peterson Special Needs Scholarship and the Autism Scholarship are absent, as is the
-original EdChoice program distinct from its universal expansion. All three are needed before
-the scholarship channel can be totalled. [open]
+Every scholarship programme the department runs has a node, and the channel is totalled from
+the 2025 annual report. What the class does not hold:
+
+- **No node for any non-scholarship nonpublic aid line.** Auxiliary Services and the Nonpublic
+  Administrative Cost Reimbursement move state money to chartered nonpublic schools outside the
+  scholarship channel, and neither is modelled here. [open]
+- **No per-district participation.** Every scholarship figure held is statewide. The annual
+  report cites a per-district breakdown on the department's reports portal, and this project has
+  not reached it — the route's 404 is a property of the portal, not evidence about the file
+  ([#10](https://github.com/goedelsoup/ohio-education-funding/issues/10)). [open]
+- **FY2014 through FY2023 has no participation series.** The archive stops at FY2013 and the
+  annual report starts at 2024-25; inside the hole the greenbooks quote rounded counts for FY2014,
+  FY2018 and FY2019 and nothing else. [open]
