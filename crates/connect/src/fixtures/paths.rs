@@ -52,6 +52,18 @@ pub const FY25_FIXTURE: &str = "crates/project/fixtures/fy25-payment-report.csv"
 pub const COMMUNITY_SCHOOL_FUNDING_FIXTURE: &str =
     "crates/dispersion/fixtures/fy27-community-school-funding.csv";
 
+/// The FY2025 community and STEM school model, per school, in the same shape as its FY2027
+/// sibling.
+///
+/// The year the equity supplement was paid at the $650 H.B. 33 set, and the only year besides
+/// FY2027 for which a departmental model of this population has been retrieved — from the
+/// Internet Archive, the department having replaced the file in place. Its own layout differs
+/// from FY2027's in four places, all of which `fixtures::community_schools` reads rather than
+/// assumes: the column letters, the total-state-support heading, STEM spelled `S`, and a base
+/// funding supplement that does not yet exist and is written zero here.
+pub const FY25_COMMUNITY_SCHOOL_FUNDING_FIXTURE: &str =
+    "crates/dispersion/fixtures/fy25-community-school-funding.csv";
+
 /// Six years of the department's joint vocational school district foundation payment reports,
 /// one row per district per year.
 ///
@@ -371,6 +383,7 @@ pub const REBUILT: &[&str] = &[
     CALCULATOR_VINTAGES_FIXTURE,
     CALCULATOR_ADM_FIXTURE,
     COMMUNITY_SCHOOL_FUNDING_FIXTURE,
+    FY25_COMMUNITY_SCHOOL_FUNDING_FIXTURE,
     JVSD_FUNDING_FIXTURE,
     CTPD_MEMBERSHIP_FIXTURE,
     PROFILE_FIXTURE,

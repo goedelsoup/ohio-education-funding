@@ -1185,24 +1185,39 @@ fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     // Read for the community school equity supplement, which no district receives and no district
     // panel can carry — see `fixtures::community_schools` for the hidden sheet next to these two
     // whose `H. Equity Supplement` column holds total state support instead.
-    let community_schools = (|| -> Result<Vec<Vec<String>>, RebuildError> {
-        let book = open_workbook(root, registered("fy27-cs-calculator"))?;
-        let detail = book.rows(fixtures::CS_DETAIL_SHEET)?;
-        let summary = book.rows(fixtures::CS_SUMMARY_SHEET)?;
-        fixtures::build_community_school_funding(&detail, &summary).map_err(RebuildError::Layout)
-    })();
-    out.push(match community_schools {
-        Ok(rows) => csv_fixture(
-            root,
+    // Two vintages of it, the same builder over both: FY2027 as the department serves it and
+    // FY2025 from the Internet Archive. The second is what turns the rate schedule from one
+    // verified year and two taken on the act's word into two and one.
+    for (source, vintage, fixture) in [
+        (
+            "fy27-cs-calculator",
+            fixtures::CommunitySchoolVintage::Fy2027,
             fixtures::COMMUNITY_SCHOOL_FUNDING_FIXTURE,
-            fixtures::COMMUNITY_SCHOOL_FUNDING_HEADER,
-            &rows,
-        )?,
-        Err(cause) => Rebuilt::skipped(
-            fixtures::COMMUNITY_SCHOOL_FUNDING_FIXTURE,
-            cause.to_string(),
         ),
-    });
+        (
+            "fy25-cs-calculator",
+            fixtures::CommunitySchoolVintage::Fy2025,
+            fixtures::FY25_COMMUNITY_SCHOOL_FUNDING_FIXTURE,
+        ),
+    ] {
+        let built = (|| -> Result<Vec<Vec<String>>, RebuildError> {
+            let book = open_workbook(root, registered(source))?;
+            let display = book.rows(fixtures::CS_DISPLAY_SHEET)?;
+            let detail = book.rows(fixtures::CS_DETAIL_SHEET)?;
+            let summary = book.rows(fixtures::CS_SUMMARY_SHEET)?;
+            fixtures::build_community_school_funding(vintage, &display, &detail, &summary)
+                .map_err(RebuildError::Layout)
+        })();
+        out.push(match built {
+            Ok(rows) => csv_fixture(
+                root,
+                fixture,
+                fixtures::COMMUNITY_SCHOOL_FUNDING_HEADER,
+                &rows,
+            )?,
+            Err(cause) => Rebuilt::skipped(fixture, cause.to_string()),
+        });
+    }
 
     // The third population the same office funds by formula, and the one with no calculator: for
     // joint vocational districts the department publishes payment reports instead. Six years,

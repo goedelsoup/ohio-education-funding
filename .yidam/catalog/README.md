@@ -40,6 +40,7 @@ Sorted by: type, then slug.
 | [`dew-education-landscape`](dew-education-landscape.md) | Ohio's Education Landscape — the department's own count of every school option | 1 |
 | [`dew-expenditure-expanded-list`](dew-expenditure-expanded-list.md) | FY2025 Expenditure Expanded List | 1 |
 | [`dew-five-year-forecast`](dew-five-year-forecast.md) | Five-year forecast filings — the department's republished submissions | 3 |
+| [`dew-fy25-community-school-calculator`](dew-fy25-community-school-calculator.md) | FY25 Community/STEM School State Foundation Funding Simulator | 1 |
 | [`dew-fy26-funding-calculator`](dew-fy26-funding-calculator.md) | FY26 TRAD State Foundation Funding Calculator — recovered from the archive | 1 |
 | [`dew-fy27-community-school-calculator`](dew-fy27-community-school-calculator.md) | FY27 Community/STEM School State Foundation Funding Simulator | 1 |
 | [`dew-fy27-funding-calculator`](dew-fy27-funding-calculator.md) | FY27 TRAD State Foundation Funding Calculator | 28 |
@@ -77,7 +78,7 @@ Sorted by: type, then slug.
 | [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 19 |
 | [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 3 |
 
-54 entries, 1 not yet cited by any corpus node. 383 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+55 entries, 1 not yet cited by any corpus node. 384 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

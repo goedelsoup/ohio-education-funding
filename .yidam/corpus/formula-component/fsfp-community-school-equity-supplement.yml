@@ -23,6 +23,13 @@ description: |
   its enrolled ADM to the cent, on all **324** of them. [verified — FY2027]
   (`crates/dispersion/src/community_school_funding.rs`)
 
+  **Two of the schedule's three rates are read from a department model rather than from the act.**
+  The FY2025 simulator, archived whole, writes its own formula out as `Equity Supplement [a*$650]`
+  and pays **317** site-based schools that rate times enrolled ADM — **$54,846,889.80** in all,
+  against 18 e-schools and 8 STEM schools paid nothing. [verified]
+  (`crates/dispersion/src/community_school_funding.rs`, FY2025 vintage) FY2026's $500 has no such
+  model and never will; the finding below says why that is closed rather than pending.
+
   ### It is paid after the phase-in and before the transition supplement
 
   The redbook places it precisely: the supplement is *"calculated after the formula's phase-in,
@@ -73,6 +80,30 @@ findings: |
   A finding that STEM schools are funded differently, stated generally, would be wrong in both
   directions.
 
+  ### The middle year of the rate schedule is act-only, permanently
+
+  R.C. 3317.022 runs $650, $500, $400 across FY2025 to FY2027. **2 of the 3** have the
+  department's own funding model behind them — FY2025's and FY2027's. [verified]
+  (`crates/dispersion/src/community_school_funding.rs`) FY2026 is the one that does not, and the
+  reason is not that nobody has looked.
+
+  The department publishes one community school calculator at a time and **replaces it in place**,
+  so the FY2026 edition stopped existing at any address the department serves when FY2027's went
+  up — and unlike the FY2025 edition it was replaced before any crawler kept a copy. Four searches
+  close it rather than one: the Internet Archive holds exactly **two** of these workbooks across
+  the whole `State-Funding-For-Schools` tree, FY2019 and FY2025; the archived captures of the
+  community school page itself link no calculator in any month of 2025; the FY2027 workbook, which
+  carries the previous year's sheet as a hidden leftover, states no $500 anywhere in it; and the
+  department's FY2026 actuals are published as school totals with no line breakout, so they cannot
+  separate this line out either. [verified]
+  (`crates/dispersion/src/community_school_funding.rs`)
+
+  So FY2026's $500 stands on the enacted act and the greenbook and will stay there. That is
+  recorded as data rather than as a footnote — `EquityRate::verified_against_a_model` is false for
+  that year and true for the other two — because $650, $500 and $400 are otherwise
+  indistinguishable in a list. A reader should not take the gap as a retrieval someone could go
+  and make.
+
   ### What the supplement is, in scale
 
   $34,650,906 is **2.29%** of the $1.51 billion of total state support these 355 schools receive.
@@ -109,15 +140,27 @@ figures:
     value: 0.02292
     field: findings
     as_written: "**2.29%** of the $1.51 billion"
+  - key: dispersion/community-school-equity-supplement-fy2025-total
+    value: 54846889.8
+    field: description
+    as_written: "**$54,846,889.80** in all"
+  - key: dispersion/community-school-equity-supplement-fy2025-recipients
+    value: 317
+    field: description
+    as_written: "pays **317** site-based schools"
+  - key: dispersion/community-school-equity-supplement-verified-rate-years
+    value: 2
+    field: findings
+    as_written: "**2 of the 3** have the\n  department's own funding model behind them"
 properties:
   name: Community school equity supplement
   function: |
     equity supplement = enrolled ADM  ×  rate,  for a site-based community school
                       = 0,                      for an e-school or a STEM school
 
-    rate = $650 (FY2025, H.B. 33)
-           $500 (FY2026, H.B. 96)
-           $400 (FY2027, H.B. 96)
+    rate = $650 (FY2025, H.B. 33)   verified against the department's FY2025 model
+           $500 (FY2026, H.B. 96)   act only, and permanently so
+           $400 (FY2027, H.B. 96)   verified against the department's FY2027 model
 
     Calculated after the formula's phase-in and before the formula transition supplement, so it is
     outside the base the phase-in scales and inside the sum the transition supplement is measured
@@ -139,8 +182,11 @@ properties:
     all, which is why the act's phrase does not need to mention them and why the department's
     model pays them nothing. [inference]
   calculator: |
-    `crates/dispersion::community_school_funding`, over the department's FY2027 simulator. Not a
-    calculator crate: nothing in `foundation` or `project` can join this population, and
+    `crates/dispersion::community_school_funding`, over the department's FY2027 simulator. The
+    archived FY2025 simulator is held beside it as a second `Vintage`, read by the same builder;
+    it is there to verify a rate rather than to be differenced against FY2027, which would measure
+    four changes at once. Not a calculator crate: nothing in `foundation` or `project` can join
+    this population, and
     `decisions/a-supplement-paid-to-a-population-the-panel-does-not-hold` records why it is a
     reported figure rather than a ninth `project::policy` lever.
 
@@ -162,6 +208,8 @@ links:
   - target: ../legislation/hb-96-2025.yml
     relationship: established-by
   - target: ../../catalog/dew-fy27-community-school-calculator.md
+    relationship: sourced-from
+  - target: ../../catalog/dew-fy25-community-school-calculator.md
     relationship: sourced-from
   - target: ../../catalog/lsc-hb96-analysis.md
     relationship: sourced-from
