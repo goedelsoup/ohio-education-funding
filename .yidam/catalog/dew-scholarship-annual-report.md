@@ -58,6 +58,31 @@ average over students holding a full-year award rather than over everyone who us
 at any point during the year. **The report does not say**, so this corpus records the discrepancy
 and does not adopt the explanation.
 
+## There is one edition, and the archive says so
+
+Asked whether a 2024 or earlier edition exists at a renamed address, this record now answers from
+the listing rather than from a filename pattern.
+
+The [Annual Reports](https://education.ohio.gov/About/Annual-Reports) page was read in full on
+24 September 2026: **64 `getattachment` links, exactly one of them a Scholarship Annual Report**.
+The Wayback Machine holds that page **74 times between 19 July 2017 and 17 June 2026**, and its
+index of everything ever captured under `/getattachment/About/Annual-Reports/` runs to **238
+distinct files — of which exactly one carries "Scholarship" in its name**, this one. So the
+absence is not a naming change and not a page this project failed to scrape: no consolidated
+scholarship report of any earlier vintage has ever been served from this directory.
+
+**What precedes it is a per-programme lineage, not an earlier edition of the same thing.** The
+archive's index holds `FY2016-JPSN-Board-Report.pdf`, `FY2017-JPSN-Annual-Report.pdf`,
+`JPSN-Report-FY20.pdf`, `FY23_JPSN_Annual_Report.pdf` and `FY24_JPSN_Annual_Report.pdf` — the Jon
+Peterson programme reporting on itself, as its own authorising section requires — plus
+`Ohio-ACE-Educational-Savings-Account-Report.pdf` for a programme this report does not cover at
+all. The last two JPSN editions are still on the live page beside this one.
+
+That changes what the gap above the FY1997-FY2013 [historical
+archive](dew-scholarship-historical-data.md) is. It is not a series this project has not looked
+for; it is a series the department did not publish. The consolidated five-programme account begins
+with 2024-2025, and one programme's own reporting is what covers part of the decade before it.
+
 ## What it is not
 
 **It is not a per-district file, and it points at one this project has not found.** The Jon

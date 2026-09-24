@@ -357,6 +357,26 @@ pub const SCHOLARSHIP_HISTORY_FIXTURE: &str = "crates/project/fixtures/scholarsh
 pub const EDCHOICE_DESIGNATED_FIXTURE: &str =
     "crates/dispersion/fixtures/edchoice-designated-2627.csv";
 
+/// The 2025-2026 edition, recovered from the Internet Archive.
+///
+/// # Why a second file and not a year column on [`EDCHOICE_DESIGNATED_FIXTURE`]
+///
+/// The editions are not the same table. Each names its Title I vintages in its own column
+/// headings, and the 2024-2025 one ranks two Performance Index years where the others rank
+/// three, so a single file would need a column that is empty for one edition in three and a
+/// header that lies about which year a share belongs to. One file per edition keeps every
+/// column's year in its own name, which is what the criteria are actually cut from.
+pub const EDCHOICE_DESIGNATED_2526_FIXTURE: &str =
+    "crates/dispersion/fixtures/edchoice-designated-2526.csv";
+
+/// The 2024-2025 edition, recovered from the Internet Archive, and the narrowest of the three.
+///
+/// Nineteen columns rather than twenty: this is the edition whose bottom-20% window is two years
+/// rather than three, so it carries one Performance Index flag fewer and names the test
+/// `bottom_20_pi_two_of_two`.
+pub const EDCHOICE_DESIGNATED_2425_FIXTURE: &str =
+    "crates/dispersion/fixtures/edchoice-designated-2425.csv";
+
 /// The three building-level Performance Index rankings the designation is cut from.
 ///
 /// Beside [`EDCHOICE_DESIGNATED_FIXTURE`] because it is that file's first input, and in
@@ -428,6 +448,8 @@ pub const REBUILT: &[&str] = &[
     BUILDING_FIXTURE,
     IDENTIFIED_FIXTURE,
     EDCHOICE_DESIGNATED_FIXTURE,
+    EDCHOICE_DESIGNATED_2526_FIXTURE,
+    EDCHOICE_DESIGNATED_2425_FIXTURE,
     PI_RANKING_FIXTURE,
     TITLE1_FIXTURE,
     CROSSWALK_FIXTURE,

@@ -187,8 +187,90 @@ R.C. 3310.032 carries the *same* pilot-project exclusion, so Cleveland's absence
 whole of it — a Cleveland resident is outside both EdChoice programmes, not merely outside the
 building-based one.
 
-**It is one edition, and the history is not at this URL.** `Designated-List-2025-2026-With-Criteria`,
-`-2024-2025-`, `-2023-2024-` and the undecorated `Designated-List-2025-2026` all return this host's
-genuine 404 — a 1,245-byte page, distinguishable from the reports portal's shell. Per the MR-81
-precedent, a filename pattern going quiet is usually a naming change rather than a withdrawal, so
-the prior editions are worth a scrape of the EdChoice Resources page before being called lost.
+**It is not the whole series.** Three editions are held — 2024-2025, 2025-2026 and 2026-2027 —
+and 2023-2024 is named in the archive and not retrievable. See below.
+
+## The page lists one edition at a time, and the archive says so too
+
+The [EdChoice Resources](https://education.ohio.gov/Topics/Other-Resources/Scholarships/EdChoice-Scholarship/EdChoice-Resources)
+page was read in full on 24 September 2026 rather than probed for guessed filenames. It carries
+**47 `getattachment` links and exactly one designated list**: the 2026-2027 edition. The other 46
+are forms, fact sheets and guidance, most of them in seven languages. There is no archive section,
+no "prior years" list, and no second workbook of any vintage.
+
+Two corrections to the guess that opened this question. The prior editions spell `with` in **lower
+case** — `Designated-List-2025-2026-with-Criteria.xlsx` — and only 2026-2027 capitalizes it, so a
+probe built from the current filename's pattern was testing a name the department never used.
+Under either spelling all three predecessors return this host's genuine 404, a 1,245-byte page,
+**byte-identical across all three** and distinguishable from the reports portal's application
+shell.
+
+**So the department is not renaming the file; it is deleting it.** That is the finding, and it is
+one the previous text could not make: the listing carries one edition because the page carries one
+edition, and the URL a departed edition used answers with a real 404 rather than a redirect.
+
+The Wayback Machine holds the page 17 times between 30 November 2023 and 16 April 2026, and the
+workbooks themselves:
+
+| Edition | Captures | Held |
+| --- | --- | --- |
+| 2023-2024 | none of the file; linked from page captures only | no |
+| 2024-2025 | `20240928123347`, `20250309093228`, then 404 from `20250714111157` | yes |
+| 2025-2026 | `20250309082659`, `20250714111029`, `20250717154725`, `20250901074111` | yes |
+| 2026-2027 | `20260120123937` | served live |
+
+Every capture of a given edition is **byte-identical to every other** — one SHA-256 per edition
+across four captures and three — so an edition is a fixed file and the earliest capture is the
+whole of it. The 9 March 2025 captures also date the deletion: both 2024-2025 and 2025-2026 were
+being served that day, and 2024-2025 was gone by 14 July. A fourth edition is therefore named and
+not retrievable: 2023-2024 is linked from captures of the page and was never itself crawled.
+
+Registered as `edchoice-designated-2526` and `edchoice-designated-2425` under
+`dew-scholarship-reports`, pinned by SHA-256, and admissible under
+[`an-archived-source-is-still-a-source`](../decisions/an-archived-source-is-still-a-source.yml):
+the publisher no longer serves them, the reason is its release model rather than a correction, and
+each **reproduces the department's own arithmetic in every one of its rows** — the designation
+from its two options, Option B from its criteria including the unstated open condition, the window
+flag from its year columns, and the Title I average from the three shares beside it.
+
+## Two editions make eligibility a change rather than a snapshot
+
+**460 designations, then 494, then 513**, over 2,937, 2,906 and 2,877 listed buildings, in 62, 68
+and 78 districts. All three editions carry 606 districts, so the pilot-project exclusion is
+constant and the growth is in designations, not coverage.
+
+**Every building that entered the designated set entered through Option B.** 42 entries in
+2025-2026 and 38 in 2026-2027, and not one of the 80 holds Option A. Departures are 8 and 19, of
+which exactly one across the two years held the academic-distress route. So the commissions are
+nearly inert as a *margin*: the route that moves buildings in and out is the derived one, three
+years running.
+
+Entries and departures are counted apart from delistings, which is what keeping all 2,877 rows
+buys: a building that stops being designated and a building that stops being listed are different
+events, and only 1 departure in each transition is the second kind.
+
+The pair also settles the open-building condition above. On one edition it was a rule inferred
+from four rows; on three it is the department's practice, applied on 1, 7 and 4 rows, with no
+closed or inactive building designated in any edition.
+
+## Two layout findings the editions disagree on
+
+**2024-2025 ranks two Performance Index years, not three, and its own heading says so.**
+R.C. 3310.03(A)(1)(a) asks for the bottom twenty per cent "for at least two of the three most
+recent consecutive rankings"; that edition's column reads `Bottom 20% PI Ranking Across 2022 and
+2023 School Years` against `Across Two of Prior Three Years` in both later editions. Two of two is
+a materially easier test than two of three, and the fixture keeps the difference in the column
+name — `bottom_20_pi_two_of_two` — rather than flattening it.
+
+**A year a building was not ranked is blank, not `No`** — 25 cells in 2024-2025 and 42 in
+2025-2026, online academies, early learning centres and buildings that had not opened. The
+2026-2027 edition writes `No` in all three of its year columns and leaves nothing blank, so this
+is a distinction the department stopped making rather than one it never made. The blank survives
+into the fixture, because a building that was outside the ranking is not a building the ranking
+cleared. The window column reads it as a year outside the bottom fifth, in every row of both
+editions.
+
+**And the missing space is new.** `Title 1Formula Average` in the 2026-2027 Option B heading is
+this edition's alone: both archived editions spell it `Title 1 Formula Average`.
+
+Pinned in `crates/dispersion/tests/the_editions_the_page_stopped_listing.rs`.

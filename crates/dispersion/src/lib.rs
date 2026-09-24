@@ -40,6 +40,7 @@ pub mod composition;
 pub mod ctpd_membership;
 pub mod deduct;
 pub mod designated;
+pub mod designated_editions;
 pub mod equity_factor;
 pub mod exemplars;
 pub mod facilities;
