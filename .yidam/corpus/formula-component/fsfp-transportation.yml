@@ -23,11 +23,11 @@ description: |
   ### Non-public riders count double, and so do their miles
 
   `public + 2 x non-public + 1.5 x community or STEM` weights the ridership, and R.C.
-  3317.0212(E)(1)(b) puts the same two multiples on *miles driven* — so the premium survives
+  3317.0212(E)(1)(b) now puts the same two multiples on *miles driven* — so the premium survives
   whichever of the two bases wins. Non-public riders are 4.5% of riders and 8.5% of weighted
-  ridership. Ohio requires districts to transport non-public pupils and those routes are less
-  efficient, so a premium is defensible; the size of it is a policy choice sitting in a
-  spreadsheet. [verified, and its justification is [open]]
+  ridership. The weight is the Fair School Funding Plan's own, and the only reason given for it
+  anywhere is the department's: these riders are "typically higher" cost to carry. [verified] Why
+  the premium is 2.0 rather than the community school 1.5 is stated nowhere. [open]
 
   ### The state minimum share is 50%, against the formula's 10%
 
@@ -109,6 +109,62 @@ findings: |
   adjustment** of `(nontraditional riders / total riders) × 0.1 × base payment`, a proportional
   uplift rather than a per-rider weight. Ohio has compensated this cost under every formula and
   has never used the same instrument twice. [verified] (the greenbooks)
+
+  ### Where the 2.0 came from, and the only body that said why
+
+  The weight's justification stood unanswered on the ground that the tests measure its effect
+  and not its origin. Four committed documents settle the origin and one of them gives a
+  reason — though not the body that legislated it.
+  ([`crates/project`](../../../crates/project/tests/the_weight_the_legislature_never_explained.rs))
+
+  **It is not inherited.** The non-traditional rider adjustment above is the last thing Ohio paid
+  for these riders before the plan, and H.B. 59 **removed** it for FY2014 — *"by removing the
+  formula adjustments for (1) nontraditional ridership […] As a result, funding is based only on
+  the greater of per rider or per mile costs for each district."* Nothing replaced it: the FY2016,
+  FY2018 and FY2020 analyses do not mention it. So eight years separate the repeal of the old
+  device from the enactment of the new one, and the old one did not distinguish a non-public rider
+  from a community school rider at all — one count, one rate, a share of the payment rather than a
+  weight on a pupil. [verified]
+
+  **It originated with the Fair School Funding Plan, already at 2.0.** The plan as Callender and
+  Sweeney [introduced it](../../catalog/ohio-bill-versions.md) in February 2021, four months
+  before [H.B. 110](../legislation/hb-110-2021.yml) enacted the formula, carries both multiples
+  verbatim, and the bill's own strike-and-insert shows what they replaced: *"(1) Multiply
+  Calculate the sum of the following:"*. Prior law took one rate times one count; the plan turned
+  that product into a weighted sum of three. An un-enacted bill cannot establish what the law is,
+  and that is not what it is doing here — it establishes **drafting**, which is the question.
+  [verified]
+
+  **No legislative analysis gives a reason, and the weights appear twice in fifteen.** Across the
+  twelve [greenbooks](../../catalog/lsc-dew-redbook.md), H.B. 96's greenbook, the redbook for the
+  same biennium and the enacted comparison, the transportation weights are mentioned only in
+  H.B. 110's — once as item (4) of a six-item list of changes, once inside a calculation box.
+  Neither says why, and the two later acts that amended this section did not restate them. The
+  same analysis discusses non-public transportation at length three pages on — pickup windows,
+  mass transit transfers, compliance deductions — and never joins any of it to the multiple.
+  [verified]
+
+  **The department gives a reason, five times, and it is about cost.** Every edition of the
+  [line-by-line explanation](../../catalog/dew-sfpr-line-by-line.md) that describes this formula,
+  FY2022 through FY2026, says: *"Community school, STEM school and nonpublic riders are weighted
+  to reflect the typically higher costs that districts incur to transport these students."* That
+  is a stated rationale from the payer, repeated without a word changing for five years.
+  [verified]
+
+  **So the question closes on the existence of the premium and narrows to its size.** The
+  department's sentence is *one* sentence for *both* weights. It explains why a premium exists; it
+  cannot explain why the premium on a non-public rider is a third larger than the premium on a
+  community school rider, and it names neither multiple. Nothing in the statute, the plan bill,
+  any analysis or any edition argues the difference. The corpus had guessed at the reason — Ohio's
+  R.C. 3327.01 duty and less efficient routes — and the guess is the right *kind* of reason and is
+  nowhere asserted by a source. What remains open is 2.0 against 1.5, not 2.0 against 1.0. [open]
+
+  **And the 2.0 was legislated twice, a fact no analysis records.** The plan bill's mile base is a
+  bare product, and [H.B. 583](../legislation/hb-583-2022.yml) — the plan's own corrections act,
+  September 2022 — reprints the section with the mile base still bare, at the very address
+  `(E)(1)(b)` the weighted version now occupies. The weights reached *miles driven* in a later act
+  than they reached riders, and not one of the fifteen analyses mentions the second occasion.
+  Which act did it is not settled by anything committed here. [open]
 
   ### The appropriation does not cover the entitlement, and this is the arithmetic
 
@@ -251,6 +307,42 @@ revisions:
       the statute and recorded the remaining question as needing a per-district figure no source
       carries. That question stays open, and narrows: the five editions give a second definition
       rather than a reconciliation, and under H.B. 166 the two labels may name one dollar.
+  - was: |
+      The non-public weight was recorded as measured but unjustified, with the reason supplied by
+      this corpus rather than by a source: "Ohio requires districts to transport non-public pupils
+      and those routes are less efficient, so a premium is defensible; the size of it is a policy
+      choice sitting in a spreadsheet."
+    now: |
+      The reason is the department's and it is about cost, stated identically in five consecutive
+      editions of the line-by-line explanation. The R.C. 3327.01 duty and the route-efficiency
+      argument are the right *kind* of reason and are asserted by nothing; they are withdrawn. The
+      premium's existence is no longer open. Its size is: one departmental sentence covers both
+      multiples and so distinguishes neither.
+    found_by: |
+      [`crates/project`](../../../crates/project/tests/the_weight_the_legislature_never_explained.rs),
+      on four documents already committed — the plan bill, the twelve greenbooks, the H.B. 96
+      redbook and the five line-by-line editions.
+    reach: |
+      The `description` section is rewritten and the finding above records the census. Nothing
+      computed moves: the weight was always 2.0 in the panel and the tests. What changes is that
+      the corpus no longer offers a rationale no source gives.
+  - was: |
+      The transportation minimum state share is "one schedule set across two budget acts rather
+      than five separate decisions", the five published values being "eight through twelve
+      twenty-fourths" — an inference from the published series.
+    now: |
+      Six years, three acts, and the schedule begins at **seven** twenty-fourths in FY2022. H.B. 1
+      of the 134th General Assembly writes all six out in one clause as fractions, in February
+      2021 — four years before the last of the three acts that enacted them.
+    found_by: |
+      The same test file. The plan bill states the schedule in words
+      (`seven twenty-fourths` … `twelve twenty-fourths`); the enacted sections round the eleventh,
+      which is why `forty-five and five-sixths` is published as `forty-five and eighty-three
+      hundredths`.
+    reach: |
+      `properties.statutory_basis` only. The claim was an inference about how many decisions the
+      series represents; it is now a reading of a committed text, and it was undercounting both
+      the years and the acts.
 properties:
   name: Transportation
   function: |
@@ -338,8 +430,18 @@ properties:
     45.83% and then 50%. [verified]
     ([`crates/project`](../../../crates/project/tests/the_parameters_before_this_biennium.rs)) The
     five published values are eight through twelve twenty-fourths rounded to two places, so the
-    floor has climbed from 33.33 to 50 percentage points in equal annual steps of a twenty-fourth
-    — one schedule set across two budget acts rather than five separate decisions. [inference]
+    floor has climbed from 33.33 to 50 percentage points in equal annual steps of a twenty-fourth.
+    [verified]
+
+    **And it is one decision, a year longer and an act wider than those five values show.**
+    [H.B. 1 of the 134th General Assembly](../../catalog/ohio-bill-versions.md) — the plan as
+    introduced in February 2021 — writes all six years out in a single clause, as *fractions*
+    rather than as percentages: **seven** twenty-fourths in FY2022 through twelve in FY2027, four
+    years before the last of the **three** acts that enacted them. The enacted section rounds the
+    eleventh rather than carrying the bill's fraction, which is why the published series looks
+    like decimals somebody chose: `forty-five and five-sixths` became `forty-five and
+    eighty-three hundredths`. [verified]
+    ([`crates/project`](../../../crates/project/tests/the_weight_the_legislature_never_explained.rs))
   calculator: |
     Not a standalone crate. Carried in `crates/project::panel::Transportation` and reproduced for
     all 609 districts in `crates/project/tests/transportation.rs`, including both supplements, the
@@ -358,6 +460,12 @@ links:
   - target: fsfp-special-education-weights.yml
     relationship: parallels
   - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from
+  - target: ../../catalog/dew-sfpr-line-by-line.md
+    relationship: sourced-from
+  - target: ../../catalog/lsc-dew-redbook.md
+    relationship: sourced-from
+  - target: ../../catalog/ohio-bill-versions.md
     relationship: sourced-from
   - target: ../parameter/transportation-cost-rates.yml
     relationship: governed-by

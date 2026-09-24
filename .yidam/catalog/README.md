@@ -54,7 +54,7 @@ Sorted by: type, then slug.
 | [`dew-report-card-value-added`](dew-report-card-value-added.md) | Ohio School Report Cards — District Value-Added Details | 1 |
 | [`dew-scholarship-annual-report`](dew-scholarship-annual-report.md) | Scholarship Annual Report — the department's own account of the channel | 5 |
 | [`dew-scholarship-historical-data`](dew-scholarship-historical-data.md) | Historical Scholarship Data — the deduct era, counted two ways | 4 |
-| [`dew-sfpr-line-by-line`](dew-sfpr-line-by-line.md) | School Finance Payment Report — Line by Line Explanation | 7 |
+| [`dew-sfpr-line-by-line`](dew-sfpr-line-by-line.md) | School Finance Payment Report — Line by Line Explanation | 8 |
 | [`dot-casino-student-distribution`](dot-casino-student-distribution.md) | County Student Distribution — gross casino revenue county student fund | 1 |
 | [`dot-reappraisal-calendar`](dot-reappraisal-calendar.md) | Ohio's sexennial reappraisal and triennial update calendar | 1 |
 | [`dot-sd1-school-district-taxes`](dot-sd1-school-district-taxes.md) | Table SD-1 — School district taxable value and taxes charged | 4 |
@@ -65,7 +65,7 @@ Sorted by: type, then slug.
 | [`jhu-homeschool-hub`](jhu-homeschool-hub.md) | Johns Hopkins Homeschool Hub — state and district home-education counts | 1 |
 | [`lsc-appropriation-spreadsheet`](lsc-appropriation-spreadsheet.md) | LSC appropriation spreadsheet | 3 |
 | [`lsc-catalog-of-budget-line-items`](lsc-catalog-of-budget-line-items.md) | Catalog of Budget Line Items — what each appropriation line was given | 12 |
-| [`lsc-dew-redbook`](lsc-dew-redbook.md) | LSC Redbook — Ohio Department of Education and Workforce | 9 |
+| [`lsc-dew-redbook`](lsc-dew-redbook.md) | LSC Redbook — Ohio Department of Education and Workforce | 10 |
 | [`lsc-hb96-analysis`](lsc-hb96-analysis.md) | LSC Budget Analysis — H.B. 96 (FY2026-27) | 8 |
 | [`lsc-school-funding-complete-resource`](lsc-school-funding-complete-resource.md) | LSC School Funding Complete Resource | 2 |
 | [`nces-ccd-lea-directory`](nces-ccd-lea-directory.md) | Common Core of Data: local education agency directory | 1 |
@@ -73,13 +73,13 @@ Sorted by: type, then slug.
 | [`ocg-white-paper-013`](ocg-white-paper-013.md) | OCG White Paper No. 013 — Does Per-Pupil Spending Track Academic Performance? | 4 |
 | [`ocg-white-paper-015`](ocg-white-paper-015.md) | OCG White Paper No. 015 — Has Ohio Been Defunding Public Education? | 2 |
 | [`ode-idea-part-b-allocations`](ode-idea-part-b-allocations.md) | IDEA Part B Allocations to Districts | 4 |
-| [`ohio-bill-versions`](ohio-bill-versions.md) | Ohio bill versions — what was proposed, not what was enacted | 0 |
+| [`ohio-bill-versions`](ohio-bill-versions.md) | Ohio bill versions — what was proposed, not what was enacted | 1 |
 | [`ohio-bills`](ohio-bills.md) | Ohio bills before enactment — the text as introduced | 3 |
 | [`ohio-essa-state-plan`](ohio-essa-state-plan.md) | Ohio's Consolidated State Plan under ESSA, and the April 2026 School Improvement amendment | 5 |
 | [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 21 |
 | [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 3 |
 
-56 entries, 1 not yet cited by any corpus node. 413 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+56 entries, 0 not yet cited by any corpus node. 413 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source
