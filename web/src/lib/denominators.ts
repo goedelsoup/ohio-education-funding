@@ -88,7 +88,19 @@ export const DENOMINATORS = {
   "sd1-adm": {
     label: "Table SD-1 ADM",
     source: "Department of Taxation",
-    note: "Children resident in the district, including those attending community schools or using scholarships. 71,947 for Columbus against Education's 43,019.",
+    /*
+     * The contrast used to be typed here: "71,947 for Columbus against Education's 43,019". Both
+     * halves were right once and neither was current. 71,947 is SD-1's TY2023 count and the feed
+     * carries four tax years now, the last of them TY2024; `method.astro` meanwhile printed the
+     * TY2024 figure twice in its own prose. So the page stated Taxation's count for one district
+     * as two different numbers, a screen apart, with nothing able to notice.
+     *
+     * `contrast` marks the entry whose sentence carries the pair, the way `divergence` marks the
+     * one carrying a median and `endpoints` the one carrying a span. The figures and the tax year
+     * are appended by `method.astro` at render time; see `denominatorContrast`.
+     */
+    contrast: "sd1-vs-enrolled",
+    note: "Children resident in the district, including those attending community schools or using scholarships.",
     field: "districts[].property_tax[].adm",
   },
   "categorical-enrolled-adm": {
@@ -184,6 +196,37 @@ export function denominatorSpan(
     firstYear: first.fiscal_year,
     lastYear: last.fiscal_year,
   };
+}
+
+/**
+ * Columbus, whose two pupil counts are the widest-known illustration of the seam.
+ *
+ * Named by IRN rather than by string match: district names are not unique in Ohio and a match on
+ * "Columbus" reaches more than one agency.
+ */
+const CONTRAST_IRN = "043802";
+
+/**
+ * The same district counted by both departments, on the latest tax year the feed carries.
+ *
+ * # Why the tax year comes back with the figures
+ *
+ * Because the pair is only a fact about denominators if both halves are the same vintage. Table
+ * SD-1 carries four tax years and the profile report carries one; a sentence naming Taxation's
+ * count without naming its year invites exactly the splice the page used to make, putting TY2024's
+ * 73,746 against a ratio measured on TY2023's 71,947.
+ *
+ * Returns `null` where either count is absent, so the caller renders the sentence without the
+ * figures rather than with a placeholder in them.
+ */
+export function denominatorContrast(
+  bundle: Bundle,
+): { name: string; enrolled: number; resident: number; taxYear: number } | null {
+  const district = bundle.districts.find((d) => d.irn === CONTRAST_IRN);
+  const enrolled = district?.adm_history?.[0];
+  const row = district?.property_tax?.filter((p) => p.adm > 0).at(-1);
+  if (!district || enrolled == null || !row) return null;
+  return { name: district.name, enrolled, resident: row.adm, taxYear: row.tax_year };
 }
 
 

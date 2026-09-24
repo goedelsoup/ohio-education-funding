@@ -14,6 +14,7 @@ import { median } from "../../src/lib/stats.ts";
 import {
   BLOCK_DENOMINATORS,
   DENOMINATORS,
+  denominatorContrast,
   denominatorOf,
   FIELD_DENOMINATORS,
   PAGE_FIGURES,
@@ -280,4 +281,42 @@ test("the card drops a count only when the figure that uses it is off the page t
     const want = declared.length - (spendingShown ? 0 : 1);
     expect(tbodyRows(html), `${d.irn} ${d.name}`).toHaveLength(want);
   }
+});
+
+test("the SD-1 contrast is one district at one tax year, read rather than typed", () => {
+  /*
+   * The pair went stale the way the median in the note above it did, and worse: `denominators.ts`
+   * carried "71,947 for Columbus against Education's 43,019" — SD-1 on TY2023 — while
+   * `method.astro` printed Taxation's count for the same district as 73,746 twice, which is
+   * TY2024. So the page stated one quantity as two numbers a screen apart, and implied a ratio
+   * of 1.714 where the corpus binds 1.6725.
+   *
+   * Both halves must therefore come from one read, and the tax year must come with them: SD-1
+   * carries four tax years and the profile report carries one, so a sentence naming Taxation's
+   * count without naming its year is an invitation to splice two vintages again.
+   */
+  const { bundle, byIrn } = loadFeed();
+  const contrast = denominatorContrast(bundle);
+  expect(contrast, "the contrast the sd1-adm entry promises is not computable").not.toBeNull();
+
+  const columbus = byIrn.get("043802")!;
+  expect(contrast!.name).toBe(columbus.name);
+  expect(contrast!.enrolled).toBe(columbus.adm_history[0]);
+
+  // The latest tax year SD-1 carries, not the first — the half that had gone stale.
+  const latest = columbus.property_tax[columbus.property_tax.length - 1]!;
+  expect(contrast!.resident).toBe(latest.adm);
+  expect(contrast!.taxYear).toBe(latest.tax_year);
+
+  // And it is a contrast: Taxation counts children resident, Education children taught.
+  expect(contrast!.resident).toBeGreaterThan(contrast!.enrolled);
+});
+
+test("the sd1-adm note states no count of its own", () => {
+  // The same guard the divergence entry has, against the same failure. `method.astro` appends the
+  // figures and the tax year at render time; a digit written into the note is a second source for
+  // one quantity, and the second source is the one that goes wrong.
+  const entry = DENOMINATORS["sd1-adm"];
+  expect("contrast" in entry).toBe(true);
+  expect(entry.note).not.toMatch(/\d/);
 });
