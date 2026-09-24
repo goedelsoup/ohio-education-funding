@@ -1,0 +1,955 @@
+school_year,ctpd_irn,ctpd,member,district_irn,career_technical_enrolment
+2025,021357,Bedford City Comprehensive CTPD,Bedford City,043562,730
+2025,200001,Apollo JVSD CTPD,Ada Exempted Village,045187,183
+2025,200001,Apollo JVSD CTPD,Allen East Local,045757,315
+2025,200001,Apollo JVSD CTPD,Auglaize County Educational Academy,,12
+2025,200001,Apollo JVSD CTPD,Bath Local,045765,84
+2025,200001,Apollo JVSD CTPD,Bluffton Exempted Village,045211,90
+2025,200001,Apollo JVSD CTPD,Columbus Grove Local,049312,118
+2025,200001,Apollo JVSD CTPD,Elida Local,045773,416
+2025,200001,Apollo JVSD CTPD,Hardin Northern Local,047498,95
+2025,200001,Apollo JVSD CTPD,Perry Local,045781,105
+2025,200001,Apollo JVSD CTPD,Shawnee Local,045799,363
+2025,200001,Apollo JVSD CTPD,Spencerville Local,045807,238
+2025,200001,Apollo JVSD CTPD,Wapakoneta City,044982,570
+2025,200002,Lima City CTPD,Heir Force Community School,,0
+2025,200002,Lima City CTPD,Lima City,044222,508
+2025,200002,Lima City CTPD,West Central Learning Academy II,,0
+2025,200003,Heartland Technical Education Center CTPD,Ashland City,043505,468
+2025,200003,Heartland Technical Education Center CTPD,Ashland County Community Academy,,5
+2025,200003,Heartland Technical Education Center CTPD,Hillsdale Local,045823,195
+2025,200003,Heartland Technical Education Center CTPD,Loudonville-Perrysville Exempted Village,045468,169
+2025,200003,Heartland Technical Education Center CTPD,Mapleton Local,045831,277
+2025,200003,Heartland Technical Education Center CTPD,West Holmes Local,047696,176
+2025,200004,Ashtabula County Technical and Career Center  CTPD,Ashtabula Area City,043513,329
+2025,200004,Ashtabula County Technical and Career Center  CTPD,Buckeye Local,045856,373
+2025,200004,Ashtabula County Technical and Career Center  CTPD,Conneaut Area City,043810,228
+2025,200004,Ashtabula County Technical and Career Center  CTPD,Geneva Area City,044057,480
+2025,200004,Ashtabula County Technical and Career Center  CTPD,Grand Valley Local,045864,349
+2025,200004,Ashtabula County Technical and Career Center  CTPD,Jefferson Area Local,045872,154
+2025,200004,Ashtabula County Technical and Career Center  CTPD,Pymatuning Valley Local School District,045880,401
+2025,200005,Tri-County JVSD CTPD,Alexander Local,045906,406
+2025,200005,Tri-County JVSD CTPD,Athens City School District,043521,399
+2025,200005,Tri-County JVSD CTPD,Federal Hocking Local,045914,127
+2025,200005,Tri-County JVSD CTPD,Logan-Hocking Local,044248,992
+2025,200005,Tri-County JVSD CTPD,Nelsonville-York City,044446,191
+2025,200005,Tri-County JVSD CTPD,New Lexington School District,044479,631
+2025,200005,Tri-County JVSD CTPD,Southeast Ohio Classical Academy,,0
+2025,200005,Tri-County JVSD CTPD,Southern Local,049064,123
+2025,200005,Tri-County JVSD CTPD,Trimble Local,045922,40
+2025,200006,Belmont-Harrison Area JVSD CTPD,Barnesville Exempted Village,045203,495
+2025,200006,Belmont-Harrison Area JVSD CTPD,Bellaire Local,043570,49
+2025,200006,Belmont-Harrison Area JVSD CTPD,Bridgeport Exempted Village,045237,297
+2025,200006,Belmont-Harrison Area JVSD CTPD,Harrison Hills City,045245,230
+2025,200006,Belmont-Harrison Area JVSD CTPD,Lakeland Academy Community School,,2
+2025,200006,Belmont-Harrison Area JVSD CTPD,Martins Ferry City,044347,324
+2025,200006,Belmont-Harrison Area JVSD CTPD,Shadyside Local,046003,198
+2025,200006,Belmont-Harrison Area JVSD CTPD,St Clairsville-Richland City,045997,508
+2025,200006,Belmont-Harrison Area JVSD CTPD,Union Local,046011,532
+2025,200007,Southern Hills JVSD CTPD,Bright Local,047613,203
+2025,200007,Southern Hills JVSD CTPD,Eastern Local School District,046037,327
+2025,200007,Southern Hills JVSD CTPD,Fayetteville-Perry Local,046045,249
+2025,200007,Southern Hills JVSD CTPD,Georgetown Exempted Village,045377,413
+2025,200007,Southern Hills JVSD CTPD,Ripley-Union-Lewis-Huntington Local,046078,242
+2025,200007,Southern Hills JVSD CTPD,Western Brown Local,046060,805
+2025,200008,Butler County JVSD CTPD,Edgewood City School District,046094,1066
+2025,200008,Butler County JVSD CTPD,Fairfield City,046102,2298
+2025,200008,Butler County JVSD CTPD,Fairfield Preparatory Academy,,0
+2025,200008,Butler County JVSD CTPD,Hamilton City,044107,1274
+2025,200008,Butler County JVSD CTPD,Lakota Local,046110,3627
+2025,200008,Butler County JVSD CTPD,Madison Local,046128,341
+2025,200008,Butler County JVSD CTPD,Marshall High School,,0
+2025,200008,Butler County JVSD CTPD,Middletown City,044404,1418
+2025,200008,Butler County JVSD CTPD,Middletown Preparatory & Fitness Academy,,0
+2025,200008,Butler County JVSD CTPD,Monroe Local,139303,590
+2025,200008,Butler County JVSD CTPD,New Miami Local,046136,35
+2025,200008,Butler County JVSD CTPD,Northwest Local,047365,2422
+2025,200008,Butler County JVSD CTPD,Ross Local,046144,749
+2025,200008,Butler County JVSD CTPD,Summit Academy Secondary School - Middletown,,0
+2025,200008,Butler County JVSD CTPD,Summit Acdy Comm Schl for Alternative Learners of Middletown,,0
+2025,200008,Butler County JVSD CTPD,Talawanda City,046151,348
+2025,200011,Springfield-Clark County JVSD CTPD,Buckeye Community School - Springfield,,1
+2025,200011,Springfield-Clark County JVSD CTPD,Clark-Shawnee Local,046284,227
+2025,200011,Springfield-Clark County JVSD CTPD,Cliff Park High School,,0
+2025,200011,Springfield-Clark County JVSD CTPD,Global Impact STEM Academy,,697
+2025,200011,Springfield-Clark County JVSD CTPD,Greenon Local,046235,477
+2025,200011,Springfield-Clark County JVSD CTPD,Northeastern Local,046250,441
+2025,200011,Springfield-Clark County JVSD CTPD,Northwestern Local,046268,404
+2025,200011,Springfield-Clark County JVSD CTPD,Southeastern Local,046276,173
+2025,200011,Springfield-Clark County JVSD CTPD,Springfield City School District,044818,150
+2025,200011,Springfield-Clark County JVSD CTPD,Springfield Preparatory and Fitness Academy,,0
+2025,200011,Springfield-Clark County JVSD CTPD,Springfield Sports Academy,,0
+2025,200011,Springfield-Clark County JVSD CTPD,Tecumseh Local,046243,483
+2025,200012,U S Grant JVSD CTPD,Bethel-Tate Local,046318,368
+2025,200012,U S Grant JVSD CTPD,Felicity-Franklin Local,046334,229
+2025,200012,U S Grant JVSD CTPD,New Richmond Exempted Village,045559,388
+2025,200012,U S Grant JVSD CTPD,New Richmond Preparatory Academy,,0
+2025,200012,U S Grant JVSD CTPD,Williamsburg Local,046367,240
+2025,200015,Columbiana County JVSD CTPD,Beaver Local,046425,94
+2025,200015,Columbiana County JVSD CTPD,Columbiana Exempted Village,045328,30
+2025,200015,Columbiana County JVSD CTPD,Crestview Local,046433,56
+2025,200015,Columbiana County JVSD CTPD,East Palestine City,043927,45
+2025,200015,Columbiana County JVSD CTPD,Leetonia Exempted Village School District,045443,23
+2025,200015,Columbiana County JVSD CTPD,Lisbon Exempted Village,045450,42
+2025,200015,Columbiana County JVSD CTPD,Southern Local,046441,115
+2025,200015,Columbiana County JVSD CTPD,United Local,046458,199
+2025,200015,Columbiana County JVSD CTPD,Utica Shale Academy of Ohio,,175
+2025,200015,Columbiana County JVSD CTPD,Wellsville Local,045039,75
+2025,200016,East Liverpool City CTPD,Buckeye On-Line School for Success,,0
+2025,200016,East Liverpool City CTPD,East Liverpool City,043919,488
+2025,200019,Cleveland Municipal CTPD,Bella Academy of Excellence,,0
+2025,200019,Cleveland Municipal CTPD,Broadway Academy,,0
+2025,200019,Cleveland Municipal CTPD,Citizens Academy Southeast,,0
+2025,200019,Cleveland Municipal CTPD,Citizens Leadership Academy East,,0
+2025,200019,Cleveland Municipal CTPD,Cleveland Academy for Scholarship Technology and Leadership,,0
+2025,200019,Cleveland Municipal CTPD,Cleveland Arts and Social Sciences Academy,,0
+2025,200019,Cleveland Municipal CTPD,Cleveland College Preparatory School,,0
+2025,200019,Cleveland Municipal CTPD,Cleveland Municipal,043786,3218
+2025,200019,Cleveland Municipal CTPD,Cleveland Preparatory Academy,,0
+2025,200019,Cleveland Municipal CTPD,Constellation Schools: Eastside Arts Academy,,0
+2025,200019,Cleveland Municipal CTPD,Constellation Schools: Madison Community Elementary,,0
+2025,200019,Cleveland Municipal CTPD,Constellation Schools: Old Brooklyn Community Elementary,,0
+2025,200019,Cleveland Municipal CTPD,Constellation Schools: Old Brooklyn Community Middle,,0
+2025,200019,Cleveland Municipal CTPD,Constellation Schools: Puritas Community Elementary,,0
+2025,200019,Cleveland Municipal CTPD,Constellation Schools: Puritas Community Middle,,0
+2025,200019,Cleveland Municipal CTPD,Constellation Schools: Stockyard Community Elementary,,0
+2025,200019,Cleveland Municipal CTPD,Constellation Schools: Stockyard Community Middle,,0
+2025,200019,Cleveland Municipal CTPD,Constellation Schools: Westpark Community Elementary,,0
+2025,200019,Cleveland Municipal CTPD,Constellation Schools: Westpark Community Middle,,0
+2025,200019,Cleveland Municipal CTPD,Constellation Schools: Westside Community School of the Arts,,0
+2025,200019,Cleveland Municipal CTPD,East Academy,,0
+2025,200019,Cleveland Municipal CTPD,East Preparatory Academy,,0
+2025,200019,Cleveland Municipal CTPD,Ginn-Thompson School for Girls,,0
+2025,200019,Cleveland Municipal CTPD,Global Ambassadors Language Academy,,0
+2025,200019,Cleveland Municipal CTPD,Harvard Avenue Performance Academy,,0
+2025,200019,Cleveland Municipal CTPD,Hope Academy Northcoast Campus,,0
+2025,200019,Cleveland Municipal CTPD,Horizon Science Acad Cleveland,,187
+2025,200019,Cleveland Municipal CTPD,Horizon Science Academy-Cleveland Middle School,,81
+2025,200019,Cleveland Municipal CTPD,Horizon Science Academy-Denison Middle School,,65
+2025,200019,Cleveland Municipal CTPD,Innovation Academy West,,0
+2025,200019,Cleveland Municipal CTPD,Intergenerational School  The,,0
+2025,200019,Cleveland Municipal CTPD,Invictus High School,,0
+2025,200019,Cleveland Municipal CTPD,Lake Erie College Preparatory School,,0
+2025,200019,Cleveland Municipal CTPD,Lake Erie International High School,,0
+2025,200019,Cleveland Municipal CTPD,Lincoln Park Academy,,0
+2025,200019,Cleveland Municipal CTPD,Menlo Park Academy,,0
+2025,200019,Cleveland Municipal CTPD,Near West Intergenerational School,,0
+2025,200019,Cleveland Municipal CTPD,Northeast Ohio College Preparatory School,,0
+2025,200019,Cleveland Municipal CTPD,Northwest School of the Arts,,0
+2025,200019,Cleveland Municipal CTPD,Ohio Connections Academy  Inc,,68
+2025,200019,Cleveland Municipal CTPD,Old Brook High School,,0
+2025,200019,Cleveland Municipal CTPD,Orchard Park Academy,,0
+2025,200019,Cleveland Municipal CTPD,Phoenix Village Academy Primary 2 dba Wings Academy 1,,0
+2025,200019,Cleveland Municipal CTPD,Promise Academy,,0
+2025,200019,Cleveland Municipal CTPD,Regent High School,,0
+2025,200019,Cleveland Municipal CTPD,SMART Academy,,0
+2025,200019,Cleveland Municipal CTPD,STEAM Academy of Warrensville Heights,,0
+2025,200019,Cleveland Municipal CTPD,Southern Cleveland Drop Back Indba Innovative Career Academy,,0
+2025,200019,Cleveland Municipal CTPD,Stepstone Academy,,0
+2025,200019,Cleveland Municipal CTPD,University of Cleveland Preparatory School,,0
+2025,200019,Cleveland Municipal CTPD,Village Preparatory School Cliffs,,0
+2025,200019,Cleveland Municipal CTPD,Village Preparatory School Willard,,0
+2025,200019,Cleveland Municipal CTPD,Village Preparatory School Woodland Hills,,0
+2025,200019,Cleveland Municipal CTPD,Washington Park Community School,,0
+2025,200019,Cleveland Municipal CTPD,West Cleveland Drop Back In dba Frederick Douglass High Scho,,0
+2025,200019,Cleveland Municipal CTPD,West Park Bilingual Academy,,0
+2025,200020,Tri-Heights Career Prep Consortium CTPD,Cleveland Heights-University Heights City,043794,493
+2025,200020,Tri-Heights Career Prep Consortium CTPD,Green Inspiration Academy,,0
+2025,200020,Tri-Heights Career Prep Consortium CTPD,Maple Heights City,044305,868
+2025,200020,Tri-Heights Career Prep Consortium CTPD,Ohio College Preparatory School,,0
+2025,200020,Tri-Heights Career Prep Consortium CTPD,Randall Park High School,,0
+2025,200020,Tri-Heights Career Prep Consortium CTPD,Shaker Heights City,044750,198
+2025,200020,Tri-Heights Career Prep Consortium CTPD,T2 Honors Academy,,0
+2025,200020,Tri-Heights Career Prep Consortium CTPD,Warrensville Heights City,045005,285
+2025,200021,East Cleveland City CTPD,Apex Academy,,0
+2025,200021,East Cleveland City CTPD,East Cleveland City School District,043901,146
+2025,200023,Lakewood City CTPD,Albert Einstein Academy for Letters  Arts and Sciences-Ohio,,0
+2025,200023,Lakewood City CTPD,Bay Village City,043547,28
+2025,200023,Lakewood City CTPD,Lakewood City,044198,988
+2025,200023,Lakewood City CTPD,Rocky River City,044701,290
+2025,200023,Lakewood City CTPD,Westlake Academy,,0
+2025,200023,Lakewood City CTPD,Westlake City,045062,34
+2025,200025,Mayfield Excel T.E.C.C. CTPD,Aurora City,049171,51
+2025,200025,Mayfield Excel T.E.C.C. CTPD,Beachwood City,043554,34
+2025,200025,Mayfield Excel T.E.C.C. CTPD,Chagrin Falls Exempted Village,045286,37
+2025,200025,Mayfield Excel T.E.C.C. CTPD,Flex High School Cleveland,,0
+2025,200025,Mayfield Excel T.E.C.C. CTPD,Mayfield City,044370,149
+2025,200025,Mayfield Excel T.E.C.C. CTPD,Orange City,046581,44
+2025,200025,Mayfield Excel T.E.C.C. CTPD,Richmond Heights Local,046599,26
+2025,200025,Mayfield Excel T.E.C.C. CTPD,Solon Academy,,0
+2025,200025,Mayfield Excel T.E.C.C. CTPD,Solon City,046607,65
+2025,200025,Mayfield Excel T.E.C.C. CTPD,South Euclid-Lyndhurst City,044792,128
+2025,200025,Mayfield Excel T.E.C.C. CTPD,West Geauga Local,047225,294
+2025,200025,Mayfield Excel T.E.C.C. CTPD,Willoughby-Eastlake City,045104,272
+2025,200026,Parma City CTPD,Constellation Schools: Parma Community,,0
+2025,200026,Parma City CTPD,Global Village Academy,,0
+2025,200026,Parma City CTPD,Huber Heights Preparatory Academy dba Parma Academy,,0
+2025,200026,Parma City CTPD,Parma City,044636,1712
+2025,200026,Parma City CTPD,Summit Academy Community School - Parma,,0
+2025,200027,Cuyahoga Valley JVSD CTPD,Alternative Education Academy,,127
+2025,200027,Cuyahoga Valley JVSD CTPD,Brecksville-Broadview Heights City,043646,127
+2025,200027,Cuyahoga Valley JVSD CTPD,Cuyahoga Heights Local,046557,160
+2025,200027,Cuyahoga Valley JVSD CTPD,Garfield Heights City Schools,044040,132
+2025,200027,Cuyahoga Valley JVSD CTPD,Gateway Online Academy of Ohio,,0
+2025,200027,Cuyahoga Valley JVSD CTPD,Independence Local,046565,37
+2025,200027,Cuyahoga Valley JVSD CTPD,Nordonia Hills City,050047,364
+2025,200027,Cuyahoga Valley JVSD CTPD,North Royalton City,044545,609
+2025,200027,Cuyahoga Valley JVSD CTPD,North Shore High School,,0
+2025,200027,Cuyahoga Valley JVSD CTPD,Northeast Ohio Classical Academy,,0
+2025,200027,Cuyahoga Valley JVSD CTPD,Pathfinder Career Academy of Ohio,,28
+2025,200027,Cuyahoga Valley JVSD CTPD,Revere Local,050054,64
+2025,200027,Cuyahoga Valley JVSD CTPD,Twinsburg City,050070,118
+2025,200028,Polaris JVSD CTPD,Berea City,043612,986
+2025,200028,Polaris JVSD CTPD,Brooklyn City,043653,342
+2025,200028,Polaris JVSD CTPD,Fairview Park City,043976,358
+2025,200028,Polaris JVSD CTPD,North Olmsted City,044529,386
+2025,200028,Polaris JVSD CTPD,Olmsted Falls City,046573,706
+2025,200028,Polaris JVSD CTPD,Strongsville Academy,,0
+2025,200028,Polaris JVSD CTPD,Strongsville City,044842,1374
+2025,200030,Four County JVSD CTPD,Archbold-Area Local,047043,148
+2025,200030,Four County JVSD CTPD,Ayersville Local,046706,116
+2025,200030,Four County JVSD CTPD,Bryan City,043679,288
+2025,200030,Four County JVSD CTPD,Central Local,046714,158
+2025,200030,Four County JVSD CTPD,Defiance City,043869,115
+2025,200030,Four County JVSD CTPD,Edgerton Local,050617,167
+2025,200030,Four County JVSD CTPD,Edon Northwest Local,050625,139
+2025,200030,Four County JVSD CTPD,Evergreen Local,047050,277
+2025,200030,Four County JVSD CTPD,Fayette Local,047068,100
+2025,200030,Four County JVSD CTPD,Hicksville Exempted Village School District,045419,188
+2025,200030,Four County JVSD CTPD,Holgate Local,047571,109
+2025,200030,Four County JVSD CTPD,Liberty Center Local,047589,211
+2025,200030,Four County JVSD CTPD,Millcreek-West Unity Local,050633,109
+2025,200030,Four County JVSD CTPD,Montpelier Exempted Village,045526,31
+2025,200030,Four County JVSD CTPD,Napoleon Area City,044438,375
+2025,200030,Four County JVSD CTPD,North Central Local,050641,89
+2025,200030,Four County JVSD CTPD,Northeastern Local,046722,186
+2025,200030,Four County JVSD CTPD,Patrick Henry Local,047597,312
+2025,200030,Four County JVSD CTPD,Pettisville Local,047076,130
+2025,200030,Four County JVSD CTPD,Pike-Delta-York Local,047084,204
+2025,200030,Four County JVSD CTPD,Stryker Local,050658,93
+2025,200030,Four County JVSD CTPD,Wauseon Exempted Village,045641,320
+2025,200031,Delaware County JVSD CTPD,Big Walnut Local,046748,610
+2025,200031,Delaware County JVSD CTPD,Buckeye Valley Local,046755,196
+2025,200031,Delaware County JVSD CTPD,Delaware City,043877,675
+2025,200031,Delaware County JVSD CTPD,Olentangy Local,046763,1285
+2025,200031,Delaware County JVSD CTPD,Worthington City,045138,636
+2025,200032,EHOVE JVSD CTPD,Bellevue City,043596,322
+2025,200032,EHOVE JVSD CTPD,Danbury Local,048934,14
+2025,200032,EHOVE JVSD CTPD,Edison Local (formerly Berlin-Milan),046789,314
+2025,200032,EHOVE JVSD CTPD,Huron City Schools,044131,212
+2025,200032,EHOVE JVSD CTPD,Huron Sports Academy,,0
+2025,200032,EHOVE JVSD CTPD,Margaretta Local,046805,294
+2025,200032,EHOVE JVSD CTPD,Monroeville Local,047712,167
+2025,200032,EHOVE JVSD CTPD,New London Local,047720,171
+2025,200032,EHOVE JVSD CTPD,Norwalk City,044560,358
+2025,200032,EHOVE JVSD CTPD,Perkins Local,046813,67
+2025,200032,EHOVE JVSD CTPD,Put-In-Bay Local,048975,0
+2025,200032,EHOVE JVSD CTPD,South Central Local,047738,156
+2025,200032,EHOVE JVSD CTPD,Townsend Community School,,9
+2025,200032,EHOVE JVSD CTPD,Vermilion Local,046821,193
+2025,200032,EHOVE JVSD CTPD,Western Reserve Local,047746,277
+2025,200033,Sandusky City CTPD,Sandusky City,044743,848
+2025,200035,Columbus City CTPD,A+ Arts Academy,,0
+2025,200035,Columbus City CTPD,A+ Children's Academy,,0
+2025,200035,Columbus City CTPD,Arts & College Preparatory Academy,,0
+2025,200035,Columbus City CTPD,Bridge Gate Community School,,0
+2025,200035,Columbus City CTPD,Capital City Career Prep High School,,1
+2025,200035,Columbus City CTPD,Capital Collegiate Preparatory Academy,,0
+2025,200035,Columbus City CTPD,Capital High School,,25
+2025,200035,Columbus City CTPD,Career Prep Virtual High School. Inc.,,0
+2025,200035,Columbus City CTPD,Central High School,,0
+2025,200035,Columbus City CTPD,Central Point Preparatory Academy,,0
+2025,200035,Columbus City CTPD,Cesar Chavez College Preparatory School,,0
+2025,200035,Columbus City CTPD,Charles School at Ohio Dominican University,,162
+2025,200035,Columbus City CTPD,Columbus Arts & Technology Academy,,28
+2025,200035,Columbus City CTPD,Columbus Bilingual Academy-North,,0
+2025,200035,Columbus City CTPD,Columbus Bilingual West,,0
+2025,200035,Columbus City CTPD,Columbus City Schools District,043802,10738
+2025,200035,Columbus City CTPD,Columbus Humanities  Arts and Technology Academy,,0
+2025,200035,Columbus City CTPD,Columbus Noor Academy,,0
+2025,200035,Columbus City CTPD,Columbus Performance Academy,,0
+2025,200035,Columbus City CTPD,Columbus Preparatory and Fitness Academy,,0
+2025,200035,Columbus City CTPD,Cornerstone Academy Community School,,0
+2025,200035,Columbus City CTPD,Early College Academy,,0
+2025,200035,Columbus City CTPD,East Bridge Academy of Excellence,,0
+2025,200035,Columbus City CTPD,Eastland Preparatory Academy,,0
+2025,200035,Columbus City CTPD,Educational Academy for Boys & Girls,,0
+2025,200035,Columbus City CTPD,Flex High School,,0
+2025,200035,Columbus City CTPD,Focus Learning Academy of Central Columbus,,0
+2025,200035,Columbus City CTPD,Focus Learning Academy of Northern Columbus,,0
+2025,200035,Columbus City CTPD,Focus Learning Academy of Southeastern Columbus,,0
+2025,200035,Columbus City CTPD,Focus Learning Academy of Southwestern Columbus,,0
+2025,200035,Columbus City CTPD,Focus North High School,,37
+2025,200035,Columbus City CTPD,Franklin Learning Academy,,0
+2025,200035,Columbus City CTPD,Franklinton High School,,0
+2025,200035,Columbus City CTPD,Franklinton Prep High School,,0
+2025,200035,Columbus City CTPD,Graham Elementary and Middle School,,0
+2025,200035,Columbus City CTPD,Graham School  The,,0
+2025,200035,Columbus City CTPD,Grandview Heights Schools,044073,9
+2025,200035,Columbus City CTPD,Great River Connections Academy,,64
+2025,200035,Columbus City CTPD,Great Western Academy,,0
+2025,200035,Columbus City CTPD,Heart of Ohio Classical Academy,,0
+2025,200035,Columbus City CTPD,Horizon Science Academy Columbus,,674
+2025,200035,Columbus City CTPD,Horizon Science Academy Columbus Middle School,,235
+2025,200035,Columbus City CTPD,Horizon Science Academy Elementary School,,0
+2025,200035,Columbus City CTPD,Imagine Columbus Primary Academy,,0
+2025,200035,Columbus City CTPD,International Acad Of Columbus,,0
+2025,200035,Columbus City CTPD,KIPP Columbus,,0
+2025,200035,Columbus City CTPD,Kids Care Elementary,,0
+2025,200035,Columbus City CTPD,LINC Academy Columbus,,0
+2025,200035,Columbus City CTPD,Legacy Academy of Excellence,,0
+2025,200035,Columbus City CTPD,Mason Run High School,,3
+2025,200035,Columbus City CTPD,Mater Academy Preparatory  Inc.,,0
+2025,200035,Columbus City CTPD,Metro Early College High School,,584
+2025,200035,Columbus City CTPD,Midnimo Cross Cultural Middle School,,0
+2025,200035,Columbus City CTPD,Noble Academy-Columbus,,48
+2025,200035,Columbus City CTPD,North Columbus Preparatory Academy,,0
+2025,200035,Columbus City CTPD,North Woods Career Prep High School,,0
+2025,200035,Columbus City CTPD,Northland Preparatory and Fitness Academy,,0
+2025,200035,Columbus City CTPD,Oakstone Community School,,0
+2025,200035,Columbus City CTPD,Ohio Achievement Charter Schools  Inc. dba Millennium Commun,,0
+2025,200035,Columbus City CTPD,Ohio Construction Academy,,115
+2025,200035,Columbus City CTPD,Patriot Preparatory Academy,,0
+2025,200035,Columbus City CTPD,Performance Academy Eastland,,0
+2025,200035,Columbus City CTPD,Renaissance Academy dba Bessie Sherrod Price Preparatory Aca,,0
+2025,200035,Columbus City CTPD,Road to Success Academy,,0
+2025,200035,Columbus City CTPD,South Columbus Preparatory Academy at German Village,,0
+2025,200035,Columbus City CTPD,South Columbus Preparatory Academy at Southfield,,0
+2025,200035,Columbus City CTPD,South Scioto Academy,,0
+2025,200035,Columbus City CTPD,Sullivant Avenue Community School,,0
+2025,200035,Columbus City CTPD,Summit Academy Community School-Columbus,,0
+2025,200035,Columbus City CTPD,Summit Academy Transition High School-Columbus,,0
+2025,200035,Columbus City CTPD,The Academy for Urban Scholars,,0
+2025,200035,Columbus City CTPD,United Schools Columbus,,0
+2025,200035,Columbus City CTPD,Unity Academy,,0
+2025,200035,Columbus City CTPD,Upper Arlington City,044933,996
+2025,200035,Columbus City CTPD,Westerville City,045047,2981
+2025,200035,Columbus City CTPD,Westside Academy,,0
+2025,200035,Columbus City CTPD,Westwood Preparatory Academy,,0
+2025,200035,Columbus City CTPD,YB Columbus Community School,,0
+2025,200035,Columbus City CTPD,Zenith Academy,,223
+2025,200035,Columbus City CTPD,Zenith Academy East,,43
+2025,200035,Columbus City CTPD,Zenith Academy West,,43
+2025,200036,Eastland JVSD CTPD,Amanda-Clearcreek Local,046847,331
+2025,200036,Eastland JVSD CTPD,Berne Union Local,046854,26
+2025,200036,Eastland JVSD CTPD,Bexley City,043620,187
+2025,200036,Eastland JVSD CTPD,Bloom-Carroll Local,046862,548
+2025,200036,Eastland JVSD CTPD,Canal Winchester Local,046946,1075
+2025,200036,Eastland JVSD CTPD,Fairfield Union Local,046870,475
+2025,200036,Eastland JVSD CTPD,Gahanna-Jefferson City,046961,1505
+2025,200036,Eastland JVSD CTPD,Groveport Community School,,0
+2025,200036,Eastland JVSD CTPD,Groveport Madison Local,046979,1114
+2025,200036,Eastland JVSD CTPD,Hamilton Local,046953,83
+2025,200036,Eastland JVSD CTPD,Liberty Union-Thurston Local,046888,390
+2025,200036,Eastland JVSD CTPD,New Albany-Plain Local,046995,272
+2025,200036,Eastland JVSD CTPD,Pickerington Local,046896,2480
+2025,200036,Eastland JVSD CTPD,Reynoldsburg City,047001,961
+2025,200036,Eastland JVSD CTPD,Teays Valley Local,049098,826
+2025,200036,Eastland JVSD CTPD,Walnut Township Local,046904,34
+2025,200036,Eastland JVSD CTPD,Whitehall City,045070,419
+2025,200036,Eastland JVSD CTPD,Whitehall Preparatory and Fitness Academy,,0
+2025,200037,Tolles Career & Technical Center CTPD,Buckeye Community School - London,,7
+2025,200037,Tolles Career & Technical Center CTPD,Dublin City,047027,468
+2025,200037,Tolles Career & Technical Center CTPD,Fairbanks Local,050328,233
+2025,200037,Tolles Career & Technical Center CTPD,Hilliard City,047019,2250
+2025,200037,Tolles Career & Technical Center CTPD,Jefferson Local,048256,274
+2025,200037,Tolles Career & Technical Center CTPD,Jonathan Alder Local,048264,630
+2025,200037,Tolles Career & Technical Center CTPD,London City,044255,505
+2025,200037,Tolles Career & Technical Center CTPD,Madison-Plains Local,048272,445
+2025,200038,South-Western City CTPD,Columbus Preparatory Academy,,0
+2025,200038,South-Western City CTPD,South-Western City,044800,5511
+2025,200039,Penta County JVSD CTPD,Anthony Wayne Local,048207,548
+2025,200039,Penta County JVSD CTPD,Benton Carroll Salem Local,048926,346
+2025,200039,Penta County JVSD CTPD,Bowling Green City School District,043638,574
+2025,200039,Penta County JVSD CTPD,Eastwood Local,050674,378
+2025,200039,Penta County JVSD CTPD,Elmwood Local,050682,298
+2025,200039,Penta County JVSD CTPD,Genoa Area Local,048942,228
+2025,200039,Penta County JVSD CTPD,Lake Local,050690,117
+2025,200039,Penta County JVSD CTPD,Maumee City,044362,543
+2025,200039,Penta County JVSD CTPD,North Baltimore Local,050708,23
+2025,200039,Penta County JVSD CTPD,Northwood Local Schools,050716,70
+2025,200039,Penta County JVSD CTPD,Ohio Digital Learning School,,0
+2025,200039,Penta County JVSD CTPD,Ohio Virtual Academy,,5794
+2025,200039,Penta County JVSD CTPD,Otsego Local,050724,420
+2025,200039,Penta County JVSD CTPD,Perrysburg Exempted Village,045583,800
+2025,200039,Penta County JVSD CTPD,Rossford Exempted Village,045609,130
+2025,200039,Penta County JVSD CTPD,Springfield Local,048223,855
+2025,200039,Penta County JVSD CTPD,Swanton Local,047092,282
+2025,200039,Penta County JVSD CTPD,Wildwood Environmental Academy,,0
+2025,200039,Penta County JVSD CTPD,Woodmore Local,049577,53
+2025,200040,Gallia-Jackson-Vinton JVSD CTPD,Gallia County Local,065680,663
+2025,200040,Gallia-Jackson-Vinton JVSD CTPD,Gallipolis City,044032,395
+2025,200040,Gallia-Jackson-Vinton JVSD CTPD,Jackson City,044156,792
+2025,200040,Gallia-Jackson-Vinton JVSD CTPD,Oak Hill Union Local,047761,314
+2025,200040,Gallia-Jackson-Vinton JVSD CTPD,Vinton County Local,050393,460
+2025,200040,Gallia-Jackson-Vinton JVSD CTPD,Wellston City,045021,445
+2025,200042,Greene County JVSD CTPD,Beavercreek City,047241,1780
+2025,200042,Greene County JVSD CTPD,Bellbrook-Sugarcreek Local,047274,746
+2025,200042,Greene County JVSD CTPD,Cedar Cliff Local,047258,132
+2025,200042,Greene County JVSD CTPD,Community STE(A)M Academy - Xenia,,158
+2025,200042,Greene County JVSD CTPD,Fairborn City,043968,839
+2025,200042,Greene County JVSD CTPD,Fairborn Digital Academy,,1
+2025,200042,Greene County JVSD CTPD,Greeneview Local,047266,299
+2025,200042,Greene County JVSD CTPD,Summit Academy Community School Alternative Learners -Xenia,,1
+2025,200042,Greene County JVSD CTPD,Xenia Community City,045153,936
+2025,200042,Greene County JVSD CTPD,Yellow Springs Exempted Village,045674,95
+2025,200043,Cincinnati City CTPD,AchievePoint Career Academy - Cincinnati,,0
+2025,200043,Cincinnati City CTPD,Alliance Academy of Cincinnati,,0
+2025,200043,Cincinnati City CTPD,Cincinnati Achievement Academy,,0
+2025,200043,Cincinnati City CTPD,Cincinnati College Preparatory Academy,,0
+2025,200043,Cincinnati City CTPD,Cincinnati Public Schools,043752,5225
+2025,200043,Cincinnati City CTPD,Cincinnati Technology Academy,,0
+2025,200043,Cincinnati City CTPD,Dublin Preparatory Academy dba Northside Preparatory Academy,,0
+2025,200043,Cincinnati City CTPD,Empowered by the Arts Academy,,0
+2025,200043,Cincinnati City CTPD,Horizon Science Academy-Cincinnati,,60
+2025,200043,Cincinnati City CTPD,IDEA Greater Cincinnati  Inc,,283
+2025,200043,Cincinnati City CTPD,Mount Auburn Preparatory Academy,,0
+2025,200043,Cincinnati City CTPD,Mt. Healthy Preparatory and Fitness Academy,,0
+2025,200043,Cincinnati City CTPD,Orion Academy,,0
+2025,200043,Cincinnati City CTPD,ReGeneration Bond Hill,,0
+2025,200043,Cincinnati City CTPD,ReGeneration Middle School,,0
+2025,200043,Cincinnati City CTPD,ReGeneration Schools Avondale Elementary,,0
+2025,200043,Cincinnati City CTPD,Riverside Community School  Inc. dba Riverside Academy,,0
+2025,200043,Cincinnati City CTPD,Summit Academy Community School - Cincinnati,,0
+2025,200043,Cincinnati City CTPD,Summit Academy Transition High School-Cincinnati,,0
+2025,200043,Cincinnati City CTPD,T.C.P. World Academy,,0
+2025,200044,Great Oaks Career Campuses,Batavia Local,046300,379
+2025,200044,Great Oaks Career Campuses,Blanchester Local,046383,246
+2025,200044,Great Oaks Career Campuses,ChallengeU Ohio Community School,,0
+2025,200044,Great Oaks Career Campuses,Cincinnati Classical Academy,,0
+2025,200044,Great Oaks Career Campuses,Clermont Northeastern Local,046326,270
+2025,200044,Great Oaks Career Campuses,Clinton-Massie Local,046391,610
+2025,200044,Great Oaks Career Campuses,Deer Park Community City,043851,65
+2025,200044,Great Oaks Career Campuses,East Clinton Local,046409,264
+2025,200044,Great Oaks Career Campuses,Fairfield Local,047621,370
+2025,200044,Great Oaks Career Campuses,Finneytown Local,047332,174
+2025,200044,Great Oaks Career Campuses,Forest Hills Local,047340,387
+2025,200044,Great Oaks Career Campuses,Goshen Local,046342,678
+2025,200044,Great Oaks Career Campuses,Greenfield Exempted Village,045401,369
+2025,200044,Great Oaks Career Campuses,Hamilton Cnty Math & Science,,0
+2025,200044,Great Oaks Career Campuses,Hillsboro City,044123,472
+2025,200044,Great Oaks Career Campuses,Indian Hill Exempted Village,045435,498
+2025,200044,Great Oaks Career Campuses,Lockland Local,044230,18
+2025,200044,Great Oaks Career Campuses,Loveland City,044271,514
+2025,200044,Great Oaks Career Campuses,Lynchburg-Clay Local,047639,344
+2025,200044,Great Oaks Career Campuses,Madeira City,044289,193
+2025,200044,Great Oaks Career Campuses,Mariemont City,044313,465
+2025,200044,Great Oaks Career Campuses,Mason City,050450,493
+2025,200044,Great Oaks Career Campuses,Miami Trace Local,046920,818
+2025,200044,Great Oaks Career Campuses,Milford Exempted Village,045500,1116
+2025,200044,Great Oaks Career Campuses,Mt Healthy City,044412,637
+2025,200044,Great Oaks Career Campuses,North College Hill City,044511,386
+2025,200044,Great Oaks Career Campuses,Norwood City,044578,50
+2025,200044,Great Oaks Career Campuses,Oak Hills Local,047373,351
+2025,200044,Great Oaks Career Campuses,Princeton City,044677,1106
+2025,200044,Great Oaks Career Campuses,Reading Community City,044693,248
+2025,200044,Great Oaks Career Campuses,Southwest Local,047381,1138
+2025,200044,Great Oaks Career Campuses,St Bernard-Elmwood Place City,044719,33
+2025,200044,Great Oaks Career Campuses,Sycamore Community City,044867,432
+2025,200044,Great Oaks Career Campuses,Three Rivers Local,047399,242
+2025,200044,Great Oaks Career Campuses,Washington Court House City,045013,267
+2025,200044,Great Oaks Career Campuses,West Clermont Local,046359,677
+2025,200044,Great Oaks Career Campuses,Wilmington City,045112,559
+2025,200044,Great Oaks Career Campuses,Winton Woods City,044081,548
+2025,200044,Great Oaks Career Campuses,Wyoming City,045146,113
+2025,200050,Jefferson County JVSD CTPD,Buckeye Local,047787,422
+2025,200050,Jefferson County JVSD CTPD,Edison Local,047795,525
+2025,200050,Jefferson County JVSD CTPD,Indian Creek Local,047803,338
+2025,200050,Jefferson County JVSD CTPD,Steubenville City,044826,862
+2025,200050,Jefferson County JVSD CTPD,Toronto City,044917,207
+2025,200051,Knox County JVSD CTPD,Centerburg Local,047829,292
+2025,200051,Knox County JVSD CTPD,Clear Fork Valley Local,049411,511
+2025,200051,Knox County JVSD CTPD,Danville Local,047837,129
+2025,200051,Knox County JVSD CTPD,East Knox Local,047845,140
+2025,200051,Knox County JVSD CTPD,Fredericktown Local,047852,381
+2025,200051,Knox County JVSD CTPD,Mount Vernon City,044420,335
+2025,200052,Auburn JVSD CTPD,ACE Community Academy,,27
+2025,200052,Auburn JVSD CTPD,Berkshire Local,047167,121
+2025,200052,Auburn JVSD CTPD,Cardinal Local,047175,45
+2025,200052,Auburn JVSD CTPD,Chardon Local,047183,84
+2025,200052,Auburn JVSD CTPD,Fairport Harbor Exempted Village,045369,39
+2025,200052,Auburn JVSD CTPD,Kenston Local,047191,246
+2025,200052,Auburn JVSD CTPD,Kirtland Local,047878,23
+2025,200052,Auburn JVSD CTPD,Lake Erie Bilingual Academy,,0
+2025,200052,Auburn JVSD CTPD,Madison Local,047886,182
+2025,200052,Auburn JVSD CTPD,Painesville City Local,044628,571
+2025,200052,Auburn JVSD CTPD,Perry Local,047902,42
+2025,200052,Auburn JVSD CTPD,Riverside Local,047894,184
+2025,200052,Auburn JVSD CTPD,iSTEM,,50
+2025,200053,Lake Shore Compact CTPD,Euclid City,043950,562
+2025,200053,Lake Shore Compact CTPD,Euclid Preparatory School,,0
+2025,200053,Lake Shore Compact CTPD,Mentor Exempted Village,045492,833
+2025,200053,Lake Shore Compact CTPD,Noble Academy-Cleveland,,85
+2025,200053,Lake Shore Compact CTPD,Pinnacle Academy,,0
+2025,200053,Lake Shore Compact CTPD,Wickliffe City,045088,53
+2025,200054,Lawrence County JVSD CTPD,Chesapeake Union Exempted Village,045294,552
+2025,200054,Lawrence County JVSD CTPD,Dawson-Bryant Local,047928,268
+2025,200054,Lawrence County JVSD CTPD,Fairland Local,047936,84
+2025,200054,Lawrence County JVSD CTPD,Ironton City School District,044149,204
+2025,200054,Lawrence County JVSD CTPD,Rock Hill Local,047944,283
+2025,200054,Lawrence County JVSD CTPD,South Point Local,047951,227
+2025,200054,Lawrence County JVSD CTPD,Symmes Valley Local,047969,211
+2025,200054,Lawrence County JVSD CTPD,Tri-State STEM+M School,,46
+2025,200055,Licking County JVSD CTPD,Granville Exempted Village,045393,437
+2025,200055,Licking County JVSD CTPD,Heath City,044115,424
+2025,200055,Licking County JVSD CTPD,Johnstown-Monroe Local,047985,382
+2025,200055,Licking County JVSD CTPD,Lakewood Local,047993,469
+2025,200055,Licking County JVSD CTPD,Licking Heights Local,048009,788
+2025,200055,Licking County JVSD CTPD,Licking Valley Local,048017,424
+2025,200055,Licking County JVSD CTPD,Newark City,044453,363
+2025,200055,Licking County JVSD CTPD,North Fork Local,048025,492
+2025,200055,Licking County JVSD CTPD,Northridge Local,048033,268
+2025,200055,Licking County JVSD CTPD,Par Excellence Academy dba Par Excellence STEM Academy,,0
+2025,200055,Licking County JVSD CTPD,Southwest Licking Local,048041,1029
+2025,200056,Ohio Hi-Point JVSD CTPD,Bellefontaine City,043588,444
+2025,200056,Ohio Hi-Point JVSD CTPD,Benjamin Logan Local,048074,478
+2025,200056,Ohio Hi-Point JVSD CTPD,Graham Local,046193,458
+2025,200056,Ohio Hi-Point JVSD CTPD,Hardin Community School,,0
+2025,200056,Ohio Hi-Point JVSD CTPD,Indian Lake Local,048082,417
+2025,200056,Ohio Hi-Point JVSD CTPD,Kenton City,044172,606
+2025,200056,Ohio Hi-Point JVSD CTPD,Marysville Exempted Village,045476,1897
+2025,200056,Ohio Hi-Point JVSD CTPD,Mechanicsburg Exempted Village,045484,271
+2025,200056,Ohio Hi-Point JVSD CTPD,Ridgemont Local,047506,196
+2025,200056,Ohio Hi-Point JVSD CTPD,Riverside Local,048090,248
+2025,200056,Ohio Hi-Point JVSD CTPD,Triad Local,046201,150
+2025,200056,Ohio Hi-Point JVSD CTPD,Upper Scioto Valley Local,047522,177
+2025,200056,Ohio Hi-Point JVSD CTPD,Urbana City,044941,353
+2025,200056,Ohio Hi-Point JVSD CTPD,Waynesfield-Goshen Local,045971,112
+2025,200056,Ohio Hi-Point JVSD CTPD,West Liberty-Salem Local,046219,269
+2025,200057,Lorain City CTPD,Constellation Schools: Lorain Community Elementary,,0
+2025,200057,Lorain City CTPD,Constellation Schools: Lorain Community Middle,,0
+2025,200057,Lorain City CTPD,Horizon Science Academy Lorain,,233
+2025,200057,Lorain City CTPD,Lorain Bilingual Preparatory Academy,,0
+2025,200057,Lorain City CTPD,Lorain City,044263,948
+2025,200057,Lorain City CTPD,Lorain Preparatory Academy,,0
+2025,200057,Lorain City CTPD,Lorain Preparatory High School,,0
+2025,200057,Lorain City CTPD,Monroe Preparatory Academy,,0
+2025,200057,Lorain City CTPD,Steel City High School,,0
+2025,200057,Lorain City CTPD,Summit Academy Community School Alternative Learners-Lorain,,0
+2025,200058,Lorain County JVSD CTPD,Amherst Exempted Village,045195,155
+2025,200058,Lorain County JVSD CTPD,Avon Lake City,048124,45
+2025,200058,Lorain County JVSD CTPD,Avon Local,048116,34
+2025,200058,Lorain County JVSD CTPD,Black River Career Prep High School,,0
+2025,200058,Lorain County JVSD CTPD,Clearview Local,048132,44
+2025,200058,Lorain County JVSD CTPD,Columbia Local,048140,63
+2025,200058,Lorain County JVSD CTPD,Constellation Schools: Elyria Community,,0
+2025,200058,Lorain County JVSD CTPD,Elyria City Schools,043943,533
+2025,200058,Lorain County JVSD CTPD,Firelands Local,048157,453
+2025,200058,Lorain County JVSD CTPD,Keystone Local,048165,65
+2025,200058,Lorain County JVSD CTPD,Midview Local,048173,463
+2025,200058,Lorain County JVSD CTPD,North Ridgeville City,044537,418
+2025,200058,Lorain County JVSD CTPD,Oberlin City Schools,044594,46
+2025,200058,Lorain County JVSD CTPD,Sheffield Academy,,0
+2025,200058,Lorain County JVSD CTPD,Sheffield-Sheffield Lake City,044768,80
+2025,200058,Lorain County JVSD CTPD,Wellington Exempted Village,045658,337
+2025,200059,Oregon City CTPD,Eagle Learning Center,,0
+2025,200059,Oregon City CTPD,Oregon City,044602,1132
+2025,200060,Sylvania City CTPD,Ottawa Hills Local,048215,1
+2025,200060,Sylvania City CTPD,Sylvania Schools,044875,2618
+2025,200061,Toledo City CTPD,Ann Jerkins-Harris Academy of Excellence,,0
+2025,200061,Toledo City CTPD,Autism Model School,,66
+2025,200061,Toledo City CTPD,Bennett Venture Academy,,0
+2025,200061,Toledo City CTPD,Discovery Academy,,0
+2025,200061,Toledo City CTPD,Explorers Academy of Science and Technology,,0
+2025,200061,Toledo City CTPD,Glass City Academy,,0
+2025,200061,Toledo City CTPD,Hope Learning Academy of Toledo,,0
+2025,200061,Toledo City CTPD,Horizon Science Academy Toledo,,151
+2025,200061,Toledo City CTPD,Horizon Science Academy-Springfield,,61
+2025,200061,Toledo City CTPD,Kenmore Preparatory Academy dba Toledo Preparatory Academy,,0
+2025,200061,Toledo City CTPD,L. Hollingworth School for Talented and Gifted,,0
+2025,200061,Toledo City CTPD,Madison Avenue School of Arts,,0
+2025,200061,Toledo City CTPD,Maritime Academy of Toledo  The,,141
+2025,200061,Toledo City CTPD,Mosaic Classical Academy,,0
+2025,200061,Toledo City CTPD,Northwest Ohio Classical Academy,,0
+2025,200061,Toledo City CTPD,Rise & Shine Academy,,0
+2025,200061,Toledo City CTPD,Skyway Career Prep High School,,0
+2025,200061,Toledo City CTPD,Summit Academy - Toledo,,0
+2025,200061,Toledo City CTPD,SunBridge Schools,,0
+2025,200061,Toledo City CTPD,The Autism Academy Of Learning,,0
+2025,200061,Toledo City CTPD,Toledo City,044909,5293
+2025,200061,Toledo City CTPD,Toledo Preparatory and Fitness Academy,,0
+2025,200061,Toledo City CTPD,Toledo School For The Arts,,316
+2025,200061,Toledo City CTPD,Western Toledo Preparatory Academy,,0
+2025,200061,Toledo City CTPD,Winterfield Venture Academy,,0
+2025,200062,Washington Local CTPD,Washington Local,048231,2359
+2025,200063,Mahoning County JVSD CTPD,Austintown Local Schools,048298,470
+2025,200063,Mahoning County JVSD CTPD,Boardman Local,048306,122
+2025,200063,Mahoning County JVSD CTPD,Campbell City,043703,26
+2025,200063,Mahoning County JVSD CTPD,Canfield Local,048314,56
+2025,200063,Mahoning County JVSD CTPD,Jackson-Milton Local,048322,62
+2025,200063,Mahoning County JVSD CTPD,Lowellville Local,048330,11
+2025,200063,Mahoning County JVSD CTPD,Poland Local,048348,33
+2025,200063,Mahoning County JVSD CTPD,Sebring Local,048355,20
+2025,200063,Mahoning County JVSD CTPD,South Range Local,048363,29
+2025,200063,Mahoning County JVSD CTPD,Springfield Local,048371,42
+2025,200063,Mahoning County JVSD CTPD,Struthers City,044859,77
+2025,200063,Mahoning County JVSD CTPD,Valley STEM+ME2 Academy,,191
+2025,200063,Mahoning County JVSD CTPD,West Branch Local,048389,458
+2025,200063,Mahoning County JVSD CTPD,Western Reserve Local,048397,154
+2025,200064,Youngstown City CTPD,Academy for Urban Scholars Youngstown,,0
+2025,200064,Youngstown City CTPD,Horizon Science Academy Youngstown,,73
+2025,200064,Youngstown City CTPD,Mahoning Valley Community School,,0
+2025,200064,Youngstown City CTPD,Southside Academy,,0
+2025,200064,Youngstown City CTPD,Stambaugh Charter Academy,,0
+2025,200064,Youngstown City CTPD,Summit Academy Secondary - Youngstown,,0
+2025,200064,Youngstown City CTPD,Summit Academy-Youngstown,,0
+2025,200064,Youngstown City CTPD,The Unlimited Classroom dba Valley Virtual Remote Learning A,,0
+2025,200064,Youngstown City CTPD,Youngstown Academy of Excellence,,0
+2025,200064,Youngstown City CTPD,Youngstown City,045161,370
+2025,200064,Youngstown City CTPD,Youngstown Community School,,0
+2025,200064,Youngstown City CTPD,Youngstown Preparatory Academy,,0
+2025,200066,Medina County JVSD CTPD,Black River Local,048462,144
+2025,200066,Medina County JVSD CTPD,Brunswick City,043661,1111
+2025,200066,Medina County JVSD CTPD,Buckeye Local,048470,561
+2025,200066,Medina County JVSD CTPD,Cloverleaf Local,048488,291
+2025,200066,Medina County JVSD CTPD,Highland Local,048496,646
+2025,200066,Medina County JVSD CTPD,Hinckley Preparatory Academy,,0
+2025,200066,Medina County JVSD CTPD,Medina City SD,044388,1331
+2025,200067,Meigs Local CTPD,Eastern Local,048512,180
+2025,200067,Meigs Local CTPD,Meigs Local,048520,599
+2025,200067,Meigs Local CTPD,Southern Local,048538,104
+2025,200069,Upper Valley JVSD CTPD,Anna Local,049759,350
+2025,200069,Upper Valley JVSD CTPD,Botkins Local,049767,115
+2025,200069,Upper Valley JVSD CTPD,Bradford Exempted Village,045229,163
+2025,200069,Upper Valley JVSD CTPD,Covington Exempted Village,045336,262
+2025,200069,Upper Valley JVSD CTPD,Fairlawn Local,049775,161
+2025,200069,Upper Valley JVSD CTPD,Fort Loramie Local,049783,238
+2025,200069,Upper Valley JVSD CTPD,Hardin-Houston Local,049791,216
+2025,200069,Upper Valley JVSD CTPD,Jackson Center Local,049809,117
+2025,200069,Upper Valley JVSD CTPD,Newton Local,048637,194
+2025,200069,Upper Valley JVSD CTPD,Piqua City,044644,737
+2025,200069,Upper Valley JVSD CTPD,Russia Local,049817,93
+2025,200069,Upper Valley JVSD CTPD,Sidney City,044784,852
+2025,200069,Upper Valley JVSD CTPD,Troy City,044925,482
+2025,200070,Switzerland of Ohio Local CTPD,Switzerland of Ohio Local,048652,428
+2025,200071,Dayton City CTPD,Alliance Community Schools  Inc. dba Dayton Leadership Acade,,0
+2025,200071,Dayton City CTPD,City Day Community School,,0
+2025,200071,Dayton City CTPD,DECA PREP,,0
+2025,200071,Dayton City CTPD,Dayton Athletic Vocational Academy,,0
+2025,200071,Dayton City CTPD,Dayton Business Technology High School,,74
+2025,200071,Dayton City CTPD,Dayton Career Tech High School dba Riverscape Career Tech,,7
+2025,200071,Dayton City CTPD,Dayton City,043844,2318
+2025,200071,Dayton City CTPD,Dayton Early College Academy  Inc,,0
+2025,200071,Dayton City CTPD,Dayton SMART Elementary School,,0
+2025,200071,Dayton City CTPD,Emerson Academy,,0
+2025,200071,Dayton City CTPD,Engage High School,,0
+2025,200071,Dayton City CTPD,Gem City Career Prep High School,,0
+2025,200071,Dayton City CTPD,Horizon Science Academy Dayton Downtown,,0
+2025,200071,Dayton City CTPD,Horizon Science Academy Dayton High School,,106
+2025,200071,Dayton City CTPD,Horizon Science Academy-Dayton,,0
+2025,200071,Dayton City CTPD,Klepinger Community School,,0
+2025,200071,Dayton City CTPD,Liberty High School,,0
+2025,200071,Dayton City CTPD,Montgomery Preparatory Academy,,0
+2025,200071,Dayton City CTPD,North Dayton School of Discovery,,0
+2025,200071,Dayton City CTPD,Pathway School of Discovery,,0
+2025,200071,Dayton City CTPD,Richard Allen Academy,,0
+2025,200071,Dayton City CTPD,Richard Allen Preparatory,,0
+2025,200071,Dayton City CTPD,Summit Academy Community School - Dayton,,0
+2025,200071,Dayton City CTPD,Summit Academy Dayton,,0
+2025,200072,Mad River Local CTPD,Mad River Local,048702,1270
+2025,200073,Miami Valley Career Technology JVSD CTPD,Ansonia Local,046623,159
+2025,200073,Miami Valley Career Technology JVSD CTPD,Arcanum-Butler Local,046631,293
+2025,200073,Miami Valley Career Technology JVSD CTPD,Bethel Local,048611,307
+2025,200073,Miami Valley Career Technology JVSD CTPD,Brookville Local,048678,303
+2025,200073,Miami Valley Career Technology JVSD CTPD,Carlisle Local,050419,162
+2025,200073,Miami Valley Career Technology JVSD CTPD,Eaton Community City,043935,466
+2025,200073,Miami Valley Career Technology JVSD CTPD,Franklin Monroe Local,046649,166
+2025,200073,Miami Valley Career Technology JVSD CTPD,Huber Heights City,048751,1622
+2025,200073,Miami Valley Career Technology JVSD CTPD,Jefferson Township Local,048686,96
+2025,200073,Miami Valley Career Technology JVSD CTPD,Miami East Local,048629,119
+2025,200073,Miami Valley Career Technology JVSD CTPD,Miami Valley Academies,,0
+2025,200073,Miami Valley Career Technology JVSD CTPD,Miamisburg City,044396,872
+2025,200073,Miami Valley Career Technology JVSD CTPD,Milton-Union Exempted Village,045518,445
+2025,200073,Miami Valley Career Technology JVSD CTPD,Mississinawa Valley Local,046672,136
+2025,200073,Miami Valley Career Technology JVSD CTPD,National Trail Local,049270,335
+2025,200073,Miami Valley Career Technology JVSD CTPD,New Lebanon Local School District,048710,53
+2025,200073,Miami Valley Career Technology JVSD CTPD,Northmont City,048728,939
+2025,200073,Miami Valley Career Technology JVSD CTPD,Northridge Local,048736,209
+2025,200073,Miami Valley Career Technology JVSD CTPD,Preble Shawnee Local,049288,302
+2025,200073,Miami Valley Career Technology JVSD CTPD,Tipp City Exempted Village,045617,127
+2025,200073,Miami Valley Career Technology JVSD CTPD,Tri-County North Local,091397,151
+2025,200073,Miami Valley Career Technology JVSD CTPD,Tri-Village Local,046680,79
+2025,200073,Miami Valley Career Technology JVSD CTPD,Trotwood Preparatory & Fitness Academy,,0
+2025,200073,Miami Valley Career Technology JVSD CTPD,Trotwood-Madison City,048694,444
+2025,200073,Miami Valley Career Technology JVSD CTPD,Twin Valley Community Local,049296,104
+2025,200073,Miami Valley Career Technology JVSD CTPD,Valley View Local,048744,251
+2025,200073,Miami Valley Career Technology JVSD CTPD,Vandalia-Butler City,044958,477
+2025,200073,Miami Valley Career Technology JVSD CTPD,Versailles Exempted Village,045633,232
+2025,200073,Miami Valley Career Technology JVSD CTPD,West Carrollton City,045054,965
+2025,200074,Morgan Local CTPD,Morgan Local,048777,451
+2025,200075,Mid-East Ohio JVSD CTPD,Caldwell Exempted Village,045252,295
+2025,200075,Mid-East Ohio JVSD CTPD,Cambridge City,043695,318
+2025,200075,Mid-East Ohio JVSD CTPD,Crooksville Exempted Village,045351,268
+2025,200075,Mid-East Ohio JVSD CTPD,East Guernsey Local,069682,267
+2025,200075,Mid-East Ohio JVSD CTPD,East Muskingum Local,048835,667
+2025,200075,Mid-East Ohio JVSD CTPD,Foxfire High School,,6
+2025,200075,Mid-East Ohio JVSD CTPD,Foxfire Intermediate School,,0
+2025,200075,Mid-East Ohio JVSD CTPD,Franklin Local,048843,481
+2025,200075,Mid-East Ohio JVSD CTPD,Maysville Local,048850,768
+2025,200075,Mid-East Ohio JVSD CTPD,Noble Local,048900,252
+2025,200075,Mid-East Ohio JVSD CTPD,Northern Local,049056,272
+2025,200075,Mid-East Ohio JVSD CTPD,Rolling Hills Local,047308,403
+2025,200075,Mid-East Ohio JVSD CTPD,Tri-Valley Local,048876,195
+2025,200075,Mid-East Ohio JVSD CTPD,West Muskingum Local,048884,181
+2025,200075,Mid-East Ohio JVSD CTPD,Zanesville City,045179,468
+2025,200075,Mid-East Ohio JVSD CTPD,Zanesville Community High School,,3
+2025,200077,Pike County Career  Technology Center CTPD,Eastern Local School District,049122,249
+2025,200077,Pike County Career  Technology Center CTPD,Scioto Valley Local,049130,254
+2025,200077,Pike County Career  Technology Center CTPD,Waverly City,049148,134
+2025,200077,Pike County Career  Technology Center CTPD,Western Local,049155,154
+2025,200078,Maplewood Area JVSD CTPD,Bio-Med Science Academy STEM School,,537
+2025,200078,Maplewood Area JVSD CTPD,Crestwood Local,049189,170
+2025,200078,Maplewood Area JVSD CTPD,Field Local,049197,82
+2025,200078,Maplewood Area JVSD CTPD,James A Garfield Local,049205,89
+2025,200078,Maplewood Area JVSD CTPD,Mogadore Local,050039,46
+2025,200078,Maplewood Area JVSD CTPD,Ravenna City,044685,105
+2025,200078,Maplewood Area JVSD CTPD,Rootstown Local,049213,75
+2025,200078,Maplewood Area JVSD CTPD,Southeast Local,049221,177
+2025,200078,Maplewood Area JVSD CTPD,Streetsboro City,049239,364
+2025,200078,Maplewood Area JVSD CTPD,Waterloo Local,049247,66
+2025,200078,Maplewood Area JVSD CTPD,Windham Exempted Village,045666,32
+2025,200081,Madison Local CTPD,Madison Local,049452,731
+2025,200082,Mansfield City CTPD,Buckeye Community School,,0
+2025,200082,Mansfield City CTPD,Cypress High School,,0
+2025,200082,Mansfield City CTPD,Foundation Academy,,0
+2025,200082,Mansfield City CTPD,GOAL Digital Academy,,113
+2025,200082,Mansfield City CTPD,Legacy Academy of Excellence Mansfield,,0
+2025,200082,Mansfield City CTPD,Mansfield City,044297,870
+2025,200082,Mansfield City CTPD,The Richland School of Academic Arts,,0
+2025,200083,Pioneer CTC JVSD CTPD,Buckeye Central Local,046508,137
+2025,200083,Pioneer CTC JVSD CTPD,Bucyrus City,043687,215
+2025,200083,Pioneer CTC JVSD CTPD,Colonel Crawford Local,046516,171
+2025,200083,Pioneer CTC JVSD CTPD,Crestline Exempted Village,045344,160
+2025,200083,Pioneer CTC JVSD CTPD,Crestview Local,049429,260
+2025,200083,Pioneer CTC JVSD CTPD,Galion City,044024,366
+2025,200083,Pioneer CTC JVSD CTPD,Lexington Local,049437,116
+2025,200083,Pioneer CTC JVSD CTPD,Lucas Local,049445,91
+2025,200083,Pioneer CTC JVSD CTPD,Northmor Local,048819,169
+2025,200083,Pioneer CTC JVSD CTPD,Ontario Local,049478,400
+2025,200083,Pioneer CTC JVSD CTPD,Plymouth-Shiloh Local,049460,199
+2025,200083,Pioneer CTC JVSD CTPD,Shelby City,044776,491
+2025,200083,Pioneer CTC JVSD CTPD,Willard City,045096,412
+2025,200083,Pioneer CTC JVSD CTPD,Wynford Local,046524,306
+2025,200084,Pickaway-Ross County JVSD CTPD,Adena Local,049494,434
+2025,200084,Pickaway-Ross County JVSD CTPD,Chillicothe City,043745,669
+2025,200084,Pickaway-Ross County JVSD CTPD,Circleville City,043760,530
+2025,200084,Pickaway-Ross County JVSD CTPD,Huntington Local,049502,426
+2025,200084,Pickaway-Ross County JVSD CTPD,Logan Elm Local,049080,528
+2025,200084,Pickaway-Ross County JVSD CTPD,Paint Valley Local,049510,64
+2025,200084,Pickaway-Ross County JVSD CTPD,Southeastern Local,049528,283
+2025,200084,Pickaway-Ross County JVSD CTPD,Southern Ohio Career Academy,,0
+2025,200084,Pickaway-Ross County JVSD CTPD,Union-Scioto Local,049536,710
+2025,200084,Pickaway-Ross County JVSD CTPD,Westfall Local,049106,331
+2025,200084,Pickaway-Ross County JVSD CTPD,Zane Trace Local,049544,301
+2025,200085,Vanguard-Sentinel JVSD CTPD,Bridges Community Academy dba Bridges Preparatory Academy,,0
+2025,200085,Vanguard-Sentinel JVSD CTPD,Buckeye Community School - Fremont,,9
+2025,200085,Vanguard-Sentinel JVSD CTPD,Clyde-Green Springs Exempted Village,045302,445
+2025,200085,Vanguard-Sentinel JVSD CTPD,Fostoria City,043992,106
+2025,200085,Vanguard-Sentinel JVSD CTPD,Fremont City,044016,628
+2025,200085,Vanguard-Sentinel JVSD CTPD,Gibsonburg Exempted Village,045385,107
+2025,200085,Vanguard-Sentinel JVSD CTPD,Hopewell-Loudon Local,049700,143
+2025,200085,Vanguard-Sentinel JVSD CTPD,Lakota Local,049569,284
+2025,200085,Vanguard-Sentinel JVSD CTPD,Mohawk Local,050740,163
+2025,200085,Vanguard-Sentinel JVSD CTPD,New Riegel Local,049718,94
+2025,200085,Vanguard-Sentinel JVSD CTPD,North Central Academy,,13
+2025,200085,Vanguard-Sentinel JVSD CTPD,Old Fort Local,049726,143
+2025,200085,Vanguard-Sentinel JVSD CTPD,Port Clinton City,044651,58
+2025,200085,Vanguard-Sentinel JVSD CTPD,Seneca East Local,049684,271
+2025,200085,Vanguard-Sentinel JVSD CTPD,Tiffin City Schools,044891,195
+2025,200085,Vanguard-Sentinel JVSD CTPD,Upper Sandusky Exempted Village,045625,177
+2025,200086,Scioto County JVSD CTPD,Bloom-Vernon Local,049593,189
+2025,200086,Scioto County JVSD CTPD,Clay Local,049601,28
+2025,200086,Scioto County JVSD CTPD,Green Local,049619,194
+2025,200086,Scioto County JVSD CTPD,Minford Local,049627,77
+2025,200086,Scioto County JVSD CTPD,New Boston Local,044461,20
+2025,200086,Scioto County JVSD CTPD,Northwest Local,049635,303
+2025,200086,Scioto County JVSD CTPD,Portsmouth City,044669,131
+2025,200086,Scioto County JVSD CTPD,Sciotoville Community School,,17
+2025,200086,Scioto County JVSD CTPD,Valley Local,049643,263
+2025,200086,Scioto County JVSD CTPD,Washington-Nile Local,049650,335
+2025,200086,Scioto County JVSD CTPD,Wheelersburg Local,049668,160
+2025,200089,Alliance City CTPD,Alliance City,043497,678
+2025,200089,Alliance City CTPD,Marlington Local,049882,532
+2025,200089,Alliance City CTPD,Salem City,044735,12
+2025,200090,Canton City CTPD,Beacon Academy,,0
+2025,200090,Canton City CTPD,Canton City,043711,1930
+2025,200090,Canton City CTPD,Canton College Preparatory School,,0
+2025,200090,Canton City CTPD,Canton Harbor High School,,0
+2025,200090,Canton City CTPD,East Branch Preparatory AcademydbaWright Preparatory Academy,,0
+2025,200090,Canton City CTPD,Stark High School,,0
+2025,200090,Canton City CTPD,Summit Academy Community School for Alternative Learn-Canton,,0
+2025,200090,Canton City CTPD,Summit Academy Secondary - Canton,,0
+2025,200092,Massillon City CTPD,Massillon City,044354,985
+2025,200093,Stark County Career Compact,Jackson Local,049858,419
+2025,200093,Stark County Career Compact,Lake Local,049866,859
+2025,200093,Stark County Career Compact,North Canton City,044503,1243
+2025,200093,Stark County Career Compact,Plain Local,049932,1497
+2025,200094,Stark County Area JVSD CTPD,Brown Local,046177,52
+2025,200094,Stark County Area JVSD CTPD,Fairless Local,049841,117
+2025,200094,Stark County Area JVSD CTPD,Louisville City,049874,501
+2025,200094,Stark County Area JVSD CTPD,Minerva Local,049890,224
+2025,200094,Stark County Area JVSD CTPD,Northwest Local,049908,119
+2025,200094,Stark County Area JVSD CTPD,Tuslaw Local,049957,355
+2025,200095,Akron City CTPD,AkroTech High School,,70
+2025,200095,Akron City CTPD,Akron Career Tech High School,,33
+2025,200095,Akron City CTPD,Akron City,043489,6502
+2025,200095,Akron City CTPD,Akron Preparatory School,,0
+2025,200095,Akron City CTPD,Akros Middle School,,0
+2025,200095,Akron City CTPD,Cascade Career Prep High School,,6
+2025,200095,Akron City CTPD,Case Preparatory Academy,,0
+2025,200095,Akron City CTPD,Edge Learning,,0
+2025,200095,Akron City CTPD,Greater Summit County Early Learning Center,,0
+2025,200095,Akron City CTPD,Imagine Akron Academy,,0
+2025,200095,Akron City CTPD,Imagine Leadership Academy,,0
+2025,200095,Akron City CTPD,Main Preparatory Academy,,0
+2025,200095,Akron City CTPD,Middlebury Academy,,0
+2025,200095,Akron City CTPD,Steel Academy,,12
+2025,200095,Akron City CTPD,Summit Academy Akron Elementary School,,0
+2025,200095,Akron City CTPD,Summit Academy Akron Middle School,,0
+2025,200095,Akron City CTPD,Summit Academy Secondary - Akron,,0
+2025,200095,Akron City CTPD,Towpath Trail High School,,0
+2025,200096,Four City Compact CTPD,Barberton City,043539,429
+2025,200096,Four City Compact CTPD,Copley-Fairlawn City,049981,112
+2025,200096,Four City Compact CTPD,Norton City,044552,174
+2025,200096,Four City Compact CTPD,Wadsworth City,044974,630
+2025,200097,Six District Voc Ed Compact CTPD,Cuyahoga Falls City School District,043836,567
+2025,200097,Six District Voc Ed Compact CTPD,Hudson City,050021,97
+2025,200097,Six District Voc Ed Compact CTPD,Kent City,044164,687
+2025,200097,Six District Voc Ed Compact CTPD,Schnee Learning Center,,0
+2025,200097,Six District Voc Ed Compact CTPD,Stow-Munroe Falls City School District,044834,464
+2025,200097,Six District Voc Ed Compact CTPD,Tallmadge City,044883,669
+2025,200097,Six District Voc Ed Compact CTPD,Woodridge Local,049973,48
+2025,200098,Portage Lakes JVSD CTPD,Coventry Local,049999,86
+2025,200098,Portage Lakes JVSD CTPD,Green Local,050013,196
+2025,200098,Portage Lakes JVSD CTPD,Manchester Local,050005,82
+2025,200098,Portage Lakes JVSD CTPD,Springfield Local,050062,142
+2025,200099,Trumbull County JVSD CTPD,Bloomfield-Mespo Local,050096,7
+2025,200099,Trumbull County JVSD CTPD,Bristol Local,050112,57
+2025,200099,Trumbull County JVSD CTPD,Brookfield Local,050120,216
+2025,200099,Trumbull County JVSD CTPD,Champion Local,050138,268
+2025,200099,Trumbull County JVSD CTPD,Girard City School District,044065,317
+2025,200099,Trumbull County JVSD CTPD,Howland Local,050161,278
+2025,200099,Trumbull County JVSD CTPD,Hubbard Exempted Village,045427,55
+2025,200099,Trumbull County JVSD CTPD,Joseph Badger Local,050179,62
+2025,200099,Trumbull County JVSD CTPD,LaBrae Local,050245,67
+2025,200099,Trumbull County JVSD CTPD,Lakeview Local,050187,301
+2025,200099,Trumbull County JVSD CTPD,Liberty Local,050195,245
+2025,200099,Trumbull County JVSD CTPD,Lordstown Local,050203,87
+2025,200099,Trumbull County JVSD CTPD,Maplewood Local,050211,53
+2025,200099,Trumbull County JVSD CTPD,Mathews Local,050153,31
+2025,200099,Trumbull County JVSD CTPD,McDonald Local,050229,28
+2025,200099,Trumbull County JVSD CTPD,Newton Falls Exempted Village,045567,172
+2025,200099,Trumbull County JVSD CTPD,Niles City,044495,69
+2025,200099,Trumbull County JVSD CTPD,Niles Preparatory Academy,,0
+2025,200099,Trumbull County JVSD CTPD,River Gate High School,,0
+2025,200099,Trumbull County JVSD CTPD,STEAM Academy of Warren,,0
+2025,200099,Trumbull County JVSD CTPD,Southington Local,050237,80
+2025,200099,Trumbull County JVSD CTPD,Summit Academy Alternative LearnersWarren Middle & Secondary,,0
+2025,200099,Trumbull County JVSD CTPD,Summit Academy Community School-Warren,,0
+2025,200099,Trumbull County JVSD CTPD,The Brilliance School,,0
+2025,200099,Trumbull County JVSD CTPD,Warren City,044990,599
+2025,200099,Trumbull County JVSD CTPD,Weathersfield Local,050252,161
+2025,200101,Buckeye JVSD CTPD,Carrollton Exempted Village,045278,260
+2025,200101,Buckeye JVSD CTPD,Claymont City,043778,491
+2025,200101,Buckeye JVSD CTPD,Conotton Valley Union Local,047548,74
+2025,200101,Buckeye JVSD CTPD,Dover City,043893,353
+2025,200101,Buckeye JVSD CTPD,East Holmes Local,047688,141
+2025,200101,Buckeye JVSD CTPD,Garaway Local,050278,42
+2025,200101,Buckeye JVSD CTPD,Indian Valley Local,050286,632
+2025,200101,Buckeye JVSD CTPD,New Philadelphia City,044487,532
+2025,200101,Buckeye JVSD CTPD,Newcomerstown Exempted Village,045542,144
+2025,200101,Buckeye JVSD CTPD,Quaker Digital Academy,,22
+2025,200101,Buckeye JVSD CTPD,Quaker Preparatory Academy,,0
+2025,200101,Buckeye JVSD CTPD,Strasburg-Franklin Local,050294,133
+2025,200101,Buckeye JVSD CTPD,Tuscarawas Valley Local,050302,122
+2025,200102,Vantage JVSD CTPD,Antwerp Local,048991,41
+2025,200102,Vantage JVSD CTPD,Continental Local,049320,89
+2025,200102,Vantage JVSD CTPD,Crestview Local,050351,105
+2025,200102,Vantage JVSD CTPD,Delphos City,043885,244
+2025,200102,Vantage JVSD CTPD,Jennings Local,049338,31
+2025,200102,Vantage JVSD CTPD,Kalida Local,049346,192
+2025,200102,Vantage JVSD CTPD,Lincolnview Local,050369,133
+2025,200102,Vantage JVSD CTPD,Ottoville Local,049387,25
+2025,200102,Vantage JVSD CTPD,Parkway Local,048579,118
+2025,200102,Vantage JVSD CTPD,Paulding Exempted Village,045575,265
+2025,200102,Vantage JVSD CTPD,Van Wert City,044966,401
+2025,200102,Vantage JVSD CTPD,Wayne Trace Local,049031,148
+2025,200103,Warren County JVSD CTPD,Franklin City,044008,270
+2025,200103,Warren County JVSD CTPD,Greater Ohio Virtual School,,7
+2025,200103,Warren County JVSD CTPD,Kings Local,050435,931
+2025,200103,Warren County JVSD CTPD,Lebanon City,044214,1038
+2025,200103,Warren County JVSD CTPD,Little Miami Local,050443,969
+2025,200103,Warren County JVSD CTPD,Springboro Community City,050427,913
+2025,200103,Warren County JVSD CTPD,Wayne Local,050468,305
+2025,200104,Washington County JVSD CTPD,Belpre City,043604,47
+2025,200104,Washington County JVSD CTPD,Fort Frye Local,050484,398
+2025,200104,Washington County JVSD CTPD,Frontier Local,050492,197
+2025,200104,Washington County JVSD CTPD,Marietta City,044321,431
+2025,200104,Washington County JVSD CTPD,Warren Local,050500,778
+2025,200104,Washington County JVSD CTPD,Wolf Creek Local,050518,115
+2025,200105,Wayne County JVSD CTPD,Beacon Hill Community School AKA Beacon Hill Academy,,26
+2025,200105,Wayne County JVSD CTPD,Chippewa Local,050534,219
+2025,200105,Wayne County JVSD CTPD,Dalton Local,050542,37
+2025,200105,Wayne County JVSD CTPD,Green Local,050559,228
+2025,200105,Wayne County JVSD CTPD,Liberty Preparatory School,,10
+2025,200105,Wayne County JVSD CTPD,Northwestern Local,050575,437
+2025,200105,Wayne County JVSD CTPD,Norwayne Local,050567,143
+2025,200105,Wayne County JVSD CTPD,Orrville City,044610,123
+2025,200105,Wayne County JVSD CTPD,Rittman Academy,,0
+2025,200105,Wayne County JVSD CTPD,Rittman Exempted Village,045591,55
+2025,200105,Wayne County JVSD CTPD,Triway Local,050591,381
+2025,200105,Wayne County JVSD CTPD,Waynedale Local,050583,54
+2025,200105,Wayne County JVSD CTPD,Wooster City,045120,608
+2025,200107,Ohio Valley Local CTPD,Adams County Ohio Valley Local,061903,674
+2025,200107,Ohio Valley Local CTPD,Manchester Local,000442,140
+2025,200108,Coshocton County JVSD CTPD,Coshocton City,043828,144
+2025,200108,Coshocton County JVSD CTPD,Coshocton Opportunity School,,1
+2025,200108,Coshocton County JVSD CTPD,Ridgewood Local,046474,295
+2025,200108,Coshocton County JVSD CTPD,River View Local,046482,187
+2025,200111,Tri-Rivers JVSD CTPD,Academy of Arts and Technology,,0
+2025,200111,Tri-Rivers JVSD CTPD,Buckeye Community School - Marion,,17
+2025,200111,Tri-Rivers JVSD CTPD,Cardington-Lincoln Local,048793,361
+2025,200111,Tri-Rivers JVSD CTPD,Elgin Local,048413,326
+2025,200111,Tri-Rivers JVSD CTPD,Highland Local,048801,362
+2025,200111,Tri-Rivers JVSD CTPD,Marion City,044339,862
+2025,200111,Tri-Rivers JVSD CTPD,Mount Gilead Exempted Village,045534,249
+2025,200111,Tri-Rivers JVSD CTPD,North Union Local School District,050336,597
+2025,200111,Tri-Rivers JVSD CTPD,Pleasant Local,048421,58
+2025,200111,Tri-Rivers JVSD CTPD,Ridgedale Local,048439,260
+2025,200111,Tri-Rivers JVSD CTPD,River Valley Local,048447,700
+2025,200111,Tri-Rivers JVSD CTPD,TRECA Digital Academy,,47
+2025,200111,Tri-Rivers JVSD CTPD,Tomorrow Center,,4
+2025,200115,Canton Local CTPD,Canton Local,049833,570
+2025,200115,Canton Local CTPD,Osnaburg Local,049916,253
+2025,200115,Canton Local CTPD,Perry Local,049924,1174
+2025,200115,Canton Local CTPD,Sandy Valley Local,049940,182
+2025,200116,Millstream Career Cooperative CTPD,Arcadia Local,047415,132
+2025,200116,Millstream Career Cooperative CTPD,Arlington Local,047423,58
+2025,200116,Millstream Career Cooperative CTPD,Carey Exempted Village Schools,045260,176
+2025,200116,Millstream Career Cooperative CTPD,Cory-Rawson Local,047431,85
+2025,200116,Millstream Career Cooperative CTPD,Findlay City,043984,893
+2025,200116,Millstream Career Cooperative CTPD,Findlay Digital Academy,,0
+2025,200116,Millstream Career Cooperative CTPD,Leipsic Local,049353,205
+2025,200116,Millstream Career Cooperative CTPD,Liberty-Benton Local,047449,101
+2025,200116,Millstream Career Cooperative CTPD,McComb Local,047456,94
+2025,200116,Millstream Career Cooperative CTPD,Miller City-New Cleveland Local,049361,201
+2025,200116,Millstream Career Cooperative CTPD,Ottawa-Glandorf Local,049379,503
+2025,200116,Millstream Career Cooperative CTPD,Pandora-Gilboa Local,049395,107
+2025,200116,Millstream Career Cooperative CTPD,Riverdale Local,047514,95
+2025,200116,Millstream Career Cooperative CTPD,Van Buren Local,047464,225
+2025,200116,Millstream Career Cooperative CTPD,Vanlue Local,047472,17
+2025,200117,Greenville City CTPD,Greenville City,044099,717
+2025,200119,Lancaster City CTPD,Lancaster City,044206,1182
+2025,200120,Centerville-Kettering-Oakwood CTPD,Centerville City,043737,517
+2025,200120,Centerville-Kettering-Oakwood CTPD,Dayton Regional STEM Schools,,597
+2025,200120,Centerville-Kettering-Oakwood CTPD,Kettering City School District,044180,2144
+2025,200120,Centerville-Kettering-Oakwood CTPD,Oakwood City,044586,35
+2025,200121,Tri Star CTPD,Celina City,043729,368
+2025,200121,Tri Star CTPD,Coldwater Exempted Village,045310,172
+2025,200121,Tri Star CTPD,Fort Recovery Local,048595,176
+2025,200121,Tri Star CTPD,Marion Local,048553,200
+2025,200121,Tri Star CTPD,Minster Local,045948,272
+2025,200121,Tri Star CTPD,New Bremen Local,045955,185
+2025,200121,Tri Star CTPD,New Knoxville Local,045963,123
+2025,200121,Tri Star CTPD,St Henry Consolidated Local,048587,296
+2025,200121,Tri Star CTPD,St Marys City,044727,534

@@ -52,7 +52,40 @@ findings: |
   districts`. [verified] (`crates/project/fixtures/dew-sfpr-line-by-line.txt`, and both cached
   workbooks)
 
-  The two facts are one fact. The calculator simulates the foundation formula, and this is not
+  ### The membership is published, and the population is not the panel
+
+  The base is *"Enrolled ADM of member schools and districts"*, and who those members are had
+  been recorded here as unpublished — one portal gone from DNS, another returning an application
+  shell for every path. **A third publishes it.** The report card's data API returns each
+  planning district's roster, and the FY2025 membership of all **90 rated planning districts** is
+  committed: **954 members**, every one of the 607 districts placed in exactly one, cross-checked
+  against the `ctpdIrn` each district's own record states. [verified]
+  ([`dew-ctpd-membership`](../../catalog/dew-ctpd-membership.md),
+  `crates/dispersion/src/ctpd_membership.rs`)
+
+  The other two of the 92 are the correctional institutions, which return HTTP 204 and are rated
+  by nobody; 90 + 2 is the table's 92, which settles the count the CTPD catalog entry recorded as
+  a legend disagreeing with itself. [verified]
+
+  **347 of the 954 members are not districts** — community schools under R.C. Chapter 3314 and
+  STEM schools under Chapter 3326. So the statute's population is the 609-district panel plus a
+  second one, which this corpus had asserted and can now measure: **36.4%** of the membership.
+  [verified] (`crates/dispersion/src/ctpd_membership.rs`)
+
+  **On the published measure that second population is far smaller than its member count
+  suggests**, and the two numbers say different things. Against **4.75%** of career-technical
+  enrolment, **277 of the 347 carry none at all** — the non-district membership is mostly
+  organisations affiliated with a planning district that send nobody through it, and one
+  e-school, Ohio Virtual Academy, is 44% of what the rest contribute. [verified]
+  (`crates/dispersion/src/ctpd_membership.rs`)
+
+  **This does not make the payment computable, and the reason has changed.** It was a missing
+  map; it is now a missing measure. The API publishes `enrlCtpd`, career-technical enrolment,
+  and the statute pays on *enrolled ADM* — a superset, and not a constant fraction of it across
+  two populations that differ this much. A per-CTPD base computed from the published column would
+  be a different quantity wearing the statute's name. [inference]
+
+    The two facts are one fact. The calculator simulates the foundation formula, and this is not
   foundation funding: it is an earmark of GRF line item 200545, Career-Technical Education
   Enhancements — whose legal basis the redbook gives as R.C. 3317.014 together with Sections
   265.10 and 265.260 of H.B. 33 — and not of 200550, Foundation Funding. The omission is a
@@ -192,12 +225,20 @@ properties:
     that moves career-technical aid with enrolment is modelling something the calculator does
     not do. [verified for the freeze; inference for the consequence]
 unfilled:
-  - field: career technical planning district membership
+  - field: enrolled ADM by career technical planning district
     why: >-
-      Not the $3 rate, which is in the section, and not the lead districts, whose table the
-      department publishes with IRNs. What is missing is which schools belong to which planning
-      district, and the one portal that published it no longer resolves. Without it the career
-      awareness payment has a statewide total and no recipient.
+      Narrower than it was, and no longer about membership. This said "which schools belong to
+      which planning district" was missing because "the one portal that published it no longer
+      resolves". A second one does: the report card's data API publishes each planning district's
+      roster, and 954 FY2025 members are committed at
+      [`ctpd-membership.csv`](../../../crates/dispersion/fixtures/ctpd-membership.csv). See
+      [`dew-ctpd-membership`](../../catalog/dew-ctpd-membership.md).
+
+      What is still missing is the **measure**. R.C. 3317.014(E)(1)(a) pays on the summed
+      **enrolled ADM** of a planning district's members; the API publishes `enrlCtpd`, which is
+      career-technical enrolment. So the recipient and its membership are now held and the base
+      the $3 multiplies is not, which is a different and smaller gap than the one recorded here
+      before.
   - field: the career-technical base cost as the department computes it, in FY2022
     why: >-
       Narrower than it was. This said the department "publishes a JVSD base cost build-up
@@ -215,6 +256,23 @@ unfilled:
       its terms, not the build-up's statewide inputs, so a claim about the series still has to be
       read off the workbook.
 figures:
+  - key: dispersion/ctpd-members-outside-the-panel
+    value: 347
+    field: findings
+    as_written: "**347 of the 954 members are not districts**"
+  - key: dispersion/ctpd-share-of-members-outside-the-panel
+    value: 0.36373
+    field: findings
+    as_written: "measure: **36.4%** of the membership"
+  - key: dispersion/ctpd-share-of-career-technical-enrolment-outside-the-panel
+    value: 0.04749
+    field: findings
+    as_written: "Against **4.75%** of career-technical\n  enrolment"
+  - key: dispersion/ctpd-members-outside-the-panel-with-no-enrolment
+    value: 277
+    field: findings
+    as_written: "**277 of the 347 carry none at all**"
+
   - key: project/career-technical-base-cost-implied-fy2022
     value: 8333.115691651989
     field: findings

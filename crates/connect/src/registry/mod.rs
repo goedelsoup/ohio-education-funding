@@ -119,6 +119,14 @@ pub enum Format {
     /// A zip of delimited text. The Census and NCES geography files come this way, and each
     /// archive holds several files of which this repository reads one or two.
     Zip,
+    /// A JSON document, read by [`crate::json`].
+    ///
+    /// One publisher answers in JSON and it is an API rather than a file: the report card's
+    /// per-organisation endpoint, which is the only place career-technical planning district
+    /// membership is published. Its bytes are stable between reads — the Cosmos metadata each
+    /// document carries records the last *write*, not the response — so these pin by digest the
+    /// way a published file does, and a changed digest means the department rewrote the record.
+    Json,
 }
 
 /// One retrievable publication.

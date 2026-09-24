@@ -40,6 +40,7 @@ pub mod fixtures;
 pub mod forecast;
 pub mod html;
 pub mod index;
+pub mod json;
 pub mod registry;
 pub mod sha256;
 
@@ -173,6 +174,25 @@ fn registered_connector(key: &str) -> &'static registry::Connector {
 /// A named pair rather than the tuple written inline, because the tuple is four levels of `Vec`
 /// deep and says nothing about which half is which.
 type JvsdSheets = (Vec<Vec<String>>, Vec<Vec<String>>);
+
+/// The school year the planning-district rosters are retrieved for.
+///
+/// FY2025 rather than the site's current FY2026, because FY2025 is the year whose membership was
+/// cross-checked against the other side of the same API — each district's own record carries a
+/// `ctpdIrn`, and all 607 agreed. FY2026 answers on the same endpoint and is not committed.
+const CTPD_SCHOOL_YEAR: u16 = 2025;
+
+/// The text of a cached source, or the reason its fixture must be skipped.
+fn cached_text(root: &Path, source: &Source) -> Result<String, RebuildError> {
+    let path = cache::cached_path(root, source);
+    if !path.exists() {
+        return Err(RebuildError::Source(FetchError::NotCached {
+            key: source.key.to_string(),
+            path,
+        }));
+    }
+    Ok(std::fs::read_to_string(path)?)
+}
 
 /// The rows of whichever of `sheets` a workbook actually has.
 ///
@@ -1221,6 +1241,53 @@ fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
             &rows,
         )?,
         Err(cause) => Rebuilt::skipped(fixtures::JVSD_FUNDING_FIXTURE, cause.to_string()),
+    });
+
+    // Who belongs to each career-technical planning district. The only fixture here built from a
+    // JSON API, because it is the only route: the report card's static catalogue carries
+    // twenty-four CTPD files back to 2013 and every one of them is ratings. See `fixtures::ctpd`.
+    let ctpd = (|| -> Result<Vec<Vec<String>>, RebuildError> {
+        let index = cached_text(root, registered("report-card-org-index"))?;
+        let keys: Vec<&'static str> = registry::connector("dew-report-card")
+            .map(|c| c.sources.iter().map(|s| s.key).collect())
+            .unwrap_or_default();
+        let bodies: Vec<(String, String)> = keys
+            .iter()
+            .filter_map(|key| key.strip_prefix("ctpd-roster-").map(|irn| (key, irn)))
+            .map(|(key, irn)| Ok((irn.to_string(), cached_text(root, registered(key))?)))
+            .collect::<Result<_, RebuildError>>()?;
+        let rosters: Vec<fixtures::CtpdRoster<'_>> = bodies
+            .iter()
+            .map(|(irn, body)| fixtures::CtpdRoster {
+                ctpd_irn: irn,
+                body,
+            })
+            .collect();
+        // The forty-seven districts whose name another district shares, each retrieved so its
+        // own `ctpdIrn` can place it. See `fixtures::ctpd`.
+        let placement_bodies: Vec<(String, String)> = keys
+            .iter()
+            .filter_map(|key| key.strip_prefix("ctpd-place-").map(|irn| (key, irn)))
+            .map(|(key, irn)| Ok((irn.to_string(), cached_text(root, registered(key))?)))
+            .collect::<Result<_, RebuildError>>()?;
+        let placements: Vec<fixtures::Placement<'_>> = placement_bodies
+            .iter()
+            .map(|(irn, body)| fixtures::Placement {
+                district_irn: irn,
+                body,
+            })
+            .collect();
+        fixtures::build_ctpd_membership(CTPD_SCHOOL_YEAR, &index, &rosters, &placements)
+            .map_err(RebuildError::Layout)
+    })();
+    out.push(match ctpd {
+        Ok(rows) => csv_fixture(
+            root,
+            fixtures::CTPD_MEMBERSHIP_FIXTURE,
+            fixtures::CTPD_MEMBERSHIP_HEADER,
+            &rows,
+        )?,
+        Err(cause) => Rebuilt::skipped(fixtures::CTPD_MEMBERSHIP_FIXTURE, cause.to_string()),
     });
 
     // The one parameter in the plan that moves without an act, across the one interval it can be
