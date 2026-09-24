@@ -33,7 +33,9 @@ normally is a constant that cannot explain it. Naming the constant is what lets 
 position be read as structure rather than as an artefact of the year.
 
 Federal money in Ohio *is* compensatory, monotonically across the wealth distribution, and it
-closes 9.5% of the local gap against state equalization's 46%. The figures are on
+closes 9.5% of the local gap against state equalization's 46% — both as means over the districts
+in each quartile. Weighted by enrolled ADM the state closes more of a smaller gap and the federal
+channel closes less of it. The figures are on
 [`equity`](../doctrine/equity.yml) and pinned by a test in
 [`dispersion`](../../../crates/dispersion/src/national_peers.rs).
 

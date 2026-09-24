@@ -236,6 +236,20 @@ impl Dispersion {
 /// district spend". The gap between this and [`Dispersion::mean`] is a measure of how much
 /// Ohio's many small districts pull the unweighted figure around.
 ///
+/// # Which of the two a figure wants
+///
+/// They are different objects and the corpus does not re-decide per figure. A mean over districts
+/// is the right statistic for spread, for gradients and for group comparisons — which is most of
+/// this crate, deliberately. An aggregate is the right statistic for any sentence whose subject is
+/// Ohio, its pupils or its money. **Where both are wanted they are two figures**, as
+/// `dispersion/trough-median-decline` and `dispersion/trough-weighted-decline` already are.
+///
+/// The rule is written down once, with the audit that produced it, in
+/// `.yidam/decisions/a-district-mean-is-not-a-state-figure.yml`. It exists because the department
+/// reissued its own FY2024 statewide aggregates for this defect and the corpus turned out to have
+/// it in one place — [`ohio_panel::equalization_by_year`], whose published "the rate holds" was
+/// flat only on the unweighted reading.
+///
 /// # Errors
 ///
 /// Returns [`DispersionError::LengthMismatch`] if the slices differ in length, or

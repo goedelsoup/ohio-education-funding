@@ -317,3 +317,126 @@ fn a_build_year_puts_state_revenue_above_current_spending() {
         );
     }
 }
+
+/// The published "rate holds" finding is a property of the unweighted mean, not of Ohio.
+///
+/// `doctrine/equity` published the state's share of the local gap as flat across FY2012-FY2024 —
+/// "there is no trend inside that window, and the absence of one is the finding". It is flat only
+/// when each quartile is summed over its districts. Summed over its pupils the same quartiles of
+/// the same panel give a share that rises by seven points, and cut into quartiles by pupils as
+/// well it rises by ten. #463 found this; this test is what stops it coming back.
+///
+/// The three series share a population and a survey. Only the aggregation differs.
+#[test]
+fn the_rate_that_holds_only_on_the_unweighted_reading() {
+    let series = dispersion::ohio_panel::equalization_by_year();
+    let window: Vec<_> = series
+        .iter()
+        .filter(|(year, _)| (2012..=2024).contains(*year))
+        .map(|(year, e)| (*year, e))
+        .collect();
+    assert_eq!(window.len(), 13 - 1, "FY2014 is not in the survey");
+
+    let slope = |points: &[(u16, f64)]| {
+        let n = points.len() as f64;
+        let mx = points.iter().map(|p| f64::from(p.0)).sum::<f64>() / n;
+        let my = points.iter().map(|p| p.1).sum::<f64>() / n;
+        let cov: f64 = points
+            .iter()
+            .map(|p| (f64::from(p.0) - mx) * (p.1 - my))
+            .sum();
+        let var: f64 = points.iter().map(|p| (f64::from(p.0) - mx).powi(2)).sum();
+        cov / var
+    };
+
+    let unweighted: Vec<(u16, f64)> = window.iter().map(|(y, e)| (*y, e.state_share())).collect();
+    let weighted: Vec<(u16, f64)> = window
+        .iter()
+        .map(|(y, e)| (*y, e.weighted_state_share()))
+        .collect();
+
+    // The unweighted series is the one the corpus published: flat, inside a nine-point band.
+    let (lo, hi) = (
+        unweighted.iter().map(|p| p.1).fold(f64::MAX, f64::min),
+        unweighted.iter().map(|p| p.1).fold(f64::MIN, f64::max),
+    );
+    assert!(
+        (0.400..0.401).contains(&lo) && (0.488..0.489).contains(&hi),
+        "the published band moved: {lo:.4} to {hi:.4}"
+    );
+    assert!(
+        slope(&unweighted).abs() < 0.004,
+        "the unweighted series acquired a trend: {:+.5} a year",
+        slope(&unweighted)
+    );
+
+    // The weighted one is not flat, and it is higher everywhere.
+    assert!(
+        slope(&weighted) > 0.006,
+        "the weighted series lost its trend: {:+.5} a year",
+        slope(&weighted)
+    );
+    assert!(
+        weighted.iter().zip(&unweighted).all(|(w, u)| w.1 > u.1),
+        "the weighted share is the higher of the two in every year"
+    );
+    let rise = weighted.last().unwrap().1 - weighted.first().unwrap().1;
+    assert!(
+        (0.06..0.08).contains(&rise),
+        "FY2012 to FY2024 on ADM: {rise:+.4}"
+    );
+
+    // And cutting the quartiles by pupils rather than by district moves it further the same way,
+    // so the direction does not depend on which of the two aggregate readings is taken.
+    let pupil_cut: Vec<(u16, f64)> = window
+        .iter()
+        .map(|(year, _)| (*year, state_share_on_pupil_quartiles(*year)))
+        .collect();
+    assert!(
+        slope(&pupil_cut) > slope(&weighted),
+        "pupil-cut {:+.5} against district-cut {:+.5}",
+        slope(&pupil_cut),
+        slope(&weighted)
+    );
+}
+
+/// The third reading: quartiles cut so each holds a quarter of Ohio's pupils, summed over pupils.
+///
+/// Not a published statistic — it exists so
+/// `the_rate_that_holds_only_on_the_unweighted_reading` can show the trend is not an artefact of
+/// holding the district-cut quartiles fixed.
+fn state_share_on_pupil_quartiles(year: u16) -> f64 {
+    let rows = dispersion::ohio_panel::panel();
+    let mut districts: Vec<(f64, f64, f64, f64)> = rows
+        .iter()
+        .filter(|r| {
+            r.comparable
+                && r.fiscal_year == year
+                && r.enrollment >= dispersion::ohio_panel::MIN_ENROLMENT
+        })
+        .map(|r| {
+            (
+                r.local_revenue / r.enrollment,
+                r.local_revenue,
+                r.state_revenue,
+                r.enrollment,
+            )
+        })
+        .collect();
+    districts.sort_by(|a, b| a.0.total_cmp(&b.0));
+
+    let pupils: f64 = districts.iter().map(|d| d.3).sum();
+    let mut sums = [[0.0f64; 3]; 4];
+    let mut running = 0.0;
+    for d in &districts {
+        // Place a district by its midpoint so a large one straddling a cut is not double-counted.
+        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
+        let q = (((running + d.3 / 2.0) * 4.0 / pupils) as usize).min(3);
+        running += d.3;
+        sums[q][0] += d.1;
+        sums[q][1] += d.2;
+        sums[q][2] += d.3;
+    }
+    let per_pupil = |q: usize, k: usize| sums[q][k] / sums[q][2];
+    (per_pupil(0, 1) - per_pupil(3, 1)) / (per_pupil(3, 0) - per_pupil(0, 0))
+}

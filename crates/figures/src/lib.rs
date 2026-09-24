@@ -5319,6 +5319,46 @@ pub static FIGURES: &[Figure] = &[
         compute: |i| band(i).1,
     },
     Figure {
+        key: "dispersion/equalization-weighted-band-narrowest",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The least of the local gap the state closes in any year from FY2012 to FY2024, \
+                with each quartile summed over its pupils rather than over its districts",
+        pinned: 0.4520,
+        tolerance: 0.0005,
+        compute: |i| weighted_band(i).0,
+    },
+    Figure {
+        key: "dispersion/equalization-weighted-band-widest",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "And the most, on the same reading \u{2014} a band half again as wide as the \
+                unweighted one, and above it in every year",
+        pinned: 0.5954,
+        tolerance: 0.0005,
+        compute: |i| weighted_band(i).1,
+    },
+    Figure {
+        key: "dispersion/weighted-state-share-of-the-local-gap-fy2012",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The share of the local gap state aid closes on enrolled ADM in FY2012, the first \
+                year of the window",
+        pinned: 0.4661,
+        tolerance: 0.0005,
+        compute: |i| i.equalization[&2012].weighted_state_share(),
+    },
+    Figure {
+        key: "dispersion/weighted-state-share-of-the-local-gap-fy2024",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "And in FY2024, the last \u{2014} seven points higher, where the unweighted \
+                reading of the same panel ends within a point and a half of where it began",
+        pinned: 0.5355,
+        tolerance: 0.0005,
+        compute: |i| i.equalization[&2024].weighted_state_share(),
+    },
+    Figure {
         key: "dispersion/state-share-of-the-local-gap-fy2024",
         owner: "crates/dispersion",
         unit: Unit::Share,
@@ -5416,6 +5456,56 @@ pub static FIGURES: &[Figure] = &[
             let q = &i.quartiles;
             (q[0].state_per_pupil - q[3].state_per_pupil)
                 / (q[3].local_per_pupil - q[0].local_per_pupil)
+        },
+    },
+    Figure {
+        key: "dispersion/weighted-local-revenue-gap-per-pupil",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "The local revenue gap between the richest and poorest quartiles on enrolled ADM, \
+                FY2022 \u{2014} the same districts, summed over their pupils",
+        pinned: 8_928.0,
+        tolerance: 1.0,
+        compute: |i| i.equalization[&2022].weighted_gap,
+    },
+    Figure {
+        key: "dispersion/weighted-state-closes-of-the-local-gap",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "How much of that gap state equalization closes, per pupil, FY2022",
+        pinned: 4_922.0,
+        tolerance: 1.0,
+        compute: |i| i.equalization[&2022].weighted_state_closes,
+    },
+    Figure {
+        key: "dispersion/weighted-federal-closes-of-the-local-gap",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "And how much the federal channel closes, per pupil, FY2022",
+        pinned: 792.0,
+        tolerance: 1.0,
+        compute: |i| i.equalization[&2022].weighted_federal_closes,
+    },
+    Figure {
+        key: "dispersion/weighted-state-share-of-the-local-gap",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "State equalization as a share of the local gap on enrolled ADM, FY2022",
+        pinned: 0.5513,
+        tolerance: 0.0005,
+        compute: |i| i.equalization[&2022].weighted_state_share(),
+    },
+    Figure {
+        key: "dispersion/weighted-local-gap-left-open",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "The part of the local gap neither higher level closes, per pupil, FY2022, on \
+                enrolled ADM \u{2014} a quarter less than the unweighted reading leaves",
+        pinned: 3_213.0,
+        tolerance: 1.0,
+        compute: |i| {
+            let e = &i.equalization[&2022];
+            e.weighted_gap - e.weighted_state_closes - e.weighted_federal_closes
         },
     },
     Figure {
@@ -15883,6 +15973,25 @@ fn band(i: &Inputs) -> (f64, f64) {
         .iter()
         .filter(|(year, _)| (2012..=2024).contains(*year))
         .map(|(_, e)| e.state_share())
+        .collect();
+    (
+        shares.iter().copied().fold(f64::MAX, f64::min),
+        shares.iter().copied().fold(f64::MIN, f64::max),
+    )
+}
+
+/// The same band on enrolled ADM, which is the statistic the unweighted one was read as.
+///
+/// Kept beside [`band`] rather than replacing it: a quartile mean over districts is a dispersion
+/// statistic and is supposed to be unweighted. What it cannot do is answer a question about
+/// pupils, and "the rate holds" was answering one. See
+/// [`dispersion::ohio_panel::equalization_by_year`].
+fn weighted_band(i: &Inputs) -> (f64, f64) {
+    let shares: Vec<f64> = i
+        .equalization
+        .iter()
+        .filter(|(year, _)| (2012..=2024).contains(*year))
+        .map(|(_, e)| e.weighted_state_share())
         .collect();
     (
         shares.iter().copied().fold(f64::MAX, f64::min),
