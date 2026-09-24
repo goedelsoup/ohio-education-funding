@@ -283,8 +283,9 @@ test("citations are counted from both the forms the corpus writes them in", () =
   const count = (slug: string) =>
     corpus.sources.find((s) => s.slug === slug)?.citedBy.length ?? -1;
 
-  // Cited only through structured `sourced-from` edges.
-  expect(count("lsc-dew-redbook")).toBe(7);
+  // Cited only through structured `sourced-from` edges. Seven until the two nonpublic support
+  // programmes were written; the redbook is where Category 3 is grouped, so both cite it.
+  expect(count("lsc-dew-redbook")).toBe(9);
   // Cited both ways: six structured edges and one markdown link, in the claim tag that closed
   // the transportation parameter's 180-day question. One number that a reader dropping either
   // form gets wrong.

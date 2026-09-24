@@ -1,0 +1,244 @@
+class: program
+label: Auxiliary Services
+summary: >-
+  The largest channel of state money to Ohio's chartered nonpublic schools that is not a
+  scholarship: $166.8 million in FY2025, divided among nonpublic pupils and spent on a statutory
+  list of secular services. Older than every voucher in this corpus.
+description: |
+  GRF line item 200511, and the oldest of the three lines the department groups as Category 3:
+  Nonpublic School Support. The money is divided among the chartered nonpublic schools by a
+  per-pupil quotient and spent on a list of secular services — textbooks, health and guidance
+  services, speech and hearing services, remedial programmes, computer equipment, school safety
+  and security — that R.C. 3317.06 sets out in seventeen severable divisions. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
+
+  **The section the line is named for does not allocate it.** R.C. 3317.06 opens "Moneys paid to
+  school districts under division (E)(1) of section 3317.024 of the Revised Code shall be used for
+  the following independent and fully severable purposes", and none of its divisions says how much
+  is paid. The allocating sentence is R.C. 3317.024(E)(2)(d), which divides "the total amount
+  appropriated for the implementation of sections 3317.06 and 3317.062" by the average daily
+  membership in chartered nonpublic schools "as determined as of the last day of October of each
+  school year". So this is a quotient of an appropriation and not a price, and its rate falls when
+  nonpublic enrolment rises. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
+
+  **The money reaches a school by one of two routes, and the school chooses.** Under
+  R.C. 3317.024(E)(1) the state pays the resident district, which buys the services and is
+  reimbursed for the cost of administering them; under (E)(2) a school that gives notice by 1
+  April of an odd-numbered year is paid directly, and R.C. 3317.062 is the same list of permitted
+  uses written for that route. A directly-paid school may designate an organisation to receive the
+  money, and that organisation "may require the school's governing authority to pay a fee … that
+  does not exceed four per cent of the total amount of payments for auxiliary services that the
+  school receives from the state". [verified] How the schools divide between the two routes is not
+  held here — neither the redbook nor the greenbook reports it. [open]
+
+  This is the programme the corpus missed for as long as it treated state money in private
+  schooling as the scholarship question. It predates every voucher modelled here, it is paid
+  outside the six funding units of R.C. 3317.022, and it has its own appropriation line where the
+  scholarships have an earmark inside one.
+findings: |
+  ### What it pays, and what it buys
+
+  **$166,816,769 in FY2025**, rising to **$172,262,613** as appropriated for FY2027 — the largest
+  of the three Category 3 lines at **68.74%** of the category. Category 3 as a whole paid
+  **$242,688,919** in FY2025 and is appropriated **$250,737,573** for FY2027. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
+
+  Set beside the channel this corpus did model: the four scholarship programmes that publish an
+  expenditure paid **$991,191,150.12** in 2024-25, so Category 3 is **24.48%** of them. That share
+  is an **upper bound** and not an estimate — Jon Peterson publishes no expenditure, so the
+  denominator is short by one programme. Even bounded, the reading holds: a quarter of the money
+  this corpus called the nonpublic channel was never in it. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
+
+  ### The line grew by a twelfth and fell by an eighth
+
+  Across FY2020 to FY2025 the appropriation rose **8.25%** in cash and fell **13.48%** in constant
+  FY2025 dollars. Category 3 together rose **12.12%** and fell **10.39%**. The nominal series is
+  the one a budget document states and it rises in nearly every biennium; the real series is what
+  a school buying the same speech therapist experienced. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
+
+  ### The per-pupil figure does not close, and the denominator is why
+
+  R.C. 3317.024(E)(2)(d) divides, so a per-pupil figure is the right question to ask. It does not
+  reproduce the published rate. Dividing FY2025 by the **173,156** pupils the department's
+  2023-24 landscape sheet counts in 711 chartered nonpublic schools gives **$963.39**, against the
+  **$913** LSC publishes in both the redbook and the greenbook — a published figure and not a
+  forecast, since the two editions agree. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
+
+  The gap is the denominator, and its direction is known. The fixture's count is a year early and
+  its 711 schools are short of the redbook's 747 and the greenbook's 725; a denominator too small
+  makes the quotient too large, so **$963.39 is an upper bound on the rate rather than the rate**.
+  Inverting the published rate on the appropriation net of the College Credit Plus earmark —
+  **$2,739,015** in FY2025, money the statutory quotient has no reason to include — implies
+  **179,713** pupils. What the corpus does not hold is the October average daily membership the
+  statute actually names, and nothing here substitutes for it. [open]
+
+  ### The third line is this line's own money coming back
+
+  ALI 200659, "Auxiliary Services Reimbursement", is carried as a separate line in fund 5980 and is
+  not a separate programme. R.C. 3317.064(A) creates its fund out of "excess moneys in the
+  auxiliary services personnel unemployment compensation fund", and R.C. 4141.47(A) says that fund
+  "shall consist of moneys paid into the fund pursuant to section 3317.06 of the Revised Code" —
+  so the line is a two-step reflux of unspent 200511 money. Both LSC editions add the fact that
+  settles it: **no transfers have occurred since FY 2013**, so twelve years of spending on it have
+  drawn down a balance rather than recycled a flow. It paid **$534,753** in FY2025 and is
+  appropriated a round **$650,000** for FY2027. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
+
+  ### What H.B. 96 did to it
+
+  [H.B. 96](../legislation/hb-96-2025.yml) amended the uses and created no line. It permits
+  auxiliary services funds to be spent on diagnostic and therapeutic mental health services for
+  chartered nonpublic pupils, and adds retired Ohio peace officers to those a school may hire as
+  security officers with them. The vendored section carries the act as its own source and shows
+  both changes in divisions (D), (E) and (P). [verified]
+  ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
+properties:
+  name: Auxiliary Services
+  mechanism: direct-appropriation
+  eligibility: |
+    Chartered nonpublic elementary and high schools, through the district in which they are located
+    or — on notice given by 1 April of an odd-numbered year — directly. [verified] There is no
+    family-level eligibility test of any kind: unlike every scholarship in this class, the pupil's
+    income, disability, and the rating of the district they would otherwise attend are all
+    irrelevant. The unit of entitlement is the school's membership. [verified]
+  amount: |
+    A per-pupil quotient, not a schedule: R.C. 3317.024(E)(2)(d) divides the appropriation for
+    R.C. 3317.06 and 3317.062 by the October average daily membership in chartered nonpublic
+    schools. LSC publishes $913 for FY2025. [verified] What this corpus can compute is an upper
+    bound — $963.39 on the 2023-24 landscape count — because the October membership the statute
+    names is not held. [open]
+  appropriation_line: |
+    GRF 200511, with 5980 200659 beside it for the reflux described in `findings`. Both are read
+    from `crates/project/fixtures/catalog-line-items.csv` across every LSC catalog edition from
+    2006, at the newest vintage that answers for each year. [verified]
+unfilled:
+  - field: the October average daily membership in chartered nonpublic schools
+    why: |
+      It is the statutory denominator — R.C. 3317.024(E)(2)(d) names it exactly — and no source
+      this project retrieves publishes it. The department's landscape sheet counts enrolment a year
+      earlier over a smaller set of schools, which makes every per-pupil figure here a bound rather
+      than the rate.
+  - field: how the schools split between the district route and the direct route
+    why: |
+      R.C. 3317.024(E)(2) makes it a per-school election and neither the redbook nor the greenbook
+      reports the result, so the share of the line passing through districts is not held. It
+      matters because only the district route generates the administrative reimbursement
+      R.C. 3317.06 pays to districts and educational service centres.
+figures:
+  - key: project/auxiliary-services-fy2025
+    value: 166816769
+    field: findings
+    as_written: "**$166,816,769 in FY2025**"
+  - key: project/auxiliary-services-fy2027
+    value: 172262613
+    field: findings
+    as_written: "rising to **$172,262,613** as appropriated for FY2027"
+  - key: project/auxiliary-services-share-of-nonpublic-support
+    value: 0.6874
+    field: findings
+    as_written: "the largest\n  of the three Category 3 lines at **68.74%** of the category"
+  - key: project/nonpublic-support-fy2025
+    value: 242688919
+    field: findings
+    as_written: "Category 3 as a whole paid\n  **$242,688,919** in FY2025"
+  - key: project/nonpublic-support-fy2027
+    value: 250737573
+    field: findings
+    as_written: "is appropriated **$250,737,573** for FY2027"
+  - key: project/scholarship-expenditure-2024-25
+    value: 991191150.12
+    field: findings
+    as_written: "paid **$991,191,150.12** in 2024-25"
+  - key: project/nonpublic-support-against-the-scholarship-channel
+    value: 0.2448
+    field: findings
+    as_written: "so Category 3 is **24.48%** of them"
+  - key: project/auxiliary-services-nominal-growth-fy2020-fy2025
+    value: 0.0825
+    field: findings
+    as_written: "the appropriation rose **8.25%** in cash"
+  - key: project/auxiliary-services-real-decline-fy2020-fy2025
+    value: 0.1348
+    field: findings
+    as_written: "fell **13.48%** in constant\n  FY2025 dollars"
+  - key: project/nonpublic-support-nominal-growth-fy2020-fy2025
+    value: 0.1212
+    field: findings
+    as_written: "Category 3 together rose **12.12%**"
+  - key: project/nonpublic-support-real-decline-fy2020-fy2025
+    value: 0.1039
+    field: findings
+    as_written: "and fell **10.39%**"
+  - key: project/chartered-nonpublic-enrolment
+    value: 173156
+    field: findings
+    as_written: "the **173,156** pupils the department's\n  2023-24 landscape sheet counts"
+  - key: project/auxiliary-services-per-pupil-upper-bound-fy2025
+    value: 963.39
+    field: findings
+    as_written: "in 711 chartered nonpublic schools gives **$963.39**"
+  - key: project/auxiliary-services-published-rate-fy2025
+    value: 913
+    field: findings
+    as_written: "against the\n  **$913** LSC publishes in both the redbook and the greenbook"
+  - key: project/college-credit-plus-earmark-fy2025
+    value: 2739015
+    field: findings
+    as_written: "**$2,739,015** in FY2025, money the statutory quotient has no reason to include"
+  - key: project/auxiliary-services-implied-membership-fy2025
+    value: 179712.76
+    field: findings
+    as_written: "implies\n  **179,713** pupils"
+  - key: project/auxiliary-services-reimbursement-fy2025
+    value: 534753
+    field: findings
+    as_written: "It paid **$534,753** in FY2025"
+  - key: project/auxiliary-services-reimbursement-fy2027
+    value: 650000
+    field: findings
+    as_written: "appropriated a round **$650,000** for FY2027"
+links:
+  - target: ../program.ont.yml
+    relationship: instance-of
+  - target: nonpublic-administrative-cost-reimbursement.yml
+    relationship: parallels
+    note: >-
+      The other Category 3 line paid to the same schools by a different mechanism. The pair is the
+      corpus's clearest instance of the difference between dividing an appropriation and repaying a
+      cost, which is why neither node is written without the other.
+  - target: ../legislation/hb-96-2025.yml
+    relationship: revised-by
+    note: >-
+      H.B. 96 added diagnostic and therapeutic mental health services and retired Ohio peace
+      officers to the permitted uses in R.C. 3317.06, and appropriated to the same line. An
+      amendment to the uses, not a new programme — which is why it is an edge here rather than a
+      node of its own.
+  - target: ../../catalog/lsc-catalog-of-budget-line-items.md
+    relationship: sourced-from
+    note: >-
+      Every dollar figure in this node comes from `catalog-line-items.csv`, read by
+      `project::ledger::nonpublic_support` at the newest edition that answers for each year.
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+    note: >-
+      R.C. 3317.06, 3317.024, 3317.062 and 3317.064, vendored into `revised-code.txt` beside the
+      formula sections. The first three settle what this programme is; the fourth settles that the
+      mobile unit line is not a second one.
+  - target: ../../catalog/dew-education-landscape.md
+    relationship: sourced-from
+    note: >-
+      The 173,156 chartered nonpublic pupils the per-pupil computation divides by — and the reason
+      it produces a bound rather than a rate, since the sheet is a year early and counts 711
+      schools against LSC's 747.
+  - target: ../../catalog/lsc-dew-redbook.md
+    relationship: sourced-from
+    note: The published $913 rate, the College Credit Plus earmark, and the FY2013 transfer fact.
+  - target: ../../catalog/dew-scholarship-annual-report.md
+    relationship: sourced-from
+    note: >-
+      The scholarship expenditure Category 3 is set against. Four programmes of five, which is why
+      the ratio is stated as an upper bound.

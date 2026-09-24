@@ -1,0 +1,162 @@
+class: program
+label: Nonpublic Administrative Cost Reimbursement
+summary: >-
+  The state repays chartered nonpublic schools for what they spent the previous year administering
+  Ohio's mandates — $75.3 million in FY2025, against actual costs and up to a per-pupil ceiling the
+  appropriation has not reached since the ceiling was raised.
+description: |
+  GRF line item 200532, authorised by R.C. 3317.063 and established by H.B. 694 of the 114th
+  General Assembly. The state annually repays each chartered nonpublic school "for the actual
+  mandated service administrative and clerical costs incurred by such school during the preceding
+  school year" — the cost of keeping the records, filing the reports and administering the tests
+  Ohio requires of a school it charters. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
+
+  **It is a reimbursement in the strict sense, and that is what separates it from its sibling.**
+  [Auxiliary services](auxiliary-services.yml) divides an appropriation by a membership and pays
+  the quotient; this line pays what a school can show it spent. R.C. 3317.063 requires the school
+  to apply, to "maintain a separate account or system of accounts" for the costs claimed, permits
+  the department to audit them, and provides that a school paid more than it spent "shall
+  immediately reimburse the state in such excess amount". The payment is bounded above rather than
+  set: it "shall not exceed the per-pupil amount specified by the general assembly for that school
+  year". [verified]
+  ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
+
+  The consequence is that the line has a slack a quotient cannot have. A direct appropriation's
+  rate is whatever the division comes to, so it is never rationed and never underspent; a
+  reimbursement against a ceiling can be either, and in FY2025 it was rationed — the General
+  Assembly authorised $475 per student and the appropriation stretched to $440.
+
+  Both lines are paid to the same schools, in the same year, out of the same category of the
+  department's budget, and neither is a scholarship: no family applies, no district is deducted,
+  and the pupil's income and disability are irrelevant to both. What differs is the arithmetic, and
+  it differs enough that the two are separate nodes rather than one node with two amounts.
+findings: |
+  ### What it pays
+
+  **$75,337,397 in FY2025**, appropriated **$77,824,960** for FY2027 — a little under a third of
+  Category 3 and the second largest of its three lines. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
+
+  Across FY2020 to FY2025 it rose **21.08%** in cash and fell **3.23%** in constant FY2025 dollars.
+  That real fall is a quarter the depth of auxiliary services', and the reason is visible in the
+  rate rather than in the appropriation: the ceiling was raised twice inside the window while the
+  quotient line had no rate to raise. A line whose price is set by statute can be given a raise;
+  a line whose price is a division cannot. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
+
+  ### The appropriation is the binding limit, not the ceiling
+
+  R.C. 3317.063 pays actual costs up to "the per-pupil amount specified by the general assembly for
+  that school year". The General Assembly specified **$475** for FY2024 through FY2027. LSC records
+  that in FY2025 the amount appropriated permitted the department to pay up to **$440** per
+  student, so the schedule was rationed **7.37%** below the rate the statute allows — the
+  appropriation bound before the ceiling did. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
+
+  What that gap means for a school is not held. A school whose mandated costs ran below $440 per
+  pupil was paid in full and felt nothing; a school at or above the ceiling absorbed the whole
+  shortfall. The distribution of claims against the ceiling is in the department's reimbursement
+  records and no source here retrieves it. [open]
+
+  ### The two rates do not share a denominator, and should not
+
+  Inverting each published rate against its own FY2025 appropriation gives **171,221** pupils here
+  and 179,713 for auxiliary services — five per cent apart, so they cannot both be the October
+  membership R.C. 3317.024(E)(2)(d) names. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
+
+  Nor should they be, and the discrepancy is the mechanism rather than an error in it. Auxiliary
+  services *is* a quotient, so its implied denominator is a membership. This line is not: it pays
+  actual costs, a school that spent less is paid less, and dividing the appropriation by the
+  ceiling therefore counts the pupils in schools claiming the maximum rather than the pupils in
+  chartered nonpublic schools. The corpus states both numbers and reconciles neither, because
+  reconciling them would mean asserting that one of the two mechanisms is the other. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
+properties:
+  name: Nonpublic Administrative Cost Reimbursement
+  mechanism: reimbursement
+  eligibility: |
+    Chartered nonpublic schools, on application, for costs actually incurred in the preceding
+    school year administering services Ohio mandates. [verified] The school must keep a separate
+    account or system of accounts for those costs, is subject to audit, and must immediately repay
+    anything received above what it spent. As with [auxiliary
+    services](auxiliary-services.yml) there is no family-level test: the school is the applicant
+    and the pupil count is only a ceiling. [verified]
+  amount: |
+    Actual prior-year mandated administrative and clerical costs, capped at a per-pupil amount the
+    General Assembly sets: $475 for FY2024 through FY2027. [verified] What was actually payable is
+    lower — the FY2025 appropriation supported $440 per student, 7.37% below the authorised rate.
+    [verified] What individual schools claimed, and how many were held to the cap rather than to
+    their own costs, is not held. [open]
+  appropriation_line: |
+    GRF 200532, read from `crates/project/fixtures/catalog-line-items.csv` across every LSC catalog
+    edition from 2006 at the newest vintage that answers for each year. [verified]
+unfilled:
+  - field: the distribution of claims against the per-pupil ceiling
+    why: |
+      It is what decides who the $35 shortfall fell on, and the difference between a rationing
+      nobody felt and one a subset of schools absorbed entirely. The department holds the
+      reimbursement applications; no source this project retrieves publishes them in any form.
+  - field: the statutory history of the per-pupil ceiling before FY2024
+    why: |
+      The $475 is held for FY2024 onward because the enacted analyses state it. The real-terms
+      series above implies the ceiling was raised at least twice across FY2020-FY2025, and the
+      earlier amounts are in the appropriations acts of those bienniums rather than in any
+      analysis committed here — so the shape of the rise is inferred from the money and not read.
+figures:
+  - key: project/nonpublic-administrative-reimbursement-fy2025
+    value: 75337397
+    field: findings
+    as_written: "**$75,337,397 in FY2025**"
+  - key: project/nonpublic-administrative-reimbursement-fy2027
+    value: 77824960
+    field: findings
+    as_written: "appropriated **$77,824,960** for FY2027"
+  - key: project/nonpublic-administrative-nominal-growth-fy2020-fy2025
+    value: 0.2108
+    field: findings
+    as_written: "it rose **21.08%** in cash"
+  - key: project/nonpublic-administrative-real-decline-fy2020-fy2025
+    value: 0.0323
+    field: findings
+    as_written: "fell **3.23%** in constant FY2025 dollars"
+  - key: project/nonpublic-administrative-rate-authorized
+    value: 475
+    field: findings
+    as_written: "The General Assembly specified **$475** for FY2024 through FY2027"
+  - key: project/nonpublic-administrative-rate-fy2025
+    value: 440
+    field: findings
+    as_written: "permitted the department to pay up to **$440** per\n  student"
+  - key: project/nonpublic-administrative-rationing-fy2025
+    value: 0.0737
+    field: findings
+    as_written: "so the schedule was rationed **7.37%** below the rate the statute allows"
+  - key: project/nonpublic-administrative-implied-membership-fy2025
+    value: 171221.36
+    field: findings
+    as_written: "gives **171,221** pupils here"
+links:
+  - target: ../program.ont.yml
+    relationship: instance-of
+  - target: auxiliary-services.yml
+    relationship: parallels
+    note: >-
+      The other Category 3 line, paid to the same schools out of the same budget heading by the
+      opposite arithmetic. Read together: the pair is what makes `direct-appropriation` and
+      `reimbursement` a distinction with consequences rather than two words for a payment.
+  - target: ../../catalog/lsc-catalog-of-budget-line-items.md
+    relationship: sourced-from
+    note: >-
+      The appropriation series, read by `project::ledger::nonpublic_support` at the newest edition
+      that answers for each year.
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+    note: >-
+      R.C. 3317.063, vendored into `revised-code.txt`. It is the section that makes this a
+      reimbursement rather than a grant: actual prior-year costs, separate accounts, audit, and
+      repayment of any excess.
+  - target: ../../catalog/lsc-dew-redbook.md
+    relationship: sourced-from
+    note: The $475 authorised rate and the $440 the FY2025 appropriation supported.

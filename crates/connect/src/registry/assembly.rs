@@ -144,6 +144,72 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
                settles the scholarship mechanism: it names six funding units, four of them \
                scholarship programs, each paid directly rather than deducted.",
     },
+    // Nonpublic school support: the three lines the department's redbook groups as Category 3,
+    // paid outside the six funding units of R.C. 3317.022 entirely. About a quarter of a billion
+    // dollars a year had been appropriated to them in every biennium the Catalog covers with no
+    // section of the Revised Code retrieved to say what any of it buys.
+    Source {
+        key: "rc-3317-06",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3317.06",
+        filename: "rc-3317-06.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3317.06. Auxiliary services: what the money may buy for pupils attending a \
+               chartered nonpublic school, and which body receives and spends it. The largest \
+               nonpublic line the state runs, and the one whose per-pupil allocation rule the \
+               corpus had never read.",
+    },
+    Source {
+        key: "rc-3317-024",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3317.024",
+        filename: "rc-3317-024.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3317.024. The payment section behind the auxiliary services line. Fetched \
+               because R.C. 3317.06 governs what the money may be *spent on* and names \
+               division (E)(1) of this section nineteen times as the thing that pays it — so a \
+               node citing 3317.06 for the allocation would be citing the wrong section.",
+    },
+    Source {
+        key: "rc-3317-062",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3317.062",
+        filename: "rc-3317-062.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3317.062. What a chartered nonpublic school that takes its auxiliary services \
+               money directly may spend it on — the second of the two routes R.C. 3317.024(E) \
+               opens, and half of the appropriation the per-pupil amount is divided out of.",
+    },
+    Source {
+        key: "rc-3317-063",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3317.063",
+        filename: "rc-3317-063.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3317.063. Reimbursement of chartered nonpublic schools for the cost of \
+               complying with state administrative and reporting requirements — the second \
+               Category 3 line, and the one paid to the school rather than to a district.",
+    },
+    Source {
+        key: "rc-3317-064",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3317.064",
+        filename: "rc-3317-064.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3317.064. The mobile-unit line: whether it is a separate programme or a \
+               financing arrangement inside auxiliary services is what the section settles, and \
+               `5980 200659` is appropriated against it.",
+    },
     // Chapter 3310 and the pilot project sections. Wired together because the question they
     // answer is one question — what a scholarship is, who qualifies, and what it pays — and
     // answering it from four programs' statutes separately is how the corpus ended up with three
@@ -288,6 +354,20 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         fixtures: &[crate::fixtures::STATUTE_FIXTURE],
         note: "R.C. 3317.03. What each reported count means, including the economically \
                disadvantaged certification the department is left to define.",
+    },
+    Source {
+        key: "rc-4141-47",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-4141.47",
+        filename: "rc-4141-47.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 4141.47. The auxiliary services personnel unemployment compensation fund, \
+               which is not in the state treasury and \"shall consist of moneys paid into the \
+               fund pursuant to section 3317.06\". It is the middle of the three steps by which \
+               `GRF 200511`'s unspent balance becomes `5980 200659`'s spending authority, and \
+               without it the third Category 3 line reads as a programme rather than a reflux.",
     },
     Source {
         key: "rc-319-301",
