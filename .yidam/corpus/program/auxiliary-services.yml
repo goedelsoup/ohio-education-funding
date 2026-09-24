@@ -59,22 +59,47 @@ findings: |
   a school buying the same speech therapist experienced. [verified]
   ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
 
-  ### The per-pupil figure does not close, and the denominator is why
+  ### The per-pupil figure closes on the October the statute names
 
-  R.C. 3317.024(E)(2)(d) divides, so a per-pupil figure is the right question to ask. It does not
-  reproduce the published rate. Dividing FY2025 by the **173,156** pupils the department's
-  2023-24 landscape sheet counts in 711 chartered nonpublic schools gives **$963.39**, against the
-  **$913** LSC publishes in both the redbook and the greenbook — a published figure and not a
-  forecast, since the two editions agree. [verified]
+  R.C. 3317.024(E)(2)(d) divides, and the corpus now holds what it divides by. The department has
+  published an October count of chartered nonpublic enrolment every year since 1977 — **49** of
+  them, at the building and at the sector, on an attachment page no connector owned. FY2025's
+  quotient takes the appropriation net of the College Credit Plus earmark, **$2,739,015**, over the
+  **179,693** pupils living in Ohio that the department counted in October 2024. It comes to
+  **$913.10**, against the **$913** LSC publishes in both the redbook and the greenbook — a
+  published figure and not a forecast, since the two editions agree. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_october_the_statute_divides_by.rs))
+
+  Three readings had to be right together for it to close, and each is refutable on its own. The
+  numerator is net of an earmark that implements neither section the quotient names. The October
+  is the school year's, so FY2025 divides by October 2024 rather than by October 2025. And the
+  count is of pupils living in Ohio: over all **181,171** the same file totals, the quotient comes
+  out eight dollars lower and matches nothing anyone publishes. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_october_the_statute_divides_by.rs))
+
+  ### What the bound was, and why it missed
+
+  Before this series the corpus divided by the department's landscape sheet — **173,156** pupils
+  for 2023-24 — and published **$963.39** as an upper bound on the rate. The direction was right
+  and the reason recorded for it was wrong. The note said the count was short of the redbook's 747
+  chartered nonpublic schools and the greenbook's 725. This series counts **711** schools in
+  October 2023, **722** a year later and **749** in October 2025 — so both LSC figures fall inside
+  the range the department's own later Octobers cover, and are newer vintages of the same sector
+  rather than a disagreement with it. The landscape count was short by a year, and by nothing
+  else. [verified]
   ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
 
-  The gap is the denominator, and its direction is known. The fixture's count is a year early and
-  its 711 schools are short of the redbook's 747 and the greenbook's 725; a denominator too small
-  makes the quotient too large, so **$963.39 is an upper bound on the rate rather than the rate**.
-  Inverting the published rate on the appropriation net of the College Credit Plus earmark —
-  **$2,739,015** in FY2025, money the statutory quotient has no reason to include — implies
-  **179,713** pupils. What the corpus does not hold is the October average daily membership the
-  statute actually names, and nothing here substitutes for it. [open]
+  The landscape sheet is the cross-publisher check now rather than the denominator, and it passes:
+  its enrolment and its school count are exactly what the department's own October 2023 data file
+  states, from a different office in a different format. Inverting the published rate on the
+  appropriation net of the earmark wants **179,713** pupils against the 179,693 counted — a gap of
+  twenty in a hundred and eighty thousand, which is what rounding a rate to the dollar costs.
+  [verified]
+  ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
+
+  What the October series still cannot say is which district a building sits in, and under
+  R.C. 3317.024(E)(1) that is the district the money moves through. No file on the department's
+  page carries a district column in any of the six layouts it has used. [open]
 
   ### The third line is this line's own money coming back
 
@@ -108,20 +133,23 @@ properties:
   amount: |
     A per-pupil quotient, not a schedule: R.C. 3317.024(E)(2)(d) divides the appropriation for
     R.C. 3317.06 and 3317.062 by the October average daily membership in chartered nonpublic
-    schools. LSC publishes $913 for FY2025. [verified] What this corpus can compute is an upper
-    bound — $963.39 on the 2023-24 landscape count — because the October membership the statute
-    names is not held. [open]
+    schools. LSC publishes $913 for FY2025, and the corpus reproduces it at $913.10: the
+    appropriation net of the College Credit Plus earmark, over the 179,693 pupils the department
+    counted in Ohio in October 2024. [verified]
   appropriation_line: |
     GRF 200511, with 5980 200659 beside it for the reflux described in `findings`. Both are read
     from `crates/project/fixtures/catalog-line-items.csv` across every LSC catalog edition from
     2006, at the newest vintage that answers for each year. [verified]
 unfilled:
-  - field: the October average daily membership in chartered nonpublic schools
+  - field: the district each chartered nonpublic school is located in
     why: |
-      It is the statutory denominator — R.C. 3317.024(E)(2)(d) names it exactly — and no source
-      this project retrieves publishes it. The department's landscape sheet counts enrolment a year
-      earlier over a smaller set of schools, which makes every per-pupil figure here a bound rather
-      than the rate.
+      R.C. 3317.024(E)(1) pays the school district a nonpublic school is located in, so the
+      resident-side incidence of this line is a district question and nothing here can answer it.
+      No file on the department's Enrollment Data page carries a district column in any of the six
+      layouts it has used, and the Chartered Nonpublic School Information page publishes no
+      directory to join against. A join on school name was rejected rather than attempted: October
+      2023's 711 schools carry 601 distinct names, sixteen of them `St Mary`, and Ohio's 607 public
+      districts carry 580 between them.
   - field: how the schools split between the district route and the direct route
     why: |
       R.C. 3317.024(E)(2) makes it a per-school election and neither the redbook nor the greenbook
@@ -173,26 +201,54 @@ figures:
     value: 0.1039
     field: findings
     as_written: "and fell **10.39%**"
-  - key: project/chartered-nonpublic-enrolment
-    value: 173156
+  - key: project/chartered-nonpublic-octobers-held
+    value: 49
     field: findings
-    as_written: "the **173,156** pupils the department's\n  2023-24 landscape sheet counts"
-  - key: project/auxiliary-services-per-pupil-upper-bound-fy2025
-    value: 963.39
-    field: findings
-    as_written: "in 711 chartered nonpublic schools gives **$963.39**"
-  - key: project/auxiliary-services-published-rate-fy2025
-    value: 913
-    field: findings
-    as_written: "against the\n  **$913** LSC publishes in both the redbook and the greenbook"
+    as_written: "every year since 1977 — **49** of\n  them"
   - key: project/college-credit-plus-earmark-fy2025
     value: 2739015
     field: findings
-    as_written: "**$2,739,015** in FY2025, money the statutory quotient has no reason to include"
+    as_written: "net of the College Credit Plus earmark, **$2,739,015**"
+  - key: project/chartered-nonpublic-october-membership-fy2025
+    value: 179693
+    field: findings
+    as_written: "**179,693** pupils living in Ohio that the department counted in October 2024"
+  - key: project/auxiliary-services-rate-fy2025
+    value: 913.1
+    field: findings
+    as_written: "It comes to\n  **$913.10**"
+  - key: project/auxiliary-services-published-rate-fy2025
+    value: 913
+    field: findings
+    as_written: "against the **$913** LSC publishes in both the redbook and the greenbook"
+  - key: project/chartered-nonpublic-october-enrolment-fy2025
+    value: 181171
+    field: findings
+    as_written: "over all **181,171** the same file totals"
+  - key: project/chartered-nonpublic-enrolment
+    value: 173156
+    field: findings
+    as_written: "the department's landscape sheet — **173,156** pupils\n  for 2023-24"
+  - key: project/auxiliary-services-per-pupil-on-the-landscape-count
+    value: 963.39
+    field: findings
+    as_written: "published **$963.39** as an upper bound on the rate"
+  - key: project/chartered-nonpublic-schools-october-2023
+    value: 711
+    field: findings
+    as_written: "counts **711** schools in October 2023"
+  - key: project/chartered-nonpublic-schools-october-2024
+    value: 722
+    field: findings
+    as_written: "**722** a year later"
+  - key: project/chartered-nonpublic-schools-october-2025
+    value: 749
+    field: findings
+    as_written: "**749** in October 2025"
   - key: project/auxiliary-services-implied-membership-fy2025
     value: 179712.76
     field: findings
-    as_written: "implies\n  **179,713** pupils"
+    as_written: "wants **179,713** pupils against the 179,693 counted"
   - key: project/auxiliary-services-reimbursement-fy2025
     value: 534753
     field: findings
@@ -231,9 +287,15 @@ links:
   - target: ../../catalog/dew-education-landscape.md
     relationship: sourced-from
     note: >-
-      The 173,156 chartered nonpublic pupils the per-pupil computation divides by — and the reason
-      it produces a bound rather than a rate, since the sheet is a year early and counts 711
-      schools against LSC's 747.
+      The 173,156 chartered nonpublic pupils in 711 schools that this node used to divide by. It is
+      the cross-publisher check now: the department's own October 2023 data file states the same
+      two numbers, from a different office and a different sheet.
+  - target: ../../catalog/dew-nonpublic-enrollment.md
+    relationship: sourced-from
+    note: >-
+      Forty-nine Octobers of chartered nonpublic enrolment, at the building and at the sector. The
+      denominator R.C. 3317.024(E)(2)(d) names, which this node carried as an unfilled field until
+      the department's Enrollment Data page got a connector.
   - target: ../../catalog/lsc-dew-redbook.md
     relationship: sourced-from
     note: The published $913 rate, the College Credit Plus earmark, and the FY2013 transfer fact.

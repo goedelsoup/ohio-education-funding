@@ -1,0 +1,122 @@
+id: nonpublic-enrollment-connector
+summary: >-
+  dew-nonpublic-enrollment, its own connector rather than a source under dew-scholarship-reports,
+  and every quantity it publishes a bound rather than a number — because the department masks
+  every count below ten and the sector is mostly small schools.
+context: |
+  **The denominator was held for one year.** R.C. 3317.024(E)(2)(d) divides the appropriation for
+  auxiliary services under R.C. 3317.06 and for administrative cost reimbursement under
+  R.C. 3317.062 by the membership in chartered nonpublic schools "as determined as of the last day
+  of October of each school year". The repository knew that membership for 2023-24 and for no
+  other year, from the Education Landscape fact sheet: 711 schools, 173,156 pupils.
+
+  That single observation was load-bearing and it was not closing.
+  [`auxiliary-services`](../corpus/program/auxiliary-services.yml) divided the FY2025
+  appropriation by it and got $963.39 where LSC publishes $913, inverted the published rate to get
+  an implied 179,713 pupils, and recorded the department's 711 schools as "short of the redbook's
+  747 and the greenbook's 725" — three separate symptoms of a denominator from the wrong October,
+  each of which read as a defect in one of the sources.
+
+  **The files were known to exist and nobody had fetched them.**
+  [#257](https://github.com/goedelsoup/ohio-education-funding/issues/257) recorded in passing that
+  the department's Enrollment Data page "reaches back to 1978 for public districts and nonpublic
+  buildings". It is a public CMS attachment page. No connector owned it.
+decision: |
+  Declare `dew-nonpublic-enrollment` as a connector in its own right, `Wired` with a recorded
+  remainder, feeding `school`, `metric` and `program`, over **twenty-three sources enumerated from
+  the page's anchors**. Build two fixtures from one read: a building panel keyed on October and
+  IRN, and a sector panel keyed on October and **basis**.
+
+  **Enumerated, not composed.** The lesson of MR-81 and of the EdChoice designated list, and this
+  page is worse than either: `nonpub.xls`, `nonpub2015.xls`, `Revised-FY16-nonpub.xls`,
+  `web_nonpub_2011.xls`, `oct_08_fy09_adm_web_nonpub.xls`, `Nonpub_FY2013-Data.xlsx`. No pattern
+  generates that set, and a pattern that generated most of it would silently omit the rest.
+
+  **Its own connector, not a source under `dew-scholarship-reports`.** The criterion that splits a
+  connector is the access regime, which
+  [`scholarship-reports-connector`](scholarship-reports-connector.yml) settled when the designated
+  list invited the other reading. Both are open fetches, so the regime does not split them — and
+  they are still two connectors, because this is a different office publishing a different page.
+  `dew-scholarship-reports` is the scholarship channel's own office describing participation in
+  its own programmes; this is the department's data office publishing an enrolment census of a
+  sector, of which the scholarship channel reaches a part. One connector over both would carry one
+  status for an office whose page this project scrapes and an office whose reports it downloads,
+  and the remainders are unrelated: the scholarship connector is blocked on per-district
+  participation, this one on the district a building sits in. Merging them would make a lifted
+  blocker on either half read as a lift on both, which is the failure
+  `dew-payment-reports`/`dew-scholarship-reports` was split to avoid.
+
+  **Every quantity is a floor, a ceiling and a censored-cell count.** A cell printed `<10` stands
+  for some number from one to nine, and in a layout of one row a school and grade a small school
+  has almost every cell masked. October 2023 masks 5,113 building-level cells against a published
+  171,830, and the unmasked cells sum to 146,078: the bound is [146,078, 192,095]. Publishing a
+  point here would be publishing the floor.
+
+  **Keyed on building IRN, and on nothing else.** Ohio's 607 public districts carry 580 distinct
+  names, which is why every panel in this repository keys on IRN; nonpublic school names are worse
+  — October 2023 holds sixteen schools named `St Mary`, nine named `St Joseph` and seven named
+  `St Peter`. The IRN is the only stable identity the file carries.
+consequences: |
+  **The per-pupil figure reproduces, and the statutory denominator is now known.** October 2024 is
+  179,693 pupils in state across 722 buildings. The FY2025 appropriation net of the College Credit
+  Plus earmark, $164,077,754, over that is **$913.10**, and LSC publishes $913. Over the same
+  count including the 1,478 out-of-state pupils it is $906. So R.C. 3317.024(E)(2)(d) is divided
+  by the in-state count, which nothing in the section says and which no document this project
+  holds states.
+
+  **Three symptoms in `auxiliary-services` were one cause.** $963.39 against $913, an implied
+  179,713 against a held 173,156, and 711 schools "short of" 747 and 725 were all the 2023-24 fact
+  sheet standing in for October 2024. The implied membership was right to within 20 pupils. The
+  school counts run 711, 722, 749 across the three Octobers, so the redbook's 747 and the
+  greenbook's 725 are later vintages of this series rather than a disagreement with it.
+
+  **The single-year figure is now a cross-publisher pin rather than the only evidence.** October
+  2023's state sheet gives 173,156 and its building sheet 711 distinct IRNs — exactly the fact
+  sheet, from a different office. That check is worth more as a check than the number was as a
+  datum.
+
+  **The sector panel carries two rows for six Octobers and reconciles neither.** The 2014-2019
+  compilation restates FY2014-FY2019 and disagrees with the annual files: October 2017 reconciles
+  exactly, October 2016's annual total is the compilation's *total* rather than its in-state
+  figure, and October 2018 reads 165,346 against 165,511. Keying on basis is what lets both stand.
+
+  **One file is read against its own label.** `nonpub_fy17.xls`'s building sheet is
+  `Revised-FY16-nonpub.xls`'s — 5,883 shared keyed cells, none differing — and against the
+  compilation's per-school totals it matches FY2016 on 86 unmasked schools and no other year on
+  more than six. October 2016 therefore has no building-level data of its own, and the file table
+  says so in a `BuildingRows::RepostedFrom` rather than in a comment. A pairwise sweep found no
+  other repost in the series.
+
+  **A remainder that is a real hole, not an unfetched file.** The district a building sits in is
+  published nowhere. Auxiliary services flows *through* that district, so the per-district
+  question the series was wanted for is still unanswerable; county and school type exist to
+  2006-07 and then stop, so even the coarse geography is gone for the modern years. `still_blocked`
+  says this, because a reader who sees forty-nine Octobers of building rows will otherwise assume
+  the district is in them.
+alternatives: |
+  **Fold the files into `dew-scholarship-reports` as more sources.** Rejected, above. Two offices,
+  two pages, two unrelated remainders; the economy is one registry row and the cost is a status
+  that describes neither.
+
+  **Read the `State Total` row the historical files carry.** Rejected, and this is the trap the
+  source is built around. That row is an Excel `SUM` over cells already overwritten with the mask
+  text, and `SUM` ignores text: it equals the unmasked-cell sum exactly on every sheet that
+  carries one. Taken at its label, 1977-78 reads as 243,489 for a sector of at least 260,867. It
+  is a floor wearing the name of a total, and the extraction asserts that identity rather than
+  assuming it.
+
+  **Reconcile the grade block against the race block into one count a building.** Rejected. They
+  are the same pupils measured twice, and the race block — five columns rather than twenty-six —
+  masks a fifth as many cells and bounds far better. But to 1982 some schools reported race and
+  left every grade cell zero, and a few disagree outright. Both are carried side by side, on the
+  same principle as the sector panel's two bases: the corpus records what does not reconcile.
+
+  **Match buildings to districts by name or by geography.** Rejected as the thing this repository
+  keeps being burned by. A name match against a district roster would produce a district column
+  that is wrong for an unknown fraction of buildings and looks exactly like a right one. An
+  unfilled field that says why is worth more than a filled one nothing can check.
+
+  **Key the sector panel on October alone and prefer the annual files.** Rejected: it would delete
+  the only evidence that the department publishes this sector twice and disagrees with itself.
+connectors:
+  - dew-nonpublic-enrollment

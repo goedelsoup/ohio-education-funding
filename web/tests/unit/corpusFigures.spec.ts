@@ -333,6 +333,14 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * and 277 of the 347 report none at all. A share of members and a share of pupils that far apart
  * is a claim each number alone would misstate, and prose stating both had been carrying it.
  *
+ * Recomputed at **1112/80** when the department's October count of chartered nonpublic enrolment
+ * got a connector. No node joined: `program/auxiliary-services` was already a carrier, and the
+ * seven net bindings are the denominator R.C. 3317.024(E)(2)(d) names replacing the landscape
+ * sheet a year early that stood in for it — twelve figures where five had been, with the
+ * reproduced $913.10 rate and the school counts of three consecutive Octobers among them. The
+ * pair was exact this time: 1105 declared against 1105 actual, the first recount in four not to
+ * find drift under the ratchet.
+ *
  * Recomputed at **1105/80** when Category 3 of the department's budget got its first reader.
  * `program/auxiliary-services` is the seventy-ninth carrier and
  * `program/nonpublic-administrative-cost-reimbursement` the eightieth — the first two nodes in
@@ -344,8 +352,8 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * test's own expressions rather than added to the last pair.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1105 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1105,
+  expect(bindings.length, "1112 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1112,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,

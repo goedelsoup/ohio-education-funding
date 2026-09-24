@@ -1717,6 +1717,33 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(reason) => Rebuilt::skipped(fixtures::MR81_FIXTURE, reason),
     });
 
+    // Forty-nine Octobers of chartered nonpublic enrolment, at the building and at the sector.
+    // One read of twenty-three files produces both fixtures, so a failure skips both: they are
+    // two views of one extraction and a half-built pair would be worse than neither.
+    match nonpublic_panels(root) {
+        Ok((buildings, sectors)) => {
+            out.push(csv_fixture(
+                root,
+                fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                fixtures::NONPUBLIC_BUILDING_HEADER,
+                &buildings,
+            )?);
+            out.push(csv_fixture(
+                root,
+                fixtures::NONPUBLIC_SECTOR_FIXTURE,
+                fixtures::NONPUBLIC_SECTOR_HEADER,
+                &sectors,
+            )?);
+        }
+        Err(reason) => {
+            out.push(Rebuilt::skipped(
+                fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                reason.clone(),
+            ));
+            out.push(Rebuilt::skipped(fixtures::NONPUBLIC_SECTOR_FIXTURE, reason));
+        }
+    }
+
     // School districts across legislative seats. The last extraction because it is the only one
     // that depends on another fixture's contents rather than only on a cached publication: the
     // panel it apportions is the FY2027 model's 609 districts.
@@ -2322,6 +2349,96 @@ fn mr81_panel(root: &Path) -> Result<Vec<Vec<String>>, String> {
         reports.extend(fixtures::workbook_filings(*year, sheet, &label)?);
     }
     fixtures::build_mr81(&reports)
+}
+
+/// Every published nonpublic enrolment file, in the order the panels should see them.
+///
+/// Each entry declares the fiscal year the file holds rather than deriving it, because the
+/// department's filenames and its sheet names disagree with each other and with the data: the
+/// October 2023 file is `nonpub_fy24.xls` and its totals sheet inside is `fy23_nonpub_state`,
+/// and the October 2008 file's building sheet is named `Oct09_adm_nonpub`. A compilation
+/// declares `None` and its sheets say their own years.
+///
+/// [`fixtures::BuildingRows::RepostedFrom`] on October 2016 is the one place a file is read
+/// against its own label; the module documentation for [`fixtures::nonpublic`] says how that
+/// was established.
+const NONPUBLIC_FILES: &[(&str, Option<u16>, fixtures::BuildingRows)] = &[
+    ("nonpublic-1977-1978", None, fixtures::BuildingRows::Own),
+    ("nonpublic-1979-1988", None, fixtures::BuildingRows::Own),
+    ("nonpublic-1989-1998", None, fixtures::BuildingRows::Own),
+    ("nonpublic-1999-2007", None, fixtures::BuildingRows::Own),
+    ("nonpublic-2008", Some(2009), fixtures::BuildingRows::Own),
+    ("nonpublic-2009", Some(2010), fixtures::BuildingRows::Own),
+    ("nonpublic-2010", Some(2011), fixtures::BuildingRows::Own),
+    ("nonpublic-2011", Some(2012), fixtures::BuildingRows::Own),
+    ("nonpublic-2012", Some(2013), fixtures::BuildingRows::Own),
+    ("nonpublic-2013", Some(2014), fixtures::BuildingRows::Own),
+    ("nonpublic-2014", Some(2015), fixtures::BuildingRows::Own),
+    ("nonpublic-2015", Some(2016), fixtures::BuildingRows::Own),
+    (
+        "nonpublic-2016",
+        Some(2017),
+        fixtures::BuildingRows::RepostedFrom(2016),
+    ),
+    ("nonpublic-2017", Some(2018), fixtures::BuildingRows::Own),
+    ("nonpublic-2018", Some(2019), fixtures::BuildingRows::Own),
+    ("nonpublic-2019", Some(2020), fixtures::BuildingRows::Own),
+    ("nonpublic-2020", Some(2021), fixtures::BuildingRows::Own),
+    ("nonpublic-2021", Some(2022), fixtures::BuildingRows::Own),
+    ("nonpublic-2022", Some(2023), fixtures::BuildingRows::Own),
+    ("nonpublic-2023", Some(2024), fixtures::BuildingRows::Own),
+    ("nonpublic-2024", Some(2025), fixtures::BuildingRows::Own),
+    ("nonpublic-2025", Some(2026), fixtures::BuildingRows::Own),
+    ("nonpublic-2013-2018", None, fixtures::BuildingRows::Own),
+];
+
+/// The chartered nonpublic building panel and sector panel, from every published file.
+///
+/// Every sheet of every workbook is read into owned rows first and the borrowing structs are
+/// built over them afterwards, for the reason [`mr81_panel`] does the same: a
+/// [`fixtures::NonpublicBook`] borrows its sheets and its sheets borrow their rows, so nothing
+/// may be dropped while the panel is being assembled.
+fn nonpublic_panels(root: &Path) -> Result<fixtures::Panels, String> {
+    let mut files: Vec<Vec<(String, Vec<Vec<String>>)>> = Vec::new();
+    for (key, _, _) in NONPUBLIC_FILES {
+        let source = registered(key);
+        let bytes = cache::read_cached(root, source).map_err(|e| e.to_string())?;
+        let book = spreadsheet::open(bytes).map_err(|e| e.to_string())?;
+        let names: Vec<String> = book
+            .sheet_names()
+            .iter()
+            .map(|s| (*s).to_string())
+            .collect();
+        let mut sheets = Vec::new();
+        for name in names {
+            let rows = book.rows(name.as_ref()).map_err(|e| e.to_string())?;
+            sheets.push((name, rows));
+        }
+        files.push(sheets);
+    }
+
+    let borrowed: Vec<Vec<fixtures::NonpublicSheet<'_>>> = files
+        .iter()
+        .map(|sheets| {
+            sheets
+                .iter()
+                .map(|(name, rows)| fixtures::NonpublicSheet { name, rows })
+                .collect()
+        })
+        .collect();
+    let books: Vec<fixtures::NonpublicBook<'_>> = NONPUBLIC_FILES
+        .iter()
+        .zip(&borrowed)
+        .map(
+            |((key, fiscal_year, buildings), sheets)| fixtures::NonpublicBook {
+                key,
+                fiscal_year: *fiscal_year,
+                buildings: *buildings,
+                sheets,
+            },
+        )
+        .collect();
+    fixtures::build_nonpublic(&books)
 }
 
 /// Read the one worksheet whose name begins with `prefix`.

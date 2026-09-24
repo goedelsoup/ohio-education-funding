@@ -75,8 +75,9 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | `census-geography` | **wired** | 4 | education-agency, actor |
 | `dew-child-nutrition` | **wired**, in part | 34 | education-agency, metric, formula-component |
 | `dew-school-improvement` | **wired**, in part | 3 | school, education-agency, accountability-regime |
+| `dew-nonpublic-enrollment` | **wired**, in part | 23 | school, metric, program |
 
-25 connectors, 390 sources between them. 22 are wired and 3 are not; 11 of the wired ones reach only part of what they feed, and say so below.
+26 connectors, 413 sources between them. 23 are wired and 3 are not; 12 of the wired ones reach only part of what they feed, and say so below.
 
 **What is blocked, in the registry's own words.**
 
@@ -93,8 +94,9 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 - `nces-ccd` — still blocked on: wired for every school year the directory publishes with an Ohio slice this reader can take, 1994-95 through 2023-24. The nine years before 1994-95 exist and are not held: 1986-87 through 1993-94 are the same fixed-width family, and nothing consumes them. The identifier-change history is still not derivable from this source, and thirty years of it now say so rather than sixteen: Ohio has never once filed the status code that marks a consolidation
 - `dew-child-nutrition` — still blocked on: wired for every October the archive holds, 1998 through 2014, across all three of the streams the report splits into from 2012. Three things it still cannot reach: October 2014 is where the directory stops, nine years short of the corpus's FY2024 observations; the three split Octobers have a band and not a poverty share, because community-eligibility sponsors collect no applications at all; and the 1998-2000 files state no sponsor type, so some thirty-five sponsors a year predate the FY2001 file they borrow one from and stay untyped
 - `dew-school-improvement` — still blocked on: wired for the current identification lists only. The department republishes each list in place under a dated filename rather than archiving prior cycles, so there is no history here: a school that exited before this file was written is indistinguishable from one never identified
+- `dew-nonpublic-enrollment` — still blocked on: wired for every October the department publishes, 1977 through 2025, at the building and at the sector. What it cannot reach is the district each building sits in. Auxiliary services under R.C. 3317.06 flows to a nonpublic school through the district its building is located in, so a per-district question about the nonpublic sector needs that column; no file in any of the three eras carries it, the Chartered Nonpublic School Information page publishes no directory, and `edchoice-designated` is public buildings only. County and school type are published for 1977-78 through 2006-07 and then stop, so even the coarser geography is gone for the modern years
 
-14 of them have no long form in [`sources/`](sources/): `dew-report-card`, `eia-diesel`, `dew-five-year-forecast`, `dew-scholarship-reports`, `dew-facts-and-figures`, `dew-typology`, `lsc-catalog`, `ohio-session-laws`, `ohio-bill-versions`, `ohio-bills`, `ohio-auditor`, `census-geography`, `dew-child-nutrition`, `dew-school-improvement`. Those are the connectors added after the original nine stubs, whose prose was never written — the decision record is the only account of why each exists.
+15 of them have no long form in [`sources/`](sources/): `dew-report-card`, `eia-diesel`, `dew-five-year-forecast`, `dew-scholarship-reports`, `dew-facts-and-figures`, `dew-typology`, `lsc-catalog`, `ohio-session-laws`, `ohio-bill-versions`, `ohio-bills`, `ohio-auditor`, `census-geography`, `dew-child-nutrition`, `dew-school-improvement`, `dew-nonpublic-enrollment`. Those are the connectors added after the original nine stubs, whose prose was never written — the decision record is the only account of why each exists.
 <!-- /REGEN -->
 
 A `declared` connector says **what blocks it** — that string is a field on the record, and a

@@ -220,6 +220,7 @@ pub const CONNECTORS: &[Connector] = &[
     census::GEOGRAPHY,
     dew::CHILD_NUTRITION,
     dew::SCHOOL_IMPROVEMENT,
+    dew::NONPUBLIC_ENROLLMENT,
 ];
 
 /// Look up a connector by key.

@@ -6,7 +6,7 @@
 //! `fixtures/catalog-line-items.csv` since the 2006 edition without anything reading them.
 //! [`project::ledger::nonpublic_support`] is the reader; this is what it is held to.
 //!
-//! Three questions, and the third is the one that does not close.
+//! Three questions, and the third one used to be the one that did not close.
 //!
 //! **What was paid.** Eight years of each line, at the vintage that answers for the year. Pinned
 //! rather than described, because the corpus quotes these figures and a series quoted from a
@@ -19,13 +19,15 @@
 //! pass on a fixture that had gone wrong everywhere else.
 //!
 //! **What a pupil is worth.** R.C. 3317.024(E)(2)(d) really does divide an appropriation by a
-//! membership, so a per-pupil figure is the right shape of question. It does not reproduce LSC's
-//! published rate, and the reason is the denominator rather than the arithmetic — see
-//! [`auxiliary_services_per_pupil_is_an_upper_bound`]. Two published rates for FY2025 imply two
-//! different memberships five per cent apart, which is a fact about the two mechanisms and is
-//! left standing rather than reconciled.
+//! membership, and for as long as the corpus held no October membership this file published a
+//! bound instead of a rate. It now holds forty-nine of them — see
+//! `the_october_the_statute_divides_by`, which owns the series and the reproduction — and the
+//! quotient comes out at $913.10 against the $913 LSC publishes. What is left here is the part
+//! that never was about the denominator: two published rates for FY2025 imply two different
+//! memberships five per cent apart, and only one of them is a membership at all.
 
 use edfund_core::FiscalYear;
+use project::ledger::nonpublic_enrolment as enrolment;
 use project::ledger::nonpublic_support as nonpublic;
 use project::statute;
 
@@ -258,46 +260,54 @@ fn the_fy2025_restatement_is_thirty_six_thousand_dollars() {
 }
 
 #[test]
-fn auxiliary_services_per_pupil_is_an_upper_bound() {
+fn auxiliary_services_per_pupil_is_a_rate_now_and_was_a_bound() {
     /*
-     * The probe the issue asked for, and the answer is that it does not close.
+     * The probe the issue asked for, and the answer it used to have.
      *
      * R.C. 3317.024(E)(2)(d) divides "the total amount appropriated for the implementation of
      * sections 3317.06 and 3317.062" by the October average daily membership in chartered
-     * nonpublic schools. The corpus holds no October ADM. What it holds is the department's
-     * landscape sheet: 173,156 pupils in 711 chartered nonpublic schools, for **2023-24**.
+     * nonpublic schools. The corpus held no October membership. What it held was the department's
+     * landscape sheet — 173,156 pupils in 711 chartered nonpublic schools for **2023-24** — and
+     * dividing FY2025 by that gave $963.39 against the $913 LSC publishes in both editions.
      *
-     * Against that denominator FY2025 comes out $963.39, and LSC publishes $913 — in both the
-     * redbook and the greenbook, so it is not a forecast that was corrected. The fixture's count
-     * is a year early and its school count is short of the redbook's 747 and the greenbook's 725,
-     * which is the whole of the gap's direction: a denominator too small makes the quotient too
-     * large, so every figure here is an upper bound on the rate and the corpus says so.
+     * The reading recorded here at the time was that the gap was the denominator and its direction
+     * known: a count too small makes the quotient too large, so $963.39 was an upper bound. The
+     * direction was right and the reason given for it was wrong. The landscape count was not short
+     * of the redbook's 747 schools and the greenbook's 725; those are later Octobers of the same
+     * series, which runs 711, 722, 749. It was short by a year, and only by a year.
+     *
+     * What the October series settles is asserted in `the_october_the_statute_divides_by`. What is
+     * asserted here is the shape of the correction: the old denominator, the old quotient, and the
+     * fact that the new one lands on the published rate.
      */
-    let pupils = nonpublic::chartered_nonpublic_enrolment();
-    assert!((pupils - 173_156.0).abs() < CENT, "{pupils}");
+    let landscape = nonpublic::chartered_nonpublic_enrolment();
+    assert!((landscape - 173_156.0).abs() < CENT, "{landscape}");
 
-    for (fiscal_year, expected) in [
-        (2024, 940.565_813_486_105_1),
-        (2025, 963.390_058_675_414),
-        (2026, 983.465_562_845_064_6),
-        (2027, 994.840_565_732_634_1),
-    ] {
-        let rate = nonpublic::per_pupil(nonpublic::AUXILIARY_SERVICES, fiscal_year)
-            .expect("the line carries the year");
-        assert!((rate - expected).abs() < 1e-9, "FY{fiscal_year}: {rate}");
-        assert!(
-            rate > nonpublic::PUBLISHED_AUXILIARY_RATE_FY2025,
-            "FY{fiscal_year} came out below the published rate, \
-             which would make the bound argument the wrong way round"
-        );
-    }
-
-    // What denominator the published rate implies, taken both ways the numerator can be read:
-    // on the whole line, and on the line net of the College Credit Plus earmark, which is money
-    // the statute's quotient has no reason to include.
     let appropriated = nonpublic::latest(nonpublic::AUXILIARY_SERVICES, 2025)
         .and_then(|claim| claim.amount)
         .expect("FY2025");
+    let on_the_landscape_count = appropriated / landscape;
+    assert!(
+        (on_the_landscape_count - 963.390_058_675_414).abs() < 1e-9,
+        "{on_the_landscape_count}"
+    );
+    assert!(
+        on_the_landscape_count > nonpublic::PUBLISHED_AUXILIARY_RATE_FY2025,
+        "the old denominator stopped being too small, \
+         which would make the bound argument the wrong way round"
+    );
+
+    let rate = nonpublic::auxiliary_rate_fy2025().expect("FY2025 and October 2024");
+    assert!((rate - 913.100_421_274_061_9).abs() < 1e-9, "{rate}");
+    assert!(
+        (rate - nonpublic::PUBLISHED_AUXILIARY_RATE_FY2025).abs() < 0.11,
+        "the quotient stopped reproducing the published rate: {rate}"
+    );
+
+    // What the published rate implies as a denominator, taken both ways the numerator can be read:
+    // on the whole line, and on the line net of the College Credit Plus earmark, which is money
+    // the statute's quotient has no reason to include. The second is the one the October count
+    // answers, and it answers it to twenty pupils.
     let whole =
         nonpublic::implied_membership(appropriated, nonpublic::PUBLISHED_AUXILIARY_RATE_FY2025)
             .expect("a positive rate");
@@ -308,21 +318,33 @@ fn auxiliary_services_per_pupil_is_an_upper_bound() {
     .expect("a positive rate");
     assert!((whole - 182_712.780_941_949_6).abs() < 1e-6, "{whole}");
     assert!((net - 179_712.764_512_595_84).abs() < 1e-6, "{net}");
+
+    let counted = enrolment::membership(2025).expect("October 2024");
     assert!(
-        net > pupils && whole > pupils,
-        "both readings want more pupils than the fixture counts"
+        (net - counted - 19.764_512_595_837).abs() < 1e-6,
+        "{net} v {counted}"
+    );
+    assert!(
+        (net / counted - 1.0).abs() < 0.000_2,
+        "the inversion of a rate rounded to the dollar lands within two hundredths of a per cent"
+    );
+    assert!(
+        whole > counted + 3_000.0,
+        "and the whole-line reading does not, which is what rules the earmark out of the quotient"
     );
 }
 
 #[test]
 fn the_two_published_rates_do_not_share_a_denominator() {
     /*
-     * And this is why the section above stops at a bound instead of solving for the membership.
+     * The part of the per-pupil question that was never about the missing denominator.
      *
      * LSC publishes two FY2025 per-pupil figures for Category 3: $913 for auxiliary services and
      * a $440 ceiling for the administrative cost reimbursement. Inverting each against its own
      * appropriation gives 179,713 pupils and 171,221 pupils — five per cent apart. They cannot
-     * both be the October membership.
+     * both be the October membership, and now that the October membership is held it is clear
+     * which one is: the department counted 179,693 pupils in October 2024, so the auxiliary
+     * figure lands on it and the reimbursement's sits 4.7% below.
      *
      * Nor should they be. Auxiliary services is a quotient: the appropriation divided by a count,
      * so its implied denominator *is* the count. The reimbursement is not — R.C. 3317.063 pays
@@ -361,6 +383,15 @@ fn the_two_published_rates_do_not_share_a_denominator() {
         "the two rates stopped disagreeing about the denominator, \
          which would be a finding and not a fix"
     );
+
+    // And which of the two is the membership, now that the membership is a number we hold.
+    let counted = enrolment::membership(2025).expect("October 2024");
+    assert!(
+        (auxiliary / counted - 1.0).abs() < 0.000_2,
+        "auxiliary: {auxiliary} against {counted}"
+    );
+    let short = 1.0 - administrative / counted;
+    assert!((short - 0.047_145_092_918_578_824).abs() < 1e-12, "{short}");
 }
 
 #[test]
