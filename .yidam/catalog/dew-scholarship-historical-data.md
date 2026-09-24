@@ -66,8 +66,10 @@ year's payments in any year. Whatever the convention was, it was Cleveland's.
 
 **It is not per district.** Every figure is statewide, which the department's note says outright —
 the archive is "only available in aggregate for the state". So it does not close
-[#10](https://github.com/goedelsoup/ohio-education-funding/issues/10), and the withdrawn
-per-district routes recorded in [`deduction`](../skills/deduction.md) are still withdrawn.
+[#10](https://github.com/goedelsoup/ohio-education-funding/issues/10): the per-district routes
+recorded in [`deduction`](../skills/deduction.md) are still unreached, and were never shown to be
+withdrawn — the portal answers every path with the same shell, and the reports behind it are
+Power BI embeds anonymous users are not entitled to.
 
 **It is not money.** There is no expenditure, award or per-pupil figure anywhere in the workbook.
 Sizing the deduct-era channel in dollars still needs a different source.

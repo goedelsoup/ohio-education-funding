@@ -27,6 +27,20 @@ description: |
   [`edchoice-scholarship`](edchoice-scholarship.yml), where the discrepancy is recorded. That this
   one is exact and the others are not suggests the difference is a denominator rather than an
   error, and nothing in the report says which. [inference] [open]
+revisions:
+  - was: |
+      `eligibility` called the per-district file that would compare the two programmes' district
+      footprints "the withdrawn one".
+    now: |
+      Unreached, not withdrawn. The reports portal's 404 is the same application shell every path
+      returns, and the report behind the route is an embed behind an entitlement the anonymous
+      token does not carry.
+    found_by: |
+      Probed 2026-09-15 and recorded on
+      [#10](https://github.com/goedelsoup/ohio-education-funding/issues/10); propagated to this
+      node by [#467](https://github.com/goedelsoup/ohio-education-funding/issues/467).
+    reach: |
+      One adjective; the open question it qualifies is unchanged.
 findings: |
   ### A ten-year series, and a greenbook figure it refutes
 
@@ -76,7 +90,8 @@ properties:
     The private-diagnosis route is worth noting beside the Jon Peterson programme, which requires
     an Evaluation Team Report and an IEP. Autism admits a child the district has never evaluated.
     [verified] Whether that difference shows up in the two programmes' district footprints is not
-    established — the per-district file that would answer it is the withdrawn one. [open]
+    established — the per-district file that would answer it is the one the annual report cites
+    and this project has not reached. [open]
   amount: |
     **FY2025: 6,016 students, $160,018,883.30, average award $26,598.88.** [verified] (2025
     Scholarship Annual Report)

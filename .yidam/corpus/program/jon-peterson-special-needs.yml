@@ -24,11 +24,31 @@ description: |
   students is thin almost everywhere, and a district-level effect is invisible in the statewide
   total.
 
-  **And the per-district breakdown is exactly what has been withdrawn.** The annual report says a
-  breakdown of students per district "is available here" and links to a route that returns 404.
-  See [`deduction`](../../skills/deduction.md), which records the two dead routes and what would
-  unblock them. The programme's own publisher points at the file and the file is not there.
-  [verified] [open]
+  **And the per-district breakdown is exactly what this project has not found.** The annual
+  report says a breakdown of students per district "is available here" and links to a route on
+  the department's reports portal — which answers every path with the same application shell, and
+  serves its reports as Power BI embeds behind an entitlement anonymous users do not hold. See
+  [`deduction`](../../skills/deduction.md), which records the two routes and what would reach
+  them. The programme's own publisher points at the file, and nothing this project can fetch
+  carries it. [verified] [open]
+revisions:
+  - was: |
+      The description said the per-district breakdown "has been withdrawn": the annual report
+      links a route that returns 404, so the file was published and then taken down.
+    now: |
+      The 404 carries no information. Every path on `reports.education.ohio.gov` returns the
+      byte-identical application shell, `/robots.txt` included, and the report behind the route
+      is a Power BI embed behind an entitlement the portal's anonymous token does not carry. The
+      breakdown is cited by a current departmental document and this project has not found it.
+    found_by: |
+      Probed 2026-09-15 and recorded on
+      [#10](https://github.com/goedelsoup/ohio-education-funding/issues/10); propagated to this
+      node by [#467](https://github.com/goedelsoup/ohio-education-funding/issues/467).
+    reach: |
+      "Withdrawn" named a remedy — ask the department to restore the file — that rested on
+      nothing, and it was listed as the cheapest unblock. What remains is a retrieval question
+      with a live route: OH|ID on the portal, which may be scoped to one district's slice.
+      Nothing else in this node depended on the reading.
 findings: |
   ### Its first year is in the archive, and applications ran a fifth above payments
 

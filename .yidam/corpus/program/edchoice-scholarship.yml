@@ -32,6 +32,21 @@ description: |
   figures) The natural reading is a denominator: an average over students holding a full-year
   award rather than over everyone who used the programme at any point. Nothing in the report says
   so, and the reading is not adopted here on the source's silence. [open]
+revisions:
+  - was: |
+      The findings called the portal route the designated list stands in for one "that stub
+      found withdrawn".
+    now: |
+      Unreached, not withdrawn. The reports portal answers every path with the same application
+      shell, so the route's 404 says nothing about the report, and the embed behind it needs an
+      entitlement the anonymous token does not carry.
+    found_by: |
+      Probed 2026-09-15 and recorded on
+      [#10](https://github.com/goedelsoup/ohio-education-funding/issues/10); propagated to this
+      node by [#467](https://github.com/goedelsoup/ohio-education-funding/issues/467).
+    reach: |
+      One adjective. The substitute relation stands: this file is eligibility at the same grain
+      as the participation the route would carry.
 findings: |
   ### A third way the published average does not sit right, and this one is arithmetic
 
@@ -64,8 +79,8 @@ findings: |
 
   This is eligibility and not participation, so it does not close the per-district question the
   [`deduction`](../../skills/deduction.md) stub records as blocked. It is the public substitute
-  for one of the two routes that stub found withdrawn, answering a different question at the same
-  grain.
+  for one of the two portal routes that stub records as unreached — a 404 there was once read as
+  a withdrawal, and is not one — answering a different question at the same grain.
 
   **Reproducing the determination finds two things the file does not say.** The designation is
   exactly Option A or Option B, but Option B is not the two criteria it names: it is those two

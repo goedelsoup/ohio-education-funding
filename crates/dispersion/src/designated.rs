@@ -7,9 +7,10 @@
 //! # Eligibility, not participation
 //!
 //! A designated building is one whose students *may* apply. Nothing here says a scholarship was
-//! awarded or used, and the per-district participation route the department once published is
-//! withdrawn — see [`crate::deduct`] and the `deduction` skill. So this closes the per-district
-//! question in one direction only, and a reader looking for uptake will not find it.
+//! awarded or used, and the per-district participation route the department cites is one this
+//! project has not reached — a report behind an entitlement, not a file that was taken down; see
+//! [`crate::deduct`] and the `deduction` skill. So this closes the per-district question in one
+//! direction only, and a reader looking for uptake will not find it.
 //!
 //! # The criteria are the statute's, and they check out
 //!

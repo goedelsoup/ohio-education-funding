@@ -129,5 +129,6 @@ A records request to the department for notification counts by district and IRN,
 FY2025, together with the suppression rule, the school year the released file actually covers, and
 whether the count is notices or students. Tracked as
 [#257](https://github.com/goedelsoup/ohio-education-funding/issues/257), in the same class as the
-withdrawn per-district scholarship breakdown — published to somebody, not published to everybody,
-with the difference that this one has never been public in any form.
+per-district scholarship breakdown the annual report cites and this project has not reached —
+published to somebody, not published to everybody, with the difference that this one has never
+been public in any form.

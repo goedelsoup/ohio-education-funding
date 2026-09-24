@@ -2089,11 +2089,14 @@ pub(super) const SCHOLARSHIP_REPORTS: Connector = Connector {
              current statewide aggregates, the archived participation series FY1997-FY2013, \
              and per-building eligibility for the current designated list. Two holes are \
              left, and they are different in kind. Per-district *participation* is still a \
-             file nobody can fetch — the annual report cites two routes for it and both 404, \
-             so the breakdown was published, is still referenced by a current departmental \
-             document, and has been withdrawn; see `dew-payment-reports` for the deduct-era \
-             half of that gap. And the archived series stops at FY2013 while the annual \
-             report starts at 2024-25, so FY2014 through FY2023 has no participation series \
+             file nobody has fetched — the annual report cites two routes for it on the \
+             department's reports portal, which answers every path with the same application \
+             shell and serves its reports as Power BI embeds behind an entitlement its \
+             anonymous token does not carry, so the breakdown is referenced by a current \
+             departmental document, has not been found, and was never shown to be taken \
+             down; see `dew-payment-reports` for the deduct-era half of that gap. And the \
+             archived series stops at FY2013 while the annual report starts at 2024-25, so \
+             FY2014 through FY2023 has no participation series \
              — LSC's greenbooks quote rounded counts for FY2014, FY2018 and FY2019 and \
              nothing else, which bounds that hole rather than filling it. The designated \
              list is current-edition-only: the four prior filenames its pattern implies all \
@@ -2152,10 +2155,10 @@ pub(super) const SCHOLARSHIP_REPORTS: Connector = Connector {
             ],
             note: "Which buildings' students may claim traditional EdChoice for 2026-2027, and \
                    under which of the two criteria, per district and per building IRN. The \
-                   public substitute for the withdrawn \
-                   `nonpublic-data-historical-ed-choice-designated-list` route — eligibility \
-                   rather than participation, so it answers a different question and answers \
-                   it per district. Only this edition is at this URL: the four prior filenames \
+                   public substitute for the `nonpublic-data-historical-ed-choice-designated-list` \
+                   portal route this project has not reached — eligibility rather than \
+                   participation, so it answers a different question and answers it per \
+                   district. Only this edition is at this URL: the four prior filenames \
                    the pattern implies all return the host's genuine 404.",
         },
     ],

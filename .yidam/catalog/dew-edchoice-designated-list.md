@@ -29,12 +29,15 @@ Together they make the whole determination reproducible from raw counts rather t
 department's own flags. It reproduces, exactly, in all 2,877 rows. What that costs is three
 readings the file states nowhere, and the third of them is a finding about the file: see below.
 
-**Why it matters here.** It is the **public substitute for the withdrawn
+**Why it matters here.** It is the **public substitute for the
 `nonpublic-data-historical-ed-choice-designated-list` route** recorded in
-[`deduction`](../skills/deduction.md), and the first per-district file in this repository about the
-scholarship channel. It does not replace what that route carried: this is who *may* claim, not who
-did, so it answers a different question — but it answers it per district, which nothing else here
-does.
+[`deduction`](../skills/deduction.md) — a portal route this project has not reached, once read
+here as withdrawn and not shown to be: that host answers every path with the same application
+shell, so its 404 says nothing about the report
+([#10](https://github.com/goedelsoup/ohio-education-funding/issues/10)). And it is the first
+per-district file in this repository about the scholarship channel. It does not replace what that
+route carries: this is who *may* claim, not who did, so it answers a different question — but it
+answers it per district, which nothing else here does.
 
 ## One column is a dated fact, and the date is in the file
 
@@ -174,8 +177,8 @@ alongside the identity above.
 ## What it is not
 
 **It is not participation.** A designated building is one whose students *may* apply. Nothing here
-says a scholarship was awarded, used, or charged anywhere, and the withdrawn route that would have
-said so is still withdrawn.
+says a scholarship was awarded, used, or charged anywhere, and the portal route that would have
+said so is still unreached — a report behind an entitlement, not a file that was taken down.
 
 **It is not EdChoice Expansion.** Expansion eligibility is income-based and turns on no building at
 all, so a designated list has nothing to do with it. This file bears on the traditional programme

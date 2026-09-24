@@ -2,7 +2,7 @@
 //!
 //! Eligibility, not participation. A designated building does not mean a scholarship was used
 //! there — it means a student enrolled in or assigned to it may apply — so this answers a
-//! different question from the withdrawn per-district participation route it stands in for, and
+//! different question from the unreached per-district participation route it stands in for, and
 //! answers it per district and per building IRN.
 //!
 //! # Why the criteria columns are carried rather than collapsed

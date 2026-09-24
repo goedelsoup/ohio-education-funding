@@ -60,11 +60,17 @@ and does not adopt the explanation.
 
 ## What it is not
 
-**It is not a per-district file, and it points at one that has been withdrawn.** The Jon Peterson
-section states that students came from 494 districts, over 80% of Ohio's, and says a breakdown per
-district "is available here" — linking to a route that returns 404. The
-[`deduction`](../skills/deduction.md) stub records that route and one other, both cited in a
-current departmental document and both gone.
+**It is not a per-district file, and it points at one this project has not found.** The Jon
+Peterson section states that students came from 494 districts, over 80% of Ohio's, and says a
+breakdown per district "is available here" — linking to a route on `reports.education.ohio.gov`
+that returns 404. This record read that 404 as a withdrawal, and the reading is void: probed
+2026-09-15 on [#10](https://github.com/goedelsoup/ohio-education-funding/issues/10), every path on
+that host returns the byte-identical Angular shell, `/robots.txt` included, and the reports behind
+it are Power BI embeds behind an entitlement the portal's anonymous token does not carry. A status
+code there is a property of the portal, not evidence about the file. What stands is narrower: the
+breakdown is cited by a current departmental document, and nothing this project can fetch carries
+it. The [`deduction`](../skills/deduction.md) stub records that route and one other, and what would
+reach them.
 
 The second of the two has a public substitute that is not the same file: the
 [EdChoice designated list](dew-edchoice-designated-list.md) is per district and per building, and
