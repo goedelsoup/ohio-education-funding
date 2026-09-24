@@ -350,10 +350,17 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * 1079 actual against 1076 declared. Third recount in a row to find the floor under its count,
  * which is what a hand-maintained exact ratchet does and why both numbers here are read off this
  * test's own expressions rather than added to the last pair.
+ *
+ * Recomputed at **1114/80** when Table 5 of the FY2026-27 redbook was bound. No new carrier, and
+ * both bindings land on `program/edchoice-expansion`, which had eight already. They are the two
+ * ends of one table — the largest programme's estimated FY2027 payments and the channel's — and
+ * what makes them worth binding is that they are the only committed statement of this channel by
+ * programme and fiscal period, in a document that says in terms it allocates no amount to any
+ * individual programme.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1112 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1112,
+  expect(bindings.length, "1114 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1114,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,

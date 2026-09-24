@@ -145,6 +145,16 @@ pub mod report {
 
     const EXPECTED_HEADER: &str = "program,name,students,expenditure,published_average";
 
+    /// The fiscal year the report covers.
+    ///
+    /// Hand-written, and the only year label in this file that is. The extract has no year column
+    /// — the report states its own coverage as "2024-25" in prose, once, in a title — so there is
+    /// nothing in the fixture to derive it from. The registry key `scholarship-annual-2025` is the
+    /// machine-readable statement of the same fact, and `project` cannot depend on `connect` to
+    /// read it. Compare [`super::history::span`], which is derived because its fixture dates every
+    /// row.
+    pub const FISCAL_YEAR: u16 = 2025;
+
     /// One programme as the report gives it.
     #[derive(Debug, Clone, PartialEq)]
     pub struct Programme {
@@ -201,8 +211,9 @@ pub mod history {
     //!
     //! The deduct era, statewide, and the only source this repository holds that counts
     //! applications and payments as separate quantities. [`super::report`] is the same channel eleven
-    //! years later under the Fair School Funding Plan; between FY2014 and FY2023 there is
-    //! nothing.
+    //! years later under the Fair School Funding Plan; between FY2014 and FY2023 there is no
+    //! series at all — only the quoted points [`super::bounds`] holds, which bound that hole and
+    //! cannot be joined to either end of it.
     //!
     //! # The two measures are not two views of one number
     //!
@@ -212,6 +223,7 @@ pub mod history {
     //! overstates the channel — by 3.1x for Cleveland in FY1997.
 
     use std::collections::BTreeMap;
+    use std::ops::RangeInclusive;
 
     use edfund_core::FiscalYear;
 
@@ -310,6 +322,23 @@ renewal_low_income";
             .collect()
     }
 
+    /// The fiscal years the archive covers, inclusive, read off the fixture.
+    ///
+    /// Derived rather than written down: this is one end of the hole
+    /// [`super::bounds`] bounds, and a later edition of the workbook extending the series must move
+    /// the hole with it rather than leaving a constant behind. `FY1997..=FY2013` today.
+    ///
+    /// # Panics
+    ///
+    /// If the archive holds no rows at all.
+    #[must_use]
+    pub fn span() -> RangeInclusive<u16> {
+        let years: Vec<u16> = observations().iter().map(|o| o.year.0).collect();
+        let first = years.iter().copied().min().expect("the archive has rows");
+        let last = years.iter().copied().max().expect("the archive has rows");
+        first..=last
+    }
+
     /// One programme's series on one measure, by fiscal year.
     #[must_use]
     pub fn series(program: &str, measure: Measure) -> BTreeMap<FiscalYear, Counts> {
@@ -318,6 +347,334 @@ renewal_low_income";
             .filter(|o| o.program == program && o.measure == measure)
             .map(|o| (o.year, o.counts))
             .collect()
+    }
+}
+
+pub mod bounds {
+    //! Every dated scholarship quantity the Legislative Service Commission quotes inside the hole
+    //! between the two committed series — and the reasons not one of them belongs on either.
+    //!
+    //! [`super::history`] runs FY1997 through FY2013 and [`super::report`] covers FY2025. Between
+    //! them are ten fiscal years with no participation series at all, and
+    //! `.yidam/decisions/scholarship-reports-connector.yml` recorded that the hole "is not empty":
+    //! LSC's budget analyses quote counts inside it. This is those counts, read out of the
+    //! committed extracts rather than described — along with the overlap-era quotes that are the
+    //! evidence for not splicing them.
+    //!
+    //! Unrelated to [`crate::bounds`], which is a census of the *formula's* floors and ceilings. A
+    //! bound here is a constraint on a quantity nothing in this repository measures.
+    //!
+    //! # These are bounds and not observations
+    //!
+    //! Three things stop every row here from being a point on either series, and they are
+    //! independent of each other:
+    //!
+    //! 1. **[`Precision`] — most carry the publisher's own hedge.** "About 87,000", "approximately
+    //!    5,128", "over 480", "an estimated average". A hedged figure constrains a quantity; it
+    //!    does not measure one.
+    //! 2. **[`Denominator`] — the population differs from row to row, and is usually unstated.**
+    //!    The FY2026-27 redbook counts *FTE students* for the two EdChoice programmes and
+    //!    *students* for the other three, in one sequence of paragraphs. LSC counts *scholarships
+    //!    awarded* for the traditional programme and *students participating* for the pilot
+    //!    project. One row counts kindergarteners and one counts grades K-5. The archive's own two
+    //!    denominators — applications made, and scholarships with a payment against them — are in
+    //!    this vocabulary and **no row uses either**.
+    //! 3. **Where a quote and the archive cover the same year, they disagree, and not by a rule.**
+    //!    Five rows fall inside the archive's span, and the gaps against its payments column run
+    //!    exactly 0.00% for Cleveland in FY2005, +0.98% for Cleveland in FY2012, −2.28% for the
+    //!    traditional programme in the same year, and **−85%** for autism. A transcription that
+    //!    reproduces the archive once and is out by a factor of seven elsewhere cannot be
+    //!    extrapolated into the years where there is nothing to check it against.
+    //!
+    //! The third is why this is a fixture rather than a sentence.
+    //! `crates/project/tests/the_points_that_bound_the_participation_hole.rs` asserts all of it,
+    //! and asserts that no row is joinable — see [`Bound::spliceable`], which is the standing guard
+    //! against a later row being appended to a series because it happened to look like a
+    //! measurement.
+    //!
+    //! # Every row is checked against the document it came from
+    //!
+    //! [`Bound::quote`] carries the publisher's own words and [`source_text`] resolves the
+    //! `source` column to the committed extract, so the test can assert that each quote appears
+    //! verbatim in its source and contains the value's own numeral. The decision record's
+    //! principle was that "a figure reaching the corpus through prose is a figure nothing
+    //! recomputes"; this is the nearest available substitute — a transcription re-checked on every
+    //! `cargo test` rather than one that was right the day it was typed.
+
+    use edfund_core::FiscalYear;
+
+    /// The committed census.
+    const FIXTURE: &str = include_str!("../fixtures/scholarship-bounds.tsv");
+
+    const EXPECTED_HEADER: &str =
+        "program\tfiscal_year\tmeasure\tvalue\tdenominator\tprecision\tsource\tquote";
+
+    /// Tab-delimited because [`Bound::quote`] is prose: "In FY 2014, 6,337 students…" carries both
+    /// the publisher's commas and their thousands separators, and `edfund_core::csv::rows` honours
+    /// no quoting.
+    const DELIMITER: char = '\t';
+
+    /// What a row counts.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+    pub enum Measure {
+        /// Recipients, participants, or awards — whichever of the three the publisher counted.
+        /// [`Denominator`] carries which.
+        Participation,
+        /// Cleveland's tutoring grants, the quantity
+        /// [`super::history::Measure::Tutoring`] holds.
+        Tutoring,
+        /// A dollar total for a programme-year.
+        Payments,
+        /// An average award. Its denominator is never stated, which is the same defect the 2025
+        /// annual report's three unreconciled averages have.
+        AverageAward,
+        /// The average Cleveland tutoring grant, an average over a different population again.
+        AverageTutoringGrant,
+        /// Chartered nonpublic schools — those participating, or, where the denominator is
+        /// [`Denominator::Operating`], every one in the state.
+        Schools,
+        /// Special-needs providers registered to participate.
+        Providers,
+    }
+
+    impl Measure {
+        /// The fixture's own spelling.
+        fn from(cell: &str) -> Option<Self> {
+            match cell {
+                "participation" => Some(Self::Participation),
+                "tutoring" => Some(Self::Tutoring),
+                "payments" => Some(Self::Payments),
+                "average_award" => Some(Self::AverageAward),
+                "average_tutoring_grant" => Some(Self::AverageTutoringGrant),
+                "schools" => Some(Self::Schools),
+                "providers" => Some(Self::Providers),
+                _ => None,
+            }
+        }
+    }
+
+    /// The population a row's count is over.
+    ///
+    /// Nine of them across the census, and the two the department's own archive publishes are here
+    /// so that a row claiming one parses and then fails [`Bound::spliceable`], rather than being
+    /// unspellable and so unguarded.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+    pub enum Denominator {
+        /// Applications made. The archive's first measure, and **no bound uses it**.
+        Applications,
+        /// Scholarships with at least one payment against them. The archive's second measure, and
+        /// **no bound uses it either**.
+        Paid,
+        /// Students, uncounted as to whether they held an award all year.
+        Students,
+        /// Full-time equivalents. The redbook's unit for the two EdChoice programmes, and not the
+        /// unit it uses for the other three in the same passage.
+        Fte,
+        /// Scholarships awarded — an award count, not a student count. A student holding one for
+        /// part of a year is one scholarship and a fraction of an FTE.
+        Scholarships,
+        /// Kindergarteners only. The expansion's first year was one grade wide.
+        Kindergarten,
+        /// Grades K-5 only, which is how wide the expansion had grown by FY2019.
+        K5,
+        /// Every chartered nonpublic school in the state rather than the participating ones — the
+        /// only denominator here that makes a count a denominator for other counts.
+        Operating,
+        /// The publisher gave none. Every dollar total and every average is here: a total has no
+        /// denominator, and an average conceals one.
+        Unstated,
+    }
+
+    impl Denominator {
+        /// The fixture's own spelling.
+        fn from(cell: &str) -> Option<Self> {
+            match cell {
+                "applications" => Some(Self::Applications),
+                "paid" => Some(Self::Paid),
+                "students" => Some(Self::Students),
+                "fte" => Some(Self::Fte),
+                "scholarships" => Some(Self::Scholarships),
+                "kindergarten" => Some(Self::Kindergarten),
+                "k5" => Some(Self::K5),
+                "operating" => Some(Self::Operating),
+                "unstated" => Some(Self::Unstated),
+                _ => None,
+            }
+        }
+
+        /// Whether this is one of the two measures [`super::history`] publishes.
+        ///
+        /// The archive is the series a bound would be appended to, so a bound naming one of its
+        /// denominators is the one that could be spliced without a reader noticing.
+        #[must_use]
+        pub fn is_the_archives(self) -> bool {
+            matches!(self, Self::Applications | Self::Paid)
+        }
+    }
+
+    /// The publisher's own hedge, which is not a statement about rounding.
+    ///
+    /// [`Self::Exact`] means the sentence carries no hedge word — "totaling $405.3 million". That
+    /// figure is still rounded to a tenth of a million; what it is not is qualified.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+    pub enum Precision {
+        /// Stated without qualification.
+        Exact,
+        /// "About" or "approximately" — the same hedge in two words.
+        About,
+        /// "An estimated average", or a forward estimate in a table.
+        Estimated,
+        /// "Over" — one-sided, and the only precision here that constrains in a single direction.
+        Over,
+    }
+
+    impl Precision {
+        /// The fixture's own spelling.
+        fn from(cell: &str) -> Option<Self> {
+            match cell {
+                "exact" => Some(Self::Exact),
+                "about" => Some(Self::About),
+                "estimated" => Some(Self::Estimated),
+                "over" => Some(Self::Over),
+                _ => None,
+            }
+        }
+
+        /// Whether the publisher qualified the figure.
+        #[must_use]
+        pub fn is_hedged(self) -> bool {
+            self != Self::Exact
+        }
+    }
+
+    /// One quantity, as one document states it.
+    #[derive(Debug, Clone, PartialEq)]
+    pub struct Bound {
+        /// The programme slug, shared with the other two fixtures where both hold the programme.
+        ///
+        /// Three values name no single programme: `edchoice-combined`, for a school count LSC
+        /// gives for the traditional and income-based programmes together; `nonpublic-sector`, for
+        /// the state's whole chartered nonpublic sector; and `channel`, for the five programmes
+        /// summed.
+        pub program: String,
+        /// The fiscal year the publisher dates it to.
+        pub year: FiscalYear,
+        /// What it counts.
+        pub measure: Measure,
+        /// The figure in whole units — dollars for [`Measure::Payments`] and the two averages,
+        /// people or institutions otherwise.
+        pub value: f64,
+        /// The population it is over.
+        pub denominator: Denominator,
+        /// The publisher's hedge.
+        pub precision: Precision,
+        /// The committed extract it was read from, which [`source_text`] resolves.
+        pub source: String,
+        /// The publisher's own words, verbatim with line breaks collapsed.
+        pub quote: String,
+    }
+
+    impl Bound {
+        /// Which committed series this bound could be appended to without a reader noticing — and
+        /// `None` for every row in the fixture, which is the point of having it.
+        ///
+        /// A bound is dangerous exactly when it *looks like* an observation on a series that
+        /// already exists: the same denominator, no hedge, and a year the series reaches or is one
+        /// short of. The test asserts this is `None` throughout, so a later extraction that adds a
+        /// genuinely spliceable row fails the gate and forces the question instead of answering it
+        /// by arriving.
+        ///
+        /// Deliberately not the whole argument against splicing — the module's third reason is a
+        /// property of pairs of rows and no per-row predicate can express it.
+        #[must_use]
+        pub fn spliceable(&self) -> Option<&'static str> {
+            let archive = super::history::span();
+            if self.denominator.is_the_archives() && self.year.0 <= archive.end() + 1 {
+                return Some("the archive, whose own denominator it names");
+            }
+            if self.measure == Measure::Participation
+                && self.denominator == Denominator::Students
+                && !self.precision.is_hedged()
+                && self.year.0 + 1 >= super::report::FISCAL_YEAR
+            {
+                return Some("the annual report, whose year and denominator it shares unhedged");
+            }
+            None
+        }
+
+        /// Whether the archive covers this bound's year, so the two can be held against each other.
+        #[must_use]
+        pub fn inside_the_archive(&self) -> bool {
+            super::history::span().contains(&self.year.0)
+        }
+    }
+
+    /// Every row of the census, in the fixture's order — by fiscal year, then programme, then
+    /// measure.
+    ///
+    /// # Panics
+    ///
+    /// If the fixture's header is not the one this was written against, or if a row names a
+    /// measure, denominator or precision this module does not know — each of which means the
+    /// extraction changed shape.
+    #[must_use]
+    pub fn census() -> Vec<Bound> {
+        edfund_core::csv::delimited(FIXTURE, EXPECTED_HEADER, DELIMITER)
+            .map(|row| Bound {
+                program: row.str(0).to_string(),
+                year: FiscalYear(row.num(1).expect("every row names a fiscal year") as u16),
+                measure: Measure::from(row.str(2)).expect("the fixture names a known measure"),
+                value: row.num(3).expect("every row carries a figure"),
+                denominator: Denominator::from(row.str(4))
+                    .expect("the fixture names a known denominator"),
+                precision: Precision::from(row.str(5))
+                    .expect("the fixture names a known precision"),
+                source: row.str(6).to_string(),
+                quote: row.str(7).to_string(),
+            })
+            .collect()
+    }
+
+    /// One programme's bounds on one measure, oldest first.
+    #[must_use]
+    pub fn of(program: &str, measure: Measure) -> Vec<Bound> {
+        let mut found: Vec<Bound> = census()
+            .into_iter()
+            .filter(|b| b.program == program && b.measure == measure)
+            .collect();
+        found.sort_by_key(|b| b.year.0);
+        found
+    }
+
+    /// The committed extract a `source` names, whitespace collapsed, for checking a quote against.
+    ///
+    /// The budget analyses of the enacted acts live inside one extract and are addressed by the
+    /// record header [`crate::greenbook`] reads; the two FY2026-27 documents are extracts of their
+    /// own, and `dew-redbook-table-5` names a table inside one of them rather than a second
+    /// document.
+    ///
+    /// # Panics
+    ///
+    /// On a `source` naming no committed document, which means the fixture cites something this
+    /// workspace does not hold.
+    #[must_use]
+    pub fn source_text(source: &str) -> String {
+        match source {
+            "dew-redbook" | "dew-redbook-table-5" => {
+                flatten(crate::ledger::budget_analysis::REDBOOK)
+            }
+            "dew-greenbook" => flatten(crate::ledger::budget_analysis::GREENBOOK),
+            record => crate::greenbook::greenbooks()
+                .into_iter()
+                .find(|g| g.id == record)
+                .unwrap_or_else(|| panic!("no committed budget analysis is named {record}"))
+                .flat(),
+        }
+    }
+
+    /// Line breaks collapsed, which is what a quotation out of a PDF must be checked against.
+    fn flatten(text: &str) -> String {
+        text.split_whitespace().collect::<Vec<_>>().join(" ")
     }
 }
 

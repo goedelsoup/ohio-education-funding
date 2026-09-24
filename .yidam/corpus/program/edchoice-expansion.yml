@@ -26,8 +26,10 @@ description: |
 
   **There are no income bands.** The award is a continuous function of family income, and both
   sections that compute it have been in the committed statute extract since it was wired — see the
-  findings. Participation counts by resident district and total appropriation by fiscal period are
-  still not held. [open]
+  findings. Participation counts by resident district are still not held. [open] Payments **by
+  fiscal period** now have a bound rather than a blank, but not an appropriation: the executive
+  proposal allocates no amount to any individual scholarship programme, so a figure for this
+  programme by fiscal year is LSC's estimate and nothing states the appropriation. [verified]
 findings: |
   **Two advocacy scorecards rank Ohio on this program, and neither measures what this corpus
   measures.** ALEC's [Index of State Education
@@ -110,6 +112,31 @@ findings: |
   Any one of three columns would close this and none is held: participation split by grade band,
   the report's published maximum award per programme, or the income distribution of recipients.
   The report links a per-district breakdown and the route returns 404. [open]
+
+  **Payments by fiscal period are bounded, and the bound is an estimate rather than an
+  appropriation.** Table 5 of LSC's FY2026-27 redbook estimates this programme's payments at
+  $475.4 million in FY2025, $521.2 million in FY2026 and **$563.5 million** in FY2027 — the largest
+  of the five programmes in every year, and 45% of the channel's estimated **$1,251.1 million** in
+  FY2027. [verified] (crates/project, `the_points_that_bound_the_participation_hole`) Two things
+  stop that from answering the appropriation question this node had open. The redbook says in terms
+  that the proposal "does not allocate specific amounts to each scholarship program", so the table
+  is LSC's arithmetic over a lump sum and not a schedule anybody enacted; and the table does not
+  quite close on itself — its FY2025 column sums $0.1 million short of its own printed total, and
+  its FY2025 estimate for the traditional programme, $292.7 million, sits *above* the $283.1 million
+  the annual report went on to report actually spent. [verified] So an appropriation by programme
+  and fiscal period is not a figure any committed document states, which is what the open item in
+  the description now says rather than that nothing is held.
+
+  **The channel's participation is bounded the same way and by figures that do not share a
+  denominator.** The redbook puts about 87,000 **FTE** students on this programme in FY2024 against
+  the annual report's 100,939 **students** in 2024-25; LSC's FY2014 figure is 992 kindergarteners,
+  the only grade the expansion then covered, and its FY2019 figure is over 10,800 in grades K-5.
+  [verified] Four figures, four populations, and none of them is the count this node wants. The
+  whole census of such points — sixty-four of them across eight budget analyses, with the reasons
+  not one can be joined to either committed series — is
+  [`scholarship-bounds.tsv`](../../../crates/project/fixtures/scholarship-bounds.tsv), asserted by
+  [`crates/project`](../../../crates/project/tests/the_points_that_bound_the_participation_hole.rs).
+  [verified]
 figures:
   - key: project/edchoice-full-award-ceiling
     value: 4.5
@@ -143,6 +170,14 @@ figures:
     value: 4.95751
     field: findings
     as_written: "**4.95751** times the federal poverty\n  guidelines"
+  - key: project/expansion-estimated-payments-fy2027
+    value: 563500000.0
+    field: findings
+    as_written: "**$563.5 million** in FY2027"
+  - key: project/scholarship-channel-estimated-payments-fy2027
+    value: 1251100000.0
+    field: findings
+    as_written: "the channel's estimated **$1,251.1 million** in\n  FY2027"
 properties:
   name: EdChoice Expansion Scholarship
   mechanism: |
