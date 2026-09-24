@@ -2200,6 +2200,13 @@ pub struct Inputs {
     pub community_school_segments: Vec<dispersion::community_school_funding::Segment>,
     /// Total state support across those 355 schools, which is what the supplement is a share of.
     pub community_school_state_support: f64,
+    /// The same block for FY2025, the other year of the rate schedule with a department model
+    /// behind it. Held to verify a rate rather than to be differenced against FY2027 — the two
+    /// years are two apart over a population that opened and closed schools in between.
+    pub community_school_equity_fy2025: dispersion::community_school_funding::EquityCost,
+    /// FY2025's 343 schools split site-based, e-school and STEM, which is how many schools the
+    /// $650 was actually paid to.
+    pub community_school_segments_fy2025: Vec<dispersion::community_school_funding::Segment>,
     /// Who belongs to each career-technical planning district, FY2025.
     ///
     /// The third population outside the 609-district panel in this manifest, and the only one
@@ -3194,15 +3201,27 @@ impl Inputs {
             at_recognized,
             at_total_taxable,
             quartiles: dispersion::national_peers::ohio_by_local_wealth(),
-            community_school_equity: dispersion::community_school_funding::equity_cost(),
-            community_school_segments: dispersion::community_school_funding::segments(),
+            community_school_equity: dispersion::community_school_funding::equity_cost(
+                dispersion::community_school_funding::Vintage::CURRENT,
+            ),
+            community_school_segments: dispersion::community_school_funding::segments(
+                dispersion::community_school_funding::Vintage::CURRENT,
+            ),
             ctpd: dispersion::ctpd_membership::outside_the_panel(),
             jvsd: dispersion::jvsd_funding::districts(),
             jvsd_item_7: dispersion::jvsd_funding::item_7_incidence(
                 dispersion::jvsd_funding::FIRST_ITEM_7_YEAR,
             ),
             community_school_state_support:
-                dispersion::community_school_funding::total_state_support(),
+                dispersion::community_school_funding::total_state_support(
+                    dispersion::community_school_funding::Vintage::CURRENT,
+                ),
+            community_school_equity_fy2025: dispersion::community_school_funding::equity_cost(
+                dispersion::community_school_funding::Vintage::Fy2025,
+            ),
+            community_school_segments_fy2025: dispersion::community_school_funding::segments(
+                dispersion::community_school_funding::Vintage::Fy2025,
+            ),
             states: dispersion::census_states::states(),
             profile: dispersion::profile::districts(),
             sd1: dispersion::sd1::rows(),
@@ -7627,6 +7646,53 @@ pub static FIGURES: &[Figure] = &[
         pinned: 0.02292,
         tolerance: 0.0005,
         compute: |i| i.community_school_equity.enacted / i.community_school_state_support,
+    },
+    // The other year of the rate schedule with a model behind it. FY2025 is here to verify a
+    // parameter, not to be differenced against FY2027 — see `Vintage` for why differencing the
+    // two measures four changes at once.
+    Figure {
+        key: "dispersion/community-school-equity-supplement-fy2025-total",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Community school equity supplement paid in the department\u{2019}s archived FY2025 \
+                model, at the $650 H.B. 33 set",
+        pinned: 54_846_889.80,
+        tolerance: 1.0,
+        compute: |i| i.community_school_equity_fy2025.enacted,
+    },
+    Figure {
+        key: "dispersion/community-school-equity-supplement-fy2025-recipients",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Site-based community schools paid the equity supplement in FY2025, of 343 \
+                community and STEM schools the department modelled that year",
+        pinned: 317.0,
+        tolerance: 0.0,
+        compute: |i| {
+            let paid = i
+                .community_school_segments_fy2025
+                .iter()
+                .filter(|segment| segment.equity_supplement > 0.0)
+                .map(|segment| segment.schools)
+                .sum::<usize>();
+            f64::from(u32::try_from(paid).unwrap_or(u32::MAX))
+        },
+    },
+    Figure {
+        key: "dispersion/community-school-equity-supplement-verified-rate-years",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Years of the equity supplement\u{2019}s three-year rate schedule verified against \
+                a department funding model, the third resting on the act alone and permanently so",
+        pinned: 2.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let verified = dispersion::community_school_funding::EQUITY_RATES
+                .iter()
+                .filter(|rate| rate.verified_against_a_model)
+                .count();
+            f64::from(u32::try_from(verified).unwrap_or(u32::MAX))
+        },
     },
     // The joint vocational districts, from six years of the department's payment reports. The
     // second population in this manifest outside the 609-district panel, and the only one the

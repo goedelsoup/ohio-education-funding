@@ -29,18 +29,37 @@
 //! department's model pays the eight STEM schools nothing. The corpus reads the *enacted* rule,
 //! and `connect::fixtures::community_schools` fails the rebuild if a future file departs from it.
 //!
-//! # The rate is a schedule, and only one year of it has a model behind it
+//! # The rate is a schedule, and the middle year of it will never have a model behind it
 //!
-//! [`EQUITY_RATES`] is three years and two authorities. FY2027's $400 is verified against this
-//! workbook, which states the rate in a header cell and pays every recipient that rate times its
-//! enrolled ADM to the cent. FY2026's $500 and FY2025's $650 come from the enacted act and the
-//! greenbook, which state all three in one sentence each; no department model for either year has
-//! been retrieved. [`EquityRate::verified_against_a_model`] is the difference, and it is carried
-//! as data rather than as a footnote because the three numbers are otherwise indistinguishable.
+//! [`EQUITY_RATES`] is three years and two authorities. FY2027's $400 and FY2025's $650 are each
+//! verified against the department's own model for that year: both workbooks write the formula
+//! out — `Equity Supplement [a*$400]`, `[a*$650]` — and pay every recipient that rate times its
+//! enrolled ADM to the cent, on 324 schools and on 317.
+//!
+//! **FY2026's $500 is read off the act and stays that way.** Not "not yet sought": the department
+//! publishes one community school calculator at a time and replaces it in place, and the FY2026
+//! edition was replaced before any archive took a copy. The Internet Archive holds exactly two of
+//! these workbooks across the whole `State-Funding-For-Schools` tree — FY2019 and FY2025 — the
+//! archived captures of the community school page link no calculator in any month of 2025, and
+//! the FY2027 workbook, which carries the previous year's sheet as a hidden leftover, states no
+//! $500 anywhere in it. The department's FY2026 actuals are published, but as school totals with
+//! no line breakout, so they cannot separate this line out either. A reader should stop looking.
+//!
+//! [`EquityRate::verified_against_a_model`] carries that distinction as data rather than as a
+//! footnote, because $650, $500 and $400 are otherwise indistinguishable in a list.
+//!
+//! # Two vintages, and what the second one is for
+//!
+//! [`Vintage`] is FY2025 and FY2027, and everything that reads schools takes one. They are not a
+//! series: two years two apart, over a population that opened and closed schools between them,
+//! under a formula whose phase-in moved from 0.6667 to 1 and which gained a line in between. The
+//! FY2025 model is held to verify a rate, and the FY2027 model is what the corpus's figures are
+//! computed from. A caller differencing them is measuring four changes at once.
 
 use std::collections::BTreeMap;
 
-const FIXTURE: &str = include_str!("../fixtures/fy27-community-school-funding.csv");
+const FY27_FIXTURE: &str = include_str!("../fixtures/fy27-community-school-funding.csv");
+const FY25_FIXTURE: &str = include_str!("../fixtures/fy25-community-school-funding.csv");
 
 const EXPECTED_HEADER: &str = "irn,school,county,designation,enrolled_adm,base_cost,\
     special_education,dpia,english_learners,career_technical,core_foundation_funding,\
@@ -50,8 +69,47 @@ const EXPECTED_HEADER: &str = "irn,school,county,designation,enrolled_adm,base_c
 /// How many columns a row of the extract has.
 const WIDTH: usize = 17;
 
-/// The fiscal year the extract models. A projection: FY2027 has not happened.
-pub const FISCAL_YEAR: u16 = 2027;
+/// The fiscal year the corpus's community school figures come from. A projection: FY2027 has not
+/// happened.
+pub const FISCAL_YEAR: u16 = Vintage::CURRENT.fiscal_year();
+
+/// Which year's model a reader is asking for.
+///
+/// Two, and they are not a series — see the module note. The department publishes one of these a
+/// year and replaces the previous one in place, so which years exist here is a fact about what
+/// was archived rather than about what was published.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum Vintage {
+    /// FY2025, the last year of the $650 rate H.B. 33 set. From the Internet Archive.
+    Fy2025,
+    /// FY2027, at $400. What the corpus's figures are computed from.
+    Fy2027,
+}
+
+impl Vintage {
+    /// The year the corpus's headline community school figures come from.
+    pub const CURRENT: Self = Self::Fy2027;
+
+    /// Both, oldest first.
+    pub const ALL: [Self; 2] = [Self::Fy2025, Self::Fy2027];
+
+    /// The fiscal year it models.
+    #[must_use]
+    pub const fn fiscal_year(self) -> u16 {
+        match self {
+            Self::Fy2025 => 2025,
+            Self::Fy2027 => 2027,
+        }
+    }
+
+    /// The committed extract.
+    const fn fixture(self) -> &'static str {
+        match self {
+            Self::Fy2025 => FY25_FIXTURE,
+            Self::Fy2027 => FY27_FIXTURE,
+        }
+    }
+}
 
 /// What kind of school the department is funding, which decides whether it is paid the supplement.
 ///
@@ -115,8 +173,9 @@ pub struct EquityRate {
     /// Whether a department funding model for that year has been retrieved and checked against
     /// this rate, as opposed to the rate being read off the act.
     ///
-    /// Only FY2027 is. The distinction is carried rather than noted because $650, $500 and $400
-    /// look equally solid in a list and are not equally solid.
+    /// FY2025 and FY2027 are; FY2026 is not and will not be — see the module note for what was
+    /// searched. The distinction is carried rather than noted because $650, $500 and $400 look
+    /// equally solid in a list and are not equally solid.
     pub verified_against_a_model: bool,
 }
 
@@ -126,11 +185,15 @@ pub struct EquityRate {
 /// and cut it to $500 then $400. FY2024 is not listed: this corpus has retrieved no source
 /// stating that year's payments, and the greenbook sentence the other three come from names
 /// FY2025 as its baseline.
+///
+/// Two of the three are verified against the department's own model for the year. The middle one
+/// is not and cannot be: the FY2026 calculator was replaced in place before any archive copied
+/// it. That is a closed question, not an open one.
 pub const EQUITY_RATES: [EquityRate; 3] = [
     EquityRate {
         fiscal_year: 2025,
         per_pupil: 650.0,
-        verified_against_a_model: false,
+        verified_against_a_model: true,
     },
     EquityRate {
         fiscal_year: 2026,
@@ -153,7 +216,7 @@ pub fn equity_rate(fiscal_year: u16) -> Option<f64> {
         .map(|rate| rate.per_pupil)
 }
 
-/// One school as the department's FY2027 model funds it.
+/// One school as the department's model for a [`Vintage`] funds it.
 ///
 /// Every money field is dollars for the year. There is no local share and no state share
 /// percentage: both would be constants.
@@ -188,7 +251,12 @@ pub struct School {
     /// The formula transition supplement, against an FY2021 base. Eight schools receive it.
     pub formula_transition_supplement: f64,
     /// The base funding supplement, $40 a pupil — paid to **all** 355, e-schools included.
-    pub base_funding_supplement: f64,
+    ///
+    /// `None` in FY2025, where the line did not exist: H.B. 96 created it. Not zero, because a
+    /// school paid nothing and a payment that had not been legislated are different facts, and
+    /// only the second is true of that year. A caller summing this across vintages has to say
+    /// which it means.
+    pub base_funding_supplement: Option<f64>,
     /// Facilities funding.
     pub facilities: f64,
     /// Total state support: everything above, as the department totals it.
@@ -210,7 +278,7 @@ impl School {
     }
 }
 
-/// Every school in the department's FY2027 model.
+/// Every school in the department's model for `vintage`.
 ///
 /// # Panics
 ///
@@ -218,8 +286,8 @@ impl School {
 /// or a designation is outside the department's three — each of which means the extract is not
 /// the file this reader expects.
 #[must_use]
-pub fn schools() -> Vec<School> {
-    let mut lines = FIXTURE.lines();
+pub fn schools(vintage: Vintage) -> Vec<School> {
+    let mut lines = vintage.fixture().lines();
     let header = lines.next().unwrap_or_default().trim();
     assert_eq!(
         header, EXPECTED_HEADER,
@@ -235,6 +303,9 @@ pub fn schools() -> Vec<School> {
                 "the community school funding fixture is uniform-width; this row is not: {line}"
             );
             let dollars = |index: usize| cells[index].trim().parse::<f64>().unwrap_or(0.0);
+            // An empty cell is a line the year did not have. Every other column is present in
+            // both vintages, so this distinction is only ever drawn where it is true.
+            let optional = |index: usize| cells[index].trim().parse::<f64>().ok();
             School {
                 irn: cells[0].trim().to_string(),
                 name: cells[1].trim().to_string(),
@@ -255,7 +326,7 @@ pub fn schools() -> Vec<School> {
                 transportation: dollars(11),
                 equity_supplement: dollars(12),
                 formula_transition_supplement: dollars(13),
-                base_funding_supplement: dollars(14),
+                base_funding_supplement: optional(14),
                 facilities: dollars(15),
                 total_state_support: dollars(16),
             }
@@ -265,8 +336,8 @@ pub fn schools() -> Vec<School> {
 
 /// The model, by IRN. School names are not unique; IRNs are.
 #[must_use]
-pub fn by_irn() -> BTreeMap<String, School> {
-    schools()
+pub fn by_irn(vintage: Vintage) -> BTreeMap<String, School> {
+    schools(vintage)
         .into_iter()
         .map(|school| (school.irn.clone(), school))
         .collect()
@@ -274,8 +345,8 @@ pub fn by_irn() -> BTreeMap<String, School> {
 
 /// The schools the supplement is actually paid to.
 #[must_use]
-pub fn recipients() -> Vec<School> {
-    schools()
+pub fn recipients(vintage: Vintage) -> Vec<School> {
+    schools(vintage)
         .into_iter()
         .filter(|school| school.equity_supplement > 0.0)
         .collect()
@@ -288,9 +359,13 @@ pub fn recipients() -> Vec<School> {
 /// multiplying a total ADM by a rate would skip.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct EquityCost {
-    /// What the department's model pays: the enacted rule at the enacted FY2027 rate.
+    /// What the department's model pays: the enacted rule at that year's enacted rate.
     pub enacted: f64,
     /// The same recipients at the $650 H.B. 33 set, which H.B. 96 cut.
+    ///
+    /// In FY2025 this equals [`Self::enacted`], because $650 *is* that year's rate. That equality
+    /// is not a degenerate case to be skipped over: it is the check that the rate H.B. 33 set is
+    /// the rate the department paid, computed over 317 schools one at a time.
     pub at_the_former_rate: f64,
     /// What extending eligibility to STEM schools would add at the enacted rate — the change the
     /// redbook attributes to the executive proposal and the act did not make.
@@ -300,17 +375,17 @@ pub struct EquityCost {
     pub extending_to_e_schools: f64,
 }
 
-/// The supplement's cost in FY2027, with the two rules it was measured against.
+/// The supplement's cost in one vintage, with the two rules it was measured against.
 #[must_use]
-pub fn equity_cost() -> EquityCost {
-    let all = schools();
+pub fn equity_cost(vintage: Vintage) -> EquityCost {
+    let all = schools(vintage);
     let paid = |designation: Designation, rate: f64| -> f64 {
         all.iter()
             .filter(|school| school.designation == designation)
             .map(|school| school.enrolled_adm * rate)
             .sum()
     };
-    let enacted_rate = equity_rate(FISCAL_YEAR).unwrap_or_default();
+    let enacted_rate = equity_rate(vintage.fiscal_year()).unwrap_or_default();
     let former_rate = equity_rate(2025).unwrap_or_default();
     EquityCost {
         enacted: all.iter().map(|school| school.equity_supplement).sum(),
@@ -337,8 +412,8 @@ pub struct Segment {
 
 /// The model split the way the supplement splits it.
 #[must_use]
-pub fn segments() -> Vec<Segment> {
-    let all = schools();
+pub fn segments(vintage: Vintage) -> Vec<Segment> {
+    let all = schools(vintage);
     Designation::ALL
         .iter()
         .map(|designation| {
@@ -359,18 +434,18 @@ pub fn segments() -> Vec<Segment> {
 
 /// Total state support across every school in the model.
 #[must_use]
-pub fn total_state_support() -> f64 {
-    schools().iter().map(|s| s.total_state_support).sum()
+pub fn total_state_support(vintage: Vintage) -> f64 {
+    schools(vintage).iter().map(|s| s.total_state_support).sum()
 }
 
 /// The supplement as a share of what the state pays these schools altogether.
 #[must_use]
-pub fn equity_share_of_state_support() -> f64 {
-    let total = total_state_support();
+pub fn equity_share_of_state_support(vintage: Vintage) -> f64 {
+    let total = total_state_support(vintage);
     if total == 0.0 {
         return 0.0;
     }
-    equity_cost().enacted / total
+    equity_cost(vintage).enacted / total
 }
 
 #[cfg(test)]
@@ -380,97 +455,124 @@ mod tests {
     /// A cent, for the equalities the department's own arithmetic makes exact.
     const CENT: f64 = 0.01;
 
+    /// What each vintage models, as a population. Not a series: schools opened and closed in
+    /// between, so the two counts are two facts rather than a trend.
+    const POPULATIONS: [(Vintage, usize, usize, usize, usize); 2] = [
+        (Vintage::Fy2025, 343, 317, 18, 8),
+        (Vintage::Fy2027, 355, 324, 23, 8),
+    ];
+
+    fn segment(vintage: Vintage, designation: Designation) -> Segment {
+        *segments(vintage)
+            .iter()
+            .find(|s| s.designation == designation)
+            .expect("every designation is a segment")
+    }
+
     #[test]
     fn every_school_the_department_models_is_read() {
-        let all = schools();
-        assert_eq!(all.len(), 355, "the FY2027 simulator models 355 schools");
-        assert_eq!(
-            by_irn().len(),
-            all.len(),
-            "and each of them once, keyed on an IRN that is unique where the name is not"
-        );
-        assert!(
-            !all.iter().any(|s| s.name.contains("State of Ohio")),
-            "the department's aggregate row is not a school"
-        );
-    }
-
-    #[test]
-    fn the_supplement_is_paid_to_the_site_based_schools_and_to_nobody_else() {
-        for school in schools() {
-            if school.designation.receives_equity_supplement() {
-                assert!(
-                    school.equity_supplement > 0.0,
-                    "{} is site-based and paid nothing",
-                    school.irn
-                );
-            } else {
-                assert_eq!(
-                    school.equity_supplement,
-                    0.0,
-                    "{} is {} and was paid {}",
-                    school.irn,
-                    school.designation.label(),
-                    school.equity_supplement
-                );
-            }
-        }
-        assert_eq!(recipients().len(), 324);
-    }
-
-    #[test]
-    fn the_thirty_one_that_are_not_paid_are_the_e_schools_and_the_stem_schools() {
-        // The finding the redbook contradicts. Both counts, because "not paid" is 31 schools and
-        // the interesting half of it is the 8.
-        let segments = segments();
-        let find = |designation: Designation| {
-            *segments
-                .iter()
-                .find(|s| s.designation == designation)
-                .expect("every designation is a segment")
-        };
-        let (site, e_school, stem) = (
-            find(Designation::SiteBased),
-            find(Designation::ESchool),
-            find(Designation::Stem),
-        );
-        assert_eq!((site.schools, e_school.schools, stem.schools), (324, 23, 8));
-        assert_eq!(e_school.equity_supplement, 0.0);
-        assert_eq!(stem.equity_supplement, 0.0);
-        assert!(
-            stem.enrolled_adm > 4_500.0,
-            "and they are not paid nothing because they are empty: {} ADM",
-            stem.enrolled_adm
-        );
-    }
-
-    #[test]
-    fn every_recipient_is_paid_the_published_rate_times_its_enrolled_adm() {
-        // The same identity the extractor enforces against the workbook, held here against the
-        // committed file — so a fixture edited by hand fails as loudly as a reposted workbook.
-        let rate = equity_rate(FISCAL_YEAR).expect("FY2027 has a rate");
-        for school in recipients() {
+        for (vintage, total, ..) in POPULATIONS {
+            let all = schools(vintage);
+            assert_eq!(all.len(), total, "{vintage:?} models {total} schools");
+            assert_eq!(
+                by_irn(vintage).len(),
+                all.len(),
+                "and each of them once, keyed on an IRN that is unique where the name is not"
+            );
             assert!(
-                (school.equity_supplement - school.enrolled_adm * rate).abs() <= CENT,
-                "{} is paid {} against {} ADM at {rate}",
-                school.irn,
-                school.equity_supplement,
-                school.enrolled_adm
+                !all.iter().any(|s| s.name.contains("State of Ohio")),
+                "the department's aggregate row is not a school"
             );
         }
     }
 
     #[test]
-    fn only_the_year_with_a_model_behind_it_claims_to_have_one() {
+    fn the_supplement_is_paid_to_the_site_based_schools_and_to_nobody_else() {
+        for (vintage, _, site_based, ..) in POPULATIONS {
+            for school in schools(vintage) {
+                if school.designation.receives_equity_supplement() {
+                    assert!(
+                        school.equity_supplement > 0.0,
+                        "{} is site-based and paid nothing in {vintage:?}",
+                        school.irn
+                    );
+                } else {
+                    assert_eq!(
+                        school.equity_supplement,
+                        0.0,
+                        "{} is {} and was paid {} in {vintage:?}",
+                        school.irn,
+                        school.designation.label(),
+                        school.equity_supplement
+                    );
+                }
+            }
+            assert_eq!(recipients(vintage).len(), site_based);
+        }
+    }
+
+    #[test]
+    fn the_schools_that_are_not_paid_are_the_e_schools_and_the_stem_schools_in_both_years() {
+        // The finding the redbook contradicts, held twice. Two years apart, under two rates, and
+        // across a $150 cut: the eligibility rule is the one thing about this line that did not
+        // move, which is what makes "the cut is the rate, not the population" a measurement
+        // rather than a reading of one file.
+        for (vintage, _, site, e, stem) in POPULATIONS {
+            let (site_based, e_school, stem_school) = (
+                segment(vintage, Designation::SiteBased),
+                segment(vintage, Designation::ESchool),
+                segment(vintage, Designation::Stem),
+            );
+            assert_eq!(
+                (site_based.schools, e_school.schools, stem_school.schools),
+                (site, e, stem),
+                "{vintage:?}"
+            );
+            assert_eq!(e_school.equity_supplement, 0.0, "{vintage:?}");
+            assert_eq!(stem_school.equity_supplement, 0.0, "{vintage:?}");
+            assert!(
+                stem_school.enrolled_adm > 2_000.0,
+                "and they are not paid nothing because they are empty: {} ADM in {vintage:?}",
+                stem_school.enrolled_adm
+            );
+        }
+    }
+
+    #[test]
+    fn every_recipient_is_paid_the_published_rate_times_its_enrolled_adm() {
+        // The same identity the extractor enforces against the workbook, held here against the
+        // committed files — so a fixture edited by hand fails as loudly as a reposted workbook.
+        for vintage in Vintage::ALL {
+            let year = vintage.fiscal_year();
+            let rate = equity_rate(year).expect("both vintages are years with a rate");
+            for school in recipients(vintage) {
+                assert!(
+                    (school.equity_supplement - school.enrolled_adm * rate).abs() <= CENT,
+                    "{} is paid {} against {} ADM at {rate} in FY{year}",
+                    school.irn,
+                    school.equity_supplement,
+                    school.enrolled_adm
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn the_two_years_with_a_model_behind_them_are_the_two_that_claim_one() {
+        // FY2026 is the gap and it is a permanent one. The department publishes one of these
+        // calculators at a time and replaces it in place; the FY2026 edition was replaced before
+        // any archive took a copy, and its rate is the one number in this schedule that no
+        // retrievable departmental document states per school.
         let verified: Vec<u16> = EQUITY_RATES
             .iter()
             .filter(|rate| rate.verified_against_a_model)
             .map(|rate| rate.fiscal_year)
             .collect();
+        assert_eq!(verified, [2025, 2027]);
         assert_eq!(
             verified,
-            [FISCAL_YEAR],
-            "FY2026 and FY2025 are read off the act; no department model for either is held"
+            Vintage::ALL.map(Vintage::fiscal_year).to_vec(),
+            "a year claims a model exactly when a vintage of it is held"
         );
         assert_eq!(equity_rate(2027), Some(400.0));
         assert_eq!(equity_rate(2026), Some(500.0));
@@ -479,11 +581,31 @@ mod tests {
     }
 
     #[test]
+    fn the_fy2025_model_is_what_verifies_the_rate_h_b_33_set() {
+        // $650 was carried from the act's own sentence until this file was retrieved. The
+        // department's FY2025 workbook pays it school by school, so the counterfactual at $650
+        // and the enacted cost are the same number — and that identity is the verification.
+        let cost = equity_cost(Vintage::Fy2025);
+        // To the rounding and no closer: `enacted` sums 317 payments the extract stores in cents,
+        // and `at_the_former_rate` multiplies each unrounded ADM by $650. Half a cent a school is
+        // $1.59, so a dollar and a half is the tolerance the comparison actually has.
+        assert!(
+            (cost.enacted - cost.at_the_former_rate).abs() <= 1.59,
+            "FY2025's enacted rate is the $650 rate: {cost:?}"
+        );
+        assert!(
+            (cost.enacted - 54_846_889.80).abs() <= 1.0,
+            "and the department's own statewide total: {}",
+            cost.enacted
+        );
+    }
+
+    #[test]
     fn a_counterfactual_applies_the_eligibility_rule_before_the_rate() {
         // `supplement_at` is not a multiplication. An e-school's ADM times a rate is a number the
         // statute does not produce, and the guard is the difference between a counterfactual and
         // a claim.
-        let all = by_irn();
+        let all = by_irn(Vintage::CURRENT);
         let e_school = all
             .values()
             .find(|s| s.designation == Designation::ESchool)
@@ -503,7 +625,7 @@ mod tests {
         // The redbook estimates $58.0m a year for the executive proposal, which kept $650 and
         // added STEM schools. The act cut the rate and did not add them. Both halves are
         // computable from this one file, and the rate is much the larger.
-        let cost = equity_cost();
+        let cost = equity_cost(Vintage::CURRENT);
         assert!((cost.enacted - 34_650_906.27).abs() <= CENT, "{cost:?}");
 
         let from_the_rate = cost.at_the_former_rate - cost.enacted;
@@ -524,25 +646,38 @@ mod tests {
 
     #[test]
     fn the_supplement_is_a_small_share_of_what_these_schools_are_paid() {
-        let share = equity_share_of_state_support();
+        let share = equity_share_of_state_support(Vintage::CURRENT);
         assert!(
             (0.0228..0.0231).contains(&share),
             "2.29% of total state support: {share}"
         );
-        assert!((total_state_support() - 1_511_789_771.13).abs() <= 1.0);
+        assert!((total_state_support(Vintage::CURRENT) - 1_511_789_771.13).abs() <= 1.0);
     }
 
     #[test]
     fn the_base_funding_supplement_is_paid_to_everyone_which_the_equity_supplement_is_not() {
         // The contrast that stops "STEM schools are funded differently" becoming a general
         // property of the file. Two per-pupil lines, one eligibility rule between them.
-        for school in schools() {
+        for school in schools(Vintage::Fy2027) {
             assert!(
-                school.base_funding_supplement > 0.0,
+                school.base_funding_supplement.unwrap_or_default() > 0.0,
                 "{} is {} and receives no base funding supplement",
                 school.irn,
                 school.designation.label()
             );
         }
+    }
+
+    #[test]
+    fn a_line_the_year_did_not_have_reads_as_absent_rather_than_as_zero() {
+        // H.B. 96 created the base funding supplement. FY2025 has no such column, and `None` is
+        // what says so — a zero would be the department having computed the line and paid
+        // nothing, which is the claim a reader summing the column would come away with.
+        assert!(schools(Vintage::Fy2025)
+            .iter()
+            .all(|school| school.base_funding_supplement.is_none()));
+        assert!(schools(Vintage::Fy2027)
+            .iter()
+            .all(|school| school.base_funding_supplement.is_some()));
     }
 }

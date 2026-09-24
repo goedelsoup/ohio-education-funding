@@ -89,10 +89,18 @@ structure-lock password; it does not impede reading.
   so the state share is 100% and the valuation, income and capacity columns the district model
   turns on are absent by construction rather than unpublished.
 
-- **One year, and the FY2026 sibling has not been sought.** The rate schedule the act sets is
-  $650 in FY2025, $500 in FY2026 and $400 in FY2027; only the last is verified against a
-  department model here. The other two are carried from the enacted act and the greenbook, which
-  state all three in one sentence each.
+- **Two of the schedule's three years have a model, and the third never will.** The rate
+  schedule the act sets is $650 in FY2025, $500 in FY2026 and $400 in FY2027. This file verifies
+  the last; the FY2025 sibling, archived whole, verifies the first — see
+  [`dew-fy25-community-school-calculator`](dew-fy25-community-school-calculator.md). **FY2026 has
+  no model and is not pending one.** The department publishes one community school calculator at
+  a time and replaces it in place, and the FY2026 edition was replaced before any crawler took a
+  copy: the Internet Archive holds exactly **two** of these workbooks across the whole
+  `State-Funding-For-Schools` tree, FY2019 and FY2025, and the archived captures of the community
+  school page itself link no calculator in any month of 2025. This workbook's own hidden leftover
+  sheet from the prior year states no $500 either, and the department's FY2026 actuals are school
+  totals with no line breakout. So FY2026's $500 rests on the enacted act and the greenbook,
+  permanently. Nothing here implies a retrieval someone could go and make.
 
 ## Used by
 

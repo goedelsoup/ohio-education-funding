@@ -21,10 +21,10 @@ context: |
   **And this repository has a recorded lesson about exactly that.**
   `the-capital-channel-has-no-second-publisher` states it: *a Wayback 200 on a portal proves the
   crawler stored a shell, not that it captured anything.* That lesson is not theoretical here.
-  Every archived copy of the **FY2025** calculator — two capture dates, two filenames, four
-  URLs — is exactly **1,048,576 bytes**, truncated at one mebibyte mid-stream, and fails a zip
-  integrity check. The archive holds a file that is the right name, the right content type and
-  the wrong length, and answers 200 for all of it.
+  Every archived copy of the **FY2025 traditional** calculator — two capture dates, two
+  filenames, four URLs — is exactly **1,048,576 bytes**, truncated at one mebibyte mid-stream,
+  and fails a zip integrity check. The archive holds a file that is the right name, the right
+  content type and the wrong length, and answers 200 for all of it.
 
   So the question is not whether to trust the Internet Archive. It is whether a retrieved file
   can be shown to be the publisher's, by something better than the status code that has already
@@ -60,12 +60,39 @@ decision: |
 
   **What is not approved.** Not a general licence to prefer the archive. A live publisher URL is
   used wherever one exists, and `verify` continues to check the live sources against their
-  digests. Not the FY2025 calculator, which is unrecoverable and stays that way in the record —
-  the catalog entry names its length so a later reader does not spend the afternoon this one
-  cost. And not backfilling FY2022 to FY2024, which the archive does not hold at all.
+  digests. Not the FY2025 **traditional** calculator, which is unrecoverable and stays that way
+  in the record — the catalog entry names its length so a later reader does not spend the
+  afternoon this one cost. And not backfilling FY2022 to FY2024, which the archive does not hold
+  at all.
 
   A note on what this does and does not close. It gives the rate series a **second** year, not a
   series. Two observations cannot separate a fuel response from anything else, and the two rates
   move in opposite directions across them — the per-rider up 4.88% and the per-mile down 2.73%
   against a 17.5% rise in diesel between the cost years they are drawn from. What the second
   year buys is the ability to say that, which the corpus could not say at all with one.
+amendment: |
+  **A second file clears the same three conditions, and it is a FY2025 file.** `fy25-cs-calculator`
+  is the FY2025 **community and STEM school** simulator, archived whole on 22 February 2025 at
+  1,347,923 bytes, and it is registered under `dew-foundation` on exactly the rule above.
+
+  It is worth being explicit that this does not reverse the "what is not approved" line, because
+  the two files share a fiscal year and nothing else. The one that stays unrecoverable is the
+  FY2025 **traditional district** calculator, whose every capture is truncated at a mebibyte. The
+  one admitted here is a different workbook, from a different page of the department's site, and
+  the archive happens to hold it intact. The distinction is the crawler's, not the rule's — which
+  is the point of writing the conditions down rather than deciding file by file.
+
+  The third condition is met in the same shape as `fy26-calculator`'s and with the same builder
+  discipline: the workbook writes its own formula out as `Equity Supplement [a*$650]`, and the
+  extractor recomputes every row against it. All **317 site-based schools** pay $650 times
+  enrolled ADM with zero mismatches; the **18 e-schools and 8 STEM schools** pay exactly zero; the
+  two sheets that compute the line independently agree on all 343 schools; and the department's
+  own statewide row, **$54,846,889.86**, is the sum of the rows beneath it. A truncated or
+  substituted file fails all four.
+
+  What it buys the corpus is one parameter, not a series: the FY2025 equity supplement rate now
+  has a department model behind it rather than the act alone. The middle year does not, and the
+  registry is the wrong place to look for it — FY2026's $500 was never published as a
+  community-school model the archive could hold. The corpus node
+  `formula-component/fsfp-community-school-equity-supplement` records that as closed rather than
+  pending.

@@ -33,6 +33,30 @@ pub(super) const FOUNDATION: Connector = Connector {
                    through its cached formula results.",
         },
         Source {
+            key: "fy25-cs-calculator",
+            title: Some("FY25 Community/STEM School State Foundation Funding Simulator"),
+            // The FY2025 sibling of `fy27-cs-calculator`, from the Internet Archive because the
+            // department replaced it in place. Unlike the FY2025 *traditional* calculator, whose
+            // captures are truncated at a megabyte, this one was archived whole and reproduces
+            // the department's own arithmetic; see `decisions/an-archived-source-is-still-a-source`.
+            url: "https://web.archive.org/web/20250222101322id_/\
+                  https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
+                  School-Payment-Reports/State-Funding-For-Schools/\
+                  Community-School-Funding/\
+                  FY25-CS-State-Foundation-Funding-Calculator-3-7-2024-1.xlsx.aspx?lang=en-US",
+            filename: "fy25-cs-calculator.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-fy25-community-school-calculator"),
+            fixtures: &[crate::fixtures::FY25_COMMUNITY_SCHOOL_FUNDING_FIXTURE],
+            note: "The year H.B. 33 set the equity supplement at $650, read from the \
+                   department's own model rather than from the act alone. Same two data sheets \
+                   as the FY2027 sibling and the same identity to check against — rate times \
+                   enrolled ADM for site-based schools, zero for e-schools and STEM schools — \
+                   over a different column layout and a designation column that spells STEM \
+                   `S` rather than `STEM`. It carries no base funding supplement: that line \
+                   did not exist in FY2025.",
+        },
+        Source {
             key: "fy27-cs-calculator",
             title: Some("FY27 Community/STEM School State Foundation Funding Simulator"),
             url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
