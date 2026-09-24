@@ -2086,21 +2086,28 @@ pub(super) const SCHOLARSHIP_REPORTS: Connector = Connector {
     status: Status::Wired {
         still_blocked: Some(
             "wired for everything the department publishes openly about this channel: the \
-             current statewide aggregates, the archived participation series FY1997-FY2013, \
-             and per-building eligibility for the current designated list. Two holes are \
-             left, and they are different in kind. Per-district *participation* is still a \
-             file nobody has fetched — the annual report cites two routes for it on the \
-             department's reports portal, which answers every path with the same application \
-             shell and serves its reports as Power BI embeds behind an entitlement its \
-             anonymous token does not carry, so the breakdown is referenced by a current \
-             departmental document, has not been found, and was never shown to be taken \
-             down; see `dew-payment-reports` for the deduct-era half of that gap. And the \
-             archived series stops at FY2013 while the annual report starts at 2024-25, so \
-             FY2014 through FY2023 has no participation series \
-             — LSC's greenbooks quote rounded counts for FY2014, FY2018 and FY2019 and \
-             nothing else, which bounds that hole rather than filling it. The designated \
-             list is current-edition-only: the four prior filenames its pattern implies all \
-             404",
+             current statewide aggregates, the archived participation series FY1997-FY2013, and \
+             per-building eligibility for three editions of the designated list. Two holes are \
+             left, and they are different in kind. Per-district *participation* is still a file \
+             nobody has fetched — the annual report cites two routes for it on the department's \
+             reports portal, which answers every path with the same application shell and \
+             serves its reports as Power BI embeds behind an entitlement its anonymous token \
+             does not carry, so the breakdown is referenced by a current departmental document, \
+             has not been found, and was never shown to be taken down; see \
+             `dew-payment-reports` for the deduct-era half of that gap. And the archived \
+             series stops at \
+             FY2013 while the annual report starts at 2024-25, so FY2014 through FY2023 has no \
+             participation series — LSC's greenbooks quote rounded counts for FY2014, FY2018 \
+             and FY2019 and nothing else, which bounds that hole rather than filling it. Nor is \
+             there an earlier annual report to widen it with: the Annual Reports page and its \
+             whole capture history carry exactly one consolidated scholarship edition, and what \
+             precedes 2024-25 is a per-programme lineage — Jon Peterson board reports from \
+             FY2016 and an Ohio ACE report — which does not cover the five programmes together. \
+             The designated list is current-edition-only at the department: the EdChoice \
+             Resources page carries one edition at a time and deletes the last, so 2023-2024, \
+             2024-2025 and 2025-2026 all return this host's genuine 404. Two of those three are \
+             held from the Internet Archive; 2023-2024 is linked from captures of the page and \
+             was never itself crawled, so a fourth edition is named and not retrievable",
         ),
     },
     note: "The department's own public account of the scholarship channel. It answers how \
@@ -2158,8 +2165,54 @@ pub(super) const SCHOLARSHIP_REPORTS: Connector = Connector {
                    public substitute for the `nonpublic-data-historical-ed-choice-designated-list` \
                    portal route this project has not reached — eligibility rather than \
                    participation, so it answers a different question and answers it per \
-                   district. Only this edition is at this URL: the four prior filenames \
-                   the pattern implies all return the host's genuine 404.",
+                   district. The current edition, and the only one the department serves: \
+                   the EdChoice Resources page lists one list at a time and its predecessors \
+                   are gone from the host under their real names, which the two sources below \
+                   carry from the archive instead.",
+        },
+        Source {
+            key: "edchoice-designated-2526",
+            title: Some("EdChoice Designated List 2025-2026, with Criteria"),
+            // The department's own file, from the Internet Archive because the EdChoice
+            // Resources page lists one edition at a time and deletes the last. Its live name
+            // spells `with` in lower case — the 2026-2027 edition is the one that capitalizes
+            // it — and returns the host's genuine 1,245-byte 404 under either spelling; see
+            // `decisions/an-archived-source-is-still-a-source`.
+            url: "https://web.archive.org/web/20250309082659id_/\
+                  https://education.ohio.gov/getattachment/Topics/Other-Resources/Scholarships/\
+                  EdChoice-Scholarship/EdChoice-Resources/\
+                  Designated-List-2025-2026-with-Criteria.xlsx.aspx?lang=en-US",
+            filename: "edchoice-designated-2526.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-edchoice-designated-list"),
+            fixtures: &[crate::fixtures::EDCHOICE_DESIGNATED_2526_FIXTURE],
+            note: "The edition before the held one, and the first pair from which eligibility \
+                   can be read as a *change* rather than a snapshot. Same twenty columns one \
+                   year back, over 2,906 buildings and 494 designations. It proves it is the \
+                   department's the way the archived calculators do: the designation rebuilds \
+                   from its own criteria columns in all 2,906 rows, the unstated open-building \
+                   condition included.",
+        },
+        Source {
+            key: "edchoice-designated-2425",
+            title: Some("EdChoice Designated List 2024-2025, with Criteria"),
+            // Archived a year earlier, and the oldest edition the archive holds as a file. The
+            // 2023-2024 edition is linked from captures of the page and was never itself
+            // crawled, so a fourth edition is named and not retrievable.
+            url: "https://web.archive.org/web/20240928123347id_/\
+                  https://education.ohio.gov/getattachment/Topics/Other-Resources/Scholarships/\
+                  EdChoice-Scholarship/EdChoice-Resources/\
+                  Designated-List-2024-2025-with-Criteria.xlsx.aspx?lang=en-US",
+            filename: "edchoice-designated-2425.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-edchoice-designated-list"),
+            fixtures: &[crate::fixtures::EDCHOICE_DESIGNATED_2425_FIXTURE],
+            note: "Nineteen columns, not twenty, and the difference is the finding: this \
+                   edition ranks **two** Performance Index years and its own heading says so. \
+                   R.C. 3310.03(A)(1)(a) asks for the bottom twenty per cent in two of the \
+                   three most recent rankings, and in 2024-2025 the department had two \
+                   rankings to apply it to. 2,937 buildings and 460 designations, rebuilding \
+                   from their own criteria in every row.",
         },
     ],
 };

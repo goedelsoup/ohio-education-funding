@@ -803,26 +803,47 @@ fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     );
 
-    // Who may claim a traditional EdChoice scholarship for 2026-2027, per building. The
-    // `Overview` sheet alone: the workbook's six other sheets are the criteria's own inputs —
-    // three years of building Performance Index rankings and three of district Title I formula
-    // counts — and the Overview carries the flags those produce, which is what an eligibility
-    // question asks for.
-    out.push(
-        match (|| -> Result<Vec<Vec<String>>, String> {
-            let book = open_workbook(root, registered("edchoice-designated-2627"))
-                .map_err(|e| e.to_string())?;
-            fixtures::build_designated(&book.rows("Overview").map_err(|e| e.to_string())?)
-        })() {
-            Ok(rows) => csv_fixture(
-                root,
-                fixtures::EDCHOICE_DESIGNATED_FIXTURE,
-                fixtures::DESIGNATED_HEADER,
-                &rows,
-            )?,
-            Err(cause) => Rebuilt::skipped(fixtures::EDCHOICE_DESIGNATED_FIXTURE, cause),
-        },
-    );
+    // Who may claim a traditional EdChoice scholarship, per building, for each of the three
+    // editions this repository holds. The `Overview` sheet alone: a workbook's other sheets are
+    // the criteria's own inputs — building Performance Index rankings and district Title I
+    // formula counts — and the Overview carries the flags those produce, which is what an
+    // eligibility question asks for.
+    //
+    // One fixture per edition, and each read against its own headings. The department publishes
+    // one edition at a time and deletes the last, so the three do not share a layout: the Title
+    // I vintages move every year and 2024-2025 ranks two Performance Index years where the
+    // others rank three. Reading each against its own edition is what makes a heading change an
+    // error rather than a column silently taken from the wrong year.
+    for (source, edition, fixture) in [
+        (
+            "edchoice-designated-2627",
+            &fixtures::DESIGNATED_2627,
+            fixtures::EDCHOICE_DESIGNATED_FIXTURE,
+        ),
+        (
+            "edchoice-designated-2526",
+            &fixtures::DESIGNATED_2526,
+            fixtures::EDCHOICE_DESIGNATED_2526_FIXTURE,
+        ),
+        (
+            "edchoice-designated-2425",
+            &fixtures::DESIGNATED_2425,
+            fixtures::EDCHOICE_DESIGNATED_2425_FIXTURE,
+        ),
+    ] {
+        out.push(
+            match (|| -> Result<Vec<Vec<String>>, String> {
+                let book = open_workbook(root, registered(source)).map_err(|e| e.to_string())?;
+                fixtures::build_designated(
+                    edition,
+                    &book.rows("Overview").map_err(|e| e.to_string())?,
+                )
+            })() {
+                Ok(rows) => csv_fixture(root, fixture, edition.header, &rows)?,
+                Err(cause) => Rebuilt::skipped(fixture, cause),
+            },
+        );
+    }
 
     // The criteria's own inputs, out of the same workbook and beside the flags they produce.
     // Three years of building Performance Index rankings and three of district Title I formula
