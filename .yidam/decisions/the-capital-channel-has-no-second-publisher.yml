@@ -65,6 +65,33 @@ consequences: |
   survey leaves live — Controlling Board releases itemise project by project and are the natural
   home for exactly this, and finding where they are published is the next thing to try.
 
+  > **RESOLVED by [#254](https://github.com/goedelsoup/ohio-education-funding/issues/254), and it
+  > closes the thread rather than advancing it.** `controllingboard.ohio.gov` never existed.
+  > `dig` returns NXDOMAIN for the apex and for `www`, `curl` exits 6 — "couldn't resolve host" —
+  > on both schemes, and the Internet Archive holds zero captures of the domain, ever. The
+  > hostname above was a guess made while writing this paragraph, and it read as a lead because it
+  > was plausible rather than because anything pointed at it.
+  >
+  > The board publishes under `obm.ohio.gov` — `/areas-of-interest/controlling-board/`, and its
+  > agendas and minutes beneath that — which is the host named three paragraphs above as answering
+  > with an identical 5,278-byte 404. It answers both of those real paths with exactly that 404,
+  > byte for byte what it returns for a path invented to be absent. The board is not a second
+  > publisher; it is the same wall.
+  >
+  > The archive holds the portal and not the documents, for the second time on the same platform.
+  > 323 distinct URLs are captured under `obm.ohio.gov/areas-of-interest/controlling-board`, every
+  > one of them HTML: IBM WebSphere Portal's `!ut/p/` state-token shell with its Angular and its
+  > stylesheets. Not one `.pdf`, `.xlsx` or `.doc` among them. That is the trap recorded above for
+  > `ofcc.ohio.gov/data.json`, reproduced exactly.
+  >
+  > So the capital channel's two remaining routes are not independent, and the paragraph below
+  > that calls the Auditor the *second* live thread is counting one too many. OFCC and the
+  > Controlling Board are different bodies with different statutory roles, and they sit behind one
+  > filter on one portal platform. "Try the other publisher" is therefore not a strategy here,
+  > because the publishers share the infrastructure that is the blocker. What is left is
+  > institutional — a records request, or a publisher that serves a self-identifying agent, which
+  > so far means `ohioauditor.gov` and its own domain.
+
   The Auditor is the second live thread and a better-founded one than when #11 named it: it is
   already a wired publisher here, and it answers this project's agent. What its district audits carry
   is the district's own capital spending rather than the state's contribution to it, so it is a
