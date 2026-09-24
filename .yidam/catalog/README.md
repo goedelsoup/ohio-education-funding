@@ -46,6 +46,7 @@ Sorted by: type, then slug.
 | [`dew-fy27-funding-calculator`](dew-fy27-funding-calculator.md) | FY27 TRAD State Foundation Funding Calculator | 28 |
 | [`dew-jvsd-foundation-payments`](dew-jvsd-foundation-payments.md) | JVSD Foundation Payment Reports, FY2022–FY2027 | 2 |
 | [`dew-mr81-enrollment-archive`](dew-mr81-enrollment-archive.md) | MR-81 free and reduced-price lunch reports, 1998–2025 | 1 |
+| [`dew-nonpublic-enrollment`](dew-nonpublic-enrollment.md) | Chartered nonpublic enrollment by building, 1977–2025 | 1 |
 | [`dew-october-enrollment`](dew-october-enrollment.md) | October headcount by grade | 2 |
 | [`dew-report-card-achievement`](dew-report-card-achievement.md) | Ohio School Report Cards — District Achievement Download | 4 |
 | [`dew-report-card-district-details`](dew-report-card-district-details.md) | Ohio School Report Cards — District Details | 1 |
@@ -78,7 +79,7 @@ Sorted by: type, then slug.
 | [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 21 |
 | [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 3 |
 
-55 entries, 1 not yet cited by any corpus node. 390 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+56 entries, 1 not yet cited by any corpus node. 413 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

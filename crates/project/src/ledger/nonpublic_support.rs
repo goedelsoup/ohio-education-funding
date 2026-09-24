@@ -23,7 +23,13 @@
 //! average daily membership in grades kindergarten through twelve in chartered nonpublic schools
 //! "as determined as of the last day of October of each school year". A reader who cites 3317.06
 //! for the allocation is citing the wrong section, which is why [`series`] is documented against
-//! the appropriation and [`per_pupil`] is documented against its denominator.
+//! the appropriation and [`per_pupil`] against its denominator.
+//!
+//! That denominator is now held. [`super::nonpublic_enrolment`] reads the department's own October
+//! count, 1977 through 2025, and [`auxiliary_rate_fy2025`] divides by it and comes out at
+//! **$913.10** against the **$913** both LSC editions publish. For most of this module's life the
+//! quotient was a bound computed on a landscape sheet a year early; what changed is the source,
+//! not the arithmetic.
 //!
 //! **There are two payment routes and the line title implies one.** R.C. 3317.024(E)(1) pays the
 //! school district the nonpublic school sits in; (E)(2) pays the chartered nonpublic school
@@ -70,6 +76,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use deflator::CpiSeries;
 use edfund_core::FiscalYear;
 
+use super::nonpublic_enrolment;
+
 /// GRF ALI `200511`, Auxiliary Services.
 ///
 /// Spent under R.C. 3317.06 and 3317.062, allocated under R.C. 3317.024(E)(2)(d), and paid either
@@ -107,9 +115,9 @@ pub const LAST_TRANSFER_YEAR: u16 = 2013;
 /// What LSC publishes as the FY2025 auxiliary services rate: **$913 per pupil**.
 ///
 /// Stated identically by the redbook ("is $913 per pupil") and the greenbook ("was $913 per
-/// pupil"), so it is not a forecast that was later corrected. This module does not reproduce it
-/// — see [`per_pupil`] and [`implied_membership`] for why, which is a question about the
-/// denominator rather than about the rate.
+/// pupil"), so it is not a forecast that was later corrected. [`auxiliary_rate_fy2025`]
+/// reproduces it to ten cents, and what it took was the right denominator rather than a
+/// different arithmetic — see [`implied_membership`] for how far off the old one was.
 pub const PUBLISHED_AUXILIARY_RATE_FY2025: f64 = 913.0;
 
 /// What the FY2025 appropriation for [`ADMINISTRATIVE_COST_REIMBURSEMENT`] permitted: **$440 per
@@ -425,11 +433,16 @@ pub fn restatable_cells() -> (usize, usize) {
 
 /// Chartered nonpublic enrolment as the department's own landscape sheet counts it.
 ///
-/// **173,156**, and the vintage is the whole caveat: the sheet is *Ohio's Education Landscape
-/// 2023-2024*, so this is the 2023-24 school year over the 711 chartered nonpublic schools it
-/// counts. The FY2025 appropriation was divided by a FY2025 October membership over a larger
-/// population — LSC's redbook counts 747 chartered nonpublic schools and its greenbook 725 — so
-/// every quotient [`per_pupil`] returns is an **upper bound** on the rate the department paid.
+/// **173,156** in 711 chartered nonpublic schools, for 2023-24 — and what this is now for is the
+/// cross-publisher check rather than the quotient. The department's October file for the same
+/// school year publishes the same two numbers exactly: 173,156 pupils over 711 buildings. Two
+/// publications of one department, produced by different offices from different sheets, agreeing
+/// on a count to the pupil.
+///
+/// It was the denominator until [`super::nonpublic_enrolment`] existed, and it was the wrong one
+/// — a year early, since FY2025's quotient divides by October 2024. The redbook's 747 and the
+/// greenbook's 725 schools are not a contradiction either: they are later Octobers of the same
+/// series, which runs 711 in October 2023, 722 in October 2024 and 749 in October 2025.
 ///
 /// # Panics
 ///
@@ -446,25 +459,61 @@ pub fn chartered_nonpublic_enrolment() -> f64 {
 /// The published vintage of [`chartered_nonpublic_enrolment`], for prose that has to say so.
 pub const ENROLMENT_VINTAGE: &str = "2023-2024";
 
-/// What a line is worth per chartered nonpublic pupil in `fiscal_year`, on
-/// [`chartered_nonpublic_enrolment`].
+/// What a line is worth per chartered nonpublic pupil in `fiscal_year`.
 ///
-/// R.C. 3317.024(E)(2)(d) really does divide, so this is the right *shape* of computation and the
-/// wrong denominator — see [`chartered_nonpublic_enrolment`] and [`implied_membership`]. It is
-/// published as a bound rather than as a rate for that reason, and the corpus records the October
-/// average daily membership the statute names as unheld.
+/// The newest figure that answers for the year, over the October membership the statute names —
+/// [`super::nonpublic_enrolment::membership`], which reads the department's own count. `None`
+/// where the catalog does not carry the line for that year, and `None` where the department has
+/// not counted that October yet: FY2027 divides by October 2026.
+///
+/// This is the *whole* line over the membership, which for [`AUXILIARY_SERVICES`] is not the rate
+/// anybody is paid — part of the line is earmarked away from the quotient before it is taken.
+/// [`auxiliary_rate_fy2025`] is what comes out when that part is removed, and it is the figure
+/// that matches what LSC publishes.
 #[must_use]
 pub fn per_pupil(ali: &str, fiscal_year: u16) -> Option<f64> {
     let claim = latest(ali, fiscal_year)?;
-    Some(claim.amount? / chartered_nonpublic_enrolment())
+    Some(claim.amount? / nonpublic_enrolment::membership(fiscal_year)?)
+}
+
+/// The FY2025 auxiliary services rate, reproduced: **$913.10**.
+///
+/// The probe that closes, and three readings had to be right at once for it to.
+///
+/// **The numerator is net of the earmark.** R.C. 3317.024(E)(2)(d) divides "the total amount
+/// appropriated for the implementation of sections 3317.06 and 3317.062", and
+/// [`COLLEGE_CREDIT_PLUS_FY2025`] is money inside ALI 200511 implementing neither. $166,816,769
+/// less $2,739,015 is $164,077,754.
+///
+/// **The denominator is the October of the school year, not of the fiscal year's name.** FY2025 is
+/// the 2024-25 school year, so the count is October 2024's.
+///
+/// **And it is in-state only.** The department publishes the two separately: 179,693 pupils living
+/// in Ohio and 1,478 living outside it. Over the first the quotient is $913.10; over all 181,171
+/// it is $905.65. LSC publishes $913, in both editions, so the in-state reading is the department's
+/// and the whole-total reading is not.
+///
+/// The vintage of the numerator does not decide it. On the 2024 edition's adjusted appropriation
+/// of $166,853,000 rather than the 2025 edition's actual, the same quotient is $913.30 — still
+/// $913 to the dollar LSC states it at.
+///
+/// `None` only if the catalog stops carrying FY2025 or the extract stops carrying October 2024.
+#[must_use]
+pub fn auxiliary_rate_fy2025() -> Option<f64> {
+    let appropriated = latest(AUXILIARY_SERVICES, 2025)?.amount?;
+    Some((appropriated - COLLEGE_CREDIT_PLUS_FY2025) / nonpublic_enrolment::membership(2025)?)
 }
 
 /// The membership a published per-pupil rate implies, given what was appropriated.
 ///
-/// The inverse of [`per_pupil`], and the instrument that says how far the fixture's denominator
-/// is from the statutory one. On FY2025 it answers two different numbers from the two published
-/// rates — see `the_two_rates_do_not_share_a_denominator` — which is a fact about the two
-/// mechanisms rather than about either figure.
+/// The inverse of [`per_pupil`], and now a check on the denominator rather than a substitute for
+/// it: inverting the published $913 on the line net of its earmark wants 179,712.76 pupils, and
+/// the department counted 179,693 in October 2024 — a gap of twenty pupils in a hundred and eighty
+/// thousand, which is what rounding a rate to the dollar costs.
+///
+/// On FY2025 it answers two different numbers from the two published rates — see
+/// `the_two_published_rates_do_not_share_a_denominator` — which is a fact about the two mechanisms
+/// rather than about either figure.
 #[must_use]
 pub fn implied_membership(appropriated: f64, rate: f64) -> Option<f64> {
     (rate > 0.0).then_some(appropriated / rate)

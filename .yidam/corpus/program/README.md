@@ -41,12 +41,16 @@ See the class definition: [program.ont.yml](../program.ont.yml).
 
 Every scholarship programme the department runs has a node, the channel is totalled from the
 2025 annual report, and the two largest non-scholarship nonpublic lines now have nodes of their
-own. What the class does not hold:
+own. The October membership R.C. 3317.024(E)(2)(d) divides by, which this list used to call
+missing, is held: forty-nine Octobers of it, and the auxiliary services rate reproduces on the
+one the statute names. What the class does not hold:
 
-- **No October average daily membership in chartered nonpublic schools.** It is the denominator
-  R.C. 3317.024(E)(2)(d) divides by, and no source this project retrieves publishes it — so every
-  per-pupil auxiliary services figure here is an upper bound computed on the landscape sheet's
-  2023-24 enrolment rather than the rate. [open]
+- **No district of location for a chartered nonpublic school.** R.C. 3317.024(E)(1) pays the
+  district a nonpublic school sits in, so the resident-side incidence of auxiliary services is a
+  district question. The department's October enrolment files carry an IRN, and before 2007 a
+  county and a school type, and no district column in any of the six layouts they have used; a
+  join on name is not available either, since October 2023's 711 schools carry 601 distinct names
+  between them. [open]
 - **No split between the district route and the direct route.** R.C. 3317.024(E)(2) makes it a
   per-school election and neither LSC edition reports the result, so how much of auxiliary
   services passes through districts is not held. [open]

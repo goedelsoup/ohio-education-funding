@@ -2689,3 +2689,419 @@ pub(super) const SCHOOL_IMPROVEMENT: Connector = Connector {
         },
     ],
 };
+
+pub(super) const NONPUBLIC_ENROLLMENT: Connector = Connector {
+    key: "dew-nonpublic-enrollment",
+    publisher: "Ohio Department of Education and Workforce, Office of Data Quality",
+    feeds: &["school", "metric", "program"],
+    status: Status::Wired {
+        still_blocked: Some(
+            "wired for every October the department publishes, 1977 through 2025, at the \
+             building and at the sector. What it cannot reach is the district each building \
+             sits in. Auxiliary services under R.C. 3317.06 flows to a nonpublic school \
+             through the district its building is located in, so a per-district question \
+             about the nonpublic sector needs that column; no file in any of the three eras \
+             carries it, the Chartered Nonpublic School Information page publishes no \
+             directory, and `edchoice-designated` is public buildings only. County and \
+             school type are published for 1977-78 through 2006-07 and then stop, so even \
+             the coarser geography is gone for the modern years",
+        ),
+    },
+    note: "Forty-nine Octobers of chartered nonpublic enrolment by building — the denominator \
+           of R.C. 3317.024(E)(2)(d) and the only long series of the sector Ohio has. The \
+           repository had held one year of it, from a fact sheet. Every count below ten is \
+           masked, so every quantity built from these files is a floor, a ceiling and a \
+           censored-cell count rather than a point.",
+    sources: &[
+        Source {
+            key: "nonpublic-1977-1978",
+            title: Some("Nonpublic enrollment, 1977-78 and 1978-79"),
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/1978-1979-Nonpublic.xls.aspx",
+            filename: "1978-1979-Nonpublic.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "The start of the series, and the two years where the grade block and the \
+                   race block disagree most. Each compilation is named for the school years \
+                   its sheets *end* in, so this one begins at 1977-78. Both sheets carry a \
+                   `State Total` row that is an Excel sum over cells the masking had already \
+                   overwritten: it reads 243,489 for a sector of at least 260,867.",
+        },
+        Source {
+            key: "nonpublic-1979-1988",
+            title: Some("Nonpublic enrollment, 1979-80 through 1988-89"),
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/1980-1989-Nonpublic.xls.aspx",
+            filename: "1980-1989-Nonpublic.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "Ten sheets, one a school year, and the decade the two blocks converge \
+                   across: schools reporting race and leaving every grade cell zero stop \
+                   after 1982-83, and from 1983-84 the blocks agree on every building with \
+                   no masked cell in either.",
+        },
+        Source {
+            key: "nonpublic-1989-1998",
+            title: Some("Nonpublic enrollment, 1989-90 through 1998-99"),
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/1990-1999-Nonpublic.xls.aspx",
+            filename: "1990-1999-Nonpublic.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "The sector's modern peak sits in here: 1996-97 floors at 218,542 and the \
+                   building count rises every year of the decade. These are the years the \
+                   scholarship participation series (FY1997 onward) can finally be read \
+                   against a denominator rather than against itself.",
+        },
+        Source {
+            key: "nonpublic-1999-2007",
+            title: Some("Nonpublic enrollment, 1999-00 through 2007-08"),
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/2000-2008-NonPublic.xls.aspx",
+            filename: "2000-2008-NonPublic.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "Both layout breaks are inside this one file. 2001-02 inserts a `Total` \
+                   column ahead of the race block and shifts it one to the right; the five \
+                   sheets from 2002-03 are named `… ethnic data unavailable` and carry no \
+                   race block at all, after which the grade block is the only measure there \
+                   is. The last sheet, 2007-08, is already the modern one-row-per-grade \
+                   layout — the break happens mid-compilation.",
+        },
+        Source {
+            key: "nonpublic-2008",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/\
+                  oct_08_fy09_adm_web_nonpub.xls.aspx",
+            filename: "oct_08_fy09_adm_web_nonpub.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "October 2008, the first annual file, and 798 buildings — the largest the \
+                   sector is in this series. Its building sheet is named `Oct09_adm_nonpub` \
+                   for an October the file does not hold, which is why the year is declared \
+                   in the file table and never read off a sheet name.",
+        },
+        Source {
+            key: "nonpublic-2009",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/nonpub_FY2010_totals.xls.aspx",
+            filename: "nonpub_FY2010_totals.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "The one October published as building totals and nothing else: IRN, name, \
+                   one number, 787 schools. No grade detail and no sex split, so this year \
+                   contributes a bound per building and no grade-level anything.",
+        },
+        Source {
+            key: "nonpublic-2010",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/web_nonpub_2011.xls.aspx",
+            filename: "web_nonpub_2011.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "October 2010. One sheet, named `2010_11` — the only two years whose \
+                   sheet name states the school year the way the compilations do.",
+        },
+        Source {
+            key: "nonpublic-2011",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/web_nonpub_2012.xls.aspx",
+            filename: "web_nonpub_2012.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "October 2011, on the sheet `2011_12`. The last file with no notes sheet \
+                   and no state total of any kind.",
+        },
+        Source {
+            key: "nonpublic-2012",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/\
+                  Nonpub_FY2013-Data.xlsx.aspx?lang=en-US",
+            filename: "Nonpub_FY2013-Data.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "October 2012, and the one file in the series published in the post-2007 \
+                   format. Its data is on `Sheet1` beside two empty sheets the publisher \
+                   never deleted.",
+        },
+        Source {
+            key: "nonpublic-2013",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/nonpub.xls.aspx",
+            filename: "nonpub.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "October 2013, published under a filename with no year in it at all. The \
+                   2014-2019 compilation states 174,108 in-state for this October against a \
+                   building floor well below it, and the two are reconciled nowhere.",
+        },
+        Source {
+            key: "nonpublic-2014",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/nonpub2015.xls.aspx",
+            filename: "nonpub2015.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "October 2014, and the last annual file with no state-totals sheet. Grade \
+                   codes change inside this year: `Kindergarten` and `1st Grade` through \
+                   here, `KG` and `01` from the next file on.",
+        },
+        Source {
+            key: "nonpublic-2015",
+            title: Some("Revised FY2016 nonpublic enrollment"),
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/Revised-FY16-nonpub.xls.aspx",
+            filename: "Revised-FY16-nonpub.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "October 2015, the first file to carry a state-totals sheet — and the one \
+                   whose state-totals sheet is wrong. It reads 144,512, below its own \
+                   building rows' floor of 147,309, so it cannot be a total of them; the \
+                   2014-2019 compilation's 171,395 is the figure for this October. The \
+                   building sheet itself is sound, and is the sheet the next year's file \
+                   reposts.",
+        },
+        Source {
+            key: "nonpublic-2016",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/nonpub_fy17.xls.aspx",
+            filename: "nonpub_fy17.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "October 2016's state totals over October 2015's buildings. The building \
+                   sheet is `Revised-FY16-nonpub.xls`'s: 5,883 keyed cells are in both and \
+                   not one of them differs, and against the compilation's per-school totals \
+                   it agrees exactly with FY2016 on 86 unmasked schools and with no other \
+                   year on more than six. Only the state-totals sheet is read from this \
+                   file; the building rows are `RepostedFrom` and dropped.",
+        },
+        Source {
+            key: "nonpublic-2017",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/nonpub_fy18.xls.aspx?lang=en-US",
+            filename: "nonpub_fy18.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "October 2017, and the one year where the annual file and the 2014-2019 \
+                   compilation reconcile exactly: 167,558 in-state plus 1,533 out-of-state \
+                   is the compilation's 169,091 total.",
+        },
+        Source {
+            key: "nonpublic-2018",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/nonpub_fy19.xls.aspx?lang=en-US",
+            filename: "nonpub_fy19.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "October 2018, and the last October two publications describe. They \
+                   disagree: 165,346 on this file's own totals sheet against 165,511 in the \
+                   compilation, which is neither that figure nor the compilation's total. \
+                   Both rows are kept, distinguished by basis.",
+        },
+        Source {
+            key: "nonpublic-2019",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/nonpub_fy20.xls.aspx?lang=en-US",
+            filename: "nonpub_fy20.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "October 2019, the last October before the pandemic and the last with a \
+                   compilation to check it against. The totals sheet is named \
+                   `FY20 Nonpub Counts`; from the next file the name becomes \
+                   `fyNN_nonpub_state`.",
+        },
+        Source {
+            key: "nonpublic-2020",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/nonpub_fy21.xls.aspx?lang=en-US",
+            filename: "nonpub_fy21.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "October 2020 — the pandemic October, and the one whose reading needs most \
+                   care, since the sector's count moved for reasons the file does not record.",
+        },
+        Source {
+            key: "nonpublic-2021",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/nonpub_fy22.xls.aspx?lang=en-US",
+            filename: "nonpub_fy22.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "October 2021, the October before universal EdChoice eligibility was \
+                   enacted and so the sector's last pre-expansion count.",
+        },
+        Source {
+            key: "nonpublic-2022",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/nonpub_fy23.xls.aspx?lang=en-US",
+            filename: "nonpub_fy23.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "October 2022.",
+        },
+        Source {
+            key: "nonpublic-2023",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/nonpub_fy24.xls.aspx?lang=en-US",
+            filename: "nonpub_fy24.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "October 2023, and the cross-publisher pin. Its state-totals sheet gives \
+                   86,232 male and 85,598 female in state and 742 and 584 out of it — \
+                   173,156 in all — and its building sheet carries 711 distinct IRNs. Both \
+                   are exactly what the 2023-24 Education Landscape fact sheet states, from \
+                   a different office and a different publication. The totals sheet is named \
+                   `fy23_nonpub_state` inside a file named for FY2024.",
+        },
+        Source {
+            key: "nonpublic-2024",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/nonpub_fy25.xls.aspx?lang=en-US",
+            filename: "nonpub_fy25.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "October 2024, which is the October R.C. 3317.024(E)(2)(d) divides the \
+                   FY2025 auxiliary services appropriation by: 179,693 in state across 722 \
+                   buildings. $164,077,754 over that is $913.10, and LSC publishes $913. \
+                   Out-of-state pupils included it would be $906, so the statutory \
+                   denominator is the in-state count.",
+        },
+        Source {
+            key: "nonpublic-2025",
+            title: None,
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/nonpub_fy26.xls.aspx?lang=en-US",
+            filename: "nonpub_fy26.xls",
+            format: Format::LegacyXls,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "October 2025, the current file: 184,069 in state across 749 buildings. \
+                   The sector has grown in each of the three Octobers since universal \
+                   eligibility, having fallen in almost every October before them.",
+        },
+        Source {
+            key: "nonpublic-2013-2018",
+            title: Some("Nonpublic enrollment, FY2014 through FY2019"),
+            url: "https://education.ohio.gov/getattachment/Topics/Data/\
+                  Frequently-Requested-Data/Enrollment-Data/\
+                  2014-2019-NonPublic.xlsx.aspx?lang=en-US",
+            filename: "2014-2019-NonPublic.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-nonpublic-enrollment"),
+            fixtures: &[
+                crate::fixtures::NONPUBLIC_BUILDING_FIXTURE,
+                crate::fixtures::NONPUBLIC_SECTOR_FIXTURE,
+            ],
+            note: "A second publication of six Octobers the annual files already cover, and \
+                   the only reason the disagreement between them is visible at all. Its \
+                   `By School` sheet masks 30 rows of 4,286 against thousands in the annual \
+                   files, because it states one number a school rather than fifty-two; its \
+                   `State Totals` sheet gives both a PK-12 and a K-12 row a year, which is \
+                   the span the annual files never state. It is also the only file that \
+                   settles what `nonpub_fy17.xls` holds.",
+        },
+    ],
+};

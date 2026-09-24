@@ -16278,20 +16278,17 @@ pub static FIGURES: &[Figure] = &[
         compute: |i| -i.nonpublic.auxiliary_growth.1,
     },
     Figure {
-        key: "project/auxiliary-services-per-pupil-upper-bound-fy2025",
+        key: "project/auxiliary-services-rate-fy2025",
         owner: "crates/project",
         unit: Unit::Dollars,
-        label: "FY2025 auxiliary services over the 173,156 chartered nonpublic pupils the \
-                department's 2023-24 landscape sheet counts — an upper bound on the rate, since \
-                the denominator is a year early and short of both of LSC's school counts",
-        pinned: 963.39,
+        label: "The FY2025 auxiliary services rate R.C. 3317.024(E)(2)(d) produces — the \
+                appropriation net of the College Credit Plus earmark over the pupils the \
+                department counted in Ohio in October 2024",
+        pinned: 913.1,
         tolerance: 0.005,
         compute: |_| {
-            project::ledger::nonpublic_support::per_pupil(
-                project::ledger::nonpublic_support::AUXILIARY_SERVICES,
-                2025,
-            )
-            .expect("the catalog carries FY2025")
+            project::ledger::nonpublic_support::auxiliary_rate_fy2025()
+                .expect("the catalog carries FY2025 and the extract carries October 2024")
         },
     },
     Figure {
@@ -16299,17 +16296,50 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Dollars,
         label: "What LSC publishes as the FY2025 auxiliary services rate per pupil, in both the \
-                redbook and the greenbook — the figure the computation above does not reproduce",
+                redbook and the greenbook — the figure the computation above reproduces to ten \
+                cents",
         pinned: 913.0,
         tolerance: 0.005,
         compute: |_| project::ledger::nonpublic_support::PUBLISHED_AUXILIARY_RATE_FY2025,
+    },
+    Figure {
+        key: "project/chartered-nonpublic-october-membership-fy2025",
+        owner: "crates/project",
+        // A `Count`, though the statute calls it an average daily membership. The department
+        // publishes this cell as a whole number of children and the extract reads it as written,
+        // so there is nothing fractional here to tolerate and an exact comparison is right.
+        // `Unit::Pupils` is for the fractional projections, and `a_pupil_figure_is_measured_
+        // rather_than_counted` enforces that division.
+        unit: Unit::Count,
+        label: "Pupils living in Ohio in chartered nonpublic schools, October 2024 — the \
+                denominator R.C. 3317.024(E)(2)(d) names, for FY2025",
+        pinned: 179_693.0,
+        tolerance: 0.0,
+        compute: |_| {
+            project::ledger::nonpublic_enrolment::membership(2025).expect("October 2024")
+        },
+    },
+    Figure {
+        key: "project/chartered-nonpublic-october-enrolment-fy2025",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "The same October counting the pupils who live outside Ohio as well — the \
+                denominator that gives $905.65 and that nobody publishes a rate on",
+        pinned: 181_171.0,
+        tolerance: 0.0,
+        compute: |_| {
+            project::ledger::nonpublic_enrolment::october(2025)
+                .and_then(|october| october.published_total)
+                .expect("October 2024")
+        },
     },
     Figure {
         key: "project/auxiliary-services-implied-membership-fy2025",
         owner: "crates/project",
         unit: Unit::Pupils,
         label: "The membership that published rate implies, on the appropriation net of the \
-                College Credit Plus earmark — against 173,156 counted",
+                College Credit Plus earmark — twenty pupils above the 179,693 counted, which is \
+                what rounding a rate to the dollar costs",
         pinned: 179_712.76,
         tolerance: 0.5,
         compute: |i| {
@@ -16322,19 +16352,82 @@ pub static FIGURES: &[Figure] = &[
         },
     },
     Figure {
+        key: "project/auxiliary-services-per-pupil-on-the-landscape-count",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the same appropriation gives over the landscape sheet's 2023-24 count — the \
+                bound the corpus published before it held the October the statute names, and it \
+                missed because the count was a year early",
+        pinned: 963.39,
+        tolerance: 0.005,
+        compute: |i| {
+            Nonpublic::nominal(&i.nonpublic.auxiliary, 2025)
+                / project::ledger::nonpublic_support::chartered_nonpublic_enrolment()
+        },
+    },
+    Figure {
         key: "project/chartered-nonpublic-enrolment",
         owner: "crates/project",
-        // A `Count` rather than `Pupils`, and the contrast with the two implied memberships
-        // beside it is the point: the landscape sheet tallies enrolled children and reports a
-        // whole number, while an average daily membership is a measurement and comes out
-        // fractional. The corpus divides by the first because it does not hold the second.
+        // A `Count` rather than `Pupils`, and the contrast with the October membership beside it
+        // is the point: the landscape sheet tallies enrolled children and reports a whole number,
+        // while an average daily membership is a measurement. That the two agree to the pupil on
+        // 2023-24 is the cross-publisher check, not an identity.
         unit: Unit::Count,
-        label: "Pupils in Ohio's 711 chartered nonpublic schools, 2023-24 — the only nonpublic \
-                enrolment the corpus holds, and not the October average daily membership \
-                R.C. 3317.024(E)(2)(d) divides by",
+        label: "Pupils in Ohio's chartered nonpublic schools, 2023-24, as the department's \
+                landscape sheet counts them — exactly what its October 2023 data file states",
         pinned: 173_156.0,
         tolerance: 0.0,
         compute: |_| project::ledger::nonpublic_support::chartered_nonpublic_enrolment(),
+    },
+    Figure {
+        key: "project/chartered-nonpublic-schools-october-2023",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Chartered nonpublic schools in October 2023 — the landscape sheet's 711, and the \
+                department's October file states the same",
+        pinned: 711.0,
+        tolerance: 0.0,
+        compute: |_| {
+            project::ledger::nonpublic_enrolment::schools(2024).expect("October 2023") as f64
+        },
+    },
+    Figure {
+        key: "project/chartered-nonpublic-schools-october-2024",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "And in October 2024 — near LSC's greenbook count of 725, which is a later \
+                October of this series rather than a disagreement with it",
+        pinned: 722.0,
+        tolerance: 0.0,
+        compute: |_| {
+            project::ledger::nonpublic_enrolment::schools(2025).expect("October 2024") as f64
+        },
+    },
+    Figure {
+        key: "project/chartered-nonpublic-schools-october-2025",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "And in October 2025, the newest the department has published",
+        pinned: 749.0,
+        tolerance: 0.0,
+        compute: |_| {
+            project::ledger::nonpublic_enrolment::schools(2026).expect("October 2025") as f64
+        },
+    },
+    Figure {
+        key: "project/chartered-nonpublic-octobers-held",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Octobers of chartered nonpublic enrolment the corpus now holds, 1977 through \
+                2025 — every one the department has published, with no gap",
+        pinned: 49.0,
+        tolerance: 0.0,
+        compute: |_| {
+            project::ledger::nonpublic_enrolment::octobers()
+                .iter()
+                .filter(|october| october.is_annual())
+                .count() as f64
+        },
     },
     Figure {
         key: "project/college-credit-plus-earmark-fy2025",

@@ -312,6 +312,19 @@ pub const TYPOLOGY_FIXTURE: &str = "crates/dispersion/fixtures/district-typology
 /// Where the MR-81 sponsor panel is written, relative to the repository root.
 pub const MR81_FIXTURE: &str = "crates/dispersion/fixtures/mr81-sponsor-panel.csv";
 
+/// Where the chartered nonpublic building panel is written, relative to the repository root.
+///
+/// One row per October and building IRN, over forty-nine Octobers. Almost every count in it is a
+/// range rather than a number: the department masks any cell under ten, and a sector of small
+/// schools laid out one column per grade per sex is mostly cells under ten.
+pub const NONPUBLIC_BUILDING_FIXTURE: &str = "crates/project/fixtures/nonpublic-building-panel.csv";
+
+/// Where the chartered nonpublic sector panel is written, relative to the repository root.
+///
+/// Keyed on the October **and the basis**, because for October 2013 through October 2018 two of
+/// the department's own publications describe the same October and disagree.
+pub const NONPUBLIC_SECTOR_FIXTURE: &str = "crates/project/fixtures/nonpublic-sector-panel.csv";
+
 /// Where the building-level report card extract is written, relative to the repository root.
 pub const BUILDING_FIXTURE: &str = "crates/dispersion/fixtures/report-card-2425-buildings.csv";
 
@@ -404,6 +417,8 @@ pub const REBUILT: &[&str] = &[
     F33_DISTRICTS_FIXTURE,
     F33_OHIO_PANEL_FIXTURE,
     MR81_FIXTURE,
+    NONPUBLIC_BUILDING_FIXTURE,
+    NONPUBLIC_SECTOR_FIXTURE,
     CCD_DIRECTORY_FIXTURE,
     TYPOLOGY_FIXTURE,
     SESSION_LAW_FIXTURE,
