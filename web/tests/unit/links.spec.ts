@@ -55,7 +55,15 @@ const W = { width: WIDTHS.wide };
 const corpus = loadCorpus();
 const { bundle, tax } = loadFeed();
 
-/** Every path this site builds a document for. */
+/**
+ * Every path this site builds a document for.
+ *
+ * The static half of this list was the set the district renderers happened to link to, which is
+ * not the same claim as the sentence above it: `/statewide` had a page and no entry, so the first
+ * district card to point at it failed this test for pointing at something real. Enumerated off
+ * `src/pages/*.astro` instead, minus `404` and the dynamic `[chamber]` route the two chamber
+ * indexes below stand in for.
+ */
 const PAGES = new Set<string>([
   "/",
   "/districts",
@@ -64,6 +72,11 @@ const PAGES = new Set<string>([
   "/compare",
   "/method",
   "/data",
+  "/statewide",
+  "/bounds",
+  "/history",
+  "/legislation",
+  "/reach",
   "/wiki",
   "/wiki/source",
   "/wiki/decision",

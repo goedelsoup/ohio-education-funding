@@ -1697,7 +1697,8 @@ function renderTransportation(d: District): string {
         <tr><th>Weighted riders</th><td class="tnum">${count(Math.round(t.weighted_riders))}</td>
           <td class="n">${count(Math.round(t.public_riders))} public${
             t.nonpublic_riders > 0
-              ? `, ${count(Math.round(t.nonpublic_riders))} non-public counted <strong>twice</strong>`
+              ? `, ${count(Math.round(t.nonpublic_riders))} non-public counted <strong>2.0
+                 times</strong>`
               : ""
           }${
             t.community_riders > 0
@@ -1946,6 +1947,75 @@ export function renderNationalPosition(d: District): string {
 
 
 /**
+ * Whether a district's students may claim a traditional EdChoice scholarship, and what that is not.
+ *
+ * # A count and a link, because a table would overstate what is known
+ *
+ * The department publishes which *buildings* are designated under R.C. 3310.03. It does not
+ * publish which district a scholarship was charged against — the per-district participation report
+ * its own annual report links to sits behind an entitlement this project cannot reach. So the
+ * honest thing to say on a district's page is how many of its buildings make a student eligible,
+ * and then to say plainly that eligibility is not uptake and that the money does not come out of
+ * the figures above. A table of building names would dress that up as a finding.
+ *
+ * # Why it is in this card rather than beside the formula
+ *
+ * Because it is a statement about what the page does *not* show. Under R.C. 3317.022 the
+ * educational choice scholarship is its own funding unit, computed beside this district's and paid
+ * directly; there is no deduction from anything above, and the row that used to say otherwise on
+ * the method page is the defect this closes.
+ *
+ * The year is named in the sentence rather than taken from the card's heading, because the
+ * designated list is the one source on this page *ahead* of the model year: it is published the
+ * autumn before the school year it governs.
+ *
+ * The four statewide counts are taken over the feed for the same reason the year is: they are the
+ * kind of figure that is written once and then quietly stops being true when the department
+ * publishes the next list.
+ */
+function renderDesignated(bundle: Bundle, d: District): string {
+  const e = d.designated;
+  const listed = bundle.districts.flatMap((o) => (o.designated == null ? [] : [o.designated]));
+  const absent = bundle.districts.length - listed.length;
+  const sending = listed.filter((o) => o.designated > 0);
+  const buildingsStatewide = sending.reduce((sum, o) => sum + o.designated, 0);
+  // Absent from the file is not the same as carrying no designated building, and the feed keeps
+  // them apart. Saying nothing at all would leave a reader to assume the commoner of the two.
+  if (e == null) {
+    return `<p class="note"><strong>The department's EdChoice designated list does not carry this
+      district.</strong> Which is not the same as carrying none of its buildings — ${count(
+        listed.length - sending.length,
+      )} districts are on the list with nothing designated. Only ${count(
+        absent,
+      )} districts are absent from it altogether, and this is one of them.</p>`;
+  }
+  const scholarship = `<a href="${routes.wikiNode(
+    "program",
+    "edchoice-scholarship",
+  )}">traditional EdChoice scholarship</a>`;
+  const beside = `<a href="${routes.at(
+    "/statewide",
+    routes.SECTIONS.statewide.fundingUnits,
+  )}">a funding unit of its own</a>`;
+  const buildings = `${count(e.listed)} building${e.listed === 1 ? "" : "s"}`;
+  const opening =
+    e.designated === 0
+      ? `<strong>None of this district's ${buildings} is designated for the ${scholarship} in
+         ${yearOf("designated")}.</strong>`
+      : `<strong>${count(e.designated)} of this district's ${buildings} ${
+          e.designated === 1 ? "is" : "are"
+        } designated for the ${scholarship} in ${yearOf("designated")}.</strong> ${
+          e.designated === 1 ? "A student enrolled there" : "Students enrolled in them"
+        } may apply.`;
+  return `<p class="note">${opening} That is <em>eligibility, not participation</em> — nothing
+    published says how many applied, or which district any scholarship was charged against. And it
+    is not a charge on anything above: the scholarship is ${beside} under R.C. 3317.022, computed
+    beside this district's unit and paid directly, not deducted from it. Statewide, ${count(
+      buildingsStatewide,
+    )} buildings in ${count(sending.length)} districts are designated.</p>`;
+}
+
+/**
  * What this page is not — the closing card, and the only one on the dashboard that declares
  * collisions rather than stating figures.
  *
@@ -2003,6 +2073,7 @@ export function renderWhatThisIsNot(bundle: Bundle, d: District): string {
              own.</p>`
           : ""
       }
+      ${renderDesignated(bundle, d)}
       <p class="note"><strong>This page divides by more than one pupil count.</strong> Base cost
         is built on ${count(baseCostAdm)} — a three-year average, because R.C. 3317.011 funds on
         the greater of that and the current year. The state share of it, and every categorical
