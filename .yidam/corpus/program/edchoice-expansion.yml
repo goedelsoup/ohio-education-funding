@@ -24,12 +24,16 @@ description: |
   2025](../litigation/vouchers-hurt-ohio-2025.yml), on Ohio constitutional grounds distinct
   from the federal question *Zelman* settled. That ruling is under appeal. [verified]
 
-  **There are no income bands.** The award is a continuous function of family income, and both
-  sections that compute it have been in the committed statute extract since it was wired — see the
-  findings. Participation counts by resident district are still not held. [open] Payments **by
-  fiscal period** now have a bound rather than a blank, but not an appropriation: the executive
-  proposal allocates no amount to any individual scholarship programme, so a figure for this
-  programme by fiscal year is LSC's estimate and nothing states the appropriation. [verified]
+  **There are no income bands — from FY2025.** The award is a continuous function of family
+  income, and both sections that compute it have been in the committed statute extract since it was
+  wired. **For FY2024 there were eight**, prescribed as a table by the same act that made the
+  programme universal, so a flat claim that the award has never been banded is false of the
+  programme's first universal year. [verified] See the findings.
+
+  Participation counts by resident district are still not held. [open] Payments **by fiscal
+  period** now have a bound rather than a blank, but not an appropriation: the executive proposal
+  allocates no amount to any individual scholarship programme, so a figure for this programme by
+  fiscal year is LSC's estimate and nothing states the appropriation. [verified]
 findings: |
   **Two advocacy scorecards rank Ohio on this program, and neither measures what this corpus
   measures.** ALEC's [Index of State Education
@@ -69,6 +73,40 @@ findings: |
   this makes the scholarship's ceiling a *function of* what districts are computed to need. The
   corpus established the first is absent under the plan; the second is present and was not
   recorded anywhere.
+
+  ### The first universal year was a table, and only that year
+
+  H.B. 33 did not switch the programme to the income curve when it made it universal. **For FY2024
+  it prescribed eight bands as a schedule**, and the logarithmic function applies only "beginning in
+  FY 2025". [verified]
+  ([`crates/project`](../../../crates/project/tests/the_one_year_the_expansion_had_bands.rs))
+
+      family income        K-8 award    9-12 award
+      at or below 450%     $6,165       $8,407
+      451% to 500%         $5,200       $7,050
+      501% to 550%         $3,650       $5,000
+      551% to 600%         $2,600       $3,550
+      601% to 650%         $1,850       $2,500
+      651% to 700%         $1,300       $1,750
+      701% to 750%           $900       $1,250
+      above 750%             $650         $950
+
+  **The table is not a discretisation of the curve — it is more generous than it at every band
+  edge.** Evaluated at each band's upper bound against the FY2025 formula on the same base amounts,
+  the prescribed award is higher in all fourteen comparisons. The floor differs too: the table's
+  $650 for K-8 sits **$33.50 above** the tenth-of-base the statute pays from FY2025. [verified]
+  (crates/project) So the year the programme's participation tripled was paid on a schedule no
+  reading of the current section reproduces, and any average award for FY2024 must be read against
+  this table rather than against the curve.
+
+  **LSC's own arithmetic checks the crate's reading of the statute twice, and turns a derivation
+  into a reading.** The greenbook works two points of the FY2025 formula independently — a family at
+  550% of poverty receiving 50% of the base amount, one at 650% receiving 25% — and both reproduce
+  exactly against `expansion_award`. It then states the income at which the floor binds as **783%**,
+  where this node had derived 782.19% and could only mark it as inferred, because "the statute gives
+  the floor as an amount and never says where it binds". LSC says where it binds, and its figure is
+  this one rounded up to the whole per cent. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_one_year_the_expansion_had_bands.rs))
 
   ### And the published average is not evidence about the ceiling
 
@@ -206,8 +244,8 @@ properties:
   eligibility: |
     Originally income-limited. Am. Sub. H.B. 33 (2023) made all Ohio students eligible, with
     award amount scaled by family income relative to the federal poverty level rather than
-    eligibility restricted by it. [verified] There are no bands to establish — the scaling is
-    continuous. See `amount`.
+    eligibility restricted by it. [verified] The scaling is continuous **from FY2025**; for FY2024
+    the same act prescribed eight bands as a table. [verified] See `amount` and the findings.
   amount: |
     **A ceiling of $5,500 for grades kindergarten through eight and $7,500 for grades nine
     through twelve, scaled down by family income above 450% of the federal poverty guidelines.**
@@ -230,7 +268,15 @@ properties:
     The last row is derived rather than stated: the statute gives the floor as an amount and never
     says at what income it binds. Solving the decay against the ten per cent floor puts it at
     **7.82 times the federal poverty guidelines**, past which a family's income is no longer an
-    input to the award at all. [inference]
+    input to the award at all. [verified] LSC published the same threshold independently, as 783%,
+    which is this figure rounded up to the whole per cent — so the derivation is corroborated
+    rather than merely internally consistent. [verified]
+    ([`crates/project`](../../../crates/project/tests/the_one_year_the_expansion_had_bands.rs))
+
+    **This schedule is the law from FY2025 and was not the law in FY2024.** The act that made the
+    programme universal prescribed a table of eight bands for its first year; the findings carry it
+    and the comparison that shows the table paid more than this curve at every band edge.
+    [verified]
 
     Two things bound what this can be used for. The award is the **lesser** of this and the
     school's base tuition net of discounts, so it is a ceiling and not a payment; and the two base
