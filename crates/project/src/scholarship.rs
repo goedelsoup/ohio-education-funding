@@ -1137,7 +1137,9 @@ pub mod bounds {
             "dew-redbook" | "dew-redbook-table-5" => {
                 flatten(crate::ledger::budget_analysis::REDBOOK)
             }
-            "dew-greenbook" => flatten(crate::ledger::budget_analysis::GREENBOOK),
+            "dew-greenbook" | "dew-greenbook-table-3" => {
+                flatten(crate::ledger::budget_analysis::GREENBOOK)
+            }
             record => crate::greenbook::greenbooks()
                 .into_iter()
                 .find(|g| g.id == record)

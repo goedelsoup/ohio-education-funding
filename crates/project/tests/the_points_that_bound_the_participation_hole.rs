@@ -12,7 +12,7 @@
 //! the hole and cannot be spliced onto the series".
 //!
 //! That sentence was the whole of the evidence. Issue #472 asked for it to become a fixture, and
-//! [`project::scholarship::bounds`] is that fixture: sixty-four quoted quantities from six
+//! [`project::scholarship::bounds`] is that fixture: one hundred quoted quantities from eight
 //! committed budget analyses, each carrying its denominator, the publisher's hedge, and the
 //! publisher's own words. These tests are what make the fixture an argument rather than a list.
 //!
@@ -21,7 +21,7 @@
 //! - **The transcription is re-checked, not trusted.** Every quote must appear verbatim in the
 //!   document its `source` column names, and must contain the row's own value as the publisher
 //!   printed it. A fixture built by reading prose is otherwise correct only on the day it is typed.
-//! - **No bound is joinable.** [`Bound::spliceable`] is `None` for all sixty-four, and
+//! - **No bound is joinable.** [`Bound::spliceable`] is `None` for all one hundred, and
 //!   [`the_splice_guard_is_not_vacuous`] shows the predicate can say otherwise on each of the
 //!   three series, so the first assertion is a measurement of the fixture and not of the code.
 //! - **The overlap years are the reason.** Five bounds fall inside the archive's own span, where
@@ -29,9 +29,14 @@
 //!   nearly seven elsewhere.
 //! - **The FY2024 redbook sits below the 2024-25 report on every programme**, in dollars and in
 //!   counts — which is what should happen if both documents are right and the channel grew.
+//! - **The same table in two editions says what the enactment moved.** LSC estimated the channel
+//!   once for the executive proposal and again for the enacted act. Three of the five programmes
+//!   do not move by a cent, and the two that do are the ones whose maxima the act raised by hand.
 //!
 //! What is *not* asserted is any reading of the hole itself. Nothing here interpolates, and nothing
 //! here should: the point of the census is that the interpolation cannot be justified.
+
+use std::collections::BTreeMap;
 
 use project::scholarship::bounds::{self, Bound, Denominator, Measure, Precision};
 use project::scholarship::{history, jpsn, report};
@@ -48,7 +53,7 @@ const HOLE: std::ops::RangeInclusive<u16> = 2014..=2022;
 #[test]
 fn the_census_is_a_census_and_reaches_across_the_hole() {
     let all = bounds::census();
-    assert_eq!(all.len(), 64);
+    assert_eq!(all.len(), 100);
 
     // Eight documents — six greenbooks of enacted acts, and both editions of the FY2026-27
     // analysis — under nine source values, because the redbook's Table 5 is addressed separately
@@ -62,6 +67,7 @@ fn the_census_is_a_census_and_reaches_across_the_hole() {
         sources,
         [
             "dew-greenbook",
+            "dew-greenbook-table-3",
             "dew-redbook",
             "dew-redbook-table-5",
             "hb166-greenbook",
@@ -74,7 +80,7 @@ fn the_census_is_a_census_and_reaches_across_the_hole() {
     );
     let documents = sources
         .iter()
-        .map(|s| s.trim_end_matches("-table-5"))
+        .map(|s| s.trim_end_matches("-table-5").trim_end_matches("-table-3"))
         .collect::<std::collections::BTreeSet<&str>>();
     assert_eq!(documents.len(), 8);
 
@@ -90,7 +96,7 @@ fn the_census_is_a_census_and_reaches_across_the_hole() {
     let after = all.iter().filter(|b| b.year.0 > *HOLE.end()).count();
     assert_eq!(inside_the_archive, 8);
     assert_eq!(inside_the_hole, 21);
-    assert_eq!(after, 35);
+    assert_eq!(after, 71);
     assert_eq!(inside_the_archive + inside_the_hole + after, all.len());
 
     // And the hole is still a hole: no committed series has grown into it.
@@ -188,7 +194,7 @@ fn no_bound_counts_what_the_archive_counts() {
         "a bound now names one of the archive's denominators"
     );
 
-    // Seven populations across sixty-four rows, which is the second reason: the denominator moves
+    // Seven populations across one hundred rows, which is the second reason: the denominator moves
     // from row to row, and for two thirds of them the publisher gave none at all.
     let mut used: Vec<Denominator> = all.iter().map(|b| b.denominator).collect();
     used.sort_unstable();
@@ -209,7 +215,7 @@ fn no_bound_counts_what_the_archive_counts() {
         .iter()
         .filter(|b| b.denominator == Denominator::Unstated)
         .count();
-    assert_eq!(unstated, 42);
+    assert_eq!(unstated, 78);
 
     // The FY2026-27 redbook counts two programmes in FTE and three in students, in one sequence of
     // paragraphs about one channel. Nothing in the document reconciles them.
@@ -235,7 +241,7 @@ fn no_bound_counts_what_the_archive_counts() {
 fn three_quarters_of_the_census_is_qualified_or_estimated() {
     let all = bounds::census();
     let hedged = all.iter().filter(|b| b.precision.is_hedged()).count();
-    assert_eq!(hedged, 37);
+    assert_eq!(hedged, 73);
     assert!(hedged * 2 > all.len());
 
     // "Over 480 chartered nonpublic schools" and "over 10,800 K-5 students" — the only two
@@ -565,6 +571,150 @@ fn table_fives_estimate_of_the_report_year_inverts_for_one_programme() {
 
     assert_eq!(below, ["autism", "cleveland", "edchoice-expansion"]);
     assert_eq!(above, ["traditional-edchoice"]);
+}
+
+/// What the enactment moved between the two editions of the same table, and what it did not.
+///
+/// The redbook's Table 5 estimates the executive proposal and the greenbook's Table 3 estimates
+/// the enacted act, over the same five programmes and the same three years. Three of the five do
+/// not move by a cent in any year: the two EdChoice limbs and Cleveland. Only the two disability
+/// scholarships move, and only in the biennium years, and the greenbook says outright why — the
+/// act holds the FY2024 statewide average base cost per pupil, which is the quantity the EdChoice
+/// and Cleveland maxima are indexed to, and raises the Autism and JPSN maxima by hand.
+///
+/// This is what settles `program/edchoice-expansion`'s appropriation item in the negative. The
+/// enacted analysis repeats the proposal's sentence verbatim — the budget "does not allocate
+/// specific amounts to each scholarship program" — so there is no appropriation by programme to
+/// bind at either stage, and the enacted estimate for this programme is not even a different
+/// number from the one already held.
+#[test]
+fn the_enactment_moved_two_programmes_and_neither_is_an_edchoice_limb() {
+    let cells = |source: &str| -> BTreeMap<(String, u16), f64> {
+        bounds::census()
+            .into_iter()
+            .filter(|b| b.source == source && b.measure == Measure::Payments)
+            .map(|b| ((b.program.clone(), b.year.0), b.value))
+            .collect()
+    };
+    let proposed = cells("dew-redbook-table-5");
+    let enacted = cells("dew-greenbook-table-3");
+    assert_eq!(proposed.len(), 18);
+    assert_eq!(enacted.len(), 18);
+
+    let mut moved: Vec<(String, u16, f64)> = Vec::new();
+    for (key, before) in &proposed {
+        let after = enacted
+            .get(key)
+            .unwrap_or_else(|| panic!("the enacted table drops {key:?}"));
+        if (after - before).abs() > f64::EPSILON {
+            moved.push((key.0.clone(), key.1, after - before));
+        }
+    }
+    moved.sort_by(|a, b| a.1.cmp(&b.1).then_with(|| a.0.cmp(&b.0)));
+
+    assert_eq!(
+        moved,
+        [
+            ("autism".to_string(), 2026, 7_700_000.0),
+            ("channel".to_string(), 2026, 12_800_000.0),
+            ("jon-peterson".to_string(), 2026, 5_100_000.0),
+            ("autism".to_string(), 2027, 8_200_000.0),
+            ("channel".to_string(), 2027, 13_800_000.0),
+            ("jon-peterson".to_string(), 2027, 5_500_000.0),
+        ],
+        "only the two disability scholarships move, and only in the biennium years"
+    );
+
+    // FY2026's channel move is exactly the two programme moves. FY2027's is $100,000 more than
+    // them, which is the rounding grain of a table printed in tenths of a million and not a sixth
+    // programme moving unseen.
+    assert_eq!(12_800_000.0, 7_700_000.0 + 5_100_000.0);
+    assert_eq!(13_800_000.0 - (8_200_000.0 + 5_500_000.0), 100_000.0);
+
+    let greenbook = bounds::source_text("dew-greenbook-table-3");
+    assert!(
+        greenbook.contains(
+            "The budget maintains the current law maximum scholarship amounts for the EdChoice \
+             and Cleveland scholarships since it also maintains the use of the FY 2024 statewide \
+             average base cost per pupil in FY 2026 and FY 2027. However, the budget increases \
+             the maximum amounts for Autism and JPSN scholarships."
+        ),
+        "the enacted analysis states the reason the EdChoice limbs did not move"
+    );
+    assert!(
+        greenbook.contains("does not allocate specific amounts to each scholarship program"),
+        "and repeats the proposal's sentence about there being no allocation by programme"
+    );
+}
+
+/// The enacted table's student column closes on itself and its dollar column does not.
+///
+/// Table 3 adds a participation column that Table 5 never carried, and that column sums to its own
+/// printed total in all three years. The dollar column does not: FY2025 and FY2027 each print a
+/// total $100,000 above the sum of their own cells, and the printed year-over-year change is a
+/// third reading that agrees with neither. Three arithmetics over one table, disagreeing at the
+/// grain the table is printed to — which is why nothing here recomputes a channel figure from the
+/// programme rows rather than quoting the row it wants.
+#[test]
+fn the_enacted_tables_students_add_up_where_its_payments_do_not() {
+    let mut residuals: Vec<(u16, f64, f64)> = Vec::new();
+    for year in 2025..=2027u16 {
+        let cells: Vec<Bound> = bounds::census()
+            .into_iter()
+            .filter(|b| b.source == "dew-greenbook-table-3" && b.year.0 == year)
+            .collect();
+        assert_eq!(cells.len(), 12, "six rows in two measures");
+
+        let residual = |measure: Measure| -> f64 {
+            let printed = cells
+                .iter()
+                .find(|b| b.measure == measure && b.program == "channel")
+                .expect("each measure prints a total")
+                .value;
+            let summed: f64 = cells
+                .iter()
+                .filter(|b| b.measure == measure && b.program != "channel")
+                .map(|b| b.value)
+                .sum();
+            printed - summed
+        };
+        residuals.push((
+            year,
+            residual(Measure::Participation),
+            residual(Measure::Payments),
+        ));
+    }
+
+    assert_eq!(
+        residuals,
+        [
+            (2025, 0.0, 100_000.0),
+            (2026, 0.0, 0.0),
+            (2027, 0.0, 100_000.0),
+        ]
+    );
+
+    // And the printed change row is the third reading. The differences of the printed totals are
+    // $101.4m and $89.1m; LSC prints $101.5m and $89.0m, each off by the same tenth in the
+    // opposite direction, because the change is taken on figures rounded once rather than twice.
+    let total = |year: u16| -> f64 {
+        bounds::census()
+            .into_iter()
+            .find(|b| {
+                b.source == "dew-greenbook-table-3"
+                    && b.measure == Measure::Payments
+                    && b.program == "channel"
+                    && b.year.0 == year
+            })
+            .expect("a printed total for each year")
+            .value
+    };
+    assert_eq!(total(2026) - total(2025), 101_400_000.0);
+    assert_eq!(total(2027) - total(2026), 89_100_000.0);
+    let greenbook = bounds::source_text("dew-greenbook-table-3");
+    assert!(
+        greenbook.contains("annual increases of $101.5 million (9.4%) and $89.0 million (7.6%)")
+    );
 }
 
 /// The archive's measured figure a bound can be held against, where one exists.

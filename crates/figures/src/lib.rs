@@ -5153,6 +5153,25 @@ fn table_five(program: &str, year: u16) -> f64 {
         .value
 }
 
+/// One cell of Table 3 of the FY2026-27 greenbook: the same estimate, made again for the act as
+/// enacted, and carrying a student column the redbook's Table 5 never had.
+///
+/// Still an estimate. The enacted analysis repeats the proposal's sentence that the budget "does
+/// not allocate specific amounts to each scholarship program", so the enactment does not turn the
+/// table into a schedule; what it does is say what moved. Three of the five programmes do not.
+///
+/// # Panics
+///
+/// If the census holds no Table 3 row for that programme, measure and year.
+fn table_three(program: &str, measure: project::scholarship::bounds::Measure, year: u16) -> f64 {
+    use project::scholarship::bounds;
+    bounds::of(program, measure)
+        .into_iter()
+        .find(|b| b.source == "dew-greenbook-table-3" && b.year.0 == year)
+        .unwrap_or_else(|| panic!("Table 3 has no {program} row for FY{year}"))
+        .value
+}
+
 /// Every figure this repository exports for the corpus to be checked against.
 ///
 /// Ordered by owning crate, then by what the figure is about. The order is the manifest's order,
@@ -8177,6 +8196,37 @@ pub static FIGURES: &[Figure] = &[
         pinned: 1_251_100_000.0,
         tolerance: 1.0,
         compute: |_| table_five("channel", 2027),
+    },
+    Figure {
+        key: "project/scholarship-channel-enacted-payments-fy2027",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "LSC\u{2019}s estimate of all five scholarship programmes\u{2019} payments, FY2027, \
+                remade for the enacted act",
+        pinned: 1_264_900_000.0,
+        tolerance: 1.0,
+        compute: |_| {
+            table_three(
+                "channel",
+                project::scholarship::bounds::Measure::Payments,
+                2027,
+            )
+        },
+    },
+    Figure {
+        key: "project/expansion-enacted-students-fy2027",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "LSC\u{2019}s estimate of EdChoice expansion participation, FY2027",
+        pinned: 113_962.0,
+        tolerance: 0.0,
+        compute: |_| {
+            table_three(
+                "edchoice-expansion",
+                project::scholarship::bounds::Measure::Participation,
+                2027,
+            )
+        },
     },
     Figure {
         key: "dispersion/community-school-comprehensive-tilt",

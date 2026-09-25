@@ -31,9 +31,11 @@ description: |
   programme's first universal year. [verified] See the findings.
 
   Participation counts by resident district are still not held. [open] Payments **by fiscal
-  period** now have a bound rather than a blank, but not an appropriation: the executive proposal
-  allocates no amount to any individual scholarship programme, so a figure for this programme by
-  fiscal year is LSC's estimate and nothing states the appropriation. [verified]
+  period** now have a bound rather than a blank, but not an appropriation, and that holds at both
+  stages of the bill: LSC's analyses of the proposal and of the enacted act each say the budget
+  allocates no amount to any individual scholarship programme, funding all five from one earmark.
+  A figure for this programme by fiscal year is therefore LSC's estimate, twice over, and nothing
+  states the appropriation. [verified]
 findings: |
   **Two advocacy scorecards rank Ohio on this program, and neither measures what this corpus
   measures.** ALEC's [Index of State Education
@@ -161,17 +163,39 @@ findings: |
   is LSC's arithmetic over a lump sum and not a schedule anybody enacted; and the table does not
   quite close on itself — its FY2025 column sums $0.1 million short of its own printed total, and
   its FY2025 estimate for the traditional programme, $292.7 million, sits *above* the $283.1 million
-  the annual report went on to report actually spent. [verified] So an appropriation by programme
-  and fiscal period is not a figure any committed document states, which is what the open item in
-  the description now says rather than that nothing is held.
+  the annual report went on to report actually spent. [verified]
+
+  **The enactment does not change that, and says so in the same words.** LSC estimated the same
+  table twice: Table 5 for the executive proposal, and Table 3 of the enacted greenbook for the act
+  that passed. The enacted analysis repeats the proposal's sentence verbatim — the budget "does not
+  allocate specific amounts to each scholarship program", funding all five within an earmark from
+  GRF line item 200550 that also pays districts, community schools and STEM schools. So there is no
+  appropriation by programme and fiscal period at either stage of the bill, and that is now a
+  finding about both editions rather than a gap in what this corpus has read. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_points_that_bound_the_participation_hole.rs))
+
+  What the second edition does say is what the enactment moved. Across five programmes and three
+  years, three do not move by a cent — the two EdChoice limbs and Cleveland — and the only two that
+  do are Autism (+$7.7m in FY2026, +$8.2m in FY2027) and Jon Peterson (+$5.1m, +$5.5m), lifting the
+  channel to **$1,264.9 million** in FY2027. LSC gives the reason outright: the maxima for most
+  programmes rise with the statewide average base cost per pupil, the act holds that quantity at
+  its FY2024 value through the biennium, and so the EdChoice and Cleveland maxima are held with it
+  while Autism's and Jon Peterson's are raised by hand. This programme's estimate is therefore
+  frozen between the two editions for a reason external to it: it is indexed to a parameter the act
+  chose not to move. [verified] (crates/project)
 
   **The channel's participation is bounded the same way and by figures that do not share a
   denominator.** The redbook puts about 87,000 **FTE** students on this programme in FY2024 against
   the annual report's 100,939 **students** in 2024-25; LSC's FY2014 figure is 992 kindergarteners,
   the only grade the expansion then covered, and its FY2019 figure is over 10,800 in grades K-5.
   [verified] Four figures, four populations, and none of them is the count this node wants. The
-  whole census of such points — sixty-four of them across eight budget analyses, with the reasons
-  not one can be joined to either committed series — is
+  enacted table adds a fifth: a student column the redbook's never carried, estimating **113,962**
+  on this programme in FY2027 against 100,011 in FY2025. It is forward-looking and it is LSC's, so
+  it bounds the channel's expected size rather than measuring anyone; what makes it worth holding
+  is that its column closes on its own printed total in all three years where the dollar column
+  beside it does not. [verified] (crates/project) The whole census of such points — one hundred of
+  them across eight budget analyses, with the reasons not one can be joined to either committed
+  series — is
   [`scholarship-bounds.tsv`](../../../crates/project/fixtures/scholarship-bounds.tsv), asserted by
   [`crates/project`](../../../crates/project/tests/the_points_that_bound_the_participation_hole.rs).
   [verified]
@@ -216,6 +240,14 @@ figures:
     value: 1251100000.0
     field: findings
     as_written: "the channel's estimated **$1,251.1 million** in\n  FY2027"
+  - key: project/scholarship-channel-enacted-payments-fy2027
+    value: 1264900000.0
+    field: findings
+    as_written: "lifting the\n  channel to **$1,264.9 million** in FY2027"
+  - key: project/expansion-enacted-students-fy2027
+    value: 113962.0
+    field: findings
+    as_written: "**113,962**\n  on this programme in FY2027"
 properties:
   name: EdChoice Expansion Scholarship
   mechanism: |
