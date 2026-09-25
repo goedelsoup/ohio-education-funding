@@ -114,6 +114,8 @@ pub struct Determination {
     pub building_irn: String,
     /// The building's name as that edition spells it.
     pub building_name: String,
+    /// Grade levels served, semicolon-separated — read with [`crate::designated::band`].
+    pub grade_levels: String,
     /// `Open`, `Closed` or `Inactive`.
     pub open_closed: String,
     /// Whether students enrolled here may claim a scholarship that year.
@@ -162,6 +164,13 @@ impl Determination {
             .count()
     }
 
+    /// Which award ceiling this building's grades fall under, by
+    /// [`crate::designated::band`].
+    #[must_use]
+    pub fn band(&self) -> crate::designated::Band {
+        crate::designated::band(&self.grade_levels)
+    }
+
     /// The years the building was not ranked at all.
     #[must_use]
     pub fn unranked_years(&self) -> usize {
@@ -170,6 +179,98 @@ impl Determination {
             .filter(|y| y.is_none())
             .count()
     }
+}
+
+/// The pupils a designated list makes eligible, split on the traditional EdChoice award ceiling.
+///
+/// The designated list says which buildings' students may claim and what grades each serves; the
+/// report card says what each enrols. The join is the only per-grade measurement of the eligible
+/// population this corpus can make, and it is eligibility and not participation — see
+/// `program/edchoice-scholarship`.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct BandPopulation {
+    /// Enrolment in designated buildings serving no grade above eighth.
+    pub through_eight: f64,
+    /// Enrolment in designated buildings serving no grade below ninth.
+    pub nine_and_above: f64,
+    /// Enrolment in designated buildings serving grades on both sides of the boundary. The list
+    /// does not say how it splits, so every reading below has to place it deliberately.
+    pub straddling: f64,
+    /// Designated buildings the report card carries no enrolment for at all.
+    pub unrated: usize,
+}
+
+impl BandPopulation {
+    /// The lower band's share of the eligible population, with every straddling building handed
+    /// to the upper side.
+    ///
+    /// The assignment that makes the lower band as small as the list allows, which is the reading
+    /// least favourable to a claim that the eligible population is an elementary one.
+    #[must_use]
+    pub fn least_k8_share(&self) -> f64 {
+        self.through_eight / (self.through_eight + self.nine_and_above + self.straddling)
+    }
+
+    /// The take-up rate on each side that a given mix of recipients would require, lower band
+    /// first.
+    ///
+    /// The eligible population on a side is what is still enrolled there plus the recipients
+    /// drawn from it, so a side losing more pupils to the programme has a smaller enrolment and
+    /// gets them added back. `straddling_to_upper` places the buildings the list does not split.
+    ///
+    /// A floor rather than a measurement: a student residing in a designated building's
+    /// attendance zone who never enrolled there is eligible under R.C. 3310.03 and is in neither
+    /// term.
+    #[must_use]
+    pub fn required_take_up(
+        &self,
+        recipients: f64,
+        k8_share: f64,
+        straddling_to_upper: bool,
+    ) -> (f64, f64) {
+        let (lower_enrolled, upper_enrolled) = if straddling_to_upper {
+            (self.through_eight, self.nine_and_above + self.straddling)
+        } else {
+            (self.through_eight + self.straddling, self.nine_and_above)
+        };
+        let lower = k8_share * recipients;
+        let upper = (1.0 - k8_share) * recipients;
+        (
+            lower / (lower_enrolled + lower),
+            upper / (upper_enrolled + upper),
+        )
+    }
+}
+
+/// One edition's designated buildings, summed on each side of the award ceiling.
+///
+/// The enrolment is the 2024-25 report card's in every edition, because that is the only building
+/// file this repository holds. For [`Edition::Y2425`] the two are the same school year; for the
+/// later two the enrolment is older than the designation.
+#[must_use]
+pub fn eligible_by_band(which: Edition) -> BandPopulation {
+    let enrolled: BTreeMap<String, f64> = crate::building::buildings()
+        .into_iter()
+        .filter_map(|b| b.enrollment.map(|pupils| (b.irn, pupils)))
+        .collect();
+    let mut population = BandPopulation {
+        through_eight: 0.0,
+        nine_and_above: 0.0,
+        straddling: 0.0,
+        unrated: 0,
+    };
+    for building in edition(which).iter().filter(|d| d.designated) {
+        let Some(pupils) = enrolled.get(&building.building_irn) else {
+            population.unrated += 1;
+            continue;
+        };
+        match building.band() {
+            crate::designated::Band::ThroughEight => population.through_eight += pupils,
+            crate::designated::Band::NineAndAbove => population.nine_and_above += pupils,
+            crate::designated::Band::Both => population.straddling += pupils,
+        }
+    }
+    population
 }
 
 /// A building, keyed the way the list keys it.
@@ -201,6 +302,7 @@ pub fn edition(which: Edition) -> Vec<Determination> {
             district_name: row.str(2).to_string(),
             building_irn: row.str(3).to_string(),
             building_name: row.str(4).to_string(),
+            grade_levels: row.str(5).to_string(),
             open_closed: row.str(6).to_string(),
             designated: flag(row.str(7)),
             option_a: flag(row.str(8)),

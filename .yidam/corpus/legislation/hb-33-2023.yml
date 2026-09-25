@@ -30,8 +30,19 @@ description: |
   education agency from a body answering to an independent State Board into a cabinet
   department answering to the Governor. [verified]
 
-  Appropriation totals, the exact income bands for the scholarship award scale, and the
-  line-item vetoes are not yet recorded. [open]
+  **The income bands and the vetoes are now recorded, and both came out differently from how this
+  node framed them.** The act prescribed eight bands for FY2024 and switched to the continuous
+  formula only from FY2025, so the scale is a table for one year and a curve thereafter —
+  [`edchoice-expansion`](../program/edchoice-expansion.yml) carries the schedule and the comparison
+  against the curve. [verified] And the act carries **one** veto, not a set of line items: see
+  `vetoes`, which is about community school enrolment auditing and touches no scholarship.
+  [verified]
+  ([`crates/project`](../../../crates/project/tests/the_one_year_the_expansion_had_bands.rs))
+
+  Appropriation totals for the act as a whole are still not recorded here. [open] The scholarship
+  channel specifically is not one of them and cannot become one: LSC states in both editions that
+  the budget "does not allocate specific amounts to each scholarship program", so there is no
+  per-programme appropriation in this act to record. [verified]
 properties:
   designation: Am. Sub. H.B. 33
   general_assembly: 135th General Assembly
@@ -57,7 +68,10 @@ properties:
     replaced the Ohio Department of Education with the cabinet-level Department of Education
     and Workforce. Signing date to be confirmed against the enrolled act. [open]
   vetoes: |
-    One. [verified] (the greenbook)
+    One, and it is not about a scholarship. [verified]
+    ([`crates/project`](../../../crates/project/tests/the_one_year_the_expansion_had_bands.rs),
+    which asserts the greenbook carries exactly one `Vetoed provision` section and that its text
+    names none of the five programmes)
 
     The act would have required the Joint Committee on Agency Rule Review to review any change the
     department proposed to its manual of standards and procedures for reviewing and auditing

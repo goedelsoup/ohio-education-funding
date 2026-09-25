@@ -56,11 +56,41 @@ findings: |
   [`the-order-was-never-the-states`](../../decisions/the-order-was-never-the-states.yml). See
   [`what-a-citator-reaches`](../../decisions/what-a-citator-reaches.yml).
 
-  Appellate status of the merits ruling: no Ohio appellate decision in this case later than
-  2024-Ohio-1217 was found on 14 August 2026, searching an index whose Tenth District coverage
-  reached 31 July 2026. That is a bound on one search rather than a fact about the docket, and
-  the docket itself has not been read. [inference] The number of districts joined as plaintiffs
-  remains unestablished. [open]
+  ### The two dates this node is missing are docket entries, and dockets are what it cannot hold
+
+  Both the filing date and the appeal's status are answered by a docket rather than by a decision,
+  and the committed sources are the wrong genre for them — which is a sharper statement than
+  "not established" and names what would end each question.
+
+  **The filing date.** The case number is committed: 2024-Ohio-1217 prints `C.P.C. No
+  22CV-000067` on its first page, and a Franklin County civil number carries the year of filing,
+  so 2022 is fixed. [verified] The day is not. `filed: 2022-01-04` above is read off reporting,
+  not off a document held here, and the record that states it is the **Franklin County Clerk of
+  Courts docket for 22CV-000067**, whose first entry is the complaint with its file stamp. That
+  docket is published under conditions of use stating the data "is not intended for distribution
+  by other persons, entities or organizations", so it is readable by a person and not
+  redistributable from here. [verified] No LSC budget analysis, no appellate decision and no
+  section of the Revised Code reaches a common pleas filing date, which is why none of the
+  committed sources can close this. [open]
+
+  **The appeal, and the docket that is not the one to read.** 24AP-60 is not the merits appeal.
+  It was the Senate President's interlocutory challenge to a discovery order, it was dismissed in
+  March 2024 for want of a final appealable order, and it is closed — so a Tenth District docket
+  exists for this case and reading it answers a different question. [verified] An appeal from the
+  June 2025 judgment would carry its own Tenth District case number, and the two records that
+  would state it are that court's docket, searched by party or by trial case number, and the
+  Clerk's docket for 22CV-000067, where a notice of appeal is an entry. Neither is held. [open]
+
+  What the committed record does support is a bound rather than a status: no Ohio appellate
+  decision in this case later than 2024-Ohio-1217 was found on 14 August 2026, searching an index
+  whose Tenth District coverage reached 31 July 2026. That places the merits appeal as undecided,
+  not as unfiled, and says nothing about when it was taken. [inference] So "under appeal" is
+  carried here as an unresolved posture with a date on the *search*, which is the only date any
+  held document supports.
+
+  The number of districts joined as plaintiffs remains unestablished. The annual report and the
+  budget analyses count students and dollars, not parties; the figure is a docket entry too — the
+  caption's full party list — and 2024-Ohio-1217 abbreviates it to "et al." [open]
 properties:
   seeded_because: |
     It is the live test of whether the *DeRolph* standard constrains anything in the current
@@ -81,7 +111,10 @@ properties:
     Ohio's EdChoice scholarship program is unconstitutional on two independent grounds: it
     directs school funds to religious and sectarian institutions contrary to Article VI,
     Section 2, and its expansion undermines the state's duty to secure a thorough and efficient
-    system of common schools. [verified] Filing date approximate. [open]
+    system of common schools. [verified]
+
+    The `filed:` date above is approximate and is not read off a held document; the findings name
+    the record that states it.
   remedy: |
     Not established here. Appeal announced by the Ohio Attorney General; no relief in effect at
     the time of this revision. [verified] Appellate posture must be re-checked before this node

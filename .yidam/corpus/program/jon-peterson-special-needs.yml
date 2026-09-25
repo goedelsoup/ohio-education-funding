@@ -178,9 +178,20 @@ properties:
     word "deduct" does not appear anywhere in R.C. 3310.41, 3310.51, 3310.52, 3310.01, 3310.03,
     3310.032, 3310.08 or 3313.975 as those sections now stand. [verified]
 
-    What is not established here is the pre-Fair-School-Funding-Plan mechanism, which was a
-    deduction and is a different question needing a different source. See `dew-payment-reports`.
-    [open]
+    **Before FY2022 it was a deduction, and it ran the way the autism programme's did.** LSC
+    writes that funding "is provided in the same way as that of the Autism program, through a
+    transfer of state aid from the resident district to the alternate provider", with the
+    scholarship student counted in the resident district's ADM for the state funding formula.
+    [verified] ([`crates/project`](../../../crates/project/tests/the_deduction_the_scholarships_were_paid_by.rs))
+
+    The mechanism was shared with that programme; the ceiling was not. Autism's was a flat dollar
+    cap. This programme's was the lesser of the tuition the alternate provider charged and what
+    the formula would have paid for the student — the formula amount plus the special education
+    amounts used to calculate funding for students in traditional districts — subject to the cap.
+    [verified] (the greenbook for H.B. 59 of the 130th, the programme's second year)
+
+    What is still open is the per-district arithmetic the deduction produced, not the rule that
+    produced it. `dew-payment-reports` is the source for that. [open]
   eligibility: |
     A child in kindergarten through grade 12 identified as having a specific disability, with an
     Evaluation Team Report and an individualized education program specifying the services

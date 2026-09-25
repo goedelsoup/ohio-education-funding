@@ -66,8 +66,38 @@ findings: |
   report's own implied average only moves it to 42.7%.
 
   **Either this programme is overwhelmingly a high-school one, or the published average is on a
-  basis this arithmetic does not fit.** The corpus cannot tell which from what it holds, and the
-  participation split by grade band that would settle it is not published. [open]
+  basis this arithmetic does not fit.** The first limb is priced below; the second is the one left
+  standing.
+
+  ### What the high-school limb would cost, now that the eligible population can be counted
+
+  The designated list carries the grades each building serves and the report card carries what each
+  enrols, so the *eligible* population splits on the same boundary the award schedule does. Hand
+  every building that spans the boundary to the high-school side — the assignment least favourable
+  to an elementary reading — and **64.96%** of the pupils a designated building makes eligible are
+  in kindergarten through eight. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_grade_split_the_designated_list_does_carry.rs))
+  The three published editions read 64.96%, 65.45% and 65.80%, so the shape belongs to the
+  designated set rather than to one year's list.
+
+  Read the eligible population as the pupils still enrolled in a designated building plus the
+  programme's own 42,607 recipients — the two groups that can be counted, which makes it a floor,
+  since a pupil residing in a designated zone who never enrolled there is eligible and is in
+  neither — and the ceiling on the recipient mix forces a take-up rate on each side. It requires
+  **28.02%** of eligible high-school pupils to be holding a traditional EdChoice scholarship
+  against 9.98% of the others: better than one in four, against one in ten, in a population that is
+  two thirds elementary. [verified] (crates/dispersion) That 28.02% is the floor of the claim and
+  not the middle of it, because the spanning buildings were handed to the high-school side; assign
+  them the other way and it is 34.91%. Reading the report's implied average instead relaxes the
+  mix to 42.7% and does not relax this — still better than a fifth against under an eighth.
+
+  So the first limb is not "this programme skews towards high schools", which is plausible. It is a
+  specific and large claim about who takes it up, and eligibility cannot settle it, because a
+  designated building measures who *may* claim. What would settle it is a grade-band split of the
+  42,607: the *Scholarship Annual Report* publishes participation for each programme as one number
+  and no departmental document this project can fetch breaks it by grade, so the split would have
+  to come from the per-student route that report cites and `deduction` records as entitlement-gated
+  — not from anything committed. [open]
 
   ### Who may claim it is now a per-building fact, and the department publishes the criteria
 
@@ -217,6 +247,14 @@ figures:
     value: 0.345625
     field: findings
     as_written: "at most **0.345625** in kindergarten\n  through eight"
+  - key: dispersion/edchoice-eligible-k8-share
+    value: 0.649633894027
+    field: findings
+    as_written: "**64.96%** of the pupils a designated building makes eligible are"
+  - key: dispersion/edchoice-required-high-school-take-up
+    value: 0.280174128583
+    field: findings
+    as_written: "**28.02%** of eligible high-school pupils"
   - key: dispersion/edchoice-designated-buildings
     value: 513
     field: findings
