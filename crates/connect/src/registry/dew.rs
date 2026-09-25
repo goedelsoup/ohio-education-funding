@@ -142,6 +142,51 @@ pub(super) const FOUNDATION: Connector = Connector {
                    removed one line and added two — so the extractor matches label text.",
         },
         Source {
+            key: "fy19-payment-report",
+            title: Some("FY2019 Final Traditional District Foundation Payment Report"),
+            // Openly served, anonymously, and never behind the reports portal that gates the
+            // legacy series. `dew-payment-reports` records 1999-2021 as OH|ID-only; that is true
+            // of the portal's *Foundation Legacy Payment Reports* collection and not of the
+            // per-year files still attached to this page, which reach back to FY2016.
+            url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
+                  School-Payment-Reports/State-Funding-For-Schools/\
+                  Traditional-School-Districts/Districts-Payment-Reports-in-Excel/\
+                  FY19_SFPR_FIN_2.xlsx.aspx?lang=en-US",
+            filename: "fy19-payment-report.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-fy19-payment-report"),
+            fixtures: &[crate::fixtures::FY19_PAYMENT_REPORT_FIXTURE],
+            note: "`Final #2`, the last FY2019 settlement, under the formula the Fair School \
+                   Funding Plan replaced. Retrieved for `TRANSITIONAL GUARANTEE` per district: \
+                   the one column that splits `[L1]` into the guarantee it contains and the \
+                   funding it would contain without one, which is what the third reading of \
+                   H.B. 110 Section 265.225 needs and no FY2021 file carries. One sheet, 133 \
+                   columns, 612 districts — one more than every later file, because Newbury \
+                   Local SD had not yet dissolved into West Geauga.",
+        },
+        Source {
+            key: "fy21-funding-bases",
+            title: Some("Foundation Funding Bases"),
+            // Unlinked from the current page and still served at its own address. The department
+            // published it to explain the bases the two transitional provisions compare against
+            // and has since replaced the page around it; `docProps` dates the bytes to a
+            // 16 June 2022 revision of a 12 January 2022 file.
+            url: "https://education.ohio.gov/getattachment/Topics/Finance-and-Funding/\
+                  School-Payment-Reports/State-Funding-For-Schools/\
+                  Traditional-School-Districts/\
+                  Foundation-Funding-Bases-6-16-2022.xlsx.aspx?lang=en-US",
+            filename: "foundation-funding-bases-2022.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-foundation-funding-bases"),
+            fixtures: &[crate::fixtures::FY21_FUNDING_BASE_FIXTURE],
+            note: "Six sheets, of which the sixth is the one the corpus could not do without: \
+                   `FY21 Funding Base` decomposes `[L1]` into seven terms whose first is the \
+                   FY2019 total foundation funding, district for district. That identity is the \
+                   licence for treating the guarantee as a term *inside* the formula transition \
+                   supplement’s base rather than a sibling of it, and the extractor refuses a \
+                   file that no longer reproduces it.",
+        },
+        Source {
             key: "fy26-calculator",
             title: Some("FY26 TRAD State Foundation Funding Calculator"),
             // The only address this file still has. The department replaced it in place when the

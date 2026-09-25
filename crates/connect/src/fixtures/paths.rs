@@ -43,6 +43,23 @@ pub const FY26_FIXTURE: &str = "crates/project/fixtures/fy26-department-model.cs
 /// [`super::fy25`] reads by the label's **text** and errors on a tag it cannot find.
 pub const FY25_FIXTURE: &str = "crates/project/fixtures/fy25-payment-report.csv";
 
+/// The FY2019 final payment report, per district, under the formula H.B. 110 replaced.
+///
+/// Retrieved for one column. `TRANSITIONAL GUARANTEE` is a term inside `[L1]`, the FY2021 base the
+/// formula transition supplement holds a district at, and without it the third reading of H.B. 110
+/// Section 265.225 — recompute `[K]` against a base that never contained a guarantee — cannot be
+/// priced at all. It carries the other twelve components beside it so that the total the split is
+/// taken from is checkable rather than asserted; see [`super::transition_base`].
+pub const FY19_PAYMENT_REPORT_FIXTURE: &str = "crates/project/fixtures/fy19-payment-report.csv";
+
+/// `[L1]` decomposed into the seven terms the department sums to reach it.
+///
+/// The licence for the split, and the only published artefact that says the guarantee is *inside*
+/// the FY2021 base rather than beside it. Committed in its own right because a term of a base is
+/// not recoverable from the base: four of the seven are deductions and two are marked
+/// `(pre-reduction)`, so no arithmetic over `[L1]` alone separates them.
+pub const FY21_FUNDING_BASE_FIXTURE: &str = "crates/project/fixtures/fy21-funding-base.csv";
+
 /// The FY2027 community and STEM school model, per school.
 ///
 /// In `dispersion` rather than beside the district models in `foundation` and `project` because
@@ -440,6 +457,8 @@ pub const REBUILT: &[&str] = &[
     FY27_FIXTURE,
     FY26_FIXTURE,
     FY25_FIXTURE,
+    FY19_PAYMENT_REPORT_FIXTURE,
+    FY21_FUNDING_BASE_FIXTURE,
     CALCULATOR_SCALARS_FIXTURE,
     CALCULATOR_COUNTS_FIXTURE,
     CALCULATOR_VINTAGES_FIXTURE,

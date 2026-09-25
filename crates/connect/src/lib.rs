@@ -1228,6 +1228,40 @@ fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(cause) => Rebuilt::skipped(fixtures::FY25_FIXTURE, cause.to_string()),
     });
 
+    // The FY2019 report and the FY2021 base sheet, which are read together because the claim that
+    // licenses splitting `[L1]` is about both at once. See `fixtures::transition_base`.
+    let fy19_report = (|| -> Result<Vec<Vec<String>>, RebuildError> {
+        let book = open_workbook(root, registered("fy19-payment-report"))?;
+        let rows = book.rows(fixtures::FY19_SHEET)?;
+        fixtures::build_fy19_payment_report(&rows).map_err(RebuildError::Layout)
+    })();
+    out.push(match fy19_report {
+        Ok(rows) => csv_fixture(
+            root,
+            fixtures::FY19_PAYMENT_REPORT_FIXTURE,
+            fixtures::FY19_PAYMENT_REPORT_HEADER,
+            &rows,
+        )?,
+        Err(cause) => Rebuilt::skipped(fixtures::FY19_PAYMENT_REPORT_FIXTURE, cause.to_string()),
+    });
+
+    let fy21_base = (|| -> Result<Vec<Vec<String>>, RebuildError> {
+        let bases = open_workbook(root, registered("fy21-funding-bases"))?;
+        let report = open_workbook(root, registered("fy19-payment-report"))?;
+        let base = bases.rows(fixtures::FY21_BASE_SHEET)?;
+        let fy19 = report.rows(fixtures::FY19_SHEET)?;
+        fixtures::build_fy21_funding_base(&base, &fy19).map_err(RebuildError::Layout)
+    })();
+    out.push(match fy21_base {
+        Ok(rows) => csv_fixture(
+            root,
+            fixtures::FY21_FUNDING_BASE_FIXTURE,
+            fixtures::FY21_FUNDING_BASE_HEADER,
+            &rows,
+        )?,
+        Err(cause) => Rebuilt::skipped(fixtures::FY21_FUNDING_BASE_FIXTURE, cause.to_string()),
+    });
+
     // The same workbook's per-district tables, in the columns that say what moved between the two
     // years the plan can be observed over. The catalog entry for this file recorded a decision not
     // to take them — see `fixtures::fy26` for why that was wrong.
