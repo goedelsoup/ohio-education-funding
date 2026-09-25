@@ -297,6 +297,60 @@ impl Bundle {
                 }
             }
 
+            // Beside `statewide` rather than inside it, because `statewide` *is* one of these
+            // six and nesting the other five under it would repeat the mistake this block was
+            // added to correct.
+            match &self.funding_units {
+                None => doc.raw("funding_units", "null"),
+                Some(f) => {
+                    let mut o = doc.block_obj("funding_units", "    ");
+                    o.text("authority", &f.authority);
+                    {
+                        let mut list = o.block_arr("units", "      ");
+                        for unit in &f.units {
+                            let mut u = list.obj();
+                            u.text("slug", &unit.slug);
+                            u.text("name", &unit.name);
+                            u.text("authority", &unit.authority);
+                            u.text("series", &unit.series);
+                            u.text("basis", &unit.basis);
+                            u.num("amount", unit.amount);
+                            // Written on every unit, zero included, so a consumer can tell a
+                            // wholly published figure from one this project summed without
+                            // having to know which unit that is.
+                            u.num("derived", unit.derived);
+                            u.opt("students", unit.students);
+                            u.opt_count("recipients", unit.recipients);
+                            u.text("recipients_noun", &unit.recipients_noun);
+                            let mut programmes = u.arr("programmes");
+                            for p in &unit.programmes {
+                                let mut e = programmes.obj();
+                                e.text("slug", &p.slug);
+                                e.text("name", &p.name);
+                                e.text("node", &p.node);
+                                e.num("students", p.students);
+                                e.num("expenditure", p.expenditure);
+                                e.flag("derived", p.derived);
+                            }
+                        }
+                    }
+                    let mut n = o.block_obj("nonpublic_support", "      ");
+                    n.text("series", &f.nonpublic_support.series);
+                    n.count("fiscal_year", f.nonpublic_support.fiscal_year);
+                    n.text("kind", &f.nonpublic_support.kind);
+                    n.num("total", f.nonpublic_support.total);
+                    let mut list = n.arr("lines");
+                    for line in &f.nonpublic_support.lines {
+                        let mut e = list.obj();
+                        e.text("ali", &line.ali);
+                        e.text("name", &line.name);
+                        e.text("authority", &line.authority);
+                        e.num("amount", line.amount);
+                        e.text("node", &line.node);
+                    }
+                }
+            }
+
             {
                 let mut list = doc.block_arr("checkpoints", "    ");
                 for c in &self.checkpoints {
@@ -1130,6 +1184,14 @@ impl Bundle {
                     }
                 }
                 o.opt_count("casino_counties", d.casino_counties);
+                match d.designated {
+                    None => o.raw("designated", "null"),
+                    Some(designated) => {
+                        let mut e = o.obj("designated");
+                        e.count("listed", designated.listed);
+                        e.count("designated", designated.designated);
+                    }
+                }
             }
         }
         s.push('\n');

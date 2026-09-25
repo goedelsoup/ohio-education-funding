@@ -141,6 +141,16 @@ export const CasinoYearSchema = z
   })
   .strict();
 
+/** One district's buildings on the EdChoice designated list, and how many are designated. */
+export const DesignatedSchema = z
+  .object({
+    /** Buildings the list carries for this district, designated or not. */
+    listed: z.number().int().nonnegative(),
+    /** Of those, the ones whose students may claim a traditional EdChoice scholarship. */
+    designated: z.number().int().nonnegative(),
+  })
+  .strict();
+
 /**
  * One closed fiscal year of a district's general fund.
  *
@@ -858,6 +868,19 @@ export const DistrictSchema = z
      * this is a fact about how far its catchment reaches — 1 for 178 of the 609 and up to 7.
      */
     casino_counties: z.number().int().positive().nullable(),
+    /**
+     * The district's row on the department's EdChoice designated building list, or `null` for one
+     * the list does not carry.
+     *
+     * Eligibility, not participation: a designated building is one whose students *may* claim a
+     * traditional EdChoice scholarship. Nothing published says which district a scholarship was
+     * charged against, so a page must not present this count as uptake.
+     *
+     * `null` and `{ listed: n, designated: 0 }` are different facts and the distinction is why
+     * this is nullable — three districts are absent from the file; 528 are on it with nothing
+     * designated.
+     */
+    designated: DesignatedSchema.nullable(),
   })
   .strict();
 
@@ -1466,6 +1489,122 @@ export const SeriesYearSchema = z
   })
   .strict();
 
+/**
+ * One scholarship programme inside a funding unit.
+ *
+ * The unit is the statute's object and the programme is the report's, and they are not the same
+ * partition: R.C. 3317.022(A)(10)'s educational choice unit pays both the traditional EdChoice
+ * scholarship and the expansion. Six units, five programmes.
+ */
+export const FundingUnitProgrammeSchema = z
+  .object({
+    slug: z.string().min(1),
+    name: z.string().min(1),
+    /** The corpus node documenting it. Renders at `/wiki/program/<node>`. */
+    node: z.string().min(1),
+    students: z.number(),
+    expenditure: z.number(),
+    /**
+     * Whether the expenditure was derived by this project rather than published.
+     *
+     * True for exactly one of the five: the report gives Jon Peterson's spending as six
+     * disability-category figures in a chart and never totals them.
+     */
+    derived: z.boolean(),
+  })
+  .strict();
+
+/** One of the six funding units of R.C. 3317.022. */
+export const FundingUnitSchema = z
+  .object({
+    slug: z.string().min(1),
+    name: z.string().min(1),
+    authority: z.string().min(1),
+    /**
+     * The {@link SeriesYearSchema} key carrying this unit's year, reckoning and source.
+     *
+     * Never a year label. Three keys cover six units, because the four scholarship units are one
+     * report.
+     *
+     * The three are enumerated rather than left as a string so that the key survives into
+     * `year.ts`'s `SeriesKey` without a cast: the card that renders these rows dates every amount
+     * from its own key, and a Rust-side rename that this schema accepted as "some string" would
+     * reach the page as an undated figure rather than as a build failure.
+     */
+    series: z.enum([
+      "funding_units.district",
+      "funding_units.community",
+      "funding_units.scholarship",
+    ]),
+    /** `model` where the figure projects a year not yet run, `report` where it accounts for one
+     * that has. The units cannot be summed across this. */
+    basis: z.enum(["model", "report"]),
+    amount: z.number(),
+    /** How much of `amount` this project derived rather than quoted. Zero for five of the six. */
+    derived: z.number(),
+    students: z.number().nullable(),
+    /**
+     * Districts or schools. `null` for the four scholarship units, and `null` rather than zero:
+     * nothing published says which district a scholarship was charged against.
+     */
+    recipients: z.number().int().nullable(),
+    /** What `recipients` counts, or empty where it is `null`. */
+    recipients_noun: z.string(),
+    programmes: z.array(FundingUnitProgrammeSchema),
+  })
+  .strict();
+
+/** One Category 3 appropriation line. */
+export const NonpublicSupportLineSchema = z
+  .object({
+    ali: z.string().min(1),
+    name: z.string().min(1),
+    authority: z.string().min(1),
+    amount: z.number(),
+    /** Two nodes for three lines: `200659` is a reflux of `200511`'s own unspent money. */
+    node: z.string().min(1),
+  })
+  .strict();
+
+/**
+ * Category 3 nonpublic school support, which is **not** one of the six funding units.
+ *
+ * It moves under R.C. 3317.024, 3317.06, 3317.062, 3317.063 and 3317.064, and a reader asking
+ * what the state spends on nonpublic education is asking about it as well as about the
+ * scholarships.
+ */
+export const NonpublicSupportSchema = z
+  .object({
+    /** Its one {@link SeriesYearSchema} key, enumerated for the reason {@link FundingUnitSchema}'s is. */
+    series: z.literal("funding_units.nonpublic_support"),
+    fiscal_year: z.number().int(),
+    /**
+     * Whether `fiscal_year`'s amounts are an `appropriation`, an `adjusted` appropriation or an
+     * `actual`. The last two years of the ledger this is read from are appropriations, so a
+     * consumer should expect the first and must not present it as money spent.
+     */
+    kind: z.string().min(1),
+    total: z.number(),
+    lines: z.array(NonpublicSupportLineSchema),
+  })
+  .strict();
+
+/**
+ * The six funding units of R.C. 3317.022, of which the rest of this feed is the first.
+ *
+ * The other five are not deductions from the district unit — the statute contains no such
+ * deduction — they are computed beside it and paid directly. Nothing here may be summed across:
+ * the district and community units model FY2027 and the four scholarship units account for the
+ * 2024-25 school year, which is why every unit names its own `series`.
+ */
+export const FundingUnitsSchema = z
+  .object({
+    authority: z.string().min(1),
+    units: z.array(FundingUnitSchema).min(1),
+    nonpublic_support: NonpublicSupportSchema,
+  })
+  .strict();
+
 export const BundleSchema = z
   .object({
     contract_version: z.string().min(1),
@@ -1480,6 +1619,8 @@ export const BundleSchema = z
     /** What year every other block is measured in, by series key. Sorted by key. */
     series_years: z.array(SeriesYearSchema).min(1),
     statewide: StatewideSchema,
+    /** The six funding units, of which `statewide` is the first. See {@link FundingUnitsSchema}. */
+    funding_units: FundingUnitsSchema.nullable(),
     checkpoints: z.array(CheckpointSchema),
     /** The drafts this repository holds, ordered by slug. See {@link DraftSchema}. */
     drafts: z.array(DraftSchema),
@@ -1538,5 +1679,11 @@ export type DraftProvision = z.infer<typeof DraftProvisionSchema>;
 export type ForecastCheckpoint = z.infer<typeof ForecastCheckpointSchema>;
 export type ProjectionBias = z.infer<typeof ProjectionBiasSchema>;
 export type ProjectionMeta = z.infer<typeof ProjectionMetaSchema>;
+export type FundingUnitProgramme = z.infer<typeof FundingUnitProgrammeSchema>;
+export type FundingUnit = z.infer<typeof FundingUnitSchema>;
+export type NonpublicSupportLine = z.infer<typeof NonpublicSupportLineSchema>;
+export type NonpublicSupport = z.infer<typeof NonpublicSupportSchema>;
+export type FundingUnits = z.infer<typeof FundingUnitsSchema>;
+export type Designated = z.infer<typeof DesignatedSchema>;
 export type SeriesYear = z.infer<typeof SeriesYearSchema>;
 export type Bundle = z.infer<typeof BundleSchema>;

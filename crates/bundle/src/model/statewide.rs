@@ -368,6 +368,146 @@ pub struct ProjectionBias {
     pub total_pre_closure: Option<f64>,
 }
 
+/// The six funding units of R.C. 3317.022, sized, and the nonpublic support that is not one of
+/// them.
+///
+/// # Why this block exists
+///
+/// Because the rest of this feed is one of the six. `statewide` and `districts` describe the
+/// district unit and nothing else, and until this block the only thing the site said about the
+/// other five was that a deduction routing money out of a district was "not modelled here" — a
+/// sentence about a mechanism R.C. 3317.022 abolished. The five are not deductions from the
+/// first; they are computed beside it and paid directly, and a page that shows one unit without
+/// naming the other five is describing a sixth of the system as the whole of it.
+///
+/// # The units are not on one reckoning and the block does not pretend they are
+///
+/// The district and community units come from the department's FY2027 calculators, a model of a
+/// year that has not happened. The four scholarship units come from the 2025 Scholarship Annual
+/// Report, an account of the 2024-25 school year that did. Those are two years, two reckonings
+/// and two bases, so every unit names its own [`FundingUnit::series`] and the consumer renders
+/// the year from [`Bundle::series_years`] rather than from a heading over the table. Adding the
+/// six into one total would be adding a projection to an actual; nothing here does it and no
+/// consumer should.
+#[derive(Debug, Clone, PartialEq)]
+pub struct FundingUnits {
+    /// The section that computes the six, for the page to cite: `R.C. 3317.022`.
+    pub authority: String,
+    /// The six, in the order the statute's opening sentence lists them.
+    pub units: Vec<FundingUnit>,
+    /// What the state pays chartered nonpublic schools *outside* the six.
+    pub nonpublic_support: NonpublicSupport,
+}
+
+/// One of the six funding units, sized from whatever source can size it.
+#[derive(Debug, Clone, PartialEq)]
+pub struct FundingUnit {
+    /// A stable key: `district`, `community-stem`, `educational-choice`, `pilot-project`,
+    /// `autism`, `jon-peterson`.
+    pub slug: String,
+    /// The statute's own name for it.
+    pub name: String,
+    /// The division or section its amount is computed under.
+    pub authority: String,
+    /// The [`SeriesYear::series`] key carrying this unit's year, its reckoning and its source.
+    ///
+    /// Never a year label. Three of these keys cover six units, because the four scholarship
+    /// units are one report.
+    pub series: String,
+    /// `model` where the figure is the department's projection of a year not yet run,
+    /// `report` where it is an account of a year that has.
+    ///
+    /// The distinction the units cannot be added across. See the type note.
+    pub basis: String,
+    /// What the unit was paid, or is modelled to be paid.
+    pub amount: Dollars,
+    /// How much of [`Self::amount`] this project derived rather than quoted.
+    ///
+    /// Zero for five of the six. The Jon Peterson unit publishes participation and six
+    /// disability-category figures it never totals, so its amount is a sum this project computed
+    /// — carried separately so a page can say which part of a figure is the publisher's.
+    pub derived: Dollars,
+    /// Students, where the unit's source counts them. `None` for none of the six as it stands.
+    pub students: Option<f64>,
+    /// Districts or schools, where the unit has a count of them beside its students.
+    ///
+    /// `None` for the four scholarship units: the report does not say which district a
+    /// scholarship was charged against, and no published file does.
+    pub recipients: Option<usize>,
+    /// What [`Self::recipients`] counts — `districts`, `schools` — or empty where it is `None`.
+    pub recipients_noun: String,
+    /// The programmes summing to this unit. Empty for the district and community units, one for
+    /// three of the scholarship units, two for the educational choice unit.
+    pub programmes: Vec<FundingUnitProgramme>,
+}
+
+/// One scholarship programme inside a funding unit.
+///
+/// The unit is the statute's object and the programme is the report's, and they are not the same
+/// partition: the educational choice unit of R.C. 3317.022(A)(10) pays both the traditional
+/// EdChoice scholarship and the expansion, which have different eligibility and different average
+/// awards. Six units, five programmes, and the join is here.
+#[derive(Debug, Clone, PartialEq)]
+pub struct FundingUnitProgramme {
+    /// The report extract's own slug.
+    pub slug: String,
+    /// The programme's name as the report prints it.
+    pub name: String,
+    /// The corpus node documenting it. Renders at `/wiki/program/<node>`.
+    pub node: String,
+    /// Participation. Every programme publishes one.
+    pub students: f64,
+    /// Statewide expenditure.
+    pub expenditure: Dollars,
+    /// Whether that expenditure was derived by this project rather than published.
+    ///
+    /// True for exactly one of the five. See [`FundingUnit::derived`].
+    pub derived: bool,
+}
+
+/// Category 3 nonpublic school support, which is **not** one of the six funding units.
+///
+/// Three appropriation lines paid under R.C. 3317.024, 3317.06, 3317.062, 3317.063 and 3317.064
+/// — not under R.C. 3317.022 — and about a quarter of a billion dollars a year. It travels with
+/// the units because a reader asking what the state spends on nonpublic education is asking about
+/// both, and it is kept out of the units' list because the statute keeps it out.
+#[derive(Debug, Clone, PartialEq)]
+pub struct NonpublicSupport {
+    /// The [`SeriesYear::series`] key carrying the year, its reckoning and its source.
+    pub series: String,
+    /// The fiscal year the three amounts are for — the last one all three lines answer for.
+    ///
+    /// Carried as a number as well as through [`Self::series`] because it is what the label in
+    /// `series_years` is derived from, and a label derived from a figure that is not in the feed
+    /// is a label nothing can check.
+    pub fiscal_year: u16,
+    /// Whether the year named there is an `appropriation`, an `adjusted` appropriation or an
+    /// `actual`. The last two years of the series are appropriations.
+    pub kind: String,
+    /// The three lines summed.
+    pub total: Dollars,
+    /// The three, in the order the Legislative Service Commission prints them.
+    pub lines: Vec<NonpublicSupportLine>,
+}
+
+/// One Category 3 appropriation line.
+#[derive(Debug, Clone, PartialEq)]
+pub struct NonpublicSupportLine {
+    /// The appropriation line item: `200511`, `200532`, `200659`.
+    pub ali: String,
+    /// The line's title.
+    pub name: String,
+    /// The sections it moves under.
+    pub authority: String,
+    /// The amount in that year's dollars.
+    pub amount: Dollars,
+    /// The corpus node documenting it, at `/wiki/program/<node>`.
+    ///
+    /// Two nodes for three lines: `200659` is a reflux of `200511`'s own unspent money rather
+    /// than a programme, so both point at `auxiliary-services`.
+    pub node: String,
+}
+
 /// The exported feed.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Bundle {
@@ -388,6 +528,10 @@ pub struct Bundle {
     pub series_years: Vec<SeriesYear>,
     /// Statewide aggregates.
     pub statewide: Statewide,
+    /// The six funding units of R.C. 3317.022, of which everything else here is the first.
+    ///
+    /// `None` only if the sources that size the other five are absent. See [`FundingUnits`].
+    pub funding_units: Option<FundingUnits>,
     /// Reference results the consumer must reproduce.
     pub checkpoints: Vec<Checkpoint>,
     /// The drafts this repository holds, ordered by slug. Empty if none.

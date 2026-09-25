@@ -948,6 +948,32 @@ pub struct District {
     /// 609 here it is a fact about how far a district's catchment reaches across county lines,
     /// and it is the reason the published sheets are keyed on (county, IRN).
     pub casino_counties: Option<usize>,
+    /// The department's EdChoice designated list for this district: buildings on it, and how many
+    /// of them are designated.
+    ///
+    /// `None` for a district the list does not carry at all — three of the 609 — which is a
+    /// different fact from a district whose buildings are all undesignated, and the distinction is
+    /// the whole reason this is an option rather than a pair of zeroes. 513 buildings in 78
+    /// districts are designated; the other 528 districts hold none.
+    ///
+    /// **Eligibility, not participation.** A designated building is one whose students *may*
+    /// apply. Nothing published says which district a scholarship was charged against, so this is
+    /// as close as the per-district question gets — see [`dispersion::designated`].
+    pub designated: Option<Designated>,
+}
+
+/// One district's row on the EdChoice designated list.
+///
+/// Two counts rather than one because a share is the question a reader actually has — "three of
+/// my district's nine buildings" says something "three" does not — and because the denominator is
+/// the list's own coverage of the district and not its building count, which this feed does not
+/// otherwise hold.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub struct Designated {
+    /// Buildings the list carries for this district, designated or not.
+    pub listed: usize,
+    /// Of those, the ones whose students may claim a traditional EdChoice scholarship.
+    pub designated: usize,
 }
 
 impl District {

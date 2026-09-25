@@ -31,10 +31,16 @@ export type {
   Draft,
   DraftProvision,
   Deflator,
+  Designated,
   District,
   DistrictOutcome,
   FinanceYear,
   ForecastCheckpoint,
+  FundingUnit,
+  FundingUnitProgramme,
+  FundingUnits,
+  NonpublicSupport,
+  NonpublicSupportLine,
   OutcomeStatewide,
   PolicyShape,
   ProjectionBias,
@@ -51,7 +57,7 @@ import type { Bundle, District, Statewide } from "./schema/feed.ts";
  * the build and the scenario routes refuse to proceed past when the two disagree — the deliberate
  * half of drift detection, where the strictness of the schemas is the accidental half.
  */
-export const REQUIRED_CONTRACT = "46.0.0";
+export const REQUIRED_CONTRACT = "47.0.0";
 
 /**
  * A district with only the fields the funding formula reads.
@@ -75,6 +81,11 @@ export const REQUIRED_CONTRACT = "46.0.0";
  * `supplements` goes out too: the performance supplement and the two enrolment supplements sit
  * outside foundation funding, and the scenario builder models the formula. A lever that changed
  * them would be changing something the formula does not compute.
+ *
+ * `designated` goes out because it is not a funding figure at all. It is eligibility for a
+ * scholarship the formula does not compute and no lever moves — under R.C. 3317.022 the
+ * educational choice unit is paid beside the district unit, not out of it — so a browser holding
+ * it could only put a building count next to a dollar figure the building count does not enter.
  *
  * `house_districts` goes out for the same reason and one more: it is a *derived* estimate, and the
  * scenario builder re-runs the formula per district from exact figures. A browser holding an
@@ -123,6 +134,7 @@ export type PanelDistrict = Omit<
   | "gifted"
   | "casino"
   | "casino_counties"
+  | "designated"
 >;
 
 /**
@@ -140,6 +152,12 @@ export type PanelDistrict = Omit<
  * thousand districts, on a *fifth* pupil count — and it is money no lever in the scenario builder
  * can move, because it never passes through an appropriation. A browser holding it would be one
  * property access from a per-pupil figure whose denominator is not in the feed.
+ *
+ * `funding_units` is omitted on the same ground and one more. Five of its six units are computed
+ * beside the panel rather than over it — a community school has no valuation, no charge-off and
+ * no local share, and a scholarship is not per district at all — so no lever here reaches them,
+ * and the block's own rule is that its units are on two bases and may not be summed. A scenario
+ * page holding it would be one property access from a total that means nothing.
  */
 export interface Panel
   extends Omit<
@@ -150,6 +168,7 @@ export interface Panel
     | "history"
     | "meal_program"
     | "casino"
+    | "funding_units"
     | "appropriations"
     | "appropriation_lines"
     | "house_districts"

@@ -41,6 +41,29 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `47.0.0` added `funding_units`: the six funding units of R.C. 3317.022, of which everything
+/// else in this feed is the first. The district unit's amount is `statewide.realized_aid_total`;
+/// the community and STEM unit comes from the department's FY2027 community school model; the
+/// four scholarship units come from the 2025 Scholarship Annual Report. Category 3 nonpublic
+/// support travels in the same object and is explicitly **not** one of the six. `series_years`
+/// gains four keys, one per source.
+///
+/// Breaking rather than additive, and not because of the shape. Until now the only thing this
+/// feed said about the other five units was a sentence on the method page describing a
+/// *deduction* from the district unit — a mechanism R.C. 3317.022 does not contain. A consumer
+/// that presented `statewide` as what Ohio spends on primary and secondary education was making
+/// a claim this block contradicts, in the same way `37.0.0`'s casino block contradicted "what
+/// the state sends this district". Nothing in the six may be summed: two are a model of FY2027
+/// and four are an account of the 2024-25 school year, which is why each unit names its own
+/// `series` rather than sitting under one heading.
+///
+/// It also adds `district.designated` — the department's EdChoice designated list per district,
+/// as buildings listed and buildings designated — and a fifth `series_years` key for it. The
+/// list is *eligibility*, not participation: nothing published says which district a scholarship
+/// was charged against, so a consumer must not read the count as uptake. `null` for the three
+/// districts the list does not carry, which is a different fact from a district whose buildings
+/// are all undesignated.
+///
 /// `38.0.0` makes the five `finances` figures nullable — `state_aid`, `local_tax`,
 /// `total_revenue`, `total_expenditure`, `ending_cash` — in both the per-district and the
 /// statewide arrays. A five-year forecast filing may carry a district's year and not every line
@@ -211,7 +234,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "46.0.0";
+pub const CONTRACT_VERSION: &str = "47.0.0";
 
 mod model;
 mod serialize;

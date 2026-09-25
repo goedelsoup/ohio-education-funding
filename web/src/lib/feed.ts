@@ -530,6 +530,7 @@ export const formulaInputs = ({
     national: _nat,
     casino: _cas,
     casino_counties: _cc,
+    designated: _des,
     ...district
   }: District): PanelDistrict => district;
 

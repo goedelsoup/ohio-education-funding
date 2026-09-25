@@ -57,7 +57,12 @@ export type SeriesKey =
   | "appropriations"
   | "meal_program"
   | "biennium"
-  | "casino";
+  | "casino"
+  | "funding_units.district"
+  | "funding_units.community"
+  | "funding_units.scholarship"
+  | "funding_units.nonpublic_support"
+  | "designated";
 
 /**
  * The year block for a series, or `null` where the feed does not carry one.

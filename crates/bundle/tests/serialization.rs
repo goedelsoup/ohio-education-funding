@@ -273,6 +273,10 @@ fn sample() -> District {
             },
         ],
         casino_counties: Some(3),
+        designated: Some(bundle::Designated {
+            listed: 9,
+            designated: 3,
+        }),
         outcome: Some(DistrictOutcome {
             performance_index: Some(89.9),
             performance_index_prior: Some(89.1),
@@ -402,6 +406,59 @@ fn bundle(districts: Vec<District>, checkpoints: Vec<Checkpoint>) -> Bundle {
                 source: "DEW FY27 calculator".into(),
             },
         ],
+        // One unit of each shape: a modelled one with recipients and no programmes, a reported
+        // one whose amount this project derived, and the Category 3 block that is not a unit.
+        funding_units: Some(FundingUnits {
+            authority: "R.C. 3317.022".into(),
+            units: vec![
+                FundingUnit {
+                    slug: "district".into(),
+                    name: "a city, local, or exempted village school district".into(),
+                    authority: "R.C. 3317.022(A)".into(),
+                    series: "funding_units.district".into(),
+                    basis: "model".into(),
+                    amount: 7_281_227_591.65,
+                    derived: 0.0,
+                    students: Some(1_425_005.525_5),
+                    recipients: Some(609),
+                    recipients_noun: "districts".into(),
+                    programmes: vec![],
+                },
+                FundingUnit {
+                    slug: "jon-peterson".into(),
+                    name: "the Jon Peterson special needs scholarship unit".into(),
+                    authority: "R.C. 3317.022(A)(13)".into(),
+                    series: "funding_units.scholarship".into(),
+                    basis: "report".into(),
+                    amount: 103_944_388.15,
+                    derived: 103_944_388.15,
+                    students: Some(8_680.0),
+                    recipients: None,
+                    recipients_noun: String::new(),
+                    programmes: vec![FundingUnitProgramme {
+                        slug: "jon-peterson".into(),
+                        name: "Jon Peterson Special Needs Scholarship Program".into(),
+                        node: "jon-peterson-special-needs".into(),
+                        students: 8_680.0,
+                        expenditure: 103_944_388.15,
+                        derived: true,
+                    }],
+                },
+            ],
+            nonpublic_support: NonpublicSupport {
+                series: "funding_units.nonpublic_support".into(),
+                fiscal_year: 2027,
+                kind: "appropriation".into(),
+                total: 250_737_573.0,
+                lines: vec![NonpublicSupportLine {
+                    ali: "200511".into(),
+                    name: "Auxiliary Services".into(),
+                    authority: "R.C. 3317.024(E), 3317.06 and 3317.062".into(),
+                    amount: 172_262_613.0,
+                    node: "auxiliary-services".into(),
+                }],
+            },
+        }),
         senate_districts: vec![HouseDistrict {
             number: "031".into(),
             adm: 4_812.3,
@@ -968,6 +1025,25 @@ fn a_district_outside_the_last_distribution_says_null_rather_than_zero() {
     .to_json();
     assert!(json.contains("\"casino\": []"));
     assert!(json.contains("\"casino_counties\": null"));
+}
+
+#[test]
+fn a_district_the_designated_list_does_not_carry_says_null_rather_than_no_buildings() {
+    // The same distinction as the test above, on a list that makes it matter more: 528 of the
+    // 609 districts hold no designated building, and a reader has to be able to tell those from
+    // the three the department's file never mentions. `{"listed": 0}` would say the district has
+    // no schools.
+    let json = Bundle {
+        ..bundle(
+            vec![District {
+                designated: None,
+                ..sample()
+            }],
+            vec![],
+        )
+    }
+    .to_json();
+    assert!(json.contains("\"designated\": null"));
 }
 
 #[test]

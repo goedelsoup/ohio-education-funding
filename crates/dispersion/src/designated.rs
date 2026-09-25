@@ -34,6 +34,14 @@ title1_share_2526,title1_average";
 /// as a three-year average.
 pub const TITLE1_THRESHOLD: f64 = 0.20;
 
+/// The school year the designations take effect in, as the department writes it.
+///
+/// A school year and not a fiscal one: R.C. 3310.03 designates a building *for* a year of
+/// enrolment, and the list is published the autumn before it. Named here because it is the
+/// fixture's own vintage — the same digits as the `2627` in its file name — and a page that wrote
+/// `2026-27` beside a count would go stale one edition later while the count moved.
+pub const SCHOOL_YEAR: &str = "2026-27";
+
 /// One building on the designated list, designated or not.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Building {
