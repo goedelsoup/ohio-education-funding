@@ -42,6 +42,71 @@ pub const TITLE1_THRESHOLD: f64 = 0.20;
 /// `2026-27` beside a count would go stale one edition later while the count moved.
 pub const SCHOOL_YEAR: &str = "2026-27";
 
+/// Which side of the traditional EdChoice award ceiling a building's grades fall on.
+///
+/// R.C. 3317.022(A)(10) sets one maximum for kindergarten through eight and a higher one for
+/// nine through twelve, so the grade a scholarship student is in decides which ceiling their
+/// award is capped at. The published list serves grades per building, which is the closest thing
+/// to that split this corpus holds.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum Band {
+    /// Every graded level served is eighth grade or below — the lower ceiling's side.
+    ThroughEight,
+    /// Every graded level served is ninth grade or above — the higher ceiling's side.
+    NineAndAbove,
+    /// The building serves grades on both sides of the boundary, so its enrolment splits and the
+    /// list does not say how.
+    Both,
+}
+
+/// Read a `grade_levels` cell as a [`Band`].
+///
+/// The cell is a semicolon-separated list the extractor built from the source's commas, and it
+/// mixes numeric levels and ranges with lettered markers: `K` for kindergarten, `P` for
+/// preschool, and `D`, `H`, `SN`, `UNG` and `PS` for programmes that name no grade at all. The
+/// markers that name no grade are skipped; `P` and any part beginning `K` put the building's
+/// floor at or below kindergarten, so `K-12` spans the boundary and `K-6` does not.
+///
+/// # Panics
+///
+/// If a part is neither a known marker nor a grade or grade range, and if a cell names no grade
+/// at all — which no row of any committed edition does.
+#[must_use]
+pub fn band(grade_levels: &str) -> Band {
+    let mut levels: Vec<u32> = Vec::new();
+    for part in grade_levels.split(';').map(str::trim) {
+        match part {
+            "" | "D" | "H" | "SN" | "UNG" | "PS" => continue,
+            "P" | "PK" => levels.push(0),
+            _ => {
+                if part.starts_with('K') {
+                    levels.push(0);
+                }
+                for piece in part.trim_start_matches(['K', '-']).split('-') {
+                    if piece.is_empty() {
+                        continue;
+                    }
+                    levels.push(piece.parse().unwrap_or_else(|_| {
+                        panic!("the designated list writes {part:?} where a grade belongs")
+                    }));
+                }
+            }
+        }
+    }
+    let highest = *levels
+        .iter()
+        .max()
+        .unwrap_or_else(|| panic!("{grade_levels:?} names no grade level"));
+    let lowest = *levels.iter().min().expect("checked above");
+    if highest <= 8 {
+        Band::ThroughEight
+    } else if lowest >= 9 {
+        Band::NineAndAbove
+    } else {
+        Band::Both
+    }
+}
+
 /// One building on the designated list, designated or not.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Building {
@@ -107,6 +172,12 @@ impl Building {
     #[must_use]
     pub fn bottom_20_years(&self) -> usize {
         self.bottom_20_by_year.iter().filter(|flag| **flag).count()
+    }
+
+    /// Which award ceiling this building's grades fall under, by [`band`].
+    #[must_use]
+    pub fn band(&self) -> Band {
+        band(&self.grade_levels)
     }
 }
 
@@ -220,6 +291,34 @@ mod tests {
             .filter(|b| b.grade_levels.contains(';'))
             .count();
         assert_eq!(split, 602, "the comma substitution lost a boundary");
+    }
+
+    /// The cases the marker vocabulary puts on the wrong side if the cell is read for digits
+    /// alone.
+    ///
+    /// `K-12` and `K;12` are the ones that matter: reading the lowest number in the cell puts
+    /// both entirely above the boundary, which is thirteen buildings of the current edition filed
+    /// as high schools. `P` and `D;P;K` name no number at all and are the opposite trap.
+    #[test]
+    fn a_kindergarten_floor_is_a_floor_whether_or_not_it_is_written_as_a_digit() {
+        assert_eq!(band("K-12"), Band::Both);
+        assert_eq!(band("K;12"), Band::Both);
+        assert_eq!(band("K-8"), Band::ThroughEight);
+        assert_eq!(band("K-12;P"), Band::Both);
+        assert_eq!(band("P"), Band::ThroughEight);
+        assert_eq!(band("D;P;K"), Band::ThroughEight);
+        assert_eq!(band("P;K;1-4;SN"), Band::ThroughEight);
+        assert_eq!(band("9-12;PS;UNG;SN"), Band::NineAndAbove);
+        assert_eq!(band("10-12"), Band::NineAndAbove);
+        assert_eq!(band("5-9"), Band::Both);
+        assert_eq!(band("7-8;SN"), Band::ThroughEight);
+    }
+
+    /// `PS` is post-secondary and is not `P`, which the one-letter test would take it for.
+    #[test]
+    fn the_post_secondary_marker_does_not_read_as_a_preschool_one() {
+        assert_eq!(band("7-12;PS"), Band::Both);
+        assert_eq!(band("9-12;PS;SN"), Band::NineAndAbove);
     }
 
     #[test]

@@ -64,7 +64,9 @@ findings: |
   From FY2010 renewals are counted independently and land 10% to 14% below the prior year's
   payments. [verified] (crates/project) That is attrition the earlier convention made
   arithmetically invisible, and it means a renewal rate computed across the whole series is
-  computed across two different definitions. [open]
+  computed across two different definitions. That is not an open question but a consequence of
+  the two verified findings above it, and both halves of it are held. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_renewal_that_was_last_years_payments.rs))
 
   ### And the programme's existence is what keeps Cleveland off the EdChoice designated list
 

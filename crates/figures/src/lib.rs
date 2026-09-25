@@ -14957,6 +14957,46 @@ pub static FIGURES: &[Figure] = &[
         },
     },
     Figure {
+        key: "dispersion/edchoice-eligible-k8-share",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Share of the pupils a designated building makes eligible who are in grades \
+                kindergarten through eight, 2024-2025, counting every building that spans the \
+                boundary as a high school",
+        pinned: 0.649_633_894_027,
+        tolerance: 0.000_01,
+        compute: |_| {
+            dispersion::designated_editions::eligible_by_band(
+                dispersion::designated_editions::Edition::Y2425,
+            )
+            .least_k8_share()
+        },
+    },
+    Figure {
+        key: "dispersion/edchoice-required-high-school-take-up",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Take-up among eligible pupils in grades nine to twelve that the published \
+                average award would require, 2024-2025",
+        pinned: 0.280_174_128_583,
+        tolerance: 0.000_01,
+        compute: |_| {
+            let programmes = project::scholarship::report::programmes();
+            let edchoice = &programmes["traditional-edchoice"];
+            let ceiling = project::scholarship::greatest_k8_share(
+                edchoice
+                    .published_average
+                    .expect("the report publishes this programme's average"),
+            )
+            .expect("the published average lies between the two grade ceilings");
+            dispersion::designated_editions::eligible_by_band(
+                dispersion::designated_editions::Edition::Y2425,
+            )
+            .required_take_up(edchoice.students, ceiling, true)
+            .1
+        },
+    },
+    Figure {
         key: "dispersion/edchoice-title1-misread-buildings",
         owner: "crates/dispersion",
         unit: Unit::Count,
