@@ -155,6 +155,36 @@ pub mod report {
     /// row.
     pub const FISCAL_YEAR: u16 = 2025;
 
+    /// The same year as the report itself names it, which is a school year and not a fiscal one.
+    ///
+    /// Derived from [`FISCAL_YEAR`] rather than typed a second time. A school year straddles two
+    /// calendar years and is the reckoning the report's own title uses, so a consumer placing
+    /// this channel beside an FY-labelled figure has to be told which kind of year it is on —
+    /// see `.yidam/decisions/every-figure-says-its-year.yml`.
+    #[must_use]
+    pub fn school_year() -> String {
+        format!("{}-{:02}", FISCAL_YEAR - 1, FISCAL_YEAR % 100)
+    }
+
+    /// Jon Peterson's statewide expenditure, which the report does not publish.
+    ///
+    /// The report gives this programme's spending as **six disability-category figures in a
+    /// chart and never totals them**; this is their sum. It is a constant here and deliberately
+    /// **not** a value in `scholarship-programs.csv`, whose `expenditure` column holds quoted
+    /// figures and whose blank cell is the assertion that the report publishes none —
+    /// `jon_peterson_publishes_participation_but_not_a_total` exists to keep it blank, on the
+    /// ground that a derived total in a column of quoted ones is the kind of figure that gets
+    /// quoted back as published.
+    ///
+    /// So it lives beside the reader, labelled, where [`channel`] can reach it and
+    /// [`published_expenditure`] cannot. The catalog record
+    /// `.yidam/catalog/dew-scholarship-annual-report.md` carries the same figure with the same
+    /// label, and the largest single category is $74,946,785.41 of it.
+    pub const JON_PETERSON_DERIVED_EXPENDITURE: Dollars = 103_944_388.15;
+
+    /// The fixture's slug for the one programme whose expenditure is derived.
+    pub const DERIVED: &str = "jon-peterson";
+
     /// One programme as the report gives it.
     #[derive(Debug, Clone, PartialEq)]
     pub struct Programme {
@@ -203,6 +233,176 @@ pub mod report {
                 )
             })
             .collect()
+    }
+
+    /// What the channel paid, decomposed the way the report publishes it.
+    ///
+    /// Two totals rather than one, because only the first is fully sourced. See
+    /// [`JON_PETERSON_DERIVED_EXPENDITURE`] for why the distinction is carried this far.
+    #[derive(Debug, Clone, Copy, PartialEq)]
+    pub struct Channel {
+        /// Participation across all five programmes. Every one of them publishes it.
+        pub students: f64,
+        /// What the four programmes that publish an expenditure paid.
+        pub published: Dollars,
+        /// Jon Peterson's, summed from the six category figures the report never totals.
+        pub derived: Dollars,
+        /// The two above. The quotable figure, and the one that is only partly quoted.
+        pub total: Dollars,
+        /// How many programmes the first figure covers, and how many the last one does.
+        pub programmes: (usize, usize),
+    }
+
+    /// The four published expenditures, summed.
+    ///
+    /// Jon Peterson is absent by construction: its cell is blank in the fixture and
+    /// [`Programme::expenditure`] is `None`, so nothing here has to know its name.
+    #[must_use]
+    pub fn published_expenditure() -> Dollars {
+        programmes().values().filter_map(|p| p.expenditure).sum()
+    }
+
+    /// The channel, published and derived halves apart.
+    ///
+    /// # Panics
+    ///
+    /// If the fixture stops carrying [`DERIVED`], which would mean the report's programme list
+    /// changed and the constant beside it is answering for a programme that is no longer there.
+    #[must_use]
+    pub fn channel() -> Channel {
+        let all = programmes();
+        assert!(
+            all.contains_key(DERIVED),
+            "the fixture no longer carries `{DERIVED}`, whose expenditure is a constant here"
+        );
+        let published = all.values().filter_map(|p| p.expenditure).sum();
+        Channel {
+            students: all.values().map(|p| p.students).sum(),
+            published,
+            derived: JON_PETERSON_DERIVED_EXPENDITURE,
+            total: published + JON_PETERSON_DERIVED_EXPENDITURE,
+            programmes: (
+                all.values().filter(|p| p.expenditure.is_some()).count(),
+                all.len(),
+            ),
+        }
+    }
+}
+
+/// The six funding units R.C. 3317.022 computes and distributes state core foundation funding to.
+///
+/// # Why a unit is not a programme
+///
+/// The statute names six units and this repository holds five scholarship *programmes*, and the
+/// two lists are not the same length. **The educational choice scholarship unit is one unit and
+/// two programmes** — traditional EdChoice under R.C. 3310.03 and the income-based expansion
+/// under R.C. 3310.032, which run concurrently under different eligibility and, since October
+/// 2023, different award rules. Division (A)(10) computes them together.
+///
+/// So a page that puts "the units" beside "the programmes" and gets six of each has miscounted
+/// somewhere, and [`units::Unit::programmes`] is the join that stops it: each unit names the report
+/// slugs that sum to it, and the district and community units name none because the annual
+/// report does not cover them.
+///
+/// # What is not a unit
+///
+/// Category 3 nonpublic support — Auxiliary Services, the Nonpublic Administrative Cost
+/// Reimbursement and the reimbursement fund — moves under R.C. 3317.024, 3317.06, 3317.062,
+/// 3317.063 and 3317.064 and under none of these divisions. See
+/// [`super::ledger::nonpublic_support`], which is about a quarter of a billion dollars a year
+/// that no reading of this list reaches.
+pub mod units {
+    /// One funding unit, as the opening of R.C. 3317.022 names it.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub struct Unit {
+        /// A stable key. Not the statute's words, which are a sentence rather than an
+        /// identifier.
+        pub slug: &'static str,
+        /// The statute's own name for it, verbatim.
+        pub name: &'static str,
+        /// The division of R.C. 3317.022(A) its amount is computed under, where the opening
+        /// names one. The district and community units are computed elsewhere and carry the
+        /// section that computes them instead.
+        pub authority: &'static str,
+        /// The slugs in [`super::report::programmes`] that sum to this unit. Empty for the two
+        /// units the scholarship annual report does not cover.
+        pub programmes: &'static [&'static str],
+    }
+
+    /// All six, in the order the statute's opening sentence lists them.
+    ///
+    /// The district unit is first because the sentence puts it first, and because it is the only
+    /// one of the six this site modelled until the block that reads this was written.
+    pub const UNITS: [Unit; 6] = [
+        Unit {
+            slug: "district",
+            name: "a city, local, or exempted village school district",
+            authority: "R.C. 3317.022(A)",
+            programmes: &[],
+        },
+        Unit {
+            slug: "community-stem",
+            name: "the community and STEM school unit",
+            authority: "R.C. 3317.026",
+            programmes: &[],
+        },
+        Unit {
+            slug: "educational-choice",
+            name: "the educational choice scholarship unit",
+            authority: "R.C. 3317.022(A)(10)",
+            programmes: &["traditional-edchoice", "edchoice-expansion"],
+        },
+        Unit {
+            slug: "pilot-project",
+            name: "the pilot project scholarship unit",
+            authority: "R.C. 3317.022(A)(11)",
+            programmes: &["cleveland"],
+        },
+        Unit {
+            slug: "autism",
+            name: "the autism scholarship unit",
+            authority: "R.C. 3317.022(A)(12)",
+            programmes: &["autism"],
+        },
+        Unit {
+            slug: "jon-peterson",
+            name: "the Jon Peterson special needs scholarship unit",
+            authority: "R.C. 3317.022(A)(13)",
+            programmes: &["jon-peterson"],
+        },
+    ];
+
+    /// The unit with this slug.
+    #[must_use]
+    pub fn of(slug: &str) -> Option<Unit> {
+        UNITS.into_iter().find(|unit| unit.slug == slug)
+    }
+
+    /// Where each programme is written up, keyed by the fixture's slug.
+    ///
+    /// The value is the corpus node's own file name under `.yidam/corpus/program/`, which is
+    /// also the last segment of the address it renders at — `/wiki/program/<node>`. It is here
+    /// rather than on [`Unit`] because a node documents a *programme* and the educational choice
+    /// unit is two of them, so a unit-level field would have to choose one and lose the other.
+    ///
+    /// `the_programmes_name_the_nodes_that_document_them` keeps this list and the fixture's slugs
+    /// in step; nothing in this crate can see the corpus itself, so the node names are checked by
+    /// the web layer that resolves them.
+    pub const NODES: [(&str, &str); 5] = [
+        ("traditional-edchoice", "edchoice-scholarship"),
+        ("edchoice-expansion", "edchoice-expansion"),
+        ("cleveland", "cleveland-scholarship"),
+        ("autism", "autism-scholarship"),
+        ("jon-peterson", "jon-peterson-special-needs"),
+    ];
+
+    /// The corpus node documenting this programme.
+    #[must_use]
+    pub fn node(programme: &str) -> Option<&'static str> {
+        NODES
+            .into_iter()
+            .find(|(slug, _)| *slug == programme)
+            .map(|(_, node)| node)
     }
 }
 

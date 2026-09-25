@@ -43,11 +43,12 @@ use std::collections::{BTreeMap, BTreeSet, HashMap};
 use crate::{
     AppropriationLine, AppropriationYear, BaseCostBuildUp, Biennium, BienniumLines, Bundle,
     CareerTechnical, CasinoYear, Categoricals, Checkpoint, Deflator, District, DistrictOutcome,
-    Dpia, Draft, DraftProvision, EnglishLearners, FinanceYear, ForecastCheckpoint, Gifted,
-    HistoryYear, HouseDistrictMember, HouseDistrictShare, MealProgramYear, MillageAnalysis,
-    National, OutcomeStatewide, PolicyShape, Projection, ProjectionBias, PropertyTaxYear,
-    RegimeCounterfactual, SeriesYear, SpecialEducation, SpendingByFunction, StateFinance,
-    Statewide, TargetedAssistance, Typology, YearKind, CONTRACT_VERSION,
+    Dpia, Draft, DraftProvision, EnglishLearners, FinanceYear, ForecastCheckpoint, FundingUnit,
+    FundingUnitProgramme, FundingUnits, Gifted, HistoryYear, HouseDistrictMember,
+    HouseDistrictShare, MealProgramYear, MillageAnalysis, National, NonpublicSupport,
+    NonpublicSupportLine, OutcomeStatewide, PolicyShape, Projection, ProjectionBias,
+    PropertyTaxYear, RegimeCounterfactual, SeriesYear, SpecialEducation, SpendingByFunction,
+    StateFinance, Statewide, TargetedAssistance, Typology, YearKind, CONTRACT_VERSION,
 };
 use dispersion::census_states::StateFinance as CensusState;
 use dispersion::mr81::poverty_share_by_year;
@@ -616,6 +617,11 @@ struct Joins<'a> {
     /// What kind of district the department says this is, or `None` for one its 2013 roster does
     /// not carry. Built once for the whole panel: the fixture is 614 rows and is read per call.
     typology: Option<&'a dispersion::typology::District>,
+    /// The district's buildings on the EdChoice designated list, and how many are designated.
+    ///
+    /// `None` for a district the list does not carry. Built once for the whole panel, because
+    /// `dispersion::designated::by_district` reads 2,877 rows per call.
+    designated: Option<&'a (usize, usize)>,
 }
 
 /// The biennium block, or zeroes for a district the payment files do not carry.
@@ -670,6 +676,7 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
         casino,
         typology,
         biennium,
+        designated,
     } = *joins;
     let adm = record.base_cost_adm();
     District {
@@ -878,6 +885,10 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
         }),
         casino: casino.map_or_else(Vec::new, |(years, _)| years.clone()),
         casino_counties: casino.and_then(|(_, counties)| *counties),
+        designated: designated.map(|(listed, designated)| crate::Designated {
+            listed: *listed,
+            designated: *designated,
+        }),
         outcome: outcome.map(|joined| DistrictOutcome {
             performance_index: joined.outcome.performance_index,
             performance_index_prior: joined.outcome.performance_index_prior,
@@ -940,6 +951,7 @@ fn series_years(
     appropriations: &[AppropriationYear],
     meal_program: &[MealProgramYear],
     casino: &[CasinoYear],
+    funding_units: &FundingUnits,
 ) -> Vec<SeriesYear> {
     let mut out = vec![
         SeriesYear {
@@ -1087,6 +1099,47 @@ fn series_years(
         });
     }
 
+    // Four rows for six units and three lines, because the year is a property of the source and
+    // three sources answer for all of them. Two of these are fiscal years of a model and one is
+    // a school year of an account, which is exactly why the table takes its labels from here
+    // instead of from a heading: the rows are on more than one reckoning and every one of them
+    // has to say which.
+    out.push(SeriesYear {
+        series: "funding_units.district".into(),
+        kind: YearKind::Fiscal,
+        label: format!("FY{}", MODEL_YEAR.0),
+        source: "DEW FY27 TRAD State Foundation Funding Calculator".into(),
+    });
+    out.push(SeriesYear {
+        series: "funding_units.community".into(),
+        kind: YearKind::Fiscal,
+        label: format!("FY{}", dispersion::community_school_funding::FISCAL_YEAR),
+        source: "DEW FY27 community school funding calculator".into(),
+    });
+    out.push(SeriesYear {
+        series: "funding_units.scholarship".into(),
+        kind: YearKind::School,
+        // Derived from the report's fiscal year rather than typed. The report is the one source
+        // in this feed that names its own coverage only in prose.
+        label: project::scholarship::report::school_year(),
+        source: "DEW 2025 Scholarship Annual Report".into(),
+    });
+    out.push(SeriesYear {
+        series: funding_units.nonpublic_support.series.clone(),
+        kind: YearKind::Fiscal,
+        label: format!("FY{}", funding_units.nonpublic_support.fiscal_year),
+        source: "Legislative Service Commission, Category 3 nonpublic school support".into(),
+    });
+    out.push(SeriesYear {
+        series: "designated".into(),
+        kind: YearKind::School,
+        // The list's own vintage, from the module that owns the fixture. A school year because
+        // R.C. 3310.03 designates a building for a year of enrolment, and the list is published
+        // the autumn before it — so it is ahead of every other year in this feed, not behind.
+        label: dispersion::designated::SCHOOL_YEAR.into(),
+        source: "DEW EdChoice designated building list".into(),
+    });
+
     out
 }
 
@@ -1106,6 +1159,196 @@ fn label_span(first: u16, last: u16, prefix: &str) -> String {
         format!("{prefix}{last}")
     } else {
         format!("{prefix}{first}-{prefix}{last}")
+    }
+}
+
+/// The six funding units of R.C. 3317.022, sized from three sources.
+///
+/// # The district unit is the only one the rest of this feed describes
+///
+/// Its amount is [`Statewide::realized_aid_total`] — the same figure every other statewide card
+/// shows — so the table cannot say one thing while the page beside it says another. The
+/// community and STEM unit comes from the department's FY2027 community school model, on the
+/// same vintage and the same basis as the district unit and therefore comparable to it. The four
+/// scholarship units come from the 2025 Scholarship Annual Report, which is a school year and an
+/// actual: not comparable to either, and labelled so it cannot be added to them.
+///
+/// The choice of source for the community unit is `.yidam/decisions/`
+/// `sizing-the-five-units-beside-the-district`. The F-33 receiving side was the alternative, and
+/// at FY2024 it carries no community school at all.
+fn funding_units(districts: &[District], statewide: &Statewide) -> FundingUnits {
+    use project::scholarship::report;
+    use project::scholarship::units;
+
+    let vintage = dispersion::community_school_funding::Vintage::CURRENT;
+    let community = dispersion::community_school_funding::schools(vintage);
+    let paid = report::programmes();
+    let channel = report::channel();
+
+    let mut out = Vec::with_capacity(units::UNITS.len());
+    for unit in units::UNITS {
+        // The two units with no programmes are the two with their own model; the other four are
+        // the report's, and their amounts are sums over the programmes named here.
+        let programmes: Vec<FundingUnitProgramme> = unit
+            .programmes
+            .iter()
+            .filter_map(|slug| {
+                let programme = paid.get(*slug)?;
+                // Read off the cell rather than off the slug, so the flag describes the fixture
+                // and not this function's memory of it.
+                let derived = programme.expenditure.is_none();
+                let expenditure = match programme.expenditure {
+                    Some(published) => published,
+                    // The blank cell is the extract's assertion that the report publishes no
+                    // total for this programme, and the sum of the six category figures it does
+                    // publish lives beside the fixture rather than in it. Defaulting to zero
+                    // here would turn that absence into a programme that spent nothing.
+                    None => {
+                        assert_eq!(
+                            *slug,
+                            report::DERIVED,
+                            "`{slug}` publishes no expenditure and no derived total is held for it"
+                        );
+                        report::JON_PETERSON_DERIVED_EXPENDITURE
+                    }
+                };
+                Some(FundingUnitProgramme {
+                    slug: (*slug).to_string(),
+                    name: programme.name.clone(),
+                    node: units::node(slug).unwrap_or_default().to_string(),
+                    students: programme.students,
+                    expenditure,
+                    derived,
+                })
+            })
+            .collect();
+
+        let (series, basis, amount, derived, students, recipients, noun) = match unit.slug {
+            "district" => (
+                "funding_units.district",
+                "model",
+                statewide.realized_aid_total,
+                0.0,
+                Some(districts.iter().map(|d| d.adm).sum()),
+                Some(districts.len()),
+                "districts",
+            ),
+            "community-stem" => (
+                "funding_units.community",
+                "model",
+                community.iter().map(|s| s.total_state_support).sum(),
+                0.0,
+                Some(community.iter().map(|s| s.enrolled_adm).sum()),
+                Some(community.len()),
+                "schools",
+            ),
+            _ => (
+                "funding_units.scholarship",
+                "report",
+                programmes.iter().map(|p| p.expenditure).sum(),
+                programmes
+                    .iter()
+                    .filter(|p| p.derived)
+                    .map(|p| p.expenditure)
+                    .sum(),
+                Some(programmes.iter().map(|p| p.students).sum()),
+                // Deliberately none. The report does not say which district a scholarship was
+                // charged against and nothing published does, so a recipient count here would
+                // have to be invented.
+                None,
+                "",
+            ),
+        };
+
+        out.push(FundingUnit {
+            slug: unit.slug.to_string(),
+            name: unit.name.to_string(),
+            authority: unit.authority.to_string(),
+            series: series.to_string(),
+            basis: basis.to_string(),
+            amount,
+            derived,
+            students,
+            recipients,
+            recipients_noun: noun.to_string(),
+            programmes,
+        });
+    }
+
+    // The four scholarship units are the whole of the report, so their amounts have to sum to
+    // the channel it publishes. An assertion rather than a test because the join is here: a unit
+    // that lost a programme would otherwise publish a smaller channel with no diff anywhere.
+    let channelled: f64 = out
+        .iter()
+        .filter(|u| u.basis == "report")
+        .map(|u| u.amount)
+        .sum();
+    debug_assert!(
+        (channelled - channel.total).abs() < 0.01,
+        "the scholarship units sum to {channelled} and the channel is {}",
+        channel.total
+    );
+
+    FundingUnits {
+        authority: "R.C. 3317.022".to_string(),
+        units: out,
+        nonpublic_support: nonpublic_support(),
+    }
+}
+
+/// Category 3 nonpublic school support, at the last year all three lines answer for.
+///
+/// One year and not a series: this block sits beside six funding units at one year apiece, and a
+/// twenty-five-year panel next to them would be answering a question nobody on that card asked.
+/// The year is read off the fixture rather than named, so a closed edition moves it.
+fn nonpublic_support() -> NonpublicSupport {
+    use project::ledger::nonpublic_support as source;
+
+    // The base is irrelevant — only `nominal` is carried — but the call has to name one, and the
+    // model year is the one every other block in this feed is anchored to.
+    let combined = source::category_three(MODEL_YEAR);
+    let year = combined.last();
+    let fiscal_year = year.map_or(MODEL_YEAR.0, |y| y.fiscal_year);
+
+    let titles = [
+        (
+            source::AUXILIARY_SERVICES,
+            "Auxiliary Services",
+            "R.C. 3317.024(E), 3317.06 and 3317.062",
+            "auxiliary-services",
+        ),
+        (
+            source::ADMINISTRATIVE_COST_REIMBURSEMENT,
+            "Nonpublic Administrative Cost Reimbursement",
+            "R.C. 3317.063",
+            "nonpublic-administrative-cost-reimbursement",
+        ),
+        (
+            source::AUXILIARY_SERVICES_REIMBURSEMENT,
+            "Auxiliary Services Reimbursement",
+            "R.C. 3317.064",
+            "auxiliary-services",
+        ),
+    ];
+
+    NonpublicSupport {
+        series: "funding_units.nonpublic_support".to_string(),
+        fiscal_year,
+        kind: year.map_or_else(|| "appropriation".to_string(), |y| y.kind.clone()),
+        total: year.map_or(0.0, |y| y.nominal),
+        lines: titles
+            .into_iter()
+            .map(|(ali, name, authority, node)| NonpublicSupportLine {
+                ali: ali.to_string(),
+                name: name.to_string(),
+                authority: authority.to_string(),
+                amount: source::series(ali, MODEL_YEAR)
+                    .into_iter()
+                    .find(|y| y.fiscal_year == fiscal_year)
+                    .map_or(0.0, |y| y.nominal),
+                node: node.to_string(),
+            })
+            .collect(),
     }
 }
 
@@ -1731,6 +1974,9 @@ pub fn build() -> Bundle {
     // unique — a name join would be wrong twice over.
     let typology = dispersion::typology::by_irn();
 
+    // Eligibility for the traditional EdChoice scholarship, joined once. See `Joins::designated`.
+    let designated = dispersion::designated::by_district();
+
     // The three observed payment years, joined once. See `Joins::biennium`.
     let biennium: HashMap<String, project::biennium::Row> = project::biennium::frame()
         .into_iter()
@@ -1754,6 +2000,7 @@ pub fn build() -> Bundle {
                     casino: casino_by_district.get(&record.irn),
                     typology: typology.get(&record.irn),
                     biennium: biennium.get(&record.irn),
+                    designated: designated.get(&record.irn),
                 },
             )
         })
@@ -1982,6 +2229,9 @@ pub fn build() -> Bundle {
     // Every year either axis carries, and the subset of them the index can reach. Both are
     // published: the difference is the answer to "which years cannot be shown in real terms",
     // and it is three — FY1998, FY1999 and FY2027, the ends of the appropriations series.
+    // Built before `series_years`, which reads the nonpublic support block's year off it.
+    let funding_units = funding_units(&districts, &statewide);
+
     let wanted = deflator_years(&districts, &history, &appropriations);
     let covered: Vec<(u16, f64)> = wanted
         .iter()
@@ -2019,8 +2269,10 @@ pub fn build() -> Bundle {
             &appropriations,
             &meal_program,
             &casino,
+            &funding_units,
         ),
         statewide,
+        funding_units: Some(funding_units),
         checkpoints,
         drafts: draft_export(),
         projection: Some(projection),

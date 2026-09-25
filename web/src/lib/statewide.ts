@@ -7,9 +7,9 @@ import { count, escapeHtml, fig, millions, money, pct } from "./format.ts";
 import { realChange, series, type Basis } from "./real.ts";
 import * as routes from "./routes.ts";
 import type { TaxStatewide } from "./feed.ts";
-import type { Bundle, District, National } from "./types.ts";
+import type { Bundle, District, FundingUnit, FundingUnits, National } from "./types.ts";
 import { median, quintiles } from "./stats.ts";
-import { yearChip, yearChipPair, yearOf } from "./year.ts";
+import { seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
 import { anchor } from "./section.ts";
 import { medianTrace, pairs } from "./relationships.ts";
 
@@ -483,5 +483,184 @@ export function renderNational(national: National | null): string {
         <a href="/districts">4.2% federal share of operating spending</a> the report card gives for
         ${yearOf("outcome.spending")}: different year, different denominator, and the difference between them is the
         relief cliff.</p>
+    </div>`;
+}
+
+/**
+ * The five funding units this site does not model, beside the one it does.
+ *
+ * # Why the card exists
+ *
+ * Every other figure on this page is R.C. 3317.022's *district* unit. The statute computes six,
+ * and the method page described the relationship between them as a deduction — a mechanism the
+ * Fair School Funding Plan abolished, and whose absence is exactly what makes the other five
+ * their own units. A reader who takes `$7.28B across 609 districts` as what Ohio spends on K-12
+ * has been told something false by omission, and the omission is $1.51B of community and STEM
+ * schools and a further $1.10B of scholarships. No share is given for them here because the card
+ * below cannot give one either: the two figures are not on the district unit's year or basis.
+ *
+ * # Why the rows may not be added up
+ *
+ * They are on two bases and two reckonings, and the card says so twice — once in the chip, once
+ * in the note under the table. The district and community units are the department's FY2027
+ * *model*, which is a computation of what the formula produces; the four scholarship units are
+ * the department's *report* of what the 2024-25 school year actually cost. Summing a projection
+ * and an actual across a two-year gap produces a number that looks like a total and is not one.
+ * Which is why every amount carries its own year as a child element rather than taking one from
+ * a column head: there is no column head here that could be right for all six.
+ *
+ * `null` renders nothing rather than an empty card — the block is absent only when the sources
+ * that size the other five are, and a card headed "The six funding units" with one row in it
+ * would be worse than no card.
+ */
+export function renderFundingUnits(units: FundingUnits | null): string {
+  if (!units) return "";
+  const programmes = (unit: FundingUnit): string =>
+    unit.programmes.length === 0
+      ? ""
+      : `<div class="n">${unit.programmes
+          .map(
+            (p) =>
+              `<a href="${routes.wikiNode("program", p.node)}">${escapeHtml(
+                p.name.replace(/ Scholarship Program$/, ""),
+              )}</a>`,
+          )
+          .join(" · ")}</div>`;
+  // The two bases, named where a reader meets them rather than as a legend under the table.
+  const basis = (unit: FundingUnit): string =>
+    unit.basis === "model" ? "the department's model" : "the department's report";
+  const derived = units.units.filter((u) => u.derived > 0);
+  const row = (unit: FundingUnit): string => `
+        <tr>
+          <th>${escapeHtml(unit.name.charAt(0).toUpperCase() + unit.name.slice(1))}
+            ${programmes(unit)}</th>
+          <td><span class="tnum">${escapeHtml(unit.authority)}</span></td>
+          <td class="tnum">${count(Math.round(unit.students ?? 0))}</td>
+          <td class="tnum">${
+            unit.recipients == null
+              ? "—"
+              : `${count(unit.recipients)} ${escapeHtml(unit.recipients_noun)}`
+          }</td>
+          <td class="tnum">${fig(millions(unit.amount).replace("+", ""), yearOf(unit.series))}</td>
+          <td>${basis(unit)}</td>
+        </tr>`;
+  return `
+    <div class="card" id="funding-units" data-part="funding-units">
+      <h2>${anchor("funding-units")}The six funding units${yearChipPair(
+        "funding_units.district",
+        "funding_units.scholarship",
+        "scholarships",
+      )}</h2>
+      <p class="note"><strong>${escapeHtml(units.authority)} computes six funding units, and
+        everything else on this site is the first of them.</strong> There is no deduction routing
+        money out of a district to a community school or a scholarship — the Fair School Funding
+        Plan abolished it. The other five are computed beside the district unit and paid directly,
+        which is why a district's page shows no charge for them and why the totals above are not
+        what Ohio spends on schooling.</p>
+      <div class="scroll"><table>
+        <thead><tr>
+          <th>Funding unit</th><th>Authority</th><th class="tnum">Students</th>
+          <th class="tnum">Paid to</th><th class="tnum">Amount</th><th>Sized from</th>
+        </tr></thead>
+        <tbody>${units.units.map(row).join("")}</tbody>
+      </table></div>
+      <p class="note"><strong>The six are not a column that adds up, and nothing here totals
+        them.</strong> Two of the rows are the department's FY${
+          seriesYear("funding_units.district")?.label.replace("FY", "") ?? ""
+        } model — what the formula computes, before a year of it has been paid — and four are its
+        account of a school year that is over. They are also on different reckonings: a fiscal year
+        runs July to June and a school year September to June. Each amount therefore carries its
+        own year beside it, and a reader who wants one number for Ohio will not find it here
+        because the published sources do not support one.</p>
+      ${
+        derived.length === 0
+          ? ""
+          : `<p class="note"><strong>One of the five figures is derived rather than
+        quoted.</strong> ${derived
+          .map((u) => escapeHtml(u.name.charAt(0).toUpperCase() + u.name.slice(1)))
+          .join(", ")} publishes participation and its expenditure by disability category, and
+        does not total the categories. The ${millions(
+          derived.reduce((sum, u) => sum + u.derived, 0),
+        ).replace("+", "")} shown for it is that sum, computed here. The department's own
+        four-programme total, which excludes it, is ${millions(
+          units.units
+            .filter((u) => u.basis === "report")
+            .reduce((sum, u) => sum + u.amount - u.derived, 0),
+        ).replace("+", "")}. Why the derived figure travels with the published one rather than in
+        the fixture is <a href="${routes.wikiDecision(
+          "sizing-the-five-units-beside-the-district",
+        )}">a recorded decision</a>.</p>`
+      }
+      <p class="note">There is no scenario lever for any of these. Every lever on this site prices
+        a change across the district panel, and a scholarship is not per district — nothing
+        published says which district one was charged against. See
+        <a href="/method#not-here">what this site does not model</a>.</p>
+    </div>`;
+}
+
+/**
+ * Category 3 nonpublic school support, which is not one of the six.
+ *
+ * # Why it is a second card and not four more rows
+ *
+ * It is state money that reaches nonpublic school pupils, so a reader looking at the scholarship
+ * units will ask about it — and it is authorised by a different run of sections (R.C. 3317.024,
+ * 3317.06, 3317.062, 3317.063, 3317.064), appropriated by line item rather than computed by a
+ * formula, and paid to school districts and chartered nonpublic schools rather than to families.
+ * Putting it in the table above would make it a seventh funding unit, which it is not, and would
+ * put an appropriation in a column of computed and reported amounts.
+ *
+ * The amounts are the enacted appropriation for the fiscal year, not what was spent. The block's
+ * own `kind` says which, and the note repeats it, because an appropriation quoted beside two
+ * columns of actuals reads as one.
+ */
+export function renderNonpublicSupport(units: FundingUnits | null): string {
+  if (!units) return "";
+  const support = units.nonpublic_support;
+  const kind = {
+    appropriation: "as enacted, before any adjustment",
+    adjusted: "as adjusted during the biennium",
+    actual: "as spent",
+  }[support.kind] ?? support.kind;
+  return `
+    <div class="card" id="nonpublic-support" data-part="nonpublic-support">
+      <h2>${anchor("nonpublic-support")}Nonpublic school support${yearChip(
+        "funding_units.nonpublic_support",
+      )}</h2>
+      <p class="note">State money for pupils in chartered nonpublic schools that is
+        <em>not</em> one of the six funding units and not a scholarship. It is appropriated by line
+        item and paid to districts and to the schools themselves for services — health, guidance,
+        textbooks, testing, and the cost of the state's own paperwork. Shown ${kind}.</p>
+      <div class="scroll"><table>
+        <thead><tr>
+          <th>Line item</th><th>Authority</th><th class="tnum">Appropriated</th>
+        </tr></thead>
+        <tbody>${support.lines
+          .map(
+            (line) => `
+          <tr>
+            <th><a href="${routes.wikiNode("program", line.node)}">${escapeHtml(
+              line.name,
+            )}</a> <span class="n">ALI ${escapeHtml(line.ali)}</span></th>
+            <td><span class="tnum">${escapeHtml(line.authority)}</span></td>
+            <td class="tnum">${fig(
+              millions(line.amount).replace("+", ""),
+              yearOf("funding_units.nonpublic_support"),
+            )}</td>
+          </tr>`,
+          )
+          .join("")}
+          <tr>
+            <th>Total</th><td></td>
+            <td class="tnum">${fig(
+              millions(support.total).replace("+", ""),
+              yearOf("funding_units.nonpublic_support"),
+            )}</td>
+          </tr>
+        </tbody>
+      </table></div>
+      <p class="note">These lines <em>may</em> be added, and are, because all three are the same
+        kind of figure in the same fiscal year — which is the difference between this table and the
+        one above it.</p>
     </div>`;
 }

@@ -51,6 +51,23 @@ const seam = denominatorContrast(bundle);
 const joined = bundle.districts.filter(
   (d) => d.property_tax?.length && d.outcome != null && d.valuation_per_pupil != null,
 ).length;
+/*
+ * The five funding units this site does not model, and the one it does.
+ *
+ * Read off the feed rather than written, because the row below names a dollar figure, a student
+ * count and a year, and the last time this row was written from memory it described a deduction
+ * R.C. 3317.022 does not contain. `statewide.astro` renders the same block as a table; this is
+ * the sentence that tells a reader it is there.
+ */
+const units = bundle.funding_units;
+const beside = units?.units.filter((u) => u.slug !== "district") ?? [];
+const scholarships = beside.filter((u) => u.basis === "report");
+const channel = {
+  total: scholarships.reduce((sum, u) => sum + u.amount, 0),
+  students: scholarships.reduce((sum, u) => sum + (u.students ?? 0), 0),
+  programmes: scholarships.flatMap((u) => u.programmes),
+};
+const community = units?.units.find((u) => u.slug === "community-stem");
 // Counted from the manifest, because the sentence that said "Thirteen" was written when it was
 // thirteen and the manifest now holds several hundred. See `digests.ts`.
 const pinned = pinnedSources();
@@ -621,11 +638,47 @@ const millageScatter = renderToString(
             </td>
           </tr>
           <tr>
-            <th>Community schools and scholarships</th>
+            <th>Five of the six funding units</th>
             <td>
-              The deduction that routes money from a resident district to a community school or a
-              scholarship is not modelled here. The {count(s.districts)} districts in this feed are
-              the traditional districts in the state's own calculator.
+              Everything on this site is the <em>district</em> unit of R.C. 3317.022 — the {
+                count(s.districts)
+              } traditional districts in the state's own calculator, {yearOf("funding_units.district")}.
+              There is no deduction routing money out of it: the statute makes the community and
+              STEM schools and each of the four scholarship programmes a funding unit of its own,
+              computed beside the district unit and paid directly. This row said otherwise until
+              the statute was read line by line.
+              {
+                community && (
+                  <Fragment>
+                    {" "}The community and STEM unit is{" "}
+                    {millions(community.amount).replace("+", "")} across {count(community.recipients ?? 0)}{" "}
+                    schools in {yearOf("funding_units.community")}, and the four scholarship units are{" "}
+                    {millions(channel.total).replace("+", "")} across {count(Math.round(channel.students))}{" "}
+                    students in {yearOf("funding_units.scholarship")} —{" "}
+                    {channel.programmes.map((p, i) => (
+                      <Fragment>
+                        {i > 0 ? ", " : ""}
+                        <a href={routes.wikiNode("program", p.node)}>{p.name.replace(/ Scholarship Program$/, "")}</a>
+                      </Fragment>
+                    ))}. Neither is modelled here; both are{" "}
+                    <a href={`/statewide#${routes.SECTIONS.statewide.fundingUnits}`}>sized on the statewide page</a>, on their own
+                    years and from their own sources. The six are on two reckonings and must not be
+                    added.
+                  </Fragment>
+                )
+              }
+            </td>
+          </tr>
+          <tr>
+            <th>A scenario lever for scholarship amounts</th>
+            <td>
+              Deliberately absent, and not pending. Every lever on this site prices a change across
+              the {count(s.districts)}-district panel, because that is what the formula is defined
+              over. A scholarship is not per district — nothing published says which district one
+              was charged against — and the EdChoice Expansion award is a function of household
+              income against the federal poverty level, a distribution this repository does not
+              hold. A slider here would have to invent both, and the figure it produced would look
+              exactly like the ones that are computed.
             </td>
           </tr>
         </tbody>

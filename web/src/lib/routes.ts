@@ -140,6 +140,11 @@ export const SECTIONS = {
     wealthOffset: "wealth-offset",
     twoFloors: "two-floors",
     national: "national",
+    /* The other five units of R.C. 3317.022, and the nonpublic support that is none of them. Two
+       addresses rather than one because Category 3 is not a funding unit and a reader following a
+       link about it should not land on a table that implies it is. */
+    fundingUnits: "funding-units",
+    nonpublicSupport: "nonpublic-support",
   },
 
   /** The front door at `/`, which is orientation rather than a view of anything. */

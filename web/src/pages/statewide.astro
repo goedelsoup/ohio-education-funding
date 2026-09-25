@@ -19,7 +19,9 @@ import { count, millions } from "../lib/format.ts";
 import { baseYear } from "../lib/real.ts";
 import * as routes from "../lib/routes.ts";
 import {
+  renderFundingUnits,
   renderNational,
+  renderNonpublicSupport,
   renderStatewideFinances,
   renderStatewideStructure,
 } from "../lib/statewide.ts";
@@ -53,6 +55,12 @@ const base = bundle.deflator
   </p>
 
   <Fragment set:html={renderStatewideStructure(bundle, tax)} />
+  {/* The other five units of R.C. 3317.022, above the national comparison rather than below it:
+      what Ohio pays for schooling is a question about Ohio before it is a question about the
+      other forty-nine, and a reader who leaves after the structural cards should not leave
+      believing the district unit is the whole of it. */}
+  <Fragment set:html={renderFundingUnits(bundle.funding_units)} />
+  <Fragment set:html={renderNonpublicSupport(bundle.funding_units)} />
   <Fragment set:html={renderNational(bundle.national)} />
 
   <BasisToggle id="statewide-basis" section="finances" base={base}>
