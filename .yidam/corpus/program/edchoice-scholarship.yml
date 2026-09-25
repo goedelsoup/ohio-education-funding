@@ -186,6 +186,32 @@ findings: |
   Indiana. A Title I formula count is a count of resident children and needs no building, which is
   why North Bass Local has a row and a 5-to-17 population of zero. [verified] (crates/dispersion)
 
+  ### Three editions now, and what moves is the route the department derives
+
+  Everything above reads one file. The department serves one edition at a time and deletes the
+  last, so eligibility has been a snapshot here — and the two editions before the current one
+  survive in the Internet Archive, which makes it a series. **460 buildings were designated for
+  2024-2025**, 494 for 2025-2026, and the 513 above for 2026-2027. The designated set grew in
+  both transitions while the population it is cut from shrank in both: 2,937 listed buildings,
+  then 2,906, then 2,877, across 62 districts, then 68, then 78. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_editions_the_page_stopped_listing.rs))
+
+  **Every one of the 80 buildings that entered the designated set entered through Option B.** 42
+  entered for 2025-2026 and 38 for 2026-2027, every one of them meeting the performance-index and
+  Title I route and 0 of them the academic-distress one. Departures run the same way: 27 buildings
+  left across the two transitions — 7 undesignated and 1 delisted, then 18 and 1, which are
+  different events and are counted apart — and 1 of the 27 held Option A. [verified]
+  (crates/dispersion)
+
+  **So the one input this repository reads rather than derives is also the one that moves nobody.**
+  The academic-distress column's load-bearing surface in the current edition is the 2 buildings
+  measured above; across two transitions it accounts for no entry at all and a single departure.
+  Whatever moves eligibility moves inside Option B — a performance-index window and a Title I
+  average, both derived and both reproducible from the sheets beside them. That narrows this
+  node's central caution rather than confirming it: the margin is not moving on the route a
+  commission decides, and which of Option B's two criteria moved each entrant is not decomposed
+  here. [open]
+
 figures:
   - key: project/traditional-greatest-k8-share
     value: 0.345625
@@ -227,6 +253,29 @@ figures:
     value: 31
     field: findings
     as_written: "**31 designations rest on them.**"
+  - key: dispersion/edchoice-designated-buildings-2425
+    value: 460
+    field: findings
+    as_written: "**460 buildings were designated for\n  2024-2025**"
+  - key: dispersion/edchoice-entrants-2526
+    value: 42
+    field: findings
+    as_written: "42\n  entered for 2025-2026"
+  - key: dispersion/edchoice-entrants-2627
+    value: 38
+    field: findings
+    as_written: "38 for 2026-2027"
+  - key: dispersion/edchoice-entrants-through-the-academic-distress-route
+    value: 0
+    field: findings
+    as_written: "0 of them the academic-distress one"
+  - key: dispersion/edchoice-departures-on-the-academic-distress-route
+    value: 1
+    field: findings
+    as_written: "1 of the 27 held Option A"
+series:
+  - key: dispersion/edchoice-designated-by-edition
+    field: findings
 properties:
   seeded_because: |
     Named in the [`deduction`](../../skills/deduction.md) calculator as one of the four programmes
@@ -256,6 +305,21 @@ properties:
     Enrollment in a building operated by the resident district that was ranked in the lowest twenty
     per cent of all buildings operated by city, local and exempted village districts by performance
     index score, as determined by the department. [verified] (R.C. 3310.03(A)(1))
+
+    **The department has published that window under two arities.** The statute asks for the
+    bottom fifth "for at least two of the three most recent consecutive rankings". The 2024-2025
+    edition of the designated list ranks **two** Performance Index years and says so in its own
+    column heading — `Bottom 20% PI Ranking Across 2022 and 2023 School Years`, against `Across
+    Two of Prior Three Years` in both later editions — so in that year the test was applied as two
+    of two, which is a materially easier one. [verified]
+    ([`crates/dispersion`](../../../crates/dispersion/tests/the_editions_the_page_stopped_listing.rs))
+
+    **And a year a building was not ranked is read as a year outside the bottom fifth.** Both
+    archived editions leave that cell blank rather than writing `No` — 25 cells in 2024-2025 and
+    42 in 2025-2026, against none at all in the current edition — and the department's own window
+    column counts a blank as a `No` in every row of every edition. A building that was not ranked
+    is not thereby excluded from the window; it simply fails that year. [verified]
+    (crates/dispersion)
 
     Students who held a scholarship for the 2020-2021 school year under the section as it stood
     before 2 March 2021 continue to receive it through grade twelve so long as they remain
