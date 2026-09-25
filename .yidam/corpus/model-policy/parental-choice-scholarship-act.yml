@@ -31,14 +31,56 @@ description: |
   deduct would be wrong about Ohio, and wrong in the way that matters most to a district's
   balance sheet. [inference]
 
-  Two provisions have no established Ohio counterpart. The state keeping the difference between
-  what a district would have received and what the scholarship costs is not a mechanism this
-  corpus has looked for in Ohio law; and the award is set from **state and local** per-pupil
-  support, where Ohio's charge-off arithmetic treats the local share as a district obligation
-  rather than as a portable amount. Both are open questions rather than absences. [open]
+  **Two provisions of the model look like nothing Ohio does, and both have Ohio answers.** The
+  state keeping the excess was Ohio law for two fiscal years and was abolished by name; the
+  **state and local** award basis appears once in Ohio's code, aimed the other way. [verified]
+  See the findings — the answer to the first is a choice Ohio made twice, differently, in one
+  document.
 
   **Nothing here says Ohio adopted this text.** See `adoption_evidence`.
 findings: |
+  ### The state keeping the excess was Ohio law, and the same budget refused it next door
+
+  H.B. 1 of the 128th General Assembly set the traditional EdChoice deduct at **$5,200 for every
+  scholarship** — up from $2,700 for a kindergartener, because the same budget began counting
+  kindergarteners as full-time students — and in the next sentence cut the maximum award to
+  **$4,200 for grades K-8 and $5,000 for grades 9-12**. A district therefore lost at least $1,000
+  more than the scholarship could pay for a younger student and at least $200 more for an older
+  one, and the state kept the difference. That is the model's provision, enacted, for FY2010 and
+  FY2011. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_residual_the_model_lets_the_state_keep.rs))
+
+  The residual was created rather than inherited. Under prior law the maxima were indexed to the
+  base cost and had reached about $4,500 and $5,300 by FY2009, so a high-school scholarship had
+  been worth *more* than the deduct that paid for it. One instrument raised the deduct and cut
+  both awards below it. H.B. 153 abolished the arrangement two years later by reducing the deduct
+  "from $5,200 to the actual amount of the scholarship" — once the two quantities are one number
+  there is no excess to keep. [verified]
+
+  **And the same greenbook disposes of the same residual the other way, two pages earlier.** The
+  Cleveland programme's deduct was a fixed earmark, and "any funds that are not needed to cover
+  the costs of the program are disbursed to CMSD". [verified] So Ohio's answer to this provision
+  is not a rule but a choice it made twice, in opposite directions, for two scholarship programmes
+  running in the same year. A model text can be matched against a state only one programme at a
+  time. [inference]
+
+  ### The award basis exists in Ohio and points inward
+
+  The model sets the award from "state and local sources". That phrase computes a per-pupil amount
+  exactly once in the committed statute extract: **R.C. 3302.12**, where a district that has
+  replaced a failing building's principal and teaching staff must fund that building at "the per
+  pupil amount of state and local revenues received by the district" multiplied by its enrolment.
+  [verified]
+  ([`crates/project`](../../../crates/project/tests/the_residual_the_model_lets_the_state_keep.rs))
+
+  It is the model's arithmetic aimed the other way — money moving from a district to a school the
+  district still operates, on an accountability trigger, rather than out of the district with a
+  departing student. Every Ohio scholarship award is a flat statutory dollar figure or a function
+  of family income, and none carries a local term at all, which is why the charge-off never enters
+  the calculation. [verified]
+
+  ### The variant that has not been read
+
   One variant of this act is a closer match to Ohio than the text on this node. ALEC publishes
   three — universal eligibility (this one), means-tested eligibility, and **universal
   eligibility with a means-tested scholarship amount** — and the third's title describes H.B.
@@ -66,6 +108,10 @@ properties:
     received to serve and educate the eligible student from state and local sources had the
     student enrolled there". Participating schools may charge tuition above the award.
     [verified] (ALEC model text)
+
+    Ohio computes a per-pupil amount from "state and local" revenue in exactly one section of the
+    committed extract, R.C. 3302.12, and that payment stays inside the district. No Ohio
+    scholarship award carries a local term. [verified] See the findings.
   district_funding_effect: |
     **A deduction, with the state keeping the remainder.** "The funds needed for a scholarship
     shall be subtracted from the state school aid payable to the student's resident school
@@ -73,7 +119,13 @@ properties:
     funds needed for a scholarship will be kept by the state."
     [verified] (ALEC model text)
 
-    Ohio's post-FSFP arrangement is not this. See the description, and
+    **Ohio ran it, for two fiscal years.** H.B. 1 of the 128th General Assembly deducted $5,200
+    for every traditional EdChoice scholarship against maxima of $4,200 and $5,000, and H.B. 153
+    ended it by making the deduct the award. The findings carry the arithmetic and the Cleveland
+    programme's opposite disposition of the same residual. [verified]
+    ([`crates/project`](../../../crates/project/tests/the_residual_the_model_lets_the_state_keep.rs))
+
+    Ohio's post-FSFP arrangement is neither. See the description, and
     [edchoice-expansion](../program/edchoice-expansion.yml) for the negative confirmation and the
     test that pins it.
   private_school_regulation: |
