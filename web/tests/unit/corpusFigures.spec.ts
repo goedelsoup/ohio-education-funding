@@ -357,10 +357,17 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * what makes them worth binding is that they are the only committed statement of this channel by
  * programme and fiscal period, in a document that says in terms it allocates no amount to any
  * individual programme.
+ *
+ * Recomputed at **1119/80** when the designated list became three editions.
+ * `program/traditional-edchoice-scholarship` had ten bindings and has fifteen; no new carrier.
+ * Four of the five are *differences* rather than levels — the entrants of each transition, the
+ * entries through the academic-distress route (0) and the departures through it (1) — which is
+ * what the node was short of, since a node that binds every level and no difference holds
+ * nothing that can go stale when the thing it describes moves.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1114 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1114,
+  expect(bindings.length, "1119 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1119,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,

@@ -1,6 +1,11 @@
 {
   "contract": "7.0.0",
   "series": [
+    {"key": "dispersion/edchoice-designated-by-edition", "owner": "crates/dispersion", "unit": "count", "axis": "Edition of the designated list, by the school year it governs", "label": "Buildings designated for traditional EdChoice in each published edition, against every building the edition lists", "rows": [
+      {"label": "2024-2025", "value": 460, "hover": "The bottom-fifth window is cut from two rankings here, not three", "of": 2937, "figure": "dispersion/edchoice-designated-buildings-2425"},
+      {"label": "2025-2026", "value": 494, "of": 2906},
+      {"label": "2026-2027", "value": 513, "of": 2877, "figure": "dispersion/edchoice-designated-buildings"}
+    ]},
     {"key": "dispersion/fy2016-step-by-business-class", "owner": "crates/dispersion", "unit": "ratio", "axis": "Property class, TY2021 share of assessed value", "label": "Correlation of the FY2016 move in state revenue per pupil with each business property class", "rows": [
       {"label": "Industrial", "value": 0.11752209551359827, "figure": "dispersion/fy2016-step-against-industrial-share"},
       {"label": "Mineral", "value": -0.03211427134692308, "figure": "dispersion/fy2016-step-against-mineral-share-negative"},

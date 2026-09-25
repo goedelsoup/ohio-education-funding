@@ -86,11 +86,12 @@ test("the two committed manifests agree on both ends of every band chart's end r
  * The coverage floor, at the value and not under it, on the figure ratchet's standing rule:
  * recount with the expressions below rather than incrementing the last stated number.
  *
- * Five series over three carriers: `dispersion/fy2016-step-by-business-class` on
+ * Six series over four carriers: `dispersion/fy2016-step-by-business-class` on
  * `education-agency/toledo-city`, which is #416's finding drawn as the four bars it was found by,
  * #444's three on `formula-component/temporary-transitional-aid-guarantee` — the plane the two
- * axes disagree on, and one grouped series per axis drawn as seven panels each — and #447's band
- * chart on `formula-component/fsfp-base-cost-calculation`.
+ * axes disagree on, and one grouped series per axis drawn as seven panels each — #447's band
+ * chart on `formula-component/fsfp-base-cost-calculation`, and #483's three editions of the
+ * EdChoice designated list on `program/traditional-edchoice-scholarship`.
  *
  * Every computation the manifest exports is drawn *somewhere*, and there are two somewheres: a
  * node's `series:` block, and a page declared in `PAGE_SERIES`. The sum is the assertion, because
@@ -99,11 +100,11 @@ test("the two committed manifests agree on both ends of every band chart's end r
  */
 test("the corpus draws no fewer series than it did", () => {
   const drawn = corpus.nodes.flatMap((node) => node.series);
-  expect(drawn.length, "5 series bindings; raise this when you add one").toBeGreaterThanOrEqual(5);
+  expect(drawn.length, "6 series bindings; raise this when you add one").toBeGreaterThanOrEqual(6);
   expect(
     corpus.nodes.filter((node) => node.series.length > 0).length,
-    "3 nodes draw a series; raise this when a fourth does",
-  ).toBeGreaterThanOrEqual(3);
+    "4 nodes draw a series; raise this when a fifth does",
+  ).toBeGreaterThanOrEqual(4);
   expect(
     new Set([...drawn.map((binding) => binding.key), ...Object.keys(PAGE_SERIES)]).size,
     "every series, cloud, plane, curve, spread and band chart the manifest exports is drawn by " +

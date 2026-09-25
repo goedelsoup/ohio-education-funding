@@ -3838,6 +3838,63 @@ fn fy2016_step_against(i: &Inputs, share: fn(&dispersion::fy2016::District) -> f
         .correlation
 }
 
+/// The two transitions between the three published editions of the EdChoice designated list.
+///
+/// Shared by the entry and departure figures and by the column that draws the designated set
+/// across the three, so the bars and the numbers beside them are one computation.
+const EDCHOICE_TRANSITIONS: [(
+    dispersion::designated_editions::Edition,
+    dispersion::designated_editions::Edition,
+); 2] = [
+    (
+        dispersion::designated_editions::Edition::Y2425,
+        dispersion::designated_editions::Edition::Y2526,
+    ),
+    (
+        dispersion::designated_editions::Edition::Y2526,
+        dispersion::designated_editions::Edition::Y2627,
+    ),
+];
+
+/// Buildings that entered the designated set in one transition, optionally only those holding
+/// the academic-distress route in the edition they entered.
+fn edchoice_entrants(
+    before: dispersion::designated_editions::Edition,
+    after: dispersion::designated_editions::Edition,
+    option_a_only: bool,
+) -> usize {
+    use dispersion::designated_editions::{changes, keyed, Change};
+    let now = keyed(after);
+    changes(before, after)
+        .into_iter()
+        .filter(|(_, change)| *change == Change::Entered)
+        .filter(|(key, _)| !option_a_only || now[key].option_a)
+        .count()
+}
+
+/// Buildings that left the designated set in one transition — undesignated or delisted — holding
+/// the academic-distress route in the edition they left.
+///
+/// Read off the *earlier* edition, because a delisted building has no row in the later one.
+fn edchoice_departures_on_option_a(
+    before: dispersion::designated_editions::Edition,
+    after: dispersion::designated_editions::Edition,
+) -> usize {
+    use dispersion::designated_editions::{changes, keyed, Change};
+    let was = keyed(before);
+    changes(before, after)
+        .into_iter()
+        .filter(|(_, change)| *change != Change::Entered)
+        .filter(|(key, _)| was[key].option_a)
+        .count()
+}
+
+/// Designated buildings in one edition, and every building that edition lists.
+fn edchoice_edition_counts(which: dispersion::designated_editions::Edition) -> (usize, usize) {
+    let rows = dispersion::designated_editions::edition(which);
+    (rows.iter().filter(|d| d.designated).count(), rows.len())
+}
+
 /// The five wealth fifths of #444's small multiples, least wealthy first.
 const WEALTH_FIFTHS: [&str; 5] = ["Least wealthy", "Second", "Third", "Fourth", "Wealthiest"];
 
@@ -3920,6 +3977,50 @@ fn census_extreme(i: &Inputs, end: Extreme) -> usize {
 
 /// The columns the wiki draws. See the module docs for the endpoint rule every entry obeys.
 pub static SERIES: &[Series] = &[
+    // #483's column. The designated set against the population it is cut from, in each of the
+    // three published editions — the numerator grows in both transitions while the denominator
+    // shrinks in both, which is a shape no level can carry and the reason the row states its
+    // `of`. The ends are 2024-2025 and 2026-2027 and both are figures the node binds.
+    Series {
+        key: "dispersion/edchoice-designated-by-edition",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        axis: "Edition of the designated list, by the school year it governs",
+        label: "Buildings designated for traditional EdChoice in each published edition, against \
+                every building the edition lists",
+        compute: |_| {
+            use dispersion::designated_editions::{Edition, EDITIONS};
+            EDITIONS
+                .into_iter()
+                .map(|which| {
+                    let (designated, listed) = edchoice_edition_counts(which);
+                    Row {
+                        label: match which {
+                            Edition::Y2425 => "2024-2025",
+                            Edition::Y2526 => "2025-2026",
+                            Edition::Y2627 => "2026-2027",
+                        },
+                        value: designated as f64,
+                        hover: match which {
+                            Edition::Y2425 => Some(
+                                "The bottom-fifth window is cut from two rankings here, not three",
+                            ),
+                            _ => None,
+                        },
+                        group: None,
+                        of: Some(listed as f64),
+                        cites: None,
+                        marked: None,
+                        figure: match which {
+                            Edition::Y2425 => Some("dispersion/edchoice-designated-buildings-2425"),
+                            Edition::Y2526 => None,
+                            Edition::Y2627 => Some("dispersion/edchoice-designated-buildings"),
+                        },
+                    }
+                })
+                .collect()
+        },
+    },
     // #416's finding, as the four bars it was found by: the summed business share is a near-zero
     // because industrial runs one way and mineral and public utility the other. The chart is
     // signed so that the cancellation is visible, and the figures it names are the magnitudes
@@ -14904,6 +15005,78 @@ pub static FIGURES: &[Figure] = &[
                 .iter()
                 .filter(|b| b.academic_distress && b.district_irn == EAST_CLEVELAND_IRN)
                 .count() as f64
+        },
+    },
+    // The three editions, and what moved between them. #471 recovered the two the department
+    // deleted; these are the numbers #483 asks the corpus to state as a difference rather than a
+    // level, because a node that binds only levels has bound nothing that can go stale when
+    // eligibility moves.
+    Figure {
+        key: "dispersion/edchoice-designated-buildings-2425",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Buildings designated for traditional EdChoice in the oldest surviving edition, \
+                2024-2025",
+        pinned: 460.0,
+        tolerance: 0.0,
+        compute: |_| {
+            edchoice_edition_counts(dispersion::designated_editions::Edition::Y2425).0 as f64
+        },
+    },
+    Figure {
+        key: "dispersion/edchoice-entrants-2526",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Buildings that entered the designated set between the 2024-2025 and 2025-2026 \
+                editions",
+        pinned: 42.0,
+        tolerance: 0.0,
+        compute: |_| {
+            use dispersion::designated_editions::Edition;
+            edchoice_entrants(Edition::Y2425, Edition::Y2526, false) as f64
+        },
+    },
+    Figure {
+        key: "dispersion/edchoice-entrants-2627",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Buildings that entered the designated set between the 2025-2026 and 2026-2027 \
+                editions",
+        pinned: 38.0,
+        tolerance: 0.0,
+        compute: |_| {
+            use dispersion::designated_editions::Edition;
+            edchoice_entrants(Edition::Y2526, Edition::Y2627, false) as f64
+        },
+    },
+    Figure {
+        key: "dispersion/edchoice-entrants-through-the-academic-distress-route",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Buildings that entered the designated set through the academic-distress route \
+                across both transitions \u{2014} the route that moves nobody",
+        pinned: 0.0,
+        tolerance: 0.0,
+        compute: |_| {
+            EDCHOICE_TRANSITIONS
+                .into_iter()
+                .map(|(before, after)| edchoice_entrants(before, after, true))
+                .sum::<usize>() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/edchoice-departures-on-the-academic-distress-route",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Buildings that left the designated set across both transitions holding the \
+                academic-distress route",
+        pinned: 1.0,
+        tolerance: 0.0,
+        compute: |_| {
+            EDCHOICE_TRANSITIONS
+                .into_iter()
+                .map(|(before, after)| edchoice_departures_on_option_a(before, after))
+                .sum::<usize>() as f64
         },
     },
     // The capacity measure's denominator. `project::capacity_denominator`, which runs
