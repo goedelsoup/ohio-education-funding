@@ -75,8 +75,21 @@ properties:
     programme and has the department "pay a scholarship under section 3317.022 of the Revised
     Code to an eligible applicant". [verified]
 
-    The word "deduct" appears nowhere in R.C. 3310.41 as it now stands. [verified] For the
-    pre-Fair-School-Funding-Plan era, which was a deduction, see `dew-payment-reports`. [open]
+    The word "deduct" appears nowhere in R.C. 3310.41 as it now stands. [verified]
+
+    **Before FY2022 it was a deduction, and this is how it ran.** The scholarship student stayed
+    in the resident district's ADM for the purposes of the state funding formula; the award — the
+    lesser of the total fees charged by the alternative provider and the statutory ceiling — was
+    then deducted from that district's state aid and paid to the provider. [verified]
+    ([`crates/project`](../../../crates/project/tests/the_deduction_the_scholarships_were_paid_by.rs)) LSC states it in those words in the greenbook for every enacted
+    budget from H.B. 1 of the 128th to H.B. 166 of the 133rd, covering FY2010 through FY2021, and
+    in none after. H.B. 110 ended it: "funding for all scholarship programs is paid directly,
+    instead of counting most scholarship students in their resident districts and deducting the
+    scholarship amount from the districts' aid". [verified] (the H.B. 110 greenbook)
+
+    What is still open is not the rule but the arithmetic it produced — which district lost how
+    much in which year. That is the per-district amount, and `dew-payment-reports` remains the
+    source for it. [open]
   eligibility: |
     A child aged three through twenty-one diagnosed as on the autism spectrum, holding either an
     individualized education program from the resident district or a private diagnosis from a

@@ -36,7 +36,8 @@ revisions:
       The old value was a reasonable reading of the programme's deduct-era history and wrong
       about the law in force. Which era a scholarship's mechanism is described from decides
       whether the resident district loses the money, so the two must be dated rather than
-      merged. The deduct-era mechanism is a separate question and still open.
+      merged. The deduct-era mechanism is now recorded on `mechanism`, and it turns out not to
+      have been the per-pupil deduction the old value implied.
 findings: |
   ### The department's archive gives this programme seventeen years, and one of its columns
   ### changes meaning in the middle
@@ -100,7 +101,25 @@ properties:
     supervision and operation" — a definition by history rather than by name, which is why the
     programme survives as a single-district one without saying so. [verified]
 
-    The deduct-era mechanism is a separate question and needs `dew-payment-reports`. [open]
+    **The deduct-era mechanism was not the other programmes' deduct.** Autism and Jon Peterson
+    kept the scholarship student in the resident district's ADM and took the award out of that
+    district's aid, so what was deducted followed a pupil. This programme inverted both halves:
+    "Scholarship students are not counted in Cleveland's ADM for funding purposes", stated in
+    every greenbook from H.B. 119 of the 127th to H.B. 166 of the 133rd, so there was no pupil in
+    the formula for a deduction to follow. What was deducted was a fixed earmark of the district's
+    own aid — **$23.5 million** a year by FY2020, **$1.0 million** of it set aside for tutoring —
+    carried forward from budget to budget at its previous level. [verified]
+    ([`crates/project`](../../../crates/project/tests/the_deduction_the_scholarships_were_paid_by.rs))
+
+    And the deduction was only ever part of it: LSC writes that the programme is "*partially*
+    supported through a deduction". The FY2008-09 analysis itemises the two channels separately —
+    a GRF appropriation for the programme, beside a deduction that in that biennium came out of
+    the district's **poverty-based assistance** rather than out of foundation funding generally.
+    The aid the deduction was taken from moved over the programme's life; the two-channel shape
+    did not. [verified] (the greenbooks for H.B. 119 of the 127th and H.B. 166 of the 133rd)
+
+    What is still open is the year-by-year size of the deduction before FY2020, which
+    `dew-payment-reports` would give. [open]
   eligibility: |
     Students residing in the Cleveland Metropolitan School District — reached in statute through
     the federal-court-supervision definition in R.C. 3313.975(A) rather than by name — subject to
