@@ -58,6 +58,11 @@ one the statute names. What the class does not hold:
   report cites a per-district breakdown on the department's reports portal, and this project has
   not reached it — the route's 404 is a property of the portal, not evidence about the file
   ([#10](https://github.com/goedelsoup/ohio-education-funding/issues/10)). [open]
-- **FY2014 through FY2023 has no participation series.** The archive stops at FY2013 and the
-  annual report starts at 2024-25; inside the hole the greenbooks quote rounded counts for FY2014,
-  FY2018 and FY2019 and nothing else. [open]
+- **FY2014 through FY2022 has no participation series, and FY2023 has one for a single
+  programme.** The archive stops at FY2013 and the consolidated annual report starts at 2024-25;
+  the Jon Peterson programme's own annual report reaches FY2023 and FY2024, which shortens the
+  channel's hole by a year at its far edge and leaves the other four programmes with nothing in
+  it. Inside what remains, the eight committed budget analyses quote twenty-one figures across
+  FY2014, FY2016, FY2018 and FY2019, thirty-seven of the census's sixty-four rows carrying the
+  publisher's own hedge, and `scholarship-bounds.tsv` holds them with the denominator and
+  precision that keep them from being spliced onto either series. [open]

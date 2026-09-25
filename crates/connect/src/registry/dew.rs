@@ -2096,13 +2096,16 @@ pub(super) const SCHOLARSHIP_REPORTS: Connector = Connector {
              has not been found, and was never shown to be taken down; see \
              `dew-payment-reports` for the deduct-era half of that gap. And the archived \
              series stops at \
-             FY2013 while the annual report starts at 2024-25, so FY2014 through FY2023 has no \
-             participation series — LSC's greenbooks quote rounded counts for FY2014, FY2018 \
-             and FY2019 and nothing else, which bounds that hole rather than filling it. Nor is \
-             there an earlier annual report to widen it with: the Annual Reports page and its \
-             whole capture history carry exactly one consolidated scholarship edition, and what \
-             precedes 2024-25 is a per-programme lineage — Jon Peterson board reports from \
-             FY2016 and an Ohio ACE report — which does not cover the five programmes together. \
+             FY2013 while the consolidated annual report starts at 2024-25, so FY2014 through \
+             FY2022 has no participation series for the channel as a whole — LSC's greenbooks \
+             quote rounded counts inside it, which bounds that hole rather than filling it. The \
+             hole is one year shorter than it was and only for one programme: what precedes \
+             2024-25 is a per-programme lineage, and Jon Peterson's FY2023 and FY2024 editions \
+             are now held, which gives that programme FY2023 through FY2025 unbroken and no \
+             other programme anything. Three earlier JPSN editions — FY2016, FY2017 and FY2020 \
+             — and an Ohio ACE report are named on archived captures of the Annual Reports page \
+             and not held; the department serves neither, so they are an archive fetch rather \
+             than a live one. \
              The designated list is current-edition-only at the department: the EdChoice \
              Resources page carries one edition at a time and deletes the last, so 2023-2024, \
              2024-2025 and 2025-2026 all return this host's genuine 404. Two of those three are \
@@ -2112,9 +2115,10 @@ pub(super) const SCHOLARSHIP_REPORTS: Connector = Connector {
     },
     note: "The department's own public account of the scholarship channel. It answers how \
            large each programme is, how far it reaches, how many families applied against how \
-           many were ever paid, and which buildings' students may claim traditional EdChoice; \
-           it does not answer which district a scholarship was charged against, and no public \
-           source does.",
+           many were ever paid, which buildings' students may claim traditional EdChoice, and \
+           — for Jon Peterson alone, which had its own report before the consolidated one — \
+           three consecutive years of participation and spending; it does not answer which \
+           district a scholarship was charged against, and no public source does.",
     sources: &[
         Source {
             key: "scholarship-annual-2025",
@@ -2124,10 +2128,52 @@ pub(super) const SCHOLARSHIP_REPORTS: Connector = Connector {
             filename: "scholarship-annual-2025.pdf",
             format: Format::Pdf,
             catalog: Some("dew-scholarship-annual-report"),
-            fixtures: &[crate::fixtures::SCHOLARSHIP_FIXTURE],
+            fixtures: &[
+                crate::fixtures::SCHOLARSHIP_FIXTURE,
+                crate::fixtures::SCHOLARSHIP_JPSN_FIXTURE,
+                crate::fixtures::SCHOLARSHIP_JPSN_CATEGORY_FIXTURE,
+            ],
             note: "Participation and award totals for all five scholarship programmes, \
                    2024-25. The only committed source here that sizes the channel from the \
                    department rather than from statute.",
+        },
+        Source {
+            key: "jpsn-annual-2024",
+            title: Some("FY24 Jon Peterson Special Needs Scholarship Annual Report"),
+            url: "https://education.ohio.gov/getattachment/About/Annual-Reports/\
+                  FY24_JPSN_Annual_Report.pdf.aspx?lang=en-US",
+            filename: "jpsn-annual-2024.pdf",
+            format: Format::Pdf,
+            catalog: Some("dew-jpsn-annual-report"),
+            fixtures: &[
+                crate::fixtures::SCHOLARSHIP_JPSN_FIXTURE,
+                crate::fixtures::SCHOLARSHIP_JPSN_CATEGORY_FIXTURE,
+            ],
+            note: "One programme for FY2024, six pages, and the year the consolidated report \
+                   does not cover. Its derived expenditure total is the one figure in this \
+                   lineage a second publisher checks: LSC's FY2026-27 redbook quotes about \
+                   $95.4 million for the same fiscal year, against $95,362,957.53 summed from \
+                   this edition's own chart. Its student count is not checked so well — the \
+                   same redbook says about 7,800 where this says 8,551.",
+        },
+        Source {
+            key: "jpsn-annual-2023",
+            title: Some("FY23 Jon Peterson Special Needs Scholarship Annual Report"),
+            url: "https://education.ohio.gov/getattachment/About/Annual-Reports/\
+                  FY23_JPSN_Annual_Report.pdf.aspx?lang=en-US",
+            filename: "jpsn-annual-2023.pdf",
+            format: Format::Pdf,
+            catalog: Some("dew-jpsn-annual-report"),
+            fixtures: &[
+                crate::fixtures::SCHOLARSHIP_JPSN_FIXTURE,
+                crate::fixtures::SCHOLARSHIP_JPSN_CATEGORY_FIXTURE,
+            ],
+            note: "The earliest edition of this report the department still serves, and the \
+                   only one in the lineage that states an expenditure total in words — \
+                   $81,773,133.70, which equals the sum of its own six category figures to the \
+                   cent and so licenses that derivation for every edition. It attributes the \
+                   total to the 2021-2022 school year while reporting FY2023 throughout, which \
+                   the fixture carries in a column of its own rather than correcting.",
         },
         Source {
             key: "scholarship-historical",

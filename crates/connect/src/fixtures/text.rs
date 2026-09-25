@@ -22,3 +22,24 @@ pub(super) fn fixed(line: &[char], start: usize, end: usize) -> String {
 pub(super) fn flatten(text: &str) -> String {
     text.split_whitespace().collect::<Vec<_>>().join(" ")
 }
+
+/// The number immediately before `marker`, written with thousands separators.
+///
+/// The reports state a count before the thing counted — "8,186 students received services from"
+/// — so the figure is found by locating the phrase and reading backwards from it. Returns `None`
+/// when what precedes the marker is not a number, which is how "Ohio's school districts" is told
+/// apart from "487 school districts" without a second pattern.
+pub(super) fn count_before(text: &str, marker: usize) -> Option<f64> {
+    let head = &text[..marker];
+    let digits: String = head
+        .chars()
+        .rev()
+        .skip_while(|c| c.is_whitespace())
+        .take_while(|c| c.is_ascii_digit() || *c == ',')
+        .filter(|c| *c != ',')
+        .collect();
+    if digits.is_empty() {
+        return None;
+    }
+    digits.chars().rev().collect::<String>().parse().ok()
+}

@@ -4,7 +4,7 @@
 //! and its two numbers taken from the text around it. The programme list is pinned: a programme
 //! that stops being reported should fail here rather than silently leave the fixture.
 
-use super::text::flatten;
+use super::text::{count_before, flatten};
 
 /// The five programmes, in the order the report presents them.
 ///
@@ -27,22 +27,6 @@ const PROGRAMMES: &[(&str, &str)] = &[
         "Jon Peterson Special Needs Scholarship Program",
     ),
 ];
-
-/// The number immediately before `marker`, written with thousands separators.
-fn count_before(text: &str, marker: usize) -> Option<f64> {
-    let head = &text[..marker];
-    let digits: String = head
-        .chars()
-        .rev()
-        .skip_while(|c| c.is_whitespace())
-        .take_while(|c| c.is_ascii_digit() || *c == ',')
-        .filter(|c| *c != ',')
-        .collect();
-    if digits.is_empty() {
-        return None;
-    }
-    digits.chars().rev().collect::<String>().parse().ok()
-}
 
 /// The dollar amount following the first occurrence of `marker` in `text`.
 fn dollars_after(text: &str, marker: &str) -> Option<f64> {

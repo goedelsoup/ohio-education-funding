@@ -4,7 +4,7 @@
 the 2024-2025 school year.
 **Type.** Primary source, published by the programme administrator.
 **Location.** `https://education.ohio.gov/getattachment/About/Annual-Reports/2025-Scholarship-Annual-Report.pdf.aspx?lang=en-US`.
-About 1.3 MB, 21 pages, retrievable by a self-identifying agent.
+About 1.3 MB, 22 pages, retrievable by a self-identifying agent.
 
 **What it contains.** One section per programme — Traditional EdChoice, EdChoice Expansion,
 Cleveland, Autism, Jon Peterson Special Needs — each with a summary, the authorising Revised Code
@@ -76,12 +76,20 @@ archive's index holds `FY2016-JPSN-Board-Report.pdf`, `FY2017-JPSN-Annual-Report
 `JPSN-Report-FY20.pdf`, `FY23_JPSN_Annual_Report.pdf` and `FY24_JPSN_Annual_Report.pdf` — the Jon
 Peterson programme reporting on itself, as its own authorising section requires — plus
 `Ohio-ACE-Educational-Savings-Account-Report.pdf` for a programme this report does not cover at
-all. The last two JPSN editions are still on the live page beside this one.
+all. The last two JPSN editions are still on the live page beside this one, and are now extracted:
+[JPSN Annual Report](dew-jpsn-annual-report.md) carries FY2023 and FY2024 for that one programme.
 
 That changes what the gap above the FY1997-FY2013 [historical
 archive](dew-scholarship-historical-data.md) is. It is not a series this project has not looked
-for; it is a series the department did not publish. The consolidated five-programme account begins
-with 2024-2025, and one programme's own reporting is what covers part of the decade before it.
+for; there is no consolidated series to find. The consolidated five-programme account begins with
+2024-2025, and one programme's own reporting is what covers part of the decade before it — which
+is now partly read rather than only named, so the gap in *this* channel is FY2014 through FY2022
+and Jon Peterson's is FY2014 through FY2022 as well.
+
+The two editions that are read also correct the shape of that lineage. They were not a rolling
+one-at-a-time replacement: three older JPSN editions were served from this page as late as June
+2023 and gone by June 2024, and FY23 and FY24 were both exported from Word on one afternoon in
+March 2025. A lapse and a catch-up, which the [JPSN record](dew-jpsn-annual-report.md) dates.
 
 ## What it is not
 

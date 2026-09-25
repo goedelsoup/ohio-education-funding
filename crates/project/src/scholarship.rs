@@ -550,12 +550,261 @@ renewal_low_income";
     }
 }
 
+pub mod jpsn {
+    //! The Jon Peterson programme's own annual report, FY2023 through FY2025.
+    //!
+    //! One programme with a series of its own, because it had a report of its own. The department
+    //! published a standalone JPSN annual report until the 2025 consolidated report absorbed it,
+    //! and it published these two together and late: both PDFs were exported from Word on one
+    //! afternoon in March 2025, nine months after FY2024 closed, and the Annual Reports page
+    //! carried neither of them in the archive's June 2024 or February 2025 captures.
+    //! [`dew-jpsn-annual-report`](../../.yidam/catalog/dew-jpsn-annual-report.md) holds that
+    //! timeline. Those two plus the consolidated report's Jon Peterson section are FY2023, FY2024
+    //! and FY2025: three consecutive years, and the first year-on-year change in this programme's
+    //! participation that the department itself published anywhere.
+    //!
+    //! # What this closes, and what it does not
+    //!
+    //! [`super::history`] ends at FY2013 and [`super::report`] covers FY2025 alone. This reaches
+    //! back two years further, for **one of the five programmes**. So the channel-wide
+    //! participation hole is FY2014 through FY2022 rather than FY2014 through FY2023, and for Jon
+    //! Peterson alone it is FY2014 through FY2022 as well — the two happen to coincide because
+    //! FY2023 is this series' first year. Nothing here reaches the other four programmes, and
+    //! [`super::bounds`] is still the only thing that speaks to the years in between.
+    //!
+    //! Each edition also prints a bar chart of total applications by fiscal year from FY2014
+    //! onward, which is the series that would *fill* the hole rather than shorten it. Its bars
+    //! carry no data labels in the text layer, so `pdftotext` reaches the axis and not the values,
+    //! and the extractor does not attempt them.
+    //!
+    //! # The expenditure total is stated once and dated to another year
+    //!
+    //! Only the FY2023 edition writes a total in words, and it attributes it to the 2021-2022
+    //! school year while reporting FY2023 throughout. [`Edition::stated_total`] and
+    //! [`Edition::stated_total_year`] are separate fields for that reason, and
+    //! [`Edition::total_is_its_own_year`] is the question rather than the answer. What licenses
+    //! [`spending`] for the two editions that state nothing is that this one total equals the sum
+    //! of its own six category figures to the cent: the department's own arithmetic, quoted.
+    //!
+    //! # Which figures in the FY2023 edition are FY2023's
+    //!
+    //! Open, and the open part is narrower than the whole edition. Its award table is identical to
+    //! FY2024's, and `the_award_table_is_recomputed_each_year_and_two_editions_print_the_same_one`
+    //! shows the table is a uniform fraction of the statutory vector with the fraction moving
+    //! between editions — so printing one table twice means an index that did not move. Set beside
+    //! the two documents having been produced in one sitting, the reading that impugns the table
+    //! rather than the spending chart is as available as the reverse, and this module commits to
+    //! neither: every column is carried as published.
+
+    use std::collections::BTreeMap;
+    use std::ops::RangeInclusive;
+
+    use edfund_core::{Dollars, FiscalYear};
+
+    /// The committed extract of the three editions, one row each.
+    const FIXTURE: &str = include_str!("../fixtures/scholarship-jpsn.csv");
+
+    const EXPECTED_HEADER: &str =
+        "fiscal_year,students,providers,districts,stated_total,stated_total_fiscal_year";
+
+    /// The same three editions' per-category series, long rather than wide.
+    const CATEGORY_FIXTURE: &str = include_str!("../fixtures/scholarship-jpsn-categories.csv");
+
+    const CATEGORY_EXPECTED_HEADER: &str = "fiscal_year,series,position,value";
+
+    /// The programme slug, shared with the other three scholarship fixtures.
+    pub const PROGRAM: &str = "jon-peterson";
+
+    /// The six funding levels R.C. 3317.022 organizes the thirteen IDEA disability categories into.
+    ///
+    /// The same six [`super::JON_PETERSON_SUPPLEMENTS`] gives the statutory supplement for, which
+    /// is what makes [`Series::Maximum`] comparable to the statute and the two charts not.
+    pub const CATEGORIES: usize = 6;
+
+    /// Which of the report's three per-category series a row belongs to.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+    pub enum Series {
+        /// The maximum annual award per category, from the table that numbers its own rows.
+        Maximum,
+        /// The share of students in each category, in percentage points.
+        Share,
+        /// What was spent on each category, in dollars.
+        Spending,
+    }
+
+    impl Series {
+        /// The fixture's own spelling.
+        fn from(cell: &str) -> Option<Self> {
+            match cell {
+                "maximum" => Some(Self::Maximum),
+                "share" => Some(Self::Share),
+                "spending" => Some(Self::Spending),
+                _ => None,
+            }
+        }
+
+        /// Whether a row's `position` is the category R.C. 3317.022 defines, or only a place in a
+        /// chart's layout.
+        ///
+        /// **True for one series of the three.** The award maxima are printed in a table with a
+        /// `#` column, so each amount arrives with its category stated. The two pie charts print
+        /// their labels around the slices and `pdftotext` reads them in layout order, which moves
+        /// between editions: the smallest disability share, near 0.7% in all three, is read first
+        /// in FY2023 and fourth in both later ones. A fixed category cannot change position, so
+        /// the position is not the category.
+        ///
+        /// What survives for the charts is the sum, which does not depend on order, and the
+        /// largest value, which is identifiable by size. [`spending`] is the first of those.
+        #[must_use]
+        pub fn position_is_a_category(self) -> bool {
+            self == Self::Maximum
+        }
+    }
+
+    /// One edition of the report.
+    #[derive(Debug, Clone, PartialEq)]
+    pub struct Edition {
+        /// The fiscal year the edition's own July-to-June heading names.
+        pub year: FiscalYear,
+        /// Students who received services. The report's only participation figure in words.
+        pub students: f64,
+        /// Approved providers, which the report states twice and the extractor makes agree.
+        pub providers: f64,
+        /// Districts of residence the programme drew from. A reach figure, not a count of
+        /// students, and the only column in this repository that measures it.
+        pub districts: f64,
+        /// The expenditure total the edition writes in words. `Some` for FY2023 alone.
+        pub stated_total: Option<Dollars>,
+        /// The fiscal year the edition attributes that total to, which is not its own.
+        pub stated_total_year: Option<FiscalYear>,
+    }
+
+    impl Edition {
+        /// Whether the stated total is attributed to this edition's own fiscal year, and `None`
+        /// where the edition states no total.
+        ///
+        /// `Some(false)` for FY2023, the only edition that states one: it names the 2021-2022
+        /// school year, two years behind the report around it. The identical phrase appears two
+        /// sentences earlier in the paragraph describing House Bill 110's abolition of the
+        /// district deduction, which is where a copy error would have come from — but the report
+        /// does not say, and the later editions drop the sentence while keeping the chart, so
+        /// nothing confirms it. The reading stays open.
+        #[must_use]
+        pub fn total_is_its_own_year(&self) -> Option<bool> {
+            self.stated_total_year.map(|named| named == self.year)
+        }
+
+        /// What the department charts and never totals, over the students it says it served.
+        ///
+        /// Derived on both sides of the division from one edition, so it is the one figure here
+        /// that cannot be affected by joining two editions together.
+        #[must_use]
+        pub fn spending_per_student(&self) -> Option<Dollars> {
+            let paid = spending(self.year)?;
+            (self.students > 0.0).then_some(paid / self.students)
+        }
+    }
+
+    /// Every edition, by fiscal year.
+    ///
+    /// # Panics
+    ///
+    /// If the fixture's header is not the one this was written against, by way of
+    /// [`edfund_core::csv::rows`], or if a row carries no fiscal year.
+    #[must_use]
+    pub fn editions() -> BTreeMap<FiscalYear, Edition> {
+        edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
+            .map(|row| {
+                let year =
+                    FiscalYear(row.num(0).expect("every edition names a fiscal year") as u16);
+                (
+                    year,
+                    Edition {
+                        year,
+                        students: row.num(1).expect("every edition publishes participation"),
+                        providers: row.num(2).expect("every edition publishes providers"),
+                        districts: row.num(3).expect("every edition publishes districts"),
+                        stated_total: row.num(4),
+                        stated_total_year: row.num(5).map(|y| FiscalYear(y as u16)),
+                    },
+                )
+            })
+            .collect()
+    }
+
+    /// The fiscal years the editions cover, inclusive, read off the fixture.
+    ///
+    /// Derived rather than written down, like [`super::history::span`] and unlike
+    /// [`super::report::FISCAL_YEAR`]: a fourth edition extending the series has to move the hole
+    /// [`super::bounds`] describes rather than leave a constant behind. `FY2023..=FY2025` today.
+    ///
+    /// # Panics
+    ///
+    /// If the fixture holds no editions at all.
+    #[must_use]
+    pub fn span() -> RangeInclusive<u16> {
+        let years: Vec<u16> = editions().keys().map(|y| y.0).collect();
+        let first = years.iter().copied().min().expect("the fixture has rows");
+        let last = years.iter().copied().max().expect("the fixture has rows");
+        first..=last
+    }
+
+    /// One series of one edition, in the order the fixture holds it.
+    ///
+    /// For [`Series::Maximum`] that order is the category number the table prints. For the other
+    /// two it is a chart's layout order and nothing more — see [`Series::position_is_a_category`].
+    ///
+    /// # Panics
+    ///
+    /// If the category fixture's header is not the one this was written against, or if a row names
+    /// a series this module does not know.
+    #[must_use]
+    pub fn series(year: FiscalYear, which: Series) -> Vec<f64> {
+        let mut found: Vec<(u8, f64)> =
+            edfund_core::csv::delimited(CATEGORY_FIXTURE, CATEGORY_EXPECTED_HEADER, ',')
+                .filter(|row| {
+                    row.num(0).map(|y| y as u16) == Some(year.0)
+                        && Series::from(row.str(1)) == Some(which)
+                })
+                .map(|row| {
+                    (
+                        row.num(2).expect("every row carries a position") as u8,
+                        row.num(3).expect("every row carries a figure"),
+                    )
+                })
+                .collect();
+        found.sort_by_key(|(position, _)| *position);
+        found.into_iter().map(|(_, value)| value).collect()
+    }
+
+    /// One edition's statewide expenditure, summed from the six category figures it charts.
+    ///
+    /// # Why summing this chart is quoting and not deriving
+    ///
+    /// Because the FY2023 edition does it itself. It prints the same chart and then writes "total
+    /// expenditures for the JPSN program … sum to $81,773,133.70", which equals the sum of its own
+    /// six figures to the cent. The department therefore treats that sum as the programme's total,
+    /// and the two editions that print the chart without the sentence are not being given a total
+    /// they never implied.
+    ///
+    /// Order-invariant, which matters: the charts' label order is a layout artefact
+    /// ([`Series::position_is_a_category`]), and a sum is the reading that does not depend on it.
+    ///
+    /// Returns `None` for a year the fixture does not hold.
+    #[must_use]
+    pub fn spending(year: FiscalYear) -> Option<Dollars> {
+        let categories = series(year, Series::Spending);
+        (categories.len() == CATEGORIES).then(|| categories.iter().sum())
+    }
+}
+
 pub mod bounds {
     //! Every dated scholarship quantity the Legislative Service Commission quotes inside the hole
     //! between the two committed series — and the reasons not one of them belongs on either.
     //!
     //! [`super::history`] runs FY1997 through FY2013 and [`super::report`] covers FY2025. Between
-    //! them are ten fiscal years with no participation series at all, and
+    //! them are nine fiscal years with no participation series at all — ten until [`super::jpsn`]
+    //! was extracted, which reached FY2023 and FY2024 for one of the five programmes — and
     //! `.yidam/decisions/scholarship-reports-connector.yml` recorded that the hole "is not empty":
     //! LSC's budget analyses quote counts inside it. This is those counts, read out of the
     //! committed extracts rather than described — along with the overlap-era quotes that are the
@@ -786,18 +1035,43 @@ pub mod bounds {
         ///
         /// Deliberately not the whole argument against splicing — the module's third reason is a
         /// property of pairs of rows and no per-row predicate can express it.
+        ///
+        /// # Why the provider counts are not in it
+        ///
+        /// [`super::jpsn`] publishes an approved-provider count for each of its three years and
+        /// the census quotes one for FY2024 — 454, unhedged, against the department's 500 for the
+        /// same fiscal year. That pair is a **contradiction rather than a splice**: the year is
+        /// occupied, so nothing can be appended to it without a reader seeing two values, and
+        /// `the_two_publishers_agree_on_the_money_and_not_on_the_counts` holds the disagreement
+        /// where it can be read. What makes a splice silent is an *empty* year, and this predicate
+        /// is about those.
+        ///
+        /// It is also the case that nothing says the two count the same population — the
+        /// department counts providers approved to participate and LSC's sentence counts providers
+        /// students received services from — and [`Denominator::Unstated`] is the absence of a
+        /// population, not one a series shares.
         #[must_use]
         pub fn spliceable(&self) -> Option<&'static str> {
             let archive = super::history::span();
             if self.denominator.is_the_archives() && self.year.0 <= archive.end() + 1 {
                 return Some("the archive, whose own denominator it names");
             }
-            if self.measure == Measure::Participation
-                && self.denominator == Denominator::Students
-                && !self.precision.is_hedged()
-                && self.year.0 + 1 >= super::report::FISCAL_YEAR
+            if self.measure != Measure::Participation
+                || self.denominator != Denominator::Students
+                || self.precision.is_hedged()
             {
+                return None;
+            }
+            if self.year.0 + 1 >= super::report::FISCAL_YEAR {
                 return Some("the annual report, whose year and denominator it shares unhedged");
+            }
+            // The Jon Peterson series reaches two years further back than the consolidated report
+            // does, so for that one programme an unhedged student count in FY2022 or later now has
+            // a series beside it where until FY2023 was extracted there was only the hole.
+            if self.program == super::jpsn::PROGRAM
+                && self.year.0 + 1 >= *super::jpsn::span().start()
+            {
+                return Some("the Jon Peterson series, which reaches back into the hole");
             }
             None
         }

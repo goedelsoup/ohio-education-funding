@@ -748,6 +748,58 @@ fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     );
 
+    // The Jon Peterson programme's own report, which the consolidated one above succeeded. Three
+    // editions read by one parser — the two standalone ones and the Jon Peterson section of the
+    // consolidated report — because reading them differently is what would make the three years
+    // look comparable when they are not. Every edition has to parse: a partial series here would
+    // be a year-on-year change computed across a gap.
+    let editions = [
+        "jpsn-annual-2023",
+        "jpsn-annual-2024",
+        "scholarship-annual-2025",
+    ];
+    // One row per edition, and one row per category position per edition: the two fixtures a
+    // single pass over the three editions fills.
+    type JpsnRows = (Vec<Vec<String>>, Vec<Vec<String>>);
+    let read = (|| -> Result<JpsnRows, String> {
+        let mut summary = Vec::new();
+        let mut categories = Vec::new();
+        for key in editions {
+            let text = cache::pdf_text(root, registered(key)).map_err(|cause| cause.to_string())?;
+            let edition =
+                fixtures::jpsn_edition(&text).map_err(|cause| format!("{key}: {cause}"))?;
+            summary.push(edition.summary);
+            categories.extend(edition.categories);
+        }
+        Ok((summary, categories))
+    })();
+    match read {
+        Ok((summary, categories)) => {
+            out.push(csv_fixture(
+                root,
+                fixtures::SCHOLARSHIP_JPSN_FIXTURE,
+                fixtures::JPSN_HEADER,
+                &summary,
+            )?);
+            out.push(csv_fixture(
+                root,
+                fixtures::SCHOLARSHIP_JPSN_CATEGORY_FIXTURE,
+                fixtures::JPSN_CATEGORY_HEADER,
+                &categories,
+            )?);
+        }
+        Err(cause) => {
+            out.push(Rebuilt::skipped(
+                fixtures::SCHOLARSHIP_JPSN_FIXTURE,
+                cause.clone(),
+            ));
+            out.push(Rebuilt::skipped(
+                fixtures::SCHOLARSHIP_JPSN_CATEGORY_FIXTURE,
+                cause,
+            ));
+        }
+    }
+
     // The same channel before the Fair School Funding Plan, and the only source here that
     // counts applications and payments separately. An archival snapshot rather than a series:
     // the department wrote it once in October 2018 out of the system the Enterprise Application
