@@ -1,0 +1,132 @@
+id: sizing-the-five-units-beside-the-district
+summary: >-
+  R.C. 3317.022 computes six funding units and this site sized one of them. The other five are
+  now in the feed — the community and STEM school unit from the department's own model, the four
+  scholarship units from the department's annual report — each carrying its own fiscal year,
+  because they have no year in common and picking one would have dated four of them wrongly. The
+  receiving side of the Census survey was the other candidate for the community unit and it
+  cannot do the job: its Ohio file carries none of those schools at the current end of the window.
+context: |
+  The method page said, in the row headed `Community schools and scholarships`, that "the
+  deduction that routes money from a resident district to a community school or a scholarship is
+  not modelled here". The corpus has since read R.C. 3317.022 and established that there is no
+  such deduction to model: the community and STEM school unit and the four scholarship units are
+  **funding units beside the district unit**, computed and paid directly. The row described a
+  mechanism that does not exist and said nothing about the one that does — the whole of what this
+  site had to say about private schooling, and it was about the wrong regime. Issue
+  [#474](https://github.com/goedelsoup/ohio-education-funding/issues/474) is the correction.
+
+  Correcting the sentence meant sizing the channel, and sizing it raised two questions that a
+  sentence would have answered by accident.
+
+  **The community and STEM school unit has two candidate publishers and they are not two views
+  of one number.** The department publishes a community and STEM school simulator — the same
+  office, the same formula, the release this repository already reads for the FY2027 traditional
+  calculator — and the Census Bureau's Annual Survey of School System Finances reports what
+  those schools *received*. One is the paying side of a model, the other the receiving side of a
+  survey, and `f33-has-two-publishers` already records that the panel changes hands inside its
+  own window.
+
+  That change of hands settles it. Of the **357 non-comparable Ohio agencies** the panel carries
+  at FY2022, from NCES's file, **298 are schools in the department's FY2027 model**. At FY2023
+  the panel switches to the Bureau's own `elsecNN.xlsx` and carries **46**, of which **none** is
+  in that model. The receiving side does not merely disagree with the paying side at the ends of
+  the window; at the current end it holds no community school at all, and a figure read off it
+  would be reporting the disappearance of a file rather than of a payment.
+
+  **The six units have no year in common, and four of them cannot be moved onto one.** The
+  district unit is the FY2027 department model, which is what every other figure on this site is
+  computed from. The community and STEM unit has a model for FY2027 and for FY2025 and — per
+  `a-supplement-paid-to-a-population-the-panel-does-not-hold` — will never have one for FY2026,
+  because the department publishes one such workbook at a time and replaces it in place. The four
+  scholarship units are sized by the *2025 Scholarship Annual Report*, which covers the school
+  year 2024-25 and is the only committed source that sizes them from the administrator rather
+  than from statute. LSC's redbook does publish all four on an FY2027 basis — Table 5, $1,251.1m
+  — but those are **estimates in a budget analysis**, and putting an estimate beside a model to
+  buy a shared year label trades a stated year for an unstated basis.
+decision: |
+  **The community and STEM school unit is sized from the department's own model, at the vintage
+  the district unit is shown at.** `dispersion::community_school_funding::total_state_support` on
+  `Vintage::Fy2027`: **$1,511,789,771.13** across **355 schools** and **126,714.26 enrolled ADM**.
+  Same publisher, same statutory formula, same fiscal year and the same kind of claim as the
+  district figure it sits beside — a model's output, not a survey's observation.
+
+  **Every unit carries its own fiscal year and its own basis, and the page renders both.** The
+  feed's `funding_units` block gives each unit a `fiscal_year`, a `basis` — `model` or `report` —
+  and the source it was read from, and `series_years` gains a row per basis so the chips on the
+  new cards are derived like every other year label on this site. That is
+  [`every-figure-says-its-year`](every-figure-says-its-year.yml) applied to a table whose rows
+  are genuinely on different years: its rule is that where rows are on more than one reckoning,
+  **every** row says which, and half-labelling is worse than none.
+
+  **The scholarship channel is published as two figures, not one.** `$991,191,150.12` is what the
+  four programmes that publish an expenditure paid; `$103,944,388.15` is Jon Peterson's, which
+  the report displays as six disability-category figures and never totals. The feed carries the
+  second with `derived: true` beside it and the page says so. The sum, **$1,095,135,538.27** over
+  **166,587 students**, is the quotable number and it is the one that is only partly quoted — the
+  distinction `the_scholarship_channel_by_the_numbers` already holds in the crates, carried
+  through to the page rather than flattened at the feed boundary.
+
+  **The derived figure lives in `project::scholarship::report` as a named constant, not in
+  `scholarship-programs.csv`.** That fixture's `expenditure` column is quoted figures and the
+  blank cell is the claim that the report publishes none; `jon_peterson_publishes_participation_but_not_a_total`
+  exists to keep it blank. A constant beside the reader, documented as derived and bound as a
+  figure, puts the number where the feed can reach it without changing what the extract asserts.
+
+  **Category 3 nonpublic support travels beside the six units and is not one of them.** Auxiliary
+  Services, the Nonpublic Administrative Cost Reimbursement and the reimbursement fund move under
+  R.C. 3317.024, 3317.06, 3317.062, 3317.063 and 3317.064 — not under R.C. 3317.022 — so the feed
+  puts them in their own block with the sections that carry them. A reader who meets the
+  scholarships and not these has met about three-quarters of what the state spends on nonpublic
+  schooling and been given no sign of it.
+consequences: |
+  **The site can state the mechanism in force for the first time.** The method row now says what
+  R.C. 3317.022 does — six units, paid directly — instead of denying a model of a deduction that
+  was abolished. The deduct-era mechanism is a separate and still-open question, and saying so is
+  cheaper than the sentence that was there.
+
+  **The statewide page shows a total it previously implied was the whole of state support.**
+  `realized_aid_total` across 609 districts is the district unit alone. Beside the community and
+  STEM unit and the four scholarship units it is one of six, and a reader who took it for "what
+  Ohio spends on schools" was reading a figure this feed can now contradict — the same failure
+  `casino` was added to the feed to stop.
+
+  **Four of the five new figures are on a year no lever can move.** The scenario machinery prices
+  eight levers over 609 districts and these populations intersect that panel in nothing, which is
+  the standing reason the equity supplement is not a lever. Nothing here changes that, and the
+  method page records the absence of a scholarship lever as a limit rather than working around it.
+
+  **`f33-has-two-publishers` gains a second consequence.** It was recorded as a break in Ohio's
+  own state column at FY2016 and as a coverage difference at the panel's far end; it is also the
+  reason the receiving side cannot answer a question about community schools at all after FY2022.
+  The population, not the column, is what moved.
+alternatives: |
+  **Size the community and STEM unit from the Census receiving side.** Rejected on the file. At
+  FY2022 it would have given $1,348.58m over 134,885 pupils against the model's $1,511.79m over
+  126,714.26 — a gap that is part year, part basis and part population, and decomposable into
+  none of the three. At FY2023 and FY2024 it gives nothing: the Bureau's Ohio file carries 46
+  non-comparable agencies and not one of them is a school in the department's model. A figure
+  that exists for one year of a fifteen-year panel is not a series, and a reader who saw it fall
+  to zero would be watching a publisher change.
+
+  **Put all six units on FY2027 using LSC's Table 5.** Rejected on basis. Those four figures are
+  a budget analysis's projections, marked `estimated` in `scholarship-bounds.tsv` for exactly
+  this reason, and the district figure beside them is a department model. Matching the year label
+  would have cost the thing the label is for: a reader could no longer tell which numbers are
+  what somebody paid and which are what somebody expects to pay. The bounds are held and are
+  reachable; they are not what sizes a unit.
+
+  **Fill Jon Peterson's expenditure into `scholarship-programs.csv` and publish one channel
+  figure.** Rejected, and the repository had already rejected it once in a test comment: "a
+  derived total in a column of quoted ones is the kind of figure that gets quoted back as
+  published". Filling the cell would also have made
+  `project/nonpublic-support-against-the-scholarship-channel` silently stop being the upper bound
+  its label says it is — 24.48% would have become 22.16% with nothing in the corpus saying the
+  denominator had grown.
+
+  **A scenario lever for scholarship amounts.** Rejected and recorded on the method page rather
+  than in code. Scholarships are not per district, the lever machinery is, and the expansion's
+  award is a continuous function of family income under R.C. 3310.08 — so the distribution a
+  lever would have to move is one this corpus does not hold. See
+  [`a-supplement-paid-to-a-population-the-panel-does-not-hold`](a-supplement-paid-to-a-population-the-panel-does-not-hold.yml),
+  which settled the same question for the community school equity supplement on the same ground.
