@@ -62,6 +62,99 @@ findings: |
   to this programme. [open] Recorded because the annual report's participation figure is the
   payment count alone, and a reader taking it for demand understates the first year by a fifth.
 
+  ### It has three published years, and the department posted two of them in one afternoon
+
+  This programme had an annual report of its own until the 2025 consolidated report absorbed it, and
+  two editions were still being served when they were fetched. With the consolidated report's Jon
+  Peterson section that is **FY2023, FY2024 and FY2025** — the only participation series any
+  scholarship programme has between FY2013 and FY2025, and the first year-on-year change in this
+  programme's participation the department has published anywhere. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_three_years_the_jon_peterson_report_gives.rs))
+
+      fiscal year   students   providers   districts   expenditure
+      FY2023          8,186        439        487      $81,773,133.70
+      FY2024          8,551        500        495      $95,362,957.53
+      FY2025          8,680        530        494     $103,944,388.15
+
+  Participation rose **4.46%** and then 1.51%, so the growth is decelerating. Providers grew faster
+  than students in both years, so the average provider served fewer children each year. And
+  districts of residence rose once and then fell by one while participation kept rising: the reach
+  saturated at the four fifths of Ohio's districts the reports claim in prose, and the growth after
+  FY2024 is more children from districts already reached. [verified] That last line is what the
+  description's "widest footprint of any programme in this channel" now rests on — a footprint that
+  has stopped widening.
+
+  **The expenditure column is the department's own arithmetic, quoted once.** Only the FY2023
+  edition writes a total in words, and it equals the sum of the six disability-category figures
+  printed beneath it to the cent. That is what licenses summing the same chart in the two editions
+  that state nothing — including the $103,944,388.15 the consolidated report implies and never
+  writes. [verified]
+
+  **The publication history is a lapse and a catch-up, not a rolling replacement.** Three older
+  editions were served from the department's Annual Reports page as late as June 2023 and were gone
+  by June 2024; the FY23 and FY24 editions were both exported from Word on one afternoon in March
+  2025, nine months after FY2024 closed, and the page carried no JPSN report at all in between.
+  [verified] ([`dew-jpsn-annual-report`](../../catalog/dew-jpsn-annual-report.md)) The three older
+  editions — FY2016, FY2017 and FY2020 — exist only in the archive and are not extracted. [open]
+
+  ### Which of the FY2023 edition's figures are FY2023's is open
+
+  Two things in that edition do not sit with the rest of it, and they point at different columns.
+
+  **The one expenditure total stated in words is dated to another year.** It says "Total
+  expenditures for the JPSN program during the 2021-2022 school year sum to $81,773,133.70" in a
+  report headed FY 2023 throughout, grafted onto the end of a paragraph whose first sentence is
+  "Prior to the 2021-2022 school year…" — which is where a copy error would come from. The FY24
+  edition deletes the sentence and keeps the paragraph and the chart, a deletion rather than a
+  correction. [verified] [open]
+
+  **The FY23 and FY24 editions print the same award table**, all six maxima to the dollar. What each
+  edition prints is a uniform fraction of the statutory vector R.C. 3317.022(A)(13) fixes — 0.8901
+  in those two editions and 0.9542 in FY2025, holding at every position to within a ten-thousandth —
+  so the table is recomputed annually, and printing one table twice means an index that stood still.
+  [verified]
+
+  Set those beside the arithmetic: between FY2023 and FY2024 the award table did not move and
+  spending per student rose 11.6%; between FY2024 and FY2025 the table rose 7.2% and spending per
+  student 7.4%. Two readings survive. Either the FY2023 edition's spending chart lags its heading,
+  or its award table was copied forward from FY24 when the two files were produced together — and
+  under the second the spending chart is FY2023's after all and the 11.6% is real. Against the
+  first: the FY2024 chart is corroborated by a second publisher, the FY2025 chart is labelled with
+  its year, and a lagged FY2023 chart would leave FY2023 with no spending figure anywhere. **This
+  corpus commits to neither and carries every column as published.** [open]
+
+  ### The two publishers agree on this programme's money and not on its counts
+
+  FY2024 is the only fiscal year both the department and the Legislative Service Commission describe,
+  so it is the only place either can be checked against the other. [verified]
+
+      FY2024        department                      LSC
+      expenditure   $95,362,957.53                  about $95.4 million
+      students      8,551                           about 7,800
+      providers     500                             454
+
+  The dollars round to each other, which is the strongest independent evidence in the lineage that a
+  given edition's spending chart belongs to the fiscal year on its cover. The counts do not: the
+  department's participation figure sits 9.6% above LSC's, and its provider count is **46 more** than
+  a figure LSC gives unhedged — LSC's 454 falling between the department's own FY2023 and FY2024
+  counts, so a reader holding both documents could take it for either year. [verified] Nothing says
+  the two count the same population: the department counts providers approved to participate and
+  LSC's sentence counts providers children received services from. [inference] The disagreement is
+  pinned rather than resolved, and it is why `Bound::spliceable` does not treat a count like LSC's
+  as joinable to this series.
+
+  ### The applications series that would fill the gap is printed and unreadable
+
+  Every edition, the consolidated report included, opens Program Participation with a bar chart of
+  total applications by fiscal year — ten bars in FY23, eleven in FY24, and **twelve in the
+  consolidated report, FY2014 through FY2025**, which is the whole of the channel's participation
+  gap and both its edges. Applications counted separately from scholarships paid is the second
+  denominator the archive maintains and the shape of evidence this channel's unexplained averages
+  need. **None of the bars carries a data label**: `pdftotext` reaches the axis gridlines, the years
+  and the legend, and nothing else. The values are in committed bytes and would need the charts'
+  geometry read rather than their text. [open]
+  ([`dew-jpsn-annual-report`](../../catalog/dew-jpsn-annual-report.md))
+
 properties:
   seeded_because: |
     Named in the [`deduction`](../../skills/deduction.md) calculator as one of the four programmes
@@ -170,6 +263,30 @@ figures:
     value: 5122.0
     field: amount
     as_written: "a $5,122 haircut"
+  - key: project/jpsn-participation-fy2023
+    value: 8186.0
+    field: findings
+    as_written: "8,186"
+  - key: project/jpsn-participation-fy2024
+    value: 8551.0
+    field: findings
+    as_written: "8,551"
+  - key: project/jpsn-series-first-change
+    value: 0.044588321524554164
+    field: findings
+    as_written: "4.46%"
+  - key: project/jpsn-expenditure-fy2023
+    value: 81773133.7
+    field: findings
+    as_written: "$81,773,133.70"
+  - key: project/jpsn-expenditure-fy2024
+    value: 95362957.53
+    field: findings
+    as_written: "$95,362,957.53"
+  - key: project/jpsn-lsc-provider-gap
+    value: 46.0
+    field: findings
+    as_written: "46 more"
 links:
   - target: ../program.ont.yml
     relationship: instance-of
@@ -195,6 +312,11 @@ links:
     note: >-
       The authorising sections this node cites by number — eligibility, the award, and the
       deduction that pays for it.
+  - target: ../../catalog/dew-jpsn-annual-report.md
+    relationship: sourced-from
+    note: >-
+      The programme's own annual report, FY23 and FY24 editions, and the only source that gives
+      this channel more than one year of participation for any programme.
   - target: ../../catalog/dew-scholarship-historical-data.md
     relationship: sourced-from
     note: >-

@@ -1,6 +1,7 @@
 //! Where every committed fixture is written, and the manifest of the ones the rebuild produces.
 //!
-//! Thirty-six path constants and [`REBUILT`], which lists the subset a full rebuild regenerates.
+//! Fifty-eight path constants and [`REBUILT`], which lists the subset a full rebuild
+//! regenerates.
 //!
 //! # Why they are together
 //!
@@ -349,6 +350,34 @@ pub const SCHOLARSHIP_FIXTURE: &str = "crates/project/fixtures/scholarship-progr
 /// eighteen, in both directions.
 pub const SCHOLARSHIP_HISTORY_FIXTURE: &str = "crates/project/fixtures/scholarship-history.csv";
 
+/// The Jon Peterson Special Needs Scholarship's own annual report, one row per edition.
+///
+/// # Why this is a third scholarship file
+///
+/// [`SCHOLARSHIP_FIXTURE`] is one row per programme for one year and [`SCHOLARSHIP_HISTORY_FIXTURE`]
+/// is one row per programme-year-denominator for the archive. This is one row per *edition of one
+/// programme's report*, and it carries three columns neither of the others has anywhere: approved
+/// providers, districts of residence, and the expenditure total the department states in words
+/// against the school year it attributes it to. Folding it into either would mean three columns
+/// empty for every row but Jon Peterson's, and a row whose fiscal year means the edition rather
+/// than the year of the count.
+pub const SCHOLARSHIP_JPSN_FIXTURE: &str = "crates/project/fixtures/scholarship-jpsn.csv";
+
+/// The Jon Peterson report's three per-category series, long rather than wide.
+///
+/// One row per edition per series per position, where `series` is `maximum`, `share` or
+/// `spending`. Long because the three series are not one table: the award maxima are printed in a
+/// table that numbers its own rows, so their `position` **is** the category R.C. 3317.022 defines,
+/// while the two pie charts are read in layout order and their `position` is **not** a category at
+/// all — matching the shares by magnitude across the three editions shows the order moving. A wide
+/// row would have joined a category to two numbers that are not its own.
+///
+/// The `value` column carries dollars for `maximum` and `spending` and percentage points for
+/// `share`, to the precision the edition published: the FY2023 edition gives its shares to one
+/// decimal place and both later editions to two.
+pub const SCHOLARSHIP_JPSN_CATEGORY_FIXTURE: &str =
+    "crates/project/fixtures/scholarship-jpsn-categories.csv";
+
 /// Where the EdChoice designated list is written, relative to the repository root.
 ///
 /// In `dispersion` rather than `project` because it is a per-building panel over every district,
@@ -462,6 +491,8 @@ pub const REBUILT: &[&str] = &[
     APPROPRIATION_FIXTURE,
     SCHOLARSHIP_FIXTURE,
     SCHOLARSHIP_HISTORY_FIXTURE,
+    SCHOLARSHIP_JPSN_FIXTURE,
+    SCHOLARSHIP_JPSN_CATEGORY_FIXTURE,
     CATALOG_FIXTURE,
     CATALOG_BASIS_FIXTURE,
 ];

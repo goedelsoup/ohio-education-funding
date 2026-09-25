@@ -9292,6 +9292,94 @@ pub static FIGURES: &[Figure] = &[
             project::scholarship::JON_PETERSON_BASE + project::scholarship::JON_PETERSON_SUPPLEMENTS[5]
         },
     },
+    // ---- the Jon Peterson series, FY2023 through FY2025 ---------------------------------------
+    //
+    // The programme's own annual report for two years plus the consolidated report's section for a
+    // third, which is the only participation series any scholarship programme has between FY2013
+    // and FY2025. Read off `scholarship::jpsn`'s two fixtures rather than retyped, so that a
+    // re-extraction that changed a figure reddens the prose quoting it.
+    Figure {
+        key: "project/jpsn-participation-fy2023",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Children the Jon Peterson programme served in FY2023, the first year of the \
+                series the department's own annual report gives",
+        pinned: 8186.0,
+        tolerance: 0.0,
+        compute: |_| {
+            project::scholarship::jpsn::editions()[&FiscalYear(2023)].students
+        },
+    },
+    Figure {
+        key: "project/jpsn-participation-fy2024",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Children the programme served in FY2024 \u{2014} the one fiscal year the \
+                department and the Legislative Service Commission both describe",
+        pinned: 8551.0,
+        tolerance: 0.0,
+        compute: |_| {
+            project::scholarship::jpsn::editions()[&FiscalYear(2024)].students
+        },
+    },
+    Figure {
+        key: "project/jpsn-series-first-change",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The programme's first published year-on-year change in participation, FY2023 to \
+                FY2024 \u{2014} it slows to 1.5% the year after",
+        pinned: 0.044_588_321_524_554_164,
+        tolerance: 0.000_1,
+        compute: |_| {
+            let editions = project::scholarship::jpsn::editions();
+            editions[&FiscalYear(2024)].students / editions[&FiscalYear(2023)].students - 1.0
+        },
+    },
+    Figure {
+        key: "project/jpsn-expenditure-fy2023",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the programme spent in FY2023 \u{2014} the one total the department states in \
+                words, and it equals the sum of its own six category figures to the cent",
+        pinned: 81_773_133.70,
+        tolerance: 0.005,
+        compute: |_| {
+            project::scholarship::jpsn::spending(FiscalYear(2023)).expect("FY2023 charts six")
+        },
+    },
+    Figure {
+        key: "project/jpsn-expenditure-fy2024",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What the programme spent in FY2024, summed from a chart the edition never totals \
+                \u{2014} it rounds to the about $95.4 million LSC publishes for the same year",
+        pinned: 95_362_957.53,
+        tolerance: 0.005,
+        compute: |_| {
+            project::scholarship::jpsn::spending(FiscalYear(2024)).expect("FY2024 charts six")
+        },
+    },
+    Figure {
+        key: "project/jpsn-lsc-provider-gap",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "How many more approved providers the department counts for FY2024 than LSC does \
+                \u{2014} LSC's 454 falls between the department's own FY2023 and FY2024 counts",
+        pinned: 46.0,
+        tolerance: 0.0,
+        compute: |_| {
+            let department = project::scholarship::jpsn::editions()[&FiscalYear(2024)].providers;
+            let lsc = project::scholarship::bounds::of(
+                project::scholarship::jpsn::PROGRAM,
+                project::scholarship::bounds::Measure::Providers,
+            )
+            .into_iter()
+            .find(|bound| bound.source == "dew-redbook")
+            .expect("the census holds LSC's FY2024 provider count")
+            .value;
+            department - lsc
+        },
+    },
     Figure {
         key: "project/jon-peterson-ceiling-haircut",
         owner: "crates/project",

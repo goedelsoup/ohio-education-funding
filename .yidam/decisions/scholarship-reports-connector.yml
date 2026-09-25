@@ -126,6 +126,15 @@ amendment: |
   > thirty-seven of sixty-four rows carry the publisher's own qualifier. None of that weakens the
   > conclusion; it is why the conclusion now has a fixture behind it rather than a count.
 
+  > **CORRECTED by [#484](https://github.com/goedelsoup/ohio-education-funding/issues/484).**
+  > "FY2014 through FY2023" is now FY2014 through **FY2022**, and "twenty-two quoted quantities
+  > inside the hole" is twenty-one. The Jon Peterson programme's own annual report was extracted
+  > for FY2023 and FY2024, which shortens the channel's hole by one year at its far edge. The row
+  > that changed buckets is the census's only FY2023 row — 714 chartered nonpublic schools
+  > operating statewide — which is not a quantity the Jon Peterson editions measure, so nothing
+  > about it became checkable. Everything else this paragraph and the two blocks above it say
+  > stands, and the hole is still a hole for four programmes of five.
+
   **"They bound the hole; they do not fill it" is a fixture.** `scholarship-bounds.tsv` holds the
   census, one row per quoted quantity, carrying the programme, the fiscal year, the measure, the
   value, the **denominator** it is over, the publisher's own **precision**, the source document,
@@ -191,5 +200,45 @@ amendment: |
   one district of 607 missing from it is Cleveland Municipal — which R.C. 3310.03 excludes by
   name, because the pilot project scholarship programme operates there. That last one is the
   first place in this corpus where a statutory exclusion is observable as a row count.
+
+  **The hole has a floor under part of it now, and the criterion above is what put it there.**
+  Two more sources joined this connector rather than starting another — `jpsn-annual-2023` and
+  `jpsn-annual-2024`, the Jon Peterson programme's own annual report for two years. The access
+  regime is identical: the same office, the same Annual Reports page, the same `getattachment`
+  route, no credentials. By the criterion this record already states, that is one connector, and
+  the alternative — a per-programme connector for a per-programme report — would have produced a
+  `Status` string indistinguishable from this one's.
+
+  What changed in the status is the remainder, which is now narrower and for a stated reason:
+  `still_blocked` names FY2014 through FY2022 rather than FY2014 through FY2023, **for one
+  programme of five**. Four programmes have nothing in the hole and the sentence has to keep
+  saying so, because a hole one year shorter reads like a hole one programme narrower and it is
+  not.
+
+  **The guard grew a third clause and the vacuity test a third case.** `Bound::spliceable` now
+  also answers for the Jon Peterson series, which reaches two years further back than the
+  consolidated report does — and the census does hold a Jon Peterson student count for FY2024,
+  7,800, kept out of the joinable set by LSC's own "about" and nothing else. Doctoring that row's
+  precision to `Exact` makes the predicate say so, which is the third doctored case and the reason
+  the all-`None` assertion is still measuring something. A guard that passes on every row measures
+  nothing, and a newly extracted series is exactly when that bites.
+
+  **One pair is a contradiction and is deliberately not called a splice.** For FY2024 the
+  department publishes 500 approved providers and LSC publishes 454, unhedged, and LSC's figure
+  falls between the department's own FY2023 and FY2024 counts. That is not a silent splice: the
+  year is occupied, so appending it would put two values in one year where a reader sees both.
+  What makes a splice dangerous is an *empty* year, and `Denominator::Unstated` is the absence of
+  a population rather than one a series shares. Reporting it as joinable would have turned the
+  hard-zero guard into a snapshot with allowed exceptions, so the disagreement lives in a test
+  named for it — `the_two_publishers_agree_on_the_money_and_not_on_the_counts` — where the money
+  agreeing to LSC's rounding grain is recorded beside the counts not agreeing at all.
+
+  **And what would fill the hole rather than shorten it is in bytes this connector already holds.**
+  Every JPSN edition and the consolidated report open with a bar chart of total applications by
+  fiscal year; the consolidated one runs FY2014 through FY2025, which is the hole and both its
+  edges, in the applications denominator the archive maintains. None of the bars carries a data
+  label, so `cache::pdf_text` reaches the axis and not the values. That is a different instrument —
+  chart geometry, not `pdftotext` — and it is named here so the next reader does not re-derive that
+  the series is missing when what is missing is a way to read it.
 connectors:
   - dew-scholarship-reports

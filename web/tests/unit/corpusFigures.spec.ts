@@ -358,6 +358,14 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * programme and fiscal period, in a document that says in terms it allocates no amount to any
  * individual programme.
  *
+ * Recomputed at **1125/80** when the Jon Peterson programme's own annual report was extracted.
+ * `program/jon-peterson-special-needs` had three bindings and has nine; no new carrier. Two of
+ * the six are the levels a three-year series is worth holding (FY2023 and FY2024 participation),
+ * and the other four are things that only exist because there is more than one year: the first
+ * published year-on-year change, the two expenditure totals summed from charts the editions do
+ * not total, and the gap between the department's provider count and LSC's for the one fiscal
+ * year both publishers describe.
+ *
  * Recomputed at **1119/80** when the designated list became three editions.
  * `program/traditional-edchoice-scholarship` had ten bindings and has fifteen; no new carrier.
  * Four of the five are *differences* rather than levels — the entrants of each transition, the
@@ -366,8 +374,8 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * nothing that can go stale when the thing it describes moves.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1119 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1119,
+  expect(bindings.length, "1125 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1125,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,

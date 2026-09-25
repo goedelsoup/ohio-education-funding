@@ -1,10 +1,12 @@
 //! The FY2014-FY2023 participation hole is bounded by quoted points, and this is the guard that
 //! keeps them from being mistaken for a series.
 //!
-//! Two fixtures cover the scholarship channel and they do not meet. `scholarship-history.csv` is
-//! the department's archive, FY1997 through FY2013, and it publishes two denominators;
-//! `scholarship-programs.csv` is the 2024-25 annual report, and it publishes one. Ten fiscal years
-//! sit between them with no participation series at all, and
+//! Three fixtures cover the scholarship channel and none of them meet. `scholarship-history.csv`
+//! is the department's archive, FY1997 through FY2013, and it publishes two denominators;
+//! `scholarship-programs.csv` is the 2024-25 annual report, and it publishes one;
+//! `scholarship-jpsn.csv` is FY2023 through FY2025 for one of the five programmes. Nine fiscal
+//! years sit between the archive and the nearest of the others with no participation series at
+//! all — ten before the Jon Peterson editions were extracted — and
 //! `.yidam/decisions/scholarship-reports-connector.yml` recorded the shape of the problem: the hole
 //! "is not empty", because LSC's budget analyses quote counts inside it, but those counts "bound
 //! the hole and cannot be spliced onto the series".
@@ -20,8 +22,8 @@
 //!   document its `source` column names, and must contain the row's own value as the publisher
 //!   printed it. A fixture built by reading prose is otherwise correct only on the day it is typed.
 //! - **No bound is joinable.** [`Bound::spliceable`] is `None` for all sixty-four, and
-//!   [`the_splice_guard_is_not_vacuous`] shows the predicate can say otherwise, so the first
-//!   assertion is a measurement of the fixture and not of the code.
+//!   [`the_splice_guard_is_not_vacuous`] shows the predicate can say otherwise on each of the
+//!   three series, so the first assertion is a measurement of the fixture and not of the code.
 //! - **The overlap years are the reason.** Five bounds fall inside the archive's own span, where
 //!   both a quote and a measured column exist. They agree once exactly and are out by a factor of
 //!   nearly seven elsewhere.
@@ -32,12 +34,16 @@
 //! here should: the point of the census is that the interpolation cannot be justified.
 
 use project::scholarship::bounds::{self, Bound, Denominator, Measure, Precision};
-use project::scholarship::{history, report};
+use project::scholarship::{history, jpsn, report};
 
 use edfund_core::FiscalYear;
 
-/// The hole, as the two committed fixtures leave it.
-const HOLE: std::ops::RangeInclusive<u16> = 2014..=2023;
+/// The hole, as the three committed fixtures leave it.
+///
+/// FY2014 through FY2022, and it was FY2014 through FY2023 until the two surviving Jon Peterson
+/// annual reports were extracted. The year that came off is one programme's, not the channel's:
+/// FY2023 now has a participation figure for Jon Peterson and for none of the other four.
+const HOLE: std::ops::RangeInclusive<u16> = 2014..=2022;
 
 #[test]
 fn the_census_is_a_census_and_reaches_across_the_hole() {
@@ -72,31 +78,44 @@ fn the_census_is_a_census_and_reaches_across_the_hole() {
         .collect::<std::collections::BTreeSet<&str>>();
     assert_eq!(documents.len(), 8);
 
-    // Where the bounds fall relative to the two series. The census is worth holding because of the
-    // middle number: twenty-two quoted quantities in ten years that no fixture measures.
+    // Where the bounds fall relative to the three series. The census is worth holding because of
+    // the middle number: twenty-one quoted quantities in nine years that no fixture measures.
+    //
+    // It was twenty-two in ten years, and the row that moved is the only FY2023 row in the census
+    // — 714 chartered nonpublic schools operating statewide. That is not a quantity the Jon
+    // Peterson editions measure, so nothing about it became checkable when the hole shortened; it
+    // is now after the hole because the hole's far edge moved past it, and that is all.
     let inside_the_archive = all.iter().filter(|b| b.inside_the_archive()).count();
     let inside_the_hole = all.iter().filter(|b| HOLE.contains(&b.year.0)).count();
     let after = all.iter().filter(|b| b.year.0 > *HOLE.end()).count();
     assert_eq!(inside_the_archive, 8);
-    assert_eq!(inside_the_hole, 22);
-    assert_eq!(after, 34);
+    assert_eq!(inside_the_hole, 21);
+    assert_eq!(after, 35);
     assert_eq!(inside_the_archive + inside_the_hole + after, all.len());
 
-    // And the hole is still a hole: neither committed series has grown into it.
+    // And the hole is still a hole: no committed series has grown into it.
     let archive = history::span();
     assert_eq!(archive, 1997..=2013);
+    assert_eq!(jpsn::span(), 2023..=2025);
     assert!(
-        *archive.end() < *HOLE.start() && report::FISCAL_YEAR > *HOLE.end(),
+        *archive.end() < *HOLE.start()
+            && *jpsn::span().start() > *HOLE.end()
+            && report::FISCAL_YEAR > *HOLE.end(),
         "a committed series now reaches into FY{}-FY{}; this census describes a gap that has \
          moved, and the decision record should say what closed it",
         HOLE.start(),
         HOLE.end()
     );
+
+    // The Jon Peterson series sits directly against the hole's far edge, which is how the hole
+    // shortened by a year: FY2023 came off the end of it rather than out of the middle. If a
+    // fourth edition ever reaches further back, the assertion above is what says so.
+    assert_eq!(*jpsn::span().start(), *HOLE.end() + 1);
 }
 
-/// The guard the issue asked for: no bound is ever joined to either series.
+/// The guard the issue asked for: no bound is ever joined to any of the three series.
 #[test]
-fn no_bound_is_joinable_to_either_committed_series() {
+fn no_bound_is_joinable_to_any_committed_series() {
     for bound in bounds::census() {
         assert_eq!(
             bound.spliceable(),
@@ -112,9 +131,9 @@ fn no_bound_is_joinable_to_either_committed_series() {
 
 /// And the guard can fail, which is what makes the test above worth running.
 ///
-/// Two doctored rows, each one field away from a row the fixture holds. If either of these stops
-/// being reported as spliceable, [`no_bound_is_joinable_to_either_committed_series`] has become an
-/// assertion about nothing.
+/// Three doctored rows, each one field away from a row the fixture holds — one per committed
+/// series. If any of them stops being reported as spliceable,
+/// [`no_bound_is_joinable_to_any_committed_series`] has become an assertion about nothing.
 #[test]
 fn the_splice_guard_is_not_vacuous() {
     let real = bounds::of("cleveland", Measure::Participation)
@@ -138,6 +157,22 @@ fn the_splice_guard_is_not_vacuous() {
         ..real
     };
     assert!(onto_the_report.spliceable().is_some());
+
+    // And the third, which only became reachable when the Jon Peterson editions were extracted:
+    // an unhedged student count for that programme in the year before its series starts. The
+    // census does hold a Jon Peterson student count — FY2024's 7,800 — and the one thing keeping
+    // it out is LSC's own "about".
+    let hedged = bounds::of(jpsn::PROGRAM, Measure::Participation)
+        .into_iter()
+        .find(|b| b.year.0 == 2024)
+        .expect("the census holds Jon Peterson's FY2024 count");
+    assert_eq!(hedged.precision, Precision::About);
+    assert!(hedged.spliceable().is_none());
+    let onto_the_jpsn_series = Bound {
+        precision: Precision::Exact,
+        ..hedged
+    };
+    assert!(onto_the_jpsn_series.spliceable().is_some());
 }
 
 /// The archive's two denominators are in the vocabulary and no bound uses either.

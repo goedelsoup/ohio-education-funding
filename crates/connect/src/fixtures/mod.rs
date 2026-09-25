@@ -53,6 +53,7 @@ pub mod fy26;
 pub mod fy27;
 pub mod grade_bands;
 pub mod identified;
+pub mod jpsn;
 pub mod jvsd;
 pub mod landscape;
 pub mod mr81;
@@ -116,6 +117,7 @@ pub use fy26::{build_fy26_model, Fy26Sheets, FY26_HEADER};
 pub use fy27::{build_fy27_model, build_profile_extract, Fy27Sheets, FY27_HEADER, PROFILE_HEADER};
 pub use grade_bands::{build_grade_bands, GRADE_BANDS_HEADER};
 pub use identified::{build_identified, IDENTIFIED_HEADER};
+pub use jpsn::{jpsn_edition, Edition as JpsnEdition, JPSN_CATEGORY_HEADER, JPSN_HEADER};
 pub use jvsd::{
     build_jvsd_funding, carried_forward_enrolment, state_share_percentage_identity, JvsdYear,
     JVSD_BASE_COST_SHEETS, JVSD_DETAIL_SHEETS, JVSD_FUNDING_HEADER,
@@ -141,9 +143,9 @@ pub use paths::{
     LANDSCAPE_FIXTURE, LSC_GREENBOOK_FIXTURE, MR81_FIXTURE, NONPUBLIC_BUILDING_FIXTURE,
     NONPUBLIC_SECTOR_FIXTURE, NOT_REGENERATED, OPINIONS_FIXTURE, PI_RANKING_FIXTURE,
     PLAN_BILL_FIXTURE, PROFILE_FIXTURE, REBUILT, REDBOOK_FIXTURE, REPORT_CARD_FIXTURE,
-    SCHOLARSHIP_FIXTURE, SCHOLARSHIP_HISTORY_FIXTURE, SD1_FIXTURE, SESSION_LAW_FIXTURE,
-    SFPR_FIXTURE, STATUTE_FIXTURE, TITLE1_FIXTURE, TRANSFER_FIXTURE, TRANSPORT_RATES_FIXTURE,
-    TYPOLOGY_FIXTURE,
+    SCHOLARSHIP_FIXTURE, SCHOLARSHIP_HISTORY_FIXTURE, SCHOLARSHIP_JPSN_CATEGORY_FIXTURE,
+    SCHOLARSHIP_JPSN_FIXTURE, SD1_FIXTURE, SESSION_LAW_FIXTURE, SFPR_FIXTURE, STATUTE_FIXTURE,
+    TITLE1_FIXTURE, TRANSFER_FIXTURE, TRANSPORT_RATES_FIXTURE, TYPOLOGY_FIXTURE,
 };
 pub use rankings::{build_pi_rankings, PI_RANKING_HEADER, PI_RANKING_SHEETS};
 pub use report_card::{
