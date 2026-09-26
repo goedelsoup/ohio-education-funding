@@ -54,10 +54,11 @@ export interface Levers {
   /**
    * What happens to the formula transition supplement, `[K]`.
    *
-   * A word rather than a number: Section 265.225 either stands or is repealed. It is a separate
-   * instrument from the guarantee — codified law against uncodified — and `[K]` backstops the
-   * guarantee, so retiring the guarantee with this left `"as-enacted"` saves a tenth of what the
-   * headline says.
+   * A word rather than a number, and two of the three words the crate accepts: Section 265.225
+   * stands or is repealed here, while `crates/project` also prices it recomputed against a base
+   * that never held the guarantee (#490). It is a separate instrument from the guarantee — codified
+   * law against uncodified — and `[K]` backstops the guarantee, so retiring the guarantee with this
+   * left `"as-enacted"` saves a tenth of what the headline says.
    */
   backstop: "as-enacted" | "repealed";
   /**

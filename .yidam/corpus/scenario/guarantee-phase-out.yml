@@ -2,13 +2,15 @@ class: scenario
 label: Phasing Out the Temporary Transitional Aid Guarantee
 summary: >-
   What Ohio's FY2027 model pays if the temporary transitional aid guarantee is removed or wound
-  down — priced twice, because the guarantee has a backstop and repealing one does not touch the
-  other. The department's own model re-run with one lever moved, at observed enrollment.
+  down — priced three ways, because a bill can leave its backstop standing, repeal it, or
+  recompute it against a base that never held a guarantee. The department's own model, one lever
+  moved.
 description: |
   **RUN.** Reproduce with `cargo run -p project --bin edfund-project -- --guarantee <rule>
-  [--backstop repealed]`. Every figure below is a **simulation**, not a forecast: it re-runs the
-  department's own FY2027 model with one lever moved, at observed enrollment. Where a projection is
-  used it is labelled and reported separately, per [`skills/project`](../../skills/project.md).
+  [--backstop repealed|rebased]`. Every figure below is a **simulation**, not a forecast: it
+  re-runs the department's own FY2027 model with one lever moved, at observed enrollment. Where a
+  projection is used it is labelled and reported separately, per
+  [`skills/project`](../../skills/project.md).
 
   Ohio's FY2027 model pays **$7,281 million** in state foundation aid to 609 districts. **$879
   million of it — 12.1% — is the temporary transitional aid guarantee**, paid to **294
@@ -17,12 +19,13 @@ description: |
   rather than computed. [verified — `crates/project`, which reproduces the department's model to
   the cent]
 
-  **Retiring it is two bills.** `[K]`, the formula transition supplement of uncodified Section
+  **Retiring it is three bills.** `[K]`, the formula transition supplement of uncodified Section
   265.225, tops a district up to its FY2021 base from a total that *already contains the
   guarantee* — so a guarantee that stops being paid becomes a shortfall `[K]` makes good. Left
-  standing it absorbs most of the apparent saving; repealed alongside, it does not. R.C. 3317.019
-  and Section 265.225 are separate instruments in separate law, and a bill could plainly do either
-  without the other, so both are priced below as a pair. See
+  standing it absorbs most of the apparent saving; repealed alongside, it does not; recomputed
+  against a base with the old guarantee taken out of it, it absorbs a quarter. R.C. 3317.019 and
+  Section 265.225 are separate instruments in separate law, and a bill could plainly do any of the
+  three, so all three are priced below. See
   [`fsfp-formula-transition-supplement`](../formula-component/fsfp-formula-transition-supplement.yml)
   for the device.
 
@@ -102,6 +105,41 @@ figures:
     value: 311
     field: findings
     as_written: "the reach is **311**"
+  # The third reading of Section 265.225, which this node declined to report until the guarantee
+  # inside `[L1]` could be split out of two other published files. Its dollars are magnitudes on
+  # the same convention as the two columns above.
+  - key: project/guarantee-removal-saving-with-the-backstop-rebased
+    value: 253566561.87
+    field: findings
+    as_written: "saves **$253.6M** on a removal"
+  - key: project/guarantee-half-phase-out-saving-with-the-backstop-rebased
+    value: 210354185.71
+    field: findings
+    as_written: "**$210.4M** on a half phase-out"
+  - key: project/guarantee-rebase-saving-with-the-backstop-rebased
+    value: 148465354.04
+    field: findings
+    as_written: "**$148.5M** on a rebase to 90%"
+  - key: project/guarantee-rules-range-with-the-backstop-rebased
+    value: 1.7079174
+    field: findings
+    as_written: "still span **1.71** to\n  one under it"
+  - key: project/backstop-rebasing-saving-with-the-guarantee-untouched
+    value: 21274914.30
+    field: findings
+    as_written: "already saves **$21.3M**"
+  - key: project/guarantee-inside-the-fy2021-funding-base
+    value: 256985672.30
+    field: findings
+    as_written: "**$257.0M** of `[L1]` is guarantee"
+  - key: project/guarantee-retirement-districts-cut-with-the-backstop-rebased
+    value: 261
+    field: findings
+    as_written: "**261** districts cut"
+  - key: project/districts-drawing-a-rebased-transition-supplement
+    value: 263
+    field: findings
+    as_written: "paying **263** districts"
   - key: project/transition-supplement-districts-off-the-guarantee
     value: 17
     field: findings
@@ -325,26 +363,64 @@ figures:
     as_written: "0.0734 and 0.0569 across it"
 
 findings: |
-  ### Retiring the guarantee is two bills, and they price an order of magnitude apart
+  ### Retiring the guarantee is three bills, and they price an order of magnitude apart
 
   Section 265.225 decides what a guarantee retirement costs, and no lever over the guarantee contains the
-  answer. Both, against the FY2027 model:
+  answer. All three, against the FY2027 model:
 
-                       foundation aid   Sec. 265.225 stands   repealed alongside
-      removal                -$879.0M               -$79.8M             -$942.5M
-      half phase-out         -$439.5M               -$70.8M             -$503.1M
-      rebase to 90%          -$248.2M               -$66.2M             -$311.8M
+                       foundation aid   Sec. 265.225 stands   repealed alongside   recomputed
+      removal                -$879.0M               -$79.8M             -$942.5M     -$253.6M
+      half phase-out         -$439.5M               -$70.8M             -$503.1M     -$210.4M
+      rebase to 90%          -$248.2M               -$66.2M             -$311.8M     -$148.5M
 
   [verified] Left standing, `[K]` absorbs **$799.1M** of the $879.0M a removal takes off
   foundation aid, and the three policies stop being three policies: a gross range of **3.54** to
-  one collapses to **1.21** to one. The middle column is current law, and it says a guarantee
-  retirement is nearly free and very nearly rule-invariant. The right column is what *retiring the
-  guarantee* means as a policy rather than as a lever. Neither alone is the answer.
+  one collapses to **1.21** to one. The second column is current law, and it says a guarantee
+  retirement is nearly free and very nearly rule-invariant. The third is what *retiring the
+  guarantee* means as a policy rather than as a lever. Neither alone is the answer, and the fourth
+  column is neither of them.
 
   The left column is the one this node published as the cost for eleven phases. It is the right
   number for the wrong quantity — what comes off `[H] + [I]` — and no district's cheque falls by
   it. The measure matters more than the model here: `biennium::Measure` separates foundation aid
   from total state support, and these two columns differ by nothing else.
+
+  ### The third reading: Section 265.225 recomputed against a base that held no guarantee
+
+  A legislature that retires `[I]` and wants to keep Section 265.225 has a third option, and it is
+  the one this node carried as an open question. `[K]` tops a district up to `[L1]`, its FY2021
+  funding base, and the department's own `Introduction` sheet says that base *"default[s] to the
+  funding base used for line A Base Cost"* — which is to say the guarantee the previous formula
+  paid sits inside `[L1]`, unallocated. Take it out and the supplement still holds a district at
+  its FY2021 total, but at a total that never held a guarantee. That saves **$253.6M** on a removal,
+  **$210.4M** on a half phase-out and **$148.5M** on a rebase to 90%: the middle answer every time,
+  and between a quarter and a half of what repeal saves — 26.9% of it on a removal, 41.8% on a half
+  phase-out, 47.6% on a rebase. [verified]
+
+  The reading was refused because `[L1]` is one published column and the department never breaks
+  the guarantee out of it. It does not have to — the split is a join, and both halves are openly
+  served. The FY2019 final settlement payment report carries a per-district `TRANSITIONAL
+  GUARANTEE` column; the FY2021 funding base is built from the FY2019 total, because FY2020 state
+  foundation funding was flat to FY2019 for the categories it is built from; and
+  `project::transition_base` asserts the identity rather than assuming it, on both sides: the seven
+  published terms sum to `[L1]` for all 611 districts, and every district but two reproduces its
+  FY2019 total to the cent, the two being footnoted restatements the department names. **$257.0M**
+  of `[L1]` is guarantee, and up to **75.4%** of a single district's base. [verified]
+
+  Two things about the fourth column are worth stating plainly, because both are easy to assume
+  away. It is **not a blend** of the other two: the three guarantee rules still span **1.71** to
+  one under it, against 1.21 as enacted and 3.54 gross, so which rule a bill picks still moves the
+  price. And it is **not a guarantee bill**: recomputing the base with `[I]` left entirely alone
+  already saves **$21.3M** and takes the supplement from 144 districts to 63, all of it inside
+  `[K]` and none of it foundation aid. So the fourth column is two amendments priced together, and
+  $79.8M + $21.3M is not $253.6M — the interaction is the larger half of it, because the same
+  dollars cannot come out of the base and out of realized aid twice. [verified]
+
+  Whom it reaches sits between the other two as well. **261** districts cut: short of the 294 the
+  guarantee pays, because 44 are still held whole by a supplement measured against the smaller
+  base, and past it, by 11 that were never on the guarantee at all and lose the `[K]` the published
+  base was paying them. The supplement ends up paying **263** districts, against the 294 it would
+  pay on the base as published. [verified]
 
   ### A guarantee-only lever reaches 167 districts, and 442 are out of reach
 
@@ -460,11 +536,11 @@ properties:
   name: Phasing out the temporary transitional aid guarantee
   question: |
     What does removing, re-basing, or phasing out the temporary transitional aid guarantee do
-    to Ohio's districts — under each of the two things the uncodified section that backstops it
+    to Ohio's districts — under each of the three things the uncodified section that backstops it
     could do — and what does raising base cost cost while it is in place?
   perturbations: |
     guarantee            as-enacted -> removed | rebase:<factor> | phase-out:<remaining>
-    backstop             as-enacted -> repealed     (Section 265.225, priced against every rule)
+    backstop             as-enacted -> repealed | rebased   (Sec. 265.225, against every rule)
     base_cost_scale      1.00 -> 1.02, 1.05, 1.10, 1.20
     minimum_state_share  0.10 as enacted for FY2026-27, not the 0.05 the plan began with
     phase_in             base cost and categoricals separately, both 1.00 at baseline
@@ -475,7 +551,9 @@ properties:
 
     `backstop` is a second dial rather than part of the guarantee rule because the two are separate
     instruments in separate law: R.C. 3317.019 names its own years, Section 265.225 is uncodified law of
-    H.B. 110 extended by H.B. 96, and a bill could plainly do either.
+    H.B. 110 extended by H.B. 96, and a bill could plainly do either. Its third value, `rebased`,
+    keeps the section and recomputes `[L1]` without the guarantee inside it; that is an amendment in
+    its own right, so it is not free even with the guarantee held at `as-enacted`.
   input_projections: |
     One leg only, and it is reported apart from every other figure. Enrolled ADM is carried to
     FY2032 by a damped trend (damping 0.30, fitted — see
@@ -493,16 +571,20 @@ properties:
   horizon: FY2027, with one projected leg to FY2032
   results_path: |
     crates/project — `cargo run -p project --bin edfund-project -- --guarantee <rule>
-    [--backstop repealed]`. Pinned by crates/project/tests/ — the savings table by
-    `what_retiring_the_guarantee_actually_saves.rs` — and by the checkpoints in crates/bundle,
-    which the web layer re-derives and must reproduce before it will render a scenario.
+    [--backstop repealed|rebased]`. Pinned by crates/project/tests/ — the savings table by
+    `what_retiring_the_guarantee_actually_saves.rs`, and the split `[L1]` the third column needs by
+    `project::transition_base` — and by the checkpoints in crates/bundle,
+    which the web layer re-derives and must reproduce before it will render a scenario. The
+    scenario page's own backstop control still offers two values: no checkpoint moves the third, so
+    nothing in the feed would hold the browser's arithmetic for it to the crate's.
   results: |
-    total state support, 609 districts, FY2027        Sec. 265.225 stands   repealed alongside
-    removal                                                       -$79.8M             -$942.5M
-    half phase-out                                                -$70.8M             -$503.1M
-    rebase to 90%                                                 -$66.2M             -$311.8M
-    districts cut                                                     167                  311
-    districts unmoved                                                 442                  298
+    total state support, 609 districts, FY2027   Sec. 265.225 stands   repealed   recomputed
+    removal                                                  -$79.8M   -$942.5M     -$253.6M
+    half phase-out                                           -$70.8M   -$503.1M     -$210.4M
+    rebase to 90%                                            -$66.2M   -$311.8M     -$148.5M
+    districts cut                                                167        311          261
+    districts unmoved                                            442        298          348
+    districts drawing `[K]` after a removal                      294          0          263
 
     foundation aid, the same three rules: -$879.0M, -$439.5M, -$248.2M. Districts cut on that
     measure: 294 under all three. The difference between the two blocks is `[K]`.
@@ -518,23 +600,27 @@ properties:
     The same on total state support: $8,021M at +/-4.23%, and $7,943M at +/-4.16%. With Section 265.225
     repealed as well, +/-7.77%.
   confidence: |
-    **This node reports two answers to one question, and the pair is deliberate.** `[I]` is a term
+    **This node reports three answers to one question, and the set is deliberate.** `[I]` is a term
     in `[K]`'s own subtrahend, so what Section 265.225 does is not a detail of a guarantee retirement — it
-    is most of its cost. Three answers are coherent:
+    is most of its cost. Three answers are coherent, and all three are now reported:
 
     - **(a) `[K]` stays as enacted.** The honest model of current law, and why removal saves about a
-      tenth of the headline. **Reported.**
+      tenth of the headline.
     - **(b) `[K]` is repealed alongside.** What "retiring the guarantee" means as a policy rather
-      than as a lever. **Reported.**
-    - **(c) `[K]` is recomputed against an FY2021 base that excludes `[I]`.** **Not reported**, and
-      not for want of a lever: `[L1]` is a single published column per district, and splitting it
-      into its guarantee and non-guarantee halves needs FY2021 per-district guarantee payments that
-      no committed source carries. The same gap that makes `[H2]` unobservable for a formula
-      district makes this unobservable for every district. [open]
+      than as a lever.
+    - **(c) `[K]` is recomputed against an FY2021 base that excludes `[I]`.** The section stands and
+      holds a district at a FY2021 total the guarantee never inflated. It was refused here on the
+      grounds that `[L1]` is a single published column and that splitting it needs FY2021
+      per-district guarantee payments no committed source carries. The first half is true and the
+      second is not the binding constraint: FY2021 is the wrong year to ask. `[L1]` is built on the
+      FY2019 total, the FY2019 final settlement report publishes the guarantee per district, and the
+      identity between the two files is asserted in `project::transition_base` rather than assumed.
+      [verified]
 
-    Reporting only one of (a) and (b) re-creates the defect this node was corrected for: (a) alone
-    says a guarantee retirement is nearly free, (b) alone says it saves $942.5M, and a reader given
-    either would be wrong about the other. [inference]
+    Reporting only one of the three re-creates the defect this node was corrected for: (a) alone
+    says a guarantee retirement is nearly free, (b) alone says it saves $942.5M, (c) alone reads as
+    a compromise that is really two amendments, and a reader given any one would be wrong about the
+    others. [inference]
 
     The simulation figures are exact against the department's model and carry no interval.
 
@@ -650,6 +736,31 @@ properties:
     bound. [verified]
 revisions:
   - was: |
+      "**(c) `[K]` is recomputed against an FY2021 base that excludes `[I]`.** **Not reported**, and
+      not for want of a lever: `[L1]` is a single published column per district, and splitting it
+      into its guarantee and non-guarantee halves needs FY2021 per-district guarantee payments that
+      no committed source carries." — the third of three coherent readings of Section 265.225,
+      declined on the availability of a source.
+    now: |
+      Reported: **-$253.6M** on a removal, **-$210.4M** on a half phase-out, **-$148.5M** on a
+      rebase to 90%. `[L1]` is still one published column, but it does not have to be split — it
+      can be joined. The refusal named the wrong year: the FY2021 settlement report carries no
+      guarantee line at all, while `[L1]`'s first term is the FY2019 total, and the FY2019 final
+      settlement report publishes `TRANSITIONAL GUARANTEE` per district. Both files were openly
+      served the whole time, so this was never blocked on portal access.
+    found_by: |
+      The department's own `Introduction` sheet in the funding-bases workbook, which says the base
+      *"default[s] to the funding base used for line A Base Cost"* and that FY2019 stands in for
+      FY2020 because state foundation funding was flat between them. Extracted by
+      `connect::fixtures::transition_base`, joined and asserted by `project::transition_base`, and
+      priced by `policy::Backstop::Rebased`.
+    reach: |
+      A recorded claim that a source cannot be had is a claim about the world, and this one was
+      wrong in a way no gate could catch: it was true of the year it named and false of the
+      question. The reading it declined is the middle answer on all three guarantee rules, and it
+      carries a finding neither of the other two shows — that recomputing the base is itself an
+      amendment to Section 265.225, worth **$21.3M** with the guarantee left alone.
+  - was: |
       The savings table stated **-$879.0M** for removal, **-$439.5M** for a half phase-out and
       **-$87.9M** for a rebase to 90% — with the `results` property giving **-$248.2M** for that
       same third row — and put **294 districts cut, 315 untouched** against every one of them.
@@ -686,7 +797,7 @@ revisions:
       `[K]` and were never on the guarantee.
     found_by: |
       `repealing_the_backstop_beside_it_saves_what_both_cost` in `crates/project/src/report.rs`, and
-      `a_guarantee_only_lever_reaches_167_districts_and_both_devices_reach_311`.
+      `the_three_answers_reach_167_261_and_311_districts`.
     reach: |
       The scoped claim is sharper than the unscoped one was, and it changes what the node concludes:
       the guarantee question and the adequacy question are disjoint, and the hold-harmless question
@@ -799,4 +910,10 @@ links:
   - target: ../doctrine/adequacy.yml
     relationship: bears-on
   - target: ../../catalog/dew-fy27-funding-calculator.md
+    relationship: sourced-from
+  # The two halves of `[L1]`: the FY2019 guarantee that the FY2021 base carried forward, and the
+  # published base itself. The third reading of Section 265.225 is a join across them.
+  - target: ../../catalog/dew-fy19-payment-report.md
+    relationship: sourced-from
+  - target: ../../catalog/dew-foundation-funding-bases.md
     relationship: sourced-from
