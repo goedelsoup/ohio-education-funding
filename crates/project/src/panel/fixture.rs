@@ -207,6 +207,8 @@ fn parse() -> Vec<DistrictRecord> {
     // Resolved once rather than per row: it walks the whole F-33 panel, and the model has 609
     // rows. Keyed on IRN, which is what this fixture carries.
     let long_run = dispersion::ohio_panel::long_run_enrollment_rates();
+    // Likewise: it reads two more committed files, and the panel does not carry the column.
+    let guarantee_in_base = crate::transition_base::guarantee_in_fy21_base();
     edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
         .filter_map(|row| {
             let base_cost_adm = row.num(column::BASE_COST_ADM)?;
@@ -362,6 +364,10 @@ fn parse() -> Vec<DistrictRecord> {
                     open_enrollment_threshold: row.required(column::OPEN_ENROLLMENT_THRESHOLD),
                     open_enrollment_adjustment: row.required(column::OPEN_ENROLLMENT_ADJUSTMENT),
                     fy21_funding_base: row.required(column::FY21_FUNDING_BASE),
+                    guarantee_in_fy21_base: guarantee_in_base
+                        .get(row.str(column::IRN))
+                        .copied()
+                        .unwrap_or(0.0),
                     transition_supplement: row.required(column::FORMULA_TRANSITION_SUPPLEMENT),
                 },
                 preschool_special_education: PreschoolSpecialEducation {
