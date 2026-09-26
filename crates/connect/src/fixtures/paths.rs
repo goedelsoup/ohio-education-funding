@@ -165,6 +165,29 @@ pub const FINANCE_FIXTURE: &str = "crates/project/fixtures/district-finances.csv
 /// home-education count nowhere else in machine-reachable form.
 pub const LANDSCAPE_FIXTURE: &str = "crates/project/fixtures/education-landscape-channels.csv";
 
+/// Where the statewide home-education series is written, relative to the repository root.
+///
+/// Twenty school years from 2005-06, from the Johns Hopkins Homeschool Hub. Beside the Landscape
+/// channels because it is the same quantity over time that the fact sheet gives for one year, and
+/// the 2023-24 row of this series and the `Home School` row of that fixture agree to the student
+/// — which is what identifies the series as the department's own counts carried forward rather
+/// than an aggregator's estimate. Every other year in it rests on the aggregator alone.
+pub const HOME_EDUCATION_STATEWIDE_FIXTURE: &str =
+    "crates/project/fixtures/home-education-statewide.csv";
+
+/// Where the per-district home-education panel is written, relative to the repository root.
+///
+/// The only per-district breakdown of home education known to exist: the department collects the
+/// R.C. 3321.042 notices per district of residence, releases the counts on request, and publishes
+/// nothing below the state total. In `dispersion` because the question it answers is a
+/// distributional one — which districts have lost what share of their resident school-age
+/// population by a route no enrollment file records.
+///
+/// Keyed by IRN, which the published sheet does not carry. See [`super::home_education`] for how
+/// the names were resolved and why the year on every row is the publisher's label rather than the
+/// year the rows are from.
+pub const HOME_EDUCATION_FIXTURE: &str = "crates/dispersion/fixtures/home-education-districts.csv";
+
 /// Where the SD-1 taxable value and taxes charged panel is written, relative to the root.
 pub const SD1_FIXTURE: &str = "crates/dispersion/fixtures/sd1-district-taxes.csv";
 
@@ -473,6 +496,8 @@ pub const REBUILT: &[&str] = &[
     FUNCTIONS_FIXTURE,
     FINANCE_FIXTURE,
     LANDSCAPE_FIXTURE,
+    HOME_EDUCATION_STATEWIDE_FIXTURE,
+    HOME_EDUCATION_FIXTURE,
     SD1_FIXTURE,
     CASINO_FIXTURE,
     LSC_GREENBOOK_FIXTURE,

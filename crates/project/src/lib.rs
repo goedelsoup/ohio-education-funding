@@ -77,6 +77,7 @@ pub mod finances;
 pub mod greenbook;
 pub mod guarantee_origin;
 pub mod hold_harmless;
+pub mod home_education;
 pub mod indexation;
 pub mod joint_vocational;
 pub mod ledger;

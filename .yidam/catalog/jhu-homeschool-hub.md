@@ -16,12 +16,16 @@ structure. Ohio appears in exactly two of them, and in none of the last four.
 
 **Sheet `OH` — a statewide annual series, 2005-06 through 2024-25.** [inference] Blank for
 1999-2000 through 2004-05. It runs 25,937 (2005-06) → 33,328 (2019-20) → 51,502 (2020-21) →
-47,491 (2021-22) → 47,468 (2022-23) → 53,051 (2023-24) → 61,009 (2024-25).
+47,491 (2021-22) → 47,468 (2022-23) → 53,051 (2023-24) → 61,009 (2024-25). Committed as
+`crates/project/fixtures/home-education-statewide.csv`, twenty rows, the blank years dropped.
 
 **Sheet `BY COUNTY, DISTRICT, TOWN, LEA` — 611 Ohio rows, one school year.** [inference] Values
 like `Akron City, 373`, `Alliance City, 70`, `Beachwood City, <10`. This is the only per-district
-home-education breakdown known to exist outside the department, and the four defects below are why
-it is catalogued rather than committed.
+home-education breakdown known to exist outside the department. Committed as
+`crates/dispersion/fixtures/home-education-districts.csv`, keyed by IRN, each count carried as a
+floor and a ceiling. Three of the four defects recorded below are why it took until
+[`home-education-connector`](../decisions/home-education-connector.yml) to get there, and three
+of the four did not survive being checked.
 
 ## Why only one figure in it is [verified]
 
@@ -54,32 +58,57 @@ carried in search indexes, and both facts-and-figures index pages link the 2023-
 archive nothing. Whether the Internet Archive holds prior editions under the same URL pattern is
 `[open]`; the probe was blocked in the session that wrote this entry.
 
-## Four defects in the district sheet
+## The four defects, and what became of them
 
-**The year label contradicts the workbook's own state total.** Every Ohio row is labeled
-`SY21-22`. Of the 611 rows, 564 carry a number and they sum to **51,349** — a floor, since the
-remaining 47 are censored and each is at least zero. The same workbook's statewide sheet gives
-2021-22 as 47,491, and a district file cannot exceed its own state total by 3,858. It reconciles
-with the year before: 2020-21 is 51,502, leaving 153 across 47 censored cells, about 3.3 each,
-which is what 27 `<10` cells and 20 `.` cells should sum to. The sheet is most likely SY2020-21
-mislabeled [inference] — the pandemic peak, and the worst year in the series to mistake for a
-typical one. Nothing in the workbook flags it, and which year it actually covers is `[open]`.
+**The year label contradicts the workbook's own state total. Standing, and it is the finding
+rather than the defect.** Every Ohio row is labeled `SY21-22`. Of the 611 rows, 559 carry a number
+and they sum to **51,349** — a floor, since the remaining 52 are censored and each is at least
+zero. The same workbook's statewide sheet gives 2021-22 as 47,491, and a district file cannot
+exceed its own state total by 3,858.
 
-**No IRN, and 48 rows are unresolvable without one.** Districts are named, not keyed. 611 rows
-carry 583 distinct names: 20 names repeat across 48 rows, some three times. `Perry Local` appears
-as 15, 34 and 87 with nothing to say which is Lake, which is Stark and which is Franklin; the
-same holds for `Buckeye Local` (44, 35, 91), `Springfield Local` (124, 18, 116), `Northwest
-Local`, `Southern Local` and fifteen others. The sheet's schema carries a county column that other
-states populate and Ohio's rows leave empty. Every district panel in this repository joins on IRN,
-so those 48 rows have nowhere to land.
+This entry first read that as 2020-21 mislabeled, on the arithmetic that 2020-21 is 51,502 and the
+remaining 153 students spread over the censored cells at about 3.3 each. That assumed the censored
+districts were small. They are not: Huber Heights is 5,631 pupils, Euclid 4,166, Southwest Local
+4,150. Against contemporaneous F-33 enrolment, 2020-21 needs a censored participation rate of
+0.22% against a reported 3.55% — a sixteenfold discontinuity — and 2021-22 and 2022-23 are
+arithmetically impossible. A size-matched estimator on 2023-24 reconstructs **53,100** against the
+published **53,051**, missing by 49 students where every other year misses by 3% to 13%. The sheet
+is 2023-24 [inference]; the fixture carries the publisher's `SY21-22` verbatim in a
+`published_year` column and writes no inferred year anywhere, and the builder fails if a revision
+ever makes the two sheets agree.
 
-**47 censored cells in two undocumented flavours.** 27 `<10` and 20 `.`, about 8% of districts.
-The workbook's codebook defines the five disaggregation categories and says nothing about either
-marker, so the difference between a suppressed small count and an unreported one is a guess.
-Unlike the report-card cells, there is no companion percentage column to recover a value from —
-columns E and F are empty for every Ohio row.
+**No IRN — but the rows are in IRN order, and all 611 resolve. Answered.** Districts are named,
+not keyed, and 611 rows carry 583 distinct names: 20 names repeat across 48 rows, some three
+times. `Perry Local` appears as 15, 34 and 87 with nothing to say which is Lake, which is Stark
+and which is Franklin; the same holds for `Buckeye Local` (44, 35, 91), `Springfield Local` (124,
+18, 116), `Northwest Local`, `Southern Local` and fifteen others. The sheet's schema carries a
+county column that other states populate and Ohio's rows leave empty.
 
-**The provenance does not resolve.** The `DATA LINKS` sheet cites, for Ohio, the department's Home
+What nothing had checked is the row order. 560 of the 611 names are unique in the department's own
+district list, and 558 of those strictly increase by IRN — one monotone run covering rows 1
+through 606, with four rows appended after it. A repeated name lying between two unique ones is
+bounded by their IRNs, and the bound admits exactly one candidate in every case but four; those
+four fall out by elimination against the IRNs already taken. **611 rows, 611 distinct IRNs,
+nothing unresolved**, and the resolution is a committed test rather than a hand-built crosswalk.
+
+**Three censoring markers, not two, and the codebook documents none.** 27 `<10`, 20 `.` and **5
+`NC`** — 52 cells, about 8.5% of districts. The two-marker count in the first draft of this entry
+came from subtracting 47 from 611 and never looking. The workbook's codebook defines the five
+disaggregation categories and says nothing about any of the three, so the difference between a
+suppressed small count, an unreported one and a not-collected one is a guess. Unlike the
+report-card cells, there is no companion percentage column to recover a value from — columns E
+and F are empty for every Ohio row. Nine other states use `.` and Ohio alone uses `<10` and `NC`,
+which is evidence for reading the first as the compiler's blank and the other two as the
+department's own markers, and evidence is not documentation: the fixture carries all three
+verbatim. `<10` bounds a cell at `[0, 9]`; `.` and `NC` get a floor of zero and **no ceiling**,
+because nothing in the file bounds them above and one of them is a 4,150-pupil district.
+
+**Twenty districts report an explicit `0.0`,** which no defect in the original four covers and
+which is the reason the markers have to stay distinguishable. Among them is Cincinnati Public
+Schools, 34,860 pupils, the third-largest district in the state. A published zero and a
+`.` are different claims and would be indistinguishable under any imputation.
+
+**The provenance does not resolve. Standing, and unfixable from here.** The `DATA LINKS` sheet cites, for Ohio, the department's Home
 Schooling topic page — the page that publishes no counts at all. The file's own citation does not
 serve the file. The release route was presumably a records request; the workbook gives no date, no
 requester, and no definition of what is being counted. Whether the measure is notices received or
@@ -108,16 +137,22 @@ The question it bears on is a denominator question — how much of a district's 
 population has left the public system by a route no enrollment file records — and a statewide
 total cannot answer it, for the same reason the statewide scholarship totals cannot close the
 per-district gap in that report. A population spread across some 600 districts is thin almost
-everywhere and concentrated somewhere, and the aggregate is silent about which.
+everywhere and concentrated somewhere, and the aggregate is silent about which. The district
+fixture is what that question is now asked against, for one school year and with 52 cells masked.
 
 ## Access constraints
 
 The workbook exports cleanly as `.xlsx` and needs no credentials. The Hub's own state pages do
 not: `education.jhu.edu` answers 403 to an automated client and to a browser user-agent alike, so
 the surrounding methodology and the link to this file were read from search results rather than
-from the page. Not pinned by digest and not fetched by a connector, and it should not be — a
-spreadsheet export has no stable content address, so nothing here can rebuild byte-identically
-from it. That is the whole reason the series is catalogued and not committed as a fixture.
+from the page.
+
+**The export is a stable content address.** The first draft of this entry asserted that it could
+not be, and that assertion was a supposition nobody had measured. Four downloads over two days
+returned the same 645,110 bytes under the same SHA-256, so the file is now fetched by
+`jhu-homeschool-hub`, pinned in `crates/connect/source-digests.txt`, and both fixtures rebuild
+byte-identically from it. Google serves the export deterministically for an unedited sheet; an
+edit to the sheet would change the digest, which is what a digest is for.
 
 **Nobody has looked at the other 38 states.** This entry was created for the Ohio rows and read
 only those; the `All States` sheet, the four disaggregation sheets and every other state sheet are
@@ -127,7 +162,9 @@ unexamined.
 
 A records request to the department for notification counts by district and IRN, FY2006 through
 FY2025, together with the suppression rule, the school year the released file actually covers, and
-whether the count is notices or students. Tracked as
+whether the count is notices or students. The committed fixtures answer the *which district* half
+and leave the other three open: one year, three undocumented markers, and an undefined measure.
+Tracked as
 [#257](https://github.com/goedelsoup/ohio-education-funding/issues/257), in the same class as the
 per-district scholarship breakdown the annual report cites and this project has not reached —
 published to somebody, not published to everybody, with the difference that this one has never

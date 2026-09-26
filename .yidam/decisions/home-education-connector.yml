@@ -1,0 +1,130 @@
+id: home-education-connector
+summary: >-
+  jhu-homeschool-hub, for the per-district home-education counts the department releases on
+  request and publishes nowhere — registered although the publisher is an aggregator, because
+  pinning an aggregator's bytes is what makes an `[inference]` checkable.
+context: |
+  [#257](https://github.com/goedelsoup/ohio-education-funding/issues/257) recorded that Ohio holds
+  home-education counts per district, releases them on request, and publishes only the statewide
+  total. It named the one file outside the department that has them — the Johns Hopkins
+  Homeschool Hub workbook, catalogued as
+  [`jhu-homeschool-hub`](../catalog/jhu-homeschool-hub.md) — and concluded it was "not fixture
+  material as it stands", on four recorded defects.
+
+  Three of the four turned out to be answerable from the file and the fixtures this repository
+  already holds.
+
+  **"No IRN, and 48 rows are unresolvable without one."** The rows are in IRN order, which nothing
+  had checked. 560 of the 611 names are unique in the department's own district list and 558 of
+  those strictly increase — one monotone run over rows 1 to 606, with four rows appended after it.
+  A repeated name between two unique ones is bounded by them, and the bound admits exactly one
+  candidate every time but four; those four fall out by elimination. **611 rows, 611 distinct
+  IRNs, nothing unresolved.**
+
+  **"A Google Sheets export has no stable content address."** A supposition, and wrong. Four
+  downloads over two days returned the same 645,110 bytes under the same SHA-256. The export is
+  deterministic.
+
+  **"The year label contradicts the workbook's own state total."** True, and it is the finding
+  rather than the defect. The catalog entry inferred 2020-21 from it by assuming the 47 censored
+  cells were small. They are not: Huber Heights is 5,631 pupils, Euclid 4,166, Southwest Local
+  4,150. Against contemporaneous F-33 enrolment, 2020-21 needs a censored participation rate of
+  0.22% against a reported 3.55% — a sixteenfold discontinuity — while 2021-22 and 2022-23 are
+  arithmetically impossible, and a size-matched estimator on 2023-24 reconstructs **53,100**
+  against the published **53,051**, missing by 49 students where every other year misses by 3% to
+  13%.
+
+  Two further things the entry does not record. There is a **third censoring marker**: 27 `<10`,
+  20 `.` and **5 `NC`**, so 559 numeric rows rather than the 564 the entry gets by subtracting 47
+  from 611. And **20 districts report an explicit `0.0`**, among them Cincinnati Public Schools at
+  34,860 pupils.
+
+  What remains of the fourth defect is real and unfixable from here: the workbook's own citation
+  points at a department page that publishes no counts, and what the count measures — notices
+  received, or children named on them — is undocumented.
+decision: |
+  Declare `jhu-homeschool-hub` as a connector, `Wired` with a recorded remainder, feeding `metric`
+  and `education-agency`, with the workbook as its single digest-pinned source, and commit two
+  fixtures from it: the statewide annual series, and the per-district panel keyed by IRN.
+
+  **Register an aggregator, and say in the module why that is not a rule violation.** The
+  prelude's rule is that figures an aggregator carries support `[inference]` and never
+  `[verified]`. That governs what may be *claimed*, not what may be *committed*. Pinning the file
+  by digest turns the claim into "this is what the Hub published, and here are its bytes", which
+  is verifiable; the counts themselves stay `[inference]` exactly as the catalog entry has them.
+
+  **Key it by joining to the typology source, not to the typology fixture.** The IRNs and counties
+  come from `district-typology-2013`, read from the cached workbook at rebuild time, so a rebuild
+  joins two published files rather than one published file and one of this repository's own
+  outputs.
+
+  **Carry the publisher's year label verbatim and no other.** `published_year` is `SY21-22` on
+  every row, because that is what the file says. The 2023-24 argument above is an inference, it
+  lives in the catalog entry, and writing it into a column would launder it into data — the exact
+  failure the `[verified]`/`[inference]` split exists to prevent. The builder asserts the
+  contradiction instead: the numeric rows sum to at least 51,349 against the same workbook's
+  2021-22 total of 47,491, and if a revision ever makes those two sheets agree the build fails,
+  because the licence for committing undated rows will have gone.
+
+  **Bound the censored cells, do not smooth them.** `<10` bounds a cell at `[0, 9]`, the same rule
+  `nonpublic` reads off the same masking convention. `.` and `NC` get a floor of zero and **no
+  ceiling**, because nothing in the file bounds them above and one of them is a 4,150-pupil
+  district. The published cell text is carried beside the pair, so the three markers stay
+  distinguishable and the twenty explicit zeros stay distinct from all of them.
+consequences: |
+  **The only per-district home-education breakdown known to exist is now in the repository**, and
+  the denominator question #257 was opened for can be asked: which districts have lost what share
+  of their resident school-age population by a route no enrollment file records. The statewide
+  total could not answer it, and the issue's own framing is that a population across some 600
+  districts is thin almost everywhere and concentrated somewhere.
+
+  **Two independently pinned files now corroborate each other.** The Hub's 2023-24 statewide cell
+  is 53,051 and the department's own fact sheet — `education-landscape-2024`, pinned separately
+  under [`facts-and-figures-connector`](facts-and-figures-connector.yml) — prints 53,051. That
+  agreement is the evidence the series is the department's counts carried forward rather than an
+  estimate, and neither file alone carries it.
+
+  **That record's third alternative is falsified and stays on the page.** It rejected committing
+  this workbook because "a Google Sheets export has no stable content address" and because of the
+  four defects. Both grounds are gone — the first measured wrong, the second three-quarters
+  answered. The record is not rewritten; a decision record is what was decided and why, and the
+  correction belongs here, in the record that supersedes it.
+
+  **The year is unresolved in the data on purpose**, which means every reader of the district
+  fixture has to consult the catalog entry to know what year it is. That is a real cost, and it is
+  the cheaper error: a wrong year written into 611 committed rows propagates silently, and an
+  absent one does not.
+
+  **Nine other states use `.` and Ohio alone uses `<10` and `NC`**, which is the evidence for
+  reading the first as the compiler's blank and the other two as the department's markers. It is
+  evidence, not documentation — the codebook defines none of the three — so the fixture carries
+  all three verbatim rather than mapping them onto one meaning.
+
+  **Nobody has looked at the other 38 states.** The district sheet holds 12,280 rows and this
+  reads 611 of them.
+alternatives: |
+  **Leave it catalogued, as the entry and `facts-and-figures-connector` both concluded.** Rejected
+  on measurement. Both grounds for that conclusion were checkable and neither had been checked:
+  the export's stability took four downloads, and the IRN ordering took one pass over the
+  committed typology fixture.
+
+  **Fold it into `dew-facts-and-figures`.** Rejected. Same subject, different publisher and a
+  different kind of authority: one is the department publishing its own count, the other is a
+  university republishing a count the department gave it privately. A connector carrying both
+  carries one status for a public file and a records request, which is the argument
+  `ohio-bill-versions` makes against merging with `ohio-session-laws`.
+
+  **Write the inferred 2023-24 into a `school_year` column.** Rejected, above. The inference is
+  strong — 49 students on a size-matched reconstruction — and it is still an inference, and a
+  column is where inferences stop being visible as inferences.
+
+  **Impute the censored cells from the size-matched estimator and commit the point estimates.**
+  Rejected. The estimator exists to date the sheet, which is a question about the file; using it
+  to fill 52 cells would put 1,700-odd modelled students into a fixture indistinguishable from the
+  559 published ones. The floor/ceiling pair says what is known and what is not.
+
+  **Commit only the district panel and leave the statewide series out.** Rejected. The series is
+  what the year check reads, it is twenty years against the fact sheet's one, and its 2023-24 row
+  is the cell that ties the whole workbook to a `[verified]` departmental figure.
+connectors:
+  - jhu-homeschool-hub

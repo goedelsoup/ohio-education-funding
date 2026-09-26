@@ -46,6 +46,7 @@ pub mod exemplars;
 pub mod facilities;
 pub mod functions;
 pub mod fy2016;
+pub mod home_education;
 pub mod identified;
 pub mod jvsd_funding;
 pub mod lea_directory;

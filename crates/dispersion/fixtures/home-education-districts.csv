@@ -1,0 +1,612 @@
+irn,district,county,published_year,published,students_floor,students_ceiling
+000442,Manchester Local (Adams),Adams,SY21-22,.,0,
+043489,Akron City,Summit,SY21-22,373,373,373
+043497,Alliance City,Stark,SY21-22,70,70,70
+043505,Ashland City,Ashland,SY21-22,179,179,179
+043513,Ashtabula Area City,Ashtabula,SY21-22,75,75,75
+043521,Athens City,Athens,SY21-22,117,117,117
+043539,Barberton City,Summit,SY21-22,105,105,105
+043547,Bay Village City,Cuyahoga,SY21-22,88,88,88
+043554,Beachwood City,Cuyahoga,SY21-22,<10,0,9
+043562,Bedford City,Cuyahoga,SY21-22,67,67,67
+043570,Bellaire Local,Belmont,SY21-22,13,13,13
+043588,Bellefontaine City,Logan,SY21-22,57,57,57
+043596,Bellevue City,Huron,SY21-22,63,63,63
+043604,Belpre City,Washington,SY21-22,27,27,27
+043612,Berea City,Cuyahoga,SY21-22,130,130,130
+043620,Bexley City,Franklin,SY21-22,41,41,41
+043638,Bowling Green City,Wood,SY21-22,0,0,0
+043646,Brecksville-Broadview Heights City,Cuyahoga,SY21-22,87,87,87
+043653,Brooklyn City,Cuyahoga,SY21-22,NC,0,
+043661,Brunswick City,Medina,SY21-22,112,112,112
+043679,Bryan City,Williams,SY21-22,89,89,89
+043687,Bucyrus City,Crawford,SY21-22,0,0,0
+043695,Cambridge City,Guernsey,SY21-22,40,40,40
+043703,Campbell City,Mahoning,SY21-22,<10,0,9
+043711,Canton City,Stark,SY21-22,150,150,150
+043729,Celina City,Mercer,SY21-22,117,117,117
+043737,Centerville City,Montgomery,SY21-22,406,406,406
+043745,Chillicothe City,Ross,SY21-22,64,64,64
+043752,Cincinnati City,Hamilton,SY21-22,0,0,0
+043760,Circleville City,Pickaway,SY21-22,67,67,67
+043778,Claymont City,Tuscarawas,SY21-22,39,39,39
+043786,Cleveland Municipal City,Cuyahoga,SY21-22,326,326,326
+043794,Cleveland Heights-University Heights City,Cuyahoga,SY21-22,185,185,185
+043802,Columbus City,Franklin,SY21-22,1352,1352,1352
+043810,Conneaut Area City,Ashtabula,SY21-22,73,73,73
+043828,Coshocton City,Coshocton,SY21-22,NC,0,
+043836,Cuyahoga Falls City,Summit,SY21-22,183,183,183
+043844,Dayton City,Montgomery,SY21-22,329,329,329
+043851,Deer Park Community City,Hamilton,SY21-22,43,43,43
+043869,Defiance City,Defiance,SY21-22,0,0,0
+043877,Delaware City,Delaware,SY21-22,343,343,343
+043885,Delphos City,Allen,SY21-22,43,43,43
+043893,Dover City,Tuscarawas,SY21-22,100,100,100
+043901,East Cleveland City,Cuyahoga,SY21-22,0,0,0
+043919,East Liverpool City,Columbiana,SY21-22,23,23,23
+043927,East Palestine City,Columbiana,SY21-22,60,60,60
+043935,Eaton Community City,Preble,SY21-22,156,156,156
+043943,Elyria City,Lorain,SY21-22,128,128,128
+043950,Euclid City,Cuyahoga,SY21-22,NC,0,
+043968,Fairborn City,Greene,SY21-22,332,332,332
+043976,Fairview Park City,Cuyahoga,SY21-22,0,0,0
+043984,Findlay City,Hancock,SY21-22,200,200,200
+043992,Fostoria City,Seneca,SY21-22,23,23,23
+044008,Franklin City,Warren,SY21-22,177,177,177
+044016,Fremont City,Sandusky,SY21-22,112,112,112
+044024,Galion City,Crawford,SY21-22,62,62,62
+044032,Gallipolis City,Gallia,SY21-22,77,77,77
+044040,Garfield Heights City,Cuyahoga,SY21-22,31,31,31
+044057,Geneva Area City,Ashtabula,SY21-22,86,86,86
+044065,Girard City,Trumbull,SY21-22,22,22,22
+044073,Grandview Heights City,Franklin,SY21-22,16,16,16
+044081,Winton Woods City,Hamilton,SY21-22,129,129,129
+044099,Greenville City,Darke,SY21-22,175,175,175
+044107,Hamilton City,Butler,SY21-22,248,248,248
+044115,Heath City,Licking,SY21-22,46,46,46
+044123,Hillsboro City,Highland,SY21-22,153,153,153
+044131,Huron City,Erie,SY21-22,38,38,38
+044149,Ironton City,Lawrence,SY21-22,15,15,15
+044156,Jackson City,Jackson,SY21-22,81,81,81
+044164,Kent City,Portage,SY21-22,74,74,74
+044172,Kenton City,Hardin,SY21-22,67,67,67
+044180,Kettering City,Montgomery,SY21-22,301,301,301
+044198,Lakewood City,Cuyahoga,SY21-22,127,127,127
+044206,Lancaster City,Fairfield,SY21-22,280,280,280
+044214,Lebanon City,Warren,SY21-22,391,391,391
+044222,Lima City,Allen,SY21-22,874,874,874
+044230,Lockland Local,Hamilton,SY21-22,0,0,0
+044248,Logan-Hocking Local,Hocking,SY21-22,59,59,59
+044255,London City,Madison,SY21-22,85,85,85
+044263,Lorain City,Lorain,SY21-22,105,105,105
+044271,Loveland City,Hamilton,SY21-22,163,163,163
+044289,Madeira City,Hamilton,SY21-22,56,56,56
+044297,Mansfield City,Richland,SY21-22,202,202,202
+044305,Maple Heights City,Cuyahoga,SY21-22,37,37,37
+044313,Mariemont City,Hamilton,SY21-22,20,20,20
+044321,Marietta City,Washington,SY21-22,136,136,136
+044339,Marion City,Marion,SY21-22,49,49,49
+044347,Martins Ferry City,Belmont,SY21-22,30,30,30
+044354,Massillon City,Stark,SY21-22,91,91,91
+044362,Maumee City,Lucas,SY21-22,37,37,37
+044370,Mayfield City,Cuyahoga,SY21-22,55,55,55
+044388,Medina City,Medina,SY21-22,294,294,294
+044396,Miamisburg City,Montgomery,SY21-22,123,123,123
+044404,Middletown City,Butler,SY21-22,153,153,153
+044412,Mt Healthy City,Hamilton,SY21-22,NC,0,
+044420,Mount Vernon City,Knox,SY21-22,267,267,267
+044438,Napoleon Area City,Henry,SY21-22,67,67,67
+044446,Nelsonville-York City,Athens,SY21-22,23,23,23
+044453,Newark City,Licking,SY21-22,352,352,352
+044461,New Boston Local,Scioto,SY21-22,<10,0,9
+044479,New Lexington City,Perry,SY21-22,56,56,56
+044487,New Philadelphia City,Tuscarawas,SY21-22,95,95,95
+044495,Niles City,Trumbull,SY21-22,51,51,51
+044503,North Canton City,Stark,SY21-22,149,149,149
+044511,North College Hill City,Hamilton,SY21-22,45,45,45
+044529,North Olmsted City,Cuyahoga,SY21-22,84,84,84
+044537,North Ridgeville City,Lorain,SY21-22,109,109,109
+044545,North Royalton City,Cuyahoga,SY21-22,.,0,
+044552,Norton City,Summit,SY21-22,134,134,134
+044560,Norwalk City,Huron,SY21-22,102,102,102
+044578,Norwood City,Hamilton,SY21-22,47,47,47
+044586,Oakwood City,Montgomery,SY21-22,141,141,141
+044594,Oberlin City,Lorain,SY21-22,0,0,0
+044602,Oregon City,Lucas,SY21-22,91,91,91
+044610,Orrville City,Wayne,SY21-22,95,95,95
+044628,Painesville City Local,Lake,SY21-22,24,24,24
+044636,Parma City,Cuyahoga,SY21-22,167,167,167
+044644,Piqua City,Miami,SY21-22,114,114,114
+044651,Port Clinton City,Ottawa,SY21-22,24,24,24
+044669,Portsmouth City,Scioto,SY21-22,45,45,45
+044677,Princeton City,Hamilton,SY21-22,106,106,106
+044685,Ravenna City,Portage,SY21-22,51,51,51
+044693,Reading Community City,Hamilton,SY21-22,17,17,17
+044701,Rocky River City,Cuyahoga,SY21-22,30,30,30
+044719,St Bernard-Elmwood Place City,Hamilton,SY21-22,19,19,19
+044727,St Marys City,Auglaize,SY21-22,50,50,50
+044735,Salem City,Columbiana,SY21-22,56,56,56
+044743,Sandusky City,Erie,SY21-22,51,51,51
+044750,Shaker Heights City,Cuyahoga,SY21-22,24,24,24
+044768,Sheffield-Sheffield Lake City,Lorain,SY21-22,41,41,41
+044776,Shelby City,Richland,SY21-22,70,70,70
+044784,Sidney City,Shelby,SY21-22,86,86,86
+044792,South Euclid-Lyndhurst City,Cuyahoga,SY21-22,89,89,89
+044800,South-Western City,Franklin,SY21-22,761,761,761
+044818,Springfield City,Clark,SY21-22,215,215,215
+044826,Steubenville City,Jefferson,SY21-22,72,72,72
+044834,Stow-Munroe Falls City,Summit,SY21-22,142,142,142
+044842,Strongsville City,Cuyahoga,SY21-22,125,125,125
+044859,Struthers City,Mahoning,SY21-22,14,14,14
+044867,Sycamore Community City,Hamilton,SY21-22,147,147,147
+044875,Sylvania City,Lucas,SY21-22,216,216,216
+044883,Tallmadge City,Summit,SY21-22,.,0,
+044891,Tiffin City,Seneca,SY21-22,44,44,44
+044909,Toledo City,Lucas,SY21-22,427,427,427
+044917,Toronto City,Jefferson,SY21-22,<10,0,9
+044925,Troy City,Miami,SY21-22,257,257,257
+044933,Upper Arlington City,Franklin,SY21-22,140,140,140
+044941,Urbana City,Champaign,SY21-22,.,0,
+044958,Vandalia-Butler City,Montgomery,SY21-22,169,169,169
+044966,Van Wert City,Van Wert,SY21-22,102,102,102
+044974,Wadsworth City,Medina,SY21-22,216,216,216
+044982,Wapakoneta City,Auglaize,SY21-22,78,78,78
+044990,Warren City,Trumbull,SY21-22,52,52,52
+045005,Warrensville Heights City,Cuyahoga,SY21-22,<10,0,9
+045013,Washington Court House City,Fayette,SY21-22,46,46,46
+045021,Wellston City,Jackson,SY21-22,52,52,52
+045039,Wellsville Local,Columbiana,SY21-22,0,0,0
+045047,Westerville City,Franklin,SY21-22,565,565,565
+045054,West Carrollton City,Montgomery,SY21-22,136,136,136
+045062,Westlake City,Cuyahoga,SY21-22,66,66,66
+045070,Whitehall City,Franklin,SY21-22,37,37,37
+045088,Wickliffe City,Lake,SY21-22,37,37,37
+045096,Willard City,Huron,SY21-22,68,68,68
+045104,Willoughby-Eastlake City,Lake,SY21-22,142,142,142
+045112,Wilmington City,Clinton,SY21-22,139,139,139
+045120,Wooster City,Wayne,SY21-22,137,137,137
+045138,Worthington City,Franklin,SY21-22,338,338,338
+045146,Wyoming City,Hamilton,SY21-22,42,42,42
+045153,Xenia Community City,Greene,SY21-22,418,418,418
+045161,Youngstown City,Mahoning,SY21-22,58,58,58
+045179,Zanesville City,Muskingum,SY21-22,89,89,89
+045187,Ada Exempted Village,Hardin,SY21-22,45,45,45
+045195,Amherst Exempted Village,Lorain,SY21-22,84,84,84
+045203,Barnesville Exempted Village,Belmont,SY21-22,15,15,15
+045211,Bluffton Exempted Village,Allen,SY21-22,69,69,69
+045229,Bradford Exempted Village,Miami,SY21-22,35,35,35
+045237,Bridgeport Exempted Village,Belmont,SY21-22,20,20,20
+045245,Harrison Hills City,Harrison,SY21-22,82,82,82
+045252,Caldwell Exempted Village,Noble,SY21-22,27,27,27
+045260,Carey Exempted Village,Wyandot,SY21-22,18,18,18
+045278,Carrollton Exempted Village,Carroll,SY21-22,104,104,104
+045286,Chagrin Falls Exempted Village,Cuyahoga,SY21-22,.,0,
+045294,Chesapeake Union Exempted Village,Lawrence,SY21-22,43,43,43
+045302,Clyde-Green Springs Exempted Village,Sandusky,SY21-22,79,79,79
+045310,Coldwater Exempted Village,Mercer,SY21-22,19,19,19
+045328,Columbiana Exempted Village,Columbiana,SY21-22,51,51,51
+045336,Covington Exempted Village,Miami,SY21-22,101,101,101
+045344,Crestline Exempted Village,Crawford,SY21-22,10,10,10
+045351,Crooksville Exempted Village,Perry,SY21-22,18,18,18
+045369,Fairport Harbor Exempted Village,Lake,SY21-22,.,0,
+045377,Georgetown Exempted Village,Brown,SY21-22,24,24,24
+045385,Gibsonburg Exempted Village,Sandusky,SY21-22,40,40,40
+045393,Granville Exempted Village,Licking,SY21-22,158,158,158
+045401,Greenfield Exempted Village,Highland,SY21-22,55,55,55
+045419,Hicksville Exempted Village,Defiance,SY21-22,63,63,63
+045427,Hubbard Exempted Village,Trumbull,SY21-22,25,25,25
+045435,Indian Hill Exempted Village,Hamilton,SY21-22,37,37,37
+045443,Leetonia Exempted Village,Columbiana,SY21-22,33,33,33
+045450,Lisbon Exempted Village,Columbiana,SY21-22,48,48,48
+045468,Loudonville-Perrysville Exempted Village,Ashland,SY21-22,73,73,73
+045476,Marysville Exempted Village,Union,SY21-22,275,275,275
+045484,Mechanicsburg Exempted Village,Champaign,SY21-22,64,64,64
+045492,Mentor Exempted Village,Lake,SY21-22,185,185,185
+045500,Milford Exempted Village,Clermont,SY21-22,353,353,353
+045518,Milton-Union Exempted Village,Miami,SY21-22,112,112,112
+045526,Montpelier Exempted Village,Williams,SY21-22,45,45,45
+045534,Mount Gilead Exempted Village,Morrow,SY21-22,0,0,0
+045542,Newcomerstown Exempted Village,Tuscarawas,SY21-22,27,27,27
+045559,New Richmond Exempted Village,Clermont,SY21-22,102,102,102
+045567,Newton Falls Exempted Village,Trumbull,SY21-22,17,17,17
+045575,Paulding Exempted Village,Paulding,SY21-22,87,87,87
+045583,Perrysburg Exempted Village,Wood,SY21-22,134,134,134
+045591,Rittman Exempted Village,Wayne,SY21-22,30,30,30
+045609,Rossford Exempted Village,Wood,SY21-22,49,49,49
+045617,Tipp City Exempted Village,Miami,SY21-22,0,0,0
+045625,Upper Sandusky Exempted Village,Wyandot,SY21-22,60,60,60
+045633,Versailles Exempted Village,Darke,SY21-22,43,43,43
+045641,Wauseon Exempted Village,Fulton,SY21-22,80,80,80
+045658,Wellington Exempted Village,Lorain,SY21-22,59,59,59
+045666,Windham Exempted Village,Portage,SY21-22,<10,0,9
+045674,Yellow Springs Exempted Village,Greene,SY21-22,42,42,42
+045757,Allen East Local,Allen,SY21-22,44,44,44
+045765,Bath Local,Allen,SY21-22,41,41,41
+045773,Elida Local,Allen,SY21-22,157,157,157
+045781,Perry Local (Allen),Allen,SY21-22,15,15,15
+045799,Shawnee Local,Allen,SY21-22,101,101,101
+045807,Spencerville Local,Allen,SY21-22,54,54,54
+045823,Hillsdale Local,Ashland,SY21-22,82,82,82
+045831,Mapleton Local,Ashland,SY21-22,80,80,80
+045856,Buckeye Local (Ashtabula),Ashtabula,SY21-22,44,44,44
+045864,Grand Valley Local,Ashtabula,SY21-22,90,90,90
+045872,Jefferson Area Local,Ashtabula,SY21-22,100,100,100
+045880,Pymatuning Valley Local,Ashtabula,SY21-22,25,25,25
+045906,Alexander Local,Athens,SY21-22,97,97,97
+045914,Federal Hocking Local,Athens,SY21-22,38,38,38
+045922,Trimble Local,Athens,SY21-22,11,11,11
+045948,Minster Local,Auglaize,SY21-22,21,21,21
+045955,New Bremen Local,Auglaize,SY21-22,19,19,19
+045963,New Knoxville Local,Auglaize,SY21-22,12,12,12
+045971,Waynesfield-Goshen Local,Auglaize,SY21-22,28,28,28
+045997,St Clairsville-Richland City,Belmont,SY21-22,63,63,63
+046003,Shadyside Local,Belmont,SY21-22,<10,0,9
+046011,Union Local,Belmont,SY21-22,64,64,64
+046037,Eastern Local (Brown),Brown,SY21-22,55,55,55
+046045,Fayetteville-Perry Local,Brown,SY21-22,56,56,56
+046060,Western Brown Local,Brown,SY21-22,57,57,57
+046078,Ripley-Union-Lewis-Huntington Local,Brown,SY21-22,<10,0,9
+046094,Edgewood City,Butler,SY21-22,90,90,90
+046102,Fairfield City,Butler,SY21-22,309,309,309
+046110,Lakota Local (Butler),Butler,SY21-22,679,679,679
+046128,Madison Local (Butler),Butler,SY21-22,52,52,52
+046136,New Miami Local,Butler,SY21-22,18,18,18
+046144,Ross Local,Butler,SY21-22,79,79,79
+046151,Talawanda City,Butler,SY21-22,209,209,209
+046177,Brown Local,Carroll,SY21-22,13,13,13
+046193,Graham Local,Champaign,SY21-22,141,141,141
+046201,Triad Local,Champaign,SY21-22,53,53,53
+046219,West Liberty-Salem Local,Champaign,SY21-22,65,65,65
+046235,Greenon Local,Clark,SY21-22,84,84,84
+046243,Tecumseh Local,Clark,SY21-22,178,178,178
+046250,Northeastern Local (Clark),Clark,SY21-22,125,125,125
+046268,Northwestern Local (Clark),Clark,SY21-22,122,122,122
+046276,Southeastern Local (Clark),Clark,SY21-22,29,29,29
+046284,Clark-Shawnee Local,Clark,SY21-22,<10,0,9
+046300,Batavia Local,Clermont,SY21-22,88,88,88
+046318,Bethel-Tate Local,Clermont,SY21-22,65,65,65
+046326,Clermont Northeastern Local,Clermont,SY21-22,139,139,139
+046334,Felicity-Franklin Local,Clermont,SY21-22,51,51,51
+046342,Goshen Local,Clermont,SY21-22,154,154,154
+046359,West Clermont Local,Clermont,SY21-22,449,449,449
+046367,Williamsburg Local,Clermont,SY21-22,39,39,39
+046383,Blanchester Local,Clinton,SY21-22,50,50,50
+046391,Clinton-Massie Local,Clinton,SY21-22,110,110,110
+046409,East Clinton Local,Clinton,SY21-22,50,50,50
+046425,Beaver Local,Columbiana,SY21-22,59,59,59
+046433,Crestview Local (Columbiana),Columbiana,SY21-22,50,50,50
+046441,Southern Local (Columbiana),Columbiana,SY21-22,18,18,18
+046458,United Local,Columbiana,SY21-22,43,43,43
+046474,Ridgewood Local,Coshocton,SY21-22,44,44,44
+046482,River View Local,Coshocton,SY21-22,173,173,173
+046508,Buckeye Central Local,Crawford,SY21-22,16,16,16
+046516,Colonel Crawford Local,Crawford,SY21-22,40,40,40
+046524,Wynford Local,Crawford,SY21-22,52,52,52
+046557,Cuyahoga Heights Local,Cuyahoga,SY21-22,<10,0,9
+046565,Independence Local,Cuyahoga,SY21-22,25,25,25
+046573,Olmsted Falls City,Cuyahoga,SY21-22,64,64,64
+046581,Orange City,Cuyahoga,SY21-22,34,34,34
+046599,Richmond Heights Local,Cuyahoga,SY21-22,16,16,16
+046607,Solon City,Cuyahoga,SY21-22,67,67,67
+046623,Ansonia Local,Darke,SY21-22,22,22,22
+046631,Arcanum-Butler Local,Darke,SY21-22,55,55,55
+046649,Franklin Monroe Local,Darke,SY21-22,87,87,87
+046672,Mississinawa Valley Local,Darke,SY21-22,29,29,29
+046680,Tri-Village Local,Darke,SY21-22,56,56,56
+046706,Ayersville Local,Defiance,SY21-22,21,21,21
+046714,Central Local,Defiance,SY21-22,81,81,81
+046722,Northeastern Local (Defiance),Defiance,SY21-22,61,61,61
+046748,Big Walnut Local,Delaware,SY21-22,203,203,203
+046755,Buckeye Valley Local,Delaware,SY21-22,0,0,0
+046763,Olentangy Local,Delaware,SY21-22,441,441,441
+046789,Edison Local (Erie),Erie,SY21-22,70,70,70
+046797,Kelleys Island Local,Erie,SY21-22,0,0,0
+046805,Margaretta Local,Erie,SY21-22,24,24,24
+046813,Perkins Local,Erie,SY21-22,59,59,59
+046821,Vermilion Local,Erie,SY21-22,61,61,61
+046847,Amanda-Clearcreek Local,Fairfield,SY21-22,74,74,74
+046854,Berne Union Local,Fairfield,SY21-22,41,41,41
+046862,Bloom-Carroll Local,Fairfield,SY21-22,133,133,133
+046870,Fairfield Union Local,Fairfield,SY21-22,98,98,98
+046888,Liberty Union-Thurston Local,Fairfield,SY21-22,57,57,57
+046896,Pickerington Local,Fairfield,SY21-22,263,263,263
+046904,Walnut Township Local,Fairfield,SY21-22,20,20,20
+046920,Miami Trace Local,Fayette,SY21-22,86,86,86
+046946,Canal Winchester Local,Franklin,SY21-22,69,69,69
+046953,Hamilton Local,Franklin,SY21-22,61,61,61
+046961,Gahanna-Jefferson City,Franklin,SY21-22,227,227,227
+046979,Groveport Madison Local,Franklin,SY21-22,176,176,176
+046995,New Albany-Plain Local,Franklin,SY21-22,66,66,66
+047001,Reynoldsburg City,Franklin,SY21-22,179,179,179
+047019,Hilliard City,Franklin,SY21-22,352,352,352
+047027,Dublin City,Franklin,SY21-22,303,303,303
+047043,Archbold-Area Local,Fulton,SY21-22,73,73,73
+047050,Evergreen Local,Fulton,SY21-22,69,69,69
+047068,Fayette Local,Fulton,SY21-22,<10,0,9
+047076,Pettisville Local,Fulton,SY21-22,13,13,13
+047084,Pike-Delta-York Local,Fulton,SY21-22,74,74,74
+047092,Swanton Local,Fulton,SY21-22,61,61,61
+047167,Berkshire Local,Geauga,SY21-22,168,168,168
+047175,Cardinal Local,Geauga,SY21-22,133,133,133
+047183,Chardon Local,Geauga,SY21-22,227,227,227
+047191,Kenston Local,Geauga,SY21-22,91,91,91
+047225,West Geauga Local,Geauga,SY21-22,117,117,117
+047241,Beavercreek City,Greene,SY21-22,648,648,648
+047258,Cedar Cliff Local,Greene,SY21-22,143,143,143
+047266,Greeneview Local,Greene,SY21-22,92,92,92
+047274,Bellbrook-Sugarcreek Local,Greene,SY21-22,196,196,196
+047308,Rolling Hills Local,Guernsey,SY21-22,20,20,20
+047332,Finneytown Local,Hamilton,SY21-22,67,67,67
+047340,Forest Hills Local,Hamilton,SY21-22,217,217,217
+047365,Northwest Local (Hamilton),Hamilton,SY21-22,236,236,236
+047373,Oak Hills Local,Hamilton,SY21-22,160,160,160
+047381,Southwest Local,Hamilton,SY21-22,NC,0,
+047399,Three Rivers Local,Hamilton,SY21-22,48,48,48
+047415,Arcadia Local,Hancock,SY21-22,21,21,21
+047423,Arlington Local,Hancock,SY21-22,51,51,51
+047431,Cory-Rawson Local,Hancock,SY21-22,45,45,45
+047449,Liberty-Benton Local,Hancock,SY21-22,51,51,51
+047456,McComb Local,Hancock,SY21-22,26,26,26
+047464,Van Buren Local,Hancock,SY21-22,27,27,27
+047472,Vanlue Local,Hancock,SY21-22,20,20,20
+047498,Hardin Northern Local,Hardin,SY21-22,12,12,12
+047506,Ridgemont Local,Hardin,SY21-22,30,30,30
+047514,Riverdale Local,Hardin,SY21-22,63,63,63
+047522,Upper Scioto Valley Local,Hardin,SY21-22,33,33,33
+047548,Conotton Valley Union Local,Harrison,SY21-22,27,27,27
+047571,Holgate Local,Henry,SY21-22,29,29,29
+047589,Liberty Center Local,Henry,SY21-22,39,39,39
+047597,Patrick Henry Local,Henry,SY21-22,25,25,25
+047613,Bright Local,Highland,SY21-22,32,32,32
+047621,Fairfield Local,Highland,SY21-22,13,13,13
+047639,Lynchburg-Clay Local,Highland,SY21-22,49,49,49
+047688,East Holmes Local,Holmes,SY21-22,151,151,151
+047696,West Holmes Local,Holmes,SY21-22,251,251,251
+047712,Monroeville Local,Huron,SY21-22,19,19,19
+047720,New London Local,Huron,SY21-22,.,0,
+047738,South Central Local,Huron,SY21-22,37,37,37
+047746,Western Reserve Local (Huron),Huron,SY21-22,57,57,57
+047761,Oak Hill Union Local,Jackson,SY21-22,27,27,27
+047787,Buckeye Local (Jefferson),Jefferson,SY21-22,35,35,35
+047795,Edison Local (Jefferson),Jefferson,SY21-22,68,68,68
+047803,Indian Creek Local,Jefferson,SY21-22,35,35,35
+047829,Centerburg Local,Knox,SY21-22,52,52,52
+047837,Danville Local,Knox,SY21-22,54,54,54
+047845,East Knox Local,Knox,SY21-22,98,98,98
+047852,Fredericktown Local,Knox,SY21-22,55,55,55
+047878,Kirtland Local,Lake,SY21-22,20,20,20
+047886,Madison Local (Lake),Lake,SY21-22,110,110,110
+047894,Riverside Local (Lake),Lake,SY21-22,151,151,151
+047902,Perry Local (Lake),Lake,SY21-22,34,34,34
+047928,Dawson-Bryant Local,Lawrence,SY21-22,26,26,26
+047936,Fairland Local,Lawrence,SY21-22,60,60,60
+047944,Rock Hill Local,Lawrence,SY21-22,21,21,21
+047951,South Point Local,Lawrence,SY21-22,.,0,
+047969,Symmes Valley Local,Lawrence,SY21-22,20,20,20
+047985,Johnstown-Monroe Local,Licking,SY21-22,98,98,98
+047993,Lakewood Local,Licking,SY21-22,106,106,106
+048009,Licking Heights Local,Licking,SY21-22,70,70,70
+048017,Licking Valley Local,Licking,SY21-22,116,116,116
+048025,North Fork Local,Licking,SY21-22,107,107,107
+048033,Northridge Local (Licking),Licking,SY21-22,98,98,98
+048041,Southwest Licking Local,Licking,SY21-22,260,260,260
+048074,Benjamin Logan Local,Logan,SY21-22,143,143,143
+048082,Indian Lake Local,Logan,SY21-22,75,75,75
+048090,Riverside Local (Logan),Logan,SY21-22,31,31,31
+048116,Avon Local,Lorain,SY21-22,87,87,87
+048124,Avon Lake City,Lorain,SY21-22,39,39,39
+048132,Clearview Local,Lorain,SY21-22,18,18,18
+048140,Columbia Local,Lorain,SY21-22,32,32,32
+048157,Firelands Local,Lorain,SY21-22,58,58,58
+048165,Keystone Local,Lorain,SY21-22,59,59,59
+048173,Midview Local,Lorain,SY21-22,81,81,81
+048207,Anthony Wayne Local,Lucas,SY21-22,187,187,187
+048215,Ottawa Hills Local,Lucas,SY21-22,16,16,16
+048223,Springfield Local (Lucas),Lucas,SY21-22,124,124,124
+048231,Washington Local,Lucas,SY21-22,0,0,0
+048256,Jefferson Local,Madison,SY21-22,.,0,
+048264,Jonathan Alder Local,Madison,SY21-22,174,174,174
+048272,Madison-Plains Local,Madison,SY21-22,72,72,72
+048298,Austintown Local,Mahoning,SY21-22,69,69,69
+048306,Boardman Local,Mahoning,SY21-22,78,78,78
+048314,Canfield Local,Mahoning,SY21-22,65,65,65
+048322,Jackson-Milton Local,Mahoning,SY21-22,15,15,15
+048330,Lowellville Local,Mahoning,SY21-22,<10,0,9
+048348,Poland Local,Mahoning,SY21-22,54,54,54
+048355,Sebring Local,Mahoning,SY21-22,<10,0,9
+048363,South Range Local,Mahoning,SY21-22,48,48,48
+048371,Springfield Local (Mahoning),Mahoning,SY21-22,18,18,18
+048389,West Branch Local,Mahoning,SY21-22,97,97,97
+048397,Western Reserve Local (Mahoning),Mahoning,SY21-22,<10,0,9
+048413,Elgin Local,Marion,SY21-22,0,0,0
+048421,Pleasant Local,Marion,SY21-22,28,28,28
+048439,Ridgedale Local,Marion,SY21-22,12,12,12
+048447,River Valley Local,Marion,SY21-22,0,0,0
+048462,Black River Local,Medina,SY21-22,119,119,119
+048470,Buckeye Local (Medina),Medina,SY21-22,91,91,91
+048488,Cloverleaf Local,Medina,SY21-22,130,130,130
+048496,Highland Local (Medina),Medina,SY21-22,187,187,187
+048512,Eastern Local (Meigs),Meigs,SY21-22,32,32,32
+048520,Meigs Local,Meigs,SY21-22,85,85,85
+048538,Southern Local (Meigs),Meigs,SY21-22,25,25,25
+048553,Marion Local,Mercer,SY21-22,18,18,18
+048579,Parkway Local,Mercer,SY21-22,46,46,46
+048587,St Henry Consolidated Local,Mercer,SY21-22,16,16,16
+048595,Fort Recovery Local,Mercer,SY21-22,35,35,35
+048611,Bethel Local,Miami,SY21-22,63,63,63
+048629,Miami East Local,Miami,SY21-22,121,121,121
+048637,Newton Local,Miami,SY21-22,106,106,106
+048652,Switzerland of Ohio Local,Monroe,SY21-22,79,79,79
+048678,Brookville Local,Montgomery,SY21-22,107,107,107
+048686,Jefferson Township Local,Montgomery,SY21-22,14,14,14
+048694,Trotwood-Madison City,Montgomery,SY21-22,44,44,44
+048702,Mad River Local,Montgomery,SY21-22,127,127,127
+048710,New Lebanon Local,Montgomery,SY21-22,58,58,58
+048728,Northmont City,Montgomery,SY21-22,217,217,217
+048736,Northridge Local,Montgomery,SY21-22,.,0,
+048744,Valley View Local,Montgomery,SY21-22,.,0,
+048751,Huber Heights City,Montgomery,SY21-22,.,0,
+048777,Morgan Local,Morgan,SY21-22,163,163,163
+048793,Cardington-Lincoln Local,Morrow,SY21-22,68,68,68
+048801,Highland Local (Morrow),Morrow,SY21-22,115,115,115
+048819,Northmor Local,Morrow,SY21-22,37,37,37
+048835,East Muskingum Local,Muskingum,SY21-22,.,0,
+048843,Franklin Local,Muskingum,SY21-22,70,70,70
+048850,Maysville Local,Muskingum,SY21-22,50,50,50
+048876,Tri-Valley Local,Muskingum,SY21-22,19,19,19
+048884,West Muskingum Local,Muskingum,SY21-22,83,83,83
+048900,Noble Local,Noble,SY21-22,28,28,28
+048926,Benton Carroll Salem Local,Ottawa,SY21-22,11,11,11
+048934,Danbury Local,Ottawa,SY21-22,<10,0,9
+048942,Genoa Area Local,Ottawa,SY21-22,22,22,22
+048959,Middle Bass Local,Ottawa,SY21-22,0,0,0
+048967,North Bass Local,Ottawa,SY21-22,.,0,
+048975,Put-In-Bay Local,Ottawa,SY21-22,0,0,0
+048991,Antwerp Local,Paulding,SY21-22,31,31,31
+049031,Wayne Trace Local,Paulding,SY21-22,54,54,54
+049056,Northern Local,Perry,SY21-22,158,158,158
+049064,Southern Local (Perry),Perry,SY21-22,32,32,32
+049080,Logan Elm Local,Pickaway,SY21-22,127,127,127
+049098,Teays Valley Local,Pickaway,SY21-22,196,196,196
+049106,Westfall Local,Pickaway,SY21-22,79,79,79
+049122,Eastern Local (Pike),Pike,SY21-22,.,0,
+049130,Scioto Valley Local,Pike,SY21-22,28,28,28
+049148,Waverly City,Pike,SY21-22,25,25,25
+049155,Western Local,Pike,SY21-22,10,10,10
+049171,Aurora City,Portage,SY21-22,34,34,34
+049189,Crestwood Local,Portage,SY21-22,53,53,53
+049197,Field Local,Portage,SY21-22,99,99,99
+049205,James A Garfield Local,Portage,SY21-22,68,68,68
+049213,Rootstown Local,Portage,SY21-22,22,22,22
+049221,Southeast Local (Portage),Portage,SY21-22,65,65,65
+049239,Streetsboro City,Portage,SY21-22,37,37,37
+049247,Waterloo Local,Portage,SY21-22,87,87,87
+049270,National Trail Local,Preble,SY21-22,76,76,76
+049288,Preble Shawnee Local,Preble,SY21-22,94,94,94
+049296,Twin Valley Community Local,Preble,SY21-22,132,132,132
+049312,Columbus Grove Local,Putnam,SY21-22,49,49,49
+049320,Continental Local,Putnam,SY21-22,18,18,18
+049338,Jennings Local,Putnam,SY21-22,<10,0,9
+049346,Kalida Local,Putnam,SY21-22,<10,0,9
+049353,Leipsic Local,Putnam,SY21-22,<10,0,9
+049361,Miller City-New Cleveland Local,Putnam,SY21-22,29,29,29
+049379,Ottawa-Glandorf Local,Putnam,SY21-22,24,24,24
+049387,Ottoville Local,Putnam,SY21-22,<10,0,9
+049395,Pandora-Gilboa Local,Putnam,SY21-22,50,50,50
+049411,Clear Fork Valley Local,Richland,SY21-22,182,182,182
+049429,Crestview Local (Richland),Richland,SY21-22,81,81,81
+049437,Lexington Local,Richland,SY21-22,149,149,149
+049445,Lucas Local,Richland,SY21-22,57,57,57
+049452,Madison Local (Richland),Richland,SY21-22,97,97,97
+049460,Plymouth-Shiloh Local,Richland,SY21-22,.,0,
+049478,Ontario Local,Richland,SY21-22,94,94,94
+049494,Adena Local,Ross,SY21-22,38,38,38
+049502,Huntington Local,Ross,SY21-22,15,15,15
+049510,Paint Valley Local,Ross,SY21-22,25,25,25
+049528,Southeastern Local (Ross),Ross,SY21-22,<10,0,9
+049536,Union-Scioto Local,Ross,SY21-22,48,48,48
+049544,Zane Trace Local,Ross,SY21-22,36,36,36
+049569,Lakota Local (Sandusky),Sandusky,SY21-22,35,35,35
+049577,Woodmore Local,Sandusky,SY21-22,49,49,49
+049593,Bloom-Vernon Local,Scioto,SY21-22,11,11,11
+049601,Clay Local,Scioto,SY21-22,<10,0,9
+049619,Green Local (Scioto),Scioto,SY21-22,0,0,0
+049627,Minford Local,Scioto,SY21-22,47,47,47
+049635,Northwest Local (Montgomery),Scioto,SY21-22,42,42,42
+049643,Valley Local,Scioto,SY21-22,<10,0,9
+049650,Washington-Nile Local,Scioto,SY21-22,10,10,10
+049668,Wheelersburg Local,Scioto,SY21-22,16,16,16
+049684,Seneca East Local,Seneca,SY21-22,16,16,16
+049700,Hopewell-Loudon Local,Seneca,SY21-22,11,11,11
+049718,New Riegel Local,Seneca,SY21-22,<10,0,9
+049726,Old Fort Local,Seneca,SY21-22,18,18,18
+049759,Anna Local,Shelby,SY21-22,30,30,30
+049767,Botkins Local,Shelby,SY21-22,15,15,15
+049775,Fairlawn Local,Shelby,SY21-22,<10,0,9
+049783,Fort Loramie Local,Shelby,SY21-22,<10,0,9
+049791,Hardin-Houston Local,Shelby,SY21-22,51,51,51
+049809,Jackson Center Local,Shelby,SY21-22,12,12,12
+049817,Russia Local,Shelby,SY21-22,17,17,17
+049833,Canton Local,Stark,SY21-22,50,50,50
+049841,Fairless Local,Stark,SY21-22,43,43,43
+049858,Jackson Local,Stark,SY21-22,152,152,152
+049866,Lake Local (Stark),Stark,SY21-22,236,236,236
+049874,Louisville City,Stark,SY21-22,80,80,80
+049882,Marlington Local,Stark,SY21-22,177,177,177
+049890,Minerva Local,Stark,SY21-22,82,82,82
+049908,Northwest Local (Stark),Stark,SY21-22,52,52,52
+049916,Osnaburg Local,Stark,SY21-22,32,32,32
+049924,Perry Local (Stark),Stark,SY21-22,87,87,87
+049932,Plain Local,Stark,SY21-22,266,266,266
+049940,Sandy Valley Local,Stark,SY21-22,25,25,25
+049957,Tuslaw Local,Stark,SY21-22,109,109,109
+049973,Woodridge Local,Summit,SY21-22,84,84,84
+049981,Copley-Fairlawn City,Summit,SY21-22,89,89,89
+049999,Coventry Local,Summit,SY21-22,20,20,20
+050005,Manchester Local (Summit),Summit,SY21-22,54,54,54
+050013,Green Local (Summit),Summit,SY21-22,.,0,
+050021,Hudson City,Summit,SY21-22,112,112,112
+050039,Mogadore Local,Summit,SY21-22,17,17,17
+050047,Nordonia Hills City,Summit,SY21-22,60,60,60
+050054,Revere Local,Summit,SY21-22,.,0,
+050062,Springfield Local (Summit),Summit,SY21-22,116,116,116
+050070,Twinsburg City,Summit,SY21-22,86,86,86
+050096,Bloomfield-Mespo Local,Trumbull,SY21-22,57,57,57
+050112,Bristol Local,Trumbull,SY21-22,39,39,39
+050120,Brookfield Local,Trumbull,SY21-22,19,19,19
+050138,Champion Local,Trumbull,SY21-22,42,42,42
+050153,Mathews Local,Trumbull,SY21-22,13,13,13
+050161,Howland Local,Trumbull,SY21-22,56,56,56
+050179,Joseph Badger Local,Trumbull,SY21-22,51,51,51
+050187,Lakeview Local,Trumbull,SY21-22,48,48,48
+050195,Liberty Local,Trumbull,SY21-22,36,36,36
+050203,Lordstown Local,Trumbull,SY21-22,11,11,11
+050211,Maplewood Local,Trumbull,SY21-22,23,23,23
+050229,McDonald Local,Trumbull,SY21-22,<10,0,9
+050237,Southington Local,Trumbull,SY21-22,16,16,16
+050245,LaBrae Local,Trumbull,SY21-22,21,21,21
+050252,Weathersfield Local,Trumbull,SY21-22,<10,0,9
+050278,Garaway Local,Tuscarawas,SY21-22,206,206,206
+050286,Indian Valley Local,Tuscarawas,SY21-22,45,45,45
+050294,Strasburg-Franklin Local,Tuscarawas,SY21-22,31,31,31
+050302,Tuscarawas Valley Local,Tuscarawas,SY21-22,59,59,59
+050328,Fairbanks Local,Union,SY21-22,119,119,119
+050336,North Union Local,Union,SY21-22,80,80,80
+050351,Crestview Local (Van Wert),Van Wert,SY21-22,36,36,36
+050369,Lincolnview Local,Van Wert,SY21-22,38,38,38
+050393,Vinton County Local,Vinton,SY21-22,124,124,124
+050419,Carlisle Local,Warren,SY21-22,76,76,76
+050427,Springboro Community City,Warren,SY21-22,248,248,248
+050435,Kings Local,Warren,SY21-22,165,165,165
+050443,Little Miami Local,Warren,SY21-22,397,397,397
+050450,Mason City,Warren,SY21-22,197,197,197
+050468,Wayne Local,Warren,SY21-22,124,124,124
+050484,Fort Frye Local,Washington,SY21-22,47,47,47
+050492,Frontier Local,Washington,SY21-22,23,23,23
+050500,Warren Local,Washington,SY21-22,93,93,93
+050518,Wolf Creek Local,Washington,SY21-22,11,11,11
+050534,Chippewa Local,Wayne,SY21-22,.,0,
+050542,Dalton Local,Wayne,SY21-22,115,115,115
+050559,Green Local (Wayne),Wayne,SY21-22,146,146,146
+050567,Norwayne Local,Wayne,SY21-22,105,105,105
+050575,Northwestern Local (Wayne),Wayne,SY21-22,91,91,91
+050583,Southeast Local (Wayne),Wayne,SY21-22,154,154,154
+050591,Triway Local,Wayne,SY21-22,94,94,94
+050617,Edgerton Local,Williams,SY21-22,0,0,0
+050625,Edon-Northwest Local,Williams,SY21-22,50,50,50
+050633,Millcreek-West Unity Local,Williams,SY21-22,30,30,30
+050641,North Central Local,Williams,SY21-22,47,47,47
+050658,Stryker Local,Williams,SY21-22,28,28,28
+050674,Eastwood Local,Wood,SY21-22,91,91,91
+050682,Elmwood Local,Wood,SY21-22,44,44,44
+050690,Lake Local (Wood),Wood,SY21-22,72,72,72
+050708,North Baltimore Local,Wood,SY21-22,22,22,22
+050716,Northwood Local,Wood,SY21-22,10,10,10
+050724,Otsego Local,Wood,SY21-22,73,73,73
+050740,Mohawk Local,Wyandot,SY21-22,19,19,19
+061903,Adams County/Ohio Valley Local,Adams,SY21-22,194,194,194
+064964,College Corner Local,Preble,SY21-22,.,0,
+065680,Gallia County Local,Gallia,SY21-22,180,180,180
+069682,East Guernsey Local,Guernsey,SY21-22,31,31,31
+091397,Tri-County North Local,Preble,SY21-22,48,48,48
+139303,Monroe Local,Butler,SY21-22,116,116,116
