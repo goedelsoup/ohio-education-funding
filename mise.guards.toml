@@ -35,7 +35,11 @@ description = "Refuses. `.yidam/schemas/` is this repository's — use `pnpm --d
 # here consumes, which a `git add .yidam` commits silently.
 #
 # It is not a version problem and no upgrade resolves it: 0.11.0 and 0.12.0
-# produce byte-identical output, and both diverge the same way.
+# produce byte-identical output, and both diverge the same way. Re-measured at
+# 0.15.0 on the re-vendor to template v0.8.0 — every figure above still holds
+# exactly: `required` five fields to three, `additionalProperties` to `true`,
+# and 21 extra files. Three CLI majors have not moved it, so the next upgrade
+# needs no re-measurement either; this task is the standing answer.
 #
 # `web/tests/unit/schema.spec.ts` catches the damage after the fact — it compares
 # both documents whole, prose fields included, and asserts the directory holds

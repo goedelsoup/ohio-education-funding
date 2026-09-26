@@ -235,8 +235,9 @@ jobs:
       # mise's own github backend fetches the release tarball over anonymous HTTPS. `_.path`
       # puts `.yidam/bin` ahead of the shims, so a developer with a `//:yidam-build` install still
       # runs that one and this changes nothing locally; in CI the directory does not exist
-      # (gitignored) and the shim answers, with the same `yidam 0.13.0 (a8fead4)` and the same
-      # feature set.
+      # (gitignored) and the shim answers, with the same version and commit the `[tools]` entry
+      # names and the same feature set. That pair is deliberately NOT written out here: it moves
+      # on every `yidam-vendor-update`, and a figure beside a thing that moves goes stale unread.
       - name: Install the pinned yidam
         run: mise install "github:goedelsoup/yidam"
 
