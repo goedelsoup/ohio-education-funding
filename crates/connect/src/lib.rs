@@ -855,6 +855,60 @@ fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     );
 
+    // Home education, statewide and then per district. The statewide series is built first
+    // because the district build reads it: the district rows are labeled with a school year
+    // whose state total they exceed, and that contradiction is what licences committing them
+    // without a year of their own. See `fixtures::home_education`.
+    let home_education_statewide = (|| -> Result<Vec<Vec<String>>, String> {
+        let book = open_workbook(root, registered("homeschool-hub-workbook"))
+            .map_err(|e| e.to_string())?;
+        fixtures::build_home_education_statewide(
+            &book
+                .rows(fixtures::HOME_EDUCATION_STATEWIDE_SHEET)
+                .map_err(|e| e.to_string())?,
+        )
+    })();
+    out.push(match &home_education_statewide {
+        Ok(rows) => csv_fixture(
+            root,
+            fixtures::HOME_EDUCATION_STATEWIDE_FIXTURE,
+            fixtures::HOME_EDUCATION_STATEWIDE_HEADER,
+            rows,
+        )?,
+        Err(cause) => Rebuilt::skipped(fixtures::HOME_EDUCATION_STATEWIDE_FIXTURE, cause),
+    });
+    out.push(
+        match (|| -> Result<Vec<Vec<String>>, String> {
+            let statewide = home_education_statewide.as_ref().map_err(Clone::clone)?;
+            let hub = open_workbook(root, registered("homeschool-hub-workbook"))
+                .map_err(|e| e.to_string())?;
+            // The department's own district list, read from its source rather than from the
+            // committed extract: the IRNs and counties the Hub's sheet lacks come from here, so
+            // a rebuild joins two published files and not one file and one of its own outputs.
+            let list = open_workbook(root, registered("district-typology-2013"))
+                .map_err(|e| e.to_string())?;
+            let typology = fixtures::build_typology(
+                &list
+                    .rows(fixtures::TYPOLOGY_SHEET)
+                    .map_err(|e| e.to_string())?,
+            )?;
+            fixtures::build_home_education_districts(
+                &hub.rows(fixtures::HOME_EDUCATION_SHEET)
+                    .map_err(|e| e.to_string())?,
+                &typology,
+                statewide,
+            )
+        })() {
+            Ok(rows) => csv_fixture(
+                root,
+                fixtures::HOME_EDUCATION_FIXTURE,
+                fixtures::HOME_EDUCATION_HEADER,
+                &rows,
+            )?,
+            Err(cause) => Rebuilt::skipped(fixtures::HOME_EDUCATION_FIXTURE, cause),
+        },
+    );
+
     // Who may claim a traditional EdChoice scholarship, per building, for each of the three
     // editions this repository holds. The `Overview` sheet alone: a workbook's other sheets are
     // the criteria's own inputs — building Performance Index rankings and district Title I

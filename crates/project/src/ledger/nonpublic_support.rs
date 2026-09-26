@@ -459,6 +459,24 @@ pub fn chartered_nonpublic_enrolment() -> f64 {
 /// The published vintage of [`chartered_nonpublic_enrolment`], for prose that has to say so.
 pub const ENROLMENT_VINTAGE: &str = "2023-2024";
 
+/// The row of [`CHANNELS`] counting children in home education.
+const HOME_SCHOOL: &str = "Home School";
+
+/// The department's own statewide home-education count, for [`ENROLMENT_VINTAGE`].
+///
+/// Nothing in this module is paid for these children — that is the point of them. The accessor
+/// lives here because this is the reader for the fact sheet's School Options table, and it
+/// exists because it is the only home-education figure Ohio publishes in machine-reachable form
+/// and therefore the only one the corpus may call `[verified]`. `crate::home_education` reads
+/// it against the twenty-year series an aggregator holds, and the two agree to the student.
+#[must_use]
+pub fn home_education_enrolment() -> f64 {
+    edfund_core::csv::rows(CHANNELS, CHANNELS_HEADER)
+        .find(|row| row.str(0) == HOME_SCHOOL)
+        .and_then(|row| row.num(1))
+        .expect("the landscape fixture no longer counts home education")
+}
+
 /// What a line is worth per chartered nonpublic pupil in `fiscal_year`.
 ///
 /// The newest figure that answers for the year, over the October membership the statute names —

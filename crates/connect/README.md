@@ -76,8 +76,9 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | `dew-child-nutrition` | **wired**, in part | 34 | education-agency, metric, formula-component |
 | `dew-school-improvement` | **wired**, in part | 3 | school, education-agency, accountability-regime |
 | `dew-nonpublic-enrollment` | **wired**, in part | 23 | school, metric, program |
+| `jhu-homeschool-hub` | **wired**, in part | 1 | metric, education-agency |
 
-26 connectors, 419 sources between them. 23 are wired and 3 are not; 12 of the wired ones reach only part of what they feed, and say so below.
+27 connectors, 420 sources between them. 24 are wired and 3 are not; 13 of the wired ones reach only part of what they feed, and say so below.
 
 **What is blocked, in the registry's own words.**
 
@@ -95,8 +96,9 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 - `dew-child-nutrition` — still blocked on: wired for every October the archive holds, 1998 through 2014, across all three of the streams the report splits into from 2012. Three things it still cannot reach: October 2014 is where the directory stops, nine years short of the corpus's FY2024 observations; the three split Octobers have a band and not a poverty share, because community-eligibility sponsors collect no applications at all; and the 1998-2000 files state no sponsor type, so some thirty-five sponsors a year predate the FY2001 file they borrow one from and stay untyped
 - `dew-school-improvement` — still blocked on: wired for the current identification lists only. The department republishes each list in place under a dated filename rather than archiving prior cycles, so there is no history here: a school that exited before this file was written is indistinguishable from one never identified
 - `dew-nonpublic-enrollment` — still blocked on: wired for every October the department publishes, 1977 through 2025, at the building and at the sector. What it cannot reach is the district each building sits in. Auxiliary services under R.C. 3317.06 flows to a nonpublic school through the district its building is located in, so a per-district question about the nonpublic sector needs that column; no file in any of the three eras carries it, the Chartered Nonpublic School Information page publishes no directory, and `edchoice-designated` is public buildings only. County and school type are published for 1977-78 through 2006-07 and then stop, so even the coarser geography is gone for the modern years
+- `jhu-homeschool-hub` — still blocked on: One school year per district, and the workbook labels it wrongly. The department holds the R.C. 3321.042 notice counts per district for every year and releases them on request; nothing below the state total is published, so the other years need a records request rather than a connector. What the count measures — notices received or children named on them — is undocumented and the two differ by household size.
 
-15 of them have no long form in [`sources/`](sources/): `dew-report-card`, `eia-diesel`, `dew-five-year-forecast`, `dew-scholarship-reports`, `dew-facts-and-figures`, `dew-typology`, `lsc-catalog`, `ohio-session-laws`, `ohio-bill-versions`, `ohio-bills`, `ohio-auditor`, `census-geography`, `dew-child-nutrition`, `dew-school-improvement`, `dew-nonpublic-enrollment`. Those are the connectors added after the original nine stubs, whose prose was never written — the decision record is the only account of why each exists.
+16 of them have no long form in [`sources/`](sources/): `dew-report-card`, `eia-diesel`, `dew-five-year-forecast`, `dew-scholarship-reports`, `dew-facts-and-figures`, `dew-typology`, `lsc-catalog`, `ohio-session-laws`, `ohio-bill-versions`, `ohio-bills`, `ohio-auditor`, `census-geography`, `dew-child-nutrition`, `dew-school-improvement`, `dew-nonpublic-enrollment`, `jhu-homeschool-hub`. Those are the connectors added after the original nine stubs, whose prose was never written — the decision record is the only account of why each exists.
 <!-- /REGEN -->
 
 A `declared` connector says **what blocks it** — that string is a field on the record, and a

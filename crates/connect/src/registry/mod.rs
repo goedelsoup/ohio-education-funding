@@ -42,6 +42,7 @@ mod census;
 mod courts;
 mod dew;
 mod eia;
+mod jhu;
 mod lsc;
 mod nces;
 mod ofcc;
@@ -221,6 +222,7 @@ pub const CONNECTORS: &[Connector] = &[
     dew::CHILD_NUTRITION,
     dew::SCHOOL_IMPROVEMENT,
     dew::NONPUBLIC_ENROLLMENT,
+    jhu::HOMESCHOOL_HUB,
 ];
 
 /// Look up a connector by key.
