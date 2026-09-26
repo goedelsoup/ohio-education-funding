@@ -106,9 +106,10 @@ What that bought:
 - Every page is complete before any script runs. Figures, tables, and charts are all in the
   document — the charts as SVG, not as a canvas drawn on load. `/compare` was the last exception
   and is not one any more: it ships the pair it is seeded with, and a reader who changes the pair
-  fetches **two files of about a kilobyte** rather than the 641 KB panel. Measured at
-  400 Kbps / 400 ms RTT, the table went from **4,340 ms** to 1,688 ms with a query and to *first
-  paint, with nothing fetched at all*, without one.
+  fetches **two files of a couple of kilobytes each** rather than the whole panel — 1.24 MB today,
+  and 641 KB when the timings below were taken. Measured at 400 Kbps / 400 ms RTT, the table went
+  from **4,340 ms** to 1,688 ms with a query and to *first paint, with nothing fetched at all*,
+  without one.
 - A search engine, a screen reader, and a text browser all get the whole page.
 - 3,487 pages build in about 54 seconds, on eight cores. Not the 5 seconds this line used to
   claim, and worth knowing before reaching for a rebuild: page emission is nearly all of it, three
@@ -1057,11 +1058,11 @@ Fields: bundle contract version, feed list, last export timestamp, node counts p
 -->
 | Field | Value |
 |---|---|
-| Contract version | `47.0.0` |
+| Contract version | `48.0.0` |
 | Districts in the feed | 609 |
-| Reference checkpoints | 11 |
+| Reference checkpoints | 13 |
 | Reference forecasts | 4 |
-| Size | 6750 KB |
+| Size | 6772 KB |
 | Deployment target | Cloudflare Pages, static, with a CSP in `web/public/_headers` |
 
 Regenerate with `cargo run --manifest-path crates/Cargo.toml -p bundle > web/public/data/bundle.json`. CI fails if the committed feed and a fresh one differ.

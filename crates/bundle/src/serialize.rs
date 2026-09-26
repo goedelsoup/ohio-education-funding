@@ -904,6 +904,7 @@ impl Bundle {
                 o.num("general_funding_base", d.general_funding_base);
                 o.num("dpia_funding_base", d.dpia_funding_base);
                 o.num("fy21_funding_base", d.fy21_funding_base);
+                o.num("guarantee_in_fy21_base", d.guarantee_in_fy21_base);
                 o.num("dpia_econ_disadvantaged_adm", d.dpia_econ_disadvantaged_adm);
                 o.num("dpia_directly_certified_adm", d.dpia_directly_certified_adm);
                 // Eight places, not four. The index is read off a scale whose top is the

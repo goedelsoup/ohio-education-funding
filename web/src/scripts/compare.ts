@@ -13,8 +13,8 @@
  * 4,131 ms, table 4,340 ms. Three seconds of an empty box. That was the last open half of #111.
  *
  * Now the picker's `<option>` list is the only district index the browser needs — it already holds
- * every name, qualified, because `compare.astro` writes it — and a pair costs two files of about a
- * kilobyte each. A bare `/compare` fetches **nothing**: the document it was served is already the
+ * every name, qualified, because `compare.astro` writes it — and a pair costs two files of a
+ * couple of kilobytes each. A bare `/compare` fetches **nothing**: the document it was served is already the
  * comparison it is about, which the card says in `data-a`/`data-b`.
  */
 

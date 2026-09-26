@@ -1322,12 +1322,14 @@ mod tests {
         // They gate different things — the scenario builder and the projection band — and the
         // page reports them as two numbers. One combined count would match neither.
         //
-        // Eleven, not eight: Stage 3 added three levers and a checkpoint for each, because a
-        // lever no checkpoint moves is a lever the browser is never required to implement. That
-        // rule is `bundle/tests/every_lever_is_checkpointed.rs`; this is the count it produced.
+        // Thirteen, not eight: Stage 3 added three levers and a checkpoint for each, because a
+        // lever no checkpoint moves is a lever the browser is never required to implement, and
+        // two more followed for the backstop — which had been a `PolicyShape` field no checkpoint
+        // moved at all, in either direction, for as long as it existed. That rule is
+        // `bundle/tests/every_lever_is_checkpointed.rs`; this is the count it produced.
         let status = bundle_status(&repository_root());
         assert!(
-            status.contains("| Reference checkpoints | 11 |"),
+            status.contains("| Reference checkpoints | 13 |"),
             "{status}"
         );
         assert!(status.contains("| Reference forecasts | 4 |"), "{status}");

@@ -67,13 +67,17 @@ export interface Policy {
    * contains the guarantee, so retiring the guarantee with this left `"as-enacted"` moves 90.9%
    * of the apparent saving onto `[K]` rather than saving it.
    *
-   * Mirrors two of the three values of `project::policy::Backstop`. The third, `rebased`, keeps
-   * Section 265.225 and recomputes `[L1]` without the guarantee inside it; it prices a removal at
-   * -$253.6M against -$79.8M here. It is absent because the feed carries `fy21_funding_base` and
-   * not the guarantee inside it, so the minuend that reading changes does not reach the browser —
-   * #490.
+   * Mirrors all three values of `project::policy::Backstop`, and three is the point: the readings
+   * are not near each other. A guarantee removal prices at -$79.8M with the section left as
+   * enacted, -$253.6M with `[L1]` recomputed without the guarantee inside it, and -$942.5M with
+   * the section repealed. Which of those a reader sees is a reading of four sentences of
+   * uncodified law, not a modelling detail.
+   *
+   * `rebased` needs a quantity the department does not publish — the guarantee term inside `[L1]`,
+   * carried per district as `guarantee_in_fy21_base` — which is why the feed had to widen before
+   * this could. Two checkpoints hold this arithmetic to the crate's.
    */
-  backstop: "as-enacted" | "repealed";
+  backstop: "as-enacted" | "repealed" | "rebased";
 }
 
 /**
@@ -494,10 +498,23 @@ export function apply(
   // Both sides come from the same construction rather than one being read from the published
   // column, so the cent of drift in recovering transportation cancels instead of registering as
   // movement. Mirrors `project::policy::apply`.
+  //
+  // Three arms rather than a branch over two, because the third changes the *minuend*: `rebased`
+  // reads the section as a hold-harmless against the formula a district was on rather than against
+  // the total it was paid, so it tops up to `[L1]` less the guarantee that was inside `[L1]`. That
+  // subtrahend is joined from two published files by `project::transition_base` and reaches here
+  // only as a feed column. Mirrors `project::hold_harmless::transition_supplement_rebased`.
   const transitionSupplement =
     p.backstop === "repealed"
       ? 0
-      : Math.max(0, d.fy21_funding_base - (realizedAid + transportation));
+      : Math.max(
+          0,
+          d.fy21_funding_base -
+            (p.backstop === "rebased" ? d.guarantee_in_fy21_base : 0) -
+            (realizedAid + transportation),
+        );
+  // The baseline is current law by construction, so it takes the as-enacted reading whatever the
+  // policy does — `delta` is against the section as it stands, not against the reading being run.
   const baselineTransitionSupplement = Math.max(
     0,
     d.fy21_funding_base - (baselineRealizedAid + baselineTransportation),

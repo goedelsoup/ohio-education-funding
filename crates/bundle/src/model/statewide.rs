@@ -137,17 +137,20 @@ pub struct PolicyShape {
     pub phase_in_dpia: f64,
     /// Weight on directly certified ADM in the DPIA count. Current law is 0.35.
     pub dpia_directly_certified_weight: f64,
-    /// What happens to the formula transition supplement: `as-enacted` or `repealed`.
+    /// What happens to the formula transition supplement: `as-enacted`, `repealed`, or `rebased`.
     ///
-    /// Two of the three values `project::policy::Backstop` carries. The third, `rebased`, keeps the
-    /// section and recomputes `[L1]` without the guarantee inside it — which needs a per-district
-    /// column this feed does not have, so no checkpoint moves it and the browser cannot be held to
-    /// the crate for it. Tracked as #490.
+    /// All three readings `project::policy::Backstop` carries. `rebased` keeps Section 265.225 and
+    /// recomputes `[L1]` without the guarantee inside it, which is why
+    /// [`District::guarantee_in_fy21_base`] is a column of this feed: the browser's mirror cannot
+    /// subtract a term it has not been given.
     ///
-    /// Serialized even though every checkpoint holds it at `as-enacted`, so the browser's mirror
-    /// reads it rather than assuming it. A lever the feed does not carry is a lever the two
-    /// implementations can come to disagree about silently, which is what happened to
-    /// `phase-in-dpia`.
+    /// Two checkpoints move it, both paired with a guarantee removal, because at current law the
+    /// section does not move and all three readings would price at zero. That pairing is what makes
+    /// the third reading verifiable rather than merely present — see
+    /// `tests/every_lever_is_checkpointed.rs`, whose own field list stopped at nine for as long as
+    /// this field went unchecked.
+    ///
+    /// [`District::guarantee_in_fy21_base`]: crate::District::guarantee_in_fy21_base
     pub backstop: &'static str,
     /// Per-pupil rate at the top of the supplemental targeted assistance scale. Current law is
     /// zero, the tier having been repealed.

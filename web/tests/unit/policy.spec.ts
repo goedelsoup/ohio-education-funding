@@ -25,6 +25,12 @@ import {
 } from "../../src/lib/statewide.ts";
 import { povertyQuintiles } from "../../src/lib/outcomes.ts";
 import { medianTrace } from "../../src/lib/relationships.ts";
+import {
+  defaultLevers,
+  renderDistrictScenario,
+  toPolicy as policyOf,
+  type Levers,
+} from "../../src/lib/scenario.ts";
 import { REQUIRED_CONTRACT, type Bundle } from "../../src/lib/types.ts";
 
 const bundle: Bundle = JSON.parse(
@@ -97,6 +103,51 @@ test("repealing the backstop beside it saves what both cost", () => {
   ).toBeLessThan(1);
   expect(t.onGuarantee).toBe(0);
   expect(t.losers).toBeGreaterThan(bundle.statewide.on_guarantee);
+});
+
+/*
+ * And the third reading, which is neither of the two above and is the reason the lever has a
+ * control rather than a fallback.
+ *
+ * `rebased` keeps Section 265.225 and tops a district up to `[L1]` less the guarantee that was
+ * inside `[L1]`, so what the section makes good is the shortfall against the *formula* a district
+ * was on rather than against the total it was paid. The figure is asserted against
+ * `crates/project`'s own test of the same question rather than against a ratio, because the point
+ * of the number is that it is not near either of its neighbours: -$79.8M, -$253.6M, -$942.5M.
+ *
+ * It is also the one reading whose arithmetic needs a column the department does not publish. A
+ * browser that ignored `guarantee_in_fy21_base` would reproduce the as-enacted figure here and
+ * this would be the test that said so.
+ */
+test("re-basing the backstop instead prices between the other two readings", () => {
+  const outcomes = applyAll(
+    bundle.districts,
+    { ...currentLaw(model), guarantee: { kind: "removed" }, backstop: "rebased" },
+    model,
+  );
+  const t = totals(outcomes);
+  // `crates/project/tests/what_retiring_the_guarantee_actually_saves.rs`.
+  expect(t.cost).toBeCloseTo(-253_566_561.87, 1);
+  const asEnacted = totals(
+    applyAll(bundle.districts, { ...currentLaw(model), guarantee: { kind: "removed" } }, model),
+  );
+  const repealed = totals(
+    applyAll(
+      bundle.districts,
+      { ...currentLaw(model), guarantee: { kind: "removed" }, backstop: "repealed" },
+      model,
+    ),
+  );
+  expect(t.cost).toBeLessThan(asEnacted.cost);
+  expect(t.cost).toBeGreaterThan(repealed.cost);
+
+  // 261 of the 609 move and 348 do not, which is a fact about the section rather than about the
+  // guarantee: a district whose guarantee was already inside `[L1]` at or above what the formula
+  // pays it loses nothing when the subtrahend is taken out.
+  expect(t.losers).toBe(261);
+  expect(t.gainers).toBe(0);
+  expect(t.districts - t.losers).toBe(348);
+  expect(t.onGuarantee).toBe(0);
 });
 
 test("no guarantee policy reaches a district the formula already pays", () => {
@@ -414,4 +465,60 @@ test("the dollar fields are checked at the same tolerance as the rest", () => {
   const clean = bundle.checkpoints[1]!;
   expect(compare(feed, { ...clean, formula_aid: clean.formula_aid + 0.5 }).agrees).toBe(true);
   expect(compare(feed, { ...clean, formula_aid: clean.formula_aid + 1.5 }).agrees).toBe(false);
+});
+
+/**
+ * A lever the current-law comparison did not read is a lever the page says nothing moved on.
+ *
+ * # The defect
+ *
+ * `isCurrentLaw` decides whether `/scenario` renders the outcome tiles or the card that reads
+ * *"nothing moves"*. It asked `samePolicy`, and `samePolicy` compared a hand-written list of six
+ * fields while `Policy` had nine. So a reader who moved *only* the transportation floor, only the
+ * supplemental rate, only the DPIA blend — or, once it had a control, only the backstop — was shown
+ * the card that says the settings are the department's own and the page has nothing to report.
+ *
+ * Repealing Section 265.225 on its own is the sharpest case: `[K]` pays $63.6M at current law, and
+ * the page called that current law.
+ *
+ * # Why it is tested from the outside
+ *
+ * `samePolicy` and `isCurrentLaw` are module-private, and should stay so — the behaviour that
+ * matters is not that two objects compare equal but that the page renders the outcome rather than
+ * the card. `renderDistrictScenario` is that surface: it asks the same predicate, and its
+ * current-law branch is the only thing that emits `data-part="current-law"`. Its statewide sibling
+ * `renderScenario` asks it too, but draws the distribution with Observable Plot and so needs a
+ * document this suite deliberately does not have — see `vitest.config.ts`.
+ *
+ * Each row asserts both halves: that the card is gone, and that the lever moves districts. Without
+ * the second half a lever that did nothing at all would pass.
+ */
+test("a scenario that moves one lever and nothing else is not reported as current law", () => {
+  const { bundle } = loadFeed();
+  const model = modelOf(bundle.statewide);
+  const law = defaultLevers(model);
+  const irn = bundle.districts[0]!.irn;
+
+  // Current law itself still renders the card, or the assertions below would hold vacuously.
+  expect(renderDistrictScenario(bundle, law, irn)).toContain('data-part="current-law"');
+
+  const alone: [string, Partial<Levers>][] = [
+    ["the backstop repealed", { backstop: "repealed" }],
+    ["the backstop re-based", { backstop: "rebased" }],
+    ["the DPIA blend", { dpiaBlend: 0 }],
+    ["the supplemental rate", { supplementalTopRate: 750 }],
+    ["the transportation floor", { transportationFloor: 0.75 }],
+  ];
+
+  for (const [what, override] of alone) {
+    const levers = { ...law, ...override };
+    const reached = totals(applyAll(bundle.districts, policyOf(levers), model));
+    expect(reached.gainers + reached.losers, `${what} moves no district`).toBeGreaterThan(0);
+
+    const rendered = renderDistrictScenario(bundle, levers, irn);
+    expect(rendered, `${what} was reported as current law`).not.toContain(
+      'data-part="current-law"',
+    );
+    expect(rendered, `${what} rendered no outcome`).toContain('data-part="outcome"');
+  }
 });

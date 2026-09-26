@@ -116,9 +116,9 @@ const HISTORICAL: Record<string, Allowance> = {
     reason: "H.B. 96 holding cost inputs at FY2022 through FY2027 — an act's terms, not a label.",
   },
   "components/ScenarioControls.astro": {
-    allowed: ["FY2019", "FY2020", "FY2022"],
+    allowed: ["FY2019", "FY2020", "FY2021", "FY2022"],
     reason:
-      "Lever names: the FY2022 cost inputs and the FY2020 floor are what the levers *are*, and renaming them with a derived year would make the control describe something else. FY2019 joins them as the DPIA phase-in's own anchor — R.C. 3317.02(N)(2) bases it on the FY2019 DPIA payment while the general term uses FY2020, and the note exists to say the two dials interpolate from different years.",
+      "Lever names: the FY2022 cost inputs and the FY2020 floor are what the levers *are*, and renaming them with a derived year would make the control describe something else. FY2019 joins them as the DPIA phase-in's own anchor — R.C. 3317.02(N)(2) bases it on the FY2019 DPIA payment while the general term uses FY2020, and the note exists to say the two dials interpolate from different years. FY2021 is the third of the same kind and the sharpest: Section 265.225 names that year's total and no other, so the three readings of the backstop are readings of an FY2021 base — a derived year there would describe a section that does not exist.",
   },
   "pages/scenario.astro": {
     allowed: ["FY2022"],
