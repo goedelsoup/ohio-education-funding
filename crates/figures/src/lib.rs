@@ -2884,6 +2884,24 @@ pub struct Guarantee {
     pub rebase: project::report::PolicyEffect,
     /// A rebase of the floor to 90%, §265.225 repealed alongside.
     pub rebase_and_backstop: project::report::PolicyEffect,
+    /// Removal, §265.225 standing but measured against a base with no guarantee inside it.
+    ///
+    /// The third reading, and the one the node carried as `[open]` until the guarantee inside
+    /// `[L1]` could be split out of two other published files — see `project::transition_base`.
+    pub removal_and_a_guarantee_free_base: project::report::PolicyEffect,
+    /// A half phase-out, on the same guarantee-free base.
+    pub half_and_a_guarantee_free_base: project::report::PolicyEffect,
+    /// A rebase of the floor to 90%, on the same guarantee-free base.
+    pub rebase_and_a_guarantee_free_base: project::report::PolicyEffect,
+    /// The guarantee-free base with the guarantee itself left entirely alone.
+    ///
+    /// Not a null run: `[K]` holds a district at a FY2021 total that contains a guarantee it is
+    /// also still being paid, so taking the guarantee out of the base cuts the supplement before
+    /// any bill touches `[I]`.
+    pub a_guarantee_free_base_alone: project::report::PolicyEffect,
+    /// What the previous formula's guarantee contributes to `[L1]`, across the 611 districts the
+    /// department publishes a base for.
+    pub guarantee_inside_the_base: f64,
     /// Whom a guarantee-only retirement reaches, and whom the backstop makes whole.
     ///
     /// Measured on total state support rather than on `scenario-delta`'s table, which is built from
@@ -3362,6 +3380,22 @@ impl Inputs {
                     half_and_backstop: at(half, Backstop::Repealed),
                     rebase: at(rebase, Backstop::AsEnacted),
                     rebase_and_backstop: at(rebase, Backstop::Repealed),
+                    removal_and_a_guarantee_free_base: at(
+                        GuaranteeRule::Removed,
+                        Backstop::Rebased,
+                    ),
+                    half_and_a_guarantee_free_base: at(half, Backstop::Rebased),
+                    rebase_and_a_guarantee_free_base: at(rebase, Backstop::Rebased),
+                    a_guarantee_free_base_alone: project::report::simulate(
+                        &panel_for_guarantee,
+                        &project::policy::Policy {
+                            backstop: Backstop::Rebased,
+                            ..project::policy::Policy::current_law()
+                        },
+                    ),
+                    guarantee_inside_the_base: project::transition_base::guarantee_in_fy21_base()
+                        .values()
+                        .sum(),
                     retirement: project::hold_harmless::retirement(
                         &panel_for_guarantee,
                         GuaranteeRule::Removed,
@@ -13418,6 +13452,105 @@ pub static FIGURES: &[Figure] = &[
         pinned: 311_801_221.99,
         tolerance: 0.005,
         compute: |i| -i.guarantee.rebase_and_backstop.cost(),
+    },
+    // ---- and the third reading of Section 265.225, which the node carried as `[open]` ----------
+    //
+    // §265.225 could stand and be recomputed against a base that never contained a guarantee. The
+    // node refused the reading because `[L1]` is published as one column; `project::transition_base`
+    // splits it by joining the department's FY2019 payment report to its FY2021 funding bases, and
+    // asserts the identity that licenses the join. These are the figures that reading produces.
+    Figure {
+        key: "project/guarantee-removal-saving-with-the-backstop-rebased",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same removal with Section 265.225 standing but recomputed against a base with \
+                no guarantee inside it -- the middle answer, and 26.9% of what repeal saves",
+        pinned: 253_566_561.87,
+        tolerance: 0.005,
+        compute: |i| -i.guarantee.removal_and_a_guarantee_free_base.cost(),
+    },
+    Figure {
+        key: "project/guarantee-half-phase-out-saving-with-the-backstop-rebased",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same half phase-out against a base with no guarantee inside it",
+        pinned: 210_354_185.71,
+        tolerance: 0.005,
+        compute: |i| -i.guarantee.half_and_a_guarantee_free_base.cost(),
+    },
+    Figure {
+        key: "project/guarantee-rebase-saving-with-the-backstop-rebased",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same rebase of the floor against a base with no guarantee inside it",
+        pinned: 148_465_354.04,
+        tolerance: 0.005,
+        compute: |i| -i.guarantee.rebase_and_a_guarantee_free_base.cost(),
+    },
+    Figure {
+        // The third column is not a blend of the other two: it keeps a range of its own, so which
+        // guarantee rule a bill picks still moves the price under it.
+        key: "project/guarantee-rules-range-with-the-backstop-rebased",
+        owner: "crates/project",
+        unit: Unit::Ratio,
+        label: "How far apart the three guarantee rules are when Section 265.225 is recomputed \
+                against a guarantee-free base -- against 3.54 gross and 1.21 as enacted",
+        pinned: 1.707_917_4,
+        tolerance: 0.000_1,
+        compute: |i| {
+            i.guarantee.removal_and_a_guarantee_free_base.cost()
+                / i.guarantee.rebase_and_a_guarantee_free_base.cost()
+        },
+    },
+    Figure {
+        // The reading that the third column prices a guarantee retirement, refuted. It is a live
+        // amendment to Section 265.225 on its own.
+        key: "project/backstop-rebasing-saving-with-the-guarantee-untouched",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What recomputing Section 265.225 against a guarantee-free base saves with the \
+                guarantee left entirely alone -- all of it inside `[K]`, none of it foundation aid",
+        pinned: 21_274_914.30,
+        tolerance: 0.005,
+        compute: |i| -i.guarantee.a_guarantee_free_base_alone.cost(),
+    },
+    Figure {
+        key: "project/guarantee-retirement-districts-cut-with-the-backstop-rebased",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts cut when Section 265.225 is recomputed against a guarantee-free base -- \
+                short of the 294 the guarantee pays, because 44 are still held whole",
+        pinned: 261.0,
+        tolerance: 0.0,
+        compute: |i| i.guarantee.removal_and_a_guarantee_free_base.losers() as f64,
+    },
+    Figure {
+        key: "project/districts-drawing-a-rebased-transition-supplement",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts the supplement pays once the guarantee is removed and its base rebased \
+                -- against 294 with the base as published and 144 under current law",
+        pinned: 263.0,
+        tolerance: 0.0,
+        compute: |i| {
+            i.guarantee
+                .removal_and_a_guarantee_free_base
+                .outcomes
+                .iter()
+                .filter(|outcome| outcome.transition_supplement > 0.005)
+                .count() as f64
+        },
+    },
+    Figure {
+        // The quantity the whole reading turns on, and the one the department does not publish.
+        key: "project/guarantee-inside-the-fy2021-funding-base",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The previous formula's guarantee inside `[L1]`, joined from the FY2019 payment \
+                report -- the whole of what FY2019 paid, because the base defaults to line A",
+        pinned: 256_985_672.30,
+        tolerance: 0.005,
+        compute: |i| i.guarantee.guarantee_inside_the_base,
     },
     Figure {
         // The node stated this figure as a *saving* in one field and $87.9m -- a tenth of the

@@ -456,24 +456,24 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1954 | supported by a committed primary source |
+| `[verified]` | 1962 | supported by a committed primary source |
 | `[inference]` | 384 | drawn from verified facts, not witnessed |
-| `[open]` | 213 | a live question — unknown, contested, or being worked |
+| `[open]` | 211 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-213 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+211 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 95 | 0 |
+| `findings` | 94 | 0 |
 | `description` | 43 | 0 |
-| `revisions` | 10 | 0 |
+| `revisions` | 11 | 0 |
 | `series` | 7 | 0 |
 | `unpriced` | 5 | 0 |
 | `mechanism` | 5 | 0 |
 | `amount` | 5 | 0 |
-| `statutory_basis` | 4 | 0 |
 | `vetoes` | 3 | 0 |
+| `statutory_basis` | 3 | 0 |
 | `roles` | 3 | 0 |
 | `restriction` | 3 | 0 |
 | `eligibility` | 3 | 0 |
@@ -496,11 +496,10 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `effective_note` | 1 | 0 |
 | `district_funding_effect` | 1 | 0 |
 | `context` | 1 | 0 |
-| `confidence` | 1 | 0 |
 | `calculator` | 1 | 0 |
 | `appropriating_bill` | 1 | 0 |
 
-**108 recorded withdrawals across 48 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**110 recorded withdrawals across 48 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Relationship vocabulary
@@ -585,7 +584,7 @@ Sorted by: kind, then alphabetically.
 | [`fsfp-disadvantaged-pupil-impact-aid`](formula-component/fsfp-disadvantaged-pupil-impact-aid.yml) | formula-component | FSFP Disadvantaged Pupil Impact Aid | 3 | 7 |
 | [`fsfp-english-learner-weights`](formula-component/fsfp-english-learner-weights.yml) | formula-component | FSFP English Learner Weights | 5 | 5 |
 | [`fsfp-enrolment-supplements`](formula-component/fsfp-enrolment-supplements.yml) | formula-component | FSFP Base and Enrollment Growth Supplements | 7 | 4 |
-| [`fsfp-formula-transition-supplement`](formula-component/fsfp-formula-transition-supplement.yml) | formula-component | FSFP Formula Transition Supplement | 8 | 8 |
+| [`fsfp-formula-transition-supplement`](formula-component/fsfp-formula-transition-supplement.yml) | formula-component | FSFP Formula Transition Supplement | 9 | 8 |
 | [`fsfp-gifted-units`](formula-component/fsfp-gifted-units.yml) | formula-component | FSFP Gifted Identification and Units | 4 | 3 |
 | [`fsfp-jvsd-state-share-of-base-cost`](formula-component/fsfp-jvsd-state-share-of-base-cost.yml) | formula-component | FSFP JVSD State Share of Base Cost | 6 | 2 |
 | [`fsfp-local-capacity-measure`](formula-component/fsfp-local-capacity-measure.yml) | formula-component | FSFP Local Capacity Measure | 11 | 13 |
@@ -672,7 +671,7 @@ Sorted by: kind, then alphabetically.
 | [`title-i`](revenue-stream/title-i.yml) | revenue-stream | Title I, Part A | 5 | 5 |
 | [`tpp-replacement-payments`](revenue-stream/tpp-replacement-payments.yml) | revenue-stream | Tangible Personal Property Tax Replacement Payments | 6 | 7 |
 | [`fsfp-input-year-refresh`](scenario/fsfp-input-year-refresh.yml) | scenario | FSFP Cost Input Refresh vs. Freeze | 10 | 10 |
-| [`guarantee-phase-out`](scenario/guarantee-phase-out.yml) | scenario | Phasing Out the Temporary Transitional Aid Guarantee | 12 | 5 |
+| [`guarantee-phase-out`](scenario/guarantee-phase-out.yml) | scenario | Phasing Out the Temporary Transitional Aid Guarantee | 12 | 6 |
 | [`anton-grdina`](school/anton-grdina.yml) | school | Anton Grdina | 7 | 1 |
 | [`barrington-road-elementary`](school/barrington-road-elementary.yml) | school | Barrington Road Elementary School | 4 | 2 |
 | [`sheridan-high-school`](school/sheridan-high-school.yml) | school | Sheridan High School | 6 | 2 |

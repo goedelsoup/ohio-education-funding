@@ -67,7 +67,11 @@ export interface Policy {
    * contains the guarantee, so retiring the guarantee with this left `"as-enacted"` moves 90.9%
    * of the apparent saving onto `[K]` rather than saving it.
    *
-   * Mirrors `project::policy::Backstop`.
+   * Mirrors two of the three values of `project::policy::Backstop`. The third, `rebased`, keeps
+   * Section 265.225 and recomputes `[L1]` without the guarantee inside it; it prices a removal at
+   * -$253.6M against -$79.8M here. It is absent because the feed carries `fy21_funding_base` and
+   * not the guarantee inside it, so the minuend that reading changes does not reach the browser —
+   * #490.
    */
   backstop: "as-enacted" | "repealed";
 }

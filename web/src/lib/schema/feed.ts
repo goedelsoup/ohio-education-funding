@@ -1222,8 +1222,8 @@ export const DraftProvisionSchema = z
     (p) =>
       p.lever === "" ||
       p.lever === "guarantee" ||
-      // `backstop` is a word too: Section 265.225 either stands or is repealed, and there is no
-      // fraction of a repeal.
+      // `backstop` is a word too: Section 265.225 stands or is repealed, and there is no fraction
+      // of a repeal. The crate has a third word for it that this schema does not (#490).
       p.lever === "backstop" ||
       (p.proposed.trim() !== "" && Number.isFinite(Number(p.proposed))),
     { message: "a numeric lever's `proposed` must parse as a finite number", path: ["proposed"] },

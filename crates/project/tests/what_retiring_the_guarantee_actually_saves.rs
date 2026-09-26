@@ -1,26 +1,42 @@
-//! What the three guarantee policies save, under each of the two things §265.225 could do.
+//! What the three guarantee policies save, under each of the three things §265.225 could do.
 //!
 //! `scenario/guarantee-phase-out` published its savings table against a model in which `[K]`, the
 //! formula transition supplement of uncodified Section 265.225, did not exist. Those figures were
 //! unbound prose, so nothing in this repository could see them go stale. This file is the pin.
 //!
-//! # The two answers, and why the node reports both
+//! # The three answers, and why the node reports all of them
 //!
 //! `[I]` is a term in `[K]`'s own subtrahend, so the supplement **backstops the guarantee**. That
-//! makes "retire the guarantee" two different bills:
+//! makes "retire the guarantee" three different bills:
 //!
-//! | | `[K]` as enacted | `[K]` repealed alongside |
-//! |---|--:|--:|
-//! | removal | −$79.8m | −$942.5m |
-//! | half phase-out | −$70.8m | −$503.1m |
-//! | rebase to 90% | −$66.2m | −$311.8m |
+//! | | `[K]` as enacted | `[K]` repealed alongside | `[K]` rebased |
+//! |---|--:|--:|--:|
+//! | removal | −$79.8m | −$942.5m | −$253.6m |
+//! | half phase-out | −$70.8m | −$503.1m | −$210.4m |
+//! | guarantee rebased to 90% | −$66.2m | −$311.8m | −$148.5m |
 //!
-//! Neither column is the finding. The left one is current law and says a guarantee retirement is
+//! No column is the finding. The first is current law and says a guarantee retirement is
 //! **nearly free and nearly policy-invariant** — three policies whose gross effect on foundation
 //! aid spans $248.2m to $879.0m come to within $13.6m of each other once the backstop has
-//! answered, which is a 3.5-fold range collapsing to a 1.2-fold one. The right one is what
+//! answered, which is a 3.5-fold range collapsing to a 1.2-fold one. The second is what
 //! "retiring the guarantee" means as a policy, and it is where the range survives. A node
 //! reporting one of them re-creates the defect: the gap between the columns *is* the finding.
+//!
+//! # The third column, which the node used to carry as `[open]`
+//!
+//! Repeal is not the only way a legislature that retires `[I]` can decline to pay it back through
+//! `[K]`. §265.225 could stand and be recomputed against a base that never contained a guarantee:
+//! the supplement still holds a district at its FY2021 total, but at an FY2021 total with the
+//! previous formula's guarantee taken out of it. That is `Backstop::Rebased`, and it is the
+//! reading the node refused, because `[L1]` is published as a single column and the department
+//! never breaks out the guarantee inside it. The split is joined out of two other published files
+//! by `project::transition_base`, which asserts the identity that licenses the join.
+//!
+//! It is the middle answer on every one of the three policies, and it is not a blend: the range
+//! across the three policies is 1.71x, not 1.21x and not 3.54x, so a bill's choice of guarantee
+//! rule still matters under it. Two of its properties are worth stating separately, because both
+//! are easy to assume away — rebasing cuts `[K]` even with `[I]` left completely alone
+//! (`−$21.3m`), and it is nowhere near additive with the guarantee bill it accompanies.
 //!
 //! # What the manifest carries and what this file carries
 //!
@@ -46,6 +62,11 @@ fn rules() -> [(&'static str, GuaranteeRule); 3] {
     ]
 }
 
+/// The three things §265.225 could do while `[I]` is being retired.
+fn backstops() -> [Backstop; 3] {
+    [Backstop::AsEnacted, Backstop::Repealed, Backstop::Rebased]
+}
+
 fn cost(guarantee: GuaranteeRule, backstop: Backstop) -> f64 {
     simulate(
         &panel(),
@@ -58,11 +79,11 @@ fn cost(guarantee: GuaranteeRule, backstop: Backstop) -> f64 {
     .cost()
 }
 
-/// Every one of the six figures is a **saving**, and the manifest states none of their signs.
+/// Every one of the nine figures is a **saving**, and the manifest states none of their signs.
 #[test]
-fn every_guarantee_policy_costs_the_state_less_under_both_answers() {
+fn every_guarantee_policy_costs_the_state_less_under_all_three_answers() {
     for (label, rule) in rules() {
-        for backstop in [Backstop::AsEnacted, Backstop::Repealed] {
+        for backstop in backstops() {
             let measured = cost(rule, backstop);
             assert!(
                 measured < 0.0,
@@ -72,9 +93,9 @@ fn every_guarantee_policy_costs_the_state_less_under_both_answers() {
     }
 }
 
-/// The six figures the node quotes, to the cent.
+/// The nine figures the node quotes, to the cent.
 #[test]
-fn the_six_savings_are_what_the_node_states() {
+fn the_nine_savings_are_what_the_node_states() {
     let expected = [
         (GuaranteeRule::Removed, Backstop::AsEnacted, -79_813_629.47),
         (GuaranteeRule::Removed, Backstop::Repealed, -942_533_256.86),
@@ -97,6 +118,17 @@ fn the_six_savings_are_what_the_node_states() {
             GuaranteeRule::Rebased { factor: 0.9 },
             Backstop::Repealed,
             -311_801_221.99,
+        ),
+        (GuaranteeRule::Removed, Backstop::Rebased, -253_566_561.87),
+        (
+            GuaranteeRule::PhasedOut { remaining: 0.5 },
+            Backstop::Rebased,
+            -210_354_185.71,
+        ),
+        (
+            GuaranteeRule::Rebased { factor: 0.9 },
+            Backstop::Rebased,
+            -148_465_354.04,
         ),
     ];
     for (rule, backstop, want) in expected {
@@ -131,6 +163,99 @@ fn the_backstop_collapses_three_policies_into_one_price() {
         "{}",
         under(Backstop::AsEnacted)
     );
+    // Rebasing `[K]` recovers part of the range and not most of it: 1.71x. It is the answer under
+    // which a bill's choice of guarantee rule is neither decisive nor irrelevant.
+    let rebased = under(Backstop::Rebased);
+    assert!((1.5..2.0).contains(&rebased), "{rebased}");
+    assert!(
+        rebased > under(Backstop::AsEnacted) && rebased < under(Backstop::Repealed),
+        "{rebased}"
+    );
+}
+
+/// Rebasing `[K]` is a bill in its own right, and it is not additive with the guarantee bill.
+///
+/// Two readings of the third column that the figure invites and the model refutes. The first is
+/// that it prices a guarantee retirement: it does not. Recomputing `[L1]` without the guarantee
+/// cuts `[K]` by **$21.3m** with `[I]` left entirely alone, and takes the supplement's population
+/// from 144 districts to **63** — because a district drawing `[K]` today is being held at a
+/// FY2021 total that contains a guarantee it is *also* still being paid, and 81 of the 144 are
+/// held there by nothing else. Rebasing is a live §265.225 amendment whether or not `[I]` moves.
+///
+/// The second is that the column is the sum of its parts: removal under a rebased `[K]` saves
+/// $253.6m, and $79.8m + $21.3m is $101.1m. The interaction is the larger half of the figure,
+/// because the same dollars cannot be taken out of the base and out of realized aid twice.
+#[test]
+fn rebasing_the_supplement_cuts_it_before_any_guarantee_bill_and_does_not_add() {
+    let panel = panel();
+    let alone = simulate(
+        &panel,
+        &Policy {
+            backstop: Backstop::Rebased,
+            ..Policy::current_law()
+        },
+    );
+    assert!(
+        (alone.cost() + 21_274_914.30).abs() < 0.01,
+        "{:.2}",
+        alone.cost()
+    );
+    assert!(
+        (alone.policy.transition_supplement - 42_303_715.18).abs() < 0.01,
+        "{:.2}",
+        alone.policy.transition_supplement
+    );
+    assert!(
+        (alone.baseline.transition_supplement - 63_578_629.48).abs() < 0.01,
+        "{:.2}",
+        alone.baseline.transition_supplement
+    );
+    // The whole of it is `[K]`: no district's realized aid or transportation moves.
+    assert!(
+        alone.foundation_cost().abs() < 0.01,
+        "{:.2}",
+        alone.foundation_cost()
+    );
+    assert!(
+        alone.transportation_cost().abs() < 0.01,
+        "{:.2}",
+        alone.transportation_cost()
+    );
+    // And it is not a trim: it extinguishes the supplement for 81 of the 144 districts drawing it.
+    let baseline = simulate(&panel, &Policy::current_law());
+    let drawing = |effect: &project::report::PolicyEffect| {
+        effect
+            .outcomes
+            .iter()
+            .filter(|outcome| outcome.transition_supplement > 0.005)
+            .count()
+    };
+    assert_eq!(drawing(&baseline), 144);
+    assert_eq!(drawing(&alone), 63);
+
+    // How many districts the supplement pays once the guarantee is removed, under each answer.
+    // Two of the three are settled by construction — repeal pays nobody, and as enacted the
+    // supplement picks up every one of the 294 districts the guarantee was holding. Only the
+    // rebased count had to be computed, and it is 31 short of that.
+    for (backstop, want) in [
+        (Backstop::AsEnacted, 294),
+        (Backstop::Rebased, 263),
+        (Backstop::Repealed, 0),
+    ] {
+        let effect = simulate(
+            &panel,
+            &Policy {
+                guarantee: GuaranteeRule::Removed,
+                backstop,
+                ..Policy::current_law()
+            },
+        );
+        assert_eq!(drawing(&effect), want, "{backstop:?}");
+    }
+
+    let both = cost(GuaranteeRule::Removed, Backstop::Rebased);
+    let parts = cost(GuaranteeRule::Removed, Backstop::AsEnacted) + alone.cost();
+    assert!(both < parts - 100_000_000.0, "{both:.2} against {parts:.2}");
 }
 
 /// A rebase to 90% does not save a tenth of the guarantee, and the node said both $87.9m and
@@ -168,8 +293,11 @@ fn a_tenth_off_the_floor_is_not_a_tenth_off_the_guarantee() {
 /// districts whole too. Extend the bill to `[K]` and the reach is 311 — past the 294 the guarantee
 /// pays, by the 17 districts that draw `[K]` and were never on the guarantee.
 #[test]
-fn a_guarantee_only_lever_reaches_167_districts_and_both_devices_reach_311() {
+fn the_three_answers_reach_167_261_and_311_districts() {
     let panel = panel();
+    // Whether a district is on the guarantee is a fact about current law, so it is read off a
+    // current-law run — a policy run's own flag is false wherever the policy took the floor away.
+    let law = simulate(&panel, &Policy::current_law());
     for (label, rule) in rules() {
         let alone = simulate(
             &panel,
@@ -199,6 +327,53 @@ fn a_guarantee_only_lever_reaches_167_districts_and_both_devices_reach_311() {
         assert!(
             both.losers() > alone.baseline.on_guarantee,
             "{label}: reaches past the guaranteed population"
+        );
+
+        // Rebasing `[K]` rather than repealing it reaches 261, which is *short* of the 294 the
+        // guarantee pays: 44 guaranteed districts are still held whole, by a supplement measured
+        // against a base that no longer contains a guarantee. It reaches past the guaranteed
+        // population all the same, by 11 districts that were never on the guarantee and lose the
+        // `[K]` the old base was paying them — the same mechanism as repeal's 17, two thirds as
+        // wide.
+        let rebased = simulate(
+            &panel,
+            &Policy {
+                guarantee: rule,
+                backstop: Backstop::Rebased,
+                ..Policy::current_law()
+            },
+        );
+        assert_eq!(rebased.losers(), 261, "{label}");
+        assert_eq!(rebased.unmoved(), 348, "{label}");
+        assert_eq!(rebased.gainers(), 0, "{label}");
+        assert!(
+            rebased.losers() < alone.baseline.on_guarantee && rebased.losers() < both.losers(),
+            "{label}"
+        );
+        let classed = |effect: &project::report::PolicyEffect, guaranteed: bool, cut: bool| {
+            effect
+                .outcomes
+                .iter()
+                .zip(law.outcomes.iter())
+                .filter(|(outcome, base)| {
+                    base.on_guarantee == guaranteed && (outcome.total_delta() < -0.005) == cut
+                })
+                .count()
+        };
+        assert_eq!(
+            classed(&rebased, true, false),
+            44,
+            "{label}: still held whole"
+        );
+        assert_eq!(
+            classed(&rebased, false, true),
+            11,
+            "{label}: cut without ever being on it"
+        );
+        assert_eq!(
+            classed(&both, false, true),
+            17,
+            "{label}: repeal's wider version"
         );
     }
 }

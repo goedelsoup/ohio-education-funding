@@ -49,10 +49,18 @@ findings: |
   lands within one percent of unity for only 6 of 601 districts. `[L1]` is smaller than `[H2]`
   for **seven** districts, which no additive reading permits at all. [verified]
 
-  What `[L1]` is a base *for* is therefore clear from the formula — a FY2021 total formula
-  funding figure, on the same footing as the sum it is compared against — and what it is
-  composed *of* is not established here. The department publishes it as a value, not a
-  derivation. [open]
+  What `[L1]` is a base *for* is clear from the formula — a FY2021 total formula funding figure,
+  on the same footing as the sum it is compared against. What it is composed *of* the department
+  publishes too, in a workbook the calculator does not point at: **seven terms**, which sum to
+  `[L1]` for all 611 districts. [verified]
+  (`crates/project/src/transition_base.rs`, which asserts the sum rather than assuming it)
+
+  The first of those terms is the FY2021 final formula payment with the executive budget
+  reductions restored, and it equals each district's **FY2019** total, because FY2020 and FY2021
+  foundation funding for traditional districts were held flat to FY2019. So the guarantee the
+  *previous* formula paid is a term inside `[L1]`, unallocated — which is what makes a third
+  reading of Section 265.225 computable at all. [verified] See
+  [`guarantee-phase-out`](../scenario/guarantee-phase-out.yml) for what that reading costs.
 
   It is also why the phase-in is less complete than its terminal year suggests. FY2027 is the
   year the Fair School Funding Plan reaches 100% of its computed amount, and in that year **294
@@ -82,6 +90,29 @@ figures:
     as_written: "38 on transportation's**"
 
 revisions:
+  - was: |
+      "What it is composed *of* is not established here. The department publishes it as a value,
+      not a derivation. [open]" — said twice, of `[L1]`, in `findings` and in the statute
+      property.
+    now: |
+      It publishes the derivation as well: seven terms in the foundation funding bases workbook,
+      summing to `[L1]` for all 611 districts, with the FY2021 final formula payment as the first
+      of them. The claim was true of the calculator, which carries `[L1]` as one column, and false
+      of the department, which had published the decomposition in another file the whole time.
+    found_by: |
+      Asking what a bill could do to Section 265.225 other than keep it or repeal it. The third
+      answer needs the guarantee taken out of `[L1]`, so the base had to be decomposed before it
+      could be priced —
+      [`crates/project/src/transition_base.rs`](../../../crates/project/src/transition_base.rs)
+      and
+      [`dew-foundation-funding-bases`](../../catalog/dew-foundation-funding-bases.md).
+    reach: |
+      The value-not-a-derivation claim is what licensed the scenario node to decline the third
+      reading of Section 265.225 as unavailable, and that refusal stood from the phase that
+      recorded it to this one. A
+      recorded gap in what a quantity is composed of is worth re-asking whenever a downstream node
+      cites it as the reason it cannot compute something: the question here was never blocked on
+      access, only on which file was looked in.
   - was: |
       The heading read "Three mechanisms anchored to one year", and the body "Ohio holds
       districts harmless against FY2021 in three places, on three bases".
@@ -182,8 +213,9 @@ properties:
     And the act says what the base is: H.B. 96 extends "a formula transition supplement based on
     an **FY 2021 funding base** to districts, community schools, and STEM schools", which is the
     department's `[L1]` named in the legislature's own words rather than inferred from the
-    formula's shape. [verified] (`lsc-budget`) What it is composed *of* is still not published;
-    the department carries it as a value. [open]
+    formula's shape. [verified] (`lsc-budget`) What it is composed *of* the department publishes
+    as seven terms in its foundation funding bases workbook, and they sum to `[L1]` for all 611
+    districts. [verified] (`crates/project/src/transition_base.rs`)
   calculator: |
     Not a standalone crate. Carried in `crates/project::panel::Transition` and reproduced for all
     609 districts in `crates/project/tests/the_supplements_outside_the_formula.rs`.

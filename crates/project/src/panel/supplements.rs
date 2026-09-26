@@ -554,6 +554,13 @@ pub struct Transition {
     pub open_enrollment_adjustment: Dollars,
     /// `[L1]` — a FY2021 base that includes transportation, unlike `[H2]`.
     pub fy21_funding_base: Dollars,
+    /// How much of `[L1]` is the guarantee the previous formula paid.
+    ///
+    /// **Not a column of the department's model**, which publishes `[L1]` whole. It is joined from
+    /// the two published files [`crate::transition_base`] reads, and the identity that licenses the
+    /// join is asserted there. It exists so that retiring the guarantee can be priced against a
+    /// base that never contained one — see [`crate::policy::Backstop::Rebased`].
+    pub guarantee_in_fy21_base: Dollars,
     /// `[K]` — the second hold-harmless, against that larger base.
     pub transition_supplement: Dollars,
 }

@@ -139,6 +139,11 @@ pub struct PolicyShape {
     pub dpia_directly_certified_weight: f64,
     /// What happens to the formula transition supplement: `as-enacted` or `repealed`.
     ///
+    /// Two of the three values `project::policy::Backstop` carries. The third, `rebased`, keeps the
+    /// section and recomputes `[L1]` without the guarantee inside it — which needs a per-district
+    /// column this feed does not have, so no checkpoint moves it and the browser cannot be held to
+    /// the crate for it. Tracked as #490.
+    ///
     /// Serialized even though every checkpoint holds it at `as-enacted`, so the browser's mirror
     /// reads it rather than assuming it. A lever the feed does not carry is a lever the two
     /// implementations can come to disagree about silently, which is what happened to

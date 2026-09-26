@@ -372,10 +372,20 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * entries through the academic-distress route (0) and the departures through it (1) — which is
  * what the node was short of, since a node that binds every level and no difference holds
  * nothing that can go stale when the thing it describes moves.
+ *
+ * Recomputed at **1137/80** when the third reading of Section 265.225 was priced. No new carrier:
+ * all eight land on `scenario/guarantee-phase-out`, which had sixty-six. Ten more had arrived since
+ * the last recompute without the ratchet moving — the fourth recount running to find the floor
+ * under the count, and the reason both numbers here are read off this test's own expressions. Six
+ * of the eight are the reading the node used to carry as `[open]`: the saving under each of the
+ * three guarantee rules, the range across them, the districts cut, and the guarantee that turns
+ * out to be sitting inside the FY2021 funding base. The other two are what makes it a second
+ * amendment rather than a variant of the first — what recomputing the base saves with the
+ * guarantee left entirely alone, and the population that still draws the supplement afterwards.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1125 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1125,
+  expect(bindings.length, "1137 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1137,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,

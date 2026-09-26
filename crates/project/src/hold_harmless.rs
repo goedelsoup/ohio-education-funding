@@ -397,6 +397,28 @@ pub fn transition_supplement_under(
     (record.transition.fy21_funding_base - (realized_aid + transportation)).max(0.0)
 }
 
+/// The same, against an `[L1]` with the FY2019 guarantee taken out of it.
+///
+/// `max([L1] − the guarantee inside [L1] − (realized aid + transportation), 0)`, which is Section
+/// 265.225 read as a hold-harmless against the *formula* a district was on rather than against the
+/// total it was paid. It is a third reading of the section and not a correction of the other two:
+/// see [`crate::policy::Backstop`].
+///
+/// The subtracted quantity is not a column of the department's model. It is joined from two
+/// published files by [`crate::transition_base`], whose tests assert the identity that licenses
+/// treating the FY2019 guarantee as a term inside `[L1]`.
+#[must_use]
+pub fn transition_supplement_rebased(
+    record: &DistrictRecord,
+    realized_aid: Dollars,
+    transportation: Dollars,
+) -> Dollars {
+    (record.transition.fy21_funding_base
+        - record.transition.guarantee_in_fy21_base
+        - (realized_aid + transportation))
+        .max(0.0)
+}
+
 /// The districts `[K]` insulates against any cut to `[H]`, `[I]` or `[J]`.
 ///
 /// A district already drawing the supplement is held at `[L1]` in total, so a dollar taken off
@@ -624,6 +646,46 @@ mod tests {
             assert_eq!(measured.losers, 167, "{rule:?}");
             assert_eq!(measured.made_whole, 127, "{rule:?}");
         }
+    }
+
+    /// The guarantee inside `[L1]` is a term of it, so taking it out cannot make the base negative.
+    ///
+    /// An "every share is in [0, 1]" assertion passes on a column of zeroes, so the widest share is
+    /// pinned beside it — and it is not small. **75.4%** of West Geauga Local's whole FY2021 base
+    /// is guarantee, nine districts are over half, and 333 of the 609 carry any at all. Which
+    /// district it is is worth noticing: West Geauga is the largest per-pupil loser of a removal
+    /// under the other two readings too, and it is the one that absorbed a dissolved district's
+    /// guarantee — see `crate::transition_base::DISSOLVED`.
+    #[test]
+    fn taking_the_guarantee_out_of_the_base_cannot_overrun_it() {
+        let panel = panel();
+        let share = |record: &DistrictRecord| {
+            record.transition.guarantee_in_fy21_base / record.transition.fy21_funding_base
+        };
+        for record in &panel {
+            assert!(
+                (0.0..=1.0).contains(&share(record)),
+                "{}: {:.2} of a base of {:.2}",
+                record.name,
+                record.transition.guarantee_in_fy21_base,
+                record.transition.fy21_funding_base
+            );
+        }
+        let widest = panel
+            .iter()
+            .max_by(|a, b| share(a).total_cmp(&share(b)))
+            .expect("a panel");
+        assert_eq!(widest.name, "West Geauga Local");
+        assert!(
+            (share(widest) - 0.753_993).abs() < 0.000_001,
+            "{:.6}",
+            share(widest)
+        );
+        assert_eq!(panel.iter().filter(|record| share(record) > 0.5).count(), 9);
+        assert_eq!(
+            panel.iter().filter(|record| share(record) > 0.0).count(),
+            333
+        );
     }
 
     /// A guaranteed district is made whole exactly when it was already drawing `[K]`.

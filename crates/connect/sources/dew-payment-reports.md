@@ -39,6 +39,16 @@ reports for FY2026 and FY2027 at fixed URLs.
 publishes *Foundation Legacy Payment Reports (1999–2021)*, covering the whole deduct era, on its
 reports portal. That portal gates on `sessionStorage.claims` and needs an OH|ID account.
 
-So the era this connector exists for is retrievable-in-principle and behind a login, which is a
-different problem from an absent index and is not one to route around. The open era is wide open,
-and is precisely the era in which the deduction does not exist.
+**And the gated collection overlaps the open one by six years.** The same
+`Districts-Payment-Reports-in-Excel` index that carries FY2026 and FY2027 also carries one final
+settlement per year back to **FY2016** — `FY16_SFPR_FIN_4.XLSX` through `FY21_SFPR_FIN_2.xlsx`, then
+FY2022 forward. Those are deduct-era files, openly served, no credentials. FY2019 and FY2021 have
+been taken; see [`dew-fy19-payment-report`](../../../.yidam/catalog/dew-fy19-payment-report.md).
+
+They carry the deduction this connector exists for, per resident district and per channel: the
+FY2019 report breaks out `COMMUNITY SCHOOL TRANSFER`, `STEM SCHOOL TRANSFER` and
+`SCHOLARSHIP TRANSFER` as separate columns, and the FY2021 report splits the scholarship transfer
+into its Cleveland, autism, EdChoice and Jon Peterson components.
+
+So FY2016 through FY2021 of this connector's range needs no login. What OH|ID still gates is 1999
+through 2015, and a login is a different problem from an absent index and not one to route around.

@@ -110,6 +110,20 @@ pub enum Backstop {
     AsEnacted,
     /// Section 265.225 repealed alongside whatever [`GuaranteeRule`] does to the guarantee.
     Repealed,
+    /// Section 265.225 stands, recomputed against an `[L1]` that never contained a guarantee.
+    ///
+    /// The reading the other two leave out. `[L1]` is a FY2021 base, and a FY2021 base contains the
+    /// guarantee the *previous* formula paid — so [`Self::AsEnacted`] holds a district at a total
+    /// that includes a hold-harmless while the hold-harmless is being repealed, and
+    /// [`Self::Repealed`] withdraws the whole of the second device to be rid of the first. This
+    /// keeps `[K]` doing what it was written to do and asks it to do so against the funding the
+    /// formula produced, guarantee excluded.
+    ///
+    /// It is the reading a drafter would reach for who meant to retire the guarantee without
+    /// retiring the transition, and it needs a figure `[L1]` does not publish. See
+    /// [`crate::transition_base`] for where the figure comes from and
+    /// [`crate::hold_harmless::transition_supplement_rebased`] for the arithmetic.
+    Rebased,
 }
 
 impl Backstop {
@@ -122,8 +136,9 @@ impl Backstop {
         match raw {
             "as-enacted" => Ok(Self::AsEnacted),
             "repealed" => Ok(Self::Repealed),
+            "rebased" => Ok(Self::Rebased),
             other => Err(format!(
-                "unknown backstop {other:?}; try as-enacted or repealed"
+                "unknown backstop {other:?}; try as-enacted, repealed or rebased"
             )),
         }
     }
@@ -663,6 +678,11 @@ pub fn apply(
             crate::hold_harmless::transition_supplement_under(record, realized_aid, transportation)
         }
         Backstop::Repealed => 0.0,
+        Backstop::Rebased => crate::hold_harmless::transition_supplement_rebased(
+            record,
+            realized_aid,
+            transportation,
+        ),
     };
 
     Outcome {

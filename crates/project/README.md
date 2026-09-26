@@ -25,6 +25,7 @@ the simulation's appearance of precision.
 | Lever | What it is |
 |---|---|
 | `--guarantee` | `as-enacted`, `removed`, `rebase:<factor>`, `phase-out:<remaining>` |
+| `--backstop` | `as-enacted`, `repealed`, `rebased` — what Section 265.225 does while the guarantee is retired |
 | `--base-cost` | multiplier on aggregate base cost — how an input-year refresh is expressed |
 | `--min-share` | the minimum state share of base cost |
 | `--phase-in`, `--phase-in-cat` | appropriated fraction, base cost and categoricals separately |
