@@ -32,6 +32,8 @@
 //! identification lists cannot be read off performance here. [`super::identified`] says this from
 //! the other side and it is the same limit.
 
+use std::sync::OnceLock;
+
 /// The committed extract.
 pub const FIXTURE: &str = include_str!("../fixtures/report-card-2425-buildings.csv");
 
@@ -106,6 +108,15 @@ mod column {
 /// from the header's — both by way of [`edfund_core::csv::rows`].
 #[must_use]
 pub fn buildings() -> Vec<Building> {
+    static BUILDINGS: OnceLock<Vec<Building>> = OnceLock::new();
+    BUILDINGS.get_or_init(parse).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse() -> Vec<Building> {
     edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
         .map(|row| Building {
             irn: row.str(column::IRN).to_string(),

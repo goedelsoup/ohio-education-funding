@@ -47,6 +47,8 @@
 //! See `the_year_the_biennium_is_measured_from.rs`, which is where that is asserted rather than
 //! assumed.
 
+use std::sync::OnceLock;
+
 use edfund_core::Dollars;
 
 /// The committed extract of the department's final FY2025 payment report.
@@ -120,6 +122,15 @@ pub struct Fy2025 {
 /// differs from the header's — both by way of [`edfund_core::csv::rows`].
 #[must_use]
 pub fn frame() -> Vec<Fy2025> {
+    static FRAME: OnceLock<Vec<Fy2025>> = OnceLock::new();
+    FRAME.get_or_init(parse).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse() -> Vec<Fy2025> {
     edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
         .map(|row| Fy2025 {
             irn: row.str(0).to_string(),

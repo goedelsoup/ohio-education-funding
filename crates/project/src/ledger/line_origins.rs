@@ -43,6 +43,7 @@
 //! every one of them.
 
 use std::collections::BTreeMap;
+use std::sync::OnceLock;
 
 /// The committed extract: one row per line item per edition.
 const BASIS: &str = include_str!("../../fixtures/catalog-line-item-basis.tsv");
@@ -214,6 +215,15 @@ fn authorised_by(basis: &str) -> (String, Option<u16>) {
 /// and then by line item.
 #[must_use]
 pub fn authority() -> Vec<LineAuthority> {
+    static AUTHORITY: OnceLock<Vec<LineAuthority>> = OnceLock::new();
+    AUTHORITY.get_or_init(parse_authority).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse_authority() -> Vec<LineAuthority> {
     let mut out: Vec<LineAuthority> = edfund_core::csv::delimited(BASIS, BASIS_HEADER, '\t')
         .filter_map(|row| {
             let basis = row.str(column::LEGAL_BASIS);
@@ -293,6 +303,15 @@ fn established(basis: &str) -> (String, Option<u16>) {
 /// wording to disagree with another's and no way to adjudicate.
 #[must_use]
 pub fn current() -> Vec<LineOrigin> {
+    static CURRENT: OnceLock<Vec<LineOrigin>> = OnceLock::new();
+    CURRENT.get_or_init(parse_current).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse_current() -> Vec<LineOrigin> {
     // The `f.len() < 5` guard this used to carry has moved into the reader, which asserts
     // every row against the header's width rather than skipping the short ones.
     let parsed: Vec<(u16, LineOrigin)> = edfund_core::csv::delimited(BASIS, BASIS_HEADER, '\t')

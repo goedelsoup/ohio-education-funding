@@ -31,6 +31,8 @@
 //! of twelve acts to twelve numbers would be twelve chances to be wrong about a fact the fixture
 //! already carries.
 
+use std::sync::OnceLock;
+
 use edfund_core::records;
 
 /// The committed extract.
@@ -126,6 +128,15 @@ impl<'a> Greenbook<'a> {
 /// Every greenbook in the extract, oldest General Assembly first.
 #[must_use]
 pub fn greenbooks() -> Vec<Greenbook<'static>> {
+    static GREENBOOKS: OnceLock<Vec<Greenbook<'static>>> = OnceLock::new();
+    GREENBOOKS.get_or_init(parse).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse() -> Vec<Greenbook<'static>> {
     records::records(FIXTURE).map(read).collect()
 }
 

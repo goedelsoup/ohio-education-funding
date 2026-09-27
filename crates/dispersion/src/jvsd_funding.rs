@@ -67,6 +67,7 @@
 //! into the floor would be reading a small district's base cost build-up as policy.
 
 use std::collections::BTreeMap;
+use std::sync::OnceLock;
 
 const FIXTURE: &str = include_str!("../fixtures/jvsd-foundation-payments.csv");
 
@@ -301,6 +302,15 @@ impl District {
 /// width — either of which means the extract is not the file this reader expects.
 #[must_use]
 pub fn districts() -> Vec<District> {
+    static DISTRICTS: OnceLock<Vec<District>> = OnceLock::new();
+    DISTRICTS.get_or_init(parse).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse() -> Vec<District> {
     let mut lines = FIXTURE.lines();
     let header = lines.next().unwrap_or_default().trim();
     assert_eq!(

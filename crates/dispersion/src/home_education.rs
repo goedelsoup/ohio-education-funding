@@ -35,6 +35,7 @@
 //! again, and [`Basis::Reported`] covers them, because a published zero is a measurement.
 
 use std::collections::BTreeMap;
+use std::sync::OnceLock;
 
 use edfund_core::csv;
 
@@ -158,6 +159,15 @@ pub struct District {
 /// extract is not the file this reader was written against.
 #[must_use]
 pub fn districts() -> Vec<District> {
+    static DISTRICTS: OnceLock<Vec<District>> = OnceLock::new();
+    DISTRICTS.get_or_init(parse).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse() -> Vec<District> {
     csv::rows(FIXTURE, EXPECTED_HEADER)
         .map(|row| {
             let published = row.str(column::PUBLISHED).to_string();

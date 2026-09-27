@@ -43,6 +43,7 @@
 //! the department does not flag. Ranks also tie, so [`Ranking::rank`] identifies no row.
 
 use std::collections::{BTreeMap, BTreeSet};
+use std::sync::OnceLock;
 
 const FIXTURE: &str = include_str!("../fixtures/edchoice-pi-rankings.csv");
 
@@ -110,6 +111,15 @@ impl Ranking {
 /// a number — both by way of the extractor's own guarantees.
 #[must_use]
 pub fn rankings() -> Vec<Ranking> {
+    static RANKINGS: OnceLock<Vec<Ranking>> = OnceLock::new();
+    RANKINGS.get_or_init(parse).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse() -> Vec<Ranking> {
     edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
         .map(|row| Ranking {
             year: row.str(0).parse().expect("a ranking year"),

@@ -54,6 +54,7 @@
 //! published FY2001 poverty share 1.8 points below what the file says.
 
 use std::collections::{BTreeMap, BTreeSet};
+use std::sync::OnceLock;
 
 const FIXTURE: &str = include_str!("../fixtures/mr81-sponsor-panel.csv");
 
@@ -133,6 +134,15 @@ pub struct Sponsor {
 /// field after it and the row still parsed.
 #[must_use]
 pub fn panel() -> Vec<Sponsor> {
+    static PANEL: OnceLock<Vec<Sponsor>> = OnceLock::new();
+    PANEL.get_or_init(parse).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse() -> Vec<Sponsor> {
     edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
         .filter_map(|row| {
             Some(Sponsor {

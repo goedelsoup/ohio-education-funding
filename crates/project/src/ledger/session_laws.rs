@@ -43,6 +43,7 @@
 //! time the money moved it had been given its proper names.
 
 use std::collections::{BTreeMap, BTreeSet};
+use std::sync::OnceLock;
 
 const FIXTURE: &str = include_str!("../../fixtures/session-law-lines.csv");
 
@@ -175,6 +176,15 @@ pub struct Appropriation {
 /// If the fixture's header is not the one this was written against.
 #[must_use]
 pub fn lines() -> Vec<Appropriation> {
+    static LINES: OnceLock<Vec<Appropriation>> = OnceLock::new();
+    LINES.get_or_init(parse).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse() -> Vec<Appropriation> {
     edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
         .filter_map(|row| {
             Some(Appropriation {

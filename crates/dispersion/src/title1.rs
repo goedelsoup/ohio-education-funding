@@ -51,6 +51,7 @@
 //! Local has a 5-to-17 population of zero and a row all the same.
 
 use std::collections::BTreeMap;
+use std::sync::OnceLock;
 
 const FIXTURE: &str = include_str!("../fixtures/title1-formula-counts.csv");
 
@@ -144,6 +145,15 @@ impl FormulaCount {
 /// a number.
 #[must_use]
 pub fn formula_counts() -> Vec<FormulaCount> {
+    static FORMULA_COUNTS: OnceLock<Vec<FormulaCount>> = OnceLock::new();
+    FORMULA_COUNTS.get_or_init(parse).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse() -> Vec<FormulaCount> {
     edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
         .map(|row| FormulaCount {
             school_year: row.str(0).to_string(),

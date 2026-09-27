@@ -37,6 +37,7 @@
 //! and the prose may not contradict it.
 
 use std::collections::BTreeMap;
+use std::sync::OnceLock;
 
 use edfund_core::Dollars;
 
@@ -578,6 +579,15 @@ pub fn price(draft: &Draft, panel: &[DistrictRecord]) -> Priced {
 /// is built to prevent — so it fails loudly instead of returning a shorter bill.
 #[must_use]
 pub fn drafts() -> BTreeMap<String, Draft> {
+    static DRAFTS: OnceLock<BTreeMap<String, Draft>> = OnceLock::new();
+    DRAFTS.get_or_init(parse).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse() -> BTreeMap<String, Draft> {
     // The row-width assertion this used to carry itself now lives in the reader, which checks
     // every row against the header. What stays here is the part that is this module's own: a
     // provision naming a lever that does not exist is unpriced, and must not load quietly.

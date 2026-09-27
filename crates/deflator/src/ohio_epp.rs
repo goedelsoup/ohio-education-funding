@@ -19,6 +19,8 @@
 //! perturbs both ends of the FY2010-FY2014 trough by the full chart-label error in the
 //! direction that would erase it, and the trough survives with room to spare.
 
+use std::sync::OnceLock;
+
 use edfund_core::FiscalYear;
 
 use crate::{Confidence, CpiSeries, Deflated};
@@ -58,6 +60,15 @@ pub struct NominalPoint {
 /// differs from the header's — both by way of [`edfund_core::csv::rows`].
 #[must_use]
 pub fn nominal_series() -> Vec<NominalPoint> {
+    static NOMINAL_SERIES: OnceLock<Vec<NominalPoint>> = OnceLock::new();
+    NOMINAL_SERIES.get_or_init(parse).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse() -> Vec<NominalPoint> {
     edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
         .filter_map(|row| {
             Some(NominalPoint {
