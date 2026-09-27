@@ -341,7 +341,7 @@ export function crossCheck(nodes: Node[], manifest: Manifest): Discrepancy[] {
         at(
           "unknown-key",
           `binds "${entry.key}", which crates/figures.json does not carry. Either the key was ` +
-            `renamed in crates/figures/src/lib.rs or the manifest is stale.`,
+            `renamed in crates/figures/src/figure.rs or the manifest is stale.`,
         );
         continue;
       }

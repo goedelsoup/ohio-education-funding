@@ -308,20 +308,45 @@ fn every_string_is_safe_to_write_unescaped() {
 ///
 /// So both directions are checked, and the first is checked against the **source** rather than
 /// the manifest, because by the time it reaches a `&'static str` the evidence is gone.
+///
+/// Every file a registry is written in, not just `lib.rs`: the registries were split into a module
+/// each and `lib.rs` kept no wrapped label at all, so a scan of it alone would read zero
+/// continuations and pass. The count below is asserted for that reason — a source file dropped
+/// from this list is a check that stops checking, silently.
 #[test]
 fn a_wrapped_label_keeps_the_space_the_continuation_eats() {
-    let source = include_str!("../src/lib.rs");
-    for (number, line) in source.lines().enumerate() {
-        let Some(head) = line.strip_suffix('\\') else {
-            continue;
-        };
-        assert!(
-            head.ends_with(' ') || head.ends_with("\\"),
-            "crates/figures/src/lib.rs:{}: a continuation with no space before the backslash \
-             glues two words together, because `\\` eats the newline and the indent after it",
-            number + 1
-        );
+    let sources = [
+        ("lib.rs", include_str!("../src/lib.rs")),
+        ("band.rs", include_str!("../src/band.rs")),
+        ("curve.rs", include_str!("../src/curve.rs")),
+        ("figure.rs", include_str!("../src/figure.rs")),
+        ("plane.rs", include_str!("../src/plane.rs")),
+        ("scatter.rs", include_str!("../src/scatter.rs")),
+        ("series.rs", include_str!("../src/series.rs")),
+        ("spread.rs", include_str!("../src/spread.rs")),
+    ];
+    let mut continuations = 0;
+    for (file, source) in sources {
+        for (number, line) in source.lines().enumerate() {
+            let Some(head) = line.strip_suffix('\\') else {
+                continue;
+            };
+            continuations += 1;
+            assert!(
+                head.ends_with(' ') || head.ends_with("\\"),
+                "crates/figures/src/{file}:{}: a continuation with no space before the \
+                 backslash glues two words together, because `\\` eats the newline and the \
+                 indent after it",
+                number + 1
+            );
+        }
     }
+    assert!(
+        continuations > 500,
+        "{continuations} wrapped source lines found across the eight files, where the figure \
+         registry alone carries hundreds; the registries have moved again and this test is \
+         checking a file they are no longer written in"
+    );
     for f in FIGURES {
         assert!(
             !f.label.contains("  "),

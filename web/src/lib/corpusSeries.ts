@@ -1114,7 +1114,7 @@ export function crossCheckSeries(nodes: Node[], manifest: SeriesManifest): Serie
         at(
           "unknown-key",
           `draws "${entry.key}", which crates/series.json does not carry. Either the key was ` +
-            `renamed in crates/figures/src/lib.rs or the manifest is stale.`,
+            `renamed in a registry under crates/figures/src/ or the manifest is stale.`,
         );
         continue;
       }
@@ -1351,8 +1351,8 @@ export function crossCheckPageSeries(
         kind: "unknown-key",
         message:
           `is declared in PAGE_SERIES as drawn by ${source.route}, and crates/series.json does ` +
-          `not carry it. Either the key was renamed in crates/figures/src/lib.rs or the page no ` +
-          `longer draws it.`,
+          `not carry it. Either the key was renamed in a registry under ` +
+          `crates/figures/src/ or the page no longer draws it.`,
       });
       continue;
     }
