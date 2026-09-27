@@ -225,6 +225,7 @@ export type DimensionKey = keyof typeof DIMENSIONS;
  */
 export const PRESET_FIELDS = [
   "guarantee",
+  "backstop",
   "guaranteeArgument",
   "baseCostScale",
   "minimumStateShare",

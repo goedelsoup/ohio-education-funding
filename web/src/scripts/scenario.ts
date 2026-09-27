@@ -142,6 +142,13 @@ function fromQuery(horizon: HorizonBound): Partial<Levers> {
   if (rule === "removed" || rule === "rebase" || rule === "phase-out" || rule === "as-enacted") {
     levers.guarantee = rule;
   }
+  // The two word-valued levers are both membership tests rather than parses, and both drop an
+  // unrecognized value rather than defaulting it: a `?bs=` nobody wrote is a link to current law,
+  // not to a reading of the section chosen on the reader's behalf.
+  const section = params.get("bs");
+  if (section === "as-enacted" || section === "repealed" || section === "rebased") {
+    levers.backstop = section;
+  }
   for (const [key, field] of [
     ["arg", "guaranteeArgument"],
     ["base", "baseCostScale"],
@@ -177,6 +184,7 @@ function toQuery(): void {
   const l = state.levers;
   const params = new URLSearchParams({
     g: l.guarantee,
+    bs: l.backstop,
     arg: String(l.guaranteeArgument),
     base: String(l.baseCostScale),
     min: String(l.minimumStateShare),
@@ -268,15 +276,17 @@ function carryLevers(): void {
 }
 
 /*
- * `backstop` has no control and is carried rather than read.
+ * Read straight from the controls, including `backstop`.
  *
- * It is a draft-only lever: Section 265.225 either stands or is repealed, which is a clause of a
- * bill rather than a dial a reader would sweep. Reading it from the DOM would reset a draft's
- * position the moment any other control was touched, and `renderDraft` would report a departure
- * the reader did not make — the failure the comment on `update` describes. So it falls back the
- * way `horizon` does when its control is absent.
+ * `backstop` was carried rather than read for as long as it had no control: it was treated as a
+ * draft-only lever on the grounds that Section 265.225 stands or is repealed, which is a clause of
+ * a bill rather than a dial a reader would sweep. That was two of its three readings. The third
+ * recomputes `[L1]` without the guarantee inside it and prices a removal between the other two, so
+ * the section is a question with an answer in the middle — which is a thing to sweep — and it has a
+ * select now. Reading it is therefore correct rather than a reset of a draft's position: the select
+ * is set from the draft at init, the way `#lv-guarantee` is.
  */
-function readLevers(fallbackHorizon: number, fallbackBackstop: Levers["backstop"]): Levers {
+function readLevers(fallbackHorizon: number): Levers {
   const number = (id: string) => Number($<HTMLInputElement>(id)!.value);
   return {
     guarantee: $<HTMLSelectElement>("#lv-guarantee")!.value as Levers["guarantee"],
@@ -289,7 +299,7 @@ function readLevers(fallbackHorizon: number, fallbackBackstop: Levers["backstop"
     supplementalTopRate: number("#lv-supplemental"),
     transportationFloor: number("#lv-transport"),
     horizon: $("#lv-horizon") ? number("#lv-horizon") : fallbackHorizon,
-    backstop: fallbackBackstop,
+    backstop: $<HTMLSelectElement>("#lv-backstop")!.value as Levers["backstop"],
   };
 }
 
@@ -741,6 +751,7 @@ function boot(panel: Panel): void {
     ? { ...fromDraft, ...fromQuery(horizonBound) }
     : fromQuery(horizonBound);
   if (initial.guarantee) $<HTMLSelectElement>("#lv-guarantee")!.value = initial.guarantee;
+  if (initial.backstop) $<HTMLSelectElement>("#lv-backstop")!.value = initial.backstop;
   const put = (id: string, value: number | undefined) => {
     const control = $<HTMLInputElement>(id);
     if (control && value != null) control.value = String(value);
@@ -808,7 +819,7 @@ function boot(panel: Panel): void {
    */
   const update = (fromControls = true) => {
     if (!state) return;
-    if (fromControls) state.levers = readLevers(fallback, state.levers.backstop);
+    if (fromControls) state.levers = readLevers(fallback);
     // Always from the controls. Unlike the levers there is no path that renders a view the reader
     // cannot see — a draft sets lever positions and says nothing about axes.
     state.view = readView();
@@ -919,6 +930,7 @@ function boot(panel: Panel): void {
     button.addEventListener("click", () => {
       const settings = JSON.parse(button.dataset.preset ?? "{}") as Levers;
       $<HTMLSelectElement>("#lv-guarantee")!.value = settings.guarantee;
+      $<HTMLSelectElement>("#lv-backstop")!.value = settings.backstop;
       put("#lv-arg", settings.guaranteeArgument);
       put("#lv-base", settings.baseCostScale);
       put("#lv-min", settings.minimumStateShare);
@@ -930,6 +942,7 @@ function boot(panel: Panel): void {
   $("#scenario-reset")?.addEventListener("click", () => {
     const defaults = defaultLevers(modelOf(panel.statewide), baseYear);
     $<HTMLSelectElement>("#lv-guarantee")!.value = defaults.guarantee;
+    $<HTMLSelectElement>("#lv-backstop")!.value = defaults.backstop;
     put("#lv-arg", defaults.guaranteeArgument);
     put("#lv-base", defaults.baseCostScale);
     put("#lv-min", defaults.minimumStateShare);

@@ -796,6 +796,18 @@ pub struct District {
     /// `[K]` tops a district up to this total, so it responds to every other lever and cannot be
     /// carried as a published constant.
     pub fy21_funding_base: Dollars,
+    /// How much of `[L1]` is the guarantee the *previous* formula paid.
+    ///
+    /// **Not a column of the department's model.** `[L1]` is published whole; this is joined from
+    /// two further published files by `project::transition_base`, and the identity that licenses
+    /// reading the FY2019 guarantee as a term inside `[L1]` is asserted there.
+    ///
+    /// Flat on the panel rather than inside the `transition` block for the reason
+    /// [`Self::fy21_funding_base`] is: the slim feed omits that block, and the browser needs this
+    /// to run the third reading of Section 265.225 — `project::policy::Backstop::Rebased` keeps
+    /// `[K]` and subtracts this from the minuend. Without it the browser could offer two of the
+    /// three values the crate prices, which is what #490 was.
+    pub guarantee_in_fy21_base: Dollars,
     /// `d1a` — FY2025 economically disadvantaged ADM, the count the DPIA blend weighs 65%.
     ///
     /// Flat on the panel rather than reached through the `dpia` block, which the slim feed omits.

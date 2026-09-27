@@ -122,6 +122,7 @@ fn sample() -> District {
         general_funding_base: 5_100_000.0,
         dpia_funding_base: 900_000.0,
         fy21_funding_base: 0.0,
+        guarantee_in_fy21_base: 0.0,
         dpia_econ_disadvantaged_adm: 0.0,
         dpia_directly_certified_adm: 0.0,
         supplemental_wealth_index: 0.0,

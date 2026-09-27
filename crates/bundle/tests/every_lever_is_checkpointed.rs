@@ -20,7 +20,7 @@
 //! So the rule is stated here rather than remembered: every field of `Policy` is moved off
 //! current law by at least one checkpoint.
 
-use bundle::build;
+use bundle::{build, PolicyShape};
 
 /// **Every lever is moved by some checkpoint.**
 ///
@@ -92,6 +92,10 @@ fn every_lever_is_moved_by_at_least_one_checkpoint() {
                 .iter()
                 .any(|s| s.transportation_floor != law.transportation_floor),
         ),
+        (
+            "backstop",
+            shapes.iter().any(|s| s.backstop != law.backstop),
+        ),
     ];
 
     let unmoved: Vec<&str> = moved
@@ -106,12 +110,41 @@ fn every_lever_is_moved_by_at_least_one_checkpoint() {
          verified while computing it wrongly or not at all. Add one to `checkpoint_policies`."
     );
 
-    // And the list above is the whole of `PolicyShape` rather than the fields someone remembered.
-    // Nine entries against nine fields; a tenth field added without a tenth entry fails here
-    // rather than passing silently.
+    /*
+     * And the list above is the whole of `PolicyShape` rather than the fields someone remembered.
+     *
+     * This is the assertion that was supposed to stop a lever arriving uncovered, and it did not:
+     * `backstop` was added as a tenth field while the list stayed at nine and this number stayed
+     * at nine with it, so the two agreed with each other and about nothing else. The count is a
+     * check on the *list*, not on the struct — nothing in Rust counts a struct's fields — so it
+     * only bites when whoever adds a field also comes here, which is exactly what did not happen.
+     *
+     * Kept, because it does catch the field added with an entry omitted, and paired now with the
+     * destructuring below, which the compiler enforces.
+     */
     assert_eq!(
         moved.len(),
-        9,
+        10,
         "PolicyShape has a field this test does not cover"
     );
+
+    /*
+     * The compiler's own count, which is the half of this the number above cannot do.
+     *
+     * An exhaustive destructure of `PolicyShape` fails to compile when a field is added, whoever
+     * adds it and wherever they were looking. Every binding is named after the entry in `moved`
+     * that covers it, so the error names what is missing rather than merely that something is.
+     */
+    let PolicyShape {
+        guarantee: _,
+        guarantee_argument: _,
+        base_cost_scale: _,
+        minimum_state_share: _,
+        phase_in_general: _,
+        phase_in_dpia: _,
+        dpia_directly_certified_weight: _,
+        supplemental_top_rate: _,
+        transportation_floor: _,
+        backstop: _,
+    } = *law;
 }

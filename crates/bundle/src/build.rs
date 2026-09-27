@@ -69,7 +69,7 @@ use project::panel::{
     panel, DistrictRecord, DPIA_BLEND, HISTORY_YEARS, MINIMUM_STATE_SHARE, MODEL_YEAR,
     TA_SUPPLEMENT_TOP_RATE,
 };
-use project::policy::{GuaranteeRule, Policy};
+use project::policy::{Backstop, GuaranteeRule, Policy};
 use project::report::{enrollment_growth_prior, forecast, simulate};
 use project::series::{Method, DEFAULT_DAMPING, DEFAULT_SHRINK_WEIGHT, ONE_SIGMA};
 use project::session_laws;
@@ -313,6 +313,47 @@ fn checkpoint_policies() -> Vec<(&'static str, Policy, PolicyShape)> {
             PolicyShape {
                 transportation_floor: 0.375,
                 ..shape("as-enacted", 0.0, 1.0, MINIMUM_STATE_SHARE, 1.0, 1.0)
+            },
+        ),
+        /*
+         * The backstop's other two readings, which no checkpoint moved for as long as the lever
+         * existed.
+         *
+         * `backstop` reached `PolicyShape` with the lever and nothing here moved it off
+         * `as-enacted`, so the browser was free to compute Section 265.225 wrongly under either
+         * of the other two and still report itself verified — the exact hole
+         * `tests/every_lever_is_checkpointed.rs` exists to refuse, and one it could not see
+         * because its own field list stopped at nine. Both are paired with a guarantee removal
+         * because `[K]` is what a removal runs into: at current law the section does not move,
+         * so a checkpoint holding the guarantee still would price all three readings at zero.
+         */
+        (
+            "guarantee removed, Section 265.225 repealed alongside",
+            Policy {
+                guarantee: GuaranteeRule::Removed,
+                backstop: Backstop::Repealed,
+                ..Policy::current_law()
+            },
+            PolicyShape {
+                backstop: "repealed",
+                ..shape("removed", 0.0, 1.0, MINIMUM_STATE_SHARE, 1.0, 1.0)
+            },
+        ),
+        (
+            // The third reading, and the only checkpoint whose arithmetic needs a column the
+            // department does not publish: `[L1]` less the guarantee the previous formula paid,
+            // joined from two further files by `project::transition_base` and carried per
+            // district as `guarantee_in_fy21_base`. A browser that ignored that column would
+            // reproduce the checkpoint above it and fail here.
+            "guarantee removed, Section 265.225 recomputed without it",
+            Policy {
+                guarantee: GuaranteeRule::Removed,
+                backstop: Backstop::Rebased,
+                ..Policy::current_law()
+            },
+            PolicyShape {
+                backstop: "rebased",
+                ..shape("removed", 0.0, 1.0, MINIMUM_STATE_SHARE, 1.0, 1.0)
             },
         ),
     ]
@@ -768,6 +809,7 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
             - record.transition.funding_base_econ_dis,
         dpia_funding_base: record.transition.funding_base_econ_dis,
         fy21_funding_base: record.transition.fy21_funding_base,
+        guarantee_in_fy21_base: record.transition.guarantee_in_fy21_base,
         dpia_econ_disadvantaged_adm: record.dpia.economically_disadvantaged_adm,
         dpia_directly_certified_adm: record.dpia.directly_certified_adm,
         supplemental_wealth_index: record.targeted_assistance.fy19_wealth_index,

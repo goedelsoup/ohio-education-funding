@@ -575,8 +575,11 @@ properties:
     `what_retiring_the_guarantee_actually_saves.rs`, and the split `[L1]` the third column needs by
     `project::transition_base` — and by the checkpoints in crates/bundle,
     which the web layer re-derives and must reproduce before it will render a scenario. The
-    scenario page's own backstop control still offers two values: no checkpoint moves the third, so
-    nothing in the feed would hold the browser's arithmetic for it to the crate's.
+    scenario page's own backstop control offers all three readings, and the three columns below are
+    the three positions of that control. Two checkpoints hold the browser to the second and third,
+    both paired with a guarantee removal because at current law the section does not pay out and all
+    three readings agree at zero; the split `[L1]` the third needs reaches the browser as a
+    per-district column of the feed rather than being re-derived there.
   results: |
     total state support, 609 districts, FY2027   Sec. 265.225 stands   repealed   recomputed
     removal                                                  -$79.8M   -$942.5M     -$253.6M

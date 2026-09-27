@@ -54,13 +54,16 @@ export interface Levers {
   /**
    * What happens to the formula transition supplement, `[K]`.
    *
-   * A word rather than a number, and two of the three words the crate accepts: Section 265.225
-   * stands or is repealed here, while `crates/project` also prices it recomputed against a base
-   * that never held the guarantee (#490). It is a separate instrument from the guarantee — codified
-   * law against uncodified — and `[K]` backstops the guarantee, so retiring the guarantee with this
-   * left `"as-enacted"` saves a tenth of what the headline says.
+   * A word rather than a number, and all three words the crate accepts: Section 265.225 stands, is
+   * repealed, or is recomputed against an `[L1]` that never held the guarantee. None of the three
+   * is a quantity, so this control is a select and not a slider.
+   *
+   * It is a separate instrument from the guarantee — codified law against uncodified — and `[K]`
+   * backstops the guarantee, so retiring the guarantee with this left `"as-enacted"` saves a tenth
+   * of what the headline says. The middle reading is the one that makes the pair legible: -$79.8M,
+   * -$253.6M and -$942.5M for the same removal.
    */
-  backstop: "as-enacted" | "repealed";
+  backstop: "as-enacted" | "repealed" | "rebased";
   /**
    * The fiscal year to project enrollment to. Equal to the base year means "do not project".
    *
@@ -222,21 +225,42 @@ function guaranteeArgumentOf(rule: Policy["guarantee"]): number | null {
  * Comparing the *policies* rather than the levers settles it at the root: a field the formula never
  * reads cannot make two scenarios different, and there is no second list to keep in step.
  *
+ * # Except that it was a second list, and it had already drifted
+ *
+ * The comparison named six fields while `Policy` had nine, and the four it did not name were the
+ * three Stage 3 levers and the backstop. So a reader who moved *only* the transportation floor, or
+ * only the supplemental rate, was shown the card that says nothing has moved — over a scenario that
+ * had moved several hundred million dollars. Repealing Section 265.225 on its own is the sharpest:
+ * `[K]` pays $63.6M at current law, and the page called that current law.
+ *
+ * So the fields are named into an object the compiler checks against `keyof Policy`. A tenth lever
+ * added to `Policy` fails to compile here rather than arriving as a control this function reports as
+ * unpressed. The guarantee's argument travels inside its own entry because it is not a field of
+ * `Policy` — the rule carries it — and a `Record<keyof Policy, …>` is exactly the list to hold this
+ * to.
+ *
  * The horizon is outside this by construction — {@link toPolicy} does not carry it — which is the
  * behaviour both callers already wanted. Projecting further out changes what is being asked, not
  * what the state would do.
  */
 function samePolicy(a: Levers, b: Levers): boolean {
-  const x = toPolicy(a);
-  const y = toPolicy(b);
-  return (
-    x.guarantee.kind === y.guarantee.kind &&
-    guaranteeArgumentOf(x.guarantee) === guaranteeArgumentOf(y.guarantee) &&
-    x.baseCostScale === y.baseCostScale &&
-    x.minimumStateShare === y.minimumStateShare &&
-    x.phaseInGeneral === y.phaseInGeneral &&
-    x.phaseInDpia === y.phaseInDpia
-  );
+  const comparable = (levers: Levers) => {
+    const p = toPolicy(levers);
+    return {
+      guarantee: `${p.guarantee.kind}:${guaranteeArgumentOf(p.guarantee)}`,
+      baseCostScale: p.baseCostScale,
+      minimumStateShare: p.minimumStateShare,
+      phaseInGeneral: p.phaseInGeneral,
+      phaseInDpia: p.phaseInDpia,
+      dpiaDirectlyCertifiedWeight: p.dpiaDirectlyCertifiedWeight,
+      supplementalTopRate: p.supplementalTopRate,
+      transportationFloor: p.transportationFloor,
+      backstop: p.backstop,
+    } satisfies Record<keyof Policy, string | number>;
+  };
+  const x = comparable(a);
+  const y = comparable(b);
+  return (Object.keys(x) as (keyof typeof x)[]).every((field) => x[field] === y[field]);
 }
 
 function isCurrentLaw(levers: Levers, model: Model): boolean {
@@ -788,10 +812,15 @@ export function draftLevers(draft: Draft, model: Model, baseYear: number): Lever
         if (value != null) levers.transportationFloor = value;
         break;
       }
-      // `backstop` takes a word rather than a number: Section 265.225 either stands or is
-      // repealed, and there is no fraction of a repeal.
+      // `backstop` takes a word rather than a number, and one of three: Section 265.225 stands, is
+      // repealed, or is recomputed without the guarantee inside `[L1]`. There is no fraction of
+      // any of them, so this is a membership test and not a parse.
       case "backstop": {
-        if (provision.proposed === "repealed" || provision.proposed === "as-enacted") {
+        if (
+          provision.proposed === "repealed" ||
+          provision.proposed === "rebased" ||
+          provision.proposed === "as-enacted"
+        ) {
           levers.backstop = provision.proposed;
         }
         break;

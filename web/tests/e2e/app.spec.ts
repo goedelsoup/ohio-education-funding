@@ -892,7 +892,7 @@ const ROUTES_WITH_FIGURES = [
     // checkpoints and the forecasts, which are gated separately.
     await page.goto("/");
     await expect(page.locator("footer")).toContainText(
-      "Formula verified at build against 11 reference scenarios and 4 reference forecasts",
+      "Formula verified at build against 13 reference scenarios and 4 reference forecasts",
     );
   });
 
@@ -3362,7 +3362,7 @@ test.describe("the verification gate", () => {
   test("reports agreement and enables the scenario builder", async ({ page }) => {
     await page.goto("/scenario");
     await expect(page.locator("#scenario-status")).toContainText(
-      "Formula reproduced against 11 reference scenarios and 4 reference forecasts",
+      "Formula reproduced against 13 reference scenarios and 4 reference forecasts",
     );
     await expect(page.locator("#scenario-out .err")).toHaveCount(0);
     await expect(page.locator("#lv-guarantee")).toBeVisible();
@@ -3511,13 +3511,55 @@ test.describe("the scenario builder", () => {
     await expect(page.locator("#lv-min")).toHaveValue("0.15");
   });
 
+  /*
+   * The three readings of Section 265.225, reachable from the control rather than only from the
+   * crate.
+   *
+   * This is #490 as a reader meets it: the corpus node for the phase-out scenario reports all three
+   * columns, and for as long as the select offered two of them a reader who moved the node's own
+   * lever could not reproduce the middle one. The figures are asserted rather than merely their
+   * order, because the order is the uninteresting half — the point is that a reading of four
+   * sentences of uncodified law is worth $863M, and which reading a reader is looking at is a thing
+   * the page has to let them choose and then say.
+   */
+  test("the backstop's three readings price the same removal three ways", async ({ page }) => {
+    await page.goto("/scenario");
+    await setGuarantee(page, "removed");
+    const stateAid = page
+      .locator("#outcome .tile")
+      .filter({ hasText: "State aid" })
+      .locator(".v");
+    await expect(stateAid).toHaveText("−$79.8M");
+
+    for (const [reading, figure] of [
+      ["rebased", "−$253.6M"],
+      ["repealed", "−$942.5M"],
+      ["as-enacted", "−$79.8M"],
+    ] as const) {
+      await page.selectOption("#lv-backstop", reading);
+      await expect(stateAid).toHaveText(figure);
+      // And it is sendable, which is the other half of being reachable.
+      await expect(page).toHaveURL(new RegExp(`[?&]bs=${reading}`));
+    }
+  });
+
+  test("a shared link carries the reading of the section it was read under", async ({ page }) => {
+    await page.goto("/scenario?g=removed&bs=rebased");
+    await expect(page.locator("#lv-backstop")).toHaveValue("rebased");
+    await expect(
+      page.locator("#outcome .tile").filter({ hasText: "Unmoved" }).locator(".v"),
+    ).toHaveText("348");
+  });
+
   test("reset returns to current law, controls and all", async ({ page }) => {
     await page.goto("/scenario");
     await setGuarantee(page, "removed");
     await page.locator("#lv-base").fill("1.2");
     await page.locator("#lv-base").dispatchEvent("input");
+    await page.selectOption("#lv-backstop", "repealed");
     await page.locator("#scenario-reset").click();
     await expect(page.locator("#lv-guarantee")).toHaveValue("as-enacted");
+    await expect(page.locator("#lv-backstop")).toHaveValue("as-enacted");
     await expect(page.locator("#lv-base")).toHaveValue("1");
     await expect(page.locator("#scenario-out")).toContainText("Current law");
   });
@@ -7367,8 +7409,12 @@ test.describe("the statute timeline", () => {
  * seconds of an empty box. That was the last open half of #111.
  *
  * Measured again after: a bare `/compare` has its table in the HTML and fetches **nothing**, and
- * `?a=&b=` fetches two files totalling **1,181 B** and finishes at 1,678 ms against a first paint
- * of 1,264 ms.
+ * `?a=&b=` fetched two files totalling **1,181 B**, finishing at 1,678 ms against a first paint of
+ * 1,264 ms.
+ *
+ * Those two files are **4,006 B** today, against a panel that is now 1,237,912 B. Both figures
+ * move with the feed — a column added to a district is added 609 times — so both are dated here
+ * rather than maintained. What the assertions below hold is the shape, which does not move.
  *
  * # Why none of these assertions is a stopwatch
  *
@@ -7395,16 +7441,30 @@ test.describe("the comparison arrives with the page", () => {
     expect(page).not.toContain("<td class=\"tnum\"></td>");
   });
 
-  test("one district is about a kilobyte, and there are 609 of them", () => {
+  test("one district is a couple of kilobytes, and there are 609 of them", () => {
     const dir = join(DIST, "data", "district");
     const files = readdirSync(dir).filter((name) => name.endsWith(".json"));
     expect(files.length, "one per district in the feed").toBe(609);
     const sizes = files.map((name) => readFileSync(join(dir, name), "utf8").length);
     const largest = Math.max(...sizes);
+    /*
+     * A ceiling on the largest file, and #490 moved it.
+     *
+     * The bound was `2_048` — a byte under 2 KiB — and the largest district measured 2,039, nine
+     * bytes inside it. `guarantee_in_fy21_base` costs 27 bytes a district, so the third reading of
+     * Section 265.225 broke a bound it had been clearing by nine. Measured now: 1,757 smallest,
+     * 1,991 median, 2,066 largest, five files over 2 KiB.
+     *
+     * Raised rather than deleted, and raised past the measurement rather than to it. What this
+     * guards is a shape — a swap costs a pair of small files and not the panel — and a ceiling
+     * that has to move every time a column is added is a ceiling that stops being read. The
+     * headroom is about four more columns; the failure it exists to catch is this route going back
+     * to shipping the whole feed, which is two orders of magnitude away from either number.
+     */
     expect(
       largest,
       "a district's formula inputs, against the 641,042 B panel this route used to download",
-    ).toBeLessThan(2_048);
+    ).toBeLessThan(2_304);
   });
 
   test("a bare /compare fetches no data at all", async ({ page }) => {

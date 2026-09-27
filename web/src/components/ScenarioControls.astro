@@ -125,6 +125,31 @@ const SLIDERS = [
         <div class="n">{onGuarantee} districts are held above what the formula computes for them.</div>
       </div>
       {
+        /*
+         * A select and not a slider, and next to the guarantee rather than among the sliders.
+         *
+         * Three readings of four sentences of uncodified law, none of them a quantity — there is no
+         * fraction of a repeal. It sits here because it is only legible beside the control above
+         * it: on its own it moves nothing, since Section 265.225 does not pay out until something
+         * cuts what a district receives. Move the guarantee and it decides most of the answer.
+         */
+      }
+      <div class="lever">
+        <label for="lv-backstop">Formula transition supplement</label>
+        <select id="lv-backstop">
+          <option value="as-enacted">As enacted — top up to the FY2021 base</option>
+          <option value="rebased">Re-base it — the FY2021 base less the guarantee inside it</option>
+          <option value="repealed">Repeal Section 265.225</option>
+        </select>
+        <div class="n">
+          Uncodified law, extended to {yearOf("formula")} by H.B. 96, and a separate instrument from
+          the guarantee above. It tops a district up to its FY2021 total, which already contained
+          the guarantee — so it absorbs a cut to the guarantee rather than passing it through. The
+          three readings price the same removal differently by an order of magnitude, and this
+          control is which of them the figures on this page are.
+        </div>
+      </div>
+      {
         SLIDERS.map((slider) => (
           <div class="lever">
             <label for={slider.id}>

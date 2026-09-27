@@ -579,6 +579,19 @@ export const DistrictSchema = z
     dpia_funding_base: num,
     fy21_funding_base: num,
     /**
+     * How much of `[L1]` is the guarantee the *previous* formula paid.
+     *
+     * Not a column of the department's model: `[L1]` is published whole, and this is joined from
+     * two further published files by `project::transition_base`. It is here because Section
+     * 265.225's third reading subtracts it — `backstop: "rebased"` tops a district up to `[L1]`
+     * less this, rather than to `[L1]` — and a mirror that has not been given a subtrahend cannot
+     * compute the reading. Two checkpoints hold this page to it.
+     *
+     * Flat rather than inside `transition` for the reason `fy21_funding_base` is: the panel type
+     * omits that block.
+     */
+    guarantee_in_fy21_base: num,
+    /**
      * `[H2] − [I1]` floored at zero: the level the guarantee holds the district at.
      *
      * Published for every district, not only the guaranteed ones. Deriving it as
@@ -1093,7 +1106,14 @@ export const PolicyShapeSchema = z
     supplemental_top_rate: num,
     /** Minimum state share applied to transportation. Current law is 0.5. */
     transportation_floor: num,
-    backstop: z.enum(["as-enacted", "repealed"]),
+    /**
+     * What happens to the formula transition supplement: all three readings of Section 265.225.
+     *
+     * `rebased` keeps the section and recomputes `[L1]` without the guarantee inside it, which is
+     * what `guarantee_in_fy21_base` is carried for. It was absent here while the crate priced it,
+     * so the page's own control offered two of the three columns the corpus reported — #490.
+     */
+    backstop: z.enum(["as-enacted", "repealed", "rebased"]),
   })
   .strict();
 
@@ -1222,8 +1242,9 @@ export const DraftProvisionSchema = z
     (p) =>
       p.lever === "" ||
       p.lever === "guarantee" ||
-      // `backstop` is a word too: Section 265.225 stands or is repealed, and there is no fraction
-      // of a repeal. The crate has a third word for it that this schema does not (#490).
+      // `backstop` is a word too, and one of three: Section 265.225 stands, is repealed, or is
+      // recomputed without the guarantee inside `[L1]`. None of the three is a quantity, so a
+      // finiteness test on `proposed` would reject all of them. See `PolicyShapeSchema.backstop`.
       p.lever === "backstop" ||
       (p.proposed.trim() !== "" && Number.isFinite(Number(p.proposed))),
     { message: "a numeric lever's `proposed` must parse as a finite number", path: ["proposed"] },

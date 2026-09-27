@@ -41,6 +41,24 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `48.0.0` added `district.guarantee_in_fy21_base` and two checkpoints, which together are the
+/// third reading of Section 265.225 arriving in a form the browser can be held to. `[L1]` is
+/// published whole; the term inside it that the *previous* formula's guarantee paid is joined from
+/// two further files by `project::transition_base`, and `project::policy::Backstop::Rebased`
+/// subtracts it before topping a district up. A mirror that has not been given the subtrahend
+/// cannot compute the reading, which is why the lever had three values in the crate and two in the
+/// page.
+///
+/// Breaking rather than additive, and the reason is the checkpoints, not the column. `backstop`
+/// has been in [`PolicyShape`] since the lever existed and **no checkpoint moved it** — not even
+/// to `repealed` — so a consumer was free to compute the section wrongly under either of the other
+/// two readings and still report itself verified. The two added here price a guarantee removal at
+/// `repealed` and at `rebased`, both paired with the removal because at current law the section
+/// does not move and all three readings come to the same number. A consumer that passed on
+/// `47.0.0` and ignores the new column now fails, which is the point: the reference scenario count
+/// moves from 11 to 13 and the arithmetic behind two of them is arithmetic nothing previously
+/// checked.
+///
 /// `47.0.0` added `funding_units`: the six funding units of R.C. 3317.022, of which everything
 /// else in this feed is the first. The district unit's amount is `statewide.realized_aid_total`;
 /// the community and STEM unit comes from the department's FY2027 community school model; the
@@ -234,7 +252,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "47.0.0";
+pub const CONTRACT_VERSION: &str = "48.0.0";
 
 mod model;
 mod serialize;
