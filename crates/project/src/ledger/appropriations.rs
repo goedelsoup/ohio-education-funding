@@ -53,6 +53,7 @@
 //! vintage changed halfway along without saying so.
 
 use std::collections::BTreeMap;
+use std::sync::OnceLock;
 
 use deflator::{Confidence, CpiSeries};
 use edfund_core::FiscalYear;
@@ -154,6 +155,15 @@ mod series_column {
 /// changed and this reader did not.
 #[must_use]
 pub fn lines() -> Vec<Line> {
+    static LINES: OnceLock<Vec<Line>> = OnceLock::new();
+    LINES.get_or_init(parse_lines).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse_lines() -> Vec<Line> {
     // This used to take the amount from the end of the row and rejoin everything between the
     // line item and it, because a title may contain a comma. That reassembly could not tell a
     // comma in the title from one in an earlier column, so it guessed. The reader now asserts
@@ -194,6 +204,15 @@ mod catalog_column {
 /// total.
 #[must_use]
 fn catalog_enacted() -> Vec<Line> {
+    static CATALOG_LINES: OnceLock<Vec<Line>> = OnceLock::new();
+    CATALOG_LINES.get_or_init(parse_catalog).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse_catalog() -> Vec<Line> {
     let covered: BTreeMap<u16, ()> = lines()
         .into_iter()
         .filter(|l| l.kind == "enacted")

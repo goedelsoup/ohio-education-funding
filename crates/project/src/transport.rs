@@ -38,6 +38,8 @@
 //! statutory floor under the state share, which H.B. 96 stepped from 45.83% to 50% and which adds
 //! **$11.3m** on its own.
 
+use std::sync::OnceLock;
+
 use edfund_core::{csv, Dollars};
 
 use crate::ledger::budget_analysis::{
@@ -94,6 +96,15 @@ pub struct Rates {
 /// If the fixture's header is not the one this reader was written against.
 #[must_use]
 pub fn rates() -> Vec<Rates> {
+    static RATES: OnceLock<Vec<Rates>> = OnceLock::new();
+    RATES.get_or_init(parse).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse() -> Vec<Rates> {
     csv::rows(FIXTURE, EXPECTED_HEADER)
         .filter_map(|row| {
             Some(Rates {

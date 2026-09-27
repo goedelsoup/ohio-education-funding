@@ -72,6 +72,7 @@
 //! lines, and `the_lines_that_pay_the_nonpublic_schools` which pins the count.
 
 use std::collections::{BTreeMap, BTreeSet};
+use std::sync::OnceLock;
 
 use deflator::CpiSeries;
 use edfund_core::FiscalYear;
@@ -450,6 +451,15 @@ pub fn restatable_cells() -> (usize, usize) {
 /// school row this is the whole point of reading.
 #[must_use]
 pub fn chartered_nonpublic_enrolment() -> f64 {
+    static CHARTERED: OnceLock<f64> = OnceLock::new();
+    *CHARTERED.get_or_init(read_chartered)
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn read_chartered() -> f64 {
     edfund_core::csv::rows(CHANNELS, CHANNELS_HEADER)
         .find(|row| row.str(0) == CHARTERED_PRIVATE)
         .and_then(|row| row.num(1))
@@ -471,6 +481,15 @@ const HOME_SCHOOL: &str = "Home School";
 /// it against the twenty-year series an aggregator holds, and the two agree to the student.
 #[must_use]
 pub fn home_education_enrolment() -> f64 {
+    static HOME_EDUCATION: OnceLock<f64> = OnceLock::new();
+    *HOME_EDUCATION.get_or_init(read_home_education)
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn read_home_education() -> f64 {
     edfund_core::csv::rows(CHANNELS, CHANNELS_HEADER)
         .find(|row| row.str(0) == HOME_SCHOOL)
         .and_then(|row| row.num(1))

@@ -138,6 +138,7 @@
 //! its own phase; what this module now says is where to look and where not to.
 
 use std::collections::{BTreeMap, BTreeSet};
+use std::sync::OnceLock;
 
 const FIXTURE: &str = include_str!("../fixtures/ccd-lea-directory.csv");
 
@@ -194,6 +195,15 @@ pub struct Agency {
 /// field after it and the row still parsed.
 #[must_use]
 pub fn panel() -> Vec<Agency> {
+    static PANEL: OnceLock<Vec<Agency>> = OnceLock::new();
+    PANEL.get_or_init(parse_panel).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse_panel() -> Vec<Agency> {
     edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
         .filter_map(|row| {
             Some(Agency {
@@ -328,6 +338,15 @@ pub fn joint_vocational_districts() -> BTreeMap<String, String> {
 /// Every agency the directory's last year files under [`SERVICE_AGENCY_CODE`], by IRN.
 #[must_use]
 pub fn service_agencies() -> BTreeMap<String, String> {
+    static SERVICE_AGENCIES: OnceLock<BTreeMap<String, String>> = OnceLock::new();
+    SERVICE_AGENCIES.get_or_init(parse_service_agencies).clone()
+}
+
+/// The directory, cut to the service agencies of the last year it names.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the walk is pure and reads
+/// only compiled-in fixtures, so a second pass could only reproduce the first.
+fn parse_service_agencies() -> BTreeMap<String, String> {
     panel()
         .into_iter()
         .filter(|a| a.opens == LAST_YEAR && a.agency_type == SERVICE_AGENCY_CODE)
@@ -408,6 +427,15 @@ pub struct Transfer {
 /// If the fixture's header is not the one this was written against.
 #[must_use]
 pub fn transfers() -> Vec<Transfer> {
+    static TRANSFER_ROWS: OnceLock<Vec<Transfer>> = OnceLock::new();
+    TRANSFER_ROWS.get_or_init(parse_transfers).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse_transfers() -> Vec<Transfer> {
     edfund_core::csv::delimited(TRANSFERS, TRANSFERS_HEADER, '\t')
         .map(|row| Transfer {
             report: row.str(transfer_column::REPORT).to_string(),

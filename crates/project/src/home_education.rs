@@ -26,6 +26,8 @@
 //! file, which is what makes the per-district cut — `dispersion::home_education` — the part of
 //! this that a funding question actually needs.
 
+use std::sync::OnceLock;
+
 use edfund_core::csv;
 
 const FIXTURE: &str = include_str!("../fixtures/home-education-statewide.csv");
@@ -54,6 +56,15 @@ pub struct Year {
 /// If the fixture's header has moved, or a count is not a number.
 #[must_use]
 pub fn series() -> Vec<Year> {
+    static SERIES: OnceLock<Vec<Year>> = OnceLock::new();
+    SERIES.get_or_init(parse).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse() -> Vec<Year> {
     csv::rows(FIXTURE, EXPECTED_HEADER)
         .map(|row| Year {
             school_year: row.str(0).to_string(),

@@ -40,6 +40,7 @@
 //! and extreme nationally, and that is the finding rather than a defect.
 
 use std::collections::BTreeMap;
+use std::sync::OnceLock;
 
 /// The fiscal year the national district fixture reports, which is not a column in it.
 ///
@@ -143,6 +144,15 @@ impl NationalDistrict {
 /// field after it and the row still parsed.
 #[must_use]
 pub fn national_panel() -> Vec<NationalDistrict> {
+    static NATIONAL_PANEL: OnceLock<Vec<NationalDistrict>> = OnceLock::new();
+    NATIONAL_PANEL.get_or_init(parse).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse() -> Vec<NationalDistrict> {
     edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
         .filter_map(|row| {
             Some(NationalDistrict {

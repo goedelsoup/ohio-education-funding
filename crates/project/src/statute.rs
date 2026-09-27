@@ -29,6 +29,8 @@
 //! reading of the twenty-mill floor would not know. Any claim made from a body here should carry
 //! the record's date.
 
+use std::sync::OnceLock;
+
 use edfund_core::records;
 use edfund_core::FiscalYear;
 
@@ -107,6 +109,15 @@ pub fn sections_expiring() -> usize {
 /// Every section the extract holds, in file order.
 #[must_use]
 pub fn sections() -> Vec<Section<'static>> {
+    static SECTIONS: OnceLock<Vec<Section<'static>>> = OnceLock::new();
+    SECTIONS.get_or_init(parse).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse() -> Vec<Section<'static>> {
     records::records(FIXTURE).map(Section::from).collect()
 }
 

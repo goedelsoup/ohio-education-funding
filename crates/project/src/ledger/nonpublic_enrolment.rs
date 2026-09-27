@@ -44,6 +44,8 @@
 //! schools named `St Mary` across 711 buildings with 601 distinct names. [`Building::irn`] is the
 //! key.
 
+use std::sync::OnceLock;
+
 use edfund_core::csv;
 
 /// The committed sector extract: one row per October per publishing file.
@@ -211,6 +213,15 @@ pub struct Building {
 /// Every row of the sector extract, in fixture order: by October, then by file.
 #[must_use]
 pub fn octobers() -> Vec<October> {
+    static OCTOBERS: OnceLock<Vec<October>> = OnceLock::new();
+    OCTOBERS.get_or_init(parse_octobers).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse_octobers() -> Vec<October> {
     csv::rows(SECTOR, SECTOR_HEADER)
         .map(|row| October {
             school_year: row.str(sector_column::SCHOOL_YEAR).to_string(),
@@ -292,6 +303,15 @@ pub fn schools(fiscal_year: u16) -> Option<usize> {
 /// If the sector extract is empty, which would mean the fixture stopped being built.
 #[must_use]
 pub fn span() -> (u16, u16) {
+    static SPAN: OnceLock<(u16, u16)> = OnceLock::new();
+    *SPAN.get_or_init(compute_span)
+}
+
+/// The two ends of the sector extract, found.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the walk is pure and reads
+/// only compiled-in fixtures, so a second pass could only reproduce the first.
+fn compute_span() -> (u16, u16) {
     let years: Vec<u16> = octobers().iter().map(|row| row.fiscal_year).collect();
     let first = years.iter().min().copied();
     let last = years.iter().max().copied();

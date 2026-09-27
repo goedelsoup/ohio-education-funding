@@ -44,6 +44,7 @@
 //! [`connect::fixtures::fy26`](../../../connect/src/fixtures/fy26.rs).
 
 use std::collections::BTreeMap;
+use std::sync::OnceLock;
 
 use edfund_core::{Adm, Dollars};
 
@@ -104,6 +105,15 @@ pub const PRESCHOOL_APPROPRIATION: Dollars = 153_976_832.0;
 /// If the fixture's first line is not a header, or a row's width differs from it.
 #[must_use]
 pub fn scalars() -> BTreeMap<u16, BTreeMap<String, f64>> {
+    static SCALAR_TABLE: OnceLock<BTreeMap<u16, BTreeMap<String, f64>>> = OnceLock::new();
+    SCALAR_TABLE.get_or_init(parse_scalars).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse_scalars() -> BTreeMap<u16, BTreeMap<String, f64>> {
     let mut lines = SCALARS.lines();
     let header: Vec<&str> = lines.next().unwrap_or_default().split(',').collect();
     let mut out: BTreeMap<u16, BTreeMap<String, f64>> = BTreeMap::new();
@@ -280,6 +290,15 @@ pub struct Prior {
 /// differs from the header's — both by way of [`edfund_core::csv::rows`].
 #[must_use]
 pub fn frame() -> Vec<Prior> {
+    static FRAME: OnceLock<Vec<Prior>> = OnceLock::new();
+    FRAME.get_or_init(parse_frame).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse_frame() -> Vec<Prior> {
     edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
         .map(|row| Prior {
             irn: row.str(0).to_string(),

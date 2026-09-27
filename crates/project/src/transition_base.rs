@@ -44,6 +44,7 @@
 //! $47,928.29, in a quantity this module totals at $256.5m. See [`RESTATED`].
 
 use std::collections::BTreeMap;
+use std::sync::OnceLock;
 
 use edfund_core::Dollars;
 
@@ -170,6 +171,15 @@ pub struct Fy2021Base {
 /// [`edfund_core::csv::rows`].
 #[must_use]
 pub fn fy2019() -> Vec<Fy2019> {
+    static FY2019: OnceLock<Vec<Fy2019>> = OnceLock::new();
+    FY2019.get_or_init(parse_fy2019).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse_fy2019() -> Vec<Fy2019> {
     edfund_core::csv::rows(FY19_FIXTURE, FY19_HEADER)
         .map(|row| Fy2019 {
             irn: row.str(0).to_string(),
@@ -227,6 +237,15 @@ impl Fy2019 {
 /// [`edfund_core::csv::rows`].
 #[must_use]
 pub fn fy2021_base() -> Vec<Fy2021Base> {
+    static FY2021_BASE: OnceLock<Vec<Fy2021Base>> = OnceLock::new();
+    FY2021_BASE.get_or_init(parse_fy2021_base).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse_fy2021_base() -> Vec<Fy2021Base> {
     edfund_core::csv::rows(FY21_FIXTURE, FY21_HEADER)
         .map(|row| Fy2021Base {
             irn: row.str(0).to_string(),

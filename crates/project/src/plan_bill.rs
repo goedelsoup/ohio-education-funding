@@ -40,6 +40,8 @@
 //! inside the sentences as bare four-digit integers. [`flat`] strips them, because a phrase search
 //! over the raw text fails on any sentence long enough to cross a line — which is most of them.
 
+use std::sync::OnceLock;
+
 /// The committed extract: the whole bill, as introduced.
 pub const FIXTURE: &str = include_str!("../fixtures/hb1-134-as-introduced.txt");
 
@@ -62,6 +64,15 @@ pub const FIXTURE: &str = include_str!("../fixtures/hb1-134-as-introduced.txt");
 /// mid-sentence when the lines are joined, and it is matched as a whole phrase.
 #[must_use]
 pub fn flat() -> String {
+    static FLAT: OnceLock<String> = OnceLock::new();
+    FLAT.get_or_init(render).clone()
+}
+
+/// The bill, flattened.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the walk is pure and reads
+/// only compiled-in fixtures, so a second pass could only reproduce the first.
+fn render() -> String {
     let mut out = String::new();
     for line in FIXTURE.lines() {
         let trimmed = line.trim_end();

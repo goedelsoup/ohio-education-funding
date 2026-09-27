@@ -137,6 +137,7 @@ pub fn jon_peterson_award(category: usize) -> Dollars {
 /// way to ask how much of the award schedule actually binds.
 pub mod report {
     use std::collections::BTreeMap;
+    use std::sync::OnceLock;
 
     use edfund_core::Dollars;
 
@@ -220,6 +221,15 @@ pub mod report {
     /// [`edfund_core::csv::rows`].
     #[must_use]
     pub fn programmes() -> BTreeMap<String, Programme> {
+        static PROGRAMMES: OnceLock<BTreeMap<String, Programme>> = OnceLock::new();
+        PROGRAMMES.get_or_init(parse_programmes).clone()
+    }
+
+    /// The fixture, read.
+    ///
+    /// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file
+    /// is compiled in, so a second read could only reproduce the first.
+    fn parse_programmes() -> BTreeMap<String, Programme> {
         edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
             .map(|row| {
                 (
@@ -424,6 +434,7 @@ pub mod history {
 
     use std::collections::BTreeMap;
     use std::ops::RangeInclusive;
+    use std::sync::OnceLock;
 
     use edfund_core::FiscalYear;
 
@@ -506,6 +517,15 @@ renewal_low_income";
     /// measure this module does not know — both of which mean the extractor changed shape.
     #[must_use]
     pub fn observations() -> Vec<Observation> {
+        static OBSERVATIONS: OnceLock<Vec<Observation>> = OnceLock::new();
+        OBSERVATIONS.get_or_init(parse_observations).clone()
+    }
+
+    /// The fixture, read.
+    ///
+    /// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file
+    /// is compiled in, so a second read could only reproduce the first.
+    fn parse_observations() -> Vec<Observation> {
         edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
             .map(|row| Observation {
                 program: row.str(0).to_string(),
@@ -598,6 +618,7 @@ pub mod jpsn {
 
     use std::collections::BTreeMap;
     use std::ops::RangeInclusive;
+    use std::sync::OnceLock;
 
     use edfund_core::{Dollars, FiscalYear};
 
@@ -713,6 +734,15 @@ pub mod jpsn {
     /// [`edfund_core::csv::rows`], or if a row carries no fiscal year.
     #[must_use]
     pub fn editions() -> BTreeMap<FiscalYear, Edition> {
+        static EDITIONS: OnceLock<BTreeMap<FiscalYear, Edition>> = OnceLock::new();
+        EDITIONS.get_or_init(parse_editions).clone()
+    }
+
+    /// The fixture, read.
+    ///
+    /// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file
+    /// is compiled in, so a second read could only reproduce the first.
+    fn parse_editions() -> BTreeMap<FiscalYear, Edition> {
         edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
             .map(|row| {
                 let year =

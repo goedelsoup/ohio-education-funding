@@ -34,6 +34,8 @@
 //! balance rising through those years is not evidence of a district's own position improving.
 //! [`Finances::pandemic_years`] names the affected span rather than leaving it to be discovered.
 
+use std::sync::OnceLock;
+
 use edfund_core::{Dollars, FiscalYear};
 
 /// The committed financial panel, built from two five-year-forecast filings.
@@ -335,6 +337,15 @@ total_expenditure,beginning_cash,ending_cash";
 /// runtime one — the file is compiled in.
 #[must_use]
 pub fn finances() -> Vec<Finances> {
+    static FINANCES_ROWS: OnceLock<Vec<Finances>> = OnceLock::new();
+    FINANCES_ROWS.get_or_init(parse).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse() -> Vec<Finances> {
     let mut out: Vec<Finances> = Vec::new();
     for row in edfund_core::csv::rows(FINANCES, EXPECTED_HEADER) {
         let irn = row.str(0).to_string();

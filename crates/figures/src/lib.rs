@@ -128,6 +128,7 @@
 #![forbid(unsafe_code)]
 
 use std::collections::{BTreeMap, BTreeSet, HashMap};
+use std::sync::OnceLock;
 
 use edfund_core::FiscalYear;
 use project::budget_analysis::{
@@ -1113,12 +1114,12 @@ pub struct ComputedCurve {
 /// Run every curve in [`CURVES`], in registry order.
 #[must_use]
 pub fn compute_all_curves() -> Vec<ComputedCurve> {
-    let inputs = Inputs::build();
+    let inputs = Inputs::shared();
     CURVES
         .iter()
         .map(|curve| ComputedCurve {
             curve,
-            traces: (curve.compute)(&inputs),
+            traces: (curve.compute)(inputs),
         })
         .collect()
 }
@@ -1134,12 +1135,12 @@ pub struct ComputedCloud {
 /// Run every cloud in [`SCATTERS`], in registry order.
 #[must_use]
 pub fn compute_all_scatters() -> Vec<ComputedCloud> {
-    let inputs = Inputs::build();
+    let inputs = Inputs::shared();
     SCATTERS
         .iter()
         .map(|scatter| ComputedCloud {
             scatter,
-            cloud: (scatter.compute)(&inputs),
+            cloud: (scatter.compute)(inputs),
         })
         .collect()
 }
@@ -1155,12 +1156,12 @@ pub struct ComputedPlane {
 /// Run every plane in [`PLANES`], in registry order.
 #[must_use]
 pub fn compute_all_planes() -> Vec<ComputedPlane> {
-    let inputs = Inputs::build();
+    let inputs = Inputs::shared();
     PLANES
         .iter()
         .map(|plane| ComputedPlane {
             plane,
-            positions: (plane.compute)(&inputs),
+            positions: (plane.compute)(inputs),
         })
         .collect()
 }
@@ -1660,12 +1661,12 @@ pub struct ComputedSpread {
 /// Run every spread in [`SPREADS`], in registry order.
 #[must_use]
 pub fn compute_all_spreads() -> Vec<ComputedSpread> {
-    let inputs = Inputs::build();
+    let inputs = Inputs::shared();
     SPREADS
         .iter()
         .map(|spread| ComputedSpread {
             spread,
-            regions: (spread.compute)(&inputs),
+            regions: (spread.compute)(inputs),
         })
         .collect()
 }
@@ -2129,12 +2130,12 @@ pub struct ComputedBand {
 /// Run every band chart in [`BANDS`], in registry order.
 #[must_use]
 pub fn compute_all_bands() -> Vec<ComputedBand> {
-    let inputs = Inputs::build();
+    let inputs = Inputs::shared();
     BANDS
         .iter()
         .map(|band| ComputedBand {
             band,
-            ranges: (band.compute)(&inputs),
+            ranges: (band.compute)(inputs),
         })
         .collect()
 }
@@ -2176,8 +2177,9 @@ fn quintile_shortfall(panel: &[DistrictRecord], quintile: usize) -> f64 {
     slice.iter().map(|pair| pair.1).sum::<f64>() / slice.len() as f64
 }
 
-/// The shared inputs. Built once, because the FY2027 panel and the county abstract are read from
-/// fixtures and every regime-diff figure below wants the same two runs over them.
+/// The shared inputs. Built once per process by [`Inputs::shared`], because the FY2027 panel and
+/// the county abstract are read from fixtures and every regime-diff figure below wants the same
+/// two runs over them.
 pub struct Inputs {
     /// The 609 districts of the FY2027 department model.
     pub panel: Vec<DistrictRecord>,
@@ -3034,9 +3036,26 @@ impl Margins {
 }
 
 impl Inputs {
-    /// Read the fixtures and run both counterfactuals.
+    /// The one build of this process, read the first time a registry is run and borrowed after.
+    ///
+    /// Every `compute_all_*` entry point below wants the whole struct, and there are seven of
+    /// them; `json::manifest` and `json::series_manifest` between them call all seven, so a
+    /// per-entry-point build ran [`Inputs::build`] — two full `project` regime runs, a thirteen
+    /// origin backtest and `project::outcomes::joined()` — seven times to produce one manifest.
+    /// Nothing about the result can differ between builds: every input is a committed fixture or
+    /// a compile-time constant, so the second run could only ever reproduce the first. What it
+    /// could do is take four minutes.
+    ///
+    /// Borrowed rather than cloned. The struct is a few megabytes of panels and standings and
+    /// every consumer is a `fn(&Inputs)`, so there is nothing for a clone to buy.
     #[must_use]
-    pub fn build() -> Self {
+    pub fn shared() -> &'static Self {
+        static INPUTS: OnceLock<Inputs> = OnceLock::new();
+        INPUTS.get_or_init(Self::build)
+    }
+
+    /// Read the fixtures and run both counterfactuals.
+    fn build() -> Self {
         let panel = panel();
         // Built before the struct literal because the outcome block is computed FROM it, and the
         // literal below moves it in.
@@ -3825,12 +3844,12 @@ pub struct Computed {
 /// Run every figure in [`FIGURES`], in registry order.
 #[must_use]
 pub fn compute_all() -> Vec<Computed> {
-    let inputs = Inputs::build();
+    let inputs = Inputs::shared();
     FIGURES
         .iter()
         .map(|figure| Computed {
             figure,
-            value: (figure.compute)(&inputs),
+            value: (figure.compute)(inputs),
         })
         .collect()
 }
@@ -3844,18 +3863,14 @@ pub struct ComputedSeries {
 }
 
 /// Run every series in [`SERIES`], in registry order.
-///
-/// Builds [`Inputs`] a second time when both manifests are written in one process. That is a
-/// fixture read repeated, not a result that can differ, and cheaper than threading one build
-/// through two binaries' worth of call sites.
 #[must_use]
 pub fn compute_all_series() -> Vec<ComputedSeries> {
-    let inputs = Inputs::build();
+    let inputs = Inputs::shared();
     SERIES
         .iter()
         .map(|series| ComputedSeries {
             series,
-            rows: (series.compute)(&inputs),
+            rows: (series.compute)(inputs),
         })
         .collect()
 }

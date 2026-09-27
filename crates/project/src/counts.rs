@@ -46,6 +46,7 @@
 //! sheet does.
 
 use std::collections::BTreeMap;
+use std::sync::OnceLock;
 
 use edfund_core::Adm;
 
@@ -190,6 +191,15 @@ impl Stability {
 /// differs from it. Both mean a column moved, and every field below is read by position.
 #[must_use]
 pub fn frame() -> Vec<Row> {
+    static FRAME: OnceLock<Vec<Row>> = OnceLock::new();
+    FRAME.get_or_init(parse_frame).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse_frame() -> Vec<Row> {
     let mut lines = COUNTS.lines();
     let header = lines.next().unwrap_or_default();
     assert_eq!(
@@ -306,6 +316,15 @@ pub struct Vintage {
 /// If a line does not have the five tab-separated fields the header names.
 #[must_use]
 pub fn vintages() -> Vec<Vintage> {
+    static VINTAGE_ROWS: OnceLock<Vec<Vintage>> = OnceLock::new();
+    VINTAGE_ROWS.get_or_init(parse_vintages).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse_vintages() -> Vec<Vintage> {
     let mut lines = VINTAGES.lines();
     let header = lines.next().unwrap_or_default();
     assert_eq!(header, "workbook\tmodel\tcalculation\tvariable\tdata_from");
@@ -400,6 +419,15 @@ pub fn english_learner_weighted(row: &Row) -> f64 {
 /// opposite reason. Pupils advancing down the taper is exactly what makes it true.
 #[must_use]
 pub fn composition_losers() -> (usize, usize) {
+    static COMPOSITION_LOSERS: OnceLock<(usize, usize)> = OnceLock::new();
+    *COMPOSITION_LOSERS.get_or_init(count_composition_losers)
+}
+
+/// The two counts, walked.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the walk is pure and reads
+/// only compiled-in fixtures, so a second pass could only reproduce the first.
+fn count_composition_losers() -> (usize, usize) {
     let (before, after) = (year(YEARS.0), year(YEARS.1));
     let mut any = 0;
     let mut losers = 0;
@@ -447,6 +475,15 @@ pub struct AdmRow {
 /// If the fixture's header is not the one this reader was written against.
 #[must_use]
 pub fn adm_series() -> Vec<AdmRow> {
+    static ADM_ROWS: OnceLock<Vec<AdmRow>> = OnceLock::new();
+    ADM_ROWS.get_or_init(parse_adm_series).clone()
+}
+
+/// The fixture, read.
+///
+/// `OnceLock` for the reason `project::panel`'s reader has one: the parse is pure and the file is
+/// compiled in, so a second read could only reproduce the first.
+fn parse_adm_series() -> Vec<AdmRow> {
     let mut lines = ADM_SERIES.lines();
     assert_eq!(
         lines.next().unwrap_or_default(),
