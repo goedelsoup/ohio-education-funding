@@ -34,15 +34,9 @@
 
 mod common;
 
-use dispersion::{partial_correlation, rank_correlation, wealth_neutrality};
+use dispersion::{partial_correlation, rank_correlation};
+use edfund_core::stats::correlation;
 use project::outcomes::{joined, Joined};
-
-/// Pearson correlation, via the crate that owns it.
-fn correlation(xs: &[f64], ys: &[f64]) -> f64 {
-    wealth_neutrality(xs, ys)
-        .expect("equal-length series")
-        .correlation
-}
 
 /// Correlation of `xs` with `ys` holding `control` constant.
 ///
@@ -51,9 +45,9 @@ fn correlation(xs: &[f64], ys: &[f64]) -> f64 {
 /// the common case where all three are Pearson over the same rows.
 fn controlling_for(xs: &[f64], ys: &[f64], control: &[f64]) -> f64 {
     partial_correlation(
-        correlation(xs, ys),
-        correlation(xs, control),
-        correlation(ys, control),
+        correlation(xs, ys).expect("equal-length series, both varying"),
+        correlation(xs, control).expect("equal-length series, both varying"),
+        correlation(ys, control).expect("equal-length series, both varying"),
     )
     .expect("a non-degenerate control")
 }
@@ -110,7 +104,7 @@ fn poverty_dominates_the_performance_index() {
         |r| r.economically_disadvantaged,
         performance_index,
     );
-    let r = correlation(&poverty, &index);
+    let r = correlation(&poverty, &index).expect("equal-length series, both varying");
     assert!(
         (r - -0.846).abs() < 0.01,
         "poverty against the Performance Index is {r:.3}, not the established -0.846"
@@ -123,7 +117,7 @@ fn guarantee_status_predicts_achievement_until_poverty_is_held_constant() {
     let records = joined();
     let (guarantee, index, poverty) = series(&records, on_guarantee, performance_index);
 
-    let raw = correlation(&guarantee, &index);
+    let raw = correlation(&guarantee, &index).expect("equal-length series, both varying");
     assert!((raw - 0.187).abs() < 0.01, "raw {raw:.3}");
 
     let controlled = controlling_for(&guarantee, &index, &poverty);
@@ -170,13 +164,13 @@ fn the_same_holds_for_growth_and_for_a_continuous_reading_of_dependence() {
 fn the_guaranteed_districts_are_less_poor_which_is_the_whole_mechanism() {
     let records = joined();
     let poverty_of = |on: bool| {
-        common::median(
+        common::median_interpolated(
             records
                 .iter()
                 .filter(|r| r.on_guarantee() == on)
-                .filter_map(|r| r.economically_disadvantaged)
-                .collect(),
+                .filter_map(|r| r.economically_disadvantaged),
         )
+        .expect("a median is taken of a non-empty series here")
     };
     let guaranteed = poverty_of(true);
     let formula = poverty_of(false);
@@ -196,13 +190,13 @@ fn the_top_coded_measure_more_than_doubles_the_apparent_poverty_gap() {
     let records = joined();
     let gap = |share: fn(&Joined) -> Option<f64>, scale: f64| {
         let of = |on: bool| {
-            common::median(
+            common::median_interpolated(
                 records
                     .iter()
                     .filter(|r| r.on_guarantee() == on)
-                    .filter_map(share)
-                    .collect(),
+                    .filter_map(share),
             )
+            .expect("a median is taken of a non-empty series here")
         };
         (of(false) - of(true)) * scale
     };
@@ -264,7 +258,7 @@ fn the_result_survives_a_rank_based_reading() {
     let records = joined();
     let (guarantee, index, _) = series(&records, guarantee_share, performance_index);
     let spearman = rank_correlation(&guarantee, &index).expect("equal lengths");
-    let pearson = correlation(&guarantee, &index);
+    let pearson = correlation(&guarantee, &index).expect("equal-length series, both varying");
     assert!(
         spearman.signum() == pearson.signum() && (spearman - pearson).abs() < 0.15,
         "rank {spearman:.3} vs pearson {pearson:.3}"
@@ -292,8 +286,9 @@ fn the_published_near_zero_correlation_turns_on_a_single_tiny_district() {
         performance_index,
     );
 
-    let weighted_606 = correlation(&weighted, &index);
-    let enrolled_606 = correlation(&enrolled, &index_again);
+    let weighted_606 = correlation(&weighted, &index).expect("equal-length series, both varying");
+    let enrolled_606 =
+        correlation(&enrolled, &index_again).expect("equal-length series, both varying");
 
     // Published over 607: -0.0155 weighted, -0.3365 enrolled.
     assert!(

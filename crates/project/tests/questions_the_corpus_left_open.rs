@@ -17,22 +17,10 @@
 //!   5. **The twenty-mill floor's last untested candidate.** Partly answered, and the limit of
 //!      what this data can say is stated rather than papered over.
 
+use edfund_core::stats::correlation;
 use project::panel::{self, DistrictRecord};
 
 const SD1: &str = include_str!("../../dispersion/fixtures/sd1-district-taxes.csv");
-
-/// Pearson correlation.
-fn correlation(x: &[f64], y: &[f64]) -> f64 {
-    let n = x.len() as f64;
-    let (mx, my) = (x.iter().sum::<f64>() / n, y.iter().sum::<f64>() / n);
-    let sx = x.iter().map(|v| (v - mx).powi(2)).sum::<f64>().sqrt();
-    let sy = y.iter().map(|v| (v - my).powi(2)).sum::<f64>().sqrt();
-    x.iter()
-        .zip(y)
-        .map(|(a, b)| (a - mx) * (b - my))
-        .sum::<f64>()
-        / (sx * sy)
-}
 
 /// Mean of `value` within each fifth of the panel ordered by `key`.
 fn quintile_means(mut rows: Vec<(f64, f64)>) -> Vec<f64> {
@@ -106,7 +94,7 @@ fn gifted_identification_tracks_poverty_more_strongly_than_property() {
 
     let split = |rows: Vec<(f64, f64)>| {
         let (x, y): (Vec<f64>, Vec<f64>) = rows.into_iter().unzip();
-        correlation(&x, &y)
+        correlation(&x, &y).expect("two series of the same length, both varying")
     };
     let r_wealth = split(by_wealth);
     let r_poverty = split(by_poverty);

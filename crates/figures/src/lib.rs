@@ -142,6 +142,7 @@
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 use std::sync::OnceLock;
 
+use edfund_core::stats::{median_interpolated, median_upper_middle};
 use edfund_core::FiscalYear;
 use project::budget_analysis::{
     self, Edition, ALI_200540_TOTAL, LOTTERY_LINE, PRESCHOOL_REMAINDER, TOTAL_FOUNDATION_AID,
@@ -1183,13 +1184,13 @@ impl Margins {
     /// The median marginal pupil in one regime, on total state support.
     #[must_use]
     pub fn median_marginal(&self, response: project::margin::Response) -> f64 {
-        median(
+        median_upper_middle(
             self.pupil
                 .iter()
                 .filter(|p| p.response == response)
-                .map(|p| p.marginal)
-                .collect(),
+                .map(|p| p.marginal),
         )
+        .expect("every response class holds marginal pupils")
     }
 
     /// Districts that lose no foundation aid at all when a pupil leaves.
@@ -1251,12 +1252,12 @@ impl Margins {
     /// anything to at all.
     #[must_use]
     pub fn recapture(&self) -> f64 {
-        median(
+        median_upper_middle(
             self.wealth
                 .iter()
-                .filter_map(project::margin::Wealth::recapture)
-                .collect(),
+                .filter_map(project::margin::Wealth::recapture),
         )
+        .expect("districts sit at the twenty-mill floor")
     }
 }
 
@@ -1528,14 +1529,15 @@ impl Inputs {
                 size_bands,
                 expected_from_size: project::size_incidence::expected_from_size(&size_bands),
                 unmoved: project::size_incidence::carried(&panel_for_forecasts, &unmoved),
-                unmoved_median_adm: median(unmoved.iter().map(|s| s.adm).collect()),
-                moved_median_adm: median(
+                unmoved_median_adm: median_upper_middle(unmoved.iter().map(|s| s.adm))
+                    .expect("the unmoved cluster is not empty"),
+                moved_median_adm: median_upper_middle(
                     siblings
                         .iter()
                         .filter(|s| !left_behind.contains(&s.irn))
-                        .map(|s| s.adm)
-                        .collect(),
-                ),
+                        .map(|s| s.adm),
+                )
+                .expect("the moved cluster is not empty"),
                 cluster_and_siblings: project::size_incidence::cluster_and_siblings(&rows).len(),
                 shrinking_at_the_cluster_rate:
                     project::size_incidence::shrinking_at_the_cluster_rate(&rows).len(),
@@ -1695,14 +1697,12 @@ impl Inputs {
             outcome_block,
             toledo: CrossSection::of(TOLEDO),
             perrysburg: CrossSection::of(PERRYSBURG),
-            median_operating_per_pupil: {
-                let mut column: Vec<f64> = dispersion::functions::districts()
+            median_operating_per_pupil: median_interpolated(
+                dispersion::functions::districts()
                     .iter()
-                    .filter_map(|d| d.operating)
-                    .collect();
-                column.sort_by(|a, b| a.partial_cmp(b).expect("no NaN in a published dollar"));
-                dispersion::median(&column).expect("the function file is not empty")
-            },
+                    .filter_map(|d| d.operating),
+            )
+            .expect("the function file is not empty"),
             fy2016: Fy2016 {
                 districts: dispersion::fy2016::frame(),
                 by_valuation: dispersion::fy2016::quintiles_by(|d| d.total_valuation),
@@ -1997,13 +1997,6 @@ fn census_ranked(i: &Inputs) -> Vec<project::bounds::Row> {
     let mut rows = project::bounds::census(&i.panel);
     rows.sort_by_key(|row| core::cmp::Reverse(row.operative));
     rows
-}
-
-/// The median of a sample. Sorted here rather than by the caller, because every call site wants
-/// the same thing and one of them getting the sort wrong would move a figure quietly.
-fn median(mut sample: Vec<f64>) -> f64 {
-    sample.sort_by(f64::total_cmp);
-    sample[sample.len() / 2]
 }
 
 /// Every district carrying an open-enrolment clawback, as `(count, total, largest, second)`.

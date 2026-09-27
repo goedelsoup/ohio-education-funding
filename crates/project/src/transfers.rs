@@ -63,6 +63,7 @@
 
 use std::collections::BTreeMap;
 
+use edfund_core::stats::{association, correlation, median_upper_middle};
 use edfund_core::FiscalYear;
 
 /// The fiscal years the build-up is measured across, as the node states it.
@@ -206,6 +207,7 @@ pub fn build_up_against_relief() -> f64 {
         &all.iter().map(|d| d.relief_per_pupil).collect::<Vec<_>>(),
         &all.iter().map(|d| d.build_up_per_pupil).collect::<Vec<_>>(),
     )
+    .expect("the relief panel is 600 districts wide and neither column is constant")
 }
 
 /// How much of the build-up the relief can be held responsible for, under one baseline.
@@ -270,23 +272,20 @@ pub fn attribution(against_both: bool) -> Attribution {
 
     let xs: Vec<f64> = all.iter().map(|d| d.relief_per_pupil).collect();
     let ys: Vec<f64> = all.iter().map(excess_of).collect();
-    let n = xs.len() as f64;
-    let (mx, my) = (xs.iter().sum::<f64>() / n, ys.iter().sum::<f64>() / n);
-    let slope = xs
-        .iter()
-        .zip(&ys)
-        .map(|(x, y)| (x - mx) * (y - my))
-        .sum::<f64>()
-        / xs.iter().map(|x| (x - mx).powi(2)).sum::<f64>();
+    let slope = association(&xs, &ys)
+        .expect("the relief panel is 600 districts wide and neither column is constant")
+        .slope;
 
     // The outer quartiles only — this slope is the line between their medians, and the two middle
-    // ones are not on it.
+    // ones are not on it. The upper middle, which is what this crate's subgroup statistics report.
     let size = all.len() / 4;
     let (poorest, richest) = (&all[..size], &all[3 * size..]);
-    let robust_slope = (median(richest.iter().map(excess_of))
-        - median(poorest.iter().map(excess_of)))
-        / (median(richest.iter().map(|d| d.relief_per_pupil))
-            - median(poorest.iter().map(|d| d.relief_per_pupil)));
+    let median = |slice: &[District], pick: &dyn Fn(&District) -> f64| {
+        median_upper_middle(slice.iter().map(pick)).expect("an outer quartile is not empty")
+    };
+    let robust_slope = (median(richest, &excess_of) - median(poorest, &excess_of))
+        / (median(richest, &|d: &District| d.relief_per_pupil)
+            - median(poorest, &|d: &District| d.relief_per_pupil));
 
     Attribution {
         excess,
@@ -295,22 +294,4 @@ pub fn attribution(against_both: bool) -> Attribution {
         slope,
         robust_slope,
     }
-}
-
-fn median(values: impl Iterator<Item = f64>) -> f64 {
-    let mut sample: Vec<f64> = values.collect();
-    sample.sort_by(f64::total_cmp);
-    sample.get(sample.len() / 2).copied().unwrap_or(f64::NAN)
-}
-
-fn correlation(xs: &[f64], ys: &[f64]) -> f64 {
-    let n = xs.len() as f64;
-    if n < 2.0 {
-        return f64::NAN;
-    }
-    let (mx, my) = (xs.iter().sum::<f64>() / n, ys.iter().sum::<f64>() / n);
-    let cov: f64 = xs.iter().zip(ys).map(|(x, y)| (x - mx) * (y - my)).sum();
-    let sx: f64 = xs.iter().map(|x| (x - mx).powi(2)).sum::<f64>().sqrt();
-    let sy: f64 = ys.iter().map(|y| (y - my).powi(2)).sum::<f64>().sqrt();
-    cov / (sx * sy)
 }

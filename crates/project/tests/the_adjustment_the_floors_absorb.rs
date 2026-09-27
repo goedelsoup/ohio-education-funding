@@ -13,6 +13,7 @@
 //! pupil against the $464.06 the floor pays, and a dated phase-down retires $695,296 of the
 //! $67.4m it reports, because `[K]` is standing behind the line it retires.
 
+use edfund_core::stats::median_upper_middle;
 use edfund_core::FiscalYear;
 use project::decline_adjustment::{
     self as pricing, eligible, fully_backstopped, Line, Shape, MIRROR_THRESHOLD,
@@ -25,13 +26,6 @@ use project::series::{Method, DEFAULT_DAMPING, DEFAULT_SHRINK_WEIGHT, ONE_SIGMA}
 
 /// A cent, the tolerance every dollar figure here is asserted at.
 const CENT: f64 = 0.01;
-
-/// The crates' median: the upper middle, never the mean of two.
-fn upper_middle(mut values: Vec<f64>) -> f64 {
-    assert!(!values.is_empty());
-    values.sort_by(|a, b| a.partial_cmp(b).expect("no NaN"));
-    values[values.len() / 2]
-}
 
 /// The two floors the cluster sits behind, which is why placement is the decision.
 #[test]
@@ -263,12 +257,12 @@ fn the_rolling_count_substitutes_a_rule_for_a_floor_and_not_any_money() {
         (per_pupil - 19.82).abs() < 0.01,
         "${per_pupil:.2} a pupil across the cluster"
     );
-    let floor_per_pupil = upper_middle(
+    let floor_per_pupil = median_upper_middle(
         cluster
             .iter()
-            .map(|record| record.guarantee / record.current_year_adm)
-            .collect(),
-    );
+            .map(|record| record.guarantee / record.current_year_adm),
+    )
+    .expect("no values to take a median of");
     assert!(
         (floor_per_pupil - 464.06).abs() < CENT,
         "against the ${floor_per_pupil:.2} the floor pays the median member"

@@ -180,6 +180,7 @@
 
 use std::collections::BTreeMap;
 
+use edfund_core::stats::median_upper_middle;
 use edfund_core::{Adm, Dollars};
 
 use crate::panel::DistrictRecord;
@@ -398,7 +399,7 @@ pub struct Cluster {
     pub dollars: Dollars,
     /// Their current-year enrolled ADM.
     pub adm: Adm,
-    /// The upper-middle multiple, on [`dispersion::median`]'s convention.
+    /// The upper-middle multiple, on [`edfund_core::stats::median_upper_middle`]'s convention.
     pub median_multiple: f64,
     /// The upper-middle state share of base cost.
     pub median_state_share: f64,
@@ -442,13 +443,16 @@ pub fn clusters(panel: &[DistrictRecord]) -> (Vec<Cluster>, Vec<String>) {
                 districts: rows.len(),
                 dollars: rows.iter().map(|(r, _)| r.guarantee).sum(),
                 adm: rows.iter().map(|(r, _)| r.current_year_adm).sum(),
-                median_multiple: upper_middle(rows.iter().map(|(_, s)| s.multiple).collect()),
-                median_state_share: upper_middle(
-                    rows.iter().map(|(r, _)| r.state_share_fraction()).collect(),
-                ),
-                median_enrollment_index: upper_middle(
-                    rows.iter().map(|(_, s)| s.enrollment_index).collect(),
-                ),
+                median_multiple: median_upper_middle(rows.iter().map(|(_, s)| s.multiple))
+                    .expect("a cluster holds the districts that were sorted into it"),
+                median_state_share: median_upper_middle(
+                    rows.iter().map(|(r, _)| r.state_share_fraction()),
+                )
+                .expect("a cluster holds the districts that were sorted into it"),
+                median_enrollment_index: median_upper_middle(
+                    rows.iter().map(|(_, s)| s.enrollment_index),
+                )
+                .expect("a cluster holds the districts that were sorted into it"),
                 formula_now_pays_more_per_pupil: rows
                     .iter()
                     .filter(|(_, s)| s.per_pupil_term <= 0.0)
@@ -457,12 +461,6 @@ pub fn clusters(panel: &[DistrictRecord]) -> (Vec<Cluster>, Vec<String>) {
         })
         .collect();
     (clusters, unreached)
-}
-
-/// The upper-middle value, which is [`dispersion::median`]'s convention and not Python's.
-fn upper_middle(mut values: Vec<f64>) -> f64 {
-    values.sort_by(f64::total_cmp);
-    values[values.len() / 2]
 }
 
 /// How many years until this district's state share reaches the minimum, at the rate the two

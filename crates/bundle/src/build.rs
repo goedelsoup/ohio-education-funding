@@ -55,6 +55,7 @@ use dispersion::mr81::poverty_share_by_year;
 use dispersion::ohio_panel::{equalization_by_year, revenue_mix_by_year};
 use dispersion::profile::ProfileDistrict;
 use dispersion::{partial_correlation, wealth_neutrality};
+use edfund_core::stats::{correlation, median_interpolated};
 use edfund_core::{AgencyType, FiscalYear};
 use foundation::{aggregate_base_cost, StatewideFactors};
 use project::appropriations::{self, Basis};
@@ -112,16 +113,6 @@ const REPORT_CARD_FIXTURE: &str = "report-card-2425-district-data.csv";
 /// operating expenditure for FY2025 in the same download, and a card showing both under one label
 /// would be picking one and being wrong about the other half of its own figures.
 const REPORT_CARD_SPENDING_YEAR: u16 = 2025;
-
-/// The median of an unsorted series, zero where it is empty.
-///
-/// Sorts, then defers to [`dispersion::median`] so the feed and the equity statistics share one
-/// definition. This used to take the upper of the two middle observations, which disagrees with
-/// `dispersion` on every even-length series — and two of the panels here are even.
-fn median(mut values: Vec<f64>) -> f64 {
-    values.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
-    dispersion::median(&values).unwrap_or(0.0)
-}
 
 /// Every draft, flattened for the feed.
 ///
@@ -376,19 +367,15 @@ fn forecast_years() -> Vec<(&'static str, usize, FiscalYear)> {
     ]
 }
 
-/// Pearson correlation over two equal-length series.
-fn correlation(xs: &[f64], ys: &[f64]) -> f64 {
-    wealth_neutrality(xs, ys).map_or(f64::NAN, |w| w.correlation)
-}
-
 /// `xs` against `ys` holding `control` constant.
+///
+/// NaN where any of the three pairings has nothing to report — fewer than two observations, or a
+/// series that does not vary. The feed's fields are plain `f64`, so an absence has to arrive as
+/// NaN; which inputs have no answer is [`edfund_core::stats::correlation`]'s decision and not one
+/// this module makes for itself.
 fn controlling_for(xs: &[f64], ys: &[f64], control: &[f64]) -> f64 {
-    partial_correlation(
-        correlation(xs, ys),
-        correlation(xs, control),
-        correlation(ys, control),
-    )
-    .unwrap_or(f64::NAN)
+    let r = |a: &[f64], b: &[f64]| correlation(a, b).unwrap_or(f64::NAN);
+    partial_correlation(r(xs, ys), r(xs, control), r(ys, control)).unwrap_or(f64::NAN)
 }
 
 /// A share the source publishes as 0 to 100, as the fraction this bundle publishes.
@@ -551,19 +538,20 @@ pub fn outcome_statewide(records: &[Joined]) -> Option<OutcomeStatewide> {
         .count();
 
     let median_index = |on: bool| {
-        median(
+        median_interpolated(
             records
                 .iter()
                 .filter(|r| r.on_guarantee() == on)
-                .filter_map(index)
-                .collect(),
+                .filter_map(index),
         )
+        .unwrap_or(0.0)
     };
 
     Some(OutcomeStatewide {
         districts: records.len(),
-        poverty_vs_performance: correlation(&poverty_series, &index_series),
-        guarantee_vs_performance: correlation(&guarantee_series, &guarantee_index),
+        poverty_vs_performance: correlation(&poverty_series, &index_series).unwrap_or(f64::NAN),
+        guarantee_vs_performance: correlation(&guarantee_series, &guarantee_index)
+            .unwrap_or(f64::NAN),
         guarantee_vs_performance_controlled: controlling_for(
             &guarantee_series,
             &guarantee_index,
@@ -574,11 +562,13 @@ pub fn outcome_statewide(records: &[Joined]) -> Option<OutcomeStatewide> {
             &growth_series,
             &spend_poverty,
         ),
-        weighted_spending_vs_performance: correlation(&weighted_series, &weighted_index),
-        enrolled_spending_vs_performance: correlation(&enrolled_series, &enrolled_index),
+        weighted_spending_vs_performance: correlation(&weighted_series, &weighted_index)
+            .unwrap_or(f64::NAN),
+        enrolled_spending_vs_performance: correlation(&enrolled_series, &enrolled_index)
+            .unwrap_or(f64::NAN),
         median_performance_on_guarantee: median_index(true),
         median_performance_on_formula: median_index(false),
-        median_federal_share: median(shares.clone()),
+        median_federal_share: median_interpolated(shares.clone()).unwrap_or(0.0),
         max_federal_share: shares.iter().copied().fold(0.0, f64::max),
         federal_share_above_tenth: shares.iter().filter(|s| **s > 0.10).count(),
         federal_share_vs_performance: controlling_for(
@@ -586,11 +576,12 @@ pub fn outcome_statewide(records: &[Joined]) -> Option<OutcomeStatewide> {
             &federal_index,
             &federal_poverty,
         ),
-        federal_share_vs_performance_raw: correlation(&federal_series, &federal_index),
+        federal_share_vs_performance_raw: correlation(&federal_series, &federal_index)
+            .unwrap_or(f64::NAN),
         growth_measures_disagree: disagree,
         growth_measures_determinate: determinate.len(),
         growth_measures_disagree_materially: materially,
-        growth_measure_agreement: correlation(&three, &one),
+        growth_measure_agreement: correlation(&three, &one).unwrap_or(f64::NAN),
     })
 }
 
@@ -2078,36 +2069,32 @@ pub fn build() -> Bundle {
         on_guarantee: districts.iter().filter(|d| d.on_guarantee()).count(),
         at_millage_floor: districts.iter().filter(|d| d.at_millage_floor()).count(),
         near_millage_floor: districts.iter().filter(|d| d.near_millage_floor()).count(),
-        median_voted_millage: median(
+        median_voted_millage: median_interpolated(
+            districts.iter().filter_map(|d| d.voted_operating_millage),
+        )
+        .unwrap_or(0.0),
+        median_effective_millage: median_interpolated(
+            districts.iter().filter_map(|d| d.effective_class1_millage),
+        )
+        .unwrap_or(0.0),
+        median_millage_reduction: median_interpolated(
             districts
                 .iter()
-                .filter_map(|d| d.voted_operating_millage)
-                .collect(),
-        ),
-        median_effective_millage: median(
-            districts
-                .iter()
-                .filter_map(|d| d.effective_class1_millage)
-                .collect(),
-        ),
-        median_millage_reduction: median(
-            districts
-                .iter()
-                .filter_map(|d| d.millage.and_then(|m| m.cumulative_reduction))
-                .collect(),
-        ),
-        median_yield_per_mill: median(yields.clone()),
+                .filter_map(|d| d.millage.and_then(|m| m.cumulative_reduction)),
+        )
+        .unwrap_or(0.0),
+        median_yield_per_mill: median_interpolated(yields.clone()).unwrap_or(0.0),
         min_yield_per_mill: yields.iter().copied().fold(f64::INFINITY, f64::min),
         max_yield_per_mill: yields.iter().copied().fold(f64::NEG_INFINITY, f64::max),
         // On Table SD-1's own denominator, so a district's SD-1 figure is positioned against a
         // median computed the same way. The profile report's median is a different quantity.
-        median_sd1_value_per_pupil: median(
+        median_sd1_value_per_pupil: median_interpolated(
             districts
                 .iter()
                 .filter_map(|d| d.property_tax.last().map(|y| y.value_per_pupil))
-                .filter(|v| *v > 0.0)
-                .collect(),
-        ),
+                .filter(|v| *v > 0.0),
+        )
+        .unwrap_or(0.0),
         below_charge_off_rate: districts
             .iter()
             .filter(|d| {
@@ -2119,12 +2106,12 @@ pub fn build() -> Bundle {
             .iter()
             .filter(|d| d.regime.is_some_and(|r| r.exceeds_base_cost))
             .count(),
-        median_regime_difference: median(
+        median_regime_difference: median_interpolated(
             districts
                 .iter()
-                .filter_map(|d| d.regime.and_then(|r| r.difference))
-                .collect(),
-        ),
+                .filter_map(|d| d.regime.and_then(|r| r.difference)),
+        )
+        .unwrap_or(0.0),
         districts_without_targeted_assistance: districts
             .iter()
             .filter(|d| d.categoricals.targeted_assistance <= 0.0)
@@ -2133,13 +2120,13 @@ pub fn build() -> Bundle {
             .iter()
             .filter(|d| d.at_minimum_state_share)
             .count(),
-        median_valuation_per_pupil: median(wealth.clone()),
-        median_operating_expenditure_per_pupil: median(
+        median_valuation_per_pupil: median_interpolated(wealth.clone()).unwrap_or(0.0),
+        median_operating_expenditure_per_pupil: median_interpolated(
             districts
                 .iter()
-                .filter_map(|d| d.operating_expenditure_per_pupil)
-                .collect(),
-        ),
+                .filter_map(|d| d.operating_expenditure_per_pupil),
+        )
+        .unwrap_or(0.0),
         wealth_neutrality_formula: wealth_neutrality(&wealth, &formula)
             .map_or(f64::NAN, |w| w.correlation),
         wealth_neutrality_realized: wealth_neutrality(&wealth, &realized)

@@ -74,6 +74,7 @@
 
 use std::collections::BTreeMap;
 
+use edfund_core::stats::median_upper_middle;
 use edfund_core::AgencyType;
 
 /// The fiscal years the comparison runs between: the last year before the recorded break, and the
@@ -249,12 +250,19 @@ pub fn by_wealth() -> [Quartile; 4] {
             districts: slice.len(),
             at_the_floor: slice.iter().filter(|d| d.at_the_floor).count() as f64
                 / slice.len() as f64,
-            local_per_pupil: median(slice.iter().map(|d| d.local_per_pupil[&WINDOW[0]])),
-            local_growth: median(
+            // The upper middle, which is the convention this table's bound cells were computed
+            // on, and NaN rather than zero for an empty quartile: a quartile with no districts has
+            // no local yield, which is not the same claim as a yield of nothing.
+            local_per_pupil: median_upper_middle(
+                slice.iter().map(|d| d.local_per_pupil[&WINDOW[0]]),
+            )
+            .unwrap_or(f64::NAN),
+            local_growth: median_upper_middle(
                 slice
                     .iter()
                     .map(|d| d.local_per_pupil[&WINDOW[1]] / d.local_per_pupil[&WINDOW[0]] - 1.0),
-            ),
+            )
+            .unwrap_or(f64::NAN),
         }
     })
 }
@@ -297,10 +305,4 @@ fn quartile_gap(all: &[District], of: impl Fn(&District) -> f64) -> f64 {
     let size = values.len() / 4;
     let mean = |slice: &[f64]| slice.iter().sum::<f64>() / slice.len() as f64;
     mean(&values[3 * size..]) - mean(&values[..size])
-}
-
-fn median(values: impl Iterator<Item = f64>) -> f64 {
-    let mut sample: Vec<f64> = values.collect();
-    sample.sort_by(f64::total_cmp);
-    sample.get(sample.len() / 2).copied().unwrap_or(f64::NAN)
 }

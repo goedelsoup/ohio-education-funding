@@ -26,6 +26,7 @@ pub mod conventions;
 pub mod csv;
 pub mod decimal;
 pub mod records;
+pub mod stats;
 
 /// A dollar amount. See the module note on floating point.
 pub type Dollars = f64;

@@ -104,7 +104,8 @@ fn fy2025_is_the_year_the_spending_caught_up() {
             (before > 1e6).then_some(after / before)
         })
         .collect();
-    let typical = common::median(ratios);
+    let typical =
+        common::median_interpolated(ratios).expect("a median is taken of a non-empty series here");
     assert!(
         (typical - 1.137).abs() < 0.01,
         "median district spending ratio {typical:.3} — a statewide jump driven by a handful of \
@@ -165,8 +166,10 @@ fn the_guarantee_is_not_producing_districts_that_sit_on_cash() {
     assert_eq!(guaranteed.len(), 294);
     assert_eq!(on_formula.len(), 314);
 
-    let held = common::median(guaranteed);
-    let other = common::median(on_formula);
+    let held = common::median_interpolated(guaranteed)
+        .expect("a median is taken of a non-empty series here");
+    let other = common::median_interpolated(on_formula)
+        .expect("a median is taken of a non-empty series here");
     assert!((held - 0.319).abs() < 0.005, "guaranteed {held:.3}");
     assert!((other - 0.338).abs() < 0.005, "formula {other:.3}");
     // The difference is about a week of spending, in the direction opposite to the claim.
@@ -213,8 +216,10 @@ fn the_guarantee_base_is_narrower_than_a_district_s_booked_state_receipts() {
     }
     assert_eq!(held.len(), 294);
 
-    let narrow = common::median(held);
-    let wide = common::median(paid);
+    let narrow =
+        common::median_interpolated(held).expect("a median is taken of a non-empty series here");
+    let wide =
+        common::median_interpolated(paid).expect("a median is taken of a non-empty series here");
     assert!(
         (narrow - 0.899).abs() < 0.01,
         "core + guarantee {narrow:.3}"
@@ -251,8 +256,10 @@ fn the_guarantee_gap_against_formula_districts_survives_the_correction() {
             on_formula.push(ratio);
         }
     }
-    let held = common::median(guaranteed);
-    let other = common::median(on_formula);
+    let held = common::median_interpolated(guaranteed)
+        .expect("a median is taken of a non-empty series here");
+    let other = common::median_interpolated(on_formula)
+        .expect("a median is taken of a non-empty series here");
     assert!((held - 1.107).abs() < 0.01, "guaranteed {held:.3}");
     assert!((other - 1.354).abs() < 0.01, "formula {other:.3}");
     assert!(
@@ -349,7 +356,8 @@ fn real_state_aid_fell_for_most_districts_over_the_observed_span() {
         changes.push(real);
     }
 
-    let typical = common::median(changes.clone());
+    let typical = common::median_interpolated(changes.clone())
+        .expect("a median is taken of a non-empty series here");
     assert!(
         nominal_up > changes.len() / 2,
         "{nominal_up} of {} rose nominally",
@@ -393,8 +401,10 @@ fn the_guarantee_erodes_because_it_is_a_nominal_floor() {
         }
     }
 
-    let held = common::median(guaranteed.clone());
-    let other = common::median(on_formula.clone());
+    let held = common::median_interpolated(guaranteed.clone())
+        .expect("a median is taken of a non-empty series here");
+    let other = common::median_interpolated(on_formula.clone())
+        .expect("a median is taken of a non-empty series here");
     assert!(
         held < other,
         "guaranteed districts fared {held:.3} against {other:.3} on formula"
@@ -853,7 +863,8 @@ fn real_state_aid_fell_by_about_a_fifth_over_the_recent_window() {
         "{losing} of {} districts lost real ground, a share of {share:.3}",
         changes.len()
     );
-    let typical = common::median(changes.clone());
+    let typical = common::median_interpolated(changes.clone())
+        .expect("a median is taken of a non-empty series here");
     assert!(
         (typical - -0.114).abs() < 0.015,
         "the median district's real state aid changed {typical:.3}"
@@ -867,12 +878,12 @@ fn spending_held_its_real_value_over_the_window_and_state_aid_did_not() {
     let cpi = deflator::CpiSeries::cpi_u_june();
     let money = finances();
     let change = |pick: fn(&project::finances::YearRecord) -> Option<f64>| {
-        common::median(
+        common::median_interpolated(
             money
                 .iter()
-                .filter_map(|d| d.real_change(&cpi, pick).ok().flatten())
-                .collect(),
+                .filter_map(|d| d.real_change(&cpi, pick).ok().flatten()),
         )
+        .expect("a median is taken of a non-empty series here")
     };
     let aid = change(|y| y.unrestricted_aid);
     let spending = change(|y| y.total_expenditure);

@@ -67,7 +67,8 @@
 //! is what [`DistrictRecord::realized_aid`] returns and the only channel this lever touches.
 //! Transportation has its own, separate and much higher, minimum share; see
 //! `project/tests/the_floor_that_pays_the_wealthy_districts.rs`. Medians are the upper-middle
-//! value, agreeing with [`dispersion::median`] here because every subgroup taken is odd.
+//! value, agreeing with [`edfund_core::stats::median_interpolated`] here because every subgroup
+//! taken is odd.
 //!
 //! # What did not reproduce, and where it went
 //!
@@ -87,6 +88,7 @@
 //! where the axis mattered enough to try.
 
 use dispersion::wealth_neutrality;
+use edfund_core::stats::median_upper_middle;
 use project::biennium::Measure;
 use project::panel::{panel, DistrictRecord};
 use project::policy::{Policy, Statewide};
@@ -121,11 +123,6 @@ fn under(districts: &[DistrictRecord], minimum: f64) -> ScenarioDelta {
 /// built the other way would carry that error into every ratio below.
 fn naive_cut(record: &DistrictRecord, minimum: f64) -> f64 {
     record.base_cost_state_share * (1.0 - minimum / IN_FORCE)
-}
-
-fn upper_middle(mut values: Vec<f64>) -> f64 {
-    values.sort_by(|a, b| a.partial_cmp(b).expect("no NaN in a published figure"));
-    values[values.len() / 2]
 }
 
 /// **The population.** 138 at the floor, and 107 of them paid by the guarantee instead.
@@ -167,11 +164,11 @@ fn most_districts_at_the_minimum_are_paid_by_the_guarantee_rather_than_the_formu
     }
     assert_eq!(bands, [3, 7, 26, 65, 6], "the multiple, banded: {bands:?}");
 
-    let median = upper_middle(
+    let median = median_upper_middle(
         held.iter()
-            .map(|r| r.realized_aid() / r.core_foundation_funding)
-            .collect(),
-    );
+            .map(|r| r.realized_aid() / r.core_foundation_funding),
+    )
+    .expect("no values to take a median of");
     assert!(
         (median - 2.404_040).abs() < 1e-5,
         "the median multiple among the held is {median}"
@@ -179,13 +176,13 @@ fn most_districts_at_the_minimum_are_paid_by_the_guarantee_rather_than_the_formu
 
     // And the 31 the guarantee does not pay are at exactly the formula, which is what makes the
     // 138 two populations rather than a spectrum.
-    let on_formula = upper_middle(
+    let on_formula = median_upper_middle(
         at_minimum
             .iter()
             .filter(|r| !r.on_guarantee())
-            .map(|r| r.realized_aid() / r.core_foundation_funding)
-            .collect(),
-    );
+            .map(|r| r.realized_aid() / r.core_foundation_funding),
+    )
+    .expect("no values to take a median of");
     assert_eq!(
         on_formula, 1.0,
         "the median multiple among the other 31 is {on_formula}"
@@ -598,12 +595,14 @@ fn base_cost_is_flat_across_wealth_while_state_share_collapses_onto_the_floor() 
             (q + 1) * quarter
         };
         let slice = &rows[q * quarter..upper];
-        base_cost.push(upper_middle(
-            slice.iter().map(|r| r.base_cost_per_pupil).collect(),
-        ));
-        state_share.push(upper_middle(
-            slice.iter().map(|r| r.state_share_fraction()).collect(),
-        ));
+        base_cost.push(
+            median_upper_middle(slice.iter().map(|r| r.base_cost_per_pupil))
+                .expect("no values to take a median of"),
+        );
+        state_share.push(
+            median_upper_middle(slice.iter().map(|r| r.state_share_fraction()))
+                .expect("no values to take a median of"),
+        );
     }
 
     // Flat: the poorest quartile's base cost per pupil is within 2% of the wealthiest's.

@@ -10,17 +10,11 @@
 //! direction that makes a temporary instrument permanent: 50 of the 89 crossed onto the guarantee
 //! between FY2026 and FY2027, from a formula that was paying them the year before.
 
+use edfund_core::stats::median_upper_middle;
 use project::enrollment_decline::{self as decline, Legs};
 use project::guarantee_origin::{self, Origin};
 use project::panel::{panel, DistrictRecord, ENROLLMENT_GROWTH_SUPPLEMENT_PER_PUPIL};
 use project::prior_model;
-
-/// The crates' median: the upper middle, never the mean of two.
-fn upper_middle(mut values: Vec<f64>) -> f64 {
-    assert!(!values.is_empty());
-    values.sort_by(|a, b| a.partial_cmp(b).expect("no NaN"));
-    values[values.len() / 2]
-}
 
 fn of(rows: &[DistrictRecord], origin: Origin) -> Vec<&DistrictRecord> {
     let index = guarantee_origin::enrollment_index(rows);
@@ -154,17 +148,17 @@ fn pupils_taught_elsewhere_are_present_and_are_not_the_account() {
     let untouched: Vec<&DistrictRecord> = districts.iter().filter(|r| !r.on_guarantee()).collect();
     let untouched = ratios(&untouched);
 
-    let median = upper_middle(loss.clone());
+    let median = median_upper_middle(loss.clone()).expect("no values to take a median of");
     assert!(
         (median - 1.0951).abs() < 0.0001,
         "the cluster's resident-over-enrolled median is {median:.4}"
     );
     assert!(
-        median > upper_middle(growth),
+        median > median_upper_middle(growth).expect("no values to take a median of"),
         "it sits above the other half"
     );
     assert!(
-        median > upper_middle(untouched.clone()),
+        median > median_upper_middle(untouched.clone()).expect("no values to take a median of"),
         "and above the districts the guarantee does not pay"
     );
 
@@ -198,8 +192,10 @@ fn fifty_of_the_eighty_nine_crossed_onto_the_guarantee_in_one_year() {
                 .iter()
                 .filter(|d| d.before < 1.0 && d.after > 1.0)
                 .count(),
-            upper_middle(divergences.iter().map(|d| d.before).collect()),
-            upper_middle(divergences.iter().map(|d| d.after).collect()),
+            median_upper_middle(divergences.iter().map(|d| d.before))
+                .expect("no values to take a median of"),
+            median_upper_middle(divergences.iter().map(|d| d.after))
+                .expect("no values to take a median of"),
         )
     };
 
@@ -250,7 +246,8 @@ fn the_gap_between_base_and_formula_is_widening_for_all_but_two() {
         87,
         "the formula is moving away from the FY2020 base for nearly every member"
     );
-    let change = upper_middle(divergences.iter().map(|d| d.change()).collect());
+    let change = median_upper_middle(divergences.iter().map(|d| d.change()))
+        .expect("no values to take a median of");
     assert!(
         (change - 0.1031).abs() < 0.0001,
         "the median gap widened by {change:.4} of a formula amount in one year"
@@ -262,12 +259,8 @@ fn the_guarantee_pays_for_decline_at_twice_what_the_plan_pays_for_growth() {
     let districts = panel();
     let cluster = decline::cluster(&districts);
 
-    let per_pupil = upper_middle(
-        cluster
-            .iter()
-            .map(|r| r.guarantee / r.current_year_adm)
-            .collect(),
-    );
+    let per_pupil = median_upper_middle(cluster.iter().map(|r| r.guarantee / r.current_year_adm))
+        .expect("no values to take a median of");
     assert!(
         (per_pupil - 464.06).abs() < 0.01,
         "the median member draws ${per_pupil:.2} a pupil"

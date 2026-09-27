@@ -130,42 +130,19 @@ impl core::fmt::Display for DispersionError {
 
 impl std::error::Error for DispersionError {}
 
-/// Linear interpolated percentile of an already-sorted slice.
-/// The median of an already-sorted series, or `None` where there is nothing to take it of.
+/// The statistics this crate shares with the rest of the workspace, re-exported so that a
+/// reader of a `dispersion` figure reaches the same definitions a `project` figure reached.
 ///
-/// `None` rather than `0.0`: zero is a plausible dollar figure, a plausible millage and a
-/// plausible share, so returning it for an empty series puts a value where an absence belongs.
-/// The two hand-rolled copies this replaces both returned `0.0`.
-///
-/// The slice must be sorted ascending; nothing here checks it.
-#[must_use]
-pub fn median(sorted: &[f64]) -> Option<f64> {
-    (!sorted.is_empty()).then(|| percentile_sorted(sorted, 0.5))
-}
-
-/// The `q`th percentile of an already-sorted series, by linear interpolation on rank
-/// `q * (n - 1)`.
-///
-/// R's type 7 and Excel's `PERCENTILE`, which is the convention every statistic in this module
-/// is computed on. Exposed so that callers elsewhere in the workspace share one definition:
-/// there were three, and the ad-hoc ones took the upper of the two middle observations, which
-/// disagrees with this on every even-length series.
-///
-/// The slice must be sorted ascending; nothing here checks it.
-#[must_use]
-pub fn percentile_sorted(sorted: &[f64], q: f64) -> f64 {
-    if sorted.len() == 1 {
-        return sorted[0];
-    }
-    let rank = q * (sorted.len() - 1) as f64;
-    let lo = rank.floor() as usize;
-    let hi = rank.ceil() as usize;
-    if lo == hi {
-        sorted[lo]
-    } else {
-        sorted[lo] + (rank - lo as f64) * (sorted[hi] - sorted[lo])
-    }
-}
+/// They live in [`edfund_core::stats`] because `dispersion` is not the bottom of the graph and
+/// four crates that do not depend on it were each carrying their own copy. There is no
+/// `dispersion::median` any more, and that is the correction: it interpolated, six helpers in
+/// `crates/project` took the upper middle, and one name covered both. Reach for
+/// [`median_interpolated`] where the old `dispersion::median` was called and
+/// [`median_upper_middle`] where a `values[len / 2]` was.
+pub use edfund_core::stats::{
+    association, correlation, median_interpolated, median_upper_middle, percentile_sorted,
+    Association,
+};
 
 impl Dispersion {
     /// Summarise a distribution.
@@ -299,30 +276,18 @@ pub fn wealth_neutrality(
     if wealth.len() != resource.len() {
         return Err(DispersionError::LengthMismatch);
     }
-    let n = wealth.len();
-    if n < 2 {
+    if wealth.len() < 2 {
         return Err(DispersionError::TooFewObservations);
     }
-    let mean_w = wealth.iter().sum::<f64>() / n as f64;
-    let mean_r = resource.iter().sum::<f64>() / n as f64;
-
-    let cov: f64 = wealth
-        .iter()
-        .zip(resource)
-        .map(|(w, r)| (w - mean_w) * (r - mean_r))
-        .sum();
-    let var_w: f64 = wealth.iter().map(|w| (w - mean_w).powi(2)).sum();
-    let var_r: f64 = resource.iter().map(|r| (r - mean_r).powi(2)).sum();
-
-    if var_w == 0.0 || var_r == 0.0 {
-        return Err(DispersionError::DegenerateDistribution);
-    }
-    let correlation = cov / (var_w * var_r).sqrt();
+    // The arithmetic is `edfund_core::stats::association`'s, and the guards above are here only
+    // to say *which* refusal it was: `association` answers `None` for all three cases, and the
+    // three errors are what callers in this crate distinguish.
+    let a = association(wealth, resource).ok_or(DispersionError::DegenerateDistribution)?;
     Ok(WealthNeutrality {
-        n,
-        correlation,
-        slope: cov / var_w,
-        r_squared: correlation * correlation,
+        n: a.n,
+        correlation: a.correlation,
+        slope: a.slope,
+        r_squared: a.r_squared,
     })
 }
 

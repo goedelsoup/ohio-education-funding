@@ -33,28 +33,11 @@
 
 use std::collections::BTreeMap;
 
+use edfund_core::stats::correlation;
+
 use project::counts;
 use project::panel;
 use project::series::DEFAULT_DAMPING;
-
-/// Pearson correlation, each series demeaned against its own year.
-fn correlation(pairs: &[(f64, f64)]) -> f64 {
-    let n = pairs.len() as f64;
-    let mean_x = pairs.iter().map(|(a, _)| a).sum::<f64>() / n;
-    let mean_y = pairs.iter().map(|(_, b)| b).sum::<f64>() / n;
-    let covariance: f64 = pairs.iter().map(|(a, b)| (a - mean_x) * (b - mean_y)).sum();
-    let spread_x: f64 = pairs
-        .iter()
-        .map(|(a, _)| (a - mean_x).powi(2))
-        .sum::<f64>()
-        .sqrt();
-    let spread_y: f64 = pairs
-        .iter()
-        .map(|(_, b)| (b - mean_y).powi(2))
-        .sum::<f64>()
-        .sqrt();
-    covariance / (spread_x * spread_y)
-}
 
 #[test]
 fn the_two_models_publish_four_years_and_agree_where_they_overlap() {
@@ -194,7 +177,12 @@ fn the_persistence_the_damping_parameterises_is_a_third_and_the_splice_says_othe
         })
         .collect();
     assert_eq!(spliced.len(), 609);
-    let spliced = correlation(&spliced);
+    // Unzipped here rather than behind a local helper: the pairs are built as pairs, and
+    // `edfund_core::stats` is the only place a correlation is defined.
+    let spliced = {
+        let (fy24, fy25): (Vec<f64>, Vec<f64>) = spliced.iter().copied().unzip();
+        correlation(&fy24, &fy25).expect("609 pairs, neither series constant")
+    };
     assert!(
         (spliced + 0.048_823).abs() < 0.000_01,
         "spliced persistence {spliced}"

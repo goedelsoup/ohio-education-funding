@@ -384,12 +384,12 @@ fn the_two_enrollment_counts_agree_on_levels_and_not_on_rates() {
     }
 
     assert!(levels.len() > 590, "{} districts joined", levels.len());
-    let on_levels = common::correlation(&levels);
+    let on_levels = common::paired_correlation(&levels);
     assert!(
         on_levels > 0.999,
         "the two counts should agree on levels; they correlate at {on_levels:.4}"
     );
-    let on_rates = common::correlation(&rates);
+    let on_rates = common::paired_correlation(&rates);
     assert!(
         (0.2..0.4).contains(&on_rates),
         "and disagree on two-year rates; they correlate at {on_rates:.3}"

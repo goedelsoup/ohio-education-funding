@@ -119,6 +119,7 @@
 
 use std::collections::BTreeMap;
 
+use edfund_core::stats::median_upper_middle;
 use edfund_core::{Adm, Dollars};
 
 use crate::guarantee_origin::{self, Origin, ANCHOR, SEAM};
@@ -342,8 +343,10 @@ pub fn shape(rows: &[&DistrictRecord], legs: &BTreeMap<String, Legs>) -> Shape {
         districts: rows.len(),
         dollars: rows.iter().map(|r| r.guarantee).sum(),
         adm: rows.iter().map(|r| r.current_year_adm).sum(),
-        median_survey: upper_middle(mine.iter().map(|l| l.survey).collect()),
-        median_departmental: upper_middle(mine.iter().map(|l| l.departmental).collect()),
+        median_survey: median_upper_middle(mine.iter().map(|l| l.survey))
+            .expect("no values to take a median of"),
+        median_departmental: median_upper_middle(mine.iter().map(|l| l.departmental))
+            .expect("no values to take a median of"),
         still_falling: mine.iter().filter(|l| l.still_falling()).count(),
         decelerating: mine.iter().filter(|l| l.decelerating()).count(),
         long_run_decline: mine
@@ -352,11 +355,4 @@ pub fn shape(rows: &[&DistrictRecord], legs: &BTreeMap<String, Legs>) -> Shape {
             .count(),
         long_run_unknown: mine.iter().filter(|l| l.long_run.is_none()).count(),
     }
-}
-
-/// The crates' median: sort, then take the upper middle. Never the mean of two.
-fn upper_middle(mut values: Vec<f64>) -> f64 {
-    assert!(!values.is_empty(), "no values to take a median of");
-    values.sort_by(|a, b| a.partial_cmp(b).expect("no NaN in a measured rate"));
-    values[values.len() / 2]
 }

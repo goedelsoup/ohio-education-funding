@@ -119,6 +119,7 @@
 //! — and that the one genuine discontinuity in the whole section, the athletics eligibility test
 //! at (A)(11), is dormant: all 609 districts are eligible.
 
+use edfund_core::stats::median_upper_middle;
 use foundation::minimums::Minimum;
 use foundation::{aggregate_base_cost, ratios, DistrictEnrollment, StatewideFactors};
 use project::enrollment_decline;
@@ -129,13 +130,6 @@ use project::staffing_minimums::{
 
 /// A cent, the tolerance every dollar figure here is asserted at.
 const CENT: f64 = 0.01;
-
-/// The crates' median: the upper middle, never the mean of two.
-fn upper_middle(mut values: Vec<f64>) -> f64 {
-    assert!(!values.is_empty());
-    values.sort_by(f64::total_cmp);
-    values[values.len() / 2]
-}
 
 /// Sextiles of the panel ordered on base cost enrolled ADM, which is what the thresholds read.
 fn sextiles<'a>(rows: &[&'a DistrictRecord]) -> Vec<Vec<&'a DistrictRecord>> {
@@ -404,11 +398,11 @@ fn the_floors_open_a_wedge_between_the_marginal_and_the_average_pupil() {
     let ratios: Vec<f64> = sextiles(&measurable)
         .iter()
         .map(|band| {
-            upper_middle(
+            median_upper_middle(
                 band.iter()
-                    .map(|d| wedge(&d.enrollment, d.base_cost_adm(), &factors).ratio())
-                    .collect(),
+                    .map(|d| wedge(&d.enrollment, d.base_cost_adm(), &factors).ratio()),
             )
+            .expect("no values to take a median of")
         })
         .collect();
     let expected = [0.6418, 0.7465, 0.8741, 0.9795, 1.0088, 0.9939];
@@ -470,12 +464,12 @@ fn shrinking_past_a_threshold_switches_a_floor_on_and_it_is_worth_a_seventeenth_
         gained / guarantee
     );
 
-    let per_pupil = upper_middle(
+    let per_pupil = median_upper_middle(
         cluster
             .iter()
-            .filter_map(|d| acquired.get(&d.irn).map(|g| g / d.base_cost_adm()))
-            .collect(),
-    );
+            .filter_map(|d| acquired.get(&d.irn).map(|g| g / d.base_cost_adm())),
+    )
+    .expect("no values to take a median of");
     assert!(
         (per_pupil - 30.81).abs() < 0.005,
         "median {per_pupil:.2} a pupil"
@@ -526,7 +520,11 @@ fn what_sits_beside_a_threshold_is_the_enrolment_distribution_and_nothing_else()
     }
     assert_eq!(controls.len(), 148);
     controls.sort_by(f64::total_cmp);
-    assert!((upper_middle(controls.clone()) - 1.20).abs() < 0.005);
+    assert!(
+        (median_upper_middle(controls.clone()).expect("no values to take a median of") - 1.20)
+            .abs()
+            < 0.005
+    );
 
     for (minimum, below, above) in beside {
         let ratio = below as f64 / (above as f64).max(0.5);

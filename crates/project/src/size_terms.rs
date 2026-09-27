@@ -140,6 +140,7 @@
 use std::collections::BTreeMap;
 
 use dispersion::{least_squares, Regression};
+use edfund_core::stats::median_upper_middle;
 use edfund_core::{Adm, Dollars};
 
 use crate::guarantee_origin;
@@ -534,12 +535,6 @@ fn terms(panel: &[DistrictRecord], changes: &[Change]) -> Vec<Terms> {
     out
 }
 
-/// The upper-middle value, which is [`dispersion::median`]'s convention and not Python's.
-fn upper_middle(mut values: Vec<f64>) -> f64 {
-    values.sort_by(f64::total_cmp);
-    values[values.len() / 2]
-}
-
 /// Demean each term's band medians against the panel's own.
 ///
 /// # Panics
@@ -548,16 +543,15 @@ fn upper_middle(mut values: Vec<f64>) -> f64 {
 #[must_use]
 pub fn profile(panel: &[DistrictRecord], changes: &[Change]) -> Profile {
     let rows = terms(panel, changes);
+    // The upper middle throughout, which is the convention the band medians and every deviation
+    // from them were computed on. `median_interpolated` would move all seven numbers.
     let row = |pick: &dyn Fn(&Terms) -> f64| -> ([f64; BANDS], f64) {
-        let level = upper_middle(rows.iter().map(pick).collect());
+        let level = median_upper_middle(rows.iter().map(pick)).expect("the panel is not empty");
         let mut out = [0.0; BANDS];
         for (band, cell) in out.iter_mut().enumerate() {
-            *cell = upper_middle(
-                rows.iter()
-                    .filter(|r| r.band == band)
-                    .map(pick)
-                    .collect::<Vec<_>>(),
-            ) - level;
+            *cell = median_upper_middle(rows.iter().filter(|r| r.band == band).map(pick))
+                .expect("a sextile of a 609-row panel is not empty")
+                - level;
         }
         (out, level)
     };
@@ -597,15 +591,12 @@ pub fn with_a_side_flattened(
         Side::Anchor => r.anchor,
         Side::FormulaAid => r.aid,
     };
-    let level = upper_middle(rows.iter().map(pick).collect());
+    let level = median_upper_middle(rows.iter().map(pick)).expect("the panel is not empty");
     let bands: Vec<f64> = (0..BANDS)
         .map(|band| {
-            upper_middle(
-                rows.iter()
-                    .filter(|r| r.band == band)
-                    .map(pick)
-                    .collect::<Vec<_>>(),
-            ) - level
+            median_upper_middle(rows.iter().filter(|r| r.band == band).map(pick))
+                .expect("a sextile of a 609-row panel is not empty")
+                - level
         })
         .collect();
     let mut counts = [0usize; BANDS];
@@ -636,15 +627,15 @@ pub fn anchor_per_pupil(panel: &[DistrictRecord]) -> [Dollars; BANDS] {
     let index = guarantee_origin::enrollment_index(panel);
     let mut out = [0.0; BANDS];
     for (band, rows) in sextiles(panel).iter().enumerate() {
-        out[band] = upper_middle(
+        out[band] = median_upper_middle(
             rows.iter()
                 .filter(|record| record.guarantee_floor() > 0.0)
                 .filter_map(|record| {
                     let ratio = index.get(&record.irn)?;
                     Some(record.guarantee_floor() / (record.adm_history[2] / ratio))
-                })
-                .collect(),
-        );
+                }),
+        )
+        .expect("every sextile holds guaranteed districts");
     }
     out
 }
@@ -662,15 +653,12 @@ pub fn capacity_growth_by_sextile(panel: &[DistrictRecord]) -> [f64; BANDS] {
     let prior = crate::prior_model::by_irn();
     let mut out = [0.0; BANDS];
     for (band, rows) in sextiles(panel).iter().enumerate() {
-        out[band] = upper_middle(
-            rows.iter()
-                .filter_map(|record| {
-                    let was = prior.get(&record.irn)?.capacity_per_pupil;
-                    let now = record.published_capacity_per_pupil?;
-                    (was > 0.0).then(|| now / was - 1.0)
-                })
-                .collect(),
-        );
+        out[band] = median_upper_middle(rows.iter().filter_map(|record| {
+            let was = prior.get(&record.irn)?.capacity_per_pupil;
+            let now = record.published_capacity_per_pupil?;
+            (was > 0.0).then(|| now / was - 1.0)
+        }))
+        .expect("every sextile holds districts both models carry");
     }
     out
 }
