@@ -13,9 +13,10 @@
     "corpus:report": "node scripts/corpus-report.ts",
     "measure": "node scripts/measure.ts",
     "baseline": "node scripts/baseline.ts",
-    "test": "pnpm test:unit && pnpm test:e2e",
-    "test:unit": "vitest run",
-    "test:watch": "vitest",
+    "test": "pnpm test:unit && pnpm build && pnpm test:dist && pnpm test:e2e",
+    "test:unit": "vitest run --project unit",
+    "test:dist": "vitest run --project dist",
+    "test:watch": "vitest --project unit",
     "test:e2e": "playwright test"
   },
   "devDependencies": {

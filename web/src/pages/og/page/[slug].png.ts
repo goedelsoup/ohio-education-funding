@@ -3,7 +3,7 @@
  *
  * The table is `src/lib/og/pages.ts`; this file only turns its keys into routes. A slug that is
  * referenced from a page but absent from the table therefore fails as a missing file in `dist/`,
- * which the artefact scan in `tests/e2e/app.spec.ts` catches — rather than as a 404 nobody sees
+ * which the artefact scan in `tests/dist/addresses.spec.ts` catches — rather than as a 404 nobody sees
  * until a preview comes back blank.
  */
 

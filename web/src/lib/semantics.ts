@@ -250,7 +250,7 @@ function moveAnchors(document: Document): number {
      * against the first letter of the title — it records eleven shipped defects of exactly that
      * shape. Moving the element and leaving the space behind reproduces the defect at the other
      * end: `from<a` is a letter immediately against an inline tag boundary, which is what
-     * `app.spec.ts` scans every route for.
+     * `complete.spec.ts` scans every route for.
      */
     const after = anchor.nextSibling;
     if (after && after.nodeType === 3 && /^\s/.test(after.textContent ?? "")) {

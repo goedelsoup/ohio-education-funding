@@ -373,7 +373,7 @@ export const county = (slug: string): string => `/county/${slug}`;
  *
  * Here rather than in `county.ts`, which is where it was, because `county.ts` renders charts and so
  * imports `plot/ssr.ts` and through it `linkedom` — a second DOM implementation, 200 KB, which has
- * no business in a browser and which `app.spec.ts` fails the build over if it reaches the client
+ * no business in a browser and which `tests/e2e/complete.spec.ts` fails over if it reaches the client
  * bundle. `/reach` names counties in a control the browser reads, so it needs the slug and cannot
  * afford the module it lived in. This one imports nothing, which is the property that makes it safe
  * to reach for from either side.

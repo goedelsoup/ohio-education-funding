@@ -1,7 +1,23 @@
 # Astro's build output. Unlike the `app/` tree this replaced, it is NOT committed: it is
 # reproducible from `src/` with `pnpm build`, and a hashed bundle in history is churn.
-dist/
+#
+# Anchored with a leading slash, and that matters: a bare `dist/` has no slash before its last
+# character, so git matches it at every depth. `tests/dist/` — the suite that reports on the build
+# — was invisible in `git status` on the commit that added it, which is the same shape of defect as
+# the `.vscode/` note at the foot of the repository root's `.gitignore`. There is one build output
+# here and it is `web/dist/`; say so.
+/dist/
 .astro/
+
+# `tests/dist/` is committed, and this negation is what makes it visible.
+#
+# Anchoring the rule above was only half of it: `dist` — no slash, so every depth again — is also in
+# a personal `~/.gitignore_global` on at least one machine here, and a global exclude file cannot be
+# fixed from inside the repository. The same mechanism as `!.vscode/` at the foot of the repository
+# root's `.gitignore`, for the same reason: a rule of one developer's own must not decide what is in
+# everyone's checkout. A repository `.gitignore` outranks `core.excludesFile`, so this re-includes
+# it for everyone.
+!tests/dist/
 
 node_modules/
 

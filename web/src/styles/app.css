@@ -475,8 +475,8 @@ td.year { font-family: var(--font-mono); color: var(--text-annotation); white-sp
  * fit three times over.
  *
  * It stays hidden below 480 anyway, and the reason has changed rather than disappeared: a phone's
- * chrome is worth keeping to what a phone reader needs, and this link is not it. `app.spec.ts`
- * asserts the 360/480 split, so it is now a decision the suite holds rather than a measurement it
+ * chrome is worth keeping to what a phone reader needs, and this link is not it.
+ * `tests/e2e/chrome.spec.ts` asserts the 360/480 split, so it is now a decision the suite holds rather than a measurement it
  * records. A phone reader still reaches the repository — every figure's attribution and every
  * corpus page links into it.
  */

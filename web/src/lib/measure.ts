@@ -225,7 +225,7 @@ export const THRESHOLDS: Thresholds = {
    * nobody has to remember a class.
    *
    * This report walks eight routes and the defect was on 1,433 pages, so the threshold alone would
-   * have been satisfied by fixing five of them. The build-wide sweep in `tests/e2e/app.spec.ts` is
+   * have been satisfied by fixing five of them. The build-wide sweep in `tests/dist/semantics.spec.ts` is
    * the half that reads every page.
    */
   rightAlignedProse: 0,
