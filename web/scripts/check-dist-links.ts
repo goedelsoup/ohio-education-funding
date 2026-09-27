@@ -235,7 +235,7 @@ for (const file of htmlFiles(DIST)) {
    *
    * Two guards for this already exist and both are blind to that shape by construction.
    * `tests/unit/fusion.spec.ts` walks `{…}` expressions, and a bare `<a>` after prose is not one.
-   * The sweep in `tests/e2e/app.spec.ts` iterates ROUTES_WITH_FIGURES, a list assembled for the
+   * The sweep in `tests/e2e/complete.spec.ts` iterates ROUTES_WITH_FIGURES, a list assembled for the
    * year-chip rule, which contains none of the three pages that were actually fusing — though the
    * suite loads /scenario nineteen times for other reasons. Asking the artefact closes both holes
    * at once, because it cannot miss a page: it reads every page there is.

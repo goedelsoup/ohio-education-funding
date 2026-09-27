@@ -6,7 +6,7 @@
  * `reach.ts` is the route's whole argument. `envelope` measures a frame over five corner lever runs
  * so that a district which did not move looks like a district which did not move; `viewFromQuery`
  * decides what a shared link draws; `presets` decides which named positions are offered at all. The
- * behaviour was observed — `tests/e2e/app.spec.ts`'s `reach` describe covers the frame holding
+ * behaviour was observed — `tests/e2e/reach.spec.ts` covers the frame holding
  * still, the identity line's gating and the flat trails — but only through a rendered SVG, which
  * needs a build and cannot reach a quantile boundary or a declared `bounds` override directly.
  *
@@ -302,7 +302,7 @@ test("an absent highlight is the default, not code 0", () => {
  * which needs a real DOM because it is the browser half of the pair — `plot/ssr.ts` is the one that
  * carries its own. So the drawn consequences of a scope (the frame holding still across selections,
  * the counts restated against it, a single district still getting a cloud under the spotlight, and
- * the refusal it gets under the subset) are asserted in `tests/e2e/app.spec.ts`'s `reach` describe,
+ * the refusal it gets under the subset) are asserted in `tests/e2e/reach.spec.ts`,
  * against the page. Standing up a fake document here to
  * run the browser renderer in node would be testing a fiction.
  */

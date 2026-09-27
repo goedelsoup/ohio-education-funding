@@ -101,9 +101,11 @@ jobs:
       - name: unit
         run: pnpm test:unit
 
-      # Explicit, though `test:e2e` builds too. The build is where the formula is checked against
-      # the Rust checkpoints and where the corpus is parsed, so a failure in either should read as
-      # a build failure rather than as a browser that never got a server to talk to.
+      # The only build in the run, and everything after it reads what it produced. The build is
+      # where the formula is checked against the Rust checkpoints and where the corpus is parsed,
+      # so a failure in either reads as a build failure rather than as a browser that never got a
+      # server to talk to. `test:e2e` used to build again; `webServer.command` in
+      # playwright.config.ts is gated on `CI` now, so Chromium is served this `dist/` too.
       - name: build
         run: pnpm build
 
@@ -113,6 +115,12 @@ jobs:
       # previous commit.
       - name: dist links
         run: pnpm check:dist
+
+      # Twenty-three assertions about the built files, which used to run inside the Playwright
+      # suite without ever opening a browser. Same placement rule as `dist links`: after `build`,
+      # never in `unit`, which runs first on purpose.
+      - name: dist
+        run: pnpm test:dist
 
       - name: Install the browser
         run: pnpm exec playwright install --with-deps chromium
@@ -136,11 +144,11 @@ jobs:
       - name: e2e
         run: pnpm test:e2e
 
-      # The bytes Chromium was just served are the bytes that get deployed. `test:e2e` rebuilds —
-      # see the `webServer` block in playwright.config.ts — so this is the tree the browser suite
-      # passed against and the one `check:dist` scanned, rather than a second build that merely
-      # ought to match it. 194 MB across 4,568 files, so it is uploaded only on the runs that
-      # actually deploy.
+      # The bytes Chromium was just served are the bytes that get deployed, and now that is true by
+      # construction rather than by two builds agreeing: `webServer.command` is gated on `CI`, so
+      # `check:dist`, `test:dist`, `measure` and the browser all read the one `dist/` the `build`
+      # step wrote, and this uploads that same tree. 194 MB across 4,568 files, so it is uploaded
+      # only on the runs that actually deploy.
       - name: Keep the built site for the deploy job
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

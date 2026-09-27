@@ -12,7 +12,7 @@
  * it, and deliberately not `fontkit` or `fontTools`, which would need adding. Verification that
  * routes through the producer answers a different question from the one being asked.
  *
- * The browser half is in `tests/e2e/app.spec.ts`, which makes chromium actually stretch a brace
+ * The browser half is in `tests/e2e/wiki.spec.ts`, which makes chromium actually stretch a brace
  * with this file. Both halves are needed: this one says the table is there, that one says it works.
  */
 

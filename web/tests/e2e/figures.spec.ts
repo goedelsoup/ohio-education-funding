@@ -35,7 +35,8 @@
  *    table each column is a different series, and letting one cell's year license another's is
  *    exactly the confusion the chips exist to prevent.
  * 3. **Its card or section heading carries a `.year-chip`.** This is the mechanism most of the
- *    site already uses, and `app.spec.ts` separately requires every card with figures to have one.
+ *    site already uses, and `complete.spec.ts` separately requires every card with figures to have
+ *    one.
  * 4. **The sentence it sits in names a year.**
  * 5. **It is in a tile or a distribution strip whose own text names a year, or which contains a
  *    `.fig`.** Both are compact composed units — key, value, note; note, chart, scale — a few

@@ -9,7 +9,7 @@
  * Not in the gate. This is a derivation, committed so the artefact can be re-made and argued with
  * rather than trusted — the same role `link-hue-search.ts` plays for `--link`. What the gate checks
  * is the file this produced: `tests/unit/math-font.spec.ts` reads it back with a parser that shares
- * no code with the subsetter, and `tests/e2e/app.spec.ts` makes a browser stretch a brace with it.
+ * no code with the subsetter, and `tests/e2e/wiki.spec.ts` makes a browser stretch a brace with it.
  *
  * # Where the bytes come from
  *

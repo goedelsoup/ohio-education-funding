@@ -22,7 +22,7 @@ import { defineConfig } from "astro/config";
  * the block after the build, reading the year out of the same feed the pages were built from.
  *
  * Not visible in `dist/`'s HTML, in `vite preview`, or in any test that opens a page — the same
- * blind spot the rest of `public/_headers` documents at length. `tests/e2e/app.spec.ts` reads the
+ * blind spot the rest of `public/_headers` documents at length. `tests/dist/machines.spec.ts` reads the
  * built `_headers` instead, which is the artefact that gets deployed.
  */
 function csvDownloadHeaders() {

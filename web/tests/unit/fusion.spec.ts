@@ -18,7 +18,7 @@
  *
  * # Why the existing scan cannot see it
  *
- * `app.spec.ts` scans the built site for a letter against an inline tag boundary —
+ * `tests/e2e/complete.spec.ts` scans the routes for a letter against an inline tag boundary —
  * `</strong>219` and `computed by<code>`. That catches the half of this defect that leaves a tag
  * behind. **This half leaves none**: `model.294` is a single text node, indistinguishable from
  * prose that meant to say that. Scanning the rendered text for a letter beside a digit finds

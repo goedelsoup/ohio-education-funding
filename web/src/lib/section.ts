@@ -66,7 +66,8 @@ import { escapeHtml } from "./format.ts";
  *
  * # The trailing space is not cosmetic
  *
- * `</a>` immediately against a letter is the fused-word defect `app.spec.ts` scans every route for
+ * `</a>` immediately against a letter is the fused-word defect `complete.spec.ts` scans every route
+ * for
  * — "computed by<code>", "219of the 606" — and eleven of those shipped before that scan existed.
  * Inside the flex row of a card heading the gap does the separating and a whitespace-only run
  * between two flex items is not rendered at all, so the space costs nothing there; outside one, on
@@ -95,7 +96,8 @@ export function anchor(id: string): string {
  * # The separator
  *
  * A space before the anchor, which `moveAnchors` also inserts and for the reason `anchor` records:
- * `</a>` immediately against a letter is the fused-word defect `app.spec.ts` scans every route for,
+ * `</a>` immediately against a letter is the fused-word defect `complete.spec.ts` scans every route
+ * for,
  * and the same defect at the other end is `from<a`. Inside a card heading's flex row the gap does
  * the separating and a whitespace-only run between two flex items is not rendered at all, so the
  * space costs nothing there and is the separation everywhere else.

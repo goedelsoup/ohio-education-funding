@@ -16,6 +16,8 @@ import { defineConfig, devices } from "@playwright/test";
 // silently tests whatever answered is worse than one that cannot start.
 const PORT = 4329;
 
+const PREVIEW = `pnpm exec vite preview --outDir dist --port ${PORT} --strictPort`;
+
 export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: true,
@@ -33,23 +35,34 @@ export default defineConfig({
   webServer: {
     // `vite preview` rather than `astro preview`, which daemonizes itself and so outlives the
     // run that started it. This stays in the foreground and dies with Playwright.
-    command: `pnpm build && pnpm exec vite preview --outDir dist --port ${PORT} --strictPort`,
+    //
+    // On CI the build in front of it is gone: the workflow has already built, and three steps
+    // between the build and this one — `check:dist`, `test:dist` and `measure` — read `dist/`
+    // directly. Building again here served Chromium a *second* build and left those three
+    // reporting on the first, which is the one difference a reader of the artefacts cannot see.
+    // Now there is one build per run and everything, the browser included, sees the same bytes.
+    //
+    // Locally the build stays, because locally there is usually no build to serve. `pnpm test:e2e`
+    // on a clean checkout has to be a command that works.
+    command: process.env["CI"] ? PREVIEW : `pnpm build && ${PREVIEW}`,
     url: `http://localhost:${PORT}`,
     // Never inherit a server this run did not start. A stale one serving a stale `dist/` would
     // make the suite pass against the previous build.
     reuseExistingServer: false,
     /*
-     * Long enough for the build in front of it, on the slowest machine that runs it.
+     * Long enough for whatever the command in front of it is, on the slowest machine that runs it.
      *
-     * This was 120s and the command it is timing is `pnpm build && vite preview` — so the window
-     * has to hold a full build, not a server start. A GitHub runner builds this site in 2m 24s
-     * now, against roughly 1m 50s before charts were drawn at two widths, and the whole e2e step
-     * failed with `Timed out waiting 120000ms from config.webServer` rather than with anything a
-     * reader would recognise as "the build takes longer than the limit".
+     * This was 120s when the command was `pnpm build && vite preview`, and the window has to hold
+     * a full build rather than a server start. A GitHub runner builds this site in 2m 24s now,
+     * against roughly 1m 50s before charts were drawn at two widths, and the whole e2e step failed
+     * with `Timed out waiting 120000ms from config.webServer` rather than with anything a reader
+     * would recognise as "the build takes longer than the limit".
      *
-     * Five minutes is not a target. It is enough headroom that a contended runner does not turn a
-     * green suite red, and the build's actual cost is tracked where it belongs — see #111.
+     * On CI the build is no longer in front of it, so the window only has to hold `vite preview`
+     * binding a port. The generous number stays where the build still runs. Neither is a target:
+     * each is enough headroom that a contended machine does not turn a green suite red, and the
+     * build's actual cost is tracked where it belongs — see #111.
      */
-    timeout: 300_000,
+    timeout: process.env["CI"] ? 60_000 : 300_000,
   },
 });

@@ -3,13 +3,14 @@
 # `mise run //web:<task>`, or run bare names from inside this directory.
 
 [tasks.gate]
-description = "Everything the web job in CI runs: check, unit, build, dist links, measure, e2e."
+description = "Everything the web job in CI runs: check, unit, build, dist links, dist, measure, e2e."
 run = [
   "mise run install",
   "mise run check",
   "mise run test-unit",
   "mise run build",
   "mise run check-dist",
+  "mise run test-dist",
   "mise run measure",
   "mise run test-e2e",
 ]
@@ -43,6 +44,14 @@ description = "Fail if the built site carries a relative href a static host cann
 # commit's `dist/`. See the header of scripts/check-dist-links.ts for why this asks a question the
 # route-table test structurally cannot.
 run = "pnpm check:dist"
+
+[tasks.test-dist]
+description = "The assertions about the built files: the CSP, the unfurl tags, the feed, the payload."
+# Twenty-three assertions that used to sit in the Playwright suite and never opened a browser. They
+# read `dist/` with `readFileSync`, so they belong here, between `build` and `test-e2e`, and not in
+# `test-unit`: that runs before `build` on purpose, and would be reading the previous commit's
+# output. Same hazard as `check-dist`; see the header of tests/dist/artefact.ts.
+run = "pnpm test:dist"
 
 [tasks.test-e2e]
 description = "The site in Chromium, a third of it with JavaScript disabled."

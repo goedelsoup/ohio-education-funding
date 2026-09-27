@@ -16,7 +16,8 @@
  * for. The picker needs no data at all: `compare.astro` renders all 609 names into its `<select>`
  * at build time, and a name is the only thing the browser wants about a district it is not
  * showing. So the split is per district, and a swap costs about four kilobytes for the two of them
- * — it was two when this was written, and the ceiling on one district lives in `app.spec.ts`,
+ * — it was two when this was written, and the ceiling on one district lives in
+ * `tests/dist/payload.spec.ts`,
  * measured rather than repeated here.
  *
  * Same shape and same stripping as `/data/panel.json`, through `formulaInputs`, so the two cannot

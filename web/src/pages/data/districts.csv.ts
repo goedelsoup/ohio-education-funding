@@ -126,7 +126,7 @@ export const GET: APIRoute = () => {
    * What the deployed site actually sends is appended to `dist/_headers` by the
    * `csv-download-headers` integration in `astro.config.mjs`, which reads the same
    * `bundle.fiscal_year` this line does. The two agreeing is asserted against the built artefact
-   * in `tests/e2e/app.spec.ts`; before that integration existed the filename below reached
+   * in `tests/dist/machines.spec.ts`; before that integration existed the filename below reached
    * nobody, and the comment above about provenance travelling in it was describing a
    * `vite preview` session rather than the deploy.
    */

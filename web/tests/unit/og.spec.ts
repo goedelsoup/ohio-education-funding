@@ -4,7 +4,8 @@
  * # What this suite can check, and what it deliberately leaves to the artefact scan
  *
  * A card is an image. Nothing here asserts that it *looks* right — that is a job for opening one,
- * and `tests/e2e/app.spec.ts` covers the half that is mechanically checkable: that every page names
+ * and `tests/dist/addresses.spec.ts` covers the half that is mechanically checkable: that every page
+ * names
  * a card and that every card it names was actually emitted.
  *
  * What is checkable here is the arithmetic and the strings, which is where the defects have

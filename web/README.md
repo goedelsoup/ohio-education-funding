@@ -67,8 +67,9 @@ one is running. A stray one from another project is the likeliest reason a page 
 ```
 pnpm --dir web check          # types, including the .astro files
 pnpm --dir web test:unit      # vitest — the formula, the schemas, the link graph, ~600ms
+pnpm --dir web test:dist      # vitest — the built files; needs a build in front of it
 pnpm --dir web test:e2e       # playwright — the site in Chromium, against a real build
-pnpm --dir web test           # both
+pnpm --dir web test           # all three, with the build they need between them
 pnpm --dir web build          # writes dist/
 pnpm --dir web schemas        # regenerate .yidam/schemas/ for the editor
 pnpm --dir web corpus:report  # every corpus diagnostic, grouped
@@ -150,7 +151,8 @@ strictly stronger than what it replaced.
 It still runs in the browser on the two scenario routes, because those genuinely compute there and
 because the panel is a separate file that can be replaced without a rebuild. A gate that only ever
 ran where the answer was already known would be decorative — and
-[an end-to-end test](tests/e2e/app.spec.ts) tampers with a checkpoint in flight to prove it is not.
+[an end-to-end test](tests/e2e/scenario.spec.ts) tampers with a checkpoint in flight to prove it is
+not.
 
 The two halves stay separate, as before: a failed **forecast** check costs the reader the band and
 nothing else, and the build succeeds with a warning. They are different claims and one can be
@@ -1023,6 +1025,7 @@ public/data/          the feed, copied verbatim into dist/
 public/favicon.svg    the site mark; the two icon routes rasterize this one file
 public/_headers       cache and security headers, read by the host
 tests/unit/           the formula, the projection, the link graph, the 404 matcher
+tests/dist/           the built files: the CSP, the unfurl tags, the feed, the payload
 tests/e2e/            the site in Chromium, a third of it with JavaScript disabled
 ```
 
