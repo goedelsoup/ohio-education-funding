@@ -25,6 +25,7 @@
 
 use std::collections::BTreeMap;
 
+use edfund_core::stats::{correlation, median_upper_middle};
 use edfund_core::FiscalYear;
 
 /// The last pre-relief year, the baseline every exposure is measured from.
@@ -149,11 +150,17 @@ pub fn by_exposure() -> [Quartile; 4] {
         } else {
             &all[3 * size..]
         };
+        // The upper middle, which is the convention every other subgroup statistic in this crate
+        // reports. `median_interpolated` would answer a different number on an even quartile.
+        let median = |pick: fn(&District) -> f64| {
+            median_upper_middle(slice.iter().map(pick))
+                .expect("an exposure quartile of a 600-district panel is not empty")
+        };
         Quartile {
             districts: slice.len(),
-            surge_per_pupil: median(slice.iter().map(|d| d.surge_per_pupil)),
-            spending_growth: median(slice.iter().map(|d| d.spending_growth)),
-            cash_years_change: median(slice.iter().map(|d| d.cash_years_change)),
+            surge_per_pupil: median(|d| d.surge_per_pupil),
+            spending_growth: median(|d| d.spending_growth),
+            cash_years_change: median(|d| d.cash_years_change),
         }
     })
 }
@@ -166,6 +173,7 @@ pub fn exposure_against_spending_growth() -> f64 {
         &all.iter().map(|d| d.surge_per_pupil).collect::<Vec<_>>(),
         &all.iter().map(|d| d.spending_growth).collect::<Vec<_>>(),
     )
+    .expect("the relief panel is 600 districts wide and neither column is constant")
 }
 
 /// One fiscal year of the two aggregates, over the districts [`districts`] admits.
@@ -231,22 +239,4 @@ pub fn federal_against_the_general_fund() -> BTreeMap<u16, YearOfBoth> {
             )
         })
         .collect()
-}
-
-fn median(values: impl Iterator<Item = f64>) -> f64 {
-    let mut sample: Vec<f64> = values.collect();
-    sample.sort_by(f64::total_cmp);
-    sample.get(sample.len() / 2).copied().unwrap_or(f64::NAN)
-}
-
-fn correlation(xs: &[f64], ys: &[f64]) -> f64 {
-    let n = xs.len() as f64;
-    if n < 2.0 {
-        return f64::NAN;
-    }
-    let (mx, my) = (xs.iter().sum::<f64>() / n, ys.iter().sum::<f64>() / n);
-    let cov: f64 = xs.iter().zip(ys).map(|(x, y)| (x - mx) * (y - my)).sum();
-    let sx: f64 = xs.iter().map(|x| (x - mx).powi(2)).sum::<f64>().sqrt();
-    let sy: f64 = ys.iter().map(|y| (y - my).powi(2)).sum::<f64>().sqrt();
-    cov / (sx * sy)
 }

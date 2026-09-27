@@ -68,6 +68,8 @@
 
 use std::collections::BTreeMap;
 
+use edfund_core::stats::median_upper_middle;
+
 use dispersion::functions;
 use foundation::{ratios, BuildingAllowance, StatewideFactors};
 use project::panel::{panel, DistrictRecord};
@@ -112,11 +114,6 @@ fn joined() -> Vec<Joined> {
         .collect()
 }
 
-fn median(mut values: Vec<f64>) -> f64 {
-    values.sort_by(f64::total_cmp);
-    values[values.len() / 2]
-}
-
 /// Quartile medians of `measure`, after ordering on `axis`.
 fn by_quartile(rows: &[Joined], axis: fn(&Joined) -> f64, measure: fn(&Joined) -> f64) -> [f64; 4] {
     let mut ordered: Vec<&Joined> = rows.iter().collect();
@@ -128,12 +125,8 @@ fn by_quartile(rows: &[Joined], axis: fn(&Joined) -> f64, measure: fn(&Joined) -
         } else {
             (i + 1) * quarter
         };
-        median(
-            ordered[i * quarter..end]
-                .iter()
-                .map(|r| measure(r))
-                .collect(),
-        )
+        median_upper_middle(ordered[i * quarter..end].iter().map(|r| measure(r)))
+            .expect("a quartile of the panel is not empty")
     })
 }
 

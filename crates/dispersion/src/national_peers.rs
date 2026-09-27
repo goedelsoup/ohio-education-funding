@@ -289,22 +289,23 @@ fn percentile_of(sorted: &[f64], value: f64) -> f64 {
 pub fn positions() -> (BTreeMap<String, NationalPosition>, NationalMedians) {
     let panel = national_panel();
 
-    let sorted = |mut v: Vec<f64>| {
-        v.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
-        v
-    };
     // The distribution is the comparable set only; Ohio's non-comparable agencies are carried in
     // the fixture so their figures exist, and are not part of anything anyone is ranked against.
     let pool: Vec<&NationalDistrict> = panel.iter().filter(|d| d.comparable).collect();
+    // Sorted here because `percentile_of` below needs it sorted; the medians sort for themselves.
+    let sorted = |mut v: Vec<f64>| {
+        v.sort_by(f64::total_cmp);
+        v
+    };
     let shares = sorted(pool.iter().map(|d| d.local_share()).collect());
     let revenue = sorted(pool.iter().map(|d| d.revenue_per_pupil()).collect());
     let spending = sorted(pool.iter().filter_map(|d| d.spending_per_pupil()).collect());
 
     let medians = NationalMedians {
         districts: pool.len(),
-        local_share: crate::median(&shares).unwrap_or(0.0),
-        revenue_per_pupil: crate::median(&revenue).unwrap_or(0.0),
-        spending_per_pupil: crate::median(&spending).unwrap_or(0.0),
+        local_share: crate::median_interpolated(shares.iter().copied()).unwrap_or(0.0),
+        revenue_per_pupil: crate::median_interpolated(revenue.iter().copied()).unwrap_or(0.0),
+        spending_per_pupil: crate::median_interpolated(spending.iter().copied()).unwrap_or(0.0),
     };
 
     let mut out = BTreeMap::new();

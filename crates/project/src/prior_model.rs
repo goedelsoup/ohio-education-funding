@@ -46,6 +46,7 @@
 use std::collections::BTreeMap;
 use std::sync::OnceLock;
 
+use edfund_core::stats::median_upper_middle;
 use edfund_core::{Adm, Dollars};
 
 use crate::panel::{self, DistrictRecord, MINIMUM_STATE_SHARE};
@@ -453,22 +454,21 @@ pub fn pairs(quantity: Quantity) -> Vec<Pair> {
         .collect()
 }
 
-/// The median of a sample, R type 7 at the halfway point on an even count's lower neighbour.
-///
-/// Local rather than borrowed from `dispersion` so that this module reports the same statistic
-/// whichever way a caller reaches it, and so that a reading here can be reproduced by hand.
-fn median(mut values: Vec<f64>) -> f64 {
-    values.sort_by(f64::total_cmp);
-    values.get(values.len() / 2).copied().unwrap_or(0.0)
-}
-
 /// The median change in a quantity, as `(its own units, a fraction)`.
+///
+/// # Which median
+///
+/// The **upper middle**, which is the convention every subgroup statistic in this crate reports
+/// and the one `crates/figures` binds these two numbers at. The docstring on the private helper
+/// this used to call said "R type 7 at the halfway point on an even count's lower neighbour" and
+/// the code under it took `values[len / 2]`, so the doc described neither convention correctly —
+/// see [`edfund_core::stats`], and #494 for the six other copies.
 #[must_use]
 pub fn median_change(quantity: Quantity) -> (f64, f64) {
     let pairs = pairs(quantity);
     (
-        median(pairs.iter().map(Pair::change).collect()),
-        median(pairs.iter().filter_map(Pair::relative).collect()),
+        median_upper_middle(pairs.iter().map(Pair::change)).unwrap_or(0.0),
+        median_upper_middle(pairs.iter().filter_map(Pair::relative)).unwrap_or(0.0),
     )
 }
 
@@ -501,8 +501,8 @@ pub fn state_share_fall() -> (f64, usize, usize) {
 pub fn median_state_share() -> (f64, f64) {
     let pairs = pairs(Quantity::StateSharePercentage);
     (
-        median(pairs.iter().map(|pair| pair.fy2026).collect()),
-        median(pairs.iter().map(|pair| pair.fy2027).collect()),
+        median_upper_middle(pairs.iter().map(|pair| pair.fy2026)).unwrap_or(0.0),
+        median_upper_middle(pairs.iter().map(|pair| pair.fy2027)).unwrap_or(0.0),
     )
 }
 
@@ -535,7 +535,10 @@ pub fn holding_capacity_still() -> (f64, f64) {
                 .max(MINIMUM_STATE_SHARE),
         );
     }
-    (median(published), median(counterfactual))
+    (
+        median_upper_middle(published).unwrap_or(0.0),
+        median_upper_middle(counterfactual).unwrap_or(0.0),
+    )
 }
 
 /// The state's share of the aggregate base cost in each year, `(FY2026, FY2027)`.

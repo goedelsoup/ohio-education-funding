@@ -98,6 +98,7 @@
 //! a computed amount against a historical one and paying the difference, which is what all four
 //! devices below do and what neither supplement does.
 
+use edfund_core::stats::median_upper_middle;
 use edfund_core::{Adm, Dollars};
 
 use crate::panel::DistrictRecord;
@@ -612,19 +613,12 @@ pub fn retirement(panel: &[DistrictRecord], guarantee: crate::policy::GuaranteeR
         }
     }
 
-    out.median_loser_valuation = median(losing);
-    out.median_made_whole_valuation = median(whole);
+    // The upper middle rather than the interpolated median, which is what this figure was
+    // computed on and what `crates/figures` binds. Python's `statistics.median` averages the two
+    // middles and disagrees on a subgroup this small; so does `median_interpolated`.
+    out.median_loser_valuation = median_upper_middle(losing).unwrap_or(0.0);
+    out.median_made_whole_valuation = median_upper_middle(whole).unwrap_or(0.0);
     out
-}
-
-/// The median of a sample, at the upper middle of an even count.
-///
-/// Local for the reason [`crate::prior_model`]'s is: the convention has to be the one every figure
-/// in this repository reports, and Python's `statistics.median` averages the two middles and
-/// disagrees on a subgroup this small.
-fn median(mut values: Vec<f64>) -> f64 {
-    values.sort_by(f64::total_cmp);
-    values.get(values.len() / 2).copied().unwrap_or(0.0)
 }
 
 #[cfg(test)]

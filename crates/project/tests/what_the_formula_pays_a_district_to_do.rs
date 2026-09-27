@@ -16,16 +16,10 @@
 //! `[K]` reverses no sign anywhere. It sets three of the four margins to zero, and the one it
 //! cannot reach is the largest.
 
+use edfund_core::stats::median_upper_middle;
 use project::margin::{self, Response, AVERAGE_YEARS, CENT, SHOCK, VALUATION_WEIGHT};
 use project::panel::{panel, DistrictRecord, OPEN_ENROLLMENT_CLAWBACK_PER_FTE};
 use project::policy::{Backstop, Policy};
-
-/// The crates' median: the upper middle, never the mean of two.
-fn upper_middle(mut values: Vec<f64>) -> f64 {
-    assert!(!values.is_empty());
-    values.sort_by(f64::total_cmp);
-    values[values.len() / 2]
-}
 
 /// Enrolled ADM across the panel, the denominator every share here is taken against.
 fn enrolled_adm(panel: &[DistrictRecord]) -> f64 {
@@ -87,8 +81,10 @@ fn the_marginal_pupil_falls_into_three_regimes() {
         "nothing holds a formula district"
     );
 
-    let median =
-        |group: &[&margin::Pupil]| upper_middle(group.iter().map(|p| p.marginal).collect());
+    let median = |group: &[&margin::Pupil]| {
+        median_upper_middle(group.iter().map(|p| p.marginal))
+            .expect("no values to take a median of")
+    };
     assert!((median(&insulated) - 0.0).abs() < CENT);
     assert!((median(&held) - 503.40).abs() < CENT, "{}", median(&held));
     assert!(
@@ -205,7 +201,8 @@ fn the_boundary_is_a_kink_and_six_districts_are_within_ten_pupils_of_it() {
         "a formula district is above its own floor by construction"
     );
 
-    let pupils = upper_middle(headroom.iter().map(|h| h.pupils).collect());
+    let pupils = median_upper_middle(headroom.iter().map(|h| h.pupils))
+        .expect("no values to take a median of");
     assert!((pupils - 206.6).abs() < 0.1, "{pupils}");
     assert_eq!(
         headroom.iter().filter(|h| h.pupils < 10.0).count(),
@@ -261,7 +258,7 @@ fn seventeen_formula_districts_reach_their_floor_within_a_year() {
     let falling: Vec<f64> = headroom.iter().filter_map(|h| h.years).collect();
     assert_eq!(falling.len(), 238, "formula districts with a falling roll");
 
-    let median = upper_middle(falling.clone());
+    let median = median_upper_middle(falling.clone()).expect("no values to take a median of");
     assert!((median - 10.1).abs() < 0.1, "{median}");
     assert_eq!(falling.iter().filter(|y| **y <= 1.0).count(), 17);
     assert_eq!(
@@ -404,7 +401,8 @@ fn the_wealth_charge_is_a_penny_on_the_dollar_and_reaches_fewer_than_half_the_st
         "held, backstopped, or on the minimum state share"
     );
 
-    let steady = upper_middle(charges.iter().map(|w| w.steady).collect());
+    let steady = median_upper_middle(charges.iter().map(|w| w.steady))
+        .expect("no values to take a median of");
     assert!((steady - 0.012_320).abs() < 1e-6, "{steady}");
     let low = charges.iter().map(|w| w.steady).fold(f64::MAX, f64::min);
     let high = charges.iter().map(|w| w.steady).fold(f64::MIN, f64::max);
@@ -433,7 +431,8 @@ fn the_wealth_charge_is_a_penny_on_the_dollar_and_reaches_fewer_than_half_the_st
         })
         .count();
     assert_eq!(lagged, 602);
-    let first = upper_middle(charges.iter().map(|w| w.first_year).collect());
+    let first = median_upper_middle(charges.iter().map(|w| w.first_year))
+        .expect("no values to take a median of");
     assert!((first - steady / AVERAGE_YEARS).abs() < 1e-9, "{first}");
 }
 
@@ -462,13 +461,14 @@ fn above_the_twenty_mill_floor_a_reappraisal_is_a_pure_loss() {
             .all(|w| w.local_yield().is_none() && w.recapture().is_none()),
         "no denominator, because there is no revenue"
     );
-    let loss = upper_middle(above.iter().map(|w| w.steady).collect());
+    let loss =
+        median_upper_middle(above.iter().map(|w| w.steady)).expect("no values to take a median of");
     assert!((loss - 0.012_063).abs() < 1e-6, "{loss}");
 
     // At the floor the value does yield revenue, and the state takes back five eighths of it.
     let recapture: Vec<f64> = at_floor.iter().filter_map(|w| w.recapture()).collect();
     assert_eq!(recapture.len(), at_floor.len());
-    let median = upper_middle(recapture.clone());
+    let median = median_upper_middle(recapture.clone()).expect("no values to take a median of");
     assert!((median - 0.6326).abs() < 0.0001, "{median}");
     let worst = recapture.iter().copied().fold(f64::MIN, f64::max);
     assert!((worst - 0.7424).abs() < 0.0001, "{worst}");

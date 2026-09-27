@@ -11,6 +11,7 @@
 //! spanning three orders of magnitude of enrollment, against a factor set (`fy2027`) two
 //! reference years newer than the one the implementation was originally written against.
 
+use edfund_core::stats::{correlation, median_interpolated};
 use foundation::department_model::{self, ModelDistrict as Row};
 use foundation::{
     aggregate_base_cost, teacher_base_cost, teacher_salary_refresh_delta, StatewideFactors,
@@ -57,23 +58,6 @@ fn formula_share_of_baseline(r: &Row) -> f64 {
 }
 
 /// Pearson correlation between two equal-length series.
-fn correlation(xs: &[f64], ys: &[f64]) -> f64 {
-    let n = xs.len() as f64;
-    let (mx, my) = (xs.iter().sum::<f64>() / n, ys.iter().sum::<f64>() / n);
-    let cov: f64 = xs.iter().zip(ys).map(|(a, b)| (a - mx) * (b - my)).sum();
-    let vx: f64 = xs.iter().map(|a| (a - mx).powi(2)).sum();
-    let vy: f64 = ys.iter().map(|b| (b - my).powi(2)).sum();
-    cov / (vx * vy).sqrt()
-}
-
-/// The median, on the one definition this workspace has.
-///
-/// Was a local upper-of-two, which disagrees with `dispersion` on every even-length series.
-fn median(mut values: Vec<f64>) -> f64 {
-    values.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
-    dispersion::median(&values).expect("a median is taken of a non-empty series here")
-}
-
 /// Share of a subset that is on the guarantee, as a percentage.
 fn guarantee_rate(set: &[&Row]) -> f64 {
     100.0 * set.iter().filter(|r| r.on_guarantee()).count() as f64 / set.len() as f64
@@ -267,8 +251,14 @@ fn guaranteed_districts_are_wealthier_and_shrinking_faster() {
     let on: Vec<&Row> = rs.iter().filter(|r| r.on_guarantee()).collect();
     let off: Vec<&Row> = rs.iter().filter(|r| !r.on_guarantee()).collect();
 
-    let val = |set: &[&Row]| median(set.iter().filter_map(|r| r.valuation_per_pupil).collect());
-    let trend = |set: &[&Row]| median(set.iter().map(|r| r.enrollment_change()).collect());
+    let val = |set: &[&Row]| {
+        median_interpolated(set.iter().filter_map(|r| r.valuation_per_pupil))
+            .expect("a median is taken of a non-empty series here")
+    };
+    let trend = |set: &[&Row]| {
+        median_interpolated(set.iter().map(|r| r.enrollment_change()))
+            .expect("a median is taken of a non-empty series here")
+    };
 
     assert!(
         val(&on) > val(&off) * 1.3,
@@ -305,8 +295,10 @@ fn property_wealth_predicts_the_guarantee_three_times_more_strongly_than_decline
         .filter(|r| r.valuation_per_pupil.is_some())
         .collect();
 
-    let med_val = median(rs.iter().filter_map(|r| r.valuation_per_pupil).collect());
-    let med_trend = median(rs.iter().map(|r| r.enrollment_change()).collect());
+    let med_val = median_interpolated(rs.iter().filter_map(|r| r.valuation_per_pupil))
+        .expect("a median is taken of a non-empty series here");
+    let med_trend = median_interpolated(rs.iter().map(|r| r.enrollment_change()))
+        .expect("a median is taken of a non-empty series here");
 
     let cell = |wealthy: bool, falling: bool| -> f64 {
         let sub: Vec<&Row> = rs
@@ -428,8 +420,8 @@ fn the_guarantee_weakens_the_formulas_equalization() {
     let formula: Vec<f64> = rs.iter().map(|r| r.formula_aid_per_pupil()).collect();
     let realized: Vec<f64> = rs.iter().map(|r| r.realized_aid_per_pupil()).collect();
 
-    let cf = correlation(&wealth, &formula);
-    let cr = correlation(&wealth, &realized);
+    let cf = correlation(&wealth, &formula).expect("two series of the same length, both varying");
+    let cr = correlation(&wealth, &realized).expect("two series of the same length, both varying");
 
     assert!(
         (cf - -0.662).abs() < 0.02,
@@ -472,11 +464,11 @@ fn the_guarantee_pays_wealthy_districts_and_the_poorer_half_nothing() {
         }
     };
     let uplift = |set: &[&Row]| {
-        median(
+        median_interpolated(
             set.iter()
-                .map(|r| r.realized_aid_per_pupil() - r.formula_aid_per_pupil())
-                .collect(),
+                .map(|r| r.realized_aid_per_pupil() - r.formula_aid_per_pupil()),
         )
+        .expect("a median is taken of a non-empty series here")
     };
 
     // Median per-district uplift: nothing at all in the poorer half.
@@ -494,7 +486,10 @@ fn the_guarantee_pays_wealthy_districts_and_the_poorer_half_nothing() {
     );
 
     // The same comparison on quartile medians rather than per-district differences.
-    let med_aid = |set: &[&Row], f: fn(&Row) -> f64| median(set.iter().map(|r| f(r)).collect());
+    let med_aid = |set: &[&Row], f: fn(&Row) -> f64| {
+        median_interpolated(set.iter().map(|r| f(r)))
+            .expect("a median is taken of a non-empty series here")
+    };
     let q1_gap = med_aid(quartile(0), Row::realized_aid_per_pupil)
         - med_aid(quartile(0), Row::formula_aid_per_pupil);
     let q4_gap = med_aid(quartile(3), Row::realized_aid_per_pupil)
@@ -506,18 +501,10 @@ fn the_guarantee_pays_wealthy_districts_and_the_poorer_half_nothing() {
     );
 
     // And it more than doubles what the wealthiest quartile would otherwise receive.
-    let q4_formula = median(
-        quartile(3)
-            .iter()
-            .map(|r| r.formula_aid_per_pupil())
-            .collect(),
-    );
-    let q4_realized = median(
-        quartile(3)
-            .iter()
-            .map(|r| r.realized_aid_per_pupil())
-            .collect(),
-    );
+    let q4_formula = median_interpolated(quartile(3).iter().map(|r| r.formula_aid_per_pupil()))
+        .expect("a median is taken of a non-empty series here");
+    let q4_realized = median_interpolated(quartile(3).iter().map(|r| r.realized_aid_per_pupil()))
+        .expect("a median is taken of a non-empty series here");
     assert!(
         q4_realized > q4_formula * 2.0,
         "Q4 formula ${q4_formula:.0} vs realized ${q4_realized:.0}"
@@ -590,7 +577,8 @@ fn the_formula_pays_guaranteed_districts_two_thirds_of_their_fy2020_level() {
     let on: Vec<&Row> = owned.iter().filter(|r| r.on_guarantee()).collect();
 
     let shares: Vec<f64> = on.iter().map(|r| formula_share_of_baseline(r)).collect();
-    let med = median(shares.clone());
+    let med =
+        median_interpolated(shares.clone()).expect("a median is taken of a non-empty series here");
     assert!((med - 0.678).abs() < 0.02, "median share {med:.3}");
 
     let under_half = shares.iter().filter(|s| **s < 0.5).count();
@@ -627,8 +615,10 @@ fn the_formula_falls_furthest_below_the_baseline_for_wealthy_districts() {
             .unwrap()
     });
     let q = on.len() / 4;
-    let share =
-        |slice: &[&Row]| median(slice.iter().map(|r| formula_share_of_baseline(r)).collect());
+    let share = |slice: &[&Row]| {
+        median_interpolated(slice.iter().map(|r| formula_share_of_baseline(r)))
+            .expect("a median is taken of a non-empty series here")
+    };
 
     let poorest = share(&on[..q]);
     let wealthiest = share(&on[3 * q..]);

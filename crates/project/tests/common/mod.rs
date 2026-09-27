@@ -6,13 +6,15 @@
 //! another, and nothing in either file said which was right. A tolerance is a claim about the
 //! fixture's storage, and a claim belongs in one place.
 //!
-//! `median` had a sharper history — the workspace carried two definitions and published figures
-//! from both. There is one now, in [`dispersion`], and the wrapper here exists only to sort first
-//! and to name the non-empty precondition.
+//! `median` had a sharper history — the workspace carried two definitions, one name, and
+//! published figures from both. Both are named now, in [`edfund_core::stats`], and this module
+//! re-exports them rather than wrapping them: the convention has to be readable at the call site,
+//! which is the one thing a helper called `median` could not do.
 //!
 //! Cargo compiles this module into every test binary that declares it, so a helper any one binary
-//! does not call is dead code there. The allow is that and nothing else.
-#![allow(dead_code)]
+//! does not call is dead code there, and a re-export it does not name is an unused import. The
+//! allows are that and nothing else.
+#![allow(dead_code, unused_imports)]
 
 /// A tolerance that admits the fixture's own rounding and nothing else.
 ///
@@ -62,19 +64,14 @@ pub fn reconciles(computed: f64, published: f64, parts: usize) -> bool {
     (computed - published).abs() <= 0.005 * (parts as f64 + 1.0)
 }
 
-/// The median, on the one definition this workspace has.
+/// The two medians and the correlation, from the one module that defines them.
 ///
-/// Was a local upper-of-two in two of these files, which disagrees with [`dispersion`] on every
-/// even-length series.
-///
-/// # Panics
-///
-/// On an empty series. Every caller here takes the median of a district panel, so an empty one is
-/// a broken fixture rather than a case to handle.
-pub fn median(mut values: Vec<f64>) -> f64 {
-    values.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
-    dispersion::median(&values).expect("a median is taken of a non-empty series here")
-}
+/// Re-exported rather than wrapped. There used to be a `median` here and five more beside it in
+/// the files that include this module, and they did not all mean the same thing: this one
+/// interpolated between the two middle observations and the copies took the upper of them, which
+/// disagrees on every even-length series. Naming the convention at the call site is the whole
+/// repair, so nothing here is allowed to hide it behind a shorter word again.
+pub use edfund_core::stats::{correlation, median_interpolated};
 
 /// Collapse a document's page furniture so a quoted phrase matches across a line break.
 ///
@@ -84,27 +81,18 @@ pub fn flat(document: &str) -> String {
     document.split_whitespace().collect::<Vec<&str>>().join(" ")
 }
 
-/// Pearson correlation over paired observations.
+/// [`correlation`] over observations that arrive already paired.
 ///
-/// Here because two counts of the same children can agree on levels and disagree on changes, and
-/// saying so needs both numbers rather than a scatter nobody looks at. Panics on fewer than two
-/// pairs or a constant series, both of which are a caller mistake rather than a finding.
-pub fn correlation(pairs: &[(f64, f64)]) -> f64 {
-    assert!(pairs.len() > 1, "a correlation needs at least two pairs");
-    let n = pairs.len() as f64;
-    let (mx, my) = pairs
-        .iter()
-        .fold((0.0, 0.0), |(a, b), (x, y)| (a + x, b + y));
-    let (mx, my) = (mx / n, my / n);
-    let (mut sxy, mut sxx, mut syy) = (0.0, 0.0, 0.0);
-    for (x, y) in pairs {
-        sxy += (x - mx) * (y - my);
-        sxx += (x - mx).powi(2);
-        syy += (y - my).powi(2);
-    }
-    assert!(
-        sxx > 0.0 && syy > 0.0,
-        "a constant series has no correlation"
-    );
-    sxy / (sxx * syy).sqrt()
+/// An adapter and not a second definition: the pairs are unzipped and handed to the shared
+/// function. Here because two counts of the same children can agree on levels and disagree on
+/// changes, and saying so needs both numbers rather than a scatter nobody looks at.
+///
+/// # Panics
+///
+/// On fewer than two pairs or a series that does not vary, both of which are a caller mistake
+/// rather than a finding.
+#[must_use]
+pub fn paired_correlation(pairs: &[(f64, f64)]) -> f64 {
+    let (xs, ys): (Vec<f64>, Vec<f64>) = pairs.iter().copied().unzip();
+    correlation(&xs, &ys).expect("at least two pairs, and neither series constant")
 }

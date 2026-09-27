@@ -48,6 +48,7 @@
 //! band. See [`the_quartile_table_the_settled_file_could_not_reproduce`], which is why the
 //! capacity measure is the axis this module reasons on.
 
+use edfund_core::stats::median_upper_middle;
 use std::collections::BTreeMap;
 
 use dispersion::{profile, sd1, typology};
@@ -65,11 +66,6 @@ use project::prior_model;
 /// The state share either side of which the two clusters sit, used only to measure how nearly
 /// disjoint they are. Nothing in the module reads it.
 const DISJOINT_AT: f64 = 0.25;
-
-fn upper_middle(mut values: Vec<f64>) -> f64 {
-    values.sort_by(f64::total_cmp);
-    values[values.len() / 2]
-}
 
 fn of(panel: &[DistrictRecord], origin: Origin) -> Vec<&DistrictRecord> {
     let index = enrollment_index(panel);
@@ -282,12 +278,12 @@ fn sixty_one_districts_are_held_up_by_nothing_but_their_missing_children() {
     assert!((ENROLLMENT_GROWTH_SUPPLEMENT_PER_PUPIL - 250.0).abs() < f64::EPSILON);
     assert!((ENROLLMENT_GROWTH_THRESHOLD - 0.03).abs() < f64::EPSILON);
     let median_loss = 1.0
-        - upper_middle(
+        - median_upper_middle(
             of(&districts, Origin::EnrollmentLoss)
                 .iter()
-                .map(|r| index[&r.irn])
-                .collect(),
-        );
+                .map(|r| index[&r.irn]),
+        )
+        .expect("no values to take a median of");
     assert!(
         median_loss > 3.0 * ENROLLMENT_GROWTH_THRESHOLD,
         "the median enrollment cluster district has lost {median_loss}, against a {ENROLLMENT_GROWTH_THRESHOLD} threshold in the other direction"
@@ -345,11 +341,11 @@ fn the_capacity_cluster_reaches_the_floor_in_a_year_and_the_enrollment_cluster_i
     let prior = prior_model::by_irn();
 
     let years = |rows: &[&DistrictRecord]| {
-        upper_middle(
+        median_upper_middle(
             rows.iter()
-                .filter_map(|r| prior.get(&r.irn).and_then(|p| years_to_the_floor(r, p)))
-                .collect(),
+                .filter_map(|r| prior.get(&r.irn).and_then(|p| years_to_the_floor(r, p))),
         )
+        .expect("no values to take a median of")
     };
     let already = |rows: &[&DistrictRecord]| {
         rows.iter()
@@ -419,9 +415,10 @@ fn size_typology_and_the_resident_count_do_not_separate_the_population() {
         };
         let slice = &by_size[s * sextile..upper];
         rates.push(slice.iter().filter(|r| r.on_guarantee()).count());
-        base_cost.push(upper_middle(
-            slice.iter().map(|r| r.base_cost_per_pupil).collect(),
-        ));
+        base_cost.push(
+            median_upper_middle(slice.iter().map(|r| r.base_cost_per_pupil))
+                .expect("no values to take a median of"),
+        );
     }
     assert_eq!(
         rates,
@@ -449,12 +446,14 @@ fn size_typology_and_the_resident_count_do_not_separate_the_population() {
             (q + 1) * quarter
         };
         let slice = &by_adm[q * quarter..upper];
-        multiples.push(upper_middle(
-            slice
-                .iter()
-                .map(|r| r.realized_aid() / r.core_foundation_funding)
-                .collect(),
-        ));
+        multiples.push(
+            median_upper_middle(
+                slice
+                    .iter()
+                    .map(|r| r.realized_aid() / r.core_foundation_funding),
+            )
+            .expect("no values to take a median of"),
+        );
     }
     let spread = multiples.iter().copied().fold(f64::MIN, f64::max)
         / multiples.iter().copied().fold(f64::MAX, f64::min);
@@ -501,8 +500,10 @@ fn size_typology_and_the_resident_count_do_not_separate_the_population() {
             .find_map(|row| row.adm)?;
         (taught > 0.0).then(|| resident / taught)
     };
-    let median_ratio =
-        |rows: &[&DistrictRecord]| upper_middle(rows.iter().filter_map(|r| ratio(r)).collect());
+    let median_ratio = |rows: &[&DistrictRecord]| {
+        median_upper_middle(rows.iter().filter_map(|r| ratio(r)))
+            .expect("no values to take a median of")
+    };
     let loss = of(&districts, Origin::EnrollmentLoss);
     let growth = of(&districts, Origin::CapacityGrowth);
     let unpaid: Vec<&DistrictRecord> = districts.iter().filter(|r| !r.on_guarantee()).collect();
@@ -645,36 +646,34 @@ fn the_quartile_table_the_settled_file_could_not_reproduce() {
             "guaranteed in capacity quartile {}",
             q + 1
         );
-        let got_base = upper_middle(guaranteed.iter().map(|r| r.base_cost_per_pupil).collect());
+        let got_base = median_upper_middle(guaranteed.iter().map(|r| r.base_cost_per_pupil))
+            .expect("no values to take a median of");
         assert!(
             (got_base - base_cost).abs() < 1.0,
             "Q{} base cost per pupil {got_base} against {base_cost}",
             q + 1
         );
-        let got_share = upper_middle(
-            guaranteed
-                .iter()
-                .map(|r| r.state_share_fraction())
-                .collect(),
-        );
+        let got_share = median_upper_middle(guaranteed.iter().map(|r| r.state_share_fraction()))
+            .expect("no values to take a median of");
         assert!(
             (got_share - share).abs() < 0.0005,
             "Q{} state share {got_share} against {share}",
             q + 1
         );
-        let got_multiple = upper_middle(
+        let got_multiple = median_upper_middle(
             guaranteed
                 .iter()
-                .map(|r| r.realized_aid() / r.core_foundation_funding)
-                .collect(),
-        );
+                .map(|r| r.realized_aid() / r.core_foundation_funding),
+        )
+        .expect("no values to take a median of");
         assert!(
             (got_multiple - multiple).abs() < 0.005,
             "Q{} multiple {got_multiple} against {multiple}",
             q + 1
         );
 
-        let over_all = upper_middle(band.iter().map(|r| r.base_cost_per_pupil).collect());
+        let over_all = median_upper_middle(band.iter().map(|r| r.base_cost_per_pupil))
+            .expect("no values to take a median of");
         assert!(
             (over_all - flat).abs() < 1.0,
             "Q{} base cost per pupil over all 609 is {over_all} against {flat}",

@@ -121,6 +121,7 @@
 
 use std::collections::BTreeMap;
 
+use edfund_core::stats::median_upper_middle;
 use edfund_core::{Adm, Dollars};
 
 use crate::guarantee_origin::{self, Decomposition, Origin};
@@ -298,16 +299,6 @@ pub fn standings(panel: &[DistrictRecord]) -> (Vec<Standing>, Vec<Unreached>) {
     (reached, unreached)
 }
 
-/// The upper-middle value, which is the crates' convention and not Python's.
-fn upper_middle(mut values: Vec<f64>) -> f64 {
-    values.sort_by(f64::total_cmp);
-    if values.is_empty() {
-        f64::NAN
-    } else {
-        values[values.len() / 2]
-    }
-}
-
 /// The enrollment cluster's median enrollment term — the rate of loss its typical member is on
 /// the floor for, and the threshold [`siblings`] is cut at.
 ///
@@ -315,12 +306,12 @@ fn upper_middle(mut values: Vec<f64>) -> f64 {
 /// say. `ln(1 / 0.8808)`, 11.9% since FY2020.
 #[must_use]
 pub fn cluster_median_enrollment_term(rows: &[Standing]) -> f64 {
-    upper_middle(
+    median_upper_middle(
         rows.iter()
             .filter(|s| s.population == Population::EnrollmentLoss)
-            .map(|s| s.terms.enrollment_term)
-            .collect(),
+            .map(|s| s.terms.enrollment_term),
     )
+    .unwrap_or(f64::NAN)
 }
 
 /// The formula districts that lost pupils at the cluster's median rate or faster.
@@ -394,19 +385,19 @@ pub fn by_capacity(rows: &[&Standing]) -> [Fifth; 5] {
         for s in slice {
             by_population[s.population.index()] += 1;
         }
+        // The upper middle, which every figure this crate publishes about a subgroup is on.
+        let median = |pick: &dyn Fn(&Standing) -> f64| {
+            median_upper_middle(slice.iter().map(|s| pick(s))).unwrap_or(f64::NAN)
+        };
         Fifth {
             rank: index + 1,
             districts: slice.len(),
             held: slice.iter().filter(|s| s.population.held()).count(),
             by_population,
-            median_capacity: upper_middle(slice.iter().map(|s| s.capacity_per_pupil).collect()),
-            median_per_pupil_term: upper_middle(
-                slice.iter().map(|s| s.terms.per_pupil_term).collect(),
-            ),
-            median_enrollment_term: upper_middle(
-                slice.iter().map(|s| s.terms.enrollment_term).collect(),
-            ),
-            median_state_share: upper_middle(slice.iter().map(|s| s.state_share).collect()),
+            median_capacity: median(&|s: &Standing| s.capacity_per_pupil),
+            median_per_pupil_term: median(&|s: &Standing| s.terms.per_pupil_term),
+            median_enrollment_term: median(&|s: &Standing| s.terms.enrollment_term),
+            median_state_share: median(&|s: &Standing| s.state_share),
         }
     })
 }
@@ -441,21 +432,23 @@ pub struct Profile {
 /// Describe a population.
 #[must_use]
 pub fn profile(rows: &[&Standing]) -> Profile {
+    let median = |pick: &dyn Fn(&Standing) -> f64| {
+        median_upper_middle(rows.iter().map(|s| pick(s))).unwrap_or(f64::NAN)
+    };
     Profile {
         districts: rows.len(),
         adm: rows.iter().map(|s| s.adm).sum(),
-        median_disadvantaged: upper_middle(
-            rows.iter()
-                .filter_map(|s| s.profile_disadvantaged)
-                .collect(),
-        ),
-        median_poverty: upper_middle(rows.iter().map(|s| s.poverty).collect()),
-        median_capacity: upper_middle(rows.iter().map(|s| s.capacity_per_pupil).collect()),
-        median_state_share: upper_middle(rows.iter().map(|s| s.state_share).collect()),
-        median_per_pupil_term: upper_middle(rows.iter().map(|s| s.terms.per_pupil_term).collect()),
-        median_enrollment_term: upper_middle(
-            rows.iter().map(|s| s.terms.enrollment_term).collect(),
-        ),
+        // NaN where a population publishes no disadvantaged share at all, which is a real case
+        // for the small ones: absent and not zero. The others are read off every member.
+        median_disadvantaged: median_upper_middle(
+            rows.iter().filter_map(|s| s.profile_disadvantaged),
+        )
+        .unwrap_or(f64::NAN),
+        median_poverty: median(&|s: &Standing| s.poverty),
+        median_capacity: median(&|s: &Standing| s.capacity_per_pupil),
+        median_state_share: median(&|s: &Standing| s.state_share),
+        median_per_pupil_term: median(&|s: &Standing| s.terms.per_pupil_term),
+        median_enrollment_term: median(&|s: &Standing| s.terms.enrollment_term),
     }
 }
 
@@ -506,23 +499,22 @@ pub fn siblings_headroom(panel: &[DistrictRecord], siblings: &[&Standing]) -> Si
     Siblings {
         profile: profile(siblings),
         headroom: rows.iter().map(|(_, h)| h.gap).sum(),
-        median_headroom: upper_middle(rows.iter().map(|(_, h)| h.gap).collect()),
-        median_headroom_per_pupil: upper_middle(rows.iter().map(|(s, h)| h.gap / s.adm).collect()),
-        median_formula_over_floor: upper_middle(
-            siblings.iter().map(|s| s.headroom().exp()).collect(),
-        ),
-        median_formula_per_pupil: upper_middle(
-            siblings.iter().map(|s| s.formula / s.adm).collect(),
-        ),
+        median_headroom: median_upper_middle(rows.iter().map(|(_, h)| h.gap)).unwrap_or(f64::NAN),
+        median_headroom_per_pupil: median_upper_middle(rows.iter().map(|(s, h)| h.gap / s.adm))
+            .unwrap_or(f64::NAN),
+        median_formula_over_floor: median_upper_middle(siblings.iter().map(|s| s.headroom().exp()))
+            .unwrap_or(f64::NAN),
+        median_formula_per_pupil: median_upper_middle(siblings.iter().map(|s| s.formula / s.adm))
+            .unwrap_or(f64::NAN),
         // Per FY2020 pupil: the current count divided by the index is the anchor-year count.
-        median_base_per_pupil: upper_middle(
+        median_base_per_pupil: median_upper_middle(
             siblings
                 .iter()
-                .map(|s| s.floor / (s.adm / s.terms.enrollment_index))
-                .collect(),
-        ),
+                .map(|s| s.floor / (s.adm / s.terms.enrollment_index)),
+        )
+        .unwrap_or(f64::NAN),
         falling: years.len(),
-        median_years_to_floor: upper_middle(years),
+        median_years_to_floor: median_upper_middle(years).unwrap_or(f64::NAN),
     }
 }
 

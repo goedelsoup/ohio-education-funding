@@ -69,6 +69,7 @@
 use std::collections::BTreeMap;
 
 use dispersion::profile::ProfileDistrict;
+use edfund_core::stats::median_upper_middle;
 use edfund_core::{round_dp, Adm};
 use foundation::minimums::Minimum;
 use foundation::ratios;
@@ -232,13 +233,6 @@ pub struct Band {
     pub beyond_the_fixed_elements: f64,
 }
 
-/// The crates' median: the upper middle, never the mean of two.
-fn upper_middle(mut values: Vec<f64>) -> f64 {
-    assert!(!values.is_empty(), "no districts to take a median of");
-    values.sort_by(f64::total_cmp);
-    values[values.len() / 2]
-}
-
 /// Summarise one group of districts.
 ///
 /// # Panics
@@ -246,7 +240,9 @@ fn upper_middle(mut values: Vec<f64>) -> f64 {
 /// If the group is empty.
 #[must_use]
 pub fn band(rows: &[&District]) -> Band {
-    let median = |f: fn(&District) -> f64| upper_middle(rows.iter().map(|d| f(d)).collect());
+    let median = |f: fn(&District) -> f64| {
+        median_upper_middle(rows.iter().map(|d| f(d))).expect("no districts to take a median of")
+    };
     Band {
         n: rows.len(),
         adm: median(|d| d.adm),

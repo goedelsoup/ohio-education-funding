@@ -521,27 +521,29 @@ pub fn foundation_movements(base: FiscalYear) -> Vec<(u16, f64)> {
 ///
 /// # Which median, and the fourth copy of a defect
 ///
-/// [`dispersion::median`], which interpolates between the two middle observations of an even
-/// series. The test this computation was hoisted out of took `magnitudes[len / 2]` — the *upper*
-/// of the two — and the series has 24 movements in it, so the two definitions differ: **$251.9m**
-/// against **$235.9m**. The corpus publishes $236 million and the crate standing behind it
-/// computed $252 million, and nothing said so, because the assertion was
+/// [`edfund_core::stats::median_interpolated`], which averages the two middle observations of an
+/// even series. The test this computation was hoisted out of took `magnitudes[len / 2]` — the
+/// *upper* of the two — and the series has 24 movements in it, so the two definitions differ:
+/// **$251.9m** against **$235.9m**. The corpus publishes $236 million and the crate standing
+/// behind it computed $252 million, and nothing said so, because the assertion was
 /// `(200_000_000.0..300_000_000.0).contains(&median)` and that band holds both.
 ///
-/// [`dispersion::percentile_sorted`] already named this as a defect it had corrected in three
-/// places. This was the fourth. See #158.
+/// [`edfund_core::stats::percentile_sorted`]'s docstring already named this as a defect it had
+/// corrected in three places. This was the fourth; there turned out to be nine more, and #494
+/// is where the name itself was fixed: there is no bare `median` to reach for now, only the two
+/// conventions under their own names.
 ///
 /// # Panics
 ///
 /// If the series is empty, which would mean the appropriation fixtures carry no foundation line.
 #[must_use]
 pub fn foundation_noise_floor(base: FiscalYear) -> f64 {
-    let mut magnitudes: Vec<f64> = foundation_movements(base)
-        .into_iter()
-        .map(|(_, moved)| moved.abs())
-        .collect();
-    magnitudes.sort_by(|a, b| a.partial_cmp(b).expect("finite"));
-    dispersion::median(&magnitudes).expect("the foundation aid series is empty")
+    edfund_core::stats::median_interpolated(
+        foundation_movements(base)
+            .into_iter()
+            .map(|(_, moved)| moved.abs()),
+    )
+    .expect("the foundation aid series is empty")
 }
 
 /// Growth across a series of years, nominal and real, as fractions.

@@ -11,6 +11,8 @@
 //! The helpers below are the ones only this registry calls. Whatever a chart also wanted stayed
 //! in [`super`], beside [`Inputs`] and the shared statistics.
 
+use edfund_core::stats::{median_interpolated, median_upper_middle};
+
 use super::*;
 
 /// One figure the corpus quotes.
@@ -929,14 +931,13 @@ fn guarantee_against_achievement(i: &Inputs) -> (Vec<f64>, Vec<f64>, Vec<f64>) {
 
 /// The median Performance Index of the districts on, or off, the guarantee.
 fn median_index(i: &Inputs, on_guarantee: bool) -> f64 {
-    let mut values: Vec<f64> = i
-        .joined
-        .iter()
-        .filter(|r| r.on_guarantee() == on_guarantee)
-        .filter_map(|r| r.outcome.performance_index)
-        .collect();
-    values.sort_by(f64::total_cmp);
-    dispersion::median(&values).expect("districts on both sides of the guarantee")
+    median_interpolated(
+        i.joined
+            .iter()
+            .filter(|r| r.on_guarantee() == on_guarantee)
+            .filter_map(|r| r.outcome.performance_index),
+    )
+    .expect("districts on both sides of the guarantee")
 }
 
 /// Districts big enough for an identification *rate* to mean anything.
@@ -1079,13 +1080,11 @@ fn zeroed(diffs: &[RegimeDiff]) -> usize {
 }
 
 /// The median total difference per pupil, over the districts that have one.
+///
+/// The upper middle, which is what the bound cell was computed on.
 fn median_difference(diffs: &[RegimeDiff]) -> f64 {
-    let mut totals: Vec<f64> = diffs
-        .iter()
-        .filter_map(RegimeDiff::total_difference)
-        .collect();
-    totals.sort_by(|a, b| a.partial_cmp(b).expect("no NaN in a regime difference"));
-    totals[totals.len() / 2]
+    median_upper_middle(diffs.iter().filter_map(RegimeDiff::total_difference))
+        .expect("districts carry a regime difference")
 }
 
 /// One cell of Table 5 of the FY2026-27 redbook: LSC's estimate of a scholarship programme's
@@ -4542,17 +4541,12 @@ pub static FIGURES: &[Figure] = &[
         pinned: 0.6700,
         tolerance: 0.0005,
         compute: |i| {
-            let shares: Vec<f64> = i
-                .composition
-                .districts
-                .iter()
-                .map(|d| d.classroom_share() / 100.0)
-                .collect();
-            dispersion::median(&{
-                let mut sorted = shares;
-                sorted.sort_by(f64::total_cmp);
-                sorted
-            })
+            median_interpolated(
+                i.composition
+                    .districts
+                    .iter()
+                    .map(|d| d.classroom_share() / 100.0),
+            )
             .expect("districts report a classroom share")
         },
     },
@@ -4951,13 +4945,13 @@ pub static FIGURES: &[Figure] = &[
         pinned: 80.7,
         tolerance: 0.05,
         compute: |_| {
-            median(
+            median_upper_middle(
                 comprehensive_support()
                     .iter()
                     .filter(|(i, _)| i.year_identified == "2018")
-                    .filter_map(|(_, b)| b.chronic_absenteeism)
-                    .collect(),
+                    .filter_map(|(_, b)| b.chronic_absenteeism),
             )
+            .expect("the 2018 cohort reports chronic absenteeism")
         },
     },
     Figure {
@@ -4969,12 +4963,12 @@ pub static FIGURES: &[Figure] = &[
         pinned: 20.8,
         tolerance: 0.05,
         compute: |_| {
-            median(
+            median_upper_middle(
                 dispersion::building::buildings()
                     .iter()
-                    .filter_map(|b| b.chronic_absenteeism)
-                    .collect(),
+                    .filter_map(|b| b.chronic_absenteeism),
             )
+            .expect("buildings report chronic absenteeism")
         },
     },
     Figure {
@@ -6453,9 +6447,9 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "Median Performance Index among districts the guarantee holds up",
-        // 89.85 and not the 89.9 two places carried: `dispersion::median` averages the two middle
-        // observations of an even series and the figure was taken as the upper of them, which is
-        // the same local-median defect this workspace corrected in three other files.
+        // 89.85 and not the 89.9 two places carried: `median_interpolated` averages the two
+        // middle observations of an even series and the figure was taken as the upper of them,
+        // which is the same local-median defect #494 finished correcting across the workspace.
         pinned: 89.85,
         tolerance: 0.005,
         compute: |i| median_index(i, true),

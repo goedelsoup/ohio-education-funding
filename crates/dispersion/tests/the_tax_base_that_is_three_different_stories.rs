@@ -23,6 +23,8 @@
 
 use std::collections::BTreeMap;
 
+use edfund_core::stats::median_upper_middle;
+
 use dispersion::tax_base::{self, Base, CONCENTRATED, TAX_YEAR};
 use foundation::department_model::{self, ModelDistrict};
 
@@ -35,15 +37,6 @@ fn model() -> BTreeMap<String, ModelDistrict> {
         .into_iter()
         .map(|d| (d.irn.clone(), d))
         .collect()
-}
-
-/// The median of a sample, by value. Empty gives `None` rather than a zero that would sort.
-fn median(mut values: Vec<f64>) -> Option<f64> {
-    if values.is_empty() {
-        return None;
-    }
-    values.sort_by(f64::total_cmp);
-    Some(values[values.len() / 2])
 }
 
 /// What one class's concentrated districts look like against the model.
@@ -68,10 +61,10 @@ fn profile_of(base: Base) -> Profile {
     Profile {
         districts: rows.len(),
         guarantee_rate: rows.iter().filter(|d| d.on_guarantee()).count() as f64 / rows.len() as f64,
-        median_enrollment_change: median(rows.iter().map(|d| d.enrollment_change()).collect())
+        median_enrollment_change: median_upper_middle(rows.iter().map(|d| d.enrollment_change()))
             .expect("a non-empty set has a median"),
-        median_valuation_per_pupil: median(
-            rows.iter().filter_map(|d| d.valuation_per_pupil).collect(),
+        median_valuation_per_pupil: median_upper_middle(
+            rows.iter().filter_map(|d| d.valuation_per_pupil),
         )
         .expect("concentrated districts have a published valuation"),
     }
@@ -181,11 +174,10 @@ fn the_class_that_behaves_as_argued_is_the_one_nobody_names() {
 
     // And they are not the districts losing pupils either — they lose them more slowly than the
     // median district, which is the second half of the claim and fails the same way.
-    let statewide_change = median(
+    let statewide_change = median_upper_middle(
         department_model::districts()
             .iter()
-            .map(ModelDistrict::enrollment_change)
-            .collect(),
+            .map(ModelDistrict::enrollment_change),
     )
     .expect("the model is not empty");
     assert!(

@@ -141,6 +141,7 @@
 
 use std::collections::BTreeMap;
 
+use edfund_core::stats::{correlation, median_upper_middle};
 use edfund_core::{Adm, Dollars, FiscalYear};
 
 use crate::hold_harmless::transition_supplement_under;
@@ -643,28 +644,14 @@ pub fn comparability(panel: &[DistrictRecord]) -> Comparability {
     }
     out.computed_falls_first_leg = first.iter().filter(|x| **x < 0.0).count();
     out.computed_falls_second_leg = second.iter().filter(|x| **x < 0.0).count();
-    out.leg_correlation = correlation(&first, &second);
-    out.computed_median_first_leg = upper_middle(first);
-    out.computed_median_second_leg = upper_middle(second);
+    // `0.0` where a leg does not vary at all, which is what the private copy this replaces
+    // answered and what the field is bound at. It is not the same statement as a measured zero,
+    // and the shared function says so by returning `None`; an `f64` field has nowhere to put the
+    // distinction, so it is written here rather than left to be rediscovered.
+    out.leg_correlation = correlation(&first, &second).unwrap_or(0.0);
+    out.computed_median_first_leg =
+        median_upper_middle(first).expect("no values to take a median of");
+    out.computed_median_second_leg =
+        median_upper_middle(second).expect("no values to take a median of");
     out
-}
-
-/// Pearson correlation of two equal-length series.
-fn correlation(xs: &[f64], ys: &[f64]) -> f64 {
-    let n = xs.len() as f64;
-    let (mx, my) = (xs.iter().sum::<f64>() / n, ys.iter().sum::<f64>() / n);
-    let cov: f64 = xs.iter().zip(ys).map(|(x, y)| (x - mx) * (y - my)).sum();
-    let sx: f64 = xs.iter().map(|x| (x - mx).powi(2)).sum::<f64>().sqrt();
-    let sy: f64 = ys.iter().map(|y| (y - my).powi(2)).sum::<f64>().sqrt();
-    if sx <= 0.0 || sy <= 0.0 {
-        return 0.0;
-    }
-    cov / (sx * sy)
-}
-
-/// The crates' median: sort, then take the upper middle. Never the mean of two.
-fn upper_middle(mut values: Vec<f64>) -> f64 {
-    assert!(!values.is_empty(), "no values to take a median of");
-    values.sort_by(|a, b| a.partial_cmp(b).expect("no NaN in a measured rate"));
-    values[values.len() / 2]
 }

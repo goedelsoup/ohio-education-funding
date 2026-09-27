@@ -24,6 +24,7 @@
 //! The first two do not depend on the third. Had the break been real, this is still the evidence
 //! that the reappraisals did not cause it.
 
+use edfund_core::stats::median_upper_middle;
 use regime_diff::reappraisal_incidence as incidence;
 
 /// The calendar identifies the events, and it is not close.
@@ -45,7 +46,8 @@ fn every_cohort_jumps_in_its_own_year_and_sits_still_in_the_others() {
             all.iter().filter(|d| d.event_tax_year == event).collect();
         assert_eq!(group.len(), cohort, "districts on the TY{event} calendar");
 
-        let jump = median(group.iter().filter_map(|d| growth(d, event)));
+        let jump =
+            median_upper_middle(group.iter().filter_map(|d| growth(d, event))).unwrap_or(f64::NAN);
         assert!(
             (jump - pinned).abs() < 5e-3,
             "TY{event} cohort's own year moved class-I value by {jump:.4}"
@@ -56,7 +58,8 @@ fn every_cohort_jumps_in_its_own_year_and_sits_still_in_the_others() {
             if quiet == event {
                 continue;
             }
-            let ordinary = median(group.iter().filter_map(|d| growth(d, quiet)));
+            let ordinary = median_upper_middle(group.iter().filter_map(|d| growth(d, quiet)))
+                .unwrap_or(f64::NAN);
             assert!(
                 ordinary < 0.02,
                 "TY{event} cohort moved {ordinary:.4} in TY{quiet}, which is not a quiet year"
@@ -210,10 +213,4 @@ fn growth(district: &incidence::District, tax_year: u16) -> Option<f64> {
     let now = district.class1_value.get(&tax_year)?;
     let before = district.class1_value.get(&(tax_year - 1))?;
     Some(now / before - 1.0)
-}
-
-fn median(values: impl Iterator<Item = f64>) -> f64 {
-    let mut sample: Vec<f64> = values.collect();
-    sample.sort_by(f64::total_cmp);
-    sample.get(sample.len() / 2).copied().unwrap_or(f64::NAN)
 }
