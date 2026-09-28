@@ -3,6 +3,7 @@ name = "bundle"
 description = "Export a versioned JSON feed of the corpus's district-level findings for the web layer"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 publish.workspace = true

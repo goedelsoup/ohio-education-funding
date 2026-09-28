@@ -19,6 +19,9 @@ members = [
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
+# The floor Cargo and clippy's MSRV lints enforce. It is the pinned toolchain rather than the
+# lowest version the code happens to compile on, because nothing has ever checked the lower one.
+rust-version = "1.98.0"
 license = "MIT"
 repository = "https://github.com/goedelsoup/ohio-education-funding"
 # Path-only crates: the domain computer is consumed from this repository, never from crates.io.

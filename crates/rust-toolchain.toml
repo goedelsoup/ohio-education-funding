@@ -1,0 +1,12 @@
+# The one toolchain every check in this workspace has been verified against.
+#
+# rustup reads this from `crates/` and every directory under it, which is where the CI `crates`
+# job runs, so the runner compiles and lints on this version rather than on whatever stable its
+# image happens to ship. mise does not read it: its `[tools]` pin exports `RUSTUP_TOOLCHAIN`,
+# which outranks this file, so `mise.toml` carries the same number and
+# `edfund-core/tests/the_toolchain_is_pinned_once.rs` fails if the two, or the workspace's
+# `rust-version`, disagree. Move all three together.
+[toolchain]
+channel = "1.98.0"
+components = ["rustfmt", "clippy"]
+profile = "minimal"

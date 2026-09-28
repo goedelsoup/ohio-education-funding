@@ -3,6 +3,7 @@ name = "local-capacity"
 description = "Fair School Funding Plan local capacity and state share, per R.C. 3317.017"
 version.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 publish.workspace = true
