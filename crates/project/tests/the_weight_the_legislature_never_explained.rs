@@ -49,6 +49,15 @@
 //! school rider. So the `[open]` closes on the *existence* of the weight and narrows to its
 //! *size* — which no committed document addresses, and which the plan bill already carried.
 //!
+//! # The miles were weighted later, in an appropriation act
+//!
+//! The plan bill and H.B. 583 both leave the mile base a bare product. The weighted sum on miles
+//! driven was inserted by Am. Sub. H.B. 45 of the 134th General Assembly — a tax-amnesty bill the
+//! Senate substituted into a spending act in December 2022 — for fiscal years 2022 and 2023, and
+//! H.B. 33 carried it forward. The fifth committed document, cut to the one section it reprints,
+//! shows the insertion; none of the fifteen analyses mentions it, under either register's wording
+//! (#481).
+//!
 //! # A by-catch: the plan bill settles a schedule the corpus had been inferring
 //!
 //! The node reasoned that the minimum state share's published values are twenty-fourths in equal
@@ -399,14 +408,14 @@ fn the_stated_reason_covers_both_weights_and_so_explains_neither_size() {
     }
 }
 
-/// **The mile leg of the weights is younger than the rider leg**, which no source dates.
+/// **The mile leg of the weights is younger than the rider leg.**
 ///
 /// The node reads R.C. 3317.0212(E)(1)(b) as putting the same two multiples on miles driven, and
 /// in the section as it stands that is exactly right. It was not always. The plan bill's mile base
 /// is a bare product, and H.B. 583 — the plan's own corrections act, September 2022 — reprints the
 /// section with the mile base still bare, at the same address `(E)(1)(b)` the weighted version now
-/// occupies. So the 2.0 was legislated onto the rider base in 2021 and onto the mile base in some
-/// later act, and no committed analysis mentions the second occasion at all.
+/// occupies. So the 2.0 was legislated onto the rider base in 2021 and onto the mile base in a
+/// later act — which the next test names.
 #[test]
 fn the_mile_base_was_unweighted_in_both_earlier_texts_and_is_weighted_now() {
     let plan = plan_bill::section("3317.0212").expect("the plan bill enacts R.C. 3317.0212");
@@ -437,6 +446,122 @@ fn the_mile_base_was_unweighted_in_both_earlier_texts_and_is_weighted_now() {
         ),
         "the section in force weights the miles, so the change happened after H.B. 583"
     );
+}
+
+/// **H.B. 45 of the 134th did it, in April 2023, and its own strike-and-insert shows it.**
+///
+/// Not H.B. 33 and not H.B. 96, the two candidates the issue named: an appropriation act passed in
+/// the lame-duck session, introduced as a five-page tax amnesty and turned into a budget vehicle by
+/// the Senate Finance substitute of December 2022. It amends the "fiscal years 2022 and 2023"
+/// division, so the weighted miles first paid in FY2023, and H.B. 33 carried them forward under new
+/// year labels. The struck `Multiply` and `by the district's total` run into the inserted text in
+/// the extract exactly as the plan bill's did on the rider side.
+#[test]
+fn the_mile_weights_were_inserted_by_hb45_of_the_134th() {
+    let hb45 = act::flat(act::HB45_TRANSPORTATION);
+
+    assert!(
+        hb45.contains("(Amended Substitute House Bill Number 45)")
+            && hb45.contains("(134th General Assembly)"),
+        "the fixture is the 134th General Assembly's H.B. 45"
+    );
+    assert_eq!(
+        act::headings(act::HB45_TRANSPORTATION),
+        vec!["3317.0212"],
+        "and it reprints R.C. 3317.0212 — so the act amends the section rather than citing it"
+    );
+
+    assert!(
+        hb45.contains(
+            "(1) For fiscal years 2022 and 2023: (a) Calculate the sum of the following: (i) The \
+             product of the statewide transportation cost per student"
+        ),
+        "the rider base is already the weighted sum, unamended — H.B. 110 put it there"
+    );
+    assert!(
+        hb45.contains(
+            "(b) Multiply Calculate the sum of the following: (i) The product of the statewide \
+             transportation cost per mile by the district's total and the number of miles driven \
+             for school bus service in as reported for qualifying riders for the current fiscal \
+             year who are enrolled in the district;"
+        ),
+        "the mile base's bare product is struck and the weighted sum inserted — the struck \
+         `Multiply`, `by the district's total` and `in` run into their replacements"
+    );
+    // Page 53 of the act begins inside this clause, so its running head sits mid-sentence in the
+    // extract; the two halves are asserted either side of it.
+    assert!(
+        hb45.contains(
+            "(iii) 2.0 times the statewide transportation cost per mile times the number of miles \
+             driven for Am. Sub. H. B. No. 45"
+        ) && hb45.contains(
+            "school bus service as reported for qualifying riders for the current fiscal year who \
+             are enrolled in nonpublic schools. (c) Multiply the greater"
+        ),
+        "and the 2.0 on nonpublic miles is inserted text, word for word what the section in force \
+         carries"
+    );
+}
+
+/// **No committed analysis describes the mile weights — under the wording LSC used when it did.**
+///
+/// The census above searches rider phrasings, and a mile-side description would not match them.
+/// These two phrases are LSC's own, from the two documents that did describe the change and are
+/// not committed: H.B. 45's fiscal note ("applies the same weights of 1.5 and 2.0 to the number of
+/// current year miles driven to transport them") and the Members Brief of January 2023 ("Weighted
+/// miles driven (for FY 2023 only)"). The control below holds the search to those sentences, so a
+/// phrase that could not find the description where it is known to be cannot pass here vacuously.
+#[test]
+fn no_committed_analysis_describes_the_mile_weights_either() {
+    const PHRASES: [&str; 2] = ["weighted miles", "miles driven to transport"];
+
+    for (source, sentence) in [
+        (
+            "H.B. 45 fiscal note",
+            "The bill applies the same weights of 1.5 and 2.0 to the number of current year miles \
+             driven to transport them.",
+        ),
+        (
+            "Members Brief 134-74",
+            "Weighted miles driven (for FY 2023 only) = Number of miles driven to transport riders \
+             enrolled in the district",
+        ),
+    ] {
+        assert!(
+            PHRASES
+                .iter()
+                .any(|p| sentence.to_lowercase().contains(p)),
+            "{source}: the search phrases do not match LSC's own description of the change"
+        );
+    }
+
+    let mut searched = 0;
+    for book in greenbooks() {
+        let flat = book.flat().to_lowercase();
+        for phrase in PHRASES {
+            assert!(
+                !flat.contains(phrase),
+                "{}: mentions {phrase:?}, so a committed greenbook does describe the mile weights",
+                book.bill
+            );
+        }
+        searched += 1;
+    }
+    for (name, text) in [
+        ("H.B. 96 greenbook", HB96_GREENBOOK),
+        ("H.B. 96 redbook", HB96_REDBOOK),
+        ("the enacted comparison", HB96_ENACTED),
+    ] {
+        let flat = flat(text).to_lowercase();
+        for phrase in PHRASES {
+            assert!(
+                !flat.contains(phrase),
+                "{name}: mentions {phrase:?}, so a committed analysis does describe the mile weights"
+            );
+        }
+        searched += 1;
+    }
+    assert_eq!(searched, 15, "the fifteen analyses the census speaks for");
 }
 
 /// **The whole minimum-share schedule was written in one clause, in February 2021.**

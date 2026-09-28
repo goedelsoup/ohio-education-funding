@@ -661,6 +661,23 @@ pub(super) const SESSION_LAWS: Connector = Connector {
                    first page. Version code `08_EN`, which is the same index H.B. 282 uses \
                    and not a coincidence worth trusting: the six below it are all 404.",
         },
+        Source {
+            key: "hb45-134-enrolled",
+            title: Some("Am. Sub. H.B. 45 of the 134th General Assembly, as enrolled"),
+            url: "https://search-prod.lis.state.oh.us/api/v2/general_assembly_134/\
+                  legislation/hb45/07_EN/pdf/",
+            filename: "hb45-134-enrolled.pdf",
+            format: Format::Pdf,
+            catalog: Some("ohio-session-laws"),
+            fixtures: &[crate::fixtures::MILE_WEIGHTS_FIXTURE],
+            note: "The act that put the 1.5 and 2.0 on miles driven, effective 7 April 2023 — \
+                   a year and a half after H.B. 110 put them on riders. Introduced as a \
+                   five-page tax amnesty; the Senate Finance substitute of December 2022 made \
+                   it an appropriation act and is the first version carrying the weighted mile \
+                   base. Read for one section, so the fixture is the amending title and \
+                   R.C. 3317.0212 only. Version code `07_EN`; the seven below it are the \
+                   bill's own earlier versions, not interim postings.",
+        },
     ],
 };
 

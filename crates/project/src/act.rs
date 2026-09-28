@@ -37,6 +37,13 @@
 /// Sub. H.B. 583 of the 134th General Assembly, as enrolled — `ohio-session-laws`, code `08_EN`.
 pub const HB583: &str = include_str!("../fixtures/hb583-corrections.txt");
 
+/// Am. Sub. H.B. 45 of the 134th General Assembly, as enrolled — `ohio-session-laws`, code
+/// `07_EN` — cut to its amending title and the one section of R.C. 3317 it reprints.
+///
+/// An appropriation act read for one provision: the strike-and-insert that put the 1.5 and 2.0
+/// on miles driven. [`headings`] over it names that section alone.
+pub const HB45_TRANSPORTATION: &str = include_str!("../fixtures/hb45-134-transportation.txt");
+
 /// Every section the act reprints as a heading, in document order, without repeats.
 ///
 /// The section a heading names is one the act **amends**. Filter by prefix to ask about a chapter:

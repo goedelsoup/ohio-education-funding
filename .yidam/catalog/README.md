@@ -80,9 +80,9 @@ Sorted by: type, then slug.
 | [`ohio-bills`](ohio-bills.md) | Ohio bills before enactment — the text as introduced | 3 |
 | [`ohio-essa-state-plan`](ohio-essa-state-plan.md) | Ohio's Consolidated State Plan under ESSA, and the April 2026 School Improvement amendment | 5 |
 | [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 21 |
-| [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 3 |
+| [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 4 |
 
-59 entries, 0 not yet cited by any corpus node. 420 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+59 entries, 0 not yet cited by any corpus node. 421 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

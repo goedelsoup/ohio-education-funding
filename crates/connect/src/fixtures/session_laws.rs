@@ -482,3 +482,100 @@ fn reconcile_act(
     }
     Ok(())
 }
+
+/// An act's amending title and the one section it reprints, and nothing else.
+///
+/// For an act read for a single provision rather than its table. The title — everything up to
+/// and including "Be it enacted" — is kept because it is the act's own statement that it amends
+/// the section; the section runs from its `Sec. 3317.0212.` heading to the line that opens the
+/// next heading. Page furniture inside the section stays, as it does in every act committed whole.
+///
+/// # Errors
+///
+/// Returns a description if the act has no enacting clause, or does not reprint `number`.
+pub fn reprinted_section(act: &str, number: &str) -> Result<String, String> {
+    const ENACTING: &str = "Be it enacted by the General Assembly of the State of Ohio:";
+    let title_end = act
+        .find(ENACTING)
+        .ok_or_else(|| "the act has no enacting clause".to_string())?
+        + ENACTING.len();
+
+    let heading = format!("Sec. {number}.");
+    let from = act[title_end..]
+        .find(&heading)
+        .ok_or_else(|| format!("the act does not reprint section {number}"))?
+        + title_end;
+    // Back to the start of the heading's own line, so the section keeps the act's indentation.
+    let from = act[..from].rfind('\n').map_or(0, |at| at + 1);
+
+    let body = &act[from..];
+    let to = body
+        .match_indices("Sec. ")
+        .skip(1)
+        .find(|(at, _)| is_heading_line(body, *at))
+        .map_or(body.len(), |(at, _)| {
+            body[..at].rfind('\n').map_or(at, |nl| nl + 1)
+        });
+
+    Ok(format!(
+        "{}\n\n\n{}",
+        act[..title_end].trim_end(),
+        body[..to].trim_end()
+    ))
+}
+
+/// Whether the `Sec. ` at `at` opens a line and names a section — `Sec. 3333.051.` at the left
+/// margin, not "Sec. 3317.0212." cited inside a sentence.
+fn is_heading_line(text: &str, at: usize) -> bool {
+    let line_start = text[..at].rfind('\n').map_or(0, |nl| nl + 1);
+    if !text[line_start..at].trim().is_empty() {
+        return false;
+    }
+    let rest = &text[at + "Sec. ".len()..];
+    let run: &str = &rest[..rest
+        .find(|c: char| !c.is_ascii_digit() && c != '.')
+        .unwrap_or(rest.len())];
+    run.len() > 1 && run.ends_with('.') && run.starts_with(|c: char| c.is_ascii_digit())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const ACT: &str = "(134th General Assembly)\n\
+        AN ACT\n\
+        To amend sections 3310.70, 3317.0212, and 3333.051.\n\
+        \n\
+        Be it enacted by the General Assembly of the State of Ohio:\n\
+        \n\
+        \x20       Sec. 3310.70. Scholarships.\n\
+        \x20       Sec. 3317.0212. (A) As used in this section:\n\
+        \x20       (E)(1)(b) Multiply Calculate the sum of the following:\n\
+        as required by Sec. 3317.02. of the Revised Code;\n\
+        \x20       Sec. 3333.051. Higher education.\n";
+
+    #[test]
+    fn the_excerpt_is_the_title_and_the_one_section() {
+        let excerpt = reprinted_section(ACT, "3317.0212").expect("the section is reprinted");
+        assert!(excerpt.starts_with("(134th General Assembly)"));
+        assert!(excerpt.contains("To amend sections 3310.70, 3317.0212, and 3333.051."));
+        assert!(excerpt.contains("        Sec. 3317.0212. (A) As used in this section:"));
+        assert!(excerpt.contains("Multiply Calculate the sum of the following:"));
+        assert!(
+            !excerpt.contains("Scholarships") && !excerpt.contains("Higher education"),
+            "the sections either side of the one asked for are left out"
+        );
+    }
+
+    #[test]
+    fn a_citation_mid_line_does_not_end_the_section() {
+        let excerpt = reprinted_section(ACT, "3317.0212").expect("the section is reprinted");
+        assert!(excerpt.ends_with("as required by Sec. 3317.02. of the Revised Code;"));
+    }
+
+    #[test]
+    fn a_section_the_act_does_not_reprint_is_an_error() {
+        assert!(reprinted_section(ACT, "3317.022").is_err());
+        assert!(reprinted_section("no enacting clause", "3317.0212").is_err());
+    }
+}
