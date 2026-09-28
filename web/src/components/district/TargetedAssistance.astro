@@ -1,0 +1,127 @@
+---
+/**
+ * Targeted assistance, inside the categorical card.
+ *
+ * # Two tiers that measure different things
+ *
+ * The largest categorical in Ohio at $1.36bn, and the only one that is an equalisation rather than
+ * a payment for a category of pupil. `[G]` is `[C] + [F]` and the addends do not answer the same
+ * question:
+ *
+ * - the **capacity tier** is 0.8% of however far the district's *total* weighted wealth falls
+ *   below the median district's, so it is about the size of the tax base full stop;
+ * - the **wealth tier** is a rate against weighted wealth *per resident pupil*, cutting off where
+ *   that reaches 1.25 times the state median.
+ *
+ * Statewide the split is 24% capacity and 76% wealth, but for a district it can be either, both or
+ * neither — 299 draw the first, 438 the second, 135 nothing at all.
+ *
+ * # And two pupil counts, one line apart
+ *
+ * The wealth tier divides by **resident** ADM to measure and multiplies by **enrolled** ADM to pay.
+ * Where a district has heavy inbound open enrolment those differ, and the card says so rather than
+ * printing a per-pupil figure over whichever one came to hand.
+ */
+import { count, fixed, money, pct } from "../../lib/format.ts";
+import type { District, Statewide } from "../../lib/types.ts";
+import SectionAnchor from "../SectionAnchor.astro";
+
+interface Props {
+  district: District;
+  statewide: Statewide;
+}
+
+const { district: d, statewide } = Astro.props;
+const t = d.targeted_assistance;
+const total = d.categoricals.targeted_assistance;
+
+// The statewide medians the two indices divide by, from the feed rather than from this file.
+// They were copied out of `crates/project::panel` and bound to nothing, so the shortfall below
+// was computed against whichever value the Rust held the last time somebody remembered.
+const medianWealth = statewide.targeted_assistance_median_weighted_wealth;
+const medianPerPupil = statewide.targeted_assistance_median_wealth_per_pupil;
+const enrolled = d.categorical_adm;
+const openEnrollmentGap = enrolled - t.resident_adm;
+
+const shortfall = medianWealth - t.weighted_wealth;
+const sizeShare =
+  enrolled > 600 ? 1 : enrolled > 400 ? (0.95 * (enrolled - 400)) / 200 + 0.05 : enrolled >= 200 ? 0.05 : 0;
+
+// These two are built here rather than in the markup: a `<` inside a template literal nested in
+// another one is read as a tag by the compiler `astro check` runs, though the build's compiler reads
+// it correctly.
+const capacityNote =
+  shortfall <= 0
+    ? "Its wealth is above the median district's, so this tier pays nothing."
+    : sizeShare <= 0
+      ? `Below 200 pupils. The tier pays nothing at this size however far below the
+                   median the district's wealth falls.`
+      : `0.8% of the ${money(shortfall)} shortfall${
+          sizeShare < 1 ? `, at ${pct(sizeShare, 0)} for a district of this size` : ""
+        }.`;
+const tiersNote =
+  total <= 0
+    ? `This district draws neither tier. 135 are in the same position, and it is not a
+           statement about their pupils — targeted assistance measures the tax base.`
+    : t.capacity_amount > 0 && t.wealth_amount > 0
+      ? `Both tiers pay here, ${pct(t.capacity_amount / total, 0)} capacity and
+             ${pct(t.wealth_amount / total, 0)} wealth. Statewide the split is 24% and 76%.`
+      : t.capacity_amount > 0
+        ? `Only the capacity tier pays here. 299 districts draw it and 438 draw the other, so
+               which one a district is on says something the total does not.`
+        : `Only the wealth tier pays here. Its total wealth is above the median district's,
+               which is what the capacity tier measures, but it is spread across enough pupils to
+               qualify on the per-pupil one.`;
+---
+
+{
+  t.weighted_wealth > 0 && (
+    <>
+    <h3 id="targeted-assistance"><SectionAnchor id="targeted-assistance" />Targeted assistance, in its two tiers</h3>
+    <div class="scroll"><table data-program="targeted-assistance">
+      <thead><tr><th>Step</th><th class="tnum">Value</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><th>Assessed valuation</th><td class="tnum">{money(t.property_valuation)}</td>
+          <td class="n">Weighted 60% in the wealth measure.</td></tr>
+        <tr><th>Federal adjusted gross income</th><td class="tnum">{money(t.federal_gross_income)}</td>
+          <td class="n">The other 40%. Wealth here is property <em>and</em> income.</td></tr>
+        <tr class="current"><th>Weighted wealth</th><td class="tnum">{money(t.weighted_wealth)}</td>
+          <td class="n">The blend of the two.</td></tr>
+        <tr><th>Capacity index</th><td class="tnum">{fixed(t.capacity_index, 4)}</td>
+          <td class="n">The median district's total wealth over this one's. Above 1 is poorer.</td></tr>
+        <tr class={t.capacity_amount <= 0 ? "n" : undefined}><th>Capacity amount</th>
+          <td class="tnum">{t.capacity_amount <= 0 ? "—" : money(t.capacity_amount)}</td>
+          <td class="n">{capacityNote}</td></tr>
+        <tr><th>Wealth per resident pupil</th><td class="tnum">{money(t.wealth_per_pupil)}</td>
+          <td class="n">Weighted wealth over {count(Math.round(t.resident_adm))} resident pupils{
+            Math.abs(openEnrollmentGap) > 1
+              ? ` — ${count(Math.round(Math.abs(openEnrollmentGap)))} ${
+                  openEnrollmentGap > 0 ? "fewer" : "more"
+                } than it enrols`
+              : ""
+          }.</td></tr>
+        <tr><th>Wealth index</th><td class="tnum">{fixed(t.wealth_index, 4)}</td>
+          <td class="n">{money(medianPerPupil)} over that. Below 0.8 the tier pays nothing.</td></tr>
+        <tr class={t.wealth_amount <= 0 ? "n" : undefined}><th>Wealth amount</th>
+          <td class="tnum">{t.wealth_amount <= 0 ? "—" : money(t.wealth_amount)}</td>
+          <td class="n">{t.wealth_amount <= 0 ? (
+              "Its wealth per pupil is above 1.25 times the state median."
+            ) : (
+              <>Paid on its {count(Math.round(enrolled))} <em>enrolled</em> pupils, not the
+                 resident count the rate was measured against.</>
+            )
+          }</td></tr>
+        <tr class="current"><th>Targeted assistance</th><td class="tnum">{money(total)}</td>
+          <td class="n">The two tiers, added.</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">{tiersNote}{
+      t.supplement_eligible && (
+        <> It also qualifies for <strong>supplemental targeted assistance</strong> — a test for
+           districts that were poor in FY2019 and have since lost more than an eighth of their
+           pupils. 36 districts qualify. The program pays every one of them nothing.</>
+      )
+    }</p>
+    </>
+  )
+}

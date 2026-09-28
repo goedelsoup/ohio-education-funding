@@ -1,0 +1,77 @@
+---
+/**
+ * Special education's six categories, inside the categorical card.
+ *
+ * # Why the second level is worth a table of its own
+ *
+ * The weights are the policy and they span a factor of sixteen: Category 1 is 0.2435 and Category
+ * 6 is 3.9554, each multiplying the statewide average base cost. A Category 6 pupil generates
+ * nearly four times what a pupil with no disability does, so which category a child is assigned to
+ * is most of what determines the money — not an administrative detail.
+ *
+ * And the distribution runs against the weights rather than with them. Statewide, Category 6 is
+ * 15% of the pupils and 48% of the spending; Category 2 is 65% of the pupils and 34%. Two
+ * categories of opposite shape are 82% of a $722m program, and the total shows neither.
+ */
+import { count, fixed, money, pct } from "../../lib/format.ts";
+import type { District } from "../../lib/types.ts";
+import SectionAnchor from "../SectionAnchor.astro";
+
+interface Props {
+  district: District;
+}
+
+const { district: d } = Astro.props;
+const s = d.special_education;
+const total = s.aid.reduce((a, b) => a + b, 0);
+const pupils = s.adm.reduce((a, b) => a + b, 0);
+
+// The statutory weights, as `crates/project::panel::SPECIAL_EDUCATION_WEIGHTS` holds them and
+// as the department's own per-category amounts confirm to within one percent.
+const weights = [0.2435, 0.6179, 1.4845, 1.9812, 2.683, 3.9554];
+
+const rows = weights
+  .map((weight, k) => ({ category: k + 1, weight, adm: s.adm[k]!, aid: s.aid[k]! }))
+  .filter((r) => r.adm > 0 || r.aid > 0);
+
+const biggest = [...rows].sort((a, b) => b.aid - a.aid)[0];
+---
+
+{
+  total > 0 && pupils > 0 && (
+    <>
+    <h3 id="special-education"><SectionAnchor id="special-education" />Special education, by category</h3>
+    <div class="scroll"><table data-program="special-education">
+      <thead><tr><th>Category</th><th class="tnum">Weight</th><th class="tnum">Pupils</th>
+        <th class="tnum">Aid</th><th class="tnum">Share of pupils</th>
+        <th class="tnum">Share of aid</th></tr></thead>
+      <tbody>
+        {rows.map((r) => (
+          <tr class={r.category === biggest?.category ? "current" : undefined}>
+              <th>Category {r.category}</th>
+              <td class="tnum">{fixed(r.weight, 4)}</td>
+              <td class="tnum">{count(Math.round(r.adm))}</td>
+              <td class="tnum">{money(r.aid)}</td>
+              <td class="tnum n">{pct(r.adm / pupils, 1)}</td>
+              <td class="tnum n">{pct(r.aid / total, 1)}</td>
+            </tr>
+        ))}
+        <tr class="current"><th>All categories</th><td class="tnum n">—</td>
+          <td class="tnum">{count(Math.round(pupils))}</td>
+          <td class="tnum">{money(total)}</td>
+          <td class="tnum">100.0%</td><td class="tnum">100.0%</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">The weight is what the category multiplies: a Category 6 pupil generates{" "}
+      <strong>3.9554 times</strong> the statewide average base cost per pupil and a Category 1
+      pupil <strong>0.2435 times</strong> it — a range of sixteen. Category assignment is not an
+      administrative detail here, it is most of the money.{
+        biggest && (
+          <> This district's largest is <strong>Category {biggest.category}</strong> at{" "}
+             {money(biggest.aid)}, which is {pct(biggest.aid / total, 0)} of its special
+             education aid from {pct(biggest.adm / pupils, 0)} of its special education pupils.</>
+        )
+      }</p>
+    </>
+  )
+}

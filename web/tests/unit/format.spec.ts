@@ -6,7 +6,7 @@
  * #503 moved off `toFixed`, so a new call there fails here rather than in a cell nobody opens.
  */
 
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 import { describe, expect, test } from "vitest";
@@ -81,9 +81,16 @@ test("the renderers #503 migrated format no number by hand", () => {
    * Comments are blanked first, so a docstring can still say what the rule forbids.
    */
   const SRC = join(import.meta.dirname, "../../src");
+  // `lib/district.ts` became a directory of components in #515. Read rather than listed, so a card
+  // split out of one of them is held too; the count is what stops a moved directory from passing
+  // on nothing.
+  const DISTRICT = readdirSync(join(SRC, "components/district"))
+    .filter((name) => name.endsWith(".astro"))
+    .map((name) => `components/district/${name}`);
+  expect(DISTRICT).toHaveLength(22);
   const MIGRATED = [
     "lib/compare.ts",
-    "lib/district.ts",
+    ...DISTRICT,
     "lib/mealProgram.ts",
     "lib/outcomes.ts",
     "lib/statewide.ts",

@@ -1,0 +1,78 @@
+---
+/**
+ * English learners, inside the categorical card.
+ *
+ * # The weights descend, which is the opposite of everywhere else
+ *
+ * 0.2104, 0.1577, 0.1053 — Category 1 is funded at twice Category 3, and Category 1 is the most
+ * recently arrived learner. The program pays most in a pupil's first year and tapers over the next
+ * two, so a district whose English learners are settling in sees this money fall while they are
+ * still learning English.
+ *
+ * Special education's weights ascend from 0.2435 to 3.9554 as need deepens, which is what a reader
+ * assumes Ohio's weights mean. Here they do not.
+ *
+ * This used to say *"every other weighted categorical in the plan runs the other way"*, and that is
+ * false — `CareerTechnical.astro` renders `[0.623, 0.5905, 0.2154, 0.183, 0.157]` five table-rows
+ * above, strictly descending, in a column headed Weight. The corpus supplies the distinction the
+ * claim was reaching for: career-technical's ordering "is not severity: it is programme type"
+ * (`fsfp-career-technical-weights.yml`), so the two descents are not the same fact. English
+ * learners is the only categorical whose weights fall along a **need** gradient, and that is the
+ * claim the page can support.
+ */
+import { fixed, money } from "../../lib/format.ts";
+import type { District } from "../../lib/types.ts";
+import { seriesSpanEnd } from "../../lib/year.ts";
+import SectionAnchor from "../SectionAnchor.astro";
+
+interface Props {
+  district: District;
+}
+
+const { district: d } = Astro.props;
+const e = d.english_learners;
+const total = d.categoricals.english_learners;
+
+const weights = [0.2104, 0.1577, 0.1053];
+const rows = weights
+  .map((weight, k) => ({ category: k + 1, weight, adm: e.adm[k]!, aid: e.aid[k]! }))
+  .filter((r) => r.adm > 0 || r.aid > 0);
+const learners = rows.reduce((a, r) => a + r.adm, 0);
+---
+
+{
+  total > 0 && rows.length > 0 && (
+    <>
+    <h3 id="english-learners"><SectionAnchor id="english-learners" />English learners, by category</h3>
+    <div class="scroll"><table data-program="english-learners">
+      <thead><tr><th>Category</th><th class="tnum">Weight</th><th class="tnum">Pupils</th>
+        <th class="tnum">Aid</th></tr></thead>
+      <tbody>
+        {rows.map((r) => (
+          <tr>
+              <th>Category {r.category}</th>
+              <td class="tnum">{fixed(r.weight, 4)}</td>
+              <td class="tnum">{fixed(r.adm, 2)}</td>
+              <td class="tnum">{money(r.aid)}</td>
+            </tr>
+        ))}
+        <tr class="current"><th>English learners</th><td class="tnum n">—</td>
+          <td class="tnum">{fixed(learners, 2)}</td><td class="tnum">{money(total)}</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">The weights <strong>descend</strong>. Category 1 is the most recently arrived
+      learner and is funded at twice Category 3, so this program pays most in a pupil's first year
+      and least in their third — it tapers as need persists rather than deepening with it. Special
+      education runs the other way, ascending from 0.2435 to 3.9554 as need deepens. Career-technical's
+      weights descend too, but along programme type rather than need, so this is the only categorical
+      that pays less as the thing it is for persists. English learner funding reaches
+      505 of Ohio's 609 districts, and 38 of them hold 80% of the $36m.</p>
+    <p class="note"><strong>And the counts are frozen at FY2021.</strong> The department's own
+      column header reads <code>Category 1 EL ADM-FY21</code>, so the FTE column above is enrolment
+      as it stood six years before the year being funded, while base cost beside it is built on a
+      rolling three-year average ending {seriesSpanEnd("enrollment")}. For a program whose whole structure is about how
+      recently a pupil arrived, that is a stranger fact than it would be anywhere else in the
+      plan.</p>
+    </>
+  )
+}

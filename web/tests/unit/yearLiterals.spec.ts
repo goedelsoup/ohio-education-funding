@@ -71,10 +71,45 @@ interface Allowance {
  * is what the page says" is not a historical fact, it is an un-migrated literal.
  */
 const HISTORICAL: Record<string, Allowance> = {
-  "lib/district.ts": {
-    allowed: ["FY2019", "FY2020", "FY2021", "FY2023", "FY2025", "FY2026"],
+  "components/district/AidSource.astro": {
+    allowed: ["FY2020"],
     reason:
-      "FY2020 as the Bridge-formula freeze, the FY2021 `[L1]` statutory base the transportation guarantee holds at, FY2019 poverty in the supplemental targeted assistance test, the FY2021 career-technical and English-learner count freezes, and FY2021 as the fiscal year the casino closure lands in — all fixed events, none of which move when a fixture advances. The closure year is the one worth naming twice: the casinos shut in March 2020 and the money arrives in FY2021 because the August payment settles the half-year that ended in June, so the literal is protecting a statement the data alone would not disambiguate. FY2025 and FY2026 are DPIA's two poverty input years and FY2023 is the profile report's valuation vintage — three properties of fixtures that will move, declared here rather than derived because the feed carries none of them. That is the honest state of it, and precisely what a file-keyed allowlist could not say.",
+      "FY2020 as the Bridge-formula freeze, a year Ohio froze funding rather than computing it — a fixed event in the condition that explains an enrollment change, and one that does not move when a fixture advances.",
+  },
+  "components/district/HoldHarmless.astro": {
+    allowed: ["FY2021"],
+    reason:
+      "FY2021 as the funding base the guarantee and the formula transition supplement each compare against, and the year all three of Ohio's hold-harmless mechanisms are anchored to — a fixed event, which stays FY2021 whatever the model year becomes.",
+  },
+  "components/district/Transportation.astro": {
+    allowed: ["FY2021"],
+    reason:
+      "FY2021 as the `[L1]` statutory base the transportation guarantee holds a district at — the third of the hold-harmless mechanisms anchored to that year, a fixed event rather than a label on a moving fixture.",
+  },
+  "components/district/TargetedAssistance.astro": {
+    allowed: ["FY2019"],
+    reason:
+      "FY2019 poverty in the supplemental targeted assistance test: the statute asks whether a district was poor in FY2019 specifically, so the year is part of the rule rather than a vintage of the data.",
+  },
+  "components/district/CareerTechnical.astro": {
+    allowed: ["FY2021"],
+    reason:
+      "FY2021 as the career-technical count freeze — the department's own column is enrolment as it stood in FY2021, a fixed event that the sentence exists to point out, and which does not move when a fixture advances.",
+  },
+  "components/district/EnglishLearners.astro": {
+    allowed: ["FY2021"],
+    reason:
+      "FY2021 as the English-learner count freeze — the department's column header reads ADM-FY21, so the counts are enrolment as it stood in FY2021, a fixed event the note is there to name.",
+  },
+  "components/district/Dpia.astro": {
+    allowed: ["FY2025", "FY2026"],
+    reason:
+      "FY2025 and FY2026 are DPIA's two poverty input years — properties of fixtures that will move, declared here rather than derived because the feed carries neither of them. That is the honest state of it, and precisely what a file-keyed allowlist could not say.",
+  },
+  "components/district/WhatThisIsNot.astro": {
+    allowed: ["FY2023"],
+    reason:
+      "FY2023 is the profile report's valuation vintage — a property of a fixture that will move, declared here rather than derived because the feed does not carry it, beside the spending year that is read with `yearOf`.",
   },
   "lib/glossary.ts": {
     allowed: ["FY2020", "FY2022", "FY2024"],

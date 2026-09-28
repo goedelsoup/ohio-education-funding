@@ -1,0 +1,122 @@
+---
+/**
+ * What a year of enrollment is worth to this district.
+ *
+ * # What this is not
+ *
+ * It is **not** the district's actual FY2026 state aid against its actual FY2027 state aid. The
+ * department publishes one funding calculator at a time and replaces it rather than archiving
+ * it, so this repository has the FY2027 model and no FY2026 one; there is no retrieved source
+ * anywhere in it carrying a district's FY2026 foundation payment. A card that put a number under
+ * "FY2026" would be inventing it.
+ *
+ * What it is instead is exact and, for the question people actually ask, more useful: the
+ * **FY2027 formula held completely fixed and run at each year's enrolled ADM**. Every other
+ * input — base cost, local capacity, the categoricals, the guarantee baseline — is identical
+ * across the rows, so the difference between them is the enrollment channel and nothing else.
+ * Comparing two years of published totals could not have said that, because the formula changed
+ * between them too.
+ *
+ * The table is exact and the band underneath it is not, so `forecastable` gates only the second.
+ * A build whose projection failed its checkpoints still shows every row here: the rows are the
+ * FY2027 formula run at three published enrollments, and nothing about them is a forecast.
+ */
+import { lastOf } from "../../lib/ends.ts";
+import { count, money, signedMoney } from "../../lib/format.ts";
+import { apply, currentLaw, modelOf, publishedStatewide } from "../../lib/policy.ts";
+import { observations } from "../../lib/project.ts";
+import * as routes from "../../lib/routes.ts";
+import type { Bundle, District } from "../../lib/types.ts";
+import { yearChip } from "../../lib/year.ts";
+import SectionAnchor from "../SectionAnchor.astro";
+import CarriedForward from "./CarriedForward.astro";
+
+interface Props {
+  bundle: Bundle;
+  district: District;
+  forecastable: boolean;
+}
+
+const { bundle, district: d, forecastable } = Astro.props;
+
+// A bundle with no projection renders nothing, so the rows and their ends are only read where
+// there is one.
+const meta = bundle.projection;
+const model = modelOf(bundle.statewide);
+const law = currentLaw(model);
+const rows =
+  meta == null
+    ? []
+    : observations(d, meta.base_year).map((o) => ({
+        year: o.fiscalYear,
+        adm: o.value,
+        aid: apply(d, law, publishedStatewide(model), o.value, model).realizedAid,
+      }));
+const latest = meta == null ? null : lastOf(rows);
+const prior = meta == null ? null : rows[rows.length - 2]!;
+const change = latest && prior ? latest.aid - prior.aid : 0;
+const admChange = latest && prior ? latest.adm - prior.adm : 0;
+---
+
+{
+  meta && latest && prior && (
+    <div class="card" id="enrollment" data-part="enrollment">
+      <h2><SectionAnchor id="enrollment" />What a year of enrollment is worth here<Fragment set:html={yearChip("enrollment")} /></h2>
+      <div class="scroll"><table>
+        <thead><tr>
+          <th>Enrollment year</th><th>Enrolled ADM</th><th>State aid at that ADM</th>
+        </tr></thead>
+        <tbody>{rows.map((r) => (
+          <tr class={r.year === meta.base_year ? "current" : undefined}>
+              <th>FY{r.year}{r.year === meta.base_year ? " — the model's own" : ""}</th>
+              <td class="tnum">{count(Math.round(r.adm))}</td>
+              <td class="tnum">{money(r.aid)}</td>
+            </tr>
+        ))}</tbody>
+      </table></div>
+      <p class="note">Moving from FY{prior.year} to FY{latest.year} enrollment{" "}
+        {admChange < 0 ? "cost" : "gained"} this district{" "}
+        {count(Math.abs(Math.round(admChange)))} pupils and{" "}
+        <strong class={change < 0 ? "loss" : "gain"}>{signedMoney(change)}</strong>{" "}
+        {
+          Math.abs(change) < 0.5 && d.on_guarantee
+            ? `— nothing, because the guarantee holds its aid at a fixed dollar amount that
+               enrollment does not enter.`
+            : `, or ${signedMoney(latest.adm > 0 ? change / latest.adm : 0, 2)} per pupil.`
+        }</p>
+      <p class="note">These are <strong>not</strong> published FY{prior.year} and
+        FY{latest.year} funding totals — the department publishes one calculator at a time and
+        this repository holds the FY{bundle.fiscal_year} one, so no FY{prior.year} payment
+        figure exists here to show. Every row is the FY{bundle.fiscal_year} formula held fixed
+        and run at that year's enrolled ADM, which isolates the enrollment channel: two years of
+        published totals could not, because the formula moved between them too.</p>
+      <p class="note"><strong>The last row's enrollment is partly a departmental
+        estimate.</strong> The FY{bundle.fiscal_year} calculator is published before
+        FY{latest.year} closes, so FY{latest.year} enrolled ADM is not a settled count — and it
+        is the row the model's own answer sits on. Every figure on this page that divides by the
+        current year inherits that, which is a different kind of uncertainty from the band below:
+        the band is a forecast and says so, this is a published number that is not final.</p>
+      <p class="note">This card holds the formula fixed and moves enrollment. The{" "}
+        <a href={routes.districtScenario(d.irn)}>scenario for this district</a> does the
+        opposite — it holds enrollment at published FY{meta.base_year} and moves the formula. The
+        two were built a phase apart and neither said the other existed, which left one district's
+        counterfactual on one route and one district's projection on another with no way to get
+        between them.</p>
+
+      {
+        forecastable ? (
+          <CarriedForward bundle={bundle} district={d} meta={meta} />
+        ) : (
+          <>
+          <h3>Carried forward</h3>
+          <p class="note">No band is drawn. This build's projection did not reproduce the forecasts{" "}
+             <code>crates/project</code> computed for it, so the enrollment carry-forward is withheld
+             rather than shown unchecked. The table above is unaffected — it is the
+             FY{bundle.fiscal_year} formula at three published enrollments, and nothing in it is a
+             forecast.</p>
+          </>
+        )
+      }
+    </div>
+  )
+}

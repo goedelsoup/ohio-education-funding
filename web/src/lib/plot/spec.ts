@@ -1999,7 +1999,7 @@ const DOTS_UP_TO = 150;
  * marks sit on. Interpolating here would place the rule between two dots and then describe it as
  * a figure the population does not contain.
  *
- * Exported for exactly that reason. `district.ts` writes the `description` for the strip charts —
+ * Exported for exactly that reason. `Strip.astro` writes the `description` for the strip charts —
  * *"Quartiles run $X to $Y, median $Z"* — and had its own copy of this expression, which is a
  * sentence and a mark agreeing by coincidence rather than by construction. See `stats.ts` on the
  * distinction between the two conventions and why this repository now keeps both, named.

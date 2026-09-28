@@ -14,14 +14,20 @@
  * Every test below is about keeping one of those four from being quietly crossed.
  */
 
+import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import { expect, test } from "vitest";
 
+import Casino from "../../src/components/district/Casino.astro";
 import { loadFeed } from "../../src/lib/feed.ts";
-import { renderCasino } from "../../src/lib/district.ts";
+import type { District } from "../../src/lib/types.ts";
 import { seriesYear } from "../../src/lib/year.ts";
 
 const { bundle } = loadFeed();
 const statewide = bundle.casino;
+
+const container = await AstroContainer.create();
+const renderCasino = (district: District) =>
+  container.renderToString(Casino, { props: { bundle, district } });
 
 test("the feed carries the series at all", () => {
   // The failure this guards is the one that has now happened three times: a panel computed in
@@ -78,7 +84,7 @@ test("the closure lands in FY2021, which is a year later than the half-year that
 
 test("the two statewide figures the card types are the ones the feed produces", () => {
   /*
-   * `renderCasino` prints a median share and a single-county count that are not in the feed —
+   * The casino card prints a median share and a single-county count that are not in the feed —
    * one is a median over a join the feed does not make, the other a count over a nullable field.
    * Typed figures in prose are what `yearLiterals.spec.ts` exists to police for years; these are
    * the same hazard in a different shape, so they are checked here against the data they describe.
@@ -119,14 +125,14 @@ test("the chip is derived from the block rather than typed beside it", () => {
   );
 });
 
-test("the card refuses a per-pupil figure and says why", () => {
+test("the card refuses a per-pupil figure and says why", async () => {
   /*
    * The strongest thing this card does is decline to divide. Four per-pupil figures already sit on
    * a district's pages and a fifth would read as one of them, so the refusal has to survive
    * someone later deciding the card looks incomplete without one.
    */
   const d = bundle.districts.find((x) => x.irn === "043802")!;
-  const html = renderCasino(bundle, d);
+  const html = await renderCasino(d);
   expect(html).toContain("no per-pupil figure here");
   expect(html).toContain("R.C. 5753.11");
   expect(html).not.toMatch(/per pupil<\/div>/);
@@ -134,7 +140,7 @@ test("the card refuses a per-pupil figure and says why", () => {
   expect(html).toContain("nothing above this card counts it");
 });
 
-test("a district with no distribution renders nothing rather than an empty card", () => {
+test("a district with no distribution renders nothing rather than an empty card", async () => {
   const d = bundle.districts[0]!;
-  expect(renderCasino(bundle, { ...d, casino: [] })).toBe("");
+  expect(await renderCasino({ ...d, casino: [] })).toBe("");
 });

@@ -14,18 +14,17 @@
  * that it checks links this repository generates, which is exactly the set that can regress here.
  */
 
+import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import { expect, test } from "vitest";
 
+import AidSource from "../../src/components/district/AidSource.astro";
+import Categoricals from "../../src/components/district/Categoricals.astro";
+import EnrollmentYears from "../../src/components/district/EnrollmentYears.astro";
+import NationalPosition from "../../src/components/district/NationalPosition.astro";
+import Supplements from "../../src/components/district/Supplements.astro";
+import WhatThisIsNot from "../../src/components/district/WhatThisIsNot.astro";
 import { renderBaseCostBuildUp } from "../../src/lib/basecost.ts";
 import { FROM_CATALOG, FROM_DECISION, loadCorpus, resolveTarget } from "../../src/lib/corpus.ts";
-import {
-  renderAidSource,
-  renderCategoricals,
-  renderEnrollmentYears,
-  renderNationalPosition,
-  renderSupplements,
-  renderWhatThisIsNot,
-} from "../../src/lib/district.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
 import { counties } from "../../src/lib/county.ts";
 import * as routes from "../../src/lib/routes.ts";
@@ -380,7 +379,8 @@ test("the metric routes the district pages link to are real nodes", () => {
  */
 const EMITTED_FLOOR = 25;
 
-test("every corpus link the district renderers emit resolves", () => {
+test("every corpus link the district renderers emit resolves", async () => {
+  const container = await AstroContainer.create();
   const districts = bundle.districts;
   const statewide = bundle.statewide;
   // Cleveland is the largest and renders the most branches; Kelleys Island is the smallest in the
@@ -392,13 +392,15 @@ test("every corpus link the district renderers emit resolves", () => {
   const emitted = new Set<string>();
   for (const d of sample) {
     const html = [
-      renderAidSource(bundle, d),
-      renderEnrollmentYears(bundle, d, true),
-      renderWhatThisIsNot(bundle, d),
+      await container.renderToString(AidSource, { props: { bundle, district: d } }),
+      await container.renderToString(EnrollmentYears, {
+        props: { bundle, district: d, forecastable: true },
+      }),
+      await container.renderToString(WhatThisIsNot, { props: { bundle, district: d } }),
       renderBaseCostBuildUp(d, statewide.districts),
-      renderCategoricals(d, statewide),
-      renderSupplements(d, statewide),
-      renderNationalPosition(d),
+      await container.renderToString(Categoricals, { props: { district: d, statewide } }),
+      await container.renderToString(Supplements, { props: { district: d, statewide } }),
+      await container.renderToString(NationalPosition, { props: { district: d } }),
       renderTaxBase(d),
       renderMillage(d, statewide),
       renderDenominators(d),
@@ -424,7 +426,7 @@ test("every corpus link the district renderers emit resolves", () => {
   const broken = [...emitted].filter((href) => !known(href)).sort();
   expect(broken, "links the district pages emit that resolve to nothing").toEqual([]);
 
-  // This and the hand-pinned test above are complementary, not redundant. `renderPosition`,
+  // This and the hand-pinned test above are complementary, not redundant. `Position.astro`,
   // `renderTaxChange` and `renderTaxAgainstSpending` need statewide comparison arguments this test
   // does not assemble, so their three slugs — assessed valuation per pupil, per-pupil operating
   // expenditure, the twenty-mill floor — are covered there and not here. Neither test alone

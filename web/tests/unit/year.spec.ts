@@ -226,8 +226,9 @@ test("the charge-off paragraph's tax year is the one the panel carries", () => {
    * So the year is checked where it is printed, against the panel it claims to describe. What
    * that catches is the year going **stale**, which is the failure mode: typing `TY2024` back in
    * still passes here while the panel says 2024, and only a per-literal allowlist would see it.
-   * That is filed rather than fixed — enumerating the 32 literals across the 11 allowlisted files
-   * is its own change, and `lib/district.ts` alone carries 9 against a reason naming 4.
+   * That is filed rather than fixed — enumerating the 45 literals across the 19 allowlisted files
+   * is its own change. `lib/district.ts` carried 12 of them under one reason until #515 split it
+   * into components, each allowed only the years it prints.
    */
   const { bundle, tax } = loadFeed();
   const district = bundle.districts.find((d) => d.regime?.charge_off_local_share != null);

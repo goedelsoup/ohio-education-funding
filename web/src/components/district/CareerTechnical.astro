@@ -1,0 +1,75 @@
+---
+/**
+ * Career-technical education, inside the categorical card.
+ *
+ * # The same shape as special education, against a base cost 20% higher
+ *
+ * Five weights times five FTE counts times a base cost times the state share. The difference is the
+ * base: CTE is weighted against a **career-technical** base cost per pupil of $9,855.62, where
+ * special education and English learners use the statewide average $8,241.61.
+ *
+ * So a CTE weight and a special education weight are not on the same scale, and a table that lists
+ * Ohio's weights together — which is the natural thing to build — understates career-technical by a
+ * fifth before any pupil is counted.
+ */
+import { fixed, money } from "../../lib/format.ts";
+import type { District } from "../../lib/types.ts";
+import { seriesSpanEnd } from "../../lib/year.ts";
+import SectionAnchor from "../SectionAnchor.astro";
+
+interface Props {
+  district: District;
+}
+
+const { district: d } = Astro.props;
+const c = d.career_technical;
+const total = d.categoricals.career_technical;
+
+// As `crates/project::panel::CTE_WEIGHTS` holds them, and as the department's own per-category
+// amounts reproduce to the cent.
+const weights = [0.623, 0.5905, 0.2154, 0.183, 0.157];
+const baseCost = 9855.62;
+
+const rows = weights
+  .map((weight, k) => ({ category: k + 1, weight, fte: c.fte[k]!, aid: c.aid[k]! }))
+  .filter((r) => r.fte > 0 || r.aid > 0);
+const fte = rows.reduce((a, r) => a + r.fte, 0);
+---
+
+{
+  total > 0 && rows.length > 0 && (
+    <>
+    <h3 id="career-technical"><SectionAnchor id="career-technical" />Career-technical education, by category</h3>
+    <div class="scroll"><table data-program="career-technical">
+      <thead><tr><th>Category</th><th class="tnum">Weight</th><th class="tnum">FTE</th>
+        <th class="tnum">Aid</th></tr></thead>
+      <tbody>
+        {rows.map((r) => (
+          <tr>
+              <th>Category {r.category}</th>
+              <td class="tnum">{fixed(r.weight, 4)}</td>
+              <td class="tnum">{fixed(r.fte, 2)}</td>
+              <td class="tnum">{money(r.aid)}</td>
+            </tr>
+        ))}
+        <tr><th>Associated services</th><td class="tnum">0.0294</td>
+          <td class="tnum n">{fixed(fte, 2)}</td>
+          <td class="tnum">{money(c.associated_services)}</td></tr>
+        <tr class="current"><th>Career-technical education</th><td class="tnum n">—</td>
+          <td class="tnum">{fixed(fte, 2)}</td><td class="tnum">{money(total)}</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">These weights multiply a <strong>career-technical</strong> base cost of{" "}
+      {money(baseCost)} per pupil, not the {money(8241.61)} the rest of the plan uses — 20%
+      higher before any weight is applied. A Category 1 CTE pupil generates{" "}
+      {money(0.623 * baseCost)} where the same weight against the general base would give{" "}
+      {money(0.623 * 8241.61)}. Ohio's weights are not a single scale, and reading them as one
+      understates this program by a fifth.</p>
+    <p class="note"><strong>The counts are frozen at FY2021.</strong> The department's own column
+      header reads <code>Category 1 Career Tech FTE-FY21</code>, so the FTE column above is
+      enrolment as it stood six years before the year being funded, while the base cost it is
+      multiplied against is built on a rolling three-year average ending {seriesSpanEnd("enrollment")}. A district that
+      has opened or closed a programme since 2021 is funded for the one it had then.</p>
+    </>
+  )
+}

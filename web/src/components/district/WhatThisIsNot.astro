@@ -1,0 +1,121 @@
+---
+/**
+ * What this page is not — the closing card, and the only one on the dashboard that declares
+ * collisions rather than stating figures.
+ *
+ * # Why the dashboard was the last route to get one
+ *
+ * Three of its four siblings already close this way: `finances.astro` says its actuals are not
+ * comparable line for line with the calculator and points here, `outcome.astro` names two mistakes
+ * it is built to prevent, `taxes.astro` names the department its figures come from and what they
+ * are not. The dashboard, which has the most collisions to declare, said nothing — and
+ * `finances.astro`'s note points at this page and receives no answer back.
+ *
+ * # The three it declares
+ *
+ * **Not money received.** Every figure above is the FY2027 calculator's answer, published before
+ * the year it funds. Money that changed hands is on `/finances`, from the district's own five-year
+ * forecast filing, and the two are differently constructed.
+ *
+ * **More than one pupil count.** `d.adm` is a three-year average and `d.current_year_adm` is the
+ * last year alone; they round to different integers for **499 of 609** districts, and the plan
+ * uses both in one calculation. `categorical_adm` is a third field carrying the current-year
+ * number for 608 districts and a figure fifty pupils below it for Akron.
+ *
+ * **Two other years and a different denominator, two cards down.** `crates/bundle` names the
+ * vintages the page does not: valuation per pupil is FY2023 and operating expenditure per pupil is
+ * FY2024, two years inside one card, both on enrolled ADM FY2024 — a *fourth* count, differing
+ * from base cost ADM for 601 of 609 — while `/finances` divides by the report card's FY2025
+ * unweighted headcount and `/outcome` by its FY2025 need-weighted one. Every one of those is
+ * declared in `denominators.ts`, which states that it cannot check prose. This card is the prose.
+ */
+import { lastOf } from "../../lib/ends.ts";
+import { count, money } from "../../lib/format.ts";
+import * as routes from "../../lib/routes.ts";
+import { hasDenominators } from "../../lib/tax.ts";
+import type { Bundle, District } from "../../lib/types.ts";
+import { yearOf } from "../../lib/year.ts";
+import SectionAnchor from "../SectionAnchor.astro";
+import Designated from "./Designated.astro";
+
+interface Props {
+  bundle: Bundle;
+  district: District;
+}
+
+const { bundle, district: d } = Astro.props;
+const baseCostAdm = Math.round(d.adm);
+const currentAdm = Math.round(d.current_year_adm);
+const categoricalAdm = Math.round(d.categorical_adm);
+const casino = d.casino.length === 0 ? null : lastOf(d.casino);
+---
+
+<div class="card" id="not" data-part="not">
+  <h2><SectionAnchor id="not" />What this page is not</h2>
+  <p class="note"><strong>None of the figures above is money this district received.</strong>{" "}
+    Every one of them is the FY{bundle.fiscal_year} funding calculator's answer for it,
+    published before the year it funds. What actually changed hands is on{" "}
+    <a href={routes.districtFinances(d.irn)}>finances</a>, taken from this district's own
+    five-year forecast filing — audited actuals, on a different construction, in different
+    years. Reading either as a check on the other is the mistake the two routes are kept
+    apart to prevent.</p>
+  {
+    casino && (
+      <p class="note"><strong>And there is state money in neither.</strong> This district
+         received {money(casino.amount)} from the casino county student fund in
+         FY{casino.fiscal_year}. It is not an appropriation to the
+         department, so no figure above computes it; it is booked outside the general fund, so
+         no row on the finances route carries it either. It is on{" "}
+         <a href={`${routes.districtFinances(d.irn)}#casino`}>finances</a>, in a card of its
+         own.</p>
+    )
+  }
+  <Designated bundle={bundle} district={d} />
+  <p class="note"><strong>This page divides by more than one pupil count.</strong> Base cost
+    is built on {count(baseCostAdm)} — a three-year average, because R.C. 3317.011 funds on
+    the greater of that and the current year. The state share of it, and every categorical
+    above, is paid on {count(currentAdm)}: the current year alone.{" "}
+    {
+      baseCostAdm === currentAdm
+        ? `Those round to the same figure here, which they do not for 499 of Ohio's
+               ${bundle.statewide.districts} districts.`
+        : `Those are different numbers, as they are for 499 of Ohio's
+               ${bundle.statewide.districts} districts.`
+    }{" "}
+    {
+      categoricalAdm === currentAdm
+        ? ""
+        : `The categoricals are paid on a third field again, ${count(categoricalAdm)}, which
+               is the same count entered twice in the department's own sheet and corrected once.`
+    }{" "}
+    The corpus calls conflating them{" "}
+    <a href={routes.metric("enrolled-adm")}>the single most common arithmetic error
+    available in Ohio school finance</a>, and{" "}
+    <a href={
+      /*
+       * The section, but only for the 432 districts that render it. `renderDenominators`
+       * returns "" where the two valuations agree within 5%, so for 177 of 609 the anchor the
+       * plan wanted named here is simply not in the target document — and a missing fragment
+       * fails silently, landing the reader at the top of a page having been promised a
+       * reconciliation. The same predicate, so the two cannot drift apart.
+       */
+      hasDenominators(d)
+        ? routes.at(routes.districtTaxes(d.irn), routes.SECTIONS.district.denominators)
+        : routes.districtTaxes(d.irn)
+    }>the property tax page</a> reconciles the two the Department of Taxation and the
+    Department of Education each publish.</p>
+  <p class="note"><strong>The position card below is two other years on a fourth count.</strong>{" "}
+    Assessed valuation per pupil there is an <strong>FY2023</strong> valuation and operating
+    expenditure per pupil is <strong>{yearOf("profile")}</strong> spending — two different years inside one
+    card — and both divide by enrolled ADM {yearOf("profile")}, beside a model that funds
+    FY{bundle.fiscal_year}. Finances shows {yearOf("outcome.spending")} spending on the report card's unweighted
+    headcount, and Outcome shows {yearOf("outcome.spending")} spending on its need-weighted one. Subtracting any of
+    them from any other produces a number that means nothing, which is why{" "}
+    <code>denominators.ts</code> exists and why it says it cannot check a sentence.</p>
+  <p class="note">Every figure on this page is also a column in{" "}
+    <a href="/data/districts.csv">the district export</a>, unrounded and one row per district.
+    This page used to close with a thirteen-row table of the same numbers rounded, which was
+    the better answer in the build where it was added and had become a restatement of ten
+    figures already above it. If a fixed-shape table on every district was what you were
+    reading, the CSV is where it went.</p>
+</div>
