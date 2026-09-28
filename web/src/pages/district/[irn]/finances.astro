@@ -16,13 +16,14 @@
 import BasisToggle from "../../../components/BasisToggle.astro";
 import DistrictNav from "../../../components/DistrictNav.astro";
 import Base from "../../../layouts/Base.astro";
-import { renderActuals, renderCasino } from "../../../lib/district.ts";
 import { renderFederalShare, renderSpendingByFunction } from "../../../lib/spending.ts";
 import { districtPaths, loadFeed, qualifiedName } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
 import { baseYear } from "../../../lib/real.ts";
 import * as routes from "../../../lib/routes.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
+import Actuals from "../../../components/district/Actuals.astro";
+import Casino from "../../../components/district/Casino.astro";
 
 export const getStaticPaths = districtPaths;
 
@@ -69,8 +70,8 @@ const description = latest
       </div>
     ) : (
       <BasisToggle id="finances-basis" section="actuals" base={base}>
-        <Fragment slot="nominal" set:html={renderActuals(bundle, district, "nominal")} />
-        <Fragment slot="real" set:html={renderActuals(bundle, district, "real")} />
+        <Actuals slot="nominal" bundle={bundle} district={district} basis="nominal" />
+        <Actuals slot="real" bundle={bundle} district={district} basis="real" />
       </BasisToggle>
     )
   }
@@ -78,7 +79,7 @@ const description = latest
   {/* The general fund does not carry this, and neither does the dashboard's calculator. It is on
       this route rather than that one because it is money that changed hands — but it sits below
       the actuals, not inside them, because the treasurer books it in a different fund. */}
-  <Fragment set:html={renderCasino(bundle, district)} />
+  <Casino bundle={bundle} district={district} />
 
   <Fragment set:html={renderSpendingByFunction(district)} />
   <Fragment set:html={renderFederalShare(district, bundle.statewide.outcomes)} />

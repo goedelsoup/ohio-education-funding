@@ -1,0 +1,96 @@
+---
+/**
+ * Gifted, inside the categorical card.
+ *
+ * # The only categorical that buys staff rather than pupils
+ *
+ * Two per-pupil amounts and three kinds of **unit**, where a unit is a headcount entitlement priced
+ * like a salary. 87% of the $54m program is unit funding.
+ *
+ * The units are clamped, and the clamps are the policy. Coordinator units are enrolment over 3,300,
+ * floored at 0.5 and capped at 8; specialist units are identified gifted FTE over 140 in each band,
+ * floored at 0.3. So a district identifying no gifted pupils still draws $93,993 before its state
+ * share — gifted is the one categorical with a floor rather than a proportion. 370 districts sit on
+ * the coordinator floor and three on the cap.
+ */
+import { fixed, money, pct } from "../../lib/format.ts";
+import type { District } from "../../lib/types.ts";
+import SectionAnchor from "../SectionAnchor.astro";
+
+interface Props {
+  district: District;
+}
+
+const { district: d } = Astro.props;
+const g = d.gifted;
+const total = d.categoricals.gifted;
+
+const units = [
+  ["Coordinator", g.coordinator_units, g.coordinator_aid, 85_776, d.categorical_adm / 3300, 0.5, "one per 3,300 pupils, floored at 0.5 and capped at 8"],
+  ["Intervention specialist, K-8", g.specialist_k8_units, g.specialist_k8_aid, 89_378, g.fte_k8 / 140, 0.3, "one per 140 identified gifted pupils, floored at 0.3"],
+  ["Intervention specialist, 9-12", g.specialist_9_12_units, g.specialist_9_12_aid, 80_974, g.fte_9_12 / 140, 0.3, "the same, priced $8,404 lower"],
+] as const;
+
+// Whether a unit is floored is decided by what the district *earned* against the floor, not by
+// comparing the awarded figure to the earned one. The feed rounds units to four places, so an
+// earned 5.31419 is published as an awarded 5.3142 and a naive `awarded > earned` reads that
+// rounding as a floor — which is what this card said about Cleveland's 9-12 specialists on the
+// first pass, while missing that its coordinators are at the cap.
+const floored = units.filter(([, , , , earned, floor]) => earned < floor - 1e-9);
+const atTheCap = g.coordinator_units >= 8 - 1e-9;
+const unitTotal = g.coordinator_aid + g.specialist_k8_aid + g.specialist_9_12_aid;
+---
+
+{
+  total > 0 && (
+    <>
+    <h3 id="gifted"><SectionAnchor id="gifted" />Gifted: two payments and three kinds of unit</h3>
+    <div class="scroll"><table data-program="gifted">
+      <thead><tr><th>Component</th><th class="tnum">Units</th><th class="tnum">Earned</th>
+        <th class="tnum">Amount</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><th>Identification</th><td class="tnum n">—</td><td class="tnum n">—</td>
+          <td class="tnum">{money(g.identification)}</td>
+          <td class="n">$24 per K-6 pupil, after the state share.</td></tr>
+        <tr><th>Referral</th><td class="tnum n">—</td><td class="tnum n">—</td>
+          <td class="tnum">{money(g.referral)}</td>
+          <td class="n">$2.50 per enrolled pupil — a different denominator, one line away.</td></tr>
+        {units.map(([label, awarded, aid, price, earned, floor, note]) => (
+          <tr class={earned < floor - 1e-9 || awarded < earned - 1e-9 ? "current" : undefined}>
+              <th>{label}</th>
+              <td class="tnum">{fixed(awarded, 4)}</td>
+              <td class="tnum n">{fixed(earned, 4)}</td>
+              <td class="tnum">{money(aid)}</td>
+              <td class="n">{money(price)} each — {note}.</td>
+            </tr>
+        ))}
+        <tr class="current"><th>Gifted</th><td class="tnum n">—</td><td class="tnum n">—</td>
+          <td class="tnum">{money(total)}</td>
+          <td class="n">{pct(unitTotal / total, 0)} of it is units.</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">{
+      floored.length > 0 ? (
+        <><strong>{
+            floored.length === 3
+              ? "Every one of this district's three unit entitlements is"
+              : floored.length === 1
+                ? "One of this district's three unit entitlements is"
+                : `${floored.length} of this district's three unit entitlements are`
+          } a floor rather than an earned amount</strong> — its own counts would buy less. That is
+           deliberate: units buy people, and half a coordinator is already the smallest thing a
+           small district can be funded for. It also means this part of its gifted money does not
+           move when its gifted enrolment does.</>
+      ) : atTheCap ? (
+        <>This district is at the <strong>eight-coordinator cap</strong>. Its enrolment earns{" "}
+           {fixed(d.categorical_adm / 3300, 2)} units and it is paid for eight, so unlike
+           most of Ohio its coordinator line is a ceiling rather than a floor. Three districts
+           are in that position.</>
+      ) : (
+        "Every unit here is earned rather than floored or capped."
+      )
+    } Statewide, 370 districts sit on the half-coordinator floor — three-fifths of Ohio — so for
+      most of the state the coordinator line is a minimum rather than a measurement.</p>
+    </>
+  )
+}

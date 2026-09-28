@@ -151,7 +151,7 @@ test.describe("the answer first", () => {
     /*
      * This asserted `toHaveCount(0)` when the conditions landed: Marion Local tripped none of the
      * four and rendered an empty `<ul>`, which reads as a gap in the page rather than as the
-     * absence of a fact. The guard for that is still in `renderAidSource` and is still correct for
+     * absence of a fact. The guard for that is still in `AidSource.astro` and is still correct for
      * a feed that carries a null enrollment change.
      *
      * It is unreachable with this feed, and deliberately so. Making the enrollment condition

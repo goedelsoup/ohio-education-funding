@@ -1,0 +1,81 @@
+---
+/**
+ * Whether a district's students may claim a traditional EdChoice scholarship, and what that is not.
+ *
+ * # A count and a link, because a table would overstate what is known
+ *
+ * The department publishes which *buildings* are designated under R.C. 3310.03. It does not
+ * publish which district a scholarship was charged against — the per-district participation report
+ * its own annual report links to sits behind an entitlement this project cannot reach. So the
+ * honest thing to say on a district's page is how many of its buildings make a student eligible,
+ * and then to say plainly that eligibility is not uptake and that the money does not come out of
+ * the figures above. A table of building names would dress that up as a finding.
+ *
+ * # Why it is in this card rather than beside the formula
+ *
+ * Because it is a statement about what the page does *not* show. Under R.C. 3317.022 the
+ * educational choice scholarship is its own funding unit, computed beside this district's and paid
+ * directly; there is no deduction from anything above, and the row that used to say otherwise on
+ * the method page is the defect this closes.
+ *
+ * The year is named in the sentence rather than taken from the card's heading, because the
+ * designated list is the one source on this page *ahead* of the model year: it is published the
+ * autumn before the school year it governs.
+ *
+ * The four statewide counts are taken over the feed for the same reason the year is: they are the
+ * kind of figure that is written once and then quietly stops being true when the department
+ * publishes the next list.
+ */
+import { count } from "../../lib/format.ts";
+import * as routes from "../../lib/routes.ts";
+import type { Bundle, District } from "../../lib/types.ts";
+import { yearOf } from "../../lib/year.ts";
+
+interface Props {
+  bundle: Bundle;
+  district: District;
+}
+
+const { bundle, district: d } = Astro.props;
+const e = d.designated;
+const listed = bundle.districts.flatMap((o) => (o.designated == null ? [] : [o.designated]));
+const absent = bundle.districts.length - listed.length;
+const sending = listed.filter((o) => o.designated > 0);
+const buildingsStatewide = sending.reduce((sum, o) => sum + o.designated, 0);
+const scholarship = routes.wikiNode("program", "edchoice-scholarship");
+const buildings = e == null ? "" : `${count(e.listed)} building${e.listed === 1 ? "" : "s"}`;
+---
+
+{
+  // Absent from the file is not the same as carrying no designated building, and the feed keeps
+  // them apart. Saying nothing at all would leave a reader to assume the commoner of the two.
+  e == null ? (
+    <p class="note"><strong>The department's EdChoice designated list does not carry this
+      district.</strong> Which is not the same as carrying none of its buildings — {count(
+        listed.length - sending.length,
+      )} districts are on the list with nothing designated. Only {count(
+        absent,
+      )} districts are absent from it altogether, and this is one of them.</p>
+  ) : (
+    <p class="note">{
+      e.designated === 0 ? (
+        <strong>None of this district's {buildings} is designated for the <a href={scholarship}>traditional EdChoice scholarship</a> in{" "}
+           {yearOf("designated")}.</strong>
+      ) : (
+        <><strong>{count(e.designated)} of this district's {buildings} {
+            e.designated === 1 ? "is" : "are"
+          } designated for the <a href={scholarship}>traditional EdChoice scholarship</a> in {yearOf("designated")}.</strong> {
+            e.designated === 1 ? "A student enrolled there" : "Students enrolled in them"
+          } may apply.</>
+      )
+    } That is <em>eligibility, not participation</em> — nothing
+    published says how many applied, or which district any scholarship was charged against. And it
+    is not a charge on anything above: the scholarship is <a href={routes.at(
+      "/statewide",
+      routes.SECTIONS.statewide.fundingUnits,
+    )}>a funding unit of its own</a> under R.C. 3317.022, computed
+    beside this district's unit and paid directly, not deducted from it. Statewide, {count(
+      buildingsStatewide,
+    )} buildings in {count(sending.length)} districts are designated.</p>
+  )
+}

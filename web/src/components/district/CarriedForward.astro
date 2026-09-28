@@ -1,0 +1,115 @@
+---
+/**
+ * This district's aid carried forward to its own enrollment band.
+ *
+ * The same verified path the statewide fan uses, over one district instead of 606. For a district
+ * the guarantee pays it collapses to a flat line — its aid does not respond to its enrollment at
+ * all — and that is the finding rather than a broken chart, so the copy says so and a second
+ * series is added showing what the formula would have computed. The vertical gap between the two
+ * is what the guarantee is worth to it.
+ */
+import type { FanPoint } from "../../lib/chart.ts";
+import { lastOf } from "../../lib/ends.ts";
+import { money } from "../../lib/format.ts";
+import { fanSpec } from "../../lib/plot/spec.ts";
+import { renderToString } from "../../lib/plot/ssr.ts";
+import { currentLaw, modelOf } from "../../lib/policy.ts";
+import { forecastPath, growthPrior, meanDistrictBias, statuteNote } from "../../lib/project.ts";
+import type { Bundle, District } from "../../lib/types.ts";
+import BiasNote from "./BiasNote.astro";
+
+interface Props {
+  bundle: Bundle;
+  district: District;
+  /** The bundle's projection, which the caller has already checked is there. */
+  meta: NonNullable<Bundle["projection"]>;
+}
+
+const { bundle, district: d, meta } = Astro.props;
+const model = modelOf(bundle.statewide);
+const path = forecastPath(
+  [d],
+  currentLaw(model),
+  meta.base_year + 6,
+  meta.base_year,
+  meta.method,
+  meta.damping,
+  meta.shrink_weight,
+  growthPrior(bundle.districts, meta.z),
+  model,
+);
+const end = lastOf(path);
+const insensitive = end.high - end.low < Math.max(1, end.realizedAid * 0.0005);
+const points: FanPoint[] = path.map((p) => ({
+  year: p.fiscalYear,
+  point: p.realizedAid,
+  low: p.low,
+  high: p.high,
+  observed: p.observed,
+  // The second line, only where the first one says nothing. A guaranteed district's aid is a
+  // fixed dollar amount, so its band is a horizontal line and a chart of it alone is a chart
+  // of nothing; what the formula computes for it falls with enrollment, and the gap between
+  // the two is the guarantee doing its job. Spread rather than `undefined`, because the
+  // property is optional and an explicit undefined is not the same thing.
+  ...(insensitive ? { reference: p.formulaAid } : {}),
+}));
+const gapNow = path.find((p) => p.fiscalYear === meta.base_year);
+const widening =
+  gapNow && end.realizedAid - end.formulaAid - (gapNow.realizedAid - gapNow.formulaAid);
+
+/*
+ * What the same forecast has been wrong by, at this drawing's own horizon.
+ *
+ * The horizon is `end.fiscalYear - meta.base_year` rather than a number written here, because
+ * this card's `through` argument above is the only thing that decides how deep the picture goes
+ * and the bias belonging to it has to move when that does. Six years today, which is the leg
+ * `scenario/guarantee-phase-out` projects and the last horizon both populations reach.
+ *
+ * Absent on the guaranteed side. `insensitive` means the band has collapsed to a line because a
+ * fixed dollar amount does not respond to enrollment at all, so an enrollment-forecast bias says
+ * nothing about what this district receives; the branch's own footnote already says why. The
+ * falling reference line is enrollment-sensitive, but it is what the formula computes rather than
+ * what is paid, and #445 is explicit that nothing here corrects anything.
+ */
+const horizon = end.fiscalYear - meta.base_year;
+const bias = insensitive ? null : meanDistrictBias(meta.bias, horizon);
+const chart = renderToString((w) => fanSpec(
+  points,
+  (v) => money(v),
+  (p) =>
+    p.observed
+      ? `FY${p.year}: ${money(p.point)} at published enrollment — exact`
+      : `FY${p.year}: ${money(p.low)} – ${money(p.high)}, central ${money(p.point)}`,
+  { width: w },
+), { label: `${insensitive ? `Aid this district receives against what the formula computes for it, in dollars by enrollment year, FY${points[0]!.year} to FY${end.fiscalYear}` : `State aid in dollars by enrollment year, FY${points[0]!.year} to FY${end.fiscalYear}, with the range across projected enrollment`}`, description: `Every year is the FY${bundle.fiscal_year} formula run at that year's enrollment rather than published aid; years through FY${meta.base_year} use published enrollment and carry no interval, and the y axis is truncated to the plotted range rather than starting at zero` });
+---
+
+<h3>Carried forward</h3>
+<div class="chartwrap" data-chart="district-fan" set:html={chart} />
+{
+  insensitive && (
+    <div class="legend">
+         <span><i class="sw formula"></i> What the district receives</span>{" "}
+         <span><i class="sw guarantee"></i> What the formula computes</span>
+       </div>
+  )
+}
+<p class="note">{
+  insensitive ? (
+    <><strong>The flat line is what this district receives, and it is flat by
+       construction.</strong> The guarantee pays a fixed dollar amount that enrollment does
+       not enter, so no forecast of its enrollment moves it and it has no band. The line
+       that falls is what the formula computes at that enrollment
+       — {money(end.formulaAid)} by FY{end.fiscalYear} against {money(end.realizedAid)}{" "}
+       received. The gap between them is the guarantee, and on this projection it{" "}
+       {(widening ?? 0) > 0 ? "widens by" : "narrows by"}{" "}
+       {money(Math.abs(widening ?? 0))} over the horizon.</>
+  ) : (
+    <>The range, not the line, is the finding: at FY{end.fiscalYear} enrollment this
+       district's aid is somewhere between {money(end.low)} and {money(end.high)}. The
+       band is the cross-sectional spread of district enrollment growth, not this
+       district's own history — three observations cannot give that.</>
+  )
+}</p>
+{bias && <BiasNote bias={bias} horizon={horizon} />}
+<Fragment set:html={statuteNote(end.fiscalYear, meta.statute_ends)} />

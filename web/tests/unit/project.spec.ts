@@ -464,7 +464,7 @@ test("shrinking to a weight of one reproduces the damped rate exactly", () => {
  * only the Rust serializer has ever agreed with. These are the four properties the card depends on.
  */
 
-/** Where the district fan ends, as `district.ts` computes it — `meta.base_year + 6`. */
+/** Where the district fan ends, as `CarriedForward.astro` computes it — `meta.base_year + 6`. */
 const FAN_HORIZON = 6;
 
 test("the bias table runs from one year and is ordered by horizon", () => {

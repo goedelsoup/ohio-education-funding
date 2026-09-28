@@ -4,22 +4,24 @@
  * receives, and where the difference comes from.
  *
  * Every figure on this page is written at build time. The page carries no feed and fetches
- * nothing; `getStaticPaths` handed it one district out of 609 and the renderers in
- * `src/lib/district.ts` turned that into markup. It is complete before any script runs.
+ * nothing; `getStaticPaths` handed it one district out of 609 and the components in
+ * `src/components/district/` turned that into markup. It is complete before any script runs.
+ *
+ * Each card is its own component rather than assembled in one place, because the district view is
+ * five routes and which cards go on which page is a routing decision, made here and in the
+ * sibling pages under `src/pages/district/`.
  */
 import DistrictNav from "../../components/DistrictNav.astro";
+import AidSource from "../../components/district/AidSource.astro";
+import Categoricals from "../../components/district/Categoricals.astro";
+import EnrollmentYears from "../../components/district/EnrollmentYears.astro";
+import NationalPosition from "../../components/district/NationalPosition.astro";
+import Position from "../../components/district/Position.astro";
+import Supplements from "../../components/district/Supplements.astro";
+import WhatThisIsNot from "../../components/district/WhatThisIsNot.astro";
 import Base from "../../layouts/Base.astro";
 import { renderBaseCostBuildUp } from "../../lib/basecost.ts";
 import { renderBiennium } from "../../lib/biennium.ts";
-import {
-  renderAidSource,
-  renderEnrollmentYears,
-  renderCategoricals,
-  renderPosition,
-  renderNationalPosition,
-  renderSupplements,
-  renderWhatThisIsNot,
-} from "../../lib/district.ts";
 import { districtPaths, loadFeed, qualifiedName } from "../../lib/feed.ts";
 import * as routes from "../../lib/routes.ts";
 import { fig, money, pct } from "../../lib/format.ts";
@@ -145,22 +147,22 @@ const description = district.on_guarantee
   {/* The answer first. This card opened with base cost per pupil, which is an input to the
       formula rather than money anyone receives, while the page's own description, its share image
       and this card's heading all said the question was state aid. */}
-  <Fragment set:html={renderAidSource(bundle, district)} />
+  <AidSource bundle={bundle} district={district} />
   {/* Third clause of that question, answered directly: for the 294 guaranteed districts this
       card says a year of enrollment is worth nothing to them. It was in position six. */}
-  <Fragment set:html={renderEnrollmentYears(bundle, district, forecastable)} />
+  <EnrollmentYears bundle={bundle} district={district} forecastable={forecastable} />
   <Fragment set:html={renderBaseCostBuildUp(district, bundle.statewide.districts)} />
   {/* The other half of formula aid, decomposed the same way and for the same reason. */}
-  <Fragment set:html={renderCategoricals(district, bundle.statewide)} />
+  <Categoricals district={district} statewide={bundle.statewide} />
   {/* Everything above is foundation funding, which the guarantee holds. This is not. */}
-  <Fragment set:html={renderSupplements(district, bundle.statewide)} />
+  <Supplements district={district} statewide={bundle.statewide} />
   {/* Everything above is one year. This is the three the budget actually covers, on both
       measures, because they disagree in sign statewide. */}
   <Fragment set:html={renderBiennium(district)} />
-  <Fragment set:html={renderPosition(bundle, district, valuations, expenditures)} />
+  <Position bundle={bundle} district={district} valuations={valuations} expenditures={expenditures} />
   {/* Ohio describing itself cannot say whether Ohio is unusual. This is the one card that can. */}
-  <Fragment set:html={renderNationalPosition(district)} />
+  <NationalPosition district={district} />
   {/* Three of the four siblings close by declaring what they are not. This route has the most
       collisions to declare and was the last to say so. */}
-  <Fragment set:html={renderWhatThisIsNot(bundle, district)} />
+  <WhatThisIsNot bundle={bundle} district={district} />
 </Base>

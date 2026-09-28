@@ -1,0 +1,119 @@
+---
+/**
+ * The categorical half of formula aid, as its six programs.
+ *
+ * # Why one number was not enough
+ *
+ * The corpus carried this as a residual for eight phases: core foundation funding less the state
+ * share of base cost. That is exact — it reconciles to the cent for all 609 districts — and it is
+ * a number a reader can do nothing with. It is also **43% of formula aid**, against a base cost
+ * half this project decomposed into the twenty-two elements of R.C. 3317.011 long ago.
+ *
+ * The six do not behave alike, and that is the reason the sum misleads rather than merely
+ * omitting. **Targeted assistance is equalisation** — it is the largest program in the state at
+ * $1.36bn and it falls to exactly zero for 135 districts, because they have too much valuation to
+ * qualify. **DPIA is poverty-driven.** A district whose categorical total rose could be poorer or
+ * could be less wealthy, and the total cannot tell you which.
+ */
+import type { Bar } from "../../lib/chart.ts";
+import { count, money, pct } from "../../lib/format.ts";
+import { barSpec } from "../../lib/plot/spec.ts";
+import { renderToString } from "../../lib/plot/ssr.ts";
+import * as routes from "../../lib/routes.ts";
+import type { District, Statewide } from "../../lib/types.ts";
+import { yearChip, yearOf } from "../../lib/year.ts";
+import SectionAnchor from "../SectionAnchor.astro";
+import CareerTechnical from "./CareerTechnical.astro";
+import Dpia from "./Dpia.astro";
+import EnglishLearners from "./EnglishLearners.astro";
+import Gifted from "./Gifted.astro";
+import SpecialEducation from "./SpecialEducation.astro";
+import TargetedAssistance from "./TargetedAssistance.astro";
+
+interface Props {
+  district: District;
+  statewide: Statewide;
+}
+
+const { district: d, statewide } = Astro.props;
+const c = d.categoricals;
+const total = d.categorical_funding;
+
+// Each program links to the corpus node describing its mechanism. The six were one residual
+// until recently and had nothing to link to; now each is a `formula-component` in its own right,
+// and the link out from a figure to what the figure *means* is the reason the wiki exists.
+const parts = [
+  ["Targeted assistance", c.targeted_assistance, "Equalisation for low-valuation districts. Zero once a district has enough.", "fsfp-targeted-assistance"],
+  ["Special education", c.special_education, "Six weighted categories of disability, spanning a factor of sixteen.", "fsfp-special-education-weights"],
+  ["Disadvantaged Pupil Impact Aid", c.dpia, "Two poverty counts blended, indexed on the state's, and squared.", "fsfp-disadvantaged-pupil-impact-aid"],
+  ["Career-technical education", c.career_technical, "Five weights against a base cost 20% above the one the rest of the plan uses.", "fsfp-career-technical-weights"],
+  ["Gifted", c.gifted, "Mostly staffing units, with a floor 370 districts sit on.", "fsfp-gifted-units"],
+  // "unlike every other categorical" until this commit, which is the same over-claim the drill-down
+  // below carried and the same one the corpus node carried: career-technical's five weights descend
+  // too. What is true of this program alone is that its weights fall along a *need* gradient.
+  ["English learners", c.english_learners, "Three weights that descend as need persists, alone among the six.", "fsfp-english-learner-weights"],
+] as const;
+
+const bars: Bar[] = parts
+  .filter(([, value]) => value > 0)
+  .map(([label, value]) => ({
+    label,
+    value,
+    direct: pct(value / total, 0),
+    hover: `${label}: ${money(value)}, ${pct(value / total, 1)} of this district's categoricals`,
+  }));
+
+const share = total / (total + d.base_cost_state_share);
+---
+
+{
+  total > 0 && (
+    <div class="card" id="categoricals" data-part="categoricals">
+      <h2><SectionAnchor id="categoricals" />The categorical half, in its six parts<Fragment set:html={yearChip("formula")} /></h2>
+      <div class="chartwrap" data-chart="categoricals" set:html={renderToString((w) => barSpec(bars, { width: w }), { label: `This district's categorical funding by program, in dollars, ${yearOf("formula")}` })} />
+
+      <div class="scroll"><table>
+        <thead><tr><th>Program</th><th class="tnum">Amount</th><th class="tnum">Share</th></tr></thead>
+        <tbody>
+          {parts.map(([label, value, note, node]) => (
+            <tr class={value <= 0 ? "n" : undefined}>
+                <th><a href={routes.wikiNode("formula-component", node)}>{label}</a>{note ? <div class="n">{note}</div> : ""}</th>
+                <td class="tnum">{value <= 0 ? "—" : money(value)}</td>
+                <td class="tnum n">{value <= 0 ? "" : pct(value / total, 1)}</td>
+              </tr>
+          ))}
+          <tr class="current"><th>Total categorical funding</th>
+            <td class="tnum">{money(total)}</td><td class="tnum">100.0%</td></tr>
+        </tbody>
+      </table></div>
+
+      <p class="note">{pct(share, 0)} of this district's formula aid is categorical rather than
+        base cost — {money(total)} against {money(d.base_cost_state_share)}. {c.targeted_assistance <= 0 ? (
+            <><strong>It receives no targeted assistance.</strong> That is the largest categorical
+               program in Ohio and it is equalisation: it goes to districts whose valuation per
+               pupil is low enough to qualify, and this district's is not. {count(
+                 statewide.districts_without_targeted_assistance,
+               )} districts are in the same position, and their categorical money is made of
+               something else entirely.</>
+          ) : (
+            `Its largest single program is
+               ${[...parts].sort((a, b) => b[1] - a[1])[0]![0]} at
+               ${money([...parts].sort((a, b) => b[1] - a[1])[0]![1])}.`
+          )
+        }</p>
+
+      <SpecialEducation district={d} />
+      <TargetedAssistance district={d} statewide={statewide} />
+      <Dpia district={d} />
+      <Gifted district={d} />
+      <CareerTechnical district={d} />
+      <EnglishLearners district={d} />
+
+      <p class="note">These six were one number on this page until recently — a residual, computed
+        as core foundation funding less the state share of base cost. The residual is exact and it
+        cannot be interrogated, which matters because the programs move for opposite reasons:
+        targeted assistance rises as a district gets poorer in <em>property</em>, DPIA as its
+        pupils get poorer. A total that adds them describes neither.</p>
+    </div>
+  )
+}

@@ -1,0 +1,86 @@
+---
+/**
+ * Disadvantaged Pupil Impact Aid, inside the categorical card.
+ *
+ * # The index is squared, and that is the whole character of the program
+ *
+ * DPIA blends two poverty counts, expresses the blend as a share of enrolment, and indexes that
+ * share against the statewide 0.5334 — **squared**. Aid scales with the square of relative
+ * poverty, so a district at twice the state's rate scores four times the index rather than twice.
+ *
+ * The two counts also disagree. Direct certification is administrative and finds a median 61% of
+ * what the economically disadvantaged count does, so putting 35% of the weight on it lowers the
+ * funded count almost everywhere. In three districts it runs the other way.
+ *
+ * # The second count is a year behind the weights, and the table says so
+ *
+ * H.B. 96 puts the second term on the year being funded, and the department's FY2027 workbook
+ * carries FY2026 against the FY2027 weights — its own column header reads `d1b FY26 Directly
+ * Certified ADM`. A simulation cannot use a count the year it prices has not produced, so every
+ * DPIA figure on this page is computed on a count the actual FY2027 payment will not use. That is
+ * a property of the source rather than of the district, which is why it is stated in the row and
+ * not in a caveat somewhere else. See #174.
+ */
+import { count, fixed, money, pct } from "../../lib/format.ts";
+import type { District } from "../../lib/types.ts";
+import SectionAnchor from "../SectionAnchor.astro";
+
+interface Props {
+  district: District;
+}
+
+const { district: d } = Astro.props;
+const p = d.dpia;
+const total = d.categoricals.dpia;
+
+const statewideShare = 0.5334;
+const linear = p.percentage / statewideShare;
+const certificationRatio =
+  p.economically_disadvantaged_adm > 0
+    ? p.directly_certified_adm / p.economically_disadvantaged_adm
+    : 0;
+---
+
+{
+  p.weighted_adm > 0 && (
+    <>
+    <h3 id="dpia"><SectionAnchor id="dpia" />Disadvantaged Pupil Impact Aid, step by step</h3>
+    <div class="scroll"><table data-program="dpia">
+      <thead><tr><th>Step</th><th class="tnum">Value</th><th>What it is</th></tr></thead>
+      <tbody>
+        <tr><th>Economically disadvantaged ADM</th>
+          <td class="tnum">{count(Math.round(p.economically_disadvantaged_adm))}</td>
+          <td class="n">FY2025. Weighted 65%.</td></tr>
+        <tr><th>Directly certified ADM</th>
+          <td class="tnum">{count(Math.round(p.directly_certified_adm))}</td>
+          <td class="n">FY2026, weighted 35% — an administrative count, {
+            certificationRatio > 0
+              ? `${pct(certificationRatio, 0)} of the disadvantaged one here`
+              : "smaller almost everywhere"
+          }. A year behind the weights beside it: the model cannot use a count the year it
+          prices has not produced.</td></tr>
+        <tr class="current"><th>Blended count</th>
+          <td class="tnum">{count(Math.round(p.weighted_adm))}</td>
+          <td class="n">The 65/35 mix. This is the number the money is paid on.</td></tr>
+        <tr><th>As a share of enrolment</th><td class="tnum">{pct(p.percentage, 2)}</td>
+          <td class="n">Against a statewide {pct(statewideShare, 2)}.</td></tr>
+        <tr class="current"><th>Index</th><td class="tnum">{fixed(p.index, 4)}</td>
+          <td class="n">That share over the state's, <strong>squared</strong> — {fixed(linear, 4)} before squaring.</td></tr>
+        <tr class="current"><th>Disadvantaged Pupil Impact Aid</th>
+          <td class="tnum">{money(total)}</td>
+          <td class="n">$422 per weighted pupil, scaled by the index.</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">The squaring is the program. A district at <strong>twice</strong> the state's
+      poverty rate scores <strong>four times</strong> the index, not twice — so DPIA is convex, and
+      $525m distributed on a curve like that concentrates far more sharply than a per-pupil rate
+      would. {
+        p.index > 1
+          ? `This district is above the state's rate, so the squaring works in its favour: its
+             index is ${fixed(p.index, 2)} where a linear one would be ${fixed(linear, 2)}.`
+          : `This district is below the state's rate, so the squaring works against it: its index
+             is ${fixed(p.index, 2)} where a linear one would be ${fixed(linear, 2)}.`
+      }</p>
+    </>
+  )
+}

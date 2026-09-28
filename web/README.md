@@ -827,7 +827,7 @@ five years different signs, so the statewide total's number under one district's
 substitution #431 exists to prevent — and `meanDistrictBias` in `project.ts` does not return the
 total at all, rather than returning it and trusting the caller.
 
-The horizon is **computed from the drawing**. `renderCarriedForward` passes `base_year + 6` to
+The horizon is **computed from the drawing**. `CarriedForward.astro` passes `base_year + 6` to
 `forecastPath`, so the card asks for `end.fiscalYear - meta.base_year` rather than a 6 written into
 the prose: a fan moved a year deeper would otherwise go on printing the old horizon's bias under the
 new label. Six years is also where both populations still answer — the pre-closure pair is `null`

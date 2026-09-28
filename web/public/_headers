@@ -38,7 +38,7 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Strict-Transport-Security: max-age=31536000
   # `style-src` needs 'unsafe-inline' for two things, both inside markup this repository generates:
-  # style *attributes* (the stacked bar widths and the percentile marker in `src/lib/district.ts`)
+  # style *attributes* (the stacked bar widths in `src/components/district/AidSource.astro`)
   # and the scoped `<style>` element Observable Plot writes into every SVG it renders. `script-src`
   # stays strict, which is the half that matters: no inline script, no event-handler attributes,
   # and nothing fetched off-origin.

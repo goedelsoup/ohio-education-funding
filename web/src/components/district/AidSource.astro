@@ -1,0 +1,188 @@
+---
+/**
+ * Where this district's state aid comes from — the first card on the page, and the answer to it.
+ *
+ * # Why the headline tiles are inside this card
+ *
+ * They were a separate block above it, and two of the three figures were printed twice within one
+ * screen: the aid-per-pupil tile and its guarantee sub-note were the bar's legend verbatim, and the
+ * bar's own `aria-label` was a third printing of the same pair. Merging without deduplicating would
+ * have been churn — the same figures under fewer headings — so the pair is printed once, in the
+ * tiles, and the legend now names the two segments instead of restating their amounts.
+ *
+ * # Why the first figure changed
+ *
+ * It was base cost per pupil, which is an input to the formula rather than money anyone receives.
+ * This page's `<meta description>`, its OG image alt text and this card's own heading all say
+ * independently that the question is state aid and where it comes from, and the page opened by
+ * answering a different one. Base cost keeps its own card, two below, where its twenty-two
+ * elements are.
+ *
+ * # Why the total is summed rather than multiplied
+ *
+ * `realized_aid_per_pupil` divides by base cost ADM. The pupil count this page prints beside it is
+ * the current-year one, and multiplying the per-pupil figure by the count next to it is wrong by a
+ * median $112,601 and by $8.2m for Cleveland. `currentRealizedAid` sums the components instead,
+ * which is exact — the same reason `scenario.astro` reaches for it.
+ */
+import { count, money, pct } from "../../lib/format.ts";
+import { currentRealizedAid } from "../../lib/policy.ts";
+import * as routes from "../../lib/routes.ts";
+import type { Bundle, District } from "../../lib/types.ts";
+import { yearChip, yearOf } from "../../lib/year.ts";
+import SectionAnchor from "../SectionAnchor.astro";
+import HoldHarmless from "./HoldHarmless.astro";
+
+interface Props {
+  bundle: Bundle;
+  district: District;
+}
+
+/**
+ * One condition the formula puts this district in, and what follows from it.
+ *
+ * The `label` alone is what this card used to print, as a pill. "At the minimum state share" is a
+ * noun phrase: it states a fact about 138 districts and gives a reader who does not already know
+ * the plan no way to reach what it means for them. A pill cannot hold a clause, so these are rows.
+ */
+interface Condition {
+  label: string;
+  href?: string;
+  consequence: string;
+}
+
+const { bundle, district: d } = Astro.props;
+const formulaPP = d.formula_aid_per_pupil;
+const realizedPP = d.realized_aid_per_pupil;
+const guaranteePP = realizedPP - formulaPP;
+const total = Math.max(realizedPP, 1);
+const formulaWidth = (formulaPP / total) * 100;
+const guaranteeWidth = (guaranteePP / total) * 100;
+
+/*
+ * Two chips are gone and neither is a loss. "Funded by the guarantee, not the formula" and "At or
+ * below the 20-mill floor" both restated the sub-line `[irn].astro` renders directly above this
+ * card, and the floor chip was strictly *less* precise than what it duplicated: the sub-line
+ * separates the 21 districts genuinely below 20 mills from the 155 sitting on it, and the chip
+ * collapsed all 176 into one phrase. What survives is what the sub-line does not already say.
+ */
+const conditions: Condition[] = [];
+if (d.near_millage_floor && !d.at_millage_floor) {
+  conditions.push({
+    label: "Within a twentieth of a mill of the floor",
+    href: routes.parameter("twenty-mill-floor"),
+    consequence: `One more reduction and H.B. 920 stops rolling its rate back at all, after
+        which a reappraisal reaches its revenue instead of being taken away again. One of 54.`,
+  });
+}
+if (d.at_minimum_state_share) {
+  conditions.push({
+    label: "At the minimum state share",
+    href: routes.metric("state-share-percentage"),
+    consequence: `The formula computed a share below 10% and the statute raised it to 10%, so a
+        change to the local capacity measure moves this district's aid by nothing until it is large
+        enough to lift it off the floor. One of 138.`,
+  });
+}
+if (d.millage?.cumulative_reduction != null && d.millage.cumulative_reduction > 0.005) {
+  conditions.push({
+    label: `${pct(d.millage.cumulative_reduction, 0)} of voted millage reduced away`,
+    href: routes.metric("effective-operating-millage"),
+    consequence: `H.B. 920's reduction factors have rolled back that much of what voters
+        approved, so what a levy raises here is not what the ballot said it would.`,
+  });
+}
+/*
+ * Symmetric, because a fall is not the only thing that happened. This fired only on a negative,
+ * so for the 109 districts whose enrollment *rose* between FY2024 and FY2026 the dashboard's sole
+ * carrier of the fact was a row in the Detail card — which is why this has to change before that
+ * card is deleted rather than after.
+ */
+if (d.enrollment_change != null && d.enrollment_change !== 0) {
+  const fell = d.enrollment_change < 0;
+  conditions.push({
+    label: `Enrollment ${fell ? "down" : "up"} ${pct(
+      Math.abs(d.enrollment_change),
+    )} ${yearOf("enrollment").replace("-", "→")}`,
+    consequence: d.on_guarantee
+      ? `Its aid did not move with it, because the guarantee holds a fixed dollar amount
+           enrollment does not enter — the next card shows what that is worth.`
+      : `Its aid ${
+          fell ? "falls" : "rises"
+        } with it, because this district is on the formula — the next card shows by how much.`,
+  });
+}
+---
+
+<div class="card" id="aid-source" data-part="aid-source">
+  <h2><SectionAnchor id="aid-source" />Where the state aid comes from<Fragment set:html={yearChip("formula")} /></h2>
+  <div class="tiles" data-part="headline">
+    <div class="tile"><div class="k">State aid, FY{bundle.fiscal_year}</div>
+      <div class="v">{money(currentRealizedAid(d))}</div>
+      <div class="n">every foundation dollar the model pays it</div></div>
+    <div class="tile"><div class="k">State aid / pupil</div>
+      <div class="v">{money(realizedPP)}</div>
+      <div class="n">{
+        d.on_guarantee
+          ? money(guaranteePP) + " of it from the guarantee"
+          : "all from the formula"
+      }</div></div>
+    <div class="tile"><div class="k">Base-cost ADM</div>
+      <div class="v">{count(Math.round(d.adm))}</div>
+      <div class="n"><a href={routes.metric(
+        "enrolled-adm",
+      )}>not a headcount</a> — a three-year average</div></div>
+  </div>
+  {
+    /*
+     * The bar is a proportion chart and 315 districts have one proportion. A full-width single
+     * segment under a legend that has collapsed to one item says nothing the tiles did not, so
+     * those districts get the prose and no chart. Nothing is lost by the omission: where the
+     * guarantee pays zero, realized aid per pupil *is* formula aid per pupil, for all 315.
+     */
+    guaranteeWidth > 0 && (
+      <div class="barwrap">
+           <div class="bar" role="img" aria-label={`${pct(
+             formulaPP / realizedPP,
+             0,
+           )} of this district's aid per pupil is computed by the formula; the guarantee pays the rest`}>
+             <div class="seg formula" style={`width:${formulaWidth}%`}></div>
+             <div class="seg guarantee" style={`width:${guaranteeWidth}%`}></div>
+           </div>
+           <div class="legend">
+             <span><i class="sw formula"></i> What the formula computes</span>{" "}
+             <span><i class="sw guarantee"></i> What the guarantee adds</span>
+           </div>
+         </div>
+    )
+  }
+  <p class="note">{
+    d.on_guarantee ? (
+      <>The formula computes {money(formulaPP)} per pupil. This district receives{" "}
+         {money(realizedPP)} because the <a href={routes.wikiNode(
+           "formula-component",
+           "temporary-transitional-aid-guarantee",
+         )}>temporary transitional aid guarantee</a> holds it at what it received in{" "}
+         <strong>FY2020</strong> — a year Ohio froze funding under the Bridge formula rather
+         than computing it. The formula produces{" "}
+         <strong>{pct(formulaPP / realizedPP, 0)}</strong> of that level.</>
+    ) : (
+      <>This district is funded by the formula, so an increase in its computed base cost
+         reaches it in full — unlike the {bundle.statewide.on_guarantee} districts held on the{" "}
+         <a href={routes.wikiNode(
+           "formula-component",
+           "temporary-transitional-aid-guarantee",
+         )}>guarantee</a>.</>
+    )
+  }</p>
+  {
+    // Marion Local trips none of the four, and an empty row renders as an unexplained gap
+    // rather than as an absence.
+    conditions.length > 0 && (
+      <ul class="conditions">{conditions.map((c) => (
+        <li><strong>{c.href ? <a href={c.href}>{c.label}</a> : c.label}</strong> — {c.consequence}</li>
+      ))}</ul>
+    )
+  }
+  <HoldHarmless district={d} />
+</div>
