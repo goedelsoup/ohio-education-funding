@@ -97,27 +97,19 @@ config_roots = ["crates", "web"]
 # <!-- YIDAM:TOOLS --> written by yidam-vendor-update from .yidam.toml — do not edit
 "github:goedelsoup/yidam" = { version = "0.15.0", version_prefix = "cli/v" }
 # <!-- /YIDAM:TOOLS -->
-# Pinned rather than "latest" so the gate is reproducible, and pinned to *this*
-# version because `.github/workflows/ci.yml` has nothing to select a toolchain
-# with: there is no `rust-toolchain.toml`, so its `rustup show` step is a no-op
-# that leaves the runner's current stable active. This pin is therefore a mirror
-# of the runner rather than a floor. When GitHub's image moves to a newer stable,
-# clippy gains lints and CI can go red with no commit behind it — and this line is
-# what has to move for a local run to reproduce the failure. That is exactly how
-# it went red at 1.97 while the local gate sat green on 1.82, and again at 1.98
-# on `chunks_exact_to_as_chunks` while this line still said 1.97: the failing job
-# was a PR that touched neither crate the lint fired in.
+# The same number as `crates/rust-toolchain.toml`, which is what the CI `crates` job compiles
+# with. It cannot be derived from that file: mise exports `RUSTUP_TOOLCHAIN` for the version named
+# here, and that variable outranks any toolchain file, so a local run uses this line whatever the
+# file says. `crates/edfund-core/tests/the_toolchain_is_pinned_once.rs` fails when the two differ,
+# or when either differs from the workspace's `rust-version`.
 #
-# **Moving this line is the whole procedure.** With the pin behind the runner
-# there is no local invocation that reproduces the failure — `cargo clippy` is
-# green, the log is the only evidence, and the fix has to be written against a
-# compiler nobody in the repository is running. Bump it first, then lint.
+# Before that file existed the runner used whatever stable its image shipped, so this line could
+# only mirror GitHub's current stable, and clippy went red with no commit behind it twice — at 1.97
+# while the local gate sat on 1.82, and at 1.98 on `chunks_exact_to_as_chunks` while this line
+# still said 1.97. A new clippy lint now arrives only when someone moves the pin.
 #
-# The workspace's real floor is lower — `Option::is_none_or` (1.82) in `connect`
-# and `spreadsheet`, `u16::is_multiple_of` (1.87) in `edfund-core`, and now
-# `slice::as_chunks` in both, which those two lint fixes introduced — but nothing
-# enforces it, so treat this as the only version any check has been verified
-# against.
+# **Moving the pin is three lines**: this one, `channel` in `crates/rust-toolchain.toml`, and
+# `rust-version` in `crates/Cargo.toml`. Then lint, and fix what the new compiler finds.
 #
 # mise installs Rust through rustup with its own profile and does not read a
 # `rust-toolchain.toml` component list, so rustfmt and clippy are requested here
