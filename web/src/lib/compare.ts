@@ -31,7 +31,7 @@
  * hand-writes a year label can still see it.
  */
 
-import { money, pct } from "./format.ts";
+import { count, escapeHtml, fixed, money, pct } from "./format.ts";
 import { currentFormulaAid, currentRealizedAid } from "./policy.ts";
 import * as routes from "./routes.ts";
 import { anchor } from "./section.ts";
@@ -73,7 +73,7 @@ export const ROWS: Row[] = [
     key: "adm",
     label: () => "Enrolled ADM (base cost)",
     pick: (d) => d.adm,
-    format: (v) => (v == null ? "—" : Math.round(v).toLocaleString("en-US")),
+    format: (v) => (v == null ? "—" : count(Math.round(v))),
   },
   { key: "realized-per-pupil", label: () => "State aid per pupil", pick: (d) => d.realized_aid_per_pupil, format: (v) => money(v) },
   { key: "formula-per-pupil", label: () => "Formula aid per pupil", pick: (d) => d.formula_aid_per_pupil, format: (v) => money(v) },
@@ -112,13 +112,13 @@ export const ROWS: Row[] = [
     key: "voted-millage",
     label: (y) => taxYear("Voted operating millage", y.millage),
     pick: (d) => d.voted_operating_millage,
-    format: (v) => (v == null ? "—" : v.toFixed(2)),
+    format: (v) => fixed(v, 2),
   },
   {
     key: "effective-millage",
     label: (y) => taxYear("Effective Class 1 millage", y.millage),
     pick: (d) => d.effective_class1_millage,
-    format: (v) => (v == null ? "—" : v.toFixed(2)),
+    format: (v) => fixed(v, 2),
     href: routes.metric("effective-operating-millage"),
   },
   {
@@ -180,17 +180,13 @@ export function difference(row: Row, left: number | null, right: number | null):
   if (left == null || right == null) return "not comparable";
   if (row.ratio && right !== 0 && left !== 0) {
     const times = left / right;
-    if (times >= 1) return `${times.toFixed(1)}× the second`;
-    return `${(1 / times).toFixed(1)}× the first`;
+    if (times >= 1) return `${fixed(times, 1)}× the second`;
+    return `${fixed(1 / times, 1)}× the first`;
   }
   const delta = left - right;
   if (Math.abs(delta) < 1e-9) return "the same";
   const sign = delta > 0 ? "+" : "−";
   return `${sign}${row.format(Math.abs(delta)).replace(/^[+−]/, "")} to the first`;
-}
-
-function escapeHtml(s: string): string {
-  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 }
 
 /** One district as this table names it: the qualified name, and where its own page is. */

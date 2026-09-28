@@ -65,6 +65,7 @@ import { yearChip } from "./year.ts";
  */
 const BAND_FROM = 2012;
 import { anchor } from "./section.ts";
+import { firstOf, lastOf } from "./ends.ts";
 
 /** What neither level of government closes — the part a district actually experiences. */
 export function residual(year: HistoryYear): number {
@@ -86,7 +87,7 @@ export function gaps(history: HistoryYear[]): number[] {
   if (history.length === 0) return [];
   const present = new Set(history.map((y) => y.fiscal_year));
   const out: number[] = [];
-  for (let y = history[0]!.fiscal_year; y <= history[history.length - 1]!.fiscal_year; y++) {
+  for (let y = firstOf(history).fiscal_year; y <= lastOf(history).fiscal_year; y++) {
     if (!present.has(y)) out.push(y);
   }
   return out;
@@ -149,8 +150,8 @@ export function inBase(
 export function renderRevenueMix(history: HistoryYear[]): string {
   if (history.length < 2) return "";
 
-  const first = history[0]!;
-  const last = history[history.length - 1]!;
+  const first = firstOf(history);
+  const last = lastOf(history);
   const points = withGaps(
     history,
     (y) => y.local_share * 100,
@@ -227,8 +228,8 @@ export function renderEqualization(
         in constant dollars.</p></div>`;
   }
 
-  const first = restated[0]!;
-  const last = restated[restated.length - 1]!;
+  const first = firstOf(restated);
+  const last = lastOf(restated);
   const points = withGaps(
     restated,
     (y) => y.gap_per_pupil,
@@ -316,8 +317,8 @@ export function renderEqualization(
 export function renderProvenance(bundle: Bundle): string {
   const history = bundle.history;
   if (history.length === 0) return "";
-  const first = history[0]!;
-  const last = history[history.length - 1]!;
+  const first = firstOf(history);
+  const last = lastOf(history);
 
   return `
     <div class="card" id="what-this-is" data-part="what-this-is">

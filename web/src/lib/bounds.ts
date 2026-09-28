@@ -41,6 +41,7 @@ import { renderToString } from "./plot/ssr.ts";
 import * as routes from "./routes.ts";
 import { anchor } from "./section.ts";
 import { yearChip, yearOf } from "./year.ts";
+import { firstOf, lastOf } from "./ends.ts";
 
 /** The one series this page draws. Named here because three things below look it up. */
 export const SERIES_KEY = "project/bounds-census";
@@ -138,8 +139,8 @@ export function census(): Census {
     families,
     whole,
     populations,
-    most: rows[0]!,
-    least: rows[rows.length - 1]!,
+    most: firstOf(rows),
+    least: lastOf(rows),
     cannotBind: rows.filter((row) => row.marked != null),
     /* The second null result, and the harder one to see: a bound that *could* bind and does not
        for any district in this panel. It is the complement of the marked rows at zero, so it is
@@ -231,11 +232,11 @@ export function renderFamilies(c: Census): string {
     <div class="card" id="families" data-part="families">
       <h2>${anchor("families")}Where the bounds are${yearChip("formula")}</h2>
       <p class="note">The five parts of the formula do not carry equal numbers of edges.
-        ${escapeHtml(c.families[0]!.label)} holds ${count(c.families[0]!.bounds)} of the
+        ${escapeHtml(firstOf(c.families).label)} holds ${count(firstOf(c.families).bounds)} of the
         ${count(c.rows.length)} on its own — the staffing ratios of R.C. 3317.011 are written as a
         minimum apiece, so each element of the base cost brings its own floor — while
-        ${escapeHtml(c.families[c.families.length - 1]!.label)} has
-        ${count(c.families[c.families.length - 1]!.bounds)}.</p>
+        ${escapeHtml(lastOf(c.families).label)} has
+        ${count(lastOf(c.families).bounds)}.</p>
       <div class="scroll"><table>
         <thead><tr><th>Family</th><th>Bounds</th><th>Share</th></tr></thead>
         <tbody>${rows}

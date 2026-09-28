@@ -20,6 +20,7 @@
 
 import { apply, type Policy, type Model, statewideUnder } from "./policy.ts";
 import type { PanelDistrict, ProjectionBias } from "./types.ts";
+import { firstOf, lastOf } from "./ends.ts";
 
 /** One observed value in a fiscal year. */
 export interface Observation {
@@ -138,8 +139,8 @@ export function fit(
   toward: number | null,
 ): Method {
   if (observations.length < 2) return { kind: "last-observed" };
-  const first = observations[0]!;
-  const last = observations[observations.length - 1]!;
+  const first = firstOf(observations);
+  const last = lastOf(observations);
   const years = last.fiscalYear - first.fiscalYear;
 
   switch (kind) {
@@ -263,8 +264,8 @@ export function observations(d: PanelDistrict, baseYear: number): Observation[] 
 export function growthPrior(districts: PanelDistrict[], z: number): Prior {
   const rates: number[] = [];
   for (const d of districts) {
-    const first = d.adm_history[0]!;
-    const last = d.adm_history[d.adm_history.length - 1]!;
+    const first = firstOf(d.adm_history);
+    const last = lastOf(d.adm_history);
     if (first > 0 && last > 0) rates.push(Math.pow(last / first, 0.5) - 1);
   }
   return { sigma: standardDeviation(rates), z };

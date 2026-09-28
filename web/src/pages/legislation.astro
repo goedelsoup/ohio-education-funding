@@ -15,12 +15,13 @@ import Base from "../layouts/Base.astro";
 import { loadCorpus } from "../lib/corpus.ts";
 import { acts, regimes, renderTimeline } from "../lib/legislation.ts";
 import * as routes from "../lib/routes.ts";
+import { firstOf, lastOf } from "../lib/ends.ts";
 
 const corpus = loadCorpus();
 const spans = regimes(corpus);
 const statutes = acts(corpus);
 const latest = Math.max(...statutes.map((a) => a.year));
-const covered = (spans[spans.length - 1]!.to ?? latest) - spans[0]!.from + 1;
+const covered = (lastOf(spans).to ?? latest) - firstOf(spans).from + 1;
 ---
 
 <Base

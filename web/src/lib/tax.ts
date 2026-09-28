@@ -36,7 +36,7 @@
  */
 
 import type { Bar } from "./chart.ts";
-import { count, escapeHtml, millions, money, pct } from "./format.ts";
+import { count, escapeHtml, fixed, millions, money, pct, signed } from "./format.ts";
 import { barSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import * as routes from "./routes.ts";
@@ -46,6 +46,7 @@ import { seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
 import { term } from "./glossary.ts";
 import { anchor } from "./section.ts";
 import { pageDenominators } from "./denominators.ts";
+import { lastOf } from "./ends.ts";
 
 /**
  * The statutory reduction-factor floor, in mills — `millage::SCHOOL_DISTRICT_FLOOR`.
@@ -143,10 +144,10 @@ export function renderTaxChange(d: District, statewide: TaxStatewide): string {
 
   const rows = [
     ["Class I taxable value", before.class1_value, after.class1_value, money],
-    ["Class I effective millage", before.class1_rate, after.class1_rate, (v: number) => v.toFixed(4)],
+    ["Class I effective millage", before.class1_rate, after.class1_rate, (v: number) => fixed(v, 4)],
     ["Class I tax charged", before.class1_taxes_charged, after.class1_taxes_charged, money],
     ["Class II taxable value", before.class2_value, after.class2_value, money],
-    ["Class II effective millage", before.class2_rate, after.class2_rate, (v: number) => v.toFixed(4)],
+    ["Class II effective millage", before.class2_rate, after.class2_rate, (v: number) => fixed(v, 4)],
     ["Class II tax charged", before.class2_taxes_charged, after.class2_taxes_charged, money],
     [
       "Real property tax charged",
@@ -184,8 +185,8 @@ export function renderTaxChange(d: District, statewide: TaxStatewide): string {
              what twenty mills would raise rather than a rate anyone is held to, so a district
              already below it has nothing that can be reduced.${
                voted != null
-                 ? ` Its voters approved ${voted.toFixed(2)} mills and it charges
-                    ${after.class1_rate.toFixed(2)}.`
+                 ? ` Its voters approved ${fixed(voted, 2)} mills and it charges
+                    ${fixed(after.class1_rate, 2)}.`
                  : ""
              } Twenty-one districts in Ohio charge under twenty effective Class I mills. Its Class
              I value moved ${pct(valueGrowth, 2)} and its charge moved ${pct(chargeGrowth, 2)}: a
@@ -200,17 +201,17 @@ export function renderTaxChange(d: District, statewide: TaxStatewide): string {
           : d.near_millage_floor
             ? `<strong>This district is above the
              <a href="${routes.parameter("twenty-mill-floor")}">20-mill floor</a> by
-             ${(after.class1_rate - FLOOR).toFixed(4)} mills</strong> — close enough that the
+             ${fixed(after.class1_rate - FLOOR, 4)} mills</strong> — close enough that the
              distinction carries little meaning. Reduction factors are technically operative and
              have almost nothing left to operate on: its rate moved
-             ${rateMoved >= 0 ? "+" : "−"}${Math.abs(rateMoved).toFixed(4)} mills against a
+             ${signed(rateMoved, 4)} mills against a
              ${pct(valueGrowth, 2)} change in value, and its charge tracked its value to within
              ${pct(Math.abs(chargeGrowth - valueGrowth), 2)}. Read it as a floor district whose
              rate happens to round up.`
             : `<strong>This district is above the
              <a href="${routes.parameter("twenty-mill-floor")}">20-mill floor</a>, so H.B. 920's
              reduction factors are fully operative.</strong> Its Class I effective rate moved
-             ${rateMoved >= 0 ? "+" : "−"}${Math.abs(rateMoved).toFixed(4)} mills against a
+             ${signed(rateMoved, 4)} mills against a
              ${pct(valueGrowth, 2)} change in value.
              ${
                rateMoved < -RATE_FALL_TOLERANCE
@@ -296,10 +297,10 @@ export function renderMillage(d: District, statewide: Statewide): string {
              this district, so the reduction cannot be stated as a share here.</p>`
           : `<div class="tiles">
               <div class="tile"><div class="k">Voted current operating millage</div>
-                <div class="v">${voted.toFixed(2)}</div>
+                <div class="v">${fixed(voted, 2)}</div>
                 <div class="n">TY${m.tax_year - 1}, the rate on the ballot</div></div>
               <div class="tile"><div class="k">${term("effective-millage", "Effective")} Class I millage</div>
-                <div class="v">${m.observed_rate.toFixed(2)}</div>
+                <div class="v">${fixed(m.observed_rate, 2)}</div>
                 <div class="n">TY${m.tax_year}, the rate anyone pays</div></div>
               <div class="tile"><div class="k">Taken by reduction factors</div>
                 <div class="v">${pct(reduced, 0)}</div>
@@ -307,26 +308,26 @@ export function renderMillage(d: District, statewide: Statewide): string {
             </div>
             <p class="note">${
               reduced < 0.005
-                ? `Voters approved <strong>${voted.toFixed(2)} mills</strong> and the district
-                   charges <strong>${m.observed_rate.toFixed(2)}</strong> — the same rate, and one
+                ? `Voters approved <strong>${fixed(voted, 2)} mills</strong> and the district
+                   charges <strong>${fixed(m.observed_rate, 2)}</strong> — the same rate, and one
                    of very few places in Ohio where that is true. Reduction factors have taken
                    nothing, because
                    <a href="${routes.parameter("twenty-mill-floor")}">the twenty-mill floor</a>
                    guarantees what twenty mills would raise and this district has never voted
                    twenty. There is no reduction to make. Everywhere else the two numbers diverge:
                    the median district voted
-                   ${statewide.median_voted_millage.toFixed(2)} mills, collects
-                   ${statewide.median_effective_millage.toFixed(2)}, and has lost
+                   ${fixed(statewide.median_voted_millage, 2)} mills, collects
+                   ${fixed(statewide.median_effective_millage, 2)}, and has lost
                    ${pct(statewide.median_millage_reduction, 0)} of what its voters approved.`
-                : `Voters approved <strong>${voted.toFixed(2)} mills</strong> and the district
-                   charges <strong>${m.observed_rate.toFixed(2)}</strong>. That gap is not a rebate
+                : `Voters approved <strong>${fixed(voted, 2)} mills</strong> and the district
+                   charges <strong>${fixed(m.observed_rate, 2)}</strong>. That gap is not a rebate
                    or a rollback anyone voted for: H.B. 920's reduction factors have removed
                    ${pct(reduced, 0)} of the approved rate over the life of the levies, a hundredth
                    of a mill at a time, as reappraisals raised the value of property that was
                    already there. Statewide the median district has lost
                    ${pct(statewide.median_millage_reduction, 0)} the same way — the median voted
-                   rate is ${statewide.median_voted_millage.toFixed(2)} mills against an effective
-                   ${statewide.median_effective_millage.toFixed(2)}.`
+                   rate is ${fixed(statewide.median_voted_millage, 2)} mills against an effective
+                   ${fixed(statewide.median_effective_millage, 2)}.`
             }</p>`
       }
 
@@ -335,10 +336,10 @@ export function renderMillage(d: District, statewide: Statewide): string {
         <thead><tr><th></th><th class="tnum">Mills</th><th>What it is</th></tr></thead>
         <tbody>
           <tr><th>Charged TY${m.tax_year - 1}</th>
-            <td class="tnum">${m.prior_rate.toFixed(4)}</td>
+            <td class="tnum">${fixed(m.prior_rate, 4)}</td>
             <td class="n">Table SD-1, the year before.</td></tr>
           <tr><th>Predicted TY${m.tax_year}</th>
-            <td class="tnum">${m.predicted_rate.toFixed(4)}</td>
+            <td class="tnum">${fixed(m.predicted_rate, 4)}</td>
             <td class="n">The prior rate scaled by the change in Class I value${
               // The floor only appears in the prediction when it actually clamped it. Saying it
               // "binds here" for a district charging under twenty mills would be backwards: the
@@ -346,10 +347,10 @@ export function renderMillage(d: District, statewide: Statewide): string {
               floorClamped ? ", held at the statutory floor" : ""
             }.</td></tr>
           <tr class="current"><th>Charged TY${m.tax_year}</th>
-            <td class="tnum">${m.observed_rate.toFixed(4)}</td>
+            <td class="tnum">${fixed(m.observed_rate, 4)}</td>
             <td class="n">Table SD-1, observed.</td></tr>
           <tr><th>Residual</th>
-            <td class="tnum">${residual >= 0 ? "+" : "−"}${Math.abs(residual).toFixed(4)}</td>
+            <td class="tnum">${signed(residual, 4)}</td>
             <td class="n">What reduction factors cannot account for.</td></tr>
         </tbody>
       </table></div>
@@ -361,14 +362,14 @@ export function renderMillage(d: District, statewide: Statewide): string {
              levy expired, and new construction was too small to register against a base this
              size.`
           : residual > 0
-            ? `<strong>The charged rate is ${Math.abs(residual).toFixed(2)} mills above what the
+            ? `<strong>The charged rate is ${fixed(Math.abs(residual), 2)} mills above what the
                factors alone predict.</strong> They apply to existing levies on existing property
                and to nothing else, so the excess is millage they never reached: a levy passed in
                the interval, or new construction added to the base after the reduction was
                computed. This page cannot tell you which — Table SD-1 publishes the outcome, not
                the levy history that produced it — but it can tell you the reduction factors are
                not the reason.`
-            : `<strong>The charged rate is ${Math.abs(residual).toFixed(2)} mills below what the
+            : `<strong>The charged rate is ${fixed(Math.abs(residual), 2)} mills below what the
                factors alone predict.</strong> Reduction factors cannot do that; they hold a
                levy's yield roughly flat, they do not retire it. A rate that falls faster than
                they explain means millage came off the books — a levy reaching its term, or one
@@ -383,7 +384,7 @@ export function renderMillage(d: District, statewide: Statewide): string {
           <div class="v">${money(statewide.median_yield_per_mill)}</div>
           <div class="n">per pupil, per mill</div></div>
         <div class="tile"><div class="k">To raise a median mill</div>
-          <div class="v">${(statewide.median_yield_per_mill / m.yield_per_mill_per_pupil).toFixed(2)}</div>
+          <div class="v">${fixed(statewide.median_yield_per_mill / m.yield_per_mill_per_pupil, 2)}</div>
           <div class="n">mills needed here</div></div>
       </div>
       <p class="note">This is the local half of the formula in one number, and the reason a
@@ -393,10 +394,10 @@ export function renderMillage(d: District, statewide: Statewide): string {
         ${
           m.yield_per_mill_per_pupil >= statewide.median_yield_per_mill
             ? `this district reaches the median district's revenue with
-               ${(statewide.median_yield_per_mill / m.yield_per_mill_per_pupil).toFixed(2)} mills
+               ${fixed(statewide.median_yield_per_mill / m.yield_per_mill_per_pupil, 2)} mills
                of effort. A lower rate here is not necessarily a lower commitment.`
             : `matching the median district's revenue takes
-               ${(statewide.median_yield_per_mill / m.yield_per_mill_per_pupil).toFixed(2)} mills
+               ${fixed(statewide.median_yield_per_mill / m.yield_per_mill_per_pupil, 2)} mills
                here. A higher rate is not necessarily a higher commitment — it can be the same
                commitment against a smaller base.`
         }
@@ -474,7 +475,7 @@ export function hasDenominators(d: District): boolean {
  */
 export function renderDenominators(d: District): string {
   if (!hasDenominators(d)) return "";
-  const latest = d.property_tax[d.property_tax.length - 1]!;
+  const latest = lastOf(d.property_tax);
   const enrolled = d.adm_history[0]!;
   const ratio = latest.value_per_pupil / d.valuation_per_pupil!;
 
@@ -637,7 +638,7 @@ export function renderChargeOff(d: District, statewide: Statewide, tax: TaxState
     <div class="card" id="charge-off" data-part="charge-off">
       <h2>${anchor("charge-off")}What the mechanism this replaced would charge${yearChipPair("formula", "profile", "profile")}</h2>
       <p class="note">Before the Fair School Funding Plan, a district's own share of its cost was
-        a flat <strong>${r.charge_off_mills.toFixed(0)} mills</strong> against its valuation —
+        a flat <strong>${fixed(r.charge_off_mills, 0)} mills</strong> against its valuation —
         the same rate for every district in Ohio, whatever it could actually levy. Holding this
         district's base cost fixed and substituting that mechanism for the plan's local capacity
         measure:</p>
@@ -647,7 +648,7 @@ export function renderChargeOff(d: District, statewide: Statewide, tax: TaxState
         <tbody>
           <tr><th>Deemed local share, charge-off</th>
             <td class="tnum">${money(r.charge_off_local_share)}</td>
-            <td class="n">${r.charge_off_mills.toFixed(0)} mills against
+            <td class="n">${fixed(r.charge_off_mills, 0)} mills against
               ${money(d.valuation_per_pupil ?? 0)} of valuation per pupil — the Department of
               Education's figure, per <strong>enrolled ADM</strong>, which is
               <em>not</em> the count the base cost below it divides by. See the note under this
@@ -689,16 +690,16 @@ export function renderChargeOff(d: District, statewide: Statewide, tax: TaxState
       ${
         short != null && rate != null
           ? `<p class="note"><strong>This district would be charged for revenue it could not
-             raise.</strong> The charge-off assumes ${r.charge_off_mills.toFixed(0)} mills; this
-             district's effective Class I rate is ${rate.toFixed(2)}, which is
-             ${short.toFixed(2)} mills short. That gap is the phantom revenue the mechanism became
+             raise.</strong> The charge-off assumes ${fixed(r.charge_off_mills, 0)} mills; this
+             district's effective Class I rate is ${fixed(rate, 2)}, which is
+             ${fixed(short, 2)} mills short. That gap is the phantom revenue the mechanism became
              known for, and it is not a district-level failing — H.B. 920 produces it
              automatically, by rolling effective rates down as valuation rises while the statutory
              rate stood still. ${count(statewide.below_charge_off_rate)} of
              ${count(statewide.districts)} districts are below the rate today. Ohio's answer was a
              supplement rather than a floor: gap aid, $73.5m across 145 districts in FY2008.</p>`
           : `<p class="note">This district's effective Class I rate is at or above the
-             ${r.charge_off_mills.toFixed(0)} mills the charge-off assumes, so it is one of the
+             ${fixed(r.charge_off_mills, 0)} mills the charge-off assumes, so it is one of the
              ${count(statewide.districts - statewide.below_charge_off_rate)} that could actually
              levy what the mechanism deemed it able to. The other
              ${count(statewide.below_charge_off_rate)} could not.</p>`
