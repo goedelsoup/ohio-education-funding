@@ -38,6 +38,7 @@ import type { Corpus, Node } from "./corpus.ts";
 import { escapeHtml } from "./format.ts";
 import * as routes from "./routes.ts";
 import { anchor } from "./section.ts";
+import { firstOf, lastOf } from "./ends.ts";
 
 /** A fiscal-year label as the corpus writes it — `FY2012`, or `current` for a regime still running. */
 export function fiscalYear(label: string): number | null {
@@ -261,8 +262,8 @@ export function renderTimeline(corpus: Corpus): string {
   const all = acts(corpus);
   if (spans.length === 0 || all.length === 0) return "";
 
-  const first = spans[0]!;
-  const current = spans[spans.length - 1]!;
+  const first = firstOf(spans);
+  const current = lastOf(spans);
   const latest = Math.max(...all.map((a) => a.year));
   const covered = (current.to ?? latest) - first.from + 1;
 

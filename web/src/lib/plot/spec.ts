@@ -43,6 +43,7 @@ import type {
   Trace,
 } from "../chart.ts";
 import { INK, ORDINAL, SERIES } from "./tokens.ts";
+import { firstOf, lastOf } from "../ends.ts";
 
 /**
  * How a chart is announced to a reader who cannot see it.
@@ -1163,7 +1164,7 @@ export function scatterSpec(
           ...(trace.band != null
             ? []
             : [
-                Plot.text([trace.points[trace.points.length - 1]!], {
+                Plot.text([lastOf(trace.points)], {
                   x: "x",
                   y: "y",
                   dx: 8,
@@ -2050,11 +2051,11 @@ export function distributionSpec(
   const iqr = q3 - q1;
   const lowFence = q1 - 1.5 * iqr;
   const highFence = q3 + 1.5 * iqr;
-  const whiskerLow = sorted.find((v) => v.value >= lowFence)?.value ?? sorted[0]!.value;
-  const whiskerHigh = [...sorted].reverse().find((v) => v.value <= highFence)?.value ?? sorted[sorted.length - 1]!.value;
+  const whiskerLow = sorted.find((v) => v.value >= lowFence)?.value ?? firstOf(sorted).value;
+  const whiskerHigh = [...sorted].reverse().find((v) => v.value <= highFence)?.value ?? lastOf(sorted).value;
 
-  const min = sorted[0]!.value;
-  const max = sorted[sorted.length - 1]!.value;
+  const min = firstOf(sorted).value;
+  const max = lastOf(sorted).value;
   const span = max - min || Math.abs(max) || 1;
   const pad = span * 0.03;
 
@@ -2074,8 +2075,8 @@ export function distributionSpec(
    * cannot be forgotten at a call site. The rule is dashed and in muted ink: it is a reference, not
    * a value, and must not be confused with the marker rule, which is solid, hued and full height.
    */
-  const min0 = sorted[0]!.value;
-  const max0 = sorted[sorted.length - 1]!.value;
+  const min0 = firstOf(sorted).value;
+  const max0 = lastOf(sorted).value;
   const crossesZero = min0 < 0 && max0 > 0;
   // Room under the strip for the label, and only where there is a label — the five unsigned strips
   // keep their exact geometry, which is what the six of them being one row apart depends on.
@@ -2193,8 +2194,8 @@ export function histogramSpec(
   format: (v: number) => string,
   options: { width: number },
 ): Spec {
-  const first = bins[0]!;
-  const last = bins[bins.length - 1]!;
+  const first = firstOf(bins);
+  const last = lastOf(bins);
   const crossesZero = first.from < 0 && last.to > 0;
 
   const side = (b: Bin) =>
@@ -2324,7 +2325,7 @@ export function fanSpec(
   const seam = Math.max(0, lastObserved);
   const observed = points.slice(0, seam + 1);
   const projected = points.slice(seam);
-  const last = points[points.length - 1]!;
+  const last = lastOf(points);
   // A band that never opens: for a district the guarantee pays, aid does not move with enrollment
   // at all. Not a degenerate chart to hide — the flat line is the finding — but two identical
   // bound labels stacked on each other would be noise.
@@ -2340,7 +2341,7 @@ export function fanSpec(
     marginLeft: 0,
     marginRight,
     dy: 18,
-    low: `FY${points[0]!.year}`,
+    low: `FY${firstOf(points).year}`,
     // The truncated axis, stated on the chart rather than in the caption underneath it. A reader
     // who takes the shape at face value has been misled by the time they reach prose.
     says: `axis starts at ${format(min)}, not zero`,
@@ -2355,7 +2356,7 @@ export function fanSpec(
       marginBottom: 26 + foot.extraBottom,
       marginLeft: 0,
       marginRight,
-      x: { axis: null, domain: [points[0]!.year, last.year] },
+      x: { axis: null, domain: [firstOf(points).year, last.year] },
       y: { axis: null, domain: [min, max] },
       marks: [
         ...(projected.length > 1
@@ -2564,8 +2565,8 @@ export function seriesSpec(
     options.reference ? [...values, options.reference.value] : values,
   );
 
-  const first = points[0]!;
-  const last = points[points.length - 1]!;
+  const first = firstOf(points);
+  const last = lastOf(points);
   // The direct label goes on the last year that has a value, which is not necessarily the last
   // year: a series ending in a gap would otherwise be labelled at a point it does not occupy.
   const endOf = (key: "a" | "b") => [...points].reverse().find((p) => p[key] != null);

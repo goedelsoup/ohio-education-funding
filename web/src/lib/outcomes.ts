@@ -18,17 +18,18 @@
 import type { Bar } from "./chart.ts";
 import { barSpec, distributionSpec, type Drawing, draws, scatterSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
-import { count, escapeHtml, money, pct } from "./format.ts";
+import { count, escapeHtml, fixed, money, pct, signed } from "./format.ts";
 import type { Bundle, District, OutcomeStatewide } from "./types.ts";
 import { schoolYearBefore, seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
 import { term } from "./glossary.ts";
 import { anchor } from "./section.ts";
 import { median, quintiles } from "./stats.ts";
 import { bands, medianTrace, pairs } from "./relationships.ts";
+import { firstOf, lastOf } from "./ends.ts";
 
 /** A correlation, signed and to three places. */
 function coefficient(v: number): string {
-  return (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(3);
+  return signed(v, 3);
 }
 
 /** Districts grouped into fifths by poverty, poorest last. */
@@ -70,8 +71,8 @@ export function renderOutcomes(bundle: Bundle): string {
     .filter((v): v is number => v != null)
     .sort((a, b) => a - b);
   const saturated = onCeiling.length;
-  const saturatedLow = (ceilingScores[0] ?? 0).toFixed(1);
-  const saturatedHigh = (ceilingScores[ceilingScores.length - 1] ?? 0).toFixed(1);
+  const saturatedLow = fixed(ceilingScores[0] ?? 0, 1);
+  const saturatedHigh = fixed(ceilingScores[ceilingScores.length - 1] ?? 0, 1);
   const saturatedShare = pct(
     (Number(saturatedHigh) - Number(saturatedLow)) /
       ((allScores[allScores.length - 1] ?? 1) - (allScores[0] ?? 0)),
@@ -93,7 +94,7 @@ export function renderOutcomes(bundle: Bundle): string {
     (d) => (d.economically_disadvantaged == null ? null : d.economically_disadvantaged * 100),
     perf,
     (d, poverty, index) =>
-      `${d.name}: ${poverty.toFixed(0)}% economically disadvantaged, Performance Index ${index.toFixed(1)}`,
+      `${d.name}: ${fixed(poverty, 0)}% economically disadvantaged, Performance Index ${fixed(index, 1)}`,
   );
   const povertyTrace = medianTrace(
     povertyPoints.map((p) => ({ x: p.x, y: p.y })),
@@ -105,8 +106,8 @@ export function renderOutcomes(bundle: Bundle): string {
     scatterSpec(
       povertyPoints,
       {
-        x: { label: "economically disadvantaged share", format: (v) => `${v.toFixed(0)}%` },
-        y: { label: "Performance Index", format: (v) => v.toFixed(0) },
+        x: { label: "economically disadvantaged share", format: (v) => `${fixed(v, 0)}%` },
+        y: { label: "Performance Index", format: (v) => fixed(v, 0) },
       },
       [povertyTrace],
       { width: w },
@@ -155,7 +156,7 @@ export function renderOutcomes(bundle: Bundle): string {
       x,
       perf,
       (d, dollars, index) =>
-        `${d.name}: ${money(dollars)} ${label}, Performance Index ${index.toFixed(1)}, ${pct(d.economically_disadvantaged ?? 0, 0)} economically disadvantaged`,
+        `${d.name}: ${money(dollars)} ${label}, Performance Index ${fixed(index, 1)}, ${pct(d.economically_disadvantaged ?? 0, 0)} economically disadvantaged`,
       { band: (d) => povertyBands.get(d) },
     );
 
@@ -175,7 +176,7 @@ export function renderOutcomes(bundle: Bundle): string {
         points,
         {
           x: { label: `spending per ${label}`, format: (v) => money(v) },
-          y: { label: "Performance Index", format: (v) => v.toFixed(0) },
+          y: { label: "Performance Index", format: (v) => fixed(v, 0) },
         },
         traces,
         { width: w, height: 330, xDomain: spendingDomain },
@@ -195,7 +196,7 @@ export function renderOutcomes(bundle: Bundle): string {
     return median(values);
   };
   const bandMedians = [0, 1, 2].map((b) =>
-    bandMedian(b, (d) => d.outcome?.performance_index).toFixed(1),
+    fixed(bandMedian(b, (d) => d.outcome?.performance_index), 1),
   );
   const enrolledGap = Math.round(
     bandMedian(2, (d) => d.outcome?.per_enrolled_pupil) -
@@ -232,9 +233,9 @@ export function renderOutcomes(bundle: Bundle): string {
       <h2>${anchor("guarantee-trap")}The guarantee is that trap, exactly${yearChipPair("outcome.performance", "formula", "guarantee")}</h2>
       <div class="scroll"><table><tbody>
         <tr><th>Median Performance Index, districts on the guarantee</th>
-            <td class="tnum">${o.median_performance_on_guarantee.toFixed(1)}</td></tr>
+            <td class="tnum">${fixed(o.median_performance_on_guarantee, 1)}</td></tr>
         <tr><th>Median Performance Index, districts on the formula</th>
-            <td class="tnum">${o.median_performance_on_formula.toFixed(1)}</td></tr>
+            <td class="tnum">${fixed(o.median_performance_on_formula, 1)}</td></tr>
         <tr><th>Guarantee status against the Performance Index</th>
             <td class="tnum">${coefficient(o.guarantee_vs_performance)}</td></tr>
         <tr><th>The same, holding poverty constant</th>
@@ -397,7 +398,7 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
     distributionSpec(
       peers.map((d) => ({
         value: d.outcome!.performance_index!,
-        hover: `${d.name}: Performance Index ${d.outcome!.performance_index!.toFixed(1)}, ${pct(d.economically_disadvantaged!, 0)} economically disadvantaged`,
+        hover: `${d.name}: Performance Index ${fixed(d.outcome!.performance_index!, 1)}, ${pct(d.economically_disadvantaged!, 0)} economically disadvantaged`,
       })),
       { width: w, marker },
     );
@@ -407,17 +408,17 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
       <h2>${anchor("comparable-poverty")}Against districts with comparable poverty${yearChip("outcome.performance")}</h2>
       <div class="tiles">
         <div class="tile"><div class="k">This district</div>
-          <div class="v">${o.performance_index.toFixed(1)}</div>
+          <div class="v">${fixed(o.performance_index, 1)}</div>
           <div class="n">${term("performance-index", "Performance Index")}, ${
             seriesYear("outcome.performance")?.label ?? ""
           }</div></div>
         <div class="tile"><div class="k">Median of its poverty fifth</div>
-          <div class="v">${peerMedian.toFixed(1)}</div>
+          <div class="v">${fixed(peerMedian, 1)}</div>
           <div class="n">${count(peers.length)} districts in the ${escapeHtml(label)},
-            ${pct(povertyRange[0]!, 0)}–${pct(povertyRange[povertyRange.length - 1]!, 0)}
+            ${pct(firstOf(povertyRange), 0)}–${pct(lastOf(povertyRange), 0)}
             economically disadvantaged</div></div>
         <div class="tile"><div class="k">Difference</div>
-          <div class="v">${gap >= 0 ? "+" : "−"}${Math.abs(gap).toFixed(1)}</div>
+          <div class="v">${signed(gap, 1)}</div>
           <div class="n">points, against like-composed districts</div></div>
       </div>
       ${
@@ -428,8 +429,8 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
              the width of this box says it is worth.</p>
              <div class="chartwrap" data-chart="peer-group">${renderToString(peerBox, { label: `Performance Index across the ${count(peers.length)} districts in the ${label}, with ${district.name} marked, ${seriesYear("outcome.performance")?.label ?? ""}` })}</div>
              <div class="scale">
-               <span>${scores[0]!.toFixed(1)}</span>
-               <span>${scores[scores.length - 1]!.toFixed(1)}</span>
+               <span>${fixed(firstOf(scores), 1)}</span>
+               <span>${fixed(lastOf(scores), 1)}</span>
              </div>`
           : ""
       }
@@ -481,7 +482,7 @@ function growthNote(
   const determinate = Math.abs(threeYear) >= 0.005 && Math.abs(oneYear) >= 0.005;
   const disagree = determinate && threeYear > 0 !== oneYear > 0;
   const context = statewide
-    ? `Statewide the two correlate at ${statewide.growth_measure_agreement.toFixed(2)}, and of the
+    ? `Statewide the two correlate at ${fixed(statewide.growth_measure_agreement, 2)}, and of the
        ${count(statewide.growth_measures_determinate)} districts printing a non-zero value on
        both, ${count(statewide.growth_measures_disagree)} point opposite ways — none of them with
        both magnitudes above 0.05.`
@@ -490,8 +491,8 @@ function growthNote(
   return `<p class="note">${
     disagree
       ? `<strong>The two growth measures point opposite ways for this district.</strong> Over
-         three years its effect size is ${threeYear.toFixed(2)}; over one year it is
-         ${oneYear.toFixed(2)}. Both are published by the department for the same year, and only
+         three years its effect size is ${fixed(threeYear, 2)}; over one year it is
+         ${fixed(oneYear, 2)}. Both are published by the department for the same year, and only
          the three-year figure appears anywhere else on this site. Read it as neither: a district
          this close to zero on both measures has no growth signal in either direction, and the
          sign is the arbitrary part. ${context}`
@@ -500,8 +501,8 @@ function growthNote(
             Math.abs(threeYear) < 0.005 ? "0.00 over three years" : "0.00 over one year"
           }, which at two decimals covers anything within half a hundredth of zero and has no
            direction to read. ${context}`
-        : `Both growth measures point the same way here (${threeYear.toFixed(2)} over three years,
-           ${oneYear.toFixed(2)} over one). ${context} This site uses the three-year figure
+        : `Both growth measures point the same way here (${fixed(threeYear, 2)} over three years,
+           ${fixed(oneYear, 2)} over one). ${context} This site uses the three-year figure
            throughout, because a single year of value-added is noisy enough that the department
            smooths it deliberately.`
   }</p>`;
@@ -544,30 +545,26 @@ export function renderDistrictOutcome(
           .map(
             ([year, value]) =>
               `<tr><th>Performance Index, ${year}</th><td class="tnum">${
-                value == null ? "—" : value.toFixed(1)
+                fixed(value, 1)
               }</td></tr>`,
           )
           .join("")}
         <tr><th>Progress, three-year average<div class="n">The department's headline growth
               measure, and the one every correlation on this site uses.</div></th>
-            <td class="tnum">${o.progress_effect_size == null ? "—" : o.progress_effect_size.toFixed(2)}</td></tr>
+            <td class="tnum">${fixed(o.progress_effect_size, 2)}</td></tr>
         <tr><th>Progress, one year<div class="n">The same measure without the smoothing, also
               published.</div></th>
-            <td class="tnum">${
-              o.progress_effect_size_one_year == null
-                ? "—"
-                : o.progress_effect_size_one_year.toFixed(2)
-            }</td></tr>
+            <td class="tnum">${fixed(o.progress_effect_size_one_year, 2)}</td></tr>
         <tr><th>Operating spending per enrolled pupil</th>
             <td>${money(o.per_enrolled_pupil)}</td></tr>
         <tr><th>Operating spending per need-weighted pupil</th>
             <td>${money(o.per_equivalent_pupil)}</td></tr>
         <tr><th>Economically disadvantaged (report card)</th>
-            <td>${o.economically_disadvantaged == null ? "—" : `${o.economically_disadvantaged.toFixed(1)}%`}</td></tr>
+            <td>${o.economically_disadvantaged == null ? "—" : `${fixed(o.economically_disadvantaged, 1)}%`}</td></tr>
         <tr><th>English learners</th>
-            <td>${o.english_learner == null ? "—" : `${o.english_learner.toFixed(1)}%`}</td></tr>
+            <td>${o.english_learner == null ? "—" : `${fixed(o.english_learner, 1)}%`}</td></tr>
         <tr><th>Students with disabilities</th>
-            <td>${o.students_with_disabilities == null ? "—" : `${o.students_with_disabilities.toFixed(1)}%`}</td></tr>
+            <td>${o.students_with_disabilities == null ? "—" : `${fixed(o.students_with_disabilities, 1)}%`}</td></tr>
       </tbody></table></div>
       <p class="note">The Performance Index is close to a fixed district trait across these three
         years, which is why a change in funding is unlikely to show up in it. Progress is the

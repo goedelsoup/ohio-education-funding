@@ -22,6 +22,7 @@ import { forecastPath, growthPrior, statuteNote } from "./project.ts";
 import type { Draft, Panel, PanelDistrict } from "./types.ts";
 import * as routes from "./routes.ts";
 import { heading } from "./section.ts";
+import { firstOf, lastOf } from "./ends.ts";
 
 /**
  * The default horizon, in years past the last observation.
@@ -373,8 +374,8 @@ export function renderProjection(bundle: Panel, levers: Levers, chip = ""): stri
     prior,
     model,
   );
-  const end = path[path.length - 1]!;
-  const start = path[0]!;
+  const end = lastOf(path);
+  const start = firstOf(path);
   // The seam, not the first point: the forecast departs from the last observed year, and that is
   // the enrollment the projected one should be read against.
   const seam = path.filter((p) => p.observed).at(-1) ?? start;
@@ -394,7 +395,7 @@ export function renderProjection(bundle: Panel, levers: Levers, chip = ""): stri
     prior,
     model,
   );
-  const referenceEnd = reference[reference.length - 1]!;
+  const referenceEnd = lastOf(reference);
   const referenceWidth =
     (referenceEnd.high - referenceEnd.low) / (2 * referenceEnd.realizedAid);
   const moved = Math.abs(width - referenceWidth) > 0.0005;

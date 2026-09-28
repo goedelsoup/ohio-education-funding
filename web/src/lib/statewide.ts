@@ -3,7 +3,7 @@
 import type { Bar } from "./chart.ts";
 import { barSpec, type Drawing, scatterSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
-import { count, escapeHtml, fig, millions, money, pct } from "./format.ts";
+import { count, escapeHtml, fig, fixed, millions, money, pct } from "./format.ts";
 import { realChange, series, type Basis } from "./real.ts";
 import * as routes from "./routes.ts";
 import type { TaxStatewide } from "./feed.ts";
@@ -12,6 +12,7 @@ import { median, quintiles } from "./stats.ts";
 import { seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
 import { anchor } from "./section.ts";
 import { medianTrace, pairs } from "./relationships.ts";
+import { firstOf, lastOf } from "./ends.ts";
 
 /**
  * The financial actuals, statewide, in both bases.
@@ -28,8 +29,8 @@ export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
   const actuals = bundle.statewide.finances;
   if (actuals.length === 0) return "";
   const { years, converted, base } = series(bundle.deflator, actuals, basis);
-  const first = years[0]!;
-  const latest = years[years.length - 1]!;
+  const first = firstOf(years);
+  const latest = lastOf(years);
   // Each statewide figure is a sum over the districts that reported the line, so it is null only
   // if none of them did — which has never happened, and would be a fact about the panel rather
   // than about the state. Handled rather than asserted: the card degrades to "—" instead of
@@ -49,8 +50,8 @@ export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
       ? null
       : latest.ending_cash / latest.total_expenditure;
   const realAid = realChange(bundle.deflator, actuals, (y) => y.state_aid);
-  const firstAid = actuals[0]!.state_aid;
-  const lastAid = actuals[actuals.length - 1]!.state_aid;
+  const firstAid = firstOf(actuals).state_aid;
+  const lastAid = lastOf(actuals).state_aid;
   const nominalAid = lastAid == null || firstAid == null || firstAid <= 0 ? null : lastAid / firstAid - 1;
 
   const bars: Bar[] = held.map((y) => ({
@@ -62,8 +63,8 @@ export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
       : {}),
   }));
 
-  const nominalFirstCash = actuals[0]!.ending_cash;
-  const nominalLastCash = actuals[actuals.length - 1]!.ending_cash;
+  const nominalFirstCash = firstOf(actuals).ending_cash;
+  const nominalLastCash = lastOf(actuals).ending_cash;
   const nominalCashChange =
     nominalLastCash == null || !nominalFirstCash ? null : nominalLastCash / nominalFirstCash - 1;
 
@@ -82,7 +83,7 @@ export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
           <div class="n">${
             yearsOfSpending == null
               ? "no spending reported"
-              : `${yearsOfSpending.toFixed(2)} years of spending at this rate`
+              : `${fixed(yearsOfSpending, 2)} years of spending at this rate`
           }</div></div>
         <div class="tile"><div class="k">Change since FY${first.fiscal_year}</div>
           <div class="v ${cashChange != null && cashChange < 0 ? "loss" : "gain"}">${millions(cashChange)}</div>
@@ -184,7 +185,7 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
    */
   const years = bundle.districts[0]?.property_tax.slice(-2) ?? [];
   const taxSpan =
-    years.length === 2 ? `TY${years[0]!.tax_year} and TY${years[1]!.tax_year}` : "the two tax years";
+    years.length === 2 ? `TY${firstOf(years).tax_year} and TY${years[1]!.tax_year}` : "the two tax years";
 
   const s = bundle.statewide;
   const bars = guaranteeRateByQuintile(bundle.districts);
@@ -283,14 +284,14 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
         wealthy districts least, and the guarantee is what stops it. Which districts those are is
         the card above this one. Read as correlations against
         valuation per pupil, the formula alone reaches
-        <strong>${s.wealth_neutrality_formula.toFixed(3)}</strong> and what districts receive
-        reaches <strong>${s.wealth_neutrality_realized.toFixed(3)}</strong>; a perfectly
+        <strong>${fixed(s.wealth_neutrality_formula, 3)}</strong> and what districts receive
+        reaches <strong>${fixed(s.wealth_neutrality_realized, 3)}</strong>; a perfectly
         compensating formula would be strongly negative.</p>
       <div class="scroll"><table><tbody>
         <tr><th>Aid vs. wealth — formula only</th>
-            <td class="tnum">${s.wealth_neutrality_formula.toFixed(3)}</td></tr>
+            <td class="tnum">${fixed(s.wealth_neutrality_formula, 3)}</td></tr>
         <tr><th>Aid vs. wealth — as received</th>
-            <td class="tnum">${s.wealth_neutrality_realized.toFixed(3)}</td></tr>
+            <td class="tnum">${fixed(s.wealth_neutrality_realized, 3)}</td></tr>
         <tr><th>Districts drawn</th>
             <td class="tnum">${count(points.length)}</td></tr>
       </tbody></table></div>
@@ -330,8 +331,8 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
       <p class="note"><strong>And the size of it: the median district has lost
         ${pct(s.median_millage_reduction, 0)} of the millage its voters approved.</strong> The
         median voted current operating rate is
-        ${s.median_voted_millage.toFixed(2)} mills; the median rate anyone pays is
-        ${s.median_effective_millage.toFixed(2)}. Nobody decided that. It is reduction factors
+        ${fixed(s.median_voted_millage, 2)} mills; the median rate anyone pays is
+        ${fixed(s.median_effective_millage, 2)}. Nobody decided that. It is reduction factors
         applied a hundredth of a mill at a time across the life of every levy, which is why a
         district can pass a levy, watch its tax base grow, and still return to the ballot.</p>
       <p class="note">Real property tax charged for current expenses is a median

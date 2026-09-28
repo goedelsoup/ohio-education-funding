@@ -53,12 +53,13 @@
  * it renders cannot disagree; the number above is here to be read, not to be trusted.
  */
 
-import { escapeHtml, pct } from "./format.ts";
+import { count, escapeHtml, fixed, pct } from "./format.ts";
 import { seriesSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import type { MealProgramYear } from "./types.ts";
 import { yearChip } from "./year.ts";
 import { anchor } from "./section.ts";
+import { firstOf, lastOf } from "./ends.ts";
 
 /** The years the report is one file, and so the years a single share exists for. */
 export function singleStream(meal: MealProgramYear[]): MealProgramYear[] {
@@ -115,8 +116,8 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
   const split = splitStream(meal);
   if (single.length < 2) return "";
 
-  const first = single[0]!;
-  const last = single[single.length - 1]!;
+  const first = firstOf(single);
+  const last = lastOf(single);
   const change = basisChange(single);
   const end = split[split.length - 1];
   /** The Octobers the feed marks as not a reading of the state. See `splitStream`. */
@@ -127,11 +128,11 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
       seriesSpec(
         splitByBasis(meal),
         { a: "on ADM", b: "on CE" },
-        (v) => `${v.toFixed(0)}%`,
+        (v) => `${fixed(v, 0)}%`,
         (p) => {
           const value = p.a ?? p.b;
           if (value == null) return `FY${p.at}`;
-          return `FY${p.at}: ${value.toFixed(1)}% ${p.a != null ? "of ADM" : "of CE count"}`;
+          return `FY${p.at}: ${fixed(value, 1)}% ${p.a != null ? "of ADM" : "of CE count"}`;
         },
         { width: w, tick: (year) => `FY${year}` },
       ),
@@ -232,8 +233,8 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
             return rule + `<tr>
               <th>FY${y.fiscal_year}</th>
               <td class="tnum n">${y.sponsors}</td>
-              <td class="tnum n">${Math.round(y.enrollment).toLocaleString("en-US")}</td>
-              <td class="tnum n">${Math.round(y.approved).toLocaleString("en-US")}</td>
+              <td class="tnum n">${count(Math.round(y.enrollment))}</td>
+              <td class="tnum n">${count(Math.round(y.approved))}</td>
               <td class="tnum">${
                 !y.comparable
                   ? "not the state"

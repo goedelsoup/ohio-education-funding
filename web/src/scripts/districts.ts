@@ -7,6 +7,7 @@
  * rather than an empty page and a spinner.
  */
 
+import { count } from "../lib/format.ts";
 import { compare } from "../lib/order.ts";
 
 const table = document.querySelector<HTMLTableElement>("#district-table");
@@ -46,8 +47,8 @@ if (table && body && nameInput && statusSelect && countOut) {
     }
     countOut!.textContent =
       shown === rows.length
-        ? `${rows.length.toLocaleString("en-US")} districts`
-        : `${shown.toLocaleString("en-US")} of ${rows.length.toLocaleString("en-US")} districts`;
+        ? `${count(rows.length)} districts`
+        : `${count(shown)} of ${count(rows.length)} districts`;
   }
 
   nameInput.addEventListener("input", applyFilters);

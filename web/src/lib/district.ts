@@ -17,6 +17,7 @@ import { renderToString } from "./plot/ssr.ts";
 import {
   count,
   escapeHtml,
+  fixed,
   logError,
   money,
   ordinal,
@@ -39,6 +40,7 @@ import type { Bar } from "./chart.ts";
 import type { Bundle, District, Statewide } from "./types.ts";
 import { seriesSpanEnd, yearChip, yearOf } from "./year.ts";
 import { anchor } from "./section.ts";
+import { firstOf, lastOf } from "./ends.ts";
 
 function strip(
   label: string,
@@ -128,7 +130,7 @@ export function renderEnrollmentYears(
     adm: o.value,
     aid: apply(d, law, publishedStatewide(model), o.value, model).realizedAid,
   }));
-  const latest = rows[rows.length - 1]!;
+  const latest = lastOf(rows);
   const prior = rows[rows.length - 2]!;
   const change = latest.aid - prior.aid;
   const admChange = latest.adm - prior.adm;
@@ -261,7 +263,7 @@ function renderCarriedForward(bundle: Bundle, d: District): string {
     growthPrior(bundle.districts, meta.z),
     model,
   );
-  const end = path[path.length - 1]!;
+  const end = lastOf(path);
   const insensitive = end.high - end.low < Math.max(1, end.realizedAid * 0.0005);
   const points: FanPoint[] = path.map((p) => ({
     year: p.fiscalYear,
@@ -387,8 +389,8 @@ const CASINO_SINGLE_COUNTY_DISTRICTS = 178;
 export function renderActuals(bundle: Bundle, d: District, basis: Basis): string {
   if (d.finances.length === 0) return "";
   const { years: shown, converted, base } = series(bundle.deflator, d.finances, basis);
-  const first = shown[0]!;
-  const latest = shown[shown.length - 1]!;
+  const first = firstOf(shown);
+  const latest = lastOf(shown);
   const cashChange =
     latest.ending_cash == null || first.ending_cash == null
       ? null
@@ -406,9 +408,9 @@ export function renderActuals(bundle: Bundle, d: District, basis: Basis): string
   const deficits = comparable.filter((y) => y.total_expenditure! > y.total_revenue!).length;
   const realAid = realChange(bundle.deflator, d.finances, (y) => y.state_aid);
   const nominalAid =
-    d.finances[d.finances.length - 1]!.state_aid == null || (d.finances[0]!.state_aid ?? 0) <= 0
+    lastOf(d.finances).state_aid == null || (firstOf(d.finances).state_aid ?? 0) <= 0
       ? null
-      : d.finances[d.finances.length - 1]!.state_aid! / d.finances[0]!.state_aid! - 1;
+      : lastOf(d.finances).state_aid! / firstOf(d.finances).state_aid! - 1;
 
   // Years with no reported balance are left out of the chart rather than drawn at zero, and
   // named under it. A bar of length nothing is a claim that the district held nothing.
@@ -438,7 +440,7 @@ export function renderActuals(bundle: Bundle, d: District, basis: Basis): string
           <div class="n">${
             yearsOfSpending == null
               ? "no spending reported"
-              : `${yearsOfSpending.toFixed(2)} years of spending at this rate`
+              : `${fixed(yearsOfSpending, 2)} years of spending at this rate`
           }</div></div>
         <div class="tile"><div class="k">Change since FY${first.fiscal_year}</div>
           <div class="v ${cashChange != null && cashChange < 0 ? "loss" : "gain"}">${signedMoney(cashChange)}</div>
@@ -728,10 +730,10 @@ function renderHoldHarmless(d: District): string {
           clawback
             ? `<tr class="current"><th>Open-enrolment clawback</th>
                 <td class="tnum">&minus;${money(t.open_enrollment_adjustment)}</td>
-                <td class="n">Its open enrolment fell ${lost.toFixed(1)} FTE against a threshold of
-                  ${t.open_enrollment_threshold.toFixed(1)}, and the guarantee is cut by
+                <td class="n">Its open enrolment fell ${fixed(lost, 1)} FTE against a threshold of
+                  ${fixed(t.open_enrollment_threshold, 1)}, and the guarantee is cut by
                   ${money(8241.61)} — the statewide average base cost per pupil — for each of the
-                  ${beyond.toFixed(1)} FTE beyond it.</td></tr>`
+                  ${fixed(beyond, 1)} FTE beyond it.</td></tr>`
             : ""
         }
         <tr><th>Guarantee</th><td class="tnum">${
@@ -985,7 +987,7 @@ function renderSpecialEducation(d: District): string {
           .map(
             (r) => `<tr${r.category === biggest?.category ? ' class="current"' : ""}>
               <th>Category ${r.category}</th>
-              <td class="tnum">${r.weight.toFixed(4)}</td>
+              <td class="tnum">${fixed(r.weight, 4)}</td>
               <td class="tnum">${count(Math.round(r.adm))}</td>
               <td class="tnum">${money(r.aid)}</td>
               <td class="tnum n">${pct(r.adm / pupils, 1)}</td>
@@ -1062,7 +1064,7 @@ function renderTargetedAssistance(d: District, statewide: Statewide): string {
           <td class="n">The other 40%. Wealth here is property <em>and</em> income.</td></tr>
         <tr class="current"><th>Weighted wealth</th><td class="tnum">${money(t.weighted_wealth)}</td>
           <td class="n">The blend of the two.</td></tr>
-        <tr><th>Capacity index</th><td class="tnum">${t.capacity_index.toFixed(4)}</td>
+        <tr><th>Capacity index</th><td class="tnum">${fixed(t.capacity_index, 4)}</td>
           <td class="n">The median district's total wealth over this one's. Above 1 is poorer.</td></tr>
         <tr${t.capacity_amount <= 0 ? ' class="n"' : ""}><th>Capacity amount</th>
           <td class="tnum">${t.capacity_amount <= 0 ? "—" : money(t.capacity_amount)}</td>
@@ -1084,7 +1086,7 @@ function renderTargetedAssistance(d: District, statewide: Statewide): string {
                 } than it enrols`
               : ""
           }.</td></tr>
-        <tr><th>Wealth index</th><td class="tnum">${t.wealth_index.toFixed(4)}</td>
+        <tr><th>Wealth index</th><td class="tnum">${fixed(t.wealth_index, 4)}</td>
           <td class="n">${money(medianPerPupil)} over that. Below 0.8 the tier pays nothing.</td></tr>
         <tr${t.wealth_amount <= 0 ? ' class="n"' : ""}><th>Wealth amount</th>
           <td class="tnum">${t.wealth_amount <= 0 ? "—" : money(t.wealth_amount)}</td>
@@ -1175,10 +1177,8 @@ function renderDpia(d: District): string {
           <td class="n">The 65/35 mix. This is the number the money is paid on.</td></tr>
         <tr><th>As a share of enrolment</th><td class="tnum">${pct(p.percentage, 2)}</td>
           <td class="n">Against a statewide ${pct(statewideShare, 2)}.</td></tr>
-        <tr class="current"><th>Index</th><td class="tnum">${p.index.toFixed(4)}</td>
-          <td class="n">That share over the state's, <strong>squared</strong> — ${linear.toFixed(
-            4,
-          )} before squaring.</td></tr>
+        <tr class="current"><th>Index</th><td class="tnum">${fixed(p.index, 4)}</td>
+          <td class="n">That share over the state's, <strong>squared</strong> — ${fixed(linear, 4)} before squaring.</td></tr>
         <tr class="current"><th>Disadvantaged Pupil Impact Aid</th>
           <td class="tnum">${money(total)}</td>
           <td class="n">$422 per weighted pupil, scaled by the index.</td></tr>
@@ -1190,9 +1190,9 @@ function renderDpia(d: District): string {
       would. ${
         p.index > 1
           ? `This district is above the state's rate, so the squaring works in its favour: its
-             index is ${p.index.toFixed(2)} where a linear one would be ${linear.toFixed(2)}.`
+             index is ${fixed(p.index, 2)} where a linear one would be ${fixed(linear, 2)}.`
           : `This district is below the state's rate, so the squaring works against it: its index
-             is ${p.index.toFixed(2)} where a linear one would be ${linear.toFixed(2)}.`
+             is ${fixed(p.index, 2)} where a linear one would be ${fixed(linear, 2)}.`
       }</p>`;
 }
 
@@ -1248,8 +1248,8 @@ function renderGifted(d: District): string {
               earned < floor - 1e-9 || awarded < earned - 1e-9 ? ' class="current"' : ""
             }>
               <th>${escapeHtml(label)}</th>
-              <td class="tnum">${awarded.toFixed(4)}</td>
-              <td class="tnum n">${earned.toFixed(4)}</td>
+              <td class="tnum">${fixed(awarded, 4)}</td>
+              <td class="tnum n">${fixed(earned, 4)}</td>
               <td class="tnum">${money(aid)}</td>
               <td class="n">${money(price)} each — ${escapeHtml(note)}.</td>
             </tr>`,
@@ -1274,7 +1274,7 @@ function renderGifted(d: District): string {
            move when its gifted enrolment does.`
         : atTheCap
           ? `This district is at the <strong>eight-coordinator cap</strong>. Its enrolment earns
-             ${(d.categorical_adm / 3300).toFixed(2)} units and it is paid for eight, so unlike
+             ${fixed(d.categorical_adm / 3300, 2)} units and it is paid for eight, so unlike
              most of Ohio its coordinator line is a ceiling rather than a floor. Three districts
              are in that position.`
           : `Every unit here is earned rather than floored or capped.`
@@ -1321,17 +1321,17 @@ function renderCareerTechnical(d: District): string {
           .map(
             (r) => `<tr>
               <th>Category ${r.category}</th>
-              <td class="tnum">${r.weight.toFixed(4)}</td>
-              <td class="tnum">${r.fte.toFixed(2)}</td>
+              <td class="tnum">${fixed(r.weight, 4)}</td>
+              <td class="tnum">${fixed(r.fte, 2)}</td>
               <td class="tnum">${money(r.aid)}</td>
             </tr>`,
           )
           .join("")}
         <tr><th>Associated services</th><td class="tnum">0.0294</td>
-          <td class="tnum n">${fte.toFixed(2)}</td>
+          <td class="tnum n">${fixed(fte, 2)}</td>
           <td class="tnum">${money(c.associated_services)}</td></tr>
         <tr class="current"><th>Career-technical education</th><td class="tnum n">—</td>
-          <td class="tnum">${fte.toFixed(2)}</td><td class="tnum">${money(total)}</td></tr>
+          <td class="tnum">${fixed(fte, 2)}</td><td class="tnum">${money(total)}</td></tr>
       </tbody>
     </table></div>
     <p class="note">These weights multiply a <strong>career-technical</strong> base cost of
@@ -1390,14 +1390,14 @@ function renderEnglishLearners(d: District): string {
           .map(
             (r) => `<tr>
               <th>Category ${r.category}</th>
-              <td class="tnum">${r.weight.toFixed(4)}</td>
-              <td class="tnum">${r.adm.toFixed(2)}</td>
+              <td class="tnum">${fixed(r.weight, 4)}</td>
+              <td class="tnum">${fixed(r.adm, 2)}</td>
               <td class="tnum">${money(r.aid)}</td>
             </tr>`,
           )
           .join("")}
         <tr class="current"><th>English learners</th><td class="tnum n">—</td>
-          <td class="tnum">${learners.toFixed(2)}</td><td class="tnum">${money(total)}</td></tr>
+          <td class="tnum">${fixed(learners, 2)}</td><td class="tnum">${money(total)}</td></tr>
       </tbody>
     </table></div>
     <p class="note">The weights <strong>descend</strong>. Category 1 is the most recently arrived
@@ -1465,9 +1465,9 @@ export function renderSupplements(d: District, statewide: Statewide): string {
             <td class="tnum">${s.performance <= 0 ? "—" : money(s.performance)}</td>
             <td class="n">${
               s.performance_eligible && rating != null
-                ? `$13 a pupil per rating point, on ${rating.toFixed(1)} — the greater of its
-                   ${s.stars?.toFixed(1) ?? "—"}-star overall rating and its
-                   ${s.progress?.toFixed(1) ?? "—"} progress rating. ${money(perPupil)} a pupil.`
+                ? `$13 a pupil per rating point, on ${fixed(rating, 1)} — the greater of its
+                   ${fixed(s.stars, 1)}-star overall rating and its
+                   ${fixed(s.progress, 1)} progress rating. ${money(perPupil)} a pupil.`
                 : `This district qualifies on none of the three routes: an overall rating above 3.5
                    stars, a progress rating of 3 or more, or a progress rating higher than the year
                    before.`
@@ -1548,8 +1548,8 @@ export function renderSupplements(d: District, statewide: Statewide): string {
  */
 export function renderCasino(bundle: Bundle, d: District): string {
   if (d.casino.length === 0) return "";
-  const first = d.casino[0]!;
-  const latest = d.casino[d.casino.length - 1]!;
+  const first = firstOf(d.casino);
+  const latest = lastOf(d.casino);
   const closure = d.casino.find((y) => y.fiscal_year === CASINO_CLOSURE_YEAR);
   const before = d.casino.find((y) => y.fiscal_year === CASINO_CLOSURE_YEAR - 1);
   const booked = d.finances.find((y) => y.fiscal_year === latest.fiscal_year);
@@ -1726,20 +1726,18 @@ function renderTransportation(d: District): string {
           <td class="tnum">${t.efficiency <= 0 ? "—" : money(t.efficiency)}</td>
           <td class="n">${
             t.efficiency > 0
-              ? `Up to 15% more for filling buses. Its index is ${t.efficiency_index.toFixed(4)}${
+              ? `Up to 15% more for filling buses. Its index is ${fixed(t.efficiency_index, 4)}${
                   t.efficiency_index >= 1.5 ? ", at the ceiling" : ""
                 }.`
-              : `Its riders-per-bus index of ${t.efficiency_index.toFixed(
-                  4,
-                )} is below the 1.0 this starts at.`
+              : `Its riders-per-bus index of ${fixed(t.efficiency_index, 4)} is below the 1.0 this starts at.`
           }</td></tr>
         <tr${t.density <= 0 ? ' class="n"' : ""}><th>Density supplement</th>
           <td class="tnum">${t.density <= 0 ? "—" : money(t.density)}</td>
           <td class="n">${
             t.density > 0
-              ? `Paid for sparseness: ${t.district_density.toFixed(1)} riders a square mile against
+              ? `Paid for sparseness: ${fixed(t.district_density, 1)} riders a square mile against
                  the 28 this counts down from.`
-              : `At ${t.district_density.toFixed(1)} riders a square mile it is above the
+              : `At ${fixed(t.district_density, 1)} riders a square mile it is above the
                  28 threshold, so this pays nothing.`
           }</td></tr>
         ${
@@ -1813,14 +1811,14 @@ function renderPreschoolSpecialEducation(d: District, statewide: Statewide): str
           .map(
             (r) => `<tr>
               <th>Category ${r.category}</th>
-              <td class="tnum">${(r.weight / 2).toFixed(4)}</td>
-              <td class="tnum">${r.adm.toFixed(2)}</td>
+              <td class="tnum">${fixed(r.weight / 2, 4)}</td>
+              <td class="tnum">${fixed(r.adm, 2)}</td>
               <td class="tnum">${money(r.aid)}</td>
             </tr>`,
           )
           .join("")}
         <tr class="current"><th>Preschool special education</th><td class="tnum n">—</td>
-          <td class="tnum">${pupils.toFixed(2)}</td><td class="tnum">${money(p.total)}</td></tr>
+          <td class="tnum">${fixed(pupils, 2)}</td><td class="tnum">${money(p.total)}</td></tr>
       </tbody>
     </table></div>
     <p class="note">Each pupil generates a <strong>flat ${money(4000)}</strong> whatever their
@@ -2064,9 +2062,9 @@ export function renderWhatThisIsNot(bundle: Bundle, d: District): string {
         d.casino.length > 0
           ? `<p class="note"><strong>And there is state money in neither.</strong> This district
              received ${money(
-               d.casino[d.casino.length - 1]!.amount,
+               lastOf(d.casino).amount,
              )} from the casino county student fund in
-             FY${d.casino[d.casino.length - 1]!.fiscal_year}. It is not an appropriation to the
+             FY${lastOf(d.casino).fiscal_year}. It is not an appropriation to the
              department, so no figure above computes it; it is booked outside the general fund, so
              no row on the finances route carries it either. It is on
              <a href="${routes.districtFinances(d.irn)}#casino">finances</a>, in a card of its

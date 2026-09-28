@@ -23,6 +23,7 @@ import { loadFeed } from "../feed.ts";
 import { acts, regimes } from "../legislation.ts";
 import { count, millions, pct } from "../format.ts";
 import type { Card } from "./card.ts";
+import { firstOf, lastOf } from "../ends.ts";
 
 /** The eyebrow every card wears unless it has a better one. */
 export const SITE = "Ohio school funding";
@@ -47,8 +48,8 @@ export function pageCards(): Record<string, Card> {
   const spanEnd =
     spans.length === 0
       ? 0
-      : (spans[spans.length - 1]!.to ?? Math.max(...statutes.map((a) => a.year)));
-  const spanStart = spans.length === 0 ? 0 : spans[0]!.from;
+      : (lastOf(spans).to ?? Math.max(...statutes.map((a) => a.year)));
+  const spanStart = spans.length === 0 ? 0 : firstOf(spans).from;
   const s = bundle.statewide;
   const fy = `FY${bundle.fiscal_year}`;
   const aid = millions(s.realized_aid_total).replace("+", "");

@@ -42,6 +42,7 @@
 
 import type { Bundle } from "./types.ts";
 import { seriesYear, type SeriesKey } from "./year.ts";
+import { firstOf, lastOf } from "./ends.ts";
 
 /** The pupil counts the sources use. Distinct measures, not variants of one. */
 export const DENOMINATORS = {
@@ -188,8 +189,8 @@ export function denominatorSpan(
 ): { first: number; last: number; firstYear: number; lastYear: number } | null {
   const rows = bundle[series];
   if (!rows || rows.length === 0) return null;
-  const first = rows[0]!;
-  const last = rows[rows.length - 1]!;
+  const first = firstOf(rows);
+  const last = lastOf(rows);
   return {
     first: first.sponsors,
     last: last.sponsors,

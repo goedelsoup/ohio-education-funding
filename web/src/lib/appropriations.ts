@@ -37,6 +37,7 @@ import { convert, type Basis } from "./real.ts";
 import type { AppropriationYear, Deflator } from "./types.ts";
 import { yearChip } from "./year.ts";
 import { anchor } from "./section.ts";
+import { firstOf, lastOf } from "./ends.ts";
 
 /** The years only the Catalog of Budget Line Items reaches. */
 export function fromCatalog(rows: AppropriationYear[]): number[] {
@@ -109,8 +110,8 @@ export function renderAppropriations(
   const shown = inBase(rows, deflator, base ?? 0, basis);
   if (shown.length < 2) return "";
 
-  const first = shown[0]!;
-  const last = shown[shown.length - 1]!;
+  const first = firstOf(shown);
+  const last = lastOf(shown);
   const multiple = growth(shown);
   const dropped = rows.length - shown.length;
   const catalogYears = fromCatalog(rows);

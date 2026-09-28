@@ -96,6 +96,40 @@ export function logError(v: number): string {
   return `${v < 0 ? "−" : "+"}${Math.abs(v).toFixed(4)}`;
 }
 
+/**
+ * A plain number to a fixed number of places: grouped, and with the minus the formatters above use.
+ *
+ * This is what `toFixed` was being asked to do in the renderers, and `toFixed` does neither half
+ * of it. It printed `-0.03` in the growth rows of 326 outcome pages, beside cells this file had
+ * formatted as `−$1,318`, and it printed Columbus's Category 2 pupils as `8376.39` in the cell
+ * beside `$1,115,773`. Millage, index values, effect sizes and FTE all come through here.
+ *
+ * Same sign rule as `money`: a magnitude that rounds away loses its sign, so `fixed(-0.001, 2)` is
+ * `0.00`.
+ */
+export function fixed(v: number | null | undefined, places: number): string {
+  if (v == null || !Number.isFinite(v)) return "—";
+  const text = decimal(places).format(Math.abs(v));
+  return (v < 0 && !roundsToZero(text) ? "−" : "") + text;
+}
+
+/**
+ * `fixed` with its sign always written, for a difference or a coefficient.
+ *
+ * A zero after rounding carries no sign, which is `signedMoney`'s rule: `+0.0000` would claim a
+ * direction the figure does not have.
+ */
+export function signed(v: number | null | undefined, places: number): string {
+  if (v == null || !Number.isFinite(v)) return "—";
+  const text = decimal(places).format(Math.abs(v));
+  if (roundsToZero(text)) return text;
+  return (v > 0 ? "+" : "−") + text;
+}
+
+function roundsToZero(text: string): boolean {
+  return Number(text.replace(/,/g, "")) === 0;
+}
+
 /** A count with thousands separators. */
 export function count(v: number): string {
   return WHOLE.format(v);
