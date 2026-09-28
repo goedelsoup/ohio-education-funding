@@ -918,7 +918,7 @@ parseable or not correct, and are worth fixing at the source rather than working
 The site is served at **<https://ohio-education-funding.pages.dev>** from Cloudflare Pages,
 project `ohio-education-funding`. Publishing is automatic: the `deploy` job in
 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs on every push to `main` that clears
-all three gates, and uploads the `dist/` the browser suite ran against rather than a rebuild of
+both build gates, and uploads the `dist/` the browser suite ran against rather than a rebuild of
 it, so what is served is what was tested.
 
 Publishing by hand is the escape hatch, and `mise run //:deploy` is the short form of it. The long
