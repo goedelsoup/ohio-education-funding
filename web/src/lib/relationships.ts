@@ -47,9 +47,9 @@ export function pairs(
      *
      * Taken as a function of the district rather than applied to the returned points, because the
      * points have already dropped whoever was missing a measure and recovering the district from a
-     * point's index means re-deriving that filter and trusting the two to agree. `attachHovers`
-     * exists because this repository does not trust that kind of index alignment even when it is
-     * someone else's renderer doing the aligning.
+     * point's index means re-deriving that filter and trusting the two to agree. `draw` checks its
+     * hover count because this repository does not trust that kind of index alignment even when
+     * it is someone else's renderer doing the aligning.
      */
     band?: (d: District) => number | undefined;
   },

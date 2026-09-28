@@ -16,7 +16,7 @@
  * files — is in `directory.spec.ts`, where a real network log is the only evidence available.
  */
 
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 import { describe, expect, test } from "vitest";
@@ -94,6 +94,32 @@ describe("module preloading", () => {
     expect(dangling.slice(0, 5), "a preload naming a file that is not there").toEqual([]);
     expect(duplicated.slice(0, 5), "a preload for a script the page already loads").toEqual([]);
     expect(undeclared.slice(0, 5), "an import the page never declared").toEqual([]);
+  });
+
+  test("a scenario route asks for the panel before it has downloaded Plot", () => {
+    /*
+     * #504. The runner draws with Observable Plot in the browser, and Plot and d3 are about 300 KB
+     * of it. Imported statically, all of that arrived and ran before the script could request the
+     * panel — two downloads in series where neither needs the other. `scenario-load.ts` imports
+     * the runner dynamically, so it is fetched beside the panel.
+     *
+     * Held as the bytes a page names in its HTML — its module scripts and its preloads, which the
+     * test above holds to the static import graph — because that is what arrives before the fetch
+     * can start. That included the 337,895 B runner on all three routes; it is under 8 KB now, and
+     * the bound is set where a return of the library could not hide under it.
+     */
+    for (const route of ["scenario.html", "reach.html", `district/${NORTHERN}/scenario.html`]) {
+      const html = readFileSync(join(DIST, route), "utf8");
+      const named = [
+        ...html.matchAll(/<script type="module" src="\/_astro\/([^"]+\.js)"/g),
+        ...html.matchAll(/<link rel="modulepreload" href="\/_astro\/([^"]+)"/g),
+      ].map((m) => m[1] ?? "");
+      expect(named.join(" "), `${route} loads the scenario entry`).toMatch(/scenario-load\./);
+      const bytes = named.reduce((sum, name) => sum + statSync(join(DIST, "_astro", name)).size, 0);
+      expect(bytes, `${route}: script it must download before asking for the panel`).toBeLessThan(
+        32_768,
+      );
+    }
   });
 });
 

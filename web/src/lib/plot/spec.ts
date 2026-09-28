@@ -10,7 +10,8 @@
  * one description of what each chart looks like and no chance of the interactive copy drifting
  * away from the static one.
  *
- * Nothing here touches a DOM, so it is testable without one.
+ * The builders touch no DOM, so they are testable without one. `draw` touches only the document
+ * it is handed, or the browser's where it is handed none.
  *
  * # The design rules these encode
  *
@@ -231,7 +232,7 @@ export function declareCursor(root: Element, hovers: Spec["hovers"]): string | n
   if (!layer) return null;
   /*
    * The alignment is checked here rather than asserted in a test over `dist/`, on the same
-   * argument `attachHovers` makes one function above: a pairing followed by index that does not
+   * argument `draw` makes about its hover text: a pairing followed by index that does not
    * line up brightens the *wrong* mark and looks entirely correct doing it. The build is where
    * that can be caught for all 3,506 pages at once.
    */
@@ -358,6 +359,97 @@ export type Drawing = (width: number) => Spec | null;
  */
 export function draws(drawing: Drawing): boolean {
   return drawing(WIDTHS.wide) != null;
+}
+
+/** Where a renderer's document comes from, and what it does with a hover layer that misaligns. */
+export interface Renderer {
+  /**
+   * The DOM Plot draws into. `ssr.ts` passes `linkedom`'s; the browser omits it and Plot uses the
+   * global one. That is the only reason there are two renderers.
+   */
+  document?: Document;
+  /**
+   * Called with a sentence when the hover text or the cursor's paired layer does not line up with
+   * what Plot drew. The build throws, so a misalignment cannot reach a reader; the browser drops
+   * the channel, because a chart that cannot pair its marks should lose its second channel rather
+   * than take the page down with it. Either way the misaligned pairing is never written.
+   */
+  onMisaligned: (message: string) => void;
+}
+
+/**
+ * One SVG element, at one width, or `null` where the builder declines the data.
+ *
+ * Both renderers are this function and a line either side of it, so the chart a slider redraws is
+ * put together by the same code as the one baked into the page.
+ *
+ * The hover text is put on each mark in data order, and the order is checked rather than trusted.
+ * Plot emits marks in the order it is given them, but that is an assumption about someone else's
+ * renderer: a mismatch means Plot dropped, filtered or reordered something, and tooltips attached
+ * by index would label the wrong quantities — worse than having none, because they would look
+ * right. Applied here rather than through Plot's `title` channel, which produces the browser's
+ * native tooltip: slow to appear, unstyleable, and unable to hold the two-clause sentences these
+ * charts need.
+ */
+export function draw(
+  build: Drawing,
+  naming: Naming,
+  width: number,
+  renderer: Renderer,
+): Element | null {
+  const spec = build(width);
+  if (!spec) return null;
+  const options = renderer.document
+    ? { ...BASE, ...spec.options, document: renderer.document }
+    : { ...BASE, ...spec.options };
+  const node = Plot.plot(options) as unknown as Element;
+  if (spec.hovers) {
+    const { selector, text } = spec.hovers;
+    const marks = node.querySelectorAll(selector);
+    if (marks.length !== text.length) {
+      renderer.onMisaligned(
+        `The hover layer does not line up with what Plot drew: ${text.length} values against ` +
+          `${marks.length} marks matching "${selector}". Attaching them by index would label ` +
+          `the wrong quantities.`,
+      );
+    } else {
+      marks.forEach((mark, index) => mark.setAttribute("data-hover", text[index]!));
+      const misaligned = declareCursor(node, spec.hovers);
+      if (misaligned) renderer.onMisaligned(misaligned);
+    }
+  }
+  applyNaming(node, naming);
+  return node;
+}
+
+/**
+ * A chart laid out at both {@link WIDTHS}, for the stylesheet to choose between.
+ *
+ * # Why two
+ *
+ * A static SVG has one layout and the stylesheet used to make it fit by scaling it. At 375px that
+ * scale is 0.46, which took the axis text to about 4.6px — see {@link WIDTHS} for why enlarging
+ * the type instead does not work. So the drawing is laid out twice, at the two widths it is
+ * actually shown at, and `app.css` picks with a container query. Both are in the document; the
+ * one the reader is not looking at is `display: none`, which also takes it out of the
+ * accessibility tree, so a screen reader is offered one chart rather than the same chart twice.
+ *
+ * `null` renders to nothing. A spec builder returns null when the data cannot support the form it
+ * was asked for — a fan chart of one observation, say — and an empty string is the honest output:
+ * better than an axis with a single mark on it, which would read as a finding. That decision is
+ * about the data and never about the width, so it is taken once, on the wide drawing, and the
+ * narrow one is not asked.
+ */
+export function pair(at: (width: number) => string): string {
+  const wide = at(WIDTHS.wide);
+  if (!wide) return "";
+  const narrow = at(WIDTHS.narrow);
+  return (
+    `<div class="chart-pair">` +
+    `<div class="chart-at" data-at="narrow">${narrow}</div>` +
+    `<div class="chart-at" data-at="wide">${wide}</div>` +
+    `</div>`
+  );
 }
 
 /**
@@ -604,7 +696,7 @@ export function barSpec(
       marks: [
         Plot.barX(bars, {
           y: "label",
-          // One mark, not two: `attachHovers` maps tooltips onto `.bar-fill > *` by index and
+          // One mark, not two: `draw` maps tooltips onto `.bar-fill > *` by index and
           // throws if the counts disagree, so splitting positives from negatives here would
           // reorder the marks out from under the hover layer.
           ...(signed
@@ -1867,7 +1959,7 @@ export function rankSpec(
         /*
          * One dot mark for every row, with the hue as a channel.
          *
-         * Split by subject the way the labels below are and `attachHovers` would index the wrong
+         * Split by subject the way the labels below are and `draw` would index the wrong
          * tooltip onto it: the cursor pairs `.rank-hit`'s children with `.rank-dot`'s by
          * position, and `declareCursor` refuses a chart where the two layers disagree in count.
          * `barSpec` takes the same channel for the same reason.

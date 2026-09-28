@@ -16,17 +16,9 @@
  * reason for a browser to have a second DOM implementation inside its first one.
  */
 
-import * as Plot from "@observablehq/plot";
 import { parseHTML } from "linkedom";
 
-import {
-  applyNaming,
-  BASE,
-  declareCursor,
-  type Drawing,
-  type Naming,
-  WIDTHS,
-} from "./spec.ts";
+import { draw, type Drawing, type Naming, pair } from "./spec.ts";
 
 /** Anything that looks like a baked-in colour: `#abc`, `#aabbcc`, `rgb(…)`, `hsl(…)`. */
 const LITERAL_COLOUR = /(#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\()/i;
@@ -57,71 +49,24 @@ function ensureThemeable(svg: string): string {
   return svg;
 }
 
-/**
- * Put `data-hover` on each rendered mark, in data order.
- *
- * Plot emits marks in the order it is given them, so index alignment holds — but that is an
- * assumption about someone else's renderer, so it is checked rather than trusted. A mismatch
- * means Plot dropped, filtered or reordered something, and tooltips attached by index would then
- * label the wrong quantities: worse than having none, because they would look right.
- *
- * Applied here rather than through Plot's `title` channel, which produces the browser's native
- * tooltip — slow to appear, unstyleable, and unable to hold the two-clause sentences these charts
- * need.
- */
-export function attachHovers(root: Element, selector: string, text: string[]): void {
-  const marks = root.querySelectorAll(selector);
-  if (marks.length !== text.length) {
-    throw new Error(
-      `The hover layer does not line up with what Plot drew: ${text.length} values against ` +
-        `${marks.length} marks matching "${selector}". Attaching them by index would label the ` +
-        `wrong quantities.`,
-    );
-  }
-  marks.forEach((mark, index) => {
-    (mark as Element).setAttribute("data-hover", text[index]!);
-  });
-}
-
-/** One SVG, at one width. */
-function draw(build: Drawing, naming: Naming, width: number): string {
-  const spec = build(width);
-  if (!spec) return "";
+/** One SVG, at one width. A misaligned hover layer stops the build — see `Renderer` in `spec.ts`. */
+function drawn(build: Drawing, naming: Naming, width: number): string {
   const { document } = parseHTML("<!doctype html><html><body></body></html>");
-  const node = Plot.plot({ ...BASE, ...spec.options, document }) as unknown as Element;
-  if (spec.hovers) {
-    attachHovers(node, spec.hovers.selector, spec.hovers.text);
-    const misaligned = declareCursor(node, spec.hovers);
-    if (misaligned) throw new Error(misaligned);
-  }
-  applyNaming(node, naming);
-  return ensureThemeable(node.outerHTML);
+  const node = draw(build, naming, width, {
+    document: document as unknown as Document,
+    onMisaligned: (message) => {
+      throw new Error(message);
+    },
+  });
+  return node ? ensureThemeable(node.outerHTML) : "";
 }
 
-/**
- * Render a chart to a pair of SVGs, for putting straight into a document.
- *
- * # Why two
- *
- * A static SVG has one layout and the stylesheet used to make it fit by scaling it. At 375px that
- * scale is 0.46, which took the axis text to about 4.6px — see {@link WIDTHS} for why enlarging
- * the type instead does not work. So the drawing is laid out twice, at the two widths it is
- * actually shown at, and `app.css` picks with a container query. Both are in the document; the
- * one the reader is not looking at is `display: none`, which also takes it out of the
- * accessibility tree, so a screen reader is offered one chart rather than the same chart twice.
- *
- * `null` renders to nothing. A spec builder returns null when the data cannot support the form it
- * was asked for — a fan chart of one observation, say — and an empty string is the honest output:
- * better than an axis with a single mark on it, which would read as a finding. That decision is
- * about the data and never about the width, so it is taken once, on the wide drawing, and the
- * narrow one is not asked.
- */
 /**
  * Render a chart to one SVG, at a width the caller has chosen.
  *
  * For a **panel of a small multiple**, which is the one drawing on this site whose width is not
  * the page's. Two panels share the wide frame and stack on a phone, so a panel is about 300px in
- * both layouts — near enough {@link WIDTHS.narrow} that the second drawing {@link renderToString}
+ * both layouts — near enough `WIDTHS.narrow` that the second drawing {@link renderToString}
  * makes would be a copy shown to nobody. That is worth saying out loud because the cloud these
  * draw is 609 dots and 609 hit targets: the pair mechanism exists to stop a chart being scaled to
  * illegibility, not to be applied where one layout already serves both.
@@ -133,18 +78,11 @@ function draw(build: Drawing, naming: Naming, width: number): string {
  * form the data cannot support draws nothing rather than an axis with a mark on it.
  */
 export function renderPanelToString(build: Drawing, naming: Naming, width: number): string {
-  const svg = draw(build, naming, width);
+  const svg = drawn(build, naming, width);
   return svg ? `<div class="chart-pair"><div class="chart-at" data-at="panel">${svg}</div></div>` : "";
 }
 
+/** A chart at both widths, for putting straight into a document. See {@link pair}. */
 export function renderToString(build: Drawing, naming: Naming): string {
-  const wide = draw(build, naming, WIDTHS.wide);
-  if (!wide) return "";
-  const narrow = draw(build, naming, WIDTHS.narrow);
-  return (
-    `<div class="chart-pair">` +
-    `<div class="chart-at" data-at="narrow">${narrow}</div>` +
-    `<div class="chart-at" data-at="wide">${wide}</div>` +
-    `</div>`
-  );
+  return pair((width) => drawn(build, naming, width));
 }
