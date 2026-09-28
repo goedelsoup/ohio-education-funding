@@ -1,0 +1,211 @@
+                                        (134th General Assembly)
+                                 (Amended Substitute House Bill Number 45)
+
+
+
+
+                                         AN ACT
+       To amend sections 102.01, 121.22, 124.134, 149.311, 149.43, 173.501, 307.6910,
+          1710.02, 2101.16, 2915.092, 3310.70, 3317.0212, 3333.051, 3505.183, 3509.05,
+          3781.1010, 3929.43, 4503.591, 4509.70, 5104.30, 5104.31, 5104.32, 5104.38,
+          5165.36, 5301.36, 5713.03, 5721.03, 5747.01, and 5747.98; to enact sections
+          3333.128, 3955.061, 3956.061, 5101.19, 5101.191, 5101.192, 5101.193,
+          5101.194, and 5104.37; and to repeal section 5747.37 of the Revised Code and to
+          amend Sections 265.220, 307.270, 343.30, and 701.70 of H.B. 110 of the 134th
+          General Assembly, Sections 219.10 as subsequently amended, 221.10 as
+          subsequently amended, 221.13 as subsequently amended, and 237.13 as
+          subsequently amended of H.B. 597 of the 134th General Assembly, and Sections
+          207.15, 221.10, 221.13, 223.10, 223.15, 237.10, and 237.13 of H.B. 687 of the
+          134th General Assembly and to repeal Section 715.20 of H.B. 110 of the 134th
+          General Assembly to make appropriations and to provide authorization and
+          conditions for the operation of state programs.
+
+Be it enacted by the General Assembly of the State of Ohio:
+
+
+         Sec. 3317.0212. (A) As used in this section:
+         (1) For fiscal years 2022 and 2023, "assigned bus" means a school bus used to transport
+qualifying riders.
+         (2) For fiscal years 2022 and 2023, "density" means the total riders per square mile of a
+school district.
+         (3) For fiscal years 2022 and 2023, "nontraditional ridership" means the average number of
+qualifying riders who are enrolled in a community school established under Chapter 3314. of the
+Revised Code, in a STEM school established under Chapter 3326. of the Revised Code, or in a
+nonpublic school and are provided school bus service by a school district during the first full week of
+October.
+         (4) "Qualifying riders" means the following:
+         (a) For fiscal years 2022 and 2023, resident students enrolled in preschool and regular
+education in grades kindergarten to twelve who are provided school bus service by a school district,
+including students with dual enrollment in a joint vocational school district or a cooperative
+education school district, and students enrolled in a community school, STEM school, or nonpublic
+school;
+         (b) For fiscal year 2024 and each fiscal year thereafter, students specified by the general
+assembly.
+         (5) "Qualifying ridership" means the following:
+         (a) For fiscal years 2022 and 2023, the greater of the average number of qualifying riders
+counted in the morning or counted in the afternoon who are provided school bus service by a school
+district during the first full week of October;
+         (b) For fiscal year 2024 and each fiscal year thereafter, a ridership determined in a manner
+specified by the general assembly.
+         (6) "Rider density" means the following:
+         (a) For fiscal years 2022 and 2023, the following quotient:
+  A school district's total number of qualifying riders/ the number of square miles in the
+                                           district
+         (b) For fiscal year 2024 and each fiscal year thereafter, a number calculated in a manner
+determined by the general assembly.
+         (7) For fiscal years 2022 and 2023, "riders" means students enrolled in regular and special
+education in grades kindergarten through twelve who are provided school bus service by a school
+district, including students with dual enrollment in a joint vocational school district or a cooperative
+education school district, and students enrolled in a community school, STEM school, or nonpublic
+school.
+         (8) "School bus service" means a school district's transportation of qualifying riders in any of
+the following types of vehicles:
+         (a) School buses owned or leased by the district;
+         (b) School buses operated by a private contractor hired by the district;
+         (c) School buses operated by another school district or entity with which the district has
+contracted, either as part of a consortium for the provision of transportation or otherwise.
+Am. Sub. H. B. No. 45                                                                           134th G.A.
+                                                    52
+         (B) Not later than the first day of November, for fiscal years 2022 and 2023, or a date
+determined by the general assembly, for fiscal year 2024 and each fiscal year thereafter, of each year,
+each city, local, and exempted village school district shall report to the department of education its
+qualifying ridership and any other information requested by the department. Subsequent adjustments
+to the reported numbers shall be made only in accordance with rules adopted by the department.
+         (C) The department shall calculate the statewide transportation cost per student as follows:
+         (1) Determine each city, local, and exempted village school district's transportation cost per
+student by dividing the district's total costs for school bus service in the previous fiscal year by its
+qualifying ridership in the previous fiscal year.
+         (2) After excluding districts that do not provide school bus service and the ten districts with
+the highest transportation costs per student and the ten districts with the lowest transportation costs
+per student, divide the aggregate cost for school bus service for the remaining districts in the previous
+fiscal year by the aggregate qualifying ridership of those districts in the previous fiscal year.
+         (D) The department shall calculate the statewide transportation cost per mile as follows:
+         (1) Determine each city, local, and exempted village school district's transportation cost per
+mile by dividing the district's total costs for school bus service in the previous fiscal year by its total
+number of miles driven for school bus service in the previous fiscal year.
+         (2) After excluding districts that do not provide school bus service and the ten districts with
+the highest transportation costs per mile and the ten districts with the lowest transportation costs per
+mile, divide the aggregate cost for school bus service for the remaining districts in the previous fiscal
+year by the aggregate miles driven for school bus service in those districts in the previous fiscal year.
+         (E) The department shall calculate each city, local, and exempted village school district's
+transportation base payment as follows:
+         (1) For fiscal years 2022 and 2023:
+         (a) Calculate the sum of the following:
+         (i) The product of the statewide transportation cost per student and the number of students
+counted in the district's qualifying ridership for the current fiscal year who are enrolled in the district;
+         (ii) 1.5 times the statewide transportation cost per student times the number of students
+counted in the district's qualifying ridership for the current fiscal year who are enrolled in community
+schools established under Chapter 3314. of the Revised Code or STEM schools established under
+Chapter 3326. of the Revised Code;
+         (iii) 2.0 times the statewide transportation cost per student times the number of students
+counted in the district's qualifying ridership for the current fiscal year who are enrolled in nonpublic
+schools.
+         (b) Multiply Calculate the sum of the following:
+         (i) The product of the statewide transportation cost per mile by the district's total and the
+number of miles driven for school bus service in as reported for qualifying riders for the current
+fiscal year who are enrolled in the district;
+         (ii) 1.5 times the statewide transportation cost per mile times the number of miles driven for
+school bus service as reported for qualifying riders for the current fiscal year who are enrolled in
+community schools or STEM schools;
+         (iii) 2.0 times the statewide transportation cost per mile times the number of miles driven for
+Am. Sub. H. B. No. 45                                                                             134th G.A.
+                                                     53
+school bus service as reported for qualifying riders for the current fiscal year who are enrolled in
+nonpublic schools.
+         (c) Multiply the greater of the amounts calculated under divisions (E)(1)(a) and (b) of this
+section by the following:
+         (i) For fiscal year 2022, the greater of twenty-nine and one-sixth per cent or the district's state
+share percentage, as defined in section 3317.02 of the Revised Code;
+         (ii) For fiscal year 2023, the greater of thirty-three and one-third per cent or the district's state
+share percentage.
+         (2) For fiscal year 2024 and each fiscal year thereafter, an amount determined by the general
+assembly.
+         (F) For fiscal years 2022 and 2023, the department shall pay a district's efficiency adjustment
+payment in accordance with divisions (F)(1) to (3) of this section. For fiscal year 2024 and each
+fiscal year thereafter, the department shall pay a district's efficiency adjustment payment in a manner
+determined by the general assembly, if the general assembly authorizes such a payment to districts.
+         (1) The department annually shall establish a target number of qualifying riders per assigned
+bus for each city, local, and exempted village school district. The department shall use the most
+recently available data in establishing the target number. The target number shall be based on the
+statewide median number of riders per assigned bus as adjusted to reflect the district's density in
+comparison to the density of all other districts. The department shall post on the department's web
+site each district's target number of riders per assigned bus and a description of how the target
+number was determined.
+         (2) The department shall determine each school district's efficiency index by dividing the
+district's number of riders per assigned bus by its target number of riders per assigned bus.
+         (3) The department shall determine each city, local, and exempted village school district's
+efficiency adjustment payment as follows:
+         (a) If the district's efficiency index is equal to or greater than 1.5, the efficiency adjustment
+payment shall be calculated according to the following formula:
+  0.15 X the district's transportation base payment calculated under division (E) of this
+                                           section
+        (b) If the district's efficiency index is less than 1.5 but greater than or equal to 1.0, the
+efficiency adjustment payment shall be calculated according to the following formula:
+   {[(The district's efficiency index - 1) X 0.15]/0.5} X the district's transportation base
+                    payment calculated under division (E) of this section
+        (c) If the district's efficiency index is less than 1.0, the efficiency adjustment payment shall be
+zero.
+        (G) In addition to funds paid under divisions (E), (F), and (H) of this section, each city, local,
+and exempted village district shall receive in accordance with rules adopted by the state board of
+education a payment for students transported by means other than school bus service and whose
+transportation is not funded under division (C) of section 3317.024 of the Revised Code. The rules
+shall include provisions for school district reporting of such students.
+        (H)(1) For purposes of division (H) of this section, a school district's "transportation
+Am. Sub. H. B. No. 45                                                                             134th G.A.
+                                                     54
+supplement percentage" means the following:
+       (a) For fiscal years 2022 and 2023, the following quotient:
+                             (28 – the district's rider density) / 100
+         If the result of the calculation for a district under division (H)(1)(a) of this section is less than
+zero, the district's transportation supplement percentage shall be zero.
+         (b) For fiscal year 2024 and each fiscal year thereafter, a percentage calculated in a manner
+determined by the general assembly.
+         (2) The department shall pay each district a transportation supplement calculated according to
+the following formula:
+    The district's transportation supplement percentage X the amount calculated for the
+                    district under division (E)(1)(b) of this section X 0.55
+        (I)(1) If a school district board and a community school governing authority elect to enter
+into an agreement under division (A) of section 3314.091 of the Revised Code, the department shall
+make payments to the community school according to the terms of the agreement for each student
+actually transported under division (C)(1) of that section. If a community school governing authority
+accepts transportation responsibility under division (B) of that section, the department shall make
+payments to the community school for each student actually transported or for whom transportation
+is arranged by the community school under division (C)(1) of that section, calculated as follows:
+        (a) For any fiscal year which the general assembly has specified that transportation payments
+to school districts be based on an across-the-board percentage of the district's payment for the
+previous school year, the per pupil payment to the community school shall be the following quotient:
+        (i) The total amount calculated for the school district in which the child is entitled to attend
+school for student transportation other than transportation of children with disabilities; divided by
+        (ii) The number of students included in the district's transportation ADM for the current fiscal
+year, as calculated under section 3317.03 of the Revised Code, plus the number of students enrolled
+in the community school not counted in the district's transportation ADM who are transported under
+division (B)(1) or (2) of section 3314.091 of the Revised Code.
+        (b) For any fiscal year which the general assembly has specified that the transportation
+payments to school districts be calculated in accordance with this section and any rules of the state
+board of education implementing this section, the payment to the community school shall be the
+following:
+        (i) For fiscal years 2022 and 2023, either of the following:
+        (I) If the school district in which the student is entitled to attend school would have used a
+method of transportation for the student for which payments are computed and paid under division
+(E) of this section, 1.0 times the statewide transportation cost per student, as calculated in division
+(C) of this section;
+        (II) If the school district in which the student is entitled to attend school would have used a
+method of transportation for the student for which payments are computed and paid in a manner
+described in division (G) of this section, the amount that would otherwise be computed for and paid
+to the district.
+        (ii) For fiscal year 2024 and each fiscal year thereafter, an amount calculated in a manner
+Am. Sub. H. B. No. 45                                                                      134th G.A.
+                                                  55
+determined by the general assembly.
+        The community school, however, is not required to use the same method to transport the
+student.
+        As used in this division, "entitled to attend school" means entitled to attend school under
+section 3313.64 or 3313.65 of the Revised Code.
+        (2) A community school shall be paid under division (H)(1) (I)(2) of this section only for
+students who are eligible as specified in section 3327.01 of the Revised Code and division (C)(1) of
+section 3314.091 of the Revised Code, and whose transportation to and from school is actually
+provided, who actually utilized transportation arranged, or for whom a payment in lieu of
+transportation is made by the community school's governing authority. To qualify for the payments,
+the community school shall report to the department, in the form and manner required by the
+department, data on the number of students transported or whose transportation is arranged, the
+number of miles traveled, cost to transport, and any other information requested by the department.

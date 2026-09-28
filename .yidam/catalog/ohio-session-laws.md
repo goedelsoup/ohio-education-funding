@@ -111,9 +111,20 @@ And `200610` is not a key on its own: `454 200610` is `Guidance and Testing` in 
 half a million a year. Anything reading the formula's share here must key on fund and number
 together.
 
+## One act read for one section, not a table
+
+**Am. Sub. H.B. 45 of the 134th** (`07_EN`, effective 7 April 2023) is fetched for the one section
+of R.C. 3317 it reprints: 3317.0212, where it inserted the 1.5 and 2.0 weights on miles driven.
+The bill was introduced as a five-page tax amnesty and became a 320-page spending act in the Senate
+substitute (`04_RS`), the first version carrying the change; the seven codes below `07_EN` are the
+bill's own versions, not interim postings. The committed fixture is the amending title and that
+section, cut by `reprinted_section`; the digest pins the whole 183-page act.
+
 ## Used by
 
 - [`crates/connect/src/fixtures/session_laws.rs`](../../crates/connect/src/fixtures/session_laws.rs), `build_session_laws`
 - `crates/project/fixtures/session-law-lines.csv`, and `project::session_laws` over it
 - The [`fiscal-period`](../corpus/fiscal-period/) nodes for FY1998-FY2001, which had no
   appropriating act named
+- `crates/project/fixtures/hb45-134-transportation.txt`, `project::act::HB45_TRANSPORTATION`, and
+  [`fsfp-transportation`](../corpus/formula-component/fsfp-transportation.yml)

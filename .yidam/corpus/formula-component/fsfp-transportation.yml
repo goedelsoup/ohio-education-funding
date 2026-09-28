@@ -23,7 +23,7 @@ description: |
   ### Non-public riders count double, and so do their miles
 
   `public + 2 x non-public + 1.5 x community or STEM` weights the ridership, and R.C.
-  3317.0212(E)(1)(b) now puts the same two multiples on *miles driven* — so the premium survives
+  3317.0212(E)(1)(b) has put the same two multiples, since H.B. 45 of 2023, on *miles driven* — so the premium survives
   whichever of the two bases wins. Non-public riders are 4.5% of riders and 8.5% of weighted
   ridership. The weight is the Fair School Funding Plan's own, and the only reason given for it
   anywhere is the department's: these riders are "typically higher" cost to carry. [verified] Why
@@ -159,12 +159,32 @@ findings: |
   R.C. 3327.01 duty and less efficient routes — and the guess is the right *kind* of reason and is
   nowhere asserted by a source. What remains open is 2.0 against 1.5, not 2.0 against 1.0. [open]
 
-  **And the 2.0 was legislated twice, a fact no analysis records.** The plan bill's mile base is a
-  bare product, and [H.B. 583](../legislation/hb-583-2022.yml) — the plan's own corrections act,
-  September 2022 — reprints the section with the mile base still bare, at the very address
-  `(E)(1)(b)` the weighted version now occupies. The weights reached *miles driven* in a later act
-  than they reached riders, and not one of the fifteen analyses mentions the second occasion.
-  Which act did it is not settled by anything committed here. [open]
+  **And the 2.0 was legislated twice — the second time by an act nobody would look in.** The plan
+  bill's mile base is a bare product, and [H.B. 583](../legislation/hb-583-2022.yml) — the plan's
+  own corrections act, September 2022 — reprints the section with the mile base still bare, at the
+  very address `(E)(1)(b)` the weighted version now occupies. The weights reached *miles driven* in
+  **Am. Sub. H.B. 45 of the 134th General Assembly**, effective 7 April 2023: not H.B. 33 or H.B.
+  96, but a lame-duck appropriation act introduced as a five-page tax amnesty and turned into a
+  budget vehicle by the Senate Finance substitute of December 2022, the first version to carry the
+  change. Its [enrolled text](../../catalog/ohio-session-laws.md) shows the insertion as
+  strike-and-insert — *"(b) Multiply Calculate the sum of the following: (i) The product of the
+  statewide transportation cost per mile by the district's total and the number of miles driven
+  for school bus service in as reported for qualifying riders"*, with the 1.5 and 2.0 clauses
+  following — and it rewrote the division for fiscal years 2022 and 2023, so the weighted miles
+  first paid in FY2023 and H.B. 33 carried them forward under new year labels. The same clause
+  created the reporting duty: a district that reported one mileage total now reports miles by the
+  enrolment of the riders carried. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_weight_the_legislature_never_explained.rs))
+
+  **Its analyst noticed; its analyses did not.** None of the fifteen committed analyses describes
+  the mile weights under LSC's own mile-side wording either. The two documents that do are not
+  among them: H.B. 45's fiscal note, which says the bill "applies the same weights of 1.5 and 2.0
+  to the number of current year miles driven to transport them" and prices it only jointly with a
+  disadvantaged pupil impact aid phase-in change, about $48m in FY2023 for the two; and LSC's
+  January 2023 Members Brief on the pupil transportation formula, which writes "weighted miles
+  driven (for FY 2023 only)". Neither gives a reason, so the mile premium, like the rider premium,
+  was enacted without one on record. [verified] (the fiscal note and the Members Brief, read at
+  retrieval and not committed)
 
   ### The appropriation does not cover the entitlement, and this is the arithmetic
 
@@ -278,6 +298,26 @@ findings: |
   cannot see that, which is the general hazard
   [the line origins](../../../crates/project/tests/the_line_origins.rs) exists for. [verified]
 revisions:
+  - was: |
+      "The weights reached *miles driven* in a later act than they reached riders, and not one of
+      the fifteen analyses mentions the second occasion. Which act did it is not settled by
+      anything committed here." The candidates were taken to be H.B. 33 and H.B. 96.
+    now: |
+      Am. Sub. H.B. 45 of the 134th General Assembly, effective 7 April 2023, inserted the weighted
+      mile base into the FY2022-23 division; H.B. 33 carried it forward. LSC did record the change,
+      in H.B. 45's fiscal note and a January 2023 Members Brief, neither of them among the fifteen
+      committed analyses and neither giving a reason.
+    found_by: |
+      The dated prior versions of R.C. 3317.0212 on `codes.ohio.gov`: the 23 September 2022
+      version (H.B. 583) has the bare product, the 7 April 2023 version (H.B. 45) the weighted sum.
+      The enrolled act was then fetched (`hb45-134-enrolled`, pinned by digest) and its
+      strike-and-insert asserted in
+      [`the_weight_the_legislature_never_explained.rs`](../../../crates/project/tests/the_weight_the_legislature_never_explained.rs).
+      H.B. 33 was never a candidate, only the first place anybody would look. Closes #481.
+    reach: |
+      `findings` only. Nothing computed moves: the FY2026 and FY2027 panels already weight miles,
+      and the census of committed analyses stands — widened to mile-side wording, it still finds
+      nothing.
   - was: |
       Transportation's own guarantee is "a **third** mechanism anchored to FY2021, distinct from
       the guarantee and the formula transition supplement: a different base, a different set of
@@ -466,6 +506,8 @@ links:
   - target: ../../catalog/lsc-dew-redbook.md
     relationship: sourced-from
   - target: ../../catalog/ohio-bill-versions.md
+    relationship: sourced-from
+  - target: ../../catalog/ohio-session-laws.md
     relationship: sourced-from
   - target: ../parameter/transportation-cost-rates.yml
     relationship: governed-by

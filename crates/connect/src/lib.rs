@@ -1835,6 +1835,18 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(cause) => Rebuilt::skipped(fixtures::CORRECTIONS_FIXTURE, cause),
     });
 
+    // The act that weighted the mile base, cut to the one section it was read for. A layout
+    // change that loses the section is fatal, as the landscape table's is; an uncached PDF or a
+    // missing `pdftotext` is skipped, as the corrective act's is.
+    let mile_weights = registered("hb45-134-enrolled");
+    out.push(match cache::pdf_text(root, mile_weights) {
+        Ok(text) => match fixtures::reprinted_section(&text, "3317.0212") {
+            Ok(excerpt) => text_fixture(root, fixtures::MILE_WEIGHTS_FIXTURE, &excerpt)?,
+            Err(layout) => return Err(RebuildError::Layout(layout)),
+        },
+        Err(cause) => Rebuilt::skipped(fixtures::MILE_WEIGHTS_FIXTURE, cause),
+    });
+
     // The bill the plan was drafted in. Committed whole and skipped rather than fatal on the
     // same two counts the corrective act is: the PDF may not be cached, and `pdftotext` may not
     // be installed.

@@ -336,6 +336,20 @@ pub const CORRECTIONS_FIXTURE: &str = "crates/project/fixtures/hb583-corrections
 /// pages against three hundred.
 pub const PLAN_BILL_FIXTURE: &str = "crates/project/fixtures/hb1-134-as-introduced.txt";
 
+/// Where the act that weighted the mile base is written, relative to the repository root — its
+/// amending title and the one section of R.C. 3317 it reprints, and nothing else.
+///
+/// # Why this one is an excerpt when the other two acts are whole
+///
+/// [`CORRECTIONS_FIXTURE`] and [`PLAN_BILL_FIXTURE`] are committed whole on the ground that each
+/// is an education act by its own title. Am. Sub. H.B. 45 of the 134th is not: it was introduced
+/// as a five-page tax amnesty and came out of Senate Finance in December 2022 as a 183-page
+/// appropriation act, of which R.C. 3317.0212 is about three pages. The question asked of it —
+/// [issue #481](https://github.com/goedelsoup/ohio-education-funding/issues/481), which act put the
+/// 1.5 and 2.0 on miles driven — is answered by the strike-and-insert in that section and by the
+/// title that says the act amends it. The digest in `source-digests.txt` still pins the whole act.
+pub const MILE_WEIGHTS_FIXTURE: &str = "crates/project/fixtures/hb45-134-transportation.txt";
+
 /// Where the Ohio slice of the CCD agency directory is written, relative to the repository root.
 pub const CCD_DIRECTORY_FIXTURE: &str = "crates/dispersion/fixtures/ccd-lea-directory.csv";
 
@@ -517,6 +531,7 @@ pub const REBUILT: &[&str] = &[
     SESSION_LAW_FIXTURE,
     PLAN_BILL_FIXTURE,
     CORRECTIONS_FIXTURE,
+    MILE_WEIGHTS_FIXTURE,
     TRANSFER_FIXTURE,
     BUILDING_FIXTURE,
     IDENTIFIED_FIXTURE,
