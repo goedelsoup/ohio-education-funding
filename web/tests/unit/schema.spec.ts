@@ -12,7 +12,7 @@ import { join, relative } from "node:path";
 import { expect, test } from "vitest";
 import YAML from "yaml";
 
-import { loadCorpus, resolveTarget } from "../../src/lib/corpus.ts";
+import { loadCorpus, resolveTarget, undeclaredDecisionKeys } from "../../src/lib/corpus.ts";
 import { loadFeed, RATE_FALL_TOLERANCE } from "../../src/lib/feed.ts";
 import {
   NodeSchema,
@@ -85,6 +85,22 @@ test("an enrollment history of the wrong length fails", () => {
 test("the corpus validates with no errors", () => {
   const errors = loadCorpus().diagnostics.filter((d) => d.severity === "error");
   expect(errors.map((d) => `${d.file}: ${d.message}`)).toEqual([]);
+});
+
+test("a decision record's field the site neither renders nor declares is refused", () => {
+  // Every real record passes, so the check is exercised on real records doctored the way #498
+  // found them: prose written under a key the page never reads.
+  const dir = join(import.meta.dirname, "../../../.yidam/decisions");
+  const records = readdirSync(dir)
+    .filter((f) => f.endsWith(".yml"))
+    .map((f) => YAML.parse(readFileSync(join(dir, f), "utf8")) as Record<string, unknown>);
+  expect(records.length).toBeGreaterThan(50);
+  expect(records.flatMap(undeclaredDecisionKeys)).toEqual([]);
+
+  const widening = records.find((r) => r.id === "the-widening-rule")!;
+  expect(undeclaredDecisionKeys({ ...widening, open: "**Settled.**" })).toEqual(["open"]);
+  expect(undeclaredDecisionKeys({ ...widening, addendum: "A later note." })).toEqual(["addendum"]);
+  expect(undeclaredDecisionKeys({ ...widening, supersedes: [] })).toEqual(["supersedes"]);
 });
 
 /**
