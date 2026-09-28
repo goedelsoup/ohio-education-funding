@@ -61,7 +61,7 @@ Tasks are [mise](https://mise.jdx.dev) tasks. `mise install` provisions Rust, No
 mise run //:ci             everything the CI workflow runs, in the same order
 mise run //crates:gate     fmt, clippy, test, doc
 mise run //web:gate        check, unit, build, e2e
-mise run //:generated      fail if the feed or any README block is stale
+mise run //:generated      fail if the feed, a manifest, the icon or a README block is stale
 mise run //crates:connectors   what is retrievable, and how far each connector got
 ```
 
@@ -72,7 +72,7 @@ the record — `cargo doc` with warnings as errors was failing for at least two 
 said so. `//:ci` is still the thing to run before pushing; the workflow is the thing that catches
 what a dirty local tree hides.
 
-The site deploys itself. A push to `main` that clears all three jobs uploads the built site to
+The site deploys itself. A push to `main` that clears both build jobs uploads the built site to
 Cloudflare Pages, and it is live at <https://ohio-education-funding.pages.dev> a minute or two
 later — the same `dist/` the browser suite ran against rather than a rebuild of it, so what is
 served is what was tested. `mise run //:deploy` publishes by hand and is the escape hatch; note
