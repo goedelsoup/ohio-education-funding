@@ -123,10 +123,19 @@ alternatives: |
   **Leave it in the test file and quote the numbers.** What was already happening, and what the
   first half of this work was undoing on the coverage side: three artifacts quoted figures a test
   produced and nothing recomputed them.
-open: |
-  **The per-district fan does not carry this yet.** `/district/<irn>` draws a projection fan per
-  district and says nothing about bias; #445 names that as a third delivery and it is not done
-  here. The figures published are statewide — a mean over districts and a total across them — and
-  neither is a statement about any one district, which is the thing a per-district surface would
-  have to be careful about.
-supersedes: []
+amendment: |
+  **The per-district fan carries it now, by #461.** This record left the district route out:
+  `/district/<irn>` drew a projection fan per district and said nothing about bias, and #445 named
+  that as a third delivery. #445 closed on its two halves and handed the third to #458, which #461
+  delivered.
+
+  The fan states the **mean district's** figure and never the total's, for the reason this record
+  gives for publishing both: a district's aid is a district-level quantity, and the two carry
+  different biases. It states both populations at the fan's own horizon rather than choosing
+  between them, and says in so many words that the figure is a mean over districts and not this
+  district's own bias. Where the band collapses — a district whose aid enrollment does not enter —
+  there is nothing for an enrollment-forecast bias to be about, and no sentence is printed.
+
+  #458 framed the work as a horizon mismatch, a ten-year fan against a pre-closure panel that stops
+  at nine. The fan is a six-year leg, `base_year + 6`, and always was, so the mismatch did not
+  exist; the correction is recorded on #458. Nothing here moved the fan, its band or its centre.

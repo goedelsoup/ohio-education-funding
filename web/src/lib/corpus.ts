@@ -840,16 +840,13 @@ function readSource(file: string): Source {
 /**
  * The prose fields a decision record can carry, in the order they are meant to be read.
  *
- * Not every record carries every one, and the variation is not sloppiness: four records state a
- * `rationale` where the rest state `consequences` and `alternatives`, two carry an `amendment`
- * recording a later revision, and `ontology` carries a `corpus_depth` integer that is not prose at
- * all. So this is the order and the labels, and a record renders the intersection — an absent
- * field is absent rather than an empty heading.
+ * Not every record carries every one, and the variation is not sloppiness: some records state a
+ * `rationale` where the rest state `consequences` and `alternatives`, and some carry an
+ * `amendment` recording a later revision. So this is the order and the labels, and a record
+ * renders the intersection — an absent field is absent rather than an empty heading.
  *
  * Reading an allowlist rather than the file's own keys is also what lets a record carry data
- * beside its prose. Thirteen of them declare a `connectors:` sequence that `crates/connect`'s
- * registry tests read to derive the connector approval list; none of it reaches this page, which
- * is the intended outcome rather than an oversight.
+ * beside its prose; {@link DECISION_DATA} names that data.
  *
  * `summary` is deliberately not here. It leads the page rather than sitting in the sequence.
  */
@@ -863,15 +860,47 @@ const DECISION_SECTIONS: { name: string; label: string }[] = [
 ];
 
 /**
+ * The top-level keys a decision record may carry that are not prose, and so render nowhere.
+ *
+ * `connectors:` is read by `crates/connect`'s registry tests to derive the connector approval list;
+ * `corpus_depth` and `governance` are `ontology`'s, written by yidam's bootstrap; `kuten` and
+ * `revision` are `kuten`'s. None of it reaches the page, which is the intended outcome.
+ *
+ * Anything a record carries outside this set, {@link DECISION_SECTIONS}, `id` and `summary` is an
+ * error. Two records once carried an `open:` field and a third an `addendum:`, all prose, all
+ * written as though a reader would see them, and none of the three reached any page (#498). An
+ * allowlist that silently drops what it does not name is exactly how that happens, so the
+ * complement is refused instead: a new prose field fails the build until it is rendered, and a
+ * new data field until it is named here.
+ */
+const DECISION_DATA = new Set(["connectors", "corpus_depth", "governance", "kuten", "revision"]);
+
+/** The top-level keys of a parsed decision record that render nowhere and are not declared data. */
+export function undeclaredDecisionKeys(record: Record<string, unknown>): string[] {
+  const known = new Set(["id", "summary", ...DECISION_SECTIONS.map((s) => s.name), ...DECISION_DATA]);
+  return Object.keys(record).filter((key) => !known.has(key));
+}
+
+/**
  * One decision record, read straight off the YAML.
  *
  * Parsed with the same loader the nodes use, and then read defensively: these files are hand-
  * written prose in block scalars and the field set genuinely varies between them, so a missing
  * field is a shape this reader expects rather than a fault.
  */
-function readDecision(file: string): Decision {
+function readDecision(file: string, report: Diagnostic[]): Decision {
   const raw = readFileSync(join(DECISIONS, file), "utf8");
   const parsed = (YAML.parse(raw) ?? {}) as Record<string, unknown>;
+  for (const key of undeclaredDecisionKeys(parsed)) {
+    report.push({
+      file: `.yidam/decisions/${file}`,
+      severity: "error",
+      message:
+        `\`${key}:\` is not a field the site renders, and not data it declares — ` +
+        `add it to DECISION_SECTIONS or DECISION_DATA in web/src/lib/corpus.ts, or move its prose ` +
+        `into a field that renders`,
+    });
+  }
   const text = (key: string): string => {
     const value = parsed[key];
     return typeof value === "string" ? value.trim() : "";
@@ -1156,7 +1185,7 @@ export function loadCorpus(): Corpus {
   const decisions = existsSync(DECISIONS)
     ? readdirSync(DECISIONS)
         .filter((f) => f.endsWith(".yml"))
-        .map(readDecision)
+        .map((f) => readDecision(f, report))
         .sort((a, b) => compare(a.slug, b.slug))
     : [];
   const byDecision = new Map(decisions.map((d) => [d.slug, d]));

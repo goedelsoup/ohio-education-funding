@@ -83,7 +83,7 @@ alternatives: |
   **0.64.** Minimises the worst horizon where 0.65 minimises the average. The surface is flat from
   about 0.63 to 0.66 and the third digit is not identified, so the rounder value is taken — the
   same tie-break `the-fitted-damping` records.
-open: |
+amendment: |
   **Settled, by #391.** The fit used horizons one to five, and that was a choice rather than the
   panel's limit: the same six origins reach **eleven** years, and the two the panel supports but
   the fit did not use — FY2011 and FY2012 — take it to **thirteen**. Run out there, coverage of
@@ -136,4 +136,3 @@ open: |
   against, and `/method` draws all four against zero beside the point they describe. Nothing in
   this record moves: the exponent is 0.65, `sigma` is unchanged, and the centre of every published
   interval is where it was.
-supersedes: []
