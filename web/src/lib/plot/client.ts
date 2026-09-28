@@ -5,40 +5,30 @@
  * nothing to bake — and the alternative, a round trip per slider tick, is exactly what the
  * duplicated formula in `policy.ts` exists to avoid.
  *
- * The specifications come from `spec.ts`, identical to the ones `ssr.ts` renders at build time,
- * so the interactive copy of a chart cannot drift away from the static one. What differs is a
- * single line: where the document comes from. There is no `linkedom` here — the browser already
- * has a DOM — which is why this is a separate module and not a branch inside `ssr.ts`.
+ * The drawing is `draw` in `spec.ts`, the function `ssr.ts` renders at build time, so the
+ * interactive copy of a chart cannot drift away from the static one. What differs is where the
+ * document comes from — there is no `linkedom` here, the browser already has a DOM — and what a
+ * misaligned hover layer does, which is why this is a separate module and not a branch inside
+ * `ssr.ts`.
  *
  * The literal-colour guard is not repeated. A chart drawn in the browser re-renders on a theme
  * change like anything else, so the failure that guard exists to catch cannot happen here.
  */
 
-import * as Plot from "@observablehq/plot";
-
 import { openToKeyboard } from "../chart.ts";
-import { applyNaming, BASE, declareCursor, type Drawing, type Naming, WIDTHS } from "./spec.ts";
+import { draw, type Drawing, type Naming, pair, type Renderer } from "./spec.ts";
+
+/**
+ * Ignored rather than thrown: a chart that cannot pair its marks should lose its second channel,
+ * not take the page down with it. The build path throws, so a misalignment cannot reach a reader
+ * in the first place.
+ */
+const BROWSER: Renderer = { onMisaligned: () => {} };
 
 /** One SVG, at one width. */
-function draw(build: Drawing, naming: Naming, width: number): string {
-  const spec = build(width);
-  if (!spec) return "";
-  const node = Plot.plot({ ...BASE, ...spec.options }) as unknown as Element;
-  if (spec.hovers) {
-    const marks = node.querySelectorAll(spec.hovers.selector);
-    // Same check as the build path, for the same reason: tooltips attached by index to a mark
-    // list Plot has reordered would label the wrong quantities and look correct doing it.
-    if (marks.length === spec.hovers.text.length) {
-      marks.forEach((mark, index) => {
-        mark.setAttribute("data-hover", spec.hovers!.text[index]!);
-      });
-      // Ignored rather than thrown, as the count check above is: a chart that cannot pair its
-      // marks should lose its second channel, not take the page down with it. The build path
-      // throws, so a misalignment cannot reach a reader in the first place.
-      declareCursor(node, spec.hovers);
-    }
-  }
-  applyNaming(node, naming);
+function drawn(build: Drawing, naming: Naming, width: number): string {
+  const node = draw(build, naming, width, BROWSER);
+  if (!node) return "";
   // Unlike the baked charts, these are only ever produced by a browser that is running this
   // module — so the tab stop can be part of the markup rather than added to it afterwards, and a
   // scenario re-render carries it without the scenario script having to remember.
@@ -57,13 +47,5 @@ function draw(build: Drawing, naming: Naming, width: number): string {
  * baked charts already answer to.
  */
 export function renderToString(build: Drawing, naming: Naming): string {
-  const wide = draw(build, naming, WIDTHS.wide);
-  if (!wide) return "";
-  const narrow = draw(build, naming, WIDTHS.narrow);
-  return (
-    `<div class="chart-pair">` +
-    `<div class="chart-at" data-at="narrow">${narrow}</div>` +
-    `<div class="chart-at" data-at="wide">${wide}</div>` +
-    `</div>`
-  );
+  return pair((width) => drawn(build, naming, width));
 }

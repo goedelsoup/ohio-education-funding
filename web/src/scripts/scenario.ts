@@ -681,7 +681,7 @@ function reportForecastFailure(panel: Panel, verification: Verification): void {
   </div>`;
 }
 
-function boot(panel: Panel): void {
+export function boot(panel: Panel): void {
   if (panel.contract_version !== REQUIRED_CONTRACT) {
     reportFailure({
       ok: false,
@@ -955,37 +955,3 @@ function boot(panel: Panel): void {
   if (fromDraft) state.levers = { ...fromDraft, ...fromQuery(horizonBound) };
   update(fromDraft == null);
 }
-
-// The slim panel, not the full feed: this page needs every district's formula inputs and none of
-// their audited finances or report cards. See `src/pages/data/panel.json.ts`.
-const PANEL = `${import.meta.env.BASE_URL}data/panel.json`;
-
-fetch(PANEL)
-  .then((response) => {
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return response.json() as Promise<Panel>;
-  })
-  .then(boot)
-  .catch((error: unknown) => {
-    const message = error instanceof Error ? error.message : String(error);
-    const out = $("#scenario-out");
-    if (out) {
-      out.innerHTML = `<div class="card err" id="panel-unreachable" data-part="panel-unreachable">
-        <p>Could not load <code>${escapeHtml(PANEL)}</code> (${escapeHtml(message)}).</p>
-        <p class="note">Every other page on this site carries its figures in the document and is
-          unaffected. This one re-runs the formula, so it needs the panel.</p>
-      </div>`;
-    }
-  });
-
-/*
- * Keep Enter from reloading the page.
- *
- * This was `onsubmit="return false"` on the form itself, which `script-src 'self'` blocks — an
- * inline event handler is inline script. The violation only appears where the CSP is actually
- * applied, which is the deployed site and never `vite preview`, so it shipped. See the built-output
- * check in `tests/e2e/`.
- */
-document
-  .querySelector<HTMLFormElement>("#scenario-controls")
-  ?.addEventListener("submit", (event) => event.preventDefault());

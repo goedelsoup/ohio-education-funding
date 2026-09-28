@@ -69,9 +69,9 @@ export const MOST_FEDERAL = "045906";
 /**
  * Move a lever and wait for the scenario to re-render behind it.
  *
- * The wait is the point. `src/scripts/scenario.ts` boots from `fetch(data/panel.json)`, and until
- * that lands `#scenario-out` is empty and no `input` listener exists — so a control touched before
- * then is an `<input>` and not a lever. Selecting and then asserting the output is non-empty is
+ * The wait is the point. `src/scripts/scenario-load.ts` boots the runner once
+ * `fetch(data/panel.json)` lands, and until then `#scenario-out` is empty and no `input` listener
+ * exists — so a control touched before then is an `<input>` and not a lever. Selecting and then asserting the output is non-empty is
  * what makes the next assertion in a test about the scenario rather than about the fetch. See the
  * note on `live` in `drafts.spec.ts` for the sharper form of the same hazard.
  */

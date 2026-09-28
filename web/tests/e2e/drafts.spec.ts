@@ -19,8 +19,8 @@ test.describe("a draft opened in the runner", () => {
    * The runner is live: its panel has arrived and its levers are wired.
    *
    * Nothing may touch a control before this resolves, and on a draft URL that is not a matter of
-   * patience. `src/scripts/scenario.ts` boots from `fetch(data/panel.json)`, and until it lands
-   * `#scenario-out` is empty and no `input` listener exists — so a control is an `<input>` and not
+   * patience. `src/scripts/scenario-load.ts` boots the runner once `fetch(data/panel.json)` lands,
+   * and until then `#scenario-out` is empty and no `input` listener exists — so a control is an `<input>` and not
    * a lever. `boot` then calls `put()` for every lever the draft sets and renders with
    * `fromControls: false`, on purpose, because the sliders are quantized and the bill's values are
    * not. An edit made before boot is therefore not ignored. It is **undone**.
