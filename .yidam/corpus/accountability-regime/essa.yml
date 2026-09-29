@@ -20,14 +20,14 @@ description: |
     2.5-star-or-lower subgroup rating.
   - **ATSI** — a subgroup at or below the CSI identification threshold score.
 
-  [verified as a statement of Ohio's plan as it stands to be amended —
-  [`ohio-essa-state-plan`](../../catalog/ohio-essa-state-plan.md)]
+  [verified] (as a statement of Ohio's plan as it stands to be amended —
+  [`ohio-essa-state-plan`](../../catalog/ohio-essa-state-plan.md))
 
   **Its fiscal content is thin and real.** Identification carries no formula money. What it
   carries, under the April 2026 amendment, is the department's proposed annual approval of
   expenditure of all federal funds — Title IA, IDEA, and 1003 School Improvement — for schools
   that miss exit criteria, and approval of district expenditure plans across Titles I through IV
-  and IDEA. [verified as proposed] Whether the amendment has been approved is not established.
+  and IDEA. [verified] Whether the amendment has been approved is not established.
   [open]
 
   **Three of the proposed interventions move a building out of the district sector**: conversion
@@ -232,7 +232,7 @@ properties:
     CSI at the lowest 5% of Title I served schools and "at least" that, the amendment adding an
     explicit permission to identify beyond the threshold; TSI at the bottom 2% of a subgroup rank
     order; ATSI at or below the CSI threshold score. Building-level. CSI and ATSI every three
-    years, TSI annually. [verified as proposed]
+    years, TSI annually. [verified]
   effective: |
     ESSA replaced No Child Left Behind for accountability purposes from the 2017-18 school year.
     NCLB has no node here.

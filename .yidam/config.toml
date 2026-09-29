@@ -6,36 +6,50 @@
 # reports what it measured and never comes due, which is where this repository
 # sat until 2026-08-31: four clocks, all decorative.
 #
-# `escalate_after` is still NOT set, and the reason has changed. It used to be
-# that the great majority of findings were malformed claim tags awaiting an
-# editorial pass, so arming the clock scheduled a red gate with no commit behind
-# it. **That pass has landed.** `claim-tag-malformed` went 579 -> 37 and lint
-# total 659 -> 117 when the corpus took the form yidam prescribes:
+# `escalate_after` is still NOT set. Figures below are measured at yidam 0.16.0
+# on 2026-09-28 and move with every corpus commit; re-measure, never quote.
+#
+# The claim-tag rewrite is finished, and it had to be finished twice. The first
+# pass (#343, 2026-09-11) moved 542 tags in 112 files to the form yidam
+# prescribes:
 #
 #   [verified] (crates/dispersion)      not   [verified — crates/dispersion]
 #
-# 542 tags, 112 files, and the standoff that blocked it for two months resolved
-# by moving BOTH sides. The folded form was not a defect here — it is where
-# `citedCrates` in `web/src/lib/corpusFigures.ts` read the figure attribution
-# for gates #157/#158/#218, which is why the mechanical rewrite of `a09ffa8`
-# threw 165 `unattributed` findings and was reverted by `440e49e`. So
-# `claimTags` and `badgeClaims` were widened to read the justification from the
-# trailing parenthetical first. The citation still has to sit adjacent to its
-# tag in the same prose field; only the delimiter moved, and no rendered page
-# changed. See #256 for the sizing and the two options it put.
+# widening `claimTags` and `badgeClaims` in the same commit, because the folded
+# form was where `citedCrates` read the attribution for gates #157/#158/#218 —
+# the mechanical rewrite of `a09ffa8` threw 165 `unattributed` findings and was
+# reverted by `440e49e`. This comment then said the pass was done. It was not:
+# `claim-tag-malformed` is a warning in no baseline, so the folded form came
+# back 45 times across 19 nodes and nothing went red (#505). The second pass
+# (2026-09-28) rewrote 97 node tags and 14 in class prose:
 #
-# What stands, and why it is not backlog:
+#   one standing, qualified         46   `[verified] (FY2027)`
+#   `[verified as proposed]`        13   bare `[verified]`; each node says in its
+#                                        own prose the amendment is proposed
+#   two standings in one tag        38   33 as `[verified] (the arithmetic)
+#                                        [inference] (the reading)`, 5 as one
+#                                        tag with the rest moved into prose
 #
-#   two standings in one tag   37   `[verified for FY2022; inference for FY2023]`
+# `claim-tag-malformed` went 67 -> 0, lint total 140 -> 73. The two standings
+# this comment used to budget for as permanent were written as two claims,
+# which is the repair upstream names. What now keeps the count at zero is
+# `web/tests/unit/corpusFigures.spec.ts`, which fails on any node carrying a
+# qualified tag, so this clock is no longer the only thing that could.
 #
-# Upstream is explicit that such a bracket is not a tag and that nothing on disk
-# needs editing for it; the repair, where anyone wants one, is to write two
-# claims. No editorial pass will take these, so **whatever `escalate_after` is
-# eventually set to has to tolerate 37 standing findings indefinitely** — and
-# the same goes for the 26 `verified-unsourced` and 52 `missing-property`,
-# neither of which moved across the pass. That is the argument the clock now
-# needs, and it is a different one from "wait for the pass". Arming it is a real
-# decision about those three populations, not a formality.
+# Tags outside nodes are uncounted on purpose: yidam defines a claim as "a
+# statement in a node", and the catalog, the decision records and the class
+# `ACTIONS.md`/`README.md` files tag their own statements without entering the
+# totals. The root README says so.
+#
+# What stands, and is the argument the clock still needs:
+#
+#   missing-property     48
+#   verified-unsourced   23
+#
+# plus one `class-claim-uncounted` (info) and one `unauthored-prose-link`.
+# Neither is a spelling problem. Several missing fields have gates that reject
+# the plausible value, and a node without a source must not be papered over.
+# Arming the clock is a decision about those two, not a formality.
 #
 # History worth keeping, because it is the same lesson three times. The count
 # read 232 of 326 until yidam 0.10.0 and the corpus had not moved: the check was
@@ -45,12 +59,6 @@
 # that had been counted as no claim *and* flagged by nothing. A count that moves
 # on a re-vendor is the instrument being corrected; decompose by the message
 # before reading it as drift.
-#
-# The pass also moved the README counters, by exactly 11 (+8 `[verified]`, +3
-# `[inference]`). `count_tag` in `crates/connect` requires `]` or a space after
-# the tag name, so the 6 comma-form and 5 wrapped-immediately tags in the 542
-# had never been counted. They are claims the headline number was missing, not
-# claims the pass created.
 
 [catalog]
 # Days, not commits, and that is the one place yidam's clocks disagree on units

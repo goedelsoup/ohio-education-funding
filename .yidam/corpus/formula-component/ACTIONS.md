@@ -140,8 +140,8 @@
 
     The second is the one that matters for the node. A guarantee described without the clawback
     reproduces correctly for 566 districts and wrongly for 43 — few enough to read as rounding,
-    which is why it survived this long. [verified —
-    `crates/project/tests/the_supplements_outside_the_formula.rs`]
+    which is why it survived this long. [verified]
+    (`crates/project/tests/the_supplements_outside_the_formula.rs`)
 
     So the answer to the modelling question is **three nodes**, on the same grounds as the six
     categoricals: three different FY2021 bases, three different sets of districts, and none nested
@@ -164,8 +164,8 @@
     recalibrated after the counts were refreshed; the calculator is a projection published before
     the fiscal year, so recalibration before payment is expected. But a parameter that has silently
     stopped satisfying its own constraint is exactly what a node with all three properties would
-    catch and a node with only the factor would not. [verified —
-    `crates/project/tests/the_supplements_outside_the_formula.rs`]
+    catch and a node with only the factor would not. [verified]
+    (`crates/project/tests/the_supplements_outside_the_formula.rs`)
 
     Three prorations are now known: transportation's special education line at 0.91746,
     transportation's general factor at 1.0, and this one. Only this one publishes its

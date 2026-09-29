@@ -36,7 +36,7 @@ is not repeated.** CSI selects among Title I served schools, so without the flag
 the list cannot be read. The NCES CCD school directory (`ccd_sch_029`) carries 65 columns and none
 of them is Title I. The CCD file that would (`ccd_sch_052`) is over 138 MB and did not download to
 a readable archive in two attempts. Ohio's own Title I Part A page links no served-schools list.
-[verified — probed 10 August 2026] Until one of those routes opens, "not on the CSI list" means
+[verified] (probed 10 August 2026) Until one of those routes opens, "not on the CSI list" means
 exactly that and nothing more. [open]
 
 **And the lists have no history.** The department republishes each in place under a dated filename

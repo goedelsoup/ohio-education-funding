@@ -115,7 +115,7 @@ properties:
     The number of districts it binds is not fixed. Raising base cost lifts districts *onto* the
     floor — their capacity stops exceeding 90% of a larger base cost — and lowering it pushes
     them off. So the count of 138 is a property of the FY2027 model rather than of the
-    parameter. [verified for the mechanism; the 138 is FY2027]
+    parameter. [verified] (the mechanism, and the 138 as a FY2027 count)
 
     Interacts with the guarantee. A district on both the floor and the guarantee is insulated
     twice, and the two mechanisms are usually described separately. [inference]

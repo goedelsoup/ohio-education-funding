@@ -60,9 +60,9 @@ findings: |
   spent its provisions rebuilding was legislated out of existence within twenty-four months, and
   the Bridge formula that followed distributed by reference to prior-year amounts — meaning
   FY2009's distribution, computed under the rules this act wrote, is inside the chain of anchors
-  that reaches FY2027. [inference — the chain is in
-  [`bridge-formula`](../funding-regime/bridge-formula.yml), and how far below FY2013 it reaches is
-  still open]
+  that reaches FY2027. [inference] (the chain is in
+  [`bridge-formula`](../funding-regime/bridge-formula.yml)) [open] (how far below FY2013 it
+  reaches)
 
   106 budget lines name H.B. 119 in their `legal_basis`, more than any other act of the pre-2010
   era except H.B. 152 of the 120th. [verified]

@@ -18,8 +18,8 @@ description: |
 
   So these are endogenous. A year in which districts spend more on buses raises the rate they
   are paid at the following year, and the twenty-district trim is the only thing bounding that.
-  Nobody decides them and no bill is required for them to move. [verified for the mechanism;
-  inference for the feedback]
+  Nobody decides them and no bill is required for them to move. [verified] (the mechanism)
+  [inference] (the feedback)
 
   **The rider weights are the General Assembly's, and the mass-transit factors are the
   department's.** A community or STEM school rider counts 1.5 and a nonpublic rider 2.0, on both
@@ -62,8 +62,8 @@ findings: |
   $308.8m of school bus payment are actually paid on. A per-mile rate is a ratio whose
   denominator moves too, so districts driving further push the statewide figure down while their
   own costs rise; that is the obvious mechanism and two observations cannot establish it.
-  [verified for the rates — [the FY2026 model](../../catalog/dew-fy26-funding-calculator.md) and
-  the FY2027 one, tested in `crates/project`; inference for the mechanism]
+  [verified] (the rates — [the FY2026 model](../../catalog/dew-fy26-funding-calculator.md) and
+  the FY2027 one, tested in `crates/project`) [inference] (the mechanism)
 
   The 17.5% is the July-to-June mean of the monthly series, and the choice is worth half the
   figure: the June-point alignment of the same
@@ -137,7 +137,7 @@ findings: |
 
   The 0.91746 factor on special education transportation is likewise absent from the section, and
   behaves like the enrolment and performance supplements: alive in the calculator and not in
-  permanent law. [verified that it is absent; inference for the parallel]
+  permanent law. [verified] (that it is absent) [inference] (the parallel)
 
   **The transportation guarantee is not.** The line that holds 38 districts at their FY2021
   payment was recorded here as absent from permanent law on the same ground, and it is one section

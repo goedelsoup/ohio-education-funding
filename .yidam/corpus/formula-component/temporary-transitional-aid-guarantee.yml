@@ -221,8 +221,8 @@ findings: |
   lets them fall past a floor that would really catch them: at a 5% phase-in the model has them
   lose 95% of their aid and puts nobody on the guarantee. Those districts hold **46% of Ohio's
   students**, so any scenario that reduces formula aid overstates its savings by an amount that
-  cannot be bounded here. [verified for the model's behaviour; the size of the real-world
-  correction is [open] and needs FY2020 per-district payments for districts not on the guarantee]
+  cannot be bounded here. [verified] (the model's behaviour) [open] (the size of the real-world
+  correction, which needs FY2020 per-district payments for districts not on the guarantee)
 
   ### The consequence for equity is direct
 
@@ -258,7 +258,7 @@ findings: |
   drawing about $181.2 million in guarantee support — and treats the phase-in gap as the
   "unfunded statutory formula" standard for defunding. Set the FY2027 figures beside it:
 
-      FY2024    180 districts     $181.2 million     [verified — as published, secondary]
+      FY2024    180 districts     $181.2 million     [verified] (as published, secondary)
       FY2027    294 districts     $879.0 million     [verified] (department FY2027 model)
 
   Roughly fivefold in dollars, arriving *at* the terminal year, the year the formula reaches

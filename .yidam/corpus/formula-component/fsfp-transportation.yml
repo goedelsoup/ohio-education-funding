@@ -102,8 +102,8 @@ findings: |
   department as the average cost of pupil transportation **for the previous school year**". So
   the endogenous, one-year-lagged response to what districts spend — the thing that makes the
   transportation rates move without an act — governs this payment too. A fuel year reaches the
-  parent's cheque by the same route and on the same delay. [verified — the section; inference
-  that the two averages are the same statistic]
+  parent's cheque by the same route and on the same delay. [verified] (the section) [inference]
+  (that the two averages are the same statistic)
 
   The predecessor formula did it with a third device again: a **nontraditional rider
   adjustment** of `(nontraditional riders / total riders) × 0.1 × base payment`, a proportional
@@ -203,7 +203,7 @@ findings: |
 
   An 8.8% increase is not generous against that. It is why the proration exists, and it is why
   the two earmarks that reach private and charter pupils are the smallest and most exposed part
-  of the channel. [verified for the figures; inference for what the headroom must cover]
+  of the channel. [verified] (the figures) [inference] (what the headroom must cover)
 
   **440 of the department's 611 districts sit on it** — 72%, against 23% on the formula's floor.
   For most of Ohio, local capacity does not determine transportation aid at all. This is the
@@ -244,7 +244,7 @@ findings: |
   [transportation-cost-rates](../parameter/transportation-cost-rates.yml) keeps as unfilled,
   because settling it needs a per-district figure for one of those years. What is settled is what
   the base *is*: one definition, stated in two places, and neither of them this formula.
-  [verified for the definition]
+  [verified] (for the definition)
 
   **That blocker has now been checked rather than asserted, and it holds.** No committed fixture
   carries a per-district FY2020 or FY2021 transportation *payment*. The FY2027 model's

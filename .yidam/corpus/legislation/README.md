@@ -126,8 +126,8 @@ beside the two the corpus already models: `legislation` is what became law and
 [`draft-legislation`](../draft-legislation/) is what was proposed and did not. A vetoed provision is
 neither — passed by both chambers and struck by one person. It is recorded in the `vetoes:` field of
 the act that carried it rather than given a class, because it has no life of its own: it exists only
-as a thing a particular act tried to do. [open — whether that stays the right shape if the field
-keeps growing]
+as a thing a particular act tried to do. [open] (whether that stays the right shape if the field
+keeps growing)
 
 **Two nodes have no greenbook and are exempt by construction.** H.B. 920 of 1976 and the
 constitutional provision predate the series entirely. **H.B. 94's greenbook exists and is silent** —

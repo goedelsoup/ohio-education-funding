@@ -144,8 +144,8 @@ findings: |
   arithmetic says the FY2022 career-technical base cost was, recovered from the schedule rather
   than read anywhere — and against the $7,202 general base cost of the same year that is a
   premium of 15.7%, where FY2027's is 19.6%. The gap between the two bases has widened by four
-  percentage points and no source in this corpus announces it. [verified for the arithmetic;
-  inference for the widening being unannounced]
+  percentage points and no source in this corpus announces it. [verified] (the arithmetic)
+  [inference] (the widening being unannounced)
 
   ### And the whole schedule is written for two years
 
@@ -223,7 +223,7 @@ properties:
     The frozen FY2021 counts mean this programme's sensitivity to *enrolment* is currently
     zero. Growth since 2021 is unfunded and decline since 2021 is unpenalised, so a projection
     that moves career-technical aid with enrolment is modelling something the calculator does
-    not do. [verified for the freeze; inference for the consequence]
+    not do. [verified] (the freeze) [inference] (the consequence)
 unfilled:
   - field: enrolled ADM by career technical planning district
     why: >-

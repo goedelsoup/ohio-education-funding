@@ -176,7 +176,7 @@ findings: |
 
   Whether the two are equivalent in effect — a longer distance charged softly against a shorter
   one charged hard — is a distributional question this corpus can pose and has not run.
-  [inference for the framing; the comparison is unmade]
+  [inference] (the framing) [open] (the comparison is unmade)
 
   ### The scale is recomputed every year, and it moves further than the cost side does
 
@@ -214,13 +214,13 @@ findings: |
   Across all 609 districts, `ln(total weighted wealth)` regressed on `ln(base cost enrolled ADM)`
   has a slope of **0.9855** and an r-squared of **0.8126**. The same districts' weighted wealth
   **per resident pupil** on the same predictor has a slope of **-0.0429** and an r-squared of
-  **0.0085**. [verified — crates/project] A slope of one and four fifths of the variance on the
+  **0.0085**. [verified] (crates/project) A slope of one and four fifths of the variance on the
   quantity the tier reads; no gradient at all on the quantity it names. Ohio's small districts are
   not poorer per pupil than its large ones, and this tier pays them as though they were.
 
   So the tier's **$334,036,712.23** reaches **299 districts at a median 876 pupils and no
   district above 3,259.83**, which is the first district of the largest ADM sextile. Per pupil,
-  by sextile, it is $2,349, $1,616, $433, and then nothing. [verified — crates/project]
+  by sextile, it is $2,349, $1,616, $433, and then nothing. [verified] (crates/project)
 
   ### It is the half of the guarantee's size curve nothing had accounted for
 
@@ -236,20 +236,20 @@ findings: |
       capacity tier struck out            52  72  88  63  49  57    36
       both struck out                     89  82  89  64  49  57     0
 
-  **Strike both out and the first-to-third gap closes to zero.** [verified — crates/project]
+  **Strike both out and the first-to-third gap closes to zero.** [verified]
   ([`crates/project`](../../../crates/project/tests/the_second_size_term_the_plan_keeps_outside_base_cost.rs))
   The tier alone keeps **87** districts off the
   [guarantee](temporary-transitional-aid-guarantee.yml), against the floors' 46, and unlike that
   counterfactual this one needs no bound: `[C]` is paid in full rather than at a state share, it
   feeds no statewide average, and FY2027's phase-in is 100%, so a dollar off it is a dollar off
-  foundation funding exactly. [verified — crates/project]
+  foundation funding exactly. [verified] (crates/project)
 
   ### The size cliff the corpus recorded is the part of the tier that pushes the other way
 
   It is natural to read the 200/400/600 ramp as the mechanism. It is its opposite. The ramp
   **withholds $91,859,433** from the 73 districts it touches; pay them in full and the smallest
   sextile's guarantee count falls from 48 back to 20 — **28 of the 30 districts the floors'
-  removal added to that band go straight back off the guarantee**. [verified — crates/project]
+  removal added to that band go straight back off the guarantee**. [verified] (crates/project)
   The drafters bounded the tier's size dependence with the one provision visibly about size, and
   left the rest of it in the index, where nothing names it. [inference]
 
@@ -259,7 +259,7 @@ findings: |
   $276,708.97 — the published median the tier's own sibling `[F]` already indexes against — and
   multiply by enrolled ADM. Same section, same rate, same published median, and **$24.2 million
   less** in aggregate. The sextile row reads `86 / 74 / 86 / 56 / 45 / 56`, first-to-third gap
-  zero. [verified — crates/project]
+  zero. [verified] (crates/project)
 
   That is an attribution and not a proposal: it holds the rate and very nearly the money fixed and
   changes only what the shortfall is measured against, which locates the whole residual in the
@@ -302,8 +302,8 @@ findings: |
   Once that is the form the pupil count follows from the shortfall. `[F]` multiplies by enrolled
   ADM because a per-pupil shortfall is not money until it does; `[C]` does not, because a
   difference of two whole-district totals already is. Capacity aid's ADM multiplier was what turned
-  a *dimensionless ratio* into dollars, and a difference needs no such conversion. [inference —
-  the uniformity is verified, the drafters' reasoning is not recorded anywhere]
+  a *dimensionless ratio* into dollars, and a difference needs no such conversion. [verified]
+  (the uniformity) [inference] (the drafters' reasoning is not recorded anywhere)
 
   ### What it costs, and what stands where the cap stood
 

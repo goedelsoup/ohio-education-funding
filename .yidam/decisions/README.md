@@ -37,6 +37,10 @@ allowlist. That is worth knowing in both directions: a data field costs the page
 *prose* field added here will not appear on it until it is added to `DECISION_SECTIONS` and to
 `SECTION_NAMES` in `routes.ts`, which `web/tests/unit/links.spec.ts` holds in agreement.
 
+A record's prose may carry claim tags, and none of them is counted. The claim totals read corpus
+nodes only, because a claim is "a statement in a node". A tag here records the standing of what
+the record asserts; a finding the corpus should count has to be written into a node.
+
 ## `connectors:`
 
 A record that approves one or more connectors lists their registry keys:

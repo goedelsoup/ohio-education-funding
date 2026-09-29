@@ -43,7 +43,7 @@ findings: |
   whatever its intent. That explains the gradient; it does not remove it. **$55.7m of a formula
   built to equalise flows against the grain of everything else in it**, and no published figure
   says so. The progress routes are what hold the gradient to 2.56 rather than whatever it would
-  otherwise be. [inference on the mechanism, [verified] on the measurement]
+  otherwise be. [inference] (the mechanism) [verified] (the measurement)
 
   ### It pays districts the same report card put under state control
 
@@ -282,7 +282,7 @@ properties:
 
     A bounded list, not a pinpoint. The analysis cites the sections for the topic and not for each
     supplement inside it, and separating them needs the enrolled act rather than LSC's account of
-    it. [open — which of the six, not whether]
+    it. [open] (which of the six, not whether)
 
   calculator: |
     Not a standalone crate. Carried in `crates/project::panel::PerformanceSupplement` and

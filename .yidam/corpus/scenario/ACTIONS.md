@@ -49,18 +49,18 @@
 
   That is a caveat on a tool where a user changes **one** district. It is a larger caveat here,
   where `crates/project::policy` changes **every** district at once, and the corpus had it recorded
-  nowhere. [verified — the note is in the FY2027 workbook's shared strings]
+  nowhere. [verified] (the note is in the FY2027 workbook's shared strings)
 
   The exposure is concentrated and measurable. `Policy::base_cost_scale` expresses an input-year
   refresh, and **$858m of categorical funding is denominated in the statewide average base cost per
   pupil**: special education, English learners, career-technical and the weighted half of preschool
-  special education are each `weight x $8,241.61 x count x state share`. [verified —
-  `crates/project/tests/what_a_scenario_holds_fixed.rs`, which recovers the shared multiplicand
-  from published amounts to confirm the dependency is real rather than assumed]
+  special education are each `weight x $8,241.61 x count x state share`. [verified]
+  (`crates/project/tests/what_a_scenario_holds_fixed.rs`, which recovers the shared multiplicand
+  from published amounts to confirm the dependency is real rather than assumed)
 
   Of that $858m the lever reaches **$812.5m**; the residue is preschool special education's
   weighted half, $45.7m, which sits outside `[H] Foundation Funding` and outside everything a
-  scenario computes. [verified — same test, which asserts both parts and their ratio]
+  scenario computes. [verified] (same test, which asserts both parts and their ratio)
 
   **Sizing the exposure, as a ratio.** Against the FY2018-to-FY2022 restatement, which raised
   statewide base cost about 3.1%:
@@ -76,8 +76,8 @@
   base cost does, so the state's residual absorbs the whole per-pupil increase and base cost aid
   rises **more** than proportionally; then the guarantee is a `max`, and a district under its floor
   delivers none of the increase. At 3.1% the model delivers $169.1m, against the $113.0m + $25.2m
-  a proportional reading gives. [inference — the two departures are `project::policy::apply`; the
-  delivered figures are runs of it]
+  a proportional reading gives. [inference] (the two departures are `project::policy::apply`; the
+  delivered figures are runs of it)
 
   This table read differently until #251. Its first row was labelled *"a 3.1% refresh, as this site
   models it"*, which described an arithmetic the site has never done; its second and third were
@@ -111,8 +111,8 @@
   stopped being monotone: the fourth band now collects slightly more per pupil than the fifth,
   because base cost aid rises with the state share while the categorical term is paid on a
   district's own special education, English learner and career-technical counts, which do not sort
-  that way. Two mechanisms in one lever. [verified —
-  `crates/scenario-delta/tests/who_a_change_reaches.rs`]
+  that way. Two mechanisms in one lever. [verified]
+  (`crates/scenario-delta/tests/who_a_change_reaches.rs`)
 
   **Three things are still held fixed, and the reasons are not interchangeable.** DPIA and
   targeted assistance ($1.89bn) are indices that genuinely cancel. Gifted ($54.4m) is priced in

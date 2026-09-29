@@ -9,14 +9,14 @@ description: |
 
   ESSA asks each state to describe what it will do about a district with a significant number or
   percentage of persistently identified schools. Ohio's approved plan answered **"Not applicable."**
-  The April 2026 amendment strikes that and lists six actions. [verified as a statement of what the
-  amendment proposes; approval is not established] [open]
+  The April 2026 amendment strikes that and lists six actions. [verified] (as a statement of what
+  the amendment proposes) Approval is not established. [open]
 
   **The unit is the district, which is what makes it a funding matter.** Everything else in the
   federal ladder acts on a building. This acts on the LEA, and its last item is Department approval
   of the district's expenditure plans for federal funds across Title I A, Title II, Title III,
   Title IV and IDEA — a broader list than the school-level equivalent, which names Title IA, IDEA
-  and School Improvement funds. [verified as proposed]
+  and School Improvement funds. [verified]
 
   **Read beside the state's own regime, the two are strikingly different in reach.** An
   [academic distress commission](academic-distress-commission.yml) under R.C. 3302.10 hands a
@@ -31,11 +31,11 @@ properties:
   name: Additional optional action for LEAs with persistently identified schools
   authority: |
     Ohio's Consolidated State Plan under ESSA, section A.4.vii.f, as it stands to be amended in
-    April 2026. [verified as proposed]
+    April 2026. [verified]
   trigger: |
     An LEA with a significant number or percentage of schools consistently identified for
     comprehensive or targeted support, or implementing targeted support plans. The threshold is not
-    defined. [verified as proposed] [open]
+    defined. [verified] [open]
   unit: education-agency
   powers: |
     Six, at the state's option:
@@ -48,11 +48,11 @@ properties:
       6  require Department approval of expenditure plans for federal funds — Title I A,
          Title II, Title III, Title IV and IDEA
 
-    [verified as proposed]
+    [verified]
   exit: Not stated. [open]
   fiscal_effect: |
     Department approval of the district's federal expenditure plans across five programmes.
-    [verified as proposed] No effect on state formula money, and no transfer of budget authority —
+    [verified] No effect on state formula money, and no transfer of budget authority —
     which is the whole distance between this and an academic distress commission. [inference]
 links:
   - target: ../intervention.ont.yml

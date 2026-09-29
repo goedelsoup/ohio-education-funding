@@ -149,8 +149,8 @@ properties:
 
     The appropriation is the binding constraint rather than the formula. The programme already
     exceeds the limit printed beside it, so an increase to either parameter runs into the
-    proration factor before it runs into anything else. [verified for the overrun; inference for
-    the consequence]
+    proration factor before it runs into anything else. [verified] (the overrun) [inference]
+    (the consequence)
 unfilled:
   - field: the flat grant and the halving before FY2014
     why: >-

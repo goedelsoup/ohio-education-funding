@@ -251,8 +251,8 @@ properties:
     The dominant driver is the teacher salary input. Base cost is majority personnel, priced
     at ($62,696.18 x 1.16) + $14,265.53 = $86,993.10 per funded teacher in FY2022, so the
     parameter's real sensitivity is to the reference year rather than to any legislative
-    choice about the number itself. [verified for the arithmetic; inference for the claim
-    about dominance]
+    choice about the number itself. [verified] (the arithmetic) [inference] (the claim
+    about dominance)
 figures:
   - key: project/base-cost-nominal-rise-since-fy2002
     value: 0.7120897382633984
