@@ -186,7 +186,8 @@ const years = Object.fromEntries(MEASURES.map((m) => [m.key, m.year])) as Record
   <form class="filters" id="district-filters" role="search">
     <div class="field">
       <label for="f-name">Name or IRN</label>
-      <input id="f-name" type="search" placeholder="Cleveland, 043786…" autocomplete="off" />
+      {/* `name="q"` so this field and the homepage's make the same address: `/districts?q=`. */}
+      <input id="f-name" name="q" type="search" placeholder="Cleveland, 043786…" autocomplete="off" />
     </div>
     <div class="field">
       <label for="f-status">Funding status</label>

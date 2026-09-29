@@ -469,6 +469,22 @@ test.describe("with JavaScript disabled", () => {
     await expect(page.locator("#district-table tbody tr")).toHaveCount(609);
   });
 
+  test("the homepage's field still lands on the index, and the index is the whole table", async ({
+    page,
+  }) => {
+    /*
+     * The other half of `?q=`. With no script the form is still a form: Enter makes the same
+     * address, and the index it reaches is what a GET to it has always been — every row, shown,
+     * for the browser's own find. A filter that hid rows without script would be a page a reader
+     * could not undo.
+     */
+    await page.goto("/");
+    await page.locator("#home-q").fill(CLEVELAND);
+    await page.locator("#home-q").press("Enter");
+    await expect(page).toHaveURL(new RegExp(`/districts\\?q=${CLEVELAND}$`));
+    await expect(page.locator("#district-table tbody tr:visible")).toHaveCount(609);
+  });
+
   test("the section menus still open, and their links still go somewhere", async ({ page }) => {
     // The reason they are `<details>` rather than a scripted menu. Four of the six entries in the
     // bar are disclosures, so a menu that needed script to open would put most of the site behind

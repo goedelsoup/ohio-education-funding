@@ -54,6 +54,19 @@ if (table && body && nameInput && statusSelect && countOut) {
   nameInput.addEventListener("input", applyFilters);
   statusSelect.addEventListener("change", applyFilters);
 
+  /*
+   * `?q=` is the homepage's search: a plain GET to this page, so the name a reader typed there
+   * arrives in the address rather than in the field. Read once, on load, into the field — so the
+   * filter shown is one the reader can see and clear — and applied like any typed name.
+   *
+   * A field the browser restored on a back navigation wins over the address: that is the reader's
+   * latest word, and the address is only their first. Without script none of this runs and the
+   * page is the whole table, which is the answer a GET to it always gave.
+   */
+  const asked = new URLSearchParams(location.search).get("q");
+  if (asked != null && nameInput.value === "") nameInput.value = asked;
+  if (nameInput.value !== "") applyFilters();
+
   /**
    * Sort by a column, addressed by its index.
    *
