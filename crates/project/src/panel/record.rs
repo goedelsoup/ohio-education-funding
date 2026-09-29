@@ -116,7 +116,7 @@ pub struct DistrictRecord {
     /// derivable. The median of district medians is $41,502 and is a different quantity" — on
     /// the strength of a reconstruction run against the Ohio median column rather than the
     /// federal one. Same substitution as the note on `median_income` above, second consequence.
-    /// See `local-capacity/tests/against_the_departments_own_capacity.rs`.
+    /// See `xcheck/tests/against_the_departments_own_capacity.rs`.
     pub statewide_median_income: Option<Dollars>,
     /// `[C5]` — the income ratio of the 40th highest district, which tops out the sliding scale.
     ///

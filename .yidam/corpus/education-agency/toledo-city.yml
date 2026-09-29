@@ -118,7 +118,7 @@ findings: |
   mill's yield is a measure of total valuation, and capacity aid is the only Ohio component that
   prefers a district's *total* valuation to its valuation per pupil — which is the comparison the
   correction leaves standing, standardised −0.1994 against −0.1204. [verified]
-  ([`crates/dispersion`](../../../crates/dispersion/tests/what_fell_out_of_the_state_column.rs))
+  ([`crates/xcheck`](../../../crates/xcheck/tests/what_fell_out_of_the_state_column.rs))
 
   It is not the only thing in the step, and the published version said it was. On one basis a
   disadvantage term reaches t = +3.92 where the published column had it at +1.38, third of three
@@ -146,7 +146,7 @@ findings: |
   the rest of the frame at two standard errors — the mineral one included, so the oil and gas
   districts that dominate the same three columns a decade later carry no FY2016 signature either.
   [verified]
-  ([`crates/dispersion`](../../../crates/dispersion/tests/what_fell_out_of_the_state_column.rs))
+  ([`crates/xcheck`](../../../crates/xcheck/tests/what_fell_out_of_the_state_column.rs))
 
   The equalization series was checked against the published step and is untouched by the
   correction as well: it cuts by quartile and takes an unweighted mean over about 152 districts,
@@ -230,7 +230,7 @@ revisions:
       the poverty term was being cancelled by an artifact.
     reach: |
       One sentence of this node and one assertion in
-      `crates/dispersion/tests/what_fell_out_of_the_state_column.rs`, which pinned the disadvantage
+      `crates/xcheck/tests/what_fell_out_of_the_state_column.rs`, which pinned the disadvantage
       term *below* two and now pins it above three.
   - was: |
       A published fact-check read Toledo's $2,766 per pupil of special-education instruction

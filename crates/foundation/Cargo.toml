@@ -18,8 +18,5 @@ edfund-core = { path = "../edfund-core" }
 # dev-dependencies.
 local-capacity = { path = "../local-capacity" }
 
-[dev-dependencies]
-dispersion = { path = "../dispersion" }
-
 [lints]
 workspace = true

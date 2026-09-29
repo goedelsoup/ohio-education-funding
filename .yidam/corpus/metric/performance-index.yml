@@ -31,7 +31,7 @@ findings: |
   Across the 606 districts where both are held, the Performance Index correlates with the
   economically disadvantaged share at **−0.846**, which is 71.6% of the cross-district variance
   in the Index. [verified] (computed; see
-  [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs))
+  [`crates/xcheck/tests/report_card_2425.rs`](../../../crates/xcheck/tests/report_card_2425.rs))
 
   Nothing else in this corpus comes close to that. It is the first thing to say about any
   district-level correlate of the Index, because almost every such correlate is partly this

@@ -2,7 +2,7 @@
 //!
 //! Everything in `millage` was written from the statute. R.C. 319.301 says reduction factors hold
 //! a levy's dollar yield roughly constant as valuation rises, and R.C. 319.301(D) says they may
-//! not carry a rate below twenty mills. The unit tests in the crate prove the arithmetic does
+//! not carry a rate below twenty mills. The unit tests in `millage` prove the arithmetic does
 //! what the doc comments claim. None of them prove it describes Ohio.
 //!
 //! These do. Two independent tables — the Department of Taxation's Table SD-1 and the Department

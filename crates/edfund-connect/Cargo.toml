@@ -1,0 +1,25 @@
+[package]
+name = "edfund-connect"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+description = "The `edfund-connect` CLI over `connect`, and the README index it regenerates"
+
+[dependencies]
+connect = { path = "../connect" }
+# For the `bundle-status` REGEN block, which prints what `bundle::build::build()` produces so the
+# README cannot drift from the feed. It is the only reason this crate exists apart from
+# `connect`: the block used to be generated there, and through `bundle` the retrieval crate
+# recompiled whenever any model crate changed (#501). A crate at the top of the graph can depend
+# on everything; the one that reads publications should not.
+bundle = { path = "../bundle" }
+
+[[bin]]
+name = "edfund-connect"
+path = "src/main.rs"
+
+[lints]
+workspace = true

@@ -63,7 +63,8 @@ findings: |
   `[C5]` to the eight places the fixture stores. The denominator those ratios are taken against is
   derivable the same way — the median of the 609 district medians, **$54,546.6375**, which is the
   department's `[I7]` exactly. [verified]
-  (`crates/local-capacity/tests/against_the_departments_own_capacity.rs`)
+  (`crates/local-capacity`, held to the department's figures in
+  `crates/xcheck/tests/against_the_departments_own_capacity.rs`)
 
   The rank is a strict one. The districts on either side of the fortieth sit at 1.47060496 and
   1.46495024, so the benchmark is one district's ratio rather than a plateau several would give —
@@ -153,7 +154,7 @@ revisions:
       department's `[C5]` exactly.
     found_by: |
       `crates/local-capacity::benchmark_ratio`, checked against the published figure in
-      `tests/against_the_departments_own_capacity.rs`.
+      `crates/xcheck/tests/against_the_departments_own_capacity.rs`.
     reach: |
       A rank was recorded as unfillable because it had been looked for as a value. The two things
       named as what would settle it were both already held — the income column was in the extract,

@@ -4,8 +4,8 @@
 //!
 //! The fixture is this crate's, and it had two readers: a public one in `project::outcomes`,
 //! which joins the outcome side to the funding model, and a private one inside this crate's own
-//! `tests/report_card_2425.rs`, which is where every coefficient the corpus quotes off this file
-//! is computed. A third, also private, sat in `tests/expenditure_functions_fy25.rs`. They
+//! `tests/report_card_2425.rs` — now `xcheck/tests/`, where every coefficient the corpus quotes
+//! off this file is computed. A third, also private, sat in `tests/expenditure_functions_fy25.rs`. They
 //! indexed the same columns by hand and nothing related them. `project::outcomes` now re-exports
 //! this module rather than restating it. See issue #157.
 //!
@@ -19,8 +19,8 @@
 //! The choice moves the headline result from nothing to something — against the Performance
 //! Index, -0.015 on the published divisor and -0.337 on the headcount — because the weight
 //! ratio is very nearly a poverty index, and dividing by it removes most of what the Performance
-//! Index measures. Both are computed in `tests/report_card_2425.rs`; neither is the "right" one
-//! without a stated question, and a figure quoted from here must name its divisor.
+//! Index measures. Both are computed in `xcheck/tests/report_card_2425.rs`; neither is the
+//! "right" one without a stated question, and a figure quoted from here must name its divisor.
 //!
 //! # The two ADM columns are published at different precisions
 //!
@@ -152,7 +152,7 @@ impl ReportCard {
     /// Operating expenditure per *weighted* pupil, recomputed rather than read.
     ///
     /// Reconstructs [`ReportCard::per_equivalent_pupil`] up to the whole-pupil rounding of the
-    /// denominator, which is the check `tests/report_card_2425.rs` makes on all 607 rows.
+    /// denominator, which is the check `xcheck/tests/report_card_2425.rs` makes on all 607 rows.
     #[must_use]
     pub fn per_weighted_pupil(&self) -> Option<Dollars> {
         self.per_pupil_on(self.weighted_adm)
@@ -280,7 +280,7 @@ pub fn district(irn: &str) -> Option<ReportCard> {
 /// paper's own table rather than from a different one.
 ///
 /// Public because `metric/expenditure-per-equivalent-pupil` prints all six figures under
-/// `[verified]`. They were computed inside `tests/report_card_2425.rs` and reachable from
+/// `[verified]`. They were computed inside `xcheck/tests/report_card_2425.rs` and reachable from
 /// nothing.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Sensitivity {

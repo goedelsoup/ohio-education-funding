@@ -76,7 +76,7 @@ findings: |
   every building that spans the boundary to the high-school side — the assignment least favourable
   to an elementary reading — and **64.96%** of the pupils a designated building makes eligible are
   in kindergarten through eight. [verified]
-  ([`crates/dispersion`](../../../crates/dispersion/tests/the_grade_split_the_designated_list_does_carry.rs))
+  ([`crates/xcheck`](../../../crates/xcheck/tests/the_grade_split_the_designated_list_does_carry.rs))
   The three published editions read 64.96%, 65.45% and 65.80%, so the shape belongs to the
   designated set rather than to one year's list.
 

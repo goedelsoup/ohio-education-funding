@@ -38,7 +38,7 @@ the same three DEW files and recomputes the paper's results from them. To the pr
 displays, all of it lands: −0.016, Spearman +0.048, federal −0.558, state-and-local +0.086,
 enrollment-weighted −0.149, enrollment against spending ρ −0.366, median $12,856, mean $13,224,
 and the Performance Index at median 88.2, mean 87.7, sd 10.9, range 53.1 to 112.8. Pinned in
-[`crates/dispersion/tests/report_card_2425.rs`](../../crates/dispersion/tests/report_card_2425.rs).
+[`crates/xcheck/tests/report_card_2425.rs`](../../crates/xcheck/tests/report_card_2425.rs).
 [verified]
 
 This is an unusually clean replication and it should be said plainly: the paper's arithmetic is

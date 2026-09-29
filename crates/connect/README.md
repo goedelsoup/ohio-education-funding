@@ -14,7 +14,7 @@ edfund-connect head <source> <sheet> [n]
                                     dump a sheet with column indices, for mapping a new layout
 ```
 
-Run it from `crates/`: `cargo run -p connect --bin edfund-connect -- list`.
+Run it from `crates/`: `cargo run -p edfund-connect -- list`.
 
 ## What replaced the stubs
 

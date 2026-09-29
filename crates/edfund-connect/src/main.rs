@@ -204,9 +204,9 @@ fn regenerate_index(root: &std::path::Path, check: bool) -> Result<(), String> {
     // uncommitted edit somewhere else in the same file, so it fails on any dirty tree and teaches
     // whoever hits it to ignore the gate. CI never noticed because CI checks out clean.
     let stale = if check {
-        connect::index::stale(root).map_err(|e| e.to_string())?
+        edfund_connect::index::stale(root).map_err(|e| e.to_string())?
     } else {
-        connect::index::regenerate(root).map_err(|e| e.to_string())?
+        edfund_connect::index::regenerate(root).map_err(|e| e.to_string())?
     };
     if stale.is_empty() {
         println!("every block is already current");

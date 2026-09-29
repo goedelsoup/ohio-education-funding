@@ -10,10 +10,12 @@ members = [
     "bundle",
     "spreadsheet",
     "connect",
+    "edfund-connect",
     "figures",
     "project",
     "scenario-delta",
     "regime-diff",
+    "xcheck",
 ]
 
 [workspace.package]

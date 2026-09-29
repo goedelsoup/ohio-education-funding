@@ -22,7 +22,7 @@ findings: |
 
   This was recorded as an argument. It is now a measurement, and it is larger than the argument
   predicted. [verified] (computed; see
-  [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs))
+  [`crates/xcheck/tests/report_card_2425.rs`](../../../crates/xcheck/tests/report_card_2425.rs))
 
       Performance Index against FY2025 operating expenditures
         divided by WEIGHTED ADM      -0.0155    (the published measure)
@@ -70,7 +70,7 @@ findings: |
   ### Only one of the two estimates is stable, and it is not the published one
 
   [verified]
-  ([`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs))
+  ([`crates/xcheck/tests/report_card_2425.rs`](../../../crates/xcheck/tests/report_card_2425.rs))
 
       scenario                              published    headcount
       all districts                          -0.0155      -0.3365
@@ -167,7 +167,7 @@ findings: |
   shares the weighting is said to answer to, so how much of the schedule is missing is a
   measurable quantity rather than an unknown one. Three shares explain 91.4% of the
   cross-district variation in the weight, over the same 606 districts every model here fits.
-  [verified] ([`crates/dispersion`](../../../crates/dispersion/tests/report_card_2425.rs))
+  [verified] ([`crates/xcheck`](../../../crates/xcheck/tests/report_card_2425.rs))
 
       extra pupils per pupil, per point of share, FY2025
         economically disadvantaged        +0.00206
@@ -194,7 +194,7 @@ findings: |
   real work: 303 of the 606 districts carry no published share. Refitting on the 303 that do
   moves the English-learner coefficient from 0.00442 to 0.00346 — smaller, as imputing a floor
   would predict, and nowhere near zero — while the other two barely move and the fit improves to
-  92.5%. [verified] ([`crates/dispersion`](../../../crates/dispersion/tests/report_card_2425.rs))
+  92.5%. [verified] ([`crates/xcheck`](../../../crates/xcheck/tests/report_card_2425.rs))
   The imputation is therefore a bound on that one coefficient, not a load-bearing assumption.
 figures:
   # The paper's own sensitivity table, both denominators. The sign flip in the third published
@@ -336,7 +336,7 @@ properties:
   calculator: |
     Published, not computed. Distribution and association statistics over it are `dispersion`;
     the unweighted-ADM recomputation lives in
-    [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)
+    [`crates/xcheck/tests/report_card_2425.rs`](../../../crates/xcheck/tests/report_card_2425.rs)
     and is pinned so a fixture refresh that moves it fails the build.
 links:
   - target: ../metric.ont.yml

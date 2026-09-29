@@ -41,7 +41,7 @@ enrollment exactly equal to its `All Students` enrollment. [verified]
 The censoring shows up exactly where censoring should: the saturated measure gives the *weaker*
 association with the outcome. This corpus uses the Cupp measure for its headline poverty findings
 and commits both. [verified — see
-[`crates/dispersion/tests/report_card_2425.rs`](../../crates/dispersion/tests/report_card_2425.rs)]
+[`crates/xcheck/tests/report_card_2425.rs`](../../crates/xcheck/tests/report_card_2425.rs)]
 
 **Access constraints.** Freely available, no registration. XLSX.
 

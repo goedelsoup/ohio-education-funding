@@ -83,12 +83,12 @@ publications and
 [`crates/dispersion/fixtures/report-card-2425-district-data.csv`](../../../crates/dispersion/fixtures/report-card-2425-district-data.csv)
 holds 607 districts with three years of Performance Index, the Progress composite and effect
 size, both ADM columns, and the expenditure numerator;
-[`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)
+[`crates/xcheck/tests/report_card_2425.rs`](../../../crates/xcheck/tests/report_card_2425.rs)
 pins what it shows in 20 tests. Every figure on all three report-card metrics is computed rather
 than quoted.
 
 **The need-adjusted model exists.** `dispersion::least_squares` fits it and
-[`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs)
+[`crates/xcheck/tests/report_card_2425.rs`](../../../crates/xcheck/tests/report_card_2425.rs)
 pins it across 27 tests: controlling for economic disadvantage, English-learner and disability
 shares, district size, and property wealth, the standardised spending coefficient is −0.073 on
 attainment level and +0.209 on growth. Missing from the specification: district typology,

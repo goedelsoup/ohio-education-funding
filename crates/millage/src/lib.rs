@@ -240,7 +240,7 @@ mod tests {
     /// charging under twenty is already there, so nothing is reduced.
     ///
     /// Ohio has six such districts and every one publishes an effective rate equal to its voted
-    /// rate. `tests/against_published_tables.rs` holds the crate to them.
+    /// rate. `xcheck/tests/against_published_tables.rs` holds the crate to them.
     #[test]
     fn a_district_that_never_voted_twenty_mills_is_never_reduced() {
         for voted in [18.7, 19.0, 19.6, 19.71] {

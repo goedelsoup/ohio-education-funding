@@ -1551,7 +1551,7 @@ fn casino_statewide() -> Vec<CasinoYear> {
 /// The same fund per district, plus the county funds it was last paid out of.
 ///
 /// Keyed on the IRN the tax department writes, which is the IRN the funding calculator writes for
-/// every traditional district — a join checked in `crates/dispersion/tests/casino_distributions.rs`
+/// every traditional district — a join checked in `crates/xcheck/tests/casino_distributions.rs`
 /// rather than assumed here.
 ///
 /// The county count comes from the **last** distribution in the panel rather than the last fiscal
@@ -2339,7 +2339,8 @@ mod tests {
          * before that it was a different string literal in the same place. Nothing connected
          * either to the download it described, so replacing the fixture would have left the page
          * confidently naming the wrong school year — and a regenerated constant produces no diff,
-         * which is the failure `connect::index`'s node count had when it was the literal `58`.
+         * which is the failure `edfund_connect::index`'s node count had when it was the literal
+         * `58`.
          *
          * `2024-25` -> `2425` is the department's own filename convention.
          */
