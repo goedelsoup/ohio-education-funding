@@ -33,23 +33,28 @@ description: |
   directory that is otherwise the canonical list of these agencies. [inference]
 properties:
   - name: irn
+    label: IRN
     type: string
     required: true
     description: Information Retrieval Number; the stable statewide identifier for the agency
   - name: agency_type
+    label: Kind of agency
     type: string
     required: true
     values: [city, local, exempted-village, joint-vocational, community, stem]
     description: The statutory kind of agency, which decides the rules it is funded on
   - name: county
+    label: County
     type: string
     required: true
     description: Primary county of the agency's territory
   - name: typology
+    label: Typology
     type: string
     required: true
     description: Department typology grouping (rural, small town, suburban, urban) used for peer comparison
   - name: established
+    label: Established
     type: date
     required: true
     description: >-
@@ -60,11 +65,13 @@ properties:
       and the node's claim tag says which. An agency no source dates records it under `unfilled:`
       and stays in the baseline.
   - name: roles
+    label: Roles
     type: text
     required: true
     prose: true
     description: Contingent roles the agency plays or has played, each with the fiscal periods it applied
   - name: series_path
+    label: Series in the repository
     type: string
     required: true
     description: Path under crates/ to this agency's committed per-fiscal-year numeric series
@@ -84,26 +91,32 @@ properties:
 edge_policy: characteristic
 edges:
   - relationship: party-to
+    label: Party to
     target: litigation
     direction: out
     description: The agency was a named plaintiff, defendant, or intervenor in the case
   - relationship: merged-into
+    label: Merged into
     target: education-agency
     direction: out
     description: The agency this one was consolidated into; required to keep long series continuous
   - relationship: peer-of
+    label: Peer of
     target: education-agency
     direction: out
     description: The agency is a comparison peer, by typology or by wealth position
   - relationship: funded-by
+    label: Funded by
     target: revenue-stream
     direction: in
     description: A channel of money that reaches this agency
   - relationship: loses-to
+    label: Loses funds to
     target: program
     direction: in
     description: A program that diverts funds away from this agency
   - relationship: measured-by
+    label: Measured by
     target: metric
     direction: in
     description: A defined measure computed over this agency's series

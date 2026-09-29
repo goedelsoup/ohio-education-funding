@@ -12,36 +12,44 @@ description: |
   to be traversable in each direction.
 properties:
   - name: case_name
+    label: Case name
     type: string
     required: true
     description: Short case name as commonly cited
   - name: citation
+    label: Citation
     type: string
     required: true
     description: Reporter citation
   - name: court
+    label: Court
     type: string
     required: true
     description: Deciding court
   - name: filed
+    label: Filed
     type: date
     required: true
     description: Date the action was commenced
   - name: decided
+    label: Decided
     type: date
     required: true
     description: Date of the decision this node records
   - name: holding
+    label: Holding
     type: text
     required: true
     prose: true
     description: What the court held, and on what constitutional ground
   - name: remedy
+    label: Remedy
     type: text
     required: true
     prose: true
     description: What relief was ordered, and whether it was complied with
   - name: procedural_history
+    label: Procedural history
     type: text
     required: false
     prose: true
@@ -65,30 +73,37 @@ properties:
 edge_policy: characteristic
 edges:
   - relationship: challenges
+    label: Challenges
     target: funding-regime
     direction: out
     description: The regime whose constitutionality was at issue
   - relationship: challenges
+    label: Challenges
     target: program
     direction: out
     description: A program whose lawfulness was at issue, as distinct from a whole regime
   - relationship: cites
+    label: Cites
     target: litigation
     direction: out
     description: A prior decision this one builds on, narrows, or reaffirms
   - relationship: invokes
+    label: Invokes
     target: doctrine
     direction: out
     description: A normative principle the court reasoned from
   - relationship: prompts
+    label: Prompts
     target: legislation
     direction: out
     description: An enactment passed in response to this decision
   - relationship: decided-by
+    label: Decided by
     target: actor
     direction: in
     description: The court that issued the decision
   - relationship: has-party
+    label: Has as a party
     target: education-agency
     direction: in
     description: An agency that was a named party

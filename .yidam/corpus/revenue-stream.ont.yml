@@ -13,29 +13,35 @@ description: |
   anew each biennium.
 properties:
   - name: name
+    label: Name
     type: string
     required: true
     description: Common name of the stream
   - name: level
+    label: Level
     type: string
     required: true
     values: [local, state, federal]
     description: The level of government the money comes from
   - name: legal_basis
+    label: Legal basis
     type: string
     required: true
     description: Constitutional provision, Revised Code chapter, or federal statute authorizing the stream
   - name: restriction
+    label: Restriction
     type: text
     required: true
     prose: true
     description: Whether funds are unrestricted general revenue or restricted to a stated purpose
   - name: growth_behavior
+    label: How it grows
     type: text
     required: true
     prose: true
     description: How the stream's yield changes over time, and what constrains it
   - name: series_path
+    label: Series in the repository
     type: string
     required: true
     description: Path under crates/ to the committed per-agency-year series for this stream
@@ -55,18 +61,22 @@ properties:
 edge_policy: characteristic
 edges:
   - relationship: funds
+    label: Funds
     target: education-agency
     direction: out
     description: The agency this channel delivers money to
   - relationship: substitutes-for
+    label: Substitutes for
     target: revenue-stream
     direction: out
     description: A stream this one was created to replace after the original was abolished or reduced
   - relationship: allocated-by
+    label: Allocated by
     target: formula-component
     direction: in
     description: The component that determines each agency's share of this stream
   - relationship: constrained-by
+    label: Constrained by
     target: legislation
     direction: in
     description: An enactment that limits, freezes, or redirects this stream

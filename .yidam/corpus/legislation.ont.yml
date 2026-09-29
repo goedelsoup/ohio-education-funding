@@ -12,22 +12,27 @@ description: |
   that establishes, constrains, and is litigated against.
 properties:
   - name: designation
+    label: Designation
     type: string
     required: true
     description: Bill designation (e.g. Am. Sub. H.B. 110) or constitutional citation
   - name: general_assembly
+    label: General Assembly
     type: string
     required: true
     description: Numbered General Assembly that passed it
   - name: signed
+    label: Signed
     type: date
     required: true
     description: Date signed or ratified
   - name: effective
+    label: Effective
     type: date
     required: true
     description: Date the operative provisions took effect
   - name: effective_note
+    label: When each part took effect
     type: text
     required: false
     prose: true
@@ -45,16 +50,19 @@ properties:
       conditionally. How many acts lack it is generated into the corpus README, and
       `yidam lint --warn` names them.
   - name: subject
+    label: What it did
     type: text
     required: true
     prose: true
     description: What the enactment did to the funding system, in two or three sentences
   - name: vetoes
+    label: Vetoes
     type: text
     required: true
     prose: true
     description: Line-item vetoes affecting education funding, where relevant
   - name: accountability_effect
+    label: Effect on accountability
     type: text
     required: false
     prose: true
@@ -84,38 +92,47 @@ properties:
 edge_policy: characteristic
 edges:
   - relationship: establishes
+    label: Establishes
     target: funding-regime
     direction: out
     description: A regime this enactment created
   - relationship: sets
+    label: Sets
     target: parameter
     direction: out
     description: A parameter value or method this enactment fixed
   - relationship: creates
+    label: Creates
     target: program
     direction: out
     description: A program this enactment established
   - relationship: constrains
+    label: Constrains
     target: revenue-stream
     direction: out
     description: A revenue channel this enactment limited, froze, or redirected
   - relationship: amends
+    label: Amends
     target: legislation
     direction: out
     description: A prior enactment this one modified
   - relationship: appropriates-for
+    label: Appropriates for
     target: fiscal-period
     direction: out
     description: The fiscal period or biennium this enactment funds
   - relationship: grounds
+    label: Grounds
     target: doctrine
     direction: in
     description: A normative principle that originates in this text
   - relationship: enacted-by
+    label: Enacted by
     target: actor
     direction: in
     description: The institution that passed or ratified it
   - relationship: prompted-by
+    label: Prompted by
     target: litigation
     direction: in
     description: A decision this enactment was a response to

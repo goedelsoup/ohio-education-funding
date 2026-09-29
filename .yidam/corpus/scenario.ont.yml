@@ -12,38 +12,46 @@ description: |
   assumed, which regime it baselines on, what code produced it, and when.
 properties:
   - name: name
+    label: Name
     type: string
     required: true
     description: Short name for the counterfactual
   - name: question
+    label: Question
     type: text
     required: true
     prose: true
     description: The policy question this scenario is constructed to answer
   - name: perturbations
+    label: Perturbations
     type: text
     required: true
     prose: true
     description: Each parameter altered, its baseline value, and its scenario value
   - name: input_projections
+    label: Input projections
     type: text
     required: true
     prose: true
     description: Which input series were projected rather than observed, and by what method
   - name: horizon
+    label: Horizon
     type: string
     required: true
     description: Fiscal periods covered by the run
   - name: results_path
+    label: Results in the repository
     type: string
     required: true
     description: Path under crates/ to the committed per-agency delta output
   - name: confidence
+    label: Confidence
     type: text
     required: true
     prose: true
     description: What the result is sensitive to, and where it should not be trusted
   - name: results
+    label: Results
     type: text
     required: true
     prose: true
@@ -64,26 +72,32 @@ properties:
 edge_policy: characteristic
 edges:
   - relationship: compares-to
+    label: Compared with
     target: scenario
     direction: out
     description: Another counterfactual this one is set against, isolating one perturbation from another
   - relationship: perturbs
+    label: Alters
     target: parameter
     direction: out
     description: A parameter whose value this scenario alters
   - relationship: projects
+    label: Projects
     target: metric
     direction: out
     description: A measure this scenario forecasts under its assumptions
   - relationship: baselines-on
+    label: Measured against
     target: funding-regime
     direction: out
     description: The regime the counterfactual is computed against
   - relationship: horizon-over
+    label: Runs over
     target: fiscal-period
     direction: out
     description: A fiscal period within the run's horizon
   - relationship: simulated-by
+    label: Priced by
     target: draft-legislation
     direction: in
     description: >-

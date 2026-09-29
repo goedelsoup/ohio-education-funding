@@ -24,14 +24,17 @@ description: |
   each applied — exactly as property-poor and guarantee district do one level up.
 properties:
   - name: building_irn
+    label: Building IRN
     type: string
     required: true
     description: The building's own IRN, which is not the district's
   - name: district
+    label: District
     type: string
     required: true
     description: Operating district and its IRN
   - name: grades
+    label: Grades
     type: string
     required: true
     description: >-
@@ -40,10 +43,12 @@ properties:
       the department's EdChoice designation lists, or the federal school directory, and the node
       names which in a claim tag.
   - name: enrollment
+    label: Enrollment
     type: string
     required: true
     description: Building enrollment, on the report card's count, with the year
   - name: performance
+    label: Performance
     type: text
     required: true
     prose: true
@@ -51,36 +56,43 @@ properties:
       Performance Index and component ratings, with the years. Three consecutive years is the
       span both the CSI escalation and the academic distress trigger read.
   - name: chronic_absenteeism
+    label: Chronic absenteeism
     type: string
     required: true
     description: >-
       The rate, with the year. A CSI criterion in its own right for buildings with fewer than
       three rated components, not a descriptive statistic.
   - name: roles
+    label: Roles
     type: text
     required: true
     prose: true
     description: >-
       Contingent identifications and the periods they applied — CSI, TSI, ATSI, Title I served.
   - name: series_path
+    label: Series in the repository
     type: string
     required: true
     description: Path under crates/ to the committed building series
 edge_policy: characteristic
 edges:
   - relationship: operated-by
+    label: Operated by
     target: education-agency
     direction: out
     description: The district that operates the building
   - relationship: identified-under
+    label: Identified under
     target: accountability-regime
     direction: out
     description: A regime that has identified this building for support or improvement
   - relationship: subject-to
+    label: Subject to
     target: intervention
     direction: out
     description: An intervention imposed on the building
   - relationship: rated-on
+    label: Rated on
     target: metric
     direction: out
     description: A measure the building is rated on

@@ -12,27 +12,33 @@ description: |
   the FY2026-27 biennium means scanning date strings across every other class.
 properties:
   - name: label
+    label: Label
     type: string
     required: true
     description: FY2022 for a fiscal year, FY2022-23 for a biennium
   - name: kind
+    label: Kind
     type: string
     required: true
     values: [fiscal-year, biennium]
     description: Whether the period is one fiscal year or the biennium a budget act appropriates for
   - name: start
+    label: Starts
     type: date
     required: true
     description: First day of the period
   - name: end
+    label: Ends
     type: date
     required: true
     description: Last day of the period
   - name: appropriating_bill
+    label: Appropriating bill
     type: string
     required: true
     description: Designation of the budget act funding this period
   - name: context
+    label: Context
     type: text
     required: true
     prose: true
@@ -53,26 +59,32 @@ properties:
 edge_policy: characteristic
 edges:
   - relationship: follows
+    label: Follows
     target: fiscal-period
     direction: out
     description: The period immediately preceding this one
   - relationship: part-of
+    label: Part of
     target: fiscal-period
     direction: out
     description: The containing period; a fiscal year is part of a biennium
   - relationship: funded-by
+    label: Funded by
     target: legislation
     direction: in
     description: The enactment appropriating for this period
   - relationship: governed-by
+    label: Governed by
     target: funding-regime
     direction: in
     description: The regime in force during this period
   - relationship: holds-value-of
+    label: Holds a value of
     target: parameter
     direction: in
     description: A parameter with a specific value in this period
   - relationship: measured-in
+    label: Measured in
     target: metric
     direction: in
     description: A measure computed for this period

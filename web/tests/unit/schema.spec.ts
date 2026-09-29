@@ -322,7 +322,9 @@ test("an ontology property missing required is rejected", () => {
     label: "Metric",
     description: "A measure.",
     edge_policy: "characteristic",
-    properties: [{ name: "series", type: "text", description: "The series.", ...property }],
+    properties: [
+      { name: "series", label: "Series", type: "text", description: "The series.", ...property },
+    ],
     edges: [],
   });
   expect(OntologyClassSchema.safeParse(withProperty({})).success).toBe(false);
@@ -332,6 +334,29 @@ test("an ontology property missing required is rejected", () => {
   expect(OntologyClassSchema.safeParse(withProperty({ required: "yes" })).success).toBe(false);
 });
 
+test("an ontology property or edge without a label is rejected", () => {
+  // A key is not a label (#551): the site shows what the declaration says a reader reads, so a
+  // declaration that says nothing would put its key back on the page.
+  const withDeclarations = (property: object, edge: object) => ({
+    class: "metric",
+    label: "Metric",
+    description: "A measure.",
+    edge_policy: "characteristic",
+    properties: [
+      { name: "unit", type: "string", required: true, description: "The unit.", ...property },
+    ],
+    edges: [
+      { relationship: "derived-from", target: "metric", direction: "out", description: "An input.", ...edge },
+    ],
+  });
+  const labelled = { label: "Unit" };
+  const edgeLabelled = { label: "Derived from" };
+  expect(OntologyClassSchema.safeParse(withDeclarations(labelled, edgeLabelled)).success).toBe(true);
+  expect(OntologyClassSchema.safeParse(withDeclarations({}, edgeLabelled)).success).toBe(false);
+  expect(OntologyClassSchema.safeParse(withDeclarations(labelled, {})).success).toBe(false);
+  expect(OntologyClassSchema.safeParse(withDeclarations({ label: "" }, edgeLabelled)).success).toBe(false);
+});
+
 test("an ontology property's values are a non-empty list of tokens", () => {
   const withProperty = (property: object) => ({
     class: "metric",
@@ -339,7 +364,14 @@ test("an ontology property's values are a non-empty list of tokens", () => {
     description: "A measure.",
     edge_policy: "characteristic",
     properties: [
-      { name: "unit", type: "string", required: true, description: "The unit.", ...property },
+      {
+        name: "unit",
+        label: "Unit",
+        type: "string",
+        required: true,
+        description: "The unit.",
+        ...property,
+      },
     ],
     edges: [],
   });

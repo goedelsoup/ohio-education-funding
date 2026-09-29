@@ -32,24 +32,29 @@ description: |
   first cited, with its alignment stated in the record and no corpus node of its own.
 properties:
   - name: publisher
+    label: Publisher
     type: string
     required: true
     description: The organization that issued it, and its stated policy alignment
   - name: version
+    label: Version
     type: string
     required: true
     description: The date the publisher finalized the text, and any amendment dates
   - name: eligibility
+    label: Eligibility
     type: text
     required: true
     prose: true
     description: Which students the model text makes eligible
   - name: award_basis
+    label: How the award is set
     type: text
     required: true
     prose: true
     description: How the model sets the amount that follows a student
   - name: district_funding_effect
+    label: Effect on district funding
     type: text
     required: true
     prose: true
@@ -60,11 +65,13 @@ properties:
       arrangement can actually be compared: this corpus has established Ohio's answer against
       the department's own calculator, so a claim here is falsifiable rather than atmospheric.
   - name: private_school_regulation
+    label: Regulation of private schools
     type: text
     required: true
     prose: true
     description: What the model requires of, or forbids regulators from imposing on, participating schools
   - name: adoption_evidence
+    label: Evidence of adoption
     type: text
     required: true
     prose: true
@@ -88,6 +95,7 @@ properties:
 edge_policy: characteristic
 edges:
   - relationship: parallels
+    label: Parallels
     target: program
     direction: out
     description: >-
@@ -95,10 +103,12 @@ edges:
       or `adopted-as`: the verb has to survive `adoption_evidence` being `[open]`, and a
       resemblance between two published texts is all that is established.
   - relationship: parallels
+    label: Parallels
     target: legislation
     direction: out
     description: An Ohio enactment whose provisions the model text resembles, on the same reading as above
   - relationship: departs-from
+    label: Departs from
     target: program
     direction: out
     description: >-
@@ -106,6 +116,7 @@ edges:
       `parallels` and the more informative of the two here, because Ohio's funding mechanism
       diverged from the model's while its eligibility design converged on it.
   - relationship: contested-under
+    label: Contested under
     target: doctrine
     direction: out
     description: A normative principle the model text's design is argued against or defended on
