@@ -77,6 +77,14 @@ findings: |
   the two ends of the relationship
   [`progress-value-added`](../metric/progress-value-added.yml) measures across the state.
   [verified]
+
+  The public school system dates from 1849, when voters first passed a $1,600 bond issue to build
+  Perrysburg Union School. That is Historic Perrysburg's account, which cites no record, and the
+  Auditor of State's audits give no organization date: they say only that the district is
+  organized under Article VI of the Ohio Constitution and that "there is no authority for a
+  school district to have a charter". [inference] The exempted-village designation is a later
+  classification of the same district, not a founding, so `established` carries the year the
+  system began and nothing finer.
 revisions:
   - was: |
       Toledo spends $6,173 more per pupil than Perrysburg.
@@ -241,6 +249,7 @@ properties:
   irn: 045583 [verified] (report card district files)
   agency_type: exempted-village
   county: Wood
+  established: "1849"
   fy2025_profile: |
     Enrolled ADM (unweighted) 5,449.34; weighted ADM 6,435; weight ratio 1.181.
     Operating expenditure $79,735,653.02 — $14,632 per headcount pupil, $12,392 per
@@ -259,9 +268,6 @@ properties:
   series_path: |
     crates/dispersion/fixtures/report-card-2425-district-data.csv and
     crates/dispersion/fixtures/expenditure-functions-fy25.csv, keyed by IRN 045583.
-unfilled:
-  - field: established
-    why: The department's district profile carries it; nobody has read it across.
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of

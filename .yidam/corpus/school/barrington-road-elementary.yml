@@ -23,9 +23,16 @@ description: |
   Stability is the other thing worth noting: 105.9, 106.2, 104.9 across three years. The buildings
   at both ends of this distribution are flat. Whatever moves Ohio's outcomes is not moving these.
   [inference]
+
+  It serves kindergarten through fifth grade — "K-5" on the report card's building record for
+  2024-25, and on the department's EdChoice designation lists for 2024-25, 2025-26 and 2026-27.
+  [verified] (Ohio School Report Cards building record, 2024-25;
+  `edchoice-designated-2425.csv`) Anton Grdina runs from preschool to eighth grade, so the
+  pair's tested grades overlap only from third to fifth. [inference]
 properties:
   building_irn: 001644 [verified]
   district: Upper Arlington City School District, IRN 044933. [verified]
+  grades: K-5
   enrollment: 801 in 2024-25. [verified]
   performance: |
     Performance Index 105.9 in 2024-25, 106.2 in 2023-24, 104.9 in 2022-23; five stars on the
@@ -37,8 +44,6 @@ properties:
     served schools. Not verified here. [open]
   series_path: crates/dispersion/fixtures/report-card-2425-buildings.csv, keyed by building IRN 001644. [verified]
 unfilled:
-  - field: grade span
-    why: The report card files carry no grade span. It is on the building's own directory entry.
   - field: the overall rating
     why: Neither published building file carries it; the achievement component is what is held.
 links:

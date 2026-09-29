@@ -69,6 +69,12 @@ findings: |
   performed, during the commission's tenure is exactly the question the accountability
   expansion exists to answer and cannot yet, because the corpus holds no commission timeline.
   [open]
+
+  **It serves preschool through eighth grade.** The report card's own building record for
+  2024-25 gives the span as "P,K-8", and the federal directory gives "PK - 8" on its 2025-26
+  entry. [verified] (Ohio School Report Cards building record, 2024-25; NCES Common Core of
+  Data school directory, 2025-26) So the achievement figures above cover the tested grades
+  three through eight of a building whose youngest pupils are not tested at all. [inference]
 figures:
   - key: dispersion/anton-grdina-rank
     value: 23
@@ -89,6 +95,7 @@ figures:
 properties:
   building_irn: 000828 [verified]
   district: Cleveland Municipal School District, IRN 043786. [verified]
+  grades: PK-8
   enrollment: 314 in 2024-25. [verified]
   performance: |
     Performance Index 36.8 in 2024-25, 39.1 in 2023-24, 38.9 in 2022-23; one star on the
@@ -104,8 +111,6 @@ properties:
     per cent of the state's published index.
   series_path: crates/dispersion/fixtures/report-card-2425-buildings.csv, keyed by building IRN 000828. [verified]
 unfilled:
-  - field: grade span
-    why: The report card files carry no grade span. It is on the building's own directory entry.
   - field: the overall rating
     why: Neither published building file carries it; the achievement component is what is held.
 links:

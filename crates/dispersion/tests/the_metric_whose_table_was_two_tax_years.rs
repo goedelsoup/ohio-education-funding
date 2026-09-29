@@ -123,3 +123,29 @@ fn a_district_with_no_pupils_has_no_valuation_per_pupil_rather_than_an_infinite_
     assert!((real.value - 1_000_000.0).abs() < f64::EPSILON);
     assert_eq!(real.basis, PupilCount::Funded);
 }
+
+/// Taxation's own figure is a series where the join is not. TY2021 publishes no pupil count, so
+/// the series starts at TY2022; on TY2023 it is the resident median the join reports, because the
+/// three districts the profile does not name leave the middle where it was.
+#[test]
+fn the_resident_median_is_a_series_from_the_first_year_the_abstract_counts_pupils() {
+    assert!(valuation::resident_median(2021).is_none());
+    let series: Vec<(usize, f64)> = [2022, 2023, 2024]
+        .into_iter()
+        .map(|year| valuation::resident_median(year).expect("a year with a count"))
+        .collect();
+    assert_eq!(
+        series
+            .iter()
+            .map(|(districts, _)| *districts)
+            .collect::<Vec<_>>(),
+        [610, 609, 609]
+    );
+    assert!(series.windows(2).all(|pair| pair[1].1 > pair[0].1));
+    let (_, joined) = valuation::medians();
+    assert!(
+        (series[1].1 - joined).abs() < 0.01,
+        "{} against {joined}",
+        series[1].1
+    );
+}

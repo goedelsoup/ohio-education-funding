@@ -193,3 +193,21 @@ fn the_persistence_the_damping_parameterises_is_a_third_and_the_splice_says_othe
         measured[0].2
     );
 }
+
+/// Read as one series the four years fall every year, over all 611 districts in each — the
+/// statewide shape `metric/enrolled-adm` publishes, and the reason the damping is fitted on a
+/// declining population.
+#[test]
+fn statewide_enrolled_adm_falls_in_every_year_the_two_models_publish() {
+    let statewide = counts::adm_statewide();
+    assert_eq!(
+        statewide.keys().copied().collect::<Vec<_>>(),
+        [2023, 2024, 2025, 2026]
+    );
+    assert!(statewide.values().all(|(districts, _)| *districts == 611));
+    let totals: Vec<f64> = statewide.values().map(|(_, total)| *total).collect();
+    assert!(
+        totals.windows(2).all(|pair| pair[1] < pair[0]),
+        "{totals:?}"
+    );
+}

@@ -181,6 +181,29 @@ pub fn medians() -> (f64, f64) {
     )
 }
 
+/// The median valuation per resident pupil in one tax year of Table SD-1 alone, as
+/// `(districts, median)`.
+///
+/// Taxation's own figure over every district it publishes both a value and a count for — not
+/// [`frame`], which needs the profile report and so exists on [`TAX_YEAR`] only. That is what
+/// makes it a series. `None` for a year the abstract carries no pupil count, which is TY2021:
+/// its workbook publishes valuation and no ADM.
+///
+/// The upper middle, as [`medians`] takes it, so the TY2023 value is the resident median there.
+#[must_use]
+pub fn resident_median(tax_year: u16) -> Option<(usize, f64)> {
+    let values: Vec<f64> = crate::sd1::rows()
+        .iter()
+        .filter(|row| row.tax_year == tax_year)
+        .filter_map(|row| {
+            let (resident, valuation) = (row.adm?, row.total_value?);
+            (resident > 0.0 && valuation > 0.0).then(|| valuation / resident)
+        })
+        .collect();
+    let districts = values.len();
+    Some((districts, edfund_core::stats::median_upper_middle(values)?))
+}
+
 /// One district by IRN, for a caller that wants a named case.
 #[must_use]
 pub fn district(irn: &str) -> Option<District> {

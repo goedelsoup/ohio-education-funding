@@ -25,48 +25,6 @@
 # a message does not make the baseline stale.
 violations:
   missing-property:
-  - node: .yidam/corpus/education-agency/cleveland-municipal.yml
-    detail: '`established` is declared by `.yidam/corpus/education-agency.ont.yml` as `required: true` and this instance does not carry it'
-    since: e0e1c69e5849e0e2cf47fefd3c17560f6aef192d
   - node: .yidam/corpus/education-agency/eastland-fairfield-ctc.yml
     detail: '`established` is declared by `.yidam/corpus/education-agency.ont.yml` as `required: true` and this instance does not carry it'
-    since: e0e1c69e5849e0e2cf47fefd3c17560f6aef192d
-  - node: .yidam/corpus/education-agency/electronic-classroom-of-tomorrow.yml
-    detail: '`established` is declared by `.yidam/corpus/education-agency.ont.yml` as `required: true` and this instance does not carry it'
-    since: e0e1c69e5849e0e2cf47fefd3c17560f6aef192d
-  - node: .yidam/corpus/education-agency/northern-local-perry.yml
-    detail: '`established` is declared by `.yidam/corpus/education-agency.ont.yml` as `required: true` and this instance does not carry it'
-    since: e0e1c69e5849e0e2cf47fefd3c17560f6aef192d
-  - node: .yidam/corpus/education-agency/perrysburg-exempted-village.yml
-    detail: '`established` is declared by `.yidam/corpus/education-agency.ont.yml` as `required: true` and this instance does not carry it'
-    since: e0e1c69e5849e0e2cf47fefd3c17560f6aef192d
-  - node: .yidam/corpus/education-agency/toledo-city.yml
-    detail: '`established` is declared by `.yidam/corpus/education-agency.ont.yml` as `required: true` and this instance does not carry it'
-    since: e0e1c69e5849e0e2cf47fefd3c17560f6aef192d
-  - node: .yidam/corpus/education-agency/upper-arlington-city.yml
-    detail: '`established` is declared by `.yidam/corpus/education-agency.ont.yml` as `required: true` and this instance does not carry it'
-    since: e0e1c69e5849e0e2cf47fefd3c17560f6aef192d
-  - node: .yidam/corpus/metric/assessed-valuation-per-pupil.yml
-    detail: '`series` is declared by `.yidam/corpus/metric.ont.yml` as `required: true` and this instance does not carry it'
-    since: e0e1c69e5849e0e2cf47fefd3c17560f6aef192d
-  - node: .yidam/corpus/metric/effective-operating-millage.yml
-    detail: '`series` is declared by `.yidam/corpus/metric.ont.yml` as `required: true` and this instance does not carry it'
-    since: e0e1c69e5849e0e2cf47fefd3c17560f6aef192d
-  - node: .yidam/corpus/metric/enrolled-adm.yml
-    detail: '`series` is declared by `.yidam/corpus/metric.ont.yml` as `required: true` and this instance does not carry it'
-    since: e0e1c69e5849e0e2cf47fefd3c17560f6aef192d
-  - node: .yidam/corpus/metric/general-fund-cash-balance.yml
-    detail: '`series` is declared by `.yidam/corpus/metric.ont.yml` as `required: true` and this instance does not carry it'
-    since: e0e1c69e5849e0e2cf47fefd3c17560f6aef192d
-  - node: .yidam/corpus/metric/state-share-percentage.yml
-    detail: '`series` is declared by `.yidam/corpus/metric.ont.yml` as `required: true` and this instance does not carry it'
-    since: e0e1c69e5849e0e2cf47fefd3c17560f6aef192d
-  - node: .yidam/corpus/school/anton-grdina.yml
-    detail: '`grades` is declared by `.yidam/corpus/school.ont.yml` as `required: true` and this instance does not carry it'
-    since: e0e1c69e5849e0e2cf47fefd3c17560f6aef192d
-  - node: .yidam/corpus/school/barrington-road-elementary.yml
-    detail: '`grades` is declared by `.yidam/corpus/school.ont.yml` as `required: true` and this instance does not carry it'
-    since: e0e1c69e5849e0e2cf47fefd3c17560f6aef192d
-  - node: .yidam/corpus/school/sheridan-high-school.yml
-    detail: '`grades` is declared by `.yidam/corpus/school.ont.yml` as `required: true` and this instance does not carry it'
     since: e0e1c69e5849e0e2cf47fefd3c17560f6aef192d

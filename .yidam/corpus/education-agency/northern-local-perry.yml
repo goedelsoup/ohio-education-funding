@@ -68,6 +68,13 @@ findings: |
   different question from which districts are poor, and the answer is not that it reaches the
   poor: this district sits in the worst-hit quartile at the 63rd percentile of valuation, and
   Cleveland gains from inside a quintile whose mean is a loss. [inference]
+
+  The district was established on June 10, 1968. The Auditor of State's audit for the year ended
+  June 30, 2024 says so in its first note, and describes it as "a consolidated school district
+  made up from three original high schools in the area, Glenford, Somerset, and Thornville,
+  combined now to be Sheridan High School", reaching into Perry, Licking and Fairfield counties.
+  [verified] ([district audits](../../catalog/auditor-district-audits.md)) The 1960 date other
+  accounts give belongs to Sheridan High School, not to the district.
 revisions:
   - was: |
       "The Fair School Funding Plan's local capacity measure adds resident income to valuation,
@@ -104,6 +111,7 @@ properties:
     rather than outstanding, and the crosswalk it asked for is not needed to key a series.
   agency_type: local
   county: Perry
+  established: 1968-06-10
   typology: |
     Rural. **Typology code 2** — rural, *average* student poverty, very small student population.
     This node previously read "high poverty", which is the department's code 1, and the
@@ -131,9 +139,6 @@ properties:
       crates/project/fixtures/district-finances.csv           FY2020-FY2024 actuals and balances
       crates/dispersion/fixtures/f33-ohio-panel.csv           FY2009-FY2024 revenue, federal basis
       crates/dispersion/fixtures/mr81-sponsor-panel.csv       1998-2014 free and reduced lunch
-unfilled:
-  - field: established
-    why: The department's district profile carries it; nobody has read it across.
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of
@@ -151,6 +156,11 @@ links:
     note: >-
       The FY2021 IDEA Part B allocation list, where this district appears by name. A separate
       federal channel from Ohio's special education weights, and cited here as such.
+  - target: ../../catalog/auditor-district-audits.md
+    relationship: sourced-from
+    note: >-
+      The audit for the year ended June 30, 2024, read for the establishment date its first note
+      recites.
   - target: ../../catalog/dew-district-typology.md
     relationship: sourced-from
     note: >-

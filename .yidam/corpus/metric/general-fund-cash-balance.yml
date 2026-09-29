@@ -46,6 +46,21 @@ properties:
     audited-actual windows tile FY2020-FY2025 without a gap. 660 reporting bodies, covering all
     609 traditional districts the FY2027 funding model pays.
     [bls-cpi-u](../../catalog/bls-cpi-u.md) for any statement in constant dollars.
+  series: |
+    Statewide general fund ending cash, line 7.020, FY2020-FY2025 [verified]
+    (`crates/project/src/finances.rs`):
+
+      FY2020    $8,367,366,132
+      FY2021    $9,234,398,370
+      FY2022    $9,861,046,108
+      FY2023   $10,262,256,511
+      FY2024   $11,204,712,970
+      FY2025    $9,135,474,508
+
+    Each year sums 659 of the 660 filing bodies, but not the same 659: Toronto City's filing
+    carries no balance for FY2020-FY2022, and IRN 049619 files nothing after FY2022. [verified]
+    An unreported line is skipped rather than summed as zero. Nominal dollars throughout; the
+    caveats give the constant-dollar reading, which ends below where it began.
   caveats: |
     **General fund only.** Capital, food service, and most federal programmes sit in other funds.
     A balance here is not the district's total resources and an expenditure here is not its total
@@ -188,6 +203,30 @@ revisions:
       by $9-10M in each of those years. Feed contract `38.0.0` makes the five `finances` figures
       nullable so an unreported line cannot be summed again.
 figures:
+  - key: project/general-fund-ending-cash-fy2020
+    value: 8367366132.0
+    field: series
+    as_written: "FY2020    $8,367,366,132"
+  - key: project/general-fund-ending-cash-fy2021
+    value: 9234398370.0
+    field: series
+    as_written: "FY2021    $9,234,398,370"
+  - key: project/general-fund-ending-cash-fy2022
+    value: 9861046108.0
+    field: series
+    as_written: "FY2022    $9,861,046,108"
+  - key: project/general-fund-ending-cash-fy2023
+    value: 10262256511.0
+    field: series
+    as_written: "FY2023   $10,262,256,511"
+  - key: project/general-fund-ending-cash-fy2024
+    value: 11204712970.0
+    field: series
+    as_written: "FY2024   $11,204,712,970"
+  - key: project/general-fund-ending-cash-fy2025
+    value: 9135474508.0
+    field: series
+    as_written: "FY2025    $9,135,474,508"
   - key: project/general-fund-transfers-fy2020
     value: 281878339.0
     field: findings

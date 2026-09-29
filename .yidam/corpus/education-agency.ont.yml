@@ -53,9 +53,12 @@ properties:
     type: date
     required: true
     description: >-
-      Date the agency was chartered or organized. Required, and not yet held by any instance: the
-      department's district profile carries it and nobody has read it across. The omissions are
-      baselined, and the agencies record it under `unfilled:`.
+      Date the agency was chartered or organized, at the precision a source gives it — a year
+      alone is common. No department file carries it: the district profile has no date column and
+      the directory records only a system timestamp. It comes from an Auditor of State audit's
+      organization note where one recites a date, and otherwise from the district's own history,
+      and the node's claim tag says which. An agency no source dates records it under `unfilled:`
+      and stays in the baseline.
   - name: roles
     type: text
     required: true

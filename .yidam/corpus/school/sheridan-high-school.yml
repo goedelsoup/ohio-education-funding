@@ -64,6 +64,11 @@ findings: |
   rated three stars or better arrived this way** — not one of the 189 direct identifications did,
   and the highest-ranked escalation sits above the state median. [verified] The route is a second
   population inside one tier, and Sheridan is its clearest case rather than its exception.
+
+  **It serves ninth through twelfth grade**, with the district's sixth to eighth grades in a
+  separate Sheridan Middle School. [verified] (Ohio School Report Cards building record,
+  2024-25, span "9-12"; `edchoice-designated-2425.csv`, which gives the same span on the
+  2024-25, 2025-26 and 2026-27 lists)
 revisions:
   - was: |
       Whether Sheridan had ever been federally identified was recorded as unknowable here,
@@ -96,6 +101,7 @@ figures:
 properties:
   building_irn: 034363 [verified]
   district: Northern Local School District (Perry County), IRN 049056. [verified]
+  grades: 9-12
   enrollment: 685 in 2024-25, on the report card's building count. [verified]
   performance: |
     Performance Index 89.9 in 2024-25, 91.5 in 2023-24, 89.2 in 2022-23; four stars on the
@@ -112,8 +118,6 @@ properties:
     served status is not published on these lists and is not held.
   series_path: crates/dispersion/fixtures/report-card-2425-buildings.csv, keyed by building IRN 034363. [verified]
 unfilled:
-  - field: grade span
-    why: The report card files carry no grade span. It is on the building's own directory entry.
   - field: the overall rating
     why: Neither published building file carries it; the achievement component is what is held.
   - field: Title I served status

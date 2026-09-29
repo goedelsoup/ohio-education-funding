@@ -380,6 +380,25 @@ fn parse() -> Vec<Finances> {
     out
 }
 
+/// One line summed statewide for one fiscal year, as `(bodies that reported it, total)`.
+///
+/// An unreported line is skipped rather than added as zero. Arithmetically identical and a
+/// different claim, and the difference is the whole of [`INCOMPLETE`] — so the count travels
+/// with the total, and a year summed over fewer bodies says so.
+#[must_use]
+pub fn statewide(
+    fiscal_year: FiscalYear,
+    line: impl Fn(&YearRecord) -> Option<Dollars>,
+) -> (usize, Dollars) {
+    finances()
+        .iter()
+        .filter_map(|f| f.year(fiscal_year))
+        .filter_map(line)
+        .fold((0, 0.0), |(bodies, total), amount| {
+            (bodies + 1, total + amount)
+        })
+}
+
 /// Look one district up by IRN.
 #[must_use]
 pub fn for_district<'a>(panel: &'a [Finances], irn: &str) -> Option<&'a Finances> {
@@ -390,6 +409,17 @@ pub fn for_district<'a>(panel: &'a [Finances], irn: &str) -> Option<&'a Finances
 mod tests {
     use super::*;
     use crate::panel::panel;
+
+    /// Every year is summed over 659 of the 660 bodies, and never the same missing one: Toronto
+    /// City's FY2023 filing carries no cash line for FY2020-FY2022, and Green Local has no FY2026
+    /// filing for FY2023-FY2025. A statewide series is over a fixed count, not a fixed set.
+    #[test]
+    fn a_statewide_cash_total_is_over_every_body_but_one() {
+        for year in COVERED {
+            let (bodies, _) = statewide(year, |y| y.ending_cash);
+            assert_eq!(bodies, 659, "FY{}", year.0);
+        }
+    }
 
     #[test]
     fn the_panel_covers_six_consecutive_closed_years_for_all_but_the_named_exception() {

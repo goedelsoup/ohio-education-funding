@@ -41,6 +41,13 @@ description: |
   property-rich district with a substantial private-school population in its boundaries is
   exactly the setting in which the scholarship channel operates differently than it does in
   [Northern Local](northern-local-perry.yml). [inference]
+findings: |
+  The district was organized in 1918. The Auditor of State's audit for the year ended June 30,
+  2011 opens its first note with that sentence — "The Upper Arlington City School District,
+  Franklin County, Ohio (the District) was organized in 1918" — and the district's audited
+  report for the year ended June 30, 2025 repeats it word for word. [verified] ([district
+  audits](../../catalog/auditor-district-audits.md)) Neither gives a month or a day, so
+  `established` carries the year alone.
 properties:
   seeded_because: |
     The contrast case against [Northern Local](northern-local-perry.yml), to make the
@@ -49,6 +56,7 @@ properties:
   irn: 044933 [verified] (FY2021 IDEA Part B allocation list)
   agency_type: city
   county: Franklin
+  established: "1918"
   fy2021_idea_part_b: |
     Public school students with disabilities: 1,121. Non-public: 68.
     Allocation: $1,490,233.42. Proportionate share: $85,227.82. [verified]
@@ -74,9 +82,6 @@ properties:
       crates/project/fixtures/district-finances.csv           FY2020-FY2024 actuals and balances
       crates/dispersion/fixtures/f33-ohio-panel.csv           FY2012-FY2022 revenue, federal basis
       crates/dispersion/fixtures/mr81-sponsor-panel.csv       1998-2014 free and reduced lunch
-unfilled:
-  - field: established
-    why: The department's district profile carries it; nobody has read it across.
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of
@@ -94,6 +99,11 @@ links:
     note: >-
       The FY2021 IDEA Part B allocation list, where this district appears by name. A separate
       federal channel from Ohio's special education weights, and cited here as such.
+  - target: ../../catalog/auditor-district-audits.md
+    relationship: sourced-from
+    note: >-
+      The audit for the year ended June 30, 2011, read for the organization year its first note
+      recites.
   - target: ../../catalog/dew-district-typology.md
     relationship: sourced-from
     note: >-

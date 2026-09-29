@@ -476,12 +476,17 @@ fn property_contract(root: &Path) -> String {
     out.push_str(&format!(
         "| omissions of an optional property | {optional_omitted} |\n"
     ));
+    let listed = match required_omitted {
+        0 => "none is listed".to_owned(),
+        1 => "the only one is listed".to_owned(),
+        n => format!("each of the {n} is listed"),
+    };
     out.push_str(&format!(
         "\n**{held_by_all} of the {total} declared properties are carried by every instance of \
-         their class.** An omission of a required property gates `yidam lint`, so each of the \
-         {required_omitted} is listed in `.yidam/lint-baseline.yml` and the next is attributable \
-         to the commit that makes it. An omission of an optional one is reported and is not a \
-         defect. Every property some instance omits:\n\n"
+         their class.** An omission of a required property gates `yidam lint`, so {listed} in \
+         `.yidam/lint-baseline.yml` and the next is attributable to the commit that makes it. An \
+         omission of an optional one is reported and is not a defect. Every property some \
+         instance omits:\n\n"
     ));
     out.push_str(
         "| Property | Required | Instances omitting it | Instances |\n|---|---|--:|--:|\n",

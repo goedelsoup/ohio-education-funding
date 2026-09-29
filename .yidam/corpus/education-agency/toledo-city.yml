@@ -165,6 +165,13 @@ findings: |
   size and poverty carries. The community-school half of it is now held, as the survey's `V92`
   column — $86.0 million in FY2015 — but only in the aggregate the survey reports, not by
   receiving school. [open]
+
+  The district dates itself to May 8, 1849. Its 175th-anniversary timeline gives "May 8, 1849
+  Toledo Public Schools is established with the election of school board officers", and counts
+  the years "from its inception on May 8, 1849". That is the district's own account, published
+  for the anniversary, and neither the election return nor the board's first minute was read; the
+  Auditor of State's audits, which recite an organization date for some districts, give none for
+  this one. [inference]
 revisions:
   - was: |
       "The tail is mostly small districts with large industrial tax bases — Green Local, Botkins,
@@ -553,6 +560,7 @@ properties:
   irn: 044909 [verified] (report card district files)
   agency_type: city
   county: Lucas
+  established: 1849-05-08
   fy2025_profile: |
     Enrolled ADM (unweighted) 21,159.75; weighted ADM 30,758; weight ratio 1.454.
     Operating expenditure $440,219,539.58 — $20,805 per headcount pupil, $14,312 per
@@ -574,9 +582,6 @@ properties:
   series_path: |
     crates/dispersion/fixtures/report-card-2425-district-data.csv and
     crates/dispersion/fixtures/expenditure-functions-fy25.csv, keyed by IRN 044909.
-unfilled:
-  - field: established
-    why: The department's district profile carries it; nobody has read it across.
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of

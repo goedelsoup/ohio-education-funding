@@ -2,6 +2,7 @@
 used-by:
   - ../corpus/doctrine/equity.yml
   - ../corpus/metric/assessed-valuation-per-pupil.yml
+  - ../corpus/metric/effective-operating-millage.yml
   - ../corpus/parameter/local-share-charge-off-millage.yml
   - ../corpus/revenue-stream/casino-tax-distribution.yml
 ---

@@ -48,9 +48,9 @@ properties:
     description: >-
       The values this metric takes over what the corpus holds — which years, over which agencies,
       and the figures — with the published series they are computed from. Required: a metric
-      without one is a measure the corpus names and has not taken, and that absence is recorded
-      in `.yidam/lint-baseline.yml`, where it gates, rather than left to silence, where it does
-      not.
+      without one is a measure the corpus names and has not taken. Every instance holds one, and
+      its figures are bound to the crates that compute them, so a series cannot be written from
+      memory.
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
 # understand what it connects to. It is not the permitted set. A large share of the corpus's edges
 # use a relationship no class declares, and almost all of those are single-use precise verbs

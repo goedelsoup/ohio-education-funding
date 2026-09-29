@@ -63,6 +63,19 @@ properties:
     `foundation` and `local-capacity` calculators, or directly from the department's Detailed
     SFPR where already computed.
     Current-year and prior-year enrolled ADM — from `dew-foundation`.
+  series: |
+    The department's published state share of base cost in the two funding models the corpus
+    holds, over the 609 districts each pays [verified] (`crates/project/src/prior_model.rs`):
+
+                          FY2026    FY2027
+      median district     41.40%    36.00%
+      aggregate           35.35%    31.52%
+      on the 10% floor       105       138
+
+    The aggregate is the state's share of the summed cost, not a mean of district shares.
+    540 of 609 districts have a lower share in the FY2027 model than in the FY2026 one, at an
+    unchanged floor. [verified] Two years only: the FY2022 model's 5% floor makes an earlier year
+    a different quantity rather than a longer series.
   caveats: |
     Hard floor — 5% in FY2022, 10% from FY2026 — so it does not discriminate among high-wealth
     districts at all: the top of the distribution compresses onto a single value and correlation
@@ -89,3 +102,32 @@ links:
     relationship: computed-for
   - target: ../../catalog/dew-sfpr-line-by-line.md
     relationship: sourced-from
+figures:
+  - key: project/median-state-share-fy2026
+    value: 0.4140033
+    field: series
+    as_written: "median district     41.40%    36.00%"
+  - key: project/median-state-share-fy2027
+    value: 0.3600332
+    field: series
+    as_written: "median district     41.40%    36.00%"
+  - key: project/aggregate-state-share-fy2026
+    value: 0.3535014889591587
+    field: series
+    as_written: "aggregate           35.35%    31.52%"
+  - key: project/aggregate-state-share-fy2027
+    value: 0.3152369262096924
+    field: series
+    as_written: "aggregate           35.35%    31.52%"
+  - key: project/districts-at-the-minimum-state-share-fy2026
+    value: 105
+    field: series
+    as_written: "on the 10% floor       105       138"
+  - key: project/districts-at-the-minimum-state-share
+    value: 138
+    field: series
+    as_written: "on the 10% floor       105       138"
+  - key: project/districts-whose-state-share-fell
+    value: 540
+    field: series
+    as_written: "540 of 609 districts"

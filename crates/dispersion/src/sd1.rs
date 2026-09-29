@@ -287,9 +287,95 @@ pub fn county(name: &str, tax_year: u16) -> Vec<&'static TaxRow> {
         .collect()
 }
 
+/// The twenty-mill floor of R.C. 319.301(E)(2), in mills.
+///
+/// `millage::SCHOOL_DISTRICT_FLOOR` is the same number, and this crate does not depend on that
+/// one for a constant.
+const FLOOR_MILLS: f64 = 20.0;
+
+/// Half a unit of the coarsest grain the abstract publishes a rate at.
+///
+/// TY2023's workbook rounds the class rates to two decimals and the other three years to four, so
+/// "at the floor" is read to the hundredth in every year — otherwise one year would be counted on
+/// a coarser test than the three around it.
+const AT_THE_FLOOR: f64 = 0.005;
+
+/// How close to the floor a rate must be to count as near it, in mills.
+const NEAR_THE_FLOOR: f64 = 0.5;
+
+/// One tax year of effective operating rates across every district the abstract carries.
+///
+/// The series `metric/effective-operating-millage` publishes. Medians are
+/// [`edfund_core::stats::median_upper_middle`], which on the abstract's odd count is the middle
+/// district's own rate.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Rates {
+    /// The tax year.
+    pub tax_year: u16,
+    /// Districts publishing a Class I rate that year.
+    pub districts: usize,
+    /// The median effective Class I rate, in mills.
+    pub class1_median: f64,
+    /// The median effective Class II rate, in mills.
+    pub class2_median: f64,
+    /// Districts whose Class I rate reads exactly twenty to the hundredth.
+    pub at_the_floor: usize,
+    /// Districts whose Class I rate is within half a mill of twenty, either side.
+    pub near_the_floor: usize,
+}
+
+/// The effective rates of one tax year, or `None` for a year the abstract does not carry.
+#[must_use]
+pub fn rates(tax_year: u16) -> Option<Rates> {
+    let year: Vec<&TaxRow> = cached()
+        .iter()
+        .filter(|row| row.tax_year == tax_year)
+        .collect();
+    let class1: Vec<f64> = year.iter().filter_map(|row| row.class1_rate).collect();
+    let within = |band: f64| {
+        class1
+            .iter()
+            .filter(|rate| (**rate - FLOOR_MILLS).abs() < band)
+            .count()
+    };
+    Some(Rates {
+        tax_year,
+        districts: class1.len(),
+        class1_median: edfund_core::stats::median_upper_middle(class1.iter().copied())?,
+        class2_median: edfund_core::stats::median_upper_middle(
+            year.iter().filter_map(|row| row.class2_rate),
+        )?,
+        at_the_floor: within(AT_THE_FLOOR),
+        near_the_floor: within(NEAR_THE_FLOOR),
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// The rates series moves the way the floor mechanism says it must: as reappraisal raises
+    /// values, reduction factors carry rates down, the median falls and districts gather at the
+    /// floor. TY2024 is the exception in the count at exactly twenty and not in the count near it.
+    #[test]
+    fn the_median_rate_falls_and_districts_gather_near_the_floor() {
+        let series: Vec<Rates> = tax_years().into_iter().filter_map(rates).collect();
+        assert_eq!(series.len(), 4);
+        for pair in series.windows(2) {
+            assert!(pair[1].class1_median < pair[0].class1_median, "{pair:?}");
+            assert!(pair[1].class2_median < pair[0].class2_median, "{pair:?}");
+            assert!(pair[1].near_the_floor > pair[0].near_the_floor, "{pair:?}");
+        }
+        assert!(series.iter().all(|year| year.districts == 611));
+        assert_eq!(
+            series
+                .iter()
+                .map(|year| year.at_the_floor)
+                .collect::<Vec<_>>(),
+            [102, 137, 172, 155]
+        );
+        assert!(rates(2020).is_none());
+    }
 
     #[test]
     fn the_abstract_carries_four_tax_years_of_districts() {

@@ -75,6 +75,18 @@ findings: |
   about its cause rather than a repetition of the observation. [verified] The cause remains the
   question that node opens.
 
+  The district dates from 1836, when the legislature incorporated Cleveland as a city and
+  allowed it to organize a tax-supported public school system. That is the Encyclopedia of
+  Cleveland History's account, a secondary one; the incorporating act was not read. [inference]
+  The "municipal" in the name is a later classification, not a founding. R.C. 3311.71 defines a
+  municipal school district as one that "is or has ever been under a federal court order" and
+  hands an existing district's management to an appointed board, and the Auditor of State's
+  audit for the year ended June 30, 2022 recites that "in November 1998, the Mayor of the City
+  of Cleveland was given appointment authority for the School District." [verified] ([district
+  audits](../../catalog/auditor-district-audits.md)) So `established` carries 1836, at the
+  year's precision the source gives, and not 1998, which changed who governs the district rather
+  than creating one. [inference]
+
   Scholarship dollar amounts remain unpopulated. [open]
 figures:
   - key: dispersion/cleveland-state-revenue-real-change-negative
@@ -93,6 +105,7 @@ properties:
   irn: 043786 [verified] (FY2021 IDEA Part B allocation list)
   agency_type: city
   county: Cuyahoga
+  established: "1836"
   fy2021_idea_part_b: |
     Public school students with disabilities: 8,027. Non-public: 609.
     Allocation: $12,818,292.57. Proportionate share: $903,930.07. [verified]
@@ -122,9 +135,6 @@ properties:
       crates/project/fixtures/district-finances.csv           FY2020-FY2024 actuals and balances
       crates/dispersion/fixtures/f33-ohio-panel.csv           FY2012-FY2022 revenue, federal basis
       crates/dispersion/fixtures/mr81-sponsor-panel.csv       1998-2014 free and reduced lunch
-unfilled:
-  - field: established
-    why: The department's district profile carries it; nobody has read it across.
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of
@@ -132,6 +142,11 @@ links:
     relationship: subject-to
   - target: ../doctrine/adequacy.yml
     relationship: illustrates
+  - target: ../../catalog/auditor-district-audits.md
+    relationship: sourced-from
+    note: >-
+      The audit for the year ended June 30, 2022, read for its recital of the 1998 transfer of
+      appointment authority to the mayor.
   - target: ../../catalog/dew-district-typology.md
     relationship: sourced-from
     note: >-
