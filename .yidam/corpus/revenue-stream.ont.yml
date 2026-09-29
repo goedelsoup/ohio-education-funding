@@ -14,23 +14,29 @@ description: |
 properties:
   - name: name
     type: string
+    required: true
     description: Common name of the stream
   - name: level
     type: string
+    required: true
     description: local | state | federal
   - name: legal_basis
     type: string
+    required: true
     description: Constitutional provision, Revised Code chapter, or federal statute authorizing the stream
   - name: restriction
     type: text
+    required: true
     prose: true
     description: Whether funds are unrestricted general revenue or restricted to a stated purpose
   - name: growth_behavior
     type: text
+    required: true
     prose: true
     description: How the stream's yield changes over time, and what constrains it
   - name: series_path
     type: string
+    required: true
     description: Path under crates/ to the committed per-agency-year series for this stream
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
 # understand what it connects to. It is not the permitted set. A large share of the corpus's edges

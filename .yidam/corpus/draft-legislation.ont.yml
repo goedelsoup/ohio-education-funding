@@ -40,6 +40,7 @@ description: |
 properties:
   - name: provenance
     type: string
+    required: true
     description: >-
       Which kind of draft this is, and therefore how the rest of the fields read: `introduced` —
       a real bill before the General Assembly, whose text exists and moves as it is amended;
@@ -48,20 +49,24 @@ properties:
       test a question.
   - name: designation
     type: string
+    required: true
     description: >-
       Bill designation where the draft has one. Empty for a hypothetical draft, and for a
       counterfactual it names the act being rewritten rather than claiming a number of its own.
   - name: general_assembly
     type: string
+    required: true
     description: Numbered General Assembly the bill is before, where it is before one
   - name: sponsors
     type: text
+    required: true
     description: >-
       Who introduced it, and any joint sponsors. "None." where the draft was never introduced —
       which is an answer rather than an empty field, because a bill nobody introduced has no
       sponsors and never will.
   - name: status
     type: text
+    required: true
     prose: true
     description: >-
       Where the draft stands — introduced, reported out of committee, passed one chamber, died
@@ -69,6 +74,7 @@ properties:
       a statute on a page that otherwise looks like one.
   - name: text_read
     type: text
+    required: true
     prose: true
     description: >-
       Which version of the text this node was written from, and the digest pinning the bytes.
@@ -76,12 +82,14 @@ properties:
       its own URL as it is amended, so "the bill says" without a version names a moving target.
   - name: question
     type: text
+    required: true
     prose: true
     description: >-
       What the draft is constructed to test. For a hypothetical or counterfactual draft this is
       the reason it exists; for an introduced bill it is what reading it is expected to settle.
   - name: provisions
     type: text
+    required: true
     prose: true
     description: >-
       Each provision: what it does, the Revised Code section it would amend or `uncodified`, the
@@ -90,6 +98,7 @@ properties:
       of them, so this is where the prose meets the simulation.
   - name: unpriced
     type: text
+    required: true
     prose: true
     description: >-
       The provisions the calculators cannot run, and what each would need before they could.

@@ -314,6 +314,24 @@ test("an ontology missing edge_policy is rejected", () => {
   );
 });
 
+test("an ontology property missing required is rejected", () => {
+  // The edge_policy test above, one field over. A declaration that says nothing about whether an
+  // instance must carry it is optional by omission, which is the state #507 found all 120 in.
+  const withProperty = (property: object) => ({
+    class: "metric",
+    label: "Metric",
+    description: "A measure.",
+    edge_policy: "characteristic",
+    properties: [{ name: "series", type: "text", description: "The series.", ...property }],
+    edges: [],
+  });
+  expect(OntologyClassSchema.safeParse(withProperty({})).success).toBe(false);
+  expect(OntologyClassSchema.safeParse(withProperty({ required: true })).success).toBe(true);
+  expect(OntologyClassSchema.safeParse(withProperty({ required: false })).success).toBe(true);
+  // A boolean, so the string a hand-edit might write does not read as a decision.
+  expect(OntologyClassSchema.safeParse(withProperty({ required: "yes" })).success).toBe(false);
+});
+
 test("the corpus is clean under the policy it declares", () => {
   // The point of stating the policy: what is left is signal. 46 undeclared relationships were
   // noise against an unstated assumption; the four undeclared properties were real omissions and

@@ -13,19 +13,24 @@ description: |
 properties:
   - name: name
     type: string
+    required: true
     description: The component's name as it appears in statute or department documentation
   - name: function
     type: text
+    required: true
     prose: true
     description: What calculation step the component performs and on what inputs
   - name: statutory_basis
     type: string
+    required: true
     description: Ohio Revised Code sections that define the component
   - name: calculator
     type: string
+    required: true
     description: Name of the crates/ calculator implementing this component, if implemented
   - name: function_tex
     type: text
+    required: false
     description: >-
       The same calculation as `function`, written in LaTeX so the site can set it in type. The
       web build compiles it to MathML with Temml and holds the output to an enumerated allowlist;
@@ -43,13 +48,14 @@ properties:
       The first of those was written because the pilot conversion shipped using two quantities it
       never defined.
 
-      NOT every component carries one, and that is a decision rather than a gap. The notation earns
-      its place where there is a fraction, a piecewise rule, an exponent or an indexed family; it
-      earns nothing on a calculation that is a list of products, where LaTeX would restate the same
-      line with a prettier multiplication sign. Two components are deliberately left as ASCII on
-      those grounds: `charge-off-local-share`, which is two products, and
-      `fsfp-formula-transition-supplement`, which is one maximum over a sum. Converting them would
-      add a second statement to keep in step and buy a reader nothing.
+      `required: false`, because NOT every component should carry one. The notation earns its place
+      where there is a fraction, a piecewise rule, an exponent or an indexed family; it earns
+      nothing on a calculation that is a list of products, where LaTeX would restate the same line
+      with a prettier multiplication sign and add a second statement to keep in step. So a
+      component without one is quiet if its `function` is a list of products, and unconverted
+      otherwise — and which components are which is not written here. It was: this paragraph
+      named two deliberate exceptions, both were converted on 11 September 2026, and the two
+      components that then lacked a `function_tex` were neither of them (#507).
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
 # understand what it connects to. It is not the permitted set. A large share of the corpus's edges
 # use a relationship no class declares, and almost all of those are single-use precise verbs

@@ -25,34 +25,45 @@ description: |
 properties:
   - name: building_irn
     type: string
+    required: true
     description: The building's own IRN, which is not the district's
   - name: district
     type: string
+    required: true
     description: Operating district and its IRN
   - name: grades
     type: string
-    description: The grade span the building serves
+    required: true
+    description: >-
+      The grade span the building serves. Required, and not yet held by any instance: the report
+      card files carry no grade span, so each building records it under `unfilled:` with where it
+      lives, and the omission is baselined rather than forgiven.
   - name: enrollment
     type: string
+    required: true
     description: Building enrollment, on the report card's count, with the year
   - name: performance
     type: text
+    required: true
     prose: true
     description: >-
       Performance Index and component ratings, with the years. Three consecutive years is the
       span both the CSI escalation and the academic distress trigger read.
   - name: chronic_absenteeism
     type: string
+    required: true
     description: >-
       The rate, with the year. A CSI criterion in its own right for buildings with fewer than
       three rated components, not a descriptive statistic.
   - name: roles
     type: text
+    required: true
     prose: true
     description: >-
       Contingent identifications and the periods they applied — CSI, TSI, ATSI, Title I served.
   - name: series_path
     type: string
+    required: true
     description: Path under crates/ to the committed building series
 edge_policy: characteristic
 edges:

@@ -13,31 +13,42 @@ description: |
 properties:
   - name: case_name
     type: string
+    required: true
     description: Short case name as commonly cited
   - name: citation
     type: string
+    required: true
     description: Reporter citation
   - name: court
     type: string
+    required: true
     description: Deciding court
   - name: filed
     type: date
+    required: true
     description: Date the action was commenced
   - name: decided
     type: date
+    required: true
     description: Date of the decision this node records
   - name: holding
     type: text
+    required: true
     prose: true
     description: What the court held, and on what constitutional ground
   - name: remedy
     type: text
+    required: true
     prose: true
     description: What relief was ordered, and whether it was complied with
   - name: procedural_history
     type: text
+    required: false
     prose: true
-    description: The path the case took — filings, remands, and rehearings — where later decisions cannot be read without it
+    description: >-
+      The path the case took — filings, remands, and rehearings — where later decisions cannot be
+      read without it. Not required: a case decided once, on the pleadings it was filed on, has no
+      path to record.
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
 # understand what it connects to. It is not the permitted set. A large share of the corpus's edges
 # use a relationship no class declares, and almost all of those are single-use precise verbs

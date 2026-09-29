@@ -20,23 +20,29 @@ description: |
 properties:
   - name: name
     type: string
+    required: true
     description: The regime's common name
   - name: level
     type: string
+    required: true
     description: state | federal
   - name: authority
     type: string
+    required: true
     description: The statute or federal act establishing it
   - name: measure
     type: text
+    required: true
     prose: true
     description: What is measured, on what scale, and at what unit
   - name: identification
     type: text
+    required: true
     prose: true
     description: How schools or districts are selected for consequence, including thresholds
   - name: effective
     type: text
+    required: true
     prose: true
     description: The period it governs, and what it superseded
 edge_policy: characteristic

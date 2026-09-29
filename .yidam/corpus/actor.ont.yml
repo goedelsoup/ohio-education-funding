@@ -13,19 +13,24 @@ description: |
 properties:
   - name: name
     type: string
+    required: true
     description: Current official name
   - name: institution_type
     type: string
+    required: true
     description: legislature | court | executive-agency | commission | legislative-agency
   - name: established
     type: date
+    required: true
     description: Date the institution was created
   - name: authority
     type: text
+    required: true
     prose: true
     description: What this institution has the power to do within the funding system
   - name: publishes
     type: text
+    required: true
     prose: true
     description: The data series and reports this institution issues, if any
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to

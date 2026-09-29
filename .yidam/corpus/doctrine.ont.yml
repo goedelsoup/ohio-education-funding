@@ -13,16 +13,20 @@ description: |
 properties:
   - name: name
     type: string
+    required: true
     description: The principle's common name
   - name: origin
     type: string
+    required: true
     description: Where the principle enters the domain — constitutional text, a decision, or scholarship
   - name: formulation
     type: text
+    required: true
     prose: true
     description: The principle stated precisely enough to be applied to a specific regime
   - name: contested
     type: text
+    required: true
     prose: true
     description: What is disputed about the principle, and by whom
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to

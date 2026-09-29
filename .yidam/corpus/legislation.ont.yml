@@ -13,18 +13,23 @@ description: |
 properties:
   - name: designation
     type: string
+    required: true
     description: Bill designation (e.g. Am. Sub. H.B. 110) or constitutional citation
   - name: general_assembly
     type: string
+    required: true
     description: Numbered General Assembly that passed it
   - name: signed
     type: date
+    required: true
     description: Date signed or ratified
   - name: effective
     type: date
+    required: true
     description: Date the operative provisions took effect
   - name: effective_note
     type: text
+    required: false
     prose: true
     description: >-
       Which provisions took effect when, where the act has more than one date. Declared because
@@ -33,16 +38,25 @@ properties:
       and wrong about the other. H.B. 96 is the case that forced it — signed 30 June 2025, with
       every R.C. 3317 section this corpus reads from it dated 30 September — and the node had
       carried the signing date for both.
+
+      Not required class-wide, because the class holds more than budget acts — a constitutional
+      provision or a single-subject act has one date and nothing to split. On a biennial budget
+      act its absence is a gap rather than a quiet node, and the class cannot say that
+      conditionally. How many acts lack it is generated into the corpus README, and
+      `yidam lint --warn` names them.
   - name: subject
     type: text
+    required: true
     prose: true
     description: What the enactment did to the funding system, in two or three sentences
   - name: vetoes
     type: text
+    required: true
     prose: true
     description: Line-item vetoes affecting education funding, where relevant
   - name: accountability_effect
     type: text
+    required: false
     prose: true
     description: >-
       What the enactment did to the accountability regime, as distinct from the funding system.
@@ -50,6 +64,10 @@ properties:
       Fair School Funding Plan's cost inputs and dissolved Lorain's academic distress commission —
       and a class that could record only the funding half would make the other invisible on the
       node where a reader would look for it.
+
+      Not required: an act that did nothing to the accountability regime has nothing to record.
+      The cost is that an absence does not say whether the act did nothing or was never read for
+      it — which is the question to ask of any act here that omits it.
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
 # understand what it connects to. It is not the permitted set. A large share of the corpus's edges
 # use a relationship no class declares, and almost all of those are single-use precise verbs

@@ -406,6 +406,156 @@ fn ontology_edges(root: &Path) -> BTreeMap<String, Vec<String>> {
     out
 }
 
+/// Which declared properties an instance must carry, and how many instances do not.
+///
+/// # Why this is generated
+///
+/// The edge contract above had a measurement behind it and the property contract had none: 120
+/// declarations, not one of which said whether it was required, so every property was optional by
+/// omission and `missing-property` reported 46 findings nobody had decided about (#507). Each
+/// declaration now says, and this block is the evidence for what they say — kept here rather than
+/// in the ontologies because the edge census already showed what a hand-copied count turns into.
+///
+/// # What it counts
+///
+/// An omission is a declared property whose key an instance does not carry at all. A key carried
+/// with "Not applicable." is carried: that is how this corpus writes an absence it has looked for,
+/// and it is the reason almost every declaration can be required.
+fn property_contract(root: &Path) -> String {
+    let declared = ontology_properties(root);
+    let nodes = corpus_nodes(root);
+
+    let (mut required, mut optional, mut unsaid) = (0usize, 0usize, 0usize);
+    let (mut required_omitted, mut optional_omitted) = (0usize, 0usize);
+    let mut held_by_all = 0usize;
+    let mut rows = String::new();
+    for (class, properties) in &declared {
+        let instances: Vec<Vec<String>> = nodes
+            .iter()
+            .filter(|(c, _, _, _)| c == class)
+            .map(|(_, _, _, text)| node_properties(text))
+            .collect();
+        for (name, says) in properties {
+            match says {
+                Some(true) => required += 1,
+                Some(false) => optional += 1,
+                None => unsaid += 1,
+            }
+            let omitting = instances.iter().filter(|keys| !keys.contains(name)).count();
+            if omitting == 0 {
+                held_by_all += 1;
+                continue;
+            }
+            match says {
+                Some(true) => required_omitted += omitting,
+                _ => optional_omitted += omitting,
+            }
+            let says = match says {
+                Some(true) => "yes",
+                Some(false) => "no",
+                None => "unsaid",
+            };
+            rows.push_str(&format!(
+                "| `{class}.{name}` | {says} | {omitting} | {} |\n",
+                instances.len()
+            ));
+        }
+    }
+    let total = required + optional + unsaid;
+
+    let mut out = String::from("| Measure | Count |\n|---|--:|\n");
+    out.push_str(&format!(
+        "| properties declared across every class | {total} |\n"
+    ));
+    out.push_str(&format!("| declared `required: true` | {required} |\n"));
+    out.push_str(&format!("| declared `required: false` | {optional} |\n"));
+    out.push_str(&format!("| declarations that do not say | {unsaid} |\n"));
+    out.push_str(&format!(
+        "| omissions of a required property | {required_omitted} |\n"
+    ));
+    out.push_str(&format!(
+        "| omissions of an optional property | {optional_omitted} |\n"
+    ));
+    out.push_str(&format!(
+        "\n**{held_by_all} of the {total} declared properties are carried by every instance of \
+         their class.** An omission of a required property gates `yidam lint`, so each of the \
+         {required_omitted} is listed in `.yidam/lint-baseline.yml` and the next is attributable \
+         to the commit that makes it. An omission of an optional one is reported and is not a \
+         defect. Every property some instance omits:\n\n"
+    ));
+    out.push_str(
+        "| Property | Required | Instances omitting it | Instances |\n|---|---|--:|--:|\n",
+    );
+    out.push_str(&rows);
+    out
+}
+
+/// Each ontology class's declared properties, in declaration order, with what `required:` says.
+///
+/// `None` where a declaration has no `required:` line — the state all 120 were in before #507, and
+/// the one the web schema now refuses.
+fn ontology_properties(root: &Path) -> BTreeMap<String, Vec<(String, Option<bool>)>> {
+    let mut out = BTreeMap::new();
+    let Ok(entries) = fs::read_dir(root.join(".yidam/corpus")) else {
+        return out;
+    };
+    for entry in entries.flatten() {
+        let name = entry.file_name().to_string_lossy().into_owned();
+        let Some(class) = name.strip_suffix(".ont.yml") else {
+            continue;
+        };
+        let text = fs::read_to_string(entry.path()).unwrap_or_default();
+        out.insert(class.to_string(), declared_properties(&text));
+    }
+    out
+}
+
+/// The `properties:` list of one ontology file, positionally: an entry opens at `  - name:` and
+/// its keys sit at four spaces, so a `required:` inside a description's block scalar — at six —
+/// is not mistaken for the declaration's own.
+fn declared_properties(text: &str) -> Vec<(String, Option<bool>)> {
+    let mut out: Vec<(String, Option<bool>)> = Vec::new();
+    let Some(start) = text.find("\nproperties:\n") else {
+        return out;
+    };
+    for line in text[start + 1..].lines().skip(1) {
+        if !line.starts_with(' ') && !line.trim().is_empty() {
+            break;
+        }
+        if let Some(name) = line.strip_prefix("  - name:") {
+            out.push((name.trim().to_string(), None));
+        } else if let Some(value) = line.strip_prefix("    required:") {
+            if let Some(last) = out.last_mut() {
+                last.1 = value.trim().parse().ok();
+            }
+        }
+    }
+    out
+}
+
+/// The keys a node carries under `properties:` — two spaces in, the values beneath them deeper.
+fn node_properties(text: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    let Some(start) = text.find("\nproperties:\n") else {
+        return out;
+    };
+    for line in text[start + 1..].lines().skip(1) {
+        if !line.starts_with(' ') && !line.trim().is_empty() {
+            break;
+        }
+        let Some(rest) = line.strip_prefix("  ") else {
+            continue;
+        };
+        if rest.starts_with([' ', '-', '#']) {
+            continue;
+        }
+        if let Some((key, _)) = rest.split_once(':') {
+            out.push(key.to_string());
+        }
+    }
+    out
+}
+
 fn catalog_audit(root: &Path) -> String {
     let corpus: Vec<String> = corpus_nodes(root)
         .into_iter()
@@ -1090,6 +1240,7 @@ fn generate(command: &str, root: &Path) -> Option<String> {
         "edfund-connect connector-registry" => connector_registry(root),
         "edfund-connect claim-audit" => claim_audit(root),
         "edfund-connect edge-vocabulary" => edge_vocabulary(root),
+        "edfund-connect property-contract" => property_contract(root),
         "edfund-connect repository-overview" => repository_overview(root),
         "edfund-connect retrieval-status" => retrieval_status(root),
         "edfund-connect claim-totals" => claim_totals(root),
@@ -1448,6 +1599,72 @@ mod tests {
         assert!(
             edge_vocabulary(&root).contains(&format!("| edges between nodes | {total} |")),
             "the generated block and a direct count disagree"
+        );
+    }
+
+    /// A `required:` or a key-like line inside a block scalar is prose, not structure.
+    ///
+    /// Both readers are positional, so the doctored inputs are the ones that would fool a reader
+    /// matching on `required:` or `key:` anywhere: a description quoting the declaration it
+    /// explains, and a node whose prose sits at the depth a key would if it were one indent less.
+    #[test]
+    fn a_line_inside_a_block_scalar_is_not_a_key() {
+        let ontology = "class: x\nproperties:\n  - name: series\n    type: text\n    \
+                        required: false\n    description: >-\n      Not\n      required: true\n  \
+                        - name: unit\n    type: string\n    description: bare\nedge_policy: open\n";
+        assert_eq!(
+            declared_properties(ontology),
+            vec![
+                ("series".to_string(), Some(false)),
+                ("unit".to_string(), None)
+            ],
+            "the quoted `required: true` belongs to the description, and `unit` says nothing"
+        );
+
+        let node = "class: metric\nproperties:\n  name: x\n  series: |\n    FY2024\n    \
+                    inputs: not a key\n  # comment: nor this\nlinks:\n  - target: y\n";
+        assert_eq!(node_properties(node), vec!["name", "series"]);
+    }
+
+    /// Every declaration says whether it is required, and the count this block gates on is the
+    /// count yidam blessed.
+    ///
+    /// The second assertion ties the generated census to an independent reader: `yidam lint
+    /// --bless` wrote one `missing-property` entry per omitted required property, from its own
+    /// parse of the same files. If the two disagree, one of them is reading the corpus wrong.
+    #[test]
+    fn the_property_contract_agrees_with_the_lint_baseline() {
+        let root = repository_root();
+        let declared = ontology_properties(&root);
+        let unsaid: Vec<String> = declared
+            .iter()
+            .flat_map(|(class, properties)| {
+                properties
+                    .iter()
+                    .filter(|(_, says)| says.is_none())
+                    .map(move |(name, _)| format!("{class}.{name}"))
+            })
+            .collect();
+        assert!(
+            unsaid.is_empty(),
+            "declarations that do not say: {unsaid:?}"
+        );
+
+        let baseline = read(&root, ".yidam/lint-baseline.yml");
+        let blessed = baseline
+            .split("\n  missing-property:\n")
+            .nth(1)
+            .map_or(0, |section| {
+                section
+                    .lines()
+                    .take_while(|line| line.starts_with("  -") || line.starts_with("    "))
+                    .filter(|line| line.starts_with("  - node:"))
+                    .count()
+            });
+        assert!(
+            property_contract(&root)
+                .contains(&format!("| omissions of a required property | {blessed} |")),
+            "the generated census and the {blessed} baselined omissions disagree"
         );
     }
 
