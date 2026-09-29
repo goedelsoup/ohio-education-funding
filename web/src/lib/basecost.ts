@@ -244,7 +244,9 @@ export function renderBaseCostBuildUp(d: District, districts: number): string {
         <strong>${residual < 0.005 ? "nothing" : money(residual, 2)}</strong>, which is what
         twenty-two elements each rounded at the point the department rounds them adds up to. The
         reproduction is checked across all
-        ${count(districts)} districts before this site is allowed to build.</p>
+        ${count(districts)} districts before this site is allowed to build, and
+        <a href="${routes.METHOD}#${routes.SECTIONS.method.baseCost}">the method page</a> sets out
+        how it is done.</p>
 
       <p class="note">What the state actually pays toward this is the
         <a href="${routes.metric("state-share-percentage")}">state share</a>, not the whole of it:

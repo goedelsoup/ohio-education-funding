@@ -313,7 +313,18 @@ export function renderEqualization(
     </div>`;
 }
 
-/** What this page is measuring, said before any of it. */
+/**
+ * What the two survey cards are measuring, and what they are not.
+ *
+ * # Why it comes after them (#549)
+ *
+ * It opened the page, ahead of the first chart, on the argument that a reader should know whose
+ * measurement this is before reading any of it. The lead under the `h1` already says so — "measured
+ * by the federal government rather than by the state" — so what this card added in first position
+ * was the detail: the survey's name, its population, and why it does not reconcile with the
+ * formula. That is apparatus in the three-tier order #549 set, and it now follows the two cards it
+ * qualifies, drawn in the apparatus register.
+ */
 export function renderProvenance(bundle: Bundle): string {
   const history = bundle.history;
   if (history.length === 0) return "";
@@ -321,10 +332,10 @@ export function renderProvenance(bundle: Bundle): string {
   const last = lastOf(history);
 
   return `
-    <div class="card" id="what-this-is" data-part="what-this-is">
+    <div class="card apparatus" id="what-this-is" data-part="what-this-is">
       <h2>${anchor("what-this-is")}What this is, and what it is not</h2>
-      <p class="note">These figures are the U.S. Census Bureau's Annual Survey of School System
-        Finances, FY${first.fiscal_year} through FY${last.fiscal_year}. They are not the state's
+      <p class="note">The two cards above are drawn from the U.S. Census Bureau's Annual Survey
+        of School System Finances, FY${first.fiscal_year} through FY${last.fiscal_year}. They are not the state's
         funding formula and they do not reconcile with it. The survey counts about
         ${last.districts} comparable Ohio systems a year — community schools and educational
         service centres among them — on its own enrollment count and its own revenue

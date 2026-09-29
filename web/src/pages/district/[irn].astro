@@ -144,6 +144,11 @@ const description = district.on_guarantee
 
   <DistrictNav irn={district.irn} current="dashboard" />
 
+  {/* The cards, and a rail beside them from 1000px that `contents.ts` puts the section list in
+      (#549). Below that width the wrapper is a plain block and the list sits above the first
+      card, as on every other route; `app.css` has the layout. */}
+  <div class="rail-layout"><div class="rail-main">
+
   {/* The answer first. This card opened with base cost per pupil, which is an input to the
       formula rather than money anyone receives, while the page's own description, its share image
       and this card's heading all said the question was state aid. */}
@@ -165,4 +170,5 @@ const description = district.on_guarantee
   {/* Three of the four siblings close by declaring what they are not. This route has the most
       collisions to declare and was the last to say so. */}
   <WhatThisIsNot bundle={bundle} district={district} />
+  </div></div>
 </Base>

@@ -1168,6 +1168,22 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .tile .k { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-caps); color: var(--text-muted); }
 .tile .v { font-size: var(--text-figure); font-weight: var(--weight-bold); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; margin: .15rem 0; }
 .tile .n { font-size: var(--text-sm); color: var(--text-secondary); }
+/*
+ * Two across on a phone, where `auto-fit` at 180px gave one (#549).
+ *
+ * A 295px column holds one 180px track, so the district dashboard's three headline figures were
+ * three full-width rows — most of a screen before the first chart, spent on three numbers. Two
+ * tracks of `minmax(0, 1fr)` hold them in two rows.
+ *
+ * The first tile of an odd-numbered group takes the whole row, which is the largest figure in
+ * every group that has one: a district's total state aid is nine digits and a dollar sign, and at
+ * `--text-figure` that is wider than half a phone. The pairs below it are per-pupil figures and
+ * counts, which fit. A group of two or four is pairs throughout.
+ */
+@media (max-width: 640px) {
+  .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-7) var(--space-6); }
+  .tiles > .tile:first-child:nth-last-child(2n + 1) { grid-column: 1 / -1; }
+}
 
 /* Stacked bar: a 2px surface gap so the two quantities read as separate. */
 .barwrap { margin: var(--space-1) 0 0; }
@@ -1307,6 +1323,71 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
   color: var(--text-primary);
   border-bottom-color: var(--border);
 }
+/*
+ * Closed on a phone, open everywhere else (#549).
+ *
+ * `contents.ts` renders the list inside a `<details>` whose summary is the label, and a `<p>` label
+ * beside it. Below 700px the `<p>` goes and the summary is the control: one line where nine entries
+ * were. From 700px the summary goes and `::details-content` holds the list open, which is the site
+ * menu's override and has the site menu's degradation — an engine with neither pseudo-element gets
+ * the phone's disclosure at every width, every link still one click away.
+ *
+ * The margins shrink with it: a closed list is one line, and a section's interval above and below
+ * one line reads as a gap rather than as a boundary.
+ */
+.contents-summary {
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--text-secondary);
+  padding: var(--space-2) 0;
+}
+.contents-fold[open] > .contents-summary { margin-bottom: var(--space-3); }
+@media (max-width: 699.98px) {
+  .contents { margin: var(--space-6) 0 var(--space-7); padding-top: var(--space-4); }
+  .contents > .contents-label { display: none; }
+}
+@media (min-width: 700px) {
+  .contents-summary { display: none; }
+  .contents-fold::details-content { content-visibility: visible; block-size: auto; }
+}
+/*
+ * The district dashboard's rail, from 1000px (#549).
+ *
+ * The page opts in with a `rail-layout` wrapper around its cards and `contents.ts` puts the list
+ * inside it, first. Here the wrapper becomes two columns — the cards, and a rail the width of a
+ * contents entry — and `main` widens to the wide measure to make the room, so the cards keep about
+ * the reading width they had rather than losing the rail's width out of it.
+ *
+ * The rail sticks under the chrome at the offset a fragment lands at, so the list stays beside
+ * whichever section a reader is in, and scrolls on its own if it outgrows the window. It is the one
+ * sticky thing on the site that is not full-width, which is why `chrome.spec.ts` counts only the
+ * sticky elements that overlap a fragment's target when it asks what covers it.
+ *
+ * Below 1000px none of this applies: the wrapper is a block, the list sits above the first card as
+ * it does on every other route, and `main` keeps the reading width.
+ */
+@media (min-width: 1000px) {
+  main:has(> .rail-layout) { max-width: var(--wrap-wide); }
+  .rail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 13.5rem;
+    column-gap: var(--space-9);
+    align-items: start;
+  }
+  .rail-main { grid-column: 1; grid-row: 1; min-width: 0; }
+  .rail-layout > .contents {
+    grid-column: 2;
+    grid-row: 1;
+    position: sticky;
+    top: calc(var(--sticky-chrome) + .75rem);
+    max-height: calc(100vh - var(--sticky-chrome) - 1.5rem);
+    overflow-y: auto;
+    margin: 0;
+  }
+  .rail-layout > .contents ul { columns: auto; }
+  .rail-layout > .contents li { font-size: var(--text-sm); }
+}
 
 /* What the aid-source card's flag pills became. A pill holds a noun phrase and nothing else, and
    "At the minimum state share" is a fact about 138 districts that a reader who does not already
@@ -1328,6 +1409,10 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
   background: var(--surface-inset);
   padding: .1rem .3rem;
   border-radius: var(--radius-sm);
+  /* The `.prose-body code` rule's reason, met again outside the corpus: `/method` cites
+     `crates/xcheck/tests/against_published_tables.rs` in a note, one token 150px wider than a
+     phone's column, and at 375px the whole page scrolled sideways by it (#549). */
+  overflow-wrap: anywhere;
 }
 .err { color: var(--series-guarantee-text); }
 .gain { color: var(--series-formula-text); }
@@ -1336,6 +1421,16 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 /* The row the published model actually uses. Weight rather than colour: the other rows are the
    same formula at a different enrollment, not a different kind of thing. */
 tr.current th, tr.current td { color: var(--text-primary); font-weight: var(--weight-semibold); }
+/* A step's gloss, under its name in the same header cell — the hold-harmless table's third column
+   folded in so the table fits a phone (#549; `HoldHarmless.astro` has the measurement). Regular
+   weight on a `current` row too: the weight marks the row's figure, not its explanation. */
+.step-note {
+  display: block;
+  margin-top: .15rem;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  color: var(--text-secondary);
+}
 
 .scroll { overflow-x: auto; }
 /* A table of sentences rather than of quantities: the numeric right-alignment below is wrong for
@@ -2292,6 +2387,12 @@ h1.slug-title {
  * it; a reader looking up a district does not, and for a long time got it in the middle of the
  * first sentence of every exemplar. Muted, smaller, and last on the page is enough to say which
  * kind of reader it is for without making anyone hunt for it.
+ *
+ * The data routes use it for the same kind of card about themselves (#549): where a figure comes
+ * from and what it is not — `/history`'s survey provenance, `/outcomes`'s limits, the "not here"
+ * cards on `/method` and `/bounds`, and the district dashboard's "What this page is not". That is
+ * the third tier of a page, after the answer and how to read it, and `anatomy.spec.ts` holds every
+ * one of them below the page's first answer.
  */
 .card.apparatus {
   border: 1px dashed var(--border);

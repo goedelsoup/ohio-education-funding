@@ -6,6 +6,7 @@
  * that is a thing the unit suite can hold exhaustively without a browser or a build.
  */
 
+import { parseHTML } from "linkedom";
 import { expect, test } from "vitest";
 
 import { contentsOf, renderContents, withContents } from "../../src/lib/contents.ts";
@@ -129,6 +130,38 @@ test("a page with too few sections gets no list at all", () => {
 
   const four = body + card("d", "Four");
   expect(withContents(four, contentsOf(four))).toContain('nav class="contents"');
+});
+
+test("a page that opens a rail gets the list inside it, still ahead of the sections", () => {
+  /*
+   * The district dashboard's layout (#549): the list is the rail's first child so the stylesheet
+   * can set it in a column beside the cards, and it still comes before every card in the document,
+   * which is where a phone and a screen reader meet it.
+   */
+  const intro = `<h1>Cleveland Municipal</h1><nav class="subnav"><a href="/x">Dashboard</a></nav>`;
+  const sections = card("a", "One") + card("b", "Two") + card("c", "Three") + card("d", "Four");
+  const body = `${intro}<div class="rail-layout"><div class="rail-main">${sections}</div></div>`;
+  const out = withContents(body, contentsOf(body));
+
+  expect(out).toContain('<div class="rail-layout"><nav class="contents"');
+  expect(out.indexOf('<nav class="contents"')).toBeLessThan(out.indexOf('<div class="card" id="a"'));
+  expect(out.replace(/<nav class="contents".*?<\/nav>/s, "")).toBe(body);
+
+  // A rail opened after the first section is not this page asking for one.
+  const late = sections + `<div class="rail-layout"></div>`;
+  expect(withContents(late, contentsOf(late)).indexOf('<nav class="contents"')).toBe(0);
+});
+
+test("the list is a disclosure, labelled by the one label that is not its control", () => {
+  // `app.css` shows the summary below 700px and the `<p>` from 700px up. The name has to come from
+  // the `<p>`, and the entries have to be inside the `<details>` or nothing collapses on a phone.
+  const { document } = parseHTML(`<body>${renderContents([{ id: "x", label: "X" }])}</body>`);
+  const nav = document.querySelector("nav.contents")!;
+  expect(document.getElementById(nav.getAttribute("aria-labelledby")!)!.tagName).toBe("P");
+  expect(nav.querySelector("details.contents-fold > summary.contents-summary")!.textContent).toBe(
+    "On this page",
+  );
+  expect(nav.querySelectorAll("details.contents-fold > ul > li > a")).toHaveLength(1);
 });
 
 test("a label is escaped, because a heading is prose and prose contains ampersands", () => {

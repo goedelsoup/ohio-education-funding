@@ -35,12 +35,18 @@ test.describe("the chrome above the fold", () => {
       const landed = await page.evaluate(async () => {
         location.hash = "#categoricals";
         await new Promise((settle) => setTimeout(settle, 80));
+        const target = document.getElementById("categoricals")!.getBoundingClientRect();
+        // Only what is stuck ABOVE the target covers it. The dashboard's contents rail (#549) is
+        // sticky too, from 1000px, and sits in a column beside the cards: its bottom is most of
+        // the window down, and it covers none of them.
         const covered = Math.max(
           0,
           ...[...document.querySelectorAll("body *")]
             .filter((node) => {
               const style = getComputedStyle(node);
-              return style.position === "sticky" && style.top !== "auto";
+              if (style.position !== "sticky" || style.top === "auto") return false;
+              const box = node.getBoundingClientRect();
+              return box.left < target.right && box.right > target.left;
             })
             .map((node) => node.getBoundingClientRect().bottom),
         );

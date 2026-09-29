@@ -27,6 +27,16 @@
  * and no guarantee, 17 draw the supplement while drawing nothing from the guarantee, and the
  * paragraph below names those 17 explicitly — so a replacement would have deleted the table from
  * precisely the districts that sentence is about. 331 districts render it now, against 173 before.
+ *
+ * # Two columns, with the explanation under the step (#549)
+ *
+ * It was three — step, value, and a "What it is" column of sentences — and at 390px that was 470px
+ * of table in a 295px box, the one table on the dashboard that sits above its first chart, scrolled
+ * sideways with its value column cut off at the edge. `td.reads` refuses to shred a sentence into
+ * a ribbon (`app.css` explains the 28ch floor), which was right for a column and wrong for this
+ * table: the sentence is a gloss on the step, not a quantity beside it, so it now sits under the
+ * step's name in the same header cell. The value column is the only other one and it never wraps,
+ * so the table fits a phone without anything giving way.
  */
 import { fixed, money } from "../../lib/format.ts";
 import * as routes from "../../lib/routes.ts";
@@ -49,35 +59,37 @@ const beyond = Math.max(lost - t.open_enrollment_threshold, 0);
   (d.guarantee > 0 || clawback || supplement) && (
     <>
     <div class="scroll"><table data-program="hold-harmless">
-      <thead><tr><th>Step</th><th class="tnum">Value</th><th>What it is</th></tr></thead>
+      <thead><tr><th>Step, and what it is</th><th class="tnum">Value</th></tr></thead>
       <tbody>
-        <tr><th>FY2021 funding base</th><td class="tnum">{money(t.funding_base)}</td>
-          <td class="n">What the guarantee compares formula funding against.</td></tr>
+        <tr><th>FY2021 funding base{" "}
+          <span class="step-note">What the guarantee compares formula funding against.</span></th>
+          <td class="tnum">{money(t.funding_base)}</td></tr>
         {
           clawback && (
-            <tr class="current"><th>Open-enrolment clawback</th>
-                <td class="tnum">&minus;{money(t.open_enrollment_adjustment)}</td>
-                <td class="n">Its open enrolment fell {fixed(lost, 1)} FTE against a threshold of{" "}
+            <tr class="current"><th>Open-enrolment clawback{" "}
+                <span class="step-note">Its open enrolment fell {fixed(lost, 1)} FTE against a threshold of{" "}
                   {fixed(t.open_enrollment_threshold, 1)}, and the guarantee is cut by{" "}
                   {money(8241.61)} — the statewide average base cost per pupil — for each of the{" "}
-                  {fixed(beyond, 1)} FTE beyond it.</td></tr>
+                  {fixed(beyond, 1)} FTE beyond it.</span></th>
+                <td class="tnum">&minus;{money(t.open_enrollment_adjustment)}</td></tr>
           )
         }
-        <tr><th>Guarantee</th><td class="tnum">{d.guarantee <= 0 ? "—" : money(d.guarantee)}</td>
-          <td class="n">{
+        <tr><th>Guarantee{" "}
+          <span class="step-note">{
             d.guarantee > 0
               ? "The base, less the clawback, less what the formula computes."
               : "The formula reaches its FY2021 base, so this pays nothing."
-          }</td></tr>
+          }</span></th>
+          <td class="tnum">{d.guarantee <= 0 ? "—" : money(d.guarantee)}</td></tr>
         {
           supplement && (
             <tr class="current"><th><a href={routes.wikiNode(
                 "formula-component",
                 "fsfp-formula-transition-supplement",
-              )}>Formula transition supplement</a></th>
-                <td class="tnum">{money(t.transition_supplement)}</td>
-                <td class="n">A <em>second</em> hold-harmless, against a larger FY2021 base of{" "}
-                  {money(t.fy21_funding_base)} that includes transportation.</td></tr>
+              )}>Formula transition supplement</a>{" "}
+                <span class="step-note">A <em>second</em> hold-harmless, against a larger FY2021 base of{" "}
+                  {money(t.fy21_funding_base)} that includes transportation.</span></th>
+                <td class="tnum">{money(t.transition_supplement)}</td></tr>
           )
         }
       </tbody>
