@@ -464,16 +464,16 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 2015 | supported by a committed primary source |
-| `[inference]` | 427 | drawn from verified facts, not witnessed |
-| `[open]` | 214 | a live question — unknown, contested, or being worked |
+| `[verified]` | 2018 | supported by a committed primary source |
+| `[inference]` | 430 | drawn from verified facts, not witnessed |
+| `[open]` | 217 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-214 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+217 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 96 | 0 |
+| `findings` | 99 | 0 |
 | `description` | 42 | 0 |
 | `revisions` | 11 | 0 |
 | `series` | 7 | 0 |
@@ -508,7 +508,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `calculator` | 1 | 0 |
 | `appropriating_bill` | 1 | 0 |
 
-**120 recorded withdrawals across 54 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**123 recorded withdrawals across 55 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Relationship vocabulary
@@ -523,13 +523,13 @@ leave the corpus and are not counted.
 -->
 | Measure | Count |
 |---|--:|
-| edges between nodes | 591 |
-| distinct relationships in use | 170 |
+| edges between nodes | 593 |
+| distinct relationships in use | 171 |
 | relationships declared across every class | 70 |
 | edges whose relationship its class does not declare | 307 |
 | relationships used exactly once | 83 |
 
-**51% of edges use a relationship the class does not declare**, and 83 of the 170 relationships in use are used a single time. That is the case for `edge_policy: characteristic`: closing the vocabulary would reject those edges or require 83 declarations that each describe one link.
+**51% of edges use a relationship the class does not declare**, and 83 of the 171 relationships in use are used a single time. That is the case for `edge_policy: characteristic`: closing the vocabulary would reject those edges or require 83 declarations that each describe one link.
 <!-- /REGEN -->
 
 This was a hand-written sentence in fifteen ontology files, in the paragraph above, and in
@@ -642,7 +642,7 @@ Sorted by: kind, then alphabetically.
 | [`evidence-based-model`](funding-regime/evidence-based-model.yml) | funding-regime | Evidence-Based Model | 7 | 9 |
 | [`fair-school-funding-plan`](funding-regime/fair-school-funding-plan.yml) | funding-regime | Fair School Funding Plan | 23 | 32 |
 | [`foundation-base-cost-formula`](funding-regime/foundation-base-cost-formula.yml) | funding-regime | Foundation Base Cost Formula | 8 | 13 |
-| [`academic-distress-commission`](intervention/academic-distress-commission.yml) | intervention | Academic Distress Commission | 8 | 5 |
+| [`academic-distress-commission`](intervention/academic-distress-commission.yml) | intervention | Academic Distress Commission | 9 | 5 |
 | [`lea-level-action`](intervention/lea-level-action.yml) | intervention | Additional Optional Action (LEA level) | 4 | 2 |
 | [`more-rigorous-interventions`](intervention/more-rigorous-interventions.yml) | intervention | More Rigorous Interventions (CSI) | 5 | 2 |
 | [`hb-1-2009`](legislation/hb-1-2009.yml) | legislation | Am. Sub. H.B. 1 (2009) — FY2010-11 Budget; Evidence-Based Model | 4 | 7 |
@@ -655,7 +655,7 @@ Sorted by: kind, then alphabetically.
 | [`hb-583-2022`](legislation/hb-583-2022.yml) | legislation | Sub. H.B. 583 (2022) — corrective and technical changes to the Fair School Funding Plan | 10 | 4 |
 | [`hb-59-2013`](legislation/hb-59-2013.yml) | legislation | Am. Sub. H.B. 59 (2013) — FY2014-15 Budget; a Formula Over the Bridge | 6 | 3 |
 | [`hb-64-2015`](legislation/hb-64-2015.yml) | legislation | Am. Sub. H.B. 64 (2015) — FY2016-17 Budget; Capacity Aid | 9 | 5 |
-| [`hb-66-2005`](legislation/hb-66-2005.yml) | legislation | Am. Sub. H.B. 66 (2005) — FY2006-07 Budget; Tangible Personal Property Tax Phase-Out | 5 | 7 |
+| [`hb-66-2005`](legislation/hb-66-2005.yml) | legislation | Am. Sub. H.B. 66 (2005) — FY2006-07 Budget; Tangible Personal Property Tax Phase-Out | 5 | 8 |
 | [`hb-920-1976`](legislation/hb-920-1976.yml) | legislation | Am. Sub. H.B. 920 (1976) — Tax Reduction Factors | 5 | 13 |
 | [`hb-94-2001`](legislation/hb-94-2001.yml) | legislation | Am. Sub. H.B. 94 (2001) — FY2002-03 Budget; the post-DeRolph II formula | 12 | 5 |
 | [`hb-95-2003`](legislation/hb-95-2003.yml) | legislation | Am. Sub. H.B. 95 (2003) — FY2004-05 Budget; the First After DeRolph | 5 | 3 |
