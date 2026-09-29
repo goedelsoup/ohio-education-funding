@@ -268,10 +268,11 @@ header.site nav { display: flex; gap: .15rem; margin-right: auto; }
  *
  * # Six entries, and the repository mark gone from the row (#548)
  *
- * The bar became two links and four menus, and the repository mark moved to the footer. On a Mac
- * the loose nav is 523px, and at 820 the row reads 30 + 523 + 32 + 32 = 617 of 780: 163 spare.
- * That is the number that decided 820 stays, and it is this machine's; the runner's is printed by
- * the header test whenever the row wraps, which is where to read it before moving anything here.
+ * The bar became two links and four menus, and the repository mark moved to the footer. On the
+ * runner the loose nav is 562px, and at 820 the row reads 30 + 562 + 31 + 32 = 655 of 780: 125
+ * spare. A Mac gives the nav 523 and 163 spare — the same thirty-nine pixels of `system-ui` the
+ * brand used to carry, now all in the nav's words. The runner's figure is the one that decides,
+ * read off a CI run failed on purpose; the header test prints it again whenever the row wraps.
  */
 @media (min-width: 820px) {
   .menu-all > summary { display: none; }
