@@ -61,6 +61,10 @@ const CITED: &[&str] = &[
     "3302.01",
     "3302.03",
     "3302.10",
+    // And the exit H.B. 110 gave the three districts under a commission in 2021, which suspends
+    // 3302.10 while a plan runs. Cited by `academic-distress-commission` for East Cleveland's
+    // release on a majority of benchmarks, and for the years its division (A) dates the three to.
+    "3302.103",
     "3302.12",
     // The two constitutional earmarks — lottery profits and the casino tax — and the school share
     // of each. Not part of the formula, which is the finding the `casino-tax-distribution` node

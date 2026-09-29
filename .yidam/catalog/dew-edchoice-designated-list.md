@@ -54,7 +54,11 @@ That date matters for exactly one of the twenty columns. Every other is an arith
 sheets beside it, so it is as current as its inputs and cannot drift. `Academic Distress School`
 is not: R.C. 3310.03(C) makes a student eligible "if the student's resident district is subject to
 section 3302.10", so the column records whether a commission exists, and nothing in the file
-computes it.
+computes it. Strictly, it records something slightly different from what (C) says. R.C.
+3302.103(E)(1) takes a district implementing its improvement plan out of R.C. 3302.10, and both
+flagged districts were on their plans when this file was written. What the flag tracks is whether
+the commission still exists, which is R.C. 3310.03(E)(2)'s test for stopping first-time awards,
+and 3302.103(E)(3) keeps the commission in existence through the plan.
 
 **It is maintained, and Lorain proves it.** Three districts have held a commission under the current
 R.C. 3302.10. Lorain City (IRN `044263`, fifteen buildings — not `047076`, which is Pettisville
@@ -63,9 +67,10 @@ department recomputes this column rather than carrying it forward.
 
 **And it went stale six weeks after it was written.** East Cleveland City (IRN `043901`, five
 buildings) is flagged `yes`. In late December 2025 the director released the district from
-commission oversight, and R.C. 3302.10(N)(1) ends the commission with the transition period — so
-R.C. 3310.03(E)(2) had already stopped first-time Option A awards there before the 2026-2027 school
-year this list governs opened. See
+commission oversight on a majority of its plan benchmarks, and R.C. 3302.103(F)(2) dissolves the
+commission on exactly that. (This entry used to cite R.C. 3302.10(N)(1), which did not apply to a
+district on its plan.) So R.C. 3310.03(E)(2) had already stopped first-time Option A awards there
+before the 2026-2027 school year this list governs opened. See
 [`dew-academic-distress-commission`](dew-academic-distress-commission.md) for the notice and its
 dating.
 

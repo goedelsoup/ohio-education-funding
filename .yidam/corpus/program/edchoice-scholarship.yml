@@ -47,6 +47,19 @@ revisions:
     reach: |
       One adjective. The substitute relation stands: this file is eligibility at the same grain
       as the participation the route would carry.
+  - was: |
+      East Cleveland was released "on an overall three-star rating, and R.C. 3302.10(N)(1) ends
+      the commission together with the transition period".
+    now: |
+      The release was on a majority of plan benchmarks, under R.C. 3302.103(F)(2). A district
+      implementing its plan is not subject to R.C. 3302.10, so (N)(1) did not apply.
+    found_by: |
+      Vendoring R.C. 3302.103 for
+      [#540](https://github.com/goedelsoup/ohio-education-funding/issues/540).
+    reach: |
+      The section, not the event. The commission still ceased in late December 2025, and (E)(2)
+      still stopped first-time awards before 2026-2027 opened. What changes is that (C)'s "subject
+      to section 3302.10" did not describe either flagged district while its plan ran.
 findings: |
   ### A third way the published average does not sit right, and this one is arithmetic
 
@@ -138,7 +151,10 @@ findings: |
   Every other column is an arithmetic on the sheets beside it, so it is exactly as current as its
   inputs. `Academic Distress School` is not an arithmetic at all: R.C. 3310.03(C) makes a student
   eligible "if the student's resident district is subject to section 3302.10", so the column
-  records whether a commission *exists* on some date. The workbook's own `docProps` gives that
+  records whether a commission *exists* on some date. That is (E)(2)'s test rather than (C)'s: R.C.
+  3302.103(E)(1) takes a district implementing its improvement plan out of R.C. 3302.10, and both
+  flagged districts were on their plans, so read literally (C) was off for them while (E)(2) waited
+  for the commission to end. [inference] The workbook's own `docProps` gives that
   date — **created and last modified 13 November 2025**, thirty-four minutes apart. [verified]
   (crates/dispersion)
 
@@ -148,8 +164,8 @@ findings: |
   (crates/dispersion)
 
   **East Cleveland's flag went stale six weeks after the file was written.** In late December 2025
-  the director released the district from commission oversight on an overall three-star rating, and
-  R.C. 3302.10(N)(1) ends the commission together with the transition period — so
+  the director released the district from commission oversight on a majority of its plan
+  benchmarks, and R.C. 3302.103(F)(2) dissolves the commission on exactly that — so
   R.C. 3310.03(E)(2)'s instruction to "cease awarding first-time scholarships pursuant to division
   (C)" had already bitten before the 2026-2027 school year this list governs opened, (E)(3) leaving
   prior-year holders eligible. The file at the department's URL is still byte-identical to the
