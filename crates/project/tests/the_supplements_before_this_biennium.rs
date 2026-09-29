@@ -195,7 +195,7 @@ fn the_base_funding_supplement_is_an_old_name_and_an_old_amount() {
 /// school version of the same bonus is *"identical to the calculation of the payment for
 /// traditional districts except that it does not use the state share index."*
 ///
-/// The present performance supplement pays a flat $13 a pupil per qualifying rating, gross. That
+/// The present performance supplement pays a flat $13 a pupil per star, gross. That
 /// is the difference `performance-supplement-rate` measures as a 2.56-fold gradient toward the
 /// least-poor fifth of districts, and the difference is a term, not an accident of which
 /// districts qualify.
