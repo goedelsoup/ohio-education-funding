@@ -3,6 +3,16 @@ used-by:
   - ../corpus/draft-legislation/hb-643-136-introduced.yml
   - ../corpus/draft-legislation/hb-96-136-as-introduced.yml
   - ../corpus/draft-legislation/hb-96-136-as-passed-house.yml
+  - ../corpus/legislation/hb-1-2009.yml
+  - ../corpus/legislation/hb-110-2021.yml
+  - ../corpus/legislation/hb-119-2007.yml
+  - ../corpus/legislation/hb-153-2011.yml
+  - ../corpus/legislation/hb-166-2019.yml
+  - ../corpus/legislation/hb-583-2022.yml
+  - ../corpus/legislation/hb-64-2015.yml
+  - ../corpus/legislation/hb-66-2005.yml
+  - ../corpus/legislation/hb-94-2001.yml
+  - ../corpus/legislation/hb-95-2003.yml
 ---
 # Ohio bills before enactment — the text as introduced
 
