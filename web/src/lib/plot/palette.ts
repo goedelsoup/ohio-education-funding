@@ -78,7 +78,7 @@ const compand = (c: number): number => {
 };
 
 /** WCAG 2.x relative luminance. */
-export function luminance(colour: Rgb): number {
+function luminance(colour: Rgb): number {
   return (
     0.2126 * linearize(colour.r) + 0.7152 * linearize(colour.g) + 0.0722 * linearize(colour.b)
   );
@@ -185,11 +185,6 @@ export const hueGap = (a: number, b: number): number => {
   const d = Math.abs(a - b) % 360;
   return d > 180 ? 360 - d : d;
 };
-
-/** Straight-line distance in Lab. The 1976 definition, kept for identifying older figures. */
-export function deltaE76(a: Lab, b: Lab): number {
-  return Math.hypot(a.l - b.l, a.a - b.a, a.b - b.b);
-}
 
 /**
  * CIEDE2000.
@@ -309,15 +304,4 @@ export function minSeparation(
 ): number {
   const seen = ramp.map((hex) => toLab(simulate(parseHex(hex), vision)));
   return Math.min(...pairs(seen).map(([a, b]) => metric(a, b)));
-}
-
-/** The worst separation across normal vision and all three dichromacies. */
-export function worstSeparation(
-  ramp: readonly string[],
-  metric: (a: Lab, b: Lab) => number = deltaE2000,
-): { vision: Vision; deltaE: number } {
-  const visions: Vision[] = ["normal", "protan", "deutan", "tritan"];
-  return visions
-    .map((vision) => ({ vision, deltaE: minSeparation(ramp, vision, metric) }))
-    .reduce((worst, one) => (one.deltaE < worst.deltaE ? one : worst));
 }

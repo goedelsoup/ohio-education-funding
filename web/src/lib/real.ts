@@ -20,7 +20,7 @@ import type { Deflator, FinanceYear } from "./types.ts";
 export type Basis = "nominal" | "real";
 
 /** The index level for a fiscal year, or `null` if the series does not cover it. */
-export function indexFor(deflator: Deflator, fiscalYear: number): number | null {
+function indexFor(deflator: Deflator, fiscalYear: number): number | null {
   return deflator.points.find((p) => p.fiscal_year === fiscalYear)?.index ?? null;
 }
 
@@ -75,7 +75,7 @@ export function convert(
  * A line the filing never carried stays absent. Returns `null` only when the index cannot cover
  * the year, which is the one case where the year cannot honestly be labelled real.
  */
-export function yearIn(
+function yearIn(
   deflator: Deflator,
   year: FinanceYear,
   base: number,

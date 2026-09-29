@@ -549,7 +549,7 @@ export function endpoints(series: ManifestSeries): SeriesRow[] {
  * is a row of a table and a summary is a lead nothing renders marks on, so neither has anywhere
  * for a chart to go.
  */
-export const DRAWABLE_FIELDS: readonly string[] = ["description", "findings"];
+const DRAWABLE_FIELDS: readonly string[] = ["description", "findings"];
 
 /**
  * The series a **page** draws rather than a node, and the node each one's endpoints are bound on.

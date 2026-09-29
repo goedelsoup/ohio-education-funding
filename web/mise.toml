@@ -3,10 +3,11 @@
 # `mise run //web:<task>`, or run bare names from inside this directory.
 
 [tasks.gate]
-description = "Everything the web job in CI runs: check, unit, build, dist links, dist, measure, e2e."
+description = "Everything the web job in CI runs: check, lint, unit, build, dist links, dist, measure, e2e."
 run = [
   "mise run install",
   "mise run check",
+  "mise run lint",
   "mise run test-unit",
   "mise run build",
   "mise run check-dist",
@@ -26,6 +27,14 @@ run = "pnpm dev"
 [tasks.check]
 description = "Type-check the Astro and TypeScript sources."
 run = "pnpm check"
+
+[tasks.lint]
+description = "Fail on a binding nobody reads."
+# One rule, `no-unused-vars`, and nothing else from oxlint's defaults: the question it answers is
+# the other half of tests/unit/exports.spec.ts. That test refuses an export no file imports; once
+# the `export` comes off, this is what sees whether the file itself still reads the binding. Not
+# `.astro` frontmatter, which oxlint does not parse. (#506)
+run = "pnpm lint"
 
 [tasks.test-unit]
 description = "The formula, the projection, the link graph, the 404 matcher."

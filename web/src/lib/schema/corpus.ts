@@ -50,7 +50,7 @@ import { z } from "astro/zod";
  * `note` is optional prose hanging off an edge, which a handful of nodes use to say why the link
  * is there.
  */
-export const LinkSchema = z
+const LinkSchema = z
   .object({
     target: z.string().min(1, "a link needs a target"),
     relationship: z.string().min(1, "a link needs a relationship"),
@@ -191,7 +191,7 @@ export const FigureSchema = z
  * and smallest rows as ordinary {@link FigureSchema} entries, so the numbers a reader would take
  * off the chart are the numbers the prose already states and the crate already pins.
  */
-export const SeriesBindingSchema = z
+const SeriesBindingSchema = z
   .object({
     /** The series manifest key, `<crate-directory>/<what-it-is>`. */
     key: z
@@ -206,7 +206,7 @@ export const SeriesBindingSchema = z
   .strict();
 
 /** What a `summary` may not be longer than, in words. See {@link NodeSchema}. */
-export const SUMMARY_MAX_WORDS = 50;
+const SUMMARY_MAX_WORDS = 50;
 
 /** Count words the way the summary limit means them: runs of non-whitespace. */
 export function words(text: string): number {
@@ -283,7 +283,7 @@ export const NodeSchema = z
   .strict();
 
 /** One declared property on a class. */
-export const OntologyPropertySchema = z
+const OntologyPropertySchema = z
   .object({
     name: z.string().min(1),
     type: z.string().min(1),
@@ -338,7 +338,7 @@ export const OntologyPropertySchema = z
   .strict();
 
 /** One declared edge on a class. */
-export const OntologyEdgeSchema = z
+const OntologyEdgeSchema = z
   .object({
     relationship: z.string().min(1),
     target: z.string().min(1),

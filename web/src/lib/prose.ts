@@ -115,7 +115,7 @@ let processor: Awaited<ReturnType<typeof createMarkdownProcessor>> | null = null
  * Skips anything already absolute — the corpus occasionally cites a statute or a publisher
  * directly, and those are not ours to rewrite.
  */
-export function rewriteLinks(markdown: string, fromClass: string): string {
+function rewriteLinks(markdown: string, fromClass: string): string {
   return markdown.replace(/\]\(([^)\s]+)\)/g, (whole, target: string) => {
     if (/^(https?:|mailto:|#|\/)/.test(target)) return whole;
     return `](${resolveTarget(target, fromClass).href})`;

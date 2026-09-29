@@ -153,7 +153,7 @@ export class MathError extends Error {}
  * Exported so a test can drive it with markup temml would never produce — the boundary is only
  * worth having if something checks it in the direction that matters.
  */
-export function checkAndClean(element: Element, where: string): void {
+function checkAndClean(element: Element, where: string): void {
   const tag = element.tagName.toLowerCase();
   if (!ELEMENTS.has(tag)) {
     throw new MathError(`${where}: <${tag}> is not on the MathML allowlist in lib/math.ts`);

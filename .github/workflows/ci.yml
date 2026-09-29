@@ -101,6 +101,9 @@ jobs:
       - name: check
         run: pnpm check
 
+      - name: lint
+        run: pnpm lint
+
       - name: unit
         run: pnpm test:unit
 

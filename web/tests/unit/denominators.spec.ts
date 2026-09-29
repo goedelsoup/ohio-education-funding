@@ -15,6 +15,7 @@ import {
   BLOCK_DENOMINATORS,
   DENOMINATORS,
   denominatorContrast,
+  DELIBERATELY_UNCOMPARABLE,
   denominatorOf,
   FIELD_DENOMINATORS,
   PAGE_FIGURES,
@@ -122,6 +123,25 @@ test("both sides of every rendered pair are declared at all", () => {
   for (const path of RENDERED_PAIRS.flat()) {
     expect(Object.keys(FIELD_DENOMINATORS), `${path} is paired but not declared`).toContain(path);
   }
+});
+
+test("every deliberately uncomparable pair is on two different counts, and is not also rendered as a pair", () => {
+  /*
+   * The other half of the two tests above, and the one nothing read. The list records pairs that
+   * sit near each other on a page and must not be read across; an entry whose two sides resolve to
+   * the same count is not uncomparable on this axis, and one that also appears in RENDERED_PAIRS is
+   * being asserted comparable and uncomparable at once.
+   */
+  const rendered = new Set(RENDERED_PAIRS.flatMap(([a, b]) => [`${a}|${b}`, `${b}|${a}`]));
+  const defects = DELIBERATELY_UNCOMPARABLE.flatMap(([a, b]) => {
+    const [left, right] = [denominatorOf(a), denominatorOf(b)];
+    if (left === null || right === null) return [`${a} | ${b}: a side resolves to no count`];
+    if (left === right) return [`${a} | ${b}: both are on ${left}`];
+    if (rendered.has(`${a}|${b}`)) return [`${a} | ${b}: also in RENDERED_PAIRS`];
+    return [];
+  });
+  expect(DELIBERATELY_UNCOMPARABLE.length).toBeGreaterThan(0);
+  expect(defects).toEqual([]);
 });
 
 test("the six pupil counts are genuinely different numbers", () => {

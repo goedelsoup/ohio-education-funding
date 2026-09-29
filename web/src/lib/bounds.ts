@@ -44,7 +44,7 @@ import { yearChip, yearOf } from "./year.ts";
 import { firstOf, lastOf } from "./ends.ts";
 
 /** The one series this page draws. Named here because three things below look it up. */
-export const SERIES_KEY = "project/bounds-census";
+const SERIES_KEY = "project/bounds-census";
 
 /** One of R.C. 3317's five families of provision, and how many bounds it contributes. */
 export interface Family {

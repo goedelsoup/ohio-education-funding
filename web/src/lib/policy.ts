@@ -229,13 +229,13 @@ export function currentLaw(m: Model): Policy {
 export const DPIA_BLEND = 0.35;
 
 /** What each weighted disadvantaged pupil generates. */
-export const DPIA_PER_PUPIL = 422;
+const DPIA_PER_PUPIL = 422;
 
 /** The FY2019 wealth index the supplemental tier requires a district to exceed. */
-export const TA_SUPPLEMENT_INDEX_THRESHOLD = 1.6;
+const TA_SUPPLEMENT_INDEX_THRESHOLD = 1.6;
 
 /** The rate at the bottom of the supplemental scale, as a share of the rate at the top. */
-export const TA_SUPPLEMENT_FLOOR_SHARE = 0.1;
+const TA_SUPPLEMENT_FLOOR_SHARE = 0.1;
 
 /**
  * DPIA from a blended count, at a stated statewide index denominator.
@@ -243,7 +243,7 @@ export const TA_SUPPLEMENT_FLOOR_SHARE = 0.1;
  * `d1 × $422 × (d1 / enrolled ADM / statewide)²`, with `d1` capped at the district's own enrolled
  * ADM. Mirrors `project::panel::Dpia::aid_from_count`.
  */
-export function dpiaFromCount(
+function dpiaFromCount(
   weightedAdm: number,
   enrolledAdm: number,
   statewide: number,
@@ -255,7 +255,7 @@ export function dpiaFromCount(
 }
 
 /** The DPIA count at a given weight on directly certified ADM. */
-export function dpiaCountAt(d: PanelDistrict, weight: number): number {
+function dpiaCountAt(d: PanelDistrict, weight: number): number {
   return (
     (1 - weight) * d.dpia_econ_disadvantaged_adm +
     weight * d.dpia_directly_certified_adm
@@ -312,7 +312,7 @@ export function statewideUnder(
  * state's highest FY2019 wealth index. Mirrors
  * `project::panel::TargetedAssistance::supplemental_rate`.
  */
-export function supplementalRate(
+function supplementalRate(
   d: PanelDistrict,
   topIndex: number,
   topRate: number,
@@ -336,7 +336,7 @@ export function supplementalRate(
  * told separately is how two implementations come to disagree. Mirrors
  * `project::policy::transport_under`.
  */
-export function transportUnder(
+function transportUnder(
   d: PanelDistrict,
   currentYearAdm: number,
   floor: number,

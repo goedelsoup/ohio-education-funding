@@ -15,8 +15,7 @@
  *    other.
  */
 
-import type { Bar } from "./chart.ts";
-import { barSpec, distributionSpec, type Drawing, draws, scatterSpec } from "./plot/spec.ts";
+import { distributionSpec, type Drawing, draws, scatterSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import { count, escapeHtml, fixed, money, pct, signed } from "./format.ts";
 import type { Bundle, District, OutcomeStatewide } from "./types.ts";

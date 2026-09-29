@@ -261,7 +261,7 @@ function stateShare(d: PanelDistrict): number {
 export type Shading = "regime" | "change" | "type";
 
 /** The three regimes, in the order the ordinal ramp runs. */
-export const REGIMES = [
+const REGIMES = [
   "Paid by the formula",
   "Held by the guarantee",
   "Held, and at the minimum state share",

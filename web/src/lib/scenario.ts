@@ -647,7 +647,6 @@ export function renderScenario(bundle: Panel, levers: Levers, chip = ""): Render
   const outcomes = applyAll(bundle.districts, toPolicy(levers), model);
   const t = totals(outcomes);
 
-  const { liftedOff, pushedOn } = guaranteeMovement(bundle.districts, outcomes);
   const deltas = outcomes
     .filter((o) => Math.abs(o.delta) > MOVED)
     .map((o) => o.deltaPerPupil);
