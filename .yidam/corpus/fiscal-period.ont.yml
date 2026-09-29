@@ -18,7 +18,8 @@ properties:
   - name: kind
     type: string
     required: true
-    description: fiscal-year | biennium
+    values: [fiscal-year, biennium]
+    description: Whether the period is one fiscal year or the biennium a budget act appropriates for
   - name: start
     type: date
     required: true

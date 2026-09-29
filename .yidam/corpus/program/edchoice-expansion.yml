@@ -250,7 +250,8 @@ figures:
     as_written: "**113,962**\n  on this programme in FY2027"
 properties:
   name: EdChoice Expansion Scholarship
-  mechanism: |
+  mechanism: funding-unit
+  mechanism_note: |
     Deduction from resident district under the original design; **not a deduction under the Fair
     School Funding Plan.** [verified] Confirmed negatively and exhaustively against the FY2027
     calculator: the payment report's transfer channel is two named lines, `S - Educational

@@ -311,8 +311,7 @@ export const OntologyPropertySchema = z
      * page has no reason to render a fact about how the corpus is measured. What it reaches is
      * `node-too-long`, which counts the lines, `missing-description`, which stops reporting a node
      * whose substance is in a property, and `yidam embed`, which composes the text an index would
-     * be built from — 51 declarations here, and 173K characters, a fifth of what this corpus
-     * writes.
+     * be built from — 52 declarations here, and about a fifth of what this corpus writes.
      *
      * **Absent means false**, for the reason `required:` absent means false upstream: a corpus
      * written before the field existed never had the chance to say. Optional rather than
@@ -323,6 +322,17 @@ export const OntologyPropertySchema = z
      * `type: text` means prose, with three named exceptions.
      */
     prose: z.boolean().optional(),
+    /**
+     * The closed set of values a `string` property admits, written as declared: exact match, no
+     * trimming or case folding. yidam gates it from 0.16.0 under `property-type`, so declaring a
+     * set closes it — there is no open list, because an open list is the description again.
+     *
+     * Ten declarations carry one, and each was a pipe-list in its description until then, which
+     * nothing read: three had drifted off their own list, `program.mechanism` into paragraphs.
+     * The rule is in
+     * [`a-closed-value-set-is-declared-not-described`](../../../../.yidam/decisions/a-closed-value-set-is-declared-not-described.yml).
+     */
+    values: z.array(z.string().min(1)).min(1).optional(),
     description: z.string().min(1),
   })
   .strict();

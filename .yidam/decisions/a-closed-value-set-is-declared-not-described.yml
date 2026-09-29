@@ -1,0 +1,87 @@
+id: a-closed-value-set-is-declared-not-described
+summary: >-
+  Ten `string` properties spelled a closed value set as a pipe-list in their description, which
+  nothing read, and three had drifted off it — `program.mechanism` into five paragraphs of tagged
+  prose. Each now declares its set with `values:`, which yidam 0.16.0 gates under
+  `property-type`. Two sets widened for values the class had always meant to admit, one for a unit
+  the list never had; every other drift was the instance's, and is corrected.
+context: |
+  yidam 0.16.0 gave a class `values:` beside `type:` (goedelsoup/yidam#1052, RFC-0044): a closed
+  set, matched exactly, gated as `property-type`. Declaring one closes it; there is no open marker.
+  The upstream issue measured this corpus among seven and found nine off-list instances here.
+  [`every-property-says-whether-it-is-required`](every-property-says-whether-it-is-required.yml)
+  recorded the ten pipe-lists and left adopting the field to this change (#526).
+
+  Measured at yidam 0.16.0 before this change, seven of the ten sets held every instance. The
+  three that did not:
+
+  - `program.mechanism`, 6 of 8 off the list. Five were not values at all: the autism, Cleveland,
+    EdChoice, EdChoice-expansion and Jon Peterson scholarships each carried the whole account of
+    how the programme is paid, with its `[verified]` and `[open]` tags and a crate link, in a field
+    declared as a token. The sixth, `classroom-facilities-assistance`, held `capital-assistance`.
+  - `parameter.unit`, 2 of 18: `fraction of the computed entitlement` on the proration factor, and
+    `dollars-per-district, nominal and unindexed. [verified]` on the guarantee base — a claim tag
+    in a unit.
+  - `metric.unit`, 1 of 9: `pupils` on enrolled ADM.
+
+  **The five paragraphs agree on a mechanism the list could not name.** R.C. 3317.022 computes
+  state core foundation funding for six funding units: the districts, the community and STEM school
+  unit, and four scholarship units. Each scholarship is paid from its unit's funds. The EdChoice
+  expansion node says in as many words that this "is not a separate appropriation at all", so none
+  of them is `direct-appropriation`, and since FY2022 none is `deduction`.
+decision: |
+  **Every closed set a description spelled is now declared, and the description says what the
+  property means instead.** The class page shows the set beside the type, so the reader loses
+  nothing when the description stops listing it.
+
+  **Where a value was right and the list was short, the list widens.**
+
+  - `program.mechanism` gains `funding-unit`, the mechanism the five scholarships are paid by now,
+    and `capital-assistance`, which the class already named — its description lists "a facilities
+    assistance program" and its `funds` edge says "as capital assistance programs do".
+  - `metric.unit` gains `pupils`. Enrolled ADM is full-time-equivalent and fractional, so
+    `parameter.unit`'s `count` would be the wrong word for it.
+  - `parameter.unit` gains `dollars`, `metric.unit`'s word for an amount no count multiplies. The
+    guarantee base is one figure per district, and it is not a rate charged per district.
+
+  **Where the instance was wrong, the instance changes.** The proration factor's unit is `ratio`:
+  an appropriation divided by an entitlement, which its own description already says. The
+  guarantee base's "nominal and unindexed. [verified]" moves into its `series`, which is prose, so
+  the tag is still counted.
+
+  **The mechanism paragraphs move to `program.mechanism_note`**, a `text` property with `prose:
+  true` and `required: false`. The paragraphs are the history the token cannot hold: each
+  scholarship was a deduction until FY2022, and Cleveland's was a fixed earmark of the district's
+  own aid rather than a per-pupil transfer. `mechanism` holds the mechanism in force. A programme
+  paid one way throughout has nothing to note, which is why the note is optional.
+consequences: |
+  **A value outside a declared set fails `yidam lint` at Error.** Probed on this branch: writing
+  `headcount` as enrolled ADM's unit fails the gate and names the seven values the class admits.
+  A new value is now a change to the ontology, made in the same commit as the instance that needs
+  it.
+
+  **A pipe-list in a `string` description fails `pnpm test:unit`.** `web/tests/unit/schema.spec.ts`
+  holds the pipe-lists at zero and the declared sets at ten, so a new closed set is declared, and a
+  declared set cannot be dropped without the test being changed.
+
+  **Three values are declared and held by no instance.** `program.mechanism`'s `deduction` and
+  `competitive-grant`, and `parameter.unit`'s `count`, are what the class says a programme or
+  parameter may be. A programme ended before FY2022 would be a deduction. They are kept because a
+  set lists what the class admits, and what the corpus holds is a separate count.
+
+  **The census moved by one declaration.** `mechanism_note` is the 121st property and the eighth
+  declared optional; three programmes omit it, and the generated block in the corpus README says
+  so.
+alternatives: |
+  **Correct the five scholarships to `direct-appropriation`.** That would shorten the list, and the
+  corpus says the reading is wrong: R.C. 3317.022 pays them through a funding unit inside the
+  foundation computation, not through a line of their own.
+
+  **Keep the paragraphs in `mechanism` and declare no set on it.** Nine of the ten would be
+  declared and the tenth left as prose. That is the property that had drifted furthest, so it is the
+  one a gate is most needed on, and a `values:` on the other nine would suggest it had been
+  decided too.
+
+  **Move the paragraphs into `findings`.** Each node already has one, and it would save a
+  declaration. Declined because the paragraphs explain the mechanism specifically, and a note
+  declared beside the token keeps the explanation next to the value it explains.

@@ -25,7 +25,8 @@ properties:
   - name: level
     type: string
     required: true
-    description: state | federal
+    values: [state, federal]
+    description: Whose law establishes the regime and attaches its consequences
   - name: authority
     type: string
     required: true

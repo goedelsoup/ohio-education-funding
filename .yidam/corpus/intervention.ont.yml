@@ -35,7 +35,8 @@ properties:
   - name: unit
     type: string
     required: true
-    description: education-agency | school — what the intervention attaches to
+    values: [education-agency, school]
+    description: What the intervention attaches to
   - name: powers
     type: text
     required: true

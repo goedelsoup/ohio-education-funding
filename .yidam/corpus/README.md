@@ -478,7 +478,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `revisions` | 11 | 0 |
 | `series` | 7 | 0 |
 | `unpriced` | 5 | 0 |
-| `mechanism` | 5 | 0 |
+| `mechanism_note` | 5 | 0 |
 | `amount` | 5 | 0 |
 | `vetoes` | 3 | 0 |
 | `statutory_basis` | 3 | 0 |
@@ -549,14 +549,14 @@ writes an absence it has looked for.
 -->
 | Measure | Count |
 |---|--:|
-| properties declared across every class | 120 |
+| properties declared across every class | 121 |
 | declared `required: true` | 113 |
-| declared `required: false` | 7 |
+| declared `required: false` | 8 |
 | declarations that do not say | 0 |
 | omissions of a required property | 15 |
-| omissions of an optional property | 33 |
+| omissions of an optional property | 36 |
 
-**110 of the 120 declared properties are carried by every instance of their class.** An omission of a required property gates `yidam lint`, so each of the 15 is listed in `.yidam/lint-baseline.yml` and the next is attributable to the commit that makes it. An omission of an optional one is reported and is not a defect. Every property some instance omits:
+**110 of the 121 declared properties are carried by every instance of their class.** An omission of a required property gates `yidam lint`, so each of the 15 is listed in `.yidam/lint-baseline.yml` and the next is attributable to the commit that makes it. An omission of an optional one is reported and is not a defect. Every property some instance omits:
 
 | Property | Required | Instances omitting it | Instances |
 |---|---|--:|--:|
@@ -569,6 +569,7 @@ writes an absence it has looked for.
 | `metric.series` | yes | 5 | 9 |
 | `parameter.simulation_key` | no | 1 | 18 |
 | `parameter.written_as` | no | 5 | 18 |
+| `program.mechanism_note` | no | 3 | 8 |
 | `school.grades` | yes | 3 | 3 |
 <!-- /REGEN -->
 

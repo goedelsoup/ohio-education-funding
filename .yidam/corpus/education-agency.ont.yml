@@ -39,7 +39,8 @@ properties:
   - name: agency_type
     type: string
     required: true
-    description: city | local | exempted-village | joint-vocational | community | stem
+    values: [city, local, exempted-village, joint-vocational, community, stem]
+    description: The statutory kind of agency, which decides the rules it is funded on
   - name: county
     type: string
     required: true

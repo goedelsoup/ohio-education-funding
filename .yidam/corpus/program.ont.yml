@@ -19,7 +19,19 @@ properties:
   - name: mechanism
     type: string
     required: true
-    description: deduction | direct-appropriation | reimbursement | competitive-grant
+    values: [deduction, direct-appropriation, funding-unit, reimbursement, competitive-grant, capital-assistance]
+    description: >-
+      How the program's money reaches its recipient now. `funding-unit` is payment to one of the
+      funding units R.C. 3317.022 names beside the districts; `deduction` is a transfer out of the
+      resident district's aid, which is how the scholarships ran before FY2022
+  - name: mechanism_note
+    type: text
+    required: false
+    prose: true
+    description: >-
+      Why the mechanism is the one named, and what it was before, where it changed — the
+      scholarships were deductions until FY2022. A program paid one way throughout has nothing to
+      note
   - name: eligibility
     type: text
     required: true

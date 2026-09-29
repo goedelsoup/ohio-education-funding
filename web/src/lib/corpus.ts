@@ -216,7 +216,12 @@ export interface OntologyClass {
    * ontology file; see `EdgePolicySchema`.
    */
   edgePolicy: "characteristic" | "exhaustive";
-  properties: { name: string; type: string; description: string }[];
+  /**
+   * `values` is the closed set a `string` property admits, or null for a property that declares
+   * none. yidam gates instances against it; the class page shows it, because the description
+   * stopped spelling it when the set became declared.
+   */
+  properties: { name: string; type: string; description: string; values: string[] | null }[];
   edges: { relationship: string; target: string; direction: string; description: string }[];
   nodes: Node[];
 }
@@ -811,10 +816,11 @@ function readClass(file: string, report: Diagnostic[]): Omit<OntologyClass, "nod
     foundationalType: foundational?.type
       ? `${foundational.type}${foundational.ontology ? ` (${foundational.ontology})` : ""}`
       : null,
-    properties: ((parsed.properties ?? []) as Record<string, string>[]).map((p) => ({
+    properties: ((parsed.properties ?? []) as Record<string, unknown>[]).map((p) => ({
       name: String(p.name ?? ""),
       type: String(p.type ?? ""),
       description: String(p.description ?? ""),
+      values: Array.isArray(p.values) ? p.values.map(String) : null,
     })),
     edges: ((parsed.edges ?? []) as Record<string, string>[]).map((e) => ({
       relationship: String(e.relationship ?? ""),

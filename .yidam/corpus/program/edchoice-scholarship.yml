@@ -320,7 +320,8 @@ properties:
     it must compute over. The corpus carried a node for the expansion and none for the programme
     it expanded, so the distinction R.C. 3310.03 and 3310.032 draw was invisible here. [inference]
   name: Educational Choice Scholarship Program (Traditional)
-  mechanism: |
+  mechanism: funding-unit
+  mechanism_note: |
     **Direct payment as its own funding unit. Not a deduction.** [verified]
 
     R.C. 3317.022 names the **educational choice scholarship unit** among the six funding units the

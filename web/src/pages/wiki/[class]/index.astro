@@ -103,7 +103,20 @@ const title = `${entry.label} — the corpus`;
                   <th>
                     <code>{property.name}</code>
                   </th>
-                  <td>{property.type}</td>
+                  <td>
+                    {property.type}
+                    {property.values && (
+                      <>
+                        , one of{" "}
+                        {property.values.map((value, i) => (
+                          <>
+                            {i > 0 && ", "}
+                            <code>{value}</code>
+                          </>
+                        ))}
+                      </>
+                    )}
+                  </td>
                   <td set:html={renderPropertyValue(property.description, entry.className)} />
                 </tr>
               ))}
