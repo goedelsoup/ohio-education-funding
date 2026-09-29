@@ -73,7 +73,7 @@ export function residual(year: HistoryYear): number {
 }
 
 /** State aid's share of the gap it is measured against. */
-export function stateShareOfGap(year: HistoryYear): number {
+function stateShareOfGap(year: HistoryYear): number {
   return year.gap_per_pupil > 0 ? year.state_closes_per_pupil / year.gap_per_pupil : 0;
 }
 

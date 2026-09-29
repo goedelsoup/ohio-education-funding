@@ -57,7 +57,7 @@ const maybeNum = z.number().nullable();
  * the same name sat in one document 100× apart, both `maybeNum` and neither saying which it was.
  * `sharesAreFractions` in `tests/unit/schema.spec.ts` is what keeps that from coming back.
  */
-export const DistrictOutcomeSchema = z
+const DistrictOutcomeSchema = z
   .object({
     /** Ohio's attainment-level measure, 2024-25. */
     performance_index: maybeNum,
@@ -90,7 +90,7 @@ export const DistrictOutcomeSchema = z
  * Every field is a correlation and none identifies an effect. The raw and controlled guarantee
  * figures are both present because showing one without the other states a confound as a finding.
  */
-export const OutcomeStatewideSchema = z
+const OutcomeStatewideSchema = z
   .object({
     districts: z.number().int().nonnegative(),
     poverty_vs_performance: num,
@@ -133,7 +133,7 @@ export const OutcomeStatewideSchema = z
  * twice — which is a fifth pupil denominator and a partition of nothing. Dividing it by `adm` or
  * `categorical_adm` gives a number that reads as comparable to the ones beside it and is not.
  */
-export const CasinoYearSchema = z
+const CasinoYearSchema = z
   .object({
     /** State fiscal year of the two payments, January and August, summed. */
     fiscal_year: z.number().int(),
@@ -142,7 +142,7 @@ export const CasinoYearSchema = z
   .strict();
 
 /** One district's buildings on the EdChoice designated list, and how many are designated. */
-export const DesignatedSchema = z
+const DesignatedSchema = z
   .object({
     /** Buildings the list carries for this district, designated or not. */
     listed: z.number().int().nonnegative(),
@@ -161,7 +161,7 @@ export const DesignatedSchema = z
  * A page must drop a `null` from an aggregate rather than add it, and say the figure is absent
  * rather than draw it at the axis.
  */
-export const FinanceYearSchema = z
+const FinanceYearSchema = z
   .object({
     fiscal_year: z.number().int(),
     /** Unrestricted grants-in-aid: state foundation money as the district books it. */
@@ -187,7 +187,7 @@ export const FinanceYearSchema = z
  * is worth nothing without showing the difference, and the difference here is about a dollar on
  * figures in the millions — twenty-two elements each rounded where the department rounds.
  */
-export const BaseCostBuildUpSchema = z
+const BaseCostBuildUpSchema = z
   .object({
     // A — teacher base cost, R.C. 3317.011(D).
     classroom_teachers: num,
@@ -241,7 +241,7 @@ export const BaseCostBuildUpSchema = z
  * so what a reappraisal does to a district depends on which side of that floor it is on — and one
  * year cannot show that.
  */
-export const PropertyTaxYearSchema = z
+const PropertyTaxYearSchema = z
   .object({
     tax_year: z.number().int(),
     /** Class I: residential and agricultural, which carry their own reduction factor. */
@@ -292,7 +292,7 @@ export const PropertyTaxYearSchema = z
  * rates anything but, so a district whose own rate had fallen below it was charged for revenue
  * it could not collect.
  */
-export const RegimeCounterfactualSchema = z
+const RegimeCounterfactualSchema = z
   .object({
     /** The statutory rate the counterfactual runs at — the charge-off's terminal 23 mills. */
     charge_off_mills: num,
@@ -339,7 +339,7 @@ export const RegimeCounterfactualSchema = z
  * newly voted millage — the statute exempts both — so the gap between predicted and observed is
  * not error. It is the millage the factors do not touch, and its sign says which kind.
  */
-export const MillageAnalysisSchema = z
+const MillageAnalysisSchema = z
   .object({
     /** The tax year `observed_rate` and `predicted_rate` describe. */
     tax_year: z.number().int(),
@@ -370,7 +370,7 @@ export const MillageAnalysisSchema = z
  * `classroom_instruction` and `nonclassroom` are the department's own roll-ups and partition
  * operating spending exactly; the named functions sit inside one or the other.
  */
-export const SpendingByFunctionSchema = z
+const SpendingByFunctionSchema = z
   .object({
     /** Unweighted ADM — the headcount denominator, not the need-weighted one. */
     adm: num,
@@ -390,7 +390,7 @@ export const SpendingByFunctionSchema = z
   .strict();
 
 /** One district, as the feed carries it. */
-export const DistrictSchema = z
+const DistrictSchema = z
   .object({
     /** Six digits, always. 28 of the 609 *names* are shared, so this is the only safe key. */
     irn: z.string().regex(/^\d{6}$/, "an IRN is six digits"),
@@ -902,7 +902,7 @@ export const DistrictSchema = z
  *
  * Money is in **thousands of dollars**, as the survey reports it. Enrolment is a headcount.
  */
-export const StateFinanceSchema = z
+const StateFinanceSchema = z
   .object({
     fips: z.string().regex(/^\d{2}$/),
     name: z.string(),
@@ -926,7 +926,7 @@ export const StateFinanceSchema = z
  * *DeRolph* claim about over-reliance on local property tax and never test it. "Too heavily"
  * needs something to compare against.
  */
-export const NationalSchema = z
+const NationalSchema = z
   .object({
     fiscal_year: z.number().int(),
     states: z.array(StateFinanceSchema).length(51),
@@ -943,7 +943,7 @@ export const NationalSchema = z
   .strict();
 
 /** Statewide aggregates, so a district can be positioned without recomputing. */
-export const StatewideSchema = z
+const StatewideSchema = z
   .object({
     districts: z.number().int().positive(),
     on_guarantee: z.number().int().nonnegative(),
@@ -1045,7 +1045,7 @@ export const StatewideSchema = z
  * Senate seats $1.10 above it, and the two chambers differ from each other by $0.96. Do not reconcile them to the cent. Everything else is
  * an estimate, and any page showing one says so.
  */
-export const HouseDistrictSchema = z
+const HouseDistrictSchema = z
   .object({
     number: z.string().min(1),
     adm: num,
@@ -1074,7 +1074,7 @@ export const HouseDistrictSchema = z
   })
   .strict();
 
-export const DeflatorSchema = z
+const DeflatorSchema = z
   .object({
     label: z.string().min(1),
     points: z.array(z.object({ fiscal_year: z.number().int(), index: num }).strict()),
@@ -1092,7 +1092,7 @@ export const DeflatorSchema = z
   .strict();
 
 /** A policy in the shape the feed serializes it. */
-export const PolicyShapeSchema = z
+const PolicyShapeSchema = z
   .object({
     guarantee: z.enum(["as-enacted", "removed", "rebase", "phase-out"]),
     guarantee_argument: num,
@@ -1124,7 +1124,7 @@ export const PolicyShapeSchema = z
  * does not need a round trip; these are what stop that second implementation from drifting away
  * from the first one unnoticed.
  */
-export const CheckpointSchema = z
+const CheckpointSchema = z
   .object({
     label: z.string().min(1),
     policy: PolicyShapeSchema,
@@ -1257,7 +1257,7 @@ export const DraftProvisionSchema = z
   );
 
 /** A bill that is not law, with every provision it states. */
-export const DraftSchema = z
+const DraftSchema = z
   .object({
     slug: z.string().min(1),
     provisions: z.array(DraftProvisionSchema).min(1),
@@ -1272,7 +1272,7 @@ export const DraftSchema = z
  * interval compounds with the horizon, and the decision to re-run the formula at each end of the
  * enrollment band rather than scale the middle.
  */
-export const ForecastCheckpointSchema = z
+const ForecastCheckpointSchema = z
   .object({
     label: z.string().min(1),
     policy: PolicyShapeSchema,
@@ -1297,7 +1297,7 @@ export const ForecastCheckpointSchema = z
  *
  * Positive means the projection ran high. These are log errors: a percentage is `exp(bias) - 1`.
  */
-export const ProjectionBiasSchema = z
+const ProjectionBiasSchema = z
   .object({
     horizon: z.number().int().positive(),
     mean_district: num,
@@ -1308,7 +1308,7 @@ export const ProjectionBiasSchema = z
   .strict();
 
 /** How this feed's forecasts were made, and what their interval rests on. */
-export const ProjectionMetaSchema = z
+const ProjectionMetaSchema = z
   .object({
     /** The last observed fiscal year. Everything past it is forecast. */
     base_year: z.number().int(),
@@ -1345,7 +1345,7 @@ export const ProjectionMetaSchema = z
  * Bureau's enrollment count rather than ADM, and every figure here computed over the subset the
  * survey marks comparable. It does not reconcile with the FY2027 model and is not meant to.
  */
-export const HistoryYearSchema = z
+const HistoryYearSchema = z
   .object({
     fiscal_year: z.number().int(),
     districts: z.number().int().positive(),
@@ -1384,7 +1384,7 @@ export const HistoryYearSchema = z
  * `floor` and `ceiling` and no share. `streams` says which kind of year a row is, and it is the
  * field to branch on rather than the year.
  */
-export const MealProgramYearSchema = z
+const MealProgramYearSchema = z
   .object({
     fiscal_year: z.number().int(),
     /** Public sponsors the year is computed over, after excluding published corruption. */
@@ -1451,7 +1451,7 @@ export const MealProgramYearSchema = z
  * (FY2006-07 and FY2012-13). Where both speak they agree to the cent, so this is not a confidence
  * signal; it is so a reader can see that four years rest on a different document.
  */
-export const AppropriationYearSchema = z
+const AppropriationYearSchema = z
   .object({
     fiscal_year: z.number().int(),
     /** Everything the department was appropriated, excluding the property tax reimbursements. */
@@ -1475,7 +1475,7 @@ export const AppropriationYearSchema = z
  * `discontinued` is the publisher's own label and does **not** distinguish abolition from
  * consolidation — a line folded into another is discontinued too.
  */
-export const AppropriationLineSchema = z
+const AppropriationLineSchema = z
   .object({
     fund: z.string().min(1),
     ali: z.string().min(1),
@@ -1501,7 +1501,7 @@ export const AppropriationLineSchema = z
  * `label` is a string and not a number because a school year has no single number, and `kind` is
  * carried separately so a consumer never has to infer the reckoning from the shape of the label.
  */
-export const SeriesYearSchema = z
+const SeriesYearSchema = z
   .object({
     series: z.string().min(1),
     kind: z.enum(["fiscal", "tax", "school"]),
@@ -1517,7 +1517,7 @@ export const SeriesYearSchema = z
  * partition: R.C. 3317.022(A)(10)'s educational choice unit pays both the traditional EdChoice
  * scholarship and the expansion. Six units, five programmes.
  */
-export const FundingUnitProgrammeSchema = z
+const FundingUnitProgrammeSchema = z
   .object({
     slug: z.string().min(1),
     name: z.string().min(1),
@@ -1536,7 +1536,7 @@ export const FundingUnitProgrammeSchema = z
   .strict();
 
 /** One of the six funding units of R.C. 3317.022. */
-export const FundingUnitSchema = z
+const FundingUnitSchema = z
   .object({
     slug: z.string().min(1),
     name: z.string().min(1),
@@ -1576,7 +1576,7 @@ export const FundingUnitSchema = z
   .strict();
 
 /** One Category 3 appropriation line. */
-export const NonpublicSupportLineSchema = z
+const NonpublicSupportLineSchema = z
   .object({
     ali: z.string().min(1),
     name: z.string().min(1),
@@ -1594,7 +1594,7 @@ export const NonpublicSupportLineSchema = z
  * what the state spends on nonpublic education is asking about it as well as about the
  * scholarships.
  */
-export const NonpublicSupportSchema = z
+const NonpublicSupportSchema = z
   .object({
     /** Its one {@link SeriesYearSchema} key, enumerated for the reason {@link FundingUnitSchema}'s is. */
     series: z.literal("funding_units.nonpublic_support"),
@@ -1618,7 +1618,7 @@ export const NonpublicSupportSchema = z
  * the district and community units model FY2027 and the four scholarship units account for the
  * 2024-25 school year, which is why every unit names its own `series`.
  */
-export const FundingUnitsSchema = z
+const FundingUnitsSchema = z
   .object({
     authority: z.string().min(1),
     units: z.array(FundingUnitSchema).min(1),

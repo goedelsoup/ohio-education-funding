@@ -167,7 +167,7 @@ function round(node: Element): void {
   }
 }
 
-export function applyNaming(node: Nameable, naming: Naming): void {
+function applyNaming(node: Nameable, naming: Naming): void {
   // `Nameable` is deliberately the smallest surface this file needs, so the tidy-up is guarded
   // rather than assumed: `ssr.ts` and `client.ts` both hand over a real element.
   if ("querySelectorAll" in node) untangle(node as unknown as Element);
@@ -257,7 +257,7 @@ export function declareCursor(root: Element, hovers: Spec["hovers"]): string | n
  * Lives here rather than beside either renderer because both use it, and `ssr.ts` imports
  * `linkedom` — a module the browser must never be handed.
  */
-export const BASE: Plot.PlotOptions = {
+const BASE: Plot.PlotOptions = {
   style: {
     background: "transparent",
     color: INK.primary,

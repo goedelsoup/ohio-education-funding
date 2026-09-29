@@ -61,7 +61,7 @@ import * as routes from "./routes.ts";
 import { yearOf } from "./year.ts";
 
 /** The two curves this card draws, shallowest population first. */
-export const CURVE_KEYS = [
+const CURVE_KEYS = [
   "project/the-bias-before-the-closure",
   "project/the-bias-across-the-closure",
 ] as const;
@@ -110,7 +110,7 @@ export interface Bias {
  * "positive from four years on" is a statement a reader can check against the picture, and "at
  * 3.7 years" is one they cannot.
  */
-export function turningPoint(line: ManifestLine): number | null {
+function turningPoint(line: ManifestLine): number | null {
   const start = line.points[0];
   if (!start || start.y === 0) return null;
   const crossed = line.points.find((point) => Math.sign(point.y) === -Math.sign(start.y));

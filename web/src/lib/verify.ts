@@ -10,7 +10,7 @@
  * absorb a real disagreement in a lever that only moves a few districts.
  */
 
-import { apply, totals, type GuaranteeRule, type Policy, currentLaw, modelOf, applyAll } from "./policy.ts";
+import { totals, type GuaranteeRule, type Policy, currentLaw, modelOf, applyAll } from "./policy.ts";
 import { forecast, growthPrior } from "./project.ts";
 import type {
   Panel,
@@ -20,7 +20,7 @@ import type {
 } from "./types.ts";
 
 /** Largest total-dollar disagreement treated as arithmetic noise rather than a defect. */
-export const TOLERANCE = 1.0;
+const TOLERANCE = 1.0;
 
 /** What a single checkpoint comparison found. */
 export interface Comparison {
@@ -136,7 +136,7 @@ export function compare(bundle: Panel, checkpoint: Checkpoint): Comparison {
  * disagreement that would mean the two implementations had actually diverged, and far above the
  * drift that transcendental rounding can produce.
  */
-export const FORECAST_TOLERANCE = 1_000.0;
+const FORECAST_TOLERANCE = 1_000.0;
 
 /** Run one forecast checkpoint's policy and horizon, and compare every reported field. */
 export function compareForecast(

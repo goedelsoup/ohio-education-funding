@@ -48,7 +48,7 @@ import * as routes from "./routes.ts";
 import { yearOf } from "./year.ts";
 
 /** The one curve this card draws. Named here because three things below look it up. */
-export const CURVE_KEY = "project/what-the-band-held-at-every-horizon";
+const CURVE_KEY = "project/what-the-band-held-at-every-horizon";
 
 /** One drawn line, and the three numbers a reader takes off it. */
 export interface Held {

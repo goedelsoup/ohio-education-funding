@@ -51,7 +51,7 @@ interface Group {
 }
 
 /** The build-up, grouped as R.C. 3317.011 groups it. */
-export function groups(b: BaseCostBuildUp): Group[] {
+function groups(b: BaseCostBuildUp): Group[] {
   return [
     {
       code: "A",

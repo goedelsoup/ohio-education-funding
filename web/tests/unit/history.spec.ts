@@ -16,7 +16,6 @@ import {
   renderEqualization,
   renderRevenueMix,
   residual,
-  stateShareOfGap,
   withGaps,
 } from "../../src/lib/history.ts";
 import { baseYear } from "../../src/lib/real.ts";

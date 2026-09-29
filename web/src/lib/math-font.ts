@@ -131,7 +131,7 @@ export function readWoff2Tables(file: Uint8Array): Map<string, Uint8Array> {
 }
 
 /** The glyph ids a coverage table covers, in coverage order — which is the order records use. */
-export function readCoverage(data: Uint8Array, offset: number): number[] {
+function readCoverage(data: Uint8Array, offset: number): number[] {
   const reader = new Reader(data);
   reader.seek(offset);
   const format = reader.u16();

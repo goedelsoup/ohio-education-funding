@@ -40,7 +40,7 @@
  */
 
 import { loadFeed } from "./feed.ts";
-import type { Bundle, SeriesYear } from "./types.ts";
+import type { SeriesYear } from "./types.ts";
 
 /** The series keys this site asks for, so a typo is a type error rather than a missing chip. */
 export type SeriesKey =
@@ -81,16 +81,6 @@ export function seriesYear(
 ): SeriesYear | null {
   const years = (feed ?? loadFeed().bundle).series_years;
   return years.find((entry) => entry.series === series) ?? null;
-}
-
-/**
- * The short form, for a chip: `FY2027`, `2024`, `2024-25`.
- *
- * The tax year loses its words here and regains them in {@link yearTitle}, which is what the chip
- * hangs on its `title`. A chip is a few characters wide and a card header has one line.
- */
-export function yearLabel(year: SeriesYear): string {
-  return year.label;
 }
 
 /**
@@ -149,7 +139,7 @@ export function yearChip(series: SeriesKey): string {
   if (!year) return "";
   return chip(
     { kind: year.kind, series: year.series },
-    yearLabel(year),
+    year.label,
     yearTitle(year),
   );
 }

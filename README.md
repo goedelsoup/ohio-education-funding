@@ -60,7 +60,7 @@ Tasks are [mise](https://mise.jdx.dev) tasks. `mise install` provisions Rust, No
 ```
 mise run //:ci             everything the CI workflow runs, in the same order
 mise run //crates:gate     fmt, clippy, test, doc
-mise run //web:gate        check, unit, build, e2e
+mise run //web:gate        check, lint, unit, build, e2e
 mise run //:generated      fail if the feed or any README block is stale
 mise run //crates:connectors   what is retrievable, and how far each connector got
 ```

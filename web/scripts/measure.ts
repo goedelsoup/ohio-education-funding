@@ -34,11 +34,10 @@
  * later redesign phase fills in one entry of `THRESHOLDS` and this flag starts biting.
  */
 
-import { createServer } from "node:http";
-import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { extname, join, normalize, resolve } from "node:path";
+import { resolve } from "node:path";
 import { chromium } from "@playwright/test";
+import { serveDist } from "./serve-dist.ts";
 import {
   BOX_MIN_RADIUS,
   PROSE_CELL_MIN_WORDS,
@@ -69,42 +68,7 @@ if (!existsSync(DIST)) {
   process.exit(1);
 }
 
-const TYPES: Record<string, string> = {
-  ".html": "text/html; charset=utf-8",
-  ".css": "text/css; charset=utf-8",
-  ".js": "text/javascript; charset=utf-8",
-  ".json": "application/json; charset=utf-8",
-  ".svg": "image/svg+xml",
-  ".png": "image/png",
-  ".csv": "text/csv; charset=utf-8",
-  ".xml": "application/xml; charset=utf-8",
-  ".txt": "text/plain; charset=utf-8",
-};
-
-const server = createServer(async (request, response) => {
-  const path = decodeURIComponent((request.url ?? "/").split("?")[0] ?? "/");
-  /* `normalize` before joining, so a `..` in the request cannot reach outside the build. This
-     serves a directory to a browser on this machine and is not exposed, but a traversal here
-     would silently measure a file that is not part of the artefact. */
-  const relative = normalize(path).replace(/^(\.\.[/\\])+/, "");
-  let file = join(DIST, relative);
-  if (file.endsWith("/") || !extname(file)) file = join(file, "index.html");
-  try {
-    const body = await readFile(file);
-    response.writeHead(200, { "content-type": TYPES[extname(file)] ?? "application/octet-stream" });
-    response.end(body);
-  } catch {
-    response.writeHead(404).end("not found");
-  }
-});
-
-const port = await new Promise<number>((ok) => {
-  server.listen(0, "127.0.0.1", () => {
-    const address = server.address();
-    ok(typeof address === "object" && address != null ? address.port : 0);
-  });
-});
-const origin = `http://127.0.0.1:${port}`;
+const { server, origin } = await serveDist(DIST);
 
 const browser = await chromium.launch();
 const rows: Measured[] = [];

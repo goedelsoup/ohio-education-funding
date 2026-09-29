@@ -66,6 +66,7 @@ one is running. A stray one from another project is the likeliest reason a page 
 
 ```
 pnpm --dir web check          # types, including the .astro files
+pnpm --dir web lint           # oxlint, no-unused-vars only; unimported exports are a unit test
 pnpm --dir web test:unit      # vitest — the formula, the schemas, the link graph, ~600ms
 pnpm --dir web test:dist      # vitest — the built files; needs a build in front of it
 pnpm --dir web test:e2e       # playwright — the site in Chromium, against a real build

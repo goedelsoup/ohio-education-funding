@@ -34,7 +34,7 @@
  */
 
 /** Which tokens may be adopted for which properties. Order is irrelevant; prefixes are disjoint. */
-export const CATEGORY: Array<{ prefix: RegExp; props: RegExp }> = [
+const CATEGORY: Array<{ prefix: RegExp; props: RegExp }> = [
   { prefix: /^--radius-/, props: /^border-radius$/ },
   {
     prefix: /^--space-/,
@@ -54,7 +54,7 @@ const SCALED =
   /^(font-size|line-height|letter-spacing|font-weight|max-width|border-radius|margin|padding|gap|row-gap|column-gap|inset|top|right|bottom|left|box-shadow)(-\w+)?$/;
 
 /** How close a literal has to be to a token to count as reaching for it rather than as unrelated. */
-export const NEAR = 0.2;
+const NEAR = 0.2;
 
 /**
  * The near-miss ceiling, which is a ratchet and not a target.
