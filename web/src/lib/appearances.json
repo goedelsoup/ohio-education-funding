@@ -6,7 +6,7 @@
       "of": 1,
       "example": {
         "href": "/scenario",
-        "title": "Scenario"
+        "title": "Try a change"
       },
       "sections": [
         {
@@ -23,7 +23,7 @@
       "of": 1,
       "example": {
         "href": "/scenario",
-        "title": "Scenario"
+        "title": "Try a change"
       },
       "sections": [
         {
@@ -35,47 +35,32 @@
   ],
   "draft-legislation/hb-96-with-refreshed-inputs": [
     {
-      "route": "/district/[irn]/scenario",
-      "pages": 609,
-      "of": 609,
-      "example": {
-        "href": "/district/043786/scenario",
-        "title": "Cleveland Municipal — scenario"
-      },
-      "sections": [
-        {
-          "id": "held-fixed",
-          "label": "What these levers hold fixed, and one they deliberately do not"
-        }
-      ]
-    },
-    {
-      "route": "/reach",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/reach",
-        "title": "Reach"
-      },
-      "sections": [
-        {
-          "id": "held-fixed",
-          "label": "What these levers hold fixed, and one they deliberately do not"
-        }
-      ]
-    },
-    {
       "route": "/scenario",
       "pages": 1,
       "of": 1,
       "example": {
         "href": "/scenario",
-        "title": "Scenario"
+        "title": "Try a change"
       },
       "sections": [
         {
           "id": "held-fixed",
-          "label": "What these levers hold fixed, and one they deliberately do not"
+          "label": "What these levers hold fixed, and one thing they deliberately do not"
+        }
+      ]
+    },
+    {
+      "route": "/scenario/reach",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/scenario/reach",
+        "title": "Try a change — who it reaches"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What the reach view holds fixed, and one thing it deliberately does not"
         }
       ]
     }
@@ -87,7 +72,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -104,7 +89,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -121,7 +106,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -138,7 +123,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -155,7 +140,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -172,7 +157,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -189,7 +174,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -206,7 +191,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -223,7 +208,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -240,7 +225,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -257,7 +242,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -274,7 +259,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -291,7 +276,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -335,47 +320,32 @@
       ]
     },
     {
-      "route": "/district/[irn]/scenario",
-      "pages": 609,
-      "of": 609,
-      "example": {
-        "href": "/district/043786/scenario",
-        "title": "Cleveland Municipal — scenario"
-      },
-      "sections": [
-        {
-          "id": "held-fixed",
-          "label": "What these levers hold fixed, and one they deliberately do not"
-        }
-      ]
-    },
-    {
-      "route": "/reach",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/reach",
-        "title": "Reach"
-      },
-      "sections": [
-        {
-          "id": "held-fixed",
-          "label": "What these levers hold fixed, and one they deliberately do not"
-        }
-      ]
-    },
-    {
       "route": "/scenario",
       "pages": 1,
       "of": 1,
       "example": {
         "href": "/scenario",
-        "title": "Scenario"
+        "title": "Try a change"
       },
       "sections": [
         {
           "id": "held-fixed",
-          "label": "What these levers hold fixed, and one they deliberately do not"
+          "label": "What these levers hold fixed, and one thing they deliberately do not"
+        }
+      ]
+    },
+    {
+      "route": "/scenario/reach",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/scenario/reach",
+        "title": "Try a change — who it reaches"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What the reach view holds fixed, and one thing it deliberately does not"
         }
       ]
     }
@@ -448,47 +418,32 @@
       ]
     },
     {
-      "route": "/district/[irn]/scenario",
-      "pages": 609,
-      "of": 609,
-      "example": {
-        "href": "/district/043786/scenario",
-        "title": "Cleveland Municipal — scenario"
-      },
-      "sections": [
-        {
-          "id": "held-fixed",
-          "label": "What these levers hold fixed, and one they deliberately do not"
-        }
-      ]
-    },
-    {
-      "route": "/reach",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/reach",
-        "title": "Reach"
-      },
-      "sections": [
-        {
-          "id": "held-fixed",
-          "label": "What these levers hold fixed, and one they deliberately do not"
-        }
-      ]
-    },
-    {
       "route": "/scenario",
       "pages": 1,
       "of": 1,
       "example": {
         "href": "/scenario",
-        "title": "Scenario"
+        "title": "Try a change"
       },
       "sections": [
         {
           "id": "held-fixed",
-          "label": "What these levers hold fixed, and one they deliberately do not"
+          "label": "What these levers hold fixed, and one thing they deliberately do not"
+        }
+      ]
+    },
+    {
+      "route": "/scenario/reach",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/scenario/reach",
+        "title": "Try a change — who it reaches"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What the reach view holds fixed, and one thing it deliberately does not"
         }
       ]
     }
@@ -527,47 +482,32 @@
       ]
     },
     {
-      "route": "/district/[irn]/scenario",
-      "pages": 609,
-      "of": 609,
-      "example": {
-        "href": "/district/043786/scenario",
-        "title": "Cleveland Municipal — scenario"
-      },
-      "sections": [
-        {
-          "id": "held-fixed",
-          "label": "What these levers hold fixed, and one they deliberately do not"
-        }
-      ]
-    },
-    {
-      "route": "/reach",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/reach",
-        "title": "Reach"
-      },
-      "sections": [
-        {
-          "id": "held-fixed",
-          "label": "What these levers hold fixed, and one they deliberately do not"
-        }
-      ]
-    },
-    {
       "route": "/scenario",
       "pages": 1,
       "of": 1,
       "example": {
         "href": "/scenario",
-        "title": "Scenario"
+        "title": "Try a change"
       },
       "sections": [
         {
           "id": "held-fixed",
-          "label": "What these levers hold fixed, and one they deliberately do not"
+          "label": "What these levers hold fixed, and one thing they deliberately do not"
+        }
+      ]
+    },
+    {
+      "route": "/scenario/reach",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/scenario/reach",
+        "title": "Try a change — who it reaches"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What the reach view holds fixed, and one thing it deliberately does not"
         }
       ]
     }
@@ -606,47 +546,32 @@
       ]
     },
     {
-      "route": "/district/[irn]/scenario",
-      "pages": 609,
-      "of": 609,
-      "example": {
-        "href": "/district/043786/scenario",
-        "title": "Cleveland Municipal — scenario"
-      },
-      "sections": [
-        {
-          "id": "held-fixed",
-          "label": "What these levers hold fixed, and one they deliberately do not"
-        }
-      ]
-    },
-    {
-      "route": "/reach",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/reach",
-        "title": "Reach"
-      },
-      "sections": [
-        {
-          "id": "held-fixed",
-          "label": "What these levers hold fixed, and one they deliberately do not"
-        }
-      ]
-    },
-    {
       "route": "/scenario",
       "pages": 1,
       "of": 1,
       "example": {
         "href": "/scenario",
-        "title": "Scenario"
+        "title": "Try a change"
       },
       "sections": [
         {
           "id": "held-fixed",
-          "label": "What these levers hold fixed, and one they deliberately do not"
+          "label": "What these levers hold fixed, and one thing they deliberately do not"
+        }
+      ]
+    },
+    {
+      "route": "/scenario/reach",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/scenario/reach",
+        "title": "Try a change — who it reaches"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What the reach view holds fixed, and one thing it deliberately does not"
         }
       ]
     }
@@ -692,7 +617,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -713,7 +638,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -730,7 +655,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -766,7 +691,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -802,7 +727,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -823,7 +748,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -844,7 +769,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -865,7 +790,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -882,7 +807,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -903,7 +828,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -920,7 +845,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -937,7 +862,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -954,7 +879,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -971,7 +896,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -988,7 +913,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -1005,7 +930,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -1022,7 +947,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -1043,7 +968,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -1060,7 +985,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -1077,7 +1002,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
@@ -1087,12 +1012,12 @@
       ]
     },
     {
-      "route": "/reach",
+      "route": "/scenario",
       "pages": 1,
       "of": 1,
       "example": {
-        "href": "/reach",
-        "title": "Reach"
+        "href": "/scenario",
+        "title": "Try a change"
       },
       "sections": [
         {
@@ -1102,12 +1027,12 @@
       ]
     },
     {
-      "route": "/scenario",
+      "route": "/scenario/reach",
       "pages": 1,
       "of": 1,
       "example": {
-        "href": "/scenario",
-        "title": "Scenario"
+        "href": "/scenario/reach",
+        "title": "Try a change — who it reaches"
       },
       "sections": [
         {
@@ -1124,7 +1049,7 @@
       "of": 1,
       "example": {
         "href": "/legislation",
-        "title": "Statute"
+        "title": "The statute timeline"
       },
       "sections": [
         {
