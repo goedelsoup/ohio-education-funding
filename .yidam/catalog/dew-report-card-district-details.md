@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/metric/performance-index.yml
+---
 # Ohio School Report Cards — District Details
 
 **Source.** Ohio Department of Education and Workforce, Ohio School Report Cards, file
@@ -56,12 +60,6 @@ and commits both. [verified — see
 - **Long form.** Keyed by (IRN, student group). A join on IRN alone silently multiplies rows.
 - **Group coverage varies** — 607 districts report Students with Disabilities, 606 Economic
   Disadvantage, 303 a numeric English Learner share, 119 Migrant.
-
-## Used by
-
-- [`metric/performance-index`](../corpus/metric/performance-index.yml)
-- [`metric/progress-value-added`](../corpus/metric/progress-value-added.yml)
-- [`metric/expenditure-per-equivalent-pupil`](../corpus/metric/expenditure-per-equivalent-pupil.yml)
 
 ## Feeds connector
 

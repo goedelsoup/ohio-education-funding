@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/model-policy/education-savings-account-act.yml
+---
 # ALEC — Education Savings Account Act
 
 **Source.** American Legislative Exchange Council, model policy *The Education Savings Account
@@ -42,7 +46,3 @@ here names ALEC or this model text, and this record makes no claim that it was d
 H.B. 11 is not a corpus node — the `legislation` class means enacted — so the comparison this
 record supports is against Ohio's enacted scholarship channel, not against the bill that would
 have most closely resembled it.
-
-## Used by
-
-- [`model-policy/education-savings-account-act`](../corpus/model-policy/education-savings-account-act.yml)

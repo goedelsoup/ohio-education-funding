@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/program/auxiliary-services.yml
+---
 # Chartered nonpublic enrollment by building, 1977–2025
 
 **Source.** Ohio Department of Education and Workforce, **Enrollment Data**, under Frequently
@@ -152,7 +156,7 @@ twenty-three files, so a failure skips both.
   are small — 1,300 to 1,700 a year — and the masking is proportionally much heavier: October
   2023's out-of-state floor is under a tenth of its published 1,326.
 
-## Used by
+## Also read by
 
 - [`crates/connect/src/fixtures/nonpublic.rs`](../../crates/connect/src/fixtures/nonpublic.rs) —
   the two panels and the masking arithmetic over them.

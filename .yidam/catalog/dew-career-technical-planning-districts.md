@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/parameter/career-technical-category-multiples.yml
+---
 # Ohio Career-Technical Planning Districts
 
 **Source.** Ohio Department of Education and Workforce. `Ohio-CTPDs.pdf`, a single-page map with
@@ -59,10 +63,6 @@ first, while the IRN column does not.
 - **The CTPD number is not an IRN and mostly not a district.** Numbers run `200001`-`200121` with
   two correctional entries at `200600` and `200602` and one outlier, `021357`, that does not share
   the prefix. The lead's IRN is a separate column and is the one that joins to anything here.
-
-## Used by
-
-- [`parameter/career-technical-category-multiples`](../corpus/parameter/career-technical-category-multiples.yml)
 
 ## Feeds connector
 

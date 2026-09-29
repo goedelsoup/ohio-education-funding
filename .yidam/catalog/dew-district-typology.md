@@ -1,3 +1,11 @@
+---
+used-by:
+  - ../corpus/education-agency/cleveland-municipal.yml
+  - ../corpus/education-agency/northern-local-perry.yml
+  - ../corpus/education-agency/perrysburg-exempted-village.yml
+  - ../corpus/education-agency/toledo-city.yml
+  - ../corpus/education-agency/upper-arlington-city.yml
+---
 # Typology of Ohio School Districts — the department's own similar-district grouping
 
 **Source.** Ohio Department of Education and Workforce, *2013 School District Typology*.

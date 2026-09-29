@@ -1,3 +1,8 @@
+---
+used-by:
+  - ../corpus/formula-component/temporary-transitional-aid-guarantee.yml
+  - ../corpus/metric/per-pupil-operating-expenditure.yml
+---
 # OCG White Paper No. 015 — Has Ohio Been Defunding Public Education?
 
 **Source.** Ohio Common Ground Research Center, "Has Ohio Been Defunding Public Education? A
@@ -142,8 +147,3 @@ comparison from the unit file and expect the published numbers. [open]
 NAEP (Section 8), the FY2014–FY2025 scholarship payment series (Section 6), and the LSC
 appropriation history remain outside the corpus's coverage and are recorded as unverified rather
 than accepted.
-
-## Used by
-
-- [`metric/per-pupil-operating-expenditure`](../corpus/metric/per-pupil-operating-expenditure.yml)
-- [`formula-component/temporary-transitional-aid-guarantee`](../corpus/formula-component/temporary-transitional-aid-guarantee.yml)

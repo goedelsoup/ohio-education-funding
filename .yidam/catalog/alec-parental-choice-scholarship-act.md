@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/model-policy/parental-choice-scholarship-act.yml
+---
 # ALEC — Parental Choice Scholarship Program Act (Universal Eligibility)
 
 **Source.** American Legislative Exchange Council, model policy *The Parental Choice Scholarship
@@ -50,7 +54,3 @@ a resemblance between two published documents and nothing more. This record does
 and this repository holds no evidence for, any claim that an Ohio bill was drawn from it.
 Sponsor testimony, committee records, or drafting history against the enacted section would be
 needed. See the `adoption_evidence` field on the corpus node, which is `[open]`.
-
-## Used by
-
-- [`model-policy/parental-choice-scholarship-act`](../corpus/model-policy/parental-choice-scholarship-act.yml)

@@ -1,3 +1,8 @@
+---
+used-by:
+  - ../corpus/metric/enrolled-adm.yml
+  - ../corpus/program/auxiliary-services.yml
+---
 # Ohio's Education Landscape — the department's own count of every school option
 
 **Source.** Ohio Department of Education and Workforce, *Ohio's Education Landscape 2023-2024*,

@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/revenue-stream/casino-tax-distribution.yml
+---
 # County Student Distribution — gross casino revenue county student fund
 
 **Source.** Ohio Department of Taxation, Revenue Accounting. Sixteen workbooks: `2015 08 Casino

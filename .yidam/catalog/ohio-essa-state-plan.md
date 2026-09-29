@@ -1,3 +1,11 @@
+---
+used-by:
+  - ../corpus/accountability-regime/essa.yml
+  - ../corpus/intervention/lea-level-action.yml
+  - ../corpus/intervention/more-rigorous-interventions.yml
+  - ../corpus/revenue-stream/idea-part-b.yml
+  - ../corpus/revenue-stream/title-i.yml
+---
 # Ohio's Consolidated State Plan under ESSA, and the April 2026 School Improvement amendment
 
 **Source.** Ohio Department of Education and Workforce, *Ohio's Consolidated State Plan* submitted
@@ -71,8 +79,3 @@ restrictions in terms of supplement-not-supplant and said nothing about it.
 - **The direction of the substantive changes is one-way.** Three insertions of "at least" before
   the 5% threshold plus a new sentence permitting identification beyond it, alongside a
   sixteen-item intervention ladder that did not previously exist. Wider net, harder consequences.
-
-## Used by
-
-- [`revenue-stream/title-i`](../corpus/revenue-stream/title-i.yml)
-- [`revenue-stream/idea-part-b`](../corpus/revenue-stream/idea-part-b.yml)

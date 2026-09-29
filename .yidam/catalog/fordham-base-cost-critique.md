@@ -1,3 +1,8 @@
+---
+used-by:
+  - ../corpus/formula-component/fsfp-base-cost-calculation.yml
+  - ../corpus/parameter/base-cost-per-pupil.yml
+---
 # Fordham Institute — Ohio Base Cost Model Commentary
 
 **Source.** Thomas B. Fordham Institute (Ohio), commentary series on the Fair School Funding
@@ -28,8 +33,3 @@ knowing that.
 Fordham's $7,352 for FY2023 and the department's $7,349.22 for FY2022 are different fiscal
 years, not a discrepancy, and combining them without checking that would produce a false
 sense of a flat series.
-
-## Used by
-
-- [`parameter/base-cost-per-pupil`](../corpus/parameter/base-cost-per-pupil.yml)
-- [`formula-component/fsfp-base-cost-calculation`](../corpus/formula-component/fsfp-base-cost-calculation.yml)

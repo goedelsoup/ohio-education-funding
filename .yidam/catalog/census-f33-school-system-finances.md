@@ -1,3 +1,16 @@
+---
+used-by:
+  - ../corpus/doctrine/equity.yml
+  - ../corpus/fiscal-period/fy2012-13.yml
+  - ../corpus/fiscal-period/fy2014-15.yml
+  - ../corpus/fiscal-period/fy2016-17.yml
+  - ../corpus/fiscal-period/fy2018-19.yml
+  - ../corpus/fiscal-period/fy2020-21.yml
+  - ../corpus/litigation/derolph-i-1997.yml
+  - ../corpus/program/classroom-facilities-assistance.yml
+  - ../corpus/revenue-stream/esser.yml
+  - ../corpus/revenue-stream/title-i.yml
+---
 # Annual Survey of School System Finances (F-33)
 
 **Source.** U.S. Census Bureau, Economic Reporting. `elsec22t.xls`, the FY2022 individual unit

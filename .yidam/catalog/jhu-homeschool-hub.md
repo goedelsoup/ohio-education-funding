@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/metric/enrolled-adm.yml
+---
 # Johns Hopkins Homeschool Hub — state and district home-education counts
 
 **Source.** Johns Hopkins University School of Education, Institute for Education Policy,

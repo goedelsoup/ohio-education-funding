@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/metric/enrolled-adm.yml
+---
 # MR-81 free and reduced-price lunch reports, 1998–2025
 
 **Source.** Ohio Department of Education, **Office for Child Nutrition**, "LUNCH MR 81 Report for
@@ -137,7 +141,7 @@ exactly. `censored` on each row says how many arrived that way.
   `dispersion::ohio_panel` now measures rather than assumes for the F-33, where the FY2022-23
   directory names 124 fewer FY2012 agencies than FY2022 ones.
 
-## Used by
+## Also read by
 
 - [`crates/dispersion/src/mr81.rs`](../../crates/dispersion/src/mr81.rs) — the panel and the
   aggregates over it, including the band the split years carry instead of a share.

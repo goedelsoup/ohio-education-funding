@@ -1,3 +1,10 @@
+---
+used-by:
+  - ../corpus/education-agency/cleveland-municipal.yml
+  - ../corpus/intervention/academic-distress-commission.yml
+  - ../corpus/legislation/hb-33-2023.yml
+  - ../corpus/program/edchoice-scholarship.yml
+---
 # Academic Distress Commission — the department's commission page
 
 **Source.** Ohio Department of Education and Workforce, Office of School and District Improvement,
@@ -89,8 +96,3 @@ period" without distinguishing the two regimes.
   the corpus could learn what a commission actually required. [open]
 - **A page, not a dataset.** Any figure taken from it is a transcription, and there is no digest
   behind it. Treat claims sourced here as weaker than claims sourced from a pinned fixture.
-
-## Used by
-
-- [`intervention/academic-distress-commission`](../corpus/intervention/academic-distress-commission.yml)
-- [`education-agency/cleveland-municipal`](../corpus/education-agency/cleveland-municipal.yml)

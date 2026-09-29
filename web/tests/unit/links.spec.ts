@@ -312,6 +312,28 @@ test("citations are counted from both the forms the corpus writes them in", () =
   expect(uncited.length).toBeLessThanOrEqual(2);
 });
 
+test("a source page's cited-by list is the entry's own used-by", () => {
+  // Two derivations of one fact: the page scrapes citations off the corpus edges, and the entry's
+  // `used-by` frontmatter is written by `yidam catalog-reconcile` from yidam's reading of the same
+  // corpus. Beside them used to sit a hand-kept `## Used by` list, wrong or absent on 46 of 58
+  // entries (#497). If the two generated ones disagree, one reader has missed a citation form.
+  const id = (path: string) => path.replace(/^\.\.\/corpus\//, "").replace(/\.yml$/, "");
+  const disagree: string[] = [];
+  let declared = 0;
+  for (const source of corpus.sources) {
+    if (source.usedBy === null) continue;
+    declared += 1;
+    const listed = [...new Set(source.usedBy.map(id))].sort();
+    const cited = [...new Set(source.citedBy.map((c) => c.id))].sort();
+    if (listed.join() !== cited.join()) {
+      disagree.push(`${source.slug}: used-by ${listed.join(", ")} ≠ cited by ${cited.join(", ")}`);
+    }
+  }
+  expect(disagree).toEqual([]);
+  // Every entry declares the list, so this cannot pass by reading none.
+  expect(declared).toBe(corpus.sources.length);
+});
+
 test("every source page is reachable and every citation resolves", () => {
   const broken: string[] = [];
   for (const source of corpus.sources) {

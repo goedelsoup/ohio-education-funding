@@ -1,3 +1,13 @@
+---
+used-by:
+  - ../corpus/doctrine/equity.yml
+  - ../corpus/education-agency/northern-local-perry.yml
+  - ../corpus/education-agency/upper-arlington-city.yml
+  - ../corpus/formula-component/fsfp-base-cost-calculation.yml
+  - ../corpus/metric/assessed-valuation-per-pupil.yml
+  - ../corpus/metric/effective-operating-millage.yml
+  - ../corpus/metric/performance-index.yml
+---
 # District Profile Report — the "Cupp Report"
 
 **Source.** Ohio Department of Education and Workforce, District Profile Reports, published
@@ -102,16 +112,8 @@ plus `xml.etree` — an XLSX is a zip of XML — with no third-party library req
   moved all 606 rows and the three that changed could not be seen in the diff. The one-time
   churn of adopting the sort is in that commit; a future re-sort upstream is now a no-op.
 
-## Used by
+## Also read by
 
-- [`parameter/twenty-mill-floor`](../corpus/parameter/twenty-mill-floor.yml)
-- [`metric/assessed-valuation-per-pupil`](../corpus/metric/assessed-valuation-per-pupil.yml)
-- [`metric/effective-operating-millage`](../corpus/metric/effective-operating-millage.yml)
-- [`metric/per-pupil-operating-expenditure`](../corpus/metric/per-pupil-operating-expenditure.yml)
-- [`doctrine/equity`](../corpus/doctrine/equity.yml)
-- [`education-agency/northern-local-perry`](../corpus/education-agency/northern-local-perry.yml)
-- [`education-agency/upper-arlington-city`](../corpus/education-agency/upper-arlington-city.yml)
-- [`education-agency/cleveland-municipal`](../corpus/education-agency/cleveland-municipal.yml)
 - [`formula-component/fsfp-base-cost-calculation`](../corpus/formula-component/fsfp-base-cost-calculation.yml)
   — the administrator count against the section's funded administrators
 

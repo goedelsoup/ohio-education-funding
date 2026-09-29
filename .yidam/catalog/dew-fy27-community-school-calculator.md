@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/formula-component/fsfp-community-school-equity-supplement.yml
+---
 # FY27 Community/STEM School State Foundation Funding Simulator
 
 **Source.** Ohio Department of Education and Workforce, Office of Budget and School Funding.
@@ -101,11 +105,6 @@ structure-lock password; it does not impede reading.
   sheet from the prior year states no $500 either, and the department's FY2026 actuals are school
   totals with no line breakout. So FY2026's $500 rests on the enacted act and the greenbook,
   permanently. Nothing here implies a retrieval someone could go and make.
-
-## Used by
-
-- [`formula-component/fsfp-community-school-equity-supplement`](../corpus/formula-component/fsfp-community-school-equity-supplement.yml)
-- [`legislation/hb-96-2025`](../corpus/legislation/hb-96-2025.yml)
 
 ## Feeds connector
 

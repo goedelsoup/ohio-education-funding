@@ -1,3 +1,9 @@
+---
+used-by:
+  - ../corpus/draft-legislation/hb-643-136-introduced.yml
+  - ../corpus/draft-legislation/hb-96-136-as-introduced.yml
+  - ../corpus/draft-legislation/hb-96-136-as-passed-house.yml
+---
 # Ohio bills before enactment — the text as introduced
 
 **Source.** Ohio General Assembly, via the Legislative Information Systems service that backs

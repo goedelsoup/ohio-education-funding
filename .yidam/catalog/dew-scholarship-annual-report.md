@@ -1,3 +1,11 @@
+---
+used-by:
+  - ../corpus/program/autism-scholarship.yml
+  - ../corpus/program/auxiliary-services.yml
+  - ../corpus/program/cleveland-scholarship.yml
+  - ../corpus/program/edchoice-scholarship.yml
+  - ../corpus/program/jon-peterson-special-needs.yml
+---
 # Scholarship Annual Report — the department's own account of the channel
 
 **Source.** Ohio Department of Education and Workforce, *2025 Scholarship Annual Report*, covering

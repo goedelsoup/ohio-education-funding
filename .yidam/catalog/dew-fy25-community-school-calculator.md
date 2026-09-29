@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/formula-component/fsfp-community-school-equity-supplement.yml
+---
 # FY25 Community/STEM School State Foundation Funding Simulator
 
 **Source.** Ohio Department of Education and Workforce, Office of Budget and School Funding.
@@ -99,10 +103,6 @@ neither impedes reading.
 - **No local share exists to be missing.** Community and STEM schools have no taxing authority,
   so the state share is 100% and the valuation, income and capacity columns the district model
   turns on are absent by construction rather than unpublished.
-
-## Used by
-
-- [`formula-component/fsfp-community-school-equity-supplement`](../corpus/formula-component/fsfp-community-school-equity-supplement.yml)
 
 ## Feeds connector
 

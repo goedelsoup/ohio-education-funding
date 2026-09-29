@@ -58,3 +58,34 @@ echo "  If it has already run: git checkout -- .yidam/schemas/" >&2
 echo "                        git clean -fd .yidam/schemas/" >&2
 exit 1
 '''
+
+[graph-lint]
+description = "Lint the corpus against the baseline ratchet, and fail when a catalog entry's `used-by` disagrees with the citations."
+# The inherited `[graph-lint]` is `yidam lint`, and this runs it unchanged. It
+# then does one more thing, because the check that covers `used-by` cannot gate.
+#
+# `catalog-used-by-drift` is Warn severity, so `yidam lint` exits 0 when it
+# fires. `yidam catalog-reconcile --dry-run` also exits 0 when it would rewrite
+# something. Each entry used to carry a hand-kept list, and 46 of 58 were wrong
+# or absent before anyone counted them (#497). Every entry now declares
+# `used-by` in frontmatter and `catalog-reconcile` writes it, so the only way to
+# go stale is to cite a source and not reconcile. The gate reads the dry run's
+# JSON: `reconciled` names every entry it would rewrite, and a current catalog
+# has none.
+#
+# The remedy is `yidam catalog-reconcile` after committing. It refuses an
+# uncommitted entry, and it makes one `reconcile:` commit per entry it
+# rewrites.
+run = '''
+set -eu
+yidam lint
+report=$(yidam catalog-reconcile --dry-run --format json)
+stale=$(printf '%s' "$report" | jq -r '.reconciled[].entry')
+if [ -n "$stale" ]; then
+  echo "error: a catalog entry's used-by disagrees with the citations:" >&2
+  printf '%s\n' "$stale" | sed 's/^/  /' >&2
+  echo "  commit, then run: yidam catalog-reconcile" >&2
+  exit 1
+fi
+echo "every catalog used-by agrees with the citations"
+'''

@@ -1,3 +1,10 @@
+---
+used-by:
+  - ../corpus/draft-legislation/hb-643-136-introduced.yml
+  - ../corpus/formula-component/fsfp-transportation.yml
+  - ../corpus/legislation/hb-583-2022.yml
+  - ../corpus/litigation/derolph-i-1997.yml
+---
 # Ohio session laws — the appropriation acts themselves
 
 **Source.** Ohio General Assembly, via the Legislative Information Systems service that backs
@@ -120,11 +127,9 @@ substitute (`04_RS`), the first version carrying the change; the seven codes bel
 bill's own versions, not interim postings. The committed fixture is the amending title and that
 section, cut by `reprinted_section`; the digest pins the whole 183-page act.
 
-## Used by
+## Also read by
 
 - [`crates/connect/src/fixtures/session_laws.rs`](../../crates/connect/src/fixtures/session_laws.rs), `build_session_laws`
 - `crates/project/fixtures/session-law-lines.csv`, and `project::session_laws` over it
-- The [`fiscal-period`](../corpus/fiscal-period/) nodes for FY1998-FY2001, which had no
-  appropriating act named
 - `crates/project/fixtures/hb45-134-transportation.txt`, `project::act::HB45_TRANSPORTATION`, and
   [`fsfp-transportation`](../corpus/formula-component/fsfp-transportation.yml)

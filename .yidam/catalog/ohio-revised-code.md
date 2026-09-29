@@ -1,3 +1,27 @@
+---
+used-by:
+  - ../corpus/accountability-regime/ohio-report-card.yml
+  - ../corpus/intervention/academic-distress-commission.yml
+  - ../corpus/parameter/career-technical-category-multiples.yml
+  - ../corpus/parameter/dpia-per-pupil-amount.yml
+  - ../corpus/parameter/english-learner-category-multiples.yml
+  - ../corpus/parameter/gifted-funding-rates.yml
+  - ../corpus/parameter/local-capacity-percentage.yml
+  - ../corpus/parameter/minimum-state-share.yml
+  - ../corpus/parameter/preschool-special-education-amounts.yml
+  - ../corpus/parameter/special-education-category-multiples.yml
+  - ../corpus/parameter/targeted-assistance-rates.yml
+  - ../corpus/parameter/transportation-cost-rates.yml
+  - ../corpus/parameter/twenty-mill-floor.yml
+  - ../corpus/program/autism-scholarship.yml
+  - ../corpus/program/auxiliary-services.yml
+  - ../corpus/program/cleveland-scholarship.yml
+  - ../corpus/program/edchoice-scholarship.yml
+  - ../corpus/program/jon-peterson-special-needs.yml
+  - ../corpus/program/nonpublic-administrative-cost-reimbursement.yml
+  - ../corpus/revenue-stream/casino-tax-distribution.yml
+  - ../corpus/revenue-stream/lottery-profits.yml
+---
 # Ohio Revised Code — the sections this corpus cites
 
 **Source.** Ohio General Assembly, via the Legislative Service Commission's `codes.ohio.gov`.
@@ -56,7 +80,7 @@ the charge-off era above all — cannot be sourced from here, because the archiv
 2014 and the mechanism was already gone. Those claims still rest on the opinions and on session
 law.
 
-## Used by
+## Also read by
 
 - [`crates/project/fixtures/revised-code.txt`](../../crates/project/fixtures/revised-code.txt)
 

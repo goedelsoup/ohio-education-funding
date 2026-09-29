@@ -1,3 +1,9 @@
+---
+used-by:
+  - ../corpus/formula-component/temporary-transitional-aid-guarantee.yml
+  - ../corpus/metric/general-fund-cash-balance.yml
+  - ../corpus/metric/per-pupil-operating-expenditure.yml
+---
 # CPI-U all items — the Bureau of Labor Statistics flat file
 
 **Source.** U.S. Bureau of Labor Statistics, Consumer Price Index for All Urban Consumers, all
@@ -44,12 +50,6 @@ fetching; `crates/connect` builds the agent string from it and says so when a fe
 A committed extract of the June observations is at
 [`crates/connect/fixtures/cpi-u-june.tsv`](../../crates/connect/fixtures/cpi-u-june.tsv), which
 is what makes the deflator's verification runnable without a network.
-
-## Used by
-
-- [`metric/per-pupil-operating-expenditure`](../corpus/metric/per-pupil-operating-expenditure.yml)
-- [`fiscal-period/`](../corpus/fiscal-period/)
-- [`legislation/hb-920-1976`](../corpus/legislation/hb-920-1976.yml)
 
 ## Feeds connector
 

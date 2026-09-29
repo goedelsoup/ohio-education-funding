@@ -95,5 +95,13 @@ Sorted by: type, then slug.
    datasets and APIs (`dew-foundation-payments`, `ohio-tax-abstract`).
 2. Include: source name, type, location or access method, one-sentence description of
    what it contains, any access constraints.
-3. Optionally add a `used-by` list of corpus node links for reverse traversal.
+3. Open the file with `used-by: []` frontmatter, as every entry here does. Never fill it by hand:
+   it is the corpus nodes that cite the entry, and `yidam catalog-reconcile` writes it from the
+   citations after they are committed.
 4. Link from any corpus node that draws on it: `[Author Year](../catalog/<slug>.md)`.
+
+Each entry used to carry a hand-kept `## Used by` list beside the generated count above, and 46 of
+58 were wrong or absent when checked (#497). Now `mise run //:graph-lint` fails when any `used-by`
+disagrees with the citations, and `web/tests/unit/links.spec.ts` holds it against the site's own
+cited-by list. What a citation cannot record — the crate, fixture or decision that reads a source,
+or why a node needs it — goes under `## Also read by`, in prose.

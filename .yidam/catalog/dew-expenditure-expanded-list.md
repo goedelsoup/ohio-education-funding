@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/metric/expenditure-per-equivalent-pupil.yml
+---
 # FY2025 Expenditure Expanded List
 
 **Source.** Ohio Department of Education and Workforce, FY2025 Expenditure Expanded List, file
@@ -45,12 +49,6 @@ against the same expenditures divided by the two counts gives −0.015 and −0.
   nearly a poverty index. The corpus does not hold the weight schedule that produces it. [open]
 - **Operating expenditures, not all funds.** The relationship to the report card's own
   all-funds spending file has not been established. [open]
-
-## Used by
-
-- [`metric/expenditure-per-equivalent-pupil`](../corpus/metric/expenditure-per-equivalent-pupil.yml)
-- [`metric/per-pupil-operating-expenditure`](../corpus/metric/per-pupil-operating-expenditure.yml)
-- [`metric/performance-index`](../corpus/metric/performance-index.yml)
 
 ## Feeds connector
 

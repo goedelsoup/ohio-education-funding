@@ -1,3 +1,10 @@
+---
+used-by:
+  - ../corpus/metric/performance-index.yml
+  - ../corpus/school/anton-grdina.yml
+  - ../corpus/school/barrington-road-elementary.yml
+  - ../corpus/school/sheridan-high-school.yml
+---
 # Ohio School Report Cards — District Achievement Download
 
 **Source.** Ohio Department of Education and Workforce, Ohio School Report Cards, district-level
@@ -74,10 +81,8 @@ anything that changes annually. [verified] All three sit inside one statutory re
 3302.03(D) governs the 2021-22 school year and every year after it, so the stability is not a
 redesign preserving ranks. [verified]
 
-## Used by
+## Also read by
 
-- [`metric/performance-index`](../corpus/metric/performance-index.yml)
-- [`accountability-regime/ohio-report-card`](../corpus/accountability-regime/ohio-report-card.yml)
 - [`catalog/ocg-white-paper-013`](ocg-white-paper-013.md)
 
 ## Feeds connector
