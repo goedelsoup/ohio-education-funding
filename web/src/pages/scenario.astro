@@ -71,61 +71,10 @@ const stages = bundle.drafts
   <p class="lead">
     Move a lever and re-run the department's FY{bundle.fiscal_year} model across all {
       count(s.districts)
-    } districts. Current law pays {millions(s.realized_aid_total).replace("+", "")}, of which {
-      millions(s.guarantee_total).replace("+", "")
-    } is the guarantee.
+    } districts, against a current law that pays {
+      millions(s.realized_aid_total).replace("+", "")
+    }, {millions(s.guarantee_total).replace("+", "")} of it guarantee money.
   </p>
-
-  {/*
-    What every lever here holds fixed. Above the controls rather than below the results, because it
-    is a limit on what the reader is about to do and not a footnote on what they got — and on the
-    district chosen above the levers, for the same reason. See `HeldFixed.astro`.
-  */}
-  <HeldFixed
-    districts={bundle.districts}
-    total={s.districts}
-    refresh={refresh}
-    heading="What these levers hold fixed, and one thing they deliberately do not"
-  />
-
-  {/*
-    What "current law" is, named.
-
-    Every figure on this page is a delta against the enacted act — `Outcome.delta` is
-    "change against current law" and the guarantee's default rule is `as-enacted`. That was
-    nowhere on the page, and a reader who arrived asking how the executive proposal compared
-    with the House's had no way to learn that one of the two is the origin and the other is not
-    reachable from any lever here. The stages are listed from the feed rather than typed, so a
-    stage added to the corpus appears here.
-  */}
-  <div class="card" id="baseline" data-part="baseline">
-    <h2><SectionAnchor id="baseline" />What the levers move away from</h2>
-    <p class="note">
-      <strong>Current law here is <a href={routes.wikiNode("legislation", "hb-96-2025")}>Am. Sub.
-      H.B. 96 as enacted</a></strong> — signed 30 June 2025, phase-in at 100% in FY{
-        bundle.fiscal_year
-      }, base cost priced at FY2022. Every figure below is a difference against it, so the act
-      itself is this page's zero rather than one of its scenarios.
-    </p>
-    {
-      stages.length > 0 && (
-        <p class="note">
-          <strong>The bill's earlier stages are not lever positions.</strong> The corpus holds{" "}
-          {/* The comma rides inside `set:html`: a `<Fragment />` followed by a comma on the next
-              line renders the newline as a space, which puts a gap before the punctuation. */}
-          <Fragment
-            set:html={`${stages
-              .map((d) => `<a href="${routes.wikiNode("draft-legislation", d.slug)}">${d.label}</a>`)
-              .join(" and ")},`}
-          />{" "}
-          and neither can be dialled from here: a stage that suspends the formula and pays from a
-          different base is a different formula, not a setting of this one. What each would have
-          cost is on its own page, reported rather than run — and the three stages compared are on{" "}
-          <a href={`${routes.wikiNode("legislation", "hb-96-2025")}#findings`}>the act's page</a>.
-        </p>
-      )
-    }
-  </div>
 
   <div id="scenario-root">
     {/*
@@ -213,7 +162,7 @@ const stages = bundle.drafts
 
   {/*
     What a district's cards hold still — shown only while one is chosen, because the statewide run
-    above says it in the held-fixed card and the forecast, and this is the one way the two differ.
+    says it in the held-fixed card below and in the forecast, and this is the one way the two differ.
 
     The district cards hold enrollment at the published year; the forecast below them projects it.
     That was said on the district route, where there was no forecast, and has to be said here, where
@@ -235,6 +184,65 @@ const stages = bundle.drafts
         >on its dashboard</a
       >.
     </p>
+  </div>
+
+  {/*
+    The apparatus, under the thing it is apparatus for (#549).
+
+    These two cards sat between the lead and the levers — about 450 words, and at a laptop's
+    height the first lever was below the fold. They were put there on the argument that a limit on
+    what the reader is about to do is not a footnote on what they got. The plan for this runner
+    (#552) decided the other way: the page is the levers, and a reader who has not yet moved one
+    has nothing for a caveat to qualify. So the levers come directly under the lead, and what they
+    hold fixed and what they move away from are read here, after the figures they explain.
+
+    One component on both views, so the caveat cannot drift between them; its heading names the
+    view it is on. See `HeldFixed.astro`.
+  */}
+  <HeldFixed
+    districts={bundle.districts}
+    total={s.districts}
+    refresh={refresh}
+    heading="What these levers hold fixed, and one thing they deliberately do not"
+  />
+
+  {/*
+    What "current law" is, named.
+
+    Every figure on this page is a delta against the enacted act — `Outcome.delta` is
+    "change against current law" and the guarantee's default rule is `as-enacted`. That was
+    nowhere on the page, and a reader who arrived asking how the executive proposal compared
+    with the House's had no way to learn that one of the two is the origin and the other is not
+    reachable from any lever here. The stages are listed from the feed rather than typed, so a
+    stage added to the corpus appears here.
+  */}
+  <div class="card" id="baseline" data-part="baseline">
+    <h2><SectionAnchor id="baseline" />What the levers move away from</h2>
+    <p class="note">
+      <strong>Current law here is <a href={routes.wikiNode("legislation", "hb-96-2025")}>Am. Sub.
+      H.B. 96 as enacted</a></strong> — signed 30 June 2025, phase-in at 100% in FY{
+        bundle.fiscal_year
+      }, base cost priced at FY2022. Every figure below is a difference against it, so the act
+      itself is this page's zero rather than one of its scenarios.
+    </p>
+    {
+      stages.length > 0 && (
+        <p class="note">
+          <strong>The bill's earlier stages are not lever positions.</strong> The corpus holds{" "}
+          {/* The comma rides inside `set:html`: a `<Fragment />` followed by a comma on the next
+              line renders the newline as a space, which puts a gap before the punctuation. */}
+          <Fragment
+            set:html={`${stages
+              .map((d) => `<a href="${routes.wikiNode("draft-legislation", d.slug)}">${d.label}</a>`)
+              .join(" and ")},`}
+          />{" "}
+          and neither can be dialled from here: a stage that suspends the formula and pays from a
+          different base is a different formula, not a setting of this one. What each would have
+          cost is on its own page, reported rather than run — and the three stages compared are on{" "}
+          <a href={`${routes.wikiNode("legislation", "hb-96-2025")}#findings`}>the act's page</a>.
+        </p>
+      )
+    }
   </div>
 
   <script>

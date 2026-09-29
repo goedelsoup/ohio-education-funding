@@ -102,10 +102,9 @@ const counties = scopeCounties(bundle.districts);
   <h1>{NAMES.scenario.name}</h1>
   <RunnerViews current="reach" />
   <p class="lead">
-    Move a lever and see which of Ohio's {count(s.districts)} districts it reaches — and which it
-    passes over. In the department's FY{bundle.fiscal_year} model {count(s.on_guarantee)} of
-    them, {pct(heldShare, 0)}, are paid by the guarantee rather than by the formula, and a
-    formula change reaches those districts last or not at all.
+    Move a lever and see which of Ohio's {count(s.districts)} districts it reaches, knowing that the
+    {" "}{count(s.on_guarantee)} ({pct(heldShare, 0)}) the guarantee pays in the department's
+    FY{bundle.fiscal_year} model are reached last or not at all.
   </p>
 
   <div id="scenario-root" data-view="reach">

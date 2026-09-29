@@ -878,9 +878,10 @@ export function matchesDraft(levers: Levers, draft: Draft, model: Model, baseYea
  * a number for two of a bill's five clauses with nothing saying so — the same failure, one layer
  * up, and harder to notice because the page looks complete.
  *
- * So the unpriced provisions render with the total and not under it. Placement follows the
- * held-fixed card above the controls: this is a limit on what the reader is about to read, not a
- * footnote on what they got.
+ * So the unpriced provisions render with the total and not under it: this is a limit on the
+ * figure beside it, not a footnote on what the reader got. (The held-fixed card, which made the
+ * same argument about the levers, moved below the results in #548 — its limits are the levers',
+ * and read after the figures; this one's are a particular figure's.)
  *
  * # A moved lever is no longer the bill
  *
