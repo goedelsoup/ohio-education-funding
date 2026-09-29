@@ -34,11 +34,7 @@ description: |
 
   So the Bridge formula's last frozen year still governs the funding of nearly half the state
   seven years after the regime was replaced. The plan that was meant to end distribution-by-
-  history inherited it as a floor. [inference] Whether that is a transitional artefact that
-  erodes as the formula grows, or a permanent feature, depends on facts the corpus does not
-  have — but for the wealthiest quartile of guaranteed districts the FY2027 formula produces
-  only 43% of the FY2020 level, so erosion would be slow. [verified] (the ratio) [inference]
-  (the conclusion)
+  history inherited it as a floor. [inference]
 findings: |
   ### The anchor chain, which is what the decade actually did
 
@@ -132,6 +128,13 @@ findings: |
   It also explains a citation this corpus would otherwise repeat: secondary accounts of the era
   give "20 mills", which is 20.6 rounded and is a **statewide average of a distribution**. Quoting
   it as this regime's charge-off rate states a mean as a parameter. [verified]
+
+  ### Whether the floor erodes
+
+  Whether the FY2020 floor is a transitional artefact that erodes as the formula grows, or a
+  permanent feature, depends on facts the corpus does not have — but for the wealthiest quartile
+  of guaranteed districts the FY2027 formula produces only 43% of the FY2020 level, so erosion
+  would be slow. [verified] (the ratio) [inference] (the conclusion)
 
 figures:
   - key: project/bridge-formula-implied-charge-off-low

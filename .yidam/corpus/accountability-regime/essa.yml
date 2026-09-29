@@ -41,10 +41,6 @@ description: |
   and failed to exit within three years, which makes the subgroup route a sixth of the whole-school
   tier rather than an edge case. A hundred carry identifications from 2018, against exit criteria
   that allow three years.
-
-  The intervention ladder itself has no node. It is sixteen items ranging from revised improvement
-  plans to closure, and modelling it needs the `intervention` class instantiated per rung rather
-  than once. [open]
 findings: |
   ### What the published rating accounts for, and what it does not
 
@@ -153,6 +149,12 @@ findings: |
   with disabilities or merely too few to make a reportable subgroup cannot be settled here: the
   report card publishes those counts at district grain and only for the 607 traditional districts.
   [open]
+
+  ### The intervention ladder has no node
+
+  The intervention ladder itself has no node. It is sixteen items ranging from revised improvement
+  plans to closure, and modelling it needs the `intervention` class instantiated per rung rather
+  than once. [open]
 figures:
   - key: dispersion/community-school-comprehensive-tilt
     value: 4.8651

@@ -42,11 +42,6 @@ description: |
   is $92k a district against $916k. [verified]
   (`crates/project/tests/questions_the_corpus_left_open.rs`) The guarantee comparison below stands — the guarantee tracks aid rather than enrolment, and property wealth predicts it three
   times more strongly than decline does. [verified]
-
-  ### Still open
-
-  Why 3% and why three years. Both are single numbers with a cliff behind them and
-  neither is explained in the calculator. [open]
 findings: |
   ### The cliff, priced in children rather than in dollars
 
@@ -72,6 +67,11 @@ findings: |
   in the formula a board could act on inside a year, and that they are the largest by three orders of
   magnitude — the inverse of how an incentive would be designed, and a side effect of paying on a
   level while testing on an increment. [inference]
+
+  ### Still open
+
+  Why 3% and why three years. Both are single numbers with a cliff behind them and
+  neither is explained in the calculator. [open]
 figures:
   - key: project/growth-supplement-cliff-per-pupil
     value: 516984.4527662955

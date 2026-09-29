@@ -37,15 +37,6 @@ description: |
   out at unity. A component with no factor was never put through that comparison. Dropping the
   1.0 as "no proration" loses the only evidence the corpus holds that the line was tested.
   [inference]
-
-  ### All three are quotients now
-
-  ~~"When each was last set" is answered for preschool and open for the other two.~~ Answered in
-  `findings`: each factor divides an enacted appropriation, and the FY2027 transportation
-  denominator reaches past every district the calculator holds.
-
-  ~~Also open: whether prorations apply anywhere inside `[H] Foundation Funding`.~~ Answered
-  above, from the workbook's own labels: none do.
 findings: |
   ### Three are known, and only one publishes its appropriation
 
@@ -385,6 +376,30 @@ figures:
     field: findings
     as_written: "the FY2027 one by **$36,760,325**"
 revisions:
+  - was: |
+      "When each was last set" is answered for preschool and open for the other two.
+    now: |
+      All three are quotients: each factor divides an enacted appropriation, and the FY2027
+      transportation denominator reaches past every district the calculator holds.
+    found_by: |
+      The `findings:` sections on which budget line governs and on the denominator being bigger
+      than the model.
+    reach: |
+      None. The question was struck through in `description:` once `findings:` answered it, and
+      the struck line and its answer moved here together.
+  - was: |
+      Open whether prorations apply anywhere inside `[H] Foundation Funding`.
+    now: |
+      None do. A phase-in is a ramp written into the enactment; a proration is a budget falling
+      short of a formula that has already run, and Ohio applies it only to what it pays around
+      schooling.
+    found_by: |
+      The workbook's own labels: the department's two notes naming special education
+      transportation, transportation and preschool special education as the prorated lines,
+      quoted in `findings:`.
+    reach: |
+      None. The question was struck through in `description:` once `findings:` answered it, and
+      the struck line and its answer moved here together.
   - was: |
       A heading, `### The residual claimant grew while its line shrank`, with no body under it —
       the last line of `findings:` since 15 August 2026.
