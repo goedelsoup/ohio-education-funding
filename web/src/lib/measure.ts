@@ -111,6 +111,15 @@ export interface Measured {
   boxes: { count: number; decorative: number; maxDepth: number };
   /** `<td>` carrying more than {@link PROSE_CELL_MIN_WORDS} words and set `text-align: right`. */
   rightAlignedProse: number;
+  /**
+   * `<a>` elements inside `main`, in document order, before the first paragraph long enough to
+   * count as {@link PROSE_MIN_CHARS} of reading — the same bar the reading measure already holds
+   * a paragraph to. A structure question, not a layout one: a breadcrumb, an infobox and a
+   * page-contents list are all links a reader passes before the page says anything, and counting
+   * them by DOM position rather than by pixel position is what keeps this out of the
+   * font-sensitive half below. `null` when the page never reaches a paragraph that long.
+   */
+  linksBeforeContent: number | null;
 
   /* Font-sensitive — layout, and therefore the platform's UI face. */
 
@@ -120,6 +129,14 @@ export interface Measured {
   headerHeight: number | null;
   /** Where the page's own `h1` starts. The chrome above it is the phone's opening screen. */
   firstContentY: number | null;
+  /**
+   * Where the first `figure`, `svg` chart or `table` below the `h1` starts. The gap between this
+   * and {@link firstContentY} is how much prose a reader crosses before the page shows them
+   * anything other than a sentence — `null` when the route draws none of the three.
+   */
+  firstFigureY: number | null;
+  /** Total height of the document. How long the page is, at this width. */
+  pageHeight: number;
   /** The advance width of `0` in the body font, which is what a `ch` figure above is divided by. */
   zeroAdvance: number | null;
   /** The family the platform actually resolved, so a `ch` figure can be compared across machines. */
@@ -131,6 +148,51 @@ export interface Report {
   /** ISO 8601. Passed in rather than read from the clock, so a report is reproducible. */
   measuredAt: string;
   rows: Measured[];
+  /** Build-wide, unlike every field above it — one count over every wiki page rather than eight. */
+  wikiToData?: WikiToData;
+}
+
+/** How many built wiki pages link a data route, out of how many wiki pages there are. */
+export interface WikiToData {
+  wikiPages: number;
+  linking: number;
+}
+
+/**
+ * A data route: an individual district, a county, or either of the two statewide summaries.
+ *
+ * Matched as an `href` prefix rather than as a full path, because `district` and `county` carry a
+ * slug — `/district/043786`, never `/district` alone — while `statewide` and `outcomes` are each
+ * one page. `/districts`, the index, is deliberately not one of these: it is the page a reader
+ * already reaches from a wiki node's own nav, and this count is asking about the ones that are
+ * not — a single district's dashboard, a county, or either whole-state view.
+ */
+const DATA_ROUTE_HREF = /^\/(district\/|county\/|statewide(?:$|\/)|outcomes(?:$|\/))/;
+
+/**
+ * How many wiki pages, out of every wiki page in a build, link a data route from their own
+ * content.
+ *
+ * Scoped to `main` for the reason {@link Measured.linksBeforeContent} is: the sticky header
+ * repeats the same handful of links on every route, and a page's own content is not what the
+ * header carries. `pages` takes an already-scoped `main` per route because the caller — a Node
+ * script walking `dist/` with `linkedom`, or a unit test handing this a fabricated document — is
+ * the one that knows how to parse HTML, and this function should not have to.
+ *
+ * Today: 5 of 274 wiki pages link a district page (each names the district the node is about),
+ * and none link a county or either statewide view — see #546.
+ */
+export function countWikiToData(pages: Array<{ path: string; main: ParentNode | null }>): WikiToData {
+  const wiki = pages.filter((p) => p.path.startsWith("/wiki/"));
+  const linking = wiki.filter((p) => {
+    if (p.main == null) return false;
+    for (const a of p.main.querySelectorAll("a[href]")) {
+      const href = a.getAttribute("href");
+      if (href != null && DATA_ROUTE_HREF.test(href)) return true;
+    }
+    return false;
+  });
+  return { wikiPages: wiki.length, linking: linking.length };
 }
 
 /**
@@ -384,6 +446,9 @@ export function formatReport(report: Report): string {
     { head: "deep", width: 4, of: (r) => cell(r.boxes.maxDepth) },
     { head: "cells", width: 5, of: (r) => cell(r.rightAlignedProse) },
     { head: "chrome", width: 6, of: (r) => cell(r.firstContentY) },
+    { head: "links", width: 5, of: (r) => cell(r.linksBeforeContent) },
+    { head: "figY", width: 6, of: (r) => cell(r.firstFigureY) },
+    { head: "pageH", width: 6, of: (r) => cell(r.pageHeight) },
   ];
 
   const lines: string[] = [];
@@ -414,6 +479,12 @@ export function formatReport(report: Report): string {
           }).join(" "),
       );
     }
+  }
+
+  if (report.wikiToData != null) {
+    const { wikiPages, linking } = report.wikiToData;
+    lines.push("");
+    lines.push(`  wikiToData: ${linking} of ${wikiPages} wiki pages link a data route from their own content.`);
   }
 
   return lines.join("\n");
@@ -543,15 +614,57 @@ export function collect(limits: {
     if (words > proseCellMinWords) rightAlignedProse += 1;
   }
 
+  /* `id="main"` is `Base.astro`'s wrapper — everything a route draws that is not the sticky
+     header. Both new counts below stop at its boundary for the same reason: the header repeats
+     the same links on every route, and counting them would make every page's figure look like
+     the reader's own content. */
+  const main = document.querySelector("main");
+
+  /* Links before content: walked by DOM position, not pixel position, which is why this sits in
+     the deterministic half above rather than beside `firstContentY`. */
+  let linksBeforeContent: number | null = null;
+  if (main != null) {
+    const firstProse = [...main.querySelectorAll("p")].find(
+      (p) => (p.textContent ?? "").trim().length >= proseMinChars,
+    );
+    if (firstProse != null) {
+      let count = 0;
+      const walker = document.createTreeWalker(main, NodeFilter.SHOW_ELEMENT);
+      for (let node = walker.nextNode(); node != null; node = walker.nextNode()) {
+        if (node === firstProse) break;
+        if ((node as Element).tagName === "A") count += 1;
+      }
+      linksBeforeContent = count;
+    }
+  }
+
+  /* The first figure, chart or table below the h1. `querySelectorAll` already returns document
+     order, so the first visible match at or after the h1's own position is the one a reader
+     reaches first. */
+  let firstFigureY: number | null = null;
+  if (main != null) {
+    const h1Top = h1 == null ? -Infinity : h1.getBoundingClientRect().top + window.scrollY;
+    for (const el of main.querySelectorAll("figure, svg, table")) {
+      if (!visible(el)) continue;
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      if (top < h1Top) continue;
+      firstFigureY = Math.round(top);
+      break;
+    }
+  }
+
   const header = document.querySelector("header.site");
   return {
     sizes: [...sizes].sort((a, b) => a - b),
     headingRatio,
     boxes: { count: boxed.size, decorative: decorative.size, maxDepth },
     rightAlignedProse,
+    linksBeforeContent,
     measure,
     headerHeight: header == null ? null : Math.round(header.getBoundingClientRect().height),
     firstContentY: h1 == null ? null : Math.round(h1.getBoundingClientRect().top + window.scrollY),
+    firstFigureY,
+    pageHeight: Math.round(document.documentElement.scrollHeight),
     zeroAdvance,
     bodyFont: bodyStyle.fontFamily,
   };

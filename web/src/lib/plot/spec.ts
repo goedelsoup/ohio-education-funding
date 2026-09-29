@@ -306,7 +306,8 @@ export const WIDTHS = {
 const PANEL_GAP = 18;
 
 /**
- * The narrowest a panel is laid out at before the row wraps: `.panel`'s flex basis in `app.css`.
+ * The narrowest a panel is laid out at before the row wraps: the `minmax()` floor in `.panels`'s
+ * grid, in `app.css`.
  *
  * The two numbers have to agree. This function works out the width a panel is *drawn* at and the
  * stylesheet works out the width it is *shown* at, and a drawing wider than its box is scaled down

@@ -12,11 +12,13 @@
  * parts that need to be right before any of them does.
  */
 
+import { parseHTML } from "linkedom";
 import { describe, expect, test } from "vitest";
 import {
   ROUTES,
   THRESHOLDS,
   WIDTHS,
+  countWikiToData,
   formatReport,
   violations,
   widestGap,
@@ -35,9 +37,12 @@ function row(overrides: Partial<Measured> = {}): Measured {
     headingRatio: 1.49,
     boxes: { count: 30, decorative: 11, maxDepth: 2 },
     rightAlignedProse: 31,
+    linksBeforeContent: 19,
     measure: { median: 75, p90: 92, max: 110, over78: 3, count: 42 },
     headerHeight: 51,
     firstContentY: 79,
+    firstFigureY: 340,
+    pageHeight: 4120,
     zeroAdvance: 8.34,
     bodyFont: "ui-sans-serif, system-ui",
     ...overrides,
@@ -223,5 +228,51 @@ describe("the printed table", () => {
 
   test("prints an em dash where a page has no measurement, not a zero", () => {
     expect(formatReport(report(row({ measure: null })))).toContain("—");
+  });
+
+  test("prints wikiToData only when the report carries it", () => {
+    expect(formatReport(report(row()))).not.toContain("wikiToData");
+    const withCount = { ...report(row()), wikiToData: { wikiPages: 274, linking: 5 } };
+    expect(formatReport(withCount)).toContain("wikiToData: 5 of 274");
+  });
+});
+
+describe("wikiToData", () => {
+  /** A page's `<main>`, parsed the way the build script hands one over. */
+  const main = (bodyHtml: string) => parseHTML(`<html><body><main>${bodyHtml}</main></body></html>`).document.querySelector("main");
+
+  test("counts only wiki pages, not the rest of the build", () => {
+    const result = countWikiToData([
+      { path: "/wiki/decision/x.html", main: main("") },
+      { path: "/district/043786.html", main: main('<a href="/district/043802">Columbus</a>') },
+    ]);
+    expect(result).toEqual({ wikiPages: 1, linking: 0 });
+  });
+
+  test("a link to an individual district, county or statewide view counts as linking", () => {
+    for (const href of ["/district/043786", "/county/cuyahoga", "/statewide", "/outcomes"]) {
+      const result = countWikiToData([{ path: "/wiki/x.html", main: main(`<a href="${href}">go</a>`) }]);
+      expect(result, href).toEqual({ wikiPages: 1, linking: 1 });
+    }
+  });
+
+  test("the district index is not a data route for this count", () => {
+    // `/districts` is the index every wiki node's own nav already reaches; this count asks about
+    // links to a single district, a county, or a statewide view, which the index is none of.
+    const result = countWikiToData([{ path: "/wiki/x.html", main: main('<a href="/districts">index</a>') }]);
+    expect(result).toEqual({ wikiPages: 1, linking: 0 });
+  });
+
+  test("a link only in the header does not count, because `main` never carries it", () => {
+    // The caller scopes `main` to `<main>` before calling this, so a page whose only such link
+    // sits in the site header is indistinguishable here from a page with no such link at all —
+    // which is the point: the header repeats the same links on every route.
+    const result = countWikiToData([{ path: "/wiki/x.html", main: main("<p>No data links here.</p>") }]);
+    expect(result).toEqual({ wikiPages: 1, linking: 0 });
+  });
+
+  test("a page missing a main counts toward wikiPages but never toward linking", () => {
+    const result = countWikiToData([{ path: "/wiki/x.html", main: null }]);
+    expect(result).toEqual({ wikiPages: 1, linking: 0 });
   });
 });

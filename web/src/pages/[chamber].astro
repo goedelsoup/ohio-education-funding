@@ -41,7 +41,7 @@ const senateWhole = bundle.senate_districts.reduce((a, h) => a + h.districts_who
   wide
 >
   <h1>{label} districts</h1>
-  <p class="sub">
+  <p class="lead">
     Ohio's {count(seats.length)} {label} districts, ordered by the state aid flowing through the
     schools in each. {count(whole)} of {count(bundle.districts.length)} school districts lie wholly
     inside one; the rest straddle a boundary. <a href={routes.chamberIndex(other)}>

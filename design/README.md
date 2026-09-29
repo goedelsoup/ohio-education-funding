@@ -21,9 +21,9 @@ nothing dropped, verified by diffing the old `:root` blocks against the new file
 anything. What the system added on top is nine tokens the site did not have: a five-step ordinal
 ramp, three claim colours, and semantic aliases.
 
-Type and space tokens exist now and **nothing consumes them yet**. The rules in `app.css` still
-carry their own literals. Moving them onto the scale is the next step and is deliberately not this
-one, because that is a change with a visual diff and this was not.
+Type and space tokens existed at landing and **nothing consumed them yet**. That has since changed:
+the rules in `app.css` now reach for `--text-*` and `--space-*` directly, and a rule still carrying
+its own literal is the exception rather than the rule.
 
 Two mechanisms changed and neither is visible:
 
@@ -56,7 +56,7 @@ The eight pattern sheets are the rest of the system and each carries a real chan
 | `claims.css` | Removes the box from `.claim` — no border, no background, no radius — and carries status on a coloured rule whose *style* is the second channel. It also drops the fourth inline variant, which this corpus emits **76 times**. |
 | `figures.css` | Introduces `.fig` as a compound element: value, year, basis as three children, so an unlabelled number is a missing child a build check can see. Adopted where the card-level year chip cannot reach — tiles, a column head, one figure in a `<dl>` — and the build check exists: `tests/e2e/figures.spec.ts`. |
 | `prose.css` | Four fields, three visual channels — size, ground, state. Close to what ships; the `.findings` inset and the `<details>` withdrawal are new treatments of fields that already exist. |
-| `base.css`, `cards.css`, `data.css`, `nav.css`, `controls.css` | Not yet read. |
+| `base.css`, `cards.css`, `data.css`, `nav.css`, `controls.css` | Read (see below); not yet landed. |
 
 Landing them means rewriting rules that 293 unit tests and 238 end-to-end tests assert against, so
 each is its own change with its own diff.
