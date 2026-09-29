@@ -3,7 +3,12 @@
 # This is the INHERITED task layer. Pull it into your mise.toml with:
 #
 #   [task_config]
-#   includes = ["mise.yidam.toml"]
+#   includes = ["mise.yidam.toml", "mise.overrides.toml"]
+#
+# A task defined here cannot be overridden from mise.toml: a task in an include
+# beats one in the config that includes it, and the later include wins. To
+# replace or refuse one of these, define it in mise.overrides.toml, which comes
+# after this file and which a vendor update never touches.
 #
 # This is a mise *task file*, not a standalone config: tables are task names
 # directly (`[graph-check]`, not `[tasks.graph-check]`) and it carries no
@@ -340,12 +345,36 @@ if [ -n "$pinned_at" ]; then
 fi
 moved=$(git -C "$tmp/y" diff --name-only "$commit" origin/HEAD -- yidam/prelude/ 2>/dev/null | wc -l | tr -d ' ')
 echo "prelude   $moved file(s) changed since the pin"
+# The verbs, and only the verbs. A row is a verb because its table's header is
+# `| Verb | When |`, not because its first cell is a backticked lowercase word.
+# GRAPH.md carries tables of ref namespaces, directories and `edge_policy` values
+# in exactly that shape, and the first version of this read all of them: a derived
+# repo's update announced the two `edge_policy` values as new commit verbs, which
+# teaches the operator to skip the line that matters. `yidam vocabulary` anchors on
+# the same header and cannot stand in here — these verbs come out of two git
+# revisions of the file, neither of them the checked-out one.
+verbs_from_graph() {
+  awk -F'|' '
+    /^[[:space:]]*\\|/ {
+      h = $2; w = $3
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", h)
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", w)
+      if (tolower(h) == "verb" && tolower(w) == "when") { t = 1; next }
+      if (!t) next
+      if (h ~ /^[-:]+$/) next
+      gsub(/`/, "", h)
+      if (h ~ /^[a-z]+$/) print h
+      next
+    }
+    { t = 0 }
+  ' | sort -u
+}
 if git -C "$tmp/y" diff --name-only "$commit" origin/HEAD -- yidam/prelude/GRAPH.md 2>/dev/null | grep -q .; then
   before="$tmp/vb"; after="$tmp/va"
   git -C "$tmp/y" show "$commit:yidam/prelude/GRAPH.md" 2>/dev/null \\
-    | sed -n 's/^| `\\([a-z]*\\)` |.*/\\1/p' | sort -u > "$before" || true
+    | verbs_from_graph > "$before" || true
   git -C "$tmp/y" show "origin/HEAD:yidam/prelude/GRAPH.md" 2>/dev/null \\
-    | sed -n 's/^| `\\([a-z]*\\)` |.*/\\1/p' | sort -u > "$after" || true
+    | verbs_from_graph > "$after" || true
   added=$(comm -13 "$before" "$after" || true)
   removed=$(comm -23 "$before" "$after" || true)
   if [ -n "$added" ] || [ -n "$removed" ]; then
@@ -630,9 +659,27 @@ fi
 # A derived repo once spent four commits reverting a verb that upstream had blessed
 # the same day, because nothing told it either fact.
 if [ -n "$previous" ] && [ "$previous" != "unknown" ] && [ "$previous" != "$commit" ]; then
+  # The verbs, and only the verbs — anchored on the `| Verb | When |` header, for the
+  # reason `yidam-vendor-status` states at length. Each task's `run` is its own script,
+  # so the function is defined twice; if you change one, change both.
+  verbs_from_graph() {
+    awk -F'|' '
+      /^[[:space:]]*\\|/ {
+        h = $2; w = $3
+        gsub(/^[[:space:]]+|[[:space:]]+$/, "", h)
+        gsub(/^[[:space:]]+|[[:space:]]+$/, "", w)
+        if (tolower(h) == "verb" && tolower(w) == "when") { t = 1; next }
+        if (!t) next
+        if (h ~ /^[-:]+$/) next
+        gsub(/`/, "", h)
+        if (h ~ /^[a-z]+$/) print h
+        next
+      }
+      { t = 0 }
+    ' | sort -u
+  }
   verbs_at() {
-    git -C "$tmp/yidam" show "$1:yidam/prelude/GRAPH.md" 2>/dev/null \\
-      | sed -n 's/^| `\\([a-z]*\\)` |.*/\\1/p' | sort -u
+    git -C "$tmp/yidam" show "$1:yidam/prelude/GRAPH.md" 2>/dev/null | verbs_from_graph
   }
   before=$(verbs_at "$previous")
   after=$(verbs_at "$commit")
@@ -792,6 +839,48 @@ run = "yidam rename"
 [graph-lint]
 description = "Lint the corpus against the baseline ratchet: 31 checks over nodes, edges, catalog, classes, and tables."
 run = "yidam lint"
+
+# The lint as the GATE runs it, and the reason it is a task of its own rather than a
+# flag someone remembers. `.github/workflows/ci.yml` runs `yidam lint --commits
+# --range origin/main..HEAD`; `mise run ci` ran `graph-lint`, which is `yidam lint`
+# with no `--commits` at all. The commit-vocabulary finding is the one a contributor
+# cannot act on after the fact — history cannot be rewritten to fix a verb — and it
+# was the one finding the local gate never showed them. They learned it from a push.
+#
+# It reports and never gates, here and in CI alike: `unrecognized-verb` is Warn
+# severity and carries no age, so nothing in it can escalate. Adding it to `ci`
+# cannot turn a green gate red. What it buys is the finding arriving while the next
+# commit message is still unwritten, which is the only time it is useful —
+# `yidam vocabulary --check "<subject>"` asks the same question of a subject that
+# does not exist yet.
+#
+# The range is resolved rather than hardcoded. CI knows it is comparing against
+# `origin/main`; a working copy does not — the branch may track something else, the
+# default branch may not be `main`, and there may be no remote at all. Each candidate
+# is *resolved* before it is used, because a range git cannot parse makes
+# `read_subjects` return an empty list: the check would run over nothing and report
+# a clean log, which is worse than not running it.
+[graph-lint-gate]
+description = "Lint as CI does: the baseline ratchet, plus the commit vocabulary over the commits this branch adds."
+run = """
+set -eu
+base=""
+for ref in '@{upstream}' origin/HEAD origin/main; do
+  if git rev-parse --verify --quiet "$ref" >/dev/null 2>&1; then
+    base="$ref"
+    break
+  fi
+done
+if [ -n "$base" ]; then
+  yidam lint --commits --range "$base..HEAD"
+else
+  # No remote to compare against. The whole log rather than nothing: a repository
+  # that has never been pushed has no "what this branch adds", and its whole log is
+  # short enough that reading it is the cheaper answer.
+  echo "no upstream to compare against — reading the whole log for the vocabulary check."
+  yidam lint --commits
+fi
+"""
 
 [graph-lint-explain]
 description = "Lint, printing each check's rationale alongside its findings."

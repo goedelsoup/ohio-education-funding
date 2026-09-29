@@ -1,5 +1,5 @@
 function = "compile_class_schema"
-description = "Each declared type compiles to its constraint; a type the corpus coined is carried through unconstrained"
+description = "Each declared type compiles to its constraint; a type the corpus coined is carried through unconstrained. A `number` is a JSON number — unquoted in the YAML, so `\"7\"` is text and fails — and its `unit:`, when declared, rides the schema as the `x-yidam-unit` annotation rather than as a constraint. A number with no unit is dimensionless and carries no annotation. A `string` declaring `values:` compiles to that set as `enum`, written as declared — a constraint the gate shares, not an annotation — and an empty `values: []` declares no set. A set on any other type is carried and ignored"
 
 [input]
 name = "survey"
@@ -11,8 +11,22 @@ properties:
     type: date
   - name: subject
     type: ref
+  - name: length
+    type: number
+    unit: km
+  - name: samples
+    type: number
   - name: extent
     type: river-mile-range
+  - name: status
+    type: string
+    values: [extant, demolished, in operation]
+  - name: kind
+    type: string
+    values: []
+  - name: tone
+    type: text
+    values: [warm, cold]
   - name: untyped
 """
 
@@ -30,7 +44,12 @@ schema = """
         "note": { "type": "string", "minLength": 1 },
         "taken": { "type": "string", "pattern": "^[0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?$" },
         "subject": { "type": "string", "minLength": 1 },
+        "length": { "type": "number", "x-yidam-unit": "km" },
+        "samples": { "type": "number" },
         "extent": true,
+        "status": { "type": "string", "minLength": 1, "enum": ["extant", "demolished", "in operation"] },
+        "kind": { "type": "string", "minLength": 1 },
+        "tone": { "type": "string", "minLength": 1 },
         "untyped": true
       },
       "additionalProperties": false

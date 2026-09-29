@@ -19,6 +19,7 @@ is a build error — `mise run parity` enforces it before running any SDK tests.
 | `parse_reference` | Parse RFC-0032's reference grammar — `yidam://<corpus>/<kind>/<path>[@<rev>][#<property>]`, the relative forms, and the legacy spellings — into a `Reference`. Total: `null` only for input naming no thing at all |
 | `render_reference` | Render a `Reference` back to a string. The only place an identifier is built |
 | `reference_conforms` | Whether every segment of a `Reference` is a slug, so it needs no escaping in any rendering — and whether its fragment names something, per kind |
+| `compose_embed_text` | Compose the one string a node is embedded as, out of the node and the three field lists its class declared |
 
 The parity surface is versioned in [`VERSION`](VERSION). Any change to a function's
 contract — input shape, output shape, or classification logic — requires bumping this
@@ -28,6 +29,29 @@ version and updating ALL THREE SDK implementations in the same PR.
 table held ten, and `VERSIONING.md` used to say "the six". A number written beside a list is
 a second copy of the list's length with nothing keeping it honest, so the numbers are gone
 and the rows are what a reader counts.
+
+**`compose_embed_text` is here because two assemblers over one corpus are two vector spaces.**
+Which string a node is embedded as is a judgement — a label, the prose the class declared, the
+identifiers a query is actually typed in, the names of the things it points at — and RFC-0007 was
+filed about this repository and a downstream consumer each making that judgement separately,
+reasonably, and incomparably. An embedder is not a parity function; the *text it embeds* is, and
+it is the half that needs no model to check.
+
+The fixture takes a node and three field lists, all three required: `prose_keys`,
+`prose_properties`, and `retrievable_properties`. The third is the axis beside `prose`
+(#717) — a gage's `parameter: "00060"` is not prose in any sense `node-too-long` or
+`missing-description` would accept, and it is exactly what a query is typed in. The set is
+*prose, then the flagged properties prose did not already carry*, and the property keys are
+qualified — `properties.units` — so the de-duplication is exact rather than a guess. A class that
+flags nothing composes exactly its prose, so a corpus written before either flag embeds
+byte-identically.
+
+Resolving those lists is not in the surface. Walking `<class>.ont.yml` and `universal.yml` for
+them is a question about a corpus on disk, and the CLI's `ProseFields` and `Retrievable` answer
+it; what all three SDKs must agree on is what the node composes to once they are answered.
+`a-stem-is-cut-at-its-last-dot.toml` exists to stop the three agreeing by coincidence: the
+Rust reference reached link stems through `Path::file_stem`, which splits on `\` as well as `/`
+on Windows, so the rule is written out in four steps and fixtured instead.
 
 **`references:` is a named field, not a key that survives `extra`.** A node's reference to a thing
 that is not a node — an issue, a crate, a catalog entry — goes in `references:`, as a **string** in
@@ -101,6 +125,13 @@ library's own reading, and no fixture makes three implementations of two specifi
 The ontology is what types these values — `<class>.ont.yml` declares them — and every consumer
 reads them as text. What *is* in contract is every string value, the key sets of `properties`
 and `extra`, and the difference between an absent key and a present empty one.
+
+**`serde_yaml` above is a name, not a crate.** The Rust SDK imports it under that name and
+`Cargo.toml` aliases it to `serde_yaml_ng`, because dtolnay archived the original and
+published it as `0.9.34+deprecated` (#931). The alias is what keeps this section true: the
+fork's parse path is byte-identical to `0.9.34`, so the scalar resolution pinned here is the
+same code and not a second reading of it. A fork that scanned differently would be a new
+contract rather than a maintenance bump, which is the bar any later replacement has to meet.
 
 **Sorted means code-point order.** Rust sorts a `String` by UTF-8 bytes and Python by code
 point, and those two agree everywhere. JavaScript's default comparator orders by UTF-16 code

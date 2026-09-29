@@ -340,7 +340,9 @@ Then read each template file in `sadhana/`:
 - `sadhana/skills/README.md`
 - `sadhana/web/README.md`
 - `sadhana/root/README.md`, `sadhana/root/AGENTS.md`, `sadhana/root/CLAUDE.md`, `sadhana/root/mise.toml`,
-  `sadhana/root/gitattributes`, `sadhana/root/gitignore`, `sadhana/root/PRACTICE.md`
+  `sadhana/root/mise.overrides.toml`, `sadhana/root/gitattributes`, `sadhana/root/gitignore`,
+  `sadhana/root/PRACTICE.md`
+- `sadhana/config.toml`
 - every file in `sadhana/github/workflows/` — run `ls sadhana/github/workflows/` and read
   each one; do not assume a fixed list (#589)
 - `sadhana/sangha/README.md` (and PROTOCOL.md, electors.md, resolutions/, positions/) —
@@ -364,6 +366,16 @@ web/README.md
 .yidam/decisions/          ← new, empty; written to in steps 2 and 5
 .yidam/skills/README.md
 ```
+
+One file installs under `.yidam/` rather than mirroring a directory:
+
+```
+sadhana/config.toml               → .yidam/config.toml   (yidam keeps no copy)
+```
+
+**Copy it unedited.** Alone among the templates it asks for no substitution: every key in it
+is commented out, and that is the delivered state. It ships so a corpus's clocks, gates and
+stores are a list this repository has left unset, not keys nobody here has met.
 
 **Create on first use, not now:** `agents/`, `packages/`, and `docs/`. Their sadhana
 templates exist and are the right content — but scaffold them the day something goes in
@@ -389,13 +401,15 @@ sadhana/root/README.md            → README.md            (overwrites yidam's)
 sadhana/root/AGENTS.md            → AGENTS.md            (overwrites yidam's)
 sadhana/root/CLAUDE.md            → .claude/CLAUDE.md    (overwrites yidam's)
 sadhana/root/mise.toml            → mise.toml            (overwrites yidam's)
+sadhana/root/mise.overrides.toml  → mise.overrides.toml  (yidam keeps no copy)
 sadhana/root/gitattributes        → .gitattributes       (overwrites yidam's)
 sadhana/root/gitignore            → .gitignore           (overwrites yidam's)
 sadhana/root/PRACTICE.md          → PRACTICE.md          (yidam keeps no copy)
 ```
 
-Overwrite all six now. Do not merge yidam's content into them. `PRACTICE.md` installs new
-rather than overwriting; step 8.5's `yidam regen` fills its block.
+Overwrite all six now. Do not merge yidam's content into them. `PRACTICE.md` and
+`mise.overrides.toml` install new rather than overwriting; step 8.5's `yidam regen` fills
+`PRACTICE.md`'s block.
 [why](bootstrap.evidence.md#overwrite-do-not-merge)
 
 **`.github/workflows/` — replace the directory, do not overwrite files inside it.** In
@@ -897,19 +911,44 @@ yet:
 mise run yidam-build
 ```
 
+**If that fails, defer the gate rather than stall here.** `mise` may be absent, and a pin no
+release was built for compiles instead, needing a toolchain mise may be unable to provision.
+Run it once. Do not install mise or a toolchain by hand, and do not stop to ask the user to:
+skip the four commands below — all four are the binary under another name — and hand the gate
+over in step 9's **Gate** line.
+[why](bootstrap.evidence.md#gate-deferred)
+
 **Then run the gate, in this order.** Each answers a different question and the order is the
 order a failure is cheapest to fix in:
 
 ```
 mise run graph-check          # is the graph well-formed
 yidam regen                   # refresh every generated block
-yidam lint --init-baseline    # record what the corpus starts with
-yidam lint                    # and read what it says
+yidam lint                    # and read every finding it reports
 ```
 
 `yidam regen` is the one that is easy to skip and cannot be. The scaffold installed in step 3
 carries `<!-- REGEN: ... -->` markers in seven files, and **every one of them is stale on
 arrival**. [why](bootstrap.evidence.md#regen-cannot-be-skipped)
+
+**If `graph-check` or `lint` reports anything, fix it now.** Fix and amend the commit it
+belongs to, or write a `fix:` commit if the genesis commit has already been pushed.
+[why](bootstrap.evidence.md#fix-while-warm)
+
+**Only once the report has been read and acted on, install the ratchet.** It is the fourth
+command, and it is last for a reason:
+
+```
+yidam lint --init-baseline    # the file the ratchet compares against
+```
+
+It is not optional — a repository with no baseline has no ratchet, and `yidam lint` answers `no
+regression` on every later commit whatever the corpus does. But it writes every error-severity
+finding standing at the moment it runs into `.yidam/lint-baseline.yml`, so **run before the
+report is read, it buys a green gate with debt nobody chose.** On a corpus with no history it
+should record **zero** entries. Any entry it does record is a finding this bootstrap decided to
+accept rather than fix: name each one, and say why it stands, in step 9's **Gate** line.
+[why](bootstrap.evidence.md#the-baseline-is-installed-last)
 
 Commit the refreshed blocks and the baseline together:
 
@@ -922,25 +961,26 @@ git commit -m "regen: REGEN blocks populated on the first run of the gate"
 understanding changed. Keep it out of the genesis commit: genesis is testimony about what the
 corpus knows, and a regenerated index table is not testimony.
 
-**If `graph-check` or `lint` reports anything, fix it now.** Fix and amend the commit it
-belongs to, or write a `fix:` commit if the genesis commit has already been pushed.
-[why](bootstrap.evidence.md#fix-while-warm)
-
 Do not ask the user to run any of this manually. A bootstrap that hands over a repository
-whose gate it has never run has not finished; it has stopped.
+whose gate it has never run has not finished; it has stopped. One that could not install the
+binary and says so in step 9 has finished with a stated gap, which is allowed.
 
 ### 9. Report
 
 Do not begin this step until the genesis commit, both `consume:` commits, the `vendor:`
-commit, and the step 8.5 gate run are all done. If any is unresolved, finish it before
-proceeding. Step 9 opens by stating the gate result — a handoff that says the repository is
-ready is a claim, and this is the one place it can be checked.
+commit, and the step 8.5 gate run are all done — or, the gate alone, deferred because the
+binary would not install. If any is merely unresolved, finish it before proceeding. Step 9
+opens by stating the gate result — a handoff that says the repository is ready is a claim, and
+this is the one place it can be checked.
 
 Output a structured handoff with seven sections:
 
 **Gate** — one line: the result of the step 8.5 run. Name the commands, say whether each
 passed, and name any finding left open and why. "Green as of `<sha>`" is checkable; "the
-repository is ready" is not.
+repository is ready" is not. If the gate was deferred, this line says so instead of claiming a
+result: what was missing, `mise run yidam-build` and then the four commands as the user's
+first action, and that no lint baseline exists and the REGEN blocks are still the scaffold's,
+so the first push fails `yidam regen --check` until it is run.
 
 **Ontology** — the class definitions written. One line per class; list the outgoing edges.
 

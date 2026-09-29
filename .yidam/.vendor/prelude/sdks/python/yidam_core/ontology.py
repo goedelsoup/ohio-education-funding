@@ -35,9 +35,23 @@ CLAIM_TOKENS = [
 @dataclass
 class OntologyProperty:
     name: str
-    #: ``string``, ``text``, ``date``, ``ref``, ``claim`` — or a type this corpus coined.
+    #: ``string``, ``text``, ``date``, ``number``, ``ref``, ``claim`` — or a type this
+    #: corpus coined.
     type: str = ""
     description: str = ""
+    #: The unit a ``number`` is written in, or empty for a dimensionless quantity.
+    #:
+    #: **A unit is a fact about the column, not the cell** (RFC-0040). Declared once, here,
+    #: so an ordering within one property can never compare across units. Published as
+    #: ``x-yidam-unit`` on the compiled schema — an annotation, not a constraint.
+    unit: str = ""
+    #: The closed set a ``string`` may hold, or empty for an unbounded one.
+    #:
+    #: **A value set is a fact about the column, declared where the gate can read it**
+    #: (RFC-0044). Declaring it closes it: ``property-type`` reports a value outside it, and
+    #: the compiled schema carries it as ``enum`` — a constraint, not an annotation. Empty is
+    #: absent, and the field is honoured on ``string`` only.
+    values: tuple[str, ...] = ()
     #: Whether every instance of the class must carry this property.
     #:
     #: **Absent means false**, and not out of timidity: every corpus written before this
@@ -117,6 +131,17 @@ def _mappings(value: Any) -> list[dict[str, Any]]:
     return [item for item in value if isinstance(item, dict)]
 
 
+def _strings(value: Any) -> tuple[str, ...]:
+    """The strings of a list, and nothing else.
+
+    A ``values:`` written as a mapping, or carrying a bare number, declares no set rather
+    than half of one.
+    """
+    if not isinstance(value, list):
+        return ()
+    return tuple(item for item in value if isinstance(item, str))
+
+
 def parse_class(name: str, content: str) -> OntologyClass:
     """Read a class definition. ``name`` is the fallback when the file does not name itself.
 
@@ -142,6 +167,8 @@ def parse_class(name: str, content: str) -> OntologyClass:
                 type=_str(p.get("type")),
                 description=_str(p.get("description")),
                 required=p.get("required") is True,
+                unit=_str(p.get("unit")),
+                values=_strings(p.get("values")),
             )
             for p in _mappings(doc.get("properties"))
         ],
@@ -157,18 +184,26 @@ def parse_class(name: str, content: str) -> OntologyClass:
     )
 
 
-def _property_schema(property_type: str) -> Any:
+def _property_schema(property_type: str, values: tuple[str, ...]) -> Any:
     """Mirrors ``lint``'s ``property-type`` check, including what it declines to check.
 
     A type the corpus coined for itself compiles to ``True`` — valid against anything —
     because a schema rejecting every type it had not heard of would make coining one
-    impossible.
+    impossible. A ``string`` declaring ``values:`` compiles to that set as ``enum``
+    (RFC-0044) — a constraint, because the gate refuses a value outside it. Written as
+    declared: no sorting, no trimming.
     """
+    if property_type == "string" and values:
+        return {"type": "string", "minLength": 1, "enum": list(values)}
     if property_type in ("string", "text", "ref"):
         return {"type": "string", "minLength": 1}
     # Structural, not a calendar: what it catches is a date field carrying prose.
     if property_type == "date":
         return {"type": "string", "pattern": "^[0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?$"}
+    # A YAML number, unquoted: `"7"` is text and the gate says so — the mirror of the date
+    # arm's advice to quote `00060`. One arm, not `integer` beside it (RFC-0040).
+    if property_type == "number":
+        return {"type": "number"}
     # A list is legal here and nowhere else: the counter reads a list of tags as one claim
     # each, so `claim_tag: [open]` unquoted is a one-element list nobody meant to write.
     if property_type == "claim":
@@ -210,9 +245,12 @@ def compile_class_schema(cls: OntologyClass) -> dict[str, Any]:
     if cls.properties:
         declared: dict[str, Any] = {}
         for p in cls.properties:
-            body = _property_schema(p.type)
-            if isinstance(body, dict) and p.description:
-                body = {**body, "description": p.description}
+            body = _property_schema(p.type, p.values)
+            if isinstance(body, dict):
+                if p.description:
+                    body = {**body, "description": p.description}
+                if p.unit:
+                    body = {**body, "x-yidam-unit": p.unit}
             declared[p.name] = body
         bag: dict[str, Any] = {"type": "object", "properties": declared}
         # Emitted for exactly the properties declared `required: true`, and omitted

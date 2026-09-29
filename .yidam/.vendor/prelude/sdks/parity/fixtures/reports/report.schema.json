@@ -41,6 +41,55 @@
         "operational"
       ],
       "description": "How `classify_commit` files a commit, declared once. Total by construction: operational verbs are the explicitly marked case and every other verb is epistemic, which the Dafny spec proves \u2014 so this enum is closed and a third member would be a change to that proof, not to a report."
+    },
+    "coupling_links": {
+      "type": "object",
+      "required": [
+        "total",
+        "dead"
+      ],
+      "description": "Links counted in one direction across the boundary between a corpus and the artifact `[object] paths` declares.",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "description": "Every relative markdown link read in this direction."
+        },
+        "dead": {
+          "type": "integer",
+          "description": "The ones whose target is not on disk. Each is also a `lint` finding: `broken-object-link` for artifact \u2192 corpus, `broken-prose-link` for corpus \u2192 artifact. A consumer that wants the locations reads `lint`, not this count."
+        }
+      }
+    },
+    "coupling_reach": {
+      "type": "object",
+      "required": [
+        "total",
+        "cited",
+        "citing",
+        "uncited"
+      ],
+      "description": "How far one kind of corpus record reaches across the boundary.",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "description": "Records of this kind the corpus holds."
+        },
+        "cited": {
+          "type": "integer",
+          "description": "Records the artifact links to at least once."
+        },
+        "citing": {
+          "type": "integer",
+          "description": "Records that link into the artifact at least once."
+        },
+        "uncited": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Records nothing in the artifact links to, repository-relative and sorted. Where to look, NOT a list of defects: most records have no reason to be cited by code, and a consumer MUST NOT count these as findings."
+        }
+      }
     }
   },
   "properties": {
@@ -434,9 +483,10 @@
               "ok",
               "undeclared",
               "declined",
-              "unmeasurable"
+              "unmeasurable",
+              "unbuildable"
             ],
-            "description": "`due` is not a defect. A corpus with three expired sources is owed, not unhealthy \u2014 `doctor` is the report that answers whether anything is wrong. `undeclared` means this corpus set no interval, so the clock can never come due; `declined` means it set none deliberately, having decided against the thing the clock measures, and `record` names where it argued that; `unmeasurable` means it set one and there is nothing to measure against, which is a gap in bookkeeping rather than a stale subject. A consumer MUST NOT render `declined` as `undeclared`: the first is a decision and the second is its absence."
+            "description": "`due` is not a defect. A corpus with three expired sources is owed, not unhealthy \u2014 `doctor` is the report that answers whether anything is wrong. `undeclared` means this corpus set no interval, so the clock can never come due; `declined` means it set none deliberately, having decided against the thing the clock measures, and `record` names where it argued that; `unmeasurable` means it set one and there is nothing to measure against, which is a gap in bookkeeping rather than a stale subject. A consumer MUST NOT render `declined` as `undeclared`: the first is a decision and the second is its absence. `unbuildable` is the one state that is a fact about the BINARY rather than about the corpus: the act that would discharge the clock is compiled out of this build, so the clock has no subject here whatever the corpus declared. Only the `index` clock can reach it \u2014 `index-build` is behind a feature the released binary does not carry, and every other clock measures something a `reports` build can both read and discharge. It is NOT `due`, and the difference is whether the row can ever change: a clock nothing available to the reader can discharge reads red on every run forever, which is the state two derived repositories met before this one existed (#1061) \u2014 one declined the clock to silence it and one wrote a comment into its config explaining the row. Its `remedy` is an install rather than a corpus act, and a consumer MUST NOT count it as owed. A light build holding an index pulled from elsewhere is NOT in this state: reading a `meta.json` needs no feature, so the staleness verdict there is the real one."
           },
           "interval": {
             "type": [
@@ -992,6 +1042,24 @@
     "index_present": {
       "type": "boolean",
       "description": "`status` and `index-status`. Whether `.yidam/index/` exists."
+    },
+    "computed_files": {
+      "type": "integer",
+      "description": "`status --format json` only. Files under `.yidam/computed/` that declare themselves readable — a top-level `format_version` and a `signals:` list. Zero where the directory is absent, which is every corpus that declares no calculator."
+    },
+    "computed_signals": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "`status --format json` only. Every signal name those files carry, sorted and deduplicated. A name is repository-wide: two files claiming one name is a `doctor` failure, not a namespace."
+    },
+    "computed_nodes": {
+      "type": "integer",
+      "description": "`status --format json` only. Distinct nodes at least one signal is attached to, keyed in the reference grammar."
+    },
+    "computed_unowned": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "`status --format json` only. Computed files no capability's `writes` glob covers, so nothing in the manifest accounts for them."
     },
     "active_phases": {
       "type": "integer",
@@ -1660,6 +1728,27 @@
         }
       }
     },
+    "unclaimed": {
+      "type": "array",
+      "description": "`regen --check` only. REGEN blocks whose command names no generator this binary has, so nothing writes them and `yidam regen` cannot make them current. Empty when `passed`. Read off the tracked markdown rather than off the generator list \u2014 a block nothing is pushed into is a block nothing records, which is how a misspelled marker name stayed green (#1062). Only `yidam `-prefixed commands are judged: the marker namespace is open and a derived repository's own binary writes its own blocks.",
+      "items": {
+        "type": "object",
+        "required": [
+          "file",
+          "generator"
+        ],
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "Repository-relative path of the file holding the block."
+          },
+          "generator": {
+            "type": "string",
+            "description": "The `<name>` in `<!-- REGEN: yidam <name> -->`, with the `yidam ` stripped."
+          }
+        }
+      }
+    },
     "verdict": {
       "enum": [
         "match",
@@ -1922,6 +2011,55 @@
         "conforming": {
           "type": "boolean",
           "description": "Whether every measured metric is inside its band. NOT an exit code: this command exits zero either way."
+        },
+        "coupling": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "required": [
+            "object",
+            "files",
+            "inbound",
+            "outbound",
+            "nodes",
+            "decisions",
+            "catalog"
+          ],
+          "description": "The links between the corpus and the artifact `[object] paths` declares, in both directions (RFC-0028 \u00a76, #577). Relative markdown links only, read over the tracked `.md`, `.rs` and `.ts` files the object globs claim and outside every authorship region \u2014 not `cites:`, which no derived corpus writes (Erratum 6). Null where no object is declared, and where the held kuten declares the corpus `projected`, because the projection is then the coupling. Read whether or not a kuten is held. NOT required, for the reason `suffixed_commits` gives: a CLI released before this field emits a report without it, and its output must still validate.",
+          "properties": {
+            "object": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The globs `[object] paths` declares, as read."
+            },
+            "files": {
+              "type": "integer",
+              "description": "The artifact files read: tracked, claimed by a glob, one of `.md`/`.rs`/`.ts`, and outside every authorship region."
+            },
+            "inbound": {
+              "$ref": "#/$defs/coupling_links",
+              "description": "Links from the artifact into `.yidam/`."
+            },
+            "outbound": {
+              "$ref": "#/$defs/coupling_links",
+              "description": "Links from corpus records into the artifact."
+            },
+            "nodes": {
+              "$ref": "#/$defs/coupling_reach",
+              "description": "Instance nodes under `.yidam/corpus/`."
+            },
+            "decisions": {
+              "$ref": "#/$defs/coupling_reach",
+              "description": "Decision records under `.yidam/decisions/`."
+            },
+            "catalog": {
+              "$ref": "#/$defs/coupling_reach",
+              "description": "Catalog entries under `.yidam/catalog/`."
+            }
+          }
         }
       }
     },
@@ -2303,9 +2441,10 @@
               "ok",
               "undeclared",
               "declined",
-              "unmeasurable"
+              "unmeasurable",
+              "unbuildable"
             ],
-            "description": "`due` is not a defect. A corpus with three expired sources is owed, not unhealthy \u2014 `doctor` is the report that answers whether anything is wrong. `undeclared` means this corpus set no interval, so the clock can never come due; `declined` means it set none deliberately, having decided against the thing the clock measures, and `record` names where it argued that; `unmeasurable` means it set one and there is nothing to measure against, which is a gap in bookkeeping rather than a stale subject. A consumer MUST NOT render `declined` as `undeclared`: the first is a decision and the second is its absence."
+            "description": "`due` is not a defect. A corpus with three expired sources is owed, not unhealthy \u2014 `doctor` is the report that answers whether anything is wrong. `undeclared` means this corpus set no interval, so the clock can never come due; `declined` means it set none deliberately, having decided against the thing the clock measures, and `record` names where it argued that; `unmeasurable` means it set one and there is nothing to measure against, which is a gap in bookkeeping rather than a stale subject. A consumer MUST NOT render `declined` as `undeclared`: the first is a decision and the second is its absence. `unbuildable` is the one state that is a fact about the BINARY rather than about the corpus: the act that would discharge the clock is compiled out of this build, so the clock has no subject here whatever the corpus declared. Only the `index` clock can reach it \u2014 `index-build` is behind a feature the released binary does not carry, and every other clock measures something a `reports` build can both read and discharge. It is NOT `due`, and the difference is whether the row can ever change: a clock nothing available to the reader can discharge reads red on every run forever, which is the state two derived repositories met before this one existed (#1061) \u2014 one declined the clock to silence it and one wrote a comment into its config explaining the row. Its `remedy` is an install rather than a corpus act, and a consumer MUST NOT count it as owed. A light build holding an index pulled from elsewhere is NOT in this state: reading a `meta.json` needs no feature, so the staleness verdict there is the real one."
           },
           "interval": {
             "type": [
@@ -2626,6 +2765,33 @@
     "changed_by_override": {
       "type": "integer",
       "description": "`policy test` only. Tests that failed against a rule `.yidam/policy/` replaced. A strict subset of the failures and **not** part of `failed`, so the two never double-count: `failed` is what is broken, this is what the corpus changed on purpose."
+    },
+    "query": {
+      "type": "string",
+      "description": "`count` only. The query as it was given, echoed. A number is only readable against the question it answers, and the consumer holding it — a REGEN block, a report on disk — is rarely the caller that chose the argument."
+    },
+    "matched": {
+      "type": ["integer", "null"],
+      "description": "`count` only. How many nodes satisfied the query's final step — the whole traversal, not a projected page: `--limit` bounds what is shown and never what is counted. **Null, never 0, when `rejected` is present.** A query that could not run has not counted zero of anything, and a consumer that cannot tell a diagnosis from a measurement would publish the diagnosis as a figure."
+    },
+    "rejected": {
+      "type": ["object", "null"],
+      "description": "`count` only. Why the query could not typecheck against this corpus, or null when it ran. Present-and-null rather than absent, so a consumer testing for the key cannot read `accepted` off a binary too old to say.",
+      "required": ["code", "message"],
+      "properties": {
+        "step": {
+          "type": ["integer", "null"],
+          "description": "Which step of the path the rejection is about, zero-based; null for a rejection about the query as a whole rather than one of its steps."
+        },
+        "code": {
+          "type": "string",
+          "description": "The rejection's stable identifier — `unknown-class`, `parse`, `unlicensed-hop` and the rest. A plain string rather than an enum on purpose: that vocabulary is frozen in `mcp/tools.json`, and a copy here would be a fourth place to forget."
+        },
+        "message": {
+          "type": "string",
+          "description": "The diagnosis in prose, naming what was wrong and, where the corpus affords one, the nearest name it does declare."
+        }
+      }
     }
   }
 }
