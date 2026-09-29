@@ -80,11 +80,32 @@ findings: |
   of unconstitutionality from DeRolph I and II standing over it. [verified] Whether the four
   modifications were ever implemented, once the order requiring them ceased to exist, is not
   established here and is the obvious question. [open]
+revisions:
+  - was: |
+      `signed: 2001-06-30` and `effective: 2001-07-01` — the eve of the biennium and its first
+      day, which is where most budget acts' dates fall and where this one's do not.
+    now: |
+      Signed and its appropriations effective 6 June 2001, its codified amendments 5 September,
+      with the split recorded in `effective_note`.
+    found_by: |
+      The legislature's version index for H.B. 94 of the 124th, whose enrolled entry gives both
+      dates, and LSC's enrolled analysis, whose cover gives the September one.
+    reach: |
+      Nothing read the date: no other node, crate or page cites it, and the fiscal period the act
+      funds takes its start from its own definition.
 properties:
   designation: Am. Sub. H.B. 94
   general_assembly: 124th General Assembly
-  signed: 2001-06-30
-  effective: 2001-07-01
+  signed: 2001-06-06
+  effective: 2001-06-06
+  effective_note: |
+    Two dates, and `effective` above carries the appropriation one. The appropriation sections
+    took effect on **6 June 2001**, the day the legislature's record has the act signed, and the
+    codified amendments on **5 September 2001**, ninety-one days later; some provisions took
+    effect on other dates. [verified]
+    ([the legislature's version index](../../catalog/ohio-bills.md);
+    [LSC's enrolled analysis](../../catalog/lsc-hb96-analysis.md), whose cover gives the
+    September date)
   subject: |
     Enacted the FY2002-03 operating budget and rebuilt the foundation formula in response to
     DeRolph II: base cost of $4,814 per pupil in FY2002 funded without a phase-in, derived from
@@ -99,6 +120,21 @@ properties:
     means no education provision was vetoed or only that LSC did not report them is not
     established, and the act itself is not retrievable: the legislature's version index reaches the
     122nd General Assembly and serves no text for the 124th's budget act. [open]
+  accountability_effect: |
+    The regime was rebuilt beside this act, not by it. Am. Sub. S.B. 1 of the same General Assembly
+    replaced the proficiency tests with achievement tests and the Ohio Graduation Tests, extended
+    ratings to buildings and added "excellent" as a fifth rating; H.B. 94 appropriated for it,
+    through Academic Standards and Student Assessment among other items. [verified]
+    ([greenbook](../../../crates/project/fixtures/lsc-education-greenbooks.txt))
+
+    **Its own coupling governed how a formula payment was spent, not how much.** LSC's final
+    analysis records that only "effective" districts could spend parity aid on anything; every
+    other district had to budget it in its continuous improvement plan and spend it on listed
+    purposes such as intervention, professional development or smaller classes, unless the state
+    superintendent approved another use (R.C. 3302.041). [inference] The greenbook does not
+    mention it. So a rating reached a formula dollar two years before
+    [H.B. 95](hb-95-2003.yml)'s earmarks let one set an amount; see
+    [Ohio report card](../accountability-regime/ohio-report-card.yml).
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of

@@ -68,6 +68,12 @@ properties:
   general_assembly: 133rd General Assembly
   signed: 2019-07-18
   effective: 2019-10-17
+  effective_note: |
+    Two dates, and `effective` above carries the codified one. Signed **18 July 2019**, with the
+    appropriation sections and the tax levy effective then, eighteen days into the biennium they
+    fund; most other provisions took effect on **17 October 2019**. [verified]
+    ([LSC's enrolled analysis](../../catalog/lsc-hb96-analysis.md);
+    [the legislature's version index](../../catalog/ohio-bills.md))
   subject: |
     Enacted the FY2020-21 operating budget. Ran no school funding formula: every traditional
     district and JVSD received its FY2019 foundation aid allocation in both years, with the formula

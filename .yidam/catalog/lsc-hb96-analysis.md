@@ -45,6 +45,34 @@ Separately, LSC simulations are estimates made before a fiscal year closes. They
 same quantity as a department payment report and routinely disagree with it. Never merge the
 two series.
 
+## Every act's enrolled analysis dates it, on its cover
+
+The bill analysis *as enrolled* opens with an `Effective date:` line, and for a budget act that
+line is the only place outside the enrolled act's own section-by-section clauses that says which
+half took effect when. The enrolled PDF itself cannot: it prints the governor's approval and the
+Secretary of State's filing stamp as blank templates.
+
+The same path shape serves it for older acts, with `en` for `en0` and `enrolled` for `enacted`:
+`lsc.ohio.gov/assets/legislation/{GA}/{bill}/en/files/{bill}-bill-analysis-as-enrolled-{GA}{st|nd|rd|th}-general-assembly.pdf`.
+The ordinal suffix is part of the name — `131st`, `133rd` — and a wrong one is a 404. Read 29
+September 2026 for their covers alone, and not fetched by the connector:
+
+| act | cover |
+|---|---|
+| H.B. 94, 124th | certain provisions effective September 5, 2001 |
+| H.B. 66, 126th | June 30, 2005; certain provisions September 29, 2005 |
+| H.B. 119, 127th | June 30, 2007; certain provisions September 29, 2007 |
+| H.B. 1, 128th | July 17, 2009; certain provisions October 16, 2009 |
+| H.B. 153, 129th | June 30, 2011; certain provisions September 29, 2011 |
+| H.B. 64, 131st | June 30, 2015; certain provisions September 29, 2015 |
+| H.B. 166, 133rd | July 18, 2019; most provisions October 17, 2019 |
+| H.B. 110, 134th | operating appropriations June 30, 2021; other provisions generally September 30, 2021 |
+
+H.B. 95 of the 125th has no analysis at that path: the URL answers with LSC's *Selected Issues*
+fiscal volume instead, which carries no effective date. Its dates, and H.B. 583's, come from the
+legislature's version index, recorded at [`ohio-bills`](ohio-bills.md), which agrees with every
+cover above where it has a value.
+
 ## Feeds connector
 
 [`lsc-budget`](../../crates/connect/sources/lsc-budget.md)

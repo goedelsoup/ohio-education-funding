@@ -55,11 +55,31 @@ findings: |
   [inference]
 
   44 budget lines name H.B. 95 in their `legal_basis`. [verified]
+revisions:
+  - was: |
+      `effective: 2003-09-24`, with no source recorded for it.
+    now: |
+      `effective: 2003-09-26`, with the split recorded in `effective_note`.
+    found_by: |
+      The legislature's version index for H.B. 95 of the 125th, which dates the codified
+      provisions *"09/26/03"*. The recorded date was ninety days after signing, and an Ohio act
+      takes effect on the ninety-first day after it is filed, so it could not have been right on
+      any filing date. [inference]
+    reach: |
+      Nothing read the date: no other node, crate or page cites it, and the fiscal period the act
+      funds takes its start from its own definition.
 properties:
   designation: Am. Sub. H.B. 95
   general_assembly: 125th General Assembly
   signed: 2003-06-26
-  effective: 2003-09-24
+  effective: 2003-09-26
+  effective_note: |
+    Two dates, and `effective` above carries the codified one. Signed **26 June 2003**, with the
+    appropriation sections effective then; the codified amendments took effect on
+    **26 September 2003**, and some provisions on other dates. [verified]
+    ([the legislature's version index](../../catalog/ohio-bills.md)) This is the one
+    budget act here dated from a single source: LSC's enrolled analysis is not at the path every
+    other act's is. ([LSC's enrolled analysis](../../catalog/lsc-hb96-analysis.md))
   subject: |
     Enacted the FY2004-05 operating budget. Retained the successful-schools base cost method, the
     cost of doing business factor and the 23-mill local contribution unchanged; set the formula

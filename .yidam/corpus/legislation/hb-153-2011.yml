@@ -104,6 +104,12 @@ properties:
   general_assembly: 129th General Assembly
   signed: 2011-06-30
   effective: 2011-06-30
+  effective_note: |
+    Two dates, and `effective` above carries the appropriation one. Signed **30 June 2011**, with
+    the appropriation sections effective then; the codified amendments took effect on
+    **29 September 2011**, and some provisions on other dates. [verified]
+    ([LSC's enrolled analysis](../../catalog/lsc-hb96-analysis.md);
+    [the legislature's version index](../../catalog/ohio-bills.md))
   subject: |
     Enacted the FY2012-13 operating budget. Repealed the Evidence-Based Model and replaced it
     with the Bridge formula, distributing state aid by reference to prior-year amounts with
@@ -120,6 +126,24 @@ properties:
     Worth recording precisely because of what it is not. This is the act that repealed the
     Evidence-Based Model and installed the Bridge formula, and none of that was vetoed: the largest
     structural change in the class passed entire.
+  accountability_effect: |
+    **It paid on a rating, and on success.** Districts and community schools rated Excellent or
+    Excellent with Distinction received an extra $17 times current-year ADM in FY2012 and FY2013,
+    and H.B. 59 then wrote this high performance subsidy into its guarantee base. [verified]
+    ([greenbook](../../../crates/project/fixtures/lsc-education-greenbooks.txt)) The census of
+    rating-driven payments in [Ohio report card](../accountability-regime/ohio-report-card.yml)
+    searches four terms, none of which is this subsidy's name, and so counts FY2012-13 among the
+    bienniums with none; the two cannot both stand. [open]
+
+    It also keyed consequences to a statewide performance index ranking rather than to a rating
+    alone: a district school in the lowest 5% for three consecutive years and in academic watch or
+    emergency must close, be contracted out, be restaffed or convert; EdChoice eligibility extended
+    to buildings in the lowest 10%; and core-subject teachers in the lowest ten percentiles must
+    retake licensure tests. Teacher evaluations became 50% student academic growth and govern
+    retention and removal. A community school offering no grade above 3, or any of 10 to 12, now
+    closes after academic emergency in two of three years, and the State Board lost its authority
+    to revoke a district's charter under H.B. 1's standards. [verified]
+    ([greenbook](../../../crates/project/fixtures/lsc-education-greenbooks.txt))
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of

@@ -126,7 +126,8 @@ findings: |
   aid by a guarantee, with prescribed increases above FY2025 halved. Contemporaneous analysis
   reports its foundation increases FY2025 → FY2027 as $179m (2.2%) for traditional districts, $80m
   (6.3%) for community schools and $38m (7.6%) for JVSDs — $297m against the executive proposal's
-  $149m. [verified] ([`fordham-house-bridge-commentary`](../../catalog/fordham-house-bridge-commentary.md),
+  $149m. [verified]
+  ([`fordham-house-bridge-commentary`](../../catalog/fordham-house-bridge-commentary.md),
   whose implied FY2025 bases of $8,136m, $1,270m and $500m sit on the greenbook's $8,117.9m,
   $1,270.3m and $497.2m, which is what makes the two stages comparable rather than two different
   years)
@@ -190,6 +191,19 @@ revisions:
     reach: |
       The class had no way to say "two dates", so the ontology gains `effective_note`. Every Ohio
       budget act has the same split and the corpus holds several.
+  - was: |
+      `effective_note` said "every section this corpus reads from the act is dated
+      30 September 2025", and the revision above repeats it.
+    now: |
+      Every R.C. 3317 section is. R.C. 3302.03, the report card section, is dated 30 June 2025.
+    found_by: |
+      Reading the source line of every section in `crates/project/fixtures/revised-code.txt`
+      rather than the chapter the note was about. R.C. 3302.03 had been committed two weeks before
+      the note was written.
+    reach: |
+      The date on the node is unchanged, because it follows the formula's sections. The
+      correction reaches the accountability side: the act's change to the report card was in
+      force for the whole of FY2026, not from October.
 properties:
   designation: Am. Sub. H.B. 96
   general_assembly: 136th General Assembly
@@ -198,9 +212,16 @@ properties:
   effective_note: |
     Two dates, and the node carried the wrong one for both. The appropriation sections took
     effect on signing, 30 June 2025; the amendments to R.C. 3317 took effect ninety days later,
-    and every section this corpus reads from the act is dated **30 September 2025** in
+    and every R.C. 3317 section this corpus reads from the act is dated **30 September 2025** in
     `crates/project/fixtures/revised-code.txt`. `effective` is the codified date because that is
     what the sections the formula is read from carry. [verified]
+
+    One section the corpus reads from the act is not. R.C. 3302.03, the report card, is dated
+    **30 June 2025**, the signing date, with this act as its source. [verified]
+    ([`crates/project`](../../../crates/project/fixtures/revised-code.txt)) The enrolled act's
+    Section 820.20 names it among the sections exempt from the referendum and effective when the
+    act became law, so that amendment took effect with the appropriations rather than with the
+    formula. [inference]
   subject: |
     Enacted the FY2026-27 operating budget. Continued the Fair School Funding Plan formula at a
     phase-in of 83.33% in FY2026 and 100% in FY2027 while carrying forward FY2022 base cost
@@ -219,6 +240,25 @@ properties:
     [H.B. 1](hb-1-2009.yml)'s EdChoice eligibility route and [H.B. 110](hb-110-2021.yml)'s
     conditional-approval scholarships — and the first that would have run outside the chartered
     system entirely. Which of the other 66 touched school funding is still not established. [open]
+  accountability_effect: |
+    **It coupled a formula dollar to a rating again:** the
+    [performance supplement](../formula-component/fsfp-performance-supplement.yml), paid on star
+    ratings. [verified]
+    ([the enacted analysis](../../../crates/project/fixtures/enacted-school-funding.txt))
+
+    It also amended the report card. R.C. 3302.03's early literacy promotion measure now counts
+    only pupils promoted on the third grade English language arts assessment or an alternative
+    assessment, and kindergarten readiness data leave the card. [verified]
+    ([revised code](../../../crates/project/fixtures/revised-code.txt)) That amendment took effect
+    in June, as `effective_note` records, so it governed the report card due that September.
+    [inference]
+
+    It codified the Community School of Quality payment, whose designation reads report card
+    ratings [verified]; required the State Board to approve a territory transfer out of a district
+    rated below two stars two years running [inference] (LSC's final analysis); and earmarked
+    nothing for academic distress commissions, against $1.3m spent in FY2025. [verified]
+    ([greenbook](../../../crates/project/fixtures/dew-greenbook.txt)) It amended neither R.C.
+    3302.10 nor R.C. 3310.03. [verified]
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of

@@ -57,6 +57,13 @@ properties:
   general_assembly: 131st General Assembly
   signed: 2015-06-30
   effective: 2015-09-29
+  effective_note: |
+    Two dates, and `effective` above carries the codified one. Signed **30 June 2015**, with the
+    appropriation sections effective then; the codified amendments took effect on
+    **29 September 2015**, and some provisions on other dates. [verified]
+    ([LSC's enrolled analysis](../../catalog/lsc-hb96-analysis.md)) The
+    legislature's version index returns every date field empty for this act, so the analysis is
+    the only source. ([the legislature's version index](../../catalog/ohio-bills.md))
   subject: |
     Enacted the FY2016-17 operating budget. Kept H.B. 59's state share index and Opportunity Grant,
     added capacity aid, graduation and third-grade reading bonuses, and a transportation

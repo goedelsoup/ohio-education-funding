@@ -76,6 +76,10 @@ properties:
   general_assembly: 134th General Assembly
   signed: 2022-06-24
   effective: 2022-09-23
+  effective_note: |
+    Two dates, though this is not a budget act: its appropriations took effect on signing,
+    **24 June 2022**, and the rest on **23 September 2022**, which `effective` above carries.
+    [verified] ([the legislature's version index](../../catalog/ohio-bills.md))
   subject: |
     Made corrective and technical changes to the Fair School Funding Plan enacted by Am. Sub.
     H.B. 110, incorporated into the FY2022 calculations. Reprinted **13** sections of R.C. 3317
@@ -88,6 +92,20 @@ properties:
     text as presented to the Governor, and a line-item veto is exercised after that. The act does
     make an appropriation, so it was vetoable. Settling it needs this act's own LSC final analysis,
     which is a second document and not the one now held. [open]
+  accountability_effect: |
+    **Each of its accountability provisions is about community schools, lasts one school year, and
+    holds a rating's consequence off.** Section 17 let a community school that its 2021-22 report
+    card brought under R.C. 3314.034(A) contract with a new sponsor for 2022-23 without that
+    section's conditions; Section 18 gave 2021-22 sponsor ratings no effect on a sponsor's
+    sanctions, penalties or revocation; and division (E) of H.B. 110's section 265.335 kept a school
+    first designated a Community School of Quality for 2019-20, with its up to $1,750 per
+    economically disadvantaged pupil, designated through 2022-23. [verified]
+    ([the enrolled act](../../../crates/project/fixtures/hb583-corrections.txt)) That (E) is this
+    act's addition rests on the enrolled H.B. 110, which does not carry it. [inference]
+
+    Section 17 is close to the sponsor provision [H.B. 110](hb-110-2021.yml) passed and the Governor
+    vetoed, widened beyond schools serving mostly pupils with disabilities. [inference] The act
+    amends no section of R.C. Chapter 3302 and not R.C. 3310.03. [verified]
 figures:
   - key: project/hb583-sections-of-chapter-3317-reprinted
     value: 13
