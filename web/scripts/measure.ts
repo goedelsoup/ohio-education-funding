@@ -34,9 +34,10 @@
  * later redesign phase fills in one entry of `THRESHOLDS` and this flag starts biting.
  */
 
-import { existsSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { chromium } from "@playwright/test";
+import { parseHTML } from "linkedom";
 import { serveDist } from "./serve-dist.ts";
 import {
   BOX_MIN_RADIUS,
@@ -46,6 +47,7 @@ import {
   THRESHOLDS,
   WIDTHS,
   collect,
+  countWikiToData,
   formatReport,
   violations,
   type Measured,
@@ -112,13 +114,37 @@ try {
 }
 
 /*
+ * wikiToData walks every page in the build, not the eight in ROUTES — the question is whether the
+ * corpus as a whole ever points a reader at a data view, and eight routes can only answer that for
+ * themselves. Parsed with `linkedom` rather than opened in the browser above: 274 pages is 274
+ * page loads for a boolean apiece, and the question is which links a page's markup carries, which
+ * a parse answers exactly as well as a render does.
+ */
+function* htmlFiles(dir: string): Generator<string> {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) yield* htmlFiles(path);
+    else if (entry.name.endsWith(".html")) yield path;
+  }
+}
+
+const wikiPages = [...htmlFiles(DIST)]
+  .filter((path) => path.startsWith(join(DIST, "wiki")))
+  .map((path) => {
+    const html = readFileSync(path, "utf-8");
+    const { document } = parseHTML(html);
+    return { path: `/${path.slice(DIST.length + 1)}`, main: document.querySelector("main") };
+  });
+const wikiToData = countWikiToData(wikiPages);
+
+/*
  * The clock is read once, here, rather than inside the collector.
  *
  * A report is a thing two runs get diffed against each other, and a timestamp taken per row would
  * make every row differ. This is also the only non-deterministic value in the output, which is
  * worth knowing when the JSON is committed or compared.
  */
-const report: Report = { measuredAt: new Date().toISOString(), rows };
+const report: Report = { measuredAt: new Date().toISOString(), rows, wikiToData };
 
 console.log(formatReport(report));
 
