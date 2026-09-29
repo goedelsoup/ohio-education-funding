@@ -230,8 +230,13 @@ export interface OntologyClass {
 export interface Source {
   slug: string;
   title: string;
-  /** The whole markdown body, minus the leading `# ` heading. */
+  /** The whole markdown body, minus the frontmatter and the leading `# ` heading. */
   body: string;
+  /**
+   * The entry's `used-by` frontmatter, verbatim: paths relative to `catalog/`. Kept by `yidam
+   * catalog-reconcile` rather than by hand; null when the entry declares none.
+   */
+  usedBy: string[] | null;
   /** Nodes that cite this source. */
   citedBy: { id: string; label: string; href: string }[];
 }
@@ -831,14 +836,26 @@ function readClass(file: string, report: Diagnostic[]): Omit<OntologyClass, "nod
   };
 }
 
+/**
+ * One catalog entry, its YAML frontmatter separated from the prose.
+ *
+ * The frontmatter is data and never renders: left in the body it reached the page as a paragraph
+ * of `used-by: - ../corpus/…`. Only `used-by` is kept, and only so a test can hold it against
+ * {@link Source.citedBy}.
+ */
 function readSource(file: string): Source {
-  const body = readFileSync(join(CATALOG, file), "utf8");
+  const raw = readFileSync(join(CATALOG, file), "utf8");
+  const front = raw.match(/^---\n([\s\S]*?)\n---\n/);
+  const meta = (front ? YAML.parse(front[1]!) : null) as Record<string, unknown> | null;
+  const body = front ? raw.slice(front[0].length) : raw;
   const slug = file.replace(/\.md$/, "");
   const heading = body.match(/^#\s+(.+)$/m);
+  const usedBy = meta?.["used-by"];
   return {
     slug,
     title: heading?.[1]?.trim() ?? slug,
     body: heading ? body.replace(heading[0], "").trim() : body.trim(),
+    usedBy: Array.isArray(usedBy) ? usedBy.map(String) : null,
     citedBy: [],
   };
 }
