@@ -39,7 +39,6 @@ pub mod cpi;
 pub mod fixtures;
 pub mod forecast;
 pub mod html;
-pub mod index;
 pub mod json;
 pub mod registry;
 pub mod sha256;

@@ -18,8 +18,9 @@
 //! # What survives
 //!
 //! The industrial reading stays refuted and the capacity-aid finding stays standing — see
-//! `what_fell_out_of_the_state_column.rs`, which is rewritten onto the corrected basis rather
-//! than deleted, because the two withdrawals are different and only one of them was this module's.
+//! `xcheck/tests/what_fell_out_of_the_state_column.rs`, which is rewritten onto the corrected basis
+//! rather than deleted, because the two withdrawals are different and only one of them was this
+//! module's.
 
 use dispersion::survey_basis::{self, Basis};
 

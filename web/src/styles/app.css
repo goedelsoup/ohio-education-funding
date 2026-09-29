@@ -2085,7 +2085,7 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
   padding: .08rem .28rem;
   border-radius: var(--radius-sm);
   font-size: .9em;
-  /* The corpus cites code by path — `crates/dispersion/tests/report_card_2425.rs` — which is one
+  /* The corpus cites code by path — `crates/xcheck/tests/report_card_2425.rs` — which is one
      unbreakable token wider than a phone. Without this it pushes the whole document sideways. */
   overflow-wrap: anywhere;
 }

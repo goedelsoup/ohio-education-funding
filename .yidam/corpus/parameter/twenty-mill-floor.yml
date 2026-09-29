@@ -50,7 +50,7 @@ findings: |
   R.C. 319.301(D) states the floor as a guarantee of what twenty mills would raise, so a
   district already below twenty is under the guarantee before any reduction and none applies.
   The published data settles it: all six report voted and effective rates equal to four
-  decimals. [verified] Fixed, with `crates/millage/tests/against_published_tables.rs` holding
+  decimals. [verified] Fixed, with `crates/xcheck/tests/against_published_tables.rs` holding
   the crate to 1,218 published district-years.
 
   **How many districts sit at the floor: 170 of 606, or 28.1%, in TY2023.** [verified]

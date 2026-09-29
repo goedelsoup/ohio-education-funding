@@ -1,0 +1,36 @@
+[package]
+name = "xcheck"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+description = "Tests that hold one crate against another's fixtures, at the top of the graph"
+
+# Test-only: the library is empty, and every dependency is a dev-dependency so nothing that
+# depends on this crate could ever pull the model in. Each test here used to live in the crate
+# it checks and reached the crate it checks against as a dev-dependency — four of which sat
+# above the crate under test, so Cargo compiled the leaf twice and `cargo test -p dispersion`
+# built `project` (#501). From here every arrow points down.
+[dev-dependencies]
+dispersion = { path = "../dispersion" }
+edfund-core = { path = "../edfund-core" }
+# For `report_card_2425.rs`, which splits the report card on the FY2027 guarantee. The model is
+# `foundation`'s fixture, so its reader is `foundation`'s; the test was carrying a third parser
+# of it.
+foundation = { path = "../foundation" }
+local-capacity = { path = "../local-capacity" }
+# Table SD-1 and the District Profile Report are `dispersion`'s fixtures, and
+# `against_published_tables.rs` is where `millage` is checked against them. It used to reach
+# across the boundary with `include_str!` and its own column tables; see issue #157.
+millage = { path = "../millage" }
+# For `what_fell_out_of_the_state_column.rs`, which checks the FY2016 finding against the words
+# LSC used for capacity aid. The greenbooks are `project`'s fixture and its reader is
+# `project`'s; the alternative was a fourth copy of the flattening. And for
+# `against_the_departments_own_capacity.rs`, which derives `local-capacity`'s inputs from the
+# panel.
+project = { path = "../project" }
+
+[lints]
+workspace = true

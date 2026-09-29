@@ -103,7 +103,8 @@ findings: |
 
   ### The calculator reproduces the department's figure exactly
 
-  [verified] (`crates/local-capacity/tests/against_the_departments_own_capacity.rs`)
+  [verified] (`crates/local-capacity`, in
+  `crates/xcheck/tests/against_the_departments_own_capacity.rs`)
   `crates/local-capacity` was written from the statute and had never been run against anything.
   It is right.
 
@@ -132,7 +133,8 @@ findings: |
   constants come back **exactly**: the median of the 609 district medians is **$54,546.6375**,
   which is `[I7]` to the last digit, and the fortieth-highest ratio is **Westlake City's
   1.46503636**, which is `[C5]`. [verified]
-  (`crates/local-capacity/tests/against_the_departments_own_capacity.rs`)
+  (`crates/local-capacity`, held to the department's figures in
+  `crates/xcheck/tests/against_the_departments_own_capacity.rs`)
 
   So nothing in this measure is a number anybody chooses, and the entry above recording `[I7]` as
   "published rather than derivable" and `[C5]` as discretionary was a wrong input read as a fact
@@ -298,7 +300,8 @@ findings: |
   The rule therefore never charges a district on the higher of its two measures. That makes it
   a floor on the state's share wearing the clothes of a smoothing device, and the asymmetry is
   invisible in any one district's figures. [verified]
-  (`crates/local-capacity/tests/against_the_departments_own_capacity.rs`)
+  (`crates/local-capacity`, held to the department's figures in
+  `crates/xcheck/tests/against_the_departments_own_capacity.rs`)
 
   **And it is the charge-off's instinct in a new device.** The mechanism this replaced also
   lagged revaluation, through [recognized
@@ -662,7 +665,7 @@ revisions:
       3317.017(A)(4) defines them: the median of the 609 is **$54,546.6375** and the fortieth
       highest ratio is **Westlake City's 1.46503636**. Neither is a number anybody sets.
     found_by: |
-      `crates/local-capacity/tests/against_the_departments_own_capacity.rs`, which derives both
+      `crates/xcheck/tests/against_the_departments_own_capacity.rs`, which derives both
       from the panel and checks them against the published figures.
     reach: |
       The failed reconstruction was run on the Ohio median income column rather than the federal
@@ -761,7 +764,7 @@ revisions:
       published inputs the residual is zero.
     found_by: |
       The `Local_Capacity` sheet of the FY2027 calculator, reproduced in
-      `crates/local-capacity/tests/against_the_departments_own_capacity.rs` for 609 of 609
+      `crates/xcheck/tests/against_the_departments_own_capacity.rs` for 609 of 609
       districts.
     reach: |
       The 4.4% gap the corpus had been carrying was not a finding about the measure — it was

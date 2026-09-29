@@ -24,7 +24,7 @@ per IRN, in one workbook. Every other Ohio spending comparison has to choose a d
 defend it; this file lets both be computed and the difference measured. It is what converted the
 corpus's objection to
 [OCG White Paper 013](ocg-white-paper-013.md) from an argument into
-[a test](../../crates/dispersion/tests/report_card_2425.rs): correlating the Performance Index
+[a test](../../crates/xcheck/tests/report_card_2425.rs): correlating the Performance Index
 against the same expenditures divided by the two counts gives −0.015 and −0.337.
 
 **Access constraints.** Freely available, no registration. XLSX.

@@ -32,7 +32,7 @@
 //! a hand-written connector table claiming nine connectors and three wired while the registry held
 //! thirteen and eleven; `crates/README.md` described the same nine in prose. Neither was reachable
 //! by the guard, because the guard reads markers. The table is now a `connector-registry` block,
-//! generated from [`crate::registry::CONNECTORS`] itself.
+//! generated from [`connect::registry::CONNECTORS`] itself.
 
 use std::collections::BTreeMap;
 use std::fs;
@@ -587,8 +587,8 @@ fn catalog_audit(root: &Path) -> String {
     entries.sort();
 
     // Sources whose bytes are pinned by digest, which is a stronger claim than being catalogued.
-    let manifest = read(root, crate::cache::MANIFEST);
-    let pinned = crate::cache::parse_manifest(&manifest).len();
+    let manifest = read(root, connect::cache::MANIFEST);
+    let pinned = connect::cache::parse_manifest(&manifest).len();
 
     let mut out = String::from("| Entry | Title | Cited by |\n|---|---|--:|\n");
     for (slug, title, cited) in &entries {
@@ -774,7 +774,7 @@ fn repository_overview(root: &Path) -> String {
 ///
 /// So the two are counted apart, on the status the registry already carries.
 fn retrieval_status(root: &Path) -> String {
-    use crate::registry::{Status, CONNECTORS};
+    use connect::registry::{Status, CONNECTORS};
 
     let wired = CONNECTORS.iter().filter(|c| c.status.is_wired()).count();
     let named = |keys: Vec<&'static str>| {
@@ -803,7 +803,7 @@ fn retrieval_status(root: &Path) -> String {
         .filter(|c| matches!(c.status, Status::Parsed))
         .map(|c| c.key)
         .collect();
-    let pinned = crate::cache::parse_manifest(&read(root, crate::cache::MANIFEST)).len();
+    let pinned = connect::cache::parse_manifest(&read(root, connect::cache::MANIFEST)).len();
 
     let mut out = format!(
         "{} connectors, {wired} wired, and {pinned} published files pinned by SHA-256. The {} \
@@ -853,7 +853,7 @@ fn claim_totals(root: &Path) -> String {
     )
 }
 
-/// The connector table, from [`crate::registry::CONNECTORS`] rather than from memory.
+/// The connector table, from [`connect::registry::CONNECTORS`] rather than from memory.
 ///
 /// This block exists because the hand-written table it replaced said nine connectors, three of
 /// them wired, at a point when the registry held thirteen and eleven. It had gone stale in every
@@ -866,7 +866,7 @@ fn claim_totals(root: &Path) -> String {
 /// DeRolph titles made, where rewording a comment silently rewrote committed data. The notes stay
 /// in the registry and the long form stays in `sources/`, both linked, neither transcribed.
 fn connector_registry(root: &Path) -> String {
-    use crate::registry::{Status, CONNECTORS};
+    use connect::registry::{Status, CONNECTORS};
 
     let mut out = String::from("| Connector | Status | Sources | Feeds |\n|---|---|--:|---|\n");
     let mut undocumented = Vec::new();
@@ -1353,7 +1353,7 @@ fn rewrite(root: &Path, write: bool) -> Result<Vec<String>, IndexError> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::cache::repository_root;
+    use connect::cache::repository_root;
 
     /// A tracked document's text, insisting the document exist.
     ///
@@ -1821,7 +1821,7 @@ mod tests {
         // would have gone on reading correctly if one were freed.
         let root = repository_root();
         let sentence = retrieval_status(&root);
-        for connector in crate::registry::CONNECTORS {
+        for connector in connect::registry::CONNECTORS {
             let named = sentence.contains(&format!("`{}`", connector.key));
             assert_eq!(
                 named,
@@ -1853,14 +1853,14 @@ mod tests {
     #[test]
     fn the_connector_table_reports_every_connector_and_its_real_status() {
         let table = connector_registry(&repository_root());
-        for connector in crate::registry::CONNECTORS {
+        for connector in connect::registry::CONNECTORS {
             assert!(
                 table.contains(&format!("`{}`", connector.key)),
                 "{} is missing from the table",
                 connector.key
             );
         }
-        let wired = crate::registry::CONNECTORS
+        let wired = connect::registry::CONNECTORS
             .iter()
             .filter(|c| c.status.is_wired())
             .count();
@@ -1875,9 +1875,9 @@ mod tests {
         // A blocker that is summarised is a blocker nobody rechecks. Four of them sat stale for
         // twelve phases behind prose that read plausibly, so the string a test guards for length
         // is the string the reader gets.
-        use crate::registry::Status;
+        use connect::registry::Status;
         let table = connector_registry(&repository_root());
-        for connector in crate::registry::CONNECTORS {
+        for connector in connect::registry::CONNECTORS {
             let reason = match connector.status {
                 Status::Declared { blocked_on } => blocked_on,
                 Status::Wired {

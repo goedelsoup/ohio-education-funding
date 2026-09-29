@@ -102,7 +102,7 @@ findings: |
   ### The sign of the spending relationship depends on which outcome is asked
 
   [verified] (computed; see
-  [`crates/dispersion/tests/report_card_2425.rs`](../../../crates/dispersion/tests/report_card_2425.rs))
+  [`crates/xcheck/tests/report_card_2425.rs`](../../../crates/xcheck/tests/report_card_2425.rs))
 
       per-pupil spending (headcount denominator) against...
                                           raw      holding disadvantage constant

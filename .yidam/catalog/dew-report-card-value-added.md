@@ -28,7 +28,7 @@ The measures behave completely differently against the same spending variable:
 | the same, holding disadvantage constant | **−0.125** | **+0.146** |
 
 The sign flips. [verified — see
-[`crates/dispersion/tests/report_card_2425.rs`](../../crates/dispersion/tests/report_card_2425.rs)]
+[`crates/xcheck/tests/report_card_2425.rs`](../../crates/xcheck/tests/report_card_2425.rs)]
 
 **Use the effect size, not the composite.** `Overall Composite` is a precision-scaled statistic —
 a gain over its standard error — so it grows with the number of tested students and correlates

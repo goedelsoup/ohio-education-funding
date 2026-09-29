@@ -194,7 +194,7 @@ jobs:
       # checkout is clean, and fails against any dirty tree — so the same command could not be
       # used by the local gate that actually runs, and the two would drift.
       - name: The README indexes
-        run: cargo run --manifest-path crates/Cargo.toml -p connect --bin edfund-connect -- index --check
+        run: cargo run --manifest-path crates/Cargo.toml -p edfund-connect -- index --check
 
   # The corpus's own gate: `yidam lint`, against the baseline ratchet in `.yidam/`.
   #

@@ -46,8 +46,8 @@
 //! their median and the benchmark is the fortieth highest ratio among them, so each moves
 //! whenever the income distribution moves and no vote is taken. Both are passed in here rather
 //! than derived, because this crate computes one district at a time and neither is a property of
-//! one district — `tests/against_the_departments_own_capacity.rs` derives them from the panel and
-//! checks them against the department's published figures.
+//! one district — `xcheck/tests/against_the_departments_own_capacity.rs` derives them from the
+//! panel and checks them against the department's published figures.
 
 #![forbid(unsafe_code)]
 
@@ -178,7 +178,7 @@ pub struct CapacityInputs {
     /// against an Ohio median of $31,555, and substituting one for the other leaves the whole
     /// blend about 4% light. Fed the real figure, this crate reproduces the department's own
     /// capacity for all 609 districts exactly — worst residual 6.364e-6, pinned by
-    /// `tests/against_the_departments_own_capacity.rs`.
+    /// `xcheck/tests/against_the_departments_own_capacity.rs`.
     pub federal_median_income: Dollars,
     /// Number of tax returns filed in the district for the income reference year.
     pub tax_returns: f64,
@@ -353,7 +353,7 @@ pub fn benchmark_ratio(district_medians: &[Dollars], statewide_median: Dollars) 
 ///
 /// In the FY2027 model the split is **602 districts on the lagged branch and 7 on the immediate
 /// one** — the seven whose valuation actually fell. See
-/// `tests/against_the_departments_own_capacity.rs`.
+/// `xcheck/tests/against_the_departments_own_capacity.rs`.
 ///
 /// # And the Fair School Funding Plan is doing what the charge-off did, by another device
 ///
