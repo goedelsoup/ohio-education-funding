@@ -161,7 +161,8 @@ properties:
     it must compute over, and missing from the corpus for as long as that stub has existed.
     [inference]
   name: Jon Peterson Special Needs Scholarship Program
-  mechanism: |
+  mechanism: funding-unit
+  mechanism_note: |
     **Direct payment as its own funding unit. Not a deduction.** [verified]
 
     R.C. 3317.022 directs the department to compute and distribute state core foundation funding

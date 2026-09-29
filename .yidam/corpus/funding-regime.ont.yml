@@ -31,7 +31,8 @@ properties:
   - name: status
     type: string
     required: true
-    description: current | superseded | partially-implemented | never-fully-funded
+    values: [current, superseded, partially-implemented, never-fully-funded]
+    description: Whether the regime is in force, replaced, or enacted and never carried through in full
   - name: boundary_note
     type: text
     required: false

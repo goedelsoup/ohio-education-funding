@@ -94,7 +94,8 @@ properties:
     programs' scale should be read: it was designed as a targeted intervention in one distressed
     district, and what grew from it was universal eligibility statewide. [inference]
   name: Cleveland Scholarship and Tutoring Program
-  mechanism: |
+  mechanism: funding-unit
+  mechanism_note: |
     **Direct payment as the pilot project scholarship unit. Not a deduction.** [verified]
     (R.C. 3317.022, R.C. 3313.975)
 

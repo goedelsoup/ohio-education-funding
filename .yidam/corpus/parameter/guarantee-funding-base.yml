@@ -276,11 +276,11 @@ properties:
     the figure is a per-district observation carried forward from FY2020. It changes only if an
     act re-bases it, which has not happened. [inference] (the taxonomy is
     [`the-four-kinds-of-parameter`](../../decisions/the-four-kinds-of-parameter.yml))
-  unit: dollars-per-district, nominal and unindexed. [verified]
+  unit: dollars
   statutory_basis: R.C. 3317.019, which names the guarantee without stating the base. [verified]
   series: |
-    One value per district rather than one per fiscal period, and it has held at the FY2020 level
-    in every year since — FY2022 through FY2027, across three biennial budgets, unchanged.
+    Dollars per district, nominal and unindexed. [verified] One value per district rather than one
+    per fiscal period, and it has held at the FY2020 level in every year since — FY2022 through FY2027, across three biennial budgets, unchanged.
     [verified] Carried per district in `crates/project::panel::Transition` and reproduced for all
     609 in `crates/project/tests/the_supplements_outside_the_formula.rs`.
   written_as: |

@@ -332,6 +332,43 @@ test("an ontology property missing required is rejected", () => {
   expect(OntologyClassSchema.safeParse(withProperty({ required: "yes" })).success).toBe(false);
 });
 
+test("an ontology property's values are a non-empty list of tokens", () => {
+  const withProperty = (property: object) => ({
+    class: "metric",
+    label: "Metric",
+    description: "A measure.",
+    edge_policy: "characteristic",
+    properties: [
+      { name: "unit", type: "string", required: true, description: "The unit.", ...property },
+    ],
+    edges: [],
+  });
+  expect(OntologyClassSchema.safeParse(withProperty({})).success).toBe(true);
+  expect(OntologyClassSchema.safeParse(withProperty({ values: ["dollars", "mills"] })).success).toBe(
+    true,
+  );
+  // Upstream reads an empty set as no set, so writing one would look like a closure and be none.
+  expect(OntologyClassSchema.safeParse(withProperty({ values: [] })).success).toBe(false);
+  // The pipe-list this field replaced, pasted in whole.
+  expect(OntologyClassSchema.safeParse(withProperty({ values: "dollars | mills" })).success).toBe(
+    false,
+  );
+});
+
+test("no string property spells a closed value set in its description", () => {
+  // Ten did, and nothing read the list: three had drifted off it, `program.mechanism` into five
+  // paragraphs of tagged prose. yidam gates a declared `values:`; a pipe-list gates nothing, so
+  // one written here is a closed set nobody will hold an instance to.
+  const pipeList = /^[\w-]+( \| [\w-]+)+/;
+  const described = loadCorpus()
+    .classes.flatMap((c) => c.properties.map((p) => ({ ...p, at: `${c.className}.${p.name}` })))
+    .filter((p) => p.type === "string" && pipeList.test(p.description))
+    .map((p) => p.at);
+  expect(described).toEqual([]);
+  const declared = loadCorpus().classes.flatMap((c) => c.properties.filter((p) => p.values));
+  expect(declared).toHaveLength(10);
+});
+
 test("the corpus is clean under the policy it declares", () => {
   // The point of stating the policy: what is left is signal. 46 undeclared relationships were
   // noise against an unstated assumption; the four undeclared properties were real omissions and

@@ -18,7 +18,8 @@ properties:
   - name: institution_type
     type: string
     required: true
-    description: legislature | court | executive-agency | commission | legislative-agency
+    values: [legislature, court, executive-agency, commission, legislative-agency]
+    description: What kind of body the institution is
   - name: established
     type: date
     required: true

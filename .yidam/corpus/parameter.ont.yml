@@ -19,7 +19,10 @@ properties:
   - name: unit
     type: string
     required: true
-    description: dollars-per-pupil | ratio | mills | percent | count
+    values: [dollars-per-pupil, dollars, ratio, mills, percent, count]
+    description: >-
+      What one value of the parameter is measured in. `dollars` is an amount no count multiplies —
+      a per-district base, for one
   - name: kind
     type: text
     required: true

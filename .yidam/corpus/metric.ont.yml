@@ -18,7 +18,10 @@ properties:
   - name: unit
     type: string
     required: true
-    description: dollars | dollars-per-pupil | percent | mills | ratio | index
+    values: [dollars, dollars-per-pupil, percent, mills, ratio, index, pupils]
+    description: >-
+      What one value of the metric is measured in. `pupils` is a membership, full-time-equivalent
+      and fractional, and not a count
   - name: definition
     type: text
     required: true

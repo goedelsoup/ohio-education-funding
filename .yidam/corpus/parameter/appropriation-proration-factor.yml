@@ -417,7 +417,7 @@ revisions:
       published proration factor is not evidence that a proration applied.
 properties:
   name: Appropriation proration factor
-  unit: fraction of the computed entitlement
+  unit: ratio
   kind: |
     **Uncodified, and the taxonomy cannot decide whether it is also delegated — which is a
     sharper statement of this node's open question than the node had.**

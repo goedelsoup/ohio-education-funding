@@ -19,7 +19,8 @@ properties:
   - name: level
     type: string
     required: true
-    description: local | state | federal
+    values: [local, state, federal]
+    description: The level of government the money comes from
   - name: legal_basis
     type: string
     required: true
