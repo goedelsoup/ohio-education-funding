@@ -22,16 +22,10 @@ use edfund_core::FiscalYear;
 use project::finances::{finances, for_district, Finances};
 use project::panel::panel;
 
-/// A statewide total is the sum over the districts that reported the line.
-///
-/// An unreported figure is skipped rather than added as zero. Arithmetically identical and a
-/// different claim, and the difference is the whole of `project::finances::INCOMPLETE`.
+/// A statewide total, over the districts that reported the line — see
+/// `project::finances::statewide`.
 fn statewide(year: u16, pick: impl Fn(&project::finances::YearRecord) -> Option<f64>) -> f64 {
-    finances()
-        .iter()
-        .filter_map(|f| f.year(FiscalYear(year)))
-        .filter_map(&pick)
-        .sum()
+    project::finances::statewide(FiscalYear(year), pick).1
 }
 
 #[test]

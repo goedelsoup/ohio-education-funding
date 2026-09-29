@@ -60,6 +60,18 @@ properties:
     [dew-october-enrollment](../../catalog/dew-october-enrollment.md) publishes headcount by
     individual grade, which is a **different measure** — a head count on one October day, not an
     average over the year — and the two must not be substituted for one another.
+  series: |
+    Statewide enrolled ADM over all 611 districts the department publishes it for, FY2023-FY2026,
+    from the two calculators' overlapping three-year windows, taking the later workbook's
+    restatement where both publish a year [verified] (`crates/project/src/counts.rs`):
+
+      FY2023   1,462,690
+      FY2024   1,439,668
+      FY2025   1,423,263
+      FY2026   1,401,939
+
+    It falls in every year. [verified] The total is over 611 districts, two more than the 609 the
+    FY2027 model pays.
   caveats: |
     **The years are labelled twice in the workbook, and once wrongly.** The `Base_Cost` sheet
     carries the same three columns cell-for-cell under headers reading FY2022/FY2023/FY2024;
@@ -473,6 +485,22 @@ revisions:
       horizon. Nothing bound moves: the arithmetic of the 1.43-year carry, the guarantee shares by
       quarter and the statewide FY2036 figures are all as they were.
 figures:
+  - key: project/statewide-enrolled-adm-fy2023
+    value: 1462689.7557849986
+    field: series
+    as_written: "FY2023   1,462,690"
+  - key: project/statewide-enrolled-adm-fy2024
+    value: 1439668.1630159982
+    field: series
+    as_written: "FY2024   1,439,668"
+  - key: project/statewide-enrolled-adm-fy2025
+    value: 1423262.958420001
+    field: series
+    as_written: "FY2025   1,423,263"
+  - key: project/statewide-enrolled-adm-fy2026
+    value: 1401939.3881840003
+    field: series
+    as_written: "FY2026   1,401,939"
   - key: project/adm-growth-persistence-earlier-window
     value: 0.3279304724735254
     field: findings

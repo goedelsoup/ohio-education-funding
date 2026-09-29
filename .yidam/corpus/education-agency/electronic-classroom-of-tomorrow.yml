@@ -107,9 +107,18 @@ findings: |
   editions where **0.60554 of schools that opened were still open after ten years**, and the median
   closed school lasted five. [verified] (crates/dispersion)
 
-  It opened in 2000 and closed in January 2018, but neither the charter date nor the closure
-  date is established to the day, so the node carries no `established` date — the class
-  declares that property a `date`, and a year is not one. [open]
+  ECOT was incorporated on February 11, 2000. The Auditor of State's audit for the year ended
+  June 30, 2007 gives "Date of Incorporation: February 11, 2000" in its statistical section, and
+  its first note calls ECOT "a nonprofit corporation established pursuant to Ohio Revised Code
+  Chapters 3314 and 1702", approved under a contract with the Lucas County Educational Service
+  Center "for a period of five academic years commencing after July 1, 2000". [verified]
+  ([district audits](../../catalog/auditor-district-audits.md)) `established` carries the
+  incorporation date, because that is when the entity was organized; the sponsor contract's
+  term, which begins after July 1, 2000, is when it was licensed to operate, and the first
+  school year was the one that began that autumn. The final audit dates the end: "the sponsor
+  suspended ECOT's operations effective January 19, 2018", and the school "moved to closed
+  status on June 30, 2018". [verified] That report also prints "ceased operations on January 19,
+  2019" once, a misprint against its own chronology. [inference]
 revisions:
   - was: |
       The node's `irn` property cited the federal directory as carrying ECOT for "fifteen
@@ -182,6 +191,7 @@ properties:
   irn: 133413 [verified] (`dispersion::lea_directory`, 19 consecutive editions 2000-2018)
   agency_type: community
   county: Statewide (chartered in Franklin County)
+  established: 2000-02-11
   typology: Not applicable; e-school.
   roles: |
     Statewide e-school [verified]. Subject to attendance-based funding recovery, FY2016 and
@@ -194,8 +204,10 @@ properties:
       crates/dispersion/fixtures/f33-ohio-panel.csv           FY2012-FY2022 revenue, federal basis
       crates/dispersion/fixtures/mr81-sponsor-panel.csv       1998-2014 free and reduced lunch
 unfilled:
-  - field: exact opening and closing dates
-    why: The year it opened and the month it closed are held; the days are not.
+  - field: first day of instruction
+    why: >-
+      The incorporation date and the day operations were suspended are held; the audits say
+      only that instruction began with the school year that opened in 2000, not on which day.
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of
@@ -203,3 +215,8 @@ links:
     relationship: funded-by
   - target: ../actor/ohio-department-of-education.yml
     relationship: audited-by
+  - target: ../../catalog/auditor-district-audits.md
+    relationship: sourced-from
+    note: >-
+      The audits for the years ended June 30, 2007 and June 30, 2018, read for the incorporation
+      date and the suspension date they recite.

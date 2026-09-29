@@ -35,9 +35,10 @@ properties:
     type: string
     required: true
     description: >-
-      The grade span the building serves. Required, and not yet held by any instance: the report
-      card files carry no grade span, so each building records it under `unfilled:` with where it
-      lives, and the omission is baselined rather than forgiven.
+      The grade span the building serves, written as `PK-8`, `K-5` or `9-12`. The report card's
+      download files carry no grade span; it comes from the report card's own building record,
+      the department's EdChoice designation lists, or the federal school directory, and the node
+      names which in a claim tag.
   - name: enrollment
     type: string
     required: true

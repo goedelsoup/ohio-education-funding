@@ -464,16 +464,16 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1969 | supported by a committed primary source |
-| `[inference]` | 406 | drawn from verified facts, not witnessed |
-| `[open]` | 213 | a live question — unknown, contested, or being worked |
+| `[verified]` | 1989 | supported by a committed primary source |
+| `[inference]` | 415 | drawn from verified facts, not witnessed |
+| `[open]` | 212 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-213 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+212 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 97 | 0 |
+| `findings` | 96 | 0 |
 | `description` | 42 | 0 |
 | `revisions` | 11 | 0 |
 | `series` | 7 | 0 |
@@ -553,24 +553,22 @@ writes an absence it has looked for.
 | declared `required: true` | 113 |
 | declared `required: false` | 8 |
 | declarations that do not say | 0 |
-| omissions of a required property | 15 |
+| omissions of a required property | 1 |
 | omissions of an optional property | 36 |
 
-**110 of the 121 declared properties are carried by every instance of their class.** An omission of a required property gates `yidam lint`, so each of the 15 is listed in `.yidam/lint-baseline.yml` and the next is attributable to the commit that makes it. An omission of an optional one is reported and is not a defect. Every property some instance omits:
+**112 of the 121 declared properties are carried by every instance of their class.** An omission of a required property gates `yidam lint`, so the only one is listed in `.yidam/lint-baseline.yml` and the next is attributable to the commit that makes it. An omission of an optional one is reported and is not a defect. Every property some instance omits:
 
 | Property | Required | Instances omitting it | Instances |
 |---|---|--:|--:|
-| `education-agency.established` | yes | 7 | 7 |
+| `education-agency.established` | yes | 1 | 7 |
 | `formula-component.function_tex` | no | 2 | 18 |
 | `funding-regime.boundary_note` | no | 1 | 5 |
 | `legislation.effective_note` | no | 12 | 16 |
 | `legislation.accountability_effect` | no | 9 | 16 |
 | `litigation.procedural_history` | no | 3 | 6 |
-| `metric.series` | yes | 5 | 9 |
 | `parameter.simulation_key` | no | 1 | 18 |
 | `parameter.written_as` | no | 5 | 18 |
 | `program.mechanism_note` | no | 3 | 8 |
-| `school.grades` | yes | 3 | 3 |
 <!-- /REGEN -->
 
 ## Node index

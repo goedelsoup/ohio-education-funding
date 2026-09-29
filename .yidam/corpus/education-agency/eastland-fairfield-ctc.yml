@@ -191,7 +191,15 @@ unfilled:
       them. A joint vocational district's own board resolution or the department's career-technical
       planning district list would settle it; neither is held.
   - field: established
-    why: The department's district profile carries it; nobody has read it across.
+    why: >-
+      Bounded, not dated. The district's own history says it "opened its doors in September 1968
+      as Eastland Vocational Center" after planning among five districts, and Whitehall's says a
+      1966 bond issue funded it; Fairfield Career Center, opened in 1987, is a second campus of the
+      same district, renamed Eastland-Fairfield about 2000, so there is no merger date to choose
+      between. Organization under R.C. 3311.18 therefore falls before September 1968 and probably
+      by 1966, but the Auditor of State's audits recite the section and no date, and the
+      organizing resolutions and the State Board's approval were not found. The department's
+      district profile does not carry the field.
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of

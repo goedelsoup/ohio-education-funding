@@ -527,6 +527,18 @@ pub fn adm_history() -> BTreeMap<u16, BTreeMap<String, f64>> {
     out
 }
 
+/// Statewide enrolled ADM by fiscal year, as `(districts, total)`, over [`adm_history`].
+///
+/// The four-year series `metric/enrolled-adm` publishes. Summed over every district the year is
+/// published for — all 611 in each — so the total is not over the 609 of the FY2027 model.
+#[must_use]
+pub fn adm_statewide() -> BTreeMap<u16, (usize, f64)> {
+    adm_history()
+        .into_iter()
+        .map(|(year, districts)| (year, (districts.len(), districts.values().sum())))
+        .collect()
+}
+
 /// How far a year moved between the workbook that first published it and the next one.
 #[derive(Debug, Clone, Copy)]
 pub struct Restatement {

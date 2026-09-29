@@ -103,6 +103,22 @@ findings: |
   resident income — and it is why a wealth-neutrality test run on this metric alone understates
   how much targeting Ohio's formula does. [inference]
 figures:
+  - key: dispersion/valuation-median-resident-ty2022
+    value: 197325.7027464859
+    field: series
+    as_written: "TY2022   $197,326   over 610 districts"
+  - key: dispersion/valuation-median-resident
+    value: 233319.6467968557
+    field: series
+    as_written: "TY2023   $233,320   over 609"
+  - key: dispersion/valuation-median-resident-ty2024
+    value: 251660.50602143514
+    field: series
+    as_written: "TY2024   $251,661   over 609"
+  - key: dispersion/valuation-median-enrolled
+    value: 248096.51175852632
+    field: series
+    as_written: "the TY2023 median is $248,097 instead"
   - key: dispersion/valuation-numerator-agreement
     value: 606
     field: findings
@@ -146,6 +162,20 @@ properties:
   inputs: |
     District total assessed valuation, by tax year — from `tax-abstract`.
     Student count, by fiscal year — from `dew-foundation`, with `nces-ccd` for crosswalks.
+  series: |
+    The median valuation per resident pupil on Table SD-1 alone — Taxation's total taxable value
+    over its own ADM — in every tax year the abstract publishes a pupil count [verified]
+    (`crates/dispersion/src/valuation.rs`):
+
+      TY2022   $197,326   over 610 districts
+      TY2023   $233,320   over 609
+      TY2024   $251,661   over 609
+
+    TY2021 has no row: its workbook carries valuation and no ADM. [verified] Over the profile
+    report's enrolled count the TY2023 median is $248,097 instead, and TY2023 is the one year both
+    counts divide a single numerator. [verified] The dollars are nominal and at 35% of market
+    value, so the rise is reappraisal and new construction as much as anything the formula would
+    call wealth. [inference]
   caveats: |
     Assessed value is 35 percent of market value for real property in Ohio and is not market
     value. Tax year and fiscal year are offset and must be aligned deliberately. The measure

@@ -382,15 +382,19 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * out to be sitting inside the FY2021 funding base. The other two are what makes it a second
  * amendment rather than a variant of the first — what recomputing the base saves with the
  * guarantee left entirely alone, and the population that still draws the supplement afterwards.
+ *
+ * Recomputed at **1176/82** when the five metrics without a `series` were given one (#524). All
+ * thirty-nine bind `field: series`; the two new carriers are `metric/effective-operating-millage`
+ * and `metric/state-share-percentage`, which had bound nothing before.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1137 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1137,
+  expect(bindings.length, "1176 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1176,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "80 nodes carry bindings; raise this when an eighty-first does",
-  ).toBeGreaterThanOrEqual(80);
+    "82 nodes carry bindings; raise this when an eighty-third does",
+  ).toBeGreaterThanOrEqual(82);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

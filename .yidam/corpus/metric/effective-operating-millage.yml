@@ -46,6 +46,29 @@ properties:
   inputs: |
     Current operating millage and effective Class 1 and Class 2 millage by district and tax
     year — FY2024 District Profile Report, and `tax-abstract` for the underlying abstracts.
+    Table SD-1 for TY2021-TY2024,
+    [dot-sd1-school-district-taxes](../../catalog/dot-sd1-school-district-taxes.md), for the
+    series.
+  series: |
+    Table SD-1's effective operating rates over all 611 school districts the abstract carries, in
+    every tax year it holds [verified] (`crates/dispersion/src/sd1.rs`):
+
+                Class I median   Class II median   at 20.00   within 0.5 of 20
+      TY2021        24.91            29.33            102           171
+      TY2022        24.56            28.67            137           180
+      TY2023        23.31            27.46            172           232
+      TY2024        22.80            26.26            155           240
+
+    "At 20.00" is a Class I rate that reads 20.00 to the hundredth, because the abstract publishes
+    some years to two decimals and others to four; "within 0.5" counts either side of the floor.
+    Both medians fall in every year and the band around the floor fills in every year. The count
+    exactly on it does not: it falls by seventeen in TY2024 while the band gains eight. [verified]
+    A falling median over a filling band is what reduction factors do while values rise — they
+    take rates down until the floor stops them. [inference]
+
+    The TY2023 row is not the profile report's picture in the description (606 districts, median
+    23.40, 170 at 20.000, 233 below 20.5). SD-1 carries five more districts, and that 233 counts
+    everything under 20.5, where the band here is two-sided. [verified]
   caveats: |
     Class 1 and Class 2 rates differ and are not interchangeable.
 
@@ -91,3 +114,76 @@ links:
     relationship: computed-for
   - target: ../../catalog/cupp-district-profile-report.md
     relationship: sourced-from
+figures:
+  - key: dispersion/median-class1-effective-millage-ty2021
+    value: 24.91
+    field: series
+    as_written: "TY2021        24.91            29.33            102           171"
+  - key: dispersion/median-class2-effective-millage-ty2021
+    value: 29.3307
+    field: series
+    as_written: "TY2021        24.91            29.33            102           171"
+  - key: dispersion/districts-at-twenty-mills-ty2021
+    value: 102
+    field: series
+    as_written: "TY2021        24.91            29.33            102           171"
+  - key: dispersion/districts-within-half-a-mill-of-twenty-ty2021
+    value: 171
+    field: series
+    as_written: "TY2021        24.91            29.33            102           171"
+  - key: dispersion/median-class1-effective-millage-ty2022
+    value: 24.5571
+    field: series
+    as_written: "TY2022        24.56            28.67            137           180"
+  - key: dispersion/median-class2-effective-millage-ty2022
+    value: 28.6664
+    field: series
+    as_written: "TY2022        24.56            28.67            137           180"
+  - key: dispersion/districts-at-twenty-mills-ty2022
+    value: 137
+    field: series
+    as_written: "TY2022        24.56            28.67            137           180"
+  - key: dispersion/districts-within-half-a-mill-of-twenty-ty2022
+    value: 180
+    field: series
+    as_written: "TY2022        24.56            28.67            137           180"
+  - key: dispersion/median-class1-effective-millage-ty2023
+    value: 23.31
+    field: series
+    as_written: "TY2023        23.31            27.46            172           232"
+  - key: dispersion/median-class2-effective-millage-ty2023
+    value: 27.46
+    field: series
+    as_written: "TY2023        23.31            27.46            172           232"
+  - key: dispersion/districts-at-twenty-mills-ty2023
+    value: 172
+    field: series
+    as_written: "TY2023        23.31            27.46            172           232"
+  - key: dispersion/districts-within-half-a-mill-of-twenty-ty2023
+    value: 232
+    field: series
+    as_written: "TY2023        23.31            27.46            172           232"
+  - key: dispersion/median-class1-effective-millage-ty2024
+    value: 22.8029
+    field: series
+    as_written: "TY2024        22.80            26.26            155           240"
+  - key: dispersion/median-class2-effective-millage-ty2024
+    value: 26.263
+    field: series
+    as_written: "TY2024        22.80            26.26            155           240"
+  - key: dispersion/districts-at-twenty-mills-on-class-one-ty2024
+    value: 155
+    field: series
+    as_written: "TY2024        22.80            26.26            155           240"
+  - key: dispersion/districts-within-half-a-mill-of-twenty-ty2024
+    value: 240
+    field: series
+    as_written: "TY2024        22.80            26.26            155           240"
+  - key: dispersion/districts-at-the-twenty-mill-floor
+    value: 170
+    field: series
+    as_written: "170 at 20.000"
+  - key: dispersion/districts-at-or-against-the-twenty-mill-floor
+    value: 233
+    field: series
+    as_written: "233 below 20.5"
