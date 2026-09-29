@@ -53,11 +53,60 @@ One corpus declares a claim property named `attestation_standing`; its `techniqu
 unsettled. That is the field working exactly as designed, on a node that is plainly not a
 question.
 
+## claim-property-undeclared
+
+A standing written into a property the class did not declare `type: claim` is read by nothing —
+not `yidam status`, not `open-questions`, not the `due` questions clock, not the MCP `claims`
+resource. The declaration is what makes it reachable, and the corpus gets no signal that it is
+missing.
+
+Run over the sixteen corpora and 2,770 nodes, the check reports **18 findings in 3 corpora**,
+which are three `(class, property)` pairs:
+
+| Corpus | Property | Nodes | Values |
+|---|---|---|---|
+| `bitrecover-bitwipe` | `question.claim_tag` | 11 | `verified` 5, `inference` 5, `open` 1 |
+| `allen-recorder` | `parcel.status` | 3 | `verified` |
+| `hegeomai` | `inquiry.status` | 4 | `open` |
+
+**It never gates, because the repair differs by row.** The first is a claim field by name,
+vocabulary and intent, and wants the declaration. The third holds `narrowing` and `answered` on
+its other nodes: that is a question's lifecycle, not an evidence standing, and declaring it
+`type: claim` would make the corpus assert something it did not — renaming the property is the
+fix. Deciding which a word is remains the judgement Article V refuses to delegate, so both fixes
+are named and neither is imposed.
+
+**Bare spellings only.** A bracketed `[open]` is already counted wherever it sits, because the
+prose scan reads the file's bytes. Measured with the same walk and the bracket test inverted,
+every such value in the population is the literal `[open]` standing in for a value the corpus
+does not have yet — **4 of them, in `precinct.registered_voters`, `precinct.polling_location`,
+`election.margin` and `election.turnout`** — and reporting those would be telling two corpora to
+declare a turnout figure as a claim.
+
 ## date-precision
 
 What `property-type` catches in a date field is prose, and `1985` is not prose: it is the
 precision the fact is actually known to, and demanding a month and a day there does not make
 the record more accurate, it makes it invented.
+
+## number-unquoted
+
+The compiled class schema says `{"type": "number"}` and refuses `"24"`, so a gate that
+accepted it would be looser than the schema it exists to be no stricter than. And a unit
+in the cell makes every instance repeat a fact the class already knows, and makes an
+ordering depend on conversion, which is a library and not an operator. The trap RFC-0018
+refused the ordering operators over was a numeric value compared as text; the unquoted
+number is what keeps a `number` from ever being one.
+
+## values-closed
+
+Before the field existed a class spelled its set in the description — `extant | demolished |
+ruin` — where nothing reads it, and across seven corpora 40 properties did so while 33
+instances held a value outside the set their own class documented. Each is one of two things:
+a widening nobody recorded, or prose in a token field, and a query for the token silently
+misses both. Declaring the set closes it because an open list is the description again. The
+match is exact because the compiled schema carries the set as `enum`, and a gate that admitted
+a spelling the schema refuses would be looser than the schema it exists to be no stricter than.
 
 ## silence-is-not-a-contract
 
@@ -237,6 +286,12 @@ trip `edge-target-class`. That is a strong incentive to leave a definition wrong
 **A retype is refused rather than guessed.** `type: string` → `type: date` over a value reading
 `last spring` has no mechanical conversion, and writing it back unchanged while reporting success
 would leave the corpus in a state its own gate rejects.
+
+Requoting is not one of the guesses, and refusing it was asking the author to carry out an
+instruction by hand. `property-type` tells a `number` holding `"24"` to *unquote it* and a
+`string` holding a bare `24` to *quote it*; a scalar has exactly one other spelling, so there is
+nothing to choose between. What stays refused is a value with no number in it to unquote —
+`about 24` keeps prose the number cannot carry, and `~24` keeps an approximation.
 
 The migration record carries the mechanical half and `.yidam/decisions/` the argument, because a
 record that also had to carry the reasoning would make `decisions-log` a list of two different

@@ -40,7 +40,7 @@ The rule was unenforceable until a corpus existed on which some tier goes unback
 "capabilities": {
   "tools": {}, "resources": {},
   "yidam": {
-    "contract": "0.24.0",
+    "contract": "0.26.0",
     "corpus": {
       "domain": "streamflow",
       "commit": "a1b2c3d",
@@ -70,6 +70,36 @@ to distinguish "not stale" from "a server too old to say".
 the vector index is loaded, which is the same fact `degraded` reports per call. A server that
 declares `vector: false` is promising every `retrieve` will come back `degraded: true`, with
 the `reason` it names here. `reason` is null exactly when `vector` is true.
+
+## Bumping the contract
+
+The version names a document, and `CONTRACT_SHA` is where the name is bound to it: one
+`<version>  sha256:<digest>` record per version, in ship order, appended and never edited. The
+digest is of `tools.json` with its own `contract` field removed — keys sorted, whitespace
+dropped — so reformatting the file is free and rewording a sentence in it is not.
+
+That asymmetry is the point. Before the ledger, four places carried the version and were held
+only to *each other*: two branches could each add a tool, each ship the number already there,
+and every gate stay green on both and on the merge (#940). A number written here is taken, so
+the second branch has to append a line for a version the file already records — which is a
+conflict in one file at merge rather than two contracts sharing a name.
+
+The digest covers the whole document, prose included, because that is where this contract keeps
+most of its substance: of 25 bumps, 11 changed no structured field at all. A digest over names,
+tiers and schemas would have been silent on the one that specified what an ordering does when
+two dates disagree about precision, which lives in two paragraphs of `notes`.
+
+A bump therefore edits five things, and `yidam/cli/tests/mcp_contract_digest.rs` prints the
+list with the line to append whenever they disagree:
+
+1. `tools.json` — the `contract` field. The live one: `serve --mcp` compiles it in.
+2. `VERSION`.
+3. this file's capability block, which is the first thing an implementer copies.
+4. `docs/mcp-server.md`'s handshake example.
+5. `CONTRACT_SHA` — append the new version and the digest of the document you just changed.
+
+Only the last is load-bearing against reuse; the first four are copies, and a copy agreeing
+with a copy is what #940 was about.
 
 ## The codes a client branches on (contract 0.15.0)
 
@@ -111,10 +141,11 @@ gate says so.
 ## An ordering is `date`-only (contract 0.16.0)
 
 `<`, `<=`, `>` and `>=` arrived on the query language for `type: date` properties, and
-**`unordered-property` is the refusal everywhere else**. The declared types are `string`,
+**`unordered-property` is the refusal everywhere else**. The declared types were `string`,
 `text`, `date`, `ref` and `claim`, with no numeric among them — an ordering that fell back to
 comparing text would be correct on `date` and a trap on the rest, ranking `10` before `9` and
-saying nothing about having done so. A plausible ordering of the wrong thing is worse than a
+saying nothing about having done so. 0.25.0 widened the licence to `number`, below, and the
+refusal stands everywhere else. A plausible ordering of the wrong thing is worse than a
 refusal, and from outside it is indistinguishable from a right one.
 
 Two consequences for a conforming server:
@@ -159,6 +190,54 @@ express. Eleven classes across six measured corpora are shaped that way.
 A malformed stored value orders against nothing. The type is checked on write and the check
 reports rather than gates, so a query has to survive meeting one; guessing an answer for it
 would be the undercount's louder twin.
+
+## An ordering on a number is numeric (contract 0.25.0)
+
+`type: number` arrived (RFC-0040), and it is the second declared type with an order. It is
+also the one on which a lexical implementation is **visible**: a fixed-width date orders the
+same as text and as a value, so a server comparing text passes every case over
+`corpus-dated/`. `10 > 9` holds as numbers and fails as text, and `corpus-measured/` is the
+fixture that tells the two apart — three reaches measuring 10, 9 and 7, where
+`length_km>9` **must** return the 10.
+
+**The comparison is exact and there is no precision rule.** `1893` denotes an interval,
+which is why dates have one; `7` and `7.0` denote the same point, which is why numbers do
+not. So `=` on a `number` compares numerically too — `length_km=7.0` matches a stored `7` —
+and `<`, `=` and `>` stay trichotomous, where on a `date` `=` keeps the rule in the section
+above. `!=` is `=`'s complement on the same reading, and `~` stays textual on every type.
+
+**A unit is a fact about the column, not the cell.** It is declared once beside the type as
+`unit: km`, the instances carry bare numbers, and the compiled class schema publishes it as
+`x-yidam-unit` — an annotation like `x-yidam-edges` that an editor can show and no validator
+treats as a constraint. The operand is bare too: `length_km>9`, never `length_km>9km`. A
+corpus that writes the number quoted has written text, and `property-type` says so; a stored
+value that is not a number orders against nothing, as a malformed date does.
+
+## A predicate over the row's typed properties (contract 0.26.0)
+
+`retrieve` gains `where` (RFC-0041): the text inside a `query` step's `[...]`, verbatim, and
+nothing of its own. A server parses it with the query grammar, typechecks it with the query
+rules over one synthetic step — the caller's `class` or `*`, no anchor — and evaluates it
+with the query comparison, so the rows it admits are exactly the rows the same predicate
+returns from `query`, ranked. Two cases over `corpus-dated/` hold the two readings of the
+canonical interval: `ended>?1893` admits a holding with no `ended`, `ended>1893` never does.
+One over `corpus-measured/` is where a server that stored the column as text is visible.
+
+Four consequences for a conforming server:
+
+- **It runs before the `k` cut.** `k` counts rows the caller asked for; three rows admitted
+  and `k: 5` is three rows.
+- **The rejections are `query`'s.** `rejected.code` carries `parse`, `undeclared-property`,
+  `unordered-property` or `unsatisfiable-predicate` for a `where` that cannot be asked, and
+  no `step`. Two are this tool's own and are about the index, not the text:
+  `where-unindexed` for a local index that predates the column, naming the re-index, and
+  `where-remote` for a server backed by a remote index, which carries no properties.
+- **Keyword search answers it.** The fixtures carry no index, so every case here runs on the
+  keyword arm, which reads the node the query evaluator reads. A server that answers a
+  `where` only over a vector index fails all of them.
+- **`predicate-unsatisfied` joins the absence codes.** The predicate parsed, typechecked and
+  refused every one of `instances` candidates. It is evidence about the values, and it is
+  reported only when at least one candidate was evaluated.
 
 ## The other closed set (contract 0.18.0)
 

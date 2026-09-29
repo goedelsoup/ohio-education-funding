@@ -96,6 +96,11 @@ against it:
 | `unlicensed-edge` | a relationship the class does not declare | only under `edge_policy: exhaustive` |
 | `edge-target-class` | an edge resolving to a node of the wrong class | yes |
 | `missing-property` | a declared property the instance omits | only where the class says `required: true` |
+| `claim-property-undeclared` | a value spelling a standing in a property the class did not declare `type: claim` | no |
+
+A standing in an undeclared property is counted by nothing. `claim-property-undeclared` never
+gates, because the repair is sometimes to rename the property rather than declare it.
+[why](GRAPH.evidence.md#claim-property-undeclared)
 
 `edge-target-class` is the one no other check could produce: `dangling-edge` catches an edge to
 nothing, and an edge to the *wrong* thing resolves, traverses, and exports, and is simply false.
@@ -103,6 +108,14 @@ nothing, and an edge to the *wrong* thing resolves, traverses, and exports, and 
 **A `date` is accepted at the precision it is known to** — `YYYY`, `YYYY-MM`, or
 `YYYY-MM-DD`. `last spring` and `[open] No date.` still fail.
 [why](GRAPH.evidence.md#date-precision)
+
+**A `number` is a YAML number, unquoted**, and its unit is declared on the class as
+`unit: km`, never in the value. `"24"` is text and fails.
+[why](GRAPH.evidence.md#number-unquoted)
+
+**A `string` that declares `values: [extant, demolished, ruin]` is closed to that set**, and
+an instance holding anything else fails, with the set named. The match is exact, as written.
+[why](GRAPH.evidence.md#values-closed)
 
 **Silence is not a contract**, read one field at a time. A class with no `properties:` has
 said nothing about properties and none are checked; a class with no `edges:` has said nothing
@@ -411,14 +424,16 @@ edge is licensed depends on where its target resolves and no schema can see that
 |---|---|
 | `migrate class <old> <new>` | the class file, its directory, every instance's `class:`, the `instance-of` edge into the class file, and every edge declaring the class at either end |
 | `migrate property <class> <old> <new>` | the declaration, and the key on every instance carrying it |
-| `migrate retype <class> <prop> <type>` | the declaration — and **refuses** if any instance's value would not satisfy the new type |
+| `migrate retype <class> <prop> <type>` | the declaration, plus any instance value it can requote — and **refuses** the rest |
+| `migrate value <class> <prop> <from> <to>` | one item of the declaration's `values:` list, and the value on every instance holding it |
 | `migrate edge <class> <rel> <target>` | the declaration at both ends, plus a report of the instances now in violation |
 
 `--dry-run` prints the plan and writes nothing.
 
-**A retype is refused rather than guessed.** The predicate that decides is the one
-`property-type` gates on, so a migration that succeeds leaves a corpus `yidam lint` still
-accepts.
+**A retype is refused rather than guessed** — except a requote, which is the same value
+written the other way: `"24"` unquotes under `number`, `24` gains quotes under `string`. The
+predicate that decides is the one `property-type` gates on, so a migration that succeeds leaves
+a corpus `yidam lint` still accepts.
 
 **An edge re-target reports what it cannot decide.** Which instances should now point elsewhere
 is a question about the corpus, not about the ontology. The migration names every one of them;

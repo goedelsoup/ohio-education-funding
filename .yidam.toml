@@ -11,6 +11,6 @@
 
 [yidam]
 origin    = "git@github.com:goedelsoup/yidam.git"
-commit    = "f80c3d75a9572086099dc3c60a7ba43737399972"
-template  = "v0.8.0"
-committed = "2026-09-25"
+commit    = "ce5e738d6e00e0a19ebfde2a55e5e4d480f0b084"
+template  = "v0.9.0"
+committed = "2026-09-28"

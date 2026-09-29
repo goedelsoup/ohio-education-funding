@@ -25,6 +25,7 @@ After bootstrap, a derived repository has two tiers:
 - `.yidam/decisions/` — structured records of choices made during this repo's life
 - `.yidam/capabilities.toml` — what may run here, what it reads and what it writes
 - `.yidam/runs/` — one receipt per capability: what ran, against what, producing which bytes
+- `.yidam/computed/` — what this repository worked out about itself; committed, and read back
 - `.yidam/skills/` — domain-specific skills
 - `.yidam/.vendor/` — inherited yidam prelude; not modified in derived repos
 - `.yidam/bin/` — the `yidam` binary built from this repo's pin; git-ignored, see below
@@ -76,7 +77,8 @@ calculators by what they compute (`lowflow`, `curve-number`, `et`).
 learning. Takes structured corpus data (nodes, edges, extracted values) and produces
 embeddings, feature vectors, or derived signals. Feature engineering bridges the corpus and the
 index layer; it is distinct from calculators because its outputs are optimized for retrieval
-quality, not domain correctness.
+quality, not domain correctness. A crate implementing it declares `kind = "featurizer"`, which
+is the only one of the three whose declared value is not its own name lowercased.
 
 **The index layer:** A vector index (e.g., LanceDB) over corpus embeddings enables semantic
 retrieval. The index is not the corpus; it is a derived representation of it. Maintaining an
@@ -611,7 +613,7 @@ naming both paths, and an unrecognized subcommand adds which binary refused it. 
 
 ---
 
-## `.yidam/capabilities.toml` and `.yidam/runs/` (optional)
+## `.yidam/capabilities.toml`, `.yidam/runs/` and `.yidam/computed/` (optional)
 
 What a pipeline may do in this repository, and the record that it did it.
 
@@ -624,7 +626,7 @@ actually perform. [why](directories.evidence.md#capabilities-provenance-invented
 
 ```toml
 [capability.travel-tier]
-kind   = "calculator"          # or `connector`
+kind   = "calculator"          # or `connector`, `featurizer`
 run    = ["sh", ".yidam/capabilities/travel-tier.sh"]
 reads  = [".yidam/corpus/**", ".yidam/capabilities/**"]
 writes = [".yidam/computed/**"]
@@ -638,6 +640,10 @@ writes = [".yidam/computed/**"]
 verb   = "compute"
 after  = ["travel-tier"]       # optional
 ```
+
+**All three capability types are declarable and `yidam run` invokes calculators only.** A
+connector or a featurizer parses, plans, and is refused by name before anything runs, with the
+reason particular to its kind. [why](directories.evidence.md#declarable-not-executable)
 
 `yidam run travel-tier` then checks the declared `reads` out of `HEAD` into a scratch directory,
 invokes the step there, and lands what it wrote — plus a receipt — as one commit. `yidam run`
@@ -654,6 +660,62 @@ nowhere else, **a capability must declare its own implementation**. Both entries
 `.yidam/capabilities/**` for that reason, and reading the script there is what puts it in the
 input state — so editing a calculator is what makes its step stale.
 [why](directories.evidence.md#capability-declares-its-own-implementation)
+
+### `run` takes two arms, and the second one is a typed function
+
+A sequence is an argv, invoked as above. A table naming one script is a **typed calculator**: a
+`.glu` file whose entry point is declared `Corpus -> Computed`, applied to the resolved corpus in
+this process, with no scratch tree and no child process at all.
+
+```toml
+[capability.class-of]
+kind   = "calculator"
+run    = { gluon = ".yidam/capabilities/class-of.glu", calls = 2000000 }
+```
+
+**Its entry point returns two fields and both are required**: `signals`, one row per node, and
+`summary`, what it counted about the run as a whole. A calculator that summarizes nothing returns an
+empty `summary` and no `summary:` key is written. Gluon records are exact, so omitting either is
+refused as not a calculator rather than defaulted.
+
+**A typed calculator declares its own script under `reads` too**, and a declaration that does not
+is refused by name. The digest of the script goes in the receipt and in the input state, so editing
+one makes its step stale — the same rule as above, reached a different way rather than for free.
+`calls` caps how many calls the script may make; omitted, the binary's default applies, and a
+calculator that does not finish is a refusal and not a warning.
+
+**The arm is behind a cargo feature outside the default set.** The binary `install.sh` downloads
+reads this declaration, plans it, and then declines the step by name, saying which feature would
+run it. So the arm a capability is written in is a statement about who can run this repository.
+[why](directories.evidence.md#typed-arm-outside-the-default-build)
+
+### `$YIDAM_GRAPH` — the corpus already parsed, and already resolved
+
+The step is invoked with four names in its environment — `$YIDAM_IN`, `$YIDAM_OUT`, `$YIDAM_STEP`
+and `$YIDAM_INPUT_COMMIT` — and, when its `reads` admit any corpus node, a fifth: `$YIDAM_GRAPH`
+names a file holding the corpus as `yidam` itself parsed it. Node classes, labels and properties,
+and every link with its target already resolved to a repository-relative path.
+
+**A step that is handed bytes parses them, and a second parser is a second answer.** The reason
+this is in the contract rather than left to each calculator is that the alternative is not
+hypothetical: `travel-tier` used to carry a regex over node YAML and an awk re-implementation of
+link resolution, neither of which anything compared against `yidam`'s own, and either of which
+could disagree with `yidam graph` about the same corpus without any gate noticing.
+[why](directories.evidence.md#resolved-corpus-is-handed-over)
+
+**It is sliced to what the step reads, and `exists` is not.** The file describes exactly the nodes
+the step's `reads` admit, so it grants no view the scratch tree does not already grant. But
+whether a link's target *is there in the repository* is answered against the whole input commit,
+because a target outside the slice is not missing — it is merely not this step's business, and a
+calculator told otherwise would report every link out of its own subtree as broken.
+
+**Its digest is part of the input state.** Changing how `yidam` resolves a link changes what every
+calculator reads, so it makes their steps stale, exactly as editing a calculator's own script
+does. [why](directories.evidence.md#resolved-corpus-in-the-input-state)
+
+A step whose `reads` admit no corpus node is handed no `$YIDAM_GRAPH` and the name is removed from
+the environment rather than left empty, so a script may test for it. `disclosure-envelope` above
+is such a step: it reads the first step's answer, not the first step's inputs.
 
 ### `after` — what must be up to date first
 
@@ -716,6 +778,49 @@ that somebody looked. [why](directories.evidence.md#receipt-records-a-look)
 node asserts, silently and for every instance, that the figure is a measurement. Prefer a
 directory of computed artifacts that carry their method, and record the choice in
 `.yidam/decisions/`. [why](directories.evidence.md#computed-output-placement)
+
+### `.yidam/computed/`
+
+What this repository worked out about itself — one file per calculator result. Committed, unlike
+`.yidam/index/`, because a computed quantity is an assertion this repository is making and the
+commit that landed it is the record of what it was computed from.
+
+**A file here is read as a signal table when it says it is one.** That means a top-level
+`format_version: 1` and a `signals:` list whose every row names a node:
+
+```yaml
+format_version: 1
+method:
+  rule: |
+    A derived assertion travels only as far as the weakest claim beneath it.
+signals:
+  - node: gage/canyon-outlet
+    travels_as: open
+    downgraded: true
+```
+
+Every other key in a row is a **signal** about that node, and `yidam embed` attaches it to that
+node's embedding record — which is what turns a computed answer into something a search can
+filter on rather than a file somebody has to open. A file carrying no `format_version` is listed
+and not read, so a calculator whose output is a report rather than a table stays legal and stays
+visible. [why](directories.evidence.md#computed-declares-its-own-readability)
+
+**A row is keyed in the reference grammar and in nothing else.** `gage/canyon-outlet`,
+`node/gage/canyon-outlet`, or the absolute `yidam://<corpus>/node/<path>` form naming this
+corpus — the grammar every SDK's `parse_reference` already implements. A revision pin
+(`gage/canyon-outlet@abc1234`) is refused rather than ignored: a signal attached at a past commit
+is not a signal about the node as it stands.
+[why](directories.evidence.md#computed-keyed-by-the-reference-grammar)
+
+**A signal name is repository-wide, and a collision is refused rather than resolved.** Two
+calculators both emitting `tier` is one name meaning two things, and a reader that picked a
+winner would make the other silently absent. `yidam doctor` reports the collision and names both
+files. [why](directories.evidence.md#computed-signal-names-are-repository-wide)
+
+**Nothing creates this directory.** A repository declaring no calculator has nothing to put in
+it, and a run is the only thing that writes here. `yidam doctor` asks what is in it and whether
+it still stands — a computed file whose inputs have moved, or whose bytes are not the ones its
+receipt recorded, is a stale answer that reads exactly like a current one.
 
 ---
 

@@ -275,6 +275,15 @@ A commit saying `compute: low-flow through August`, written by a person after in
 calculator by hand, is an account written after the fact and checkable against nothing. The
 manifest is what makes the same subject line a claim something verified.
 
+## declarable-not-executable
+
+Two of the three kinds load and are turned away, and the reasons are not the same sort of reason.
+A connector's is a decision: it reaches a network and a credential path, and the vault rules
+already govern those. A featurizer's is an absence: the slice has not been built. Either way a
+declaration that parses and refuses by name beats a manifest that cannot express the kind at all,
+which is what the taxonomy's third type had for as long as the enum behind it had two arms — a
+crate implementing it was indistinguishable, in every report, from a crate implementing nothing.
+
 ## reads-writes-load-bearing
 
 Both are decidable before the step runs rather than after it has produced a tree. A check applied
@@ -286,6 +295,20 @@ declaration refuses with nothing committed.
 It is not a formality. The step stands in the scratch tree and nowhere else, so reading the script
 there is what puts it in the input state — and a calculator whose script was not declared would
 compute a new answer while its receipt said nothing had changed.
+
+## resolved-corpus-is-handed-over
+
+One parser and one link resolver, or as many as there are calculators. The second is not a style
+preference: `yidam graph`, `yidam lint` and every consumer of a corpus answer *what does this link
+point at* through one function, and a shell calculator that answered it again in awk was the only
+place in the system where that question had two implementations and no test comparing them.
+
+## resolved-corpus-in-the-input-state
+
+The same argument as the script itself. A run and a `doctor` must agree about what a step read, so
+the digest of the resolved corpus goes in the input state and both sides compute it with the same
+function — two builders would disagree the day one of them changed, and every step would read as
+stale forever.
 
 ## after-epistemic
 
@@ -324,6 +347,41 @@ that does not exist.
 A computed quantity is a fact about a calculation, and a class property is read as a fact about
 the subject. So writing a derived figure onto a node asserts, silently and for every instance,
 that the figure is a measurement — and nothing in the node records the method that produced it.
+
+## computed-declares-its-own-readability
+
+`.yidam/computed/` was written from the day a calculator was declared and nothing read it. The
+two shipped calculators emitted a `method:` block, a per-node table and a `summary:` block in one
+file, which is a good file for a person and gives a reader no way to tell which part is an
+assertion about a node. A reader guessing — treating any top-level list of mappings as a table —
+would have read `tiers:` as eight signals about nodes named `verified`, `inference` and `open`.
+
+So the file declares its own readability and the reader never guesses. The cost is one line per
+calculator; the alternative is a heuristic that is wrong in a way nothing reports, on a directory
+whose entire failure mode is being silently unread.
+
+## computed-keyed-by-the-reference-grammar
+
+A node had eleven string spellings in this toolkit before a grammar was written for it, and the
+grammar exists because every reader had invented its own. A computed file keyed on a twelfth —
+a bare stem, a class-scoped id, a path with or without `.yml` — would be a form nothing else
+parses and that every later reader has to be taught.
+
+The revision pin is the case worth stating. `gage/canyon-outlet@abc1234` parses, so accepting it
+and ignoring the revision would attach a signal computed against one commit to the node as it
+stands now. That is the failure the chain rule in `agent-conduct.md` exists to prevent, arriving
+by a different door: an answer travelling further than what it was computed from.
+
+## computed-signal-names-are-repository-wide
+
+The alternative was a per-file prefix — `travel-tier.travels_as` — which resolves every collision
+and invents a second name for every signal. Both spellings then exist forever: the one the
+calculator emits and the one a query has to use, with the file's own name load-bearing in the
+second. Renaming a calculator would rename every signal it computes.
+
+Refusing instead makes the collision a thing somebody fixes once, in the calculator, and keeps
+the name a query uses the name the calculator wrote. The refusal names both files because either
+one of them is the one to change and a reader cannot tell which from a message naming one.
 
 ## authorship-why
 
@@ -387,3 +445,12 @@ gap; that same repository spent four commits the same day removing the verb, on 
 reasoning that no gap existed in the prelude *it* could see. Both were right about their own
 evidence. Neither could see the other, and the derived repo ended further from upstream than it
 started.
+
+## typed-arm-outside-the-default-build
+
+The engine resolves 71 marginal packages against the policy engine's 8, for +6.8 MB on a binary
+whose whole argument is that it is small enough to download. The hermeticity case that ungated the
+policy engine does not transfer: a build that cannot evaluate policy cannot refuse anything, while a
+build that cannot run a typed calculator refuses that step by name and commits nothing. So the
+manifest still parses in every build — a corpus declaring the arm is not a malformed corpus — and
+the refusal names the feature rather than reading as a broken manifest.

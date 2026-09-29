@@ -250,6 +250,25 @@ between a repository that works and one that merely exists, and it is answerable
 commands. A bootstrap that hands over a repository whose gate it has never run has not finished;
 it has stopped.
 
+## gate-deferred
+
+The gate is four commands and one binary, and the binary is where a bootstrap is most likely to
+stop. `mise run yidam-build` needs mise, and then either a release built for this platform at
+this pin or a Rust toolchain to compile one — and most pins carry no release, so most bootstraps
+compile. It is also the last thing the protocol asks for: it fails after the ontology dialogue,
+the seeding and the genesis commit, with the expensive and unrepeatable part already done and
+the agent holding context no later session gets back. Spending that context on provisioning a
+toolchain, or handing the protocol back to the user mid-step to provision one, turns a finished
+corpus into an interrupted bootstrap.
+
+A repository whose gate has not run is a worse repository, not an invalid one. The commits are
+real, the corpus is real, and the four commands are still four commands whenever the binary
+arrives. What makes the untested state dangerous is silence about it: the first push fails
+`yidam regen --check` on generated content nobody wrote, which reads as a broken template
+rather than as the one command that was deferred. So the deferral is a named handover item, and
+the gate line in step 9 — the one place the handoff makes a checkable claim — is where it
+cannot be left out.
+
 ## regen-cannot-be-skipped
 
 The `<!-- REGEN: ... -->` blocks are generated from a corpus that did not exist when the template
@@ -264,3 +283,24 @@ Findings from the first gate run are about work that was written minutes ago by 
 reading them, which is the cheapest they will ever be to act on. A `catalog-uncited` or a
 `missing-property` at this point is a step-4 or step-6 mistake still warm; the same finding six
 months from now is archaeology.
+
+## the-baseline-is-installed-last
+
+`yidam lint --init-baseline` and `yidam lint` are not two readings of the same state. The first
+writes every error-severity finding into `.yidam/lint-baseline.yml` and exits; the second then
+compares the corpus against that file and finds no regression, because the file was written from
+the corpus a moment earlier. Run in that order the pair cannot report anything, and the gate's
+first run — the one occasion where every finding is about work minutes old — produces a green
+line and no reader.
+
+A derived corpus blessed 44 malformed claim tags at genesis this way. Nobody read them, not
+through inattention but because the `lint` that followed was green, which is what a gate is for.
+The cost is not the 44 findings; it is that the repository's *first* baseline, in a corpus with
+21 commits, was 44 entries long and no operator had chosen a single one.
+
+The baseline itself is not the problem and cannot be dropped: a repository with no
+`lint-baseline.yml` has no ratchet at all, and `yidam lint` reports `no regression` on every
+commit forever. What a bootstrap owes is the empty one — a corpus with no history has no legacy,
+so every finding standing at genesis is a mistake made in the last hour by the agent holding the
+context to fix it, not debt inherited from anyone. Reading the report first is what makes the
+recorded number a decision instead of a measurement.
