@@ -61,23 +61,28 @@ letter has no date line. What dates it is everything around it —
 So: **late December 2025**, bounded by the letter's own contents rather than stated in it. Recorded
 at that precision and no finer. The district had been under state control since 2018.
 
-**Release is cessation, not a lesser status.** R.C. 3302.10(N)(1): "Upon completion of the
-transition period, the chief executive officer shall relinquish all operational, managerial, and
-instructional control of the district to the district board and district superintendent and the
-academic distress commission shall cease to exist." The department's word and the statute's
-consequence are the same event, so this page's "released" is R.C. 3310.03(E)(2)'s "ceases to exist"
-and the distinction that would have made the gap cosmetic does not exist.
+**Release is dissolution, not a lesser status, and the section is R.C. 3302.103.** The letter's
+"16 of 20 benchmarks" is the test in R.C. 3302.103(F)(2), the section H.B. 110 enacted for the
+three districts on this page: a district that meets "at least a majority of the academic
+improvement benchmarks" in its plan has its commission "dissolved". While the plan runs,
+3302.103(E)(1) says the district "shall not be subject to section 3302.10", so division (N) was
+not available to East Cleveland from July 2022. This entry used to read the release as
+3302.10(N)(1). It was not, and a first three-star year could not have completed (N)(1) anyway.
+Either way the commission no longer exists, so this page's "released" is still R.C.
+3310.03(E)(2)'s "ceases to exist".
 
-**Three commissions, three different endings, and only one of them under division (N).** East
-Cleveland exited by rating, on the three stars division (N)(1) requires to *begin* a transition.
-Lorain exited by legislation. Youngstown, at 2.5 stars, can do neither — which is exactly the trap
+**Three commissions, three different ends, and none of them under division (N).** East Cleveland
+met its plan benchmarks. Lorain exited by legislation. Youngstown is in an approved extension of
+its plan, and a district on that route leaves early only by statute, which is what the department
+told reporters. It is not held by the two-to-three star band
 [`intervention/academic-distress-commission`](../corpus/intervention/academic-distress-commission.yml)
-inferred from reading entry and exit against each other, now corroborated by the administering
-department's own account of why Youngstown is still in.
+describes, because R.C. 3302.10 does not apply to it while the plan runs.
 
 **Cleveland is not on this list**, and the omission is informative rather than an oversight.
-Cleveland's intervention was under the *former* R.C. 3302.10, the pre-2015 regime that the current
-section refers to when it speaks of a commission "still in existence on October 15, 2015". The
+The *former* R.C. 3302.10 is the pre-2015 regime that the current section refers to when it speaks
+of a commission "still in existence on October 15, 2015". R.C. 3302.103(A) lists the two
+former-section commissions that survived into the current one, established in 2010 and 2013, and
+those are Youngstown's and Lorain's. So if Cleveland was ever under a commission, it had left by then. The
 corpus recorded Cleveland as "subject to state academic distress intervention for part of the
 period" without distinguishing the two regimes.
 
@@ -88,9 +93,9 @@ period" without distinguishing the two regimes.
   including Cleveland's — is not here.
 - **No dates for establishment.** The page gives the 2021 plan requirement, the 2023 Lorain
   dissolution and East Cleveland's release, and does not say when any commission was established.
-  [open] East Cleveland's *end* is now dated to late December 2025 and its start to 2018, both from
-  the release notice and the reporting around it rather than from this page; Youngstown's and
-  Lorain's start dates remain unheld.
+  R.C. 3302.103(A) supplies the years, 2010, 2013 and 2018, without naming districts. East
+  Cleveland's is the 2018 one, from the reporting around its release. Which of Youngstown and
+  Lorain is 2010 is not on this page or in any held source. [open]
 - **The linked documents are not held.** Approval letters, improvement plans and annual reports are
   separate PDFs. They would carry the benchmarks each district was held to, which is the only place
   the corpus could learn what a commission actually required. [open]

@@ -249,12 +249,14 @@ pub fn by_district() -> BTreeMap<String, (usize, usize)> {
 /// See [`ACADEMIC_DISTRESS_DISTRICT_IRNS`].
 pub const AUTHORED: &str = "2025-11-13";
 
-/// The two districts this edition flags as subject to R.C. 3302.10.
+/// The two districts this edition flags under the academic-distress route.
 ///
-/// East Cleveland City and Youngstown City. On [`AUTHORED`] both were. By the time the 2026-2027
-/// school year this list governs began, only Youngstown was: East Cleveland's commission ceased to
-/// exist in late December 2025, when the director released the district and R.C. 3302.10(N)(1)
-/// ended the commission with the transition period.
+/// East Cleveland City and Youngstown City. On [`AUTHORED`] both had a commission in existence,
+/// though neither was strictly "subject to section 3302.10": R.C. 3302.103(E)(1) suspends that
+/// section while a district implements its improvement plan, and keeps the commission in being. By
+/// the time the 2026-2027 school year this list governs began, only Youngstown's commission
+/// existed: East Cleveland's was dissolved in late December 2025, when the director released the
+/// district on a majority of its plan benchmarks under R.C. 3302.103(F)(2).
 pub const ACADEMIC_DISTRESS_DISTRICT_IRNS: [&str; 2] = [EAST_CLEVELAND_IRN, YOUNGSTOWN_IRN];
 
 /// East Cleveland City's IRN. Flagged, and released from its commission six weeks after

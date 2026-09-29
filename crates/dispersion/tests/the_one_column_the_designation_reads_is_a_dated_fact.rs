@@ -19,17 +19,22 @@
 //! - **Youngstown City**, IRN `045161`, thirteen buildings, flag `yes`.
 //!
 //! The workbook's own `docProps/core.xml` dates it to [`designated::AUTHORED`] — 13 November 2025,
-//! created and last modified thirty-four minutes apart. On that date all three flags were right.
+//! created and last modified thirty-four minutes apart. On that date all three flags were right,
+//! read as whether a commission exists. They were not right read as (C)'s literal "subject to
+//! section 3302.10": R.C. 3302.103(E)(1) suspends that section for a district implementing its
+//! improvement plan, and both flagged districts were. The department evidently reads the column
+//! as R.C. 3310.03(E)(2) does, by the commission's existence, which 3302.103(E)(3) preserves.
 //!
 //! **Six weeks later East Cleveland's stopped being right.** In late December 2025 the director of
 //! education and workforce wrote to the district's superintendent that it "has been released from
 //! Academic Distress Commission oversight", having met 16 of 20 benchmarks under its Revitalization
-//! Plan with an overall three-star rating. R.C. 3302.10(N)(1) attaches the consequence: "Upon
-//! completion of the transition period, the chief executive officer shall relinquish all
-//! operational, managerial, and instructional control of the district ... and the academic distress
-//! commission shall cease to exist." Release is not a departmental courtesy that leaves the
-//! commission standing — the statute ends it with the transition. By January 2026 the department
-//! was describing Youngstown as the sole district in Ohio under academic distress.
+//! Plan with an overall three-star rating. R.C. 3302.103(F)(2) attaches the consequence: if the
+//! district "meets at least a majority of the academic improvement benchmarks established in its
+//! improvement plan ... the academic distress commission shall be dissolved". Release is not a
+//! departmental courtesy that leaves the commission standing — the statute ends it. (R.C.
+//! 3302.10(N)(1) was not the route: 3302.103(E)(1) suspends 3302.10 while a plan runs.) By January
+//! 2026 the department was describing Youngstown as the sole district in Ohio under academic
+//! distress.
 //!
 //! R.C. 3310.03(E)(2) then says the department "shall cease awarding first-time scholarships
 //! pursuant to division (C) ... when the academic distress commission established for the district

@@ -66,7 +66,8 @@ findings: |
   [growth](../metric/progress-value-added.yml). [verified]
 
   **The threshold that pays sits below the threshold that releases.** Division (N)(1) needs three
-  stars to *begin* a transition out. 59 districts sit below that — Youngstown among them at 2.5 —
+  stars to *begin* a transition out. 59 districts sit below that — Youngstown among them at 2.5,
+  though its own exit runs through R.C. 3302.103 rather than (N), below —
   and **15 of them are paid, $3,036,977.90 between them, not one through the star route.** A
   district can be too poorly rated to start its own release and well enough rated to be paid for
   its performance in the same year. [verified] (computed)
@@ -88,7 +89,7 @@ findings: |
       Lorain City School District   dissolved by H.B. 33, signed 4 July 2023
       Youngstown City Schools       continuing; the sole district left under one as of January 2026
 
-  **Three commissions have ended three different ways, and at most one of them by division (N).** The
+  **Three commissions have met three different ends, and none of them was division (N).** The
   release notice this node previously recorded without opening has now been read, and it dates East
   Cleveland's exit — not on its face, because the letter carries no date line, but from the
   department's own filename (`message-12_25`), the letter's closing promise to visit "in January",
@@ -98,37 +99,48 @@ findings: |
   read 15 September 2026) The district had been under state control since 2018, so its commission
   ran roughly seven years.
 
-  The letter's grounds read as division (N)(1): 16 of 20 benchmarks met, the Performance Index up
-  more than 12 points, a 4-star Progress rating, and **an overall rating of 3 stars** — the
-  threshold that begins a transition. And "released" is not a softer status than the statute's: by
-  (N)(1) the chief executive officer relinquishes control "and the academic distress commission
-  shall cease to exist". [verified] So the department's word and R.C. 3310.03(E)(2)'s trigger for
-  cutting off first-time scholarships are the same event.
+  The letter's grounds are the benchmarks of a plan: 16 of 20 met, the Performance Index up more
+  than 12 points, a 4-star Progress rating, and an overall rating of 3 stars. [verified] **The
+  statute they answer to is R.C. 3302.103, not division (N).** [H.B.
+  110](../legislation/hb-110-2021.yml) enacted that section for the three districts then under a
+  commission. Each board wrote an academic improvement plan "in effect from July 1, 2022, to June
+  30, 2025", with annual and overall benchmarks. While a district implements its plan, division
+  (E) says it "shall not be subject to section 3302.10": the board takes its powers back, the chief
+  executive officer is removed, and the commission continues only to assist. At the end, division
+  (F)(2) says a district that meets "at least a majority of the academic improvement benchmarks"
+  has its commission "dissolved". [verified]
+  ([`crates/project/fixtures/revised-code.txt`](../../../crates/project/fixtures/revised-code.txt))
+  East Cleveland's plan was approved on 3 December 2021, so from July 2022 division (N) did not
+  apply to it at all, and 16 of 20 is a majority. The release is division (F)(2). [verified] The
+  three stars are in the letter as a result, not as a ground: a first three-star year could not
+  have completed (N)(1) anyway, because that year only begins a transition. Either way the
+  commission no longer exists, so R.C. 3310.03(E)(2)'s cut-off for first-time scholarships is
+  still the same event.
 
-  **They read at least as well as H.B. 110's own exit, which this node did not hold.** [H.B.
-  110](../legislation/hb-110-2021.yml) gave these three districts a separate way out. Each board
-  develops an academic improvement plan with benchmarks covering FY2023 to FY2025. Once the plan
-  is approved, the district takes back control from the chief executive officer, who is removed,
-  and it "is not subject to any other provisions of current law regarding ADCs". At the end of
-  the three years, a district that meets "at least a majority of the academic improvement
-  benchmarks" has its commission dissolved. [verified]
-  ([greenbook](../../../crates/project/fixtures/lsc-education-greenbooks.txt)) Sixteen of twenty
-  is a majority, the plan period closed with FY2025, and the letter came in late December 2025.
-  A single three-star year cannot complete (N)(1) in any case, because that year only begins a
-  transition and expressly does not count toward ending it. So East Cleveland more likely left
-  through H.B. 110's process than through (N)(1). [inference] The notice as recorded names no
-  section, and the corpus holds neither R.C. 3302.103's text nor East Cleveland's earlier overall
-  ratings. [open] Either route ends the commission. What "not subject to any other provisions" did
-  to division (G)(3)'s scholarship switch during the plan years is also unread. [open]
+  **The plan years left the two scholarship divisions disagreeing.** R.C. 3310.03(C) makes a
+  student eligible if the resident district "is subject to section 3302.10", and 3302.103(E)(1) says
+  a district implementing its plan is not. Division (E)(2) stops first-time awards only when the
+  commission "ceases to exist", and 3302.103(E)(3) keeps the commission in existence through the
+  plan. [verified] Read literally, division (C) switched Option A off in July 2022 while division
+  (E)(2) waited for the dissolution. [inference] The department's designated list follows the
+  second reading: it still flagged East Cleveland in November 2025. Whether the department has said
+  why is unread. [open]
 
-  **The two-to-three star trap has a witness, though not a clean one.** This node reasoned that a
-  district between two and three stars can neither re-trigger nor begin its exit. Youngstown sits
-  at 2.5, and in January 2026 the department told reporters that its removal "would have to be the
-  result of state legislation". [verified] That fits the trap. It fits just as well a district
-  whose H.B. 110 plan period has run without meeting a majority of its benchmarks, and since its
-  plan was approved Youngstown has been on that route rather than division (N)'s. [inference]
-  Lorain's exit *was* legislation. So of the three, one left on its plan or its rating, one by
-  statute, and the third has reached neither. [inference]
+  **The two-to-three star trap does not hold anyone here.** This node reasoned that a district
+  between two and three stars can neither re-trigger nor begin its exit under division (N). That
+  is still how the section reads, but none of the three has been subject to it since July 2022,
+  and the department names no other district under a commission.
+  Youngstown sits at 2.5, and in January 2026 the department told reporters that its removal
+  "would have to be the result of state legislation". [verified] Under 3302.103 a district that
+  misses a majority may apply for up to two one-year extensions. If it misses at the end of five
+  years, or an extension is refused, division (F)(1)(b) returns it to R.C. 3302.10 with a new chief
+  executive officer. [verified] The department's page records an approved extension of
+  Youngstown's plan, so it is in an extension year and still outside R.C. 3302.10. [verified]
+  ([`dew-academic-distress-commission`](../../catalog/dew-academic-distress-commission.md)) Its
+  remark then fits a district that can leave early only by statute, with its benchmarks judged
+  again at the end of the extension, rather than the star band. [inference] Which extension it is
+  in, and so whether FY2027 is its last plan year, is not recorded. [open] So of the three, one
+  left on its plan, one by statute, and the third has done neither. [verified]
 
   All three were under oversight when a 2021 change in state law required an academic
   improvement plan running three school years with annual benchmarks; revised plans were
@@ -151,6 +163,16 @@ findings: |
   is an argument for holding both domains that only became visible once both were held.
   [inference]
 
+  **The three commissions are dated by the statute that let them out.** R.C. 3302.103(A)
+  applies to a district whose commission was established in 2010 or in 2013 under the former R.C.
+  3302.10 and re-established under the current section, and to one established in 2018 under
+  the current section. [verified]
+  ([`crates/project/fixtures/revised-code.txt`](../../../crates/project/fixtures/revised-code.txt))
+  The 2018 commission is East Cleveland's, which matches the reporting around its release. The
+  section names no district, and no held source says which of Lorain and Youngstown is 2010 and
+  which is 2013. [open] So two of the three commissions began under the former section and were
+  carried into the current one.
+
   **And Cleveland is not one of the three.** Its
   [node](../education-agency/cleveland-municipal.yml) records "state academic distress
   intervention for part of the period" without saying which regime. The regime before this one is
@@ -160,14 +182,18 @@ findings: |
   commission for an academic emergency district that had failed adequate yearly progress in four
   consecutive years, with authority over personnel, management and budgetary decisions.
   [verified] ([greenbook](../../../crates/project/fixtures/lsc-education-greenbooks.txt)) LSC's
-  final analysis places it at R.C. 3302.10 effective July 2007. [inference] That Cleveland's
-  intervention fell under this regime is still an inference. Whether and when Cleveland entered and
-  left it has not been read. [open] Reading the current three as the complete history would lose
-  the fact that Ohio has had two regimes, and since 2021 a third route out of the second.
+  final analysis places it at R.C. 3302.10 effective July 2007. [inference] R.C. 3302.103(A)
+  lists the commissions under the former section that survived into the current one, 2010 and
+  2013, and those are Youngstown and Lorain. Cleveland, if it was under the former section, had
+  left it by October 2015. [inference] Whether it was ever under a commission at all has not been
+  read. [open] Reading the current three as the complete history would lose the fact that Ohio
+  has had two regimes, and since 2021 a third route out of the second.
 
   ### Getting out is harder than staying in
 
-  The exit criteria are division (N), and they are not the trigger run backwards. [verified]
+  The exit criteria are division (N), and they are not the trigger run backwards. [verified] They
+  are the section's own, and since July 2022 none of the three districts has been subject to them:
+  R.C. 3302.103 set them aside for the plan years, as above.
 
   A district *begins* a transition out when it receives an overall grade of "C" or higher, or an
   overall performance rating of **three stars or higher**. That year starts a clock and,
@@ -208,9 +234,9 @@ findings: |
   (crates/dispersion) An intervention's end reaches the scholarship channel through a column in a
   spreadsheet, and it reached it late.
 
-  **What is still not established.** When Lorain's and Youngstown's commissions were established —
-  the department's page gives the 2021 plan requirement and the 2023 dissolution and no start
-  dates, and only East Cleveland's is dated, to 2018 by the reporting around its release. [open]
+  **What is still not established.** Which of Lorain's and Youngstown's commissions is the 2010
+  one and which the 2013 one: R.C. 3302.103(A) gives the two years and names neither district.
+  [open]
   Whether any commission changed outcomes, which is what the apparatus rests on. [open] And the
   trigger itself is uncomputable from what is held: R.C. 3302.10(A)(1) needs three consecutive
   years of the **overall** district rating, and the corpus holds one year of the Achievement
@@ -265,6 +291,23 @@ revisions:
       The former regime is now dated and has a creating act in the corpus. Cleveland's place in
       it is still unsourced. The claim that it was under this regime was never more than an
       inference and is now marked as one.
+  - was: |
+      East Cleveland "more likely left through H.B. 110's process than through (N)(1)", with the
+      route open, and the Youngstown remark read as fitting either the star band or the plan
+      route. The commissions' start dates, other than East Cleveland's, were open.
+    now: |
+      Settled by the section itself. R.C. 3302.103(E)(1) takes a district implementing its plan
+      out of R.C. 3302.10 entirely, so (N) could not apply from July 2022. East Cleveland's
+      release is division (F)(2), a majority of benchmarks. The trap holds nobody while the plan
+      route runs. The commissions date to 2010, 2013 and 2018.
+    found_by: |
+      Vendoring R.C. 3302.103 into `revised-code.txt` for #540 and reading divisions (A), (E) and
+      (F).
+    reach: |
+      The event, its date and its scholarship consequence stand. The section also shows that
+      R.C. 3310.03(C) and (E)(2) disagree during the plan years, which the designated-list
+      finding in `crates/dispersion` had read as one test. Which of Lorain and Youngstown is 2010
+      stays open.
 figures:
   - key: project/performance-supplement-to-youngstown
     value: 162207.67
@@ -306,6 +349,12 @@ properties:
 
     Division (O) is the other exit: a district left operating no schools, by reconstitution or
     closure, ends its own commission. [verified]
+
+    R.C. 3302.103 is a third, for the three districts under a commission in 2021 only. While a
+    district implements its academic improvement plan it is not subject to R.C. 3302.10. Meeting a
+    majority of the plan's benchmarks at the end of the three years, or after up to two one-year
+    extensions, dissolves the commission. Missing them after five years, or being refused an
+    extension, returns the district to R.C. 3302.10. [verified]
   powers: |
     Exercised by a chief executive officer appointed by the commission and paid by the department.
     Employee responsibilities and job descriptions; compensation; teacher class loads; evaluations;
@@ -352,12 +401,11 @@ properties:
     is in the funding formula, and the first is a deduction the formula does not see coming.
     [inference]
 unfilled:
-  - field: the commissions' start dates
+  - field: which of Lorain and Youngstown holds the 2010 commission
     why: >-
-      The department's page gives the 2021 plan requirement and the 2023 dissolution and no
-      establishment dates. East Cleveland's is now dated to 2018 from the reporting around its
-      release, so two of the three remain unplaceable on the fiscal-period axis rather than all
-      three.
+      R.C. 3302.103(A) dates the three commissions to 2010, 2013 and 2018, and East Cleveland's is
+      the 2018 one. The section names no district, and neither the department's page nor any held
+      greenbook says which of the other two is which.
   - field: the overall district rating, three consecutive years
     why: >-
       R.C. 3302.10(A)(1)'s trigger needs it and no held source carries it: the report card fixture
