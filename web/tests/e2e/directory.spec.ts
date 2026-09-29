@@ -130,6 +130,31 @@ test.describe("the district index shows the distribution it is filtering", () =>
     await expect(page.locator("#district-measures")).toHaveAttribute("data-measure", "poverty");
     await expect(page.locator("#district-measures .measure:visible")).toHaveCount(1);
   });
+
+  test("the strip's high-value label never crowds the filter label below it", async ({ page }) => {
+    /*
+     * `.measures` and the `.filters` form that follows it had no margin between them anywhere in
+     * the chain — `.scale`, the div holding the strip's own low/high labels, carried none either —
+     * so the visible strip's high-value label (e.g. "$896") sat directly against "Name or IRN" at
+     * every width. Not font-sensitive: the gap was zero regardless of how either label is set.
+     */
+    for (const width of [375, 768, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/districts");
+      const scaleHigh = page.locator(".measure:visible .scale span").last();
+      const nameLabel = page.locator('label[for="f-name"]');
+      const [scaleBox, labelBox] = await Promise.all([
+        scaleHigh.boundingBox(),
+        nameLabel.boundingBox(),
+      ]);
+      expect(scaleBox, `${width}px: strip label box`).not.toBeNull();
+      expect(labelBox, `${width}px: filter label box`).not.toBeNull();
+      expect(
+        labelBox!.y,
+        `${width}px: "${await scaleHigh.textContent()}" (bottom ${scaleBox!.y + scaleBox!.height}) vs "Name or IRN" (top ${labelBox!.y})`,
+      ).toBeGreaterThan(scaleBox!.y + scaleBox!.height);
+    }
+  });
 });
 
 /**

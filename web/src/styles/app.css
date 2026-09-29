@@ -14,9 +14,9 @@
  *    choice still beats the OS setting — but the theme tokens are now discoverable as theme tokens
  *    rather than hidden behind what reads to tooling as a component selector.
  *
- * 2. Type and space tokens exist for the first time. Nothing below consumes them yet: the rules in
- *    this file still carry their own literals, and moving them onto the scale is the next step, not
- *    this one. They are imported now so the two halves cannot drift while that happens.
+ * 2. Type and space tokens exist for the first time. That was true on landing; the rules below now
+ *    reach for `--text-*` and `--space-*` directly rather than restating the literal, and a rule
+ *    still carrying one is the exception rather than the rule.
  */
 @import "./tokens/colors.css";
 @import "./tokens/typography.css";
@@ -40,10 +40,11 @@ body {
    *
    * `--font-sans` names IBM Plex Sans first and no binary ships. Pointing `body` at it would put
    * that face in front for whoever happens to have it installed, giving those readers a site
-   * measured against a font nobody calibrated: the chart constants in `plot/spec.ts`, the four
-   * `--sticky-chrome` values and the reading measure were all set against the platform stack. The
-   * serif decision settled the general question — this site renders in platform faces — and this
-   * is the same answer applied to the sans. See `tokens.spec.ts`.
+   * measured against a font nobody calibrated: the chart constants in `plot/spec.ts`, the two
+   * `--sticky-chrome` values (52px, and 106px at >=1000px) and the reading measure were all set
+   * against the platform stack. The serif decision settled the general question — this site
+   * renders in platform faces — and this is the same answer applied to the sans. See
+   * `tokens.spec.ts`.
    */
 }
 
@@ -1230,7 +1231,10 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
  * A reader with no script sees the aid distribution and a complete page; a reader with script sees
  * the strip follow the column they sorted by.
  */
-.measures { margin: var(--space-6) 0 0; }
+/* Bottom margin added deliberately: `.scale`'s high-value label (e.g. "$896") had nothing
+   between it and the "Name or IRN" filter label below, on every width — see the crowding
+   regression test in `tests/e2e/directory.spec.ts`. */
+.measures { margin: var(--space-6) 0 var(--space-6); }
 .measure { display: none; }
 .measures[data-measure="adm"] .measure[data-measure="adm"],
 .measures[data-measure="aid"] .measure[data-measure="aid"],
@@ -1373,7 +1377,7 @@ math {
  * `overflow-x: auto` on a `display: block math` box, Chromium reports no overflow while visibly
  * cutting the last row of an `aligned` environment in half.
  */
-.formula {
+div.formula {
   overflow-x: auto;
   background: var(--surface-inset);
   padding: var(--space-4) .7rem;
@@ -2141,7 +2145,7 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
  * corrected in place rather than rewritten, and that sentence is the point of the whole feature.
  */
 .card.correction-index {
-  border-color: color-mix(in srgb, var(--series-guarantee) 35%, var(--border));
+  border: 1px solid color-mix(in srgb, var(--series-guarantee) 35%, var(--border));
 }
 .card.correction-index h2 { color: var(--series-guarantee-text); }
 
@@ -2273,7 +2277,7 @@ h1.slug-title {
  * kind of reader it is for without making anyone hunt for it.
  */
 .card.apparatus {
-  border-style: dashed;
+  border: 1px dashed var(--border);
   background: none;
   color: var(--text-secondary);
   font-size: var(--text-base);
@@ -2429,13 +2433,14 @@ footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); 
  * elements, so omitting one is a missing child in the markup rather than a forgotten adjective,
  * and a build check can see it.
  *
- * # This is landed and not yet adopted, and the number is the reason
+ * # Landed, and adopted at four call sites so far — the number is why the rest waits
  *
- * The site formats figures through `format.ts` from **750 call sites across 28 files**. Wrapping
- * every one is a change worth deciding on with that number in hand rather than starting and
- * discovering it. The card-level year chip is what answers "which year" today, and it answers it
- * well for a card; where it does not reach is body prose, a chart label, and a table cell whose
- * column head is silent. That gap is real and this is the shape that closes it.
+ * The site formats figures through `format.ts` from **750 call sites across 28 files**, and only
+ * `districts.astro`, `district/[irn].astro`, `district/[irn]/taxes.astro` and `statewide.ts` call
+ * `fig()` today. Wrapping the rest is a change worth deciding on with that number in hand rather
+ * than starting and discovering it. The card-level year chip is what answers "which year" today,
+ * and it answers it well for a card; where it does not reach is body prose, a chart label, and a
+ * table cell whose column head is silent. That gap is real and this is the shape that closes it.
  *
  * In a table cell the annotation moves to the column head, which is the only place it is not
  * repeated 609 times — so a cell keeps the value alone and the head must carry the rest.

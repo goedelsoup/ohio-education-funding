@@ -41,7 +41,7 @@ const description =
   wide
 >
   <h1>{county.name} County</h1>
-  <p class="sub">
+  <p class="lead">
     {count(county.districts.length)} district{county.districts.length === 1 ? "" : "s"} ·
     {" "}{count(Math.round(county.adm))} pupils
     {" "}{county.onGuarantee > 0 ? ` · ${count(county.onGuarantee)} on the guarantee` : ""}

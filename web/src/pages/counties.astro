@@ -108,7 +108,7 @@ const overlapping = (() => {
   wide
 >
   <h1>Counties</h1>
-  <p class="sub">
+  <p class="lead">
     Ohio's {count(all.length)} counties, ordered by the gap between the richest and poorest school
     district inside each one. {widest.name} is the widest at{" "}
     {widest.valuationRatio!.toFixed(1)}&times;, and {count(measurable.filter((c) => c.valuationRatio! >= 3).length)}{" "}

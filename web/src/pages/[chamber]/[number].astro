@@ -82,7 +82,7 @@ const valuationByIrn = new Map(
   wide
 >
   <h1>{label} District {number}</h1>
-  <p class="sub">
+  <p class="lead">
     {count(house.members.length)} school district{house.members.length === 1 ? "" : "s"}
     {house.districts_wholly_inside > 0 ? `, ${count(house.districts_wholly_inside)} of them wholly inside` : ""}
     {" "}· an estimated {count(Math.round(house.adm))} pupils
