@@ -41,13 +41,6 @@ description: |
   406 districts draw the first, 388 the second, and 200-odd draw both — which is coherent,
   since being efficient with the buses you run and having few children per square mile are
   different problems. [verified]
-
-  ### A proration on the special education line
-
-  `[J]` is `max(state share, 50%) x reported cost x 0.91746`. A factor below one means the
-  appropriation did not cover the computed entitlement, so the published amount is not what a
-  district is owed but what there was to divide. See [appropriation proration
-  factor](../parameter/appropriation-proration-factor.yml). [verified]
 figures:
   - key: project/transportation-proration-earmark-fy2014
     value: 413385915.0
@@ -185,6 +178,13 @@ findings: |
   driven (for FY 2023 only)". Neither gives a reason, so the mile premium, like the rider premium,
   was enacted without one on record. [verified] (the fiscal note and the Members Brief, read at
   retrieval and not committed)
+
+  ### A proration on the special education line
+
+  `[J]` is `max(state share, 50%) x reported cost x 0.91746`. A factor below one means the
+  appropriation did not cover the computed entitlement, so the published amount is not what a
+  district is owed but what there was to divide. See [appropriation proration
+  factor](../parameter/appropriation-proration-factor.yml). [verified]
 
   ### The appropriation does not cover the entitlement, and this is the arithmetic
 

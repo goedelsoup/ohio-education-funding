@@ -89,6 +89,9 @@ findings: |
 
   ### The second count is a year behind the weights, and the act says it should not be
 
+  The act names the **vintage**, which nothing else did: the first term is the **FY2025** count,
+  not the year the aid is paid in.
+
   H.B. 96 fixes the first term at FY2025 and sets the second on *"the ADM of students directly
   certified as economically disadvantaged **for the fiscal year for which the DPIA payment is
   calculated**"*. The greenbook writes the FY2027 row out to match — `(FY 2027 Directly certified
@@ -243,9 +246,6 @@ description: |
   So the blend is **uncodified statutory law** — the same category as the four supplements —
   changeable by the next budget and not by the department. [verified] (`lsc-budget`,
   `crates/project/tests/what_the_act_says_and_the_code_does_not.rs`)
-
-  And the act names the **vintage**, which nothing else did: the first term is the **FY2025**
-  count, not the year the aid is paid in.
 figures:
   - key: project/dpia-statewide-percentage-fy2026
     value: 0.565990245

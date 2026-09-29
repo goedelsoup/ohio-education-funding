@@ -473,8 +473,8 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 95 | 0 |
-| `description` | 44 | 0 |
+| `findings` | 97 | 0 |
+| `description` | 42 | 0 |
 | `revisions` | 11 | 0 |
 | `series` | 7 | 0 |
 | `unpriced` | 5 | 0 |
@@ -507,7 +507,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `calculator` | 1 | 0 |
 | `appropriating_bill` | 1 | 0 |
 
-**111 recorded withdrawals across 48 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**113 recorded withdrawals across 48 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Relationship vocabulary

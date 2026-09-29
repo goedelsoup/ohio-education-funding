@@ -32,19 +32,6 @@ description: |
   FY2025 — about 12%, of which the phase-in advance accounts for none, since phase-in scales
   the appropriation rather than the computed cost. [inference] A refresh of comparable
   magnitude is the natural first perturbation to test.
-
-  **Predicted shape, stated in advance so the run can contradict it.** Freezing the reference
-  year should bite hardest where salaries have risen fastest since FY2022, and the effect
-  should be larger in state-share terms for districts with high state share — because state aid
-  is the residual after local capacity, a reduction in computed base cost falls
-  disproportionately on the state's portion. [inference] That would make a freeze regressive
-  across the wealth distribution despite being uniform in method.
-
-  Two effects will partly offset it and must be reported separately rather than netted:
-  districts at the **10% minimum state share** are insulated at the bottom of the state-share
-  scale [verified], and districts held on a **guarantee** are off-formula entirely and see no
-  effect at all. [inference] If the run does not show the predicted shape, the reasoning above
-  is wrong.
 findings: |
   **THE ANSWER, on the department's own published worked example district** (20,342.13 base
   cost enrolled ADM, 43 buildings), perturbing the classroom teacher salary from the FY2022
@@ -63,6 +50,20 @@ findings: |
   **computed base cost statewide by roughly $497 million a year, from the teacher salary term
   alone.** [inference] (assumes this district's cost structure is representative) The state's
   appropriation consequence is a different and smaller number; see the incidence result below.
+
+  ### Predicted shape, stated in advance so the run can contradict it
+
+  Freezing the reference year should bite hardest where salaries have risen fastest since FY2022, and the effect
+  should be larger in state-share terms for districts with high state share — because state aid
+  is the residual after local capacity, a reduction in computed base cost falls
+  disproportionately on the state's portion. [inference] That would make a freeze regressive
+  across the wealth distribution despite being uniform in method.
+
+  Two effects will partly offset it and must be reported separately rather than netted:
+  districts at the **10% minimum state share** are insulated at the bottom of the state-share
+  scale [verified], and districts held on a **guarantee** are off-formula entirely and see no
+  effect at all. [inference] If the run does not show the predicted shape, the reasoning above
+  is wrong.
 
   ### The incidence result is sharper than predicted
 

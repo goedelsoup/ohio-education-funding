@@ -44,12 +44,6 @@ description: |
   way toward a new one. Whether that left them ahead or behind depends on how the FY2022 computed
   DPIA compared with the FY2019 payment, district by district, and the FY2019 figures are not
   held here. [open]
-
-  **Reaching 100% does not mean reaching the plan.** H.B. 96 takes the phase-in to 100% in
-  FY2027 while holding the cost inputs at FY2022 levels. [verified] (the LSC greenbook states
-  both) The percentage and the
-  input reference year are separate dials, and only one of them is usually named. See
-  [`fsfp-base-cost-calculation`](../formula-component/fsfp-base-cost-calculation.yml).
 properties:
   name: FSFP phase-in percentage
   unit: percent
@@ -146,6 +140,13 @@ findings: |
   **down** toward the formula as the percentage rises. For those districts a lower phase-in is
   worth *more*. The schedule that runs 16.67% to 100% is the sixfold retirement of a floor, and
   the plan's own arrival at full funding is what removes the protection.
+
+  ### Reaching 100% does not mean reaching the plan
+
+  H.B. 96 takes the phase-in to 100% in FY2027 while holding the cost inputs at FY2022 levels.
+  [verified] (the LSC greenbook states both) The percentage and the input reference year are
+  separate dials, and only one of them is usually named. See
+  [`fsfp-base-cost-calculation`](../formula-component/fsfp-base-cost-calculation.yml).
 
   ### Lowering it cannot push a district onto the guarantee
 

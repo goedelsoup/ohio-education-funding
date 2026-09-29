@@ -44,12 +44,6 @@ description: |
   even run — seven years earlier. The last clause is now literal rather than rhetorical, and the
   span is **eight** years: FY2020 was a freeze of FY2019, so the distribution being held was
   computed in FY2019. [verified]
-
-  ### It is a nominal quantity
-
-  Written in dollars with no escalator, so its real value falls every year by construction.
-  Across FY2020-FY2025 prices rose 25.1%. A parameter that is never changed is still being
-  changed, in the only terms that matter to a district's payroll. [verified]
 findings: |
   ### It is published for every district, not only the guaranteed ones
 
@@ -146,6 +140,12 @@ findings: |
   back down above the third sextile, where the plan's two size-dependent terms have stopped
   binding. Because it is monotone it cannot produce the peak at the third sextile, which is how
   it was separated from the terms that do. [inference]
+
+  ### It is a nominal quantity
+
+  Written in dollars with no escalator, so its real value falls every year by construction.
+  Across FY2020-FY2025 prices rose 25.1%. A parameter that is never changed is still being
+  changed, in the only terms that matter to a district's payroll. [verified]
 
 figures:
   - key: project/guarantee-anchor-per-pupil-gradient

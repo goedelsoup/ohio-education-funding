@@ -42,10 +42,6 @@ description: |
   fund to support innovative education programs", holds **sole authority to disburse** from it
   until the district exits, and every disbursement must support the approved improvement plan.
   Moneys appropriated by the General Assembly for that purpose go into it. [verified]
-
-  **The powers escalate by year**, and division (K) replaces the elected board in year four — so
-  it is superseded on a schedule rather than at the trigger. Two other divisions move money past
-  the district. [verified] Both are set out below.
 findings: |
   ### It pays and takes at once, and it is not the same number
 
@@ -250,6 +246,10 @@ properties:
     continue those alterations. **Year four: a new board of education is appointed** under R.C.
     3302.11, while the CEO retains complete control until relinquishing it under division (N).
     Year five and after: everything already unlocked. [verified]
+
+    So the elected board is superseded on a schedule rather than at the trigger: division (K)
+    replaces it in year four. Two other divisions move money past the district. [verified] Both
+    are set out under `fiscal_effect`.
   fiscal_effect: |
     Transfers the power to create the district's budget from the elected board to a state-appointed
     chief executive officer whose salary the department pays. [verified] Establishes a separate
