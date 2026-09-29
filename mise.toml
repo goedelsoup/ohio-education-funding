@@ -222,7 +222,7 @@ echo "the feed, both manifests, the site icon and every REGEN block are current"
 [tasks.deploy]
 description = "Manually publish web/dist to Cloudflare Pages. Production deploys itself on merge to main."
 # Production is deployed by the `deploy` job in `.github/workflows/ci.yml`, on
-# every push to `main` that clears all three gates, from the exact `dist/` the
+# every push to `main` that clears both build gates, from the exact `dist/` the
 # browser suite ran against. This task is the escape hatch — a Cloudflare outage
 # mid-merge, or a deploy needed while the remote is unreachable — and running it
 # should be a decision rather than a habit.

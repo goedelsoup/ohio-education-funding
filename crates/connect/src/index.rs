@@ -1264,7 +1264,7 @@ pub fn regenerate(root: &Path) -> Result<Vec<String>, IndexError> {
 /// Which documents carry a stale block, without touching any of them.
 ///
 /// The form a gate wants. Regenerating and then asking `git diff --quiet` — which is what
-/// `.github/workflows/ci.yml` does — cannot distinguish a stale block from an unrelated
+/// `.github/workflows/ci.yml` once did — cannot distinguish a stale block from an unrelated
 /// uncommitted edit in the same file, so it reports a false failure against any dirty working
 /// tree. CI never met that case because CI checks out clean; a person running the same check
 /// locally meets it immediately, and a gate that cries wolf on every edit is a gate that gets
