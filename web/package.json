@@ -10,6 +10,7 @@
     "check": "astro check",
     "lint": "oxlint src scripts tests",
     "schemas": "node scripts/schemas.ts",
+    "appearances": "node scripts/appearances.ts",
     "check:dist": "node scripts/check-dist-links.ts",
     "corpus:report": "node scripts/corpus-report.ts",
     "measure": "node scripts/measure.ts",

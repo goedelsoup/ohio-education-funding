@@ -286,6 +286,22 @@ export const NodeSchema = z
 const OntologyPropertySchema = z
   .object({
     name: z.string().min(1),
+    /**
+     * What a reader is shown in place of the name, in sentence case: "Effect on accountability"
+     * for `accountability_effect`, "Procedural history" for `procedural_history`.
+     *
+     * **Required, and declared here rather than looked up in `web/`.** The name is a key an author
+     * types and a validator matches. The node and class pages printed it in `<code>` because
+     * nothing else was available, so a reader met `procedural_history` where a heading belonged
+     * (#551). A lookup table in the site would be a second vocabulary that drifts from the first the
+     * day somebody declares a property; on the declaration, it arrives with the key or the schema
+     * refuses it.
+     *
+     * yidam has no such field and ignores it: measured at 0.16.0, `yidam lint` passes unchanged
+     * with the key present. The rule is in
+     * [`a-key-is-not-a-label`](../../../../.yidam/decisions/a-key-is-not-a-label.yml).
+     */
+    label: z.string().min(1),
     type: z.string().min(1),
     /**
      * Whether an instance without this property is incomplete (`true`) or merely quiet (`false`).
@@ -341,6 +357,17 @@ const OntologyPropertySchema = z
 const OntologyEdgeSchema = z
   .object({
     relationship: z.string().min(1),
+    /**
+     * What a reader is shown in place of the relationship slug: "Measured against" for
+     * `baselines-on`, "Priced by" for `simulated-by`. Required for the reason a property's
+     * `label` is.
+     *
+     * One slug has one label wherever it is declared — `funded-by` is on two classes, `parallels`
+     * twice on one — and `ontologyLabels.spec.ts` holds that. A relationship no class declares,
+     * which is most of them, has nowhere to carry one and is shown as its slug in words; see
+     * `relationshipLabel` in `lib/corpus.ts`.
+     */
+    label: z.string().min(1),
     target: z.string().min(1),
     direction: z.enum(["in", "out"]),
     description: z.string().min(1),

@@ -12,10 +12,12 @@ description: |
   is an input policy chooses, a metric is an output policy produces.
 properties:
   - name: name
+    label: Name
     type: string
     required: true
     description: The measure's name
   - name: unit
+    label: Unit
     type: string
     required: true
     values: [dollars, dollars-per-pupil, percent, mills, ratio, index, pupils]
@@ -23,25 +25,30 @@ properties:
       What one value of the metric is measured in. `pupils` is a membership, full-time-equivalent
       and fractional, and not a count
   - name: definition
+    label: Definition
     type: text
     required: true
     prose: true
     description: The computation, stated as a formula over named inputs
   - name: inputs
+    label: Inputs
     type: text
     required: true
     prose: true
     description: The source series required, and where each comes from
   - name: caveats
+    label: Caveats
     type: text
     required: true
     prose: true
     description: Known ways this measure misleads, and what it excludes
   - name: calculator
+    label: Calculator
     type: string
     required: true
     description: Name of the crates/ calculator implementing it, if implemented
   - name: series
+    label: Values over time
     type: text
     required: true
     prose: true
@@ -67,22 +74,27 @@ properties:
 edge_policy: characteristic
 edges:
   - relationship: derived-from
+    label: Derived from
     target: metric
     direction: out
     description: A measure this one is computed from; composite measures must expose their inputs
   - relationship: measures
+    label: Measures
     target: education-agency
     direction: out
     description: The agency or agency set this measure is computed over
   - relationship: operationalizes
+    label: Makes measurable
     target: doctrine
     direction: out
     description: The normative principle this measure renders testable
   - relationship: computed-for
+    label: Computed for
     target: fiscal-period
     direction: out
     description: A fiscal period for which this measure has been computed
   - relationship: projected-by
+    label: Projected by
     target: scenario
     direction: in
     description: A counterfactual that forecasts this measure forward

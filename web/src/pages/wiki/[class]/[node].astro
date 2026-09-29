@@ -11,7 +11,9 @@
  * That join is the reason the wiki is on the same site as the data rather than beside it.
  */
 import Base from "../../../layouts/Base.astro";
-import { loadCorpus } from "../../../lib/corpus.ts";
+import { loadCorpus, propertyLabel, relationshipLabel } from "../../../lib/corpus.ts";
+import { loadAppearances } from "../../../lib/appearances.ts";
+import { leadAndBody } from "../../../lib/lead.ts";
 import { sectionForClass } from "../../../lib/nav.ts";
 import { loadFeed } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
@@ -34,7 +36,13 @@ export function getStaticPaths() {
 const { node } = Astro.props;
 const corpus = loadCorpus();
 const entry = corpus.byClass.get(node.className);
-const description = await renderProse(node.description, node.className, `${node.id}#description`);
+/* When the summary restates the description's first paragraph, that paragraph is the lead and the
+   body starts after it — the page says its first thing once. See `lib/lead.ts`. */
+const { lead, body: description } = leadAndBody(
+  node.summary,
+  node.description,
+  await renderProse(node.description, node.className, `${node.id}#description`),
+);
 const findings = node.findings
   ? await renderProse(node.findings, node.className, `${node.id}#findings`)
   : null;
@@ -296,6 +304,14 @@ const { byIrn } = loadFeed();
 const irn = node.properties.find((p) => p.name === "irn")?.value.match(/\b(\d{6})\b/)?.[1];
 const district = irn ? byIrn.get(irn) : undefined;
 
+/*
+ * The pages outside the corpus that link this node, from the committed inversion of the last
+ * build (#551). Before it, a reader who reached `metric/performance-index` from a search had no way
+ * to learn that every district's outcome page charts it: the link pointed one way. See
+ * `lib/appearances.ts` for why it is read off the build rather than declared.
+ */
+const appearances = loadAppearances()[node.id] ?? [];
+
 const stated = node.out.filter((edge) => edge.stated);
 const mentions = node.out.filter((edge) => !edge.stated);
 
@@ -368,7 +384,9 @@ for (const edge of node.out) {
  */
 const properties = shownProperties(node.properties.filter((p) => p.name !== "seeded_because"))
   .map((property) => ({
-    name: property.shownAs,
+    /* The declared label, never the key (#551). A typeset property is labelled as the plain one
+       it is shown in place of, for the reason `shownProperties` prints it under that name. */
+    name: propertyLabel(node.className, property.shownAs),
     html: isMathProperty(property.name)
       ? renderMathProperty(property.value, `${node.id}#${property.name}`, formulaTerms)
       : isListProperty(property.name)
@@ -394,7 +412,7 @@ const properties = shownProperties(node.properties.filter((p) => p.name !== "see
   <h1>{node.label}</h1>
   {/* The lead, ahead of everything including the identifier. A reader arriving at the longest
       node in the corpus used to meet 2,806 words before finding out what the thing was. */}
-  <p class="lead">{node.summary}</p>
+  {"html" in lead ? <p class="lead" set:html={lead.html} /> : <p class="lead">{lead.text}</p>}
   <p class="sub">
     <code>{node.id}</code>
     {node.in.length > 0 ? ` · ${node.in.length} node${node.in.length === 1 ? "" : "s"} point here` : ""}
@@ -486,9 +504,7 @@ const properties = shownProperties(node.properties.filter((p) => p.name !== "see
                 property.spans ? (
                   <>
                     <tr class="spanning-name">
-                      <th colspan="2">
-                        <code>{property.name}</code>
-                      </th>
+                      <th colspan="2">{property.name}</th>
                     </tr>
                     <tr class="spanning-value">
                       <td colspan="2" set:html={property.html} />
@@ -496,13 +512,60 @@ const properties = shownProperties(node.properties.filter((p) => p.name !== "see
                   </>
                 ) : (
                   <tr>
-                    <th>
-                      <code>{property.name}</code>
-                    </th>
+                    <th>{property.name}</th>
                     <td set:html={property.html} />
                   </tr>
                 ),
               )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )
+  }
+
+  {
+    /*
+     * Beside the links and ahead of them, because it is the same question asked of the rest of the
+     * site: "Pointed at by" is what in the corpus cites this node, and this is what outside it
+     * does. One row per place — a route every district has is one row, shown by one example of
+     * it, with how many of its pages carry the link; a route that links on some districts only
+     * says so in the count.
+     */
+    appearances.length > 0 && (
+      <div class="card" id="on-the-site" data-part="on-the-site">
+        <h2><SectionAnchor id="on-the-site" />Where this appears on the site</h2>
+        <p class="note">
+          The pages outside the corpus that link here, and the section of each the link sits in.
+        </p>
+        <div class="scroll">
+          <table class="prose">
+            <tbody>
+              {appearances.map((place) => (
+                <tr>
+                  <th>
+                    <a href={place.example.href}>{place.example.title}</a>
+                  </th>
+                  <td>
+                    {place.sections.length > 0 && (
+                      <>
+                        In{" "}
+                        {place.sections.map((section, i) => (
+                          <>
+                            {i > 0 && (i === place.sections.length - 1 ? " and " : ", ")}
+                            “<a href={`${place.example.href}#${section.id}`}>{section.label}</a>”
+                          </>
+                        ))}
+                        .{" "}
+                      </>
+                    )}
+                    {place.of > 1 &&
+                      (place.pages === place.of
+                        ? `The same link is on all ${count(place.of)} pages like this one.`
+                        : `The same link is on ${count(place.pages)} of the ${count(place.of)} pages like this one.`)}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -519,9 +582,7 @@ const properties = shownProperties(node.properties.filter((p) => p.name !== "see
             <tbody>
               {stated.map((edge) => (
                 <tr>
-                  <th>
-                    <code>{edge.relationship ?? "links to"}</code>
-                  </th>
+                  <th>{edge.relationship ? relationshipLabel(edge.relationship) : "Links to"}</th>
                   <td>
                     <a href={edge.href}>{edge.label}</a>
                   </td>
@@ -559,7 +620,7 @@ const properties = shownProperties(node.properties.filter((p) => p.name !== "see
                       <a href={edge.href}>{edge.label}</a>
                     </th>
                     <td>
-                      {edge.relationship ? <code>{edge.relationship}</code> : <span class="n">mentions</span>}
+                      {edge.relationship ? relationshipLabel(edge.relationship) : <span class="n">mentions</span>}
                     </td>
                   </tr>
                 ))}

@@ -12,19 +12,23 @@ description: |
   whether a regime was fair, not only what it paid.
 properties:
   - name: name
+    label: Name
     type: string
     required: true
     description: The principle's common name
   - name: origin
+    label: Origin
     type: string
     required: true
     description: Where the principle enters the domain — constitutional text, a decision, or scholarship
   - name: formulation
+    label: Formulation
     type: text
     required: true
     prose: true
     description: The principle stated precisely enough to be applied to a specific regime
   - name: contested
+    label: What is contested
     type: text
     required: true
     prose: true
@@ -45,22 +49,27 @@ properties:
 edge_policy: characteristic
 edges:
   - relationship: tensions-with
+    label: In tension with
     target: doctrine
     direction: out
     description: A principle this one trades against, such that advancing one may cost the other
   - relationship: grounded-in
+    label: Grounded in
     target: legislation
     direction: out
     description: The constitutional or statutory text this principle originates in
   - relationship: invoked-by
+    label: Invoked by
     target: litigation
     direction: in
     description: A case that reasoned from this principle
   - relationship: applied-to
+    label: Applied to
     target: funding-regime
     direction: in
     description: A regime that has been judged against this principle
   - relationship: operationalized-by
+    label: Made measurable by
     target: metric
     direction: in
     description: A computable measure that renders this principle testable

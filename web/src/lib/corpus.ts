@@ -221,8 +221,22 @@ export interface OntologyClass {
    * none. yidam gates instances against it; the class page shows it, because the description
    * stopped spelling it when the set became declared.
    */
-  properties: { name: string; type: string; description: string; values: string[] | null }[];
-  edges: { relationship: string; target: string; direction: string; description: string }[];
+  properties: {
+    name: string;
+    /** What a reader is shown instead of {@link name}. See `OntologyPropertySchema.label`. */
+    label: string;
+    type: string;
+    description: string;
+    values: string[] | null;
+  }[];
+  edges: {
+    relationship: string;
+    /** What a reader is shown instead of {@link relationship}. See `OntologyEdgeSchema.label`. */
+    label: string;
+    target: string;
+    direction: string;
+    description: string;
+  }[];
   nodes: Node[];
 }
 
@@ -826,12 +840,14 @@ function readClass(file: string, report: Diagnostic[]): Omit<OntologyClass, "nod
       : null,
     properties: ((parsed.properties ?? []) as Record<string, unknown>[]).map((p) => ({
       name: String(p.name ?? ""),
+      label: String(p.label ?? ""),
       type: String(p.type ?? ""),
       description: String(p.description ?? ""),
       values: Array.isArray(p.values) ? p.values.map(String) : null,
     })),
     edges: ((parsed.edges ?? []) as Record<string, string>[]).map((e) => ({
       relationship: String(e.relationship ?? ""),
+      label: String(e.label ?? ""),
       target: String(e.target ?? ""),
       direction: String(e.direction ?? ""),
       description: String(e.description ?? ""),
@@ -1277,7 +1293,11 @@ export function loadCorpus(): Corpus {
   for (const node of nodes) {
     for (const edge of node.out) {
       if (!isSource(edge.href)) continue;
-      bySlug.get(edge.href.slice("/wiki/source/".length))?.citedBy.push({
+      const source = bySlug.get(edge.href.slice("/wiki/source/".length));
+      // A stated `sourced-from` link reaches here named by its file stem, which is a key: the
+      // entry's own heading is what a reader is shown for it everywhere else (#551).
+      if (source && edge.label === source.slug) edge.label = source.title;
+      source?.citedBy.push({
         id: node.id,
         label: node.label,
         href: routes.wikiNode(node.className, node.name),
@@ -1342,4 +1362,81 @@ export function loadCorpus(): Corpus {
     byDecision,
   };
   return cached;
+}
+
+/**
+ * A key as words, for the keys no declaration names.
+ *
+ * Two kinds reach a page with no `label:` behind them. Most relationships are undeclared on
+ * purpose — single-use verbs like `recovered-funds-from`, which the ontologies argue against
+ * declaring (see `edge_policy`) — and `instance-of` and `sourced-from` are universal conventions no
+ * class declares. And a year's figures pasted onto a node, `fy2024_profile`, match a pattern rather
+ * than a name. Neither has anywhere in the corpus to carry a label; see
+ * [`a-key-is-not-a-label`](../../../.yidam/decisions/a-key-is-not-a-label.yml).
+ *
+ * So the key is read as words: separators become spaces, the first letter is capitalised, and a
+ * leading fiscal year keeps the form the key gave it — `fy2026_27_appropriation` is "FY2026-27
+ * appropriation". What this can never return is the key itself, which is what `wikiKeys.spec.ts`
+ * holds every page to.
+ */
+export function humanizeKey(key: string): string {
+  const spaced = (text: string): string => text.replace(/[-_]+/g, " ").trim();
+  const observation = key.match(/^fy(\d{4})(?:_(\d{2}))?_(.+)$/);
+  if (observation) {
+    const [, year, second, rest] = observation;
+    return `FY${year}${second ? `-${second}` : ""} ${spaced(rest!)}`;
+  }
+  const text = spaced(key);
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+let relationshipLabels: Map<string, string> | null = null;
+
+/**
+ * What a reader is shown for a relationship slug: its declared `label`, or the slug as words.
+ *
+ * One slug, one label, wherever it is declared — `ontologyLabels.spec.ts` holds the declarations
+ * to that, which is what makes it safe to look the label up by slug alone. An inbound edge is
+ * named by the relationship its *source* declared, so in a list of what points here the label
+ * reads from that end: H.B. 110, "Establishes".
+ */
+export function relationshipLabel(slug: string): string {
+  if (!relationshipLabels) {
+    relationshipLabels = new Map();
+    for (const entry of loadCorpus().classes) {
+      for (const edge of entry.edges) {
+        if (edge.label !== "" && !relationshipLabels.has(edge.relationship)) {
+          relationshipLabels.set(edge.relationship, edge.label);
+        }
+      }
+    }
+  }
+  return relationshipLabels.get(slug) ?? humanizeKey(slug);
+}
+
+/**
+ * What a reader is shown for a property of a node of `className`: the class's declared `label`,
+ * or — for a universal or undeclared property — the name as words.
+ */
+export function propertyLabel(className: string, name: string): string {
+  const declared = loadCorpus()
+    .byClass.get(className)
+    ?.properties.find((property) => property.name === name)?.label;
+  return declared || humanizeKey(name);
+}
+
+/**
+ * The districts the corpus holds a node for, as IRNs, in the corpus's order.
+ *
+ * The IRN is written with its claim tag attached — `044933 [verified — …]` — so it is pulled out by
+ * pattern rather than read as a field, the same way the node page finds the live district behind
+ * one. `lib/appearances.ts` shows these first when a route every district has needs an example.
+ */
+export function exemplarIrns(): string[] {
+  return loadCorpus()
+    .nodes.filter((node) => node.className === "education-agency")
+    .flatMap((node) => {
+      const irn = node.properties.find((p) => p.name === "irn")?.value.match(/\b(\d{6})\b/)?.[1];
+      return irn ? [irn] : [];
+    });
 }

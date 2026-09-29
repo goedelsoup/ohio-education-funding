@@ -12,23 +12,28 @@ description: |
   parameters.
 properties:
   - name: name
+    label: Name
     type: string
     required: true
     description: The component's name as it appears in statute or department documentation
   - name: function
+    label: Calculation
     type: text
     required: true
     prose: true
     description: What calculation step the component performs and on what inputs
   - name: statutory_basis
+    label: Statutory basis
     type: string
     required: true
     description: Ohio Revised Code sections that define the component
   - name: calculator
+    label: Calculator
     type: string
     required: true
     description: Name of the crates/ calculator implementing this component, if implemented
   - name: function_tex
+    label: Calculation, typeset
     type: text
     required: false
     description: >-
@@ -72,18 +77,22 @@ properties:
 edge_policy: characteristic
 edges:
   - relationship: replaces
+    label: Replaces
     target: formula-component
     direction: out
     description: The component in a prior regime that occupied the same role in the calculation
   - relationship: governed-by
+    label: Governed by
     target: parameter
     direction: out
     description: A dialable value the component consumes
   - relationship: distributes
+    label: Distributes
     target: revenue-stream
     direction: out
     description: The channel of money this component allocates
   - relationship: part-of
+    label: Part of
     target: funding-regime
     direction: in
     description: The regime this component belongs to

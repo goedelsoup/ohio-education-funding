@@ -12,24 +12,29 @@ description: |
   distinct nodes linked by succession rather than as one entity with a changed name.
 properties:
   - name: name
+    label: Name
     type: string
     required: true
     description: Current official name
   - name: institution_type
+    label: Kind of institution
     type: string
     required: true
     values: [legislature, court, executive-agency, commission, legislative-agency]
     description: What kind of body the institution is
   - name: established
+    label: Established
     type: date
     required: true
     description: Date the institution was created
   - name: authority
+    label: Authority
     type: text
     required: true
     prose: true
     description: What this institution has the power to do within the funding system
   - name: publishes
+    label: Publishes
     type: text
     required: true
     prose: true
@@ -50,18 +55,22 @@ properties:
 edge_policy: characteristic
 edges:
   - relationship: succeeds
+    label: Succeeds
     target: actor
     direction: out
     description: The institution this one replaced, inheriting its authority
   - relationship: enacts
+    label: Enacts
     target: legislation
     direction: out
     description: An enactment this institution passed or ratified
   - relationship: decides
+    label: Decides
     target: litigation
     direction: out
     description: A case this institution decided
   - relationship: administers
+    label: Administers
     target: program
     direction: out
     description: A program this institution operates

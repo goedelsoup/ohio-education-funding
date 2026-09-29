@@ -100,9 +100,7 @@ const title = `${entry.label} — the corpus`;
             <tbody>
               {entry.properties.map((property) => (
                 <tr>
-                  <th>
-                    <code>{property.name}</code>
-                  </th>
+                  <th>{property.label}</th>
                   <td>
                     {property.type}
                     {property.values && (
@@ -148,11 +146,11 @@ const title = `${entry.label} — the corpus`;
               {entry.edges.map((edge) => (
                 <tr>
                   <th>
-                    <code>{edge.relationship}</code> <span class="n">{edge.direction}</span>
+                    {edge.label} <span class="n">{edge.direction}</span>
                   </th>
                   <td>
                     {loadCorpus().byClass.has(edge.target) ? (
-                      <a href={routes.wikiClass(edge.target)}>{edge.target}</a>
+                      <a href={routes.wikiClass(edge.target)}>{loadCorpus().byClass.get(edge.target)!.label}</a>
                     ) : (
                       edge.target
                     )}

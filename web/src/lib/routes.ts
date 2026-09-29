@@ -296,6 +296,8 @@ export const SECTIONS = {
     properties: "properties",
     relationships: "relationships",
     links: "links",
+    /* The pages outside the corpus that link a node, inverted from the build by `appearances.ts`. */
+    onTheSite: "on-the-site",
     findings: "findings",
     district: "district",
     /* The card on a `draft-legislation` node offering to open it in the scenario runner. */

@@ -1,0 +1,1729 @@
+{
+  "draft-legislation/hb-96-136-as-introduced": [
+    {
+      "route": "/scenario",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/scenario",
+        "title": "Scenario"
+      },
+      "sections": [
+        {
+          "id": "baseline",
+          "label": "What the levers move away from"
+        }
+      ]
+    }
+  ],
+  "draft-legislation/hb-96-136-as-passed-house": [
+    {
+      "route": "/scenario",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/scenario",
+        "title": "Scenario"
+      },
+      "sections": [
+        {
+          "id": "baseline",
+          "label": "What the levers move away from"
+        }
+      ]
+    }
+  ],
+  "draft-legislation/hb-96-with-refreshed-inputs": [
+    {
+      "route": "/district/[irn]/scenario",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786/scenario",
+        "title": "Cleveland Municipal — scenario"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What these levers hold fixed, and one they deliberately do not"
+        }
+      ]
+    },
+    {
+      "route": "/reach",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/reach",
+        "title": "Reach"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What these levers hold fixed, and one they deliberately do not"
+        }
+      ]
+    },
+    {
+      "route": "/scenario",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/scenario",
+        "title": "Scenario"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What these levers hold fixed, and one they deliberately do not"
+        }
+      ]
+    }
+  ],
+  "fiscal-period/fy2002-03": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "fiscal-period/fy2004-05": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "fiscal-period/fy2006-07": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "fiscal-period/fy2008-09": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "fiscal-period/fy2010-11": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "fiscal-period/fy2012-13": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "fiscal-period/fy2014-15": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "fiscal-period/fy2016-17": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "fiscal-period/fy2018-19": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "fiscal-period/fy2020-21": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "fiscal-period/fy2022-23": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "fiscal-period/fy2024-25": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "fiscal-period/fy2026-27": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "formula-component/fsfp-career-technical-weights": [
+    {
+      "route": "/district/[irn]",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786",
+        "title": "Cleveland Municipal"
+      },
+      "sections": [
+        {
+          "id": "categoricals",
+          "label": "The categorical half, in its six parts"
+        }
+      ]
+    }
+  ],
+  "formula-component/fsfp-disadvantaged-pupil-impact-aid": [
+    {
+      "route": "/district/[irn]",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786",
+        "title": "Cleveland Municipal"
+      },
+      "sections": [
+        {
+          "id": "categoricals",
+          "label": "The categorical half, in its six parts"
+        }
+      ]
+    },
+    {
+      "route": "/district/[irn]/scenario",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786/scenario",
+        "title": "Cleveland Municipal — scenario"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What these levers hold fixed, and one they deliberately do not"
+        }
+      ]
+    },
+    {
+      "route": "/reach",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/reach",
+        "title": "Reach"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What these levers hold fixed, and one they deliberately do not"
+        }
+      ]
+    },
+    {
+      "route": "/scenario",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/scenario",
+        "title": "Scenario"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What these levers hold fixed, and one they deliberately do not"
+        }
+      ]
+    }
+  ],
+  "formula-component/fsfp-english-learner-weights": [
+    {
+      "route": "/district/[irn]",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786",
+        "title": "Cleveland Municipal"
+      },
+      "sections": [
+        {
+          "id": "categoricals",
+          "label": "The categorical half, in its six parts"
+        }
+      ]
+    }
+  ],
+  "formula-component/fsfp-enrolment-supplements": [
+    {
+      "route": "/district/[irn]",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786",
+        "title": "Cleveland Municipal"
+      },
+      "sections": [
+        {
+          "id": "supplements",
+          "label": "Outside the formula"
+        }
+      ]
+    }
+  ],
+  "formula-component/fsfp-formula-transition-supplement": [
+    {
+      "route": "/district/[irn]",
+      "pages": 144,
+      "of": 609,
+      "example": {
+        "href": "/district/043786",
+        "title": "Cleveland Municipal"
+      },
+      "sections": [
+        {
+          "id": "aid-source",
+          "label": "Where the state aid comes from"
+        }
+      ]
+    }
+  ],
+  "formula-component/fsfp-gifted-units": [
+    {
+      "route": "/district/[irn]",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786",
+        "title": "Cleveland Municipal"
+      },
+      "sections": [
+        {
+          "id": "categoricals",
+          "label": "The categorical half, in its six parts"
+        }
+      ]
+    },
+    {
+      "route": "/district/[irn]/scenario",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786/scenario",
+        "title": "Cleveland Municipal — scenario"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What these levers hold fixed, and one they deliberately do not"
+        }
+      ]
+    },
+    {
+      "route": "/reach",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/reach",
+        "title": "Reach"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What these levers hold fixed, and one they deliberately do not"
+        }
+      ]
+    },
+    {
+      "route": "/scenario",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/scenario",
+        "title": "Scenario"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What these levers hold fixed, and one they deliberately do not"
+        }
+      ]
+    }
+  ],
+  "formula-component/fsfp-performance-supplement": [
+    {
+      "route": "/district/[irn]",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786",
+        "title": "Cleveland Municipal"
+      },
+      "sections": [
+        {
+          "id": "supplements",
+          "label": "Outside the formula"
+        }
+      ]
+    }
+  ],
+  "formula-component/fsfp-preschool-special-education": [
+    {
+      "route": "/district/[irn]",
+      "pages": 606,
+      "of": 609,
+      "example": {
+        "href": "/district/043786",
+        "title": "Cleveland Municipal"
+      },
+      "sections": [
+        {
+          "id": "supplements",
+          "label": "Outside the formula"
+        }
+      ]
+    },
+    {
+      "route": "/district/[irn]/scenario",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786/scenario",
+        "title": "Cleveland Municipal — scenario"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What these levers hold fixed, and one they deliberately do not"
+        }
+      ]
+    },
+    {
+      "route": "/reach",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/reach",
+        "title": "Reach"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What these levers hold fixed, and one they deliberately do not"
+        }
+      ]
+    },
+    {
+      "route": "/scenario",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/scenario",
+        "title": "Scenario"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What these levers hold fixed, and one they deliberately do not"
+        }
+      ]
+    }
+  ],
+  "formula-component/fsfp-special-education-weights": [
+    {
+      "route": "/district/[irn]",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786",
+        "title": "Cleveland Municipal"
+      },
+      "sections": [
+        {
+          "id": "categoricals",
+          "label": "The categorical half, in its six parts"
+        }
+      ]
+    }
+  ],
+  "formula-component/fsfp-targeted-assistance": [
+    {
+      "route": "/district/[irn]",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786",
+        "title": "Cleveland Municipal"
+      },
+      "sections": [
+        {
+          "id": "categoricals",
+          "label": "The categorical half, in its six parts"
+        }
+      ]
+    },
+    {
+      "route": "/district/[irn]/scenario",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786/scenario",
+        "title": "Cleveland Municipal — scenario"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What these levers hold fixed, and one they deliberately do not"
+        }
+      ]
+    },
+    {
+      "route": "/reach",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/reach",
+        "title": "Reach"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What these levers hold fixed, and one they deliberately do not"
+        }
+      ]
+    },
+    {
+      "route": "/scenario",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/scenario",
+        "title": "Scenario"
+      },
+      "sections": [
+        {
+          "id": "held-fixed",
+          "label": "What these levers hold fixed, and one they deliberately do not"
+        }
+      ]
+    }
+  ],
+  "formula-component/fsfp-transportation": [
+    {
+      "route": "/district/[irn]",
+      "pages": 605,
+      "of": 609,
+      "example": {
+        "href": "/district/043786",
+        "title": "Cleveland Municipal"
+      },
+      "sections": [
+        {
+          "id": "supplements",
+          "label": "Outside the formula"
+        }
+      ]
+    }
+  ],
+  "formula-component/temporary-transitional-aid-guarantee": [
+    {
+      "route": "/district/[irn]",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786",
+        "title": "Cleveland Municipal"
+      },
+      "sections": [
+        {
+          "id": "aid-source",
+          "label": "Where the state aid comes from"
+        }
+      ]
+    }
+  ],
+  "funding-regime/bridge-formula": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "regimes",
+          "label": "What was in force, and for how long"
+        },
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "funding-regime/equal-yield-formula": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "regimes",
+          "label": "What was in force, and for how long"
+        }
+      ]
+    }
+  ],
+  "funding-regime/evidence-based-model": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "regimes",
+          "label": "What was in force, and for how long"
+        },
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "funding-regime/fair-school-funding-plan": [
+    {
+      "route": "/bounds",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/bounds",
+        "title": "Bounds"
+      },
+      "sections": [
+        {
+          "id": "census",
+          "label": "38 bounds, and who is on each"
+        }
+      ]
+    },
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "regimes",
+          "label": "What was in force, and for how long"
+        },
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    },
+    {
+      "route": "/statewide",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/statewide",
+        "title": "Statewide"
+      },
+      "sections": [
+        {
+          "id": "two-floors",
+          "label": "Two floors"
+        }
+      ]
+    }
+  ],
+  "funding-regime/foundation-base-cost-formula": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "regimes",
+          "label": "What was in force, and for how long"
+        },
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "legislation/hb-1-2009": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "regimes",
+          "label": "What was in force, and for how long"
+        },
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "legislation/hb-110-2021": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "regimes",
+          "label": "What was in force, and for how long"
+        },
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "legislation/hb-119-2007": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "legislation/hb-153-2011": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "regimes",
+          "label": "What was in force, and for how long"
+        },
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "legislation/hb-166-2019": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "legislation/hb-33-2023": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "legislation/hb-49-2017": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "legislation/hb-583-2022": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "legislation/hb-59-2013": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "legislation/hb-64-2015": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "legislation/hb-66-2005": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "legislation/hb-920-1976": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        },
+        {
+          "id": "standing",
+          "label": "The instruments that never expired"
+        }
+      ]
+    }
+  ],
+  "legislation/hb-94-2001": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "legislation/hb-95-2003": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    }
+  ],
+  "legislation/hb-96-2025": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        }
+      ]
+    },
+    {
+      "route": "/reach",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/reach",
+        "title": "Reach"
+      },
+      "sections": [
+        {
+          "id": "baseline",
+          "label": "What the levers move away from"
+        }
+      ]
+    },
+    {
+      "route": "/scenario",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/scenario",
+        "title": "Scenario"
+      },
+      "sections": [
+        {
+          "id": "baseline",
+          "label": "What the levers move away from"
+        }
+      ]
+    }
+  ],
+  "legislation/ohio-constitution-article-vi-section-2": [
+    {
+      "route": "/legislation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/legislation",
+        "title": "Statute"
+      },
+      "sections": [
+        {
+          "id": "acts",
+          "label": "Every act, in the order it was signed"
+        },
+        {
+          "id": "standing",
+          "label": "The instruments that never expired"
+        }
+      ]
+    }
+  ],
+  "litigation/derolph-i-1997": [
+    {
+      "route": "/county/[slug]",
+      "pages": 84,
+      "of": 88,
+      "example": {
+        "href": "/county/adams",
+        "title": "Adams County"
+      },
+      "sections": [
+        {
+          "id": "spread",
+          "label": "The spread inside Adams County"
+        }
+      ]
+    },
+    {
+      "route": "/statewide",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/statewide",
+        "title": "Statewide"
+      },
+      "sections": [
+        {
+          "id": "national",
+          "label": "Whether Ohio is unusual"
+        }
+      ]
+    }
+  ],
+  "metric/assessed-valuation-per-pupil": [
+    {
+      "route": "/compare",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/compare",
+        "title": "Compare"
+      },
+      "sections": [
+        {
+          "id": "comparison",
+          "label": "Side by side"
+        }
+      ]
+    },
+    {
+      "route": "/district/[irn]",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786",
+        "title": "Cleveland Municipal"
+      },
+      "sections": [
+        {
+          "id": "position",
+          "label": "Position among Ohio's 609 districts"
+        }
+      ]
+    }
+  ],
+  "metric/effective-operating-millage": [
+    {
+      "route": "/compare",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/compare",
+        "title": "Compare"
+      },
+      "sections": [
+        {
+          "id": "comparison",
+          "label": "Side by side"
+        }
+      ]
+    },
+    {
+      "route": "/district/[irn]",
+      "pages": 588,
+      "of": 609,
+      "example": {
+        "href": "/district/043786",
+        "title": "Cleveland Municipal"
+      },
+      "sections": [
+        {
+          "id": "aid-source",
+          "label": "Where the state aid comes from"
+        }
+      ]
+    },
+    {
+      "route": "/district/[irn]/taxes",
+      "pages": 606,
+      "of": 609,
+      "example": {
+        "href": "/district/043786/taxes",
+        "title": "Cleveland Municipal — property tax"
+      },
+      "sections": [
+        {
+          "id": "millage",
+          "label": "What voters approved, and what the factors left"
+        }
+      ]
+    }
+  ],
+  "metric/enrolled-adm": [
+    {
+      "route": "/district/[irn]",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786",
+        "title": "Cleveland Municipal"
+      },
+      "sections": [
+        {
+          "id": "aid-source",
+          "label": "Where the state aid comes from"
+        },
+        {
+          "id": "not",
+          "label": "What this page is not"
+        }
+      ]
+    },
+    {
+      "route": "/district/[irn]/taxes",
+      "pages": 432,
+      "of": 609,
+      "example": {
+        "href": "/district/043786/taxes",
+        "title": "Cleveland Municipal — property tax"
+      },
+      "sections": [
+        {
+          "id": "denominators",
+          "label": "The pupil counts on this page, and which figure uses which"
+        }
+      ]
+    }
+  ],
+  "metric/expenditure-per-equivalent-pupil": [
+    {
+      "route": "/district/[irn]/finances",
+      "pages": 607,
+      "of": 609,
+      "example": {
+        "href": "/district/043786/finances",
+        "title": "Cleveland Municipal — finances"
+      },
+      "sections": [
+        {
+          "id": "spending-by-function",
+          "label": "Where the money went"
+        },
+        {
+          "id": "federal-share",
+          "label": "Where the money came from"
+        }
+      ]
+    }
+  ],
+  "metric/per-pupil-operating-expenditure": [
+    {
+      "route": "/compare",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/compare",
+        "title": "Compare"
+      },
+      "sections": [
+        {
+          "id": "comparison",
+          "label": "Side by side"
+        }
+      ]
+    },
+    {
+      "route": "/district/[irn]",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786",
+        "title": "Cleveland Municipal"
+      },
+      "sections": [
+        {
+          "id": "position",
+          "label": "Position among Ohio's 609 districts"
+        }
+      ]
+    }
+  ],
+  "metric/performance-index": [
+    {
+      "route": "/district/[irn]/outcome",
+      "pages": 606,
+      "of": 609,
+      "example": {
+        "href": "/district/043786/outcome",
+        "title": "Cleveland Municipal — outcome"
+      },
+      "sections": [
+        {
+          "id": "comparable-poverty",
+          "label": "Against districts with comparable poverty"
+        }
+      ]
+    }
+  ],
+  "metric/state-share-percentage": [
+    {
+      "route": "/district/[irn]",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786",
+        "title": "Cleveland Municipal"
+      },
+      "sections": [
+        {
+          "id": "base-cost",
+          "label": "Why base cost is $8,120 per pupil"
+        }
+      ]
+    },
+    {
+      "route": "/district/[irn]/taxes",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786/taxes",
+        "title": "Cleveland Municipal — property tax"
+      },
+      "sections": [
+        {
+          "id": "millage",
+          "label": "What voters approved, and what the factors left"
+        }
+      ]
+    }
+  ],
+  "parameter/base-cost-per-pupil": [
+    {
+      "route": "/district/[irn]/taxes",
+      "pages": 432,
+      "of": 609,
+      "example": {
+        "href": "/district/043786/taxes",
+        "title": "Cleveland Municipal — property tax"
+      },
+      "sections": [
+        {
+          "id": "denominators",
+          "label": "The pupil counts on this page, and which figure uses which"
+        }
+      ]
+    }
+  ],
+  "parameter/twenty-mill-floor": [
+    {
+      "route": "/district/[irn]",
+      "pages": 54,
+      "of": 609,
+      "example": {
+        "href": "/district/049056",
+        "title": "Northern Local"
+      },
+      "sections": [
+        {
+          "id": "aid-source",
+          "label": "Where the state aid comes from"
+        }
+      ]
+    },
+    {
+      "route": "/district/[irn]/taxes",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786/taxes",
+        "title": "Cleveland Municipal — property tax"
+      },
+      "sections": [
+        {
+          "id": "valuation-change",
+          "label": "TY2023 to TY2024"
+        }
+      ]
+    },
+    {
+      "route": "/statewide",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/statewide",
+        "title": "Statewide"
+      },
+      "sections": [
+        {
+          "id": "two-floors",
+          "label": "Two floors"
+        }
+      ]
+    }
+  ],
+  "program/autism-scholarship": [
+    {
+      "route": "/method",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/method",
+        "title": "Method"
+      },
+      "sections": [
+        {
+          "id": "not-here",
+          "label": "What is not here"
+        }
+      ]
+    },
+    {
+      "route": "/statewide",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/statewide",
+        "title": "Statewide"
+      },
+      "sections": [
+        {
+          "id": "funding-units",
+          "label": "The six funding units"
+        }
+      ]
+    }
+  ],
+  "program/auxiliary-services": [
+    {
+      "route": "/statewide",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/statewide",
+        "title": "Statewide"
+      },
+      "sections": [
+        {
+          "id": "nonpublic-support",
+          "label": "Nonpublic school support"
+        }
+      ]
+    }
+  ],
+  "program/cleveland-scholarship": [
+    {
+      "route": "/method",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/method",
+        "title": "Method"
+      },
+      "sections": [
+        {
+          "id": "not-here",
+          "label": "What is not here"
+        }
+      ]
+    },
+    {
+      "route": "/statewide",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/statewide",
+        "title": "Statewide"
+      },
+      "sections": [
+        {
+          "id": "funding-units",
+          "label": "The six funding units"
+        }
+      ]
+    }
+  ],
+  "program/edchoice-expansion": [
+    {
+      "route": "/method",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/method",
+        "title": "Method"
+      },
+      "sections": [
+        {
+          "id": "not-here",
+          "label": "What is not here"
+        }
+      ]
+    },
+    {
+      "route": "/statewide",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/statewide",
+        "title": "Statewide"
+      },
+      "sections": [
+        {
+          "id": "funding-units",
+          "label": "The six funding units"
+        }
+      ]
+    }
+  ],
+  "program/edchoice-scholarship": [
+    {
+      "route": "/district/[irn]",
+      "pages": 606,
+      "of": 609,
+      "example": {
+        "href": "/district/049056",
+        "title": "Northern Local"
+      },
+      "sections": [
+        {
+          "id": "not",
+          "label": "What this page is not"
+        }
+      ]
+    },
+    {
+      "route": "/method",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/method",
+        "title": "Method"
+      },
+      "sections": [
+        {
+          "id": "not-here",
+          "label": "What is not here"
+        }
+      ]
+    },
+    {
+      "route": "/statewide",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/statewide",
+        "title": "Statewide"
+      },
+      "sections": [
+        {
+          "id": "funding-units",
+          "label": "The six funding units"
+        }
+      ]
+    }
+  ],
+  "program/jon-peterson-special-needs": [
+    {
+      "route": "/method",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/method",
+        "title": "Method"
+      },
+      "sections": [
+        {
+          "id": "not-here",
+          "label": "What is not here"
+        }
+      ]
+    },
+    {
+      "route": "/statewide",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/statewide",
+        "title": "Statewide"
+      },
+      "sections": [
+        {
+          "id": "funding-units",
+          "label": "The six funding units"
+        }
+      ]
+    }
+  ],
+  "program/nonpublic-administrative-cost-reimbursement": [
+    {
+      "route": "/statewide",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/statewide",
+        "title": "Statewide"
+      },
+      "sections": [
+        {
+          "id": "nonpublic-support",
+          "label": "Nonpublic school support"
+        }
+      ]
+    }
+  ],
+  "revenue-stream/casino-tax-distribution": [
+    {
+      "route": "/district/[irn]/finances",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786/finances",
+        "title": "Cleveland Municipal — finances"
+      },
+      "sections": [
+        {
+          "id": "casino",
+          "label": "The money that reaches this district outside the formula"
+        }
+      ]
+    }
+  ],
+  "scenario/fsfp-input-year-refresh": [
+    {
+      "route": "/district/[irn]",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786",
+        "title": "Cleveland Municipal"
+      },
+      "sections": [
+        {
+          "id": "base-cost",
+          "label": "Why base cost is $8,120 per pupil"
+        }
+      ]
+    },
+    {
+      "route": "/method",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/method",
+        "title": "Method"
+      },
+      "sections": [
+        {
+          "id": "base-cost",
+          "label": "Base cost, and how the build-up is reconciled"
+        }
+      ]
+    }
+  ],
+  "scenario/guarantee-phase-out": [
+    {
+      "route": "/method",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/method",
+        "title": "Method"
+      },
+      "sections": [
+        {
+          "id": "forecast-range",
+          "label": "Why the forecast leads with a range"
+        }
+      ]
+    }
+  ]
+}

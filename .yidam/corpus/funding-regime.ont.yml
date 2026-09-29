@@ -12,28 +12,34 @@ description: |
   condition change is intrinsic rather than relational.
 properties:
   - name: name
+    label: Name
     type: string
     required: true
     description: The regime's common name, as used in legislative and department documents
   - name: effective_from
+    label: In force from
     type: string
     required: true
     description: First fiscal period in which the regime governed distribution
   - name: effective_to
+    label: In force until
     type: string
     required: true
     description: Last fiscal period, or "current" if still in effect
   - name: distribution_logic
+    label: How it distributes money
     type: text
     required: true
     prose: true
     description: How the regime decides what each agency receives, in two or three sentences
   - name: status
+    label: Status
     type: string
     required: true
     values: [current, superseded, partially-implemented, never-fully-funded]
     description: Whether the regime is in force, replaced, or enacted and never carried through in full
   - name: boundary_note
+    label: Where its boundary is drawn
     type: text
     required: false
     prose: true
@@ -57,30 +63,37 @@ properties:
 edge_policy: characteristic
 edges:
   - relationship: composed-of
+    label: Made up of
     target: formula-component
     direction: out
     description: A structural mechanism the regime is built from
   - relationship: supersedes
+    label: Supersedes
     target: funding-regime
     direction: out
     description: The regime this one replaced
   - relationship: assessed-against
+    label: Assessed against
     target: doctrine
     direction: out
     description: A normative principle by which this regime has been judged
   - relationship: active-during
+    label: In force during
     target: fiscal-period
     direction: out
     description: A fiscal period in which this regime governed distribution
   - relationship: established-by
+    label: Established by
     target: legislation
     direction: in
     description: The enactment that created the regime
   - relationship: challenged-by
+    label: Challenged by
     target: litigation
     direction: in
     description: A case testing this regime against constitutional text
   - relationship: baseline-for
+    label: Baseline for
     target: scenario
     direction: in
     description: A counterfactual computed against this regime as its baseline

@@ -13,10 +13,12 @@ description: |
   because a voucher is not a channel of money to a district but a diversion away from one.
 properties:
   - name: name
+    label: Name
     type: string
     required: true
     description: Program name as it appears in statute and appropriation documents
   - name: mechanism
+    label: Mechanism
     type: string
     required: true
     values: [deduction, direct-appropriation, funding-unit, reimbursement, competitive-grant, capital-assistance]
@@ -25,6 +27,7 @@ properties:
       funding units R.C. 3317.022 names beside the districts; `deduction` is a transfer out of the
       resident district's aid, which is how the scholarships ran before FY2022
   - name: mechanism_note
+    label: Why this mechanism
     type: text
     required: false
     prose: true
@@ -33,16 +36,19 @@ properties:
       scholarships were deductions until FY2022. A program paid one way throughout has nothing to
       note
   - name: eligibility
+    label: Eligibility
     type: text
     required: true
     prose: true
     description: Who qualifies, and how eligibility has changed over time
   - name: amount
+    label: Amount
     type: text
     required: true
     prose: true
     description: Per-recipient or per-project amount, by fiscal period
   - name: appropriation_line
+    label: Appropriation line
     type: string
     required: true
     description: Budget line item identifier
@@ -62,22 +68,27 @@ properties:
 edge_policy: characteristic
 edges:
   - relationship: diverts-from
+    label: Diverts from
     target: education-agency
     direction: out
     description: The agency whose funding is reduced or displaced by this program
   - relationship: funds
+    label: Funds
     target: education-agency
     direction: out
     description: An agency this program pays money to, as capital assistance programs do
   - relationship: challenged-by
+    label: Challenged by
     target: litigation
     direction: in
     description: A case testing this program's lawfulness
   - relationship: created-by
+    label: Created by
     target: legislation
     direction: in
     description: The enactment that established the program
   - relationship: administered-by
+    label: Administered by
     target: actor
     direction: in
     description: The institution that operates the program

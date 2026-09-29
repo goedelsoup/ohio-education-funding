@@ -39,6 +39,7 @@ description: |
   `legislation/ACTIONS.md` already states for amendment: the earlier node stands as it was.
 properties:
   - name: provenance
+    label: Provenance
     type: string
     required: true
     description: >-
@@ -48,16 +49,19 @@ properties:
       real and the variant is not; `hypothetical` — a change nobody has introduced, authored to
       test a question.
   - name: designation
+    label: Designation
     type: string
     required: true
     description: >-
       Bill designation where the draft has one. Empty for a hypothetical draft, and for a
       counterfactual it names the act being rewritten rather than claiming a number of its own.
   - name: general_assembly
+    label: General Assembly
     type: string
     required: true
     description: Numbered General Assembly the bill is before, where it is before one
   - name: sponsors
+    label: Sponsors
     type: text
     required: true
     description: >-
@@ -65,6 +69,7 @@ properties:
       which is an answer rather than an empty field, because a bill nobody introduced has no
       sponsors and never will.
   - name: status
+    label: Status
     type: text
     required: true
     prose: true
@@ -73,6 +78,7 @@ properties:
       with the session, or never introduced. The field that stops a reader taking a proposal for
       a statute on a page that otherwise looks like one.
   - name: text_read
+    label: Text read
     type: text
     required: true
     prose: true
@@ -81,6 +87,7 @@ properties:
       Load-bearing here in a way it is not for an enacted act: a pending bill's text moves under
       its own URL as it is amended, so "the bill says" without a version names a moving target.
   - name: question
+    label: Question
     type: text
     required: true
     prose: true
@@ -88,6 +95,7 @@ properties:
       What the draft is constructed to test. For a hypothetical or counterfactual draft this is
       the reason it exists; for an introduced bill it is what reading it is expected to settle.
   - name: provisions
+    label: Provisions
     type: text
     required: true
     prose: true
@@ -97,6 +105,7 @@ properties:
       can run it. The unit of this class — a bill is a list of these and a scenario is a subset
       of them, so this is where the prose meets the simulation.
   - name: unpriced
+    label: Not priced
     type: text
     required: true
     prose: true
@@ -121,6 +130,7 @@ properties:
 edge_policy: characteristic
 edges:
   - relationship: perturbs
+    label: Alters
     target: parameter
     direction: out
     description: >-
@@ -128,6 +138,7 @@ edges:
       deliberately: a provision and a perturbation are the same act described in two vocabularies,
       and giving them different verbs would hide that the draft is what the run is of.
   - relationship: simulated-by
+    label: Priced by
     target: scenario
     direction: out
     description: >-
@@ -135,10 +146,12 @@ edges:
       one run per provision to attribute and one combined run for its total, because the levers
       interact and the per-provision figures do not sum to it.
   - relationship: amends
+    label: Amends
     target: legislation
     direction: out
     description: An enactment this draft would change
   - relationship: redrafts
+    label: Redrafts
     target: legislation
     direction: out
     description: >-
@@ -146,24 +159,29 @@ edges:
       amending bill changes a statute that stands, while a redraft asks what the same act would
       have done had it chosen otherwise, and only one of those is a thing anyone could introduce.
   - relationship: baselines-on
+    label: Measured against
     target: funding-regime
     direction: out
     description: The regime the draft's provisions are a change against
   - relationship: enacted-as
+    label: Enacted as
     target: legislation
     direction: out
     description: >-
       The act this draft became, where it passed. Added to the draft rather than replacing it,
       so that what was introduced and what was enacted stay separately readable.
   - relationship: creates
+    label: Creates
     target: program
     direction: out
     description: A program the draft would establish
   - relationship: constrains
+    label: Constrains
     target: revenue-stream
     direction: out
     description: A revenue channel the draft would limit, freeze, or redirect
   - relationship: parallels
+    label: Parallels
     target: model-policy
     direction: out
     description: >-

@@ -7,8 +7,7 @@
  * it wrong** — where the everyday reading and the Ohio reading differ, and the difference changes
  * the number. "Per equivalent pupil" sounds like a per-pupil figure and divides by a count that
  * has been weighted upward for need. "Effective millage" sounds like the rate voters approved and
- * is the rate after H.B. 920 reduced it. "On the guarantee" sounds like a benefit and is the
- * statement that the formula computes less for the district than it used to get.
+ * is the rate after H.B. 920 reduced it.
  *
  * A term whose everyday reading is simply *vaguer* than the technical one does not earn an entry.
  * The list is short so that the dotted underlines stay meaningful; a page where every third word
@@ -19,6 +18,16 @@
  * Because the wiki is on the same site for exactly this reason. A tooltip has room for the
  * distinction and not for the evidence; the node has the evidence. Every entry that has a node
  * points at it, and the ones that do not are the ones worth writing next.
+ *
+ * # An entry is a call site, not a vocabulary
+ *
+ * An entry no page passes to {@link term} is a definition no reader can reach. #551 found seven:
+ * `enrolled-pupil`, `twenty-mill-floor`, `guarantee`, `state-share`, `value-added`, `phase-in`
+ * and `tax-year`, written in anticipation and never attached. They were retired rather than
+ * attached. Where those words appear on a data page they are mostly already a link to the node
+ * that defines them — the twenty-mill floor five times in `tax.ts`, the state share once — and a
+ * tooltip beside a link to the same definition says the same thing twice. Git has the
+ * definitions; an entry comes back with the call site that needs it.
  */
 
 import { escapeHtml } from "./format.ts";
@@ -50,13 +59,6 @@ export const GLOSSARY: Record<string, Term> = {
     href: "/wiki/metric/expenditure-per-equivalent-pupil",
     hrefLabel: "Expenditure Per Equivalent Pupil",
   },
-  "enrolled-pupil": {
-    definition:
-      "A headcount denominator: spending divided by pupils, with no weighting. Comparable across " +
-      "districts in a way the need-weighted figure beside it is not.",
-    href: "/wiki/metric/per-pupil-operating-expenditure",
-    hrefLabel: "Per-Pupil Operating Expenditure",
-  },
   "effective-millage": {
     definition:
       "The rate a district actually levies after H.B. 920's tax reduction factors, not the rate " +
@@ -64,29 +66,6 @@ export const GLOSSARY: Record<string, Term> = {
       "a number.",
     href: "/wiki/metric/effective-operating-millage",
     hrefLabel: "Effective Operating Millage",
-  },
-  "twenty-mill-floor": {
-    definition:
-      "The limit below which reduction factors may not push a district's effective operating " +
-      "rate. At the floor, growth in property value reaches revenue; above it, it does not.",
-    href: "/wiki/parameter/twenty-mill-floor",
-    hrefLabel: "Twenty-Mill Floor",
-  },
-  guarantee: {
-    definition:
-      "A district is on the guarantee when the formula computes less for it than its FY2020 " +
-      "baseline, and the state pays the baseline instead. It is a statement about the formula " +
-      "falling short, not about the district being favoured — though the money is real.",
-    href: "/wiki/formula-component/temporary-transitional-aid-guarantee",
-    hrefLabel: "Temporary Transitional Aid Guarantee",
-  },
-  "state-share": {
-    definition:
-      "The fraction of a district's base cost the state pays rather than the district, set by a " +
-      "measure of local capacity and floored at a statutory minimum. A district at the minimum " +
-      "is one the formula says can fund itself.",
-    href: "/wiki/metric/state-share-percentage",
-    hrefLabel: "State Share Percentage",
   },
   "base-cost": {
     definition:
@@ -104,34 +83,12 @@ export const GLOSSARY: Record<string, Term> = {
     href: "/wiki/metric/performance-index",
     hrefLabel: "Performance Index",
   },
-  "value-added": {
-    definition:
-      "Ohio's growth measure: observed achievement against what the state's model predicted from " +
-      "each student's own prior scores. The figure used here is the three-year average, which is " +
-      "the department's headline form.",
-    href: "/wiki/metric/progress-value-added",
-    hrefLabel: "Progress (Value-Added)",
-  },
-  "phase-in": {
-    definition:
-      "The fraction of the plan's computed formula amount that is actually appropriated. A " +
-      "district funded at 100% of the phase-in is funded at 100% of a figure priced from FY2022 " +
-      "salary inputs.",
-    href: "/wiki/parameter/fsfp-phase-in-percentage",
-    hrefLabel: "FSFP Phase-In Percentage",
-  },
   adm: {
     definition:
       "Average daily membership — the pupil count Ohio funds on. Two distinct counts wear the " +
       "name and they differ for every district; the formula uses each in different places.",
     href: "/wiki/metric/enrolled-adm",
     hrefLabel: "Enrolled ADM",
-  },
-  "tax-year": {
-    definition:
-      "A calendar year of valuation and levy. The revenue a tax year raises reaches a district " +
-      "in the following fiscal year, so a 2024 tax year and an FY2024 budget are eleven months " +
-      "apart.",
   },
 };
 

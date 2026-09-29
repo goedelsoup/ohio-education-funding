@@ -13,10 +13,12 @@ description: |
   a parameter's value.
 properties:
   - name: name
+    label: Name
     type: string
     required: true
     description: The parameter's name in statute or department documentation
   - name: unit
+    label: Unit
     type: string
     required: true
     values: [dollars-per-pupil, dollars, ratio, mills, percent, count]
@@ -24,6 +26,7 @@ properties:
       What one value of the parameter is measured in. `dollars` is an amount no count multiplies —
       a per-district base, for one
   - name: kind
+    label: Kind
     type: text
     required: true
     prose: true
@@ -40,15 +43,18 @@ properties:
       outlives a regime can change kind at the boundary, and because "not in the Revised Code" and
       "not in law" are different claims that this taxonomy has already conflated once.
   - name: series
+    label: Values over time
     type: text
     required: true
     prose: true
     description: Value per fiscal period, with the enactment that set each value
   - name: statutory_basis
+    label: Statutory basis
     type: string
     required: true
     description: Ohio Revised Code section that fixes the value or its method
   - name: simulation_key
+    label: Simulation key
     type: string
     required: false
     description: >-
@@ -56,6 +62,7 @@ properties:
       parameter the calculator does not bind as a scalar — one held as a per-district column —
       has no key, and a key pointing at nothing would read as provenance it does not have.
   - name: written_as
+    label: Written in formulas as
     type: text
     required: false
     description: >-
@@ -72,6 +79,7 @@ properties:
       Not required: a parameter every formula writes as a symbol (`w_k`) has no phrase to list,
       and rewording a formula to manufacture one would run the vocabulary backwards.
   - name: sensitivity
+    label: Sensitivity
     type: text
     required: true
     prose: true
@@ -92,18 +100,22 @@ properties:
 edge_policy: characteristic
 edges:
   - relationship: valued-in
+    label: Valued in
     target: fiscal-period
     direction: out
     description: A fiscal period for which this parameter holds a specific value
   - relationship: set-by
+    label: Set by
     target: legislation
     direction: in
     description: The enactment that fixed this parameter's value or method
   - relationship: consumed-by
+    label: Read by
     target: formula-component
     direction: in
     description: The component that reads this parameter
   - relationship: perturbed-by
+    label: Altered by
     target: scenario
     direction: in
     description: A counterfactual that alters this parameter's value
