@@ -31,6 +31,7 @@
 import HeldFixed from "../components/HeldFixed.astro";
 import ScenarioControls from "../components/ScenarioControls.astro";
 import Base from "../layouts/Base.astro";
+import { NAMES } from "../lib/nav.ts";
 import SectionAnchor from "../components/SectionAnchor.astro";
 import { loadFeed, qualifiedName } from "../lib/feed.ts";
 import { count, millions, pct } from "../lib/format.ts";
@@ -90,13 +91,13 @@ const counties = scopeCounties(bundle.districts);
 ---
 
 <Base
-  title="Reach"
+  title={NAMES.reach.name}
   description={`Which of Ohio's ${s.districts} school districts a change in the funding formula actually reaches, and which the guarantee holds still — every district plotted against the aid its formula computes for it.`}
   image={routes.og.page("reach")}
   imageAlt="Every Ohio school district plotted against what the formula computes for it, with the guarantee wall"
   section="reach"
 >
-  <h1>Reach</h1>
+  <h1>{NAMES.reach.name}</h1>
   <p class="lead">
     Move a lever and see which of Ohio's {count(s.districts)} districts it reaches — and which it
     passes over. In the department's FY{bundle.fiscal_year} model {count(s.on_guarantee)} of
@@ -281,13 +282,12 @@ const counties = scopeCounties(bundle.districts);
 
         <noscript>
           <div class="card err" id="needs-script" data-part="needs-script">
-            <h2><SectionAnchor id="needs-script" />This page needs JavaScript</h2>
+            <h2><SectionAnchor id="needs-script" />Re-running the formula needs JavaScript</h2>
             <p class="note">
-              Every other page on this site carries its figures in the document and reads correctly
-              without any script. This one re-derives Ohio's funding formula over all {
-                count(s.districts)
-              } districts as you move a slider, and plots the result, which is not something a
-              pre-rendered page can do.
+              Most pages on this site carry their figures in the document and read correctly
+              without any script. The ones that re-run the formula cannot: this page re-derives it
+              over all {count(s.districts)} districts as you move a slider, and plots the result,
+              which is not something a pre-rendered page can do.
             </p>
             <p class="note">
               The underlying data is still available: <a href="/data">the feed and a CSV of the
@@ -378,7 +378,12 @@ const counties = scopeCounties(bundle.districts);
   </div>
 
   {/* The same limits as the scenario runner, because these are the same levers. */}
-  <HeldFixed districts={bundle.districts} total={s.districts} refresh={refresh} />
+  <HeldFixed
+    districts={bundle.districts}
+    total={s.districts}
+    refresh={refresh}
+    heading="What the reach view holds fixed, and one thing it deliberately does not"
+  />
 
   <div class="card" id="baseline" data-part="baseline">
     <h2><SectionAnchor id="baseline" />What the levers move away from</h2>

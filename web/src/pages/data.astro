@@ -7,6 +7,7 @@
  * and withholding it while claiming the figures are checkable would be a contradiction.
  */
 import Base from "../layouts/Base.astro";
+import { NAMES } from "../lib/nav.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { count } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
@@ -80,14 +81,14 @@ const jsonLd = {
 ---
 
 <Base
-  title="Data"
+  title={NAMES.data.name}
   description="Download the Ohio school funding panel: the full feed as JSON, the formula inputs alone, and the district table as CSV."
   image={routes.og.page("data")}
   imageAlt="The Ohio school funding panel, as JSON and CSV"
   section="data"
   jsonLd={jsonLd}
 >
-  <h1>Data</h1>
+  <h1>{NAMES.data.name}</h1>
   <p class="lead">
     Everything this site renders, in the form it renders it from. No registration, no API key,
     static files.

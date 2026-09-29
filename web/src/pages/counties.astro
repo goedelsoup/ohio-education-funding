@@ -8,6 +8,7 @@
  * reader will meet them.
  */
 import Base from "../layouts/Base.astro";
+import { NAMES } from "../lib/nav.ts";
 import { counties, type County } from "../lib/county.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { count, money } from "../lib/format.ts";
@@ -100,14 +101,14 @@ const overlapping = (() => {
 ---
 
 <Base
-  title="Counties"
+  title={NAMES.counties.name}
   description={`Ohio's ${all.length} counties, ranked by how far apart the richest and poorest school district in each one is on property wealth per pupil.`}
   image={routes.og.page("counties")}
   imageAlt="Ohio's 88 counties, ranked by the property wealth gap inside each one"
   section="counties"
   wide
 >
-  <h1>Counties</h1>
+  <h1>{NAMES.counties.name}</h1>
   <p class="lead">
     Ohio's {count(all.length)} counties, ordered by the gap between the richest and poorest school
     district inside each one. {widest.name} is the widest at{" "}

@@ -14,6 +14,7 @@
  */
 import BasisToggle from "../components/BasisToggle.astro";
 import Base from "../layouts/Base.astro";
+import { NAMES } from "../lib/nav.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { count, millions } from "../lib/format.ts";
 import { baseYear } from "../lib/real.ts";
@@ -40,13 +41,13 @@ const base = bundle.deflator
 ---
 
 <Base
-  title="Statewide"
+  title={NAMES.statewide.name}
   description={`Ohio pays ${millions(s.realized_aid_total).replace("+", "")} in state foundation aid across ${s.districts} districts in FY${bundle.fiscal_year}. ${s.on_guarantee} of them are funded by the guarantee rather than the formula.`}
   image={routes.og.page("statewide")}
   imageAlt="Ohio school funding: what the state pays across all 609 districts, and how much of it is guarantee money"
   section="statewide"
 >
-  <h1>Statewide</h1>
+  <h1>{NAMES.statewide.name}</h1>
   <p class="lead">
     All {count(s.districts)} districts at once: what the Fair School Funding Plan computes for them
     and what they actually receive, how much of the total is guarantee money rather than formula

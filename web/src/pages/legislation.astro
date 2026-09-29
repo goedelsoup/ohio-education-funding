@@ -12,6 +12,7 @@
  * against a built page.
  */
 import Base from "../layouts/Base.astro";
+import { NAMES } from "../lib/nav.ts";
 import { loadCorpus } from "../lib/corpus.ts";
 import { acts, regimes, renderTimeline } from "../lib/legislation.ts";
 import * as routes from "../lib/routes.ts";
@@ -25,7 +26,7 @@ const covered = (lastOf(spans).to ?? latest) - firstOf(spans).from + 1;
 ---
 
 <Base
-  title="Statute"
+  title={NAMES.legislation.name}
   description={`Every act behind Ohio school funding, from the 1851 constitutional duty to this biennium's budget: ${spans.length} formulas across ${covered} fiscal years, what each act did to the formula, and which biennium it paid for.`}
   image={routes.og.page("legislation")}
   imageAlt={`${spans.length} Ohio school funding formulas across ${covered} fiscal years, and the acts that established them`}
@@ -33,7 +34,7 @@ const covered = (lastOf(spans).to ?? latest) - firstOf(spans).from + 1;
   wide
 >
   <p class="crumb"><a href={routes.wikiClass("legislation")}>Legislation</a></p>
-  <h1>Ohio school funding in statute</h1>
+  <h1>{NAMES.legislation.name}</h1>
   <p class="lead">
     The formula a district is paid by is whatever the last budget act said it was. This is every
     act the corpus holds, in the order it was signed: {spans.length} formulas across

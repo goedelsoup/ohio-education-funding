@@ -46,16 +46,25 @@ interface Props {
   total: number;
   /** The refresh the feed prices, already resolved by the caller that also gives it to the levers. */
   refresh: RefreshEffect | null;
+  /**
+   * The card's heading, which names the view it sits on.
+   *
+   * It was one sentence on all three routes — "What these levers hold fixed, and one they
+   * deliberately do not" — so a reader moving between them, and anything that lists a page's
+   * headings, met the same `h2` three times with nothing saying which run it described. The
+   * caveat is the same on each (see above); the heading says whose it is.
+   */
+  heading: string;
 }
 
-const { districts, total, refresh } = Astro.props;
+const { districts, total, refresh, heading } = Astro.props;
 // Memoised on the panel, which `loadFeed` caches — so this is summed once per build and not once
 // per district page.
 const fixed = heldFixed(districts);
 ---
 
 <div class="card" id="held-fixed" data-part="held-fixed">
-  <h2><SectionAnchor id="held-fixed" />What these levers hold fixed, and one they deliberately do not<Fragment set:html={yearChip("formula")} /></h2>
+  <h2><SectionAnchor id="held-fixed" />{heading}<Fragment set:html={yearChip("formula")} /></h2>
   <p class="note">
     Ohio's formula contains statewide constants — the average base cost per pupil, the statewide
     poverty share, the median weighted wealth — that are computed once over all districts. The

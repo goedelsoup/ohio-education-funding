@@ -329,6 +329,11 @@ test.describe("routes", () => {
     await page.goto("/#outcomes");
     await expect(page).toHaveURL(/\/outcomes$/);
 
+    // The table sent this to `/` after the statewide panel had moved to `/statewide`, and the
+    // no-loop guard turned that into doing nothing.
+    await page.goto("/#statewide");
+    await expect(page).toHaveURL(/\/statewide$/);
+
     await page.goto("/#scenario?g=removed&arg=0.5&base=1&min=0.1&pb=1&pc=1&h=2032");
     await expect(page).toHaveURL(/\/scenario\?/);
     await expect(page.locator("#lv-guarantee")).toHaveValue("removed");

@@ -238,7 +238,7 @@ test.describe("the statute timeline", () => {
     await expect(first).toHaveAttribute("href", "/legislation");
     await first.click();
     await expect(page).toHaveURL(/\/legislation$/);
-    await expect(page.locator("h1")).toHaveText("Ohio school funding in statute");
+    await expect(page.locator("h1")).toHaveText("The statute timeline");
   });
 
   test("a formula that ran one biennium is drawn narrower than one that ran five", async ({

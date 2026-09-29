@@ -70,7 +70,12 @@ const refresh = refreshEffect(bundle.districts, bundle.drafts, modelOf(s));
     that a reader of this page is entitled to know about before moving the slider, not after. That
     is more true here than on `/scenario`, not less: this is the page a school board sends.
   */}
-  <HeldFixed districts={bundle.districts} total={s.districts} refresh={refresh} />
+  <HeldFixed
+    districts={bundle.districts}
+    total={s.districts}
+    refresh={refresh}
+    heading={`What ${district.name}'s run holds fixed, and one thing it deliberately does not`}
+  />
 
   <div id="scenario-root" data-irn={district.irn}>
     {/*
@@ -92,14 +97,15 @@ const refresh = refreshEffect(bundle.districts, bundle.drafts, modelOf(s));
 
     <noscript>
       <div class="card err" id="needs-script" data-part="needs-script">
-        <h2><SectionAnchor id="needs-script" />This is the one view that needs JavaScript</h2>
+        <h2><SectionAnchor id="needs-script" />Re-running the formula needs JavaScript</h2>
         <p class="note">
-          The other three views of this district — its <a href={`/district/${district.irn}`}
+          The other four views of this district — its <a href={`/district/${district.irn}`}
             >dashboard</a
-          >, <a href={`/district/${district.irn}/outcome`}>outcome</a> and <a
+          >, <a href={`/district/${district.irn}/outcome`}>outcome</a>, <a
             href={`/district/${district.irn}/finances`}>finances</a
-          > — carry every figure in the document and read correctly without any script. This one
-          re-derives the funding formula as you move a slider.
+          > and <a href={`/district/${district.irn}/taxes`}>property tax</a> — carry every figure
+          in the document and read correctly without any script. This one re-derives the funding
+          formula as you move a slider.
         </p>
       </div>
     </noscript>

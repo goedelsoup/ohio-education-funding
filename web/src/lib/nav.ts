@@ -56,6 +56,52 @@ export type Section =
   | "method"
   | "data";
 
+/**
+ * The name table: one row per page the bar links to, and the one name that page goes by.
+ *
+ * # Why a place has one name
+ *
+ * A page carried up to four — its label in the bar, its `<title>`, its `h1` and its URL — and
+ * they disagreed. `/legislation` was "The statute timeline" in the bar, "Statute" in the tab and
+ * "Ohio school funding in statute" on the page; `/history` was "History" everywhere but its own
+ * heading, which said "The long view". A reader who clicks a word expects to land on a page that
+ * says the same word back, and a reader who bookmarks the tab should recognise it in the bar.
+ *
+ * So the bar and the page both read the name from here, and `tests/dist/names.spec.ts` holds them
+ * to it on the built site: for every link in the bar, the label is the `<title>` stem and the `h1`
+ * begins with it. An `h1` may add a clause after the name; it may not say something else first.
+ *
+ * The corpus classes are not rows. Their name is the ontology's own `label:`, which the bar and the
+ * class index both read, so there is nothing here to restate.
+ *
+ * The URL is the fourth name and is not required to match. Changing an address costs a redirect
+ * and every link already sent; changing a label costs nothing, and `/legislation` is a better
+ * address than any spelling of its title would be.
+ */
+export const NAMES = {
+  statewide: { href: "/statewide", name: "Statewide" },
+  districts: { href: "/districts", name: "Find a district" },
+  counties: { href: "/counties", name: "Counties" },
+  house: { href: "/house", name: "House districts" },
+  senate: { href: "/senate", name: "Senate districts" },
+  compare: { href: "/compare", name: "Compare" },
+  legislation: { href: "/legislation", name: "The statute timeline" },
+  outcomes: { href: "/outcomes", name: "Outcomes" },
+  history: { href: "/history", name: "History" },
+  scenario: { href: "/scenario", name: "Scenario" },
+  reach: { href: routes.REACH, name: "Reach" },
+  bounds: { href: routes.BOUNDS, name: "Bounds" },
+  wiki: { href: "/wiki", name: "The corpus" },
+  method: { href: routes.METHOD, name: "Method" },
+  data: { href: "/data", name: "Data" },
+} as const satisfies Partial<Record<Section, { href: string; name: string }>>;
+
+/** A row of the name table as a link in the bar. */
+function place(key: keyof typeof NAMES, note?: string): NavLink {
+  const { href, name } = NAMES[key];
+  return note == null ? { key, href, label: name } : { key, href, label: name, note };
+}
+
 /** One link in a menu panel. */
 export interface NavLink {
   /** Set where this link is a page a reader can be *on*. Matched against `Base`'s `section`. */
@@ -235,21 +281,27 @@ export function landmarkActs(corpus: Corpus): Landmark[] {
  * That is a content decision, and it is not this phase's.
  */
 function litigation(corpus: Corpus): NavLink[] {
-  return [classLink(corpus, "litigation", "Litigation"), classLink(corpus, "doctrine", "Doctrine")];
+  return [classLink(corpus, "litigation"), classLink(corpus, "doctrine")];
 }
 
 /**
  * A whole class behind one link, with how much is behind it.
  *
- * The count sits in the label rather than in a note because a note under `Components` reading
- * "16 components" says the label twice. Notes elsewhere in the bar carry something the label does
- * not — the rule that admitted an act, the year a regime was established — and one that restates
- * its own heading teaches a reader to stop reading them.
+ * The count sits in the label rather than in a note because a note under `Formula Component`
+ * reading "18 components" says the label twice. Notes elsewhere in the bar carry something the
+ * label does not — the rule that admitted an act, the year a regime was established — and one that
+ * restates its own heading teaches a reader to stop reading them.
+ *
+ * The name is the ontology's `label:`, which is also the class index's `h1` and `<title>` stem.
+ * It was a second, shorter name typed here — `Components`, `Parameters`, `All 16 acts` — so the
+ * link said one thing and the page it opened said another.
  */
-function classLink(corpus: Corpus, className: string, label: string): NavLink {
+function classLink(corpus: Corpus, className: string): NavLink {
+  const entry = corpus.byClass.get(className);
+  if (!entry) throw new Error(`The bar links the class \`${className}\`, and the corpus has none`);
   return {
     href: routes.wikiClass(className),
-    label: `${label} (${corpus.byClass.get(className)?.nodes.length ?? 0})`,
+    label: `${entry.label} (${entry.nodes.length})`,
   };
 }
 
@@ -326,7 +378,6 @@ export function sectionForClass(className: string): Section {
  */
 export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavGroup[] {
   const acts = landmarkActs(corpus);
-  const legislation = corpus.byClass.get("legislation");
 
   return [
     {
@@ -337,24 +388,15 @@ export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavGroup[] {
       sections: [
         {
           links: [
-            {
-              key: "statewide",
-              href: "/statewide",
-              label: "Statewide",
-              note: "all of Ohio at once",
-            },
-            // Read from the feed, not typed in, for the reason `og/pages.ts` gives at length: a
-            // count that a regenerated panel makes wrong is worse than no count. This one is on
-            // every page.
-            {
-              key: "districts",
-              href: "/districts",
-              label: `All ${bundle.statewide.districts} districts`,
-            },
-            { key: "counties", href: "/counties", label: "Counties" },
-            { key: "house", href: "/house", label: "House" },
-            { key: "senate", href: "/senate", label: "Senate" },
-            { key: "compare", href: "/compare", label: "Compare two" },
+            place("statewide", "all of Ohio at once"),
+            // The count is read from the feed, not typed in, for the reason `og/pages.ts` gives at
+            // length: a count that a regenerated panel makes wrong is worse than no count. It was
+            // the label, "All 609 districts", and is the note now that the label is the page's name.
+            place("districts", `all ${bundle.statewide.districts}, by name or IRN`),
+            place("counties"),
+            place("house"),
+            place("senate"),
+            place("compare"),
           ],
         },
       ],
@@ -369,14 +411,7 @@ export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavGroup[] {
           // The chronological view, above the acts rather than among them: it is the only entry
           // here that is not a node, and a reader who wants "how did this get here" wants it
           // before they want any single act.
-          links: [
-            {
-              key: "legislation",
-              href: "/legislation",
-              label: "The statute timeline",
-              note: "every act, in order",
-            },
-          ],
+          links: [place("legislation", "every act, in order")],
         },
         {
           links: acts.map((act) => ({
@@ -386,13 +421,7 @@ export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavGroup[] {
           })),
         },
         {
-          links: [
-            {
-              href: routes.wikiClass("legislation"),
-              label: `All ${legislation?.nodes.length ?? 0} acts`,
-            },
-            ...litigation(corpus),
-          ],
+          links: [classLink(corpus, "legislation"), ...litigation(corpus)],
         },
       ],
     },
@@ -405,9 +434,9 @@ export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavGroup[] {
         { links: regimes(corpus) },
         {
           links: [
-            classLink(corpus, "formula-component", "Components"),
-            classLink(corpus, "parameter", "Parameters"),
-            classLink(corpus, "metric", "Metrics"),
+            classLink(corpus, "formula-component"),
+            classLink(corpus, "parameter"),
+            classLink(corpus, "metric"),
           ],
         },
       ],
@@ -420,25 +449,15 @@ export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavGroup[] {
       sections: [
         {
           links: [
-            {
-              key: "outcomes",
-              href: "/outcomes",
-              label: "Outcomes",
-              note: "association, not effect",
-            },
-            { key: "history", href: "/history", label: "History", note: "the Census long view" },
-            { key: "scenario", href: "/scenario", label: "Scenario", note: "re-run the formula" },
+            place("outcomes", "association, not effect"),
+            place("history", "the Census long view"),
+            place("scenario", "re-run the formula"),
             /* Beside the runner rather than under it: they drive the same levers and ask
                different questions of them — how much, and who. */
-            { key: "reach", href: routes.REACH, label: "Reach", note: "who the guarantee holds still" },
+            place("reach", "who the guarantee holds still"),
             /* Last in the run because it is the widest: the other four ask what the formula did
                to somebody, and this one asks what shape the formula is. */
-            {
-              key: "bounds",
-              href: routes.BOUNDS,
-              label: "Bounds",
-              note: "every floor and ceiling, and who is on it",
-            },
+            place("bounds", "every floor and ceiling, and who is on it"),
           ],
         },
       ],
@@ -451,9 +470,9 @@ export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavGroup[] {
       sections: [
         {
           links: [
-            { key: "wiki", href: "/wiki", label: "Wiki", note: "the corpus itself" },
-            { key: "method", href: "/method", label: "Method" },
-            { key: "data", href: "/data", label: "Downloads" },
+            place("wiki", "what every page is generated from"),
+            place("method"),
+            place("data", "every figure, as files"),
           ],
         },
       ],

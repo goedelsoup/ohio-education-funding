@@ -597,12 +597,12 @@ test.describe("with JavaScript disabled", () => {
     await expect(page.locator("main")).toContainText("20 mills");
   });
 
-  test("the scenario route says outright that it is the exception", async ({ page }) => {
+  test("the scenario route says it needs JavaScript, and why", async ({ page }) => {
     await page.goto("/scenario");
     // Located by role rather than by text: Playwright's text engine does not descend into
     // `<noscript>`, even in a context where the parser has turned its contents into real DOM.
     await expect(
-      page.getByRole("heading", { name: "This is the one page that needs JavaScript" }),
+      page.getByRole("heading", { name: "Re-running the formula needs JavaScript" }),
     ).toBeVisible();
   });
 });

@@ -23,6 +23,7 @@
  * top. So it is cards, in order, like every other static page here.
  */
 import Base from "../layouts/Base.astro";
+import { NAMES } from "../lib/nav.ts";
 import SectionAnchor from "../components/SectionAnchor.astro";
 import {
   census,
@@ -40,13 +41,13 @@ const c = census();
 ---
 
 <Base
-  title="Bounds"
+  title={NAMES.bounds.name}
   description={`Every floor, ceiling and clamp in Ohio's school funding formula — ${count(c.rows.length)} of them — ranked by how many of the state's districts each one is actually the operative term for, with the one that cannot bind for any district at all.`}
   image={routes.og.page("bounds")}
   imageAlt="Every bound in Ohio's school funding formula, ranked by the number of districts it is the operative term for"
   section="bounds"
 >
-  <h1>Bounds</h1>
+  <h1>{NAMES.bounds.name}</h1>
   <p class="lead">
     Ohio's funding formula is written in floors and ceilings: a district is funded for at least one
     EMIS employee, its capacity percentage is capped, its guarantee cannot fall below zero. There

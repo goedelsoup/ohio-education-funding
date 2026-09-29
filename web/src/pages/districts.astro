@@ -11,6 +11,7 @@
  * already complete — with no script, every row is present and the browser's own find works.
  */
 import Base from "../layouts/Base.astro";
+import { NAMES } from "../lib/nav.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { count, fig, money, pct } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
@@ -133,14 +134,14 @@ const years = Object.fromEntries(MEASURES.map((m) => [m.key, m.year])) as Record
 ---
 
 <Base
-  title="Districts"
+  title={NAMES.districts.name}
   description={`All ${s.districts} Ohio school districts in the FY${bundle.fiscal_year} funding model, with state aid per pupil, guarantee status, property wealth and enrollment.`}
   image={routes.og.page("districts")}
   imageAlt="Every Ohio school district, with how many are funded by the guarantee"
   section="districts"
   wide
 >
-  <h1>Districts</h1>
+  <h1>{NAMES.districts.name}</h1>
   <p class="lead">
     All {count(s.districts)} districts in the department's FY{bundle.fiscal_year} model.
     {" "}{count(s.on_guarantee)} are held above what the formula computes for them by the guarantee;

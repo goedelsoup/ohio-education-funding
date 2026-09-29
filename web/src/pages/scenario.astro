@@ -13,6 +13,7 @@
 import HeldFixed from "../components/HeldFixed.astro";
 import ScenarioControls from "../components/ScenarioControls.astro";
 import Base from "../layouts/Base.astro";
+import { NAMES } from "../lib/nav.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { count, millions } from "../lib/format.ts";
 import { modelOf } from "../lib/policy.ts";
@@ -54,13 +55,13 @@ const stages = bundle.drafts
 ---
 
 <Base
-  title="Scenario"
+  title={NAMES.scenario.name}
   description={`Re-run Ohio's FY${bundle.fiscal_year} school funding formula with the guarantee, base cost, minimum state share and phase-in moved, across all ${s.districts} districts.`}
   image={routes.og.page("scenario")}
   imageAlt="Re-run Ohio's funding formula with the guarantee, base cost, minimum state share and phase-in moved"
   section="scenario"
 >
-  <h1>Scenario</h1>
+  <h1>{NAMES.scenario.name}</h1>
   <p class="lead">
     Move a lever and re-run the department's FY{bundle.fiscal_year} model across all {
       count(s.districts)
@@ -74,7 +75,12 @@ const stages = bundle.drafts
     is a limit on what the reader is about to do and not a footnote on what they got — and on the
     district route for the same reason. See `HeldFixed.astro`.
   */}
-  <HeldFixed districts={bundle.districts} total={s.districts} refresh={refresh} />
+  <HeldFixed
+    districts={bundle.districts}
+    total={s.districts}
+    refresh={refresh}
+    heading="What the statewide run holds fixed, and one thing it deliberately does not"
+  />
 
   {/*
     What "current law" is, named.
@@ -139,12 +145,16 @@ const stages = bundle.drafts
 
     <noscript>
       <div class="card err" id="needs-script" data-part="needs-script">
-        <h2><SectionAnchor id="needs-script" />This is the one page that needs JavaScript</h2>
+        {/* One heading on every page that re-runs the formula. Each used to claim to be the only
+            one — "the one page", "the one view", "this page" beside "every other page" — and a
+            reader who met two of them met a contradiction. */}
+        <h2><SectionAnchor id="needs-script" />Re-running the formula needs JavaScript</h2>
         <p class="note">
-          Every other page on this site carries its figures in the document and reads correctly
-          without any script. This one re-derives Ohio's funding formula over all {
-            count(s.districts)
-          } districts as you move a slider, which is not something a pre-rendered page can do.
+          Most pages on this site carry their figures in the document and read correctly without
+          any script. The ones that re-run the formula cannot: this page, <a href={routes.REACH}
+            >who a change reaches</a
+          >, and each district's scenario view re-derive it over all {count(s.districts)} districts
+          as you move a slider, which is not something a pre-rendered page can do.
         </p>
         <p class="note">
           The underlying data is still available: <a href="/data">the feed and a CSV of the panel</a>,
