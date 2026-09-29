@@ -470,13 +470,12 @@ test.describe("with JavaScript disabled", () => {
   });
 
   test("the section menus still open, and their links still go somewhere", async ({ page }) => {
-    // The reason they are `<details>` rather than a scripted menu, and the reason it matters more
-    // than it did. Every entry in the bar is a disclosure now — the flat `Statewide` and
-    // `Scenario` links went into `Places` and `Research` — so a menu that needed script to open
-    // would put the entire site behind JavaScript, on a site whose whole point is that nothing is.
+    // The reason they are `<details>` rather than a scripted menu. Four of the six entries in the
+    // bar are disclosures, so a menu that needed script to open would put most of the site behind
+    // JavaScript, on a site whose whole point is that nothing is.
     await page.goto("/");
     const places = page.locator("header.site nav details.menu").filter({ hasText: "Places" });
-    await expect(places.locator("a")).toHaveCount(6);
+    await expect(places.locator("a")).toHaveCount(5);
     await expect(places.locator('a[href="/counties"]')).toBeHidden();
 
     await places.locator("summary").click();
@@ -486,29 +485,29 @@ test.describe("with JavaScript disabled", () => {
     await expect(page.locator("h1")).toBeVisible();
   });
 
-  test("all five entries are disclosures, and every one of them opens", async ({ page }) => {
+  test("two entries are links and four are disclosures, and every one of them opens", async ({
+    page,
+  }) => {
     /*
-     * Places was the only group this suite had ever opened without script, back when two of the
-     * five entries were plain links and a failure in the disclosure machinery still left
-     * `Statewide` and `Scenario` reachable. Both of those went into menus. There is no longer any
-     * flat link in the bar at all, so a `<details>` that needed JavaScript would now put every
-     * section of the site behind it rather than three fifths of one.
+     * #548 put two flat links back in the bar — `Find a district` and `Try a change` — so a failure
+     * in the disclosure machinery leaves those two reachable and nothing else. The four menus are
+     * everything else the site holds, and each has to open with nothing running.
      */
     await page.goto("/");
+    const flat = page.locator("header.site nav a.menu-place");
+    await expect(flat).toHaveText(["Find a district", "Try a change"]);
+    await expect(flat.nth(0)).toBeVisible();
+    await expect(flat.nth(0)).toHaveAttribute("href", "/districts");
+    await expect(flat.nth(1)).toHaveAttribute("href", "/scenario");
     const menus = page.locator("header.site nav details.menu");
-    await expect(menus).toHaveCount(5);
-    await expect(page.locator("header.site nav > a")).toHaveCount(0);
+    await expect(menus).toHaveCount(4);
 
     /*
-     * By position and not by `filter({ hasText })`, which is how this was first written and which
-     * does not work any more: the panels carry generated prose, `hasText` is a case-insensitive
-     * substring, and "Formula" matches three menus — its own, `Law` (whose note under H.B. 153
-     * reads "Bridge Formula") and `Research` ("re-run the formula").
-     *
-     * Positions are worth asserting in their own right. "After Places" is where the two lifted
-     * corpus axes were asked to go, and nothing else says so.
+     * By position and not by `filter({ hasText })`: the panels carry prose, `hasText` is a
+     * case-insensitive substring, and `Library` holds a run headed "Formula" and a class called
+     * "Scenario" — a filter on either word matches a menu it does not name.
      */
-    for (const [index, label] of ["Places", "Law", "Formula", "Research", "Reference"].entries()) {
+    for (const [index, label] of ["Places", "Analysis", "Library", "About"].entries()) {
       const menu = menus.nth(index);
       await expect(menu.locator("summary"), `entry ${index} is not ${label}`).toHaveText(label);
       const first = menu.locator(".menu-panel a").first();
@@ -551,24 +550,32 @@ test.describe("with JavaScript disabled", () => {
     await expect(page.locator("h1")).toBeVisible();
   });
 
-  test("a menu note says why a link is in the menu, not what the link already says", async ({
+  test("Library names every class with what is behind it, under a heading saying what it is for", async ({
     page,
   }) => {
     /*
-     * Two thirds of the bar is generated from `.yidam/corpus/`, and the second line under each
-     * generated link is the derivation showing its work: which rule admitted an act, which year a
-     * regime began. This asserts the notes survive to the page — the unit suite checks the rules
-     * select correctly, and a correct selection rendered without its reason is a menu of seven
-     * bill numbers a reader has no way to tell apart.
+     * The bar reads `Library` out of `.yidam/corpus/`, and the unit suite checks it selects every
+     * class. This asserts the selection survives to the page with its two readings: the heading
+     * over each run, and the count inside each class's label — a panel of twenty ontology names
+     * with neither is an index nobody sorted.
      */
     await page.goto("/");
-    const law = page.locator("header.site nav details.menu").filter({ hasText: "Law" });
-    await law.locator("summary").click();
-    const fsfp = law.locator('a[href="/wiki/legislation/hb-110-2021"]');
-    await expect(fsfp.locator(".menu-label")).toHaveText("Am. Sub. H.B. 110 (2021)");
-    await expect(fsfp.locator(".menu-note")).toHaveText("Fair School Funding Plan");
-    // The rule that maintains itself: whichever act is the current budget names the biennium.
-    await expect(law.locator(".menu-note", { hasText: /^appropriates for FY/ })).toHaveCount(1);
+    const library = page.locator("header.site nav details.menu").nth(2);
+    await library.locator("summary").click();
+    await expect(library.locator(".menu-heading")).toHaveText([
+      "Law",
+      "Formula",
+      "Institutions",
+      "Proposals",
+      "The record",
+    ]);
+    // Every class index, each carrying its count. Eighteen classes today, read off the page
+    // rather than typed, so the claim is that each one it holds is counted.
+    const classes = library.locator('a[href^="/wiki/"]:not([href="/wiki/source"]):not([href="/wiki/decision"])');
+    expect(await classes.count()).toBeGreaterThan(15);
+    for (const label of await classes.locator(".menu-label").allTextContents()) {
+      expect(label, "a class link without its count").toMatch(/ \(\d+\)$/);
+    }
   });
 
   test("the group holding the current page is marked, and the page itself is marked inside it", async ({
@@ -578,10 +585,24 @@ test.describe("with JavaScript disabled", () => {
     // Marking the summary as the current *page* would tell a screen reader the reader is on a
     // thing that is not a destination.
     await page.goto("/history");
-    const research = page.locator("header.site nav details.menu").filter({ hasText: "Research" });
-    await expect(research.locator("summary")).toHaveAttribute("aria-current", "true");
-    await research.locator("summary").click();
-    await expect(research.locator('a[href="/history"]')).toHaveAttribute("aria-current", "page");
+    const analysis = page.locator("header.site nav details.menu").nth(1);
+    await expect(analysis.locator("summary")).toHaveAttribute("aria-current", "true");
+    await analysis.locator("summary").click();
+    await expect(analysis.locator('a[href="/history"]')).toHaveAttribute("aria-current", "page");
+  });
+
+  test("a flat entry is the page on its own address, and holds the pages under it", async ({
+    page,
+  }) => {
+    // The same two claims for the two links, which have no summary to carry the second: a district
+    // page sits under `Find a district` without being `/districts`.
+    const find = page.locator('header.site nav a.menu-place[href="/districts"]');
+    await page.goto("/districts");
+    await expect(find).toHaveAttribute("aria-current", "page");
+    await page.goto(`/district/${CLEVELAND}`);
+    await expect(find).toHaveAttribute("aria-current", "true");
+    await page.goto("/history");
+    await expect(find).not.toHaveAttribute("aria-current", /.*/);
   });
 
   test("the constant-dollar switch still switches", async ({ page }) => {

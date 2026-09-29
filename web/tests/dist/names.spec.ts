@@ -52,8 +52,8 @@ const CLASS_INDEX = /^\/wiki\/[^/]+$/;
 /**
  * The bar's label without the count a class link carries.
  *
- * Only a class link's: an act's label ends in its year, `Am. Sub. H.B. 96 (2025)`, which is the
- * same shape and is part of the name.
+ * Only a class link's. The bar named acts too until #548, and an act's label ends in its year —
+ * `Am. Sub. H.B. 96 (2025)` — which is the same shape and is part of the name.
  */
 const nameOf = (label: string, href: string) =>
   CLASS_INDEX.test(href) ? label.replace(/\s+\(\d+\)$/, "") : label;
@@ -82,18 +82,14 @@ function bar(): Entry[] {
   });
 }
 
-/**
- * Links that name a single act rather than a place, which this phase leaves alone.
- *
- * The `Law` panel names seven acts by designation — `Am. Sub. H.B. 96 (2025)` — and each act's
- * page is titled by designation *and* subject. They are not places: they are the only entries the
- * bar computes out of the corpus rather than names, and #548 takes them out of the bar in favour
- * of the class indexes. Until then they are exempt, by pattern, and the exemption goes with them.
+/*
+ * No exemptions. The `Law` panel named seven acts by designation, each titled on its own page by
+ * designation *and* subject, and they were excused here by pattern until #548 took them out of the
+ * bar in favour of the class indexes. The exemption went with them: every link the bar carries now
+ * is a place, and every place goes by one name.
  */
-const ACT = /^\/wiki\/legislation\/[^/]+$/;
-
 describe("one name per place", () => {
-  const entries = bar().filter((entry) => !ACT.test(entry.href));
+  const entries = bar();
 
   test("the bar was read", () => {
     // Guard against the selector going stale: every assertion below is vacuous over an empty bar.

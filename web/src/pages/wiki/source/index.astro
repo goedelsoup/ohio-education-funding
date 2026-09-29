@@ -7,6 +7,7 @@
  * marked — the catalog treats an entry nothing reaches as a gap, not as clutter.
  */
 import Base from "../../../layouts/Base.astro";
+import { NAMES } from "../../../lib/nav.ts";
 import { loadCorpus } from "../../../lib/corpus.ts";
 import { compare } from "../../../lib/order.ts";
 import * as routes from "../../../lib/routes.ts";
@@ -19,14 +20,14 @@ const uncited = ranked.filter((s) => s.citedBy.length === 0).length;
 ---
 
 <Base
-  title="Sources"
+  title={NAMES.sources.name}
   description={`The ${sources.length} sources behind the Ohio school funding corpus — department publications, Legislative Service Commission analyses, district filings, and the litigation record.`}
   image={routes.og.page("sources")}
   imageAlt="The sources behind the Ohio school funding corpus"
-  section="wiki"
+  section="sources"
 >
   <p class="crumb"><a href="/wiki">The corpus</a></p>
-  <h1>Sources</h1>
+  <h1>{NAMES.sources.name}</h1>
   <p class="sub">
     {sources.length} entries. Every numeric claim in the corpus should reach one of these in a
     single hop{uncited > 0 ? `; ${uncited} are not yet cited by any node` : ""}.

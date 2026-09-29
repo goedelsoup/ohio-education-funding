@@ -37,7 +37,7 @@ const body = await renderProse(source.body, FROM_CATALOG);
   description={`${source.title} — a source behind the Ohio school funding corpus, cited by ${source.citedBy.length} node${source.citedBy.length === 1 ? "" : "s"}.`}
   image={routes.og.wikiSource(source.slug)}
   imageAlt={`${source.title}, and how many corpus nodes cite it`}
-  section="wiki"
+  section="sources"
 >
   <p class="crumb"><a href="/wiki">The corpus</a> › <a href="/wiki/source">Sources</a></p>
   <h1>{source.title}</h1>

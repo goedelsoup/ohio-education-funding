@@ -8,6 +8,7 @@
  * reader learns most from and the ones a reader is most likely to be looking for.
  */
 import Base from "../../../layouts/Base.astro";
+import { NAMES } from "../../../lib/nav.ts";
 import { loadCorpus } from "../../../lib/corpus.ts";
 import { summarize } from "../../../lib/prose.ts";
 import { compare } from "../../../lib/order.ts";
@@ -23,14 +24,14 @@ const withdrawals = decisions.reduce((sum, decision) => sum + decision.correctio
 ---
 
 <Base
-  title="Decisions"
+  title={NAMES.decisions.name}
   description={`The ${decisions.length} decision records behind the Ohio school funding corpus — what was chosen, what was rejected, and the ${withdrawals} claims later withdrawn.`}
   image={routes.og.page("wiki")}
   imageAlt="The decisions behind the Ohio school funding corpus"
-  section="wiki"
+  section="decisions"
 >
   <p class="crumb"><a href="/wiki">The corpus</a></p>
-  <h1>Decisions</h1>
+  <h1>{NAMES.decisions.name}</h1>
   <p class="sub">
     {decisions.length} records of why this repository is shaped the way it is — what was chosen,
     what was rejected and on what evidence, and what turned out to be wrong. {withdrawals} claims

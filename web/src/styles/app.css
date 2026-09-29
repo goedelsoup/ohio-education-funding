@@ -174,7 +174,7 @@ header.site {
  * directly on the bar. The keyline and the facet are the same token for the same reason: they are
  * the ground showing through the pencil, and the ground here is the header.
  *
- * 30px against a 52px bar, sized to the theme button's line box like the repository mark.
+ * 30px against a 52px bar, sized to the theme button's line box.
  */
 .brand { display: inline-flex; align-items: center; flex: none; }
 .brand svg { display: block; width: 30px; height: 30px; }
@@ -265,6 +265,13 @@ header.site nav { display: flex; gap: .15rem; margin-right: auto; }
  *
  * The cost is that a reader between 700 and 819px gets the phone's disclosure. That is one click
  * further to a section, on a window nobody's phone has and few laptops open to.
+ *
+ * # Six entries, and the repository mark gone from the row (#548)
+ *
+ * The bar became two links and four menus, and the repository mark moved to the footer. On a Mac
+ * the loose nav is 523px, and at 820 the row reads 30 + 523 + 32 + 32 = 617 of 780: 163 spare.
+ * That is the number that decided 820 stays, and it is this machine's; the runner's is printed by
+ * the header test whenever the row wraps, which is where to read it before moving anything here.
  */
 @media (min-width: 820px) {
   .menu-all > summary { display: none; }
@@ -282,6 +289,18 @@ header.site nav a,
 header.site nav a:hover { background: var(--surface-2); color: var(--text-primary); }
 header.site nav a[aria-current="page"] {
   background: var(--surface-2);
+  color: var(--text-primary);
+  font-weight: var(--weight-semibold);
+}
+/*
+ * The two entries that are links rather than menus — `Find a district` and `Try a change`.
+ *
+ * The same box as a summary beside them, so the row reads as one row of entries; no `▾`, because
+ * nothing opens. `true` is the summary's treatment, for the same reason: a district page sits
+ * under `Find a district` without being it.
+ */
+header.site nav .menu-place { white-space: nowrap; }
+header.site nav .menu-place[aria-current="true"] {
   color: var(--text-primary);
   font-weight: var(--weight-semibold);
 }
@@ -355,6 +374,39 @@ header.site nav .menu-note {
 }
 header.site nav a:hover .menu-note,
 header.site nav a[aria-current="page"] .menu-note { color: var(--text-secondary); }
+/* What a run is, in `Library`: text rather than a heading element, set as a label over it. */
+header.site nav .menu-heading {
+  display: block;
+  padding: var(--space-1) .6rem 0;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--text-annotation);
+}
+/*
+ * `Library`, which is every class of the corpus — twenty-odd links in five headed runs.
+ *
+ * One column of that ran to about 800px, off a laptop viewport under a sticky header, where the
+ * tail of an absolutely positioned panel cannot be scrolled to. Two columns halve it. `columns`
+ * rather than a grid so the runs balance by height instead of pairing off row by row, and
+ * `break-inside: avoid` so a run is never split from its heading.
+ *
+ * Above the nav's breakpoint it hangs from its own right edge: `Library` is the fifth entry of
+ * six, and a 30rem panel hung from its left edge would run off the right of the window. Below
+ * 640px the panel is static and one column like every other — see the rule after this.
+ */
+@media (min-width: 641px) {
+  header.site nav .menu-panel.menu-wide {
+    display: block;
+    columns: 2;
+    column-gap: var(--space-2);
+    width: 30rem;
+    max-width: none;
+  }
+  header.site nav .menu-wide .menu-run { break-inside: avoid; }
+}
+@media (min-width: 820px) {
+  header.site nav .menu-panel.menu-wide { left: auto; right: 0; }
+}
 /* Narrow viewports: the header already wraps, and an absolutely positioned panel next to a
    wrapped row lands on top of the row below it. Let the menu push the header open instead. */
 @media (max-width: 640px) {
@@ -440,58 +492,18 @@ td.year { font-family: var(--font-mono); color: var(--text-annotation); white-sp
 }
 
 /*
- * The repository mark: a chrome link, and not a control.
+ * The repository mark, in the footer since #548.
  *
- * It wore `.ghost` and read as a third button. The pill is what the theme toggle uses to say it
- * acts on the page, and the same border around the octocat claimed that of a link whose whole
- * behaviour is to leave. So the mark sets its own colour and drops the underline, which is what
- * every other chrome link here does — position is the affordance.
+ * It sat in the header beside the theme button, hidden below 480px because a phone's row had no
+ * room for it. The bar needed that width for its six entries, and a link whose whole behaviour is
+ * to leave the site is not a way of moving around it — so it moved to the footer, where there is
+ * room at every width and it carries its name in words rather than only in an `aria-label`.
  *
- * The padding stays although it now draws nothing: it is what makes a 16px glyph a 32px target,
- * which is the theme button's size and the floor a finger needs.
- *
- * `inline-flex` and a `block` child are what keep the row one row. An inline `<svg>` sits on the
- * baseline and the line box then reserves descender space under it, which is a taller box than
- * the button beside it and a taller header than 52px. Laying the box out instead of the line
- * takes that away.
- *
- * Focus is drawn rather than inherited. `a:focus-visible` thickens an underline, and this link
- * has no word to underline — without a ring of its own a keyboard reader would lose it.
- *
- * # And why it is not on the narrowest phones
- *
- * There was no room, and no arrangement of this row made room. At 360px the bar has 320px inside
- * its padding and it spent 297 of them on the runner's metrics — the brand as WORDS at 166, the
- * collapsed nav at 68, the theme button at 31 and two gaps. Twenty-three spare; the mark wants 32
- * and a gap. Closing the gaps and trimming the padding could have bought a pixel or two, at the
- * price of a smaller tap target on exactly the devices that are touched, and it would have wrapped
- * again on the next machine whose `system-ui` was a little wider.
- *
- * So it appears at 480px, where the same row had 95px spare.
- *
- * # That arithmetic is now obsolete, and the rule is kept on purpose
- *
- * The brand is a 30px mark rather than 166px of words, so the same row at 360px now holds
- * 30 + 68 + 31 + 32 = 161 of its 320px and has 159 spare. The mark wants 48 of that and would
- * fit three times over.
- *
- * It stays hidden below 480 anyway, and the reason has changed rather than disappeared: a phone's
- * chrome is worth keeping to what a phone reader needs, and this link is not it.
- * `tests/e2e/chrome.spec.ts` asserts the 360/480 split, so it is now a decision the suite holds rather than a measurement it
- * records. A phone reader still reaches the repository — every figure's attribution and every
- * corpus page links into it.
+ * `inline-flex` and a `block` child keep the glyph off the baseline, so it sits centred on the
+ * words beside it rather than riding the descender space an inline `<svg>` reserves.
  */
-.mark {
-  display: none;
-  align-items: center;
-  padding: var(--space-1) .5rem;
-  color: var(--text-secondary);
-  text-decoration: none;
-}
-.mark svg { display: block; width: 1rem; height: 1rem; }
-@media (min-width: 480px) { .mark { display: inline-flex; } }
-.mark:hover { color: var(--text-primary); }
-.mark:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.mark { display: inline-flex; align-items: center; gap: var(--space-2); }
+.mark svg { display: block; width: 1rem; height: 1rem; flex: none; }
 
 /*
  * A link is the ink with a rule under it. The rule is the affordance; the colour is not.

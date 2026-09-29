@@ -15,7 +15,8 @@
  * The brand mark points here and nothing else does. That is the convention a reader already has,
  * and a tab as well would put one destination in the bar twice. It also means this page has to
  * earn its place by orienting rather than by being unavoidable: it is three cards, and the reason
- * there is no fourth is that a front door which lists everything is a list, not a door.
+ * there is no fourth is that a front door which lists everything is a list, not a door. The third
+ * is the bar itself, read out of `nav()` with a line for each entry.
  *
  * # Where the figures are
  *
@@ -105,10 +106,11 @@ const NOTABLE = ["043802", "043786", "044909", "049056", "044933", "045583"]
     Read from `nav()`, not written here. A front door and a section bar that can disagree about
     what the site contains is the navigability defect this page exists to fix, and a hand-written
     list is exactly how they come to disagree — a section added to one is added to the other only
-    if somebody remembers. `tests/unit/nav.spec.ts` asserts the two carry the same groups.
+    if somebody remembers. Both kinds of entry are rows: a menu's row opens the page it fronts, and
+    a flat entry's row is the entry itself.
   */}
   <div class="card" id="sections" data-part="sections">
-    <h2><SectionAnchor id="sections" />The five sections</h2>
+    <h2><SectionAnchor id="sections" />Every section of the site</h2>
     <div class="scroll">
       <table class="prose">
         <tbody>
