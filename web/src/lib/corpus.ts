@@ -547,11 +547,11 @@ function readNode(className: string, file: string, report: Diagnostic[]): Node {
   ).map(([key, value]) => ({ name: key, value: String(value).trim() }));
 
   /*
-   * Every place this corpus writes a link, which is five places and not one.
+   * Every place this corpus writes a link, which is six places and not one.
    *
    * `links:` is the structured one. The rest are prose: the description, the `findings` block two
-   * nodes carry, the revision entries, individual property values, and — for the one node that
-   * writes its whole link list as a paragraph — that paragraph. Each of those was found the hard
+   * nodes carry, the revision entries, the `unfilled` entries, individual property values, and —
+   * for the one node that writes its whole link list as a paragraph — that paragraph. Each of those was found the hard
    * way, by a source page or a backlink list coming up empty for a node that plainly referenced
    * something.
    */
@@ -569,6 +569,9 @@ function readNode(className: string, file: string, report: Diagnostic[]): Node {
       revision.found_by,
       revision.reach ?? "",
     ]),
+    // An `unfilled` entry often says where the missing value lives, which is a citation. One
+    // written only here was absent from its source page until `used-by` was generated (#497).
+    ...unfilled.map((entry) => entry.why ?? ""),
     ...properties.map((property) => property.value),
   ].join("\n\n");
   const seen = new Set(declared);
