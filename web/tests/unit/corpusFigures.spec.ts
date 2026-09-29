@@ -687,6 +687,55 @@ test("the justification beside a tag is read as its detail", () => {
   ]);
 });
 
+/**
+ * Every tag that carries words inside its own brackets: `[verified — x]`, `[verified, x]`,
+ * `[verified as proposed]`, `[verified for a; inference for b]`. Bracket-matched, so a markdown
+ * link inside the words does not close the tag early, and a span followed by `(` is link text
+ * (`[open enrolment clawback](…)`) rather than a tag.
+ */
+function qualifiedTags(text: string): string[] {
+  const found: string[] = [];
+  for (const match of text.matchAll(/\[(verified|inference|open|unentered)(?=[^\]])/g)) {
+    let depth = 0;
+    let end = -1;
+    for (let i = match.index; i < text.length; i++) {
+      if (text[i] === "[") depth++;
+      else if (text[i] === "]" && --depth === 0) {
+        end = i + 1;
+        break;
+      }
+    }
+    if (end < 0 || text[end] === "(") continue;
+    const name = match[1]!;
+    const rest = text.slice(match.index + 1 + name.length, end - 1);
+    if (/^[\s—–,]/.test(rest)) found.push(text.slice(match.index, end));
+  }
+  return found;
+}
+
+test("the qualified-tag scan finds each spelling #505 found, and nothing else", () => {
+  expect(qualifiedTags("x [verified — `crates/project`] y")).toHaveLength(1);
+  expect(qualifiedTags("x [verified —\n  crates/foundation] y")).toHaveLength(1);
+  expect(qualifiedTags("[verified, as far as those sections go]")).toHaveLength(1);
+  expect(qualifiedTags("[verified as proposed]")).toHaveLength(1);
+  expect(qualifiedTags("[verified for the ratio; inference for the conclusion]")).toHaveLength(1);
+  expect(qualifiedTags("[verified — [the model](../../catalog/m.md) and more]")).toHaveLength(1);
+
+  expect(qualifiedTags("[verified] (`crates/project`) [inference] (the reading)")).toEqual([]);
+  expect(qualifiedTags("the [open enrolment clawback](../x.yml) and [verifiedish]")).toEqual([]);
+});
+
+test("no corpus node writes a qualified claim tag", () => {
+  // `claim-tag-malformed` is a warning and in no baseline, so after the 542-tag pass the folded
+  // form came back 45 times across 19 nodes and nothing went red (#505). The spelling is
+  // `[verified] (justification)`, and two standings are two tags. A provision not in force is a
+  // fact about the node's subject, written in its prose — not a suffix on the evidence tag.
+  const found = corpus.nodes.flatMap((node) =>
+    qualifiedTags(`${node.summary}\n\n${node.linkText}`).map((tag) => `${node.id}: ${tag}`),
+  );
+  expect(found, "write `[tag] (justification)`, one standing per tag").toEqual([]);
+});
+
 // --- The gate, broken on purpose in each position ---------------------------------------------
 
 /** A node that is correct in every position, and the manifest it is correct against. */

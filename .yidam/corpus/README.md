@@ -117,7 +117,7 @@ once for a corpus that has been changing ever since.
 
 ## `figures:` — the numbers a node quotes, bound to the crate that computes them
 
-`[verified — crates/regime-diff]` is hand-typed text, and nothing related it to
+`[verified] (crates/regime-diff)` is hand-typed text, and nothing related it to
 `crates/regime-diff`. A correction's blast radius was therefore whichever files the author
 happened to open. That is not a hypothetical failure: the `recognized-valuation` correction
 reached **three of its six carriers**, and two `formula-component` nodes went on publishing a
@@ -171,7 +171,7 @@ five kinds are **permanent**:
   bound *successfully* to the wrong numeral — the `20` that meant mills — which is a false pass
   rather than a miss. Where the corpus states a computed count, it now states it in digits.
 - **An identifier is not a figure.** An IRN, a bill number, an ALI code and a SHA-256 digest all
-  carry digits inside a `[verified — crates/…]` tag and none of them is a quantity a calculator
+  carry digits inside a `[verified] (crates/…)` tag and none of them is a quantity a calculator
   computes. `education-agency/*.irn`, `fiscal-period/*.appropriating_bill` and
   `program/*.appropriation_line` are in this class.
 - **A share below one part in fifty cannot be exported.** `figures`'s own guard requires that a
@@ -456,17 +456,17 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1964 | supported by a committed primary source |
-| `[inference]` | 384 | drawn from verified facts, not witnessed |
-| `[open]` | 210 | a live question — unknown, contested, or being worked |
+| `[verified]` | 1969 | supported by a committed primary source |
+| `[inference]` | 406 | drawn from verified facts, not witnessed |
+| `[open]` | 213 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-210 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+213 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 93 | 0 |
-| `description` | 43 | 0 |
+| `findings` | 95 | 0 |
+| `description` | 44 | 0 |
 | `revisions` | 11 | 0 |
 | `series` | 7 | 0 |
 | `unpriced` | 5 | 0 |

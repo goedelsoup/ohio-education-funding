@@ -52,8 +52,8 @@ Ohio has had two commission regimes and the corpus previously ran them together.
 produced the current academic distress commission is not retrievable by anything this repository
 can reach: `legislature.ohio.gov` serves the bill page as a JavaScript application with no
 analysis link in the static HTML, the LSC asset path for a 131st-General-Assembly final analysis
-404s, and the search API returns the bill's record with no analysis document in it. [verified —
-probed 2026-08-10] What R.C. 3302.10 itself supplies is oblique but real: it refers to a commission
+404s, and the search API returns the bill's record with no analysis document in it. [verified]
+(probed 2026-08-10) What R.C. 3302.10 itself supplies is oblique but real: it refers to a commission
 established under a *former* section 3302.10 and still in existence on 15 October 2015, which
 dates the replacement and confirms a prior regime existed. [verified] The node waits for a source
 rather than being written from recollection.

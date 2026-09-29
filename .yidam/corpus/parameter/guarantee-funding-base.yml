@@ -97,8 +97,8 @@ findings: |
   A district's `[H2]` is disclosed by the guarantee paying out against it. For the 315
   districts the formula pays, `[H2]` sits below their current amount and no committed source
   carries it — so it cannot be recovered, and any simulated cut lets those districts fall past
-  a floor that would really catch them. [verified for the model's behaviour; the size of the
-  real-world correction is [open]]
+  a floor that would really catch them. [verified] (the model's behaviour) [open]
+  (the size of the real-world correction)
   ### The base is not what districts received in FY2020
 
   The description above states the anchor as "the FY2020 level" on the department's own gloss —
@@ -135,10 +135,10 @@ findings: |
 
   `[H2]` per FY2020 pupil declines **monotonically** across the six ADM sextiles — $6,478,
   $5,877, $4,960, $4,589, $3,812, $3,176, the smallest band at **2.04 times** the largest.
-  [verified — crates/project]
+  [verified]
   ([`crates/project`](../../../crates/project/tests/the_second_size_term_the_plan_keeps_outside_base_cost.rs))
   Measured against current-year pupils instead, which needs no enrolment index at all, the shape
-  is the same: $7,257 to $3,334, a ratio of 2.18. [verified — crates/project]
+  is the same: $7,257 to $3,334, a ratio of 2.18. [verified] (crates/project)
 
   That gradient is a property of the [Bridge formula](../funding-regime/bridge-formula.yml) and
   of the [Evidence-Based Model](../funding-regime/evidence-based-model.yml) run beneath it, not of

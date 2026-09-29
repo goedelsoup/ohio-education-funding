@@ -23,19 +23,19 @@ description: |
   prices a *pupil* — a weight times a base cost times a count. Here it prices a *post*, and it
   writes three different figures for what are three different jobs. The K-8 specialist is priced
   above the coordinator and the 9-12 specialist below both; the section gives no reason.
-  [verified for the figures; open for the ordering]
+  [verified] (the figures) [open] (the ordering)
 
   The unit floors do most of the distributional work at the small end. A district of any size
   gets at least half a coordinator unit and at least three tenths of each specialist unit, so a
   district with almost no identified gifted pupils is still funded for a fraction of two posts.
-  [verified for the floors; inference for the effect]
+  [verified] (the floors) [inference] (the effect)
 findings: |
   ### The cap is a cap on large districts and there is no analogue elsewhere
 
   Eight coordinator units is the maximum however large the district. At one unit per 3,300
   enrolled ADM, the cap binds above 26,400 pupils — which is a handful of Ohio districts, and
   they are the largest. No other component in the plan stops paying at a size threshold.
-  [verified for the arithmetic; inference for the comparison]
+  [verified] (the arithmetic) [inference] (the comparison)
 
   ### Identification funding runs against the districts most likely to under-identify
 
@@ -44,8 +44,8 @@ findings: |
   per pupil. [verified] (crates/project) Identification funds are paid on the K-6 *enrolled* count
   rather than on identified pupils, so that part is neutral; unit funding is paid on the
   *identified* count, so it is not. A district that identifies fewer gifted pupils receives
-  fewer specialist units to identify and serve them. [verified for the correlations; inference
-  for the mechanism]
+  fewer specialist units to identify and serve them. [verified] (the correlations) [inference]
+  (the mechanism)
 
   ### And the whole schedule is written for two years
 

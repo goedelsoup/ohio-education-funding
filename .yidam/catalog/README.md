@@ -11,6 +11,10 @@ report, an LSC estimate made before the fiscal year closed, or a district's own 
 forecast — three numbers that describe the same thing and routinely disagree. Every numeric
 claim in the corpus should reach a catalog entry in one hop.
 
+An entry may tag what it says about its own source (`[verified] (probed 2026-08-10)`), and those
+tags are not in the claim totals, which count corpus nodes only. A tag here describes the record;
+a claim about the domain belongs in a node that cites the record.
+
 ## Source registry
 
 <!-- REGEN: edfund-connect catalog-audit

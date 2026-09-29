@@ -26,7 +26,7 @@
   say what would settle it.
 - **Choose the verb so it survives the provenance being open.** `parallels`, not `template-for`
   or `adopted-as`. The relationship has to remain true if `adoption_evidence` is never filled.
-- **Quote the text.** Provisions carry `[verified — ALEC model text]` and are quoted rather than
+- **Quote the text.** Provisions carry `[verified] (ALEC model text)` and are quoted rather than
   paraphrased, because the whole value of the comparison is that both sides are exact. A
   paraphrased mechanism cannot be diffed against a statute.
 - **Record the publisher's alignment once, in the catalog record**, and reference it. Repeating it

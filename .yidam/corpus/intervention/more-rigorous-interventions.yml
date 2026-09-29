@@ -16,9 +16,9 @@ description: |
 
   **The ladder is new.** Ohio's approved plan carried a stub here; the April 2026 amendment
   supplies the entire menu, along with a section that changed from "Not applicable" to a
-  district-level regime — see [LEA-level action](lea-level-action.yml). [verified as a statement of
-  what the amendment proposes; approval by the U.S. Department of Education is not established]
-  [open]
+  district-level regime — see [LEA-level action](lea-level-action.yml). [verified] (as a statement
+  of what the amendment proposes) Approval by the U.S. Department of Education is not
+  established. [open]
 
   **Three of the sixteen end the school as a district building**: conversion to a charter school
   replicating a high-performing school operated by a Department-approved school management
@@ -31,7 +31,7 @@ description: |
   of all federal funds, "including but not limited to Title IA, IDEA, Noncompetitive School
   Improvement Funds (1003)" — a state gate on federal money, conditioned on academic performance.
   It is recorded on both [Title I](../revenue-stream/title-i.yml) and
-  [IDEA Part B](../revenue-stream/idea-part-b.yml). [verified as proposed]
+  [IDEA Part B](../revenue-stream/idea-part-b.yml). [verified]
 
   **How many schools this could reach is now known.** 231 buildings are currently CSI, and **127
   of them were identified more than three years ago** — 100 in 2018 and 27 in 2022, holding 50,086
@@ -85,10 +85,10 @@ properties:
   name: More rigorous interventions
   authority: |
     Ohio's Consolidated State Plan under ESSA, section A.4.vii.c, as it stands to be amended in
-    April 2026. Federal basis at ESEA section 1111(d)(3)(A)(i)(I). [verified as proposed]
+    April 2026. Federal basis at ESEA section 1111(d)(3)(A)(i)(I). [verified]
   trigger: |
     Identification as a CSI school, and failure to meet the state's exit criteria within three
-    years. [verified as proposed] The exit criteria themselves require two consecutive years of
+    years. [verified] The exit criteria themselves require two consecutive years of
     improvement above the cut score that led to identification.
   unit: school
   powers: |
@@ -111,15 +111,15 @@ properties:
       15  contracting out operation of all or part of the school
       16  closure
 
-    [verified as proposed] Items 11 and 13 through 16 change who operates the building; item 10
+    [verified] Items 11 and 13 through 16 change who operates the building; item 10
     changes who approves its spending; the remainder are instructional.
   exit: |
     Not stated for the interventions themselves. The underlying CSI exit criteria require two
     consecutive years of performance above the lowest 5% and above the school's own identification
-    cut score. [verified as proposed]
+    cut score. [verified]
   fiscal_effect: |
     Item 10 gates federal money: annual Department approval of expenditure of all federal funds,
-    Title IA and IDEA named. [verified as proposed]
+    Title IA and IDEA named. [verified]
 
     Items 13 through 16 are structural rather than budgetary and are the larger fiscal event —
     a building converted to a charter, merged under a management organization, contracted out or

@@ -30,8 +30,8 @@ findings: |
   A pupil in category 3 has already achieved a proficient score. The money continues for two
   school years afterwards, which is a policy about consolidation rather than about need, and it
   is invisible in the number: 0.1053 beside 0.2104 reads as "less English learner", not as
-  "still funded after the pupil stopped being one". [verified for the definition; inference for
-  the reading]
+  "still funded after the pupil stopped being one". [verified] (the definition) [inference]
+  (the reading)
 
   ### The counts are the current year's, and they turn over fast
 
@@ -60,8 +60,8 @@ findings: |
   an escalator, which are different gifts and only the second is visible in the numbers. The
   companion arithmetic on
   [special education](special-education-category-multiples.yml) — the same conversion, but with a
-  scalar attached — shows what an increase looks like when one is given. [verified for the
-  arithmetic; inference for the reading]
+  scalar attached — shows what an increase looks like when one is given. [verified]
+  (the arithmetic) [inference] (the reading)
 
   ### And the definitions stop at FY2027
 

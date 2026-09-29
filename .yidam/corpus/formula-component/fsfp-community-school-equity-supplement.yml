@@ -20,8 +20,8 @@ description: |
 
   The department's FY2027 simulator states the rate in a header cell of its own — `Detail SFPR`
   row 2, *Equity Suplement per pupil*, against `400` — and pays every recipient that rate times
-  its enrolled ADM to the cent, on all **324** of them. [verified — FY2027]
-  (`crates/dispersion/src/community_school_funding.rs`)
+  its enrolled ADM to the cent, on all **324** of them. [verified]
+  (FY2027, `crates/dispersion/src/community_school_funding.rs`)
 
   **Two of the schedule's three rates are read from a department model rather than from the act.**
   The FY2025 simulator, archived whole, writes its own formula out as `Equity Supplement [a*$650]`
@@ -42,8 +42,8 @@ findings: |
 
   Of the 355 community and STEM schools the department models, **324 receive the supplement and 31
   do not**. The 31 are exactly the **23 e-schools and 8 STEM schools**, paid zero against 35,501
-  and 4,586 enrolled ADM between them — so they are not unpaid for being small. [verified — FY2027]
-  (`crates/dispersion/src/community_school_funding.rs`)
+  and 4,586 enrolled ADM between them — so they are not unpaid for being small. [verified]
+  (FY2027, `crates/dispersion/src/community_school_funding.rs`)
 
   **The redbook says the opposite, and it is describing a different bill.** Its account of the
   executive proposal is that it *"codifies the equity supplement into permanent law and expands
@@ -63,8 +63,8 @@ findings: |
   than eligibility. Over the same 324 recipients, the $650 H.B. 33 set would pay
   **$56.3 million** against the enacted **$34,650,906** — a difference of **$21.66 million**,
   against the **$1.8 million** that extending to the eight STEM schools at the enacted rate would
-  have added. The rate term is larger by more than an order of magnitude. [verified — FY2027]
-  (`crates/dispersion/src/community_school_funding.rs`)
+  have added. The rate term is larger by more than an order of magnitude. [verified]
+  (FY2027, `crates/dispersion/src/community_school_funding.rs`)
 
   And the redbook's own $58.0 million estimate is consistent with that reading: $650 applied to
   site-based plus STEM enrolled ADM gives $59.3 million on this year's projections, within 2.2% of
@@ -75,8 +75,8 @@ findings: |
   The same workbook pays a **base funding supplement of $40 a pupil to all 355 schools**, e-schools
   and STEM schools included, and funds STEM schools' facilities at the brick-and-mortar rate rather
   than the e-school one. So the file does not treat "not a site-based community school" as a
-  general disqualification; it disqualifies on this line and no other. [verified — FY2027]
-  (`crates/dispersion/src/community_school_funding.rs`)
+  general disqualification; it disqualifies on this line and no other. [verified]
+  (FY2027, `crates/dispersion/src/community_school_funding.rs`)
   A finding that STEM schools are funded differently, stated generally, would be wrong in both
   directions.
 
@@ -107,7 +107,7 @@ findings: |
   ### What the supplement is, in scale
 
   $34,650,906 is **2.29%** of the $1.51 billion of total state support these 355 schools receive.
-  [verified — FY2027] (`crates/dispersion/src/community_school_funding.rs`) It is a small line on
+  [verified] (FY2027, `crates/dispersion/src/community_school_funding.rs`) It is a small line on
   a large one, and the reason it is worth its own node is not its size: it is the only line in the
   plan computed over a population other than the 609-district panel, and it has no district
   analogue to be compared against.

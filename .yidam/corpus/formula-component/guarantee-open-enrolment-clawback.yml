@@ -119,17 +119,17 @@ findings: |
   R.C. 3317.019(C)(1) makes the decrease threshold the greater of ten per cent of last year's
   entering open-enrolment count and twenty pupils. Ten per cent is under twenty for any district
   with fewer than 200 such pupils, so the floor of twenty is what sets the threshold for **499**
-  of the 609 districts; the percentage governs for the other 110. [verified — crates/project]
+  of the 609 districts; the percentage governs for the other 110. [verified] (crates/project)
   Governing a threshold is not the same as changing an outcome, and the census that measured this
   for every bound in the plan counts both: **71** districts lost more than ten per cent of their
   entering count and not more than twenty pupils, so they would be charged under the percentage
-  alone and are charged nothing under the floor. [verified — crates/project]
+  alone and are charged nothing under the floor. [verified]
   ([`crates/project`](../../../crates/project/tests/the_bounds_that_cannot_bind_and_the_ones_that_never_have.rs))
 
   The clamp at the other end of the same computation is the one the counts above describe: the
   charge is taken off a guarantee that cannot go below zero, and for **22** of the 43 districts
   charged the guarantee was smaller than the charge, so the clamp rather than the charge is what
-  they are paid. [verified — crates/project] Among the plan's thirty-eight bounds it is one of
+  they are paid. [verified] (crates/project) Among the plan's thirty-eight bounds it is one of
   three that a single district reaches only partially or alone — see the [Fair School Funding
   Plan](../funding-regime/fair-school-funding-plan.yml) node for the census.
 properties:

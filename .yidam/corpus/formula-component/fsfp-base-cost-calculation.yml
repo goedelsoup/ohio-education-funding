@@ -62,16 +62,16 @@ findings: |
   cost and the two ceilings beside them take $2,328,808 back, for a net **$187,146,075** — and
   because R.C. 3317.017 computes local capacity from valuation and income rather than from base
   cost, the state pays five sixths of it rather than its state share of it: **$156,371,578** of
-  aid. [verified — crates/project] The largest single floor is not the six special teachers the
+  aid. [verified] (crates/project) The largest single floor is not the six special teachers the
   description names but the five student wellness and success staff, at $47.3m; the most widely
   felt is the one EMIS support employee, which binds for **554 of 609 districts** and is
-  therefore not a small-district provision at all. [verified — crates/project]
+  therefore not a small-district provision at all. [verified] (crates/project)
 
   ### They are why the smallest districts are not on the guarantee
 
   Strike every floor out of the section and **46** more districts fall onto the [temporary
   transitional aid guarantee](temporary-transitional-aid-guarantee.yml), 294 becoming 340, of
-  which 42 are in the smallest two enrolment sextiles. [verified — crates/project] The asymmetry
+  which 42 are in the smallest two enrolment sextiles. [verified] (crates/project) The asymmetry
   that makes this work is that the guarantee's anchor is a FY2020 figure produced under the
   [Bridge formula](../funding-regime/bridge-formula.yml) and contains no part of a section
   enacted for FY2022: the floors sit on one side of the comparison only.
@@ -85,37 +85,37 @@ findings: |
   is not the only place the plan measures size.** The other half is [targeted
   assistance](fsfp-targeted-assistance.yml)'s capacity tier, which compares two whole-district
   totals and so reads enrolment — strike both terms out and the first-to-third gap closes from 53
-  districts to zero. [verified — crates/project]
+  districts to zero. [verified]
   ([`crates/project`](../../../crates/project/tests/the_second_size_term_the_plan_keeps_outside_base_cost.rs))
 
   ### The shape is a decay and not a cliff, and one floor cannot bind
 
   Every floor is the greater of a quotient and a number, which meets the quotient exactly at the
   threshold, so nothing steps. The jump in aggregate base cost at each threshold is inside the
-  grain of the department's own two-decimal rounding of funded position counts. [verified —
-  crates/foundation] What the floors do instead is separate the **marginal** pupil from the
+  grain of the department's own two-decimal rounding of funded position counts. [verified]
+  (crates/foundation) What the floors do instead is separate the **marginal** pupil from the
   average one: in the smallest enrolment sextile one more pupil adds 0.64 of what the average
   pupil costs, rising to parity at about 2,000 pupils, and **313 of 608** districts are funded
-  for a marginal pupil worth less than 95% of their average. [verified — crates/project]
+  for a marginal pupil worth less than 95% of their average. [verified] (crates/project)
 
   And R.C. 3317.011(F)(6)(c) states a floor of one leadership support staff member that **can
   never be the operative term** — its own input at (F)(6)(a) is already floored at two
   administrators, so the quotient it is compared against is never below one, at any enrolment.
-  [verified — crates/foundation] Small districts' leadership support is nonetheless raised, by
+  [verified] (crates/foundation) Small districts' leadership support is nonetheless raised, by
   $6.1m, and that is the administrator floor at (F)(3) flowing through rather than this
   provision. It is the only bound in the whole modelled formula that cannot bind, and no other
   is reachable and unreached — the census is on the [Fair School Funding
-  Plan](../funding-regime/fair-school-funding-plan.yml) node. [verified — crates/project]
+  Plan](../funding-regime/fair-school-funding-plan.yml) node. [verified] (crates/project)
 
   ### Nothing committed says where the numbers came from
 
   The section states each floor as a bare integer inside the division that applies it. LSC's
   greenbook for [H.B. 110](../legislation/hb-110-2021.yml), the act that enacted it, restates
-  all seven in a parameter table and derives none of them. [verified — crates/project] The
+  all seven in a parameter table and derives none of them. [verified] (crates/project) The
   drafting tradition had the other shape available: the [Evidence-Based
   Model](../funding-regime/evidence-based-model.yml)'s school nurse wellness coordinator factor
   was zero below 418 pupils — a size cut-off written to exclude small districts rather than to
-  protect them. [verified — crates/project]
+  protect them. [verified] (crates/project)
 
   ### The one floor a published count can be set against
 
@@ -133,20 +133,20 @@ findings: |
   administrator elements funded at the report's own enrolled ADM. Ohio's 606 traditional
   districts employ about twice the administrators the build-up counts, and **47** employ fewer
   than it funds, 44 of them under the 1,500 ADM threshold at which the two-administrator floor
-  stops binding. [verified — crates/project] The gradient runs against a cliff story: the
+  stops binding. [verified] (crates/project) The gradient runs against a cliff story: the
   median employed-to-funded multiple is **1.52** below the threshold and **1.84** above it, and
-  1.23 in the smallest enrolment sextile against about 1.8 from the fourth up. [verified —
-  crates/project] The floor does not put small districts above their funded count; it brings the
+  1.23 in the smallest enrolment sextile against about 1.8 from the fourth up. [verified]
+  (crates/project) The floor does not put small districts above their funded count; it brings the
   funded count closest to payroll exactly where it binds, and employed administrators per
   thousand pupils fall monotonically from 12.3 in the smallest sextile to 7.2 in the largest,
-  so real staffing has the fixed component the section models. [verified — crates/project]
+  so real staffing has the fixed component the section models. [verified] (crates/project)
 
   The height of that component is about right and its shape is not. A line through the districts
   under the threshold has an intercept between 2.6 and 3.8 administrators depending on where it
   stops, every one under the section's four; but the section funds exactly two other
   administrators at every enrolment under 1,500, and what districts employ beyond a
   superintendent, a treasurer and their funded building leaders doubles across that range, from
-  about three to about six. [verified — crates/project] The plateau the floor writes has no
+  about three to about six. [verified] (crates/project) The plateau the floor writes has no
   counterpart on payroll. Funded is not employed, and none of this is an audit: the finding is the
   gradient, not the level, and why the smallest districts sit closest to their funded count the
   report cannot say. [inference]
@@ -156,7 +156,7 @@ findings: |
   The medians above are a summary of a shape, and the shape is the finding. Drawn as one band per
   sextile of enrolled ADM, the smallest sixth is funded for **5.23** administrators and employs
   **6.25**; the largest is funded for **20.69** and employs **39.00**; and over the 606 districts
-  **1.9664** are employed for every one the four elements fund. [verified — crates/project] The
+  **1.9664** are employed for every one the four elements fund. [verified] (crates/project) The
   band is narrowest at the bottom and widens upward, which is the gradient stated as a picture:
   the ends of a row are one measure at two points, so on a logarithmic axis the row's length is
   the multiple and its position is the level.

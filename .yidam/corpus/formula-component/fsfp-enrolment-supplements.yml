@@ -182,7 +182,7 @@ properties:
 
     A bounded list, not a pinpoint. The analysis cites the sections for the topic and not for each
     supplement inside it, and separating them needs the enrolled act rather than LSC's account of
-    it. [open — which of the six, not whether]
+    it. [open] (which of the six, not whether)
 
   calculator: |
     Not a standalone crate. Carried in `crates/project::panel::Supplements` and reproduced for all
