@@ -111,11 +111,6 @@ const HISTORICAL: Record<string, Allowance> = {
     reason:
       "FY2023 is the profile report's valuation vintage — a property of a fixture that will move, declared here rather than derived because the feed does not carry it, beside the spending year that is read with `yearOf`.",
   },
-  "lib/glossary.ts": {
-    allowed: ["FY2020", "FY2022", "FY2024"],
-    reason:
-      "Definitions: the FY2020 guarantee anchor, FY2022 cost pricing, and a worked tax-year-versus-fiscal-year example — a 2024 tax year against an FY2024 budget, eleven months apart — whose whole point is that specific pair of numbers.",
-  },
   "lib/history.ts": {
     allowed: ["FY2009", "FY2011", "FY2020"],
     reason:
@@ -162,8 +157,7 @@ const HISTORICAL: Record<string, Allowance> = {
       "page's levers move away from. It is a property of H.B. 96 rather than of a fixture — the " +
       "act holds the salary inputs at FY2022 through FY2027, so the year does not advance when " +
       "the feed does, and there is no series to derive it from because the feed carries the " +
-      "model's output rather than the year its prices were read in. `lib/glossary.ts` declares " +
-      "the same literal for the same fact.",
+      "model's output rather than the year its prices were read in.",
   },
   "pages/method.astro": {
     allowed: ["FY2018", "FY2022"],
