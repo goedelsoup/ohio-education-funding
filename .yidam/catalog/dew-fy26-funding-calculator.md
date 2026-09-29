@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/parameter/transportation-cost-rates.yml
+---
 # FY26 TRAD State Foundation Funding Calculator — recovered from the archive
 
 **Source.** Ohio Department of Education and Workforce, Office of Budget and School Funding.
@@ -88,14 +92,6 @@ One workbook could not have shown that. Every count the plan multiplies is commi
 at `crates/project/fixtures/calculator-counts.csv`, and the two vintage tables at
 `crates/project/fixtures/calculator-vintages.tsv`, built by
 [`crates/connect/src/fixtures/counts.rs`](../../crates/connect/src/fixtures/counts.rs).
-
-## Used by
-
-- [`parameter/transportation-cost-rates`](../corpus/parameter/transportation-cost-rates.yml)
-- [`formula-component/fsfp-local-capacity-measure`](../corpus/formula-component/fsfp-local-capacity-measure.yml)
-- [`formula-component/fsfp-disadvantaged-pupil-impact-aid`](../corpus/formula-component/fsfp-disadvantaged-pupil-impact-aid.yml)
-- [`formula-component/fsfp-career-technical-weights`](../corpus/formula-component/fsfp-career-technical-weights.yml)
-- [`formula-component/fsfp-english-learner-weights`](../corpus/formula-component/fsfp-english-learner-weights.yml)
 
 ## Feeds connector
 

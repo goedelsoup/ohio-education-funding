@@ -1,3 +1,8 @@
+---
+used-by:
+  - ../corpus/program/cleveland-scholarship.yml
+  - ../corpus/program/edchoice-scholarship.yml
+---
 # EdChoice Designated List — which buildings' students may claim a scholarship
 
 **Source.** Ohio Department of Education and Workforce, *Designated List 2026-2027, With

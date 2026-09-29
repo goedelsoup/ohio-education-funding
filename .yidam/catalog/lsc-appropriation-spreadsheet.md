@@ -1,3 +1,9 @@
+---
+used-by:
+  - ../corpus/fiscal-period/fy2022-23.yml
+  - ../corpus/fiscal-period/fy2024-25.yml
+  - ../corpus/fiscal-period/fy2026-27.yml
+---
 # LSC appropriation spreadsheet
 
 **Publisher.** Ohio Legislative Service Commission, Legislative Budget Office.

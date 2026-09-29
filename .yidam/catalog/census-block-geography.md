@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/actor/ohio-general-assembly.yml
+---
 # Census block geography: school districts, legislative districts, and population
 
 **Source.** U.S. Census Bureau, Geography Division and Redistricting Data Office. Three files:

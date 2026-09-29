@@ -1,3 +1,12 @@
+---
+used-by:
+  - ../corpus/legislation/hb-94-2001.yml
+  - ../corpus/litigation/cincinnati-v-walter-1979.yml
+  - ../corpus/litigation/derolph-i-1997.yml
+  - ../corpus/litigation/derolph-ii-2000.yml
+  - ../corpus/litigation/derolph-iii-2001.yml
+  - ../corpus/litigation/derolph-iv-2002.yml
+---
 # DeRolph Litigation Record
 
 **Source.** Supreme Court of Ohio opinion archive (`supremecourt.ohio.gov/rod/docs`) for the
@@ -48,14 +57,10 @@ decisions plus a 1997 clarification and the 2003 prohibition action, which some 
 count as five or six events. This corpus models the four numbered decisions and describes the
 clarification and the prohibition inside the relevant nodes.
 
-## Used by
+## Also read by
 
 - [`crates/regime-diff/fixtures/derolph-opinions.txt`](../../crates/regime-diff/fixtures/derolph-opinions.txt)
   — the committed extract of all four opinions, one record per case.
-- [`litigation/derolph-i-1997`](../corpus/litigation/derolph-i-1997.yml)
-- [`litigation/derolph-iv-2002`](../corpus/litigation/derolph-iv-2002.yml)
-- [`education-agency/northern-local-perry`](../corpus/education-agency/northern-local-perry.yml)
-- [`doctrine/adequacy`](../corpus/doctrine/adequacy.yml)
 - [`parameter/local-share-charge-off-millage`](../corpus/parameter/local-share-charge-off-millage.yml)
   — *DeRolph I* ¶97 is the source for the charge-off rate progression and its Ohio Laws
   citations, which is the one place this corpus uses the opinions as a **statutory** record

@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/parameter/transportation-cost-rates.yml
+---
 # Midwest No. 2 diesel retail prices — the EIA monthly series
 
 **Source.** U.S. Energy Information Administration, No. 2 Diesel Retail Prices, Midwest
@@ -59,11 +63,6 @@ a fifth below what they are paying. That is the lag working exactly as the secti
 
 A committed extract is at
 [`crates/connect/fixtures/midwest-diesel-monthly.csv`](../../crates/connect/fixtures/midwest-diesel-monthly.csv).
-
-## Used by
-
-- [`parameter/transportation-cost-rates`](../corpus/parameter/transportation-cost-rates.yml)
-- [`formula-component/fsfp-transportation`](../corpus/formula-component/fsfp-transportation.yml)
 
 ## Feeds connector
 

@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/metric/per-pupil-operating-expenditure.yml
+---
 # Longitudinal School Finance Study — Ohio Auditor of State
 
 **Source.** Ohio Auditor of State (Keith Faber), *Longitudinal School Finance Study: A Special
@@ -43,11 +47,6 @@ converters; read it as a rendered document or run `pdftotext -layout`.
 
 Inflation adjustment uses national CPI for all items, June of each year, aligned to the fiscal
 year end. CPI grew 71.9% from June 2000 to June 2022. [verified]
-
-## Used by
-
-- [`metric/per-pupil-operating-expenditure`](../corpus/metric/per-pupil-operating-expenditure.yml)
-- [`doctrine/adequacy`](../corpus/doctrine/adequacy.yml)
 
 ## Feeds connectors
 

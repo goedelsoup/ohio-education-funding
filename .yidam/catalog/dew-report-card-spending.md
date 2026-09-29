@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/metric/expenditure-per-equivalent-pupil.yml
+---
 # Ohio School Report Cards — District Spending Per Pupil
 
 **Source.** Ohio Department of Education and Workforce, Ohio School Report Cards, district-level
@@ -47,9 +51,8 @@ a measurement: the Performance Index correlates with those expenditures at −0.
 pupil and **−0.337** per unweighted pupil. [verified] Note that its published filename carries
 spaces (`FY25 Expanded List.xlsx`), not the underscores cited in White Paper 013.
 
-## Used by
+## Also read by
 
-- [`metric/expenditure-per-equivalent-pupil`](../corpus/metric/expenditure-per-equivalent-pupil.yml)
 - [`catalog/ocg-white-paper-013`](ocg-white-paper-013.md)
 
 ## Feeds connector

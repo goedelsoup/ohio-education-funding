@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/actor/ohio-general-assembly.yml
+---
 # Common Core of Data: local education agency directory
 
 **Source.** National Center for Education Statistics, U.S. Department of Education.

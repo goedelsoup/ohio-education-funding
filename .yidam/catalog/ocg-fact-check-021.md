@@ -1,3 +1,9 @@
+---
+used-by:
+  - ../corpus/education-agency/perrysburg-exempted-village.yml
+  - ../corpus/education-agency/toledo-city.yml
+  - ../corpus/metric/expenditure-per-equivalent-pupil.yml
+---
 # OCG Ground Truth Fact-Check RL-2026-021 — Toledo–Perrysburg Special-Needs Spending
 
 **Source.** Ohio Common Ground Research Center, *Ground Truth* fact-check, "Do Ohio's Urban
@@ -66,9 +72,3 @@ for both districts. Both caveats are accurate and neither is undercut by the abo
 - The comparison the file actually supports and the fact-check did not make is function-level:
   Toledo spends $6,173 more per pupil and a markedly smaller share of it on instruction (51.3%
   against 62.6%) and classroom instruction (63.4% against 73.1%). [verified]
-
-## Used by
-
-- [`education-agency/toledo-city`](../corpus/education-agency/toledo-city.yml)
-- [`education-agency/perrysburg-exempted-village`](../corpus/education-agency/perrysburg-exempted-village.yml)
-- [`metric/expenditure-per-equivalent-pupil`](../corpus/metric/expenditure-per-equivalent-pupil.yml)

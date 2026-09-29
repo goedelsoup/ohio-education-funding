@@ -1,3 +1,14 @@
+---
+used-by:
+  - ../corpus/formula-component/fsfp-base-cost-calculation.yml
+  - ../corpus/formula-component/fsfp-local-capacity-measure.yml
+  - ../corpus/formula-component/fsfp-transportation.yml
+  - ../corpus/legislation/hb-110-2021.yml
+  - ../corpus/metric/state-share-percentage.yml
+  - ../corpus/parameter/base-cost-per-pupil.yml
+  - ../corpus/parameter/fsfp-phase-in-percentage.yml
+  - ../corpus/parameter/transportation-cost-rates.yml
+---
 # School Finance Payment Report — Line by Line Explanation
 
 **Source.** Ohio Department of Education (now Department of Education and Workforce), Office
@@ -29,15 +40,6 @@ publisher name changes across the series at the 2023 transition from ODE to DEW,
 **Caveat.** Describes the formula *as enacted for that fiscal year*. Figures are not
 comparable across editions without checking whether the cost-input reference year changed —
 it moved from FY2018 to FY2022 between the FY2023 and FY2024 editions.
-
-## Used by
-
-- [`formula-component/fsfp-base-cost-calculation`](../corpus/formula-component/fsfp-base-cost-calculation.yml)
-- [`formula-component/fsfp-local-capacity-measure`](../corpus/formula-component/fsfp-local-capacity-measure.yml)
-- [`parameter/base-cost-per-pupil`](../corpus/parameter/base-cost-per-pupil.yml)
-- [`parameter/fsfp-phase-in-percentage`](../corpus/parameter/fsfp-phase-in-percentage.yml)
-- [`metric/state-share-percentage`](../corpus/metric/state-share-percentage.yml)
-- [`legislation/hb-110-2021`](../corpus/legislation/hb-110-2021.yml)
 
 ## Feeds connector
 

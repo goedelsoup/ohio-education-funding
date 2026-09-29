@@ -1,3 +1,10 @@
+---
+used-by:
+  - ../corpus/education-agency/toledo-city.yml
+  - ../corpus/metric/expenditure-per-equivalent-pupil.yml
+  - ../corpus/metric/performance-index.yml
+  - ../corpus/metric/progress-value-added.yml
+---
 # OCG White Paper No. 013 — Does Per-Pupil Spending Track Academic Performance?
 
 **Source.** Ohio Common Ground Research Center, White Paper No. 013, "Does Per-Pupil Spending
@@ -95,8 +102,3 @@ gradient.
 - Its enrollment total (~1.47M, FY2025) exceeds the corpus's FY2024 enrolled ADM total
   (1,439,473) while Ohio enrollment is falling, so the two ADM definitions are not the same
   quantity. [open]
-
-## Used by
-
-- [`metric/performance-index`](../corpus/metric/performance-index.yml)
-- [`metric/expenditure-per-equivalent-pupil`](../corpus/metric/expenditure-per-equivalent-pupil.yml)

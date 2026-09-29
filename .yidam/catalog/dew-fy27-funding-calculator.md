@@ -1,3 +1,34 @@
+---
+used-by:
+  - ../corpus/formula-component/fsfp-career-technical-weights.yml
+  - ../corpus/formula-component/fsfp-disadvantaged-pupil-impact-aid.yml
+  - ../corpus/formula-component/fsfp-english-learner-weights.yml
+  - ../corpus/formula-component/fsfp-enrolment-supplements.yml
+  - ../corpus/formula-component/fsfp-formula-transition-supplement.yml
+  - ../corpus/formula-component/fsfp-gifted-units.yml
+  - ../corpus/formula-component/fsfp-performance-supplement.yml
+  - ../corpus/formula-component/fsfp-preschool-special-education.yml
+  - ../corpus/formula-component/fsfp-special-education-weights.yml
+  - ../corpus/formula-component/fsfp-targeted-assistance.yml
+  - ../corpus/formula-component/fsfp-transportation.yml
+  - ../corpus/formula-component/guarantee-open-enrolment-clawback.yml
+  - ../corpus/formula-component/temporary-transitional-aid-guarantee.yml
+  - ../corpus/metric/enrolled-adm.yml
+  - ../corpus/parameter/appropriation-proration-factor.yml
+  - ../corpus/parameter/career-technical-category-multiples.yml
+  - ../corpus/parameter/dpia-per-pupil-amount.yml
+  - ../corpus/parameter/english-learner-category-multiples.yml
+  - ../corpus/parameter/enrolment-supplement-amounts.yml
+  - ../corpus/parameter/gifted-funding-rates.yml
+  - ../corpus/parameter/guarantee-funding-base.yml
+  - ../corpus/parameter/minimum-state-share.yml
+  - ../corpus/parameter/performance-supplement-rate.yml
+  - ../corpus/parameter/preschool-special-education-amounts.yml
+  - ../corpus/parameter/special-education-category-multiples.yml
+  - ../corpus/parameter/targeted-assistance-rates.yml
+  - ../corpus/parameter/transportation-cost-rates.yml
+  - ../corpus/scenario/guarantee-phase-out.yml
+---
 # FY27 TRAD State Foundation Funding Calculator
 
 **Source.** Ohio Department of Education and Workforce, Office of Budget and School Funding.
@@ -82,14 +113,6 @@ needing a spreadsheet engine.
 - Three statutory values are not exposed: the substitute daily rate and the superintendent and
   treasurer salary bands. The corpus assumes them unchanged from FY2022, an assumption the
   cent-level agreement on teacher base cost confirms for the substitute rate.
-
-## Used by
-
-- [`scenario/fsfp-input-year-refresh`](../corpus/scenario/fsfp-input-year-refresh.yml)
-- [`parameter/base-cost-per-pupil`](../corpus/parameter/base-cost-per-pupil.yml)
-- [`formula-component/fsfp-base-cost-calculation`](../corpus/formula-component/fsfp-base-cost-calculation.yml)
-- [`funding-regime/fair-school-funding-plan`](../corpus/funding-regime/fair-school-funding-plan.yml)
-- [`fiscal-period/fy2027`](../corpus/fiscal-period/fy2027.yml)
 
 ## Feeds connector
 

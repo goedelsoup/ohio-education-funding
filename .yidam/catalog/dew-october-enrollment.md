@@ -1,3 +1,8 @@
+---
+used-by:
+  - ../corpus/metric/enrolled-adm.yml
+  - ../corpus/scenario/fsfp-input-year-refresh.yml
+---
 # October headcount by grade
 
 **Source.** Ohio Department of Education and Workforce, Frequently Requested Data → Enrollment
@@ -41,11 +46,6 @@ produced through headless LibreOffice, and that pipeline summed a withheld `<10`
   recorded Vanlue's grades 9-12 as 56 where the true figure is between 57 and 65. [verified]
 - **District data is on the third of seven sheets**, which is why conversion targets `.xlsx`
   rather than CSV: LibreOffice's CSV filter exports only the active sheet.
-
-## Used by
-
-- [`formula-component/`](../corpus/formula-component/) — the grade-band pupil-teacher ratios
-- [`metric/`](../corpus/metric/)
 
 ## Feeds connector
 

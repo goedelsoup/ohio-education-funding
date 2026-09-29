@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/metric/progress-value-added.yml
+---
 # Ohio School Report Cards — District Value-Added Details
 
 **Source.** Ohio Department of Education and Workforce, Ohio School Report Cards, district-level
@@ -49,12 +53,6 @@ and is not: ranking districts on the composite ranks them partly by size. [verif
   growth is stable the way it has asked of the Index. [open]
 - **Same 607-district rated population** as the achievement and spending files, matching on IRN
   with no losses. [verified]
-
-## Used by
-
-- [`metric/progress-value-added`](../corpus/metric/progress-value-added.yml)
-- [`metric/performance-index`](../corpus/metric/performance-index.yml)
-- [`metric/expenditure-per-equivalent-pupil`](../corpus/metric/expenditure-per-equivalent-pupil.yml)
 
 ## Feeds connector
 

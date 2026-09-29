@@ -1,3 +1,10 @@
+---
+used-by:
+  - ../corpus/education-agency/northern-local-perry.yml
+  - ../corpus/education-agency/upper-arlington-city.yml
+  - ../corpus/formula-component/fsfp-special-education-weights.yml
+  - ../corpus/revenue-stream/idea-part-b.yml
+---
 # IDEA Part B Allocations to Districts
 
 **Source.** Ohio Department of Education (now DEW), Special Education Data and Funding —
@@ -42,13 +49,6 @@ conversion; `pdftotext -layout` reads it cleanly and preserves the column struct
 - **Name collisions are real.** "Northern Local" (049056) and "Hardin Northern Local" (047498)
   are different districts. The file carries no county column, so IRN-to-county attribution needs
   a separate crosswalk.
-
-## Used by
-
-- [`education-agency/northern-local-perry`](../corpus/education-agency/northern-local-perry.yml)
-- [`education-agency/upper-arlington-city`](../corpus/education-agency/upper-arlington-city.yml)
-- [`education-agency/cleveland-municipal`](../corpus/education-agency/cleveland-municipal.yml)
-- [`education-agency/eastland-fairfield-ctc`](../corpus/education-agency/eastland-fairfield-ctc.yml)
 
 ## Feeds connector
 

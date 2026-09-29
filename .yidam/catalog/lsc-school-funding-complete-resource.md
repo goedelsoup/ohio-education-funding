@@ -1,3 +1,8 @@
+---
+used-by:
+  - ../corpus/formula-component/charge-off-local-share.yml
+  - ../corpus/parameter/local-share-charge-off-millage.yml
+---
 # LSC School Funding Complete Resource
 
 **Source.** Ohio Legislative Service Commission, *School Funding Complete Resource*.
@@ -37,8 +42,3 @@ copy first; every figure this corpus draws from LSC comes from the 2008 file.
 charge-off rate series is carried as constants in
 [`crates/regime-diff`](../../crates/regime-diff/src/charge_off.rs) with its authority beside it,
 because four values with citations are a parameter and not a data file.
-
-## Used by
-
-- [`parameter/local-share-charge-off-millage`](../corpus/parameter/local-share-charge-off-millage.yml)
-- [`formula-component/charge-off-local-share`](../corpus/formula-component/charge-off-local-share.yml)

@@ -1,3 +1,14 @@
+---
+used-by:
+  - ../corpus/draft-legislation/hb-96-with-refreshed-inputs.yml
+  - ../corpus/formula-component/fsfp-community-school-equity-supplement.yml
+  - ../corpus/formula-component/fsfp-jvsd-state-share-of-base-cost.yml
+  - ../corpus/legislation/hb-583-2022.yml
+  - ../corpus/legislation/hb-96-2025.yml
+  - ../corpus/parameter/enrolment-supplement-amounts.yml
+  - ../corpus/parameter/fsfp-phase-in-percentage.yml
+  - ../corpus/parameter/performance-supplement-rate.yml
+---
 # LSC Budget Analysis — H.B. 96 (FY2026-27)
 
 **Source.** Ohio Legislative Service Commission, Legislative Budget Office. The document set
@@ -33,12 +44,6 @@ it.
 Separately, LSC simulations are estimates made before a fiscal year closes. They describe the
 same quantity as a department payment report and routinely disagree with it. Never merge the
 two series.
-
-## Used by
-
-- [`legislation/hb-96-2025`](../corpus/legislation/hb-96-2025.yml)
-- [`parameter/fsfp-phase-in-percentage`](../corpus/parameter/fsfp-phase-in-percentage.yml)
-- [`fiscal-period/fy2026-27`](../corpus/fiscal-period/fy2026-27.yml)
 
 ## Feeds connector
 

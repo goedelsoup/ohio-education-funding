@@ -1,3 +1,16 @@
+---
+used-by:
+  - ../corpus/formula-component/fsfp-transportation.yml
+  - ../corpus/legislation/hb-119-2007.yml
+  - ../corpus/legislation/hb-166-2019.yml
+  - ../corpus/legislation/hb-49-2017.yml
+  - ../corpus/legislation/hb-59-2013.yml
+  - ../corpus/legislation/hb-64-2015.yml
+  - ../corpus/legislation/hb-95-2003.yml
+  - ../corpus/program/auxiliary-services.yml
+  - ../corpus/program/nonpublic-administrative-cost-reimbursement.yml
+  - ../corpus/revenue-stream/lottery-profits.yml
+---
 # LSC Redbook — Ohio Department of Education and Workforce
 
 **Source.** Ohio Legislative Service Commission, Legislative Budget Office. *Redbook: Ohio
@@ -50,10 +63,9 @@ dependency than the `curl` the rest of retrieval uses — poppler does not ship 
 Windows — so a rebuild without it reports the fixture skipped rather than failing. The extract is
 committed, so only a refresh needs poppler.
 
-## Used by
+## Also read by
 
 - [`crates/project/fixtures/dew-redbook.txt`](../../crates/project/fixtures/dew-redbook.txt)
-- [`parameter/appropriation-proration-factor`](../corpus/parameter/appropriation-proration-factor.yml)
 
 ## Feeds connector
 

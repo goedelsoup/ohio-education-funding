@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/program/edchoice-expansion.yml
+---
 # Heritage Foundation — Education Freedom Report Card (2023, 2nd edition)
 
 **Source.** The Heritage Foundation, *2023 Education Freedom Report Card: State Rankings for
@@ -67,7 +71,3 @@ computes, by declared scope. Heritage's spending figure and
 therefore measure different things, and neither can be substituted for the other. Also note the
 edition year: the 2023 card predates the first full year of Ohio's universal EdChoice expansion,
 so Ohio's 12th on choice is a rank earned mostly before the expansion this corpus records.
-
-## Used by
-
-- [`program/edchoice-expansion`](../corpus/program/edchoice-expansion.yml)

@@ -1,3 +1,8 @@
+---
+used-by:
+  - ../corpus/formula-component/fsfp-jvsd-state-share-of-base-cost.yml
+  - ../corpus/parameter/career-technical-category-multiples.yml
+---
 # JVSD Foundation Payment Reports, FY2022–FY2027
 
 **Source.** Ohio Department of Education and Workforce, Office of Budget and School Funding.

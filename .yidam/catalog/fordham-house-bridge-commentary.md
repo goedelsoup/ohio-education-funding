@@ -1,3 +1,10 @@
+---
+used-by:
+  - ../corpus/draft-legislation/hb-96-136-as-introduced.yml
+  - ../corpus/draft-legislation/hb-96-136-as-passed-house.yml
+  - ../corpus/formula-component/fsfp-disadvantaged-pupil-impact-aid.yml
+  - ../corpus/legislation/hb-96-2025.yml
+---
 # Fordham Institute — "Ohio House puts the brakes on Cupp-Patterson"
 
 **Source.** Thomas B. Fordham Institute (Ohio), commentary on the House-passed version of
@@ -141,8 +148,3 @@ that an advocacy publisher is a catalog record and never a corpus node.
 **Access constraints.** Freely available. The page will not yield a byline, a dateline or its
 verbatim text to a fetching tool, so both attributions above are `[inference]`. Not pinned by
 digest and fed by no connector.
-
-## Used by
-
-- [`legislation/hb-96-2025`](../corpus/legislation/hb-96-2025.yml)
-- [`formula-component/fsfp-disadvantaged-pupil-impact-aid`](../corpus/formula-component/fsfp-disadvantaged-pupil-impact-aid.yml)

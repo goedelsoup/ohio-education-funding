@@ -1,3 +1,8 @@
+---
+used-by:
+  - ../corpus/formula-component/fsfp-formula-transition-supplement.yml
+  - ../corpus/scenario/guarantee-phase-out.yml
+---
 # Foundation Funding Bases — the two bases the phase-in runs from
 
 **Source.** Ohio Department of Education and Workforce, Office of Budget and School Funding.

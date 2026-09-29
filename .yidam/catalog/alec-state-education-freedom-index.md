@@ -1,3 +1,9 @@
+---
+used-by:
+  - ../corpus/model-policy/education-savings-account-act.yml
+  - ../corpus/model-policy/parental-choice-scholarship-act.yml
+  - ../corpus/program/edchoice-expansion.yml
+---
 # ALEC — Index of State Education Freedom (2025, 2nd edition)
 
 **Source.** American Legislative Exchange Council, *2025 ALEC Index of State Education Freedom: A
@@ -55,9 +61,3 @@ and the gap is not a finding: the editions are two years apart across Ohio's uni
 expansion, the jurisdiction counts differ (50 against 51), and Heritage scores spending and
 teacher regulation while this index scores neither. Reporting the two ranks as a discrepancy
 would manufacture one.
-
-## Used by
-
-- [`model-policy/parental-choice-scholarship-act`](../corpus/model-policy/parental-choice-scholarship-act.yml)
-- [`model-policy/education-savings-account-act`](../corpus/model-policy/education-savings-account-act.yml)
-- [`program/edchoice-expansion`](../corpus/program/edchoice-expansion.yml)

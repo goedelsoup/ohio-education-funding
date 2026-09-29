@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/parameter/local-share-charge-off-millage.yml
+---
 # Ohio's sexennial reappraisal and triennial update calendar
 
 **Source.** Ohio Department of Taxation, Tax Equalization Division, *Year of Sexennial
@@ -47,7 +51,6 @@ Commissioner. The digest manifest is not the detector here, because the file is 
 the cache; the empirical test is, and it will fail loudly if the calendar and the abstract stop
 agreeing.
 
-## Used by
+## Also read by
 
-- [`parameter/local-share-charge-off-millage`](../corpus/parameter/local-share-charge-off-millage.yml)
 - [`decisions/recognized-valuation`](../decisions/recognized-valuation.yml)

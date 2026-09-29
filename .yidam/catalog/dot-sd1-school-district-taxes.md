@@ -1,3 +1,10 @@
+---
+used-by:
+  - ../corpus/doctrine/equity.yml
+  - ../corpus/metric/assessed-valuation-per-pupil.yml
+  - ../corpus/parameter/local-share-charge-off-millage.yml
+  - ../corpus/revenue-stream/casino-tax-distribution.yml
+---
 # Table SD-1 — School district taxable value and taxes charged
 
 **Source.** Ohio Department of Taxation, Tax Analysis Division. `SD1CY21.xlsx` through
@@ -96,7 +103,7 @@ exactly: statewide median 36%, fiftieth-ranked district 74%, Columbus 47.8%, Cle
 Cincinnati 50.4%, and $513 million of JVSD operating levy. See
 [`crates/dispersion/tests/sd1_district_taxes.rs`](../../crates/dispersion/tests/sd1_district_taxes.rs).
 
-## Used by
+## Also read by
 
 - [`crates/dispersion/fixtures/sd1-district-taxes.csv`](../../crates/dispersion/fixtures/sd1-district-taxes.csv)
 

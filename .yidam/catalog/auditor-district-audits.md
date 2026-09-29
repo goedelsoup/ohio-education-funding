@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/revenue-stream/state-foundation-aid.yml
+---
 # Auditor of State — district and service centre audit reports
 
 **Source.** Auditor of State of Ohio. Annual financial audits of school districts and educational
@@ -71,7 +75,7 @@ rather than filled from the statute's shape.
 
 **The instruments.** Three resolutions, in two minute books, neither published.
 
-## Used by
+## Also read by
 
 - [`crates/dispersion/src/lea_directory.rs`](../../crates/dispersion/src/lea_directory.rs) —
   `transfers()` and `explained()`, beside the directory whose 689 departures they explain five of.

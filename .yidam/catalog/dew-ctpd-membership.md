@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/parameter/career-technical-category-multiples.yml
+---
 # Career-Technical Planning District Membership
 
 **Source.** Ohio Department of Education and Workforce, Ohio School Report Cards data API.
@@ -93,7 +97,3 @@ Content** and appear in no organisation index, because nobody rates them. 90 + 2
 - **FY2026 answers on the same endpoint and is not committed.** FY2025 is taken because it is the
   year whose membership was cross-checked against the other side of the same API: every district's
   own record carries a `ctpdIrn`, and all 607 agreed with the roster-derived placement.
-
-## Used by
-
-- [`parameter/career-technical-category-multiples`](../corpus/parameter/career-technical-category-multiples.yml)

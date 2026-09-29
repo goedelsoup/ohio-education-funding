@@ -1,3 +1,7 @@
+---
+used-by:
+  - ../corpus/scenario/guarantee-phase-out.yml
+---
 # FY2019 Final Traditional District Foundation Payment Report
 
 **Source.** Ohio Department of Education and Workforce, Office of Budget and School Funding.

@@ -1,3 +1,10 @@
+---
+used-by:
+  - ../corpus/program/autism-scholarship.yml
+  - ../corpus/program/cleveland-scholarship.yml
+  - ../corpus/program/edchoice-scholarship.yml
+  - ../corpus/program/jon-peterson-special-needs.yml
+---
 # Historical Scholarship Data — the deduct era, counted two ways
 
 **Source.** Ohio Department of Education and Workforce, *Historical Scholarship Data*, a workbook
