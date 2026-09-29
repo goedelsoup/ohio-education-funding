@@ -346,14 +346,18 @@ test.describe("the wiki", () => {
     await page.goto("/wiki/parameter/twenty-mill-floor");
     await expect(page.locator("h1")).toHaveText("Twenty-Mill Floor");
     await expect(page.getByText("Pointed at by")).toBeVisible();
-    await expect(page.locator(".card", { hasText: "Links" })).toContainText("constrains");
+    // By the relationship's label, not its slug: `constrains` is a key (#551).
+    await expect(page.locator(".card", { hasText: "Links" })).toContainText("Constrains");
   });
 
   test("rewrites corpus file paths into working routes", async ({ page }) => {
     // The transformation most likely to rot: `../legislation/hb-920-1976.yml` has to become a
-    // route, and a wrong guess produces an ordinary-looking link that 404s.
+    // route, and a wrong guess produces an ordinary-looking link that 404s. The paragraph that
+    // cites it is the page's lead, since the summary restated it (#551).
     await page.goto("/wiki/parameter/twenty-mill-floor");
-    const link = page.locator('.prose-body a[href="/wiki/legislation/hb-920-1976"]').first();
+    const link = page
+      .locator('main :is(.lead, .prose-body) a[href="/wiki/legislation/hb-920-1976"]')
+      .first();
     await expect(link).toBeVisible();
     await link.click();
     await expect(page.locator("h1")).toContainText("H.B. 920");
@@ -413,8 +417,8 @@ test.describe("the wiki", () => {
     await page.goto("/wiki/education-agency");
     await expect(page.getByRole("heading", { name: "Properties" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Relationships" })).toBeVisible();
-    await expect(page.locator(".card", { hasText: "Properties" })).toContainText("irn");
-    await expect(page.locator(".card", { hasText: "Relationships" })).toContainText("party-to");
+    await expect(page.locator(".card", { hasText: "Properties" })).toContainText("IRN");
+    await expect(page.locator(".card", { hasText: "Relationships" })).toContainText("Party to");
   });
 
   test("a source lists the nodes that cite it", async ({ page }) => {
@@ -501,5 +505,22 @@ test.describe("the decisions behind the corpus", () => {
     // levers partition the state, which the record's own figures disproved.
     await expect(rows.first()).toContainText("claims");
     await expect(rows.first().locator("code")).toHaveText("drafts-are-not-legislation");
+  });
+});
+
+test.describe("the wiki with scripts off", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("lists where a node appears on the site, and the link lands there", async ({ page }) => {
+    // #551: the corpus links back to the data. The list is in the built page, not hydrated, so it
+    // is the same list with scripts off — and its example is an exemplar district the corpus holds.
+    await page.goto("/wiki/metric/performance-index");
+    const card = page.locator("#on-the-site");
+    await expect(card).toBeVisible();
+    await expect(card).toContainText("pages like this one");
+    const link = card.locator("th a").first();
+    await expect(link).toHaveAttribute("href", "/district/043786/outcome");
+    await link.click();
+    await expect(page.locator("h1")).toContainText("Cleveland Municipal");
   });
 });
