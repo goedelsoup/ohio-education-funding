@@ -66,11 +66,28 @@ findings: |
 
   106 budget lines name H.B. 119 in their `legal_basis`, more than any other act of the pre-2010
   era except H.B. 152 of the 120th. [verified]
+revisions:
+  - was: |
+      `effective: 2007-09-28`, with no source recorded for it.
+    now: |
+      `effective: 2007-09-29`, with the split recorded in `effective_note`.
+    found_by: |
+      LSC's enrolled analysis of H.B. 119 of the 127th and the legislature's version index, which
+      both give 29 September 2007.
+    reach: |
+      Nothing read the date: no other node, crate or page cites it, and the fiscal period the act
+      funds takes its start from its own definition.
 properties:
   designation: Am. Sub. H.B. 119
   general_assembly: 127th General Assembly
   signed: 2007-06-30
-  effective: 2007-09-28
+  effective: 2007-09-29
+  effective_note: |
+    Two dates, and `effective` above carries the codified one. Signed **30 June 2007**, with the
+    appropriation sections effective then; the codified amendments took effect on
+    **29 September 2007**, and some provisions on other dates. [verified]
+    ([LSC's enrolled analysis](../../catalog/lsc-hb96-analysis.md);
+    [the legislature's version index](../../catalog/ohio-bills.md))
   subject: |
     Enacted the FY2008-09 operating budget. Raised the base cost formula amount 3.0% a year to
     $5,565 and $5,732; abolished the cost of doing business factor and the FY2005 base cost

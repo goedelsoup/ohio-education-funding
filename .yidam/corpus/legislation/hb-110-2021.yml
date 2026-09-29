@@ -40,11 +40,33 @@ description: |
   The act specified a six-year phase-in that no enacting General Assembly could bind its
   successors to complete, and the plan has been re-legislated in each subsequent budget.
   [verified]
+revisions:
+  - was: |
+      `effective: 2021-07-01`, the first day of the biennium, which is neither of the act's dates.
+    now: |
+      `effective: 2021-06-30`, the day the operating appropriations took effect, with the
+      September date of the formula's amendments recorded in `effective_note`.
+    found_by: |
+      LSC's enrolled analysis of H.B. 110 of the 134th, whose cover gives both dates.
+    reach: |
+      Nothing read the date: no other node, crate or page cites it, and the fiscal period the act
+      funds takes its start from its own definition.
 properties:
   designation: Am. Sub. H.B. 110
   general_assembly: 134th General Assembly
   signed: 2021-06-30
-  effective: 2021-07-01
+  effective: 2021-06-30
+  effective_note: |
+    Two dates, and `effective` above carries the appropriation one. Signed **30 June 2021**, with
+    the operating appropriations effective then; the other provisions, the Fair School Funding
+    Plan's amendments to R.C. 3317 among them, took effect generally on **30 September 2021**.
+    [verified]
+    ([LSC's enrolled analysis](../../catalog/lsc-hb96-analysis.md)) The statute in force still
+    cites that date for the prior law it replaced,
+    *"as that division existed prior to September 30, 2021"*. [verified]
+    ([`crates/project`](../../../crates/project/fixtures/revised-code.txt)) The legislature's
+    version index returns every date field empty for this act.
+    ([the legislature's version index](../../catalog/ohio-bills.md))
   subject: |
     Enacted the FY2022-23 operating budget and established the Fair School Funding Plan:
     district-specific base cost built from staffing ratios and minimum service levels priced at
@@ -72,6 +94,23 @@ properties:
 
     **Nothing in the Fair School Funding Plan itself was vetoed.** The formula, the base cost
     build-up, the local capacity measure and the guarantee all passed as enrolled.
+  accountability_effect: |
+    **It is where the rating bonuses ended.** Its greenbook carries none of the four terms the
+    census in [Ohio report card](../accountability-regime/ohio-report-card.yml) searches for, where
+    H.B. 166's still carried the graduation and third grade reading bonuses. [verified]
+    (crates/project, `rating_payments::quiet`, pinned by test) That the formula paid on no rating
+    from FY2022 until [H.B. 96](hb-96-2025.yml) rests on the same four terms, which miss
+    [H.B. 153](hb-153-2011.yml)'s high performance subsidy. [inference]
+
+    It barred new academic distress commissions for 2021-22 and 2022-23 and gave Lorain, East
+    Cleveland and Youngstown a way out of theirs through an improvement plan; barred automatic
+    closure of a community school on any rating issued before 2022-23; dropped the rule confining
+    new start-up community schools to a "challenged school district", which a low rating could make
+    a district; and moved the years performance-based EdChoice reads its building rankings from.
+    [verified] ([greenbook](../../../crates/project/fixtures/lsc-education-greenbooks.txt)) The
+    report card's own revision is not this act's: LSC's final analysis places it in H.B. 82 of the
+    same General Assembly. [inference] See
+    [academic distress commission](../intervention/academic-distress-commission.yml).
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of

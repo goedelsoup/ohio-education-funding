@@ -28,6 +28,12 @@ properties:
   general_assembly: 126th General Assembly
   signed: 2005-06-30
   effective: 2005-06-30
+  effective_note: |
+    Two dates, and `effective` above carries the appropriation one. Signed **30 June 2005**, with
+    the appropriation sections effective then; the codified amendments took effect on
+    **29 September 2005**, and some provisions on other dates. [verified]
+    ([LSC's enrolled analysis](../../catalog/lsc-hb96-analysis.md);
+    [the legislature's version index](../../catalog/ohio-bills.md))
   subject: |
     Enacted the FY2006-07 operating budget. Phased out the tangible personal property tax on
     general business property beginning in tax year 2006, phased down utility tangible
@@ -52,6 +58,22 @@ properties:
     would have kept test-scoring companies from personally identifiable student data until July
     2006, so that the veto gave them access immediately; and a reduction of the Ohio Wyami Teacher
     Cohorts earmark from $1.5 million each year to $1.5 million across the biennium.
+  accountability_effect: |
+    **The act that built both of Ohio's rating-triggered consequences for a district, in forms the
+    corpus holds only as their successors.** It required the department to establish an academic
+    distress commission for each academic emergency district that had failed adequate yearly
+    progress four consecutive years, with authority over personnel, management and budgetary
+    decisions; and it established the Educational Choice Scholarship Pilot Program for students in
+    buildings in academic emergency three or more consecutive years, with an amount deducted from
+    the resident district's state aid for each scholarship. [verified]
+    ([greenbook](../../../crates/project/fixtures/lsc-education-greenbooks.txt))
+
+    LSC's final analysis places the commission at R.C. 3302.10 from July 2007 — the former section
+    the current one supersedes — and adds sanctions ending in closure for academic watch and
+    emergency community schools that miss expected gains, a bar on lowering a rating solely because
+    one subgroup missed adequate yearly progress, and a rule letting the superintendent direct the
+    building-blocks spending of watch and emergency districts. [inference] See
+    [Ohio report card](../accountability-regime/ohio-report-card.yml).
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of

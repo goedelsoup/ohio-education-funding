@@ -3,6 +3,16 @@ used-by:
   - ../corpus/draft-legislation/hb-643-136-introduced.yml
   - ../corpus/draft-legislation/hb-96-136-as-introduced.yml
   - ../corpus/draft-legislation/hb-96-136-as-passed-house.yml
+  - ../corpus/legislation/hb-1-2009.yml
+  - ../corpus/legislation/hb-110-2021.yml
+  - ../corpus/legislation/hb-119-2007.yml
+  - ../corpus/legislation/hb-153-2011.yml
+  - ../corpus/legislation/hb-166-2019.yml
+  - ../corpus/legislation/hb-583-2022.yml
+  - ../corpus/legislation/hb-64-2015.yml
+  - ../corpus/legislation/hb-66-2005.yml
+  - ../corpus/legislation/hb-94-2001.yml
+  - ../corpus/legislation/hb-95-2003.yml
 ---
 # Ohio bills before enactment — the text as introduced
 
@@ -72,6 +82,25 @@ committee history exists" are the same observation, and only the second is a fin
 What the endpoints still cannot say is whether a bill is *dead*. Zero meetings is the same record
 for one that will be heard next month and one that never will, and the General Assembly publishes
 no marker for the difference.
+
+## The enrolled entry dates both halves of an act, and one date field is not what it says
+
+The `EN` entry's `effective_date` is a single date, and for a budget act it is the
+appropriation half. The codified half is in a free-text field beside it, `effective_date_notes`
+— for H.B. 66 of the 126th, *"Certain provisions effective 2005/09/29; certain other provisions
+effective on other dates; contains item vetoes"*. Read 29 September 2026 across twelve acts, from
+H.B. 94 of the 124th to H.B. 96 of the 136th, it agrees with the date on LSC's enrolled analysis
+([`lsc-hb96-analysis`](lsc-hb96-analysis.md)) for every act where both have a value.
+
+Two do not have one. **H.B. 64 of the 131st and H.B. 110 of the 134th return every date field
+null** on all of their versions, so their dates rest on the LSC cover alone.
+
+**`governor_signed_date` is not the signing date for five of them.** It reads 12 July 2005 for
+H.B. 66, 11 July 2007 for H.B. 119, 28 July 2009 for H.B. 1, 12 July 2011 for H.B. 153 and
+11 July 2013 for H.B. 59 — eleven to fourteen days after the date the same record, and LSC,
+give for the appropriations taking effect, which cannot precede the signature. What it records
+instead is not stated. Read the signing date off `effective_date` for an act whose appropriations
+took effect on signing, and never off this field.
 
 ## A digest here pins the renderer as well as the document
 

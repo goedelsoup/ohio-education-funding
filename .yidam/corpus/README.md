@@ -464,12 +464,12 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 1989 | supported by a committed primary source |
-| `[inference]` | 415 | drawn from verified facts, not witnessed |
-| `[open]` | 212 | a live question — unknown, contested, or being worked |
+| `[verified]` | 2015 | supported by a committed primary source |
+| `[inference]` | 427 | drawn from verified facts, not witnessed |
+| `[open]` | 214 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-212 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+214 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
@@ -492,6 +492,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `caveats` | 2 | 0 |
 | `boundary_note` | 2 | 0 |
 | `adoption_evidence` | 2 | 0 |
+| `accountability_effect` | 2 | 0 |
 | `trigger` | 1 | 0 |
 | `status` | 1 | 0 |
 | `sponsors` | 1 | 0 |
@@ -507,7 +508,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `calculator` | 1 | 0 |
 | `appropriating_bill` | 1 | 0 |
 
-**113 recorded withdrawals across 48 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**118 recorded withdrawals across 52 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Relationship vocabulary
@@ -554,7 +555,7 @@ writes an absence it has looked for.
 | declared `required: false` | 8 |
 | declarations that do not say | 0 |
 | omissions of a required property | 1 |
-| omissions of an optional property | 36 |
+| omissions of an optional property | 18 |
 
 **112 of the 121 declared properties are carried by every instance of their class.** An omission of a required property gates `yidam lint`, so the only one is listed in `.yidam/lint-baseline.yml` and the next is attributable to the commit that makes it. An omission of an optional one is reported and is not a defect. Every property some instance omits:
 
@@ -563,8 +564,8 @@ writes an absence it has looked for.
 | `education-agency.established` | yes | 1 | 7 |
 | `formula-component.function_tex` | no | 2 | 18 |
 | `funding-regime.boundary_note` | no | 1 | 5 |
-| `legislation.effective_note` | no | 12 | 16 |
-| `legislation.accountability_effect` | no | 9 | 16 |
+| `legislation.effective_note` | no | 2 | 16 |
+| `legislation.accountability_effect` | no | 1 | 16 |
 | `litigation.procedural_history` | no | 3 | 6 |
 | `parameter.simulation_key` | no | 1 | 18 |
 | `parameter.written_as` | no | 5 | 18 |
@@ -582,7 +583,7 @@ Sorted by: kind, then alphabetically.
 | Node | Class | Label | Out | In |
 |---|---|---|--:|--:|
 | [`essa`](accountability-regime/essa.yml) | accountability-regime | Every Student Succeeds Act | 7 | 7 |
-| [`ohio-report-card`](accountability-regime/ohio-report-card.yml) | accountability-regime | Ohio School Report Card | 8 | 9 |
+| [`ohio-report-card`](accountability-regime/ohio-report-card.yml) | accountability-regime | Ohio School Report Card | 8 | 13 |
 | [`department-of-education-and-workforce`](actor/department-of-education-and-workforce.yml) | actor | Department of Education and Workforce | 3 | 6 |
 | [`ohio-department-of-education`](actor/ohio-department-of-education.yml) | actor | Ohio Department of Education (superseded) | 2 | 2 |
 | [`ohio-general-assembly`](actor/ohio-general-assembly.yml) | actor | Ohio General Assembly | 6 | 5 |
@@ -629,7 +630,7 @@ Sorted by: kind, then alphabetically.
 | [`fsfp-gifted-units`](formula-component/fsfp-gifted-units.yml) | formula-component | FSFP Gifted Identification and Units | 4 | 3 |
 | [`fsfp-jvsd-state-share-of-base-cost`](formula-component/fsfp-jvsd-state-share-of-base-cost.yml) | formula-component | FSFP JVSD State Share of Base Cost | 6 | 2 |
 | [`fsfp-local-capacity-measure`](formula-component/fsfp-local-capacity-measure.yml) | formula-component | FSFP Local Capacity Measure | 11 | 13 |
-| [`fsfp-performance-supplement`](formula-component/fsfp-performance-supplement.yml) | formula-component | FSFP Performance Supplement | 10 | 7 |
+| [`fsfp-performance-supplement`](formula-component/fsfp-performance-supplement.yml) | formula-component | FSFP Performance Supplement | 10 | 8 |
 | [`fsfp-preschool-special-education`](formula-component/fsfp-preschool-special-education.yml) | formula-component | FSFP Preschool Special Education | 6 | 4 |
 | [`fsfp-special-education-weights`](formula-component/fsfp-special-education-weights.yml) | formula-component | FSFP Special Education Weights | 6 | 10 |
 | [`fsfp-targeted-assistance`](formula-component/fsfp-targeted-assistance.yml) | formula-component | FSFP Targeted Assistance | 13 | 7 |
@@ -641,24 +642,24 @@ Sorted by: kind, then alphabetically.
 | [`evidence-based-model`](funding-regime/evidence-based-model.yml) | funding-regime | Evidence-Based Model | 7 | 9 |
 | [`fair-school-funding-plan`](funding-regime/fair-school-funding-plan.yml) | funding-regime | Fair School Funding Plan | 23 | 32 |
 | [`foundation-base-cost-formula`](funding-regime/foundation-base-cost-formula.yml) | funding-regime | Foundation Base Cost Formula | 8 | 13 |
-| [`academic-distress-commission`](intervention/academic-distress-commission.yml) | intervention | Academic Distress Commission | 8 | 4 |
+| [`academic-distress-commission`](intervention/academic-distress-commission.yml) | intervention | Academic Distress Commission | 8 | 5 |
 | [`lea-level-action`](intervention/lea-level-action.yml) | intervention | Additional Optional Action (LEA level) | 4 | 2 |
 | [`more-rigorous-interventions`](intervention/more-rigorous-interventions.yml) | intervention | More Rigorous Interventions (CSI) | 5 | 2 |
 | [`hb-1-2009`](legislation/hb-1-2009.yml) | legislation | Am. Sub. H.B. 1 (2009) — FY2010-11 Budget; Evidence-Based Model | 4 | 7 |
-| [`hb-110-2021`](legislation/hb-110-2021.yml) | legislation | Am. Sub. H.B. 110 (2021) — FY2022-23 Budget; Fair School Funding Plan | 7 | 11 |
+| [`hb-110-2021`](legislation/hb-110-2021.yml) | legislation | Am. Sub. H.B. 110 (2021) — FY2022-23 Budget; Fair School Funding Plan | 11 | 11 |
 | [`hb-119-2007`](legislation/hb-119-2007.yml) | legislation | Am. Sub. H.B. 119 (2007) — FY2008-09 Budget; Two Protections Removed | 8 | 3 |
-| [`hb-153-2011`](legislation/hb-153-2011.yml) | legislation | Am. Sub. H.B. 153 (2011) — FY2012-13 Budget; Bridge Formula | 7 | 6 |
+| [`hb-153-2011`](legislation/hb-153-2011.yml) | legislation | Am. Sub. H.B. 153 (2011) — FY2012-13 Budget; Bridge Formula | 8 | 7 |
 | [`hb-166-2019`](legislation/hb-166-2019.yml) | legislation | Am. Sub. H.B. 166 (2019) — FY2020-21 Budget; the Year There Was No Formula | 7 | 7 |
 | [`hb-33-2023`](legislation/hb-33-2023.yml) | legislation | Am. Sub. H.B. 33 (2023) — FY2024-25 Budget | 9 | 15 |
 | [`hb-49-2017`](legislation/hb-49-2017.yml) | legislation | Am. Sub. H.B. 49 (2017) — FY2018-19 Budget; the Guarantee Made Conditional | 6 | 4 |
 | [`hb-583-2022`](legislation/hb-583-2022.yml) | legislation | Sub. H.B. 583 (2022) — corrective and technical changes to the Fair School Funding Plan | 10 | 4 |
 | [`hb-59-2013`](legislation/hb-59-2013.yml) | legislation | Am. Sub. H.B. 59 (2013) — FY2014-15 Budget; a Formula Over the Bridge | 6 | 3 |
 | [`hb-64-2015`](legislation/hb-64-2015.yml) | legislation | Am. Sub. H.B. 64 (2015) — FY2016-17 Budget; Capacity Aid | 9 | 5 |
-| [`hb-66-2005`](legislation/hb-66-2005.yml) | legislation | Am. Sub. H.B. 66 (2005) — FY2006-07 Budget; Tangible Personal Property Tax Phase-Out | 4 | 7 |
+| [`hb-66-2005`](legislation/hb-66-2005.yml) | legislation | Am. Sub. H.B. 66 (2005) — FY2006-07 Budget; Tangible Personal Property Tax Phase-Out | 5 | 7 |
 | [`hb-920-1976`](legislation/hb-920-1976.yml) | legislation | Am. Sub. H.B. 920 (1976) — Tax Reduction Factors | 5 | 13 |
-| [`hb-94-2001`](legislation/hb-94-2001.yml) | legislation | Am. Sub. H.B. 94 (2001) — FY2002-03 Budget; the post-DeRolph II formula | 10 | 5 |
-| [`hb-95-2003`](legislation/hb-95-2003.yml) | legislation | Am. Sub. H.B. 95 (2003) — FY2004-05 Budget; the First After DeRolph | 5 | 2 |
-| [`hb-96-2025`](legislation/hb-96-2025.yml) | legislation | Am. Sub. H.B. 96 (2025) — FY2026-27 Budget | 11 | 29 |
+| [`hb-94-2001`](legislation/hb-94-2001.yml) | legislation | Am. Sub. H.B. 94 (2001) — FY2002-03 Budget; the post-DeRolph II formula | 12 | 5 |
+| [`hb-95-2003`](legislation/hb-95-2003.yml) | legislation | Am. Sub. H.B. 95 (2003) — FY2004-05 Budget; the First After DeRolph | 5 | 3 |
+| [`hb-96-2025`](legislation/hb-96-2025.yml) | legislation | Am. Sub. H.B. 96 (2025) — FY2026-27 Budget | 12 | 30 |
 | [`ohio-constitution-article-vi-section-2`](legislation/ohio-constitution-article-vi-section-2.yml) | legislation | Ohio Constitution, Article VI, Section 2 (1851) | 2 | 5 |
 | [`cincinnati-v-walter-1979`](litigation/cincinnati-v-walter-1979.yml) | litigation | Cincinnati City School District Board of Education v. Walter (1979) | 6 | 4 |
 | [`derolph-i-1997`](litigation/derolph-i-1997.yml) | litigation | DeRolph v. State (DeRolph I, 1997) | 6 | 14 |

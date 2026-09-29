@@ -30,6 +30,12 @@ properties:
     efficient system of common schools throughout the state, and bars any religious or other
     sect from exclusive right to or control of any part of the school funds.
   vetoes: Not applicable.
+  accountability_effect: |
+    None. The section's two clauses, as the description above gives them, lay a duty on the
+    General Assembly and bar sectarian control of school funds; neither names a measure of
+    schools, a rating, or a consequence attached to one. [inference] What answerability the text
+    creates runs to the legislature and is enforced by the courts, which is what *DeRolph* did —
+    a different mechanism from the regime this property records.
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of

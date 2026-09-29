@@ -28,6 +28,13 @@ properties:
   general_assembly: 128th General Assembly
   signed: 2009-07-17
   effective: 2009-07-17
+  effective_note: |
+    Two dates, and `effective` above carries the appropriation one. Signed **17 July 2009**, with
+    the appropriation sections effective then, seventeen days into the biennium they fund; the
+    codified amendments, the Evidence-Based Model among them, took effect on **16 October 2009**,
+    and some provisions on other dates. [verified]
+    ([LSC's enrolled analysis](../../catalog/lsc-hb96-analysis.md);
+    [the legislature's version index](../../catalog/ohio-bills.md))
   subject: |
     Enacted the FY2010-11 operating budget and replaced the prior foundation formula with the
     Evidence-Based Model, which derived a per-district adequacy amount from specified
@@ -62,6 +69,20 @@ properties:
     Employees Health Care Board to the department; a community school calamity-day waiver; and an
     earmark of $1,279,948 and $1,500,000 in School Management Assistance for the Auditor of State
     to run performance audits of districts in fiscal caution, watch or emergency.
+  accountability_effect: |
+    **It made a rating decide how freely a district could spend its money, not how much it got.**
+    The act required spending rules for the Evidence-Based Model's components affording districts
+    "degrees of flexibility depending on their current report card performance ratings": districts
+    rated excellent were exempt, and the academic improvement rules bound only districts in academic
+    emergency or watch for two or more consecutive years. Non-compliance fed graduated sanctions
+    ending in a trustee, an accountability compliance commission or revocation of the district's
+    charter, none before July 1, 2011. [inference] (LSC's final analysis) Whether any was ever
+    imposed is not established. [open]
+
+    It also ordered the Ohio Graduation Test replaced as the diploma requirement by a college
+    readiness assessment, end-of-course exams and a senior project, and new report card performance
+    indicators with a fiscal reporting dimension from FY2011. [verified]
+    ([greenbook](../../../crates/project/fixtures/lsc-education-greenbooks.txt))
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of
