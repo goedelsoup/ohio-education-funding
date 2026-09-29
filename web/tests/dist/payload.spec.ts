@@ -90,7 +90,9 @@ describe("module preloading", () => {
       }
     }
 
-    expect(declared, "the build declares preloads at all").toBeGreaterThan(3_000);
+    // 2,955 once #548 folded the 609 per-district scenario pages into `/scenario?d=`; a floor under
+    // that rather than at it, so a lost page family fails here and a lost preload or two does not.
+    expect(declared, "the build declares preloads at all").toBeGreaterThan(2_500);
     expect(dangling.slice(0, 5), "a preload naming a file that is not there").toEqual([]);
     expect(duplicated.slice(0, 5), "a preload for a script the page already loads").toEqual([]);
     expect(undeclared.slice(0, 5), "an import the page never declared").toEqual([]);
@@ -106,9 +108,10 @@ describe("module preloading", () => {
      * Held as the bytes a page names in its HTML — its module scripts and its preloads, which the
      * test above holds to the static import graph — because that is what arrives before the fetch
      * can start. That included the 337,895 B runner on all three routes; it is under 8 KB now, and
-     * the bound is set where a return of the library could not hide under it.
+     * the bound is set where a return of the library could not hide under it. Two routes since
+     * #548: the district one is `/scenario?d=`, the same file as the first.
      */
-    for (const route of ["scenario.html", "reach.html", `district/${NORTHERN}/scenario.html`]) {
+    for (const route of ["scenario.html", "scenario/reach.html"]) {
       const html = readFileSync(join(DIST, route), "utf8");
       const named = [
         ...html.matchAll(/<script type="module" src="\/_astro\/([^"]+\.js)"/g),

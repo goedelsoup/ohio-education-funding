@@ -55,7 +55,7 @@ test.describe("the verification gate", () => {
       await route.fulfill({ json: panel });
     });
 
-    await page.goto(`/district/${NORTHERN}/scenario`);
+    await page.goto(`/scenario?d=${NORTHERN}`);
     await expect(page.locator("#scenario-out .err h2")).toBeVisible();
     expect(await headingText(page.locator("#scenario-out .err h2"))).toBe(
       "The scenario builder is disabled",
@@ -223,7 +223,7 @@ test.describe("the scenario builder", () => {
   test("the district scenario names its own change and the statewide count", async ({ page }) => {
     // The design rule this page exists for: a change that helps this district is not thereby a
     // good change, and the number of districts it hurts is in the same view, not behind a link.
-    await page.goto(`/district/${NORTHERN}/scenario?g=removed&arg=0.5&base=1&min=0.1&pb=1&pc=1&h=2026`);
+    await page.goto(`/scenario?d=${NORTHERN}&g=removed&arg=0.5&base=1&min=0.1&pb=1&pc=1&h=2026`);
     await expect(page.locator("#scenario-out")).toContainText("State aid under this scenario");
     await expect(page.locator("#scenario-out")).toContainText("And to everyone else");
     await expect(page.locator("#scenario-out")).toContainText("294");
@@ -277,7 +277,7 @@ test.describe("the scenario builder", () => {
    * The result is a card with a heading, and every heading on the page wears its anchor the same
    * way. Both were properties of the *client-rendered* half, which no build-time pass can see.
    */
-  for (const route of ["/scenario", `/district/${CLEVELAND}/scenario`]) {
+  for (const route of ["/scenario", `/scenario?d=${CLEVELAND}`]) {
     test(`the result has a heading, and it is the answer — ${route}`, async ({ page }) => {
       /*
        * Under current law there was one, "Current law". Move a lever and the headline became a bare
@@ -342,28 +342,36 @@ test.describe("the scenario builder", () => {
     });
   }
 
-  test("the district route mints no horizon it cannot set", async ({ page }) => {
-    // It has no horizon control, draws no band, and reads nothing from `h` — so every URL it minted
-    // carried `h=2032` for a reader to copy and send.
-    await page.goto(`/district/${CLEVELAND}/scenario`);
-    await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
+  test("a chosen district is part of the address, and the whole state names none", async ({
+    page,
+  }) => {
+    /*
+     * The district was a route, `/district/[irn]/scenario`, with no horizon control and no band, and
+     * a test here pinned that it minted no `h`. It is now a setting of this runner (#548): the band
+     * is drawn under the district's cards, so the horizon travels, and so does the district — a URL
+     * copied off a district's run has to reopen on that district, levers and all.
+     */
+    await page.goto(`/scenario?d=${CLEVELAND}`);
+    await expect(page.locator("#sc-district")).toHaveValue(CLEVELAND);
+    await expect(page.locator('#scenario-out [data-part="outcome"], #scenario-out .card')).not.toHaveCount(0);
     await page.locator("#lv-base").fill("1.05");
     await page.locator("#lv-base").dispatchEvent("input");
     await expect(page).toHaveURL(/[?&]base=1\.05/);
-    expect(new URL(page.url()).searchParams.has("h")).toBe(false);
-
-    // And the statewide route, which does have one, still carries it.
-    await page.goto("/scenario");
-    await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
-    await page.locator("#lv-base").fill("1.05");
-    await page.locator("#lv-base").dispatchEvent("input");
+    await expect(page).toHaveURL(new RegExp(`[?&]d=${CLEVELAND}`));
     await expect(page).toHaveURL(/[?&]h=\d{4}/);
+    await expect(page.locator('#projection-out [data-part="projection"]')).toBeVisible();
+
+    // And choosing the whole state drops it, keeping the levers.
+    await page.locator("#sc-district").selectOption("");
+    await expect(page).toHaveURL(/[?&]base=1\.05/);
+    expect(new URL(page.url()).searchParams.has("d")).toBe(false);
+    await expect(page.locator('[data-part="not"]')).toBeHidden();
   });
 
   test("a cost is not rendered as a gain", async ({ page }) => {
     // The gain/loss classes mean "more aid" and "less aid", which is what the tiles are about.
     // Under a row headed *cost* the same green rendered a billion dollars of spending as a win.
-    await page.goto(`/district/${CLEVELAND}/scenario?g=as-enacted&arg=0.5&base=1.15&min=0.1&pb=1&pc=1`);
+    await page.goto(`/scenario?d=${CLEVELAND}&g=as-enacted&arg=0.5&base=1.15&min=0.1&pb=1&pc=1`);
     const row = page.locator('[data-part="moved-elsewhere"] tr', { hasText: "Cost to the state" });
     await expect(row.locator("td")).not.toHaveClass(/gain|loss/);
     await expect(row.locator("td")).toContainText("+$");
@@ -375,7 +383,7 @@ test.describe("the scenario builder", () => {
      * reason: 0 districts receive less" — the card exists to interrupt self-interest, and delivered
      * the interruption with a zero attached.
      */
-    await page.goto(`/district/${CLEVELAND}/scenario?g=as-enacted&arg=0.5&base=1.15&min=0.1&pb=1&pc=1`);
+    await page.goto(`/scenario?d=${CLEVELAND}&g=as-enacted&arg=0.5&base=1.15&min=0.1&pb=1&pc=1`);
     const card = page.locator('[data-part="moved-elsewhere"]');
     await expect(card.locator("tr", { hasText: "Down" }).locator("td")).toHaveText("0");
     await expect(card).toContainText("No district receives less");

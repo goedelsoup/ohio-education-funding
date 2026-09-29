@@ -4,7 +4,8 @@
  *
  * # Why this is its own route and not a card on `/scenario`
  *
- * It was a card there, under the histogram, and the two were answering different questions in the
+ * It is the runner's second view — `/scenario/reach`, a tab of `Try a change` since #548 merged the
+ * two bar entries — and not a card on the first, because it was a card there once, under the histogram, and the two were answering different questions in the
  * same breath. `/scenario` answers *how much*: a total, a distribution, a ranking of the districts
  * that moved furthest. This answers *which*, and on a formula that pays the larger of a district's
  * formula amount and its guarantee those are not the same question — a lever can cost the state
@@ -28,13 +29,14 @@
  * containing levers. Restyling rather than reimplementing is what keeps the two views' levers from
  * drifting apart.
  */
-import HeldFixed from "../components/HeldFixed.astro";
-import ScenarioControls from "../components/ScenarioControls.astro";
-import Base from "../layouts/Base.astro";
-import { NAMES } from "../lib/nav.ts";
-import SectionAnchor from "../components/SectionAnchor.astro";
-import { loadFeed, qualifiedName } from "../lib/feed.ts";
-import { count, millions, pct } from "../lib/format.ts";
+import HeldFixed from "../../components/HeldFixed.astro";
+import RunnerViews from "../../components/RunnerViews.astro";
+import ScenarioControls from "../../components/ScenarioControls.astro";
+import Base from "../../layouts/Base.astro";
+import { NAMES } from "../../lib/nav.ts";
+import SectionAnchor from "../../components/SectionAnchor.astro";
+import { loadFeed, qualifiedName } from "../../lib/feed.ts";
+import { count, millions, pct } from "../../lib/format.ts";
 import {
   DEFAULT_VIEW,
   DIMENSIONS,
@@ -42,12 +44,12 @@ import {
   groups,
   presets,
   scopeCounties,
-} from "../lib/reach.ts";
-import { LEVER_BOUNDS } from "../lib/scenario.ts";
-import { modelOf } from "../lib/policy.ts";
-import { refreshEffect } from "../lib/refresh.ts";
-import * as routes from "../lib/routes.ts";
-import { yearChip } from "../lib/year.ts";
+} from "../../lib/reach.ts";
+import { LEVER_BOUNDS } from "../../lib/scenario.ts";
+import { modelOf } from "../../lib/policy.ts";
+import { refreshEffect } from "../../lib/refresh.ts";
+import * as routes from "../../lib/routes.ts";
+import { yearChip } from "../../lib/year.ts";
 
 const { bundle, alphabetical } = loadFeed();
 const s = bundle.statewide;
@@ -91,13 +93,14 @@ const counties = scopeCounties(bundle.districts);
 ---
 
 <Base
-  title={NAMES.reach.name}
+  title={`${NAMES.scenario.name} — who it reaches`}
   description={`Which of Ohio's ${s.districts} school districts a change in the funding formula actually reaches, and which the guarantee holds still — every district plotted against the aid its formula computes for it.`}
   image={routes.og.page("reach")}
   imageAlt="Every Ohio school district plotted against what the formula computes for it, with the guarantee wall"
-  section="reach"
+  section="scenario"
 >
-  <h1>{NAMES.reach.name}</h1>
+  <h1>{NAMES.scenario.name}</h1>
+  <RunnerViews current="reach" />
   <p class="lead">
     Move a lever and see which of Ohio's {count(s.districts)} districts it reaches — and which it
     passes over. In the department's FY{bundle.fiscal_year} model {count(s.on_guarantee)} of
@@ -285,9 +288,9 @@ const counties = scopeCounties(bundle.districts);
             <h2><SectionAnchor id="needs-script" />Re-running the formula needs JavaScript</h2>
             <p class="note">
               Most pages on this site carry their figures in the document and read correctly
-              without any script. The ones that re-run the formula cannot: this page re-derives it
-              over all {count(s.districts)} districts as you move a slider, and plots the result,
-              which is not something a pre-rendered page can do.
+              without any script. The ones that re-run the formula cannot: both views of this runner
+              re-derive it over all {count(s.districts)} districts as you move a slider, and this one
+              plots the result, which is not something a pre-rendered page can do.
             </p>
             <p class="note">
               The underlying data is still available: <a href="/data">the feed and a CSV of the
@@ -400,6 +403,6 @@ const counties = scopeCounties(bundle.districts);
   </div>
 
   <script>
-    import "../scripts/scenario-load.ts";
+    import "../../scripts/scenario-load.ts";
   </script>
 </Base>

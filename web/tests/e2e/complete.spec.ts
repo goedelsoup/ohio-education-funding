@@ -62,8 +62,16 @@ test.describe("the document arrives complete", () => {
      * one written at build time, and rather more likely to be missed.
      */
     const unaddressed: string[] = [];
-    for (const suffix of ["", "/finances", "/outcome", "/taxes", "/scenario"]) {
-      await page.goto(`/district/${CLEVELAND}${suffix}`);
+    // The fifth tab is the runner opened on the district, not a route of the district's own (#548).
+    const views: [string, string][] = [
+      ["/dashboard", `/district/${CLEVELAND}`],
+      ["/finances", `/district/${CLEVELAND}/finances`],
+      ["/outcome", `/district/${CLEVELAND}/outcome`],
+      ["/taxes", `/district/${CLEVELAND}/taxes`],
+      ["/scenario", `/scenario?d=${CLEVELAND}`],
+    ];
+    for (const [suffix, url] of views) {
+      await page.goto(url);
       if (suffix === "/scenario") {
         await expect(page.locator("#scenario-out .card")).not.toHaveCount(0);
       }
@@ -72,7 +80,7 @@ test.describe("the document arrives complete", () => {
         .evaluateAll((nodes) =>
           nodes.map((n) => n.querySelector("h2")?.textContent?.trim() ?? "(no heading)"),
         );
-      for (const heading of bare) unaddressed.push(`${suffix || "/dashboard"}: ${heading}`);
+      for (const heading of bare) unaddressed.push(`${suffix}: ${heading}`);
     }
     expect(unaddressed, "a card with no data-part is a card only its heading can reach").toEqual(
       [],
@@ -109,7 +117,7 @@ const ROUTES_WITH_FIGURES = [
   `/district/${CLEVELAND}/finances`,
   `/district/${CLEVELAND}/outcome`,
   `/district/${CLEVELAND}/taxes`,
-  `/district/${CLEVELAND}/scenario`,
+  `/scenario?d=${CLEVELAND}`,
   /*
    * `/scenario` was missing, and the omission is the same shape the docstring above describes.
    * Scanned by hand it had two unchipped cards carrying figures — the projection, present in the
@@ -122,7 +130,7 @@ const ROUTES_WITH_FIGURES = [
    * same reason `/scenario` was added rather than because it currently catches anything: the
    * moment a tile lands on it, it is covered.
    */
-  "/reach",
+  "/scenario/reach",
 ];
 
   test("a card with figures says what year they are on", async ({ page }) => {
@@ -141,7 +149,8 @@ const ROUTES_WITH_FIGURES = [
     const missing: string[] = [];
     for (const route of ROUTES_WITH_FIGURES) {
       await page.goto(route);
-      if (route.endsWith("/scenario") || route === "/reach") {
+      // Both of the runner's views, with and without a district chosen.
+      if (route.startsWith("/scenario")) {
         /*
          * Past a lever, not merely past the first render.
          *
@@ -160,9 +169,10 @@ const ROUTES_WITH_FIGURES = [
         // depend on the levers — but it is waited for past the lever anyway, so the sweep sees the
         // card the reader sees rather than the one the page opened with.
         await expect(
-          page.locator(route === "/reach" ? '[data-part="positions"]' : '[data-part="outcome"]'),
+          page.locator(route === "/scenario/reach" ? '[data-part="positions"]' : '[data-part="outcome"]'),
         ).toBeVisible();
-        if (route === "/scenario") {
+        // The forecast is statewide and stays under a chosen district's cards (#548).
+        if (route !== "/scenario/reach") {
           await expect(page.locator('#projection-out [data-part="projection"]')).toBeVisible();
         }
       }
@@ -385,7 +395,7 @@ const ROUTES_WITH_FIGURES = [
     expect(await weigh("/scenario")).toBe(2);
     // And on the reach view, for the same reason and the same one extra script: its cloud is
     // redrawn on every lever tick.
-    expect(await weigh("/reach")).toBe(2);
+    expect(await weigh("/scenario/reach")).toBe(2);
   });
 
   test("the CSV has one row per district and a header", async ({ request }) => {

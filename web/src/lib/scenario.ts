@@ -463,6 +463,28 @@ export function renderProjection(bundle: Panel, levers: Levers, chip = ""): stri
 }
 
 /**
+ * The district the runner was opened on, if any: an IRN, or `""` for the whole state.
+ *
+ * Two places, in order. The fragment first, `#d=043786`, because that is where
+ * `public/_redirects` puts it when an old `/district/043786/scenario?g=…` link lands: a Cloudflare
+ * redirect keeps the incoming query only when the destination names none, so the district rides in
+ * the fragment and the reader's levers ride through untouched. Then the query, `?d=`, which is
+ * what the district pages link to and what the runner writes back.
+ *
+ * `d` is the same key `/scenario/reach` names its lit districts with, and may carry several:
+ * `?d=043786,044933`. This view answers for one, so it takes the first — crossing from the reach
+ * view with a selection opens the first district named rather than none. Anything that is not six
+ * digits is ignored rather than rendered as "no district with IRN …": a malformed link is the
+ * whole state, which is what it can honestly be read as.
+ */
+export function chosenDistrict(search: URLSearchParams, hash: string): string {
+  const fragment = /^#d=(\d{6})(?:$|[,&])/.exec(hash)?.[1];
+  if (fragment) return fragment;
+  const first = (search.get("d") ?? "").split(",")[0] ?? "";
+  return /^\d{6}$/.test(first) ? first : "";
+}
+
+/**
  * The same levers, answered for one district.
  *
  * # Why this is not just the statewide table filtered to one row
@@ -594,9 +616,9 @@ export function renderDistrictScenario(
              the reason: ${t.losers} district${t.losers === 1 ? "" : "s"} ${
                t.losers === 1 ? "receives" : "receive"
              } less under these settings.`
-      } <a href="/scenario">The distribution across all
+      } <a href="#distribution">The distribution across all
         ${t.districts}</a> — who gains, who loses, and how that falls across property wealth — is
-        the statewide view.</p>
+        further down this page, statewide.</p>
     </div>`;
 }
 

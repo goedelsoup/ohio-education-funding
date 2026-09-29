@@ -14,11 +14,11 @@ Roughly 3,500 pages, all of them static files:
 | `/district/{irn}/outcome` | What its pupils achieve — against districts with comparable poverty, never against the state. |
 | `/district/{irn}/finances` | What it actually collected and spent, and what it spent it on by function. |
 | `/district/{irn}/taxes` | What property here is worth by class, what is charged on it, and which side of the 20-mill floor that puts the district on. |
-| `/district/{irn}/scenario` | What a proposed change does to this district, and how many districts it moves the other way. |
+| `/district/{irn}/scenario` | Redirects to `/scenario#d={irn}` (`public/_redirects`): the runner, opened on this district. |
 | `/outcomes` | Statewide: how little of attainment the funding side explains. |
 | `/history` | FY2009–FY2022 on the federal survey: where the money came from, and whom it reached. The only route that reaches before FY2020. |
-| `/scenario` | Move a lever and see who it reaches, across all 609, in the browser. |
-| `/reach` | The same levers asked the other question: *which* districts move, all 609 plotted against what the formula computes for them, with the guarantee wall drawn as the law it is. Scopeable to a county or to named districts. |
+| `/scenario` | *Try a change*, what changes: move a lever and re-run the formula across all 609 in the browser — for the whole state, or with one district chosen (`?d={irn}`), its own cards first and how many districts move the other way beside them. |
+| `/scenario/reach` | *Try a change*, who it reaches — the runner's second view, formerly `/reach` (which redirects here). The same levers asked the other question: *which* districts move, all 609 plotted against what the formula computes for them, with the guarantee wall drawn as the law it is. Scopeable to a county or to named districts. |
 | `/compare` | Two districts side by side. |
 | `/legislation` | Every act behind the formula, in the order it was signed: five regimes across fifty fiscal years, what each act did, and which biennium it paid for. Generated from the corpus. |
 | `/wiki` | The corpus — regimes, statutes, litigation, parameters, metric definitions — rendered from `.yidam/` directly. |
@@ -512,7 +512,7 @@ being drawn as the end of a continuum it is nowhere near.
 
 ### A selection lights the cloud rather than filtering it
 
-`/reach` can be scoped to counties and to individually named districts, and the scope decides what is
+`/scenario/reach` can be scoped to counties and to individually named districts, and the scope decides what is
 **lit**: the whole state stays plotted, in-scope districts keep their shading and their trails, and
 the rest are muted. That is not a softer version of a filter. It is the only version that works, for
 two reasons that are both measurements.

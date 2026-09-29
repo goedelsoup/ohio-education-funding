@@ -33,16 +33,16 @@ test.describe("axe", () => {
     ["a district's outcomes", `/district/${CLEVELAND}/outcome`],
     ["a district's taxes", `/district/${CLEVELAND}/taxes`],
     ["the scenario runner, which rewrites itself", "/scenario"],
-    ["the reach view, which is the runner asking who rather than how much", "/reach"],
+    ["the reach view, which is the runner asking who rather than how much", "/scenario/reach"],
     /*
      * The mode control is `hidden` until there is a selection, and axe does not scan what is
      * hidden — so a bare `/reach` leaves the one fieldset on the site unexamined. This is the same
      * route with a selection large enough to draw on its own, which shows the control, the subset
      * card and the in-prose button that switches back.
      */
-    ["the reach view subsetted to a county, where the mode control is", "/reach?co=cuyahoga&only=1"],
+    ["the reach view subsetted to a county, where the mode control is", "/scenario/reach?co=cuyahoga&only=1"],
     /* And the refusal, which is a card with no chart in it and its own way out. */
-    ["the reach view refusing a selection too small to draw", "/reach?co=athens&only=1"],
+    ["the reach view refusing a selection too small to draw", "/scenario/reach?co=athens&only=1"],
     ["the comparison", `/compare?a=${CLEVELAND}&b=${NORTHERN}`],
     ["a county", "/county/cuyahoga"],
     ["the counties index", "/counties"],
@@ -62,7 +62,7 @@ test.describe("axe", () => {
       await page.goto(route);
       // The scenario and comparison routes compute in the browser; scanning before they have
       // rendered would be scanning an empty container and calling it clean.
-      if (route.startsWith("/scenario") || route.startsWith("/reach")) {
+      if (route.startsWith("/scenario") || route.startsWith("/scenario/reach")) {
         await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
       }
       if (route.startsWith("/compare")) await expect(page.locator("#compare-out table")).toBeVisible();

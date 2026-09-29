@@ -50,7 +50,6 @@ export type Section =
   | "outcomes"
   | "history"
   | "scenario"
-  | "reach"
   | "bounds"
   | "wiki"
   | "method"
@@ -88,13 +87,31 @@ export const NAMES = {
   legislation: { href: "/legislation", name: "The statute timeline" },
   outcomes: { href: "/outcomes", name: "Outcomes" },
   history: { href: "/history", name: "History" },
-  scenario: { href: "/scenario", name: "Scenario" },
-  reach: { href: routes.REACH, name: "Reach" },
+  scenario: { href: "/scenario", name: "Try a change" },
   bounds: { href: routes.BOUNDS, name: "Bounds" },
   wiki: { href: "/wiki", name: "The corpus" },
   method: { href: routes.METHOD, name: "Method" },
   data: { href: "/data", name: "Data" },
 } as const satisfies Partial<Record<Section, { href: string; name: string }>>;
+
+/**
+ * The runner's two views: one place, one name, asked two questions.
+ *
+ * `/scenario` and `/reach` were two entries in the bar, `Scenario` and `Reach`, for one set of
+ * levers over one panel — the second a question about the first rather than a place of its own.
+ * They are one entry now, `Try a change`, and these are the tabs inside it. Both pages carry the
+ * name in their `<title>` and `h1`; the tab says which question is open.
+ *
+ * `data-carry-levers` on each tab hands the reader's lever positions to the other view — see
+ * `carryLevers` in `scripts/scenario.ts`.
+ */
+export const RUNNER_VIEWS = [
+  { key: "changes", href: NAMES.scenario.href, label: "What changes" },
+  { key: "reach", href: routes.REACH, label: "Who it reaches" },
+] as const;
+
+/** Which of {@link RUNNER_VIEWS} a runner page is. */
+export type RunnerView = (typeof RUNNER_VIEWS)[number]["key"];
 
 /** A row of the name table as a link in the bar. */
 function place(key: keyof typeof NAMES, note?: string): NavLink {
@@ -451,10 +468,7 @@ export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavGroup[] {
           links: [
             place("outcomes", "association, not effect"),
             place("history", "the Census long view"),
-            place("scenario", "re-run the formula"),
-            /* Beside the runner rather than under it: they drive the same levers and ask
-               different questions of them — how much, and who. */
-            place("reach", "who the guarantee holds still"),
+            place("scenario", "what changes, and who it reaches"),
             /* Last in the run because it is the widest: the other four ask what the formula did
                to somebody, and this one asks what shape the formula is. */
             place("bounds", "every floor and ceiling, and who is on it"),

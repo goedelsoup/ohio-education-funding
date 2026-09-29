@@ -134,16 +134,16 @@ const CONTAINERS: Exempt[] = [
      * footing as the slider that moves them, and a fiscal year on one would assert that the
      * *setting* was measured in a year.
      *
-     * `reach.html`'s `25%` already has this exemption, route-keyed, for the same reason and in
-     * the same words. A container is the right shape for it: the controls render on `/scenario`,
-     * `/reach` and all 609 district scenario routes, and the route-keyed form would need 611
-     * identical entries.
+     * `scenario/reach.html`'s `25%` already has this exemption, route-keyed, for the same reason
+     * and in the same words. A container is the right shape for it: the controls render on both of
+     * the runner's views, and rendered on 609 district scenario routes besides until #548 folded
+     * those into `/scenario?d=` — a route-keyed form would have needed 611 identical entries.
      *
      * What this does not exempt is the *result*. Every figure the run produces is outside
      * `.levers` and still has to carry its year.
      */
     reason:
-      "A lever's note names the setting's ends, not a measurement — the same ground `reach.html`'s `25%` is exempt on, scoped to the control rather than to 611 routes.",
+      "A lever's note names the setting's ends, not a measurement — the same ground `scenario/reach.html`'s `25%` is exempt on, scoped to the control rather than to each route that renders it.",
     containers: [".levers .n"],
   },
   {
@@ -169,7 +169,7 @@ const CONTAINERS: Exempt[] = [
  * than about Ohio in a year.
  */
 const NOT_A_MEASUREMENT: Record<string, Allowance> = {
-  "reach.html": {
+  "scenario/reach.html": {
     figures: ["25%"],
     reason:
       "A lever position, not a measurement. `Minimum share at 25%` names one of the presets on " +

@@ -67,7 +67,7 @@ test.describe("what the scenario holds fixed", () => {
    * only `/scenario` is what let that stand, and it is the same scoping mistake the year-chip rule
    * records making.
    */
-  for (const route of ["/scenario", `/district/${CLEVELAND}/scenario`]) {
+  for (const route of ["/scenario", `/scenario?d=${CLEVELAND}`]) {
     test(`the caveat is above the controls, not below the results — ${route}`, async ({ page }) => {
       /*
        * It is a limit on what the reader is about to do, not a footnote on what they got. The
@@ -102,7 +102,7 @@ test.describe("what the scenario holds fixed", () => {
     // the moment somebody copies the markup back into a page to reword it there.
     await page.goto("/scenario");
     const statewide = (await page.locator('[data-part="held-fixed"]').innerText()).replace(/\s+/g, " ");
-    await page.goto(`/district/${CLEVELAND}/scenario`);
+    await page.goto(`/scenario?d=${CLEVELAND}`);
     const district = (await page.locator('[data-part="held-fixed"]').innerText()).replace(/\s+/g, " ");
     expect(district).toBe(statewide);
   });

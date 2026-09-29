@@ -1,19 +1,20 @@
 ---
 /**
- * The five views of one district.
+ * The four views of one district, and the way into the runner with it chosen.
  *
- * These were tabs over a single document and are now five URLs, which is the change that made
+ * These were tabs over a single document and are now their own URLs, which is the change that made
  * this buildout worth doing: a school board arguing about its own guarantee can send the page
  * rather than "open the site and pick us from the dropdown".
  *
  * Real links, not buttons — the styling borrows the tab affordance because that is what the
  * relationship between them is, but every one of them is a document that exists on its own.
  */
+import { NAMES } from "../lib/nav.ts";
 import * as routes from "../lib/routes.ts";
 
 interface Props {
   irn: string;
-  current: "dashboard" | "outcome" | "finances" | "taxes" | "scenario";
+  current: "dashboard" | "outcome" | "finances" | "taxes";
 }
 
 const { irn, current } = Astro.props;
@@ -23,7 +24,9 @@ const VIEWS = [
   { key: "outcome", href: routes.districtOutcome(irn), label: "Outcome" },
   { key: "finances", href: routes.districtFinances(irn), label: "Finances" },
   { key: "taxes", href: routes.districtTaxes(irn), label: "Property tax" },
-  { key: "scenario", href: routes.districtScenario(irn), label: "Scenario" },
+  // Out to the runner with this district chosen: a change is tried on the whole state and answered
+  // for this district, so it is the one tab that is not a view of this district alone (#548).
+  { key: "scenario", href: routes.districtScenario(irn), label: NAMES.scenario.name },
 ] as const;
 ---
 

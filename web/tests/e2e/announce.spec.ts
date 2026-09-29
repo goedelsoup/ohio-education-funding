@@ -60,7 +60,7 @@ test.describe("announcing what changed", () => {
   test("the district scenario announces its own change too", async ({ page }) => {
     // 609 routes, and the one a school board sends. The statewide page having a live region and
     // this one not would be the same oversight in a smaller place.
-    await page.goto(`/district/${CLEVELAND}/scenario`);
+    await page.goto(`/scenario?d=${CLEVELAND}`);
     await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
     await page.selectOption("#lv-guarantee", "removed");
     await expect(page.locator("#changed")).toContainText("Scenario updated");

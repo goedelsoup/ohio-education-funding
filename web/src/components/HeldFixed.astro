@@ -10,9 +10,9 @@
  * > Placed above the controls rather than below the results, because it is a limit on what the
  * > reader is about to do and not a footnote on what they got.
  *
- * `/district/:irn/scenario` renders the same five levers and had none of it. Its own
- * "What this does not move" card names assessed valuation and enrollment — limits specific to that
- * view — and said nothing about the $812.5M of categoricals the base cost lever also moves, nothing
+ * `/district/:irn/scenario` rendered the same five levers and had none of it (it is `/scenario?d=`
+ * now, #548). Its own "What this does not move" card names assessed valuation and enrollment —
+ * limits specific to that view — and said nothing about the $812.5M of categoricals the base cost lever also moves, nothing
  * about DPIA and targeted assistance cancelling, nothing about gifted or preschool.
  *
  * That route's header comment calls it "the page a school board sends", and `renderDraft` has
@@ -53,6 +53,10 @@ interface Props {
    * deliberately do not" — so a reader moving between them, and anything that lists a page's
    * headings, met the same `h2` three times with nothing saying which run it described. The
    * caveat is the same on each (see above); the heading says whose it is.
+   *
+   * Two routes since #548 folded the district one into `/scenario?d=`, where the card reads the
+   * same whether or not a district is chosen — the caveat is about the levers, which is what the
+   * `/scenario` heading names. The reach view's names the view.
    */
   heading: string;
 }

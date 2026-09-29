@@ -84,10 +84,10 @@ test.describe("the answer first", () => {
       "holds enrollment at published FY2026 and moves the formula",
     );
     await expect(
-      page.locator(`[data-part="enrollment"] a[href="/district/${CLEVELAND}/scenario"]`),
+      page.locator(`[data-part="enrollment"] a[href="/scenario?d=${CLEVELAND}"]`),
     ).toHaveCount(1);
 
-    await page.goto(`/district/${CLEVELAND}/scenario`);
+    await page.goto(`/scenario?d=${CLEVELAND}`);
     await expect(page.locator('[data-part="not"]')).toContainText("holds enrollment fixed");
     await expect(
       page.locator(`[data-part="not"] a[href="/district/${CLEVELAND}"]`),

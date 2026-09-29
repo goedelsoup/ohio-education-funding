@@ -12,7 +12,17 @@
 /** The district a route is about. IRN, always — 28 district names in the feed are not unique. */
 export const district = (irn: string): string => `/district/${irn}`;
 export const districtOutcome = (irn: string): string => `/district/${irn}/outcome`;
-export const districtScenario = (irn: string): string => `/district/${irn}/scenario`;
+/**
+ * The runner, opened on one district.
+ *
+ * Not a route of the district's own any more. `/district/[irn]/scenario` was the runner rebuilt
+ * 609 times around one district's cards; it is now `/scenario` with that district chosen, so a
+ * reader who opens it from a district page is in the same runner as everyone else, with the same
+ * forecast and the same way across to who a change reaches. `public/_redirects` sends the old
+ * address here, carrying the query — see `scripts/scenario.ts` for why the district rides in the
+ * fragment on that one hop.
+ */
+export const districtScenario = (irn: string): string => `/scenario?d=${irn}`;
 export const districtFinances = (irn: string): string => `/district/${irn}/finances`;
 export const districtTaxes = (irn: string): string => `/district/${irn}/taxes`;
 
@@ -28,11 +38,14 @@ export const scenarioDraft = (slug: string): string =>
 /**
  * The same levers, asked which districts they reach rather than by how much.
  *
- * A constant rather than a literal because three files name it — the bar, the scenario runner's
- * cross-link, and the page itself — and because the two runner views have to be able to hand each
- * other a reader's lever positions, which is a link built from this plus `location.search`.
+ * The runner's second view, so it lives under the runner: `/scenario/reach`. It was `/reach`, a
+ * place of its own in the bar, until the two were merged into one entry (#548); `public/_redirects`
+ * keeps the old address landing.
+ *
+ * A constant rather than a literal because the two runner views have to be able to hand each other
+ * a reader's lever positions, which is a link built from this plus `location.search`.
  */
-export const REACH = "/reach";
+export const REACH = "/scenario/reach";
 
 /**
  * The census of the modelled formula's bounds.
@@ -233,6 +246,8 @@ export const SECTIONS = {
     movedElsewhere: "moved-elsewhere",
     movedUnderneath: "moved-underneath",
     unknownDistrict: "unknown-district",
+    /* What a district's cards hold still, shown only when the runner is opened on one. */
+    not: "not",
     /* Written by `scripts/scenario.ts` rather than by the build, into a div the built page
        carries empty. Addressed on the same terms so the runtime half of this page and the
        server-rendered half do not diverge in what a reader can link to. */
@@ -246,7 +261,7 @@ export const SECTIONS = {
   },
 
   /**
-   * `/reach` — the same levers, asked the other question.
+   * `/scenario/reach` — the same levers, asked the other question.
    *
    * `/scenario` answers *how much* a lever moves; this answers *which districts it reaches*, and
    * the two are not the same question on a formula that pays `max(formula, floor)`. It is the

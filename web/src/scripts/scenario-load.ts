@@ -1,5 +1,5 @@
 /**
- * What the three scenario routes load first: the panel request, and the runner beside it.
+ * What the runner's two views load first: the panel request, and the runner beside it.
  *
  * # Why the runner is not imported here
  *
@@ -12,8 +12,9 @@
  * waits for the slower of the two rather than for their sum. This file carries nothing a browser
  * has to wait on — no formula, no chart — which is the whole of the reason it is separate.
  *
- * It does not keep Plot off `/reach` until a lever moves. That page draws its cloud at rest, and
- * draws it from the formula run in the browser, so the library is needed before anything is shown.
+ * It does not keep Plot off `/scenario/reach` until a lever moves. That view draws its cloud at
+ * rest, and draws it from the formula run in the browser, so the library is needed before anything
+ * is shown.
  */
 
 import { escapeHtml } from "../lib/format.ts";

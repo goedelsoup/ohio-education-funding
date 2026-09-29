@@ -274,7 +274,9 @@ test.describe("the chrome above the fold", () => {
 });
 
 test.describe("routes", () => {
-  test("each of a district's five views is its own address", async ({ page }) => {
+  test("each of a district's four views is its own address, and the fifth tab opens the runner on it", async ({
+    page,
+  }) => {
     // `/taxes` landed after the other four and was left out of this list, so the one nav state
     // nothing had ever asserted was the heaviest sibling's. The label is read off the rendered
     // nav rather than hard-coded twice, so a rename fails here rather than passing on a stale
@@ -284,12 +286,18 @@ test.describe("routes", () => {
       ["/outcome", "Outcome"],
       ["/finances", "Finances"],
       ["/taxes", "Property tax"],
-      ["/scenario", "Scenario"],
     ] as const) {
       await page.goto(`/district/${NORTHERN}${path}`);
       await expect(page.locator("h1")).toHaveText("Northern Local");
       await expect(page.locator(`.subnav a[aria-current="page"]`)).toHaveText(heading);
     }
+    // The scenario tab was `/district/[irn]/scenario`, a copy of the runner per district. It is
+    // the runner now, opened with the district chosen (#548).
+    await page.locator(".subnav a", { hasText: "Try a change" }).click();
+    await expect(page).toHaveURL(new RegExp(`/scenario\\?d=${NORTHERN}`));
+    await expect(page.locator("h1")).toHaveText("Try a change");
+    await expect(page.locator("#sc-district")).toHaveValue(NORTHERN);
+    await expect(page.locator(`.subnav a[aria-current="page"]`)).toHaveText("What changes");
   });
 
   test("the root is a front door, and the statewide panel is a place", async ({ page }) => {
@@ -430,16 +438,17 @@ test.describe("routes", () => {
     const hrefs = await page
       .locator("header.site nav a")
       .evaluateAll((nodes) => nodes.map((n) => (n as HTMLAnchorElement).getAttribute("href")!));
-    // Thirty-two across five groups. An exact count rather than a floor, so that dropping an
+    // Thirty-two across five groups, again. An exact count rather than a floor, so that dropping an
     // entry fails here and adding one is an acknowledged change — and so that a derivation which
     // quietly stops selecting anything cannot pass by returning an empty menu. It went from
     // thirty to thirty-one when `/legislation` joined the `Law` panel, to thirty-two when
     // `/reach` joined `Research` beside the scenario runner it splits the second question off,
     // and to thirty-three when `/bounds` joined the same panel — the census of the plan's own
     // edges, which is the only page here whose subject is the shape of the whole formula rather
-    // than a quantity it produces.
+    // than a quantity it produces. And back to thirty-two when `/reach` became the runner's second
+    // view (`/scenario/reach`), reached from a tab on the runner rather than from the bar (#548).
     // Which is the mechanism working: the count is changed on purpose by somebody who knew why.
-    expect(hrefs).toHaveLength(33);
+    expect(hrefs).toHaveLength(32);
     for (const href of hrefs) {
       await page.goto(href);
       await expect(page.locator("h1"), `${href} has no heading`).toBeVisible();

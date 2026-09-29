@@ -2,15 +2,16 @@ import { modelOf } from "../lib/policy.ts";
 /**
  * The scenario builder, in the browser.
  *
- * # Why these three routes still compute client-side when nothing else does
+ * # Why these two routes still compute client-side when nothing else does
  *
  * Every other page on this site is baked: its figures are written into the HTML at build time and
- * no formula runs in the browser. These three cannot be. A lever has a continuum of positions, and
+ * no formula runs in the browser. These two cannot be. A lever has a continuum of positions, and
  * a static page per position is not a page — so the formula runs here, over the whole
  * 609-district panel, on every slider tick.
  *
- * The three are `/scenario`, `/district/[irn]/scenario` and `/reach`, and which one this is comes
- * off the page rather than out of the URL — see `irn` and `view`.
+ * The two are the runner's views, `/scenario` and `/scenario/reach`, and which one this is comes
+ * off the page rather than out of the URL — see `view`. One district is a setting of the first
+ * rather than a route of its own — see `chosen`.
  *
  * # The verification gate, which is why that is allowed
  *
@@ -32,6 +33,7 @@ import { modelOf } from "../lib/policy.ts";
 
 import { escapeHtml } from "../lib/format.ts";
 import {
+  chosenDistrict,
   clampLevers,
   defaultLevers,
   draftLevers,
@@ -55,6 +57,7 @@ import {
 } from "../lib/reach.ts";
 import { isForecastVerified, isVerified, verify, type Verification } from "../lib/verify.ts";
 import { heading } from "../lib/section.ts";
+import { district as districtHome } from "../lib/routes.ts";
 import { saying, tileSummary } from "../lib/status.ts";
 
 const $ = <T extends HTMLElement>(selector: string): T | null =>
@@ -71,22 +74,33 @@ const changed = $("#changed");
 const say = changed ? saying(changed) : () => {};
 
 const root = $("#scenario-root");
-/** Present on the district route, absent on the other two. */
-const irn = root?.dataset.irn;
 
 /**
- * Which of the three views this script is driving, from the page that carries it.
+ * Which of the two views this script is driving, from the page that carries it.
  *
- * `/scenario` is the default and names nothing. `/reach` sets `data-view="reach"` and renders the
+ * `/scenario` is the default and names nothing. `/scenario/reach` sets `data-view="reach"` and renders the
  * cloud alone: it asks which districts a lever reaches rather than by how much, which is a
  * different question on a formula that pays the larger of two numbers, and it is the one view
  * that still says something at rest — the guarantee wall is there before any lever moves.
  *
- * A page attribute rather than a `location.pathname` test, for the reason `irn` is one: this file
- * is the runner for whatever page imports it, and a runner that reads the URL to find out which
- * page it is on cannot be put on a third without being edited.
+ * A page attribute rather than a `location.pathname` test: this file is the runner for whatever
+ * page imports it, and a runner that reads the URL to find out which page it is on cannot be put on
+ * a third without being edited.
  */
 const view = root?.dataset.view ?? "";
+
+/**
+ * The district the *what changes* view answers for, or `""` for the whole state.
+ *
+ * Read off `#sc-district` on every tick rather than kept, for the reason `readView` reads the
+ * DOM: the control is the state, and a copy kept anywhere else is overwritten or goes stale the
+ * first time a reader changes it. Seeded from the URL once, in `boot` — see `chosenDistrict`.
+ *
+ * This was `/district/[irn]/scenario`, a route per district carrying `data-irn`. It is a choice
+ * now, so a reader can move from one district to another, or to the state, without leaving the
+ * levers they set.
+ */
+const chosen = (): string => (view === "reach" ? "" : ($<HTMLSelectElement>("#sc-district")?.value ?? ""));
 
 /**
  * The draft this page was opened from, if any.
@@ -194,9 +208,13 @@ function toQuery(): void {
     sta: String(l.supplementalTopRate),
     tf: String(l.transportationFloor),
   });
-  // Only where a horizon can be set. The district route has no such control, draws no band, and
-  // reads nothing from `h` — so every URL it minted carried `h=2032` for a reader to copy and send.
+  // Only where a horizon can be set. The reach view has no such control, draws no band, and reads
+  // nothing from `h` — so a URL it minted with one would carry a lever nobody could see.
   if ($("#lv-horizon")) params.set("h", String(l.horizon));
+  // The district this view answers for, only where there is one. Same key the reach view lights
+  // districts with, so crossing tabs carries it — see `chosenDistrict`.
+  const district = chosen();
+  if (district) params.set("d", district);
   /*
    * The view, only where there is one to read.
    *
@@ -265,9 +283,9 @@ function toQuery(): void {
  * `link.pathname` rather than the stored href, so this is idempotent — a pathname carries no
  * query, and re-running it replaces the search rather than appending a second one.
  *
- * The horizon does not cross. `/reach` draws no band and carries no horizon control, so `toQuery`
- * omits `h` there exactly as it does on the district route; a reader who had set a forecast year
- * gets it back by setting it again. The alternative is carrying a lever the page cannot show.
+ * The horizon does not survive a round trip. `/scenario/reach` draws no band and carries no horizon
+ * control, so `toQuery` omits `h` there; a reader who had set a forecast year gets it back by
+ * setting it again. The alternative is carrying a lever the page cannot show.
  */
 function carryLevers(): void {
   for (const link of document.querySelectorAll<HTMLAnchorElement>("a[data-carry-levers]")) {
@@ -565,16 +583,29 @@ function render(): void {
    * first version of this wrote the banner only in the statewide branch.
    */
   const banner = draftSlug ? renderDraft(state.panel, state.levers, draftSlug) : "";
+  const irn = chosen();
+  // What a district's cards hold still, which the statewide cards say elsewhere. See `scenario.astro`.
+  const not = $("#not");
+  if (not) not.hidden = irn === "";
+  const home = not?.querySelector<HTMLAnchorElement>("a[data-district-home]");
+  if (home) home.href = irn ? districtHome(irn) : "/districts";
   if (view === "reach") {
     // No projection container on this page and no detail half: the forecast is a different claim
     // and the cloud is the whole of this one.
     if (out) out.innerHTML = banner + renderReach(state.panel, state.levers, state.view, chip);
     if (detail) detail.innerHTML = "";
   } else if (irn) {
-    // One district, one container. There is no forecast on that route — the band is drawn once,
-    // statewide, where it is the subject — so there is nothing for a detail half to sit below.
+    /*
+     * One district: its cards lead, in place of the statewide tiles, and the statewide rest stays.
+     *
+     * In place of rather than beside, because the district cards already carry the statewide count
+     * — "And to everyone else" is the card that exists to — and both halves are titled `outcome`
+     * and `current-law`, which one document cannot hold twice. The forecast and the distribution
+     * below are statewide and say so, and they are what the district route could not show: it had
+     * no band and linked away for the distribution.
+     */
     if (out) out.innerHTML = banner + renderDistrictScenario(state.panel, state.levers, irn, chip);
-    if (detail) detail.innerHTML = "";
+    if (detail) detail.innerHTML = renderScenario(state.panel, state.levers, chip).detail;
   } else {
     const rendered = renderScenario(state.panel, state.levers, chip);
     if (out) out.innerHTML = banner + rendered.summary;
@@ -719,6 +750,18 @@ export function boot(panel: Panel): void {
     view: viewFromQuery(new URLSearchParams(location.search)),
   };
 
+  /*
+   * The district the runner was opened on, into the control `chosen` reads it back out of.
+   *
+   * Only an IRN the picker offers: the options are the feed's districts, so an IRN it does not
+   * carry leaves the picker on the whole state rather than rendering a card for nobody.
+   */
+  const picker = $<HTMLSelectElement>("#sc-district");
+  if (picker) {
+    const opened = chosenDistrict(new URLSearchParams(location.search), location.hash);
+    if (opened && picker.querySelector(`option[value="${opened}"]`)) picker.value = opened;
+  }
+
   const status = $("#scenario-status");
   if (!isVerified(verification)) {
     reportFailure(verification);
@@ -835,6 +878,7 @@ export function boot(panel: Panel): void {
 
   for (const control of document.querySelectorAll(
     "#scenario-controls input, #scenario-controls select, #reach-view input, #reach-view select, " +
+      "#sc-district, " +
       '#reach-scope input[name="co"], #reach-scope input[name="mode"]',
   )) {
     control.addEventListener("input", () => update());
@@ -914,6 +958,7 @@ export function boot(panel: Panel): void {
   /* Enter in the scope form must not navigate. Same rule as the district index's filters, and the
      same reason it cannot be an inline handler: `script-src 'self'` blocks one. */
   $<HTMLFormElement>("#reach-scope")?.addEventListener("submit", (event) => event.preventDefault());
+  $<HTMLFormElement>("#scenario-scope")?.addEventListener("submit", (event) => event.preventDefault());
 
   /*
    * The presets, which are lever positions with names.
