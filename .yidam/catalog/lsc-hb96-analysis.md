@@ -3,7 +3,16 @@ used-by:
   - ../corpus/draft-legislation/hb-96-with-refreshed-inputs.yml
   - ../corpus/formula-component/fsfp-community-school-equity-supplement.yml
   - ../corpus/formula-component/fsfp-jvsd-state-share-of-base-cost.yml
+  - ../corpus/legislation/hb-1-2009.yml
+  - ../corpus/legislation/hb-110-2021.yml
+  - ../corpus/legislation/hb-119-2007.yml
+  - ../corpus/legislation/hb-153-2011.yml
+  - ../corpus/legislation/hb-166-2019.yml
   - ../corpus/legislation/hb-583-2022.yml
+  - ../corpus/legislation/hb-64-2015.yml
+  - ../corpus/legislation/hb-66-2005.yml
+  - ../corpus/legislation/hb-94-2001.yml
+  - ../corpus/legislation/hb-95-2003.yml
   - ../corpus/legislation/hb-96-2025.yml
   - ../corpus/parameter/enrolment-supplement-amounts.yml
   - ../corpus/parameter/fsfp-phase-in-percentage.yml
