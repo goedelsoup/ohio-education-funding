@@ -21,27 +21,34 @@ description: |
 properties:
   - name: name
     type: string
+    required: true
     description: What the intervention is called in statute or in the state plan
   - name: authority
     type: string
+    required: true
     description: Revised Code section, federal provision, or plan section that establishes it
   - name: trigger
     type: text
+    required: true
     prose: true
     description: The condition that begins it, stated as the measure and the threshold
   - name: unit
     type: string
+    required: true
     description: education-agency | school — what the intervention attaches to
   - name: powers
     type: text
+    required: true
     prose: true
     description: What the intervention may do, and which of those powers are fiscal
   - name: exit
     type: text
+    required: true
     prose: true
     description: The condition that ends it, and who determines that it has been met
   - name: fiscal_effect
     type: text
+    required: true
     prose: true
     description: >-
       What it does to money — who controls the budget, which funds it gates, what it costs and

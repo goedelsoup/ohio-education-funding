@@ -1,0 +1,116 @@
+id: every-property-says-whether-it-is-required
+summary: >-
+  The eighteen ontology classes declared 120 properties and not one said whether an instance had
+  to carry it, so every property was optional by omission and `missing-property` reported 46
+  findings nobody had decided about. Each declaration now says: 113 required, 7 not. The rule is
+  that an instance without a required property is incomplete, and an absence the corpus has looked
+  for is written as a value — "Not applicable." — rather than left out. The 15 required omissions
+  no committed source answers are baselined, so they gate for the next node and not for these.
+context: |
+  The edge contract was defended by a measurement. `edge_policy: characteristic` stands on a
+  generated census in the corpus README, written after seventeen hand-copied figures went stale
+  under it. The property contract had nothing: across the 18 `.ont.yml` files the key `required`
+  did not appear once (#507). yidam gates `missing-property` on `required: true` and only reports
+  it otherwise, so a corpus that never says `required` can omit anything and stay green.
+
+  Measured at yidam 0.16.0 before this change: 110 of the 120 properties are carried by every
+  instance of their class. Ten are not, 48 omissions between them — the 46 #507 counted, plus two
+  `function_tex` omissions that arrived with new components after its pin.
+
+  **The fully carried properties include every one worded as conditional.** `metric.calculator`
+  says "if implemented", `legislation.vetoes` "where relevant", `actor.publishes` "if any". All
+  are carried by every instance, and the absences are written as answers: "Published, not
+  computed", "None recorded.", "Not applicable.", "Not a standalone crate", "No line of its own".
+  `draft-legislation.sponsors` had already stated the practice — "None." is an answer rather than
+  an empty field. So "if any" in a description has never meant "may be omitted" here; it meant
+  "may be empty, and say so".
+
+  **Two of #507's rows were misread.** It described `education-agency.established` (0 of 7) and
+  `school.grades` (0 of 3) as declarations the corpus never adopted. Six of the seven agencies and
+  all three schools record the missing value under `unfilled:`, with where it lives — the
+  department's district profile, the building's directory entry — and the seventh records its
+  opening date the same way under a different noun. The corpus adopted both properties and could
+  not answer them; `missing-property` does not read `unfilled:`, so the two states looked the same.
+  Neither is derivable from what is committed: the report card fixtures, and the building details
+  workbook in the source cache, carry no grade span.
+
+  **And one description had gone stale in the way the edge census had.** `function_tex` named its
+  two deliberate exceptions, `charge-off-local-share` and `fsfp-formula-transition-supplement`.
+  Both were converted to LaTeX on 11 September 2026. The two components without one now are
+  neither of them, and each has what the description says earns the notation — a piecewise rule
+  in one, a floored fraction in the other.
+decision: |
+  **Every property declaration carries `required:`, and the web schema refuses one that does
+  not.** `OntologyPropertySchema` requires the key, with no default — upstream's default of false
+  is right for a corpus that never had the chance to say, and wrong for one that has said. The
+  reasoning is `edge_policy`'s, one field over: a class that has not decided should not pass as
+  though it had.
+
+  **`required: true` means an instance without the property is incomplete.** 113 declarations:
+  the 110 every instance carries, and three that are wanted and not yet held —
+  `metric.series`, `education-agency.established`, `school.grades`. Their 15 omissions are in
+  `.yidam/lint-baseline.yml`, blessed rather than hand-written, so a new metric, agency or school
+  node without the property fails the gate, and filling one of the 15 fails it too until the
+  baseline is re-blessed. That second failure is the ratchet working: the baseline must shrink
+  with the debt.
+
+  `metric.series` is required on the argument #507 made: a metric whose values over the held
+  data are not written down is a measure the corpus names and has not taken. Its description is
+  rewritten to what the four instances that carry it hold — the figures, over which years and
+  agencies — rather than "the published series", which none of them is.
+
+  **`required: false` means an instance may be quiet, and its description says when.** Seven:
+
+  - `formula-component.function_tex` — the notation earns its place on a fraction, a piecewise
+    rule, an exponent or an indexed family, and not on a list of products. Which components are
+    which is no longer named in the description, since the names are what went stale.
+  - `parameter.written_as` — a parameter every formula writes as a symbol has no phrase to list.
+  - `parameter.simulation_key` — a parameter the calculator does not bind as a scalar has no key,
+    and one pointing at nothing would read as provenance.
+  - `litigation.procedural_history` — a case decided once has no path to record.
+  - `funding-regime.boundary_note` — a regime whose years are not in dispute has nothing to note.
+  - `legislation.effective_note` — a constitutional provision or a single-date act has one date.
+    On a biennial budget act, its absence is a gap the class cannot express.
+  - `legislation.accountability_effect` — an act that did nothing to the accountability regime has
+    nothing to record. An absence does not say whether the act did nothing or was never read for
+    it.
+
+  **The census is generated.** `edfund-connect property-contract` writes a block into the corpus
+  README beside the relationship vocabulary: declarations by what `required:` says, omissions
+  split the same way, and every property some instance omits. A test holds its required-omission
+  count equal to the number of `missing-property` entries yidam blessed, so the two readers of the
+  same files cannot drift apart unseen.
+consequences: |
+  **`yidam lint` passes with 15 baselined violations where it passed with none.** The baseline
+  was empty because nothing could gate, not because nothing was missing. The 33 omissions of
+  optional properties are still reported under `--warn`; they are now reported against a
+  declaration that says they are allowed, which upstream cannot yet tell from one that says
+  nothing (goedelsoup/yidam#1078).
+
+  **A new property costs one decision more.** Adding a declaration without `required:` fails
+  `web/tests/unit/schema.spec.ts`. Adding one with `required: true` to a class whose instances do
+  not carry it fails `yidam lint` at once, which is the point: the declaration and the corpus
+  have to agree on the day the property is added.
+
+  **Two gaps are left open and named.** `legislation.effective_note` on the budget acts that omit
+  it, and `accountability_effect` on the acts never read for it, are optional because the class
+  cannot say "required on a budget act" — not because they are complete.
+
+  **Ten `string` descriptions spell a closed value set in prose**, and three have drifted off it
+  (`metric.unit` once, `parameter.unit` twice, `program.mechanism` six times). #507 asked only
+  that this pass record them. yidam 0.16.0 has since given a class `values:` to declare the set
+  (goedelsoup/yidam#1052), and adopting it is a separate change with its own schema edit.
+alternatives: |
+  **Required only what #507 flagged.** Mark `metric.series` required and leave the rest silent.
+  Declined because silence is the state the issue was about: 110 properties every instance
+  carries would still be optional by omission, and the next node could leave out an agency's IRN
+  without a finding at Error.
+
+  **Drop `established` and `grades`.** The issue offered it: a property no instance carries
+  describes an intention, not the graph. Declined because the intention is recorded — nine
+  `unfilled:` entries say where each value lives — and dropping the declaration would leave those
+  entries naming a fact nothing asks for.
+
+  **Declare the unheld three `required: false` and keep the baseline empty.** An empty baseline
+  reads well. It would also be a declaration saying an agency is complete without its charter
+  date when the agencies themselves say it is missing.

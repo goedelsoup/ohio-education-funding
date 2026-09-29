@@ -288,6 +288,22 @@ export const OntologyPropertySchema = z
     name: z.string().min(1),
     type: z.string().min(1),
     /**
+     * Whether an instance without this property is incomplete (`true`) or merely quiet (`false`).
+     * yidam gates `missing-property` on `true` from 0.16.0 and only reports it on `false`.
+     *
+     * **Required here, with no default, where upstream defaults it to false.** Upstream's default
+     * is right for upstream: a corpus written before the field existed never had the chance to
+     * say, and gating it on a declaration nobody made would be wrong. This corpus has since
+     * decided every property it declares, and a declaration that omits the key would put it back
+     * in the state #507 found — optional by omission rather than by decision, with nothing to
+     * tell the two apart. The same reasoning as `edge_policy` below, one field over.
+     *
+     * The census of what is required is generated into `.yidam/corpus/README.md` under
+     * "property contract"; the rule is in
+     * [`every-property-says-whether-it-is-required`](../../../../.yidam/decisions/every-property-says-whether-it-is-required.yml).
+     */
+    required: z.boolean(),
+    /**
      * Whether this property's value is prose the node is saying, rather than a value it is
      * carrying. `sensitivity` and `caveats` are paragraphs; `irn` and `simulation_key` are not.
      *

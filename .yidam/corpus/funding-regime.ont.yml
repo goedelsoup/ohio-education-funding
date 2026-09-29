@@ -13,24 +13,33 @@ description: |
 properties:
   - name: name
     type: string
+    required: true
     description: The regime's common name, as used in legislative and department documents
   - name: effective_from
     type: string
+    required: true
     description: First fiscal period in which the regime governed distribution
   - name: effective_to
     type: string
+    required: true
     description: Last fiscal period, or "current" if still in effect
   - name: distribution_logic
     type: text
+    required: true
     prose: true
     description: How the regime decides what each agency receives, in two or three sentences
   - name: status
     type: string
+    required: true
     description: current | superseded | partially-implemented | never-fully-funded
   - name: boundary_note
     type: text
+    required: false
     prose: true
-    description: Where this regime's boundary is contested or blurred — a successor that phased in over several years, or a period the department funded by freeze rather than by formula
+    description: >-
+      Where this regime's boundary is contested or blurred — a successor that phased in over
+      several years, or a period the department funded by freeze rather than by formula. Not
+      required: a regime whose first and last years are not in dispute has nothing to note.
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
 # understand what it connects to. It is not the permitted set. A large share of the corpus's edges
 # use a relationship no class declares, and almost all of those are single-use precise verbs

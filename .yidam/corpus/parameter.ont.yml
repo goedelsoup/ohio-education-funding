@@ -14,12 +14,15 @@ description: |
 properties:
   - name: name
     type: string
+    required: true
     description: The parameter's name in statute or department documentation
   - name: unit
     type: string
+    required: true
     description: dollars-per-pupil | ratio | mills | percent | count
   - name: kind
     type: text
+    required: true
     prose: true
     description: >-
       What sort of thing sets this value, and therefore what would have to happen for it to
@@ -35,16 +38,23 @@ properties:
       "not in law" are different claims that this taxonomy has already conflated once.
   - name: series
     type: text
+    required: true
     prose: true
     description: Value per fiscal period, with the enactment that set each value
   - name: statutory_basis
     type: string
+    required: true
     description: Ohio Revised Code section that fixes the value or its method
   - name: simulation_key
     type: string
-    description: Identifier the crates/ foundation calculator uses to bind this parameter
+    required: false
+    description: >-
+      Identifier the crates/ foundation calculator uses to bind this parameter. Not required: a
+      parameter the calculator does not bind as a scalar — one held as a per-district column —
+      has no key, and a key pointing at nothing would read as provenance it does not have.
   - name: written_as
     type: text
+    required: false
     description: >-
       The phrases a formula writes this parameter as, one per line. A formula does not name a
       parameter the way this class does — it writes "statewide average base cost per pupil" or
@@ -55,8 +65,12 @@ properties:
       carries no hand-written link. A phrase counts only inside a formula whose component declares
       a `governed-by` edge to this parameter, which is what lets a generic word like "supplement"
       be an alias without linking every other component's supplements.
+
+      Not required: a parameter every formula writes as a symbol (`w_k`) has no phrase to list,
+      and rewording a formula to manufacture one would run the vocabulary backwards.
   - name: sensitivity
     type: text
+    required: true
     prose: true
     description: What moves when this parameter moves, and which agencies feel it most
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to

@@ -14,20 +14,25 @@ description: |
 properties:
   - name: name
     type: string
+    required: true
     description: Program name as it appears in statute and appropriation documents
   - name: mechanism
     type: string
+    required: true
     description: deduction | direct-appropriation | reimbursement | competitive-grant
   - name: eligibility
     type: text
+    required: true
     prose: true
     description: Who qualifies, and how eligibility has changed over time
   - name: amount
     type: text
+    required: true
     prose: true
     description: Per-recipient or per-project amount, by fiscal period
   - name: appropriation_line
     type: string
+    required: true
     description: Budget line item identifier
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
 # understand what it connects to. It is not the permitted set. A large share of the corpus's edges

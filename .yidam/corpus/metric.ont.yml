@@ -13,29 +13,41 @@ description: |
 properties:
   - name: name
     type: string
+    required: true
     description: The measure's name
   - name: unit
     type: string
+    required: true
     description: dollars | dollars-per-pupil | percent | mills | ratio | index
   - name: definition
     type: text
+    required: true
     prose: true
     description: The computation, stated as a formula over named inputs
   - name: inputs
     type: text
+    required: true
     prose: true
     description: The source series required, and where each comes from
   - name: caveats
     type: text
+    required: true
     prose: true
     description: Known ways this measure misleads, and what it excludes
   - name: calculator
     type: string
+    required: true
     description: Name of the crates/ calculator implementing it, if implemented
   - name: series
     type: text
+    required: true
     prose: true
-    description: The published series this metric is computed from, and the years it covers
+    description: >-
+      The values this metric takes over what the corpus holds — which years, over which agencies,
+      and the figures — with the published series they are computed from. Required: a metric
+      without one is a measure the corpus names and has not taken, and that absence is recorded
+      in `.yidam/lint-baseline.yml`, where it gates, rather than left to silence, where it does
+      not.
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
 # understand what it connects to. It is not the permitted set. A large share of the corpus's edges
 # use a relationship no class declares, and almost all of those are single-use precise verbs

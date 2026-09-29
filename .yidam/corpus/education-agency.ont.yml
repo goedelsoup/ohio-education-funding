@@ -34,25 +34,35 @@ description: |
 properties:
   - name: irn
     type: string
+    required: true
     description: Information Retrieval Number; the stable statewide identifier for the agency
   - name: agency_type
     type: string
+    required: true
     description: city | local | exempted-village | joint-vocational | community | stem
   - name: county
     type: string
+    required: true
     description: Primary county of the agency's territory
   - name: typology
     type: string
+    required: true
     description: Department typology grouping (rural, small town, suburban, urban) used for peer comparison
   - name: established
     type: date
-    description: Date the agency was chartered or organized
+    required: true
+    description: >-
+      Date the agency was chartered or organized. Required, and not yet held by any instance: the
+      department's district profile carries it and nobody has read it across. The omissions are
+      baselined, and the agencies record it under `unfilled:`.
   - name: roles
     type: text
+    required: true
     prose: true
     description: Contingent roles the agency plays or has played, each with the fiscal periods it applied
   - name: series_path
     type: string
+    required: true
     description: Path under crates/ to this agency's committed per-fiscal-year numeric series
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
 # understand what it connects to. It is not the permitted set. A large share of the corpus's edges

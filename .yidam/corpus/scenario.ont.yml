@@ -13,31 +13,39 @@ description: |
 properties:
   - name: name
     type: string
+    required: true
     description: Short name for the counterfactual
   - name: question
     type: text
+    required: true
     prose: true
     description: The policy question this scenario is constructed to answer
   - name: perturbations
     type: text
+    required: true
     prose: true
     description: Each parameter altered, its baseline value, and its scenario value
   - name: input_projections
     type: text
+    required: true
     prose: true
     description: Which input series were projected rather than observed, and by what method
   - name: horizon
     type: string
+    required: true
     description: Fiscal periods covered by the run
   - name: results_path
     type: string
+    required: true
     description: Path under crates/ to the committed per-agency delta output
   - name: confidence
     type: text
+    required: true
     prose: true
     description: What the result is sensitive to, and where it should not be trusted
   - name: results
     type: text
+    required: true
     prose: true
     description: The figures the run produced, as a table, with the units and the panel they are over
 # `edges:` below names the relationships this class is *defined by* — the ones a reader needs to
