@@ -426,6 +426,18 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
                academic grounds.",
     },
     Source {
+        key: "rc-3302-103",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3302.103",
+        filename: "rc-3302-103.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3302.103. The improvement-plan exit H.B. 110 gave the three districts under an \
+               academic distress commission in 2021 — a second way out beside R.C. 3302.10(N), \
+               judged on benchmarks rather than the overall rating.",
+    },
+    Source {
         key: "rc-3302-12",
         title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-3302.12",
