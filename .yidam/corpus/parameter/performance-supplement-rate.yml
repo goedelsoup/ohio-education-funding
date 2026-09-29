@@ -1,14 +1,16 @@
 class: parameter
 label: Performance Supplement Rate
 summary: >-
-  $13 a pupil per qualifying rating — the only place Ohio's funding formula pays on a measured
-  outcome. It is in no section of the Revised Code, and per pupil it runs 2.6 times higher in
-  the least-poor fifth of districts than in the poorest.
+  $13 a pupil per star — the only place Ohio's funding formula pays on a measured outcome. It is
+  in no section of the Revised Code, and per pupil it runs 2.6 times higher in the least-poor
+  fifth of districts than in the poorest.
 description: |
-  The performance supplement pays `$13 × enrolled ADM` for each of three routes a district can
-  qualify on: an overall star rating at or above 3.5, a progress rating at or above 3.0, and a
-  third route the department computes on its own sheet. $55.7m statewide to 427 of 609
-  districts. [verified]
+  The performance supplement pays `$13 × stars × enrolled ADM`, where the stars are the greater
+  of the district's overall rating and its progress component rating. Three routes decide
+  whether a district is paid and none of them sets the amount: an overall rating of four stars
+  or higher, a progress rating of three or higher, or a progress rating higher than the year
+  before. $55.7m statewide to 427 of 609 districts, $32.50 to $65.00 a pupil. [verified]
+  (`crates/project/fixtures/enacted-school-funding.txt`)
 
   **It is the only component of Ohio's *current* funding formula that pays on a measured
   outcome.** Everything else prices an input — pupils, categories, miles, poverty — or holds a
@@ -67,6 +69,35 @@ findings: |
   Whether that is the intended design — a reward, which by construction goes to those who
   qualify — or an unexamined consequence, is not established by anything this corpus holds.
   [open]
+revisions:
+  - was: |
+      "The performance supplement pays `$13 × enrolled ADM` for each of three routes a district
+      can qualify on: an overall star rating at or above 3.5, a progress rating at or above 3.0,
+      and a third route the department computes on its own sheet." The summary called it "$13 a
+      pupil per qualifying rating", and the series table read "$13 per pupil, per qualifying
+      route" and "3.5 overall star rating threshold".
+    now: |
+      The routes decide eligibility and not the amount. The amount is `$13 × stars × enrolled
+      ADM`, where the stars are the greater of the overall and progress ratings, so it runs from
+      $32.50 to $65.00 a pupil. The overall route needs four stars, not 3.5. The department's
+      sheet writes it `> 3.5`, which on a half-star scale is the same set. "At or above 3.5"
+      would admit a 3.5-star district the act excludes.
+    found_by: |
+      Reading LSC's final analysis of H.B. 96, committed at
+      `crates/project/fixtures/enacted-school-funding.txt`, against this node. Section 265.239
+      pays "$13 multiplied by the greater of the number of 'stars'" and qualifies at "four 'stars'
+      or higher". `formula-component/fsfp-performance-supplement` and
+      `project::panel::PerformanceSupplement` already had it right, and
+      `crates/project/tests/what_the_act_says_and_the_code_does_not.rs` pins `> 3.5` to `>= 4`.
+    reach: |
+      No figure moves. The per-fifth means, the 2.56 ratio and the qualification shares are
+      computed from the department's own `[O]` amount and `Q4` eligibility columns, and never
+      from a per-route rebuild, so the misreading stayed in the prose. The same reading was in
+      `accountability-regime/ohio-report-card`'s table ("$13 a pupil, flat") and in two crate doc
+      comments ("per qualifying rating"), and all of them are
+      corrected with this one. The rustdoc on `PerformanceSupplement` also still carried the
+      pre-binding table ($54.74 … $23.31, 2.3 times), which the component node had already
+      recorded as superseded.
 properties:
   name: Performance supplement rate
   unit: dollars-per-pupil
@@ -87,9 +118,9 @@ properties:
   series: |
     FY2027, from the department's calculator:
 
-      $13     per pupil, per qualifying route                    line [O]
-      3.5     overall star rating threshold
-      3.0     progress rating threshold
+      $13     per pupil, per star of the greater rating          line [O]
+      4       overall stars to qualify (the sheet's "> 3.5")
+      3       progress stars to qualify
 
     Scale, from the committed panel. [verified] (crates/project)
       statewide                                  $55,676,980.25

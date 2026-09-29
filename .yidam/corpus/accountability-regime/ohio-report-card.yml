@@ -128,7 +128,7 @@ findings: |
       FY2008-09   H.B. 119   Closing the Achievement Gap                  on failure   0.15% of the formula amount
       FY2016-19   H.B.  64   graduation and third grade reading bonuses   on success   7.5%, times the state share index
       FY2020-21   H.B. 166   the same bonuses, community and STEM only    on success   7.5%, no state share index
-      FY2026-27   H.B.  96   performance supplement                       on success   $13 a pupil, flat
+      FY2026-27   H.B.  96   performance supplement                       on success   $13 x stars, no state share index
 
   5 of the 6 are formula components; the first two rows reach a district's money without passing
   through the formula at all. [verified]
@@ -137,7 +137,7 @@ findings: |
   where more buildings were rated badly, and only to districts whose poverty index was 1.0 or
   above — thirty-one qualified. The bonuses paid more where results were better, at fifty times
   the rate, and multiplied by the state share index, which makes a payment larger in a poorer
-  district. The supplement now in force pays on results and multiplies by nothing.
+  district. The supplement now in force pays on results and multiplies by no wealth term at all.
   [verified] (crates/project, `rating_payments`, pinned by test)
 
   **The un-equalised form is the one that survived.** H.B. 166's freeze held every district and
@@ -223,6 +223,21 @@ properties:
     In its current form from the 2022-23 report cards, when star ratings replaced letter grades.
     Ohio has published report cards in some form since well before that; the earlier eras are not
     modelled here.
+revisions:
+  - was: |
+      The rating-payments table gave the FY2026-27 performance supplement's rate as "$13 a pupil,
+      flat", and the paragraph under it said the supplement "multiplies by nothing".
+    now: |
+      $13 a pupil times the greater of the overall and progress star ratings, so $32.50 to $65.00
+      a pupil. It is flat only in the sense the table is about: no state share index, so no wealth
+      term. The stars are a multiplier.
+    found_by: |
+      Section 265.239 of H.B. 96, as LSC's final analysis gives it at
+      `crates/project/fixtures/enacted-school-funding.txt`, read against
+      `parameter/performance-supplement-rate`, which had the same per-route misreading.
+    reach: |
+      Corrected together with the parameter node and two crate doc comments. The table's "no
+      section of the Revised Code" framing is unaffected, because 265.239 is uncodified.
 unfilled:
   - field: the components other than performance index and progress
     why: Early literacy, graduation and chronic absenteeism are named in the section and not modelled here.

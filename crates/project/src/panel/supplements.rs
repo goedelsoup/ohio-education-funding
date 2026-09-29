@@ -31,9 +31,9 @@ use edfund_core::{Adm, Dollars};
 ///
 /// # It runs the opposite way to the rest of the formula
 ///
-/// Sorted by economically disadvantaged share, mean supplement per pupil runs **$54.74, $43.24,
-/// $36.21, $30.03, $23.31** from the least-poor quintile to the poorest, and the share of
-/// districts qualifying runs 91% to 49%. The least-poor districts receive **2.3 times** per pupil
+/// Sorted by economically disadvantaged share, mean supplement per pupil runs **$55.92, $43.51,
+/// $35.62, $30.62, $21.84** from the least-poor quintile to the poorest, and the share of
+/// districts qualifying runs 94% to 47%. The least-poor districts receive **2.56 times** per pupil
 /// what the poorest do.
 ///
 /// That is worth stating precisely rather than as an accusation. Ohio's attainment measures track

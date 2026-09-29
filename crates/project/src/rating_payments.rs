@@ -52,7 +52,7 @@
 //! the un-equalised form is the one that survived the freeze — and the one Ohio readopted.
 //!
 //! **The supplement now in force pays on success and equalises nothing.** H.B. 96's performance
-//! supplement is $13 per pupil per qualifying rating, flat at any valuation. It is outside the
+//! supplement is $13 per pupil per star, flat at any valuation. It is outside the
 //! greenbook window and is recorded at `parameter/performance-supplement-rate`, which measures the
 //! consequence: per pupil it runs 2.56 times higher in the least-poor fifth of districts than in
 //! the poorest.
