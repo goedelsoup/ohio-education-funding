@@ -784,35 +784,52 @@ h3 {
  * The chip is pinned to the far end rather than won there by `space-between`.
  *
  * With two items in the row — a title and a chip — those are the same layout. They stop being the
- * same the moment a heading carries three, which every heading now does: the section anchor is a
- * flex item too, and `space-between` on three items spreads the *title* into the middle of the
- * card. `margin-left: auto` says what was always meant, which is that the chip goes to the end and
- * everything else stays where it started.
+ * same the moment a heading carries three, which every heading did while the section anchor was a
+ * flex item of its own, and `space-between` on three items spreads the *title* into the middle of
+ * the card. `margin-left: auto` says what was always meant, which is that the chip goes to the end
+ * and everything else stays where it started. (The anchor now travels inside `.heading-text`.)
  */
 .card > h2 > .year-chip-wrap { margin-left: auto; }
 
 /*
  * The address of a section, as something a reader can see and click.
  *
- * Muted, small, and permanently visible. The convention elsewhere is to reveal this on hover,
- * which is exactly what the `.year-chip` note below objects to about `title`: a hover-only
- * affordance does not exist on a touch screen and does not exist for a keyboard reader until
- * focus lands on it by accident. This stylesheet already carries one permanently visible muted
- * annotation on every heading, and the second costs the design nothing the first did not.
+ * Muted and small, and visible on every device that has no hover. #549 hides it until the heading
+ * is hovered or the link is focused, but only under `(hover: hover) and (pointer: fine)` — a
+ * mouse. A touch screen matches neither half of that query and keeps the permanent `#`, because a
+ * hover-only affordance does not exist there; `section.ts` states the whole argument.
  *
- * `flex: none` so it never absorbs the row's slack, and it darkens rather than underlines on
- * hover — an underline here reads as a mis-set heading rather than as a link.
+ * `opacity` rather than `display` or `visibility`, which would take the link out of the tab order:
+ * a keyboard reader reaches every one of these with nothing running, and it shows on focus.
+ *
+ * It darkens rather than underlines on hover — an underline here reads as a mis-set heading rather
+ * than as a link.
  */
 .section-anchor {
-  flex: none;
   color: var(--text-muted);
   font-weight: var(--weight-regular);
   text-decoration: none;
-  transition: color .12s ease;
+  transition: color .12s ease, opacity .12s ease;
 }
 .section-anchor:hover { color: var(--text-primary); }
+@media (hover: hover) and (pointer: fine) {
+  .section-anchor { opacity: 0; }
+  :is(h1, h2, h3, h4):hover .section-anchor,
+  :target > h2 .section-anchor,
+  .section-anchor:focus-visible { opacity: 1; }
+}
 /*
- * The colour fade, off.
+ * The title and its address, one flex item in a card heading's row.
+ *
+ * `moveAnchors` in `semantics.ts` wraps them so the `#` wraps with the title's last word instead
+ * of as a flex item of its own, and puts the space before it inside `.heading-tail` so that break
+ * opportunity is gone too. `min-width: 0` lets the item shrink below its longest word's run in the
+ * row, which a flex item otherwise refuses to do.
+ */
+.heading-text { min-width: 0; }
+.heading-tail { white-space: nowrap; }
+/*
+ * The fades, off.
  *
  * `.skip`, `.year-chip-def` and `.term-def` each carry this and this one did not, which is the
  * whole reason `stylesheet.spec.ts` now derives the list from the stylesheet instead of trusting
