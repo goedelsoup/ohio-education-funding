@@ -95,7 +95,7 @@ config_roots = ["crates", "web"]
 
 [tools]
 # <!-- YIDAM:TOOLS --> written by yidam-vendor-update from .yidam.toml — do not edit
-"github:goedelsoup/yidam" = { version = "0.16.0", version_prefix = "cli/v" }
+"github:goedelsoup/yidam" = { version = "0.17.0", version_prefix = "cli/v" }
 # <!-- /YIDAM:TOOLS -->
 # The same number as `crates/rust-toolchain.toml`, which is what the CI `crates` job compiles
 # with. It cannot be derived from that file: mise exports `RUSTUP_TOOLCHAIN` for the version named

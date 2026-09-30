@@ -41,6 +41,15 @@ description = "Refuses. `.yidam/schemas/` is this repository's — use `pnpm --d
 # and 21 extra files. Three CLI majors have not moved it, so the next upgrade
 # needs no re-measurement either; this task is the standing answer.
 #
+# 0.17.0 moved the other half (yidam#1057). `yidam schema` now marks what it
+# writes and refuses, before writing anything, a target that carries no marker —
+# and neither of ours does, so a bare `yidam schema` leaves the directory alone.
+# Measured on the re-vendor to v0.10.0: it refused both files and the tree stayed
+# clean. What it still does not refuse is `yidam schema --force`, which is what
+# its own refusal message and the 0.17.0 upgrade notes tell a repository to run.
+# Here that is exactly the damage described above, so this task stays: it is now
+# the half that stops someone following upstream's instruction.
+#
 # `web/tests/unit/schema.spec.ts` catches the damage after the fact — it compares
 # both documents whole, prose fields included, and asserts the directory holds
 # exactly the two files the emitter writes. This task is the half that stops it
