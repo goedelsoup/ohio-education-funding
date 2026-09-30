@@ -2243,7 +2243,15 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
   border-radius: var(--radius-md);
   font-size: var(--text-base);
 }
-.prose-body pre code { background: none; padding: 0; overflow-wrap: normal; }
+/*
+ * Code takes one size step down from the text it sits in, and only one. `.9em` compounds: inside
+ * a `pre` already at `--text-base` it made 12.7px, and inside a `.claim-detail` already at `.9em`
+ * it made 13.7px — two sizes no other text on the page had, which put the funding-plan node over
+ * the ten-size ceiling (#550). A block and a justification have taken their step, so code in them
+ * inherits it.
+ */
+.prose-body pre code { background: none; padding: 0; overflow-wrap: normal; font-size: inherit; }
+.prose-body .claim-detail code { font-size: inherit; }
 .prose-body blockquote {
   margin: 0 0 var(--space-5);
   color: var(--text-secondary);
