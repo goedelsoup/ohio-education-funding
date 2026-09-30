@@ -9,7 +9,7 @@
 import Base from "../layouts/Base.astro";
 import { NAMES } from "../lib/nav.ts";
 import { loadFeed } from "../lib/feed.ts";
-import { count } from "../lib/format.ts";
+import { count, millions } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
 import { yearChip } from "../lib/year.ts";
 import SectionAnchor from "../components/SectionAnchor.astro";
@@ -150,7 +150,7 @@ const jsonLd = {
               <tr>
                 <th>{checkpoint.label}</th>
                 <td class="tnum">
-                  {(checkpoint.realized_aid / 1e9).toFixed(3)}B
+                  {millions(checkpoint.realized_aid).replace("+", "")}
                 </td>
                 <td class="tnum">{checkpoint.gainers}</td>
                 <td class="tnum">{checkpoint.losers}</td>

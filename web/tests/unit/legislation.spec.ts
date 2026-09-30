@@ -244,12 +244,32 @@ test("this file writes no year of its own, and neither does the page", () => {
     years.add(regime.from);
     if (regime.to != null) years.add(regime.to);
   }
+  // Derived from each fiscal period's `start` and `end` dates, which are the corpus's.
+  for (const act of all) {
+    if (act.funds) years.add(act.funds.from).add(act.funds.to);
+  }
   const stray = [...html.matchAll(/\b(1[89]\d{2}|20\d{2})\b/g)]
     .map(([, y]) => Number.parseInt(y!, 10))
     .filter((year) => !years.has(year));
   expect([...new Set(stray)], "a year on the page comes from neither an act nor a regime").toEqual(
     [],
   );
+});
+
+test("every fiscal span on the page is written one way", () => {
+  /*
+   * The "Paid for" column printed each fiscal period's hand-typed `label` — "FY2002-2003" beside
+   * "FY2022-23", with a hyphen, where the Years column beside it wrote "FY2012–FY2021" (#574). A
+   * span is now formatted from the period's dates, so there is one shape: both years in full and
+   * an en dash, or a single year.
+   */
+  const spansOnPage = [...html.matchAll(/FY\d{4}(?:\s*[-–]\s*(?:FY)?\d+)?/g)].map(([s]) => s);
+  // Guard against a pattern that stopped matching: every multi-year period is a dashed span.
+  const biennia = all.filter((a) => a.funds && a.funds.from !== a.funds.to).length;
+  expect(biennia).toBeGreaterThan(0);
+  expect(spansOnPage.filter((s) => /[-–]/.test(s)).length).toBeGreaterThanOrEqual(biennia);
+  const odd = spansOnPage.filter((s) => !/^FY\d{4}(?:–FY\d{4})?$/.test(s));
+  expect([...new Set(odd)]).toEqual([]);
 });
 
 test("an empty corpus renders nothing rather than an empty chart", () => {

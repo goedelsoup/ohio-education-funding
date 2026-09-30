@@ -39,6 +39,7 @@ import { escapeHtml } from "./format.ts";
 import * as routes from "./routes.ts";
 import { anchor } from "./section.ts";
 import { firstOf, lastOf } from "./ends.ts";
+import { fiscalSpan, fiscalYearOf } from "./year.ts";
 
 /** A fiscal-year label as the corpus writes it — `FY2012`, or `current` for a regime still running. */
 export function fiscalYear(label: string): number | null {
@@ -86,7 +87,7 @@ export interface Act {
   /** What it did to which regime, where it did anything. */
   action: { verb: Action; regime: string; href: string } | null;
   /** The biennium or year it appropriates for. Absent on the three acts that are not budgets. */
-  funds: { label: string; href: string; start: string; end: string } | null;
+  funds: { href: string; from: number; to: number } | null;
   /** The earlier acts it amends, newest first. The chain, as the corpus states it. */
   amends: { label: string; href: string }[];
 }
@@ -116,6 +117,11 @@ export function acts(corpus: Corpus): Act[] {
     );
     const fundsEdge = node.out.find((e) => e.relationship === "appropriates-for" && e.id);
     const period = fundsEdge?.id ? corpus.byId.get(fundsEdge.id) : undefined;
+    const paidFrom = period ? fiscalYearOf(prop(period, "start")) : null;
+    const paidTo = period ? fiscalYearOf(prop(period, "end")) : null;
+    if (period && (paidFrom == null || paidTo == null)) {
+      throw new Error(`${period.id} has no parseable \`start\` and \`end\`; the "Paid for" span is built on them`);
+    }
 
     const act: Act = {
       id: node.id,
@@ -134,10 +140,9 @@ export function acts(corpus: Corpus): Act[] {
       funds:
         period != null
           ? {
-              label: prop(period, "label") || period.label,
               href: routes.wikiNode(period.className, period.name),
-              start: prop(period, "start"),
-              end: prop(period, "end"),
+              from: paidFrom!,
+              to: paidTo!,
             }
           : null,
       amends: node.out
@@ -231,7 +236,7 @@ export function succession(spans: Regime[]): string[] {
 
 /** `FY2012–FY2021`, or `FY2022 onward` for the one still running. En dash, not a hyphen. */
 function span(regime: Regime): string {
-  return regime.to == null ? `FY${regime.from} onward` : `FY${regime.from}–FY${regime.to}`;
+  return regime.to == null ? `FY${regime.from} onward` : fiscalSpan(regime.from, regime.to);
 }
 
 /** How many biennia a regime lasted, which is what makes a two-year regime visible as one. */
@@ -321,7 +326,7 @@ export function renderTimeline(corpus: Corpus): string {
           }</td>
           <td>${
             act.funds
-              ? link(act.funds.href, act.funds.label)
+              ? link(act.funds.href, fiscalSpan(act.funds.from, act.funds.to))
               : `<span class="caveat-inline">not a budget act</span>`
           }</td>
         </tr>`;

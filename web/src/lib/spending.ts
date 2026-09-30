@@ -27,7 +27,7 @@
  */
 
 import type { Bar } from "./chart.ts";
-import { count, escapeHtml, money, pct } from "./format.ts";
+import { count, escapeHtml, fixed, money, pct } from "./format.ts";
 import { barSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import * as routes from "./routes.ts";
@@ -240,11 +240,11 @@ export function renderFederalShare(d: District, statewide: OutcomeStatewide | nu
       ${
         statewide
           ? `<p class="note">Across the state, federal share and the Performance Index correlate
-             at <strong>${statewide.federal_share_vs_performance_raw.toFixed(3)}</strong>. That
+             at <strong>${fixed(statewide.federal_share_vs_performance_raw, 3)}</strong>. That
              number is worth almost nothing on its own: federal education money is allocated
              substantially by poverty, so it is largely the poverty relationship read backwards.
              <strong>Holding poverty constant it is
-             ${statewide.federal_share_vs_performance.toFixed(3)}.</strong> Neither figure
+             ${fixed(statewide.federal_share_vs_performance, 3)}.</strong> Neither figure
              identifies an effect in either direction, and the gap between them is the whole
              reason both are printed.</p>`
           : ""

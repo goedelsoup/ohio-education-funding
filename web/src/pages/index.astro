@@ -27,7 +27,7 @@
 import Base from "../layouts/Base.astro";
 import SectionAnchor from "../components/SectionAnchor.astro";
 import { loadFeed } from "../lib/feed.ts";
-import { count, millions } from "../lib/format.ts";
+import { count, fixed, millions } from "../lib/format.ts";
 import { nav } from "../lib/nav.ts";
 import * as routes from "../lib/routes.ts";
 
@@ -101,7 +101,7 @@ const NOTABLE = ["043802", "043786", "044909", "049056", "044933", "045583"]
             <th><a href="/outcomes">Does any of it show up in outcomes?</a></th>
             <td>
               Poverty explains Ohio's attainment measure at {
-                s.outcomes ? s.outcomes.poverty_vs_performance.toFixed(3) : "—"
+                s.outcomes ? fixed(s.outcomes.poverty_vs_performance, 3) : "—"
               }. Every other association on this site is shown against that.
             </td>
           </tr>
