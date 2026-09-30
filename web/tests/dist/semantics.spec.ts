@@ -219,7 +219,7 @@ describe("document semantics", () => {
     const bad: string[] = [];
     for (const file of pages()) {
       for (const match of readFileSync(file, "utf8").matchAll(
-        /<button\b([^>]*\bclass="year-chip"[^>]*)>/g,
+        /<button\b([^>]*\bclass="year-chip[ "][^>]*)>/g,
       )) {
         const attrs = match[1] ?? "";
         chips += 1;

@@ -113,7 +113,7 @@ const seeded = comparison(
     <div class="flags">
       {
         named.map((pair) => (
-          <a class="flag" href={`/compare?a=${pair.a}&b=${pair.b}`} title={pair.why}>
+          <a class="pill" href={`/compare?a=${pair.a}&b=${pair.b}`} title={pair.why}>
             {pair.aName} vs {pair.bName}
           </a>
         ))

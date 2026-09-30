@@ -147,7 +147,7 @@ test.describe("a draft opened in the runner", () => {
     const card = page.locator('.card[data-part="runner"]');
     await expect(card).toContainText("4 of this draft's 6 provisions");
     await expect(card).toContainText("not of the bill");
-    await expect(card.locator("a.flag")).toHaveAttribute(
+    await expect(card.locator("a.pill")).toHaveAttribute(
       "href",
       "/scenario?draft=fund-the-plan-and-retire-the-guarantee",
     );

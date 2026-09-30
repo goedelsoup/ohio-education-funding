@@ -481,15 +481,51 @@ td.year { font-family: var(--font-mono); color: var(--text-annotation); white-sp
    of the act and a sixth column for it would be empty on a third of the rows. */
 .amends { display: block; font-size: var(--text-xs); color: var(--text-annotation); }
 
-.ghost {
+/*
+ * The pill: one control, wherever a pill is a control (#550).
+ *
+ * There were six of these, each written where it was first needed — `.ghost` for the theme
+ * button, `.flag` for a row of links, `.chip` for a scope selection, `.year-chip` for a year, and
+ * the basis switch twice, as `<label>`s and as `<button>`s nothing rendered any more. They agreed
+ * on the shape and disagreed on everything a reader could see: four paddings, three type sizes,
+ * two grounds, three hover states and one with none.
+ *
+ * A pill here is always operable — a link, a button or the label of a radio — so it always has
+ * the edge: `--border-control` is the 3:1 boundary WCAG 1.4.11 asks of a control, and the edge is
+ * how a reader tells this pill from text. The other pill the design allows, a static label, would
+ * take no border at all, because a bordered box that does nothing is exactly what `boxDecorative`
+ * counts; nothing on the site is one today, so it has no rule.
+ *
+ * `data-size="small"` is the year chip's size, and size is the whole of that variant: it sits at
+ * the end of a card heading on twelve thousand pages and a reading-size pill there would outweigh
+ * the heading it annotates.
+ */
+.pill {
   font: inherit;
-  background: none;
+  font-size: var(--text-sm);
+  /* Stated rather than inherited: `font: inherit` would take a card heading's bold into the year
+     chip that sits at the end of it. */
+  font-weight: var(--weight-regular);
+  font-variant-numeric: tabular-nums;
+  padding: var(--space-1) var(--space-3);
   border: 1px solid var(--border-control);
   border-radius: var(--radius-pill);
+  background: var(--surface-2);
   color: var(--text-secondary);
+  text-decoration: none;
   cursor: pointer;
-  padding: var(--space-1) .5rem;
+}
+.pill[data-size="small"] {
+  font-size: var(--text-xs);
   line-height: var(--leading-tight);
+  padding: .1rem var(--space-2);
+  white-space: nowrap;
+}
+.pill:hover { border-color: var(--accent-rule); color: var(--text-primary); }
+.pill:focus-visible {
+  color: var(--text-primary);
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 /*
@@ -618,17 +654,9 @@ a:focus-visible { color: var(--link); text-decoration-thickness: 2px; }
 .basis-panel.real { display: none; }
 .basis-scope input[data-basis="real"]:checked ~ .basis-panel.real { display: block; }
 .basis-scope input[data-basis="real"]:checked ~ .basis-panel.nominal { display: none; }
-.basis-scope .basis label {
-  display: inline-block;
-  margin: 0;
-  font-size: var(--text-sm);
-  padding: .3rem var(--space-4);
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border-control);
-  background: var(--surface-2);
-  color: var(--text-secondary);
-  cursor: pointer;
-}
+/* Each label is a `.pill`; this only undoes the global `label` rule's block margin. The checked
+   one is the only selected pill on the site, so its state is written here, against the radio. */
+.basis-scope .basis label { margin: 0; }
 .basis-scope input[data-basis="nominal"]:checked ~ .basis label[data-basis="nominal"],
 .basis-scope input[data-basis="real"]:checked ~ .basis label[data-basis="real"] {
   background: var(--surface-1);
@@ -872,30 +900,11 @@ h3 {
  * problem on this site; the chip now wears the same shape. See `yearChip` in `src/lib/year.ts`.
  *
  * `flex: none` on the wrapper rather than on the button, because the wrapper is what a card
- * heading lays out now.
+ * heading lays out now. The button itself is a small `.pill` and has no rule of its own; its
+ * focus ring is the pill's, and is never hidden, because focus is how a keyboard reader finds the
+ * reckoning at all.
  */
 .year-chip-wrap { position: relative; display: inline-flex; flex: none; }
-.year-chip {
-  font: inherit;
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: .01em;
-  color: var(--text-muted);
-  background: none;
-  border: 1px solid var(--border-control);
-  border-radius: var(--radius-pill);
-  padding: .1rem .45rem;
-  white-space: nowrap;
-  cursor: help;
-}
-.year-chip:hover { color: var(--text-primary); border-color: var(--text-muted); }
-/* Never hidden on focus: this is how a keyboard reader finds the reckoning at all. */
-.year-chip:focus-visible {
-  color: var(--text-primary);
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
-}
 
 /*
  * What the chip says, for eyes.
@@ -1251,10 +1260,9 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .sw.ordinal-2 { background: var(--ordinal-2); }
 .sw.ordinal-3 { background: var(--ordinal-3); }
 
-.flags { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: var(--space-5); }
-/* A bordered pill, so the border is the affordance and the underline is a second one. Same call
-   as `.subnav a` and the header nav, which are the same shape and already drop it. */
-.flag { font-size: var(--text-sm); padding: var(--space-1) .5rem; border-radius: var(--radius-pill); border: 1px solid var(--border-control); color: var(--text-secondary); background: var(--surface-2); text-decoration: none; }
+/* A row of `.pill` links. The pill drops the underline: the border is the affordance and the
+   underline would be a second one. */
+.flags { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-5); }
 
 /*
  * What is on this page, above the sections it lists.
@@ -1405,7 +1413,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 /* What the aid-source card's flag pills became. A pill holds a noun phrase and nothing else, and
    "At the minimum state share" is a fact about 138 districts that a reader who does not already
    know the plan cannot get from to what it means for theirs. These carry the consequence, so they
-   are rows rather than pills; the pill class above is unchanged and still used in eight places. */
+   are rows rather than pills; `.pill` is unchanged by it. */
 .conditions { list-style: none; margin: var(--space-5) 0 0; padding: 0; display: grid; gap: .5rem; }
 .conditions li { color: var(--text-secondary); font-size: var(--text-base); border-left: 2px solid var(--border); padding-left: var(--space-4); }
 .conditions strong { color: var(--text-primary); font-weight: var(--weight-semibold); }
@@ -1916,23 +1924,7 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
 
 /* The nominal / constant-dollar switch. A pair, not a checkbox: neither basis is the default
    truth, and a checkbox would make one of them a modification of the other. */
-.basis { display: flex; align-items: center; gap: .4rem; margin-bottom: var(--space-5); flex-wrap: wrap; }
-.basis button {
-  font: inherit;
-  font-size: var(--text-sm);
-  padding: .3rem var(--space-4);
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border-control);
-  background: var(--surface-2);
-  color: var(--text-secondary);
-  cursor: pointer;
-}
-.basis button.active {
-  background: var(--surface-1);
-  color: var(--text-primary);
-  border-color: var(--accent-rule);
-  font-weight: var(--weight-semibold);
-}
+.basis { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-5); flex-wrap: wrap; }
 .basis .n { font-size: var(--text-sm); color: var(--text-muted); margin-left: .3rem; }
 
 .levers { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: var(--space-5); }
@@ -2055,26 +2047,14 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
 }
 .scope-county .n { color: var(--text-muted); font-size: var(--text-xs); font-variant-numeric: tabular-nums; }
 
-/* What is selected. A chip is a thing you can take off, so every one of these is a button. */
-.chips { display: flex; flex-wrap: wrap; gap: .4rem; }
-.chip {
-  display: inline-flex;
-  align-items: baseline;
-  gap: var(--space-2);
-  font-size: var(--text-sm);
-  padding: var(--space-1) .5rem;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border-control);
-  color: var(--text-secondary);
-  background: var(--surface-2);
-  cursor: pointer;
-}
-.chip:hover { border-color: var(--accent-rule); color: var(--text-primary); }
+/* What is selected. A chip is a thing you can take off, so every one of these is a button — a
+   `.pill`, laid out here only so the `×` sits beside its name. "Every district" used to drop the
+   ground to say it was the absence of a scope rather than a selection; its words say that, and a
+   second pill for one button was the drift #550 undid. */
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.chips > .pill { display: inline-flex; align-items: baseline; gap: var(--space-2); }
 .chip-off { color: var(--text-muted); }
-.chip:hover .chip-off { color: var(--text-primary); }
-/* "Every district" is the absence of a scope rather than another selection, so it does not wear the
-   ground the selections do. */
-.chip-clear { background: none; }
+.pill:hover .chip-off { color: var(--text-primary); }
 
 /*
  * What the selection does to everything outside it — see `ScopeMode` in `lib/reach.ts`.

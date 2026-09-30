@@ -73,8 +73,8 @@ const { id, section, base } = Astro.props;
     aria-label="Dollar basis: Constant dollars"
   />
   <div class="basis">
-    <label for={`${id}-nominal`} data-basis="nominal">Nominal</label>
-    <label for={`${id}-real`} data-basis="real">Constant dollars</label>
+    <label class="pill" for={`${id}-nominal`} data-basis="nominal">Nominal</label>
+    <label class="pill" for={`${id}-real`} data-basis="real">Constant dollars</label>
     <span class="n">{base == null ? "no index covers this series" : `FY${base} dollars`}</span>
   </div>
   <div class="basis-panel nominal"><slot name="nominal" /></div>
