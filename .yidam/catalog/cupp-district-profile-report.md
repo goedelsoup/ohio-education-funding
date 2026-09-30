@@ -51,7 +51,7 @@ supervisor/manager (110), treasurer (112), coordinator (113), education administ
 (199). That is the union of R.C. 3317.011's four administrator elements at (F)(1)-(3) and (G)(1),
 so the count can be set against the two-other-administrators floor and against nothing else in
 that section; the six other staffing floors meet no column here, and the category detail they
-would need lives in EMIS staff reporting, which is not catalogued.
+would need lives in EMIS staff reporting, which is not cataloged.
 
 **Access constraints.** Freely available. XLSX rather than CSV; it parses with stdlib `zipfile`
 plus `xml.etree` — an XLSX is a zip of XML — with no third-party library required. The

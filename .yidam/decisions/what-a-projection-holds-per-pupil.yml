@@ -1,14 +1,14 @@
 id: what-a-projection-holds-per-pupil
 summary: >-
-  `report::forecast` scales base cost aid linearly in enrolment, which holds base cost per pupil
+  `report::forecast` scales base cost aid linearly in enrollment, which holds base cost per pupil
   and local capacity per pupil at their FY2027 values. Both move with the count, they move against
   each other, and the net is $31.7m at FY2032 — two thirds of the enrollment effect the forecast
   reports. The published figure is left alone, because the two runs are the ends of an interval
   rather than a wrong answer and a right one.
 context: |
-  `policy::apply` takes a substituted enrolment and computes base cost aid as the department's
+  `policy::apply` takes a substituted enrollment and computes base cost aid as the department's
   published state share times the ratio of the two counts. Its own note says what that is worth:
-  *"the defensible approximation: it is exact at modelled enrollment, which is where every
+  *"the defensible approximation: it is exact at modeled enrollment, which is where every
   deterministic result in this crate is computed."*
 
   [`report::forecast`](../../crates/project/src/report.rs) is the one caller for which that
@@ -37,7 +37,7 @@ decision: |
 
   [`project::projected_base_cost`](../../crates/project/src/projected_base_cost.rs) recomputes
   each from its own inputs at the projected count — aggregate base cost from `foundation` on the
-  enrolment scaled to it, and capacity from the published wealth charge over the projected
+  enrollment scaled to it, and capacity from the published wealth charge over the projected
   denominator — and runs the correction through `report::forecast_with`, which is
   `report::forecast` with a restatement hook rather than a second copy of the loop.
   `Terms::NEITHER` reproduces the committed path exactly, and that is asserted rather than
@@ -56,7 +56,7 @@ decision: |
   direction of that assumption is the whole of the answer.
 
   **Why not correct the base cost half alone**, which is not in that condition — R.C. 3317.011
-  says what aggregate base cost is at any enrolment and `foundation` computes it. Because it is
+  says what aggregate base cost is at any enrollment and `foundation` computes it. Because it is
   the smaller of the two terms and points the opposite way: correcting it alone moves the
   published figure **up** by $11.3m, in the direction the larger term says is wrong. A partial
   correction that moves a number the wrong way is worse than no correction, and it would look like
@@ -76,7 +76,7 @@ consequences: |
   **The interval moves further than the point.** Both terms are convex in the count, so the
   correction is largest at the low end of the enrollment band and smallest at the high end. The
   FY2032 band goes from $6,958M–$7,582M to $6,853M to $7,740M — the ±4.3% this corpus publishes
-  becomes ±6.2%. A forecast that scales a curved function from its centre understates its own
+  becomes ±6.2%. A forecast that scales a curved function from its center understates its own
   interval, and that is the part of this a wider band would not have absorbed.
 
   **The exposed population is exactly the formula population.** 297 districts are off the
@@ -90,10 +90,10 @@ consequences: |
   than it teaches statewide. The shipped projection has that at nothing by FY2032, because the
   damping flattens the series and a flat series has no average to sit above — so the funded count
   falls 2.86% against the taught count's 1.26%, and more than half the correction above is that
-  cushion closing. It is [`the-fitted-damping`](the-fitted-damping.yml)'s horizon behaviour
+  cushion closing. It is [`the-fitted-damping`](the-fitted-damping.yml)'s horizon behavior
   showing up inside the statute.
 
-  **`report::forecast` gained a seam and no behaviour.** `forecast_with` takes a restatement hook
+  **`report::forecast` gained a seam and no behavior.** `forecast_with` takes a restatement hook
   and `forecast` passes an inert one that allocates nothing. The published numbers are unchanged
   to the cent, which the figure manifest's pins hold.
 alternatives: |

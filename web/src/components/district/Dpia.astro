@@ -62,7 +62,7 @@ const certificationRatio =
         <tr class="current"><th>Blended count</th>
           <td class="tnum">{count(Math.round(p.weighted_adm))}</td>
           <td class="n">The 65/35 mix. This is the number the money is paid on.</td></tr>
-        <tr><th>As a share of enrolment</th><td class="tnum">{pct(p.percentage, 2)}</td>
+        <tr><th>As a share of enrollment</th><td class="tnum">{pct(p.percentage, 2)}</td>
           <td class="n">Against a statewide {pct(statewideShare, 2)}.</td></tr>
         <tr class="current"><th>Index</th><td class="tnum">{fixed(p.index, 4)}</td>
           <td class="n">That share over the state's, <strong>squared</strong> — {fixed(linear, 4)} before squaring.</td></tr>
@@ -76,7 +76,7 @@ const certificationRatio =
       $525m distributed on a curve like that concentrates far more sharply than a per-pupil rate
       would. {
         p.index > 1
-          ? `This district is above the state's rate, so the squaring works in its favour: its
+          ? `This district is above the state's rate, so the squaring works in its favor: its
              index is ${fixed(p.index, 2)} where a linear one would be ${fixed(linear, 2)}.`
           : `This district is below the state's rate, so the squaring works against it: its index
              is ${fixed(p.index, 2)} where a linear one would be ${fixed(linear, 2)}.`

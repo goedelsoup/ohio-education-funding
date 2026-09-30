@@ -5,19 +5,19 @@ summary: >-
   career-technical base cost 19.6% above the general one. Written for FY2026 and FY2027 only:
   from FY2028 the section pays "an amount calculated in a manner determined by the general assembly".
 description: |
-  Five multiples, one per approved programme category, and a sixth for associated services:
+  Five multiples, one per approved program category, and a sixth for associated services:
   0.6230, 0.5905, 0.2154, 0.1830, 0.1570, and 0.0294. [verified] (R.C. 3317.014(A) and (B))
 
-  **They descend by programme type, not by severity.** Special education's six ascend with the
-  disability; these five sort programmes. The top two are workforce development grouped by
+  **They descend by program type, not by severity.** Special education's six ascend with the
+  disability; these five sort programs. The top two are workforce development grouped by
   field — agricultural and environmental systems, construction technologies, engineering and
   science technologies, finance, health science, information technology and manufacturing at
   0.6230; business and administration, hospitality and tourism, human services, law and public
   safety, transportation systems and arts and communications at 0.5905. The gap below them, to
-  0.2154, is not a further grade of workforce programme: it is career-based intervention, a
+  0.2154, is not a further grade of workforce program: it is career-based intervention, a
   different kind of thing. [verified] (the section)
 
-  Why the first field group is priced above the second, both being full workforce programmes,
+  Why the first field group is priced above the second, both being full workforce programs,
   is not stated in the section. [open]
 
   **The multiplicand is not the one the other weight schedules use.** These five multiply a
@@ -29,7 +29,7 @@ description: |
   statewide average career-technical base cost per pupil for that fiscal year". [verified]
 
   The associated-services multiple is the odd one. 0.0294 applies to the sum of categories one
-  through five rather than to any category, so it is the one part of the programme that does
+  through five rather than to any category, so it is the one part of the program that does
   not vary with which category a pupil is in. [verified]
 findings: |
   ### The section prices a third thing, and it is missing for a reason that is not the rate
@@ -74,13 +74,13 @@ findings: |
 
   **On the published measure that second population is far smaller than its member count
   suggests**, and the two numbers say different things. Against **4.75%** of career-technical
-  enrolment, **277 of the 347 carry none at all** — the non-district membership is mostly
-  organisations affiliated with a planning district that send nobody through it, and one
+  enrollment, **277 of the 347 carry none at all** — the non-district membership is mostly
+  organizations affiliated with a planning district that send nobody through it, and one
   e-school, Ohio Virtual Academy, is 44% of what the rest contribute. [verified]
   (`crates/dispersion/src/ctpd_membership.rs`)
 
   **This does not make the payment computable, and the reason has changed.** It was a missing
-  map; it is now a missing measure. The API publishes `enrlCtpd`, career-technical enrolment,
+  map; it is now a missing measure. The API publishes `enrlCtpd`, career-technical enrollment,
   and the statute pays on *enrolled ADM* — a superset, and not a constant fraction of it across
   two populations that differ this much. A per-CTPD base computed from the published column would
   be a different quantity wearing the statute's name. [inference]
@@ -167,7 +167,7 @@ properties:
     the General Assembly, so the default is not continuation.
 
     That is a distinction the four-kind taxonomy does not have a word for, and it is not the
-    same as `uncodified`. The enrolment and performance supplements are uncodified — nowhere in
+    same as `uncodified`. The enrollment and performance supplements are uncodified — nowhere in
     the Revised Code, alive only in a budget act's temporary law. These multiples are codified,
     published, and citable, and they still stop. See the decision record
     [the four kinds of parameter](../../decisions/the-four-kinds-of-parameter.yml), which
@@ -210,7 +210,7 @@ properties:
     career-technical base cost per pupil
     associated services
   sensitivity: |
-    $54m in all, the smaller of the two weighted programmes, and $3.2m of it is associated
+    $54m in all, the smaller of the two weighted programs, and $3.2m of it is associated
     services. [verified]
 
     The multiplicand is the exposure that is easy to miss. Because these five are priced in the
@@ -220,9 +220,9 @@ properties:
     scales one and not the other is making a policy choice rather than an arithmetic one.
     [inference]
 
-    The frozen FY2021 counts mean this programme's sensitivity to *enrolment* is currently
-    zero. Growth since 2021 is unfunded and decline since 2021 is unpenalised, so a projection
-    that moves career-technical aid with enrolment is modelling something the calculator does
+    The frozen FY2021 counts mean this program's sensitivity to *enrollment* is currently
+    zero. Growth since 2021 is unfunded and decline since 2021 is unpenalized, so a projection
+    that moves career-technical aid with enrollment is modeling something the calculator does
     not do. [verified] (the freeze) [inference] (the consequence)
 unfilled:
   - field: enrolled ADM by career technical planning district
@@ -236,7 +236,7 @@ unfilled:
 
       What is still missing is the **measure**. R.C. 3317.014(E)(1)(a) pays on the summed
       **enrolled ADM** of a planning district's members; the API publishes `enrlCtpd`, which is
-      career-technical enrolment. So the recipient and its membership are now held and the base
+      career-technical enrollment. So the recipient and its membership are now held and the base
       the $3 multiplies is not, which is a different and smaller gap than the one recorded here
       before.
   - field: the career-technical base cost as the department computes it, in FY2022
@@ -267,7 +267,7 @@ figures:
   - key: dispersion/ctpd-share-of-career-technical-enrolment-outside-the-panel
     value: 0.04749
     field: findings
-    as_written: "Against **4.75%** of career-technical\n  enrolment"
+    as_written: "Against **4.75%** of career-technical\n  enrollment"
   - key: dispersion/ctpd-members-outside-the-panel-with-no-enrolment
     value: 277
     field: findings

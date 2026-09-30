@@ -23,18 +23,18 @@ does, line by line, in the department's words:
 
 - `[H2]` is the FY2020 May #1 formula payment (line A), **less** FY2019 final capped transportation,
   **less** the FY2020 community and STEM school deduction, **less** the FY2020 total scholarship
-  transfer, **plus** FY2020 net open enrolment for K-12 students, **plus** the FY2021 net excess cost
+  transfer, **plus** FY2020 net open enrollment for K-12 students, **plus** the FY2021 net excess cost
   adjustment — that last term removed for FY2023 by H.B. 583.
 - `[L1]` is the FY2021 final #2 formula payment (line A) with the executive budget reductions
-  restored, **plus** FY2021 net open enrolment, **plus** FY2022 net excess cost, **less** the FY2021
+  restored, **plus** FY2021 net open enrollment, **plus** FY2022 net excess cost, **less** the FY2021
   community and STEM school deduction, **less** the FY2021 total scholarship transfer, **plus** FY2021
-  student wellness and success, **plus** the FY2021 enrolment growth supplement.
+  student wellness and success, **plus** the FY2021 enrollment growth supplement.
 
 Three sentences on that sheet answer questions the acts leave silent.
 
 **Why FY2019 figures stand in for FY2020 ones:** *"References to FY19 funding are used because FY20
 state foundation funding for traditional districts was flat to FY19 funding for the categories
-described below."* That is the licence for reading a 2019 payment report as the base of a 2022
+described below."* That is the license for reading a 2019 payment report as the base of a 2022
 formula.
 
 **Why `[L1]` is larger than `[H2]` by a district's transportation:** *"transportation funding is not

@@ -72,7 +72,7 @@ findings: |
   denominator one, and attributing it wholly to spending decisions is wrong". On this population
   over these years it is not partly. It is all of it.
 
-  Part of the enrolment fall is children moving rather than children not existing: 88,974 pupils
+  Part of the enrollment fall is children moving rather than children not existing: 88,974 pupils
   sat outside the comparable set in FY2010 against 134,885 in FY2022, about a third of the
   district loss over the same span, and the rest is demographic. That changes what the arithmetic
   is about and not the arithmetic. [verified]
@@ -419,7 +419,7 @@ properties:
     ([`crates/dispersion`](../../../crates/dispersion/tests/what_the_series_did_after_it_stopped.rs))
 
     The two are different entity sets, so this does not settle the Auditor's series — its wider
-    population includes the community schools and service centres the panel excludes, and those
+    population includes the community schools and service centers the panel excludes, and those
     were where a large part of the relief money landed. What it does settle is that "real spending
     peaked in FY2020" cannot be carried as a general fact about Ohio: on the one exact per-district
     record the corpus holds, it is false. Whether the Auditor's own population peaks there is still
@@ -460,7 +460,7 @@ properties:
 
     Every figure in that table moved when it was bound. The test behind them asserts a band —
     `r.abs() < 0.06` for the three revenue shares, `close(r, -0.186, 0.02)` for the two that
-    register — and the corpus published the band's centre as though it were the measurement. The
+    register — and the corpus published the band's center as though it were the measurement. The
     bands still hold and every one of the values inside them had drifted, which is the eighth
     occurrence of that pattern in this issue and the reason convention four exists.
 

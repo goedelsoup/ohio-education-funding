@@ -1,5 +1,5 @@
 class: parameter
-label: Enrolment Supplement Amounts
+label: Enrollment Supplement Amounts
 summary: >-
   $40 a pupil to every district and $250 a pupil to the 43 that grew more than 3%, neither rate
   in any section of the Revised Code. The 3% is a cliff: the nearest miss cost $430,477.
@@ -10,7 +10,7 @@ description: |
   statewide across 609 districts, a mean of $92,085 each. Nothing has to be true of a district
   to receive it. [verified]
 
-  **The enrolment growth supplement is $250 per pupil, to districts whose enrolment grew more
+  **The enrollment growth supplement is $250 per pupil, to districts whose enrollment grew more
   than 3%.** $39.4m statewide to **43** districts, a mean of $915,804 each — ten times the base
   supplement's per-district amount, concentrated in 7% of districts. [verified]
 
@@ -21,7 +21,7 @@ description: |
 findings: |
   ### The 3% is a cliff, and the corpus can price the edge of it
 
-  The growth supplement pays $250 on the district's **whole** enrolment, not on the growth
+  The growth supplement pays $250 on the district's **whole** enrollment, not on the growth
   above the threshold. So a district at 3.01% growth receives $250 a pupil across every pupil
   and a district at 2.99% receives nothing.
 
@@ -38,7 +38,7 @@ findings: |
   166 created it for FY2020-21 and paid *"each school district with a student enrollment of at
   least 50 that experienced an average annual percentage change in its enrollment between FY 2016
   and FY 2019 that is **greater than zero**"* — the payment being that percentage times 100 times
-  FY2019 enrolment times $20 in FY2020 and $30 in FY2021. So the amount rose continuously with
+  FY2019 enrollment times $20 in FY2020 and $30 in FY2021. So the amount rose continuously with
   growth and the eligibility test was zero rather than 3 per cent. [verified]
   ([`crates/project`](../../../crates/project/tests/the_supplements_before_this_biennium.rs))
 
@@ -53,14 +53,14 @@ findings: |
   not reduced. [verified]
 
   What survived is the last year of it, made permanent. The formula transition supplement adds
-  each district's FY2021 enrolment growth supplement to the floor it holds them at, and H.B. 33
+  each district's FY2021 enrollment growth supplement to the floor it holds them at, and H.B. 33
   carries the same clause into FY2024-25 — so the FY2021 payment is still in the base two
-  bienniums after the programme ended. A district that grew in 2019 is funded for it in 2025.
+  bienniums after the program ended. A district that grew in 2019 is funded for it in 2025.
   [verified]
 
   ### The $40 is a twenty-year-old name and a twenty-year-old amount
 
-  "Base funding supplement" was the FY2006 formula's term for four itemised additions to base
+  "Base funding supplement" was the FY2006 formula's term for four itemized additions to base
   cost, each tied to a named service — academic intervention $25.00, professional development
   $3.50, data-based decision making $5.28, and professional development in data-based decision
   making $6.22. They add to **$40.00** a pupil. They rose to $47.99 in FY2007 and to $50.91 by
@@ -75,12 +75,12 @@ findings: |
 
   ### They run against the direction of the panel
 
-  The median district's enrolment **fell 4.8%** over the three years the supplement measures.
+  The median district's enrollment **fell 4.8%** over the three years the supplement measures.
   So a supplement written to reward growth reaches a seventh of districts in a state where most
   are shrinking, and the base supplement — flat, universal, and a sixth the size per district —
   is what the other 566 get. [verified]
 properties:
-  name: Enrolment supplement amounts
+  name: Enrollment supplement amounts
   unit: dollars-per-pupil
   kind: |
     **Uncodified.** Not in R.C. 3317.022, which assembles core foundation funding, and not in
@@ -102,8 +102,8 @@ properties:
     FY2027, from the department's calculator:
 
       $40     base funding supplement, per pupil, every district        line [L]
-      $250    enrolment growth supplement, per pupil, whole enrolment   line [M]
-      3%      three-year enrolment growth threshold for [M]
+      $250    enrollment growth supplement, per pupil, whole enrollment   line [M]
+      3%      three-year enrollment growth threshold for [M]
 
     Scale, from the committed panel. [verified] (crates/project)
       base funding supplement, statewide      $56,079,575.54
@@ -112,20 +112,20 @@ properties:
       districts drawing it                                43
       per district that draws it                 $915,803.56
       the largest forgone growth supplement       $430,476.80
-      median three-year enrolment change              −4.84%
+      median three-year enrollment change              −4.84%
 
     What the same two lines were before, from the committed LSC analyses: [verified]
 
-      FY2006  $40.00  base funding supplements, four of them, itemised by service
+      FY2006  $40.00  base funding supplements, four of them, itemized by service
       FY2007  $47.99  the same four
       FY2009  $50.91  and frozen there through FY2011
       FY2014  —       the H.B. 59 formula drops the term entirely
-      FY2020  $20     enrolment growth supplement, per pupil per point of average annual growth
+      FY2020  $20     enrollment growth supplement, per pupil per point of average annual growth
       FY2021  $30     the same taper, admitting every district that grew at all
       FY2022  $0      ALI 200636 cut to nothing; the FY2021 payment frozen into the guarantee
-      FY2026  $27     base funding supplement, flat, unitemised, every district
+      FY2026  $27     base funding supplement, flat, unitemized, every district
       FY2027  $40     the same, raised
-      FY2026  $225    enrolment growth supplement returns, at a 5% growth threshold
+      FY2026  $225    enrollment growth supplement returns, at a 5% growth threshold
       FY2027  $250    the same, raised, at a 3% threshold
 
     **The FY2026 row read $40 and that is the FY2027 amount.** H.B. 96's own analysis states the
@@ -151,7 +151,7 @@ properties:
     FY2026 — a higher rate on an easier test, which the act's own analysis prices at $22.9m for
     22 districts and then $45.0m for 40. The calculator carries an `EGS pct` cell reading 1 in
     both years; it is not that threshold, and what it governs is not established. [open]
-      FY2026  $250    growth supplement, on the whole enrolment, past a 3% threshold
+      FY2026  $250    growth supplement, on the whole enrollment, past a 3% threshold
   statutory_basis: |
     None. Not in R.C. 3317.022 and not in any other section this corpus cites; the two rates and
     the threshold are transcribed from the calculator, where they appear as lines [L] and [M].
@@ -165,12 +165,12 @@ properties:
     base funding supplement
     growth supplement
   sensitivity: |
-    The $40 is the most linear parameter in the plan: it multiplies enrolment and nothing else,
+    The $40 is the most linear parameter in the plan: it multiplies enrollment and nothing else,
     so its cost is exactly $40 times statewide ADM and its distribution is exactly the
     distribution of pupils.
 
     The $250 is the least. Its cost depends on which districts clear 3%, which depends on a
-    three-year enrolment trend, so a forecast of the supplement is a forecast of the growth
+    three-year enrollment trend, so a forecast of the supplement is a forecast of the growth
     distribution rather than of a rate. Moving the threshold is a far larger lever than moving
     the rate: the four districts between 2.7% and 3.0% would together draw about a million
     dollars from a threshold change that costs nothing per pupil. [inference]
@@ -195,7 +195,7 @@ figures:
   - key: project/enrolment-growth-supplement-per-pupil-fy2026
     value: 225
     field: series
-    as_written: "FY2026  $225    enrolment growth supplement returns"
+    as_written: "FY2026  $225    enrollment growth supplement returns"
   - key: project/calculator-scalars-that-held
     value: 25
     field: series
@@ -247,7 +247,7 @@ figures:
   - key: project/median-three-year-enrolment-decline
     value: 0.048417089
     field: findings
-    as_written: "The median district's enrolment **fell 4.8%**"
+    as_written: "The median district's enrollment **fell 4.8%**"
 links:
   - target: ../parameter.ont.yml
     relationship: instance-of

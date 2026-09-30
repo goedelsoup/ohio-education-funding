@@ -52,7 +52,7 @@ findings: |
   deduct in both years, both districts lost state revenue per pupil in constant dollars —
   Perrysburg by 20.29% and Toledo by 15.06%. Only one of them replaced it: Perrysburg's local
   revenue per pupil rose **22.3% in real terms** while Toledo's fell 8.14%, and Perrysburg's
-  enrolment grew 20% while Toledo's fell 21%. The state's real contribution retreated from both;
+  enrollment grew 20% while Toledo's fell 21%. The state's real contribution retreated from both;
   the tax base decided who could follow, and the tax base is the whole of the difference.
   [verified]
 
@@ -283,5 +283,5 @@ links:
     relationship: sourced-from
     note: >-
       The department's 2013 typology roster, which is where this node's code comes from. The
-      prose characterisation was written before the roster was fetched, and for two of the five
+      prose characterization was written before the roster was fetched, and for two of the five
       nodes that carry a code the two disagreed.

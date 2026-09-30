@@ -48,7 +48,7 @@ function functions(s: SpendingByFunction): { label: string; value: number; note?
     {
       label: "Pupil support",
       value: s.pupil_support,
-      note: "Counselling, health, attendance, psychological services.",
+      note: "Counseling, health, attendance, psychological services.",
     },
     { label: "Pupil transportation", value: s.pupil_transportation },
     {

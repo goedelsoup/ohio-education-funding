@@ -119,11 +119,11 @@ amendment: |
   And the inference rule this record proposed — a bare `FY 2026` column is an appropriation if the
   year is in the biennium — is wrong for exactly the workbooks that need it. In the with-actuals
   variant a bare column for a closed biennium year is spending, not appropriation, so the 129th's
-  FY2012 and FY2013 were labelled `appropriation` when they are neither enacted nor, in one of
+  FY2012 and FY2013 were labeled `appropriation` when they are neither enacted nor, in one of
   the two columns, anything at all.
 
   Nothing was committed. The alternative — ship it and caveat it — was refused on the grounds this
-  repository keeps arriving at: a misdated or mislabelled figure is not a parse failure, produces
+  repository keeps arriving at: a misdated or mislabeled figure is not a parse failure, produces
   a plausible number, and nothing downstream would catch it. The next attempt takes both variants
   per biennium and treats a repeated year as an error.
   **The PDF era was measured, and the approach this record proposed for it does not work.**
@@ -153,7 +153,7 @@ amendment: |
   amounts**. Within one page the figures are right-aligned, so their positions cluster tightly,
   and the number of clusters is the number of columns. Order the clusters left to right and map
   them onto the years the header names, in order — using the header for *which years* and the data
-  for *where they are*, which is the division of labour each is actually reliable for. A page
+  for *where they are*, which is the division of labor each is actually reliable for. A page
   whose cluster count and year count disagree is a page to refuse rather than to guess at.
 
   **This record's own closing sentence was the next thing found wrong.** It left the Catalog of
@@ -162,7 +162,7 @@ amendment: |
   the string it replaced had. [`the-catalog-of-budget-line-items`](the-catalog-of-budget-line-items.yml)
   opened both. The Catalog is not blocked and covers **both** bienniums this record calls
   unretrievable, FY2006-07 and FY2012-13, from a document that prints actuals and appropriations
-  in adjacent labelled columns — which is the defect the workbook attempt above was reverted for.
+  in adjacent labeled columns — which is the defect the workbook attempt above was reverted for.
   The per-district simulations are not LSC's publication at all. Neither finding changes the PDF
   and workbook analysis here; both narrow what it is needed for.
 

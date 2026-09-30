@@ -2,7 +2,7 @@ id: the-jvsd-rewrite-that-changed-no-percentage
 summary: >-
   Six years of the department's JVSD payment reports are extracted and reported, not added as a
   ninth Policy lever. Item 7 of H.B. 96 turns out to leave the state share percentage exactly as
-  it was — what it moves is the enrolment count the percentage multiplies — and the lever the
+  it was — what it moves is the enrollment count the percentage multiplies — and the lever the
   population's own amendment points at, a minimum state share, sits below every district in it.
 context: |
   Issue #369 recorded the JVSD base cost method as outside the lever set because it "needs a
@@ -21,7 +21,7 @@ context: |
   every guess at one returns a 404 that reads exactly like an absence. The archive runs FY2014 to
   FY2027.
 
-  For FY2022 through FY2026 a payment report is the better artefact than a calculator would have
+  For FY2022 through FY2026 a payment report is the better artifact than a calculator would have
   been, not a lesser one: it is an actual rather than a projection. Six years are now extracted,
   spanning the amendment — FY2022-FY2025 under prior law and FY2026-FY2027 under item 7.
 
@@ -40,7 +40,7 @@ context: |
 
   **What it changes is the ADM the percentage multiplies** — from the three-year average built
   into aggregate base cost to the current year's enrolled ADM. Prior law was a subtraction with no
-  enrolment term anywhere; item 7 is a multiplication over a live count. Worth $10.2m in FY2026,
+  enrollment term anywhere; item 7 is a multiplication over a live count. Worth $10.2m in FY2026,
   36 of 49 districts better off.
 
   Neither the act's own list nor the greenbook's statement of the formula says this. Both describe
@@ -62,8 +62,8 @@ decision: |
   dead over most of its range.** A **`MinimumStateShare`** lever is the natural one, since item 7
   explicitly maintains the 10% minimum and `project::policy` already carries that field for
   districts. **No joint vocational district has been on that floor in any of the six years** —
-  the lowest share observed is 0.10923, in FY2027. Dialling the floor down therefore moves exactly
-  zero dollars, and dialling it up moves money only once it passes a district's actual share. The
+  the lowest share observed is 0.10923, in FY2027. Dialing the floor down therefore moves exactly
+  zero dollars, and dialing it up moves money only once it passes a district's actual share. The
   corpus would be shipping a control whose null region it had measured and not mentioned.
 
   This is not an argument that *no* lever over JVSDs could do anything — a base cost scale would,
@@ -74,7 +74,7 @@ decision: |
 
   The thing that *is* worth reporting is the one no lever would have shown: that a rewrite
   described as a change of method changes no percentage, and that its real effect is a change of
-  enrolment vintage which neither published account names.
+  enrollment vintage which neither published account names.
 
   **Six years rather than two**, because a before and an after inside one fixture is what makes
   that statement checkable. `dispersion::jvsd_funding` reproduces the department's own payments
@@ -82,7 +82,7 @@ decision: |
   FY2026-FY2027, to the cent, on every district.
 
   **FY2026 is the only year item 7 is priced in.** FY2027's report is a September payment whose
-  enrolled ADM is FY2026's on 43 of 49 districts, because FY2027 enrolment does not exist in
+  enrolled ADM is FY2026's on 43 of 49 districts, because FY2027 enrollment does not exist in
   September 2026. Under prior law that would have been harmless; under item 7 the provisional
   count reaches the money. `item_7_incidence` returns `None` for every year but FY2026 rather than
   returning a number that would mostly measure a placeholder.

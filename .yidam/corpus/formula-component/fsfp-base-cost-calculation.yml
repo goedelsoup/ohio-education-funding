@@ -71,20 +71,20 @@ findings: |
 
   Strike every floor out of the section and **46** more districts fall onto the [temporary
   transitional aid guarantee](temporary-transitional-aid-guarantee.yml), 294 becoming 340, of
-  which 42 are in the smallest two enrolment sextiles. [verified] (crates/project) The asymmetry
+  which 42 are in the smallest two enrollment sextiles. [verified] (crates/project) The asymmetry
   that makes this work is that the guarantee's anchor is a FY2020 figure produced under the
   [Bridge formula](../funding-regime/bridge-formula.yml) and contains no part of a section
   enacted for FY2022: the floors sit on one side of the comparison only.
 
   This is half of an answer to something the corpus had measured and not explained — the
-  guarantee rate by enrolment sextile is non-monotone, lowest among the smallest districts and
+  guarantee rate by enrollment sextile is non-monotone, lowest among the smallest districts and
   highest in the third sextile. The floors account for about half of that shape.
 
   The residual was recorded here as "not size", on the reasoning that this section holds base
   cost's only size-dependent terms. **The reasoning holds and the conclusion did not: base cost
   is not the only place the plan measures size.** The other half is [targeted
   assistance](fsfp-targeted-assistance.yml)'s capacity tier, which compares two whole-district
-  totals and so reads enrolment — strike both terms out and the first-to-third gap closes from 53
+  totals and so reads enrollment — strike both terms out and the first-to-third gap closes from 53
   districts to zero. [verified]
   ([`crates/project`](../../../crates/project/tests/the_second_size_term_the_plan_keeps_outside_base_cost.rs))
 
@@ -94,16 +94,16 @@ findings: |
   threshold, so nothing steps. The jump in aggregate base cost at each threshold is inside the
   grain of the department's own two-decimal rounding of funded position counts. [verified]
   (crates/foundation) What the floors do instead is separate the **marginal** pupil from the
-  average one: in the smallest enrolment sextile one more pupil adds 0.64 of what the average
+  average one: in the smallest enrollment sextile one more pupil adds 0.64 of what the average
   pupil costs, rising to parity at about 2,000 pupils, and **313 of 608** districts are funded
   for a marginal pupil worth less than 95% of their average. [verified] (crates/project)
 
   And R.C. 3317.011(F)(6)(c) states a floor of one leadership support staff member that **can
   never be the operative term** — its own input at (F)(6)(a) is already floored at two
-  administrators, so the quotient it is compared against is never below one, at any enrolment.
+  administrators, so the quotient it is compared against is never below one, at any enrollment.
   [verified] (crates/foundation) Small districts' leadership support is nonetheless raised, by
   $6.1m, and that is the administrator floor at (F)(3) flowing through rather than this
-  provision. It is the only bound in the whole modelled formula that cannot bind, and no other
+  provision. It is the only bound in the whole modeled formula that cannot bind, and no other
   is reachable and unreached — the census is on the [Fair School Funding
   Plan](../funding-regime/fair-school-funding-plan.yml) node. [verified] (crates/project)
 
@@ -127,7 +127,7 @@ findings: |
   the section's superintendent, treasurer, other district administrators and building leaders,
   and nothing else. [verified] There is no teacher FTE and no category finer than that, so six
   of the seven floors meet no column, and the question for them moves to EMIS staff reporting,
-  which the corpus has not catalogued. [inference]
+  which the corpus has not cataloged. [inference]
 
   For the one floor it can see, both sides are FY2024 — the report's count against the four
   administrator elements funded at the report's own enrolled ADM. Ohio's 606 traditional
@@ -135,7 +135,7 @@ findings: |
   than it funds, 44 of them under the 1,500 ADM threshold at which the two-administrator floor
   stops binding. [verified] (crates/project) The gradient runs against a cliff story: the
   median employed-to-funded multiple is **1.52** below the threshold and **1.84** above it, and
-  1.23 in the smallest enrolment sextile against about 1.8 from the fourth up. [verified]
+  1.23 in the smallest enrollment sextile against about 1.8 from the fourth up. [verified]
   (crates/project) The floor does not put small districts above their funded count; it brings the
   funded count closest to payroll exactly where it binds, and employed administrators per
   thousand pupils fall monotonically from 12.3 in the smallest sextile to 7.2 in the largest,
@@ -144,7 +144,7 @@ findings: |
   The height of that component is about right and its shape is not. A line through the districts
   under the threshold has an intercept between 2.6 and 3.8 administrators depending on where it
   stops, every one under the section's four; but the section funds exactly two other
-  administrators at every enrolment under 1,500, and what districts employ beyond a
+  administrators at every enrollment under 1,500, and what districts employ beyond a
   superintendent, a treasurer and their funded building leaders doubles across that range, from
   about three to about six. [verified] (crates/project) The plateau the floor writes has no
   counterpart on payroll. Funded is not employed, and none of this is an audit: the finding is the
@@ -161,7 +161,7 @@ findings: |
   the ends of a row are one measure at two points, so on a logarithmic axis the row's length is
   the multiple and its position is the level.
 
-  The chart marks **1,500** pupils on the enrolment axis, because "narrowest where the floor
+  The chart marks **1,500** pupils on the enrollment axis, because "narrowest where the floor
   binds" is a claim about a position on that axis rather than about the picture as a whole. It
   draws one of the seven floors, and the six the report has no column for are named beside it
   rather than left out: a chart of one floor captioned as a chart of staffing would overstate

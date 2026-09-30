@@ -30,7 +30,7 @@ test.describe("one district's own band", () => {
     // receives — and a card that printed one anyway would be attaching a measurement to a line the
     // measurement cannot reach.
     await expect(page.locator('[data-part="enrollment"]')).not.toContainText(
-      "centred high",
+      "centered high",
     );
   });
 
@@ -44,7 +44,7 @@ test.describe("one district's own band", () => {
     // The level, beside the width. Read off the painted text rather than asserted as a figure: the
     // numbers come from the feed at the fan's own horizon, and what this checks is that both
     // populations reach the page and that neither is presented as this district's own error.
-    await expect(card).toContainText("The band is centred high, on the average district");
+    await expect(card).toContainText("The band is centered high, on the average district");
     await expect(card).toContainText("forecast 6 years out");
     await expect(card).toContainText("before the pandemic school closures");
     await expect(card).toContainText("closures included");
@@ -165,7 +165,7 @@ test.describe("the categorical half", () => {
     await expect(card).toContainText("descend as need persists, alone among the six");
     // Both halves of the distinction are on the page, not just the correction.
     await expect(card).toContainText("Special education runs the other way");
-    await expect(card).toContainText("along programme type rather than need");
+    await expect(card).toContainText("along program type rather than need");
   });
 
   test("the frozen FY2021 counts travel with the columns they qualify", async ({ page }) => {

@@ -38,7 +38,7 @@ findings: |
   variable wearing a different label — including [OCG White Paper
   013](../../catalog/ocg-white-paper-013.md)'s strongest reported finding, that federal
   expenditure per pupil tracks the Index at −0.558. Holding disadvantage constant, that −0.558
-  falls to **−0.158**. [verified] The paper hypothesised that its federal result was a poverty
+  falls to **−0.158**. [verified] The paper hypothesized that its federal result was a poverty
   signal and said it could not test the hypothesis directly. It can be tested directly, it now
   has been, and the hypothesis is largely right: about seven-tenths of the association was
   poverty.
@@ -111,13 +111,13 @@ findings: |
   Against [Progress (value-added)](progress-value-added.yml), the same spending variable
   carries the opposite sign. In a need-adjusted model controlling for economic disadvantage,
   English-learner and disability shares, log enrollment, and valuation per pupil, the
-  standardised spending coefficient is **−0.073** here (t = −2.84) and **+0.209** on growth (t
+  standardized spending coefficient is **−0.073** here (t = −2.84) and **+0.209** on growth (t
   = +4.60). [verified] The negative association recorded on this metric is a property of
   measuring level. It does not survive the switch to a measure of gain, and neither metric
   should be quoted on outcomes without the other.
 
   That model also explains most of this metric and little of the other: R² 0.752 against 0.227,
-  with economic disadvantage carrying a standardised −0.659 here. **Three-quarters of what this
+  with economic disadvantage carrying a standardized −0.659 here. **Three-quarters of what this
   measure records is demographics.** [verified]
 
   **The average student's district scores below the average district.** Unweighted mean 87.7;

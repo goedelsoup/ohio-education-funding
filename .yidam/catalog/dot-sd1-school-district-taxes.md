@@ -41,7 +41,7 @@ take the **last two**.
 The fifth caller was a node rather than a function, and it failed differently: `metric/assessed-
 valuation-per-pupil` published a three-row table with one TY2024 row and two TY2023 rows, a count
 and a median that reproduce only on TY2024, and the numerator identity the finding rests on, which
-holds only on TY2023 — all labelled `[verified — TY2023]`. No figure was wrong about the fixture
+holds only on TY2023 — all labeled `[verified — TY2023]`. No figure was wrong about the fixture
 and no two of them had to be from the same year. **Anything reading this fixture as a level must
 name a tax year in a constant**, which is what `dispersion::valuation::TAX_YEAR` now is.
 

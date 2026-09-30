@@ -31,7 +31,7 @@ properties:
     H.B. 166 (133rd General Assembly). [verified] (the 2019 edition of the Catalog of
     [Budget Line Items](../../catalog/lsc-catalog-of-budget-line-items.md),
     `crates/project/fixtures/catalog-line-item-basis.tsv`, which names the
-    authorising act on every line item it carries)
+    authorizing act on every line item it carries)
 
     The Catalog cites this act on 177 line items and prints it bare, `H.B. 166 of the 133rd
     G.A.`, which agrees with the form used here.

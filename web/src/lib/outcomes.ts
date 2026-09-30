@@ -220,7 +220,7 @@ export function renderOutcomes(bundle: Bundle): string {
       <p class="note">One dot per district: the share of its pupils the state counts as
         economically disadvantaged, against its Performance Index. The line is the median of each
         fifth of districts, least poor on the left — the summary this card used to show on its
-        own, now drawn over the ${count(povertyPoints.length)} districts it summarises.</p>
+        own, now drawn over the ${count(povertyPoints.length)} districts it summarizes.</p>
       <div class="chartwrap" data-chart="poverty-and-performance">${renderToString(povertyScatter, { label: `Economically disadvantaged share against Performance Index across ${count(povertyPoints.length)} districts, with the median of each poverty fifth, ${yearOf("outcome.performance")}` })}</div>
       <p class="note">At <strong>${coefficient(o.poverty_vs_performance)}</strong>, economic
         disadvantage explains about ${pct(o.poverty_vs_performance ** 2, 0)} of the variance in
@@ -424,7 +424,7 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
         draws(peerBox)
           ? `<p class="note">Every district in that fifth, by Performance Index — the shaded box is
              its middle half, the line inside it the middle of the fifth, and the
-             coloured rule is ${escapeHtml(district.name)}. The gap in the third tile is worth what
+             colored rule is ${escapeHtml(district.name)}. The gap in the third tile is worth what
              the width of this box says it is worth.</p>
              <div class="chartwrap" data-chart="peer-group">${renderToString(peerBox, { label: `Performance Index across the ${count(peers.length)} districts in the ${label}, with ${district.name} marked, ${seriesYear("outcome.performance")?.label ?? ""}` })}</div>
              <div class="scale">

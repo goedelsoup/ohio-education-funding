@@ -73,14 +73,14 @@ consequences: |
 alternatives: |
   **Leave it.** The band was still a floor, which is the safe direction to be wrong in. Rejected
   because 55.8% coverage on a stated 68% interval is not a conservative interval, it is a
-  mislabelled one, and the label is what a reader acts on.
+  mislabeled one, and the label is what a reader acts on.
 
   **Rescale `sigma` instead.** Would fix one horizon and miss the rest, since the defect grows
   with the horizon. It also costs the prior its provenance.
 
   **Fit to the dispersion (0.60).** The obvious move and the wrong target; see the decision.
 
-  **0.64.** Minimises the worst horizon where 0.65 minimises the average. The surface is flat from
+  **0.64.** Minimizes the worst horizon where 0.65 minimizes the average. The surface is flat from
   about 0.63 to 0.66 and the third digit is not identified, so the rounder value is taken — the
   same tie-break `the-fitted-damping` records.
 amendment: |
@@ -102,7 +102,7 @@ amendment: |
 
   Whether the band should be asymmetric was not addressed. It is multiplicative, so it already is
   in dollars, but the *log* error has a growing positive mean — see
-  `the_bias_no_single_damping_can_remove` — and an interval centred on a biased point estimate
+  `the_bias_no_single_damping_can_remove` — and an interval centered on a biased point estimate
   inherits that bias whatever its width. **That was the whole of the long-horizon defect.**
   Pooled across origins the band's coverage sinks from 67.1% at five years to 60.1% at thirteen,
   and removing each origin's own mean restores all of it: the width is right and the level is not.
@@ -111,7 +111,7 @@ amendment: |
   `sigma`, being a cross-sectional spread, cannot price a statewide level break at any exponent.
   Mean log error reaches +0.056 at the feed's ten-year horizon, so the point sits about 5.8% high.
 
-  **Neither the centre nor the band moves, and the bias is published instead.**
+  **Neither the center nor the band moves, and the bias is published instead.**
   `crates/project/tests/the_bias_that_belongs_to_the_years.rs` measured the four remedies #423
   named. The 5.8% is the mean *district's*; the statewide total's is 3.2% across the closure and
   within 0.7% at every horizon to seven years before it, with a sign that changes from origin to
@@ -121,10 +121,10 @@ amendment: |
   bias is a year effect. A district's long-run rate persists into its next three to nine years at
   0.27 to 0.30, the three tenths the damping already carries, so decaying the rate toward a share
   of the long-run rate over-corrects at every share above five hundredths and five hundredths is
-  worth a third of a percent; relative to the state the error-minimising share is zero. A drift
+  worth a third of a percent; relative to the state the error-minimizing share is zero. A drift
   fitted on the pre-closure mean district removes half of what crosses the closure and puts the
   total a point low before it. An asymmetric band is that correction drawn as a band, and holds
-  less — 62.5% against 65.6% at ten years — than shifting the centre by the same amount.
+  less — 62.5% against 65.6% at ten years — than shifting the center by the same amount.
 
   **Done, by #431, and recorded in
   [`the-bias-published-beside-the-point`](the-bias-published-beside-the-point.yml).** The feed
@@ -134,5 +134,5 @@ amendment: |
   a different question rather than a cleaner sample of one. The computation is hoisted into
   `project::backtest::bias_profile`, on the same scored forecasts the band above is measured
   against, and `/method` draws all four against zero beside the point they describe. Nothing in
-  this record moves: the exponent is 0.65, `sigma` is unchanged, and the centre of every published
+  this record moves: the exponent is 0.65, `sigma` is unchanged, and the center of every published
   interval is where it was.

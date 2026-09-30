@@ -2,7 +2,7 @@ id: the-acts-themselves
 summary: >-
   The session laws extend the enacted appropriation series from FY2002 back to FY1998 and stop
   there, against a floor the legislature published rather than one this project inferred — and the
-  first act after DeRolph I turns out to have refused to itemise the year the court's deadline
+  first act after DeRolph I turns out to have refused to itemize the year the court's deadline
   fell in.
 context: |
   `lsc-budget`'s blocker had one clause left standing after two phases of correction: before FY1999
@@ -17,7 +17,7 @@ context: |
   They are the same thing. Ohio's operating budget acts carry the appropriation table in the bill.
 decision: |
   Add `ohio-session-laws` as a connector in its own right rather than folding it into `ohio-laws`.
-  Same publisher, different artefact: `ohio-laws` retrieves Revised Code sections as they stand
+  Same publisher, different artifact: `ohio-laws` retrieves Revised Code sections as they stand
   today, and this retrieves acts as they were passed.
 
   Wire the two acts whose education tables are **printed once**: Am. Sub. H.B. 215 of the 122nd
@@ -29,7 +29,7 @@ decision: |
 
   **Keep the four years out of the published feed for now.** They are in the crates, tested, and
   joined; the site's series still begins at FY2002. FY1999 cannot go on a chart until the shape it
-  needs is built, and putting it there without that would draw fifty-one programmes falling to zero.
+  needs is built, and putting it there without that would draw fifty-one programs falling to zero.
 consequences: |
   **The floor is the publisher's and it is stated, not inferred.** `GET
   https://search-prod.lis.state.oh.us/api/v2/` returns the service's own index of every General
@@ -42,16 +42,16 @@ consequences: |
   *DeRolph I* was decided in March 1997 and falls inside the 122nd, so the first budget enacted
   after the decision is the oldest thing there is.
 
-  **And that act declined to itemise half of its own biennium.** H.B. 215 spreads FY1998 across
+  **And that act declined to itemize half of its own biennium.** H.B. 215 spreads FY1998 across
   fifty-three GRF education lines and FY1999 across one: fifty-one of the fifty-three are `$0`
   and the whole year — **$4,470,135,592** — sits in `200-405 Primary and Secondary Education
-  Funding`, under prose promising an itemisation by 15 January 1998 and making FY1999's earmarks
+  Funding`, under prose promising an itemization by 15 January 1998 and making FY1999's earmarks
   "subject to the passage of a new school finance formula and education reform plan".
 
   The zeros are the act's, not the reader's, and the reconciliation is what proves it: 53 GRF rows
   sum to the printed 4,899,708,534 and 5,134,145,592 exactly, in both columns.
 
-  **The promise was kept, and the evidence needed no new retrieval.** H.B. 650 itemised FY1999 in
+  **The promise was kept, and the evidence needed no new retrieval.** H.B. 650 itemized FY1999 in
   February 1998. What shows it is a fixture this repository already held: the greenbook's FY1999
   *actuals* carry 141 line items and **no `200405` at all**, while `200501` — appropriated nothing
   — spent $3,035,363,396. A line appropriated $4.47 billion and spent zero, because by the time the
@@ -95,7 +95,7 @@ consequences: |
   named by fund number, and unlike every other total in the act. A reader matching `TOTAL ` misses
   it and loses $699,892,200 silently. The check failed instead.
 alternatives: |
-  **Wire H.B. 650 and H.B. 770 too, and publish FY1999 itemised.** Rejected for this phase and
+  **Wire H.B. 650 and H.B. 770 too, and publish FY1999 itemized.** Rejected for this phase and
   scoped rather than abandoned. Both print every amended row twice — struck inline, inserted
   beneath — and **H.B. 650 reprints H.B. 215's fund-group totals unchanged**, so the reconciliation
   that guards every other extraction here would pass against the superseded number. That is the
@@ -129,13 +129,13 @@ alternatives: |
   1997/98 — the same Legislative Information Systems floor this decision establishes from the
   publisher's index, reached independently and agreeing with it.
 
-  So the era this decision cannot price is digitised and behind a paywall rather than absent. The
+  So the era this decision cannot price is digitized and behind a paywall rather than absent. The
   span that matters most — the Foundation Program era, the equal yield formula, and the years
   *DeRolph* was tried on — falls in the gap between HathiTrust's 1921 and the 1997 floor, and is
   served by exactly one publisher, commercially.
 
-  That changes the ask rather than clearing it. It is a request to a licence-holder and not a
-  digitisation hunt, and the State Library of Ohio is the obvious first one: it is the institution
+  That changes the ask rather than clearing it. It is a request to a license-holder and not a
+  digitization hunt, and the State Library of Ohio is the obvious first one: it is the institution
   most likely both to hold the subscription and to answer a reference request. **The corpus must not
   record the era as unreachable in general** — what is established is that one publisher does not
   serve it and another does, for a fee.

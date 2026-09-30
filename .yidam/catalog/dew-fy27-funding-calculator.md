@@ -44,7 +44,7 @@ gifted, career-technical, special education, transportation, and preschool speci
 ADM and valuation data; and forward projections of tax returns, median income, and federal AGI
 for TY2027.
 
-This is the most valuable single artefact the corpus has retrieved, for three reasons.
+This is the most valuable single artifact the corpus has retrieved, for three reasons.
 
 **It gives the verified FY2022 reference-year inputs.** The corpus had been carrying $67,654
 for the FY2022 classroom teacher salary on secondary reporting. The department's own figure is

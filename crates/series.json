@@ -12,7 +12,7 @@
       {"label": "Public utility", "value": -0.015924725729688064, "figure": "dispersion/fy2016-step-against-public-utility-share-negative"},
       {"label": "All three summed", "value": 0.01639987724589519, "figure": "dispersion/fy2016-step-against-summed-business-share"}
     ]},
-    {"key": "project/bounds-census", "owner": "crates/project", "unit": "count", "axis": "Bound, ranked by the districts it is the operative term for", "label": "Every bound in the modelled formula, and how many districts each one is the operative term for", "rows": [
+    {"key": "project/bounds-census", "owner": "crates/project", "unit": "count", "axis": "Bound, ranked by the districts it is the operative term for", "label": "Every bound in the modeled formula, and how many districts each one is the operative term for", "rows": [
       {"label": "One EMIS support employee", "value": 554, "group": "Base cost", "of": 609, "cites": "R.C. 3317.011(F)(5)(b)", "figure": "project/bounds-the-most-reached-is-operative-for"},
       {"label": "Decrease threshold, floor of twenty", "value": 499, "group": "Guarantee", "of": 609, "cites": "R.C. 3317.019(C)(1)"},
       {"label": "Transportation share at the 50% floor", "value": 434, "group": "Transportation", "of": 604, "cites": "R.C. 3317.0212(E)(1)(c)(ii)"},
@@ -2049,24 +2049,24 @@
   "bands": [
     {"key": "project/administrators-employed-against-administrators-funded", "owner": "crates/project", "subject": "sextile", "label": "What districts employ against what the four administrator elements of R.C. 3317.011 fund, by sextile of enrolled ADM", "ends": ["What the four administrator elements fund", "What the district employs"], "measure": {"label": "Administrators, in full-time equivalents", "unit": "positions", "min": 5.23, "max": 39.0, "log": true},
      "spans": [
-       {"label": "552 pupils", "low": 5.23, "high": 6.25, "hover": "The first band by enrolment: 101 districts around 552 pupils, funded for 5.23 administrators and employing 6.25 — 1.23×, or 12.3 per thousand pupils", "lowFigure": "project/administrators-funded-in-the-smallest-sextile", "highFigure": "project/administrators-employed-in-the-smallest-sextile"},
-       {"label": "886 pupils", "low": 5.97, "high": 9.7, "hover": "The second band by enrolment: 101 districts around 886 pupils, funded for 5.97 administrators and employing 9.70 — 1.61×, or 10.8 per thousand pupils"},
-       {"label": "1,229 pupils", "low": 6.73, "high": 11.0, "hover": "The third band by enrolment: 101 districts around 1,229 pupils, funded for 6.73 administrators and employing 11.00 — 1.64×, or 9.0 per thousand pupils"},
-       {"label": "1,663 pupils", "low": 7.91, "high": 15.0, "hover": "The fourth band by enrolment: 101 districts around 1,663 pupils, funded for 7.91 administrators and employing 15.00 — 1.85×, or 8.8 per thousand pupils"},
-       {"label": "2,548 pupils", "low": 11.06, "high": 20.0, "hover": "The fifth band by enrolment: 101 districts around 2,548 pupils, funded for 11.06 administrators and employing 20.00 — 1.80×, or 7.8 per thousand pupils"},
-       {"label": "5,256 pupils", "low": 20.689999999999998, "high": 39.0, "hover": "The sixth band by enrolment: 101 districts around 5,256 pupils, funded for 20.69 administrators and employing 39.00 — 1.82×, or 7.2 per thousand pupils", "lowFigure": "project/administrators-funded-in-the-largest-sextile", "highFigure": "project/administrators-employed-in-the-largest-sextile"}
+       {"label": "552 pupils", "low": 5.23, "high": 6.25, "hover": "The first band by enrollment: 101 districts around 552 pupils, funded for 5.23 administrators and employing 6.25 — 1.23×, or 12.3 per thousand pupils", "lowFigure": "project/administrators-funded-in-the-smallest-sextile", "highFigure": "project/administrators-employed-in-the-smallest-sextile"},
+       {"label": "886 pupils", "low": 5.97, "high": 9.7, "hover": "The second band by enrollment: 101 districts around 886 pupils, funded for 5.97 administrators and employing 9.70 — 1.61×, or 10.8 per thousand pupils"},
+       {"label": "1,229 pupils", "low": 6.73, "high": 11.0, "hover": "The third band by enrollment: 101 districts around 1,229 pupils, funded for 6.73 administrators and employing 11.00 — 1.64×, or 9.0 per thousand pupils"},
+       {"label": "1,663 pupils", "low": 7.91, "high": 15.0, "hover": "The fourth band by enrollment: 101 districts around 1,663 pupils, funded for 7.91 administrators and employing 15.00 — 1.85×, or 8.8 per thousand pupils"},
+       {"label": "2,548 pupils", "low": 11.06, "high": 20.0, "hover": "The fifth band by enrollment: 101 districts around 2,548 pupils, funded for 11.06 administrators and employing 20.00 — 1.80×, or 7.8 per thousand pupils"},
+       {"label": "5,256 pupils", "low": 20.689999999999998, "high": 39.0, "hover": "The sixth band by enrollment: 101 districts around 5,256 pupils, funded for 20.69 administrators and employing 39.00 — 1.82×, or 7.2 per thousand pupils", "lowFigure": "project/administrators-funded-in-the-largest-sextile", "highFigure": "project/administrators-employed-in-the-largest-sextile"}
      ],
      "markers": [
-       {"label": "1,500 pupils: under it R.C. 3317.011(F)(3) funds two other administrators whatever the enrolment. It falls 16 districts into the fourth band.", "value": 1500.0, "at": 3.1584158415841586, "figure": "project/the-administrator-floors-adm-threshold"}
+       {"label": "1,500 pupils: under it R.C. 3317.011(F)(3) funds two other administrators whatever the enrollment. It falls 16 districts into the fourth band.", "value": 1500.0, "at": 3.1584158415841586, "figure": "project/the-administrator-floors-adm-threshold"}
      ],
-     "whole": {"label": "606 districts employ 12,938 FTE administrators against the 6,580 the four administrator elements fund at their own FY2024 enrolment: 1.9664 employed for every one funded.", "value": 1.9664034263793537, "figure": "project/administrators-employed-for-every-one-funded"},
+     "whole": {"label": "606 districts employ 12,938 FTE administrators against the 6,580 the four administrator elements fund at their own FY2024 enrollment: 1.9664 employed for every one funded.", "value": 1.9664034263793537, "figure": "project/administrators-employed-for-every-one-funded"},
      "unreached": [
        {"label": "R.C. 3317.011(D)(2), special teachers", "why": "a floor of 6 positions under 900 ADM; no column of the report counts it"},
        {"label": "R.C. 3317.011(E)(1), guidance counselors", "why": "a floor of 1 position, on grades 9-12 rather than on enrolled ADM; no column of the report counts it"},
        {"label": "R.C. 3317.011(E)(3), student wellness and success staff", "why": "a floor of 5 positions under 1,250 ADM; no column of the report counts it"},
        {"label": "R.C. 3317.011(F)(4), fiscal support staff", "why": "a floor of 2 positions under 1,700 ADM; no column of the report counts it"},
        {"label": "R.C. 3317.011(F)(5), EMIS support employees", "why": "a floor of 1 position under 5,000 ADM; no column of the report counts it"},
-       {"label": "R.C. 3317.011(G)(2), building leadership support staff", "why": "a floor of one per open building at any enrolment; no column of the report counts it"}
+       {"label": "R.C. 3317.011(G)(2), building leadership support staff", "why": "a floor of one per open building at any enrollment; no column of the report counts it"}
      ]}
   ]
 }

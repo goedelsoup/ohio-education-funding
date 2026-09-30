@@ -43,7 +43,7 @@ const total = d.categorical_funding;
 // until recently and had nothing to link to; now each is a `formula-component` in its own right,
 // and the link out from a figure to what the figure *means* is the reason the wiki exists.
 const parts = [
-  ["Targeted assistance", c.targeted_assistance, "Equalisation for low-valuation districts. Zero once a district has enough.", "fsfp-targeted-assistance"],
+  ["Targeted assistance", c.targeted_assistance, "Equalization for low-valuation districts. Zero once a district has enough.", "fsfp-targeted-assistance"],
   ["Special education", c.special_education, "Six weighted categories of disability, spanning a factor of sixteen.", "fsfp-special-education-weights"],
   ["Disadvantaged Pupil Impact Aid", c.dpia, "Two poverty counts blended, indexed on the state's, and squared.", "fsfp-disadvantaged-pupil-impact-aid"],
   ["Career-technical education", c.career_technical, "Five weights against a base cost 20% above the one the rest of the plan uses.", "fsfp-career-technical-weights"],
@@ -90,7 +90,7 @@ const share = total / (total + d.base_cost_state_share);
       <p class="note">{pct(share, 0)} of this district's formula aid is categorical rather than
         base cost — {money(total)} against {money(d.base_cost_state_share)}. {c.targeted_assistance <= 0 ? (
             <><strong>It receives no targeted assistance.</strong> That is the largest categorical
-               program in Ohio and it is equalisation: it goes to districts whose valuation per
+               program in Ohio and it is equalization: it goes to districts whose valuation per
                pupil is low enough to qualify, and this district's is not. {count(
                  statewide.districts_without_targeted_assistance,
                )} districts are in the same position, and their categorical money is made of

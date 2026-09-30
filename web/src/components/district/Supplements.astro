@@ -77,13 +77,13 @@ const nearTheCliff = !s.growth_eligible && s.enrollment_change > 0.02;
             <td class="tnum">{s.growth <= 0 ? "—" : money(s.growth)}</td>
             <td class="n">{
               s.growth_eligible ? (
-                <>$250 on <em>every</em> pupil — not the pupils gained — because its enrolment rose{" "}
+                <>$250 on <em>every</em> pupil — not the pupils gained — because its enrollment rose{" "}
                    {pct(s.enrollment_change, 2)} over three years, clearing the 3% threshold.</>
               ) : s.enrollment_change > 0 ? (
-                `Its enrolment rose ${pct(s.enrollment_change, 2)} over three years, short of
+                `Its enrollment rose ${pct(s.enrollment_change, 2)} over three years, short of
                      the 3% this requires.`
               ) : (
-                `Its enrolment fell ${pct(Math.abs(s.enrollment_change), 2)} over three years.
+                `Its enrollment fell ${pct(Math.abs(s.enrollment_change), 2)} over three years.
                      This pays only for growth.`
               )
             }</td></tr>

@@ -52,7 +52,7 @@ decision: |
 
   Each revision entry is four fields:
 
-      was         the claim as it stood, in enough of its own words to be recognised
+      was         the claim as it stood, in enough of its own words to be recognized
       now         what replaced it
       found_by    the test, source, or catalog record that settled it
       reach       what else was affected, or the explicit statement that nothing was

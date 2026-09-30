@@ -16,8 +16,8 @@ observations as committed.
 **Why it matters here.** [R.C. 3317.0212](../corpus/parameter/transportation-cost-rates.yml)(C)
 and (D) set both of the state's transportation rates — $1,337.175 per weighted rider and $6.867
 per mile — as **trimmed means of what districts themselves reported spending in the prior fiscal
-year**. Neither rate is chosen; both are statistics over district behaviour. Diesel is the part
-of that behaviour that moves fastest and the only part with a published monthly price, so this
+year**. Neither rate is chosen; both are statistics over district behavior. Diesel is the part
+of that behavior that moves fastest and the only part with a published monthly price, so this
 is the series that says what the rate will do a year before it does it.
 
 **What it shows on arrival.** Ohio is in a compounding fuel shock. On a July-to-June fiscal year:
@@ -39,7 +39,7 @@ a fifth below what they are paying. That is the lag working exactly as the secti
   guess.** Ohio levies **47 cents a gallon** on diesel under
   [R.C. 5735.05](../corpus/parameter/transportation-cost-rates.yml)(E)(2), *"forty-seven cents on
   each gallon of motor fuel other than gasoline"*, and school districts **claim it back** through
-  the department's Motor Fuel Tax Refund programme. So the retail level is wrong for a district
+  the department's Motor Fuel Tax Refund program. So the retail level is wrong for a district
   budget, which is expected.
 
   What is not expected is the direction. Subtracting a fixed per-gallon wedge from both ends of a

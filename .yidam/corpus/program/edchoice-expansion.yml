@@ -27,14 +27,14 @@ description: |
   **There are no income bands — from FY2025.** The award is a continuous function of family
   income, and both sections that compute it have been in the committed statute extract since it was
   wired. **For FY2024 there were eight**, prescribed as a table by the same act that made the
-  programme universal, so a flat claim that the award has never been banded is false of the
-  programme's first universal year. [verified] See the findings.
+  program universal, so a flat claim that the award has never been banded is false of the
+  program's first universal year. [verified] See the findings.
 
   Participation counts by resident district are still not held. [open] Payments **by fiscal
   period** now have a bound rather than a blank, but not an appropriation, and that holds at both
   stages of the bill: LSC's analyses of the proposal and of the enacted act each say the budget
-  allocates no amount to any individual scholarship programme, funding all five from one earmark.
-  A figure for this programme by fiscal year is therefore LSC's estimate, twice over, and nothing
+  allocates no amount to any individual scholarship program, funding all five from one earmark.
+  A figure for this program by fiscal year is therefore LSC's estimate, twice over, and nothing
   states the appropriation. [verified]
 findings: |
   **Two advocacy scorecards rank Ohio on this program, and neither measures what this corpus
@@ -78,7 +78,7 @@ findings: |
 
   ### The first universal year was a table, and only that year
 
-  H.B. 33 did not switch the programme to the income curve when it made it universal. **For FY2024
+  H.B. 33 did not switch the program to the income curve when it made it universal. **For FY2024
   it prescribed eight bands as a schedule**, and the logarithmic function applies only "beginning in
   FY 2025". [verified]
   ([`crates/project`](../../../crates/project/tests/the_one_year_the_expansion_had_bands.rs))
@@ -93,11 +93,11 @@ findings: |
       701% to 750%           $900       $1,250
       above 750%             $650         $950
 
-  **The table is not a discretisation of the curve — it is more generous than it at every band
+  **The table is not a discretization of the curve — it is more generous than it at every band
   edge.** Evaluated at each band's upper bound against the FY2025 formula on the same base amounts,
   the prescribed award is higher in all fourteen comparisons. The floor differs too: the table's
   $650 for K-8 sits **$33.50 above** the tenth-of-base the statute pays from FY2025. [verified]
-  (crates/project) So the year the programme's participation tripled was paid on a schedule no
+  (crates/project) So the year the program's participation tripled was paid on a schedule no
   reading of the current section reproduces, and any average award for FY2024 must be read against
   this table rather than against the curve.
 
@@ -113,15 +113,15 @@ findings: |
   ### And the published average is not evidence about the ceiling
 
   Every award is the **lesser** of the ceiling and the school's base tuition net of discounts, so
-  the 2025 report's $4,958.41 average for this programme is bounded above by a mix of two indexed
+  the 2025 report's $4,958.41 average for this program is bounded above by a mix of two indexed
   ceilings and by tuition, and cannot be read as saying which of the three binds. [inference] A
   reader wanting to know how much of the ceiling is used needs tuition by school, which the corpus
   does not hold.
 
   ### But it does establish that at least one of them binds
 
-  R.C. 3310.08(A)(2) makes this programme's base amount the *same* schedule the
-  [traditional programme](edchoice-scholarship.yml) pays — $5,500 and $7,500 by grade band — so the
+  R.C. 3310.08(A)(2) makes this program's base amount the *same* schedule the
+  [traditional program](edchoice-scholarship.yml) pays — $5,500 and $7,500 by grade band — so the
   smaller of the two is a floor on any full-award average whatever the grade mix. In FY2025 those
   figures are the operative ones without indexing, because H.B. 33 froze the statewide average base
   cost per pupil the ceiling is indexed to at its FY2024 level, and a ceiling indexed to a frozen
@@ -129,19 +129,19 @@ findings: |
   ([`crates/project`](../../../crates/project/tests/the_gap_two_averages_cannot_decompose.rs))
 
   The published average is **$541.59 below that floor**, which no grade mix can account for —
-  **$54,667,553.01** across the programme's recipients that the schedule directs and the year did
+  **$54,667,553.01** across the program's recipients that the schedule directs and the year did
   not pay. [verified] (crates/project) It holds on the report's other average too, at $617.18, and
   it is made harder rather than easier by the students still paid the undecayed amount under R.C.
-  3317.022(A)(10)(a)(ii)(I): part of the programme is on the flat schedule, so whatever reduces the
+  3317.022(A)(10)(a)(ii)(I): part of the program is on the flat schedule, so whatever reduces the
   rest reduces it further.
 
-  ### What the gap against the traditional programme cannot settle
+  ### What the gap against the traditional program cannot settle
 
-  Traditional EdChoice averaged $6,808.75 against this programme's $4,958.41, and the 27.2% gap
+  Traditional EdChoice averaged $6,808.75 against this program's $4,958.41, and the 27.2% gap
   looks like a measurement of the income decay. It is not: three quantities move an average award —
   grade mix, the decay, and a tuition below the ceiling — and two published averages cannot
-  separate three unknowns. **The two populations also push opposite ways**, since this programme is
-  universal and therefore richer, while the traditional programme is triggered by a building's
+  separate three unknowns. **The two populations also push opposite ways**, since this program is
+  universal and therefore richer, while the traditional program is triggered by a building's
   performance and plausibly sends its recipients to cheaper schools. [inference]
 
   Attributing the whole gap to income — the largest the decay can be — puts the mean factor at
@@ -150,19 +150,19 @@ findings: |
   reading rather than an estimate of it. [verified] (crates/project)
 
   Any one of three columns would close this and none is held: participation split by grade band,
-  the report's published maximum award per programme, or the income distribution of recipients.
+  the report's published maximum award per program, or the income distribution of recipients.
   The report links a per-district breakdown and the route returns 404. [open]
 
   **Payments by fiscal period are bounded, and the bound is an estimate rather than an
-  appropriation.** Table 5 of LSC's FY2026-27 redbook estimates this programme's payments at
+  appropriation.** Table 5 of LSC's FY2026-27 redbook estimates this program's payments at
   $475.4 million in FY2025, $521.2 million in FY2026 and **$563.5 million** in FY2027 — the largest
-  of the five programmes in every year, and 45% of the channel's estimated **$1,251.1 million** in
+  of the five programs in every year, and 45% of the channel's estimated **$1,251.1 million** in
   FY2027. [verified] (crates/project, `the_points_that_bound_the_participation_hole`) Two things
   stop that from answering the appropriation question this node had open. The redbook says in terms
   that the proposal "does not allocate specific amounts to each scholarship program", so the table
   is LSC's arithmetic over a lump sum and not a schedule anybody enacted; and the table does not
   quite close on itself — its FY2025 column sums $0.1 million short of its own printed total, and
-  its FY2025 estimate for the traditional programme, $292.7 million, sits *above* the $283.1 million
+  its FY2025 estimate for the traditional program, $292.7 million, sits *above* the $283.1 million
   the annual report went on to report actually spent. [verified]
 
   **The enactment does not change that, and says so in the same words.** LSC estimated the same
@@ -170,27 +170,27 @@ findings: |
   that passed. The enacted analysis repeats the proposal's sentence verbatim — the budget "does not
   allocate specific amounts to each scholarship program", funding all five within an earmark from
   GRF line item 200550 that also pays districts, community schools and STEM schools. So there is no
-  appropriation by programme and fiscal period at either stage of the bill, and that is now a
+  appropriation by program and fiscal period at either stage of the bill, and that is now a
   finding about both editions rather than a gap in what this corpus has read. [verified]
   ([`crates/project`](../../../crates/project/tests/the_points_that_bound_the_participation_hole.rs))
 
-  What the second edition does say is what the enactment moved. Across five programmes and three
+  What the second edition does say is what the enactment moved. Across five programs and three
   years, three do not move by a cent — the two EdChoice limbs and Cleveland — and the only two that
   do are Autism (+$7.7m in FY2026, +$8.2m in FY2027) and Jon Peterson (+$5.1m, +$5.5m), lifting the
   channel to **$1,264.9 million** in FY2027. LSC gives the reason outright: the maxima for most
-  programmes rise with the statewide average base cost per pupil, the act holds that quantity at
+  programs rise with the statewide average base cost per pupil, the act holds that quantity at
   its FY2024 value through the biennium, and so the EdChoice and Cleveland maxima are held with it
-  while Autism's and Jon Peterson's are raised by hand. This programme's estimate is therefore
+  while Autism's and Jon Peterson's are raised by hand. This program's estimate is therefore
   frozen between the two editions for a reason external to it: it is indexed to a parameter the act
   chose not to move. [verified] (crates/project)
 
   **The channel's participation is bounded the same way and by figures that do not share a
-  denominator.** The redbook puts about 87,000 **FTE** students on this programme in FY2024 against
+  denominator.** The redbook puts about 87,000 **FTE** students on this program in FY2024 against
   the annual report's 100,939 **students** in 2024-25; LSC's FY2014 figure is 992 kindergarteners,
   the only grade the expansion then covered, and its FY2019 figure is over 10,800 in grades K-5.
   [verified] Four figures, four populations, and none of them is the count this node wants. The
   enacted table adds a fifth: a student column the redbook's never carried, estimating **113,962**
-  on this programme in FY2027 against 100,011 in FY2025. It is forward-looking and it is LSC's, so
+  on this program in FY2027 against 100,011 in FY2025. It is forward-looking and it is LSC's, so
   it bounds the channel's expected size rather than measuring anyone; what makes it worth holding
   is that its column closes on its own printed total in all three years where the dollar column
   beside it does not. [verified] (crates/project) The whole census of such points — one hundred of
@@ -247,7 +247,7 @@ figures:
   - key: project/expansion-enacted-students-fy2027
     value: 113962.0
     field: findings
-    as_written: "**113,962**\n  on this programme in FY2027"
+    as_written: "**113,962**\n  on this program in FY2027"
 properties:
   name: EdChoice Expansion Scholarship
   mechanism: funding-unit
@@ -257,7 +257,7 @@ properties:
     calculator: the payment report's transfer channel is two named lines, `S - Educational
     Service Center` and `T - Other Adjustments`, and neither the thirty-column summary nor the
     fifty-eight-column detail carries a line named for a scholarship or a community school. The
-    one unlabelled line is too small to be one — its negative half is $95.6m across 577
+    one unlabeled line is too small to be one — its negative half is $95.6m across 577
     districts, 1.12% of total state support, against scholarship spending on the order of a
     billion a year. See `crates/project/tests/the_voucher_channel_is_absent.rs`.
 
@@ -307,7 +307,7 @@ properties:
     ([`crates/project`](../../../crates/project/tests/the_one_year_the_expansion_had_bands.rs))
 
     **This schedule is the law from FY2025 and was not the law in FY2024.** The act that made the
-    programme universal prescribed a table of eight bands for its first year; the findings carry it
+    program universal prescribed a table of eight bands for its first year; the findings carry it
     and the comparison that shows the table paid more than this curve at every band edge.
     [verified]
 
@@ -344,13 +344,13 @@ links:
   - target: ../litigation/vouchers-hurt-ohio-2025.yml
     relationship: challenged-by
     note: >-
-      The relationship `program.ont.yml` declares for exactly this pair, on the programme the
+      The relationship `program.ont.yml` declares for exactly this pair, on the program the
       case is about. It was written in this node's prose and nowhere in the graph, so nothing
-      traversing edges could get from the programme to the case against it.
+      traversing edges could get from the program to the case against it.
   - target: edchoice-scholarship.yml
     relationship: expands
     note: >-
-      The programme this one is an expansion of, named in both nodes' prose and in this one's own
+      The program this one is an expansion of, named in both nodes' prose and in this one's own
       label. `edchoice-scholarship` carries `precedes` in the other direction; nothing carried
       the relation that gives this node its name.
   - target: ../../catalog/alec-state-education-freedom-index.md

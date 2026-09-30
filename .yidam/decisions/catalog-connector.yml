@@ -21,7 +21,7 @@ decision: |
   `Wired` with a recorded remainder, feeding `fiscal-period`, `program`, `legislation` and
   `parameter`.
 
-  Same publisher, different artefact — the reason `ohio-session-laws` is not folded into
+  Same publisher, different artifact — the reason `ohio-session-laws` is not folded into
   `ohio-laws` and `tax-casino` is not folded into `tax-abstract`. `lsc-budget` retrieves the
   greenbook, which is LSC's analysis of **a specific act as enrolled**. The Catalog is LSC's
   standing reference, restating each line item's history **as of publication**. A figure restated
@@ -42,7 +42,7 @@ consequences: |
   no line-item table at all, is in the 2006 edition. FY2012-13, whose two workbook variants LSC
   serves as one file, is in the 2011 edition.
 
-  **The defect that reverted the workbook attempt is labelled here rather than silent.** An edition
+  **The defect that reverted the workbook attempt is labeled here rather than silent.** An edition
   published at a biennium's start carries two `Appropriation` columns; the next carries one
   `Adj. Approp.` in their place — the enacted figure revised by what has happened since. That is
   the same supersession that produced zero appropriation rows for a whole biennium without

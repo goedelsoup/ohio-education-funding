@@ -3,12 +3,12 @@ label: FSFP Targeted Assistance
 summary: >-
   The largest categorical at $1.36 billion, and the one that does not belong with them. The
   others pay for a kind of pupil; this pays for the absence of a tax base. It is an
-  equalisation wearing a categorical's label.
+  equalization wearing a categorical's label.
 description: |
   The largest of the six categoricals at **$1.36bn**, and the one that does not belong with
   them. Special education, DPIA, gifted, career-technical and English learners each pay for a
   *kind of pupil*. Targeted assistance pays for the *absence of a tax base*, which is what
-  [local capacity](fsfp-local-capacity-measure.yml) also measures. It is an equalisation
+  [local capacity](fsfp-local-capacity-measure.yml) also measures. It is an equalization
   wearing a categorical's label, and reading it as a categorical is the first mistake
   available. [verified]
 
@@ -26,7 +26,7 @@ description: |
   ### The capacity tier has a size cliff
 
   Because that tier measures total wealth rather than wealth per pupil, a very small district
-  would otherwise draw equalisation designed for one twenty times its size. The department's
+  would otherwise draw equalization designed for one twenty times its size. The department's
   guard is a step function rather than a per-pupil measure: a district **below 200 ADM receives
   none of the tier**, one from 200 to 400 receives **5%** of it, and the fraction ramps
   linearly to 100% only between 400 and 600. [verified]
@@ -37,12 +37,12 @@ description: |
   Its eligibility test still runs and still qualifies **36 districts**: `[H]` is `YES` where a
   district's FY2019 wealth index exceeded 1.6 **and** its FY2019 enrolled ADM was below 88% of
   its total ADM — a district that was poor and had already lost more than an eighth of its
-  pupils to open enrolment and community schools. [verified]
+  pupils to open enrollment and community schools. [verified]
 
   **The zero is a repeal.** [H.B. 96](../legislation/hb-96-2025.yml) eliminated the payment
   outright — item 5 of the act's own list of changes to the school financing system. [verified]
   In FY2025 it paid **$52.5 million to 36 districts**, the same 36 the eligibility column still
-  qualifies. What survives is the column, not the programme.
+  qualifies. What survives is the column, not the program.
 findings: |
   ### The tier was repealed while the condition it answered remained
 
@@ -52,12 +52,12 @@ findings: |
   pupils in another district, a community school, or a nonpublic school on a scholarship.
   [verified]
 
-  So the supplemental tier was compensating for an artefact of the plan's own pupil count, and
-  H.B. 96 removed the compensation and left the artefact. The eligibility test still runs each
+  So the supplemental tier was compensating for an artifact of the plan's own pupil count, and
+  H.B. 96 removed the compensation and left the artifact. The eligibility test still runs each
   year and still names the districts, which means a future biennium could fund the line without
   changing anything else — a statement about the spreadsheet rather than about the law.
 
-  It behaves like an equalisation and not like a categorical: it **falls to exactly zero for
+  It behaves like an equalization and not like a categorical: it **falls to exactly zero for
   135 of 609 districts**, which no payment for pupils ever does. Columbus receives none of it.
   [verified]
 
@@ -102,7 +102,7 @@ findings: |
 
   It binds for five districts today, and that is not why it matters. A threshold written into
   the formula is a standing property of the formula; the number of districts on the wrong side
-  of it is a fact about this year's enrolment. Sixty-eight districts sit between 200 and 600
+  of it is a fact about this year's enrollment. Sixty-eight districts sit between 200 and 600
   pupils, on the shelf or the ramp, and a shrinking district crosses these boundaries in the
   direction that costs it money. [inference]
 
@@ -122,7 +122,7 @@ findings: |
   plus those open-enrolling out. `[F]` then multiplies the resulting rate by **enrolled** ADM.
   Both are defensible alone: wealth per pupil should arguably be measured against the pupils a
   district's own taxpayers are responsible for, and aid should arguably be paid on the pupils
-  it teaches. Together they mean a district with heavy inbound open enrolment is measured as
+  it teaches. Together they mean a district with heavy inbound open enrollment is measured as
   wealthier per pupil than it is and then paid on the larger count. The measurement and the
   payment disagree about who the district's pupils are. [verified]
 
@@ -150,7 +150,7 @@ findings: |
   carries it.
 
   **Parity aid is the ancestor, and three of this component's features are its.** Am. Sub. H.B.
-  94 created it to equalise *"an additional 9.5 mills (above the adequacy level) to the 80th
+  94 created it to equalize *"an additional 9.5 mills (above the adequacy level) to the 80th
   percentile district's wealth level"*, on *"a weighted average property wealth (2/3) and income
   wealth (1/3)"*, reaching about 492 districts. A millage instrument, a blend of valuation with
   income, and a rank threshold — which is what this component is.
@@ -183,7 +183,7 @@ findings: |
   Both medians move between the department's two published models. Median weighted wealth goes
   from $362,326,436.80 to $392,151,306.63, **+8.23%**; the per-pupil median from $253,337.38 to
   $276,708.97, **+9.23%**. Every weight and every base cost in the plan is the same number in both
-  years, so the scale this component equalises to moves nine per cent in a year while the scale
+  years, so the scale this component equalizes to moves nine per cent in a year while the scale
   the rest of the formula prices against does not move at all. [verified]
   ([`crates/project`](../../../crates/project/tests/the_exclusion_that_was_computed_once.rs))
 
@@ -203,7 +203,7 @@ findings: |
   in three distinct ways: a heading that no longer describes its column, a table of vintages two
   biennia old, and a number nothing recomputes. [inference]
 
-  ### The capacity tier's index is a measurement of enrolment
+  ### The capacity tier's index is a measurement of enrollment
 
   The description above records that the tier "is about the size of the tax base, full stop", and
   reads the department's 200/400/600 ramp as the guard against that. Both are right and neither
@@ -348,7 +348,7 @@ properties:
                                    0.05         if 200 <= ADM <= 400
                                    0.95 x (ADM-400)/200 + 0.05   if 400 < ADM < 600
                                    1            if ADM >= 600
-    D  Weighted Wealth Per Pupil = A / (enrolled ADM - open enrolment in + open enrolment out)
+    D  Weighted Wealth Per Pupil = A / (enrolled ADM - open enrollment in + open enrollment out)
     E  Wealth Index              = statewide median wealth per pupil / D
     F  Wealth Amount             = if E < 0.8 then 0
                                    else (median_per_pupil x 0.014 - D x 0.0112) x enrolled ADM
@@ -374,7 +374,7 @@ properties:
       0 & \text{if } A \ge \text{median} \\
       s(\text{ADM}) \times 0.008 \times (\text{median} - A) & \text{otherwise}
     \end{cases} && \text{capacity amount} \\
-    D &= \frac{A}{\text{enrolled ADM} - \text{open enrolment in} + \text{open enrolment out}}
+    D &= \frac{A}{\text{enrolled ADM} - \text{open enrollment in} + \text{open enrollment out}}
       && \text{weighted wealth per pupil} \\
     E &= \frac{\text{statewide median wealth per pupil}}{D} && \text{wealth index} \\
     F &= \begin{cases}
@@ -477,11 +477,11 @@ series:
 revisions:
   - was: |
       The zeroed line was read as a dormancy: "a **live zero rather than an absence**: a future
-      biennium can fund the line without changing anything else", with the state characterised as
+      biennium can fund the line without changing anything else", with the state characterized as
       maintaining a test and declining to attach money to it.
     now: |
       H.B. 96 repealed the payment. The money was taken away, not withheld pending a decision, and
-      the FY2025 programme it ended was $52.5m to 36 districts.
+      the FY2025 program it ended was $52.5m to 36 districts.
     found_by: |
       The act's own list of changes at `crates/project/fixtures/enacted-school-funding.txt`, read
       after the node's 36 qualifying districts turned out to be the same 36 the LSC greenbook

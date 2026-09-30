@@ -73,7 +73,7 @@ exceed its own state total by 3,858.
 This entry first read that as 2020-21 mislabeled, on the arithmetic that 2020-21 is 51,502 and the
 remaining 153 students spread over the censored cells at about 3.3 each. That assumed the censored
 districts were small. They are not: Huber Heights is 5,631 pupils, Euclid 4,166, Southwest Local
-4,150. Against contemporaneous F-33 enrolment, 2020-21 needs a censored participation rate of
+4,150. Against contemporaneous F-33 enrollment, 2020-21 needs a censored participation rate of
 0.22% against a reported 3.55% — a sixteenfold discontinuity — and 2021-22 and 2022-23 are
 arithmetically impossible. A size-matched estimator on 2023-24 reconstructs **53,100** against the
 published **53,051**, missing by 49 students where every other year misses by 3% to 13%. The sheet
@@ -124,7 +124,7 @@ EMIS carries the flow but not the stock.
 [EMIS Manual §2.4, Student Standing (FS) Record, v14.1](https://education.ohio.gov/getattachment/Topics/Data/EMIS/EMIS-Documentation/Current-EMIS-Manual/2-4-Student-Standing-FS-Record-v14-1.pdf.aspx?lang=en-US)
 defines Withdrawal Reason `43 — Transferred to Home Education`, "Parent or guardian notice on
 file". [verified] It is reported per district and published per district nowhere, and on its own
-it is the wrong measure: a child who begins home education at six and never enrols is invisible to
+it is the wrong measure: a child who begins home education at six and never enrolls is invisible to
 it permanently. The stock lives in the R.C. 3321.042 notices held by each district of residence,
 which no statute requires anyone to forward to the state as a count. [verified]
 
@@ -133,7 +133,7 @@ which no statute requires anyone to forward to the state as a count. [verified]
 Home-educated students carry no ADM, so they leave the formula without appearing in any enrollment
 file. The only fiscal trace anywhere in this repository is a $250,000 FY2015 earmark inside GRF
 200550 for PSEO on behalf of home-schooled students, in the H.B. 59 greenbook. [verified] At
-61,009 the population is larger than every scholarship programme in the department's 2025
+61,009 the population is larger than every scholarship program in the department's 2025
 [annual report](dew-scholarship-annual-report.md) but one, and larger than the JVSD enrollment the
 Landscape fact sheet prints beside it.
 

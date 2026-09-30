@@ -6,10 +6,10 @@ used-by:
   - ../corpus/education-agency/upper-arlington-city.yml
   - ../corpus/revenue-stream/state-foundation-aid.yml
 ---
-# Auditor of State — district and service centre audit reports
+# Auditor of State — district and service center audit reports
 
 **Source.** Auditor of State of Ohio. Annual financial audits of school districts and educational
-service centres.
+service centers.
 **Type.** Primary source, of an unusual kind — a **state officer reciting a local body's act**.
 Every other primary source this repository holds is the acting body's own document.
 **Location.** `ohioauditor.gov/auditsearch/Reports/<year>/<Entity>_<yy>_<County>.pdf`.
@@ -92,7 +92,7 @@ search interface in front of them does not, and nothing here needs it:
 ## What this does not settle
 
 **Which section Bettsville and Ledgemont ran under.** Only West Geauga's report names one. Berkshire's
-cites R.C. 3311.241 for cancellation of solvency-fund debt on dissolution, which is a neighbouring
+cites R.C. 3311.241 for cancellation of solvency-fund debt on dissolution, which is a neighboring
 provision and may or may not indicate a different route. The `section` column is empty for both
 rather than filled from the statute's shape.
 

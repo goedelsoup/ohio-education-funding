@@ -11,7 +11,7 @@ description: |
 
   **Deliberately parallel to [funding-regime](funding-regime.ont.yml).** Ohio has been changing how
   it pays schools and how it judges them on overlapping but non-coincident schedules, and the two
-  histories are usually told separately. Modelling them as sibling classes on one time axis is
+  histories are usually told separately. Modeling them as sibling classes on one time axis is
   what lets a reader ask whether a district was being judged by one system while funded by
   another — which, through the whole Fair School Funding Plan phase-in, it was.
 

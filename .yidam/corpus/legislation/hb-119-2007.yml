@@ -30,10 +30,10 @@ description: |
   is computed. Because both are wholly state-funded, folding them in **raises the state share
   percentage for most districts** — and that percentage then determines the state's share of
   special education and career-technical weighted funding. [verified] A change of accounting
-  position that moves money in a different programme.
+  position that moves money in a different program.
 
-  **Other provisions.** The poverty index stops using current-year data, so it stabilises within a
-  year. A new *Closing the Achievement Gap* programme pays on an "academic distress index" — the
+  **Other provisions.** The poverty index stops using current-year data, so it stabilizes within a
+  year. A new *Closing the Achievement Gap* program pays on an "academic distress index" — the
   share of a district's buildings in academic watch or emergency, divided by the statewide share —
   for districts above a threshold on both that and poverty. [verified]
 findings: |
@@ -43,7 +43,7 @@ findings: |
   the changes inside it warrant separate regime nodes. On the evidence of this act the structure
   was not stable at the end: the multiplier was removed, the floor was removed, and two supplements
   changed which side of the state-share calculation they sat on. Whether that is a new regime or
-  the old one being emptied is a judgement the corpus can now make from a source rather than from
+  the old one being emptied is a judgment the corpus can now make from a source rather than from
   silence. [inference]
 
   ### Two removals, and only one of them is remembered
@@ -92,23 +92,23 @@ properties:
     Enacted the FY2008-09 operating budget. Raised the base cost formula amount 3.0% a year to
     $5,565 and $5,732; abolished the cost of doing business factor and the FY2005 base cost
     guarantee; moved parity aid and poverty-based assistance inside the base cost calculation,
-    raising most districts' state share percentage; stabilised the poverty index by dropping
+    raising most districts' state share percentage; stabilized the poverty index by dropping
     current-year data; created Closing the Achievement Gap on an academic distress index.
   vetoes: |
-    Three, and the first is a scholarship programme that would not exist for another four years.
+    Three, and the first is a scholarship program that would not exist for another four years.
     [verified] (the greenbook)
 
     **The Special Education Scholarship Pilot Program**, creating scholarships for children with
-    disabilities to attend alternative public or private special education programmes, **funded by
+    disabilities to attend alternative public or private special education programs, **funded by
     transferring state aid from the scholarship child's resident district** — the deduct mechanism
     exactly. Vetoed, together with its $50,000 and $250,000 administrative earmarks in
-    200-421. A materially identical programme was enacted later as the Jon Peterson Special Needs
+    200-421. A materially identical program was enacted later as the Jon Peterson Special Needs
     Scholarship, which `dew-scholarship-reports` carries. [verified]
 
     Also vetoed: a provision barring the department from withholding payment to a community school
-    over a disputed enrolment until the resident district proved the student was not enrolled — a
+    over a disputed enrollment until the resident district proved the student was not enrolled — a
     burden-of-proof rule in the community school deduct; and a provision letting the department
-    spend the Reading Recovery earmark on other reading programmes and on evaluating Reading
+    spend the Reading Recovery earmark on other reading programs and on evaluating Reading
     Recovery itself.
   accountability_effect: |
     Closing the Achievement Gap pays on the academic watch and academic emergency building counts,
@@ -126,7 +126,7 @@ properties:
     **It paid on failure, and in its second year it also paid on improvement.** A district that
     qualified in FY2008 and lowered its academic distress percentage received its FY2008 subsidy
     times 1.035; one that did not improve received the same amount flat; a district newly
-    qualifying got the formula. So the same programme rewarded being rated badly and getting
+    qualifying got the formula. So the same program rewarded being rated badly and getting
     better, which no later Ohio coupling has done. [verified]
 
     The rate is 0.15 per cent of the formula amount. The bonuses H.B. 64 introduced eight years

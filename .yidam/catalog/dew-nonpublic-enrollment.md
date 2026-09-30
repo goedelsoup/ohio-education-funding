@@ -47,14 +47,14 @@ source and it is worth stating twice.
   been overwritten with the mask text, and `SUM` ignores text. It equals the sum of the unmasked
   cells exactly, on all twenty-eight sheets that carry one — the last three sheets of the
   2000-2008 compilation carry no such row. It is a floor wearing the label of a total:
-  read as Ohio's nonpublic enrolment, 1977-78 comes out as 243,489 when the sector was between
+  read as Ohio's nonpublic enrollment, 1977-78 comes out as 243,489 when the sector was between
   260,867 and 266,736.
 - The annual files' state-totals sheet is a **true pre-masking total**, computed before the
   building rows were censored. October 2023's says 171,830 where its own building rows floor at
   146,078. From October 2015 every annual file carries one; before that, none does.
 
 **Two blocks measure the same pupils and they do not agree.** The historical layout carries
-enrolment twice — across twenty-six grade-and-sex columns and across five race columns. Same
+enrollment twice — across twenty-six grade-and-sex columns and across five race columns. Same
 population, so each bounds it, and the race block, being a fifth as wide, masks a fifth as many
 cells and bounds it far better: 1977-78 is [243,489, 266,736] on grades and [260,867, 270,209] on
 race. They are not merely differently precise. To 1982 a number of schools reported race and left

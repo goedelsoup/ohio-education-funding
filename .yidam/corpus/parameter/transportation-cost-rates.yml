@@ -3,7 +3,7 @@ label: Transportation Cost Rates
 summary: >-
   $1,337.175 per rider and $6.867 per mile — the two rates in the plan that nobody chose. The
   section names no dollar figure: both are trimmed means of what districts themselves reported
-  spending last year, so the rate moves when districts' own behaviour moves.
+  spending last year, so the rate moves when districts' own behavior moves.
 description: |
   Every district's school bus payment is the greater of two bases: weighted ridership times a
   statewide cost per student, or bus miles times a statewide cost per mile. In the FY2027 model
@@ -123,9 +123,9 @@ findings: |
 
   The per-mile base is `bus miles × $6.867 × 180`, and **180 does not appear anywhere in R.C.
   3317.0212**. The section speaks of "miles driven for school bus service as reported", with no
-  annualisation.
+  annualization.
 
-  **It is an annualisation, and the department says so in five consecutive editions of its own
+  **It is an annualization, and the department says so in five consecutive editions of its own
   line-by-line explanation.** The method is to "calculate the statewide average annual per-mile
   expenditure for each district based on 180 days of service", and "the mileage is based on the
   average number of miles traveled during the rider count week". Reported miles are a *daily*
@@ -136,7 +136,7 @@ findings: |
   FY2022 through FY2026, tested in `crates/project`)
 
   The 0.91746 factor on special education transportation is likewise absent from the section, and
-  behaves like the enrolment and performance supplements: alive in the calculator and not in
+  behaves like the enrollment and performance supplements: alive in the calculator and not in
   permanent law. [verified] (that it is absent) [inference] (the parallel)
 
   **The transportation guarantee is not.** The line that holds 38 districts at their FY2021
@@ -164,7 +164,7 @@ findings: |
   (E)(1); the guarantee is not in the section.
   ### What the floor is worth, and which districts it pays
 
-  The floor is not a detail at the edge of the programme. Paying every district its own state share
+  The floor is not a detail at the edge of the program. Paying every district its own state share
   instead would cost **$289,611,593.21** less — two fifths of Ohio's transportation aid is paid by
   the floor rather than by the share. [verified]
   ([`crates/project`](../../../crates/project/tests/the_floor_that_pays_the_wealthy_districts.rs))

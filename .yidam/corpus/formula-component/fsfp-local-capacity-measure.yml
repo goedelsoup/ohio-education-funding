@@ -68,7 +68,7 @@ findings: |
   off under the plan. A reform described only as tightening is being described by half.
   [verified]
 
-  **Across wealth the change of mechanism favours the top, and only the top.** Mean gain per
+  **Across wealth the change of mechanism favors the top, and only the top.** Mean gain per
   pupil against the charge-off, by valuation quintile: −$118.47, −$231.81, −$294.46, −$365.14,
   **+$632.23**. Only the wealthiest quintile does better under this measure; the four below it
   all did better under the charge-off, and the gradient runs the wrong way — the poorer the
@@ -159,8 +159,8 @@ findings: |
 
   ### A threshold written as a rank is the house convention, and this one reversed its direction
 
-  The rank itself is not the novelty. Every Ohio equalisation formula this corpus can reach names
-  a district rather than a dollar figure: equity aid at its FY1998 peak equalised to the 48th
+  The rank itself is not the novelty. Every Ohio equalization formula this corpus can reach names
+  a district rather than a dollar figure: equity aid at its FY1998 peak equalized to the 48th
   percentile district, H.B. 94's own equity aid to the 118th lowest-wealth district and its parity
   aid to the 490th, H.B. 119 narrowed who qualified for parity aid while leaving that 490th in
   place, and tier one targeted assistance was still on the 490th under H.B. 59 twelve years later.
@@ -306,7 +306,7 @@ findings: |
   **And it is the charge-off's instinct in a new device.** The mechanism this replaced also
   lagged revaluation, through [recognized
   valuation](../parameter/local-share-charge-off-millage.yml) — a three-year phase-in of the
-  inflationary increase. Two regimes, the same judgement that a reappraisal should not reach
+  inflationary increase. Two regimes, the same judgment that a reappraisal should not reach
   state aid all at once, and two different implementations. A reader told only that the plan
   "uses a three-year average" would not see that it is the successor to something. [verified]
 
@@ -325,7 +325,7 @@ findings: |
   count cancels. What Ohio charges is `(0.6 V + 0.2 AGI + 0.2 M × R) × rate`, a number of dollars
   set by wealth alone, and it comes to **$8.894bn** across the 609. A departing pupil costs a
   district exactly one base cost per pupil and never more: the residual is zero for the 80 districts
-  whose two pupil counts coincide and positive — in the district's favour — for every other, because
+  whose two pupil counts coincide and positive — in the district's favor — for every other, because
   base cost enrolled ADM is a three-year maximum that takes a year to follow a departure down.
   [verified] (`crates/project`)
 
@@ -374,7 +374,7 @@ findings: |
   denominator is carrying, and where. [verified] (`crates/project`)
 
   **119 districts would lose by it, $57.5m in total** and up to $2,671 a pupil. They are the net
-  open-enrolment-in districts, whose resident count is *smaller* than the one they teach; the
+  open-enrollment-in districts, whose resident count is *smaller* than the one they teach; the
   divergence has two signs and a correction priced on the gainers alone does not see them. **33** of
   the 138 districts on the 10% floor would come off it. [verified] (`crates/project`)
 
@@ -450,15 +450,15 @@ findings: |
   fails the same gate at 1.044. The instrument aimed at this effect excluded the two districts
   carrying the most of it. [verified] (`crates/project`)
 
-  ### The open-enrolment adjustment is a choice, not an inheritance
+  ### The open-enrollment adjustment is a choice, not an inheritance
 
   R.C. 3317.0217(C)(1) subtracts the students of R.C. 3317.03(A)(1)(b) and adds those of (A)(2)(d):
-  open enrolment in and out. (A)(2) runs (a) through **(j)** — community school, alternative school,
-  college, open enrolment, educational service center, compact district, nonpublic scholarship,
+  open enrollment in and out. (A)(2) runs (a) through **(j)** — community school, alternative school,
+  college, open enrollment, educational service center, compact district, nonpublic scholarship,
   provider scholarship, STEM school, college-preparatory boarding school. The adjustment takes one
   of **ten**, from the subsection it is citing. [verified] (`crates/project`)
 
-  It cannot be an artefact of the section predating the choice channels. R.C. 3317.0217's current
+  It cannot be an artifact of the section predating the choice channels. R.C. 3317.0217's current
   text was written by H.B. 110, the same act that replaced the residence count with the attendance
   one, twenty-four years after Ohio's first community school. The section *number* is older and
   belonged to parity aid in 2001, which is a trap this corpus already records —
@@ -477,17 +477,17 @@ findings: |
   They were taken out of the **multiplier** instead, and LSC states the reason: *"an adjustment is
   made to the formula ADM of each district so as to not credit the district with targeted assistance
   for students educated through these programs."* The netting list is e-schools, EdChoice, Jon
-  Peterson and 75% of non-e-school community schools — and **open enrolment is not in it**.
+  Peterson and 75% of non-e-school community schools — and **open enrollment is not in it**.
   [verified] (`crates/project`)
 
   The two corrections are **not** complements, though. Prior law's netting list names three of the
   ten channels R.C. 3317.03(A)(2) lists — community school, EdChoice, Jon Peterson — and the new
-  denominator adjustment reaches one, open enrolment. Together they reach four. Alternative schools,
+  denominator adjustment reaches one, open enrollment. Together they reach four. Alternative schools,
   College Credit Plus, educational service centers, compact districts, STEM schools and
   college-preparatory boarding schools are reached by **neither**. [verified] (`crates/project`)
 
   What is continuous is narrower and exact: **the one channel prior law let a district keep targeted
-  assistance for is the one channel the new denominator adds back.** Open enrolment's deduct was
+  assistance for is the one channel the new denominator adds back.** Open enrollment's deduct was
   computed on the formula amount and career-technical weight, so targeted assistance never followed
   an open-enrolling child, and prior law did not net one out. R.C. 3317.0217(C)(1) reproduces that
   treatment in a regime where the count changed from residence to attendance. [inference]
@@ -495,7 +495,7 @@ findings: |
   ### And this is the component the denominator reaches furthest into
 
   R.C. 3317.0217(C)(1) is the one place the plan already concedes the principle. It divides weighted
-  wealth by a residence-flavoured count and multiplies the resulting rate by **enrolled** ADM — so
+  wealth by a residence-flavored count and multiplies the resulting rate by **enrolled** ADM — so
   targeted assistance already measures wealth against the children a district is responsible for and
   pays against the children it teaches. The question it leaves is only how far that count reaches.
 
@@ -518,7 +518,7 @@ findings: |
   agricultural real property percentage less 10%, times 40% of the formula amount, and *"only
   districts with more than 10% agricultural real property qualify"*. H.B. 110's payment of the same
   name is keyed on residence against attendance and reaches, in LSC's words, *"primarily lower
-  wealth, urban districts"*. The name is continuous across the greenbooks and the programme is not.
+  wealth, urban districts"*. The name is continuous across the greenbooks and the program is not.
   [verified] (`crates/project`)
 
   ### There is no millage term, so the measure cannot see a levy
@@ -574,7 +574,7 @@ revisions:
       column heading; here they differ by a whole finding, and the edition that describes a bill
       nobody enacted is the one that holds it.
   - was: |
-      R.C. 3317.03(A)(2) was recorded as listing **nine** channels, and the open-enrolment
+      R.C. 3317.03(A)(2) was recorded as listing **nine** channels, and the open-enrollment
       adjustment as taking "one of nine". The count reached four paragraphs of this node, a test
       asserting how many channels neither regime corrects, the body of issue #399 and a decision
       record.
@@ -595,32 +595,32 @@ revisions:
       independent copies of the same list side by side and requiring them to agree — which was
       done for a different reason entirely.
   - was: |
-      The open-enrolment adjustment and prior law's multiplier netting were recorded as "a matched
+      The open-enrollment adjustment and prior law's multiplier netting were recorded as "a matched
       pair, and H.B. 110 kept one" — the half that "had no home on the payment side" once the
       deduct architecture was abolished.
     now: |
       They are not complements. Prior law's netting reaches three of the ten channels of
       R.C. 3317.03(A)(2) and the new adjustment reaches one; **six are reached by neither**. What
-      is continuous is exact but narrower: open enrolment is the one channel prior law let a
+      is continuous is exact but narrower: open enrollment is the one channel prior law let a
       district keep targeted assistance for, and it is the one the new denominator adds back.
     found_by: |
       `prior_laws_netting_reaches_three_channels_and_the_new_adjustment_reaches_one`, which counts
       the netting list against the ten channels rather than reading it as a set.
     reach: |
-      "Complement" was inferred from one absence — open enrolment missing from the netting list —
+      "Complement" was inferred from one absence — open enrollment missing from the netting list —
       without checking the other eight channels against it. One matching absence is not a partition,
       and a tidy story about two halves of a design is the kind that survives because it is
       pleasant. Neither regime ever had a principled denominator; the error was supposing the old
       one did.
   - was: |
-      The open-enrolment adjustment in R.C. 3317.0217(C)(1) was left as a question about drafting —
-      "why H.B. 110 reconstructed the open-enrolment channel of the old residence count and not the
+      The open-enrollment adjustment in R.C. 3317.0217(C)(1) was left as a question about drafting —
+      "why H.B. 110 reconstructed the open-enrollment channel of the old residence count and not the
       other eight, when all nine were on the page of the section it cross-referenced."
     now: |
       There was no partial count to reconstruct. Prior law's formula ADM was a **residence** count
       for every channel but the JVSD carve-out, and the choice children were netted out of targeted
       assistance's **multiplier** rather than its denominator. H.B. 110's adjustment covers open
-      enrolment, which is the one channel that netting list omits — so the question is not why one
+      enrollment, which is the one channel that netting list omits — so the question is not why one
       of nine, but whether the surviving half of a matched pair was kept deliberately.
     found_by: |
       `crates/project/tests/what_the_general_assembly_was_shown.rs`, against `hb59-greenbook`,

@@ -21,7 +21,7 @@ income, student poverty and percent minority. The second sheet lists five exempl
 code and is editorial illustration — every district on it is already on the first.
 
 **Why it matters here.** `education-agency.ont.yml` has declared a `typology` property since the
-ontology was written, and not one agency node could fill it. Five nodes characterise their
+ontology was written, and not one agency node could fill it. Five nodes characterize their
 district in prose and then record the code itself as `unfilled:` — *"Rural, high poverty. Exact
 department typology code not yet entered."* `.yidam/skills/scenario-delta.md` states the cost
 plainly: **"Typology is not an available axis"**, tagged `[open]`. And
@@ -95,7 +95,7 @@ Of the 609: 3 at code 0, 123 at 1, 106 at 2, 110 at 3, 89 at 4, 77 at 5, 46 at 6
 
 It is not a locale code. NCES publishes an urban-centric locale (`ULOCAL`) for every district and
 this is not that — it is Ohio's own composite, built from a location score crossed with poverty
-and enrolment size. The two are not interchangeable and neither derives the other.
+and enrollment size. The two are not interchangeable and neither derives the other.
 
 It is also not the CUPP similar-district grouping. The CUPP profile reports a district's
 similar-district *averages* and never names the group, so the two files are complements: one says

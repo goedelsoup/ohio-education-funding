@@ -31,7 +31,7 @@ the bottom five are Kentucky (19.57, F), Rhode Island (15.23, F), Oregon (15.02,
 Massachusetts (14.47, F) and New York (9.96, F). Fifty states are scored; the District of
 Columbia is not.
 
-**Why it is catalogued, and the single most useful thing about it.** **The index has no spending
+**Why it is cataloged, and the single most useful thing about it.** **The index has no spending
 category at all.** Its 100 points measure whether programs exist and how accessible they are;
 nothing in it scores funding level, adequacy, or distribution. That is not a defect — it is what
 the document is for — but it means the index cannot be cited for any claim about whether Ohio

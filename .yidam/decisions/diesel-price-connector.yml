@@ -15,8 +15,8 @@ context: |
   $1,337.175 per weighted rider and the $6.867 per mile the FY2027 model carries — are defined as
   **trimmed means of what districts themselves reported spending in the prior fiscal year**,
   after excluding non-transporting districts and the ten highest and ten lowest per-pupil costs.
-  Nobody chooses them. They are statistics over district behaviour, and they move when that
-  behaviour moves, with no act required.
+  Nobody chooses them. They are statistics over district behavior, and they move when that
+  behavior moves, with no act required.
 
   That makes the cost of running a bus a formula input, and diesel is the part of that cost with
   a published monthly price. Without it the corpus can say the rates are endogenous — the
@@ -34,7 +34,7 @@ decision: |
   Wired when a calculator reads it.
 
   One source: `EMD_EPD2D_PTE_R20_DPG`, No. 2 diesel retail prices for the Midwest (PADD 2),
-  monthly, from the `hist_xls` path. Catalogued at
+  monthly, from the `hist_xls` path. Cataloged at
   [`eia-diesel-prices`](../catalog/eia-diesel-prices.md).
 
   It is a separate connector rather than a second source under `bls-cpi` — the shape that was

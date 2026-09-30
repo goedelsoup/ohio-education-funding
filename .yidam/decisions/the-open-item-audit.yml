@@ -6,7 +6,7 @@ summary: >-
 context: |
   Four consecutive phases had the same shape: a recorded claim turned out to be wrong, and the
   correction was one `curl` away. Four stale blockers and five wrong claims, all found by opening a
-  file the corpus had already catalogued.
+  file the corpus had already cataloged.
 
   That pattern says something uncomfortable about the `[open]` markers themselves. They were being
   read as a map of what is unknown. They are a record of what somebody did not get to, written at a
@@ -18,7 +18,7 @@ decision: |
   Sweep all `[open]` claims mechanically — by node, by field — and classify each as answerable from
   data on disk, answerable from a source now wired, genuinely blocked, or misdescribed.
 
-  Prioritise the `statutory_basis` cluster, because `ohio-laws` had just been wired and every one of
+  Prioritize the `statutory_basis` cluster, because `ohio-laws` had just been wired and every one of
   those items was of the form "transcribed from the calculator; the correspondence with statute has
   not been read."
 consequences: |
@@ -55,16 +55,16 @@ consequences: |
     - **Measured** — statute specifies a computation over reported data. Transportation's two rates
       are **trimmed means of what districts themselves spent last year**, the ten highest and ten
       lowest excluded; R.C. 3317.0212 contains no dollar figure at all. The 40th-highest-district
-      benchmark in local capacity is an order statistic. Changed by districts' own behaviour, with
+      benchmark in local capacity is an order statistic. Changed by districts' own behavior, with
       nobody deciding and no bill required.
-    - **Uncodified** — nowhere in the Revised Code. The base funding supplement, the enrolment
+    - **Uncodified** — nowhere in the Revised Code. The base funding supplement, the enrollment
       growth supplement, the performance supplement and the formula transition supplement. Changed
       by the biennial budget, and gone if it is not re-enacted.
 
   **$214.8m is paid under provisions that are not in the Revised Code** — those four supplements
   together, more than English learner and career-technical funding combined. Nothing improper
   follows; Ohio funds a great deal this way. What follows is that a reader who takes them for
-  permanent programme funding is wrong in a way no figure on the department's report would reveal,
+  permanent program funding is wrong in a way no figure on the department's report would reveal,
   and this corpus was listing them beside base cost as though they were the same kind of promise.
 
   **A second wrong citation.** `fsfp-gifted-units` cited R.C. 3317.053, which does not exist —

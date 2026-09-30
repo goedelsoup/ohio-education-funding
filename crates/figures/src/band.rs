@@ -320,7 +320,7 @@ fn floors_the_report_cannot_see() -> Vec<Missing> {
                     grouped(n),
                     if n == 1.0 { "position" } else { "positions" }
                 ),
-                _ => "a floor of one per open building at any enrolment".to_string(),
+                _ => "a floor of one per open building at any enrollment".to_string(),
             };
             Missing {
                 label: format!("R.C. 3317.011{}, {}", m.division(), m.label()),
@@ -370,7 +370,7 @@ pub static BANDS: &[Band] = &[Band {
             .map(|(at, b)| Span {
                 label: format!("{} pupils", grouped(b.adm)),
                 hover: format!(
-                    "The {} band by enrolment: {} districts around {} pupils, funded for {:.2} \
+                    "The {} band by enrollment: {} districts around {} pupils, funded for {:.2} \
                      administrators and employing {:.2} \u{2014} {:.2}\u{d7}, or {:.1} per \
                      thousand pupils",
                     SIXTHS[at],
@@ -428,7 +428,7 @@ pub static BANDS: &[Band] = &[Band {
             vec![Marker {
                 label: format!(
                     "{} pupils: under it R.C. 3317.011(F)(3) funds two other administrators \
-                     whatever the enrolment. It falls {} districts into the {} band.",
+                     whatever the enrollment. It falls {} districts into the {} band.",
                     grouped(staffing::threshold()),
                     into,
                     SIXTHS[which],
@@ -440,7 +440,7 @@ pub static BANDS: &[Band] = &[Band {
             Aggregate {
                 label: format!(
                     "{} districts employ {} FTE administrators against the {} the four \
-                     administrator elements fund at their own {} enrolment: {:.4} employed for \
+                     administrator elements fund at their own {} enrollment: {:.4} employed for \
                      every one funded.",
                     grouped(districts),
                     grouped(employed),

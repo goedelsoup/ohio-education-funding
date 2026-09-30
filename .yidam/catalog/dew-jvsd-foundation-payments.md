@@ -19,7 +19,7 @@ department's other two formula populations sit under names that say what they ar
 vocational district's reports are filed under *career-technical*, and **no path on the
 department's site contains the words "Joint Vocational" at all**. Every guess at one 404s, and a
 404 from a CMS that serves a styled error page at 200-sized length reads exactly like an absence.
-The link that finds them is labelled `JVSD Payment Reports in Excel Format` on the
+The link that finds them is labeled `JVSD Payment Reports in Excel Format` on the
 `School-Payment-Reports` index and points into the career-tech tree. Issue #371 recorded the
 population as published-nowhere on the strength of three probes under the obvious name; it is
 published, and has been since FY2014.
@@ -27,7 +27,7 @@ published, and has been since FY2014.
 **And there is no JVSD calculator.** For traditional districts and for community and STEM schools
 the department publishes a *simulator* — a working model, forward-looking. For these forty-nine
 it publishes **payment reports**: what was paid, after the year closed. For FY2022 through FY2026
-that is the better artefact, and for FY2027 it is the only one. The archive runs FY2014 to
+that is the better artifact, and for FY2027 it is the only one. The archive runs FY2014 to
 FY2027; this corpus takes FY2022 forward, which is the Fair School Funding Plan era.
 
 **What they contain.** Eight worksheets per year, 49 districts each — `Parameters`, `Base Cost`,
@@ -40,7 +40,7 @@ by grade band and career-technical FTE.
 
 **The forty-nine agree with this corpus's own answer.** `dispersion::lea_directory::joint_vocational_districts()`
 finds forty-nine JVSDs in the federal directory by two routes that never touch this file — the
-agency name, and the property levy a JVSD charges and a service centre does not. The department's
+agency name, and the property levy a JVSD charges and a service center does not. The department's
 IRNs match that set exactly, member for member. That is a third independent route, and it is the
 department's own.
 
@@ -88,9 +88,9 @@ prescribes.
   cent, so a check written at cent tolerance passes while discarding the only thing that tells
   them apart.
 
-- **FY2027 is a first payment, not a final, and its enrolment is last year's.** The September 2026
+- **FY2027 is a first payment, not a final, and its enrollment is last year's.** The September 2026
   report carries FY2026's `[a] Enrolled ADM` on **43 of the 49 districts**, and an ADM equal to
-  base cost enrolled ADM on 39, because FY2027 enrolment does not exist in September 2026. Under
+  base cost enrolled ADM on 39, because FY2027 enrollment does not exist in September 2026. Under
   prior law this would not have mattered — the state share multiplied a three-year average that
   was already known. Under item 7 it multiplies the current year, so FY2027's state share of base
   cost is provisional in a way no earlier year's is. The fixture marks it per row.

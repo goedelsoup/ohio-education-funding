@@ -1,7 +1,7 @@
 class: formula-component
-label: Guarantee Open Enrolment Clawback
+label: Guarantee Open Enrollment Clawback
 summary: >-
-  Line [I1]: a reduction in a district's guarantee for every open-enrolment pupil it has stopped
+  Line [I1]: a reduction in a district's guarantee for every open-enrollment pupil it has stopped
   accepting beyond a threshold, charged at the full statewide average base cost rather than at the
   district's share of it. Charged to 43 districts in FY2027; 22 of them lose anything to it.
 description: |
@@ -9,11 +9,11 @@ description: |
   guarantee](temporary-transitional-aid-guarantee.yml), and the only part of the hold-harmless
   that can take money away. [verified]
 
-      [I2] Decrease Threshold      = max(prior-year entering open enrolment FTE x 0.1, 20)
+      [I2] Decrease Threshold      = max(prior-year entering open enrollment FTE x 0.1, 20)
       [I1] Open Enrolment Adjust.  = if (prior FTE - current FTE) >= [I2]
                                       then 8241.61 x ((prior - current) - [I2]) else 0
 
-  A guaranteed district whose entering open enrolment has fallen by more than the greater of
+  A guaranteed district whose entering open enrollment has fallen by more than the greater of
   10% of last year's count or 20 FTE has its guarantee reduced by **$8,241.61 for every FTE
   beyond that threshold**. [verified] $8,241.61 is the statewide average base cost per pupil.
 
@@ -24,14 +24,14 @@ description: |
   falls by the whole of it when they leave. A district at the minimum share therefore loses
   roughly ten times what the departing pupil was costing the state. [verified]
 
-  Whether that is a deliberate incentive against shedding open enrolment or an artefact of
+  Whether that is a deliberate incentive against shedding open enrollment or an artifact of
   reaching for a convenient statewide figure is not established. [open] The department's own
   framing is the former: it is described as a disincentive against closing a district's
   borders, not as a general term.
 
   ### It is asymmetric
 
-  There is no corresponding increase for a district that *gains* open enrolment. The threshold
+  There is no corresponding increase for a district that *gains* open enrollment. The threshold
   and the rate apply in one direction only, so the term can reduce a guarantee and can never
   raise one. [verified]
 findings: |
@@ -91,13 +91,13 @@ findings: |
   districts and wrongly for 43 — an error rate low enough to read as rounding. Naming it
   separately is what makes its absence from an account visible. [inference]
 
-  ### What an open-enrolment FTE is worth beside one of the district's own children
+  ### What an open-enrollment FTE is worth beside one of the district's own children
 
   The description above compares the charge against what the state was paying for the departing
   pupil. Compare it instead against what the district actually loses at the margin, and the gap is
   both wider and differently shaped. A guaranteed district loses **no foundation aid at all** when
   one of its own pupils leaves, because the guarantee holds that line level — so its resident margin
-  is its transportation aid alone, between $319.46 and $1,902.03, while the open-enrolment margin is
+  is its transportation aid alone, between $319.46 and $1,902.03, while the open-enrollment margin is
   the undiminished $8,241.61. [verified] (crates/project)
 
   That is between **4.33 and 25.80 times** as much for another district's child as for one of its
@@ -117,7 +117,7 @@ findings: |
   ### The floor of twenty governs the threshold for most of the state, and spares 71 districts
 
   R.C. 3317.019(C)(1) makes the decrease threshold the greater of ten per cent of last year's
-  entering open-enrolment count and twenty pupils. Ten per cent is under twenty for any district
+  entering open-enrollment count and twenty pupils. Ten per cent is under twenty for any district
   with fewer than 200 such pupils, so the floor of twenty is what sets the threshold for **499**
   of the 609 districts; the percentage governs for the other 110. [verified] (crates/project)
   Governing a threshold is not the same as changing an outcome, and the census that measured this
@@ -133,9 +133,9 @@ findings: |
   three that a single district reaches only partially or alone — see the [Fair School Funding
   Plan](../funding-regime/fair-school-funding-plan.yml) node for the census.
 properties:
-  name: Open enrolment adjustment
+  name: Open enrollment adjustment
   function: |
-    [I2] Decrease Threshold     = max(prior-year entering open enrolment FTE x 0.1, 20)
+    [I2] Decrease Threshold     = max(prior-year entering open enrollment FTE x 0.1, 20)
     [I1] Open Enrolment Adjust. = if (prior FTE - current FTE) >= [I2]
                                    then 8241.61 x ((prior - current) - [I2]) else 0
 
@@ -143,16 +143,16 @@ properties:
     than at the district's state share of it. [verified]
 
     Subtracted inside [I], so it reduces the guarantee without reducing anything the formula
-    computes. There is no matching term for a district that gains open enrolment.
+    computes. There is no matching term for a district that gains open enrollment.
   function_tex: |
     \begin{aligned}
-    I_2 &= \max\bigl( \text{prior-year entering open enrolment FTE} \times 0.1,\ 20 \bigr)
+    I_2 &= \max\bigl( \text{prior-year entering open enrollment FTE} \times 0.1,\ 20 \bigr)
       && \text{decrease threshold} \\
     I_1 &= \begin{cases}
       8241.61 \times \bigl( (\text{prior} - \text{current}) - I_2 \bigr)
         & \text{if } \text{prior} - \text{current} \ge I_2 \\
       0 & \text{otherwise}
-    \end{cases} && \text{open enrolment adjustment}
+    \end{cases} && \text{open enrollment adjustment}
     \end{aligned}
   statutory_basis: R.C. 3317.019, with the department's FY2027 workbook supplying the rate. [verified]
   calculator: |

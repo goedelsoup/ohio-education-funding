@@ -5,7 +5,7 @@ summary: >-
   recorded.
 context: |
   Five connectors had been unblocked in as many phases, every one by opening a file the corpus had
-  already catalogued. Three remained, and after the last round none of the three had an obviously
+  already cataloged. Three remained, and after the last round none of the three had an obviously
   stale reason. This is the attempt on all three, made together so the result is a statement about
   what is left rather than another single find.
 decision: |
@@ -61,7 +61,7 @@ consequences: |
   string**. The data is served; the agent is filtered. Sending a browser string would work, and
   `cache` already states the position — impersonating one "would be discourteous besides". The
   filter is more likely an undiscriminating CDN default than a considered exclusion of researchers,
-  but guessing at intent is not a licence to route around it.
+  but guessing at intent is not a license to route around it.
 
   Behind the filter the project portfolios are interactive maps rather than files, so even with
   access a bulk export would have to be reverse-engineered out of a map service. The honest next
@@ -78,7 +78,7 @@ alternatives: |
   abandoning it when it costs something would make it decoration.
 
   **Create an OH|ID account and wire the legacy reports.** Not rejected on principle — the account
-  is free and the reports are public records. Rejected for now because a credentialled connector is
+  is free and the reports are public records. Rejected for now because a credentialed connector is
   a different kind of thing from the twelve here: it cannot be refreshed by anyone who clones the
   repository, and the digest manifest's promise that a fixture can be regenerated from its source
   would quietly stop holding. If the deduct era becomes the subject rather than context, it is

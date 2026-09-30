@@ -117,7 +117,7 @@ properties:
     This node previously read "high poverty", which is the department's code 1, and the
     department does not place it there: its 2013 student poverty measure was 43.5%, below the
     46.4% median of the code it was being assigned to and inside the average-poverty rural group.
-    The characterisation was entered before the code could be read. [verified]
+    The characterization was entered before the code could be read. [verified]
   fy2021_idea_part_b: |
     Public school students with disabilities: 298. Non-public: fewer than 10 (suppressed).
     Allocation: $483,451.88. Proportionate share: $11,095.62. [verified]
@@ -165,5 +165,5 @@ links:
     relationship: sourced-from
     note: >-
       The department's 2013 typology roster, which is where this node's code comes from. The
-      prose characterisation was written before the roster was fetched, and for two of the five
+      prose characterization was written before the roster was fetched, and for two of the five
       nodes that carry a code the two disagreed.

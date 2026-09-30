@@ -69,7 +69,7 @@ findings: |
 
   **For a salary the comparison is sharper than for a price.** A per-pupil rate that falls 11.27%
   buys 11.27% less of whatever it buys. A *post* priced at $85,776 has to be filled at whatever
-  the labour market charges, so a district funded for one coordinator unit is funded for a
+  the labor market charges, so a district funded for one coordinator unit is funded for a
   declining fraction of one coordinator. The section calls it a unit either way. [inference]
 
   ### What it costs, and why it is the smallest of the three
@@ -77,7 +77,7 @@ findings: |
   Across the FY2027 model, paying gifted at the FY2022 real value would cost **$6.9m** more than
   the formula pays. That is the smallest share of the $133.2m the three frozen components lose,
   on exactly the same 11.27% factor that costs [DPIA](dpia-per-pupil-amount.yml) $66.7m — the
-  difference is the size of the programme, not the depth of the freeze. [verified]
+  difference is the size of the program, not the depth of the freeze. [verified]
 
   Gifted sits inside `[H] Foundation Funding`, so a district the guarantee holds absorbs its share
   rather than feeling it. That is the opposite of the
@@ -96,7 +96,7 @@ properties:
     explicit "if the general assembly authorizes such a payment".
 
     The unit prices deserve a note of their own. A price on a post is a legislated *salary
-    assumption*, and it does not move with the labour market — so it behaves like a legislated
+    assumption*, and it does not move with the labor market — so it behaves like a legislated
     parameter in law and like a deteriorating one in substance, in the way a nominal figure
     always does. That companion series now exists: see the findings, and
     [`crates/project::indexation`](../../../crates/project/src/indexation.rs).
@@ -127,7 +127,7 @@ properties:
 
     Each unit amount is multiplied by the district's state share percentage. [verified]
 
-    What the programme pays, summed over the panel's 609 districts, and the three unit kinds
+    What the program pays, summed over the panel's 609 districts, and the three unit kinds
     separately: [verified] (crates/project)
 
       $54,445,264.51  gifted funding, statewide
@@ -136,7 +136,7 @@ properties:
       $12,633,770.59  9-12 intervention specialist units
 
     The three unit kinds are 87% of it; identification and referral are the remaining $6.8m
-    between them, and professional development is zero for every district. So a programme whose
+    between them, and professional development is zero for every district. So a program whose
     two per-pupil rates are the part anyone can quote is overwhelmingly paid through the part
     priced per post.
 
@@ -164,7 +164,7 @@ properties:
     unit funding
   sensitivity: |
     The two per-pupil rates and the three unit prices move different money in different
-    directions. Identification and referral scale with enrolment and reach every district; unit
+    directions. Identification and referral scale with enrollment and reach every district; unit
     funding scales with identified pupils and with the floors, so it reaches small districts
     disproportionately at the bottom and stops scaling at the top.
 

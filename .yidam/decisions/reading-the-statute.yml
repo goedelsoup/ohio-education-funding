@@ -15,7 +15,7 @@ context: |
 
   This is the third stale blocker this repository has found by opening a file instead of reading
   its own note about the file — after the NCES crosswalk that had been "blocked since genesis" and
-  turned out to be one column in a catalogued directory, and `tax-abstract`, whose blocker outlived
+  turned out to be one column in a cataloged directory, and `tax-abstract`, whose blocker outlived
   the block in the other direction. The pattern is worth naming: **a recorded blocker is a claim
   with a date on it, and this corpus has been treating them as facts.**
 decision: |
@@ -56,13 +56,13 @@ consequences: |
     - the **English learner taper** is keyed to time enrolled in United States schools and to
       attaining a proficient score — a schedule rather than a discretion, which is evidence
       against the reclassification-incentive reading and not proof of anything;
-    - the **career-technical categories** are programme areas, not severities, so the drop from
-      0.5905 to 0.2154 is a gap between kinds of programme rather than grades of one;
+    - the **career-technical categories** are program areas, not severities, so the drop from
+      0.5905 to 0.2154 is a gap between kinds of program rather than grades of one;
     - the **squaring** in the disadvantaged-pupil index is R.C. 3317.02(I)(1)(a), which the DPIA
       node had recorded as "not located in statute here".
 
   **One citation was simply wrong.** The DPIA node cited R.C. 3317.029. There is no such section;
-  the programme is R.C. 3317.022(A)(4).
+  the program is R.C. 3317.022(A)(4).
 
   **And one thing turned out not to be law at all.** DPIA's 65/35 blend of economically
   disadvantaged and directly certified ADM appears in no section. R.C. 3317.03(B)(21) delegates the

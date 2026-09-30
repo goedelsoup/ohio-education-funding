@@ -3,7 +3,7 @@ label: FSFP JVSD State Share of Base Cost
 summary: >-
   How Ohio's forty-nine joint vocational districts are charged a local share: a half-mill against
   the lesser of two valuations. H.B. 96 restated it per pupil, which leaves the percentage exactly
-  as it was and moves the aid onto a live enrolment count.
+  as it was and moves the aid onto a live enrollment count.
 description: |
   The local share of the third population the state funds by formula. Ohio has 49 joint vocational
   school districts, and every one of them is funded through this component.
@@ -17,7 +17,7 @@ description: |
   that was never retired.
 
   **Prior law, FY2022–FY2025.** Aggregate base cost less the charge-off, floored at a 10% minimum
-  state share. A subtraction, with no enrolment in it anywhere:
+  state share. A subtraction, with no enrollment in it anywhere:
 
       state share $ = aggregate base cost  −  (charged valuation × 0.0005)
       charged valuation = lesser of the most recent annual value and the three-year average
@@ -60,19 +60,19 @@ findings: |
   ### The department's forty-nine are the forty-nine the directory gives
 
   Ohio's joint vocational districts are typed `4` by the federal directory — *regional education
-  service agency*, the code educational service centres also carry — so a hundred agencies hold
+  service agency*, the code educational service centers also carry — so a hundred agencies hold
   that code and forty-nine of them are JVSDs. Two routes split them and agree: the agency name,
-  and the property levy a JVSD charges and a service centre does not. The department's own payment
+  and the property levy a JVSD charges and a service center does not. The department's own payment
   reports match that set exactly, member for member, which makes them a third route arriving at
   the same answer from the other direction. [verified]
   (`crates/dispersion/src/jvsd_funding.rs`)
 
-  ### What it changes is which enrolment count the share multiplies
+  ### What it changes is which enrollment count the share multiplies
 
   Prior law applied the share to aggregate base cost, which is built on **base cost enrolled ADM**
   — a three-year average. Item 7 applies it to **enrolled ADM**, the current year. The amendment
-  moves JVSD base cost aid from a smoothed enrolment count onto a live one, and it moves money
-  only for districts whose enrolment is not flat. Neither the act's own list nor the greenbook's
+  moves JVSD base cost aid from a smoothed enrollment count onto a live one, and it moves money
+  only for districts whose enrollment is not flat. Neither the act's own list nor the greenbook's
   statement of the formula says this; both describe the per-pupil restatement, which is the half
   that cancels. [inference]
 
@@ -86,7 +86,7 @@ findings: |
 
   The FY2027 report is a September payment, the first of an open year. Its enrolled ADM is
   FY2026's on **43 of the 49 districts**, and equal to base cost enrolled ADM on 39, because
-  FY2027 enrolment does not exist in September 2026. [verified]
+  FY2027 enrollment does not exist in September 2026. [verified]
   (`crates/dispersion/src/jvsd_funding.rs`)
 
   Under prior law that would have been harmless: the share multiplied an average already known.
@@ -154,7 +154,7 @@ properties:
     charged valuation      = lesser of (most recent annual value, three-year average value)
     local capacity         = charged valuation  ×  0.0005
 
-    Prior law, FY2022-FY2025 — a subtraction, with no enrolment term:
+    Prior law, FY2022-FY2025 — a subtraction, with no enrollment term:
 
       state share $        = aggregate base cost  −  local capacity
       state share %        = 1 − local capacity / aggregate base cost,  floored at 0.10

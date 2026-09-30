@@ -32,7 +32,7 @@ The sign flips. [verified — see
 
 **Use the effect size, not the composite.** `Overall Composite` is a precision-scaled statistic —
 a gain over its standard error — so it grows with the number of tested students and correlates
-with enrollment at **+0.244**. `Overall Effect Size` is the standardised gain and correlates with
+with enrollment at **+0.244**. `Overall Effect Size` is the standardized gain and correlates with
 enrollment at +0.155. The two correlate with each other at +0.917, so the choice looks immaterial
 and is not: ranking districts on the composite ranks them partly by size. [verified]
 
@@ -44,7 +44,7 @@ and is not: ranking districts on the composite ranks them partly by size. [verif
   tracks the economically disadvantaged share at −0.325, about 10.6% of its variance, against
   71.5% for the Index. Treating Progress as a clean measure of school contribution overstates
   what it does. [verified]
-- **It is centred by construction.** Mean effect size −0.003, median 0.000, standard deviation
+- **It is centered by construction.** Mean effect size −0.003, median 0.000, standard deviation
   0.083, range −0.29 to +0.29. Ohio's value-added model is normed so the state average is zero,
   which means this measure cannot say whether Ohio as a whole is improving — only which districts
   moved more than others. Any across-year or against-state reading of it is wrong. [verified]

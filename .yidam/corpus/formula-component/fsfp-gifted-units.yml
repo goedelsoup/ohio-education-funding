@@ -51,7 +51,7 @@ findings: |
 
   Eight coordinator units is reached at 26,400 enrolled pupils, and **three districts are
   there**. Columbus and Cleveland are funded for eight coordinators however many pupils they
-  have; Cleveland's enrolment earns 9.33. A floor and a cap on the same line means the middle
+  have; Cleveland's enrollment earns 9.33. A floor and a cap on the same line means the middle
   of the distribution is the only place the ratio actually operates. [verified]
 
   ### Identification rates do vary with wealth
@@ -59,7 +59,7 @@ findings: |
   Gifted funding scales off *identified* FTE, so it depends on how many children a district
   identifies — a district practice as much as a pupil population.
 
-      identified share of enrolment, by quintile      Q1      Q5     ratio
+      identified share of enrollment, by quintile      Q1      Q5     ratio
       ordered by valuation per pupil                10.1%   19.0%     1.9x
       ordered by economically disadvantaged %       25.0%    8.6%     2.9x
 
@@ -104,7 +104,7 @@ revisions:
       Whether identification rates vary with wealth was recorded as "exactly the kind of
       question this decomposition makes askable and the corpus has not asked."
     now: |
-      They do, and **poverty is much the stronger axis**. Identified share of enrolment runs
+      They do, and **poverty is much the stronger axis**. Identified share of enrollment runs
       10.1% to 19.0% across valuation quintiles (1.9x) and 25.0% to 8.6% across economically
       disadvantaged quintiles (2.9x), monotone in both — r = −0.67 on poverty against r = +0.35
       on property wealth.

@@ -36,10 +36,10 @@ context: |
 
   The cause is legible and is the part worth recording. `FOUNDATION_LINES`' own doc comment cites
   `200604` as its cautionary example — *"an appropriation line item is not a stable identifier
-  across this period — `200604` names three different programmes across three funds — so any
+  across this period — `200604` names three different programs across three funds — so any
   series built by line number needs its succession established before it means anything."* That is
   right. But the succession was established for `200501` and used to **exclude** `200604` rather
-  than to resolve it, and its third programme is the one carrying the foundation-funding title.
+  than to resolve it, and its third program is the one carrying the foundation-funding title.
 decision: |
   **Two numbers, two spans, both published, each naming the other.**
 
@@ -81,7 +81,7 @@ consequences: |
       2027  $10,131,392,875  $10,731,392,875   66.4% -> 70.3%
 
   FY2002 through FY2021 are untouched, which is the check that the title rule caught the
-  programme and not the line.
+  program and not the line.
 
   **No bound figure moved, and that is the design rather than luck.** Every summary statistic this
   workspace publishes off the series — the noise floor in `what_the_series_cannot_settle`, the mean

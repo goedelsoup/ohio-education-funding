@@ -16,7 +16,7 @@ name of the lead district, the lead's **IRN**, its city, and which of four kinds
 district is — comprehensive district, JVSD, compact/contract, or correctional institution. The
 table carries **92** rows. Above it a map legend breaks the same population into 26 comprehensive,
 15 compact/contract, 49 JVSD and 2 correctional, which sums to 92 against a printed total of 91;
-the legend disagrees with itself and the table is the countable artefact.
+the legend disagrees with itself and the table is the countable artifact.
 
 **Why it was retrieved.** R.C. 3317.014(E)(1)(a) pays career awareness and exploration funds to
 *the lead district of each career technical planning district*, on the summed enrolled ADM of that
@@ -36,8 +36,8 @@ roster at all. Only attribution to a recipient does.
 
 **Access constraints.** Freely available, no authentication. `pdftotext -layout` recovers the table
 cleanly; the map above it becomes a scatter of three-digit labels that should be discarded rather
-than parsed. Two ligature artefacts survive extraction — `ﬁ` and `ﬀ` in names like Springfield,
-Mayfield, Canfield, Fairfield and Jefferson — so a name match against this file needs normalising
+than parsed. Two ligature artifacts survive extraction — `ﬁ` and `ﬀ` in names like Springfield,
+Mayfield, Canfield, Fairfield and Jefferson — so a name match against this file needs normalizing
 first, while the IRN column does not.
 
 **Caveats.**
@@ -59,7 +59,7 @@ first, while the IRN column does not.
   as an earmark inside GRF line item 200545.
 - **It is undated.** The file carries no revision date and no fiscal year, so it states the
   designations as of retrieval and cannot be used to date a change in them. A CTPD that
-  reorganised would be invisible against an earlier reading.
+  reorganized would be invisible against an earlier reading.
 - **The CTPD number is not an IRN and mostly not a district.** Numbers run `200001`-`200121` with
   two correctional entries at `200600` and `200602` and one outlier, `021357`, that does not share
   the prefix. The lead's IRN is a separate column and is the one that joins to anything here.

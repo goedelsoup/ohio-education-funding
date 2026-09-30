@@ -8,7 +8,7 @@ description: |
   GRF line item 200511, and the oldest of the three lines the department groups as Category 3:
   Nonpublic School Support. The money is divided among the chartered nonpublic schools by a
   per-pupil quotient and spent on a list of secular services — textbooks, health and guidance
-  services, speech and hearing services, remedial programmes, computer equipment, school safety
+  services, speech and hearing services, remedial programs, computer equipment, school safety
   and security — that R.C. 3317.06 sets out in seventeen severable divisions. [verified]
   ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
 
@@ -19,21 +19,21 @@ description: |
   appropriated for the implementation of sections 3317.06 and 3317.062" by the average daily
   membership in chartered nonpublic schools "as determined as of the last day of October of each
   school year". So this is a quotient of an appropriation and not a price, and its rate falls when
-  nonpublic enrolment rises. [verified]
+  nonpublic enrollment rises. [verified]
   ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
 
   **The money reaches a school by one of two routes, and the school chooses.** Under
   R.C. 3317.024(E)(1) the state pays the resident district, which buys the services and is
   reimbursed for the cost of administering them; under (E)(2) a school that gives notice by 1
   April of an odd-numbered year is paid directly, and R.C. 3317.062 is the same list of permitted
-  uses written for that route. A directly-paid school may designate an organisation to receive the
-  money, and that organisation "may require the school's governing authority to pay a fee … that
+  uses written for that route. A directly-paid school may designate an organization to receive the
+  money, and that organization "may require the school's governing authority to pay a fee … that
   does not exceed four per cent of the total amount of payments for auxiliary services that the
   school receives from the state". [verified] How the schools divide between the two routes is not
   held here — neither the redbook nor the greenbook reports it. [open]
 
-  This is the programme the corpus missed for as long as it treated state money in private
-  schooling as the scholarship question. It predates every voucher modelled here, it is paid
+  This is the program the corpus missed for as long as it treated state money in private
+  schooling as the scholarship question. It predates every voucher modeled here, it is paid
   outside the six funding units of R.C. 3317.022, and it has its own appropriation line where the
   scholarships have an earmark inside one.
 findings: |
@@ -44,10 +44,10 @@ findings: |
   **$242,688,919** in FY2025 and is appropriated **$250,737,573** for FY2027. [verified]
   ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
 
-  Set beside the channel this corpus did model: the four scholarship programmes that publish an
+  Set beside the channel this corpus did model: the four scholarship programs that publish an
   expenditure paid **$991,191,150.12** in 2024-25, so Category 3 is **24.48%** of them. That share
   is an **upper bound** and not an estimate — Jon Peterson publishes no expenditure, so the
-  denominator is short by one programme. Even bounded, the reading holds: a quarter of the money
+  denominator is short by one program. Even bounded, the reading holds: a quarter of the money
   this corpus called the nonpublic channel was never in it. [verified]
   ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
 
@@ -62,7 +62,7 @@ findings: |
   ### The per-pupil figure closes on the October the statute names
 
   R.C. 3317.024(E)(2)(d) divides, and the corpus now holds what it divides by. The department has
-  published an October count of chartered nonpublic enrolment every year since 1977 — **49** of
+  published an October count of chartered nonpublic enrollment every year since 1977 — **49** of
   them, at the building and at the sector, on an attachment page no connector owned. FY2025's
   quotient takes the appropriation net of the College Credit Plus earmark, **$2,739,015**, over the
   **179,693** pupils living in Ohio that the department counted in October 2024. It comes to
@@ -90,7 +90,7 @@ findings: |
   ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
 
   The landscape sheet is the cross-publisher check now rather than the denominator, and it passes:
-  its enrolment and its school count are exactly what the department's own October 2023 data file
+  its enrollment and its school count are exactly what the department's own October 2023 data file
   states, from a different office in a different format. Inverting the published rate on the
   appropriation net of the earmark wants **179,713** pupils against the 179,693 counted — a gap of
   twenty in a hundred and eighty thousand, which is what rounding a rate to the dollar costs.
@@ -104,7 +104,7 @@ findings: |
   ### The third line is this line's own money coming back
 
   ALI 200659, "Auxiliary Services Reimbursement", is carried as a separate line in fund 5980 and is
-  not a separate programme. R.C. 3317.064(A) creates its fund out of "excess moneys in the
+  not a separate program. R.C. 3317.064(A) creates its fund out of "excess moneys in the
   auxiliary services personnel unemployment compensation fund", and R.C. 4141.47(A) says that fund
   "shall consist of moneys paid into the fund pursuant to section 3317.06 of the Revised Code" —
   so the line is a two-step reflux of unspent 200511 money. Both LSC editions add the fact that
@@ -155,7 +155,7 @@ unfilled:
       R.C. 3317.024(E)(2) makes it a per-school election and neither the redbook nor the greenbook
       reports the result, so the share of the line passing through districts is not held. It
       matters because only the district route generates the administrative reimbursement
-      R.C. 3317.06 pays to districts and educational service centres.
+      R.C. 3317.06 pays to districts and educational service centers.
 figures:
   - key: project/auxiliary-services-fy2025
     value: 166816769
@@ -271,7 +271,7 @@ links:
     note: >-
       H.B. 96 added diagnostic and therapeutic mental health services and retired Ohio peace
       officers to the permitted uses in R.C. 3317.06, and appropriated to the same line. An
-      amendment to the uses, not a new programme — which is why it is an edge here rather than a
+      amendment to the uses, not a new program — which is why it is an edge here rather than a
       node of its own.
   - target: ../../catalog/lsc-catalog-of-budget-line-items.md
     relationship: sourced-from
@@ -282,7 +282,7 @@ links:
     relationship: sourced-from
     note: >-
       R.C. 3317.06, 3317.024, 3317.062 and 3317.064, vendored into `revised-code.txt` beside the
-      formula sections. The first three settle what this programme is; the fourth settles that the
+      formula sections. The first three settle what this program is; the fourth settles that the
       mobile unit line is not a second one.
   - target: ../../catalog/dew-education-landscape.md
     relationship: sourced-from
@@ -293,7 +293,7 @@ links:
   - target: ../../catalog/dew-nonpublic-enrollment.md
     relationship: sourced-from
     note: >-
-      Forty-nine Octobers of chartered nonpublic enrolment, at the building and at the sector. The
+      Forty-nine Octobers of chartered nonpublic enrollment, at the building and at the sector. The
       denominator R.C. 3317.024(E)(2)(d) names, which this node carried as an unfilled field until
       the department's Enrollment Data page got a connector.
   - target: ../../catalog/lsc-dew-redbook.md
@@ -302,5 +302,5 @@ links:
   - target: ../../catalog/dew-scholarship-annual-report.md
     relationship: sourced-from
     note: >-
-      The scholarship expenditure Category 3 is set against. Four programmes of five, which is why
+      The scholarship expenditure Category 3 is set against. Four programs of five, which is why
       the ratio is stated as an upper bound.

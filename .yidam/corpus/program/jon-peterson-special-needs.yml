@@ -11,16 +11,16 @@ description: |
   and named for a former state representative who worked on special education. [verified]
   (R.C. 3310.52; 2025 Scholarship Annual Report)
 
-  **It is capped, and it is the only scholarship programme here that is.** Participation may not
+  **It is capped, and it is the only scholarship program here that is.** Participation may not
   exceed five per cent of the students statewide identified as children with disabilities in the
   previous fiscal year. [verified] (R.C. 3310.52(B)) Nothing comparable bounds EdChoice, the
-  expansion, Cleveland or Autism, which makes this the one programme whose size is a policy
+  expansion, Cleveland or Autism, which makes this the one program whose size is a policy
   decision rather than a demand outcome.
 
   **It reaches almost every district in the state.** Students enrolled in 2024-2025 came from
   494 school districts — over 80% of Ohio's. [verified] (2025 Scholarship Annual Report) That is
-  the widest footprint of any programme in this channel, and it is why a per-district figure
-  matters more here than anywhere else: a programme touching four fifths of districts at 8,680
+  the widest footprint of any program in this channel, and it is why a per-district figure
+  matters more here than anywhere else: a program touching four fifths of districts at 8,680
   students is thin almost everywhere, and a district-level effect is invisible in the statewide
   total.
 
@@ -29,7 +29,7 @@ description: |
   the department's reports portal — which answers every path with the same application shell, and
   serves its reports as Power BI embeds behind an entitlement anonymous users do not hold. See
   [`deduction`](../../skills/deduction.md), which records the two routes and what would reach
-  them. The programme's own publisher points at the file, and nothing this project can fetch
+  them. The program's own publisher points at the file, and nothing this project can fetch
   carries it. [verified] [open]
 revisions:
   - was: |
@@ -52,23 +52,23 @@ revisions:
 findings: |
   ### Its first year is in the archive, and applications ran a fifth above payments
 
-  The department's archive reaches this programme for **FY2013** alone — the year it began — and
+  The department's archive reaches this program for **FY2013** alone — the year it began — and
   is the only held source that splits it. 2,129 applications; 1,779 scholarships with at least one
   payment made against them. [verified]
   ([`crates/project`](../../../crates/project/tests/the_renewal_that_was_last_years_payments.rs))
 
-  So 350 families applied in the programme's first year and were never paid, a sixth of everyone
+  So 350 families applied in the program's first year and were never paid, a sixth of everyone
   who asked. The archive does not say why, and none of its four income-status definitions applies
-  to this programme. [open] Recorded because the annual report's participation figure is the
+  to this program. [open] Recorded because the annual report's participation figure is the
   payment count alone, and a reader taking it for demand understates the first year by a fifth.
 
   ### It has three published years, and the department posted two of them in one afternoon
 
-  This programme had an annual report of its own until the 2025 consolidated report absorbed it, and
+  This program had an annual report of its own until the 2025 consolidated report absorbed it, and
   two editions were still being served when they were fetched. With the consolidated report's Jon
   Peterson section that is **FY2023, FY2024 and FY2025** — the only participation series any
-  scholarship programme has between FY2013 and FY2025, and the first year-on-year change in this
-  programme's participation the department has published anywhere. [verified]
+  scholarship program has between FY2013 and FY2025, and the first year-on-year change in this
+  program's participation the department has published anywhere. [verified]
   ([`crates/project`](../../../crates/project/tests/the_three_years_the_jon_peterson_report_gives.rs))
 
       fiscal year   students   providers   districts   expenditure
@@ -81,7 +81,7 @@ findings: |
   districts of residence rose once and then fell by one while participation kept rising: the reach
   saturated at the four fifths of Ohio's districts the reports claim in prose, and the growth after
   FY2024 is more children from districts already reached. [verified] That last line is what the
-  description's "widest footprint of any programme in this channel" now rests on — a footprint that
+  description's "widest footprint of any program in this channel" now rests on — a footprint that
   has stopped widening.
 
   **The expenditure column is the department's own arithmetic, quoted once.** Only the FY2023
@@ -119,11 +119,11 @@ findings: |
   student 7.4%. Two readings survive. Either the FY2023 edition's spending chart lags its heading,
   or its award table was copied forward from FY24 when the two files were produced together — and
   under the second the spending chart is FY2023's after all and the 11.6% is real. Against the
-  first: the FY2024 chart is corroborated by a second publisher, the FY2025 chart is labelled with
+  first: the FY2024 chart is corroborated by a second publisher, the FY2025 chart is labeled with
   its year, and a lagged FY2023 chart would leave FY2023 with no spending figure anywhere. **This
   corpus commits to neither and carries every column as published.** [open]
 
-  ### The two publishers agree on this programme's money and not on its counts
+  ### The two publishers agree on this program's money and not on its counts
 
   FY2024 is the only fiscal year both the department and the Legislative Service Commission describe,
   so it is the only place either can be checked against the other. [verified]
@@ -157,7 +157,7 @@ findings: |
 
 properties:
   seeded_because: |
-    Named in the [`deduction`](../../skills/deduction.md) calculator as one of the four programmes
+    Named in the [`deduction`](../../skills/deduction.md) calculator as one of the four programs
     it must compute over, and missing from the corpus for as long as that stub has existed.
     [inference]
   name: Jon Peterson Special Needs Scholarship Program
@@ -170,7 +170,7 @@ properties:
     districts; the community and STEM school unit; the educational choice scholarship unit; the
     pilot project scholarship unit; the autism scholarship unit; and **the Jon Peterson special
     needs scholarship unit**. The scholarship is paid to the unit, and R.C. 3310.52(C) has the
-    department pay the eligible applicant — or the provider, if the applicant so authorises.
+    department pay the eligible applicant — or the provider, if the applicant so authorizes.
     [verified] (R.C. 3317.022, R.C. 3310.52)
 
     This is the positive form of a finding the corpus previously held only negatively. The
@@ -179,17 +179,17 @@ properties:
     word "deduct" does not appear anywhere in R.C. 3310.41, 3310.51, 3310.52, 3310.01, 3310.03,
     3310.032, 3310.08 or 3313.975 as those sections now stand. [verified]
 
-    **Before FY2022 it was a deduction, and it ran the way the autism programme's did.** LSC
+    **Before FY2022 it was a deduction, and it ran the way the autism program's did.** LSC
     writes that funding "is provided in the same way as that of the Autism program, through a
     transfer of state aid from the resident district to the alternate provider", with the
     scholarship student counted in the resident district's ADM for the state funding formula.
     [verified] ([`crates/project`](../../../crates/project/tests/the_deduction_the_scholarships_were_paid_by.rs))
 
-    The mechanism was shared with that programme; the ceiling was not. Autism's was a flat dollar
-    cap. This programme's was the lesser of the tuition the alternate provider charged and what
+    The mechanism was shared with that program; the ceiling was not. Autism's was a flat dollar
+    cap. This program's was the lesser of the tuition the alternate provider charged and what
     the formula would have paid for the student — the formula amount plus the special education
     amounts used to calculate funding for students in traditional districts — subject to the cap.
-    [verified] (the greenbook for H.B. 59 of the 130th, the programme's second year)
+    [verified] (the greenbook for H.B. 59 of the 130th, the program's second year)
 
     What is still open is the per-district arithmetic the deduction produced, not the rule that
     produced it. `dew-payment-reports` is the source for that. [open]
@@ -205,7 +205,7 @@ properties:
   amount: |
     **FY2025: 8,680 students, $103,944,388.15, across 530 approved providers.** [verified] (2025
     Scholarship Annual Report; the dollar figure is the sum of the report's six disability-category
-    totals, which the report displays without totalling)
+    totals, which the report displays without totaling)
 
     The statutory bound is the **least of three** things: the fees charged by the student's
     provider; $7,190 plus a supplement determined by disability category; and **$34,000**.
@@ -223,7 +223,7 @@ properties:
 
     **The formula already exceeds its own ceiling.** A category six student computes to $39,122
     and is paid at most $34,000 — a $5,122 haircut on the most severely disabled category in the
-    programme, before any year of indexing. [verified] Category five is $4,250 below the ceiling
+    program, before any year of indexing. [verified] Category five is $4,250 below the ceiling
     and rising.
 
     That matters because the three terms are indexed differently. The $7,190 base rises with the
@@ -236,12 +236,12 @@ properties:
 
     The award is therefore category-scaled in the same way the special education weights are, and
     the six category totals in the annual report are the only published decomposition of this
-    programme's spending. The largest category alone is $74,946,785.41, 72% of the programme.
+    program's spending. The largest category alone is $74,946,785.41, 72% of the program.
     [verified]
   appropriation_line: |
     **No line of its own — paid from the foundation aid appropriation.** Five line items support
     state foundation aid payments for all public school students *and* scholarship payments for
-    students in state scholarship programmes: GRF ALI 200550 Foundation Funding, GRF ALI 200502
+    students in state scholarship programs: GRF ALI 200550 Foundation Funding, GRF ALI 200502
     Pupil Transportation, Fund 5VS0 ALI 200604, Fund 5YO0 ALI 200491, and Lottery Fund 7017
     ALI 200612. [verified] (LSC redbook and greenbook, `crates/project/fixtures/dew-redbook.txt` and
     `dew-greenbook.txt`. Checked against the act as enacted, not only as introduced: the five
@@ -258,9 +258,9 @@ properties:
     different chapters of the Revised Code and were established across 42 years.** Pupil
     Transportation (GRF 200502) was established by H.B. 191 of the 112th General Assembly, which
     convened in 1977; Fund 5VS0's foundation line by H.B. 166 of the 133rd, in 2019. The lottery
-    fund's line, 200612, carries the same name as the general revenue fund's and is authorised
+    fund's line, 200612, carries the same name as the general revenue fund's and is authorized
     under R.C. 3770 — the lottery chapter — rather than under R.C. 3317; Fund 5YO0's support line
-    cites 3317 beside R.C. 5753, the casino wagering tax. A programme with no line of its own is
+    cites 3317 beside R.C. 5753, the casino wagering tax. A program with no line of its own is
     paid from five that do not share a statute, a fund or a decade. [verified]
 figures:
   - key: project/scholarship-line-establishing-span
@@ -317,18 +317,18 @@ links:
   - target: ../../catalog/dew-scholarship-annual-report.md
     relationship: sourced-from
     note: >-
-      The administrator's own account of the programme, and where this node's participation and
+      The administrator's own account of the program, and where this node's participation and
       expenditure figures for 2024-2025 come from.
   - target: ../../catalog/ohio-revised-code.md
     relationship: sourced-from
     note: >-
-      The authorising sections this node cites by number — eligibility, the award, and the
+      The authorizing sections this node cites by number — eligibility, the award, and the
       deduction that pays for it.
   - target: ../../catalog/dew-jpsn-annual-report.md
     relationship: sourced-from
     note: >-
-      The programme's own annual report, FY23 and FY24 editions, and the only source that gives
-      this channel more than one year of participation for any programme.
+      The program's own annual report, FY23 and FY24 editions, and the only source that gives
+      this channel more than one year of participation for any program.
   - target: ../../catalog/dew-scholarship-historical-data.md
     relationship: sourced-from
     note: >-

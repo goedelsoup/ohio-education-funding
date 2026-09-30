@@ -169,7 +169,7 @@ export function renderCensus(c: Census): string {
   const year = yearOf("formula");
   const naming = {
     label:
-      `Every bound in the modelled formula, ranked by how many of Ohio's ${count(c.whole)} ` +
+      `Every bound in the modeled formula, ranked by how many of Ohio's ${count(c.whole)} ` +
       `school districts each one is the operative term for${year ? `, ${year}` : ""}. ` +
       `Logarithmic scale, from ${count(c.most.value)} districts down to ${count(c.least.value)}.`,
   };
@@ -319,7 +319,7 @@ export function renderNulls(c: Census): string {
              (${escapeHtml(row.cites ?? "the statute")}) is operative for
              <strong>no district in the state</strong>, and cannot be. It is a floor beneath a
              quantity that is never smaller than it — so it is written into the statute, it is
-             modelled here, and it decides nothing. The chart above draws it at the foot of the
+             modeled here, and it decides nothing. The chart above draws it at the foot of the
              scale rather than dropping it: a bound with no force is a finding, and a bar of
              length nought states nothing at all.</p>`,
           )

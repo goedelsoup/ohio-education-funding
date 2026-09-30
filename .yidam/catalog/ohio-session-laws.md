@@ -52,7 +52,7 @@ served". The index is `.../legislation/{bill}/`, a JSON array with one object pe
 | act | biennium | what it is |
 |---|---|---|
 | Am. Sub. H.B. 215, 122nd | FY1998-99 | the main operating budget |
-| Am. Sub. H.B. 650, 122nd | FY1999 | itemises the year H.B. 215 left in one line |
+| Am. Sub. H.B. 650, 122nd | FY1999 | itemizes the year H.B. 215 left in one line |
 | Am. Sub. H.B. 770, 122nd | FY1998-99 | corrective; reprints Section 50 as amended |
 | Am. Sub. H.B. 282, 123rd | FY2000-01 | education appropriations, and **not** the budget bill |
 
@@ -67,7 +67,7 @@ Education was appropriated by H.B. 282, enacted a day earlier, as the response t
 own fund-group totals and those to its grand total, in both columns.
 
 **H.B. 770 is the operative text for FY1998-99 and H.B. 215 is not.** It reprints Section 50 *as
-already amended by H.B. 650*, so its columns carry the itemisation H.B. 215 deferred, with
+already amended by H.B. 650*, so its columns carry the itemization H.B. 215 deferred, with
 `200-405` struck back to zero. H.B. 215 is kept because the shape of what it did is the finding.
 
 The amendment is **positional, not typographic**. Strike-through does not survive into the text
@@ -101,7 +101,7 @@ XII Section 14. That measure failed. Its line items are printed as literal place
   its five group totals sum to its printed grand total exactly. The dollar sits between the rows
   and the GRF footing. It is carried as a named defect rather than absorbed by a tolerance.
 - **H.B. 770's FY1999 grand total omits the Education Improvement Fund's $1,443,401**, while its
-  FY1998 grand total includes it. This one is resolvable in the rows' favour and was resolved
+  FY1998 grand total includes it. This one is resolvable in the rows' favor and was resolved
   there: `appropriation-lines.csv` already carries `200689 Hazardous Waste Removal` as a FY1999
   *actual* of exactly $1,443,401, from the H.B. 94 greenbook, so the money was appropriated and
   spent and it is the act's footing that is wrong.

@@ -62,7 +62,7 @@ properties:
     An unreported line is skipped rather than summed as zero. Nominal dollars throughout; the
     caveats give the constant-dollar reading, which ends below where it began.
   caveats: |
-    **General fund only.** Capital, food service, and most federal programmes sit in other funds.
+    **General fund only.** Capital, food service, and most federal programs sit in other funds.
     A balance here is not the district's total resources and an expenditure here is not its total
     spending. It must never be compared line-for-line with
     [per-pupil operating expenditure](per-pupil-operating-expenditure.yml), which is computed on
@@ -164,7 +164,7 @@ findings: |
   already carries ESSER I, which arrived in the spring of 2020; FY2025 is not a post-period either,
   because ESSER III's obligation deadline fell in September 2024 and liquidation ran into 2025. On
   the FY2020 baseline the excess is $0.86bn — 46.9% of a $1.83bn build-up — and relief explains
-  15.1% to 39.4% of it. Levelled against both years the excess is $0.57bn, 31.3%, and relief
+  15.1% to 39.4% of it. Leveled against both years the excess is $0.57bn, 31.3%, and relief
   explains **6.4% to 8.8%**. The two ends of each range are a least-squares slope, which a handful
   of large districts pull, and the gap between the outer quartile medians, which they cannot.
   [verified] (crates/project, `transfers::attribution`, pinned by test)

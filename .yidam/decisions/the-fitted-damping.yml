@@ -38,7 +38,7 @@ context: |
 decision: |
   Set `DEFAULT_DAMPING` to **0.30**.
 
-  **Why 0.30 rather than the 0.20 that minimises the headline metric.** The objective is flat
+  **Why 0.30 rather than the 0.20 that minimizes the headline metric.** The objective is flat
   between them — 0.04033 against 0.04031 on the three-point window the callers actually use,
   0.05%, which no honest reading distinguishes. 0.30 is the optimum on the *enrollment-weighted*
   metric, which is the one that governs a statewide total rather than a typical district, and on

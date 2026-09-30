@@ -38,7 +38,7 @@ fetching; `crates/connect` builds the agent string from it and says so when a fe
 - **Period matters as much as series.** `M06` is June; `M13` is the annual average and `S01`
   is the first-half average. Reading the wrong period gives a plausible number that is not the
   one the deflator's fiscal-year alignment assumes.
-- **Neighbouring series names are close enough to confuse.** `CUUS0000SA0` is the semi-annual
+- **Neighboring series names are close enough to confuse.** `CUUS0000SA0` is the semi-annual
   companion and `CUUR0000SAF1` is food. Both would deflate quietly and wrongly.
 - **CPI-U is a general consumer index.** School costs are majority compensation, for which the
   Employment Cost Index is the better deflator with much shorter coverage. Any figure produced

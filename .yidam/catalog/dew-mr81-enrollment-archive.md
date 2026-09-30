@@ -69,7 +69,7 @@ paid on.
     2001         comma, sponsor-centric: County, SponsorIRN, ..., AdmCount, ...
     2002-2009    tab, sponsor-centric; ProvisionYear appears in 2003
     2010-2011    tab, sponsor-centric, AdmCount renamed CECount
-    2012-2014    three programme streams, separately published
+    2012-2014    three program streams, separately published
     2015-2025    one workbook an October, streams on a column, counts masked under ten
 
 Every year from 1999 carries a delimited file alongside the rendered text; 1998 is comma-delimited
@@ -84,8 +84,8 @@ form the 2013 community-eligibility stream was ever posted in — and a workbook
 
 **Two things the workbook era carries that the delimited one did not.** Its Notes sheet *states*
 the community-eligibility rule this repository had previously measured off the 2014 file — the
-printed percentage is the directly-certified count times 1.6 over enrolment — so the ceiling half
-of the corpus's band is the programme's own arithmetic rather than an inference. And it **masks a
+printed percentage is the directly-certified count times 1.6 over enrollment — so the ceiling half
+of the corpus's band is the program's own arithmetic rather than an inference. And it **masks a
 count printed as `<10`**, which is not a bound: when either of the free/reduced pair falls under
 ten *both* are masked, so the value behind one can be 15 or 19. The masked count is recovered from
 the percentage printed beside it, on an identity that reproduces all **42,983** unmasked cells
@@ -130,7 +130,7 @@ exactly. `censored` on each row says how many arrived that way.
 - **Two Octobers are not a reading of Ohio.** Under USDA's nationwide free-meal waivers, in force
   for 2020-21 and 2021-22, a sponsor could serve every student free without collecting one
   application — and almost every one stopped filing. October 2020 and October 2021 carry **296 and
-  261 sponsors against about 850**, and a quarter of the enrolment; their band reads twenty points
+  261 sponsors against about 850**, and a quarter of the enrollment; their band reads twenty points
   above the years either side and every point of that is about who filed. The feed marks them
   `comparable: false` and the page prints "not the state" in the row.
 - **Traditional is emptying into community eligibility.** 2,849 sites in October 2015 against

@@ -730,12 +730,12 @@ export function renderChargeOff(d: District, statewide: Statewide, tax: TaxState
         calculation is all that is comparable.</p>
 
       <p class="note"><strong>A correction, because this page said something wrong.</strong> It
-        described recognised valuation as an H.B. 920 adjustment that this project did not hold,
-        and warned that every figure was on a wider base. The first half was wrong: recognised
+        described recognized valuation as an H.B. 920 adjustment that this project did not hold,
+        and warned that every figure was on a wider base. The first half was wrong: recognized
         valuation is not an H.B. 920 adjustment at all. It phases a reappraisal's inflationary
         increase into the charge-off base over three years — two thirds deferred in the
         revaluation year, one third the year after, nothing by the third. Which districts it
-        favours is decided by the Department of Taxation's staggered county calendar, not by any
+        favors is decided by the Department of Taxation's staggered county calendar, not by any
         district's tax history.
         ${
           r.recognized_share >= 0.9995

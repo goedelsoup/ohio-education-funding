@@ -64,17 +64,17 @@ findings: |
 
   Three independent selections over the panel return the same single district, which is what
   makes this an identification rather than a coincidence: the only district whose blend exceeds
-  its enrolment, the only one whose weighted ADM equals its enrolment, and the only one at a
+  its enrollment, the only one whose weighted ADM equals its enrollment, and the only one at a
   disadvantaged percentage of ~100%. [verified]
   (`crates/project/tests/questions_the_corpus_left_open.rs`)
 
-  ### The cause: a prior-year count against a collapsed enrolment
+  ### The cause: a prior-year count against a collapsed enrollment
 
-  The blend's first term is the **FY2025** count. Edgerton's enrolment fell from **504.48 in
+  The blend's first term is the **FY2025** count. Edgerton's enrollment fell from **504.48 in
   FY2025 to 342.38 in FY2026** — a third of the district in one year. Its count of 497.21 is
-  **98.6% of the enrolment it was measured against** and 145% of the one it is applied to.
+  **98.6% of the enrollment it was measured against** and 145% of the one it is applied to.
 
-  The three districts whose count most exceeds current enrolment make the point better than any
+  The three districts whose count most exceeds current enrollment make the point better than any
   argument:
 
       district                 ED/FY2025   current/FY2025   ED/current
@@ -162,7 +162,7 @@ findings: |
   `d3` divides by 0.533380310606710 — the statewide economically disadvantaged percentage. R.C.
   3317.02(I)(1)(a)(i) defines it as a **computation, not a constant**: the statewide ADM it
   divides by is the sum of enrolled ADM for all city, local and exempted village districts,
-  statewide community school enrolment, and statewide STEM school enrolment. So it is
+  statewide community school enrollment, and statewide STEM school enrollment. So it is
   recomputed rather than carried forward, and its value moves when any of those three move.
   [verified] (`ohio-laws`)
 
@@ -199,12 +199,12 @@ findings: |
 label: FSFP Disadvantaged Pupil Impact Aid
 summary: >-
   $525 million, and the only categorical whose mechanism is neither a weight times a count nor
-  an equalisation off wealth. It blends two poverty counts, indexes the blend against the
+  an equalization off wealth. It blends two poverty counts, indexes the blend against the
   state's, and squares it.
 description: |
   **$525m**, and the only one of the six whose mechanism is neither a weight times a count nor
-  an equalisation off wealth. DPIA blends two poverty counts, expresses the blend as a share of
-  enrolment, indexes that share against the state's — and **squares it**. [verified]
+  an equalization off wealth. DPIA blends two poverty counts, expresses the blend as a share of
+  enrollment, indexes that share against the state's — and **squares it**. [verified]
 
   ### The squaring is the whole character of the program, and no DPIA total shows it
 
@@ -224,7 +224,7 @@ description: |
   ### The weighted ADM is capped at the district's own enrolled ADM
 
   The blend can produce more disadvantaged pupils than pupils, and where it would the published
-  figure is the enrolment instead. [verified]
+  figure is the enrollment instead. [verified]
 
   ### Where the statute says it
 
@@ -310,19 +310,19 @@ revisions:
       elsewhere, and the two are not nested.
   - was: |
       Edgerton Local's disadvantaged count was recorded as being "on a different basis than
-      enrolment or it is wrong".
+      enrollment or it is wrong".
     now: |
       It is on a different basis, and the act names which: the blend's first term is the
-      **FY2025** count. Edgerton's enrolment fell from 504.48 in FY2025 to 342.38 in FY2026, so
-      its count of 497.21 is 98.6% of the enrolment it was measured against and 145% of the one
+      **FY2025** count. Edgerton's enrollment fell from 504.48 in FY2025 to 342.38 in FY2026, so
+      its count of 497.21 is 98.6% of the enrollment it was measured against and 145% of the one
       it is applied to.
     found_by: |
       H.B. 96's own table, which names the vintage of each term, read against the district's
-      two enrolment years.
+      two enrollment years.
     reach: |
       It settles the disjunction rather than one half of it — nothing about Edgerton's figure
       is wrong. The same 98.6% appears in the two other districts whose count most exceeds
-      current enrolment, so the dispersion is entirely in the denominator.
+      current enrollment, so the dispersion is entirely in the denominator.
   - was: |
       The squaring was recorded as "visible in the workbook's own formula and has not been
       located in statute here."
@@ -373,7 +373,7 @@ properties:
     \text{aid} &= d_1 \times \$422 \times d_3
     \end{aligned}
   statutory_basis: |
-    R.C. 3317.022(A)(4) for the programme and the $422; R.C. 3317.02(I)(1) for the index and its
+    R.C. 3317.022(A)(4) for the program and the $422; R.C. 3317.02(I)(1) for the index and its
     squaring; R.C. 3317.03(B)(21) for the count. This node previously cited R.C. 3317.029, which
     does not exist. [verified] (`ohio-laws`)
 

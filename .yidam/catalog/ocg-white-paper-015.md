@@ -61,7 +61,7 @@ Section 5 reports FY2024: $741.8M below the formula, 180 districts drawing $181.
 The department's own FY2027 model — the terminal year, formula at 100% — shows **294 of 609
 districts (48.3%), holding 54.1% of Ohio's students, funded by the
 [guarantee](../corpus/formula-component/temporary-transitional-aid-guarantee.yml) rather than the
-formula, totalling $878,974,300.** [verified] Roughly fivefold growth in guarantee dollars
+formula, totaling $878,974,300.** [verified] Roughly fivefold growth in guarantee dollars
 arriving *at* completion of the phase-in.
 
 The guarantee is anchored to **FY2020 and has never been re-based**; for guaranteed districts the
@@ -128,7 +128,7 @@ The FY2024 F-33 survey is held and the cross-state table splits in two. [verifie
 **The revenue mix reproduces, and it is the part the argument rests on.** Ohio's shares come out
 state 35.1% / local 53.3% / federal 11.6% against the published 34.6 / 53.6 / 11.8; Indiana and
 Kentucky land within half a point on every line. Ohio's local reliance sits more than nine points
-above the national figure and above all three of its western and southern neighbours. The
+above the national figure and above all three of its western and southern neighbors. The
 paper's Section 9 claim is confirmed.
 
 **The per-pupil dollars do not reproduce, and the corpus cannot say why.** Aggregating the

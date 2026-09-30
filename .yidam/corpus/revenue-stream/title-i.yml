@@ -43,7 +43,7 @@ findings: |
   **Local reliance does not enter this formula anywhere.** 20 U.S.C. 6337 multiplies a state's
   per-formula-child amount by two factors and neither is about the state-and-local split. The
   *effort* factor is per-pupil expenditure over per-capita income, relative to the national
-  ratio — total spending against ability to pay. The *equity* factor is the enrolment-weighted
+  ratio — total spending against ability to pay. The *equity* factor is the enrollment-weighted
   coefficient of variation of per-pupil expenditure across the state's own local education
   agencies, counting only agencies enrolling more than 200 pupils. Ohio raising 51.8% of school
   revenue locally is invisible to both. [verified] (20 U.S.C. 6337(b))
@@ -95,7 +95,7 @@ revisions:
       formula's two multipliers are total spending against per-capita income, and the dispersion
       of spending across the state's own districts; neither reads the state-and-local split. The
       corrected reading is the sharper one — the corpus was already computing the quantity that
-      matters and had never recognised it as a federal parameter.
+      matters and had never recognized it as a federal parameter.
     found_by: |
       Reading the statute in order to answer the materiality question the same sentence left open.
       51.8% local is the fact this corpus reaches for whenever a national comparison is wanted,

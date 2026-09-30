@@ -148,7 +148,7 @@ test.describe("the hold-harmless machinery", () => {
     const table = page.locator('[data-part="aid-source"] table[data-program="hold-harmless"]');
     await expect(table).toBeVisible();
     await expect(table).toContainText("FY2021 funding base");
-    await expect(table).toContainText("Open-enrolment clawback");
+    await expect(table).toContainText("Open-enrollment clawback");
     await expect(page.locator("main")).toContainText("not at this district's share of it");
   });
 
@@ -278,7 +278,7 @@ test.describe("the hold-harmless machinery", () => {
     await expect(table).toContainText("FY2021 funding base");
     await expect(table).toContainText("Guarantee");
     // The two conditional rows stay conditional. This district has neither.
-    await expect(table).not.toContainText("Open-enrolment clawback");
+    await expect(table).not.toContainText("Open-enrollment clawback");
     await expect(table).not.toContainText("Formula transition supplement");
   });
 

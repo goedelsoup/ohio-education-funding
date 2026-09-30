@@ -89,7 +89,7 @@ before, the year of, and the year after.
 
 So the source does not merely omit the answer. It asserts the wrong one, about the departing
 agency, while leaving the surviving agency unmarked. Every derivation from that was tested and
-fails: enrolment absorption on the survivor is confounded roughly fifty to one by ordinary growth;
+fails: enrollment absorption on the survivor is confounded roughly fifty to one by ordinary growth;
 name changes on the survivor arrive up to two years out of alignment and share a vocabulary with
 cosmetic re-spellings. Settling the reason needs Ohio's own territory-transfer orders under
 R.C. 3311.22, which are resolutions in an educational service center's minute book — not published,
@@ -118,8 +118,8 @@ type 1 in 2006–07. Counting Ohio's districts as types 1 and 2 gives 661, then 
 
 **The 66 are what the fourteen older years added.** Ohio did not have educational service centers
 in 1994–95; it had **86 county boards of education**, and this file watches thirty-nine of them
-disappear between 1995–96 and 2001–02 while multi-county centres appear beside them — Athens and
-Meigs leave, Athens-Meigs arrives; Ross and Pike leave, Ross-Pike arrives. Fourteen such centres
+disappear between 1995–96 and 2001–02 while multi-county centers appear beside them — Athens and
+Meigs leave, Athens-Meigs arrives; Ross and Pike leave, Ross-Pike arrives. Fourteen such centers
 join, so the category holds 61 by 2001–02; sixty are recoded from type 3 to type 4 in 2002–03 and
 the last leaves. Every one of the forty is filed under code 2.
 

@@ -16,7 +16,7 @@ context: |
 
   **What the audit covered.** Every `sum::<f64>() / n` in the workspace — 62 sites. Most are internal: variance and
   correlation terms, k-means centroids, three-year averages over *years* rather than districts,
-  a regression intercept being un-centred. Four are correct by construction and already say so —
+  a regression intercept being un-centered. Four are correct by construction and already say so —
   `census_states::national_share` and `figures::national_share` are ratios of sums,
   `achievement_denominator` is the department's own published definition of the top 2% of
   buildings, `implied_divisor` averages six schedule-implied divisors and no districts at all.
@@ -56,7 +56,7 @@ context: |
   Not one changes sign, and the two that carry the strongest claims get stronger. So the levels
   are where the convention shows, and only where a level is stated as a fact about Ohio.
 
-  **One published finding is wrong rather than unlabelled.** `doctrine/equity` published, on
+  **One published finding is wrong rather than unlabeled.** `doctrine/equity` published, on
   `ohio_panel::equalization_by_year`: *"The state's share of the
   gap it closes does not move: 42.4% at the start, 43.9% at the end, and never outside 40.0% to
   48.8% in any of the thirteen years. There is no trend inside that window, and the absence of one
@@ -73,7 +73,7 @@ context: |
   **Both aggregate readings rise by seven to ten points across the window. Only the district mean
   is flat.** The published sentence makes the absence of a trend the finding, and that absence
   belongs to the statistic. This is a different kind of defect from a level that is correct and
-  unlabelled: relabelling it does not repair it, because the claim is about movement over time and
+  unlabeled: relabeling it does not repair it, because the claim is about movement over time and
   the movement is real.
 
   The FY2022 single year is the ordinary, milder case. The gap of $9,590 is $8,928 on ADM, state
@@ -87,7 +87,7 @@ decision: |
   - A mean over districts answers *what does the average district do*. It is the right statistic
     for spread, for gradients, for group comparisons, and for anything whose subject is districts.
     Most of `crates/dispersion` is this on purpose.
-  - An aggregate — a ratio of sums, equivalently an enrolment-weighted mean — answers *what does
+  - An aggregate — a ratio of sums, equivalently an enrollment-weighted mean — answers *what does
     the average pupil's district do*. It is the right statistic for any sentence whose subject is
     Ohio, its pupils, or its money.
   - **Where both are wanted, they are two figures.** Not one figure with a caveat, and not a
@@ -116,7 +116,7 @@ consequences: |
   **A third convention exists and is named rather than adopted.** Cutting quartiles so each holds
   a quarter of Ohio's *pupils* is a different object again from weighting district-cut quartiles.
   It is computed in `the_rate_that_holds_only_on_the_unweighted_reading` and published nowhere:
-  its job is to show the trend is not an artefact of holding the district cut fixed. Two published
+  its job is to show the trend is not an artifact of holding the district cut fixed. Two published
   objects is the rule; three would be the caveat this decision exists to refuse.
 
   **The published unweighted figures do not move.** `dispersion/equalization-band-narrowest` is

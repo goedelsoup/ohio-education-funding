@@ -117,7 +117,7 @@ revisions:
     reach: |
       The definition had propagated into `crates/project/src/policy.rs`, its TypeScript mirror,
       the scenario page's two lever notes, and the regime node's `distribution_logic`. All of
-      them modelled the dial as `computed x pct`, which understated statewide aid by $2.57bn at
+      them modeled the dial as `computed x pct`, which understated statewide aid by $2.57bn at
       50% — and, because the panel's terminal year is FY2027 at 100%, every identity test passed
       throughout: the two formulations agree exactly where the fixture sits.
   - was: |
@@ -154,7 +154,7 @@ findings: |
   percentage walks a district back toward the floor and stops there. Running the FY2027 panel
   down the dial, the guarantee holds **294 districts at 100%, 293 at 50%, and none at 0%** —
   where the interpolation has already delivered the base to everyone and the only residual left
-  is the open enrolment clawback. [verified]
+  is the open enrollment clawback. [verified]
   ([`crates/project/src/policy.rs`](../../../crates/project/src/policy.rs))
 
   ### What the dial is worth

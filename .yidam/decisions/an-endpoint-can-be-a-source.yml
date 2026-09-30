@@ -25,7 +25,7 @@ context: |
   wanted argued about is the ordinary fragility of any URL.
 
   **"Three places were tried."** A fourth was: the report card's entire static download
-  catalogue. It publishes a `Career Technical Planning District` category of **twenty-four files
+  catalog. It publishes a `Career Technical Planning District` category of **twenty-four files
   going back to 2013** — grades, ratings, and two 2013 files split by JVSD type. Membership is in
   none of them. So "the API is the only route" is checked rather than assumed, which is what the
   earlier note could not say about its own three probes.
@@ -33,7 +33,7 @@ context: |
   **Two things the sweep found on the way. First, the 92 that were 90.** The catalog's CTPD table
   has 92 rows and a map legend that "disagrees with itself". Ninety planning districts answer;
   the two that do not are the correctional institutions `200600` and `200602`, which return
-  **HTTP 204** and appear in no organisation index because nobody rates them. 90 + 2 = 92, and the discrepancy the catalog recorded as
+  **HTTP 204** and appear in no organization index because nobody rates them. 90 + 2 = 92, and the discrepancy the catalog recorded as
   unresolved was a population boundary rather than a counting error.
 
   **The join inverts.** A roster names its members and gives no identifier. But every *district's*
@@ -52,7 +52,7 @@ decision: |
   - **90 rosters**, one per rated planning district. Each note says how many districts and how
     many community or STEM schools that planning district has, so the block is readable as data
     rather than as ninety copies of one entry.
-  - **1 organisation index**, `live-search.json` — every organisation the report card rates, with
+  - **1 organization index**, `live-search.json` — every organization the report card rates, with
     IRN, kind and name. This is what resolves a roster's names, and it is the publisher's own
     table rather than a match against this repository's panel.
   - **47 placements**, and they are the substance of this record. See below.
@@ -62,10 +62,10 @@ decision: |
   rather than the time of the read, so two fetches are byte-identical. Pinning holds, and a
   changed digest means the department rewrote the record rather than that a timestamp moved.
 
-  **The forty-seven are retrieved because a name cannot place them.** Normalised for the two
+  **The forty-seven are retrieved because a name cannot place them.** Normalized for the two
   styles the publisher writes, Ohio's 607 rated district names collapse to **579 keys**:
   nineteen keys are shared by forty-seven districts — three `Perry Local`s, three `Buckeye
-  Local`s, three `Madison Local`s. The organisation index disambiguates them with a ` - County`
+  Local`s, three `Madison Local`s. The organization index disambiguates them with a ` - County`
   tail that a roster entry does not carry, and `enrollmentDist` entries carry `distName` and
   `enrlCtpd` and nothing else. So each of those forty-seven districts is retrieved on its own,
   for the `ctpdIrn` its record states. No two same-named districts share a planning district —
@@ -80,7 +80,7 @@ decision: |
   right, and the reasoning is worth keeping. The key is shipped to every visitor in the
   department's own bundle and a read through it is equivalent to loading the public page — so it
   is not *secret*. But findable in a minified bundle and committed to a public repository's
-  permanent history under a name a scanner recognises are different acts, and it is somebody
+  permanent history under a name a scanner recognizes are different acts, and it is somebody
   else's credential either way. The URLs carry `{REPORT_CARD_KEY}` and `cache::resolved_url`
   fills it from `EDFUND_REPORT_CARD_KEY`, on the same pattern as `EDFUND_CONTACT`: absent, these
   sources cannot be refreshed and everything else works, because the fixture is committed.
@@ -89,7 +89,7 @@ decision: |
   than pin it" — correct advice reached for the wrong reason. The obstacle is not that the URL
   cannot carry the key. It is that this repository should not.
 
-  **What is committed is what the source states.** `enrlCtpd` is career-technical enrolment; the
+  **What is committed is what the source states.** `enrlCtpd` is career-technical enrollment; the
   statute pays on enrolled ADM, which this source does not publish. The fixture carries the
   published measure, the reader says which it is, and nothing built on it returns a dollar.
 alternatives: |
@@ -126,6 +126,6 @@ alternatives: |
   small — but it is not ours, git history is not erasable by deleting a line, and a scanner
   hit that a maintainer waved through is a worse precedent than an environment variable.
 
-  **Take FY2026, the site's current year.** Rejected in favour of FY2025, which is the year whose
+  **Take FY2026, the site's current year.** Rejected in favor of FY2025, which is the year whose
   roster-derived placement was cross-checked against every district's own `ctpdIrn` — all 607
   agreed. FY2026 answers on the same endpoint and is a re-retrieval away.

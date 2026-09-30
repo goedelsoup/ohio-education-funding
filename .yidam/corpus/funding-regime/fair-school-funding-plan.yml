@@ -115,7 +115,7 @@ findings: |
   cost](../formula-component/fsfp-base-cost-calculation.yml), [local
   capacity](../formula-component/fsfp-local-capacity-measure.yml), the categoricals, the
   [guarantee](../formula-component/temporary-transitional-aid-guarantee.yml) and
-  [transportation](../formula-component/fsfp-transportation.yml) the modelled formula contains
+  [transportation](../formula-component/fsfp-transportation.yml) the modeled formula contains
   **38** such bounds, and exactly **1** of them cannot bind: R.C. 3317.011(F)(6)(c)'s floor of
   one leadership support staff member, whose own input is already floored past it. [verified]
   (crates/project) Every other bound is reached by at least one district in the department's
@@ -150,9 +150,9 @@ findings: |
   0.8. [verified] (crates/project)
 
   The census counts districts *on* a bound, which is not the count a bound *moves* — 138 sit on
-  the minimum state share and 31 move when it is lowered — and the [open enrolment
+  the minimum state share and 31 move when it is lowered — and the [open enrollment
   clawback](../formula-component/guarantee-open-enrolment-clawback.yml) node records the one new
-  instance the census priced. Steps are not in it: the athletics eligibility test, the enrolment
+  instance the census priced. Steps are not in it: the athletics eligibility test, the enrollment
   growth supplement's gate, the performance supplement's rating gates and the repealed
   supplemental tier's gates are two-branch tests rather than bounds, and each is measured where
   it lives. [inference]
@@ -164,7 +164,7 @@ figures:
   - key: project/bounds-in-the-modelled-formula
     value: 38
     field: findings
-    as_written: "the modelled formula contains\n  **38** such bounds"
+    as_written: "the modeled formula contains\n  **38** such bounds"
   - key: project/bounds-that-cannot-bind
     value: 1
     field: findings

@@ -1,7 +1,7 @@
 id: typology-connector
 summary: >-
   dew-typology, for the department's own similar-district grouping — a property this ontology has
-  declared since it was written, that five agency nodes characterise in prose and record as
+  declared since it was written, that five agency nodes characterize in prose and record as
   unfilled, and that a skill names as the axis it cannot have. One 79 KB workbook closes all four.
 context: |
   The corpus has been asking for this longer than it has been able to answer.
@@ -9,11 +9,11 @@ context: |
   `education-agency.ont.yml` declares a `typology` property — *"Department typology grouping
   (rural, small town, suburban, urban) used for peer comparison"* — and an edge, `peer-of`, whose
   description reads *"The agency is a comparison peer, by typology or by wealth position"*. Neither
-  could be filled from anything committed. Five agency nodes carry a prose characterisation and
+  could be filled from anything committed. Five agency nodes carry a prose characterization and
   then record the same absence in their own `unfilled:` block:
 
       - field: the department's typology code
-        why: The characterisation is entered; the department's own code is not.
+        why: The characterization is entered; the department's own code is not.
 
   Cleveland Municipal, Toledo City, Upper Arlington City, Perrysburg Exempted Village and Northern
   Local each say *"Exact department typology code not yet entered."*
@@ -77,7 +77,7 @@ consequences: |
   shape of an eleven-year-old roster against a current one, and the reverse of the failure that
   would matter.
 alternatives: |
-  **Derive a typology from poverty and enrolment, which the panel already carries.** Rejected, and
+  **Derive a typology from poverty and enrollment, which the panel already carries.** Rejected, and
   it is the alternative worth naming most loudly. The two axes are on the panel and a plausible
   eight-way split is a few lines of arithmetic — and the result would be an invented classification
   wearing the department's category names. `fordham-house-bridge-commentary` had already written

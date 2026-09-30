@@ -27,7 +27,7 @@ section it would amend, and the amended text of each section. H.B. 643 of the 13
 section and eleven kilobytes; H.B. 96 of the same General Assembly is the operating budget and
 amends more than two thousand.
 
-**Why this is a third artefact and not one of the two already here.**
+**Why this is a third artifact and not one of the two already here.**
 [`ohio-revised-code`](ohio-revised-code.md) serves the Revised Code **as it stands today**, and
 [`ohio-session-laws`](ohio-session-laws.md) serves acts **as they were passed**. A pending bill
 is neither: it is not in the code and it has not been enacted, and it may never be either. The
@@ -72,7 +72,7 @@ subject taxonomy, an official **`local_impact_statement`**, `governor_signed_dat
     meetings     /api/v2/general_assembly_{GA}/legislation/{bill}/meetings/
     amendments   /api/v2/general_assembly_{GA}/legislation/{bill}/amendments/
 
-`meetings` is the committee history: date, time, chair, and whether the sitting was cancelled.
+`meetings` is the committee history: date, time, chair, and whether the sitting was canceled.
 
 **An empty array from either is only evidence once the endpoint is shown to fill.** Measured
 9 September 2026: H.B. 96 of the 136th returns **99** meetings, H.B. 186 returns **14**, and
@@ -143,7 +143,7 @@ has. [open]
 There is deliberately none, and this connector stays at `retrievable` rather than being wired.
 Turning a bill into provisions is reading, not extraction: deciding that a section amending
 R.C. 3310.032 changes eligibility rather than an award amount, and that no lever in this
-repository expresses it, is a judgement about the funding system. A parser that produced a
+repository expresses it, is a judgment about the funding system. A parser that produced a
 provision list from section headings would produce something that looked authoritative and was
 not.
 

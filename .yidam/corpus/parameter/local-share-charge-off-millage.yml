@@ -128,7 +128,7 @@ findings: |2
   example assumes. What is not cyclical is the direction — total taxable value always
   overstates the charge-off. [verified] (and the long-run figure is LSC's)
 
-  **One component is still not modelled.** LSC records an **exempt property adjustment** to
+  **One component is still not modeled.** LSC records an **exempt property adjustment** to
   recognized valuation for about 13 districts holding large state-owned exempt property —
   $836.4m in FY2008, $19.2m of local share. It needs the department's own list of those
   districts. About 0.3% of statewide valuation, and absent. [open]
@@ -204,7 +204,7 @@ findings: |2
 
   ### The Bridge formula has no charge-off rate, which is why none could be found
 
-  LSC, analysing H.B. 59 of the 130th:
+  LSC, analyzing H.B. 59 of the 130th:
 
   > the state share index used for the opportunity grant does not result in a uniform charge-off
   > rate. Rather, if a local share in FY 2014 were to be derived from the state share index and
@@ -232,7 +232,7 @@ findings: |2
 
   The [Fair School Funding Plan](../funding-regime/fair-school-funding-plan.yml) replaced the
   charge-off with local capacity for city, local and exempted village districts. It did not for
-  JVSDs. LSC, analysing the plan itself:
+  JVSDs. LSC, analyzing the plan itself:
 
   > Instead of a per-pupil local capacity amount, the local share of the base cost for JVSDs is
   > calculated by multiplying a 1/2 mill by the lesser of the district's three-year average
@@ -301,7 +301,7 @@ properties:
     mills, "irrespective of the language of R.C. 3317.012(D)(4) suggesting such a methodology" —
     a court overriding a statutory method. [verified] The taxonomy asks what would have to happen
     for a value to change; for those six years the answer was neither an act nor a departmental
-    decision nor a district's behaviour, but a change in the law of the case.
+    decision nor a district's behavior, but a change in the law of the case.
 
     The category is not worth adding for one instance. It is worth recording that the four kinds
     were derived from one regime's parameters in one biennium, and that a parameter with a

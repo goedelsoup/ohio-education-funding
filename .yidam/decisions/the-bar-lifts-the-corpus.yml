@@ -58,8 +58,8 @@ decision: |
   Seven of sixteen, and no list anywhere. `web/src/lib/nav.ts` computes the whole bar;
   `web/src/layouts/Base.astro` renders what it is given and decides nothing.
 
-  **A menu of seven chosen out of sixteen is an editorial judgement, and a typed list does not
-  record it.** The judgement would live in whoever typed the list, the corpus would never learn
+  **A menu of seven chosen out of sixteen is an editorial judgment, and a typed list does not
+  record it.** The judgment would live in whoever typed the list, the corpus would never learn
   it, and the list would be wrong the day an act was added — silently, because a stale menu
   renders and resolves exactly like a current one. Rule 3 is the clearest case: when H.B. 96 is
   succeeded, the menu re-points itself with no edit anywhere.
@@ -87,7 +87,7 @@ consequences: |
   from `statewide` to a new `home` family in `routes.ts` — the anchors are unchanged, so a link
   into `#three-questions` from a board packet still finds the section it named.
 
-  **No case is named in the menu, and DeRolph is the most recognisable thing here.** The corpus
+  **No case is named in the menu, and DeRolph is the most recognizable thing here.** The corpus
   holds no short name for a case: labels are full citations, and
   `Cincinnati City School District Board of Education v. Walter (1979)` is sixty-two characters.
   The obvious derivation — the parenthetical — reads `DeRolph I (1997)` correctly and then reads
@@ -102,7 +102,7 @@ consequences: |
   thirteen rather than letting it happen quietly.
 alternatives: |
   **One tab per class — `Legislation`, `Litigation`, `Formula`.** Closest to how the redesign was
-  first described, and it makes the pattern generalise: a lifted class is a tab, its instances are
+  first described, and it makes the pattern generalize: a lifted class is a tab, its instances are
   the panel. Rejected on width. Seven top-level entries plus a search field is near the point the
   bar's own history says it wrapped to a second row, and `Legislation` and `Litigation` are the
   two entries a reader is least likely to distinguish at a glance — DeRolph is *about* the
@@ -113,7 +113,7 @@ alternatives: |
   on the site comes out of — exactly where it was.
 
   **A landmark list on the legislation nodes themselves.** A `landmark: true` property would be
-  corpus-side and reviewable, which is the right instinct. It is still a judgement recorded as an
+  corpus-side and reviewable, which is the right instinct. It is still a judgment recorded as an
   assertion rather than derived from what the acts do, and the three rules turned out to select
   the same seven acts a hand-made list would have — with the difference that they explain why each
   one is there, and keep selecting after the next budget.

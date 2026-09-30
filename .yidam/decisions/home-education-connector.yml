@@ -7,7 +7,7 @@ context: |
   [#257](https://github.com/goedelsoup/ohio-education-funding/issues/257) recorded that Ohio holds
   home-education counts per district, releases them on request, and publishes only the statewide
   total. It named the one file outside the department that has them — the Johns Hopkins
-  Homeschool Hub workbook, catalogued as
+  Homeschool Hub workbook, cataloged as
   [`jhu-homeschool-hub`](../catalog/jhu-homeschool-hub.md) — and concluded it was "not fixture
   material as it stands", on four recorded defects.
 
@@ -28,7 +28,7 @@ context: |
   **"The year label contradicts the workbook's own state total."** True, and it is the finding
   rather than the defect. The catalog entry inferred 2020-21 from it by assuming the 47 censored
   cells were small. They are not: Huber Heights is 5,631 pupils, Euclid 4,166, Southwest Local
-  4,150. Against contemporaneous F-33 enrolment, 2020-21 needs a censored participation rate of
+  4,150. Against contemporaneous F-33 enrollment, 2020-21 needs a censored participation rate of
   0.22% against a reported 3.55% — a sixteenfold discontinuity — while 2021-22 and 2022-23 are
   arithmetically impossible, and a size-matched estimator on 2023-24 reconstructs **53,100**
   against the published **53,051**, missing by 49 students where every other year misses by 3% to
@@ -64,7 +64,7 @@ decision: |
   failure the `[verified]`/`[inference]` split exists to prevent. The builder asserts the
   contradiction instead: the numeric rows sum to at least 51,349 against the same workbook's
   2021-22 total of 47,491, and if a revision ever makes those two sheets agree the build fails,
-  because the licence for committing undated rows will have gone.
+  because the license for committing undated rows will have gone.
 
   **Bound the censored cells, do not smooth them.** `<10` bounds a cell at `[0, 9]`, the same rule
   `nonpublic` reads off the same masking convention. `.` and `NC` get a floor of zero and **no
@@ -103,7 +103,7 @@ consequences: |
   **Nobody has looked at the other 38 states.** The district sheet holds 12,280 rows and this
   reads 611 of them.
 alternatives: |
-  **Leave it catalogued, as the entry and `facts-and-figures-connector` both concluded.** Rejected
+  **Leave it cataloged, as the entry and `facts-and-figures-connector` both concluded.** Rejected
   on measurement. Both grounds for that conclusion were checkable and neither had been checked:
   the export's stability took four downloads, and the IRN ordering took one pass over the
   committed typology fixture.
@@ -120,7 +120,7 @@ alternatives: |
 
   **Impute the censored cells from the size-matched estimator and commit the point estimates.**
   Rejected. The estimator exists to date the sheet, which is a question about the file; using it
-  to fill 52 cells would put 1,700-odd modelled students into a fixture indistinguishable from the
+  to fill 52 cells would put 1,700-odd modeled students into a fixture indistinguishable from the
   559 published ones. The floor/ceiling pair says what is known and what is not.
 
   **Commit only the district panel and leave the statewide series out.** Rejected. The series is

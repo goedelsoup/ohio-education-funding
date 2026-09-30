@@ -16,7 +16,7 @@ description: |
   Ohio's own system leaves most dependent on a weak local base. [verified]
 
   **It expired.** The last obligation deadline fell in September 2024. A district that used
-  ESSER for recurring costs — staff, programmes, interventions — faced the loss of that money
+  ESSER for recurring costs — staff, programs, interventions — faced the loss of that money
   with no state channel replacing it. This is the fiscal cliff that runs underneath every
   FY2025 and FY2026 forecast in
   [`district-finances.csv`](../../../crates/project/fixtures/district-finances.csv). [verified]
@@ -61,7 +61,7 @@ findings: |
   [a district mean is not a state figure](../../decisions/a-district-mean-is-not-a-state-figure.yml).
   [inference]
 
-  **And FY2022 is the most favourable year that will ever be measured for this**, because the
+  **And FY2022 is the most favorable year that will ever be measured for this**, because the
   federal column is at its ESSER peak. The offset shown here is an upper bound on a channel
   that has since contracted to its pre-pandemic level. Whatever the answer to "does the system
   equalize", it is worse than these figures after September 2024. [inference]
@@ -78,7 +78,7 @@ findings: |
 
   That is the control and not a limitation. Ohio districts received relief into special revenue
   funds, so a district that spent it on one-time costs leaves no general-fund trace at all. A
-  district that spent it on **recurring** costs — staff, programmes, interventions it meant to
+  district that spent it on **recurring** costs — staff, programs, interventions it meant to
   keep — has to carry them somewhere once the grant ends, and the general fund is the somewhere.
   So the recurring-cost reading makes a prediction: general-fund spending after the cliff should
   grow faster where the relief was larger.

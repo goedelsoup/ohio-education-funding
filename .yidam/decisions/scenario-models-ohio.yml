@@ -9,11 +9,11 @@ context: |
   > weighted wealth per-pupil or federal median income) are NOT recalculated based on the data
   > changes specific to your district.
 
-  That is correct behaviour for the tool it describes. A user changes one district's inputs and
+  That is correct behavior for the tool it describes. A user changes one district's inputs and
   asks what happens to that district; the statewide average would move by a rounding error, and
   recomputing it would obscure the answer rather than improve it.
 
-  It is not correct behaviour here. `crates/project::policy` moves **all 609 districts at once**,
+  It is not correct behavior here. `crates/project::policy` moves **all 609 districts at once**,
   and under a change of that kind the statewide average is the first thing that would move — it is
   an average *of* the thing being changed.
 
@@ -91,7 +91,7 @@ consequences: |
   **$45.7m remains unreached and is not held fixed.** Preschool special education's weighted half
   is denominated identically but sits outside `[H] Foundation Funding`, so it is outside
   `categorical_funding` and outside everything the scenario computes. Recording it as "held fixed"
-  would misdescribe it: the scenario has never modelled the program at all.
+  would misdescribe it: the scenario has never modeled the program at all.
 alternatives: |
   **Mirror the department's tool exactly.** The status quo, and it has a real argument: a reader
   can check this site against the department's simulator, and a number that reproduces an official
@@ -108,7 +108,7 @@ alternatives: |
   `formula-component` nodes were split to preserve, and collapsing it for tidiness would undo that.
 
   **Make it a lever the reader can toggle.** Considered. Rejected because it offers a choice that
-  is not the reader's to make: one of the two behaviours is a better description of Ohio and the
+  is not the reader's to make: one of the two behaviors is a better description of Ohio and the
   other is an artifact of a tool built for a different question. A site that cannot say which of
   its own two answers is right has moved the work onto the reader.
 

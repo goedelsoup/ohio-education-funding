@@ -59,7 +59,7 @@ findings: |
   the 3,151 rated buildings sit between them**. [verified]
   ([`crates/dispersion`](../../../crates/dispersion/tests/the_list_the_report_card_does_not_explain.rs))
 
-  That the escalation route reaches this far up is not an artefact of one school. All 42
+  That the escalation route reaches this far up is not an artifact of one school. All 42
   escalations were checked against the same rank order, and **every one of the 11 CSI schools
   rated three stars or better arrived this way** — not one of the 189 direct identifications did,
   and the highest-ranked escalation sits above the state median. [verified] The route is a second

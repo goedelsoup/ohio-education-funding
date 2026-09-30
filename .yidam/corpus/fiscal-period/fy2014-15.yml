@@ -2,13 +2,13 @@ class: fiscal-period
 label: FY2014-2015 Biennium
 summary: >-
   A Bridge formula biennium, and the one that is only half-measured. FY2014 is absent from the
-  federal F-33 archive under every naming its neighbours answer to, and nothing here
+  federal F-33 archive under every naming its neighbors answer to, and nothing here
   interpolates the missing year.
 description: |
   July 1, 2013 through June 30, 2015 — a biennium of the [Bridge
   formula](../funding-regime/bridge-formula.yml) era. [verified]
 
-  **FY2014 is absent from the F-33 archive** under every naming its neighbours answer to, so this biennium is half-measured. Nothing interpolates the missing year.
+  **FY2014 is absent from the F-33 archive** under every naming its neighbors answer to, so this biennium is half-measured. Nothing interpolates the missing year.
 findings: |
   **What is measured**, over comparable districts, on federal definitions: [verified]
   (`dispersion::ohio_panel`, pinned by test)
@@ -32,7 +32,7 @@ properties:
     Am. Sub. H.B. 59 (130th General Assembly). [verified] (the 2013 edition of the Catalog of
     [Budget Line Items](../../catalog/lsc-catalog-of-budget-line-items.md),
     `crates/project/fixtures/catalog-line-item-basis.tsv`, which names the
-    authorising act on every line item it carries)
+    authorizing act on every line item it carries)
 
     The `Am. Sub.` designation is now checkable and holds: the 2013 edition of the Catalog of
     Budget Line Items prints `Am. Sub. H.B. 59 of the 130th G.A.` on 173 of the 203 line items

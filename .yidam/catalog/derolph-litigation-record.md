@@ -49,7 +49,7 @@ as `[open]`.
 archive". The Reporter publishes no common pleas court at all. The Franklin County Clerk of Courts
 does publish it, and its conditions of use say the data "is not intended for distribution by other
 persons, entities or organizations" and direct organizations to a public records request. That is
-a licence, not a wall. See
+a license, not a wall. See
 [`what-a-citator-reaches`](../decisions/what-a-citator-reaches.yml).
 
 **Caveat.** Counts of "how many DeRolph rulings" differ across sources — four Supreme Court

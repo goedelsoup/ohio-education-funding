@@ -59,10 +59,10 @@ It also answered four questions the corpus had recorded as open, and corrected o
 - the **clinical categories** behind the special education weights, which R.C. 3317.013 names;
 - what the **English learner taper** actually tracks — time enrolled in United States schools and
   attainment of a proficient score, per R.C. 3317.016;
-- the **career-technical programme categories**, which R.C. 3317.014 lists by name;
+- the **career-technical program categories**, which R.C. 3317.014 lists by name;
 - where the **squaring** in the disadvantaged-pupil index comes from — R.C. 3317.02(I)(1)(a),
   which the DPIA node had recorded as "not located in statute here";
-- and **R.C. 3317.029 does not exist.** The DPIA node cited it. The programme is R.C. 3317.022(A)(4).
+- and **R.C. 3317.029 does not exist.** The DPIA node cited it. The program is R.C. 3317.022(A)(4).
 
 **How it is read.** `connect::html` — a text extractor rather than an HTML parser, because nothing
 here wants a tree. It drops `<script>` and `<style>` with their contents, treats block tags as line
