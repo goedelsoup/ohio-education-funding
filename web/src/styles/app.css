@@ -742,6 +742,41 @@ h3 {
    district page, and a reader scanning for the county should not have to track a full column
    width to find it. #188 restructures what it says; this only stops it running the page. */
 /*
+ * The eyebrow (#550): capitals, tracked by `--tracking-caps`, and declared nowhere else.
+ *
+ * It is the apparatus voice — a label that says what the content under or beside it is, rather
+ * than being content — and it was written out in thirteen places, eleven at `--tracking-caps` and
+ * two at .06em: `.contents-label` and `.claim`. Nothing about either wanted a wider track; they
+ * were the two written before the token existed. All thirteen now take it from this one rule.
+ *
+ * What is NOT here is the size and the ink, because the eyebrow is set at three sizes for three
+ * jobs: `--text-xs` for a label (most of these), `--text-sm` for a column head, and the claim
+ * mark's .68em, which scales with the sentence it rides in. Each keeps its own below. The claim
+ * mark also keeps its own colour, its rule and nothing boxy — see `stylesheet.spec.ts`, which
+ * reads this rule as one of the claim's and finds only case and tracking in it.
+ *
+ * A selector list rather than a class in the markup: every member already has a class or a
+ * position that says what it is, and thirty-odd call sites across `.astro` and `.ts` writing a
+ * second class would say it twice.
+ */
+.facts dt,
+.contents-label,
+.tile .k,
+thead th,
+#district-table thead button,
+.axis-pick > span,
+.rail-hd,
+.scope-hd,
+.scope-mode > legend,
+.claim,
+.card.apparatus .revision-body h3,
+tr.series-break > th,
+tr.series-break > td {
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+}
+
+/*
  * The identity line: name/value pairs the eye can target, instead of a run of middots.
  *
  * Two type sizes doing two jobs. The label takes the apparatus voice — `--text-xs`, uppercase,
@@ -765,8 +800,6 @@ h3 {
 }
 .facts dt {
   font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-caps);
   color: var(--text-muted);
 }
 .facts dd {
@@ -1177,7 +1210,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
  * has five dead rule groups in its history for exactly that reason.
  */
 .tile { padding: 0; }
-.tile .k { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-caps); color: var(--text-muted); }
+.tile .k { font-size: var(--text-xs); color: var(--text-muted); }
 .tile .v { font-size: var(--text-figure); font-weight: var(--weight-bold); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; margin: .15rem 0; }
 .tile .n { font-size: var(--text-sm); color: var(--text-secondary); }
 /*
@@ -1306,8 +1339,6 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
   margin: 0 0 .45rem;
   font-size: var(--text-xs);
   font-weight: var(--weight-semibold);
-  letter-spacing: .06em;
-  text-transform: uppercase;
   color: var(--text-muted);
 }
 .contents ul {
@@ -1613,7 +1644,7 @@ table.prose tr.spanning-name th { border-bottom: 0; padding-bottom: var(--space-
 table.prose tr.spanning-value td { padding-top: 0; }
 table { width: 100%; border-collapse: collapse; font-size: var(--text-base); }
 th, td { text-align: left; padding: .42rem .5rem; border-bottom: 1px solid var(--border); }
-thead th { color: var(--text-muted); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: var(--tracking-caps); }
+thead th { color: var(--text-muted); font-size: var(--text-sm); }
 th { font-weight: var(--weight-medium); color: var(--text-secondary); }
 td { text-align: right; font-variant-numeric: tabular-nums; }
 /*
@@ -1964,8 +1995,6 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
 .axis-pick > span,
 .rail-hd {
   font-size: var(--text-xs);
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
   color: var(--text-muted);
 }
 .axis-pick select { width: 100%; }
@@ -2004,8 +2033,6 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
 }
 .scope-hd {
   font-size: var(--text-xs);
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
   color: var(--text-muted);
 }
 .scope-count { color: var(--text-secondary); }
@@ -2075,8 +2102,6 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
   float: left;
   margin-right: var(--space-4);
   font-size: var(--text-xs);
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
   color: var(--text-muted);
 }
 .scope-mode label {
@@ -2327,8 +2352,6 @@ h1.slug-title {
   display: inline;
   font-size: .68em;
   font-weight: var(--weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: .06em;
   white-space: nowrap;
   /* Rides the baseline of the sentence it qualifies. A raised mark reads as a footnote reference,
      which is exactly what it is not: these are part of the claim, not a pointer away from it. */
@@ -2411,8 +2434,6 @@ h1.slug-title {
 .card.apparatus .revision-body h3 {
   margin: 1rem 0 .4rem;
   font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-caps);
   color: var(--text-muted);
 }
 .card.apparatus .revision-body > *:first-child { margin-top: 0; }
@@ -2469,8 +2490,6 @@ footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); 
 #district-table thead button {
   font: inherit;
   font-size: var(--text-sm);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-caps);
   color: var(--text-muted);
   background: none;
   border: 0;
@@ -2599,8 +2618,6 @@ tr.series-break > td {
   border-bottom: 0;
   padding-top: var(--space-3);
   font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-caps);
   color: var(--text-muted);
   text-align: left;
   font-weight: var(--weight-semibold);
