@@ -10,6 +10,7 @@
 import DistrictNav from "../../../components/DistrictNav.astro";
 import Base from "../../../layouts/Base.astro";
 import { districtPaths, loadFeed, qualifiedName } from "../../../lib/feed.ts";
+import { fixed } from "../../../lib/format.ts";
 import { districtTitle } from "../../../lib/nav.ts";
 import { renderDistrictOutcome, renderOutcomeContext } from "../../../lib/outcomes.ts";
 import * as routes from "../../../lib/routes.ts";
@@ -25,7 +26,7 @@ const o = district.outcome;
 const description =
   o?.performance_index == null
     ? `No report card is published for ${district.name}.`
-    : `${district.name} scores ${o.performance_index.toFixed(1)} on Ohio's Performance Index for ${yearOf("outcome.performance")}, shown against districts with comparable poverty rather than against the state.`;
+    : `${district.name} scores ${fixed(o.performance_index, 1)} on Ohio's Performance Index for ${yearOf("outcome.performance")}, shown against districts with comparable poverty rather than against the state.`;
 ---
 
 <Base
@@ -53,7 +54,7 @@ const description =
             <td>
               Economic disadvantage explains Ohio's attainment measure at {
                 bundle.statewide.outcomes
-                  ? bundle.statewide.outcomes.poverty_vs_performance.toFixed(3)
+                  ? fixed(bundle.statewide.outcomes.poverty_vs_performance, 3)
                   : "—"
               }. Most other district-level variables are that one in disguise — including, sharply,
               guarantee status. <a href="/outcomes">Every association statewide, with its
@@ -68,11 +69,11 @@ const description =
               itself composition-driven, the first is substantially a composition proxy — statewide
               the same numerator gives {
                 bundle.statewide.outcomes
-                  ? bundle.statewide.outcomes.weighted_spending_vs_performance.toFixed(3)
+                  ? fixed(bundle.statewide.outcomes.weighted_spending_vs_performance, 3)
                   : "—"
               } one way and {
                 bundle.statewide.outcomes
-                  ? bundle.statewide.outcomes.enrolled_spending_vs_performance.toFixed(3)
+                  ? fixed(bundle.statewide.outcomes.enrolled_spending_vs_performance, 3)
                   : "—"
               } the other.
             </td>

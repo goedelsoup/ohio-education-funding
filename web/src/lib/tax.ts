@@ -697,7 +697,7 @@ export function renderChargeOff(d: District, statewide: Statewide, tax: TaxState
              automatically, by rolling effective rates down as valuation rises while the statutory
              rate stood still. ${count(statewide.below_charge_off_rate)} of
              ${count(statewide.districts)} districts are below the rate today. Ohio's answer was a
-             supplement rather than a floor: gap aid, $73.5m across 145 districts in FY2008.</p>`
+             supplement rather than a floor: gap aid, $73.5M across 145 districts in FY2008.</p>`
           : `<p class="note">This district's effective Class I rate is at or above the
              ${fixed(r.charge_off_mills, 0)} mills the charge-off assumes, so it is one of the
              ${count(statewide.districts - statewide.below_charge_off_rate)} that could actually

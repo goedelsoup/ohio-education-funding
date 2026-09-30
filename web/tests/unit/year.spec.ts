@@ -12,7 +12,7 @@ import { expect, test } from "vitest";
 import { loadFeed } from "../../src/lib/feed.ts";
 import { renderChargeOff } from "../../src/lib/tax.ts";
 import { GLOSSARY, term } from "../../src/lib/glossary.ts";
-import { schoolYearBefore, seriesYear, yearChip, yearChipPair, yearTitle } from "../../src/lib/year.ts";
+import { fiscalSpan, fiscalYearOf, schoolYearBefore, seriesYear, yearChip, yearChipPair, yearTitle } from "../../src/lib/year.ts";
 
 test("every series the feed carries names its reckoning as well as its digits", () => {
   /*
@@ -294,4 +294,16 @@ test("no corpus node states a statewide constant the feed contradicts", () => {
     if (hit) offenders.push(`${node.id}: "${hit[0]}" against the feed's ${stated}%`);
   }
   expect(offenders, "the feed is authoritative for this constant").toEqual([]);
+});
+
+test("a fiscal year is named for its June, and a span of them is written one way", () => {
+  // Ohio's fiscal year runs July to June: the first of July opens the next one.
+  expect(fiscalYearOf("2001-07-01")).toBe(2002);
+  expect(fiscalYearOf("2003-06-30")).toBe(2003);
+  expect(fiscalYearOf("2026-12-31")).toBe(2027);
+  expect(fiscalYearOf("2026-01-01")).toBe(2026);
+  expect(fiscalYearOf("FY2002")).toBeNull();
+  expect(fiscalYearOf("")).toBeNull();
+  expect(fiscalSpan(2002, 2003)).toBe("FY2002–FY2003");
+  expect(fiscalSpan(2022, 2022)).toBe("FY2022");
 });

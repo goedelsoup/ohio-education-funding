@@ -227,6 +227,28 @@ export function schoolYearBefore(label: string, years: number): string {
 }
 
 /**
+ * The fiscal year an ISO date falls in: Ohio's runs July to June and is named for the June, so
+ * `2001-07-01` is FY2002 and `2003-06-30` is FY2003. `null` for anything that is not `YYYY-MM-DD`.
+ */
+export function fiscalYearOf(date: string): number | null {
+  const match = /^(\d{4})-(\d{2})-\d{2}$/.exec(date.trim());
+  if (!match) return null;
+  const year = Number(match[1]);
+  return Number(match[2]) >= 7 ? year + 1 : year;
+}
+
+/**
+ * A run of fiscal years: `FY2002–FY2003`, or `FY2022` for one year.
+ *
+ * En dash and both years in full, because `/legislation` printed "FY2002-2003" and "FY2022-23" in
+ * one column beside "FY2012–FY2021" in the next (#574). Those were the corpus's `label`s, each
+ * typed by hand in its own file; the dates beside them are what this is built from.
+ */
+export function fiscalSpan(from: number, to: number): string {
+  return from === to ? `FY${from}` : `FY${from}–FY${to}`;
+}
+
+/**
  * The last year of a span label: `FY2024-FY2026` → `FY2026`, and `FY2027` → `FY2027`.
  *
  * Written for the sentences that name one end of a window rather than the window — *"a rolling
