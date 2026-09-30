@@ -349,9 +349,36 @@ header.site nav details[open] > summary { background: var(--surface-2); color: v
 header.site nav summary[aria-current] { color: var(--text-primary); font-weight: var(--weight-semibold); }
 header.site nav summary:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 
+/*
+ * The popover (#550): the one box that floats over the page, and the only one with a shadow.
+ *
+ * There were four, and each had its own idea of the same thing. The menu panel was `--surface-1`
+ * at `--radius-lg` under `--shadow-panel`; the term's definition and the chip's were `--surface-2`
+ * at an 8px corner under a shadow written out by hand; the chart's tooltip was `--surface-1` edged
+ * in `--accent-rule` at `--radius-md` under `--shadow-tip`. Four grounds-and-edges for one idea —
+ * "this is above the page, not in it" — and three of the corners and two of the shadows off the
+ * scale.
+ *
+ * Now one ground, one edge, one corner and one elevation, stated once here where the first of the
+ * four is declared. (`--shadow-tip` had no other reader and is gone. The one shadow still written
+ * out is the definitions' sheet on a phone, which sits at the foot of the screen and so casts
+ * upward — the same elevation pointed the other way, not a fifth box.) `--surface-1` rather than `--surface-2`, because the menu panel's rows hover
+ * TO `--surface-2` and a panel painted in it would swallow its own hover. What still differs is
+ * what each holds — how dense it is, how wide it may run and which way it opens — and those stay
+ * with each one below.
+ */
+header.site nav .menu-panel,
+.year-chip-def,
+.term-def,
+#tip {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-panel);
+}
 header.site nav .menu-panel {
   position: absolute;
-  top: calc(100% + .35rem);
+  top: calc(100% + var(--space-2));
   left: 0;
   z-index: 1;
   /* Wide enough for the longest label the bar can hold, which is the constitution's citation at
@@ -361,10 +388,6 @@ header.site nav .menu-panel {
   display: flex;
   flex-direction: column;
   padding: var(--space-2);
-  background: var(--surface-1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-panel);
 }
 header.site nav .menu-panel a { display: block; }
 
@@ -916,28 +939,29 @@ h3 {
  * pinned to the end of its card heading by `margin-left: auto`, so a panel opening rightwards
  * from there opens off the side of the page.
  */
-.year-chip-def {
+/* The two definitions — the chip's and the term's — open the same way and hold the same kind of
+   sentence, so they share everything but their anchor and their width. The box is the popover's. */
+.year-chip-def,
+.term-def {
   position: absolute;
-  right: 0;
-  top: calc(100% + .35rem);
+  top: calc(100% + var(--space-2));
   z-index: 20;
   width: max-content;
-  max-width: min(26rem, calc(100vw - 2rem));
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: .5rem .65rem;
+  padding: var(--space-3) var(--space-4);
   font-size: var(--text-sm);
   font-weight: var(--weight-regular);
   line-height: var(--leading-base);
-  letter-spacing: normal;
-  text-align: left;
-  white-space: normal;
   color: var(--text-secondary);
-  box-shadow: 0 6px 20px rgb(0 0 0 / 18%);
   opacity: 0;
   visibility: hidden;
   transition: opacity .12s ease;
+}
+.year-chip-def {
+  right: 0;
+  max-width: min(26rem, calc(100vw - 2rem));
+  letter-spacing: normal;
+  text-align: left;
+  white-space: normal;
 }
 .year-chip-wrap:hover > .year-chip-def,
 .year-chip-wrap:focus-within > .year-chip-def { opacity: 1; visibility: visible; }
@@ -988,27 +1012,12 @@ h3 {
 
 .term-wrap { position: relative; display: inline; }
 .term-def {
-  /* Laid out but not painted, rather than `display: none` — a definition removed from the box
-     tree is removed from the accessibility tree with it, and `aria-describedby` then points at
-     nothing. This is the one rule in this block that is load-bearing for correctness. */
-  position: absolute;
+  /* Laid out but not painted — `visibility`, in the shared rule above, rather than `display:
+     none`. A definition removed from the box tree is removed from the accessibility tree with it,
+     and `aria-describedby` then points at nothing. This is the one property in this block that is
+     load-bearing for correctness. */
   left: 0;
-  top: calc(100% + .4rem);
-  z-index: 20;
-  width: max-content;
   max-width: min(30rem, calc(100vw - 2rem));
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: var(--space-3) .7rem;
-  font-size: var(--text-sm);
-  font-weight: var(--weight-regular);
-  line-height: var(--leading-base);
-  color: var(--text-secondary);
-  box-shadow: 0 6px 20px rgb(0 0 0 / 18%);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity .12s ease;
 }
 .term-wrap:hover > .term-def,
 .term-wrap:focus-within > .term-def { opacity: 1; visibility: visible; }
@@ -1043,10 +1052,10 @@ h3 {
   .term-def,
   .year-chip-def {
     position: fixed;
-    left: .75rem;
-    right: .75rem;
+    left: var(--space-4);
+    right: var(--space-4);
     top: auto;
-    bottom: .75rem;
+    bottom: var(--space-4);
     width: auto;
     max-width: none;
     font-size: var(--text-base);
@@ -1889,17 +1898,15 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
   margin-bottom: 3px;
 }
 
+/* The chart's tooltip. The box is the popover's; what is its own is that it follows the pointer
+   and is dense, because it sits over the marks it describes. */
 #tip {
   position: fixed;
   z-index: 10;
   pointer-events: none;
-  background: var(--surface-1);
   color: var(--text-primary);
-  border: 1px solid var(--accent-rule);
-  border-radius: var(--radius-md);
-  padding: var(--space-2) .55rem;
+  padding: var(--space-2) var(--space-3);
   font-size: var(--text-sm);
-  box-shadow: var(--shadow-tip);
   max-width: 320px;
 }
 
