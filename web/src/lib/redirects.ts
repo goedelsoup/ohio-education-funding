@@ -10,8 +10,10 @@
  * the 404 would pass on a file that redirects nowhere.
  *
  * So the preview server is given this (`scripts/preview.config.ts`), and the old addresses are
- * checked in a browser against the rules that will actually deploy. What it implements is the part
- * of the host's matcher the file uses, written from the documented behaviour:
+ * checked in a browser against the rules that will actually deploy. So is the server the measure
+ * instrument loads the build through (`scripts/serve-dist.ts`), which otherwise measured a 404.
+ * What it implements is the part of the host's matcher the file uses, written from the documented
+ * behaviour:
  *
  * - `:name` matches one path segment and `*` matches the rest, spliced back in as `:splat`;
  * - the status is the third field, 302 when absent;
