@@ -1,19 +1,25 @@
 ---
 /**
- * Move a lever, see who it reaches — across all 609 districts.
+ * Try a change: move a lever, see what changes — across all 609 districts, or for one.
  *
- * The one view that answers the question a policy argument actually turns on. A district page can
- * say what a change does to that district; only this can say how many districts move the other
- * way, and how that falls across property wealth.
+ * The view that answers the question a policy argument actually turns on. What a change does to one
+ * district is here too, chosen above the levers: a district page's scenario tab opens this with the
+ * district chosen (`?d=`), and the district's cards lead — followed, on the same page and not behind
+ * a link, by how many districts move the other way. That was `/district/[irn]/scenario`, 609
+ * copies of this runner around one district's cards, until #548 made it a setting of this one.
+ *
+ * Its second view, `/scenario/reach`, asks *who* a change reaches; `RunnerViews` is the way across.
  *
  * Unlike every other page here the figures are computed in the browser, because a lever has a
  * continuum of positions and a static page per position is not a page. What licenses that is the
  * verification gate in `src/scripts/scenario.ts`.
  */
 import HeldFixed from "../components/HeldFixed.astro";
+import RunnerViews from "../components/RunnerViews.astro";
 import ScenarioControls from "../components/ScenarioControls.astro";
 import Base from "../layouts/Base.astro";
-import { loadFeed } from "../lib/feed.ts";
+import { NAMES } from "../lib/nav.ts";
+import { loadFeed, qualifiedName } from "../lib/feed.ts";
 import { count, millions } from "../lib/format.ts";
 import { modelOf } from "../lib/policy.ts";
 import { refreshEffect } from "../lib/refresh.ts";
@@ -21,7 +27,7 @@ import * as routes from "../lib/routes.ts";
 import { yearChip } from "../lib/year.ts";
 import SectionAnchor from "../components/SectionAnchor.astro";
 
-const { bundle, forecastable } = loadFeed();
+const { bundle, forecastable, alphabetical } = loadFeed();
 const s = bundle.statewide;
 const meta = bundle.projection;
 
@@ -54,27 +60,151 @@ const stages = bundle.drafts
 ---
 
 <Base
-  title="Scenario"
+  title={NAMES.scenario.name}
   description={`Re-run Ohio's FY${bundle.fiscal_year} school funding formula with the guarantee, base cost, minimum state share and phase-in moved, across all ${s.districts} districts.`}
   image={routes.og.page("scenario")}
   imageAlt="Re-run Ohio's funding formula with the guarantee, base cost, minimum state share and phase-in moved"
   section="scenario"
 >
-  <h1>Scenario</h1>
+  <h1>{NAMES.scenario.name}</h1>
+  <RunnerViews current="changes" />
   <p class="lead">
     Move a lever and re-run the department's FY{bundle.fiscal_year} model across all {
       count(s.districts)
-    } districts. Current law pays {millions(s.realized_aid_total).replace("+", "")}, of which {
-      millions(s.guarantee_total).replace("+", "")
-    } is the guarantee.
+    } districts, against a current law that pays {
+      millions(s.realized_aid_total).replace("+", "")
+    }, {millions(s.guarantee_total).replace("+", "")} of it guarantee money.
   </p>
 
+  <div id="scenario-root">
+    {/*
+      The year chip, rendered here because the client cannot build one.
+
+      `yearChip` reads the feed through `loadFeed`, which touches the filesystem, so the cards this
+      route renders in the browser had no way to say what year their figures are on — and did not.
+      Handing over the markup keeps one definition of the chip and puts it on cards a build-time
+      pass can never reach. See `scripts/scenario.ts`.
+    */}
+    <template id="scenario-chip" set:html={yearChip("formula")} />
+
+    {/*
+      Whose change: the state, or one district.
+
+      Above the levers because it decides what the first cards say — a district's own figure, or the
+      state's — and a reader should choose the question before moving anything. A district page's
+      scenario tab opens the runner with its district chosen here (`?d=`); "The whole state" is the
+      way back out. The same picker `/scenario/reach` names districts with, and the same `d` key, so
+      a district chosen here is lit there when the reader crosses tabs.
+
+      Rendered at build, so a reader with no script sees the control and it does nothing, as the
+      levers beside it do.
+    */}
+    <form id="scenario-scope" class="reach-axes">
+      <label class="axis-pick">
+        <span>For</span>
+        <select id="sc-district">
+          <option value="">The whole state</option>
+          {alphabetical.map((d) => <option value={d.irn}>{qualifiedName(d)}</option>)}
+        </select>
+      </label>
+    </form>
+
+    <ScenarioControls
+      model={s.minimum_state_share}
+      onGuarantee={s.on_guarantee}
+      projection={{
+        available: forecastable && meta != null,
+        baseYear: meta?.base_year ?? 0,
+        maxYear: meta?.horizon ?? 0,
+      }}
+      refresh={refresh}
+    />
+
+    <noscript>
+      <div class="card err" id="needs-script" data-part="needs-script">
+        {/* One heading on every page that re-runs the formula. Each used to claim to be the only
+            one — "the one page", "the one view", "this page" beside "every other page" — and a
+            reader who met two of them met a contradiction. */}
+        <h2><SectionAnchor id="needs-script" />Re-running the formula needs JavaScript</h2>
+        <p class="note">
+          Most pages on this site carry their figures in the document and read correctly without
+          any script. The ones that re-run the formula cannot: both views of this runner — this one
+          and <a href={routes.REACH}>who a change reaches</a> — re-derive it over all {
+            count(s.districts)
+          } districts as you move a slider, which is not something a pre-rendered page can do.
+        </p>
+        <p class="note">
+          The underlying data is still available: <a href="/data">the feed and a CSV of the panel</a>,
+          and <a href="/districts">every district's published figures</a>.
+        </p>
+      </div>
+    </noscript>
+
+    <!--
+      Three containers, and the order is the point.
+
+      #scenario-out takes the simulation's headline tiles, directly under the levers, because that
+      is where a reader who has just moved one looks. #projection-out takes the forecast. And
+      #scenario-detail takes the rest of the simulation — the distribution, the most-affected
+      table, the counts underneath — which are read at rest rather than at the moment a slider
+      moves.
+
+      The simulation is exact and the projection is a forecast. They are gated on separate checks
+      and one can be disabled without the other, and there is deliberately no figure anywhere that
+      adds them together. What that rule requires is that the forecast never appear above the
+      figures it is a forecast *of*, and the tiles are still above it.
+    -->
+    <div id="scenario-out"></div>
+    <div id="projection-out"></div>
+    <div id="scenario-detail"></div>
+    <p class="note" id="scenario-status"></p>
+  </div>
+
   {/*
-    What every lever here holds fixed. Above the controls rather than below the results, because it
-    is a limit on what the reader is about to do and not a footnote on what they got — and on the
-    district route for the same reason. See `HeldFixed.astro`.
+    What a district's cards hold still — shown only while one is chosen, because the statewide run
+    says it in the held-fixed card below and in the forecast, and this is the one way the two differ.
+
+    The district cards hold enrollment at the published year; the forecast below them projects it.
+    That was said on the district route, where there was no forecast, and has to be said here, where
+    there is one on the same page.
   */}
-  <HeldFixed districts={bundle.districts} total={s.districts} refresh={refresh} />
+  <div class="card" id="not" data-part="not" hidden>
+    <h2><SectionAnchor id="not" />What a district's cards do not move</h2>
+    <p class="note">
+      Assessed valuation is held fixed, because the corpus has one observation per district and
+      cannot project it. Local capacity is 60% valuation, so a scenario in which property values
+      move is out of reach here. A district's own cards hold enrollment at published FY{
+        meta?.base_year ?? ""
+      }; the forecast is the statewide band, drawn once, where it is the subject.
+    </p>
+    <p class="note">
+      So this view holds enrollment fixed and moves the formula. The reciprocal — the
+      formula held completely fixed and run at each published year's enrollment, with the
+      district's own band carried forward — is <a href="/districts" data-district-home
+        >on its dashboard</a
+      >.
+    </p>
+  </div>
+
+  {/*
+    The apparatus, under the thing it is apparatus for (#549).
+
+    These two cards sat between the lead and the levers — about 450 words, and at a laptop's
+    height the first lever was below the fold. They were put there on the argument that a limit on
+    what the reader is about to do is not a footnote on what they got. The plan for this runner
+    (#552) decided the other way: the page is the levers, and a reader who has not yet moved one
+    has nothing for a caveat to qualify. So the levers come directly under the lead, and what they
+    hold fixed and what they move away from are read here, after the figures they explain.
+
+    One component on both views, so the caveat cannot drift between them; its heading names the
+    view it is on. See `HeldFixed.astro`.
+  */}
+  <HeldFixed
+    districts={bundle.districts}
+    total={s.districts}
+    refresh={refresh}
+    heading="What these levers hold fixed, and one thing they deliberately do not"
+  />
 
   {/*
     What "current law" is, named.
@@ -113,64 +243,6 @@ const stages = bundle.drafts
         </p>
       )
     }
-  </div>
-
-  <div id="scenario-root">
-    {/*
-      The year chip, rendered here because the client cannot build one.
-
-      `yearChip` reads the feed through `loadFeed`, which touches the filesystem, so the cards this
-      route renders in the browser had no way to say what year their figures are on — and did not.
-      Handing over the markup keeps one definition of the chip and puts it on cards a build-time
-      pass can never reach. See `scripts/scenario.ts`.
-    */}
-    <template id="scenario-chip" set:html={yearChip("formula")} />
-
-    <ScenarioControls
-      model={s.minimum_state_share}
-      onGuarantee={s.on_guarantee}
-      projection={{
-        available: forecastable && meta != null,
-        baseYear: meta?.base_year ?? 0,
-        maxYear: meta?.horizon ?? 0,
-      }}
-      refresh={refresh}
-    />
-
-    <noscript>
-      <div class="card err" id="needs-script" data-part="needs-script">
-        <h2><SectionAnchor id="needs-script" />This is the one page that needs JavaScript</h2>
-        <p class="note">
-          Every other page on this site carries its figures in the document and reads correctly
-          without any script. This one re-derives Ohio's funding formula over all {
-            count(s.districts)
-          } districts as you move a slider, which is not something a pre-rendered page can do.
-        </p>
-        <p class="note">
-          The underlying data is still available: <a href="/data">the feed and a CSV of the panel</a>,
-          and <a href="/districts">every district's published figures</a>.
-        </p>
-      </div>
-    </noscript>
-
-    <!--
-      Three containers, and the order is the point.
-
-      #scenario-out takes the simulation's headline tiles, directly under the levers, because that
-      is where a reader who has just moved one looks. #projection-out takes the forecast. And
-      #scenario-detail takes the rest of the simulation — the distribution, the most-affected
-      table, the counts underneath — which are read at rest rather than at the moment a slider
-      moves.
-
-      The simulation is exact and the projection is a forecast. They are gated on separate checks
-      and one can be disabled without the other, and there is deliberately no figure anywhere that
-      adds them together. What that rule requires is that the forecast never appear above the
-      figures it is a forecast *of*, and the tiles are still above it.
-    -->
-    <div id="scenario-out"></div>
-    <div id="projection-out"></div>
-    <div id="scenario-detail"></div>
-    <p class="note" id="scenario-status"></p>
   </div>
 
   <script>

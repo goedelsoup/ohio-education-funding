@@ -3,7 +3,7 @@
  *
  * # What was wrong
  *
- * `/scenario`, `/compare` and the 609 `/district/*\/scenario` routes replace their entire result
+ * `/scenario`, `/scenario/reach` and `/compare` replace their entire result
  * block when a lever moves. A reader who can see it watches the figures change; a reader who
  * cannot hears nothing at all, and the figures they came for have quietly become different
  * figures. The site had exactly two live regions before this — `#f-count` on `/districts`, and it

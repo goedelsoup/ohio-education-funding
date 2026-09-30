@@ -4,15 +4,12 @@
  *
  * # Why this is a component and was markup on one page
  *
- * It lived in `pages/scenario.astro`, and the reason it was written argues for it being on both
- * scenario routes rather than one:
+ * It lived in `pages/scenario.astro`, and the reason it was written argues for it being on every
+ * view of the runner rather than one: it is a limit on the levers, and every view has the levers.
  *
- * > Placed above the controls rather than below the results, because it is a limit on what the
- * > reader is about to do and not a footnote on what they got.
- *
- * `/district/:irn/scenario` renders the same five levers and had none of it. Its own
- * "What this does not move" card names assessed valuation and enrollment — limits specific to that
- * view — and said nothing about the $812.5M of categoricals the base cost lever also moves, nothing
+ * `/district/:irn/scenario` rendered the same five levers and had none of it (it is `/scenario?d=`
+ * now, #548). Its own "What this does not move" card names assessed valuation and enrollment —
+ * limits specific to that view — and said nothing about the $812.5M of categoricals the base cost lever also moves, nothing
  * about DPIA and targeted assistance cancelling, nothing about gifted or preschool.
  *
  * That route's header comment calls it "the page a school board sends", and `renderDraft` has
@@ -24,6 +21,15 @@
  *
  * The first version of the draft banner wrote it only in the statewide branch too. Same shape, one
  * card over.
+ *
+ * # Why it is below the results
+ *
+ * It was placed above the controls, "because it is a limit on what the reader is about to do and
+ * not a footnote on what they got". Three hundred words between the lead and the first lever put
+ * that lever below the fold, on a page whose whole purpose is the lever. The plan for the runner
+ * (#552, from #549) put the levers directly under the lead and this card after the figures, as the
+ * explanation of them. The draft banner still sits above the total it qualifies: that one names
+ * what a particular figure leaves out, and belongs where the figure is.
  *
  * # Why the wording did not need a district variant
  *
@@ -46,16 +52,29 @@ interface Props {
   total: number;
   /** The refresh the feed prices, already resolved by the caller that also gives it to the levers. */
   refresh: RefreshEffect | null;
+  /**
+   * The card's heading, which names the view it sits on.
+   *
+   * It was one sentence on all three routes — "What these levers hold fixed, and one they
+   * deliberately do not" — so a reader moving between them, and anything that lists a page's
+   * headings, met the same `h2` three times with nothing saying which run it described. The
+   * caveat is the same on each (see above); the heading says whose it is.
+   *
+   * Two routes since #548 folded the district one into `/scenario?d=`, where the card reads the
+   * same whether or not a district is chosen — the caveat is about the levers, which is what the
+   * `/scenario` heading names. The reach view's names the view.
+   */
+  heading: string;
 }
 
-const { districts, total, refresh } = Astro.props;
+const { districts, total, refresh, heading } = Astro.props;
 // Memoised on the panel, which `loadFeed` caches — so this is summed once per build and not once
 // per district page.
 const fixed = heldFixed(districts);
 ---
 
 <div class="card" id="held-fixed" data-part="held-fixed">
-  <h2><SectionAnchor id="held-fixed" />What these levers hold fixed, and one they deliberately do not<Fragment set:html={yearChip("formula")} /></h2>
+  <h2><SectionAnchor id="held-fixed" />{heading}<Fragment set:html={yearChip("formula")} /></h2>
   <p class="note">
     Ohio's formula contains statewide constants — the average base cost per pupil, the statewide
     poverty share, the median weighted wealth — that are computed once over all districts. The

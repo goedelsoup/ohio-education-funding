@@ -230,15 +230,17 @@ test.describe("what the budget is made of", () => {
 });
 
 test.describe("the statute timeline", () => {
-  test("the Law menu opens onto it, and it is the first thing in the panel", async ({ page }) => {
+  test("the Library menu opens onto it, and it is the first thing in the panel", async ({ page }) => {
+    // First in the `Law` run, which is first in the panel: the one link there that is not an
+    // index, and the one a reader asking "how did this get here" wants before any single act.
     await page.goto("/");
-    const law = page.locator("header.site nav details.menu").nth(1);
+    const law = page.locator("header.site nav details.menu").nth(2);
     await law.locator("summary").click();
     const first = law.locator(".menu-panel a").first();
     await expect(first).toHaveAttribute("href", "/legislation");
     await first.click();
     await expect(page).toHaveURL(/\/legislation$/);
-    await expect(page.locator("h1")).toHaveText("Ohio school funding in statute");
+    await expect(page.locator("h1")).toHaveText("The statute timeline");
   });
 
   test("a formula that ran one biennium is drawn narrower than one that ran five", async ({

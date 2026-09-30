@@ -16,7 +16,9 @@ import { defineConfig, devices } from "@playwright/test";
 // silently tests whatever answered is worse than one that cannot start.
 const PORT = 4329;
 
-const PREVIEW = `pnpm exec vite preview --outDir dist --port ${PORT} --strictPort`;
+// With the host's `_redirects` applied, so an address that moved is tested landing where the host
+// sends it rather than 404ing on a server that never read the file. See `scripts/preview.config.ts`.
+const PREVIEW = `pnpm exec vite preview --config scripts/preview.config.ts --outDir dist --port ${PORT} --strictPort`;
 
 export default defineConfig({
   testDir: "./tests/e2e",

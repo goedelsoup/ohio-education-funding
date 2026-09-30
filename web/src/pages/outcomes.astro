@@ -7,6 +7,7 @@
  * that by never emitting an association without its controlled figure beside it.
  */
 import Base from "../layouts/Base.astro";
+import { NAMES } from "../lib/nav.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { renderOutcomes } from "../lib/outcomes.ts";
 import * as routes from "../lib/routes.ts";
@@ -16,7 +17,7 @@ const o = bundle.statewide.outcomes;
 ---
 
 <Base
-  title="Outcomes"
+  title={NAMES.outcomes.name}
   description={
     o
       ? `Economic disadvantage explains Ohio's attainment measure at ${o.poverty_vs_performance.toFixed(3)}. Every other district-level association is shown against that, with its controlled figure beside it.`
@@ -26,7 +27,7 @@ const o = bundle.statewide.outcomes;
   imageAlt="Ohio school funding set against the report-card measures"
   section="outcomes"
 >
-  <h1>Outcomes</h1>
+  <h1>{NAMES.outcomes.name}</h1>
   <p class="lead">
     What districts achieve, and how little of it the funding side explains. Every association here
     is a correlation over {o ? o.districts : 0} districts and none of them identifies an effect.

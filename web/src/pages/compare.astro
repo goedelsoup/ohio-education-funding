@@ -11,6 +11,7 @@
  * on this site where the combinatorics genuinely defeat static generation.
  */
 import Base from "../layouts/Base.astro";
+import { NAMES } from "../lib/nav.ts";
 import { comparison, type Years } from "../lib/compare.ts";
 import { loadFeed, qualifiedName } from "../lib/feed.ts";
 import { count } from "../lib/format.ts";
@@ -79,13 +80,13 @@ const seeded = comparison(
 ---
 
 <Base
-  title="Compare"
+  title={NAMES.compare.name}
   description={`Put any two of Ohio's ${bundle.statewide.districts} school districts side by side: funding, guarantee status, property wealth, spending and outcomes.`}
   image={routes.og.page("compare")}
   imageAlt="Any two Ohio school districts, side by side"
   section="compare"
 >
-  <h1>Compare</h1>
+  <h1>{NAMES.compare.name}</h1>
   <p class="lead">
     Any two of Ohio's {count(bundle.statewide.districts)} districts, side by side. A single
     district's figures are a fact; two districts' figures are usually the argument.

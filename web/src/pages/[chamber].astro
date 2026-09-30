@@ -9,6 +9,7 @@
  * infer that two pages built the same way are equally reliable.
  */
 import Base from "../layouts/Base.astro";
+import { NAMES } from "../lib/nav.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { count, money, pct } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
@@ -23,6 +24,9 @@ const chamber = Astro.params.chamber as "house" | "senate";
 const { bundle } = loadFeed();
 const seats = chamber === "house" ? bundle.house_districts : bundle.senate_districts;
 const label = chamber === "house" ? "House" : "Senate";
+/* The page's name is the bar's — see `NAMES` in `nav.ts`. `label` stays for the prose, which counts
+   seats ("Ohio's 99 House districts") and cannot take the name whole. */
+const name = NAMES[chamber].name;
 const other = chamber === "house" ? "senate" : "house";
 
 const ranked = [...seats].sort((a, b) => b.realized_aid - a.realized_aid);
@@ -33,14 +37,14 @@ const senateWhole = bundle.senate_districts.reduce((a, h) => a + h.districts_who
 ---
 
 <Base
-  title={`${label} districts`}
+  title={name}
   description={`Ohio's ${seats.length} ${label} districts, with school funding apportioned across them from census blocks — an estimate, since no legislative district is a unit of account in Ohio's funding system.`}
   image={routes.og.page(chamber)}
   imageAlt={`Ohio's ${seats.length} ${label} districts, with school funding apportioned across them`}
   section={chamber}
   wide
 >
-  <h1>{label} districts</h1>
+  <h1>{name}</h1>
   <p class="lead">
     Ohio's {count(seats.length)} {label} districts, ordered by the state aid flowing through the
     schools in each. {count(whole)} of {count(bundle.districts.length)} school districts lie wholly

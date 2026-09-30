@@ -58,7 +58,10 @@ if (location.pathname === "/" && location.hash.length > 1) {
   const [view, irn] = (route ?? "").split("/");
   const search = query ? `?${query}` : "";
   const moved = new Map<string, string>([
-    ["statewide", "/"],
+    // `#statewide` was the statewide panel, which moved to `/statewide` when `/` became a front
+    // door. The table still sent it to `/`, and the guard below — written for when `/` WAS the
+    // panel — turned that into "do nothing": an old statewide link landed on the front page.
+    ["statewide", "/statewide"],
     ["outcomes", "/outcomes"],
     ["scenario", `/scenario${search}`],
   ]);
@@ -66,8 +69,8 @@ if (location.pathname === "/" && location.hash.length > 1) {
     view === "district" && /^\d{6}$/.test(irn ?? "")
       ? `/district/${irn}`
       : moved.get(view ?? "");
-  // `/` is in the table so a `#statewide` link is recognised rather than falling through, but
-  // redirecting the front page to itself would be a loop.
+  // No entry targets `/` any more, but redirecting the front page to itself would be a loop, so
+  // the guard stays for whichever entry is next pointed at it.
   if (target && target !== location.pathname) location.replace(target);
 }
 

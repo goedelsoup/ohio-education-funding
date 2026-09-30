@@ -4,13 +4,13 @@
  * # Why this is a module and not a `const` in the layout
  *
  * It was a `const` in `Base.astro` for as long as the bar was five flat-ish entries that never
- * changed. Two things ended that. The first is that the bar now lifts corpus classes into it, so
- * part of it is *derived* — which acts appear under `Law` is computed from edges in
- * `.yidam/corpus/`, and a derivation with nothing checking it is a list that goes quietly wrong the
- * first time somebody adds a node. The second is that the checks worth having are about the
- * structure and not about the pixels: every href resolves, every lifted class is two clicks deep,
- * the landmark rules select what they claim to. All three are unit tests against this file, and
- * none of them wants to parse a rendered `<header>` to ask its question.
+ * changed. Two things ended that. The first is that part of the bar is *derived* from
+ * `.yidam/corpus/` — every class the corpus holds is a link under `Library`, with a count read off
+ * the directory — and a derivation with nothing checking it is a list that goes quietly wrong the
+ * first time somebody adds a class. The second is that the checks worth having are about the
+ * structure and not about the pixels: every href resolves, every class is two clicks deep, no run
+ * outgrows its panel. All three are unit tests against this file, and none of them wants to parse
+ * a rendered `<header>` to ask its question.
  *
  * `Base.astro` renders what `nav()` returns and decides nothing.
  *
@@ -22,24 +22,24 @@
  */
 
 import type { Bundle } from "./types.ts";
-import { loadCorpus, type Corpus, type Node } from "./corpus.ts";
-import { compare } from "./order.ts";
+import { loadCorpus, type Corpus } from "./corpus.ts";
 import * as routes from "./routes.ts";
 
 /**
  * What a page passes as `section`, naming where it sits in the bar.
  *
  * A group key marks the group as containing the current page without marking any child as being
- * it — which is the case for all sixteen acts, of which the menu names seven.
+ * it — which is the case for every corpus node, of which the bar names none: it names their
+ * classes.
  */
 export type Section =
   // The groups.
   | "places"
-  | "law"
-  | "formula"
-  | "research"
-  | "reference"
-  // The children, where a child is a page in its own right.
+  | "analysis"
+  | "library"
+  | "about"
+  // The children, where a child is a page in its own right. `districts` and `scenario` are also
+  // entries of the bar on their own — see `nav()`.
   | "statewide"
   | "districts"
   | "counties"
@@ -50,11 +50,78 @@ export type Section =
   | "outcomes"
   | "history"
   | "scenario"
-  | "reach"
   | "bounds"
   | "wiki"
+  | "sources"
+  | "decisions"
   | "method"
   | "data";
+
+/**
+ * The name table: one row per page the bar links to, and the one name that page goes by.
+ *
+ * # Why a place has one name
+ *
+ * A page carried up to four — its label in the bar, its `<title>`, its `h1` and its URL — and
+ * they disagreed. `/legislation` was "The statute timeline" in the bar, "Statute" in the tab and
+ * "Ohio school funding in statute" on the page; `/history` was "History" everywhere but its own
+ * heading, which said "The long view". A reader who clicks a word expects to land on a page that
+ * says the same word back, and a reader who bookmarks the tab should recognise it in the bar.
+ *
+ * So the bar and the page both read the name from here, and `tests/dist/names.spec.ts` holds them
+ * to it on the built site: for every link in the bar, the label is the `<title>` stem and the `h1`
+ * begins with it. An `h1` may add a clause after the name; it may not say something else first.
+ *
+ * The corpus classes are not rows. Their name is the ontology's own `label:`, which the bar and the
+ * class index both read, so there is nothing here to restate.
+ *
+ * The URL is the fourth name and is not required to match. Changing an address costs a redirect
+ * and every link already sent; changing a label costs nothing, and `/legislation` is a better
+ * address than any spelling of its title would be.
+ */
+export const NAMES = {
+  statewide: { href: "/statewide", name: "Statewide" },
+  districts: { href: "/districts", name: "Find a district" },
+  counties: { href: "/counties", name: "Counties" },
+  house: { href: "/house", name: "House districts" },
+  senate: { href: "/senate", name: "Senate districts" },
+  compare: { href: "/compare", name: "Compare" },
+  legislation: { href: "/legislation", name: "The statute timeline" },
+  outcomes: { href: "/outcomes", name: "Outcomes" },
+  history: { href: "/history", name: "History" },
+  scenario: { href: "/scenario", name: "Try a change" },
+  bounds: { href: routes.BOUNDS, name: "Bounds" },
+  wiki: { href: "/wiki", name: "The corpus" },
+  sources: { href: "/wiki/source", name: "Sources" },
+  decisions: { href: "/wiki/decision", name: "Decisions" },
+  method: { href: routes.METHOD, name: "Method" },
+  data: { href: "/data", name: "Data" },
+} as const satisfies Partial<Record<Section, { href: string; name: string }>>;
+
+/**
+ * The runner's two views: one place, one name, asked two questions.
+ *
+ * `/scenario` and `/reach` were two entries in the bar, `Scenario` and `Reach`, for one set of
+ * levers over one panel — the second a question about the first rather than a place of its own.
+ * They are one entry now, `Try a change`, and these are the tabs inside it. Both pages carry the
+ * name in their `<title>` and `h1`; the tab says which question is open.
+ *
+ * `data-carry-levers` on each tab hands the reader's lever positions to the other view — see
+ * `carryLevers` in `scripts/scenario.ts`.
+ */
+export const RUNNER_VIEWS = [
+  { key: "changes", href: NAMES.scenario.href, label: "What changes" },
+  { key: "reach", href: routes.REACH, label: "Who it reaches" },
+] as const;
+
+/** Which of {@link RUNNER_VIEWS} a runner page is. */
+export type RunnerView = (typeof RUNNER_VIEWS)[number]["key"];
+
+/** A row of the name table as a link in the bar. */
+function place(key: keyof typeof NAMES, note?: string): NavLink {
+  const { href, name } = NAMES[key];
+  return note == null ? { key, href, label: name } : { key, href, label: name, note };
+}
 
 /** One link in a menu panel. */
 export interface NavLink {
@@ -65,24 +132,33 @@ export interface NavLink {
   /**
    * Why this link is in the menu, on its own line under the label.
    *
-   * Never decoration. Under `Law` it is the rule that admitted the act; under `Formula` it is the
-   * count of what is behind the link. A note that says nothing should be omitted, not invented.
+   * Never decoration: a note that says nothing should be omitted, not invented. The class links
+   * under `Library` carry none — their count sits in the label, see `classLink`.
    */
   note?: string;
 }
 
-/** A run of links under one rule. */
+/** A run of links under one rule, and optionally under a heading. */
 export interface NavSection {
+  /**
+   * What the run is, where a panel holds several of different kinds.
+   *
+   * Only `Library` sets one. Its twenty-odd links are the corpus's classes, and a flat column of
+   * ontology labels reads as an index nobody sorted; five short headings say what each run is for.
+   * Rendered as text, not as a heading element — see `Base.astro` — so the bar adds nothing to a
+   * page's outline.
+   */
+  heading?: string;
   links: NavLink[];
 }
 
-/** A top-level entry, and the panel it opens. */
-export interface NavGroup {
-  /** Marks the whole group current when a page names it. */
+/** What every entry in the bar has, whether it opens a panel or goes somewhere. */
+interface NavEntryBase {
+  /** Marks the entry current when a page names it. */
   key: Section;
   label: string;
   /**
-   * What this section answers, in one line, for the homepage.
+   * What this entry answers, in one line, for the homepage.
    *
    * The homepage maps over these rather than carrying a list of its own. A bar and a front door
    * that can disagree about what the site contains is the navigability defect, not the fix — and
@@ -91,376 +167,248 @@ export interface NavGroup {
    */
   blurb: string;
   /**
-   * The one page this section opens onto, for a reader who wants the section rather than a link
-   * inside it. A group has no href of its own — a `<summary>` is a disclosure, not a link — so
-   * this is what the homepage points its heading at.
+   * The one page this entry opens onto. For a flat entry that is its href; for a group, which has
+   * no href of its own — a `<summary>` is a disclosure, not a link — it is where the homepage
+   * points its heading.
    */
   front: string;
+}
+
+/** A top-level entry that opens a panel. */
+export interface NavGroup extends NavEntryBase {
+  kind: "group";
   /**
    * The panel, as runs of links separated by a rule.
    *
-   * One column, deliberately. The first shape of the `Law` panel was two, because naming four
-   * cases beside seven acts made a fourteen-row column that runs off a laptop viewport under a
-   * sticky header. The cases collapsed to a single link for a different reason — see
-   * `litigation` — and the second column went with them rather than staying as machinery for a
-   * panel nothing builds.
+   * One column except in `wide` panels, which are two above the nav's breakpoint — see
+   * `.menu-panel.wide` in `app.css`.
    */
   sections: NavSection[];
+  /** Lay the runs out in two columns where there is room. `Library` only. */
+  wide?: boolean;
 }
 
-/** Which act the corpus can point at as the one now in force, and which rule found each act. */
-export type Rule = "establishes" | "outside-the-budget" | "in-force";
-
-export interface Landmark {
-  node: Node;
-  rule: Rule;
-  /** The note the menu prints. Derived from the rule, so it is true of every member of it. */
-  note: string;
+/** A top-level entry that is a link, one click from anywhere. */
+export interface NavPlace extends NavEntryBase {
+  kind: "place";
 }
 
-const REGIME = "funding-regime/";
-
-/** The year an act was signed, from the ISO date every legislation node carries. */
-export function signedYear(node: Node): number {
-  const signed = node.properties.find((p) => p.name === "signed")?.value.trim() ?? "";
-  const year = Number.parseInt(signed.slice(0, 4), 10);
-  if (!Number.isFinite(year)) {
-    throw new Error(`${node.id} has no parseable \`signed\` date; the bar reads its year from it`);
-  }
-  return year;
-}
-
-/** `Am. Sub. H.B. 110 (2021)`. The designation verbatim — `Am. Sub.` is part of the bill's name. */
-export function actLabel(node: Node): string {
-  const designation = node.properties.find((p) => p.name === "designation")?.value.trim();
-  if (!designation) throw new Error(`${node.id} has no \`designation\`; the bar reads its label`);
-  return `${designation} (${signedYear(node)})`;
-}
-
-/**
- * The acts the `Law` menu names, and why each one is there.
- *
- * # Three rules, and no list
- *
- * A menu of seven items chosen out of sixteen is an editorial judgement, and this repository's
- * standing objection to those is that nothing records them: the judgement lives in whoever typed
- * the list, the corpus never learns it, and the list is wrong the day an act is added. So the
- * seven are *selected* rather than named —
- *
- * 1. **It establishes a funding regime.** H.B. 1, H.B. 153, H.B. 110 — the three acts that put a
- *    formula in place rather than continuing one.
- * 2. **It does not appropriate.** Every other act here is a biennial budget; these are not. The
- *    Constitution's education clause, H.B. 920's tax reduction factors, and H.B. 583, which
- *    corrected the Fair School Funding Plan between budgets.
- * 3. **It is the most recently signed act that does appropriate.** The budget in force.
- *
- * Rule 3 is why this is worth deriving at all: the menu re-points itself at the next budget with
- * no edit anywhere, and an act added to the corpus enters or does not enter the bar on its own
- * merits. `tests/unit/nav.spec.ts` asserts what the rules currently select, so a corpus change
- * that reshapes the bar fails a check rather than passing silently.
- *
- * # Rule 2's odd member
- *
- * H.B. 583 is a corrective act, not standing law, and the note it gets says only that it sits
- * outside the budget cycle — which is what the rule actually detects and is true of all three.
- * It earns the slot on its own account:
- * `crates/project/tests/the_act_that_corrected_the_plan.rs` exists because a reader who reaches
- * H.B. 110 and not H.B. 583 is reading a formula that was never run.
- */
-export function landmarkActs(corpus: Corpus): Landmark[] {
-  const acts = corpus.byClass.get("legislation")?.nodes ?? [];
-  const found = new Map<string, Landmark>();
-
-  const appropriates = (node: Node): boolean =>
-    node.out.some((e) => e.relationship === "appropriates-for");
-
-  for (const node of acts) {
-    const regime = node.out.find(
-      (e) => e.relationship === "establishes" && e.id?.startsWith(REGIME),
-    );
-    if (regime) {
-      found.set(node.id, { node, rule: "establishes", note: regime.label });
-      continue;
-    }
-    if (!appropriates(node)) {
-      found.set(node.id, { node, rule: "outside-the-budget", note: "not a budget act" });
-    }
-  }
-
-  /*
-   * The budget in force: latest `signed` among the acts that appropriate.
-   *
-   * Not "the act whose biennium contains the bundle's fiscal year", which was the first shape and
-   * is the wrong one — `fiscal-period` node names are inconsistent about how they abbreviate a
-   * biennium (`fy2004-2005` beside `fy2026-27`), so matching on them means parsing two formats and
-   * being silently wrong about one of them. `signed` is an ISO date on every node in the class.
-   */
-  const budgets = acts.filter(appropriates);
-  const inForce = budgets.reduce<Node | null>(
-    (latest, node) => (latest == null || signedYear(node) > signedYear(latest) ? node : latest),
-    null,
-  );
-  if (inForce && !found.has(inForce.id)) {
-    const period = inForce.out.find((e) => e.relationship === "appropriates-for");
-    found.set(inForce.id, {
-      node: inForce,
-      rule: "in-force",
-      note: period ? `appropriates for ${period.label}` : "the budget in force",
-    });
-  }
-
-  // Newest first. A reader looking for the act behind this year's figures starts at the top; one
-  // looking for where the duty comes from reads to the bottom and finds 1851 there.
-  return [...found.values()].sort((a, b) => signedYear(b.node) - signedYear(a.node));
-}
-
-/**
- * Why no case is named in the menu, and what it would take to name one.
- *
- * DeRolph is the most recognisable thing in Ohio school funding and the menu does not carry it.
- * That is not a judgement about its importance — it is that **the corpus holds no short name for
- * a case**, and the menu needs one. Litigation labels are full citations:
- * `Cincinnati City School District Board of Education v. Walter (1979)` is sixty-two characters
- * and wraps to three lines in a panel.
- *
- * The obvious derivation is the parenthetical, and it is wrong. It reads `DeRolph I (1997)` off
- * `DeRolph v. State (DeRolph I, 1997)` correctly and then reads **`Franklin County (2025)`** off
- * `EdChoice Constitutional Challenge (Franklin County, 2025)` — a venue offered to a reader as the
- * name of a case, in the bar, on every page. A rule that is right four times out of six and gives
- * no sign which two it missed is worse here than no rule.
- *
- * So `Litigation` is one link with its count, like `Doctrine`. The fix is a corpus change and not
- * a web one: declare a short name on `litigation.ont.yml` and fill it on the six nodes, and then
- * the menu, the statute timeline and a case's own breadcrumb all have something true to print.
- * That is a content decision, and it is not this phase's.
- */
-function litigation(corpus: Corpus): NavLink[] {
-  return [classLink(corpus, "litigation", "Litigation"), classLink(corpus, "doctrine", "Doctrine")];
-}
+export type NavEntry = NavGroup | NavPlace;
 
 /**
  * A whole class behind one link, with how much is behind it.
  *
- * The count sits in the label rather than in a note because a note under `Components` reading
- * "16 components" says the label twice. Notes elsewhere in the bar carry something the label does
- * not — the rule that admitted an act, the year a regime was established — and one that restates
- * its own heading teaches a reader to stop reading them.
+ * The count sits in the label rather than in a note because a note under `Formula Component`
+ * reading "18 components" says the label twice.
+ *
+ * The name is the ontology's `label:`, which is also the class index's `h1` and `<title>` stem.
+ * It was a second, shorter name typed here — `Components`, `Parameters`, `All 16 acts` — so the
+ * link said one thing and the page it opened said another.
  */
-function classLink(corpus: Corpus, className: string, label: string): NavLink {
+function classLink(corpus: Corpus, className: string): NavLink {
+  const entry = corpus.byClass.get(className);
+  if (!entry) throw new Error(`The bar links the class \`${className}\`, and the corpus has none`);
   return {
     href: routes.wikiClass(className),
-    label: `${label} (${corpus.byClass.get(className)?.nodes.length ?? 0})`,
+    label: `${entry.label} (${entry.nodes.length})`,
   };
 }
 
 /**
- * The regimes, newest first, by the act that established each.
+ * Where each corpus class sits in `Library`, by what a reader would come to it for.
  *
- * `byClass` returns them in the order the directory is read, which is alphabetical, which puts
- * `Bridge Formula` above `Fair School Funding Plan` and tells a reader nothing. Ordered by the
- * signed year of the establishing act, the panel reads as the succession it is — and the two with
- * no establishing act in the corpus (`Equal Yield`, `Foundation Base Cost`, both older than
- * anything the legislation class reaches) fall to the bottom rather than being given a date they
- * do not have.
+ * # Every class, and why that is the rule now
+ *
+ * The bar lifted seven of eighteen classes — statute into `Law`, the formula's four into `Formula`
+ * — and the other eleven, `school`, `program`, `actor` and the rest, were reachable only by opening
+ * `/wiki` and reading down a list (#548). And `Law` did not name its class so much as seven acts
+ * out of sixteen, chosen by three rules over the corpus's edges: an editorial judgement that was
+ * at least derived, and still a judgement a reader could not see. The class index lists all of
+ * them, and is one click from the bar.
+ *
+ * # A class this table does not name
+ *
+ * Still reaches the bar: `nav()` puts it in a last run headed `Also in the corpus`, so a class
+ * added to `.yidam/` is two clicks deep on the day it lands rather than never. That run is a
+ * notification and not a place — `tests/unit/nav.spec.ts` fails while it exists, and the fix is a
+ * line here.
  */
-function regimes(corpus: Corpus): NavLink[] {
-  const acts = corpus.byClass.get("legislation")?.nodes ?? [];
-  const established = new Map<string, number>();
-  for (const act of acts) {
-    for (const edge of act.out) {
-      if (edge.relationship === "establishes" && edge.id?.startsWith(REGIME)) {
-        established.set(edge.id, signedYear(act));
-      }
-    }
-  }
-  const nodes = [...(corpus.byClass.get("funding-regime")?.nodes ?? [])];
-  nodes.sort((a, b) => {
-    const ya = established.get(a.id) ?? 0;
-    const yb = established.get(b.id) ?? 0;
-    return yb - ya || compare(a.label, b.label);
-  });
-  return nodes.map((node) => {
-    const link: NavLink = { href: routes.wikiNode(node.className, node.name), label: node.label };
-    const year = established.get(node.id);
-    // Spread rather than `note: year ?? undefined`. Under `exactOptionalPropertyTypes`, a key
-    // present and holding `undefined` is not the same as an absent key, and the two regimes older
-    // than anything the legislation class reaches have no year to print.
-    return year == null ? link : { ...link, note: `established ${year}` };
-  });
-}
+export const LIBRARY: readonly { heading: string; classes: readonly string[] }[] = [
+  { heading: "Law", classes: ["legislation", "litigation", "doctrine"] },
+  {
+    heading: "Formula",
+    classes: [
+      "funding-regime",
+      "formula-component",
+      "parameter",
+      "metric",
+      "revenue-stream",
+      "fiscal-period",
+    ],
+  },
+  {
+    heading: "Institutions",
+    classes: [
+      "education-agency",
+      "actor",
+      "school",
+      "program",
+      "accountability-regime",
+      "intervention",
+    ],
+  },
+  { heading: "Proposals", classes: ["draft-legislation", "model-policy", "scenario"] },
+];
+
+/** The heading of the run that holds any class {@link LIBRARY} does not place. */
+export const UNPLACED = "Also in the corpus";
 
 /**
- * Where a wiki page sits in the bar.
+ * Where a wiki page sits in the bar: under `Library`, whatever its class.
  *
- * The point of lifting a class is that a reader standing on one of its nodes can see where they
- * are. Before this every one of the wiki's pages reported itself as `Reference › Wiki`, so a
- * reader who arrived at H.B. 110 from a search had nothing in the bar telling them the site had a
- * section about statute at all.
+ * The point of lifting a class was that a reader standing on one of its nodes can see where they
+ * are. When seven classes were lifted into `Law` and `Formula` this chose between those and
+ * `wiki`; every class is under `Library` now, so the group is the answer for all of them and the
+ * class index — a link in the panel — marks itself by path. Kept as a function of the class
+ * because the wiki routes call it that way, and a class that one day earns a place of its own
+ * changes one line here rather than every route. It reads no argument today, so it names none.
  */
-export function sectionForClass(className: string): Section {
-  if (["legislation", "litigation", "doctrine"].includes(className)) return "law";
-  if (["funding-regime", "formula-component", "parameter", "metric"].includes(className)) {
-    return "formula";
-  }
-  return "wiki";
-}
+export const sectionForClass: (className: string) => Section = () => "library";
 
 /**
  * The bar.
  *
- * # Why there is no flat entry left
+ * # Six entries, by what a reader came to do
  *
- * Every top-level entry opens a panel, where `Statewide` and `Scenario` used to be links. That is
- * a real cost — nothing in the bar is one click away any more — and it buys two things. The bar
- * holds five axes now rather than three, and a bar that mixes links with disclosures teaches a
- * reader nothing about which is which until they have clicked both.
+ * It was organised by the corpus's own taxonomy — Places, Law, Formula, Research, Reference — which
+ * is how the repository is built and not how it is read. It is organised by task now (#548):
+ * find one district; look at a place; read an analysis; try a change; look something up; learn how
+ * the figures are made.
  *
- * That cost used to be offset by a search box sitting beside the bar, which was the one-click path
- * to the thing most readers want: this site is read one district at a time. The box is gone, and
- * nothing replaced it, so the shortest path to a named district is now two clicks — the panel,
- * then `/districts` — and a name typed into that page's filter. If the depth is ever measured and
- * found to cost readers, the fix is a flat entry in the bar, not a second index to maintain.
+ * # Two of them are links, not menus
+ *
+ * `Find a district` and `Try a change`. A bar of nothing but disclosures put every destination two
+ * clicks away, and the one most readers want — this site is read one district at a time — was the
+ * second link inside `Places`. The note that was here said so, and named the fix: "a flat entry in
+ * the bar, not a second index to maintain". The runner is the other: it is one page with two
+ * views, and a menu holding one link is a click that decides nothing.
+ *
+ * Search is not coming back through this door. It was removed for guessing wrong with confidence
+ * and for an 88 KB index; `/districts` filters by name or IRN, and the homepage's field is a plain
+ * GET to it.
  *
  * The homepage takes no entry at all. It is what the brand mark points at, which is a convention a
  * reader already has, and giving it a tab as well would put one destination in the bar twice.
  */
-export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavGroup[] {
-  const acts = landmarkActs(corpus);
-  const legislation = corpus.byClass.get("legislation");
+export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavEntry[] {
+  const placed = new Set(LIBRARY.flatMap((run) => run.classes));
+  const unplaced = corpus.classes.map((c) => c.className).filter((name) => !placed.has(name));
+  const classRuns: NavSection[] = LIBRARY.map((run) => ({
+    heading: run.heading,
+    links: run.classes
+      .filter((name) => corpus.byClass.has(name))
+      .map((name) => classLink(corpus, name)),
+  }));
+  // The statute timeline is the chronological view of the `Law` classes, and sits at the head of
+  // their run: it is the only link there that is not an index, and a reader who wants "how did
+  // this get here" wants it before any single act.
+  classRuns[0]!.links.unshift(place("legislation"));
+  if (unplaced.length > 0) {
+    classRuns.push({ heading: UNPLACED, links: unplaced.map((name) => classLink(corpus, name)) });
+  }
 
   return [
     {
+      kind: "place",
+      key: "districts",
+      front: NAMES.districts.href,
+      // The count is read from the feed, not typed in, for the reason `og/pages.ts` gives at
+      // length: a count that a regenerated panel makes wrong is worse than no count.
+      blurb: `All ${bundle.statewide.districts}, by name or IRN, each with the formula's answer beside the one it receives.`,
+      label: NAMES.districts.name,
+    },
+    {
+      kind: "group",
       key: "places",
       front: "/statewide",
-      blurb: "Every district, every county, both legislative chambers — and any two of them side by side.",
+      blurb: "All of Ohio at once, every county, both legislative chambers — and any two districts side by side.",
       label: "Places",
       sections: [
         {
           links: [
-            {
-              key: "statewide",
-              href: "/statewide",
-              label: "Statewide",
-              note: "all of Ohio at once",
-            },
-            // Read from the feed, not typed in, for the reason `og/pages.ts` gives at length: a
-            // count that a regenerated panel makes wrong is worse than no count. This one is on
-            // every page.
-            {
-              key: "districts",
-              href: "/districts",
-              label: `All ${bundle.statewide.districts} districts`,
-            },
-            { key: "counties", href: "/counties", label: "Counties" },
-            { key: "house", href: "/house", label: "House" },
-            { key: "senate", href: "/senate", label: "Senate" },
-            { key: "compare", href: "/compare", label: "Compare two" },
+            place("statewide", "all of Ohio at once"),
+            place("counties"),
+            place("house"),
+            place("senate"),
+            place("compare", "any two districts, side by side"),
           ],
         },
       ],
     },
     {
-      key: "law",
-      front: routes.wikiClass("legislation"),
-      blurb: "The acts, the cases and the doctrines the money is arranged under, from an 1851 duty to this biennium's budget.",
-      label: "Law",
-      sections: [
-        {
-          // The chronological view, above the acts rather than among them: it is the only entry
-          // here that is not a node, and a reader who wants "how did this get here" wants it
-          // before they want any single act.
-          links: [
-            {
-              key: "legislation",
-              href: "/legislation",
-              label: "The statute timeline",
-              note: "every act, in order",
-            },
-          ],
-        },
-        {
-          links: acts.map((act) => ({
-            href: routes.wikiNode(act.node.className, act.node.name),
-            label: actLabel(act.node),
-            note: act.note,
-          })),
-        },
-        {
-          links: [
-            {
-              href: routes.wikiClass("legislation"),
-              label: `All ${legislation?.nodes.length ?? 0} acts`,
-            },
-            ...litigation(corpus),
-          ],
-        },
-      ],
-    },
-    {
-      key: "formula",
-      front: routes.wikiClass("funding-regime"),
-      blurb: "What the state computes, regime by regime, and the parameters a budget sets when it computes it.",
-      label: "Formula",
-      sections: [
-        { links: regimes(corpus) },
-        {
-          links: [
-            classLink(corpus, "formula-component", "Components"),
-            classLink(corpus, "parameter", "Parameters"),
-            classLink(corpus, "metric", "Metrics"),
-          ],
-        },
-      ],
-    },
-    {
-      key: "research",
+      kind: "group",
+      key: "analysis",
       front: "/outcomes",
       blurb: "What this repository worked out from all of it — and, as loudly, what none of it claims.",
-      label: "Research",
+      label: "Analysis",
       sections: [
         {
           links: [
-            {
-              key: "outcomes",
-              href: "/outcomes",
-              label: "Outcomes",
-              note: "association, not effect",
-            },
-            { key: "history", href: "/history", label: "History", note: "the Census long view" },
-            { key: "scenario", href: "/scenario", label: "Scenario", note: "re-run the formula" },
-            /* Beside the runner rather than under it: they drive the same levers and ask
-               different questions of them — how much, and who. */
-            { key: "reach", href: routes.REACH, label: "Reach", note: "who the guarantee holds still" },
-            /* Last in the run because it is the widest: the other four ask what the formula did
+            place("outcomes", "association, not effect"),
+            place("history", "the Census long view"),
+            /* Last in the run because it is the widest: the other two ask what the formula did
                to somebody, and this one asks what shape the formula is. */
-            {
-              key: "bounds",
-              href: routes.BOUNDS,
-              label: "Bounds",
-              note: "every floor and ceiling, and who is on it",
-            },
+            place("bounds", "every floor and ceiling, and who is on it"),
           ],
         },
       ],
     },
     {
-      key: "reference",
+      kind: "place",
+      key: "scenario",
+      front: NAMES.scenario.href,
+      blurb: "Move a lever and re-run the formula for every district: what changes, and who it reaches.",
+      label: NAMES.scenario.name,
+    },
+    {
+      kind: "group",
+      key: "library",
       front: "/wiki",
-      blurb: "The corpus these pages are generated from, how the figures are made, and the data itself.",
-      label: "Reference",
+      blurb: "The statute, the formula and every other class of the corpus these pages are generated from, with its sources and decisions.",
+      label: "Library",
+      wide: true,
+      sections: [
+        ...classRuns,
+        {
+          heading: "The record",
+          links: [
+            place("wiki", "every class, and what it holds"),
+            place("sources", "what every claim cites"),
+            place("decisions", "why it is built this way"),
+          ],
+        },
+      ],
+    },
+    {
+      kind: "group",
+      key: "about",
+      front: routes.METHOD,
+      blurb: "How every figure here is made and checked, and the data itself as files.",
+      label: "About",
       sections: [
         {
-          links: [
-            { key: "wiki", href: "/wiki", label: "Wiki", note: "the corpus itself" },
-            { key: "method", href: "/method", label: "Method" },
-            { key: "data", href: "/data", label: "Downloads" },
-          ],
+          links: [place("method", "how the figures are made"), place("data", "every figure, as files")],
         },
       ],
     },
   ];
 }
 
-export function navLinks(groups: NavGroup[]): NavLink[] {
-  return groups.flatMap((g) => g.sections.flatMap((s) => s.links));
+/** Every link the bar carries, flat entries included, in the order a reader meets them. */
+export function navLinks(entries: NavEntry[]): NavLink[] {
+  return entries.flatMap((entry) =>
+    entry.kind === "place"
+      ? [{ key: entry.key, href: entry.front, label: entry.label }]
+      : entry.sections.flatMap((s) => s.links),
+  );
 }

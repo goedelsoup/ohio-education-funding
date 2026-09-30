@@ -40,7 +40,7 @@ test.describe("reach", () => {
      * make — and this one is not, because the guarantee wall is a property of the formula rather
      * than of a lever position. A reader who lands here from the bar sees the shape of the state.
      */
-    await page.goto("/reach");
+    await page.goto("/scenario/reach");
     await booted(page);
     await expect(page.locator('#scenario-out [data-part="positions"]')).toBeVisible();
     // `:visible` because every chart is drawn twice, at both container widths, and the stylesheet
@@ -96,7 +96,7 @@ test.describe("reach", () => {
       return [...html.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]).join("|");
     };
 
-    await page.goto("/reach");
+    await page.goto("/scenario/reach");
     await booted(page);
     const frame = await ends();
     expect(frame).toContain("$0");
@@ -124,7 +124,7 @@ test.describe("reach", () => {
      * quantile and the marks are clipped to it, which is only honest if the page says how many it
      * clipped.
      */
-    await page.goto("/reach");
+    await page.goto("/scenario/reach");
     await booted(page);
     const notes = page.locator('[data-part="positions"] .note');
     await expect(notes.filter({ hasText: "sit outside the frame" })).toHaveCount(1);
@@ -145,7 +145,7 @@ test.describe("reach", () => {
      * `scatterSpec`'s own note on `identity` says this form must never do. So it is gated on the
      * pair rather than on a flag, and this is the check that the gate is on the pair.
      */
-    await page.goto("/reach");
+    await page.goto("/scenario/reach");
     await booted(page);
     await expect(page.locator(".scatter-identity")).not.toHaveCount(0);
 
@@ -172,7 +172,7 @@ test.describe("reach", () => {
      * the refresh at 1.0395 and the control steps by 0.01, so a preset compared by equality would
      * read unpressed the instant it was pressed.
      */
-    await page.goto("/reach");
+    await page.goto("/scenario/reach");
     await booted(page);
     const pressed = page.locator('[data-preset][aria-pressed="true"]');
     await expect(pressed).toHaveCount(1);
@@ -197,7 +197,7 @@ test.describe("reach", () => {
   });
 
   test("turning the trails off leaves the cloud and removes the segments", async ({ page }) => {
-    await page.goto("/reach");
+    await page.goto("/scenario/reach");
     await booted(page);
     await page.locator("#lv-base").fill("1.12");
     await page.locator("#lv-base").dispatchEvent("input");
@@ -219,7 +219,7 @@ test.describe("reach", () => {
      * payment does not move, so `y1 === y2`. If that ever stopped being true the picture would
      * still look plausible and would be claiming the guarantee reaches people it does not.
      */
-    await page.goto("/reach");
+    await page.goto("/scenario/reach");
     await booted(page);
     await page.locator("#lv-base").fill("1.12");
     await page.locator("#lv-base").dispatchEvent("input");
@@ -253,7 +253,7 @@ test.describe("reach", () => {
   test("a county selection lights its districts and leaves the state drawn behind them", async ({
     page,
   }) => {
-    await page.goto("/reach");
+    await page.goto("/scenario/reach");
     await booted(page);
     const drawn = page.locator('[data-chart="positions"] .chart-at[data-at="wide"] .scatter-dot circle');
     const before = await drawn.count();
@@ -294,7 +294,7 @@ test.describe("reach", () => {
      * The clipped count stays global on purpose: it is a fact about the drawing, and the whole state
      * is still drawn.
      */
-    await page.goto("/reach");
+    await page.goto("/scenario/reach");
     await booted(page);
     const notes = page.locator('[data-part="positions"] .note');
     await expect(notes.first()).toContainText("districts are");
@@ -318,7 +318,7 @@ test.describe("reach", () => {
      * would have rendered nothing here; and the frame is the state's, so the one lit dot sits where
      * the state puts it rather than alone on an axis fitted to itself.
      */
-    await page.goto("/reach");
+    await page.goto("/scenario/reach");
     await booted(page);
     const ends = async () => {
       const html = await page.locator('[data-chart="positions"]').innerHTML();
@@ -335,7 +335,7 @@ test.describe("reach", () => {
   });
 
   test("a selection travels in the query string and comes back as chips", async ({ page }) => {
-    await page.goto("/reach");
+    await page.goto("/scenario/reach");
     await booted(page);
     await page.locator("#rv-counties > summary").click();
     await page.locator('#reach-scope input[name="co"][value="athens"]').check();
@@ -370,7 +370,7 @@ test.describe("reach", () => {
      * so a preset, which is a whole lever position, must not take it with it. The two are read from
      * different controls and this is what says they stay that way.
      */
-    await page.goto("/reach");
+    await page.goto("/scenario/reach");
     await booted(page);
     await page.locator("#rv-counties > summary").click();
     await page.locator('#reach-scope input[name="co"][value="athens"]').check();
@@ -395,7 +395,7 @@ test.describe("reach", () => {
      * reason the mode lives in the scope form rather than beside the axis menus: it modifies the
      * selection above it and means nothing without one.
      */
-    await page.goto("/reach");
+    await page.goto("/scenario/reach");
     await booted(page);
     await expect(page.locator("#rv-mode-pick")).toBeHidden();
 
@@ -422,7 +422,7 @@ test.describe("reach", () => {
      * rest gone. What must not go with them is the ruler — a frame fitted to one county would make
      * two counties incomparable, and silently, because a refitted axis looks like an axis.
      */
-    await page.goto("/reach");
+    await page.goto("/scenario/reach");
     await booted(page);
     const dots = page.locator('[data-chart="positions"] .chart-at[data-at="wide"] .scatter-dot circle');
     const ends = async () => {
@@ -473,7 +473,7 @@ test.describe("reach", () => {
      * refusing is a heading with a gap under it. The refusal has to say why in that rule's own
      * terms and has to have somewhere to send the reader — which is what the spotlight is for.
      */
-    await page.goto("/reach?co=athens&only=1");
+    await page.goto("/scenario/reach?co=athens&only=1");
     await booted(page);
     const card = page.locator('[data-part="positions"]');
     await expect(card).toContainText("Athens County is too small to draw on its own");
@@ -506,12 +506,12 @@ test.describe("reach", () => {
      * the radio cannot give. So it appears under a county that holds enough districts and not under
      * one that does not — a reader must not be invited into a refusal.
      */
-    await page.goto("/reach?co=athens");
+    await page.goto("/scenario/reach?co=athens");
     await booted(page);
     const offer = page.locator('[data-part="positions"] button[data-scope-mode="subset"]');
     await expect(offer).toHaveCount(0);
 
-    await page.goto("/reach?co=cuyahoga");
+    await page.goto("/scenario/reach?co=cuyahoga");
     await booted(page);
     await expect(offer).toHaveCount(1);
     await offer.click();

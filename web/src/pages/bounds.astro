@@ -11,9 +11,9 @@
  * So it is a page, and `corpusSeries.ts`'s `PAGE_SERIES` is the small table that says a series can
  * be drawn by one, with the plan's own corpus node still answering for the figures at its ends.
  *
- * It sits in `Research` beside Outcomes, History, Scenario and Reach. Those four ask what the
- * formula did to somebody. This one asks what shape the formula is, which is the question a reader
- * has to have answered before any of the other four means very much.
+ * It sits in `Analysis` beside Outcomes and History, a menu away from the runner. Those ask what
+ * the formula did to somebody. This one asks what shape the formula is, which is the question a
+ * reader has to have answered before any of the others means very much.
  *
  * # The layout is the site's card stack, not `/reach`'s stage
  *
@@ -23,6 +23,7 @@
  * top. So it is cards, in order, like every other static page here.
  */
 import Base from "../layouts/Base.astro";
+import { NAMES } from "../lib/nav.ts";
 import SectionAnchor from "../components/SectionAnchor.astro";
 import {
   census,
@@ -40,13 +41,13 @@ const c = census();
 ---
 
 <Base
-  title="Bounds"
+  title={NAMES.bounds.name}
   description={`Every floor, ceiling and clamp in Ohio's school funding formula — ${count(c.rows.length)} of them — ranked by how many of the state's districts each one is actually the operative term for, with the one that cannot bind for any district at all.`}
   image={routes.og.page("bounds")}
   imageAlt="Every bound in Ohio's school funding formula, ranked by the number of districts it is the operative term for"
   section="bounds"
 >
-  <h1>Bounds</h1>
+  <h1>{NAMES.bounds.name}</h1>
   <p class="lead">
     Ohio's funding formula is written in floors and ceilings: a district is funded for at least one
     EMIS employee, its capacity percentage is capped, its guarantee cannot fall below zero. There
@@ -107,8 +108,9 @@ const c = census();
       <strong>And a count of districts is not a count of dollars.</strong> The ranking above says
       how often a bound is the deciding term, not what turns on it. The one place where those two
       come apart most sharply is the guarantee, which is operative for roughly half the state and
-      carries about an eighth of the money — see <a href={routes.REACH}>Reach</a> for who it holds
-      still, and <a href="/scenario">Scenario</a> for what moving a lever costs.
+      carries about an eighth of the money — see <a href={routes.REACH}>who a change reaches</a>
+      for who it holds still, and <a href={NAMES.scenario.href}>what a change does</a> for what
+      moving a lever costs.
     </p>
   </div>
 </Base>

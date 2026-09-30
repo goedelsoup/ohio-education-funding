@@ -162,7 +162,7 @@ test.describe("a draft opened in the runner", () => {
      * mildest.
      */
     await page.goto(
-      `/district/${NORTHERN}/scenario?draft=fund-the-plan-and-retire-the-guarantee`,
+      `/scenario?d=${NORTHERN}&draft=fund-the-plan-and-retire-the-guarantee`,
     );
     await expect(page.locator("#scenario-out > :first-child")).toHaveAttribute(
       "data-part",

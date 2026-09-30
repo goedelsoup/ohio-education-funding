@@ -9,6 +9,7 @@
  * It is generated from `.yidam/corpus/` directly. There is no exported copy to go stale.
  */
 import Base from "../../layouts/Base.astro";
+import { NAMES } from "../../lib/nav.ts";
 import { loadCorpus } from "../../lib/corpus.ts";
 import { count } from "../../lib/format.ts";
 import { compare } from "../../lib/order.ts";
@@ -61,13 +62,13 @@ const recentlyCorrected = corpus.decisions
 ---
 
 <Base
-  title="The corpus"
+  title={NAMES.wiki.name}
   description={`${corpus.nodes.length} nodes across ${corpus.classes.length} classes covering how Ohio funds its public schools: the formula and its regimes, the property tax base beside it, the litigation, and the programs that route money around the formula.`}
   image={routes.og.page("wiki")}
   imageAlt="The corpus behind these figures: the formula, the tax base, the litigation, the programs"
   section="wiki"
 >
-  <h1>The corpus</h1>
+  <h1>{NAMES.wiki.name}</h1>
   <p class="sub">
     How Ohio funds its public schools: the state foundation formula and its successive regimes, the
     constrained local property tax base beside it, the litigation that tested the combination

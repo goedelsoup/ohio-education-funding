@@ -67,12 +67,20 @@ test.describe("what the scenario holds fixed", () => {
    * only `/scenario` is what let that stand, and it is the same scoping mistake the year-chip rule
    * records making.
    */
-  for (const route of ["/scenario", `/district/${CLEVELAND}/scenario`]) {
-    test(`the caveat is above the controls, not below the results — ${route}`, async ({ page }) => {
+  for (const route of ["/scenario", `/scenario?d=${CLEVELAND}`]) {
+    test(`the levers come first and the caveat explains the results under them — ${route}`, async ({
+      page,
+    }) => {
       /*
-       * It is a limit on what the reader is about to do, not a footnote on what they got. The
-       * department's own calculator warns that its statewide constants are not recalculated when a
-       * district's data changes; that caveat is larger here, where every lever moves every district.
+       * The department's own calculator warns that its statewide constants are not recalculated
+       * when a district's data changes; that caveat is larger here, where every lever moves every
+       * district, so the card has to be on the page.
+       *
+       * Where on the page changed. It was above the controls, as a limit on what the reader was
+       * about to do — and three hundred words there put the first lever below the fold. #548 (the
+       * plan's #549 decision) put the levers directly under the lead and this card, with the
+       * baseline card, after the results as their explanation. Both halves are asserted: nothing
+       * that is a card comes before the levers, and both prose cards come after the runner.
        */
       await page.goto(route);
       const caveat = page.locator('.card[data-part="held-fixed"]');
@@ -84,16 +92,19 @@ test.describe("what the scenario holds fixed", () => {
       await expect(caveat).toContainText("Gifted");
       await expect(caveat).toContainText("preschool");
 
-      // Above the controls in document order.
       const order = await page.evaluate(() => {
-        const c = document.querySelector('[data-part="held-fixed"]');
-        const controls = document.querySelector("#scenario-root");
-        if (!c || !controls) return null;
-        return c.compareDocumentPosition(controls) & Node.DOCUMENT_POSITION_FOLLOWING
-          ? "before"
-          : "after";
+        const runner = document.querySelector("#scenario-root")!;
+        const after = (part: string) => {
+          const card = document.querySelector(`[data-part="${part}"]`);
+          return card != null && !!(runner.compareDocumentPosition(card) & Node.DOCUMENT_POSITION_FOLLOWING);
+        };
+        return {
+          first: document.querySelector("main .card")?.id ?? null,
+          heldFixedAfter: after("held-fixed"),
+          baselineAfter: after("baseline"),
+        };
       });
-      expect(order).toBe("before");
+      expect(order).toEqual({ first: "levers", heldFixedAfter: true, baselineAfter: true });
     });
   }
 
@@ -102,7 +113,7 @@ test.describe("what the scenario holds fixed", () => {
     // the moment somebody copies the markup back into a page to reword it there.
     await page.goto("/scenario");
     const statewide = (await page.locator('[data-part="held-fixed"]').innerText()).replace(/\s+/g, " ");
-    await page.goto(`/district/${CLEVELAND}/scenario`);
+    await page.goto(`/scenario?d=${CLEVELAND}`);
     const district = (await page.locator('[data-part="held-fixed"]').innerText()).replace(/\s+/g, " ");
     expect(district).toBe(statewide);
   });

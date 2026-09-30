@@ -81,7 +81,13 @@ test.describe("the chrome above the fold", () => {
      * decide it, so they travel with the failure.
      */
     const room: string[] = [];
-    for (const width of [360, 390, 480, 520, 700, 900, 1000, 1280]) {
+    /*
+     * 820 is the tightest the loose bar gets: the first width at which the six entries sit in the
+     * row rather than inside `Menu`. #548 widened that row — two flat entries and four menus,
+     * where there had been five menus — so it is measured where it is narrowest rather than at
+     * 900, where it has room it does not have at 820.
+     */
+    for (const width of [360, 390, 480, 520, 700, 820, 900, 1000, 1280]) {
       await page.setViewportSize({ width, height: 800 });
       await page.goto("/district/043786");
       const state = await page.evaluate(() => {
@@ -116,69 +122,43 @@ test.describe("the chrome above the fold", () => {
       "480: header 52, h1 at 80",
       "520: header 52, h1 at 80",
       "700: header 52, h1 at 80",
+      "820: header 52, h1 at 80",
       "900: header 52, h1 at 80",
       "1000: header 52, h1 at 80",
       "1280: header 52, h1 at 80",
     ]);
   });
 
-  test("the header's one outbound link is the repository, and it is not a button", async ({
+  test("the header leaves the site nowhere, and the repository is in the footer at every width", async ({
     page,
   }) => {
     /*
-     * Every figure on this site names the crate that computes it, and for a long time a reader
-     * following that attribution had nowhere to go. This is the somewhere — the only link in the
-     * chrome that leaves the site, so it is worth asserting that it is still the only one.
+     * Every figure on this site names the crate that computes it, and a reader following that
+     * attribution needs somewhere to go. The repository link was that somewhere, in the header
+     * beside the theme button and hidden below 480px for want of room. #548 moved it to the
+     * footer: the bar is for moving around this site, and it needed the width for six entries.
      *
-     * It is checked as chrome rather than as a control. The mark sits next to the theme button
-     * and wore the same pill for a while, which said it acted on the page; it does not, it leaves.
-     * So: no border, an accessible name, since it has no word of its own, and `noopener` on the
-     * new tab.
+     * So two claims. Nothing in the header leaves the site — a link added back there is a choice
+     * this test makes somebody state. And the footer carries the link at the narrowest width and
+     * the widest, by its name in words, opening a new tab without handing it this one.
      */
-    await page.setViewportSize({ width: 1000, height: 800 });
-    await page.goto("/district/043786");
-
-    /*
-     * Where it is, and where it is not. At 360px the bar spends 297 of its 320px on the brand,
-     * the collapsed nav and the theme button, and 23 spare does not hold a 32px mark and a gap —
-     * so it appears at 480px, where the same row has 95 to spare. Asserted at both ends because
-     * the header-height test only sees the consequence: a row that wrapped, not a row that was
-     * asked to hold one thing too many.
-     */
-    const mark = page.locator("header.site .mark");
-    for (const [width, shown] of [
-      [360, false],
-      [480, true],
-    ] as [number, boolean][]) {
+    for (const width of [360, 1000]) {
       await page.setViewportSize({ width, height: 800 });
-      expect(await mark.isVisible(), `the mark at ${width}px`).toBe(shown);
+      await page.goto("/district/043786");
+      const outbound = await page.evaluate(() =>
+        [...document.querySelectorAll("header.site a")]
+          .map((a) => (a as HTMLAnchorElement).href)
+          .filter((href) => new URL(href).origin !== location.origin),
+      );
+      expect(outbound, `the header links off the site at ${width}px`).toEqual([]);
+
+      const mark = page.locator("footer.site a.mark");
+      await expect(mark, `the repository link at ${width}px`).toBeVisible();
+      await expect(mark).toHaveAccessibleName("Source on GitHub");
+      await expect(mark).toHaveAttribute("href", "https://github.com/goedelsoup/ohio-education-funding");
+      await expect(mark).toHaveAttribute("rel", "noopener noreferrer");
+      await expect(mark).toHaveAttribute("target", "_blank");
     }
-    await page.setViewportSize({ width: 1000, height: 800 });
-
-    const outbound = await page.evaluate(() => {
-      const links = [...document.querySelectorAll("header.site a")].filter(
-        (a) => new URL((a as HTMLAnchorElement).href).origin !== location.origin,
-      ) as HTMLAnchorElement[];
-      return links.map((a) => ({
-        href: a.href,
-        name: a.getAttribute("aria-label"),
-        rel: a.rel,
-        target: a.target,
-        border: getComputedStyle(a).borderTopWidth,
-        text: a.textContent!.trim(),
-      }));
-    });
-
-    expect(outbound).toEqual([
-      {
-        href: "https://github.com/goedelsoup/ohio-education-funding",
-        name: "Source on GitHub",
-        rel: "noopener noreferrer",
-        target: "_blank",
-        border: "0px",
-        text: "",
-      },
-    ]);
   });
 
   test("keyboard focus never lands under the header", async ({ page }) => {
@@ -274,7 +254,9 @@ test.describe("the chrome above the fold", () => {
 });
 
 test.describe("routes", () => {
-  test("each of a district's five views is its own address", async ({ page }) => {
+  test("each of a district's four views is its own address, and the fifth tab opens the runner on it", async ({
+    page,
+  }) => {
     // `/taxes` landed after the other four and was left out of this list, so the one nav state
     // nothing had ever asserted was the heaviest sibling's. The label is read off the rendered
     // nav rather than hard-coded twice, so a rename fails here rather than passing on a stale
@@ -284,12 +266,18 @@ test.describe("routes", () => {
       ["/outcome", "Outcome"],
       ["/finances", "Finances"],
       ["/taxes", "Property tax"],
-      ["/scenario", "Scenario"],
     ] as const) {
       await page.goto(`/district/${NORTHERN}${path}`);
       await expect(page.locator("h1")).toHaveText("Northern Local");
       await expect(page.locator(`.subnav a[aria-current="page"]`)).toHaveText(heading);
     }
+    // The scenario tab was `/district/[irn]/scenario`, a copy of the runner per district. It is
+    // the runner now, opened with the district chosen (#548).
+    await page.locator(".subnav a", { hasText: "Try a change" }).click();
+    await expect(page).toHaveURL(new RegExp(`/scenario\\?d=${NORTHERN}`));
+    await expect(page.locator("h1")).toHaveText("Try a change");
+    await expect(page.locator("#sc-district")).toHaveValue(NORTHERN);
+    await expect(page.locator(`.subnav a[aria-current="page"]`)).toHaveText("What changes");
   });
 
   test("the root is a front door, and the statewide panel is a place", async ({ page }) => {
@@ -328,6 +316,11 @@ test.describe("routes", () => {
 
     await page.goto("/#outcomes");
     await expect(page).toHaveURL(/\/outcomes$/);
+
+    // The table sent this to `/` after the statewide panel had moved to `/statewide`, and the
+    // no-loop guard turned that into doing nothing.
+    await page.goto("/#statewide");
+    await expect(page).toHaveURL(/\/statewide$/);
 
     await page.goto("/#scenario?g=removed&arg=0.5&base=1&min=0.1&pb=1&pc=1&h=2032");
     await expect(page).toHaveURL(/\/scenario\?/);
@@ -425,16 +418,22 @@ test.describe("routes", () => {
     const hrefs = await page
       .locator("header.site nav a")
       .evaluateAll((nodes) => nodes.map((n) => (n as HTMLAnchorElement).getAttribute("href")!));
-    // Thirty-two across five groups. An exact count rather than a floor, so that dropping an
+    // Thirty-two across five groups, again. An exact count rather than a floor, so that dropping an
     // entry fails here and adding one is an acknowledged change — and so that a derivation which
     // quietly stops selecting anything cannot pass by returning an empty menu. It went from
     // thirty to thirty-one when `/legislation` joined the `Law` panel, to thirty-two when
     // `/reach` joined `Research` beside the scenario runner it splits the second question off,
     // and to thirty-three when `/bounds` joined the same panel — the census of the plan's own
     // edges, which is the only page here whose subject is the shape of the whole formula rather
-    // than a quantity it produces.
-    // Which is the mechanism working: the count is changed on purpose by somebody who knew why.
-    expect(hrefs).toHaveLength(33);
+    // than a quantity it produces. And back to thirty-two when `/reach` became the runner's second
+    // view (`/scenario/reach`), reached from a tab on the runner rather than from the bar (#548).
+    //
+    // Then thirty-four, when #548 rebuilt the bar by task: the seven acts and five regimes the
+    // corpus selected for `Law` and `Formula` went, and every one of the eighteen classes came in
+    // under `Library`, beside Sources and Decisions — two flat links, 5 places, 3 analyses, 22 in
+    // the library and 2 about. Which is the mechanism working: the count is changed on purpose by
+    // somebody who knew why.
+    expect(hrefs).toHaveLength(34);
     for (const href of hrefs) {
       await page.goto(href);
       await expect(page.locator("h1"), `${href} has no heading`).toBeVisible();
@@ -448,19 +447,19 @@ test.describe("the section menus", () => {
     // disabled suite asserts. What is checked here is that the script does not make it worse.
     await page.goto("/");
     const places = page.locator("header.site nav details.menu").filter({ hasText: "Places" });
-    const reference = page.locator("header.site nav details.menu").filter({ hasText: "Reference" });
+    const about = page.locator("header.site nav details.menu").last();
 
     await places.locator("summary").click();
     await expect(places).toHaveAttribute("open", "");
 
-    await reference.locator("summary").click();
-    await expect(reference).toHaveAttribute("open", "");
+    await about.locator("summary").click();
+    await expect(about).toHaveAttribute("open", "");
     await expect(places).not.toHaveAttribute("open", "");
 
     await page.keyboard.press("Escape");
-    await expect(reference).not.toHaveAttribute("open", "");
+    await expect(about).not.toHaveAttribute("open", "");
     // Focus returns to the summary rather than to the top of the document.
-    await expect(reference.locator("summary")).toBeFocused();
+    await expect(about.locator("summary")).toBeFocused();
   });
 
   test("a click outside closes an open menu", async ({ page }) => {
@@ -470,6 +469,34 @@ test.describe("the section menus", () => {
     await expect(places).toHaveAttribute("open", "");
     await page.locator("h1").click();
     await expect(places).not.toHaveAttribute("open", "");
+  });
+
+  test("the Library panel opens inside the window at every width it hangs from the bar", async ({
+    page,
+  }) => {
+    /*
+     * `Library` is every class of the corpus, and one column of it ran to about 800px — past the
+     * fold of a laptop, in an absolutely positioned box a reader cannot scroll to. It is two
+     * columns above 640px, and above 820px it hangs from its own right edge, because it is the
+     * fifth entry of six and a 30rem box hung from its left would run off the right of the window.
+     *
+     * 700 is inside the `Menu` disclosure; 820 is the narrowest loose bar; 1280 is the widest the
+     * header grows. At each, the whole panel is on screen: nothing clipped at either side, and the
+     * last link above the bottom of an 800px window.
+     */
+    for (const width of [700, 820, 1280]) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto("/");
+      if (width < 820) await page.locator("header.site nav details.menu-all > summary").click();
+      const library = page.locator("header.site nav details.menu").nth(2);
+      await library.locator("summary").click();
+      const panel = library.locator(".menu-panel");
+      const box = (await panel.boundingBox())!;
+      expect(box.x, `Library runs off the left at ${width}px`).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width, `Library runs off the right at ${width}px`).toBeLessThanOrEqual(width);
+      expect(box.y + box.height, `Library runs below the window at ${width}px`).toBeLessThanOrEqual(800);
+      await expect(panel.locator("a").last()).toBeInViewport();
+    }
   });
 
   test("on a phone the longest menu stays inside the viewport, and scrolls if it cannot", async ({
@@ -493,8 +520,8 @@ test.describe("the section menus", () => {
      *
      * # Two opens now, and the risk this guards went up rather than down
      *
-     * #189 folded the five menus into one outer disclosure below the nav's breakpoint, so
-     * reaching `Law` on a phone means opening `Menu` and then opening `Law` inside it. This test caught that change by
+     * #189 folded the menus into one outer disclosure below the nav's breakpoint, so
+     * reaching `Library` on a phone means opening `Menu` and then opening `Library` inside it. This test caught that change by
      * timing out on a summary that is no longer rendered — which is the right failure, because the
      * thing it is about is now worse in principle: an open menu is nested one level deeper inside
      * the same sticky box, and the box still may not outgrow the screen.
@@ -503,14 +530,16 @@ test.describe("the section menus", () => {
     await page.goto("/");
 
     await page.locator("header.site nav details.menu-all > summary").click();
-    const law = page.locator("header.site nav details.menu").filter({ hasText: "Law" });
-    await law.locator("summary").click();
-    await expect(law).toHaveAttribute("open", "");
+    // `Library` since #548: every class of the corpus, twenty-two links in five headed runs, and
+    // one column at this width. `Law` was seven.
+    const library = page.locator("header.site nav details.menu").nth(2);
+    await library.locator("summary").click();
+    await expect(library).toHaveAttribute("open", "");
 
     const header = page.locator("header.site");
     expect((await header.boundingBox())!.height).toBeLessThanOrEqual(667);
 
-    const last = law.locator(".menu-panel a").last();
+    const last = library.locator(".menu-panel a").last();
     await last.scrollIntoViewIfNeeded();
     await expect(last).toBeInViewport();
   });

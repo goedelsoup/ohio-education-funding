@@ -1,0 +1,16 @@
+# Addresses that moved, sent to where they went. Read by Cloudflare Pages at the edge.
+#
+# Nothing else serving `dist/` reads this: `vite preview` serves it as a file. The browser tests
+# run against a preview server taught these rules by `scripts/preview.config.ts`, and
+# `tests/e2e/redirects.spec.ts` visits every source below and checks it lands.
+#
+# The incoming query is kept only when the destination names none of its own, so no destination
+# here carries a `?` — the levers in an old scenario link are the part worth keeping.
+
+# The reach view became the runner's second tab (#548).
+/reach  /scenario/reach  301
+
+# A district's scenario became the runner opened on that district (#548). The IRN rides in the
+# fragment so the query, which holds the reader's levers, passes through untouched; the runner
+# reads `#d=` and writes it back as `?d=`. See `chosenDistrict` in `src/lib/scenario.ts`.
+/district/:irn/scenario  /scenario#d=:irn  301

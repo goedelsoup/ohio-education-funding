@@ -15,7 +15,8 @@
  * The brand mark points here and nothing else does. That is the convention a reader already has,
  * and a tab as well would put one destination in the bar twice. It also means this page has to
  * earn its place by orienting rather than by being unavoidable: it is three cards, and the reason
- * there is no fourth is that a front door which lists everything is a list, not a door.
+ * there is no fourth is that a front door which lists everything is a list, not a door. The third
+ * is the bar itself, read out of `nav()` with a line for each entry.
  *
  * # Where the figures are
  *
@@ -57,6 +58,20 @@ const NOTABLE = ["043802", "043786", "044909", "049056", "044933", "045583"]
 
   <div class="card" id="find-a-district" data-part="find-a-district">
     <h2><SectionAnchor id="find-a-district" />Find a district</h2>
+    {/*
+      A plain GET to the index, and nothing on this page runs. `/districts?q=043786` is the
+      address the form makes: with script the index reads `q` and shows the one row; without it
+      the index is the whole table, alphabetical, with the browser's own find — which is what it
+      always was. So the field works in the half of the site that never loads a script, and does
+      more where one runs.
+    */}
+    <form class="filters" method="get" action="/districts" role="search">
+      <div class="field">
+        <label for="home-q">Name or IRN</label>
+        <input id="home-q" name="q" type="search" placeholder="Cleveland, 043786…" autocomplete="off" />
+      </div>
+      <button type="submit" class="flag">Find</button>
+    </form>
     <p class="note">
       All {count(s.districts)} are in the <a href="/districts">district index</a>, which sorts and
       filters by name or IRN. These are the ones most often asked about.
@@ -76,7 +91,7 @@ const NOTABLE = ["043802", "043786", "044909", "049056", "044933", "045583"]
             <td>One page per district, with the formula's answer beside the one it receives.</td>
           </tr>
           <tr>
-            <th><a href="/scenario">Who would a change actually reach?</a></th>
+            <th><a href={routes.REACH}>Who would a change actually reach?</a></th>
             <td>
               Move a lever and re-run the formula across all {count(s.districts)} districts, with
               the count it fails to reach beside the total it costs.
@@ -105,10 +120,11 @@ const NOTABLE = ["043802", "043786", "044909", "049056", "044933", "045583"]
     Read from `nav()`, not written here. A front door and a section bar that can disagree about
     what the site contains is the navigability defect this page exists to fix, and a hand-written
     list is exactly how they come to disagree — a section added to one is added to the other only
-    if somebody remembers. `tests/unit/nav.spec.ts` asserts the two carry the same groups.
+    if somebody remembers. Both kinds of entry are rows: a menu's row opens the page it fronts, and
+    a flat entry's row is the entry itself.
   */}
   <div class="card" id="sections" data-part="sections">
-    <h2><SectionAnchor id="sections" />The five sections</h2>
+    <h2><SectionAnchor id="sections" />Every section of the site</h2>
     <div class="scroll">
       <table class="prose">
         <tbody>

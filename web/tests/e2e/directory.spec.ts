@@ -29,6 +29,28 @@ test.describe("finding things", () => {
     await expect(page.locator("#f-count")).toContainText("294 of 609");
   });
 
+  test("the homepage's field is a GET to the index, and the index reads it", async ({ page }) => {
+    /*
+     * #548's find-a-district. The homepage form is plain HTML and the index reads `?q=` on load,
+     * so this is two claims: typing an IRN on the front door and pressing Enter makes the address,
+     * and the address shows the one district — with the name in the field, where it can be seen
+     * and cleared, rather than a filter applied from nowhere.
+     */
+    await page.goto("/");
+    await page.locator("#home-q").fill(CLEVELAND);
+    await page.locator("#home-q").press("Enter");
+    await expect(page).toHaveURL(new RegExp(`/districts\\?q=${CLEVELAND}$`));
+    await expect(page.locator("#f-name")).toHaveValue(CLEVELAND);
+    const shown = page.locator("#district-table tbody tr:visible");
+    await expect(shown).toHaveCount(1);
+    await expect(shown.locator("a")).toHaveAttribute("href", `/district/${CLEVELAND}`);
+    await expect(page.locator("#f-count")).toHaveText("1 of 609 districts");
+
+    // And the field is the reader's: clearing it is the whole table again.
+    await page.locator("#f-name").fill("");
+    await expect(page.locator("#district-table tbody tr:visible")).toHaveCount(609);
+  });
+
   test("sorting by a column reorders the table, and says so where ARIA looks", async ({ page }) => {
     /*
      * The assertion this replaces read `aria-sort` off the *button*, which is where the markup put
