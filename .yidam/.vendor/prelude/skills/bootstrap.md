@@ -76,10 +76,10 @@ which are not seeds. Note each seed file's `kind` frontmatter field.
 - **`constraint`** files: enforce these as hard boundaries during scaffolding. Do not deviate
   from them without surfacing the constraint and asking explicitly.
 - **`augmentation`** files: read the `constitutional:` frontmatter flag. `constitutional:
-  true` marks a constitutional extension — a domain-specific article that adds to
-  [CONSTITUTION.md](../CONSTITUTION.md) — and must be committed into the derived repo
-  permanently: append it to the repo's copy of the constitution as part of the genesis
-  scaffolding. `constitutional: false` marks a general guideline — additional prelude for
+  true` marks a domain article — an addition to [CONSTITUTION.md](../CONSTITUTION.md) that
+  governs the derived repo for its lifetime. Copy it to `.yidam/constitution/<stem>.md` in the
+  genesis commit, with `<stem>.rego` and `<stem>_test.rego` from beside the seed when they
+  exist. Do not append it to the vendored `CONSTITUTION.md` — a re-vendor erases it. `constitutional: false` marks a general guideline — additional prelude for
   this run only, gone once samudaya is consumed. A file missing the flag is malformed
   (`samudaya-audit` reports it as an issue); surface it to the user and ask, rather than
   classifying the content yourself.
@@ -97,11 +97,34 @@ file to internalize here.
 
 1. `yidam/prelude/GLOSSARY.md` — the borrowed vocabulary the other six use without explaining
 2. `yidam/prelude/IDENTITY.md` — what kind of knowledge artifact this repo is
-3. `yidam/prelude/GRAPH.md` — the graph model: nodes, edges, commit types, branch semantics
+3. `yidam/prelude/GRAPH.md` — the graph model: nodes, edges, commit types. Skip
+   [Residence time](../GRAPH.md#residence-time),
+   [The baseline, and its own clock](../GRAPH.md#the-baseline-and-its-own-clock) and
+   [Branches as inquiry](../GRAPH.md#branches-as-inquiry)
 4. `yidam/prelude/CONSTITUTION.md` — the governance rules that constrain what you may do
-5. `yidam/prelude/PHASES.md` — the named phases of inquiry
-6. `yidam/prelude/guidelines/agent-conduct.md` — specific conduct norms
-7. `yidam/prelude/guidelines/directories.md` — where things live and what belongs in each
+5. `yidam/prelude/PHASES.md` — the named phases of inquiry. Read only
+   [Phase types](../PHASES.md#phase-types); a bootstrap runs no phase
+6. `yidam/prelude/guidelines/agent-conduct.md` — specific conduct norms. Skip
+   [Prefer a base rate to a refusal](../guidelines/agent-conduct.md#prefer-a-base-rate-to-a-refusal),
+   [When claims leave the repository](../guidelines/agent-conduct.md#when-claims-leave-the-repository),
+   [When claims arrive from another repository](../guidelines/agent-conduct.md#when-claims-arrive-from-another-repository),
+   [When a claim rests on a node beside it](../guidelines/agent-conduct.md#when-a-claim-rests-on-a-node-beside-it),
+   [When your corpus disagrees with the one it cites](../guidelines/agent-conduct.md#when-your-corpus-disagrees-with-the-one-it-cites)
+   and
+   [The safeguards were built against carelessness](../guidelines/agent-conduct.md#the-safeguards-were-built-against-carelessness-not-against-interest)
+7. `yidam/prelude/guidelines/directories.md` — where things live and what belongs in each. Skip
+   [`.yidam/catalog/`](../guidelines/directories.md#yidamcatalog),
+   [`.yidam/tonpa.toml`](../guidelines/directories.md#yidamtonpatoml-and-yidamtonpa),
+   [`.yidam/private-paths`](../guidelines/directories.md#yidamprivate-paths-optional),
+   [`.yidam/policy/`](../guidelines/directories.md#yidampolicy-optional),
+   [`.yidam/bin/`](../guidelines/directories.md#yidambin),
+   [`.yidam/capabilities.toml`](../guidelines/directories.md#yidamcapabilitiestoml-yidamruns-and-yidamcomputed-optional)
+   and [`.yidam/authorship.yml`](../guidelines/directories.md#yidamauthorshipyml-optional)
+
+A row that says **Skip** names sections about a corpus that already exists, and a bootstrap
+has none yet; step 9 names the first of them, `.yidam/catalog/`, as the first thing to do
+after this one. Read each file to the end apart from those sections. A row that says **Read
+only** means that section and nothing else in the file.
 
 `GLOSSARY.md` is first and is deliberately the shortest: the six files below use its words
 without defining them. [why](bootstrap.evidence.md#glossary-first)
@@ -609,6 +632,12 @@ An edge is a claim that two things are related, and the `relationship` says how.
 instance needs at least one edge to another *instance*.
 [why](bootstrap.evidence.md#a-link-is-not-an-edge)
 
+A description makes claims too, and a seeded node tags them the way any later node does — with
+the `[verified]`, `[inference]` and `[open]` tags agent-conduct.md defines under "Mark claim
+confidence". A claim the seed material cannot yet support carries the `[open]` tag; it is not
+left out, and it is not stated as fact.
+[why](bootstrap.evidence.md#seeded-claims-carry-tags)
+
 Keep the seed set at one level of abstraction.
 [why](bootstrap.evidence.md#one-level-of-abstraction)
 
@@ -701,9 +730,16 @@ instances to produce a meaningful result, run it now and commit the output with 
 
 ```
 .yidam/skills/<calculator-name>.md
+---
+name: <calculator-name>
+description: <one line>
+status: stub
+---
 ```
 
 The stub should describe what it computes, which corpus nodes it reads, and what it returns.
+`status: stub` keeps `yidam skills-index` from counting it as a capability; change it to
+`built` when an agent can follow it.
 
 **Do not commit anything in this step.** The implied edges are an `establish:` and the
 remaining stubs are an `implement:`; both are written in step 8, after the genesis commit.

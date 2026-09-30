@@ -6,11 +6,13 @@
 # `commit` is the resolvable pin: it is what the re-vendor procedure and CI
 # check out. `template` is the release tag at that commit, or "untagged".
 # `committed` is that commit's date — how old the vendored prelude is.
+# `cli` is the yidam binary in use when this file was written: version (build commit).
 #
 # See .yidam/.vendor/prelude/guidelines/directories.md for the re-vendor procedure.
 
 [yidam]
 origin    = "git@github.com:goedelsoup/yidam.git"
-commit    = "ce5e738d6e00e0a19ebfde2a55e5e4d480f0b084"
-template  = "v0.9.0"
-committed = "2026-09-28"
+commit    = "f41a1bdc439ded48a062c534092db3894cc8b1ba"
+template  = "v0.10.0"
+committed = "2026-09-30"
+cli       = "0.17.0 (f41a1bd)"
