@@ -238,8 +238,8 @@ export function renderBaseCostBuildUp(d: District, districts: number): string {
 
       <p class="note"><strong>These figures are computed here, not quoted.</strong> Every other
         per-district number on this site is the department's published model passed through; this
-        one is <code>crates/foundation</code> running the statute against this district's grade
-        bands. The department publishes its own aggregate for the same district —
+        one is <a href="${routes.source("crates/foundation")}">the site's own implementation of the
+        statute</a> running against this district's grade bands. The department publishes its own aggregate for the same district —
         ${money(b.published_aggregate)} — and the two differ by
         <strong>${residual < 0.005 ? "nothing" : money(residual, 2)}</strong>, which is what
         twenty-two elements each rounded at the point the department rounds them adds up to. The

@@ -44,10 +44,10 @@ const seam = denominatorContrast(bundle);
 /*
  * The districts every panel reaches, which is not the districts in the model.
  *
- * `bundle.provenance` renders directly above the table and says the sources are joined "across the
- * 606 districts every panel covers"; the table's first row says the model holds 609. Both are
- * right and a reader met them two lines apart with nothing saying so. Counted here rather than
- * typed, and the three panels are the three the provenance sentence names.
+ * `bundle.provenance` renders directly above the table and states how many of the model's districts
+ * every source reaches. It used to say "the 606 districts every panel covers" beside a first row
+ * of 609 with nothing saying so. Counted here rather than typed, by the predicate
+ * that `in_every_panel` in `crates/bundle/src/build.rs` also counts with.
  */
 const joined = bundle.districts.filter(
   (d) => d.property_tax?.length && d.outcome != null && d.valuation_per_pupil != null,
@@ -538,9 +538,9 @@ const millageScatter = renderToString(
             <th>Districts in the model</th>
             <td>
               {count(s.districts)}
-              {/* The provenance sentence directly above says "the 606 districts every panel
-                  covers", and a reader met the two numbers two lines apart with nothing
-                  reconciling them. Both are right: 606 is the join, 609 is the model. */}
+              {/* The provenance sentence directly above states both counts now, derived by the
+                  same predicate as `joined` (`in_every_panel` in crates/bundle); it used to say
+                  "the 606 districts every panel covers" as a literal (#571). */}
               <div class="n">
                 Of which the {count(joined)} that carry every panel are the population any
                 cross-source figure is computed on.

@@ -261,8 +261,8 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
 
     <div class="card" id="guarantee" data-part="guarantee">
       <h2>${anchor("guarantee")}Who is on the guarantee${yearChip("formula")}</h2>
-      <p class="note">Districts grouped into fifths by assessed valuation per pupil, poorest on
-        the left. The guarantee was written as transitional relief for districts losing
+      <p class="note">Districts grouped into fifths by assessed valuation per pupil, poorest at
+        the top. The guarantee was written as transitional relief for districts losing
         students; the pattern it actually produces is a wealth gradient.</p>
       <div class="chartwrap" data-chart="quintiles">${renderToString((w) => barSpec(bars, { width: w, max: 1 }), { label: `Share of districts on the guarantee by fifth of assessed valuation per pupil, poorest fifth first, FY${bundle.fiscal_year}` })}</div>
       <p class="note">Median valuation per pupil statewide is

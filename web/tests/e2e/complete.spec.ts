@@ -299,9 +299,11 @@ const ROUTES_WITH_FIGURES = [
     await context.close();
   });
 
-  test("states the provenance of the figures in the footer", async ({ page }) => {
+  test("states the model year in the footer, and the contract on /method", async ({ page }) => {
     /*
-     * The model year and the contract, which is what the footer is for.
+     * The model year, which is what the footer is for. The contract version moved to /method in
+     * #571: the footer is read by people arriving from a shared link, and a version number is for
+     * the technical reader who looks for it there.
      *
      * It used to assert on `FY27` inside the provenance paragraph, and that paragraph no longer
      * names any year — it said "millage is TY2023" while the data said 2024, so the years moved
@@ -311,9 +313,13 @@ const ROUTES_WITH_FIGURES = [
      */
     await page.goto(`/district/${CLEVELAND}`);
     await expect(page.locator("footer")).toContainText("FY2027 model");
-    await expect(page.locator("footer")).toContainText("Bundle contract");
+    await expect(page.locator("footer")).not.toContainText("Bundle contract");
     // And it does not quietly grow the years back, which is how the paragraph went stale.
     await expect(page.locator("footer")).not.toContainText("TY20");
+    await page.goto("/method");
+    await expect(page.locator("#provenance tr", { hasText: "Bundle contract" })).toContainText(
+      REQUIRED_CONTRACT,
+    );
   });
 
   test("the footer reports the build-time formula check", async ({ page }) => {
@@ -321,7 +327,7 @@ const ROUTES_WITH_FIGURES = [
     // checkpoints and the forecasts, which are gated separately.
     await page.goto("/");
     await expect(page.locator("footer")).toContainText(
-      "Formula verified at build against 13 reference scenarios and 4 reference forecasts",
+      "Every figure is checked against 13 reference scenarios and 4 reference forecasts before the site is built.",
     );
   });
 

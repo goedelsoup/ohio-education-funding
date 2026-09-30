@@ -59,7 +59,7 @@ import {
 } from "../lib/reach.ts";
 import { isForecastVerified, isVerified, verify, type Verification } from "../lib/verify.ts";
 import { heading } from "../lib/section.ts";
-import { district as districtHome } from "../lib/routes.ts";
+import { district as districtHome, source } from "../lib/routes.ts";
 import { saying, tileSummary } from "../lib/status.ts";
 
 const $ = <T extends HTMLElement>(selector: string): T | null =>
@@ -700,9 +700,10 @@ function reportFailure(verification: Verification): void {
       <h2>${heading("disabled", "The scenario builder is disabled")}</h2>
       <p>This page re-derives Ohio's funding formula in the browser so a slider does not need a
         round trip, and it checks that derivation against results computed by
-        <code>crates/project</code> before using it. Those checks did not pass:</p>
+        <a href="${source("crates/project")}">a second implementation of the formula</a> before
+        using it. Those checks did not pass:</p>
       <ul>${detail}</ul>
-      <p class="note">The Rust is authoritative. Either the two implementations have drifted apart
+      <p class="note">That implementation is authoritative. Either the two have drifted apart
         or this panel is from a different build. Every other page on this site reads figures
         computed at build time and is unaffected.</p>
     </div>`;
@@ -735,10 +736,10 @@ function reportForecastFailure(panel: Panel, verification: Verification): void {
   out.innerHTML = `<div class="card err" id="projection-disabled" data-part="projection-disabled">
     <h2>${heading("projection-disabled", "The projection is disabled")}</h2>
     <p>This page carries its own copy of the enrollment projection so a slider does not need a
-      round trip, and checks it against forecasts computed by <code>crates/project</code> before
-      drawing a band. Those checks did not pass:</p>
+      round trip, and checks it against forecasts computed by
+      <a href="${source("crates/project")}">a second implementation</a> before drawing a band. Those checks did not pass:</p>
     <ul>${detail}</ul>
-    <p class="note">The Rust is authoritative. The simulation above runs at published enrollment
+    <p class="note">That implementation is authoritative. The simulation above runs at published enrollment
       and does not depend on this.</p>
   </div>`;
 }
@@ -808,7 +809,7 @@ export function boot(panel: Panel): void {
     const forecasts = isForecastVerified(verification)
       ? ` and ${verification.forecasts.length} reference forecasts`
       : "";
-    status.textContent = `Formula reproduced against ${verification.comparisons.length} reference scenarios${forecasts} from crates/project.`;
+    status.textContent = `Formula reproduced against ${verification.comparisons.length} reference scenarios${forecasts} before this page would run.`;
   }
   if (!isForecastVerified(verification)) reportForecastFailure(panel, verification);
 

@@ -295,7 +295,7 @@ export function renderTimeline(corpus: Corpus): string {
           <td>${
             regime.establishedBy
               ? link(regime.establishedBy.href, regime.establishedBy.designation)
-              : `<span class="caveat-inline">older than this corpus reaches</span>`
+              : `<span class="caveat-inline">before the earliest act collected here</span>`
           }</td>
         </tr>`,
     )
@@ -317,7 +317,7 @@ export function renderTimeline(corpus: Corpus): string {
           <td>${
             act.action
               ? `${VERB[act.action.verb]} ${link(act.action.href, act.action.regime)}`
-              : `<span class="caveat-inline">no formula edge</span>`
+              : `<span class="caveat-inline">no formula change recorded</span>`
           }</td>
           <td>${
             act.funds
@@ -334,7 +334,7 @@ export function renderTimeline(corpus: Corpus): string {
     <div class="card" id="regimes" data-part="regimes">
       <h2>${anchor("regimes")}What was in force, and for how long</h2>
       <p class="note">${spans.length} formulas across ${covered} fiscal years, end to end. The
-        spans are each regime's own <code>effective_from</code> and <code>effective_to</code>; that
+        spans are each formula's own first and last year in force; that
         they tile the years with no gap and no overlap is checked rather than drawn.</p>
 
       <div class="scroll">
@@ -346,7 +346,7 @@ export function renderTimeline(corpus: Corpus): string {
         </table>
       </div>
       <p class="note">Two of the ${spans.length} have no establishing act here and will not get
-        one: they begin before the oldest instrument this corpus holds. That is the edge of the
+        one: they begin before the oldest act this site holds. That is the edge of the
         collection rather than a hole in it.</p>
     </div>
 

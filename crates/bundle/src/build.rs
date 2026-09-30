@@ -1955,6 +1955,46 @@ fn spending_by_function() -> HashMap<String, SpendingByFunction> {
         .collect()
 }
 
+/// The provenance paragraph, rendered on /method and /data and carried in the panel export.
+///
+/// Deliberately no longer restates the years. It used to name every one of them, and it said
+/// "millage is TY2023" while all 609 districts carried `tax_year: 2024` — a sentence and a column
+/// cannot disagree in a way anything notices, and the sentence is the half a reader sees. Years
+/// are in `series_years` now, derived, and stated once.
+///
+/// The district counts are derived for the same reason. The paragraph said "the 606 districts
+/// every panel covers" as a literal, beside 609 everywhere else on the page, and a reader met the
+/// two with nothing saying they were different populations (#571). Both are counted here, and the
+/// sentence says what the smaller one is.
+///
+/// Plain prose, no backticks: this string is rendered into the site as text, so a code span
+/// would print its own punctuation to the reader.
+fn provenance(districts: &[District]) -> String {
+    format!(
+        "Ohio DEW TRAD State Foundation Funding Calculator (a projection, not an actual) joined \
+         with the District Profile Report, the Department of Taxation's Table SD-1, and the Ohio \
+         School Report Card on IRN. {joined} of the {total} districts appear in all four; the \
+         rest are missing from at least one. Enrolled ADM spans three years, of which the last is \
+         partly departmental estimate. Each block states the year it is measured in beside its \
+         own figures; see .yidam/catalog/ for what each source can be trusted for.",
+        joined = in_every_panel(districts),
+        total = districts.len(),
+    )
+}
+
+/// The districts every joined source reaches: a tax history, a report card and a valuation.
+///
+/// The same predicate `/method` counts with (`joined` in `method.astro`), which is what lets the
+/// provenance sentence and the page's table state one population.
+fn in_every_panel(districts: &[District]) -> usize {
+    districts
+        .iter()
+        .filter(|d| {
+            !d.property_tax.is_empty() && d.outcome.is_some() && d.valuation_per_pupil.is_some()
+        })
+        .count()
+}
+
 /// Assemble the bundle from the committed fixtures.
 ///
 /// Split from `main` so the tests can assert on the document this crate actually publishes rather
@@ -2277,20 +2317,7 @@ pub fn build() -> Bundle {
         house_districts: house_district_block(&records, Chamber::House),
         senate_districts: house_district_block(&records, Chamber::Senate),
         contract_version: CONTRACT_VERSION.to_string(),
-        // Deliberately no longer restates the years. It used to name every one of them, and it
-        // said "millage is TY2023" while all 609 districts carried `tax_year: 2024` — a sentence
-        // and a column cannot disagree in a way anything notices, and the sentence is the half a
-        // reader sees. Years are in `series_years` now, derived, and stated once.
-        // Plain prose, no backticks: this string is rendered into the site footer as text, so a
-        // code span would print its own punctuation to the reader.
-        provenance: "Ohio DEW TRAD State Foundation Funding Calculator (a projection, not an \
-                     actual) joined with the District Profile Report, the Department of \
-                     Taxation's Table SD-1, and the Ohio School Report Card on IRN across the \
-                     606 districts every panel covers. Enrolled ADM spans three years, of which \
-                     the last is partly departmental estimate. Each block states the year it is \
-                     measured in beside its own figures; see .yidam/catalog/ for what each \
-                     source can be trusted for."
-            .to_string(),
+        provenance: provenance(&districts),
         fiscal_year: MODEL_YEAR.0,
         series_years: series_years(
             &districts,
@@ -2367,6 +2394,23 @@ mod tests {
             .expect("a leading year")
             + 1;
         assert_eq!(REPORT_CARD_SPENDING_YEAR, ends_in);
+    }
+
+    /// The provenance sentence counts its own populations (#571).
+    ///
+    /// It said "606" as a literal, beside a model of 609; the count is derived now, and this pins
+    /// that it is the count and that the sentence names the whole model beside it.
+    #[test]
+    fn provenance_states_both_district_counts_it_derives() {
+        let bundle = super::build();
+        let joined = in_every_panel(&bundle.districts);
+        assert!(joined > 0 && joined < bundle.districts.len());
+        let expected = format!("{joined} of the {} districts", bundle.districts.len());
+        assert!(
+            bundle.provenance.contains(&expected),
+            "provenance should say `{expected}`: {}",
+            bundle.provenance
+        );
     }
 
     #[test]

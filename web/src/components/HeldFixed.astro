@@ -38,6 +38,7 @@
  * reporting one district — that page reports the statewide counts beside its own figure, for the
  * same reason.
  */
+import { loadCorpus } from "../lib/corpus.ts";
 import { count, millions, pct } from "../lib/format.ts";
 import { heldFixed, refreshEffect, type RefreshEffect } from "../lib/refresh.ts";
 import * as routes from "../lib/routes.ts";
@@ -68,6 +69,13 @@ interface Props {
 }
 
 const { districts, total, refresh, heading } = Astro.props;
+/*
+ * The draft's name as the corpus titles it, not its slug: the link text printed
+ * `hb-96-with-refreshed-inputs`, which is a file name (#571).
+ */
+const refreshName = refresh
+  ? (loadCorpus().byId.get(`draft-legislation/${refresh.slug}`)?.label ?? refresh.slug)
+  : null;
 // Memoised on the panel, which `loadFeed` caches — so this is summed once per build and not once
 // per district page.
 const fixed = heldFixed(districts);
@@ -93,9 +101,9 @@ const fixed = heldFixed(districts);
     {
       refresh && (
         <Fragment>
-          {" "}The refresh <a href={routes.wikiNode("draft-legislation", refresh.slug)}>{
-            refresh.slug
-          }</a> prices — {pct(refresh.scale - 1, 2)} on base cost — delivers{" "}
+          {" "}The refresh priced in{" "}
+          <a href={routes.wikiNode("draft-legislation", refresh.slug)}>{refreshName}</a> —{" "}
+          {pct(refresh.scale - 1, 2)} on base cost — delivers{" "}
           {millions(refresh.throughBaseCost).replace("+", "")} through base cost aid and{" "}
           {millions(refresh.throughCategoricals).replace("+", "")} more through those three. Until
           recently this page delivered only the first.

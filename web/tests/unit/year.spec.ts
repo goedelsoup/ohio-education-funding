@@ -174,6 +174,13 @@ test("the cross-department agreement count is computed, not typed", () => {
   // And it is a minority, which is the fact the card exists to explain: most districts disagree
   // on the latest year because only one department has published it.
   expect(tax.agreeOnLatest).toBeLessThan(bundle.statewide.districts / 2);
+
+  // Its denominator is derived the same way: the page typed it as `606` twice (#571).
+  const carrying = bundle.districts.filter(
+    (d) => d.property_tax.length > 0 && d.effective_class1_millage != null,
+  ).length;
+  expect(tax.carryingBoth).toBe(carrying);
+  expect(tax.agreeOnLatest).toBeLessThanOrEqual(tax.carryingBoth);
 });
 
 test("the recognised-valuation aggregates are computed, not typed", () => {
