@@ -43,7 +43,22 @@ test.describe("charts on a phone", () => {
     `/district/${CLEVELAND}/outcome`,
     // The one wiki node that draws a series, and the only wiki route with a chart on it.
     "/wiki/education-agency/toledo-city",
+    // Drawn in the browser, and the narrow drawing in a 548px box — the widest scale-up #577 found.
+    "/scenario/reach",
+    "/county/ottawa",
+    "/house/090",
   ];
+
+  /**
+   * Open a route with its charts drawn. The scenario routes draw theirs in the browser after a
+   * fetch, so a page that has only loaded has no chart yet, and every assertion below would pass
+   * on nothing. The baked routes are drawn when they load, and not all of them show a chart at
+   * every width, so they are not waited on.
+   */
+  const visit = async (page: Page, route: string) => {
+    await page.goto(route);
+    if (route.startsWith("/scenario/")) await page.locator("svg.plot:visible").first().waitFor();
+  };
 
   /** Every text mark in a chart the reader can actually see, with the size it is painted at. */
   const paintedText = (page: Page) =>
@@ -72,19 +87,69 @@ test.describe("charts on a phone", () => {
       return out;
     });
 
-  test("no chart draws its text below 9px", async ({ page }) => {
+  test("on a phone, chart text is painted between 9px and 12px", async ({ page }) => {
     // 390px is the common modern phone and 375 the narrowest worth drawing for. The floor is 9px
     // rather than a round 10 because `WIDTHS.narrow` is sized to scale by at least 0.9 there, and
-    // the 10px axis marks are the smallest type any of these forms uses.
+    // the 10px axis marks are the smallest type any of these forms uses. The ceiling is the 12.8px
+    // HTML legend beside these charts: at 375 the county labels painted at 9.2px under it, and a
+    // chart should not be both the smallest and the largest type on a phone page.
     await page.setViewportSize({ width: 375, height: 900 });
-    const small: string[] = [];
+    const outside: string[] = [];
     for (const route of CHARTED) {
-      await page.goto(route);
+      await visit(page, route);
       for (const mark of await paintedText(page)) {
-        if (mark.px < 9) small.push(`${route} [${mark.chart}] "${mark.text}" at ${mark.px.toFixed(1)}px`);
+        if (mark.px < 9 || mark.px > 12) {
+          outside.push(`${route} [${mark.chart}] "${mark.text}" at ${mark.px.toFixed(1)}px`);
+        }
       }
     }
-    expect(small.slice(0, 10), "chart text a reader cannot read").toEqual([]);
+    expect(outside.slice(0, 10), "chart text outside the phone band").toEqual([]);
+  });
+
+  test("on a wide page, no chart text is painted larger than the body text", async ({ page }) => {
+    /*
+     * The other end of the same scale. A drawing is `width: 100%` over its `viewBox`, so before
+     * `MAX_SCALE` it grew with its column: `/counties`' dumbbell labels painted at 16.9–18.6px at
+     * 1280, over 15px prose, and the same form was a different size on a 900px page and an 1180px
+     * one. 15px is `12 × MAX_SCALE` — the largest type any form sets, at the most it is scaled —
+     * and the hundredth is float slack on an exact product, not tolerance.
+     */
+    await page.setViewportSize({ width: 1280, height: 900 });
+    const large: string[] = [];
+    for (const route of CHARTED) {
+      await visit(page, route);
+      for (const mark of await paintedText(page)) {
+        if (mark.px > 15.01) large.push(`${route} [${mark.chart}] "${mark.text}" at ${mark.px.toFixed(1)}px`);
+      }
+    }
+    expect(large.slice(0, 10), "chart text painted over body size").toEqual([]);
+  });
+
+  test("a strip's scale row ends where its drawing does", async ({ page }) => {
+    // A capped drawing sits at the left of a wider column. The HTML row naming its two ends is
+    // capped to match in `app.css`; if the two disagreed, the high end would sit under nothing.
+    const off: string[] = [];
+    let seen = 0;
+    for (const width of [375, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const route of CHARTED) {
+        await visit(page, route);
+        const gaps = await page.locator(".chart-scale").evaluateAll((rows) =>
+          rows
+            .filter((row) => row.getClientRects().length)
+            .map((row) => {
+              const svg = [...row.querySelectorAll("svg.plot")].find((s) => s.getClientRects().length);
+              const scale = row.querySelector(".scale");
+              if (!svg || !scale) return Infinity;
+              return scale.getBoundingClientRect().right - svg.getBoundingClientRect().right;
+            }),
+        );
+        seen += gaps.length;
+        for (const gap of gaps) if (Math.abs(gap) > 0.5) off.push(`${route} at ${width}px: ${gap}px`);
+      }
+    }
+    expect(seen, "the routes carry scale rows to measure").toBeGreaterThan(0);
+    expect(off.slice(0, 10), "scale rows that overrun or fall short of their strip").toEqual([]);
   });
 
   test("no chart draws a label outside its own frame", async ({ page }) => {
@@ -99,7 +164,7 @@ test.describe("charts on a phone", () => {
     await page.setViewportSize({ width: 375, height: 900 });
     const clipped: string[] = [];
     for (const route of CHARTED) {
-      await page.goto(route);
+      await visit(page, route);
       for (const mark of await paintedText(page)) {
         if (mark.outside > 0.5) {
           clipped.push(`${route} [${mark.chart}] "${mark.text}" over by ${Math.round(mark.outside)}px`);
@@ -125,7 +190,7 @@ test.describe("charts on a phone", () => {
     await page.setViewportSize({ width: 375, height: 900 });
     const through: string[] = [];
     for (const route of CHARTED) {
-      await page.goto(route);
+      await visit(page, route);
       const hits = await page.evaluate(() => {
         const out: string[] = [];
         for (const svg of document.querySelectorAll("svg.plot")) {

@@ -135,10 +135,12 @@ const valuationByIrn = new Map(
             tax base, poorest on the left.
             {" "}{spreadCount >= BOX_FROM ? " The shaded box is the middle half of them." : ""}
           </p>
-          <div class="chartwrap" data-chart="seat-spread" set:html={spread} />
-          <div class="scale">
-            <span>{money(spreadLow)}</span>
-            <span>{money(spreadHigh)}</span>
+          <div class="chart-scale">
+            <div class="chartwrap" data-chart="seat-spread" set:html={spread} />
+            <div class="scale">
+              <span>{money(spreadLow)}</span>
+              <span>{money(spreadHigh)}</span>
+            </div>
           </div>
         </>
       )

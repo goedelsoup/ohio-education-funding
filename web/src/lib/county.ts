@@ -188,10 +188,12 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
                  ? " The shaded box is the middle half of them."
                  : ""
              }</p>
-             <div class="chartwrap" data-chart="county-spread">${renderToString(dots, { label: `Assessed valuation per pupil for each of the ${count(c.districts.filter((d) => d.valuation_per_pupil != null).length)} districts in ${c.name} County reporting a tax base, poorest at left, ${yearOf("formula")}` })}</div>
-             <div class="scale">
-               <span>${money(poor.valuation_per_pupil!)}</span>
-               <span>${money(rich.valuation_per_pupil!)}</span>
+             <div class="chart-scale">
+               <div class="chartwrap" data-chart="county-spread">${renderToString(dots, { label: `Assessed valuation per pupil for each of the ${count(c.districts.filter((d) => d.valuation_per_pupil != null).length)} districts in ${c.name} County reporting a tax base, poorest at left, ${yearOf("formula")}` })}</div>
+               <div class="scale">
+                 <span>${money(poor.valuation_per_pupil!)}</span>
+                 <span>${money(rich.valuation_per_pupil!)}</span>
+               </div>
              </div>`
           : ""
       }
@@ -223,10 +225,12 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
              district reporting a tax base — one dot each, narrowest on the left, and the colored
              rule is ${escapeHtml(c.name)}. The median is
              ${median(ratios.map((r) => r.value)).toFixed(1)}× apart.</p>
-             <div class="chartwrap" data-chart="county-position">${renderToString(position, "presentational")}</div>
-             <div class="scale">
-               <span>${Math.min(...ratios.map((r) => r.value)).toFixed(1)}×</span>
-               <span>${Math.max(...ratios.map((r) => r.value)).toFixed(1)}×</span>
+             <div class="chart-scale">
+               <div class="chartwrap" data-chart="county-position">${renderToString(position, "presentational")}</div>
+               <div class="scale">
+                 <span>${Math.min(...ratios.map((r) => r.value)).toFixed(1)}×</span>
+                 <span>${Math.max(...ratios.map((r) => r.value)).toFixed(1)}×</span>
+               </div>
              </div>`
           : ""
       }

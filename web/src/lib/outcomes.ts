@@ -426,10 +426,12 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
              its middle half, the line inside it the middle of the fifth, and the
              colored rule is ${escapeHtml(district.name)}. The gap in the third tile is worth what
              the width of this box says it is worth.</p>
-             <div class="chartwrap" data-chart="peer-group">${renderToString(peerBox, { label: `Performance Index across the ${count(peers.length)} districts in the ${label}, with ${district.name} marked, ${seriesYear("outcome.performance")?.label ?? ""}` })}</div>
-             <div class="scale">
-               <span>${fixed(firstOf(scores), 1)}</span>
-               <span>${fixed(lastOf(scores), 1)}</span>
+             <div class="chart-scale">
+               <div class="chartwrap" data-chart="peer-group">${renderToString(peerBox, { label: `Performance Index across the ${count(peers.length)} districts in the ${label}, with ${district.name} marked, ${seriesYear("outcome.performance")?.label ?? ""}` })}</div>
+               <div class="scale">
+                 <span>${fixed(firstOf(scores), 1)}</span>
+                 <span>${fixed(lastOf(scores), 1)}</span>
+               </div>
              </div>`
           : ""
       }
