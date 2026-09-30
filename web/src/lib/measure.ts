@@ -250,10 +250,10 @@ export const THRESHOLDS: Thresholds = {
   /*
    * #186. The reading ramp and the apparatus ramp, held apart.
    *
-   * `sizeCount` at 10 is the wiki node, which is the busiest page here: eight named steps, `body`
-   * at the apparatus size, and the em-relative inline marks that scale with whatever sentence they
-   * sit in. Every one is a token or a proportion of one. It was thirteen, eleven of them crowded
-   * inside 3.7px.
+   * `sizeCount` at 10 is the wiki node, which is the busiest page here: eight named steps and `body`
+   * at the apparatus size. The em-relative inline marks that used to scale with whatever sentence
+   * they sat in are ramp tokens since #573, and `typography.spec.ts` sweeps the routes for any size
+   * off the ramp. It was thirteen, eleven of them crowded inside 3.7px.
    *
    * `headingRatio` at 2 against the 2.56 measured. Below about 2 a heading is not a rank, it is a
    * rounding error — it was 1.49.
