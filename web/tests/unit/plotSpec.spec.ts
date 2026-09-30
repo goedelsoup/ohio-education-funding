@@ -7,6 +7,9 @@
  * the answer instead of the omission.
  */
 
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
 import { expect, test } from "vitest";
 
 import type {
@@ -24,6 +27,7 @@ import {
   barSpec,
   distributionSpec,
   fanSpec,
+  MAX_SCALE,
   panelWidth,
   planeSpec,
   rankSpec,
@@ -33,7 +37,7 @@ import {
   truncatedDomain,
   WIDTHS,
 } from "../../src/lib/plot/spec.ts";
-import { renderToString } from "../../src/lib/plot/ssr.ts";
+import { renderPanelToString, renderToString } from "../../src/lib/plot/ssr.ts";
 
 /**
  * The width these assertions are written at.
@@ -779,4 +783,35 @@ test("the hit layer is one full-height column per position on the index", () => 
   expect(spec.hovers!.text).toEqual(["at 1", "at 2", "at 3"]);
   const marks = (spec.options.marks ?? []) as unknown as { className?: string }[];
   expect(marks.filter((mark) => mark.className === "series-hit")).toHaveLength(1);
+});
+
+test("no drawing is scaled up past the ceiling that keeps its type at body size", () => {
+  // Every width a chart is drawn at — the pair's two and a panel's own — against the viewBox it
+  // actually came out at, so a builder that ignored its width would fail here, not pass on it.
+  const series = (w: number) =>
+    seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", { width: w, tick: (at) => `${at}` });
+  const drawn = renderToString(series, "presentational") + renderPanelToString(series, "presentational", panelWidth(2));
+  const svgs = [...drawn.matchAll(/<svg\b[^>]*>/g)].map((m) => m[0]);
+  expect(svgs).toHaveLength(3);
+  for (const svg of svgs) {
+    const box = Number(/viewBox="0 0 (\d+(?:\.\d+)?) /.exec(svg)?.[1]);
+    const cap = Number(/max-width:(\d+(?:\.\d+)?)px/.exec(svg)?.[1]);
+    expect(cap, svg).toBe(box * MAX_SCALE);
+  }
+  // 12 units is `BASE`'s type, the largest any form sets; 15px is the body text it must not pass.
+  expect(12 * MAX_SCALE).toBeLessThanOrEqual(15);
+});
+
+test("the scale row under a strip is capped where the drawing above it is", () => {
+  // `.chart-scale` cannot read the drawing's `max-width`, so it states the same two products.
+  const css = readFileSync(resolve(process.cwd(), "src/styles/app.css"), "utf8");
+  const caps = [
+    ...css.matchAll(/\.chart-scale > \.scale \{ max-width: calc\((\d+)px \* ([\d.]+)\); \}/g),
+  ].map((m) => [Number(m[1]), Number(m[2])]);
+  expect(caps).toEqual([
+    [WIDTHS.narrow, MAX_SCALE],
+    [WIDTHS.wide, MAX_SCALE],
+    // Print shows the wide drawing whatever the width, and the row follows it.
+    [WIDTHS.wide, MAX_SCALE],
+  ]);
 });

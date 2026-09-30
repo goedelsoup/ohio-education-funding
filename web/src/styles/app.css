@@ -1870,6 +1870,23 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 .chart-at[data-at="panel"] { display: block; }
 
 /*
+ * A strip and the HTML scale row under it, which names the strip's two ends.
+ *
+ * A drawing stops growing at `MAX_SCALE` times its width (`plot/spec.ts`), so in a column wider
+ * than that it sits at the left with room to its right. A `.scale` row left at full width would
+ * put its high end out in that room, under nothing. The row takes the same cap: 1.25 × 320 while
+ * the narrow drawing is shown, 1.25 × 640 once the wide one is. The breakpoint is `.chart-pair`'s,
+ * and this is a container of the same width, so the two queries answer the same question. Written
+ * as the product rather than as 400px and 800px: the numbers are a drawing's width and a ceiling on
+ * its scale, not a step on the space scale, and a unit test holds each factor to `plot/spec.ts`.
+ */
+.chart-scale { container-type: inline-size; }
+.chart-scale > .scale { max-width: calc(320px * 1.25); }
+@container (min-width: 576px) {
+  .chart-scale > .scale { max-width: calc(640px * 1.25); }
+}
+
+/*
  * A set of panels, laid out against each other.
  *
  * Side by side where the card can hold two — the finding these were built for *is* the comparison,
@@ -2916,6 +2933,7 @@ tr.series-break > td {
      stylesheet has not measured. */
   .chart-at[data-at="narrow"] { display: none; }
   .chart-at[data-at="wide"] { display: block; }
+  .chart-scale > .scale { max-width: calc(640px * 1.25); }
 
   .card, .chartwrap, .tile, .strip-row, .flags, tr { break-inside: avoid; }
   /* A heading, and a legend, belong to what follows them. */

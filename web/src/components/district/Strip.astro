@@ -56,10 +56,12 @@ const box: Drawing | null =
         <strong class="tnum">{money(value)}{" "}
           <span class="n">{percentile} percentile</span></strong>
       </div>
-      <div class="chartwrap" data-chart="position" set:html={renderToString(box, { label: `${label} across the ${count(sorted.length)} districts reporting it, with this district at ${money(value)}, the ${percentile} percentile`, description: `Quartiles run ${money(nearestRank(sorted, 0.25))} to ${money(nearestRank(sorted, 0.75))}, median ${money(nearestRank(sorted, 0.5))}` })} />
-      <div class="scale">
-        <span>{money(sorted[0] ?? 0)}</span>{" "}
-        <span>{money(sorted[sorted.length - 1] ?? 0)}</span>
+      <div class="chart-scale">
+        <div class="chartwrap" data-chart="position" set:html={renderToString(box, { label: `${label} across the ${count(sorted.length)} districts reporting it, with this district at ${money(value)}, the ${percentile} percentile`, description: `Quartiles run ${money(nearestRank(sorted, 0.25))} to ${money(nearestRank(sorted, 0.75))}, median ${money(nearestRank(sorted, 0.5))}` })} />
+        <div class="scale">
+          <span>{money(sorted[0] ?? 0)}</span>{" "}
+          <span>{money(sorted[sorted.length - 1] ?? 0)}</span>
+        </div>
       </div>
     </div>
   )
