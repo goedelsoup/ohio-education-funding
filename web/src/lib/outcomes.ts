@@ -559,11 +559,11 @@ export function renderDistrictOutcome(
         <tr><th>Operating spending per need-weighted pupil</th>
             <td>${money(o.per_equivalent_pupil)}</td></tr>
         <tr><th>Economically disadvantaged (report card)</th>
-            <td>${o.economically_disadvantaged == null ? "—" : `${fixed(o.economically_disadvantaged, 1)}%`}</td></tr>
+            <td class="tnum">${pct(o.economically_disadvantaged, 1)}</td></tr>
         <tr><th>English learners</th>
-            <td>${o.english_learner == null ? "—" : `${fixed(o.english_learner, 1)}%`}</td></tr>
+            <td class="tnum">${pct(o.english_learner, 1)}</td></tr>
         <tr><th>Students with disabilities</th>
-            <td>${o.students_with_disabilities == null ? "—" : `${fixed(o.students_with_disabilities, 1)}%`}</td></tr>
+            <td class="tnum">${pct(o.students_with_disabilities, 1)}</td></tr>
       </tbody></table></div>
       <p class="note">The Performance Index is close to a fixed district trait across these three
         years, which is why a change in funding is unlikely to show up in it. Progress is the
