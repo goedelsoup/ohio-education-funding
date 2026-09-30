@@ -47,6 +47,9 @@ colour, which computes to invalid and falls back to inherited.
 Renamed here to `--text-ink`. The rename cannot break anything that works today, because nothing
 that works today reads the shadowed name.
 
+#550 later deleted `--text-ink`, with the two other aliases nothing read (`--surface-page`,
+`--surface-card`).
+
 ## What has not landed, and what it costs
 
 The eight pattern sheets are the rest of the system and each carries a real change:

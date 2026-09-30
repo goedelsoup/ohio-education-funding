@@ -169,18 +169,13 @@
   /*
    * Semantic aliases. Prefer these in component CSS; the base values above are for the palette.
    *
-   * `--text-ink` is this repository's rename of an alias the design system called `--text-body`.
-   * `tokens/typography.css` defines `--text-body` as a font SIZE (0.93rem) and `patterns/prose.css`
-   * consumes it as one, so the two collided on `:root` with incompatible types. `styles.css`
-   * imports colour before type, so the size already won and the colour alias was dead on arrival —
-   * renaming it cannot break anything that works today, and it turns a silent shadow into two
-   * names. Reordering those imports without this fix would have set every `.prose-body`
-   * font-size to a colour, which computes to invalid and falls back to inherited.
+   * Two, because two are read. There were five: `--surface-page`, `--surface-card` and
+   * `--text-ink` came over from the design system (the last as this repository's rename of its
+   * colour `--text-body`, which collided with the font size of that name) and no rule ever read
+   * any of them. #550 deleted the three; an alias with no reader is a second name for a colour
+   * that a reader of this file has to check is not a second colour.
    */
-  --surface-page: var(--surface-0);
-  --surface-card: var(--surface-1);
   --surface-inset: var(--surface-2);
-  --text-ink: var(--text-primary);
   --text-annotation: var(--text-muted);
   /*
    * The keyboard cursor, and it was a declared token nothing read: every one of the seven
