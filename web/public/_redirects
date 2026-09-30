@@ -1,7 +1,8 @@
 # Addresses that moved, sent to where they went. Read by Cloudflare Pages at the edge.
 #
-# Nothing else serving `dist/` reads this: `vite preview` serves it as a file. The browser tests
-# run against a preview server taught these rules by `scripts/preview.config.ts`, and
+# Nothing else serving `dist/` reads this unless taught to: `vite preview` serves it as a file.
+# The browser tests run against a preview server taught these rules by `scripts/preview.config.ts`,
+# the measure instrument's server (`scripts/serve-dist.ts`) reads them through the same parser, and
 # `tests/e2e/redirects.spec.ts` visits every source below and checks it lands.
 #
 # The incoming query is kept only when the destination names none of its own, so no destination
