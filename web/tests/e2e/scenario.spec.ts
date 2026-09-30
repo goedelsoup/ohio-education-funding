@@ -366,6 +366,67 @@ test.describe("the scenario builder", () => {
     await expect(page.locator('[data-part="not"]')).toBeHidden();
   });
 
+  test("a link naming several districts opens on the first, says so, and keeps the rest", async ({
+    page,
+  }) => {
+    /*
+     * The reach view writes `d` as a list. This view read the first and wrote that one back over
+     * the list on boot, so a reach link naming two districts opened on one, said nothing, and a
+     * reader crossing back found the other gone (#563).
+     *
+     * Waiting on the cards before the click: the runner boots from a fetch, and the note's buttons
+     * are written by the same `render` the cards are.
+     */
+    const d = () => new URL(page.url()).searchParams.get("d");
+    await page.goto(`/scenario?d=${NORTHERN},${CLEVELAND}`);
+    await expect(page.locator("#scenario-out .card")).not.toHaveCount(0);
+    await expect(page.locator("#sc-district")).toHaveValue(NORTHERN);
+    const note = page.locator("#sc-named");
+    await expect(note).toBeVisible();
+    await expect(note).toContainText("named 2 districts");
+    await expect.poll(d).toBe(`${NORTHERN},${CLEVELAND}`);
+
+    // The other is a button that sets the picker, and the list follows it.
+    await note.locator(`[data-named-district="${CLEVELAND}"]`).click();
+    await expect(page.locator("#sc-district")).toHaveValue(CLEVELAND);
+    await expect(page.locator("#scenario-out")).toContainText("Cleveland");
+    await expect.poll(d).toBe(`${CLEVELAND},${NORTHERN}`);
+
+    // And crossing back lights both.
+    await page.locator(".subnav a", { hasText: "Who it reaches" }).click();
+    await expect(page).toHaveURL(/\/scenario\/reach\?/);
+    await expect(page.locator(`#rv-chips button[data-district="${CLEVELAND}"]`)).toHaveCount(1);
+    await expect(page.locator(`#rv-chips button[data-district="${NORTHERN}"]`)).toHaveCount(1);
+
+    // Choosing a district the link did not name leaves the list, and the note with it.
+    await page.goBack();
+    await expect(page.locator("#scenario-out .card")).not.toHaveCount(0);
+    await page.locator("#sc-district").selectOption("");
+    await expect(note).toBeHidden();
+    await expect.poll(d).toBeNull();
+  });
+
+  test("a redirect's #d= does not outlive the boot", async ({ page }) => {
+    /*
+     * `/district/:irn/scenario` lands on `/scenario#d=:irn`, and the fragment wins over `?d=`. The
+     * runner cleared it only when the query it wrote differed from the one in the bar — so a URL
+     * whose query already read right kept its `#d=` through the boot and through any tick that
+     * left the query alone, and a copy of it named the fragment's district, not the page's (#563).
+     */
+    await page.goto(`/scenario?d=${NORTHERN}`);
+    await expect(page.locator("#scenario-out .card")).not.toHaveCount(0);
+    const canonical = page.url();
+    expect(new URL(canonical).searchParams.get("d")).toBe(NORTHERN);
+
+    // A fresh load, not a fragment navigation within the page.
+    await page.goto("about:blank");
+    await page.goto(`${canonical}#d=${NORTHERN}`);
+    await expect(page.locator("#scenario-out .card")).not.toHaveCount(0);
+    await expect(page.locator("#sc-district")).toHaveValue(NORTHERN);
+    await expect.poll(() => new URL(page.url()).hash).toBe("");
+    expect(new URL(page.url()).search).toBe(new URL(canonical).search);
+  });
+
   test("a cost is not rendered as a gain", async ({ page }) => {
     // The gain/loss classes mean "more aid" and "less aid", which is what the tiles are about.
     // Under a row headed *cost* the same green rendered a billion dollars of spending as a win.

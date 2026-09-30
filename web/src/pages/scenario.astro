@@ -107,6 +107,9 @@ const stages = bundle.drafts
           {alphabetical.map((d) => <option value={d.irn}>{qualifiedName(d)}</option>)}
         </select>
       </label>
+      {/* Filled by the script when the link that opened the runner named several districts —
+          the reach view writes `d` as a list, and this view answers for one. See `renderNamed`. */}
+      <p id="sc-named" class="note" hidden></p>
     </form>
 
     <ScenarioControls
