@@ -48,6 +48,18 @@
   --radius-lg: 10px;  /* a card, a menu panel */
   --radius-pill: 999px; /* a pill: year chip, flag, basis switch */
 
+  /*
+   * One size for a control in a form row (#576).
+   *
+   * An input, a select and a submit button beside each other are read as one row, and there were
+   * five sizes of them: a 28px pill beside a 35px field on the homepage, 32px selects beside 35px
+   * inputs on `/districts`, and selects at 32, 37 and 40px across the runners because each took
+   * its text size from whatever it sat inside. These three are the whole of a control's box.
+   */
+  --control-height: 2.25rem;
+  --control-radius: var(--radius-md);
+  --control-text: var(--text-base);
+
   --wrap-read: 900px;
   --wrap-wide: 1180px;
 

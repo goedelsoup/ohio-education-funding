@@ -1179,11 +1179,55 @@ select, input[type="range"], input[type="text"], input[type="search"], textarea 
   color: var(--text-primary);
   background: var(--surface-2);
   border: 1px solid var(--border-control);
-  border-radius: var(--radius-md);
+  border-radius: var(--control-radius);
   padding: var(--space-3);
 }
+/*
+ * The box, from the three `--control-*` tokens (#576).
+ *
+ * The text size is stated rather than inherited. `font: inherit` let a select take its size from
+ * what held it — 12.8px inside an axis label, 15px beside a lever — so one page drew the same
+ * control at two heights.
+ *
+ * `appearance: none` on the select because WebKit draws a native select at its own height and
+ * ignores the one given; the chevron is two gradients in the text colour, so it follows the theme,
+ * and the right padding is its room. The text box is then exactly the content box, which is what
+ * the e2e check measures a selected option against.
+ */
+select, input[type="text"], input[type="search"], button[type="submit"] {
+  height: var(--control-height);
+  font-size: var(--control-text);
+  line-height: var(--leading-tight);
+  padding-block: 0;
+  padding-inline: var(--space-3);
+}
+select {
+  appearance: none;
+  padding-inline-end: 1.75rem;
+  text-overflow: ellipsis;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--text-secondary) 50%),
+    linear-gradient(135deg, var(--text-secondary) 50%, transparent 50%);
+  background-position: calc(100% - 15px) 50%, calc(100% - 10px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+/* A button and not a pill: it is the row's action, so it takes the row's box, and the weight is
+   what says it is not another field. */
+button[type="submit"] {
+  font-family: inherit;
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+  background: var(--surface-1);
+  border: 1px solid var(--border-control);
+  border-radius: var(--control-radius);
+  padding-inline: var(--space-5);
+  cursor: pointer;
+}
+button[type="submit"]:hover { border-color: var(--text-secondary); }
 /* The thumb and the filled track are control chrome, not a series. Same reason as the ring. */
 input[type="range"] { padding: var(--space-2) 0; accent-color: var(--link); }
+input[type="checkbox"], input[type="radio"] { accent-color: var(--link); }
 output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-weight: var(--weight-semibold); }
 
 /*
@@ -2095,10 +2139,12 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
   cursor: pointer;
   display: flex;
   gap: var(--space-2);
-  align-items: baseline;
-  padding: var(--space-2) var(--space-3);
+  align-items: center;
+  /* The same box as the picker beside it, which is the row it shares (#576). */
+  min-height: var(--control-height);
+  padding: 0 var(--space-3);
   border: 1px solid var(--border-control);
-  border-radius: var(--radius-md);
+  border-radius: var(--control-radius);
   background: var(--surface-1);
   font-size: var(--text-sm);
 }
@@ -2544,7 +2590,7 @@ footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); 
 .filters { display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: flex-end; margin-bottom: var(--space-6); }
 .filters .field { display: flex; flex-direction: column; gap: var(--space-1); }
 .filters label { margin: 0; }
-.filters input, .filters select { width: auto; min-width: 11rem; font-size: var(--text-base); padding: var(--space-2) var(--space-3); }
+.filters input, .filters select { width: auto; min-width: 11rem; }
 .filters .count { font-size: var(--text-sm); color: var(--text-muted); padding-bottom: var(--space-3); }
 #district-table td { text-align: right; }
 #district-table th[scope="row"] { text-align: left; font-weight: var(--weight-medium); }
