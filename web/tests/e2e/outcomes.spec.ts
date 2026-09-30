@@ -106,6 +106,19 @@ test.describe("the outcome routes", () => {
     await expect(card).toContainText("It is <strong>not</strong> an effect".replace(/<[^>]+>/g, ""));
   });
 
+  test("the report card's disadvantaged share reads as a percentage, not a fraction of one", async ({
+    page,
+  }) => {
+    // It read 1.0% for Cleveland after the bundle moved the field to a fraction (#570).
+    await page.goto(`/district/${CLEVELAND}/outcome`);
+    const cell = page
+      .locator('[data-part="outcomes"] tr', { hasText: "Economically disadvantaged (report card)" })
+      .locator("td");
+    const text = (await cell.textContent()) ?? "";
+    expect(text).toMatch(/^\d+\.\d%$/);
+    expect(Number.parseFloat(text)).toBeGreaterThanOrEqual(50);
+  });
+
   test("a district with no report card says so instead of showing blanks", async ({ page }) => {
     // Three of the 609 have no report card. The page has to exist and explain itself.
     await page.goto("/data/bundle.json");
