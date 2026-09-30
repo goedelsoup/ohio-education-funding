@@ -17,8 +17,8 @@ Roughly 3,500 pages, all of them static files:
 | `/district/{irn}/scenario` | Redirects to `/scenario#d={irn}` (`public/_redirects`): the runner, opened on this district. |
 | `/outcomes` | Statewide: how little of attainment the funding side explains. |
 | `/history` | FY2009–FY2022 on the federal survey: where the money came from, and whom it reached. The only route that reaches before FY2020. |
-| `/scenario` | *Try a change*, what changes: move a lever and re-run the formula across all 609 in the browser — for the whole state, or with one district chosen (`?d={irn}`), its own cards first and how many districts move the other way beside them. |
-| `/scenario/reach` | *Try a change*, who it reaches — the runner's second view, formerly `/reach` (which redirects here). The same levers asked the other question: *which* districts move, all 609 plotted against what the formula computes for them, with the guarantee wall drawn as the law it is. Scopeable to a county or to named districts. |
+| `/scenario` | *Change the formula*, what changes: move a lever and re-run the formula across all 609 in the browser — for the whole state, or with one district chosen (`?d={irn}`), its own cards first and how many districts move the other way beside them. |
+| `/scenario/reach` | *Change the formula*, who it reaches — the runner's second view, formerly `/reach` (which redirects here). The same levers asked the other question: *which* districts move, all 609 plotted against what the formula computes for them, with the guarantee wall drawn as the law it is. Scopeable to a county or to named districts. |
 | `/compare` | Two districts side by side. |
 | `/legislation` | Every act behind the formula, in the order it was signed: five regimes across fifty fiscal years, what each act did, and which biennium it paid for. Generated from the corpus. |
 | `/wiki` | The corpus — regimes, statutes, litigation, parameters, metric definitions — rendered from `.yidam/` directly. |

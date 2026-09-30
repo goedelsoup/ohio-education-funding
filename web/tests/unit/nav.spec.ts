@@ -38,14 +38,14 @@ const groups = entries.filter((e): e is NavGroup => e.kind === "group");
 test("the bar is six entries by task, two of them flat links", () => {
   /*
    * #548's target, written out. The two flat entries are the two things a reader most often came
-   * to do — find one district, try a change — and a menu in front of either is a click that
+   * to do — find one district, change the formula — and a menu in front of either is a click that
    * decides nothing.
    */
   expect(entries.map((e) => [e.kind, e.label])).toEqual([
     ["place", "Find a district"],
     ["group", "Places"],
     ["group", "Analysis"],
-    ["place", "Try a change"],
+    ["place", "Change the formula"],
     ["group", "Library"],
     ["group", "About"],
   ]);

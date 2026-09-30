@@ -55,7 +55,7 @@ test.describe("addresses that moved", () => {
   test("the old reach address opens the runner's reach view, levers and all", async ({ page }) => {
     await page.goto("/reach?base=1.05");
     await expect(page).toHaveURL(/\/scenario\/reach\?/);
-    await expect(page.locator("h1")).toHaveText("Try a change");
+    await expect(page.locator("h1")).toHaveText("Change the formula");
     await expect(page.locator('.subnav a[aria-current="page"]')).toHaveText("Who it reaches");
     await expect(page.locator("#lv-base")).toHaveValue("1.05");
   });

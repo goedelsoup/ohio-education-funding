@@ -89,7 +89,7 @@ export const NAMES = {
   legislation: { href: "/legislation", name: "The statute timeline" },
   outcomes: { href: "/outcomes", name: "Outcomes" },
   history: { href: "/history", name: "History" },
-  scenario: { href: "/scenario", name: "Try a change" },
+  scenario: { href: "/scenario", name: "Change the formula" },
   bounds: { href: routes.BOUNDS, name: "Bounds" },
   wiki: { href: "/wiki", name: "The corpus" },
   sources: { href: "/wiki/source", name: "Sources" },
@@ -103,7 +103,7 @@ export const NAMES = {
  *
  * `/scenario` and `/reach` were two entries in the bar, `Scenario` and `Reach`, for one set of
  * levers over one panel — the second a question about the first rather than a place of its own.
- * They are one entry now, `Try a change`, and these are the tabs inside it. Both pages carry the
+ * They are one entry now, `Change the formula`, and these are the tabs inside it. Both pages carry the
  * name in their `<title>` and `h1`; the tab says which question is open.
  *
  * `data-carry-levers` on each tab hands the reader's lever positions to the other view — see
@@ -282,12 +282,12 @@ export const sectionForClass: (className: string) => Section = () => "library";
  *
  * It was organised by the corpus's own taxonomy — Places, Law, Formula, Research, Reference — which
  * is how the repository is built and not how it is read. It is organised by task now (#548):
- * find one district; look at a place; read an analysis; try a change; look something up; learn how
+ * find one district; look at a place; read an analysis; change the formula; look something up; learn how
  * the figures are made.
  *
  * # Two of them are links, not menus
  *
- * `Find a district` and `Try a change`. A bar of nothing but disclosures put every destination two
+ * `Find a district` and `Change the formula`. A bar of nothing but disclosures put every destination two
  * clicks away, and the one most readers want — this site is read one district at a time — was the
  * second link inside `Places`. The note that was here said so, and named the fix: "a flat entry in
  * the bar, not a second index to maintain". The runner is the other: it is one page with two
