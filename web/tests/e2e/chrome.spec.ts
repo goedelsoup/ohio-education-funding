@@ -271,7 +271,7 @@ test.describe("routes", () => {
       ["", "Dashboard"],
       ["/outcome", "Outcome"],
       ["/finances", "Finances"],
-      ["/taxes", "Property tax"],
+      ["/taxes", "Taxes"],
     ] as const) {
       await page.goto(`/district/${NORTHERN}${path}`);
       await expect(page.locator("h1")).toHaveText("Northern Local");

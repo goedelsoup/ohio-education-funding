@@ -23,6 +23,7 @@ import Base from "../../layouts/Base.astro";
 import { renderBaseCostBuildUp } from "../../lib/basecost.ts";
 import { renderBiennium } from "../../lib/biennium.ts";
 import { districtPaths, loadFeed, qualifiedName } from "../../lib/feed.ts";
+import { districtTitle } from "../../lib/nav.ts";
 import * as routes from "../../lib/routes.ts";
 import { fig, money, pct } from "../../lib/format.ts";
 import { yearOf } from "../../lib/year.ts";
@@ -50,7 +51,7 @@ const description = district.on_guarantee
 ---
 
 <Base
-  title={qualifiedName(district)}
+  title={districtTitle(qualifiedName(district), "dashboard")}
   description={description}
   image={routes.og.district(district.irn)}
   imageAlt={`${district.name}: state aid per pupil, and how much of it comes from the guarantee`}

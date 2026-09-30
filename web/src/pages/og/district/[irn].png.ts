@@ -5,7 +5,7 @@
  *
  * A district has five routes — the dashboard, finances, outcome, scenario and taxes — and they all
  * point at this one image. What separates them in a feed is `og:title`, which carries each page's
- * own title, so a share of `/district/043786/taxes` reads "Cleveland Municipal — property tax"
+ * own title, so a share of `/district/043786/taxes` reads "Cleveland Municipal — Taxes"
  * above a card showing Cleveland's aid. Five renderings per district would be 3,045 images for a
  * difference no reader would see, at five times the build cost and five times the deploy.
  *

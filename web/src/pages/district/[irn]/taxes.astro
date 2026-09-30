@@ -11,6 +11,7 @@
 import DistrictNav from "../../../components/DistrictNav.astro";
 import Base from "../../../layouts/Base.astro";
 import { districtPaths, loadFeed, qualifiedName } from "../../../lib/feed.ts";
+import { districtTitle } from "../../../lib/nav.ts";
 import { count, fig, money, pct } from "../../../lib/format.ts";
 import * as routes from "../../../lib/routes.ts";
 import {
@@ -48,7 +49,7 @@ const description = latest
 ---
 
 <Base
-  title={`${qualifiedName(district)} — property tax`}
+  title={districtTitle(qualifiedName(district), "taxes")}
   description={description}
   image={routes.og.district(district.irn)}
   imageAlt={`${district.name}: state aid per pupil, and how much of it comes from the guarantee`}

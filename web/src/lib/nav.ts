@@ -117,6 +117,51 @@ export const RUNNER_VIEWS = [
 /** Which of {@link RUNNER_VIEWS} a runner page is. */
 export type RunnerView = (typeof RUNNER_VIEWS)[number]["key"];
 
+/**
+ * A district's tabs: the name table for the pages under `/district/[irn]`.
+ *
+ * # Why they needed one
+ *
+ * #547 gave every place in the bar one name and left these alone (#559). The fourth tab said
+ * `Property tax`, its `<title>` said `property tax`, and its address said `taxes` — three names for
+ * one page, and a hand-typed copy of the strip on every exemplar's wiki page had drifted further,
+ * still calling the runner `Scenario` after the bar had renamed it.
+ *
+ * So the strip, the `<title>` and that copy read the name from here. The rule is the bar's with
+ * the district in front: a tab's `<title>` is the district, then the name — see
+ * {@link districtTitle} — and `tests/dist/names.spec.ts` holds the built pages to it.
+ *
+ * # The URL follows the name
+ *
+ * Unlike a place in the bar, where the address is not required to match. A tab's last segment is
+ * its name in lower case, and `tests/unit/nav.spec.ts` fails where it is not. The name was chosen to
+ * fit the address rather than the reverse, because a district page is sent as a link and every
+ * moved one costs a redirect across all of them.
+ *
+ * The dashboard is the district's own page: its address has no segment and its `<title>` no name,
+ * because the district is what the page is called.
+ *
+ * The last tab is not a view of this district alone — it opens the runner with the district chosen
+ * (#548) — so it carries the runner's name and the runner's address.
+ */
+export const DISTRICT_VIEWS = [
+  { key: "dashboard", name: "Dashboard", href: routes.district },
+  { key: "outcome", name: "Outcome", href: routes.districtOutcome },
+  { key: "finances", name: "Finances", href: routes.districtFinances },
+  { key: "taxes", name: "Taxes", href: routes.districtTaxes },
+  { key: "scenario", name: NAMES.scenario.name, href: routes.districtScenario },
+] as const;
+
+/** Which of {@link DISTRICT_VIEWS} a district page is. The runner is not one of them. */
+export type DistrictView = Exclude<(typeof DISTRICT_VIEWS)[number]["key"], "scenario">;
+
+/** A district page's `<title>`, before the site name: the district, then the tab it is on. */
+export function districtTitle(qualifiedName: string, view: DistrictView): string {
+  if (view === "dashboard") return qualifiedName;
+  const { name } = DISTRICT_VIEWS.find((v) => v.key === view)!;
+  return `${qualifiedName} — ${name}`;
+}
+
 /** A row of the name table as a link in the bar. */
 function place(key: keyof typeof NAMES, note?: string): NavLink {
   const { href, name } = NAMES[key];

@@ -14,7 +14,7 @@ import Base from "../../../layouts/Base.astro";
 import { loadCorpus, propertyLabel, relationshipLabel } from "../../../lib/corpus.ts";
 import { loadAppearances } from "../../../lib/appearances.ts";
 import { leadAndBody } from "../../../lib/lead.ts";
-import { sectionForClass } from "../../../lib/nav.ts";
+import { DISTRICT_VIEWS, sectionForClass } from "../../../lib/nav.ts";
 import { loadFeed } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
 import { isBlockProperty, isListProperty, isMathProperty, renderListProperty, renderMathProperty, renderProse, renderPropertyValue, shownProperties, summarize } from "../../../lib/prose.ts";
@@ -450,15 +450,14 @@ const properties = shownProperties(node.properties.filter((p) => p.name !== "see
           {" "}{district.on_guarantee ? " held there by the guarantee." : " all of it from the formula."}
         </p>
         <div class="flags">
-          {/* All five, in the order the district sub-navigation puts them. Property tax was
-              omitted here for six phases after it was built — it is the heaviest of the five and
-              the one an exemplar district's page has most reason to reach, since a district is an
-              exemplar in this corpus largely on account of its tax base. */}
-          <a class="pill" href={routes.district(district.irn)}>Dashboard</a>
-          <a class="pill" href={routes.districtOutcome(district.irn)}>Outcome</a>
-          <a class="pill" href={routes.districtFinances(district.irn)}>Finances</a>
-          <a class="pill" href={routes.districtTaxes(district.irn)}>Property tax</a>
-          <a class="pill" href={routes.districtScenario(district.irn)}>Scenario</a>
+          {/* All five, read from the table the district sub-navigation reads. This was a typed
+              copy: the tax page was missing from it for six phases after it was built — the one an
+              exemplar district's page has most reason to reach, since a district is an exemplar
+              in this corpus largely on account of its tax base — and it went on calling the runner
+              `Scenario` after the bar had renamed it (#559). */}
+          {DISTRICT_VIEWS.map((view) => (
+            <a class="pill" href={view.href(district.irn)}>{view.name}</a>
+          ))}
         </div>
       </div>
     )

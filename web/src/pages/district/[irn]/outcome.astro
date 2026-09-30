@@ -10,6 +10,7 @@
 import DistrictNav from "../../../components/DistrictNav.astro";
 import Base from "../../../layouts/Base.astro";
 import { districtPaths, loadFeed, qualifiedName } from "../../../lib/feed.ts";
+import { districtTitle } from "../../../lib/nav.ts";
 import { renderDistrictOutcome, renderOutcomeContext } from "../../../lib/outcomes.ts";
 import * as routes from "../../../lib/routes.ts";
 import { yearOf } from "../../../lib/year.ts";
@@ -28,7 +29,7 @@ const description =
 ---
 
 <Base
-  title={`${qualifiedName(district)} — outcome`}
+  title={districtTitle(qualifiedName(district), "outcome")}
   description={description}
   image={routes.og.district(district.irn)}
   imageAlt={`${district.name}: state aid per pupil, and how much of it comes from the guarantee`}
