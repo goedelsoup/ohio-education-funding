@@ -473,15 +473,97 @@ export function renderProjection(bundle: Panel, levers: Levers, chip = ""): stri
  *
  * `d` is the same key `/scenario/reach` names its lit districts with, and may carry several:
  * `?d=043786,044933`. This view answers for one, so it takes the first — crossing from the reach
- * view with a selection opens the first district named rather than none. Anything that is not six
- * digits is ignored rather than rendered as "no district with IRN …": a malformed link is the
- * whole state, which is what it can honestly be read as.
+ * view with a selection opens the first district named rather than none — and says so: see
+ * {@link namedDistricts} and {@link renderNamed}. Anything that is not six digits is ignored rather
+ * than rendered as "no district with IRN …": a malformed link is the whole state, which is what it
+ * can honestly be read as.
  */
 export function chosenDistrict(search: URLSearchParams, hash: string): string {
+  return namedDistricts(search, hash)[0] ?? "";
+}
+
+/**
+ * Every district a link to the runner names, in the order it names them, once each.
+ *
+ * The fragment a redirect wrote names one, and wins for the reason {@link chosenDistrict} gives.
+ * Otherwise the whole of `?d=`, which the reach view writes as a list: until #563 this view read
+ * the first and dropped the rest without a word, so a reach link naming three districts opened on
+ * one, wrote that one back over the list, and a reader crossing back found two of their districts
+ * gone. Keeping the list is what lets the page say what it did with it, and hand it back.
+ */
+export function namedDistricts(search: URLSearchParams, hash: string): string[] {
   const fragment = /^#d=(\d{6})(?:$|[,&])/.exec(hash)?.[1];
-  if (fragment) return fragment;
-  const first = (search.get("d") ?? "").split(",")[0] ?? "";
-  return /^\d{6}$/.test(first) ? first : "";
+  if (fragment) return [fragment];
+  const irns = (search.get("d") ?? "").split(",").filter((irn) => /^\d{6}$/.test(irn));
+  return [...new Set(irns)];
+}
+
+/**
+ * What the runner writes back as `d`: the district it answers for, and the rest of the link's list
+ * behind it while it is answering for one of them.
+ *
+ * First, so {@link chosenDistrict} reads the same district back off a copied URL. The rest ride
+ * along so the reach view, one tab away, still lights every district the reader was sent. A reader
+ * who picks a district the link did not name has left the list, and a URL carrying it would light
+ * districts nobody on this page chose — so it goes.
+ */
+export function districtParam(picked: string, named: readonly string[]): string {
+  if (picked === "") return "";
+  if (!named.includes(picked)) return picked;
+  return [picked, ...named.filter((irn) => irn !== picked)].join(",");
+}
+
+/**
+ * The note under the picker when a link named several districts: which one this view is answering
+ * for, and a button for each of the others.
+ *
+ * `""` when there is nothing to say — one district or none named, or a district chosen that the
+ * link did not name, where the list is no longer what the page is showing. The buttons carry
+ * `data-named-district`, and the script sets the picker from them, so there is one control and
+ * one code path. The reach link is `data-carry-levers`, and the address it carries holds the whole
+ * list — see {@link districtParam}.
+ */
+export function renderNamed(
+  named: readonly string[],
+  picked: string,
+  nameOf: (irn: string) => string,
+): string {
+  if (named.length < 2 || !named.includes(picked)) return "";
+  const others = named
+    .filter((irn) => irn !== picked)
+    .map(
+      (irn) =>
+        `<button type="button" class="linkish" data-named-district="${escapeHtml(irn)}">${escapeHtml(nameOf(irn))}</button>`,
+    );
+  return `The link that opened this named ${count(named.length)} districts, and this view answers
+    for one at a time: this is ${escapeHtml(nameOf(picked))}. Switch to ${listed(others)}, or see
+    <a href="${routes.REACH}" data-carry-levers>who the change reaches</a> with all
+    ${count(named.length)} lit at once.`;
+}
+
+/** "a", "a or b", "a, b, or c". */
+function listed(parts: readonly string[]): string {
+  if (parts.length <= 2) return parts.join(" or ");
+  return `${parts.slice(0, -1).join(", ")}, or ${parts.at(-1)}`;
+}
+
+/**
+ * The address the runner writes after a tick, or `null` when the bar already reads it.
+ *
+ * `query` is what {@link chosenDistrict} and the lever readers read back; the fragment is kept
+ * unless it is a `#d=`. That one is the redirect's hand-off, read once at boot and superseded by
+ * `?d=` from the first write — but `toQuery` compared path and query alone and wrote nothing when
+ * they matched, so a `#d=` could outlive the district it named, and a URL copied later reopened on
+ * the fragment's district rather than the picker's (#563). Another fragment — an in-page anchor a
+ * reader followed — is theirs, and stays.
+ */
+export function nextAddress(
+  at: { pathname: string; search: string; hash: string },
+  query: string,
+): string | null {
+  const hash = at.hash.startsWith("#d=") ? "" : at.hash;
+  const next = `${at.pathname}?${query}${hash}`;
+  return `${at.pathname}${at.search}${at.hash}` === next ? null : next;
 }
 
 /**
@@ -495,12 +577,16 @@ export function chosenDistrict(search: URLSearchParams, hash: string): string {
  * reasoning the statewide incidence view exists to interrupt. So this card leads with the
  * district's own figure and then states, in the same card, how many districts move the other way
  * — and links to the distribution rather than summarising it away.
+ *
+ * `run` is the formula already run for these levers, where a caller has it — see
+ * {@link renderRunner}.
  */
 export function renderDistrictScenario(
   bundle: Panel,
   levers: Levers,
   irn: string,
   chip = "",
+  run?: Outcome[],
 ): string {
   const model = modelOf(bundle.statewide);
   const district = bundle.districts.find((d) => d.irn === irn);
@@ -508,7 +594,7 @@ export function renderDistrictScenario(
     return `<div class="card err" id="unknown-district" data-part="unknown-district"><p>No district with IRN ${escapeHtml(irn)} is in this feed.</p></div>`;
   }
 
-  const outcomes = applyAll(bundle.districts, toPolicy(levers), model);
+  const outcomes = run ?? applyAll(bundle.districts, toPolicy(levers), model);
   const t = totals(outcomes);
 
   const { liftedOff, pushedOn } = guaranteeMovement(bundle.districts, outcomes);
@@ -644,8 +730,43 @@ export interface RenderedScenario {
   detail: string;
 }
 
-/** Run the levers and render the result. */
-export function renderScenario(bundle: Panel, levers: Levers, chip = ""): RenderedScenario {
+/**
+ * What the *what changes* view shows for its district, or for the whole state when `irn` is `""`.
+ *
+ * One district's cards lead in place of the statewide tiles, and the statewide rest stays — see
+ * `render` in `scripts/scenario.ts` for why in place of rather than beside.
+ *
+ * One pass over the panel, for the reason {@link RenderedScenario} gives. The script used to take
+ * the two halves from {@link renderDistrictScenario} and {@link renderScenario} separately, and
+ * each ran `applyAll` over all 609 districts for the same levers — so a district's view did the
+ * formula twice per slider frame, once for a summary it then threw away (#563).
+ */
+export function renderRunner(
+  bundle: Panel,
+  levers: Levers,
+  irn: string,
+  chip = "",
+): RenderedScenario {
+  if (irn === "") return renderScenario(bundle, levers, chip);
+  const outcomes = applyAll(bundle.districts, toPolicy(levers), modelOf(bundle.statewide));
+  return {
+    summary: renderDistrictScenario(bundle, levers, irn, chip, outcomes),
+    detail: renderScenario(bundle, levers, chip, outcomes).detail,
+  };
+}
+
+/**
+ * Run the levers and render the result.
+ *
+ * `run` is the formula already run for these levers, where a caller has it — see
+ * {@link renderRunner}.
+ */
+function renderScenario(
+  bundle: Panel,
+  levers: Levers,
+  chip = "",
+  run?: Outcome[],
+): RenderedScenario {
   const model = modelOf(bundle.statewide);
   if (isCurrentLaw(levers, model)) {
     return {
@@ -666,7 +787,7 @@ export function renderScenario(bundle: Panel, levers: Levers, chip = ""): Render
     };
   }
 
-  const outcomes = applyAll(bundle.districts, toPolicy(levers), model);
+  const outcomes = run ?? applyAll(bundle.districts, toPolicy(levers), model);
   const t = totals(outcomes);
 
   const deltas = outcomes

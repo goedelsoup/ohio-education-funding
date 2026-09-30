@@ -33,14 +33,16 @@ import { modelOf } from "../lib/policy.ts";
 
 import { escapeHtml } from "../lib/format.ts";
 import {
-  chosenDistrict,
   clampLevers,
   defaultLevers,
+  districtParam,
   draftLevers,
-  renderDistrictScenario,
+  namedDistricts,
+  nextAddress,
   renderDraft,
+  renderNamed,
   renderProjection,
-  renderScenario,
+  renderRunner,
   type HorizonBound,
   type Levers,
 } from "../lib/scenario.ts";
@@ -94,13 +96,23 @@ const view = root?.dataset.view ?? "";
  *
  * Read off `#sc-district` on every tick rather than kept, for the reason `readView` reads the
  * DOM: the control is the state, and a copy kept anywhere else is overwritten or goes stale the
- * first time a reader changes it. Seeded from the URL once, in `boot` — see `chosenDistrict`.
+ * first time a reader changes it. Seeded from the URL once, in `boot` — see `namedDistricts`.
  *
  * This was `/district/[irn]/scenario`, a route per district carrying `data-irn`. It is a choice
  * now, so a reader can move from one district to another, or to the state, without leaving the
  * levers they set.
  */
 const chosen = (): string => (view === "reach" ? "" : ($<HTMLSelectElement>("#sc-district")?.value ?? ""));
+
+/**
+ * The districts the link that opened this view named, of those the picker offers — see
+ * `namedDistricts`.
+ *
+ * Kept, unlike `chosen`, because it is not a control: it is what the reader was sent, and nothing
+ * on the page can change it. The picker opens on the first; the rest are offered beside it and
+ * written back behind it while it sits on one of them — see `districtParam` and `renderNamed`.
+ */
+let linked: string[] = [];
 
 /**
  * The draft this page was opened from, if any.
@@ -212,8 +224,9 @@ function toQuery(): void {
   // nothing from `h` — so a URL it minted with one would carry a lever nobody could see.
   if ($("#lv-horizon")) params.set("h", String(l.horizon));
   // The district this view answers for, only where there is one. Same key the reach view lights
-  // districts with, so crossing tabs carries it — see `chosenDistrict`.
-  const district = chosen();
+  // districts with, so crossing tabs carries it — and the rest of a list the reader was sent with
+  // it, behind it, so crossing back lights all of them. See `districtParam`.
+  const district = districtParam(chosen(), linked);
   if (district) params.set("d", district);
   /*
    * The view, only where there is one to read.
@@ -264,8 +277,9 @@ function toQuery(): void {
   // here would make the URL in the bar stop being the one that opened the bill, while the page
   // was still explaining that these figures came from one.
   if (draftSlug) params.set("draft", draftSlug);
-  const next = `${location.pathname}?${params.toString()}`;
-  if (location.pathname + location.search !== next) history.replaceState(null, "", next);
+  // And a redirect's `#d=` goes, even on a tick that leaves the query as it was — see `nextAddress`.
+  const next = nextAddress(location, params.toString());
+  if (next != null) history.replaceState(null, "", next);
 }
 
 /**
@@ -458,6 +472,24 @@ function syncView(view: View): void {
  */
 let drawnScope = "";
 
+/**
+ * The note under the district picker, when the link that opened the view named several — see
+ * `renderNamed`. Rebuilt only when the district changes, for the reason `drawnScope` gives.
+ */
+let drawnNamed: string | null = null;
+
+function syncNamed(irn: string): void {
+  const note = $("#sc-named");
+  const picker = $<HTMLSelectElement>("#sc-district");
+  if (!note || !picker || drawnNamed === irn) return;
+  drawnNamed = irn;
+  const nameOf = (value: string) =>
+    picker.querySelector(`option[value="${value}"]`)?.textContent?.trim() ?? value;
+  const html = renderNamed(linked, irn, nameOf);
+  note.hidden = html === "";
+  note.innerHTML = html;
+}
+
 function syncScope(view: View): void {
   const chips = $("#rv-chips");
   const summary = $("#rv-county-count");
@@ -589,14 +621,16 @@ function render(): void {
   if (not) not.hidden = irn === "";
   const home = not?.querySelector<HTMLAnchorElement>("a[data-district-home]");
   if (home) home.href = irn ? districtHome(irn) : "/districts";
+  syncNamed(irn);
   if (view === "reach") {
     // No projection container on this page and no detail half: the forecast is a different claim
     // and the cloud is the whole of this one.
     if (out) out.innerHTML = banner + renderReach(state.panel, state.levers, state.view, chip);
     if (detail) detail.innerHTML = "";
-  } else if (irn) {
+  } else {
     /*
-     * One district: its cards lead, in place of the statewide tiles, and the statewide rest stays.
+     * One district, or the state. For a district its cards lead, in place of the statewide tiles,
+     * and the statewide rest stays.
      *
      * In place of rather than beside, because the district cards already carry the statewide count
      * — "And to everyone else" is the card that exists to — and both halves are titled `outcome`
@@ -604,10 +638,7 @@ function render(): void {
      * below are statewide and say so, and they are what the district route could not show: it had
      * no band and linked away for the distribution.
      */
-    if (out) out.innerHTML = banner + renderDistrictScenario(state.panel, state.levers, irn, chip);
-    if (detail) detail.innerHTML = renderScenario(state.panel, state.levers, chip).detail;
-  } else {
-    const rendered = renderScenario(state.panel, state.levers, chip);
+    const rendered = renderRunner(state.panel, state.levers, irn, chip);
     if (out) out.innerHTML = banner + rendered.summary;
     // Written on every render, including when it is empty. Under current law there is nothing to
     // distribute or rank, and a detail half left standing from the last lever position would be
@@ -758,8 +789,10 @@ export function boot(panel: Panel): void {
    */
   const picker = $<HTMLSelectElement>("#sc-district");
   if (picker) {
-    const opened = chosenDistrict(new URLSearchParams(location.search), location.hash);
-    if (opened && picker.querySelector(`option[value="${opened}"]`)) picker.value = opened;
+    linked = namedDistricts(new URLSearchParams(location.search), location.hash).filter(
+      (irn) => picker.querySelector(`option[value="${irn}"]`) != null,
+    );
+    if (linked[0]) picker.value = linked[0];
   }
 
   const status = $("#scenario-status");
@@ -959,6 +992,17 @@ export function boot(panel: Panel): void {
      same reason it cannot be an inline handler: `script-src 'self'` blocks one. */
   $<HTMLFormElement>("#reach-scope")?.addEventListener("submit", (event) => event.preventDefault());
   $<HTMLFormElement>("#scenario-scope")?.addEventListener("submit", (event) => event.preventDefault());
+
+  /* The other districts a link named, each a way to set the picker rather than a second control —
+     so `chosen` still reads one place. Delegated, because `syncNamed` rebuilds the note. */
+  $("#sc-named")?.addEventListener("click", (event) => {
+    const button = (event.target as HTMLElement).closest<HTMLButtonElement>("[data-named-district]");
+    const picker = $<HTMLSelectElement>("#sc-district");
+    if (!button || !picker) return;
+    picker.value = button.dataset.namedDistrict ?? "";
+    update();
+    picker.focus();
+  });
 
   /*
    * The presets, which are lever positions with names.

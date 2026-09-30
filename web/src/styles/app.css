@@ -2022,6 +2022,9 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
   color: var(--text-muted);
 }
 .axis-pick select { width: 100%; }
+/* The runner's note on a link that named several districts: a line of its own under the picker,
+   not a third column squeezed in beside it. */
+#sc-named { flex-basis: 100%; margin: 0; }
 .axis-check { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); }
 
 /*
