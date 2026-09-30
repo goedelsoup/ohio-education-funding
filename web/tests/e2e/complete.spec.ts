@@ -505,13 +505,13 @@ test.describe("with JavaScript disabled", () => {
     page,
   }) => {
     /*
-     * #548 put two flat links back in the bar — `Find a district` and `Try a change` — so a failure
+     * #548 put two flat links back in the bar — `Find a district` and `Change the formula` — so a failure
      * in the disclosure machinery leaves those two reachable and nothing else. The four menus are
      * everything else the site holds, and each has to open with nothing running.
      */
     await page.goto("/");
     const flat = page.locator("header.site nav a.menu-place");
-    await expect(flat).toHaveText(["Find a district", "Try a change"]);
+    await expect(flat).toHaveText(["Find a district", "Change the formula"]);
     await expect(flat.nth(0)).toBeVisible();
     await expect(flat.nth(0)).toHaveAttribute("href", "/districts");
     await expect(flat.nth(1)).toHaveAttribute("href", "/scenario");

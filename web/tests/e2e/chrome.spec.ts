@@ -279,9 +279,9 @@ test.describe("routes", () => {
     }
     // The scenario tab was `/district/[irn]/scenario`, a copy of the runner per district. It is
     // the runner now, opened with the district chosen (#548).
-    await page.locator(".subnav a", { hasText: "Try a change" }).click();
+    await page.locator(".subnav a", { hasText: "Change the formula" }).click();
     await expect(page).toHaveURL(new RegExp(`/scenario\\?d=${NORTHERN}`));
-    await expect(page.locator("h1")).toHaveText("Try a change");
+    await expect(page.locator("h1")).toHaveText("Change the formula");
     await expect(page.locator("#sc-district")).toHaveValue(NORTHERN);
     await expect(page.locator(`.subnav a[aria-current="page"]`)).toHaveText("What changes");
   });
