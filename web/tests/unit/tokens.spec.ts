@@ -58,16 +58,27 @@ describe("app.css", () => {
     expect(offenders).toEqual([]);
   });
 
-  test("does not grow the pile of literals that sit near a token without using it", () => {
+  test("holds no literal that sits near a token without using it", () => {
     /*
-     * A ratchet, not a target.
-     *
-     * These are NOT adoptable here: each one moves a pixel, and the phase that put `app.css` on
-     * the scale is contractually a no-op. #186 resolves them, and until it does the count may not
-     * rise — a new literal near a token is a new size chosen by eye, which is how a seven-size
-     * scale became the thirteen the page renders.
+     * A hard zero since #550, which spent the ratchet #186 left: every spacing literal within 20%
+     * of a step now uses the step. A new one is a size chosen by eye beside a value the scale
+     * already had an opinion about, and the listing says which token it was reaching for.
      */
+    const offenders = near.map(
+      (f) => `app.css:${f.line}  ${f.property}: ${f.value}  (${f.part} ~ ${f.token} ${f.tokenValue})`,
+    );
+    expect(offenders).toEqual([]);
     expect(near.length).toBeLessThanOrEqual(NEAR_MISS_CEILING);
+  });
+
+  test("examines the literals beside a var() in the same declaration", () => {
+    // The audit skipped any declaration containing `var(` until #550, which let
+    // `padding: var(--space-4) .7rem` hold an exact match under a gate reading zero.
+    const probe = audit(".a { padding: var(--space-4) .7rem; margin: 0 var(--space-1) .5rem; }", TOKENS);
+    expect(probe.exact.map((f) => f.part)).toEqual([".7rem"]);
+    expect(probe.near.map((f) => `${f.part}~${f.token}`)).toEqual([".5rem~--space-3"]);
+    // An offset from a token is not a step on the scale.
+    expect(audit(".a { top: calc(var(--sticky-chrome) + .75rem); }", TOKENS).near).toEqual([]);
   });
 
   test("holds no type left, because #186 took the type", () => {
@@ -82,9 +93,8 @@ describe("app.css", () => {
      */
     const grouped = clusters(near);
     expect(grouped.filter((c) => /^(font-size|line-height|letter-spacing)$/.test(c.property))).toEqual([]);
-    // What is left is geometry — spacing and one radius — which is the ratchet's remaining job and
-    // a different phase's decision. `border-radius: 8px` against `--radius-md: 7px`, five times,
-    // is the largest of them and is not a type question at all.
+    // Anything that comes back must be geometry — spacing or a radius — and the zero above
+    // refuses that too; this names the kind of failure when it does.
     const kinds = [...new Set(grouped.map((c) => c.property))].sort();
     const GEOMETRY = /^(margin|padding|gap|row-gap|column-gap|inset|top|right|bottom|left|border-radius)/;
     expect(kinds.every((k) => GEOMETRY.test(k)), kinds.join(", ")).toBe(true);

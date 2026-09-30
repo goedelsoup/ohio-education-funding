@@ -21,10 +21,9 @@
  *
  * - **exact** — the literal equals a category-matching token. This is a defect: the token exists,
  *   means this, and is not being used. Held at zero by `tokens.spec.ts`.
- * - **near** — within 20% of a category-matching token. NOT a defect and not adoptable here:
- *   adopting one moves a pixel, and the phase that moved these literals onto the scale is
- *   contractually a no-op. It is a *ratchet* instead — the count may not rise. See
- *   {@link NEAR_MISS_CEILING}.
+ * - **near** — within 20% of a category-matching token. Adopting one moves a pixel, so the phase
+ *   that put these literals on the scale left them as a ratchet; #550 spent it, and the ceiling is
+ *   zero. See {@link NEAR_MISS_CEILING}.
  * - **none** — no token of that kind is anywhere near. Neither a defect nor a ratchet; some of
  *   these are one-off geometry that should never become a token.
  *
@@ -57,19 +56,19 @@ const SCALED =
 const NEAR = 0.2;
 
 /**
- * The near-miss ceiling, which is a ratchet and not a target.
+ * The near-miss ceiling, which was a ratchet and is now a hard zero.
  *
- * 55 declarations sit within 20% of a token they do not use. #186 took every `font-size` and
+ * 55 declarations sat within 20% of a token they did not use. #186 took every `font-size` and
  * `line-height` among them onto the ramps — those were the register — and left the spacing ones,
- * which are rhythm rather than type and would have doubled that phase's visual diff for a
- * different reason than the one it was about. Every one is a pixel somebody chose
- * by eye next to a value the scale already had an opinion about, and resolving them is #186's job
- * because each resolution moves something.
+ * which are rhythm rather than type. #550 resolved the rest, each onto the nearest step that did
+ * not change what the rule was for, and found six more the audit could not see because a `var()`
+ * elsewhere in the declaration hid them (see {@link audit}).
  *
- * Until then this may not rise. A new literal near a token is a new size chosen by eye, which is
- * exactly how a seven-size scale became the thirteen the page renders.
+ * Zero, and it stays there. A new literal near a token is a new size chosen by eye, which is
+ * exactly how a seven-size scale became the thirteen the page renders. A value that is genuinely
+ * not a step — one-off geometry, a hairline — is more than 20% from every token and is not counted.
  */
-export const NEAR_MISS_CEILING = 55;
+export const NEAR_MISS_CEILING = 0;
 
 /** A token declaration. */
 export interface Token {
@@ -141,6 +140,12 @@ const adoptable = (token: string, property: string): boolean =>
  * Shorthands are examined part by part: `padding: 1.15rem 1.25rem` has one part on the scale and
  * one off it, and reporting the whole declaration as either would be wrong in one direction or the
  * other.
+ *
+ * A part that is already a `var()` is on the scale and is set aside, and the literals beside it
+ * are still examined. This skipped any declaration containing `var(` until #550, which is how
+ * `padding: var(--space-4) .7rem` held an exact match for `--space-4` under a gate that read zero:
+ * the first token a shorthand adopted hid the rest of it. `calc()` is still skipped whole, because
+ * `calc(var(--sticky-chrome) + .75rem)` is an offset from a token, not a step on the scale.
  */
 export function audit(css: string, tokens: Token[]): { exact: Finding[]; near: Finding[] } {
   const exact: Finding[] = [];
@@ -152,7 +157,9 @@ export function audit(css: string, tokens: Token[]): { exact: Finding[]; near: F
       for (const declaration of line.matchAll(/([a-z-]+)\s*:\s*([^;{}]+)[;}]/g)) {
         const property = (declaration[1] ?? "").trim();
         const value = (declaration[2] ?? "").trim();
-        if (value.includes("var(") || !SCALED.test(property) || !/\d/.test(value)) continue;
+        if (value.includes("calc(") || !SCALED.test(property)) continue;
+        const literal = value.replace(/var\([^()]*\)/g, "").trim();
+        if (!/\d/.test(literal)) continue;
 
         const whole = tokens.find((t) => sameQuantity(t.value, value) && adoptable(t.name, property));
         if (whole != null) {
@@ -163,7 +170,7 @@ export function audit(css: string, tokens: Token[]): { exact: Finding[]; near: F
           continue;
         }
 
-        for (const part of value.split(/\s+/)) {
+        for (const part of literal.split(/\s+/)) {
           const hit = tokens.find((t) => sameQuantity(t.value, part) && adoptable(t.name, property));
           if (hit != null) {
             exact.push({

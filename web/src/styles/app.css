@@ -26,7 +26,7 @@
 
 body {
   margin: 0;
-  padding: 0 0 4rem;
+  padding: 0 0 var(--space-10);
   background: var(--surface-0);
   color: var(--text-primary);
   font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -121,10 +121,10 @@ a[href], button, input, select, textarea, summary, [tabindex] {
  */
 .skip {
   position: absolute;
-  left: .75rem;
+  left: var(--space-4);
   top: -4rem;
   z-index: 10;
-  padding: .5rem .8rem;
+  padding: var(--space-3) var(--space-5);
   background: var(--surface-2);
   color: var(--text-primary);
   border: 1px solid var(--border-control);
@@ -134,7 +134,7 @@ a[href], button, input, select, textarea, summary, [tabindex] {
   transition: top .12s ease;
 }
 .skip:focus-visible {
-  top: .75rem;
+  top: var(--space-4);
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
@@ -158,7 +158,7 @@ header.site {
   padding: var(--space-3) var(--space-7);
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-5);
   flex-wrap: wrap;
 }
 /*
@@ -268,6 +268,9 @@ header.site nav { display: flex; gap: .15rem; margin-right: auto; }
  * spare. A Mac gives the nav 523 and 163 spare — the same thirty-nine pixels of `system-ui` the
  * brand used to carry, now all in the nav's words. The runner's figure is the one that decides,
  * read off a CI run failed on purpose; the header test prints it again whenever the row wraps.
+ *
+ * #550 put the row's gap on `--space-5`, 14.4px where it was 16, so the two gaps give 3.2px back
+ * and the runner's 125 spare is 128. `--space-6` was as near, and would have taken 3.2px away.
  */
 @media (min-width: 820px) {
   .menu-all > summary { display: none; }
@@ -453,7 +456,7 @@ header.site nav .menu-heading {
     position: static;
     border: none;
     box-shadow: none;
-    padding: var(--space-1) 0 var(--space-1) .7rem;
+    padding: var(--space-1) 0 var(--space-1) var(--space-4);
     min-width: 0;
   }
   /*
@@ -860,7 +863,7 @@ tr.series-break > td {
 .card > h2 {
   display: flex;
   align-items: baseline;
-  gap: .4rem;
+  gap: var(--space-2);
   /*
    * Wrapping, because a chip cannot break and a heading row can.
    *
@@ -1177,7 +1180,7 @@ select, input[type="range"], input[type="text"], input[type="search"], textarea 
   background: var(--surface-2);
   border: 1px solid var(--border-control);
   border-radius: var(--radius-md);
-  padding: .5rem .6rem;
+  padding: var(--space-3);
 }
 /* The thumb and the filled track are control chrome, not a series. Same reason as the ring. */
 input[type="range"] { padding: var(--space-2) 0; accent-color: var(--link); }
@@ -1335,7 +1338,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
   border-top: 1px solid var(--accent-rule);
 }
 .contents-label {
-  margin: 0 0 .45rem;
+  margin: 0 0 var(--space-3);
   font-size: var(--text-xs);
   font-weight: var(--weight-semibold);
   color: var(--text-muted);
@@ -1345,13 +1348,13 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
   margin: 0;
   padding: 0;
   columns: 17rem auto;
-  column-gap: 2rem;
+  column-gap: var(--space-8);
 }
 .contents li {
   /* Never split an entry across the column break: half a heading at the foot of one column and
      half at the head of the next is unreadable as either. */
   break-inside: avoid;
-  margin: 0 0 .3rem;
+  margin: 0 0 var(--space-2);
   font-size: var(--text-base);
   line-height: var(--leading-snug);
 }
@@ -1456,7 +1459,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
    "At the minimum state share" is a fact about 138 districts that a reader who does not already
    know the plan cannot get from to what it means for theirs. These carry the consequence, so they
    are rows rather than pills; `.pill` is unchanged by it. */
-.conditions { list-style: none; margin: var(--space-5) 0 0; padding: 0; display: grid; gap: .5rem; }
+.conditions { list-style: none; margin: var(--space-5) 0 0; padding: 0; display: grid; gap: var(--space-3); }
 .conditions li { color: var(--text-secondary); font-size: var(--text-base); }
 .conditions strong { color: var(--text-primary); font-weight: var(--weight-semibold); }
 
@@ -1470,7 +1473,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 }
 .note code {
   background: var(--surface-inset);
-  padding: .1rem .3rem;
+  padding: .1rem var(--space-2);
   border-radius: var(--radius-sm);
   /* The `.prose-body code` rule's reason, met again outside the corpus: `/method` cites
      `crates/xcheck/tests/against_published_tables.rs` in a note, one token 150px wider than a
@@ -1555,7 +1558,7 @@ math {
 div.formula {
   overflow-x: auto;
   background: var(--surface-inset);
-  padding: var(--space-4) .7rem;
+  padding: var(--space-4);
   border-radius: var(--radius-md);
 }
 math[display="block"] { margin: 0; }
@@ -1633,7 +1636,7 @@ pre.aligned {
   overflow-x: auto;
   margin: 0;
   background: var(--surface-inset);
-  padding: var(--space-3) .7rem;
+  padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
   font-size: var(--text-base);
   line-height: var(--leading-base);
@@ -1664,7 +1667,7 @@ pre.aligned code { background: none; padding: 0; }
 table.prose tr.spanning-name th { border-bottom: 0; padding-bottom: var(--space-2); }
 table.prose tr.spanning-value td { padding-top: 0; }
 table { width: 100%; border-collapse: collapse; font-size: var(--text-base); }
-th, td { text-align: left; padding: .42rem .5rem; border-bottom: 1px solid var(--border); }
+th, td { text-align: left; padding: .42rem var(--space-3); border-bottom: 1px solid var(--border); }
 thead th { color: var(--text-muted); font-size: var(--text-sm); }
 th { font-weight: var(--weight-medium); color: var(--text-secondary); }
 td { text-align: right; font-variant-numeric: tabular-nums; }
@@ -1703,11 +1706,11 @@ td.reads {
 }
 tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 
-.strip-row { margin-bottom: 1rem; }
-.strip-head { display: flex; justify-content: space-between; font-size: var(--text-base); gap: 1rem; }
+.strip-row { margin-bottom: var(--space-6); }
+.strip-head { display: flex; justify-content: space-between; font-size: var(--text-base); gap: var(--space-6); }
 /* The percentile rides with the value it describes. Centred under the box it read as a label
    on the middle of the axis, which is the one place the district being described is not. */
-.strip-head .n { margin-left: .45rem; font-weight: var(--weight-regular); }
+.strip-head .n { margin-left: var(--space-3); font-weight: var(--weight-regular); }
 /* The flat strip this replaced is gone — see `distributionSpec`. What is left is the frame the
    box plot sits in: the label and value above it, the scale below. */
 .strip-row .chartwrap { margin: .1rem 0 .1rem; }
@@ -1965,7 +1968,7 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
 /* The nominal / constant-dollar switch. A pair, not a checkbox: neither basis is the default
    truth, and a checkbox would make one of them a modification of the other. */
 .basis { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-5); flex-wrap: wrap; }
-.basis .n { font-size: var(--text-sm); color: var(--text-muted); margin-left: .3rem; }
+.basis .n { font-size: var(--text-sm); color: var(--text-muted); margin-left: var(--space-2); }
 
 .levers { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: var(--space-5); }
 .lever .n { font-size: var(--text-xs); color: var(--text-muted); margin-top: .25rem; }
@@ -2187,7 +2190,7 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
  * Corpus prose is long-form and argumentative in a way nothing else on this site is, so it gets a
  * reading measure and real paragraph rhythm rather than the compact card type the data pages use.
  */
-.crumb { font-size: var(--text-sm); color: var(--text-muted); margin: 0 0 .5rem; }
+.crumb { font-size: var(--text-sm); color: var(--text-muted); margin: 0 0 var(--space-3); }
 .crumb a { color: var(--text-secondary); }
 /*
  * THE FINDINGS — what THIS REPOSITORY computed, and how to read it.
@@ -2222,10 +2225,10 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
 .prose-body > *:last-child { margin-bottom: 0; }
 .prose-body p { margin: 0 0 var(--space-6); max-width: var(--measure-prose); }
 .prose-body li { max-width: var(--measure-prose); margin-bottom: var(--space-2); }
-.prose-body h2, .prose-body h3 { margin: 1.5rem 0 var(--space-3); }
+.prose-body h2, .prose-body h3 { margin: var(--space-8) 0 var(--space-3); }
 .prose-body code {
   background: var(--surface-inset);
-  padding: .08rem .28rem;
+  padding: .1rem var(--space-2);
   border-radius: var(--radius-sm);
   font-size: .9em;
   /* The corpus cites code by path — `crates/xcheck/tests/report_card_2425.rs` — which is one
@@ -2236,8 +2239,8 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
 .prose-body pre {
   overflow-x: auto;
   background: var(--surface-inset);
-  padding: var(--space-4) .85rem;
-  border-radius: 8px;
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-md);
   font-size: var(--text-base);
 }
 .prose-body pre code { background: none; padding: 0; overflow-wrap: normal; }
@@ -2245,7 +2248,7 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
   margin: 0 0 var(--space-5);
   color: var(--text-secondary);
 }
-.prose-body table { margin-bottom: .95rem; }
+.prose-body table { margin-bottom: var(--space-5); }
 .prose-body td { text-align: left; font-variant-numeric: normal; }
 
 /*
@@ -2436,12 +2439,12 @@ h1.slug-title {
  * does not survive being read quickly, printed, or seen by someone who does not distinguish the
  * two hues. The strike is redundant with the "It said" heading on purpose.
  */
-.card.apparatus .revision + .revision { margin-top: .5rem; }
+.card.apparatus .revision + .revision { margin-top: var(--space-3); }
 .card.apparatus .revision > summary {
   cursor: pointer;
   font-weight: var(--weight-semibold);
   color: var(--text-secondary);
-  padding: .3rem 0;
+  padding: var(--space-2) 0;
 }
 .card.apparatus .revision > summary:hover { color: var(--text-primary); }
 .card.apparatus .revision-body {
@@ -2450,7 +2453,7 @@ h1.slug-title {
   margin: var(--space-2) 0 var(--space-1);
 }
 .card.apparatus .revision-body h3 {
-  margin: 1rem 0 .4rem;
+  margin: var(--space-6) 0 var(--space-2);
   font-size: var(--text-xs);
   color: var(--text-muted);
 }
@@ -2483,11 +2486,11 @@ footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); 
  * reader uses the browser's own find. Nothing is hidden behind the control that is not in the
  * document.
  */
-.filters { display: flex; gap: .6rem; flex-wrap: wrap; align-items: flex-end; margin-bottom: 1rem; }
+.filters { display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: flex-end; margin-bottom: var(--space-6); }
 .filters .field { display: flex; flex-direction: column; gap: var(--space-1); }
 .filters label { margin: 0; }
-.filters input, .filters select { width: auto; min-width: 11rem; font-size: var(--text-base); padding: var(--space-2) .55rem; }
-.filters .count { font-size: var(--text-sm); color: var(--text-muted); padding-bottom: .45rem; }
+.filters input, .filters select { width: auto; min-width: 11rem; font-size: var(--text-base); padding: var(--space-2) var(--space-3); }
+.filters .count { font-size: var(--text-sm); color: var(--text-muted); padding-bottom: var(--space-3); }
 #district-table td { text-align: right; }
 #district-table th[scope="row"] { text-align: left; font-weight: var(--weight-medium); }
 /*
