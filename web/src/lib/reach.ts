@@ -1139,13 +1139,13 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
 
   const legend =
     (view.shading === "regime"
-      ? REGIMES.map((label, i) => `<span><i class="sw ordinal-${i + 1}"></i> ${label}</span>`).join("")
+      ? REGIMES.map((label, i) => `<span><i class="sw" data-series="ordinal-${i + 1}"></i> ${label}</span>`).join("")
       : view.shading === "type"
-        ? `<span><i class="sw gain"></i> ${escapeHtml(litLabel)} (${count(lit)})</span>
-           <span><i class="sw neutral"></i> Every other district</span>`
-        : `<span><i class="sw gain"></i> Paid more</span>
-           <span><i class="sw loss"></i> Paid less</span>
-           <span><i class="sw neutral"></i> Unmoved</span>`) +
+        ? `<span><i class="sw" data-series="gain"></i> ${escapeHtml(litLabel)} (${count(lit)})</span>
+           <span><i class="sw" data-series="neutral"></i> Every other district</span>`
+        : `<span><i class="sw" data-series="gain"></i> Paid more</span>
+           <span><i class="sw" data-series="loss"></i> Paid less</span>
+           <span><i class="sw" data-series="neutral"></i> Unmoved</span>`) +
     /*
      * The scope's own entry, and the reason `muted` exists.
      *
@@ -1159,7 +1159,7 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
      */
     (scope == null || subset
       ? ""
-      : `<span><i class="sw neutral muted"></i> Outside ${escapeHtml(asked)}, drawn for context</span>`);
+      : `<span><i class="sw" data-series="muted"></i> Outside ${escapeHtml(asked)}, drawn for context</span>`);
 
   return `
     <div class="card stage" id="positions" data-part="positions">

@@ -455,8 +455,8 @@ const millageScatter = renderToString(
     </p>
     <div class="chartwrap" data-chart="reduction-factors" set:html={millageScatter} />
     <div class="legend">
-      <span><i class="sw formula"></i> Above the floor — the factors set the rate</span>
-      <span><i class="sw guarantee"></i> At the twenty-mill floor — they have stopped</span>
+      <span><i class="sw" data-series="formula"></i> Above the floor — the factors set the rate</span>
+      <span><i class="sw" data-series="guarantee"></i> At the twenty-mill floor — they have stopped</span>
     </div>
     <p class="note">
       {/* `{" "}` before every expression that opens a line: Astro trims the newline between text

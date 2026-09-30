@@ -235,8 +235,8 @@ test.describe("counties, which are a peer group and not a boundary", () => {
       .evaluateAll((n) => n.map((g) => g.getAttribute("fill")));
     expect(fills.sort()).toEqual(["var(--ordinal-1)", "var(--ordinal-3)"]);
 
-    await expect(page.locator("#disparity .legend .sw.ordinal-1")).toHaveCount(1);
-    await expect(page.locator("#disparity .legend .sw.ordinal-3")).toHaveCount(1);
+    await expect(page.locator("#disparity .legend .sw[data-series=ordinal-1]")).toHaveCount(1);
+    await expect(page.locator("#disparity .legend .sw[data-series=ordinal-3]")).toHaveCount(1);
   });
 
   test("the rows are ordered the way the table beside them is", async ({ page }) => {

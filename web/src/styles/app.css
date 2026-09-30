@@ -313,7 +313,7 @@ header.site nav a[aria-current="page"],
 }
 .subnav a[aria-current="page"] { border-color: var(--accent-rule); }
 /*
- * The two entries that are links rather than menus — `Find a district` and `Try a change`.
+ * The two entries that are links rather than menus — `Find a district` and `Change the formula`.
  *
  * The same box as a summary beside them, so the row reads as one row of entries; no `▾`, because
  * nothing opens. `true` is the summary's treatment, for the same reason: a district page sits
@@ -362,10 +362,10 @@ header.site nav summary:focus-visible { outline: 2px solid var(--focus-ring); ou
  * Now one ground, one edge, one corner and one elevation, stated once here where the first of the
  * four is declared. (`--shadow-tip` had no other reader and is gone. The one shadow still written
  * out is the definitions' sheet on a phone, which sits at the foot of the screen and so casts
- * upward — the same elevation pointed the other way, not a fifth box.) `--surface-1` rather than `--surface-2`, because the menu panel's rows hover
- * TO `--surface-2` and a panel painted in it would swallow its own hover. What still differs is
- * what each holds — how dense it is, how wide it may run and which way it opens — and those stay
- * with each one below.
+ * upward — the same elevation pointed the other way, not a fifth box.) `--surface-1` rather than
+ * `--surface-2`, because the menu panel's rows hover TO `--surface-2` and a panel painted in it
+ * would swallow its own hover. What still differs is what each holds — how dense it is, how wide
+ * it may run and which way it opens — and those stay with each one below.
  */
 header.site nav .menu-panel,
 .year-chip-def,
@@ -1234,18 +1234,17 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .barwrap { margin: var(--space-1) 0 0; }
 .bar { display: flex; height: 22px; border-radius: 5px; overflow: hidden; background: var(--surface-2); gap: 2px; }
 .seg { height: 100%; border-radius: var(--radius-sm); }
-.seg.only { border-radius: var(--radius-sm); }
-.seg.formula { background: var(--series-formula); }
-.seg.guarantee { background: var(--series-guarantee); }
+.seg[data-series="formula"] { background: var(--series-formula); }
+.seg[data-series="guarantee"] { background: var(--series-guarantee); }
 
 .legend { display: flex; gap: var(--space-6); flex-wrap: wrap; margin-top: var(--space-3); font-size: var(--text-sm); color: var(--text-secondary); }
 .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: var(--space-2); vertical-align: baseline; }
-.sw.formula, .sw.gain { background: var(--series-formula); }
-.sw.guarantee, .sw.loss { background: var(--series-guarantee); }
+.sw[data-series="formula"], .sw[data-series="gain"] { background: var(--series-formula); }
+.sw[data-series="guarantee"], .sw[data-series="loss"] { background: var(--series-guarantee); }
 /* The third state of a two-hue split: a district the levers did not move. Not a hue, deliberately
    — an unmoved district has no polarity, and `SERIES.neutral` is the mark the charts already use
    for it. */
-.sw.neutral { background: var(--neutral-mark); }
+.sw[data-series="neutral"] { background: var(--neutral-mark); }
 /*
  * The de-emphasised swatch, for the scope legend on `/reach`.
  *
@@ -1253,7 +1252,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
  * `lib/plot/spec.ts` for why one channel was not enough on a token this close to its surface. A
  * swatch that only dropped its opacity would be describing a dot the chart does not draw.
  */
-.sw.muted {
+.sw[data-series="muted"] {
   background: var(--neutral-mark);
   opacity: .49;
   width: 7px;
@@ -1267,7 +1266,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
  * what separates it on the picture from the identity and fitted lines the clouds draw: those are
  * measurements and this is arithmetic. `scatterSpec`'s `rules` option is the drawing half.
  */
-.sw.rule {
+.sw[data-series="rule"] {
   background: none;
   width: 16px;
   height: 0;
@@ -1279,9 +1278,9 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 /* The ordinal ramp, for a chart grouping districts into ordered bands. Its legend is not
    optional: the lightest step light and the darkest step dark sit near 2.2:1 against their
    surface, and this is the relief that buys. */
-.sw.ordinal-1 { background: var(--ordinal-1); }
-.sw.ordinal-2 { background: var(--ordinal-2); }
-.sw.ordinal-3 { background: var(--ordinal-3); }
+.sw[data-series="ordinal-1"] { background: var(--ordinal-1); }
+.sw[data-series="ordinal-2"] { background: var(--ordinal-2); }
+.sw[data-series="ordinal-3"] { background: var(--ordinal-3); }
 
 /* A row of `.pill` links. The pill drops the underline: the border is the affordance and the
    underline would be a second one. */
@@ -1929,8 +1928,8 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
 /* A range is two numbers and has to stay one line's worth of thought, so it sets a shade
    smaller than a point estimate would. It is still the largest thing in the card. */
 .tile .v.range { font-size: var(--text-h2); }
-.sw.band { background: var(--series-formula); opacity: .5; }
-.sw.dash {
+.sw[data-series="band"] { background: var(--series-formula); opacity: .5; }
+.sw[data-series="dash"] {
   background: repeating-linear-gradient(90deg,
     var(--series-formula) 0 4px, transparent 4px 7px);
   border-radius: 0;
@@ -1938,12 +1937,12 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
   width: 14px;
   margin-bottom: 3px;
 }
-.sw.anchor {
+.sw[data-series="anchor"] {
   background: var(--surface-1);
   border: 2px solid var(--series-formula);
   border-radius: 50%;
 }
-.sw.solid {
+.sw[data-series="solid"] {
   background: var(--series-formula);
   border-radius: 0;
   height: 2px;
@@ -2683,8 +2682,8 @@ tr.series-break > td {
     forced-color-adjust: none;
     border: 1px solid currentColor;
   }
-  .seg.formula { border-style: solid; }
-  .seg.guarantee { border-style: dashed; }
+  .seg[data-series="formula"] { border-style: solid; }
+  .seg[data-series="guarantee"] { border-style: dashed; }
 
   /*
    * The legend keys. A swatch is 10px of pure background and nothing else, so without this every
@@ -2696,24 +2695,24 @@ tr.series-break > td {
     forced-color-adjust: none;
     border: 1px solid currentColor;
   }
-  .sw.formula, .sw.gain { border-style: solid; }
-  .sw.guarantee, .sw.loss { border-style: dashed; }
-  .sw.neutral { border-style: dotted; }
+  .sw[data-series="formula"], .sw[data-series="gain"] { border-style: solid; }
+  .sw[data-series="guarantee"], .sw[data-series="loss"] { border-style: dashed; }
+  .sw[data-series="neutral"] { border-style: dotted; }
   /* Out of scope is context, so on paper it becomes an outline with nothing inside it — the same
-     relationship to `.sw.neutral` that a muted dot has to the cloud it is drawn behind. Opacity is
+     relationship to `.sw[data-series="neutral"]` that a muted dot has to the cloud it is drawn behind. Opacity is
      the channel on screen and a forced palette is entitled to ignore it, so the shape has to carry
      the fact on its own. */
-  .sw.muted { background: none; border-style: dotted; }
+  .sw[data-series="muted"] { background: none; border-style: dotted; }
   /* The ordinal ramp is ordered, so its second channel is ordered too: sparse to solid, running
      the same direction as light to dark. */
-  .sw.ordinal-1 { border-style: dotted; }
-  .sw.ordinal-2 { border-style: dashed; }
-  .sw.ordinal-3 { border-style: solid; }
+  .sw[data-series="ordinal-1"] { border-style: dotted; }
+  .sw[data-series="ordinal-2"] { border-style: dashed; }
+  .sw[data-series="ordinal-3"] { border-style: solid; }
   /* The fan chart's four keys are already shape rather than colour — a band, a dashed line, a
      ring, a solid line — so they only need the shape drawn as a rule instead of as a fill. */
-  .sw.band { border-style: solid; }
-  .sw.dash { background: none; border: 0; border-top: 2px dashed currentColor; }
-  .sw.solid { background: none; border: 0; border-top: 2px solid currentColor; }
+  .sw[data-series="band"] { border-style: solid; }
+  .sw[data-series="dash"] { background: none; border: 0; border-top: 2px dashed currentColor; }
+  .sw[data-series="solid"] { background: none; border: 0; border-top: 2px solid currentColor; }
 
   /*
    * The regime spans on `/legislation`. Colour encodes nothing here — the note above says so — so

@@ -47,7 +47,7 @@
  * it, in the built page, which is the same trick the `data-part` / `id` agreement test uses.
  *
  * The class is `section-anchor` and not `anchor` because `app.css` already spends `.anchor` on a
- * chart legend swatch — `<i class="sw anchor">`, the marker for the last observed year — and a
+ * chart legend swatch — `<i class="sw" data-series="anchor">`, the marker for the last observed year — and a
  * bare `.anchor` rule would style both.
  */
 

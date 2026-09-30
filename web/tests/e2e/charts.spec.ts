@@ -316,9 +316,9 @@ test.describe("colour that carries a third variable", () => {
      */
     await page.goto("/outcomes");
     const card = page.locator('[data-part="two-denominators"]');
-    await expect(card.locator(".legend .sw.ordinal-1")).toHaveCount(1);
-    await expect(card.locator(".legend .sw.ordinal-2")).toHaveCount(1);
-    await expect(card.locator(".legend .sw.ordinal-3")).toHaveCount(1);
+    await expect(card.locator(".legend .sw[data-series=ordinal-1]")).toHaveCount(1);
+    await expect(card.locator(".legend .sw[data-series=ordinal-2]")).toHaveCount(1);
+    await expect(card.locator(".legend .sw[data-series=ordinal-3]")).toHaveCount(1);
 
     // Three distinct fills across the dots, and they are the ramp rather than the series pair.
     const fills = await card
@@ -354,8 +354,8 @@ test.describe("colour that carries a third variable", () => {
       .locator(".scatter-dot circle")
       .evaluateAll((nodes) => [...new Set(nodes.map((n) => n.getAttribute("fill")))]);
     expect(fills.sort()).toEqual(["var(--series-formula)", "var(--series-guarantee)"]);
-    await expect(card.locator(".legend .sw.formula")).toHaveCount(1);
-    await expect(card.locator(".legend .sw.guarantee")).toHaveCount(1);
+    await expect(card.locator(".legend .sw[data-series=formula]")).toHaveCount(1);
+    await expect(card.locator(".legend .sw[data-series=guarantee]")).toHaveCount(1);
   });
 
   test("the card says how much the picture is hiding", async ({ page }) => {

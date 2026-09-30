@@ -67,7 +67,7 @@ const Heading = level;
       <div class="legend">
         {chart.legend.map((key) => (
           <span>
-            <i class={`sw ${key.swatch}`} />
+            <i class="sw" data-series={key.swatch} />
             {key.label}
           </span>
         ))}

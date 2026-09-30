@@ -238,9 +238,9 @@ const PAPER = atRule("@media print {");
  */
 test("a swatch or a bar segment never encodes with a ground alone", () => {
   const painted = new Map<string, string[]>();
-  for (const [selector, body] of rules(/\.(sw|seg)\./)) {
+  for (const [selector, body] of rules(/\.(sw|seg)\[data-series=/)) {
     if (!/(^|;)\s*background\s*:/.test(`;${body}`)) continue;
-    for (const [, variant] of selector.matchAll(/\.(?:sw|seg)\.([a-z0-9-]+)/g)) {
+    for (const [, variant] of selector.matchAll(/\.(?:sw|seg)\[data-series="([a-z0-9-]+)"\]/g)) {
       painted.set(variant!, [...(painted.get(variant!) ?? []), body]);
     }
   }
@@ -250,7 +250,7 @@ test("a swatch or a bar segment never encodes with a ground alone", () => {
   const offenders = [...painted].filter(([variant, bodies]) => {
     if (bodies.some((body) => /border/.test(body))) return false;
     const onPaper = [...SECOND_CHANNEL.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
-      .filter(([, s]) => new RegExp(`\\.(sw|seg)\\.${variant}(?![a-z0-9-])`).test(s!))
+      .filter(([, s]) => new RegExp(`\\.(sw|seg)\\[data-series="${variant}"\\]`).test(s!))
       .map(([, , b]) => b!);
     return !onPaper.some((body) => /border/.test(body));
   });
