@@ -359,7 +359,7 @@ export function markCorrections(html: string): { html: string; corrections: numb
     corrections += 1;
     return whole.replace(
       "<blockquote>",
-      `<blockquote class="correction" id="correction-${corrections}">`,
+      `<blockquote class="correction" data-aside="correction" id="correction-${corrections}">`,
     );
   });
   return { html: marked, corrections };

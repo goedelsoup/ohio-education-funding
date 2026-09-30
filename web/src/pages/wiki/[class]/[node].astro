@@ -694,7 +694,7 @@ const properties = shownProperties(node.properties.filter((p) => p.name !== "see
             <summary>
               Correction {index + 1} of {revisions.length}
             </summary>
-            <div class="revision-body">
+            <div class="revision-body" data-aside="correction">
               <h3>It said</h3>
               <div class="withdrawn prose-body" set:html={revision.was} />
               <h3>It says</h3>
