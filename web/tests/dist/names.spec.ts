@@ -115,3 +115,43 @@ describe("one name per place", () => {
     },
   );
 });
+
+/*
+ * The same rule one level down, for a district's tabs (#559). `DISTRICT_VIEWS` in `src/lib/nav.ts`
+ * is the table; this reads the strip a reader sees on a built dashboard and opens every tab it
+ * links. A tab's `<title>` is the district's `h1`, then the tab's label — except the dashboard's,
+ * which is the district alone. The runner's tab leaves the district and is a place in the bar,
+ * held by the rule above.
+ *
+ * Two districts: Cleveland, and one whose name another district shares, so its `h1` carries the
+ * county and the title has to carry it too.
+ */
+describe("one name per district tab", () => {
+  const SITE = " — Ohio school funding";
+  const districts = ["043786", "000442"];
+
+  test("the second was chosen for its shared name", () => {
+    const h1 = text(read(fileFor("/district/000442")).querySelector("main h1"));
+    expect(h1).toMatch(/, .+ County$/);
+  });
+
+  test.each(districts)("%s: each tab's label is its page's title after the district", (irn) => {
+    const home = `/district/${irn}`;
+    const dashboard = read(fileFor(home));
+    const district = text(dashboard.querySelector("main h1"));
+
+    const tabs = [...dashboard.querySelectorAll(".subnav a[href]")]
+      .map((a) => ({ href: a.getAttribute("href") ?? "", label: text(a) }))
+      .filter((tab) => tab.href === home || tab.href.startsWith(`${home}/`));
+    // Guard against the selector going stale, as above: the dashboard and its three siblings.
+    expect(tabs.map((t) => t.href)).toEqual([home, `${home}/outcome`, `${home}/finances`, `${home}/taxes`]);
+
+    for (const tab of tabs) {
+      const doc = read(fileFor(tab.href));
+      expect(text(doc.querySelector("main h1")), tab.href).toBe(district);
+      const title = text(doc.querySelector("title"));
+      const expected = tab.href === home ? district : `${district} — ${tab.label}`;
+      expect(title, `${tab.href}: the tab says "${tab.label}"`).toBe(`${expected}${SITE}`);
+    }
+  });
+});

@@ -20,9 +20,11 @@ import { expect, test } from "vitest";
 import { loadCorpus } from "../../src/lib/corpus.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
 import {
+  DISTRICT_VIEWS,
   LIBRARY,
   NAMES,
   UNPLACED,
+  districtTitle,
   nav,
   navLinks,
   sectionForClass,
@@ -210,4 +212,27 @@ test("every link has somewhere to go and something to be called", () => {
   // Two links to one place in one bar is a reader clicking to where they already were.
   const hrefs = links.map((l) => l.href);
   expect(new Set(hrefs).size, `duplicate hrefs: ${hrefs.join(", ")}`).toBe(hrefs.length);
+});
+
+test("a district tab's address is its name, and its title says it after the district", () => {
+  /*
+   * #559. The fourth tab was `Property tax` over `/district/[irn]/taxes`. Every view of the
+   * district's own ends in its name, lower-cased; the dashboard is the district itself and ends in
+   * nothing; the runner keeps its own address and the bar's name for it. The built pages' titles
+   * are held to the same names in `tests/dist/names.spec.ts`.
+   */
+  const irn = "043786";
+  for (const view of DISTRICT_VIEWS) {
+    const href = view.href(irn);
+    if (view.key === "scenario") {
+      expect(view.name).toBe(NAMES.scenario.name);
+      expect(new URL(href, "https://host.invalid").pathname).toBe(NAMES.scenario.href);
+    } else if (view.key === "dashboard") {
+      expect(href).toBe(`/district/${irn}`);
+      expect(districtTitle("Cleveland Municipal", view.key)).toBe("Cleveland Municipal");
+    } else {
+      expect(href, view.name).toBe(`/district/${irn}/${view.name.toLowerCase().replace(/ /g, "-")}`);
+      expect(districtTitle("Cleveland Municipal", view.key)).toBe(`Cleveland Municipal — ${view.name}`);
+    }
+  }
 });

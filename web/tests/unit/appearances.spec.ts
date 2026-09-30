@@ -21,7 +21,7 @@ test("a route folds only the segments that multiply it", () => {
 
 /** A page as `Base.astro` shapes it: a menu outside `<main>`, cards inside it. */
 const page = (main: string, menu = "") =>
-  `<html><head><title>Cleveland Municipal — outcome — Ohio school funding</title></head><body>` +
+  `<html><head><title>Cleveland Municipal — Outcome — Ohio school funding</title></head><body>` +
   `<nav>${menu}</nav><main id="main">${main}</main></body></html>`;
 
 test("a citation is read from main only, and named by the card it sits in", () => {
@@ -62,7 +62,7 @@ test("the inversion counts a route's pages and prefers an exemplar as its exampl
     route: "/district/[irn]/outcome",
     pages: 2,
     of: 3,
-    example: { href: "/district/043786/outcome", title: "Cleveland Municipal — outcome" },
+    example: { href: "/district/043786/outcome", title: "Cleveland Municipal — Outcome" },
     sections: [{ id: "pi", label: "PI" }],
   });
   // With no exemplar among them, the first in path order.

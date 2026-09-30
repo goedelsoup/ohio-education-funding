@@ -8,33 +8,24 @@
  *
  * Real links, not buttons — the styling borrows the tab affordance because that is what the
  * relationship between them is, but every one of them is a document that exists on its own.
+ *
+ * The names and addresses are `DISTRICT_VIEWS` in `lib/nav.ts`, which the pages' titles read too.
  */
-import { NAMES } from "../lib/nav.ts";
-import * as routes from "../lib/routes.ts";
+import { DISTRICT_VIEWS, type DistrictView } from "../lib/nav.ts";
 
 interface Props {
   irn: string;
-  current: "dashboard" | "outcome" | "finances" | "taxes";
+  current: DistrictView;
 }
 
 const { irn, current } = Astro.props;
-
-const VIEWS = [
-  { key: "dashboard", href: routes.district(irn), label: "Dashboard" },
-  { key: "outcome", href: routes.districtOutcome(irn), label: "Outcome" },
-  { key: "finances", href: routes.districtFinances(irn), label: "Finances" },
-  { key: "taxes", href: routes.districtTaxes(irn), label: "Property tax" },
-  // Out to the runner with this district chosen: a change is tried on the whole state and answered
-  // for this district, so it is the one tab that is not a view of this district alone (#548).
-  { key: "scenario", href: routes.districtScenario(irn), label: NAMES.scenario.name },
-] as const;
 ---
 
 <nav class="subnav" aria-label="Views of this district">
   {
-    VIEWS.map((view) => (
-      <a href={view.href} aria-current={view.key === current ? "page" : undefined}>
-        {view.label}
+    DISTRICT_VIEWS.map((view) => (
+      <a href={view.href(irn)} aria-current={view.key === current ? "page" : undefined}>
+        {view.name}
       </a>
     ))
   }

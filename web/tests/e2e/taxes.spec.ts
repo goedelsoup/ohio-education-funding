@@ -18,7 +18,7 @@ test.describe("the property tax route", () => {
     // back and a reappraisal reaches its revenue directly. That is the point of carrying two.
     await page.goto(`/district/${AT_FLOOR}/taxes`);
     await expect(page.locator("h1")).toHaveText("Fremont City");
-    await expect(page.locator(`.subnav a[aria-current="page"]`)).toHaveText("Property tax");
+    await expect(page.locator(`.subnav a[aria-current="page"]`)).toHaveText("Taxes");
     const change = page.locator('[data-part="valuation-change"]');
     await expect(change).toContainText("at the");
     await expect(change).toContainText("reduction factors have stopped operating");
