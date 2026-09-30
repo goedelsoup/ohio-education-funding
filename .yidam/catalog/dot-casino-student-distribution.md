@@ -62,7 +62,7 @@ itself rather than trusting a reviewer's sense of scale.
 recalculation sits in column E — where every other year's amount is — so a fixed offset reports the
 half-year at seven thousand dollars.
 
-**The analyst's copy is a different file at a neighbouring path.** `2024 01 County Student
+**The analyst's copy is a different file at a neighboring path.** `2024 01 County Student
 Distribution Report.xlsx` and `…Report Web.xlsx` are both live; the first carries an extra
 `RP_MAIN_PG1 (2)` sheet reconciling districts against county allocations, where the two differ by
 four cents. The `Web` file is the one the page links, and it is the one pinned. The August 2021

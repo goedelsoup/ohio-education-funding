@@ -166,7 +166,7 @@ findings: |
   following — and it rewrote the division for fiscal years 2022 and 2023, so the weighted miles
   first paid in FY2023 and H.B. 33 carried them forward under new year labels. The same clause
   created the reporting duty: a district that reported one mileage total now reports miles by the
-  enrolment of the riders carried. [verified]
+  enrollment of the riders carried. [verified]
   ([`crates/project`](../../../crates/project/tests/the_weight_the_legislature_never_explained.rs))
 
   **Its analyst noticed; its analyses did not.** None of the fifteen committed analyses describes
@@ -207,7 +207,7 @@ findings: |
 
   **440 of the department's 611 districts sit on it** — 72%, against 23% on the formula's floor.
   For most of Ohio, local capacity does not determine transportation aid at all. This is the
-  single largest difference between how Ohio equalises instruction and how it equalises getting
+  single largest difference between how Ohio equalizes instruction and how it equalizes getting
   to it, and it is the kind of fact no published total can carry. [verified]
 
   The denominator is the department's rather than this repository's, and the two differ. The
@@ -339,7 +339,7 @@ revisions:
       [`the_freeze_that_was_a_stale_column_header`](../../../crates/project/tests/the_freeze_that_was_a_stale_column_header.rs).
     reach: |
       The class [README](README.md) said Ohio holds districts harmless against FY2021 "in three
-      separate places"; the figure manifest labelled the district count "transportation's own
+      separate places"; the figure manifest labeled the district count "transportation's own
       FY2021 guarantee"; `project::panel::Transportation` documented the field the same way. All
       three are corrected. No amount moves — `[F1]` is the number the department publishes and
       the panel reads, and what changes is what year it is a number *from*. The sibling
@@ -446,7 +446,7 @@ properties:
     what districts themselves reported spending last year**. [verified] (`ohio-laws`)
 
     That makes them a fourth kind of parameter in this corpus, beside the legislated, the delegated
-    and the uncodified: a rate that moves when districts' own behaviour moves, with no one deciding
+    and the uncodified: a rate that moves when districts' own behavior moves, with no one deciding
     it and no bill required. It also means the rates are endogenous — a year in which districts
     spend more on buses raises the rate they are paid at, and the trim is the only thing bounding
     that.

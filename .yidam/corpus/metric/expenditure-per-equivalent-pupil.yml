@@ -119,7 +119,7 @@ findings: |
   disadvantaged share at +0.345 *and* with valuation per pupil at +0.281, and the FY2024 Cupp
   series gives +0.383 and +0.279 independently. [verified] Ohio's poorest and wealthiest
   districts both spend above its middle, for entirely different reasons, and a single
-  coefficient across that shape is two relationships cancelling.
+  coefficient across that shape is two relationships canceling.
 
   ### And the corrected number does not survive a change of outcome
 
@@ -138,7 +138,7 @@ findings: |
   with neither noting the other's basis. [verified] The abstract argument on this node has a
   district attached to it.
 
-  The fact-check also shows the rule generalising past this metric. It compares
+  The fact-check also shows the rule generalizing past this metric. It compares
   special-education spending per *total* pupil across two districts whose disability shares are
   21.9% and 11.3%, and reads the residual as heavier need in the urban district. Per student
   with a disability the comparison reverses. A denominator does not have to be need-weighted to
@@ -318,7 +318,7 @@ properties:
     **Components sum to the total.** Federal and state-and-local are shares of one quantity.
 
     **Weighted ADM is published as a whole number; unweighted ADM carries four decimals.** So a
-    recomputed per-equivalent-pupil figure carries quantisation noise inversely proportional to
+    recomputed per-equivalent-pupil figure carries quantization noise inversely proportional to
     district size — Put-in-Bay Local at 77 weighted pupils reconstructs $86 from its published
     $46,716. Immaterial in aggregate, material for any single small district. [verified]
 

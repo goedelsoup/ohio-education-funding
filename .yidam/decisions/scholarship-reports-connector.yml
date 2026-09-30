@@ -36,12 +36,12 @@ decision: |
   lifting the credentialed half's blocker — which is the one thing about that blocker a reader must
   not conclude.
 
-  **Committed as a rebuilt fixture rather than quoted.** Five programme totals to the cent is
+  **Committed as a rebuilt fixture rather than quoted.** Five program totals to the cent is
   exactly the transcription this repository keeps finding wrong, and a figure reaching the corpus
   through prose is a figure nothing recomputes.
 consequences: |
   **Two internal contradictions in the report, both pinned rather than resolved.** Its executive
-  summary claims "more than 175,000" students; its five programme counts sum to **166,587**. And
+  summary claims "more than 175,000" students; its five program counts sum to **166,587**. And
   three of its four published averages are not expenditure over participation — Autism reconciles
   to the cent, the other three sit **1.5% to 3.4% above**. That is a denominator the report does
   not name, not a slip, and the fixture carries both readings rather than picking one.
@@ -72,7 +72,7 @@ alternatives: |
   cost of the separate connector is one more row in the registry table; the cost of folding is a
   status that describes neither half.
 
-  **Quote the five programme totals into the corpus nodes and skip the connector.** Rejected: the
+  **Quote the five program totals into the corpus nodes and skip the connector.** Rejected: the
   figures are the whole reason to hold the document, and a number in a node with no fixture behind
   it is the shape issue #131 exists to catch.
 
@@ -83,7 +83,7 @@ alternatives: |
 amendment: |
   **Two more public workbooks, both kept under this connector rather than given their own.**
   Found 2026-09-15 re-probing #10: the *Historical Scholarship Data* archive (FY1997-FY2013,
-  statewide, by programme) and the *EdChoice Designated List 2026-2027* (per district, per
+  statewide, by program) and the *EdChoice Designated List 2026-2027* (per district, per
   building). Both are linked from pages this project had already read, both are plain fetches,
   and neither was held.
 
@@ -96,7 +96,7 @@ amendment: |
   published openly by the same office on the same set of pages, every one is a fetch with no
   credentials, and one `Wired` status with one remainder describes all three honestly. Splitting
   on grain would have produced a connector whose status says exactly what this one's says, and
-  `dew-payment-reports` would then be sitting beside two neighbours instead of one, with its own
+  `dew-payment-reports` would then be sitting beside two neighbors instead of one, with its own
   reason for separateness that much harder to read.
 
   **The remainder gets larger and more specific, not smaller.** Before this the string said
@@ -121,22 +121,22 @@ amendment: |
   > — FY2014, FY2016, FY2018, FY2019 and FY2023 — and sixty-four across the census as a whole.
   > "None naming a denominator" is wrong in the direction that matters: LSC names three different
   > ones inside the hole (students participating, scholarships awarded, kindergarteners) and the
-  > FY2026-27 redbook names two more in one sequence of paragraphs (students for three programmes,
+  > FY2026-27 redbook names two more in one sequence of paragraphs (students for three programs,
   > FTE students for the two EdChoice ones). The hedging is also wider than "three of four" —
   > thirty-seven of sixty-four rows carry the publisher's own qualifier. None of that weakens the
   > conclusion; it is why the conclusion now has a fixture behind it rather than a count.
 
   > **CORRECTED by [#484](https://github.com/goedelsoup/ohio-education-funding/issues/484).**
   > "FY2014 through FY2023" is now FY2014 through **FY2022**, and "twenty-two quoted quantities
-  > inside the hole" is twenty-one. The Jon Peterson programme's own annual report was extracted
+  > inside the hole" is twenty-one. The Jon Peterson program's own annual report was extracted
   > for FY2023 and FY2024, which shortens the channel's hole by one year at its far edge. The row
   > that changed buckets is the census's only FY2023 row — 714 chartered nonpublic schools
   > operating statewide — which is not a quantity the Jon Peterson editions measure, so nothing
   > about it became checkable. Everything else this paragraph and the two blocks above it say
-  > stands, and the hole is still a hole for four programmes of five.
+  > stands, and the hole is still a hole for four programs of five.
 
   **"They bound the hole; they do not fill it" is a fixture.** `scholarship-bounds.tsv` holds the
-  census, one row per quoted quantity, carrying the programme, the fiscal year, the measure, the
+  census, one row per quoted quantity, carrying the program, the fiscal year, the measure, the
   value, the **denominator** it is over, the publisher's own **precision**, the source document,
   and the publisher's **words**. `project::scholarship::bounds` reads it through the uniform-width
   reader; `the_points_that_bound_the_participation_hole` asserts the claim this record had been
@@ -157,14 +157,14 @@ amendment: |
   five of them on a measure the archive publishes, and where both speak they disagree without a
   rule.** Cleveland's
   FY2005 count reproduces the payments column exactly; its FY2012 count runs 0.98% above; the
-  traditional programme's FY2012 count runs 2.28% *below*; and LSC's FY2012 autism count is
+  traditional program's FY2012 count runs 2.28% *below*; and LSC's FY2012 autism count is
   **85% below** the department's — 360 students against 2,413, in the same analysis whose other two
   counts are within two points. A transcription that is exact once and out by a factor of seven
   elsewhere cannot be extrapolated into years with nothing to check it against. That is the
   sentence the fixture replaces, and it could not have been written without the overlap rows.
 
-  **What the FY2014 quotes do bound.** For each of the three programmes the archive covers with
-  both denominators, LSC's FY2014 count falls strictly between that programme's FY2013 payments and
+  **What the FY2014 quotes do bound.** For each of the three programs the archive covers with
+  both denominators, LSC's FY2014 count falls strictly between that program's FY2013 payments and
   its FY2013 applications — Cleveland 5,964 < 6,337 < 6,602, traditional EdChoice
   16,065 < 16,987 < 17,516, Jon Peterson 1,779 < 2,103 < 2,129. The quoted figure is consistent
   with either column having grown and inconsistent with being either one, which is the precise
@@ -173,7 +173,7 @@ amendment: |
   it reads as a series continuing. It is the most tempting splice in the census and it is refused
   on the same terms as the other sixty-three.
 
-  **The FY2024 redbook sits below the 2024-25 report on every programme, which is the check that
+  **The FY2024 redbook sits below the 2024-25 report on every program, which is the check that
   both documents are right.** In dollars for the four that publish a total — $405.3m against
   $492.9m for the expansion, $272.3m against $283.1m, $136.5m against $160.0m, $53.4m against
   $55.2m — and in counts for all five, by between 5.7% and 31%. The spread is itself a reminder
@@ -182,7 +182,7 @@ amendment: |
 
   **What the archive settles that the report could not.** The 2025 report's three unreconciled
   averages were recorded above as "a denominator the report does not name". This workbook
-  maintains two denominators for every programme-year — applications made against scholarships
+  maintains two denominators for every program-year — applications made against scholarships
   with at least one payment — and they are far apart. It does not identify the report's
   denominator, and it establishes that the department has long counted this channel two ways,
   which was the part that had been a guess.
@@ -198,21 +198,21 @@ amendment: |
   is exactly `Option A OR Option B`, its Title I column tests the three-year *average* that
   R.C. 3310.03(A)(1)(b) requires rather than the each-year rule its own name suggests, and the
   one district of 607 missing from it is Cleveland Municipal — which R.C. 3310.03 excludes by
-  name, because the pilot project scholarship programme operates there. That last one is the
+  name, because the pilot project scholarship program operates there. That last one is the
   first place in this corpus where a statutory exclusion is observable as a row count.
 
   **The hole has a floor under part of it now, and the criterion above is what put it there.**
   Two more sources joined this connector rather than starting another — `jpsn-annual-2023` and
-  `jpsn-annual-2024`, the Jon Peterson programme's own annual report for two years. The access
+  `jpsn-annual-2024`, the Jon Peterson program's own annual report for two years. The access
   regime is identical: the same office, the same Annual Reports page, the same `getattachment`
   route, no credentials. By the criterion this record already states, that is one connector, and
-  the alternative — a per-programme connector for a per-programme report — would have produced a
+  the alternative — a per-program connector for a per-program report — would have produced a
   `Status` string indistinguishable from this one's.
 
   What changed in the status is the remainder, which is now narrower and for a stated reason:
   `still_blocked` names FY2014 through FY2022 rather than FY2014 through FY2023, **for one
-  programme of five**. Four programmes have nothing in the hole and the sentence has to keep
-  saying so, because a hole one year shorter reads like a hole one programme narrower and it is
+  program of five**. Four programs have nothing in the hole and the sentence has to keep
+  saying so, because a hole one year shorter reads like a hole one program narrower and it is
   not.
 
   **The guard grew a third clause and the vacuity test a third case.** `Bound::spliceable` now

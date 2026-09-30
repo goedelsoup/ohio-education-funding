@@ -220,7 +220,7 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
       ${
         draws(position)
           ? `<p class="note">Where that sits among the ${ratios.length} counties with more than one
-             district reporting a tax base — one dot each, narrowest on the left, and the coloured
+             district reporting a tax base — one dot each, narrowest on the left, and the colored
              rule is ${escapeHtml(c.name)}. The median is
              ${median(ratios.map((r) => r.value)).toFixed(1)}× apart.</p>
              <div class="chartwrap" data-chart="county-position">${renderToString(position, "presentational")}</div>
@@ -240,7 +240,7 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
         ${escapeHtml(rich.name)}, which is the disparity <a href="${routes.wikiNode(
           "litigation",
           "derolph-i-1997",
-        )}">DeRolph</a> was brought over and the reason the formula has an equalisation term at
+        )}">DeRolph</a> was brought over and the reason the formula has an equalization term at
         all.</p>
       <p class="note">${
         poor.realized_aid_per_pupil > rich.realized_aid_per_pupil
@@ -260,7 +260,7 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
                rich.on_guarantee
                  ? `${escapeHtml(rich.name)} is on it.`
                  : `neither district here is on it, so the cause is elsewhere — most often a
-                    difference in enrolment trend or in the categorical mix.`
+                    difference in enrollment trend or in the categorical mix.`
              }`
       } Statewide, ${count(statewide.on_guarantee)} districts are held above their formula
         amount.</p>

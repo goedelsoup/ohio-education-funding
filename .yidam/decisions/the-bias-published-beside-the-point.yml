@@ -7,10 +7,10 @@ summary: >-
 context: |
   [`the-widening-rule`](the-widening-rule.yml) fitted the band's shape and left its level alone,
   and its `open:` block named what remained: the log error has a growing positive mean, and an
-  interval centred on a biased point inherits that bias whatever its width. #423 asked whether to
+  interval centered on a biased point inherits that bias whatever its width. #423 asked whether to
   correct it and on what. `crates/project/tests/the_bias_that_belongs_to_the_years.rs` measured
   the four remedies it named and every one of them failed, for reasons recorded there and
-  summarised in that block — the bias is a **year** effect with no gradient on anything a forecast
+  summarized in that block — the bias is a **year** effect with no gradient on anything a forecast
   can see at its origin, so there is nothing to correct it *on*.
 
   What that file also found is the reason this is a decision rather than a note. The 5.8% the
@@ -48,7 +48,7 @@ decision: |
   **Four figures per horizon rather than two.** The mean-district/total split is the finding, and
   the pre-closure restriction is not a sample of the same question — it is a different one. A
   forecast whose target is FY2021 or later is scored across a statewide level break that no method
-  fitted before it could see. Both populations are published and neither is labelled the corrected
+  fitted before it could see. Both populations are published and neither is labeled the corrected
   one.
 
   **Absent rather than zero at the deep horizons.** No origin reaches ten years without crossing
@@ -82,7 +82,7 @@ consequences: |
 
   **`/method` states it beside the point rather than in the band.** The forecast card's footnote
   carried the 5.8% as a sentence; it now draws all four lines against zero, and the two panels are
-  the two populations. The band itself does not move, and the centre does not move.
+  the two populations. The band itself does not move, and the center does not move.
 
   **Twelve pins, in `ratio` and not `share`.** Two curves at three figures a line is twelve, and
   the document carries ten of them plus the two the FY2032 leg needs: horizons one to three are
@@ -96,7 +96,7 @@ consequences: |
   **The two negative figures are pinned as magnitudes.** `crates/figures.json` cannot bind a
   negative — its numeral regex captures no sign — so the one-year pair takes `-negative` in its
   key, `.abs()` in its `compute`, and a U+2212 in the prose beside it. That is a limitation of
-  the binding mechanism and not a judgement about the figures, and it is recorded here because
+  the binding mechanism and not a judgment about the figures, and it is recorded here because
   the sign is the whole of what this record is about.
 
   **Four of the twelve name a value another pin already names.** Every line here runs
@@ -138,4 +138,4 @@ amendment: |
 
   #458 framed the work as a horizon mismatch, a ten-year fan against a pre-closure panel that stops
   at nine. The fan is a six-year leg, `base_year + 6`, and always was, so the mismatch did not
-  exist; the correction is recorded on #458. Nothing here moved the fan, its band or its centre.
+  exist; the correction is recorded on #458. Nothing here moved the fan, its band or its center.

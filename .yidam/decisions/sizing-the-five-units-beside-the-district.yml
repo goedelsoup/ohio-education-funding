@@ -9,7 +9,7 @@ summary: >-
 context: |
   The method page said, in the row headed `Community schools and scholarships`, that "the
   deduction that routes money from a resident district to a community school or a scholarship is
-  not modelled here". The corpus has since read R.C. 3317.022 and established that there is no
+  not modeled here". The corpus has since read R.C. 3317.022 and established that there is no
   such deduction to model: the community and STEM school unit and the four scholarship units are
   **funding units beside the district unit**, computed and paid directly. The row described a
   mechanism that does not exist and said nothing about the one that does — the whole of what this
@@ -57,10 +57,10 @@ decision: |
   new cards are derived like every other year label on this site. That is
   [`every-figure-says-its-year`](every-figure-says-its-year.yml) applied to a table whose rows
   are genuinely on different years: its rule is that where rows are on more than one reckoning,
-  **every** row says which, and half-labelling is worse than none.
+  **every** row says which, and half-labeling is worse than none.
 
   **The scholarship channel is published as two figures, not one.** `$991,191,150.12` is what the
-  four programmes that publish an expenditure paid; `$103,944,388.15` is Jon Peterson's, which
+  four programs that publish an expenditure paid; `$103,944,388.15` is Jon Peterson's, which
   the report displays as six disability-category figures and never totals. The feed carries the
   second with `derived: true` beside it and the page says so. The sum, **$1,095,135,538.27** over
   **166,587 students**, is the quotable number and it is the one that is only partly quoted — the

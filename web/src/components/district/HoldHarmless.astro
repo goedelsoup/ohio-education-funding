@@ -66,8 +66,8 @@ const beyond = Math.max(lost - t.open_enrollment_threshold, 0);
           <td class="tnum">{money(t.funding_base)}</td></tr>
         {
           clawback && (
-            <tr class="current"><th>Open-enrolment clawback{" "}
-                <span class="step-note">Its open enrolment fell {fixed(lost, 1)} FTE against a threshold of{" "}
+            <tr class="current"><th>Open-enrollment clawback{" "}
+                <span class="step-note">Its open enrollment fell {fixed(lost, 1)} FTE against a threshold of{" "}
                   {fixed(t.open_enrollment_threshold, 1)}, and the guarantee is cut by{" "}
                   {money(8241.61)} — the statewide average base cost per pupil — for each of the{" "}
                   {fixed(beyond, 1)} FTE beyond it.</span></th>
@@ -100,7 +100,7 @@ const beyond = Math.max(lost - t.open_enrollment_threshold, 0);
            this district's share of it.</strong> The state was paying its{" "}
            <em>share</em> of {money(8241.61)} for each of those pupils — for a district at the 10%
            minimum that is about {money(824)} — and the guarantee falls by the whole{" "}
-           {money(8241.61)} when they leave. Whether that is a deliberate incentive or an artefact of reaching for a
+           {money(8241.61)} when they leave. Whether that is a deliberate incentive or an artifact of reaching for a
            convenient statewide figure is not established here.</p>
       )
     }

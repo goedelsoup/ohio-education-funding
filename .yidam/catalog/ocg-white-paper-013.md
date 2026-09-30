@@ -64,7 +64,7 @@ limitation, "no need-adjusted model in this version," understates it: there is a
 inside the independent variable, on one side only, pointing the way that flattens the result. See
 [`metric/expenditure-per-equivalent-pupil`](../corpus/metric/expenditure-per-equivalent-pupil.yml).
 
-**Two of its own conjectures, tested.** The paper hypothesised that its federal-spending result
+**Two of its own conjectures, tested.** The paper hypothesized that its federal-spending result
 was a poverty signal and said it could not test that directly. Holding the economically
 disadvantaged share constant, federal per-pupil falls from −0.558 to **−0.158** — the hypothesis
 was largely right. And the variable it was standing in for is far stronger than anything the
@@ -83,10 +83,10 @@ year's (−0.388), so there is no forward-directed signal to lag into. [verified
 "a need-adjusted, multivariable descriptive model relating Performance Index to per-pupil spending
 while accounting for economically disadvantaged, English-learner, and disability shares, district
 enrollment, typology, and local wealth" as its first Future Research item. That model now exists
-in this corpus, missing only typology. The standardised spending coefficient is **−0.073** on the
+in this corpus, missing only typology. The standardized spending coefficient is **−0.073** on the
 Performance Index and **+0.209** on the Progress component. [verified] Its own proposed test
 returns opposite signs depending on which of Ohio's two published outcome measures is used, and
-the paper analysed only one of them.
+the paper analyzed only one of them.
 
 **One correction of description.** The paper reads state-and-local spending across performance
 quintiles as "moving in the opposite direction, from $12,403 to $13,324." That row is flat within

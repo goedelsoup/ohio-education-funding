@@ -475,7 +475,7 @@ revisions:
       Re-deriving the grade-band fixture with the withheld counts handled as withheld rather
       than as zero.
     reach: |
-      A pipeline defect rather than a modelling one, and it reached only districts with
+      A pipeline defect rather than a modeling one, and it reached only districts with
       withheld grade counts — which is to say small ones, where the proportional distortion is
       largest.
   - was: |

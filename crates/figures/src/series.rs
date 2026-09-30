@@ -247,7 +247,7 @@ pub static SERIES: &[Series] = &[
         owner: "crates/project",
         unit: Unit::Count,
         axis: "Bound, ranked by the districts it is the operative term for",
-        label: "Every bound in the modelled formula, and how many districts each one is the \
+        label: "Every bound in the modeled formula, and how many districts each one is the \
                 operative term for",
         compute: |i| {
             census_ranked(i)

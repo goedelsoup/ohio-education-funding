@@ -40,7 +40,7 @@ last set, and against which appropriation" as needing "the budget bill's line it
   *why* this program prorates when most do not — and nothing on the department's own sheet says so.
 - **The $147,500,000 limit the FY2027 calculator prints is the FY2025 estimate.** FY2026 and FY2027
   are both $153,976,832. So the proration factor and the limit beside it were carried over together
-  from the prior biennium, and against the year being modelled the program is $5.6m *under* its
+  from the prior biennium, and against the year being modeled the program is $5.6m *under* its
   appropriation rather than $908,184 over it.
 
 It also corroborates, in prose, a claim this corpus first reached by noticing an absence:

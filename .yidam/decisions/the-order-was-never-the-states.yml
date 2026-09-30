@@ -58,7 +58,7 @@ consequences: |
   says the same: West Geauga gains 208 pupils in FY2021 and **Chardon loses 110** in the same year.
   A survivor that shrinks did not receive anybody.
 
-  It came from a judge's failure-mode analysis — offered there as an example of enrolment
+  It came from a judge's failure-mode analysis — offered there as an example of enrollment
   absorption getting the *sign* wrong — and was carried into a docstring and a test as though it
   were a finding. The fixture that contradicts it was sitting beside the code the whole time. The
   test that named four survivors now names three.

@@ -124,7 +124,7 @@ findings: |
 
   **The comprehensive tilt is carried by a designation.** Ohio's plan identifies every high school
   with a federal graduation rate at or below 67%, and that criterion carries no Title I gate.
-  Dropout recovery schools enrol pupils who have already left school once, and **73** of the 76
+  Dropout recovery schools enroll pupils who have already left school once, and **73** of the 76
   dropout recovery identifications in the state are community-operated. [verified]
   (crates/dispersion) The designation is 75 of the 231 CSI schools, one of 60 TSI and none of 117
   ATSI — the shape of a criterion only high schools can fail.
@@ -144,8 +144,8 @@ findings: |
 
   **Size is not the explanation, which was worth testing and is wrong.** Community school buildings
   are half the size of the rest, a median of 206 pupils against 411, and a subgroup needs pupils to
-  be reportable. The under-representation nonetheless holds inside every enrolment band, including
-  buildings of 700 and over. [verified] (crates/dispersion) Whether these schools enrol fewer pupils
+  be reportable. The under-representation nonetheless holds inside every enrollment band, including
+  buildings of 700 and over. [verified] (crates/dispersion) Whether these schools enroll fewer pupils
   with disabilities or merely too few to make a reportable subgroup cannot be settled here: the
   report card publishes those counts at district grain and only for the 607 traditional districts.
   [open]
@@ -153,7 +153,7 @@ findings: |
   ### The intervention ladder has no node
 
   The intervention ladder itself has no node. It is sixteen items ranging from revised improvement
-  plans to closure, and modelling it needs the `intervention` class instantiated per rung rather
+  plans to closure, and modeling it needs the `intervention` class instantiated per rung rather
   than once. [open]
 figures:
   - key: dispersion/community-school-comprehensive-tilt

@@ -9,7 +9,7 @@ used-by:
 
 **Source.** Ohio Department of Education and Workforce, *Historical Scholarship Data*, a workbook
 prepared for posting 23 October 2018 and last touched 2 March 2022.
-**Type.** Primary source, published by the programme administrator. An archival extract rather
+**Type.** Primary source, published by the program administrator. An archival extract rather
 than a report: the department's own note says it was taken from "archive of historical scholarship
 application and usage data prior to the creation of the new Enterprise Application System", and
 that the figures "reflect the data business rules used at the time of archival".
@@ -17,9 +17,9 @@ that the figures "reflect the data business rules used at the time of archival".
 21 KB, six sheets, retrievable by a self-identifying agent with no credentials. Registered as
 `scholarship-historical` and pinned by SHA-256.
 
-**What it contains.** Statewide participation by programme and fiscal year, on four sheets.
+**What it contains.** Statewide participation by program and fiscal year, on four sheets.
 
-| Programme | Years | What is counted |
+| Program | Years | What is counted |
 |---|---|---|
 | Cleveland | FY1997–FY2013 | Applications and payments, each split new/renewal and low-income; plus tutoring grants |
 | EdChoice (Traditional) | FY2007–FY2013 | Applications and payments, each split new/renewal and low-income |
@@ -39,7 +39,7 @@ Funding Plan, where every scholarship is its own funding unit paid directly. Thi
 years when a scholarship was deducted from a resident district's foundation payment, and
 [`deduction`](../skills/deduction.md) recorded that era as a retrieval problem no phase had solved.
 
-And it publishes **two denominators for the same programme-year**. *Application Count* and
+And it publishes **two denominators for the same program-year**. *Application Count* and
 *Scholarships Used (At least 1 payment made)* are separate blocks on every sheet that has both, and
 they are far apart: Cleveland's applications exceed its payments in every one of its seventeen
 years, by **3.1×** in FY1997 and still by 11% in FY2013, and traditional EdChoice's by 9% to 19%.
@@ -54,7 +54,7 @@ Recorded because it is visible in the file's own arithmetic and stated nowhere i
 For Cleveland, **applications-renewal in year *t* equals payments-total in year *t*−1, exactly,
 for twelve consecutive years** — FY1998 through FY2009. FY1998's 1,994 renewals are FY1997's 1,994
 paid scholarships; FY2009's 6,272 are FY2008's 6,272. Twelve exact matches is not a coincidence
-about family behaviour. It is a roll-forward: everyone paid last year was carried into this year's
+about family behavior. It is a roll-forward: everyone paid last year was carried into this year's
 renewal count administratively, whether or not a family did anything.
 
 **It breaks cleanly at FY2010**, the same year the *Renewal and Qualified as Low Income* column
@@ -83,11 +83,11 @@ Sizing the deduct-era channel in dollars still needs a different source.
 
 **It stops at FY2013, and what continues it is not a series.** The annual report picks the channel
 up again at 2024-25. Between them the only participation figures this repository holds are the ones
-LSC quotes in passing — FY2014 for all four programmes in the 131st's greenbook, FY2018 and FY2019
+LSC quotes in passing — FY2014 for all four programs in the 131st's greenbook, FY2018 and FY2019
 in the 133rd's, three of the four prefixed "about" and none saying which denominator it counts on.
 Those bound the hole; they do not fill it.
 
 **Blank and `NA` are different things the fixture cannot tell apart.** Cleveland's tutoring column
-reads `NA` from FY2010 — the department saying the programme's figures are not available — while
+reads `NA` from FY2010 — the department saying the program's figures are not available — while
 the low-income columns before FY2010 are simply empty. Both reach the fixture as absent, because a
 CSV has one way of saying nothing, and neither becomes a zero.

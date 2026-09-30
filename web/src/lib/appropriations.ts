@@ -202,9 +202,9 @@ export function renderAppropriations(
         yield formula cannot be priced from here.</p>
 
       <p class="note">One of those years was appropriated twice. Am. Sub. H.B. 215, the first
-        budget enacted after the Supreme Court held the funding system unconstitutional, itemised
+        budget enacted after the Supreme Court held the funding system unconstitutional, itemized
         FY1998 across fifty-three general revenue lines and FY1999 across <em>one</em> — the whole
-        year in a single item, against a promise to itemise it by January 1998. The promise was
+        year in a single item, against a promise to itemize it by January 1998. The promise was
         kept, and the figure above is the one that governed rather than the one first passed. The
         difference is about $175 million and fifty line items.</p>`
       }

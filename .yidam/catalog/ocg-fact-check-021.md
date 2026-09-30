@@ -33,7 +33,7 @@ nearly double, not modest — while its special-education spending per *total* p
 1.17–1.36 times as high. Per student with a disability the comparison reverses: roughly
 **$12,600** in Toledo against **$18,000–$20,900** in Perrysburg. [inference — the
 special-education dollars are the fact-check's own, from audited statements this corpus does not
-hold, so this is an order-of-magnitude normalisation rather than an audited cost. A 1.94x
+hold, so this is an order-of-magnitude normalization rather than an audited cost. A 1.94x
 population difference against a 1.36x spending difference leaves no room for the sign to return.]
 
 This is the corpus's denominator rule arriving from a new direction: not a need-weighted pupil

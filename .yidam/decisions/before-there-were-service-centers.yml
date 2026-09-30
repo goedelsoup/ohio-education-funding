@@ -51,10 +51,10 @@ consequences: |
   **The bodies that make the orders were themselves consolidating, and the register denies it.**
   Ohio has 86 county boards of education in 1994-95 — the CCD types them 3, *supervisory union
   administrative center*. Thirty-nine of them disappear between 1995-96 and 2001-02, in ones and
-  fives, while multi-county centres appear beside them carrying the departed counties in their own
+  fives, while multi-county centers appear beside them carrying the departed counties in their own
   names: Athens and Meigs leave and Athens-Meigs arrives; Ross and Pike leave and Ross-Pike
   arrives; Guernsey, Monroe and Noble leave and Guernsey-Monroe-Noble arrives. Fourteen such
-  centres join, so type 3 is 61 rather than 47 by 2001-02; sixty of those are recoded to type 4 the
+  centers join, so type 3 is 61 rather than 47 by 2001-02; sixty of those are recoded to type 4 the
   following year and the sixty-first, Carroll-Harrison, leaves. Forty type-3 departures in all.
 
   **Every one of the thirty-nine is filed under code 2** — *"closed with no effect on another
@@ -94,7 +94,7 @@ consequences: |
   2003-04 layout gives the status byte as 281 — which is the metropolitan indicator's position,
   stated four lines above, in the same document, for the same year — and gives it again elsewhere
   as 384. 284 is the one byte the document leaves unaccounted for, and it is where the two
-  neighbouring years put it. The check that settles it is not neighbourliness: at 284 every agency
+  neighboring years put it. The check that settles it is not neighborliness: at 284 every agency
   the file flags closed is absent from the following year, and at 281 that fails immediately. A
   wrong position here would not have errored. It would have yielded a column of plausible small
   integers and a panel in which nothing ever closed.
@@ -137,7 +137,7 @@ consequences: |
   - **2000-01**: 47 agencies move from type 1 to type 7. They are Ohio's first community schools,
     filed as regular school districts for two years. This is the dangerous one — on the type
     alone Ohio appears to gain 47 school districts in 1999-2000 and lose them again.
-  - **2002-03**: 60 supervisory-union centres and 49 joint vocational school districts move into
+  - **2002-03**: 60 supervisory-union centers and 49 joint vocational school districts move into
     type 4 together. Type 3 empties; type 4 goes from nothing to 109.
   - **2006-07**: 376 agencies move from type 2 into type 1. Type 2 empties.
 
@@ -147,8 +147,8 @@ consequences: |
   Types 1 and 2 together: 661 through 1997-98, then 675 and 708 in the two misfiled years, then
   662, then 613 to 622 from 2002-03 once the joint vocational districts leave. The number
   underneath barely moves — 661 less 47 joint vocational districts is 614 in 1994-95, and 619 in
-  2023-24. Meanwhile type 7 goes from 24 county data-processing centres in 1994-95 to 503 agencies
-  in 2005-06 and back to 345. Whatever the community school programme did to Ohio, it did not
+  2023-24. Meanwhile type 7 goes from 24 county data-processing centers in 1994-95 to 503 agencies
+  in 2005-06 and back to 345. Whatever the community school program did to Ohio, it did not
   change the number of school districts.
 
   **Every superseded revision that is still served was compared.** NCES links only the latest

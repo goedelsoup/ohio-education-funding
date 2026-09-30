@@ -2,18 +2,18 @@
 used-by:
   - ../corpus/program/jon-peterson-special-needs.yml
 ---
-# JPSN Annual Report — one programme reporting on itself, for two years
+# JPSN Annual Report — one program reporting on itself, for two years
 
 **Source.** Ohio Department of Education and Workforce, *Jon Peterson Special Needs Scholarship
 Annual Report*, FY23 and FY24 editions, covering the 2022-2023 and 2023-2024 school years.
-**Type.** Primary source, published by the programme administrator under R.C. 3310.51.
+**Type.** Primary source, published by the program administrator under R.C. 3310.51.
 **Location.** `https://education.ohio.gov/getattachment/About/Annual-Reports/FY23_JPSN_Annual_Report.pdf.aspx?lang=en-US`
 and the same path with `FY24`. 535,051 and 507,089 bytes, **six pages each** — a cover and five
 numbered ones — letter size, retrievable by a self-identifying agent. Pinned as `jpsn-annual-2023`
 and `jpsn-annual-2024`.
 
 **What it contains.** The two editions are the same document with the year changed. Table of
-contents; an executive summary naming the programme's origin in 2012 and its eligibility route
+contents; an executive summary naming the program's origin in 2012 and its eligibility route
 through an ETR and an IEP; **Scholarship Award Categories**, which is a six-row table headed
 `FY <year> (July 1, <y-1> – June 30, <y>)` with a `#` column and a *Maximum Dollar Amount per Year*
 column; **Program Participation and Expenditures**, holding a total-applications bar chart, the
@@ -27,7 +27,7 @@ Both cite [R.C. 3310.51](https://codes.ohio.gov/ohio-revised-code/section-3310.5
 [O.A.C. chapter 3301-101](https://codes.ohio.gov/ohio-administrative-code/chapter-3301-101).
 
 The figures this corpus takes from them, beside the FY2025 figures the
-[consolidated report](dew-scholarship-annual-report.md) carries for the same programme:
+[consolidated report](dew-scholarship-annual-report.md) carries for the same program:
 
 | | FY2023 | FY2024 | FY2025 |
 |---|--:|--:|--:|
@@ -37,17 +37,17 @@ The figures this corpus takes from them, beside the FY2025 figures the
 | Expenditure, summed from the chart | $81,773,133.70 | $95,362,957.53 | $103,944,388.15 |
 | Expenditure stated in words | $81,773,133.70 | not stated | not stated |
 
-That is **three consecutive years and this programme's first published year-on-year change**:
+That is **three consecutive years and this program's first published year-on-year change**:
 participation up 4.5% and then 1.5%, providers up faster than students in both years, and districts
 of residence rising once and then falling by one while participation kept growing. The reach
 saturated near the four-fifths of Ohio's districts both editions claim in prose — "nearly 80
-percent" in FY23, "over 80 percent" in FY24 — while the programme kept growing inside it.
+percent" in FY23, "over 80 percent" in FY24 — while the program kept growing inside it.
 
 **Why it matters here.** It is the only thing in this corpus that measures any scholarship
-programme's participation between FY2013 and FY2025. The channel-wide hole the
+program's participation between FY2013 and FY2025. The channel-wide hole the
 [historical archive](dew-scholarship-historical-data.md) and the consolidated report bracket was
 FY2014 through FY2023; these two editions make it FY2014 through **FY2022**, for one of five
-programmes. Four programmes still have nothing in it.
+programs. Four programs still have nothing in it.
 
 ## These two editions were published together, and late
 
@@ -165,10 +165,10 @@ documents cite these breakdowns and nothing this project can fetch carries them.
 three served from the live page as late as June 2023 and gone by June 2024. They are admissible
 under `an-archived-source-is-still-a-source` and are deliberately not extracted here. Between them
 they would add FY2016, FY2017 and FY2020 to a series that currently starts at FY2023, and whether
-they carry labelled charts is unknown.
+they carry labeled charts is unknown.
 
 **It is not the deduct era, and it describes its end.** Both editions' Statewide Expenditures
 section states that scholarships were deducted from the district of residence before the 2021-2022
-school year and that House Bill 110 eliminated the mechanism in favour of direct funding. That is
+school year and that House Bill 110 eliminated the mechanism in favor of direct funding. That is
 the department's own account of what `the-deduct-was-abolished-not-hidden` records, in the
 department's own words, and the figures either side of it are post-deduction throughout.

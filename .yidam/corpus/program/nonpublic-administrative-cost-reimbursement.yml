@@ -5,7 +5,7 @@ summary: >-
   Ohio's mandates — $75.3 million in FY2025, against actual costs and up to a per-pupil ceiling the
   appropriation has not reached since the ceiling was raised.
 description: |
-  GRF line item 200532, authorised by R.C. 3317.063 and established by H.B. 694 of the 114th
+  GRF line item 200532, authorized by R.C. 3317.063 and established by H.B. 694 of the 114th
   General Assembly. The state annually repays each chartered nonpublic school "for the actual
   mandated service administrative and clerical costs incurred by such school during the preceding
   school year" — the cost of keeping the records, filing the reports and administering the tests
@@ -25,7 +25,7 @@ description: |
   The consequence is that the line has a slack a quotient cannot have. A direct appropriation's
   rate is whatever the division comes to, so it is never rationed and never underspent; a
   reimbursement against a ceiling can be either, and in FY2025 it was rationed — the General
-  Assembly authorised $475 per student and the appropriation stretched to $440.
+  Assembly authorized $475 per student and the appropriation stretched to $440.
 
   Both lines are paid to the same schools, in the same year, out of the same category of the
   department's budget, and neither is a scholarship: no family applies, no district is deducted,
@@ -86,7 +86,7 @@ properties:
   amount: |
     Actual prior-year mandated administrative and clerical costs, capped at a per-pupil amount the
     General Assembly sets: $475 for FY2024 through FY2027. [verified] What was actually payable is
-    lower — the FY2025 appropriation supported $440 per student, 7.37% below the authorised rate.
+    lower — the FY2025 appropriation supported $440 per student, 7.37% below the authorized rate.
     [verified] What individual schools claimed, and how many were held to the cap rather than to
     their own costs, is not held. [open]
   appropriation_line: |
@@ -159,4 +159,4 @@ links:
       repayment of any excess.
   - target: ../../catalog/lsc-dew-redbook.md
     relationship: sourced-from
-    note: The $475 authorised rate and the $440 the FY2025 appropriation supported.
+    note: The $475 authorized rate and the $440 the FY2025 appropriation supported.

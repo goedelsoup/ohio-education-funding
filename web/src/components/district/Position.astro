@@ -43,7 +43,7 @@ const { bundle, district: d, valuations, expenditures } = Astro.props;
   <h2><SectionAnchor id="position" />Position among Ohio's {bundle.statewide.districts} districts<Fragment set:html={yearChip("profile")} /></h2>
   <p class="note">The middle half of Ohio's districts is the shaded box, the line inside it is
     the median, and the whiskers reach the last district within one and a half times the
-    box's width. Anything drawn past them is its own district. The coloured rule is this one.</p>
+    box's width. Anything drawn past them is its own district. The colored rule is this one.</p>
   <Strip
     label="Assessed valuation per pupil"
     value={d.valuation_per_pupil}

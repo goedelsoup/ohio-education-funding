@@ -1,6 +1,6 @@
 id: school-improvement-connector
 summary: >-
-  dew-school-improvement, three identification lists wired — the corpus had modelled the regime,
+  dew-school-improvement, three identification lists wired — the corpus had modeled the regime,
   the trigger and the intervention before it could name one identified school, and the building
   DeRolph is named for is on the list.
 context: |
@@ -54,7 +54,7 @@ consequences: |
   build. That cell is now the only place the escalation path is legible per school.
 alternatives: |
   **Fold the lists into `dew-report-card`.** Rejected, above: same publisher, opposite archiving
-  behaviour, and one `still_blocked` string cannot describe both.
+  behavior, and one `still_blocked` string cannot describe both.
 
   **Wait for an archived cycle before wiring anything.** Rejected: the snapshot is the only thing
   the department publishes, and refusing it would have left the accountability nodes unable to name

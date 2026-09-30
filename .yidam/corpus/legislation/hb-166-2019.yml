@@ -24,7 +24,7 @@ description: |
     education, catastrophic cost — the department must use the district's **FY2019** index.
     [verified]
 
-  **The new money went somewhere else.** Student wellness and success funds, an enrolment growth
+  **The new money went somewhere else.** Student wellness and success funds, an enrollment growth
   supplement, and quality community schools support are paid alongside the frozen foundation
   amount rather than through it. A biennium that adds money without touching the formula is
   choosing not to redistribute: every district's share of foundation aid is whatever its share was
@@ -39,7 +39,7 @@ findings: |
 
   It does. **FY2020 is FY2019, carried forward unchanged by this act.** So `[H2]` is not the output
   of a formula run in FY2020; it is the output of H.B. 49's formula run in FY2019, on FY2019
-  enrolment and a FY2019 state share index, preserved by a statute that declined to recompute.
+  enrollment and a FY2019 state share index, preserved by a statute that declined to recompute.
   [verified]
 
   ### And the corpus's own appropriation series shows it, in a fixture that was already committed
@@ -78,7 +78,7 @@ properties:
     Enacted the FY2020-21 operating budget. Ran no school funding formula: every traditional
     district and JVSD received its FY2019 foundation aid allocation in both years, with the formula
     amount held at $6,020, the state share index held at FY2019, and per-pupil deduction rates held
-    at FY2019. Created the student wellness and success funds, an enrolment growth supplement, and
+    at FY2019. Created the student wellness and success funds, an enrollment growth supplement, and
     quality community schools support, all outside the frozen amount.
   vetoes: |
     Four, and the first is a per-pupil floor that would have begun in the Fair School Funding
@@ -102,7 +102,7 @@ properties:
     and a study committee.
   accountability_effect: |
     Carried academic distress commission provisions, end-of-course examination and graduation
-    requirement changes, and industry-recognised credential provisions.
+    requirement changes, and industry-recognized credential provisions.
 
     **And its freeze severed the link between a district's report card and its money, while leaving
     that link running for community and STEM schools.** Every traditional district and JVSD
@@ -114,7 +114,7 @@ properties:
 
     For two years the only Ohio schools whose funding still moved with their own report card were
     community and STEM schools, on the version of the bonus that had never carried the state share
-    index. That un-equalised form is the one Ohio readopted in FY2026. See
+    index. That un-equalized form is the one Ohio readopted in FY2026. See
     [Ohio report card](../accountability-regime/ohio-report-card.yml) and
     [performance supplement rate](../parameter/performance-supplement-rate.yml).
 links:

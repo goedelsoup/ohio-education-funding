@@ -126,7 +126,7 @@ export const DENOMINATORS = {
     field: "districts[].national.revenue_per_pupil",
   },
   "census-fall-enrollment": {
-    label: "Fall enrolment",
+    label: "Fall enrollment",
     source: "U.S. Census Bureau, F-33",
     note: "The federal survey's own count, on its own definitions, for every state.",
     field: "national.states[].enrollment",
@@ -152,7 +152,7 @@ export const DENOMINATORS = {
     label: "Fall membership, `V33`, per year",
     source: "U.S. Census Bureau / NCES, School District Finance Survey (F-33)",
     series: "history",
-    note: "The same measure as `f33-fall-membership` and a different population: every comparable Ohio system in each year of the panel rather than one district in a single year, so about 950 agencies including community schools and educational service centres. Nothing on the history route may be compared to a figure from the formula side, which counts 609 traditional districts on ADM.",
+    note: "The same measure as `f33-fall-membership` and a different population: every comparable Ohio system in each year of the panel rather than one district in a single year, so about 950 agencies including community schools and educational service centers. Nothing on the history route may be compared to a figure from the formula side, which counts 609 traditional districts on ADM.",
     field: "history[].poorest_local_per_pupil",
   },
 } as const;

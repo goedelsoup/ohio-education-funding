@@ -53,7 +53,7 @@ decision: |
 
   **Tables follow one rule.** Where the rows or columns are on one year, the chip carries it and
   the table does not repeat it. Where they are on more than one, **every** row says which.
-  Half-labelling is worse than none, because it implies the unlabelled rows share the labelled
+  Half-labeling is worse than none, because it implies the unlabeled rows share the labeled
   one's year.
 
   **A defined term is the trigger, with a dotted underline** — not a `(?)` beside it. It renders
@@ -119,6 +119,6 @@ alternatives: |
   it: a definition that needs a bundle to appear is a definition most crawlers and some readers
   never get.
 
-  **Colour the chips by reckoning.** Rejected. A tax year and a fiscal year are equally
-  authoritative, and colouring one would imply a hierarchy that is not there. The distinction is
+  **Color the chips by reckoning.** Rejected. A tax year and a fiscal year are equally
+  authoritative, and coloring one would imply a hierarchy that is not there. The distinction is
   carried by the label and spelled out in the title.

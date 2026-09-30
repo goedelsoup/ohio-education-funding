@@ -24,7 +24,7 @@ description: |
   communities that had already lost the underlying tax base by state decision six years earlier
   — a second withdrawal from the same places. [inference]
 
-  This is also the act that makes the case for modelling regimes and reimbursements separately.
+  This is also the act that makes the case for modeling regimes and reimbursements separately.
   A district in an industrial county experienced FY2012 as three simultaneous reductions — the
   formula freeze, the stimulus expiry, and the reimbursement phase-out — none of which appears
   in a base cost figure. [inference]
@@ -32,7 +32,7 @@ description: |
   Appropriation totals, the exact reimbursement phase-out schedule, and the number of districts
   affected are not yet recorded. [open]
 findings: |
-  ### The mechanism, which the corpus had only ever characterised
+  ### The mechanism, which the corpus had only ever characterized
 
   LSC's greenbook states it in formula boxes. Aid in FY2012 and FY2013 is **a per-pupil amount
   carried from FY2011, adjusted for property wealth, applied to the current year's pupils** —
@@ -55,7 +55,7 @@ findings: |
       supplemental allocation     = FY2011 total state aid MINUS its federal stimulus portion,
                                     less the total allocation, where that is positive
 
-  Three things follow that the characterisation did not carry. The adjustment is **indexed to
+  Three things follow that the characterization did not carry. The adjustment is **indexed to
   property wealth**, not to total resources. The uniform statewide adjustment is **set to fit the
   appropriation**, so the formula is solved backwards from the money available rather than forwards
   from a cost. And the floor is **FY2011 aid net of the federal stimulus**, so the one-time money is
@@ -87,15 +87,15 @@ revisions:
       Wealth-indexed, not resource-proportional, and not a freeze. Each district's FY2011 aid *per
       pupil* is carried forward, adjusted by where its charge-off valuation per pupil sits against
       the statewide median, and multiplied by current-year ADM — so a district's allocation moved
-      with its own enrolment every year. The freeze is the floor underneath it, and the floor is
+      with its own enrollment every year. The freeze is the floor underneath it, and the floor is
       FY2011 aid net of federal stimulus.
     found_by: |
       LSC's greenbook for the act, which states each step as a formula box. It was retrieved only
       when the greenbook series was completed across all twelve General Assemblies; before that the
       corpus had the act's appropriation table and no account of what the act did.
     reach: |
-      The characterisation was a reasonable reading of the effect and it hid the mechanism. Two
-      things depended on the difference: that a Bridge-era district's aid tracked its enrolment,
+      The characterization was a reasonable reading of the effect and it hid the mechanism. Two
+      things depended on the difference: that a Bridge-era district's aid tracked its enrollment,
       which a freeze would not do, and that the statewide adjustment is solved to fit the
       appropriation, which makes this the one formula in the corpus that runs backwards from
       available money. It also fixes the depth of the anchor chain at FY2011.

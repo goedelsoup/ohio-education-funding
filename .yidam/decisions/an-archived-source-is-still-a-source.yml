@@ -39,7 +39,7 @@ decision: |
   survives rather than about what the document is.
 
   **The rule this establishes.** An archived URL is admissible when three things hold, and all
-  three are recorded on the source rather than left to judgement:
+  three are recorded on the source rather than left to judgment:
 
     1. The publisher no longer serves the file at any address, and the reason is the publisher's
        release model rather than a transient failure.
@@ -58,7 +58,7 @@ decision: |
   That is a stronger claim than any live source in this registry currently makes about itself,
   which is the appropriate asymmetry: an archived source should have to prove more.
 
-  **What is not approved.** Not a general licence to prefer the archive. A live publisher URL is
+  **What is not approved.** Not a general license to prefer the archive. A live publisher URL is
   used wherever one exists, and `verify` continues to check the live sources against their
   digests. Not the FY2025 **traditional** calculator, which is unrecoverable and stays that way
   in the record — the catalog entry names its length so a later reader does not spend the

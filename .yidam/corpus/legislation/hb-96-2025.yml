@@ -87,7 +87,7 @@ findings: |
 
   Nothing in what districts were paid turns on any of this: the department computes both terms and
   [`crates/local-capacity`](../../../crates/local-capacity/) reproduces its published per-pupil
-  capacity for 609 of 609 districts. The item is a fact about what the text authorises. [verified]
+  capacity for 609 of 609 districts. The item is a fact about what the text authorizes. [verified]
 
   ### The enacted foundation totals
 
@@ -228,7 +228,7 @@ properties:
     inputs rather than refreshing them. [verified] (the enacted act and the LSC Greenbook, both
     committed)
   vetoes: |
-    67 line items vetoed before signing. [verified] One of them is an education programme, and the
+    67 line items vetoed before signing. [verified] One of them is an education program, and the
     greenbook names it. [verified] (`crates/project/fixtures/dew-greenbook.txt`)
 
     The act established the **Nonchartered Educational Savings Account Program**, to begin in the

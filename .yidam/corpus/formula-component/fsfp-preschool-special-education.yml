@@ -13,7 +13,7 @@ description: |
   Only the
   weighted half is reduced by a district's wealth. So this is the one component in Ohio's school
   funding where the wealthiest district and the poorest are funded **identically** for most of what
-  they receive. Whether that is deliberate levelling or an artefact of bolting a flat grant onto a
+  they receive. Whether that is deliberate leveling or an artifact of bolting a flat grant onto a
   weighted formula is not established. [open]
 
   ### The same six weights behave completely differently here
@@ -132,5 +132,5 @@ revisions:
     reach: |
       The mechanism this node describes is unaffected — the flat grant, the halving and the six
       weights are all statutory. What changes is the claim that the appropriation binds: it does
-      not, on the year being modelled. A withdrawal recorded in one node does not reach a second
+      not, on the year being modeled. A withdrawal recorded in one node does not reach a second
       node that repeats the claim, which is the defect worth naming rather than the figure.

@@ -34,19 +34,19 @@ findings: |
   ### Why nothing here had ever found a joint vocational district
 
   The federal directory does not type one as a district. It types it `4`, a **regional education
-  service agency** — the same code Ohio's educational service centres carry. **100 agencies hold
-  that code and 49 are joint vocational districts**; the other 51 are service centres. A reader
+  service agency** — the same code Ohio's educational service centers carry. **100 agencies hold
+  that code and 49 are joint vocational districts**; the other 51 are service centers. A reader
   filtering on district type gets none of them and a reader filtering on `4` gets half a list of
   something else. [verified]
   ([`crates/project`](../../../crates/project/tests/the_joint_vocational_district_the_corpus_held_nothing_about.rs))
 
   Two independent routes split the hundred and select the same forty-nine: the name, because a
-  service centre says so, and the levy, because a joint vocational district charges property tax
-  and a service centre does not — so exactly 49 of the 100 appear in the Auditor's district
+  service center says so, and the levy, because a joint vocational district charges property tax
+  and a service center does not — so exactly 49 of the 100 appear in the Auditor's district
   finances at all. [verified] That is the whole of Ohio's joint vocational sector, nameable from
   fixtures this repository already reads.
 
-  ### The funding series and the enrolment
+  ### The funding series and the enrollment
 
   Six closed fiscal years, FY2020 through FY2025, from the Auditor's district finances: property
   tax from $16.0m to **$25.9m**, unrestricted state aid from $5.7m to **$12.1m**. State aid more
@@ -54,13 +54,13 @@ findings: |
   rose over the six years — a statement that needs both halves, and the node held neither.
   [verified]
 
-  Enrolment is two years of the Census F-33 panel: **1,160** in FY2023 and 1,354 in FY2024, with
+  Enrollment is two years of the Census F-33 panel: **1,160** in FY2023 and 1,354 in FY2024, with
   total revenue rising from $35.0m to $42.9m. [verified]
 
-  **And the enrolment is exactly the trap this node's description warns about.** Current spending
+  **And the enrollment is exactly the trap this node's description warns about.** Current spending
   over that count gives **$20,869** per pupil in FY2024 against a comparable-district median of
   $15,426 — thirty-five per cent higher, on a head count that is not full-time equivalent because
-  these students are enrolled in their home districts too. The ratio is an artefact of the
+  these students are enrolled in their home districts too. The ratio is an artifact of the
   denominator, and it is what a roll-up that treated a joint vocational district as a district
   would publish. [verified]
 
@@ -131,11 +131,11 @@ revisions:
     now: |
       Three of the four are populated: the agency is one of Ohio's 49 joint vocational districts
       in the federal directory, the funding series is six closed fiscal years of the Auditor's
-      finances, and the enrolment is two years of the Census F-33 panel. The member district list
+      finances, and the enrollment is two years of the Census F-33 panel. The member district list
       is still not held, and is now bounded rather than absent.
     found_by: |
       Asking what the CCD types a joint vocational district as. It is `4`, a regional education
-      service agency — the code Ohio's educational service centres carry — so every reader here
+      service agency — the code Ohio's educational service centers carry — so every reader here
       that filtered on a district type had been skipping them, and every fixture that holds them
       holds them under a code half of which is something else.
     reach: |

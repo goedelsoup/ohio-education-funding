@@ -279,7 +279,7 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
         thirty; on a linear axis nine districts in ten sit in the left-hand third.</p>
       <div class="chartwrap" data-chart="wealth-offset">${renderToString(scatter, { label: `State aid per pupil against assessed valuation per pupil, one dot for each of ${count(points.length)} districts, with median lines for formula aid and aid as received, both axes logarithmic, FY${bundle.fiscal_year}` })}</div>
       <p class="note"><strong>The gap between the two lines is what the guarantee costs the
-        equalisation.</strong> It is ${money(gapPoorest)} per pupil among the least wealthy tenth
+        equalization.</strong> It is ${money(gapPoorest)} per pupil among the least wealthy tenth
         of districts and ${money(gapWealthiest)} among the wealthiest — the formula would pay the
         wealthy districts least, and the guarantee is what stops it. Which districts those are is
         the card above this one. Read as correlations against
@@ -583,7 +583,7 @@ export function renderFundingUnits(units: FundingUnits | null): string {
         does not total the categories. The ${millions(
           derived.reduce((sum, u) => sum + u.derived, 0),
         ).replace("+", "")} shown for it is that sum, computed here. The department's own
-        four-programme total, which excludes it, is ${millions(
+        four-program total, which excludes it, is ${millions(
           units.units
             .filter((u) => u.basis === "report")
             .reduce((sum, u) => sum + u.amount - u.derived, 0),

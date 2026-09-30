@@ -36,14 +36,14 @@ decision: |
   **What no declaration names is read as words.** Most relationships are undeclared on purpose
   (`edge_policy: characteristic`); `instance-of` and `sourced-from` are conventions no class
   declares; `fy2027_scale` is one of a family of observation keys matched by pattern. Each is
-  shown with its separators as spaces and its first letter capitalised, and a leading fiscal year
+  shown with its separators as spaces and its first letter capitalized, and a leading fiscal year
   kept in the key's own form — "FY2027 scale". The one thing the fallback may not return is the
   key.
 consequences: |
   **A new declaration costs one line more**, and fails `web/tests/unit/schema.spec.ts` without it.
 
   **Two tests hold the rule from both ends.** `web/tests/unit/ontologyLabels.spec.ts` holds the
-  declarations — every one labelled, no label its own key, one slug one label.
+  declarations — every one labeled, no label its own key, one slug one label.
   `web/tests/dist/wikiKeys.spec.ts` holds the build — no key or bare slug in a property or
   relationship position on any wiki page.
 
@@ -54,7 +54,7 @@ consequences: |
   **Upstream is asked for the field.** Until yidam's ontology types carry a label, `yidam`'s own
   output (its MCP tools, its lint messages) keeps printing keys.
 alternatives: |
-  **Humanise every key and declare nothing.** Covers most of the vocabulary and none of the
+  **Humanize every key and declare nothing.** Covers most of the vocabulary and none of the
   keys worth a label: `effective_note` would read "Effective note", which is what the key already
   said and not what it holds.
 

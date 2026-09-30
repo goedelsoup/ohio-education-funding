@@ -106,7 +106,7 @@ findings: |
   earn the same performance rating" is satisfied on the achievement component with room to
   spare — the modal rating is four stars at 227 of 607, or 37.4%. [verified] (computed) It is a
   weak constraint, and the same column shows why: on that component three districts hold one
-  star and 91 hold five. Nothing in the section requires the scale to be centred, only that it
+  star and 91 hold five. Nothing in the section requires the scale to be centered, only that it
   not collapse, and the corpus holds no year in which any component came close to collapsing.
 
   ### What a rating has bought, and how often
@@ -133,20 +133,20 @@ findings: |
   5 of the 6 are formula components; the first two rows reach a district's money without passing
   through the formula at all. [verified]
 
-  **The direction reversed and then the equaliser went.** Closing the Achievement Gap paid more
+  **The direction reversed and then the equalizer went.** Closing the Achievement Gap paid more
   where more buildings were rated badly, and only to districts whose poverty index was 1.0 or
   above — thirty-one qualified. The bonuses paid more where results were better, at fifty times
   the rate, and multiplied by the state share index, which makes a payment larger in a poorer
   district. The supplement now in force pays on results and multiplies by no wealth term at all.
   [verified] (crates/project, `rating_payments`, pinned by test)
 
-  **The un-equalised form is the one that survived.** H.B. 166's freeze held every district and
+  **The un-equalized form is the one that survived.** H.B. 166's freeze held every district and
   JVSD at its FY2019 foundation aid, so a district's bonus stopped moving with its report card,
   while requiring community and STEM schools' bonuses to be recalculated each year at a frozen
   formula amount. That version had never used the state share index — LSC calls it *"identical to
   the calculation of the payment for traditional districts except that it does not use the state
   share index"* — so for two years the only Ohio schools whose funding moved with their own
-  results were charters and STEM schools, on the un-equalised calculation Ohio then readopted for
+  results were charters and STEM schools, on the un-equalized calculation Ohio then readopted for
   everyone. [verified]
 
   What that costs is measured at
@@ -222,7 +222,7 @@ properties:
   effective: |
     In its current form from the 2022-23 report cards, when star ratings replaced letter grades.
     Ohio has published report cards in some form since well before that; the earlier eras are not
-    modelled here.
+    modeled here.
 revisions:
   - was: |
       The rating-payments table gave the FY2026-27 performance supplement's rate as "$13 a pupil,
@@ -240,9 +240,9 @@ revisions:
       section of the Revised Code" framing is unaffected, because 265.239 is uncodified.
 unfilled:
   - field: the components other than performance index and progress
-    why: Early literacy, graduation and chronic absenteeism are named in the section and not modelled here.
+    why: Early literacy, graduation and chronic absenteeism are named in the section and not modeled here.
   - field: the earlier report-card eras
-    why: Ohio published report cards long before 2022-23; only the current form is modelled.
+    why: Ohio published report cards long before 2022-23; only the current form is modeled.
 links:
   - target: ../accountability-regime.ont.yml
     relationship: instance-of

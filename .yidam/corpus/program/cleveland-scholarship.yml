@@ -21,36 +21,36 @@ description: |
   challenge](../litigation/vouchers-hurt-ohio-2025.yml). [inference]
 
   **It is not charged against Cleveland's funding.** Under the Fair School Funding Plan the
-  programme is the **pilot project scholarship unit**, one of six funding units R.C. 3317.022
+  program is the **pilot project scholarship unit**, one of six funding units R.C. 3317.022
   pays directly rather than a deduction from the district's foundation payment. [verified]
 revisions:
   - was: |
       The node carried `mechanism: deduction` flatly, from its seeding.
     now: |
       It is **not** charged against Cleveland's funding. Under the Fair School Funding Plan the
-      programme is the **pilot project scholarship unit**, one of six funding units R.C.
+      program is the **pilot project scholarship unit**, one of six funding units R.C.
       3317.022 pays directly.
     found_by: |
       R.C. 3317.022, read against the FY2027 calculator's funding units.
     reach: |
-      The old value was a reasonable reading of the programme's deduct-era history and wrong
+      The old value was a reasonable reading of the program's deduct-era history and wrong
       about the law in force. Which era a scholarship's mechanism is described from decides
       whether the resident district loses the money, so the two must be dated rather than
       merged. The deduct-era mechanism is now recorded on `mechanism`, and it turns out not to
       have been the per-pupil deduction the old value implied.
 findings: |
-  ### The department's archive gives this programme seventeen years, and one of its columns
+  ### The department's archive gives this program seventeen years, and one of its columns
   ### changes meaning in the middle
 
-  The 2025 annual report was the only participation figure the corpus held for this programme.
+  The 2025 annual report was the only participation figure the corpus held for this program.
   The department's *Historical Scholarship Data* workbook carries it from **FY1997**, the
-  programme's first year, and counts it two ways in every one of them: applications made, and
+  program's first year, and counts it two ways in every one of them: applications made, and
   scholarships with at least one payment against them. [verified]
   ([`crates/project`](../../../crates/project/tests/the_renewal_that_was_last_years_payments.rs))
 
   The two are far apart. FY1997 records 3.1 applications for every scholarship actually paid, and
   even FY2013 records 1.1. [verified] (crates/project) So a participation figure taken off the
-  wrong column overstates the early programme threefold, and the report's own unexplained average
+  wrong column overstates the early program threefold, and the report's own unexplained average
   — recorded on [`edchoice-scholarship`](edchoice-scholarship.yml) — is a denominator question of
   exactly this kind.
 
@@ -68,7 +68,7 @@ findings: |
   the two verified findings above it, and both halves of it are held. [verified]
   ([`crates/project`](../../../crates/project/tests/the_renewal_that_was_last_years_payments.rs))
 
-  ### And the programme's existence is what keeps Cleveland off the EdChoice designated list
+  ### And the program's existence is what keeps Cleveland off the EdChoice designated list
 
   R.C. 3310.03 makes a student ineligible for traditional EdChoice whose "resident district is
   not a school district in which the pilot project scholarship program is operating", and directs
@@ -77,7 +77,7 @@ findings: |
   covers 606 districts, and the one it does not cover is Cleveland Municipal. [verified]
   ([`crates/dispersion`](../../../crates/dispersion/tests/the_condition_the_designated_list_does_not_state.rs))
   R.C. 3310.032 carries the same exclusion, so a Cleveland resident is outside both EdChoice
-  programmes rather than only the building-based one. [verified]
+  programs rather than only the building-based one. [verified]
 
 figures:
   - key: project/cleveland-roll-forward-years
@@ -99,14 +99,14 @@ properties:
     **Direct payment as the pilot project scholarship unit. Not a deduction.** [verified]
     (R.C. 3317.022, R.C. 3313.975)
 
-    The statute never names Cleveland. R.C. 3313.975(A) has the director implement the programme in
+    The statute never names Cleveland. R.C. 3313.975(A) has the director implement the program in
     "any school districts that are or have ever been under federal court order requiring
     supervision and operation" — a definition by history rather than by name, which is why the
-    programme survives as a single-district one without saying so. [verified]
+    program survives as a single-district one without saying so. [verified]
 
-    **The deduct-era mechanism was not the other programmes' deduct.** Autism and Jon Peterson
+    **The deduct-era mechanism was not the other programs' deduct.** Autism and Jon Peterson
     kept the scholarship student in the resident district's ADM and took the award out of that
-    district's aid, so what was deducted followed a pupil. This programme inverted both halves:
+    district's aid, so what was deducted followed a pupil. This program inverted both halves:
     "Scholarship students are not counted in Cleveland's ADM for funding purposes", stated in
     every greenbook from H.B. 119 of the 127th to H.B. 166 of the 133rd, so there was no pupil in
     the formula for a deduction to follow. What was deducted was a fixed earmark of the district's
@@ -114,11 +114,11 @@ properties:
     carried forward from budget to budget at its previous level. [verified]
     ([`crates/project`](../../../crates/project/tests/the_deduction_the_scholarships_were_paid_by.rs))
 
-    And the deduction was only ever part of it: LSC writes that the programme is "*partially*
-    supported through a deduction". The FY2008-09 analysis itemises the two channels separately —
-    a GRF appropriation for the programme, beside a deduction that in that biennium came out of
+    And the deduction was only ever part of it: LSC writes that the program is "*partially*
+    supported through a deduction". The FY2008-09 analysis itemizes the two channels separately —
+    a GRF appropriation for the program, beside a deduction that in that biennium came out of
     the district's **poverty-based assistance** rather than out of foundation funding generally.
-    The aid the deduction was taken from moved over the programme's life; the two-channel shape
+    The aid the deduction was taken from moved over the program's life; the two-channel shape
     did not. [verified] (the greenbooks for H.B. 119 of the 127th and H.B. 166 of the 133rd)
 
     What is still open is the year-by-year size of the deduction before FY2020, which
@@ -126,12 +126,12 @@ properties:
   eligibility: |
     Students residing in the Cleveland Metropolitan School District — reached in statute through
     the federal-court-supervision definition in R.C. 3313.975(A) rather than by name — subject to
-    income-based priority in awarding. Created in 1995 as a pilot initiative; authorised under
+    income-based priority in awarding. Created in 1995 as a pilot initiative; authorized under
     R.C. 3313.974 through 3313.979. [verified] (R.C. 3313.975; 2025 Scholarship Annual Report)
   amount: |
     **FY2025: 8,345 students, $55,155,295.70, average award as published $6,836.35.** [verified]
     (2025 Scholarship Annual Report) Expenditure over participation is $6,609.38; the same
-    unexplained gap the other programmes show, recorded on
+    unexplained gap the other programs show, recorded on
     [`edchoice-scholarship`](edchoice-scholarship.yml). [open]
 
     Statutory bound: the lesser of the alternative school's net tuition charges, or **$5,500** for
@@ -171,12 +171,12 @@ links:
   - target: ../../catalog/dew-scholarship-annual-report.md
     relationship: sourced-from
     note: >-
-      The administrator's own account of the programme, and where this node's participation and
+      The administrator's own account of the program, and where this node's participation and
       expenditure figures for 2024-2025 come from.
   - target: ../../catalog/ohio-revised-code.md
     relationship: sourced-from
     note: >-
-      The authorising sections this node cites by number — eligibility, the award, and the
+      The authorizing sections this node cites by number — eligibility, the award, and the
       deduction that pays for it.
   - target: ../../catalog/dew-scholarship-historical-data.md
     relationship: sourced-from

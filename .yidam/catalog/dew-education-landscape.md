@@ -13,12 +13,12 @@ restating them.
 About 1.1 MB, two pages, retrievable without credentials. Registered as
 `education-landscape-2024` and pinned by SHA-256.
 
-**What it contains.** Statewide counts for 2023-2024: enrolment by race and by diverse-learner
+**What it contains.** Statewide counts for 2023-2024: enrollment by race and by diverse-learner
 category, district settings, school types, educator licensure and demographics, and — the table
 this corpus takes — **School Options**, which counts every way an Ohio child is schooled other
 than in a traditional district classroom.
 
-| Channel | Enrolment |
+| Channel | Enrollment |
 |---|--:|
 | Chartered Private Schools (711 of them) | 173,156 |
 | Public Vouchers for Private School | 150,914 |
@@ -38,7 +38,7 @@ The sheet also prints **Total Enrollment 1,665,521** for the same year, which is
 fixture's last row rather than quoted — a denominator nothing recomputes is the transcription this
 repository keeps finding wrong.
 
-**It is not a total of the table above it.** That figure is Ohio's *public* enrolment: the
+**It is not a total of the table above it.** That figure is Ohio's *public* enrollment: the
 community schools are inside it, and home education, the chartered private schools and the
 voucher students attending them are not. A share taken against it is a ratio to the public
 system, which is the comparison the corpus makes; a share of all Ohio children would need a
@@ -60,12 +60,12 @@ the only place in the corpus that does not.
 
 ## Two internal identities, and one cross-source check
 
-The five voucher programmes sum to the voucher total exactly — 41,234 + 88,095 + 8,028 + 8,551 +
+The five voucher programs sum to the voucher total exactly — 41,234 + 88,095 + 8,028 + 8,551 +
 5,006 = 150,914 — and the two community-school types sum to theirs — 83,959 + 33,014 = 116,973.
 Both are asserted where the fixture is read, because a layout change that shifted a column would
 break them and nothing else would notice.
 
-The five programmes also appear in the
+The five programs also appear in the
 [2025 Scholarship Annual Report](dew-scholarship-annual-report.md), for the *following* school
 year. Every one is larger there, which is the corroboration that matters: two independent
 department publications, consecutive years, the same five names, all moving the same way.

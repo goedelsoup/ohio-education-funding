@@ -47,7 +47,7 @@ decision: |
   source that settled it — 67 of them across 36 nodes. That is the node saying something.
 
   **A property is prose when the class declared it `type: text`, with three exceptions.** 51 of
-  54 flagged, and the rule is the corpus's own vocabulary rather than a judgement made 54 times:
+  54 flagged, and the rule is the corpus's own vocabulary rather than a judgment made 54 times:
   `text` is what this corpus already writes when a value is sentences, `string` is what it writes
   when a value is a name, a code or a path. The three excluded are named here rather than left to
   a reader to notice:

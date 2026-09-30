@@ -27,12 +27,12 @@ genuine 404. **There is no 2012 edition either**, which is less obvious: that UR
 returns a PDF, and it is the 2011 document byte for byte. See *One document, two names* below.
 
 **What one entry contains.** Per appropriation line item: the fund, the six-digit line number, the
-name, six fiscal years of money with each year labelled, the authorising act, and a prose statement
+name, six fiscal years of money with each year labeled, the authorizing act, and a prose statement
 of what the line pays for.
 
 ## Why this is the source the appropriation series needed
 
-**It carries the enacted appropriation and the actual expenditure in adjacent labelled columns.**
+**It carries the enacted appropriation and the actual expenditure in adjacent labeled columns.**
 That is the defect that reverted the greenbook workbook attempt: there, the variant carrying actuals
 *superseded* the enacted column and stated the enacted figure nowhere, so a whole biennium produced
 zero appropriation rows without failing. Here the two claims sit side by side, each under its own
@@ -42,7 +42,7 @@ heading.
 line-item table at all, is in the 2006 edition. FY2012-13, whose two workbook variants LSC serves as
 one file, is in the 2011 edition.
 
-**It names the act.** A `Legal Basis` line gives the sections and act authorising the line this
+**It names the act.** A `Legal Basis` line gives the sections and act authorizing the line this
 biennium *and* the act that originally established it — `Sections 265.10, 265.210 … of H.B. 166 of
 the 133rd G.A. (originally established by H.B. 66 of the 126th G.A.)`. All 2,008 extracted line
 items carry one.

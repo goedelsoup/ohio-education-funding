@@ -118,8 +118,8 @@ export function renderLineOrigins(lines: AppropriationLine[]): string {
       <p class="note">${undated} of these lines name no establishing act. The Catalog gives every
         line a legal basis and only sometimes says which act created it; where it does not, this
         says nothing rather than reading an origin off an earlier edition with the same number.
-        Line item numbers are reused — one number in this series names three different programmes
-        across three funds — so inheriting an origin down a number would attribute one programme's
+        Line item numbers are reused — one number in this series names three different programs
+        across three funds — so inheriting an origin down a number would attribute one program's
         founding act to another's, and the table would look complete.</p>
 
       <p class="note">A discontinued line is the publisher's own label and not a finding about

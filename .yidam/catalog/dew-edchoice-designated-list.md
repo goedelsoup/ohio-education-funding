@@ -7,7 +7,7 @@ used-by:
 
 **Source.** Ohio Department of Education and Workforce, *Designated List 2026-2027, With
 Criteria*.
-**Type.** Primary source, published by the programme administrator. An eligibility determination
+**Type.** Primary source, published by the program administrator. An eligibility determination
 rather than a report: this file *is* the designation, not a description of one.
 **Location.** `https://education.ohio.gov/getattachment/Topics/Other-Resources/Scholarships/EdChoice-Scholarship/EdChoice-Resources/Designated-List-2026-2027-With-Criteria.xlsx.aspx?lang=en-US`.
 876 KB, eight sheets, retrievable by a self-identifying agent with no credentials. Registered as
@@ -77,7 +77,7 @@ dating.
 **What the staleness costs is nothing, and that is worth stating as precisely as the defect.** All
 five East Cleveland buildings also satisfy Option B — bottom twenty per cent in two of three
 rankings, Title I average 48.9% — so they are designated on the derived route regardless. Recomputing
-the designation while honouring Option A only for Youngstown leaves all 513 designations standing.
+the designation while honoring Option A only for Youngstown leaves all 513 designations standing.
 The entire load-bearing surface of the unreproduced column is **two buildings**, both Youngstown's
 Rayen Early College schools, and Youngstown's commission is the one that still exists.
 
@@ -177,7 +177,7 @@ and the reason is statutory rather than clerical. R.C. 3310.03 opens by making a
 only if "the student's resident district is not a school district in which the pilot project
 scholarship program is operating", and closes division (A)(1) by directing that "when ranking
 school buildings … the department shall not include buildings operated by" such a district.
-Cleveland is the pilot project district — it has a scholarship programme of its own, catalogued in this corpus
+Cleveland is the pilot project district — it has a scholarship program of its own, cataloged in this corpus
 as `cleveland-scholarship` — so no Cleveland building can be designated, and the department's file
 does not rank them at all.
 
@@ -191,10 +191,10 @@ says a scholarship was awarded, used, or charged anywhere, and the portal route 
 said so is still unreached — a report behind an entitlement, not a file that was taken down.
 
 **It is not EdChoice Expansion.** Expansion eligibility is income-based and turns on no building at
-all, so a designated list has nothing to do with it. This file bears on the traditional programme
+all, so a designated list has nothing to do with it. This file bears on the traditional program
 only, which is the smaller of the two: 42,607 students against 100,939 in 2024-25. Note that
 R.C. 3310.032 carries the *same* pilot-project exclusion, so Cleveland's absence here is not the
-whole of it — a Cleveland resident is outside both EdChoice programmes, not merely outside the
+whole of it — a Cleveland resident is outside both EdChoice programs, not merely outside the
 building-based one.
 
 **It is not the whole series.** Three editions are held — 2024-2025, 2025-2026 and 2026-2027 —
@@ -273,7 +273,7 @@ a materially easier test than two of three, and the fixture keeps the difference
 name — `bottom_20_pi_two_of_two` — rather than flattening it.
 
 **A year a building was not ranked is blank, not `No`** — 25 cells in 2024-2025 and 42 in
-2025-2026, online academies, early learning centres and buildings that had not opened. The
+2025-2026, online academies, early learning centers and buildings that had not opened. The
 2026-2027 edition writes `No` in all three of its year columns and leaves nothing blank, so this
 is a distinction the department stopped making rather than one it never made. The blank survives
 into the fixture, because a building that was outside the ranking is not a building the ranking

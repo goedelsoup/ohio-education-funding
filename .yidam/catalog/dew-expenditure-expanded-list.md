@@ -36,7 +36,7 @@ against the same expenditures divided by the two counts gives −0.015 and −0.
   therefore reproduces the published one only within the rounding, and the residual scales
   inversely with size — Put-in-Bay Local at 77 weighted pupils lands $86 below its published
   $46,716, while Akron City at 29,162 lands within a cent. This is not an error in either
-  figure, but it means small-district per-weighted-pupil values carry quantisation noise the
+  figure, but it means small-district per-weighted-pupil values carry quantization noise the
   headcount values do not. [verified]
 - **Coverage is wider than the report card's district files.** 607 public districts, 320
   community schools, 49 JVSDs, 19 eschools, 8 STEM schools, and a handful of rows with no org

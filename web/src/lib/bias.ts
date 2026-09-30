@@ -261,8 +261,8 @@ export function renderBias(b: Bias): string {
 
   return `
     <p class="note"><strong>And the band's level is a second question, with two answers.</strong>
-      The width above holds; that is a fact about the spread and none at all about the centre. The
-      centre is drawn below, and it is two lines rather than one because this site publishes two
+      The width above holds; that is a fact about the spread and none at all about the center. The
+      center is drawn below, and it is two lines rather than one because this site publishes two
       quantities out of the same projections — a statewide total, and six hundred district figures
       — and they do not carry the same bias.</p>
 
@@ -285,7 +285,7 @@ export function renderBias(b: Bias): string {
       panel turns back: each one's furthest distance from zero is its last point — ${across.meanDistrict.worst.gap.toFixed(
         4,
       )} and ${across.total.worst.gap.toFixed(4)} at ${years(across.total.worst.at)} across the
-      closure — so the drift is not a middle-distance artefact that washes out, and the deepest
+      closure — so the drift is not a middle-distance artifact that washes out, and the deepest
       horizon is where a correction would matter most and is trusted least. All twelve numbers are
       pinned in <code>crates/figures.json</code> and stated by
       <a href="${escapeHtml(nodeHref(b))}">the corpus node for the projection</a>.</p>`;

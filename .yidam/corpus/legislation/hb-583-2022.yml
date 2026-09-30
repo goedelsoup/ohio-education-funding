@@ -32,7 +32,7 @@ description: |
   [verified] (the enrolled act)
 
   Its own appropriation is a single federal line: **$2,415,201 in FY2022 and nothing in FY2023**,
-  for the tutoring programme it created, out of American Rescue Plan emergency funds. There is no
+  for the tutoring program it created, out of American Rescue Plan emergency funds. There is no
   general revenue line in it at all — which is why an act that moved the formula leaves no trace
   in an appropriation series. [verified]
 findings: |
@@ -59,7 +59,7 @@ findings: |
   ### And it made prorated scholarships whole, retroactively
 
   Section 15 provides that a student whose EdChoice expansion award had been cut under division
-  (E) of R.C. 3310.032 receives the full amount from the act's effective date. An act characterised
+  (E) of R.C. 3310.032 receives the full amount from the act's effective date. An act characterized
   as technical moved money in the channel the districts are now
   [litigating](../litigation/vouchers-hurt-ohio-2025.yml) over. [verified]
 
@@ -86,7 +86,7 @@ properties:
     and reopened **4** uncodified sections of H.B. 110, leaving R.C. 3317.022 untouched. Froze the
     two statewide transportation cost inputs at FY2020 data for the biennium, ended the proration
     of EdChoice expansion scholarships, and appropriated one federal line of $2.4m for a new
-    tutoring programme. [verified] (the enrolled act)
+    tutoring program. [verified] (the enrolled act)
   vetoes: |
     Not recorded here, and the enrolled act cannot record it: what the version index serves is the
     text as presented to the Governor, and a line-item veto is exercised after that. The act does
@@ -131,7 +131,7 @@ revisions:
   - was: |
       "What it changed is not held … This one is a separate PDF that no connector fetches, so the
       corpus can say that corrections were made, that they are operative, and that they are
-      technical on LSC's characterisation, and cannot say which provisions moved."
+      technical on LSC's characterization, and cannot say which provisions moved."
     now: |
       The act is held. It came through `ohio-session-laws` — the same legislature version API that
       already served H.B. 215, H.B. 770 and H.B. 282 — at version code `08_EN`, and is committed

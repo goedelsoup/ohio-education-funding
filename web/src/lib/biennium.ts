@@ -130,7 +130,7 @@ export function renderBiennium(d: District): string {
         support — each year counted against FY${years[0]}, not against the year before it.</p>
       <h3>What the change is made of</h3>
       <p class="note">The five lines below sum to the total state support change exactly. The
-        first is the whole of what this site's model computes; the other four are not modelled
+        first is the whole of what this site's model computes; the other four are not modeled
         here at all.</p>
       <div class="scroll">
         <table>

@@ -29,7 +29,7 @@ The act also carries a rationale section arguing that a broad array of choices â
 private secular, private religious â€” is what led the U.S. Supreme Court and state courts to
 uphold choice programs, the purpose being secular and the parent's options many.
 
-**Why a model bill is catalogued at all.** Two of its provisions are directly comparable against
+**Why a model bill is cataloged at all.** Two of its provisions are directly comparable against
 things this corpus has already established, which makes it more than a statement of a position.
 The award is set from **state and local** per-pupil support and is **subtracted from state school
 aid payable to the resident district**, with the state keeping any remainder. Ohio's original

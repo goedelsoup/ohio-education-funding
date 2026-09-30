@@ -49,11 +49,11 @@ decision: |
   [`crates/dispersion/src/partition.rs`](../../crates/dispersion/src/partition.rs) is the
   estimator: Lloyd's algorithm from farthest-first seeds, no random number anywhere, no
   crates.io dependency, and known-answer tests — three separated blobs recovered exactly, a
-  six-point line yielding the centres and inertia arithmetic gives — before it was pointed at
+  six-point line yielding the centers and inertia arithmetic gives — before it was pointed at
   Ohio. On six standardized profile variables, at every `k` from 2 to 9 and started from the
-  department's typology's own centres, the most any run labels right on the enrollment cluster
+  department's typology's own centers, the most any run labels right on the enrollment cluster
   against the rest is 519 of 607, where a single cell scores 518. A cluster member's nearest
-  neighbour on the six variables is a member 31 of 89 times, so the cluster is a region of the
+  neighbor on the six variables is a member 31 of 89 times, so the cluster is a region of the
   profile — a thin one that no cell of any partition tried holds a majority of. What the fit does
   find is guarantee membership, weakly: a nine-cell k-means describes it 48 districts better
   than the 2013 typology, and neither reaches three quarters. That is the wealth gradient,
@@ -111,4 +111,4 @@ alternatives: |
   **Seed the k-means randomly, with a fixed seed.** Rejected because a stated seed is still a
   choice between the data and the claim. Farthest-first seeding is deterministic and has a known
   weakness — it starts at the extremes, and Kelleys Island is a cell to itself at every `k` — so
-  the run is repeated from the typology's own centres, and both are reported.
+  the run is repeated from the typology's own centers, and both are reported.

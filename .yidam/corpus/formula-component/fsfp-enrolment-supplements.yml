@@ -12,7 +12,7 @@ description: |
   no test of any kind. It is the simplest line in the whole calculation and the only one with no
   conditionality whatever.
 
-  **The enrollment growth supplement** is $250 a pupil for a district whose enrolment rose at least
+  **The enrollment growth supplement** is $250 a pupil for a district whose enrollment rose at least
   **3%** over three years — and it pays on **every** pupil, not on the pupils gained. $39.4m to 43
   districts, against a median district that **shrank 4.8%**. [verified]
 
@@ -26,21 +26,21 @@ description: |
 
   The cliff sits in a thin part of the distribution, which is where a cliff does its most arbitrary
   work: Ohio's median district is shrinking, so the districts near the threshold are few and their
-  neighbours on either side are otherwise alike. [inference]
+  neighbors on either side are otherwise alike. [inference]
 
   ### It points the opposite way to the guarantee
 
   The
-  [guarantee](temporary-transitional-aid-guarantee.yml) pays a district whose enrolment has
-  **fallen**; this pays one whose enrolment has **risen**. The same formula cushions movement in
-  both directions, which means it responds to enrolment change considerably less than its
+  [guarantee](temporary-transitional-aid-guarantee.yml) pays a district whose enrollment has
+  **fallen**; this pays one whose enrollment has **risen**. The same formula cushions movement in
+  both directions, which means it responds to enrollment change considerably less than its
   per-pupil construction suggests. **And "whether any district draws both" carried a premise that
   was itself wrong: the base funding supplement has no eligibility test at all.** All 609 districts
   draw it; the growth supplement reaches 43, so the growth districts are a strict subset and "both"
   is a consequence rather than a coincidence. The two share a sheet and nothing else — $56.1m
   spread flat across everyone against $39.4m concentrated on 43 districts behind a 3% cliff, which
   is $92k a district against $916k. [verified]
-  (`crates/project/tests/questions_the_corpus_left_open.rs`) The guarantee comparison below stands — the guarantee tracks aid rather than enrolment, and property wealth predicts it three
+  (`crates/project/tests/questions_the_corpus_left_open.rs`) The guarantee comparison below stands — the guarantee tracks aid rather than enrollment, and property wealth predicts it three
   times more strongly than decline does. [verified]
 findings: |
   ### The cliff, priced in children rather than in dollars
@@ -48,7 +48,7 @@ findings: |
   "$430,477 for three hundredths of a percentage point" states the cliff in money. Stated in
   children it is sharper: on the supplement's own measure New Lexington is **0.83 of one pupil**
   short of the threshold, which prices the marginal child there at **$516,984.45**. [verified]
-  (crates/project) Two thousand times the $250 a pupil the rule is written at, for one enrolment.
+  (crates/project) Two thousand times the $250 a pupil the rule is written at, for one enrollment.
 
   Two districts sit within one pupil of the threshold and fifteen within ten, of 566 short of it at
   all. [verified] (crates/project)
@@ -56,11 +56,11 @@ findings: |
   ### And it is one of only two margins in this formula a board can act on
 
   Almost everything the plan prices hangs on something nobody chooses. A district's resident
-  enrolment and its assessed valuation are not board decisions, and for the 294 districts the
+  enrollment and its assessed valuation are not board decisions, and for the 294 districts the
   [guarantee](temporary-transitional-aid-guarantee.yml) pays, the marginal resident pupil is worth
-  nothing whatever. Whom a district *admits* is a board decision, taken under an open-enrolment
+  nothing whatever. Whom a district *admits* is a board decision, taken under an open-enrollment
   policy adopted pursuant to R.C. 3313.98 — and both of the formula's largest marginal prices hang
-  on it: this cliff, and the [open-enrolment clawback](guarantee-open-enrolment-clawback.yml)'s
+  on it: this cliff, and the [open-enrollment clawback](guarantee-open-enrolment-clawback.yml)'s
   $8,241.61 an FTE. [inference]
 
   Nothing here claims any board has acted on either. The claim is that these two are the only prices
@@ -127,7 +127,7 @@ revisions:
       these three supplements' own figures against that file.
     reach: |
       Three nodes carried the sentence verbatim — this one, [the performance
-      supplement](fsfp-performance-supplement.yml) and [the enrolment
+      supplement](fsfp-performance-supplement.yml) and [the enrollment
       supplements](fsfp-enrolment-supplements.yml) — and a fourth,
       [DPIA](fsfp-disadvantaged-pupil-impact-aid.yml), had already gone through the same route and
       recorded a revision for it. The blocker was false on the day the sibling's revision was
@@ -138,7 +138,7 @@ properties:
   name: Base and enrollment growth supplements
   function: |
     [L] Base funding supplement = enrolled ADM x $40                     (every district)
-    M1  Enrolment change        = (FY26 enrolled ADM - FY23 enrolled ADM) / FY23
+    M1  Enrollment change        = (FY26 enrolled ADM - FY23 enrolled ADM) / FY23
     M2  Eligibility             = M1 >= 3%
     [M] Growth supplement       = if eligible then enrolled ADM x $250 else 0
 
@@ -155,7 +155,7 @@ properties:
     \begin{aligned}
     L &= \text{enrolled ADM} \times \$40 && \text{base funding supplement} \\
     M_1 &= \frac{\text{FY26 enrolled ADM} - \text{FY23 enrolled ADM}}{\text{FY23 enrolled ADM}}
-      && \text{enrolment change} \\
+      && \text{enrollment change} \\
     M_2 &= M_1 \ge 3\% && \text{eligibility} \\
     M &= \begin{cases}
       \text{enrolled ADM} \times \$250 & \text{if } M_2 \\

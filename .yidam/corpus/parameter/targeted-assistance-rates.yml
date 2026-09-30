@@ -59,7 +59,7 @@ findings: |
   Whether the 200 floor is an administrative de minimis or a policy about very small districts
   is not stated in the section, and what it does is not in doubt. The capacity tier pays a
   millage on a shortfall between two **whole-district totals**, so its amount per pupil has no
-  bound at all as enrolment falls: Kelleys Island Local's 3.51 pupils would draw **$701,208.49
+  bound at all as enrollment falls: Kelleys Island Local's 3.51 pupils would draw **$701,208.49
   each**, and all 17 districts at or below 400 enrolled ADM would draw more per pupil than the
   **$3,773.82** that is the most any full-rate district draws. The floor and the shelf are what
   stand between that and the payment file. [verified]
@@ -80,7 +80,7 @@ findings: |
   wrong about which districts are poor. [verified]
   ### The instrument is older than FY2014, and the threshold is what moved
 
-  Targeted assistance succeeds **parity aid**, which ran FY2002 to FY2011 and equalised millage
+  Targeted assistance succeeds **parity aid**, which ran FY2002 to FY2011 and equalized millage
   to the wealth of the 80th percentile district on a blend of valuation with income — a millage
   instrument, a wealth blend and a rank threshold, which is what this parameter is.
   [`fsfp-targeted-assistance`](../formula-component/fsfp-targeted-assistance.yml) carries the
@@ -88,7 +88,7 @@ findings: |
   ([`crates/project`](../../../crates/project/tests/the_component_targeted_assistance_succeeded.rs))
 
   The rate has moved six times in twenty-five years and the *target* has moved once. Parity aid
-  equalised to the 80th percentile; H.B. 59's tier one equalised to the 490th lowest district of
+  equalized to the 80th percentile; H.B. 59's tier one equalized to the 490th lowest district of
   612, which is the same place; H.B. 110 moved it to the median and raised the rate from 6 mills
   to 14. Reading this parameter's rates as a series without that is reading a rate against a
   moving base. [verified]
@@ -102,7 +102,7 @@ findings: |
 
   **FY2014-15, Am. Sub. H.B. 59.** Two tiers, neither of them these. Tier one blended valuation
   and income **50/50** rather than 60/40, indexed against the *statewide* wealth per pupil rather
-  than the median, equalised to the wealth of the **490th lowest** district rather than to the
+  than the median, equalized to the wealth of the **490th lowest** district rather than to the
   median district's, and charged **6 mills**. The wealth index then entered the payment a second
   time as a multiplier, so that tier was progressive in wealth twice over where the current one is
   linear in the district's own. Tier two paid up to 40 per cent of tier one again to districts
@@ -124,7 +124,7 @@ findings: |
   describes neither component at all, so the FY2024-25 evidence is *absent* rather than contrary:
   LSC writes about what an act changed, and this section was not amended.
 
-  ### Nothing has moved and the programme has grown by a third
+  ### Nothing has moved and the program has grown by a third
 
   LSC estimated targeted assistance at **$988.4 million** in FY2022 before guarantees and
   phase-ins — $738.5m of it the wealth amount, $250.0m the capacity amount. The FY2027 panel
@@ -133,9 +133,9 @@ findings: |
 
   The medians are what moved. Both tiers pay a *difference* between the median district's wealth
   and the district's own, so a statewide revaluation that lifts every district's property value
-  proportionally lifts every gap proportionally and raises the programme's cost with no enactment
-  at all. An equalisation programme built on a wealth gap rather than on a revenue shortfall gets
-  more expensive as the tax base it equalises grows. [inference]
+  proportionally lifts every gap proportionally and raises the program's cost with no enactment
+  at all. An equalization program built on a wealth gap rather than on a revenue shortfall gets
+  more expensive as the tax base it equalizes grows. [inference]
 
 properties:
   name: Targeted assistance rates
@@ -177,7 +177,7 @@ properties:
       FY2008     8.0 mills the same target, 410 districts
       FY2009     8.5 mills the same target, 367 districts, on a 75 : 25 blend
       FY2010-11  —         parity aid ends as a district payment; its wealth measure does not
-      FY2012-13  —         the Bridge formula computes no equalisation of this kind at all
+      FY2012-13  —         the Bridge formula computes no equalization of this kind at all
       FY2014-15  6 mills   tier one, to the 490th lowest district, on a 50/50 wealth blend
       FY2014-19  40%       tier two, of tier one, at a tenth agricultural property or more
       FY2016-19  one mill  capacity aid, on three-year average valuation
@@ -233,7 +233,7 @@ properties:
     moves discontinuously in the capacity tier regardless of its wealth. [inference]
 
     Both tiers are charged against medians of the district panel, so a change in the
-    *distribution* of Ohio's district wealth moves this programme with no enactment at all.
+    *distribution* of Ohio's district wealth moves this program with no enactment at all.
     [inference]
 unfilled:
   - field: the divisions each rate sits in, before FY2026

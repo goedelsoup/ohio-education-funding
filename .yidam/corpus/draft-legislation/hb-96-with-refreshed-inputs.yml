@@ -38,7 +38,7 @@ description: |
 
   Nothing to the phase-in, the minimum state share, the guarantee's rule, or any channel outside
   the foundation formula. A district's scholarship and community-school deductions are unmoved
-  and unmodelled, so a district's net position can differ from its formula payment in either
+  and unmodeled, so a district's net position can differ from its formula payment in either
   direction.
 findings: |
   **The provision prices, and it is the only provision, so the draft's cost is its cost.** Run
@@ -72,7 +72,7 @@ findings: |
 
   Base cost alone rises $465.0M; the categoricals priced in the statewide average carry it to
   $497.1M. Counting them is a deliberate divergence from the department's own simulator, which
-  holds the statewide averages fixed — correct behaviour for a tool where a user changes one
+  holds the statewide averages fixed — correct behavior for a tool where a user changes one
   district, and wrong here, where a provision of a budget act moves all 609 at once. Recorded at
   [`scenario-models-ohio`](../../decisions/scenario-models-ohio.yml).
 

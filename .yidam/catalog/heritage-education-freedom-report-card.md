@@ -49,7 +49,7 @@ with open enrollment and a lottery, to accept the scholarship as the full value 
 hold accreditation. Ohio's 12th on Education Choice is therefore a composite of how many students
 are eligible and participating *and* how little is asked of the schools they attend.
 
-**Why it is catalogued.** It is the most-cited external ranking of Ohio's choice programs and the
+**Why it is cataloged.** It is the most-cited external ranking of Ohio's choice programs and the
 only retrieved source that scores Ohio on choice and on spending in one instrument. Its point of
 view is not incidental to the numbers — the scoring direction on spending is a policy position
 expressed as a rank — and cataloguing it with that stated is the only way a corpus node can use

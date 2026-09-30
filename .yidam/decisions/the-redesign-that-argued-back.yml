@@ -19,13 +19,13 @@ context: |
   existed to institute. That is the pattern worth recording: in each case the instrument was
   built first and then contradicted the brief.
 decision: |
-  **The link hue does not exist, so links stopped being a colour.** #187 asked for a third text
+  **The link hue does not exist, so links stopped being a color.** #187 asked for a third text
   hue, separated from the two chart series and legible on three surfaces. `web/scripts/link-hue-search.ts`
   is the committed search: at the palette's own chroma there is no hue in 40°–240° with any
   solution at all, because blue at 255.5° and orange at 37.9° are the two ends of the axis
   dichromats keep. The best candidate scored **ΔE 10.2** — below the **10.9** that got a five-step
   ramp deleted from this palette for being two bands a reader cannot tell apart. So `--link`
-  became an underline colour rather than a text colour: a mark at 3:1 instead of text at 5:1, and
+  became an underline color rather than a text color: a mark at 3:1 instead of text at 5:1, and
   the word itself stays ink.
 
   **The sanitize schema was not widened.** #201 asked for it, to admit MathML. `prose.ts` records
@@ -52,7 +52,7 @@ decision: |
   decision, which is that a headline is set in an old-style serif.
 consequences: |
   **The refusals are enforced, not just recorded.** `palette.spec.ts` asserts no third text hue is
-  reintroduced and that `--link` is the underline colour. `math.ts` carries the allowlist and the
+  reintroduced and that `--link` is the underline color. `math.ts` carries the allowlist and the
   build fails on an element outside it. `tokens.spec.ts` asserts exactly one `@font-face` and that
   no text stack names the shipped face. `og.spec.ts` lays the card headline out twice, with and
   without the serif, and requires the geometry to differ — satori falls back silently, so a source
@@ -73,7 +73,7 @@ consequences: |
   `formula-component.ont.yml`: a fraction, a piecewise rule, an exponent or an indexed family
   earns the notation, and nothing else does.
 alternatives: |
-  **A coloured link, accepted below the bar.** The 10.2 could have shipped — it is one candidate
+  **A colored link, accepted below the bar.** The 10.2 could have shipped — it is one candidate
   among many that this site would previously have taken on a glance. Refusing it cost a
   familiar affordance; keeping it would have meant applying a standard to links that the palette
   had already refused to apply to a chart ramp, in the same file, three weeks apart.
@@ -95,7 +95,7 @@ alternatives: |
   **Duplicating the nav for the phone header.** #189 needed the five section menus on one row and
   the obvious build is a narrow copy and a wide copy with `display: none` between them — 4,103
   bytes of duplicate nav on each of 3,492 pages and the same 31 links in the document twice.
-  Rejected in favour of one `<details>` whose summary the wide layout hides, which depends on
+  Rejected in favor of one `<details>` whose summary the wide layout hides, which depends on
   `::details-content` and degrades to the phone's disclosure where that is unsupported. The
   degradation is stated in the stylesheet because it is the part a reviewer should get to disagree
   with.

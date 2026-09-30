@@ -30,7 +30,7 @@ description: |
   That is evidence against the reclassification-incentive reading and it is not proof: a
   district still influences how quickly a pupil reaches proficiency, and the money still falls
   when they do. What can be said is that the statute's own construction is a schedule rather
-  than a discretion. Whether the descent expresses a judgement that acquisition costs most at
+  than a discretion. Whether the descent expresses a judgment that acquisition costs most at
   the start is still not established. [open]
 
   ### The counts are not frozen, and watching them move is the taper in action
@@ -56,7 +56,7 @@ findings: |
   will pick whichever they already believed. That is the general argument for decomposing the
   categorical lump, stated by the smallest program in it. [inference]
 
-  ### Composition moves this programme, and it is now a number
+  ### Composition moves this program, and it is now a number
 
   Because the schedule descends, a pupil who advances a category costs their district money
   without leaving its population. Between the department's two published models **46 districts**
@@ -92,7 +92,7 @@ revisions:
       for CTE: the FY2021 Category 1 learners are not the FY2027 Category 1 learners".
     now: |
       The suffix is a label carried forward with a sheet built for the FY2022 report. The counts
-      are FY2026's, and this programme is where the mistake was easiest to catch, because its
+      are FY2026's, and this program is where the mistake was easiest to catch, because its
       counts are the ones that move most: 512 of 611 districts, and Category 1 down 22% in a
       single year.
     found_by: |
@@ -104,9 +104,9 @@ revisions:
     reach: |
       The same claim stood on [career-technical](fsfp-career-technical-weights.yml), which is
       where it was first written, and on both `parameter` nodes beneath them. The furthest it
-      reached is this programme's own
+      reached is this program's own
       [multiples node](../parameter/english-learner-category-multiples.yml), whose `sensitivity`
-      argued from the freeze that what moves the programme is composition rather than size.
+      argued from the freeze that what moves the program is composition rather than size.
       Composition does move it — the taper is real — but because pupils advance through the
       categories, not because nobody recounted them.
   - was: |
@@ -116,7 +116,7 @@ revisions:
       [Career-technical](fsfp-career-technical-weights.yml) descends too — 0.623, 0.5905,
       0.2154, 0.183, 0.157. The supportable claim is narrower and more interesting: this is the
       only categorical whose weights fall along a *need* gradient. Career-technical's ordering
-      is programme type, not severity.
+      is program type, not severity.
     found_by: |
       The sibling node's own account of what each of its five multiples buys, under R.C.
       3317.014.

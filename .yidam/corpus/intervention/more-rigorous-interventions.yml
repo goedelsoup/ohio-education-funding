@@ -8,7 +8,7 @@ description: |
   What Ohio proposes to do to a Comprehensive Support and Improvement school that has not met the
   exit criteria within three years. Sixteen items, and the last one is closing it.
 
-  **Modelled as one node rather than sixteen, deliberately.** The rungs share a trigger, an
+  **Modeled as one node rather than sixteen, deliberately.** The rungs share a trigger, an
   authority, a unit and an actor; they differ only in what they do, and the state requires "one or
   more" from the menu rather than applying them in sequence. Sixteen nodes would repeat four
   identical fields to vary a sentence — the same duplication objected to when accountability status

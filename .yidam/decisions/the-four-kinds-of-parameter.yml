@@ -76,7 +76,7 @@ consequences: |
   Two fields split across both columns, which is the sign the line is drawn somewhere real rather
   than per-field: Eastland-Fairfield's `typology` is genuinely open — JVSDs sit outside the
   department's typology entirely and how they should be grouped for peer comparison is unresolved —
-  while its five neighbours are missing a code that exists and is published.
+  while its five neighbors are missing a code that exists and is published.
 alternatives: |
   **An enum for `kind`, validated by the schema.** Rejected on the first node classified, as above.
   The regime-boundary case is not an edge case in a corpus whose stated span is 1851 to the present;

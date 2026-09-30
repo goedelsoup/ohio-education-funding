@@ -17,7 +17,7 @@ context: |
 
   - `program.mechanism`, 6 of 8 off the list. Five were not values at all: the autism, Cleveland,
     EdChoice, EdChoice-expansion and Jon Peterson scholarships each carried the whole account of
-    how the programme is paid, with its `[verified]` and `[open]` tags and a crate link, in a field
+    how the program is paid, with its `[verified]` and `[open]` tags and a crate link, in a field
     declared as a token. The sixth, `classroom-facilities-assistance`, held `capital-assistance`.
   - `parameter.unit`, 2 of 18: `fraction of the computed entitlement` on the proration factor, and
     `dollars-per-district, nominal and unindexed. [verified]` on the guarantee base — a claim tag
@@ -52,7 +52,7 @@ decision: |
   **The mechanism paragraphs move to `program.mechanism_note`**, a `text` property with `prose:
   true` and `required: false`. The paragraphs are the history the token cannot hold: each
   scholarship was a deduction until FY2022, and Cleveland's was a fixed earmark of the district's
-  own aid rather than a per-pupil transfer. `mechanism` holds the mechanism in force. A programme
+  own aid rather than a per-pupil transfer. `mechanism` holds the mechanism in force. A program
   paid one way throughout has nothing to note, which is why the note is optional.
 consequences: |
   **A value outside a declared set fails `yidam lint` at Error.** Probed on this branch: writing
@@ -65,12 +65,12 @@ consequences: |
   declared set cannot be dropped without the test being changed.
 
   **Three values are declared and held by no instance.** `program.mechanism`'s `deduction` and
-  `competitive-grant`, and `parameter.unit`'s `count`, are what the class says a programme or
-  parameter may be. A programme ended before FY2022 would be a deduction. They are kept because a
+  `competitive-grant`, and `parameter.unit`'s `count`, are what the class says a program or
+  parameter may be. A program ended before FY2022 would be a deduction. They are kept because a
   set lists what the class admits, and what the corpus holds is a separate count.
 
   **The census moved by one declaration.** `mechanism_note` is the 121st property and the eighth
-  declared optional; three programmes omit it, and the generated block in the corpus README says
+  declared optional; three programs omit it, and the generated block in the corpus README says
   so.
 alternatives: |
   **Correct the five scholarships to `direct-appropriation`.** That would shorten the list, and the

@@ -20,7 +20,7 @@ reporting on the Bureau's own definitions rather than each state's.
 **Location.** `www2.census.gov/programs-surveys/school-finances/tables/2022/secondary-education-finance/`.
 
 **What it contains.** Every school system in the United States, one row each: 14,106 of them,
-with fall enrolment, revenue by source (federal, state, local, and within local the property tax
+with fall enrollment, revenue by source (federal, state, local, and within local the property tax
 and the parent-government appropriation separately), current spending broken into functions,
 capital outlay, debt, and per-pupil derivations. Seventy-two columns.
 
@@ -83,12 +83,12 @@ thirty-nine independent-district states with the exclusion named.
 ## What the fixture holds, and what it does not
 
 [`census-f33-states.csv`](../../crates/dispersion/fixtures/census-f33-states.csv) is the state
-aggregate: fifty-one rows out of fourteen thousand, carrying enrolment, revenue by source,
+aggregate: fifty-one rows out of fourteen thousand, carrying enrollment, revenue by source,
 property tax, parent-government appropriations and current spending. Money is in **thousands of
 dollars**, as the survey reports it.
 
-Systems are included when enrolment exceeds zero. That rule rather than a school-level filter,
-because states organise differently — Ohio has 609 unified districts and no elementary-only ones,
+Systems are included when enrollment exceeds zero. That rule rather than a school-level filter,
+because states organize differently — Ohio has 609 unified districts and no elementary-only ones,
 Illinois has hundreds of both — and any rule stated in school levels would count different things
 in different states. It admits everything that teaches somebody and excludes the two categories
 that would double count: 691 education service agencies, whose revenue arrives *from* the
@@ -124,7 +124,7 @@ no losses.
 
 **The comparison set is not every agency, and getting that wrong is easy.** The survey's unit is a
 local education agency, and 357 of Ohio's 968 rows are community schools, joint vocational
-districts and educational service centres. A community school raises almost no local tax by
+districts and educational service centers. A community school raises almost no local tax by
 construction, so leaving them in drags the distribution somewhere no traditional district lives —
 the first attempt here put Ohio's 200 smallest agencies at an **8% local share**, which is a true
 fact about charter finance and a useless one about school districts.
@@ -171,7 +171,7 @@ patterns. The panel states the gap rather than interpolating across it. [open]
 `elsec24t.xlsx` — `.xlsx` where FY2022 is `.xls` — drops the `IDCENSUS` column, which shifts
 every later index by one. Every column the corpus wants still exists and still means the same
 thing, so a positional read would have produced a complete, plausible, entirely wrong extract:
-state codes read as unit types, revenue read as enrolment. `build_f33_states` was positional and
+state codes read as unit types, revenue read as enrollment. `build_f33_states` was positional and
 is now header-driven; it reproduces the FY2022 fixture byte for byte, which is the check that the
 change was safe. [verified]
 

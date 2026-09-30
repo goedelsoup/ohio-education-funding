@@ -246,8 +246,8 @@ export function comparison(years: Years, left: Named, right: Named, chip: string
         <thead><tr><th></th>${head(left)}${head(right)}<th>Difference</th></tr></thead>
         <tbody>${rows}${flags}</tbody>
       </table></div>
-      <p class="note">Nothing in this table is coloured good or bad. Higher state aid per pupil and
-        higher property wealth point in opposite directions, and which figure counts as favourable
+      <p class="note">Nothing in this table is colored good or bad. Higher state aid per pupil and
+        higher property wealth point in opposite directions, and which figure counts as favorable
         depends on the argument being made — which is the reason to look at two districts rather
         than one. FY${years.fiscal} model; valuation is ${escapeHtml(years.profile)} and
         expenditure ${escapeHtml(years.spending)}.</p>

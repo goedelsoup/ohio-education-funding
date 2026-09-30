@@ -60,7 +60,7 @@ Placed beside the act that passed, in millions:
 **The enacted budget spent $42.7m more than the House bridge plan and gave traditional districts
 $37.5m less.** The whole difference, and $37.5m besides, went to community schools and JVSDs — the
 two sectors the commentary reports as the House plan's relative winners, and both did materially
-better under the law than under the proposal it is criticising. [verified — the greenbook table
+better under the law than under the proposal it is criticizing. [verified — the greenbook table
 against the commentary's own percentages]
 
 **The enrollment claim holds in direction and rough size, on a window this repository can see.**

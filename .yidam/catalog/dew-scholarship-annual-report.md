@@ -10,18 +10,18 @@ used-by:
 
 **Source.** Ohio Department of Education and Workforce, *2025 Scholarship Annual Report*, covering
 the 2024-2025 school year.
-**Type.** Primary source, published by the programme administrator.
+**Type.** Primary source, published by the program administrator.
 **Location.** `https://education.ohio.gov/getattachment/About/Annual-Reports/2025-Scholarship-Annual-Report.pdf.aspx?lang=en-US`.
 About 1.3 MB, 22 pages, retrievable by a self-identifying agent.
 
-**What it contains.** One section per programme — Traditional EdChoice, EdChoice Expansion,
-Cleveland, Autism, Jon Peterson Special Needs — each with a summary, the authorising Revised Code
+**What it contains.** One section per program — Traditional EdChoice, EdChoice Expansion,
+Cleveland, Autism, Jon Peterson Special Needs — each with a summary, the authorizing Revised Code
 sections, eligibility in prose, the fiscal-year maximum award, participation, statewide
 expenditure, a participation-by-year chart, and a provider list.
 
 The figures this corpus takes from it, all for 2024-2025:
 
-| Programme | Students | Expenditure | Average award, as published |
+| Program | Students | Expenditure | Average award, as published |
 |---|--:|--:|--:|
 | Traditional EdChoice | 42,607 | $283,149,735.14 | $6,808.75 |
 | EdChoice Expansion | 100,939 | $492,867,235.98 | $4,958.41 |
@@ -30,11 +30,11 @@ The figures this corpus takes from it, all for 2024-2025:
 | Jon Peterson | 8,680 | $103,944,388.15 | not published |
 
 Jon Peterson's expenditure is **derived**, not quoted: it is the sum of the report's six
-disability-category figures, which the report displays as a chart without totalling. The other four
+disability-category figures, which the report displays as a chart without totaling. The other four
 are quoted.
 
 **Why it matters here.** It is the only committed source that sizes the scholarship channel from
-the department rather than from statute. The four programmes that publish a total come to
+the department rather than from statute. The four programs that publish a total come to
 **$991,191,150.12**; adding Jon Peterson's derived $103,944,388.15 brings the channel to
 **$1.095 billion**, across **166,587 students**. The two figures are kept apart because the round
 one is the quotable one and only the first is fully sourced — which is still the order of magnitude
@@ -46,14 +46,14 @@ inside a $95.6 million residual.
 
 Recorded because both are visible in the document's own numbers, and neither is explained in it.
 
-**The executive summary overstates its own parts.** It says the five programmes "collectively
-empowered the families of more than 175,000 students". The five programme counts it publishes sum
-to **166,587** — a gap of 8,413, about 5%. A student holding scholarships in two programmes would
+**The executive summary overstates its own parts.** It says the five programs "collectively
+empowered the families of more than 175,000 students". The five program counts it publishes sum
+to **166,587** — a gap of 8,413, about 5%. A student holding scholarships in two programs would
 push the sum the other way, so double-counting does not explain it.
 
 **Three of the four published averages are not expenditure over participation.**
 
-| Programme | Published average | Expenditure ÷ participants |
+| Program | Published average | Expenditure ÷ participants |
 |---|--:|--:|
 | Traditional EdChoice | $6,808.75 | $6,645.62 |
 | EdChoice Expansion | $4,958.41 | $4,882.82 |
@@ -62,7 +62,7 @@ push the sum the other way, so double-counting does not explain it.
 
 Autism matches to the cent and the other three do not, each published figure sitting above the
 implied one by 1.5–3.4%. That pattern says denominator rather than arithmetic error — plausibly an
-average over students holding a full-year award rather than over everyone who used the programme
+average over students holding a full-year award rather than over everyone who used the program
 at any point during the year. **The report does not say**, so this corpus records the discrepancy
 and does not adopt the explanation.
 
@@ -79,18 +79,18 @@ distinct files — of which exactly one carries "Scholarship" in its name**, thi
 absence is not a naming change and not a page this project failed to scrape: no consolidated
 scholarship report of any earlier vintage has ever been served from this directory.
 
-**What precedes it is a per-programme lineage, not an earlier edition of the same thing.** The
+**What precedes it is a per-program lineage, not an earlier edition of the same thing.** The
 archive's index holds `FY2016-JPSN-Board-Report.pdf`, `FY2017-JPSN-Annual-Report.pdf`,
 `JPSN-Report-FY20.pdf`, `FY23_JPSN_Annual_Report.pdf` and `FY24_JPSN_Annual_Report.pdf` — the Jon
-Peterson programme reporting on itself, as its own authorising section requires — plus
-`Ohio-ACE-Educational-Savings-Account-Report.pdf` for a programme this report does not cover at
+Peterson program reporting on itself, as its own authorizing section requires — plus
+`Ohio-ACE-Educational-Savings-Account-Report.pdf` for a program this report does not cover at
 all. The last two JPSN editions are still on the live page beside this one, and are now extracted:
-[JPSN Annual Report](dew-jpsn-annual-report.md) carries FY2023 and FY2024 for that one programme.
+[JPSN Annual Report](dew-jpsn-annual-report.md) carries FY2023 and FY2024 for that one program.
 
 That changes what the gap above the FY1997-FY2013 [historical
 archive](dew-scholarship-historical-data.md) is. It is not a series this project has not looked
-for; there is no consolidated series to find. The consolidated five-programme account begins with
-2024-2025, and one programme's own reporting is what covers part of the decade before it — which
+for; there is no consolidated series to find. The consolidated five-program account begins with
+2024-2025, and one program's own reporting is what covers part of the decade before it — which
 is now partly read rather than only named, so the gap in *this* channel is FY2014 through FY2022
 and Jon Peterson's is FY2014 through FY2022 as well.
 

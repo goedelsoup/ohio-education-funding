@@ -41,7 +41,7 @@ findings: |
   composition — this corpus established that spending per *weighted* pupil against performance
   is substantially a composition proxy — so any program keyed to them follows composition
   whatever its intent. That explains the gradient; it does not remove it. **$55.7m of a formula
-  built to equalise flows against the grain of everything else in it**, and no published figure
+  built to equalize flows against the grain of everything else in it**, and no published figure
   says so. The progress routes are what hold the gradient to 2.56 rather than whatever it would
   otherwise be. [inference] (the mechanism) [verified] (the measurement)
 
@@ -102,7 +102,7 @@ findings: |
   Fort Frye Local. More than half the state moves, and it moves one place. [verified]
   ([`crates/project`](../../../crates/project/tests/whether_the_supplement_moves_a_position.rs))
 
-  ### And it narrows the equalisation, which is the regressive reading and not a refutation of it
+  ### And it narrows the equalization, which is the regressive reading and not a refutation of it
 
   The coefficient of variation of state support per pupil is **0.5242** with the supplement and
   **0.5281** without it, so the supplement *compresses* the distribution of state aid by 0.0040 —
@@ -111,7 +111,7 @@ findings: |
   quartile's **$4,851** — each the mean over the districts in that quartile rather than over their
   pupils, per
   [a district mean is not a state figure](../../decisions/a-district-mean-is-not-a-state-figure.yml)
-  — and that gap is the equalisation. A payment that falls with need therefore
+  — and that gap is the equalization. A payment that falls with need therefore
   rises as a *share of aid*, and compresses the gap. [verified]
 
   Against the aid a district already has, the supplement is worth **0.011408** of the least-poor
@@ -234,7 +234,7 @@ revisions:
       these three supplements' own figures against that file.
     reach: |
       Three nodes carried the sentence verbatim — this one, [the performance
-      supplement](fsfp-performance-supplement.yml) and [the enrolment
+      supplement](fsfp-performance-supplement.yml) and [the enrollment
       supplements](fsfp-enrolment-supplements.yml) — and a fourth,
       [DPIA](fsfp-disadvantaged-pupil-impact-aid.yml), had already gone through the same route and
       recorded a revision for it. The blocker was false on the day the sibling's revision was

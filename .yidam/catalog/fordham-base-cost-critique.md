@@ -19,7 +19,7 @@ the stale-input problem (teacher salaries rose from $62,353 in 2018 to $67,654 i
 districts under roughly 700 students, about one-sixth of Ohio districts, carry base amounts
 above $8,000 per pupil because minimum staffing floors apply regardless of enrollment.
 
-**Why a critical secondary source is catalogued at all.** The small-district and stale-input
+**Why a critical secondary source is cataloged at all.** The small-district and stale-input
 observations are not in the department's methodology documentation, which specifies the
 formula without evaluating it. They are the kind of claim the corpus needs in order to ask
 whether a mechanism does what it says, and they come with a point of view — Fordham is a

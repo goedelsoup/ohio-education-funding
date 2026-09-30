@@ -37,7 +37,7 @@ properties:
       how they came to be listed side by side as though they were the same promise. Legislated —
       written in the section, changed only by an act. Delegated — statute names the department and
       the department decides, within whatever constraint the section imposes. Measured — statute
-      specifies a computation over reported data, so the value moves when districts' own behaviour
+      specifies a computation over reported data, so the value moves when districts' own behavior
       moves and nobody decides. Uncodified — nowhere in the Revised Code, set by the biennial
       budget, and gone if it is not re-enacted. Text rather than an enum because a parameter that
       outlives a regime can change kind at the boundary, and because "not in the Revised Code" and

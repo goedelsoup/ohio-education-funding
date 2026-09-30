@@ -147,9 +147,9 @@ findings: |
   approved for all three on 3 December 2021. [verified] That change is H.B. 110's.
 
   **Two acts already in this corpus turn out to have accountability effects it did not
-  record.** [H.B. 33](../legislation/hb-33-2023.yml) is modelled here for refreshing the cost
+  record.** [H.B. 33](../legislation/hb-33-2023.yml) is modeled here for refreshing the cost
   inputs to FY2022 and making EdChoice universal; it also dissolved Lorain's commission. [H.B.
-  110](../legislation/hb-110-2021.yml) is modelled as the Fair School Funding Plan act, and it
+  110](../legislation/hb-110-2021.yml) is modeled as the Fair School Funding Plan act, and it
   did the commission work itself. Its greenbook says the budget "prohibits the creation of any new
   ADCs for the 2021-2022 and 2022-2023 school years" and "establishes a process by which the three
   school districts currently subject to an ADC may be relieved from the oversight of the ADC prior
@@ -245,7 +245,7 @@ findings: |
   could not have audited the column above in any case. [inference]
 revisions:
   - was: |
-      "H.B. 110 is modelled as the Fair School Funding Plan act, and the 2021 improvement-plan
+      "H.B. 110 is modeled as the Fair School Funding Plan act, and the 2021 improvement-plan
       requirement dates to the same session."
     now: |
       H.B. 110 enacted the commission changes itself. It barred new commissions for 2021-22 and

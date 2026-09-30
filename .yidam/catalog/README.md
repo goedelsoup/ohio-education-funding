@@ -29,7 +29,7 @@ Sorted by: type, then slug.
 | [`alec-education-savings-account-act`](alec-education-savings-account-act.md) | ALEC — Education Savings Account Act | 1 |
 | [`alec-parental-choice-scholarship-act`](alec-parental-choice-scholarship-act.md) | ALEC — Parental Choice Scholarship Program Act (Universal Eligibility) | 1 |
 | [`alec-state-education-freedom-index`](alec-state-education-freedom-index.md) | ALEC — Index of State Education Freedom (2025, 2nd edition) | 3 |
-| [`auditor-district-audits`](auditor-district-audits.md) | Auditor of State — district and service centre audit reports | 5 |
+| [`auditor-district-audits`](auditor-district-audits.md) | Auditor of State — district and service center audit reports | 5 |
 | [`auditor-longitudinal-school-finance`](auditor-longitudinal-school-finance.md) | Longitudinal School Finance Study — Ohio Auditor of State | 1 |
 | [`bls-cpi-u`](bls-cpi-u.md) | CPI-U all items — the Bureau of Labor Statistics flat file | 3 |
 | [`census-block-geography`](census-block-geography.md) | Census block geography: school districts, legislative districts, and population | 1 |
@@ -50,7 +50,7 @@ Sorted by: type, then slug.
 | [`dew-fy26-funding-calculator`](dew-fy26-funding-calculator.md) | FY26 TRAD State Foundation Funding Calculator — recovered from the archive | 1 |
 | [`dew-fy27-community-school-calculator`](dew-fy27-community-school-calculator.md) | FY27 Community/STEM School State Foundation Funding Simulator | 1 |
 | [`dew-fy27-funding-calculator`](dew-fy27-funding-calculator.md) | FY27 TRAD State Foundation Funding Calculator | 28 |
-| [`dew-jpsn-annual-report`](dew-jpsn-annual-report.md) | JPSN Annual Report — one programme reporting on itself, for two years | 1 |
+| [`dew-jpsn-annual-report`](dew-jpsn-annual-report.md) | JPSN Annual Report — one program reporting on itself, for two years | 1 |
 | [`dew-jvsd-foundation-payments`](dew-jvsd-foundation-payments.md) | JVSD Foundation Payment Reports, FY2022–FY2027 | 2 |
 | [`dew-mr81-enrollment-archive`](dew-mr81-enrollment-archive.md) | MR-81 free and reduced-price lunch reports, 1998–2025 | 1 |
 | [`dew-nonpublic-enrollment`](dew-nonpublic-enrollment.md) | Chartered nonpublic enrollment by building, 1977–2025 | 1 |

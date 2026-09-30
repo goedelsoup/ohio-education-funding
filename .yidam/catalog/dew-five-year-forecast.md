@@ -33,7 +33,7 @@ The lines this corpus extracts:
 | `7.010` | Beginning cash balance, 1 July | **Carry-over** |
 | `7.020` | Ending cash balance, 30 June | **Cash on hand** |
 
-**Why it matters here.** Every other per-district figure in this repository is modelled — what a
+**Why it matters here.** Every other per-district figure in this repository is modeled — what a
 formula computes, what a district spent per pupil on the department's definitions, what its
 pupils achieved. **This is the only record of money that changed hands**, and the only measure of
 what a district *holds* rather than what it is given.
@@ -67,7 +67,7 @@ this source must say which basis it is in, and
 - **Booked aid is not formula output.** `1.035` is what lands in the general fund; the FY2027
   calculator's "total state support" is a different construction. A ratio between them carries
   that gap, and any claim resting on one must be stated against a control measured the same way.
-- **General fund only.** Capital, food service, and most federal programmes sit in other funds.
+- **General fund only.** Capital, food service, and most federal programs sit in other funds.
   An expenditure figure here is not the district's total spending.
 - **FY2021–FY2024 are the pandemic relief years.** ESSER money was booked in the general fund by
   some districts and separately by others, so a balance rising across that span is not evidence

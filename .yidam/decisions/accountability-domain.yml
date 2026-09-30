@@ -10,7 +10,7 @@ context: |
   asked about. The user has since said the omission was deliberate at the time, to get funding
   right first, and that it excluded goals they hold.
 
-  The immediate occasion was Ohio's April 2026 ESSA amendment request, catalogued in
+  The immediate occasion was Ohio's April 2026 ESSA amendment request, cataloged in
   `ohio-essa-state-plan`. Reviewing it found two provisions that are funding facts — the state
   proposing annual approval of federal expenditure for persistently identified schools — and
   three that the corpus could not express at all.
@@ -77,7 +77,7 @@ consequences: |
 
   **The double duty is now expressible, and it is the finding the expansion exists to hold.** One
   number — the Ohio School Report Card overall rating — determines a payment under the Fair School
-  Funding Plan and a sanction under R.C. 3302.10. Before this decision the corpus modelled the
+  Funding Plan and a sanction under R.C. 3302.10. Before this decision the corpus modeled the
   payment and had no way to say the other half. It is not obvious that a measure should do both:
   a rating that pays a supplement rewards performance at the margin, and the same rating three
   years running removes the board's control of its own budget.
@@ -85,7 +85,7 @@ consequences: |
   **What this costs.** The corpus stops being a funding corpus. Every traversal that was "district
   in a fiscal period" acquires a second unit and a second time grain — the report card runs on
   school years and the formula on fiscal years — and the classes that were defined against money
-  now have neighbours that are not about money at all. That is the price of the goals the user
+  now have neighbors that are not about money at all. That is the price of the goals the user
   named, and it is being paid deliberately.
 alternatives: |
   **Keep accountability as catalog context only.** This was the recommendation after reviewing the
@@ -96,15 +96,15 @@ alternatives: |
   state appointee writes the district's budget. A recommendation to exclude a domain should not
   have been made before reading that domain's enabling statute.
 
-  **Federal ESSA only.** Rejected. Bounded and already catalogued, but its fiscal content is
-  expenditure-plan approval and little else, and it would have modelled the smaller half.
+  **Federal ESSA only.** Rejected. Bounded and already cataloged, but its fiscal content is
+  expenditure-plan approval and little else, and it would have modeled the smaller half.
 
   **Roll identification up to the education-agency and skip a building class.** Rejected. It keeps
   one grain and one time axis, and it would record that a district has four identified schools
   while making the identified school itself unrepresentable — which loses the object the whole
   mechanism acts on.
 
-  **Model status as an `accountability-status` Relator class.** Rejected in favour of roles, which
+  **Model status as an `accountability-status` Relator class.** Rejected in favor of roles, which
   the education-agency class already documents as the right home for contingent labels. A new
   class would duplicate machinery that exists and would make the corpus's own convention
   inconsistent for no gain.

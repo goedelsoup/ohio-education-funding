@@ -59,7 +59,7 @@ findings: |
   That coefficient of variation had no benchmark for as long as this node has quoted it. Ohio
   describing itself cannot say whether Ohio is unusual, and no other state's distribution had been
   computed. Congress computes exactly this statistic for all 51 jurisdictions and pays states on
-  it: under 20 U.S.C. 6337 a state's **equity factor** is the enrolment-weighted coefficient of
+  it: under 20 U.S.C. 6337 a state's **equity factor** is the enrollment-weighted coefficient of
   variation of per-pupil expenditure across its own districts, and the Education Finance Incentive
   Grant multiplies the state's per-child amount by 1.30 minus that factor. [verified] (20 U.S.C.
   6337(b))
@@ -80,7 +80,7 @@ findings: |
   ### Wealth neutrality, which is more interesting than the dispersion
 
   State revenue per pupil correlates with assessed valuation per pupil at **−0.548**: aid does
-  fall as property wealth rises, so equalisation is real, but property wealth explains only about
+  fall as property wealth rises, so equalization is real, but property wealth explains only about
   30% of the variation in state aid. [verified]
 
   Meanwhile state revenue per pupil correlates with the economically disadvantaged share at
@@ -147,7 +147,7 @@ findings: |
 
   Two things follow that the correlations did not give. Federal money in Ohio is compensatory,
   monotonically across all four quartiles, which could have been assumed either way — Title I runs
-  on a poverty count and IDEA Part B does not, so the aggregate behaviour was not derivable from
+  on a poverty count and IDEA Part B does not, so the aggregate behavior was not derivable from
   the parts. And the state's contribution is not close to full equalization on any reading: nearly
   half of what the local base opens, the state closes, and the rest stands.
 
@@ -278,7 +278,7 @@ findings: |
 
   The measure now takes a floor of forty pupils before it forms a per-pupil ratio. Forty is read
   off the data rather than chosen to fit it: across all fifteen years no comparable Ohio district
-  has an enrolment between 18 and 63, so any number inside that empty band removes this district
+  has an enrollment between 18 and 63, so any number inside that empty band removes this district
   in every year and nothing else in any year. Its dollars remain in every aggregate; what it
   cannot carry is a denominator of five.
   [verified] (`dispersion::ohio_panel::MIN_ENROLMENT`, pinned by test)
@@ -393,12 +393,12 @@ revisions:
       at the top of the FY2023 distribution, four times the next one.
     reach: |
       **No pinned figure in this node changes**: every one of them is FY2022, and the district was
-      not comparable that year — which is the same fact that produced the artefact. Nine of the
+      not comparable that year — which is the same fact that produced the artifact. Nine of the
       fifteen years in the series move, FY2019 through FY2021 among them, so the band widens from
       40.0-46.5% to 40.0-48.8% and the ARRA finding in
       `dispersion::ohio_panel` is restated against the band's own floor rather than against a third.
       `dispersion::ohio_panel::MIN_ENROLMENT` is the correction and it is asserted, not assumed:
-      the empty enrolment band it sits in is a test.
+      the empty enrollment band it sits in is a test.
   - was: |
       "Ohio's triennial property reappraisals… would raise local revenue in the richest quartile
       mechanically — widening the gap with nothing about state aid having changed."
@@ -413,7 +413,7 @@ revisions:
       cycle: a cohort's event year moves class-I value 24 to 55 times as much as its quiet years.
     reach: |
       It does not touch the measurement, only the cause the node offered for it — and the cause is
-      no longer needed, because the movement it was offered to explain was an artefact. The finding
+      no longer needed, because the movement it was offered to explain was an artifact. The finding
       stands on its own: this is what a reappraisal does to Ohio's distribution whether or not
       anything else moved.
   - was: |

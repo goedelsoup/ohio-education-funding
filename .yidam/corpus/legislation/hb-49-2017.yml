@@ -19,7 +19,7 @@ description: |
     100%. [verified] (the greenbook)
 
   Every other biennium of the decade re-read the anchor and left it at 100%. This one made the
-  floor a function of enrolment loss, which is the only time in ten years that the mechanism
+  floor a function of enrollment loss, which is the only time in ten years that the mechanism
   distinguished between districts on it. It did not remove the floor from anyone; it lowered it by
   at most five points for the districts emptying fastest. [verified]
 
@@ -36,11 +36,11 @@ findings: |
   ### This is where the corpus can watch a guarantee stop being a hold-harmless
 
   A hold-harmless holds a district harmless. A guarantee at 95% of a prior year, for districts
-  chosen by enrolment loss, is a managed decline — and it is the only evidence in the decade that
+  chosen by enrollment loss, is a managed decline — and it is the only evidence in the decade that
   the General Assembly regarded the floor as something to be reduced rather than re-read.
   [inference] The Fair School Funding Plan's own
   [clawback](../formula-component/guarantee-open-enrolment-clawback.yml) reduces the base for a
-  district that has shed open-enrolment entrants, which is the same instinct applied to a different
+  district that has shed open-enrollment entrants, which is the same instinct applied to a different
   cause of loss, four years later. Whether the second was drawn from the first is not established.
   [open]
 
@@ -68,7 +68,7 @@ properties:
     nothing about when they first took effect. [verified]
   subject: |
     Enacted the FY2018-19 operating budget. Re-anchored temporary transitional aid from FY2015 to
-    FY2017 and made it conditional on enrolment: districts losing 10% or more of total ADM between
+    FY2017 and made it conditional on enrollment: districts losing 10% or more of total ADM between
     FY2014 and FY2016 were guaranteed 95% rather than 100%, on a scale from 5%. Provided for
     funding recomputations and for recommendations on compensating districts for valuation losses.
   vetoes: |
@@ -93,7 +93,7 @@ properties:
     disabilities; and permission to administer state assessments on paper.
   accountability_effect: |
     Changed the application periods for the Jon Peterson Special Needs and income-based EdChoice
-    scholarship programmes, and carried College Credit Plus provisions.
+    scholarship programs, and carried College Credit Plus provisions.
 
     On the funding side it carried both of H.B. 64's report-card bonuses into FY2018-19 unchanged,
     and it is the act whose analysis sets the community and STEM school version beside the district
@@ -101,8 +101,8 @@ properties:
     payment for traditional districts except that it does not use the state share index."*
     [verified] (crates/project, `rating_payments`, pinned by test)
 
-    That sentence is why the un-equalised form is identifiable at all, and it is the form that
-    outlived the equalised one — H.B. 166 froze districts and kept recalculating the charter
+    That sentence is why the un-equalized form is identifiable at all, and it is the form that
+    outlived the equalized one — H.B. 166 froze districts and kept recalculating the charter
     bonuses. See [Ohio report card](../accountability-regime/ohio-report-card.yml).
 links:
   - target: ../legislation.ont.yml

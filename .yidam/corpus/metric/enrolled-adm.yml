@@ -73,7 +73,7 @@ properties:
     It falls in every year. [verified] The total is over 611 districts, two more than the 609 the
     FY2027 model pays.
   caveats: |
-    **The years are labelled twice in the workbook, and once wrongly.** The `Base_Cost` sheet
+    **The years are labeled twice in the workbook, and once wrongly.** The `Base_Cost` sheet
     carries the same three columns cell-for-cell under headers reading FY2022/FY2023/FY2024;
     `ADM Data` labels the identical values FY2024/FY2025/FY2026. They cannot both be right and
     the arithmetic settles it: base cost ADM is the three-year average of the three, and this is
@@ -113,7 +113,7 @@ properties:
     them in the abstract since it was written. [verified] (`crates/project`)
 
     **And the fourth year exists twice, under one name.** The `Base_Enrollment Growth` sheet heads
-    a column `M1B FY23 Enrolled ADM` — the enrolment growth supplement's base — and it is not the
+    a column `M1B FY23 Enrolled ADM` — the enrollment growth supplement's base — and it is not the
     `[b1] FY23 Enrolled ADM` the `ADM Data` sheet publishes. They disagree in **608 of the 609
     districts** the panel carries, by up to 4.6%. Reading them as one series is the trap, and its
     cost is measured in the findings below. [verified] (`crates/project`)
@@ -146,7 +146,7 @@ findings: |
   (`crates/project`)
   The [temporary transitional aid guarantee](../formula-component/temporary-transitional-aid-guarantee.yml)
   pays a fixed dollar amount that enrollment does not enter. For the 294 districts it funds — very
-  nearly half the state — running the FY2027 formula at FY2024, FY2025 or FY2026 enrolment
+  nearly half the state — running the FY2027 formula at FY2024, FY2025 or FY2026 enrollment
   produces the identical figure to the cent, and projecting their enrollment forward produces a
   flat line with no interval at all. What moves for them is the *formula's* answer, which falls
   as enrollment does; the widening gap between the two is the guarantee.
@@ -217,17 +217,17 @@ findings: |
   ADM counts children a district enrolls. The department's own annual fact sheet counts, in one
   table and one year, every way an Ohio child is schooled instead — 173,156 in chartered private
   schools, 150,914 on vouchers, 116,973 in community schools, 79,006 on inter-district open
-  enrolment, 49,524 in joint vocational districts, and **53,051 in home education**, against a
-  statewide enrolment of 1,665,521.
+  enrollment, 49,524 in joint vocational districts, and **53,051 in home education**, against a
+  statewide enrollment of 1,665,521.
 
-  That 1,665,521 is Ohio's *public* enrolment: the community schools are inside it, and home
+  That 1,665,521 is Ohio's *public* enrollment: the community schools are inside it, and home
   education, the chartered private schools and the voucher students at them are not. So home
   education is 3.2% of the public system rather than 3.2% of Ohio's children — the second
   denominator is larger and nothing published states it. On the first, it is larger than the
   joint vocational districts, larger than every Ohio e-school together, and larger than four of
-  the five voucher programmes. **It is also
+  the five voucher programs. **It is also
   the only one of the thirteen channels with no per-district record anywhere.** Community schools
-  report through EMIS; vouchers are administered per student; open enrolment names both districts.
+  report through EMIS; vouchers are administered per student; open enrollment names both districts.
   A home-education notice is filed with the district of residence under R.C. 3321.042 and no
   statute requires anyone to forward it to the state as a count. EMIS carries withdrawal reason
   `43 — Transferred to Home Education`, which is a flow rather than a stock: a child who begins
@@ -238,12 +238,12 @@ findings: |
   33,328 in 2019-20 to 61,009 in 2024-25, with the step in 2020-21. The series is an aggregator's
   and cannot be verified, but its 2023-24 member is 53,051 and the department's sheet says 53,051,
   which is what identifies it as Ohio's numbers carried forward. Against the committed F-33 panel,
-  district enrolment fell 62,609 between FY2020 and FY2024 while home education rose about 19,700
+  district enrollment fell 62,609 between FY2020 and FY2024 while home education rose about 19,700
   — **roughly 31% of the decline in magnitude**. That is a size comparison and not a
   decomposition: districts also lost pupils to community schools, to vouchers, and to a falling
   birth cohort, and nothing here apportions between them. What it establishes is that a channel
-  carrying no ADM, in no enrolment file, reported per district nowhere, is of the same order as a
-  third of the enrolment loss that half the state's guarantee status turns on. See
+  carrying no ADM, in no enrollment file, reported per district nowhere, is of the same order as a
+  third of the enrollment loss that half the state's guarantee status turns on. See
   [dew-education-landscape](../../catalog/dew-education-landscape.md) and
   [jhu-homeschool-hub](../../catalog/jhu-homeschool-hub.md).
 
@@ -257,7 +257,7 @@ findings: |
   projection in the published feed, which is a decision to record rather than a number to edit.
   The decision is recorded at
   [the-fitted-damping](../../decisions/the-fitted-damping.yml) and the value is now **0.30** —
-  chosen over the 0.20 that minimises the headline metric because the objective is flat between
+  chosen over the 0.20 that minimizes the headline metric because the objective is flat between
   them (0.04033 against 0.04031, which no honest reading distinguishes) and 0.30 is the optimum on
   the enrollment-weighted metric, the one that governs a statewide total rather than a typical
   district.
@@ -333,7 +333,7 @@ findings: |
 
   This is not a defect in `series::advance`, which does what damping means. It is that a ten-year
   panel drawn this way carries about four years of demographic content and six years of the same
-  number relabelled, and nothing said so. Measured in `the_trend_the_damping_discards`.
+  number relabeled, and nothing said so. Measured in `the_trend_the_damping_discards`.
 
   **AND IT CANNOT BE DE-BIASED BY CHOOSING A DIFFERENT DAMPING.** [verified] (`crates/project`)
   That was left open and the answer is no. **The damping that zeroes the bias rises with the
@@ -377,7 +377,7 @@ findings: |
   percent, and the share that zeroes the bias rises with the horizon as the damping's did. A
   drift fitted on the pre-closure mean district removes half of what crosses the closure and
   puts the total a point low before it. An asymmetric band is that correction drawn as a band
-  and holds less. Neither the centre nor the band moves; the bias is to be published beside the
+  and holds less. Neither the center nor the band moves; the bias is to be published beside the
   projection, two figures per horizon, which is a feed field and a decision of its own. Measured
   in `the_bias_that_belongs_to_the_years`.
 
@@ -427,7 +427,7 @@ findings: |
   **The interval moves further than the point does.** Both terms are convex in the count, so the
   correction is largest at the low end of the enrollment band and smallest at the high end: the
   FY2032 band goes from $6,958M–$7,582M to **$6,853M to $7,740M**, and the ±4.3% stated above
-  becomes ±6.2%. A forecast that scales a curved function from its centre understates its own
+  becomes ±6.2%. A forecast that scales a curved function from its center understates its own
   interval.
 
   **The exposed population is exactly the formula population.** The guarantee is a `max`, so a
@@ -465,7 +465,7 @@ revisions:
       fifteen-year rate, the fastest-declining quarter of districts are forecast **8.0% high** at
       five years and the flattest quarter 2.0% low; the sign flips exactly where the growth rate
       does" — offered, in `the_trend_the_damping_discards`, as the reason the bias is *not* a
-      period effect: "a period artefact would show as a bias shared across districts."
+      period effect: "a period artifact would show as a bias shared across districts."
     now: |
       The quartile figures stand, and the inference drawn from them does not. The sort is on the
       rate over FY2009–FY2024, which includes the years the forecasts are scored on; a district

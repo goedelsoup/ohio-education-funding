@@ -32,7 +32,7 @@ decision: |
 
     - the **rule**, transcribed from LSC with its worked example reproduced as a test;
     - the Department of Taxation's **county reappraisal calendar**, carried as constants in
-      `regime_diff::recognized_valuation::CYCLE` and catalogued;
+      `regime_diff::recognized_valuation::CYCLE` and cataloged;
     - **Table SD-1 extended from two tax years to four**, TY2021–TY2024.
 
   Estimate each district's inflationary increase as its event-year growth in excess of its own

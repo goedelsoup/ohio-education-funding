@@ -24,7 +24,7 @@ account rather than to a school. The provisions this corpus draws on:
 | Testing | State assessments or "nationally norm-referenced tests that measure learning gains in math and language arts"; results reported annually disaggregated by grade, gender, family income and race; public reporting from year three |
 | Survey | An annual parental satisfaction survey is required |
 
-**Why a model bill is catalogued at all.** The same reason as the voucher act, plus one provision
+**Why a model bill is cataloged at all.** The same reason as the voucher act, plus one provision
 that has no Ohio counterpart and is worth having on the record: the model deducts the award from
 the resident district **and** keeps the student in that district's enrollment count. A district
 funded on a count that includes students it is not educating, while the money for them is

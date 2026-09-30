@@ -38,7 +38,7 @@ decision: |
   list invited the other reading. Both are open fetches, so the regime does not split them — and
   they are still two connectors, because this is a different office publishing a different page.
   `dew-scholarship-reports` is the scholarship channel's own office describing participation in
-  its own programmes; this is the department's data office publishing an enrolment census of a
+  its own programs; this is the department's data office publishing an enrollment census of a
   sector, of which the scholarship channel reaches a part. One connector over both would carry one
   status for an office whose page this project scrapes and an office whose reports it downloads,
   and the remainders are unrelated: the scholarship connector is blocked on per-district

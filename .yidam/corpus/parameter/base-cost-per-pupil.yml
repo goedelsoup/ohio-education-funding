@@ -127,7 +127,7 @@ properties:
 
     **And a statewide per-pupil amount did run through the hole — the deduction.** What a
     district is charged for a pupil it does not teach, on a community school, STEM school, open
-    enrolment or Post-Secondary Enrolment Options transfer, was legislated in each of those acts
+    enrollment or Post-Secondary Enrollment Options transfer, was legislated in each of those acts
     and fell in each: $5,732 in FY2009 when it was the base cost, then $5,718, $5,703 and $5,653.
     Ohio stopped saying what a pupil costs without stopping saying what one is worth taking away.
     [verified]
@@ -163,7 +163,7 @@ properties:
     Under the plan the average is not knowable when the act passes: it is a quotient over data
     the department has not collected. So the biennium's own greenbook estimates it and the next
     biennium's states what it was. H.B. 110 estimated FY2022 at $7,202 and the year came in at
-    $7,352, so the estimate was low by 2.08% — and because FY2023 was then frozen at the realised
+    $7,352, so the estimate was low by 2.08% — and because FY2023 was then frozen at the realized
     figure, it was wrong about two years rather than one. The career-technical companion missed
     the same way in FY2024: $9,726 estimated, $9,855.62 used. [verified]
 
@@ -193,7 +193,7 @@ properties:
     freezes all three. $8,241.61 is the load-bearing one — it
     is what the English learner and special education weights multiply
     ([`project::panel::categoricals::AVERAGE_BASE_COST_PER_PUPIL`](../../../crates/project/src/panel/categoricals.rs))
-    and what the open-enrolment clawback charges per FTE — so it is a *stated input* rather than a
+    and what the open-enrollment clawback charges per FTE — so it is a *stated input* rather than a
     derived average, and it is not recoverable from the two figures above it. Any statement of the
     form "aggregate ÷ ADM = the average the formula uses" is false here by $15.94. [verified]
     (summed from `crates/foundation/fixtures/fy27-department-model.csv`, 609 districts)

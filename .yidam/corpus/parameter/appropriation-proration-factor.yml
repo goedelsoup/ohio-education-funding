@@ -116,7 +116,7 @@ findings: |
 
   The $147,500,000 stated beside the 0.96854448 factor is the **FY2025 estimate**. FY2026 and
   FY2027 are both $153,976,832. So the factor and the limit beside it are carried over together
-  from the prior biennium, and on the year being modelled the program at $148,408,184 is
+  from the prior biennium, and on the year being modeled the program at $148,408,184 is
   **$5.6m under** its appropriation rather than $908,184 over it — meaning no proration would
   arise at all.
 
@@ -268,7 +268,7 @@ findings: |
   pass-through is not identified by anything this repository can reach —
   [`crates/dispersion`](../../../crates/dispersion/tests/the_fuel_response_the_panel_cannot_identify.rs)
   fits eleven specifications and every one spans zero, and the blocker is the absence of a mile
-  column in the F-33 rather than sample size. So the table above is parameterised by cost and a
+  column in the F-33 rather than sample size. So the table above is parameterized by cost and a
   reader who holds a fuel share can compose the two. [verified]
 figures:
   - key: project/sped-transport-factor-at-a-tenth-more-cost
@@ -408,7 +408,7 @@ revisions:
       orphaned heading's own body was severed in `041e08b4`, the commit that split one prose field
       into four: the paragraph it introduced began mid-sentence (", which is the clearest
       illustration of…") and the first half went with the migration. Its substance — what a
-      residual claimant is and why this programme prorates when the others do not — survives in
+      residual claimant is and why this program prorates when the others do not — survives in
       `description:` under its own heading, so nothing was lost but the heading.
     found_by: |
       `git log -S` on the heading text while adding the section above it. A heading with an empty

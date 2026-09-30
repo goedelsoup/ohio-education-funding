@@ -9,7 +9,7 @@ description: |
   **RUN.** Reproduce with `cargo run -p project --bin edfund-project -- --guarantee <rule>
   [--backstop repealed|rebased]`. Every figure below is a **simulation**, not a forecast: it
   re-runs the department's own FY2027 model with one lever moved, at observed enrollment. Where a
-  projection is used it is labelled and reported separately, per
+  projection is used it is labeled and reported separately, per
   [`skills/project`](../../skills/project.md).
 
   Ohio's FY2027 model pays **$7,281 million** in state foundation aid to 609 districts. **$879
@@ -29,7 +29,7 @@ description: |
   [`fsfp-formula-transition-supplement`](../formula-component/fsfp-formula-transition-supplement.yml)
   for the device.
 
-  This scenario generalises [fsfp-input-year-refresh](fsfp-input-year-refresh.yml) from the
+  This scenario generalizes [fsfp-input-year-refresh](fsfp-input-year-refresh.yml) from the
   single district that node refreshes to the whole state.
 figures:
   - key: project/districts-on-the-guarantee
@@ -492,7 +492,7 @@ findings: |
   where this node published **+$95.4M**, because `base_cost_scale` was given the categoricals
   priced in base cost on 2026-08-09 — recorded at
   [`the-scenario-models-ohio`](../../decisions/scenario-models-ohio.yml), forty days before the
-  backstop was modelled at all. The two corrections run opposite ways and nearly cancel:
+  backstop was modeled at all. The two corrections run opposite ways and nearly cancel:
   **+$11.2M** of categorical scaling against **-$5.0M** of clawback, which is the whole of the
   $6.3M between the figure this node published and the one it now reports. That is the hazard in
   a net figure, and the reason the foundation column is bound here beside the total: a table
@@ -668,7 +668,7 @@ properties:
     rather than past it. Measured in
     `crates/project/tests/the_horizons_the_backtest_stopped_short_of.rs`.
 
-    [verified] **What fails past five years is the centre, not the width.** Pooled across origins
+    [verified] **What fails past five years is the center, not the width.** Pooled across origins
     the band's coverage does sink — **64.5%** held at one year, 67.1% at five, **60.1%** at
     thirteen, and at its worst **8.9%** of forecasts short of the target at eleven — and removing
     each origin's own mean puts the whole of that back. At a fixed horizon every origin runs the
@@ -695,7 +695,7 @@ properties:
     0.30** — the three tenths the damping already carries. Decaying the rate toward a share of
     the long-run rate over-corrects at every share above five hundredths, a drift fitted before
     the closure removes half of what crosses it and puts the total a point low before it, and an
-    asymmetric band holds less than shifting the centre by the same amount. Neither the centre
+    asymmetric band holds less than shifting the center by the same amount. Neither the center
     nor the band is corrected. Measured in
     `crates/project/tests/the_bias_that_belongs_to_the_years.rs`.
 
@@ -707,7 +707,7 @@ properties:
     panel reaches nine years, and there the mean district ends at +0.0272 and the total at
     +0.0171. This node's own projection runs a six-year leg to FY2032, and at six years those
     figures are +0.0117 for the mean district and +0.0036 for the total — so the FY2032 band
-    above is centred high on both counts, by roughly three times as much on the district average
+    above is centered high on both counts, by roughly three times as much on the district average
     as on the state total, and nothing above is adjusted for it. The same six years across the
     closure read +0.0237 for the mean district — twice the pre-closure figure at the identical
     horizon, which is why the population a six-year statement rests on has to be named rather
@@ -719,7 +719,7 @@ properties:
     and the statewide figure is still low. Neither line on either population turns back — the
     furthest any of the four ever sits from zero is its own last point, 0.0272 and 0.0171 before
     the closure and 0.0734 and 0.0569 across it — so the drift is not a middle-distance
-    artefact that washes out, and the deepest horizon is the one where a correction would matter
+    artifact that washes out, and the deepest horizon is the one where a correction would matter
     most and is trusted least. A level correction sized on one of the two quantities is the wrong
     size for the other, which is why both are published and neither is applied. Computed by
     `crates/project`'s `backtest::bias_profile` and checked against the independent table in
@@ -823,7 +823,7 @@ revisions:
       is stronger without it: the backstop filters a guarantee retirement up the wealth
       distribution. `temporary-transitional-aid-guarantee`'s quintile table already pointed this
       way — Q4 and Q5 losing most per pupil — and the two nodes were in tension until `[K]` was
-      modelled.
+      modeled.
   - was: |
       "**Removing the guarantee nearly doubles the state's exposure to enrollment forecast
       error.**" [inference] — from a foundation-aid band of ±4.3% under current law against ±7.8%

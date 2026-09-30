@@ -179,7 +179,7 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
         counts the children directly certified through SNAP, food assistance, foster care or a
         homeless roll — everyone who would have qualified by filing and did not appear on one of
         those lists is missing from it. Its ceiling is what those schools may claim for, which is
-        the same count times the 1.6 the federal programme uses, capped at enrollment. For
+        the same count times the 1.6 the federal program uses, capped at enrollment. For
         FY${end.fiscal_year} that is ${pct(end.floor, 1)} to ${pct(end.ceiling, 1)}. The band
         contains FY${last.fiscal_year}'s ${pct(last.share!, 1)}, so the thing this series cannot
         settle is not the level but the direction.</p>`
@@ -194,7 +194,7 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
         almost every one stopped filing. ${waived
           .map((y) => `FY${y.fiscal_year} carries ${y.sponsors} sponsors`)
           .join(" and ")}, against ${(end ?? last).sponsors} the year this page ends on, on about
-        a quarter of the enrolment. What they report is true of the sponsors in them and is not a
+        a quarter of the enrollment. What they report is true of the sponsors in them and is not a
         reading of Ohio, so nothing above ranges over them.</p>`
       }
 

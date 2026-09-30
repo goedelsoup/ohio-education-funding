@@ -58,10 +58,10 @@ findings: |
   there is no excess to keep. [verified]
 
   **And the same greenbook disposes of the same residual the other way, two pages earlier.** The
-  Cleveland programme's deduct was a fixed earmark, and "any funds that are not needed to cover
+  Cleveland program's deduct was a fixed earmark, and "any funds that are not needed to cover
   the costs of the program are disbursed to CMSD". [verified] So Ohio's answer to this provision
-  is not a rule but a choice it made twice, in opposite directions, for two scholarship programmes
-  running in the same year. A model text can be matched against a state only one programme at a
+  is not a rule but a choice it made twice, in opposite directions, for two scholarship programs
+  running in the same year. A model text can be matched against a state only one program at a
   time. [inference]
 
   ### The award basis exists in Ohio and points inward
@@ -69,7 +69,7 @@ findings: |
   The model sets the award from "state and local sources". That phrase computes a per-pupil amount
   exactly once in the committed statute extract: **R.C. 3302.12**, where a district that has
   replaced a failing building's principal and teaching staff must fund that building at "the per
-  pupil amount of state and local revenues received by the district" multiplied by its enrolment.
+  pupil amount of state and local revenues received by the district" multiplied by its enrollment.
   [verified]
   ([`crates/project`](../../../crates/project/tests/the_residual_the_model_lets_the_state_keep.rs))
 
@@ -122,7 +122,7 @@ properties:
     **Ohio ran it, for two fiscal years.** H.B. 1 of the 128th General Assembly deducted $5,200
     for every traditional EdChoice scholarship against maxima of $4,200 and $5,000, and H.B. 153
     ended it by making the deduct the award. The findings carry the arithmetic and the Cleveland
-    programme's opposite disposition of the same residual. [verified]
+    program's opposite disposition of the same residual. [verified]
     ([`crates/project`](../../../crates/project/tests/the_residual_the_model_lets_the_state_keep.rs))
 
     Ohio's post-FSFP arrangement is neither. See the description, and

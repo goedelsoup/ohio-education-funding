@@ -200,7 +200,7 @@ properties:
   unpriced: |
     Two of five, and the $262.0M figure does not include either of them.
 
-    **Special education category weights (provision 3, R.C. 3317.014).** Unlevered rather than unmodelled — the
+    **Special education category weights (provision 3, R.C. 3317.014).** Unlevered rather than unmodeled — the
     six weights are carried and the categorical total is computed, but nothing scales one weight.
     A lever would cost a field on `Policy`, a checkpoint in `bundle`, and a mirrored
     implementation in `web/src/lib/policy.ts`, because `verify.ts` refuses to render the scenario

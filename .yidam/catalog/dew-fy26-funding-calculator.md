@@ -72,7 +72,7 @@ Both facts are true and the conclusion does not follow from them. Bus miles and 
 survey a year apart and they are stable. The columns two corpus nodes had recorded as unmeasurable
 "because the corpus holds one year of the calculator" are not: per-pupil local capacity moves
 **+9.34%** at the median and 2 districts of 609 are unchanged, and disadvantaged pupil impact aid
-moves **−8.58%** with none unchanged. Generalising from the one sheet that was opened to the
+moves **−8.58%** with none unchanged. Generalizing from the one sheet that was opened to the
 thirty that were not is the error, and it foreclosed the question the file was closest to
 answering.
 

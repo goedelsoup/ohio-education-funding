@@ -338,7 +338,7 @@ export function renderProvenance(bundle: Bundle): string {
         of School System Finances, FY${first.fiscal_year} through FY${last.fiscal_year}. They are not the state's
         funding formula and they do not reconcile with it. The survey counts about
         ${last.districts} comparable Ohio systems a year — community schools and educational
-        service centres among them — on its own enrollment count and its own revenue
+        service centers among them — on its own enrollment count and its own revenue
         classification, where everything else on this site is the Department of Education and
         Workforce's FY${bundle.fiscal_year} model of ${bundle.statewide.districts} traditional
         districts.</p>

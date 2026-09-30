@@ -42,7 +42,7 @@ enacted for that biennium nowhere at all. Both variants are held here for that r
   columns headed with a year, and the `as enacted` variant carries an amount for every stage the
   bill passed through. Only the enacted, actual and adjusted columns are extracted; the
   legislative stages are real figures that never became law and are left in the source.
-- **An unlabelled column means different things in the two variants.** In the revised workbook a
+- **An unlabeled column means different things in the two variants.** In the revised workbook a
   bare `FY 2014` is spending; in the enacted one it is a prior year. Nothing in the cell says so.
 - **The 129th serves the same file under both names.** Its `as-enrolled` and
   `with-actual-expenditures` URLs return byte-identical content, so FY2012-13 has actuals and no

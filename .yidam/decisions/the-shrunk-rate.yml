@@ -43,9 +43,9 @@ decision: |
   **A rate, per district, nullable.** `long_run_enrollment_rate` is `V33` fall membership and
   `adm_history` is enrolled ADM. A level from one cannot be spliced onto the other, and a rate can
   be composed with it, so the panel publishes a rate and never a series. A district the survey
-  does not reach is projected `damped` at the same damping — the behaviour it had before — rather
+  does not reach is projected `damped` at the same damping — the behavior it had before — rather
   than shrunk toward a zero nobody measured, which would be a claim about that district rather
-  than an absence of one. All 609 currently have one, so the fallback is defence and not a
+  than an absence of one. All 609 currently have one, so the fallback is defense and not a
   population.
 consequences: |
   **The assumption this rests on, stated because it cannot be tested.** Enrolled ADM and `V33`

@@ -117,7 +117,7 @@ function groups(b: BaseCostBuildUp): Group[] {
         { code: "C4", label: "Fiscal support", value: b.fiscal_support },
         { code: "C5", label: "EMIS support", value: b.emis },
         { code: "C6", label: "Leadership support", value: b.leadership_support },
-        { code: "C7", label: "Information technology centre", value: b.itc },
+        { code: "C7", label: "Information technology center", value: b.itc },
       ],
     },
     {

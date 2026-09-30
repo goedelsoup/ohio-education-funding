@@ -17,9 +17,9 @@ description: |
                  0 )
 
   `[H2]` is the [guarantee funding base](../parameter/guarantee-funding-base.yml) — the FY2020
-  anchor, published per district and never re-based. `[I1]` is the [open enrolment
+  anchor, published per district and never re-based. `[I1]` is the [open enrollment
   clawback](guarantee-open-enrolment-clawback.yml), a reduction for a guaranteed district that
-  has shed entering open enrolment beyond a threshold. Each is a mechanism in its own right
+  has shed entering open enrollment beyond a threshold. Each is a mechanism in its own right
   that this line composes rather than contains. [verified]
 
   Because the guarantee is a difference rather than a rate, any increase in computed funding
@@ -53,7 +53,7 @@ findings: |
   hold-harmless is not topping up its aid but constituting it. Whatever the guarantee is *for*,
   North Bass is the case where nothing else is doing any work.
 
-  Its neighbour **Middle Bass Local** is the other half of the pair and receives nothing at all,
+  Its neighbor **Middle Bass Local** is the other half of the pair and receives nothing at all,
   which is the same fact from the other side: two districts the formula has no answer for, one
   carrying a 2020 figure forward indefinitely and one carrying zero.
 
@@ -192,7 +192,7 @@ findings: |
   in size: the formula transition supplement makes 127 of the 294 whole, and the cut that survives
   runs further up the wealth distribution than this table does. See
   [guarantee-phase-out](../scenario/guarantee-phase-out.yml), whose largest per-pupil loser moved
-  from the poorest district in the state to one of the wealthiest once `[K]` was modelled. [verified]
+  from the poorest district in the state to one of the wealthiest once `[K]` was modeled. [verified]
 
   Two things this does *not* say. The gradient is **not monotone** — Q4 loses more per pupil than
   Q5, because the wealthiest districts are small and already floored, so less distance separates
@@ -221,7 +221,7 @@ findings: |
   lets them fall past a floor that would really catch them: at a 5% phase-in the model has them
   lose 95% of their aid and puts nobody on the guarantee. Those districts hold **46% of Ohio's
   students**, so any scenario that reduces formula aid overstates its savings by an amount that
-  cannot be bounded here. [verified] (the model's behaviour) [open] (the size of the real-world
+  cannot be bounded here. [verified] (the model's behavior) [open] (the size of the real-world
   correction, which needs FY2020 per-district payments for districts not on the guarantee)
 
   ### The consequence for equity is direct
@@ -311,7 +311,7 @@ findings: |
   ### A zero margin is not a payment for shrinking, and the difference is the finding
 
   `enrollment_decline` measured the median member of its cluster drawing $464.06 a pupil for
-  enrolment lost. That is an average, and the margin beside it is zero; the two are consistent
+  enrollment lost. That is an average, and the margin beside it is zero; the two are consistent
   precisely because the guarantee pays a level, and a district cannot act on an average. [verified]
   (crates/project)
 
@@ -361,7 +361,7 @@ findings: |
 
   `realized = max([H], factor x last year's realized)` — "no district's foundation aid falls more
   than a stated percentage in a year" — is date-free, reaches a district that crosses in any year,
-  and extinguishes itself for one whose enrolment settles. Walked to FY2032:
+  and extinguishes itself for one whose enrollment settles. Walked to FY2032:
 
       anchor                          [I] statewide    districts    [I] to the 89    of the 89
       the FY2020 base, as enacted     $932,058,576          312       $144,560,558           89
@@ -440,7 +440,7 @@ findings: |
 
   **And the four supplements agree.** The same cut of what
   [`the_adjustment_the_floors_absorb.rs`](../../../crates/project/tests/the_adjustment_the_floors_absorb.rs)
-  priced, at the modelled year, outside the cluster, per pupil:
+  priced, at the modeled year, outside the cluster, per pupil:
 
       shape                              least wealthy   wealthiest   poorest   least poor
       rolling pupil count                      $166.55       $11.43   $109.79       $11.68
@@ -670,7 +670,7 @@ findings: |
   $222.89, $189.68 and $242.77 across the five fifths, so the whole of that shape's gradient is a
   property of the districts around them. [verified] (crates/project)
 
-  The gradient is therefore this population's neighbourhood and not this population. The siblings
+  The gradient is therefore this population's neighborhood and not this population. The siblings
   sit at the poor end — 22, 17, 11, 6 and 7 of them across the wealth fifths — and raise it; what
   makes it a gradient is the 81 other districts in the poorest fifth, whose $119.29 a pupil is
   already fourteen times the wealthiest fifth's. [inference]
@@ -700,12 +700,12 @@ findings: |
   once, from deterministic seeds, at every k from 2 to 9, after known-answer tests in
   `crates/dispersion`. Scored as a ceiling, with every cell assigned to its majority, the most any
   of them labels right on the cluster against the rest is **519** of 607, where a single cell
-  scores **518**; started from the typology's own nine centres instead, 518 exactly. The 2013
+  scores **518**; started from the typology's own nine centers instead, 518 exactly. The 2013
   typology itself scores **518** on the cluster and **384** on guarantee membership; a nine-cell
   k-means reaches **432** on membership and the typology-seeded run **415**, so a fit beats the
   baseline at describing who is held, and neither reaches three quarters. With nothing fitted, a
-  cluster member's nearest neighbour on the six variables is a member **31** of 89 times, against
-  89 of 607 by chance, and **449** of 607 districts have a neighbour that is held if and only if
+  cluster member's nearest neighbor on the six variables is a member **31** of 89 times, against
+  89 of 607 by chance, and **449** of 607 districts have a neighbor that is held if and only if
   they are. The cluster is a region of the profile, a thin one, and no cell of any partition tried
   holds a majority of it. [verified] (crates/project)
 
@@ -1069,7 +1069,7 @@ figures:
   - key: project/nearest-neighbours-agreeing-on-membership
     value: 449
     field: findings
-    as_written: "**449** of 607 districts have a neighbour"
+    as_written: "**449** of 607 districts have a neighbor"
   - key: project/size-terms-newly-guaranteed-statewide
     value: 136
     field: findings
@@ -1301,9 +1301,9 @@ revisions:
   - was: |
       A hold-harmless and nothing else: computed funding below a baseline, pay the difference.
     now: |
-      The department's `[I]` subtracts an [open enrolment
+      The department's `[I]` subtracts an [open enrollment
       clawback](guarantee-open-enrolment-clawback.yml) as well. A guaranteed district whose open
-      enrolment FTE has fallen by more than `max(10% of last year, 20 FTE)` has its guarantee cut
+      enrollment FTE has fallen by more than `max(10% of last year, 20 FTE)` has its guarantee cut
       by **$8,241.61 for every FTE beyond that threshold** — the statewide average base cost per
       pupil, charged at full value rather than at the district's state share. **43 districts,
       $5.1m withheld.**
@@ -1322,7 +1322,7 @@ revisions:
       It is `[H2] Funding Base`, published per district on `Detail_SFPR`, and it is the FY2020
       level Ohio froze funding at under the [Bridge
       formula](../funding-regime/bridge-formula.yml). It is **not** `[L1] FY21 Funding Base` on
-      the same sheet, which is explicitly labelled and generally larger — that one is the base for
+      the same sheet, which is explicitly labeled and generally larger — that one is the base for
       the [formula transition supplement](fsfp-formula-transition-supplement.yml).
     found_by: |
       The department's FY2026 payment report line-by-line explanation, which states the guarantee
@@ -1356,7 +1356,7 @@ properties:
     [I] Guarantee = if [H2] > [H] and ([H2] - [I1] - [H]) > 0
                      then [H2] - [I1] - [H] else 0
 
-    where [H2] is the guarantee funding base and [I1] the open enrolment adjustment, each of which
+    where [H2] is the guarantee funding base and [I1] the open enrollment adjustment, each of which
     has a node of its own.
 
     Reported as line [I] of the Summary School Finance Payment Report, separate from core
@@ -1365,7 +1365,7 @@ properties:
     \begin{aligned}
     H &= \text{foundation funding} \\
     H_2 &= \text{guarantee funding base} && \text{a node of its own} \\
-    I_1 &= \text{open enrolment adjustment} && \text{a node of its own} \\
+    I_1 &= \text{open enrollment adjustment} && \text{a node of its own} \\
     I &= \begin{cases}
       H_2 - I_1 - H & \text{if } H_2 > H \ \text{ and }\ H_2 - I_1 - H > 0 \\
       0 & \text{otherwise}

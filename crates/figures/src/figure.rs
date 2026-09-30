@@ -2235,7 +2235,7 @@ pub static FIGURES: &[Figure] = &[
         key: "scenario-delta/refresh-adm-share-unmoved",
         owner: "crates/scenario-delta",
         unit: Unit::Share,
-        label: "The share of Ohio's modelled enrollment held by the districts an increase does \
+        label: "The share of Ohio's modeled enrollment held by the districts an increase does \
                 not reach — the figure that says whether the unmoved count is a large fact",
         pinned: 0.430_474_04,
         tolerance: 0.000_01,
@@ -2295,7 +2295,7 @@ pub static FIGURES: &[Figure] = &[
         key: "dispersion/ohio-spending-per-pupil-fy2022",
         owner: "crates/dispersion",
         unit: Unit::Dollars,
-        label: "Ohio's current spending per pupil, FY2022, on the Bureau's own enrolment count",
+        label: "Ohio's current spending per pupil, FY2022, on the Bureau's own enrollment count",
         pinned: 14_923.0,
         tolerance: 1.0,
         compute: |i| ohio(i).spending_per_pupil(),
@@ -2462,7 +2462,7 @@ pub static FIGURES: &[Figure] = &[
         key: "dispersion/fy2016-step-total-valuation-coefficient-negative",
         owner: "crates/dispersion",
         unit: Unit::Ratio,
-        label: "Log total assessed value against the FY2016 move, standardised, holding wealth \
+        label: "Log total assessed value against the FY2016 move, standardized, holding wealth \
                 per pupil and disadvantage \u{2014} negative",
         pinned: 0.1994,
         tolerance: 0.0005,
@@ -2523,7 +2523,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "The same with the performance supplement removed \u{2014} wider, so the \
-                supplement narrows Ohio's equalisation rather than widening it",
+                supplement narrows Ohio's equalization rather than widening it",
         pinned: 0.5281,
         tolerance: 0.0005,
         compute: |_| project::supplement_reach::dispersion().1,
@@ -2568,7 +2568,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/evidence-based-model-line-items",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Line items of the state budget authorised under R.C. 3306, the Evidence-Based \
+        label: "Line items of the state budget authorized under R.C. 3306, the Evidence-Based \
                 Model's chapter, across eighteen editions of the Catalog",
         pinned: 1.0,
         tolerance: 0.0,
@@ -2595,7 +2595,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/chapter-3317-line-items-before-the-model",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Line items authorised under R.C. 3317 in the 2006 edition, before the model",
+        label: "Line items authorized under R.C. 3317 in the 2006 edition, before the model",
         pinned: 10.0,
         tolerance: 0.0,
         compute: |_| chapter_lines(2006),
@@ -2695,7 +2695,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/enrolment-growth-supplement-per-pupil-fy2026",
         owner: "crates/project",
         unit: Unit::Dollars,
-        label: "And the enrolment growth supplement's, against $250 a year later",
+        label: "And the enrollment growth supplement's, against $250 a year later",
         pinned: 225.0,
         tolerance: 0.01,
         compute: |_| scalar_at("enrolment_growth_supplement_per_pupil", 2026),
@@ -2948,7 +2948,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "How far statewide median weighted wealth moves between the two published models \
-                \u{2014} the quantity targeted assistance equalises to",
+                \u{2014} the quantity targeted assistance equalizes to",
         pinned: 0.082_314_914_960_079_92,
         tolerance: 0.000_001,
         compute: |_| {
@@ -2975,8 +2975,8 @@ pub static FIGURES: &[Figure] = &[
         key: "project/adm-growth-persistence",
         owner: "crates/project",
         unit: Unit::Ratio,
-        label: "How much of a district's enrolment growth rate carries into the next year, \
-                FY2025 to FY2026 \u{2014} the quantity the projection's damping parameterises",
+        label: "How much of a district's enrollment growth rate carries into the next year, \
+                FY2025 to FY2026 \u{2014} the quantity the projection's damping parameterizes",
         pinned: 0.341_205,
         tolerance: 0.000_01,
         compute: |_| project::counts::adm_persistence()[1].2,
@@ -3055,7 +3055,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Share,
         label: "How far the most recently arrived English learners fall between the two models \
-                \u{2014} a cohort ageing through the taper, not a file nobody refreshed",
+                \u{2014} a cohort aging through the taper, not a file nobody refreshed",
         pinned: 0.219_738_035_205_238_6,
         tolerance: 0.000_001,
         compute: |_| -project::counts::stability(project::counts::Series::EnglishLearner(1)).change(),
@@ -3657,7 +3657,7 @@ pub static FIGURES: &[Figure] = &[
         // day, not an average daily membership. The survey publishes it whole and it compares
         // exactly.
         unit: Unit::Count,
-        label: "Electronic Classroom of Tomorrow peak enrolment, FY2016, on the Census count",
+        label: "Electronic Classroom of Tomorrow peak enrollment, FY2016, on the Census count",
         pinned: 14_153.0,
         tolerance: 0.0,
         compute: |i| {
@@ -3954,7 +3954,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Site-based community schools paid the equity supplement in FY2025, of 343 \
-                community and STEM schools the department modelled that year",
+                community and STEM schools the department modeled that year",
         pinned: 317.0,
         tolerance: 0.0,
         compute: |i| {
@@ -4119,7 +4119,7 @@ pub static FIGURES: &[Figure] = &[
         key: "dispersion/ctpd-share-of-career-technical-enrolment-outside-the-panel",
         owner: "crates/dispersion",
         unit: Unit::Share,
-        label: "The same population as a share of career-technical enrolment rather than of \
+        label: "The same population as a share of career-technical enrollment rather than of \
                 members \u{2014} not of enrolled ADM, which the statute pays on and this source \
                 does not publish",
         pinned: 0.04749,
@@ -4130,7 +4130,7 @@ pub static FIGURES: &[Figure] = &[
         key: "dispersion/ctpd-members-outside-the-panel-with-no-enrolment",
         owner: "crates/dispersion",
         unit: Unit::Count,
-        label: "Non-district planning district members carrying no career-technical enrolment at \
+        label: "Non-district planning district members carrying no career-technical enrollment at \
                 all, FY2025",
         pinned: 277.0,
         tolerance: 0.0,
@@ -4258,7 +4258,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/scholarship-channel-estimated-payments-fy2027",
         owner: "crates/project",
         unit: Unit::Dollars,
-        label: "LSC\u{2019}s estimate of all five scholarship programmes\u{2019} payments, FY2027",
+        label: "LSC\u{2019}s estimate of all five scholarship programs\u{2019} payments, FY2027",
         pinned: 1_251_100_000.0,
         tolerance: 1.0,
         compute: |_| table_five("channel", 2027),
@@ -4267,7 +4267,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/scholarship-channel-enacted-payments-fy2027",
         owner: "crates/project",
         unit: Unit::Dollars,
-        label: "LSC\u{2019}s estimate of all five scholarship programmes\u{2019} payments, FY2027, \
+        label: "LSC\u{2019}s estimate of all five scholarship programs\u{2019} payments, FY2027, \
                 remade for the enacted act",
         pinned: 1_264_900_000.0,
         tolerance: 1.0,
@@ -4428,7 +4428,7 @@ pub static FIGURES: &[Figure] = &[
         key: "dispersion/cleveland-enrolment-change-negative",
         owner: "crates/dispersion",
         unit: Unit::Share,
-        label: "Cleveland Municipal enrolment over the same span \u{2014} negative",
+        label: "Cleveland Municipal enrollment over the same span \u{2014} negative",
         pinned: 0.3225,
         tolerance: 0.0005,
         compute: |i| i.closed.cleveland_enrolment.nominal.abs(),
@@ -4716,7 +4716,7 @@ pub static FIGURES: &[Figure] = &[
         key: "dispersion/classroom-spending-on-growth",
         owner: "crates/dispersion",
         unit: Unit::Ratio,
-        label: "Classroom instruction per pupil against the Progress effect size, standardised, \
+        label: "Classroom instruction per pupil against the Progress effect size, standardized, \
                 with non-classroom spending and five controls",
         pinned: 0.2432,
         tolerance: 0.0005,
@@ -5559,7 +5559,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/jpsn-participation-fy2023",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Children the Jon Peterson programme served in FY2023, the first year of the \
+        label: "Children the Jon Peterson program served in FY2023, the first year of the \
                 series the department's own annual report gives",
         pinned: 8186.0,
         tolerance: 0.0,
@@ -5571,7 +5571,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/jpsn-participation-fy2024",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Children the programme served in FY2024 \u{2014} the one fiscal year the \
+        label: "Children the program served in FY2024 \u{2014} the one fiscal year the \
                 department and the Legislative Service Commission both describe",
         pinned: 8551.0,
         tolerance: 0.0,
@@ -5583,7 +5583,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/jpsn-series-first-change",
         owner: "crates/project",
         unit: Unit::Share,
-        label: "The programme's first published year-on-year change in participation, FY2023 to \
+        label: "The program's first published year-on-year change in participation, FY2023 to \
                 FY2024 \u{2014} it slows to 1.5% the year after",
         pinned: 0.044_588_321_524_554_164,
         tolerance: 0.000_1,
@@ -5596,7 +5596,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/jpsn-expenditure-fy2023",
         owner: "crates/project",
         unit: Unit::Dollars,
-        label: "What the programme spent in FY2023 \u{2014} the one total the department states in \
+        label: "What the program spent in FY2023 \u{2014} the one total the department states in \
                 words, and it equals the sum of its own six category figures to the cent",
         pinned: 81_773_133.70,
         tolerance: 0.005,
@@ -5608,7 +5608,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/jpsn-expenditure-fy2024",
         owner: "crates/project",
         unit: Unit::Dollars,
-        label: "What the programme spent in FY2024, summed from a chart the edition never totals \
+        label: "What the program spent in FY2024, summed from a chart the edition never totals \
                 \u{2014} it rounds to the about $95.4 million LSC publishes for the same year",
         pinned: 95_362_957.53,
         tolerance: 0.005,
@@ -6154,7 +6154,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/dispersion",
         unit: Unit::Count,
         label: "Ohio agencies the federal directory types as regional education service agencies \
-                \u{2014} joint vocational districts and educational service centres together",
+                \u{2014} joint vocational districts and educational service centers together",
         pinned: 100.0,
         tolerance: 0.0,
         compute: |_| dispersion::lea_directory::service_agencies().len() as f64,
@@ -6183,7 +6183,7 @@ pub static FIGURES: &[Figure] = &[
         key: "dispersion/eastland-fairfield-enrolment-fy2023",
         owner: "crates/dispersion",
         unit: Unit::Count,
-        label: "Eastland-Fairfield's enrolment on the Census count, FY2023 \u{2014} a head count \
+        label: "Eastland-Fairfield's enrollment on the Census count, FY2023 \u{2014} a head count \
                 and not a full-time equivalent, which is what makes a ratio off it a trap",
         pinned: 1_160.0,
         tolerance: 0.0,
@@ -6368,8 +6368,8 @@ pub static FIGURES: &[Figure] = &[
         key: "project/enrolment-growth-supplement-total",
         owner: "crates/project",
         unit: Unit::Dollars,
-        label: "The enrolment growth supplement statewide — $250 a pupil on the whole roll, for \
-                a district whose enrolment rose 3% over three years",
+        label: "The enrollment growth supplement statewide — $250 a pupil on the whole roll, for \
+                a district whose enrollment rose 3% over three years",
         pinned: 39_379_553.0,
         tolerance: 1.0,
         compute: |i| i.panel.iter().map(|r| r.supplements.growth).sum(),
@@ -6411,7 +6411,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/median-three-year-enrolment-decline",
         owner: "crates/project",
         unit: Unit::Share,
-        label: "How far the median district's enrolment fell over the three years the growth \
+        label: "How far the median district's enrollment fell over the three years the growth \
                 supplement measures",
         pinned: 0.048417,
         tolerance: 0.00001,
@@ -6446,7 +6446,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/other-districts-just-below-the-growth-cliff",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Districts between 2.7% and 3% enrolment growth besides the nearest miss — near \
+        label: "Districts between 2.7% and 3% enrollment growth besides the nearest miss — near \
                 the cliff, and paid nothing for it",
         pinned: 3.0,
         tolerance: 0.0,
@@ -6751,7 +6751,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/open-enrolment-clawback-carrying",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Districts charged an open-enrolment adjustment, FY2027",
+        label: "Districts charged an open-enrollment adjustment, FY2027",
         pinned: 43.0,
         tolerance: 0.0,
         compute: |i| clawback(&i.panel).charged as f64,
@@ -6760,7 +6760,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/open-enrolment-clawback-adjustment",
         owner: "crates/project",
         unit: Unit::Dollars,
-        label: "Total open-enrolment adjustment charged, FY2027 — gross of the guarantee it meets",
+        label: "Total open-enrollment adjustment charged, FY2027 — gross of the guarantee it meets",
         pinned: 5_110_050.0,
         tolerance: 0.5,
         compute: |i| clawback(&i.panel).adjustment,
@@ -6769,7 +6769,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/open-enrolment-clawback-districts",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Districts whose guarantee is reduced by the open-enrolment clawback, FY2027",
+        label: "Districts whose guarantee is reduced by the open-enrollment clawback, FY2027",
         pinned: 22.0,
         tolerance: 0.0,
         compute: |i| clawback(&i.panel).reduced as f64,
@@ -6778,7 +6778,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/open-enrolment-clawback-withheld",
         owner: "crates/project",
         unit: Unit::Dollars,
-        label: "Total withheld by the open-enrolment clawback, FY2027",
+        label: "Total withheld by the open-enrollment clawback, FY2027",
         pinned: 3_037_537.0,
         tolerance: 0.5,
         compute: |i| clawback(&i.panel).withheld,
@@ -6787,7 +6787,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/open-enrolment-clawback-largest",
         owner: "crates/project",
         unit: Unit::Dollars,
-        label: "The largest single open-enrolment clawback, FY2027 — Columbus City",
+        label: "The largest single open-enrollment clawback, FY2027 — Columbus City",
         pinned: 674_561.0,
         tolerance: 0.5,
         compute: |i| clawback(&i.panel).largest,
@@ -6796,7 +6796,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/open-enrolment-clawback-second-largest",
         owner: "crates/project",
         unit: Unit::Dollars,
-        label: "The second largest open-enrolment clawback, FY2027 — Cuyahoga Falls",
+        label: "The second largest open-enrollment clawback, FY2027 — Cuyahoga Falls",
         pinned: 640_025.0,
         tolerance: 0.5,
         compute: |i| clawback(&i.panel).second,
@@ -7768,7 +7768,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/foundation-appropriation-fell-fy2013-real",
         owner: "crates/project",
         unit: Unit::Dollars,
-        label: "And in FY2013 — both unremarkable among their neighbours, which is the null result",
+        label: "And in FY2013 — both unremarkable among their neighbors, which is the null result",
         pinned: 100_531_931.0,
         tolerance: 1.0,
         compute: |i| movement(i, 2013),
@@ -8179,7 +8179,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/fy2025-open-enrolment-clawback-districts",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Districts carrying an open-enrolment clawback in the FY2025 payment report -- more \
+        label: "Districts carrying an open-enrollment clawback in the FY2025 payment report -- more \
                 than it reduces, because the guarantee is a floor at zero",
         pinned: 41.0,
         tolerance: 0.0,
@@ -8263,7 +8263,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose marginal pupil costs less than 95% of their average pupil -- the \
-                wedge the floors open, measured at each district\u{2019}s own enrolment",
+                wedge the floors open, measured at each district\u{2019}s own enrollment",
         pinned: 313.0,
         tolerance: 0.0,
         compute: |i| {
@@ -8287,7 +8287,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose FY2024 FTE administrators are fewer than the four administrator \
-                elements of R.C. 3317.011 fund at their own enrolment",
+                elements of R.C. 3317.011 fund at their own enrollment",
         pinned: 47.0,
         tolerance: 0.0,
         compute: |i| {
@@ -8336,7 +8336,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Positions,
         label: "What the four administrator elements of R.C. 3317.011 fund at the median \
-                enrolment of the smallest sixth of districts by FY2024 enrolled ADM",
+                enrollment of the smallest sixth of districts by FY2024 enrolled ADM",
         pinned: 5.23,
         tolerance: 0.005,
         compute: |i| {
@@ -8367,7 +8367,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/administrators-funded-in-the-largest-sextile",
         owner: "crates/project",
         unit: Unit::Positions,
-        label: "What the same four elements fund at the median enrolment of the largest sixth of \
+        label: "What the same four elements fund at the median enrollment of the largest sixth of \
                 districts by FY2024 enrolled ADM",
         pinned: 20.69,
         tolerance: 0.005,
@@ -8403,7 +8403,7 @@ pub static FIGURES: &[Figure] = &[
         // compared exactly: R.C. 3317.011(F)(3) says one thousand five hundred, and the prose
         // that writes 1,500 is quoting the section rather than reporting an ADM.
         label: "The base cost enrolled ADM below which R.C. 3317.011(F)(3) funds two other \
-                district administrators whatever the enrolment",
+                district administrators whatever the enrollment",
         pinned: 1500.0,
         tolerance: 0.0,
         compute: |_| project::administrator_staffing::threshold(),
@@ -8413,7 +8413,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Ratio,
         label: "FY2024 FTE administrators employed statewide for every one the four administrator \
-                elements of R.C. 3317.011 fund at districts' own enrolment",
+                elements of R.C. 3317.011 fund at districts' own enrollment",
         pinned: 1.9664,
         tolerance: 0.0005,
         compute: |i| {
@@ -9997,7 +9997,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/formula-districts-a-year-from-the-floor",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Formula districts whose own enrolment trend reaches their FY2020 floor inside one \
+        label: "Formula districts whose own enrollment trend reaches their FY2020 floor inside one \
                 year -- the boundary measured in time rather than in dollars",
         pinned: 17.0,
         tolerance: 0.0,
@@ -10037,7 +10037,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/clawback-margin-exposed-districts",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Districts for which one open-enrolment FTE is worth the whole statewide average \
+        label: "Districts for which one open-enrollment FTE is worth the whole statewide average \
                 base cost -- the guaranteed districts `[I1]` reaches that `[K]` does not backstop",
         pinned: 9.0,
         tolerance: 0.0,
@@ -10642,7 +10642,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/special-education-categories-two-and-six-share-of-money",
         owner: "crates/project",
         unit: Unit::Share,
-        label: "What the two together are of the programme, by money -- the pair is 82% of the \
+        label: "What the two together are of the program, by money -- the pair is 82% of the \
                 spending and 80% of the pupils, which is why the sentence has to say which",
         pinned: 0.8195,
         tolerance: 0.00005,
@@ -11616,7 +11616,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/targeted-assistance-wealth-tier-as-written",
         owner: "crates/project",
         unit: Unit::Dollars,
-        label: "Targeted assistance's wealth tier on the residence-flavoured count the statute \
+        label: "Targeted assistance's wealth tier on the residence-flavored count the statute \
                 itself uses",
         pinned: 1_030_296_442.066_495_8,
         tolerance: 200.0,
@@ -11737,7 +11737,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts whose aid would fall if local capacity were divided by the resident \
-                count \u{2014} the net open-enrolment-in districts",
+                count \u{2014} the net open-enrollment-in districts",
         pinned: 119.0,
         tolerance: 0.0,
         #[allow(clippy::cast_precision_loss)]
@@ -11764,7 +11764,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/the-plans-own-resident-adjustment",
         owner: "crates/project",
         unit: Unit::Pupils,
-        label: "Pupils R.C. 3317.0217(C)(1)'s open-enrolment adjustment moves statewide",
+        label: "Pupils R.C. 3317.0217(C)(1)'s open-enrollment adjustment moves statewide",
         pinned: 2_098.196_313_999_995_7,
         tolerance: 0.01,
         compute: |_| project::capacity_denominator::resident_gap().0,
@@ -11822,7 +11822,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/bounds-in-the-modelled-formula",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Floors, ceilings, clamps at zero, greater-ofs and lesser-ofs the modelled formula \
+        label: "Floors, ceilings, clamps at zero, greater-ofs and lesser-ofs the modeled formula \
                 contains, across base cost, local capacity, the categoricals, the guarantee and \
                 transportation",
         pinned: 38.0,
@@ -11845,7 +11845,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/bounds-that-have-never-bound",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Bounds the modelled formula states that could be reached and that no Ohio \
+        label: "Bounds the modeled formula states that could be reached and that no Ohio \
                 district in the department's FY2027 model reaches \u{2014} the null result issue \
                 #410 asked to be reported as one",
         pinned: 0.0,
@@ -11862,7 +11862,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/bounds-the-most-reached-is-operative-for",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Districts on the most-reached bound in the modelled formula, which is R.C. \
+        label: "Districts on the most-reached bound in the modeled formula, which is R.C. \
                 3317.011(F)(5)(b)'s floor of one EMIS support employee",
         pinned: 554.0,
         tolerance: 0.0,
@@ -11873,7 +11873,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/bounds-the-least-reached-is-operative-for",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Districts on the least-reached bound in the modelled formula, which is R.C. \
+        label: "Districts on the least-reached bound in the modeled formula, which is R.C. \
                 3317.011(F)(6)(c)'s floor of one leadership support staff \u{2014} the one no \
                 input can put in force",
         pinned: 0.0,
@@ -11885,7 +11885,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/bounds-in-base-cost",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Of the modelled formula's bounds, the ones R.C. 3317.011 and 3317.02 state over \
+        label: "Of the modeled formula's bounds, the ones R.C. 3317.011 and 3317.02 state over \
                 base cost \u{2014} the staffing floors and ceilings, the size bands and the \
                 single-year enrolled ADM",
         pinned: 13.0,
@@ -11896,7 +11896,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/bounds-in-local-capacity",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Of the modelled formula's bounds, the ones R.C. 3317.017 states over local \
+        label: "Of the modeled formula's bounds, the ones R.C. 3317.017 states over local \
                 capacity and the state share it produces",
         pinned: 4.0,
         tolerance: 0.0,
@@ -11906,7 +11906,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/bounds-in-the-categoricals",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Of the modelled formula's bounds, the ones R.C. 3317.022, 3317.051 and 3317.0217 \
+        label: "Of the modeled formula's bounds, the ones R.C. 3317.022, 3317.051 and 3317.0217 \
                 state over the categorical payments \u{2014} disadvantaged pupil impact aid, \
                 gifted units and targeted assistance",
         pinned: 9.0,
@@ -11917,7 +11917,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/bounds-in-the-guarantee",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Of the modelled formula's bounds, the ones R.C. 3317.019 and the uncodified \
+        label: "Of the modeled formula's bounds, the ones R.C. 3317.019 and the uncodified \
                 transition supplement state over the guarantee and the clawback beside it",
         pinned: 5.0,
         tolerance: 0.0,
@@ -11927,7 +11927,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/bounds-in-transportation",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Of the modelled formula's bounds, the ones R.C. 3317.0212 and the special \
+        label: "Of the modeled formula's bounds, the ones R.C. 3317.0212 and the special \
                 education transportation line state over the transportation payment",
         pinned: 7.0,
         tolerance: 0.0,
@@ -11955,7 +11955,7 @@ pub static FIGURES: &[Figure] = &[
         owner: "crates/project",
         unit: Unit::Count,
         label: "Districts for which R.C. 3317.019(C)(1)'s floor of twenty pupils, rather than \
-                ten per cent of last year's count, sets the open-enrolment decrease threshold",
+                ten per cent of last year's count, sets the open-enrollment decrease threshold",
         pinned: 499.0,
         tolerance: 0.0,
         #[allow(clippy::cast_precision_loss)]
@@ -11970,7 +11970,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/districts-the-decrease-threshold-floor-spares",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Districts that lost more than ten per cent of their open-enrolment count and not \
+        label: "Districts that lost more than ten per cent of their open-enrollment count and not \
                 more than twenty pupils \u{2014} charged under the percentage alone, charged \
                 nothing under the floor",
         pinned: 71.0,
@@ -12828,7 +12828,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/typology-seeded-partition-membership-ceiling",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "A k-means started from the typology's own nine centres, on membership",
+        label: "A k-means started from the typology's own nine centers, on membership",
         pinned: 415.0,
         tolerance: 0.0,
         compute: |i| i.lost_pupils.seeded.ceilings.membership as f64,
@@ -12837,7 +12837,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/enrollment-cluster-nearest-neighbours-in-the-cluster",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Of the 89, how many have a nearest neighbour on the six profile variables that \
+        label: "Of the 89, how many have a nearest neighbor on the six profile variables that \
                 is also in the cluster -- against 89 of 607 by chance",
         pinned: 31.0,
         tolerance: 0.0,
@@ -12851,7 +12851,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/nearest-neighbours-agreeing-on-membership",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Districts whose nearest neighbour on the six variables is held if and only if \
+        label: "Districts whose nearest neighbor on the six variables is held if and only if \
                 they are, of 607",
         pinned: 449.0,
         tolerance: 0.0,
@@ -12863,7 +12863,7 @@ pub static FIGURES: &[Figure] = &[
         unit: Unit::Dollars,
         label: "What Ohio paid the chartered nonpublic schools through Category 3 in FY2025 \
                 — auxiliary services, the administrative cost reimbursement and the mobile unit \
-                line, outside the five scholarship programmes",
+                line, outside the five scholarship programs",
         pinned: 242_688_919.0,
         tolerance: 0.5,
         compute: |i| Nonpublic::nominal(&i.nonpublic.category, 2025),
@@ -12901,7 +12901,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/nonpublic-support-against-the-scholarship-channel",
         owner: "crates/project",
         unit: Unit::Share,
-        label: "Category 3 in FY2025 as a share of what the four scholarship programmes that \
+        label: "Category 3 in FY2025 as a share of what the four scholarship programs that \
                 publish an expenditure paid in 2024-25 — an upper bound, since Jon Peterson's is \
                 not published",
         pinned: 0.2448,
@@ -13112,7 +13112,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/chartered-nonpublic-octobers-held",
         owner: "crates/project",
         unit: Unit::Count,
-        label: "Octobers of chartered nonpublic enrolment the corpus now holds, 1977 through \
+        label: "Octobers of chartered nonpublic enrollment the corpus now holds, 1977 through \
                 2025 — every one the department has published, with no gap",
         pinned: 49.0,
         tolerance: 0.0,
@@ -13211,7 +13211,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/nonpublic-administrative-rate-authorized",
         owner: "crates/project",
         unit: Unit::Dollars,
-        label: "And what the General Assembly authorised per student for FY2024 through FY2027 \
+        label: "And what the General Assembly authorized per student for FY2024 through FY2027 \
                 — the ceiling R.C. 3317.063 pays up to and the appropriation did not reach",
         pinned: 475.0,
         tolerance: 0.005,
@@ -13221,7 +13221,7 @@ pub static FIGURES: &[Figure] = &[
         key: "project/nonpublic-administrative-rationing-fy2025",
         owner: "crates/project",
         unit: Unit::Share,
-        label: "How far below the authorised rate FY2025 was paid — the gap a reimbursement can \
+        label: "How far below the authorized rate FY2025 was paid — the gap a reimbursement can \
                 have and a direct appropriation cannot, because the second sets its rate by \
                 dividing",
         pinned: 0.0737,

@@ -18,7 +18,7 @@ context: |
     Profile Report, 61 columns None either.
 
   And the one place a deduction could have been hiding is measured. `T - Other Adjustments` is
-  the only unlabelled line in the report; its negative half is $95.6m across 577 districts, 1.12%
+  the only unlabeled line in the report; its negative half is $95.6m across 577 districts, 1.12%
   of total state support, against Ohio scholarship spending on the order of a billion a year. A
   deduction channel would have to be ten times the size of the residual it would have to sit in.
 
@@ -29,7 +29,7 @@ context: |
 
   What is genuinely missing is the era before — the years the deduction governed, roughly FY1998
   through FY2021. Those amounts live in the department's School Foundation Payment Reports, which
-  are a different artefact from the funding calculator: the calculator models a year, the payment
+  are a different artifact from the funding calculator: the calculator models a year, the payment
   report records what was paid. They are also the only source that could settle whether ECOT
   recovery money returned to the districts it had been deducted from, which the `deduction` skill
   names as the sharpest open question in its scope.

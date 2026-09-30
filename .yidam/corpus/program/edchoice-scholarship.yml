@@ -2,12 +2,12 @@ class: program
 label: Traditional EdChoice Scholarship
 summary: >-
   The original EdChoice: a scholarship tied to assignment to a low-performing public school
-  building, authorised in 2005. A distinct program from the income-based expansion, running
+  building, authorized in 2005. A distinct program from the income-based expansion, running
   concurrently under different eligibility and award rules.
 description: |
   The original EdChoice: a scholarship for students assigned to a low-performing public school
-  building, established by the General Assembly in 2005 and authorised under R.C. 3310.03.
-  [verified] (R.C. 3310.03; 2025 Scholarship Annual Report) It is a distinct programme from the
+  building, established by the General Assembly in 2005 and authorized under R.C. 3310.03.
+  [verified] (R.C. 3310.03; 2025 Scholarship Annual Report) It is a distinct program from the
   [income-based expansion](edchoice-expansion.yml) of 2013, which is R.C. 3310.032, and the two
   run concurrently with different eligibility and — since October 2023 — different award rules.
   [verified]
@@ -15,22 +15,22 @@ description: |
   **Eligibility is a property of the building, not of the family.** A student qualifies by being
   enrolled in a building operated by the resident district that was ranked in the lowest twenty
   per cent of all buildings statewide by performance index score. [verified] (R.C. 3310.03(A)(1))
-  That is the design the corpus's central caution is about: the programme is triggered by a
+  That is the design the corpus's central caution is about: the program is triggered by a
   performance measure this site elsewhere shows to be substantially a composition proxy, so the
   buildings it designates are disproportionately the poorest ones. [inference]
 
-  **This is the programme whose original mechanism generated the districts' complaint.** Under the
+  **This is the program whose original mechanism generated the districts' complaint.** Under the
   deduct-era design, a scholarship was funded by reducing the resident district's foundation
   payment — and if the student had never attended the district, the district lost money for a
   child it had never educated. [verified] That is no longer the mechanism; see `mechanism`.
 
   **The 2025 report does not add up, in two ways, and both are recorded rather than resolved.**
-  Its executive summary says the five programmes served "more than 175,000" students; the five
-  programme counts it publishes sum to 166,587, a gap of 8,413. And its stated average awards
-  disagree with expenditure divided by participation for this programme, the expansion, and
+  Its executive summary says the five programs served "more than 175,000" students; the five
+  program counts it publishes sum to 166,587, a gap of 8,413. And its stated average awards
+  disagree with expenditure divided by participation for this program, the expansion, and
   Cleveland — while matching exactly for Autism. [verified] (by arithmetic on the report's own
   figures) The natural reading is a denominator: an average over students holding a full-year
-  award rather than over everyone who used the programme at any point. Nothing in the report says
+  award rather than over everyone who used the program at any point. Nothing in the report says
   so, and the reading is not adopted here on the source's silence. [open]
 revisions:
   - was: |
@@ -74,19 +74,19 @@ findings: |
   So a published average of $6,808.75 requires a grade mix of at most **0.345625** in kindergarten
   through eight — and that is before any tuition binds, since every student paying less than the
   ceiling forces the share lower still. [verified] (crates/project) Grades K-8 are nine of thirteen
-  grade levels. A programme triggered by a building's performance index could plausibly skew
+  grade levels. A program triggered by a building's performance index could plausibly skew
   towards high schools, but a bound near a third is a long way from an even spread, and the
   report's own implied average only moves it to 42.7%.
 
-  **Either this programme is overwhelmingly a high-school one, or the published average is on a
+  **Either this program is overwhelmingly a high-school one, or the published average is on a
   basis this arithmetic does not fit.** The first limb is priced below; the second is the one left
   standing.
 
   ### What the high-school limb would cost, now that the eligible population can be counted
 
   The designated list carries the grades each building serves and the report card carries what each
-  enrols, so the *eligible* population splits on the same boundary the award schedule does. Hand
-  every building that spans the boundary to the high-school side — the assignment least favourable
+  enrolls, so the *eligible* population splits on the same boundary the award schedule does. Hand
+  every building that spans the boundary to the high-school side — the assignment least favorable
   to an elementary reading — and **64.96%** of the pupils a designated building makes eligible are
   in kindergarten through eight. [verified]
   ([`crates/xcheck`](../../../crates/xcheck/tests/the_grade_split_the_designated_list_does_carry.rs))
@@ -94,7 +94,7 @@ findings: |
   designated set rather than to one year's list.
 
   Read the eligible population as the pupils still enrolled in a designated building plus the
-  programme's own 42,607 recipients — the two groups that can be counted, which makes it a floor,
+  program's own 42,607 recipients — the two groups that can be counted, which makes it a floor,
   since a pupil residing in a designated zone who never enrolled there is eligible and is in
   neither — and the ceiling on the recipient mix forces a take-up rate on each side. It requires
   **28.02%** of eligible high-school pupils to be holding a traditional EdChoice scholarship
@@ -104,10 +104,10 @@ findings: |
   them the other way and it is 34.91%. Reading the report's implied average instead relaxes the
   mix to 42.7% and does not relax this — still better than a fifth against under an eighth.
 
-  So the first limb is not "this programme skews towards high schools", which is plausible. It is a
+  So the first limb is not "this program skews towards high schools", which is plausible. It is a
   specific and large claim about who takes it up, and eligibility cannot settle it, because a
   designated building measures who *may* claim. What would settle it is a grade-band split of the
-  42,607: the *Scholarship Annual Report* publishes participation for each programme as one number
+  42,607: the *Scholarship Annual Report* publishes participation for each program as one number
   and no departmental document this project can fetch breaks it by grade, so the split would have
   to come from the per-student route that report cites and `deduction` records as entitlement-gated
   — not from anything committed. [open]
@@ -175,7 +175,7 @@ findings: |
   **And the exposure is nil, which is the part worth measuring rather than asserting.** The stale
   flag stands on 5 East Cleveland buildings and every one of them satisfies Option B as well —
   bottom fifth in two of three rankings, Title I average 48.9% — so they are designated on the
-  derived route whatever the read one says. Honouring Option A only for the commission that still
+  derived route whatever the read one says. Honoring Option A only for the commission that still
   exists leaves all 513 designations standing. **The whole load-bearing surface of the unreproduced
   column is 2 buildings**, both Youngstown's Rayen Early College schools, in the one district still
   under a commission. [verified]
@@ -332,8 +332,8 @@ series:
     field: findings
 properties:
   seeded_because: |
-    Named in the [`deduction`](../../skills/deduction.md) calculator as one of the four programmes
-    it must compute over. The corpus carried a node for the expansion and none for the programme
+    Named in the [`deduction`](../../skills/deduction.md) calculator as one of the four programs
+    it must compute over. The corpus carried a node for the expansion and none for the program
     it expanded, so the distinction R.C. 3310.03 and 3310.032 draw was invisible here. [inference]
   name: Educational Choice Scholarship Program (Traditional)
   mechanism: funding-unit
@@ -395,14 +395,14 @@ properties:
   appropriation_line: |
     **No line of its own — paid from the foundation aid appropriation.** The same five line items
     support foundation aid for all public school students and scholarship payments for students in
-    state scholarship programmes: GRF ALI 200550 Foundation Funding, GRF ALI 200502 Pupil
+    state scholarship programs: GRF ALI 200550 Foundation Funding, GRF ALI 200502 Pupil
     Transportation, Fund 5VS0 ALI 200604, Fund 5YO0 ALI 200491, and Lottery Fund 7017 ALI 200612.
     [verified] (LSC redbook and greenbook, `crates/project/fixtures/dew-redbook.txt` and
     `dew-greenbook.txt`. Checked against the act as enacted, not only as introduced: the five
     lines and the sentence naming them are identical in both. The *amounts* in that table are
     not — foundation aid was enacted $82m above the proposal — so nothing here quotes one.)
 
-    So the budget document a reader would consult to size this programme shows it merged with the
+    So the budget document a reader would consult to size this program shows it merged with the
     formula it draws from. The department's annual report is the only committed source here that
     sizes it separately. [verified]
 links:
@@ -419,12 +419,12 @@ links:
   - target: ../../catalog/dew-scholarship-annual-report.md
     relationship: sourced-from
     note: >-
-      The administrator's own account of the programme, and where this node's participation and
+      The administrator's own account of the program, and where this node's participation and
       expenditure figures for 2024-2025 come from.
   - target: ../../catalog/ohio-revised-code.md
     relationship: sourced-from
     note: >-
-      The authorising sections this node cites by number — eligibility, the award, and the
+      The authorizing sections this node cites by number — eligibility, the award, and the
       deduction that pays for it.
   - target: ../../catalog/dew-edchoice-designated-list.md
     relationship: sourced-from

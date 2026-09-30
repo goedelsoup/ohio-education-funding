@@ -10,7 +10,7 @@ used-by:
 **Source.** Ohio Department of Education (now DEW), Special Education Data and Funding —
 annual IDEA Part B special education allocation tables, one per fiscal year.
 **Type.** Primary source — official allocation record.
-**Status.** *Catalogued, never retrieved, cited by hand.* There is no connector for it, so
+**Status.** *Cataloged, never retrieved, cited by hand.* There is no connector for it, so
 nothing here rests on bytes this repository holds. Four corpus nodes draw on it anyway: two
 name the federal channel itself, and two are districts read off the FY2021 list by hand. It is
 kept because the special education weights are a live question the corpus cannot currently

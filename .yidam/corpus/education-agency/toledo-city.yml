@@ -36,23 +36,23 @@ findings: |
   **It is the corpus's clearest case of the denominator problem in the wild.** The same
   operating total divided by weighted ADM gives **$14,312** — which is what the report card
   prints as expenditure per equivalent pupil, and what [OCG White Paper
-  013](../../catalog/ocg-white-paper-013.md) analysed. Divided by headcount it gives $20,805,
+  013](../../catalog/ocg-white-paper-013.md) analyzed. Divided by headcount it gives $20,805,
   which is what [OCG fact-check RL-2026-021](../../catalog/ocg-fact-check-021.md) reported
   three weeks later. A 45% spread for one district in one year, in two publications from one
   author, neither noting the other's basis. [verified] Toledo's weighted ADM is 30,758 against
   21,160 enrolled — a weight ratio of 1.45, the consequence of a 98.9% economically
   disadvantaged share and a 21.9% disability share.
 
-  ### Normalised by the population actually served
+  ### Normalized by the population actually served
 
   It reports Toledo spending $2,766 per pupil on special-education instruction against
   Perrysburg's $2,032–$2,363, and reads the difference as "consistent with a modestly heavier
   student-need profile." Toledo's disability share is 21.9% against Perrysburg's 11.3% — nearly
-  double, not modest. Normalised by the population actually served, Toledo spends roughly
+  double, not modest. Normalized by the population actually served, Toledo spends roughly
   **$12,600 per student with a disability** against Perrysburg's **$18,000–$20,900**: about a
   third less, not somewhat more. [inference] (the special-education dollars are the
   fact-check's, from audited statements this corpus does not hold; the shares are the report
-  card's, so this is an order-of-magnitude normalisation rather than an audited per-pupil cost.
+  card's, so this is an order-of-magnitude normalization rather than an audited per-pupil cost.
   A 1.94x population difference against a 1.36x spending difference leaves no room for the sign
   to return.)
 
@@ -69,7 +69,7 @@ findings: |
   **Toledo's state revenue per pupil lost 15.1% against prices between FY2010 and FY2024** —
   measured net of the community-school deduct in both years, which is the only way the survey's
   state column is one quantity across that span. Its local revenue per pupil fell 8.14% in real
-  terms, while its enrolment fell 21%. Both of Toledo's revenue sources lost ground against
+  terms, while its enrollment fell 21%. Both of Toledo's revenue sources lost ground against
   prices for fourteen years. Beside it, [Perrysburg](perrysburg-exempted-village.yml) lost
   **20.3%** of its state revenue on the same basis and gained 22.3% of its local. [verified]
   ([`crates/dispersion`](../../../crates/dispersion/tests/the_break_that_belonged_to_the_survey.rs))
@@ -117,7 +117,7 @@ findings: |
   raise with one mill", "provided to districts that raise less than the median amount". One
   mill's yield is a measure of total valuation, and capacity aid is the only Ohio component that
   prefers a district's *total* valuation to its valuation per pupil — which is the comparison the
-  correction leaves standing, standardised −0.1994 against −0.1204. [verified]
+  correction leaves standing, standardized −0.1994 against −0.1204. [verified]
   ([`crates/xcheck`](../../../crates/xcheck/tests/what_fell_out_of_the_state_column.rs))
 
   It is not the only thing in the step, and the published version said it was. On one basis a
@@ -140,7 +140,7 @@ findings: |
   **And that holds class by class, which the summed measure it was first taken on could not
   show.** Table SD-1 carries business property in three columns — industrial, mineral and public
   utility — and they are three different populations, which the withdrawal below did not separate.
-  Added together at TY2021 they give +0.0164, and that near-zero is opposite signs cancelling
+  Added together at TY2021 they give +0.0164, and that near-zero is opposite signs canceling
   rather than an absence: the step runs −0.0321 on mineral and −0.0159 on public utility against
   the positive industrial reading. Separated, no class separates its concentrated districts from
   the rest of the frame at two standard errors — the mineral one included, so the oil and gas
@@ -186,7 +186,7 @@ revisions:
       share than everyone else, 0.1412 against 0.1517, and the quintile gradient on business
       property is flat.
     found_by: |
-      Measuring it. The characterisation was five district names read off a sorted list, and Table
+      Measuring it. The characterization was five district names read off a sorted list, and Table
       SD-1 carries `industrial_value`, `mineral_value` and `public_utility_value` per district,
       which nothing had regressed the step against.
     reach: |
@@ -223,7 +223,7 @@ revisions:
       correction is available to every consumer rather than to this node.
   - was: |
       "In a model carrying total valuation, valuation per pupil and disadvantage together, total
-      valuation is the term that matters: standardised −0.29096 against −0.11219 for wealth per
+      valuation is the term that matters: standardized −0.29096 against −0.11219 for wealth per
       pupil, with the disadvantage term not clearing two."
     now: |
       **Revised.** Total valuation is still the largest of the three and still beats wealth per
@@ -234,7 +234,7 @@ revisions:
     found_by: |
       Refitting the same model with the outcome on one basis. The adjustment had removed the
       largest deducts from the outcome, and the largest deducts belong to the poorest districts, so
-      the poverty term was being cancelled by an artifact.
+      the poverty term was being canceled by an artifact.
     reach: |
       One sentence of this node and one assertion in
       `crates/xcheck/tests/what_fell_out_of_the_state_column.rs`, which pinned the disadvantage
@@ -251,7 +251,7 @@ revisions:
       The report card's own disability shares, applied to the fact-check's audited spending
       figures.
     reach: |
-      An order-of-magnitude normalisation rather than an audited per-pupil cost — the
+      An order-of-magnitude normalization rather than an audited per-pupil cost — the
       special-education dollars are the fact-check's, from statements not held here. A 1.94x
       population difference against a 1.36x spending difference leaves no room for the sign to
       return. [inference]
@@ -271,11 +271,11 @@ figures:
   - key: dispersion/fy2016-step-wealth-per-pupil-coefficient-negative
     value: 0.1204
     field: findings
-    as_written: "standardised −0.1994 against −0.1204"
+    as_written: "standardized −0.1994 against −0.1204"
   - key: dispersion/fy2016-step-total-valuation-coefficient-negative
     value: 0.1994
     field: findings
-    as_written: "standardised −0.1994"
+    as_written: "standardized −0.1994"
   - key: dispersion/fy2016-step-against-total-valuation-negative
     value: 0.2691
     field: findings
@@ -597,5 +597,5 @@ links:
     relationship: sourced-from
     note: >-
       The department's 2013 typology roster, which is where this node's code comes from. The
-      prose characterisation was written before the roster was fetched, and for two of the five
+      prose characterization was written before the roster was fetched, and for two of the five
       nodes that carry a code the two disagreed.

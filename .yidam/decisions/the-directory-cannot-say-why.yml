@@ -61,7 +61,7 @@ consequences: |
   districts are coded `1 Open` in the year before, the year of, and the year after. The departing
   row asserts the negation of what happened; the surviving row records nothing at all.
 
-  **The two obvious derivations were tested rather than assumed away.** Enrolment absorption on
+  **The two obvious derivations were tested rather than assumed away.** Enrollment absorption on
   the survivor is confounded roughly fifty to one by ordinary growth — 141 comparable-district
   year-pairs gain more pupils than Bettsville ever had — and it gets the *sign* wrong on Newbury,
   where Chardon lost 110 pupils the same year it received some of them. Name changes on the
@@ -125,9 +125,9 @@ alternatives: |
   populated code 5 this would be a direct read and worth having; it does not, and the code it does
   populate states the opposite of the truth for every case anyone would want to look up.
 
-  **Identify the successor by enrolment absorption.** Rejected at roughly forty-seven false
+  **Identify the successor by enrollment absorption.** Rejected at roughly forty-seven false
   positives per true positive, and on getting Newbury backwards. A district of 400 vanishing the
-  year a neighbour grows by 400 is suggestive and is not proof, and an unproven join in a
+  year a neighbor grows by 400 is suggestive and is not proof, and an unproven join in a
   committed fixture is worse than an absent one because nothing downstream can tell them apart.
 
   **Publish the three known consolidations as facts, sourced from county records.** Rejected as
@@ -148,7 +148,7 @@ alternatives: |
 
   > **This rejection was wrong on its second clause, and the first was overstated.** The per-year
   > table is thirteen lines, not seven layouts. And there was a consumer, named in this very
-  > record without being recognised: the reason a district departs sits with an educational
+  > record without being recognized: the reason a district departs sits with an educational
   > service center's governing board, and in 1994-95 Ohio had no service centers — it had 86
   > county boards, thirty-nine of which disappear over the next seven years with the same code 2
   > this record is about. The finance panel is not the only thing a membership series can serve,
