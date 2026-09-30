@@ -258,6 +258,20 @@ test("a swatch or a bar segment never encodes with a ground alone", () => {
 });
 
 /**
+ * A breakpoint has one spelling, and it is pixels.
+ *
+ * There were two: most were px and three were rem (34rem, 40rem, 60rem). In a media query a rem is
+ * the initial 16px and not the root's size, so the two spellings meant the same widths — but a
+ * reader comparing `40rem` against `max-width: 640px` two hundred lines away had to know that to
+ * see they were one breakpoint. #550 wrote them all in px.
+ */
+test("every width breakpoint is written in px", () => {
+  const widths = [...CSS.matchAll(/@media[^{]*?\((?:min|max)-width:\s*([^)]+)\)/g)].map((m) => m[1]!.trim());
+  expect(widths.length, "no width breakpoint found — has the parser drifted?").toBeGreaterThan(5);
+  expect(widths.filter((w) => !/^\d+(\.\d+)?px$/.test(w))).toEqual([]);
+});
+
+/**
  * The findings genre survives a medium with no backgrounds.
  *
  * `.card.findings` is separated from every other card by its ground and nothing else, and the note

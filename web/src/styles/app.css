@@ -1078,9 +1078,9 @@ tr.series-break > td {
  * it appears on the same hover or focus, it is always wholly on screen, and it cannot widen the
  * document because a fixed box is outside the scroll region by definition.
  *
- * The breakpoint is the width below which a 30rem panel cannot fit beside anything.
+ * The breakpoint, 544px, is 34rem: the width below which a 30rem panel cannot fit beside anything.
  */
-@media (max-width: 34rem) {
+@media (max-width: 544px) {
   /* The chip's panel joins the term's down here for the same reason and one of its own: anchored
      to a chip at the end of a card heading, a 26rem panel on a 375px screen reaches past the left
      edge of the document and is simply not readable. A sheet at the foot has room for the
@@ -1155,14 +1155,14 @@ tr.series-break > td {
  * 0.872 and its 10px axis text landed at 8.7px. The e2e suite caught it: `no chart draws its text
  * below 9px`.
  *
- * So below 40rem the horizontal padding is `--space-7` exactly, which is the value this card had
+ * So below 640px the horizontal padding is `--space-7` exactly, which is the value this card had
  * before #185 and therefore leaves the chart arithmetic where every constant in `plot/spec.ts` was
  * calibrated. The vertical padding still grows; it costs a chart nothing.
  *
  * 56px of padding on a 375px screen was too much anyway. The failing test is the reason it was
  * found, not the reason it is wrong.
  */
-@media (max-width: 40rem) {
+@media (max-width: 640px) {
   .card { padding: var(--space-6) var(--space-7); }
 }
 
@@ -1987,7 +1987,7 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
  * and the lever grid collapses to one column because the rail is 260px and not a page.
  */
 .reach { display: grid; gap: var(--space-6); align-items: start; }
-@media (min-width: 60rem) {
+@media (min-width: 960px) {
   /* Rail second in the source so the picture is first for a screen reader and on a phone, and
      placed first here because a control surface reads left-to-right. */
   .reach { grid-template-columns: 17rem minmax(0, 1fr); }
