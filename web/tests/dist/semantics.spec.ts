@@ -105,6 +105,7 @@ describe("document semantics", () => {
 
     const ragged: string[] = [];
     const leading: string[] = [];
+    const loose: string[] = [];
     let cells = 0;
     let anchors = 0;
 
@@ -130,9 +131,14 @@ describe("document semantics", () => {
        */
       for (const anchor of document.querySelectorAll("h1 a.section-anchor, h2 a.section-anchor, h3 a.section-anchor")) {
         anchors += 1;
-        const heading = anchor.parentElement!;
+        // The heading, not the anchor's parent: #549 wraps the title and the anchor in
+        // `.heading-text`, and the anchor in `.heading-tail`, whose own text is just ` #`.
+        const heading = anchor.closest("h1, h2, h3")!;
         const text = (heading.textContent ?? "").trim();
         if (text.startsWith("#") && leading.length < 5) leading.push(`${where}: ${text.slice(0, 50)}`);
+        if (!anchor.parentElement?.matches(".heading-text > .heading-tail") && loose.length < 5) {
+          loose.push(`${where}: ${text.slice(0, 50)}`);
+        }
       }
     }
 
@@ -140,6 +146,10 @@ describe("document semantics", () => {
     expect(anchors, "the build carries section anchors to check").toBeGreaterThan(1000);
     expect(ragged, "a sentence set ragged-left in a column of figures").toEqual([]);
     expect(leading, "a card heading still opens with its own address").toEqual([]);
+    expect(
+      loose,
+      "an anchor outside `.heading-tail`, where it can wrap onto a line of its own (#549)",
+    ).toEqual([]);
   });
 
 

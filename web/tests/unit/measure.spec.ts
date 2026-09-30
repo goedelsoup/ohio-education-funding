@@ -15,10 +15,12 @@
 import { parseHTML } from "linkedom";
 import { describe, expect, test } from "vitest";
 import {
+  FIRST_FIGURE_CEILINGS,
   ROUTES,
   THRESHOLDS,
   WIDTHS,
   countWikiToData,
+  firstFigureCeiling,
   formatReport,
   violations,
   widestGap,
@@ -208,6 +210,30 @@ describe("once a phase sets one", () => {
       measureMax: 78,
       headingRatio: 2,
     })).toEqual([]);
+  });
+});
+
+describe("the first-figure ceilings (#549)", () => {
+  test("classify each sampled route under its own class, and no route under two", () => {
+    for (const kind of FIRST_FIGURE_CEILINGS) {
+      for (const route of kind.sample) {
+        expect(FIRST_FIGURE_CEILINGS.filter((c) => c.pattern.test(route)).map((c) => c.name)).toEqual([kind.name]);
+        expect(firstFigureCeiling(route)).toBe(kind.ceiling);
+      }
+    }
+  });
+
+  test("are the worse measurement plus a tenth, rounded up to the next hundred", () => {
+    for (const kind of FIRST_FIGURE_CEILINGS) {
+      expect(kind.ceiling).toBe(Math.ceil((kind.measured * 1.1) / 100) * 100);
+    }
+  });
+
+  test("cover every district and county page, and nothing the answer does not live on", () => {
+    expect(firstFigureCeiling("/district/000442.html")).toBe(1800);
+    expect(firstFigureCeiling("/county/van-wert.html")).toBe(900);
+    expect(firstFigureCeiling("/district/043786/finances.html")).toBeNull();
+    expect(firstFigureCeiling("/wiki/funding-regime/fair-school-funding-plan.html")).toBeNull();
   });
 });
 

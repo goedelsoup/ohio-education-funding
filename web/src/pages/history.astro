@@ -106,7 +106,6 @@ const appropriationBase = bundle.deflator
       <Fragment set:html={renderAbsent()} />
     ) : (
       <>
-        <Fragment set:html={renderProvenance(bundle)} />
         <Fragment set:html={renderRevenueMix(history)} />
 
         <BasisToggle id="history-basis" section="equity-gap" base={base}>
@@ -119,6 +118,10 @@ const appropriationBase = bundle.deflator
             set:html={renderEqualization(history, bundle.deflator, base, "real")}
           />
         </BasisToggle>
+        {/* Where the two cards above come from, and what they do not reconcile with. Apparatus,
+            so after the answer rather than ahead of it (#549): the lead has already said whose
+            measurement this is, and this is the detail a reader checking it wants. */}
+        <Fragment set:html={renderProvenance(bundle)} />
 
   {/* What the totals above are made of. No dollars here, so no basis toggle. */}
   <Fragment set:html={renderLineOrigins(lines)} />

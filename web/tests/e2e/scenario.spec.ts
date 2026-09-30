@@ -324,13 +324,11 @@ test.describe("the scenario builder", () => {
           .map((n) => {
             const a = n.querySelector("a.section-anchor");
             if (!a) return null;
-            const kids = [...n.childNodes].filter(
-              (k) => k.nodeType !== Node.TEXT_NODE || k.textContent!.trim(),
-            );
-            return {
-              heading: n.textContent!.replace(/\s+/g, " ").trim().slice(0, 44),
-              first: kids.indexOf(a as ChildNode) === 0,
-            };
+            // Read off the words rather than the child list: since #549 the anchor sits inside
+            // `.heading-text > .heading-tail`, so it is never a direct child either way and a
+            // child-index check would pass on every heading.
+            const text = n.textContent!.replace(/\s+/g, " ").trim();
+            return { heading: text.slice(0, 44), first: text.startsWith("#") };
           })
           .filter((x): x is { heading: string; first: boolean } => x != null),
       );

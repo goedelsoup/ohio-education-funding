@@ -236,12 +236,30 @@ const isFigure = (text: string): boolean => text === "" || NOTHING.test(text) ||
  * CSS `order` would move it visually in one line and leave it first for anything reading the
  * document — a keyboard, a screen reader, a copy-paste. A heading that says one thing to the eye
  * and another to everything else is the shape of defect this module exists to remove.
+ *
+ * # Why it is wrapped with the title, and the space with it (#549)
+ *
+ * Moving it last left it a flex item of its own. A card heading is a wrapping flex row, so a title
+ * that filled the row pushed the `#` onto a line by itself — on a phone, most long headings, and a
+ * lone glyph under a heading reads as a stray mark rather than as that heading's address.
+ *
+ * So the title and the anchor become ONE flex item, `.heading-text`, where they are inline text
+ * and wrap as a sentence does; and the space before the `#` goes inside `.heading-tail`, which is
+ * `white-space: nowrap`, so the only break opportunity between the last word and the `#` is
+ * suppressed and the two wrap together. Measured in Chromium across 150–340px of heading width:
+ * the `#` alone on a line at 18 of 20 widths in the flat row, 2 of 20 with the wrapper and a plain
+ * space, and 0 with the space inside the tail. The text is unchanged — `…comes from #` — so
+ * nothing that reads a heading's words sees a difference.
+ *
+ * `section.ts`'s `heading` writes the same shape for the headings the browser renders.
  */
 function moveAnchors(document: Document): number {
   let moved = 0;
   for (const anchor of document.querySelectorAll("a.section-anchor")) {
     const heading = anchor.parentElement;
     if (!heading) continue;
+    // Already in its final shape — written by `heading()` rather than prepended by `anchor()`.
+    if (heading.classList.contains("heading-tail")) continue;
 
     /*
      * The separator moves with it, and this is not cosmetic.
@@ -257,10 +275,30 @@ function moveAnchors(document: Document): number {
       after.textContent = (after.textContent ?? "").replace(/^\s+/, "");
     }
 
-    const chip = heading.querySelector(".year-chip-wrap");
-    if (chip) chip.before(anchor);
-    else heading.append(anchor);
-    anchor.before(document.createTextNode(" "));
+    anchor.remove();
+    const chip = [...heading.children].find((child) => child.classList.contains("year-chip-wrap"));
+    const nodes = [...heading.childNodes];
+    const title = chip ? nodes.slice(0, nodes.indexOf(chip)) : nodes;
+
+    // The title's own trailing whitespace, which would otherwise be a break opportunity outside
+    // the tail and put the `#` back on a line of its own.
+    for (let i = title.length - 1; i >= 0; i -= 1) {
+      const node = title[i]!;
+      if (node.nodeType !== 3) break;
+      node.textContent = (node.textContent ?? "").replace(/\s+$/, "");
+      if (node.textContent !== "") break;
+    }
+
+    const text = document.createElement("span");
+    text.className = "heading-text";
+    for (const node of title) text.append(node);
+    const tail = document.createElement("span");
+    tail.className = "heading-tail";
+    tail.append(document.createTextNode(" "), anchor);
+    text.append(tail);
+
+    if (chip) chip.before(text);
+    else heading.append(text);
     moved += 1;
   }
   return moved;

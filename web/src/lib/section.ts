@@ -13,13 +13,21 @@
  * So this is the other half. A muted `#` at the head of every section heading, which is a link to
  * that section, which a reader can click, copy, or right-click into a full URL.
  *
- * # Why it is always visible
+ * # When it is visible (#549 revised this)
  *
- * The convention elsewhere is to reveal the anchor on hover. That repeats exactly the criticism
- * the `.year-chip` rule in `app.css` makes of `title`: it is hover-only, so it does not exist on a
- * touch screen and it does not exist for a reader who navigates by keyboard until focus lands on
- * it by accident. This stylesheet already accepted a permanently visible muted annotation on every
- * heading — the year chip — and a second one costs the design nothing it has not already paid.
+ * It was always visible, on the argument that a hover-only affordance does not exist on a touch
+ * screen and does not exist for a keyboard reader until focus lands on it by accident. Both halves
+ * of that still hold and are still honoured — but the cost it waved through turned out not to be
+ * nothing: every card heading ending in a muted glyph, which on a phone wrapped onto a line of its
+ * own and read as a stray mark.
+ *
+ * So the reveal is scoped to the one kind of device where hover exists. `app.css` hides it only
+ * under `(hover: hover) and (pointer: fine)` — a mouse — and there it appears on hovering the
+ * heading and whenever the link has keyboard focus. A touch screen matches neither query and
+ * keeps the permanently visible `#`; a keyboard reader tabs onto a link that is in the tab order
+ * the whole time and shows the moment it is focused. It is `opacity`, never `display` or
+ * `visibility`, because either of those would take it out of the tab order too. None of it needs
+ * a script.
  *
  * # Why it is a bare `<a href="#…">` and nothing else
  *
@@ -93,19 +101,24 @@ export function anchor(id: string): string {
  *
  * A helper that takes both pieces cannot be called in the wrong order.
  *
- * # The separator
+ * # The separator, and the two spans
  *
  * A space before the anchor, which `moveAnchors` also inserts and for the reason `anchor` records:
  * `</a>` immediately against a letter is the fused-word defect `complete.spec.ts` scans every route
- * for,
- * and the same defect at the other end is `from<a`. Inside a card heading's flex row the gap does
- * the separating and a whitespace-only run between two flex items is not rendered at all, so the
- * space costs nothing there and is the separation everywhere else.
+ * for, and the same defect at the other end is `from<a`.
+ *
+ * The space sits inside `.heading-tail`, which does not wrap, and the title and the tail sit inside
+ * `.heading-text`, which is one flex item in a card heading's row. Without the first the `#` could
+ * still break onto its own line at that space; without the second it was a flex item of its own
+ * and did so on most long headings at phone width. `moveAnchors` records the measurement.
  *
  * @param id the `id` of the card this heading belongs to
  * @param title the heading's text, already escaped or trusted
  * @param chip a year chip to pin at the far end of the row, or `""`
  */
 export function heading(id: string, title: string, chip = ""): string {
-  return `${title} ${anchor(id).trimEnd()}${chip}`;
+  return (
+    `<span class="heading-text">${title}` +
+    `<span class="heading-tail"> ${anchor(id).trimEnd()}</span></span>${chip}`
+  );
 }

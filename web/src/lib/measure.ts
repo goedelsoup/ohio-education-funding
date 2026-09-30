@@ -329,6 +329,86 @@ export const THRESHOLDS: Thresholds = {
    */
 };
 
+/**
+ * How far down a phone screen the first figure may start, by the kind of page (#549).
+ *
+ * `firstContentY` asks how much chrome sits above the `h1`; this asks how much of everything else
+ * does — the lede, the facts row, the notes and the disclaimers — before the reader reaches the
+ * first chart, table or figure that answers what the page is for. It was 1,726px on a Cleveland
+ * dashboard at 375px, which is two and a half phone screens of preamble, and 1,993 on the worst
+ * district. #549 moved the apparatus below the answer and folded the dashboard's contents list,
+ * and these are the ceilings that keep it there.
+ *
+ * # Why per class and not one number
+ *
+ * The pages are different shapes and one number would either forbid the dashboard or permit a
+ * listing to grow a screen of preamble unnoticed. A class is a set of routes that share a template
+ * and so move together; each carries the worst route of its class that was measured and a sample
+ * the browser suite loads, and the worst route is always in the sample.
+ *
+ * # The font it holds under, and the headroom
+ *
+ * FONT-SENSITIVE: the y of the first figure is the height of every line of prose above it, and a
+ * wider face wraps more. Each `measured` is the WORSE of two runs at 375px over the same build —
+ * this machine's system-ui (the stack resolves to it, since IBM Plex is not installed) and DejaVu
+ * Sans / Serif / Sans Mono loaded in place of the three stacks, which is what an Ubuntu runner
+ * resolves them to. DejaVu is wider and read 0-65px deeper route for route; the worst dashboard reads 1,634 under
+ * both, because what sits above its first table is mostly figures rather than prose.
+ *
+ * Every ceiling is the worse measurement plus ten percent, rounded up to the next hundred. Ten
+ * percent is about a paragraph at this width: enough that a reworded sentence does not redden the
+ * suite, not enough that a new card above the answer passes. The dashboard, overview and method
+ * ceilings are each below what that class's worst route measured before #549, so the check would
+ * have failed the site as it was. The listing class did not move — its tables already led — and
+ * its ceiling only holds it there.
+ *
+ * `/index.html` sits in the overview class at its current 948; the homepage is being rebuilt
+ * alongside this, and a homepage that puts its first figure lower should move the class or earn
+ * its own rather than raise this one silently.
+ *
+ * Wiki routes and the district sub-pages are not classed: a wiki node is prose by genre and has no
+ * answer figure to reach, and the sub-pages each lead with their table already.
+ */
+export const FIRST_FIGURE_CEILINGS = [
+  {
+    name: "district dashboard",
+    pattern: /^\/district\/\d{6}\.html$/,
+    // All 609 dashboards measured. Median 1,325 under system-ui, 1,347 under DejaVu. Was 1,993.
+    measured: 1634,
+    ceiling: 1800,
+    sample: ["/district/046755.html", "/district/043786.html"],
+  },
+  {
+    name: "overview",
+    pattern: /^\/(index|statewide|outcomes|history|bounds)\.html$/,
+    // /statewide under DejaVu. Before #549: /history 1,681, /statewide 1,302, /bounds 1,241.
+    measured: 1072,
+    ceiling: 1200,
+    sample: ["/index.html", "/statewide.html", "/outcomes.html", "/history.html", "/bounds.html"],
+  },
+  {
+    name: "listing",
+    pattern: /^\/(districts|compare|county\/[a-z-]+)\.html$/,
+    // /compare under DejaVu. All 88 counties measured; the deepest is Hocking at 744.
+    measured: 800,
+    ceiling: 900,
+    sample: ["/districts.html", "/compare.html", "/county/hocking.html", "/county/cuyahoga.html"],
+  },
+  {
+    name: "method",
+    pattern: /^\/method\.html$/,
+    // A reading page whose first figure is the base-cost table, after the argument. Was 2,596.
+    measured: 2260,
+    ceiling: 2500,
+    sample: ["/method.html"],
+  },
+] as const;
+
+/** The first-figure ceiling a route is held to, or `null` for a route no class covers. */
+export function firstFigureCeiling(route: string): number | null {
+  return FIRST_FIGURE_CEILINGS.find((c) => c.pattern.test(route))?.ceiling ?? null;
+}
+
 /** One breach of one threshold, named so the message says what to do rather than what happened. */
 export interface Violation {
   route: string;

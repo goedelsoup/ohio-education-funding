@@ -152,6 +152,21 @@ function words(heading: Element): string {
  * `aria-label` names it for a screen reader and names it for nobody else. On `/` the list sits
  * under three headline figures, where an unlabelled row of links reads as a filter on them — so
  * the heading is visible, and small enough not to compete with the `h1` above it.
+ *
+ * # Why it is a disclosure, and why it is said twice (#549)
+ *
+ * On a phone the list was the whole first screen of the district dashboard: nine entries, one
+ * column, before the first figure. So below 700px it is a `<details>`, closed, and its `<summary>`
+ * is the label — one line, and the entries one tap away. From 700px up `app.css` hides the summary
+ * and forces the content open with `::details-content`, the same override the site menu uses, and
+ * the `<p>` label shows instead.
+ *
+ * That is why the words "On this page" are written twice. A summary left visible at a width where
+ * the list cannot close would be a control that does nothing, still in the tab order; hiding it
+ * takes it out of both. Exactly one of the two is rendered at any width, and the `<p>` is the one
+ * `aria-labelledby` names, which a hidden element may be.
+ *
+ * All of it is markup and a stylesheet. A reader with no script gets the same disclosure.
  */
 export function renderContents(entries: Entry[]): string {
   const items = entries
@@ -160,9 +175,19 @@ export function renderContents(entries: Entry[]): string {
   return (
     `<nav class="contents" aria-labelledby="contents-label">` +
     `<p class="contents-label" id="contents-label">On this page</p>` +
-    `<ul>${items}</ul></nav>`
+    `<details class="contents-fold"><summary class="contents-summary">On this page</summary>` +
+    `<ul>${items}</ul></details></nav>`
   );
 }
+
+/**
+ * The opening tag a page writes to have its contents list set in a rail beside its sections.
+ *
+ * `withContents` looks for it and nothing else does; the layout is `app.css`'s. The district
+ * dashboard is the one route that asks (#549): the longest page with the most sections, and the
+ * one a reader moves around in rather than reads down.
+ */
+const RAIL = `<div class="rail-layout">`;
 
 /**
  * Put the list above the sections it lists.
@@ -179,10 +204,18 @@ export function renderContents(entries: Entry[]): string {
  * element in the body. Everything before it is the page introducing itself and everything from it
  * on is the page. Nothing is parsed to find it — the string is machine-generated and the opening
  * tag of a section is one of two shapes.
+ *
+ * # A page that asks for a rail
+ *
+ * A page that opens a `rail-layout` before its first section gets the list as that element's first
+ * child instead, so the stylesheet can set it in a column beside the sections from 1000px up. It
+ * is still before them in the document, which is where a screen reader and a phone meet it.
  */
 export function withContents(body: string, entries: Entry[]): string {
   if (entries.length < MINIMUM) return body;
   const first = body.search(/<div class="(?:card|basis-scope)[ "]/);
   if (first === -1) return body;
-  return body.slice(0, first) + renderContents(entries) + body.slice(first);
+  const rail = body.indexOf(RAIL);
+  const at = rail !== -1 && rail < first ? rail + RAIL.length : first;
+  return body.slice(0, at) + renderContents(entries) + body.slice(at);
 }
