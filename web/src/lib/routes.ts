@@ -67,6 +67,16 @@ export const BOUNDS = "/bounds";
 export const METHOD = "/method";
 
 /**
+ * A directory of the site's source on GitHub.
+ *
+ * For page copy that names the code behind a figure. The copy names the thing — "a second
+ * implementation of the formula" — and links here, rather than printing a crate path that a reader
+ * arriving from a shared link cannot use (#571).
+ */
+export const source = (path: string): string =>
+  `https://github.com/goedelsoup/ohio-education-funding/tree/main/${path}`;
+
+/**
  * The addressable sections of every route.
  *
  * # Why there is a vocabulary rather than a fragment written where it is needed

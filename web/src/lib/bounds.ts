@@ -197,7 +197,7 @@ export function renderCensus(c: Census): string {
         <strong>${escapeHtml(c.least.label)}</strong> is operative for
         ${c.least.value === 0 ? "none of them" : outOf(c, c.least)}. Both figures, and the
         ${count(c.families.length)} family totals below, are pinned in
-        <code>crates/figures.json</code> and quoted by <a href="${nodeHref(c)}">the corpus node for
+        <a href="${routes.source("crates/figures.json")}">the site's figure register</a> and quoted by <a href="${nodeHref(c)}">the corpus node for
         the plan itself</a> — which is where a claim about the whole plan is answered for, this
         page having no node of its own to bind it to.</p>
     </div>`;

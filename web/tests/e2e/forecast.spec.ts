@@ -145,11 +145,16 @@ test.describe("what the scenario holds fixed", () => {
 
     const worked = (await caveat.innerText()).replace(/\s+/g, " ");
     const stated =
-      /The refresh (\S+) prices — [\d.]+% on base cost — delivers \$([\d.]+)M through base cost aid and \$([\d.]+)M/.exec(
+      /The refresh priced in .+? — [\d.]+% on base cost — delivers \$([\d.]+)M through base cost aid and \$([\d.]+)M/.exec(
         worked,
       );
     expect(stated, "the card states a worked example").not.toBeNull();
-    const [, slug, throughBase, throughCategoricals] = stated!;
+    const [, throughBase, throughCategoricals] = stated!;
+    // The draft is named by its title and linked by its slug; the slug was the link text until
+    // #571, which printed a file name to the reader.
+    const href = await caveat.locator('a[href*="/wiki/draft-legislation/"]').first().getAttribute("href");
+    const slug = href!.split("/").pop()!;
+    expect(await caveat.innerText()).not.toContain(slug);
 
     /*
      * Opened through the draft rather than through `?base=`, and that is not a detail.

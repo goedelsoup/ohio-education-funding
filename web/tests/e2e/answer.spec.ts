@@ -295,7 +295,9 @@ test.describe("the card that restated the page", () => {
     await expect(card).toContainText("for TY2023");
     await expect(card).toContainText("That is not the rate in the tile above");
     await expect(card).toContainText("219");
-    await expect(card).toContainText("effective_class1_millage_ty23");
+    // Named as a year, not as the column it is read from (#571).
+    await expect(card).toContainText("column is TY2023");
+    await expect(card).not.toContainText("effective_class1_millage");
   });
 });
 

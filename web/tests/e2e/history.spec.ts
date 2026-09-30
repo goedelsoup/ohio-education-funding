@@ -277,7 +277,7 @@ test.describe("the statute timeline", () => {
     // reads as a load that failed.
     await page.goto("/legislation");
     const acts = page.locator("#acts tbody tr");
-    await expect(acts.filter({ hasText: "H.B. 920" })).toContainText("no formula edge");
+    await expect(acts.filter({ hasText: "H.B. 920" })).toContainText("no formula change recorded");
     await expect(acts.filter({ hasText: "H.B. 920" })).toContainText("not a budget act");
     await expect(acts.filter({ hasText: "H.B. 583" })).toContainText("corrects");
     await expect(page.locator("#acts tbody td:empty")).toHaveCount(0);

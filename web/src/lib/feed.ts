@@ -131,6 +131,12 @@ export interface TaxStatewide {
    */
   agreeOnLatest: number;
   /**
+   * Districts carrying both publications' rates: a Taxation year and the profile report's column.
+   *
+   * The denominator of `agreeOnLatest`, which the taxes page typed as `606` twice (#571).
+   */
+  carryingBoth: number;
+  /**
    * Share of the latest tax year's taxable value still deferred by recognised valuation.
    *
    * Weighted by Table SD-1's total value, which is the base the charge-off is taken against — a
@@ -369,6 +375,7 @@ function taxStatewide(districts: District[]): TaxStatewide {
   let nearFloor = 0;
   let crossedTheFloor = 0;
   let agreeOnLatest = 0;
+  let carryingBoth = 0;
 
   // Recognised valuation, summed over the panel rather than averaged over districts — see
   // `deferredShare`. Both run off the latest tax year, which is the year the charge-off row
@@ -426,6 +433,7 @@ function taxStatewide(districts: District[]): TaxStatewide {
      * happening instead of asserting a number somebody typed.
      */
     if (after && d.effective_class1_millage != null) {
+      carryingBoth++;
       if (Math.abs(after.class1_rate - d.effective_class1_millage) <= 0.01) agreeOnLatest++;
     }
 
@@ -468,6 +476,7 @@ function taxStatewide(districts: District[]): TaxStatewide {
     nearFloor,
     crossedTheFloor,
     agreeOnLatest,
+    carryingBoth,
     deferredShare: taxableValue === 0 ? 0 : deferredValue / taxableValue,
     deferredChargeOff,
     medianRegimeDifferenceUncorrected: median(uncorrected),

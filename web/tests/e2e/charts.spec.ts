@@ -366,11 +366,11 @@ test.describe("colour that carries a third variable", () => {
   });
 
   test("the poverty measure's ceiling is stated where the limits are", async ({ page }) => {
-    // Not a cap this repository applies — the source publishes exactly 100% for them and the
+    // Not a cap this site applies — the source publishes exactly 100% for them and the
     // values below approach it continuously. It is still a ceiling, and the page says so.
     await page.goto("/outcomes");
     const limits = page.locator("#limits");
     await expect(limits).toContainText("has a ceiling");
-    await expect(limits).toContainText("not a value this repository caps");
+    await expect(limits).toContainText("not a value this site caps");
   });
 });

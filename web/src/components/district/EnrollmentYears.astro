@@ -86,7 +86,7 @@ const admChange = latest && prior ? latest.adm - prior.adm : 0;
         }</p>
       <p class="note">These are <strong>not</strong> published FY{prior.year} and
         FY{latest.year} funding totals — the department publishes one calculator at a time and
-        this repository holds the FY{bundle.fiscal_year} one, so no FY{prior.year} payment
+        this site holds the FY{bundle.fiscal_year} one, so no FY{prior.year} payment
         figure exists here to show. Every row is the FY{bundle.fiscal_year} formula held fixed
         and run at that year's enrolled ADM, which isolates the enrollment channel: two years of
         published totals could not, because the formula moved between them too.</p>
@@ -110,7 +110,7 @@ const admChange = latest && prior ? latest.adm - prior.adm : 0;
           <>
           <h3>Carried forward</h3>
           <p class="note">No band is drawn. This build's projection did not reproduce the forecasts{" "}
-             <code>crates/project</code> computed for it, so the enrollment carry-forward is withheld
+             a second implementation of the formula computed for it, so the enrollment carry-forward is withheld
              rather than shown unchecked. The table above is unaffected — it is the
              FY{bundle.fiscal_year} formula at three published enrollments, and nothing in it is a
              forecast.</p>

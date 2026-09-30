@@ -1,6 +1,6 @@
 {
   "contract_version": "48.0.0",
-  "provenance": "Ohio DEW TRAD State Foundation Funding Calculator (a projection, not an actual) joined with the District Profile Report, the Department of Taxation's Table SD-1, and the Ohio School Report Card on IRN across the 606 districts every panel covers. Enrolled ADM spans three years, of which the last is partly departmental estimate. Each block states the year it is measured in beside its own figures; see .yidam/catalog/ for what each source can be trusted for.",
+  "provenance": "Ohio DEW TRAD State Foundation Funding Calculator (a projection, not an actual) joined with the District Profile Report, the Department of Taxation's Table SD-1, and the Ohio School Report Card on IRN. 606 of the 609 districts appear in all four; the rest are missing from at least one. Enrolled ADM spans three years, of which the last is partly departmental estimate. Each block states the year it is measured in beside its own figures; see .yidam/catalog/ for what each source can be trusted for.",
   "fiscal_year": 2027,
   "series_years": [
     {"series": "appropriations", "kind": "fiscal", "label": "FY1998-FY2027", "source": "Legislative Service Commission, enacted appropriations"},

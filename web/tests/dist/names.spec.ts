@@ -36,7 +36,7 @@ import { join } from "node:path";
 import { parseHTML } from "linkedom";
 import { describe, expect, test } from "vitest";
 
-import { DIST } from "./artefact.ts";
+import { DIST, pages } from "./artefact.ts";
 
 const read = (file: string) => parseHTML(readFileSync(file, "utf8")).document;
 
@@ -153,5 +153,40 @@ describe("one name per district tab", () => {
       const expected = tab.href === home ? district : `${district} — ${tab.label}`;
       expect(title, `${tab.href}: the tab says "${tab.label}"`).toBe(`${expected}${SITE}`);
     }
+  });
+});
+
+/*
+ * No title says the site's name twice (#571).
+ *
+ * The home page passed the site name as its title and the layout appended the site name again, so
+ * every browser tab and every shared link to the front door read "Ohio school funding — Ohio school
+ * funding". The layout now skips the suffix when the stem is the suffix; this holds it, across
+ * `<title>`, `og:title` and `twitter:title`, on every page.
+ */
+describe("no title repeats the site name", () => {
+  const SITE = "Ohio school funding";
+
+  test("the home page is titled once", () => {
+    const doc = read(join(DIST, "index.html"));
+    expect(text(doc.querySelector("title"))).toBe(SITE);
+  });
+
+  test("no page's title stem equals its suffix", () => {
+    const doubled = pages().flatMap((file) => {
+      const doc = read(file);
+      const titles = [
+        text(doc.querySelector("title")),
+        doc.querySelector('meta[property="og:title"]')?.getAttribute("content") ?? "",
+        doc.querySelector('meta[name="twitter:title"]')?.getAttribute("content") ?? "",
+      ];
+      return titles
+        .filter((title) => {
+          const parts = title.split(" — ");
+          return parts.length > 1 && parts.at(-2) === parts.at(-1);
+        })
+        .map((title) => `${file.slice(DIST.length)}: "${title}"`);
+    });
+    expect(doubled).toEqual([]);
   });
 });

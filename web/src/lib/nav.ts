@@ -394,7 +394,7 @@ export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavEntry[] {
       kind: "group",
       key: "analysis",
       front: "/outcomes",
-      blurb: "What this repository worked out from all of it — and, as loudly, what none of it claims.",
+      blurb: "What this site worked out from all of it — and, as loudly, what none of it claims.",
       label: "Analysis",
       sections: [
         {

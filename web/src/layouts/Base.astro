@@ -96,8 +96,15 @@ const { bundle, verification, forecastable } = loadFeed();
 const site = Astro.site ?? new URL("https://ohio-education-funding.pages.dev");
 const canonical = new URL(canonicalPath(Astro.url.pathname), site);
 const cardUrl = new URL(image, site);
-/** `og:title` is read without the tab strip around it, so it carries the site name too. */
-const socialTitle = `${title} — Ohio school funding`;
+/**
+ * The site name, appended to every page's own title — except the home page's, whose title *is*
+ * the site name. Appending it there printed "Ohio school funding — Ohio school funding" in every
+ * browser tab and on every shared link to the front door (#571).
+ *
+ * `og:title` is read without the tab strip around it, so it carries the site name too.
+ */
+const SITE_NAME = "Ohio school funding";
+const socialTitle = title === SITE_NAME ? title : `${title} — ${SITE_NAME}`;
 
 /**
  * The sections.
@@ -173,7 +180,7 @@ const body = applySemantics(listed).html;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title} — Ohio school funding</title>
+    <title>{socialTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
 
@@ -340,21 +347,29 @@ const body = applySemantics(listed).html;
 
     <footer class="site">
       <div class={wide ? "wrap wide" : "wrap"}>
+        {/*
+          Plain language, because this line is on every page and is read by people who arrived from
+          a shared link, not from the repository. It used to name the crate that computes the
+          reference forecasts, print the provenance paragraph with a `.yidam/catalog/` pointer and
+          state the bundle contract version. Those are for a technical reader, who looks for them
+          on /method and /data, and both pages still carry them (#571).
+        */}
         <p>
           {
             forecastable
-              ? `Formula verified at build against ${checkpoints} reference scenarios and ${forecasts} reference forecasts computed by crates/project.`
-              : `Formula verified at build against ${checkpoints} reference scenarios. The projection check did not pass, so no band is drawn.`
+              ? `Every figure is checked against ${checkpoints} reference scenarios and ${forecasts} reference forecasts before the site is built.`
+              : `Every figure is checked against ${checkpoints} reference scenarios before the site is built. The projection check did not pass, so no band is drawn.`
           }{" "}
+          FY{bundle.fiscal_year} model.
+        </p>
+        <p>
           <a href="/method">How these figures are made</a> · <a href="/data">Download the data</a>
         </p>
-        <p>{bundle.provenance}</p>
-        <p>Bundle contract {bundle.contract_version}. FY{bundle.fiscal_year} model.</p>
         {/*
           The repository, which is the only external link in the site's chrome.
 
-          Every figure on every page names the crate that computes it, and a reader following that
-          attribution needs somewhere to go. It sat in the header beside the theme button until
+          Every figure on every page is computed by code in it, and a reader who wants to check
+          one needs somewhere to go. It sat in the header beside the theme button until
           #548, which moved it here: the bar is for moving around this site, and a link that leaves
           it spent header width the six entries needed — at 360px it was already hidden to make
           room. The footer has room at every width, so it is shown at every width.
