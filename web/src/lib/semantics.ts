@@ -202,9 +202,33 @@ const NOTHING = /^(—|–|-|n\/a|none|no change|not published|not stated|not re
  * optionally a range. `<0.1%` is here because the site writes suppressed small shares that way.
  */
 const FIGURE =
-  /^[\s(\[]*[<>]?\s*[-+−]?\$?[\d,]+(\.\d+)?\s*(%|pp|x|×|mills?|per pupil|FTE|ADM|of\s+[\d,]+|districts?(\s*\([\d.]+%\))?)?[\s)\]]*((–|—|to|-)\s*[-+−]?\$?[\d,]+(\.\d+)?\s*(%|pp)?)?[\s)\]]*$/i;
+  /^[\s(\[]*[<>]?\s*[-+−]?\$?[\d,]+(\.\d+)?[KMB]?\s*(%|pp|x|×|mills?|per pupil|FTE|ADM|of\s+[\d,]+|districts?(\s*\([\d.]+%\))?)?[\s)\]]*((–|—|to|-)\s*[-+−]?\$?[\d,]+(\.\d+)?[KMB]?\s*(%|pp)?)?[\s)\]]*$/i;
 
-const isFigure = (text: string): boolean => text === "" || NOTHING.test(text) || FIGURE.test(text);
+/**
+ * Whether a cell's text is a figure, a null, or nothing — the question `alignColumns` asks.
+ *
+ * The `[KMB]` after the number is #575's: `millions()` writes `$7.28B` and `$412.6M`, and without
+ * the suffix `/statewide`'s six funding units and its nonpublic appropriations were classed as
+ * words and set ragged-left.
+ */
+export const isFigure = (text: string): boolean =>
+  text === "" || NOTHING.test(text) || FIGURE.test(text);
+
+/**
+ * A cell's text as a reader sees it: without `fig()`'s year and basis, which `td .fig-year` hides.
+ *
+ * `$7.28B FY2027` is not a figure by the pattern above and `$7.28B` is, and the year is not on the
+ * screen — the column head carries it. Classifying on `textContent` read the hidden label as part
+ * of the cell, which is the other half of how `/statewide`'s money columns came out as words
+ * (#575).
+ */
+function shownText(cell: Element): string {
+  const hidden = cell.querySelectorAll(".fig-year, .fig-basis");
+  if (hidden.length === 0) return (cell.textContent ?? "").replace(/\s+/g, " ").trim();
+  const copy = cell.cloneNode(true) as Element;
+  for (const label of copy.querySelectorAll(".fig-year, .fig-basis")) label.remove();
+  return (copy.textContent ?? "").replace(/\s+/g, " ").trim();
+}
 
 /**
  * Move a section's address to the end of its heading, where it stops being the first thing read.
@@ -357,6 +381,7 @@ function alignColumns(document: Document): number {
      * while the code claimed to have covered the table.
      */
     const columns = new Map<number, Element[]>();
+    const heads: { cell: Element; from: number; to: number }[] = [];
     for (const row of table.querySelectorAll("tr")) {
       let index = 0;
       for (const cell of row.children) {
@@ -364,18 +389,23 @@ function alignColumns(document: Document): number {
         if (cell.tagName === "TD") {
           if (!columns.has(index)) columns.set(index, []);
           columns.get(index)!.push(cell);
+        } else if (cell.tagName === "TH" && cell.closest("thead") != null) {
+          heads.push({ cell, from: index, to: index + span });
         }
         index += span;
       }
     }
 
-    for (const cells of columns.values()) {
-      const filled = cells.filter((cell) => (cell.textContent ?? "").trim() !== "");
+    const figureColumns = new Set<number>();
+    for (const [index, cells] of columns) {
+      const shown = cells.map(shownText);
+      const filled = shown.filter((text) => text !== "");
       if (filled.length === 0) continue;
-      const figures = filled.filter((cell) =>
-        isFigure((cell.textContent ?? "").replace(/\s+/g, " ").trim()),
-      ).length;
-      if (figures * 2 >= filled.length) continue;
+      const figures = filled.filter(isFigure).length;
+      if (figures * 2 >= filled.length) {
+        figureColumns.add(index);
+        continue;
+      }
 
       /*
        * A second question, because "not a figure" covers two different things.
@@ -389,13 +419,27 @@ function alignColumns(document: Document): number {
        * Without this the district dashboard's `WHAT IT IS` column is squeezed to about fifteen
        * characters a line at 390px, which is a ribbon rather than a sentence.
        */
-      const longest = Math.max(
-        ...filled.map((cell) => (cell.textContent ?? "").replace(/\s+/g, " ").trim().length),
-      );
+      const longest = Math.max(...filled.map((text) => text.length));
       for (const cell of cells) {
         cell.classList.add("says");
         if (longest > 40) cell.classList.add("reads");
         marked += 1;
+      }
+    }
+
+    /*
+     * And the head goes where its figures go (#575).
+     *
+     * `app.css` sets every `th` left and only `td` right, so across 20 tables on 9 routes every
+     * figure column was a left head over right figures — `STATE AID` floating over empty space at
+     * the column's left edge. A head is marked only when every body column it spans is a figure
+     * column, so a spanning group head over one figure and one word column stays left.
+     */
+    for (const { cell, from, to } of heads) {
+      const spanned = [];
+      for (let index = from; index < to; index += 1) if (columns.has(index)) spanned.push(index);
+      if (spanned.length > 0 && spanned.every((index) => figureColumns.has(index))) {
+        cell.classList.add("heads-figures");
       }
     }
   }

@@ -1498,7 +1498,36 @@ tr.current th, tr.current td { color: var(--text-primary); font-weight: var(--we
   color: var(--text-secondary);
 }
 
-.scroll { overflow-x: auto; }
+/*
+ * A table wider than its column scrolls inside this box — and says so (#575).
+ *
+ * At 375px, 15 tables on 8 routes scrolled sideways with nothing to show it. `/statewide`'s funding
+ * units table is 540px in 295px, and Amount, the column that matters, was entirely off-screen with
+ * no sign that there was anything to the right. A reader who does not already know to swipe reads
+ * the table as ending at the clip.
+ *
+ * The cue is four backgrounds, and none of them is a `box-shadow` — #182's rule 15 keeps elevation
+ * off anything sitting on the page, and `stylesheet.spec.ts` holds it. Two small shade gradients
+ * are pinned to the box's edges (`scroll`), and two covers the colour of the card ride with the
+ * content (`local`). At the left edge of the content the left cover sits over the left shade and
+ * hides it; scroll away and the cover goes with the content, uncovering the shade. So a shade
+ * shows on exactly the side there is more to see, and a table that fits shows none.
+ *
+ * The covers are the ground's colour, so they are only right on a ground of that colour.
+ * `--scroll-ground` is that colour — a card's — and `e2e/tables.spec.ts` checks it against the
+ * ground each overflowing box actually sits on. The cells paint no background of their own, which
+ * is what lets the shade show through them.
+ */
+.scroll {
+  --scroll-ground: var(--surface-1);
+  --scroll-shade: color-mix(in srgb, var(--text-primary) 16%, transparent);
+  overflow-x: auto;
+  background:
+    linear-gradient(to right, var(--scroll-ground) 40%, transparent) left / 1.5rem 100% no-repeat local,
+    linear-gradient(to left, var(--scroll-ground) 40%, transparent) right / 1.5rem 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, var(--scroll-shade), transparent) left / .6rem 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, var(--scroll-shade), transparent) right / .6rem 100% no-repeat scroll;
+}
 /* A table of sentences rather than of quantities: the numeric right-alignment below is wrong for
    it, and so is the tabular figure width. */
 table.prose td { text-align: left; font-variant-numeric: normal; }
@@ -1685,6 +1714,21 @@ td.says {
   text-align: left;
   font-variant-numeric: normal;
 }
+/*
+ * The head of a figure column sits over its figures (#575). `alignColumns` marks the heads whose
+ * every body column is a figure column; without it all 20 tables measured on 9 routes set their
+ * heads left over figures set right, so a head floated over empty space at the column's far edge.
+ */
+thead th.heads-figures { text-align: right; }
+/*
+ * A row's own name refuses to be a ribbon (#575).
+ *
+ * The first column is what the row is about, and in a table too wide for a phone it was the one
+ * the layout squeezed: `/statewide`'s funding units wrapped one word per line in it while the
+ * figures ran off the right. `.scroll` is there to take the width; this is the name taking its
+ * share of it.
+ */
+tbody th[scope="row"] { min-width: 9rem; }
 
 /*
  * And a column that holds sentences gets a sentence's width.

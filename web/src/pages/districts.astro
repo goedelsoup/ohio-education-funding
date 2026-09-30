@@ -12,7 +12,7 @@
  */
 import Base from "../layouts/Base.astro";
 import { NAMES } from "../lib/nav.ts";
-import { loadFeed } from "../lib/feed.ts";
+import { loadFeed, qualifiedName } from "../lib/feed.ts";
 import { count, fig, money, pct } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
 import { yearOf, type SeriesKey } from "../lib/year.ts";
@@ -251,7 +251,7 @@ const years = Object.fromEntries(MEASURES.map((m) => [m.key, m.year])) as Record
                 data-shrinking={d.enrollment_change != null && d.enrollment_change < 0 ? "1" : ""}
               >
                 <th scope="row" data-sort-value={d.name}>
-                  <a href={routes.district(d.irn)}>{d.name}</a>
+                  <a href={routes.district(d.irn)}>{qualifiedName(d)}</a>
                   <span class="n"> {d.irn}</span>
                 </th>
                 <td data-sort-value={d.adm}>{count(Math.round(d.adm))}</td>

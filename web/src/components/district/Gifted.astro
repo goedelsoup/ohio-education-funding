@@ -55,13 +55,25 @@ const unitTotal = g.coordinator_aid + g.specialist_k8_aid + g.specialist_9_12_ai
         <tr><th>Referral</th><td class="tnum n">—</td><td class="tnum n">—</td>
           <td class="tnum">{money(g.referral)}</td>
           <td class="n">$2.50 per enrolled pupil — a different denominator, one line away.</td></tr>
+        {/*
+          * A floored or capped unit says so in words, not in bold (#575). `tr.current` is "the row
+          * the model uses", and here it also meant "not earned": on the 216 districts where every
+          * entitlement is floored, four of the table's six rows were bold and the weight marked
+          * nothing. The total keeps it; the reason a unit is not its count goes beside the unit.
+          */}
         {units.map(([label, awarded, aid, price, earned, floor, note]) => (
-          <tr class={earned < floor - 1e-9 || awarded < earned - 1e-9 ? "current" : undefined}>
+          <tr>
               <th>{label}</th>
               <td class="tnum">{fixed(awarded, 4)}</td>
               <td class="tnum n">{fixed(earned, 4)}</td>
               <td class="tnum">{money(aid)}</td>
-              <td class="n">{money(price)} each — {note}.</td>
+              <td class="n">{money(price)} each — {note}.{
+                earned < floor - 1e-9
+                  ? <> <strong>Paid the floor, not its count.</strong></>
+                  : awarded < earned - 1e-9
+                    ? <> <strong>Paid the cap, not its count.</strong></>
+                    : null
+              }</td>
             </tr>
         ))}
         <tr class="current"><th>Gifted</th><td class="tnum n">—</td><td class="tnum n">—</td>
