@@ -8,7 +8,7 @@
  * Chart selectors here say `svg.plot:visible`; the reason is in `helpers.ts`.
  */
 
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 /*
  * The display face is a platform stack, so it is six different faces in the wild.
@@ -169,4 +169,172 @@ test.describe("the body face, under every fallback it can resolve to", () => {
       expect(through.slice(0, 10), through.join("\n")).toEqual([]);
     });
   }
+});
+
+/*
+ * The type system, read off the rendered page (#573).
+ *
+ * The two sweeps above force a face and ask whether the layout survives it. This one forces
+ * nothing and asks what the site actually sets: every visible text node's computed family and
+ * size, on one page per route family.
+ *
+ * It exists because five slips each looked too small to matter: `code` in Courier because it
+ * named no family, the `/scenario/reach` presets in Arial because a `<button>` does not inherit
+ * its font, figures in mono beside sans neighbours, a claim mark in three faces and three sizes,
+ * and eighteen distinct sizes against an eight-step ramp — every off-ramp one an `em` rule taking
+ * a proportion of whatever it landed in. None fails a stylesheet read, because each is a
+ * cascade outcome rather than a declaration.
+ *
+ * # What counts as a family
+ *
+ * The three text tokens, `--font-math` for MathML, and `body`'s own stack. That last is
+ * `--font-sans` without IBM Plex Sans in front, which is a decision recorded at `body` in
+ * `app.css`, and the first test pins that relationship rather than assuming it. Text inside an
+ * `<svg>` is excluded: chart text is `system-ui` by design (`plot/spec.ts`).
+ *
+ * # What counts as a size
+ *
+ * The eight ramp tokens and `body`'s 15px apparatus size, which the same comment at `body`
+ * records as a decision. Nothing else. At 1280px only: `h1.slug-title` clamps between 2rem and
+ * 2.4rem, so a narrower viewport draws a title between two steps on purpose.
+ */
+test.describe("the type system, as the page sets it", () => {
+  const ROUTES = [
+    "/",
+    "/statewide",
+    "/districts",
+    "/district/043786",
+    "/district/043786/finances",
+    "/district/043786/outcome",
+    "/district/043786/taxes",
+    "/scenario",
+    "/scenario/reach",
+    "/compare?a=043786&b=049056",
+    "/county/cuyahoga",
+    "/outcomes",
+    "/method",
+    "/history",
+    "/legislation",
+    "/wiki",
+    "/wiki/doctrine/equity",
+    "/wiki/funding-regime/fair-school-funding-plan",
+    "/wiki/decision",
+    "/wiki/decision/the-order-was-never-the-states",
+    "/data",
+  ] as const;
+  const RAMP = ["xs", "sm", "base", "body", "lead", "h2", "h1", "figure"] as const;
+  /** `body`'s apparatus size: a stated decision, not a leftover. See `body` in `app.css`. */
+  const ALLOWANCE = 1;
+
+  interface Census {
+    tokens: { sans: string; mono: string; serif: string; math: string; body: string };
+    ramp: string[];
+    bodySize: string;
+    figValue: string;
+    families: Record<string, string>;
+    sizes: Record<string, string>;
+    claims: string[];
+    codes: string[];
+    /** A figure in a row of facts or a table cell, set in a face its cell is not. */
+    oddFigures: string[];
+  }
+
+  const read = async (page: Page, route: string): Promise<Census> => {
+    await page.goto(route);
+    // The runner and the comparison render in the browser; reading before they have is reading
+    // an empty container.
+    if (route.startsWith("/scenario")) {
+      await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
+    }
+    if (route.startsWith("/compare")) await expect(page.locator("#compare-out table")).toBeVisible();
+    return page.evaluate((ramp) => {
+      const probe = (style: string, className = ""): { fontFamily: string; fontSize: string } => {
+        const el = document.createElement("span");
+        el.setAttribute("style", style);
+        el.className = className;
+        document.body.append(el);
+        const { fontFamily, fontSize } = getComputedStyle(el);
+        el.remove();
+        return { fontFamily, fontSize };
+      };
+      const tokens = {
+        sans: probe("font-family: var(--font-sans)").fontFamily,
+        mono: probe("font-family: var(--font-mono)").fontFamily,
+        serif: probe("font-family: var(--font-serif)").fontFamily,
+        math: probe("font-family: var(--font-math)").fontFamily,
+        body: getComputedStyle(document.body).fontFamily,
+      };
+      const where = (el: Element): string =>
+        el.tagName.toLowerCase() + [...el.classList].map((c) => `.${c}`).join("");
+
+      const families: Record<string, string> = {};
+      const sizes: Record<string, string> = {};
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      for (let node = walker.nextNode(); node != null; node = walker.nextNode()) {
+        const el = node.parentElement;
+        if (el == null || !(node.textContent ?? "").trim() || el.closest("svg")) continue;
+        if (!el.getClientRects().length) continue;
+        const style = getComputedStyle(el);
+        if (style.visibility === "hidden") continue;
+        families[style.fontFamily] ??= where(el);
+        sizes[style.fontSize] ??= where(el);
+      }
+      const visible = (selector: string): CSSStyleDeclaration[] =>
+        [...document.querySelectorAll(selector)]
+          .filter((el) => el.getClientRects().length)
+          .map((el) => getComputedStyle(el));
+      return {
+        tokens,
+        ramp: ramp.map((step) => probe(`font-size: var(--text-${step})`).fontSize),
+        bodySize: getComputedStyle(document.body).fontSize,
+        figValue: probe("", "fig-value").fontFamily,
+        families,
+        sizes,
+        claims: visible(".claim").map((s) => `${s.fontFamily} @ ${s.fontSize}`),
+        codes: visible("code").map((s) => s.fontFamily),
+        oddFigures: [...document.querySelectorAll(".facts .fig-value, td .fig-value")]
+          .filter((el) => el.getClientRects().length)
+          .filter((el) => {
+            const cell = el.closest("dd, td");
+            return cell != null && getComputedStyle(el).fontFamily !== getComputedStyle(cell).fontFamily;
+          })
+          .map((el) => `"${(el.textContent ?? "").trim()}" in ${where(el.closest("dd, td")!)}`),
+      };
+    }, [...RAMP]);
+  };
+
+  test("body's stack is the sans token without the face that does not ship", async ({ page }) => {
+    const { tokens } = await read(page, "/");
+    const [first, ...rest] = tokens.sans.split(",").map((family) => family.trim());
+    expect(first).toBe('"IBM Plex Sans"');
+    expect(tokens.body).toBe(rest.join(", "));
+  });
+
+  test("every family, size, claim mark and code span is one the system names", async ({ page }) => {
+    const strays: string[] = [];
+    const allSizes = new Set<string>();
+    const claims = new Map<string, string>();
+    for (const route of ROUTES) {
+      const census = await read(page, route);
+      const { tokens } = census;
+      const named = new Set(Object.values(tokens));
+      for (const [family, el] of Object.entries(census.families)) {
+        if (!named.has(family)) strays.push(`${route}: ${el} is set in ${family}`);
+      }
+      const ramp = new Set([...census.ramp, census.bodySize]);
+      for (const [size, el] of Object.entries(census.sizes)) {
+        allSizes.add(size);
+        if (!ramp.has(size)) strays.push(`${route}: ${el} is ${size}, which is not a step on the ramp`);
+      }
+      for (const figure of census.oddFigures) strays.push(`${route}: ${figure} is in another face than its cell`);
+      for (const claim of census.claims) claims.set(claim, route);
+      expect(census.figValue, "a figure in prose is still the mono token").toBe(tokens.mono);
+      for (const family of new Set(census.codes)) {
+        if (family !== census.figValue) strays.push(`${route}: code is set in ${family}, not in the figures' face`);
+      }
+    }
+    expect(strays, strays.join("\n")).toEqual([]);
+    expect([...claims.keys()], "every claim mark shares one family and one size").toHaveLength(1);
+    expect(allSizes.size, [...allSizes].join(" ")).toBeLessThanOrEqual(RAMP.length + ALLOWANCE);
+  });
 });

@@ -112,6 +112,22 @@ a[href], button, input, select, textarea, summary, [tabindex] {
 }
 
 /*
+ * Two defaults the browser supplies and this site does not want (#573).
+ *
+ * A `<button>` does not inherit its font: the user-agent sheet gives it the platform's control
+ * face, which on macOS is 13.33px Arial. Every button here that had been styled said `font:
+ * inherit` itself; the `/scenario/reach` presets did not, and were the only Arial on the site.
+ * Stated once here, so a button written tomorrow starts in the page's face rather than in Arial.
+ *
+ * `code` falls back to the generic `monospace`, which is Courier on macOS — a second monospace
+ * beside `--font-mono`, in 210 code spans across 17 routes. The generic keyword also triggers the
+ * browser's monospace size quirk, which drew code 13/16 the size of the text around it. Naming
+ * the token's stack removes both.
+ */
+button { font: inherit; }
+code, kbd, samp, pre { font-family: var(--font-mono); }
+
+/*
  * Past the header, before the bar.
  *
  * Off-screen until focused rather than `display: none`, which would take it out of the tab order
@@ -752,11 +768,11 @@ h3 {
  * two at .06em: `.contents-label` and `.claim`. Nothing about either wanted a wider track; they
  * were the two written before the token existed. All thirteen now take it from this one rule.
  *
- * What is NOT here is the size and the ink, because the eyebrow is set at three sizes for three
- * jobs: `--text-xs` for a label (most of these), `--text-sm` for a column head, and the claim
- * mark's .68em, which scales with the sentence it rides in. Each keeps its own below. The claim
- * mark also keeps its own colour, its rule and nothing boxy — see `stylesheet.spec.ts`, which
- * reads this rule as one of the claim's and finds only case and tracking in it.
+ * What is NOT here is the size and the ink, because the eyebrow is set at two sizes for two
+ * jobs: `--text-xs` for a label (most of these, and the claim mark since #573), `--text-sm` for a
+ * column head. Each keeps its own below. The claim mark also keeps its own colour, its rule
+ * and nothing boxy — see `stylesheet.spec.ts`, which reads this rule as one of the claim's and
+ * finds only case and tracking in it.
  *
  * A selector list rather than a class in the markup: every member already has a class or a
  * position that says what it is, and thirty-odd call sites across `.astro` and `.ts` writing a
@@ -2323,7 +2339,7 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
   background: var(--surface-inset);
   padding: .1rem var(--space-2);
   border-radius: var(--radius-sm);
-  font-size: .9em;
+  font-size: var(--text-base);
   /* The corpus cites code by path — `crates/xcheck/tests/report_card_2425.rs` — which is one
      unbreakable token wider than a phone. Without this it pushes the whole document sideways. */
   overflow-wrap: anywhere;
@@ -2337,10 +2353,11 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
   font-size: var(--text-base);
 }
 /*
- * Code takes one size step down from the text it sits in, and only one. `.9em` compounds: inside
- * a `pre` already at `--text-base` it made 12.7px, and inside a `.claim-detail` already at `.9em`
- * it made 13.7px — two sizes no other text on the page had, which put the funding-plan node over
- * the ten-size ceiling (#550). A block and a justification have taken their step, so code in them
+ * Code is `--text-base`, a step on the ramp, rather than a proportion of the text it sits in. It
+ * was `.9em`, and an em size is a new size in every context it lands in: 15.3px in prose, 12.7px
+ * inside a `pre`, 13.7px inside a justification — sizes no other text on the page had, which put
+ * the funding-plan node over the ten-size ceiling (#550) and left 18 distinct sizes against an
+ * 8-step ramp (#573). A block and a justification are already at `--text-base`, so code in them
  * inherits it.
  */
 .prose-body pre code { background: none; padding: 0; overflow-wrap: normal; font-size: inherit; }
@@ -2472,7 +2489,12 @@ h1.slug-title {
  */
 .claim {
   display: inline;
-  font-size: .68em;
+  /* One face and one size wherever the mark lands (#573). At `.68em` and no family it took both
+     from its sentence: the serif at 13.6px in a lead, the sans at 11.5px in prose, 9.6px in dense
+     text, and the mono inside an aligned block — one mark in three faces and three sizes. Only
+     face and size are set here; the mark still has no border, background or radius. */
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
   font-weight: var(--weight-semibold);
   white-space: nowrap;
   /* Rides the baseline of the sentence it qualifies. A raised mark reads as a footnote reference,
@@ -2496,13 +2518,15 @@ h1.slug-title {
   font-weight: var(--weight-regular);
   text-transform: none;
   letter-spacing: 0;
-  font-size: .9em;
+  /* A step on the ramp, for the reason the mark above is: `.9em` was 18px in a lead and 15.3px
+     in prose, and neither is a size this site sets anywhere else. */
+  font-size: var(--text-base);
   color: var(--text-muted);
   white-space: normal;
 }
 /* Qualification at phrase scale: inline, parenthetical, inside the sentence it qualifies. The
    paragraph and card scales are `.note` and `.card.caveat`. */
-.caveat-inline { font-size: .92em; color: var(--text-muted); }
+.caveat-inline { font-size: var(--text-sm); color: var(--text-muted); }
 .caveat-inline::before { content: "("; }
 .caveat-inline::after { content: ")"; }
 
@@ -2688,7 +2712,7 @@ footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); 
 .fig { display: inline; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .fig-value { font-family: var(--font-mono); font-weight: var(--weight-medium); }
 .fig-year,
-.fig-basis { font-size: .78em; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.fig-basis { font-size: var(--text-xs); color: var(--text-muted); font-variant-numeric: tabular-nums; }
 /* The gap is a word space in the markup, not a margin here — see `fig()` in `lib/format.ts`. Two
    adjacent inline spans concatenate with nothing between them in the accessible name, so a margin
    is a gap only a sighted reader gets, and the tiles were announcing "$251,661TY2024". */
@@ -2703,7 +2727,7 @@ footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); 
    the type. Without this the tile's headline figure drops to the body weight `.fig-value` sets. */
 .tile .v .fig-value { font: inherit; letter-spacing: inherit; }
 .tile .v .fig-year,
-.tile .v .fig-basis { font-size: .5em; font-weight: var(--weight-regular); letter-spacing: 0; }
+.tile .v .fig-basis { font-size: var(--text-xs); font-weight: var(--weight-regular); letter-spacing: 0; }
 /*
  * A column head is the one place the compound's VALUE is a label rather than a number.
  *
@@ -2719,6 +2743,15 @@ footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); 
  */
 th .fig { white-space: normal; }
 th .fig-value { font: inherit; letter-spacing: inherit; }
+/*
+ * And a value beside other values keeps their face. The district header's facts row set
+ * "DISADVANTAGED 100.0%" in mono between two sans values, and `/statewide`'s Amount and
+ * Appropriated columns were the only table figures on the site in mono (#573). The mono is for a
+ * figure standing in prose; in a row of facts or a column of cells the alignment is the table's
+ * job, and `.fig` already sets tabular figures, which `font: inherit` carries down.
+ */
+.facts .fig-value,
+td .fig-value { font: inherit; }
 th .fig-year, th .fig-basis { display: inline; }
 td .fig-year, td .fig-basis { display: none; }
 
