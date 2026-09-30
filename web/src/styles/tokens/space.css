@@ -86,6 +86,11 @@
    * does not show. Measured with the page scrolled, the lowest sticky edge is at 105. Erring by a
    * pixel upward is the right direction for a value whose job is to keep a target clear.
    *
+   * #550 put the sub-navigation's tabs on the space scale, which took 1.6px off the strip: it is
+   * 52.6px now and the lowest sticky edge 103.6. The value is left at 106 rather than re-derived,
+   * because the error is still in the safe direction — a fragment lands two pixels further clear —
+   * and a token that tracked every tenth of a pixel of the strip would move with each change to it.
+   *
    * # FONT-SENSITIVE, and here is the edge
    *
    * The header is one row because its three items fit on one, so a face that draws them wider can
@@ -104,5 +109,5 @@
   --shadow-tip: 0 2px 10px rgb(0 0 0 / 18%);
 }
 
-/* `.subnav` becomes sticky here and adds its 54px. Below this only the header is sticky. */
+/* `.subnav` becomes sticky here and adds its 53px. Below this only the header is sticky. */
 @media (min-width: 1000px) { :root { --sticky-chrome: 106px; } }

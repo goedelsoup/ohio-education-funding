@@ -155,7 +155,7 @@ header.site {
 .site-inner {
   max-width: var(--wrap-wide);
   margin: 0 auto;
-  padding: .6rem var(--space-7);
+  padding: var(--space-3) var(--space-7);
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -216,14 +216,9 @@ header.site nav { display: flex; gap: .15rem; margin-right: auto; }
  * It stays a native `<details>` at both sizes. A third of the end-to-end suite runs with
  * JavaScript disabled and opens these menus.
  */
-/* The same shape as a nav item, because it is one — restated by selector, not by value. */
-.menu-all > summary {
-  cursor: pointer;
-  list-style: none;
-}
-.menu-all > summary::-webkit-details-marker { display: none; }
-.menu-all > summary::after { content: " ▾"; color: var(--text-muted); }
-.menu-all > summary:hover { background: var(--surface-2); color: var(--text-primary); }
+/* The summary is a tab like the entries it holds, and `header.site nav summary` below already
+   matches it — so it takes the tab's box, the `▾` and the hover from there rather than restating
+   them. (The copies it had here were outranked by that selector and never applied.) */
 .menu-all > .menu-groups { display: flex; flex-direction: column; gap: .15rem; padding: var(--space-3) 0; }
 
 /*
@@ -279,20 +274,44 @@ header.site nav { display: flex; gap: .15rem; margin-right: auto; }
   .menu-all::details-content { content-visibility: visible; block-size: auto; }
   .menu-all > .menu-groups { flex-direction: row; padding: 0; }
 }
+/*
+ * The tab (#550): one entry in a row of places, and the only tab shape on the site.
+ *
+ * It had four spellings — the header's links, the header's summaries (twice over, once for the
+ * section menus and once for `Menu`), a district's or a runner's `.subnav`, and a `.tabs button`
+ * with no markup left anywhere. They agreed on the type, the corner and the ink and disagreed on
+ * the box by a few tenths of a rem each, none of which was a token. Now one rule set: the header
+ * entry, the menu row and the view strip are the same tab, and the view strip differs only by
+ * sitting in the page, where it takes the operable edge (`--border-control`) that a control on the
+ * page takes.
+ *
+ * The vertical padding moved from .3rem to `--space-2` and `.site-inner`'s from .6rem to
+ * `--space-3` in the same change, which cancel: the header row is the height it was, so
+ * `--sticky-chrome` still says 52px. Both edges of the bar are on tokens now.
+ */
 header.site nav a,
-.menu-all > summary {
+header.site nav summary,
+.subnav a {
   font-size: var(--text-base);
-  padding: .3rem .6rem;
+  padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
   color: var(--text-secondary);
   text-decoration: none;
 }
-header.site nav a:hover { background: var(--surface-2); color: var(--text-primary); }
-header.site nav a[aria-current="page"] {
+header.site nav a:hover,
+.subnav a:hover { background: var(--surface-2); color: var(--text-primary); }
+header.site nav a[aria-current="page"],
+.subnav a[aria-current="page"] {
   background: var(--surface-2);
   color: var(--text-primary);
   font-weight: var(--weight-semibold);
 }
+.subnav a {
+  flex: none;
+  border: 1px solid var(--border-control);
+  background: var(--surface-1);
+}
+.subnav a[aria-current="page"] { border-color: var(--accent-rule); }
 /*
  * The two entries that are links rather than menus — `Find a district` and `Try a change`.
  *
@@ -310,10 +329,6 @@ header.site nav .menu-place[aria-current="true"] {
    see the note in `Base.astro`. Everything below is appearance; none of it is behaviour. */
 header.site nav .menu { position: relative; }
 header.site nav summary {
-  font-size: var(--text-base);
-  padding: .3rem .6rem;
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
   cursor: pointer;
   white-space: nowrap;
   /* Both, because the triangle is a `::marker` in most engines and a `::-webkit-details-marker`
@@ -323,7 +338,7 @@ header.site nav summary {
 header.site nav summary::-webkit-details-marker { display: none; }
 header.site nav summary::after {
   content: "▾";
-  margin-left: .3rem;
+  margin-left: var(--space-2);
   font-size: .75em;
   opacity: .6;
 }
@@ -378,7 +393,7 @@ header.site nav a[aria-current="page"] .menu-note { color: var(--text-secondary)
 /* What a run is, in `Library`: text rather than a heading element, set as a label over it. */
 header.site nav .menu-heading {
   display: block;
-  padding: var(--space-1) .6rem 0;
+  padding: var(--space-1) var(--space-3) 0;
   font-size: var(--text-xs);
   font-weight: var(--weight-semibold);
   color: var(--text-annotation);
@@ -589,14 +604,13 @@ a:focus-visible { color: var(--link); text-decoration-thickness: 2px; }
  */
 .subnav {
   display: flex;
-  gap: .4rem;
+  gap: var(--space-2);
   margin: 0 0 var(--space-6);
   flex-wrap: nowrap;
   overflow-x: auto;
   scrollbar-width: none;
 }
 .subnav::-webkit-scrollbar { display: none; }
-.subnav a { flex: none; }
 
 /*
  * Sticky from 1000px up, and deliberately not below it.
@@ -630,21 +644,6 @@ a:focus-visible { color: var(--link); text-decoration-thickness: 2px; }
     padding: var(--space-3) 0;
     margin-bottom: var(--space-3);
   }
-}
-.subnav a {
-  font-size: var(--text-base);
-  padding: .4rem .8rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-control);
-  background: var(--surface-1);
-  color: var(--text-secondary);
-  text-decoration: none;
-}
-.subnav a[aria-current="page"] {
-  background: var(--surface-2);
-  color: var(--text-primary);
-  border-color: var(--accent-rule);
-  font-weight: var(--weight-semibold);
 }
 
 /*
@@ -1141,24 +1140,6 @@ select, input[type="range"], input[type="text"], input[type="search"], textarea 
 /* The thumb and the filled track are control chrome, not a series. Same reason as the ring. */
 input[type="range"] { padding: var(--space-2) 0; accent-color: var(--link); }
 output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-weight: var(--weight-semibold); }
-
-/* Tabs. The filter row sits above the content, in one row. */
-.tabs { display: flex; gap: .4rem; margin-bottom: var(--space-6); flex-wrap: wrap; }
-.tabs button {
-  font: inherit;
-  padding: .45rem .85rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-control);
-  background: var(--surface-1);
-  color: var(--text-secondary);
-  cursor: pointer;
-}
-.tabs button.active {
-  background: var(--surface-2);
-  color: var(--text-primary);
-  border-color: var(--accent-rule);
-  font-weight: var(--weight-semibold);
-}
 
 /*
  * The tiles, which are a row of figures and not five boxes inside a sixth.
