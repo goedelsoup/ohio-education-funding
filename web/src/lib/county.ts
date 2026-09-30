@@ -199,13 +199,13 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
         <thead><tr><th>District</th><th class="tnum">Valuation per pupil</th>
           <th class="tnum">State aid per pupil</th><th class="tnum">Pupils</th></tr></thead>
         <tbody>
-          <tr class="current"><th><a href="${routes.district(rich.irn)}">${escapeHtml(
+          <tr><th><a href="${routes.district(rich.irn)}">${escapeHtml(
             rich.name,
           )}</a><div class="n">The most property wealth per pupil here</div></th>
             <td class="tnum">${money(rich.valuation_per_pupil!)}</td>
             <td class="tnum">${money(rich.realized_aid_per_pupil)}</td>
             <td class="tnum">${count(Math.round(rich.adm))}</td></tr>
-          <tr class="current"><th><a href="${routes.district(poor.irn)}">${escapeHtml(
+          <tr><th><a href="${routes.district(poor.irn)}">${escapeHtml(
             poor.name,
           )}</a><div class="n">The least</div></th>
             <td class="tnum">${money(poor.valuation_per_pupil!)}</td>

@@ -35,6 +35,10 @@ const rows = weights
   .filter((r) => r.adm > 0 || r.aid > 0);
 
 const biggest = [...rows].sort((a, b) => b.aid - a.aid)[0];
+// Set in bold only when picked out of three or more. Of two, the share column already says which is
+// larger, and with the total also bold two of the table's three rows carried the weight, which
+// then marked nothing (#575).
+const marked = rows.length > 2 ? biggest : undefined;
 ---
 
 {
@@ -47,7 +51,7 @@ const biggest = [...rows].sort((a, b) => b.aid - a.aid)[0];
         <th class="tnum">Share of aid</th></tr></thead>
       <tbody>
         {rows.map((r) => (
-          <tr class={r.category === biggest?.category ? "current" : undefined}>
+          <tr class={r.category === marked?.category ? "current" : undefined}>
               <th>Category {r.category}</th>
               <td class="tnum">{fixed(r.weight, 4)}</td>
               <td class="tnum">{count(Math.round(r.adm))}</td>

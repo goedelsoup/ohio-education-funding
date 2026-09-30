@@ -7,7 +7,7 @@
  * the mistake this page is most likely to invite.
  */
 import Base from "../../layouts/Base.astro";
-import { loadFeed } from "../../lib/feed.ts";
+import { loadFeed, qualifiedName } from "../../lib/feed.ts";
 import { count, money, pct } from "../../lib/format.ts";
 import * as routes from "../../lib/routes.ts";
 import { yearChip } from "../../lib/year.ts";
@@ -150,11 +150,20 @@ const valuationByIrn = new Map(
         <th class="tnum">State aid</th>
       </tr></thead>
       <tbody>
+        {/*
+          * No bold row and no per-row gloss for a district wholly inside (#575). `tr.current` means
+          * "the row the published model uses", and on House 90 it was on 11 of 18 rows with the same
+          * sentence under each — a mark on most rows marks nothing. "Of the district" already
+          * answers the question, so it is the mark: 100% is written only for a district that is
+          * wholly inside, and a share that merely rounds there reads ">99.9%".
+          *
+          * The name is `qualifiedName`, because names are not unique: House 90 holds two Eastern
+          * Local School Districts, and without the county they were one name twice.
+          */}
         {house.members.map((m) => (
-          <tr class={m.wholly_inside ? "current" : undefined}>
-            <th><a href={routes.district(m.irn)}>{m.name}</a>
-              {m.wholly_inside ? <div class="n">Entirely inside this House district</div> : null}</th>
-            <td class="tnum">{pct(m.share, 1)}</td>
+          <tr>
+            <th><a href={routes.district(m.irn)}>{byIrn.has(m.irn) ? qualifiedName(byIrn.get(m.irn)!) : m.name}</a></th>
+            <td class="tnum">{m.wholly_inside ? "100%" : pct(m.share, 1) === "100.0%" ? ">99.9%" : pct(m.share, 1)}</td>
             <td class="tnum">{pct(m.share_of_house_district, 1)}</td>
             <td class="tnum">{count(Math.round(m.adm))}</td>
             {/* The measure the strip above is drawn from, so a dot can be read back to a row.

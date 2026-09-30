@@ -154,6 +154,84 @@ describe("document semantics", () => {
 
 
 
+  /**
+   * Four things a data table must not do, swept over every table in the build (#575).
+   *
+   * Each was found on a handful of routes and is produced by a rule that reaches all of them: the
+   * head alignment and the classing by `alignColumns`, the bold row and the name by the templates.
+   * Only the table is parsed, not the page — there are a great many pages and the question is
+   * entirely inside `<table>`.
+   */
+  test("a figure column's head sits over its figures, and a table marks and names its rows apart", () => {
+    let heads = 0;
+    let tables = 0;
+    const leftHeads: string[] = [];
+    const wordFigures: string[] = [];
+    const overmarked: string[] = [];
+    const repeated: string[] = [];
+
+    for (const file of pages()) {
+      const where = file.slice(DIST.length + 1);
+      for (const match of readFileSync(file, "utf8").matchAll(/<table\b[\s\S]*?<\/table>/g)) {
+        const { document } = parseHTML(`<!doctype html><html><body>${match[0]}</body></html>`);
+        const table = document.querySelector("table")!;
+        if (table.classList.contains("prose")) continue;
+        tables += 1;
+
+        // Body columns by index, counting `colspan` — the same walk `alignColumns` makes.
+        const columns = new Map<number, Element[]>();
+        for (const row of table.querySelectorAll("tbody tr")) {
+          let index = 0;
+          for (const cell of row.children) {
+            if (cell.tagName === "TD") columns.set(index, [...(columns.get(index) ?? []), cell]);
+            index += Number(cell.getAttribute("colspan") ?? 1);
+          }
+        }
+        for (const row of table.querySelectorAll("thead tr")) {
+          let index = 0;
+          for (const cell of row.children) {
+            const span = Number(cell.getAttribute("colspan") ?? 1);
+            const cells = span === 1 ? columns.get(index) : undefined;
+            index += span;
+            if (!cells || cells.every((c) => (c.textContent ?? "").trim() === "")) continue;
+            if (cells.some((c) => c.classList.contains("says"))) continue;
+            heads += 1;
+            if (!cell.classList.contains("heads-figures") && leftHeads.length < 5) {
+              leftHeads.push(`${where}: ${(cell.textContent ?? "").trim().slice(0, 40)}`);
+            }
+          }
+        }
+
+        for (const cell of table.querySelectorAll("td.says")) {
+          if (cell.querySelector(".fig") && wordFigures.length < 5) {
+            wordFigures.push(`${where}: ${(cell.textContent ?? "").trim().slice(0, 40)}`);
+          }
+        }
+
+        const rows = table.querySelectorAll("tbody tr");
+        const current = table.querySelectorAll("tbody tr.current");
+        if (rows.length > 1 && current.length * 2 > rows.length && overmarked.length < 5) {
+          overmarked.push(`${where}: ${current.length} of ${rows.length} rows`);
+        }
+
+        const names = [...table.querySelectorAll('tbody th a[href^="/district/"]')].map((a) =>
+          (a.textContent ?? "").replace(/\s+/g, " ").trim(),
+        );
+        const twice = names.find((name, i) => names.indexOf(name) !== i);
+        if (twice && repeated.length < 5) repeated.push(`${where}: ${twice}`);
+      }
+    }
+
+    expect(tables, "the build carries tables to check").toBeGreaterThan(10_000);
+    expect(heads, "the build carries figure columns to check").toBeGreaterThan(10_000);
+    expect(leftHeads, "a figure column whose head reads left").toEqual([]);
+    expect(wordFigures, "a fig() amount in a column classed as words").toEqual([]);
+    expect(overmarked, "a bold row on most of a table's rows, which marks nothing").toEqual([]);
+    expect(repeated, "one district name twice in a table, with nothing to tell them apart").toEqual([]);
+  });
+
+
+
   test("every one of them in the build says what it is", () => {
     /*
      * Scanned over the artefact rather than a page at a time, for the reason the CSP block above
