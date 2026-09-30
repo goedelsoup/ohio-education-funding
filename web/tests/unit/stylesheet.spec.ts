@@ -238,9 +238,9 @@ const PAPER = atRule("@media print {");
  */
 test("a swatch or a bar segment never encodes with a ground alone", () => {
   const painted = new Map<string, string[]>();
-  for (const [selector, body] of rules(/\.(sw|seg)\./)) {
+  for (const [selector, body] of rules(/\.(sw|seg)\[data-series=/)) {
     if (!/(^|;)\s*background\s*:/.test(`;${body}`)) continue;
-    for (const [, variant] of selector.matchAll(/\.(?:sw|seg)\.([a-z0-9-]+)/g)) {
+    for (const [, variant] of selector.matchAll(/\.(?:sw|seg)\[data-series="([a-z0-9-]+)"\]/g)) {
       painted.set(variant!, [...(painted.get(variant!) ?? []), body]);
     }
   }
@@ -250,11 +250,25 @@ test("a swatch or a bar segment never encodes with a ground alone", () => {
   const offenders = [...painted].filter(([variant, bodies]) => {
     if (bodies.some((body) => /border/.test(body))) return false;
     const onPaper = [...SECOND_CHANNEL.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
-      .filter(([, s]) => new RegExp(`\\.(sw|seg)\\.${variant}(?![a-z0-9-])`).test(s!))
+      .filter(([, s]) => new RegExp(`\\.(sw|seg)\\[data-series="${variant}"\\]`).test(s!))
       .map(([, , b]) => b!);
     return !onPaper.some((body) => /border/.test(body));
   });
   expect(offenders.map(([variant]) => variant)).toEqual([]);
+});
+
+/**
+ * A breakpoint has one spelling, and it is pixels.
+ *
+ * There were two: most were px and three were rem (34rem, 40rem, 60rem). In a media query a rem is
+ * the initial 16px and not the root's size, so the two spellings meant the same widths — but a
+ * reader comparing `40rem` against `max-width: 640px` two hundred lines away had to know that to
+ * see they were one breakpoint. #550 wrote them all in px.
+ */
+test("every width breakpoint is written in px", () => {
+  const widths = [...CSS.matchAll(/@media[^{]*?\((?:min|max)-width:\s*([^)]+)\)/g)].map((m) => m[1]!.trim());
+  expect(widths.length, "no width breakpoint found — has the parser drifted?").toBeGreaterThan(5);
+  expect(widths.filter((w) => !/^\d+(\.\d+)?px$/.test(w))).toEqual([]);
 });
 
 /**

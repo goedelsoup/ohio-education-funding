@@ -491,7 +491,7 @@ function syncScope(view: View): void {
   const chip = (label: string, kind: "county" | "district", value: string): HTMLButtonElement => {
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "chip";
+    button.className = "pill";
     button.dataset[kind] = value;
     button.append(label);
     /* A mark that says it comes off, and out of the accessibility tree — the whole action is on
@@ -523,7 +523,7 @@ function syncScope(view: View): void {
 
   const clear = document.createElement("button");
   clear.type = "button";
-  clear.className = "chip chip-clear";
+  clear.className = "pill";
   clear.id = "rv-clear";
   clear.textContent = "Every district";
   clear.setAttribute("aria-label", "Clear the selection and light every district");
@@ -905,9 +905,9 @@ export function boot(panel: Panel): void {
   });
 
   $("#rv-chips")?.addEventListener("click", (event) => {
-    const chip = (event.target as HTMLElement).closest<HTMLButtonElement>("button.chip");
+    const chip = (event.target as HTMLElement).closest<HTMLButtonElement>("button");
     if (!chip) return;
-    if (chip.classList.contains("chip-clear")) {
+    if (chip.id === "rv-clear") {
       for (const box of document.querySelectorAll<HTMLInputElement>(
         '#reach-scope input[name="co"]',
       )) {

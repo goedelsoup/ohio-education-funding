@@ -434,7 +434,7 @@ const properties = shownProperties(node.properties.filter((p) => p.name !== "see
             : " There are none it cannot run, which is a property of a one-clause draft rather than of drafts."}
         </p>
         <div class="flags">
-          <a class="flag" href={routes.scenarioDraft(draft.slug)}>Open in the scenario runner</a>
+          <a class="pill" href={routes.scenarioDraft(draft.slug)}>Open in the scenario runner</a>
         </div>
       </div>
     )
@@ -454,11 +454,11 @@ const properties = shownProperties(node.properties.filter((p) => p.name !== "see
               omitted here for six phases after it was built — it is the heaviest of the five and
               the one an exemplar district's page has most reason to reach, since a district is an
               exemplar in this corpus largely on account of its tax base. */}
-          <a class="flag" href={routes.district(district.irn)}>Dashboard</a>
-          <a class="flag" href={routes.districtOutcome(district.irn)}>Outcome</a>
-          <a class="flag" href={routes.districtFinances(district.irn)}>Finances</a>
-          <a class="flag" href={routes.districtTaxes(district.irn)}>Property tax</a>
-          <a class="flag" href={routes.districtScenario(district.irn)}>Scenario</a>
+          <a class="pill" href={routes.district(district.irn)}>Dashboard</a>
+          <a class="pill" href={routes.districtOutcome(district.irn)}>Outcome</a>
+          <a class="pill" href={routes.districtFinances(district.irn)}>Finances</a>
+          <a class="pill" href={routes.districtTaxes(district.irn)}>Property tax</a>
+          <a class="pill" href={routes.districtScenario(district.irn)}>Scenario</a>
         </div>
       </div>
     )
@@ -599,7 +599,7 @@ const properties = shownProperties(node.properties.filter((p) => p.name !== "see
           <h3>Also mentions</h3>
           <div class="flags">
             {mentions.map((edge) => (
-              <a class="flag" href={edge.href}>
+              <a class="pill" href={edge.href}>
                 {edge.label}
               </a>
             ))}
@@ -694,7 +694,7 @@ const properties = shownProperties(node.properties.filter((p) => p.name !== "see
             <summary>
               Correction {index + 1} of {revisions.length}
             </summary>
-            <div class="revision-body">
+            <div class="revision-body" data-aside="correction">
               <h3>It said</h3>
               <div class="withdrawn prose-body" set:html={revision.was} />
               <h3>It says</h3>

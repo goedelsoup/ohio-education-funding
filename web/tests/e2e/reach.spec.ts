@@ -279,7 +279,7 @@ test.describe("reach", () => {
     await expect(page.locator('[data-part="positions"] .legend')).toContainText(
       "Outside Athens County",
     );
-    await expect(page.locator('[data-part="positions"] .legend .sw.muted')).toHaveCount(1);
+    await expect(page.locator('[data-part="positions"] .legend .sw[data-series=muted]')).toHaveCount(1);
   });
 
   test("every count a reader reads as an answer is restated against the selection", async ({
@@ -439,7 +439,7 @@ test.describe("reach", () => {
     expect(await dots.count(), "only the county is drawn").toBe(31);
     expect(await ends(), "and on the frame the whole state is measured on").toBe(frame);
     // Nothing is out of scope on the chart, so the legend must not name a population that is gone.
-    await expect(page.locator('[data-part="positions"] .legend .sw.muted')).toHaveCount(0);
+    await expect(page.locator('[data-part="positions"] .legend .sw[data-series=muted]')).toHaveCount(0);
     await expect(page.locator('[data-part="positions"] .legend')).not.toContainText("for context");
 
     /*

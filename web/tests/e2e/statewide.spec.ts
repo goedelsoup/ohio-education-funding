@@ -78,7 +78,12 @@ test.describe("presentation", () => {
     await page.goto(`/district/${CLEVELAND}`);
     await page.emulateMedia({ media: "print" });
     const styles = await page.evaluate(() =>
-      [".seg.formula", ".seg.guarantee", ".sw.formula", ".sw.guarantee"].map((selector) => {
+      [
+        ".seg[data-series=formula]",
+        ".seg[data-series=guarantee]",
+        ".sw[data-series=formula]",
+        ".sw[data-series=guarantee]",
+      ].map((selector) => {
         const element = document.querySelector(selector);
         if (!element) return `${selector} is not on the page`;
         const { borderStyle, borderWidth } = getComputedStyle(element);
@@ -86,10 +91,10 @@ test.describe("presentation", () => {
       }),
     );
     expect(styles).toEqual([
-      ".seg.formula solid 1px",
-      ".seg.guarantee dashed 1px",
-      ".sw.formula solid 1px",
-      ".sw.guarantee dashed 1px",
+      ".seg[data-series=formula] solid 1px",
+      ".seg[data-series=guarantee] dashed 1px",
+      ".sw[data-series=formula] solid 1px",
+      ".sw[data-series=guarantee] dashed 1px",
     ]);
   });
 

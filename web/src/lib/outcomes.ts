@@ -260,9 +260,9 @@ export function renderOutcomes(bundle: Bundle): string {
         state its district's poverty rate falls in — the variable neither axis carries, and the one
         both charts are really about.</p>
       <div class="legend">
-        <span><i class="sw ordinal-1"></i> Least poor third</span>
-        <span><i class="sw ordinal-2"></i> Middle third</span>
-        <span><i class="sw ordinal-3"></i> Poorest third</span>
+        <span><i class="sw" data-series="ordinal-1"></i> Least poor third</span>
+        <span><i class="sw" data-series="ordinal-2"></i> Middle third</span>
+        <span><i class="sw" data-series="ordinal-3"></i> Poorest third</span>
       </div>
 
       <p class="note">Spending per <em>need-weighted</em> pupil, against attainment —

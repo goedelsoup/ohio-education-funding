@@ -30,18 +30,18 @@
   --space-8: 1.75rem;
   --space-9: 2.5rem;
   /*
-   * Two steps the scale did not have, and the reason it needed them.
+   * A step the scale did not have, and the reason it needed it.
    *
    * Everything from 1 to 9 is intra-component: the gap inside a card, between a label and its
    * value, around a control. Nothing here was large enough to separate one section of a page from
    * the next, so that job fell to a border — which is how a page ended up with 30 bordered boxes
    * and no boundary meaning anything in particular. See #185.
    *
-   * These are the inter-section steps. 10 is the interval between cards; 11 is the one before a
-   * genre changes — the apparatus block at the foot of a wiki node, the footer.
+   * This is the inter-section step: the interval between cards, and the foot of the page. There
+   * was an 11 at 4.5rem, for the interval before a genre changes; nothing ever used it, and #550
+   * deleted it.
    */
   --space-10: 3.25rem;
-  --space-11: 4.5rem;
 
   --radius-sm: 4px;   /* a code span, a bar segment */
   --radius-md: 7px;   /* a control: nav link, tab, select, range */
@@ -86,6 +86,11 @@
    * does not show. Measured with the page scrolled, the lowest sticky edge is at 105. Erring by a
    * pixel upward is the right direction for a value whose job is to keep a target clear.
    *
+   * #550 put the sub-navigation's tabs on the space scale, which took 1.6px off the strip: it is
+   * 52.6px now and the lowest sticky edge 103.6. The value is left at 106 rather than re-derived,
+   * because the error is still in the safe direction — a fragment lands two pixels further clear —
+   * and a token that tracked every tenth of a pixel of the strip would move with each change to it.
+   *
    * # FONT-SENSITIVE, and here is the edge
    *
    * The header is one row because its three items fit on one, so a face that draws them wider can
@@ -99,10 +104,10 @@
    */
   --sticky-chrome: 52px;
 
-  /* Elevation. Two, and both belong to things that float over the page — never to a card. */
+  /* Elevation. One, and it belongs to the popover — the only thing that floats over the page, and
+     never a card. There were two until #550 gave the chart's tooltip the popover's box. */
   --shadow-panel: 0 10px 28px rgb(0 0 0 / 18%);
-  --shadow-tip: 0 2px 10px rgb(0 0 0 / 18%);
 }
 
-/* `.subnav` becomes sticky here and adds its 54px. Below this only the header is sticky. */
+/* `.subnav` becomes sticky here and adds its 53px. Below this only the header is sticky. */
 @media (min-width: 1000px) { :root { --sticky-chrome: 106px; } }

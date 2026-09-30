@@ -421,7 +421,7 @@ test("marking a correction leaves an anchor and does not touch a quotation", asy
   );
   const { html: marked, corrections } = markCorrections(html);
   expect(corrections).toBe(1);
-  expect(marked).toContain('<blockquote class="correction" id="correction-1">');
+  expect(marked).toContain('<blockquote class="correction" data-aside="correction" id="correction-1">');
   // The quotation keeps the bare tag, so the stylesheet can treat the two differently.
   expect(marked).toContain("<blockquote>\n<p>a quotation");
 });

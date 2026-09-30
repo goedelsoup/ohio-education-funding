@@ -45,9 +45,13 @@
  * recommended arrangement — enhance the default rather than remove it. Measured over the four
  * routes, those are two distinct computed shapes and the split is clean:
  *
- *     solid 2px, var(--link)   a.section-anchor, button.year-chip, summary, svg
- *     auto 1px, the UA ring    a, a.brand, a.flag, button, button.flag, button.ghost,
- *                              div.scroll, input, input.vh, select
+ *     solid 2px, var(--link)   a.pill, a.section-anchor, button.pill, button.year-chip,
+ *                              summary, svg
+ *     auto 1px, the UA ring    a, a.brand, a.mark, a.menu-place, button, div.scroll, input,
+ *                              select
+ *
+ * (Remeasured for #550, which folded `.flag` and `.ghost` into `.pill` and gave the pill the
+ * year chip's authored ring — so the pill families moved from the second list to the first.)
  *
  * **An `auto` ring cannot be judged from `outlineColor`.** Chromium paints it as a two-tone
  * indicator — a dark stroke and a light one — precisely so it stays visible on any background, and

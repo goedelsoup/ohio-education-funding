@@ -88,7 +88,7 @@ const total = corrected.reduce((sum, section) => sum + section.corrections, 0);
         <div class="flags">
           {corrected.map((section) =>
             Array.from({ length: section.corrections }, (_, index) => (
-              <a class="flag" href={`#${section.name}-correction-${index + 1}`}>
+              <a class="pill" href={`#${section.name}-correction-${index + 1}`}>
                 {section.label}
                 {section.corrections > 1 ? ` (${index + 1})` : ""}
               </a>
@@ -126,7 +126,7 @@ const total = corrected.reduce((sum, section) => sum + section.corrections, 0);
       ) : (
         <div class="flags">
           {decision.citedBy.map((entry) => (
-            <a class="flag" href={entry.href}>
+            <a class="pill" href={entry.href}>
               {entry.label}
             </a>
           ))}

@@ -11,8 +11,12 @@
  * landed on `<i class="sw formula">` and the swatch computed to 22.375px against 10px for every
  * other one — on 556 swatches across 296 pages, since aee2e0e7. The fix (`app.css`, the code-block
  * rule) was to require the type this component actually renders as: `div.formula`, which a bare
- * `<i>` can never match. Reverting that one word reopens the hole — see `classCollision.spec.ts.md`
- * in the PR body for the proof.
+ * `<i>` can never match.
+ *
+ * #550 then took the swatch's half away too. A swatch's series is an attribute now,
+ * `<i class="sw" data-series="formula">`, styled as `.sw[data-series="formula"]`, so the element
+ * carries one class and a bare `.formula` has nothing to land on. Reverting `div.formula` alone no
+ * longer reopens the hole; the last test below proves both halves.
  *
  * # What "bare" and "compound" mean here
  *
@@ -21,10 +25,11 @@
  * is not, because the type is part of what it takes to match.
  *
  * A **compound class selector** is two or more classes chained with no combinator between them —
- * `.sw.formula` — which an element matches only by carrying every class listed. That is exactly
- * the shape a component's variant modifier takes (`.card.apparatus`), and exactly the shape a
- * coincidence takes (`.sw.formula`). The difference between them is not visible in either
- * selector alone.
+ * `.sw.formula`, as the swatch was written — which an element matches only by carrying every class
+ * listed. That is exactly the shape a component's variant modifier takes (`.card.apparatus`), and
+ * exactly the shape a coincidence takes (`.sw.formula`). The difference between them is not
+ * visible in either selector alone. A variant written as an attribute (`[data-series]`,
+ * `[data-size]`, `[data-aside]`) is not a class and cannot take part in one.
  *
  * # How a coincidence is told from a modifier, without being told which is which
  *
@@ -43,14 +48,11 @@
  *
  * # The allow-list
  *
- * Two pairs pass through it, `sw.gain` and `sw.loss`. `.gain` and `.loss` are bare rules that set
- * `color` on the signed delta figures used elsewhere on the site (a "+$500" printed in the
- * formula/guarantee hue); `.sw.gain` and `.sw.loss` set `background` on the same two legend
- * swatches `.sw.formula` and `.sw.guarantee` already draw, under different names for a signed
- * chart's legend. Both halves are bare, so the shape is identical to the defect above — but
- * `color` has nothing to paint on an empty `<i>` swatch with no text content, so the collision is
- * real and harmless. Anything added here needs the same sentence: which property leaks, and why it
- * draws nothing on the element it was never meant to reach.
+ * Empty. It held `sw.gain` and `sw.loss` — the bare `.gain` and `.loss` colour the signed delta
+ * figures, and `.sw.gain` and `.sw.loss` were two swatches under the same names — until #550 moved
+ * the swatch's series onto `data-series`. Anything added here needs a sentence saying which
+ * property leaks and why it draws nothing on the element it was never meant to reach; a variant
+ * written as an attribute needs no entry at all.
  */
 
 import { readFileSync } from "node:fs";
@@ -64,10 +66,7 @@ const CSS = readFileSync(resolve(process.cwd(), "src/styles/app.css"), "utf8").r
 );
 
 /** A pair the check must not flag, and the one-sentence reason it is safe. */
-const ALLOW_LIST: Record<string, string> = {
-  "gain.sw": "`.gain` only sets `color`, which paints nothing on an empty swatch `<i>`.",
-  "loss.sw": "`.loss` only sets `color`, which paints nothing on an empty swatch `<i>`.",
-};
+const ALLOW_LIST: Record<string, string> = {};
 
 /** Strips a pseudo-class or pseudo-element so `.sw.formula:hover` still reads as two classes. */
 const stripPseudo = (token: string): string => token.replace(/::?[a-zA-Z-]+(\([^)]*\))?/g, "");
@@ -162,15 +161,20 @@ describe("the class-collision gate", () => {
     }
   });
 
-  test("reverting the .formula fix reopens the collision this gate exists to catch", () => {
-    // Proof that the gate bites, run in-process rather than by hand: the code-block rule scoped to
-    // `div.formula` is stood back down to a bare `.formula`, which is exactly the one-word revert
-    // that shipped the original defect, and the gate must fail against it.
-    const reverted = CSS.replace(/(^|\n)div\.formula(\s*\{)/, "$1.formula$2");
-    expect(reverted, "the replacement above did not match — has div.formula moved or been reworded?").not.toBe(CSS);
-    const { collisions } = findCollisions(reverted);
-    const offenders = collisions.filter(({ pair }) => !(pair in ALLOW_LIST));
-    expect(offenders.length, "reverting div.formula to .formula should reopen a collision").toBeGreaterThan(0);
+  test("reverting both halves of the .formula fix reopens the collision this gate exists to catch", () => {
+    // Proof that the gate bites, run in-process rather than by hand. The code-block rule scoped to
+    // `div.formula` is stood back down to a bare `.formula`, the one-word revert that shipped the
+    // original defect. On its own that is now harmless, because the swatch no longer carries the
+    // class; the swatch's variant is stood back down to `.sw.formula` as well, and the gate must
+    // fail against the two together.
+    const unscoped = CSS.replace(/(^|\n)div\.formula(\s*\{)/, "$1.formula$2");
+    expect(unscoped, "the replacement above did not match — has div.formula moved or been reworded?").not.toBe(CSS);
+    expect(findCollisions(unscoped).collisions, "a bare .formula alone should reach no swatch").toEqual([]);
+
+    const reverted = unscoped.replaceAll('.sw[data-series="formula"]', ".sw.formula");
+    expect(reverted, "the swatch selector did not match — has the formula swatch moved?").not.toBe(unscoped);
+    const offenders = findCollisions(reverted).collisions.filter(({ pair }) => !(pair in ALLOW_LIST));
+    expect(offenders.length, "reverting both halves should reopen a collision").toBeGreaterThan(0);
     expect(offenders.some((o) => o.pair === "formula.sw")).toBe(true);
   });
 });

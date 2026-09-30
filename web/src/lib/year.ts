@@ -154,7 +154,7 @@ export function yearChip(series: SeriesKey): string {
 function chip(data: { kind: string; series: string }, label: string, says: string): string {
   return (
     `<span class="year-chip-wrap">` +
-    `<button type="button" class="year-chip" data-kind="${data.kind}" ` +
+    `<button type="button" class="year-chip pill" data-size="small" data-kind="${data.kind}" ` +
     `data-series="${data.series}" aria-label="${escapeAttribute(says)}">` +
     `${escapeAttribute(label)}</button>` +
     `<span class="year-chip-def" aria-hidden="true">${escapeAttribute(says)}</span>` +

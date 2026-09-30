@@ -153,7 +153,7 @@ const recentlyCorrected = corpus.decisions
     <div class="flags">
       {
         leading.map((s) => (
-          <a class="flag" href={routes.wikiSource(s.slug)}>
+          <a class="pill" href={routes.wikiSource(s.slug)}>
             {s.title}
           </a>
         ))
@@ -176,7 +176,7 @@ const recentlyCorrected = corpus.decisions
     <div class="flags">
       {
         recentlyCorrected.map((d) => (
-          <a class="flag" href={routes.wikiDecision(d.slug)}>
+          <a class="pill" href={routes.wikiDecision(d.slug)}>
             {d.slug}
           </a>
         ))

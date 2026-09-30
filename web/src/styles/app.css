@@ -26,7 +26,7 @@
 
 body {
   margin: 0;
-  padding: 0 0 4rem;
+  padding: 0 0 var(--space-10);
   background: var(--surface-0);
   color: var(--text-primary);
   font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -121,10 +121,10 @@ a[href], button, input, select, textarea, summary, [tabindex] {
  */
 .skip {
   position: absolute;
-  left: .75rem;
+  left: var(--space-4);
   top: -4rem;
   z-index: 10;
-  padding: .5rem .8rem;
+  padding: var(--space-3) var(--space-5);
   background: var(--surface-2);
   color: var(--text-primary);
   border: 1px solid var(--border-control);
@@ -134,7 +134,7 @@ a[href], button, input, select, textarea, summary, [tabindex] {
   transition: top .12s ease;
 }
 .skip:focus-visible {
-  top: .75rem;
+  top: var(--space-4);
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
@@ -155,10 +155,10 @@ header.site {
 .site-inner {
   max-width: var(--wrap-wide);
   margin: 0 auto;
-  padding: .6rem var(--space-7);
+  padding: var(--space-3) var(--space-7);
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-5);
   flex-wrap: wrap;
 }
 /*
@@ -216,14 +216,9 @@ header.site nav { display: flex; gap: .15rem; margin-right: auto; }
  * It stays a native `<details>` at both sizes. A third of the end-to-end suite runs with
  * JavaScript disabled and opens these menus.
  */
-/* The same shape as a nav item, because it is one — restated by selector, not by value. */
-.menu-all > summary {
-  cursor: pointer;
-  list-style: none;
-}
-.menu-all > summary::-webkit-details-marker { display: none; }
-.menu-all > summary::after { content: " ▾"; color: var(--text-muted); }
-.menu-all > summary:hover { background: var(--surface-2); color: var(--text-primary); }
+/* The summary is a tab like the entries it holds, and `header.site nav summary` below already
+   matches it — so it takes the tab's box, the `▾` and the hover from there rather than restating
+   them. (The copies it had here were outranked by that selector and never applied.) */
 .menu-all > .menu-groups { display: flex; flex-direction: column; gap: .15rem; padding: var(--space-3) 0; }
 
 /*
@@ -273,28 +268,55 @@ header.site nav { display: flex; gap: .15rem; margin-right: auto; }
  * spare. A Mac gives the nav 523 and 163 spare — the same thirty-nine pixels of `system-ui` the
  * brand used to carry, now all in the nav's words. The runner's figure is the one that decides,
  * read off a CI run failed on purpose; the header test prints it again whenever the row wraps.
+ *
+ * #550 put the row's gap on `--space-5`, 14.4px where it was 16, so the two gaps give 3.2px back
+ * and the runner's 125 spare is 128. `--space-6` was as near, and would have taken 3.2px away.
  */
 @media (min-width: 820px) {
   .menu-all > summary { display: none; }
   .menu-all::details-content { content-visibility: visible; block-size: auto; }
   .menu-all > .menu-groups { flex-direction: row; padding: 0; }
 }
+/*
+ * The tab (#550): one entry in a row of places, and the only tab shape on the site.
+ *
+ * It had four spellings — the header's links, the header's summaries (twice over, once for the
+ * section menus and once for `Menu`), a district's or a runner's `.subnav`, and a `.tabs button`
+ * with no markup left anywhere. They agreed on the type, the corner and the ink and disagreed on
+ * the box by a few tenths of a rem each, none of which was a token. Now one rule set: the header
+ * entry, the menu row and the view strip are the same tab, and the view strip differs only by
+ * sitting in the page, where it takes the operable edge (`--border-control`) that a control on the
+ * page takes.
+ *
+ * The vertical padding moved from .3rem to `--space-2` and `.site-inner`'s from .6rem to
+ * `--space-3` in the same change, which cancel: the header row is the height it was, so
+ * `--sticky-chrome` still says 52px. Both edges of the bar are on tokens now.
+ */
 header.site nav a,
-.menu-all > summary {
+header.site nav summary,
+.subnav a {
   font-size: var(--text-base);
-  padding: .3rem .6rem;
+  padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
   color: var(--text-secondary);
   text-decoration: none;
 }
-header.site nav a:hover { background: var(--surface-2); color: var(--text-primary); }
-header.site nav a[aria-current="page"] {
+header.site nav a:hover,
+.subnav a:hover { background: var(--surface-2); color: var(--text-primary); }
+header.site nav a[aria-current="page"],
+.subnav a[aria-current="page"] {
   background: var(--surface-2);
   color: var(--text-primary);
   font-weight: var(--weight-semibold);
 }
+.subnav a {
+  flex: none;
+  border: 1px solid var(--border-control);
+  background: var(--surface-1);
+}
+.subnav a[aria-current="page"] { border-color: var(--accent-rule); }
 /*
- * The two entries that are links rather than menus — `Find a district` and `Try a change`.
+ * The two entries that are links rather than menus — `Find a district` and `Change the formula`.
  *
  * The same box as a summary beside them, so the row reads as one row of entries; no `▾`, because
  * nothing opens. `true` is the summary's treatment, for the same reason: a district page sits
@@ -310,10 +332,6 @@ header.site nav .menu-place[aria-current="true"] {
    see the note in `Base.astro`. Everything below is appearance; none of it is behaviour. */
 header.site nav .menu { position: relative; }
 header.site nav summary {
-  font-size: var(--text-base);
-  padding: .3rem .6rem;
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
   cursor: pointer;
   white-space: nowrap;
   /* Both, because the triangle is a `::marker` in most engines and a `::-webkit-details-marker`
@@ -323,7 +341,7 @@ header.site nav summary {
 header.site nav summary::-webkit-details-marker { display: none; }
 header.site nav summary::after {
   content: "▾";
-  margin-left: .3rem;
+  margin-left: var(--space-2);
   font-size: .75em;
   opacity: .6;
 }
@@ -334,9 +352,36 @@ header.site nav details[open] > summary { background: var(--surface-2); color: v
 header.site nav summary[aria-current] { color: var(--text-primary); font-weight: var(--weight-semibold); }
 header.site nav summary:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 
+/*
+ * The popover (#550): the one box that floats over the page, and the only one with a shadow.
+ *
+ * There were four, and each had its own idea of the same thing. The menu panel was `--surface-1`
+ * at `--radius-lg` under `--shadow-panel`; the term's definition and the chip's were `--surface-2`
+ * at an 8px corner under a shadow written out by hand; the chart's tooltip was `--surface-1` edged
+ * in `--accent-rule` at `--radius-md` under `--shadow-tip`. Four grounds-and-edges for one idea —
+ * "this is above the page, not in it" — and three of the corners and two of the shadows off the
+ * scale.
+ *
+ * Now one ground, one edge, one corner and one elevation, stated once here where the first of the
+ * four is declared. (`--shadow-tip` had no other reader and is gone. The one shadow still written
+ * out is the definitions' sheet on a phone, which sits at the foot of the screen and so casts
+ * upward — the same elevation pointed the other way, not a fifth box.) `--surface-1` rather than
+ * `--surface-2`, because the menu panel's rows hover TO `--surface-2` and a panel painted in it
+ * would swallow its own hover. What still differs is what each holds — how dense it is, how wide
+ * it may run and which way it opens — and those stay with each one below.
+ */
+header.site nav .menu-panel,
+.year-chip-def,
+.term-def,
+#tip {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-panel);
+}
 header.site nav .menu-panel {
   position: absolute;
-  top: calc(100% + .35rem);
+  top: calc(100% + var(--space-2));
   left: 0;
   z-index: 1;
   /* Wide enough for the longest label the bar can hold, which is the constitution's citation at
@@ -346,10 +391,6 @@ header.site nav .menu-panel {
   display: flex;
   flex-direction: column;
   padding: var(--space-2);
-  background: var(--surface-1);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-panel);
 }
 header.site nav .menu-panel a { display: block; }
 
@@ -378,7 +419,7 @@ header.site nav a[aria-current="page"] .menu-note { color: var(--text-secondary)
 /* What a run is, in `Library`: text rather than a heading element, set as a label over it. */
 header.site nav .menu-heading {
   display: block;
-  padding: var(--space-1) .6rem 0;
+  padding: var(--space-1) var(--space-3) 0;
   font-size: var(--text-xs);
   font-weight: var(--weight-semibold);
   color: var(--text-annotation);
@@ -415,7 +456,7 @@ header.site nav .menu-heading {
     position: static;
     border: none;
     box-shadow: none;
-    padding: var(--space-1) 0 var(--space-1) .7rem;
+    padding: var(--space-1) 0 var(--space-1) var(--space-4);
     min-width: 0;
   }
   /*
@@ -481,15 +522,51 @@ td.year { font-family: var(--font-mono); color: var(--text-annotation); white-sp
    of the act and a sixth column for it would be empty on a third of the rows. */
 .amends { display: block; font-size: var(--text-xs); color: var(--text-annotation); }
 
-.ghost {
+/*
+ * The pill: one control, wherever a pill is a control (#550).
+ *
+ * There were six of these, each written where it was first needed — `.ghost` for the theme
+ * button, `.flag` for a row of links, `.chip` for a scope selection, `.year-chip` for a year, and
+ * the basis switch twice, as `<label>`s and as `<button>`s nothing rendered any more. They agreed
+ * on the shape and disagreed on everything a reader could see: four paddings, three type sizes,
+ * two grounds, three hover states and one with none.
+ *
+ * A pill here is always operable — a link, a button or the label of a radio — so it always has
+ * the edge: `--border-control` is the 3:1 boundary WCAG 1.4.11 asks of a control, and the edge is
+ * how a reader tells this pill from text. The other pill the design allows, a static label, would
+ * take no border at all, because a bordered box that does nothing is exactly what `boxDecorative`
+ * counts; nothing on the site is one today, so it has no rule.
+ *
+ * `data-size="small"` is the year chip's size, and size is the whole of that variant: it sits at
+ * the end of a card heading on twelve thousand pages and a reading-size pill there would outweigh
+ * the heading it annotates.
+ */
+.pill {
   font: inherit;
-  background: none;
+  font-size: var(--text-sm);
+  /* Stated rather than inherited: `font: inherit` would take a card heading's bold into the year
+     chip that sits at the end of it. */
+  font-weight: var(--weight-regular);
+  font-variant-numeric: tabular-nums;
+  padding: var(--space-1) var(--space-3);
   border: 1px solid var(--border-control);
   border-radius: var(--radius-pill);
+  background: var(--surface-2);
   color: var(--text-secondary);
+  text-decoration: none;
   cursor: pointer;
-  padding: var(--space-1) .5rem;
+}
+.pill[data-size="small"] {
+  font-size: var(--text-xs);
   line-height: var(--leading-tight);
+  padding: .1rem var(--space-2);
+  white-space: nowrap;
+}
+.pill:hover { border-color: var(--accent-rule); color: var(--text-primary); }
+.pill:focus-visible {
+  color: var(--text-primary);
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 /*
@@ -553,14 +630,13 @@ a:focus-visible { color: var(--link); text-decoration-thickness: 2px; }
  */
 .subnav {
   display: flex;
-  gap: .4rem;
+  gap: var(--space-2);
   margin: 0 0 var(--space-6);
   flex-wrap: nowrap;
   overflow-x: auto;
   scrollbar-width: none;
 }
 .subnav::-webkit-scrollbar { display: none; }
-.subnav a { flex: none; }
 
 /*
  * Sticky from 1000px up, and deliberately not below it.
@@ -595,21 +671,6 @@ a:focus-visible { color: var(--link); text-decoration-thickness: 2px; }
     margin-bottom: var(--space-3);
   }
 }
-.subnav a {
-  font-size: var(--text-base);
-  padding: .4rem .8rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-control);
-  background: var(--surface-1);
-  color: var(--text-secondary);
-  text-decoration: none;
-}
-.subnav a[aria-current="page"] {
-  background: var(--surface-2);
-  color: var(--text-primary);
-  border-color: var(--accent-rule);
-  font-weight: var(--weight-semibold);
-}
 
 /*
  * The basis switch, with no script behind it: both panels are in the document and a sibling
@@ -618,17 +679,9 @@ a:focus-visible { color: var(--link); text-decoration-thickness: 2px; }
 .basis-panel.real { display: none; }
 .basis-scope input[data-basis="real"]:checked ~ .basis-panel.real { display: block; }
 .basis-scope input[data-basis="real"]:checked ~ .basis-panel.nominal { display: none; }
-.basis-scope .basis label {
-  display: inline-block;
-  margin: 0;
-  font-size: var(--text-sm);
-  padding: .3rem var(--space-4);
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border-control);
-  background: var(--surface-2);
-  color: var(--text-secondary);
-  cursor: pointer;
-}
+/* Each label is a `.pill`; this only undoes the global `label` rule's block margin. The checked
+   one is the only selected pill on the site, so its state is written here, against the radio. */
+.basis-scope .basis label { margin: 0; }
 .basis-scope input[data-basis="nominal"]:checked ~ .basis label[data-basis="nominal"],
 .basis-scope input[data-basis="real"]:checked ~ .basis label[data-basis="real"] {
   background: var(--surface-1);
@@ -692,6 +745,41 @@ h3 {
    district page, and a reader scanning for the county should not have to track a full column
    width to find it. #188 restructures what it says; this only stops it running the page. */
 /*
+ * The eyebrow (#550): capitals, tracked by `--tracking-caps`, and declared nowhere else.
+ *
+ * It is the apparatus voice — a label that says what the content under or beside it is, rather
+ * than being content — and it was written out in thirteen places, eleven at `--tracking-caps` and
+ * two at .06em: `.contents-label` and `.claim`. Nothing about either wanted a wider track; they
+ * were the two written before the token existed. All thirteen now take it from this one rule.
+ *
+ * What is NOT here is the size and the ink, because the eyebrow is set at three sizes for three
+ * jobs: `--text-xs` for a label (most of these), `--text-sm` for a column head, and the claim
+ * mark's .68em, which scales with the sentence it rides in. Each keeps its own below. The claim
+ * mark also keeps its own colour, its rule and nothing boxy — see `stylesheet.spec.ts`, which
+ * reads this rule as one of the claim's and finds only case and tracking in it.
+ *
+ * A selector list rather than a class in the markup: every member already has a class or a
+ * position that says what it is, and thirty-odd call sites across `.astro` and `.ts` writing a
+ * second class would say it twice.
+ */
+.facts dt,
+.contents-label,
+.tile .k,
+thead th,
+#district-table thead button,
+.axis-pick > span,
+.rail-hd,
+.scope-hd,
+.scope-mode > legend,
+.claim,
+.card.apparatus .revision-body h3,
+tr.series-break > th,
+tr.series-break > td {
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+}
+
+/*
  * The identity line: name/value pairs the eye can target, instead of a run of middots.
  *
  * Two type sizes doing two jobs. The label takes the apparatus voice — `--text-xs`, uppercase,
@@ -715,8 +803,6 @@ h3 {
 }
 .facts dt {
   font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-caps);
   color: var(--text-muted);
 }
 .facts dd {
@@ -777,7 +863,7 @@ h3 {
 .card > h2 {
   display: flex;
   align-items: baseline;
-  gap: .4rem;
+  gap: var(--space-2);
   /*
    * Wrapping, because a chip cannot break and a heading row can.
    *
@@ -872,30 +958,11 @@ h3 {
  * problem on this site; the chip now wears the same shape. See `yearChip` in `src/lib/year.ts`.
  *
  * `flex: none` on the wrapper rather than on the button, because the wrapper is what a card
- * heading lays out now.
+ * heading lays out now. The button itself is a small `.pill` and has no rule of its own; its
+ * focus ring is the pill's, and is never hidden, because focus is how a keyboard reader finds the
+ * reckoning at all.
  */
 .year-chip-wrap { position: relative; display: inline-flex; flex: none; }
-.year-chip {
-  font: inherit;
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: .01em;
-  color: var(--text-muted);
-  background: none;
-  border: 1px solid var(--border-control);
-  border-radius: var(--radius-pill);
-  padding: .1rem .45rem;
-  white-space: nowrap;
-  cursor: help;
-}
-.year-chip:hover { color: var(--text-primary); border-color: var(--text-muted); }
-/* Never hidden on focus: this is how a keyboard reader finds the reckoning at all. */
-.year-chip:focus-visible {
-  color: var(--text-primary);
-  outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
-}
 
 /*
  * What the chip says, for eyes.
@@ -908,28 +975,29 @@ h3 {
  * pinned to the end of its card heading by `margin-left: auto`, so a panel opening rightwards
  * from there opens off the side of the page.
  */
-.year-chip-def {
+/* The two definitions — the chip's and the term's — open the same way and hold the same kind of
+   sentence, so they share everything but their anchor and their width. The box is the popover's. */
+.year-chip-def,
+.term-def {
   position: absolute;
-  right: 0;
-  top: calc(100% + .35rem);
+  top: calc(100% + var(--space-2));
   z-index: 20;
   width: max-content;
-  max-width: min(26rem, calc(100vw - 2rem));
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: .5rem .65rem;
+  padding: var(--space-3) var(--space-4);
   font-size: var(--text-sm);
   font-weight: var(--weight-regular);
   line-height: var(--leading-base);
-  letter-spacing: normal;
-  text-align: left;
-  white-space: normal;
   color: var(--text-secondary);
-  box-shadow: 0 6px 20px rgb(0 0 0 / 18%);
   opacity: 0;
   visibility: hidden;
   transition: opacity .12s ease;
+}
+.year-chip-def {
+  right: 0;
+  max-width: min(26rem, calc(100vw - 2rem));
+  letter-spacing: normal;
+  text-align: left;
+  white-space: normal;
 }
 .year-chip-wrap:hover > .year-chip-def,
 .year-chip-wrap:focus-within > .year-chip-def { opacity: 1; visibility: visible; }
@@ -980,27 +1048,12 @@ h3 {
 
 .term-wrap { position: relative; display: inline; }
 .term-def {
-  /* Laid out but not painted, rather than `display: none` — a definition removed from the box
-     tree is removed from the accessibility tree with it, and `aria-describedby` then points at
-     nothing. This is the one rule in this block that is load-bearing for correctness. */
-  position: absolute;
+  /* Laid out but not painted — `visibility`, in the shared rule above, rather than `display:
+     none`. A definition removed from the box tree is removed from the accessibility tree with it,
+     and `aria-describedby` then points at nothing. This is the one property in this block that is
+     load-bearing for correctness. */
   left: 0;
-  top: calc(100% + .4rem);
-  z-index: 20;
-  width: max-content;
   max-width: min(30rem, calc(100vw - 2rem));
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: var(--space-3) .7rem;
-  font-size: var(--text-sm);
-  font-weight: var(--weight-regular);
-  line-height: var(--leading-base);
-  color: var(--text-secondary);
-  box-shadow: 0 6px 20px rgb(0 0 0 / 18%);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity .12s ease;
 }
 .term-wrap:hover > .term-def,
 .term-wrap:focus-within > .term-def { opacity: 1; visibility: visible; }
@@ -1025,9 +1078,9 @@ h3 {
  * it appears on the same hover or focus, it is always wholly on screen, and it cannot widen the
  * document because a fixed box is outside the scroll region by definition.
  *
- * The breakpoint is the width below which a 30rem panel cannot fit beside anything.
+ * The breakpoint, 544px, is 34rem: the width below which a 30rem panel cannot fit beside anything.
  */
-@media (max-width: 34rem) {
+@media (max-width: 544px) {
   /* The chip's panel joins the term's down here for the same reason and one of its own: anchored
      to a chip at the end of a card heading, a 26rem panel on a 375px screen reaches past the left
      edge of the document and is simply not readable. A sheet at the foot has room for the
@@ -1035,10 +1088,10 @@ h3 {
   .term-def,
   .year-chip-def {
     position: fixed;
-    left: .75rem;
-    right: .75rem;
+    left: var(--space-4);
+    right: var(--space-4);
     top: auto;
-    bottom: .75rem;
+    bottom: var(--space-4);
     width: auto;
     max-width: none;
     font-size: var(--text-base);
@@ -1102,14 +1155,14 @@ h3 {
  * 0.872 and its 10px axis text landed at 8.7px. The e2e suite caught it: `no chart draws its text
  * below 9px`.
  *
- * So below 40rem the horizontal padding is `--space-7` exactly, which is the value this card had
+ * So below 640px the horizontal padding is `--space-7` exactly, which is the value this card had
  * before #185 and therefore leaves the chart arithmetic where every constant in `plot/spec.ts` was
  * calibrated. The vertical padding still grows; it costs a chart nothing.
  *
  * 56px of padding on a 375px screen was too much anyway. The failing test is the reason it was
  * found, not the reason it is wrong.
  */
-@media (max-width: 40rem) {
+@media (max-width: 640px) {
   .card { padding: var(--space-6) var(--space-7); }
 }
 
@@ -1127,29 +1180,11 @@ select, input[type="range"], input[type="text"], input[type="search"], textarea 
   background: var(--surface-2);
   border: 1px solid var(--border-control);
   border-radius: var(--radius-md);
-  padding: .5rem .6rem;
+  padding: var(--space-3);
 }
 /* The thumb and the filled track are control chrome, not a series. Same reason as the ring. */
 input[type="range"] { padding: var(--space-2) 0; accent-color: var(--link); }
 output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-weight: var(--weight-semibold); }
-
-/* Tabs. The filter row sits above the content, in one row. */
-.tabs { display: flex; gap: .4rem; margin-bottom: var(--space-6); flex-wrap: wrap; }
-.tabs button {
-  font: inherit;
-  padding: .45rem .85rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-control);
-  background: var(--surface-1);
-  color: var(--text-secondary);
-  cursor: pointer;
-}
-.tabs button.active {
-  background: var(--surface-2);
-  color: var(--text-primary);
-  border-color: var(--accent-rule);
-  font-weight: var(--weight-semibold);
-}
 
 /*
  * The tiles, which are a row of figures and not five boxes inside a sixth.
@@ -1178,7 +1213,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
  * has five dead rule groups in its history for exactly that reason.
  */
 .tile { padding: 0; }
-.tile .k { font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-caps); color: var(--text-muted); }
+.tile .k { font-size: var(--text-xs); color: var(--text-muted); }
 .tile .v { font-size: var(--text-figure); font-weight: var(--weight-bold); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; margin: .15rem 0; }
 .tile .n { font-size: var(--text-sm); color: var(--text-secondary); }
 /*
@@ -1202,18 +1237,17 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .barwrap { margin: var(--space-1) 0 0; }
 .bar { display: flex; height: 22px; border-radius: 5px; overflow: hidden; background: var(--surface-2); gap: 2px; }
 .seg { height: 100%; border-radius: var(--radius-sm); }
-.seg.only { border-radius: var(--radius-sm); }
-.seg.formula { background: var(--series-formula); }
-.seg.guarantee { background: var(--series-guarantee); }
+.seg[data-series="formula"] { background: var(--series-formula); }
+.seg[data-series="guarantee"] { background: var(--series-guarantee); }
 
 .legend { display: flex; gap: var(--space-6); flex-wrap: wrap; margin-top: var(--space-3); font-size: var(--text-sm); color: var(--text-secondary); }
 .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: var(--space-2); vertical-align: baseline; }
-.sw.formula, .sw.gain { background: var(--series-formula); }
-.sw.guarantee, .sw.loss { background: var(--series-guarantee); }
+.sw[data-series="formula"], .sw[data-series="gain"] { background: var(--series-formula); }
+.sw[data-series="guarantee"], .sw[data-series="loss"] { background: var(--series-guarantee); }
 /* The third state of a two-hue split: a district the levers did not move. Not a hue, deliberately
    — an unmoved district has no polarity, and `SERIES.neutral` is the mark the charts already use
    for it. */
-.sw.neutral { background: var(--neutral-mark); }
+.sw[data-series="neutral"] { background: var(--neutral-mark); }
 /*
  * The de-emphasised swatch, for the scope legend on `/reach`.
  *
@@ -1221,7 +1255,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
  * `lib/plot/spec.ts` for why one channel was not enough on a token this close to its surface. A
  * swatch that only dropped its opacity would be describing a dot the chart does not draw.
  */
-.sw.muted {
+.sw[data-series="muted"] {
   background: var(--neutral-mark);
   opacity: .49;
   width: 7px;
@@ -1235,7 +1269,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
  * what separates it on the picture from the identity and fitted lines the clouds draw: those are
  * measurements and this is arithmetic. `scatterSpec`'s `rules` option is the drawing half.
  */
-.sw.rule {
+.sw[data-series="rule"] {
   background: none;
   width: 16px;
   height: 0;
@@ -1247,14 +1281,13 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 /* The ordinal ramp, for a chart grouping districts into ordered bands. Its legend is not
    optional: the lightest step light and the darkest step dark sit near 2.2:1 against their
    surface, and this is the relief that buys. */
-.sw.ordinal-1 { background: var(--ordinal-1); }
-.sw.ordinal-2 { background: var(--ordinal-2); }
-.sw.ordinal-3 { background: var(--ordinal-3); }
+.sw[data-series="ordinal-1"] { background: var(--ordinal-1); }
+.sw[data-series="ordinal-2"] { background: var(--ordinal-2); }
+.sw[data-series="ordinal-3"] { background: var(--ordinal-3); }
 
-.flags { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: var(--space-5); }
-/* A bordered pill, so the border is the affordance and the underline is a second one. Same call
-   as `.subnav a` and the header nav, which are the same shape and already drop it. */
-.flag { font-size: var(--text-sm); padding: var(--space-1) .5rem; border-radius: var(--radius-pill); border: 1px solid var(--border-control); color: var(--text-secondary); background: var(--surface-2); text-decoration: none; }
+/* A row of `.pill` links. The pill drops the underline: the border is the affordance and the
+   underline would be a second one. */
+.flags { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-5); }
 
 /*
  * What is on this page, above the sections it lists.
@@ -1305,11 +1338,9 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
   border-top: 1px solid var(--accent-rule);
 }
 .contents-label {
-  margin: 0 0 .45rem;
+  margin: 0 0 var(--space-3);
   font-size: var(--text-xs);
   font-weight: var(--weight-semibold);
-  letter-spacing: .06em;
-  text-transform: uppercase;
   color: var(--text-muted);
 }
 .contents ul {
@@ -1317,13 +1348,13 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
   margin: 0;
   padding: 0;
   columns: 17rem auto;
-  column-gap: 2rem;
+  column-gap: var(--space-8);
 }
 .contents li {
   /* Never split an entry across the column break: half a heading at the foot of one column and
      half at the head of the next is unreadable as either. */
   break-inside: avoid;
-  margin: 0 0 .3rem;
+  margin: 0 0 var(--space-2);
   font-size: var(--text-base);
   line-height: var(--leading-snug);
 }
@@ -1402,12 +1433,34 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
   .rail-layout > .contents li { font-size: var(--text-sm); }
 }
 
+/*
+ * The aside (#550): a block set off from the text it sits in by a rule down its left edge.
+ *
+ * There were five of them, each with its own rule and its own inset: a condition row (2px, .7rem
+ * in), a quotation (2px, .9rem), a correction (3px, guarantee), a withdrawn revision (3px,
+ * guarantee) and the findings card on paper (3px, primary ink). They are one idea — "this block
+ * is said in a different voice from the one around it" — and one rule now, with the voice as a
+ * variant: `data-aside="correction"` for the two that withdraw something, which are the only two
+ * that take the guarantee hue and the heavier rule, so the difference is carried by width as well
+ * as by colour. The findings card keeps its paper-only rule in the print block, where
+ * `stylesheet.spec.ts` pins it, and draws it at the correction's width.
+ *
+ * The rule is a marker and never a ground: the correction's tint is its own, below, and a hue on
+ * this rule is a series hue used as a marker — which is the one use the genre test permits.
+ */
+:where(.conditions li, .prose-body blockquote, .card.apparatus .revision-body) {
+  border-left: 2px solid var(--border);
+  padding-left: var(--space-5);
+}
+/* `:where` above so the default weighs nothing and the variant needs no selector of its own to win. */
+[data-aside="correction"] { border-left: 3px solid var(--series-guarantee); }
+
 /* What the aid-source card's flag pills became. A pill holds a noun phrase and nothing else, and
    "At the minimum state share" is a fact about 138 districts that a reader who does not already
    know the plan cannot get from to what it means for theirs. These carry the consequence, so they
-   are rows rather than pills; the pill class above is unchanged and still used in eight places. */
-.conditions { list-style: none; margin: var(--space-5) 0 0; padding: 0; display: grid; gap: .5rem; }
-.conditions li { color: var(--text-secondary); font-size: var(--text-base); border-left: 2px solid var(--border); padding-left: var(--space-4); }
+   are rows rather than pills; `.pill` is unchanged by it. */
+.conditions { list-style: none; margin: var(--space-5) 0 0; padding: 0; display: grid; gap: var(--space-3); }
+.conditions li { color: var(--text-secondary); font-size: var(--text-base); }
 .conditions strong { color: var(--text-primary); font-weight: var(--weight-semibold); }
 
 /* Qualification at paragraph scale — beside the figure it qualifies, never a footnote and never
@@ -1420,7 +1473,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 }
 .note code {
   background: var(--surface-inset);
-  padding: .1rem .3rem;
+  padding: .1rem var(--space-2);
   border-radius: var(--radius-sm);
   /* The `.prose-body code` rule's reason, met again outside the corpus: `/method` cites
      `crates/xcheck/tests/against_published_tables.rs` in a note, one token 150px wider than a
@@ -1505,7 +1558,7 @@ math {
 div.formula {
   overflow-x: auto;
   background: var(--surface-inset);
-  padding: var(--space-4) .7rem;
+  padding: var(--space-4);
   border-radius: var(--radius-md);
 }
 math[display="block"] { margin: 0; }
@@ -1583,7 +1636,7 @@ pre.aligned {
   overflow-x: auto;
   margin: 0;
   background: var(--surface-inset);
-  padding: var(--space-3) .7rem;
+  padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
   font-size: var(--text-base);
   line-height: var(--leading-base);
@@ -1614,8 +1667,8 @@ pre.aligned code { background: none; padding: 0; }
 table.prose tr.spanning-name th { border-bottom: 0; padding-bottom: var(--space-2); }
 table.prose tr.spanning-value td { padding-top: 0; }
 table { width: 100%; border-collapse: collapse; font-size: var(--text-base); }
-th, td { text-align: left; padding: .42rem .5rem; border-bottom: 1px solid var(--border); }
-thead th { color: var(--text-muted); font-size: var(--text-sm); text-transform: uppercase; letter-spacing: var(--tracking-caps); }
+th, td { text-align: left; padding: .42rem var(--space-3); border-bottom: 1px solid var(--border); }
+thead th { color: var(--text-muted); font-size: var(--text-sm); }
 th { font-weight: var(--weight-medium); color: var(--text-secondary); }
 td { text-align: right; font-variant-numeric: tabular-nums; }
 /*
@@ -1653,11 +1706,11 @@ td.reads {
 }
 tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 
-.strip-row { margin-bottom: 1rem; }
-.strip-head { display: flex; justify-content: space-between; font-size: var(--text-base); gap: 1rem; }
+.strip-row { margin-bottom: var(--space-6); }
+.strip-head { display: flex; justify-content: space-between; font-size: var(--text-base); gap: var(--space-6); }
 /* The percentile rides with the value it describes. Centred under the box it read as a label
    on the middle of the axis, which is the one place the district being described is not. */
-.strip-head .n { margin-left: .45rem; font-weight: var(--weight-regular); }
+.strip-head .n { margin-left: var(--space-3); font-weight: var(--weight-regular); }
 /* The flat strip this replaced is gone — see `distributionSpec`. What is left is the frame the
    box plot sits in: the label and value above it, the scale below. */
 .strip-row .chartwrap { margin: .1rem 0 .1rem; }
@@ -1878,8 +1931,8 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
 /* A range is two numbers and has to stay one line's worth of thought, so it sets a shade
    smaller than a point estimate would. It is still the largest thing in the card. */
 .tile .v.range { font-size: var(--text-h2); }
-.sw.band { background: var(--series-formula); opacity: .5; }
-.sw.dash {
+.sw[data-series="band"] { background: var(--series-formula); opacity: .5; }
+.sw[data-series="dash"] {
   background: repeating-linear-gradient(90deg,
     var(--series-formula) 0 4px, transparent 4px 7px);
   border-radius: 0;
@@ -1887,12 +1940,12 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
   width: 14px;
   margin-bottom: 3px;
 }
-.sw.anchor {
+.sw[data-series="anchor"] {
   background: var(--surface-1);
   border: 2px solid var(--series-formula);
   border-radius: 50%;
 }
-.sw.solid {
+.sw[data-series="solid"] {
   background: var(--series-formula);
   border-radius: 0;
   height: 2px;
@@ -1900,40 +1953,22 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
   margin-bottom: 3px;
 }
 
+/* The chart's tooltip. The box is the popover's; what is its own is that it follows the pointer
+   and is dense, because it sits over the marks it describes. */
 #tip {
   position: fixed;
   z-index: 10;
   pointer-events: none;
-  background: var(--surface-1);
   color: var(--text-primary);
-  border: 1px solid var(--accent-rule);
-  border-radius: var(--radius-md);
-  padding: var(--space-2) .55rem;
+  padding: var(--space-2) var(--space-3);
   font-size: var(--text-sm);
-  box-shadow: var(--shadow-tip);
   max-width: 320px;
 }
 
 /* The nominal / constant-dollar switch. A pair, not a checkbox: neither basis is the default
    truth, and a checkbox would make one of them a modification of the other. */
-.basis { display: flex; align-items: center; gap: .4rem; margin-bottom: var(--space-5); flex-wrap: wrap; }
-.basis button {
-  font: inherit;
-  font-size: var(--text-sm);
-  padding: .3rem var(--space-4);
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border-control);
-  background: var(--surface-2);
-  color: var(--text-secondary);
-  cursor: pointer;
-}
-.basis button.active {
-  background: var(--surface-1);
-  color: var(--text-primary);
-  border-color: var(--accent-rule);
-  font-weight: var(--weight-semibold);
-}
-.basis .n { font-size: var(--text-sm); color: var(--text-muted); margin-left: .3rem; }
+.basis { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-5); flex-wrap: wrap; }
+.basis .n { font-size: var(--text-sm); color: var(--text-muted); margin-left: var(--space-2); }
 
 .levers { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: var(--space-5); }
 .lever .n { font-size: var(--text-xs); color: var(--text-muted); margin-top: .25rem; }
@@ -1952,7 +1987,7 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
  * and the lever grid collapses to one column because the rail is 260px and not a page.
  */
 .reach { display: grid; gap: var(--space-6); align-items: start; }
-@media (min-width: 60rem) {
+@media (min-width: 960px) {
   /* Rail second in the source so the picture is first for a screen reader and on a phone, and
      placed first here because a control surface reads left-to-right. */
   .reach { grid-template-columns: 17rem minmax(0, 1fr); }
@@ -1984,8 +2019,6 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
 .axis-pick > span,
 .rail-hd {
   font-size: var(--text-xs);
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
   color: var(--text-muted);
 }
 .axis-pick select { width: 100%; }
@@ -2024,8 +2057,6 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
 }
 .scope-hd {
   font-size: var(--text-xs);
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
   color: var(--text-muted);
 }
 .scope-count { color: var(--text-secondary); }
@@ -2055,26 +2086,14 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
 }
 .scope-county .n { color: var(--text-muted); font-size: var(--text-xs); font-variant-numeric: tabular-nums; }
 
-/* What is selected. A chip is a thing you can take off, so every one of these is a button. */
-.chips { display: flex; flex-wrap: wrap; gap: .4rem; }
-.chip {
-  display: inline-flex;
-  align-items: baseline;
-  gap: var(--space-2);
-  font-size: var(--text-sm);
-  padding: var(--space-1) .5rem;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border-control);
-  color: var(--text-secondary);
-  background: var(--surface-2);
-  cursor: pointer;
-}
-.chip:hover { border-color: var(--accent-rule); color: var(--text-primary); }
+/* What is selected. A chip is a thing you can take off, so every one of these is a button — a
+   `.pill`, laid out here only so the `×` sits beside its name. "Every district" used to drop the
+   ground to say it was the absence of a scope rather than a selection; its words say that, and a
+   second pill for one button was the drift #550 undid. */
+.chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.chips > .pill { display: inline-flex; align-items: baseline; gap: var(--space-2); }
 .chip-off { color: var(--text-muted); }
-.chip:hover .chip-off { color: var(--text-primary); }
-/* "Every district" is the absence of a scope rather than another selection, so it does not wear the
-   ground the selections do. */
-.chip-clear { background: none; }
+.pill:hover .chip-off { color: var(--text-primary); }
 
 /*
  * What the selection does to everything outside it — see `ScopeMode` in `lib/reach.ts`.
@@ -2107,8 +2126,6 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
   float: left;
   margin-right: var(--space-4);
   font-size: var(--text-xs);
-  letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
   color: var(--text-muted);
 }
 .scope-mode label {
@@ -2173,7 +2190,7 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
  * Corpus prose is long-form and argumentative in a way nothing else on this site is, so it gets a
  * reading measure and real paragraph rhythm rather than the compact card type the data pages use.
  */
-.crumb { font-size: var(--text-sm); color: var(--text-muted); margin: 0 0 .5rem; }
+.crumb { font-size: var(--text-sm); color: var(--text-muted); margin: 0 0 var(--space-3); }
 .crumb a { color: var(--text-secondary); }
 /*
  * THE FINDINGS — what THIS REPOSITORY computed, and how to read it.
@@ -2208,10 +2225,10 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
 .prose-body > *:last-child { margin-bottom: 0; }
 .prose-body p { margin: 0 0 var(--space-6); max-width: var(--measure-prose); }
 .prose-body li { max-width: var(--measure-prose); margin-bottom: var(--space-2); }
-.prose-body h2, .prose-body h3 { margin: 1.5rem 0 var(--space-3); }
+.prose-body h2, .prose-body h3 { margin: var(--space-8) 0 var(--space-3); }
 .prose-body code {
   background: var(--surface-inset);
-  padding: .08rem .28rem;
+  padding: .1rem var(--space-2);
   border-radius: var(--radius-sm);
   font-size: .9em;
   /* The corpus cites code by path — `crates/xcheck/tests/report_card_2425.rs` — which is one
@@ -2222,18 +2239,24 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
 .prose-body pre {
   overflow-x: auto;
   background: var(--surface-inset);
-  padding: var(--space-4) .85rem;
-  border-radius: 8px;
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-md);
   font-size: var(--text-base);
 }
-.prose-body pre code { background: none; padding: 0; overflow-wrap: normal; }
+/*
+ * Code takes one size step down from the text it sits in, and only one. `.9em` compounds: inside
+ * a `pre` already at `--text-base` it made 12.7px, and inside a `.claim-detail` already at `.9em`
+ * it made 13.7px — two sizes no other text on the page had, which put the funding-plan node over
+ * the ten-size ceiling (#550). A block and a justification have taken their step, so code in them
+ * inherits it.
+ */
+.prose-body pre code { background: none; padding: 0; overflow-wrap: normal; font-size: inherit; }
+.prose-body .claim-detail code { font-size: inherit; }
 .prose-body blockquote {
-  margin: 0 0 .95rem;
-  padding-left: var(--space-5);
-  border-left: 2px solid var(--border);
+  margin: 0 0 var(--space-5);
   color: var(--text-secondary);
 }
-.prose-body table { margin-bottom: .95rem; }
+.prose-body table { margin-bottom: var(--space-5); }
 .prose-body td { text-align: left; font-variant-numeric: normal; }
 
 /*
@@ -2249,11 +2272,10 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
  * ground they sit on.
  */
 .prose-body blockquote.correction {
-  border-left: 3px solid var(--series-guarantee);
   background: color-mix(in srgb, var(--series-guarantee) 7%, transparent);
   color: var(--text-primary);
-  padding: .75rem var(--space-5) .05rem;
-  border-radius: 0 8px 8px 0;
+  padding: var(--space-4) var(--space-5) .05rem;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
   /* Was a flat 1.5rem, which is less than the sticky header at every width — so the correction a
      reader clicked through to landed under it. The same measured variable the section anchors use. */
   scroll-margin-top: calc(var(--sticky-chrome) + .75rem);
@@ -2359,8 +2381,6 @@ h1.slug-title {
   display: inline;
   font-size: .68em;
   font-weight: var(--weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: .06em;
   white-space: nowrap;
   /* Rides the baseline of the sentence it qualifies. A raised mark reads as a footnote reference,
      which is exactly what it is not: these are part of the claim, not a pointer away from it. */
@@ -2427,24 +2447,22 @@ h1.slug-title {
  * does not survive being read quickly, printed, or seen by someone who does not distinguish the
  * two hues. The strike is redundant with the "It said" heading on purpose.
  */
-.card.apparatus .revision + .revision { margin-top: .5rem; }
+.card.apparatus .revision + .revision { margin-top: var(--space-3); }
 .card.apparatus .revision > summary {
   cursor: pointer;
   font-weight: var(--weight-semibold);
   color: var(--text-secondary);
-  padding: .3rem 0;
+  padding: var(--space-2) 0;
 }
 .card.apparatus .revision > summary:hover { color: var(--text-primary); }
 .card.apparatus .revision-body {
-  border-left: 3px solid var(--series-guarantee);
-  padding: .1rem 0 .1rem var(--space-5);
-  margin: .4rem 0 var(--space-1);
+  padding-top: .1rem;
+  padding-bottom: .1rem;
+  margin: var(--space-2) 0 var(--space-1);
 }
 .card.apparatus .revision-body h3 {
-  margin: 1rem 0 .4rem;
+  margin: var(--space-6) 0 var(--space-2);
   font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-caps);
   color: var(--text-muted);
 }
 .card.apparatus .revision-body > *:first-child { margin-top: 0; }
@@ -2476,11 +2494,11 @@ footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); 
  * reader uses the browser's own find. Nothing is hidden behind the control that is not in the
  * document.
  */
-.filters { display: flex; gap: .6rem; flex-wrap: wrap; align-items: flex-end; margin-bottom: 1rem; }
+.filters { display: flex; gap: var(--space-3); flex-wrap: wrap; align-items: flex-end; margin-bottom: var(--space-6); }
 .filters .field { display: flex; flex-direction: column; gap: var(--space-1); }
 .filters label { margin: 0; }
-.filters input, .filters select { width: auto; min-width: 11rem; font-size: var(--text-base); padding: var(--space-2) .55rem; }
-.filters .count { font-size: var(--text-sm); color: var(--text-muted); padding-bottom: .45rem; }
+.filters input, .filters select { width: auto; min-width: 11rem; font-size: var(--text-base); padding: var(--space-2) var(--space-3); }
+.filters .count { font-size: var(--text-sm); color: var(--text-muted); padding-bottom: var(--space-3); }
 #district-table td { text-align: right; }
 #district-table th[scope="row"] { text-align: left; font-weight: var(--weight-medium); }
 /*
@@ -2501,8 +2519,6 @@ footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); 
 #district-table thead button {
   font: inherit;
   font-size: var(--text-sm);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-caps);
   color: var(--text-muted);
   background: none;
   border: 0;
@@ -2631,8 +2647,6 @@ tr.series-break > td {
   border-bottom: 0;
   padding-top: var(--space-3);
   font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-caps);
   color: var(--text-muted);
   text-align: left;
   font-weight: var(--weight-semibold);
@@ -2679,8 +2693,8 @@ tr.series-break > td {
     forced-color-adjust: none;
     border: 1px solid currentColor;
   }
-  .seg.formula { border-style: solid; }
-  .seg.guarantee { border-style: dashed; }
+  .seg[data-series="formula"] { border-style: solid; }
+  .seg[data-series="guarantee"] { border-style: dashed; }
 
   /*
    * The legend keys. A swatch is 10px of pure background and nothing else, so without this every
@@ -2692,24 +2706,24 @@ tr.series-break > td {
     forced-color-adjust: none;
     border: 1px solid currentColor;
   }
-  .sw.formula, .sw.gain { border-style: solid; }
-  .sw.guarantee, .sw.loss { border-style: dashed; }
-  .sw.neutral { border-style: dotted; }
+  .sw[data-series="formula"], .sw[data-series="gain"] { border-style: solid; }
+  .sw[data-series="guarantee"], .sw[data-series="loss"] { border-style: dashed; }
+  .sw[data-series="neutral"] { border-style: dotted; }
   /* Out of scope is context, so on paper it becomes an outline with nothing inside it — the same
-     relationship to `.sw.neutral` that a muted dot has to the cloud it is drawn behind. Opacity is
+     relationship to `.sw[data-series="neutral"]` that a muted dot has to the cloud it is drawn behind. Opacity is
      the channel on screen and a forced palette is entitled to ignore it, so the shape has to carry
      the fact on its own. */
-  .sw.muted { background: none; border-style: dotted; }
+  .sw[data-series="muted"] { background: none; border-style: dotted; }
   /* The ordinal ramp is ordered, so its second channel is ordered too: sparse to solid, running
      the same direction as light to dark. */
-  .sw.ordinal-1 { border-style: dotted; }
-  .sw.ordinal-2 { border-style: dashed; }
-  .sw.ordinal-3 { border-style: solid; }
+  .sw[data-series="ordinal-1"] { border-style: dotted; }
+  .sw[data-series="ordinal-2"] { border-style: dashed; }
+  .sw[data-series="ordinal-3"] { border-style: solid; }
   /* The fan chart's four keys are already shape rather than colour — a band, a dashed line, a
      ring, a solid line — so they only need the shape drawn as a rule instead of as a fill. */
-  .sw.band { border-style: solid; }
-  .sw.dash { background: none; border: 0; border-top: 2px dashed currentColor; }
-  .sw.solid { background: none; border: 0; border-top: 2px solid currentColor; }
+  .sw[data-series="band"] { border-style: solid; }
+  .sw[data-series="dash"] { background: none; border: 0; border-top: 2px dashed currentColor; }
+  .sw[data-series="solid"] { background: none; border: 0; border-top: 2px solid currentColor; }
 
   /*
    * The regime spans on `/legislation`. Colour encodes nothing here — the note above says so — so

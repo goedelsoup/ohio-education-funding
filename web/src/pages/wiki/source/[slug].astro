@@ -60,7 +60,7 @@ const body = await renderProse(source.body, FROM_CATALOG);
       ) : (
         <div class="flags">
           {source.citedBy.map((node) => (
-            <a class="flag" href={node.href}>
+            <a class="pill" href={node.href}>
               {node.label}
             </a>
           ))}
