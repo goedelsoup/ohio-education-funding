@@ -73,13 +73,28 @@ const widening =
  */
 const horizon = end.fiscalYear - meta.base_year;
 const bias = insensitive ? null : meanDistrictBias(meta.bias, horizon);
+/*
+ * One year's reading, naming every line drawn through it.
+ *
+ * A band with no width is one amount, and printing it as "$X – $X, central $X" said it three
+ * times while leaving out the line the guaranteed case is drawn for (#607). So a band that rounds
+ * to one figure is written as that figure, and where the formula's line is drawn the sentence says
+ * which amount is received and which is computed.
+ */
+const reading = (p: FanPoint): string => {
+  const level = p.observed
+    ? `${money(p.point)} at published enrollment — exact`
+    : money(p.low) === money(p.high)
+      ? money(p.point)
+      : `${money(p.low)} – ${money(p.high)}, central ${money(p.point)}`;
+  return p.reference == null
+    ? `FY${p.year}: ${level}`
+    : `FY${p.year}: receives ${level}; the formula computes ${money(p.reference)}`;
+};
 const chart = renderToString((w) => fanSpec(
   points,
   compactMoney,
-  (p) =>
-    p.observed
-      ? `FY${p.year}: ${money(p.point)} at published enrollment — exact`
-      : `FY${p.year}: ${money(p.low)} – ${money(p.high)}, central ${money(p.point)}`,
+  reading,
   { width: w },
 ), { label: `${insensitive ? `Aid this district receives against what the formula computes for it, in dollars by enrollment year, FY${points[0]!.year} to FY${end.fiscalYear}` : `State aid in dollars by enrollment year, FY${points[0]!.year} to FY${end.fiscalYear}, with the range across projected enrollment`}`, description: `Every year is the FY${bundle.fiscal_year} formula run at that year's enrollment rather than published aid; years through FY${meta.base_year} use published enrollment and carry no interval, and the y axis is truncated to the plotted range rather than starting at zero` });
 ---
@@ -89,8 +104,8 @@ const chart = renderToString((w) => fanSpec(
 {
   insensitive && (
     <div class="legend">
-         <span><i class="sw" data-series="formula"></i> What the district receives</span>{" "}
-         <span><i class="sw" data-series="guarantee"></i> What the formula computes</span>
+         <span><i class="sw" data-series="guarantee"></i> What the district receives</span>{" "}
+         <span><i class="sw" data-series="formula"></i> What the formula computes</span>
        </div>
   )
 }

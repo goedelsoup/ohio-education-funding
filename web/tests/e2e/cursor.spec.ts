@@ -495,6 +495,46 @@ test.describe("the tip's placement", () => {
     });
   }
 
+  /*
+   * #607. A fan's or a series' hit column is the full height of the frame, and the tip hung from
+   * its foot sat over the axis note and the key under the chart — at y=626 against a frame ending
+   * at 614 on Columbus. Every year is walked, because the anchor is the drawn value and the value
+   * moves.
+   */
+  for (const { route, hit } of [
+    { route: "/district/043802", hit: ".fan-hit" },
+    { route: "/history", hit: ".series-hit" },
+  ]) {
+    test(`the keyboard tip on a ${hit.slice(1)} column clears the axis note and the key on ${route}`, async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 800 });
+      await page.goto(route);
+      const svg = page.locator(`svg.plot:visible:has(${hit})`).first();
+      await svg.scrollIntoViewIfNeeded();
+      await svg.focus();
+      const years = await svg.evaluate((node, selector) => node.querySelectorAll(`${selector} > *`).length, hit);
+      expect(years, "the chart has years to walk").toBeGreaterThan(1);
+      const covered: string[] = [];
+      for (let year = 0; year < years; year++) {
+        await page.keyboard.press("ArrowRight");
+        const tip = (await page.locator("#tip").boundingBox())!;
+        const under = await svg.evaluate((node) => {
+          const wrap = node.closest(".chartwrap");
+          const key = wrap?.nextElementSibling?.matches(".legend") ? wrap.nextElementSibling : null;
+          return [...node.querySelectorAll(".axis-foot"), ...(key ? [key] : [])].map((el) => {
+            const b = el.getBoundingClientRect();
+            return { name: el.textContent?.trim().slice(0, 30) ?? "", top: b.top, bottom: b.bottom, left: b.left, right: b.right };
+          });
+        });
+        for (const b of under) {
+          const apart =
+            tip.x + tip.width <= b.left || b.right <= tip.x || tip.y + tip.height <= b.top || b.bottom <= tip.y;
+          if (!apart) covered.push(`year ${year}: ${b.name}`);
+        }
+      }
+      expect(covered).toEqual([]);
+    });
+  }
+
   test.describe("on a phone", () => {
     test.use({ hasTouch: true, viewport: { width: 375, height: 812 } });
 

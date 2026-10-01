@@ -357,6 +357,15 @@ export function bin(values: number[], n: number): Bin[] {
 /** Text a chart is given when it becomes operable, so the affordance is announced with it. */
 const CURSOR_HINT = "Use the arrow keys to read each value.";
 
+/** A mark's `data-y`, in the drawing's units, taken to the viewport; `null` where it has none. */
+function anchorOf(mark: Element): number | null {
+  const y = Number.parseFloat(mark.getAttribute("data-y") ?? "");
+  // The mark's own matrix, not the drawing's: it carries any transform on the layer as well, which
+  // applies to the column and the value alike.
+  const matrix = (mark as SVGGraphicsElement).getScreenCTM?.();
+  return Number.isFinite(y) && matrix ? matrix.d * y + matrix.f : null;
+}
+
 /**
  * Make one drawing a single tab stop, and say so in its name.
  *
@@ -396,11 +405,14 @@ export function attachValues(root: HTMLElement, tip: HTMLElement, said: HTMLElem
    * (#600). Past the bottom, the tip goes above `above`: the pointer, or the mark's top edge when a
    * keyboard or a tap placed it, so it never covers the mark it is reading out.
    */
-  const put = (left: number, top: number, above = top) => {
+  const put = (left: number, top: number, above = top, upward = false) => {
     const pad = 12;
     const { offsetWidth: width, offsetHeight: height } = tip;
     const x = Math.min(left + pad, window.innerWidth - width - pad);
-    const y = top + pad + height > window.innerHeight - pad ? above - pad - height : top + pad;
+    const y =
+      (upward && above - pad - height >= pad) || top + pad + height > window.innerHeight - pad
+        ? above - pad - height
+        : top + pad;
     tip.style.left = `${Math.max(pad, x)}px`;
     tip.style.top = `${Math.max(pad, y)}px`;
   };
@@ -409,13 +421,13 @@ export function attachValues(root: HTMLElement, tip: HTMLElement, said: HTMLElem
   let shown: Element | null = null;
   let shownAt = { left: 0, top: 0 };
 
-  const show = (mark: Element, left: number, top: number, above = top) => {
+  const show = (mark: Element, left: number, top: number, above = top, upward = false) => {
     tip.textContent = mark.getAttribute("data-hover") ?? "";
     tip.hidden = false;
     shown = mark;
     const box = mark.getBoundingClientRect();
     shownAt = { left: box.left, top: box.top };
-    put(left, top, above);
+    put(left, top, above, upward);
   };
 
   const hide = () => {
@@ -424,10 +436,20 @@ export function attachValues(root: HTMLElement, tip: HTMLElement, said: HTMLElem
     point(null);
   };
 
-  /** Show the value at a mark's own position, for the two ways in that have no cursor position. */
+  /**
+   * Show the value at a mark's own position, for the two ways in that have no cursor position.
+   *
+   * A mark carrying `data-y` is a full-height column whose value is drawn somewhere inside it (see
+   * `anchor` on `Spec.hovers`). Its foot is the foot of the frame, and a tip hung from there covered
+   * the axis note and the key under a fan (#607). So the tip goes at the drawn value instead, on
+   * the side of it with more of the column: below a value in the top half, above one in the bottom.
+   */
   const showAtMark = (mark: Element) => {
     const box = mark.getBoundingClientRect();
-    show(mark, box.left + box.width / 2, box.bottom, box.top);
+    const left = box.left + box.width / 2;
+    const drawn = anchorOf(mark);
+    if (drawn == null) show(mark, left, box.bottom, box.top);
+    else show(mark, left, drawn, drawn, drawn > box.top + box.height / 2);
   };
 
   /**

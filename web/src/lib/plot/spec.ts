@@ -225,7 +225,20 @@ export type Cursor =
 export interface Spec {
   options: Plot.PlotOptions;
   /** CSS selector for the hoverable marks, and one string per mark in data order. */
-  hovers?: { selector: string; text: string[]; cursor: Cursor };
+  hovers?: {
+    selector: string;
+    text: string[];
+    cursor: Cursor;
+    /**
+     * Where a keyboard or a tap puts the tip, as a y value in data units, one per mark.
+     *
+     * For a hit target that is not where its value is drawn. A fan or series column is the full
+     * height of the frame, and the tip anchored to its foot sat over the axis note and the key
+     * below the chart (#607). Written onto each mark as `data-y`, in the drawing's own units, by
+     * {@link draw}; `null` leaves a mark anchored to its box.
+     */
+    anchor?: (number | null)[];
+  };
 }
 
 /**
@@ -425,6 +438,25 @@ export interface Renderer {
 }
 
 /**
+ * Write each hit mark's anchor onto it, through the y scale Plot actually drew with.
+ *
+ * Plot's scale rather than arithmetic on the spec's margins and domain, because the scale is the
+ * one thing that agrees with the paths by construction. Rounded to a tenth of a unit: the tip is
+ * placed in whole pixels, and full precision would be bytes on every year of every district fan.
+ */
+function anchorTips(node: Element, marks: NodeListOf<Element>, anchor?: (number | null)[]): void {
+  if (!anchor) return;
+  const y = (node as unknown as { scale(name: "y"): { apply(v: number): number } | undefined })
+    .scale("y");
+  if (!y) return;
+  marks.forEach((mark, index) => {
+    const value = anchor[index];
+    if (value == null) return;
+    mark.setAttribute("data-y", `${Math.round(y.apply(value) * 10) / 10}`);
+  });
+}
+
+/**
  * One SVG element, at one width, or `null` where the builder declines the data.
  *
  * Both renderers are this function and a line either side of it, so the chart a slider redraws is
@@ -461,6 +493,7 @@ export function draw(
       );
     } else {
       marks.forEach((mark, index) => mark.setAttribute("data-hover", text[index]!));
+      anchorTips(node, marks, spec.hovers.anchor);
       const misaligned = declareCursor(node, spec.hovers);
       if (misaligned) renderer.onMisaligned(misaligned);
     }
@@ -3035,6 +3068,17 @@ export function fanSpec(
 
   const bounds = degenerate ? [last.high] : [last.high, last.low];
 
+  /*
+   * Which half of the pair the banded series wears.
+   *
+   * Alone, the band is the formula run at projected enrollment, and it takes the formula's hue.
+   * Beside a reference it is not: the reference is the formula's own answer, so the band is what
+   * the district *receives* — for a guaranteed district, the guarantee's fixed amount. It was drawn
+   * in the formula's hue regardless and the reference in the guarantee's, which reversed the pair
+   * against "Where the aid comes from" a few hundred pixels up the same page (#607).
+   */
+  const banded = hasReference ? SERIES.guarantee : SERIES.formula;
+
   // The two bound labels live here. Capped like every other gutter, because 104px is a sixth of
   // the wide frame and a third of the narrow one.
   const marginRight = gutter(options.width, 104);
@@ -3067,28 +3111,28 @@ export function fanSpec(
                 x: "year",
                 y1: "low",
                 y2: "high",
-                fill: SERIES.formula,
+                fill: banded,
                 fillOpacity: 0.16,
                 className: "fan-band",
               }),
               Plot.line(projected, {
                 x: "year",
                 y: "high",
-                stroke: SERIES.formula,
+                stroke: banded,
                 strokeWidth: 2,
                 className: "fan-edge",
               }),
               Plot.line(projected, {
                 x: "year",
                 y: "low",
-                stroke: SERIES.formula,
+                stroke: banded,
                 strokeWidth: 2,
                 className: "fan-edge",
               }),
               Plot.line(projected, {
                 x: "year",
                 y: "point",
-                stroke: SERIES.formula,
+                stroke: banded,
                 strokeWidth: 2,
                 strokeDasharray: "5 4",
                 className: "fan-mid",
@@ -3102,7 +3146,7 @@ export function fanSpec(
               Plot.line(observed, {
                 x: "year",
                 y: "point",
-                stroke: SERIES.formula,
+                stroke: banded,
                 strokeWidth: 2,
                 className: "fan-observed",
               }),
@@ -3113,7 +3157,7 @@ export function fanSpec(
               Plot.line(points, {
                 x: "year",
                 y: "reference",
-                stroke: SERIES.guarantee,
+                stroke: SERIES.formula,
                 strokeWidth: 2,
                 className: "fan-reference",
               }),
@@ -3124,7 +3168,7 @@ export function fanSpec(
                 dx: 8,
                 text: () => format(last.reference ?? 0),
                 textAnchor: "start",
-                fill: SERIES_TEXT.guarantee,
+                fill: SERIES_TEXT.formula,
                 className: "fan-bound reference",
               }),
             ]
@@ -3136,7 +3180,7 @@ export function fanSpec(
                 y: "point",
                 r: 4,
                 fill: INK.surface,
-                stroke: SERIES.formula,
+                stroke: banded,
                 strokeWidth: 2,
                 className: "fan-anchor",
               }),
@@ -3168,6 +3212,8 @@ export function fanSpec(
     hovers: {
       selector: ".fan-hit > *",
       text: points.map((p) => escapeHtml(hover(p))),
+      // The topmost line drawn that year, so the tip opens over the plot and not under it.
+      anchor: points.map((p) => Math.max(p.high, p.point, ...(hasReference ? [p.reference!] : []))),
       cursor: {
         second: "none",
         because:
@@ -3383,6 +3429,11 @@ export function seriesSpec(
     hovers: {
       selector: ".series-hit > *",
       text: points.map((p) => escapeHtml(hover(p))),
+      // The upper of the two lines, as the fan anchors at its topmost; a year with neither has none.
+      anchor: points.map((p) => {
+        const here = [p.a, p.b].filter((v): v is number => v != null);
+        return here.length ? Math.max(...here) : null;
+      }),
       cursor: {
         second: "none",
         because:

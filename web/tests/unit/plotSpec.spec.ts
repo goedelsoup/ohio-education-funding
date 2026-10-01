@@ -361,6 +361,70 @@ test("a fan chart does not stretch its axis to fit a reference it will not draw"
   expect((full.options.y!.domain as number[])[1]).toBeGreaterThan(400);
 });
 
+test("a fan with the formula's line draws it in the formula's hue and the band in the other", () => {
+  /*
+   * #607. Beside a reference, the band is what a guaranteed district receives and the reference is
+   * what the formula computes. The fan drew them the other way round, so its key contradicted
+   * "Where the aid comes from" on the same page. Alone, the band is formula aid and keeps its hue.
+   */
+  const years: FanPoint[] = [2025, 2026, 2027].map((year, i) => ({
+    year,
+    point: 100,
+    low: 100,
+    high: 100,
+    observed: i === 0,
+    reference: 90 - i,
+  }));
+  const strokes = (spec: Spec) => {
+    const svg = renderToString(() => spec, { label: "a fan", description: "one district" });
+    const { document } = parseHTML(svg);
+    const of = (name: string) =>
+      document.querySelector(`.${name}`)?.getAttribute("stroke") ?? null;
+    return { reference: of("fan-reference"), seam: of("fan-anchor"), mid: of("fan-mid") };
+  };
+  const guaranteed = strokes(fanSpec(years, String, () => "", W)!);
+  expect(guaranteed.reference).toBe(SERIES.formula);
+  expect(guaranteed.seam).toBe(SERIES.guarantee);
+  expect(guaranteed.mid).toBe(SERIES.guarantee);
+
+  const alone = strokes(fanSpec(years.map(({ reference: _, ...p }) => p), String, () => "", W)!);
+  expect(alone.reference).toBeNull();
+  expect(alone.seam).toBe(SERIES.formula);
+});
+
+test("a full-height hit column carries the drawn value it anchors a tip at", () => {
+  /*
+   * #607's fourth defect. The fan's hit column spans the frame, so a tip hung from its foot sat
+   * over the axis note and the key. Each column now carries `data-y`, the topmost line drawn that
+   * year in the drawing's own units, and it has to fall inside the column it belongs to.
+   */
+  const years: FanPoint[] = [2025, 2026, 2027, 2028].map((year, i) => ({
+    year,
+    point: 100 - i,
+    low: 100 - 2 * i,
+    high: 100 + i,
+    observed: i === 0,
+  }));
+  const svg = renderToString((width) => fanSpec(years, String, (p) => `${p.year}`, { width }), {
+    label: "a fan",
+    description: "one district",
+  });
+  const { document } = parseHTML(svg);
+  const drawing = document.querySelector('[data-at="wide"] svg')!;
+  const columns = [...drawing.querySelectorAll(".fan-hit > rect")];
+  expect(columns).toHaveLength(years.length);
+  const ys = columns.map((rect) => {
+    const y = Number(rect.getAttribute("data-y"));
+    const top = Number(rect.getAttribute("y"));
+    expect(y).toBeGreaterThanOrEqual(top);
+    expect(y).toBeLessThanOrEqual(top + Number(rect.getAttribute("height")));
+    return y;
+  });
+  // The high edge rises year on year, so its anchor climbs the drawing — y falls.
+  expect(ys).toEqual([...ys].sort((a, b) => b - a));
+  expect(new Set(ys).size).toBe(years.length);
+});
+
 test("the truncated domain is the one the annotation has to name", () => {
   // Exported so a caller can check that its own format resolves the axis start — see
   // `appropriations.spec.ts`, where a format with no decimal places understated it by a fifth.
