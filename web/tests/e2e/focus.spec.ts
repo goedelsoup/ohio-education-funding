@@ -46,12 +46,13 @@
  * routes, those are two distinct computed shapes and the split is clean:
  *
  *     solid 2px, var(--link)   a.pill, a.section-anchor, button.pill, button.year-chip,
- *                              summary, svg
- *     auto 1px, the UA ring    a, a.brand, a.mark, a.menu-place, button, div.scroll, input,
- *                              select
+ *                              summary, svg, and every link in the header, the views and the
+ *                              contents — a.brand, a.menu-place among them
+ *     auto 1px, the UA ring    a, a.mark, button, div.scroll, input, select
  *
  * (Remeasured for #550, which folded `.flag` and `.ghost` into `.pill` and gave the pill the
- * year chip's authored ring — so the pill families moved from the second list to the first.)
+ * year chip's authored ring — so the pill families moved from the second list to the first. #599
+ * moved the chrome's links across too; the last test here holds them to one ring.)
  *
  * **An `auto` ring cannot be judged from `outlineColor`.** Chromium paints it as a two-tone
  * indicator — a dark stroke and a light one — precisely so it stays visible on any background, and
@@ -198,6 +199,88 @@ test.describe("the keyboard focus ring", () => {
         authored.size,
         "no control on these routes draws its own focus ring any more",
       ).toBeGreaterThanOrEqual(4);
+    });
+  }
+});
+
+/**
+ * One ring across the chrome, and none of it cut off (#599).
+ *
+ * The header's links took the browser's ring while the summaries beside them took the authored
+ * one, so tabbing along one row of places changed ring halfway — and #550 made those entries one
+ * family. `.subnav` and the rail's contents scroll, a scroll container clips at its padding box,
+ * and neither had padding: the first tab's ring and every contents link's lost 2px on the left.
+ *
+ * A district page, because it carries all three regions, at a desktop width where the contents is
+ * the rail and at a phone width where the sub-navigation scrolls sideways.
+ */
+test.describe("the chrome's focus ring", () => {
+  for (const width of [1280, 375]) {
+    test(`is one ring across the header, the views and the contents, and none is clipped, at ${width}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto("/district/043802");
+      await page.locator("body").click({ position: { x: 2, y: 2 } });
+
+      const rings = new Map<string, string[]>();
+      const clipped: string[] = [];
+      for (let step = 0; step < 60; step += 1) {
+        await page.keyboard.press("Tab");
+        const stop = await page.evaluate(() => {
+          const el = document.activeElement as HTMLElement | null;
+          if (!el || el === document.body) return null;
+          const region = el.closest("header.site")
+            ? "header"
+            : el.closest(".subnav")
+              ? "views"
+              : el.closest(".contents")
+                ? "contents"
+                : null;
+          if (!region || !el.matches(":focus-visible")) return { region: null };
+          const style = getComputedStyle(el);
+          const reach = parseFloat(style.outlineWidth) + parseFloat(style.outlineOffset);
+          const name = `${region} "${(el.textContent ?? "").trim().slice(0, 24) || el.getAttribute("aria-label")}"`;
+          const cut: string[] = [];
+          for (const box of el.getClientRects()) {
+            for (let at = el.parentElement; at; at = at.parentElement) {
+              const o = getComputedStyle(at);
+              if (o.overflowX === "visible" && o.overflowY === "visible") continue;
+              const c = at.getBoundingClientRect();
+              const edges = {
+                left: box.left - reach - (c.left + parseFloat(o.borderLeftWidth)),
+                right: c.right - parseFloat(o.borderRightWidth) - (box.right + reach),
+                top: box.top - reach - (c.top + parseFloat(o.borderTopWidth)),
+                bottom: c.bottom - parseFloat(o.borderBottomWidth) - (box.bottom + reach),
+              };
+              for (const [edge, room] of Object.entries(edges)) {
+                if (room < -0.5) cut.push(`${name} loses ${(-room).toFixed(1)}px on the ${edge}`);
+              }
+            }
+          }
+          return {
+            region,
+            name,
+            ring: `${style.outlineStyle} ${style.outlineWidth} ${style.outlineColor} +${style.outlineOffset}`,
+            cut,
+          };
+        });
+        if (stop === null) break;
+        if (!stop.region) continue;
+        rings.set(stop.ring!, [...(rings.get(stop.ring!) ?? []), stop.name!]);
+        clipped.push(...stop.cut!);
+      }
+
+      const names = [...rings.values()].flat();
+      for (const region of ["header", "views", "contents"]) {
+        expect(names.some((n) => n.startsWith(region)), `tabbing reached the ${region}`).toBe(true);
+      }
+      expect(
+        [...rings].map(([ring, stops]) => `${ring}: ${stops.length} stops, e.g. ${stops[0]}`),
+        "one ring style across the chrome",
+      ).toHaveLength(1);
+      expect([...rings.keys()][0]).toMatch(/^solid 2px /);
+      expect(clipped, "a ring cut off by the box that scrolls it").toEqual([]);
     });
   }
 });

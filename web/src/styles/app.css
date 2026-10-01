@@ -330,7 +330,11 @@ header.site nav a[aria-current="page"],
   border: 1px solid var(--border-control);
   background: var(--surface-1);
 }
-.subnav a[aria-current="page"] { border-color: var(--accent-rule); }
+/* A state edge is never fainter than the resting one (#599). `--accent-rule` is a recessive rule,
+   lighter than `--border-control`, and a selected tab drawn in it read as the disabled one beside
+   its neighbours: 1.44:1 against their 3.43. `--text-secondary` is the step past the resting edge,
+   which `button[type="submit"]:hover` already took. */
+.subnav a[aria-current="page"] { border-color: var(--text-secondary); }
 /*
  * The two entries that are links rather than menus — `Find a district` and `Change the formula`.
  *
@@ -366,7 +370,16 @@ header.site nav details[open] > summary { background: var(--surface-2); color: v
 /* The group holding the current page. Weight rather than the full current-page treatment: the
    summary is not a link and marking it as though it were would say the reader is on it. */
 header.site nav summary[aria-current] { color: var(--text-primary); font-weight: var(--weight-semibold); }
-header.site nav summary:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+/*
+ * One ring across the chrome (#599). The header's links took the browser's ring and the summaries
+ * beside them this one, so a row #550 made one family changed ring halfway along it — and the
+ * views and the contents are the same kind of entry. Every chrome stop takes the authored ring.
+ */
+header.site a:focus-visible,
+header.site nav summary:focus-visible,
+.subnav a:focus-visible,
+.contents a:focus-visible,
+.contents-summary:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
 
 /*
  * The popover (#550): the one box that floats over the page, and the only one with a shadow.
@@ -391,7 +404,10 @@ header.site nav .menu-panel,
 .term-def,
 #tip {
   background: var(--surface-1);
-  border: 1px solid var(--border);
+  /* The operable edge and not the hairline (#599): a popover shares the card's ground, so its edge
+     is the whole of what separates the two, and `--border` is 1.40:1 against it in dark, where the
+     shadow is lost on near-black. `--border-control` is 3:1 or better in both themes. */
+  border: 1px solid var(--border-control);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-panel);
 }
@@ -578,7 +594,7 @@ td.year { font-family: var(--font-mono); color: var(--text-annotation); white-sp
   padding: .1rem var(--space-2);
   white-space: nowrap;
 }
-.pill:hover { border-color: var(--accent-rule); color: var(--text-primary); }
+.pill:hover { border-color: var(--text-secondary); color: var(--text-primary); }
 .pill:focus-visible {
   color: var(--text-primary);
   outline: 2px solid var(--focus-ring);
@@ -647,7 +663,12 @@ a:focus-visible { color: var(--link); text-decoration-thickness: 2px; }
 .subnav {
   display: flex;
   gap: var(--space-2);
-  margin: 0 0 var(--space-6);
+  /* Room for a focus ring, which reaches 4px past a tab (2px wide at a 2px offset): a scroll
+     container clips at its padding box, so with none the first tab's ring lost its left edge
+     (#599). The margin hands the room back, so the tabs sit where they did. */
+  padding: calc(2px + 2px);
+  margin: calc(-2px - 2px) calc(-2px - 2px) calc(var(--space-6) - 4px);
+  scroll-padding-inline: calc(2px + 2px);
   flex-wrap: nowrap;
   overflow-x: auto;
   scrollbar-width: none;
@@ -683,7 +704,8 @@ a:focus-visible { color: var(--link); text-decoration-thickness: 2px; }
     top: 51px;
     z-index: 4;
     background: var(--surface-1);
-    padding: var(--space-3) 0;
+    padding-block: var(--space-3);
+    margin-top: 0;
     margin-bottom: var(--space-3);
   }
 }
@@ -702,7 +724,7 @@ a:focus-visible { color: var(--link); text-decoration-thickness: 2px; }
 .basis-scope input[data-basis="real"]:checked ~ .basis label[data-basis="real"] {
   background: var(--surface-1);
   color: var(--text-primary);
-  border-color: var(--accent-rule);
+  border-color: var(--text-secondary);
   font-weight: var(--weight-semibold);
 }
 /* Keyboard focus has to be visible on the label, because the input it belongs to is off-screen. */
@@ -1500,7 +1522,11 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
     top: calc(var(--sticky-chrome) + .75rem);
     max-height: calc(100vh - var(--sticky-chrome) - 1.5rem);
     overflow-y: auto;
-    margin: 0;
+    /* A ring's reach on either side, as `.subnav` has it: this scrolls too, and clipped every
+       contents link's ring on the left (#599). */
+    padding-inline: calc(2px + 2px);
+    margin: 0 calc(-2px - 2px);
+    scroll-padding: calc(2px + 2px);
   }
   .rail-layout > .contents ul { columns: auto; }
   .rail-layout > .contents li { font-size: var(--text-sm); }
@@ -2354,8 +2380,8 @@ svg.plot [data-hover] {
   color: var(--text-primary);
   cursor: pointer;
 }
-.preset:hover { border-color: var(--accent-rule); }
-.preset[aria-pressed="true"] { border-color: var(--accent-rule); background: var(--surface-2); }
+.preset:hover { border-color: var(--text-secondary); }
+.preset[aria-pressed="true"] { border-color: var(--text-secondary); background: var(--surface-2); }
 .preset-label { display: block; font-weight: var(--weight-semibold); font-size: var(--text-sm); }
 .preset-note { display: block; font-size: var(--text-xs); color: var(--text-muted); margin-top: .15rem; }
 

@@ -122,6 +122,21 @@ if (menus.length > 0) {
 }
 
 /**
+ * A tab reached by the keyboard is brought fully into the row that scrolls it (#599).
+ *
+ * Chromium scrolls a focused element into view only when none of it shows. On a phone the
+ * district's last view, "Change the formula", sat focused with 10px of its 148 inside the strip
+ * and the rest, ring included, past the edge. `nearest` moves the row only as far as it must, and
+ * the row's `scroll-padding-inline` leaves the ring's reach beside the tab.
+ */
+document.addEventListener("focusin", (event) => {
+  const target = event.target;
+  if (target instanceof Element && target.closest(".subnav, .contents")) {
+    target.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }
+});
+
+/**
  * The theme switch.
  *
  * `data-theme` on the root beats the OS setting in both directions, which the stylesheet already

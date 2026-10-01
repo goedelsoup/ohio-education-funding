@@ -448,7 +448,9 @@ test.describe("the four tabs are one page", () => {
           return { x: r.x, width: r.width };
         });
       const h1 = await box("main h1");
-      const subnav = await box("main .subnav");
+      // The first tab, not the strip: the strip bleeds 4px either side so a focus ring has room
+      // inside the box that scrolls it (#599), and what a reader lines up is the tab.
+      const subnav = await box("main .subnav a >> nth=0");
       expect(subnav.x, `the tabs and the heading part on ${tab || "the dashboard"}`).toBe(h1.x);
       xs.push(h1.x);
       const main = await box("main");

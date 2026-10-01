@@ -160,6 +160,65 @@ describe("the boundary of a control", () => {
     }
   });
 
+  /*
+   * A state's edge, and a popover's (#599). Hover and selection drew the edge in `--accent-rule`,
+   * which is lighter than the resting `--border-control`: a selected tab measured 1.44:1 against
+   * its unselected neighbours' 3.43 and read as the disabled one. And the popovers share the
+   * card's ground, so their edge is all that separates them from it, and `--border` there was
+   * 1.40:1 in dark, where the shadow does not show on near-black.
+   */
+  const STYLESHEET = readFileSync(resolve(process.cwd(), "src/styles/app.css"), "utf8").replace(
+    /\/\*[\s\S]*?\*\//g,
+    "",
+  );
+  const declared = (pattern: RegExp) =>
+    [...STYLESHEET.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+      .map(([, selector, body]) => [selector!.trim().replace(/\s+/g, " "), body!] as const)
+      .filter(([selector]) => pattern.test(selector));
+  const lowest = (mode: keyof typeof PALETTE, token: string) => {
+    const tokens = PALETTE[mode].tokens;
+    const edge = tokens.get(token);
+    expect(edge, `${token} is not declared in the ${mode} palette`).toBeTruthy();
+    return Math.min(
+      ...(["--surface-1", "--surface-2"] as const).map((surface) =>
+        contrast(parseHex(edge!), parseHex(tokens.get(surface)!)),
+      ),
+    );
+  };
+
+  test("a hovered, pressed, current or checked control's edge is never fainter than at rest", () => {
+    const states = declared(/:hover|\[aria-pressed="true"\]|\[aria-current|:checked/).flatMap(
+      ([selector, body]) =>
+        [...body.matchAll(/(?:^|;|\s)border(?:-color)?\s*:[^;]*var\((--[a-z0-9-]+)\)/g)].map(
+          (m) => [selector, m[1]!] as const,
+        ),
+    );
+    // The five #599 named, and the submit button that already had it right.
+    expect(states.length, "the scan found the state rules").toBeGreaterThanOrEqual(6);
+    for (const mode of ["light", "dark"] as const) {
+      const rest = lowest(mode, "--border-control");
+      for (const [selector, token] of states) {
+        expect(lowest(mode, token), `${mode} ${selector} in ${token}`).toBeGreaterThanOrEqual(rest);
+      }
+    }
+  });
+
+  test("a popover's edge clears 3:1 against the card it floats over, in both modes", () => {
+    const popovers = declared(/#tip/).filter(([, body]) => /border\s*:/.test(body));
+    expect(popovers, "one rule edges every popover").toHaveLength(1);
+    const [selector, body] = popovers[0]!;
+    for (const kind of [".menu-panel", ".year-chip-def", ".term-def"]) expect(selector).toContain(kind);
+    const token = /border\s*:[^;]*var\((--[a-z0-9-]+)\)/.exec(body)?.[1];
+    expect(token, "the popover edge is a token").toBeTruthy();
+    for (const mode of ["light", "dark"] as const) {
+      const tokens = PALETTE[mode].tokens;
+      expect(
+        contrast(parseHex(tokens.get(token!)!), parseHex(tokens.get("--surface-1")!)),
+        `${mode} ${token} on --surface-1`,
+      ).toBeGreaterThanOrEqual(3);
+    }
+  });
+
   test("the hairline is left alone, and is still the thing that failed", () => {
     // Stated rather than assumed: this is why there are two tokens and not one darkened one. A
     // `--border` at 3:1 would put a control's boundary on every card edge and table rule on the
