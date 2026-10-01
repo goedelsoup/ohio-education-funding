@@ -67,14 +67,29 @@ export const BOUNDS = "/bounds";
 export const METHOD = "/method";
 
 /**
+ * The repository: where every figure on the site is computed, and the footer's one external link.
+ */
+export const REPOSITORY = "https://github.com/goedelsoup/ohio-education-funding";
+
+/**
  * A directory of the site's source on GitHub.
  *
  * For page copy that names the code behind a figure. The copy names the thing — "a second
  * implementation of the formula" — and links here, rather than printing a crate path that a reader
  * arriving from a shared link cannot use (#571).
  */
-export const source = (path: string): string =>
-  `https://github.com/goedelsoup/ohio-education-funding/tree/main/${path}`;
+export const source = (path: string): string => `${REPOSITORY}/tree/main/${path}`;
+
+/**
+ * Where a reader reports a wrong figure: a new issue, with the page it was read on as its title.
+ *
+ * A link and not a form, so reporting costs the site no request — #182's rule that a page makes
+ * no external request holds, because following a link is the reader's request, not the page's.
+ * The address is passed in rather than read from `location` because the footer is written at build
+ * and has to work with JavaScript off (#595).
+ */
+export const reportError = (page: string): string =>
+  `${REPOSITORY}/issues/new?title=${encodeURIComponent(`Error on ${page}`)}`;
 
 /**
  * The addressable sections of every route.
@@ -239,6 +254,7 @@ export const SECTIONS = {
     downloads: "downloads",
     checkpoints: "checkpoints",
     terms: "terms",
+    cite: "cite",
   },
 
   /** `/scenario`, and the cards its runner writes into the page. */

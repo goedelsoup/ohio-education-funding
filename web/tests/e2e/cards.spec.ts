@@ -56,7 +56,9 @@ test.describe("what is on this page", () => {
 
   test("a page with three sections or fewer has no list", async ({ page }) => {
     // `/counties` is one card and a note; `/house` is two. A list of them is longer than they are.
-    for (const route of ["/counties", "/house", "/data"]) {
+    // `/data` was a third until #595 gave it a fourth section, "How to cite", which a list helps a
+    // reader arriving for exactly that to find.
+    for (const route of ["/counties", "/house"]) {
       await page.goto(route);
       await expect(page.locator("main nav.contents"), `${route} should have no list`).toHaveCount(0);
     }

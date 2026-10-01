@@ -12,7 +12,8 @@ import { contentsOf, withContents } from "../lib/contents.ts";
 import { applySemantics } from "../lib/semantics.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { nav, type Section } from "../lib/nav.ts";
-import { canonicalPath, og } from "../lib/routes.ts";
+import { modelSource } from "../lib/modelSource.ts";
+import { canonicalPath, og, REPOSITORY, reportError } from "../lib/routes.ts";
 import { HEIGHT, WIDTH } from "../lib/og/card.ts";
 import { inlineMark } from "../lib/og/mark.ts";
 import "../styles/app.css";
@@ -84,6 +85,16 @@ const {
   jsonLd,
 } = Astro.props;
 const { bundle, verification, forecastable } = loadFeed();
+/**
+ * When the data dates from, and where to say it is wrong (#595).
+ *
+ * A journalist citing the site needs both and could find neither: the calculator's date was on its
+ * catalog page alone, and the footer offered no way to report an error. The date is read from the
+ * catalog entry by `modelSource`, never typed here. The maintainer is the repository's owner,
+ * read off its address for the same reason.
+ */
+const model = modelSource(bundle.fiscal_year);
+const maintainer = new URL(REPOSITORY).pathname.split("/")[1];
 
 /**
  * This page's address, as a reader would type it.
@@ -363,10 +374,19 @@ const body = applySemantics(listed).html;
           FY{bundle.fiscal_year} model.
         </p>
         <p>
+          Data: the Ohio Department of Education and Workforce's{" "}
+          <a href={model.href}>FY{bundle.fiscal_year} funding calculator</a>, dated{" "}
+          <time datetime={model.iso}>{model.date}</time>. Maintained by {maintainer} ·{" "}
+          <a href={reportError(canonical.pathname)} rel="noopener noreferrer" target="_blank"
+            >Report an error</a
+          >
+        </p>
+        <p>
           <a href="/method">How these figures are made</a> · <a href="/data">Download the data</a>
         </p>
         {/*
-          The repository, which is the only external link in the site's chrome.
+          The repository, which with the report link above is the only external link in the
+          site's chrome.
 
           Every figure on every page is computed by code in it, and a reader who wants to check
           one needs somewhere to go. It sat in the header beside the theme button until
@@ -380,7 +400,7 @@ const body = applySemantics(listed).html;
         <p>
           <a
             class="mark"
-            href="https://github.com/goedelsoup/ohio-education-funding"
+            href={REPOSITORY}
             rel="noopener noreferrer"
             target="_blank"
           >

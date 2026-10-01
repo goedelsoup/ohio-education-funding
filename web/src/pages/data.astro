@@ -12,6 +12,7 @@ import { loadFeed } from "../lib/feed.ts";
 import { count, millions } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
 import { yearChip } from "../lib/year.ts";
+import { modelSource } from "../lib/modelSource.ts";
 import SectionAnchor from "../components/SectionAnchor.astro";
 
 const { bundle, verification } = loadFeed();
@@ -38,6 +39,20 @@ const s = bundle.statewide;
  * claim than the page beside it makes.
  */
 const site = Astro.site ?? new URL("https://ohio-education-funding.pages.dev");
+
+/**
+ * A line to copy into a story (#595).
+ *
+ * The Terms below ask anyone publishing a figure to name its year and basis, and gave nothing to
+ * paste that did. So the line carries all three things a citation of this site needs — the model
+ * year, the dollar basis and the address — and the date of the calculator the figures come from,
+ * read from its catalog entry like the footer's. It names this page and nominal dollars because
+ * those are what the files here are; the note under it says what to change for one page.
+ */
+const model = modelSource(bundle.fiscal_year);
+const citation =
+  `Ohio school funding, FY${bundle.fiscal_year} model, nominal dollars. ${new URL("/data", site).href}. ` +
+  `Data: Ohio Department of Education and Workforce, FY${bundle.fiscal_year} funding calculator, dated ${model.date}.`;
 const formulaYear = bundle.series_years.find((entry) => entry.series === "formula");
 const jsonLd = {
   "@context": "https://schema.org",
@@ -173,5 +188,15 @@ const jsonLd = {
       and constant dollars supports opposite arguments, and this site shows both for that reason.
     </p>
     <p class="note">{bundle.provenance}</p>
+  </div>
+
+  <div class="card" id="cite" data-part="cite">
+    <h2><SectionAnchor id="cite" />How to cite</h2>
+    <p class="citation">{citation}</p>
+    <p class="note">
+      Citing a figure from one page, give that page's address instead, and write "constant dollars"
+      with the year the page names if you read the figure in them. A wrong figure is worth telling
+      us about: the footer of every page has a link for it.
+    </p>
   </div>
 </Base>
