@@ -4,8 +4,8 @@ foundational_type:
   ontology: ufo
   type: relator
 description: |
-  A separately-authorized initiative that moves education money outside the base formula,
-  binding the state, a recipient, and usually a district whose funding is affected — a
+  A separately-authorized initiative that moves education money outside the base formula. It
+  binds the state, a recipient, and usually a district whose funding is affected — a
   scholarship or voucher, a facilities assistance program, a competitive grant. It is a
   Relator rather than a bare edge because the arrangement carries its own identity and
   history: an eligibility rule, an appropriation line, an administering body, a per-pupil

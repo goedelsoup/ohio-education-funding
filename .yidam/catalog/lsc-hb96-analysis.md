@@ -28,8 +28,8 @@ each stage of passage, *Greenbook* (as enacted), and the appropriation spreadshe
 the Department of Education and Workforce is at
 `lsc.ohio.gov/assets/legislation/136/hb96/en0/files/hb96-edu-greenbook-as-enacted-136th-general-assembly.pdf`.
 
-**What it contains.** For H.B. 96: the enacted phase-in percentages, the appropriation levels
-by line item and fiscal year, and the analysis of every change to the Fair School Funding
+**What it contains.** For H.B. 96: the enacted phase-in percentages, appropriations by
+line item and fiscal year, and the analysis of every change to the Fair School Funding
 Plan. LSC publishes the equivalent set for every biennium, which makes this the only
 continuous appropriation series across the whole period this corpus covers, and the main
 source for the pre-2000 record where department files do not reach.

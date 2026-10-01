@@ -14,10 +14,10 @@ per Equivalent Pupil and Performance Index Across Ohio's Traditional Public-Scho
 **Type.** Secondary source — analysis over primary data, with a published replication package.
 **Location.** `ohiocommonground.com`.
 
-**What it contains.** A district-level cross-section of 607 rated traditional districts joining
-the [report-card Performance Index](dew-report-card-achievement.md) to
-[report-card expenditure per equivalent pupil](dew-report-card-spending.md) by IRN, with
-enrollment from the FY2025 Expenditure Expanded List. Reports Pearson and Spearman coefficients,
+**What it contains.** A cross-section of 607 rated traditional districts joining the
+[report-card Performance Index](dew-report-card-achievement.md) to
+[report-card expenditure per equivalent pupil](dew-report-card-spending.md) by IRN. Enrollment
+comes from the FY2025 Expenditure Expanded List. Reports Pearson and Spearman coefficients,
 Fisher-z intervals, spending and performance quintiles both unweighted and enrollment-weighted,
 and a seven-row sensitivity table.
 

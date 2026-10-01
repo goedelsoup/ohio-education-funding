@@ -5,7 +5,7 @@
  * `decision` are the fourteenth and fifteenth pseudo-classes, and splitting the endpoint would put
  * one route family in three files for no reason a reader of any of them would see.
  *
- * The figure line is the node's own first sentence, run through the same `summarize` the page's
+ * The note is the node's own first sentence, through the same `snippet` the page's
  * `<meta name="description">` uses. A corpus node has no number to lead with; what it has is a
  * definition, and the definition is the thing worth carrying into a feed.
  */
@@ -17,7 +17,7 @@ import { count } from "../../../../lib/format.ts";
 import type { Card } from "../../../../lib/og/card.ts";
 import { SITE } from "../../../../lib/og/pages.ts";
 import { respond } from "../../../../lib/og/render.ts";
-import { summarize } from "../../../../lib/prose.ts";
+import { snippet, sourceSnippet } from "../../../../lib/prose.ts";
 
 export const getStaticPaths: GetStaticPaths = () => {
   const corpus = loadCorpus();
@@ -39,30 +39,26 @@ export const getStaticPaths: GetStaticPaths = () => {
 
 /** Exported for the unit suite, which renders the longest label in the corpus. */
 export function nodeCard(node: Node, className: string): Card {
-  const edges = node.out.length + node.in.length;
   return {
-    eyebrow: `${SITE} · ${className}`,
+    eyebrow: `${SITE} · Library`,
     headline: node.label,
     // The node's own lead, not a truncation of its body. `summary` is capped at 50 words and
-    // carries no markdown, which is exactly what this card can render; `summarize` stays for the
-    // two kinds of document that have no such field.
-    figureNote: summarize(node.summary, 190, node.className),
-    meta:
-      // A corpus is a graph and the edge count is the only honest measure of how much of it a node
-      // is load-bearing for. Nodes with no edges exist and say so rather than showing "0 links".
-      edges > 0
-        ? `${count(edges)} link${edges === 1 ? "" : "s"} into and out of the corpus`
-        : "A corpus node",
+    // carries no markdown, which is exactly what this card can render.
+    figureNote: snippet(node.summary, node.className),
+    // What the page is, in the words the Library's own headings use. An edge count ("24 links into
+    // and out of the corpus") measured the graph, which is not what a feed reader is deciding on.
+    meta: className,
   };
 }
 
 /** Exported for the unit suite. */
 export function sourceCard(source: Source): Card {
   return {
-    eyebrow: `${SITE} · Wiki source`,
+    eyebrow: `${SITE} · Library source`,
     headline: source.title,
-    figureNote: summarize(source.body, 190, FROM_CATALOG),
-    meta: `Cited by ${count(source.citedBy.length)} node${source.citedBy.length === 1 ? "" : "s"}`,
+    // What the source contains, not its `**Source.** … **Type.**` field list (#593).
+    figureNote: sourceSnippet(source.body, FROM_CATALOG),
+    meta: `Cited by ${count(source.citedBy.length)} Library ${source.citedBy.length === 1 ? "entry" : "entries"}`,
   };
 }
 
@@ -78,7 +74,7 @@ export function decisionCard(decision: Decision): Card {
   return {
     eyebrow: `${SITE} · Decision record`,
     headline: decision.title,
-    figureNote: summarize(decision.summary, 190, FROM_DECISION),
+    figureNote: snippet(decision.summary, FROM_DECISION),
     meta:
       decision.corrections > 0
         ? `${count(decision.corrections)} claim${

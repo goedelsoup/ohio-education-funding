@@ -25,7 +25,7 @@
  */
 import Base from "../../../layouts/Base.astro";
 import { type Decision, FROM_DECISION, loadCorpus } from "../../../lib/corpus.ts";
-import { markCorrections, renderProse, summarize } from "../../../lib/prose.ts";
+import { snippet, markCorrections, renderProse } from "../../../lib/prose.ts";
 import * as routes from "../../../lib/routes.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
 
@@ -55,7 +55,7 @@ const total = corrected.reduce((sum, section) => sum + section.corrections, 0);
 
 <Base
   title={decision.title}
-  description={summarize(decision.summary, 180, FROM_DECISION)}
+  description={snippet(decision.summary, FROM_DECISION)}
   image={routes.og.wikiDecision(decision.slug)}
   imageAlt={`${decision.title} — a decision record behind the Ohio school funding corpus`}
   section="decisions"

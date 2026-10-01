@@ -12,8 +12,8 @@ source of record for any figure in it, and the distinction is load-bearing here.
 **Location.** `docs.google.com/spreadsheets/d/1xFaTmfL1W-rkgrT_M39aApH2SVTjpnte/`, linked from
 `education.jhu.edu/edpolicy/policy-research-initiatives/homeschool-hub/states/ohio/`.
 
-**What it contains.** 47 sheets: an `All States` summary, 39 state sheets, a codebook, a data-links
-sheet, and five sheets disaggregating by county/district, grade or age, gender, race, and family
+**What it contains.** 47 sheets: an `All States` summary, 39 state sheets, a codebook and a
+data-links sheet. Five more break the counts down by county/district, grade or age, gender, race, and family
 structure. Ohio appears in exactly two of them, and in none of the last four.
 
 ## The two Ohio sheets

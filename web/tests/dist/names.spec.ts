@@ -190,3 +190,36 @@ describe("no title repeats the site name", () => {
     expect(doubled).toEqual([]);
   });
 });
+
+/*
+ * Every description is a sentence a search result can show whole (#593).
+ *
+ * The wiki's ran to 200 characters and ended in "…", cut mid-clause by `summarize`; the top-level
+ * pages ran past 160 by hand; a county's, a district's and an outcome page's templates did on their
+ * longest names. A result snippet is cut near 160 by the engine, wherever it falls, and a preview
+ * card that carries the description inherits the same cut. `snippet` in `src/lib/prose.ts` writes the
+ * corpus's; this holds every page's, across `description`, `og:description` and
+ * `twitter:description`.
+ */
+describe("every description fits a snippet and ends a sentence", () => {
+  const LIMIT = 160;
+
+  test("on every page", () => {
+    const files = pages();
+    // Guard against a stale glob: every assertion below is vacuous over no pages.
+    expect(files.length).toBeGreaterThan(1000);
+    const bad = files.flatMap((file) => {
+      const doc = read(file);
+      const found = [
+        'meta[name="description"]',
+        'meta[property="og:description"]',
+        'meta[name="twitter:description"]',
+      ].map((selector) => doc.querySelector(selector)?.getAttribute("content") ?? null);
+      return found
+        .filter((d): d is string => d !== null)
+        .filter((d) => d.length > LIMIT || d.endsWith("…") || !/[.!?"”)]$/.test(d))
+        .map((d) => `${file.slice(DIST.length)} (${d.length}): ${d}`);
+    });
+    expect([...new Set(bad)]).toEqual([]);
+  });
+});

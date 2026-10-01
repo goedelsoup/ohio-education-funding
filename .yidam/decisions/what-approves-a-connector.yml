@@ -1,7 +1,7 @@
 id: what-approves-a-connector
 summary: >-
-  The registry's approval list is derived from these records rather than restated beside them, and
-  the four connectors that had been wired without one get a record — written now, and saying so.
+  The registry's approval list is derived from these records rather than restated beside them. The
+  four connectors that had been wired without one get a record — written now, and saying so.
 context: |
   [`crates/connect/README.md`](../../crates/connect/README.md) said, for eleven phases, that a
   connector appearing in the registry without a decision record fails a test. It did not. The test

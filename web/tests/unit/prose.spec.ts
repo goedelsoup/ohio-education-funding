@@ -23,6 +23,9 @@ import { countCorrections, FROM_CATALOG, FROM_DECISION, loadCorpus, resolveTarge
 import { escapeHtml } from "../../src/lib/format.ts";
 import {
   badgeClaims,
+  DESCRIPTION_LIMIT,
+  firstSentence,
+  snippet,
   markCorrections,
   nameCitations,
   renderProse,
@@ -30,6 +33,7 @@ import {
   isListProperty,
   renderListProperty,
   renderPropertyValue,
+  sourceSnippet,
   summarize,
 } from "../../src/lib/prose.ts";
 
@@ -314,6 +318,74 @@ test("summarize cuts on a word boundary and only claims an elision when there wa
   expect(long.startsWith(cut.slice(0, -1))).toBe(true);
   // The last kept token is a whole word, not a fragment of the next one.
   expect(long[cut.length - 1]).toMatch(/[\s.]/);
+});
+
+describe("snippet, the sentence a description and a card carry (#593)", () => {
+  test("is the first sentence when it fits", () => {
+    expect(snippet("The floor under a district's share. It rose in FY2024.", "parameter")).toBe(
+      "The floor under a district's share.",
+    );
+  });
+
+  test("keeps a closing quote with its sentence, and ends where an identifier opens the next", () => {
+    expect(firstSentence('The column read "Not applicable." The April edition did not.', "x")).toBe(
+      'The column read "Not applicable."',
+    );
+    expect(firstSentence("Six connectors were wired. ohio-courts came last.", FROM_DECISION)).toBe(
+      "Six connectors were wired.",
+    );
+  });
+
+  test("cuts an over-long sentence where the author set off an elaboration", () => {
+    const long = `The rate the plan charges against a district's blended wealth — ${"a clause ".repeat(20)}to end.`;
+    expect(snippet(long, "parameter")).toBe("The rate the plan charges against a district's blended wealth.");
+  });
+
+  test("never cuts a serial list short, which would read as a complete one", () => {
+    const listed = `Money that reaches every district, is restricted to education, and ${"appears nowhere ".repeat(12)}in the formula.`;
+    // The only commas fall before the serial ", and"; cutting at one would drop a list member.
+    expect(snippet(listed, "x").endsWith("…")).toBe(true);
+  });
+
+  test("never cuts inside a parenthesis or on a dangling conjunction", () => {
+    const paren = `Five repeated claims about funding, each tested against four universes (all-funds NCES, state appropriations, ${"x ".repeat(40)}).`;
+    expect(snippet(paren, "x")).toBe("Five repeated claims about funding.");
+    const dangling = `Counts for 2024: enrollment by race, school types, licensure and demographics, and — ${"the table ".repeat(10)}— more.`;
+    expect(snippet(dangling, "x")).toBe("Counts for 2024: enrollment by race, school types, licensure and demographics.");
+  });
+
+  test("a source reads from what it contains, not its citation fields", () => {
+    const body = [
+      "# A source",
+      "**Source.** The department. `file.xlsx`.\n**Type.** Primary source.\n**Location.** `example.gov`.",
+      "**Why it is here.** Because the corpus needed it.",
+      "## What it contains",
+      "Every district, once per year.",
+    ].join("\n\n");
+    expect(sourceSnippet(body, FROM_CATALOG)).toBe("Every district, once per year.");
+    expect(sourceSnippet(body.replace("## What it contains\n\n", ""), FROM_CATALOG)).toBe(
+      "Because the corpus needed it.",
+    );
+  });
+
+  /*
+   * The census the descriptions rest on. `snippet` returns an ellipsis rather than inventing a cut, so
+   * a sentence with no clean place to stop shows up here by name, and the fix is a shorter sentence
+   * in the corpus — five summaries and six catalog entries were split for #593.
+   */
+  test("fits every corpus page in a snippet, ending in its own punctuation", () => {
+    const leads = [
+      ...corpus.nodes.map((n) => [n.id, snippet(n.summary, n.className)]),
+      ...corpus.classes.map((c) => [c.className, snippet(c.description, c.className)]),
+      ...corpus.decisions.map((d) => [d.slug, snippet(d.summary, FROM_DECISION)]),
+      ...corpus.sources.map((s) => [s.slug, sourceSnippet(s.body, FROM_CATALOG)]),
+    ];
+    expect(leads.length).toBeGreaterThan(250);
+    const bad = leads
+      .filter(([, text]) => text!.length > DESCRIPTION_LIMIT || !/[.!?"”)]$/.test(text!) || /[*`]/.test(text!))
+      .map(([id, text]) => `${id}: ${text}`);
+    expect(bad).toEqual([]);
+  });
 });
 
 test("every corpus summary is clean markdown-free prose", () => {

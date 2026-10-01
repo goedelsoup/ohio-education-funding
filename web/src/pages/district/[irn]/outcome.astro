@@ -26,7 +26,7 @@ const o = district.outcome;
 const description =
   o?.performance_index == null
     ? `No report card is published for ${district.name}.`
-    : `${district.name} scores ${fixed(o.performance_index, 1)} on Ohio's Performance Index for ${yearOf("outcome.performance")}, shown against districts with comparable poverty rather than against the state.`;
+    : `${district.name} scores ${fixed(o.performance_index, 1)} on Ohio's Performance Index for ${yearOf("outcome.performance")}, against districts with comparable poverty rather than the state.`;
 ---
 
 <Base
