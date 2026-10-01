@@ -178,20 +178,26 @@ const charts = node.series.map((binding) => {
         subjects: count(region.subjects),
       })),
       unreached: spread.unreached.map((missing) => ({ label: missing.label, why: missing.why })),
-      panels: panels.map((panel) => ({
-        label: panels.length === 1 ? null : panel.label,
-        html: renderPanelToString(
-          () =>
-            scatterSpec(panel.points, { x: panel.x, y: panel.y }, [], {
-              width,
-              xDomain: panel.xDomain,
-              yDomain: panel.yDomain,
-              rules: panel.rules,
-            }),
-          { label: `${spread.label} — ${panel.label}` },
-          width,
-        ),
-      })),
+      /* A spread of one panel is a chart rather than a panel, and is drawn at both widths like
+         any other. `panelWidth(1)` is the whole wide frame, and drawn once at that it was the 640
+         drawing on a phone: the TTAG node's one-panel spread painted its 11px type at 5.1px. */
+      panels: panels.map((panel) => {
+        const draw = (w: number) =>
+          scatterSpec(panel.points, { x: panel.x, y: panel.y }, [], {
+            width: w,
+            xDomain: panel.xDomain,
+            yDomain: panel.yDomain,
+            rules: panel.rules,
+          });
+        const naming = { label: `${spread.label} — ${panel.label}` };
+        return {
+          label: panels.length === 1 ? null : panel.label,
+          html:
+            panels.length === 1
+              ? renderToString(draw, naming)
+              : renderPanelToString(() => draw(width), naming, width),
+        };
+      }),
     };
   }
 
