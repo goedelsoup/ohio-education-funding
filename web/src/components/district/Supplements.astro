@@ -60,7 +60,7 @@ const nearTheCliff = !s.growth_eligible && s.enrollment_change > 0.02;
             "formula-component",
             "fsfp-performance-supplement",
           )}>Performance supplement</a></th>
-            <td class="tnum">{s.performance <= 0 ? "—" : money(s.performance)}</td>
+            <td class="tnum">{money(s.performance)}</td>
             <td class="n">{
               s.performance_eligible && rating != null
                 ? `$13 a pupil per rating point, on ${fixed(rating, 1)} — the greater of its
@@ -74,7 +74,7 @@ const nearTheCliff = !s.growth_eligible && s.enrollment_change > 0.02;
             "formula-component",
             "fsfp-enrolment-supplements",
           )}>Enrollment growth supplement</a></th>
-            <td class="tnum">{s.growth <= 0 ? "—" : money(s.growth)}</td>
+            <td class="tnum">{money(s.growth)}</td>
             <td class="n">{
               s.growth_eligible ? (
                 <>$250 on <em>every</em> pupil — not the pupils gained — because its enrollment rose{" "}

@@ -13,7 +13,7 @@
 import Base from "../layouts/Base.astro";
 import { NAMES } from "../lib/nav.ts";
 import { loadFeed, qualifiedName } from "../lib/feed.ts";
-import { compactMoney, count, fig, money, pct } from "../lib/format.ts";
+import { compactMoney, count, fig, money, NOT_REPORTED, pct, reported } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
 import { yearOf, type SeriesKey } from "../lib/year.ts";
 import { distributionSpec } from "../lib/plot/spec.ts";
@@ -274,23 +274,23 @@ const years = Object.fromEntries(MEASURES.map((m) => [m.key, m.year])) as Record
                   {money(d.realized_aid_per_pupil)}
                 </td>
                 <td data-sort-value={guaranteePP} data-label={HEADS.guarantee}>
-                  {d.on_guarantee ? money(guaranteePP) : "—"}
+                  {money(d.on_guarantee ? guaranteePP : 0)}
                 </td>
                 <td data-sort-value={sortable(d.valuation_per_pupil)} data-label={HEADS.valuation}>
-                  {money(d.valuation_per_pupil)}
+                  {reported(d.valuation_per_pupil, money)}
                 </td>
                 <td
                   data-sort-value={sortable(d.economically_disadvantaged)}
                   data-label={HEADS.poverty}
                 >
-                  {pct(d.economically_disadvantaged, 1)}
+                  {reported(d.economically_disadvantaged, (v) => pct(v, 1))}
                 </td>
                 <td
                   data-sort-value={sortable(d.enrollment_change)}
                   data-label={HEADS.enrollment}
                   class={d.enrollment_change != null && d.enrollment_change < 0 ? "loss" : ""}
                 >
-                  {pct(d.enrollment_change, 1)}
+                  {reported(d.enrollment_change, (v) => pct(v, 1))}
                 </td>
               </tr>
             );
@@ -305,6 +305,9 @@ const years = Object.fromEntries(MEASURES.map((m) => [m.key, m.year])) as Record
     formula did not compute. Enrolled ADM is the base cost count — the greater of the three-year
     average and the current year. Enrollment change is {enrollmentSpan}, of which the last year is partly
     a departmental estimate. Property valuation is {valuationYear} and is missing for three districts.
+  </p>
+  <p class="note">
+    A zero means nothing was paid; "{NOT_REPORTED}" means the source has no figure for that district.
   </p>
 
   <script>

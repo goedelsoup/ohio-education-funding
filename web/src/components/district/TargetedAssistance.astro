@@ -90,7 +90,7 @@ const tiersNote =
         <tr><th>Capacity index</th><td class="tnum">{fixed(t.capacity_index, 4)}</td>
           <td class="n">The median district's total wealth over this one's. Above 1 is poorer.</td></tr>
         <tr class={t.capacity_amount <= 0 ? "n" : undefined}><th>Capacity amount</th>
-          <td class="tnum">{t.capacity_amount <= 0 ? "—" : money(t.capacity_amount)}</td>
+          <td class="tnum">{money(t.capacity_amount)}</td>
           <td class="n">{capacityNote}</td></tr>
         <tr><th>Wealth per resident pupil</th><td class="tnum">{money(t.wealth_per_pupil)}</td>
           <td class="n">Weighted wealth over {count(Math.round(t.resident_adm))} resident pupils{
@@ -103,7 +103,7 @@ const tiersNote =
         <tr><th>Wealth index</th><td class="tnum">{fixed(t.wealth_index, 4)}</td>
           <td class="n">{money(medianPerPupil)} over that. Below 0.8 the tier pays nothing.</td></tr>
         <tr class={t.wealth_amount <= 0 ? "n" : undefined}><th>Wealth amount</th>
-          <td class="tnum">{t.wealth_amount <= 0 ? "—" : money(t.wealth_amount)}</td>
+          <td class="tnum">{money(t.wealth_amount)}</td>
           <td class="n">{t.wealth_amount <= 0 ? (
               "Its wealth per pupil is above 1.25 times the state median."
             ) : (

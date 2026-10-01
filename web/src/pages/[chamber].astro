@@ -95,7 +95,7 @@ const senateWhole = bundle.senate_districts.reduce((a, h) => a + h.districts_who
             <td class="tnum">{money(h.realized_aid)}</td>
             <td class="tnum n">{pct(h.realized_aid / total, 2)}</td>
             <td class="tnum">{count(Math.round(h.adm))}</td>
-            <td class="tnum">{h.guarantee <= 0 ? "—" : money(h.guarantee)}</td>
+            <td class="tnum">{money(h.guarantee)}</td>
             <td class="tnum">{count(h.members.length)}</td>
             <td class="tnum n">{count(h.districts_wholly_inside)}</td>
           </tr>

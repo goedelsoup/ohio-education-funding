@@ -31,7 +31,8 @@ function decimal(decimals: number): Intl.NumberFormat {
 }
 
 /**
- * A dollar amount, or an em dash where there is no value.
+ * A dollar amount, or an em dash where there is no value. Zero is `$0`, never the dash; a table
+ * that would otherwise print a bare dash for a missing figure uses {@link reported}.
  *
  * The minus is U+2212 and sits outside the dollar sign, which is what `signedMoney` and
  * `millions` in this file already do. This one fell through to `toLocaleString`, so it printed
@@ -47,6 +48,26 @@ export function money(v: number | null | undefined, decimals = 0): string {
   if (v == null || !Number.isFinite(v)) return "—";
   const text = decimal(decimals).format(Math.abs(v));
   return (v < 0 && Number(text.replace(/,/g, "")) !== 0 ? "−" : "") + "$" + text;
+}
+
+/**
+ * What a cell says when the source has no figure for it.
+ *
+ * Not "—", because "—" was also standing for zero. On `/districts` College Corner Local's row read
+ * "—" under the guarantee, meaning $0, and "—" two cells along under valuation, meaning the source
+ * had no value — and the district's own Dashboard wrote the second as "not reported" (#597).
+ */
+export const NOT_REPORTED = "not reported";
+
+/**
+ * `format(v)`, or {@link NOT_REPORTED} where there is no value.
+ *
+ * Zero is a value. The only test is the null branch every formatter here already has, so a zero
+ * reaches `format` and is written `$0` or `0.0%`; a cell that means "nothing was paid" calls
+ * `money` and gets `$0` rather than writing a dash of its own.
+ */
+export function reported(v: number | null | undefined, format: (v: number) => string): string {
+  return v == null || !Number.isFinite(v) ? NOT_REPORTED : format(v);
 }
 
 /** A signed dollar amount, so a zero change reads as zero rather than as a gain. */

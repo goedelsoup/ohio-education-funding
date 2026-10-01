@@ -19,7 +19,7 @@
  * so rather than letting a reader compare a number here with one three cards up, which is exactly
  * the error `denominators.ts` exists because this site shipped twice.
  */
-import { money, ordinal, pct } from "../../lib/format.ts";
+import { money, NOT_REPORTED, ordinal, pct } from "../../lib/format.ts";
 import type { District } from "../../lib/types.ts";
 import { yearChip, yearOf } from "../../lib/year.ts";
 import SectionAnchor from "../SectionAnchor.astro";
@@ -48,7 +48,7 @@ const rows: [string, string, number, string][] = n
       ],
       [
         "Current spending per pupil",
-        n.spending_per_pupil <= 0 ? "—" : money(n.spending_per_pupil),
+        n.spending_per_pupil <= 0 ? NOT_REPORTED : money(n.spending_per_pupil),
         n.spending_per_pupil_percentile,
         "What it spent, as the Bureau defines spending.",
       ],
@@ -79,7 +79,7 @@ const rows: [string, string, number, string][] = n
             <tr>
                 <th>{label}</th>
                 <td class="tnum">{value}</td>
-                <td class="tnum">{percentile <= 0 ? "—" : rank(percentile)}</td>
+                <td class="tnum">{percentile <= 0 ? NOT_REPORTED : rank(percentile)}</td>
                 <td class="n">{note}</td>
               </tr>
           ))}

@@ -57,9 +57,15 @@ import { lastOf } from "./ends.ts";
  */
 const FLOOR = 20;
 
-/** A signed change, written so a reader does not have to work out the direction. */
+/**
+ * A signed change, written so a reader does not have to work out the direction.
+ *
+ * A change from zero has no percentage, and it used to be written "—" — the glyph the rest of the
+ * site was using for a missing figure, and in some cells for zero itself (#597). Both figures are
+ * in the row beside it, so this says in words that it started from nothing.
+ */
 function change(from: number, to: number): string {
-  if (from === 0) return "—";
+  if (from === 0) return to === 0 ? "no change" : "from zero";
   const delta = to / from - 1;
   if (Math.abs(delta) < 0.00005) return "no change";
   return `${delta > 0 ? "+" : "−"}${pct(Math.abs(delta), 2)}`;
