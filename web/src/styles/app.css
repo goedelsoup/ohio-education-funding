@@ -2131,11 +2131,10 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
  */
 .reach { display: grid; gap: var(--space-6); align-items: start; }
 @media (min-width: 960px) {
-  /* Rail second in the source so the picture is first for a screen reader and on a phone, and
-     placed first here because a control surface reads left-to-right. */
+  /* Rail first in the source as on screen (#564): the levers lead on a phone as on `/scenario`,
+     and the focus order is the drawn order rather than a CSS `order` away from it. */
   .reach { grid-template-columns: 17rem minmax(0, 1fr); }
-  .reach-stage { order: 2; }
-  .reach-rail { order: 1; position: sticky; top: var(--space-6); }
+  .reach-rail { position: sticky; top: var(--space-6); }
 }
 .reach-stage { min-width: 0; }
 

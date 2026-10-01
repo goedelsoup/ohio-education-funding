@@ -14,7 +14,7 @@ import Base from "../../../layouts/Base.astro";
 import { loadCorpus, propertyLabel, relationshipLabel } from "../../../lib/corpus.ts";
 import { loadAppearances } from "../../../lib/appearances.ts";
 import { leadAndBody } from "../../../lib/lead.ts";
-import { DISTRICT_VIEWS, sectionForClass } from "../../../lib/nav.ts";
+import { DISTRICT_VIEWS, NAMES, sectionForClass } from "../../../lib/nav.ts";
 import { loadFeed } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
 import { isBlockProperty, isListProperty, isMathProperty, renderListProperty, renderMathProperty, renderProse, renderPropertyValue, shownProperties, summarize } from "../../../lib/prose.ts";
@@ -337,6 +337,17 @@ const draft = loadFeed().bundle.drafts.find((d) => d.slug === node.name);
 const unpriced = draft?.provisions.filter((p) => p.lever === "").length ?? 0;
 
 /*
+ * A worked scenario, which shares a word with the runner and is not it (#560).
+ *
+ * The class was labelled `Scenario` and the runner lives at `/scenario`, so a reader who met both
+ * had two things with one name and nothing on either page saying how they relate. The class is
+ * `Worked Scenario` now, and this card says the rest: a node here is a change argued in prose with
+ * its results committed, and the runner is where a reader sets their own. The class index carries
+ * the same pointer, and the runner's baseline card points back.
+ */
+const worked = node.className === "scenario" && !draft;
+
+/*
  * The `<meta name="description">`, cut to what a search result and a preview card actually show.
  *
  * `node.summary` went in whole. The corpus schema caps it at 450 characters, the longest in the
@@ -424,7 +435,7 @@ const properties = shownProperties(node.properties.filter((p) => p.name !== "see
   {
     draft && (
       <div class="card" id="runner" data-part="runner">
-        <h2><SectionAnchor id="runner" />This draft, in the scenario runner</h2>
+        <h2><SectionAnchor id="runner" />This draft, in {NAMES.scenario.name}</h2>
         <p class="note">
           {draft.provisions.length - unpriced} of this draft&apos;s {draft.provisions.length}
           {" "}provisions bind a lever in the FY{loadFeed().bundle.fiscal_year} model, so they can
@@ -434,7 +445,24 @@ const properties = shownProperties(node.properties.filter((p) => p.name !== "see
             : " There are none it cannot run, which is a property of a one-clause draft rather than of drafts."}
         </p>
         <div class="flags">
-          <a class="pill" href={routes.scenarioDraft(draft.slug)}>Open in the scenario runner</a>
+          <a class="pill" href={routes.scenarioDraft(draft.slug)}>Open in {NAMES.scenario.name}</a>
+        </div>
+      </div>
+    )
+  }
+
+  {
+    worked && (
+      <div class="card" id="runner" data-part="runner">
+        <h2><SectionAnchor id="runner" />This scenario, and {NAMES.scenario.name}</h2>
+        <p class="note">
+          A worked scenario is a change argued here in prose, against the act as enacted, with the
+          figures it produced computed by the crates and committed beside it. {NAMES.scenario.name}
+          {" "}is the live counterpart: the same model, re-run in your browser at whatever lever
+          positions you set, from the same baseline.
+        </p>
+        <div class="flags">
+          <a class="pill" href={NAMES.scenario.href}>Open {NAMES.scenario.name}</a>
         </div>
       </div>
     )

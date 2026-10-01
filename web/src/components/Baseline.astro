@@ -1,0 +1,116 @@
+---
+/**
+ * What "current law" is on the runner, named once for both views.
+ *
+ * # Why the card exists
+ *
+ * Every figure the runner shows is a delta against the enacted act — `Outcome.delta` is "change
+ * against current law" and the guarantee's default rule is `as-enacted`. That was nowhere on the
+ * page, and a reader who arrived asking how the executive proposal compared with the House's had no
+ * way to learn that neither is the origin, and neither is reachable from any lever.
+ *
+ * # Why this is a component and was two cards
+ *
+ * Both views carried a card headed "What the levers move away from", under the same anchor, and
+ * they said different things (#562). `/scenario` named the act with its terms — signed 30 June
+ * 2025, phase-in at 100%, base cost priced at FY2022 — and then the bill's earlier stages, which no
+ * lever reaches. `/scenario/reach` named the act with its size — the total it pays, the districts,
+ * the guarantee's share — and said nothing about the stages. A reader crossing the tabs met two
+ * accounts of one baseline and could not tell whether they were one.
+ *
+ * They were one, so this is one text. What each view does *with* the baseline does differ — one
+ * reports a difference against it, the other draws a trail from it — and that is the one paragraph
+ * that varies, introduced by the view's own tab label so it reads as what it is.
+ *
+ * The same reasoning as `HeldFixed.astro` beside it: a caveat about the levers is the same on
+ * every view, because every view has the levers.
+ *
+ * # Every figure is a difference against it, not every figure "below"
+ *
+ * The old `/scenario` text said "every figure below", from when the card sat above the levers.
+ * #549 moved it under the results, where "below" pointed at nothing.
+ *
+ * # The worked scenarios
+ *
+ * The corpus's own scenarios start from the same act (#560). Said here because this is the card
+ * that names the act, and because the two share a word: the class is a change argued in prose,
+ * this runner is where a reader sets their own.
+ */
+import { NAMES, RUNNER_VIEWS, type RunnerView } from "../lib/nav.ts";
+import { count, millions } from "../lib/format.ts";
+import * as routes from "../lib/routes.ts";
+import type { Bundle } from "../lib/types.ts";
+import SectionAnchor from "./SectionAnchor.astro";
+
+interface Props {
+  bundle: Bundle;
+  /** Which view the card sits on, which decides its one view-specific paragraph. */
+  view: RunnerView;
+}
+
+const { bundle, view } = Astro.props;
+const s = bundle.statewide;
+const tab = RUNNER_VIEWS.find((v) => v.key === view)!.label;
+
+/*
+ * The stages of the act this runner baselines on: drafts that are versions of it rather than
+ * changes to it. Read off the feed by slug prefix so a stage added to the corpus appears without
+ * this file being edited.
+ */
+const stages = bundle.drafts
+  .filter((d) => d.slug.startsWith("hb-96-136-as-"))
+  .map((d) => ({
+    slug: d.slug,
+    label: d.slug === "hb-96-136-as-introduced" ? "the executive proposal" : "the House-passed substitute",
+  }));
+---
+
+<div class="card" id="baseline" data-part="baseline">
+  <h2><SectionAnchor id="baseline" />What the levers move away from</h2>
+  <p class="note">
+    <strong>Current law here is <a href={routes.wikiNode("legislation", "hb-96-2025")}>Am. Sub.
+    H.B. 96 as enacted</a></strong> — signed 30 June 2025, phase-in at 100% in FY{
+      bundle.fiscal_year
+    }, base cost priced at FY2022. It pays {millions(s.realized_aid_total).replace("+", "")} across{" "}
+    {count(s.districts)} districts, {millions(s.guarantee_total).replace("+", "")} of it guarantee
+    money. Both views of {NAMES.scenario.name} start from it, so the act itself is their zero rather
+    than one of their scenarios.
+  </p>
+  {
+    view === "changes" ? (
+      <p class="note" data-view-specific>
+        <strong>In <em>{tab}</em>,</strong> every figure is a difference against it: the tiles, the
+        distribution and the most-affected table all read zero with the controls untouched.
+      </p>
+    ) : (
+      <p class="note" data-view-specific>
+        <strong>In <em>{tab}</em>,</strong> every trail starts at the act's own position for the
+        district, so with the controls untouched there is nothing to see moving — which is the
+        correct answer, and the shape of the state is there either way.
+      </p>
+    )
+  }
+  {
+    stages.length > 0 && (
+      <p class="note">
+        <strong>The bill's earlier stages are not lever positions.</strong> The corpus holds{" "}
+        {/* The comma rides inside `set:html`: a `<Fragment />` followed by a comma on the next
+            line renders the newline as a space, which puts a gap before the punctuation. */}
+        <Fragment
+          set:html={`${stages
+            .map((d) => `<a href="${routes.wikiNode("draft-legislation", d.slug)}">${d.label}</a>`)
+            .join(" and ")},`}
+        />{" "}
+        and neither can be dialed from here: a stage that suspends the formula and pays from a
+        different base is a different formula, not a setting of this one. What each would have
+        cost is on its own page, reported rather than run — and the three stages compared are on{" "}
+        <a href={`${routes.wikiNode("legislation", "hb-96-2025")}#findings`}>the act's page</a>.
+      </p>
+    )
+  }
+  <p class="note">
+    The corpus's <a href={routes.wikiClass("scenario")}>worked scenarios</a> start from the same
+    act. Each argues one change in prose, with the figures it produced committed beside it; this
+    runner is where you set your own.
+  </p>
+</div>

@@ -325,7 +325,7 @@ export const SECTIONS = {
     onTheSite: "on-the-site",
     findings: "findings",
     district: "district",
-    /* The card on a `draft-legislation` node offering to open it in the scenario runner. */
+    /* The card on a `draft-legislation` or `scenario` node pointing into the runner. */
     runner: "runner",
     revisions: "revisions",
     /* What the node does not hold — the `unfilled:` entries, as a block rather than as badges. */

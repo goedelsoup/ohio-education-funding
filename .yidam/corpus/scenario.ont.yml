@@ -1,5 +1,5 @@
 class: scenario
-label: Scenario
+label: Worked Scenario
 foundational_type:
   ontology: ufo
   type: situation
