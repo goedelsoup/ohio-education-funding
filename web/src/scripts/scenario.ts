@@ -37,16 +37,18 @@ import {
   defaultLevers,
   districtParam,
   draftLevers,
+  horizonText,
+  LEVER_TEXT,
   namedDistricts,
   nextAddress,
   renderDraft,
   renderNamed,
   renderProjection,
   renderRunner,
+  SLIDER_IDS,
   type HorizonBound,
   type Levers,
 } from "../lib/scenario.ts";
-import { pct } from "../lib/format.ts";
 import type { Panel } from "../lib/types.ts";
 import { REQUIRED_CONTRACT } from "../lib/types.ts";
 import {
@@ -580,15 +582,10 @@ function syncLabels(levers: Levers, baseYear: number): void {
     // `#lv-arg-out` names the output; the control it belongs to is `#lv-arg`.
     $(id.replace(/-out$/, ""))?.setAttribute("aria-valuetext", text);
   };
-  set("#lv-arg-out", pct(levers.guaranteeArgument, 0));
-  set(
-    "#lv-base-out",
-    `${levers.baseCostScale >= 1 ? "+" : "−"}${pct(Math.abs(levers.baseCostScale - 1), 0)}`,
-  );
-  set("#lv-min-out", pct(levers.minimumStateShare, 0));
-  set("#lv-phase-out", pct(levers.phaseInGeneral, 0));
-  set("#lv-phase-dpia-out", pct(levers.phaseInDpia, 0));
-  set("#lv-horizon-out", levers.horizon <= baseYear ? "not projected" : `FY${levers.horizon}`);
+  for (const [id, field] of Object.entries(SLIDER_IDS)) {
+    set(`#${id}-out`, LEVER_TEXT[field](levers[field]));
+  }
+  set("#lv-horizon-out", horizonText(levers.horizon, baseYear));
   // The retained-share slider only means anything for the two rules that take an argument.
   const argument = $<HTMLInputElement>("#lv-arg")?.closest(".lever") as HTMLElement | null;
   if (argument) {

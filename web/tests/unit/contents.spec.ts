@@ -107,6 +107,28 @@ test("a heading with no address anywhere above it is skipped rather than guessed
   expect(contentsOf("<div class='card'><h2>Nowhere</h2></div>")).toEqual([]);
 });
 
+test("a card inside <noscript> is not a way into the page", () => {
+  /*
+   * #598: the runner listed "Re-running the formula needs JavaScript", whose card is inside a
+   * `<noscript>` — a link to nowhere, offered to exactly the reader it was not written for.
+   */
+  const body = card("levers", "Levers") + `<noscript>${card("needs-script", "Needs JavaScript")}</noscript>`;
+  expect(contentsOf(body)).toEqual([{ id: "levers", label: "Levers" }]);
+});
+
+test("a card the page has not shown is not a way into it", () => {
+  // #598: `/scenario`'s `#not` is `hidden` until a district is chosen, and its entry went nowhere.
+  const hidden = card("not", "What a district's cards do not move").replace(
+    'class="card"',
+    'class="card" hidden',
+  );
+  // Any hidden ancestor, not just the card: a heading is as unreachable two levels down.
+  const nested = `<div hidden>${card("deep", "Deep")}</div>`;
+  expect(contentsOf(card("levers", "Levers") + hidden + nested)).toEqual([
+    { id: "levers", label: "Levers" },
+  ]);
+});
+
 test("the list goes above the first section and below the page introducing itself", () => {
   /*
    * The boundary is found rather than marked. Everything before the first section element is the

@@ -31,6 +31,17 @@
  * already fails the build on a fragment naming an id its page does not carry. An entry that points
  * at nothing cannot reach a reader, so this module does not restate the guarantee.
  *
+ * # What is not a way in (#598)
+ *
+ * A heading the reader cannot reach. One inside `<noscript>` is a card for a reader with no script,
+ * and listed for everyone it sent a reader *with* script to a fragment that goes nowhere — on the
+ * runner, under the words "Re-running the formula needs JavaScript". One under a `hidden` ancestor
+ * is a card the page has not shown: `/scenario`'s "What a district's cards do not move" is
+ * revealed only once a district is chosen, and its entry left the page at the top otherwise. Both
+ * are skipped. A no-script reader loses an entry for a card set directly under the levers, and a
+ * reader who has chosen a district loses one for a card they are already looking at; either is
+ * better than a link that does nothing.
+ *
  * Build-time only, and for the reason `plot/ssr.ts` states about itself: `linkedom` is 200 KB and
  * has no business in a browser. This is imported by `Base.astro`'s frontmatter, which runs during
  * the build and never ships.
@@ -64,6 +75,7 @@ export function contentsOf(body: string): Entry[] {
   const headings = new Map<string, string[]>();
 
   for (const heading of document.querySelectorAll("h2, .prose-body h3[id]")) {
+    if (heading.closest("noscript, [hidden]")) continue;
     const owner = heading.hasAttribute("id") ? heading : heading.closest("[id]");
     const id = owner?.getAttribute("id");
     if (!id) continue;

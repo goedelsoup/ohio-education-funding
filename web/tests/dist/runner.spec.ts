@@ -33,13 +33,26 @@ const TABS = Object.fromEntries(RUNNER_VIEWS.map((v) => [v.key, v.label])) as Re
 const doc = (file: string): Document => parseHTML(readFileSync(join(DIST, file), "utf8")).document;
 const text = (el: Element): string => (el.textContent ?? "").replace(/\s+/g, " ").trim();
 
-/** The baseline card, and its text with the view-specific paragraph taken out. */
+/**
+ * The baseline card, and its text with the view-specific paragraph taken out.
+ *
+ * And without the link back to the contents list, which is a property of the page rather than of
+ * the card: a heading carries one only where the page has a list to lead back to, and since #598
+ * `/scenario` has too few reachable sections for one while `/scenario/reach` keeps its list.
+ */
 function baseline(file: string): { card: Element; specific: Element[]; shared: string } {
   const card = doc(file).querySelector('[data-part="baseline"]');
   if (!card) throw new Error(`${file} has no baseline card`);
   const specific = [...card.querySelectorAll("[data-view-specific]")];
   const copy = card.cloneNode(true) as Element;
   for (const p of copy.querySelectorAll("[data-view-specific]")) p.remove();
+  // `linkContents` writes a space and then the link, so both go.
+  for (const a of copy.querySelectorAll("a.to-contents")) {
+    if (a.previousSibling?.nodeType === 3 && a.previousSibling.textContent?.trim() === "") {
+      a.previousSibling.remove();
+    }
+    a.remove();
+  }
   return { card, specific, shared: text(copy) };
 }
 

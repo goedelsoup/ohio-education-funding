@@ -139,12 +139,16 @@ const CONTAINERS: Exempt[] = [
      * the runner's views, and rendered on 609 district scenario routes besides until #548 folded
      * those into `/scenario?d=` — a route-keyed form would have needed 611 identical entries.
      *
+     * The `<output>` beside each slider's name is the same thing said once more: where the slider
+     * sits. It was empty in the built page until #598 rendered each default into it, and the
+     * defaults are current law's positions — 50%, 35%, $0 — not measurements of a year.
+     *
      * What this does not exempt is the *result*. Every figure the run produces is outside
      * `.levers` and still has to carry its year.
      */
     reason:
-      "A lever's note names the setting's ends, not a measurement — the same ground `scenario/reach.html`'s `25%` is exempt on, scoped to the control rather than to each route that renders it.",
-    containers: [".levers .n"],
+      "A lever's note names the setting's ends, and its output where the slider sits, not a measurement — the same ground `scenario/reach.html`'s `25%` is exempt on, scoped to the control rather than to each route that renders it.",
+    containers: [".levers .n", ".levers output"],
   },
   {
     /*

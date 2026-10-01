@@ -109,6 +109,48 @@ export const LEVER_BOUNDS = {
   transportationFloor: { min: 0, max: 1, step: 0.0125 },
 } as const;
 
+/**
+ * What each slider shows beside its name, and says as its spoken value.
+ *
+ * # Why it is here and not in the script that updates it
+ *
+ * The script was the only writer, and it wrote six of the nine (#598). "DPIA, directly certified",
+ * "Supplemental targeted assistance" and "Transportation floor" had an empty `<output>` however far
+ * they were moved, and before the script booted — or with no script at all — every lever did. So
+ * the text is a function of the value, stated once, and `ScenarioControls.astro` renders it into
+ * the document at the default while `syncLabels` rewrites it on every move. Keyed on
+ * `LEVER_BOUNDS`, so a tenth slider with no entry here is a type error rather than a blank.
+ */
+export const LEVER_TEXT: { [K in keyof typeof LEVER_BOUNDS]: (value: number) => string } = {
+  guaranteeArgument: (v) => pct(v, 0),
+  baseCostScale: (v) => `${v >= 1 ? "+" : "−"}${pct(Math.abs(v - 1), 0)}`,
+  minimumStateShare: (v) => pct(v, 0),
+  phaseInGeneral: (v) => pct(v, 0),
+  phaseInDpia: (v) => pct(v, 0),
+  dpiaBlend: (v) => pct(v, 0),
+  supplementalTopRate: (v) => money(v),
+  // Steps of 1.25 points, and H.B. 96's own positions were 41.67% and 45.83%: whole percent would
+  // show two different floors as one figure. Trailing zeros go, so current law reads 50%.
+  transportationFloor: (v) => `${Number((v * 100).toFixed(2))}%`,
+};
+
+/** Each slider's element id, and the lever it moves. The `<output>` beside it is `${id}-out`. */
+export const SLIDER_IDS = {
+  "lv-arg": "guaranteeArgument",
+  "lv-base": "baseCostScale",
+  "lv-min": "minimumStateShare",
+  "lv-phase": "phaseInGeneral",
+  "lv-phase-dpia": "phaseInDpia",
+  "lv-dpia-blend": "dpiaBlend",
+  "lv-supplemental": "supplementalTopRate",
+  "lv-transport": "transportationFloor",
+} as const satisfies Record<string, keyof typeof LEVER_BOUNDS>;
+
+/** What the horizon slider shows: a year, or that the page is not projecting. */
+export function horizonText(horizon: number, baseYear: number): string {
+  return horizon <= baseYear ? "not projected" : `FY${horizon}`;
+}
+
 /** The two ends of the horizon, which are a property of the feed rather than of the control. */
 export interface HorizonBound {
   /** The last observed year. Equal to it means "do not project". */
