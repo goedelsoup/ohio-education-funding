@@ -24,6 +24,7 @@ import { escapeHtml } from "../../src/lib/format.ts";
 import {
   badgeClaims,
   markCorrections,
+  nameCitations,
   renderProse,
   isBlockProperty,
   isListProperty,
@@ -528,16 +529,18 @@ describe("a property value whose columns carry meaning", () => {
    * is still named, and the count of properties that did gain emphasis is asserted separately so
    * the change cannot silently reach nothing.
    */
-  test("and every property that is not a block renders exactly as it did before, emphasis aside", () => {
+  test("and every property that is not a block renders exactly as it did before, emphasis and citation names aside", () => {
+    // `nameCitations` is the second licensed difference (#591): applied here, so a citation is the
+    // only thing it may have moved.
     const before = (value: string, fromClass: string): string =>
-      badgeClaims(
+      nameCitations(badgeClaims(
         escapeHtml(value)
           .replace(/\[([^[\]]+)\]\(([^)\s]+)\)/g, (_whole, label: string, target: string) => {
             const href = /^(https?:|\/)/.test(target) ? target : resolveTarget(target, fromClass).href;
             return `<a href="${href}">${label}</a>`;
           })
           .replace(/`([^`]+)`/g, "<code>$1</code>"),
-      )
+      ))
         .split(/\n\s*\n/)
         .map((paragraph) => paragraph.replace(/\s*\n\s*/g, " ").trim())
         .filter((paragraph) => paragraph !== "")
@@ -696,5 +699,71 @@ describe("emphasis in a property value", () => {
       }
     }
     expect(left, "a property value still carrying an emphasis delimiter").toEqual([]);
+  });
+});
+
+/**
+ * A citation by file stem, named (#591).
+ *
+ * The corpus cites a page as ``[`bridge-formula`](…)``, which shipped as a monospace slug in the
+ * middle of a sentence on 108 Library pages. The source keeps its idiom; the page shows the name.
+ */
+describe("a citation whose label is its target's stem", () => {
+  test("reads as the target's name, in the convention for its kind", () => {
+    expect(nameCitations('<a href="/wiki/funding-regime/bridge-formula"><code>bridge-formula</code></a>')).toBe(
+      '<a href="/wiki/funding-regime/bridge-formula">Bridge Formula</a>',
+    );
+    expect(nameCitations('<a href="/wiki/source/lsc-hb96-analysis"><code>lsc-hb96-analysis</code></a>')).toBe(
+      '<a href="/wiki/source/lsc-hb96-analysis"><cite>LSC Budget Analysis — H.B. 96 (FY2026-27)</cite></a>',
+    );
+    expect(
+      nameCitations('<a href="/wiki/decision/the-four-kinds-of-parameter"><code>the-four-kinds-of-parameter</code></a>'),
+    ).toBe('“<a href="/wiki/decision/the-four-kinds-of-parameter">The four kinds of parameter</a>”');
+  });
+
+  test("is named when the label carries its directory too", () => {
+    expect(nameCitations('<a href="/wiki/funding-regime/bridge-formula"><code>funding-regime/bridge-formula</code></a>')).toBe(
+      '<a href="/wiki/funding-regime/bridge-formula">Bridge Formula</a>',
+    );
+    expect(
+      nameCitations('<a href="/wiki/decision/the-four-kinds-of-parameter"><code>decisions/the-four-kinds-of-parameter</code></a>'),
+    ).toContain(">The four kinds of parameter</a>");
+  });
+
+  test("is named without the backticks when the label is a slug, and left alone when it is a word", () => {
+    expect(nameCitations('<a href="/wiki/funding-regime/bridge-formula">bridge-formula</a>')).toBe(
+      '<a href="/wiki/funding-regime/bridge-formula">Bridge Formula</a>',
+    );
+    const word = '<a href="/wiki/doctrine/equity">equity</a>';
+    expect(nameCitations(word)).toBe(word);
+  });
+
+  test("keeps any label the author chose instead, which is the opt-out", () => {
+    const kept = [
+      // A line cited by its letter, and an intervention cited by the act that created it.
+      '<a href="/wiki/formula-component/fsfp-formula-transition-supplement"><code>[K]</code></a>',
+      '<a href="/wiki/intervention/academic-distress-commission"><code>hb-70</code></a>',
+      // A sentence about the file itself.
+      '<a href="/wiki/funding-regime/bridge-formula"><code>bridge-formula.yml</code></a>',
+      // A stem that names some other page than the one linked.
+      '<a href="/wiki/funding-regime/bridge-formula"><code>the-four-kinds-of-parameter</code></a>',
+      // Not a page this site renders from the corpus.
+      '<a href="https://github.com/x/crates/project"><code>crates/project</code></a>',
+    ];
+    for (const html of kept) expect(nameCitations(html)).toBe(html);
+  });
+
+  test("is named through both renderers, inside a claim tag's detail as well as in a sentence", async () => {
+    const prose = await renderProse(
+      "The rule is [`the-four-kinds-of-parameter`](the-four-kinds-of-parameter.yml). [verified] ([`lsc-hb96-analysis`](../catalog/lsc-hb96-analysis.md))",
+      FROM_DECISION,
+    );
+    expect(prose).toContain('The rule is “<a href="/wiki/decision/the-four-kinds-of-parameter">The four kinds of parameter</a>”.');
+    expect(prose).toContain("<cite>LSC Budget Analysis — H.B. 96 (FY2026-27)</cite>");
+    expect(prose).not.toMatch(/<code>[a-z0-9-]+<\/code>/);
+
+    const cell = renderPropertyValue("see [`bridge-formula`](../funding-regime/bridge-formula.yml) [verified]", "parameter");
+    expect(cell).toContain('see <a href="/wiki/funding-regime/bridge-formula">Bridge Formula</a>');
+    expect(cell).toContain('class="claim verified"');
   });
 });

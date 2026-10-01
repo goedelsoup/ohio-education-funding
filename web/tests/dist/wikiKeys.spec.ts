@@ -101,11 +101,12 @@ test("the check bites on a class page's relationship table and a pointed-at-by c
  * hyphenated — so every decision page was headed by its slug, every row of `/wiki/decision`
  * linked by one, and the check passed them all.
  *
- * A slug inside rendered corpus prose is the author's citation idiom — the corpus cites a node or
- * a record as ``[`bridge-formula`](…)`` throughout — and is left alone as #551 leaves a key in
- * prose alone. Prose renders into `.prose-body` and, for a property's value, into the row's data
- * cell; 61 such citations sit in property cells. What is held is what a template chose to print:
- * the title, the `h1`, a pill, a row heading, a crumb.
+ * Rendered corpus prose — `.prose-body`, and a property's value in the row's data cell — is the
+ * author's, and a slug in it is left alone as #551 leaves a key in prose alone, with one exception
+ * (#591). The corpus cites a page as ``[`bridge-formula`](…)``, a link whose whole text is its
+ * target's own stem, and that is a file name standing where the page's name belongs; the renderer
+ * names it, and this holds the prose to that. A link whose label is anything else is the author
+ * choosing what to print, and stays exempt.
  */
 
 /** A hyphenated slug: a node, catalog entry or decision record by its file stem. */
@@ -114,15 +115,35 @@ const KEBAB = /^[a-z0-9]+(-[a-z0-9]+)+$/;
 /** Every wiki page, the catalog and the decisions included. */
 const LIBRARY = pages(join(DIST, "wiki"));
 
+const text = (element: Element): string => (element.textContent ?? "").replace(/\s+/g, " ").trim();
+
+/**
+ * A link printing the stem of the Library page it links to, bare or with its directory: in a code
+ * span, or as plain text that is a slug rather than a word. `[equity](…)` is a word in a sentence.
+ * A class page, `/wiki/parameter`, is cited by its key the way #551's keys are and is not held.
+ */
+function selfCited(a: Element): boolean {
+  const stem = a.getAttribute("href")?.match(/^\/wiki\/[^/#]+\/([^/#]+)$/)?.[1];
+  const label = text(a);
+  if (stem === undefined || (label !== stem && !label.endsWith(`/${stem}`))) return false;
+  return a.querySelector("code") !== null || /[-/]/.test(label);
+}
+
 /** The title, the `h1`, and every link outside rendered prose and property values, as text. */
 function names(html: string): string[] {
   const { document } = parseHTML(html);
   const headings = [...document.querySelectorAll("title, h1")];
   const links = [...document.querySelectorAll("a")].filter((a) => !a.closest(".prose-body, td, code, pre"));
-  return [...headings, ...links].map((element) => (element.textContent ?? "").replace(/\s+/g, " ").trim());
+  return [...headings, ...links].map(text);
 }
 
-const slugsIn = (html: string): string[] => names(html).filter((text) => KEBAB.test(text));
+/** Every link in rendered prose or a property value whose text is its own target's stem. */
+function stemCitations(html: string): string[] {
+  const { document } = parseHTML(html);
+  return [...document.querySelectorAll(".prose-body a, td a")].filter(selfCited).map(text);
+}
+
+const slugsIn = (html: string): string[] => [...names(html).filter((text) => KEBAB.test(text)), ...stemCitations(html)];
 
 test("no Library page is headed or linked by a slug", () => {
   expect(LIBRARY.length).toBeGreaterThan(250);
@@ -149,11 +170,40 @@ test("the check bites on a decision's heading, the decision index and a front-do
   expect(doctoredIndex).not.toBe(index);
   expect(slugsIn(doctoredIndex)).toEqual(["the-three-streams-of-mr81"]);
 
-  // A citation in prose is exempt, and stays exempt: the exemption is not what is letting the
-  // doctored cases through.
+  // A citation in prose labelled as the author chose is exempt, and stays exempt: the exemption
+  // is not what is letting the doctored cases through.
   const prose = '<div class="prose-body"><a href="/wiki/decision/kuten"><code>kuten-x</code></a></div>';
   expect(slugsIn(prose)).toEqual([]);
   expect(slugsIn(prose.replace('class="prose-body"', 'class="flags"'))).toEqual(["kuten-x"]);
+});
+
+test("the check bites on a citation in prose or a property cell printed as its target's stem", () => {
+  // As #591 found it: a bare stem in a sentence, with or without its directory, in either place
+  // corpus prose renders.
+  const bare = (href: string, label: string) => `<a href="${href}"><code>${label}</code></a>`;
+  expect(slugsIn(`<div class="prose-body">${bare("/wiki/decision/kuten", "kuten")}</div>`)).toEqual(["kuten"]);
+  expect(slugsIn(`<table><tr><td>${bare("/wiki/metric/enrolled-adm", "metric/enrolled-adm")}</td></tr></table>`)).toEqual([
+    "metric/enrolled-adm",
+  ]);
+  // Not kebab-case, and still a file name where a name belongs.
+  expect(slugsIn(`<div class="prose-body">${bare("/wiki/fiscal-period/fy2022", "fy2022")}</div>`)).toEqual(["fy2022"]);
+  // Without the backticks: a slug is still a slug, and a word is still a word.
+  expect(slugsIn('<div class="prose-body"><a href="/wiki/parameter/twenty-mill-floor">twenty-mill-floor</a></div>')).toEqual([
+    "twenty-mill-floor",
+  ]);
+  expect(slugsIn('<div class="prose-body"><a href="/wiki/doctrine/equity">equity</a></div>')).toEqual([]);
+
+  // A real page, with one of its named citations put back the way the corpus writes it.
+  const page = readFileSync(join(DIST, "wiki/formula-component/temporary-transitional-aid-guarantee.html"), "utf8");
+  expect(slugsIn(page)).toEqual([]);
+  const { document } = parseHTML(page);
+  const cited = [...document.querySelectorAll(".prose-body a[href^='/wiki/']")].find(
+    (a) => !a.querySelector("code") && /^\/wiki\/[^#]+\/[^/#]+$/.test(a.getAttribute("href") ?? ""),
+  );
+  expect(cited).toBeDefined();
+  const stem = cited!.getAttribute("href")!.split("/").at(-1)!;
+  cited!.innerHTML = `<code>${stem}</code>`;
+  expect(slugsIn(document.toString())).toEqual([stem]);
 });
 
 /** The foundational types a class description argues for once it has defined the class. */
