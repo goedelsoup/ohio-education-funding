@@ -11,7 +11,7 @@ import DistrictNav from "../../../components/DistrictNav.astro";
 import Base from "../../../layouts/Base.astro";
 import { districtPaths, loadFeed, qualifiedName } from "../../../lib/feed.ts";
 import { fixed } from "../../../lib/format.ts";
-import { districtTitle } from "../../../lib/nav.ts";
+import { districtTitle, NAMES } from "../../../lib/nav.ts";
 import { renderDistrictOutcome, renderOutcomeContext } from "../../../lib/outcomes.ts";
 import * as routes from "../../../lib/routes.ts";
 import { yearOf } from "../../../lib/year.ts";
@@ -36,6 +36,10 @@ const description =
   imageAlt={`${district.name}: state aid per pupil, and how much of it comes from the guarantee`}
   section="districts"
 >
+  <p class="crumb">
+    <a href={NAMES.districts.href}>{NAMES.districts.name}</a> ›{" "}
+    <a href={routes.district(district.irn)}>{qualifiedName(district)}</a>
+  </p>
   <h1>{qualifiedName(district)}</h1>
   <p class="lead">What its pupils achieve, and how little of it the funding side explains.</p>
 

@@ -9,6 +9,7 @@
 import Base from "../../layouts/Base.astro";
 import { loadFeed, qualifiedName } from "../../lib/feed.ts";
 import { compactMoney, count, money, pct } from "../../lib/format.ts";
+import { NAMES } from "../../lib/nav.ts";
 import * as routes from "../../lib/routes.ts";
 import { yearChip } from "../../lib/year.ts";
 import SectionAnchor from "../../components/SectionAnchor.astro";
@@ -74,6 +75,7 @@ const valuationByIrn = new Map(
   section={chamber}
   wide
 >
+  <p class="crumb">Places › <a href={NAMES[chamber].href}>{NAMES[chamber].name}</a></p>
   <h1>{label} District {number}</h1>
   <p class="lead">
     {count(house.members.length)} school district{house.members.length === 1 ? "" : "s"}

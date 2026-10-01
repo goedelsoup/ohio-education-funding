@@ -10,6 +10,7 @@
 import { parseHTML } from "linkedom";
 import { describe, expect, test } from "vitest";
 
+import { contentsOf, renderContents } from "../../src/lib/contents.ts";
 import { anchor, heading } from "../../src/lib/section.ts";
 import { applySemantics } from "../../src/lib/semantics.ts";
 
@@ -67,5 +68,49 @@ describe("the section anchor", () => {
     const { html, anchored } = applySemantics(written);
     expect(anchored).toBe(0);
     expect(html).toBe(written);
+  });
+});
+
+/**
+ * The way back to the contents list, beside the address (#594).
+ *
+ * `linkContents` gives one to every heading with an address, on a page that has a list for it to
+ * lead back to, and to nothing on a page that has none.
+ */
+describe("the link back to the contents", () => {
+  const card = (id: string, title: string, inner = "") =>
+    `<div class="card" id="${id}"><h2>${heading(id, title)}</h2>${inner}</div>`;
+  const page = (cards: string) => renderContents(contentsOf(cards)) + cards;
+
+  test("sits in the tail of every section heading, after the address", () => {
+    const cards = ["a", "b", "c", "d"].map((id) => card(id, `Section ${id}`)).join("");
+    const { html, linked } = applySemantics(page(cards));
+    expect(linked).toBe(4);
+    const { document } = parseHTML(`<!doctype html><html><body>${html}</body></html>`);
+    for (const tail of document.querySelectorAll("h2 .heading-tail")) {
+      const [address, back] = [...tail.querySelectorAll("a")];
+      expect(address?.className).toBe("section-anchor");
+      expect(back?.className).toBe("to-contents");
+      expect(back?.getAttribute("href")).toBe("#contents");
+    }
+    // It lands somewhere: the list carries the id the link names.
+    expect(document.querySelector("nav.contents")?.id).toBe("contents");
+    // Separated from the `#` by a space, never fused to it.
+    expect(document.querySelector("h2")?.textContent).toBe("Section a # ↑ Contents");
+  });
+
+  test("and in a card's own h3s too, so a long card is not a stretch with no way back", () => {
+    const inner = `<h3>${heading("a-row", "A row of the breakdown")}</h3>`;
+    const cards = card("a", "Section a", inner) + ["b", "c", "d"].map((id) => card(id, id)).join("");
+    const { html, linked } = applySemantics(page(cards));
+    expect(linked).toBe(5);
+    const { document } = parseHTML(`<!doctype html><html><body>${html}</body></html>`);
+    expect(document.querySelector("h3 .heading-tail .to-contents")).not.toBeNull();
+  });
+
+  test("and nowhere on a page with no list", () => {
+    const { html, linked } = applySemantics(card("a", "Alone"));
+    expect(linked).toBe(0);
+    expect(html).not.toContain("to-contents");
   });
 });

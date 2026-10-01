@@ -91,8 +91,10 @@ body {
 
    `main[id]` is the skip link's target, and it needs this for exactly the same reason the others
    do: a skip link that lands the reader under the chrome has skipped them past the top of the
-   content. The end-to-end test for the link found this rather than a reading of the rule. */
-.card[id], .basis-scope[id], h2[id], h3[id], main[id] {
+   content. The end-to-end test for the link found this rather than a reading of the rule.
+
+   `nav#contents` is where every heading's "Contents" link lands (#594). */
+.card[id], .basis-scope[id], h2[id], h3[id], main[id], nav#contents {
   scroll-margin-top: calc(var(--sticky-chrome) + .75rem);
 }
 
@@ -674,6 +676,33 @@ a:focus-visible { color: var(--link); text-decoration-thickness: 2px; }
   scrollbar-width: none;
 }
 .subnav::-webkit-scrollbar { display: none; }
+/*
+ * And a cue that it scrolls (#594), since the scrollbar is hidden.
+ *
+ * At 375px the district's fifth tab showed as a 6px sliver — x=349–496 in a box ending at 355 —
+ * and nothing said there was more. `.scroll`'s cue cannot be borrowed: it is a background, and a
+ * background is painted under the content, which works for a table's cells because they paint none
+ * and fails here because each tab paints `--surface-1` over its own box — the one tab cut off is
+ * the one that would hide its shade.
+ *
+ * So the fade is a box of its own, over the tabs: the strip's last flex item, held at the right
+ * edge by `sticky` while there is more row to the right, and fading into the ground the strip sits
+ * on. Scrolled to the end it is back in its own place, the gap after the last tab, and covers
+ * nothing — the same "shows on exactly the side there is more" that `.scroll`'s `local` covers
+ * achieve. The negative margin takes back the gap it would otherwise add, and it ignores the
+ * pointer so the tab it fades is still the tab a tap reaches.
+ */
+.subnav { --scroll-ground: var(--surface-0); }
+.subnav::after {
+  content: "";
+  flex: none;
+  width: 1.5rem;
+  margin-left: calc(-1 * var(--space-2));
+  position: sticky;
+  right: 0;
+  pointer-events: none;
+  background: linear-gradient(to left, var(--scroll-ground) 20%, transparent);
+}
 
 /*
  * Sticky from 1000px up, and deliberately not below it.
@@ -703,7 +732,8 @@ a:focus-visible { color: var(--link); text-decoration-thickness: 2px; }
     position: sticky;
     top: 51px;
     z-index: 4;
-    background: var(--surface-1);
+    --scroll-ground: var(--surface-1);
+    background: var(--scroll-ground);
     padding-block: var(--space-3);
     margin-top: 0;
     margin-bottom: var(--space-3);
@@ -940,19 +970,32 @@ tr.series-break > td {
  *
  * It darkens rather than underlines on hover — an underline here reads as a mis-set heading rather
  * than as a link.
+ *
+ * `.to-contents` is the link back to the page's contents list that sits beside it (#594), and takes
+ * every one of these rules with it: it is the same kind of apparatus, in the same place.
  */
-.section-anchor {
+.section-anchor,
+.to-contents {
   color: var(--text-muted);
   font-weight: var(--weight-regular);
   text-decoration: none;
   transition: color .12s ease, opacity .12s ease;
 }
-.section-anchor:hover { color: var(--text-primary); }
+.section-anchor:hover,
+.to-contents:hover { color: var(--text-primary); }
+.to-contents { margin-left: var(--space-2); font-size: var(--text-sm); }
 @media (hover: hover) and (pointer: fine) {
-  .section-anchor { opacity: 0; }
-  :is(h1, h2, h3, h4):hover .section-anchor,
-  :target > h2 .section-anchor,
-  .section-anchor:focus-visible { opacity: 1; }
+  .section-anchor,
+  .to-contents { opacity: 0; }
+  :is(h1, h2, h3, h4):hover :is(.section-anchor, .to-contents),
+  :target > h2 :is(.section-anchor, .to-contents),
+  .section-anchor:focus-visible,
+  .to-contents:focus-visible { opacity: 1; }
+}
+/* Where the list sits in a sticky rail beside the sections it is already on screen, and a link
+   back to it goes nowhere a reader cannot see. */
+@media (min-width: 1000px) {
+  .rail-layout .to-contents { display: none; }
 }
 /*
  * The title and its address, one flex item in a card heading's row.
@@ -976,10 +1019,12 @@ tr.series-break > td {
  * says every transition and not every animation.
  */
 @media (prefers-reduced-motion: reduce) {
-  .section-anchor { transition: none; }
+  .section-anchor,
+  .to-contents { transition: none; }
 }
 /* Never hidden on focus: this is how a keyboard reader finds a section address at all. */
-.section-anchor:focus-visible {
+.section-anchor:focus-visible,
+.to-contents:focus-visible {
   color: var(--text-primary);
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
@@ -2748,6 +2793,25 @@ footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); 
  */
 #district-table th[scope="row"] a { text-decoration-color: var(--border-control); }
 #district-table tr[hidden] { display: none; }
+/*
+ * Each figure names its column on a phone (#594), since the head is a 39,000px scroll away and
+ * cannot stick — `districts.astro` says why. The name sits over the figure, muted and small, so
+ * "640 $12,148" reads as an enrollment and an aid figure and the eye still runs down the figures.
+ *
+ * The second `content` gives the label empty alternative text: a screen reader already hears the
+ * column's head with each cell, and would otherwise hear it twice. An engine without the syntax
+ * drops that declaration and keeps the first.
+ */
+@media (max-width: 699.98px) {
+  #district-table td::before {
+    content: attr(data-label);
+    content: attr(data-label) / "";
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+}
 /* A sort control is a button in a header cell, so it is reachable by keyboard and announces. */
 #district-table thead button {
   font: inherit;
