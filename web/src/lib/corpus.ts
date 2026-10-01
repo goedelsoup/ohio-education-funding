@@ -267,18 +267,21 @@ export interface Section {
 /**
  * One decision record: why the repository is shaped the way it is, including where it was wrong.
  *
- * # Why there is no title field
+ * # Why the title is derived
  *
- * Because the corpus does not write one, and inventing one here would be worse than using what it
- * does write. A node carries `label:` and a catalog entry carries a `# ` heading; a decision
- * record carries only `id`, and every reference to one in corpus prose is the slug in code font —
- * ``[`the-order-was-never-the-states`](…)``. So the slug is the title, shown the way the corpus
- * already shows it, and {@link summary} is the sentence underneath. Sentence-casing the slug would
- * turn `the-three-streams-of-mr81` into "The three streams of mr81".
+ * A node carries `label:` and a catalog entry carries a `# ` heading; a decision record carries
+ * only `id`. The slug used to be the title, in monospace, on the ground that corpus prose cites a
+ * record that way — ``[`the-order-was-never-the-states`](…)``. Read as a page, though, a mono
+ * slug heading every record and every row of the index is a file listing (#579), and the slugs
+ * are already sentences: `the-four-kinds-of-parameter` is "The four kinds of parameter". So
+ * {@link title} is the slug as words, by {@link decisionTitle}, and the slug stays on the page as
+ * a small meta line for whoever wants to cite it.
  */
 export interface Decision {
   /** File stem, which is also `id:` in the record and the URL. */
   slug: string;
+  /** What a reader is shown: {@link slug} as a sentence-case title. */
+  title: string;
   /** The record's own one-paragraph statement of what it decided. Markdown. */
   summary: string;
   /** Every prose field the record carries, in the order they are meant to be read. */
@@ -955,8 +958,10 @@ function readDecision(file: string, report: Diagnostic[]): Decision {
   })).filter((section) => section.body !== "");
 
   const summary = text("summary");
+  const slug = file.replace(/\.yml$/, "");
   return {
-    slug: file.replace(/\.yml$/, ""),
+    slug,
+    title: decisionTitle(slug),
     summary,
     sections,
     linkText: [summary, ...sections.map((s) => s.body)].join("\n\n"),
@@ -1278,7 +1283,7 @@ export function loadCorpus(): Corpus {
   for (const decision of decisions) {
     scanCitations(decision.linkText, FROM_DECISION, {
       id: `decision/${decision.slug}`,
-      label: decision.slug,
+      label: decision.title,
       href: routes.wikiDecision(decision.slug),
     });
   }
@@ -1295,8 +1300,12 @@ export function loadCorpus(): Corpus {
       if (!isSource(edge.href)) continue;
       const source = bySlug.get(edge.href.slice("/wiki/source/".length));
       // A stated `sourced-from` link reaches here named by its file stem, which is a key: the
-      // entry's own heading is what a reader is shown for it everywhere else (#551).
-      if (source && edge.label === source.slug) edge.label = source.title;
+      // entry's own heading is what a reader is shown for it everywhere else (#551). A link in
+      // prose can be named by a key too — "the [`bls-cpi`](…) connector" — and as an "Also
+      // mentions" pill it has lost the sentence that made that read as a citation (#579).
+      if (source && (edge.label === source.slug || /^[a-z0-9]+(-[a-z0-9]+)+$/.test(edge.label))) {
+        edge.label = source.title;
+      }
       source?.citedBy.push({
         id: node.id,
         label: node.label,
@@ -1362,6 +1371,30 @@ export function loadCorpus(): Corpus {
     byDecision,
   };
   return cached;
+}
+
+/**
+ * The words in a decision slug that sentence case gets wrong, spelled the way the corpus prints
+ * them. A slug is lower case by construction, so a proper noun or an initialism in one has lost
+ * its capitals; this puts them back. `decisionTitle.spec.ts` holds every slug in the corpus to a
+ * title, so a new record whose slug needs a word here fails there rather than shipping "mr81".
+ */
+const DECISION_WORDS: Record<string, string> = {
+  greenbook: "Greenbook",
+  jvsd: "JVSD",
+  mr81: "MR-81",
+  ohio: "Ohio",
+};
+
+/**
+ * A decision record's title, from its slug: hyphens become spaces, the first letter is capitalised,
+ * and the words in {@link DECISION_WORDS} take their printed form — `the-three-streams-of-mr81` is
+ * "The three streams of MR-81".
+ */
+export function decisionTitle(slug: string): string {
+  const words = slug.split("-").map((word) => DECISION_WORDS[word] ?? word);
+  const text = words.join(" ");
+  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 /**

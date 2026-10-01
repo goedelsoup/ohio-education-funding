@@ -731,7 +731,8 @@ export function summarize(markdown: string, max: number): string {
     text = text.replace(claim, "");
   }
 
-  text = text.replace(/\s+/g, " ").trim();
+  // A tag removed from the end of a clause leaves its space behind: "under the formula ."
+  text = text.replace(/\s+/g, " ").replace(/ ([.,;:!?])/g, "$1").trim();
   if (text.length <= max) return text;
 
   // Cut on a word boundary, and only claim an elision when there was one.
@@ -739,4 +740,23 @@ export function summarize(markdown: string, max: number): string {
   const space = cut.lastIndexOf(" ");
   const kept = space > max * 0.6 ? cut.slice(0, space) : cut;
   return `${kept.replace(/[\s,;:.—–-]+$/, "")}…`;
+}
+
+/**
+ * The first sentence of corpus markdown, as plain text — for a cell that defines something (#579).
+ *
+ * A class description opens with what the class *is* and then argues for its foundational type:
+ * "It is a Phase rather than a Kind". {@link summarize} cut every one of the eighteen at 180
+ * characters, which landed each in the middle of that argument — an ellipsis after "It is an", and
+ * ontology vocabulary shown to a reader who came for a definition. The first sentence is the
+ * definition in every class, so the cell ends where the author ended it.
+ *
+ * A full stop ends a sentence only before a space and a capital, and not after a dotted initialism
+ * or an abbreviation the corpus writes mid-sentence — "U.S. Department", "DeRolph v. State". A lone
+ * capital does end one: `revenue-stream`'s definition closes on "federal Title I."
+ */
+export function firstSentence(markdown: string): string {
+  const text = summarize(markdown, Infinity);
+  const end = /(?<!\.[A-Z]|\b(?:v|vs|e\.g|i\.e|No|St))[.!?](?=\s+[A-Z“"(])/.exec(text);
+  return end ? text.slice(0, end.index + 1) : text;
 }

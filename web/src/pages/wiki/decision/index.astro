@@ -65,9 +65,7 @@ const withdrawals = decisions.reduce((sum, decision) => sum + decision.correctio
             ranked.map((decision) => (
               <tr>
                 <th>
-                  <a href={routes.wikiDecision(decision.slug)}>
-                    <code>{decision.slug}</code>
-                  </a>
+                  <a href={routes.wikiDecision(decision.slug)}>{decision.title}</a>
                   <span class="row-note">{summarize(decision.summary, 200)}</span>
                 </th>
                 <td>

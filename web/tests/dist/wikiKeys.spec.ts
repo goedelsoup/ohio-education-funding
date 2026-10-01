@@ -94,3 +94,88 @@ test("the check bites on a class page's relationship table and a pointed-at-by c
   cell!.textContent = "sets";
   expect(keysIn(document.toString())).toContain("sets");
 });
+
+/*
+ * #579: the same rule for the names a page is headed and linked by. `SNAKE` above is a property
+ * key's shape, and a decision record's slug is not one — `the-four-kinds-of-parameter` is
+ * hyphenated — so every decision page was headed by its slug, every row of `/wiki/decision`
+ * linked by one, and the check passed them all.
+ *
+ * A slug inside rendered corpus prose is the author's citation idiom — the corpus cites a node or
+ * a record as ``[`bridge-formula`](…)`` throughout — and is left alone as #551 leaves a key in
+ * prose alone. Prose renders into `.prose-body` and, for a property's value, into the row's data
+ * cell; 61 such citations sit in property cells. What is held is what a template chose to print:
+ * the title, the `h1`, a pill, a row heading, a crumb.
+ */
+
+/** A hyphenated slug: a node, catalog entry or decision record by its file stem. */
+const KEBAB = /^[a-z0-9]+(-[a-z0-9]+)+$/;
+
+/** Every wiki page, the catalog and the decisions included. */
+const LIBRARY = pages(join(DIST, "wiki"));
+
+/** The title, the `h1`, and every link outside rendered prose and property values, as text. */
+function names(html: string): string[] {
+  const { document } = parseHTML(html);
+  const headings = [...document.querySelectorAll("title, h1")];
+  const links = [...document.querySelectorAll("a")].filter((a) => !a.closest(".prose-body, td, code, pre"));
+  return [...headings, ...links].map((element) => (element.textContent ?? "").replace(/\s+/g, " ").trim());
+}
+
+const slugsIn = (html: string): string[] => names(html).filter((text) => KEBAB.test(text));
+
+test("no Library page is headed or linked by a slug", () => {
+  expect(LIBRARY.length).toBeGreaterThan(250);
+  expect(LIBRARY.filter((file) => file.includes("/wiki/decision/")).length).toBeGreaterThan(50);
+  const printed: string[] = [];
+  for (const file of LIBRARY) {
+    for (const slug of slugsIn(readFileSync(file, "utf8"))) printed.push(`${relative(DIST, file)}: ${slug}`);
+  }
+  expect(printed).toEqual([]);
+});
+
+test("the check bites on a decision's heading, the decision index and a front-door pill", () => {
+  const record = readFileSync(join(DIST, "wiki/decision/the-four-kinds-of-parameter.html"), "utf8");
+  expect(slugsIn(record)).toEqual([]);
+  expect(record).toContain("<h1>The four kinds of parameter</h1>");
+  const doctoredRecord = record.replace(
+    "<h1>The four kinds of parameter</h1>",
+    "<h1>the-four-kinds-of-parameter</h1>",
+  );
+  expect(slugsIn(doctoredRecord)).toEqual(["the-four-kinds-of-parameter"]);
+
+  const index = readFileSync(join(DIST, "wiki/decision.html"), "utf8");
+  const doctoredIndex = index.replace(">The three streams of MR-81</a>", ">the-three-streams-of-mr81</a>");
+  expect(doctoredIndex).not.toBe(index);
+  expect(slugsIn(doctoredIndex)).toEqual(["the-three-streams-of-mr81"]);
+
+  // A citation in prose is exempt, and stays exempt: the exemption is not what is letting the
+  // doctored cases through.
+  const prose = '<div class="prose-body"><a href="/wiki/decision/kuten"><code>kuten-x</code></a></div>';
+  expect(slugsIn(prose)).toEqual([]);
+  expect(slugsIn(prose.replace('class="prose-body"', 'class="flags"'))).toEqual(["kuten-x"]);
+});
+
+/** The foundational types a class description argues for once it has defined the class. */
+const ONTOLOGY_TYPE = /\b(Kind|Phase|Event|Role|Quality|Relator|Situation)\b/;
+
+/** The definition cell of every row in `/wiki`'s class table. */
+function blurbs(html: string): string[] {
+  const { document } = parseHTML(html);
+  return [...document.querySelectorAll("#classes td")].map((td) => (td.textContent ?? "").trim());
+}
+
+const unclean = (html: string): string[] =>
+  blurbs(html).filter((text) => !/[.!?]$/.test(text) || text.endsWith("…") || ONTOLOGY_TYPE.test(text));
+
+test("every class on /wiki is defined in a whole sentence, without the ontology's vocabulary", () => {
+  const html = readFileSync(join(DIST, "wiki.html"), "utf8");
+  expect(blurbs(html).length).toBe(loadCorpus().classes.length);
+  expect(unclean(html)).toEqual([]);
+
+  // The cell as it rendered before #579.
+  const before = "A named statewide method for distributing state aid to education agencies, holding for a bounded span of fiscal periods before being replaced. It is a Phase rather than a…";
+  const doctored = html.replace(/(<td>)A named statewide method[^<]*(<\/td>)/, `$1${before}$2`);
+  expect(doctored).not.toBe(html);
+  expect(unclean(doctored)).toEqual([before]);
+});
