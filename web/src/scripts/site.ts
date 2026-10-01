@@ -81,11 +81,21 @@ if (location.pathname === "/" && location.hash.length > 1) {
  * a browser will not do unaided is close one when another opens, when Escape is pressed, or when
  * the reader clicks elsewhere — three behaviours a menu is expected to have and none of which it
  * is broken without. A reader with this script off gets two menus open at once.
+ *
+ * `data-menu` enrols a disclosure outside the header that floats over the page the same way —
+ * the reach view's county picker (#603), which no click outside used to close.
  */
-const menus = [...document.querySelectorAll<HTMLDetailsElement>("header.site nav details.menu")];
+const menus = [
+  ...document.querySelectorAll<HTMLDetailsElement>("header.site nav details.menu, details[data-menu]"),
+];
 
 const closeMenus = (except?: HTMLDetailsElement) => {
   for (const menu of menus) if (menu !== except) menu.open = false;
+};
+
+/** Every menu that does not hold `target` closes, and the one that does stays as it is. */
+const closeMenusOutside = (target: EventTarget | null) => {
+  for (const menu of menus) if (!(target instanceof Node && menu.contains(target))) menu.open = false;
 };
 
 for (const menu of menus) {
@@ -107,18 +117,16 @@ if (menus.length > 0) {
     open.querySelector("summary")?.focus();
   });
 
-  document.addEventListener("click", (event) => {
-    const target = event.target;
-    if (target instanceof Node && menus.some((menu) => menu.contains(target))) return;
-    closeMenus();
-  });
+  document.addEventListener("click", (event) => closeMenusOutside(event.target));
 
-  // Tabbing out of a menu closes it, which is what a sighted keyboard reader expects to see.
-  document.addEventListener("focusin", (event) => {
-    const target = event.target;
-    if (target instanceof Node && menus.some((menu) => menu.contains(target))) return;
-    closeMenus();
-  });
+  /*
+   * Tabbing out of a menu closes it, which is what a sighted keyboard reader expects to see.
+   *
+   * Out of *that* menu, not out of every menu (#603). This returned early whenever focus landed
+   * in any menu, and the next summary along is in one: Tab from inside an open `Places` to the
+   * `Analysis` summary left `Places` open, and opening `Analysis` then drew its panel over it.
+   */
+  document.addEventListener("focusin", (event) => closeMenusOutside(event.target));
 }
 
 /**

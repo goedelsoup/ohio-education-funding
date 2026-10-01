@@ -282,6 +282,27 @@ test.describe("reach", () => {
     await expect(page.locator('[data-part="positions"] .legend .sw[data-series=muted]')).toHaveCount(1);
   });
 
+  test("the county picker opens over the plot and closes on a click outside it", async ({ page }) => {
+    /*
+     * #603. Open, its list pushed the plot about 350px down the page, and nothing but its own
+     * summary closed it. It floats now, as the header's menus do, and `site.ts` closes it the way
+     * it closes theirs.
+     */
+    await page.goto("/scenario/reach");
+    await booted(page);
+    const counties = page.locator("#rv-counties");
+    const plot = page.locator('[data-chart="positions"]');
+    const before = (await plot.boundingBox())!.y;
+
+    await counties.locator("summary").click();
+    await expect(counties).toHaveAttribute("open", "");
+    await expect(counties.locator(".scope-list")).toBeVisible();
+    expect((await plot.boundingBox())!.y, "opening the list does not move the plot").toBe(before);
+
+    await page.locator("h1").click();
+    await expect(counties).not.toHaveAttribute("open", "");
+  });
+
   test("every count a reader reads as an answer is restated against the selection", async ({
     page,
   }) => {
