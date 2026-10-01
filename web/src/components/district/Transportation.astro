@@ -70,7 +70,7 @@ const shortfall = t.special_education_unprorated - t.special_education;
           )
         }
         <tr class={t.efficiency <= 0 ? "n" : undefined}><th>Efficiency supplement</th>
-          <td class="tnum">{t.efficiency <= 0 ? "—" : money(t.efficiency)}</td>
+          <td class="tnum">{money(t.efficiency)}</td>
           <td class="n">{
             t.efficiency > 0
               ? `Up to 15% more for filling buses. Its index is ${fixed(t.efficiency_index, 4)}${
@@ -79,7 +79,7 @@ const shortfall = t.special_education_unprorated - t.special_education;
               : `Its riders-per-bus index of ${fixed(t.efficiency_index, 4)} is below the 1.0 this starts at.`
           }</td></tr>
         <tr class={t.density <= 0 ? "n" : undefined}><th>Density supplement</th>
-          <td class="tnum">{t.density <= 0 ? "—" : money(t.density)}</td>
+          <td class="tnum">{money(t.density)}</td>
           <td class="n">{
             t.density > 0
               ? `Paid for sparseness: ${fixed(t.district_density, 1)} riders a square mile against

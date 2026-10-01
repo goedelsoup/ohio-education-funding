@@ -80,7 +80,7 @@ const beyond = Math.max(lost - t.open_enrollment_threshold, 0);
               ? "The base, less the clawback, less what the formula computes."
               : "The formula reaches its FY2021 base, so this pays nothing."
           }</span></th>
-          <td class="tnum">{d.guarantee <= 0 ? "—" : money(d.guarantee)}</td></tr>
+          <td class="tnum">{money(d.guarantee)}</td></tr>
         {
           supplement && (
             <tr class="current"><th><a href={routes.wikiNode(

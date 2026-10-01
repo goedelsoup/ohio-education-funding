@@ -78,7 +78,7 @@ const share = total / (total + d.base_cost_state_share);
           {parts.map(([label, value, note, node]) => (
             <tr class={value <= 0 ? "n" : undefined}>
                 <th><a href={routes.wikiNode("formula-component", node)}>{label}</a>{note ? <div class="n">{note}</div> : ""}</th>
-                <td class="tnum">{value <= 0 ? "—" : money(value)}</td>
+                <td class="tnum">{money(value)}</td>
                 <td class="tnum n">{value <= 0 ? "" : pct(value / total, 1)}</td>
               </tr>
           ))}

@@ -102,7 +102,7 @@ const valuationByIrn = new Map(
         <tr><th>Categorical funding</th><td class="tnum">{money(house.categorical_funding)}</td>
           <td class="n">Targeted assistance, special education, DPIA, gifted, CTE, English learners.</td></tr>
         <tr><th>Guarantee</th>
-          <td class="tnum">{house.guarantee <= 0 ? "—" : money(house.guarantee)}</td>
+          <td class="tnum">{money(house.guarantee)}</td>
           <td class="n">{house.guarantee <= 0
             ? "No district here is held above its formula amount."
             : "Aid the formula does not justify, held in place by the transitional guarantee."}</td></tr>

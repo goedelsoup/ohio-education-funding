@@ -12,7 +12,8 @@ import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 
 import { firstOf, lastOf } from "../../src/lib/ends.ts";
-import { compactMoney, fixed, pct, sig, signed } from "../../src/lib/format.ts";
+import * as format from "../../src/lib/format.ts";
+import { compactMoney, fixed, NOT_REPORTED, pct, reported, sig, signed } from "../../src/lib/format.ts";
 
 describe("fixed", () => {
   test("groups thousands and keeps its places", () => {
@@ -153,4 +154,59 @@ test("the renderers #503 migrated format no number by hand", () => {
     }
   }
   expect(offenders, "use `fixed`, `signed` or `count` from src/lib/format.ts").toEqual([]);
+});
+
+describe("zero is not missing", () => {
+  /*
+   * "—" meant $0 under one column of /districts and "no figure" under the next (#597). A zero is a
+   * value and is written as one; only the null branch writes a placeholder.
+   */
+  test("no formatter writes a zero as the dash", () => {
+    const zeros = {
+      money: format.money(0),
+      signedMoney: format.signedMoney(0),
+      millions: format.millions(0),
+      compactMoney: format.compactMoney(0),
+      sig: format.sig(0),
+      pct: format.pct(0),
+      logError: format.logError(0),
+      fixed: format.fixed(0, 2),
+      signed: format.signed(0, 2),
+      count: format.count(0),
+      reported: format.reported(0, format.money),
+    };
+    // Every number formatter `format.ts` exports is in the table, so a new one cannot skip it.
+    const NOT_NUMBERS = ["ordinal", "percentileOf", "escapeHtml", "fig", "NOT_REPORTED"];
+    expect(Object.keys(format).filter((k) => !NOT_NUMBERS.includes(k)).sort()).toEqual(
+      Object.keys(zeros).sort(),
+    );
+    for (const [name, text] of Object.entries(zeros)) {
+      expect(text, name).not.toContain("—");
+      expect(text, name).not.toBe(NOT_REPORTED);
+    }
+    expect(zeros.money).toBe("$0");
+    expect(zeros.pct).toBe("0.0%");
+  });
+
+  test("a missing value is not reported, in words", () => {
+    expect(reported(null, format.money)).toBe("not reported");
+    expect(reported(undefined, format.money)).toBe("not reported");
+    expect(reported(Number.NaN, (v) => pct(v, 1))).toBe("not reported");
+    expect(reported(0.123, (v) => pct(v, 1))).toBe("12.3%");
+  });
+
+  test("no renderer writes a dash for a zero it tested for", () => {
+    /*
+     * `x <= 0 ? "—" : money(x)` was the pattern, in eleven cells across nine files. It sent a zero
+     * past `money` into a dash of its own, so this holds the source rather than the formatter.
+     */
+    const SRC = join(import.meta.dirname, "../../src");
+    const files = readdirSync(SRC, { recursive: true, encoding: "utf8" }).filter((name) =>
+      /\.(astro|ts)$/.test(name),
+    );
+    expect(files.length).toBeGreaterThan(100);
+    const ZERO_AS_DASH = /(?:<=?|===?)\s*0\s*\?\s*"—"/;
+    const offenders = files.filter((name) => ZERO_AS_DASH.test(readFileSync(join(SRC, name), "utf8")));
+    expect(offenders, "write the zero through `money`; a missing value through `reported`").toEqual([]);
+  });
 });
