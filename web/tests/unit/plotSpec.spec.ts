@@ -10,6 +10,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
+import { parseHTML } from "linkedom";
 import { expect, test } from "vitest";
 
 import type {
@@ -17,6 +18,7 @@ import type {
   FanPoint,
   Fit,
   Place,
+  Range,
   Rank,
   ScatterPoint,
   SeriesPoint,
@@ -30,6 +32,7 @@ import {
   MAX_SCALE,
   panelWidth,
   planeSpec,
+  rangeSpec,
   rankSpec,
   scatterSpec,
   seriesSpec,
@@ -620,9 +623,15 @@ test("every dot is named on the picture, and no two names are drawn on top of ea
     const spec = planeSpec(rules(), PLANE_AXES, { width, ...PLANE_FRAME })!;
     const svg = renderToString(() => spec, "presentational");
     const labels = [...svg.matchAll(/class="plane-label"[^>]*>([\s\S]*?)<\/g>/g)];
-    const drawn = labels.flatMap((match) => [...match[1]!.matchAll(/<text[^>]*>([^<]*)<\/text>/g)]);
-    expect(drawn.map((m) => m[1]), `${width}px draws all seven names once`).toHaveLength(
-      rules().length * 2,
+    // A name broken in two is one `text` of two `tspan`s, and reads back as the name it was.
+    const drawn = labels.flatMap((match) =>
+      [...match[1]!.matchAll(/<text[^>]*>([\s\S]*?)<\/text>/g)].map((m) =>
+        m[1]!.replace(/<tspan[^>]*>/g, " ").replace(/<\/tspan>/g, "").trim(),
+      ),
+    );
+    expect(drawn, `${width}px draws all seven names once`).toHaveLength(rules().length * 2);
+    expect(new Set(drawn), `${width}px draws each name whole`).toEqual(
+      new Set(rules().map((rule) => rule.label)),
     );
   }
 });
@@ -814,4 +823,160 @@ test("the scale row under a strip is capped where the drawing above it is", () =
     // Print shows the wide drawing whatever the width, and the row follows it.
     [WIDTHS.wide, MAX_SCALE],
   ]);
+});
+
+/**
+ * Every text mark in one drawing that would be painted past its viewBox, with how far.
+ *
+ * The browser measures this in `charts.spec.ts`; here there is no font, so a line is taken at
+ * 0.667em a character — `EM_PER_CHAR` in `spec.ts`, the ninetieth percentile of what this site's
+ * marks actually paint at — and a line box at 0.8em above its baseline and 0.25em below. Plot's
+ * own output is read rather than the spec, so a translate on a group, a `dy`, a text anchor and a
+ * wrapped `tspan` are all counted where they land. Loose enough to pass a label that fits, and
+ * tight enough to fail the 139 units the TTAG plane's y title ran past its own panel.
+ */
+function overruns(svg: string): string[] {
+  const { document } = parseHTML(`<!doctype html><html><body>${svg}</body></html>`);
+  const root = document.querySelector("svg")!;
+  const [, , width, height] = root.getAttribute("viewBox")!.split(" ").map(Number) as [
+    number,
+    number,
+    number,
+    number,
+  ];
+  const inherited = (el: Element, name: string): string | null =>
+    el.closest(`[${name}]`)?.getAttribute(name) ?? null;
+  const em = (value: string | null, size: number) =>
+    value == null ? 0 : value.endsWith("em") ? parseFloat(value) * size : parseFloat(value);
+  const out: string[] = [];
+  for (const text of root.querySelectorAll("text")) {
+    let x = 0;
+    let y = 0;
+    for (let el: Element | null = text; el && el !== root; el = el.parentElement) {
+      const t = /translate\(([-\d.]+),\s*([-\d.]+)\)/.exec(el.getAttribute("transform") ?? "");
+      if (t) {
+        x += Number(t[1]);
+        y += Number(t[2]);
+      }
+    }
+    const size = Number(inherited(text, "font-size") ?? 10);
+    const anchor = inherited(text, "text-anchor") ?? "start";
+    const spans = [...text.querySelectorAll("tspan")];
+    const lines = spans.length > 0 ? spans.map((s) => s.textContent ?? "") : [text.textContent ?? ""];
+    const w = Math.max(...lines.map((line) => line.trim().length)) * 0.667 * size;
+    const left = x - (anchor === "end" ? w : anchor === "middle" ? w / 2 : 0);
+    // Baselines: the first line's `y`, and each later line one `dy` below the last.
+    let baseline = y + em(spans[0]?.getAttribute("y") ?? text.getAttribute("y"), size);
+    const first = baseline;
+    for (const span of spans.slice(1)) baseline += em(span.getAttribute("dy"), size);
+    const box = { left, right: left + w, top: first - 0.8 * size, bottom: baseline + 0.25 * size };
+    const over = Math.max(-box.left, box.right - width, -box.top, box.bottom - height);
+    if (over > 0.5) out.push(`"${lines.join(" / ").trim()}" by ${over.toFixed(1)}`);
+  }
+  return out;
+}
+
+/** The one drawing a fixed-width builder makes, out of the pair `renderToString` returns. */
+function drawingAt(build: () => Spec | null): string {
+  const svg = /<svg\b[\s\S]*?<\/svg>/.exec(renderToString(build, "presentational"));
+  expect(svg, "the builder drew something").not.toBeNull();
+  return svg![0];
+}
+
+/** An axis name as long as the TTAG plane's, which is 85 characters. */
+const LONG_AXIS =
+  "The per-pupil term: the FY2027 formula against the FY2020 regime, per pupil, in logs too";
+
+test("an axis name as long as a sentence wraps inside the drawing at every width it is drawn at", () => {
+  /*
+   * #608. The dropped foot line was given "the whole width" and had the width less `marginLeft`;
+   * the scatter's and the plane's y titles were single lines. On the TTAG node's two-panel plane
+   * the left panel's y title ran 139 units into the right panel and its x title 51, and on `/bounds`
+   * at 375 the rank chart's axis name started 173px in and ended past the viewport.
+   */
+  expect(LONG_AXIS.length).toBeGreaterThanOrEqual(85);
+  const axis = { label: LONG_AXIS, format: (v: number) => String(v) };
+  for (const width of [WIDTHS.narrow, panelWidth(2)]) {
+    const rank = drawingAt(() => rankSpec(census([554, 499, 43, 1, 0]), axis, { width }));
+    const scatter = drawingAt(() =>
+      scatterSpec(cloud([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]), { x: axis, y: axis }, [], { width }),
+    );
+    const plane = drawingAt(() =>
+      planeSpec(rules(), { x: axis, y: axis }, { width, ...PLANE_FRAME }),
+    );
+    expect(overruns(rank), `rank at ${width}`).toEqual([]);
+    expect(overruns(scatter), `scatter at ${width}`).toEqual([]);
+    expect(overruns(plane), `plane at ${width}`).toEqual([]);
+  }
+});
+
+test("a wrapped axis name costs the margin its lines take, so the frame moves rather than the type", () => {
+  // The top margin grows by a line per line of the y title and the foot by one per line of the
+  // dropped x name, so nothing written above or below the frame is drawn into it.
+  const short = { label: "Spending", format: (v: number) => String(v) };
+  const long = { label: LONG_AXIS, format: (v: number) => String(v) };
+  const at = (axes: { x: typeof short; y: typeof short }) =>
+    planeSpec(rules(), axes, { width: WIDTHS.narrow, ...PLANE_FRAME })!.options;
+  const plain = at({ x: short, y: short });
+  const wrapped = at({ x: long, y: long });
+  expect(wrapped.marginTop! - plain.marginTop!).toBeGreaterThan(0);
+  expect((wrapped.marginTop! - plain.marginTop!) % 14).toBe(0);
+  expect(wrapped.marginBottom! - plain.marginBottom!).toBeGreaterThan(16);
+  expect((wrapped.marginBottom! - plain.marginBottom!) % 16).toBe(0);
+});
+
+test("a range row is its full height at any count, with the foot added rather than taken out", () => {
+  /*
+   * `height` was `rows × 14` with the foot's 22 units subtracted from it, so a six-row chart left
+   * 10.3 units a row for 10-unit names and they ran into each other — 4.5px at 375 on the
+   * base-cost node. Eighty-four rows hid it, which is why `/counties` never showed it.
+   */
+  const axis = { label: "Pupils", format: (v: number) => String(v) };
+  for (const n of [3, 6, 84]) {
+    const rows: Range[] = Array.from({ length: n }, (_, i) => ({
+      label: `row ${i}`,
+      low: 100 + i,
+      high: 200 + i * 3,
+      hover: `row ${i}`,
+    }));
+    for (const width of [WIDTHS.narrow, WIDTHS.wide]) {
+      const { height, marginTop, marginBottom } = rangeSpec(rows, axis, { width })!.options;
+      expect((height! - (marginTop ?? 0) - marginBottom!) / n, `${n} rows at ${width}`).toBeGreaterThanOrEqual(14);
+    }
+  }
+});
+
+test("a rank row is its full height at any count, as a range row is", () => {
+  const { height, marginTop, marginBottom } = rankSpec(census([9, 3, 1]), COUNT, W)!.options;
+  expect((height! - (marginTop ?? 0) - marginBottom!) / 3).toBeGreaterThanOrEqual(16);
+});
+
+test("a name with no room beside its mark is broken in two rather than drawn off the drawing", () => {
+  /*
+   * At the narrow width `[M] mirrored beside [L], [M], [O]` is 33 characters, about 242 units,
+   * in a 218-unit frame: it fits at none of the four offsets. The placer fell through to the first
+   * of them, drew it rightward from a mark at the frame's right edge, and the SVG cut it to
+   * `[M] mirrored beside [L], [`.
+   */
+  const long = "[M] mirrored beside [L], [M], [O]";
+  expect(long).toHaveLength(33);
+  const places: Place[] = [
+    ...rules(),
+    { label: long, x: PLANE_FRAME.xDomain[1], y: 30e6, hover: "beside all three" },
+  ];
+  for (const width of [WIDTHS.narrow, panelWidth(2), WIDTHS.wide]) {
+    const svg = drawingAt(() => planeSpec(places, PLANE_AXES, { width, ...PLANE_FRAME }));
+    expect(overruns(svg), `${width}px`).toEqual([]);
+  }
+});
+
+test("a panel is never drawn at the width of a whole chart", () => {
+  // `panelWidth(1)` is the wide frame, and a one-panel spread drawn once at it was the 640
+  // drawing on a phone. `renderToString` is the route for a chart with no sibling.
+  const series = (w: number) =>
+    seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", { width: w, tick: (at) => `${at}` });
+  expect(() => renderPanelToString(() => series(panelWidth(1)), "presentational", panelWidth(1))).toThrow(
+    /renderToString/,
+  );
+  expect(renderPanelToString(() => series(panelWidth(2)), "presentational", panelWidth(2))).toContain("<svg");
 });

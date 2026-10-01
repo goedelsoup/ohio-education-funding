@@ -516,6 +516,68 @@ function textPx(text: string, fontSize = 11): number {
 }
 
 /**
+ * A string broken into lines that each hold to `px` pixels of drawn text, at word boundaries.
+ *
+ * Not Plot's `lineWidth`, for the one place that option cannot serve: the caller has to know how
+ * many lines came out, because each one costs margin. Plot wraps against its own width table and
+ * does not say what it decided, so a margin sized beside it is a second estimate of the same
+ * thing, and the two disagree on exactly the labels long enough to matter. The lines are joined
+ * with `\n` by the caller, which Plot draws as one `tspan` each, so the count here is the count
+ * drawn. A single word wider than the budget is left whole: cutting it would print a fragment.
+ */
+function wrapText(text: string, px: number, fontSize = 11): string[] {
+  const lines: string[] = [];
+  let line = "";
+  for (const word of text.split(/\s+/).filter(Boolean)) {
+    const next = line ? `${line} ${word}` : word;
+    if (line && textPx(next, fontSize) > px) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = next;
+    }
+  }
+  if (line) lines.push(line);
+  return lines.length > 0 ? lines : [""];
+}
+
+/** The extra drop per wrapped line of a y-axis title: 11px type and the clear space under it. */
+const TITLE_LINE = 14;
+
+/**
+ * The y-axis title a cloud or a plane prints above its frame, wrapped to the drawing.
+ *
+ * It sits at the left edge and runs right, over the frame, and was one line: on the two-panel TTAG
+ * plane the left panel's title ran 139 units past its own SVG and across its neighbour's. Wrapped
+ * to the whole width less 4 units each side, and the frame moves down by a line for every line
+ * past the first, so the top of the title stays where a one-line title has always been.
+ */
+function yTitle(width: number, marginLeft: number, label: string, marginTop: number) {
+  const lines = wrapText(label, width - 8);
+  const extra = (lines.length - 1) * TITLE_LINE;
+  /*
+   * Plot sets a top-anchored text's first baseline at `0.71 × lineHeight` em, so a spacing given
+   * to the lines moves the first one down with them — 2.1 units here, which put every title
+   * through the y-axis maximum printed under it. A one-line title is given no spacing and is
+   * drawn exactly where it was; a wrapped one is lifted by what the spacing moved it.
+   */
+  const lift = lines.length > 1 ? 0.71 * (TITLE_LINE - 11) : 0;
+  return {
+    marginTop: marginTop + extra,
+    mark: Plot.text([0], {
+      frameAnchor: "top-left",
+      dx: -marginLeft + 4,
+      dy: -12 - extra - lift,
+      text: () => lines.join("\n"),
+      textAnchor: "start",
+      ...(lines.length > 1 ? { lineHeight: TITLE_LINE / 11 } : {}),
+      fill: INK.muted,
+      fontSize: 11,
+    }),
+  };
+}
+
+/**
  * The annotation along the foot of a chart: an end of the scale at each corner, and between them
  * the one sentence the chart has to say about itself.
  *
@@ -566,6 +628,9 @@ function axisFoot(options: {
       frameAnchor: anchor,
       dy: y,
       text: () => text,
+      // A bottom anchor stacks a wrapped string upward from its last line, which is what the
+      // dropped line's `dy` is measured to. Spaced at `line` so each one keeps its clear space.
+      lineHeight: line / 11,
       ...(anchor === "bottom-left" ? { textAnchor: "start" as const } : {}),
       ...(anchor === "bottom-right" ? { textAnchor: "end" as const } : {}),
       fill: INK.muted,
@@ -582,18 +647,29 @@ function axisFoot(options: {
    *
    * Nudging it by half the margin difference would fix that panel and leave the next asymmetric
    * one to be discovered the same way, because the correction would be sized on an estimate of
-   * painted width and the estimate is the thing that was wrong. A line of its own has the whole
-   * width available and no reason to be centred in anything: anchored to the frame's left edge it
-   * sits under the low end of the scale it is talking about, and where it starts stops depending
-   * on which font the reader has.
+   * painted width and the estimate is the thing that was wrong. A line of its own has no reason to
+   * be centred in anything: anchored to the frame's left edge it sits under the low end of the
+   * scale it is talking about, and where it starts stops depending on which font the reader has.
+   *
+   * It does not have the whole width, though, and this said it did. It starts at `marginLeft`, so
+   * what it has is the width less that, and on a 311px panel an 85-character axis name ran 51
+   * units past the SVG. So it wraps to what it has, and every line past the first costs another
+   * `line` of bottom margin.
    */
+  if (fits) {
+    return {
+      marks: [at("bottom-left", dy, low), at("bottom-right", dy, high), at("bottom", dy, says)],
+      extraBottom: 0,
+    };
+  }
+  const lines = wrapText(says, width - marginLeft - 4);
   return {
     marks: [
       at("bottom-left", dy, low),
       at("bottom-right", dy, high),
-      fits ? at("bottom", dy, says) : at("bottom-left", dy + line, says),
+      at("bottom-left", dy + line * lines.length, lines.join("\n")),
     ],
-    extraBottom: fits ? 0 : line,
+    extraBottom: line * lines.length,
   };
 }
 
@@ -1091,7 +1167,8 @@ export function scatterSpec(
       ? 24 + Math.max(...labelledTraces.map((t) => t.label.length)) * 7.2
       : 24,
   );
-  const marginTop = 28;
+  const title = yTitle(width, marginLeft, axes.y.label + (axes.y.log ? " (log scale)" : ""), 28);
+  const marginTop = title.marginTop;
   const foot = axisFoot({
     width,
     marginLeft,
@@ -1349,15 +1426,7 @@ export function scatterSpec(
           fill: INK.muted,
           fontSize: 11,
         }),
-        Plot.text([0], {
-          frameAnchor: "top-left",
-          dx: -marginLeft + 4,
-          dy: -12,
-          text: () => axes.y.label + (axes.y.log ? " (log scale)" : ""),
-          textAnchor: "start",
-          fill: INK.muted,
-          fontSize: 11,
-        }),
+        title.mark,
 
         // The hit layer. Bigger than the mark and invisible, so a reader can point at a district
         // rather than at a 2.4px dot — and drawn last so it is above every other mark.
@@ -1416,13 +1485,32 @@ interface Box {
   bottom: number;
 }
 
-/** Where a label drawn at `at` would land, given its mark's position and its text. */
-function labelBox(at: LabelAt, px: number, py: number, text: string): Box {
+/** A direct label's offset and the lines it is drawn in: one, or the name broken in two. */
+interface Placement {
+  at: LabelAt;
+  lines: readonly string[];
+}
+
+/**
+ * How far a label's centre moves off its offset to keep a second line clear of its own mark.
+ *
+ * A wrapped label is drawn centred on its anchor, so above and below a dot it would grow back
+ * across the dot by half a line. Beside one it grows up and down evenly, which the dot's keep-out
+ * square already allows for.
+ */
+function labelShift(at: LabelAt, lines: number): number {
+  const half = ((lines - 1) * LABEL_LINE) / 2;
+  return at === "above" ? -half : at === "below" ? half : 0;
+}
+
+/** Where a label drawn at `at` would land, given its mark's position and its lines. */
+function labelBox(at: LabelAt, px: number, py: number, lines: readonly string[]): Box {
   const { dx, dy, textAnchor } = LABEL_AT[at];
-  const w = textPx(text);
+  const w = Math.max(...lines.map((line) => textPx(line)));
+  const h = LABEL_LINE * lines.length;
   const left = px + dx + (textAnchor === "start" ? 0 : textAnchor === "end" ? -w : -w / 2);
-  const top = py + dy - LABEL_LINE / 2;
-  return { left, top, right: left + w, bottom: top + LABEL_LINE };
+  const top = py + dy + labelShift(at, lines.length) - h / 2;
+  return { left, top, right: left + w, bottom: top + h };
 }
 
 /** How much of each other two boxes cover, in square pixels. Zero where they merely touch. */
@@ -1430,6 +1518,28 @@ function overlap(a: Box, b: Box): number {
   const w = Math.min(a.right, b.right) - Math.max(a.left, b.left);
   const h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
   return w > 0 && h > 0 ? w * h : 0;
+}
+
+/** How much of a box lies outside the frame, in square pixels. */
+function outside(box: Box, frame: Box): number {
+  return (box.right - box.left) * (box.bottom - box.top) - overlap(box, frame);
+}
+
+/**
+ * A name broken at the space nearest its middle, so the two lines are as near one length as the
+ * words allow. Null for a name of one word, which has nowhere to break.
+ */
+function halves(label: string): [string, string] | null {
+  const words = label.split(" ");
+  if (words.length < 2) return null;
+  let best: [string, string] | null = null;
+  for (let at = 1; at < words.length; at += 1) {
+    const pair: [string, string] = [words.slice(0, at).join(" "), words.slice(at).join(" ")];
+    if (!best || Math.max(...pair.map((l) => l.length)) < Math.max(...best.map((l) => l.length))) {
+      best = pair;
+    }
+  }
+  return best;
 }
 
 /**
@@ -1450,42 +1560,73 @@ function overlap(a: Box, b: Box): number {
  * which degrades a crowded frame rather than dropping a name out of it — a plane of seven named
  * policies with one unlabelled dot on it is worse than a tight one.
  *
+ * # Where no offset fits at all
+ *
+ * A name wider than the room beside its mark fits at none of the four, and the placer used to
+ * fall through to the first of them anyway — so on the narrow TTAG plane `[M] mirrored beside
+ * [L], [M], [O]` was drawn rightward from a mark near the right edge and cut at the SVG's, and
+ * `[M] mirrored inside [H]` landed on another dot's mark because the default was never costed.
+ * So a name with no clear place on one line is tried again broken in two, at all four offsets,
+ * and only where neither fits inside the frame does the placer settle for the candidate with the
+ * least of it outside. A cut name is the last resort rather than the default.
+ *
+ * The frame a label has is the drawing's width, not the plot's. The side margins are empty but for
+ * the y-axis's two ends, which the caller passes as `occupied`, and holding labels to the plot
+ * left `[M] mirrored inside [H]` with no clear place on the narrow TTAG plane: its one clear place
+ * is broken in two to the left of its mark, two units into a margin with nothing in it there.
+ *
  * Deterministic in the order the marks arrive, which is the manifest's order, so the same document
  * draws the same picture on every build.
  */
 function placeLabels(
   marks: readonly { label: string; px: number; py: number }[],
   frame: Box,
-): LabelAt[] {
-  const taken: Box[] = marks.map((m) => ({
-    left: m.px - DOT_KEEP_OUT,
-    top: m.py - DOT_KEEP_OUT,
-    right: m.px + DOT_KEEP_OUT,
-    bottom: m.py + DOT_KEEP_OUT,
-  }));
-  const out: LabelAt[] = [];
+  occupied: readonly Box[] = [],
+): Placement[] {
+  const taken: Box[] = [
+    ...occupied,
+    ...marks.map((m) => ({
+      left: m.px - DOT_KEEP_OUT,
+      top: m.py - DOT_KEEP_OUT,
+      right: m.px + DOT_KEEP_OUT,
+      bottom: m.py + DOT_KEEP_OUT,
+    })),
+  ];
+  const out: Placement[] = [];
   for (const mark of marks) {
-    let best: LabelAt = LABEL_ORDER[0]!;
+    const split = halves(mark.label);
+    const forms: (readonly string[])[] = [[mark.label], ...(split ? [split] : [])];
+    let best: Placement | null = null;
+    // The least-overlapping candidate inside the frame. One line is tried before two at every
+    // offset, so a name is broken only where whole it would collide or leave the frame.
     let least = Infinity;
-    for (const at of LABEL_ORDER) {
-      const box = labelBox(at, mark.px, mark.py, mark.label);
-      if (
-        box.left < frame.left ||
-        box.right > frame.right ||
-        box.top < frame.top ||
-        box.bottom > frame.bottom
-      ) {
-        continue;
+    search: for (const lines of forms) {
+      for (const at of LABEL_ORDER) {
+        const box = labelBox(at, mark.px, mark.py, lines);
+        if (outside(box, frame) > 0) continue;
+        const cost = taken.reduce((sum, b) => sum + overlap(box, b), 0);
+        if (cost < least) {
+          least = cost;
+          best = { at, lines };
+        }
+        if (cost === 0) break search;
       }
-      const cost = taken.reduce((sum, b) => sum + overlap(box, b), 0);
-      if (cost < least) {
-        least = cost;
-        best = at;
-      }
-      if (cost === 0) break;
     }
-    out.push(best);
-    taken.push(labelBox(best, mark.px, mark.py, mark.label));
+    // Nothing fits: whichever candidate leaves the least of itself outside.
+    if (!best) {
+      let least = Infinity;
+      for (const lines of forms) {
+        for (const at of LABEL_ORDER) {
+          const cost = outside(labelBox(at, mark.px, mark.py, lines), frame);
+          if (cost < least) {
+            least = cost;
+            best = { at, lines };
+          }
+        }
+      }
+    }
+    out.push(best!);
+    taken.push(labelBox(best!.at, mark.px, mark.py, best!.lines));
   }
   return out;
 }
@@ -1552,7 +1693,8 @@ export function planeSpec(
   }
 
   const marginLeft = 62;
-  const marginTop = 28;
+  const title = yTitle(width, marginLeft, axes.y.label, 28);
+  const marginTop = title.marginTop;
   const marginRight = gutter(width, 40);
   const foot = axisFoot({
     width,
@@ -1577,7 +1719,17 @@ export function planeSpec(
     px: frame.left + ((place.x - xLo) / (xHi - xLo)) * (frame.right - frame.left),
     py: frame.bottom - ((place.y - yLo) / (yHi - yLo)) * (frame.bottom - frame.top),
   }));
-  const placed = placeLabels(at, frame);
+  // Labels have the drawing's width less the 4 units every edge label here keeps, between the
+  // title and the foot. The y-axis's two ends are the only text in the side margins.
+  const ends = [axes.y.format(yHi), axes.y.format(yLo)].map((text) => 4 + textPx(text));
+  const placed = placeLabels(
+    at,
+    { left: 4, top: frame.top, right: width - 4, bottom: frame.bottom },
+    [
+      { left: 4, top: frame.top + 3, right: ends[0]!, bottom: frame.top + 3 + LABEL_LINE },
+      { left: 4, top: frame.bottom - LABEL_LINE, right: ends[1]!, bottom: frame.bottom },
+    ],
+  );
 
   return {
     options: {
@@ -1610,23 +1762,33 @@ export function planeSpec(
           className: "plane-dot",
         }),
 
-        // One text mark per placement, because `dx`, `dy` and `textAnchor` are constants in Plot.
-        // Text is not in the hover selector, so splitting these reorders nothing that is indexed.
-        ...LABEL_ORDER.flatMap((which) => {
-          const mine = places.filter((_, i) => placed[i] === which);
-          if (mine.length === 0) return [];
-          return [
-            Plot.text(mine, {
-              x: "x",
-              y: "y",
-              ...LABEL_AT[which],
-              text: "label",
-              fill: INK.primary,
-              fontSize: 11,
-              className: "plane-label",
-            }),
-          ];
-        }),
+        // One text mark per placement and line count, because `dx`, `dy` and `textAnchor` are
+        // constants in Plot and a wrapped label's `dy` is shifted by its second line. Text is not
+        // in the hover selector, so splitting these reorders nothing that is indexed.
+        ...LABEL_ORDER.flatMap((which) =>
+          [1, 2].flatMap((count) => {
+            const mine = places.filter(
+              (_, i) => placed[i]!.at === which && placed[i]!.lines.length === count,
+            );
+            if (mine.length === 0) return [];
+            const lines = new Map(mine.map((place) => [place, placed[places.indexOf(place)]!.lines]));
+            return [
+              Plot.text(mine, {
+                x: "x",
+                y: "y",
+                ...LABEL_AT[which],
+                dy: LABEL_AT[which].dy + labelShift(which, count),
+                text: (place: Place) => lines.get(place)!.join("\n"),
+                // Spacing for the broken names only: Plot scales a centred line's offset by it,
+                // so a one-line name given it would move off the mark it was placed against.
+                ...(count > 1 ? { lineHeight: LABEL_LINE / 11 } : {}),
+                fill: INK.primary,
+                fontSize: 11,
+                className: "plane-label",
+              }),
+            ];
+          }),
+        ),
 
         // Both ends of both scales, as a cloud carries them: a frame with no numbers on it is a
         // texture, and here the numbers are what say how far from the rule in force these get.
@@ -1648,15 +1810,7 @@ export function planeSpec(
           fill: INK.muted,
           fontSize: 11,
         }),
-        Plot.text([0], {
-          frameAnchor: "top-left",
-          dx: -marginLeft + 4,
-          dy: -12,
-          text: () => axes.y.label,
-          textAnchor: "start",
-          fill: INK.muted,
-          fontSize: 11,
-        }),
+        title.mark,
 
         // The hit layer, above everything, as every pointed-at form here draws one.
         Plot.dot(places, {
@@ -1748,7 +1902,15 @@ export function rangeSpec(
 
   const marginTop = 0;
   const marginBottom = 22 + foot.extraBottom;
-  const height = rows.length * rowHeight;
+  /*
+   * The rows' band plus the margins, not the rows' band with the margins taken out of it.
+   *
+   * This was `rows.length * rowHeight`, and the foot's margin came out of it — which on 84 rows is
+   * a quarter of a row each and on six is nearly four units of every row's fourteen. The six-row
+   * sextile chart on the base-cost node drew 10-unit names in 7.7–10.3-unit rows and ran each into
+   * the next. A row is `rowHeight` at any count, so the foot is added to it.
+   */
+  const height = marginTop + marginBottom + rows.length * rowHeight;
   // The rows' own band, which is what a marker's row position is a fraction of. `at` is clamped
   // rather than dropped: a threshold past the end of the ordering is a real thing to say, and
   // saying it at the last edge is truer than saying nothing.
@@ -1959,7 +2121,8 @@ export function rankSpec(
   return {
     options: {
       width,
-      height: rows.length * rowHeight,
+      // `rangeSpec`'s height, for the defect recorded there: the foot is added to the rows.
+      height: 22 + foot.extraBottom + rows.length * rowHeight,
       marginLeft,
       marginRight,
       marginTop: 0,

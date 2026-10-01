@@ -15,6 +15,7 @@
 
 import { expect, test, type Page } from "@playwright/test";
 
+import { chartedRoutes } from "./charted.ts";
 import { CLEVELAND } from "./helpers.ts";
 
 /*
@@ -30,24 +31,19 @@ import { CLEVELAND } from "./helpers.ts";
  * the scale factor only exists once the SVG is in a box of a known width.
  */
 test.describe("charts on a phone", () => {
-  const CHARTED = [
-    "/",
-    "/statewide",
-    "/outcomes",
-    "/counties",
-    "/history",
-    "/method",
-    "/districts",
-    `/district/${CLEVELAND}`,
-    `/district/${CLEVELAND}/finances`,
-    `/district/${CLEVELAND}/outcome`,
-    // The one wiki node that draws a series, and the only wiki route with a chart on it.
-    "/wiki/education-agency/toledo-city",
-    // Drawn in the browser, and the narrow drawing in a 548px box — the widest scale-up #577 found.
-    "/scenario/reach",
-    "/county/ottawa",
-    "/house/090",
-  ];
+  /*
+   * Every route that draws a chart, read off the build — see `charted.ts`. This was a hand list
+   * that left out `/bounds` and four of the five wiki routes with plots, so none of the four
+   * tests below had ever run on the charts #608 found leaving their frames.
+   *
+   * Read in `beforeAll` rather than at import: locally the build is the web server's, and it is
+   * not there yet when this file is loaded.
+   */
+  let CHARTED: string[] = [];
+  test.beforeAll(() => {
+    CHARTED = chartedRoutes();
+    expect(CHARTED, "the build has charts to visit").toContain(`/district/${CLEVELAND}`);
+  });
 
   /**
    * Open a route with its charts drawn. The scenario routes draw theirs in the browser after a

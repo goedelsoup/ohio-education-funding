@@ -18,7 +18,7 @@
 
 import { parseHTML } from "linkedom";
 
-import { draw, type Drawing, type Naming, pair } from "./spec.ts";
+import { draw, type Drawing, type Naming, pair, panelWidth } from "./spec.ts";
 
 /** Anything that looks like a baked-in colour: `#abc`, `#aabbcc`, `rgb(…)`, `hsl(…)`. */
 const LITERAL_COLOUR = /(#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\()/i;
@@ -76,8 +76,20 @@ function drawn(build: Drawing, naming: Naming, width: number): string {
  *
  * Returns the empty string where the builder returns null, on {@link renderToString}'s rule: a
  * form the data cannot support draws nothing rather than an axis with a mark on it.
+ *
+ * @throws for a width past two panels' share of the wide frame. That is the widest a panel of a
+ * real small multiple is drawn at, and anything wider is one chart drawn once — `panelWidth(1)` is
+ * 640, and the TTAG node's one-panel spread went through here at that width and painted 5px type
+ * on a phone. A chart with no sibling goes through {@link renderToString}.
  */
 export function renderPanelToString(build: Drawing, naming: Naming, width: number): string {
+  if (width > panelWidth(2)) {
+    throw new Error(
+      `renderPanelToString was asked for a ${width}px panel, wider than a panel of two. A chart ` +
+        `drawn once at that width is scaled to a phone with its type; draw it with renderToString, ` +
+        `which makes the narrow drawing as well.`,
+    );
+  }
   const svg = drawn(build, naming, width);
   return svg ? `<div class="chart-pair"><div class="chart-at" data-at="panel">${svg}</div></div>` : "";
 }

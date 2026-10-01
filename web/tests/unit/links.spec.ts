@@ -1017,17 +1017,18 @@ test("a marker on a range is a dashed rule at a fraction of the rows, and it is 
       { label: "test" },
     );
 
-  // Four rows over a 34px band — 56 tall less the 22 the foot takes — so half way down is 17.
+  // Four rows over a 56px band — a 14px row each, with the margins outside it (#608: the band
+  // was 56 tall less the foot, which crushed the rows) — so half way down is 28.
   const half = draw(2);
   expect(half).toContain('class="range-marker"');
-  expect(half).toMatch(/<line y2="17" y1="17"[^>]*stroke-dasharray="3,3"/);
+  expect(half).toMatch(/<line y2="28" y1="28"[^>]*stroke-dasharray="3,3"/);
   // A quarter of the way is a quarter of the band, not a row boundary: the fraction is the point.
-  expect(draw(1.5)).toMatch(/<line y2="12.75" y1="12.75"/);
+  expect(draw(1.5)).toMatch(/<line y2="21" y1="21"/);
 
   // Clamped rather than dropped at either end. A threshold past the last row is a real thing to
   // say about the ordering, and saying it at the edge is truer than saying nothing at all.
   expect(draw(-3)).toMatch(/<line y2="0" y1="0"/);
-  expect(draw(9)).toMatch(/<line y2="34" y1="34"/);
+  expect(draw(9)).toMatch(/<line y2="56" y1="56"/);
 
   // And no marker is no rule: the form is shared with `/counties`, which marks nothing.
   expect(renderToString(() => rangeSpec(rows, axis, W), { label: "test" })).not.toContain(
