@@ -47,6 +47,8 @@ export const headingText = (heading: Locator): Promise<string> =>
   heading.evaluate((node) => {
     const clone = node.cloneNode(true) as HTMLElement;
     clone.querySelector("a.section-anchor")?.remove();
+    // And the way back to the contents beside it, on a page that has a list (#594).
+    clone.querySelector("a.to-contents")?.remove();
     // The chip carries its reckoning in a panel beside it now, so a heading's `textContent`
     // includes that sentence unless the whole wrapper goes. See `yearChip` in `src/lib/year.ts`.
     clone.querySelector(".year-chip-wrap")?.remove();

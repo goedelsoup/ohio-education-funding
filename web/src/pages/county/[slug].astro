@@ -9,6 +9,7 @@ import Base from "../../layouts/Base.astro";
 import { counties, medianRealizedAid, renderCounty } from "../../lib/county.ts";
 import { loadFeed } from "../../lib/feed.ts";
 import { count, money } from "../../lib/format.ts";
+import { NAMES } from "../../lib/nav.ts";
 import * as routes from "../../lib/routes.ts";
 import { yearOf } from "../../lib/year.ts";
 
@@ -40,6 +41,7 @@ const description =
   section="counties"
   wide
 >
+  <p class="crumb">Places › <a href={NAMES.counties.href}>{NAMES.counties.name}</a></p>
   <h1>{county.name} County</h1>
   <p class="lead">
     {count(county.districts.length)} district{county.districts.length === 1 ? "" : "s"} ·

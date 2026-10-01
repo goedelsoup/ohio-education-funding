@@ -329,6 +329,51 @@ function moveAnchors(document: Document): number {
 }
 
 /**
+ * A way back to the contents, beside each section's address (#594).
+ *
+ * # What was wrong
+ *
+ * `/district/043802` is 26,645px tall at 375px, about 33 screens, and its contents list sits closed
+ * at the top. Past it, nothing on the page led back: the header is the only sticky element, and
+ * the sub-navigation stays in the document below 1000px for the reason `app.css` gives. A reader
+ * who had used the list to reach a section had to scroll the whole way up to use it again.
+ *
+ * # Why in the heading's tail, and in every one
+ *
+ * The tail is where a section's address already is, so the two links that say where this section
+ * sits travel together, wrap together and are hidden and shown together.
+ *
+ * Every heading that has an address gets one, not only the ones the list names. That was the first
+ * version, and measured at 375px it left the district dashboard's categorical card 7,200px — nine
+ * screens — with no way back, because its six categoricals are `h3`s the list rightly does not
+ * name. A link back is for wherever a reader has got to, which is not the same set as the places
+ * the list leads. With the card's own headings the longest stretch without one is the base cost
+ * build-up, about 4,200px; `e2e/contents.spec.ts` holds the page to a link within a screen of
+ * where it has been scrolled.
+ *
+ * A page with no list gets nothing: `withContents` writes one only from four sections up, and a
+ * link to a fragment the page does not carry is what `check-dist-links.ts` fails the build on.
+ *
+ * Last of the passes, after `nameScrollers` has read the headings above each box: the link's words
+ * are not part of what a table under that heading holds.
+ */
+function linkContents(document: Document): number {
+  if (!document.querySelector("nav#contents")) return 0;
+
+  let linked = 0;
+  for (const tail of document.querySelectorAll(".heading-tail")) {
+    const link = document.createElement("a");
+    link.className = "to-contents";
+    link.setAttribute("href", "#contents");
+    link.setAttribute("aria-label", "Back to contents");
+    link.innerHTML = `<span aria-hidden="true">↑</span> Contents`;
+    tail.append(document.createTextNode(" "), link);
+    linked += 1;
+  }
+  return linked;
+}
+
+/**
  * Right-align the columns that hold figures, and leave the rest alone.
  *
  * # What was wrong
@@ -530,6 +575,8 @@ export function applySemantics(body: string): {
   aligned: number;
   /** Section addresses moved out of the first position in their heading. */
   anchored: number;
+  /** Headings given a link back to the page's contents list. */
+  linked: number;
 } {
   /*
    * A whole document and then an assignment, rather than `parseHTML(\`<body>…</body>\`)`.
@@ -554,6 +601,7 @@ export function applySemantics(body: string): {
   const scoped = scopeTables(document);
   const aligned = alignColumns(document);
   const anchored = moveAnchors(document);
+  const linked = linkContents(document);
 
-  return { html: document.body.innerHTML, unnamed, scoped, relevelled, aligned, anchored };
+  return { html: document.body.innerHTML, unnamed, scoped, relevelled, aligned, anchored, linked };
 }

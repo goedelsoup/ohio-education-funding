@@ -122,16 +122,19 @@ test.describe("the chrome above the fold", () => {
       room.push(`${width}: ${state.room}`);
     }
     // One row is 52px. Asserted as a set so a regression names the width it happened at.
+    //
+    // The `h1` at 108 is the row plus the crumb above the heading, 28px, which says on a phone
+    // where the page sits when the bar has folded to `Menu` (#594). It was 80 with no crumb.
     expect(heights, `what the row was holding —\n${room.join("\n")}\n`).toEqual([
-      "360: header 52, h1 at 80",
-      "390: header 52, h1 at 80",
-      "480: header 52, h1 at 80",
-      "520: header 52, h1 at 80",
-      "700: header 52, h1 at 80",
-      "820: header 52, h1 at 80",
-      "900: header 52, h1 at 80",
-      "1000: header 52, h1 at 80",
-      "1280: header 52, h1 at 80",
+      "360: header 52, h1 at 108",
+      "390: header 52, h1 at 108",
+      "480: header 52, h1 at 108",
+      "520: header 52, h1 at 108",
+      "700: header 52, h1 at 108",
+      "820: header 52, h1 at 108",
+      "900: header 52, h1 at 108",
+      "1000: header 52, h1 at 108",
+      "1280: header 52, h1 at 108",
     ]);
   });
 

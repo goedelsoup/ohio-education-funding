@@ -23,7 +23,7 @@ import Base from "../../layouts/Base.astro";
 import { renderBaseCostBuildUp } from "../../lib/basecost.ts";
 import { renderBiennium } from "../../lib/biennium.ts";
 import { districtPaths, loadFeed, qualifiedName } from "../../lib/feed.ts";
-import { districtTitle } from "../../lib/nav.ts";
+import { districtTitle, NAMES } from "../../lib/nav.ts";
 import * as routes from "../../lib/routes.ts";
 import { fig, money, pct } from "../../lib/format.ts";
 import { yearOf } from "../../lib/year.ts";
@@ -59,6 +59,7 @@ const description = district.on_guarantee
   imageAlt={`${district.name}: state aid per pupil, and how much of it comes from the guarantee`}
   section="districts"
 >
+  <p class="crumb"><a href={NAMES.districts.href}>{NAMES.districts.name}</a></p>
   <h1>{qualifiedName(district)}</h1>
   {/*
      The identity line, as a labelled set rather than a middot-joined sentence.

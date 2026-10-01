@@ -167,13 +167,20 @@ function words(heading: Element): string {
  * `aria-labelledby` names, which a hidden element may be.
  *
  * All of it is markup and a stylesheet. A reader with no script gets the same disclosure.
+ *
+ * # Why it has an address (#594)
+ *
+ * On a phone the list is closed near the top of a page that runs to thirty-odd screens, and it was
+ * the only way into the page's sections. Nothing further down led back to it. Every heading with an
+ * address now carries a link to `#contents` beside its `#`, which `semantics.ts`'s `linkContents`
+ * writes, and this is what that link lands on.
  */
 export function renderContents(entries: Entry[]): string {
   const items = entries
     .map((entry) => `<li><a href="#${entry.id}">${escapeHtml(entry.label)}</a></li>`)
     .join("");
   return (
-    `<nav class="contents" aria-labelledby="contents-label">` +
+    `<nav class="contents" id="contents" aria-labelledby="contents-label">` +
     `<p class="contents-label" id="contents-label">On this page</p>` +
     `<details class="contents-fold"><summary class="contents-summary">On this page</summary>` +
     `<ul>${items}</ul></details></nav>`

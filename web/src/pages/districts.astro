@@ -37,6 +37,24 @@ const enrollmentSpan = yearOf("enrollment").replace("-", " to ");
 const valuationYear = yearOf("profile");
 const s = bundle.statewide;
 
+/*
+ * The figure columns' heads, written once because each cell repeats its own below 700px (#594).
+ *
+ * At 375px the table is 39,219px tall and its head is at y=704, so a reader a few screens down met
+ * rows reading "640 $12,148" with nothing to say which figure was which. A sticky head cannot fix
+ * that here: the table scrolls sideways inside `.scroll`, and a sticky element sticks to its
+ * nearest scrolling box, which is that one and not the page. So each figure carries its column's
+ * name as `data-label`, and `app.css` shows it over the figure at that width.
+ */
+const HEADS = {
+  adm: "Enrolled ADM",
+  aid: "State aid / pupil",
+  guarantee: "From guarantee",
+  valuation: "Valuation / pupil",
+  poverty: "Econ. disadv.",
+  enrollment: "Enrollment Δ",
+} as const;
+
 /** A cell whose sort key is not what it displays: dollars with separators, blanks, percentages. */
 const sortable = (value: number | null) => (value == null ? "" : String(value));
 
@@ -227,12 +245,12 @@ const years = Object.fromEntries(MEASURES.map((m) => [m.key, m.year])) as Record
             prefix carries the reckoning that a chip's long form would otherwise have to.
           */}
           <th aria-sort="ascending"><button type="button" data-sort="name">District</button></th>
-          <th aria-sort="none"><button type="button" data-sort="adm" set:html={fig("Enrolled ADM", years.adm)} /></th>
-          <th aria-sort="none"><button type="button" data-sort="aid" set:html={fig("State aid / pupil", years.aid)} /></th>
-          <th aria-sort="none"><button type="button" data-sort="guarantee" set:html={fig("From guarantee", years.guarantee)} /></th>
-          <th aria-sort="none"><button type="button" data-sort="valuation" set:html={fig("Valuation / pupil", years.valuation)} /></th>
-          <th aria-sort="none"><button type="button" data-sort="poverty" set:html={fig("Econ. disadv.", years.poverty)} /></th>
-          <th aria-sort="none"><button type="button" data-sort="enrollment" set:html={fig("Enrollment Δ", years.enrollment)} /></th>
+          <th aria-sort="none"><button type="button" data-sort="adm" set:html={fig(HEADS.adm, years.adm)} /></th>
+          <th aria-sort="none"><button type="button" data-sort="aid" set:html={fig(HEADS.aid, years.aid)} /></th>
+          <th aria-sort="none"><button type="button" data-sort="guarantee" set:html={fig(HEADS.guarantee, years.guarantee)} /></th>
+          <th aria-sort="none"><button type="button" data-sort="valuation" set:html={fig(HEADS.valuation, years.valuation)} /></th>
+          <th aria-sort="none"><button type="button" data-sort="poverty" set:html={fig(HEADS.poverty, years.poverty)} /></th>
+          <th aria-sort="none"><button type="button" data-sort="enrollment" set:html={fig(HEADS.enrollment, years.enrollment)} /></th>
         </tr>
       </thead>
       <tbody>
@@ -251,23 +269,25 @@ const years = Object.fromEntries(MEASURES.map((m) => [m.key, m.year])) as Record
                   <a href={routes.district(d.irn)}>{qualifiedName(d)}</a>
                   <span class="n"> {d.irn}</span>
                 </th>
-                <td data-sort-value={d.adm}>{count(Math.round(d.adm))}</td>
-                <td data-sort-value={d.realized_aid_per_pupil}>
+                <td data-sort-value={d.adm} data-label={HEADS.adm}>{count(Math.round(d.adm))}</td>
+                <td data-sort-value={d.realized_aid_per_pupil} data-label={HEADS.aid}>
                   {money(d.realized_aid_per_pupil)}
                 </td>
-                <td data-sort-value={guaranteePP}>
+                <td data-sort-value={guaranteePP} data-label={HEADS.guarantee}>
                   {d.on_guarantee ? money(guaranteePP) : "—"}
                 </td>
-                <td data-sort-value={sortable(d.valuation_per_pupil)}>
+                <td data-sort-value={sortable(d.valuation_per_pupil)} data-label={HEADS.valuation}>
                   {money(d.valuation_per_pupil)}
                 </td>
                 <td
                   data-sort-value={sortable(d.economically_disadvantaged)}
+                  data-label={HEADS.poverty}
                 >
                   {pct(d.economically_disadvantaged, 1)}
                 </td>
                 <td
                   data-sort-value={sortable(d.enrollment_change)}
+                  data-label={HEADS.enrollment}
                   class={d.enrollment_change != null && d.enrollment_change < 0 ? "loss" : ""}
                 >
                   {pct(d.enrollment_change, 1)}
