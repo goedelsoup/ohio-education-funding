@@ -1005,17 +1005,32 @@ tr.series-break > td {
  * What the chip says, for eyes.
  *
  * `aria-hidden`, because the button's own name already carries the sentence — see `yearChip` for
- * why the long form is a name rather than a description. That also means this panel may be hidden
- * however is convenient, unlike `.term-def`, whose box-tree presence is load-bearing.
+ * why the long form is a name rather than a description.
  *
  * Anchored to the right rather than the left, which is the difference from `.term-def`: a chip is
  * pinned to the end of its card heading by `margin-left: auto`, so a panel opening rightwards
  * from there opens off the side of the page.
  */
 /* The two definitions — the chip's and the term's — open the same way and hold the same kind of
-   sentence, so they share everything but their anchor and their width. The box is the popover's. */
+   sentence, so they share everything but their anchor and their width. The box is the popover's.
+
+   A definition is a sentence wherever it opens from, so it resets what its trigger's line may
+   have set. The chip sits in a heading and the term in a tile's key, which is the eyebrow: before
+   case and tracking were reset here (#601), every definition opened from a tile — "equivalent
+   pupil" on every finances page, "effective" on every taxes page — was a paragraph of tracked
+   capitals.
+
+   Closed, it is out of layout (`display: none`), not merely unpainted. An absolute box still
+   counts toward its scroll container's overflow when it is `visibility: hidden`, so a closed
+   30rem panel anchored to a term near the right edge widened whatever held it: the page by up to
+   243px between 545 and 880px, and on the taxes page the table wrapper, which scrolled sideways
+   by 151px at every desktop width with nothing visible to scroll to (#601). Neither form of
+   hiding costs the term its description — `visibility: hidden` was already outside the
+   accessibility tree, and `aria-describedby` reads a hidden target's text by design.
+   `complete.spec.ts` asserts the description with the definition closed. */
 .year-chip-def,
 .term-def {
+  display: none;
   position: absolute;
   top: calc(100% + var(--space-2));
   z-index: 20;
@@ -1025,6 +1040,10 @@ tr.series-break > td {
   font-weight: var(--weight-regular);
   line-height: var(--leading-base);
   color: var(--text-secondary);
+  text-align: left;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: normal;
   opacity: 0;
   visibility: hidden;
   transition: opacity .12s ease;
@@ -1032,12 +1051,16 @@ tr.series-break > td {
 .year-chip-def {
   right: 0;
   max-width: min(26rem, calc(100vw - 2rem));
-  letter-spacing: normal;
-  text-align: left;
-  white-space: normal;
 }
 .year-chip-wrap:hover > .year-chip-def,
-.year-chip-wrap:focus-within > .year-chip-def { opacity: 1; visibility: visible; }
+.year-chip-wrap:focus-within > .year-chip-def { display: block; opacity: 1; visibility: visible; }
+/* The fade, from `display: none`: without a starting style there is no "before" to fade from. */
+@starting-style {
+  .year-chip-wrap:hover > .year-chip-def,
+  .year-chip-wrap:focus-within > .year-chip-def,
+  .term-wrap:hover > .term-def,
+  .term-wrap:focus-within > .term-def { opacity: 0; }
+}
 @media (prefers-reduced-motion: reduce) {
   .year-chip-def { transition: none; }
 }
@@ -1085,15 +1108,11 @@ tr.series-break > td {
 
 .term-wrap { position: relative; display: inline; }
 .term-def {
-  /* Laid out but not painted — `visibility`, in the shared rule above, rather than `display:
-     none`. A definition removed from the box tree is removed from the accessibility tree with it,
-     and `aria-describedby` then points at nothing. This is the one property in this block that is
-     load-bearing for correctness. */
   left: 0;
   max-width: min(30rem, calc(100vw - 2rem));
 }
 .term-wrap:hover > .term-def,
-.term-wrap:focus-within > .term-def { opacity: 1; visibility: visible; }
+.term-wrap:focus-within > .term-def { display: block; opacity: 1; visibility: visible; }
 .term-def a { white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) {
   .term-def { transition: none; }
@@ -1115,13 +1134,20 @@ tr.series-break > td {
  * it appears on the same hover or focus, it is always wholly on screen, and it cannot widen the
  * document because a fixed box is outside the scroll region by definition.
  *
- * The breakpoint, 544px, is 34rem: the width below which a 30rem panel cannot fit beside anything.
+ * The breakpoint is 1024px, and it was 544px — 34rem, the width below which a 30rem panel cannot
+ * fit beside anything. That was the wrong question. A panel anchored at the term's left edge needs
+ * 30rem to the RIGHT of the term, and a term in the second tile of a row starts past the middle of
+ * the column: "equivalent pupil" on the finances page opened 243px off a 680px screen, 47px off an
+ * 820px one, and had 6px to spare at 900 on the machine that measured it — less than one font's
+ * difference from another (#601). Below 1024 the readers are phones, tablets and narrow windows,
+ * and a sheet serves all of them; at 1024, on the three routes that carry a term, the panel
+ * nearest the edge has 174px left. `terms.spec.ts` sweeps both sides of the line.
  */
-@media (max-width: 544px) {
+@media (max-width: 1023.98px) {
   /* The chip's panel joins the term's down here for the same reason and one of its own: anchored
      to a chip at the end of a card heading, a 26rem panel on a 375px screen reaches past the left
      edge of the document and is simply not readable. A sheet at the foot has room for the
-     sentence. */
+     sentence, and the two definitions keep opening the same way at every width. */
   .term-def,
   .year-chip-def {
     position: fixed;
@@ -1134,6 +1160,22 @@ tr.series-break > td {
     font-size: var(--text-base);
     box-shadow: 0 -4px 24px rgb(0 0 0 / 28%);
   }
+}
+/* And in a scrolling table, the sheet at every width. A scroll box clips what is absolutely
+   positioned inside it, so on the taxes page "ADM" and "base cost" opened their panels into the
+   table wrapper's overflow, half of each sentence behind its edge at 1440px (#601). A fixed box's
+   containing block is the viewport, so the wrapper cannot clip it. The declarations are the
+   sheet's above, repeated because a media query cannot be or-ed with a selector. */
+.scroll .term-def {
+  position: fixed;
+  left: var(--space-4);
+  right: var(--space-4);
+  top: auto;
+  bottom: var(--space-4);
+  width: auto;
+  max-width: none;
+  font-size: var(--text-base);
+  box-shadow: 0 -4px 24px rgb(0 0 0 / 28%);
 }
 
 /*
@@ -2802,6 +2844,11 @@ footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); 
 .tile .v .fig-value { font: inherit; letter-spacing: inherit; }
 .tile .v .fig-year,
 .tile .v .fig-basis { font-size: var(--text-xs); font-weight: var(--weight-regular); letter-spacing: 0; }
+/* And in a tile the year may take a line of its own. `.fig` is `nowrap` so a value never parts
+   from its year in running prose, but a tile's value is set at `--text-figure` in a half-phone
+   track, and "$539,202,050 TY2024" ran 52px past one at 375px and panned the page (#601). The
+   value itself has no break opportunity, so it is the suffix that moves. */
+.tile .v .fig { white-space: normal; }
 /*
  * A column head is the one place the compound's VALUE is a label rather than a number.
  *

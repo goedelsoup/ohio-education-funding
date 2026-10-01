@@ -33,6 +33,8 @@ test.describe("the display face, under every fallback it can resolve to", () => 
   const FACES = ["Iowan Old Style", "Palatino", "Charter", "Georgia", "Times New Roman", "DejaVu Serif"];
   const ROUTES = [
     "/district/043786",
+    // The taxes page because its tiles hold a nine-digit charge, which ran off a phone (#601).
+    "/district/043786/taxes",
     "/wiki/funding-regime/fair-school-funding-plan",
     "/wiki/decision/the-four-kinds-of-parameter",
   ];

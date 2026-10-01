@@ -290,6 +290,11 @@ const ROUTES_WITH_FIGURES = [
     await expect(definition).toHaveCount(1);
     await expect(definition).toContainText(/H\.B\. 920|need|weighted/);
 
+    // And described while the definition is closed, which is `display: none` (#601): a hidden
+    // target is still read for `aria-describedby`, so a closed panel costs the term nothing.
+    await expect(definition).toBeHidden();
+    await expect(trigger).toHaveAccessibleDescription(/H\.B\. 920|need|weighted/);
+
     // Not announced twice: a `title` would be read alongside the description.
     await expect(trigger).not.toHaveAttribute("title", /./);
 
