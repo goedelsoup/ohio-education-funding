@@ -12,7 +12,13 @@
  * `src/scripts/scenario.ts`. With no script they render and do nothing — which is why the page
  * around them says so rather than pretending otherwise.
  */
-import { DEFAULT_HORIZON_YEARS, LEVER_BOUNDS } from "../lib/scenario.ts";
+import {
+  DEFAULT_HORIZON_YEARS,
+  LEVER_BOUNDS,
+  LEVER_TEXT,
+  SLIDER_IDS,
+  horizonText,
+} from "../lib/scenario.ts";
 import type { RefreshEffect } from "../lib/refresh.ts";
 import { pct } from "../lib/format.ts";
 import { yearOf } from "../lib/year.ts";
@@ -107,7 +113,18 @@ const SLIDERS = [
     value: 0.5,
     note: `The minimum share of the calculated amount the state pays, whatever the district's own share. ${yearOf("formula")} is 50%, and the floor runs up the wealth distribution rather than down it.`,
   },
-];
+] as const;
+
+/*
+ * Written into the document rather than left for the script (#598). The script wrote six of these
+ * outputs and not the other three, and before it booted — or with no script at all — none of them.
+ *
+ * The retained-share lever is hidden here for the same reason. It means something only under two of
+ * the guarantee's four readings, and the default is neither; drawn and then hidden by the script it
+ * was the runner's one layout shift, with "Base cost" moving up into its place.
+ */
+const shown = (slider: (typeof SLIDERS)[number]) => LEVER_TEXT[SLIDER_IDS[slider.id]](slider.value);
+const horizon = projection.baseYear + DEFAULT_HORIZON_YEARS;
 ---
 
 <div class="card" id="levers" data-part="levers">
@@ -151,9 +168,9 @@ const SLIDERS = [
       </div>
       {
         SLIDERS.map((slider) => (
-          <div class="lever">
+          <div class="lever" hidden={slider.id === "lv-arg"}>
             <label for={slider.id}>
-              {slider.label} <output id={`${slider.id}-out`} />
+              {slider.label} <output id={`${slider.id}-out`}>{shown(slider)}</output>
             </label>
             <input
               type="range"
@@ -162,6 +179,7 @@ const SLIDERS = [
               max={slider.max}
               step={slider.step}
               value={slider.value}
+              aria-valuetext={shown(slider)}
             />
             <div class="n">{slider.note}</div>
           </div>
@@ -175,7 +193,8 @@ const SLIDERS = [
         projection.available && (
           <div class="lever">
             <label for="lv-horizon">
-              Project enrollment to <output id="lv-horizon-out" />
+              Project enrollment to{" "}
+              <output id="lv-horizon-out">{horizonText(horizon, projection.baseYear)}</output>
             </label>
             <input
               type="range"
@@ -183,7 +202,8 @@ const SLIDERS = [
               min={projection.baseYear}
               max={projection.maxYear}
               step={1}
-              value={projection.baseYear + DEFAULT_HORIZON_YEARS}
+              value={horizon}
+              aria-valuetext={horizonText(horizon, projection.baseYear)}
             />
             <div class="n">
               FY{projection.baseYear} is the last observed year — leave it there for no forecast.

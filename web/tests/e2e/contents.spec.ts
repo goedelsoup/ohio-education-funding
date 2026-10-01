@@ -94,3 +94,61 @@ test("a row far down the district directory names each of its figures", async ({
     expect(heads[i], `column ${i + 1} is headed by its label`).toContain(name!);
   });
 });
+
+/*
+ * Every entry in "On this page" lands on something the reader can see (#598).
+ *
+ * The runner listed a card inside `<noscript>` — "Re-running the formula needs JavaScript", offered
+ * to readers with a script — and `/scenario`'s `#not`, which is `hidden` until a district is
+ * chosen. Both links left the page where it was. Run with the script on and off, because the two
+ * are different sets of visible cards on the same document.
+ *
+ * `/scenario` is not here because it no longer has a list: without those two it has three
+ * sections, under the four `withContents` asks for. `/scenario/reach` is the runner view that
+ * keeps one, and still carries the same `<noscript>` card.
+ */
+const LISTED = ["/scenario/reach", "/district/043802", "/statewide", "/wiki/doctrine/equity"];
+
+for (const javaScriptEnabled of [true, false]) {
+  test.describe(`contents entries, with JavaScript ${javaScriptEnabled ? "on" : "off"}`, () => {
+    test.use({ javaScriptEnabled });
+
+    for (const path of LISTED) {
+      test(`every entry on ${path} names a visible section`, async ({ page }) => {
+        await page.goto(path);
+        if (javaScriptEnabled && path === "/scenario/reach") {
+          await expect(page.locator("#scenario-out")).not.toBeEmpty();
+        }
+        const targets = await page
+          .locator("nav#contents a")
+          .evaluateAll((links) => links.map((a) => a.getAttribute("href")!.slice(1)));
+        expect(targets.length, `${path} has a contents list`).toBeGreaterThan(0);
+        for (const id of targets) {
+          await expect(page.locator(`[id="${id}"]`), `#${id}`).toBeVisible();
+        }
+      });
+    }
+  });
+}
+
+test.describe("the levers, with JavaScript off", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("every lever shows its value, and the retained-share lever starts hidden", async ({
+    page,
+  }) => {
+    /*
+     * The outputs were written only by the script, so with none every one was empty and the
+     * horizon read "Project enrollment to" with no year (#598). And the retained-share lever was
+     * drawn and then hidden on boot — the runner's one layout shift — for a default that never
+     * shows it.
+     */
+    await page.goto("/scenario");
+    const outputs = page.locator(".lever output");
+    expect(await outputs.count()).toBeGreaterThanOrEqual(9);
+    for (const text of await outputs.allTextContents()) expect(text.trim()).not.toBe("");
+    await expect(page.locator("#lv-horizon-out")).toHaveText(/^FY\d{4}$/);
+    await expect(page.locator("#lv-arg")).toBeHidden();
+    await expect(page.locator("#lv-base")).toBeVisible();
+  });
+});

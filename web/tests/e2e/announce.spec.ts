@@ -86,11 +86,22 @@ test.describe("announcing what changed", () => {
      */
     await page.goto("/scenario");
     await expect(page.locator("#scenario-out .tile, #scenario-out .card")).not.toHaveCount(0);
-    for (const [control, output] of [
-      ["#lv-base", "#lv-base-out"],
-      ["#lv-min", "#lv-min-out"],
-      ["#lv-phase", "#lv-phase-out"],
-    ] as const) {
+    /*
+     * Every slider, read off the page rather than listed here. This was a list of three, and three
+     * of the nine sliders had an empty output and no `aria-valuetext` at all (#598) — none of them
+     * in the list.
+     */
+    const ids = await page.locator('input[type="range"]').evaluateAll((nodes) =>
+      nodes.map((n) => n.id),
+    );
+    expect(ids.length, "the runner's sliders").toBeGreaterThanOrEqual(9);
+    // Moved off the default as well, because a value written once at build and never again would
+    // pass at rest. The script is what has to keep up.
+    await page.locator("#lv-transport").fill("0.7");
+    await page.locator("#lv-supplemental").fill("500");
+    await expect(page.locator("#lv-supplemental-out")).toHaveText("$500");
+    await expect(page.locator("#lv-transport-out")).toHaveText("70%");
+    for (const [control, output] of ids.map((id) => [`#${id}`, `#${id}-out`] as const)) {
       const shown = (await page.locator(output).textContent())?.trim() ?? "";
       expect(shown, `${output} shows something`).not.toBe("");
       await expect(page.locator(control), `${control} announces what it shows`).toHaveAttribute(
