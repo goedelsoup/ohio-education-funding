@@ -17,7 +17,7 @@
 
 import { distributionSpec, type Drawing, draws, scatterSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
-import { count, escapeHtml, fixed, money, pct, signed } from "./format.ts";
+import { compactMoney, count, escapeHtml, fixed, money, pct, signed } from "./format.ts";
 import type { Bundle, District, OutcomeStatewide } from "./types.ts";
 import { schoolYearBefore, seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
 import { term } from "./glossary.ts";
@@ -174,7 +174,7 @@ export function renderOutcomes(bundle: Bundle): string {
       scatterSpec(
         points,
         {
-          x: { label: `spending per ${label}`, format: (v) => money(v) },
+          x: { label: `spending per ${label}`, format: compactMoney },
           y: { label: "Performance Index", format: (v) => fixed(v, 0) },
         },
         traces,
@@ -399,7 +399,7 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
         value: d.outcome!.performance_index!,
         hover: `${d.name}: Performance Index ${fixed(d.outcome!.performance_index!, 1)}, ${pct(d.economically_disadvantaged!, 0)} economically disadvantaged`,
       })),
-      { width: w, marker },
+      { width: w, format: (v) => fixed(v, 0), marker },
     );
 
   return `
@@ -426,13 +426,7 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
              its middle half, the line inside it the middle of the fifth, and the
              colored rule is ${escapeHtml(district.name)}. The gap in the third tile is worth what
              the width of this box says it is worth.</p>
-             <div class="chart-scale">
-               <div class="chartwrap" data-chart="peer-group">${renderToString(peerBox, { label: `Performance Index across the ${count(peers.length)} districts in the ${label}, with ${district.name} marked, ${seriesYear("outcome.performance")?.label ?? ""}` })}</div>
-               <div class="scale">
-                 <span>${fixed(firstOf(scores), 1)}</span>
-                 <span>${fixed(lastOf(scores), 1)}</span>
-               </div>
-             </div>`
+             <div class="chartwrap" data-chart="peer-group">${renderToString(peerBox, { label: `Performance Index across the ${count(peers.length)} districts in the ${label}, with ${district.name} marked, ${seriesYear("outcome.performance")?.label ?? ""}` })}</div>`
           : ""
       }
       <p class="note">Ohio's attainment measure tracks economic disadvantage at

@@ -155,3 +155,89 @@ describe("figures in prose", () => {
     expect(report, "format the value through `fixed`, `signed` or `millions` in src/lib/format.ts").toEqual([]);
   });
 });
+
+/**
+ * Every number a chart draws, written at a reading precision (#610).
+ *
+ * # What this holds
+ *
+ * Chart text came at three precisions: "$1,234,567,890" at the end of a fan, "$812.5M" on a bar
+ * beside it, "$1.2B" in the scale row underneath. A label on a chart stands for a position, not a
+ * figure to quote — the tooltip and the table carry the full figure — so the axis ends, the direct
+ * labels and the series ends go through `compactMoney`. And a bar a few pupils wide was labelled
+ * "0%", which reads as a bar that should not be there; `pct` writes "<1%" for it.
+ */
+describe("chart text", () => {
+  /** The classes whose text is a number the chart states. */
+  const NUMERIC = /^(?:axis-foot|bar-value|series-end)$/;
+  const texts: { page: string; cls: string; text: string }[] = [];
+  /** Each drawing carrying a "0%" direct label, for the width check below. */
+  const zeroes: { page: string; svg: string }[] = [];
+  for (const file of pages()) {
+    const page = readFileSync(file, "utf8");
+    if (!page.includes('class="plot')) continue;
+    const at = file.slice(DIST.length + 1);
+    for (const svg of page.match(/<svg\b[\s\S]*?<\/svg>/g) ?? []) {
+      for (const group of svg.matchAll(/<g\b[^>]*\bclass="([^"]+)"[^>]*>([\s\S]*?)<\/g>/g)) {
+        const cls = group[1]!.split(/\s+/)[0]!;
+        if (!NUMERIC.test(cls)) continue;
+        for (const t of group[2]!.matchAll(/<text\b[^>]*>([\s\S]*?)<\/text>/g)) {
+          const text = t[1]!.replace(/<[^>]+>/g, "").trim();
+          if (text) texts.push({ page: at, cls, text });
+          if (cls === "bar-value" && text === "0%") zeroes.push({ page: at, svg });
+        }
+      }
+    }
+  }
+
+  test("the sweep reads chart text of every kind it is about", () => {
+    for (const cls of ["axis-foot", "bar-value", "series-end"]) {
+      expect(texts.filter((t) => t.cls === cls).length, cls).toBeGreaterThan(20);
+    }
+  });
+
+  test("no axis end, direct label or series end writes dollars to the dollar past a million", () => {
+    const long = texts.filter((t) => /\$\d{1,3}(,\d{3}){2,}/.test(t.text));
+    expect(
+      long.slice(0, 10).map((t) => `${t.page} [${t.cls}] ${t.text}`),
+      "write the chart's number through `compactMoney`",
+    ).toEqual([]);
+  });
+
+  /** The "0%" direct labels in one drawing that sit on a bar wider than nothing. */
+  const zeroOnWidth = (svg: string): string[] => {
+    const doc = parseHTML(`<div>${svg}</div>`).document;
+    const rects = [...doc.querySelectorAll("g.bar-fill rect")].map((r) => ({
+      mid: Number(r.getAttribute("y")) + Number(r.getAttribute("height")) / 2,
+      width: Number(r.getAttribute("width")),
+    }));
+    const wrong: string[] = [];
+    for (const t of doc.querySelectorAll("g.bar-value text")) {
+      if (t.textContent?.trim() !== "0%") continue;
+      const at = /translate\([^,]+,([-\d.]+)/.exec(t.getAttribute("transform") ?? "")?.[1] ?? t.getAttribute("y");
+      const bar = rects.find((r) => Math.abs(r.mid - Number(at)) <= 1);
+      if (bar == null || bar.width > 0.5) wrong.push(`"0%" on a bar ${bar?.width ?? "?"}px wide`);
+    }
+    return wrong;
+  };
+
+  test("no bar of any width is labelled 0%", () => {
+    /*
+     * A direct label sits on its bar's row, so the bar it labels is the `.bar-fill` rect whose
+     * middle is the text's y. A bar of zero width labelled "0%" is true; any other is not.
+     */
+    const wrong = zeroes.flatMap(({ page, svg }) => zeroOnWidth(svg).map((w) => `${page}: ${w}`));
+    expect(wrong.slice(0, 10)).toEqual([]);
+  });
+
+  test("the 0% guard fires on a real drawing written the old way", () => {
+    // The build carries no "0%" label to check, so the rule above passes on nothing unless it is
+    // shown to fire: a real "<1%" bar, relabelled as it was before #610, must be caught.
+    const sample = pages()
+      .map((file) => readFileSync(file, "utf8"))
+      .find((page) => page.includes(">&lt;1%</text>"));
+    const svg = sample?.match(/<svg\b[\s\S]*?<\/svg>/g)?.find((s) => s.includes(">&lt;1%</text>"));
+    expect(svg, "a drawing with a <1% label").toBeDefined();
+    expect(zeroOnWidth(svg!.replace(">&lt;1%</text>", ">0%</text>")).length).toBeGreaterThan(0);
+  });
+});

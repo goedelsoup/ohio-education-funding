@@ -13,7 +13,7 @@
 import Base from "../layouts/Base.astro";
 import { NAMES } from "../lib/nav.ts";
 import { loadFeed, qualifiedName } from "../lib/feed.ts";
-import { count, fig, money, pct } from "../lib/format.ts";
+import { compactMoney, count, fig, money, pct } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
 import { yearOf, type SeriesKey } from "../lib/year.ts";
 import { distributionSpec } from "../lib/plot/spec.ts";
@@ -67,14 +67,15 @@ const sortable = (value: number | null) => (value == null ? "" : String(value));
  */
 const MEASURES = (
   [
-    ["adm", "Enrolled ADM", "formula", (d: District) => d.adm, (v: number) => count(Math.round(v))],
-    ["aid", "State aid per pupil", "formula", (d: District) => d.realized_aid_per_pupil, (v: number) => money(v)],
+    ["adm", "Enrolled ADM", "formula", (d: District) => d.adm, (v: number) => count(Math.round(v)), (v: number) => count(Math.round(v))],
+    ["aid", "State aid per pupil", "formula", (d: District) => d.realized_aid_per_pupil, (v: number) => money(v), compactMoney],
     [
       "guarantee",
       "What the guarantee adds, per pupil",
       "formula",
       (d: District) => (d.on_guarantee ? d.guarantee / Math.max(d.adm, 1) : null),
       (v: number) => money(v),
+      compactMoney,
       "on the guarantee",
     ],
     [
@@ -83,6 +84,7 @@ const MEASURES = (
       "profile",
       (d: District) => d.valuation_per_pupil,
       (v: number) => money(v),
+      compactMoney,
       "reporting a tax base",
     ],
     [
@@ -91,9 +93,10 @@ const MEASURES = (
       "profile",
       (d: District) => d.economically_disadvantaged,
       (v: number) => pct(v, 0),
+      (v: number) => pct(v, 0),
       "reporting the share",
     ],
-    ["enrollment", "Enrollment change", "enrollment", (d: District) => d.enrollment_change, (v: number) => pct(v, 1)],
+    ["enrollment", "Enrollment change", "enrollment", (d: District) => d.enrollment_change, (v: number) => pct(v, 1), (v: number) => pct(v, 1)],
   ] as const satisfies readonly (readonly [string, string, SeriesKey, ...unknown[]])[]
 /*
  * The population is per measure, and three of the six are not every district.
@@ -107,7 +110,7 @@ const MEASURES = (
  * `subset` says why a measure has fewer, rather than leaving the reader to wonder whether three
  * districts went missing.
  */
-).map(([key, label, series, read, format, subset]) => {
+).map(([key, label, series, read, format, axis, subset]) => {
   const values = bundle.districts
     .map((d) => ({ d, v: read(d) }))
     .filter((row): row is { d: District; v: number } => row.v != null && Number.isFinite(row.v))
@@ -119,9 +122,7 @@ const MEASURES = (
     year: yearOf(series),
     n: values.length,
     subset,
-    chart: renderToString((w) => distributionSpec(values, { width: w }), { label: `${label} across ${count(values.length)} districts, from ${format(sorted[0] ?? 0)} to ${format(sorted[sorted.length - 1] ?? 0)}` }),
-    low: format(sorted[0] ?? 0),
-    high: format(sorted[sorted.length - 1] ?? 0),
+    chart: renderToString((w) => distributionSpec(values, { width: w, format: axis }), { label: `${label} across ${count(values.length)} districts, from ${format(sorted[0] ?? 0)} to ${format(sorted[sorted.length - 1] ?? 0)}` }),
   };
 });
 
@@ -173,13 +174,7 @@ const years = Object.fromEntries(MEASURES.map((m) => [m.key, m.year])) as Record
             {" "}{m.year}. The shaded box is the middle half; the dots past the whiskers are
             districts of their own.
           </p>
-          <div class="chart-scale">
-            <div class="chartwrap" set:html={m.chart} />
-            <div class="scale">
-              <span>{m.low}</span>
-              <span>{m.high}</span>
-            </div>
-          </div>
+          <div class="chartwrap" set:html={m.chart} />
         </div>
       ))
     }

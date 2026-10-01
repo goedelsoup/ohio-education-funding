@@ -33,7 +33,7 @@
  */
 
 import type { District, Statewide } from "./types.ts";
-import { count, escapeHtml, money, pct } from "./format.ts";
+import { compactMoney, count, escapeHtml, fixed, money, pct } from "./format.ts";
 import { compare } from "./order.ts";
 import * as routes from "./routes.ts";
 import { median } from "./stats.ts";
@@ -152,7 +152,7 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
   // Read outside the drawing: `valuationRatio` is narrowed by the guard at the top of this
   // function, and a property narrowing does not survive into a closure that runs later.
   const marker = { value: c.valuationRatio!, label: c.name };
-  const position: Drawing = (w) => distributionSpec(ratios, { width: w, marker });
+  const position: Drawing = (w) => distributionSpec(ratios, { width: w, format: (v) => `${fixed(v, 1)}×`, marker });
 
   /*
    * Every district in the county, not just the two ends of it.
@@ -174,7 +174,7 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
           value: d.valuation_per_pupil!,
           hover: `${d.name}: ${money(d.valuation_per_pupil!)} per pupil, ${money(d.realized_aid_per_pupil)} state aid per pupil`,
         })),
-      { width: w },
+      { width: w, format: compactMoney },
     );
 
   return `
@@ -188,13 +188,7 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
                  ? " The shaded box is the middle half of them."
                  : ""
              }</p>
-             <div class="chart-scale">
-               <div class="chartwrap" data-chart="county-spread">${renderToString(dots, { label: `Assessed valuation per pupil for each of the ${count(c.districts.filter((d) => d.valuation_per_pupil != null).length)} districts in ${c.name} County reporting a tax base, poorest at left, ${yearOf("formula")}` })}</div>
-               <div class="scale">
-                 <span>${money(poor.valuation_per_pupil!)}</span>
-                 <span>${money(rich.valuation_per_pupil!)}</span>
-               </div>
-             </div>`
+             <div class="chartwrap" data-chart="county-spread">${renderToString(dots, { label: `Assessed valuation per pupil for each of the ${count(c.districts.filter((d) => d.valuation_per_pupil != null).length)} districts in ${c.name} County reporting a tax base, poorest at left, ${yearOf("formula")}` })}</div>`
           : ""
       }
       <div class="scroll"><table>
@@ -225,13 +219,7 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
              district reporting a tax base — one dot each, narrowest on the left, and the colored
              rule is ${escapeHtml(c.name)}. The median is
              ${median(ratios.map((r) => r.value)).toFixed(1)}× apart.</p>
-             <div class="chart-scale">
-               <div class="chartwrap" data-chart="county-position">${renderToString(position, "presentational")}</div>
-               <div class="scale">
-                 <span>${Math.min(...ratios.map((r) => r.value)).toFixed(1)}×</span>
-                 <span>${Math.max(...ratios.map((r) => r.value)).toFixed(1)}×</span>
-               </div>
-             </div>`
+             <div class="chartwrap" data-chart="county-position">${renderToString(position, "presentational")}</div>`
           : ""
       }
       <p class="note">Two districts in the same county, <strong>${c.valuationRatio.toFixed(

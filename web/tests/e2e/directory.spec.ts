@@ -156,14 +156,14 @@ test.describe("the district index shows the distribution it is filtering", () =>
   test("the strip's high-value label never crowds the filter label below it", async ({ page }) => {
     /*
      * `.measures` and the `.filters` form that follows it had no margin between them anywhere in
-     * the chain — `.scale`, the div holding the strip's own low/high labels, carried none either —
-     * so the visible strip's high-value label (e.g. "$896") sat directly against "Name or IRN" at
-     * every width. Not font-sensitive: the gap was zero regardless of how either label is set.
+     * the chain, so the visible strip's high-value label (e.g. "$896") sat directly against "Name
+     * or IRN" at every width. Not font-sensitive: the gap was zero regardless of how either label
+     * is set. The label is now the strip's own foot, drawn inside the SVG.
      */
     for (const width of [375, 768, 1280]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto("/districts");
-      const scaleHigh = page.locator(".measure:visible .scale span").last();
+      const scaleHigh = page.locator(".measure:visible svg.plot:visible g.axis-foot text").last();
       const nameLabel = page.locator('label[for="f-name"]');
       const [scaleBox, labelBox] = await Promise.all([
         scaleHigh.boundingBox(),

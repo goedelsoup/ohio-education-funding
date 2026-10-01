@@ -10,7 +10,7 @@
  */
 import type { FanPoint } from "../../lib/chart.ts";
 import { lastOf } from "../../lib/ends.ts";
-import { money } from "../../lib/format.ts";
+import { compactMoney, money } from "../../lib/format.ts";
 import { fanSpec } from "../../lib/plot/spec.ts";
 import { renderToString } from "../../lib/plot/ssr.ts";
 import { currentLaw, modelOf } from "../../lib/policy.ts";
@@ -75,7 +75,7 @@ const horizon = end.fiscalYear - meta.base_year;
 const bias = insensitive ? null : meanDistrictBias(meta.bias, horizon);
 const chart = renderToString((w) => fanSpec(
   points,
-  (v) => money(v),
+  compactMoney,
   (p) =>
     p.observed
       ? `FY${p.year}: ${money(p.point)} at published enrollment — exact`

@@ -242,33 +242,6 @@ test.describe("charts on a phone", () => {
     expect(large.slice(0, 10), "chart text painted over body size").toEqual([]);
   });
 
-  test("a strip's scale row ends where its drawing does", async ({ page }) => {
-    // A capped drawing sits at the left of a wider column. The HTML row naming its two ends is
-    // capped to match in `app.css`; if the two disagreed, the high end would sit under nothing.
-    const off: string[] = [];
-    let seen = 0;
-    for (const width of [375, 600, 1280]) {
-      await page.setViewportSize({ width, height: 900 });
-      for (const route of CHARTED) {
-        await visit(page, route);
-        const gaps = await page.locator(".chart-scale").evaluateAll((rows) =>
-          rows
-            .filter((row) => row.getClientRects().length)
-            .map((row) => {
-              const svg = [...row.querySelectorAll("svg.plot")].find((s) => s.getClientRects().length);
-              const scale = row.querySelector(".scale");
-              if (!svg || !scale) return Infinity;
-              return scale.getBoundingClientRect().right - svg.getBoundingClientRect().right;
-            }),
-        );
-        seen += gaps.length;
-        for (const gap of gaps) if (Math.abs(gap) > 0.5) off.push(`${route} at ${width}px: ${gap}px`);
-      }
-    }
-    expect(seen, "the routes carry scale rows to measure").toBeGreaterThan(0);
-    expect(off.slice(0, 10), "scale rows that overrun or fall short of their strip").toEqual([]);
-  });
-
   test("no chart draws a label outside its own frame", async ({ page }) => {
     /*
      * The other half of drawing narrow. Every gutter in `spec.ts` is sized to the text that goes

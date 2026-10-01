@@ -106,7 +106,7 @@ import type {
 } from "./chart.ts";
 import type { Node } from "./corpus.ts";
 import { citedCrates, proseFields, type Manifest, type Unit } from "./corpusFigures.ts";
-import { count, money, pct } from "./format.ts";
+import { compactMoney, count, money, pct, sig } from "./format.ts";
 import * as routes from "./routes.ts";
 
 /**
@@ -665,7 +665,7 @@ const POSITIONS = new Intl.NumberFormat("en-US", {
  * slopes and correlations these charts carry are pinned at, and a reader quoting one off a chart
  * should be quoting the figure rather than a rounding of it.
  */
-export function formatValue(unit: Unit, value: number): string {
+function formatValue(unit: Unit, value: number): string {
   switch (unit) {
     case "count":
       return count(value);
@@ -680,6 +680,31 @@ export function formatValue(unit: Unit, value: number): string {
     case "ratio":
       return value.toFixed(4);
   }
+}
+
+/**
+ * A value as an axis end writes it: the tooltip's figure, rounded to what a reader can place.
+ *
+ * {@link formatValue} writes a tooltip coordinate at the precision the crate pins, so a ratio came
+ * out as "0.1175" and a dollar total as "$1,234,567,890" at the end of an axis, where the label
+ * stands for a position on a line rather than a figure to quote. Dollars go compact and a ratio
+ * to three significant figures (#610); the other units are already written at a reading precision.
+ */
+export function formatTick(unit: Unit, value: number): string {
+  switch (unit) {
+    case "dollars":
+      return compactMoney(value);
+    case "ratio":
+      return sig(value);
+    default:
+      return formatValue(unit, value);
+  }
+}
+
+/** {@link formatTick}, signed as {@link formatRow} is, for the axes of a chart drawn in changes. */
+function formatTickRow(unit: Unit, value: number): string {
+  const sign = value > 0 ? "+" : value < 0 ? "−" : "";
+  return `${sign}${formatTick(unit, Math.abs(value))}`;
 }
 
 /**
@@ -839,12 +864,12 @@ export function panelsOf(cloud: ManifestScatter): CloudPanel[] {
       points,
       x: {
         label: cloud.x.label,
-        format: (v: number) => formatValue(cloud.x.unit, v),
+        format: (v: number) => formatTick(cloud.x.unit, v),
         log: cloud.x.log,
       },
       y: {
         label: panel.y.label,
-        format: (v: number) => formatValue(panel.y.unit, v),
+        format: (v: number) => formatTick(panel.y.unit, v),
         log: panel.y.log,
       },
       fit: {
@@ -991,12 +1016,12 @@ export function regionsOf(spread: ManifestSpread): SpreadPanel[] {
     }),
     x: {
       label: spread.x.label,
-      format: (v: number) => formatRow(spread.x.unit, v),
+      format: (v: number) => formatTickRow(spread.x.unit, v),
       log: spread.x.log,
     },
     y: {
       label: spread.y.label,
-      format: (v: number) => formatRow(spread.y.unit, v),
+      format: (v: number) => formatTickRow(spread.y.unit, v),
       log: spread.y.log,
     },
     xDomain: [spread.x.min, spread.x.max],
@@ -1022,7 +1047,7 @@ export interface BandChart {
  * in TypeScript would be a second source for the same claim.
  */
 export function rangesOf(band: ManifestBand): BandChart {
-  const format = (v: number) => formatValue(band.measure.unit, v);
+  const format = (v: number) => formatTick(band.measure.unit, v);
   return {
     rows: band.spans.map((span) => ({
       label: span.label,

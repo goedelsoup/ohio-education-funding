@@ -45,6 +45,7 @@ import type {
 } from "../chart.ts";
 import { INK, ORDINAL, SERIES } from "./tokens.ts";
 import { firstOf, lastOf } from "../ends.ts";
+import { fiscalYear } from "../yearLabel.ts";
 
 /**
  * How a chart is announced to a reader who cannot see it.
@@ -334,9 +335,6 @@ export const WIDTHS = {
  * 1.25 is the 15px of body text. So no chart label is painted larger than the sentence above it.
  * `draw` writes the cap onto every SVG as a `max-width`, which is the one place both renderers and
  * every panel width pass through; a box wider than the cap leaves the drawing at its left edge.
- *
- * `.chart-scale` in `app.css` holds the same three products, 375, 550 and 800, for the HTML scale
- * row under a strip, which has to end where the drawing does.
  */
 export const MAX_SCALE = 1.25;
 
@@ -599,8 +597,123 @@ function yTitle(width: number, marginLeft: number, label: string, marginTop: num
 }
 
 /**
- * The annotation along the foot of a chart: an end of the scale at each corner, and between them
- * the one sentence the chart has to say about itself.
+ * A numeric scale whose ends a foot labels where they fall, rather than at the frame's corners.
+ *
+ * `format` is the chart's own formatter for a label. `floor`, where given, is what the low end of
+ * the domain says instead of a number: `rankSpec`'s domain starts half a step below its smallest
+ * drawable value, so the row at zero has somewhere to sit, and a log scale reaches no zero to
+ * label. It printed "0" there, a value the axis cannot hold.
+ */
+export interface FootScale {
+  domain: [number, number];
+  log?: boolean | undefined;
+  format: (v: number) => string;
+  floor?: string;
+  /**
+   * A label the scale's own labels keep clear of, centred on its value: the strips' "no change" at
+   * zero. Drawn by the foot so that it is measured with the rest rather than drawn over them.
+   */
+  beside?: { value: number; label: string };
+}
+
+/** `rangeSpec`'s x domain: the data on a log scale, and 4% either side of it on a linear one. */
+function rangeDomain(min: number, max: number, log = false): [number, number] {
+  return log ? [min, max] : [min - (max - min) * 0.04, max + (max - min) * 0.04];
+}
+
+/**
+ * The two round ends of a y scale, in the left margin, each at its own height.
+ *
+ * The highest hangs down from its value and the lowest hangs up from its value, so the pair stays
+ * inside the frame whichever end of the domain a round value lands at.
+ */
+function yEnds(
+  domain: [number, number],
+  format: (v: number) => string,
+  marginLeft: number,
+  log = false,
+): Plot.Markish[] {
+  const ticks = axisTicks(domain, log);
+  return [firstOf(ticks), lastOf(ticks)].map((value, i) =>
+    Plot.text([value], {
+      y: () => value,
+      frameAnchor: "left",
+      dx: -marginLeft + 4,
+      text: () => format(value),
+      // The top label 3 units clear of the axis name above the frame, which a round value at the
+      // very top would otherwise touch where the name wraps to two lines.
+      ...(i === 1 ? { dy: 3 } : {}),
+      textAnchor: "start",
+      lineAnchor: i === 0 ? "bottom" : "top",
+      fill: INK.muted,
+      fontSize: 11,
+      className: "axis-end",
+    }),
+  );
+}
+
+/**
+ * The values to label along a numeric axis: round ones, inside the domain.
+ *
+ * Every foot printed the data's two extremes, `$78,992 | $1,350,078`, as written. The strips' and
+ * the scatters' domains are padded past the extremes, so the extremes were not even where they
+ * were printed. "$1,350,078" sat 25px of 800 to the right of the dot it named, over nothing. A
+ * round value at its own position tells the reader where the scale is, which is the one job the
+ * label has.
+ *
+ * Linear: the first and last multiples of a 1-2-5 step inside the domain. Log: the first and last
+ * 1-2-5 values inside it and every power of ten between them. Two numbers on a log axis say
+ * nothing about its spacing, and the decades are what a reader reads it by.
+ */
+export function axisTicks(domain: [number, number], log = false): number[] {
+  const [lo, hi] = domain;
+  if (!(hi > lo)) return [lo];
+  if (log && lo > 0) {
+    const first = niceLog(lo, "up");
+    const last = niceLog(hi, "down");
+    if (first < last) {
+      const decades: number[] = [];
+      for (let k = Math.ceil(Math.log10(first)); 10 ** k < last; k++) {
+        const decade = clean(10 ** k);
+        if (decade > first) decades.push(decade);
+      }
+      return [first, ...decades, last];
+    }
+  }
+  // Coarse first, finer until there are two to label: a narrow domain can hold no multiple of the
+  // step its span suggests, or only one.
+  for (let step = niceStep((hi - lo) / 4); step > (hi - lo) / 1000; step = niceStep(step / 2)) {
+    const first = clean(Math.ceil(lo / step) * step);
+    const last = clean(Math.floor(hi / step) * step);
+    if (last > first) return [first, last];
+  }
+  return [lo, hi];
+}
+
+/** The largest 1, 2 or 5 times a power of ten that is at most `v`. */
+function niceStep(v: number): number {
+  const power = 10 ** Math.floor(Math.log10(v));
+  const m = v / power;
+  return clean((m >= 5 ? 5 : m >= 2 ? 2 : 1) * power);
+}
+
+/** The nearest 1-2-5 value at or beyond `v` in the direction given. */
+function niceLog(v: number, toward: "up" | "down"): number {
+  const k = Math.floor(Math.log10(v));
+  const rungs = [-1, 0, 1].flatMap((d) => [1, 2, 5].map((m) => clean(m * 10 ** (k + d))));
+  return toward === "up"
+    ? Math.min(...rungs.filter((r) => r >= v * (1 - 1e-9)))
+    : Math.max(...rungs.filter((r) => r <= v * (1 + 1e-9)));
+}
+
+/** A product of a step and an integer, without the float residue `0.1 * 3` leaves. */
+function clean(v: number): number {
+  return Number(v.toPrecision(12));
+}
+
+/**
+ * The annotation along the foot of a chart: the scale's labels, and between them the one sentence
+ * the chart has to say about itself.
  *
  * Four forms drew this row and all four drew it the same way — three text marks at one `dy`,
  * anchored bottom-left, bottom and bottom-right. On a 640 frame the three fit. On a 320 one they
@@ -609,27 +722,37 @@ function yTitle(width: number, marginLeft: number, label: string, marginTop: num
  * — the whole reason that statement is on the chart rather than in the caption — arrived as a
  * smear of overlapping type.
  *
- * So the row measures itself. Where the three fit, nothing changes and the wide drawings are
- * byte-identical to what they were. Where they do not, the centre drops to a line of its own under
- * the two ends — and stops being a centre, for the reason given where it is drawn — and the caller
- * is told how much more bottom margin that costs.
+ * So the row measures itself. Where the centre fits between the labels, it stays there. Where it
+ * does not, the centre drops to a line of its own under them — and stops being a centre, for the
+ * reason given where it is drawn — and the caller is told how much more bottom margin that costs.
+ *
+ * # Two kinds of end
+ *
+ * `low` and `high` as strings are written at the frame's corners. That is right for a time axis
+ * whose domain is exactly its first and last year, which is what the fan and the series pass. A
+ * {@link FootScale} is labelled at round values where they fall instead (see {@link axisTicks}),
+ * and an interior label that would collide with its neighbours is left out rather than drawn
+ * through them. The ends are kept first, because they are what says how far the scale runs.
  */
 function axisFoot(options: {
   width: number;
   marginLeft: number;
   marginRight: number;
   dy: number;
-  /** The low end of the scale, at the left corner. */
-  low: string;
-  /** What the chart says about itself, between them. */
+  /** What the chart says about itself, between the labels. Empty for a strip, which says nothing. */
   says: string;
-  /** The high end, at the right corner. */
-  high: string;
-}): { marks: Plot.Markish[]; extraBottom: number } {
-  const { width, marginLeft, marginRight, dy, low, says, high } = options;
+  /**
+   * The type size, 11 by default. A strip is drawn at the narrow width and painted across a whole
+   * column, so on a phone its 11 units came out at 12.3px, past the band every other chart's foot
+   * sits in; it passes 10.
+   */
+  fontSize?: number;
+} & ({ low: string; high: string } | { scale: FootScale })): {
+  marks: Plot.Markish[];
+  extraBottom: number;
+} {
+  const { width, marginLeft, marginRight, dy, says, fontSize = 11 } = options;
   const frame = width - marginLeft - marginRight;
-  // A gap either side of the centre, so "fits" means legibly rather than exactly.
-  const fits = textPx(low) + textPx(says) + textPx(high) + 24 <= frame;
   /*
    * The drop to a second line, and why it is not the type size.
    *
@@ -644,19 +767,77 @@ function axisFoot(options: {
    * DejaVu Sans, Liberation Sans, Arial, Verdana and Tahoma.
    */
   const line = 16;
-  const at = (anchor: "bottom-left" | "bottom" | "bottom-right", y: number, text: string) =>
-    Plot.text([0], {
-      frameAnchor: anchor,
+  const text = (
+    value: number,
+    position: { frameAnchor: "bottom-left" | "bottom" | "bottom-right" } | { x: number },
+    y: number,
+    label: string,
+    textAnchor: "start" | "middle" | "end",
+  ) =>
+    Plot.text([value], {
+      ...("x" in position ? { x: () => position.x, frameAnchor: "bottom" as const } : position),
       dy: y,
-      text: () => text,
+      text: () => label,
       // A bottom anchor stacks a wrapped string upward from its last line, which is what the
       // dropped line's `dy` is measured to. Spaced at `line` so each one keeps its clear space.
-      lineHeight: line / 11,
-      ...(anchor === "bottom-left" ? { textAnchor: "start" as const } : {}),
-      ...(anchor === "bottom-right" ? { textAnchor: "end" as const } : {}),
+      lineHeight: line / fontSize,
+      ...(textAnchor === "middle" ? {} : { textAnchor }),
       fill: INK.muted,
-      fontSize: 11,
+      fontSize,
+      className: "axis-foot",
     });
+
+  /** The labels, and the spans of the frame they occupy, measured from its left edge. */
+  let ends: Plot.Markish[];
+  let taken: [number, number][];
+  if ("scale" in options) {
+    const { domain, log = false, format, floor, beside } = options.scale;
+    const [lo, hi] = domain;
+    const px = (v: number) =>
+      frame * (log ? Math.log(v / lo) / Math.log(hi / lo) : (v - lo) / (hi - lo));
+    const ticks = axisTicks(domain, log).filter((v) => v > lo || floor == null);
+    const candidates = [
+      ...(floor != null ? [{ value: lo, label: floor }] : []),
+      ...ticks.map((value) => ({ value, label: format(value) })),
+    ].map((c, i, all) => {
+      const anchor: "start" | "middle" | "end" =
+        i === 0 ? "start" : i === all.length - 1 ? "end" : "middle";
+      const x = px(c.value);
+      const w = textPx(c.label, fontSize);
+      const span: [number, number] =
+        anchor === "start" ? [x, x + w] : anchor === "end" ? [x - w, x] : [x - w / 2, x + w / 2];
+      return { ...c, anchor, span, end: i === 0 || i === all.length - 1 };
+    });
+    const fixed = beside
+      ? [beside].map((b) => {
+          const x = px(b.value);
+          const w = textPx(b.label, fontSize);
+          return { ...b, anchor: "middle" as const, span: [x - w / 2, x + w / 2] as [number, number], end: false };
+        })
+      : [];
+    // The fixed label first, then the ends, then the interior in order, each only where it clears
+    // what is already kept.
+    const kept: typeof candidates = [...fixed];
+    for (const c of [...candidates.filter((c) => c.end), ...candidates.filter((c) => !c.end)]) {
+      if (kept.every((k) => c.span[0] >= k.span[1] + 8 || c.span[1] <= k.span[0] - 8)) kept.push(c);
+    }
+    kept.sort((a, b) => a.value - b.value);
+    ends = kept.map((c) => text(c.value, { x: c.value }, dy, c.label, c.anchor));
+    taken = kept.map((c) => c.span);
+  } else {
+    const { low, high } = options;
+    ends = [
+      text(0, { frameAnchor: "bottom-left" }, dy, low, "start"),
+      text(0, { frameAnchor: "bottom-right" }, dy, high, "end"),
+    ];
+    taken = [
+      [0, textPx(low)],
+      [frame - textPx(high), frame],
+    ];
+  }
+  // A gap either side of the centre, so "fits" means legibly rather than exactly.
+  const half = textPx(says) / 2;
+  const fits = taken.every(([a, b]) => frame / 2 - half >= b + 12 || frame / 2 + half <= a - 12);
   /*
    * The dropped line starts at the axis rather than staying centred, and that is not cosmetic.
    *
@@ -677,18 +858,15 @@ function axisFoot(options: {
    * units past the SVG. So it wraps to what it has, and every line past the first costs another
    * `line` of bottom margin.
    */
+  if (says === "") return { marks: ends, extraBottom: 0 };
   if (fits) {
-    return {
-      marks: [at("bottom-left", dy, low), at("bottom-right", dy, high), at("bottom", dy, says)],
-      extraBottom: 0,
-    };
+    return { marks: [...ends, text(0, { frameAnchor: "bottom" }, dy, says, "middle")], extraBottom: 0 };
   }
   const lines = wrapText(says, width - marginLeft - 4);
   return {
     marks: [
-      at("bottom-left", dy, low),
-      at("bottom-right", dy, high),
-      at("bottom-left", dy + line * lines.length, lines.join("\n")),
+      ...ends,
+      text(0, { frameAnchor: "bottom-left" }, dy + line * lines.length, lines.join("\n"), "start"),
     ],
     extraBottom: line * lines.length,
   };
@@ -1203,9 +1381,12 @@ export function scatterSpec(
     marginLeft,
     marginRight,
     dy: 20,
-    low: axes.x.format(xMin),
     says: axes.x.label + (axes.x.log ? " (log scale)" : ""),
-    high: axes.x.format(xMax),
+    scale: {
+      domain: axes.x.log ? [xMin, xMax] : [xMin - xPad, xMax + xPad],
+      log: axes.x.log,
+      format: axes.x.format,
+    },
   });
   const marginBottom = 40 + foot.extraBottom;
 
@@ -1435,26 +1616,20 @@ export function scatterSpec(
 
         // Both ends of both scales. A cloud with no numbers on it is a texture.
         ...foot.marks,
-        Plot.text([0], {
-          frameAnchor: "top-left",
-          dx: -marginLeft + 4,
-          // Clear of the axis name above it. Both sat on the frame's top edge, so
-          // "Performance Index" and the 113 it labels were drawn through each other at every
-          // width — the one collision in this file that predates there being two of them.
-          dy: 3,
-          text: () => axes.y.format(yMax),
-          textAnchor: "start",
-          fill: INK.muted,
-          fontSize: 11,
-        }),
-        Plot.text([0], {
-          frameAnchor: "bottom-left",
-          dx: -marginLeft + 4,
-          text: () => axes.y.format(yMin),
-          textAnchor: "start",
-          fill: INK.muted,
-          fontSize: 11,
-        }),
+        /*
+         * The y scale's round ends, each at its own height, as the foot's are at their own x.
+         *
+         * These were the data's extremes printed at the frame's corners, over a domain padded past
+         * them. Each label hangs inward from its value, the top one down and the bottom one up, so
+         * neither reaches the axis name above the frame. Those two sat on the frame's top edge
+         * once and "Performance Index" and the 113 it labels were drawn through each other.
+         */
+        ...yEnds(
+          axes.y.log ? [yMin, yMax] : [yMin - yPad, yMax + yPad],
+          axes.y.format,
+          marginLeft,
+          axes.y.log,
+        ),
         title.mark,
 
         // The hit layer. Bigger than the mark and invisible, so a reader can point at a district
@@ -1775,9 +1950,8 @@ export function planeSpec(
     marginLeft,
     marginRight,
     dy: 20,
-    low: axes.x.format(xLo),
     says: axes.x.label,
-    high: axes.x.format(xHi),
+    scale: { domain: [xLo, xHi], format: axes.x.format },
   });
   const marginBottom = 40 + foot.extraBottom;
   const height = options.height ?? 420;
@@ -1969,9 +2143,8 @@ export function rangeSpec(
     marginLeft,
     marginRight: 16,
     dy: 16,
-    low: axis.format(min),
     says: axis.label + (axis.log ? " (log scale)" : ""),
-    high: axis.format(max),
+    scale: { domain: rangeDomain(min, max, axis.log), log: axis.log, format: axis.format },
   });
 
   const marginTop = 0;
@@ -2005,7 +2178,7 @@ export function rangeSpec(
       x: {
         axis: null,
         type: axis.log ? "log" : "linear",
-        domain: axis.log ? [min, max] : [min - (max - min) * 0.04, max + (max - min) * 0.04],
+        domain: rangeDomain(min, max, axis.log),
       },
       y: { axis: null, domain: rows.map((r) => r.label), padding: 0.2 },
       marks: [
@@ -2191,9 +2364,15 @@ export function rankSpec(
     marginLeft,
     marginRight,
     dy: 16,
-    low: axis.format(smallest),
     says: `${axis.label} (log scale)`,
-    high: axis.format(max),
+    scale: {
+      domain: [floor, max],
+      log: true,
+      format: axis.format,
+      // The zero row sits at the floor, which is below every value the scale can hold. "0" there
+      // named a point a log axis has no position for.
+      ...(smallest > 0 ? {} : { floor: `under ${axis.format(Math.min(...positive))}` }),
+    },
   });
 
   return {
@@ -2405,6 +2584,15 @@ export function distributionSpec(
     /** The one this page is about. Drawn last, above every other mark. */
     marker?: { value: number; label: string } | null;
     /**
+     * How the strip's scale labels are written. Required: a strip is drawn with no axis, and
+     * without these a dot four fifths along means nothing at all.
+     *
+     * The labels used to be an HTML row under the SVG, its two ends pinned to the corners of a
+     * domain padded past the data, so "$1,350,078" sat about 25px of 800 from the dot it named.
+     * They are drawn here now, at round values, where those values fall (see {@link axisFoot}).
+     */
+    format: (v: number) => string;
+    /**
      * Draw every value rather than only the outliers.
      *
      * Defaults on up to {@link DOTS_UP_TO}. Pass it explicitly only to override that for a reason
@@ -2452,9 +2640,22 @@ export function distributionSpec(
   const min0 = firstOf(sorted).value;
   const max0 = lastOf(sorted).value;
   const crossesZero = min0 < 0 && max0 > 0;
-  // Room under the strip for the label, and only where there is a label — the five unsigned strips
-  // keep their exact geometry, which is what the six of them being one row apart depends on.
-  const height = crossesZero ? 64 : 46;
+  // Room under the strip for one line of labels. Every strip has the line now, so the six on
+  // `/districts` stay one row apart whichever of them crosses zero.
+  const height = 64;
+  const foot = axisFoot({
+    width: options.width,
+    marginLeft: 2,
+    marginRight: 2,
+    dy: 15,
+    says: "",
+    fontSize: 10,
+    scale: {
+      domain: [min - pad, max + pad],
+      format: options.format,
+      ...(crossesZero ? { beside: { value: 0, label: "no change" } } : {}),
+    },
+  });
   const mid = 0;
   const outliers = dots ? [] : sorted.filter((v) => v.value < whiskerLow || v.value > whiskerHigh);
   // Five lanes, so a run of equal values is countable rather than one mark. Deterministic: this
@@ -2469,25 +2670,14 @@ export function distributionSpec(
       marginLeft: 2,
       marginRight: 2,
       marginTop: 4,
-      marginBottom: crossesZero ? 22 : 4,
+      marginBottom: 22,
       x: { axis: null, domain: [min - pad, max + pad] },
       y: { axis: null, domain: [-19, 19] },
       marks: [
         // Under everything, because it is what the dots are read against rather than a mark
         // among them.
-        ...(crossesZero
-          ? [
-              Plot.ruleX([0], { stroke: INK.muted, strokeDasharray: "3 3" }),
-              Plot.text([0], {
-                x: 0,
-                frameAnchor: "bottom",
-                dy: 15,
-                text: () => "no change",
-                fill: INK.muted,
-                fontSize: 11,
-              }),
-            ]
-          : []),
+        ...(crossesZero ? [Plot.ruleX([0], { stroke: INK.muted, strokeDasharray: "3 3" })] : []),
+        ...foot.marks,
 
         // The whisker, drawn first and thin: it is the range, not the mass.
         Plot.ruleY([mid], {
@@ -2715,11 +2905,11 @@ export function fanSpec(
     marginLeft: 0,
     marginRight,
     dy: 18,
-    low: `FY${firstOf(points).year}`,
+    low: fiscalYear(firstOf(points).year),
     // The truncated axis, stated on the chart rather than in the caption underneath it. A reader
     // who takes the shape at face value has been misled by the time they reach prose.
     says: `axis starts at ${format(min)}, not zero`,
-    high: `FY${last.year}`,
+    high: fiscalYear(last.year),
   });
 
   return {

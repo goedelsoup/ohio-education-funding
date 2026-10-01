@@ -71,11 +71,56 @@ export function millions(v: number | null | undefined): string {
     : `${sign}$${(magnitude / 1_000_000).toFixed(1)}M`;
 }
 
-/** A fraction as a percentage, with the same minus the dollar formatters use. */
+/**
+ * A dollar amount at three significant figures, for the numbers a chart prints: `$83.5M`, `$10.5B`.
+ *
+ * One chart form printed money three ways. District bars wrote `$83,470,878`, `/statewide` wrote
+ * `$10.48B`, and the wiki's scatter ends wrote `$18,184,179,141`. A label or an axis end exists to
+ * be read at a glance, and nine digits cannot be. The full figure is still on the page, in the
+ * tooltip and in the table. Those keep {@link money}.
+ *
+ * Under ten thousand it is {@link money}'s whole dollars. That is the per-pupil scale, where the
+ * prose beside a chart writes `$4,229` and a label reading `$4.23K` would round the same figure a
+ * second way.
+ *
+ * Same sign rule as `money`: the minus is U+2212 and sits outside the dollar sign.
+ */
+export function compactMoney(v: number | null | undefined): string {
+  if (v == null || !Number.isFinite(v)) return "—";
+  if (Math.abs(v) < 10_000) return money(v);
+  return (v < 0 ? "−" : "") + "$" + COMPACT.format(Math.abs(v));
+}
+
+const COMPACT = new Intl.NumberFormat("en-US", { notation: "compact", maximumSignificantDigits: 3 });
+
+/**
+ * A plain number to three significant figures, grouped, with a true minus.
+ *
+ * For an axis end on a ratio scale. `corpusSeries.ts` writes ratios to four places, which is the
+ * right precision for a tooltip quoting a pinned coefficient. On an axis it printed `+2.0057` and
+ * `62,603.6`, which are positions on a scale, not figures anybody will quote.
+ */
+export function sig(v: number | null | undefined): string {
+  if (v == null || !Number.isFinite(v)) return "—";
+  const text = SIG.format(Math.abs(v));
+  return (v < 0 && !roundsToZero(text) ? "−" : "") + text;
+}
+
+const SIG = new Intl.NumberFormat("en-US", { maximumSignificantDigits: 3 });
+
+/**
+ * A fraction as a percentage, with the same minus the dollar formatters use.
+ *
+ * A positive share that rounds to nothing is written `<1%` (or `<0.1%` at one place), not `0%`. On
+ * `/district/043802/taxes` the Agricultural and Railroad bars were drawn with width and labelled
+ * `0%`, so the label and the bar disagreed. The bar was right. A negative share that rounds to
+ * nothing keeps `money`'s rule and loses its sign.
+ */
 export function pct(v: number | null | undefined, decimals = 1): string {
   if (v == null || !Number.isFinite(v)) return "—";
   const n = v * 100;
   const text = Math.abs(n).toFixed(decimals);
+  if (n > 0 && Number(text) === 0) return `<${(1 / 10 ** decimals).toFixed(decimals)}%`;
   return (n < 0 && Number(text) !== 0 ? "−" : "") + text + "%";
 }
 

@@ -41,6 +41,7 @@
 
 import { loadFeed } from "./feed.ts";
 import type { SeriesYear } from "./types.ts";
+import { fiscalYear } from "./yearLabel.ts";
 
 /** The series keys this site asks for, so a typo is a type error rather than a missing chip. */
 export type SeriesKey =
@@ -245,7 +246,7 @@ export function fiscalYearOf(date: string): number | null {
  * typed by hand in its own file; the dates beside them are what this is built from.
  */
 export function fiscalSpan(from: number, to: number): string {
-  return from === to ? `FY${from}` : `FY${from}–FY${to}`;
+  return from === to ? fiscalYear(from) : `${fiscalYear(from)}–${fiscalYear(to)}`;
 }
 
 /**

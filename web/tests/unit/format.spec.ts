@@ -12,7 +12,7 @@ import { join } from "node:path";
 import { describe, expect, test } from "vitest";
 
 import { firstOf, lastOf } from "../../src/lib/ends.ts";
-import { fixed, signed } from "../../src/lib/format.ts";
+import { compactMoney, fixed, pct, sig, signed } from "../../src/lib/format.ts";
 
 describe("fixed", () => {
   test("groups thousands and keeps its places", () => {
@@ -55,6 +55,50 @@ describe("signed", () => {
 
   test("has an em dash for no value", () => {
     expect(signed(null, 1)).toBe("—");
+  });
+});
+
+describe("pct", () => {
+  test("a positive share below half a percent prints <1%, not 0%", () => {
+    // #610: a bar drawn with width and labelled "0%" contradicts itself.
+    expect(pct(0.004, 0)).toBe("<1%");
+    expect(pct(0.0001, 0)).toBe("<1%");
+    expect(pct(0.0004, 1)).toBe("<0.1%");
+  });
+
+  test("leaves zero, the boundary and negatives alone", () => {
+    expect(pct(0, 0)).toBe("0%");
+    expect(pct(0.005, 0)).toBe("1%");
+    expect(pct(-0.004, 0)).toBe("0%");
+    expect(pct(-0.02, 0)).toBe("−2%");
+  });
+});
+
+describe("compactMoney", () => {
+  test("is three significant figures at every scale a chart prints", () => {
+    expect(compactMoney(83_470_878)).toBe("$83.5M");
+    expect(compactMoney(10_480_000_000)).toBe("$10.5B");
+    expect(compactMoney(1_350_078)).toBe("$1.35M");
+    expect(compactMoney(200_000)).toBe("$200K");
+    expect(compactMoney(-176_555_014)).toBe("−$177M");
+  });
+
+  test("keeps whole dollars under ten thousand, where the prose does", () => {
+    expect(compactMoney(4229)).toBe("$4,229");
+    expect(compactMoney(-47)).toBe("−$47");
+  });
+
+  test("has an em dash for no value", () => {
+    expect(compactMoney(null)).toBe("—");
+  });
+});
+
+describe("sig", () => {
+  test("writes a ratio to three significant figures with a true minus", () => {
+    expect(sig(2.0057)).toBe("2.01");
+    expect(sig(-3.537)).toBe("−3.54");
+    expect(sig(62_603.6)).toBe("62,600");
+    expect(sig(0.0272)).toBe("0.0272");
   });
 });
 

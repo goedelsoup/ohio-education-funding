@@ -152,11 +152,7 @@ pub static SERIES: &[Series] = &[
                 .map(|which| {
                     let (designated, listed) = edchoice_edition_counts(which);
                     Row {
-                        label: match which {
-                            Edition::Y2425 => "2024-2025",
-                            Edition::Y2526 => "2025-2026",
-                            Edition::Y2627 => "2026-2027",
-                        },
+                        label: which.school_year(),
                         value: designated as f64,
                         hover: match which {
                             Edition::Y2425 => Some(

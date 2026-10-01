@@ -21,7 +21,7 @@ import { isBlockProperty, isListProperty, isMathProperty, renderListProperty, re
 import * as routes from "../../../lib/routes.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
 import SeriesChart from "../../../components/SeriesChart.astro";
-import { barsOf, formatValue, loadSeriesManifest, multiplesOf, panelsOf, placesOf, rangesOf, regionsOf } from "../../../lib/corpusSeries.ts";
+import { barsOf, formatTick, loadSeriesManifest, multiplesOf, panelsOf, placesOf, rangesOf, regionsOf } from "../../../lib/corpusSeries.ts";
 import { count } from "../../../lib/format.ts";
 import { barSpec, panelWidth, planeSpec, rangeSpec, scatterSpec } from "../../../lib/plot/spec.ts";
 import { renderPanelToString, renderToString } from "../../../lib/plot/ssr.ts";
@@ -138,8 +138,8 @@ const charts = node.series.map((binding) => {
               planeSpec(
                 placesOf(plane),
                 {
-                  x: { label: plane.x.label, format: (v: number) => formatValue(plane.x.unit, v) },
-                  y: { label: plane.y.label, format: (v: number) => formatValue(plane.y.unit, v) },
+                  x: { label: plane.x.label, format: (v: number) => formatTick(plane.x.unit, v) },
+                  y: { label: plane.y.label, format: (v: number) => formatTick(plane.y.unit, v) },
                 },
                 { width: w, xDomain: [plane.x.min, plane.x.max], yDomain: [plane.y.min, plane.y.max] },
               ),

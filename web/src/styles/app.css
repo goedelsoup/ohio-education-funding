@@ -1369,7 +1369,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
  * A reader with no script sees the aid distribution and a complete page; a reader with script sees
  * the strip follow the column they sorted by.
  */
-/* Bottom margin added deliberately: `.scale`'s high-value label (e.g. "$896") had nothing
+/* Bottom margin added deliberately: the strip's high-end label (e.g. "$896") had nothing
    between it and the "Name or IRN" filter label below, on every width — see the crowding
    regression test in `tests/e2e/directory.spec.ts`. */
 .measures { margin: var(--space-6) 0 var(--space-6); }
@@ -1838,9 +1838,8 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
    on the middle of the axis, which is the one place the district being described is not. */
 .strip-head .n { margin-left: var(--space-3); font-weight: var(--weight-regular); }
 /* The flat strip this replaced is gone — see `distributionSpec`. What is left is the frame the
-   box plot sits in: the label and value above it, the scale below. */
+   box plot sits in: the label and value above it. The drawing states its own ends. */
 .strip-row .chartwrap { margin: .1rem 0 .1rem; }
-.scale { display: flex; justify-content: space-between; font-size: var(--text-xs); color: var(--text-muted); }
 
 /*
  * Charts. Marks are thin, axes recessive, text wears text tokens rather than series color.
@@ -1893,26 +1892,6 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
    `renderPanelToString`. Named rather than left unqualified so that a drawing with no pair is
    visibly a decision and not a missing sibling. */
 .chart-at[data-at="panel"] { display: block; }
-
-/*
- * A strip and the HTML scale row under it, which names the strip's two ends.
- *
- * A drawing stops growing at `MAX_SCALE` times its width (`plot/spec.ts`), so in a column wider
- * than that it sits at the left with room to its right. A `.scale` row left at full width would
- * put its high end out in that room, under nothing. The row takes the same cap: 1.25 × the width
- * of whichever drawing is shown. The breakpoints are `.chart-pair`'s, and this is a container of
- * the same width, so the queries answer the same question. Written as the product rather than as
- * 375px, 550px and 800px: the numbers are a drawing's width and a ceiling on its scale, not a step
- * on the space scale, and a unit test holds each factor to `plot/spec.ts`.
- */
-.chart-scale { container-type: inline-size; }
-.chart-scale > .scale { max-width: calc(300px * 1.25); }
-@container (min-width: 440px) {
-  .chart-scale > .scale { max-width: calc(440px * 1.25); }
-}
-@container (min-width: 640px) {
-  .chart-scale > .scale { max-width: calc(640px * 1.25); }
-}
 
 /*
  * A set of panels, laid out against each other.
@@ -2947,12 +2926,11 @@ tr.series-break > td {
      stylesheet has not measured. */
   .chart-at[data-at="narrow"], .chart-at[data-at="middle"] { display: none; }
   .chart-at[data-at="wide"] { display: block; }
-  .chart-scale > .scale { max-width: calc(640px * 1.25); }
 
   .card, .chartwrap, .tile, .strip-row, .flags, tr { break-inside: avoid; }
   /* A heading, and a legend, belong to what follows them. */
   h1, h2, h3, .contents-label { break-after: avoid; }
-  .legend, .scale { break-before: avoid; }
+  .legend { break-before: avoid; }
   /* A table that does cross a page carries its column heads onto the next one. */
   thead { display: table-header-group; }
 

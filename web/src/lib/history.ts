@@ -163,7 +163,8 @@ export function renderRevenueMix(history: HistoryYear[]): string {
       seriesSpec(
         points,
         { a: "local", b: "state" },
-        (v) => `${v.toFixed(0)}%`,
+        // To the place the prose beside it uses: "state 35%" sat next to a sentence saying 34.5%.
+        (v) => `${v.toFixed(1)}%`,
         (p) =>
           p.a == null
             ? `FY${p.at}: not published`

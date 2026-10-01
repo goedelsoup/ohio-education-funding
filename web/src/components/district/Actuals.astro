@@ -24,7 +24,7 @@
  * throws on an empty one.
  */
 import { firstOf, lastOf } from "../../lib/ends.ts";
-import { fixed, money, pct, signedMoney } from "../../lib/format.ts";
+import { compactMoney, fixed, money, pct, signedMoney } from "../../lib/format.ts";
 import { barSpec } from "../../lib/plot/spec.ts";
 import { renderToString } from "../../lib/plot/ssr.ts";
 import { realChange, series, type Basis } from "../../lib/real.ts";
@@ -80,7 +80,7 @@ const bars = held.map((y) => ({
   value: y.ending_cash!,
   hover: `FY${y.fiscal_year}: ${money(y.ending_cash)} held, ${money(y.total_revenue)} in, ${money(y.total_expenditure)} out`,
   ...(y.fiscal_year === peak?.fiscal_year || y.fiscal_year === latest.fiscal_year
-    ? { direct: money(y.ending_cash) }
+    ? { direct: compactMoney(y.ending_cash) }
     : {}),
 }));
 ---

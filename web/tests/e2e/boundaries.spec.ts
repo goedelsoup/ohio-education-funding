@@ -139,24 +139,23 @@ test.describe("house districts", () => {
     await expect(page.locator('a[href^="/house/"]')).toHaveCount(99);
   });
 
-  test("the seat's valuation strip can be read off, in the scale row and in the table", async ({
+  test("the seat's valuation strip can be read off, in its own foot and in the table", async ({
     page,
   }) => {
     /*
      * 129 seat pages drew a valuation strip and gave a reader no way to recover a value from it:
-     * `distributionSpec` draws no axis by construction, and this was the one page carrying it with
-     * neither the `.scale` row every other strip on the site has nor a valuation column in the
-     * table underneath. A dot four fifths along meant nothing at all.
+     * `distributionSpec` drew no axis, and this page had no valuation column in the table
+     * underneath either. A dot four fifths along meant nothing at all.
      *
-     * Both, and not either: the scale row states the ends, and the column is what lets a reader go
-     * from a dot to the district it belongs to.
+     * Both, and not either: the strip's foot states two values at the places they sit, and the
+     * column is what lets a reader go from a dot to the district it belongs to.
      */
     await page.goto("/house/065");
     const card = page.locator('[data-part="members"]');
-    await expect(card.locator('[data-chart="seat-spread"] svg.plot:visible')).toBeVisible();
-    const scale = card.locator(".scale").first();
-    await expect(scale.locator("span")).toHaveCount(2);
-    await expect(scale.locator("span").first()).toContainText("$");
+    const svg = card.locator('[data-chart="seat-spread"] svg.plot:visible');
+    await expect(svg).toBeVisible();
+    const ends = svg.locator("g.axis-foot text").filter({ hasText: "$" });
+    expect(await ends.count()).toBeGreaterThanOrEqual(2);
     await expect(card.locator("thead")).toContainText("Valuation per pupil");
   });
 

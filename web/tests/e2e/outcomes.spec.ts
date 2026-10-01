@@ -78,22 +78,20 @@ test.describe("the outcome routes", () => {
     /*
      * The sentence under the second chart reads "now they separate on the horizontal axis too".
      * Fitted to their own ranges the two x axes differed by 1.64×, so part of the separation a
-     * reader saw was the frame rather than the dollars. Both charts state their own ends, so the
-     * assertion is that the two pairs of ends are the same pair.
+     * reader saw was the frame rather than the dollars. Both charts label their x axis at round
+     * values (#610), so the assertion is that the two charts label the same values.
      */
     await page.goto("/outcomes");
     const card = page.locator('[data-part="two-denominators"]');
     const ends = async (chart: string) =>
-      (await card.locator(`[data-chart="${chart}"] svg.plot:visible text`).allTextContents()).filter((t) =>
-        /^\$[\d,]+$/.test(t),
+      (await card.locator(`[data-chart="${chart}"] svg.plot:visible g.axis-foot text`).allTextContents()).filter((t) =>
+        t.startsWith("$"),
       );
     const weighted = await ends("weighted-spending");
-    // Both ends of the x axis — the third bottom label is the axis's name. Asserted so that the
-    // comparison below is not between two empty lists, which would pass on a chart that had
-    // stopped drawing its scale at all.
-    expect(weighted).toHaveLength(2);
-    // The wider denominator's own maximum, on the chart of the narrower one.
-    expect(weighted[1]).toBe("$38,140");
+    // At least both ends of the x axis — the axis's name is in the foot too, and is not a dollar
+    // figure. Asserted so that the comparison below is not between two empty lists, which would
+    // pass on a chart that had stopped drawing its scale at all.
+    expect(weighted.length).toBeGreaterThanOrEqual(2);
     expect(weighted).toEqual(await ends("enrolled-spending"));
   });
 
