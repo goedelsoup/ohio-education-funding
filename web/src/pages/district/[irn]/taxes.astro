@@ -79,7 +79,15 @@ const description = latest
       </div>
     ) : (
       <>
+        {/* The charge first: on a phone the first of three tiles takes the whole row and the other
+            two share one (#549), and the charge is the only figure here too wide for half a phone
+            — "$539,202,050" is 162px against a 159px track at 375px (#601). */}
         <div class="tiles">
+          <div class="tile">
+            <div class="k">Real property tax charged</div>
+            <div class="v" set:html={fig(money(latest.real_property_taxes_charged), `TY${latest.tax_year}`)} />
+            <div class="n">TY{latest.tax_year}, current expenses</div>
+          </div>
           <div class="tile">
             <div class="k">Taxable value per pupil</div>
             <div class="v" set:html={fig(money(latest.value_per_pupil), `TY${latest.tax_year}`)} />
@@ -107,11 +115,6 @@ const description = latest
                       : "above the floor — reduction factors are operative"
               }
             </div>
-          </div>
-          <div class="tile">
-            <div class="k">Real property tax charged</div>
-            <div class="v" set:html={fig(money(latest.real_property_taxes_charged), `TY${latest.tax_year}`)} />
-            <div class="n">TY{latest.tax_year}, current expenses</div>
           </div>
         </div>
 
