@@ -402,6 +402,7 @@ header.site nav summary:focus-visible,
  * it may run and which way it opens — and those stay with each one below.
  */
 header.site nav .menu-panel,
+.scope-list,
 .year-chip-def,
 .term-def,
 #tip {
@@ -479,6 +480,15 @@ header.site nav .menu-heading {
     max-width: none;
   }
   header.site nav .menu-wide .menu-run { break-inside: avoid; }
+  /* No rule between runs here (#603). Under `columns` the run after another can be the top of
+     column two, which then began a rule and a padding below column one; and every run in this
+     panel has a heading, which divides it already. The space is kept, below each run instead. */
+  header.site nav .menu-wide .menu-run + .menu-run {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+  header.site nav .menu-wide .menu-run:not(:last-child) { padding-bottom: var(--space-2); }
 }
 @media (min-width: 820px) {
   header.site nav .menu-panel.menu-wide { left: auto; right: 0; }
@@ -2345,9 +2355,18 @@ svg.plot [data-hover] {
 .scope-picks { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-5); align-items: end; }
 .scope-picks > .axis-pick { flex: 1 1 15rem; }
 
-.scope-counties { flex: 1 1 13rem; min-width: 0; }
+/*
+ * A disclosure that reads as one and opens over the plot (#603).
+ *
+ * The flex summary has no marker, and #576 gave it the picker's box, so closed it read as a select
+ * missing its arrow; the header's chevron says it opens. Open, its list floats rather than pushing
+ * the plot 350px down the page, which is the header menus' behaviour, and `site.ts` closes it the
+ * way it closes theirs. Under the sticky header and subnav, which stay on top as the page scrolls.
+ */
+.scope-counties { flex: 1 1 13rem; min-width: 0; position: relative; }
 .scope-counties > summary {
   cursor: pointer;
+  list-style: none;
   display: flex;
   gap: var(--space-2);
   align-items: center;
@@ -2358,6 +2377,13 @@ svg.plot [data-hover] {
   border-radius: var(--control-radius);
   background: var(--surface-1);
   font-size: var(--text-sm);
+}
+.scope-counties > summary::-webkit-details-marker { display: none; }
+.scope-counties > summary::after {
+  content: "▾";
+  margin-left: auto;
+  font-size: .75em;
+  opacity: .6;
 }
 .scope-hd {
   font-size: var(--text-xs);
@@ -2371,14 +2397,15 @@ svg.plot [data-hover] {
  * page out from under the plot they are selecting for.
  */
 .scope-list {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  right: 0;
+  z-index: 3;
   max-height: 14rem;
   overflow-y: auto;
   overscroll-behavior: contain;
-  margin-top: var(--space-2);
   padding: var(--space-2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface-1);
 }
 .scope-county {
   display: grid;

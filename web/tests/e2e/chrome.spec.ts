@@ -480,6 +480,60 @@ test.describe("the section menus", () => {
     await expect(places).not.toHaveAttribute("open", "");
   });
 
+  test("tabbing from an open menu to the next summary leaves at most one open", async ({ page }) => {
+    /*
+     * The keyboard half of "opening one closes the other" (#603). `focusin` returned early when
+     * focus landed in any menu, and the next summary along is in one, so Tab from the last link in
+     * `Places` to `Analysis` left `Places` open — and Enter then drew `Analysis` over it.
+     */
+    await page.goto("/");
+    const menus = page.locator("header.site nav details.menu");
+    const places = menus.filter({ hasText: "Places" });
+    const analysis = menus.filter({ hasText: "Analysis" });
+    const open = page.locator("header.site details.menu[open]");
+
+    await places.locator("summary").click();
+    await places.locator(".menu-panel a").last().focus();
+    await page.keyboard.press("Tab");
+    await expect(analysis.locator("summary")).toBeFocused();
+    await expect(open, "Places closes when focus leaves it for the next summary").toHaveCount(0);
+
+    await page.keyboard.press("Enter");
+    await expect(open).toHaveCount(1);
+    await expect(analysis).toHaveAttribute("open", "");
+  });
+
+  test("the Library panel's two columns start on one line, with no rule above either", async ({
+    page,
+  }) => {
+    /*
+     * `.menu-run + .menu-run` draws a rule and a padding over each run after the first, and under
+     * `columns: 2` the run after another can be the top of column two (#603). Column two began
+     * 7px below column one, under a rule that divided nothing.
+     */
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/");
+    const library = page.locator("header.site nav details.menu").nth(2);
+    await library.locator("summary").click();
+    const columns = await library.locator(".menu-panel").evaluate((panel) => {
+      // What a reader sees begin each column is its first entry, a heading or a link, and not the
+      // run's box: that starts at the rule, level with column one, over the 7px the issue measured.
+      const tops = new Map<number, number>();
+      for (const entry of panel.querySelectorAll<HTMLElement>(".menu-heading, a")) {
+        const rect = entry.getBoundingClientRect();
+        const left = Math.round(rect.left);
+        tops.set(left, Math.min(tops.get(left) ?? Infinity, rect.top));
+      }
+      const ruled = [...panel.querySelectorAll(".menu-run")].filter(
+        (run) => getComputedStyle(run).borderTopWidth !== "0px",
+      ).length;
+      return { tops: [...tops.values()], ruled };
+    });
+    expect(columns.tops, "two columns").toHaveLength(2);
+    expect(Math.abs(columns.tops[0]! - columns.tops[1]!), "the columns start level").toBeLessThan(0.5);
+    expect(columns.ruled, "no run draws a rule; each has a heading").toBe(0);
+  });
+
   test("the Library panel opens inside the window at every width it hangs from the bar", async ({
     page,
   }) => {
