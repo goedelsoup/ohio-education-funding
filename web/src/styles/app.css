@@ -2048,17 +2048,47 @@ svg.plot [data-hover].at {
   filter: brightness(1.2);
 }
 /* The mark a ringed hit layer names. See `data-paired` above; set with `.at`, never on its own. */
-svg.plot .at-mark {
+svg.plot .at-mark,
+/* And the mark a pointer or a tap is on, which is the same pair without the ring (#614). */
+svg.plot .hover-mark {
   filter: brightness(1.2);
   fill-opacity: 1;
 }
 /* The chart itself is a tab stop — one per chart, not one per mark. See `openToKeyboard`. */
 svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+/* A click focuses it too, and the browser's own ring around the whole chart answers nothing. */
+svg.plot:focus:not(:focus-visible) { outline: none; }
+
+/*
+ * Every hover target reaches 12px past its own edge (#614), so the smallest one is a 24px target
+ * on a phone (WCAG 2.5.8). Measured at 375 before this, a range row was 11px and a series column
+ * 5.6.
+ *
+ * A stroke rather than a bigger mark, for three reasons. It is invisible, so the drawing does not
+ * change. It is outside the element's box, so the cursor's ring and every test that measures a
+ * mark by `getBoundingClientRect` are where they were. And `non-scaling-stroke` makes it CSS
+ * pixels rather than user units, so it is 24 whichever of `WIDTHS` the chart was drawn at and
+ * however far that drawing was scaled.
+ *
+ * Twelve pixels each way is more than the gap between two range rows, so reaches overlap. The
+ * browser would give an overlap to whichever mark was drawn last; `attachValues` gives it to the
+ * nearest one instead.
+ *
+ * Round joins, because Chromium bounds a mitred stroke by its miter limit: a bar's box as
+ * Playwright reads it grew by 48px a side, and a tip placed against that box would sit 36px away.
+ */
+svg.plot [data-hover] {
+  stroke: transparent;
+  stroke-width: 24px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
 
 .bar-value { font-variant-numeric: tabular-nums; }
 .axis { stroke: var(--accent-rule); stroke-width: 1; }
 .bar-fill > *, .hist > * { cursor: default; }
-.bar-fill > *:hover, .hist > *:hover { filter: brightness(1.12); }
+/* A class rather than `:hover`: the browser's hover is the topmost reach, not the nearest mark. */
+.bar-fill > .hover, .hist > .hover { filter: brightness(1.12); }
 
 /*
  * The fan chart. The band is the subject here, not shading behind a line, so it gets a fill AND
@@ -2071,7 +2101,7 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
 .fan-bound { font-variant-numeric: tabular-nums; }
 /* One full-height column per year: the hit target is the strip, not the 2px line inside it. */
 .fan-hit > * { fill: transparent; }
-.fan-hit > *:hover { fill: var(--text-primary); fill-opacity: .05; }
+.fan-hit > .hover { fill: var(--text-primary); fill-opacity: .05; }
 
 .tile.wide { grid-column: span 2; }
 /* A range is two numbers and has to stay one line's worth of thought, so it sets a shade

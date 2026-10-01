@@ -739,6 +739,31 @@ test("the hit layer matches the dot layer place for place", () => {
   expect(spec.hovers!.cursor).toEqual({ second: "paired marks", layers: [".plane-dot"] });
 });
 
+test("a cloud and a plane are walked left to right, whatever order their caller passed", () => {
+  /*
+   * The arrow keys walk the hit layer in document order, and the callers pass districts
+   * alphabetically: ArrowRight on `/outcomes` went Manchester, Akron, Alliance, Ashland, 137px a
+   * step on average (#614). The readings are in the drawn order, so following them is following
+   * the walk.
+   */
+  const shuffled = cloud([9, 3, 7, 1, 12, 5, 11, 2, 8, 4, 10, 6].map((x) => x * 1000));
+  const scatter = scatterSpec(shuffled, AXES, [], W)!;
+  const xs = scatter.hovers!.text.map((h) => shuffled.find((p) => p.hover === h)!.x);
+  expect(xs).toEqual([...xs].sort((a, b) => a - b));
+
+  // A tie on x goes upwards, so two districts on one x are still adjacent stops.
+  const plane = planeSpec(rules(), PLANE_AXES, PLANE)!;
+  expect(plane.hovers!.text).toEqual([
+    "2% cap",
+    "1% cap",
+    "mirror inside",
+    "rolling",
+    "phase-down",
+    "mirror beside",
+    "ratchet",
+  ]);
+});
+
 test("a signed panel with nothing in it still draws its zero, so the empty rule is legible", () => {
   /*
    * The dated phase-down moves neither axis by a cent, so its panel in #444's small multiples is

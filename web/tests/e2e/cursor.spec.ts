@@ -260,35 +260,38 @@ test("every invisible hover target names the mark it brightens, or is named as h
  * does not match, an index that lands on the wrong element. One route per paired chart form,
  * driven with the arrow keys the cursor is actually for.
  */
+/** One route per paired chart form, and per caller where two callers stamp the same form. */
+const PAIRED = [
+  { route: "/outcomes", hit: ".scatter-hit", mark: ".scatter-dot" },
+  { route: "/counties", hit: ".range-hit", mark: ".range-high" },
+  { route: "/district/043786", hit: ".dist-hit", mark: ".dist-dot" },
+  { route: "/bounds", hit: ".rank-hit", mark: ".rank-dot" },
+  {
+    route: "/wiki/formula-component/temporary-transitional-aid-guarantee",
+    hit: ".plane-hit",
+    mark: ".plane-dot",
+  },
+  // The same route twice, because the same page carries two chart forms and the second is a
+  // spread: `scatterSpec` marks in a panel the node builds, rather than the `/outcomes` cloud
+  // this file already drives. A layer class is shared; the code path that stamps the pairing
+  // onto it is not.
+  {
+    route: "/wiki/formula-component/temporary-transitional-aid-guarantee",
+    hit: ".scatter-hit",
+    mark: ".scatter-dot",
+  },
+  // And `range-hit` twice, for the same reason: `/counties` above is a page that calls
+  // `rangeSpec` itself, and this is the band chart a corpus node binds and the wiki route
+  // draws. Same form, different caller, and the caller is what stamps the pairing.
+  {
+    route: "/wiki/formula-component/fsfp-base-cost-calculation",
+    hit: ".range-hit",
+    mark: ".range-high",
+  },
+] as const;
+
 test.describe("the cursor's second channel", () => {
-  for (const { route, hit, mark } of [
-    { route: "/outcomes", hit: ".scatter-hit", mark: ".scatter-dot" },
-    { route: "/counties", hit: ".range-hit", mark: ".range-high" },
-    { route: "/district/043786", hit: ".dist-hit", mark: ".dist-dot" },
-    { route: "/bounds", hit: ".rank-hit", mark: ".rank-dot" },
-    {
-      route: "/wiki/formula-component/temporary-transitional-aid-guarantee",
-      hit: ".plane-hit",
-      mark: ".plane-dot",
-    },
-    // The same route twice, because the same page carries two chart forms and the second is a
-    // spread: `scatterSpec` marks in a panel the node builds, rather than the `/outcomes` cloud
-    // this file already drives. A layer class is shared; the code path that stamps the pairing
-    // onto it is not.
-    {
-      route: "/wiki/formula-component/temporary-transitional-aid-guarantee",
-      hit: ".scatter-hit",
-      mark: ".scatter-dot",
-    },
-    // And `range-hit` twice, for the same reason: `/counties` above is a page that calls
-    // `rangeSpec` itself, and this is the band chart a corpus node binds and the wiki route
-    // draws. Same form, different caller, and the caller is what stamps the pairing.
-    {
-      route: "/wiki/formula-component/fsfp-base-cost-calculation",
-      hit: ".range-hit",
-      mark: ".range-high",
-    },
-  ]) {
+  for (const { route, hit, mark } of PAIRED) {
     test(`brightens the ${mark.slice(1)} under the ring on ${route}`, async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 900 });
       await page.goto(route);
@@ -414,19 +417,227 @@ test.describe("the tip's dismissal", () => {
     expect(a && b, "a chart with two bars").toBeTruthy();
     // Bars run down the chart or across it; the gap is on whichever side they do not share.
     const down = b!.top >= a!.bottom;
-    const gap = down
+    const between = down
       ? { x: (Math.max(a!.left, b!.left) + Math.min(a!.right, b!.right)) / 2, y: (a!.bottom + b!.top) / 2 }
       : { x: (a!.right + b!.left) / 2, y: (Math.max(a!.top, b!.top) + Math.min(a!.bottom, b!.bottom)) / 2 };
     expect(down ? b!.top - a!.bottom : b!.left - a!.right, "the bars have a gap").toBeGreaterThan(0);
+    /*
+     * Every mark reaches 12px past its edge since #614, so the gap between two bars is now the
+     * nearer bar's. The chart still has ground no mark reaches, out past the ends of the bars along
+     * that same gap, and the tip has to hold there for the reason it had to hold in the gap.
+     */
+    const gap = await bars.evaluate(
+      (svg, { start, down }) => {
+        const own = svg.getBoundingClientRect();
+        for (let step = 0; step < 2000; step += 2) {
+          const x = down ? start.x + step : start.x;
+          const y = down ? start.y : start.y - step;
+          if (x > own.right || y < own.top) break;
+          const under = document.elementFromPoint(x, y);
+          if (under && svg.contains(under) && !under.closest("[data-hover]")) return { x, y };
+        }
+        return null;
+      },
+      { start: between, down },
+    );
+    expect(gap, "somewhere on the chart, along the gap, that no mark reaches").not.toBeNull();
 
     await page.mouse.move((a!.left + a!.right) / 2, (a!.top + a!.bottom) / 2);
     const tip = page.locator("#tip");
     await expect(tip, "the hover raised the tip").toBeVisible();
-    expect(
-      await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.closest("[data-hover]") ?? null, gap),
-      "the point is a gap, not another mark",
-    ).toBeNull();
-    await page.mouse.move(gap.x, gap.y, { steps: 4 });
+    await page.mouse.move(gap!.x, gap!.y, { steps: 4 });
     await expect(tip, "and the gap did not take it down").toBeVisible();
+  });
+});
+
+/**
+ * The pointer, the keys and a tap, made to agree (#614).
+ *
+ * The keyboard lit the pair; a hover on six of nine forms raised a tip and changed nothing on the
+ * chart, and a tap lit nothing anywhere. The arrows walked a cloud alphabetically. A click drew the
+ * browser's ring round the whole chart. And on a phone every form but the fan was a target under
+ * 24px.
+ */
+test.describe("the pointer's cursor", () => {
+  /** The `index`th mark of the first visible chart's `hit` layer, scrolled to, with its box. */
+  const aim = (page: Page, hit: string, index: number) =>
+    page
+      .locator(`svg.plot:visible:has(${hit})`)
+      .first()
+      .evaluate(
+        (svg, [selector, i]) => {
+          const marks = [...svg.querySelectorAll(`${selector} > *`)];
+          const mark = marks[Math.min(Number(i), marks.length - 1)]!;
+          mark.scrollIntoView({ block: "center" });
+          const box = mark.getBoundingClientRect();
+          return {
+            index: marks.indexOf(mark),
+            x: box.left + box.width / 2,
+            y: box.top + box.height / 2,
+            bottom: box.bottom,
+          };
+        },
+        [hit, String(index)] as const,
+      );
+
+  /** Which marks of that chart's `layer` carry the class `cls`, by index. */
+  const lit = (page: Page, hit: string, layer: string, cls: string) =>
+    page
+      .locator(`svg.plot:visible:has(${hit})`)
+      .first()
+      .evaluate(
+        (svg, [selector, name]) =>
+          [...svg.querySelectorAll(`${selector} > *`)]
+            .map((m, i) => (m.classList.contains(name) ? i : -1))
+            .filter((i) => i >= 0),
+        [layer, cls] as const,
+      );
+
+  for (const { route, hit, mark } of PAIRED) {
+    test(`a hover lights the ${mark.slice(1)} on ${route}, without the ring`, async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 900 });
+      await page.goto(route);
+      const at = await aim(page, hit, 3);
+      await settled(page);
+      await page.mouse.move(at.x, at.y);
+
+      const hovered = await lit(page, hit, hit, "hover");
+      expect(hovered, "one hit mark is the pointer's").toHaveLength(1);
+      expect(await lit(page, hit, mark, "hover-mark"), "and the mark it names is lit").toEqual(hovered);
+      const style = await page
+        .locator(`svg.plot:visible:has(${hit})`)
+        .first()
+        .evaluate((svg, m) => ({
+          fillOpacity: getComputedStyle(svg.querySelector(`${m} > .hover-mark`)!).fillOpacity,
+          outline: getComputedStyle(svg.querySelector("[data-hover].hover")!).outlineStyle,
+        }), mark);
+      expect(style.fillOpacity, "at full opacity, the keyboard's second channel").toBe("1");
+      expect(style.outline, "and no ring: the pointer is already standing on the mark").toBe("none");
+
+      await page.mouse.move(1, 1);
+      expect(await lit(page, hit, mark, "hover-mark"), "leaving the chart puts it out").toEqual([]);
+    });
+  }
+
+  test("the arrow keys walk a cloud left to right", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto("/outcomes");
+    const svg = page.locator("svg.plot:visible:has(.scatter-hit)").first();
+    await svg.focus();
+    const xs: number[] = [];
+    for (let i = 0; i < 10; i++) {
+      await page.keyboard.press("ArrowRight");
+      xs.push(
+        await svg.evaluate((node) => {
+          const b = node.querySelector("[data-hover].at")!.getBoundingClientRect();
+          return b.left + b.width / 2;
+        }),
+      );
+    }
+    expect(xs, "each step is at or right of the last").toEqual([...xs].sort((a, b) => a - b));
+  });
+
+  test("a click focuses a chart without the browser's ring round it", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto("/history");
+    const svg = page.locator("svg.plot[tabindex]:visible").first();
+    await svg.scrollIntoViewIfNeeded();
+    await settled(page);
+    await svg.click();
+    const state = await svg.evaluate((node) => ({
+      focused: document.activeElement === node,
+      outline: getComputedStyle(node).outlineStyle,
+    }));
+    expect(state.focused, "the click did focus it, or this measures nothing").toBe(true);
+    expect(state.outline).toBe("none");
+  });
+
+  test.describe("on a phone", () => {
+    test.use({ hasTouch: true, viewport: { width: 375, height: 812 } });
+
+    test("a tap lights the mark it reads", async ({ page }) => {
+      await page.goto("/outcomes");
+      const at = await aim(page, ".scatter-hit", 10);
+      await settled(page);
+      await page.touchscreen.tap(at.x, at.y);
+      await expect(page.locator("#tip")).toBeVisible();
+      const hovered = await lit(page, ".scatter-hit", ".scatter-hit", "hover");
+      expect(hovered).toHaveLength(1);
+      expect(await lit(page, ".scatter-hit", ".scatter-dot", "hover-mark")).toEqual(hovered);
+    });
+
+    /*
+     * Not each target's box, which is what the issue measured: 84 range rows 11px apart cannot each
+     * have a 24px box without overlapping, and the browser gives an overlap to the row drawn last.
+     * The reach is a transparent stroke instead (see `app.css`), so this asks the browser's own hit
+     * test whether the points 11.5px either side of a mark's centre, across a dimension under 24px,
+     * find the mark.
+     */
+    for (const { route, hit } of [
+      { route: "/outcomes", hit: ".scatter-hit" },
+      { route: "/counties", hit: ".range-hit" },
+      { route: "/bounds", hit: ".rank-hit" },
+      { route: "/district/043786", hit: ".dist-hit" },
+      { route: "/district/043786", hit: ".fan-hit" },
+      { route: "/district/043786", hit: ".bar-fill" },
+      { route: "/history", hit: ".series-hit" },
+      { route: "/statewide", hit: ".bar-fill" },
+      { route: "/wiki/formula-component/temporary-transitional-aid-guarantee", hit: ".plane-hit" },
+    ]) {
+      test(`every ${hit.slice(1)} target on ${route} reaches 24px`, async ({ page }) => {
+        await page.goto(route);
+        const reading = await page
+          .locator(`svg.plot:visible:has(${hit})`)
+          .first()
+          .evaluate((svg, selector) => {
+            const short: string[] = [];
+            const marks = [...svg.querySelectorAll(`${selector} > [data-hover]`)];
+            for (const mark of marks) {
+              mark.scrollIntoView({ block: "center", inline: "center" });
+              const b = mark.getBoundingClientRect();
+              const cx = b.left + b.width / 2;
+              const cy = b.top + b.height / 2;
+              const probes: [number, number][] = [];
+              if (b.height < 24) probes.push([cx, cy - 11.5], [cx, cy + 11.5]);
+              if (b.width < 24) probes.push([cx - 11.5, cy], [cx + 11.5, cy]);
+              // Only inside the chart. A series' first year sits on the drawing's left edge, and
+              // the card's `.scroll` clips its reach there: a tap beside the chart is not a tap
+              // on it, and the reach inward is the one a reader has.
+              const own = svg.getBoundingClientRect();
+              const inside = ([x, y]: [number, number]) =>
+                x >= own.left && x <= own.right && y >= own.top && y <= own.bottom;
+              const missed = ([x, y]: [number, number]) =>
+                !document.elementsFromPoint(x, y).includes(mark);
+              if (probes.filter(inside).some(missed)) {
+                short.push(`#${marks.indexOf(mark)} ${b.width.toFixed(1)}×${b.height.toFixed(1)}`);
+              }
+            }
+            return { short, of: marks.length };
+          }, hit);
+        expect(reading.of, "the chart has targets").toBeGreaterThan(1);
+        expect(reading.short, `targets that reach under 24px, of ${reading.of}`).toEqual([]);
+      });
+    }
+
+    test("where two reaches overlap, the nearer mark has it", async ({ page }) => {
+      /*
+       * A range row reaches 12px past its edge and the rows are 11px apart, so the bottom of one
+       * row is inside the reach of the next. The browser answers with the row drawn last, which is
+       * the next one down; the reader is pointing at this one.
+       */
+      await page.goto("/counties");
+      const row = await aim(page, ".range-hit", 20);
+      await settled(page);
+      const topmost = await page.evaluate(
+        ([x, y]) => {
+          const t = document.elementFromPoint(x!, y!);
+          return t ? [...t.parentElement!.children].indexOf(t) : -1;
+        },
+        [row.x, row.bottom - 1],
+      );
+      expect(topmost, "the browser alone would answer with the next row").toBe(row.index + 1);
+      await page.touchscreen.tap(row.x, row.bottom - 1);
+      expect(await lit(page, ".range-hit", ".range-hit", "hover")).toEqual([row.index]);
+    });
   });
 });

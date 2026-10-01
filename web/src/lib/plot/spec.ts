@@ -1266,6 +1266,21 @@ function printedFit(fit: Fit): string {
   return `slope ${slope} \u00b7 r\u00b2 ${fit.rSquared.toFixed(4)}`;
 }
 
+/**
+ * Left to right, then upwards: the order the arrow keys walk a cloud in.
+ *
+ * The cursor walks the hit layer in document order, which is the order a caller passed the data
+ * in. For a cloud that was alphabetical, and ArrowRight on `/outcomes` jumped 137px on average
+ * across an 800px plot — Manchester, then Akron, then Alliance, then back to Ashland (#614). The
+ * bar, rank and range forms never had it, because their data order is their axis order.
+ *
+ * Sorted once, before any layer is drawn, so the hit layer and the marks it is paired with by
+ * index are drawn from the same array still.
+ */
+function byPosition<T extends { x: number; y: number }>(marks: readonly T[]): T[] {
+  return [...marks].sort((a, b) => a.x - b.x || a.y - b.y);
+}
+
 export function scatterSpec(
   points: ScatterPoint[],
   axes: {
@@ -1375,6 +1390,7 @@ export function scatterSpec(
   // Two points are not a cloud. Same rule as the line forms, for the same reason: a scatter of
   // three districts would read as a finding about a population that has not been measured.
   if (points.length < MIN_CLOUD) return null;
+  points = byPosition(points);
 
   // Both ends of a displacement, so a trail cannot run out of the frame it is drawn in.
   const xs = points.flatMap((p) => (p.from ? [p.x, p.from.x] : [p.x]));
@@ -2060,6 +2076,9 @@ export function planeSpec(
     right: width - marginRight,
     bottom: height - marginBottom,
   };
+  // The dots, their hit layer and its readings, in the order the arrow keys walk them. Not the
+  // labels: the placer is order-dependent, and the order it was tuned in is the caller's.
+  const walk = byPosition(places);
   const at = places.map((place) => ({
     label: place.label,
     px: frame.left + ((place.x - xLo) / (xHi - xLo)) * (frame.right - frame.left),
@@ -2095,7 +2114,7 @@ export function planeSpec(
         Plot.ruleX([0], { stroke: INK.rule, className: "plane-zero" }),
         Plot.ruleY([0], { stroke: INK.rule, className: "plane-zero" }),
 
-        Plot.dot(places, {
+        Plot.dot(walk, {
           x: "x",
           y: "y",
           r: 4.5,
@@ -2159,7 +2178,7 @@ export function planeSpec(
         title.mark,
 
         // The hit layer, above everything, as every pointed-at form here draws one.
-        Plot.dot(places, {
+        Plot.dot(walk, {
           x: "x",
           y: "y",
           r: 10,
@@ -2171,7 +2190,7 @@ export function planeSpec(
     },
     hovers: {
       selector: ".plane-hit > *",
-      text: places.map((p) => escapeHtml(p.hover)),
+      text: walk.map((p) => escapeHtml(p.hover)),
       cursor: { second: "paired marks", layers: [".plane-dot"] },
     },
   };
