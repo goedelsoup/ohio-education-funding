@@ -1651,6 +1651,17 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 
 /* Qualification at paragraph scale — beside the figure it qualifies, never a footnote and never
    "see methodology". The phrase scale is `.caveat-inline`; the card scale is `.card.caveat`. */
+/*
+ * The line `/data` offers to paste into a story (#595). One click selects the whole of it, so it
+ * can be copied without a script; the address in it breaks anywhere, because at phone width an
+ * unbroken URL is wider than the card.
+ */
+.citation {
+  user-select: all;
+  overflow-wrap: anywhere;
+  background: var(--surface-2);
+  padding: var(--space-3) var(--space-4);
+}
 .note {
   color: var(--text-secondary);
   font-size: var(--text-base);
