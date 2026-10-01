@@ -49,7 +49,7 @@ export const FAMILIES: readonly { pattern: RegExp; visit: string }[] = [
  * The routes that draw their charts in the browser, after a fetch.
  *
  * The build cannot say these have a chart, because in the build they do not: the SVG arrives with
- * the scenario. The narrow drawing in a 548px box here is the widest scale-up #577 found.
+ * the scenario. Its stage was the narrow drawing in a 548px box at every desktop width until #609.
  */
 export const CLIENT_DRAWN: readonly string[] = ["/scenario/reach"];
 

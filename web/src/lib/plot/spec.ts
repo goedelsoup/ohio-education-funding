@@ -269,9 +269,9 @@ const BASE: Plot.PlotOptions = {
 };
 
 /**
- * The two widths every chart is drawn at.
+ * The three widths every chart is drawn at.
  *
- * # Why a chart is drawn twice rather than scaled
+ * # Why a chart is drawn more than once rather than scaled
  *
  * A build-time SVG has one size, and the stylesheet used to make it fit by scaling: `width: 100%`
  * over a 640-unit `viewBox`. On a 375px phone the content box is 293px, so the whole drawing was
@@ -284,21 +284,40 @@ const BASE: Plot.PlotOptions = {
  * with it — on a frame that has not grown. The labels would collide instead of shrinking, which
  * is the same defect wearing different clothes.
  *
- * So the layout is recomputed at the width it will be shown at. `NARROW` is sized so that a phone
- * scales it by at least 0.9 rather than 0.46; `WIDE` is the width these forms were designed and
- * tuned at, unchanged. `renderToString` draws both and the stylesheet shows one — see
- * `.chart-pair` in `app.css` for the container query that picks, and why the swap is at 576px.
+ * So the layout is recomputed at the width it will be shown at. `narrow` is sized so that a phone
+ * scales it by at least 0.9 rather than 0.46; `wide` is the width these forms were designed and
+ * tuned at, unchanged. `renderToString` draws all three and the stylesheet shows one — see
+ * `.chart-pair` in `app.css` for the container query that picks.
  *
- * The cost is real and was weighed: two SVGs per chart is about 31% more built HTML. It buys
- * legible axis text on the width most of this site's readers are on.
+ * # Why three
+ *
+ * Two left a band neither drawing filled (#609). A drawing grows to {@link MAX_SCALE} of its width
+ * and no further, so the narrow one stopped at 400px while its box ran on to the 576px swap: a
+ * 400px fan in a 552px card, then a jump to the wide drawing 46% wider with its text a third
+ * smaller. Moving the swap cannot close that, because the wide drawing at 0.8 paints its 10px axis
+ * text at 8. The band needs a drawing of its own.
+ *
+ * Each drawing takes over where it is shown at exactly its own width, from the one below it at
+ * its cap. That makes the step in painted type at a swap 1 − 1/1.25, a fifth, and never more; it
+ * means `middle` and `wide` are never shown smaller than they were laid out; and it fixes
+ * `middle` as the width that leaves the two bands it cannot fill equally short of full — the
+ * narrow drawing's 375 in a box nearly 440 wide, and its own 550 in a box nearly 640. √(375 × 512)
+ * is 438. Both bands fill at least 85% of their box.
+ *
+ * The cost is real and was weighed: each drawing after the first is about 31% more built HTML,
+ * and a scatter's coordinates do not compress against another width's (#518). It buys legible
+ * axis text on the width most of this site's readers are on, and a chart that fills its card at
+ * every width between.
  */
 export const WIDTHS = {
   /**
-   * For a phone. 293px is the content box at 375px, the narrowest viewport worth drawing for, so
-   * 320 is scaled by 0.92 there rather than shrunk.
+   * For a phone. 280px is the content box at 360px, the narrowest common Android viewport, so 300
+   * is scaled by 0.93 there rather than shrunk. 320 was, and painted 10px axis text at 8.8 (#609).
    */
-  narrow: 320,
-  /** What every chart in this file was drawn at before there were two, and still is. */
+  narrow: 300,
+  /** For the band between a phone and a desktop column. See "Why three" above. */
+  middle: 440,
+  /** What every chart in this file was drawn at before there was more than one, and still is. */
   wide: 640,
 } as const;
 
@@ -316,8 +335,8 @@ export const WIDTHS = {
  * `draw` writes the cap onto every SVG as a `max-width`, which is the one place both renderers and
  * every panel width pass through; a box wider than the cap leaves the drawing at its left edge.
  *
- * `.chart-scale` in `app.css` holds the same two products, 400 and 800, for the HTML scale row
- * under a strip, which has to end where the drawing does.
+ * `.chart-scale` in `app.css` holds the same three products, 375, 550 and 800, for the HTML scale
+ * row under a strip, which has to end where the drawing does.
  */
 export const MAX_SCALE = 1.25;
 
@@ -340,8 +359,8 @@ const PANEL_MIN = 280;
  * A panel is laid out against its sibling rather than against the page: two of them share the
  * wide frame, so each is a little under half of it, and on a phone they stack and each is the
  * narrow frame. Both of those are near enough {@link WIDTHS.narrow} that a panel is drawn **once**
- * rather than at two widths — which is the reason this is a function and not a call to
- * `renderToString`. The cloud these draw is 609 dots; a second copy for a layout it is never shown
+ * rather than at each of them — which is the reason this is a function and not a call to
+ * `renderToString`. The cloud these draw is 609 dots; another copy for a layout it is never shown
  * in would be the largest dead mark in the built HTML.
  *
  * # Why `n` is not the divisor
@@ -444,30 +463,32 @@ export function draw(
 }
 
 /**
- * A chart laid out at both {@link WIDTHS}, for the stylesheet to choose between.
+ * A chart laid out at every one of {@link WIDTHS}, for the stylesheet to choose between.
  *
- * # Why two
+ * # Why more than one
  *
  * A static SVG has one layout and the stylesheet used to make it fit by scaling it. At 375px that
  * scale is 0.46, which took the axis text to about 4.6px — see {@link WIDTHS} for why enlarging
- * the type instead does not work. So the drawing is laid out twice, at the two widths it is
- * actually shown at, and `app.css` picks with a container query. Both are in the document; the
- * one the reader is not looking at is `display: none`, which also takes it out of the
- * accessibility tree, so a screen reader is offered one chart rather than the same chart twice.
+ * the type instead does not work. So the drawing is laid out at each width it is actually shown
+ * at, and `app.css` picks with a container query. All of them are in the document; the ones the
+ * reader is not looking at are `display: none`, which also takes them out of the accessibility
+ * tree, so a screen reader is offered one chart rather than the same chart three times.
  *
  * `null` renders to nothing. A spec builder returns null when the data cannot support the form it
  * was asked for — a fan chart of one observation, say — and an empty string is the honest output:
  * better than an axis with a single mark on it, which would read as a finding. That decision is
  * about the data and never about the width, so it is taken once, on the wide drawing, and the
- * narrow one is not asked.
+ * other two are not asked.
  */
 export function pair(at: (width: number) => string): string {
   const wide = at(WIDTHS.wide);
   if (!wide) return "";
   const narrow = at(WIDTHS.narrow);
+  const middle = at(WIDTHS.middle);
   return (
     `<div class="chart-pair">` +
     `<div class="chart-at" data-at="narrow">${narrow}</div>` +
+    `<div class="chart-at" data-at="middle">${middle}</div>` +
     `<div class="chart-at" data-at="wide">${wide}</div>` +
     `</div>`
   );
@@ -1478,7 +1499,7 @@ const LABEL_LINE = 13;
 const DOT_KEEP_OUT = 6;
 
 /** A rectangle in the frame's pixel coordinates. */
-interface Box {
+export interface Box {
   left: number;
   top: number;
   right: number;
@@ -1486,9 +1507,11 @@ interface Box {
 }
 
 /** A direct label's offset and the lines it is drawn in: one, or the name broken in two. */
-interface Placement {
+export interface Placement {
   at: LabelAt;
   lines: readonly string[];
+  /** Where it lands, in the frame's pixels: what {@link placeLabels} costed it at. */
+  box: Box;
 }
 
 /**
@@ -1575,14 +1598,50 @@ function halves(label: string): [string, string] | null {
  * left `[M] mirrored inside [H]` with no clear place on the narrow TTAG plane: its one clear place
  * is broken in two to the left of its mark, two units into a margin with nothing in it there.
  *
+ * # Why the order is searched
+ *
+ * Greedy is order-dependent, and the order is the manifest's, which knows nothing about the
+ * picture. On the narrow TTAG plane (#609) the rolling count came first and took the one place
+ * above its mark that was clear *then* — the place `[M] mirrored inside [H]` needed — and the
+ * mirror was left to overlap it by half a pixel in this model, which the runner's taller font made
+ * a collision. The other way round, both are clear. So where the manifest's order leaves any
+ * overlap, each mark is tried first in turn, and the least costly of those orders is kept: more
+ * than one pass, still deterministic, and a tie keeps the earlier order.
+ *
  * Deterministic in the order the marks arrive, which is the manifest's order, so the same document
  * draws the same picture on every build.
  */
-function placeLabels(
+export function placeLabels(
   marks: readonly { label: string; px: number; py: number }[],
   frame: Box,
   occupied: readonly Box[] = [],
 ): Placement[] {
+  const manifest = marks.map((_, i) => i);
+  let best = placeInOrder(marks, manifest, frame, occupied);
+  if (best.outside === 0 && best.overlap === 0) return best.placements;
+  for (const first of manifest.slice(1)) {
+    const tried = placeInOrder(marks, [first, ...manifest.filter((i) => i !== first)], frame, occupied);
+    if (
+      tried.outside < best.outside ||
+      (tried.outside === best.outside && tried.overlap < best.overlap)
+    ) {
+      best = tried;
+    }
+  }
+  return best.placements;
+}
+
+/**
+ * One greedy pass of {@link placeLabels}, visiting the marks in `order`. The placements come back
+ * in the marks' own order, with how much of them lies outside the frame and how much they cover
+ * of each other and of the marks, both in square pixels.
+ */
+function placeInOrder(
+  marks: readonly { label: string; px: number; py: number }[],
+  order: readonly number[],
+  frame: Box,
+  occupied: readonly Box[],
+): { placements: Placement[]; outside: number; overlap: number } {
   const taken: Box[] = [
     ...occupied,
     ...marks.map((m) => ({
@@ -1592,8 +1651,11 @@ function placeLabels(
       bottom: m.py + DOT_KEEP_OUT,
     })),
   ];
-  const out: Placement[] = [];
-  for (const mark of marks) {
+  const out: Placement[] = new Array(marks.length);
+  let spilled = 0;
+  let covered = 0;
+  for (const index of order) {
+    const mark = marks[index]!;
     const split = halves(mark.label);
     const forms: (readonly string[])[] = [[mark.label], ...(split ? [split] : [])];
     let best: Placement | null = null;
@@ -1607,7 +1669,7 @@ function placeLabels(
         const cost = taken.reduce((sum, b) => sum + overlap(box, b), 0);
         if (cost < least) {
           least = cost;
-          best = { at, lines };
+          best = { at, lines, box };
         }
         if (cost === 0) break search;
       }
@@ -1617,18 +1679,22 @@ function placeLabels(
       let least = Infinity;
       for (const lines of forms) {
         for (const at of LABEL_ORDER) {
-          const cost = outside(labelBox(at, mark.px, mark.py, lines), frame);
+          const box = labelBox(at, mark.px, mark.py, lines);
+          const cost = outside(box, frame);
           if (cost < least) {
             least = cost;
-            best = { at, lines };
+            best = { at, lines, box };
           }
         }
       }
+      spilled += least;
+    } else {
+      covered += least;
     }
-    out.push(best!);
-    taken.push(labelBox(best!.at, mark.px, mark.py, best!.lines));
+    out[index] = best!;
+    taken.push(best!.box);
   }
-  return out;
+  return { placements: out, outside: spilled, overlap: covered };
 }
 
 /**

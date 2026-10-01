@@ -21,11 +21,11 @@ import { CLEVELAND } from "./helpers.ts";
 /*
  * Charts, at the width they are actually read at.
  *
- * Every chart is drawn twice — see `WIDTHS` in `src/lib/plot/spec.ts` — because a static SVG
- * scaled to a phone takes its axis text down with it. The defect these replace: at 375px the
- * 640-unit drawing was scaled by 0.46 and the tick labels rendered near 4.6px, which is half the
- * size at which text is legible, on the viewport most first visits arrive at. Nothing caught it,
- * because a scaled SVG is correct markup and its `font-size` attribute still says 10.
+ * Every chart is drawn at three widths — see `WIDTHS` in `src/lib/plot/spec.ts` — because a
+ * static SVG scaled to a phone takes its axis text down with it. The defect these replace: at
+ * 375px the 640-unit drawing was scaled by 0.46 and the tick labels rendered near 4.6px, which is
+ * half the size at which text is legible, on the viewport most first visits arrive at. Nothing
+ * caught it, because a scaled SVG is correct markup and its `font-size` attribute still says 10.
  *
  * So these measure what the browser paints rather than what the file says. A unit test cannot:
  * the scale factor only exists once the SVG is in a box of a known width.
@@ -84,22 +84,143 @@ test.describe("charts on a phone", () => {
     });
 
   test("on a phone, chart text is painted between 9px and 12px", async ({ page }) => {
-    // 390px is the common modern phone and 375 the narrowest worth drawing for. The floor is 9px
-    // rather than a round 10 because `WIDTHS.narrow` is sized to scale by at least 0.9 there, and
-    // the 10px axis marks are the smallest type any of these forms uses. The ceiling is the 12.8px
-    // HTML legend beside these charts: at 375 the county labels painted at 9.2px under it, and a
-    // chart should not be both the smallest and the largest type on a phone page.
-    await page.setViewportSize({ width: 375, height: 900 });
+    // 375 is the common iPhone and 360 the common Android, the narrowest worth drawing for. The
+    // floor is 9px rather than a round 10 because `WIDTHS.narrow` is sized to scale by at least 0.9
+    // at 360, and the 10px axis marks are the smallest type any of these forms uses. Only 375 was
+    // tested until #609, and at 360 the county labels painted at 8.8px. The ceiling is the 12.8px
+    // HTML legend beside these charts: a chart should not be both the smallest and the largest
+    // type on a phone page.
     const outside: string[] = [];
-    for (const route of CHARTED) {
-      await visit(page, route);
-      for (const mark of await paintedText(page)) {
-        if (mark.px < 9 || mark.px > 12) {
-          outside.push(`${route} [${mark.chart}] "${mark.text}" at ${mark.px.toFixed(1)}px`);
+    for (const width of [360, 375]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const route of CHARTED) {
+        await visit(page, route);
+        for (const mark of await paintedText(page)) {
+          if (mark.px < 9 || mark.px > 12) {
+            outside.push(`${route} at ${width} [${mark.chart}] "${mark.text}" at ${mark.px.toFixed(1)}px`);
+          }
         }
       }
     }
     expect(outside.slice(0, 10), "chart text outside the phone band").toEqual([]);
+  });
+
+  test("between a phone and a desktop, a chart fills its box and its type moves in small steps", async ({
+    page,
+  }) => {
+    /*
+     * #609. With two drawings, the narrow one stopped growing at 400px and its box ran on to the
+     * 576px swap — a 400px fan in a 552px card — and then the wide drawing took over 46% wider,
+     * its type a third smaller. Every phone and desktop test passed throughout, because the band
+     * is neither.
+     *
+     * So this walks the band in 16px steps, on every charted route, and holds two things.
+     *
+     * - A drawing fills at least 85% of its box, up to the 800px a drawing is capped at. 85% is
+     *   what the swaps leave by construction — see "Why three" on `WIDTHS` — and not a tolerance.
+     * - The largest type in a chart never falls by more than a fifth from one step to the next.
+     *   A fifth is the step a swap makes by construction: the drawing before it is at its cap and
+     *   the one after at its own width, 1/1.25. A layout change that shrinks a chart's box — a
+     *   rail opening beside it at 960 — is held to the same step.
+     *
+     * One load per route and the viewport walked under it: the container queries answer a resize
+     * without a reload, which is the behaviour a reader dragging a window gets.
+     */
+    const thin: string[] = [];
+    const jumps: string[] = [];
+    for (const route of CHARTED) {
+      await page.setViewportSize({ width: 360, height: 900 });
+      await visit(page, route);
+      let before = new Map<string, number>();
+      for (let width = 360; width <= 1104; width += 16) {
+        await page.setViewportSize({ width, height: 900 });
+        const charts = await page.evaluate(() => {
+          const seen = new Map<string, number>();
+          const out: { key: string; box: number; painted: number; type: number }[] = [];
+          for (const svg of document.querySelectorAll<SVGSVGElement>(".chart-pair svg.plot")) {
+            if (!svg.getClientRects().length) continue;
+            if (svg.closest(".chart-at")?.getAttribute("data-at") === "panel") continue;
+            const name = svg.closest("[data-chart]")?.getAttribute("data-chart") ?? "unnamed";
+            const n = seen.get(name) ?? 0;
+            seen.set(name, n + 1);
+            const painted = svg.getBoundingClientRect().width;
+            const scale = painted / svg.viewBox.baseVal.width;
+            const sizes = [...svg.querySelectorAll("text")]
+              .filter((t) => (t.textContent ?? "").trim())
+              .map((t) => (parseFloat(getComputedStyle(t).fontSize) || 10) * scale);
+            out.push({
+              key: `${name}#${n}`,
+              box: svg.closest(".chart-pair")!.getBoundingClientRect().width,
+              painted,
+              type: sizes.length ? Math.max(...sizes) : 0,
+            });
+          }
+          return out;
+        });
+        const now = new Map<string, number>();
+        for (const chart of charts) {
+          const want = 0.85 * Math.min(chart.box, 800);
+          if (chart.painted < want - 0.5) {
+            thin.push(
+              `${route} at ${width} [${chart.key}] ${Math.round(chart.painted)}px in a ${Math.round(chart.box)}px box`,
+            );
+          }
+          if (!chart.type) continue;
+          now.set(chart.key, chart.type);
+          const last = before.get(chart.key);
+          if (last && chart.type < 0.8 * last - 0.05) {
+            jumps.push(
+              `${route} at ${width} [${chart.key}] ${last.toFixed(1)}px to ${chart.type.toFixed(1)}px`,
+            );
+          }
+        }
+        before = now;
+      }
+    }
+    expect(thin.slice(0, 10), "drawings that leave their box blank").toEqual([]);
+    expect(jumps.slice(0, 10), "chart type that jumps between neighbouring widths").toEqual([]);
+  });
+
+  test("the reach plot is the wide drawing on a desktop", async ({ page }) => {
+    // #609. The rail opens beside the stage at 960, and on a reading-width page that left the
+    // stage 548px: under the swap, so from 968 up the plot was drawn at its phone size and halved
+    // as the window widened. The page is `.wrap.wide` now.
+    for (const width of [1024, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await visit(page, "/scenario/reach");
+      const shown = page.locator('[data-chart="positions"] svg.plot:visible');
+      await expect(shown).toHaveCount(1);
+      expect(
+        await shown.evaluate((svg) => svg.closest(".chart-at")?.getAttribute("data-at")),
+        `${width}px`,
+      ).toBe("wide");
+      expect((await shown.boundingBox())!.width, `${width}px`).toBeGreaterThanOrEqual(600);
+    }
+  });
+
+  test("a note under a chart does not run past the drawing it qualifies", async ({ page }) => {
+    // A figure reads as one width. At 1440 every wide drawing is at its 800px cap inside a wider
+    // column, and a note under it is held to `--measure-note`, which ends inside the drawing; this
+    // keeps it there. 8px of slack is a glyph's overhang, not a layout.
+    await page.setViewportSize({ width: 1440, height: 900 });
+    const over: string[] = [];
+    let seen = 0;
+    for (const route of CHARTED) {
+      await visit(page, route);
+      const runs = await page.locator(".chartwrap + p.note").evaluateAll((notes) =>
+        notes.flatMap((note) => {
+          const svg = [...note.previousElementSibling!.querySelectorAll("svg.plot")].find(
+            (s) => s.getClientRects().length,
+          );
+          if (!svg || !note.getClientRects().length) return [];
+          return [note.getBoundingClientRect().right - svg.getBoundingClientRect().right];
+        }),
+      );
+      seen += runs.length;
+      for (const run of runs) if (run > 8) over.push(`${route}: ${Math.round(run)}px past`);
+    }
+    expect(seen, "the routes carry notes under charts").toBeGreaterThan(0);
+    expect(over.slice(0, 10), "notes wider than their chart").toEqual([]);
   });
 
   test("on a wide page, no chart text is painted larger than the body text", async ({ page }) => {
@@ -126,7 +247,7 @@ test.describe("charts on a phone", () => {
     // capped to match in `app.css`; if the two disagreed, the high end would sit under nothing.
     const off: string[] = [];
     let seen = 0;
-    for (const width of [375, 1280]) {
+    for (const width of [375, 600, 1280]) {
       await page.setViewportSize({ width, height: 900 });
       for (const route of CHARTED) {
         await visit(page, route);
@@ -157,13 +278,16 @@ test.describe("charts on a phone", () => {
      * reads as a rendering fault rather than as a truncation and is exactly the kind of thing
      * nobody reports.
      */
-    await page.setViewportSize({ width: 375, height: 900 });
+    // 375 for the narrow drawing and 600 for the middle one, which every route shows there (#609).
     const clipped: string[] = [];
-    for (const route of CHARTED) {
-      await visit(page, route);
-      for (const mark of await paintedText(page)) {
-        if (mark.outside > 0.5) {
-          clipped.push(`${route} [${mark.chart}] "${mark.text}" over by ${Math.round(mark.outside)}px`);
+    for (const width of [375, 600]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const route of CHARTED) {
+        await visit(page, route);
+        for (const mark of await paintedText(page)) {
+          if (mark.outside > 0.5) {
+            clipped.push(`${route} at ${width} [${mark.chart}] "${mark.text}" over by ${Math.round(mark.outside)}px`);
+          }
         }
       }
     }
@@ -183,9 +307,9 @@ test.describe("charts on a phone", () => {
      * made the defect a property of the reviewer's machine. Zero pairs on this build clear even a
      * 1px *gap* requirement, so there is no slack being spent here.
      */
-    await page.setViewportSize({ width: 375, height: 900 });
     const through: string[] = [];
-    for (const route of CHARTED) {
+    for (const [route, width] of CHARTED.flatMap((r) => [375, 600].map((w) => [r, w] as const))) {
+      await page.setViewportSize({ width, height: 900 });
       await visit(page, route);
       const hits = await page.evaluate(() => {
         const out: string[] = [];
@@ -208,18 +332,19 @@ test.describe("charts on a phone", () => {
         }
         return out;
       });
-      for (const hit of hits) through.push(`${route}: ${hit}`);
+      for (const hit of hits) through.push(`${route} at ${width}: ${hit}`);
     }
     expect(through.slice(0, 10), "overlapping chart type").toEqual([]);
   });
 
-  test("the reader is shown one of the two drawings, never both and never neither", async ({
+  test("the reader is shown one of the three drawings, never two and never none", async ({
     page,
   }) => {
-    // The container query is the only thing choosing between them, so a stylesheet that stopped
-    // loading, or a breakpoint edited to leave a gap, would show two charts stacked or none at
-    // all — both of which read as a broken page rather than as a missing rule.
-    for (const width of [375, 500, 640, 900, 1280]) {
+    // The container queries are the only thing choosing between them, so a stylesheet that
+    // stopped loading, or a breakpoint edited to leave a gap, would show charts stacked or none at
+    // all — both of which read as a broken page rather than as a missing rule. A width in each
+    // band, and one either side of each swap.
+    for (const width of [375, 500, 519, 520, 640, 719, 720, 900, 1280]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(`/district/${CLEVELAND}`);
       const shown = await page.locator(".chart-pair").evaluateAll((pairs) =>

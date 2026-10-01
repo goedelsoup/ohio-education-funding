@@ -385,10 +385,10 @@ test("the fan chart labels both bounds and dashes the centre", () => {
   // tooltips actually attached rather than by the class, which Plot puts on the group once: the
   // property worth pinning is that every year is pointable, not how the marks are nested.
   //
-  // Six because a chart is drawn twice — one drawing per width, of which the reader is shown one.
+  // Three per drawing, and a chart is drawn once per width, of which the reader is shown one.
   // Asserted on the pair rather than on a slice of it, so that a drawing losing its hover layer
-  // fails here whichever of the two it is.
-  expect(svg.match(/data-hover=/g)?.length).toBe(2 * 3);
+  // fails here whichever of them it is.
+  expect(svg.match(/data-hover=/g)?.length).toBe(Object.keys(WIDTHS).length * 3);
   expect(svg).toContain("fan-anchor");
 });
 
