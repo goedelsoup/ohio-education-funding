@@ -31,11 +31,13 @@ import {
   fanSpec,
   MAX_SCALE,
   panelWidth,
+  placeLabels,
   planeSpec,
   rangeSpec,
   rankSpec,
   scatterSpec,
   seriesSpec,
+  type Box,
   type Spec,
   truncatedDomain,
   WIDTHS,
@@ -645,6 +647,39 @@ test("the placement is a function of the positions, not of the order they are dr
   const once = renderToString(() => planeSpec(rules(), PLANE_AXES, PLANE), "presentational");
   const again = renderToString(() => planeSpec(rules(), PLANE_AXES, PLANE), "presentational");
   expect(once).toBe(again);
+});
+
+test("a mark the manifest lists first does not take the only clear place of one listed later", () => {
+  /*
+   * The narrow TTAG plane as #609 drew it, in its own pixels. The rolling count is listed first
+   * and was placed above its mark — clear at the time, and the one place the mirror inside `[H]`
+   * then needed. The mirror overlapped it by half a pixel here and collided on the runner's font.
+   * Placed the other way round, both are clear: the order is searched, not taken.
+   */
+  const marks = [
+    { label: "A ratchet, FY2032", px: 252.7, py: 173.3 },
+    { label: "A 2% cap, FY2032", px: 69.3, py: 336.7 },
+    { label: "A 1% cap, FY2036 undamped", px: 118.2, py: 235.3 },
+    { label: "A rolling pupil count", px: 193.9, py: 153.9 },
+    { label: "[M] mirrored inside [H]", px: 148.4, py: 159.8 },
+    { label: "[M] mirrored beside [L], [M], [O]", px: 205.9, py: 53.3 },
+    { label: "A dated phase-down", px: 205.9, py: 250.3 },
+  ];
+  const frame = { left: 4, top: 39.6, right: 296, bottom: 350 };
+  const axisEnds = [
+    { left: 4, top: 42.6, right: 92, bottom: 55.6 },
+    { left: 4, top: 337, right: 92, bottom: 350 },
+  ];
+  const placed = placeLabels(marks, frame, axisEnds);
+  const covers = (a: Box, b: Box) =>
+    Math.min(a.right, b.right) > Math.max(a.left, b.left) && Math.min(a.bottom, b.bottom) > Math.max(a.top, b.top);
+  const through: string[] = [];
+  placed.forEach((one, i) => {
+    placed.slice(i + 1).forEach((other, j) => {
+      if (covers(one.box, other.box)) through.push(`${marks[i]!.label} / ${marks[i + 1 + j]!.label}`);
+    });
+  });
+  expect(through).toEqual([]);
 });
 
 test("the hit layer matches the dot layer place for place", () => {

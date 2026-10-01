@@ -1499,7 +1499,7 @@ const LABEL_LINE = 13;
 const DOT_KEEP_OUT = 6;
 
 /** A rectangle in the frame's pixel coordinates. */
-interface Box {
+export interface Box {
   left: number;
   top: number;
   right: number;
@@ -1507,9 +1507,11 @@ interface Box {
 }
 
 /** A direct label's offset and the lines it is drawn in: one, or the name broken in two. */
-interface Placement {
+export interface Placement {
   at: LabelAt;
   lines: readonly string[];
+  /** Where it lands, in the frame's pixels: what {@link placeLabels} costed it at. */
+  box: Box;
 }
 
 /**
@@ -1596,14 +1598,50 @@ function halves(label: string): [string, string] | null {
  * left `[M] mirrored inside [H]` with no clear place on the narrow TTAG plane: its one clear place
  * is broken in two to the left of its mark, two units into a margin with nothing in it there.
  *
+ * # Why the order is searched
+ *
+ * Greedy is order-dependent, and the order is the manifest's, which knows nothing about the
+ * picture. On the narrow TTAG plane (#609) the rolling count came first and took the one place
+ * above its mark that was clear *then* — the place `[M] mirrored inside [H]` needed — and the
+ * mirror was left to overlap it by half a pixel in this model, which the runner's taller font made
+ * a collision. The other way round, both are clear. So where the manifest's order leaves any
+ * overlap, each mark is tried first in turn, and the least costly of those orders is kept: more
+ * than one pass, still deterministic, and a tie keeps the earlier order.
+ *
  * Deterministic in the order the marks arrive, which is the manifest's order, so the same document
  * draws the same picture on every build.
  */
-function placeLabels(
+export function placeLabels(
   marks: readonly { label: string; px: number; py: number }[],
   frame: Box,
   occupied: readonly Box[] = [],
 ): Placement[] {
+  const manifest = marks.map((_, i) => i);
+  let best = placeInOrder(marks, manifest, frame, occupied);
+  if (best.outside === 0 && best.overlap === 0) return best.placements;
+  for (const first of manifest.slice(1)) {
+    const tried = placeInOrder(marks, [first, ...manifest.filter((i) => i !== first)], frame, occupied);
+    if (
+      tried.outside < best.outside ||
+      (tried.outside === best.outside && tried.overlap < best.overlap)
+    ) {
+      best = tried;
+    }
+  }
+  return best.placements;
+}
+
+/**
+ * One greedy pass of {@link placeLabels}, visiting the marks in `order`. The placements come back
+ * in the marks' own order, with how much of them lies outside the frame and how much they cover
+ * of each other and of the marks, both in square pixels.
+ */
+function placeInOrder(
+  marks: readonly { label: string; px: number; py: number }[],
+  order: readonly number[],
+  frame: Box,
+  occupied: readonly Box[],
+): { placements: Placement[]; outside: number; overlap: number } {
   const taken: Box[] = [
     ...occupied,
     ...marks.map((m) => ({
@@ -1613,8 +1651,11 @@ function placeLabels(
       bottom: m.py + DOT_KEEP_OUT,
     })),
   ];
-  const out: Placement[] = [];
-  for (const mark of marks) {
+  const out: Placement[] = new Array(marks.length);
+  let spilled = 0;
+  let covered = 0;
+  for (const index of order) {
+    const mark = marks[index]!;
     const split = halves(mark.label);
     const forms: (readonly string[])[] = [[mark.label], ...(split ? [split] : [])];
     let best: Placement | null = null;
@@ -1628,7 +1669,7 @@ function placeLabels(
         const cost = taken.reduce((sum, b) => sum + overlap(box, b), 0);
         if (cost < least) {
           least = cost;
-          best = { at, lines };
+          best = { at, lines, box };
         }
         if (cost === 0) break search;
       }
@@ -1638,18 +1679,22 @@ function placeLabels(
       let least = Infinity;
       for (const lines of forms) {
         for (const at of LABEL_ORDER) {
-          const cost = outside(labelBox(at, mark.px, mark.py, lines), frame);
+          const box = labelBox(at, mark.px, mark.py, lines);
+          const cost = outside(box, frame);
           if (cost < least) {
             least = cost;
-            best = { at, lines };
+            best = { at, lines, box };
           }
         }
       }
+      spilled += least;
+    } else {
+      covered += least;
     }
-    out.push(best!);
-    taken.push(labelBox(best!.at, mark.px, mark.py, best!.lines));
+    out[index] = best!;
+    taken.push(best!.box);
   }
-  return out;
+  return { placements: out, outside: spilled, overlap: covered };
 }
 
 /**
