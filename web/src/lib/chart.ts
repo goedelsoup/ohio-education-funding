@@ -393,10 +393,22 @@ export function attachValues(root: HTMLElement, tip: HTMLElement, said: HTMLElem
     tip.style.top = `${top + pad}px`;
   };
 
+  /** The mark the tip is reading out, however it got there, and where that mark was then. */
+  let shown: Element | null = null;
+  let shownAt = { left: 0, top: 0 };
+
   const show = (mark: Element, left: number, top: number) => {
     tip.textContent = mark.getAttribute("data-hover") ?? "";
     tip.hidden = false;
+    shown = mark;
+    const box = mark.getBoundingClientRect();
+    shownAt = { left: box.left, top: box.top };
     put(left, top);
+  };
+
+  const hide = () => {
+    tip.hidden = true;
+    shown = null;
   };
 
   /** Show the value at a mark's own position, for the two ways in that have no cursor position. */
@@ -440,9 +452,14 @@ export function attachValues(root: HTMLElement, tip: HTMLElement, said: HTMLElem
   };
 
   root.addEventListener("mousemove", (event) => {
-    const target = (event.target as Element | null)?.closest("[data-hover]");
+    const under = event.target as Element | null;
+    const target = under?.closest("[data-hover]");
     if (!target) {
-      tip.hidden = true;
+      // The gap between two bars is still the chart. Hiding there blinked the tip off and on
+      // seven times down a five-bar chart (#613), so the last reading stays where it was until
+      // the pointer leaves the chart it belongs to.
+      const svg = under?.closest?.("svg.plot");
+      if (!(svg && shown && svg.contains(shown))) hide();
       return;
     }
     // A reader who has picked up the mouse has left the cursor behind, and two highlighted marks
@@ -451,9 +468,26 @@ export function attachValues(root: HTMLElement, tip: HTMLElement, said: HTMLElem
     show(target, event.clientX, event.clientY);
   });
 
-  root.addEventListener("mouseleave", () => {
-    tip.hidden = true;
-  });
+  root.addEventListener("mouseleave", hide);
+
+  /*
+   * The tip is `position: fixed`, so a scroll carried its mark away and left it behind over
+   * whatever scrolled in — a heading, a table (#613). Now it goes with the mark, and off the screen
+   * with it. Only when the mark has moved, though: a scroll event is dispatched a frame after its
+   * scroll, so one that brought a mark into view arrives after the hover it made possible, and must
+   * not undo it. Capture, so a scrolling container inside the page counts as well as the page.
+   */
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (tip.hidden || !shown) return;
+      const box = shown.getBoundingClientRect();
+      if (box.left === shownAt.left && box.top === shownAt.top) return;
+      if (box.bottom < 0 || box.top > window.innerHeight) hide();
+      else showAtMark(shown);
+    },
+    { capture: true, passive: true },
+  );
 
   /*
    * Touch. `click` rather than `pointerdown`, so a drag that happens to begin on a mark scrolls
@@ -462,13 +496,20 @@ export function attachValues(root: HTMLElement, tip: HTMLElement, said: HTMLElem
   root.addEventListener("click", (event) => {
     const target = (event.target as Element | null)?.closest?.("[data-hover]");
     if (!target) {
-      if (at == null) tip.hidden = true;
+      if (at == null) hide();
       return;
     }
     showAtMark(target);
   });
 
   root.addEventListener("keydown", (event) => {
+    // Escape dismisses the tip wherever focus is, not only inside a chart: a hover or a tap puts
+    // it up without moving focus, and content on hover must be dismissable (WCAG 1.4.13).
+    if (event.key === "Escape" && (!tip.hidden || at)) {
+      drop();
+      hide();
+      return;
+    }
     const svg = (event.target as Element | null)?.closest?.("svg.plot[tabindex]");
     if (!svg) return;
     const marks = [...svg.querySelectorAll("[data-hover]")];
@@ -493,10 +534,6 @@ export function attachValues(root: HTMLElement, tip: HTMLElement, said: HTMLElem
       case "End":
         next = last;
         break;
-      case "Escape":
-        drop();
-        tip.hidden = true;
-        return;
       default:
         return;
     }
@@ -515,6 +552,6 @@ export function attachValues(root: HTMLElement, tip: HTMLElement, said: HTMLElem
     const svg = (event.target as Element | null)?.closest?.("svg.plot[tabindex]");
     if (!svg) return;
     drop();
-    tip.hidden = true;
+    hide();
   });
 }

@@ -50,7 +50,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join, relative } from "node:path";
 
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 const DIST = join(import.meta.dirname, "../../dist");
 
@@ -342,4 +342,91 @@ test.describe("the cursor's second channel", () => {
       ]);
     });
   }
+});
+
+/**
+ * When the tip goes away (#613).
+ *
+ * It was easy to raise and hard to lower: a scroll left it fixed over whatever scrolled in, Escape
+ * reached it only from inside a chart, and the gaps between marks blinked it off and on. These are
+ * the three readings the issue took, as checks. Where the tip is placed is #600's.
+ */
+/**
+ * Two frames, for a scroll to finish being a scroll. A scroll event is dispatched on the next
+ * frame rather than when the scroll happens, so one raised by `scrollIntoViewIfNeeded` arrives
+ * after a hover that follows it and takes the tip down — which is the behaviour under test.
+ */
+const settled = (page: Page) =>
+  page.evaluate(
+    () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))),
+  );
+
+test.describe("the tip's dismissal", () => {
+  test.describe("on a phone", () => {
+    test.use({ hasTouch: true, viewport: { width: 375, height: 812 } });
+
+    test("a tapped tip goes with its mark when the page scrolls", async ({ page }) => {
+      await page.goto("/statewide");
+      const mark = page.locator("svg.plot .bar-fill > *").first();
+      await mark.scrollIntoViewIfNeeded();
+      await settled(page);
+      await mark.tap();
+      const tip = page.locator("#tip");
+      await expect(tip, "the tap raised the tip").toBeVisible();
+
+      await page.evaluate(() => window.scrollBy(0, 250));
+      await expect
+        .poll(async () => {
+          if (await tip.isHidden()) return 0;
+          const [t, m] = await Promise.all([tip.boundingBox(), mark.boundingBox()]);
+          return t && m ? Math.abs(t.y - (m.y + m.height)) : Infinity;
+        }, { message: "hidden, or still beside the mark it reads" })
+        .toBeLessThanOrEqual(30);
+    });
+  });
+
+  test("Escape dismisses a hover tip with focus outside the chart", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto("/outcomes");
+    const mark = page.locator("svg.plot:visible .scatter-hit > *").first();
+    await mark.scrollIntoViewIfNeeded();
+    await settled(page);
+    await mark.hover({ force: true });
+    const tip = page.locator("#tip");
+    await expect(tip, "the hover raised the tip").toBeVisible();
+
+    await page.keyboard.press("Escape");
+    await expect(tip).toBeHidden();
+  });
+
+  test("the tip holds across the gap between two bars", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto("/statewide");
+    const bars = page.locator("svg.plot:visible").filter({ has: page.locator(".bar-fill") }).first();
+    await bars.scrollIntoViewIfNeeded();
+    await settled(page);
+    const [a, b] = await bars.evaluate((svg) =>
+      [...svg.querySelectorAll(".bar-fill > *")].slice(0, 2).map((m) => {
+        const r = m.getBoundingClientRect();
+        return { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
+      }),
+    );
+    expect(a && b, "a chart with two bars").toBeTruthy();
+    // Bars run down the chart or across it; the gap is on whichever side they do not share.
+    const down = b!.top >= a!.bottom;
+    const gap = down
+      ? { x: (Math.max(a!.left, b!.left) + Math.min(a!.right, b!.right)) / 2, y: (a!.bottom + b!.top) / 2 }
+      : { x: (a!.right + b!.left) / 2, y: (Math.max(a!.top, b!.top) + Math.min(a!.bottom, b!.bottom)) / 2 };
+    expect(down ? b!.top - a!.bottom : b!.left - a!.right, "the bars have a gap").toBeGreaterThan(0);
+
+    await page.mouse.move((a!.left + a!.right) / 2, (a!.top + a!.bottom) / 2);
+    const tip = page.locator("#tip");
+    await expect(tip, "the hover raised the tip").toBeVisible();
+    expect(
+      await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.closest("[data-hover]") ?? null, gap),
+      "the point is a gap, not another mark",
+    ).toBeNull();
+    await page.mouse.move(gap.x, gap.y, { steps: 4 });
+    await expect(tip, "and the gap did not take it down").toBeVisible();
+  });
 });
