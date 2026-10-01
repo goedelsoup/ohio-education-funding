@@ -22,7 +22,7 @@
  */
 import Base from "../../../layouts/Base.astro";
 import { loadCorpus } from "../../../lib/corpus.ts";
-import { sectionForClass } from "../../../lib/nav.ts";
+import { NAMES, sectionForClass } from "../../../lib/nav.ts";
 import { renderProse, renderPropertyValue, summarize } from "../../../lib/prose.ts";
 import * as routes from "../../../lib/routes.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
@@ -41,7 +41,7 @@ const description = await renderProse(entry.description, entry.className);
  * class and the site has a scenario runner at /scenario, and both pages were titled "Scenario" —
  * the last duplicate title in the build, and the only one not caused by two districts sharing a
  * township name. The suffix says which of the two a result is, and reads as the sibling indexes
- * do.
+ * do. The class is labelled `Worked Scenario` since #560, and the suffix stays for the next one.
  */
 const title = `${entry.label} — the corpus`;
 ---
@@ -62,6 +62,22 @@ const title = `${entry.label} — the corpus`;
   </p>
 
   <div class="card prose-body" id="description" data-part="description"><Fragment set:html={description} /></div>
+
+  {
+    /*
+     * The one class that shares a word with a place in the bar (#560). Its nodes are changes
+     * argued in prose; the runner at `/scenario` is where a reader makes their own. Said here,
+     * above the list, because this is where a reader who came from the bar's `/scenario` lands
+     * wondering which of the two they are on.
+     */
+    entry.className === "scenario" && (
+      <p class="note">
+        These are worked out in the corpus: each argues one change in prose, with the figures it
+        produced committed beside it. To set the levers yourself, use{" "}
+        <a href={NAMES.scenario.href}>{NAMES.scenario.name}</a>.
+      </p>
+    )
+  }
 
   <div class="card" id="nodes" data-part="nodes">
     <h2><SectionAnchor id="nodes" />Nodes</h2>

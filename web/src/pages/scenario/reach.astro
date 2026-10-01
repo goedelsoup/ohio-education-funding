@@ -29,6 +29,7 @@
  * containing levers. Restyling rather than reimplementing is what keeps the two views' levers from
  * drifting apart.
  */
+import Baseline from "../../components/Baseline.astro";
 import HeldFixed from "../../components/HeldFixed.astro";
 import RunnerViews from "../../components/RunnerViews.astro";
 import ScenarioControls from "../../components/ScenarioControls.astro";
@@ -36,7 +37,7 @@ import Base from "../../layouts/Base.astro";
 import { NAMES } from "../../lib/nav.ts";
 import SectionAnchor from "../../components/SectionAnchor.astro";
 import { loadFeed, qualifiedName } from "../../lib/feed.ts";
-import { count, millions, pct } from "../../lib/format.ts";
+import { count, pct } from "../../lib/format.ts";
 import {
   DEFAULT_VIEW,
   DIMENSIONS,
@@ -112,6 +113,50 @@ const counties = scopeCounties(bundle.districts);
     <template id="scenario-chip" set:html={yearChip("formula")} />
 
     <div class="reach">
+      {/*
+        The levers first, at every width (#564).
+
+        The rail was second in the source and placed first by CSS above 960px, so on a phone a
+        reader scrolled past the whole plot to reach the controls that change it, and on a laptop
+        the focus order ran through the plot's menus before the levers drawn to their left. The
+        other view settled the question in #549: the runner is the levers, and what they move
+        follows them. The untouched cloud is an answer too, and it is still the first figure.
+      */}
+      <aside class="reach-rail">
+        <div class="presets">
+          <h2 class="rail-hd">Start from</h2>
+          <div class="preset-row">
+            {
+              named.map((p) => (
+                <button
+                  type="button"
+                  class="preset"
+                  aria-pressed={p.key === "law" ? "true" : "false"}
+                  data-preset={JSON.stringify(p.levers)}
+                >
+                  <span class="preset-label">{p.label}</span>
+                  <span class="preset-note">{p.note}</span>
+                </button>
+              ))
+            }
+          </div>
+          <p class="note">
+            Every one of these is a position the sliders below can hold. That is a real
+            constraint rather than a note about the buttons: base cost stops at {
+              LEVER_BOUNDS.baseCostScale.max
+            }×, and some districts do not clear their own guarantee anywhere inside that range. A
+            preset for one of them would name a setting this model cannot be put in.
+          </p>
+        </div>
+
+        <ScenarioControls
+          model={s.minimum_state_share}
+          onGuarantee={s.on_guarantee}
+          projection={{ available: false, baseYear: 0, maxYear: 0 }}
+          refresh={refresh}
+        />
+      </aside>
+
       <div class="reach-stage">
         {/*
           What is plotted, over the plot.
@@ -306,40 +351,6 @@ const counties = scopeCounties(bundle.districts);
         <div id="scenario-out"></div>
       </div>
 
-      <aside class="reach-rail">
-        <div class="presets">
-          <h2 class="rail-hd">Start from</h2>
-          <div class="preset-row">
-            {
-              named.map((p) => (
-                <button
-                  type="button"
-                  class="preset"
-                  aria-pressed={p.key === "law" ? "true" : "false"}
-                  data-preset={JSON.stringify(p.levers)}
-                >
-                  <span class="preset-label">{p.label}</span>
-                  <span class="preset-note">{p.note}</span>
-                </button>
-              ))
-            }
-          </div>
-          <p class="note">
-            Every one of these is a position the sliders below can hold. That is a real
-            constraint rather than a note about the buttons: base cost stops at {
-              LEVER_BOUNDS.baseCostScale.max
-            }×, and some districts do not clear their own guarantee anywhere inside that range. A
-            preset for one of them would name a setting this model cannot be put in.
-          </p>
-        </div>
-
-        <ScenarioControls
-          model={s.minimum_state_share}
-          onGuarantee={s.on_guarantee}
-          projection={{ available: false, baseYear: 0, maxYear: 0 }}
-          refresh={refresh}
-        />
-      </aside>
     </div>
 
     <p class="note" id="scenario-status"></p>
@@ -387,19 +398,8 @@ const counties = scopeCounties(bundle.districts);
     heading="What the reach view holds fixed, and one thing it deliberately does not"
   />
 
-  <div class="card" id="baseline" data-part="baseline">
-    <h2><SectionAnchor id="baseline" />What the levers move away from</h2>
-    <p class="note">
-      <strong>Current law here is <a href={routes.wikiNode("legislation", "hb-96-2025")}>Am. Sub.
-      H.B. 96 as enacted</a></strong>, which pays {
-        millions(s.realized_aid_total).replace("+", "")
-      } across {count(s.districts)} districts in FY{bundle.fiscal_year}, {
-        millions(s.guarantee_total).replace("+", "")
-      } of it guarantee money. Every trail starts at that act's own position for the district, so
-      with the controls untouched there is nothing to see moving — which is the correct answer, and
-      the shape of the state is there either way.
-    </p>
-  </div>
+  {/* What "current law" is: the same card as the other view, with this view's paragraph. */}
+  <Baseline bundle={bundle} view="reach" />
 
   <script>
     import "../../scripts/scenario-load.ts";

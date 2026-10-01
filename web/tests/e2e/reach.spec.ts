@@ -521,4 +521,58 @@ test.describe("reach", () => {
     ).toHaveCount(31);
   });
 
+  /*
+   * The levers lead on this view as on the other (#564).
+   *
+   * `/scenario` put its levers directly under the lead in #549 and this view was left as it was:
+   * the rail second in the source and placed first by CSS above 960px. So on a phone a reader
+   * scrolled past the whole plot to reach the controls that change it, and on a laptop the focus
+   * order ran through the plot's menus before the levers drawn to their left. Chosen on purpose
+   * now, and held at both widths: the rail is first in the document, so first in focus order, and
+   * first on screen — above the plot on a phone, left of it on a laptop.
+   */
+  for (const [width, axis] of [
+    [375, "y"],
+    [1280, "x"],
+  ] as const) {
+    test(`the levers come before the plot at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto("/scenario/reach");
+      await booted(page);
+      const rail = page.locator(".reach-rail");
+      const stage = page.locator(".reach-stage");
+      await expect(rail.locator('[data-part="levers"]')).toBeVisible();
+
+      const sourceFirst = await rail.evaluate(
+        (el) =>
+          !!(el.compareDocumentPosition(document.querySelector(".reach-stage")!) &
+            Node.DOCUMENT_POSITION_FOLLOWING),
+      );
+      expect(sourceFirst, "the rail precedes the stage in the document").toBe(true);
+
+      const r = (await rail.boundingBox())!;
+      const st = (await stage.boundingBox())!;
+      if (axis === "y") expect(r.y + r.height, "the rail ends above the plot").toBeLessThanOrEqual(st.y);
+      else expect(r.x + r.width, "the rail sits left of the plot").toBeLessThanOrEqual(st.x);
+    });
+  }
+});
+
+test.describe("reach, with JavaScript off", () => {
+  test.use({ javaScriptEnabled: false });
+
+  test("the levers still come first, ahead of the note that they need a script", async ({ page }) => {
+    // The same order as `/scenario` with no script: the controls render and do nothing, and the
+    // notice explaining why follows them rather than standing between the reader and them.
+    await page.setViewportSize({ width: 375, height: 800 });
+    await page.goto("/scenario/reach");
+    await expect(page.locator('.reach-rail [data-part="levers"]')).toBeVisible();
+    await expect(page.locator('[data-part="needs-script"]')).toBeVisible();
+    const order = await page.evaluate(() => {
+      const levers = document.querySelector('[data-part="levers"]')!;
+      const notice = document.querySelector('[data-part="needs-script"]')!;
+      return !!(levers.compareDocumentPosition(notice) & Node.DOCUMENT_POSITION_FOLLOWING);
+    });
+    expect(order).toBe(true);
+  });
 });

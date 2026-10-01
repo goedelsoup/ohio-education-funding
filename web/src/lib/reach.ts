@@ -1206,8 +1206,8 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
             ? " Each district is drawn from where current law puts it to where these levers do, so a trail with no vertical component is a district whose payment did not move."
             : ""
         } This is <em>which</em> districts move;
-        <a href="/scenario" data-carry-levers>how much they move</a> is on the scenario runner, at
-        the same lever positions.</p>
+        <a href="/scenario" data-carry-levers>how much they move</a> is the runner's other view,
+        at the same lever positions.</p>
       ${
         scope == null
           ? ""

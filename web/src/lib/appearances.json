@@ -14,6 +14,21 @@
           "label": "What the levers move away from"
         }
       ]
+    },
+    {
+      "route": "/scenario/reach",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/scenario/reach",
+        "title": "Change the formula — who it reaches"
+      },
+      "sections": [
+        {
+          "id": "baseline",
+          "label": "What the levers move away from"
+        }
+      ]
     }
   ],
   "draft-legislation/hb-96-136-as-passed-house": [
@@ -24,6 +39,21 @@
       "example": {
         "href": "/scenario",
         "title": "Change the formula"
+      },
+      "sections": [
+        {
+          "id": "baseline",
+          "label": "What the levers move away from"
+        }
+      ]
+    },
+    {
+      "route": "/scenario/reach",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/scenario/reach",
+        "title": "Change the formula — who it reaches"
       },
       "sections": [
         {
