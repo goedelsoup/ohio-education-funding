@@ -960,8 +960,10 @@ test("a range draws both ends of each item, not the ratio between them", () => {
   expect(svg).toContain("range-high");
   expect(svg).toContain("range-span");
   // Two shades of one hue: the ends of a range are one measure at two points, not two series.
-  expect(svg).toContain("var(--ordinal-1)");
+  expect(svg).toContain("var(--ordinal-2)");
   expect(svg).toContain("var(--ordinal-3)");
+  // Not the light step, which is under 3:1 against the card at any opacity (#615).
+  expect(svg).not.toContain("var(--ordinal-1)");
   expect(svg).not.toContain("var(--series-guarantee)");
   expect(svg.replace(/<style>[\s\S]*?<\/style>/g, "")).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(/i);
 });

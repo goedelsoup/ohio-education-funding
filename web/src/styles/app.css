@@ -1972,6 +1972,15 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 
 .chart, svg.plot { width: 100%; height: auto; display: block; }
 /*
+ * A banded scatter's dots, at their theme's alpha. Plot writes `DOT.opacity.banded` onto each
+ * circle, which is the light figure and what a chart with no stylesheet gets; this replaces it
+ * with `--banded-opacity`, which is lower in dark — see that token for why one alpha cannot hold
+ * both 3:1 bars there. Keyed on the attribute because the plain cloud (0.45) and a muted dot (0.22)
+ * share the `.scatter-dot` group and must keep theirs; `palette.spec.ts` holds the value here to
+ * `DOT.opacity.banded`.
+ */
+svg.plot .scatter-dot circle[fill-opacity="0.8"] { fill-opacity: var(--banded-opacity); }
+/*
  * The mark the keyboard cursor is on.
  *
  * `outline` rather than a `stroke`, because these marks are rects, circles and paths with strokes
@@ -1999,8 +2008,9 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
  * true and is asserted in `palette.spec.ts`. It is not reachable by the cursor:
  *
  *   - No hover target is filled with it, per the sweep above.
- *   - Where the ramp is drawn on a scatter it is composited at `fill-opacity: 0.62`, and against
- *     what is actually painted the ink clears — **5.30 light and 3.44 dark**.
+ *   - Where the ramp is drawn on a scatter it is composited at `--banded-opacity` — 0.8 light,
+ *     0.65 dark (#615) — and against what is actually painted the ink clears: **3.27 light and
+ *     3.22 dark** on the step nearest it. That ceiling is why the alpha is a token per theme.
  *   - The one place it was drawn at full opacity *underneath this ring* was `/counties`, where a
  *     `range-high` dot overhung its own hit band by the dot's radius and the ring ran through it.
  *     `rangeSpec` insets the band by `DOT_RADIUS` now, so the dot is inside the band it belongs

@@ -133,6 +133,19 @@
   --ordinal-3: #123f75;
 
   /*
+   * The alpha a banded scatter paints the ramp at, and why it is a token and not a constant.
+   *
+   * A banded dot is data, so its painted colour clears 3:1 against the card (#615) — and the
+   * keyboard ring, which is the ink, has to clear 3:1 against that same painted colour. In light the
+   * first needs 0.78 or more; in dark the second needs 0.66 or less, because the dark ramp's top
+   * step is pale and an opaque one sits close to white ink. No single alpha does both, so each
+   * theme takes its own: 0.8 here (3.13 data, 3.27 ring) and 0.65 in dark (3.04, 3.22). The SVG
+   * attribute is `DOT.opacity.banded` and the rule in `app.css` that reads this overrides it, so
+   * a chart with no stylesheet is drawn at the light figure. `palette.spec.ts` holds all four.
+   */
+  --banded-opacity: 0.8;
+
+  /*
    * There is no five-step ramp, and the absence is a result rather than an omission.
    *
    * One was contributed, measured, and removed. It scored 10.9 light / 10.7 dark against the
@@ -238,6 +251,7 @@
   --ordinal-1: #1c528f;
   --ordinal-2: #4a92ea;
   --ordinal-3: #aed3f6;
+  --banded-opacity: 0.65;
   --claim-verified: #62a8f0;
   --claim-inference: #a3a29a;
   --claim-open: #ef8352;
@@ -265,6 +279,7 @@
   --ordinal-1: #7fb0e8;
   --ordinal-2: #2a78d6;
   --ordinal-3: #123f75;
+  --banded-opacity: 0.8;
   --claim-verified: #1c6bc9;
   --claim-inference: #5c5b56;
   --claim-open: #b8490e;
@@ -291,6 +306,7 @@
   --ordinal-1: #1c528f;
   --ordinal-2: #4a92ea;
   --ordinal-3: #aed3f6;
+  --banded-opacity: 0.65;
   --claim-verified: #62a8f0;
   --claim-inference: #a3a29a;
   --claim-open: #ef8352;
@@ -335,6 +351,7 @@
   --ordinal-1: #7fb0e8;
   --ordinal-2: #2a78d6;
   --ordinal-3: #123f75;
+  --banded-opacity: 0.8;
   --claim-verified: #1c6bc9;
   --claim-inference: #5c5b56;
   --claim-open: #b8490e;
