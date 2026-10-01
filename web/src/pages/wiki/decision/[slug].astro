@@ -55,7 +55,7 @@ const total = corrected.reduce((sum, section) => sum + section.corrections, 0);
 
 <Base
   title={decision.title}
-  description={summarize(decision.summary, 180)}
+  description={summarize(decision.summary, 180, FROM_DECISION)}
   image={routes.og.wikiDecision(decision.slug)}
   imageAlt={`${decision.title} — a decision record behind the Ohio school funding corpus`}
   section="decisions"

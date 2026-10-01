@@ -12,7 +12,7 @@
 
 import type { APIRoute, GetStaticPaths } from "astro";
 
-import { type Decision, loadCorpus, type Node, type Source } from "../../../../lib/corpus.ts";
+import { type Decision, FROM_CATALOG, FROM_DECISION, loadCorpus, type Node, type Source } from "../../../../lib/corpus.ts";
 import { count } from "../../../../lib/format.ts";
 import type { Card } from "../../../../lib/og/card.ts";
 import { SITE } from "../../../../lib/og/pages.ts";
@@ -46,7 +46,7 @@ export function nodeCard(node: Node, className: string): Card {
     // The node's own lead, not a truncation of its body. `summary` is capped at 50 words and
     // carries no markdown, which is exactly what this card can render; `summarize` stays for the
     // two kinds of document that have no such field.
-    figureNote: summarize(node.summary, 190),
+    figureNote: summarize(node.summary, 190, node.className),
     meta:
       // A corpus is a graph and the edge count is the only honest measure of how much of it a node
       // is load-bearing for. Nodes with no edges exist and say so rather than showing "0 links".
@@ -61,7 +61,7 @@ export function sourceCard(source: Source): Card {
   return {
     eyebrow: `${SITE} · Wiki source`,
     headline: source.title,
-    figureNote: summarize(source.body, 190),
+    figureNote: summarize(source.body, 190, FROM_CATALOG),
     meta: `Cited by ${count(source.citedBy.length)} node${source.citedBy.length === 1 ? "" : "s"}`,
   };
 }
@@ -78,7 +78,7 @@ export function decisionCard(decision: Decision): Card {
   return {
     eyebrow: `${SITE} · Decision record`,
     headline: decision.title,
-    figureNote: summarize(decision.summary, 190),
+    figureNote: summarize(decision.summary, 190, FROM_DECISION),
     meta:
       decision.corrections > 0
         ? `${count(decision.corrections)} claim${

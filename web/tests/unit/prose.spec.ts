@@ -19,7 +19,7 @@ import { join, relative, sep } from "node:path";
 
 import { describe, expect, test } from "vitest";
 
-import { countCorrections, FROM_DECISION, loadCorpus, resolveTarget } from "../../src/lib/corpus.ts";
+import { countCorrections, FROM_CATALOG, FROM_DECISION, loadCorpus, resolveTarget } from "../../src/lib/corpus.ts";
 import { escapeHtml } from "../../src/lib/format.ts";
 import {
   badgeClaims,
@@ -287,29 +287,29 @@ test("a claim tag inside code is quoted rather than asserted", async () => {
 test("summarize keeps a link's label and drops only its target", () => {
   // `/wiki/education-agency` shipped "seeded as the contrast case against ." and "the suburban
   // counterpart to  eleven miles away across the Maumee" — the label was deleted with the target.
-  expect(summarize("the counterpart to [Toledo](toledo-city.yml) eleven miles away", 200)).toBe(
+  expect(summarize("the counterpart to [Toledo](toledo-city.yml) eleven miles away", 200, "district")).toBe(
     "the counterpart to Toledo eleven miles away",
   );
 });
 
 test("summarize strips the markup a meta description cannot show", () => {
-  expect(summarize("*DeRolph v. State* found the **system** unconstitutional. [verified]", 200)).toBe(
+  expect(summarize("*DeRolph v. State* found the **system** unconstitutional. [verified]", 200, "district")).toBe(
     "DeRolph v. State found the system unconstitutional.",
   );
-  expect(summarize("computed in `crates/bundle` from the report card", 200)).toBe(
+  expect(summarize("computed in `crates/bundle` from the report card", 200, "district")).toBe(
     "computed in crates/bundle from the report card",
   );
   // A tag whose justification is itself a link: the link is flattened to its label first, so the
   // tag is then a plain bracket pair and goes whole.
-  expect(summarize("Base cost. [verified — [the page](../../catalog/x.md)]", 200)).toBe("Base cost.");
+  expect(summarize("Base cost. [verified — [the page](../../catalog/x.md)]", 200, "district")).toBe("Base cost.");
 });
 
 test("summarize cuts on a word boundary and only claims an elision when there was one", () => {
-  expect(summarize("a short one", 200)).toBe("a short one");
-  expect(summarize("a short one", 200).endsWith("…")).toBe(false);
+  expect(summarize("a short one", 200, "district")).toBe("a short one");
+  expect(summarize("a short one", 200, "district").endsWith("…")).toBe(false);
 
   const long = "The Fair School Funding Plan sets a base cost per pupil computed from inputs.";
-  const cut = summarize(long, 40);
+  const cut = summarize(long, 40, "district");
   expect(cut.endsWith("…")).toBe(true);
   expect(long.startsWith(cut.slice(0, -1))).toBe(true);
   // The last kept token is a whole word, not a fragment of the next one.
@@ -319,7 +319,7 @@ test("summarize cuts on a word boundary and only claims an elision when there wa
 test("every corpus summary is clean markdown-free prose", () => {
   const dirty: string[] = [];
   for (const node of corpus.nodes) {
-    const summary = summarize(node.description, 200);
+    const summary = summarize(node.description, 200, node.className);
     if (/[*`]|\[(verified|inference|open|unentered)\b|\]\(|\s\s/.test(summary)) {
       dirty.push(`${node.id}: ${summary}`);
     }
@@ -765,5 +765,34 @@ describe("a citation whose label is its target's stem", () => {
     const cell = renderPropertyValue("see [`bridge-formula`](../funding-regime/bridge-formula.yml) [verified]", "parameter");
     expect(cell).toContain('see <a href="/wiki/funding-regime/bridge-formula">Bridge Formula</a>');
     expect(cell).toContain('class="claim verified"');
+  });
+
+  test("is named in a summary too, which has no link left to name it in (#606)", () => {
+    // The catalog's own idiom, from `dew-expenditure-expanded-list`: the summary read
+    // "decisions/report-card-connector" where the page reads the record's title.
+    expect(
+      summarize("See [`decisions/report-card-connector`](../decisions/report-card-connector.yml) for the host.", 200, FROM_CATALOG),
+    ).toBe("See “Report card connector” for the host.");
+    expect(summarize("from [bridge-formula](../funding-regime/bridge-formula.yml) on", 200, "parameter")).toBe(
+      "from Bridge Formula on",
+    );
+    expect(summarize("in [`lsc-hb96-analysis`](../catalog/lsc-hb96-analysis.md) [verified]", 200, FROM_DECISION)).toBe(
+      "in LSC Budget Analysis — H.B. 96 (FY2026-27)",
+    );
+    // Inside a claim tag's detail the name is made and then removed with the tag, as any label is.
+    expect(summarize("Base cost. [verified — [`bridge-formula`](../funding-regime/bridge-formula.yml)]", 200, "parameter")).toBe(
+      "Base cost.",
+    );
+  });
+
+  test("keeps a label the author chose in a summary, as written", () => {
+    for (const [markdown, kept] of [
+      ["under [`hb-70`](../intervention/academic-distress-commission.yml)", "under hb-70"],
+      ["read [`bridge-formula.yml`](../funding-regime/bridge-formula.yml)", "read bridge-formula.yml"],
+      ["the [Bridge](../funding-regime/bridge-formula.yml) years", "the Bridge years"],
+      ["in [`crates/project`](https://github.com/x/crates/project)", "in crates/project"],
+    ] as const) {
+      expect(summarize(markdown, 200, "formula-component")).toBe(kept);
+    }
   });
 });
