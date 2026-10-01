@@ -747,11 +747,17 @@ function axisFoot(options: {
    * sits in; it passes 10.
    */
   fontSize?: number;
+  /**
+   * Above the frame rather than under it: the scale repeated at the top of a chart too tall to
+   * read against a foot alone (#611). Drawn without `says`, which the foot already carries, and
+   * classed `axis-head` so the two can be told apart.
+   */
+  top?: boolean;
 } & ({ low: string; high: string } | { scale: FootScale })): {
   marks: Plot.Markish[];
   extraBottom: number;
 } {
-  const { width, marginLeft, marginRight, dy, says, fontSize = 11 } = options;
+  const { width, marginLeft, marginRight, dy, says, fontSize = 11, top = false } = options;
   const frame = width - marginLeft - marginRight;
   /*
    * The drop to a second line, and why it is not the type size.
@@ -775,8 +781,12 @@ function axisFoot(options: {
     textAnchor: "start" | "middle" | "end",
   ) =>
     Plot.text([value], {
-      ...("x" in position ? { x: () => position.x, frameAnchor: "bottom" as const } : position),
-      dy: y,
+      ...("x" in position
+        ? { x: () => position.x, frameAnchor: top ? ("top" as const) : ("bottom" as const) }
+        : top
+          ? { frameAnchor: position.frameAnchor.replace("bottom", "top") as "top-left" | "top" | "top-right" }
+          : position),
+      dy: top ? -y : y,
       text: () => label,
       // A bottom anchor stacks a wrapped string upward from its last line, which is what the
       // dropped line's `dy` is measured to. Spaced at `line` so each one keeps its clear space.
@@ -784,7 +794,7 @@ function axisFoot(options: {
       ...(textAnchor === "middle" ? {} : { textAnchor }),
       fill: INK.muted,
       fontSize,
-      className: "axis-foot",
+      className: top ? "axis-head" : "axis-foot",
     });
 
   /** The labels, and the spans of the frame they occupy, measured from its left edge. */
@@ -873,6 +883,50 @@ function axisFoot(options: {
 }
 
 /**
+ * The dash each of a spread's rules is drawn in, and the legend swatch that names it (#611).
+ *
+ * Every rule was dashed `4 3`, so the TTAG spread's two — "the floor equals the formula" and "the
+ * formula pays what the FY2020 regime did" — had one key swatch between them and a reader could not
+ * tell which line was which. Distinct by dash rather than by hue: a rule is arithmetic, and the
+ * hues are the classes. The swatch half is `.sw[data-series="rule-dotted"]` in `app.css`.
+ */
+const RULE_DASHES = [
+  { dash: "4 3", swatch: "rule" },
+  { dash: "1.5 3", swatch: "rule-dotted" },
+] as const;
+
+/** The dash of a spread's `at`th rule. Throws past the last, which wants a third pattern. */
+function ruleDash(at: number): string {
+  const entry = RULE_DASHES[at];
+  if (!entry) throw new Error(`rule ${at + 1} has no dash of its own; add one to RULE_DASHES`);
+  return entry.dash;
+}
+
+/** The legend swatch of a spread's `at`th rule, drawn in the dash {@link ruleDash} gives it. */
+export function ruleSwatch(at: number): string {
+  ruleDash(at);
+  return RULE_DASHES[at]!.swatch;
+}
+
+/** The height past which a chart states its scale at the top as well as the foot (#611). */
+const TALL = 400;
+
+/**
+ * The scale again, above a chart too tall to be read against its foot alone.
+ *
+ * `/counties` draws 84 rows in 1470px, so a reader at the top of it was a screen and a half from
+ * the only numbers that said what a position meant. Above {@link TALL} the scale is repeated over
+ * the frame — the labels the foot keeps, without the axis name, which the foot says.
+ */
+function tallHead(
+  body: number,
+  options: { width: number; marginLeft: number; marginRight: number; scale: FootScale },
+): { marks: Plot.Markish[]; marginTop: number } {
+  if (body <= TALL) return { marks: [], marginTop: 0 };
+  return { marks: axisFoot({ ...options, dy: 12, says: "", top: true }).marks, marginTop: 22 };
+}
+
+/**
  * A horizontal bar chart: magnitude compared across a handful of named categories.
  *
  * Horizontal because the categories are text and vertical bars would need rotated labels, which
@@ -893,7 +947,19 @@ function axisFoot(options: {
  */
 export function barSpec(
   bars: Bar[],
-  options: { width: number; max?: number; min?: number; labelChars?: number },
+  options: {
+    width: number;
+    max?: number;
+    min?: number;
+    labelChars?: number;
+    /**
+     * The scale, for a chart whose bars carry no direct label (#611). Without one the bars have
+     * a length and no value: a corpus column drew seven panels of five bars and not one number,
+     * so the only way to learn what a bar was worth was to hover every one of them. Drawn only
+     * where no bar is labelled, because a labelled bar already says its value at its end.
+     */
+    scale?: { format: (v: number) => string; says: string };
+  },
 ): Spec {
   const { width } = options;
   const max = options.max ?? Math.max(...bars.map((b) => Math.abs(b.value)), 1);
@@ -975,18 +1041,32 @@ export function barSpec(
   const marked = bars.filter((b) => b.current);
   const plain = bars.filter((b) => !b.current);
 
+  const marginRight = gutter(width, longest > 0 ? 16 + longest * 7.2 : 20);
+  const foot =
+    options.scale && labelled.length === 0
+      ? axisFoot({
+          width,
+          marginLeft: nameGutter,
+          marginRight,
+          dy: 16,
+          says: options.scale.says,
+          scale: { domain: [floor, max], format: options.scale.format },
+        })
+      : null;
+  const marginBottom = foot ? 22 + foot.extraBottom : 0;
+
   return {
     options: {
       width,
-      height: bars.length * rowHeight,
+      height: bars.length * rowHeight + marginBottom,
       // Bounded below so short-label charts keep their existing proportions, and above so a very
       // long name costs the bars width rather than running off the plot.
       marginLeft: nameGutter,
       // Room at the right for the longest direct label actually present. Without it the largest
       // bar's value runs off the viewBox and is clipped — and it is the one most worth reading.
-      marginRight: gutter(width, longest > 0 ? 16 + longest * 7.2 : 20),
+      marginRight,
       marginTop: 0,
-      marginBottom: 0,
+      marginBottom,
       x: { axis: null, domain: [floor, max] },
       y: { axis: null, domain: bars.map((b) => b.label), padding: 0.47 },
       marks: [
@@ -1067,6 +1147,7 @@ export function barSpec(
               }),
             ]
           : []),
+        ...(foot ? foot.marks : []),
       ],
     },
     hovers: {
@@ -1474,13 +1555,13 @@ export function scatterSpec(
         // under the cloud, because they are what it is read against. Dashed, which is the one
         // thing separating them from those two — a definition is not a measurement, and a spread
         // may carry several where a cloud carries one fitted line.
-        ...(options.rules ?? []).map((rule) =>
+        ...(options.rules ?? []).map((rule, at) =>
           Plot.line([rule.from, rule.to], {
             x: "x",
             y: "y",
             stroke: INK.rule,
             strokeWidth: 1.5,
-            strokeDasharray: "4 3",
+            strokeDasharray: ruleDash(at),
             // A function, not the string: Plot reads a string `ariaLabel` as a field name, finds
             // nothing on either end point, and drops the whole segment as undefined. The line
             // then renders as an empty `<g>` — a boundary that is silently not there, which is
@@ -2147,8 +2228,14 @@ export function rangeSpec(
     scale: { domain: rangeDomain(min, max, axis.log), log: axis.log, format: axis.format },
   });
 
-  const marginTop = 0;
   const marginBottom = 22 + foot.extraBottom;
+  const head = tallHead(marginBottom + rows.length * rowHeight, {
+    width,
+    marginLeft,
+    marginRight: 16,
+    scale: { domain: rangeDomain(min, max, axis.log), log: axis.log, format: axis.format },
+  });
+  const marginTop = head.marginTop;
   /*
    * The rows' band plus the margins, not the rows' band with the margins taken out of it.
    *
@@ -2235,6 +2322,7 @@ export function rangeSpec(
           }),
         ),
         ...foot.marks,
+        ...head.marks,
         /*
          * One band per row, above everything: the hit target is the row, not the 3px dot at
          * either end of it.
@@ -2375,14 +2463,26 @@ export function rankSpec(
     },
   });
 
+  const head = tallHead(22 + foot.extraBottom + rows.length * rowHeight, {
+    width,
+    marginLeft,
+    marginRight,
+    scale: {
+      domain: [floor, max],
+      log: true,
+      format: axis.format,
+      ...(smallest > 0 ? {} : { floor: `under ${axis.format(Math.min(...positive))}` }),
+    },
+  });
+
   return {
     options: {
       width,
       // `rangeSpec`'s height, for the defect recorded there: the foot is added to the rows.
-      height: 22 + foot.extraBottom + rows.length * rowHeight,
+      height: head.marginTop + 22 + foot.extraBottom + rows.length * rowHeight,
       marginLeft,
       marginRight,
-      marginTop: 0,
+      marginTop: head.marginTop,
       marginBottom: 22 + foot.extraBottom,
       x: { axis: null, type: "log", domain: [floor, max] },
       y: { axis: null, domain: rows.map((r) => r.label), padding: 0.2 },
@@ -2456,6 +2556,7 @@ export function rankSpec(
             ]
           : []),
         ...foot.marks,
+        ...head.marks,
         // The hit target is the row rather than the dot, and overhangs the ends by the dot's
         // radius — `rangeSpec`'s insets, for the defect recorded there.
         Plot.rect(rows, {

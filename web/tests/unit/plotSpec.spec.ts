@@ -37,6 +37,7 @@ import {
   planeSpec,
   rangeSpec,
   rankSpec,
+  ruleSwatch,
   scatterSpec,
   seriesSpec,
   type Box,
@@ -1073,4 +1074,52 @@ test("a panel is never drawn at the width of a whole chart", () => {
     /renderToString/,
   );
   expect(renderPanelToString(() => series(panelWidth(2)), "presentational", panelWidth(2))).toContain("<svg");
+});
+
+test("a range chart too tall to read against its foot states its scale at the top as well", () => {
+  /*
+   * #611: `/counties` draws 84 rows in 1470px and said what a position meant only at the bottom,
+   * a screen and a half from the first row. Above the threshold the scale is repeated over the
+   * frame; a short chart keeps the foot alone.
+   */
+  const rows = (n: number): Range[] =>
+    Array.from({ length: n }, (_, i) => ({ label: `County ${i}`, low: 1000 + i * 50, high: 4000 + i * 90, hover: "" }));
+  const axis = { label: "aid per pupil", format: compactMoney };
+  const ends = (svg: string, cls: string) =>
+    [...parseHTML(`<div>${svg}</div>`).document.querySelectorAll(`g.${cls} text`)].filter((t) =>
+      /\$/.test(t.textContent ?? ""),
+    ).length;
+
+  const tall = renderToString(() => rangeSpec(rows(84), axis, W), "presentational");
+  expect(ends(tall, "axis-foot")).toBeGreaterThanOrEqual(2 * DRAWINGS);
+  expect(ends(tall, "axis-head")).toBeGreaterThanOrEqual(2 * DRAWINGS);
+  expect(rangeSpec(rows(84), axis, W)!.options.marginTop).toBeGreaterThan(0);
+
+  const short = renderToString(() => rangeSpec(rows(6), axis, W), "presentational");
+  expect(ends(short, "axis-foot")).toBeGreaterThanOrEqual(2 * DRAWINGS);
+  expect(ends(short, "axis-head")).toBe(0);
+});
+
+test("a spread's rules are told apart by dash, as their legend swatches are", () => {
+  /*
+   * #611: the TTAG spread draws "the floor equals the formula" and "the formula pays what the FY2020
+   * regime did", and both were dashed `4 3` with one grey key swatch between them. Within one
+   * figure every rule now has its own (stroke, dash) and its own swatch.
+   */
+  const points: ScatterPoint[] = Array.from({ length: 20 }, (_, i) => ({ x: i, y: i % 7, hover: "" }));
+  const rules = [
+    { label: "y = -x", from: { x: 0, y: 0 }, to: { x: 19, y: -19 } },
+    { label: "y = 0", from: { x: 0, y: 0 }, to: { x: 19, y: 0 } },
+  ];
+  const svg = renderToString(() => scatterSpec(points, AXES, [], { ...W, rules }), "presentational");
+  const drawn = [...parseHTML(`<div>${svg}</div>`).document.querySelectorAll("g.scatter-rule")]
+    .slice(0, rules.length)
+    .map((g) => {
+      const path = g.querySelector("path");
+      return `${g.getAttribute("stroke") ?? path?.getAttribute("stroke")} ${g.getAttribute("stroke-dasharray") ?? path?.getAttribute("stroke-dasharray")}`;
+    });
+  expect(drawn).toHaveLength(2);
+  expect(new Set(drawn).size).toBe(2);
+  expect(new Set(rules.map((_, at) => ruleSwatch(at))).size).toBe(2);
+  expect(() => ruleSwatch(rules.length)).toThrow(/no dash of its own/);
 });

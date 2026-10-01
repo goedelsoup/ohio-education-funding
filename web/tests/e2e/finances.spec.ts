@@ -54,6 +54,25 @@ test.describe("spending by function", () => {
     await expect(card).toContainText("unweighted ADM");
   });
 
+  test("spending by function is drawn largest first", async ({ page }) => {
+    // #611: in the department's line order the bars stepped down and back up, which reads as a
+    // sort that failed.
+    await page.goto(`/district/043802/finances`);
+    const svg = page.locator('[data-chart="functions"] svg.plot:visible');
+    // `> *` because a rounded bar is a path rather than a rect.
+    const bars = svg.locator("g.bar-fill > *");
+    await expect(bars.first()).toBeAttached();
+    const widths = await bars.evaluateAll((marks) =>
+      marks.map((m) => {
+        const box = (m as SVGGraphicsElement).getBBox();
+        return { y: box.y, w: box.width };
+      }),
+    );
+    expect(widths.length).toBeGreaterThan(2);
+    const ordered = widths.sort((a, b) => a.y - b.y).map((r) => r.w);
+    expect(ordered).toEqual([...ordered].sort((a, b) => b - a));
+  });
+
   test("a district with no report-card row says so rather than showing zero", async ({ page }) => {
     // Two of the 609 have no spending row. Rendering them as $0 across every function would be a
     // finding about their spending rather than about the file.
@@ -178,4 +197,27 @@ test.describe("against america", () => {
       "not in the national comparison",
     );
   });
+
+  for (const route of ["/district/043802", "/district/043802/finances"]) {
+    test(`a chart on ${route} names the unit its labels are written in`, async ({ page }) => {
+      /*
+       * #611: the base-cost chart said "dollars, $353,814,437 in total" over bars labelled in
+       * percent, and the categoricals chart said "in dollars" over the same. A chart whose labels
+       * are percentages says what they are a share of.
+       */
+      await page.goto(route);
+      const charts = page.locator(".chartwrap svg.plot:visible");
+      await expect(charts.locator("g.bar-value text").first()).toBeAttached();
+      let shares = 0;
+      for (const svg of await charts.all()) {
+        const values = await svg.locator("g.bar-value text").allTextContents();
+        if (!values.some((v) => v.includes("%"))) continue;
+        shares++;
+        const label = (await svg.getAttribute("aria-label")) ?? "";
+        expect(label, `labelled in percent: ${values.join(" ")}`).toMatch(/\bshare\b/);
+        expect(label).not.toMatch(/\bin dollars\b|, dollars,/);
+      }
+      expect(shares).toBeGreaterThan(0);
+    });
+  }
 });

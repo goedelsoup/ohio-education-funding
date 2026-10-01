@@ -169,7 +169,7 @@ describe("figures in prose", () => {
  */
 describe("chart text", () => {
   /** The classes whose text is a number the chart states. */
-  const NUMERIC = /^(?:axis-foot|bar-value|series-end)$/;
+  const NUMERIC = /^(?:axis-foot|axis-head|bar-value|series-end)$/;
   const texts: { page: string; cls: string; text: string }[] = [];
   /** Each drawing carrying a "0%" direct label, for the width check below. */
   const zeroes: { page: string; svg: string }[] = [];
@@ -240,4 +240,64 @@ describe("chart text", () => {
     expect(svg, "a drawing with a <1% label").toBeDefined();
     expect(zeroOnWidth(svg!.replace(">&lt;1%</text>", ">0%</text>")).length).toBeGreaterThan(0);
   });
+
+  /** Whether a drawing states a number in one of the {@link NUMERIC} classes. */
+  const statesANumber = (svg: string): boolean =>
+    [...svg.matchAll(/<g\b[^>]*\bclass="([^"]+)"[^>]*>([\s\S]*?)<\/g>/g)].some(
+      (group) =>
+        NUMERIC.test(group[1]!.split(/\s+/)[0]!) &&
+        [...group[2]!.matchAll(/<text\b[^>]*>([\s\S]*?)<\/text>/g)].some((t) => /\d/.test(t[1]!)),
+    );
+
+  /** Every drawing in the build, with the page it is on. */
+  const drawings = pages().flatMap((file) =>
+    (readFileSync(file, "utf8").match(/<svg\b[^>]*class="plot"[^>]*>[\s\S]*?<\/svg>/g) ?? []).map((svg) => ({
+      page: file.slice(DIST.length + 1),
+      svg,
+    })),
+  );
+
+  test("every chart states at least one number", () => {
+    /*
+     * #611: the corpus bar charts drew a length on every bar and no number anywhere — not a value,
+     * not a scale — so the TTAG node's seven panels could be compared with each other and read as
+     * nothing. A category name or a year is not the number; the classes above are.
+     */
+    expect(drawings.length).toBeGreaterThan(1000);
+    const mute = drawings.filter((d) => !statesANumber(d.svg));
+    expect(
+      mute.slice(0, 10).map((d) => `${d.page}: ${/aria-label="([^"]*)"/.exec(d.svg)?.[1] ?? "?"}`),
+      "give the chart a direct label or an axis foot",
+    ).toEqual([]);
+  });
+
+  test("the mute-chart guard fires on a corpus bar panel drawn without its scale", () => {
+    const panel = drawings.find((d) => d.page.startsWith("wiki/") && d.svg.includes('class="bar-fill"') && !d.svg.includes('class="bar-value"'));
+    expect(panel, "a corpus bar panel read against its foot").toBeDefined();
+    expect(statesANumber(panel!.svg)).toBe(true);
+    expect(statesANumber(panel!.svg.replace(/class="axis-foot"/g, 'class="unread"'))).toBe(false);
+  });
+});
+
+/*
+ * A legend whose keys are not each their own picture (#611). The TTAG spread drew two rules in one
+ * dash and named them with two copies of one swatch, so the key told a reader there were two lines
+ * and not which was which.
+ */
+test("no legend repeats a swatch", () => {
+  const repeated: string[] = [];
+  let legends = 0;
+  for (const file of pages()) {
+    const page = readFileSync(file, "utf8");
+    for (const legend of page.match(/<div class="legend"[^>]*>[\s\S]*?<\/div>/g) ?? []) {
+      const swatches = [...legend.matchAll(/<i class="sw"[^>]*data-series="([^"]+)"/g)].map((m) => m[1]!);
+      if (swatches.length === 0) continue;
+      legends++;
+      if (new Set(swatches).size !== swatches.length) {
+        repeated.push(`${file.slice(DIST.length + 1)}: ${swatches.join(", ")}`);
+      }
+    }
+  }
+  expect(legends).toBeGreaterThan(10);
+  expect(repeated.slice(0, 10)).toEqual([]);
 });

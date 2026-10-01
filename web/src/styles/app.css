@@ -1336,6 +1336,14 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
   border-top: 1.5px dashed var(--accent-rule);
   vertical-align: middle;
 }
+/* A spread's second rule, dotted where the first is dashed, as `ruleDash` draws it (#611). */
+.sw[data-series="rule-dotted"] {
+  background: repeating-linear-gradient(90deg, var(--accent-rule) 0 1.5px, transparent 1.5px 4.5px);
+  width: 16px;
+  height: 1.5px;
+  border-radius: 0;
+  vertical-align: middle;
+}
 
 /* The ordinal ramp, for a chart grouping districts into ordered bands. Its legend is not
    optional: the lightest step light and the darkest step dark sit near 2.2:1 against their
@@ -2860,6 +2868,9 @@ tr.series-break > td {
   .sw[data-series="band"] { border-style: solid; }
   .sw[data-series="dash"] { background: none; border: 0; border-top: 2px dashed currentColor; }
   .sw[data-series="solid"] { background: none; border: 0; border-top: 2px solid currentColor; }
+  /* A spread's two rules, told apart by dash on paper as on screen (#611). */
+  .sw[data-series="rule"] { border: 0; border-top: 1.5px dashed currentColor; }
+  .sw[data-series="rule-dotted"] { background: none; border: 0; border-top: 1.5px dotted currentColor; }
 
   /*
    * The regime spans on `/legislation`. Colour encodes nothing here — the note above says so — so

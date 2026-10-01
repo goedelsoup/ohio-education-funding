@@ -722,6 +722,31 @@ export function barsOf(series: ManifestSeries): Bar[] {
   }));
 }
 
+/**
+ * The scale a series' bars are read against, for `barSpec`'s axis foot (#611).
+ *
+ * {@link barsOf} draws no direct labels, so without this a column's bars carried a length and no
+ * value at all. Signed where any row is negative, as the rows' own hovers are, and named by its
+ * unit between the ends because a ratio's ends carry no unit mark of their own.
+ */
+export function barScale(series: ManifestSeries): { format: (v: number) => string; says: string } {
+  const signed = series.rows.some((row) => row.value < 0);
+  return {
+    format: (v: number) => (signed ? formatTickRow(series.unit, v) : formatTick(series.unit, v)),
+    says: UNIT_WORD[series.unit],
+  };
+}
+
+/** What a unit is called under an axis. */
+const UNIT_WORD: Record<Unit, string> = {
+  count: "count",
+  dollars: "dollars",
+  share: "share",
+  pupils: "pupils",
+  positions: "FTE positions",
+  ratio: "ratio",
+};
+
 /** One small multiple of a grouped series: the run's name, and its rows as bars. */
 export interface SeriesMultiple {
   label: string;
