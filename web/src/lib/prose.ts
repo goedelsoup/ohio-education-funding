@@ -69,8 +69,9 @@ import rehypeSanitize from "rehype-sanitize";
 import { renderMath } from "./math.ts";
 import { anchor } from "./section.ts";
 
-import { resolveTarget } from "./corpus.ts";
+import { loadCorpus, resolveTarget } from "./corpus.ts";
 import { escapeHtml } from "./format.ts";
+import * as routes from "./routes.ts";
 
 /**
  * The three epistemic marks a claim can carry, and the fourth that is not one.
@@ -393,6 +394,85 @@ function anchorHeadings(html: string): string {
   );
 }
 
+/** A page a citation can name: how it reads in a sentence, and the stems an author cites it by. */
+interface Citable {
+  /** The link, named in the convention for its kind. */
+  link: string;
+  /** `bridge-formula` and `parameter/bridge-formula`; a label that is neither is the author's own. */
+  stems: readonly string[];
+}
+
+let citable: Map<string, Citable> | null = null;
+
+/**
+ * Every node, catalog entry and decision record, by the `href` {@link resolveTarget} gives it.
+ *
+ * Each kind's name is set the way that kind of thing is named mid-sentence. A node's `label:` is a
+ * proper name in title case — "the Bridge Formula reaches back" — and stands as it is. A catalog
+ * entry is a published work, so its heading is a `<cite>`. A decision record's title is a sentence
+ * in sentence case, "Every property says whether it is required", and is quoted, which is what
+ * keeps it from reading as the start of a new sentence when it lands after "The rule is".
+ */
+function citables(): Map<string, Citable> {
+  if (citable) return citable;
+  const { nodes, sources, decisions } = loadCorpus();
+  citable = new Map();
+  for (const node of nodes) {
+    const href = routes.wikiNode(node.className, node.name);
+    citable.set(href, {
+      link: `<a href="${href}">${escapeHtml(node.label)}</a>`,
+      stems: [node.name, node.id],
+    });
+  }
+  for (const source of sources) {
+    const href = routes.wikiSource(source.slug);
+    citable.set(href, {
+      link: `<a href="${href}"><cite>${escapeHtml(source.title)}</cite></a>`,
+      stems: [source.slug, `catalog/${source.slug}`],
+    });
+  }
+  for (const decision of decisions) {
+    // The quotes sit outside the link, as punctuation does.
+    const href = routes.wikiDecision(decision.slug);
+    citable.set(href, {
+      link: `“<a href="${href}">${escapeHtml(decision.title)}</a>”`,
+      stems: [decision.slug, `decisions/${decision.slug}`],
+    });
+  }
+  return citable;
+}
+
+/**
+ * Name the pages the corpus cites by file stem (#591).
+ *
+ * The corpus's citation idiom is ``[`bridge-formula`](../funding-regime/bridge-formula.yml)``: a
+ * link whose whole text is the target's stem in a code span. In an editor that is the file being
+ * pointed at; on a page it is a monospace slug in the middle of a sentence, and there were 211 of
+ * them across 108 Library pages, and 60 more written without the backticks. A plain label is a
+ * stem only when it is hyphenated or carries its directory: ``[equity](../doctrine/equity.yml)``
+ * is a word in a sentence, and naming it "Equity" would capitalise one mid-sentence for nothing. The source stays as it is — claim-tag details, figure bindings
+ * and the citation census in `links.spec.ts` all read it — and the page shows the target's name.
+ *
+ * Only a label that is exactly the target's own stem, bare or with its directory, is replaced.
+ * Anything else is the author choosing what to print: ``[`[K]`](fsfp-formula-transition-supplement.yml)``
+ * cites a line by its letter and ``[`hb-70`](…academic-distress-commission.yml)`` cites the act
+ * that created an intervention, and both keep their code span. That is also the opt-out for a
+ * sentence that is about a file name — write the label as `bridge-formula.yml` and it stays.
+ *
+ * The regular expression matches the anchor the markdown processor and
+ * {@link renderPropertyValue} both write, in the one form they write it, and the `href` is
+ * already resolved: this never reads an authored target.
+ */
+export function nameCitations(html: string): string {
+  return html.replace(
+    /<a href="(\/wiki\/[^"]+)">(?:<code>([^<]+)<\/code>|([a-z0-9]+(?:[-/][a-z0-9]+)+))<\/a>/g,
+    (whole, href: string, code: string | undefined, plain: string | undefined) => {
+      const target = citables().get(href);
+      return target?.stems.includes(code ?? plain!) ? target.link : whole;
+    },
+  );
+}
+
 /**
  * Render a corpus markdown string to HTML.
  *
@@ -414,7 +494,7 @@ export async function renderProse(
     rehypePlugins: [rehypeSanitize],
   });
   const { code } = await processor.render(rewriteLinks(markdown, fromClass));
-  return renderMathFences(anchorHeadings(badgeClaims(code)), where ?? fromClass);
+  return renderMathFences(anchorHeadings(nameCitations(badgeClaims(code))), where ?? fromClass);
 }
 
 /**
@@ -636,7 +716,7 @@ export function renderListProperty(value: string, fromClass: string): string {
  */
 export function renderPropertyValue(value: string, fromClass: string): string {
   const inline = (text: string): string =>
-    badgeClaims(
+    nameCitations(badgeClaims(
       escapeHtml(text)
         // Inline links, which several properties carry. The label may not contain a bracket: a
         // property that writes `[verified — [the department's page](…)]` nests one link inside one
@@ -669,7 +749,7 @@ export function renderPropertyValue(value: string, fromClass: string): string {
          */
         .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
         .replace(/(?<![*\w])\*(?!\s)([^*]+?)(?<!\s)\*(?![*\w])/g, "<em>$1</em>"),
-    );
+    ));
 
   const chunks = value
     .split(/\n\s*\n/)
