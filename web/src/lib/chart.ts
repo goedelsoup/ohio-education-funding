@@ -411,6 +411,7 @@ export function attachValues(root: HTMLElement, tip: HTMLElement, said: HTMLElem
   const hide = () => {
     tip.hidden = true;
     shown = null;
+    point(null);
   };
 
   /** Show the value at a mark's own position, for the two ways in that have no cursor position. */
@@ -453,10 +454,60 @@ export function attachValues(root: HTMLElement, tip: HTMLElement, said: HTMLElem
     said.textContent = "";
   };
 
+  /**
+   * The mark a pointer or a tap is on: the same pair the keyboard lights, without the ring (#614).
+   *
+   * Hovering a scatter used to raise a tip and change nothing on the chart, so a reader could not
+   * see which of 606 dots it was about. The ring stays the keyboard's, because a mouse reader has
+   * a pointer already standing on the mark and a ring around it would be a second cursor.
+   */
+  let pointed: Element | null = null;
+
+  /**
+   * The mark a point is nearest, of the ones whose reach it is in.
+   *
+   * A hover target reaches 12px past its edge (see the stroke rule in `app.css`), which is more
+   * than the gap between two range rows or two series columns, so a point can be in several. The
+   * browser would answer with the last one drawn, which is the row *below* the one a reader is
+   * pointing just under. Nearest is by distance to the mark's own box, which is zero inside it,
+   * then by distance to its centre, which settles two overlapping scatter dots.
+   */
+  const nearest = (hit: Element, x: number, y: number): Element => {
+    const layer = hit.parentElement;
+    let best = hit;
+    let score = [Infinity, Infinity];
+    for (const mark of document.elementsFromPoint(x, y)) {
+      if (mark.parentElement !== layer || !mark.hasAttribute("data-hover")) continue;
+      const box = mark.getBoundingClientRect();
+      const dx = Math.max(box.left - x, 0, x - box.right);
+      const dy = Math.max(box.top - y, 0, y - box.bottom);
+      const mine = [
+        Math.hypot(dx, dy),
+        Math.hypot(x - (box.left + box.right) / 2, y - (box.top + box.bottom) / 2),
+      ];
+      if (mine[0]! < score[0]! || (mine[0] === score[0] && mine[1]! < score[1]!)) {
+        best = mark;
+        score = mine;
+      }
+    }
+    return best;
+  };
+  const point = (mark: Element | null) => {
+    if (mark === pointed) return;
+    if (pointed) {
+      pointed.classList.remove("hover");
+      for (const twin of paired(pointed)) twin.classList.remove("hover-mark");
+    }
+    pointed = mark;
+    if (!mark) return;
+    mark.classList.add("hover");
+    for (const twin of paired(mark)) twin.classList.add("hover-mark");
+  };
+
   root.addEventListener("mousemove", (event) => {
     const under = event.target as Element | null;
-    const target = under?.closest("[data-hover]");
-    if (!target) {
+    const hit = under?.closest("[data-hover]");
+    if (!hit) {
       // The gap between two bars is still the chart. Hiding there blinked the tip off and on
       // seven times down a five-bar chart (#613), so the last reading stays where it was until
       // the pointer leaves the chart it belongs to.
@@ -466,8 +517,10 @@ export function attachValues(root: HTMLElement, tip: HTMLElement, said: HTMLElem
     }
     // A reader who has picked up the mouse has left the cursor behind, and two highlighted marks
     // would be two answers to "which one am I on".
+    const target = nearest(hit, event.clientX, event.clientY);
     if (at && at !== target) drop();
     show(target, event.clientX, event.clientY);
+    point(target);
   });
 
   root.addEventListener("mouseleave", hide);
@@ -496,12 +549,15 @@ export function attachValues(root: HTMLElement, tip: HTMLElement, said: HTMLElem
    * the page instead of firing a tooltip at the reader.
    */
   root.addEventListener("click", (event) => {
-    const target = (event.target as Element | null)?.closest?.("[data-hover]");
-    if (!target) {
+    const hit = (event.target as Element | null)?.closest?.("[data-hover]");
+    if (!hit) {
       if (at == null) hide();
       return;
     }
+    const target = nearest(hit, event.clientX, event.clientY);
+    if (at && at !== target) drop();
     showAtMark(target);
+    point(target);
   });
 
   root.addEventListener("keydown", (event) => {
@@ -541,6 +597,8 @@ export function attachValues(root: HTMLElement, tip: HTMLElement, said: HTMLElem
     }
     // Only once a key is one this handles: arrows still scroll a chart nobody is reading.
     event.preventDefault();
+    // And the other way: a reader who has taken up the keys has left the pointer's mark behind.
+    point(null);
     if (at) cursor(at, false);
     at = marks[next] ?? null;
     if (!at) return;
