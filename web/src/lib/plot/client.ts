@@ -37,9 +37,9 @@ function drawn(build: Drawing, naming: Naming, width: number): string {
 }
 
 /**
- * Render a chart to a pair of SVGs, so the callers shared with the build path match.
+ * Render a chart at every one of `WIDTHS`, so the callers shared with the build path match.
  *
- * Both widths are drawn here too, rather than measuring the container and drawing the one that
+ * All three widths are drawn here too, rather than measuring the container and drawing the one that
  * fits. These charts are replaced on every slider tick, so a width read at render time would be
  * the width at that tick — and a reader who then rotates the phone, or drags a desktop window
  * narrow, would keep the layout chosen for the width they no longer have until they moved a lever

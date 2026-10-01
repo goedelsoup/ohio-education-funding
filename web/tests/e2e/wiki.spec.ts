@@ -42,7 +42,7 @@ test.describe("panels laid out against each other", () => {
       [...document.querySelectorAll(".panels")].map((set) => ({
         key: set.closest("[data-series]")?.getAttribute("data-series") ?? "unnamed",
         panels: [...set.querySelectorAll("svg.plot")]
-          // One of the two drawings is `display: none` at any width — see `renderToString`.
+          // All but one of a chart's drawings are `display: none` at any width — see `renderToString`.
           .filter((svg) => svg.getClientRects().length > 0)
           .map((svg) => ({
             width: Math.round(svg.getBoundingClientRect().width),

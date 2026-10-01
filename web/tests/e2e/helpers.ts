@@ -17,7 +17,7 @@
  * # Why chart selectors say `svg.plot:visible`
  *
  * Every chart is in the document twice — one drawing per width, of which the stylesheet shows one.
- * See `WIDTHS` in `src/lib/plot/spec.ts` for why. So `[data-chart="fan"] svg` matches two elements
+ * See `WIDTHS` in `src/lib/plot/spec.ts` for why. So `[data-chart="fan"] svg` matches three elements
  * and every assertion written against it is a strict-mode violation rather than a failure that
  * says anything.
  *

@@ -66,10 +66,10 @@ function drawn(build: Drawing, naming: Naming, width: number): string {
  *
  * For a **panel of a small multiple**, which is the one drawing on this site whose width is not
  * the page's. Two panels share the wide frame and stack on a phone, so a panel is about 300px in
- * both layouts — near enough `WIDTHS.narrow` that the second drawing {@link renderToString}
- * makes would be a copy shown to nobody. That is worth saying out loud because the cloud these
+ * every layout — near enough `WIDTHS.narrow` that the other drawings {@link renderToString}
+ * makes would be copies shown to nobody. That is worth saying out loud because the cloud these
  * draw is 609 dots and 609 hit targets: the pair mechanism exists to stop a chart being scaled to
- * illegibility, not to be applied where one layout already serves both.
+ * illegibility, not to be applied where one layout already serves them all.
  *
  * The SVG is `width: 100%` over a `viewBox`, so a panel drawn at 312 fits a 293px phone column by
  * shrinking, exactly as every other chart here does.
@@ -94,7 +94,7 @@ export function renderPanelToString(build: Drawing, naming: Naming, width: numbe
   return svg ? `<div class="chart-pair"><div class="chart-at" data-at="panel">${svg}</div></div>` : "";
 }
 
-/** A chart at both widths, for putting straight into a document. See {@link pair}. */
+/** A chart at every one of `WIDTHS`, for putting straight into a document. See {@link pair}. */
 export function renderToString(build: Drawing, naming: Naming): string {
   return pair((width) => drawn(build, naming, width));
 }

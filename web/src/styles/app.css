@@ -1862,31 +1862,34 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
  */
 
 /*
- * Which of a chart's two layouts the reader gets.
+ * Which of a chart's three layouts the reader gets.
  *
- * `renderToString` emits both — see `src/lib/plot/ssr.ts` for why a chart is drawn twice rather
- * than scaled — and this picks. A **container** query rather than a media query, because the
- * question is how much room this chart has and not how wide the window is: the same card sits in
- * a 900px column on a district page and an 1180px one on `/districts`, and a chart inside a
- * `.strip-row` has less than either.
+ * `renderToString` emits all three — see `WIDTHS` in `src/lib/plot/spec.ts` for why a chart is
+ * drawn more than once rather than scaled — and this picks. A **container** query rather than a
+ * media query, because the question is how much room this chart has and not how wide the window
+ * is: the same card sits in a 900px column on a district page and an 1180px one on `/districts`,
+ * and a chart inside a `.strip-row` has less than either.
  *
- * The swap is at 576px because that is 0.9 × 640: below it the wide drawing would be scaled past
- * the point where its 10px axis text stays at 9px, which is the whole defect this replaced. Above
- * it the wide drawing is the better picture at every width. The narrow drawing is therefore shown
- * from 293px — a phone's content box — up to 576px, and is scaled between 0.92 and 1.8 across
- * that range.
+ * Each drawing takes over at its own width, so it is never shown smaller than it was laid out,
+ * and the one before it has by then reached its `MAX_SCALE` cap: the step in painted type at a
+ * swap is a fifth and no more (#609). The swap used to be at 576px, 0.9 × 640, with only two
+ * drawings — which left the narrow one at 400px in boxes up to 575, and then a jump.
  *
- * `display: none` and not `visibility`: the hidden drawing must leave the accessibility tree, or
- * a screen reader is offered the same chart twice under the same name.
+ * `display: none` and not `visibility`: a hidden drawing must leave the accessibility tree, or a
+ * screen reader is offered the same chart three times under the same name.
  */
 .chart-pair { container-type: inline-size; }
 .chart-at[data-at="narrow"] { display: block; }
-.chart-at[data-at="wide"] { display: none; }
-@container (min-width: 576px) {
+.chart-at[data-at="middle"], .chart-at[data-at="wide"] { display: none; }
+@container (min-width: 440px) {
   .chart-at[data-at="narrow"] { display: none; }
+  .chart-at[data-at="middle"] { display: block; }
+}
+@container (min-width: 640px) {
+  .chart-at[data-at="middle"] { display: none; }
   .chart-at[data-at="wide"] { display: block; }
 }
-/* A panel of a small multiple is drawn once and shown in both layouts — see
+/* A panel of a small multiple is drawn once and shown in every layout — see
    `renderPanelToString`. Named rather than left unqualified so that a drawing with no pair is
    visibly a decision and not a missing sibling. */
 .chart-at[data-at="panel"] { display: block; }
@@ -1896,15 +1899,18 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
  *
  * A drawing stops growing at `MAX_SCALE` times its width (`plot/spec.ts`), so in a column wider
  * than that it sits at the left with room to its right. A `.scale` row left at full width would
- * put its high end out in that room, under nothing. The row takes the same cap: 1.25 × 320 while
- * the narrow drawing is shown, 1.25 × 640 once the wide one is. The breakpoint is `.chart-pair`'s,
- * and this is a container of the same width, so the two queries answer the same question. Written
- * as the product rather than as 400px and 800px: the numbers are a drawing's width and a ceiling on
- * its scale, not a step on the space scale, and a unit test holds each factor to `plot/spec.ts`.
+ * put its high end out in that room, under nothing. The row takes the same cap: 1.25 × the width
+ * of whichever drawing is shown. The breakpoints are `.chart-pair`'s, and this is a container of
+ * the same width, so the queries answer the same question. Written as the product rather than as
+ * 375px, 550px and 800px: the numbers are a drawing's width and a ceiling on its scale, not a step
+ * on the space scale, and a unit test holds each factor to `plot/spec.ts`.
  */
 .chart-scale { container-type: inline-size; }
-.chart-scale > .scale { max-width: calc(320px * 1.25); }
-@container (min-width: 576px) {
+.chart-scale > .scale { max-width: calc(300px * 1.25); }
+@container (min-width: 440px) {
+  .chart-scale > .scale { max-width: calc(440px * 1.25); }
+}
+@container (min-width: 640px) {
   .chart-scale > .scale { max-width: calc(640px * 1.25); }
 }
 
@@ -2926,10 +2932,10 @@ tr.series-break > td {
    * wide table on this site has printed with its right-hand columns missing.
    */
   .scroll { overflow-x: visible; }
-  /* Paper is wider than 576px and never scrolls, so the wide drawing is the one to print. Stated
+  /* Paper is wider than 640px and never scrolls, so the wide drawing is the one to print. Stated
      rather than left to the container query, which would be answering about a column this
      stylesheet has not measured. */
-  .chart-at[data-at="narrow"] { display: none; }
+  .chart-at[data-at="narrow"], .chart-at[data-at="middle"] { display: none; }
   .chart-at[data-at="wide"] { display: block; }
   .chart-scale > .scale { max-width: calc(640px * 1.25); }
 

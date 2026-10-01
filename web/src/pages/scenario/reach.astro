@@ -28,6 +28,12 @@
  * frame around them: `.reach-rail` drops the card chrome so a reader sees levers rather than a box
  * containing levers. Restyling rather than reimplementing is what keeps the two views' levers from
  * drifting apart.
+ *
+ * The page is `wide`, the one runner route that is. The rail takes 17rem of the row from 960px up,
+ * and in the reading column that left the stage 548px of drawing at every desktop width: under the
+ * swap to the wide drawing, so the plot was drawn at its phone size and halved as the window grew
+ * past 960 (#609). A page with a rail beside its picture is two columns, and a reading column is
+ * one.
  */
 import Baseline from "../../components/Baseline.astro";
 import HeldFixed from "../../components/HeldFixed.astro";
@@ -99,6 +105,7 @@ const counties = scopeCounties(bundle.districts);
   image={routes.og.page("reach")}
   imageAlt="Every Ohio school district plotted against what the formula computes for it, with the guarantee wall"
   section="scenario"
+  wide
 >
   <h1>{NAMES.scenario.name}</h1>
   <RunnerViews current="reach" />

@@ -42,12 +42,15 @@ import {
 } from "../../src/lib/plot/spec.ts";
 import { renderPanelToString, renderToString } from "../../src/lib/plot/ssr.ts";
 
+/** How many layouts `renderToString` emits: one per width in `WIDTHS`. */
+const DRAWINGS = Object.keys(WIDTHS).length;
+
 /**
  * The width these assertions are written at.
  *
- * Every chart is laid out twice — see `WIDTHS` — and what is asserted here is the layout
- * arithmetic, which is the same arithmetic at either width. So the tests name one rather than
- * running each of them twice to make the same point.
+ * Every chart is laid out at each of `WIDTHS` — and what is asserted here is the layout
+ * arithmetic, which is the same arithmetic at any of them. So the tests name one rather than
+ * running each of them three times to make the same point.
  */
 const W = { width: WIDTHS.wide };
 
@@ -84,7 +87,7 @@ test("the bar a chart was built to locate is marked, on two channels", () => {
   expect(plain).not.toContain('font-weight="600"');
 });
 
-test("a column with bars on both sides of zero draws its rule at both widths", () => {
+test("a column with bars on both sides of zero draws its rule at every width", () => {
   /*
    * The first chart a corpus node draws — `dispersion/fy2016-step-by-business-class`, on the
    * Toledo node — is four correlations, two of them negative and none of them a subject. Signed
@@ -102,7 +105,7 @@ test("a column with bars on both sides of zero draws its rule at both widths", (
   ];
   const pair = renderToString((w) => barSpec(bars, { width: w }), { label: "The column" });
   const drawings = pair.split("<svg").slice(1);
-  expect(drawings).toHaveLength(2);
+  expect(drawings).toHaveLength(DRAWINGS);
   for (const drawing of drawings) {
     expect((drawing.match(/<rect/g) ?? []).length).toBe(4);
     expect((drawing.match(/<line/g) ?? []).length).toBe(1);
@@ -365,7 +368,7 @@ test("a muted point is drawn smaller and fainter, and the radius is a pixel coun
   expect(
     [...svg.matchAll(/<circle[^>]*\sr="7"/g)].length,
     "one full-size hit target per district, muted or not",
-  ).toBe(points.length * 2);
+  ).toBe(points.length * DRAWINGS);
 });
 
 /**
@@ -475,7 +478,7 @@ test("a set of panels is drawn at the width the stylesheet will give it, not at 
  * `className` and `data` are not on the static type even though every mark these specs build — a
  * `dot`, a `ruleY`, a `text`, a `rect` — carries both. The cast is narrow and deliberate: which
  * rows reach which layer is exactly what the assertions below are about, and the rendered SVG
- * shows it only as a count of anonymous `<g>` children, twice over for the chart pair.
+ * shows it only as a count of anonymous `<g>` children, once over for each of the pair's drawings.
  */
 function layerRows(spec: Spec, className: string): number {
   const marks = (spec.options.marks ?? []) as unknown as {
@@ -619,7 +622,7 @@ test("every dot is named on the picture, and no two names are drawn on top of ea
    * rolling count and the mirror inside `[H]` sit four pixels apart on the outcome axis at the
    * narrow width. `placeLabels` is what resolves that, and this is the assertion that it does.
    */
-  for (const width of [WIDTHS.narrow, WIDTHS.wide]) {
+  for (const width of Object.values(WIDTHS)) {
     const spec = planeSpec(rules(), PLANE_AXES, { width, ...PLANE_FRAME })!;
     const svg = renderToString(() => spec, "presentational");
     const labels = [...svg.matchAll(/class="plane-label"[^>]*>([\s\S]*?)<\/g>/g)];
@@ -629,7 +632,7 @@ test("every dot is named on the picture, and no two names are drawn on top of ea
         m[1]!.replace(/<tspan[^>]*>/g, " ").replace(/<\/tspan>/g, "").trim(),
       ),
     );
-    expect(drawn, `${width}px draws all seven names once`).toHaveLength(rules().length * 2);
+    expect(drawn, `${width}px draws all seven names once`).toHaveLength(rules().length * DRAWINGS);
     expect(new Set(drawn), `${width}px draws each name whole`).toEqual(
       new Set(rules().map((rule) => rule.label)),
     );
@@ -671,8 +674,8 @@ test("a signed panel with nothing in it still draws its zero, so the empty rule 
     [...renderToString(() => spec, "presentational").matchAll(/stroke="var\(--accent-rule\)"/g)]
       .length;
   expect(rules(barSpec(flat, { width })), "no rule without a signed scale").toBe(0);
-  // Two, because `renderToString` lays the drawing out twice. One rule per drawing.
-  expect(rules(barSpec(flat, { width, max: 166.55, min: -83.51 }))).toBe(2);
+  // One rule per drawing `renderToString` lays out.
+  expect(rules(barSpec(flat, { width, max: 166.55, min: -83.51 }))).toBe(DRAWINGS);
   // And the panel is drawn on the set's scale, not on its own nothing.
   expect(barSpec(flat, { width, max: 166.55, min: -83.51 }).options.x!.domain).toEqual([
     -83.51, 166.55,
@@ -762,7 +765,7 @@ test("the reference is drawn muted and once, not as a third series", () => {
   expect(svg).toContain("what ±1σ claims");
   // The categorical pair is the two quantities. A reference in a third hue would read as a third.
   expect(svg).not.toContain("var(--series-c)");
-  // Once per drawing, and the pair is drawn at both widths — see `WIDTHS`.
+  // Once per drawing, and the pair is drawn at every one of `WIDTHS`.
   for (const drawing of svg.split("<svg").slice(1)) {
     expect((drawing.match(/what ±1σ claims/g) ?? []).length).toBe(1);
   }
@@ -795,13 +798,13 @@ test("the hit layer is one full-height column per position on the index", () => 
 });
 
 test("no drawing is scaled up past the ceiling that keeps its type at body size", () => {
-  // Every width a chart is drawn at — the pair's two and a panel's own — against the viewBox it
+  // Every width a chart is drawn at — the three of `pair` and a panel's own — against the viewBox it
   // actually came out at, so a builder that ignored its width would fail here, not pass on it.
   const series = (w: number) =>
     seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", { width: w, tick: (at) => `${at}` });
   const drawn = renderToString(series, "presentational") + renderPanelToString(series, "presentational", panelWidth(2));
   const svgs = [...drawn.matchAll(/<svg\b[^>]*>/g)].map((m) => m[0]);
-  expect(svgs).toHaveLength(3);
+  expect(svgs).toHaveLength(4);
   for (const svg of svgs) {
     const box = Number(/viewBox="0 0 (\d+(?:\.\d+)?) /.exec(svg)?.[1]);
     const cap = Number(/max-width:(\d+(?:\.\d+)?)px/.exec(svg)?.[1]);
@@ -819,10 +822,34 @@ test("the scale row under a strip is capped where the drawing above it is", () =
   ].map((m) => [Number(m[1]), Number(m[2])]);
   expect(caps).toEqual([
     [WIDTHS.narrow, MAX_SCALE],
+    [WIDTHS.middle, MAX_SCALE],
     [WIDTHS.wide, MAX_SCALE],
     // Print shows the wide drawing whatever the width, and the row follows it.
     [WIDTHS.wide, MAX_SCALE],
   ]);
+});
+
+test("each drawing takes over at its own width, from one already at its cap", () => {
+  /*
+   * #609. With the swap anywhere else, one of two things comes back: a band where the drawing
+   * shown has stopped at its cap and its box runs on, or a drawing shown smaller than it was laid
+   * out. The container queries are read from the stylesheet, because they are where the swap
+   * actually happens, and both of them — `.chart-pair` and `.chart-scale` — must say the same.
+   */
+  const css = readFileSync(resolve(process.cwd(), "src/styles/app.css"), "utf8");
+  const swaps = [...css.matchAll(/@container \(min-width: (\d+)px\)/g)].map((m) => Number(m[1]));
+  expect(swaps).toEqual([WIDTHS.middle, WIDTHS.wide, WIDTHS.middle, WIDTHS.wide]);
+
+  const order = [WIDTHS.narrow, WIDTHS.middle, WIDTHS.wide];
+  for (let i = 1; i < order.length; i += 1) {
+    const before = order[i - 1]! * MAX_SCALE;
+    const at = order[i]!;
+    // The one before has stopped growing by the swap, so the step in painted type is exactly
+    // 1 - 1/MAX_SCALE, a fifth.
+    expect(before, `${at}`).toBeLessThan(at);
+    // And the band it cannot fill is never more than 15% of its box short.
+    expect(before / at, `${at}`).toBeGreaterThan(0.85);
+  }
 });
 
 /**
@@ -939,7 +966,7 @@ test("a range row is its full height at any count, with the foot added rather th
       high: 200 + i * 3,
       hover: `row ${i}`,
     }));
-    for (const width of [WIDTHS.narrow, WIDTHS.wide]) {
+    for (const width of Object.values(WIDTHS)) {
       const { height, marginTop, marginBottom } = rangeSpec(rows, axis, { width })!.options;
       expect((height! - (marginTop ?? 0) - marginBottom!) / n, `${n} rows at ${width}`).toBeGreaterThanOrEqual(14);
     }
@@ -964,7 +991,7 @@ test("a name with no room beside its mark is broken in two rather than drawn off
     ...rules(),
     { label: long, x: PLANE_FRAME.xDomain[1], y: 30e6, hover: "beside all three" },
   ];
-  for (const width of [WIDTHS.narrow, panelWidth(2), WIDTHS.wide]) {
+  for (const width of [...Object.values(WIDTHS), panelWidth(2)]) {
     const svg = drawingAt(() => planeSpec(places, PLANE_AXES, { width, ...PLANE_FRAME }));
     expect(overruns(svg), `${width}px`).toEqual([]);
   }
