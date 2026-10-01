@@ -48,7 +48,7 @@ const houseSeats = [...district.house_districts].sort((a, b) => Number(a.number)
 
 const guaranteePP = district.realized_aid_per_pupil - district.formula_aid_per_pupil;
 const description = district.on_guarantee
-  ? `${district.name} receives ${money(district.realized_aid_per_pupil)} per pupil in state aid, of which ${money(guaranteePP)} comes from the temporary transitional aid guarantee rather than the formula.`
+  ? `${district.name} receives ${money(district.realized_aid_per_pupil)} per pupil in state aid, ${money(guaranteePP)} of it from the guarantee rather than the formula.`
   : `${district.name} receives ${money(district.realized_aid_per_pupil)} per pupil in state aid, all of it computed by the formula.`;
 ---
 

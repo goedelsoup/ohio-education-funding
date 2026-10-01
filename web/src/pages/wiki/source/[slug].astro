@@ -12,7 +12,7 @@
  */
 import Base from "../../../layouts/Base.astro";
 import { FROM_CATALOG, loadCorpus } from "../../../lib/corpus.ts";
-import { renderProse } from "../../../lib/prose.ts";
+import { renderProse, sourceSnippet } from "../../../lib/prose.ts";
 import * as routes from "../../../lib/routes.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
 
@@ -34,9 +34,9 @@ const body = await renderProse(source.body, FROM_CATALOG);
 
 <Base
   title={source.title}
-  description={`${source.title} — a source behind the Ohio school funding corpus, cited by ${source.citedBy.length} node${source.citedBy.length === 1 ? "" : "s"}.`}
+  description={sourceSnippet(source.body, FROM_CATALOG)}
   image={routes.og.wikiSource(source.slug)}
-  imageAlt={`${source.title}, and how many corpus nodes cite it`}
+  imageAlt={`${source.title}, and what it contains`}
   section="sources"
 >
   <p class="crumb"><a href="/wiki">The corpus</a> › <a href="/wiki/source">Sources</a></p>

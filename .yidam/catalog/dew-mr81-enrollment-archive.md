@@ -29,9 +29,9 @@ a denominator, not because it is an enrollment report.
 Everything below is from the files. The slug is left alone because it is cited, and renaming it
 would break the citation to make the mistake less visible.
 
-**What it contains.** Per school site: sponsor, county, site IRN, kitchen type, an enrollment
-count, free lunch applications, reduced-price lunch applications, their total, and both as
-percentages of enrollment. Sponsor subtotals in the rendered files.
+**What it contains.** Per school site: sponsor, county, site IRN, kitchen type, enrollment,
+and free and reduced-price lunch applications, each also as a share of enrollment, with their
+total. Sponsor subtotals in the rendered files.
 
 **Why it is worth more than the enrollment framing suggested.** Seventeen consecutive Octobers of
 free and reduced-price counts is a **district poverty series**, and the corpus has none. Ohio's

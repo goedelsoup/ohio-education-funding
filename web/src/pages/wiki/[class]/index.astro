@@ -23,7 +23,7 @@
 import Base from "../../../layouts/Base.astro";
 import { loadCorpus } from "../../../lib/corpus.ts";
 import { NAMES, sectionForClass } from "../../../lib/nav.ts";
-import { renderProse, renderPropertyValue, summarize } from "../../../lib/prose.ts";
+import { snippet, renderProse, renderPropertyValue } from "../../../lib/prose.ts";
 import * as routes from "../../../lib/routes.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
 
@@ -48,7 +48,7 @@ const title = `${entry.label} — the corpus`;
 
 <Base
   title={title}
-  description={summarize(entry.description, 200, entry.className)}
+  description={snippet(entry.description, entry.className)}
   image={routes.og.wikiClass(entry.className)}
   imageAlt={`${entry.label}: ${entry.nodes.length} node${entry.nodes.length === 1 ? "" : "s"} in the Ohio school funding corpus`}
   section={sectionForClass(entry.className)}

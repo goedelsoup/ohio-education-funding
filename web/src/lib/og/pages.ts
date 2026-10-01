@@ -76,7 +76,9 @@ export function pageCards(): Record<string, Card> {
       label: `${pct(guaranteeOfAid, 0)} of it from the guarantee`,
       tone: "guarantee",
     },
-    meta: `Bundle contract ${bundle.contract_version} · ${fy} model`,
+    // What the card is and when, in a reader's words. The contract version was a build label and
+    // reached `/`, `/statewide` and the 404 through this one card (#593).
+    meta: `${s.districts} districts · ${fy} model`,
   };
 
   return {
@@ -85,7 +87,7 @@ export function pageCards(): Record<string, Card> {
 
     statewide: {
       ...site,
-      headline: "Ohio school funding",
+      headline: "Every Ohio district's state aid, in one panel",
       figureNote: `State foundation aid across ${s.districts} districts, ${fy}`,
     },
 
@@ -118,7 +120,7 @@ export function pageCards(): Record<string, Card> {
       headline: "The 99 Ohio House districts",
       figure: "Apportioned, not published",
       figureNote:
-        "State aid distributed across legislative lines from census blocks — an estimate, since no seat is a unit of account",
+        "An estimate built from census blocks, since the state pays districts and no seat is a unit of account",
       meta: `${fy} model`,
     },
 
@@ -127,7 +129,7 @@ export function pageCards(): Record<string, Card> {
       headline: "The 33 Ohio Senate districts",
       figure: "Apportioned, not published",
       figureNote:
-        "State aid distributed across legislative lines from census blocks — an estimate, since no seat is a unit of account",
+        "An estimate built from census blocks, since the state pays districts and no seat is a unit of account",
       meta: `${fy} model`,
     },
 
@@ -153,7 +155,7 @@ export function pageCards(): Record<string, Card> {
       headline: "Ohio school funding in statute",
       figure: `${spans.length} formulas, ${spanEnd - spanStart + 1} years`,
       figureNote:
-        "Every act from the 1851 constitutional duty to this biennium's budget, in the order it was signed, with what each one did to the formula",
+        "Every act from the 1851 constitutional duty to this biennium's budget, and what each did to the formula",
       /* The span, and not decoration: `og.spec.ts` requires a card carrying a number to name its
          year, because a card outlives the page it was shared from. This one's number *is* a span
          of years, so the two ends are the honest thing to date it with. */
@@ -190,7 +192,7 @@ export function pageCards(): Record<string, Card> {
       figure: count(s.on_guarantee),
       figureTone: "guarantee",
       figureNote:
-        "districts are paid the guarantee rather than the formula, so a more generous formula reaches them last or not at all",
+        "districts are paid the guarantee, so a more generous formula reaches them last or not at all",
       bar: {
         share: guaranteeOfDistricts,
         label: `${pct(guaranteeOfDistricts, 0)} of the state's districts`,
@@ -211,9 +213,9 @@ export function pageCards(): Record<string, Card> {
       eyebrow: SITE,
       headline: "Where the formula stops computing",
       figure: `${count(bounds.rows.length)} bounds`,
-      figureNote: `floors, ceilings and clamps in Ohio's funding formula — ${
+      figureNote: `floors, ceilings and clamps in the formula, ${
         bounds.cannotBind.length === 1 ? "one of which" : `${count(bounds.cannotBind.length)} of which`
-      } can never be the operative term for any district in the state`,
+      } can never bind for any district`,
       meta: `Ranked by the districts each one decides · ${fy}`,
     },
 
@@ -222,8 +224,8 @@ export function pageCards(): Record<string, Card> {
       headline: "How these figures are made",
       figure: `${verification.comparisons.length} checkpoints`,
       figureNote:
-        "The department's own model, re-run and required to reproduce every reference scenario before the site may build",
-      meta: `Bundle contract ${bundle.contract_version} · ${fy}`,
+        "The department's own model, re-run and required to match every reference scenario before the site builds",
+      meta: `Method and verification · ${fy}`,
     },
 
     data: {
@@ -232,21 +234,21 @@ export function pageCards(): Record<string, Card> {
       figure: "JSON and CSV",
       figureNote:
         "The full feed, the formula inputs alone, and the district table — the same figures the pages are built from",
-      meta: `Bundle contract ${bundle.contract_version} · ${fy}`,
+      meta: `Data downloads · ${fy}`,
     },
 
     wiki: {
-      eyebrow: `${SITE} · Wiki`,
+      eyebrow: `${SITE} · Library`,
       headline: "How Ohio funds its public schools",
-      figure: "The corpus",
+      figure: "The Library",
       figureNote:
-        "The formula and its regimes, the property tax base beside it, the litigation, and the programs that route money around it",
+        "The formula and its regimes, the property tax base, the litigation, and the programs around the formula",
       meta: "Every numeric claim one hop from its source",
     },
 
     sources: {
-      eyebrow: `${SITE} · Wiki`,
-      headline: "The sources behind the corpus",
+      eyebrow: `${SITE} · Library`,
+      headline: "The sources behind the Library",
       figure: "Where each claim came from",
       figureNote:
         "Department publications, Legislative Service Commission analyses, district filings, and the litigation record",

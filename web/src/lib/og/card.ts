@@ -29,7 +29,7 @@ export type Tone = "formula" | "guarantee";
 
 /** The content of one card. */
 export interface Card {
-  /** Above the rule. The site, or the section within it: "Wiki", "Cuyahoga County". */
+  /** Above the rule. The site, or the section within it: "Library", "Cuyahoga County". */
   eyebrow: string;
   /** The subject. A district name, a county name, a corpus node's label. */
   headline: string;

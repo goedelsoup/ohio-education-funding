@@ -20,7 +20,7 @@ edition is titled *FY 2022 School Finance Payment Report Line by Line Explanatio
 Provisions of Am. Sub. H.B. 110 and H.B. 583 of the 134th General Assembly*.
 
 **What it contains.** The complete computational specification of the Fair School Funding
-Plan, component by component, with the Revised Code section for each, the exact formula, the
+Plan, component by component. Each carries its Revised Code section, the exact formula, the
 statewide factor values in force that year, and worked screenshots from the actual payment
 reports. This is the document that turns the formula from a description into something
 reproducible.

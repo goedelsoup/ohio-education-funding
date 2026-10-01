@@ -257,12 +257,12 @@ describe("every card the site builds", () => {
    * a card is a number that will be read a year from now with nothing around it. Every card
    * carrying one has to say which year it is from.
    *
-   * The figure slot does not always hold a number. "The corpus", "Apportioned, not published" and
+   * The figure slot does not always hold a number. "The Library", "Apportioned, not published" and
    * "JSON and CSV" are phrases, and a phrase does not date. So the rule is about digits, not about
    * whether the slot is filled.
    *
-   * It applies to the feed's cards and not the corpus's. "12 nodes" is a count of an ontology
-   * class, and an ontology class is not a thing a fiscal year happened to.
+   * It applies to the feed's cards and not the corpus's. "12 formula components" is a count of an
+   * ontology class, and an ontology class is not a thing a fiscal year happened to.
    */
   test("dates every figure that is actually a number", () => {
     for (const card of fromFeed()) {
@@ -270,7 +270,34 @@ describe("every card the site builds", () => {
       expect(
         `${card.meta ?? ""} ${card.figureNote ?? ""}`,
         `"${card.figure}" on the ${card.headline} card is a number with no year beside it`,
-      ).toMatch(/FY\d{4}|contract \d/i);
+      ).toMatch(/FY\d{4}/);
+    }
+  });
+
+  /*
+   * #593: seven written notes ran past the 110 characters `render` keeps beside a figure, so the
+   * card that reached a feed ended "…since no seat is a unit of…". The note is the one sentence a
+   * card has, and it is written to fit rather than cut to.
+   */
+  test("carries a note that fits, so render never cuts it", () => {
+    for (const card of every()) {
+      if (!card.figureNote) continue;
+      const limit = card.figure ? 110 : 190;
+      expect(clamp(card.figureNote, limit), `the ${card.headline} card's note is cut`).toBe(card.figureNote);
+    }
+  });
+
+  /*
+   * The meta line is what the page is and when. "Bundle contract 48.0.0", "Ontology class ·
+   * phase (ufo)", "5 nodes" and "24 links into and out of the corpus" were the build's and the
+   * corpus's vocabulary, printed on every card that reached a feed (#593).
+   */
+  test("says what the page is, in no build or ontology vocabulary", () => {
+    for (const card of every()) {
+      expect(card.meta ?? "", `the ${card.headline} card's meta line`).not.toMatch(
+        /contract|ontology|ufo|\bnodes?\b/i,
+      );
+      expect(card.eyebrow, `the ${card.headline} card's eyebrow`).not.toMatch(/\bWiki\b/);
     }
   });
 });

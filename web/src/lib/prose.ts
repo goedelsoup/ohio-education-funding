@@ -867,6 +867,94 @@ export function summarize(markdown: string, max: number, fromClass: string): str
  */
 export function firstSentence(markdown: string, fromClass: string): string {
   const text = summarize(markdown, Infinity, fromClass);
-  const end = /(?<!\.[A-Z]|\b(?:v|vs|e\.g|i\.e|No|St))[.!?](?=\s+[A-Z“"(])/.exec(text);
-  return end ? text.slice(0, end.index + 1) : text;
+  // A closing quote stays with its sentence: `used to read "Not applicable." The April…`. And a
+  // sentence may open on an identifier, which the decision records do — "ohio-courts wired",
+  // "budget_analysis reads" — so a lower-case word with a `-` or `_` in it starts one too.
+  const end = /(?<!\.[A-Z]|\b(?:v|vs|e\.g|i\.e|No|St))[.!?]["”]?(?=\s+(?:[A-Z“"(]|[a-z]+[-_][a-z]))/.exec(
+    text,
+  );
+  return end ? text.slice(0, end.index + end[0].length) : text;
+}
+
+/**
+ * How long a `<meta name="description">` may be: about what a search result shows before it cuts
+ * the snippet itself, mid-word (#593).
+ */
+export const DESCRIPTION_LIMIT = 160;
+
+/**
+ * The first sentence of corpus markdown, at {@link DESCRIPTION_LIMIT} or fewer, ending in its own
+ * punctuation — the meta description and the preview card's note for a corpus page (#593).
+ *
+ * {@link summarize} cut the wiki's meta descriptions mid-clause at 200 characters, past what a
+ * search result shows, and every link-preview card showed the same cut. The first sentence is
+ * what the author wrote to stand alone, and most fit. One that does not is cut where the author
+ * set off what follows as an elaboration — a dash, a semicolon, a colon — and closed with a full
+ * stop: "The rate the plan charges against a district's blended wealth." Failing that, at a comma,
+ * but never before a serial ", and": cutting "reaches every district, is restricted to education,
+ * and appears nowhere" at a comma reads as a complete list that is not one.
+ *
+ * Where there is no such cut the sentence is returned cut by {@link summarize}, ellipsis and all,
+ * rather than invented; `tests/unit/prose.spec.ts` names every one, and the fix is a shorter
+ * sentence in the corpus.
+ */
+export function snippet(markdown: string, fromClass: string, max: number = DESCRIPTION_LIMIT): string {
+  // A sentence that introduces a table or a list ends on its colon, which is no ending here.
+  const sentence = firstSentence(markdown, fromClass).replace(/:$/, ".");
+  if (sentence.length <= max) return sentence;
+  // Room for the full stop the cut adds, no cut so early it leaves a fragment ("For H.B. 96."),
+  // and none inside a parenthesis, which would leave it open.
+  const within = (i: number) =>
+    i >= 20 && i < max && (sentence.slice(0, i).match(/\(/g)?.length ?? 0) === (sentence.slice(0, i).match(/\)/g)?.length ?? 0);
+  // "…licensure and demographics, and — the table this corpus takes —" closes on "demographics".
+  const close = (i: number) =>
+    `${sentence.slice(0, i).replace(/(?:[\s,;:—–-]|\b(?:and|or)\b)+$/, "")}.`;
+  const strong = [...sentence.matchAll(/ [—–] |; |: /g)].map((m) => m.index).filter(within);
+  if (strong.length > 0) return close(strong.at(-1)!);
+  const lastSerial = Math.max(sentence.lastIndexOf(", and "), sentence.lastIndexOf(", or "));
+  const commas = [...sentence.matchAll(/, /g)]
+    .map((m) => m.index)
+    .filter((i) => within(i) && i > lastSerial);
+  if (commas.length > 0) return close(commas.at(-1)!);
+  return summarize(sentence, max, fromClass);
+}
+
+/** The fields a catalog entry opens with, which say where it is and not what it is. */
+const CATALOG_FIELDS = /^(?:Source|Type|Location|Publisher|Status|Access constraints)\.$/;
+
+/**
+ * A catalog source's first sentence of prose, for its meta description and card (#593).
+ *
+ * A source's body opens with `**Source.**`, `**Type.**` and `**Location.**` — a citation, a
+ * classification and an address — so its first sentence was "Source." and its summary a flattened
+ * field list with file names in it. What it is starts at the paragraph labelled `What it contains`,
+ * or failing one the first paragraph after the fields; a lead-in that only names the paragraph goes, and one that is itself a
+ * sentence stays.
+ */
+export function sourceSnippet(markdown: string, fromClass: string, max: number = DESCRIPTION_LIMIT): string {
+  const paragraphs = markdown
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+  // The paragraph labelled for it, in either form an entry uses: `**What it contains.**`, or a
+  // `## What it contains` heading over the paragraph that follows.
+  const contains = paragraphs.findIndex((p) => /^(?:\*\*|#+\s*)What it contains\b/.test(p));
+  const prose = paragraphs.filter((p) => {
+    if (/^(?:#|\||---)/.test(p)) return false;
+    const label = /^\*\*([^*]+)\*\*/.exec(p);
+    return !(label && CATALOG_FIELDS.test(label[1]!.trim()));
+  });
+  const ordered =
+    contains < 0
+      ? prose
+      : [paragraphs[contains]!.startsWith("#") ? paragraphs[contains + 1] : paragraphs[contains], ...prose];
+  for (const paragraph of ordered) {
+    if (paragraph === undefined) continue;
+    const label = /^\*\*([^*]+)\*\*\s*/.exec(paragraph);
+    const body =
+      label && /^(?:What|Why|How)\b/.test(label[1]!) ? paragraph.slice(label[0].length) : paragraph;
+    const text = snippet(body, fromClass, max);
+    if (text !== "") return text;
+  }
+  return snippet(markdown, fromClass, max);
 }

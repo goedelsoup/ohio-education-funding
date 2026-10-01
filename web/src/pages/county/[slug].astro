@@ -30,7 +30,7 @@ const all = counties(bundle.districts);
 const description =
   county.valuationRatio == null
     ? `${county.name} County's school district in Ohio's FY${bundle.fiscal_year} funding model.`
-    : `The ${county.districts.length} school districts the department places in ${county.name} County, Ohio, compared: property wealth per pupil, state aid, and a ${county.valuationRatio.toFixed(1)}× gap between the richest and poorest.`;
+    : `The ${county.districts.length} school districts in ${county.name} County, Ohio, compared: property wealth per pupil, state aid, and a ${county.valuationRatio.toFixed(1)}× gap between the richest and poorest.`;
 ---
 
 <Base

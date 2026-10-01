@@ -12,9 +12,8 @@ RL-2026-021.
 **Type.** Secondary source — analysis over primary data.
 **Location.** `ohiocommonground.com`.
 
-**What it contains.** A verdict of FALSE on a circulating claim that Toledo Public Schools
-devotes ~45% of spending to special-needs or student-support services against 14–16% for
-Perrysburg. Reports, for FY2024–25: student-support share 8.1% / 8.5%, special-education
+**What it contains.** A verdict of FALSE on a claim that Toledo Public Schools spends ~45% on
+special-needs or student-support services against 14–16% for Perrysburg. Reports, for FY2024–25: student-support share 8.1% / 8.5%, special-education
 instruction share 14.5% / 14.4–14.7%, special-education instruction per pupil $2,766 /
 $2,032–$2,363, and total operating per pupil $20,805 / $14,632.
 
