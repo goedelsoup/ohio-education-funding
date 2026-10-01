@@ -1,0 +1,27 @@
+---
+/**
+ * The name-or-IRN field: a plain GET to the district index.
+ *
+ * Nothing on the page it sits on runs. `/districts?q=043786` is the address the form makes: with
+ * script the index reads `q` and shows the one row; without it the index is the whole table,
+ * alphabetical, with the browser's own find — which is what it always was. So the field works in
+ * the half of the site that never loads a script, and does more where one runs.
+ *
+ * The homepage's and the 404's (#596), which is where a mistyped IRN lands.
+ */
+
+interface Props {
+  /** The input's `id`, unique on its page and what its label points at. */
+  id: string;
+}
+
+const { id } = Astro.props;
+---
+
+<form class="filters" method="get" action="/districts" role="search">
+  <div class="field">
+    <label for={id}>Name or IRN</label>
+    <input id={id} name="q" type="search" placeholder="Cleveland, 043786…" autocomplete="off" />
+  </div>
+  <button type="submit">Find</button>
+</form>

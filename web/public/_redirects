@@ -5,6 +5,10 @@
 # the measure instrument's server (`scripts/serve-dist.ts`) reads them through the same parser, and
 # `tests/e2e/redirects.spec.ts` visits every source below and checks it lands.
 #
+# Not every rule that deploys is here. An IRN or seat typed without its leading zeros (#596) is
+# one rule per key, read off the feed, so the build appends those to `dist/_redirects` — see the
+# `unpadded-addresses` integration in `astro.config.mjs`. `tests/dist/addresses.spec.ts` checks them.
+#
 # The incoming query is kept only when the destination names none of its own, so no destination
 # here carries a `?` — the levers in an old scenario link are the part worth keeping.
 

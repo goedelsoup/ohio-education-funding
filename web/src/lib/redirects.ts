@@ -91,3 +91,82 @@ export function resolveRedirect(
   }
   return null;
 }
+
+/**
+ * How many rules without a placeholder the host will read. Cloudflare Pages caps a `_redirects`
+ * file at 2,000 static rules and 100 dynamic ones, and past the cap it ignores the rest — silently,
+ * at the edge, where no test here can see it.
+ */
+export const STATIC_RULE_LIMIT = 2000;
+
+/** The keys the site's addresses are built from, read off the feed. */
+export interface Addresses {
+  irns: readonly string[];
+  house: readonly string[];
+  senate: readonly string[];
+}
+
+/**
+ * An address as a person types it, where that differs from the one the site uses.
+ *
+ * Every key here is zero-padded — an IRN to six digits, a seat in either chamber to three — and the
+ * unpadded form is the one a spreadsheet produces from an IRN and the one anyone writes for "House
+ * District 90". Every partly padded form too, since `/senate/01` is as natural as `/senate/1`. None
+ * for a key with no leading zero, as for Senate 10-33 and the one IRN that starts with a 1: a rule
+ * from an address to itself is a redirect loop.
+ */
+function unpadded(key: string): string[] {
+  const forms: string[] = [];
+  for (let rest = key; rest.length > 1 && rest.startsWith("0"); ) {
+    rest = rest.slice(1);
+    forms.push(rest);
+  }
+  return forms;
+}
+
+/**
+ * The unpadded addresses (#596), each sent to the page it names: `/house/90` to `/house/090`,
+ * `/senate/1` and `/senate/01` to `/senate/001`, `/district/43802` to `/district/043802`.
+ *
+ * One rule per key rather than a pattern, because the host matches no regular expressions — a
+ * `:number` placeholder cannot say "pad me" — and because a static rule costs nothing against the
+ * hundred dynamic ones.
+ */
+export function unpaddedRedirects({ irns, house, senate }: Addresses): Redirect[] {
+  const rules: Redirect[] = [];
+  const add = (root: string, keys: readonly string[]) => {
+    for (const key of keys) {
+      for (const form of unpadded(key)) {
+        rules.push({ from: `${root}/${form}`, to: `${root}/${key}`, status: 301 });
+      }
+    }
+  };
+  add("/district", irns);
+  add("/house", house);
+  add("/senate", senate);
+  return rules;
+}
+
+/**
+ * The hand-written file with the generated rules after it — what `dist/_redirects` holds.
+ *
+ * After, so a hand-written rule wins where both match; none does today. Throws rather than writes
+ * a file the host would read only the first 2,000 static lines of.
+ */
+export function withUnpadded(file: string, addresses: Addresses): string {
+  const generated = unpaddedRedirects(addresses);
+  const rules = [...parseRedirects(file), ...generated];
+  const statics = rules.filter((r) => !/[:*]/.test(r.from)).length;
+  if (statics > STATIC_RULE_LIMIT) {
+    throw new Error(
+      `_redirects: ${statics} static rules, over the host's ${STATIC_RULE_LIMIT}; the rest would be ignored`,
+    );
+  }
+  return (
+    `${file.replace(/\n*$/, "\n")}\n` +
+    "# Written at build by the `unpadded-addresses` integration in `astro.config.mjs`, not by hand.\n" +
+    "# An address typed without its leading zeros, sent to the padded one the site uses (#596).\n" +
+    generated.map((r) => `${r.from}  ${r.to}  ${r.status}`).join("\n") +
+    "\n"
+  );
+}

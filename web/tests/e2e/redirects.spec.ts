@@ -95,3 +95,36 @@ test.describe("the runner's two views", () => {
     await expect(page.locator("#sc-district")).toHaveValue(CLEVELAND);
   });
 });
+
+test.describe("the page an address that is not there lands on (#596)", () => {
+  test.use({ viewport: { width: 375, height: 800 } });
+
+  test("fits a 375px screen, nothing inside it scrolling sideways", async ({ page }) => {
+    // `/404` rather than a missing path: `vite preview` answers an unknown path with the root
+    // document, where the host serves this one. The overflow was a 392px table in a 295px box,
+    // which scrolled inside its `.scroll` and left the page's own width alone, so every element
+    // is asked, not the document.
+    await page.goto("/404");
+    const wide = await page.locator("main").evaluate((main) =>
+      [main, ...main.querySelectorAll("*")]
+        .filter((el) => el.scrollWidth > el.clientWidth + 1 && el.clientWidth > 0)
+        .map((el) => `${el.tagName.toLowerCase()}.${el.className}: ${el.scrollWidth} in ${el.clientWidth}`),
+    );
+    expect(wide).toEqual([]);
+  });
+
+  test("offers the name-or-IRN field and every section of the bar", async ({ page }) => {
+    await page.goto("/404");
+    await expect(page.locator("#where-to-go li a")).toHaveText([
+      "Find a district",
+      "Places",
+      "Analysis",
+      "Change the formula",
+      "Library",
+      "About",
+    ]);
+    await page.locator("#missing-q").fill(CLEVELAND);
+    await page.locator("#missing-q").press("Enter");
+    await expect(page).toHaveURL(new RegExp(`/districts\\?q=${CLEVELAND}$`));
+  });
+});

@@ -15,7 +15,13 @@ import { resolve } from "node:path";
 
 import { describe, expect, test } from "vitest";
 
-import { parseRedirects, resolveRedirect } from "../../src/lib/redirects.ts";
+import {
+  STATIC_RULE_LIMIT,
+  parseRedirects,
+  resolveRedirect,
+  unpaddedRedirects,
+  withUnpadded,
+} from "../../src/lib/redirects.ts";
 import { REACH, districtScenario } from "../../src/lib/routes.ts";
 import { chosenDistrict } from "../../src/lib/scenario.ts";
 
@@ -70,6 +76,60 @@ describe("the matcher keeps the host's query rule", () => {
     const own = parseRedirects("/a/:id/x  /b/:id  301\n/c/*  /d/:splat  301");
     expect(resolveRedirect(own, "/a/1/2/x", "")).toBeNull();
     expect(resolveRedirect(own, "/c/1/2", "")?.location).toBe("/d/1/2");
+  });
+});
+
+describe("an address typed without its leading zeros (#596)", () => {
+  const addresses = {
+    irns: ["043802", "000442", "139303"],
+    house: ["001", "090"],
+    senate: ["001", "010"],
+  };
+  const built = parseRedirects(withUnpadded(FILE, addresses));
+
+  test("lands on the padded page", () => {
+    for (const [typed, page] of [
+      ["/district/43802", "/district/043802"],
+      ["/district/442", "/district/000442"],
+      ["/district/0442", "/district/000442"],
+      ["/house/90", "/house/090"],
+      ["/house/1", "/house/001"],
+      ["/house/01", "/house/001"],
+      ["/senate/1", "/senate/001"],
+      ["/senate/10", "/senate/010"],
+    ]) {
+      expect(resolveRedirect(built, typed!, ""), typed).toEqual({ location: page, status: 301 });
+    }
+  });
+
+  test("never sends a key that needs no padding to itself", () => {
+    // An IRN that starts with a 1 is already what anyone types.
+    const rules = unpaddedRedirects(addresses);
+    expect(rules.map((r) => r.from)).toEqual([
+      "/district/43802",
+      "/district/00442",
+      "/district/0442",
+      "/district/442",
+      "/house/01",
+      "/house/1",
+      "/house/90",
+      "/senate/01",
+      "/senate/1",
+      "/senate/10",
+    ]);
+    for (const rule of rules) expect(rule.from).not.toBe(rule.to);
+  });
+
+  test("keeps the hand-written rules, and they still win", () => {
+    expect(built.slice(0, rules.length)).toEqual(rules);
+    expect(resolveRedirect(built, "/district/043786/scenario", "")?.location).toBe(
+      "/scenario#d=043786",
+    );
+  });
+
+  test("refuses a file the host would read only part of", () => {
+    const irns = Array.from({ length: STATIC_RULE_LIMIT }, (_, i) => String(i + 1).padStart(6, "0"));
+    expect(() => withUnpadded(FILE, { irns, house: [], senate: [] })).toThrow(/over the host/);
   });
 });
 
