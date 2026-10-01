@@ -44,6 +44,8 @@ const senateSeats = bundle.senate_districts
   .map((seat) => seat.number)
   .sort();
 
+const houseSeats = [...district.house_districts].sort((a, b) => Number(a.number) - Number(b.number));
+
 const guaranteePP = district.realized_aid_per_pupil - district.formula_aid_per_pupil;
 const description = district.on_guarantee
   ? `${district.name} receives ${money(district.realized_aid_per_pupil)} per pupil in state aid, of which ${money(guaranteePP)} comes from the temporary transitional aid guarantee rather than the formula.`
@@ -104,7 +106,9 @@ const description = district.on_guarantee
     <div>
       <dt>House</dt>
       <dd>
-        {district.house_districts.map((h, i) => (
+        {/* By number, as the Senate seats beside them are. The feed lists them largest census-block
+            share first, an order nothing on this line said and a reader took for none (#578). */}
+        {houseSeats.map((h, i) => (
           <Fragment>
             {i > 0 ? ", " : ""}<a href={routes.houseDistrict(h.number)}>{Number(h.number)}</a>
           </Fragment>
@@ -135,12 +139,6 @@ const description = district.on_guarantee
         <dd set:html={fig(pct(district.economically_disadvantaged, 1), yearOf("profile"))} />
       </div>
     )}
-    {/* Not a fact about this district, and labelled so it does not read as one: it says what the
-        district is being counted among, which is the thing every figure below is relative to. */}
-    <div>
-      <dt>In the model</dt>
-      <dd>{bundle.statewide.districts} districts, FY{bundle.fiscal_year}</dd>
-    </div>
   </dl>
 
   <DistrictNav irn={district.irn} current="dashboard" />
