@@ -438,7 +438,7 @@ test.describe("the decisions behind the corpus", () => {
     page,
   }) => {
     await page.goto("/wiki/decision/the-order-was-never-the-states");
-    await expect(page.locator("h1")).toHaveText("the-order-was-never-the-states");
+    await expect(page.locator("h1")).toHaveText("The order was never the states");
     const headings = await page.locator(".card h2").evaluateAll((nodes) =>
       nodes.map((node) => {
         const clone = node.cloneNode(true) as HTMLElement;
@@ -491,7 +491,7 @@ test.describe("the decisions behind the corpus", () => {
     // links from published prose point into this subtree.
     await page.goto("/wiki/source/derolph-litigation-record");
     await page.locator('.prose-body a[href="/wiki/decision/what-a-citator-reaches"]').first().click();
-    await expect(page.locator("h1")).toHaveText("what-a-citator-reaches");
+    await expect(page.locator("h1")).toHaveText("What a citator reaches");
     await expect(page.getByRole("heading", { name: "Cited by" })).toBeVisible();
   });
 
@@ -508,7 +508,7 @@ test.describe("the decisions behind the corpus", () => {
     // one resolving an [open] item, one narrowing another, and one withdrawing a claim that two
     // levers partition the state, which the record's own figures disproved.
     await expect(rows.first()).toContainText("claims");
-    await expect(rows.first().locator("code")).toHaveText("drafts-are-not-legislation");
+    await expect(rows.first().locator("a")).toHaveText("Drafts are not legislation");
   });
 });
 

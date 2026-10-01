@@ -69,15 +69,15 @@ export function sourceCard(source: Source): Card {
 /**
  * Exported for the unit suite.
  *
- * The headline is the slug, because that is the only name a decision record has and it is how the
- * corpus itself refers to one. The meta line leads with the withdrawals where there are any: a
- * record that has been corrected is the more interesting of the two kinds, and a card that says so
- * is doing the same job the page's own banner does.
+ * The headline is the title the page carries — the slug as words, see `decisionTitle`. The meta
+ * line leads with the withdrawals where there are any: a record that has been corrected is the more
+ * interesting of the two kinds, and a card that says so is doing the same job the page's own
+ * banner does.
  */
 export function decisionCard(decision: Decision): Card {
   return {
     eyebrow: `${SITE} · Decision record`,
-    headline: decision.slug,
+    headline: decision.title,
     figureNote: summarize(decision.summary, 190),
     meta:
       decision.corrections > 0

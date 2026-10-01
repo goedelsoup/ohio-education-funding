@@ -2450,29 +2450,6 @@ svg.plot:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2
 .card.lede { font-size: var(--text-lead); color: var(--text-primary); }
 .card.lede p { max-width: var(--measure-note); }
 
-/* A decision record's own name is its title, in the monospace the corpus cites it in. */
-/*
- * A decision record's own name is its title, in the monospace the corpus cites it in.
- *
- * It was `--text-figure` — 24px, which is 1.41x the prose underneath it, so the page's title was
- * barely larger than its own sentences. The mono face is the point and stays; the size joins the
- * reading ramp's top step like every other `h1`.
- *
- * Mono is wide, and the longest slug here is 33 characters, so the size is clamped rather than
- * fixed: at 2.4rem in a monospace that is roughly 760px, which fits the 900px column on a desktop
- * and does not fit a phone. `overflow-wrap` stays as the backstop for a slug longer than any that
- * exists today.
- */
-h1.slug-title {
-  font-family: var(--font-mono);
-  /* The floor is 2rem and not smaller. At 375px a 1.4rem clamp landed the title at 1.49x body —
-     the exact ratio this phase exists to remove, reintroduced on one route at one width, and the
-     threshold caught it. 2rem holds the rank at every width; a 33-character slug wraps there, and
-     `overflow-wrap` below is what makes wrapping safe. */
-  font-size: clamp(2rem, 6vw, var(--text-h1));
-  letter-spacing: -0.02em;
-  overflow-wrap: anywhere;
-}
 /* The one-line summary under a row in an index table. */
 .row-note {
   display: block;

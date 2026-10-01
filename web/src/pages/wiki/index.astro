@@ -13,7 +13,7 @@ import { NAMES } from "../../lib/nav.ts";
 import { loadCorpus } from "../../lib/corpus.ts";
 import { count } from "../../lib/format.ts";
 import { compare } from "../../lib/order.ts";
-import { summarize } from "../../lib/prose.ts";
+import { firstSentence } from "../../lib/prose.ts";
 import * as routes from "../../lib/routes.ts";
 import SectionAnchor from "../../components/SectionAnchor.astro";
 
@@ -132,7 +132,7 @@ const recentlyCorrected = corpus.decisions
                   <a href={routes.wikiClass(c!.className)}>{c!.label}</a>
                   <span class="n"> {c!.nodes.length}</span>
                 </th>
-                <td>{summarize(c!.description, 180)}</td>
+                <td>{firstSentence(c!.description)}</td>
               </tr>
             ))
           }
@@ -177,7 +177,7 @@ const recentlyCorrected = corpus.decisions
       {
         recentlyCorrected.map((d) => (
           <a class="pill" href={routes.wikiDecision(d.slug)}>
-            {d.slug}
+            {d.title}
           </a>
         ))
       }

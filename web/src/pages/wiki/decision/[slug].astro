@@ -54,18 +54,18 @@ const total = corrected.reduce((sum, section) => sum + section.corrections, 0);
 ---
 
 <Base
-  title={decision.slug}
+  title={decision.title}
   description={summarize(decision.summary, 180)}
   image={routes.og.wikiDecision(decision.slug)}
-  imageAlt={`${decision.slug} — a decision record behind the Ohio school funding corpus`}
+  imageAlt={`${decision.title} — a decision record behind the Ohio school funding corpus`}
   section="decisions"
 >
   <p class="crumb">
     <a href="/wiki">The corpus</a> › <a href="/wiki/decision">Decisions</a>
   </p>
-  <h1 class="slug-title">{decision.slug}</h1>
+  <h1>{decision.title}</h1>
   <p class="sub">
-    A decision record{
+    A decision record · <code>{decision.slug}</code>{
       decision.citedBy.length > 0
         ? ` · cited by ${decision.citedBy.length} ${decision.citedBy.length === 1 ? "page" : "pages"}`
         : ""
