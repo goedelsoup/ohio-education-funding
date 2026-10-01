@@ -451,6 +451,62 @@ test.describe("the tip's dismissal", () => {
 });
 
 /**
+ * Where the tip is placed (#600). It went below and right of the pointer and was clamped on the
+ * right only, so a chart scrolled to the foot of the window put the tip under the fold: 5 of 8
+ * hovers on `/statewide` at 1280x800, and 6 of 10 on a district page.
+ */
+test.describe("the tip's placement", () => {
+  /** Scroll the chart's foot to the window's, and return a point on its lowest mark. */
+  const lowest = async (page: Page, route: string) => {
+    await page.goto(route);
+    const chart = page.locator("svg.plot:visible").filter({ has: page.locator("[data-hover]") }).last();
+    await chart.scrollIntoViewIfNeeded();
+    await chart.evaluate((svg) => window.scrollBy(0, svg.getBoundingClientRect().bottom - window.innerHeight));
+    await settled(page);
+    const at = await chart.evaluate((svg) => {
+      const boxes = [...svg.querySelectorAll("[data-hover]")]
+        .map((mark) => mark.getBoundingClientRect())
+        .filter((box) => box.width > 0 && box.height > 0 && box.bottom <= window.innerHeight);
+      const box = boxes.reduce((low, box) => (box.bottom > low.bottom ? box : low));
+      // Its lower edge, where a pointer still reads it: the lowest place a hover can be.
+      return { x: box.left + box.width / 2, y: box.bottom - 2 };
+    });
+    return at;
+  };
+  const inside = async (page: Page, at: { y: number }) => {
+    const tip = page.locator("#tip");
+    await expect(tip, "the tip is raised").toBeVisible();
+    const box = (await tip.boundingBox())!;
+    const { width, height } = page.viewportSize()!;
+    // Or the check passes on a mark with room below it, and measures nothing.
+    expect(at.y + 12 + box.height, "below the mark, the tip would have run off").toBeGreaterThan(height);
+    expect(box.y, "the tip's top is on screen").toBeGreaterThanOrEqual(0);
+    expect(box.y + box.height, "the tip's foot is on screen").toBeLessThanOrEqual(height);
+    expect(box.x, "the tip's left is on screen").toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width, "the tip's right is on screen").toBeLessThanOrEqual(width);
+  };
+
+  for (const route of ["/statewide", "/counties", "/district/043802"]) {
+    test(`a hover at the foot of the window keeps the tip on screen on ${route}`, async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 800 });
+      const at = await lowest(page, route);
+      await page.mouse.move(at.x, at.y);
+      await inside(page, at);
+    });
+  }
+
+  test.describe("on a phone", () => {
+    test.use({ hasTouch: true, viewport: { width: 375, height: 812 } });
+
+    test("a tap at the foot of the window keeps the tip on screen", async ({ page }) => {
+      const at = await lowest(page, "/statewide");
+      await page.touchscreen.tap(at.x, at.y);
+      await inside(page, at);
+    });
+  });
+});
+
+/**
  * The pointer, the keys and a tap, made to agree (#614).
  *
  * The keyboard lit the pair; a hover on six of nine forms raised a tip and changed nothing on the
