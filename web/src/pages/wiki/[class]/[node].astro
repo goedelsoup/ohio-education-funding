@@ -371,7 +371,7 @@ const worked = node.className === "scenario" && !draft;
  * 200 rather than 160, matching `/wiki/[class]`: a preview card shows more than a snippet does,
  * and the extra words cost a reader of the snippet nothing.
  */
-const metaDescription = summarize(node.summary, 200);
+const metaDescription = summarize(node.summary, 200, node.className);
 
 const seeded = node.properties.find((p) => p.name === "seeded_because");
 

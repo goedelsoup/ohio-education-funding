@@ -132,7 +132,7 @@ const recentlyCorrected = corpus.decisions
                   <a href={routes.wikiClass(c!.className)}>{c!.label}</a>
                   <span class="n"> {c!.nodes.length}</span>
                 </th>
-                <td>{firstSentence(c!.description)}</td>
+                <td>{firstSentence(c!.description, c!.className)}</td>
               </tr>
             ))
           }

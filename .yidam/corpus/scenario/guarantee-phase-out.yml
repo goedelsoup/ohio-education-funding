@@ -491,7 +491,7 @@ findings: |
   The foundation column moved too, and `[K]` is not why. It reads **+$106.6M** at two per cent
   where this node published **+$95.4M**, because `base_cost_scale` was given the categoricals
   priced in base cost on 2026-08-09 — recorded at
-  [`the-scenario-models-ohio`](../../decisions/scenario-models-ohio.yml), forty days before the
+  [`scenario-models-ohio`](../../decisions/scenario-models-ohio.yml), forty days before the
   backstop was modeled at all. The two corrections run opposite ways and nearly cancel:
   **+$11.2M** of categorical scaling against **-$5.0M** of clawback, which is the whole of the
   $6.3M between the figure this node published and the one it now reports. That is the hazard in
@@ -865,7 +865,7 @@ revisions:
       the `on guarantee` count because that column is decided inside realized aid and so cannot be
       reached by a device paid downstream of it. First bad commit `66e2312`, whose own message
       states the mechanism and whose decision is recorded at
-      [`the-scenario-models-ohio`](../../decisions/scenario-models-ohio.yml). Probing its tree
+      [`scenario-models-ohio`](../../decisions/scenario-models-ohio.yml). Probing its tree
       directly returns $106,645,239.28, to the cent what the crate returns today, so nothing in
       the intervening forty days moved the column again.
     reach: |

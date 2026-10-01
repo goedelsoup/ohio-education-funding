@@ -108,6 +108,9 @@ const STRIPPED = [...TAGS, "unentered"] as const;
  */
 const SEPARATOR = /^[\s,;:—–]/;
 
+/** A link target that is already a URL rather than a path into the corpus. */
+const ABSOLUTE = /^(https?:|mailto:|#|\/)/;
+
 let processor: Awaited<ReturnType<typeof createMarkdownProcessor>> | null = null;
 
 /**
@@ -118,7 +121,7 @@ let processor: Awaited<ReturnType<typeof createMarkdownProcessor>> | null = null
  */
 function rewriteLinks(markdown: string, fromClass: string): string {
   return markdown.replace(/\]\(([^)\s]+)\)/g, (whole, target: string) => {
-    if (/^(https?:|mailto:|#|\/)/.test(target)) return whole;
+    if (ABSOLUTE.test(target)) return whole;
     return `](${resolveTarget(target, fromClass).href})`;
   });
 }
@@ -398,6 +401,8 @@ function anchorHeadings(html: string): string {
 interface Citable {
   /** The link, named in the convention for its kind. */
   link: string;
+  /** The same name as plain text, for a {@link summarize} that has no markup to set it in. */
+  name: string;
   /** `bridge-formula` and `parameter/bridge-formula`; a label that is neither is the author's own. */
   stems: readonly string[];
 }
@@ -421,6 +426,7 @@ function citables(): Map<string, Citable> {
     const href = routes.wikiNode(node.className, node.name);
     citable.set(href, {
       link: `<a href="${href}">${escapeHtml(node.label)}</a>`,
+      name: node.label,
       stems: [node.name, node.id],
     });
   }
@@ -428,6 +434,7 @@ function citables(): Map<string, Citable> {
     const href = routes.wikiSource(source.slug);
     citable.set(href, {
       link: `<a href="${href}"><cite>${escapeHtml(source.title)}</cite></a>`,
+      name: source.title,
       stems: [source.slug, `catalog/${source.slug}`],
     });
   }
@@ -436,6 +443,7 @@ function citables(): Map<string, Citable> {
     const href = routes.wikiDecision(decision.slug);
     citable.set(href, {
       link: `“<a href="${href}">${escapeHtml(decision.title)}</a>”`,
+      name: `“${decision.title}”`,
       stems: [decision.slug, `decisions/${decision.slug}`],
     });
   }
@@ -465,12 +473,29 @@ function citables(): Map<string, Citable> {
  */
 export function nameCitations(html: string): string {
   return html.replace(
-    /<a href="(\/wiki\/[^"]+)">(?:<code>([^<]+)<\/code>|([a-z0-9]+(?:[-/][a-z0-9]+)+))<\/a>/g,
-    (whole, href: string, code: string | undefined, plain: string | undefined) => {
-      const target = citables().get(href);
-      return target?.stems.includes(code ?? plain!) ? target.link : whole;
-    },
+    new RegExp(`<a href="(/wiki/[^"]+)">(?:<code>([^<]+)</code>|(${SLUG}))</a>`, "g"),
+    (whole, href: string, code: string | undefined, plain: string | undefined) =>
+      cited(href, code ?? plain!)?.link ?? whole,
   );
+}
+
+/** A label written without backticks that may still be a stem: hyphenated, or with its directory. */
+const SLUG = "[a-z0-9]+(?:[-/][a-z0-9]+)+";
+
+/** The page at `href`, when `label` is one of the stems it is cited by. See {@link nameCitations}. */
+function cited(href: string, label: string): Citable | undefined {
+  const target = citables().get(href);
+  return target?.stems.includes(label) ? target : undefined;
+}
+
+/**
+ * The plain name of the page a markdown link cites by its stem; undefined when the label is the
+ * author's own. {@link nameCitations}' rule, read off the markdown for {@link summarize} (#606).
+ */
+function citedName(label: string, target: string, fromClass: string): string | undefined {
+  const stem = /^`([^`]+)`$/.exec(label)?.[1] ?? (new RegExp(`^${SLUG}$`).test(label) ? label : undefined);
+  if (stem === undefined || ABSOLUTE.test(target)) return undefined;
+  return cited(resolveTarget(target, fromClass).href, stem)?.name;
 }
 
 /**
@@ -790,12 +815,17 @@ export function renderPropertyValue(value: string, fromClass: string): string {
  * The order below matters: links lose their targets before claim tags are removed, so a tag whose
  * justification *is* a link — `[verified — [the department's page](…)]` — has become
  * `[verified — the department's page]` and is then removed whole.
+ *
+ * `fromClass` is what a relative link is relative to, as for {@link renderProse}: a link citing its
+ * target by stem has to be resolved before it can be named, and left as it is it reads
+ * "decisions/report-card-connector" on a link-preview card.
  */
-export function summarize(markdown: string, max: number): string {
+export function summarize(markdown: string, max: number, fromClass: string): string {
   let text = markdown
     // A link keeps its label and loses its target. Deleting the label with it is what produced
-    // "the suburban counterpart to  eleven miles away across the Maumee".
-    .replace(/\[([^[\]]*)\]\([^)\s]*\)/g, "$1")
+    // "the suburban counterpart to  eleven miles away across the Maumee". A label that is the
+    // target's stem gives way to the target's name, as it does on the rendered page (#606).
+    .replace(/\[([^[\]]*)\]\(([^)\s]*)\)/g, (_, label: string, target: string) => citedName(label, target, fromClass) ?? label)
     // Block markers, which say nothing once the line breaks are gone.
     .replace(/^\s{0,3}#{1,6}\s+/gm, "")
     .replace(/^\s{0,3}>\s?/gm, "")
@@ -835,8 +865,8 @@ export function summarize(markdown: string, max: number): string {
  * or an abbreviation the corpus writes mid-sentence — "U.S. Department", "DeRolph v. State". A lone
  * capital does end one: `revenue-stream`'s definition closes on "federal Title I."
  */
-export function firstSentence(markdown: string): string {
-  const text = summarize(markdown, Infinity);
+export function firstSentence(markdown: string, fromClass: string): string {
+  const text = summarize(markdown, Infinity, fromClass);
   const end = /(?<!\.[A-Z]|\b(?:v|vs|e\.g|i\.e|No|St))[.!?](?=\s+[A-Z“"(])/.exec(text);
   return end ? text.slice(0, end.index + 1) : text;
 }

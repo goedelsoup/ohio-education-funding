@@ -36,7 +36,7 @@ export function classCard(entry: OntologyClass): Card {
     //
     // 110 is the note limit `render` applies to a card that has a figure. Cutting to the same
     // length here means one ellipsis rather than a summary that is then truncated again.
-    figureNote: summarize(entry.description, 110),
+    figureNote: summarize(entry.description, 110, entry.className),
     meta: entry.foundationalType ? `Ontology class · ${entry.foundationalType}` : "Ontology class",
   };
 }

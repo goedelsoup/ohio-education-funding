@@ -9,7 +9,7 @@
  */
 import Base from "../../../layouts/Base.astro";
 import { NAMES } from "../../../lib/nav.ts";
-import { loadCorpus } from "../../../lib/corpus.ts";
+import { FROM_DECISION, loadCorpus } from "../../../lib/corpus.ts";
 import { summarize } from "../../../lib/prose.ts";
 import { compare } from "../../../lib/order.ts";
 import * as routes from "../../../lib/routes.ts";
@@ -66,7 +66,7 @@ const withdrawals = decisions.reduce((sum, decision) => sum + decision.correctio
               <tr>
                 <th>
                   <a href={routes.wikiDecision(decision.slug)}>{decision.title}</a>
-                  <span class="row-note">{summarize(decision.summary, 200)}</span>
+                  <span class="row-note">{summarize(decision.summary, 200, FROM_DECISION)}</span>
                 </th>
                 <td>
                   {decision.corrections === 0 ? (

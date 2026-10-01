@@ -45,24 +45,24 @@ test("no decision slug carries a word sentence case cannot spell", () => {
 });
 
 test("firstSentence ends where the author ended the sentence, not at an initial", () => {
-  expect(firstSentence("Run by the U.S. Department of Education. It is a Kind.")).toBe(
+  expect(firstSentence("Run by the U.S. Department of Education. It is a Kind.", "district")).toBe(
     "Run by the U.S. Department of Education.",
   );
-  expect(firstSentence("Paid as federal Title I. It is a Relator.")).toBe("Paid as federal Title I.");
-  expect(firstSentence("Decided in *DeRolph v. State* in 1997. An Event.")).toBe(
+  expect(firstSentence("Paid as federal Title I. It is a Relator.", "district")).toBe("Paid as federal Title I.");
+  expect(firstSentence("Decided in *DeRolph v. State* in 1997. An Event.", "district")).toBe(
     "Decided in DeRolph v. State in 1997.",
   );
-  expect(firstSentence("Paid under [the formula](../x.md) [verified]. It is a Quality.")).toBe(
+  expect(firstSentence("Paid under [the formula](../x.md) [verified]. It is a Quality.", "district")).toBe(
     "Paid under the formula.",
   );
-  expect(firstSentence("One sentence and nothing after it")).toBe("One sentence and nothing after it");
+  expect(firstSentence("One sentence and nothing after it", "district")).toBe("One sentence and nothing after it");
 });
 
 test("every class blurb is a whole definition with no ontology vocabulary in it", () => {
   const { classes } = loadCorpus();
   expect(classes.length).toBeGreaterThan(15);
   const bad = classes
-    .map((c) => ({ name: c.className, blurb: firstSentence(c.description) }))
+    .map((c) => ({ name: c.className, blurb: firstSentence(c.description, c.className) }))
     .filter(({ blurb }) => !/[.!?]$/.test(blurb) || ONTOLOGY_TYPE.test(blurb) || blurb.length > 400);
   expect(bad).toEqual([]);
 });
