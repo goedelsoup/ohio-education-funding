@@ -46,6 +46,7 @@ import {
   WIDTHS,
 } from "../../src/lib/plot/spec.ts";
 import { renderPanelToString, renderToString } from "../../src/lib/plot/ssr.ts";
+import { ORDINAL, SERIES } from "../../src/lib/plot/tokens.ts";
 
 /** How many layouts `renderToString` emits: one per width in `WIDTHS`. */
 const DRAWINGS = Object.keys(WIDTHS).length;
@@ -1191,4 +1192,66 @@ test("a chart's own words start with a capital, whatever the caller wrote", () =
   expect(svg).toContain(">Assessed valuation per pupil<");
   expect(svg).toContain("State aid per pupil");
   expect(svg).not.toMatch(/>(assessed|state aid)/);
+});
+
+/**
+ * A chart's words are ink, never a mark's colour (#600). The series hues are picked to separate
+ * from each other, not to be read: at 12px the light guarantee mark measured 3.12:1 on the card,
+ * the light formula mark 4.30:1. A label names its series in the text token of that hue, and the
+ * line or dot beside it carries the mark colour.
+ *
+ * Rendered rather than read off the marks, so a fill passed as a function, or inherited from a
+ * group, is caught as well as a constant.
+ */
+test("no chart text is filled with a series or ordinal mark colour", () => {
+  const marks = new Set<string>([...Object.values(SERIES), ...ORDINAL]);
+  const fan: FanPoint[] = [2025, 2026, 2027].map((year, i) => ({
+    year,
+    point: 100 + i,
+    low: 99 + i,
+    high: 101 + i,
+    observed: i === 0,
+    reference: 98 + i,
+  }));
+  const traced: Trace[] = (["formula", "guarantee"] as const).map((series, i) => ({
+    label: `${series} trace`,
+    series,
+    points: [{ x: 10_000, y: 50 + i }, { x: 20_000, y: 55 + i }],
+  }));
+  const strip = [-0.08, -0.03, -0.01, 0.02, 0.05, 0.09].map((value) => ({ value, hover: `${value}` }));
+  const builds: [string, (width: number) => Spec | null][] = [
+    ["bar", (width) => barSpec([{ label: "Ohio", value: 45, current: true }, { label: "Utah", value: -3 }], { width })],
+    ["scatter", (width) => scatterSpec(cloud(Array.from({ length: 30 }, (_, i) => i)), AXES, traced, { width })],
+    ["plane", (width) => planeSpec(rules(), PLANE_AXES, { width, ...PLANE_FRAME })],
+    ["rank", (width) => rankSpec(census([554, 499, 43, 1, 0]), COUNT, { width })],
+    ["range", (width) => rangeSpec([{ label: "row", low: 1, high: 2, hover: "row" }], COUNT, { width })],
+    ["distribution", (width) => distributionSpec(strip, { width, format: (v) => pct(v, 0) })],
+    ["fan", (width) => fanSpec(fan, (v) => `${v}`, () => "", { width })],
+    [
+      "series",
+      (width) =>
+        seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", {
+          width,
+          tick: (at) => `${at}`,
+          reference: { value: 0.683, label: "what it claims" },
+        }),
+    ],
+  ];
+
+  const offenders: string[] = [];
+  let texts = 0;
+  for (const [form, build] of builds) {
+    const { document } = parseHTML(`<div>${renderToString(build, "presentational")}</div>`);
+    for (const text of document.querySelectorAll("svg text")) {
+      texts++;
+      let fill: string | null = null;
+      for (let at: Element | null = text; at && fill == null; at = at.parentElement) {
+        fill = at.getAttribute("fill");
+      }
+      if (fill != null && marks.has(fill)) offenders.push(`${form}: "${text.textContent}" in ${fill}`);
+    }
+  }
+  // Every form drew words, or the scan passed on nothing.
+  expect(texts).toBeGreaterThan(builds.length * DRAWINGS);
+  expect(offenders).toEqual([]);
 });

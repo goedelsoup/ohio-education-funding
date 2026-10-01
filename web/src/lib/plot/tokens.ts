@@ -39,6 +39,20 @@ export const SERIES = {
 } as const;
 
 /**
+ * The categorical pair as ink, for a label that names one of the two series.
+ *
+ * A mark's hue is chosen to separate from the other mark, not to be read as text: at 12px and
+ * weight 400 the light guarantee mark measured 3.12:1 on the card and the light formula mark
+ * 4.30:1, both under 4.5:1 (#600). These are the same hues moved to text contrast — the pair
+ * `.gain` and `.loss` already wear — so a label still says which line it ends, and the line or
+ * dot beside it keeps the mark colour.
+ */
+export const SERIES_TEXT = {
+  formula: "var(--series-formula-text)",
+  guarantee: "var(--series-guarantee-text)",
+} as const;
+
+/**
  * The ordinal ramp: three steps of one hue, light to dark.
  *
  * Separate from {@link SERIES} because it answers a different question. The pair above is

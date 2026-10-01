@@ -44,7 +44,7 @@ import type {
   SeriesPoint,
   Trace,
 } from "../chart.ts";
-import { INK, ORDINAL, SERIES } from "./tokens.ts";
+import { INK, ORDINAL, SERIES, SERIES_TEXT } from "./tokens.ts";
 import { firstOf, lastOf } from "../ends.ts";
 import { fiscalYear } from "../yearLabel.ts";
 
@@ -1684,7 +1684,8 @@ export function scatterSpec(
                   dx: 8,
                   text: () => trace.label,
                   textAnchor: "start",
-                  fill: traceHue(trace),
+                  // A banded trace is not labelled here, so the label is always one of the pair.
+                  fill: SERIES_TEXT[trace.series],
                   className: "scatter-trace-end",
                 }),
               ]),
@@ -3123,7 +3124,7 @@ export function fanSpec(
                 dx: 8,
                 text: () => format(last.reference ?? 0),
                 textAnchor: "start",
-                fill: SERIES.guarantee,
+                fill: SERIES_TEXT.guarantee,
                 className: "fan-bound reference",
               }),
             ]
@@ -3289,7 +3290,7 @@ export function seriesSpec(
       className,
     });
 
-  const endLabel = (point: SeriesPoint | undefined, key: "a" | "b", stroke: string) =>
+  const endLabel = (point: SeriesPoint | undefined, key: "a" | "b", ink: string) =>
     point
       ? [
           Plot.text([point], {
@@ -3298,7 +3299,7 @@ export function seriesSpec(
             dx: 8,
             text: () => endText(point, key),
             textAnchor: "start",
-            fill: stroke,
+            fill: ink,
             className: "series-end",
           }),
         ]
@@ -3364,8 +3365,8 @@ export function seriesSpec(
         ...reference,
         line("a", SERIES.formula, "series-a"),
         line("b", SERIES.guarantee, "series-b"),
-        ...endLabel(endA, "a", SERIES.formula),
-        ...endLabel(endB, "b", SERIES.guarantee),
+        ...endLabel(endA, "a", SERIES_TEXT.formula),
+        ...endLabel(endB, "b", SERIES_TEXT.guarantee),
         Plot.ruleY([min], { stroke: INK.rule, className: "axis" }),
         ...foot.marks,
         // One full-height column per year, above every mark, as the fan chart does.

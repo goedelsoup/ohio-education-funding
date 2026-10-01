@@ -389,23 +389,33 @@ export function attachValues(root: HTMLElement, tip: HTMLElement, said: HTMLElem
   /** The mark the keyboard cursor is on, if a keyboard put it there. */
   let at: Element | null = null;
 
-  const put = (left: number, top: number) => {
+  /*
+   * Below the point and to its right, unless that runs off the window. Both edges were clamped on
+   * the right only, so a mark near the bottom of a chart scrolled to the foot of the screen put its
+   * tip under the fold — 5 of 8 hovers on `/statewide` at 1280x800, one with its foot at y=834
+   * (#600). Past the bottom, the tip goes above `above`: the pointer, or the mark's top edge when a
+   * keyboard or a tap placed it, so it never covers the mark it is reading out.
+   */
+  const put = (left: number, top: number, above = top) => {
     const pad = 12;
-    tip.style.left = `${Math.min(left + pad, window.innerWidth - tip.offsetWidth - pad)}px`;
-    tip.style.top = `${top + pad}px`;
+    const { offsetWidth: width, offsetHeight: height } = tip;
+    const x = Math.min(left + pad, window.innerWidth - width - pad);
+    const y = top + pad + height > window.innerHeight - pad ? above - pad - height : top + pad;
+    tip.style.left = `${Math.max(pad, x)}px`;
+    tip.style.top = `${Math.max(pad, y)}px`;
   };
 
   /** The mark the tip is reading out, however it got there, and where that mark was then. */
   let shown: Element | null = null;
   let shownAt = { left: 0, top: 0 };
 
-  const show = (mark: Element, left: number, top: number) => {
+  const show = (mark: Element, left: number, top: number, above = top) => {
     tip.textContent = mark.getAttribute("data-hover") ?? "";
     tip.hidden = false;
     shown = mark;
     const box = mark.getBoundingClientRect();
     shownAt = { left: box.left, top: box.top };
-    put(left, top);
+    put(left, top, above);
   };
 
   const hide = () => {
@@ -417,7 +427,7 @@ export function attachValues(root: HTMLElement, tip: HTMLElement, said: HTMLElem
   /** Show the value at a mark's own position, for the two ways in that have no cursor position. */
   const showAtMark = (mark: Element) => {
     const box = mark.getBoundingClientRect();
-    show(mark, box.left + box.width / 2, box.bottom);
+    show(mark, box.left + box.width / 2, box.bottom, box.top);
   };
 
   /**
