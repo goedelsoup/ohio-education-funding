@@ -332,7 +332,11 @@ test.describe("a table that scrolls sideways", () => {
             // inside it was what escaped.
             const box = (name.firstElementChild ?? name).getBoundingClientRect();
             const beside = value.getBoundingClientRect();
-            return box.right > beside.left + 1 ? [`${name.textContent?.trim()}`] : [];
+            // Intersection in both axes rather than "right of the value's left edge": below 500px
+            // a name/value row stacks (#578), the name above its value and the full column wide.
+            const across = box.right > beside.left + 1 && box.left < beside.right - 1;
+            const down = box.bottom > beside.top + 1 && box.top < beside.bottom - 1;
+            return across && down ? [`${name.textContent?.trim()}`] : [];
           }),
         );
         expect(overlaps, `${route} at ${width}px`).toEqual([]);

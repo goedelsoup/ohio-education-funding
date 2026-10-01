@@ -810,7 +810,6 @@ tr.series-break > td {
   flex-wrap: wrap;
   gap: var(--space-4) var(--space-7);
   margin: 0 0 var(--space-8);
-  max-width: var(--measure-note);
 }
 .facts > div {
   display: flex;
@@ -1470,9 +1469,15 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
  *
  * Below 1000px none of this applies: the wrapper is a block, the list sits above the first card as
  * it does on every other route, and `main` keeps the reading width.
+ *
+ * All four district tabs open the wrapper, not just the dashboard (#578). With it on one tab only,
+ * `main` was 1180px there and 900px on the other three, so the heading and the tab strip jumped
+ * 140px sideways on every tab click. The footer widens in the same rule because it is sized from
+ * the layout's `wide` prop, which no district route sets, and was left 900px under a 1180px page.
  */
 @media (min-width: 1000px) {
-  main:has(> .rail-layout) { max-width: var(--wrap-wide); }
+  main:has(> .rail-layout),
+  body:has(main > .rail-layout) footer.site > .wrap { max-width: var(--wrap-wide); }
   .rail-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 13.5rem;
@@ -1531,6 +1536,10 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
   margin: var(--space-5) 0 0;
   max-width: var(--measure-note);
 }
+/* A note that is the page's own lede, directly in `main`, is followed by the first card. With a top
+   margin only it sat flush against that card on `/county/*` and `/house/*` (#578); this is the gap
+   `.lead` leaves before the first card on the routes that open with one. */
+main > .note { margin-bottom: var(--space-6); }
 .note code {
   background: var(--surface-inset);
   padding: .1rem var(--space-2);
@@ -1721,6 +1730,19 @@ table.prose { table-layout: fixed; }
  * opportunity in them at all, which is the case `break-word` declines to handle.
  */
 table.prose th, table.prose th code { overflow-wrap: anywhere; }
+/*
+ * On a phone a name/value row stacks: the name above its value, each the full column (#578).
+ *
+ * At 375px the 32% name column is 94px, and the home page's questions — links a reader is meant to
+ * follow — wrapped to four lines each. Below 500px there is no width at which two columns of
+ * sentences both read, so the row stops being two columns. `.spanning-*` rows already stack. A
+ * prose table with a header row is a listing with columns, not a name/value list, and keeps them.
+ */
+@media (max-width: 500px) {
+  table.prose:not(:has(thead)),
+  table.prose:not(:has(thead)) :is(tbody, tr, th, td) { display: block; }
+  table.prose:not(:has(thead)) th { width: auto; border-bottom: 0; padding-bottom: 0; }
+}
 pre.aligned {
   overflow-x: auto;
   margin: 0;

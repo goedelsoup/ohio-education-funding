@@ -321,3 +321,46 @@ test.describe("every card has an address", () => {
     await expect(link).toContainText("the tax base each pupil stands on");
   });
 });
+
+test.describe("the room a card is given", () => {
+  test("the first card stands clear of the note or lede above it, on every route family", async ({
+    page,
+  }) => {
+    /*
+     * A lede `.note` had a top margin and no bottom one, so on `/county/*` and `/house/*` the first
+     * card sat flush against it — 0px, against 18px on the routes that open with a `.lead` and 52px
+     * between cards (#578). The floor is the `.lead`'s 1.1rem, 17.6px.
+     */
+    for (const route of ["/county/ottawa", "/house/090", "/senate/003", "/counties", "/house"]) {
+      await page.goto(route);
+      const gap = await page.evaluate(() => {
+        const card = document.querySelector("main .card");
+        if (!card) return null;
+        const top = card.getBoundingClientRect().top;
+        // The lowest edge of anything in `main` before the card that is not one of its ancestors.
+        let bottom = -Infinity;
+        for (const n of document.querySelectorAll("main *")) {
+          if (n === card) break;
+          if (n.contains(card)) continue;
+          const r = n.getBoundingClientRect();
+          if (r.height > 0) bottom = Math.max(bottom, r.bottom);
+        }
+        return top - bottom;
+      });
+      expect(gap, `${route} has no card`).not.toBeNull();
+      expect(gap!, `the first card on ${route} sits against what is above it`).toBeGreaterThanOrEqual(17.5);
+    }
+  });
+
+  test("on a phone, no question on the home page wraps past two lines", async ({ page }) => {
+    // The name column of a two-column prose table is 32%, 94px at 375, and each question link
+    // wrapped to four lines (#578). Below 500px the rows stack instead.
+    await page.setViewportSize({ width: 375, height: 800 });
+    await page.goto("/");
+    const links = page.locator("#three-questions table.prose th a");
+    await expect(links).toHaveCount(3);
+    // An inline element has one client rect per line box it occupies.
+    const lines = await links.evaluateAll((nodes) => nodes.map((n) => n.getClientRects().length));
+    for (const count of lines) expect(count, `a question takes ${count} lines`).toBeLessThanOrEqual(2);
+  });
+});

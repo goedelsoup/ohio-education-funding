@@ -427,3 +427,55 @@ test.describe("the money no other figure on the site counts", () => {
     await expect(card.locator('a[href$="/finances#casino"]')).toHaveCount(1);
   });
 });
+
+test.describe("the four tabs are one page", () => {
+  test("the heading and the tabs sit at one x on every tab, over a footer as wide as the page", async ({
+    page,
+  }) => {
+    /*
+     * The dashboard opened the rail layout and the other three did not, so `main` was 1180px on
+     * one tab and 900px on three: the h1 and the tab strip moved 140px sideways on every click,
+     * and the footer stayed 900px under the 1180px dashboard (#578). 1280 is a width where the
+     * two measures differ; below 1000 both are the reading width and nothing can move.
+     */
+    await page.setViewportSize({ width: 1280, height: 900 });
+    const xs: number[] = [];
+    for (const tab of ["", "/finances", "/outcome", "/taxes"]) {
+      await page.goto(`/district/${CLEVELAND}${tab}`);
+      const box = (selector: string) =>
+        page.locator(selector).evaluate((n) => {
+          const r = n.getBoundingClientRect();
+          return { x: r.x, width: r.width };
+        });
+      const h1 = await box("main h1");
+      const subnav = await box("main .subnav");
+      expect(subnav.x, `the tabs and the heading part on ${tab || "the dashboard"}`).toBe(h1.x);
+      xs.push(h1.x);
+      const main = await box("main");
+      const footer = await box("footer.site > .wrap");
+      expect(footer, `the footer is not the page's width on ${tab || "the dashboard"}`).toEqual(main);
+    }
+    expect(new Set(xs).size, `the heading moves between tabs: ${xs.join(", ")}`).toBe(1);
+  });
+});
+
+test.describe("the identity line", () => {
+  test("House seats are listed by number, as the Senate seats are", async ({ page }) => {
+    // The feed orders them largest census-block share first, which nothing on the line said: a
+    // reader saw "3, 1, 2, 9, 6, 10…" beside a Senate list in order (#578).
+    await page.goto(`/district/${CLEVELAND}`);
+    const identity = page.locator('[data-part="identity"]');
+    for (const chamber of ["House", "Senate"]) {
+      const seats = await identity
+        .locator("div", { has: page.locator("dt", { hasText: new RegExp(`^${chamber}$`) }) })
+        .locator("dd a")
+        .allTextContents();
+      expect(seats.length, `${chamber} lists no seat`).toBeGreaterThan(1);
+      expect(seats.map(Number), `${chamber} seats are out of order`).toEqual(
+        seats.map(Number).toSorted((a, b) => a - b),
+      );
+    }
+    // The model's district count is not a fact about this district, and it took a row of its own.
+    await expect(identity).not.toContainText("In the model");
+  });
+});

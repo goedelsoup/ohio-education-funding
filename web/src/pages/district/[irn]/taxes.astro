@@ -63,6 +63,10 @@ const description = latest
 
   <DistrictNav irn={district.irn} current="taxes" />
 
+  {/* The dashboard's rail layout, so the heading, the tabs and the cards sit at one x on all four
+      tabs (#578). The rail holds this page's contents list when it has one. */}
+  <div class="rail-layout"><div class="rail-main">
+
   {
     !latest ? (
       <div class="card" id="not-published" data-part="not-published">
@@ -158,4 +162,5 @@ const description = latest
       </>
     )
   }
+  </div></div>
 </Base>

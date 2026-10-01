@@ -41,6 +41,10 @@ const description =
 
   <DistrictNav irn={district.irn} current="outcome" />
 
+  {/* The dashboard's rail layout, so the heading, the tabs and the cards sit at one x on all four
+      tabs (#578). The rail holds this page's contents list when it has one. */}
+  <div class="rail-layout"><div class="rail-main">
+
   <Fragment set:html={renderOutcomeContext(bundle, district)} />
   <Fragment set:html={renderDistrictOutcome(district, bundle.statewide.outcomes)} />
 
@@ -89,4 +93,5 @@ const description =
       >.
     </p>
   </div>
+  </div></div>
 </Base>
