@@ -310,4 +310,38 @@ describe("document semantics", () => {
     expect(chips, "the build carries chips at all").toBeGreaterThan(10_000);
     expect(bad.slice(0, 5)).toEqual([]);
   });
+
+  test("a chart's name is one sentence, and its words start a sentence", () => {
+    /*
+     * #612 counted 504 axis-foot texts and 18 series end labels starting lower-case beside the
+     * capitalised legends, and a name that ran to 577 characters because the method was appended
+     * to it. The method is a `<desc>` now, and `axisFoot`, `yTitle` and the series end labels
+     * capitalise what they are handed — so the census is over what they drew, not who called them.
+     *
+     * 250 is a name a screen reader can be skipped past; the longest left is about 230. A ".." is
+     * a sentence joined to one that already ended.
+     */
+    const length = (attr: string) => attr.replace(/&(#\d+|#x[0-9a-f]+|\w+);/gi, "x").length;
+    let named = 0;
+    const bad: string[] = [];
+    for (const file of pages()) {
+      const page = readFileSync(file, "utf8");
+      const at = file.slice(DIST.length + 1);
+      for (const svg of page.matchAll(/<svg\b[^>]*?\baria-label="([^"]*)"/g)) {
+        const name = svg[1] ?? "";
+        named += 1;
+        if (length(name) > 250) bad.push(`${at}: a ${length(name)}-character name`);
+        if (name.includes("..")) bad.push(`${at}: "${name}"`);
+      }
+      for (const group of page.matchAll(
+        /<g\b[^>]*\bclass="(axis-foot|axis-head|y-title|series-end|series-reference)"[^>]*>([\s\S]*?)<\/g>/g,
+      )) {
+        for (const text of (group[2] ?? "").matchAll(/<text\b[^>]*>(?:<tspan\b[^>]*>)?\s*([^<]*)/g)) {
+          if (/^\p{Ll}/u.test(text[1] ?? "")) bad.push(`${at}: ${group[1]} "${text[1]}"`);
+        }
+      }
+    }
+    expect(named, "the build names its charts at all").toBeGreaterThan(1_000);
+    expect(bad.slice(0, 5)).toEqual([]);
+  });
 });

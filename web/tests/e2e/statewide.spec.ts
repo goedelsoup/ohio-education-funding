@@ -131,7 +131,7 @@ test.describe("presentation", () => {
     await page.goto("/scenario?g=removed&arg=0.5&base=1.1&min=0.1&pb=1&pc=1&h=2026");
     const chart = page.locator('[data-chart="deltas"] svg.plot:visible');
     await expect(chart).toBeVisible();
-    await expect(chart).toContainText("no change");
+    await expect(chart).toContainText("No change");
     // Two hues and a neutral midpoint, never a hue at zero.
     await expect(chart.locator(".hist > *")).not.toHaveCount(0);
   });

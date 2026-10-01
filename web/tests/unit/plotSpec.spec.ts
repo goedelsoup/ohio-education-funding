@@ -134,7 +134,7 @@ test("a signed distribution draws its zero, and an unsigned one does not", () =>
   /*
    * The enrollment-change strip on `/districts` is the site's one signed distribution and drew no
    * zero reference, so a dot two thirds along could have been a district that grew or one that
-   * shrank. `histogramSpec` draws a dashed rule and labels it "no change" for exactly that reason.
+   * shrank. `histogramSpec` draws a dashed rule and labels it "No change" for exactly that reason.
    *
    * Detected from the domain rather than passed at the call site, which is what makes it reach
    * the sixth strip without anyone remembering. Every strip is one height, because every strip
@@ -146,14 +146,14 @@ test("a signed distribution draws its zero, and an unsigned one does not", () =>
   );
   expect(signed).not.toBeNull();
   expect(signed!.options.height).toBe(64);
-  expect(renderToString(() => signed, "presentational")).toContain("no change");
+  expect(renderToString(() => signed, "presentational")).toContain("No change");
 
   const unsigned = distributionSpec(
     [1, 2, 3, 4, 5, 6].map((value) => ({ value, hover: `${value}` })),
     { ...W, format: String },
   );
   expect(unsigned!.options.height).toBe(64);
-  expect(renderToString(() => unsigned, "presentational")).not.toContain("no change");
+  expect(renderToString(() => unsigned, "presentational")).not.toContain("No change");
 });
 
 /** Each `.axis-foot` text in a rendered drawing, with the x its `transform` places it at. */
@@ -845,12 +845,12 @@ test("the reference is drawn muted and once, not as a third series", () => {
       }),
     "presentational",
   );
-  expect(svg).toContain("what ±1σ claims");
+  expect(svg).toContain("What ±1σ claims");
   // The categorical pair is the two quantities. A reference in a third hue would read as a third.
   expect(svg).not.toContain("var(--series-c)");
   // Once per drawing, and the pair is drawn at every one of `WIDTHS`.
   for (const drawing of svg.split("<svg").slice(1)) {
-    expect((drawing.match(/what ±1σ claims/g) ?? []).length).toBe(1);
+    expect((drawing.match(/What ±1σ claims/g) ?? []).length).toBe(1);
   }
 });
 
@@ -863,7 +863,7 @@ test("both corner labels are the caller's, so a horizon is not written as a fisc
       }),
     "presentational",
   );
-  expect(svg).toContain("one year");
+  expect(svg).toContain("One year");
   expect(svg).toContain("3 years");
   // The `FY` prefix used to be written here rather than passed in, which is what made this form
   // unusable for the one caller whose index counts something else.
@@ -1122,4 +1122,48 @@ test("a spread's rules are told apart by dash, as their legend swatches are", ()
   expect(new Set(drawn).size).toBe(2);
   expect(new Set(rules.map((_, at) => ruleSwatch(at))).size).toBe(2);
   expect(() => ruleSwatch(rules.length)).toThrow(/no dash of its own/);
+});
+
+/**
+ * A chart's name is its finding, and the method is its description (#612).
+ *
+ * The description was appended to the name, and a screen reader speaks a name in full before a
+ * reader can move past the chart — 577 characters on `/method`. A name ending in a full stop and
+ * joined to that with ". " also read "down to 0..".
+ */
+test("a chart's description is a <desc>, not part of its name", () => {
+  const svg = renderToString(
+    (width) => barSpec([{ label: "One", value: 1, hover: "One: 1" }], { width }),
+    { label: "A chart that ends in a full stop.", description: "How it was cut." },
+  );
+  const { document } = parseHTML(`<!doctype html><html><body>${svg}</body></html>`);
+  const charts = [...document.querySelectorAll("svg.plot")];
+  expect(charts.length).toBeGreaterThan(0);
+  for (const chart of charts) {
+    expect(chart.getAttribute("aria-label")).toBe("A chart that ends in a full stop");
+    expect(chart.querySelector("desc")?.textContent).toBe("How it was cut.");
+  }
+});
+
+/**
+ * Every axis title, foot and end label is drawn in sentence case, whatever case the caller wrote
+ * it in (#612): one page said "assessed valuation per pupil" and the next "Formula aid per pupil".
+ */
+test("a chart's own words start with a capital, whatever the caller wrote", () => {
+  const svg = renderToString(
+    (width) =>
+      scatterSpec(
+        cloud([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]),
+        {
+          x: { label: "assessed valuation per pupil", format: String },
+          y: { label: "state aid per pupil", format: String },
+        },
+        [],
+        { width },
+      ),
+    { label: "a cloud" },
+  );
+  expect(svg).toContain(">Assessed valuation per pupil<");
+  expect(svg).toContain("State aid per pupil");
+  expect(svg).not.toMatch(/>(assessed|state aid)/);
 });

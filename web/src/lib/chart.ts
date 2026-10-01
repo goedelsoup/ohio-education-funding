@@ -10,6 +10,8 @@
  * two scenario routes. This module is imported by both halves and depends on neither.
  */
 
+import { unstop } from "./chartWords.ts";
+
 /** One bar. */
 export interface Bar {
   label: string;
@@ -372,7 +374,7 @@ export function openToKeyboard(svg: Element): void {
   svg.setAttribute("tabindex", "0");
   const named = svg.getAttribute("aria-label");
   if (named && !named.endsWith(CURSOR_HINT)) {
-    svg.setAttribute("aria-label", `${named}. ${CURSOR_HINT}`);
+    svg.setAttribute("aria-label", `${unstop(named)}. ${CURSOR_HINT}`);
   }
 }
 
