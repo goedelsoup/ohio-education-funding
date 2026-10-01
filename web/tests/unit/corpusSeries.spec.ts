@@ -345,9 +345,12 @@ test("a series becomes the bars the chart draws, signed and with a spoken value"
     { label: "Mineral", value: -0.0321, hover: "Mineral: −0.0321" },
     { label: "Public utility", value: -0.0159, hover: "Public utility: −0.0159" },
   ]);
-  // A hover the manifest gives is kept as given.
-  series.series[0]!.rows[0]!.hover = "Industrial, the wrong sign for a TPP reading";
-  expect(barsOf(series.series[0]!)[0]!.hover).toBe("Industrial, the wrong sign for a TPP reading");
+  // A hover the manifest gives is a note on the reading, and goes after it rather than in place of
+  // it: a bar's tooltip that never said its own value was the EdChoice "2024-25" bar (#612).
+  series.series[0]!.rows[0]!.hover = "the wrong sign for a TPP reading";
+  expect(barsOf(series.series[0]!)[0]!.hover).toBe(
+    "Industrial: +0.1175 — the wrong sign for a TPP reading",
+  );
   // And each unit is written the way its readers write it.
   expect(formatRow("share", -0.281)).toBe("−28.1%");
   expect(formatRow("dollars", 5_100_000)).toBe("+$5,100,000");
@@ -623,9 +626,10 @@ test("a cloud becomes one panel per outcome, every point under each, on the crat
     expect(panel.xDomain).toEqual([cloud.x.min, cloud.x.max]);
   }
   expect(panels[0]!.yDomain).toEqual([1e6, 1.8e10]);
-  // The tooltip says which district and where it sits on both axes, each in its own unit.
+  // The tooltip says which district and where it sits on both axes, each in its own unit, in the
+  // one pattern every composed hover takes (#612). "ADM" keeps its capitals.
   expect(panels[1]!.points[1]!.hover).toBe(
-    "Manchester Local: Enrolled ADM 673.6, Weighted wealth per resident pupil $162,000",
+    "Manchester Local — enrolled ADM: 673.6; weighted wealth per resident pupil: $162,000",
   );
   // The line arrives as a segment in the data's own units — nothing here fits anything.
   expect(panels[1]!.fit).toEqual({
@@ -842,8 +846,9 @@ test("a plane becomes one named place per rule, both coordinates signed and spok
   ]);
   // The hover carries both axes by name, because a dot on a plane says nothing on its own about
   // which measure is which — and it carries the sign, which is the finding.
+  // Each axis by the head of its title: "against the enacted anchor" is the axis's to say.
   expect(places[0]!.hover).toBe(
-    "1% cap at FY2036: Guarantee written −$107,611,729, Total state support +$10,287,444",
+    "1% cap at FY2036 — guarantee written: −$107,611,729; total state support: +$10,287,444",
   );
 });
 
@@ -1739,4 +1744,27 @@ test("every bar a column draws is read against a number: a value at its end or a
       expect(values > 0 || ends.length >= 2, `${series.key}: a drawing with no number on it`).toBe(true);
     }
   }
+});
+
+/**
+ * Every composed point hover over the committed manifest, in the one pattern (#612).
+ *
+ * The spreads' axis titles are full sentences — "The enrollment term: fewer pupils than in FY2020,
+ * in logs" — and a hover that glued two of them together ran past two hundred characters, with a
+ * capital "The" after a comma. Over the real titles rather than a fixture's, because it is the
+ * real titles that were too long.
+ */
+test("no committed cloud, plane or spread hover glues two axis titles together", () => {
+  const hovers = [
+    ...manifest.scatters.flatMap((cloud) => panelsOf(cloud).flatMap((p) => p.points)),
+    ...manifest.planes.flatMap((plane) => placesOf(plane)),
+    ...manifest.spreads.flatMap((spread) => regionsOf(spread).flatMap((p) => p.points)),
+  ].map((point) => point.hover ?? "");
+  expect(hovers.length, "the manifest has points to read").toBeGreaterThan(100);
+  for (const hover of hovers) {
+    expect(hover).not.toContain(", The ");
+    expect(hover).toMatch(/^[^—]+ — [^:;]+: [^;]+; [^:;]+: /);
+  }
+  // The longest is a district's name, two short axis names, two figures and a class.
+  expect(Math.max(...hovers.map((h) => h.length))).toBeLessThan(160);
 });

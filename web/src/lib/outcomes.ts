@@ -155,7 +155,7 @@ export function renderOutcomes(bundle: Bundle): string {
       x,
       perf,
       (d, dollars, index) =>
-        `${d.name}: ${money(dollars)} ${label}, Performance Index ${fixed(index, 1)}, ${pct(d.economically_disadvantaged ?? 0, 0)} economically disadvantaged`,
+        `${d.name}: ${money(dollars)} per ${label}, Performance Index ${fixed(index, 1)}, ${pct(d.economically_disadvantaged ?? 0, 0)} economically disadvantaged`,
       { band: (d) => povertyBands.get(d) },
     );
 

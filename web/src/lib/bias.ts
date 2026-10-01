@@ -217,10 +217,10 @@ function panel(p: Population, width: number, panelText: string): string {
         },
       ),
     {
-      label: `${p.curve.label}${panelText}. Two lines: the mean of the districts' log errors, ` +
-        `and the log of summed forecasts over summed actuals. The dashed rule is zero, which is ` +
-        `a forecast right on average`,
+      label: `${p.curve.label}${panelText}`,
       description:
+        `Two lines: the mean of the districts' log errors, and the log of summed forecasts over ` +
+        `summed actuals. The dashed rule is zero, which is a forecast right on average. ` +
         `The mean district runs ${logError(p.meanDistrict.first)} at one year and ` +
         `${logError(p.meanDistrict.last)} at ${p.deepest}; the state total ` +
         `${logError(p.total.first)} and ${logError(p.total.last)}. Both start under zero and end ` +

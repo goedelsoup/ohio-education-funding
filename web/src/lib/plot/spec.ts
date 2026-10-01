@@ -28,6 +28,7 @@
 
 import * as Plot from "@observablehq/plot";
 
+import { sentence, unstop } from "../chartWords.ts";
 import { escapeHtml } from "../format.ts";
 import type {
   Bar,
@@ -177,10 +178,19 @@ function applyNaming(node: Nameable, naming: Naming): void {
     return;
   }
   node.setAttribute("role", "img");
-  node.setAttribute(
-    "aria-label",
-    naming.description ? `${naming.label}. ${naming.description}` : naming.label,
-  );
+  node.setAttribute("aria-label", unstop(naming.label));
+  /*
+   * The description is the method — how the axis is cut, what a band means — and it was appended
+   * to the name, which a screen reader speaks in full before a reader can move past the chart: 577
+   * characters on `/method` (#612). In a `<desc>` it is the chart's accessible description
+   * instead, read after the name and only by a reader who stays to hear it.
+   */
+  if (naming.description && "ownerDocument" in node) {
+    const element = node as unknown as Element;
+    const desc = element.ownerDocument.createElementNS("http://www.w3.org/2000/svg", "desc");
+    desc.textContent = naming.description;
+    element.prepend(desc);
+  }
 }
 
 /**
@@ -572,7 +582,7 @@ const TITLE_LINE = 14;
  * past the first, so the top of the title stays where a one-line title has always been.
  */
 function yTitle(width: number, marginLeft: number, label: string, marginTop: number) {
-  const lines = wrapText(label, width - 8);
+  const lines = wrapText(sentence(label), width - 8);
   const extra = (lines.length - 1) * TITLE_LINE;
   /*
    * Plot sets a top-anchored text's first baseline at `0.71 × lineHeight` em, so a spacing given
@@ -592,6 +602,7 @@ function yTitle(width: number, marginLeft: number, label: string, marginTop: num
       ...(lines.length > 1 ? { lineHeight: TITLE_LINE / 11 } : {}),
       fill: INK.muted,
       fontSize: 11,
+      className: "y-title",
     }),
   };
 }
@@ -757,7 +768,8 @@ function axisFoot(options: {
   marks: Plot.Markish[];
   extraBottom: number;
 } {
-  const { width, marginLeft, marginRight, dy, says, fontSize = 11, top = false } = options;
+  const { width, marginLeft, marginRight, dy, fontSize = 11, top = false } = options;
+  const says = sentence(options.says);
   const frame = width - marginLeft - marginRight;
   /*
    * The drop to a second line, and why it is not the type size.
@@ -787,7 +799,8 @@ function axisFoot(options: {
           ? { frameAnchor: position.frameAnchor.replace("bottom", "top") as "top-left" | "top" | "top-right" }
           : position),
       dy: top ? -y : y,
-      text: () => label,
+      // A tick is a word as often as a number — "one year", "under 1" — and a word starts a line.
+      text: () => sentence(label),
       // A bottom anchor stacks a wrapped string upward from its last line, which is what the
       // dropped line's `dy` is measured to. Spaced at `line` so each one keeps its clear space.
       lineHeight: line / fontSize,
@@ -801,7 +814,11 @@ function axisFoot(options: {
   let ends: Plot.Markish[];
   let taken: [number, number][];
   if ("scale" in options) {
-    const { domain, log = false, format, floor, beside } = options.scale;
+    const { domain, log = false, format, floor } = options.scale;
+    const beside = options.scale.beside && {
+      ...options.scale.beside,
+      label: sentence(options.scale.beside.label),
+    };
     const [lo, hi] = domain;
     const px = (v: number) =>
       frame * (log ? Math.log(v / lo) / Math.log(hi / lo) : (v - lo) / (hi - lo));
@@ -2896,7 +2913,7 @@ export function histogramSpec(
                 x: 0,
                 frameAnchor: "bottom",
                 dy: 18,
-                text: () => "no change",
+                text: () => "No change",
                 fill: INK.muted,
                 fontSize: 11,
               }),
@@ -3239,7 +3256,7 @@ export function seriesSpec(
   const endB = endOf("b");
   /** What the end labels say, which is what the right gutter has to hold. */
   const endText = (point: SeriesPoint | undefined, key: "a" | "b"): string =>
-    point ? `${key === "a" ? labels.a : labels.b} ${format(point[key] ?? 0)}` : "";
+    point ? `${sentence(key === "a" ? labels.a : labels.b)} ${format(point[key] ?? 0)}` : "";
   const longestEnd = Math.max(endText(endA, "a").length, endText(endB, "b").length);
 
   const line = (key: "a" | "b", stroke: string, className: string) =>
@@ -3286,7 +3303,7 @@ export function seriesSpec(
           y: ref.value,
           dx: 2,
           dy: -6,
-          text: () => ref.label,
+          text: () => sentence(ref.label),
           textAnchor: "start",
           fill: INK.muted,
           fontSize: 11,

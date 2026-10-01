@@ -126,7 +126,7 @@ test.describe("the district index shows the distribution it is filtering", () =>
      * Enrollment change is the site's one signed distribution. It drew no zero reference, so a dot
      * two thirds along could have been a district that grew or one that shrank and the strip
      * carried nothing to say which — while `histogramSpec` draws a dashed rule and labels it
-     * "no change" for exactly that reason.
+     * "No change" for exactly that reason.
      *
      * The other five measure quantities that cannot be negative, and drawing a zero on them would
      * be a reference to a value outside their range. `distributionSpec` decides from the domain,
@@ -135,11 +135,11 @@ test.describe("the district index shows the distribution it is filtering", () =>
     await page.goto("/districts");
     const measures = page.locator("#district-measures");
     await expect(measures.locator('.measure[data-measure="enrollment"]')).toContainText(
-      "no change",
+      "No change",
     );
     for (const key of ["aid", "valuation", "poverty", "adm", "guarantee"]) {
       await expect(measures.locator(`.measure[data-measure="${key}"]`)).not.toContainText(
-        "no change",
+        "No change",
       );
     }
   });

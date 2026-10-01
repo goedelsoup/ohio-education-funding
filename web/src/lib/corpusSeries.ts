@@ -104,6 +104,7 @@ import type {
   ScatterPoint,
   SeriesPoint,
 } from "./chart.ts";
+import { noted, pointHover } from "./chartWords.ts";
 import type { Node } from "./corpus.ts";
 import { citedCrates, proseFields, type Manifest, type Unit } from "./corpusFigures.ts";
 import { compactMoney, count, money, pct, sig } from "./format.ts";
@@ -625,7 +626,7 @@ function hoverForRow(series: ManifestSeries, row: SeriesRow): string {
     row.of === undefined
       ? `${row.label}: ${value}`
       : `${row.label}: ${value} of ${formatValue(series.unit, row.of)}`;
-  return [head, row.hover, row.cites].filter(Boolean).join(" — ");
+  return [noted(head, row.hover), row.cites].filter(Boolean).join(" — ");
 }
 
 /**
@@ -712,13 +713,13 @@ function formatTickRow(unit: Unit, value: number): string {
  *
  * No `direct` labels — a number on every mark is what that field's own doc warns against, and the
  * endpoints are stated in the prose the chart sits under — and no `current`, because a column
- * has no subject. The hover is the manifest's when it gives one and `label: value` otherwise.
+ * has no subject. The hover is `label: value`, with the manifest's note after it where it gives one.
  */
 export function barsOf(series: ManifestSeries): Bar[] {
   return series.rows.map((row) => ({
     label: row.label,
     value: row.value,
-    hover: row.hover ?? `${row.label}: ${formatRow(series.unit, row.value)}`,
+    hover: noted(`${row.label}: ${formatRow(series.unit, row.value)}`, row.hover),
   }));
 }
 
@@ -810,7 +811,7 @@ export function multiplesOf(
       value: row.value,
       // The run's name as well as the row's, because a tooltip is read with nothing beside it and
       // the name of the panel it belongs to is above the chart rather than in it.
-      hover: row.hover ?? `${label} — ${row.label}: ${formatRow(series.unit, row.value)}`,
+      hover: noted(`${label} — ${row.label}: ${formatRow(series.unit, row.value)}`, row.hover),
     });
   }
   for (const panel of panels) {
@@ -857,9 +858,10 @@ export interface CloudPanel {
 /** The hover a point carries: which subject it is, and where it sits on both axes. */
 function hoverFor(cloud: ManifestScatter, panel: ManifestPanel, point: ManifestPoint, at: number) {
   const y = point.ys[at];
-  return (
-    `${point.label}: ${cloud.x.label} ${formatValue(cloud.x.unit, point.x)}, ` +
-    `${panel.y.label} ${y === undefined ? "—" : formatValue(panel.y.unit, y)}`
+  return pointHover(
+    point.label,
+    { label: cloud.x.label, value: formatValue(cloud.x.unit, point.x) },
+    { label: panel.y.label, value: y === undefined ? "—" : formatValue(panel.y.unit, y) },
   );
 }
 
@@ -921,9 +923,11 @@ export function placesOf(plane: ManifestPlane): Place[] {
     label: point.label,
     x: point.x,
     y: point.y,
-    hover:
-      `${point.label}: ${plane.x.label} ${formatRow(plane.x.unit, point.x)}, ` +
-      `${plane.y.label} ${formatRow(plane.y.unit, point.y)}`,
+    hover: pointHover(
+      point.label,
+      { label: plane.x.label, value: formatRow(plane.x.unit, point.x) },
+      { label: plane.y.label, value: formatRow(plane.y.unit, point.y) },
+    ),
   }));
 }
 
@@ -1034,9 +1038,12 @@ export function regionsOf(spread: ManifestSpread): SpreadPanel[] {
         x: mark.x,
         y: mark.y,
         series: CLASS_HUES[Math.min(mark.class, CLASS_HUES.length - 1)]!,
-        hover:
-          `${mark.label}: ${spread.x.label} ${formatRow(spread.x.unit, mark.x)}, ` +
-          `${spread.y.label} ${formatRow(spread.y.unit, mark.y)} — ${what}`,
+        hover: pointHover(
+          mark.label,
+          { label: spread.x.label, value: formatRow(spread.x.unit, mark.x) },
+          { label: spread.y.label, value: formatRow(spread.y.unit, mark.y) },
+          what,
+        ),
       } satisfies ScatterPoint;
     }),
     x: {

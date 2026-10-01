@@ -170,8 +170,8 @@ export function renderCensus(c: Census): string {
   const naming = {
     label:
       `Every bound in the modeled formula, ranked by how many of Ohio's ${count(c.whole)} ` +
-      `school districts each one is the operative term for${year ? `, ${year}` : ""}. ` +
-      `Logarithmic scale, from ${count(c.most.value)} districts down to ${count(c.least.value)}.`,
+      `school districts each one is the operative term for${year ? `, ${year}` : ""}`,
+    description: `Logarithmic scale, from ${count(c.most.value)} districts down to ${count(c.least.value)}.`,
   };
   const chart = renderToString(
     (width) =>

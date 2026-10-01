@@ -37,6 +37,7 @@ import { heading } from "./section.ts";
 import { renderToString } from "./plot/client.ts";
 import { MIN_CLOUD, scatterSpec } from "./plot/spec.ts";
 import type { ScatterPoint } from "./chart.ts";
+import { pointHover } from "./chartWords.ts";
 import type { Levers } from "./scenario.ts";
 import { LEVER_BOUNDS, defaultLevers, toPolicy } from "./scenario.ts";
 import { refreshEffect } from "./refresh.ts";
@@ -941,13 +942,18 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
     const point: ScatterPoint = {
       x,
       y,
-      hover: `${d.name}: ${dx.label.toLowerCase()} ${dx.format(x)}, ${dy.label.toLowerCase()} ${dy.format(y)} — ${
-        o.onGuarantee
-          ? o.atMinimumStateShare
-            ? "held, and at the minimum state share"
-            : "held by the guarantee"
-          : "paid by the formula"
-      }${Math.abs(o.delta) > MOVED ? `, ${signedMoney(o.deltaPerPupil)} per pupil` : ", unmoved"}`,
+      hover: pointHover(
+        d.name,
+        { label: dx.label, value: dx.format(x) },
+        { label: dy.label, value: dy.format(y) },
+        `${
+          o.onGuarantee
+            ? o.atMinimumStateShare
+              ? "held, and at the minimum state share"
+              : "held by the guarantee"
+            : "paid by the formula"
+        }${Math.abs(o.delta) > MOVED ? `, ${signedMoney(o.deltaPerPupil)} per pupil` : ", unmoved"}`,
+      ),
     };
     /*
      * Out of scope is drawn as context: muted, unshaded, and with no trail.

@@ -191,11 +191,11 @@ export function renderCoverage(c: Coverage): string {
       label:
         `The share of district forecasts that fell inside the plus-or-minus one sigma band, at ` +
         `every horizon from one year to ${c.deepest}, over every origin and district the F-33 ` +
-        `panel admits${panel}. Two lines: every error with origins pooled, and the same errors ` +
-        `with each origin's own mean removed. The dashed rule is the ${pct(c.reference.value, 1)} such a ` +
-        `band claims to hold.`,
+        `panel admits${panel}.`,
       description:
-        `Pooled, coverage is ${pct(c.pooled.first, 1)} at one year and ` +
+        `Two lines: every error with origins pooled, and the same errors with each origin's own ` +
+        `mean removed. The dashed rule is the ${pct(c.reference.value, 1)} such a band claims to ` +
+        `hold. Pooled, coverage is ${pct(c.pooled.first, 1)} at one year and ` +
         `${pct(c.pooled.last, 1)} at ${c.deepest}, at worst ${points(c.pooled.worst.gap)} under ` +
         `the target at ${years(c.pooled.worst.at)}; with each origin's mean removed it stays ` +
         `within ${points(c.crossDistrict.worst.gap)} of it at every horizon`,
