@@ -4,6 +4,8 @@ import { appendFileSync, existsSync, readdirSync, readFileSync, writeFileSync } 
 import sitemap from "@astrojs/sitemap";
 import { defineConfig } from "astro/config";
 
+import { withUnpadded } from "./src/lib/redirects.ts";
+
 /**
  * Put the CSV download's response headers back, where the static host will actually apply them.
  *
@@ -50,6 +52,41 @@ function csvDownloadHeaders() {
             "/data/districts.csv\n" +
             "  Content-Type: text/csv; charset=utf-8\n" +
             `  Content-Disposition: attachment; filename="ohio-school-funding-fy${feed.fiscal_year}.csv"\n`,
+        );
+      },
+    },
+  };
+}
+
+/**
+ * Send an address typed without its leading zeros to the page it names (#596).
+ *
+ * `/house/90`, `/senate/1` and `/district/43802` — the last being an IRN as a spreadsheet writes
+ * it — were 404s, because every key the site's addresses are built from is zero-padded. The host
+ * matches no regular expressions, so this is one rule per key, and the keys move with the feed:
+ * written into `public/_redirects` by hand they would be right until a district merged. So the
+ * rules are appended to the built copy, read off the same feed the pages were built from, by
+ * `withUnpadded` in `src/lib/redirects.ts`. The preview server and the measure instrument read
+ * `dist/_redirects`, so the browser suite visits every one.
+ */
+function unpaddedAddresses() {
+  return {
+    name: "unpadded-addresses",
+    hooks: {
+      /** @type {(context: { dir: URL }) => void} */
+      "astro:build:done": ({ dir }) => {
+        /** @type {{ districts: { irn: string }[], house_districts: { number: string }[], senate_districts: { number: string }[] }} */
+        const feed = JSON.parse(
+          readFileSync(new URL("./public/data/bundle.json", import.meta.url), "utf8"),
+        );
+        const file = new URL("_redirects", dir);
+        writeFileSync(
+          file,
+          withUnpadded(readFileSync(file, "utf8"), {
+            irns: feed.districts.map((d) => d.irn),
+            house: feed.house_districts.map((h) => h.number),
+            senate: feed.senate_districts.map((h) => h.number),
+          }),
         );
       },
     },
@@ -249,6 +286,7 @@ export default defineConfig({
         !page.endsWith("icon-32.png"),
     }),
     csvDownloadHeaders(),
+    unpaddedAddresses(),
     trimVendorSources(),
     preloadModules(),
   ],

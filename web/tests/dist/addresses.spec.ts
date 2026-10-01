@@ -23,6 +23,7 @@ import { join } from "node:path";
 
 import { describe, expect, test } from "vitest";
 
+import { parseRedirects, resolveRedirect } from "../../src/lib/redirects.ts";
 import { DIST, pages } from "./artefact.ts";
 
 describe("what a link to this site looks like when it is pasted somewhere", () => {
@@ -109,6 +110,52 @@ describe("what a link to this site looks like when it is pasted somewhere", () =
   test("the icons the layout links are all present", () => {
     for (const icon of ["favicon.svg", "icon-32.png", "apple-touch-icon.png"]) {
       expect(existsSync(join(DIST, icon)), `${icon} was not emitted`).toBe(true);
+    }
+  });
+});
+
+describe("an address typed without its leading zeros (#596)", () => {
+  // The built file, which is what deploys: the generated rules exist nowhere else.
+  const rules = parseRedirects(readFileSync(join(DIST, "_redirects"), "utf8"));
+  const feed = JSON.parse(readFileSync(join(DIST, "data", "bundle.json"), "utf8")) as {
+    districts: { irn: string }[];
+    house_districts: { number: string }[];
+    senate_districts: { number: string }[];
+  };
+  const keys: [string, string[]][] = [
+    ["/district", feed.districts.map((d) => d.irn)],
+    ["/house", feed.house_districts.map((h) => h.number)],
+    ["/senate", feed.senate_districts.map((h) => h.number)],
+  ];
+
+  test("every unpadded IRN and seat number redirects to a page that exists", () => {
+    const offenders: string[] = [];
+    let checked = 0;
+    for (const [root, list] of keys) {
+      for (const key of list) {
+        const bare = String(Number(key));
+        if (bare === key) continue;
+        checked++;
+        // Unpadded, and padded to two for a three-digit seat: `/senate/1` and `/senate/01`.
+        for (const typed of new Set([`${root}/${bare}`, `${root}/${bare.padStart(2, "0")}`])) {
+          if (typed === `${root}/${key}`) continue;
+          const hit = resolveRedirect(rules, typed, "");
+          if (hit?.location !== `${root}/${key}` || hit.status !== 301)
+            offenders.push(`${typed} → ${hit?.location ?? "404"}`);
+          else if (!existsSync(join(DIST, `${hit.location.slice(1)}.html`)))
+            offenders.push(`${typed} → ${hit.location}, which the build did not emit`);
+        }
+      }
+    }
+    expect(offenders.slice(0, 10)).toEqual([]);
+    // 608 IRNs that start with a zero and all 132 seats. A floor, so a feed that
+    // stopped padding would read as a failure here rather than as nothing to check.
+    expect(checked).toBeGreaterThan(700);
+  });
+
+  test("no page the build emitted is itself redirected", () => {
+    for (const [root, list] of keys) {
+      for (const key of list) expect(resolveRedirect(rules, `${root}/${key}`, ""), key).toBeNull();
     }
   });
 });
