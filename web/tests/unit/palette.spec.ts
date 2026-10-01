@@ -58,7 +58,7 @@ import {
   toLab,
   toOklch,
 } from "../../src/lib/plot/palette.ts";
-import { DOT, barSpec } from "../../src/lib/plot/spec.ts";
+import { DOT, STRIP, barSpec, scatterSpec } from "../../src/lib/plot/spec.ts";
 import { renderToString } from "../../src/lib/plot/ssr.ts";
 
 const TOKENS = resolve(process.cwd(), "src/styles/tokens/colors.css");
@@ -93,6 +93,32 @@ const ramp = (mode: keyof typeof PALETTE, names: string[]): string[] =>
 
 const ORD3 = ["--ordinal-1", "--ordinal-2", "--ordinal-3"];
 const PAIR = ["--series-formula", "--series-guarantee"];
+
+/**
+ * `--banded-opacity` in one block of the palette. A number, not a hex, so {@link block} does not
+ * read it; it gets its own parse and its own agreement check.
+ */
+function alphaIn(marker: string): number {
+  const css = readFileSync(TOKENS, "utf8");
+  const start = css.indexOf(marker);
+  const body = css.slice(start, css.indexOf("\n}", start));
+  const value = body.match(/--banded-opacity:\s*([0-9.]+)\s*;/)?.[1];
+  expect(value, `no --banded-opacity in the ${marker} block`).toBeTruthy();
+  return Number(value);
+}
+
+/** The alpha a banded dot is painted at, per theme, as the stylesheet resolves it. */
+const BANDED = { light: alphaIn(":root {"), dark: alphaIn(':root[data-theme="dark"] {') } as const;
+
+/** A mark at `alpha` composited over `surface`, as the browser paints it, to the nearest 8-bit step. */
+const over = (mark: string, surface: string, alpha: number) => {
+  const [f, b] = [parseHex(mark), parseHex(surface)];
+  return {
+    r: Math.round(alpha * f.r + (1 - alpha) * b.r),
+    g: Math.round(alpha * f.g + (1 - alpha) * b.g),
+    b: Math.round(alpha * f.b + (1 - alpha) * b.b),
+  };
+};
 
 /** The worst separation across normal vision and all three dichromacies. */
 const worst = (colours: string[]): number =>
@@ -372,6 +398,125 @@ describe("a bar chart with a negative value", () => {
 });
 
 /**
+ * Every chart mark that carries data clears 3:1 against the card as painted (#615, WCAG 1.4.11).
+ *
+ * Composited, because the token is not what a reader sees: the strip's dots were `--neutral-mark`
+ * at 0.5, which is 1.48:1 light, and the `DOT` comment claimed "near 2.2:1" for a banded end step
+ * that measured 1.60 — the ramp's full-opacity figure with the alpha forgotten. Both themes, and
+ * the theme blocks are the same four restatements `the four restatements of the palette` holds
+ * equal, so the OS-preference dark case is the explicit one.
+ *
+ * Each opacity the chart module names is classified here, one way or the other. The loops run over
+ * the objects, not over a list written beside them, so a new key in `DOT` or `STRIP` fails until
+ * someone decides whether it is data — which is the choice this test exists to force.
+ */
+describe("a chart mark that carries data", () => {
+  type Mode = keyof typeof PALETTE;
+  const painted = (mode: Mode, token: string, alpha: number): number => {
+    const tokens = PALETTE[mode].tokens;
+    const surface = tokens.get("--surface-1")!;
+    const mark = tokens.get(token);
+    expect(mark, `${token} is not declared in the ${mode} palette`).toBeTruthy();
+    return contrast(over(mark!, surface, alpha), parseHex(surface));
+  };
+
+  /** Data marks: the token each is painted in, and every opacity it is drawn at. */
+  const DATA: { mark: string; token: string; alpha: number }[] = [
+    // Steps 2 and 3 of a banded scatter. Step 1 is exempt below.
+    { mark: "strip dot, every member drawn", token: "--text-muted", alpha: STRIP.opacity.dots },
+    { mark: "strip dot, outliers only", token: "--text-muted", alpha: STRIP.opacity.outliers },
+    { mark: "range-low", token: "--ordinal-2", alpha: 1 },
+    { mark: "range-high", token: "--ordinal-3", alpha: 1 },
+    { mark: "scatter-trace, formula", token: "--series-formula", alpha: 1 },
+    { mark: "scatter-trace, guarantee", token: "--series-guarantee", alpha: 1 },
+    { mark: "scatter-trace, step 2", token: "--ordinal-2", alpha: 1 },
+    { mark: "scatter-trace, step 3", token: "--ordinal-3", alpha: 1 },
+  ];
+
+  /** Marks not held to 3:1, by name, and why. A mark that is in neither list is unclassified. */
+  const EXEMPT: Record<string, string> = {
+    "DOT.opacity.plain":
+      "the neutral cloud: hundreds of marks whose overlap is the density; --neutral-mark is under 3:1 opaque",
+    "DOT.opacity.muted": "de-emphasis by design, held to its own floor and ordering above",
+    "banded step 1":
+      "--ordinal-1 is 2.20:1 opaque, so no alpha reaches 3:1; the ramp obliges a legend, which every banded chart carries",
+    "scatter-trace, step 1": "the same token as banded step 1, and named by the same legend",
+    "STRIP.box": "the IQR box is the frame the dots are read against, not a value",
+    "rules": "--accent-rule draws axes, whiskers and spans: structure, not data",
+    "fan band": "fillOpacity 0.16, but edged by its own boundary lines, which carry the shape",
+  };
+
+  test("clears 3:1 against the card in both themes", () => {
+    for (const mode of ["light", "dark"] as const) {
+      for (const { mark, token, alpha } of DATA) {
+        expect(painted(mode, token, alpha), `${mode} ${mark}`).toBeGreaterThanOrEqual(3);
+      }
+      // Steps 2 and 3 of a banded scatter, at the theme's own alpha. Step 1 is exempt below.
+      for (const step of ["--ordinal-2", "--ordinal-3"]) {
+        expect(painted(mode, step, BANDED[mode]), `${mode} banded ${step}`).toBeGreaterThanOrEqual(3);
+      }
+    }
+  });
+
+  test("and the banded alpha is the light figure on the SVG, overridden per theme by the stylesheet", () => {
+    expect(BANDED.light, "light paints at what the SVG says").toBe(DOT.opacity.banded);
+    expect(BANDED.dark, "dark paints lower, for the ring").toBeLessThan(BANDED.light);
+    const app = readFileSync(resolve(process.cwd(), "src/styles/app.css"), "utf8");
+    const rule = app.match(
+      /\.scatter-dot circle\[fill-opacity="([0-9.]+)"\]\s*\{\s*fill-opacity:\s*var\(--banded-opacity\)/,
+    );
+    expect(rule, "app.css has no rule applying --banded-opacity to banded dots").toBeTruthy();
+    // The selector is keyed on the attribute Plot writes, so the two must be the same string.
+    expect(Number(rule![1])).toBe(DOT.opacity.banded);
+    const points = [0, 1, 2].flatMap((band) =>
+      Array.from({ length: 5 }, (_, i) => ({ x: i + band, y: i * band, hover: "", band })),
+    );
+    const axis = { label: "v", format: String };
+    const svg = renderToString((w) => scatterSpec(points, { x: axis, y: axis }, [], { width: w }), {
+      label: "test",
+    });
+    expect(svg).toContain(`fill-opacity="${rule![1]}"`);
+    for (const other of [DOT.opacity.plain, DOT.opacity.muted]) expect(other).not.toBe(DOT.opacity.banded);
+    // And all five blocks agree with the two read above, as the colours do.
+    expect(alphaIn("@media (prefers-color-scheme: dark) {")).toBe(BANDED.dark);
+    expect(alphaIn(':root[data-theme="light"] {')).toBe(BANDED.light);
+    expect(alphaIn("@media print {")).toBe(BANDED.light);
+  });
+
+  test("and every opacity the chart module names is either data or exempt by name", () => {
+    const data = new Set<number>([DOT.opacity.banded, STRIP.opacity.dots, STRIP.opacity.outliers]);
+    for (const [key, alpha] of Object.entries(DOT.opacity)) {
+      expect(
+        data.has(alpha) || `DOT.opacity.${key}` in EXEMPT,
+        `DOT.opacity.${key} is neither a data mark nor exempt`,
+      ).toBe(true);
+    }
+    for (const [key, alpha] of Object.entries(STRIP.opacity)) {
+      expect(data.has(alpha), `STRIP.opacity.${key} is not held to 3:1`).toBe(true);
+    }
+    expect("STRIP.box" in EXEMPT).toBe(true);
+  });
+
+  test("and no opacity in the chart module is a bare number, outside the one named exemption", () => {
+    // A literal would be a mark this test never sees. The fan band is the one, and it is listed.
+    const source = readFileSync(resolve(process.cwd(), "src/lib/plot/spec.ts"), "utf8");
+    const literals = [...source.matchAll(/(?:fill|stroke)?[oO]pacity:\s*([0-9.]+)/g)].map((m) => m[1]);
+    expect(literals).toEqual(["0.16"]);
+    expect("fan band" in EXEMPT).toBe(true);
+  });
+
+  test("and the exempt are exempt because they fail, not by habit", () => {
+    // A listed exemption that has started passing is a mark that could now be held to the bar.
+    for (const mode of ["light", "dark"] as const) {
+      expect(painted(mode, "--ordinal-1", 1), `${mode} --ordinal-1 opaque`).toBeLessThan(3);
+      expect(painted(mode, "--accent-rule", 1), `${mode} --accent-rule`).toBeLessThan(3);
+      expect(painted(mode, "--neutral-mark", STRIP.box), `${mode} the IQR box`).toBeLessThan(3);
+    }
+    expect(painted("light", "--neutral-mark", 1), "light --neutral-mark opaque").toBeLessThan(3);
+  });
+});
+
+/**
  * The rule this file says it derives by, run instead of trusted.
  *
  * `colors.css` claims the `-text` variants hold "OKLab hue and chroma to the mark colour's exactly
@@ -589,35 +734,26 @@ describe("the focus ring", () => {
   /**
    * But it clears against the ramp **as the site paints it**, which is the figure that was missing.
    *
-   * A banded scatter draws the ramp at `fill-opacity: 0.62` and the neutral cloud at `0.45`, so the
+   * A banded scatter draws the ramp at `--banded-opacity` and the neutral cloud at `0.45`, so the
    * colour a ring is ever adjacent to is the token composited over the card and not the token. The
    * blend moves every step *away* from the ink, necessarily: the ink and the surface are 19.17
    * apart light and 17.42 dark, so anything pulled toward one is pulled away from the other.
    *
-   * `--ordinal-3` at 0.62 comes out at 5.30 light and 3.44 dark. That is the number the cursor
-   * comment should have carried, and the reason the scatter was never the problem.
+   * `--ordinal-3` at 0.62 came out at 5.30 light and 3.44 dark. #615 raised the alpha so the dots
+   * clear 3:1 against the card, and that pulls them back toward the ink: at 0.8 the dark top step
+   * fell to 2.31. This test is what said so, and why dark paints at 0.65 — 3.27 light, 3.22 dark.
    */
   test("and does clear it against the ramp as a chart actually paints it", () => {
     /*
-     * `fillOpacity` for a banded scatter, imported rather than written down. It was a local `0.62`
-     * with a comment naming where the real value lives, which is a second copy of a number that
-     * has since gained a third sibling — see `DOT`.
+     * The alpha per theme, read from the token the stylesheet paints with rather than written
+     * down here — see `BANDED` and `DOT`.
      */
-    const BANDED = DOT.opacity.banded;
-    const over = (mark: string, surface: string, alpha: number) => {
-      const [f, b] = [parseHex(mark), parseHex(surface)];
-      return {
-        r: Math.round(alpha * f.r + (1 - alpha) * b.r),
-        g: Math.round(alpha * f.g + (1 - alpha) * b.g),
-        b: Math.round(alpha * f.b + (1 - alpha) * b.b),
-      };
-    };
     for (const mode of ["light", "dark"] as const) {
       const tokens = PALETTE[mode].tokens;
       const ink = parseHex(tokens.get("--text-primary")!);
       for (const step of ORD3) {
         expect(
-          contrast(ink, over(tokens.get(step)!, tokens.get("--surface-1")!, BANDED)),
+          contrast(ink, over(tokens.get(step)!, tokens.get("--surface-1")!, BANDED[mode])),
           `${mode} ink ring on ${step} as painted`,
         ).toBeGreaterThanOrEqual(3);
       }
@@ -666,14 +802,6 @@ describe("the focus ring", () => {
      * Measured over `--neutral-mark`, which is what an out-of-scope district wears, composited onto
      * the tightest surface a chart sits on.
      */
-    const over = (mark: string, surface: string, alpha: number) => {
-      const [f, b] = [parseHex(mark), parseHex(surface)];
-      return {
-        r: Math.round(alpha * f.r + (1 - alpha) * b.r),
-        g: Math.round(alpha * f.g + (1 - alpha) * b.g),
-        b: Math.round(alpha * f.b + (1 - alpha) * b.b),
-      };
-    };
     for (const mode of ["light", "dark"] as const) {
       const tokens = PALETTE[mode].tokens;
       const surface = tokens.get("--surface-1")!;

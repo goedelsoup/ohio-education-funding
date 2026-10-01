@@ -217,7 +217,7 @@ const charts = node.series.map((binding) => {
         `row's length is the ratio between its two ends and its position is the level. ` +
         `${band.whole.label} Hover or focus a row for both of its values.`,
       legend: [
-        { swatch: "ordinal-1", label: band.ends[0] },
+        { swatch: "ordinal-2", label: band.ends[0] },
         { swatch: "ordinal-3", label: band.ends[1] },
         ...band.markers.map((marker) => ({ swatch: "rule", label: marker.label })),
       ],

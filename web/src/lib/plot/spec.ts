@@ -927,10 +927,18 @@ export const MIN_CLOUD = 12;
  * in this cloud has ever met 3:1: `--neutral-mark` is 2.35:1 light against `--surface-1` at full
  * opacity, before the 0.45 the form draws it at. Small, partly transparent marks are what make
  * density legible as density here, and the relief for that is the legend the banded forms carry.
+ *
+ * `banded` is held to 3:1 and was not. This comment said its end step sat "near 2.2:1" at 0.62;
+ * composited over the card it measured 1.60 light and 1.56 dark (#615), because 2.2 is the ramp's
+ * figure at full opacity and the alpha comes off it. This is the light figure and the one written
+ * onto the SVG; dark paints at 0.65 through `--banded-opacity`, because above 0.66 the keyboard
+ * ring stops clearing the dark ramp's pale top step (the token says more). Either way the middle
+ * and outer steps clear 3:1. The light step cannot at any alpha — `--ordinal-1` is 2.20:1 fully
+ * opaque — and is exempt by name in `palette.spec.ts`, relieved by the legend the ramp obliges.
  */
 export const DOT = {
   radius: { plain: 2.4, muted: 1.6 },
-  opacity: { banded: 0.62, plain: 0.45, muted: 0.22 },
+  opacity: { banded: 0.8, plain: 0.45, muted: 0.22 },
 } as const;
 
 /**
@@ -2015,7 +2023,11 @@ export function rangeSpec(
           y: "label",
           x: "low",
           r: DOT_RADIUS,
-          fill: ORDINAL[0],
+          /* The middle step and not the light one. `--ordinal-1` is 2.20:1 against the card at full
+             opacity in both themes, and this dot is a data mark a reader has to find on a 14px row
+             (#615). `--ordinal-2` is 4.30 light and 5.47 dark, and is still the lower of the two
+             shades, so a low end and a high end stay one measure at two points. */
+          fill: ORDINAL[1],
           stroke: "none",
           className: "range-low",
         }),
@@ -2333,6 +2345,26 @@ export function rankSpec(
 const DOTS_UP_TO = 150;
 
 /**
+ * How a strip's members are painted, and why not in the cloud's neutral.
+ *
+ * They were `--neutral-mark` at 0.5 and 0.7: 1.48 and 1.77 against the card in light (#615). A
+ * county strip draws sixteen of them, so they are not a density the eye integrates, as a scatter's
+ * six hundred are — each one is a district a reader is meant to find. `--neutral-mark` cannot get
+ * there at any alpha: it is 2.35:1 light fully opaque. So the fill is the muted ink, the grey the
+ * chart's own annotation is set in — still grey, still no hue — at 4.08 light and 4.56 dark where
+ * every member is drawn, and 3.03 and 3.51 where only the outliers are.
+ *
+ * What is **not** held to 3:1, by name in `palette.spec.ts`: the box behind the dots and the
+ * whisker and axis rules. They are the frame a reader locates the dots in, not data a reader reads
+ * off, and the median rule drawn across the box is the ink.
+ */
+export const STRIP = {
+  fill: INK.muted,
+  opacity: { dots: 0.85, outliers: 0.7 },
+  box: 0.28,
+} as const;
+
+/**
  * The `q`th quantile of an ascending series by **nearest rank**, or zero for an empty one.
  *
  * Deliberately not `stats.percentile`, which interpolates and is the definition every median this
@@ -2474,7 +2506,7 @@ export function distributionSpec(
                 y1: -11,
                 y2: 11,
                 fill: SERIES.neutral,
-                fillOpacity: 0.28,
+                fillOpacity: STRIP.box,
                 rx: 3,
               }),
               Plot.ruleX([med], { y1: -11, y2: 11, stroke: INK.secondary, strokeWidth: 2 }),
@@ -2485,8 +2517,8 @@ export function distributionSpec(
           x: "value",
           y: (_d: DistributionValue, i: number) => (dots ? lane(i) : 0),
           r: dots ? 2.8 : 2.4,
-          fill: SERIES.neutral,
-          fillOpacity: dots ? 0.5 : 0.7,
+          fill: STRIP.fill,
+          fillOpacity: dots ? STRIP.opacity.dots : STRIP.opacity.outliers,
           stroke: "none",
           className: "dist-dot",
         }),
