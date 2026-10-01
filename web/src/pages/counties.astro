@@ -11,7 +11,7 @@ import Base from "../layouts/Base.astro";
 import { NAMES } from "../lib/nav.ts";
 import { counties, type County } from "../lib/county.ts";
 import { loadFeed } from "../lib/feed.ts";
-import { count, money } from "../lib/format.ts";
+import { compactMoney, count, money } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
 import { yearChip } from "../lib/year.ts";
 import { rangeSpec } from "../lib/plot/spec.ts";
@@ -46,7 +46,7 @@ const disparity = renderToString(
   (w) =>
     rangeSpec(
       rows,
-      { label: "assessed valuation per pupil", format: (v) => money(v), log: true },
+      { label: "assessed valuation per pupil", format: compactMoney, log: true },
       { width: w },
     ),
   {

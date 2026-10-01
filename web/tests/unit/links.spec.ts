@@ -50,6 +50,8 @@ import {
  * one rather than running each of them twice to make the same point.
  */
 const W = { width: WIDTHS.wide };
+/** A strip's options: `distributionSpec` labels its own ends, so it takes a formatter. */
+const STRIP = { ...W, format: String };
 
 const corpus = loadCorpus();
 const { bundle, tax } = loadFeed();
@@ -664,14 +666,14 @@ test("a distribution draws its members where they fit and its shape where they d
   const values = (n: number) =>
     Array.from({ length: n }, (_, i) => ({ value: i, hover: `d${i}` }));
 
-  const small = distributionSpec(values(30), W);
+  const small = distributionSpec(values(30), STRIP);
   expect(small?.hovers?.text.length, "a small population is drawn in full").toBe(30);
 
-  const medium = distributionSpec(values(120), W);
+  const medium = distributionSpec(values(120), STRIP);
   expect(medium?.hovers?.text.length, "a poverty fifth is drawn in full").toBe(120);
 
   // 609 evenly spaced values have no outliers, so the box is the whole of what is drawn.
-  const large = distributionSpec(values(609), W);
+  const large = distributionSpec(values(609), STRIP);
   expect(large?.hovers?.text.length).toBeLessThan(30);
 });
 
@@ -679,8 +681,8 @@ test("a distribution refuses a population too small to have a shape", () => {
   const values = (n: number) => Array.from({ length: n }, (_, i) => ({ value: i, hover: `d${i}` }));
   // A pair is not a distribution. Two of Ohio's legislative seats hold two school districts, and
   // the table on those pages names both.
-  expect(distributionSpec(values(2), W)).toBeNull();
-  expect(distributionSpec(values(3), W)).not.toBeNull();
+  expect(distributionSpec(values(2), STRIP)).toBeNull();
+  expect(distributionSpec(values(3), STRIP)).not.toBeNull();
 });
 
 test("the box is drawn only where quartiles summarise something", () => {
@@ -694,8 +696,8 @@ test("the box is drawn only where quartiles summarise something", () => {
   const boxes = (spec: ReturnType<typeof distributionSpec>) =>
     (renderToString(() => spec, { label: "test" }).match(/<rect/g) ?? []).length;
 
-  expect(boxes(distributionSpec(values(BOX_FROM - 1), W)), "no box below the floor").toBe(0);
-  expect(boxes(distributionSpec(values(BOX_FROM), W)), "a box at the floor").toBeGreaterThan(0);
+  expect(boxes(distributionSpec(values(BOX_FROM - 1), STRIP)), "no box below the floor").toBe(0);
+  expect(boxes(distributionSpec(values(BOX_FROM), STRIP)), "a box at the floor").toBeGreaterThan(0);
 });
 
 test("a district's position is drawn against the population it is being placed in", () => {
@@ -709,7 +711,7 @@ test("a district's position is drawn against the population it is being placed i
     .filter((d) => d.valuation_per_pupil != null)
     .map((d) => ({ value: d.valuation_per_pupil!, hover: d.name }));
   const spec = distributionSpec(valuations, {
-    ...W,
+    ...STRIP,
     marker: { value: valuations[0]!.value, label: "a district" },
   });
   const svg = renderToString(() => spec, { label: "test" });

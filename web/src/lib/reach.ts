@@ -32,7 +32,7 @@
 
 import type { Outcome, Model } from "./policy.ts";
 import { MOVED, applyAll, currentLaw, modelOf } from "./policy.ts";
-import { count, escapeHtml, money, pct, signedMoney } from "./format.ts";
+import { compactMoney, count, escapeHtml, money, pct, signedMoney } from "./format.ts";
 import { heading } from "./section.ts";
 import { renderToString } from "./plot/client.ts";
 import { MIN_CLOUD, scatterSpec } from "./plot/spec.ts";
@@ -1169,8 +1169,8 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
           scatterSpec(
             points,
             {
-              x: { label: dx.label, format: dx.format, log: xLog },
-              y: { label: dy.label, format: dy.format, log: yLog },
+              x: { label: dx.label, format: dx.format === money ? compactMoney : dx.format, log: xLog },
+              y: { label: dy.label, format: dy.format === money ? compactMoney : dy.format, log: yLog },
             },
             [],
             /*

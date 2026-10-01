@@ -60,13 +60,14 @@ bottom_20_pi_2425,title1_at_least_20_three_years,title1_share_2324,title1_share_
 title1_share_2526,title1_average";
 
 impl Edition {
-    /// The school year the edition governs.
+    /// The school year the edition governs, in the site's school-year form (`2024-25`) — the
+    /// label a chart draws, so it is written the way every other school year on the site is.
     #[must_use]
     pub fn school_year(self) -> &'static str {
         match self {
-            Edition::Y2425 => "2024-2025",
-            Edition::Y2526 => "2025-2026",
-            Edition::Y2627 => "2026-2027",
+            Edition::Y2425 => "2024-25",
+            Edition::Y2526 => "2025-26",
+            Edition::Y2627 => "2026-27",
         }
     }
 

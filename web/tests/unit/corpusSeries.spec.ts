@@ -7,12 +7,14 @@
  * reported. A check that has only ever seen correct input has not been shown to reject anything.
  */
 
+import { parseHTML } from "linkedom";
 import { expect, test } from "vitest";
 
 import { loadCorpus, type Node } from "../../src/lib/corpus.ts";
 import { loadFigureManifest, READS_CONTRACT, type Manifest } from "../../src/lib/corpusFigures.ts";
 import {
   bandsAgainstFigures,
+  barScale,
   barsOf,
   censusAgainstFigures,
   crossCheckPageSeries,
@@ -41,6 +43,8 @@ import {
   type SeriesDiscrepancyKind,
   type SeriesManifest,
 } from "../../src/lib/corpusSeries.ts";
+import { barSpec, panelWidth } from "../../src/lib/plot/spec.ts";
+import { renderPanelToString, renderToString } from "../../src/lib/plot/ssr.ts";
 
 const corpus = loadCorpus();
 const manifest = loadSeriesManifest();
@@ -1699,4 +1703,40 @@ test("the committed band chart is the administrator floor, drawn against what is
   // they are named beside the chart rather than left out of it — #447's more careful half.
   expect(band!.unreached).toHaveLength(6);
   for (const missing of band!.unreached) expect(missing.label).toMatch(/^R\.C\. 3317\.011\(/);
+});
+
+test("every bar a column draws is read against a number: a value at its end or a scale under it", () => {
+  /*
+   * #611: `barsOf` sets no `direct`, and `barSpec` drew no axis, so the TTAG node's seven panels
+   * of five bars carried a length and not one number — and nor did the correlation-by-class column
+   * or the EdChoice editions. Drawn as the wiki draws them, each panel or chart now has either a
+   * `bar-value` text or a foot naming both ends of its scale.
+   */
+  const drawn = manifest.series.filter((series) => series.rows.length > 0);
+  expect(drawn.length).toBeGreaterThan(0);
+  for (const series of drawn) {
+    const multiples = multiplesOf(series);
+    const svgs = multiples
+      ? multiples.panels.map((panel) =>
+          renderPanelToString(
+            () =>
+              barSpec(panel.bars, {
+                width: panelWidth(multiples.panels.length),
+                max: multiples.max,
+                min: multiples.min,
+                labelChars: multiples.labelChars,
+                scale: { ...barScale(series), says: "" },
+              }),
+            "presentational",
+            panelWidth(multiples.panels.length),
+          ),
+        )
+      : [renderToString((w) => barSpec(barsOf(series), { width: w, scale: barScale(series) }), "presentational")];
+    for (const svg of svgs) {
+      const doc = parseHTML(`<div>${svg}</div>`).document;
+      const values = doc.querySelectorAll("g.bar-value text").length;
+      const ends = [...doc.querySelectorAll("g.axis-foot text")].filter((t) => /\d/.test(t.textContent ?? ""));
+      expect(values > 0 || ends.length >= 2, `${series.key}: a drawing with no number on it`).toBe(true);
+    }
+  }
 });

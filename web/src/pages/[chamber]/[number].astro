@@ -8,7 +8,7 @@
  */
 import Base from "../../layouts/Base.astro";
 import { loadFeed, qualifiedName } from "../../lib/feed.ts";
-import { count, money, pct } from "../../lib/format.ts";
+import { compactMoney, count, money, pct } from "../../lib/format.ts";
 import * as routes from "../../lib/routes.ts";
 import { yearChip } from "../../lib/year.ts";
 import SectionAnchor from "../../components/SectionAnchor.astro";
@@ -53,21 +53,14 @@ const spreadValues = house.members
     hover: `${d.name}: ${money(d.valuation_per_pupil!)} per pupil, ${money(d.realized_aid_per_pupil)} state aid per pupil`,
   }));
 const spreadCount = spreadValues.length;
-const spread = renderToString((w) => distributionSpec(spreadValues, { width: w }), { label: `Assessed valuation per pupil across the ${spreadCount} districts in ${label} District ${number} with a reported tax base, poorest to wealthiest` });
+const spread = renderToString((w) => distributionSpec(spreadValues, { width: w, format: compactMoney }), { label: `Assessed valuation per pupil across the ${spreadCount} districts in ${label} District ${number} with a reported tax base, poorest to wealthiest` });
 /*
- * The two ends of the strip, and the column the strip is drawn from.
+ * The valuation column, beside the strip it is drawn from.
  *
- * `distributionSpec` draws no axis by construction — every other strip on the site states its
- * scale in a `.scale` row underneath, and these 129 pages drew the dots with no axis, no scale row
- * and no valuation column in the table below, which left a reader nothing to recover a value with.
- * A dot at four fifths of the width meant nothing at all.
- *
- * `sortedSpread` is the same array the chart is drawn from, so the two ends named here are the two
- * ends drawn — not a min and max taken again off a different filter.
+ * These 129 pages once drew the dots with no axis and no valuation column in the table below, which
+ * left a reader nothing to recover a value with. The strip now states its own ends
+ * (`distributionSpec`'s foot), and the table gives every district's figure.
  */
-const sortedSpread = [...spreadValues].sort((a, b) => a.value - b.value);
-const spreadLow = sortedSpread[0]?.value ?? null;
-const spreadHigh = sortedSpread[sortedSpread.length - 1]?.value ?? null;
 const valuationByIrn = new Map(
   house.members.map((m) => [m.irn, byIrn.get(m.irn)?.valuation_per_pupil ?? null]),
 );
@@ -135,13 +128,7 @@ const valuationByIrn = new Map(
             tax base, poorest on the left.
             {" "}{spreadCount >= BOX_FROM ? " The shaded box is the middle half of them." : ""}
           </p>
-          <div class="chart-scale">
-            <div class="chartwrap" data-chart="seat-spread" set:html={spread} />
-            <div class="scale">
-              <span>{money(spreadLow)}</span>
-              <span>{money(spreadHigh)}</span>
-            </div>
-          </div>
+          <div class="chartwrap" data-chart="seat-spread" set:html={spread} />
         </>
       )
     }

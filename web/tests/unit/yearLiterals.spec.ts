@@ -274,3 +274,26 @@ test("the reason names every year it licenses", () => {
   }
   expect(unargued, "say in the reason why this year is a fact about the past").toEqual([]);
 });
+
+test("the chart module composes no year, and the series manifest writes school years short", () => {
+  /*
+   * #610: chart text wrote years four ways. Two of them were composed rather than typed, so the
+   * literal scan above could not see them — `FY${last.year}` in the fan's foot, and the crate's
+   * EdChoice editions drawn as "2024-2025" beside every other school year's "2024-25". The chart
+   * module and the module that turns the manifest into charts take a year from a formatter, and the
+   * manifest the crate writes is held to the site's school-year form.
+   */
+  const composed = /(?:FY|TY)\$\{|\$\{[^}]*\}-\$\{/g;
+  const found: string[] = [];
+  for (const relative of ["lib/plot/spec.ts", "lib/corpusSeries.ts"]) {
+    const live = withoutUnrendered(readFileSync(join(SRC, relative), "utf8"));
+    for (const match of live.matchAll(composed)) {
+      found.push(`${relative}:${live.slice(0, match.index).split("\n").length}  ${match[0]}`);
+    }
+  }
+  expect(found, "write the year through `year.ts` or `yearLabel.ts`").toEqual([]);
+
+  const manifest = readFileSync(join(SRC, "../../crates/series.json"), "utf8");
+  const long = [...manifest.matchAll(/"label": "[^"]*\b(20\d\d-20\d\d)\b[^"]*"/g)].map((m) => m[1]);
+  expect(long, "a school year is `2024-25` — see `Edition::school_year`").toEqual([]);
+});

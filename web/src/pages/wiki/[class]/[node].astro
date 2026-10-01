@@ -21,9 +21,9 @@ import { isBlockProperty, isListProperty, isMathProperty, renderListProperty, re
 import * as routes from "../../../lib/routes.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
 import SeriesChart from "../../../components/SeriesChart.astro";
-import { barsOf, formatValue, loadSeriesManifest, multiplesOf, panelsOf, placesOf, rangesOf, regionsOf } from "../../../lib/corpusSeries.ts";
+import { barScale, barsOf, formatTick, loadSeriesManifest, multiplesOf, panelsOf, placesOf, rangesOf, regionsOf } from "../../../lib/corpusSeries.ts";
 import { count } from "../../../lib/format.ts";
-import { barSpec, panelWidth, planeSpec, rangeSpec, scatterSpec } from "../../../lib/plot/spec.ts";
+import { barSpec, panelWidth, planeSpec, rangeSpec, ruleSwatch, scatterSpec } from "../../../lib/plot/spec.ts";
 import { renderPanelToString, renderToString } from "../../../lib/plot/ssr.ts";
 
 export function getStaticPaths() {
@@ -138,8 +138,8 @@ const charts = node.series.map((binding) => {
               planeSpec(
                 placesOf(plane),
                 {
-                  x: { label: plane.x.label, format: (v: number) => formatValue(plane.x.unit, v) },
-                  y: { label: plane.y.label, format: (v: number) => formatValue(plane.y.unit, v) },
+                  x: { label: plane.x.label, format: (v: number) => formatTick(plane.x.unit, v) },
+                  y: { label: plane.y.label, format: (v: number) => formatTick(plane.y.unit, v) },
                 },
                 { width: w, xDomain: [plane.x.min, plane.x.max], yDomain: [plane.y.min, plane.y.max] },
               ),
@@ -171,7 +171,7 @@ const charts = node.series.map((binding) => {
           swatch: CLASS_SWATCHES[Math.min(at, CLASS_SWATCHES.length - 1)]!,
           label: what,
         })),
-        ...spread.boundaries.map((boundary) => ({ swatch: "rule", label: boundary.label })),
+        ...spread.boundaries.map((boundary, at) => ({ swatch: ruleSwatch(at), label: boundary.label })),
       ],
       census: spread.census.map((region) => ({
         label: region.label,
@@ -246,7 +246,8 @@ const charts = node.series.map((binding) => {
       label: series!.label,
       note:
         `By ${series!.axis.charAt(0).toLowerCase()}${series!.axis.slice(1)}, one panel each and ` +
-        `one scale across all ${multiples.panels.length}. Hover or focus a bar for its value.`,
+        `one scale across all ${multiples.panels.length}, in ${barScale(series!).says}. Hover or focus a ` +
+        `bar for its value.`,
       panels: multiples.panels.map((panel) => ({
         label: panel.label,
         html: renderPanelToString(
@@ -256,6 +257,9 @@ const charts = node.series.map((binding) => {
               max: multiples.max,
               min: multiples.min,
               labelChars: multiples.labelChars,
+              // The unit is said once per set, in the note above the grid; each panel carries the
+              // shared scale's numbers so a panel read alone still has them.
+              scale: { ...barScale(series!), says: "" },
             }),
           { label: `${series!.label} — ${panel.label}` },
           width,
@@ -274,7 +278,7 @@ const charts = node.series.map((binding) => {
     panels: [
       {
         label: null,
-        html: renderToString((w) => barSpec(barsOf(series!), { width: w }), {
+        html: renderToString((w) => barSpec(barsOf(series!), { width: w, scale: barScale(series!) }), {
           label: series!.label,
         }),
       },

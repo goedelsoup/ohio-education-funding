@@ -24,7 +24,9 @@ import type {
   SeriesPoint,
   Trace,
 } from "../../src/lib/chart.ts";
+import { compactMoney, pct } from "../../src/lib/format.ts";
 import {
+  axisTicks,
   DOT,
   barSpec,
   distributionSpec,
@@ -35,6 +37,7 @@ import {
   planeSpec,
   rangeSpec,
   rankSpec,
+  ruleSwatch,
   scatterSpec,
   seriesSpec,
   type Box,
@@ -127,19 +130,19 @@ test("a column with bars on both sides of zero draws its rule at every width", (
   expect(unsigned).not.toContain("<line");
 });
 
-test("a signed distribution draws its zero, and an unsigned one is unchanged", () => {
+test("a signed distribution draws its zero, and an unsigned one does not", () => {
   /*
    * The enrollment-change strip on `/districts` is the site's one signed distribution and drew no
    * zero reference, so a dot two thirds along could have been a district that grew or one that
    * shrank. `histogramSpec` draws a dashed rule and labels it "no change" for exactly that reason.
    *
    * Detected from the domain rather than passed at the call site, which is what makes it reach
-   * the sixth strip without anyone remembering. The five unsigned strips keep their geometry: they
-   * sit one row apart on the same page and a taller sixth would be visible as a jump.
+   * the sixth strip without anyone remembering. Every strip is one height, because every strip
+   * carries a foot: the six sit one row apart on the same page and a taller one would be a jump.
    */
   const signed = distributionSpec(
     [-0.08, -0.03, -0.01, 0.02, 0.05, 0.09].map((value) => ({ value, hover: `${value}` })),
-    W,
+    { ...W, format: (v) => pct(v, 0) },
   );
   expect(signed).not.toBeNull();
   expect(signed!.options.height).toBe(64);
@@ -147,10 +150,55 @@ test("a signed distribution draws its zero, and an unsigned one is unchanged", (
 
   const unsigned = distributionSpec(
     [1, 2, 3, 4, 5, 6].map((value) => ({ value, hover: `${value}` })),
-    W,
+    { ...W, format: String },
   );
-  expect(unsigned!.options.height).toBe(46);
+  expect(unsigned!.options.height).toBe(64);
   expect(renderToString(() => unsigned, "presentational")).not.toContain("no change");
+});
+
+/** Each `.axis-foot` text in a rendered drawing, with the x its `transform` places it at. */
+function footLabels(svg: string): { x: number; text: string }[] {
+  const doc = parseHTML(`<div>${svg}</div>`).document;
+  return [...doc.querySelectorAll("g.axis-foot text")].map((t) => {
+    const at = /translate\(([-\d.]+)/.exec(t.getAttribute("transform") ?? "");
+    return { x: at ? Number(at[1]) : Number(t.getAttribute("x") ?? NaN), text: t.textContent ?? "" };
+  });
+}
+
+test("a strip's end labels sit at the values they name", () => {
+  /*
+   * The HTML scale row under a strip named the data's extremes at the edges of the box. The domain
+   * is padded, so the edges are not the extremes: the "$896" at the right end of the aid strip
+   * labelled empty space a few pixels past the last dot. The strip now states nice values, each
+   * drawn at its own x, so a label is a claim about where it stands.
+   */
+  const values = [3120, 4410, 5000, 6200, 7400, 9100, 12800, 15500];
+  const spec = distributionSpec(
+    values.map((value) => ({ value, hover: `${value}` })),
+    { ...W, format: compactMoney },
+  );
+  const svg = renderToString(() => spec, "presentational");
+  const labels = footLabels(svg).filter((l) => /\$/.test(l.text));
+  expect(labels.length).toBeGreaterThanOrEqual(2);
+  const [lo, hi] = spec!.options.x!.domain as [number, number];
+  const left = 2;
+  const right = W.width - 2;
+  for (const { x, text } of labels) {
+    const value = Number(text.replace(/[$,]/g, "").replace(/K$/, "e3"));
+    const expected = left + ((value - lo) / (hi - lo)) * (right - left);
+    expect(Math.abs(x - expected), `${text} at ${x}, scale says ${expected}`).toBeLessThanOrEqual(1);
+  }
+});
+
+test("a log axis over two decades labels the decades between its ends", () => {
+  /*
+   * A log axis labelled only at its two ends gives a reader no way to tell whether the middle of the
+   * strip is ten times the left or a thousand; the interior powers of ten are what make the spacing
+   * legible.
+   */
+  expect(axisTicks([3, 4200], true)).toEqual([5, 10, 100, 1000, 2000]);
+  expect(axisTicks([3, 4200], true).length).toBeGreaterThanOrEqual(3);
+  expect(axisTicks([0.6, 9.4])).toEqual([2, 8]);
 });
 
 test("the label gutter is sized to the labels that are drawn", () => {
@@ -849,31 +897,16 @@ test("no drawing is scaled up past the ceiling that keeps its type at body size"
   expect(12 * MAX_SCALE).toBeLessThanOrEqual(15);
 });
 
-test("the scale row under a strip is capped where the drawing above it is", () => {
-  // `.chart-scale` cannot read the drawing's `max-width`, so it states the same two products.
-  const css = readFileSync(resolve(process.cwd(), "src/styles/app.css"), "utf8");
-  const caps = [
-    ...css.matchAll(/\.chart-scale > \.scale \{ max-width: calc\((\d+)px \* ([\d.]+)\); \}/g),
-  ].map((m) => [Number(m[1]), Number(m[2])]);
-  expect(caps).toEqual([
-    [WIDTHS.narrow, MAX_SCALE],
-    [WIDTHS.middle, MAX_SCALE],
-    [WIDTHS.wide, MAX_SCALE],
-    // Print shows the wide drawing whatever the width, and the row follows it.
-    [WIDTHS.wide, MAX_SCALE],
-  ]);
-});
-
 test("each drawing takes over at its own width, from one already at its cap", () => {
   /*
    * #609. With the swap anywhere else, one of two things comes back: a band where the drawing
    * shown has stopped at its cap and its box runs on, or a drawing shown smaller than it was laid
    * out. The container queries are read from the stylesheet, because they are where the swap
-   * actually happens, and both of them — `.chart-pair` and `.chart-scale` — must say the same.
+   * actually happens.
    */
   const css = readFileSync(resolve(process.cwd(), "src/styles/app.css"), "utf8");
   const swaps = [...css.matchAll(/@container \(min-width: (\d+)px\)/g)].map((m) => Number(m[1]));
-  expect(swaps).toEqual([WIDTHS.middle, WIDTHS.wide, WIDTHS.middle, WIDTHS.wide]);
+  expect(swaps).toEqual([WIDTHS.middle, WIDTHS.wide]);
 
   const order = [WIDTHS.narrow, WIDTHS.middle, WIDTHS.wide];
   for (let i = 1; i < order.length; i += 1) {
@@ -1041,4 +1074,52 @@ test("a panel is never drawn at the width of a whole chart", () => {
     /renderToString/,
   );
   expect(renderPanelToString(() => series(panelWidth(2)), "presentational", panelWidth(2))).toContain("<svg");
+});
+
+test("a range chart too tall to read against its foot states its scale at the top as well", () => {
+  /*
+   * #611: `/counties` draws 84 rows in 1470px and said what a position meant only at the bottom,
+   * a screen and a half from the first row. Above the threshold the scale is repeated over the
+   * frame; a short chart keeps the foot alone.
+   */
+  const rows = (n: number): Range[] =>
+    Array.from({ length: n }, (_, i) => ({ label: `County ${i}`, low: 1000 + i * 50, high: 4000 + i * 90, hover: "" }));
+  const axis = { label: "aid per pupil", format: compactMoney };
+  const ends = (svg: string, cls: string) =>
+    [...parseHTML(`<div>${svg}</div>`).document.querySelectorAll(`g.${cls} text`)].filter((t) =>
+      /\$/.test(t.textContent ?? ""),
+    ).length;
+
+  const tall = renderToString(() => rangeSpec(rows(84), axis, W), "presentational");
+  expect(ends(tall, "axis-foot")).toBeGreaterThanOrEqual(2 * DRAWINGS);
+  expect(ends(tall, "axis-head")).toBeGreaterThanOrEqual(2 * DRAWINGS);
+  expect(rangeSpec(rows(84), axis, W)!.options.marginTop).toBeGreaterThan(0);
+
+  const short = renderToString(() => rangeSpec(rows(6), axis, W), "presentational");
+  expect(ends(short, "axis-foot")).toBeGreaterThanOrEqual(2 * DRAWINGS);
+  expect(ends(short, "axis-head")).toBe(0);
+});
+
+test("a spread's rules are told apart by dash, as their legend swatches are", () => {
+  /*
+   * #611: the TTAG spread draws "the floor equals the formula" and "the formula pays what the FY2020
+   * regime did", and both were dashed `4 3` with one grey key swatch between them. Within one
+   * figure every rule now has its own (stroke, dash) and its own swatch.
+   */
+  const points: ScatterPoint[] = Array.from({ length: 20 }, (_, i) => ({ x: i, y: i % 7, hover: "" }));
+  const rules = [
+    { label: "y = -x", from: { x: 0, y: 0 }, to: { x: 19, y: -19 } },
+    { label: "y = 0", from: { x: 0, y: 0 }, to: { x: 19, y: 0 } },
+  ];
+  const svg = renderToString(() => scatterSpec(points, AXES, [], { ...W, rules }), "presentational");
+  const drawn = [...parseHTML(`<div>${svg}</div>`).document.querySelectorAll("g.scatter-rule")]
+    .slice(0, rules.length)
+    .map((g) => {
+      const path = g.querySelector("path");
+      return `${g.getAttribute("stroke") ?? path?.getAttribute("stroke")} ${g.getAttribute("stroke-dasharray") ?? path?.getAttribute("stroke-dasharray")}`;
+    });
+  expect(drawn).toHaveLength(2);
+  expect(new Set(drawn).size).toBe(2);
+  expect(new Set(rules.map((_, at) => ruleSwatch(at))).size).toBe(2);
+  expect(() => ruleSwatch(rules.length)).toThrow(/no dash of its own/);
 });

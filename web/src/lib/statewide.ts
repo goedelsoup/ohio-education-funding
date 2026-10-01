@@ -3,7 +3,7 @@
 import type { Bar } from "./chart.ts";
 import { barSpec, type Drawing, scatterSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
-import { count, escapeHtml, fig, fixed, millions, money, pct } from "./format.ts";
+import { compactMoney, count, escapeHtml, fig, fixed, millions, money, pct } from "./format.ts";
 import { realChange, series, type Basis } from "./real.ts";
 import * as routes from "./routes.ts";
 import type { TaxStatewide } from "./feed.ts";
@@ -59,7 +59,7 @@ export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
     value: y.ending_cash!,
     hover: `FY${y.fiscal_year}: ${millions(y.ending_cash).replace("+", "")} held, ${millions(y.total_revenue).replace("+", "")} in, ${millions(y.total_expenditure).replace("+", "")} out`,
     ...(y.fiscal_year === peak?.fiscal_year || y.fiscal_year === latest.fiscal_year
-      ? { direct: millions(y.ending_cash).replace("+", "") }
+      ? { direct: compactMoney(y.ending_cash) }
       : {}),
   }));
 
@@ -224,8 +224,8 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
     scatterSpec(
       points,
       {
-        x: { label: "assessed valuation per pupil", format: (v) => money(v), log: true },
-        y: { label: "state aid per pupil", format: (v) => money(v), log: true },
+        x: { label: "assessed valuation per pupil", format: compactMoney, log: true },
+        y: { label: "state aid per pupil", format: compactMoney, log: true },
       },
       [formulaTrace, realizedTrace],
       { width: w },

@@ -9,7 +9,7 @@
 import { bin, type FanPoint } from "./chart.ts";
 import { renderToString } from "./plot/client.ts";
 import { fanSpec, histogramSpec } from "./plot/spec.ts";
-import { count, escapeHtml, millions, money, pct, signedMoney } from "./format.ts";
+import { compactMoney, count, escapeHtml, millions, money, pct, signedMoney } from "./format.ts";
 import {
   MOVED,
   applyAll,
@@ -431,7 +431,7 @@ export function renderProjection(bundle: Panel, levers: Levers, chip = ""): stri
 
       <div class="chartwrap" data-chart="fan">${renderToString((w) => fanSpec(
         points,
-        (v) => millions(v).replace("+", ""),
+        compactMoney,
         (p) =>
           p.observed
             ? `FY${p.year}: ${millions(p.point).replace("+", "")} at published enrollment — exact`

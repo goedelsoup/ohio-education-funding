@@ -31,7 +31,7 @@
  */
 import type { Bar } from "../../lib/chart.ts";
 import { firstOf, lastOf } from "../../lib/ends.ts";
-import { count, money, pct } from "../../lib/format.ts";
+import { compactMoney, count, money, pct } from "../../lib/format.ts";
 import { barSpec } from "../../lib/plot/spec.ts";
 import { renderToString } from "../../lib/plot/ssr.ts";
 import * as routes from "../../lib/routes.ts";
@@ -94,7 +94,7 @@ const bars: Bar[] = d.casino.map((y) => ({
     y.fiscal_year === CASINO_CLOSURE_YEAR ? " — the casinos were closed for a quarter of it" : ""
   }`,
   ...(y.fiscal_year === latest?.fiscal_year || y.fiscal_year === CASINO_CLOSURE_YEAR
-    ? { direct: money(y.amount) }
+    ? { direct: compactMoney(y.amount) }
     : {}),
 }));
 ---

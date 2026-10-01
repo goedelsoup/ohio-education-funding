@@ -13,7 +13,7 @@
  * The percentile stays underneath. It is the sentence a reader repeats and the box is what makes
  * it mean something.
  */
-import { count, money, ordinal, percentileOf } from "../../lib/format.ts";
+import { compactMoney, count, money, ordinal, percentileOf } from "../../lib/format.ts";
 import { distributionSpec, type Drawing, nearestRank } from "../../lib/plot/spec.ts";
 import { renderToString } from "../../lib/plot/ssr.ts";
 import type { District } from "../../lib/types.ts";
@@ -42,7 +42,7 @@ const box: Drawing | null =
             .map((d) => ({ d, v: measure(d) }))
             .filter((row): row is { d: District; v: number } => row.v != null)
             .map(({ d, v }) => ({ value: v, hover: `${d.name}: ${money(v)}` })),
-          { width: w, marker: { value, label } },
+          { width: w, format: compactMoney, marker: { value, label } },
         );
 ---
 
@@ -56,13 +56,7 @@ const box: Drawing | null =
         <strong class="tnum">{money(value)}{" "}
           <span class="n">{percentile} percentile</span></strong>
       </div>
-      <div class="chart-scale">
-        <div class="chartwrap" data-chart="position" set:html={renderToString(box, { label: `${label} across the ${count(sorted.length)} districts reporting it, with this district at ${money(value)}, the ${percentile} percentile`, description: `Quartiles run ${money(nearestRank(sorted, 0.25))} to ${money(nearestRank(sorted, 0.75))}, median ${money(nearestRank(sorted, 0.5))}` })} />
-        <div class="scale">
-          <span>{money(sorted[0] ?? 0)}</span>{" "}
-          <span>{money(sorted[sorted.length - 1] ?? 0)}</span>
-        </div>
-      </div>
+      <div class="chartwrap" data-chart="position" set:html={renderToString(box, { label: `${label} across the ${count(sorted.length)} districts reporting it, with this district at ${money(value)}, the ${percentile} percentile`, description: `Quartiles run ${money(nearestRank(sorted, 0.25))} to ${money(nearestRank(sorted, 0.75))}, median ${money(nearestRank(sorted, 0.5))}` })} />
     </div>
   )
 }
