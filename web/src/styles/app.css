@@ -1330,6 +1330,9 @@ tr.series-break > td {
  *
  * `.note` and `.conditions li` keep `--measure-note`: they are qualification beside a figure
  * rather than a paragraph of argument, and 74ch is the wider of the two measures for that reason.
+ * That holds only for a note nested below the card: `.card > p` (0,1,1) outranks `.note` (0,1,0),
+ * so a note that is the card's own child is set as prose here. The one note whose size must not
+ * depend on its nesting — the dek directly above a chart — has its own rule beside `.note` (#657).
  */
 .card > p,
 .card > ul,
@@ -1478,7 +1481,13 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .seg[data-series="formula"] { background: var(--series-formula); }
 .seg[data-series="guarantee"] { background: var(--series-guarantee); }
 
-.legend { display: flex; gap: var(--space-6); flex-wrap: wrap; margin-top: var(--space-3); font-size: var(--text-sm); color: var(--text-secondary); }
+/*
+ * A key goes directly above the chart it keys, with no prose between (#657). It sat above on three
+ * charts and below on five, and on `/outcomes` one key served two charts from a paragraph away. So
+ * the margin is on both sides: the dek or heading above it, the drawing below. `charts.spec.ts`
+ * fails on a key with anything but its chart after it.
+ */
+.legend { display: flex; gap: var(--space-6); flex-wrap: wrap; margin: var(--space-3) 0; font-size: var(--text-sm); color: var(--text-secondary); }
 .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: var(--space-2); vertical-align: baseline; }
 .sw[data-series="formula"], .sw[data-series="gain"] { background: var(--series-formula); }
 .sw[data-series="guarantee"], .sw[data-series="loss"] { background: var(--series-guarantee); }
@@ -1749,6 +1758,19 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
    margin only it sat flush against that card on `/county/*` and `/house/*` (#578); this is the gap
    `.lead` leaves before the first card on the routes that open with one. */
 main > .note { margin-bottom: var(--space-6); }
+/*
+ * The dek: the note directly above a chart, or above the key directly above one.
+ *
+ * It is argument rather than qualification — the sentence the chart is drawn to prove — so it is
+ * set as prose. It was prose only by accident of nesting: a dek that was the card's own child took
+ * `.card > p` at 16.96px on a 726px measure, and one a level down kept `.note` at 14.08px on 656, so
+ * the Change tab carried both sizes in one card (#657). This rule outranks both, wherever it sits.
+ */
+p.note:has(+ .chartwrap, + .legend + .chartwrap) {
+  font-size: var(--text-body);
+  line-height: var(--leading-prose);
+  max-width: var(--measure-prose);
+}
 .note code {
   background: var(--surface-inset);
   padding: .1rem var(--space-2);
@@ -3228,7 +3250,8 @@ tr.series-break > td {
   .card, .chartwrap, .tile, .strip-row, .flags, tr { break-inside: avoid; }
   /* A heading, and a legend, belong to what follows them. */
   h1, h2, h3, .contents-label { break-after: avoid; }
-  .legend { break-before: avoid; }
+  /* A key sits directly above its chart (#657), so it is kept with the chart below it. */
+  .legend { break-after: avoid; }
   /* A table that does cross a page carries its column heads onto the next one. */
   thead { display: table-header-group; }
 

@@ -75,8 +75,10 @@ export const SERIES_TEXT = {
  *
  * So the conclusion held and the arithmetic behind it did not exist. It does now.
  *
- * A chart using this must carry a legend. The end steps sit near 2.2:1 against their own surface,
- * which is a contrast warning that obligates relief rather than one that can be waved off.
+ * A chart using this must carry a key in text ink: a legend, or the swatch-and-name labels
+ * `scatterSpec` draws in its gutter for a banded trace. The end steps sit near 2.2:1 against their
+ * own surface, which is a contrast warning that obligates relief rather than one that can be
+ * waved off.
  */
 export const ORDINAL = [
   "var(--ordinal-1)",

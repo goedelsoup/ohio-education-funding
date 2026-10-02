@@ -1177,6 +1177,7 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
   return `
     <div class="card stage" id="positions" data-part="positions">
       <h2>${heading("positions", "Where every district stands", chip)}</h2>
+      <div class="legend">${legend}</div>
       <div class="chartwrap" data-chart="positions">${renderToString(
         (w) =>
           scatterSpec(
@@ -1203,7 +1204,6 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
           description: `${count(scoped - pinned)} ${scope == null ? "districts" : `of the ${count(scoped)} districts in scope`} are paid differently under these settings and ${count(pinned)} are paid the same.${wall ? " No district can fall below the diagonal, where realized aid equals formula aid; a district drawn above it is held by the guarantee and the vertical distance is what the guarantee pays it. A trail that runs flat is a district whose formula amount moved and whose payment did not." : ""}`,
         },
       )}</div>
-      <div class="legend">${legend}</div>
       <p class="note">${
         wall
           ? `Nothing can sit below the diagonal: a district receives the larger of its formula

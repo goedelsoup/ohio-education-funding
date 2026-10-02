@@ -417,32 +417,61 @@ test("a log axis over two decades labels the decades between its ends", () => {
   expect(axisTicks([0.6, 9.4])).toEqual([2, 8]);
 });
 
-test("the label gutter is sized to the labels that are drawn", () => {
+/** Each drawn `<g class>` mark's shapes in a rendered drawing, at the position the transforms add up to. */
+function placed(svg: string, className: string): { x: number; y: number; text: string; fill: string }[] {
+  const doc = parseHTML(`<div>${svg.slice(0, svg.indexOf("</svg>") + 6)}</div>`).document;
+  const shift = (el: Element | null) => {
+    const at = /translate\(([-\d.]+),([-\d.]+)\)/.exec(el?.getAttribute("transform") ?? "");
+    return at ? [Number(at[1]), Number(at[2])] : [0, 0];
+  };
+  return [...doc.querySelectorAll(`g.${className}`)].flatMap((g) => {
+    const [gx, gy] = shift(g);
+    return [...g.children].map((child) => {
+      const [x, y] = shift(child);
+      return { x: x! + gx!, y: y! + gy!, text: child.textContent ?? "", fill: g.getAttribute("fill") ?? "" };
+    });
+  });
+}
+
+test("a banded trace is named in the gutter, behind a swatch of its band", () => {
   /*
-   * A banded trace carries its identity in the legend, and `scatterSpec` deliberately draws no end
-   * label for one. The gutter was sized off every trace all the same, so both banded scatters on
-   * `/outcomes` gave up 22% of a 640px frame to labels that were never rendered.
+   * On `/outcomes` one legend keyed two banded scatters from above both — 171px above the first at
+   * 1280, a screen above the second (#657). Each median line is named where it ends instead, in
+   * the gutter so the names stay off the cloud, in text ink because the ramp's end steps are near
+   * 2.2:1 against the card, and behind a swatch so the hue is still on the page.
+   *
+   * Three lines ending a fraction of a unit apart is the hard case: their names must not print on
+   * each other, and each must still sit in the order its line ends.
    */
   const points = cloud(Array.from({ length: 30 }, (_, i) => 10_000 + i * 400));
-  const banded: Trace[] = ["least poor third", "middle third", "poorest third"].map((label, band) => ({
+  const banded: Trace[] = ["Least poor", "Middle", "Poorest"].map((label, band) => ({
     label,
     series: "formula",
     band,
-    points: [{ x: 10_000, y: 50 }, { x: 20_000, y: 55 }],
+    points: [{ x: 10_000, y: 50 }, { x: 20_000, y: 55 + band * 0.1 }],
   }));
 
-  const withBands = scatterSpec(points, AXES, banded, W)!;
-  const withNone = scatterSpec(points, AXES, [], W)!;
-  expect(withBands.options.marginRight).toBe(withNone.options.marginRight);
+  const spec = scatterSpec(points, AXES, banded, W)!;
+  const bare = scatterSpec(points, AXES, [], W)!;
+  // The names get their room, or they run off the viewBox.
+  expect(spec.options.marginRight).toBeGreaterThan(bare.options.marginRight!);
 
-  // A trace that *is* labelled still gets its room, or the label runs off the viewBox.
-  const labelled = scatterSpec(
-    points,
-    AXES,
-    [{ label: "median of each fifth", series: "formula", points: banded[0]!.points }],
-    W,
-  )!;
-  expect(labelled.options.marginRight).toBeGreaterThan(withNone.options.marginRight!);
+  const svg = renderToString(() => spec, "presentational");
+  const names = placed(svg, "scatter-trace-end");
+  const swatches = placed(svg, "scatter-band-key");
+  expect(names.map((n) => n.text)).toEqual(["Poorest", "Middle", "Least poor"]);
+  expect(swatches.map((s) => s.fill)).toEqual([ORDINAL[2], ORDINAL[1], ORDINAL[0]]);
+
+  const frame = W.width - spec.options.marginRight!;
+  for (const [i, name] of names.entries()) {
+    expect(name.fill, "text ink, not the band's hue").toBe(INK.secondary);
+    expect(name.x, `${name.text} sits in the gutter`).toBeGreaterThan(frame);
+    expect(swatches[i]!.x).toBeGreaterThan(frame);
+    expect(swatches[i]!.x).toBeLessThan(name.x);
+    expect(Math.abs(swatches[i]!.y - name.y), "a swatch on its name's line").toBeLessThan(0.01);
+    expect(name.x + name.text.length * 7.2, `${name.text} inside the viewBox`).toBeLessThanOrEqual(W.width);
+    if (i > 0) expect(name.y - names[i - 1]!.y, "clear of the name above").toBeGreaterThanOrEqual(13);
+  }
 });
 
 test("a small multiple can be put on one horizontal scale", () => {
