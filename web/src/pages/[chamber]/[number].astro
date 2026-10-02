@@ -13,7 +13,7 @@ import { NAMES } from "../../lib/nav.ts";
 import * as routes from "../../lib/routes.ts";
 import { yearChip } from "../../lib/year.ts";
 import SectionAnchor from "../../components/SectionAnchor.astro";
-import { BOX_FROM, distributionSpec } from "../../lib/plot/spec.ts";
+import { distributionSpec } from "../../lib/plot/spec.ts";
 import { renderToString } from "../../lib/plot/ssr.ts";
 
 export async function getStaticPaths() {
@@ -52,6 +52,7 @@ const spreadValues = house.members
   .map((d) => ({
     value: d.valuation_per_pupil!,
     hover: `${d.name}: ${money(d.valuation_per_pupil!)} per pupil, ${money(d.realized_aid_per_pupil)} state aid per pupil`,
+    name: d.name,
   }));
 const spreadCount = spreadValues.length;
 // The card's finding (#653): the two ends of the strip, by name.
@@ -67,7 +68,18 @@ const spreadFinding =
     : seatRichest
       ? `${seatRichest.name} stands on ${money(seatRichest.valuation_per_pupil!)} of tax base per pupil.`
       : null;
-const spread = renderToString((w) => distributionSpec(spreadValues, { width: w, format: compactMoney }), { label: `Assessed valuation per pupil across the ${spreadCount} districts in ${label} District ${number} with a reported tax base, poorest to wealthiest` });
+/*
+ * The two ends by name, and Ohio's median as a dashed rule (#654): eighteen dots from $110K to
+ * $259K said nothing about whether that was a poor seat or a rich one until the strip carried a
+ * number from outside the seat to read them against.
+ */
+const ohioMedian = bundle.statewide.median_valuation_per_pupil;
+const spread = renderToString((w) => distributionSpec(spreadValues, {
+  width: w,
+  format: compactMoney,
+  ends: true,
+  reference: { value: ohioMedian, label: `Ohio median ${money(ohioMedian)}` },
+}), { label: `Assessed valuation per pupil across the ${spreadCount} districts in ${label} District ${number} with a reported tax base, poorest to wealthiest` });
 /*
  * The valuation column, beside the strip it is drawn from.
  *
@@ -141,7 +153,6 @@ const valuationByIrn = new Map(
           <p class="note">
             {spreadFinding && <><strong>{spreadFinding}</strong>{" "}</>}Assessed valuation per pupil across the {spreadCount} districts here with a reported
             tax base, poorest on the left.
-            {" "}{spreadCount >= BOX_FROM ? " The shaded box is the middle half of them." : ""}
           </p>
           <div class="chartwrap" data-chart="seat-spread" set:html={spread} />
         </>

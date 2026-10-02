@@ -20,6 +20,13 @@ import type { District } from "../../lib/types.ts";
 
 interface Props {
   label: string;
+  /** What the marked district is called, printed above its rule. */
+  name: string;
+  /**
+   * Ohio's published median of the measure, printed on the strip (#654). The published figure and
+   * not the box's nearest-rank rule, so the strip states the number every other page states.
+   */
+  median: number;
   /** This district's value, or null where it reported none. */
   value: number | null;
   /** Every reporting district's value, ascending. */
@@ -30,7 +37,7 @@ interface Props {
   href?: string;
 }
 
-const { label, value, sorted, population, measure, href } = Astro.props;
+const { label, name, median, value, sorted, population, measure, href } = Astro.props;
 const percentile = value == null ? null : ordinal(Math.round(percentileOf(sorted, value) * 100));
 
 const box: Drawing | null =
@@ -42,7 +49,12 @@ const box: Drawing | null =
             .map((d) => ({ d, v: measure(d) }))
             .filter((row): row is { d: District; v: number } => row.v != null)
             .map(({ d, v }) => ({ value: v, hover: `${d.name}: ${money(v)}` })),
-          { width: w, format: compactMoney, marker: { value, label } },
+          {
+            width: w,
+            format: compactMoney,
+            marker: { value, label: name },
+            reference: { value: median, label: `Ohio median ${money(median)}` },
+          },
         );
 ---
 
@@ -56,7 +68,7 @@ const box: Drawing | null =
         <strong class="tnum">{money(value)}{" "}
           <span class="n">{percentile} percentile</span></strong>
       </div>
-      <div class="chartwrap" data-chart="position" set:html={renderToString(box, { label: `${label} across the ${count(sorted.length)} districts reporting it, with this district at ${money(value)}, the ${percentile} percentile`, description: `Quartiles run ${money(nearestRank(sorted, 0.25))} to ${money(nearestRank(sorted, 0.75))}, median ${money(nearestRank(sorted, 0.5))}` })} />
+      <div class="chartwrap" data-chart="position" set:html={renderToString(box, { label: `${label} across the ${count(sorted.length)} districts reporting it, with this district at ${money(value)}, the ${percentile} percentile`, description: `Quartiles run ${money(nearestRank(sorted, 0.25))} to ${money(nearestRank(sorted, 0.75))}` })} />
     </div>
   )
 }

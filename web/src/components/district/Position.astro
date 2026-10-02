@@ -61,6 +61,8 @@ const finding =
     box's width. Anything drawn past them is its own district. The colored rule is this one.</p>
   <Strip
     label="Assessed valuation per pupil"
+    name={d.name}
+    median={bundle.statewide.median_valuation_per_pupil}
     value={d.valuation_per_pupil}
     sorted={valuations}
     population={bundle.districts}
@@ -69,6 +71,8 @@ const finding =
   />
   <Strip
     label="Operating expenditure per pupil"
+    name={d.name}
+    median={bundle.statewide.median_operating_expenditure_per_pupil}
     value={d.operating_expenditure_per_pupil}
     sorted={expenditures}
     population={bundle.districts}
