@@ -25,6 +25,7 @@ export const districtOutcome = (irn: string): string => `/district/${irn}/outcom
 export const districtScenario = (irn: string): string => `/scenario?d=${irn}`;
 export const districtFinances = (irn: string): string => `/district/${irn}/finances`;
 export const districtTaxes = (irn: string): string => `/district/${irn}/taxes`;
+export const districtChange = (irn: string): string => `/district/${irn}/change`;
 
 /**
  * The scenario runner, opened from a draft bill.
@@ -133,6 +134,11 @@ export const SECTIONS = {
     categoricals: "categoricals",
     supplements: "supplements",
     biennium: "biennium",
+    byLine: "by-line",
+    phaseIn: "phase-in",
+    drivers: "drivers",
+    transfers: "transfers",
+    neighbors: "neighbors",
     position: "position",
     national: "national",
     specialEducation: "special-education",

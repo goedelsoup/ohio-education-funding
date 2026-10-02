@@ -263,7 +263,7 @@ test.describe("the chrome above the fold", () => {
 });
 
 test.describe("routes", () => {
-  test("each of a district's four views is its own address, and the fifth tab opens the runner on it", async ({
+  test("each of a district's five views is its own address, and the sixth tab opens the runner on it", async ({
     page,
   }) => {
     // `/taxes` landed after the other four and was left out of this list, so the one nav state
@@ -275,6 +275,7 @@ test.describe("routes", () => {
       ["/outcome", "Outcome"],
       ["/finances", "Finances"],
       ["/taxes", "Taxes"],
+      ["/change", "Change"],
     ] as const) {
       await page.goto(`/district/${NORTHERN}${path}`);
       await expect(page.locator("h1")).toHaveText("Northern Local");

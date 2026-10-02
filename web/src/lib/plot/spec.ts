@@ -567,6 +567,17 @@ function gutter(width: number, wanted: number): number {
  */
 const EM_PER_CHAR = 0.667;
 
+/**
+ * How much wider a name is drawn at weight 600 than at normal weight.
+ *
+ * The budget above is measured on normal-weight text, and a bar chart draws its subject's name
+ * bold. On a phone the name gutter is capped, so the bold name is the one that has to wrap — and
+ * `Cleveland Municipal`, marked on its county's chart at `WIDTHS.narrow`, fitted the normal-weight
+ * budget, stayed on one line and painted 10px past the left of the frame on CI's fonts (#639).
+ * Ten in 125px is 8%, so the factor is that rather than a figure chosen first.
+ */
+const BOLD_WIDENS = 1.08;
+
 /** A `lineWidth` in ems that holds a line to `px` pixels of drawn text. */
 function lineWidth(px: number, fontSize = 10): number {
   return (px / fontSize) * (0.5 / EM_PER_CHAR);
@@ -1052,7 +1063,12 @@ export function barSpec(
   // This was a fixed 160, which silently clipped anything longer — "Building leadership and
   // operation" rendered as "g leadership and operation", which reads as a rendering fault rather
   // than a truncation and is exactly the kind of thing nobody reports.
-  const longestLabel = Math.max(0, ...bars.map((b) => b.label.length));
+  // A marked name is drawn at 600 (below), which is wider than the same name at normal weight, so
+  // it is counted at the width it is drawn at — see {@link BOLD_WIDENS}.
+  const longestLabel = Math.max(
+    0,
+    ...bars.map((b) => b.label.length * (b.current ? BOLD_WIDENS : 1)),
+  );
   /*
    * The name gutter, and what it costs when the frame is a phone wide.
    *
@@ -1167,7 +1183,8 @@ export function barSpec(
                 textAnchor: "end",
                 fill: INK.primary,
                 fontWeight: 600,
-                lineWidth: lineWidth(nameGutter),
+                // The budget is what is left of the gutter after the `dx`, at the bold width.
+                lineWidth: lineWidth((nameGutter - 10) / BOLD_WIDENS),
                 className: "bar-label current",
               }),
             ]

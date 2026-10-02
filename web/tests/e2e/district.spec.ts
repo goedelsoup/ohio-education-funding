@@ -440,7 +440,7 @@ test.describe("the four tabs are one page", () => {
      */
     await page.setViewportSize({ width: 1280, height: 900 });
     const xs: number[] = [];
-    for (const tab of ["", "/finances", "/outcome", "/taxes"]) {
+    for (const tab of ["", "/finances", "/outcome", "/taxes", "/change"]) {
       await page.goto(`/district/${CLEVELAND}${tab}`);
       const box = (selector: string) =>
         page.locator(selector).evaluate((n) => {

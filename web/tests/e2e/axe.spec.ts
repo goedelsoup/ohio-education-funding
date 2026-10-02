@@ -32,6 +32,7 @@ test.describe("axe", () => {
     ["a district's finances, which is where the basis switch is", `/district/${CLEVELAND}/finances`],
     ["a district's outcomes", `/district/${CLEVELAND}/outcome`],
     ["a district's taxes", `/district/${CLEVELAND}/taxes`],
+    ["a district's change, which has the measure switch", `/district/${CLEVELAND}/change`],
     ["the scenario runner, which rewrites itself", "/scenario"],
     ["the reach view, which is the runner asking who rather than how much", "/scenario/reach"],
     /*

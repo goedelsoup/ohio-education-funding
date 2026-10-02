@@ -153,8 +153,9 @@ describe("the comparison arrives with the page", () => {
     expect(card, "#compare-out holds a comparison card naming its own pair").not.toBeNull();
     expect(card![1], "and the pair is the corpus's own property-poor half").toBe(NORTHERN);
 
-    // Seventeen rows: thirteen quantities and four flags, each addressable by its own key.
-    expect((page.match(/data-row="/g) ?? []).length).toBe(17);
+    // Nineteen rows: fifteen quantities and four flags, each addressable by its own key. The two
+    // year-on-year change rows (#639) are the last two quantities added.
+    expect((page.match(/data-row="/g) ?? []).length).toBe(19);
     // Both column heads name a district and link to it, which is the half a swap rewrites.
     // `[^>]*` because a post-build pass adds `scope="col"` between the tag and the attribute.
     expect((page.match(/<th[^>]*data-head="[ab]"[^>]*><a href="\/district\//g) ?? []).length).toBe(2);

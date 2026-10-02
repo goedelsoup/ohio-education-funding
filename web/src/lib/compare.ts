@@ -54,6 +54,8 @@ export interface Years {
   profile: string;
   /** The year of the operating-expenditure row. */
   spending: string;
+  /** The two model years the change rows run between, `[from, to]`. */
+  change: [number, number];
 }
 
 /** One comparable quantity, with the formatter that makes it readable. */
@@ -142,12 +144,39 @@ export const ROWS: Row[] = [
     format: (v) => pct(v, 1),
   },
   {
+    /*
+     * The year on year, on both measures and named as such (#639). Both are department models —
+     * the footnote says so — and a percentage, so a city and a village compare on one scale.
+     */
+    key: "total-change",
+    label: (y) => `Total state support, FY${y.change[0]} to FY${y.change[1]}`,
+    pick: (d) => change(d.biennium.total_middle, d.biennium.total_terminal),
+    format: (v) => signedPct(v),
+  },
+  {
+    key: "foundation-change",
+    label: (y) => `Foundation aid, FY${y.change[0]} to FY${y.change[1]}`,
+    pick: (d) => change(d.biennium.foundation_middle, d.biennium.foundation_terminal),
+    format: (v) => signedPct(v),
+  },
+  {
     key: "enrollment-change",
     label: (y) => `Enrollment change, ${y.enrollment.replace("-", "–")}`,
     pick: (d) => d.enrollment_change,
     format: (v) => pct(v, 1),
   },
 ];
+
+/** A change as a share of where it started, or `null` from nothing. */
+function change(from: number, to: number): number | null {
+  return from > 0 ? to / from - 1 : null;
+}
+
+/** `+0.1%` or `−3.1%`; the difference column strips the sign and writes its own. */
+function signedPct(v: number | null): string {
+  if (v == null) return "—";
+  return v > 0 ? `+${pct(v, 1)}` : pct(v, 1);
+}
 
 /** A yes/no property, which has a difference but not an arithmetic one. */
 export interface Flag {
@@ -250,6 +279,8 @@ export function comparison(years: Years, left: Named, right: Named, chip: string
         higher property wealth point in opposite directions, and which figure counts as favorable
         depends on the argument being made — which is the reason to look at two districts rather
         than one. FY${years.fiscal} model; valuation is ${escapeHtml(years.profile)} and
-        expenditure ${escapeHtml(years.spending)}.</p>
+        expenditure ${escapeHtml(years.spending)}. The two change rows compare the department's
+        FY${years.change[0]} and FY${years.change[1]} models, not payments, in nominal
+        dollars.</p>
     </div>`;
 }

@@ -540,9 +540,17 @@ export const formulaInputs = ({
     casino: _cas,
     casino_counties: _cc,
     designated: _des,
-    biennium: _bi,
+    biennium,
     ...district
-  }: District): PanelDistrict => district;
+  }: District): PanelDistrict => ({
+    ...district,
+    biennium: {
+      total_middle: biennium.total_middle,
+      total_terminal: biennium.total_terminal,
+      foundation_middle: biennium.foundation_middle,
+      foundation_terminal: biennium.foundation_terminal,
+    },
+  });
 
 export function qualifiedName(district: District): string {
   if (!ambiguousNames) {

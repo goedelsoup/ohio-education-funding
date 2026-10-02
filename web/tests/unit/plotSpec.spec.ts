@@ -93,6 +93,29 @@ test("the bar a chart was built to locate is marked, on two channels", () => {
   expect(plain).not.toContain('font-weight="600"');
 });
 
+test("a marked name wraps at the width it is drawn at, which is bold", () => {
+  /*
+   * Cuyahoga's chart on `/district/043786/change` marks Cleveland Municipal. At the phone width the
+   * gutter is capped, the bold name fitted a budget measured on normal-weight text, and it painted
+   * 10px past the left of the frame on CI (#639). Wrapped, it is two words on two lines.
+   */
+  const bars: Bar[] = [
+    { label: "Cleveland Heights-University Heights City", value: 0.05 },
+    { label: "Cleveland Municipal", value: -0.02, current: true },
+    { label: "Bay Village City", value: 0.03 },
+  ];
+  const html = renderToString(
+    (w) => barSpec(bars, { width: w, scale: { format: String, says: "change" } }),
+    "presentational",
+  );
+  const { document } = parseHTML(`<div>${html}</div>`);
+  const marked = (at: string) =>
+    [...document.querySelectorAll(`[data-at="${at}"] .bar-label.current tspan`)].map((t) => t.textContent);
+  expect(marked("narrow")).toEqual(["Cleveland", "Municipal"]);
+  // Where the gutter is not capped it is sized to the bold name, which therefore stays whole.
+  expect(marked("wide")).toEqual([]);
+});
+
 test("a column with bars on both sides of zero draws its rule at every width", () => {
   /*
    * The first chart a corpus node draws — `dispersion/fy2016-step-by-business-class`, on the

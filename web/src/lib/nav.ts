@@ -149,6 +149,7 @@ export const DISTRICT_VIEWS = [
   { key: "outcome", name: "Outcome", href: routes.districtOutcome },
   { key: "finances", name: "Finances", href: routes.districtFinances },
   { key: "taxes", name: "Taxes", href: routes.districtTaxes },
+  { key: "change", name: "Change", href: routes.districtChange },
   { key: "scenario", name: NAMES.scenario.name, href: routes.districtScenario },
 ] as const;
 

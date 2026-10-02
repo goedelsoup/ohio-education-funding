@@ -3,7 +3,7 @@
  *
  * # One card, five pages
  *
- * A district has five routes — the dashboard, finances, outcome, scenario and taxes — and they all
+ * A district has five routes — the dashboard, outcome, finances, taxes and change — and they all
  * point at this one image. What separates them in a feed is `og:title`, which carries each page's
  * own title, so a share of `/district/043786/taxes` reads "Cleveland Municipal — Taxes"
  * above a card showing Cleveland's aid. Five renderings per district would be 3,045 images for a

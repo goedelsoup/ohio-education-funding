@@ -168,6 +168,7 @@ test.describe("every card has an address", () => {
       `/district/${CLEVELAND}`,
       `/district/${CLEVELAND}/finances`,
       `/district/${CLEVELAND}/taxes`,
+      `/district/${CLEVELAND}/change`,
     ]) {
       await page.goto(route);
       const anchors = page.locator("main a.section-anchor");

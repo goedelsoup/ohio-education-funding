@@ -21,7 +21,7 @@ import { CLEVELAND } from "./helpers.ts";
 // Columbus: the largest real property tax charge of any district, so the widest tile figure.
 const COLUMBUS = "043802";
 const ROUTES = [CLEVELAND, COLUMBUS].flatMap((irn) =>
-  ["finances", "taxes", "outcome"].map((page) => `/district/${irn}/${page}`),
+  ["finances", "taxes", "outcome", "change"].map((page) => `/district/${irn}/${page}`),
 );
 
 test.describe("a defined term", () => {

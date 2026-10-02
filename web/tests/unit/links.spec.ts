@@ -92,6 +92,7 @@ const PAGES = new Set<string>([
     routes.districtOutcome(d.irn),
     routes.districtFinances(d.irn),
     routes.districtTaxes(d.irn),
+    routes.districtChange(d.irn),
   ]),
   ...corpus.classes.map((c) => routes.wikiClass(c.className)),
   ...corpus.nodes.map((n) => routes.wikiNode(n.className, n.name)),
@@ -459,11 +460,12 @@ test("every corpus link the district renderers emit resolves", async () => {
 test("every district in the feed has all four of its views, and a way into the runner", () => {
   // The route table above is generated from the feed, so this checks the thing that route table
   // asserts: that `getStaticPaths` covers the whole panel and not a filtered subset of it.
-  expect(PAGES.size).toBeGreaterThanOrEqual(bundle.districts.length * 4);
+  expect(PAGES.size).toBeGreaterThanOrEqual(bundle.districts.length * 5);
   for (const irn of ["043786", "049056", "044933"]) {
     expect(PAGES.has(routes.district(irn))).toBe(true);
     expect(PAGES.has(routes.districtTaxes(irn))).toBe(true);
-    // The fifth tab is the runner opened on the district (#548), not a page of the district's own.
+    expect(PAGES.has(routes.districtChange(irn))).toBe(true);
+    // The last tab is the runner opened on the district (#548), not a page of the district's own.
     expect(known(routes.districtScenario(irn))).toBe(true);
     expect(PAGES.has(`/district/${irn}/scenario`)).toBe(false);
   }

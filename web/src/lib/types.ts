@@ -57,7 +57,7 @@ import type { Bundle, District, Statewide } from "./schema/feed.ts";
  * the build and the scenario routes refuse to proceed past when the two disagree — the deliberate
  * half of drift detection, where the strictness of the schemas is the accidental half.
  */
-export const REQUIRED_CONTRACT = "49.0.0";
+export const REQUIRED_CONTRACT = "50.0.0";
 
 /**
  * A district with only the fields the funding formula reads.
@@ -136,7 +136,19 @@ export type PanelDistrict = Omit<
   | "casino_counties"
   | "designated"
   | "biennium"
->;
+> & {
+  /**
+   * The biennium's last two years on both measures, and nothing else of it.
+   *
+   * `/compare` shows the year-on-year change (#639) and fetches two of these files; the per-line
+   * detail and the observed years stay on the district's own `/change` tab. Four numbers, about
+   * 140 bytes against the 2,304 B ceiling `payload.spec.ts` holds the largest file under.
+   */
+  biennium: Pick<
+    District["biennium"],
+    "total_middle" | "total_terminal" | "foundation_middle" | "foundation_terminal"
+  >;
+};
 
 /**
  * The feed with the two heavy per-district blocks removed. Served as `/data/panel.json`.
