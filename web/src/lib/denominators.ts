@@ -393,6 +393,10 @@ export const FIELD_DENOMINATORS: Record<string, DenominatorKey | null> = {
   "districts[].transition.open_enrollment_threshold": null,
   "districts[].transition.open_enrollment_adjustment": null,
 
+  // The enrollment growth supplement as each biennium year paid it: a dollar total, named for the
+  // count its eligibility is tested on. Not a quantity over a pupil count.
+  "districts[].biennium.observed[].enrollment_growth": null,
+
   // Dimensionless: a change, and correlations whose parts each cancel their own denominator.
   "districts[].enrollment_change": null,
   "statewide.outcomes.enrolled_spending_vs_performance": null,

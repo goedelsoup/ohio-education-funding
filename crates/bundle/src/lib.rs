@@ -41,6 +41,15 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `49.0.0` added the detail behind `biennium`'s two measures, so a page can say *why* a district
+/// moved and not only how far: per year, the five supplements by name, the phase-in's base,
+/// calculated and paid figures, the published state share, and transfers with net funding; per
+/// district, assessed valuation for the three tax years the terminal year's capacity blends.
+/// Absences are `null` and mean unpublished — FY2025 carries no state share, FY2026 no transfers,
+/// FY2025 no itemized transfers — and none of them is a zero. Breaking because the web schema is
+/// strict. A district's rank within its county is not carried: `county` is already on every
+/// district, so it is a sort the page can do and a field here would be a second copy of it.
+///
 /// `48.0.0` added `district.guarantee_in_fy21_base` and two checkpoints, which together are the
 /// third reading of Section 265.225 arriving in a form the browser can be held to. `[L1]` is
 /// published whole; the term inside it that the *previous* formula's guarantee paid is joined from
@@ -252,7 +261,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "48.0.0";
+pub const CONTRACT_VERSION: &str = "49.0.0";
 
 mod model;
 mod serialize;

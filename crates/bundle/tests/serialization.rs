@@ -208,6 +208,40 @@ fn sample() -> District {
                 preschool_special_education: 3_000.0,
                 supplements: 100_000.0,
             },
+            observed: [
+                BienniumYear {
+                    targeted_assistance: 250_000.0,
+                    funding_base: 7_700_000.0,
+                    phase_in_calculated: 7_650_000.0,
+                    phase_in_paid: 7_660_000.0,
+                    transfers: Some(-40_000.0),
+                    net_state_funding: Some(9_060_000.0),
+                    ..BienniumYear::default()
+                },
+                // FY2026 publishes no transfers: absent, which the feed must write as null.
+                BienniumYear {
+                    base_funding: 60_000.0,
+                    funding_base: 7_700_000.0,
+                    phase_in_calculated: 7_640_000.0,
+                    phase_in_paid: 7_650_000.0,
+                    state_share: Some(0.4125),
+                    ..BienniumYear::default()
+                },
+                BienniumYear {
+                    base_funding: 90_000.0,
+                    funding_base: 7_700_000.0,
+                    phase_in_calculated: 7_630_000.0,
+                    phase_in_paid: 7_630_000.0,
+                    state_share: Some(0.4),
+                    transfers: Some(-45_000.0),
+                    service_center_charge: Some(-30_000.0),
+                    other_adjustments: Some(-15_000.0),
+                    net_state_funding: Some(9_355_000.0),
+                    ..BienniumYear::default()
+                },
+            ],
+            valuation: [250_000_000.0, 300_000_000.0, 301_000_000.0],
+            valuation_tax_years: [2023, 2024, 2025],
         },
         guarantee: 0.0,
         at_minimum_state_share: false,
@@ -801,6 +835,7 @@ fn the_fy2020_baseline_is_only_recoverable_on_the_guarantee() {
                 preschool_special_education: 3_000.0,
                 supplements: -5_000.0,
             },
+            ..sample().biennium
         },
         ..sample()
     };
@@ -837,6 +872,33 @@ fn missing_values_serialize_as_null_not_zero() {
         !json.contains("\"valuation_per_pupil\": 0"),
         "a missing value must not be indistinguishable from zero"
     );
+}
+
+/// A biennium year that publishes no transfers says so, and the years stay in order.
+///
+/// FY2026's model has no transfer columns. A zero there would read as "nothing withheld", which
+/// the department never said.
+#[test]
+fn an_unpublished_biennium_figure_is_null_and_the_years_keep_their_positions() {
+    let json = bundle(vec![sample()], vec![]).to_json();
+    let start = json.find("\"observed\": [").expect("observed is written");
+    let observed = &json[start..start + json[start..].find(']').expect("closes")];
+    let years: Vec<&str> = observed.split("}, {").collect();
+    assert_eq!(years.len(), 3, "{observed}");
+    assert!(years[0].contains("\"transfers\": -40000"), "{}", years[0]);
+    assert!(years[0].contains("\"state_share\": null"), "{}", years[0]);
+    assert!(years[1].contains("\"transfers\": null"), "{}", years[1]);
+    assert!(
+        years[1].contains("\"net_state_funding\": null"),
+        "{}",
+        years[1]
+    );
+    assert!(
+        years[2].contains("\"service_center_charge\": -30000"),
+        "{}",
+        years[2]
+    );
+    assert!(json.contains("\"valuation_tax_years\": [2023, 2024, 2025]"));
 }
 
 /// No key appears twice inside one district object.
