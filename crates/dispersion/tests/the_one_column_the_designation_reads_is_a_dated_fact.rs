@@ -22,8 +22,10 @@
 //! created and last modified thirty-four minutes apart. On that date all three flags were right,
 //! read as whether a commission exists. They were not right read as (C)'s literal "subject to
 //! section 3302.10": R.C. 3302.103(E)(1) suspends that section for a district implementing its
-//! improvement plan, and both flagged districts were. The department evidently reads the column
-//! as R.C. 3310.03(E)(2) does, by the commission's existence, which 3302.103(E)(3) preserves.
+//! improvement plan, and both flagged districts were. The department reads the column as R.C.
+//! 3310.03(E)(2) does, by the commission's existence, which 3302.103(E)(3) preserves. Its rule,
+//! OAC 3301-11-03(A), lists a building on (C) and removes it only on (E), and every held edition
+//! does so (`the_editions_the_page_stopped_listing`).
 //!
 //! **Six weeks later East Cleveland's stopped being right.** In late December 2025 the director of
 //! education and workforce wrote to the district's superintendent that it "has been released from

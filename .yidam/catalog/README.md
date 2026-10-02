@@ -40,7 +40,7 @@ Sorted by: type, then slug.
 | [`dew-career-technical-planning-districts`](dew-career-technical-planning-districts.md) | Ohio Career-Technical Planning Districts | 1 |
 | [`dew-ctpd-membership`](dew-ctpd-membership.md) | Career-Technical Planning District Membership | 1 |
 | [`dew-district-typology`](dew-district-typology.md) | Typology of Ohio School Districts — the department's own similar-district grouping | 5 |
-| [`dew-edchoice-designated-list`](dew-edchoice-designated-list.md) | EdChoice Designated List — which buildings' students may claim a scholarship | 2 |
+| [`dew-edchoice-designated-list`](dew-edchoice-designated-list.md) | EdChoice Designated List — which buildings' students may claim a scholarship | 3 |
 | [`dew-education-landscape`](dew-education-landscape.md) | Ohio's Education Landscape — the department's own count of every school option | 2 |
 | [`dew-expenditure-expanded-list`](dew-expenditure-expanded-list.md) | FY2025 Expenditure Expanded List | 1 |
 | [`dew-five-year-forecast`](dew-five-year-forecast.md) | Five-year forecast filings — the department's republished submissions | 3 |

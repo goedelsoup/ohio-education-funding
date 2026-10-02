@@ -123,8 +123,21 @@ findings: |
   commission "ceases to exist", and 3302.103(E)(3) keeps the commission in existence through the
   plan. [verified] Read literally, division (C) switched Option A off in July 2022 while division
   (E)(2) waited for the dissolution. [inference] The department's designated list follows the
-  second reading: it still flagged East Cleveland in November 2025. Whether the department has said
-  why is unread. [open]
+  second reading in every plan-year edition read. The 2022-23 list, written in late 2021, flags all
+  three districts in their first plan year: East Cleveland's 4 buildings, Lorain's 15 and
+  Youngstown's 13. The 2024-25 and 2025-26 lists flag East Cleveland and Youngstown and drop
+  Lorain, whose commission H.B. 33 dissolved, and the 2026-27 list still flags East Cleveland in
+  November 2025. [verified]
+  ([`dew-edchoice-designated-list`](../../catalog/dew-edchoice-designated-list.md))
+
+  The department's rule says why. OAC 3301-11-03(A), effective 15 June 2023, has it publish the
+  buildings meeting division (A), (B) or (C) of R.C. 3310.03 and "remove from the list any school
+  building that has ceased operations or fulfills the criteria described in division (E)".
+  [verified] The rule cites "section 3301.03", which concerns the state board's members and has no
+  division (E) criteria, so the cross-reference is a slip for 3310.03. [inference] So a building
+  enters on (C) and leaves only on (E), and a plan year is not an (E) event. The rule postdates the
+  2022-23 list, and neither it nor LSC's final analysis of H.B. 110 mentions 3302.103(E)(1): LSC
+  describes the plan years without EdChoice and EdChoice without the plan years. [verified]
 
   **The two-to-three star trap does not hold anyone here.** This node reasoned that a district
   between two and three stars can neither re-trigger nor begin its exit under division (N). That
@@ -181,9 +194,17 @@ findings: |
   the current section. [verified]
   ([`crates/project/fixtures/revised-code.txt`](../../../crates/project/fixtures/revised-code.txt))
   The 2018 commission is East Cleveland's, which matches the reporting around its release. The
-  section names no district, and no held source says which of Lorain and Youngstown is 2010 and
-  which is 2013. [open] So two of the three commissions began under the former section and were
-  carried into the current one.
+  section names no district.
+
+  **The department's own pages name them, in the years they were written.** Its Youngstown page
+  says the commission "was established by the State Superintendent of Public Instruction in
+  January of 2010, pursuant to Section 3302.10", and adopted its first recovery plan on 28 June
+  2010. Lorain's recovery plan says its commission "was established by the State Superintendent
+  of Public Instruction in April of 2013", and its first minutes are of 22 April 2013. [verified]
+  ([`dew-academic-distress-commission`](../../catalog/dew-academic-distress-commission.md),
+  archived editions read 2 October 2026) So division (A)(2), the 2010 commission, is Youngstown's,
+  and division (A)(1), the 2013 one, is Lorain's. Two of the three commissions began under the
+  former section and were carried into the current one.
 
   **And Cleveland is not one of the three.** Its
   [node](../education-agency/cleveland-municipal.yml) records "state academic distress
@@ -195,8 +216,8 @@ findings: |
   consecutive years, with authority over personnel, management and budgetary decisions.
   [verified] ([greenbook](../../../crates/project/fixtures/lsc-education-greenbooks.txt)) LSC's
   final analysis places it at R.C. 3302.10 effective July 2007. [inference] R.C. 3302.103(A)
-  lists the commissions under the former section that survived into the current one, 2010 and
-  2013, and those are Youngstown and Lorain. Cleveland, if it was under the former section, had
+  lists the commissions under the former section that survived into the current one, Youngstown's
+  of 2010 and Lorain's of 2013. Cleveland, if it was under the former section, had
   left it by October 2015. [inference] Whether it was ever under a commission at all has not been
   read. [open] Reading the current three as the complete history would lose the fact that Ohio
   has had two regimes, and since 2021 a third route out of the second.
@@ -246,10 +267,7 @@ findings: |
   (crates/dispersion) An intervention's end reaches the scholarship channel through a column in a
   spreadsheet, and it reached it late.
 
-  **What is still not established.** Which of Lorain's and Youngstown's commissions is the 2010
-  one and which the 2013 one: R.C. 3302.103(A) gives the two years and names neither district.
-  [open]
-  Whether any commission changed outcomes, which is what the apparatus rests on. [open] And the
+  **What is still not established.** Whether any commission changed outcomes, which is what the apparatus rests on. [open] And the
   trigger itself is uncomputable from what is held: R.C. 3302.10(A)(1) needs three consecutive
   years of the **overall** district rating, and the corpus holds one year of the Achievement
   component star and no overall rating in any cached report card download. [open] That gap bounds
@@ -333,6 +351,33 @@ revisions:
     reach: |
       The present tense was true when written and went stale on 30 June 2026. The trap still
       holds nobody while the plan route runs, but that route ends by 30 June 2027 at the latest.
+  - was: |
+      "The section names no district, and no held source says which of Lorain and Youngstown is
+      2010 and which is 2013."
+    now: |
+      Youngstown's commission was established in January 2010 and Lorain's in April 2013, by the
+      department's own Youngstown page and Lorain recovery plan. So R.C. 3302.103(A)(2) is
+      Youngstown's and (A)(1) is Lorain's.
+    found_by: |
+      Reading the department's commission pages and recovery plans as the Internet Archive held
+      them between 2014 and 2016, for #543. The current page and its attachments do not date
+      either commission.
+    reach: |
+      The ordering was already written once, in the paragraph on Cleveland, as a list that could
+      be read either way. It now names each district against its year.
+  - was: |
+      "Whether the department has said why is unread", of the designated list following R.C.
+      3310.03(E)(2) rather than (C) during the plan years, on one edition's evidence.
+    now: |
+      Four editions, 2022-23 to 2026-27, flag every district while its plan runs. OAC 3301-11-03(A)
+      lists buildings on (A), (B) or (C) and removes them only on (E), which is the department's
+      stated mechanism. Neither the rule nor LSC's H.B. 110 analysis addresses 3302.103(E)(1).
+    found_by: |
+      Reading the 2022-23 designated list from the Internet Archive, the held editions' Option A
+      columns, the administrative code and LSC's final analysis of H.B. 110, for #545.
+    reach: |
+      The literal-(C) reading stays an inference about the statute. What changed is that the
+      department's practice is now sourced to its own rule rather than read off one file.
 figures:
   - key: project/performance-supplement-to-youngstown
     value: 162207.67
@@ -426,11 +471,6 @@ properties:
     is in the funding formula, and the first is a deduction the formula does not see coming.
     [inference]
 unfilled:
-  - field: which of Lorain and Youngstown holds the 2010 commission
-    why: >-
-      R.C. 3302.103(A) dates the three commissions to 2010, 2013 and 2018, and East Cleveland's is
-      the 2018 one. The section names no district, and neither the department's page nor any held
-      greenbook says which of the other two is which.
   - field: the overall district rating, three consecutive years
     why: >-
       R.C. 3302.10(A)(1)'s trigger needs it and no held source carries it: the report card fixture

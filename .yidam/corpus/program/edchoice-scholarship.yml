@@ -154,7 +154,11 @@ findings: |
   records whether a commission *exists* on some date. That is (E)(2)'s test rather than (C)'s: R.C.
   3302.103(E)(1) takes a district implementing its improvement plan out of R.C. 3302.10, and both
   flagged districts were on their plans, so read literally (C) was off for them while (E)(2) waited
-  for the commission to end. [inference] The workbook's own `docProps` gives that
+  for the commission to end. [inference] Every plan-year edition read follows (E)(2), from the
+  2022-23 list, which flags all three districts in their first plan year, to this one. [verified]
+  ([`dew-edchoice-designated-list`](../../catalog/dew-edchoice-designated-list.md)) The
+  department's rule, OAC 3301-11-03(A), lists buildings meeting (C) and removes them only on
+  division (E), which is why. The workbook's own `docProps` gives that
   date — **created and last modified 13 November 2025**, thirty-four minutes apart. [verified]
   (crates/dispersion)
 

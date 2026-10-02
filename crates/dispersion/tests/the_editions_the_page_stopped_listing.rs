@@ -243,3 +243,45 @@ fn every_edition_reproduces_the_department_own_arithmetic_in_every_row() {
         }
     }
 }
+
+/// Buildings designated on the academic-distress route alone, oldest first.
+const OPTION_A_ALONE: [usize; 3] = [3, 2, 2];
+
+/// Every held edition flags a district while its R.C. 3302.103 plan runs.
+///
+/// R.C. 3302.103(E)(1) takes a district implementing its plan out of R.C. 3302.10, so R.C.
+/// 3310.03(C), read literally, is off for it. Division (E)(2) stops first-time awards only when
+/// the commission ceases to exist. East Cleveland and Youngstown were on their plans for all
+/// three of these school years, and every edition flags every one of their buildings. Lorain,
+/// whose commission H.B. 33 dissolved in July 2023, is flagged in none. So the column follows
+/// (E)(2), which is what OAC 3301-11-03(A) says: a building listed on (C) is removed on (E).
+#[test]
+fn every_edition_flags_the_districts_on_their_plans_and_only_those() {
+    use dispersion::designated::{EAST_CLEVELAND_IRN, LORAIN_IRN, YOUNGSTOWN_IRN};
+
+    for (which, alone) in EDITIONS.into_iter().zip(OPTION_A_ALONE) {
+        let rows = edition(which);
+        let year = which.school_year();
+        for d in &rows {
+            let on_a_plan =
+                d.district_irn == EAST_CLEVELAND_IRN || d.district_irn == YOUNGSTOWN_IRN;
+            assert_eq!(
+                d.option_a, on_a_plan,
+                "{year}: {} in {}",
+                d.building_name, d.district_name
+            );
+        }
+        assert_eq!(
+            rows.iter().filter(|d| d.district_irn == LORAIN_IRN).count(),
+            15,
+            "{year}: Lorain's buildings"
+        );
+        assert_eq!(
+            rows.iter()
+                .filter(|d| d.designated && d.option_a && !d.option_b)
+                .count(),
+            alone,
+            "{year}: designated on the distress route alone"
+        );
+    }
+}

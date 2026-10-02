@@ -1,5 +1,6 @@
 ---
 used-by:
+  - ../corpus/intervention/academic-distress-commission.yml
   - ../corpus/program/cleveland-scholarship.yml
   - ../corpus/program/edchoice-scholarship.yml
 ---
@@ -59,6 +60,27 @@ computes it. Strictly, it records something slightly different from what (C) say
 flagged districts were on their plans when this file was written. What the flag tracks is whether
 the commission still exists, which is R.C. 3310.03(E)(2)'s test for stopping first-time awards,
 and 3302.103(E)(3) keeps the commission in existence through the plan.
+
+**Every plan-year edition reads it that way, and the department's rule says so.** Read on
+2 October 2026, the four editions run as follows:
+
+- **2022-23** was written in late 2021 (docProps created 12 October, modified 22 December). It is
+  not held: it was read from Wayback `20220523154707` at
+  `education.ohio.gov/getattachment/Topics/Other-Resources/Scholarships/EdChoice-Scholarship-Program/2022_2023_Designated_List_w_Criteria.xlsx.aspx?lang=en-US`,
+  SHA-256 `25c731c4fd5f2a98f261ec8363d091af708e6db9a7eccb4226b7c09f91823797`. It flags all three
+  districts in their first plan year: East Cleveland's 4 buildings, Lorain's 15 and Youngstown's
+  13. Four buildings are designated on that route alone.
+- **2024-25 and 2025-26**, both held, flag East Cleveland and Youngstown and not Lorain. Three
+  buildings and then two rest on the route alone.
+- **2026-27**, this file, flags the same two, with two buildings on the route alone.
+
+OAC 3301-11-03(A), effective 15 June 2023, has the department publish the buildings meeting
+division (A), (B) or (C) of R.C. 3310.03, and "remove from the list any school building that has
+ceased operations or fulfills the criteria described in division (E)". So a building enters on
+(C) and leaves only on (E). The rule writes "section 3301.03", which governs the state board's
+members, so the cross-reference reads as a slip for 3310.03. The rule postdates the 2022-23 list,
+and neither it nor LSC's final analysis of H.B. 110 mentions 3302.103(E)(1). LSC describes the plan
+years and EdChoice separately and never connects them.
 
 **It is maintained, and Lorain proves it.** Three districts have held a commission under the current
 R.C. 3302.10. Lorain City (IRN `044263`, fifteen buildings — not `047076`, which is Pettisville
@@ -198,7 +220,8 @@ whole of it — a Cleveland resident is outside both EdChoice programs, not mere
 building-based one.
 
 **It is not the whole series.** Three editions are held — 2024-2025, 2025-2026 and 2026-2027 —
-and 2023-2024 is named in the archive and not retrievable. See below.
+and 2023-2024 is named in the archive and not retrievable. See below. The 2022-2023 edition has
+been read from the archive, for its distress column only, and is not committed.
 
 ## The page lists one edition at a time, and the archive says so too
 
