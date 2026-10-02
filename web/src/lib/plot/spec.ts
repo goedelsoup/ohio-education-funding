@@ -1020,10 +1020,26 @@ export function barSpec(
      * where no bar is labelled, because a labelled bar already says its value at its end.
      */
     scale?: { format: (v: number) => string; says: string };
+    /**
+     * A chart of change, which reads its fill as gain against loss whatever its data's sign (#651).
+     *
+     * Signed mode was entered only when a value fell below zero, so a county where every district
+     * rose dropped back to subject mode and filled its subject's *gain* in the hue the same chart
+     * gives a *loss* in every other county. With this set the chart is signed always: the zero
+     * rule, the polarity fill, and a subject marked by a stroke and its bold name, never a hue.
+     */
+    polarity?: boolean;
   },
 ): Spec {
   const { width } = options;
-  const max = options.max ?? Math.max(...bars.map((b) => Math.abs(b.value)), 1);
+  /*
+   * The `1` is a floor for counts and dollars, where a domain under one is a chart of nothing. A
+   * chart of change is a chart of ratios, and the floor drew every county's change on 0 to +100%
+   * when the median county's largest move was 7% (#651), so a polarity chart fits its own bars.
+   */
+  const max =
+    options.max ??
+    Math.max(...bars.map((b) => Math.abs(b.value)), options.polarity ? Number.MIN_VALUE : 1);
   const labelled = bars.filter((b) => b.direct != null);
   /*
    * A negative value is drawn as a negative value, on the charts in the build that have one.
@@ -1042,11 +1058,8 @@ export function barSpec(
    * baseline of a negative bar and square its data end — the opposite of what the rounding means.
    */
   const lowest = Math.min(options.min ?? 0, 0, ...bars.map((b) => b.value));
-  const signed = lowest < 0;
+  const signed = lowest < 0 || options.polarity === true;
   const negativeLabelled = labelled.filter((b) => b.value < 0);
-  // A direct label on a negative bar is written leftwards from the bar's end, so the domain gets
-  // room for it rather than letting it collide with the category names outside the frame.
-  const floor = signed ? lowest - (negativeLabelled.length > 0 ? (max - lowest) * 0.08 : 0) : 0;
   /*
    * How much room the direct labels get at the right — this chart's own longest, or the set's.
    *
@@ -1100,14 +1113,35 @@ export function barSpec(
    * weight. Weight survives a monochrome print and a forced-colours mode, which is the point.
    *
    * In signed mode the fill already carries polarity — a deficit against a surplus — and a hue
-   * cannot mean two things at once, so there the subject bar keeps the label channel alone. Two
-   * charts in the build are signed — Springfield's balance, and the correlation-by-class column a
-   * corpus node draws from `crates/series.json` — and none of their bars is a subject.
+   * cannot mean two things at once, so there the subject bar keeps its bold name and takes a 2px
+   * ring in primary ink instead of a fill. The county chart on the Change tab (#639) is the first
+   * signed chart with a subject, and it is signed by `polarity`, not by its data (#651).
    */
   const marked = bars.filter((b) => b.current);
   const plain = bars.filter((b) => !b.current);
 
   const marginRight = gutter(width, longest > 0 ? 16 + longest * 7.2 : 20);
+  /*
+   * A direct label on a negative bar is written leftwards from the bar's end, so the domain gets
+   * room for it rather than letting it collide with the category names outside the frame.
+   *
+   * Eight per cent of the span is enough where the negative side is most of it, and was what every
+   * signed chart had. A chart of change is the opposite shape: Franklin runs from −2% to +25%, and
+   * eight per cent of that is 20px for a 35px "−2.2%", so the county chart drew its subject's value
+   * through its own name at every width (#651). There the room is sized in pixels, for
+   * each labelled bar, from the frame the bar is drawn in: `frame × (v − floor) / (max − floor)`
+   * is where the bar ends, and it has to clear the label, the `dx` and a margin for a wider font.
+   */
+  const frame = width - nameGutter - marginRight;
+  const clear = (b: Bar) => {
+    const r = Math.min(0.9, (textPx(b.direct!) + 12) / frame);
+    return (b.value - r * max) / (1 - r);
+  };
+  const floor = !signed
+    ? 0
+    : options.polarity
+      ? Math.min(lowest, ...negativeLabelled.map(clear))
+      : lowest - (negativeLabelled.length > 0 ? (max - lowest) * 0.08 : 0);
   const foot =
     options.scale && labelled.length === 0
       ? axisFoot({
@@ -1153,6 +1187,11 @@ export function barSpec(
             : marked.length > 0
               ? (b: Bar) => (b.current ? SERIES.guarantee : SERIES.formula)
               : SERIES.formula,
+          // The subject of a signed chart, whose fill is already spoken for by polarity: a ring in
+          // primary ink, the treatment #652 proposes for every form. Only where there is one.
+          ...(signed && marked.length > 0
+            ? { stroke: (b: Bar) => (b.current ? INK.primary : "none"), strokeWidth: 2 }
+            : {}),
           className: "bar-fill",
           // Rounded at the data end, square at the baseline: the bar grows from the axis and
           // rounding that end would detach it from the thing it is measured against. Not in

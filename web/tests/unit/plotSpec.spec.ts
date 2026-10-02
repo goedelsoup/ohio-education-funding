@@ -93,6 +93,33 @@ test("the bar a chart was built to locate is marked, on two channels", () => {
   expect(plain).not.toContain('font-weight="600"');
 });
 
+test("a chart of change is fitted to its ratios and fills by polarity whatever their sign", () => {
+  /*
+   * The county chart on the Change tab (#651). `barSpec` floored its domain at 1, so every
+   * county's change was drawn on 0 to +100% when the median county's largest move was 7%. And in a
+   * county where every district rose, nothing was below zero, signed mode never engaged, and the
+   * subject's *gain* was filled in guarantee orange — the hue the same chart gives a loss.
+   */
+  const rose: Bar[] = [
+    { label: "Dublin City", value: 0.245 },
+    { label: "Hilliard City", value: 0.031, current: true },
+    { label: "Bexley City", value: 0.012 },
+  ];
+  const domain = barSpec(rose, { width: WIDTHS.wide, polarity: true }).options.x!.domain as number[];
+  expect(domain[1]).toBeLessThanOrEqual(1.25 * 0.245);
+  // Without `polarity` a chart of counts keeps the floor it was written for.
+  expect((barSpec(rose, W).options.x!.domain as number[])[1]).toBe(1);
+
+  const svg = renderToString((w) => barSpec(rose, { width: w, polarity: true }), "presentational");
+  for (const drawing of svg.split("<svg").slice(1)) {
+    expect(drawing, "a gain is never the loss hue").not.toContain("var(--series-guarantee)");
+    expect((drawing.match(/<line/g) ?? []).length, "the zero rule").toBe(1);
+    // The subject is marked by a ring and its bold name, on the one bar.
+    expect((drawing.match(/stroke="var\(--text-primary\)"/g) ?? []).length).toBe(1);
+    expect(drawing).toContain('font-weight="600"');
+  }
+});
+
 test("a marked name wraps at the width it is drawn at, which is bold", () => {
   /*
    * Cuyahoga's chart on `/district/043786/change` marks Cleveland Municipal. At the phone width the

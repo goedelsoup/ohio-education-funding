@@ -6,6 +6,7 @@
  * a fraction of a percent of its base. Every figure here is one of the department's own lines, so
  * the pins are the files' figures rather than this module's opinion of them.
  */
+import { parseHTML } from "linkedom";
 import { expect, test } from "vitest";
 
 import { renderBiennium } from "../../src/lib/biennium.ts";
@@ -148,6 +149,48 @@ test("the neighbors card draws both measures, the headline checked, this distric
   expect(html).toContain('data-chart="neighbors-foundation"');
   expect(html).toMatch(/data-measure="total"[^>]*checked/);
   expect(html).toContain("4th-largest rise of 9 in Allen County");
+});
+
+test("the county chart is drawn on the county's own scale, with its ends and subject labelled", () => {
+  // #651: every county was drawn on 0 to +100%, and no bar carried a value.
+  const html = renderNeighbors(LIMA, districts);
+  expect(html).not.toContain("+100.0%");
+  const { document } = parseHTML(`<div>${html}</div>`);
+  for (const measure of ["total", "foundation"] as const) {
+    const ranked = districts
+      .filter((d) => d.county === "Allen")
+      .map((d) => ({ d, ratio: yearChange(d.biennium, measure).ratio }))
+      .sort((x, y) => y.ratio - x.ratio);
+    const wide = document.querySelector(`[data-chart="neighbors-${measure}"] [data-at="wide"]`)!;
+    const values = [...wide.querySelectorAll(".bar-value text, text.bar-value")].map((t) => t.textContent);
+    const want = new Set([ranked[0]!, ranked.at(-1)!, ranked.find((r) => r.d.irn === LIMA.irn)!]);
+    expect(values.sort()).toEqual([...want].map((r) => signedPct(r.ratio)).sort());
+  }
+});
+
+test("a county where every district rose draws a gain in the gain hue", () => {
+  // Counties whose every district rose on a measure: signed mode used to switch off for them.
+  const counties = [...new Set(districts.map((d) => d.county))];
+  let seen = 0;
+  for (const measure of ["total", "foundation"] as const) {
+    for (const county of counties) {
+      const peers = districts.filter((d) => d.county === county);
+      if (peers.length < 3 || peers.some((d) => yearChange(d.biennium, measure).ratio <= 0)) continue;
+      seen++;
+      const { document } = parseHTML(`<div>${renderNeighbors(peers[0]!, districts)}</div>`);
+      const chart = document.querySelector(`[data-chart="neighbors-${measure}"]`)!;
+      expect(chart.innerHTML, `${county} on ${measure}`).not.toContain("var(--series-guarantee)");
+    }
+  }
+  expect(seen, "the feed has such a county, or this passed on nothing").toBeGreaterThan(0);
+});
+
+test("a county of one or two districts draws no chart, and says so in words", () => {
+  const lone = districts.find((d) => districts.filter((p) => p.county === d.county).length < 3);
+  expect(lone, "the feed has a small county").toBeTruthy();
+  const html = renderNeighbors(lone!, districts);
+  expect(html).not.toContain("<svg");
+  expect(html).toMatch(/only district in|of [12] in/);
 });
 
 test("the dashboard card carries the year on year, the rank, the line and the tab", () => {
