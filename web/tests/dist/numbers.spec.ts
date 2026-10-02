@@ -172,7 +172,7 @@ describe("figures in prose", () => {
  */
 describe("chart text", () => {
   /** The classes whose text is a number the chart states. */
-  const NUMERIC = /^(?:axis-foot|axis-head|bar-value|series-end)$/;
+  const NUMERIC = /^(?:axis-foot|axis-head|bar-value|series-end|series-start)$/;
   const texts: { page: string; cls: string; text: string }[] = [];
   /** Each drawing carrying a "0%" direct label, for the width check below. */
   const zeroes: { page: string; svg: string }[] = [];

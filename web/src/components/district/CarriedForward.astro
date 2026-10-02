@@ -95,20 +95,14 @@ const chart = renderToString((w) => fanSpec(
   points,
   compactMoney,
   reading,
-  { width: w },
+  // The two lines named on the drawing rather than in a key under it (#655): the finding is the
+  // gap between their ends, and a reader should not leave the chart to learn which end is which.
+  { width: w, ...(insensitive ? { labels: { point: "Received", reference: "Formula" } } : {}) },
 ), { label: `${insensitive ? `Aid this district receives against what the formula computes for it, in dollars by enrollment year, FY${points[0]!.year} to FY${end.fiscalYear}` : `State aid in dollars by enrollment year, FY${points[0]!.year} to FY${end.fiscalYear}, with the range across projected enrollment`}`, description: `Every year is the FY${bundle.fiscal_year} formula run at that year's enrollment rather than published aid; years through FY${meta.base_year} use published enrollment and carry no interval, and the y axis is truncated to the plotted range rather than starting at zero` });
 ---
 
 <h3>Carried forward</h3>
 <div class="chartwrap" data-chart="district-fan" set:html={chart} />
-{
-  insensitive && (
-    <div class="legend">
-         <span><i class="sw" data-series="guarantee"></i> What the district receives</span>{" "}
-         <span><i class="sw" data-series="formula"></i> What the formula computes</span>
-       </div>
-  )
-}
 <p class="note">{
   insensitive ? (
     <><strong>By FY{end.fiscalYear} this district is paid{" "}

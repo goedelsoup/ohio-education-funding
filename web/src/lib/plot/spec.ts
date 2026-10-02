@@ -3217,7 +3217,18 @@ export function fanSpec(
   points: FanPoint[],
   format: (v: number) => string,
   hover: (p: FanPoint) => string,
-  options: { width: number },
+  options: {
+    width: number;
+    /**
+     * What each line is called, written into its end label: "Received $114M", "Formula $87.2M".
+     *
+     * For a fan drawn beside its reference, where the two ends are two quantities and the finding
+     * is the distance between them (#655). Without names the end labels were two bare numbers and
+     * which was which lived in a key under the chart. `point` names the band's upper bound — its
+     * only bound when the band has collapsed to a line — and `reference` the reference's end.
+     */
+    labels?: { point: string; reference: string };
+  },
 ): Spec | null {
   // One point is not a series. Returning null draws nothing rather than a degenerate axis with a
   // single mark on it, which would read as a finding about a quantity that has not been measured
@@ -3255,6 +3266,10 @@ export function fanSpec(
   const degenerate = last.high - last.low < Math.max(1e-9, Math.abs(last.point) * 1e-6);
 
   const bounds = degenerate ? [last.high] : [last.high, last.low];
+  const named = (name: string | undefined, value: number) =>
+    name ? `${sentence(name)} ${format(value)}` : format(value);
+  const boundText = (v: number, i: number) => named(i === 0 ? options.labels?.point : undefined, v);
+  const referenceText = hasReference ? named(options.labels?.reference, last.reference ?? 0) : "";
 
   /*
    * Which half of the pair the banded series wears.
@@ -3267,9 +3282,14 @@ export function fanSpec(
    */
   const banded = hasReference ? SERIES.guarantee : SERIES.formula;
 
-  // The two bound labels live here. Capped like every other gutter, because 104px is a sixth of
-  // the wide frame and a third of the narrow one.
-  const marginRight = gutter(options.width, 104);
+  /*
+   * The end labels live here, sized to the longest string drawn as `seriesSpec` sizes its own.
+   * It was a fixed 104px, which held two bare amounts and would have cut "Received $114M" short.
+   * Capped like every other gutter, because a named label is a sixth of the wide frame and a
+   * third of the narrow one.
+   */
+  const longestEnd = Math.max(referenceText.length, ...bounds.map((v, i) => boundText(v, i).length));
+  const marginRight = gutter(options.width, 32 + longestEnd * 7.2);
   const foot = axisFoot({
     width: options.width,
     marginLeft: 0,
@@ -3354,7 +3374,7 @@ export function fanSpec(
                 // Guarded by `hasReference` above, which the type system cannot see through.
                 y: last.reference ?? 0,
                 dx: 8,
-                text: () => format(last.reference ?? 0),
+                text: () => referenceText,
                 textAnchor: "start",
                 fill: SERIES_TEXT.formula,
                 className: "fan-bound reference",
@@ -3378,9 +3398,11 @@ export function fanSpec(
           x: last.year,
           y: (v: number) => v,
           dx: 8,
-          text: (v: number) => format(v),
+          text: (v: number, i: number) => boundText(v, i),
           textAnchor: "start",
-          fill: INK.primary,
+          // In the band's text hue when there is a second line to tell it from. In primary ink the
+          // received line's label read as belonging to neither, beside a formula label in blue.
+          fill: hasReference ? SERIES_TEXT.guarantee : INK.primary,
           className: "fan-bound",
         }),
         Plot.ruleY([min], { stroke: INK.rule, className: "axis" }),
@@ -3512,6 +3534,18 @@ export function seriesSpec(
   const endText = (point: SeriesPoint | undefined, key: "a" | "b"): string =>
     point ? `${sentence(key === "a" ? labels.a : labels.b)} ${format(point[key] ?? 0)}` : "";
   const longestEnd = Math.max(endText(endA, "a").length, endText(endB, "b").length);
+  /*
+   * And the first value of each, at the left (#655). Every dek over these charts is a
+   * start-to-end comparison — "fell from 45.9% to 34.5%" — and the end alone left the start to be
+   * estimated off a line with no axis. Bare numbers, since the end label already names the line
+   * and the hue joins the two.
+   */
+  const startOf = (key: "a" | "b") => points.find((p) => p[key] != null);
+  const startA = startOf("a");
+  const startB = startOf("b");
+  const startText = (point: SeriesPoint | undefined, key: "a" | "b"): string =>
+    point ? format(point[key] ?? 0) : "";
+  const widestStart = Math.max(textPx(startText(startA, "a"), 12), textPx(startText(startB, "b"), 12));
 
   const line = (key: "a" | "b", stroke: string, className: string) =>
     Plot.line(points, {
@@ -3538,6 +3572,30 @@ export function seriesSpec(
           }),
         ]
       : [];
+
+  /*
+   * Above the upper line's start and below the lower one's, so two starts a few units apart do not
+   * print over each other. In the gutter rather than over the plot: an audit render that drew them
+   * inside the frame put a falling line through the upper label at both 1280 and 390.
+   */
+  const startLabel = (point: SeriesPoint | undefined, key: "a" | "b", ink: string) => {
+    if (!point) return [];
+    const other = key === "a" ? startB?.b : startA?.a;
+    const value = point[key] ?? 0;
+    const dy = other == null ? 4 : value >= other ? -5 : 7;
+    return [
+      Plot.text([point], {
+        x: point.at,
+        y: value,
+        dx: -6,
+        dy,
+        text: () => startText(point, key),
+        textAnchor: "end",
+        fill: ink,
+        className: "series-start",
+      }),
+    ];
+  };
 
   /*
    * Under everything, because it is what the two lines are read against rather than a third line
@@ -3583,9 +3641,15 @@ export function seriesSpec(
    * `WIDTHS.narrow` it put both of `/history`'s end labels outside the frame.
    */
   const marginRight = gutter(options.width, 32 + longestEnd * 7.2);
+  /*
+   * The start labels' gutter: the string drawn at `BASE`'s 12px, the 6px offset from the line, and
+   * 6px clear. Not the 7.2px-a-character the right gutter uses, which is slack on a long name and
+   * none on three glyphs — `29%` and `64%` were drawn 2-3px off the left edge at 375 and 600.
+   */
+  const marginLeft = gutter(options.width, 12 + widestStart);
   const foot = axisFoot({
     width: options.width,
-    marginLeft: 0,
+    marginLeft,
     marginRight,
     dy: 18,
     low: options.tick(first.at),
@@ -3599,7 +3663,7 @@ export function seriesSpec(
       height: 220,
       marginTop: 14,
       marginBottom: 26 + foot.extraBottom,
-      marginLeft: 0,
+      marginLeft,
       marginRight,
       x: { axis: null, domain: [first.at, last.at] },
       y: { axis: null, domain: [min, max] },
@@ -3609,6 +3673,8 @@ export function seriesSpec(
         line("b", SERIES.guarantee, "series-b"),
         ...endLabel(endA, "a", SERIES_TEXT.formula),
         ...endLabel(endB, "b", SERIES_TEXT.guarantee),
+        ...startLabel(startA, "a", SERIES_TEXT.formula),
+        ...startLabel(startB, "b", SERIES_TEXT.guarantee),
         Plot.ruleY([min], { stroke: INK.rule, className: "axis" }),
         ...foot.marks,
         // One full-height column per year, above every mark, as the fan chart does.
