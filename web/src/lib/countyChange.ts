@@ -22,6 +22,7 @@ import {
   levelChange,
   MEASURES,
   type MeasureKey,
+  neighborsChart,
   signedPct,
   UNMOVED,
   type YearIndex,
@@ -128,7 +129,10 @@ function head(label: string, key: string, sorted?: "descending"): string {
   return `<th scope="col" class="tnum" aria-sort="${sorted ?? "none"}"><button type="button" data-sort="${key}">${label}</button></th>`;
 }
 
-/** One measure's table and the sentences above it. */
+/**
+ * One measure's sentences, its chart and its table, in that order (#661): the chart draws the
+ * whole biennium the table is sorted on, so its bars read top to bottom in the table's order.
+ */
 function panel(c: County, measure: MeasureKey): string {
   const years = yearsOf(c.districts[0]!.biennium);
   const name = MEASURES[measure].name;
@@ -169,6 +173,7 @@ function panel(c: County, measure: MeasureKey): string {
   return `<div class="measure-panel ${measure}">
       <p class="note">On <strong>${name}</strong>:</p>
       <ul class="note">${STEPS.map(([from, to]) => stepSentence(c.districts, measure, from, to)).join("")}</ul>
+      ${neighborsChart(c.districts, measure, { from: 0, to: 2 })}
       <div class="scroll"><table data-sortable>
         <thead><tr>
           <th scope="col" aria-sort="none"><button type="button" data-sort="name">District</button></th>
@@ -227,6 +232,25 @@ function withoutSentence(c: County): string {
 }
 
 /**
+ * The card's finding (#653), on the step and measure its first chart draws: the whole biennium,
+ * on total state support. The bullets beneath split it by step and the toggle by measure.
+ */
+export function finding(c: County): string {
+  const years = yearsOf(c.districts[0]!.biennium);
+  const when = `from FY${years[0]} to FY${years[2]}`;
+  const name = MEASURES.total.name;
+  if (c.districts.length === 1) {
+    const d = c.districts[0]!;
+    const x = levelChange(d.biennium, "total", 0, 2);
+    const moved = { rise: `rose ${signedPct(x.ratio)}`, fall: `fell ${signedPct(x.ratio)}`, none: "did not move" };
+    return `${escapeHtml(d.name)}'s ${name} ${moved[direction(x.dollars)]} ${when}.`;
+  }
+  const t = tally(c.districts, "total", 0, 2);
+  const none = t.none.length ? `, and ${count(t.none.length)} did not move` : "";
+  return `On ${name} ${when}, ${count(t.rise.length)} of the ${count(c.districts.length)} districts here rose and ${count(t.fall.length)} fell${none}.`;
+}
+
+/**
  * The card: both measures under the no-script toggle `renderNeighbors` uses, the state share
  * beside them, and the county attribution said where the reader is comparing.
  */
@@ -236,7 +260,8 @@ export function renderWhoGained(c: County): string {
   return `
     <div class="card measure-scope" id="${id}" data-part="${id}">
       <h2>${anchor(id)}Who gained, who lost${yearChip("biennium")}</h2>
-      <p class="note">Every district here in the three years, on the measure selected. FY${years[0]}
+      <p class="note"><strong>${finding(c)}</strong> Every district here in the three years, on the
+        measure selected. FY${years[0]}
         is the department's final payment report; FY${years[1]} and FY${years[2]} are its models of
         those years, not payments. Changes are percentages of each district's own earlier year, so
         a city and a village read on one scale. Every figure is in nominal dollars.</p>

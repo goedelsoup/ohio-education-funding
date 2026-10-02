@@ -3,8 +3,8 @@
  * Why this district's funding moved across the biennium (#639).
  *
  * The dashboard's biennium card says *that* it moved, on both measures, and stays short (#602).
- * This tab says what moved: every payment line in the three years, the phase-in's stages, the
- * inputs underneath, what was deducted before payment, and where the district sits in its county.
+ * This tab says where the district sits in its county, then what moved: every payment line in the
+ * three years, the phase-in's stages, the inputs underneath, and what was deducted before payment.
  * See `lib/change.ts` for what the page may and may not attribute a change to.
  */
 import DistrictNav from "../../../components/DistrictNav.astro";
@@ -56,10 +56,12 @@ const description = `${district.name}'s ${MEASURES.total.name} moved ${signedPct
   <DistrictNav irn={district.irn} current="change" />
 
   <div class="rail-layout"><div class="rail-main">
+    {/* The comparison first: this is the page that exists to compare, and its one chart was its
+        last card, after four tables (#661). */}
+    <Fragment set:html={renderNeighbors(district, bundle.districts)} />
     <Fragment set:html={renderByLine(district)} />
     <Fragment set:html={renderPhaseIn(district)} />
     <Fragment set:html={renderDrivers(district)} />
     <Fragment set:html={renderTransfers(district)} />
-    <Fragment set:html={renderNeighbors(district, bundle.districts)} />
   </div></div>
 </Base>

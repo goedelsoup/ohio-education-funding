@@ -1157,6 +1157,7 @@ test("a panel with nothing in it prints its zeros, and the set reserves the room
   // The panel that draws nothing is, because otherwise it draws row names against a zero rule and
   // reads as a chart that failed to render — which is exactly how #444's two inert rules shipped.
   expect(multiples.panels[1]!.bars.map((bar) => bar.direct)).toEqual(["$0"]);
+  expect(multiples.zero).toEqual(["Does nothing"]);
   // And the room those labels want belongs to the set, not to the panel carrying them: a panel
   // with a narrower frame than its siblings draws zero at a different pixel. See `barSpec`.
   expect(multiples.labelChars).toBe(2);
@@ -1174,6 +1175,8 @@ test("the two inert anchor rules are labelled on both axes, and only they are", 
     // `A dated phase-down` pays nothing to any fifth on either axis — the rule is dated out before
     // the year the panel measures — and a panel of five zeros has no ink of its own to show it.
     expect(labelled, key).toEqual(["A dated phase-down"]);
+    // And named for the note above the grid, where the reader meets it before the empty panel (#661).
+    expect(multiples.zero, key).toEqual(["A dated phase-down"]);
     for (const panel of multiples.panels) {
       const zeroed = panel.bars.every((bar) => bar.value === 0);
       expect(

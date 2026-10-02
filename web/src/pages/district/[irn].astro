@@ -159,12 +159,15 @@ const description = district.on_guarantee
   <Fragment set:html={renderBaseCostBuildUp(district, bundle.statewide.districts)} />
   {/* The other half of formula aid, decomposed the same way and for the same reason. */}
   <Categoricals district={district} statewide={bundle.statewide} />
-  {/* Everything above is foundation funding, which the guarantee holds. This is not. */}
+  {/* Where the district stands, as a figure. It sat after the biennium, and from the categoricals
+      chart to its strips a 1280px page ran 6,800px with no figure: the categoricals card's own
+      tables and Supplements are most of that, so the strips come before both (#661). */}
+  <Position bundle={bundle} district={district} valuations={valuations} expenditures={expenditures} />
+  {/* Every payment above is foundation funding, which the guarantee holds. This is not. */}
   <Supplements district={district} statewide={bundle.statewide} />
   {/* Everything above is one year. This is the three the budget actually covers, on both
       measures, because they disagree in sign statewide. */}
   <Fragment set:html={renderBiennium(district, bundle.districts)} />
-  <Position bundle={bundle} district={district} valuations={valuations} expenditures={expenditures} />
   {/* Ohio describing itself cannot say whether Ohio is unusual. This is the one card that can. */}
   <NationalPosition district={district} />
   {/* Three of the four siblings close by declaring what they are not. This route has the most

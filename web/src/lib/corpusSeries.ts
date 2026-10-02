@@ -791,12 +791,16 @@ export interface SeriesMultiple {
  * a set that can want this, because a panel with a single non-zero bar draws that bar and the
  * emptiness beside it is then a comparison rather than an absence.
  *
+ * Those panels are also named in `zero`, for the note above the grid: in a grid of seven the
+ * zero panel can sit alone on the last row, where it reads as an afterthought rather than a
+ * finding unless something above the grid has already said it (#661).
+ *
  * `null` where any row carries no group: a multiple of one panel is a bar chart with a heading on
  * it, and the route draws that with {@link barsOf} instead.
  */
 export function multiplesOf(
   series: ManifestSeries,
-): { panels: SeriesMultiple[]; max: number; min: number; labelChars: number } | null {
+): { panels: SeriesMultiple[]; zero: string[]; max: number; min: number; labelChars: number } | null {
   if (series.rows.length === 0 || series.rows.some((row) => row.group === undefined)) return null;
   const panels: SeriesMultiple[] = [];
   for (const row of series.rows) {
@@ -814,13 +818,13 @@ export function multiplesOf(
       hover: noted(`${label} — ${row.label}: ${formatRow(series.unit, row.value)}`, row.hover),
     });
   }
-  for (const panel of panels) {
-    if (panel.bars.every((bar) => bar.value === 0)) {
-      for (const bar of panel.bars) bar.direct = formatRow(series.unit, bar.value);
-    }
+  const zero = panels.filter((panel) => panel.bars.every((bar) => bar.value === 0));
+  for (const panel of zero) {
+    for (const bar of panel.bars) bar.direct = formatRow(series.unit, bar.value);
   }
   return {
     panels,
+    zero: zero.map((panel) => panel.label),
     max: Math.max(...series.rows.map((row) => Math.abs(row.value)), 1),
     min: Math.min(0, ...series.rows.map((row) => row.value)),
     // Part of the shared scale rather than a detail of the panels that happen to carry a label:
