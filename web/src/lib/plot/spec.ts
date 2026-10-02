@@ -3690,6 +3690,12 @@ export interface SeriesOptions {
   tick: (at: number) => string;
   /** A value the lines are measured against, drawn as a rule and held inside the frame. */
   reference?: { value: number; label: string };
+  /**
+   * Draw the first series in `INK.muted`, for a lone line that is neither formula aid nor the
+   * guarantee — cash held (#659). The bar chart it replaced was `hue: "plain"` for the reason
+   * #652 gives, and the categorical pair's first hue would have said "formula" again.
+   */
+  plain?: boolean;
 }
 
 /**
@@ -3899,11 +3905,11 @@ export function seriesSpec(
       y: { axis: null, domain: [min, max] },
       marks: [
         ...reference(options.width - marginLeft - marginRight),
-        line("a", SERIES.formula, "series-a"),
+        line("a", options.plain ? INK.muted : SERIES.formula, "series-a"),
         line("b", SERIES.guarantee, "series-b"),
-        ...endLabel(endA, "a", SERIES_TEXT.formula),
+        ...endLabel(endA, "a", options.plain ? INK.muted : SERIES_TEXT.formula),
         ...endLabel(endB, "b", SERIES_TEXT.guarantee),
-        ...startLabel(startA, "a", SERIES_TEXT.formula),
+        ...startLabel(startA, "a", options.plain ? INK.muted : SERIES_TEXT.formula),
         ...startLabel(startB, "b", SERIES_TEXT.guarantee),
         Plot.ruleY([min], { stroke: INK.rule, className: "axis" }),
         ...foot.marks,

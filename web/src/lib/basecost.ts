@@ -163,19 +163,6 @@ function staff(value: number): string {
   return count(Math.round(value));
 }
 
-/**
- * An element's share of base cost, which for several of the twenty-two rounds to `0.0%`.
- *
- * A column of `0.0%` reads as a column of missing values, and the reader has no way to tell it
- * from one. `<0.1%` is a claim rather than an absence: it says the row was computed, it is small,
- * and the table is not broken. The alternative — a second decimal place — widens the column on
- * every district's page to describe rows nobody reads at that precision.
- */
-function share(fraction: number): string {
-  if (fraction > 0 && fraction < 0.0005) return "&lt;0.1%";
-  return pct(fraction, 1);
-}
-
 /** Render the build-up for one district. */
 export function renderBaseCostBuildUp(d: District, districts: number): string {
   const b = d.base_cost_build_up;
@@ -189,13 +176,14 @@ export function renderBaseCostBuildUp(d: District, districts: number): string {
     hover: `${group.label} (R.C. ${group.section}): ${money(group.total)}, ${pct(group.total / aggregate, 1)} of base cost`,
   }));
 
+  // Dollars only (#659). The chart labels each group's share, and a Share column here repeated it,
+  // clipped to "SHA" inside the scroll wrapper at 375.
   const rows = parts
     .flatMap((group) => [
       `<tr class="current">
         <th><span class="n">${group.code}</span> ${escapeHtml(group.label)}
           <span class="n">R.C. ${group.section}</span></th>
         <td class="tnum">${money(group.total)}</td>
-        <td class="tnum">${pct(group.total / aggregate, 1)}</td>
       </tr>`,
       ...group.elements.map(
         (element) => `<tr>
@@ -203,7 +191,6 @@ export function renderBaseCostBuildUp(d: District, districts: number): string {
             element.note ? `<div class="n">${escapeHtml(element.note)}</div>` : ""
           }</th>
           <td class="tnum">${money(element.value)}</td>
-          <td class="tnum n">${share(element.value / aggregate)}</td>
         </tr>`,
       ),
     ])
@@ -230,12 +217,11 @@ export function renderBaseCostBuildUp(d: District, districts: number): string {
       <div class="chartwrap" data-chart="base-cost">${renderToString((w) => barSpec(bars, { width: w, hue: "formula" }), { label: `Aggregate base cost by component group of R.C. 3317.011, each as a share of its ${money(aggregate)} total${yearOf("formula") ? `, ${yearOf("formula")}` : ""}` })}</div>
 
       <div class="scroll"><table>
-        <thead><tr><th>Element</th><th>Amount</th><th>Share</th></tr></thead>
+        <thead><tr><th>Element</th><th>Amount</th></tr></thead>
         <tbody>${rows}
           <tr class="current">
             <th>Aggregate base cost</th>
             <td class="tnum">${money(aggregate)}</td>
-            <td class="tnum">100.0%</td>
           </tr>
         </tbody>
       </table></div>

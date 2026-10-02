@@ -1,7 +1,7 @@
 /** The statewide view: the three structural facts, and the one chart that shows the first. */
 
-import type { Bar } from "./chart.ts";
-import { barSpec, type Drawing, scatterSpec } from "./plot/spec.ts";
+import type { Bar, SeriesPoint } from "./chart.ts";
+import { barSpec, type Drawing, scatterSpec, seriesSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import { compactMoney, count, escapeHtml, fig, fixed, millions, money, ordinal, pct } from "./format.ts";
 import { realChange, series, type Basis } from "./real.ts";
@@ -13,6 +13,7 @@ import { seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
 import { anchor } from "./section.ts";
 import { medianTrace, pairs } from "./relationships.ts";
 import { firstOf, lastOf } from "./ends.ts";
+import { fiscalYear } from "./yearLabel.ts";
 
 /** A ratio change as a distance from where it started: `8% above`, `14% below`, `level with`. */
 function against(ratio: number | null): string {
@@ -42,12 +43,6 @@ export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
   // if none of them did — which has never happened, and would be a fact about the panel rather
   // than about the state. Handled rather than asserted: the card degrades to "—" instead of
   // reading a missing filing as a state with no cash.
-  const held = years.filter((y) => y.ending_cash != null);
-  const peak = held.reduce<(typeof held)[number] | null>(
-    (a, b) => (a == null || b.ending_cash! > a.ending_cash! ? b : a),
-    null,
-  );
-
   const cashChange =
     latest.ending_cash == null || first.ending_cash == null
       ? null
@@ -61,14 +56,18 @@ export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
   const lastAid = lastOf(actuals).state_aid;
   const nominalAid = lastAid == null || firstAid == null || firstAid <= 0 ? null : lastAid / firstAid - 1;
 
-  const bars: Bar[] = held.map((y) => ({
-    label: `FY${y.fiscal_year}`,
-    value: y.ending_cash!,
-    hover: `FY${y.fiscal_year}: ${millions(y.ending_cash).replace("+", "")} held, ${millions(y.total_revenue).replace("+", "")} in, ${millions(y.total_expenditure).replace("+", "")} out`,
-    ...(y.fiscal_year === peak?.fiscal_year || y.fiscal_year === latest.fiscal_year
-      ? { direct: compactMoney(y.ending_cash) }
-      : {}),
-  }));
+  /*
+   * A line, not bars (#659). The bars ran fiscal years down the page, FY2019 at the top, so the
+   * rise and fall the note describes had to be read top to bottom against the convention that
+   * time runs left to right. A year with no balance is a break in the line rather than a zero.
+   */
+  const cash: SeriesPoint[] = years.map((y) => ({ at: y.fiscal_year, a: y.ending_cash, b: null }));
+  const cashHover = (p: SeriesPoint): string => {
+    const y = years.find((year) => year.fiscal_year === p.at)!;
+    return y.ending_cash == null
+      ? `${fiscalYear(p.at)}: no balance reported`
+      : `${fiscalYear(p.at)}: ${millions(y.ending_cash).replace("+", "")} held, ${millions(y.total_revenue).replace("+", "")} in, ${millions(y.total_expenditure).replace("+", "")} out`;
+  };
 
   const nominalFirstCash = firstOf(actuals).ending_cash;
   const nominalLastCash = lastOf(actuals).ending_cash;
@@ -106,7 +105,7 @@ export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
           <div class="n">real; ${pct(nominalAid, 1)} nominal</div></div>
       </div>
 
-      <div class="chartwrap" data-chart="statewide-cash">${renderToString((w) => barSpec(bars, { width: w, hue: "plain" }), { label: `General fund cash held at 30 June, summed over the ${count(bundle.statewide.districts)} districts in this feed, by fiscal year, FY${first.fiscal_year} to FY${latest.fiscal_year}, ${label}` })}</div>
+      <div class="chartwrap" data-chart="statewide-cash">${renderToString((w) => seriesSpec(cash, { a: "held", b: "" }, compactMoney, cashHover, { width: w, tick: fiscalYear, plain: true }), { label: `General fund cash held at 30 June, summed over the ${count(bundle.statewide.districts)} districts in this feed, by fiscal year, FY${first.fiscal_year} to FY${latest.fiscal_year}, ${label}` })}</div>
       <p class="note">${
           converted
             ? `<strong>In constant dollars the balance ends ${against(cashChange == null || !first.ending_cash ? null : cashChange / first.ending_cash)}
