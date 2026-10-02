@@ -1451,6 +1451,79 @@ function byPosition<T extends { x: number; y: number }>(marks: readonly T[]): T[
   return [...marks].sort((a, b) => a.x - b.x || a.y - b.y);
 }
 
+/** The room a band's swatch takes ahead of its name in the gutter, in pixels. */
+const BAND_KEY = 12;
+
+/** The least distance between two gutter names' baselines, in pixels: the 10px type and a gap. */
+const BAND_LEADING = 13;
+
+/**
+ * A banded trace's name, in the right gutter at the height its line ends, behind a swatch of its
+ * band's hue (#657).
+ *
+ * The bands were keyed by a legend, and on `/outcomes` one legend served two charts: 171px above
+ * the first at 1280 with a paragraph between, and a screen above the second. At three lines the
+ * convention — and `/history`'s own practice — is to name each where it ends. In the gutter rather
+ * than at the line's last point, because that point is the median of the top bin and sits inside
+ * the cloud; names there ran across its densest part.
+ *
+ * The ramp's end steps are near 2.2:1 against the card, so the name is set in text ink and not in
+ * the band's hue, as a legend's would be. The swatch carries the hue and the height carries the
+ * line: each name moves off its line's end only as far as keeps it clear of the others, in the
+ * order the lines end, and stays inside the plot's height.
+ */
+function bandLabels(
+  traces: readonly Trace[],
+  domain: [number, number],
+  log: boolean,
+  frame: { top: number; bottom: number },
+  right: number,
+) {
+  const t = (v: number) => (log ? Math.log(v) : v);
+  const ends = traces
+    .filter((trace) => trace.band != null && trace.points.length > 0)
+    .map((trace) => {
+      const end = lastOf(trace.points);
+      const share = (t(end.y) - t(domain[0])) / (t(domain[1]) - t(domain[0]));
+      return { trace, end, py: frame.bottom - share * (frame.bottom - frame.top) };
+    })
+    .sort((a, b) => a.py - b.py);
+  // Down from the top, then back up from the floor, so a crowd at either edge stays inside it.
+  const at = ends.map((e) => e.py);
+  for (let i = 0; i < at.length; i += 1) {
+    at[i] = Math.max(at[i]!, frame.top + 4, i > 0 ? at[i - 1]! + BAND_LEADING : -Infinity);
+  }
+  for (let i = at.length - 1; i >= 0; i -= 1) {
+    at[i] = Math.min(at[i]!, frame.bottom - 4, i < at.length - 1 ? at[i + 1]! - BAND_LEADING : Infinity);
+  }
+  return ends.flatMap(({ trace, end, py }, i) => {
+    const dy = at[i]! - py;
+    return [
+      Plot.dot([end], {
+        x: () => right,
+        y: "y",
+        dx: 8 + 4,
+        dy,
+        r: 4,
+        symbol: "square",
+        fill: ORDINAL[Math.min(ORDINAL.length - 1, Math.max(0, trace.band!))] as string,
+        stroke: "none",
+        className: "scatter-band-key",
+      }),
+      Plot.text([end], {
+        x: () => right,
+        y: "y",
+        dx: 8 + BAND_KEY + 2,
+        dy,
+        text: () => trace.label,
+        textAnchor: "start",
+        fill: INK.secondary,
+        className: "scatter-trace-end",
+      }),
+    ];
+  });
+}
+
 export function scatterSpec(
   points: ScatterPoint[],
   axes: {
@@ -1643,19 +1716,14 @@ export function scatterSpec(
   const { width } = options;
   const marginLeft = 62;
   /*
-   * Sized to the labels that are actually drawn, which is not every trace.
-   *
-   * A banded trace carries its identity in the legend and this function deliberately draws no end
-   * label for it — see the trace marks below. The gutter was sized off `traces` all the same, so
-   * both banded scatters on `/outcomes` gave up **22% of a 640px frame** to labels that were never
-   * rendered: three bands whose longest name is "least poor third", 139px of white space beside a
-   * cloud that had been squeezed to make room for it.
+   * Sized to the labels that are drawn, and every trace carries one (#657): a banded trace's sits
+   * in the gutter behind a swatch of its band, which is the extra `BAND_KEY`. Short names are the
+   * caller's to choose — called "least poor third", the bands' gutter came to 22% of a 640px frame.
    */
-  const labelledTraces = traces.filter((t) => t.band == null);
   const marginRight = gutter(
     width,
-    labelledTraces.length > 0
-      ? 24 + Math.max(...labelledTraces.map((t) => t.label.length)) * 7.2
+    traces.length > 0
+      ? Math.max(...traces.map((t) => 24 + (t.band != null ? BAND_KEY : 0) + t.label.length * 7.2))
       : 24,
   );
   const title = yTitle(width, marginLeft, axes.y.label + (axes.y.log ? LOG_SCALE : ""), 28);
@@ -1687,6 +1755,13 @@ export function scatterSpec(
     options.identity || options.fit
       ? width - marginLeft - marginRight + marginTop + marginBottom
       : (options.height ?? 420);
+  const bandKeys = bandLabels(
+    traces,
+    axes.y.log ? [yMin, yMax] : [yMin - yPad, yMax + yPad],
+    axes.y.log ?? false,
+    { top: marginTop, bottom: height - marginBottom },
+    axes.x.log ? xMax : xMax + xPad,
+  );
   return {
     options: {
       width,
@@ -1841,13 +1916,9 @@ export function scatterSpec(
             className: "scatter-trace",
           }),
           /*
-           * A direct label, except where the bands already have one.
-           *
-           * A banded chart carries a legend by construction — the ramp's end steps are near 2.2:1
-           * against their surface and the legend is the relief that buys — so labelling each trace
-           * as well says the same thing twice and says it on top of the cloud. Three of them ran
-           * across the densest part of this one. Identity is still not hue alone; it is hue and a
-           * legend, which is what the legend is for.
+           * A direct label at the line's end, except for a banded trace, whose name goes in the
+           * gutter instead — see `bandLabels`. Three names at the line ends ran across the densest
+           * part of the cloud.
            */
           ...(trace.band != null
             ? []
@@ -1864,6 +1935,7 @@ export function scatterSpec(
                 }),
               ]),
         ]),
+        ...bandKeys,
 
         /*
          * The two numbers, in the one corner of a fitted panel that is empty in both of them.

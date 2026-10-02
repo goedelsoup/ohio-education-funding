@@ -142,16 +142,16 @@ if (d.enrollment_change != null && d.enrollment_change !== 0) {
      */
     guaranteeWidth > 0 && (
       <div class="barwrap">
+           <div class="legend">
+             <span><i class="sw" data-series="formula"></i> What the formula computes</span>{" "}
+             <span><i class="sw" data-series="guarantee"></i> What the guarantee adds</span>
+           </div>
            <div class="bar" role="img" aria-label={`${pct(
              formulaPP / realizedPP,
              0,
            )} of this district's aid per pupil is computed by the formula; the guarantee pays the rest`}>
              <div class="seg" data-series="formula" style={`width:${formulaWidth}%`}></div>
              <div class="seg" data-series="guarantee" style={`width:${guaranteeWidth}%`}></div>
-           </div>
-           <div class="legend">
-             <span><i class="sw" data-series="formula"></i> What the formula computes</span>{" "}
-             <span><i class="sw" data-series="guarantee"></i> What the guarantee adds</span>
            </div>
          </div>
     )

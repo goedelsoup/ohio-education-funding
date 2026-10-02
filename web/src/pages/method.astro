@@ -458,11 +458,11 @@ const millageScatter = renderToString(
       the same quantity arrived at two ways, so they can be drawn against each other and the
       distance between them read off the axis.
     </p>
-    <div class="chartwrap" data-chart="reduction-factors" set:html={millageScatter} />
     <div class="legend">
       <span><i class="sw" data-series="formula"></i> Above the floor — the factors set the rate</span>
       <span><i class="sw" data-series="guarantee"></i> At the twenty-mill floor — they have stopped</span>
     </div>
+    <div class="chartwrap" data-chart="reduction-factors" set:html={millageScatter} />
     <p class="note">
       {/* `{" "}` before every expression that opens a line: Astro trims the newline between text
           and an adjacent expression exactly as JSX does, and "for188 of 609" is what that looks

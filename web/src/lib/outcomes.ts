@@ -128,7 +128,9 @@ export function renderOutcomes(bundle: Bundle): string {
    * side-by-side comparison must not do.
    */
   const povertyBands = bands(bundle.districts, (d) => d.economically_disadvantaged);
-  const BAND_LABELS = ["least poor third", "middle third", "poorest third"];
+  // Each median line's name, drawn in the chart's gutter where the line ends (#657). Short,
+  // because the gutter is taken from the cloud; the dek says they are thirds.
+  const BAND_LABELS = ["Least poor", "Middle", "Poorest"];
 
   /*
    * One horizontal scale across the pair, so the comparison the card asks for is a comparison.
@@ -178,7 +180,9 @@ export function renderOutcomes(bundle: Bundle): string {
           y: { label: "Performance Index", format: (v) => fixed(v, 0) },
         },
         traces,
-        { width: w, height: 330, xDomain: spendingDomain },
+        // 270 so the pair is one screen at 1280x800: at 330 the two drew 894px from the first
+        // lead-in, and the card's argument is the contrast between them (#657).
+        { width: w, height: 270, xDomain: spendingDomain },
       );
     return drawing;
   };
@@ -262,27 +266,22 @@ export function renderOutcomes(bundle: Bundle): string {
         disability; below, by the pupils actually enrolled. Each dot is shaded by the third of the
         state its district's poverty rate falls in — the variable neither axis carries, and the one
         both charts are really about.</p>
-      <div class="legend">
-        <span><i class="sw" data-series="ordinal-1"></i> Least poor third</span>
-        <span><i class="sw" data-series="ordinal-2"></i> Middle third</span>
-        <span><i class="sw" data-series="ordinal-3"></i> Poorest third</span>
-      </div>
-
-      <p class="note">Spending per <em>need-weighted</em> pupil, against attainment —
-        ${coefficient(o.weighted_spending_vs_performance)}. <strong>The three thirds sit at the
-        same spending and at different attainment</strong>: their tenth percentiles are within
+      <p class="note"><strong>Flat:</strong> per <em>need-weighted</em> pupil, spending predicts
+        nothing (${coefficient(o.weighted_spending_vs_performance)}).</p>
+      <div class="chartwrap" data-chart="weighted-spending">${renderToString(weightedScatter, { label: `Spending per need-weighted pupil against Performance Index, one dot per district shaded by poverty third, with a median line for each third, ${yearOf("outcome.spending")} spending and ${yearOf("outcome.performance")} attainment` })}</div>
+      <p class="note"><strong>Falls:</strong> per <em>enrolled</em> pupil, attainment falls as
+        spending rises (${coefficient(o.enrolled_spending_vs_performance)}).</p>
+      <div class="chartwrap" data-chart="enrolled-spending">${renderToString(enrolledScatter, { label: `Spending per enrolled pupil against Performance Index, one dot per district shaded by poverty third, with a median line for each third, ${yearOf("outcome.spending")} spending and ${yearOf("outcome.performance")} attainment` })}</div>
+      <p class="note">In the upper chart <strong>the three thirds sit at the same spending and
+        at different attainment</strong>: their tenth percentiles are within
         ${money(500)} of each other and their ninetieths within ${money(100)}, while their median
         Performance Index runs ${bandMedians[0]}, ${bandMedians[1]}, ${bandMedians[2]}. The
         denominator has absorbed the difference between them, which is what a coefficient of
         ${coefficient(o.weighted_spending_vs_performance)} looks like from the inside.</p>
-      <div class="chartwrap" data-chart="weighted-spending">${renderToString(weightedScatter, { label: `Spending per need-weighted pupil against Performance Index, one dot per district shaded by poverty third, with a median line for each third, ${yearOf("outcome.spending")} spending and ${yearOf("outcome.performance")} attainment` })}</div>
-
-      <p class="note">Spending per <em>enrolled</em> pupil, against the same attainment —
-        ${coefficient(o.enrolled_spending_vs_performance)}. The same three bands, and now they
-        separate on the horizontal axis too: the poorest third spends
+      <p class="note">In the lower chart the same three bands separate on the horizontal axis
+        too: the poorest third spends
         ${money(enrolledGap)} more per enrolled pupil than the least poor. Nothing about the
         districts changed between these two charts. Only the denominator did.</p>
-      <div class="chartwrap" data-chart="enrolled-spending">${renderToString(enrolledScatter, { label: `Spending per enrolled pupil against Performance Index, one dot per district shaded by poverty third, with a median line for each third, ${yearOf("outcome.spending")} spending and ${yearOf("outcome.performance")} attainment` })}</div>
       <div class="scroll"><table><tbody>
         <tr><th>Spending per <em>need-weighted</em> pupil vs achievement</th>
             <td class="tnum">${coefficient(o.weighted_spending_vs_performance)}</td></tr>

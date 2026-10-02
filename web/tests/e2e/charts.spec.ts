@@ -329,6 +329,50 @@ test.describe("charts on a phone", () => {
       expect([...new Set(shown)], `${width}px shows one drawing per chart`).toEqual([1]);
     }
   });
+
+  test("a key sits directly above its chart, and every dek is one size", async ({ page }) => {
+    /*
+     * #657. Keys sat above three charts and below five, and on `/outcomes` one key served two
+     * scatters from a paragraph above the first. The rule is the one `.legend` states in
+     * `app.css`: a key's next sibling is the drawing it keys — a `.chartwrap`, the `.panels` of a
+     * small multiple, or the CSS `.bar` on a district's aid card.
+     *
+     * And a dek, the note directly above a chart (or above its key), computed 16.96px as a card's
+     * own child and 14.08px a level down, so the Change tab carried both in one card. One size,
+     * wherever it is nested.
+     */
+    await page.setViewportSize({ width: 1280, height: 900 });
+    const astray: string[] = [];
+    const sizes = new Map<string, string>();
+    let keys = 0;
+    for (const route of CHARTED) {
+      await visit(page, route);
+      const found = await page.evaluate(() => ({
+        keys: [...document.querySelectorAll(".legend")].map((key) => ({
+          ok: key.nextElementSibling?.matches(".chartwrap, .panels, .bar") ?? false,
+          text: (key.textContent ?? "").replace(/\s+/g, " ").trim().slice(0, 40),
+        })),
+        deks: [...document.querySelectorAll("p.note")]
+          .filter((note) => {
+            const next = note.nextElementSibling;
+            return (
+              next?.matches(".chartwrap") ||
+              (next?.matches(".legend") && next.nextElementSibling?.matches(".chartwrap"))
+            );
+          })
+          .map((note) => ({
+            px: getComputedStyle(note).fontSize,
+            text: (note.textContent ?? "").replace(/\s+/g, " ").trim().slice(0, 40),
+          })),
+      }));
+      keys += found.keys.length;
+      for (const key of found.keys) if (!key.ok) astray.push(`${route}: "${key.text}"`);
+      for (const dek of found.deks) if (!sizes.has(dek.px)) sizes.set(dek.px, `${route}: "${dek.text}"`);
+    }
+    expect(keys, "the routes carry keys").toBeGreaterThan(0);
+    expect(astray, "a key with something other than its chart below it").toEqual([]);
+    expect([...sizes.entries()], "deks at more than one size").toHaveLength(1);
+  });
 });
 
 /*
@@ -462,7 +506,7 @@ test.describe("a year chip", () => {
 });
 
 test.describe("colour that carries a third variable", () => {
-  test("the spending charts are banded by poverty, with the legend the ramp obliges", async ({
+  test("the spending charts are banded by poverty, each line named where it ends", async ({
     page,
   }) => {
     /*
@@ -470,14 +514,23 @@ test.describe("colour that carries a third variable", () => {
      * and here that is the card's whole argument: the three poverty thirds sit at the same
      * spending per need-weighted pupil and at different attainment.
      *
-     * The legend is not decoration. The ramp's end steps sit near 2.2:1 against their surface,
-     * which is a contrast warning that obligates relief rather than one that can be waved off.
+     * The ramp's end steps sit near 2.2:1 against their surface, which obliges a key in text ink.
+     * One legend keyed both charts from above the first until #657; each chart now names its own
+     * three lines in its gutter, behind a swatch of each band.
      */
     await page.goto("/outcomes");
     const card = page.locator('[data-part="two-denominators"]');
-    await expect(card.locator(".legend .sw[data-series=ordinal-1]")).toHaveCount(1);
-    await expect(card.locator(".legend .sw[data-series=ordinal-2]")).toHaveCount(1);
-    await expect(card.locator(".legend .sw[data-series=ordinal-3]")).toHaveCount(1);
+    await expect(card.locator(".legend")).toHaveCount(0);
+    for (const key of ["weighted-spending", "enrolled-spending"]) {
+      const chart = card.locator(`[data-chart="${key}"] svg.plot:visible`);
+      await expect(chart.locator(".scatter-trace")).toHaveCount(3);
+      await expect(chart.locator(".scatter-band-key > *")).toHaveCount(3);
+      expect((await chart.locator(".scatter-trace-end").allTextContents()).sort()).toEqual([
+        "Least poor",
+        "Middle",
+        "Poorest",
+      ]);
+    }
 
     // Three distinct fills across the dots, and they are the ramp rather than the series pair.
     const fills = await card
@@ -490,13 +543,24 @@ test.describe("colour that carries a third variable", () => {
     ]);
   });
 
-  test("a banded chart does not label its traces as well as its legend", async ({ page }) => {
-    // Three labelled lines over the densest part of the cloud said the same thing the legend
-    // already said, on top of the data it was describing.
+  test("the two denominators are one screen, each under its own lead-in", async ({ page }) => {
+    /*
+     * The card's argument is a contrast between its two charts, and a note between them put the
+     * pair at 949px at 1280, so they were never on one screen together (#657). The readings follow
+     * the pair; what stays between them is the second chart's one-line lead-in. And the contrast
+     * is printed, flat against falling, where it was only in the prose.
+     */
+    await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto("/outcomes");
-    const chart = page.locator('[data-chart="weighted-spending"] svg.plot:visible');
-    await expect(chart.locator(".scatter-trace")).toHaveCount(3);
-    await expect(chart.locator(".scatter-trace-end")).toHaveCount(0);
+    const card = page.locator('[data-part="two-denominators"]');
+    const first = card.locator('[data-chart="weighted-spending"]');
+    const second = card.locator('[data-chart="enrolled-spending"]');
+    const lead = (chart: typeof first) => chart.locator("xpath=preceding-sibling::*[1]");
+    await expect(lead(first)).toContainText("Flat:");
+    await expect(lead(second)).toContainText("Falls:");
+    const top = await first.evaluate((el) => el.getBoundingClientRect().top);
+    const bottom = await second.evaluate((el) => el.getBoundingClientRect().bottom);
+    expect(bottom - top, "the first scatter's top to the second's foot").toBeLessThanOrEqual(800);
   });
 
   test("the millage chart splits on the variable that explains it, not a proxy", async ({
