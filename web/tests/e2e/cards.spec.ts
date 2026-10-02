@@ -153,6 +153,7 @@ test.describe("every card has an address", () => {
      */
     for (const route of [
       "/",
+      "/what-changed",
       "/history",
       "/outcomes",
       "/method",

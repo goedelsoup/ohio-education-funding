@@ -62,6 +62,7 @@ test("each menu holds the places #548 put in it, in its order", () => {
       .sections.flatMap((s) => s.links.map((l) => l.label));
   expect(labels("Places")).toEqual([
     "Statewide",
+    "What changed",
     "Counties",
     "House districts",
     "Senate districts",

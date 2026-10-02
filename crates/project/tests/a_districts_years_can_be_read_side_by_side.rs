@@ -272,3 +272,29 @@ fn enrolled_adm_is_absent_in_fy2025() {
         assert!(fy26.is_some_and(|adm| adm > 0.0) && fy27.is_some_and(|adm| adm > 0.0));
     }
 }
+
+/// DPIA is carried for the two model years, and over the 609 it is the program's whole fall.
+///
+/// $567.7M in the FY2026 model and $525.1M in the FY2027 one, 7.5% lower, in 562 districts: the
+/// blend moving from 75/25 to 65/35 toward a directly certified count that was itself restated
+/// lower. The figures `the_two_clocks_the_plan_runs_on.rs` pins over each file's own rows, read
+/// here over the comparison's population.
+#[test]
+fn dpia_is_absent_in_fy2025_and_falls_across_the_model_years() {
+    let frame = biennium::frame();
+    let (mut fy26, mut fy27, mut fell) = (0.0, 0.0, 0);
+    for row in &frame {
+        let [a, b, c] = row.years.map(|year| year.dpia);
+        assert!(a.is_none(), "{}", row.total.irn);
+        let (b, c) = (
+            b.expect("FY2026 models DPIA"),
+            c.expect("FY2027 models DPIA"),
+        );
+        fy26 += b;
+        fy27 += c;
+        fell += usize::from(c < b - 0.005);
+    }
+    assert!(close(fy26, 567_673_868.76, 1.0), "{fy26}");
+    assert!(close(fy27, 525_094_312.31, 1.0), "{fy27}");
+    assert_eq!(fell, 562);
+}

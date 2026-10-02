@@ -235,6 +235,17 @@ export const SECTIONS = {
     whoGained: "who-gained",
   },
 
+  /** `/what-changed` — the biennium statewide, by provision (#641). */
+  changed: {
+    twoMeasures: "two-measures",
+    distribution: "distribution",
+    targetedAssistance: "targeted-assistance",
+    directCertification: "direct-certification",
+    reappraisal: "reappraisal",
+    phaseIn: "phase-in",
+    byCounty: "by-county",
+  },
+
   /** `/house`, `/senate`, and `/[chamber]/[number]`. */
   chamber: {
     estimates: "estimates",

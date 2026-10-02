@@ -1,0 +1,61 @@
+---
+/**
+ * What changed across the biennium, for all 609 districts at once, by provision (#641).
+ *
+ * The district's `/change` tab answers this for one district and the county page's who-gained
+ * card for a handful; this is the same question over the state, and the place a reader asking
+ * "why did my district's aid fall" finds the provisions that moved everyone's. It sits in Places
+ * beside Statewide because it is a view of all of Ohio rather than an analysis of it.
+ *
+ * Every card is in the document; the county filter and the sort only hide and reorder rows.
+ */
+import Base from "../layouts/Base.astro";
+import { NAMES } from "../lib/nav.ts";
+import { loadFeed } from "../lib/feed.ts";
+import { count } from "../lib/format.ts";
+import * as routes from "../lib/routes.ts";
+import { yearsOf } from "../lib/change.ts";
+import {
+  renderByCounty,
+  renderDirectCertification,
+  renderDistribution,
+  renderPhaseIn,
+  renderReappraisal,
+  renderTargetedAssistance,
+  renderTwoMeasures,
+  summary,
+} from "../lib/whatChanged.ts";
+
+const { alphabetical } = loadFeed();
+const y = yearsOf(alphabetical[0]!.biennium);
+---
+
+<Base
+  title={NAMES.changed.name}
+  description={summary(alphabetical)}
+  image={routes.og.page("what-changed")}
+  imageAlt="Ohio school funding across the biennium: total state support and foundation aid moving in opposite directions"
+  section="changed"
+>
+  <h1>{NAMES.changed.name}, FY{y[0]} to FY{y[2]}</h1>
+  <p class="lead">
+    {summary(alphabetical)} The cards below take the provisions that moved it one at a time —
+    the supplement H.B. 96 repealed, the new count in DPIA, reappraisal through local capacity and
+    the phase-in — and say where each reached, without assigning any of it a purpose. FY{y[0]} is
+    the department's final payment report and FY{y[1]} and FY{y[2]} are its models, for the{" "}
+    {count(alphabetical.length)} districts all three carry.
+  </p>
+
+  <Fragment set:html={renderTwoMeasures(alphabetical)} />
+  <Fragment set:html={renderDistribution(alphabetical)} />
+  <Fragment set:html={renderTargetedAssistance(alphabetical)} />
+  <Fragment set:html={renderDirectCertification(alphabetical)} />
+  <Fragment set:html={renderReappraisal(alphabetical)} />
+  <Fragment set:html={renderPhaseIn(alphabetical)} />
+  <Fragment set:html={renderByCounty(alphabetical)} />
+
+  <script>
+    import "../scripts/sortable.ts";
+    import "../scripts/whatChanged.ts";
+  </script>
+</Base>

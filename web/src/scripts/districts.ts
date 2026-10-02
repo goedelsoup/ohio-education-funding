@@ -121,11 +121,12 @@ if (table && body && nameInput && statusSelect && countOut) {
    * All six are in the document already — see `districts.astro` for why they are rendered at build
    * rather than drawn here — so this sets an attribute and a sibling selector does the rest.
    * `name` is the default sort and is not a quantity, so it leaves the strip where it was rather
-   * than hiding all six.
+   * than hiding all six. The biennium's change columns have no strip either, for the reason
+   * `districts.astro` gives, so a sort by one of them leaves the strip where it was too.
    */
   const measures = document.querySelector<HTMLElement>("#district-measures");
   const showMeasure = (key: string) => {
-    if (measures && key !== "name") measures.dataset.measure = key;
+    if (measures?.querySelector(`.measure[data-measure="${CSS.escape(key)}"]`)) measures.dataset.measure = key;
   };
 
   /*

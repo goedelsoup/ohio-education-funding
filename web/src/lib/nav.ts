@@ -42,6 +42,7 @@ export type Section =
   // The children, where a child is a page in its own right. `districts` and `scenario` are also
   // entries of the bar on their own — see `nav()`.
   | "statewide"
+  | "changed"
   | "districts"
   | "counties"
   | "house"
@@ -82,6 +83,7 @@ export type Section =
  */
 export const NAMES = {
   statewide: { href: "/statewide", name: "Statewide" },
+  changed: { href: "/what-changed", name: "What changed" },
   districts: { href: "/districts", name: "Find a district" },
   counties: { href: "/counties", name: "Counties" },
   house: { href: "/house", name: "House districts" },
@@ -408,6 +410,7 @@ export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavEntry[] {
         {
           links: [
             place("statewide", "all of Ohio at once"),
+            place("changed", "the biennium, provision by provision"),
             place("counties"),
             place("house"),
             place("senate"),

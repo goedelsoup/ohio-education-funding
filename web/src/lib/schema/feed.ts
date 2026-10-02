@@ -789,6 +789,10 @@ const DistrictSchema = z
      * three and the five supplements make up `total_*` in every year to within cent rounding. And
      * the year's `enrolled_adm`, null for FY2025, whose payment report carries no enrollment inputs.
      *
+     * `dpia` is Disadvantaged Pupil Impact Aid as the year's formula computes it, null for FY2025.
+     * It is a component of `phase_in_calculated`, not a payment line, so it is added to neither
+     * measure: it reaches foundation aid through the phase-in, and not at all at the base.
+     *
      * `valuation` is assessed valuation for the tax years in `valuation_tax_years`, oldest first.
      */
     biennium: z
@@ -814,6 +818,7 @@ const DistrictSchema = z
                 service_center_charge: maybeNum,
                 other_adjustments: maybeNum,
                 net_state_funding: maybeNum,
+                dpia: maybeNum,
               })
               .strict(),
           )

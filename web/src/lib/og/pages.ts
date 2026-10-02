@@ -24,6 +24,7 @@ import { acts, regimes } from "../legislation.ts";
 import { count, millions, pct } from "../format.ts";
 import type { Card } from "./card.ts";
 import { firstOf, lastOf } from "../ends.ts";
+import { statewideLevels } from "../whatChanged.ts";
 
 /** The eyebrow every card wears unless it has a better one. */
 export const SITE = "Ohio school funding";
@@ -64,6 +65,12 @@ export function pageCards(): Record<string, Card> {
    */
   const guaranteeOfAid = s.realized_aid_total > 0 ? s.guarantee_total / s.realized_aid_total : 0;
   const guaranteeOfDistricts = s.on_guarantee / s.districts;
+  /* The biennium's two measures, off the same sums `/what-changed` prints. */
+  const biennium = bundle.districts[0]!.biennium;
+  const [total, foundation] = (["total", "foundation"] as const).map((m) => {
+    const l = statewideLevels(bundle.districts, m);
+    return l[2] - l[0];
+  });
 
   /** The site's own card. What a link to anything unnamed here previews as. */
   const site: Card = {
@@ -89,6 +96,14 @@ export function pageCards(): Record<string, Card> {
       ...site,
       headline: "Every Ohio district's state aid, in one panel",
       figureNote: `State foundation aid across ${s.districts} districts, ${fy}`,
+    },
+
+    "what-changed": {
+      eyebrow: SITE,
+      headline: `What changed, FY${biennium.year_baseline} to FY${biennium.year_terminal}`,
+      figure: millions(total!),
+      figureNote: `Total state support across ${s.districts} districts, while foundation aid moved ${millions(foundation!)}`,
+      meta: `FY${biennium.year_baseline} paid, FY${biennium.year_middle} and FY${biennium.year_terminal} models`,
     },
 
     districts: {

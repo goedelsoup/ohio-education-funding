@@ -770,6 +770,9 @@ pub struct BienniumYear {
     pub other_adjustments: Option<Dollars>,
     /// Total state support after transfers. `None` exactly where [`Self::transfers`] is.
     pub net_state_funding: Option<Dollars>,
+    /// Disadvantaged Pupil Impact Aid as the year's formula computes it, before the phase-in and
+    /// the guarantee. `None` for the payment report, which does not itemize the formula.
+    pub dpia: Option<Dollars>,
 }
 
 /// One district, as the web layer needs it.

@@ -41,6 +41,12 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `51.0.0` added each biennium year's Disadvantaged Pupil Impact Aid as the formula computes it,
+/// so a page can say what H.B. 96's change to the disadvantaged count did between the two model
+/// years. `null` for FY2025, whose payment report does not itemize the formula. A component of
+/// the formula's calculated figure and not a payment line: it reaches foundation aid through the
+/// phase-in, and a page must not add it to either measure.
+///
 /// `50.0.0` added each biennium year's three remaining payment lines as levels — transportation,
 /// special education transportation and preschool special education — and the enrolled ADM the
 /// year's file states, so a page can set the three years side by side line by line. With
@@ -267,7 +273,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "50.0.0";
+pub const CONTRACT_VERSION: &str = "51.0.0";
 
 mod model;
 mod serialize;

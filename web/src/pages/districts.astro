@@ -12,6 +12,7 @@
  */
 import Base from "../layouts/Base.astro";
 import { NAMES } from "../lib/nav.ts";
+import { MEASURES as CHANGE_MEASURES, levelChange, signedPct, yearsOf, type YearIndex } from "../lib/change.ts";
 import { loadFeed, qualifiedName } from "../lib/feed.ts";
 import { compactMoney, count, fig, money, NOT_REPORTED, pct, reported } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
@@ -54,6 +55,32 @@ const HEADS = {
   poverty: "Econ. disadv.",
   enrollment: "Enrollment Δ",
 } as const;
+
+/*
+ * The change columns (#641): each measure across each step of the biennium, as a share of the
+ * district's own earlier year, so a city and a village sort on one scale.
+ *
+ * Six columns rather than one with a control, because the question a reader brings here is "who
+ * fell furthest", and on which measure and which step is part of that question — the two measures
+ * disagree in sign statewide. The years are the feed's, read off the first district: all 609 carry
+ * the same three. No strip follows these columns; the script leaves the strip where it was.
+ */
+const biennium = yearsOf(bundle.districts[0]!.biennium);
+const STEPS: readonly (readonly [YearIndex, YearIndex])[] = [
+  [0, 1],
+  [1, 2],
+  [0, 2],
+];
+const CHANGES = (["total", "foundation"] as const).flatMap((measure) =>
+  STEPS.map(([from, to]) => ({
+    measure,
+    from,
+    to,
+    key: `${measure}-${from}-${to}`,
+    head: measure === "total" ? "Total support Δ" : "Foundation aid Δ",
+    span: `FY${biennium[from]} to FY${biennium[to]}`,
+  })),
+);
 
 /** A cell whose sort key is not what it displays: dollars with separators, blanks, percentages. */
 const sortable = (value: number | null) => (value == null ? "" : String(value));
@@ -251,6 +278,9 @@ const years = Object.fromEntries(MEASURES.map((m) => [m.key, m.year])) as Record
           <th aria-sort="none"><button type="button" data-sort="valuation" set:html={fig(HEADS.valuation, years.valuation)} /></th>
           <th aria-sort="none"><button type="button" data-sort="poverty" set:html={fig(HEADS.poverty, years.poverty)} /></th>
           <th aria-sort="none"><button type="button" data-sort="enrollment" set:html={fig(HEADS.enrollment, years.enrollment)} /></th>
+          {CHANGES.map((c) => (
+            <th aria-sort="none"><button type="button" data-sort={c.key} set:html={fig(c.head, c.span)} /></th>
+          ))}
         </tr>
       </thead>
       <tbody>
@@ -292,6 +322,14 @@ const years = Object.fromEntries(MEASURES.map((m) => [m.key, m.year])) as Record
                 >
                   {reported(d.enrollment_change, (v) => pct(v, 1))}
                 </td>
+                {CHANGES.map((c) => {
+                  const { ratio } = levelChange(d.biennium, c.measure, c.from, c.to);
+                  return (
+                    <td data-sort-value={ratio} data-label={`${c.head} ${c.span}`} class={ratio < 0 ? "loss" : ""}>
+                      {signedPct(ratio)}
+                    </td>
+                  );
+                })}
               </tr>
             );
           })
@@ -305,6 +343,13 @@ const years = Object.fromEntries(MEASURES.map((m) => [m.key, m.year])) as Record
     formula did not compute. Enrolled ADM is the base cost count — the greater of the three-year
     average and the current year. Enrollment change is {enrollmentSpan}, of which the last year is partly
     a departmental estimate. Property valuation is {valuationYear} and is missing for three districts.
+  </p>
+  <p class="note">
+    The change columns are each district's {CHANGE_MEASURES.total.name} and its{" "}
+    {CHANGE_MEASURES.foundation.name}, as a share of its own earlier year. FY{biennium[0]} is the
+    department's final payment report; FY{biennium[1]} and FY{biennium[2]} are its models of those
+    years, not payments. A district held at its funding base reads no change in foundation aid
+    whatever its other lines do. Each district's own change tab splits its figures by line.
   </p>
   <p class="note">
     A zero means nothing was paid; "{NOT_REPORTED}" means the source has no figure for that district.

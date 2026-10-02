@@ -27,6 +27,7 @@ test.describe("axe", () => {
   const FAMILIES = [
     ["the front door", "/"],
     ["the statewide panel", "/statewide"],
+    ["the biennium by provision, with a measure toggle and a county filter", "/what-changed"],
     ["the district index, which is the one table with controls over it", "/districts"],
     ["a district dashboard", `/district/${CLEVELAND}`],
     ["a district's finances, which is where the basis switch is", `/district/${CLEVELAND}/finances`],
