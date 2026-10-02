@@ -19,8 +19,9 @@
  * # The ordering hazard, which is the same one `check:dist` documents
  *
  * A suite that reads `dist/` is reading *some* build, and a stale one is the previous commit. This
- * project therefore runs **after** `build`, never as part of `test:unit` — see `web/mise.toml` and
- * the `dist` step in `ci.yml`. The guard below catches the case where nothing has built at all,
+ * project therefore runs **after** `build`, never as part of `test:unit`. In `web/mise.toml` that is
+ * step order; in `ci.yml` it is the `web-dist` job's `needs: web-build`, and the `dist/` it reads is
+ * the tarball that job uploaded. The guard below catches the case where nothing has built at all,
  * which is the failure a newcomer hits; it cannot catch a stale build, and neither can
  * `check-dist-links.ts`. Ordering is what holds that, and it is stated in both places that own it.
  */

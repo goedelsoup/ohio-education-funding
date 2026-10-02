@@ -3,7 +3,11 @@
 # `mise run //web:<task>`, or run bare names from inside this directory.
 
 [tasks.gate]
-description = "Everything the web job in CI runs: check, lint, unit, build, dist links, dist, measure, e2e."
+description = "Everything the web jobs in CI run: check, lint, unit, build, dist links, dist, measure, e2e."
+# In one serial list, where CI runs it as five jobs (#647): `web-static` (check, lint, unit) and
+# `web-build` side by side, then `web-dist` and three `web-e2e` shards on the build's tarball. The
+# order here is the dependency order CI expresses with `needs:` — unit before build, so a formula
+# defect reads as a formula failure, and everything that reads `dist/` after the build that made it.
 run = [
   "mise run install",
   "mise run check",
