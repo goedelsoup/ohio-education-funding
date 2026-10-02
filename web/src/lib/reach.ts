@@ -132,7 +132,7 @@ export const DIMENSIONS = {
   },
   realized: {
     frame: "zero",
-    label: "Realized aid per pupil",
+    label: "Aid received per pupil",
     format: money,
     of: (_d, o) => per(o.realizedAid, o),
   },
@@ -184,7 +184,7 @@ export const DIMENSIONS = {
   },
   adm: {
     frame: "log",
-    label: "Enrolled ADM",
+    label: "Enrollment",
     format: (v) => count(Math.round(v)),
     of: (d) => d.current_year_adm,
   },
@@ -1194,14 +1194,14 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
              */
             {
               width: w,
-              ...(wall ? { identity: { label: "realized = formula" } } : {}),
+              ...(wall ? { identity: { label: "received = formula" } } : {}),
               ...(xFixed ? { xDomain: xFixed } : {}),
               ...(yFixed ? { yDomain: yFixed } : {}),
             },
           ),
         {
           label: `${drawnLabel}, ${dx.label.toLowerCase()} against ${dy.label.toLowerCase()}${view.trails ? ", with a trail from its position under current law" : ""}${scopeClause}`,
-          description: `${count(scoped - pinned)} ${scope == null ? "districts" : `of the ${count(scoped)} districts in scope`} are paid differently under these settings and ${count(pinned)} are paid the same.${wall ? " No district can fall below the diagonal, where realized aid equals formula aid; a district drawn above it is held by the guarantee and the vertical distance is what the guarantee pays it. A trail that runs flat is a district whose formula amount moved and whose payment did not." : ""}`,
+          description: `${count(scoped - pinned)} ${scope == null ? "districts" : `of the ${count(scoped)} districts in scope`} are paid differently under these settings and ${count(pinned)} are paid the same.${wall ? " No district can fall below the diagonal, where aid received equals formula aid; a district drawn above it is held by the guarantee and the vertical distance is what the guarantee pays it. A trail that runs flat is a district whose formula amount moved and whose payment did not." : ""}`,
         },
       )}</div>
       <p class="note">${

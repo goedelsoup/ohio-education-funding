@@ -219,13 +219,13 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
   const realizedTrace = medianTrace(
     withValuation.map((d) => ({ x: d.valuation_per_pupil!, y: d.realized_aid_per_pupil })),
     10,
-    "as received",
+    "aid received",
     "guarantee",
   );
   const formulaTrace = medianTrace(
     withValuation.map((d) => ({ x: d.valuation_per_pupil!, y: d.formula_aid_per_pupil })),
     10,
-    "the formula",
+    "formula aid",
     "formula",
   );
   const scatter: Drawing = (w) =>
@@ -290,7 +290,7 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
         districts — one of what the formula computes, one of what is actually paid. Both scales
         are logarithmic, because valuation per pupil spans seventeen times and aid per pupil
         thirty; on a linear axis nine districts in ten sit in the left-hand third.</p>
-      <div class="chartwrap" data-chart="wealth-offset">${renderToString(scatter, { label: `State aid per pupil against assessed valuation per pupil, one dot for each of ${count(points.length)} districts, with median lines for formula aid and aid as received, both axes logarithmic, FY${bundle.fiscal_year}` })}</div>
+      <div class="chartwrap" data-chart="wealth-offset">${renderToString(scatter, { label: `State aid per pupil against assessed valuation per pupil, one dot for each of ${count(points.length)} districts, with median lines for formula aid and aid received, both axes logarithmic, FY${bundle.fiscal_year}` })}</div>
       <p class="note"><strong>The gap between the two lines is what the guarantee costs the
         equalization.</strong> The formula would pay the wealthy districts least, and the guarantee
         is what stops it. Which districts those are is
@@ -300,9 +300,9 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
         reaches <strong>${fixed(s.wealth_neutrality_realized, 3)}</strong>; a perfectly
         compensating formula would be strongly negative.</p>
       <div class="scroll"><table><tbody>
-        <tr><th>Aid vs. wealth — formula only</th>
+        <tr><th>Formula aid vs. wealth</th>
             <td class="tnum">${fixed(s.wealth_neutrality_formula, 3)}</td></tr>
-        <tr><th>Aid vs. wealth — as received</th>
+        <tr><th>Aid received vs. wealth</th>
             <td class="tnum">${fixed(s.wealth_neutrality_realized, 3)}</td></tr>
         <tr><th>Districts drawn</th>
             <td class="tnum">${count(points.length)}</td></tr>

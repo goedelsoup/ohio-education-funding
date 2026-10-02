@@ -168,6 +168,15 @@ test("the renderers #503 migrated format no number by hand", () => {
   expect(offenders, "use `fixed`, `signed` or `count` from src/lib/format.ts").toEqual([]);
 });
 
+test("a log error on a chart is the percentage it amounts to (#658)", () => {
+  // `exp(v) - 1`, not `100 v`: the deepest pre-closure figure is +0.0272, which is +2.8%.
+  expect(format.logErrorPercent(0.0272)).toBe("+2.8%");
+  expect(format.logErrorPercent(-0.0071)).toBe("−0.7%");
+  // A magnitude that rounds away loses its sign.
+  expect(format.logErrorPercent(-0.0001)).toBe("0.0%");
+  expect(format.logErrorPercent(0)).toBe("0.0%");
+});
+
 describe("zero is not missing", () => {
   /*
    * "—" meant $0 under one column of /districts and "no figure" under the next (#597). A zero is a
@@ -184,6 +193,7 @@ describe("zero is not missing", () => {
       sig: format.sig(0),
       pct: format.pct(0),
       logError: format.logError(0),
+      logErrorPercent: format.logErrorPercent(0),
       fixed: format.fixed(0, 2),
       signed: format.signed(0, 2),
       count: format.count(0),

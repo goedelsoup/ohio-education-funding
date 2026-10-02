@@ -127,12 +127,14 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
     (w) =>
       seriesSpec(
         splitByBasis(meal),
-        { a: "on ADM", b: "on CE" },
+        // The reader's words for the two denominators (#658). `ADM` and `CE` are the source's
+        // columns, and the note under the chart names them for a reader who goes looking.
+        { a: "by enrollment", b: "by access" },
         (v) => `${fixed(v, 0)}%`,
         (p) => {
           const value = p.a ?? p.b;
           if (value == null) return `FY${p.at}`;
-          return `FY${p.at}: ${fixed(value, 1)}% ${p.a != null ? "of ADM" : "of CE count"}`;
+          return `FY${p.at}: ${fixed(value, 1)}% ${p.a != null ? "of enrollment" : "of students with program access"}`;
         },
         { width: w, tick: (year) => `FY${year}` },
       ),
@@ -155,9 +157,10 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
         change == null
           ? ""
           : `<p class="note"><strong>The two lines are not one line.</strong> The denominator
-        changes in FY${change}: through FY${change - 1} it is <code>AdmCount</code>, and from
-        FY${change} it is <code>CECount</code> — the highest daily number of students with access
-        to the program, which is neither ADM nor the count before it. The series is drawn in two
+        changes in FY${change}: through FY${change - 1} it is <code>AdmCount</code>, average daily
+        membership ("by enrollment" on the chart), and from FY${change} it is <code>CECount</code>
+        — the highest daily number of students with access to the program ("by access"),
+        which is neither average daily membership nor the count before it. The series is drawn in two
         pieces because joining them would assert a continuity the source does not have. The step
         across FY${change} is partly the definition moving, and nothing here can say how much.</p>`
       }

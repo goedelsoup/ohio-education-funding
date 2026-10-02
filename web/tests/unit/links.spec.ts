@@ -622,7 +622,7 @@ test("a median trace bins by count and keeps every district", () => {
   const values = loadFeed()
     .bundle.districts.filter((d) => d.valuation_per_pupil != null)
     .map((d) => ({ x: d.valuation_per_pupil!, y: d.realized_aid_per_pupil }));
-  const trace = medianTrace(values, 10, "as received", "guarantee");
+  const trace = medianTrace(values, 10, "aid received", "guarantee");
   expect(trace.points.length).toBe(10);
 
   // The x of each bin is its own median, so the line is drawn where the districts are.
@@ -643,13 +643,13 @@ test("the guarantee shows up as a gap between what the formula computes and what
   const realized = medianTrace(
     districts.map((d) => ({ x: d.valuation_per_pupil!, y: d.realized_aid_per_pupil })),
     10,
-    "as received",
+    "aid received",
     "guarantee",
   );
   const formula = medianTrace(
     districts.map((d) => ({ x: d.valuation_per_pupil!, y: d.formula_aid_per_pupil })),
     10,
-    "the formula",
+    "formula aid",
     "formula",
   );
   const gap = (i: number) => realized.points[i]!.y - formula.points[i]!.y;
