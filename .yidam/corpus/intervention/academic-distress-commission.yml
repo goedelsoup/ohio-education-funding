@@ -134,13 +134,25 @@ findings: |
   "would have to be the result of state legislation". [verified] Under 3302.103 a district that
   misses a majority may apply for up to two one-year extensions. If it misses at the end of five
   years, or an extension is refused, division (F)(1)(b) returns it to R.C. 3302.10 with a new chief
-  executive officer. [verified] The department's page records an approved extension of
-  Youngstown's plan, so it is in an extension year and still outside R.C. 3302.10. [verified]
-  ([`dew-academic-distress-commission`](../../catalog/dew-academic-distress-commission.md)) Its
-  remark then fits a district that can leave early only by statute, with its benchmarks judged
-  again at the end of the extension, rather than the star band. [inference] Which extension it is
-  in, and so whether FY2027 is its last plan year, is not recorded. [open] So of the three, one
-  left on its plan, one by statute, and the third has done neither. [verified]
+  executive officer. [verified] **The extension is the first, for 2025-26.** The director's letter
+  of 22 January 2026 finds that Youngstown "did not meet the majority" of its overall benchmarks,
+  declines its request for release, and approves "an extension for the Youngstown City School
+  District in accordance with R.C. 3302.103" for "the extension year (2025-2026 school year)". It
+  refuses the district's request to amend the benchmarks, because 3302.103(D)(2) closed the
+  revision window on 30 June 2025. [verified] The district's own 2024-25 annual report counts 6 of
+  24 benchmarks met, after 9 in 2023-24 and 16 in 2022-23. [verified]
+  ([`dew-academic-distress-commission`](../../catalog/dew-academic-distress-commission.md), both
+  read 2 October 2026) Its remark then fits a district that can leave early only by statute, with
+  its benchmarks judged again at the end of the extension, rather than the star band. [inference]
+
+  **So FY2027 is the last year the plan route can run, not a year it is known to run.** The
+  extension year ended on 30 June 2026. Division (F)(1)(a) lets the district "again" apply for one
+  more year, and the five years of (F)(1)(b) end on 30 June 2027. [verified] At its end Youngstown
+  either met a majority and its commission dissolved, or holds a second extension for 2026-27, or
+  is back under R.C. 3302.10 with a new chief executive officer. Which of the three is not
+  recorded: the department's page lists no second application or approval, and it has not been
+  modified since 10 February 2026. [open] So of the three, one left on its plan, one by statute,
+  and the third has done neither. [verified]
 
   All three were under oversight when a 2021 change in state law required an academic
   improvement plan running three school years with annual benchmarks; revised plans were
@@ -308,6 +320,19 @@ revisions:
       R.C. 3310.03(C) and (E)(2) disagree during the plan years, which the designated-list
       finding in `crates/dispersion` had read as one test. Which of Lorain and Youngstown is 2010
       stays open.
+  - was: |
+      "The department's page records an approved extension of Youngstown's plan, so it is in an
+      extension year and still outside R.C. 3302.10", with which extension open.
+    now: |
+      The approved extension is the first, for the 2025-26 school year, by the director's letter
+      of 22 January 2026. That year has ended. Whether Youngstown met a majority, holds a second
+      extension for 2026-27, or is back under R.C. 3302.10 is open.
+    found_by: |
+      Reading the extension approval letter and the 2024-25 annual report from the department's
+      page for #544.
+    reach: |
+      The present tense was true when written and went stale on 30 June 2026. The trap still
+      holds nobody while the plan route runs, but that route ends by 30 June 2027 at the latest.
 figures:
   - key: project/performance-supplement-to-youngstown
     value: 162207.67

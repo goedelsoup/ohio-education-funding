@@ -464,7 +464,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 2032 | supported by a committed primary source |
+| `[verified]` | 2034 | supported by a committed primary source |
 | `[inference]` | 430 | drawn from verified facts, not witnessed |
 | `[open]` | 217 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
@@ -508,7 +508,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `appropriating_bill` | 1 | 0 |
 | `accountability_effect` | 1 | 0 |
 
-**128 recorded withdrawals across 56 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**129 recorded withdrawals across 56 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Relationship vocabulary
