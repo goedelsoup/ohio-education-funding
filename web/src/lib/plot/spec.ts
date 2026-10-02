@@ -2933,12 +2933,106 @@ export function nearestRank(sorted: number[], q: number): number {
  */
 export const BOX_FROM = 8;
 
+/** One line of text above a strip, and the row of the band it was given. */
+interface StripLabel {
+  text: string;
+  value: number;
+  fill: string;
+  bold: boolean;
+  className: string;
+  anchor: "start" | "end";
+  row: number;
+}
+
+/** The clear space between two labels sharing a row of a strip's band, in pixels. */
+const STRIP_LABEL_GAP = 8;
+
+/**
+ * The pitch of a strip's label band, in pixels.
+ *
+ * Not `LABEL_LINE`'s 13: that spaces the lines of one wrapped label, and these are separate labels
+ * that are only on separate rows because they would collide. An 11px line's glyph box is 1.19em in
+ * SF Pro — 13.1px — so two rows 13 apart overlapped by a fraction of a pixel, which is a collision
+ * on the e2e's zero-tolerance check. 15 clears it under every font that check is run against.
+ */
+const STRIP_LABEL_LINE = 15;
+
+/**
+ * The band of names above a strip, one row per collision.
+ *
+ * Each label starts at the value it names and runs away from the nearer edge, so the marker's name
+ * begins at its own rule; one that would run off the frame that way runs the other. Rows are given
+ * in order — the marker's name first, then the reference's, then the ends — and a label goes to the
+ * lowest row where it clears every label already there, turning to run the other way first if that
+ * is what clears it, so the subject's name is the one nearest its rule and the band is as few rows
+ * as the names allow. The widths are `textPx`'s estimate, set near the 90th percentile of a character, with
+ * {@link STRIP_LABEL_GAP} of slack on top.
+ */
+function stripLabels(
+  wanted: Omit<StripLabel, "anchor" | "row">[],
+  domain: [number, number],
+  width: number,
+): StripLabel[] {
+  const [lo, hi] = domain;
+  const left = 2;
+  const right = width - 2;
+  const px = (v: number) => left + ((v - lo) / (hi - lo || 1)) * (right - left);
+  const rows: { from: number; to: number }[][] = [];
+  return wanted.map((label) => {
+    const at = px(label.value);
+    const w = textPx(label.text, 11) * (label.bold ? BOLD_WIDENS : 1);
+    const spanOf = (anchor: "start" | "end") =>
+      anchor === "start" ? { from: at, to: at + w } : { from: at - w, to: at };
+    const preferred: "start" | "end" = at < width / 2 ? "start" : "end";
+    const other: "start" | "end" = preferred === "start" ? "end" : "start";
+    // Each way the label fits inside the frame, the preferred first. One that fits neither way is
+    // still drawn, the preferred way, rather than dropped.
+    const fitting = ([preferred, other] as const).filter((a) => {
+      const span = spanOf(a);
+      return span.from >= left && span.to <= right;
+    });
+    const anchors = fitting.length > 0 ? fitting : [preferred];
+    const clear = (span: { from: number; to: number }, taken: { from: number; to: number }[]) =>
+      taken.every((t) => span.to + STRIP_LABEL_GAP <= t.from || span.from >= t.to + STRIP_LABEL_GAP);
+    // The lowest row either way clears, so a label turns to the other side before it goes up.
+    for (const [row, taken] of rows.entries()) {
+      const anchor = anchors.find((a) => clear(spanOf(a), taken));
+      if (anchor) {
+        taken.push(spanOf(anchor));
+        return { ...label, anchor, row };
+      }
+    }
+    rows.push([spanOf(anchors[0]!)]);
+    return { ...label, anchor: anchors[0]!, row: rows.length - 1 };
+  });
+}
+
 export function distributionSpec(
   values: DistributionValue[],
   options: {
     width: number;
-    /** The one this page is about. Drawn last, above every other mark. */
+    /**
+     * The one this page is about. Drawn last, above every other mark, with `label` printed above
+     * the strip where its rule meets it.
+     */
     marker?: { value: number; label: string } | null;
+    /**
+     * A stated value to read the members against — Ohio's median on a seat's eighteen districts —
+     * drawn as a dashed rule with `label` above it. Without it a seat of poorer-than-typical
+     * districts and a seat of richer ones drew alike: the strip carried no number from outside
+     * itself. The domain is widened to hold it, so a seat wholly above the median says so.
+     *
+     * Where it falls within a pixel of the box's own median the rule is not drawn twice, and the
+     * label names that rule.
+     */
+    reference?: { value: number; label: string } | null;
+    /**
+     * Name the lowest and highest members above them, from each one's `name`.
+     *
+     * For the strips whose card is built on those two — a county's richest and poorest district —
+     * so the comparison in the sentence above is two named dots rather than two of sixteen.
+     */
+    ends?: boolean;
     /**
      * How the strip's scale labels are written. Required: a strip is drawn with no axis, and
      * without these a dot four fifths along means nothing at all.
@@ -2972,10 +3066,13 @@ export function distributionSpec(
   const whiskerLow = sorted.find((v) => v.value >= lowFence)?.value ?? firstOf(sorted).value;
   const whiskerHigh = [...sorted].reverse().find((v) => v.value <= highFence)?.value ?? lastOf(sorted).value;
 
-  const min = firstOf(sorted).value;
-  const max = lastOf(sorted).value;
+  // The reference is inside the domain whether or not any member is near it.
+  const reference = options.reference ?? null;
+  const min = Math.min(firstOf(sorted).value, reference?.value ?? Infinity);
+  const max = Math.max(lastOf(sorted).value, reference?.value ?? -Infinity);
   const span = max - min || Math.abs(max) || 1;
   const pad = span * 0.03;
+  const domain: [number, number] = [min - pad, max + pad];
 
   const dots = options.dots ?? values.length <= DOTS_UP_TO;
   const box = values.length >= BOX_FROM;
@@ -2997,9 +3094,41 @@ export function distributionSpec(
   const min0 = firstOf(sorted).value;
   const max0 = lastOf(sorted).value;
   const crossesZero = min0 < 0 && max0 > 0;
+  /*
+   * The names, above the strip. The marker's first, so it takes the row nearest its rule.
+   *
+   * The comment on the marker promised it was labelled from the day it was written and no text
+   * mark followed it (#654): the county, seat and outcomes strips named none of their dots and
+   * marked no reference, so the comparison each card's sentence makes was a pair of unnamed dots.
+   */
+  const lowest = firstOf(sorted);
+  const highest = lastOf(sorted);
+  const labels = stripLabels(
+    [
+      ...(options.marker
+        ? [{ text: options.marker.label, value: options.marker.value, fill: SUBJECT, bold: true, className: "dist-marker-label" }]
+        : []),
+      ...(reference
+        ? [{ text: reference.label, value: reference.value, fill: INK.muted, bold: false, className: "dist-reference-label" }]
+        : []),
+      ...(options.ends && lowest.name != null && highest.name != null
+        ? [lowest, highest].map((end) => ({
+            text: end.name!,
+            value: end.value,
+            fill: INK.secondary,
+            bold: false,
+            className: "dist-end-label",
+          }))
+        : []),
+    ],
+    domain,
+    options.width,
+  );
+  const band = labels.length === 0 ? 0 : Math.max(...labels.map((l) => l.row)) + 1;
   // Room under the strip for one line of labels. Every strip has the line now, so the six on
-  // `/districts` stay one row apart whichever of them crosses zero.
-  const height = 64;
+  // `/districts` stay one row apart whichever of them crosses zero. Above it, a row per row of
+  // names, and none where there are none.
+  const height = 64 + band * STRIP_LABEL_LINE;
   const foot = axisFoot({
     width: options.width,
     marginLeft: 2,
@@ -3008,7 +3137,7 @@ export function distributionSpec(
     says: "",
     fontSize: 10,
     scale: {
-      domain: [min - pad, max + pad],
+      domain,
       format: options.format,
       ...(crossesZero ? { beside: { value: 0, label: "no change" } } : {}),
     },
@@ -3026,9 +3155,9 @@ export function distributionSpec(
       height,
       marginLeft: 2,
       marginRight: 2,
-      marginTop: 4,
+      marginTop: 4 + band * STRIP_LABEL_LINE,
       marginBottom: 22,
-      x: { axis: null, domain: [min - pad, max + pad] },
+      x: { axis: null, domain },
       y: { axis: null, domain: [-19, 19] },
       marks: [
         // Under everything, because it is what the dots are read against rather than a mark
@@ -3060,6 +3189,13 @@ export function distributionSpec(
             ]
           : []),
 
+        // The stated value, full height and dashed, under the dots it is read against. Not drawn
+        // within a pixel of the box's own median rule, which it would only double; the label then
+        // names that rule.
+        ...(reference && !(box && Math.abs(reference.value - med) <= (domain[1] - domain[0]) / (options.width - 4))
+          ? [Plot.ruleX([reference.value], { y1: -19, y2: 19, ...RULE.reference, className: "dist-reference" })]
+          : []),
+
         Plot.dot(drawn, {
           x: "value",
           y: (_d: DistributionValue, i: number) => (dots ? lane(i) : 0),
@@ -3083,6 +3219,22 @@ export function distributionSpec(
               }),
             ]
           : []),
+
+        // The band of names, each above the frame at the value it names (see `stripLabels`).
+        ...labels.map((label) =>
+          Plot.text([label.value], {
+            x: (v: number) => v,
+            frameAnchor: "top",
+            lineAnchor: "bottom",
+            dy: -3 - label.row * STRIP_LABEL_LINE,
+            text: () => label.text,
+            textAnchor: label.anchor,
+            fill: label.fill,
+            fontSize: 11,
+            ...(label.bold ? { fontWeight: 600 } : {}),
+            className: label.className,
+          }),
+        ),
 
         // The hit layer, wider than the marks, above them, and only where there are marks to hit.
         Plot.dot(drawn, {

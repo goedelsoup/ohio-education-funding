@@ -293,6 +293,11 @@ export interface Rank {
 export interface DistributionValue {
   value: number;
   hover: string;
+  /**
+   * What the member is called, printed above it when it is one of the two ends a strip names
+   * (`distributionSpec`'s `ends`). Optional: a strip of six hundred names none of them.
+   */
+  name?: string;
 }
 
 /**

@@ -33,7 +33,7 @@
  */
 
 import type { District, Statewide } from "./types.ts";
-import { compactMoney, count, escapeHtml, fixed, money, pct } from "./format.ts";
+import { compactMoney, count, escapeHtml, fixed, money, ordinal, pct, percentileOf } from "./format.ts";
 import { compare } from "./order.ts";
 import * as routes from "./routes.ts";
 import { median } from "./stats.ts";
@@ -153,7 +153,15 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
   // Read outside the drawing: `valuationRatio` is narrowed by the guard at the top of this
   // function, and a property narrowing does not survive into a closure that runs later.
   const marker = { value: c.valuationRatio!, label: c.name };
-  const position: Drawing = (w) => distributionSpec(ratios, { width: w, format: (v) => `${fixed(v, 1)}×`, marker });
+  // `stats.median`, the figure the note under the strip states; drawn on the box's own rule where
+  // the two conventions land within a pixel of each other, which on 84 counties they do.
+  const medianRatio = median(ratios.map((r) => r.value));
+  const reference = { value: medianRatio, label: `Median ${fixed(medianRatio, 1)}×` };
+  const position: Drawing = (w) =>
+    distributionSpec(ratios, { width: w, format: (v) => `${fixed(v, 1)}×`, marker, reference });
+  const ratioPercentile = ordinal(
+    Math.round(percentileOf(ratios.map((r) => r.value).sort((a, b) => a - b), c.valuationRatio) * 100),
+  );
 
   /*
    * Every district in the county, not just the two ends of it.
@@ -174,8 +182,18 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
         .map((d) => ({
           value: d.valuation_per_pupil!,
           hover: `${d.name}: ${money(d.valuation_per_pupil!)} per pupil, ${money(d.realized_aid_per_pupil)} state aid per pupil`,
+          name: d.name,
         })),
-      { width: w, format: compactMoney },
+      {
+        width: w,
+        format: compactMoney,
+        // The two the finding above names, by name, and the state's middle to read them against.
+        ends: true,
+        reference: {
+          value: statewide.median_valuation_per_pupil,
+          label: `Ohio median ${money(statewide.median_valuation_per_pupil)}`,
+        },
+      },
     );
 
   // The card's finding (#653), from the two ends the table names.
@@ -223,9 +241,11 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
       ${
         draws(position)
           ? `<p class="note">Where that sits among the ${ratios.length} counties with more than one
-             district reporting a tax base — one dot each, narrowest on the left, and the colored
-             rule is ${escapeHtml(c.name)}. The median is
-             ${median(ratios.map((r) => r.value)).toFixed(1)}× apart.</p>
+             district reporting a tax base — one dot each, narrowest on the left, and the rule
+             marked ${escapeHtml(c.name)} is this county. The median is ${medianRatio.toFixed(1)}× apart.</p>
+             <div class="strip-head"><span>Richest over poorest district, tax base per pupil</span>
+               <strong class="tnum">${fixed(c.valuationRatio, 1)}×
+                 <span class="n">${ratioPercentile} percentile</span></strong></div>
              <div class="chartwrap" data-chart="county-position">${renderToString(position, "presentational")}</div>`
           : ""
       }

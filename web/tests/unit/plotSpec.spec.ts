@@ -164,6 +164,97 @@ test("the subject is one colour whatever form it is drawn in", () => {
   expect(dots, "and no subject in the guarantee hue").not.toContain(SERIES.guarantee);
 });
 
+/** Every `<text>` of a class in a rendered drawing, by its contents. */
+function texts(svg: string, className: string): string[] {
+  return [...parseHTML(`<div>${svg}</div>`).document.querySelectorAll(`g.${className} text`)].map(
+    (t) => t.textContent ?? "",
+  );
+}
+
+test("a strip's marker is labelled, as its comment always said it was", () => {
+  /*
+   * #654. The comment over the marker promised it was "labelled", and the marks under it were a
+   * single rule. `Strip.astro` passed a label, `county.ts` and `outcomes.ts` passed one, and none of
+   * the three was ever drawn: Franklin on its county strip was a coloured line with no name.
+   */
+  const strip = renderToString(
+    (w) =>
+      distributionSpec(
+        Array.from({ length: 30 }, (_, i) => ({ value: i, hover: `d${i}` })),
+        { width: w, format: String, marker: { value: 12, label: "Columbus City" } },
+      ),
+    "presentational",
+  );
+  expect(texts(strip, "dist-marker-label")).toEqual(Array(DRAWINGS).fill("Columbus City"));
+});
+
+test("a strip's reference is a dashed rule with its label, inside the domain", () => {
+  /*
+   * #654. A House seat's eighteen districts ran $110K to $259K and nothing on the strip said Ohio's
+   * median is $248K — the seat is a poor one, and the figure could not say so.
+   */
+  const values = [110, 120, 140, 150, 170, 190, 200, 230, 259].map((value) => ({ value, hover: `${value}` }));
+  const spec = distributionSpec(values, {
+    ...W,
+    format: String,
+    reference: { value: 300, label: "Ohio median 300" },
+  });
+  const svg = renderToString(() => spec, "presentational");
+  expect(texts(svg, "dist-reference-label")).toEqual(Array(DRAWINGS).fill("Ohio median 300"));
+  expect(svg).toContain("dist-reference");
+  // A reference beyond every member widens the domain to hold it, rather than drawing off the edge.
+  const [, hi] = spec!.options.x!.domain as [number, number];
+  expect(hi).toBeGreaterThan(300);
+
+  // On the box's own median it is not a second rule: the label names the one already there.
+  const onMedian = renderToString(
+    () => distributionSpec(values, { ...W, format: String, reference: { value: 170, label: "median" } }),
+    "presentational",
+  );
+  expect(texts(onMedian, "dist-reference-label")).toEqual(Array(DRAWINGS).fill("median"));
+  expect(parseHTML(`<div>${onMedian}</div>`).document.querySelectorAll("g.dist-reference")).toHaveLength(0);
+});
+
+test("a strip names its two ends when asked, and only then", () => {
+  /*
+   * #654. The county card's sentence compares Whitehall with Grandview Heights, and the strip under
+   * it drew them as two of sixteen unnamed dots.
+   */
+  const values = [121566, 150000, 200000, 260000, 474526].map((value, i) => ({
+    value,
+    hover: `${value}`,
+    name: ["Whitehall City", "b", "c", "d", "Grandview Heights City"][i]!,
+  }));
+  const named = renderToString(() => distributionSpec(values, { ...W, format: compactMoney, ends: true }), "presentational");
+  expect(texts(named, "dist-end-label")).toEqual(
+    Array.from({ length: DRAWINGS }, () => ["Whitehall City", "Grandview Heights City"]).flat(),
+  );
+  const plain = distributionSpec(values, { ...W, format: compactMoney });
+  expect(texts(renderToString(() => plain, "presentational"), "dist-end-label")).toEqual([]);
+  // And a strip with no names is the height it always was, so `/districts`' six stay one row apart.
+  expect(plain!.options.height).toBe(64);
+});
+
+test("two names that would collide take two rows, and the strip grows to hold them", () => {
+  // The marker and the reference a few units apart: one row cannot hold both names.
+  const values = Array.from({ length: 30 }, (_, i) => ({ value: i, hover: `d${i}` }));
+  const apart = distributionSpec(values, {
+    ...W,
+    format: String,
+    marker: { value: 3, label: "Marked" },
+    reference: { value: 27, label: "Reference" },
+  });
+  const close = distributionSpec(values, {
+    ...W,
+    format: String,
+    marker: { value: 14, label: "Marked district" },
+    reference: { value: 15, label: "Ohio median 15" },
+  });
+  expect(apart!.options.height).toBe(64 + 15);
+  expect(close!.options.height).toBe(64 + 30);
+  expect(close!.options.marginTop).toBe(4 + 30);
+});
+
 test("a chart of change is fitted to its ratios and fills by polarity whatever their sign", () => {
   /*
    * The county chart on the Change tab (#651). `barSpec` floored its domain at 1, so every
