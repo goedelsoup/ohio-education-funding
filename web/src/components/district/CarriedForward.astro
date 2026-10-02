@@ -97,7 +97,12 @@ const chart = renderToString((w) => fanSpec(
   reading,
   // The two lines named on the drawing rather than in a key under it (#655): the finding is the
   // gap between their ends, and a reader should not leave the chart to learn which end is which.
-  { width: w, ...(insensitive ? { labels: { point: "Received", reference: "Formula" } } : {}) },
+  // A formula-funded district's two ends are the band's bounds, and this chart has no key at all
+  // to say so (#675).
+  {
+    width: w,
+    labels: insensitive ? { high: "Received", reference: "Formula" } : { high: "High", low: "Low" },
+  },
 ), { label: `${insensitive ? `Aid this district receives against what the formula computes for it, in dollars by enrollment year, FY${points[0]!.year} to FY${end.fiscalYear}` : `State aid in dollars by enrollment year, FY${points[0]!.year} to FY${end.fiscalYear}, with the range across projected enrollment`}`, description: `Every year is the FY${bundle.fiscal_year} formula run at that year's enrollment rather than published aid; years through FY${meta.base_year} use published enrollment and carry no interval, and the y axis is truncated to the plotted range rather than starting at zero` });
 ---
 

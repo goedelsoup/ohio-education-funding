@@ -30,6 +30,9 @@ test.describe("the projection", () => {
     await expect(chart.locator(".fan-edge")).toHaveCount(2);
     // Two bound labels, and no label on the central estimate.
     await expect(chart.locator(".fan-bound text")).toHaveCount(2);
+    // Each named as the end of the range it is, on the drawing (#675).
+    await expect(chart.locator(".fan-bound text").first()).toHaveText(/^High \$/);
+    await expect(chart.locator(".fan-bound text").last()).toHaveText(/^Low \$/);
   });
 
   test("says on its face that the axis is truncated", async ({ page }) => {

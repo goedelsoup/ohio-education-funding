@@ -39,6 +39,8 @@ test.describe("one district's own band", () => {
     const chart = page.locator('[data-chart="district-fan"] svg.plot:visible');
     await expect(chart.locator(".fan-band")).toHaveCount(1);
     await expect(chart.locator(".fan-reference")).toHaveCount(0);
+    // The two bare bounds named, since this chart has no key to say what they are (#675).
+    await expect(chart.locator(".fan-bound text")).toHaveText([/^High \$/, /^Low \$/]);
     const card = page.locator('[data-part="enrollment"]');
     await expect(card).toContainText("The range, not the line, is the finding");
     // The level, beside the width. Read off the painted text rather than asserted as a figure: the

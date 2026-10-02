@@ -3448,10 +3448,15 @@ export function fanSpec(
      *
      * For a fan drawn beside its reference, where the two ends are two quantities and the finding
      * is the distance between them (#655). Without names the end labels were two bare numbers and
-     * which was which lived in a key under the chart. `point` names the band's upper bound — its
-     * only bound when the band has collapsed to a line — and `reference` the reference's end.
+     * which was which lived in a key under the chart. `high` names the band's upper bound — its
+     * only bound when the band has collapsed to a line — `low` its lower bound, and `reference`
+     * the reference's end.
+     *
+     * An open band names both bounds for the same reason (#675): "$7.58B" and "$6.96B" at the end
+     * of the /scenario fan did not say they were the top and bottom of a range, and the legend
+     * under it keys line styles, not those two numbers.
      */
-    labels?: { point: string; reference: string };
+    labels?: { high?: string; low?: string; reference?: string };
   },
 ): Spec | null {
   // One point is not a series. Returning null draws nothing rather than a degenerate axis with a
@@ -3492,7 +3497,8 @@ export function fanSpec(
   const bounds = degenerate ? [last.high] : [last.high, last.low];
   const named = (name: string | undefined, value: number) =>
     name ? `${sentence(name)} ${format(value)}` : format(value);
-  const boundText = (v: number, i: number) => named(i === 0 ? options.labels?.point : undefined, v);
+  const boundText = (v: number, i: number) =>
+    named(i === 0 ? options.labels?.high : options.labels?.low, v);
   const referenceText = hasReference ? named(options.labels?.reference, last.reference ?? 0) : "";
 
   /*
