@@ -1356,6 +1356,54 @@ test("a fan given names writes them into its end labels, in their lines' text hu
   }
 });
 
+test("a fan drawn beside its reference brackets the gap between their ends and names it", () => {
+  /*
+   * #676. The guaranteed district's finding is the difference between "Received $114M" and
+   * "Formula $87.2M", and it was printed only in the note under the chart.
+   */
+  const years: FanPoint[] = [2025, 2026, 2027].map((year, i) => ({
+    year,
+    point: 114e6,
+    low: 114e6,
+    high: 114e6,
+    observed: i === 0,
+    reference: 90e6 - i * 1.4e6,
+  }));
+  const labels = { high: "received", reference: "formula", gap: "guarantee" };
+  // Through the caller's format, so a gutter of compact money is not bracketed in whole dollars.
+  const format = (v: number) => `F${compactMoney(v)}`;
+  const svg = renderToString(
+    (width) => fanSpec(years, format, () => "", { width, labels }),
+    "presentational",
+  );
+  const { document } = parseHTML(`<div>${svg}</div>`);
+  for (const drawing of document.querySelectorAll("svg")) {
+    const gap = [...drawing.querySelectorAll("g.fan-gap text")];
+    expect(gap.map((t) => t.textContent)).toEqual([`+${format(114e6 - 87.2e6)} guarantee`]);
+    // A measurement between the lines, so in muted ink and not either line's hue.
+    expect(gap[0]!.closest("[fill]")?.getAttribute("fill")).toBe(INK.muted);
+    expect(drawing.querySelectorAll("g.fan-gap line")).toHaveLength(1);
+  }
+  for (const width of Object.values(WIDTHS)) {
+    const drawn = drawingAt(() => fanSpec(years, format, () => "", { width, labels }));
+    expect(overruns(drawn), `${width}px`).toEqual([]);
+  }
+
+  // No bracket where the two ends print as one figure: "+$0" is a difference the chart cannot see.
+  const level = years.map((p) => ({ ...p, reference: 114e6 + 1 }));
+  const flat = renderToString(
+    (width) => fanSpec(level, compactMoney, () => "", { width, labels }),
+    "presentational",
+  );
+  expect(flat).not.toContain("fan-gap");
+  // Nor without a reference, whatever names are passed.
+  const alone = renderToString(
+    (width) => fanSpec(years.map(({ reference: _, ...p }) => p), compactMoney, () => "", { width, labels }),
+    "presentational",
+  );
+  expect(alone).not.toContain("fan-gap");
+});
+
 test("an open fan given bound names writes both into its end labels", () => {
   /*
    * #675. The /scenario fan ended in "$7.58B" and "$6.96B", and nothing on the drawing said those

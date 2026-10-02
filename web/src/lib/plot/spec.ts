@@ -3455,8 +3455,11 @@ export function fanSpec(
      * An open band names both bounds for the same reason (#675): "$7.58B" and "$6.96B" at the end
      * of the /scenario fan did not say they were the top and bottom of a range, and the legend
      * under it keys line styles, not those two numbers.
+     *
+     * `gap` names the distance between the band's centre and the reference at the last year,
+     * which is drawn as a bracket only when there is a reference: "+$26.6M guarantee" (#676).
      */
-    labels?: { high?: string; low?: string; reference?: string };
+    labels?: { high?: string; low?: string; reference?: string; gap?: string };
   },
 ): Spec | null {
   // One point is not a series. Returning null draws nothing rather than a degenerate axis with a
@@ -3500,6 +3503,26 @@ export function fanSpec(
   const boundText = (v: number, i: number) =>
     named(i === 0 ? options.labels?.high : options.labels?.low, v);
   const referenceText = hasReference ? named(options.labels?.reference, last.reference ?? 0) : "";
+
+  /*
+   * The distance between the two ends, which is the finding when there are two lines (#676).
+   *
+   * It was only in the note under the chart. Drawn as a bracket between the line ends in the
+   * reference rule's muted dash rather than a series hue, because it is a measurement between the
+   * two quantities and not a third one. Its label hangs off the band's end on the gap's side,
+   * inside the frame on a halo as the series reference's is (#662): the gutter already holds both
+   * end labels, and a third there would be the first thing a phone frame runs out of room for.
+   *
+   * Absent where the two ends print as one figure, because a bracket labelled "+$0" is a claim
+   * about a difference the chart's own precision cannot see.
+   */
+  const gap = hasReference ? last.point - (last.reference ?? 0) : 0;
+  const gapText =
+    hasReference && format(last.point) !== format(last.reference ?? 0)
+      ? [`${gap > 0 ? "+" : "−"}${format(Math.abs(gap))}`, options.labels?.gap]
+          .filter(Boolean)
+          .join(" ")
+      : "";
 
   /*
    * Which half of the pair the banded series wears.
@@ -3608,6 +3631,31 @@ export function fanSpec(
                 textAnchor: "start",
                 fill: SERIES_TEXT.formula,
                 className: "fan-bound reference",
+              }),
+            ]
+          : []),
+        ...(gapText
+          ? [
+              Plot.ruleX([last.year], {
+                y1: last.point,
+                y2: last.reference ?? 0,
+                dx: -4,
+                ...RULE.reference,
+                className: "fan-gap",
+              }),
+              Plot.text([last], {
+                x: last.year,
+                y: last.point,
+                dx: -10,
+                dy: gap > 0 ? 4 : -4,
+                text: () => gapText,
+                lineAnchor: gap > 0 ? "top" : "bottom",
+                textAnchor: "end",
+                fill: INK.muted,
+                stroke: INK.surface,
+                strokeWidth: 3,
+                fontSize: 11,
+                className: "fan-gap",
               }),
             ]
           : []),

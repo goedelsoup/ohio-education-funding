@@ -22,6 +22,8 @@ test.describe("one district's own band", () => {
     // Its aid does not respond to its enrollment at all, so the band collapses — and the second
     // line, the formula's own falling answer, is what makes the chart say something.
     await expect(chart.locator(".fan-reference")).toHaveCount(1);
+    // The finding is the gap between the two ends, and it is on the drawing (#676).
+    await expect(chart.locator(".fan-gap text")).toHaveText(/^\+\$[\d.]+[KMB] guarantee$/);
     await expect(page.locator('[data-part="enrollment"]')).toContainText(
       "flat by construction",
     );
