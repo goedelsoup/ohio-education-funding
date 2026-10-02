@@ -36,9 +36,17 @@ import { join } from "node:path";
 import { parseHTML } from "linkedom";
 import { describe, expect, test } from "vitest";
 
-import { DIST, pages } from "./artefact.ts";
+import { DIST, head, pages } from "./artefact.ts";
 
 const read = (file: string) => parseHTML(readFileSync(file, "utf8")).document;
+
+/**
+ * The page's `<head>` alone, for the two sweeps over every page that read only the title and the
+ * metas (#646). A whole parse of the build is ~18s; this is under one.
+ */
+const readHead = (file: string) => parseHTML(head(readFileSync(file, "utf8"), file)).document;
+
+type Doc = ReturnType<typeof read>;
 
 /** `/statewide` → `dist/statewide.html`, under `build.format: "file"`. */
 function fileFor(href: string): string {
@@ -178,22 +186,36 @@ describe("no title repeats the site name", () => {
     expect(text(doc.querySelector("title"))).toBe(SITE);
   });
 
-  test("no page's title stem equals its suffix", () => {
-    const doubled = pages().flatMap((file) => {
-      const doc = read(file);
-      const titles = [
-        text(doc.querySelector("title")),
-        doc.querySelector('meta[property="og:title"]')?.getAttribute("content") ?? "",
-        doc.querySelector('meta[name="twitter:title"]')?.getAttribute("content") ?? "",
-      ];
-      return titles
-        .filter((title) => {
-          const parts = title.split(" — ");
-          return parts.length > 1 && parts.at(-2) === parts.at(-1);
-        })
-        .map((title) => `${file.slice(DIST.length)}: "${title}"`);
+  const titlesOf = (doc: Doc) => [
+    text(doc.querySelector("title")),
+    doc.querySelector('meta[property="og:title"]')?.getAttribute("content") ?? "",
+    doc.querySelector('meta[name="twitter:title"]')?.getAttribute("content") ?? "",
+  ];
+  const doubledIn = (titles: string[]) =>
+    titles.filter((title) => {
+      const parts = title.split(" — ");
+      return parts.length > 1 && parts.at(-2) === parts.at(-1);
     });
+
+  test("no page's title stem equals its suffix", () => {
+    const files = pages();
+    let titled = 0;
+    const doubled = files.flatMap((file) => {
+      const titles = titlesOf(readHead(file));
+      if (titles[0]) titled += 1;
+      return doubledIn(titles).map((title) => `${file.slice(DIST.length)}: "${title}"`);
+    });
+    // Guard against the head cut losing the title: every page was read as titled.
+    expect(titled).toBe(files.length);
     expect(doubled).toEqual([]);
+  });
+
+  test("the check bites on a real head with its site name doubled", () => {
+    const html = readFileSync(join(DIST, "statewide.html"), "utf8").replace(
+      /<title>([^<]*)<\/title>/,
+      `<title>${SITE} — ${SITE}</title>`,
+    );
+    expect(doubledIn(titlesOf(parseHTML(head(html)).document))).toEqual([`${SITE} — ${SITE}`]);
   });
 });
 
@@ -210,22 +232,33 @@ describe("no title repeats the site name", () => {
 describe("every description fits a snippet and ends a sentence", () => {
   const LIMIT = 160;
 
+  const descriptionsOf = (doc: Doc) =>
+    ['meta[name="description"]', 'meta[property="og:description"]', 'meta[name="twitter:description"]']
+      .map((selector) => doc.querySelector(selector)?.getAttribute("content") ?? null)
+      .filter((d): d is string => d !== null);
+  const unfit = (found: string[]) =>
+    found.filter((d) => d.length > LIMIT || d.endsWith("…") || !/[.!?"”)]$/.test(d));
+
   test("on every page", () => {
     const files = pages();
     // Guard against a stale glob: every assertion below is vacuous over no pages.
     expect(files.length).toBeGreaterThan(1000);
+    let described = 0;
     const bad = files.flatMap((file) => {
-      const doc = read(file);
-      const found = [
-        'meta[name="description"]',
-        'meta[property="og:description"]',
-        'meta[name="twitter:description"]',
-      ].map((selector) => doc.querySelector(selector)?.getAttribute("content") ?? null);
-      return found
-        .filter((d): d is string => d !== null)
-        .filter((d) => d.length > LIMIT || d.endsWith("…") || !/[.!?"”)]$/.test(d))
-        .map((d) => `${file.slice(DIST.length)} (${d.length}): ${d}`);
+      const found = descriptionsOf(readHead(file));
+      if (found.length > 0) described += 1;
+      return unfit(found).map((d) => `${file.slice(DIST.length)} (${d.length}): ${d}`);
     });
+    // Guard against the head cut losing the metas: nearly every page carries a description.
+    expect(described).toBeGreaterThan(files.length * 0.9);
     expect([...new Set(bad)]).toEqual([]);
+  });
+
+  test("the check bites on a real head with its description cut short", () => {
+    const html = readFileSync(join(DIST, "statewide.html"), "utf8").replace(
+      /(<meta name="description" content=")[^"]*"/,
+      `$1${"word ".repeat(40)}and so…"`,
+    );
+    expect(unfit(descriptionsOf(parseHTML(head(html)).document))).toHaveLength(1);
   });
 });
