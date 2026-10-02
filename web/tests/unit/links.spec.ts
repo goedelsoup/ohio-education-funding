@@ -74,6 +74,7 @@ const PAGES = new Set<string>([
   "/method",
   "/data",
   "/statewide",
+  "/what-changed",
   "/bounds",
   "/history",
   "/legislation",

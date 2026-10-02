@@ -272,6 +272,14 @@ pub struct Year {
     /// `[b4]` the published state share of base cost. `None` for FY2025, whose payment report
     /// does not carry it.
     pub state_share: Option<f64>,
+    /// Disadvantaged Pupil Impact Aid as the year's formula computes it, before the phase-in and
+    /// the guarantee. `None` for FY2025, whose payment report does not itemize the formula.
+    ///
+    /// The one categorical carried by year, because it is the one H.B. 96 changed the count of:
+    /// FY2026 blends the disadvantaged and directly certified counts 75/25 and FY2027 65/35. A
+    /// component of what the formula calculates, not a payment line — it reaches foundation aid
+    /// through the phase-in, and not at all for a district held at its base.
+    pub dpia: Option<Dollars>,
 }
 
 /// One district's three years, its measure, and the lines the change is made of.
@@ -356,6 +364,7 @@ fn year_2025(row: &Fy2025) -> Year {
             net_state_funding: row.net_state_funding,
         }),
         state_share: None,
+        dpia: None,
     }
 }
 
@@ -382,6 +391,7 @@ fn year_2026(row: &Prior) -> Year {
         },
         transfers: None,
         state_share: Some(row.state_share_percentage),
+        dpia: Some(row.dpia_aid),
     }
 }
 
@@ -415,6 +425,7 @@ fn year_2027(record: &DistrictRecord) -> Year {
             net_state_funding: record.net_state_funding,
         }),
         state_share: record.published_state_share,
+        dpia: Some(record.categoricals.dpia),
     }
 }
 

@@ -715,6 +715,7 @@ fn biennium_of(row: Option<&project::biennium::Row>) -> Biennium {
                 service_center_charge: transfers.and_then(|t| t.service_center),
                 other_adjustments: transfers.and_then(|t| t.other),
                 net_state_funding: transfers.map(|t| t.net_state_funding),
+                dpia: year.dpia,
             }
         }),
         valuation: row.valuation,

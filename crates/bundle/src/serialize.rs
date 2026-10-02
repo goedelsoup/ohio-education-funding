@@ -997,6 +997,7 @@ impl Bundle {
                             y.opt("service_center_charge", year.service_center_charge);
                             y.opt("other_adjustments", year.other_adjustments);
                             y.opt("net_state_funding", year.net_state_funding);
+                            y.opt("dpia", year.dpia);
                         }
                     }
                     {

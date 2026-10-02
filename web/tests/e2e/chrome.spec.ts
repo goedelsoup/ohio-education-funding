@@ -443,7 +443,10 @@ test.describe("routes", () => {
     // under `Library`, beside Sources and Decisions — two flat links, 5 places, 3 analyses, 22 in
     // the library and 2 about. Which is the mechanism working: the count is changed on purpose by
     // somebody who knew why.
-    expect(hrefs).toHaveLength(34);
+    //
+    // Thirty-five when `/what-changed` joined Places beside Statewide (#641): the biennium read
+    // provision by provision, a place in time rather than on the map.
+    expect(hrefs).toHaveLength(35);
     for (const href of hrefs) {
       await page.goto(href);
       await expect(page.locator("h1"), `${href} has no heading`).toBeVisible();

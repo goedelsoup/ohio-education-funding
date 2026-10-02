@@ -378,6 +378,21 @@
           "label": "What the reach view holds fixed, and one thing it deliberately does not"
         }
       ]
+    },
+    {
+      "route": "/what-changed",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/what-changed",
+        "title": "What changed"
+      },
+      "sections": [
+        {
+          "id": "direct-certification",
+          "label": "Direct certification in DPIA"
+        }
+      ]
     }
   ],
   "formula-component/fsfp-english-learner-weights": [
@@ -474,6 +489,23 @@
         {
           "id": "held-fixed",
           "label": "What the reach view holds fixed, and one thing it deliberately does not"
+        }
+      ]
+    }
+  ],
+  "formula-component/fsfp-local-capacity-measure": [
+    {
+      "route": "/what-changed",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/what-changed",
+        "title": "What changed"
+      },
+      "sections": [
+        {
+          "id": "reappraisal",
+          "label": "Reappraisal and the state share"
         }
       ]
     }
@@ -1070,6 +1102,21 @@
           "label": "What the levers move away from"
         }
       ]
+    },
+    {
+      "route": "/what-changed",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/what-changed",
+        "title": "What changed"
+      },
+      "sections": [
+        {
+          "id": "targeted-assistance",
+          "label": "The repealed supplement"
+        }
+      ]
     }
   ],
   "legislation/ohio-constitution-article-vi-section-2": [
@@ -1340,6 +1387,21 @@
           "label": "What voters approved, and what the factors left"
         }
       ]
+    },
+    {
+      "route": "/what-changed",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/what-changed",
+        "title": "What changed"
+      },
+      "sections": [
+        {
+          "id": "reappraisal",
+          "label": "Reappraisal and the state share"
+        }
+      ]
     }
   ],
   "parameter/base-cost-per-pupil": [
@@ -1355,6 +1417,23 @@
         {
           "id": "denominators",
           "label": "The pupil counts on this page, and which figure uses which"
+        }
+      ]
+    }
+  ],
+  "parameter/fsfp-phase-in-percentage": [
+    {
+      "route": "/what-changed",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/what-changed",
+        "title": "What changed"
+      },
+      "sections": [
+        {
+          "id": "phase-in",
+          "label": "The phase-in"
         }
       ]
     }

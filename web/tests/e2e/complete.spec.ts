@@ -106,6 +106,7 @@ const ROUTES_WITH_FIGURES = [
      this list kept pointing at the root — so the sweeps below went on passing against a page that
      no longer carries what they scan for. */
   "/statewide",
+  "/what-changed",
   "/legislation",
   "/outcomes",
   "/history",
@@ -504,7 +505,7 @@ test.describe("with JavaScript disabled", () => {
     // JavaScript, on a site whose whole point is that nothing is.
     await page.goto("/");
     const places = page.locator("header.site nav details.menu").filter({ hasText: "Places" });
-    await expect(places.locator("a")).toHaveCount(5);
+    await expect(places.locator("a")).toHaveCount(6);
     await expect(places.locator('a[href="/counties"]')).toBeHidden();
 
     await places.locator("summary").click();

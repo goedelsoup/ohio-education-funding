@@ -227,6 +227,7 @@ fn sample() -> District {
                     phase_in_paid: 7_650_000.0,
                     state_share: Some(0.4125),
                     enrolled_adm: Some(1_204.5),
+                    dpia: Some(310_000.0),
                     ..BienniumYear::default()
                 },
                 BienniumYear {
@@ -890,6 +891,8 @@ fn an_unpublished_biennium_figure_is_null_and_the_years_keep_their_positions() {
     assert!(years[0].contains("\"transfers\": -40000"), "{}", years[0]);
     assert!(years[0].contains("\"state_share\": null"), "{}", years[0]);
     assert!(years[0].contains("\"enrolled_adm\": null"), "{}", years[0]);
+    assert!(years[0].contains("\"dpia\": null"), "{}", years[0]);
+    assert!(years[1].contains("\"dpia\": 310000"), "{}", years[1]);
     assert!(
         years[0].contains("\"transportation\": 900000"),
         "{}",

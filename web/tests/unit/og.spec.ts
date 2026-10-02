@@ -321,6 +321,7 @@ describe("the card routes", () => {
     const table = pageCards();
     for (const slug of [
       "statewide",
+      "what-changed",
       "districts",
       "counties",
       "compare",

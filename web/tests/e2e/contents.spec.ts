@@ -86,7 +86,7 @@ test("a row far down the district directory names each of its figures", async ({
       heads: [...document.querySelectorAll("#district-table thead th")].slice(1).map((th) => th.textContent ?? ""),
     };
   });
-  expect(labels).toHaveLength(6);
+  expect(labels).toHaveLength(12);
   labels.forEach((label, i) => {
     // `content` serialises with its quotes, and the alternative text after a solidus.
     const name = /^"([^"]+)"/.exec(label)?.[1];
@@ -107,7 +107,7 @@ test("a row far down the district directory names each of its figures", async ({
  * sections, under the four `withContents` asks for. `/scenario/reach` is the runner view that
  * keeps one, and still carries the same `<noscript>` card.
  */
-const LISTED = ["/scenario/reach", "/district/043802", "/statewide", "/wiki/doctrine/equity"];
+const LISTED = ["/scenario/reach", "/district/043802", "/statewide", "/what-changed", "/wiki/doctrine/equity"];
 
 for (const javaScriptEnabled of [true, false]) {
   test.describe(`contents entries, with JavaScript ${javaScriptEnabled ? "on" : "off"}`, () => {
