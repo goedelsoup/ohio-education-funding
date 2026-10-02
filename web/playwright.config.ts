@@ -25,6 +25,13 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env["CI"],
   retries: process.env["CI"] ? 2 : 0,
+  // Playwright's default is half the cores, which is 2 on a 4-vCPU GitHub runner. Each `web-e2e`
+  // shard has the runner to itself and `vite preview` serves static files, so on CI it gets all
+  // four. `retries` above is what would surface the preview server falling behind: a test that
+  // passes only on retry is contention, and the run's flaky count says so (#647). Locally the
+  // default stands — written out, since `exactOptionalPropertyTypes` refuses an `undefined` — because
+  // a laptop running the suite is usually doing something else too.
+  workers: process.env["CI"] ? 4 : "50%",
   reporter: process.env["CI"] ? [["github"], ["html", { open: "never" }]] : [["list"]],
 
   use: {
