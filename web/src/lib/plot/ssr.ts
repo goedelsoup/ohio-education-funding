@@ -20,8 +20,13 @@ import { parseHTML } from "linkedom";
 
 import { draw, type Drawing, type Naming, pair, panelWidth } from "./spec.ts";
 
-/** Anything that looks like a baked-in colour: `#abc`, `#aabbcc`, `rgb(…)`, `hsl(…)`. */
-const LITERAL_COLOUR = /(#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\()/i;
+/**
+ * Anything that looks like a baked-in colour: `#abc`, `#aabbcc`, `rgb(…)`, `hsl(…)`.
+ *
+ * Not a numeric character reference: the serializer writes a no-break space as `&#160;`, and the
+ * log-scale axis names carry one so their parenthetical does not wrap apart (#662).
+ */
+const LITERAL_COLOUR = /((?<!&)#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\()/i;
 
 /**
  * Refuse to emit a chart carrying a literal colour.
