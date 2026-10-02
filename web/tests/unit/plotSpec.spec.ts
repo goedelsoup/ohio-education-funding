@@ -47,7 +47,7 @@ import {
   WIDTHS,
 } from "../../src/lib/plot/spec.ts";
 import { renderPanelToString, renderToString } from "../../src/lib/plot/ssr.ts";
-import { INK, ORDINAL, SERIES, SUBJECT } from "../../src/lib/plot/tokens.ts";
+import { INK, ORDINAL, SERIES, SERIES_TEXT, SUBJECT } from "../../src/lib/plot/tokens.ts";
 
 /** How many layouts `renderToString` emits: one per width in `WIDTHS`. */
 const DRAWINGS = Object.keys(WIDTHS).length;
@@ -1112,6 +1112,101 @@ test("both corner labels are the caller's, so a horizon is not written as a fisc
   // The `FY` prefix used to be written here rather than passed in, which is what made this form
   // unusable for the one caller whose index counts something else.
   expect(svg).not.toContain("FY");
+});
+
+test("the reference label is wrapped to the frame, so it cannot reach the start labels' gutter", () => {
+  /*
+   * #655's CI failure. On `/method` at 375 the right-anchored "What ±1σ claims to hold" ran left out
+   * of the 300px drawing's frame and through the lower line's "66%" start label in the gutter.
+   * Measured with the file's own p90 glyph width, which is wider than CI's fonts paint.
+   */
+  const label = "what ±1σ claims to hold";
+  for (const width of Object.values(WIDTHS)) {
+    const spec = seriesSpec(HELD, { a: "pooled", b: "cross-district" }, share, () => "", {
+      width,
+      tick: (at) => `${at}`,
+      reference: { value: 0.683, label },
+    })!;
+    const frame = width - Number(spec.options.marginLeft) - Number(spec.options.marginRight);
+    const { document } = parseHTML(`<div>${drawingAt(() => spec)}</div>`);
+    const lines = [...document.querySelectorAll("g.series-reference text")].flatMap((t) => {
+      const spans = [...t.querySelectorAll("tspan")];
+      return (spans.length ? spans : [t]).map((n) => n.textContent ?? "");
+    });
+    expect(lines.join(" "), `${width}px`).toBe("What ±1σ claims to hold");
+    for (const line of lines) expect(line.length * 0.667 * 11, `${width}px "${line}"`).toBeLessThanOrEqual(frame);
+  }
+});
+
+test("a series chart prints where each line starts, as well as where it ends", () => {
+  /*
+   * #655. Every dek over these charts is a start-to-end comparison — "fell from 45.9% to 34.5%" —
+   * and only the end was drawn, so the start had to be read off a line with no axis.
+   */
+  const svg = renderToString(
+    (w) => seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", { width: w, tick: (at) => `${at}` }),
+    "presentational",
+  );
+  const { document } = parseHTML(`<div>${svg}</div>`);
+  const starts = [...document.querySelectorAll("g.series-start")];
+  expect(starts).toHaveLength(2 * DRAWINGS);
+  for (const drawing of document.querySelectorAll("svg")) {
+    const texts = [...drawing.querySelectorAll("g.series-start text")].map((t) => t.textContent);
+    expect(texts.sort()).toEqual([share(HELD[0]!.a!), share(HELD[0]!.b!)].sort());
+  }
+  // In the hue's text token, and anchored at their end so they sit left of the line in the gutter.
+  for (const start of starts) {
+    expect([SERIES_TEXT.formula, SERIES_TEXT.guarantee]).toContain(start.getAttribute("fill"));
+    expect(start.getAttribute("text-anchor")).toBe("end");
+  }
+});
+
+test("a series that opens on a gap is labelled at its first value, inside the frame", () => {
+  const gapped: SeriesPoint[] = [{ at: 1, a: 0.5, b: null }, ...HELD.slice(1)];
+  for (const width of Object.values(WIDTHS)) {
+    const svg = drawingAt(() =>
+      seriesSpec(gapped, { a: "pooled", b: "cross" }, share, () => "", { width, tick: (at) => `${at}` }),
+    );
+    expect(svg).toContain(`>${share(HELD[1]!.b!)}<`);
+    expect(overruns(svg), `${width}px`).toEqual([]);
+  }
+});
+
+test("a fan given names writes them into its end labels, in their lines' text hues", () => {
+  /*
+   * #655. A guaranteed district's fan ended in "$114M" and "$87.2M", and which was which lived in
+   * a key under the chart. The received label was also in primary ink beside a blue formula label.
+   */
+  const years: FanPoint[] = [2025, 2026, 2027].map((year, i) => ({
+    year,
+    point: 114e6,
+    low: 114e6,
+    high: 114e6,
+    observed: i === 0,
+    reference: 90e6 - i * 1e6,
+  }));
+  const labels = { point: "received", reference: "formula" };
+  const svg = renderToString(
+    (width) => fanSpec(years, compactMoney, () => "", { width, labels }),
+    "presentational",
+  );
+  const { document } = parseHTML(`<div>${svg}</div>`);
+  for (const drawing of document.querySelectorAll("svg")) {
+    const ends = [...drawing.querySelectorAll("g.fan-bound text")].map((t) => [
+      t.textContent,
+      t.closest("[fill]")?.getAttribute("fill"),
+    ]);
+    expect(ends.sort()).toEqual(
+      [
+        [`Received ${compactMoney(114e6)}`, SERIES_TEXT.guarantee],
+        [`Formula ${compactMoney(88e6)}`, SERIES_TEXT.formula],
+      ].sort(),
+    );
+  }
+  for (const width of Object.values(WIDTHS)) {
+    const drawn = drawingAt(() => fanSpec(years, compactMoney, () => "", { width, labels }));
+    expect(overruns(drawn), `${width}px`).toEqual([]);
+  }
 });
 
 test("the hit layer is one full-height column per position on the index", () => {
