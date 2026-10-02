@@ -111,7 +111,7 @@ const bars = held.map((y) => ({
 
   {
     bars.length > 0 && (
-      <div class="chartwrap" data-chart="cash" set:html={renderToString((w) => barSpec(bars, { width: w }), { label: `General fund cash held at 30 June by fiscal year, FY${first.fiscal_year} to FY${latest.fiscal_year}${converted ? `, in FY${base} dollars` : ""}` })} />
+      <div class="chartwrap" data-chart="cash" set:html={renderToString((w) => barSpec(bars, { width: w, hue: "plain" }), { label: `General fund cash held at 30 June by fiscal year, FY${first.fiscal_year} to FY${latest.fiscal_year}${converted ? `, in FY${base} dollars` : ""}` })} />
     )
   }
   {

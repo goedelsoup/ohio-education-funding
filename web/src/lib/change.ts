@@ -455,7 +455,7 @@ function neighborsChart(d: District, peers: readonly District[], measure: Measur
   const labelChars = Math.max(...ratios.map((r) => signedPct(r).length));
   const label = `Change in ${name} from FY${years[1]} to FY${years[2]}, as a percentage of FY${years[1]}, for each of the ${peers.length} districts in ${d.county} County; ${d.name} is marked`;
   return `<div class="chartwrap" data-chart="neighbors-${measure}">${renderToString(
-    (w) => barSpec(bars, { width: w, polarity: true, max: high, min: low, labelChars }),
+    (w) => barSpec(bars, { width: w, hue: "polarity", max: high, min: low, labelChars }),
     { label },
   )}</div>`;
 }

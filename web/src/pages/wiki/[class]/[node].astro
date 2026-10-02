@@ -254,6 +254,8 @@ const charts = node.series.map((binding) => {
           () =>
             barSpec(panel.bars, {
               width,
+              // A corpus series is a measurement, not formula aid or the guarantee (#652).
+              hue: "plain",
               max: multiples.max,
               min: multiples.min,
               labelChars: multiples.labelChars,
@@ -278,7 +280,7 @@ const charts = node.series.map((binding) => {
     panels: [
       {
         label: null,
-        html: renderToString((w) => barSpec(barsOf(series!), { width: w, scale: barScale(series!) }), {
+        html: renderToString((w) => barSpec(barsOf(series!), { width: w, hue: "plain", scale: barScale(series!) }), {
           label: series!.label,
         }),
       },

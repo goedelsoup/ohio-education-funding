@@ -13,18 +13,23 @@ import { expect, test } from "@playwright/test";
 
 import { CLEVELAND } from "./helpers.ts";
 
+/** A bar of the one chart on `/statewide` drawn in a series hue: the guarantee quintiles. */
+const GUARANTEE_BAR = '.bar-fill[fill="var(--series-guarantee)"] > *';
+
 test.describe("presentation", () => {
   test("renders in dark mode without losing the series colours", async ({ page }) => {
     // Charts are rendered at build time and cannot re-render on a theme change, so every colour in
     // them is a custom property. This is the test that the indirection actually resolves.
     await page.emulateMedia({ colorScheme: "dark" });
     await page.goto("/statewide");
+    // The guarantee quintiles: most of this page's bars mean neither series and are drawn plain
+    // (#652), so the test reads the one chart whose bars are a series.
     const fill = await page
-      .locator(".bar-fill")
+      .locator(GUARANTEE_BAR)
       .first()
       .evaluate((element) => getComputedStyle(element).fill);
-    // #3987e5 — the dark-mode step, not the light one.
-    expect(fill).toBe("rgb(57, 135, 229)");
+    // #d95926 — the dark-mode step, not the light one.
+    expect(fill).toBe("rgb(217, 89, 38)");
   });
 
   test("the theme toggle beats the OS setting in both directions", async ({ page }) => {
@@ -33,10 +38,10 @@ test.describe("presentation", () => {
     await page.locator("#theme").click();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
     const fill = await page
-      .locator(".bar-fill")
+      .locator(GUARANTEE_BAR)
       .first()
       .evaluate((element) => getComputedStyle(element).fill);
-    expect(fill).toBe("rgb(42, 120, 214)");
+    expect(fill).toBe("rgb(235, 104, 52)");
   });
 
   /**

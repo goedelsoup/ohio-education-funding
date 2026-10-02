@@ -44,7 +44,7 @@ import type {
   SeriesPoint,
   Trace,
 } from "../chart.ts";
-import { INK, ORDINAL, SERIES, SERIES_TEXT } from "./tokens.ts";
+import { INK, ORDINAL, SERIES, SERIES_TEXT, SUBJECT } from "./tokens.ts";
 import { firstOf, lastOf } from "../ends.ts";
 import { fiscalYear } from "../yearLabel.ts";
 
@@ -987,6 +987,17 @@ function tallHead(
   return { marks: axisFoot({ ...options, dy: 12, says: "", top: true }).marks, marginTop: 22 };
 }
 
+/** What a bar chart's fill says — see `hue` on {@link barSpec}. */
+export type BarHue = "formula" | "guarantee" | "plain" | "polarity";
+
+/** The unsigned fill of each {@link BarHue}. A polarity chart is always signed, so its entry is never read. */
+const BAR_HUE: Record<BarHue, string> = {
+  formula: SERIES.formula,
+  guarantee: SERIES.guarantee,
+  plain: INK.muted,
+  polarity: SERIES.formula,
+};
+
 /**
  * A horizontal bar chart: magnitude compared across a handful of named categories.
  *
@@ -1021,14 +1032,25 @@ export function barSpec(
      */
     scale?: { format: (v: number) => string; says: string };
     /**
-     * A chart of change, which reads its fill as gain against loss whatever its data's sign (#651).
+     * What the bars' colour means, which only the caller knows (#652).
      *
-     * Signed mode was entered only when a value fell below zero, so a county where every district
-     * rose dropped back to subject mode and filled its subject's *gain* in the hue the same chart
-     * gives a *loss* in every other county. With this set the chart is signed always: the zero
-     * rule, the polarity fill, and a subject marked by a stroke and its bold name, never a hue.
+     * Every bar chart was filled formula blue by default, so the share of districts *held by the
+     * guarantee* was drawn in the formula's hue, and so were cash, casino receipts and the tax
+     * base, which are neither. Required so a new chart has to say.
+     *
+     *   - `"formula"` — the bars are formula aid.
+     *   - `"guarantee"` — the bars are the guarantee.
+     *   - `"plain"` — the bars are neither: `INK.muted`, 5.7:1 on the card and 3.0:1 or better
+     *     against the cursor's ink, so it clears both floors without a new token.
+     *   - `"polarity"` — a chart of change, read as gain against loss whatever its data's sign
+     *     (#651). Signed mode was entered only when a value fell below zero, so a county where every
+     *     district rose dropped back to an unsigned chart and filled its subject's *gain* in the
+     *     loss hue. This keeps the chart signed always.
+     *
+     * Any chart with a value below zero is signed and filled by polarity whatever this says: a
+     * deficit drawn in the same colour as a surplus is the defect signed mode was written for.
      */
-    polarity?: boolean;
+    hue: BarHue;
   },
 ): Spec {
   const { width } = options;
@@ -1039,7 +1061,7 @@ export function barSpec(
    */
   const max =
     options.max ??
-    Math.max(...bars.map((b) => Math.abs(b.value)), options.polarity ? Number.MIN_VALUE : 1);
+    Math.max(...bars.map((b) => Math.abs(b.value)), options.hue === "polarity" ? Number.MIN_VALUE : 1);
   const labelled = bars.filter((b) => b.direct != null);
   /*
    * A negative value is drawn as a negative value, on the charts in the build that have one.
@@ -1058,7 +1080,7 @@ export function barSpec(
    * baseline of a negative bar and square its data end — the opposite of what the rounding means.
    */
   const lowest = Math.min(options.min ?? 0, 0, ...bars.map((b) => b.value));
-  const signed = lowest < 0 || options.polarity === true;
+  const signed = lowest < 0 || options.hue === "polarity";
   const negativeLabelled = labelled.filter((b) => b.value < 0);
   /*
    * How much room the direct labels get at the right — this chart's own longest, or the set's.
@@ -1107,15 +1129,18 @@ export function barSpec(
    * not read it, so **Ohio carried no mark in a chart built to show Ohio's position** and a reader
    * had to find it by reading the category names — which is the work the chart was drawn to save.
    *
-   * Colour is one channel and never the only one, the rule the print stylesheet applies to every
-   * ground-encoded mark on the site. So the fill takes the contrasting half of the validated pair
-   * *and* the category name is drawn in primary ink at 600 rather than in secondary at normal
-   * weight. Weight survives a monochrome print and a forced-colours mode, which is the point.
+   * Its fill is the chart's, whatever that is (#652). It was the guarantee's hue, which made
+   * Ohio's bar say "guarantee" in a chart of local shares, and in a chart of change made a
+   * district's gain the colour of a loss (#651). A fill already means something — the hue the
+   * caller chose, or polarity — and cannot mean "this one" as well. So the subject is marked by a
+   * {@link SUBJECT} ring and by its name in primary ink at 600, and weight is what survives a
+   * monochrome print and a forced-colours mode.
    *
-   * In signed mode the fill already carries polarity — a deficit against a surplus — and a hue
-   * cannot mean two things at once, so there the subject bar keeps its bold name and takes a 2px
-   * ring in primary ink instead of a fill. The county chart on the Change tab (#639) is the first
-   * signed chart with a subject, and it is signed by `polarity`, not by its data (#651).
+   * The ring is a mark of its own, drawn behind the bar and 2px larger. It was a `stroke` on the
+   * bar, which is a hover target, and `svg.plot [data-hover] { stroke: transparent }` widens every
+   * target with an invisible stroke: CSS beats a presentation attribute, so on the built page the
+   * ring #651 shipped was never painted. Behind, it intercepts no pointer, and it is not in
+   * `.bar-fill`, so the tooltips' index is untouched.
    */
   const marked = bars.filter((b) => b.current);
   const plain = bars.filter((b) => !b.current);
@@ -1139,7 +1164,7 @@ export function barSpec(
   };
   const floor = !signed
     ? 0
-    : options.polarity
+    : options.hue === "polarity"
       ? Math.min(lowest, ...negativeLabelled.map(clear))
       : lowest - (negativeLabelled.length > 0 ? (max - lowest) * 0.08 : 0);
   const foot =
@@ -1170,6 +1195,21 @@ export function barSpec(
       x: { axis: null, domain: [floor, max] },
       y: { axis: null, domain: bars.map((b) => b.label), padding: 0.47 },
       marks: [
+        // The subject's ring, under its bar. See "The bar the chart was built to locate" above.
+        ...(marked.length > 0
+          ? [
+              Plot.barX(marked, {
+                y: "label",
+                ...(signed
+                  ? { x1: 0, x2: (b: Bar) => b.value }
+                  : { x: (b: Bar) => Math.abs(b.value) }),
+                inset: -2,
+                fill: SUBJECT,
+                className: "bar-subject",
+                ...(signed ? {} : { rx2: 5 }),
+              }),
+            ]
+          : []),
         Plot.barX(bars, {
           y: "label",
           // One mark, not two: `draw` maps tooltips onto `.bar-fill > *` by index and
@@ -1178,20 +1218,11 @@ export function barSpec(
           ...(signed
             ? { x1: 0, x2: (b: Bar) => b.value }
             : { x: (b: Bar) => Math.abs(b.value) }),
-          // A constant where the chart has no subject, and not merely as an optimisation: Plot
+          // A constant where the chart is unsigned, and not merely as an optimisation: Plot
           // hoists a constant fill onto the group and pushes a channel down onto each rect, so a
           // function here would move where the colour lives on every one of the nine charts built
           // on this spec — including the two the theme tests read `.bar-fill`'s computed fill from.
-          fill: signed
-            ? (b: Bar) => (b.value < 0 ? SERIES.guarantee : SERIES.formula)
-            : marked.length > 0
-              ? (b: Bar) => (b.current ? SERIES.guarantee : SERIES.formula)
-              : SERIES.formula,
-          // The subject of a signed chart, whose fill is already spoken for by polarity: a ring in
-          // primary ink, the treatment #652 proposes for every form. Only where there is one.
-          ...(signed && marked.length > 0
-            ? { stroke: (b: Bar) => (b.current ? INK.primary : "none"), strokeWidth: 2 }
-            : {}),
+          fill: signed ? (b: Bar) => (b.value < 0 ? SERIES.guarantee : SERIES.formula) : BAR_HUE[options.hue],
           className: "bar-fill",
           // Rounded at the data end, square at the baseline: the bar grows from the axis and
           // rounding that end would detach it from the thing it is measured against. Not in
@@ -1740,7 +1771,11 @@ export function scatterSpec(
           fill: hue,
           fillOpacity: (p: ScatterPoint) =>
             p.muted ? DOT.opacity.muted : banded ? DOT.opacity.banded : DOT.opacity.plain,
-          stroke: "none",
+          /* A ring is a stroke channel only where some point wears one, so a chart without
+             rings carries no per-dot stroke attribute — six hundred of them on every scatter. */
+          ...(points.some((p) => p.ring && !p.muted)
+            ? { stroke: (p: ScatterPoint) => (p.ring && !p.muted ? INK.primary : "none"), strokeWidth: 1 }
+            : { stroke: "none" }),
           className: "scatter-dot",
           // As the trails: a fixed frame holds an outlier at the edge rather than painting it
           // over the card, and a fitted one has nothing outside to clip.
@@ -2637,7 +2672,7 @@ export function rankSpec(
           r: DOT_RADIUS,
           fill:
             marked.length > 0
-              ? (r: Rank) => (r.marked == null ? SERIES.formula : SERIES.guarantee)
+              ? (r: Rank) => (r.marked == null ? SERIES.formula : SUBJECT)
               : SERIES.formula,
           stroke: "none",
           className: "rank-dot",
@@ -2940,13 +2975,14 @@ export function distributionSpec(
           className: "dist-dot",
         }),
 
-        // The member the page is about: full height, full hue, above everything, and labelled.
+        // The member the page is about: full height, in `SUBJECT` ink (#652), above everything, and
+        // labelled. Taller than the median rule beside it, which is how the two are told apart.
         ...(options.marker
           ? [
               Plot.ruleX([options.marker.value], {
                 y1: -17,
                 y2: 17,
-                stroke: SERIES.formula,
+                stroke: SUBJECT,
                 strokeWidth: 2.5,
                 className: "dist-marker",
               }),
