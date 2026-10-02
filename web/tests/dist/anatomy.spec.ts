@@ -4,8 +4,8 @@
  * A data page has three tiers: the answer (a chart, a table, the tiles), how to read it, and the
  * apparatus — where the numbers come from and what the page is not. #549 found the third tier
  * ahead of the first on `/history`, whose survey provenance card sat above both of its charts, and
- * marked every such card `.card.apparatus` so that the order is a property of the bytes rather
- * than of whoever last edited the page.
+ * marked every such card `data-card="apparatus"` so that the order is a property of the bytes
+ * rather than of whoever last edited the page. (It was a class, `.card.apparatus`, until #566.)
  *
  * # What counts as an answer
  *
@@ -31,7 +31,7 @@ import { describe, expect, test } from "vitest";
 import { DIST, pages } from "./artefact.ts";
 
 const ANSWER = /<svg\b[^>]*\bclass="plot\b|<table\b(?![^>]*\bclass="[^"]*\bprose\b)|\bclass="tiles"|\brole="img"/;
-const APPARATUS = /\bclass="[^"]*\bapparatus\b/;
+const APPARATUS = /\bdata-card="apparatus"/;
 
 /** The data routes #549 names, by the file a host serves for each. */
 const NAMED = [
@@ -96,7 +96,7 @@ describe("answer before apparatus", () => {
     // `/history` as it was before #549: the Census provenance card first, the charts after it.
     const page = read("history.html");
     expect(misordered(page)).toBeNull();
-    const doctored = page.replace(/<\/h1>/, '</h1><div class="card apparatus"><p>Provenance.</p></div>');
+    const doctored = page.replace(/<\/h1>/, '</h1><div class="card" data-card="apparatus"><p>Provenance.</p></div>');
     expect(doctored).not.toBe(page);
     expect(misordered(doctored)).toBe("opens with apparatus ahead of its first answer");
   });
@@ -112,7 +112,7 @@ describe("answer before apparatus", () => {
     // `/method`'s pupil-count table is a table of sentences. If that counted, a page could put its
     // apparatus below a prose table and above every figure it has.
     const { answer, apparatus } = anatomy(
-      '<main><table class="prose"></table><div class="card apparatus"></div><svg class="plot"></svg></main>',
+      '<main><table class="prose"></table><div class="card" data-card="apparatus"></div><svg class="plot"></svg></main>',
     );
     expect(apparatus).toBeGreaterThan(-1);
     expect(answer).toBeGreaterThan(apparatus);

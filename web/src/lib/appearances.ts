@@ -123,7 +123,7 @@ export function citationsOf(html: string): Map<string, { id: string; label: stri
     listed.set(entry[1]!, textOf(entry[2]!));
   }
 
-  const cards = [...main.matchAll(/<div class="card[^"]*" id="([^"]+)"/g)].map((card) => ({
+  const cards = [...main.matchAll(/<div class="card[^"]*"[^>]*?\sid="([^"]+)"/g)].map((card) => ({
     at: card.index,
     id: card[1]!,
   }));

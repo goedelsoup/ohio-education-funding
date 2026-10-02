@@ -244,7 +244,7 @@ export interface NavGroup extends NavEntryBase {
    * The panel, as runs of links separated by a rule.
    *
    * One column except in `wide` panels, which are two above the nav's breakpoint — see
-   * `.menu-panel.wide` in `app.css`.
+   * `.menu-panel[data-width="wide"]` in `app.css`.
    */
   sections: NavSection[];
   /** Lay the runs out in two columns where there is room. `Library` only. */

@@ -83,9 +83,9 @@ test("a section rendered once per dollar basis is one entry, named by what both 
    */
   const body =
     `<div class="basis-scope" id="finances" data-part="finances">` +
-    `<div class="basis-panel nominal"><div class="card" data-part="finances">` +
+    `<div class="basis-panel" data-basis="nominal"><div class="card" data-part="finances">` +
     `<h2>${anchor("finances")}What districts actually received, spent, and hold — nominal</h2></div></div>` +
-    `<div class="basis-panel real"><div class="card" data-part="finances">` +
+    `<div class="basis-panel" data-basis="real"><div class="card" data-part="finances">` +
     `<h2>${anchor("finances")}What districts actually received, spent, and hold — FY2020 dollars</h2></div></div>` +
     `</div>`;
   expect(contentsOf(body)).toEqual([

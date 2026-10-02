@@ -72,11 +72,11 @@ const total = corrected.reduce((sum, section) => sum + section.corrections, 0);
     }
   </p>
 
-  <div class="card prose-body lede" id="summary" data-part="summary"><Fragment set:html={summary} /></div>
+  <div class="card prose-body" data-card="lede" id="summary" data-part="summary"><Fragment set:html={summary} /></div>
 
   {
     total > 0 && (
-      <div class="card correction-index" id="corrections" data-part="corrections">
+      <div class="card" data-card="correction-index" id="corrections" data-part="corrections">
         <h2><SectionAnchor id="corrections" />
           {total} {total === 1 ? "claim in this record has" : "claims in this record have"} been
           withdrawn or superseded

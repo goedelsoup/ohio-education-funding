@@ -77,6 +77,6 @@ const { id, section, base } = Astro.props;
     <label class="pill" for={`${id}-real`} data-basis="real">Constant dollars</label>
     <span class="n">{base == null ? "no index covers this series" : `FY${base} dollars`}</span>
   </div>
-  <div class="basis-panel nominal"><slot name="nominal" /></div>
-  <div class="basis-panel real"><slot name="real" /></div>
+  <div class="basis-panel" data-basis="nominal"><slot name="nominal" /></div>
+  <div class="basis-panel" data-basis="real"><slot name="real" /></div>
 </div>

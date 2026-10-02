@@ -320,7 +320,7 @@ const body = applySemantics(listed).html;
                 >
                   {group.label}
                 </summary>
-                <div class={group.wide ? "menu-panel menu-wide" : "menu-panel"}>
+                <div class="menu-panel" data-width={group.wide ? "wide" : undefined}>
                   {/* The lead: `Library`'s record, as tiles across the panel — see `NavGroup.lead`.
                       The glyph is `aria-hidden`; the label is still the link's whole name. */}
                   {group.lead ? (
@@ -383,12 +383,12 @@ const body = applySemantics(listed).html;
       </div>
     </header>
 
-    <main id="main" class={wide ? "wrap wide" : "wrap"}>
+    <main id="main" class="wrap" data-width={wide ? "wide" : undefined}>
       <Fragment set:html={body} />
     </main>
 
     <footer class="site">
-      <div class={wide ? "wrap wide" : "wrap"}>
+      <div class="wrap" data-width={wide ? "wide" : undefined}>
         {/*
           Plain language, because this line is on every page and is read by people who arrived from
           a shared link, not from the repository. It used to name the crate that computes the

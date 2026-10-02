@@ -352,7 +352,7 @@ export const WIDTHS = {
  * a `viewBox`, so a drawing grows with its box: the 640 drawing in `/counties`' 1180px column
  * painted its dumbbell labels at 16.9–18.6px, larger than the 15px prose around them, and the 320
  * drawing in `/scenario/reach`'s 548px box painted at 18.8px. The same form came out at different
- * sizes on pages under one menu, because some pages are `.wrap.wide` and some are not.
+ * sizes on pages under one menu, because some pages set the wide `.wrap` and some do not.
  *
  * 1.25 because the largest type any form here sets is 12 units — `BASE`'s `fontSize` — and 12 ×
  * 1.25 is the 15px of body text. So no chart label is painted larger than the sentence above it.

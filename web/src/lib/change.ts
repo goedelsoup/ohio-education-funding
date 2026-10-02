@@ -481,7 +481,7 @@ export function renderNeighbors(d: District, districts: readonly District[]): st
   const panel = (measure: MeasureKey) => {
     const change = yearChange(d.biennium, measure);
     const rank = countyRank(d, districts, measure);
-    return `<div class="measure-panel ${measure}">
+    return `<div class="measure-panel" data-measure="${measure}">
         <p class="note"><strong>On ${MEASURES[measure].name}, ${escapeHtml(d.name)} moved
           ${signedPct(change.ratio)} (${signedMoney(change.dollars)}) from FY${years[1]} to
           FY${years[2]}: ${rankPhrase(rank, d.county)}.</strong></p>

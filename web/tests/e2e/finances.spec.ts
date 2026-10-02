@@ -15,8 +15,8 @@ import { CLEVELAND, MOST_FEDERAL } from "./helpers.ts";
 test.describe("the finances route", () => {
   test("shows six closed years of money that changed hands", async ({ page }) => {
     await page.goto(`/district/${CLEVELAND}/finances`);
-    await expect(page.locator(".basis-panel.nominal tbody tr")).toHaveCount(6);
-    await expect(page.locator(".basis-panel.nominal")).toContainText("audited actuals");
+    await expect(page.locator('.basis-panel[data-basis="nominal"] tbody tr')).toHaveCount(6);
+    await expect(page.locator('.basis-panel[data-basis="nominal"]')).toContainText("audited actuals");
   });
 
   test("refuses to be read as a check on the model", async ({ page }) => {
@@ -31,9 +31,9 @@ test.describe("the finances route", () => {
     // The reason both bases are offered rather than one: they support opposite arguments, and the
     // difference is entirely CPI.
     await page.goto("/statewide");
-    const nominal = page.locator(".basis-panel.nominal .tile", { hasText: "Change since FY2020" });
+    const nominal = page.locator('.basis-panel[data-basis="nominal"] .tile', { hasText: "Change since FY2020" });
     await expect(nominal.locator(".v")).toHaveClass(/gain/);
-    const real = page.locator(".basis-panel.real .tile", { hasText: "Change since FY2020" });
+    const real = page.locator('.basis-panel[data-basis="real"] .tile', { hasText: "Change since FY2020" });
     await expect(real.locator(".v")).toHaveClass(/loss/);
   });
 });

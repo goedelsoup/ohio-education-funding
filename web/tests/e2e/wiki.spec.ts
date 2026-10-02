@@ -463,17 +463,19 @@ test.describe("the decisions behind the corpus", () => {
     // territory split between West Geauga and Chardon; it did not, and the record now says so in
     // four places. A reader who lands here from a search must not have to find that by reading.
     await page.goto("/wiki/decision/the-directory-cannot-say-why");
-    const index = page.locator(".card.correction-index");
+    const index = page.locator('.card[data-card="correction-index"]');
     await expect(index).toBeVisible();
     await expect(index.getByRole("heading")).toContainText("been withdrawn or superseded");
 
     // Four corrections, each with an anchor into the section that carries it.
     await expect(page.locator("blockquote.correction")).toHaveCount(4);
-    const first = index.locator("a").first();
+    // The pills, not the first link: that is the heading's own section anchor, which points back at
+    // the index, and it passed here only while the index carried `correction-index` as a class.
+    const first = index.locator(".flags a").first();
     const target = (await first.getAttribute("href"))!.slice(1);
     await first.click();
     await expect(page.locator(`#${target}`)).toBeVisible();
-    await expect(page.locator(`#${target}`)).toHaveClass(/correction/);
+    await expect(page.locator(`blockquote#${target}`)).toHaveClass(/\bcorrection\b/);
   });
 
   test("a quotation is not dressed as a correction", async ({ page }) => {
@@ -482,7 +484,7 @@ test.describe("the decisions behind the corpus", () => {
     await page.goto("/wiki/decision/reading-an-amending-act");
     await expect(page.locator("blockquote")).not.toHaveCount(0);
     await expect(page.locator("blockquote.correction")).toHaveCount(0);
-    await expect(page.locator(".card.correction-index")).toHaveCount(0);
+    await expect(page.locator('.card[data-card="correction-index"]')).toHaveCount(0);
   });
 
   test("a catalog entry reaches the decision behind it without leaving the site", async ({

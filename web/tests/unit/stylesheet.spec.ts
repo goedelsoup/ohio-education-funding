@@ -140,14 +140,15 @@ test("no prose genre takes a typeface, a hue, or a radius of its own", () => {
   );
   const offenders: string[] = [];
   // Match the class as a token wherever it appears, chained or not. The first version anchored on
-  // `(^|,|\s)\.findings`, which never matched `.card.findings` — the class this site actually uses,
+  // `(^|,|\s)\.findings`, which never matched `.card.findings` — the selector this site then used,
   // because findings is a card here — so the whole genre was exempt and a series hue on its ground
-  // passed green. Caught by setting one deliberately.
+  // passed green. Caught by setting one deliberately. #566 moved the card's variant onto an
+  // attribute, `.card[data-card="findings"]`, which `\.findings` cannot see either, so it is named.
   // The genre's classes named in full. `(?![a-z-])` after `revision` rejected `revision-body`,
   // which is the withdrawal's actual container — so the one element that could grow a container
   // shape was the one out of scope, and a radius on it passed. Three attempts, three misses, each
   // found by breaking it rather than by reading it.
-  const GENRE = /\.(lead|findings|revision|revision-body|withdrawn)(?![a-z-])/;
+  const GENRE = /\.(lead|findings|revision|revision-body|withdrawn)(?![a-z-])|\[data-card="findings"\]/;
   for (const [selector, body] of rules(GENRE)) {
     for (const declaration of body.split(";")) {
       const [property = "", value = ""] = declaration.split(":").map((part) => part.trim());
@@ -161,8 +162,8 @@ test("no prose genre takes a typeface, a hue, or a radius of its own", () => {
       }
       // A card legitimately has a radius, and `findings` IS a card here — so the exemption is for
       // a rule targeting the card itself, which means the LAST compound in the selector. Testing
-      // the whole string exempted `.card.apparatus .revision-body` too, which is a descendant and
-      // not a card, and let a radius onto the withdrawal.
+      // the whole string exempted `.card[data-card="apparatus"] .revision-body` too, which is a
+      // descendant and not a card, and let a radius onto the withdrawal.
       const target = selector.split(/\s+/).at(-1) ?? "";
       if (property === "border-radius" && !target.includes(".card")) {
         offenders.push(`${selector} sets its own radius`);
@@ -184,7 +185,7 @@ test("no prose genre takes a typeface, a hue, or a radius of its own", () => {
  * raised rectangles reads as forty competing objects rather than as one document.
  */
 test("nothing that sits on the page carries a shadow", () => {
-  const offenders = rules(/(^|,|\s)\.(card|tile)(\.|,|\s|$)|(^|,|\s)table(\s|,|$)/)
+  const offenders = rules(/(^|,|\s)\.(card|tile)(\.|\[|,|\s|$)|(^|,|\s)table(\s|,|$)/)
     .filter(([, body]) => /box-shadow\s*:\s*(?!none)/.test(body))
     .map(([selector]) => selector);
   expect(offenders).toEqual([]);
@@ -274,13 +275,13 @@ test("every width breakpoint is written in px", () => {
 /**
  * The findings genre survives a medium with no backgrounds.
  *
- * `.card.findings` is separated from every other card by its ground and nothing else, and the note
+ * The findings card is separated from every other card by its ground and nothing else, and the note
  * on that rule calls the confusion it prevents — a statute read as an estimate — the single most
  * damaging one available on this site. On paper the ground is gone, so something else has to say
  * the voice changed.
  */
 test("the findings card is not the only card by its ground alone", () => {
-  expect(SECOND_CHANNEL).toMatch(/\.card\.findings\s*\{[^}]*border-left\s*:/);
+  expect(SECOND_CHANNEL).toMatch(/\.card\[data-card="findings"\]\s*\{[^}]*border-left\s*:/);
 });
 
 /**

@@ -301,7 +301,7 @@ export function renderOutcomes(bundle: Bundle): string {
         decides which districts are found wanting.</p>
     </div>
 
-    <div class="card apparatus" id="limits" data-part="limits">
+    <div class="card" data-card="apparatus" id="limits" data-part="limits">
       <h2>${anchor("limits")}What this cannot tell you</h2>
       <p class="note">Every figure here is a correlation over ${count(o.districts)} districts, and
         none identifies an effect. Districts are not assigned to the guarantee at random — they

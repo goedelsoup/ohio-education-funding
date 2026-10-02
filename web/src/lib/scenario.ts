@@ -454,8 +454,8 @@ export function renderProjection(bundle: Panel, levers: Levers, chip = ""): stri
     <div class="card" id="projection" data-part="projection">
       <h2>${heading("projection", "At projected enrollment", chip)}</h2>
       <div class="tiles">
-        <div class="tile wide"><div class="k">Total state aid, FY${end.fiscalYear}</div>
-          <div class="v range">${range(end.low, end.high)}</div>
+        <div class="tile" data-width="wide"><div class="k">Total state aid, FY${end.fiscalYear}</div>
+          <div class="v" data-value="range">${range(end.low, end.high)}</div>
           <div class="n">Central estimate ${millions(end.realizedAid).replace("+", "")}.
             One path through the band, not the answer.</div></div>
         <div class="tile"><div class="k">Band half-width</div>

@@ -50,7 +50,7 @@ body {
 
 .wrap { max-width: var(--wrap-read); margin: 0 auto; padding: 0 var(--space-7); }
 /* Wider than the reading measure, for the pages that are a table of 609 rows. */
-.wrap.wide { max-width: var(--wrap-wide); }
+.wrap[data-width="wide"] { max-width: var(--wrap-wide); }
 
 /* Screen-reader-only. Used for the radio inputs behind the basis switch and for form labels
    whose purpose the adjacent control already makes visually obvious. */
@@ -506,35 +506,35 @@ header.site nav .menu-runs { display: contents; }
  * 640px the panel is static and one column like every other — see the rule after this.
  */
 @media (min-width: 641px) {
-  header.site nav .menu-panel.menu-wide {
+  header.site nav .menu-panel[data-width="wide"] {
     width: 30rem;
     max-width: none;
   }
-  header.site nav .menu-wide .menu-runs {
+  header.site nav [data-width="wide"] .menu-runs {
     display: block;
     columns: 2;
     column-gap: var(--space-2);
   }
   /* Three tiles over both columns: the glyph above the label, the note under it. */
-  header.site nav .menu-wide .menu-lead {
+  header.site nav [data-width="wide"] .menu-lead {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-2);
   }
-  header.site nav .menu-wide .menu-lead a { flex-direction: column; gap: var(--space-2); }
-  header.site nav .menu-wide .menu-run { break-inside: avoid; }
+  header.site nav [data-width="wide"] .menu-lead a { flex-direction: column; gap: var(--space-2); }
+  header.site nav [data-width="wide"] .menu-run { break-inside: avoid; }
   /* No rule between runs here (#603). Under `columns` the run after another can be the top of
      column two, which then began a rule and a padding below column one; and every run in this
      panel has a heading, which divides it already. The space is kept, below each run instead. */
-  header.site nav .menu-wide .menu-run + .menu-run {
+  header.site nav [data-width="wide"] .menu-run + .menu-run {
     margin-top: 0;
     padding-top: 0;
     border-top: 0;
   }
-  header.site nav .menu-wide .menu-run:not(:last-child) { padding-bottom: var(--space-2); }
+  header.site nav [data-width="wide"] .menu-run:not(:last-child) { padding-bottom: var(--space-2); }
 }
 @media (min-width: 820px) {
-  header.site nav .menu-panel.menu-wide { left: auto; right: 0; }
+  header.site nav .menu-panel[data-width="wide"] { left: auto; right: 0; }
 }
 /* Narrow viewports: the header already wraps, and an absolutely positioned panel next to a
    wrapped row lands on top of the row below it. Let the menu push the header open instead. */
@@ -797,9 +797,9 @@ a:focus-visible { color: var(--link); text-decoration-thickness: 2px; }
  * The basis switch, with no script behind it: both panels are in the document and a sibling
  * selector keyed on the checked radio decides which one is shown. See `BasisToggle.astro`.
  */
-.basis-panel.real { display: none; }
-.basis-scope input[data-basis="real"]:checked ~ .basis-panel.real { display: block; }
-.basis-scope input[data-basis="real"]:checked ~ .basis-panel.nominal { display: none; }
+.basis-panel[data-basis="real"] { display: none; }
+.basis-scope input[data-basis="real"]:checked ~ .basis-panel[data-basis="real"] { display: block; }
+.basis-scope input[data-basis="real"]:checked ~ .basis-panel[data-basis="nominal"] { display: none; }
 /* Each label is a `.pill`; this only undoes the global `label` rule's block margin. The checked
    one is the only selected pill on the site, so its state is written here, against the radio. */
 .basis-scope .basis label { margin: 0; }
@@ -819,9 +819,9 @@ a:focus-visible { color: var(--link); text-decoration-thickness: 2px; }
  * The measure switch on a district's `/change` tab: the same two-radio pattern, keyed on the
  * measure rather than the dollar basis. Total state support is the headline and checked first.
  */
-.measure-panel.foundation { display: none; }
-.measure-scope input[data-measure="foundation"]:checked ~ .measure-panel.foundation { display: block; }
-.measure-scope input[data-measure="foundation"]:checked ~ .measure-panel.total { display: none; }
+.measure-panel[data-measure="foundation"] { display: none; }
+.measure-scope input[data-measure="foundation"]:checked ~ .measure-panel[data-measure="foundation"] { display: block; }
+.measure-scope input[data-measure="foundation"]:checked ~ .measure-panel[data-measure="total"] { display: none; }
 .measure-scope .basis label { margin: 0; }
 .measure-scope input[data-measure="total"]:checked ~ .basis label[data-measure="total"],
 .measure-scope input[data-measure="foundation"]:checked ~ .basis label[data-measure="foundation"] {
@@ -912,7 +912,7 @@ thead th,
 .scope-hd,
 .scope-mode > legend,
 .claim,
-.card.apparatus .revision-body h3,
+.card[data-card="apparatus"] .revision-body h3,
 tr.series-break > th,
 tr.series-break > td {
   text-transform: uppercase;
@@ -1310,7 +1310,7 @@ tr.series-break > td {
  * them is the interval: `--space-10` between cards, against the 1.1rem it was, which is the step
  * the scale did not have until this phase added it.
  *
- * The ground stays, and that is deliberate rather than timid. `.card.findings` is distinguished
+ * The ground stays, and that is deliberate rather than timid. The findings card is distinguished
  * from every other card by its ground alone on screen — see the print block, where a second
  * channel is added because paper has no grounds — so removing grounds here would take a genre
  * distinction with it.
@@ -1722,7 +1722,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
  * The rule is a marker and never a ground: the correction's tint is its own, below, and a hue on
  * this rule is a series hue used as a marker — which is the one use the genre test permits.
  */
-:where(.conditions li, .prose-body blockquote, .card.apparatus .revision-body) {
+:where(.conditions li, .prose-body blockquote, .card[data-card="apparatus"] .revision-body) {
   border-left: 2px solid var(--border);
   padding-left: var(--space-5);
 }
@@ -2368,10 +2368,10 @@ svg.plot [data-hover] {
 .fan-hit > * { fill: transparent; }
 .fan-hit > .hover { fill: var(--text-primary); fill-opacity: .05; }
 
-.tile.wide { grid-column: span 2; }
+.tile[data-width="wide"] { grid-column: span 2; }
 /* A range is two numbers and has to stay one line's worth of thought, so it sets a shade
    smaller than a point estimate would. It is still the largest thing in the card. */
-.tile .v.range { font-size: var(--text-h2); }
+.tile .v[data-value="range"] { font-size: var(--text-h2); }
 /* The band as the fan draws it: the formula hue at the band's own 0.16 between its two 2px edges
    (#662). At `opacity: .5` the key was rgb(147,186,232) beside a band of rgb(218,230,244). */
 .sw[data-series="band"] {
@@ -2678,7 +2678,7 @@ svg.plot [data-hover] {
  * renders findings as a card with a heading and a note, and those do the "named label" job better
  * than a bare label would. What was missing was the ground, so that is what this adds.
  */
-.card.findings { background: var(--surface-inset); }
+.card[data-card="findings"] { background: var(--surface-inset); }
 
 /*
  * THE SUBJECT — mechanism, statute, history. The norm every other genre is measured against.
@@ -2760,15 +2760,15 @@ svg.plot [data-hover] {
  * is a card rather than a banner strip because it carries a sentence explaining why the record was
  * corrected in place rather than rewritten, and that sentence is the point of the whole feature.
  */
-.card.correction-index {
+.card[data-card="correction-index"] {
   border: 1px solid color-mix(in srgb, var(--series-guarantee) 35%, var(--border));
 }
-.card.correction-index h2 { color: var(--series-guarantee-text); }
+.card[data-card="correction-index"] h2 { color: var(--series-guarantee-text); }
 
 /* A decision record's `summary` — its own one-paragraph statement of what it settled. Set a step
    up from the body because it leads the page rather than sitting in the sequence of sections. */
-.card.lede { font-size: var(--text-lead); color: var(--text-primary); }
-.card.lede p { max-width: var(--measure-note); }
+.card[data-card="lede"] { font-size: var(--text-lead); color: var(--text-primary); }
+.card[data-card="lede"] p { max-width: var(--measure-note); }
 
 /* The one-line summary under a row in an index table. */
 .row-note {
@@ -2880,18 +2880,18 @@ svg.plot [data-hover] {
  * the third tier of a page, after the answer and how to read it, and `anatomy.spec.ts` holds every
  * one of them below the page's first answer.
  */
-.card.apparatus {
+.card[data-card="apparatus"] {
   border: 1px dashed var(--border);
   background: none;
   color: var(--text-secondary);
   font-size: var(--text-base);
 }
-.card.apparatus h2 { font-size: var(--text-base); color: var(--text-muted); }
+.card[data-card="apparatus"] h2 { font-size: var(--text-base); color: var(--text-muted); }
 
 /*
  * What a node used to say, one `<details>` per withdrawal.
  *
- * Inside `.apparatus`, so it inherits the dashed, muted treatment that says "this is the corpus
+ * Inside the apparatus card, so it inherits the dashed, muted treatment that says "this is the corpus
  * about itself" — but the *withdrawn text* gets the opposite of a quotation's greying, for the
  * same reason `blockquote.correction` does: it is this repository saying it was wrong.
  *
@@ -2900,31 +2900,31 @@ svg.plot [data-hover] {
  * does not survive being read quickly, printed, or seen by someone who does not distinguish the
  * two hues. The strike is redundant with the "It said" heading on purpose.
  */
-.card.apparatus .revision + .revision { margin-top: var(--space-3); }
-.card.apparatus .revision > summary {
+.card[data-card="apparatus"] .revision + .revision { margin-top: var(--space-3); }
+.card[data-card="apparatus"] .revision > summary {
   cursor: pointer;
   font-weight: var(--weight-semibold);
   color: var(--text-secondary);
   padding: var(--space-2) 0;
 }
-.card.apparatus .revision > summary:hover { color: var(--text-primary); }
-.card.apparatus .revision-body {
+.card[data-card="apparatus"] .revision > summary:hover { color: var(--text-primary); }
+.card[data-card="apparatus"] .revision-body {
   padding-top: .1rem;
   padding-bottom: .1rem;
   margin: var(--space-2) 0 var(--space-1);
 }
-.card.apparatus .revision-body h3 {
+.card[data-card="apparatus"] .revision-body h3 {
   margin: var(--space-6) 0 var(--space-2);
   font-size: var(--text-xs);
   color: var(--text-muted);
 }
-.card.apparatus .revision-body > *:first-child { margin-top: 0; }
-.card.apparatus .withdrawn { text-decoration: line-through; color: var(--text-muted); }
+.card[data-card="apparatus"] .revision-body > *:first-child { margin-top: 0; }
+.card[data-card="apparatus"] .withdrawn { text-decoration: line-through; color: var(--text-muted); }
 /* The strike is for the prose, not for a citation inside it: a struck-through link target is
    unreadable, and the whole value of `found_by` is that somebody can go and check it. */
-.card.apparatus .withdrawn a,
-.card.apparatus .withdrawn code,
-.card.apparatus .withdrawn .claim { text-decoration: none; }
+.card[data-card="apparatus"] .withdrawn a,
+.card[data-card="apparatus"] .withdrawn code,
+.card[data-card="apparatus"] .withdrawn .claim { text-decoration: none; }
 
 footer { color: var(--text-muted); font-size: var(--text-sm); margin-top: var(--space-8); }
 /*
@@ -3156,7 +3156,7 @@ tr.series-break > td {
  * rest of this stylesheet already follows is the answer to all of them:
  *
  *   `.claim`   colour AND rule style AND the word
- *   `.apparatus`  a dashed border, not a ground
+ *   `[data-card="apparatus"]`  a dashed border, not a ground
  *   `blockquote.correction`  a left rule, and the hue only beside it
  *
  * Every mark below is a place that rule was not applied. `background` is the channel browsers drop
@@ -3238,7 +3238,7 @@ tr.series-break > td {
    * A left rule, which is what a correction already uses, and no hue — a hue here would name a
    * data series. The ground is still asked for, for a reader who prints with backgrounds on.
    */
-  .card.findings {
+  .card[data-card="findings"] {
     print-color-adjust: exact;
     border-left: 3px solid var(--text-primary);
   }

@@ -143,7 +143,7 @@ function distributionPanel(districts: readonly District[], measure: MeasureKey):
       ${td(signedPct(percentile(ratios, 0.25)))}${td(signedPct(median(ratios)))}${td(signedPct(percentile(ratios, 0.75)))}
     </tr>`;
   });
-  return `<div class="measure-panel ${measure}">
+  return `<div class="measure-panel" data-measure="${measure}">
       <div class="scroll"><table>
         <thead><tr><th scope="col">${MEASURES[measure].name[0]!.toUpperCase()}${MEASURES[measure].name.slice(1)}</th>
           ${th("Rose")}${th("Fell")}${th("Did not move")}
