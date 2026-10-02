@@ -63,4 +63,7 @@ const description =
     median Ohio district receives {money(medianAid)} per pupil in state aid in {yearOf("formula")}.</p>
 
   <Fragment set:html={renderCounty(county, bundle.statewide, medianAid, all)} />
+  <script>
+    import "../../scripts/sortable.ts";
+  </script>
 </Base>

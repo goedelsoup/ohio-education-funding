@@ -61,15 +61,28 @@ export function signedPct(v: number): string {
   return v > 0 ? `+${pct(v, 1)}` : pct(v, 1);
 }
 
+/** A position in the three years: 0 is `year_baseline`, 2 is `year_terminal`. */
+export type YearIndex = 0 | 1 | 2;
+
+/** One year to a later one, in dollars and as a share of the earlier year. */
+export function levelChange(
+  b: Biennium,
+  measure: MeasureKey,
+  from: YearIndex,
+  to: YearIndex,
+): { dollars: number; ratio: number } {
+  const levels = MEASURES[measure].levels(b);
+  const dollars = levels[to] - levels[from];
+  return { dollars, ratio: levels[from] > 0 ? dollars / levels[from] : 0 };
+}
+
 /** The middle year to the last, in dollars and as a share of the middle year. */
 export function yearChange(b: Biennium, measure: MeasureKey): { dollars: number; ratio: number } {
-  const [, middle, terminal] = MEASURES[measure].levels(b);
-  const dollars = terminal - middle;
-  return { dollars, ratio: middle > 0 ? dollars / middle : 0 };
+  return levelChange(b, measure, 1, 2);
 }
 
 /** Under a cent is no change: the files publish to the cent. */
-const UNMOVED = 0.005;
+export const UNMOVED = 0.005;
 
 /**
  * Where a district's change sits among its county's.
@@ -165,9 +178,18 @@ export function namedLines(b: Biennium): Line[] {
  * `null` when no line moved by a cent — a district held at its base with flat outside lines.
  */
 export function largestMove(b: Biennium): { label: string; change: number } | null {
+  return largestMoveBetween(b, 1, 2);
+}
+
+/** {@link largestMove} between any two of the three years. */
+export function largestMoveBetween(
+  b: Biennium,
+  from: YearIndex,
+  to: YearIndex,
+): { label: string; change: number } | null {
   let best: { label: string; change: number } | null = null;
   for (const line of namedLines(b)) {
-    const change = line.levels[2] - line.levels[1];
+    const change = line.levels[to] - line.levels[from];
     if (Math.abs(change) < UNMOVED) continue;
     if (!best || Math.abs(change) > Math.abs(best.change)) best = { label: line.label, change };
   }

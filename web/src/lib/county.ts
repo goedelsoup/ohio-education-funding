@@ -39,6 +39,7 @@ import * as routes from "./routes.ts";
 import { median } from "./stats.ts";
 import { yearChip, yearChipPair, yearOf } from "./year.ts";
 import { anchor } from "./section.ts";
+import { renderWhoGained } from "./countyChange.ts";
 import { BOX_FROM, distributionSpec, type Drawing, draws } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 
@@ -348,7 +349,7 @@ export function medianRealizedAid(districts: District[]): number {
   return median(districts.map((d) => d.realized_aid_per_pupil));
 }
 
-/** One county page: the spread, then the roster. */
+/** One county page: the spread, the roster, then who in it gained and who lost. */
 export function renderCounty(
   c: County,
   statewide: Statewide,
@@ -356,5 +357,5 @@ export function renderCounty(
   /** Every county, so the spread card can say where this one's disparity sits among them. */
   all: County[],
 ): string {
-  return `${renderSpread(c, statewide, all)}${renderRoster(c, statewide, statewideMedianAid)}`;
+  return `${renderSpread(c, statewide, all)}${renderRoster(c, statewide, statewideMedianAid)}${renderWhoGained(c)}`;
 }

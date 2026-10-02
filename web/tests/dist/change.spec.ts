@@ -70,3 +70,26 @@ describe("Elida Local's dashboard", () => {
     expect(card.querySelector('a[href="/district/045773/change"]')).toBeTruthy();
   });
 });
+
+describe("Allen County's who-gained card (#640)", () => {
+  const document = read("county/allen.html");
+  const card = document.querySelector("#who-gained");
+
+  test("is on the built page, dated, with both measures", () => {
+    expect(card).toBeTruthy();
+    expect(card!.querySelector(".year-chip")).toBeTruthy();
+    expect(card!.querySelectorAll("table[data-sortable]")).toHaveLength(2);
+  });
+
+  test("reads each of #642's four answers", () => {
+    const words = text(card);
+    expect(words).toContain("The 2 that fell: Elida Local and Lima City.");
+    expect(words).toContain("Supplemental targeted assistance (repealed by H.B. 96)");
+    expect(words).toContain("Without supplemental targeted assistance");
+    expect(words).toContain("Delphos City is at the formula's minimum state share");
+  });
+
+  test("loads the sort script", () => {
+    expect(document.querySelector('script[type="module"]')).toBeTruthy();
+  });
+});

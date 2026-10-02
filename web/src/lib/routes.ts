@@ -232,6 +232,7 @@ export const SECTIONS = {
     roster: "roster",
     spread: "spread",
     disparity: "disparity",
+    whoGained: "who-gained",
   },
 
   /** `/house`, `/senate`, and `/[chamber]/[number]`. */
