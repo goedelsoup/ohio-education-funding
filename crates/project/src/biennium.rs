@@ -299,6 +299,28 @@ pub struct Row {
     pub valuation: [Dollars; 3],
 }
 
+impl Row {
+    /// Total state support's FY2025→FY2026 change with supplemental targeted assistance taken out
+    /// of both years: the dollars, and that change as a share of FY2025 without it. `None` for a
+    /// district paid under a cent of it in FY2025.
+    ///
+    /// H.B. 96 repealed the supplement after FY2025, so a recipient's first step carries all of it
+    /// as a loss. This is what the rest of the payment did. The county page's who-gained card
+    /// prints the same figure, and `withoutTargetedAssistance` in `web/src/lib/countyChange.ts`
+    /// must agree with it.
+    #[must_use]
+    pub fn without_targeted_assistance(&self) -> Option<(Dollars, f64)> {
+        let [fy25, fy26, _] = self.years;
+        if fy25.supplements.targeted_assistance < 0.01 {
+            return None;
+        }
+        let before = self.total.at(BASELINE_YEAR)? - fy25.supplements.targeted_assistance;
+        let after = self.total.at(MIDDLE_YEAR)? - fy26.supplements.targeted_assistance;
+        let change = after - before;
+        Some((change, if before > 0.0 { change / before } else { 0.0 }))
+    }
+}
+
 /// The tax years [`Row::valuation`] covers, oldest first.
 pub const VALUATION_TAX_YEARS: [u16; 3] = [2023, 2024, 2025];
 

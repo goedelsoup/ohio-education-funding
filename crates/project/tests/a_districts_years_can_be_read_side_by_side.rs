@@ -132,6 +132,20 @@ fn lima_lost_targeted_assistance_and_the_phase_in_had_nothing_to_give_it() {
     }
 }
 
+/// **Without the repealed supplement, Lima's total state support rose 1.95% FY25→26.**
+///
+/// $37,177,475.93 → $37,900,888.46, over FY2025 without it. #642 and #640 printed +1.7%, which no
+/// definition reproduces (#649); this is the figure the county page prints.
+#[test]
+fn without_targeted_assistance_lima_rose_by_under_two_percent() {
+    let (dollars, ratio) = row(LIMA)
+        .without_targeted_assistance()
+        .expect("Lima was paid the supplement");
+    assert!(close(dollars, 723_412.53, 0.005), "{dollars}");
+    assert!(close(ratio, 0.019_458, 0.000_001), "{ratio}");
+    assert_eq!(row(ELIDA).without_targeted_assistance(), None);
+}
+
 /// The repeal is a category, not a district: about half its recipients were cut, against under a
 /// quarter of everyone else.
 #[test]
