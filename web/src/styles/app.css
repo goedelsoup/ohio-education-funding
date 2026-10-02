@@ -538,7 +538,7 @@ header.site nav .menu-runs { display: contents; }
 }
 /* Narrow viewports: the header already wraps, and an absolutely positioned panel next to a
    wrapped row lands on top of the row below it. Let the menu push the header open instead. */
-@media (max-width: 640px) {
+@media (max-width: 640.98px) {
   header.site nav .menu-panel {
     position: static;
     border: none;
@@ -1361,7 +1361,7 @@ tr.series-break > td {
  * 56px of padding on a 375px screen was too much anyway. The failing test is the reason it was
  * found, not the reason it is wrong.
  */
-@media (max-width: 640px) {
+@media (max-width: 640.98px) {
   .card { padding: var(--space-6) var(--space-7); }
 }
 
@@ -1471,7 +1471,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
  * `--text-figure` that is wider than half a phone. The pairs below it are per-pupil figures and
  * counts, which fit. A group of two or four is pairs throughout.
  */
-@media (max-width: 640px) {
+@media (max-width: 640.98px) {
   .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-7) var(--space-6); }
   .tiles > .tile:first-child:nth-last-child(2n + 1) { grid-column: 1 / -1; }
 }
@@ -1971,7 +1971,7 @@ table.prose th, table.prose th code { overflow-wrap: anywhere; }
  * sentences both read, so the row stops being two columns. `.spanning-*` rows already stack. A
  * prose table with a header row is a listing with columns, not a name/value list, and keeps them.
  */
-@media (max-width: 500px) {
+@media (max-width: 500.98px) {
   table.prose:not(:has(thead)),
   table.prose:not(:has(thead)) :is(tbody, tr, th, td) { display: block; }
   table.prose:not(:has(thead)) th { width: auto; border-bottom: 0; padding-bottom: 0; }

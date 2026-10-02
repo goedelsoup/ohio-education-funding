@@ -273,6 +273,41 @@ test("every width breakpoint is written in px", () => {
 });
 
 /**
+ * A pair of breakpoints is written one way, the way that leaves the narrower sliver.
+ *
+ * Max/min pairs were spelled two ways: `699.98px`/`700px` and `640px`/`641px`. The second leaves a
+ * sliver: a viewport 640.5px wide — a zoomed or scaled one, where a CSS width need not be whole —
+ * is above `max-width: 640px` and below `min-width: 641px`, and matches neither block. #566 took
+ * the first spelling, which narrows that sliver to .02px: a `min-width` is a whole pixel, and a
+ * `max-width` is a whole pixel less .02, the complement of the `min-width` one pixel up. Every rule
+ * kept the whole-pixel widths it had — `640px` became `640.98px`, `500px` became `500.98px` — so
+ * nothing moved on a whole viewport.
+ *
+ * Container queries are held to the same rule, and so are the token files, where `--sticky-chrome`
+ * changes at a breakpoint.
+ */
+test("every max-width breakpoint is the complement of a whole-pixel min-width", () => {
+  const tokens = resolve(process.cwd(), "src/styles/tokens");
+  const sheets = [
+    CSS,
+    ...readdirSync(tokens)
+      .filter((name) => name.endsWith(".css"))
+      .map((name) => readFileSync(join(tokens, name), "utf8").replace(/\/\*[\s\S]*?\*\//g, "")),
+  ];
+  const bounds = sheets.flatMap((sheet) =>
+    [...sheet.matchAll(/@(?:media|container)[^{]*?\((min|max)-width:\s*([^)]+)\)/g)].map((m) => ({
+      side: m[1]!,
+      width: m[2]!.trim(),
+    })),
+  );
+  expect(bounds.filter((b) => b.side === "max").length, "no max-width found — has the parser drifted?").toBeGreaterThan(3);
+  const offenders = bounds
+    .filter(({ side, width }) => !(side === "min" ? /^\d+px$/ : /^\d+\.98px$/).test(width))
+    .map(({ side, width }) => `${side}-width: ${width}`);
+  expect(offenders).toEqual([]);
+});
+
+/**
  * The findings genre survives a medium with no backgrounds.
  *
  * The findings card is separated from every other card by its ground and nothing else, and the note
