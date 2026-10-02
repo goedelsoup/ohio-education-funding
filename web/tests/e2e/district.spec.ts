@@ -196,9 +196,8 @@ test.describe("the categorical half", () => {
     await page.goto("/district/046797");
     const card = page.locator('[data-part="base-cost"]');
     await expect(card).toContainText("0.22 funded classroom teachers");
-    // And no share cell reads as a missing value.
-    await expect(card.locator("td", { hasText: /^0\.0%$/ })).toHaveCount(0);
-    await expect(card.locator("td", { hasText: "<0.1%" })).not.toHaveCount(0);
+    // The table's share cells, which read `<0.1%` here rather than `0.0%`, went with its Share
+    // column (#659); `tests/dist/repeats.spec.ts` holds the table to dollars.
   });
 
   test("targeted assistance shows both tiers and names the two pupil counts", async ({ page }) => {

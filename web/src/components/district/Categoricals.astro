@@ -54,14 +54,23 @@ const parts = [
   ["English learners", c.english_learners, "Three weights that descend as need persists, alone among the six.", "fsfp-english-learner-weights"],
 ] as const;
 
-const bars: Bar[] = parts
-  .filter(([, value]) => value > 0)
-  .map(([label, value]) => ({
-    label,
-    value,
-    direct: pct(value / total, 0),
-    hover: `${label}: ${money(value)}, ${pct(value / total, 1)} of this district's categoricals`,
-  }));
+/*
+ * All six, a program the district receives none of included as a stub labelled `$0` (#659). The
+ * chart drew only the non-zero parts under a heading saying six, and 316 of 609 districts have at
+ * least one zero, so more than half the dashboards showed five bars or fewer and the reader could
+ * not tell an omitted program from one the chart had no room for. In dollars rather than `0%`,
+ * because `0%` is also what a program under half a percent rounds to, and this is not that.
+ */
+const bars: Bar[] = parts.map(([label, value]) =>
+  value > 0
+    ? {
+        label,
+        value,
+        direct: pct(value / total, 0),
+        hover: `${label}: ${money(value)}, ${pct(value / total, 1)} of this district's categoricals`,
+      }
+    : { label, value: 0, direct: money(0), hover: `${label}: ${money(0)}. This district receives none.` },
+);
 
 const share = total / (total + d.base_cost_state_share);
 ---
@@ -72,18 +81,19 @@ const share = total / (total + d.base_cost_state_share);
       <h2><SectionAnchor id="categoricals" />The categorical half, in its six parts<Fragment set:html={yearChip("formula")} /></h2>
       <div class="chartwrap" data-chart="categoricals" set:html={renderToString((w) => barSpec(bars, { width: w, hue: "formula" }), { label: `This district's categorical funding by program, each as a share of its ${money(total)} total, ${yearOf("formula")}` })} />
 
+      {/* Dollars only (#659): the chart above labels each program's share, and a Share column here
+          repeated it, clipped to "SHA" at 375. */}
       <div class="scroll"><table>
-        <thead><tr><th>Program</th><th class="tnum">Amount</th><th class="tnum">Share</th></tr></thead>
+        <thead><tr><th>Program</th><th class="tnum">Amount</th></tr></thead>
         <tbody>
           {parts.map(([label, value, note, node]) => (
             <tr class={value <= 0 ? "n" : undefined}>
                 <th><a href={routes.wikiNode("formula-component", node)}>{label}</a>{note ? <div class="n">{note}</div> : ""}</th>
                 <td class="tnum">{money(value)}</td>
-                <td class="tnum n">{value <= 0 ? "" : pct(value / total, 1)}</td>
               </tr>
           ))}
           <tr class="current"><th>Total categorical funding</th>
-            <td class="tnum">{money(total)}</td><td class="tnum">100.0%</td></tr>
+            <td class="tnum">{money(total)}</td></tr>
         </tbody>
       </table></div>
 

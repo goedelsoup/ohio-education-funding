@@ -123,6 +123,33 @@ test("a bar chart says what its bars are, and plain bars are no series", () => {
   barSpec(bars, { width: WIDTHS.wide });
 });
 
+test("a lone plain series is drawn in no series' hue, and labels only its own line", () => {
+  /*
+   * #659. Cash held was a `hue: "plain"` bar chart and became a line; the line's first hue is
+   * formula blue, which would have undone #652 on 610 pages.
+   */
+  const cash: SeriesPoint[] = [
+    { at: 2020, a: 3, b: null },
+    { at: 2021, a: 5, b: null },
+    { at: 2022, a: 4, b: null },
+  ];
+  const svg = (plain: boolean) =>
+    parseHTML(
+      `<div>${renderToString(
+        (w) => seriesSpec(cash, { a: "held", b: "" }, (v) => `$${v}`, () => "", { width: w, tick: (at) => `${at}`, plain }),
+        "presentational",
+      )}</div>`,
+    ).document;
+  const plain = svg(true);
+  expect(plain.querySelector(".series-a")!.getAttribute("stroke")).toBe(INK.muted);
+  expect(plain.querySelector(".series-end")!.getAttribute("fill")).toBe(INK.muted);
+  expect(plain.querySelector(".series-start")!.getAttribute("fill")).toBe(INK.muted);
+  // One end label, in the first of the chart's drawings: the empty second series has none.
+  expect(plain.querySelector("svg")!.querySelectorAll(".series-end text")).toHaveLength(1);
+  expect(plain.querySelector(".series-end text")!.textContent).toBe("Held $4");
+  expect(svg(false).querySelector(".series-a")!.getAttribute("stroke")).toBe(SERIES.formula);
+});
+
 test("the subject is one colour whatever form it is drawn in", () => {
   /*
    * #652. Columbus was marked blue on its strips and orange on its fan, on one page: the strip
