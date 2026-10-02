@@ -64,6 +64,8 @@ export function tally(
  * H.B. 96 repealed the supplement, so the first step carries its whole FY2025 amount as a loss for
  * every district that had one. Taking it out of both years asks what the rest of a district's
  * payment did. `null` for a district that had none in the first year, where the question is empty.
+ * The same definition as `Row::without_targeted_assistance` in crates/project, and both are pinned
+ * on Lima City's +1.95%.
  */
 export function withoutTargetedAssistance(d: District): { dollars: number; ratio: number } | null {
   const b = d.biennium;

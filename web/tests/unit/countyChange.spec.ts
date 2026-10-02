@@ -53,8 +53,10 @@ test("without the repealed supplement, Lima rose — and it is Allen's only reci
   const recipients = ALLEN.districts.filter((d) => withoutTargetedAssistance(d) != null);
   expect(irns(recipients)).toEqual([LIMA]);
   const lima = withoutTargetedAssistance(byIrn(LIMA))!;
-  expect(lima.dollars).toBeGreaterThan(0);
-  expect(lima.ratio).toBeCloseTo(0.0195, 3);
+  // The same figures `without_targeted_assistance_lima_rose_by_under_two_percent` pins in
+  // crates/project: +1.95%, not the +1.7% #642 printed (#649).
+  expect(lima.dollars).toBeCloseTo(723_412.53, 2);
+  expect(lima.ratio).toBeCloseTo(0.019458, 6);
 });
 
 test("a district with no supplement in FY2025 has no without-it figure", () => {
