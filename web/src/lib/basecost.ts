@@ -212,11 +212,15 @@ export function renderBaseCostBuildUp(d: District, districts: number): string {
   // A dollar or so, from twenty-two roundings. Stated as a figure rather than waved at, and
   // widened to cents because at this size a percentage would read as zero and say nothing.
   const residual = Math.abs(b.residual);
+  // The card's finding (#653): the group the bars show is largest.
+  const largest = parts.reduce((a, g) => (g.total > a.total ? g : a));
 
   return `
     <div class="card" id="base-cost" data-part="base-cost">
       <h2>${anchor("base-cost")}Why base cost is ${money(d.base_cost_per_pupil)} per pupil${yearChip("formula")}</h2>
-      <p class="note">Base cost is not a rate the state sets. It is assembled for each district
+      <p class="note"><strong>The largest part is ${escapeHtml(largest.label.toLowerCase())}, at
+        ${pct(largest.total / aggregate, 0)}: ${money(largest.total)} of ${money(aggregate)}.</strong>
+        Base cost is not a rate the state sets. It is assembled for each district
         from staffing ratios written into R.C. 3317.011, applied to
         <strong>this district's own enrollment</strong> and priced at statewide average salaries.
         ${staff(b.funded_classroom_teachers)} funded classroom teachers and

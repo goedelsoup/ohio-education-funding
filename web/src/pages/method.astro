@@ -19,7 +19,7 @@ import {
 } from "../lib/denominators.ts";
 import * as routes from "../lib/routes.ts";
 import { yearChip, yearOf } from "../lib/year.ts";
-import { coverage, renderCoverage } from "../lib/coverage.ts";
+import { coverage, coverageFinding, renderCoverage } from "../lib/coverage.ts";
 import { pinnedSources } from "../lib/digests.ts";
 import { bias, renderBias } from "../lib/bias.ts";
 import { scatterSpec } from "../lib/plot/spec.ts";
@@ -446,6 +446,11 @@ const millageScatter = renderToString(
   <div class="card" id="reduction-factors" data-part="reduction-factors">
     <h2><SectionAnchor id="reduction-factors" />H.B. 920's reduction factors, against what was charged<Fragment set:html={yearChip("millage")} /></h2>
     <p class="note">
+      <strong>
+        H.B. 920's reduction factors predict the rate exactly for {millage.exact} of{" "}
+        {millage.total} districts: {millage.floorExact} of the {millage.atFloor} districts at
+        the twenty-mill floor, and {millage.aboveExact} of the {millage.aboveFloor} above it.
+      </strong>{" "}
       The card above says base cost is the exception on the <em>funding</em> side. There is one
       more on the property-tax side: <code>crates/millage</code> runs H.B. 920's reduction factors
       forward from each district's prior charged rate, applies the statutory floor, and predicts
@@ -463,10 +468,8 @@ const millageScatter = renderToString(
           and an adjacent expression exactly as JSX does, and "for188 of 609" is what that looks
           like. The e2e suite scans every route for the tag-boundary form of this and cannot see
           this one, because it leaves no tag behind. */}
-      A district on the line is one the factors account for exactly. <strong>They do, for{" "}
-      {millage.exact} of {millage.total}</strong> — and where they do is the part worth stating:{" "}
-      {millage.floorExact} of the {millage.atFloor} districts at the twenty-mill floor land on the
-      line, against {millage.aboveExact} of the {millage.aboveFloor} above it. At the floor the
+      A district on the line is one the factors account for exactly, and where they do is the
+      part worth stating. At the floor the
       reduction factors have stopped operating and there is nothing left to predict; above it they
       are what sets the rate, and that is where the model is approximate.
     </p>
@@ -498,6 +501,10 @@ const millageScatter = renderToString(
 
   <div class="card" id="forecast-range" data-part="forecast-range">
     <h2><SectionAnchor id="forecast-range" />Why the forecast leads with a range</h2>
+    <p class="note">
+      <Fragment set:html={coverageFinding(held)} />{" "}
+      That is a claim about a range, and it is why the range is what the forecast leads with.
+    </p>
     <p class="note">
       A forecast rendered as "$7.13B (±3.4%)" is read as $7.13B. The interval becomes a disclaimer
       the eye skips, which is worse than showing no interval at all, because it lends a forecast

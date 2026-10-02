@@ -111,17 +111,20 @@ const chart = renderToString((w) => fanSpec(
 }
 <p class="note">{
   insensitive ? (
-    <><strong>The flat line is what this district receives, and it is flat by
-       construction.</strong> The guarantee pays a fixed dollar amount that enrollment does
-       not enter, so no forecast of its enrollment moves it and it has no band. The line
-       that falls is what the formula computes at that enrollment
-       — {money(end.formulaAid)} by FY{end.fiscalYear} against {money(end.realizedAid)}{" "}
-       received. The gap between them is the guarantee, and on this projection it{" "}
+    <><strong>By FY{end.fiscalYear} this district is paid{" "}
+       {money(Math.abs(end.realizedAid - end.formulaAid))}{" "}
+       {end.realizedAid < end.formulaAid ? "less" : "more"} than its formula computes:{" "}
+       {money(end.realizedAid)} against {money(end.formulaAid)}.</strong> The flat line is
+       what it receives, and it is flat by construction: the guarantee pays a fixed dollar
+       amount that enrollment does not enter, so no forecast of its enrollment moves it and it
+       has no band. The line that falls is what the formula computes at that enrollment. The
+       gap between them is the guarantee, and on this projection it{" "}
        {(widening ?? 0) > 0 ? "widens by" : "narrows by"}{" "}
        {money(Math.abs(widening ?? 0))} over the horizon.</>
   ) : (
-    <>The range, not the line, is the finding: at FY{end.fiscalYear} enrollment this
-       district's aid is somewhere between {money(end.low)} and {money(end.high)}. The
+    <><strong>At FY{end.fiscalYear} enrollment this district's aid is somewhere between{" "}
+       {money(end.low)} and {money(end.high)}.</strong> The range, not the line, is the
+       finding. The
        band is the cross-sectional spread of district enrollment growth, not this
        district's own history — three observations cannot give that.</>
   )

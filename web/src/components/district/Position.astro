@@ -21,6 +21,7 @@
  * year while the other carried no denominator. The note below names both.
  */
 import * as routes from "../../lib/routes.ts";
+import { ordinal, percentileOf } from "../../lib/format.ts";
 import { hasDenominators } from "../../lib/tax.ts";
 import type { Bundle, District } from "../../lib/types.ts";
 import { yearChip } from "../../lib/year.ts";
@@ -37,11 +38,25 @@ interface Props {
 }
 
 const { bundle, district: d, valuations, expenditures } = Astro.props;
+
+/** The card's finding: the two percentiles the strips mark, in one sentence (#653). */
+const at = (sorted: number[], value: number | null | undefined) =>
+  value == null ? null : ordinal(Math.round(percentileOf(sorted, value) * 100));
+const wealth = at(valuations, d.valuation_per_pupil);
+const spending = at(expenditures, d.operating_expenditure_per_pupil);
+const finding =
+  wealth && spending
+    ? `${d.name} stands at the ${wealth} percentile on tax base per pupil and the ${spending} on operating spending.`
+    : wealth
+      ? `${d.name} stands at the ${wealth} percentile on tax base per pupil; its operating spending is not reported.`
+      : spending
+        ? `${d.name} stands at the ${spending} percentile on operating spending per pupil; its tax base is not reported.`
+        : null;
 ---
 
 <div class="card" id="position" data-part="position">
   <h2><SectionAnchor id="position" />Position among Ohio's {bundle.statewide.districts} districts<Fragment set:html={yearChip("profile")} /></h2>
-  <p class="note">The middle half of Ohio's districts is the shaded box, the line inside it is
+  <p class="note">{finding && <><strong>{finding}</strong>{" "}</>}The middle half of Ohio's districts is the shaded box, the line inside it is
     the median, and the whiskers reach the last district within one and a half times the
     box's width. Anything drawn past them is its own district. The colored rule is this one.</p>
   <Strip

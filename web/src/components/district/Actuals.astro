@@ -75,6 +75,20 @@ const peak = held.reduce<(typeof held)[number] | null>(
   (a, b) => (a == null || b.ending_cash! > a.ending_cash! ? b : a),
   null,
 );
+// The card's finding (#653), read off the bars it sits over: the last balance drawn, against the first.
+const heldFirst = held[0];
+const heldLast = held[held.length - 1];
+const heldMoved = heldFirst && heldLast ? heldLast.ending_cash! - heldFirst.ending_cash! : 0;
+const finding =
+  heldFirst && heldLast && heldFirst !== heldLast
+    ? `This district held ${money(heldLast.ending_cash)} at 30 June FY${heldLast.fiscal_year}, ${
+        Math.abs(heldMoved) < 0.5
+          ? "the same as"
+          : `${money(Math.abs(heldMoved))} ${heldMoved < 0 ? "less" : "more"} than`
+      } in FY${heldFirst.fiscal_year}${converted ? `, in FY${base} dollars` : ""}.`
+    : heldLast
+      ? `This district held ${money(heldLast.ending_cash)} at 30 June FY${heldLast.fiscal_year}${converted ? `, in FY${base} dollars` : ""}.`
+      : null;
 const bars = held.map((y) => ({
   label: `FY${y.fiscal_year}`,
   value: y.ending_cash!,
@@ -114,6 +128,13 @@ const bars = held.map((y) => ({
       <div class="chartwrap" data-chart="cash" set:html={renderToString((w) => barSpec(bars, { width: w, hue: "plain" }), { label: `General fund cash held at 30 June by fiscal year, FY${first.fiscal_year} to FY${latest.fiscal_year}${converted ? `, in FY${base} dollars` : ""}` })} />
     )
   }
+  <p class="note">{finding && <><strong>{finding}</strong>{" "}</>}Cash held at 30 June, general fund{
+    converted ? `, in FY${base} dollars — deflated with ${bundle.deflator?.label ?? "an index"}` : ""
+  }.
+    FY{PANDEMIC_YEARS[0]}–FY{PANDEMIC_YEARS[PANDEMIC_YEARS.length - 1]} are the federal
+    pandemic relief years: that money was booked in the general fund by some districts and
+    separately by others, so a balance rising across them is not evidence about this
+    district's own position.</p>
   {
     unreported.length > 0 && (
       <p class="note">This district's filing carries no cash balance for{" "}
@@ -123,13 +144,6 @@ const bars = held.map((y) => ({
         reporting that it held nothing.</p>
     )
   }
-  <p class="note">Cash held at 30 June, general fund{
-    converted ? `, in FY${base} dollars — deflated with ${bundle.deflator?.label ?? "an index"}` : ""
-  }.
-    FY{PANDEMIC_YEARS[0]}–FY{PANDEMIC_YEARS[PANDEMIC_YEARS.length - 1]} are the federal
-    pandemic relief years: that money was booked in the general fund by some districts and
-    separately by others, so a balance rising across them is not evidence about this
-    district's own position.</p>
 
   <div class="scroll"><table>
     <thead><tr>

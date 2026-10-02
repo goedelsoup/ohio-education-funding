@@ -172,8 +172,9 @@ test.describe("whether Ohio is unusual", () => {
     await expect(chart).toContainText("Ohio (7th of 51)");
     const rule = card.locator('p.note:has(+ [data-chart="local-share"])');
     await expect(rule).toBeVisible();
-    await expect(rule).toContainText("than 44 states");
     await expect(rule).toContainText("the national figure");
+    // The ranking is the card's finding, so it leads the first note in bold (#653).
+    await expect(card.locator("p.note").first().locator("strong")).toContainText("than 44 states");
   });
 
   test("the property tax rank names the states it excludes and why", async ({ page }) => {
