@@ -139,7 +139,16 @@ export function renderAppropriations(
   return `
     <div class="card" data-part="appropriations">
       <h2>${anchor("appropriations")}What the legislature set aside${yearChip("appropriations")}</h2>
-      <p class="note">Every appropriation line the Department of Education and Workforce was
+      <p class="note"><strong>The department was appropriated ${BILLIONS(first.enacted)} in
+        FY${first.fiscal_year} and ${BILLIONS(last.enacted)} in FY${last.fiscal_year}${
+          multiple == null
+            ? ""
+            : multiple >= 1.05
+              ? `: ${multiple.toFixed(2)}× as much`
+              : multiple <= 0.95
+                ? `: ${multiple.toFixed(2)}× its starting value`
+                : ", not a material change"
+        }, in ${escapeHtml(label)}.</strong> Every appropriation line the Department of Education and Workforce was
         given, FY${first.fiscal_year} through FY${last.fiscal_year}, in ${escapeHtml(label)}. The
         upper line is the department's whole appropriation; the lower is the two lines the funding
         formula itself is paid from. Property tax reimbursement lines are excluded — they are
@@ -147,11 +156,7 @@ export function renderAppropriations(
 
       <div class="scroll">${chart}</div>
 
-      <p class="note">${
-        multiple == null
-          ? ""
-          : `Across this window the appropriation ${multiple >= 1.05 ? `grew ${multiple.toFixed(2)}×` : multiple <= 0.95 ? `fell to ${multiple.toFixed(2)}× its starting value` : "did not materially change"} in ${escapeHtml(label)}.`
-      } The same series on the other basis tells a different story, which is the reason this card
+      <p class="note">The same series on the other basis tells a different story, which is the reason this card
         carries the switch: a nominal total that rises every biennium is compatible with a real
         total that does not move, and both sentences are true.${
           dropped > 0

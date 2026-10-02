@@ -54,6 +54,19 @@ const spreadValues = house.members
     hover: `${d.name}: ${money(d.valuation_per_pupil!)} per pupil, ${money(d.realized_aid_per_pupil)} state aid per pupil`,
   }));
 const spreadCount = spreadValues.length;
+// The card's finding (#653): the two ends of the strip, by name.
+const valued = house.members
+  .map((m) => byIrn.get(m.irn))
+  .filter((d): d is NonNullable<typeof d> => d != null && d.valuation_per_pupil != null)
+  .sort((a, b) => a.valuation_per_pupil! - b.valuation_per_pupil!);
+const seatPoorest = valued[0];
+const seatRichest = valued[valued.length - 1];
+const spreadFinding =
+  seatPoorest && seatRichest && seatPoorest !== seatRichest && seatPoorest.valuation_per_pupil! > 0
+    ? `${seatRichest.name} stands on ${(seatRichest.valuation_per_pupil! / seatPoorest.valuation_per_pupil!).toFixed(1)}× the tax base per pupil of ${seatPoorest.name}: ${money(seatRichest.valuation_per_pupil!)} against ${money(seatPoorest.valuation_per_pupil!)}.`
+    : seatRichest
+      ? `${seatRichest.name} stands on ${money(seatRichest.valuation_per_pupil!)} of tax base per pupil.`
+      : null;
 const spread = renderToString((w) => distributionSpec(spreadValues, { width: w, format: compactMoney }), { label: `Assessed valuation per pupil across the ${spreadCount} districts in ${label} District ${number} with a reported tax base, poorest to wealthiest` });
 /*
  * The valuation column, beside the strip it is drawn from.
@@ -126,7 +139,7 @@ const valuationByIrn = new Map(
       spread && (
         <>
           <p class="note">
-            Assessed valuation per pupil across the {spreadCount} districts here with a reported
+            {spreadFinding && <><strong>{spreadFinding}</strong>{" "}</>}Assessed valuation per pupil across the {spreadCount} districts here with a reported
             tax base, poorest on the left.
             {" "}{spreadCount >= BOX_FROM ? " The shaded box is the middle half of them." : ""}
           </p>

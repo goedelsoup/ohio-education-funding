@@ -128,6 +128,12 @@ const overlapping = (() => {
   <div class="card" id="disparity" data-part="disparity">
     <h2><SectionAnchor id="disparity" />What each county spans<Fragment set:html={yearChip("formula")} /></h2>
     <p class="note">
+      <strong>
+        The widest span is {widest.name} County's: {widest.richest!.name} stands on{" "}
+        {widest.valuationRatio!.toFixed(1)}&times; the tax base per pupil of{" "}
+        {widest.poorest!.name}, {money(widest.richest!.valuation_per_pupil!)} against{" "}
+        {money(widest.poorest!.valuation_per_pupil!)}.
+      </strong>{" "}
       One row per county: the assessed valuation per pupil its poorest district stands on, its
       richest, and the distance between them. Ordered by that distance, widest at the top — the
       same order as the table below.

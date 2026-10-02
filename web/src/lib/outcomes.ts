@@ -217,14 +217,14 @@ export function renderOutcomes(bundle: Bundle): string {
 
     <div class="card" id="poverty-and-performance" data-part="poverty-and-performance">
       <h2>${anchor("poverty-and-performance")}Poverty is most of what the Performance Index measures${yearChip("outcome.performance")}</h2>
-      <p class="note">One dot per district: the share of its pupils the state counts as
-        economically disadvantaged, against its Performance Index. The line is the median of each
+      <p class="note"><strong>Economic disadvantage explains about
+        ${pct(o.poverty_vs_performance ** 2, 0)} of the variance in the Performance Index, at a
+        correlation of ${coefficient(o.poverty_vs_performance)}.</strong> One dot per district: the
+        share of its pupils the state counts as economically disadvantaged, against its Performance Index. The line is the median of each
         fifth of districts, least poor on the left — the summary this card used to show on its
         own, now drawn over the ${count(povertyPoints.length)} districts it summarizes.</p>
       <div class="chartwrap" data-chart="poverty-and-performance">${renderToString(povertyScatter, { label: `Economically disadvantaged share against Performance Index across ${count(povertyPoints.length)} districts, with the median of each poverty fifth, ${yearOf("outcome.performance")}` })}</div>
-      <p class="note">At <strong>${coefficient(o.poverty_vs_performance)}</strong>, economic
-        disadvantage explains about ${pct(o.poverty_vs_performance ** 2, 0)} of the variance in
-        Ohio's attainment measure. Any other district-level variable correlated with it will
+      <p class="note">That is most of Ohio's attainment measure. Any other district-level variable correlated with it will
         appear to predict achievement, and mostly will not be.</p>
     </div>
 
@@ -252,7 +252,10 @@ export function renderOutcomes(bundle: Bundle): string {
 
     <div class="card" id="two-denominators" data-part="two-denominators">
       <h2>${anchor("two-denominators")}The same numerator, two denominators, two answers${yearChipPair("outcome.performance", "outcome.spending", "spending")}</h2>
-      <p class="note">The same districts and the same two axes, twice — both charts are drawn on
+      <p class="note"><strong>Divided by need-weighted pupils, spending correlates with
+        attainment at ${coefficient(o.weighted_spending_vs_performance)}; divided by enrolled
+        pupils, at ${coefficient(o.enrolled_spending_vs_performance)}.</strong> The same districts
+        and the same two axes, twice — both charts are drawn on
         one horizontal scale spanning the wider of the two denominators, so a difference in
         horizontal position is a difference in dollars and not in the frame. Above, the department
         divides spending by a count weighted upward for disadvantage, English learners and
@@ -422,7 +425,11 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
       </div>
       ${
         draws(peerBox)
-          ? `<p class="note">Every district in that fifth, by Performance Index — the shaded box is
+          ? `<p class="note"><strong>${escapeHtml(district.name)} scores ${
+               Math.abs(gap) < 0.05
+                 ? `level with the median of its poverty fifth, ${fixed(peerMedian, 1)}`
+                 : `${fixed(Math.abs(gap), 1)} points ${gap < 0 ? "below" : "above"} the median of its poverty fifth: ${fixed(o.performance_index, 1)} against ${fixed(peerMedian, 1)}`
+             }.</strong> Every district in that fifth, by Performance Index — the shaded box is
              its middle half, the line inside it the middle of the fifth, and the
              colored rule is ${escapeHtml(district.name)}. The gap in the third tile is worth what
              the width of this box says it is worth.</p>

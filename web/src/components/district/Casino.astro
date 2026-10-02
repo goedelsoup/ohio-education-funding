@@ -103,12 +103,16 @@ const bars: Bar[] = d.casino.map((y) => ({
   first && latest && (
     <div class="card" id="casino" data-part="casino">
       <h2><SectionAnchor id="casino" />The money that reaches this district outside the formula<Fragment set:html={yearChip("casino")} /></h2>
-      <p class="note">Every other figure on this page is state aid computed by a formula or booked
+      <p class="note"><strong>This district received {money(latest.amount)} from the casino
+        fund in FY{latest.fiscal_year}{shareOfAid == null
+          ? "."
+          : `, ${pct(shareOfAid, 2)} of the state aid it booked that year.`}</strong>{" "}
+        Every other figure on this page is state aid computed by a formula or booked
         by the treasurer as grants-in-aid. This is neither. It is a share of the{" "}
         <a href={routes.wikiNode("revenue-stream", "casino-tax-distribution")}>gross casino
         revenue county student fund</a>, which moves from the Tax Commissioner through county
         funds to districts and never becomes an appropriation to the department — so{" "}
-        <strong>nothing above this card counts it</strong>.</p>
+        nothing above this card counts it.</p>
 
       <div class="tiles">
         <div class="tile"><div class="k">Received, FY{latest.fiscal_year}</div>

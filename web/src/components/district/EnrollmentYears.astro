@@ -74,16 +74,16 @@ const admChange = latest && prior ? latest.adm - prior.adm : 0;
             </tr>
         ))}</tbody>
       </table></div>
-      <p class="note">Moving from FY{prior.year} to FY{latest.year} enrollment{" "}
+      <p class="note"><strong>Moving from FY{prior.year} to FY{latest.year} enrollment{" "}
         {admChange < 0 ? "cost" : "gained"} this district{" "}
         {count(Math.abs(Math.round(admChange)))} pupils and{" "}
-        <strong class={change < 0 ? "loss" : "gain"}>{signedMoney(change)}</strong>{" "}
+        <span class={change < 0 ? "loss" : "gain"}>{signedMoney(change)}</span>{" "}
         {
           Math.abs(change) < 0.5 && d.on_guarantee
             ? `— nothing, because the guarantee holds its aid at a fixed dollar amount that
                enrollment does not enter.`
             : `, or ${signedMoney(latest.adm > 0 ? change / latest.adm : 0, 2)} per pupil.`
-        }</p>
+        }</strong></p>
       <p class="note">These are <strong>not</strong> published FY{prior.year} and
         FY{latest.year} funding totals — the department publishes one calculator at a time and
         this site holds the FY{bundle.fiscal_year} one, so no FY{prior.year} payment

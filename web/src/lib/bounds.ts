@@ -181,10 +181,21 @@ export function renderCensus(c: Census): string {
     naming,
   );
 
+  // The bounds no district is on, for the card's finding (#653).
+  const inert = c.rows.filter((row) => row.value === 0).length;
+
   return `
     <div class="card" id="census" data-part="census">
       <h2>${anchor("census")}${count(c.rows.length)} bounds, and who is on each${yearChip("formula")}</h2>
-      <p class="note">Each row is one floor, one ceiling or one clamp written into the funding
+      <p class="note"><strong>One bound decides the amount for ${count(c.most.value)} ${
+        c.most.of === undefined || c.most.of === c.whole
+          ? `of Ohio's ${count(c.whole)} districts`
+          : `of the ${count(c.most.of)} districts it applies to`
+      }${
+        inert === 0
+          ? ""
+          : `, and ${inert === 1 ? "one" : count(inert)} of the ${count(c.rows.length)} ${inert === 1 ? "decides" : "decide"} it for none`
+      }.</strong> Each row is one floor, one ceiling or one clamp written into the funding
         formula, and its mark is the number of districts for which that bound — rather than the
         quantity it is bounding — is what actually decides the amount. The scale is logarithmic
         because the two ends of this census are ${count(c.most.value)} districts and

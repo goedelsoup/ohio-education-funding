@@ -142,11 +142,12 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
   return `
     <div class="card" id="meal-program" data-part="meal-program">
       <h2>${anchor("meal-program")}What the poverty weight is counted on${yearChip("meal_program")}</h2>
-      <p class="note">Free and reduced-price lunch applications approved, as a share of the
-        meal-program enrollment count, across every public sponsor in the Office for Child
-        Nutrition's MR-81. It rose from ${pct(first.share!, 1)} in FY${first.fiscal_year} to
-        ${pct(last.share!, 1)} in FY${last.fiscal_year} — fourteen Octobers, where the rest of this
-        site has six years of anything.</p>
+      <p class="note"><strong>Approved applications ${last.share! < first.share! ? "fell" : "rose"} from ${pct(first.share!, 1)} of
+        the enrollment count in FY${first.fiscal_year} to ${pct(last.share!, 1)} in
+        FY${last.fiscal_year}.</strong> Free and reduced-price lunch applications approved, as a
+        share of the meal-program enrollment count, across every public sponsor in the Office for
+        Child Nutrition's MR-81 — fourteen Octobers, where the rest of this site has six years of
+        anything.</p>
 
       <div class="scroll">${chart}</div>
 

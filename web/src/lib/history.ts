@@ -179,10 +179,11 @@ export function renderRevenueMix(history: HistoryYear[]): string {
   return `
     <div class="card" id="revenue-mix" data-part="revenue-mix">
       <h2>${anchor("revenue-mix")}Where the money came from${yearChip("history")}</h2>
-      <p class="note">Local, state and federal revenue as shares of the total, across every
-        comparable Ohio school system the Census Bureau surveyed. The state share fell from
+      <p class="note"><strong>The state share ${last.state_share < first.state_share ? "fell" : "rose"} from
         ${pct(first.state_share, 1)} in FY${first.fiscal_year} to ${pct(last.state_share, 1)} in
-        FY${last.fiscal_year}, and the local share rose to meet it.</p>
+        FY${last.fiscal_year}, and the local share ${last.state_share < first.state_share ? "rose to meet it" : "gave way"}.</strong>
+        Local, state and federal revenue as shares of the total, across every comparable Ohio
+        school system the Census Bureau surveyed.</p>
 
       <div class="scroll">${chart}</div>
 
@@ -274,7 +275,11 @@ export function renderEqualization(
   return `
     <div class="card" data-part="equity-gap">
       <h2>${anchor("equity-gap")}Whom it reached${yearChip("history")}</h2>
-      <p class="note">Districts sorted by local revenue per pupil and cut into quarters. The gap is
+      <p class="note"><strong>The gap between the poorest and richest quarter of districts
+        ${last.gap_per_pupil < first.gap_per_pupil ? "narrowed" : "grew"} from ${money(first.gap_per_pupil)}
+        per pupil in FY${first.fiscal_year} to ${money(last.gap_per_pupil)} in
+        FY${last.fiscal_year}.</strong> Districts sorted by local revenue per pupil and cut into
+        quarters. The gap is
         the distance between the poorest quarter and the richest; the second line is what neither
         state nor federal aid closes, which is the part a district actually experiences.
         ${basis === "real" ? `In FY${base} dollars.` : "In the dollars of each year."}</p>

@@ -178,12 +178,18 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
       { width: w, format: compactMoney },
     );
 
+  // The card's finding (#653), from the two ends the table names.
+  const finding = `<strong>${escapeHtml(rich.name)} stands on ${c.valuationRatio.toFixed(1)}×
+    ${escapeHtml(poor.name)}'s tax base per pupil: ${money(rich.valuation_per_pupil!)} against
+    ${money(poor.valuation_per_pupil!)}.</strong>`;
+  const drawsDots = draws(dots);
+
   return `
     <div class="card" id="spread" data-part="spread">
       <h2>${anchor("spread")}The spread inside ${escapeHtml(c.name)} County${yearChip("formula")}</h2>
       ${
-        draws(dots)
-          ? `<p class="note">Every district in the county by the assessed valuation each of its
+        drawsDots
+          ? `<p class="note">${finding} Every district in the county by the assessed valuation each of its
              pupils stands on — one dot each, poorest on the left.${
                c.districts.filter((d) => d.valuation_per_pupil != null).length >= BOX_FROM
                  ? " The shaded box is the middle half of them."
@@ -210,7 +216,7 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
             <td class="tnum">${count(Math.round(poor.adm))}</td></tr>
         </tbody>
       </table></div>
-      <p class="note">These four figures are the headline; <a href="${routes.compare(
+      <p class="note">${drawsDots ? "" : `${finding} `}These four figures are the headline; <a href="${routes.compare(
         rich.irn,
         poor.irn,
       )}">the full comparison</a> puts the two side by side on every measure the panel carries.</p>

@@ -14,6 +14,13 @@ import { anchor } from "./section.ts";
 import { medianTrace, pairs } from "./relationships.ts";
 import { firstOf, lastOf } from "./ends.ts";
 
+/** A ratio change as a distance from where it started: `8% above`, `14% below`, `level with`. */
+function against(ratio: number | null): string {
+  if (ratio == null) return "unmeasured against";
+  if (Math.abs(ratio) < 0.005) return "level with";
+  return `${pct(Math.abs(ratio), 0)} ${ratio < 0 ? "below" : "above"}`;
+}
+
 /**
  * The financial actuals, statewide, in both bases.
  *
@@ -100,17 +107,19 @@ export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
       </div>
 
       <div class="chartwrap" data-chart="statewide-cash">${renderToString((w) => barSpec(bars, { width: w, hue: "plain" }), { label: `General fund cash held at 30 June, summed over the ${count(bundle.statewide.districts)} districts in this feed, by fiscal year, FY${first.fiscal_year} to FY${latest.fiscal_year}, ${label}` })}</div>
-      <p class="note">General fund cash held at 30 June, summed over the
-        ${count(bundle.statewide.districts)} districts in this feed.
-        ${
+      <p class="note">${
           converted
-            ? `Deflated with <strong>${bundle.deflator?.label ?? "an index"}</strong>. Nominally
-               the balance ends ${pct(nominalCashChange, 0)}
-               above FY${first.fiscal_year}; in constant dollars it ends
-               ${pct(cashChange == null || !first.ending_cash ? null : cashChange / first.ending_cash, 0)}. Both are correct and they support
-               opposite arguments, which is why this page will not show only one.`
-            : `These are the figures as filed. The panel spans the sharpest price change in forty
-               years, so switch to constant dollars before drawing a conclusion from the shape.`
+            ? `<strong>In constant dollars the balance ends ${against(cashChange == null || !first.ending_cash ? null : cashChange / first.ending_cash)}
+               FY${first.fiscal_year}; nominally it ends ${against(nominalCashChange)} it.</strong>
+               Both are correct and they support opposite arguments, which is why this page will
+               not show only one. General fund cash held at 30 June, summed over the
+               ${count(bundle.statewide.districts)} districts in this feed, deflated with
+               ${bundle.deflator?.label ?? "an index"}.`
+            : `<strong>Districts held ${millions(latest.ending_cash).replace("+", "")} at 30 June
+               FY${latest.fiscal_year}, ${against(nominalCashChange)} FY${first.fiscal_year}.</strong>
+               General fund cash, summed over the ${count(bundle.statewide.districts)} districts in
+               this feed, as filed. The panel spans the sharpest price change in forty years, so
+               switch to constant dollars before drawing a conclusion from the shape.`
         }</p>
       <p class="note">FY2021–FY2024 are the federal pandemic relief years: that money was booked
         in the general fund by some districts and separately by others, so a balance rising
@@ -261,7 +270,9 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
 
     <div class="card" id="guarantee" data-part="guarantee">
       <h2>${anchor("guarantee")}Who is on the guarantee${yearChip("formula")}</h2>
-      <p class="note">Districts grouped into fifths by assessed valuation per pupil, poorest at
+      <p class="note"><strong>${pct(lastOf(bars).value, 0)} of the wealthiest fifth of
+        districts are on the guarantee, against ${pct(firstOf(bars).value, 0)} of the
+        poorest.</strong> Districts grouped into fifths by assessed valuation per pupil, poorest at
         the top. The guarantee was written as transitional relief for districts losing
         students; the pattern it actually produces is a wealth gradient.</p>
       <div class="chartwrap" data-chart="quintiles">${renderToString((w) => barSpec(bars, { width: w, max: 1, hue: "guarantee" }), { label: `Share of districts on the guarantee by fifth of assessed valuation per pupil, poorest fifth first, FY${bundle.fiscal_year}` })}</div>
@@ -271,7 +282,10 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
 
     <div class="card" id="wealth-offset" data-part="wealth-offset">
       <h2>${anchor("wealth-offset")}Does state aid offset property wealth?${yearChipPair("formula", "profile", "valuation")}</h2>
-      <p class="note">One dot per district: the assessed valuation each of its pupils stands on,
+      <p class="note"><strong>State aid falls as property wealth rises, and the guarantee holds
+        up the top end: it pays ${money(gapWealthiest)} per pupil above the formula among the
+        wealthiest tenth of districts and ${money(gapPoorest)} among the least wealthy.</strong>
+        One dot per district: the assessed valuation each of its pupils stands on,
         against the state aid each of them receives. A compensating formula slopes down to the
         right, and this one does. The two lines are medians through ten equal-count groups of
         districts — one of what the formula computes, one of what is actually paid. Both scales
@@ -279,9 +293,8 @@ export function renderStatewideStructure(bundle: Bundle, tax: TaxStatewide): str
         thirty; on a linear axis nine districts in ten sit in the left-hand third.</p>
       <div class="chartwrap" data-chart="wealth-offset">${renderToString(scatter, { label: `State aid per pupil against assessed valuation per pupil, one dot for each of ${count(points.length)} districts, with median lines for formula aid and aid as received, both axes logarithmic, FY${bundle.fiscal_year}` })}</div>
       <p class="note"><strong>The gap between the two lines is what the guarantee costs the
-        equalization.</strong> It is ${money(gapPoorest)} per pupil among the least wealthy tenth
-        of districts and ${money(gapWealthiest)} among the wealthiest — the formula would pay the
-        wealthy districts least, and the guarantee is what stops it. Which districts those are is
+        equalization.</strong> The formula would pay the wealthy districts least, and the guarantee
+        is what stops it. Which districts those are is
         the card above this one. Read as correlations against
         valuation per pupil, the formula alone reaches
         <strong>${fixed(s.wealth_neutrality_formula, 3)}</strong> and what districts receive
@@ -453,7 +466,10 @@ export function renderNational(national: National | null): string {
   return `
     <div class="card" id="national" data-part="national">
       <h2>${anchor("national")}Whether Ohio is unusual${yearChip("national")}</h2>
-      <p class="note">Everything else on this site is Ohio describing itself. This is the Census
+      <p class="note"><strong>Ohio raises ${pct(share(ohio.local_revenue), 1)} of its school
+        money locally, against ${pct(national.national_local_share, 1)} nationally — more than
+        ${count(national.states.length - national.ohio_local_rank)} states.</strong>
+        Everything else on this site is Ohio describing itself. This is the Census
         Bureau counting every school system in the country on one set of definitions, for
         FY${national.fiscal_year} — the only figures here that can say whether what Ohio does is
         normal.</p>
@@ -472,8 +488,7 @@ export function renderNational(national: National | null): string {
           .join("")}</tbody>
       </table></div>
 
-      <p class="note"><strong>Ohio raises more of its school money locally than
-        ${count(national.states.length - national.ohio_local_rank)} states.</strong> ${lead}</p>
+      <p class="note">${lead}</p>
       <div class="chartwrap" data-chart="local-share">${renderToString((w) => barSpec(bars, { width: w, hue: "plain" }), { label: `Local share of school revenue by state, percent of total revenue, the states with the highest share and Ohio, FY${national.fiscal_year}`, description: `${shown.length} of ${national.states.length} states are drawn: those with the highest local share, and Ohio at rank ${national.ohio_local_rank}; the last bar is all ${national.states.length} combined, at ${pct(national.national_local_share, 1)}` })}</div>
 
       <p class="note"><strong>Ohio spends about what the country spends and raises it differently.

@@ -153,6 +153,18 @@ function nodeHref(c: Coverage): string {
 }
 
 /**
+ * The forecast card's finding, as the bold lead-in of its first note (#653): the flat line's two
+ * ends against what the band claims, from the same figures the note under the chart states.
+ */
+export function coverageFinding(c: Coverage): string {
+  const dated = yearOf("history");
+  return `<strong>Backtested${dated ? ` over ${dated}` : ""}, the band held
+    ${pct(c.crossDistrict.first, 1)} of district forecasts at one year and
+    ${pct(c.crossDistrict.last, 1)} at ${c.deepest}, against the ${pct(c.reference.value, 1)} it
+    claims.</strong>`;
+}
+
+/**
  * The chart, and what the two lines say.
  *
  * Server-rendered like every other static chart here: `check:dist` reads the built HTML, and the
