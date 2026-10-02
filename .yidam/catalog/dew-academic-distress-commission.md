@@ -110,8 +110,8 @@ describes, because R.C. 3302.10 does not apply to it while the plan runs.
 **Cleveland is not on this list**, and the omission is informative rather than an oversight.
 The *former* R.C. 3302.10 is the pre-2015 regime that the current section refers to when it speaks
 of a commission "still in existence on October 15, 2015". R.C. 3302.103(A) lists the two
-former-section commissions that survived into the current one, established in 2010 and 2013, and
-those are Youngstown's and Lorain's. So if Cleveland was ever under a commission, it had left by then. The
+former-section commissions that survived into the current one: Youngstown's, established in 2010,
+is division (A)(2), and Lorain's, established in 2013, is (A)(1). So if Cleveland was ever under a commission, it had left by then. The
 corpus recorded Cleveland as "subject to state academic distress intervention for part of the
 period" without distinguishing the two regimes.
 
@@ -123,11 +123,32 @@ period" without distinguishing the two regimes.
 - **No dates for establishment.** The page gives the 2021 plan requirement, the 2023 Lorain
   dissolution and East Cleveland's release, and does not say when any commission was established.
   R.C. 3302.103(A) supplies the years, 2010, 2013 and 2018, without naming districts. East
-  Cleveland's is the 2018 one, from the reporting around its release. Which of Youngstown and
-  Lorain is 2010 is not on this page or in any held source. [open]
+  Cleveland's is the 2018 one, from the reporting around its release. This entry used to say that
+  which of Youngstown and Lorain held the 2010 commission was in no held source. The department's
+  archived pages settle it, and they are listed below.
 - **The linked documents are not held.** Approval letters, improvement plans and annual reports are
   separate PDFs. Three have been read: East Cleveland's release notice, Youngstown's extension
   approval and its 2024-25 annual report. None is committed. They would carry the benchmarks each district was held to, which is the only place
   the corpus could learn what a commission actually required. [open]
 - **A page, not a dataset.** Any figure taken from it is a transcription, and there is no digest
   behind it. Treat claims sourced here as weaker than claims sourced from a pinned fixture.
+
+**The archived pages that date the commissions.** The department's commission pages from before
+its 2016 site move survive in the Internet Archive, and they date what the current page does not.
+All were read on 2 October 2026, and none is committed.
+
+- **Youngstown's recovery plan page**, Wayback `20150425032807`, at
+  `education.ohio.gov/Topics/School-Improvement/Academic-Distress-Commission/Youngstown-City-Schools-Academic-Recovery-Plan`
+  (HTML SHA-256 `95ec0eb8…46`). It says the commission "was established by the State
+  Superintendent of Public Instruction in January of 2010, pursuant to Section 3302.10". The
+  commission adopted its Academic Recovery Plan on 28 June 2010, and the superintendent approved it
+  on 27 July 2010. The 2014-15 Youngstown plan (Wayback `20160508151637`, SHA-256 `ab10c493…eb38`)
+  also dates the commission to 2010.
+- **Lorain's Academic Recovery Plan**, Wayback `20151228090442`, at
+  `…/Lorain/Lorain-City-Schools-Academic-Recovery-Plan.pdf.aspx` (16 pages, SHA-256
+  `a89eb00f…2af859`). It says the commission "was established by the State Superintendent of Public
+  Instruction in April of 2013", and the commission adopted the plan on 19 August 2013. Its first
+  minutes are dated 22 April 2013 (Wayback `20151228084202`, SHA-256 `33cc58d6…6c56`).
+
+So R.C. 3302.103(A)(2), the 2010 commission, is Youngstown's, and (A)(1), the 2013 one, is
+Lorain's.
