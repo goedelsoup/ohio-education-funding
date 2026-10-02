@@ -55,3 +55,44 @@ export const pages = (dir: string = DIST): string[] =>
         ? [join(dir, entry.name)]
         : [],
   );
+
+/*
+ * # Parsing less than the page
+ *
+ * A full linkedom parse of every page is most of what this project costs (#646): 17.6s a sweep
+ * over the build, and six tests made one each. Most of them read a small part of what they parse,
+ * so these two cut the input down to the part read — and each is written so that what the caller
+ * reads comes out byte-identical, not merely close. A narrowed sweep that passes because it no
+ * longer sees the defect is the failure to fear here, so the tests that use them carry a bite
+ * test on a doctored real page as well as a count of what they found.
+ */
+
+/**
+ * The page up to and including `</head>`: the `<title>` and every `<meta>`, and nothing of the
+ * body. Throws on a page with no `</head>` rather than returning a fragment that would read as a
+ * page with no title.
+ */
+export function head(html: string, file = "a page"): string {
+  const end = html.indexOf("</head>");
+  if (end < 0) throw new Error(`${file} has no </head>`);
+  return html.slice(0, end + "</head>".length);
+}
+
+/** One tag, with `>` allowed inside a quoted attribute value. */
+const TAG = /<(?:[^>"']|"[^"]*"|'[^']*')*>/g;
+
+/**
+ * The page with every inline `<svg>` reduced to its text.
+ *
+ * A chart's marks — the rects, paths and their coordinates — are about half of what a parse of
+ * the build spends its time on, and no sweep that reads text reads them. Its text it does read:
+ * `body.textContent` carries every axis foot and direct label, and a cell holding a sparkline
+ * counts its words. So the tags go and the text stays, in place, and `textContent` of every
+ * element that held a drawing is what it was. That holds because no drawing in the build nests
+ * another, holds a comment, or carries a `<style>` or `<script>` whose text a sweep would
+ * otherwise remove — and `artefact.spec.ts` holds each of those over the build.
+ *
+ * Not for a sweep that reads a drawing's elements or attributes: those parse the page whole.
+ */
+export const drawingsAsText = (html: string): string =>
+  html.replace(/<svg\b[\s\S]*?<\/svg>/g, (svg) => svg.replace(TAG, ""));

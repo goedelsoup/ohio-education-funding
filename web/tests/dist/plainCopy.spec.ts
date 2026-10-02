@@ -38,7 +38,7 @@ import { relative } from "node:path";
 import { parseHTML } from "linkedom";
 import { describe, expect, test } from "vitest";
 
-import { DIST, pages } from "./artefact.ts";
+import { DIST, drawingsAsText, pages } from "./artefact.ts";
 
 /** The routes that may keep technical references, relative to `dist/`. */
 const EXEMPT = /^(method\.html|data\.html|data\/|wiki\.html|wiki\/)/;
@@ -50,9 +50,14 @@ const PATTERNS: [string, RegExp][] = [
   ["a file-stem slug", /\b[a-z]+(?=(?:-[a-z0-9]+){3,}\b)(?:-[a-z0-9]+)*?-\d+(?:-[a-z0-9]+)+\b/g],
 ];
 
-/** The page's visible text: the title and the body, without scripts, styles or templates. */
+/**
+ * The page's visible text: the title and the body, without scripts, styles or templates.
+ *
+ * Drawings reduced to their text first (#646): a chart's labels are visible text and stay in
+ * scope; its marks are not, and are half the parse.
+ */
 function visibleText(file: string): string {
-  const { document } = parseHTML(readFileSync(file, "utf8"));
+  const { document } = parseHTML(drawingsAsText(readFileSync(file, "utf8")));
   for (const node of document.querySelectorAll("script, style, template")) node.remove();
   const title = document.querySelector("title")?.textContent ?? "";
   return `${title}\n${document.body?.textContent ?? ""}`.replace(/\s+/g, " ");

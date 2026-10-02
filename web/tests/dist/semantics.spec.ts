@@ -30,7 +30,7 @@ import { describe, expect, test } from "vitest";
 
 import { parseHTML } from "linkedom";
 
-import { DIST, pages } from "./artefact.ts";
+import { DIST, drawingsAsText, pages } from "./artefact.ts";
 
 describe("document semantics", () => {
 
@@ -111,8 +111,9 @@ describe("document semantics", () => {
 
     for (const file of pages()) {
       const where = file.slice(DIST.length + 1);
-      const html = readFileSync(file, "utf8");
-      const { document } = parseHTML(html);
+      // Drawings reduced to their text (#646): no `td` or heading is inside one, and a cell that
+      // holds one counts the same words either way.
+      const { document } = parseHTML(drawingsAsText(readFileSync(file, "utf8")));
 
       for (const cell of document.querySelectorAll("td")) {
         if (cell.closest("table")?.classList.contains("prose")) continue;

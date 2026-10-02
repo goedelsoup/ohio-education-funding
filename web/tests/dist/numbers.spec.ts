@@ -19,7 +19,7 @@ import { relative } from "node:path";
 import { parseHTML } from "linkedom";
 import { describe, expect, test } from "vitest";
 
-import { DIST, pages } from "./artefact.ts";
+import { DIST, drawingsAsText, pages } from "./artefact.ts";
 
 /** The text a `.tnum` element opens with — up to its first child tag, which is enough for a figure. */
 const TNUM = /<(?:td|th|span|div)\b[^>]*\bclass="[^"]*\btnum\b[^"]*"[^>]*>([^<]*)/g;
@@ -106,9 +106,12 @@ describe("figures in prose", () => {
    * With a space at every cell and block boundary, which `textContent` does not put there: a row
    * reading `<th>H.B. 110</th><td>7.281B</td>` is "H.B. 1107.281B" without it, and the digit
    * before the figure hid the defect this sweep was written for.
+   *
+   * Drawings reduced to their text first (#646): a chart's axis ends and labels are visible text
+   * and stay in scope; its marks are not, and are half the parse.
    */
   function visibleText(file: string): string {
-    const html = readFileSync(file, "utf8").replace(/<\/(?:td|th|p|li|dt|dd|div|h[1-6]|caption)>/g, " $&");
+    const html = drawingsAsText(readFileSync(file, "utf8")).replace(/<\/(?:td|th|p|li|dt|dd|div|h[1-6]|caption)>/g, " $&");
     const { document } = parseHTML(html);
     for (const node of document.querySelectorAll("script, style, template")) node.remove();
     const title = document.querySelector("title")?.textContent ?? "";
