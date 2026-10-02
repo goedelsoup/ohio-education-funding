@@ -15,6 +15,7 @@ import { fanSpec } from "../../lib/plot/spec.ts";
 import { renderToString } from "../../lib/plot/ssr.ts";
 import { currentLaw, modelOf } from "../../lib/policy.ts";
 import { forecastPath, growthPrior, meanDistrictBias, statuteNote } from "../../lib/project.ts";
+import { heading } from "../../lib/section.ts";
 import type { Bundle, District } from "../../lib/types.ts";
 import BiasNote from "./BiasNote.astro";
 
@@ -113,7 +114,9 @@ const chart = renderToString((w) => fanSpec(
 ), { label: `${insensitive ? `Aid this district receives against what the formula computes for it, in dollars by enrollment year, FY${points[0]!.year} to FY${end.fiscalYear}` : `State aid in dollars by enrollment year, FY${points[0]!.year} to FY${end.fiscalYear}, with the range across projected enrollment`}`, description: `Every year is the FY${bundle.fiscal_year} formula run at that year's enrollment rather than published aid; years through FY${meta.base_year} use published enrollment and carry no interval, and the y axis is truncated to the plotted range rather than starting at zero` });
 ---
 
-<h3>Carried forward</h3>
+{/* Its own address (#616): the card's `#enrollment` is the section, and this is the one chart
+    in it, which a reader linking "the forecast" should be able to land on. */}
+<h3 id="carried-forward" set:html={heading("carried-forward", "Carried forward")} />
 <div class="chartwrap" data-chart="district-fan" set:html={chart} />
 <p class="note">{
   insensitive ? (

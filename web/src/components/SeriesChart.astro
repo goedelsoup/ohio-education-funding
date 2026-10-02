@@ -12,7 +12,12 @@
  * opens at `<h2>` — see `levelHeadings` in `semantics.ts` — so a chart there is an `<h2>` too, or
  * the page would skip a level and the dist scan for that would fail the build. The heading
  * carries no `id`, deliberately: that is how `levelHeadings` tells a template heading from a
- * prose one, and the address is on the card.
+ * prose one.
+ *
+ * The address is on the chart instead, and the heading carries its `#` (#616). The findings card
+ * is one `#findings` over as many as 21 charts, and a reader citing "the third chart" had nothing
+ * to link to. The id is the series key's last segment, which is already the chart's name in
+ * `crates/series.json` and is unique within a node.
  *
  * A **cloud** arrives as more than one panel. Its panel labels are captions rather than headings:
  * a panel is not a section of the document, it is one of a pair a reader is looking at together,
@@ -39,6 +44,9 @@
  * *floors its source has no column for*. Same rule, different sentence, and the caller supplies
  * the sentence rather than this template guessing from the shape of the props.
  */
+import { escapeHtml } from "../lib/format.ts";
+import { heading } from "../lib/section.ts";
+
 interface Props {
   chart: {
     key: string;
@@ -58,10 +66,11 @@ interface Props {
 }
 const { chart, level } = Astro.props;
 const Heading = level;
+const id = chart.key.slice(chart.key.lastIndexOf("/") + 1);
 ---
 
-<div class="series" data-series={chart.key}>
-  <Heading>{chart.label}</Heading>
+<div class="series" id={id} data-series={chart.key}>
+  <Heading set:html={heading(id, escapeHtml(chart.label))} />
   {
     chart.legend && chart.legend.length > 0 && (
       <div class="legend">

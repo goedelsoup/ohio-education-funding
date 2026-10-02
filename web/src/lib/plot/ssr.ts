@@ -18,7 +18,7 @@
 
 import { parseHTML } from "linkedom";
 
-import { draw, type Drawing, type Naming, pair, panelWidth } from "./spec.ts";
+import { draw, type Drawing, type Naming, pair, panelWidth, valuesOf } from "./spec.ts";
 
 /**
  * Anything that looks like a baked-in colour: `#abc`, `#aabbcc`, `rgb(…)`, `hsl(…)`.
@@ -96,7 +96,9 @@ export function renderPanelToString(build: Drawing, naming: Naming, width: numbe
     );
   }
   const svg = drawn(build, naming, width);
-  return svg ? `<div class="chart-pair"><div class="chart-at" data-at="panel">${svg}</div></div>` : "";
+  return svg
+    ? `<div class="chart-pair"><div class="chart-at" data-at="panel">${svg}</div>${valuesOf(svg)}</div>`
+    : "";
 }
 
 /** A chart at every one of `WIDTHS`, for putting straight into a document. See {@link pair}. */

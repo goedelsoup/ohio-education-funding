@@ -114,3 +114,56 @@ describe("the link back to the contents", () => {
     expect(html).not.toContain("to-contents");
   });
 });
+
+describe("a chart's own address (#616)", () => {
+  const chart = (name: string, foot = "") =>
+    `<div class="chartwrap" data-chart="${name}"><div class="chart-pair">` +
+    `<div class="chart-at" data-at="wide"><svg class="plot"></svg></div>${foot}</div></div>`;
+  const card = (id: string, inner: string) =>
+    `<div class="card" id="${id}"><h2>${heading(id, id)}</h2>${inner}</div>`;
+  const parse = (html: string) => parseHTML(`<!doctype html><html><body>${html}</body></html>`).document;
+
+  test("is the section's, where the section draws one chart", () => {
+    const { html, charted } = applySemantics(card("alone", chart("fan")));
+    expect(charted).toBe(0);
+    expect(parse(html).querySelector(".chart-anchor")).toBeNull();
+  });
+
+  test("is its own where the section draws two, named for the chart and numbered on a repeat", () => {
+    const foot = `<div class="chart-foot"><details class="chart-values"><summary>The values</summary></details></div>`;
+    const { html, charted } = applySemantics(
+      card("position", chart("position", foot) + chart("position", foot) + chart("spread")),
+    );
+    expect(charted).toBe(3);
+    const document = parse(html);
+    const ids = [...document.querySelectorAll(".chartwrap")].map((el) => el.id);
+    // `position` is the card's, so even the first strip is numbered.
+    expect(ids).toEqual(["position-1", "position-2", "spread"]);
+    for (const id of ids) {
+      const link = document.querySelector(`#${id} .chart-foot > a.chart-anchor`);
+      expect(link?.getAttribute("href")).toBe(`#${id}`);
+      expect(link?.getAttribute("aria-label")).toBe("Link to this chart");
+    }
+    // Ahead of the values, in the line that was already there, and not fused to them.
+    const first = document.querySelector("#position-1 .chart-foot")!;
+    expect(first.firstElementChild?.className).toBe("chart-anchor");
+    expect(first.querySelectorAll(".chart-foot").length).toBe(0);
+    expect(first.textContent).toBe("# The values");
+  });
+
+  test("is its own under a heading with no address", () => {
+    const { html, charted } = applySemantics(`<h1>Find a district</h1>${chart("measure-aid")}`);
+    expect(charted).toBe(1);
+    const document = parse(html);
+    expect(document.querySelector(".chartwrap")?.id).toBe("measure-aid");
+    // No values line to share, so it gets one of its own.
+    expect(document.querySelector(".chart-pair > .chart-foot > a.chart-anchor")).not.toBeNull();
+  });
+
+  test("is left alone where the chart already carries one", () => {
+    const series = (id: string) =>
+      `<div class="series" id="${id}"><h3>${heading(id, id)}</h3>${chart(`project/${id}`)}</div>`;
+    const { charted } = applySemantics(card("findings", series("one") + series("two")));
+    expect(charted).toBe(0);
+  });
+});

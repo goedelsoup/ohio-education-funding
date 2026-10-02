@@ -346,3 +346,125 @@ describe("document semantics", () => {
     expect(bad.slice(0, 5)).toEqual([]);
   });
 });
+
+describe("a chart's values and its address (#616)", () => {
+  /** Each `.chart-pair` in a page, as the markup from its opening tag to the next one's. */
+  const pairsOf = (page: string): string[] => page.split(/<div\b[^>]*\bclass="chart-pair"[^>]*>/).slice(1);
+  /** The drawing a reader is shown at the widest layout, or the one drawing of a panel. */
+  const shown = (pair: string): string =>
+    /data-at="(?:wide|panel)"><svg\b[\s\S]*?<\/svg>/.exec(pair)?.[0] ?? "";
+  const hovers = (svg: string): number => (svg.match(/\bdata-hover="/g) ?? []).length;
+
+  test("a chart with more than eight marks to hover has its values as text beside it", () => {
+    /*
+     * A screen reader in browse mode does not drive the arrow-key cursor, so `role="img"` left it
+     * the chart's name and nothing else: 4,456 charts with more than eight marks and no table or
+     * list of their values. Eight is the issue's line — under it, a chart's values are its labels.
+     *
+     * And the list says what the marks say, count for count: it is built from their hovers, and a
+     * list one short of the marks would be the alternative quietly dropping a district.
+     */
+    let checked = 0;
+    const bare: string[] = [];
+    for (const file of pages()) {
+      const page = readFileSync(file, "utf8");
+      if (!page.includes('class="chart-pair"')) continue;
+      for (const pair of pairsOf(page)) {
+        const svg = shown(pair);
+        const marks = hovers(svg);
+        if (marks <= 8 || /^<svg\b[^>]*\baria-hidden="true"/.test(svg.slice(svg.indexOf("<svg")))) continue;
+        checked += 1;
+        const list = /<details class="chart-values">[\s\S]*?<\/details>/.exec(pair)?.[0];
+        const items = (list?.match(/<li>/g) ?? []).length;
+        if (items !== marks) {
+          bare.push(`${file.slice(DIST.length + 1)}: ${marks} marks, ${items} values listed`);
+        }
+      }
+    }
+    expect(checked, "the build carries charts with many marks").toBeGreaterThan(4_000);
+    expect(bare.slice(0, 5), "a chart whose values only a pointer can reach").toEqual([]);
+  });
+
+  test("no chart hidden from assistive technology carries a hover", () => {
+    /*
+     * The county-position strip was `aria-hidden` and kept 84 `data-hover` dots: values a mouse
+     * and a finger could reach and a screen reader could not. A chart hidden because the text
+     * beside it says what it says has nothing to hover.
+     */
+    const hidden: string[] = [];
+    for (const file of pages()) {
+      const page = readFileSync(file, "utf8");
+      for (const svg of page.matchAll(/<svg\b[^>]*\baria-hidden="true"[^>]*>[\s\S]*?<\/svg>/g)) {
+        if (svg[0].includes("data-hover=")) hidden.push(file.slice(DIST.length + 1));
+      }
+    }
+    expect(hidden.slice(0, 5)).toEqual([]);
+  });
+
+  test("every chart can be linked to on its own", () => {
+    /*
+     * A chart's address was its section's, so `/method`'s three forecast charts were all
+     * `#forecast-range` and 21 wiki charts were all `#findings`. The rule here is stated over what
+     * a link does rather than how the markup is shaped: some link on the page points at an element
+     * that holds this chart and no other — or at a heading with no other chart under it before the
+     * next. The panels of one small multiple are one chart, and so are the two drawings of a basis
+     * toggle: `/finances` draws its cash chart once in nominal and once in constant dollars, shows
+     * one, and `#actuals` lands on the pair.
+     */
+    let charts = 0;
+    const unaddressed: string[] = [];
+    for (const file of pages()) {
+      const html = readFileSync(file, "utf8");
+      if (!html.includes('class="chart-pair"')) continue;
+      const { document } = parseHTML(html);
+      const linked = new Set(
+        [...document.querySelectorAll('a[href^="#"]')].map((a) => a.getAttribute("href")!.slice(1)),
+      );
+      const ownFigure = (pair: Element): Element => pair.closest(".panels") ?? pair;
+      const figuresIn = (box: Element): Element[] => [
+        ...new Set([...box.querySelectorAll(".chart-pair")].map(ownFigure)),
+      ];
+      // A drawing in a later basis panel is the same figure as its counterpart in the first.
+      const figureOf = (pair: Element): Element => {
+        const own = ownFigure(pair);
+        const panel = own.closest(".basis-panel");
+        const first = panel?.closest(".basis-scope")?.querySelector(".basis-panel");
+        if (!panel || !first || first === panel) return own;
+        return figuresIn(first)[figuresIn(panel).indexOf(own)] ?? own;
+      };
+
+      // Each heading and the figures under it, in document order.
+      const under = new Map<Element, Set<Element>>();
+      let heading: Element | null = null;
+      for (const el of document.querySelectorAll("h1, h2, h3, h4, h5, h6, .chart-pair")) {
+        if (!el.classList.contains("chart-pair")) heading = el;
+        else if (heading && !el.closest("template")) {
+          under.set(heading, (under.get(heading) ?? new Set()).add(figureOf(el)));
+        }
+      }
+
+      const figures = new Set(
+        [...document.querySelectorAll(".chart-pair")].filter((p) => !p.closest("template")).map(figureOf),
+      );
+      for (const figure of figures) {
+        charts += 1;
+        let ok = false;
+        for (let box = figure as Element | null; box && !ok; box = box.parentElement) {
+          if (!box.id || !linked.has(box.id)) continue;
+          const held = new Set([...box.querySelectorAll(".chart-pair")].map(figureOf));
+          if (held.size === 1) ok = true;
+        }
+        for (const [h, set] of under) {
+          if (ok) break;
+          if (h.id && linked.has(h.id) && set.size === 1 && set.has(figure)) ok = true;
+        }
+        if (!ok) {
+          const name = figure.querySelector("svg")?.getAttribute("aria-label")?.slice(0, 60);
+          unaddressed.push(`${file.slice(DIST.length + 1)}: ${name}`);
+        }
+      }
+    }
+    expect(charts, "the build carries charts at all").toBeGreaterThan(5_000);
+    expect(unaddressed.slice(0, 10), "a chart with no address of its own").toEqual([]);
+  });
+});

@@ -1840,3 +1840,30 @@ test("no chart text is filled with a series or ordinal mark colour", () => {
   expect(texts).toBeGreaterThan(builds.length * DRAWINGS);
   expect(offenders).toEqual([]);
 });
+
+test("a chart's values are listed as text, from the hovers its marks carry (#616)", () => {
+  const bars: Bar[] = [
+    { label: "Teachers", value: 0.58, hover: "Teachers: 58% & rising" },
+    { label: "Support", value: 0.42, hover: "Support: 42%" },
+  ];
+  const html = renderToString((w) => barSpec(bars, { width: w, hue: "formula" }), { label: "Base cost" });
+  const { document } = parseHTML(`<div>${html}</div>`);
+  const list = document.querySelectorAll(".chart-pair > .chart-foot > details.chart-values");
+  // One list for the three drawings, not one per width.
+  expect(list).toHaveLength(1);
+  expect(list[0]!.querySelector("summary")?.textContent).toBe("The values");
+  expect([...list[0]!.querySelectorAll("li")].map((li) => li.textContent)).toEqual([
+    "Teachers: 58% & rising",
+    "Support: 42%",
+  ]);
+  // The attribute's escaping carries over: text, never markup.
+  expect(html).toContain("<li>Teachers: 58% &amp; rising</li>");
+
+  // A panel gets its own.
+  const panel = renderPanelToString((w) => barSpec(bars, { width: w, hue: "formula" }), { label: "Base cost" }, panelWidth(2));
+  expect((panel.match(/<li>/g) ?? []).length).toBe(2);
+
+  // A hidden chart gets none: it is hidden because the text beside it says what it says.
+  const hidden = renderToString((w) => barSpec(bars, { width: w, hue: "formula" }), "presentational");
+  expect(hidden).not.toContain("chart-values");
+});
