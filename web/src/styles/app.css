@@ -2870,7 +2870,8 @@ footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); 
   }
 }
 /* A sort control is a button in a header cell, so it is reachable by keyboard and announces. */
-#district-table thead button {
+#district-table thead button,
+table[data-sortable] thead button {
   font: inherit;
   font-size: var(--text-sm);
   color: var(--text-muted);
@@ -2887,9 +2888,12 @@ footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); 
  * off the attribute: it was `button[aria-sort]`, and only the sorted column ever carried one, so
  * the six columns the arrow exists to advertise as sortable were the six that never showed it.
  */
-#district-table thead button::after { content: " ↕"; opacity: .45; }
-#district-table thead th[aria-sort="ascending"] button::after { content: " ↑"; opacity: 1; }
-#district-table thead th[aria-sort="descending"] button::after { content: " ↓"; opacity: 1; }
+#district-table thead button::after,
+table[data-sortable] thead button::after { content: " ↕"; opacity: .45; }
+#district-table thead th[aria-sort="ascending"] button::after,
+table[data-sortable] thead th[aria-sort="ascending"] button::after { content: " ↑"; opacity: 1; }
+#district-table thead th[aria-sort="descending"] button::after,
+table[data-sortable] thead th[aria-sort="descending"] button::after { content: " ↓"; opacity: 1; }
 
 /*
  * What a node does not hold, as a block in the position the content would occupy.
