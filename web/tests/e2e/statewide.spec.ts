@@ -157,6 +157,25 @@ test.describe("whether Ohio is unusual", () => {
     await expect(card).toContainText("DeRolph");
   });
 
+  test("the local-share chart shows its selection rule and the national figure", async ({ page }) => {
+    /*
+     * #656. Drawn as the six highest local shares and Ohio, Ohio was the shortest bar and read as
+     * the lowest; the rule that explained it was only in the SVG's `<desc>`. The national share is
+     * read off the table above and has to be on the chart, and the rule has to be visible text.
+     */
+    await page.goto("/statewide");
+    const card = page.locator(".card", { hasText: "Whether Ohio is unusual" });
+    const national = (await card.locator("tbody tr").first().locator("td").nth(2).innerText()).trim();
+    const chart = card.locator('[data-chart="local-share"] svg.plot:visible');
+    await expect(chart).toContainText("All 51, combined");
+    await expect(chart).toContainText(`${Math.round(parseFloat(national))}%`);
+    await expect(chart).toContainText("Ohio (7th of 51)");
+    const rule = card.locator('p.note:has(+ [data-chart="local-share"])');
+    await expect(rule).toBeVisible();
+    await expect(rule).toContainText("than 44 states");
+    await expect(rule).toContainText("the national figure");
+  });
+
   test("the property tax rank names the states it excludes and why", async ({ page }) => {
     /*
      * Nine states report zero school property tax and levy plenty of it — their districts are

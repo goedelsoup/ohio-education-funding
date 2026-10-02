@@ -3,7 +3,7 @@
 import type { Bar } from "./chart.ts";
 import { barSpec, type Drawing, scatterSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
-import { compactMoney, count, escapeHtml, fig, fixed, millions, money, pct } from "./format.ts";
+import { compactMoney, count, escapeHtml, fig, fixed, millions, money, ordinal, pct } from "./format.ts";
 import { realChange, series, type Basis } from "./real.ts";
 import * as routes from "./routes.ts";
 import type { TaxStatewide } from "./feed.ts";
@@ -394,13 +394,30 @@ export function renderNational(national: National | null): string {
   const ranked = [...national.states].sort((a, b) => b.local_revenue / b.total_revenue - a.local_revenue / a.total_revenue);
   const shown = [...ranked.slice(0, 6), ...(ranked.slice(0, 6).some((s) => s.name === "Ohio") ? [] : [ohio])];
 
+  /*
+   * The rule is drawn as well as written (#656). Trimmed to the top six, Ohio was the shortest bar
+   * on the chart and read as the lowest — the opposite of the finding. So Ohio's bar says its rank,
+   * the national figure is a hollow row of its own, and the selection is a visible lead-in rather
+   * than only the SVG's `<desc>`.
+   */
+  const ohioLabel = `Ohio (${ordinal(national.ohio_local_rank)} of ${national.states.length})`;
+  const lead = ranked.slice(0, 6).includes(ohio)
+    ? `Drawn: the six highest-share states, Ohio among them, and the national figure.`
+    : `Drawn: the six highest-share states, Ohio, and the national figure.`;
   const bars: Bar[] = shown.map((s) => ({
-    label: s.name === "Ohio" ? "Ohio" : s.name,
+    label: s.name === "Ohio" ? ohioLabel : s.name,
     value: (s.local_revenue / s.total_revenue) * 100,
     direct: pct(s.local_revenue / s.total_revenue, 0),
     hover: `${s.name}: ${pct(s.local_revenue / s.total_revenue, 1)} local, ${pct(s.state_revenue / s.total_revenue, 1)} state`,
     current: s.name === "Ohio",
   }));
+  bars.push({
+    label: `All ${national.states.length}, combined`,
+    value: national.national_local_share * 100,
+    direct: pct(national.national_local_share, 0),
+    hover: `All ${national.states.length}, combined: ${pct(national.national_local_share, 1)} local`,
+    reference: true,
+  });
 
   const rows: [string, string, string, string][] = [
     [
@@ -455,7 +472,9 @@ export function renderNational(national: National | null): string {
           .join("")}</tbody>
       </table></div>
 
-      <div class="chartwrap" data-chart="local-share">${renderToString((w) => barSpec(bars, { width: w, hue: "plain" }), { label: `Local share of school revenue by state, percent of total revenue, the states with the highest share and Ohio, FY${national.fiscal_year}`, description: `${shown.length} of ${national.states.length} states are drawn: those with the highest local share, and Ohio at rank ${national.ohio_local_rank}` })}</div>
+      <p class="note"><strong>Ohio raises more of its school money locally than
+        ${count(national.states.length - national.ohio_local_rank)} states.</strong> ${lead}</p>
+      <div class="chartwrap" data-chart="local-share">${renderToString((w) => barSpec(bars, { width: w, hue: "plain" }), { label: `Local share of school revenue by state, percent of total revenue, the states with the highest share and Ohio, FY${national.fiscal_year}`, description: `${shown.length} of ${national.states.length} states are drawn: those with the highest local share, and Ohio at rank ${national.ohio_local_rank}; the last bar is all ${national.states.length} combined, at ${pct(national.national_local_share, 1)}` })}</div>
 
       <p class="note"><strong>Ohio spends about what the country spends and raises it differently.
         </strong> Current spending per pupil is ${money(perPupil)} against a national

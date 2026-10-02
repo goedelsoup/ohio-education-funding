@@ -1144,6 +1144,18 @@ export function barSpec(
    */
   const marked = bars.filter((b) => b.current);
   const plain = bars.filter((b) => !b.current);
+  /*
+   * A reference row is hollow: an outline in its own mark under a transparent hit bar.
+   *
+   * Not a third fill. The palette's neutral is 2.35:1 on the card, and a hover target's fill is
+   * held to what the cursor's ink clears (`tests/e2e/cursor.spec.ts`); transparent is the hit
+   * layers' own fill and clears by construction. And not the bar's own stroke, which the hover
+   * layer's CSS paints transparent — the reason the subject's ring is its own mark too.
+   */
+  const references = bars.filter((b) => b.reference);
+  const base = signed
+    ? (b: Bar) => (b.value < 0 ? SERIES.guarantee : SERIES.formula)
+    : BAR_HUE[options.hue];
 
   const marginRight = gutter(width, longest > 0 ? 16 + longest * 7.2 : 20);
   /*
@@ -1210,6 +1222,22 @@ export function barSpec(
               }),
             ]
           : []),
+        ...(references.length > 0
+          ? [
+              Plot.barX(references, {
+                y: "label",
+                ...(signed
+                  ? { x1: 0, x2: (b: Bar) => b.value }
+                  : { x: (b: Bar) => Math.abs(b.value) }),
+                inset: 0.75,
+                fill: "none",
+                stroke: INK.muted,
+                strokeWidth: 1.5,
+                className: "bar-reference",
+                ...(signed ? {} : { rx2: 4 }),
+              }),
+            ]
+          : []),
         Plot.barX(bars, {
           y: "label",
           // One mark, not two: `draw` maps tooltips onto `.bar-fill > *` by index and
@@ -1222,7 +1250,11 @@ export function barSpec(
           // hoists a constant fill onto the group and pushes a channel down onto each rect, so a
           // function here would move where the colour lives on every one of the nine charts built
           // on this spec — including the two the theme tests read `.bar-fill`'s computed fill from.
-          fill: signed ? (b: Bar) => (b.value < 0 ? SERIES.guarantee : SERIES.formula) : BAR_HUE[options.hue],
+          // A channel where a reference row needs its own fill, and only there.
+          fill:
+            references.length === 0
+              ? base
+              : (b: Bar) => (b.reference ? "transparent" : typeof base === "string" ? base : base(b)),
           className: "bar-fill",
           // Rounded at the data end, square at the baseline: the bar grows from the axis and
           // rounding that end would detach it from the thing it is measured against. Not in
@@ -2366,7 +2398,17 @@ const DOT_RADIUS = 3;
 export function rangeSpec(
   rows: Range[],
   axis: { label: string; format: (v: number) => string; log?: boolean },
-  options: { width: number; markers?: RangeMarker[] },
+  options: {
+    width: number;
+    markers?: RangeMarker[];
+    /**
+     * Text drawn beside each row's high end, for the figure the rows are sorted by (#656).
+     *
+     * `/counties` sorts its 84 rows by the high-to-low ratio and printed it nowhere, so on a log
+     * axis the reader had to compare segment lengths to recover an order they had been given.
+     */
+    rowLabel?: (row: Range) => string;
+  },
 ): Spec | null {
   if (rows.length < 2) return null;
 
@@ -2378,12 +2420,18 @@ export function rangeSpec(
   const longest = Math.max(...rows.map((r) => r.label.length));
   // A 14px row cannot hold a second line, so this gutter is capped rather than wrapped: a name
   // too long for a phone's frame is drawn shorter, not folded into the row below it.
-  const { width, markers = [] } = options;
+  const { width, markers = [], rowLabel } = options;
   const marginLeft = gutter(width, Math.max(70, Math.min(150, Math.round(longest * 6.2) + 10)));
+  /* Room for the widest row label past the frame's right edge, where the row holding the maximum
+     draws it; any other row's sits inside the frame, past its own high end. */
+  const ROW_LABEL_DX = DOT_RADIUS + 5;
+  const marginRight = rowLabel
+    ? 16 + Math.ceil(ROW_LABEL_DX + Math.max(...rows.map((r) => textPx(rowLabel(r)))))
+    : 16;
   const foot = axisFoot({
     width,
     marginLeft,
-    marginRight: 16,
+    marginRight,
     dy: 16,
     says: axis.label + (axis.log ? " (log scale)" : ""),
     scale: { domain: rangeDomain(min, max, axis.log), log: axis.log, format: axis.format },
@@ -2393,7 +2441,7 @@ export function rangeSpec(
   const head = tallHead(marginBottom + rows.length * rowHeight, {
     width,
     marginLeft,
-    marginRight: 16,
+    marginRight,
     scale: { domain: rangeDomain(min, max, axis.log), log: axis.log, format: axis.format },
   });
   const marginTop = head.marginTop;
@@ -2420,7 +2468,7 @@ export function rangeSpec(
       width,
       height,
       marginLeft,
-      marginRight: 16,
+      marginRight,
       marginTop,
       marginBottom,
       x: {
@@ -2470,6 +2518,20 @@ export function rangeSpec(
           fontSize: 10,
           className: "range-label",
         }),
+        ...(rowLabel
+          ? [
+              Plot.text(rows, {
+                y: "label",
+                x: "high",
+                dx: ROW_LABEL_DX,
+                text: (r: Range) => rowLabel(r),
+                textAnchor: "start",
+                fill: INK.muted,
+                fontSize: 11,
+                className: "range-row-label",
+              }),
+            ]
+          : []),
         // Across the rows, under the foot and over the spans: it is a position in the plan
         // rather than a value of any row, so it is dashed, and it carries no text of its own —
         // a 14px row has nowhere to put one, and the legend says what it is.

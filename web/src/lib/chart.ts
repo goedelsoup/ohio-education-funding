@@ -31,6 +31,15 @@ export interface Bar {
    * the page rather than about the data, and a chart with two subjects has none.
    */
   current?: boolean;
+  /**
+   * A row that is not a member of the population: the figure the members are read against.
+   *
+   * `/statewide`'s local-share chart is the case (#656). It draws the six highest-share states and
+   * Ohio, so Ohio was the shortest bar and read as the lowest — when the page's finding is that
+   * Ohio is 7th of 51, well above the national 43%. The national figure belongs on the chart, and
+   * drawn as a state it would be a fifty-second one. `barSpec` draws it hollow.
+   */
+  reference?: boolean;
 }
 
 /** One bin of a distribution. */

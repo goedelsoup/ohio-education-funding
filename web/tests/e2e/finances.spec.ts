@@ -179,7 +179,7 @@ test.describe("against america", () => {
     // Plot hoists constants onto the mark's group, which is why the subject is a group of its own.
     const marked = chart.locator("g.bar-label.current");
     await expect(marked).toHaveAttribute("font-weight", "600");
-    await expect(marked.locator("text")).toHaveText(["Ohio"]);
+    await expect(marked.locator("text")).toHaveText(["Ohio (7th of 51)"]);
     // And the rest of the states are still in the plain group, at the plain weight.
     const plain = chart.locator("g.bar-label:not(.current)");
     expect(await plain.locator("text").count()).toBeGreaterThan(3);

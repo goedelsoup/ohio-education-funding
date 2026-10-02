@@ -1290,6 +1290,55 @@ test("a panel is never drawn at the width of a whole chart", () => {
   expect(renderPanelToString(() => series(panelWidth(2)), "presentational", panelWidth(2))).toContain("<svg");
 });
 
+test("a range chart sorted on a figure prints that figure on every row", () => {
+  /*
+   * #656. `/counties` sorts 84 rows widest span first by the high-to-low ratio and printed the
+   * ratio nowhere, so the reader had to recover the order from segment lengths on a log axis.
+   */
+  const rows: Range[] = Array.from({ length: 12 }, (_, i) => ({
+    label: `County ${i}`,
+    low: 1000,
+    high: 1000 * (8 - i * 0.5),
+    hover: "",
+  }));
+  const axis = { label: "valuation per pupil", format: compactMoney, log: true };
+  const spec = rangeSpec(rows, axis, { ...W, rowLabel: (r) => `${(r.high / r.low).toFixed(1)}×` })!;
+  const svg = renderToString(() => spec, "presentational");
+  const labels = [...parseHTML(`<div>${svg}</div>`).document.querySelectorAll(".range-row-label text")].map(
+    (t) => t.textContent,
+  );
+  expect(labels, "one per row, in each layout").toHaveLength(rows.length * DRAWINGS);
+  expect(labels[0]).toBe("8.0×");
+  // And the widest of them has room past the frame, where the row holding the maximum draws it.
+  expect(spec.options.marginRight).toBeGreaterThan(rangeSpec(rows, axis, W)!.options.marginRight as number);
+});
+
+test("a reference row is drawn hollow, so it does not read as one more member", () => {
+  /*
+   * #656. `/statewide` draws the six highest local shares and Ohio, and Ohio was the shortest bar
+   * — read as the lowest, when Ohio is 7th of 51 and well above the national 43%. The national
+   * figure is now a row of its own, outlined rather than filled.
+   */
+  const bars: Bar[] = [
+    { label: "New Hampshire", value: 63, direct: "63%" },
+    { label: "Ohio (7th of 51)", value: 52, direct: "52%", current: true },
+    { label: "All 51, combined", value: 43.4, direct: "43%", reference: true },
+  ];
+  const { document } = parseHTML(
+    `<div>${renderToString((w) => barSpec(bars, { width: w, hue: "plain" }), "presentational")}</div>`,
+  );
+  const outlines = [...document.querySelectorAll(".bar-reference")];
+  expect(outlines).toHaveLength(DRAWINGS);
+  for (const outline of outlines) {
+    expect(outline.children).toHaveLength(1);
+    expect(outline.getAttribute("fill")).toBe("none");
+    expect(outline.getAttribute("stroke")).toBe(INK.muted);
+  }
+  // The hit bar is transparent on the reference row and keeps the chart's hue on the others.
+  const fills = [...document.querySelector(".bar-fill")!.children].map((rect) => rect.getAttribute("fill"));
+  expect(fills).toEqual([INK.muted, INK.muted, "transparent"]);
+});
+
 test("a range chart too tall to read against its foot states its scale at the top as well", () => {
   /*
    * #611: `/counties` draws 84 rows in 1470px and said what a position meant only at the bottom,

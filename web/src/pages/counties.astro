@@ -47,7 +47,7 @@ const disparity = renderToString(
     rangeSpec(
       rows,
       { label: "assessed valuation per pupil", format: compactMoney, log: true },
-      { width: w },
+      { width: w, rowLabel: (r) => `${(r.high / r.low).toFixed(1)}×` },
     ),
   {
     label: `Assessed valuation per pupil from the poorest to the richest district in each of ${count(rows.length)} counties, widest span first, on a log scale, FY${bundle.fiscal_year}`,
