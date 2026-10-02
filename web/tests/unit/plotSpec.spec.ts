@@ -40,13 +40,14 @@ import {
   ruleSwatch,
   scatterSpec,
   seriesSpec,
+  type BarHue,
   type Box,
   type Spec,
   truncatedDomain,
   WIDTHS,
 } from "../../src/lib/plot/spec.ts";
 import { renderPanelToString, renderToString } from "../../src/lib/plot/ssr.ts";
-import { ORDINAL, SERIES } from "../../src/lib/plot/tokens.ts";
+import { INK, ORDINAL, SERIES, SUBJECT } from "../../src/lib/plot/tokens.ts";
 
 /** How many layouts `renderToString` emits: one per width in `WIDTHS`. */
 const DRAWINGS = Object.keys(WIDTHS).length;
@@ -71,26 +72,96 @@ test("the bar a chart was built to locate is marked, on two channels", () => {
    * Ohio's bar and nothing read it — `Bar` did not declare the field and `barSpec` ignored it —
    * so Ohio carried no mark in a chart built to show Ohio's position.
    *
-   * Two channels, because one of them is colour: the fill takes the contrasting half of the
-   * validated pair, and the category name is drawn in primary ink at 600. The second is what
-   * survives a monochrome print, which is the rule the print stylesheet applies site-wide.
+   * Two channels: a `SUBJECT` ring drawn behind the bar, and the category name in primary ink at
+   * 600. Not a change of fill (#652): the subject took the guarantee hue, so a chart of formula
+   * aid said its subject was guaranteed, and an ink fill would put the cursor ring at 1:1.
    */
   const bars: Bar[] = [
     { label: "Nebraska", value: 60 },
     { label: "Ohio", value: 45, current: true },
     { label: "Utah", value: 30 },
   ];
-  const svg = renderToString((w) => barSpec(bars, { width: w }), "presentational");
-  expect(svg).toContain("var(--series-guarantee)");
+  const svg = renderToString((w) => barSpec(bars, { width: w, hue: "formula" }), "presentational");
+  const { document } = parseHTML(`<div>${svg}</div>`);
+  const rings = [...document.querySelectorAll(".bar-subject")];
+  expect(rings.length, "one ring per layout").toBe(DRAWINGS);
+  for (const ring of rings) {
+    expect(ring.getAttribute("fill")).toBe(SUBJECT);
+    expect(ring.children.length, "on the one bar").toBe(1);
+  }
+  expect(svg, "the subject keeps the chart's fill").not.toContain("var(--series-guarantee)");
   expect(svg).toContain('font-weight="600"');
 
-  // And a chart with no subject is unchanged: same fills, no second text mark.
+  // And a chart with no subject is unchanged: same fills, no ring, no second text mark.
   const plain = renderToString(
-    (w) => barSpec(bars.map(({ current: _c, ...b }) => b), { width: w }),
+    (w) => barSpec(bars.map(({ current: _c, ...b }) => b), { width: w, hue: "formula" }),
     "presentational",
   );
-  expect(plain).not.toContain("var(--series-guarantee)");
+  expect(plain).not.toContain("bar-subject");
   expect(plain).not.toContain('font-weight="600"');
+});
+
+test("a bar chart says what its bars are, and plain bars are no series", () => {
+  /*
+   * #652. Formula blue was every bar chart's default, so 11 of 13 sampled — cash held, casino
+   * receipts, the share of districts *held by the guarantee* — wore the hue that means formula aid.
+   * `hue` is required, so a caller cannot fall into one.
+   */
+  const bars: Bar[] = [
+    { label: "a", value: 3 },
+    { label: "b", value: 2 },
+  ];
+  const fill = (hue: BarHue) =>
+    parseHTML(`<div>${renderToString((w) => barSpec(bars, { width: w, hue }), "presentational")}</div>`)
+      .document.querySelector(".bar-fill")!
+      .getAttribute("fill");
+  expect(fill("formula")).toBe(SERIES.formula);
+  expect(fill("guarantee")).toBe(SERIES.guarantee);
+  expect(fill("plain")).toBe(INK.muted);
+  expect(Object.values(SERIES), "plain is never a series").not.toContain(fill("plain"));
+  // @ts-expect-error — a bar chart has to say what its bars mean.
+  barSpec(bars, { width: WIDTHS.wide });
+});
+
+test("the subject is one colour whatever form it is drawn in", () => {
+  /*
+   * #652. Columbus was marked blue on its strips and orange on its fan, on one page: the strip
+   * marker was formula blue, the bar and the rank dot guarantee orange.
+   */
+  const bars = renderToString(
+    (w) => barSpec([{ label: "a", value: 2, current: true }, { label: "b", value: 1 }], { width: w, hue: "plain" }),
+    "presentational",
+  );
+  const strip = renderToString(
+    (w) =>
+      distributionSpec(
+        Array.from({ length: 30 }, (_, i) => ({ value: i, hover: `d${i}` })),
+        { width: w, format: String, marker: { value: 12, label: "Columbus" } },
+      ),
+    "presentational",
+  );
+  const rank = renderToString(
+    (w) =>
+      rankSpec(
+        [
+          { label: "a", value: 5, hover: "a" },
+          { label: "b", value: 3, hover: "b", marked: "this one" },
+          { label: "c", value: 1, hover: "c" },
+        ],
+        { label: "count", format: String },
+        { width: w },
+      ),
+    "presentational",
+  );
+  const colours = (svg: string, selector: string, attribute: string) =>
+    [...parseHTML(`<div>${svg}</div>`).document.querySelectorAll(selector)].map(
+      (el) => el.getAttribute(attribute) ?? el.parentElement?.getAttribute(attribute),
+    );
+  expect(colours(bars, ".bar-subject", "fill")).toEqual(Array(DRAWINGS).fill(SUBJECT));
+  expect(colours(strip, ".dist-marker", "stroke")).toEqual(Array(DRAWINGS).fill(SUBJECT));
+  const dots = colours(rank, ".rank-dot circle", "fill");
+  expect(dots.filter((c) => c === SUBJECT).length, "the marked dot, once per layout").toBe(DRAWINGS);
+  expect(dots, "and no subject in the guarantee hue").not.toContain(SERIES.guarantee);
 });
 
 test("a chart of change is fitted to its ratios and fills by polarity whatever their sign", () => {
@@ -105,17 +176,20 @@ test("a chart of change is fitted to its ratios and fills by polarity whatever t
     { label: "Hilliard City", value: 0.031, current: true },
     { label: "Bexley City", value: 0.012 },
   ];
-  const domain = barSpec(rose, { width: WIDTHS.wide, polarity: true }).options.x!.domain as number[];
+  const domain = barSpec(rose, { width: WIDTHS.wide, hue: "polarity" }).options.x!.domain as number[];
   expect(domain[1]).toBeLessThanOrEqual(1.25 * 0.245);
   // Without `polarity` a chart of counts keeps the floor it was written for.
-  expect((barSpec(rose, W).options.x!.domain as number[])[1]).toBe(1);
+  expect((barSpec(rose, { ...W, hue: "formula" }).options.x!.domain as number[])[1]).toBe(1);
 
-  const svg = renderToString((w) => barSpec(rose, { width: w, polarity: true }), "presentational");
+  const svg = renderToString((w) => barSpec(rose, { width: w, hue: "polarity" }), "presentational");
   for (const drawing of svg.split("<svg").slice(1)) {
     expect(drawing, "a gain is never the loss hue").not.toContain("var(--series-guarantee)");
     expect((drawing.match(/<line/g) ?? []).length, "the zero rule").toBe(1);
-    // The subject is marked by a ring and its bold name, on the one bar.
-    expect((drawing.match(/stroke="var\(--text-primary\)"/g) ?? []).length).toBe(1);
+    // The subject is marked by a ring and its bold name, on the one bar. The ring is its own
+    // mark: #651 drew it as the bar's stroke, which the hover layer's CSS painted transparent.
+    const { document } = parseHTML(`<svg${drawing}`);
+    expect(document.querySelector(".bar-subject")?.children.length).toBe(1);
+    expect(document.querySelector(".bar-fill")?.getAttribute("stroke") ?? "none").toBe("none");
     expect(drawing).toContain('font-weight="600"');
   }
 });
@@ -132,7 +206,7 @@ test("a marked name wraps at the width it is drawn at, which is bold", () => {
     { label: "Bay Village City", value: 0.03 },
   ];
   const html = renderToString(
-    (w) => barSpec(bars, { width: w, scale: { format: String, says: "change" } }),
+    (w) => barSpec(bars, { width: w, hue: "formula", scale: { format: String, says: "change" } }),
     "presentational",
   );
   const { document } = parseHTML(`<div>${html}</div>`);
@@ -159,7 +233,7 @@ test("a column with bars on both sides of zero draws its rule at every width", (
     { label: "Public utility", value: -0.0159, hover: "Public utility: −0.0159" },
     { label: "All three summed", value: 0.0164, hover: "All three summed: +0.0164" },
   ];
-  const pair = renderToString((w) => barSpec(bars, { width: w }), { label: "The column" });
+  const pair = renderToString((w) => barSpec(bars, { width: w, hue: "formula" }), { label: "The column" });
   const drawings = pair.split("<svg").slice(1);
   expect(drawings).toHaveLength(DRAWINGS);
   for (const drawing of drawings) {
@@ -175,7 +249,7 @@ test("a column with bars on both sides of zero draws its rule at every width", (
   }
   // And a column of the same shape with nothing below zero draws no rule.
   const unsigned = renderToString(
-    (w) => barSpec(bars.map((b) => ({ ...b, value: Math.abs(b.value) })), { width: w }),
+    (w) => barSpec(bars.map((b) => ({ ...b, value: Math.abs(b.value) })), { width: w, hue: "formula" }),
     "presentational",
   );
   expect(unsigned).not.toContain("<line");
@@ -896,11 +970,11 @@ test("a signed panel with nothing in it still draws its zero, so the empty rule 
   const rules = (spec: Spec) =>
     [...renderToString(() => spec, "presentational").matchAll(/stroke="var\(--accent-rule\)"/g)]
       .length;
-  expect(rules(barSpec(flat, { width })), "no rule without a signed scale").toBe(0);
+  expect(rules(barSpec(flat, { width, hue: "formula" })), "no rule without a signed scale").toBe(0);
   // One rule per drawing `renderToString` lays out.
-  expect(rules(barSpec(flat, { width, max: 166.55, min: -83.51 }))).toBe(DRAWINGS);
+  expect(rules(barSpec(flat, { width, hue: "formula", max: 166.55, min: -83.51 }))).toBe(DRAWINGS);
   // And the panel is drawn on the set's scale, not on its own nothing.
-  expect(barSpec(flat, { width, max: 166.55, min: -83.51 }).options.x!.domain).toEqual([
+  expect(barSpec(flat, { width, hue: "formula", max: 166.55, min: -83.51 }).options.x!.domain).toEqual([
     -83.51, 166.55,
   ]);
 });
@@ -908,7 +982,7 @@ test("a signed panel with nothing in it still draws its zero, so the empty rule 
 test("a shared scale is the same scale: two panels of one set draw a value at one length", () => {
   // What makes the monotonicity readable across seven panels is that the axis does not move.
   const of = (bars: Bar[]) =>
-    barSpec(bars, { width: panelWidth(7), max: 166.55, min: -83.51 }).options.x!.domain;
+    barSpec(bars, { width: panelWidth(7), hue: "formula" as const, max: 166.55, min: -83.51 }).options.x!.domain;
   const big: Bar[] = [{ label: "Least wealthy", value: 166.55, hover: "a" }];
   const small: Bar[] = [{ label: "Least wealthy", value: 4.06, hover: "b" }];
   expect(of(big)).toEqual(of(small));
@@ -923,7 +997,7 @@ test("a set shares its frame as well as its domain, so a labelled panel keeps it
    * zeros because it has no bars to print them on. That panel's frame came out ten pixels
    * narrower than the six beside it, which moves every pixel inside it, the zero rule included.
    */
-  const set = { width: panelWidth(7), max: 166.55, min: -83.51, labelChars: 2 };
+  const set = { width: panelWidth(7), hue: "formula" as const, max: 166.55, min: -83.51, labelChars: 2 };
   const drawn: Bar[] = [{ label: "Least wealthy", value: 166.55, hover: "a" }];
   const zeros: Bar[] = [{ label: "Least wealthy", value: 0, direct: "$0", hover: "b" }];
   const frame = (spec: Spec) => [spec.options.marginLeft, spec.options.marginRight];
@@ -935,8 +1009,8 @@ test("a set shares its frame as well as its domain, so a labelled panel keeps it
     barSpec(drawn, own).options.marginRight,
   );
   // A chart that is not part of a set still sizes its own gutter, which is every other caller.
-  expect(barSpec(drawn, { width: WIDTHS.wide }).options.marginRight).toBe(
-    barSpec(zeros, { width: WIDTHS.wide, labelChars: 0 }).options.marginRight,
+  expect(barSpec(drawn, { width: WIDTHS.wide, hue: "formula" }).options.marginRight).toBe(
+    barSpec(zeros, { width: WIDTHS.wide, hue: "formula", labelChars: 0 }).options.marginRight,
   );
 });
 
@@ -1273,7 +1347,7 @@ test("a spread's rules are told apart by dash, as their legend swatches are", ()
  */
 test("a chart's description is a <desc>, not part of its name", () => {
   const svg = renderToString(
-    (width) => barSpec([{ label: "One", value: 1, hover: "One: 1" }], { width }),
+    (width) => barSpec([{ label: "One", value: 1, hover: "One: 1" }], { width, hue: "formula" }),
     { label: "A chart that ends in a full stop.", description: "How it was cut." },
   );
   const { document } = parseHTML(`<!doctype html><html><body>${svg}</body></html>`);
@@ -1334,7 +1408,7 @@ test("no chart text is filled with a series or ordinal mark colour", () => {
   }));
   const strip = [-0.08, -0.03, -0.01, 0.02, 0.05, 0.09].map((value) => ({ value, hover: `${value}` }));
   const builds: [string, (width: number) => Spec | null][] = [
-    ["bar", (width) => barSpec([{ label: "Ohio", value: 45, current: true }, { label: "Utah", value: -3 }], { width })],
+    ["bar", (width) => barSpec([{ label: "Ohio", value: 45, current: true }, { label: "Utah", value: -3 }], { width, hue: "formula" })],
     ["scatter", (width) => scatterSpec(cloud(Array.from({ length: 30 }, (_, i) => i)), AXES, traced, { width })],
     ["plane", (width) => planeSpec(rules(), PLANE_AXES, { width, ...PLANE_FRAME })],
     ["rank", (width) => rankSpec(census([554, 499, 43, 1, 0]), COUNT, { width })],

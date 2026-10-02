@@ -1482,6 +1482,13 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
 .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: var(--space-2); vertical-align: baseline; }
 .sw[data-series="formula"], .sw[data-series="gain"] { background: var(--series-formula); }
 .sw[data-series="guarantee"], .sw[data-series="loss"] { background: var(--series-guarantee); }
+/* Held twice over on `/reach`: the guarantee hue and the 1px ink ring the dot wears (#652). An
+   outline rather than a shadow, which a forced palette drops (#182). */
+.sw[data-series="guarantee-ringed"] {
+  background: var(--series-guarantee);
+  outline: 1px solid var(--text-primary);
+  outline-offset: 0;
+}
 /* The third state of a two-hue split: a district the levers did not move. Not a hue, deliberately
    — an unmoved district has no polarity, and `SERIES.neutral` is the mark the charts already use
    for it. */
@@ -2180,6 +2187,7 @@ svg.plot .scatter-dot circle[fill-opacity="0.8"] { fill-opacity: var(--banded-op
  *
  * So the ring's own contrast question has exactly two answers, and both clear: the ink against
  * `--series-formula` is 4.46 light and 3.64 dark, and against `--series-guarantee` 6.15 and 3.88.
+ * A plain bar chart (#652) fills with `--text-muted`, and the ink clears that at 3.37 and 3.01.
  * `tests/e2e/cursor.spec.ts` asserts that over `dist/` so a mark cannot quietly become hoverable
  * in a colour the ink cannot clear.
  *
@@ -2201,7 +2209,9 @@ svg.plot .scatter-dot circle[fill-opacity="0.8"] { fill-opacity: var(--banded-op
  * `--link` is not the alternative and never was. A ring surrounds a MARK here rather than sitting
  * on a surface, no single hue on this palette clears 3:1 against every mark — the best available
  * is 2.02:1 — and `--link` itself manages 1.19 light and 1.03 dark against the formula blue. The
- * ink clears it because the ink is the one colour a chart never draws with.
+ * ink clears it because the ink is never a hover target's fill. It is drawn as `SUBJECT` (#652) —
+ * a ring behind the current bar, a rank dot, a strip marker — and never where this ring can land
+ * on it as a fill.
  *
  * # The second channel, and the 3.5% of targets that do not get one
  *
@@ -3121,6 +3131,8 @@ tr.series-break > td {
   }
   .sw[data-series="formula"], .sw[data-series="gain"] { border-style: solid; }
   .sw[data-series="guarantee"], .sw[data-series="loss"] { border-style: dashed; }
+  /* Dashed as the guarantee is, and doubled for the ring it wears on screen. */
+  .sw[data-series="guarantee-ringed"] { border: 3px double currentColor; outline: 0; }
   .sw[data-series="neutral"] { border-style: dotted; }
   /* Out of scope is context, so on paper it becomes an outline with nothing inside it — the same
      relationship to `.sw[data-series="neutral"]` that a muted dot has to the cloud it is drawn behind. Opacity is

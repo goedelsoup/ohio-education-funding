@@ -140,7 +140,7 @@ const bars: Bar[] = d.casino.map((y) => ({
           }</div></div>
       </div>
 
-      <div class="chartwrap" data-chart="casino" set:html={renderToString((w) => barSpec(bars, { width: w }), { label: `Casino tax distribution received by this district, in dollars by fiscal year, FY${first.fiscal_year} to FY${latest.fiscal_year}` })} />
+      <div class="chartwrap" data-chart="casino" set:html={renderToString((w) => barSpec(bars, { width: w, hue: "plain" }), { label: `Casino tax distribution received by this district, in dollars by fiscal year, FY${first.fiscal_year} to FY${latest.fiscal_year}` })} />
 
       <p class="note">{
         closure && before && before.amount > 0 ? (

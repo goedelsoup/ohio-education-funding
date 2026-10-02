@@ -94,3 +94,15 @@ export const INK = {
   /** The card the chart sits on. Used for the ring on overlapping marks. */
   surface: "var(--surface-1)",
 } as const;
+
+/**
+ * The mark of the row or member a chart was drawn to locate — Ohio among the states, a district
+ * among its county (#652).
+ *
+ * It was a hue chosen per form: a formula-blue rule on a strip, a guarantee-orange bar and dot
+ * elsewhere, so Columbus was blue on its dashboard strips and orange on its fan. Ink is the one
+ * colour no series is drawn in, so it can mean "this one" on every form without colliding with a
+ * series. On a bar it is a ring rather than a fill: the keyboard cursor is drawn in the same ink,
+ * and a bar filled with it would leave the ring 1:1 against its own mark.
+ */
+export const SUBJECT = INK.primary;

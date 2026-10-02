@@ -440,16 +440,16 @@ describe("a bar chart with a negative value", () => {
   ];
 
   test("puts the negative bar on the other side of zero, in the other colour", () => {
-    const svg = renderToString((w) => barSpec(mixed, { width: w }), { label: "test" });
+    const svg = renderToString((w) => barSpec(mixed, { width: w, hue: "formula" }), { label: "test" });
     // The polarity pair the palette licenses for gain against loss, both present exactly here.
     expect(svg).toContain("var(--series-formula)");
     expect(svg).toContain("var(--series-guarantee)");
-    const abs = renderToString((w) => barSpec([{ label: "b", value: 2 }], { width: w }), { label: "test" });
+    const abs = renderToString((w) => barSpec([{ label: "b", value: 2 }], { width: w, hue: "formula" }), { label: "test" });
     expect(abs).not.toContain("var(--series-guarantee)");
   });
 
   test("and leaves an all-positive chart exactly as it was", () => {
-    const svg = renderToString((w) => barSpec(positive, { width: w }), { label: "test" });
+    const svg = renderToString((w) => barSpec(positive, { width: w, hue: "formula" }), { label: "test" });
     expect(svg).not.toContain("var(--series-guarantee)");
     // Rounded data end, which signed mode drops and this must keep.
     expect(svg).toMatch(/rx|A4,4/);

@@ -261,12 +261,15 @@ function stateShare(d: PanelDistrict): number {
  */
 export type Shading = "regime" | "change" | "type";
 
-/** The three regimes, in the order the ordinal ramp runs. */
+/** The three regimes, from unconstrained to held twice over. */
 const REGIMES = [
   "Paid by the formula",
   "Held by the guarantee",
   "Held, and at the minimum state share",
 ] as const;
+
+/** Each regime's key swatch, in `REGIMES` order: the categorical pair, the last one ringed. */
+const REGIME_SWATCH = ["formula", "guarantee", "guarantee-ringed"] as const;
 
 /** One of the department's groups, as the picker offers it. */
 export interface Group {
@@ -854,13 +857,16 @@ function scopeLabel(
  * its payment does not, so it travels right along a horizontal line and gains nothing. A cloud of
  * after-positions would place those districts where they always were and say nothing about it.
  *
- * # Three bands rather than two series
+ * # Two series and a ring rather than three bands
  *
- * The regime shading needs a third step: held *and* at the minimum state share, whose local
- * capacity is censored and which therefore cannot move at all until the floor itself does. That is
- * an ordered fact — unconstrained, held, held twice over — so it takes the ordinal ramp. The other
- * shading is a genuine two-way split and takes the validated pair, where `formula` is the hue
- * `SERIES` documents as doubling for "gain".
+ * The regime shading needs a third state: held *and* at the minimum state share, whose local
+ * capacity is censored and which therefore cannot move at all until the floor itself does. It was
+ * drawn in the ordinal ramp until #652, and the ramp's middle step is the formula hue in the light
+ * palette — so "held by the guarantee" was painted formula blue, and the two lower steps barely
+ * separated in a cloud of 609. Regimes are categories that happen to nest, not steps of a measure:
+ * formula is paid by the formula, guarantee is held, and held twice over is the guarantee hue with
+ * a 1px ink ring ({@link ScatterPoint.ring}). Every shading here now takes the validated pair,
+ * where `formula` is the hue `SERIES` documents as doubling for "gain".
  *
  * # The scope, which changes what is lit and — on request — what is drawn
  *
@@ -959,7 +965,7 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
      * Out of scope is drawn as context: muted, unshaded, and with no trail.
      *
      * Unshaded rather than shaded-and-muted because the shading answers a question that was asked
-     * about a different population. A muted ordinal band would still be saying *this district is
+     * about a different population. A muted regime hue would still be saying *this district is
      * held twice over* in a legend the reader is reading about their own county.
      *
      * The trail is withheld here rather than drawn faintly, which is why `muted` has to reach the
@@ -972,7 +978,8 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
     }
     scoped += 1;
     if (view.shading === "regime") {
-      point.band = o.onGuarantee ? (o.atMinimumStateShare ? 2 : 1) : 0;
+      point.series = o.onGuarantee ? "guarantee" : "formula";
+      if (o.onGuarantee && o.atMinimumStateShare) point.ring = true;
     } else if (view.shading === "type") {
       // One group lit, everything else left neutral. See `Shading` for why this is not nine hues.
       if (d.typology?.code === view.highlight) point.series = "formula";
@@ -1145,7 +1152,7 @@ export function renderReach(panel: Panel, levers: Levers, view: View, chip = "")
 
   const legend =
     (view.shading === "regime"
-      ? REGIMES.map((label, i) => `<span><i class="sw" data-series="ordinal-${i + 1}"></i> ${label}</span>`).join("")
+      ? REGIMES.map((label, i) => `<span><i class="sw" data-series="${REGIME_SWATCH[i]}"></i> ${label}</span>`).join("")
       : view.shading === "type"
         ? `<span><i class="sw" data-series="gain"></i> ${escapeHtml(litLabel)} (${count(lit)})</span>
            <span><i class="sw" data-series="neutral"></i> Every other district</span>`

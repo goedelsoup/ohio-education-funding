@@ -97,6 +97,15 @@ export interface ScatterPoint {
    */
   band?: number;
   /**
+   * Ring this point in ink: a second, narrower claim inside the `series` it is already drawn in.
+   *
+   * `/reach`'s regimes are the case. Held at the minimum state share is held twice over, so it
+   * wears the guarantee hue *and* a 1px ring rather than a third colour: the palette has two hues,
+   * and the ordinal ramp's middle step is the formula hue in the light palette (#652), so a ramp
+   * drew "held by the guarantee" in formula blue. A muted point never wears one.
+   */
+  ring?: boolean;
+  /**
    * Where this district sat before the change being drawn — its position under current law.
    *
    * Present only on a scatter whose subject is **movement**, where the pair of positions is the

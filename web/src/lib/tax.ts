@@ -102,7 +102,7 @@ export function renderTaxBase(d: District): string {
   return `
     <div class="card" id="tax-base" data-part="tax-base">
       <h2>${anchor("tax-base")}What the tax base is made of, TY${latest.tax_year}${yearChip("property_tax")}</h2>
-      <div class="chartwrap" data-chart="tax-base">${renderToString((w) => barSpec(bars, { width: w }), { label: `Taxable value by property class, each as a share of ${money(latest.total_value)}, ${latest.tax_year} tax year` })}</div>
+      <div class="chartwrap" data-chart="tax-base">${renderToString((w) => barSpec(bars, { width: w, hue: "plain" }), { label: `Taxable value by property class, each as a share of ${money(latest.total_value)}, ${latest.tax_year} tax year` })}</div>
       <p class="note">Total taxable value ${money(latest.total_value)}, or
         ${money(latest.value_per_pupil)} per pupil.
         <strong>${pct(residentialShare, 0)}</strong> of it is Class I — residential and

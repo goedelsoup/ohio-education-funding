@@ -67,12 +67,22 @@ function* walk(dir: string): Generator<string> {
  *
  * `transparent` is the hit layers. The two series tokens are the bar charts, where the hover
  * target *is* the bar — measured against the ink at 4.46/3.64 and 6.15/3.88, both clear.
+ * `--text-muted` is a bar chart whose bars mean neither series (#652's `hue: "plain"`): the ink
+ * clears it at 3.37 light and 3.01 dark.
+ *
+ * The ink itself is not here, and that is why `SUBJECT` is a ring behind a bar rather than its
+ * fill: an ink-filled bar would put this ring at 1:1.
  *
  * An ordinal token appearing here is the regression this exists for, and it is not hypothetical in
  * the other direction: #187 found this ring drawn in `--series-formula` itself, 1.00:1 against the
  * bar it surrounded.
  */
-const PERMITTED = new Set(["transparent", "var(--series-formula)", "var(--series-guarantee)"]);
+const PERMITTED = new Set([
+  "transparent",
+  "var(--series-formula)",
+  "var(--series-guarantee)",
+  "var(--text-muted)",
+]);
 
 test("no chart puts the keyboard cursor on a mark the ink cannot clear", () => {
   /*

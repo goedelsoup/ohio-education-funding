@@ -1727,6 +1727,7 @@ test("every bar a column draws is read against a number: a value at its end or a
             () =>
               barSpec(panel.bars, {
                 width: panelWidth(multiples.panels.length),
+                hue: "plain",
                 max: multiples.max,
                 min: multiples.min,
                 labelChars: multiples.labelChars,
@@ -1736,7 +1737,7 @@ test("every bar a column draws is read against a number: a value at its end or a
             panelWidth(multiples.panels.length),
           ),
         )
-      : [renderToString((w) => barSpec(barsOf(series), { width: w, scale: barScale(series) }), "presentational")];
+      : [renderToString((w) => barSpec(barsOf(series), { width: w, hue: "plain", scale: barScale(series) }), "presentational")];
     for (const svg of svgs) {
       const doc = parseHTML(`<div>${svg}</div>`).document;
       const values = doc.querySelectorAll("g.bar-value text").length;

@@ -25,7 +25,15 @@
  * as `reach.astro` already does.
  */
 
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
+
+/*
+ * `renderReach` draws with the browser's renderer, and this suite has no document — see
+ * `vitest.config.ts`. The build's renderer draws the same spec without one.
+ */
+vi.mock("../../src/lib/plot/client.ts", async () => ({
+  renderToString: (await import("../../src/lib/plot/ssr.ts")).renderToString,
+}));
 
 import { loadFeed } from "../../src/lib/feed.ts";
 import type { Dimension } from "../../src/lib/reach.ts";
@@ -39,10 +47,12 @@ import {
   groups,
   inScope,
   presets,
+  renderReach,
   scopeCounties,
   viewFromQuery,
 } from "../../src/lib/reach.ts";
 import { MIN_CLOUD } from "../../src/lib/plot/spec.ts";
+import { ORDINAL } from "../../src/lib/plot/tokens.ts";
 import { compare } from "../../src/lib/order.ts";
 import { applyAll, currentLaw, modelOf } from "../../src/lib/policy.ts";
 import { LEVER_BOUNDS, defaultLevers } from "../../src/lib/scenario.ts";
@@ -416,4 +426,26 @@ test("a scope is carried in the query string and held to shape", () => {
   // A set written twice is a set.
   expect(viewFromQuery(new URLSearchParams("co=athens,athens")).counties).toEqual(["athens"]);
   expect(viewFromQuery(new URLSearchParams("")).counties).toEqual([]);
+});
+
+test("the regimes are the categorical pair and a ring, never the ordinal ramp", () => {
+  /*
+   * #652. The regimes were drawn in the ordinal ramp, whose middle step is the formula hue in the
+   * light palette, so "held by the guarantee" was painted formula blue and the two held steps barely
+   * separated in a cloud of 609. Formula is formula, held is the guarantee, and held twice over is
+   * the guarantee with an ink ring.
+   */
+  const model = modelOf(panel.statewide);
+  const html = renderReach(panel, defaultLevers(model), DEFAULT_VIEW);
+  expect(DEFAULT_VIEW.shading).toBe("regime");
+  for (const step of ORDINAL) expect(html, `${step} is not a regime`).not.toContain(step);
+  expect(html).not.toContain('data-series="ordinal-');
+  expect(html).toContain("var(--series-formula)");
+  expect(html).toContain("var(--series-guarantee)");
+  expect(html).toContain('data-series="guarantee-ringed"');
+  // The ring is drawn on the dots, and only on the held-twice-over ones.
+  const rings = (html.match(/<circle[^>]*stroke="var\(--text-primary\)"/g) ?? []).length;
+  const held = law.filter((o) => o.onGuarantee && o.atMinimumStateShare).length;
+  expect(held, "a population to ring").toBeGreaterThan(0);
+  expect(rings).toBe(held * 3);
 });
