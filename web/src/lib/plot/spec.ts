@@ -531,7 +531,36 @@ export function pair(at: (width: number) => string): string {
     `<div class="chart-at" data-at="narrow">${narrow}</div>` +
     `<div class="chart-at" data-at="middle">${middle}</div>` +
     `<div class="chart-at" data-at="wide">${wide}</div>` +
+    valuesOf(wide) +
     `</div>`
+  );
+}
+
+/**
+ * The chart's values as text, read off the hover strings its marks already carry.
+ *
+ * `role="img"` makes a chart one graphic with a name, which is right for a reader moving through
+ * the page and leaves the values to the keyboard cursor — and a screen reader in browse mode does
+ * not drive that cursor, so it got the name and nothing else (#616). 4,456 charts on the site had
+ * more than eight marks and no table or list beside them.
+ *
+ * The strings are the ones the cursor and the tooltip already speak, so this adds no figure the
+ * chart did not carry and cannot disagree with the marks: it is taken from the same attributes,
+ * in the order Plot drew them. Read off the serialised SVG rather than the spec so both renderers
+ * and the panel path get it from one place — the attribute values arrive already escaped, and an
+ * escaped attribute value is valid element text. A closed `<details>` works with script off and
+ * costs a sighted reader one line.
+ *
+ * Nothing for a chart without hovers, whose values are its labels; and nothing for a
+ * presentational one, which is hidden because the text beside it already says what it says.
+ */
+export function valuesOf(svg: string): string {
+  if (/^<[a-z]+\b[^>]*\baria-hidden="true"/.test(svg)) return "";
+  const values = [...svg.matchAll(/\bdata-hover="([^"]*)"/g)].map((m) => `<li>${m[1]}</li>`);
+  if (values.length === 0) return "";
+  return (
+    `<div class="chart-foot"><details class="chart-values">` +
+    `<summary>The values</summary><ul>${values.join("")}</ul></details></div>`
   );
 }
 

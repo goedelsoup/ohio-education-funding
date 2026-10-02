@@ -246,7 +246,7 @@ function renderSpread(c: County, statewide: Statewide, all: County[]): string {
              <div class="strip-head"><span>Richest over poorest district, tax base per pupil</span>
                <strong class="tnum">${fixed(c.valuationRatio, 1)}×
                  <span class="n">${ratioPercentile} percentile</span></strong></div>
-             <div class="chartwrap" data-chart="county-position">${renderToString(position, "presentational")}</div>`
+             <div class="chartwrap" data-chart="county-position">${renderToString(position, { label: `Tax base per pupil of the richest district over the poorest, for each of the ${ratios.length} counties with more than one district reporting one, with ${c.name} County marked, ${yearOf("formula")}` })}</div>`
           : ""
       }
       <p class="note">Two districts in the same county, <strong>${c.valuationRatio.toFixed(

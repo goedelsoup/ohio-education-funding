@@ -19,7 +19,8 @@ import { describe, expect, test } from "vitest";
 
 import { DIST, pages } from "./artefact.ts";
 
-const CHARTWRAP = /<div class="chartwrap"[^>]*>/g;
+/** Attribute order is the serializer's: a wrapper given its own address (#616) opens `<div id=… class=…`. */
+const CHARTWRAP = /<div\b[^>]*\bclass="chartwrap"[^>]*>/g;
 const MARKER = /<g\b[^>]*\bclass="dist-marker"/;
 /** A `.strip-head` ending exactly where the chart begins. It holds no `<div>` of its own. */
 const HEAD_BEFORE = /<div class="strip-head"[^>]*>(?:(?!<\/?div\b)[\s\S])*<\/div>\s*$/;

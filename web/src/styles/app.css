@@ -93,8 +93,10 @@ body {
    do: a skip link that lands the reader under the chrome has skipped them past the top of the
    content. The end-to-end test for the link found this rather than a reading of the rule.
 
-   `nav#contents` is where every heading's "Contents" link lands (#594). */
-.card[id], .basis-scope[id], h2[id], h3[id], main[id], nav#contents {
+   `nav#contents` is where every heading's "Contents" link lands (#594), and the last line is
+   where a chart's own `#` lands (#616). */
+.card[id], .basis-scope[id], h2[id], h3[id], main[id], nav#contents,
+.series[id], .panels[id], .chartwrap[id], .chart-pair[id] {
   scroll-margin-top: calc(var(--sticky-chrome) + .75rem);
 }
 
@@ -2125,6 +2127,43 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 .chart-at[data-at="panel"] { display: block; }
 
 /*
+ * The line under a chart: its values as text, and its address where the heading's is shared.
+ *
+ * The values are the hover strings the marks already carry, in a closed `<details>` (`valuesOf` in
+ * `plot/spec.ts`), so a reader in browse mode, or with no pointer, has what the cursor speaks.
+ * The `#` is `anchorCharts` in `semantics.ts`, and only on a chart whose section holds another.
+ * It is always shown rather than revealed on hover as a heading's is: there is no heading row
+ * here for a pointer to be over.
+ */
+.chart-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+.chart-values { flex: 1 1 auto; min-width: 0; }
+.chart-values > summary { cursor: pointer; }
+.chart-values > summary:hover { color: var(--text-primary); }
+.chart-values > ul {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-7);
+  columns: 20rem;
+  column-gap: var(--space-8);
+}
+.chart-values li { break-inside: avoid; }
+.chart-anchor { color: var(--text-muted); text-decoration: none; }
+.chart-anchor:hover { color: var(--text-primary); }
+.chart-anchor:focus-visible {
+  color: var(--text-primary);
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/*
  * A set of panels, laid out against each other.
  *
  * Side by side where the card can hold two — the finding these were built for *is* the comparison,
@@ -3246,6 +3285,8 @@ tr.series-break > td {
      stylesheet has not measured. */
   .chart-at[data-at="narrow"], .chart-at[data-at="middle"] { display: none; }
   .chart-at[data-at="wide"] { display: block; }
+  /* A chart's values list and its link are for a screen; paper has the drawing itself (#616). */
+  .chart-foot { display: none; }
 
   .card, .chartwrap, .tile, .strip-row, .flags, tr { break-inside: avoid; }
   /* A heading, and a legend, belong to what follows them. */

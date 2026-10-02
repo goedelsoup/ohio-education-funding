@@ -560,6 +560,99 @@ function levelHeadings(document: Document): number {
 }
 
 /**
+ * An address for every chart that does not have one of its own.
+ *
+ * # What was wrong
+ *
+ * A chart's address was its section's: the card id, reached by the heading's `#`. That holds where
+ * a section draws one chart, and nowhere else — `/method`'s three forecast charts were all
+ * `#forecast-range`, the district page's two position strips both `#position`, a county's two
+ * charts `#spread`. A journalist could not link or cite "the second chart" (#616). 2,600 of the
+ * site's 8,800 charts shared a heading with another.
+ *
+ * # The rule
+ *
+ * A chart is addressed if it carries an id — a wiki chart does, see `SeriesChart.astro` — or if it
+ * is the only chart under the nearest heading above it and that heading has a `#`. Every other
+ * chart gets an id and a `#` of its own, at the start of the line its values sit on.
+ *
+ * The id is the chart's `data-chart` name, which is already the name the tests and the stylesheet
+ * know it by, and is numbered only where the name repeats or is taken: `#county-position`,
+ * `#position-2`.
+ *
+ * # Why derived and not written at the call sites
+ *
+ * The argument `nameScrollers` makes. Whether a chart shares its heading is a property of the page
+ * it lands on, not of the renderer that wrote it — `Strip.astro` draws one strip and does not know
+ * the card draws two — so a convention at the call sites would be a convention the next card
+ * forgets. Server-rendered charts only: the scenario routes draw theirs in the browser, one to a
+ * heading that carries its own `#`.
+ */
+function anchorCharts(document: Document): number {
+  const UNIT = (pair: Element): Element =>
+    pair.closest(".series") ?? pair.closest(".panels") ?? pair.closest(".chartwrap") ?? pair;
+
+  const under = new Map<Element | null, Element[]>();
+  let heading: Element | null = null;
+  for (const el of document.querySelectorAll("h1, h2, h3, h4, h5, h6, .chart-pair")) {
+    if (!el.classList.contains("chart-pair")) {
+      heading = el;
+      continue;
+    }
+    if (el.closest("template")) continue;
+    const unit = UNIT(el);
+    // A unit's own heading — a wiki chart's — is inside it, and is not a heading above it.
+    const above = heading && unit.contains(heading) ? null : heading;
+    const units = under.get(above) ?? [];
+    if (!units.includes(unit) && ![...under.values()].some((u) => u.includes(unit))) units.push(unit);
+    under.set(above, units);
+  }
+
+  const taken = new Set([...document.querySelectorAll("[id]")].map((el) => el.id));
+  const unaddressed = [...under].flatMap(([above, units]) =>
+    units.length === 1 && above?.querySelector("a.section-anchor") ? [] : units,
+  ).filter((unit) => !unit.id);
+
+  const names = unaddressed.map(
+    (unit) =>
+      (unit.getAttribute("data-chart") ?? unit.querySelector("[data-chart]")?.getAttribute("data-chart"))
+        ?.split("/")
+        .pop() ??
+      unit.closest("[id]")?.id ??
+      "chart",
+  );
+  const repeated = new Set(names.filter((name, i) => names.indexOf(name) !== i));
+  const seen = new Map<string, number>();
+
+  unaddressed.forEach((unit, i) => {
+    const name = names[i]!;
+    let id = name;
+    if (repeated.has(name) || taken.has(name)) {
+      let k = seen.get(name) ?? 0;
+      do id = `${name}-${(k += 1)}`;
+      while (taken.has(id));
+      seen.set(name, k);
+    }
+    taken.add(id);
+    unit.id = id;
+
+    let foot = unit.querySelector(".chart-foot");
+    if (!foot) {
+      foot = document.createElement("div");
+      foot.className = "chart-foot";
+      (unit.querySelector(".chart-pair") ?? unit).append(foot);
+    }
+    const link = document.createElement("a");
+    link.className = "chart-anchor";
+    link.setAttribute("href", `#${id}`);
+    link.setAttribute("aria-label", "Link to this chart");
+    link.innerHTML = `<span aria-hidden="true">#</span>`;
+    foot.prepend(link, document.createTextNode(" "));
+  });
+  return unaddressed.length;
+}
+
+/**
  * Every pass, over one parse of the rendered body.
  *
  * The counts are returned rather than swallowed so the tests can hold them: a scrolling box with
@@ -577,6 +670,8 @@ export function applySemantics(body: string): {
   anchored: number;
   /** Headings given a link back to the page's contents list. */
   linked: number;
+  /** Charts given an address of their own, because their heading's was shared or missing. */
+  charted: number;
 } {
   /*
    * A whole document and then an assignment, rather than `parseHTML(\`<body>…</body>\`)`.
@@ -601,7 +696,17 @@ export function applySemantics(body: string): {
   const scoped = scopeTables(document);
   const aligned = alignColumns(document);
   const anchored = moveAnchors(document);
+  const charted = anchorCharts(document);
   const linked = linkContents(document);
 
-  return { html: document.body.innerHTML, unnamed, scoped, relevelled, aligned, anchored, linked };
+  return {
+    html: document.body.innerHTML,
+    unnamed,
+    scoped,
+    relevelled,
+    aligned,
+    anchored,
+    linked,
+    charted,
+  };
 }

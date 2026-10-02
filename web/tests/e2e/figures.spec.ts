@@ -22,7 +22,7 @@
  * whose head carries its year, and nothing in the 44% of money strings that sit in a dated column.
  * The mechanism was working everywhere it had been applied. It had not been applied outside cards.
  *
- * # Reach, and the five ways a figure has it
+ * # Reach, and the six ways a figure has it
  *
  * A figure is dated if any one of these holds. They are not ranked; a figure needs one.
  *
@@ -41,6 +41,10 @@
  * 5. **It is in a tile or a distribution strip whose own text names a year, or which contains a
  *    `.fig`.** Both are compact composed units — key, value, note; note, chart, scale — a few
  *    dozen characters end to end. There is no "elsewhere on the page" inside one.
+ * 6. **It is in a chart's values list, and the chart's name names a year.** The list is the
+ *    drawing's text alternative (#616), built from the same hovers, and the name is what a screen
+ *    reader announces before it. `/method`'s band coverage is the case: an unchipped card, a span
+ *    of FY2009-FY2024 in the name, and thirteen rows of percentages under it.
  *
  * # Exemptions carry a reason, and are enforced in both directions
  *
@@ -213,6 +217,12 @@ test("every figure on every page can reach the year it is measured in", () => {
     const allowed = NOT_A_MEASUREMENT[route];
 
     const { document } = parseHTML(html);
+    /* Read before the drawings go: a chart's values list is dated by its drawing's name (rule 6). */
+    const namedLists = new Set(
+      [...document.querySelectorAll("details.chart-values")].filter((list) =>
+        YEAR.test(list.closest(".chart-pair")?.querySelector("svg")?.getAttribute("aria-label") ?? ""),
+      ),
+    );
     /* `<annotation>` is MathML's copy of the LaTeX source. It is inside `<semantics>` and is never
        painted, so a `\$90` in it is markup rather than a figure a reader meets. */
     for (const el of document.querySelectorAll("script,style,svg,head,template,annotation")) {
@@ -240,6 +250,10 @@ test("every figure on every page can reach the year it is measured in", () => {
       // 5. A tile or a strip, which is one composed unit end to end.
       const unit = parent.closest(".tile, .measure");
       if (unit && (unit.querySelector(".fig") || YEAR.test(unit.textContent ?? ""))) continue;
+
+      // 6. A chart's values list, whose drawing names the year.
+      const list = parent.closest("details.chart-values");
+      if (list && namedLists.has(list)) continue;
 
       // 3. A chipped card or section, at any depth.
       let chipped = false;

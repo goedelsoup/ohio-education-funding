@@ -219,7 +219,7 @@ const years = Object.fromEntries(MEASURES.map((m) => [m.key, m.year])) as Record
             {" "}{m.year}. The shaded box is the middle half; the dots past the whiskers are
             districts of their own.
           </p>
-          <div class="chartwrap" set:html={m.chart} />
+          <div class="chartwrap" data-chart={`measure-${m.key}`} set:html={m.chart} />
         </div>
       ))
     }
