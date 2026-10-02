@@ -16,7 +16,7 @@ import { CLEVELAND } from "./helpers.ts";
 test.describe("the projection", () => {
   test("leads with the range and demotes the point to a footnote", async ({ page }) => {
     await page.goto("/scenario");
-    const headline = page.locator("#projection-out .tile.wide");
+    const headline = page.locator('#projection-out .tile[data-width="wide"]');
     await expect(headline.locator(".v")).toContainText("–");
     await expect(headline.locator(".n")).toContainText("One path through the band, not the answer");
   });

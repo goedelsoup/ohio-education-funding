@@ -203,7 +203,7 @@ test.describe("the hold-harmless machinery", () => {
     const body = page.locator("main");
     await expect(body).toContainText("Open Enrolment Adjustment");
 
-    const withdrawals = page.locator(".card.apparatus", { hasText: "What this node used to say" });
+    const withdrawals = page.locator('.card[data-card="apparatus"]', { hasText: "What this node used to say" });
     await expect(withdrawals).toBeVisible();
     await expect(withdrawals.locator("details.revision")).toHaveCount(3);
     await expect(withdrawals).toContainText("566 districts and wrongly for 43");

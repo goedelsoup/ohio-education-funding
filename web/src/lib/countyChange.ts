@@ -170,7 +170,7 @@ function panel(c: County, measure: MeasureKey): string {
       </tr>`;
     })
     .join("");
-  return `<div class="measure-panel ${measure}">
+  return `<div class="measure-panel" data-measure="${measure}">
       <p class="note">On <strong>${name}</strong>:</p>
       <ul class="note">${STEPS.map(([from, to]) => stepSentence(c.districts, measure, from, to)).join("")}</ul>
       ${neighborsChart(c.districts, measure, { from: 0, to: 2 })}

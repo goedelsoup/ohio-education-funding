@@ -48,6 +48,18 @@ test("a citation is read from main only, and named by the card it sits in", () =
   ]);
 });
 
+test("a card's variant attribute does not hide its id", () => {
+  // #566 moved the card's variant onto `data-card`, which renders between `class` and `id`. The
+  // reader wanted `id` straight after `class`, so every apparatus card fell out and its links were
+  // credited to whichever plain card came before it.
+  const html = page(
+    `<div class="card" id="pi"><h2>PI</h2></div>` +
+      `<div class="card" data-card="apparatus" id="not" data-part="not"><h2>What this is not</h2>` +
+      `<a href="/wiki/metric/performance-index">the index</a></div>`,
+  );
+  expect([...citationsOf(html)]).toEqual([["metric/performance-index", [{ id: "not", label: "What this is not" }]]]);
+});
+
 test("the inversion counts a route's pages and prefers an exemplar as its example", () => {
   const cites = page(`<div class="card" id="pi"><h2>PI</h2><a href="/wiki/metric/performance-index">x</a></div>`);
   const silent = page(`<div class="card" id="pi"><h2>PI</h2></div>`);

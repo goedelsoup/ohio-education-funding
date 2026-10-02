@@ -184,7 +184,7 @@ test.describe("charts on a phone", () => {
   test("the reach plot is the wide drawing on a desktop", async ({ page }) => {
     // #609. The rail opens beside the stage at 960, and on a reading-width page that left the
     // stage 548px: under the swap, so from 968 up the plot was drawn at its phone size and halved
-    // as the window widened. The page is `.wrap.wide` now.
+    // as the window widened. The page is the wide `.wrap` now.
     for (const width of [1024, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await visit(page, "/scenario/reach");

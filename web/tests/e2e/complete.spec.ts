@@ -638,13 +638,13 @@ test.describe("with JavaScript disabled", () => {
     // Two radios and a sibling selector rather than a click handler, so the control is not a dead
     // button for a reader without script.
     await page.goto(`/district/${CLEVELAND}/finances`);
-    await expect(page.locator(".basis-panel.nominal")).toBeVisible();
-    await expect(page.locator(".basis-panel.real")).toBeHidden();
+    await expect(page.locator('.basis-panel[data-basis="nominal"]')).toBeVisible();
+    await expect(page.locator('.basis-panel[data-basis="real"]')).toBeHidden();
 
     await page.locator('label[data-basis="real"]').click();
-    await expect(page.locator(".basis-panel.real")).toBeVisible();
-    await expect(page.locator(".basis-panel.nominal")).toBeHidden();
-    await expect(page.locator(".basis-panel.real")).toContainText("FY2020 dollars");
+    await expect(page.locator('.basis-panel[data-basis="real"]')).toBeVisible();
+    await expect(page.locator('.basis-panel[data-basis="nominal"]')).toBeHidden();
+    await expect(page.locator('.basis-panel[data-basis="real"]')).toContainText("FY2020 dollars");
   });
 
   test("the wiki renders its prose and its claim badges", async ({ page }) => {

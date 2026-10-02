@@ -26,16 +26,16 @@
  *
  * A **compound class selector** is two or more classes chained with no combinator between them —
  * `.sw.formula`, as the swatch was written — which an element matches only by carrying every class
- * listed. That is exactly the shape a component's variant modifier takes (`.card.apparatus`), and
+ * listed. That is exactly the shape a component's variant modifier took (`.card.apparatus`), and
  * exactly the shape a coincidence takes (`.sw.formula`). The difference between them is not
  * visible in either selector alone. A variant written as an attribute (`[data-series]`,
- * `[data-size]`, `[data-aside]`) is not a class and cannot take part in one.
+ * `[data-card]`, `[data-width]`) is not a class and cannot take part in one.
  *
  * # How a coincidence is told from a modifier, without being told which is which
  *
- * A modifier class — `.apparatus`, `.correction-index`, every one of the card variants — never
- * gets a bare rule of its own. It exists only chained after `.card`, because it was never meant to
- * style anything by itself. `.formula` and `.sw` are different: **both** halves of `.sw.formula`
+ * A modifier class — `.apparatus`, `.correction-index`, every one of the card variants as they
+ * were — never gets a bare rule of its own. It exists only chained after `.card`, because it was
+ * never meant to style anything by itself. `.formula` and `.sw` are different: **both** halves of `.sw.formula`
  * carry an independent bare rule elsewhere in this file — `.formula` styled a code block on its
  * own, `.sw` styles a ten-pixel box on its own — which is the actual signature of a collision: two
  * classes that each already mean something on their own being chained together means whichever
@@ -43,8 +43,21 @@
  *
  * So the check below does not ask "is this selector a modifier pattern" — it cannot know that. It
  * asks the narrower, checkable question: does a compound selector chain two classes that **both**
- * also have a bare rule elsewhere in this stylesheet. `.card.apparatus` never trips it, because
- * `.apparatus` has no bare rule to collide with. `.sw.formula` did, until the fix.
+ * also have a bare rule elsewhere in this stylesheet. `.card.apparatus` never tripped it, because
+ * `.apparatus` had no bare rule to collide with. `.sw.formula` did, until the fix.
+ *
+ * # Absent is not impossible, so the modifiers are attributes
+ *
+ * That check answers "does anything collide today". It cannot answer "can anything collide
+ * tomorrow": `.card.apparatus` was safe only until someone wrote a bare `.apparatus` for something
+ * else, and nothing would have stopped them. #566 moved every remaining modifier onto an attribute
+ * named for its axis — `.card[data-card]`, `.wrap`/`.tile`/`.menu-panel[data-width]`,
+ * `.v[data-value]`, `.basis-panel[data-basis]`, `.measure-panel[data-measure]` — so no compound
+ * class selector is left to collide, and the last test below keeps it that way.
+ *
+ * One family stays compound on purpose: `.claim.verified`, `.claim.inference`, `.claim.open`. The
+ * three-claim-class gate from #182 (`stylesheet.spec.ts`) pins that shape, and the markup writes
+ * it from the evidence vocabulary as `class="claim ${tag}"`.
  *
  * # The allow-list
  *
@@ -85,41 +98,49 @@ interface Collision {
 }
 
 /**
- * Every compound selector chaining two classes that each also carry an independent bare rule.
+ * Every selector in the stylesheet, with the compound tokens it is built from.
  *
  * Selector lists are split on top-level commas and each side handled as its own selector; each
  * selector is then split on combinators into the individual compound tokens a descendant chain is
- * built from. A one-token, one-class, unqualified selector marks that class as bare; a token
- * carrying two or more classes is a compound, and every unordered pair inside it is a candidate.
+ * built from.
  */
-function findCollisions(css: string): { bareClasses: Set<string>; collisions: Collision[] } {
-  const rules = [...css.matchAll(/([^{}]+)\{[^{}]*\}/g)].map(([, selectorList]) => selectorList!.trim());
-
-  const bareClasses = new Set<string>();
-  const compounds = new Map<string, Set<string>>();
-
-  for (const selectorList of rules) {
-    for (const raw of selectorList.split(",")) {
+function* selectorsOf(css: string): Generator<{ selector: string; tokens: string[] }> {
+  for (const [, selectorList] of css.matchAll(/([^{}]+)\{[^{}]*\}/g)) {
+    for (const raw of selectorList!.trim().split(",")) {
       const selector = raw.trim();
       if (!selector) continue;
       const tokens = selector
         .split(/\s*[>+~]\s*|\s+/)
         .filter(Boolean)
         .map(stripPseudo);
+      yield { selector, tokens };
+    }
+  }
+}
 
-      if (tokens.length === 1 && isBareClassToken(tokens[0]!)) {
-        bareClasses.add(classesOf(tokens[0]!)[0]!);
-      }
+/**
+ * Every compound selector chaining two classes that each also carry an independent bare rule.
+ *
+ * A one-token, one-class, unqualified selector marks that class as bare; a token carrying two or
+ * more classes is a compound, and every unordered pair inside it is a candidate.
+ */
+function findCollisions(css: string): { bareClasses: Set<string>; collisions: Collision[] } {
+  const bareClasses = new Set<string>();
+  const compounds = new Map<string, Set<string>>();
 
-      for (const token of tokens) {
-        const classes = classesOf(token);
-        if (classes.length < 2) continue;
-        for (let i = 0; i < classes.length; i += 1) {
-          for (let j = i + 1; j < classes.length; j += 1) {
-            const key = [classes[i], classes[j]].sort().join(".");
-            if (!compounds.has(key)) compounds.set(key, new Set());
-            compounds.get(key)!.add(selector);
-          }
+  for (const { selector, tokens } of selectorsOf(css)) {
+    if (tokens.length === 1 && isBareClassToken(tokens[0]!)) {
+      bareClasses.add(classesOf(tokens[0]!)[0]!);
+    }
+
+    for (const token of tokens) {
+      const classes = classesOf(token);
+      if (classes.length < 2) continue;
+      for (let i = 0; i < classes.length; i += 1) {
+        for (let j = i + 1; j < classes.length; j += 1) {
+          const key = [classes[i], classes[j]].sort().join(".");
+          if (!compounds.has(key)) compounds.set(key, new Set());
+          compounds.get(key)!.add(selector);
         }
       }
     }
@@ -176,5 +197,40 @@ describe("the class-collision gate", () => {
     const offenders = findCollisions(reverted).collisions.filter(({ pair }) => !(pair in ALLOW_LIST));
     expect(offenders.length, "reverting both halves should reopen a collision").toBeGreaterThan(0);
     expect(offenders.some((o) => o.pair === "formula.sw")).toBe(true);
+  });
+});
+
+/** Every compound token in the stylesheet that is not a claim mark, with the selector it is in. */
+function compoundModifiers(css: string): string[] {
+  const found: string[] = [];
+  for (const { selector, tokens } of selectorsOf(css)) {
+    for (const token of tokens) {
+      const classes = classesOf(token);
+      if (classes.length < 2) continue;
+      if (classes.length === 2 && classes[0] === "claim") continue;
+      found.push(`${token} in ${selector}`);
+    }
+  }
+  return found;
+}
+
+describe("a variant is an attribute, not a second class", () => {
+  test("the only compound class selectors are the three claim marks", () => {
+    // The exemption has to be exercised, or this passes because the parser stopped seeing compounds.
+    const claims = new Set<string>();
+    for (const { tokens } of selectorsOf(CSS)) {
+      for (const token of tokens) {
+        const classes = classesOf(token);
+        if (classes.length === 2 && classes[0] === "claim") claims.add(classes[1]!);
+      }
+    }
+    expect([...claims].sort()).toEqual(["inference", "open", "verified"]);
+    expect(compoundModifiers(CSS)).toEqual([]);
+  });
+
+  test("standing one card variant back down to a class is caught", () => {
+    const reverted = CSS.replaceAll('.card[data-card="lede"]', ".card.lede");
+    expect(reverted, "the lede selector did not match — has the lede card moved?").not.toBe(CSS);
+    expect(compoundModifiers(reverted)).toContain(".card.lede in .card.lede");
   });
 });

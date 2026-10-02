@@ -121,5 +121,6 @@
   --shadow-panel: 0 10px 28px rgb(0 0 0 / 18%);
 }
 
-/* `.subnav` becomes sticky here and adds its 53px. Below this only the header is sticky. */
+/* `.subnav` becomes sticky here and adds its 52.6px (106 errs 2.4px clear; see above). Below this
+   only the header is sticky. */
 @media (min-width: 1000px) { :root { --sticky-chrome: 106px; } }

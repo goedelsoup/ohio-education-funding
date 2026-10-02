@@ -88,19 +88,19 @@ test("each table is sortable, written largest biennium rise first", () => {
 });
 
 test("Lima's row names the repealed supplement as the line that moved it most", () => {
-  const total = card.querySelector(".measure-panel.total")!;
+  const total = card.querySelector('.measure-panel[data-measure="total"]')!;
   const lima = [...total.querySelectorAll("tbody tr")].find((r) => text(r.querySelector("th")) === "Lima City")!;
   expect(lima.querySelector("th a")?.getAttribute("href")).toBe(routes.districtChange(LIMA));
   expect(text(lima)).toContain("Supplemental targeted assistance (repealed by H.B. 96)");
   expect(text(lima)).toContain("−$1,859,367");
   // The foundation panel has no line column: foundation aid is one line.
-  expect(card.querySelectorAll(".measure-panel.foundation thead th")).toHaveLength(9);
+  expect(card.querySelectorAll('.measure-panel[data-measure="foundation"] thead th')).toHaveLength(9);
 });
 
 test("each measure draws its county between the sentences and the table, in the table's order", () => {
   // #661: the card was a table and a bullet list, where the district tab draws the same comparison.
   for (const measure of ["total", "foundation"] as const) {
-    const panel = card.querySelector(`.measure-panel.${measure}`)!;
+    const panel = card.querySelector(`.measure-panel[data-measure="${measure}"]`)!;
     const parts = [...panel.children].map((el) =>
       el.matches("ul") ? "sentences" : el.matches("[data-chart]") ? "chart" : el.matches(".scroll") ? "table" : null,
     );

@@ -140,14 +140,15 @@ test("no prose genre takes a typeface, a hue, or a radius of its own", () => {
   );
   const offenders: string[] = [];
   // Match the class as a token wherever it appears, chained or not. The first version anchored on
-  // `(^|,|\s)\.findings`, which never matched `.card.findings` — the class this site actually uses,
+  // `(^|,|\s)\.findings`, which never matched `.card.findings` — the selector this site then used,
   // because findings is a card here — so the whole genre was exempt and a series hue on its ground
-  // passed green. Caught by setting one deliberately.
+  // passed green. Caught by setting one deliberately. #566 moved the card's variant onto an
+  // attribute, `.card[data-card="findings"]`, which `\.findings` cannot see either, so it is named.
   // The genre's classes named in full. `(?![a-z-])` after `revision` rejected `revision-body`,
   // which is the withdrawal's actual container — so the one element that could grow a container
   // shape was the one out of scope, and a radius on it passed. Three attempts, three misses, each
   // found by breaking it rather than by reading it.
-  const GENRE = /\.(lead|findings|revision|revision-body|withdrawn)(?![a-z-])/;
+  const GENRE = /\.(lead|findings|revision|revision-body|withdrawn)(?![a-z-])|\[data-card="findings"\]/;
   for (const [selector, body] of rules(GENRE)) {
     for (const declaration of body.split(";")) {
       const [property = "", value = ""] = declaration.split(":").map((part) => part.trim());
@@ -161,8 +162,8 @@ test("no prose genre takes a typeface, a hue, or a radius of its own", () => {
       }
       // A card legitimately has a radius, and `findings` IS a card here — so the exemption is for
       // a rule targeting the card itself, which means the LAST compound in the selector. Testing
-      // the whole string exempted `.card.apparatus .revision-body` too, which is a descendant and
-      // not a card, and let a radius onto the withdrawal.
+      // the whole string exempted `.card[data-card="apparatus"] .revision-body` too, which is a
+      // descendant and not a card, and let a radius onto the withdrawal.
       const target = selector.split(/\s+/).at(-1) ?? "";
       if (property === "border-radius" && !target.includes(".card")) {
         offenders.push(`${selector} sets its own radius`);
@@ -184,7 +185,7 @@ test("no prose genre takes a typeface, a hue, or a radius of its own", () => {
  * raised rectangles reads as forty competing objects rather than as one document.
  */
 test("nothing that sits on the page carries a shadow", () => {
-  const offenders = rules(/(^|,|\s)\.(card|tile)(\.|,|\s|$)|(^|,|\s)table(\s|,|$)/)
+  const offenders = rules(/(^|,|\s)\.(card|tile)(\.|\[|,|\s|$)|(^|,|\s)table(\s|,|$)/)
     .filter(([, body]) => /box-shadow\s*:\s*(?!none)/.test(body))
     .map(([selector]) => selector);
   expect(offenders).toEqual([]);
@@ -272,15 +273,50 @@ test("every width breakpoint is written in px", () => {
 });
 
 /**
+ * A pair of breakpoints is written one way, the way that leaves the narrower sliver.
+ *
+ * Max/min pairs were spelled two ways: `699.98px`/`700px` and `640px`/`641px`. The second leaves a
+ * sliver: a viewport 640.5px wide — a zoomed or scaled one, where a CSS width need not be whole —
+ * is above `max-width: 640px` and below `min-width: 641px`, and matches neither block. #566 took
+ * the first spelling, which narrows that sliver to .02px: a `min-width` is a whole pixel, and a
+ * `max-width` is a whole pixel less .02, the complement of the `min-width` one pixel up. Every rule
+ * kept the whole-pixel widths it had — `640px` became `640.98px`, `500px` became `500.98px` — so
+ * nothing moved on a whole viewport.
+ *
+ * Container queries are held to the same rule, and so are the token files, where `--sticky-chrome`
+ * changes at a breakpoint.
+ */
+test("every max-width breakpoint is the complement of a whole-pixel min-width", () => {
+  const tokens = resolve(process.cwd(), "src/styles/tokens");
+  const sheets = [
+    CSS,
+    ...readdirSync(tokens)
+      .filter((name) => name.endsWith(".css"))
+      .map((name) => readFileSync(join(tokens, name), "utf8").replace(/\/\*[\s\S]*?\*\//g, "")),
+  ];
+  const bounds = sheets.flatMap((sheet) =>
+    [...sheet.matchAll(/@(?:media|container)[^{]*?\((min|max)-width:\s*([^)]+)\)/g)].map((m) => ({
+      side: m[1]!,
+      width: m[2]!.trim(),
+    })),
+  );
+  expect(bounds.filter((b) => b.side === "max").length, "no max-width found — has the parser drifted?").toBeGreaterThan(3);
+  const offenders = bounds
+    .filter(({ side, width }) => !(side === "min" ? /^\d+px$/ : /^\d+\.98px$/).test(width))
+    .map(({ side, width }) => `${side}-width: ${width}`);
+  expect(offenders).toEqual([]);
+});
+
+/**
  * The findings genre survives a medium with no backgrounds.
  *
- * `.card.findings` is separated from every other card by its ground and nothing else, and the note
+ * The findings card is separated from every other card by its ground and nothing else, and the note
  * on that rule calls the confusion it prevents — a statute read as an estimate — the single most
  * damaging one available on this site. On paper the ground is gone, so something else has to say
  * the voice changed.
  */
 test("the findings card is not the only card by its ground alone", () => {
-  expect(SECOND_CHANNEL).toMatch(/\.card\.findings\s*\{[^}]*border-left\s*:/);
+  expect(SECOND_CHANNEL).toMatch(/\.card\[data-card="findings"\]\s*\{[^}]*border-left\s*:/);
 });
 
 /**

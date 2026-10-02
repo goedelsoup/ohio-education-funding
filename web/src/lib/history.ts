@@ -338,7 +338,7 @@ export function renderProvenance(bundle: Bundle): string {
   const last = lastOf(history);
 
   return `
-    <div class="card apparatus" id="what-this-is" data-part="what-this-is">
+    <div class="card" data-card="apparatus" id="what-this-is" data-part="what-this-is">
       <h2>${anchor("what-this-is")}What this is, and what it is not</h2>
       <p class="note">The two cards above are drawn from the U.S. Census Bureau's Annual Survey
         of School System Finances, FY${first.fiscal_year} through FY${last.fiscal_year}. They are not the state's
