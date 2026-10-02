@@ -35,8 +35,37 @@ state law required an academic improvement plan, and revised plans were approved
   now been opened — see below.
 - **Lorain**'s commission was dissolved by H.B. 33, signed 4 July 2023.
 - **Youngstown** remains, with annual reports through 2024-2025 and an approved extension of its
-  plan. By January 2026 the department was describing it as **the sole district in Ohio under
-  academic distress**, and said removal "would have to be the result of state legislation".
+  plan, both now opened — see below. By January 2026 the department was describing it as **the
+  sole district in Ohio under academic distress**, and said removal "would have to be the result
+  of state legislation".
+
+## The Youngstown extension, opened
+
+`YCS-Approval-of-Extension-1_26.pdf` at the same `getattachment/` path, two pages, read 2 October
+2026, SHA-256 `70b89736…a447c`. It is a scanned image with no text layer, so it was read by eye,
+not extracted. A letter from the director, **dated 22 January 2026**, to the superintendent and
+board president. It says:
+
+- the district asked for release under R.C. 3302.103, and the department found it "did not meet
+  the majority" of the overall benchmarks in its three-year plan, so release is declined;
+- on the superintendent's emailed request of 14 January 2026, the director has "approved an
+  extension ... in accordance with R.C. 3302.103", and **"During the extension year (2025-2026
+  school year)"** the district continues implementing the plan;
+- the district's request to amend its benchmarks is refused, because R.C. 3302.103(D)(2)'s
+  revision window ran from 1 July 2022 to 30 June 2025.
+
+So this is the **first** of the two extensions division (F)(1)(a) allows. The approval post-dates
+half the year it covers. It does not mention a second extension or say what follows the 2025-26
+year.
+
+`Youngstown-City-School-District-AIP-Annual-Report-2025.pdf`, 33 pages, read the same day,
+SHA-256 `e9f3af32…2689c`. The district's own report: **6 of 24 benchmarks met in 2024-25**, after
+9 in 2023-24 and 16 in 2022-23. It notes that it would have met 15 had the targets not risen in
+the final year.
+
+**The page itself was still "Last Modified 2/10/2026" on 2 October 2026.** It lists no second
+extension application or approval. Whether Youngstown's plan route ended on 30 June 2026 or runs
+into a second extension year is not on it. [open]
 
 ## The release notice, opened
 
@@ -97,7 +126,8 @@ period" without distinguishing the two regimes.
   Cleveland's is the 2018 one, from the reporting around its release. Which of Youngstown and
   Lorain is 2010 is not on this page or in any held source. [open]
 - **The linked documents are not held.** Approval letters, improvement plans and annual reports are
-  separate PDFs. They would carry the benchmarks each district was held to, which is the only place
+  separate PDFs. Three have been read: East Cleveland's release notice, Youngstown's extension
+  approval and its 2024-25 annual report. None is committed. They would carry the benchmarks each district was held to, which is the only place
   the corpus could learn what a commission actually required. [open]
 - **A page, not a dataset.** Any figure taken from it is a transcription, and there is no digest
   behind it. Treat claims sourced here as weaker than claims sourced from a pinned fixture.
