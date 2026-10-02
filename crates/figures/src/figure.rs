@@ -888,6 +888,21 @@ fn eastland_fairfield_finances(
         .unwrap_or(f64::NAN)
 }
 
+/// Districts on Eastland's planning-district roster whose Table SD-1 row carries a joint
+/// vocational levy in the later quiet tax year — its members by statute rather than by contract.
+fn eastland_fairfield_levying_members() -> usize {
+    let roster: BTreeSet<String> = dispersion::ctpd_membership::roster("200036")
+        .into_iter()
+        .filter_map(|member| member.district_irn)
+        .collect();
+    let tax_year = project::joint_vocational::QUIET_TAX_YEARS[1];
+    dispersion::sd1::rows()
+        .iter()
+        .filter(|row| row.tax_year == tax_year && roster.contains(&row.irn))
+        .filter(|row| project::joint_vocational::levy(row) > 0.0)
+        .count()
+}
+
 /// Rows in the F-33 Ohio panel belonging to a joint vocational district.
 fn joint_vocational_panel_rows() -> usize {
     let joint: BTreeSet<String> = dispersion::lea_directory::joint_vocational_districts()
@@ -6251,6 +6266,16 @@ pub static FIGURES: &[Figure] = &[
         pinned: 12.0,
         tolerance: 0.0,
         compute: |_| project::joint_vocational::reconciling().len() as f64,
+    },
+    Figure {
+        key: "project/eastland-fairfield-statutory-members",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Districts on Eastland-Fairfield\u{2019}s planning-district roster that carry its levy \
+                \u{2014} the members by statute, against one more by contract",
+        pinned: 15.0,
+        tolerance: 0.0,
+        compute: |_| eastland_fairfield_levying_members() as f64,
     },
     Figure {
         key: "dispersion/districts-in-a-joint-vocational-district",
