@@ -516,7 +516,8 @@ test.describe("the section menus", () => {
     await page.goto("/");
     const library = page.locator("header.site nav details.menu").nth(2);
     await library.locator("summary").click();
-    const columns = await library.locator(".menu-panel").evaluate((panel) => {
+    // The runs and not the panel: the lead above them spans both columns, and is held below.
+    const columns = await library.locator(".menu-runs").evaluate((panel) => {
       // What a reader sees begin each column is its first entry, a heading or a link, and not the
       // run's box: that starts at the rule, level with column one, over the 7px the issue measured.
       const tops = new Map<number, number>();
@@ -533,6 +534,64 @@ test.describe("the section menus", () => {
     expect(columns.tops, "two columns").toHaveLength(2);
     expect(Math.abs(columns.tops[0]! - columns.tops[1]!), "the columns start level").toBeLessThan(0.5);
     expect(columns.ruled, "no run draws a rule; each has a heading").toBe(0);
+  });
+
+  test("the Library panel leads with the record: three tiles on one line, across both columns", async ({
+    page,
+  }) => {
+    /*
+     * The class index, the sources and the decisions were a fifth headed run at the foot of column
+     * two, drawn like `Doctrine (3)`. They head the panel now, a glyph over each label, spanning
+     * the columns below — and a row each on a phone, where the panel is one column.
+     */
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/");
+    const library = page.locator("header.site nav details.menu").nth(2);
+    await library.locator("summary").click();
+    const lead = library.locator(".menu-lead a");
+    expect(await lead.evaluateAll((as) => as.map((a) => a.getAttribute("href")))).toEqual([
+      "/wiki",
+      "/wiki/source",
+      "/wiki/decision",
+    ]);
+    await expect(library.locator(".menu-lead svg[aria-hidden='true']")).toHaveCount(3);
+    const geometry = await library.locator(".menu-panel").evaluate((panel) => {
+      const tiles = [...panel.querySelectorAll(".menu-lead a")].map((a) => a.getBoundingClientRect());
+      const runs = panel.querySelector(".menu-runs")!.getBoundingClientRect();
+      const icon = panel.querySelector(".menu-lead svg")!.getBoundingClientRect();
+      const label = panel.querySelector(".menu-lead .menu-label")!.getBoundingClientRect();
+      return {
+        tops: tiles.map((t) => t.top),
+        left: tiles[0]!.left,
+        right: tiles.at(-1)!.right,
+        runs: { left: runs.left, right: runs.right, top: runs.top },
+        bottom: Math.max(...tiles.map((t) => t.bottom)),
+        iconAbove: icon.bottom <= label.top + 0.5,
+      };
+    });
+    for (const top of geometry.tops) expect(Math.abs(top - geometry.tops[0]!), "tiles share a line").toBeLessThan(0.5);
+    expect(geometry.left, "the lead starts where the columns do").toBeLessThanOrEqual(geometry.runs.left + 0.5);
+    expect(geometry.right, "the lead ends where the columns do").toBeGreaterThanOrEqual(geometry.runs.right - 0.5);
+    expect(geometry.bottom, "the lead is above the columns").toBeLessThanOrEqual(geometry.runs.top);
+    expect(geometry.iconAbove, "the glyph sits over its label in a tile").toBe(true);
+
+    // On a phone the panel is one column, and so is the lead: a row each, the glyph beside its label.
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto("/");
+    await page.locator("header.site nav details.menu-all > summary").click();
+    const phone = page.locator("header.site nav details.menu").nth(2);
+    await phone.locator("summary").click();
+    const rows = await phone.locator(".menu-lead").evaluate((lead) => {
+      const tiles = [...lead.querySelectorAll("a")].map((a) => a.getBoundingClientRect());
+      const icon = lead.querySelector("svg")!.getBoundingClientRect();
+      const label = lead.querySelector(".menu-label")!.getBoundingClientRect();
+      return {
+        stacked: tiles.every((t, i) => i === 0 || t.top >= tiles[i - 1]!.bottom - 0.5),
+        beside: icon.right <= label.left + 0.5,
+      };
+    });
+    expect(rows.stacked, "the lead's links stack on a phone").toBe(true);
+    expect(rows.beside, "the glyph sits beside its label on a phone").toBe(true);
   });
 
   test("the Library panel opens inside the window at every width it hangs from the bar", async ({

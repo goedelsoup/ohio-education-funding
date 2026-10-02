@@ -24,6 +24,7 @@
 import type { Bundle } from "./types.ts";
 import { loadCorpus, type Corpus } from "./corpus.ts";
 import * as routes from "./routes.ts";
+import type { NavIcon } from "./icons.ts";
 
 /**
  * What a page passes as `section`, naming where it sits in the bar.
@@ -164,9 +165,15 @@ export function districtTitle(qualifiedName: string, view: DistrictView): string
 }
 
 /** A row of the name table as a link in the bar. */
-function place(key: keyof typeof NAMES, note?: string): NavLink {
+function place(key: keyof typeof NAMES, note?: string, icon?: NavIcon): NavLink {
   const { href, name } = NAMES[key];
-  return note == null ? { key, href, label: name } : { key, href, label: name, note };
+  return {
+    key,
+    href,
+    label: name,
+    ...(note == null ? {} : { note }),
+    ...(icon == null ? {} : { icon }),
+  };
 }
 
 /** One link in a menu panel. */
@@ -182,6 +189,14 @@ export interface NavLink {
    * under `Library` carry none — their count sits in the label, see `classLink`.
    */
   note?: string;
+  /**
+   * A glyph drawn beside the label, from `icons.ts`. Only a group's {@link NavGroup.lead} sets one.
+   *
+   * Never decoration either, and never alone: the label is still the link's name, and the glyph is
+   * `aria-hidden`. What it carries is a kind — these three are pages *about* the corpus, set apart
+   * from the classes that are its contents — and an icon on every link would carry nothing.
+   */
+  icon?: NavIcon;
 }
 
 /** A run of links under one rule, and optionally under a heading. */
@@ -232,6 +247,16 @@ export interface NavGroup extends NavEntryBase {
   sections: NavSection[];
   /** Lay the runs out in two columns where there is room. `Library` only. */
   wide?: boolean;
+  /**
+   * Links set above the runs, across the whole panel, each with its glyph. `Library` only.
+   *
+   * The record — the class index, the sources and the decisions — sat as a fifth headed run at the
+   * foot of `Library`'s second column, drawn exactly like `Doctrine (3)`. It is not a fifth kind of
+   * class: it is what the classes are indexed, cited and justified by, and the first of the three is
+   * the panel's own front door. So it heads the panel as three tiles over both columns instead of
+   * sitting at the bottom of one, and the columns below balance better for losing it.
+   */
+  lead?: NavLink[];
 }
 
 /** A top-level entry that is a link, one click from anywhere. */
@@ -423,17 +448,12 @@ export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavEntry[] {
       blurb: "The statute, the formula and every other class of the corpus these pages are generated from, with its sources and decisions.",
       label: "Library",
       wide: true,
-      sections: [
-        ...classRuns,
-        {
-          heading: "The record",
-          links: [
-            place("wiki", "every class, and what it holds"),
-            place("sources", "what every claim cites"),
-            place("decisions", "why it is built this way"),
-          ],
-        },
+      lead: [
+        place("wiki", "every class, and what it holds", "corpus"),
+        place("sources", "what every claim cites", "sources"),
+        place("decisions", "why it is built this way", "decisions"),
       ],
+      sections: classRuns,
     },
     {
       kind: "group",
@@ -450,11 +470,16 @@ export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavEntry[] {
   ];
 }
 
+/** Every link a group's panel holds, its lead first, in the order a reader meets them. */
+export function groupLinks(group: NavGroup): NavLink[] {
+  return [...(group.lead ?? []), ...group.sections.flatMap((s) => s.links)];
+}
+
 /** Every link the bar carries, flat entries included, in the order a reader meets them. */
 export function navLinks(entries: NavEntry[]): NavLink[] {
   return entries.flatMap((entry) =>
     entry.kind === "place"
       ? [{ key: entry.key, href: entry.front, label: entry.label }]
-      : entry.sections.flatMap((s) => s.links),
+      : groupLinks(entry),
   );
 }

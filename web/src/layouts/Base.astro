@@ -11,7 +11,8 @@
 import { contentsOf, withContents } from "../lib/contents.ts";
 import { applySemantics } from "../lib/semantics.ts";
 import { loadFeed } from "../lib/feed.ts";
-import { nav, type Section } from "../lib/nav.ts";
+import { groupLinks, nav, type Section } from "../lib/nav.ts";
+import { ICON_VIEWBOX, ICONS } from "../lib/icons.ts";
 import { modelSource } from "../lib/modelSource.ts";
 import { canonicalPath, og, REPOSITORY, reportError } from "../lib/routes.ts";
 import { HEIGHT, WIDTH } from "../lib/og/card.ts";
@@ -312,7 +313,7 @@ const body = applySemantics(listed).html;
                 <summary
                   aria-current={
                     group.key === section ||
-                    group.sections.some((run) => run.links.some((link) => isCurrent(link)))
+                    groupLinks(group).some((link) => isCurrent(link))
                       ? "true"
                       : undefined
                   }
@@ -320,19 +321,49 @@ const body = applySemantics(listed).html;
                   {group.label}
                 </summary>
                 <div class={group.wide ? "menu-panel menu-wide" : "menu-panel"}>
-                  {group.sections.map((run) => (
-                    <div class="menu-run">
-                      {/* Text, not a heading element: the bar is on every page, and an `h3` in
-                          it would be the first heading of each one's outline. */}
-                      {run.heading ? <span class="menu-heading">{run.heading}</span> : null}
-                      {run.links.map((link) => (
+                  {/* The lead: `Library`'s record, as tiles across the panel — see `NavGroup.lead`.
+                      The glyph is `aria-hidden`; the label is still the link's whole name. */}
+                  {group.lead ? (
+                    <div class="menu-lead">
+                      {group.lead.map((link) => (
                         <a href={link.href} aria-current={isCurrent(link) ? "page" : undefined}>
-                          <span class="menu-label">{link.label}</span>
-                          {link.note ? <span class="menu-note">{link.note}</span> : null}
+                          {link.icon ? (
+                            <svg
+                              class="menu-icon"
+                              viewBox={ICON_VIEWBOX}
+                              width="20"
+                              height="20"
+                              aria-hidden="true"
+                              focusable="false"
+                            >
+                              {ICONS[link.icon].map((d) => <path d={d} />)}
+                            </svg>
+                          ) : null}
+                          <span class="menu-text">
+                            <span class="menu-label">{link.label}</span>
+                            {link.note ? <span class="menu-note">{link.note}</span> : null}
+                          </span>
                         </a>
                       ))}
                     </div>
-                  ))}
+                  ) : null}
+                  {/* One box around the runs, so a `wide` panel can set them in columns below its
+                      lead. Elsewhere `display: contents`, and the runs are the panel's own. */}
+                  <div class="menu-runs">
+                    {group.sections.map((run) => (
+                      <div class="menu-run">
+                        {/* Text, not a heading element: the bar is on every page, and an `h3` in
+                            it would be the first heading of each one's outline. */}
+                        {run.heading ? <span class="menu-heading">{run.heading}</span> : null}
+                        {run.links.map((link) => (
+                          <a href={link.href} aria-current={isCurrent(link) ? "page" : undefined}>
+                            <span class="menu-label">{link.label}</span>
+                            {link.note ? <span class="menu-note">{link.note}</span> : null}
+                          </a>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </details>
             ))
