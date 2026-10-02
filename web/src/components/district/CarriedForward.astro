@@ -80,7 +80,7 @@ const bias = insensitive ? null : meanDistrictBias(meta.bias, horizon);
  * A band with no width is one amount, and printing it as "$X – $X, central $X" said it three
  * times while leaving out the line the guaranteed case is drawn for (#607). So a band that rounds
  * to one figure is written as that figure, and where the formula's line is drawn the sentence says
- * which amount is received and which is computed.
+ * which amount is received and which is computed, in the site's one name for each (#658).
  */
 const reading = (p: FanPoint): string => {
   const level = p.observed
@@ -90,7 +90,7 @@ const reading = (p: FanPoint): string => {
       : `${money(p.low)} – ${money(p.high)}, central ${money(p.point)}`;
   return p.reference == null
     ? `FY${p.year}: ${level}`
-    : `FY${p.year}: receives ${level}; the formula computes ${money(p.reference)}`;
+    : `FY${p.year}: aid received ${level}; formula aid ${money(p.reference)}`;
 };
 const chart = renderToString((w) => fanSpec(
   points,
@@ -111,7 +111,7 @@ const chart = renderToString((w) => fanSpec(
         }
       : { high: "High", low: "Low" },
   },
-), { label: `${insensitive ? `Aid this district receives against what the formula computes for it, in dollars by enrollment year, FY${points[0]!.year} to FY${end.fiscalYear}` : `State aid in dollars by enrollment year, FY${points[0]!.year} to FY${end.fiscalYear}, with the range across projected enrollment`}`, description: `Every year is the FY${bundle.fiscal_year} formula run at that year's enrollment rather than published aid; years through FY${meta.base_year} use published enrollment and carry no interval, and the y axis is truncated to the plotted range rather than starting at zero` });
+), { label: `${insensitive ? `Aid received by this district against its formula aid, in dollars by enrollment year, FY${points[0]!.year} to FY${end.fiscalYear}` : `State aid in dollars by enrollment year, FY${points[0]!.year} to FY${end.fiscalYear}, with the range across projected enrollment`}`, description: `Every year is the FY${bundle.fiscal_year} formula run at that year's enrollment rather than published aid; years through FY${meta.base_year} use published enrollment and carry no interval, and the y axis is truncated to the plotted range rather than starting at zero` });
 ---
 
 {/* Its own address (#616): the card's `#enrollment` is the section, and this is the one chart

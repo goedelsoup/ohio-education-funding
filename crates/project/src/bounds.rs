@@ -514,6 +514,12 @@ impl Bound {
     /// collides with another short name is two rows of a chart a reader cannot tell apart — and
     /// the two gifted unit floors, the two staffing support ceilings and the two 50% transport
     /// floors are all near enough to collide if nobody is checking.
+    ///
+    /// It is the one of the three a chart prints, so it is written in the reader's words rather
+    /// than the code's (#658). "Mile base over rider base" and "Decrease threshold, floor of
+    /// twenty" were the model's own terms on a public chart, and "ADM" was an initialism nothing on
+    /// `/bounds` expands. The variant is the key tests and the corpus cite; this can be reworded
+    /// freely, and the same test holds it to no bare "ADM".
     #[must_use]
     pub const fn short(self) -> &'static str {
         match self {
@@ -531,32 +537,32 @@ impl Bound {
             }
             Self::StaffingCeiling(Ceiling::FiscalSupport) => "Thirty-five fiscal support staff",
             Self::StaffingCeiling(Ceiling::BuildingSupport) => "Three building support staff each",
-            Self::SizeBandSmall => "Size-banded salaries, under 500 ADM",
-            Self::SizeBandLarge => "Size-banded salaries, over 4,000 ADM",
-            Self::BaseCostEnrolledAdm => "Enrolled ADM, the single year",
-            Self::ValuationLesserOf => "Capacity valuation, the recent year",
-            Self::IncomeLesserOf => "Capacity income, the recent year",
-            Self::CapacityRateCeiling => "Capacity percentage capped at 0.025",
+            Self::SizeBandSmall => "Size-banded salaries, under 500 pupils",
+            Self::SizeBandLarge => "Size-banded salaries, over 4,000 pupils",
+            Self::BaseCostEnrolledAdm => "Current enrollment above the average",
+            Self::ValuationLesserOf => "Current valuation below the average",
+            Self::IncomeLesserOf => "Current income below the average",
+            Self::CapacityRateCeiling => "Local capacity rate capped at 2.5%",
             Self::MinimumStateShare => "Minimum state share of base cost",
-            Self::DpiaCountCap => "DPIA count capped at enrolled ADM",
+            Self::DpiaCountCap => "Poverty aid count capped at enrollment",
             Self::GiftedCoordinatorFloor => "Gifted coordinator units, floor",
             Self::GiftedCoordinatorCeiling => "Gifted coordinator units, ceiling",
             Self::GiftedSpecialistK8Floor => "K-8 gifted specialist units, floor",
             Self::GiftedSpecialist912Floor => "9-12 gifted specialist units, floor",
-            Self::CapacityTierZero => "Capacity tier zero at median wealth",
-            Self::CapacityTierSizeCutoff => "Capacity tier zero under 200 ADM",
-            Self::CapacityTierSizeRamp => "Capacity tier ramped to 600 ADM",
-            Self::WealthTierZero => "Wealth tier zero under an index of 0.8",
-            Self::FundingBaseClampAtZero => "Guarantee floor clamped at zero",
+            Self::CapacityTierZero => "No capacity aid from median wealth up",
+            Self::CapacityTierSizeCutoff => "No capacity aid under 200 pupils",
+            Self::CapacityTierSizeRamp => "Capacity aid phased in to 600 pupils",
+            Self::WealthTierZero => "No wealth-tier aid under an index of 0.8",
+            Self::FundingBaseClampAtZero => "Guarantee base held at zero",
             Self::Guarantee => "The guarantee itself",
-            Self::DecreaseThresholdFloor => "Decrease threshold, floor of twenty",
-            Self::ClawbackClampAtZero => "Clawback clamped by the guarantee",
+            Self::DecreaseThresholdFloor => "Clawback threshold: 20 pupils, not 10%",
+            Self::ClawbackClampAtZero => "Clawback larger than the guarantee",
             Self::TransitionSupplement => "Formula transition supplement",
             Self::TransportationFloor => "Transportation share at the 50% floor",
-            Self::MileBase => "Mile base over rider base",
-            Self::EfficiencyZero => "Efficiency zero under an index of 1.0",
-            Self::EfficiencyCeiling => "Efficiency held at 15%",
-            Self::DensityZero => "Density zero at 28 riders a square mile",
+            Self::MileBase => "Transport paid on miles, not riders",
+            Self::EfficiencyZero => "No efficiency adjustment under index 1.0",
+            Self::EfficiencyCeiling => "Efficiency adjustment capped at 15%",
+            Self::DensityZero => "No density aid from 28 riders a sq. mile",
             Self::TransportationGuarantee => "Transportation's own guarantee",
             Self::SpecialEducationTransportFloor => "Special education transport, 50% floor",
         }

@@ -54,7 +54,7 @@ import {
   type ManifestLine,
   type ManifestReference,
 } from "./corpusSeries.ts";
-import { escapeHtml, logError } from "./format.ts";
+import { escapeHtml, logError, logErrorPercent } from "./format.ts";
 import { panelWidth, seriesSpec } from "./plot/spec.ts";
 import { renderPanelToString } from "./plot/ssr.ts";
 import * as routes from "./routes.ts";
@@ -200,16 +200,19 @@ function panel(p: Population, width: number, panelText: string): string {
         p.points,
         /*
          * Short, because the gutter that holds them is capped at 0.45 of a 311px panel and
-         * `mean district +0.0272` is painted 135px wide on the runner against the 132 it has.
+         * `mean district +0.0272` was painted 135px wide on the runner against the 132 it had.
          * These two words are the card's own framing of the pair — "a statewide total, and six
          * hundred district figures" — and every place with room for the longer form says the
          * longer form: the hover, the alternative text, and the paragraph under the panels.
          */
         { a: "district", b: "statewide" },
-        logError,
+        // The ends as percentages, which is how the rest of the page states a rate (#658); the
+        // hover keeps the log error the feed publishes beside it.
+        logErrorPercent,
         (point) =>
-          `${years(point.at)} ahead: the mean district ran ${logError(point.a ?? 0)} in logs, ` +
-          `the state total ${logError(point.b ?? 0)}`,
+          `${years(point.at)} ahead: the mean district ran ${logErrorPercent(point.a ?? 0)} ` +
+          `(${logError(point.a ?? 0)} in logs), the state total ${logErrorPercent(point.b ?? 0)} ` +
+          `(${logError(point.b ?? 0)} in logs)`,
         {
           width,
           tick: (at) => years(at),
@@ -221,10 +224,10 @@ function panel(p: Population, width: number, panelText: string): string {
       description:
         `Two lines: the mean of the districts' log errors, and the log of summed forecasts over ` +
         `summed actuals. The dashed rule is zero, which is a forecast right on average. ` +
-        `The mean district runs ${logError(p.meanDistrict.first)} at one year and ` +
-        `${logError(p.meanDistrict.last)} at ${p.deepest}; the state total ` +
-        `${logError(p.total.first)} and ${logError(p.total.last)}. Both start under zero and end ` +
-        `over it`,
+        `The mean district runs ${logErrorPercent(p.meanDistrict.first)} at one year and ` +
+        `${logErrorPercent(p.meanDistrict.last)} at ${p.deepest}; the state total ` +
+        `${logErrorPercent(p.total.first)} and ${logErrorPercent(p.total.last)}, each the ` +
+        `exponential of the log error less one. Both start under zero and end over it`,
     },
     width,
   );

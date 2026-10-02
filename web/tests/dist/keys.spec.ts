@@ -78,7 +78,7 @@ describe("chart keys and readings", () => {
     expect(columbus.length).toBeGreaterThan(0);
     for (const { hovers } of columbus) {
       expect(hovers.length).toBeGreaterThan(1);
-      for (const hover of hovers) expect(hover).toMatch(/: receives \$[\d,]+.*; the formula computes \$[\d,]+$/);
+      for (const hover of hovers) expect(hover).toMatch(/: aid received \$[\d,]+.*; formula aid \$[\d,]+$/);
     }
   });
 });

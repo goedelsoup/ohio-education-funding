@@ -483,6 +483,13 @@ fn every_bound_has_a_distinct_short_name_that_fits_a_chart_gutter() {
             short.chars().count() < bound.label().chars().count(),
             "{bound:?}'s short name is no shorter than its long one; one of the two is wrong"
         );
+        // A chart's words, not the model's (#658): the page defines no initialism for the reader.
+        assert!(
+            !short
+                .split(|c: char| !c.is_alphanumeric())
+                .any(|word| word == "ADM"),
+            "{bound:?}'s short name {short:?} prints ADM, which /bounds never defines"
+        );
         assert!(
             seen.insert(short),
             "{bound:?} shares the short name {short:?} with another bound"

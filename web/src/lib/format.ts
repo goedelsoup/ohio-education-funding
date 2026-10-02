@@ -178,6 +178,20 @@ export function logError(v: number): string {
 }
 
 /**
+ * The same log error as the percentage it amounts to, `exp(v) - 1`, signed, to one place.
+ *
+ * For a chart's own text (#658). `+0.0272` was the one unitless decimal on a /method card that
+ * states every other rate as a percentage, and a line end stands for a position rather than a
+ * figure to quote, so the first-order caveat above costs it nothing. The hover and the prose keep
+ * the log error. A magnitude that rounds away loses its sign, as in `signed`.
+ */
+export function logErrorPercent(v: number): string {
+  const n = Math.expm1(v) * 100;
+  const text = Math.abs(n).toFixed(1);
+  return (Number(text) === 0 ? "" : n < 0 ? "−" : "+") + text + "%";
+}
+
+/**
  * A plain number to a fixed number of places: grouped, and with the minus the formatters above use.
  *
  * This is what `toFixed` was being asked to do in the renderers, and `toFixed` does neither half

@@ -77,3 +77,25 @@ export function pointHover(
     note,
   );
 }
+
+/**
+ * Words a chart may not print, each with what to write instead.
+ *
+ * The quantity paid had three names on three charts — "Realized aid per pupil", "as received",
+ * "What the district receives" — and two of the site's charts printed a source column's initialism
+ * the page defined only after the chart or not at all: "On CE" on /history, "Enrolled ADM, the
+ * single year" on /bounds (#658). The terms stay in prose and method notes, where a sentence can
+ * say what they are; a line end or a gutter cannot.
+ */
+export const BANNED: { word: RegExp; instead: string }[] = [
+  { word: /\brealiz/i, instead: `"aid received", the site's one name for aid actually paid` },
+  { word: /\bCE\b/, instead: `"access", and name the count in a note` },
+  { word: /\bADM\b/, instead: `"enrollment" or "pupils", and expand ADM in a note` },
+];
+
+/** What a chart's text says that it should not, one entry per banned word it contains. */
+export function banned(text: string): string[] {
+  return BANNED.filter((b) => b.word.test(text)).map(
+    (b) => `${text.match(b.word)![0]} in "${text}": write ${b.instead}`,
+  );
+}

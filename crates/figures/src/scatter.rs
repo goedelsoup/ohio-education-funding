@@ -238,7 +238,7 @@ pub static SCATTERS: &[Scatter] = &[
             };
             Cloud::at_one_scale(
                 Axis {
-                    label: "Base cost enrolled ADM",
+                    label: "Base cost enrollment",
                     unit: Unit::Pupils,
                     min: from,
                     max: to,
