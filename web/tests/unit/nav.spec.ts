@@ -71,6 +71,23 @@ test("each menu holds the places #548 put in it, in its order", () => {
   expect(labels("About")).toEqual(["Method", "Data"]);
 });
 
+test("Library leads with the record, each with its glyph, and only Library has a lead", () => {
+  /*
+   * The class index, the sources and the decisions head `Library` as tiles across both columns:
+   * pages about the corpus, set apart from the classes that are its contents. A glyph on every
+   * link would say nothing, so a lead is the only place one is drawn, and every link in it has one.
+   */
+  const library = groups.find((g) => g.key === "library")!;
+  expect(library.lead?.map((l) => l.href)).toEqual(["/wiki", "/wiki/source", "/wiki/decision"]);
+  expect(library.lead?.every((l) => l.icon != null && l.note != null)).toBe(true);
+  expect(library.sections.map((s) => s.heading)).toEqual(LIBRARY.map((run) => run.heading));
+  for (const group of groups.filter((g) => g !== library)) {
+    expect(group.lead, `${group.label} has a lead`).toBeUndefined();
+  }
+  const iconed = links.filter((l) => l.icon != null).map((l) => l.href);
+  expect(iconed).toEqual(library.lead!.map((l) => l.href));
+});
+
 test("every corpus class is two clicks from the bar: one to open Library, one to arrive", () => {
   /*
    * The point of the redesign, as an assertion. Before it, seven of eighteen classes were lifted
@@ -168,11 +185,14 @@ test("no column of a panel has grown past what it can hold", () => {
    *
    * A one-column panel is one column. `Library` is two (`.menu-wide`), which `columns` balances by
    * height, so what it has to hold is half its rows, each heading counted as one — held under the
-   * same bound, and a run may not be larger than a column on its own.
+   * same bound, and a run may not be larger than a column on its own. Its lead is across both, and
+   * counts against each.
    */
   for (const group of groups) {
     const rows = group.sections.reduce((n, run) => n + run.links.length + (run.heading ? 1 : 0), 0);
-    const perColumn = group.wide ? Math.ceil(rows / 2) : rows;
+    // A lead spans the columns, so it sits over each of them: a glyph, a label and a two-line note
+    // are about two rows tall.
+    const perColumn = (group.wide ? Math.ceil(rows / 2) : rows) + (group.lead ? 2 : 0);
     expect(perColumn, `${group.label} has ${rows} rows and will not fit its panel`).toBeLessThan(
       17,
     );

@@ -596,7 +596,6 @@ test.describe("with JavaScript disabled", () => {
       "Formula",
       "Institutions",
       "Proposals",
-      "The record",
     ]);
     // Every class index, each carrying its count. Eighteen classes today, read off the page
     // rather than typed, so the claim is that each one it holds is counted.

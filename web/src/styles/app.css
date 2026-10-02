@@ -460,12 +460,44 @@ header.site nav .menu-heading {
   color: var(--text-annotation);
 }
 /*
- * `Library`, which is every class of the corpus — twenty-odd links in five headed runs.
+ * `Library`'s lead: the class index, the sources and the decisions, each beside its glyph.
+ *
+ * They were a fifth headed run at the foot of column two, drawn like the classes they index. They
+ * head the panel now, under one rule that marks the boundary the runs' rules mark elsewhere: above
+ * it, the pages about the corpus; below it, the corpus. A row each at a phone's width, where the
+ * panel is one column; tiles across the panel where it is two — see the wide rules below.
+ *
+ * The glyph takes the link's ink, so it lifts with the label on hover and on the current page
+ * rather than needing states of its own.
+ */
+header.site nav .menu-lead {
+  display: flex;
+  flex-direction: column;
+  gap: .1rem;
+  margin-bottom: var(--space-2);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border);
+}
+header.site nav .menu-lead a { display: flex; align-items: flex-start; gap: var(--space-3); }
+header.site nav .menu-icon {
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+header.site nav .menu-text { display: block; min-width: 0; }
+/* The runs' own box only where a panel sets them in columns; everywhere else it is not there. */
+header.site nav .menu-runs { display: contents; }
+/*
+ * `Library`, which is every class of the corpus — twenty-odd links in four headed runs, under a lead of three.
  *
  * One column of that ran to about 800px, off a laptop viewport under a sticky header, where the
  * tail of an absolutely positioned panel cannot be scrolled to. Two columns halve it. `columns`
  * rather than a grid so the runs balance by height instead of pairing off row by row, and
- * `break-inside: avoid` so a run is never split from its heading.
+ * `break-inside: avoid` so a run is never split from its heading. The columns are set on
+ * `.menu-runs` and not on the panel, so the lead above them spans both.
  *
  * Above the nav's breakpoint it hangs from its own right edge: `Library` is the fifth entry of
  * six, and a 30rem panel hung from its left edge would run off the right of the window. Below
@@ -473,12 +505,21 @@ header.site nav .menu-heading {
  */
 @media (min-width: 641px) {
   header.site nav .menu-panel.menu-wide {
-    display: block;
-    columns: 2;
-    column-gap: var(--space-2);
     width: 30rem;
     max-width: none;
   }
+  header.site nav .menu-wide .menu-runs {
+    display: block;
+    columns: 2;
+    column-gap: var(--space-2);
+  }
+  /* Three tiles over both columns: the glyph above the label, the note under it. */
+  header.site nav .menu-wide .menu-lead {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+  header.site nav .menu-wide .menu-lead a { flex-direction: column; gap: var(--space-2); }
   header.site nav .menu-wide .menu-run { break-inside: avoid; }
   /* No rule between runs here (#603). Under `columns` the run after another can be the top of
      column two, which then began a rule and a padding below column one; and every run in this
