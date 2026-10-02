@@ -719,6 +719,49 @@ pub struct Biennium {
     pub foundation_aid: [Dollars; 3],
     /// What the change in the wide measure is made of.
     pub lines: BienniumLines,
+    /// Each year's detail, oldest first, dated by [`Self::years`].
+    pub observed: [BienniumYear; 3],
+    /// Assessed valuation for the three tax years [`Self::valuation_tax_years`] names, oldest
+    /// first — the window the terminal year's capacity measure blends.
+    pub valuation: [Dollars; 3],
+    /// The tax years [`Self::valuation`] is for.
+    pub valuation_tax_years: [u16; 3],
+}
+
+/// One observed year of [`Biennium`], beyond its two measures.
+///
+/// Mirrors [`project::biennium::Year`], flattened. The supplements and the phase-in are parts of
+/// the two measures rather than measures of their own: the five supplements sit inside total state
+/// support only, and `phase_in_paid` is foundation aid before the guarantee is added.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct BienniumYear {
+    /// Supplemental targeted assistance. Zero after the baseline year: H.B. 96 repealed it.
+    pub targeted_assistance: Dollars,
+    /// The formula transition supplement.
+    pub formula_transition: Dollars,
+    /// The base funding supplement.
+    pub base_funding: Dollars,
+    /// The enrollment growth supplement.
+    pub enrollment_growth: Dollars,
+    /// The performance supplement.
+    pub performance: Dollars,
+    /// The FY2020 funding base the phase-in interpolates from.
+    pub funding_base: Dollars,
+    /// What the foundation formula computes, before the phase-in and the guarantee.
+    pub phase_in_calculated: Dollars,
+    /// Foundation funding as paid after the phase-in, before the guarantee.
+    pub phase_in_paid: Dollars,
+    /// The published state share of base cost. `None` where the year's file does not carry it.
+    pub state_share: Option<f64>,
+    /// All transfers, signed — negative is withheld. `None` where the year publishes none, which
+    /// is not the same as zero.
+    pub transfers: Option<Dollars>,
+    /// The service center charge, where the year itemizes transfers.
+    pub service_center_charge: Option<Dollars>,
+    /// The other adjustments line, where the year itemizes transfers.
+    pub other_adjustments: Option<Dollars>,
+    /// Total state support after transfers. `None` exactly where [`Self::transfers`] is.
+    pub net_state_funding: Option<Dollars>,
 }
 
 /// One district, as the web layer needs it.

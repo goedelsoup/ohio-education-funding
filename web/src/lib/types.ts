@@ -57,7 +57,7 @@ import type { Bundle, District, Statewide } from "./schema/feed.ts";
  * the build and the scenario routes refuse to proceed past when the two disagree — the deliberate
  * half of drift detection, where the strictness of the schemas is the accidental half.
  */
-export const REQUIRED_CONTRACT = "48.0.0";
+export const REQUIRED_CONTRACT = "49.0.0";
 
 /**
  * A district with only the fields the funding formula reads.
@@ -135,6 +135,7 @@ export type PanelDistrict = Omit<
   | "casino"
   | "casino_counties"
   | "designated"
+  | "biennium"
 >;
 
 /**

@@ -776,9 +776,41 @@ const DistrictSchema = z
      *
      * `line_*` splits the change on the wide measure across the department's payment lines and is
      * exhaustive: the five sum to `total_terminal - total_baseline` to the cent.
+     *
+     * `observed` is the same three years' detail, by position — index 0 is `year_baseline`. Each
+     * entry names the five supplements (parts of total state support, not of foundation aid), the
+     * phase-in's base, calculated and paid figures (foundation aid before the guarantee), the
+     * published state share, and transfers with net funding. A `null` is a figure that year's file
+     * does not publish — FY2025 has no state share, FY2026 no transfers — and is never a zero.
+     * The named supplements' change matches `line_supplements` to within cent rounding.
+     *
+     * `valuation` is assessed valuation for the tax years in `valuation_tax_years`, oldest first.
      */
     biennium: z
       .object({
+        observed: z
+          .array(
+            z
+              .object({
+                targeted_assistance: num,
+                formula_transition: num,
+                base_funding: num,
+                enrollment_growth: num,
+                performance: num,
+                funding_base: num,
+                phase_in_calculated: num,
+                phase_in_paid: num,
+                state_share: maybeNum,
+                transfers: maybeNum,
+                service_center_charge: maybeNum,
+                other_adjustments: maybeNum,
+                net_state_funding: maybeNum,
+              })
+              .strict(),
+          )
+          .length(3),
+        valuation: z.array(num).length(3),
+        valuation_tax_years: z.array(z.number().int()).length(3),
         year_baseline: num,
         year_middle: num,
         year_terminal: num,

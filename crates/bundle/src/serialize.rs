@@ -941,34 +941,65 @@ impl Bundle {
                 // Both measures, flat, and the five lines. Named `baseline`/`middle`/`terminal`
                 // rather than by year: the years are in `series_years` under `biennium`, and a
                 // year written into a key here would be a second place to change when one moves.
-                fields(
-                    &mut o,
-                    "biennium",
-                    &[
-                        ("year_baseline", f64::from(d.biennium.years[0])),
-                        ("year_middle", f64::from(d.biennium.years[1])),
-                        ("year_terminal", f64::from(d.biennium.years[2])),
-                        ("total_baseline", d.biennium.total_state_support[0]),
-                        ("total_middle", d.biennium.total_state_support[1]),
-                        ("total_terminal", d.biennium.total_state_support[2]),
-                        ("foundation_baseline", d.biennium.foundation_aid[0]),
-                        ("foundation_middle", d.biennium.foundation_aid[1]),
-                        ("foundation_terminal", d.biennium.foundation_aid[2]),
-                        ("line_foundation", d.biennium.lines.foundation),
-                        ("line_transportation", d.biennium.lines.transportation),
+                // `observed` is the same three years' detail, positionally — index 0 is
+                // `year_baseline` — so it carries no year of its own either.
+                {
+                    let b = &d.biennium;
+                    let mut inner = o.obj("biennium");
+                    for (key, value) in [
+                        ("year_baseline", f64::from(b.years[0])),
+                        ("year_middle", f64::from(b.years[1])),
+                        ("year_terminal", f64::from(b.years[2])),
+                        ("total_baseline", b.total_state_support[0]),
+                        ("total_middle", b.total_state_support[1]),
+                        ("total_terminal", b.total_state_support[2]),
+                        ("foundation_baseline", b.foundation_aid[0]),
+                        ("foundation_middle", b.foundation_aid[1]),
+                        ("foundation_terminal", b.foundation_aid[2]),
+                        ("line_foundation", b.lines.foundation),
+                        ("line_transportation", b.lines.transportation),
                         (
                             "line_special_education_transportation",
-                            d.biennium.lines.special_education_transportation,
+                            b.lines.special_education_transportation,
                         ),
                         (
                             "line_preschool_special_education",
-                            d.biennium.lines.preschool_special_education,
+                            b.lines.preschool_special_education,
                         ),
-                        ("line_supplements", d.biennium.lines.supplements),
-                    ],
-                    &[],
-                    &[],
-                );
+                        ("line_supplements", b.lines.supplements),
+                    ] {
+                        inner.num(key, value);
+                    }
+                    {
+                        let mut list = inner.arr("observed");
+                        for year in &b.observed {
+                            let mut y = list.obj();
+                            y.num("targeted_assistance", year.targeted_assistance);
+                            y.num("formula_transition", year.formula_transition);
+                            y.num("base_funding", year.base_funding);
+                            y.num("enrollment_growth", year.enrollment_growth);
+                            y.num("performance", year.performance);
+                            y.num("funding_base", year.funding_base);
+                            y.num("phase_in_calculated", year.phase_in_calculated);
+                            y.num("phase_in_paid", year.phase_in_paid);
+                            y.opt_share("state_share", year.state_share);
+                            y.opt("transfers", year.transfers);
+                            y.opt("service_center_charge", year.service_center_charge);
+                            y.opt("other_adjustments", year.other_adjustments);
+                            y.opt("net_state_funding", year.net_state_funding);
+                        }
+                    }
+                    {
+                        let mut list = inner.arr("valuation");
+                        for value in b.valuation {
+                            list.num(value);
+                        }
+                    }
+                    let mut list = inner.arr("valuation_tax_years");
+                    for year in b.valuation_tax_years {
+                        list.count(year);
+                    }
+                }
                 // Special education, then the other five, then the six totals. Emitted once —
                 // this block and the categoricals beside it were pasted twice, so every district
                 // in the shipped feed carried both keys twice. JSON takes the last, so nothing

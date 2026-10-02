@@ -165,6 +165,93 @@ impl Lines {
     }
 }
 
+/// The supplements one year paid, by name.
+///
+/// [`Lines::supplements`] stays a residual so the five lines are exhaustive whatever an act does;
+/// this is the same money named, so a reader can see *which* supplement moved. The two agree to
+/// the cent on every district — `the_named_supplements_are_the_whole_of_the_residual` — and if an
+/// act adds a supplement that this does not name, that test is what fails.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct Supplements {
+    /// Supplemental targeted assistance. Paid in FY2025 only: H.B. 96 repealed it.
+    pub targeted_assistance: Dollars,
+    /// The formula transition supplement, the second hold-harmless on an FY2021 base.
+    pub formula_transition: Dollars,
+    /// The base funding supplement, which H.B. 96 created.
+    pub base_funding: Dollars,
+    /// The enrollment growth supplement, which H.B. 96 created.
+    pub enrollment_growth: Dollars,
+    /// The performance supplement, which H.B. 96 created.
+    pub performance: Dollars,
+}
+
+impl Supplements {
+    /// Every named supplement summed.
+    #[must_use]
+    pub fn total(&self) -> Dollars {
+        self.targeted_assistance
+            + self.formula_transition
+            + self.base_funding
+            + self.enrollment_growth
+            + self.performance
+    }
+}
+
+/// The foundation formula's published stages in one year: the base it interpolates from, what it
+/// computes, and what it pays before the guarantee.
+///
+/// R.C. 3317.022 pays `base + rate × (calculated − base)`, so a district whose formula computes
+/// about its FY2020 base gains nothing from a rising rate, and one far above it gains most. That is
+/// the whole of why two neighbours can move in opposite directions under the same act.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct PhaseIn {
+    /// `[Ha]`/`[H2]` — the FY2020 funding base. The same figure in all three years.
+    pub funding_base: Dollars,
+    /// `[Hb]` — the formula's own output, before the phase-in and the guarantee.
+    pub calculated: Dollars,
+    /// `[Hd]` — foundation funding as paid, `base + rate × (calculated − base)`.
+    pub paid: Dollars,
+}
+
+impl PhaseIn {
+    /// The step the phase-in took from the base. Negative where the formula computes below it.
+    #[must_use]
+    pub fn step(&self) -> Dollars {
+        self.paid - self.funding_base
+    }
+}
+
+/// What the department subtracts from total state support to reach net state funding.
+///
+/// Every component is a deduction, and none is the voucher or community-school channel: under the
+/// Fair School Funding Plan those are funded directly rather than deducted.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Transfers {
+    /// The educational service center charge. `None` where the year publishes only the total.
+    pub service_center: Option<Dollars>,
+    /// The residual adjustments line. `None` where the year publishes only the total.
+    pub other: Option<Dollars>,
+    /// All transfers, as a signed amount — negative is money withheld.
+    pub total: Dollars,
+    /// Total state support after transfers.
+    pub net_state_funding: Dollars,
+}
+
+/// One observed year of one district, beyond its two measures.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Year {
+    /// The supplements paid, by name.
+    pub supplements: Supplements,
+    /// The foundation formula's stages.
+    pub phase_in: PhaseIn,
+    /// Transfers and net funding. `None` for FY2026, whose model publishes no transfer columns —
+    /// absent, which is not the same as zero.
+    pub transfers: Option<Transfers>,
+    /// `[b4]` the published state share of base cost. `None` for FY2025, whose payment report
+    /// does not carry it.
+    pub state_share: Option<f64>,
+}
+
 /// One district's three years, its measure, and the lines the change is made of.
 #[derive(Debug, Clone)]
 pub struct Row {
@@ -174,7 +261,16 @@ pub struct Row {
     pub foundation: Change,
     /// What the wide measure's FY2025→FY2027 change is made of.
     pub lines: Lines,
+    /// FY2025, FY2026 and FY2027, in that order.
+    pub years: [Year; 3],
+    /// Assessed valuation for tax years 2023, 2024 and 2025, oldest first — the three the FY2027
+    /// capacity measure blends. A county reappraisal shows up here a year before the state share
+    /// falls under it.
+    pub valuation: [Dollars; 3],
 }
+
+/// The tax years [`Row::valuation`] covers, oldest first.
+pub const VALUATION_TAX_YEARS: [u16; 3] = [2023, 2024, 2025];
 
 /// A district's FY2027 preschool, transportation and foundation lines, from the panel.
 fn at_fy2027(record: &DistrictRecord) -> (Dollars, Dollars, Dollars, Dollars, Dollars) {
@@ -210,6 +306,77 @@ fn at_fy2025(row: &Fy2025) -> (Dollars, Dollars, Dollars, Dollars, Dollars) {
         row.preschool_special_education,
         row.total_state_support,
     )
+}
+
+/// The FY2025 year beyond its measures.
+fn year_2025(row: &Fy2025) -> Year {
+    Year {
+        supplements: Supplements {
+            targeted_assistance: row.supplemental_targeted_assistance,
+            formula_transition: row.formula_transition_supplement,
+            ..Supplements::default()
+        },
+        phase_in: PhaseIn {
+            funding_base: row.funding_base,
+            calculated: row.foundation_calculated,
+            paid: row.foundation,
+        },
+        // The payment report states net funding and not its parts.
+        transfers: Some(Transfers {
+            service_center: None,
+            other: None,
+            total: row.net_state_funding - row.total_state_support,
+            net_state_funding: row.net_state_funding,
+        }),
+        state_share: None,
+    }
+}
+
+/// The FY2026 year beyond its measures.
+fn year_2026(row: &Prior) -> Year {
+    Year {
+        supplements: Supplements {
+            targeted_assistance: 0.0,
+            formula_transition: row.formula_transition_supplement,
+            base_funding: row.base_funding_supplement,
+            enrollment_growth: row.enrollment_growth_supplement,
+            performance: row.performance_supplement,
+        },
+        phase_in: PhaseIn {
+            funding_base: row.funding_base,
+            calculated: row.foundation_calculated,
+            paid: row.foundation_funding,
+        },
+        transfers: None,
+        state_share: Some(row.state_share_percentage),
+    }
+}
+
+/// The FY2027 year beyond its measures.
+///
+/// The phase-in is at 100% in this year, so what the formula calculates is what it pays.
+fn year_2027(record: &DistrictRecord) -> Year {
+    Year {
+        supplements: Supplements {
+            targeted_assistance: 0.0,
+            formula_transition: record.transition.transition_supplement,
+            base_funding: record.supplements.base_funding,
+            enrollment_growth: record.supplements.growth,
+            performance: record.performance.amount,
+        },
+        phase_in: PhaseIn {
+            funding_base: record.transition.funding_base,
+            calculated: record.core_foundation_funding,
+            paid: record.core_foundation_funding,
+        },
+        transfers: Some(Transfers {
+            service_center: Some(record.service_center_charge),
+            other: Some(record.other_adjustments),
+            total: record.total_transfers,
+            net_state_funding: record.net_state_funding,
+        }),
+        state_share: record.published_state_share,
+    }
 }
 
 /// Every district the three files agree on, in IRN order.
@@ -256,6 +423,11 @@ pub fn frame() -> Vec<Row> {
                 preschool_special_education: p27 - p25,
                 // The residual, so the five are exhaustive whatever an act does to the supplements.
                 supplements: (w27 - w25) - foundation - (t27 - t25) - (s27 - s25) - (p27 - p25),
+            },
+            years: [year_2025(before), year_2026(middle), year_2027(&record)],
+            valuation: {
+                let [newest, middle, oldest] = record.valuation_three_year;
+                [oldest, middle, newest]
             },
         });
     }

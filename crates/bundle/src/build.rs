@@ -41,10 +41,10 @@
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 use crate::{
-    AppropriationLine, AppropriationYear, BaseCostBuildUp, Biennium, BienniumLines, Bundle,
-    CareerTechnical, CasinoYear, Categoricals, Checkpoint, Deflator, District, DistrictOutcome,
-    Dpia, Draft, DraftProvision, EnglishLearners, FinanceYear, ForecastCheckpoint, FundingUnit,
-    FundingUnitProgramme, FundingUnits, Gifted, HistoryYear, HouseDistrictMember,
+    AppropriationLine, AppropriationYear, BaseCostBuildUp, Biennium, BienniumLines, BienniumYear,
+    Bundle, CareerTechnical, CasinoYear, Categoricals, Checkpoint, Deflator, District,
+    DistrictOutcome, Dpia, Draft, DraftProvision, EnglishLearners, FinanceYear, ForecastCheckpoint,
+    FundingUnit, FundingUnitProgramme, FundingUnits, Gifted, HistoryYear, HouseDistrictMember,
     HouseDistrictShare, MealProgramYear, MillageAnalysis, National, NonpublicSupport,
     NonpublicSupportLine, OutcomeStatewide, PolicyShape, Projection, ProjectionBias,
     PropertyTaxYear, RegimeCounterfactual, SeriesYear, SpecialEducation, SpendingByFunction,
@@ -676,6 +676,9 @@ fn biennium_of(row: Option<&project::biennium::Row>) -> Biennium {
                 preschool_special_education: 0.0,
                 supplements: 0.0,
             },
+            observed: [BienniumYear::default(); 3],
+            valuation: [0.0; 3],
+            valuation_tax_years: project::biennium::VALUATION_TAX_YEARS,
         };
     };
     let years = [BASELINE_YEAR, MIDDLE_YEAR, MODEL_YEAR];
@@ -692,6 +695,26 @@ fn biennium_of(row: Option<&project::biennium::Row>) -> Biennium {
             preschool_special_education: row.lines.preschool_special_education,
             supplements: row.lines.supplements,
         },
+        observed: row.years.map(|year| {
+            let transfers = year.transfers;
+            BienniumYear {
+                targeted_assistance: year.supplements.targeted_assistance,
+                formula_transition: year.supplements.formula_transition,
+                base_funding: year.supplements.base_funding,
+                enrollment_growth: year.supplements.enrollment_growth,
+                performance: year.supplements.performance,
+                funding_base: year.phase_in.funding_base,
+                phase_in_calculated: year.phase_in.calculated,
+                phase_in_paid: year.phase_in.paid,
+                state_share: year.state_share,
+                transfers: transfers.map(|t| t.total),
+                service_center_charge: transfers.and_then(|t| t.service_center),
+                other_adjustments: transfers.and_then(|t| t.other),
+                net_state_funding: transfers.map(|t| t.net_state_funding),
+            }
+        }),
+        valuation: row.valuation,
+        valuation_tax_years: project::biennium::VALUATION_TAX_YEARS,
     }
 }
 
@@ -2452,6 +2475,9 @@ mod tests {
                 d.economically_disadvantaged,
             );
             check("dpia.percentage", &d.irn, Some(d.dpia.percentage));
+            for year in &d.biennium.observed {
+                check("biennium.observed.state_share", &d.irn, year.state_share);
+            }
             if let Some(r) = &d.regime {
                 check("regime.recognized_share", &d.irn, Some(r.recognized_share));
             }
