@@ -1332,7 +1332,7 @@ test("a fan given names writes them into its end labels, in their lines' text hu
     observed: i === 0,
     reference: 90e6 - i * 1e6,
   }));
-  const labels = { point: "received", reference: "formula" };
+  const labels = { high: "received", reference: "formula" };
   const svg = renderToString(
     (width) => fanSpec(years, compactMoney, () => "", { width, labels }),
     "presentational",
@@ -1349,6 +1349,34 @@ test("a fan given names writes them into its end labels, in their lines' text hu
         [`Formula ${compactMoney(88e6)}`, SERIES_TEXT.formula],
       ].sort(),
     );
+  }
+  for (const width of Object.values(WIDTHS)) {
+    const drawn = drawingAt(() => fanSpec(years, compactMoney, () => "", { width, labels }));
+    expect(overruns(drawn), `${width}px`).toEqual([]);
+  }
+});
+
+test("an open fan given bound names writes both into its end labels", () => {
+  /*
+   * #675. The /scenario fan ended in "$7.58B" and "$6.96B", and nothing on the drawing said those
+   * were the top and bottom of the range.
+   */
+  const years: FanPoint[] = [2025, 2026, 2027].map((year, i) => ({
+    year,
+    point: 7.2e9,
+    low: 7.2e9 - i * 0.12e9,
+    high: 7.2e9 + i * 0.19e9,
+    observed: i === 0,
+  }));
+  const labels = { high: "high", low: "low" };
+  const svg = renderToString(
+    (width) => fanSpec(years, compactMoney, () => "", { width, labels }),
+    "presentational",
+  );
+  const { document } = parseHTML(`<div>${svg}</div>`);
+  for (const drawing of document.querySelectorAll("svg")) {
+    const ends = [...drawing.querySelectorAll("g.fan-bound text")].map((t) => t.textContent);
+    expect(ends).toEqual([`High ${compactMoney(7.58e9)}`, `Low ${compactMoney(6.96e9)}`]);
   }
   for (const width of Object.values(WIDTHS)) {
     const drawn = drawingAt(() => fanSpec(years, compactMoney, () => "", { width, labels }));

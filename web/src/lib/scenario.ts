@@ -484,7 +484,9 @@ export function renderProjection(bundle: Panel, levers: Levers, chip = ""): stri
           p.observed
             ? `FY${p.year}: ${millions(p.point).replace("+", "")} at published enrollment — exact`
             : `FY${p.year}: ${range(p.low, p.high)}, central ${millions(p.point).replace("+", "")}`,
-        { width: w },
+        // The legend keys the line styles; the two amounts at the band's end are named on the
+        // drawing, which nothing in the legend did (#675).
+        { width: w, labels: { high: "High", low: "Low" } },
       ), { label: `Statewide total state aid by fiscal year at projected enrollment, FY${start.fiscalYear} to FY${end.fiscalYear}`, description: `Solid and exact through FY${seam.fiscalYear}, the last year of published enrollment; after it a dashed central estimate inside a band reaching ±${pct(width, 1)} at the horizon, on a vertical axis that does not start at zero` })}</div>
 
       <p class="note">This is a <strong>forecast</strong>, and the card above it is not. The
