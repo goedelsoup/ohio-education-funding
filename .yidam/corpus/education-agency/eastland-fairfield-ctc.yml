@@ -1,12 +1,12 @@
 class: education-agency
 label: Eastland-Fairfield Career and Technical Schools
 summary: >-
-  A joint vocational school district drawing students and property tax from member districts
-  across Franklin and Fairfield counties. It has no residents of its own, so its funding
+  A joint vocational school district drawing students and property tax from fifteen member
+  districts across Franklin, Fairfield and Pickaway counties. It has no residents of its own, so its funding
   depends on decisions made by districts it does not control.
 description: |
-  A joint vocational school district serving member districts across Franklin and Fairfield
-  counties.
+  A joint vocational school district serving fifteen member districts across Franklin, Fairfield
+  and Pickaway counties, and a sixteenth by contract.
 
   A JVSD has no residents of its own in the ordinary sense. It levies property tax across the
   combined territory of its member districts and enrolls their students part-time or
@@ -95,8 +95,27 @@ findings: |
   the seven Franklin County districts that carry a levy at two mills — and not the two at 1.8,
   which is a different joint vocational district — brings it to within a tenth. So fourteen
   districts in Franklin and Fairfield are members, and about a ninth of the levy comes from
-  outside them. [inference] The roster is not established, and the absence now has a size.
-  [open]
+  outside them. [inference]
+
+  ### The member list, filled
+
+  The ninth is Teays Valley Local, in Pickaway County. The report card's roster for the
+  district's career-technical planning district names sixteen districts, and **15** of them carry
+  the levy in both quiet tax years. With Teays Valley added the roster falls short of the
+  district's books by 7.5% and 3.9%, inside the band. Teays Valley's levy is two mills, the rate
+  the seven Franklin members carry, which is a second witness: a joint vocational district levies
+  one rate across its territory. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_joint_vocational_district_the_corpus_held_nothing_about.rs))
+
+  The sixteenth is Bexley City. It is on the planning district's roster and its SD-1 row carries
+  no joint vocational levy, so it belongs by contract and not by statute. The district's own
+  audits say so: it serves "16 (15 statute and one contracted) school districts". [verified]
+  ([Auditor of State, FY2013 audit](https://www.ohioauditor.gov/auditsearch/Reports/2014/Eastland_Fairfield_Career_and_Technical_Schools_13-Franklin.pdf))
+  The district's fiftieth-anniversary history names the same fifteen joining: the five founders,
+  then Teays Valley, Pickerington and New Albany-Plain within three years of opening, then seven
+  in the 1980s. Bexley appears there only as a district sending tuition-paying students in 1968.
+  [verified]
+  ([Wayback 20181011134351](http://web.archive.org/web/20181011134351/http://www.eastlandfairfield.com/50YearsALegacyofExcellence.aspx))
 properties:
   seeded_because: |
     JVSDs are funded on rules that differ from traditional districts in ways easy to overlook and
@@ -143,6 +162,20 @@ revisions:
       numbers: the per-pupil figure its description warns about is thirty-five per cent above the
       comparable median, and the corpus's F-33 panel excludes every joint vocational district for
       that reason.
+  - was: |
+      "The roster is not established, and the absence now has a size." The member districts
+      outside Franklin and Fairfield were recorded as unfilled, bounded at about a ninth of the
+      levy.
+    now: |
+      Fifteen members by statute, fourteen in Franklin and Fairfield and Teays Valley in Pickaway,
+      and Bexley by contract. The fifteen reconcile against the district's own books.
+    found_by: |
+      Running the planning district's roster, committed after this node was last revised, through
+      the reconciliation the node already used. Bexley's missing levy then matched the Auditor's
+      "15 statute and one contracted".
+    reach: |
+      `established` is now the only unfilled field. The county pairing's count of twelve is
+      unchanged: it tests the roster a name gives, and this one came from elsewhere.
 figures:
   - key: dispersion/joint-vocational-districts
     value: 49
@@ -184,12 +217,11 @@ figures:
     value: 24
     field: findings
     as_written: "**12 of 24**"
+  - key: project/eastland-fairfield-statutory-members
+    value: 15
+    field: findings
+    as_written: "and **15** of them carry"
 unfilled:
-  - field: the member districts outside Franklin and Fairfield
-    why: >-
-      The reconciliation bounds them at about a ninth of the levy and no committed source rosters
-      them. A joint vocational district's own board resolution or the department's career-technical
-      planning district list would settle it; neither is held.
   - field: established
     why: >-
       Bounded, not dated. The district's own history says it "opened its doors in September 1968

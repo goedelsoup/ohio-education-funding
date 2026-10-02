@@ -105,14 +105,7 @@ pub fn county_named() -> Vec<Reconciliation> {
         let named: Vec<&String> = counties.iter().filter(|c| words.contains(*c)).collect();
         let [county] = named.as_slice() else { continue };
 
-        let misses: Vec<f64> = QUIET_TAX_YEARS
-            .iter()
-            .filter_map(|tax_year| {
-                let charged: f64 = sd1::county(county, *tax_year).into_iter().map(levy).sum();
-                let booked = gross_property_tax(&irn, tax_year + 1)?;
-                (charged > 0.0 && booked > 0.0).then(|| charged / booked - 1.0)
-            })
-            .collect();
+        let misses = misses(&irn, |row| row.county.eq_ignore_ascii_case(county));
         out.push(Reconciliation {
             irn: irn.clone(),
             name,
@@ -122,6 +115,35 @@ pub fn county_named() -> Vec<Reconciliation> {
     }
     out.sort_by(|a, b| a.county.cmp(&b.county));
     out
+}
+
+/// How far a roster named by IRN falls from one joint vocational district's books, one share per
+/// [`QUIET_TAX_YEARS`].
+///
+/// The county pairing in [`county_named`] is the roster a name gives you; this is the test for a
+/// roster from anywhere else — a planning district's membership, a board resolution, an audit's
+/// count. A roster member that carries no joint vocational levy adds nothing, so a member by
+/// contract rather than by statute neither helps nor hurts the sum.
+#[must_use]
+pub fn roster_misses(irn: &str, roster: &[&str]) -> Vec<f64> {
+    misses(irn, |row| roster.contains(&row.irn.as_str()))
+}
+
+/// The levies of the rows `member` selects, against what `irn` booked, per quiet tax year.
+fn misses(irn: &str, member: impl Fn(&TaxRow) -> bool) -> Vec<f64> {
+    let rows = sd1::rows();
+    QUIET_TAX_YEARS
+        .iter()
+        .filter_map(|tax_year| {
+            let charged: f64 = rows
+                .iter()
+                .filter(|row| row.tax_year == *tax_year && member(row))
+                .map(levy)
+                .sum();
+            let booked = gross_property_tax(irn, tax_year + 1)?;
+            (charged > 0.0 && booked > 0.0).then(|| charged / booked - 1.0)
+        })
+        .collect()
 }
 
 /// Of those, the ones whose county is the whole membership.

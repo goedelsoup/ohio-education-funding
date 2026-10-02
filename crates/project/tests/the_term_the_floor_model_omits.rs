@@ -212,9 +212,8 @@ fn the_districts_far_below_the_floor_are_the_ones_it_cannot_lift() {
 /// current-expense rate sits.
 ///
 /// This is arithmetic on a hypothesis and not a measurement of one. Confirming it needs TY1981
-/// joint vocational current-expense rates by district, which no source this corpus holds carries;
-/// the membership lists alone are unpopulated, as `education-agency/eastland-fairfield-ctc`
-/// records. What the arithmetic establishes is that the term is not the wrong size, which is the
+/// joint vocational current-expense rates by district, which no source this corpus holds carries.
+/// The memberships are held now, as the planning-district rosters, but a 1981 rate is not. What the arithmetic establishes is that the term is not the wrong size, which is the
 /// cheapest way a named cause can fail and the one this passes.
 ///
 /// It also reaches the district the rounding account does not. Bradford Exempted Village is a

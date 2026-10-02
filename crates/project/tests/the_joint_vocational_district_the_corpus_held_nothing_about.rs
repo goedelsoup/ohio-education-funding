@@ -19,15 +19,19 @@
 //! says so) and the levy (a joint vocational district charges property tax and a service centre
 //! does not, so only the forty-nine appear in the Auditor's finances at all).
 //!
-//! # The fourth field, narrowed rather than filled
+//! # The fourth field, narrowed and then filled
 //!
-//! The roster is not recovered here and the node should not claim it is. What is new is an
-//! instrument and its calibration: a joint vocational district's members are exactly the
+//! The roster was first narrowed rather than recovered, by an instrument and its calibration: a joint vocational district's members are exactly the
 //! districts whose Table SD-1 rows carry its levy, so summing a candidate roster's levies and
 //! comparing against the district's own published property tax says whether the roster is
 //! complete. Against the whole of the county its name points at, **twelve of twenty-four
 //! reconcile and twelve do not** — and the sign of the miss says which way the roster crosses
 //! the county line. [`project::joint_vocational`] is where that lives.
+//!
+//! Eastland-Fairfield's county pairing left a ninth of its levy unexplained. Its career-technical
+//! planning district's roster closes the gap: fifteen of the sixteen districts on it carry the
+//! levy, the one outside Franklin and Fairfield is Teays Valley in Pickaway County, and the
+//! fifteen reconcile inside the band (#533).
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -271,7 +275,7 @@ fn twelve_rosters_reconcile_against_their_county_and_twelve_do_not() {
 /// Against Fairfield County alone the reconciliation misses by 71%; adding the seven Franklin
 /// County districts that carry a levy at the two-mill floor brings it to within a tenth, which
 /// is close enough to say those fourteen are members and too far to say they are all of them.
-/// So the node's fourth field stays open, with a size on it.
+/// The missing member is Teays Valley; see `the_planning_districts_roster_is_the_whole_levy`.
 #[test]
 fn the_roster_reaches_past_both_counties_in_the_name() {
     /// The seven Fairfield County districts that carry a joint vocational levy, and the seven
@@ -335,4 +339,100 @@ fn the_two_franklin_districts_left_out_are_on_a_different_rate() {
         (7, 2),
         "the rates in Franklin: {rates:?}"
     );
+}
+
+/// Eastland's planning district.
+const EASTLAND_PLANNING_DISTRICT: &str = "200036";
+
+/// Bexley City, which the planning district lists and the levy does not reach.
+const BEXLEY: &str = "043620";
+
+/// Teays Valley Local, the member the county pairing could not see.
+const TEAYS_VALLEY: &str = "049098";
+
+/// The districts on the planning district's roster, by IRN.
+fn planning_district_roster() -> Vec<String> {
+    dispersion::ctpd_membership::roster(EASTLAND_PLANNING_DISTRICT)
+        .into_iter()
+        .filter_map(|member| member.district_irn)
+        .collect()
+}
+
+/// The planning district's roster is the whole of the levy.
+///
+/// The fourteen above leave a ninth unexplained. The report card's planning-district roster names
+/// sixteen districts, and against Eastland-Fairfield's own books it lands inside the band in both
+/// quiet years. Fifteen of the sixteen carry the levy; the sixteenth is Bexley, which carries none. That is
+/// the Auditor's own count: the district's audits describe it as serving sixteen districts,
+/// fifteen by statute and one by contract.
+#[test]
+fn the_planning_districts_roster_is_the_whole_levy() {
+    let roster = planning_district_roster();
+    assert_eq!(roster.len(), 16, "districts on the roster: {roster:?}");
+
+    let members: Vec<&str> = roster.iter().map(String::as_str).collect();
+    let misses = joint_vocational::roster_misses(EASTLAND_FAIRFIELD, &members);
+    assert_eq!(misses.len(), QUIET_TAX_YEARS.len());
+    assert!(
+        misses.iter().all(|m| m.abs() < joint_vocational::TOLERANCE),
+        "the planning district's roster misses by {misses:?}"
+    );
+
+    let rows = sd1::rows();
+    for tax_year in QUIET_TAX_YEARS {
+        let levying: BTreeSet<&str> = rows
+            .iter()
+            .filter(|row| row.tax_year == tax_year && members.contains(&row.irn.as_str()))
+            .filter(|row| joint_vocational::levy(row) > 0.0)
+            .map(|row| row.irn.as_str())
+            .collect();
+        assert_eq!(
+            levying.len(),
+            15,
+            "TY{tax_year}: members levying {levying:?}"
+        );
+        assert!(
+            !levying.contains(BEXLEY),
+            "TY{tax_year}: Bexley carries the levy"
+        );
+    }
+}
+
+/// Teays Valley is the one statutory member outside Franklin and Fairfield, at the same rate.
+///
+/// So the node's unfilled field — the members outside the two counties in the name — is one
+/// district in Pickaway County, at the two mills the seven Franklin members carry. A joint
+/// vocational district levies one rate across its territory, which is what makes the rate a
+/// second witness and not a coincidence.
+#[test]
+fn teays_valley_is_the_one_member_outside_the_two_counties() {
+    let roster = planning_district_roster();
+    let rows = sd1::rows();
+    for tax_year in QUIET_TAX_YEARS {
+        let outside: Vec<(&str, &str, f64)> = rows
+            .iter()
+            .filter(|row| row.tax_year == tax_year && roster.contains(&row.irn))
+            .filter(|row| joint_vocational::levy(row) > 0.0)
+            .filter(|row| {
+                !row.county.eq_ignore_ascii_case("Franklin")
+                    && !row.county.eq_ignore_ascii_case("Fairfield")
+            })
+            .map(|row| {
+                let value = row.real_property_value.unwrap_or(f64::NAN);
+                (
+                    row.irn.as_str(),
+                    row.county.as_str(),
+                    joint_vocational::levy(row) / value * 1000.0,
+                )
+            })
+            .collect();
+        let [(irn, county, mills)] = outside.as_slice() else {
+            panic!("TY{tax_year}: members outside the two counties: {outside:?}");
+        };
+        assert_eq!((*irn, *county), (TEAYS_VALLEY, "Pickaway"));
+        assert!(
+            (mills - 2.0).abs() < 5e-4,
+            "TY{tax_year}: Teays Valley at {mills} mills"
+        );
+    }
 }
