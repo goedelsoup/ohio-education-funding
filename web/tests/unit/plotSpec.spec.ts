@@ -1114,6 +1114,30 @@ test("both corner labels are the caller's, so a horizon is not written as a fisc
   expect(svg).not.toContain("FY");
 });
 
+test("the reference label is wrapped to the frame, so it cannot reach the start labels' gutter", () => {
+  /*
+   * #655's CI failure. On `/method` at 375 the right-anchored "What ±1σ claims to hold" ran left out
+   * of the 300px drawing's frame and through the lower line's "66%" start label in the gutter.
+   * Measured with the file's own p90 glyph width, which is wider than CI's fonts paint.
+   */
+  const label = "what ±1σ claims to hold";
+  for (const width of Object.values(WIDTHS)) {
+    const spec = seriesSpec(HELD, { a: "pooled", b: "cross-district" }, share, () => "", {
+      width,
+      tick: (at) => `${at}`,
+      reference: { value: 0.683, label },
+    })!;
+    const frame = width - Number(spec.options.marginLeft) - Number(spec.options.marginRight);
+    const { document } = parseHTML(`<div>${drawingAt(() => spec)}</div>`);
+    const lines = [...document.querySelectorAll("g.series-reference text")].flatMap((t) => {
+      const spans = [...t.querySelectorAll("tspan")];
+      return (spans.length ? spans : [t]).map((n) => n.textContent ?? "");
+    });
+    expect(lines.join(" "), `${width}px`).toBe("What ±1σ claims to hold");
+    for (const line of lines) expect(line.length * 0.667 * 11, `${width}px "${line}"`).toBeLessThanOrEqual(frame);
+  }
+});
+
 test("a series chart prints where each line starts, as well as where it ends", () => {
   /*
    * #655. Every dek over these charts is a start-to-end comparison — "fell from 45.9% to 34.5%" —

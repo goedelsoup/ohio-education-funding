@@ -3603,7 +3603,7 @@ export function seriesSpec(
    * a reference in a third hue would read as a quantity that has no per-position value.
    */
   const ref = options.reference;
-  const reference = ref
+  const reference = (frame: number) => ref
     ? [
         Plot.ruleY([ref.value], {
           ...RULE.reference,
@@ -3616,12 +3616,18 @@ export function seriesSpec(
          * in the card's own colour is painted first, so a line that still crosses it is cut
          * rather than read through.
          */
+        /*
+         * Wrapped to the frame, so it cannot reach either gutter (#655). Right-anchored at 23
+         * characters it ran left out of a 300px drawing's frame on CI's fonts and through the
+         * lower line's start label in the gutter there. Its lines hang down from under the rule.
+         */
         Plot.text([ref.value], {
           x: last.at,
           y: ref.value,
           dx: -2,
-          dy: 8,
-          text: () => sentence(ref.label),
+          dy: 3,
+          text: () => wrapText(sentence(ref.label), frame - 4).join("\n"),
+          lineAnchor: "top",
           textAnchor: "end",
           fill: INK.muted,
           stroke: INK.surface,
@@ -3668,7 +3674,7 @@ export function seriesSpec(
       x: { axis: null, domain: [first.at, last.at] },
       y: { axis: null, domain: [min, max] },
       marks: [
-        ...reference,
+        ...reference(options.width - marginLeft - marginRight),
         line("a", SERIES.formula, "series-a"),
         line("b", SERIES.guarantee, "series-b"),
         ...endLabel(endA, "a", SERIES_TEXT.formula),
