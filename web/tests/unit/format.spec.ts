@@ -13,7 +13,7 @@ import { describe, expect, test } from "vitest";
 
 import { firstOf, lastOf } from "../../src/lib/ends.ts";
 import * as format from "../../src/lib/format.ts";
-import { compactMoney, fixed, NOT_REPORTED, pct, reported, sig, signed } from "../../src/lib/format.ts";
+import { compactMoney, compactMoneyTicks, fixed, NOT_REPORTED, pct, reported, sig, signed } from "../../src/lib/format.ts";
 
 describe("fixed", () => {
   test("groups thousands and keeps its places", () => {
@@ -94,6 +94,18 @@ describe("compactMoney", () => {
   });
 });
 
+describe("compactMoneyTicks", () => {
+  test("writes a tick set in one style once any tick reaches ten thousand (#662)", () => {
+    // `/statewide`'s wealth-offset axis read "$1,000" beside "$20K".
+    expect(compactMoneyTicks([1000, 20_000])).toEqual(["$1K", "$20K"]);
+    expect(compactMoneyTicks([-5000, 25_000])).toEqual(["−$5K", "$25K"]);
+  });
+
+  test("keeps a set that never reaches ten thousand whole", () => {
+    expect(compactMoneyTicks([1000, 5000])).toEqual(["$1,000", "$5,000"]);
+  });
+});
+
 describe("sig", () => {
   test("writes a ratio to three significant figures with a true minus", () => {
     expect(sig(2.0057)).toBe("2.01");
@@ -167,6 +179,8 @@ describe("zero is not missing", () => {
       signedMoney: format.signedMoney(0),
       millions: format.millions(0),
       compactMoney: format.compactMoney(0),
+      // A zero tick in a compact set, which is the branch `compactMoney` does not reach.
+      compactMoneyTicks: format.compactMoneyTicks([0, 20_000])[0]!,
       sig: format.sig(0),
       pct: format.pct(0),
       logError: format.logError(0),

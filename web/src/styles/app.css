@@ -2311,7 +2311,13 @@ svg.plot [data-hover] {
 /* A range is two numbers and has to stay one line's worth of thought, so it sets a shade
    smaller than a point estimate would. It is still the largest thing in the card. */
 .tile .v.range { font-size: var(--text-h2); }
-.sw[data-series="band"] { background: var(--series-formula); opacity: .5; }
+/* The band as the fan draws it: the formula hue at the band's own 0.16 between its two 2px edges
+   (#662). At `opacity: .5` the key was rgb(147,186,232) beside a band of rgb(218,230,244). */
+.sw[data-series="band"] {
+  background: color-mix(in srgb, var(--series-formula) 16%, transparent);
+  border-block: 2px solid var(--series-formula);
+  border-radius: 0;
+}
 .sw[data-series="dash"] {
   background: repeating-linear-gradient(90deg,
     var(--series-formula) 0 4px, transparent 4px 7px);

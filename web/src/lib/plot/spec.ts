@@ -29,7 +29,7 @@
 import * as Plot from "@observablehq/plot";
 
 import { sentence, unstop } from "../chartWords.ts";
-import { escapeHtml } from "../format.ts";
+import { compactMoney, compactMoneyTicks, escapeHtml } from "../format.ts";
 import type {
   Bar,
   Bin,
@@ -44,7 +44,7 @@ import type {
   SeriesPoint,
   Trace,
 } from "../chart.ts";
-import { INK, ORDINAL, SERIES, SERIES_TEXT, SUBJECT } from "./tokens.ts";
+import { INK, ORDINAL, RULE, SERIES, SERIES_TEXT, SUBJECT } from "./tokens.ts";
 import { firstOf, lastOf } from "../ends.ts";
 import { fiscalYear } from "../yearLabel.ts";
 
@@ -601,7 +601,8 @@ function textPx(text: string, fontSize = 11): number {
 function wrapText(text: string, px: number, fontSize = 11): string[] {
   const lines: string[] = [];
   let line = "";
-  for (const word of text.split(/\s+/).filter(Boolean)) {
+  // Not `\s`, which matches U+00A0: a non-breaking space holds its two words together (#662).
+  for (const word of text.split(/[^\S\u00a0]+/).filter(Boolean)) {
     const next = line ? `${line} ${word}` : word;
     if (line && textPx(next, fontSize) > px) {
       lines.push(line);
@@ -671,6 +672,20 @@ export interface FootScale {
   beside?: { value: number; label: string };
 }
 
+/**
+ * One axis's labels, in one style. A money axis is the case that needs the whole set at once —
+ * see {@link compactMoneyTicks} — and every other format is per value.
+ */
+function tickLabels(values: number[], format: (v: number) => string): string[] {
+  return format === compactMoney ? compactMoneyTicks(values) : values.map(format);
+}
+
+/**
+ * What a log axis appends to its title. The space inside the parenthesis is U+00A0: `/bounds`
+ * wrapped "(log" and "scale)" onto two lines at 1280 (#662).
+ */
+const LOG_SCALE = " (log\u00a0scale)";
+
 /** `rangeSpec`'s x domain: the data on a log scale, and 4% either side of it on a linear one. */
 function rangeDomain(min: number, max: number, log = false): [number, number] {
   return log ? [min, max] : [min - (max - min) * 0.04, max + (max - min) * 0.04];
@@ -689,12 +704,14 @@ function yEnds(
   log = false,
 ): Plot.Markish[] {
   const ticks = axisTicks(domain, log);
-  return [firstOf(ticks), lastOf(ticks)].map((value, i) =>
+  const pair = [firstOf(ticks), lastOf(ticks)];
+  const labels = tickLabels(pair, format);
+  return pair.map((value, i) =>
     Plot.text([value], {
       y: () => value,
       frameAnchor: "left",
       dx: -marginLeft + 4,
-      text: () => format(value),
+      text: () => labels[i]!,
       // The top label 3 units clear of the axis name above the frame, which a round value at the
       // very top would otherwise touch where the name wraps to two lines.
       ...(i === 1 ? { dy: 3 } : {}),
@@ -867,9 +884,10 @@ function axisFoot(options: {
     const px = (v: number) =>
       frame * (log ? Math.log(v / lo) / Math.log(hi / lo) : (v - lo) / (hi - lo));
     const ticks = axisTicks(domain, log).filter((v) => v > lo || floor == null);
+    const labels = tickLabels(ticks, format);
     const candidates = [
       ...(floor != null ? [{ value: lo, label: floor }] : []),
-      ...ticks.map((value) => ({ value, label: format(value) })),
+      ...ticks.map((value, i) => ({ value, label: labels[i]! })),
     ].map((c, i, all) => {
       const anchor: "start" | "middle" | "end" =
         i === 0 ? "start" : i === all.length - 1 ? "end" : "middle";
@@ -952,8 +970,8 @@ function axisFoot(options: {
  * hues are the classes. The swatch half is `.sw[data-series="rule-dotted"]` in `app.css`.
  */
 const RULE_DASHES = [
-  { dash: "4 3", swatch: "rule" },
-  { dash: "1.5 3", swatch: "rule-dotted" },
+  { dash: RULE.boundary[0], swatch: "rule" },
+  { dash: RULE.boundary[1], swatch: "rule-dotted" },
 ] as const;
 
 /** The dash of a spread's `at`th rule. Throws past the last, which wants a third pattern. */
@@ -1261,7 +1279,7 @@ export function barSpec(
           // signed mode — see above.
           ...(signed ? {} : { rx2: 4 }),
         }),
-        ...(signed ? [Plot.ruleX([0], { stroke: INK.rule })] : []),
+        ...(signed ? [Plot.ruleX([0], RULE.zero)] : []),
         Plot.text(plain, {
           y: "label",
           frameAnchor: "left",
@@ -1640,14 +1658,14 @@ export function scatterSpec(
       ? 24 + Math.max(...labelledTraces.map((t) => t.label.length)) * 7.2
       : 24,
   );
-  const title = yTitle(width, marginLeft, axes.y.label + (axes.y.log ? " (log scale)" : ""), 28);
+  const title = yTitle(width, marginLeft, axes.y.label + (axes.y.log ? LOG_SCALE : ""), 28);
   const marginTop = title.marginTop;
   const foot = axisFoot({
     width,
     marginLeft,
     marginRight,
     dy: 20,
-    says: axes.x.label + (axes.x.log ? " (log scale)" : ""),
+    says: axes.x.label + (axes.x.log ? LOG_SCALE : ""),
     scale: {
       domain: axes.x.log ? [xMin, xMax] : [xMin - xPad, xMax + xPad],
       log: axes.x.log,
@@ -2243,7 +2261,8 @@ export function planeSpec(
   }));
   // Labels have the drawing's width less the 4 units every edge label here keeps, between the
   // title and the foot. The y-axis's two ends are the only text in the side margins.
-  const ends = [axes.y.format(yHi), axes.y.format(yLo)].map((text) => 4 + textPx(text));
+  const [yHiLabel, yLoLabel] = tickLabels([yHi, yLo], axes.y.format);
+  const ends = [yHiLabel!, yLoLabel!].map((text) => 4 + textPx(text));
   const placed = placeLabels(
     at,
     { left: 4, top: frame.top, right: width - 4, bottom: frame.bottom },
@@ -2268,8 +2287,8 @@ export function planeSpec(
       marks: [
         // The two axes, through the origin. Recessive like every other rule on the site, and the
         // only frame this form draws — see the note above on why there is no bounding box.
-        Plot.ruleX([0], { stroke: INK.rule, className: "plane-zero" }),
-        Plot.ruleY([0], { stroke: INK.rule, className: "plane-zero" }),
+        Plot.ruleX([0], { ...RULE.zero, className: "plane-zero" }),
+        Plot.ruleY([0], { ...RULE.zero, className: "plane-zero" }),
 
         Plot.dot(walk, {
           x: "x",
@@ -2319,7 +2338,7 @@ export function planeSpec(
           frameAnchor: "top-left",
           dx: -marginLeft + 4,
           dy: 3,
-          text: () => axes.y.format(yHi),
+          text: () => yHiLabel!,
           textAnchor: "start",
           fill: INK.muted,
           fontSize: 11,
@@ -2327,7 +2346,7 @@ export function planeSpec(
         Plot.text([0], {
           frameAnchor: "bottom-left",
           dx: -marginLeft + 4,
-          text: () => axes.y.format(yLo),
+          text: () => yLoLabel!,
           textAnchor: "start",
           fill: INK.muted,
           fontSize: 11,
@@ -2416,12 +2435,13 @@ export function rangeSpec(
   const min = Math.min(...values);
   const max = Math.max(...values);
 
-  const rowHeight = 14;
+  // 16 for 11px names (#662). At 14 the row held 10px type and drew 11px through its neighbours.
+  const rowHeight = 16;
   const longest = Math.max(...rows.map((r) => r.label.length));
-  // A 14px row cannot hold a second line, so this gutter is capped rather than wrapped: a name
+  // A 16px row cannot hold a second line, so this gutter is capped rather than wrapped: a name
   // too long for a phone's frame is drawn shorter, not folded into the row below it.
   const { width, markers = [], rowLabel } = options;
-  const marginLeft = gutter(width, Math.max(70, Math.min(150, Math.round(longest * 6.2) + 10)));
+  const marginLeft = gutter(width, Math.max(70, Math.min(150, Math.round(longest * 6.8) + 10)));
   /* Room for the widest row label past the frame's right edge, where the row holding the maximum
      draws it; any other row's sits inside the frame, past its own high end. */
   const ROW_LABEL_DX = DOT_RADIUS + 5;
@@ -2433,7 +2453,7 @@ export function rangeSpec(
     marginLeft,
     marginRight,
     dy: 16,
-    says: axis.label + (axis.log ? " (log scale)" : ""),
+    says: axis.label + (axis.log ? LOG_SCALE : ""),
     scale: { domain: rangeDomain(min, max, axis.log), log: axis.log, format: axis.format },
   });
 
@@ -2493,7 +2513,7 @@ export function rangeSpec(
           x: "low",
           r: DOT_RADIUS,
           /* The middle step and not the light one. `--ordinal-1` is 2.20:1 against the card at full
-             opacity in both themes, and this dot is a data mark a reader has to find on a 14px row
+             opacity in both themes, and this dot is a data mark a reader has to find on a 16px row
              (#615). `--ordinal-2` is 4.30 light and 5.47 dark, and is still the lower of the two
              shades, so a low end and a high end stay one measure at two points. */
           fill: ORDINAL[1],
@@ -2515,7 +2535,8 @@ export function rangeSpec(
           text: "label",
           textAnchor: "end",
           fill: INK.secondary,
-          fontSize: 10,
+          // The axis foot's size (#662): at 10 the names painted at 12.5px under a 13.8px foot.
+          fontSize: 11,
           className: "range-label",
         }),
         ...(rowLabel
@@ -2534,13 +2555,12 @@ export function rangeSpec(
           : []),
         // Across the rows, under the foot and over the spans: it is a position in the plan
         // rather than a value of any row, so it is dashed, and it carries no text of its own —
-        // a 14px row has nowhere to put one, and the legend says what it is.
+        // a 16px row has nowhere to put one, and the legend says what it is.
         ...across.map((marker) =>
           Plot.frame({
             anchor: "top",
             insetTop: (marker.at / rows.length) * area,
-            stroke: INK.rule,
-            strokeDasharray: "3,3",
+            ...RULE.reference,
             className: "range-marker",
           }),
         ),
@@ -2642,11 +2662,25 @@ export function rankSpec(
   const { width } = options;
   // Sized to the longest name, like `barSpec`'s, and to 260 rather than `rangeSpec`'s 150: these
   // names are sentences about a provision and not county names. Where the cap bites, the row
-  // grows to hold two lines rather than the name being cut — the 14px row `rangeSpec` draws
+  // grows to hold two lines rather than the name being cut — the 16px row `rangeSpec` draws
   // cannot, which is why that form truncates and this one wraps.
-  const wanted = Math.max(90, Math.min(260, Math.round(longest * 6.2) + 12));
+  const wanted = Math.max(90, Math.min(260, Math.round(longest * 6.8) + 12));
   const marginLeft = gutter(width, wanted);
-  const rowHeight = marginLeft < wanted ? 28 : 16;
+  /*
+   * Wrapped here rather than by Plot's `lineWidth`, so the row knows how many lines it holds. At
+   * 11px (#662) a name that took two lines at 10 took three, and a row sized for two drew it
+   * through its neighbours on `/bounds` at 375. The marked row is bold and wraps on a narrower
+   * budget — see {@link BOLD_WIDENS}.
+   */
+  const wrapped = new Map(
+    rows.map((r) => [
+      r.label,
+      wrapText(r.label, (marginLeft - 10) / (r.marked != null ? BOLD_WIDENS : 1)).join("\n"),
+    ]),
+  );
+  const lines = Math.max(...[...wrapped.values()].map((t) => t.split("\n").length));
+  const rowHeight = lines > 1 ? Math.max(28, 14 * lines) : 16;
+  const name = (r: Rank) => wrapped.get(r.label) ?? r.label;
 
   const marked = rows.filter((r) => r.marked != null);
   const plain = rows.filter((r) => r.marked == null);
@@ -2663,7 +2697,7 @@ export function rankSpec(
    * Measured against a first pass with no reserve, which is the smaller frame, so the answer errs
    * toward leaving room rather than toward cutting the phrase.
    */
-  const phrase = Math.max(0, ...marked.map((r) => textPx(r.marked ?? "", 10)));
+  const phrase = Math.max(0, ...marked.map((r) => textPx(r.marked ?? "", 11)));
   const inner = Math.max(1, width - marginLeft - gutter(width, 16));
   const decades = Math.log(max / floor);
   const rightmost = Math.max(floor, ...marked.map(at));
@@ -2675,7 +2709,7 @@ export function rankSpec(
     marginLeft,
     marginRight,
     dy: 16,
-    says: `${axis.label} (log scale)`,
+    says: `${axis.label}${LOG_SCALE}`,
     scale: {
       domain: [floor, max],
       log: true,
@@ -2743,11 +2777,10 @@ export function rankSpec(
           y: "label",
           frameAnchor: "left",
           dx: -8,
-          text: "label",
+          text: name,
           textAnchor: "end",
           fill: INK.secondary,
-          fontSize: 10,
-          lineWidth: lineWidth(marginLeft),
+          fontSize: 11,
           className: "rank-label",
         }),
         // The subject's second channel. Weight and ink survive a monochrome print and a
@@ -2758,12 +2791,11 @@ export function rankSpec(
                 y: "label",
                 frameAnchor: "left",
                 dx: -8,
-                text: "label",
+                text: name,
                 textAnchor: "end",
                 fill: INK.primary,
-                fontSize: 10,
+                fontSize: 11,
                 fontWeight: 600,
-                lineWidth: lineWidth(marginLeft),
                 className: "rank-label current",
               }),
               Plot.text(marked, {
@@ -2773,7 +2805,7 @@ export function rankSpec(
                 text: "marked",
                 textAnchor: "start",
                 fill: INK.primary,
-                fontSize: 10,
+                fontSize: 11,
                 className: "rank-mark",
               }),
             ]
@@ -2954,12 +2986,13 @@ export function distributionSpec(
    * valuation, a poverty share — and for those the left edge is the smallest value and nothing is
    * being crossed. The sixth is enrollment change, the site's one signed distribution, and it drew
    * no zero: a dot two thirds along could have been a district that grew or one that shrank, and
-   * the strip carried nothing to say which. `histogramSpec` draws a dashed rule at zero and labels
-   * it "no change" for exactly that reason, and gives a bin straddling it a neutral fill.
+   * the strip carried nothing to say which. `histogramSpec` draws a rule at zero and labels it
+   * "no change" for exactly that reason, and gives a bin straddling it a neutral fill.
    *
    * Detected from the domain rather than passed in, so it appears wherever the condition holds and
-   * cannot be forgotten at a call site. The rule is dashed and in muted ink: it is a reference, not
-   * a value, and must not be confused with the marker rule, which is solid, hued and full height.
+   * cannot be forgotten at a call site. The rule is `RULE.zero`, solid as every baseline is (#662):
+   * it was dashed muted ink here and solid rule grey on signed bars. It is not confused with the
+   * marker, which is 2.5px of `SUBJECT` ink against this 1px of recessive rule grey.
    */
   const min0 = firstOf(sorted).value;
   const max0 = lastOf(sorted).value;
@@ -3000,7 +3033,7 @@ export function distributionSpec(
       marks: [
         // Under everything, because it is what the dots are read against rather than a mark
         // among them.
-        ...(crossesZero ? [Plot.ruleX([0], { stroke: INK.muted, strokeDasharray: "3 3" })] : []),
+        ...(crossesZero ? [Plot.ruleX([0], RULE.zero)] : []),
         ...foot.marks,
 
         // The whisker, drawn first and thin: it is the range, not the mass.
@@ -3085,6 +3118,7 @@ export function histogramSpec(
 ): Spec {
   const first = firstOf(bins);
   const last = lastOf(bins);
+  const histEnds = tickLabels([first.from, last.to], format);
   const crossesZero = first.from < 0 && last.to > 0;
 
   const side = (b: Bin) =>
@@ -3112,10 +3146,10 @@ export function histogramSpec(
           rx2: 4,
           className: "hist",
         }),
-        Plot.ruleY([0], { stroke: INK.rule }),
+        Plot.ruleY([0], RULE.zero),
         ...(crossesZero
           ? [
-              Plot.ruleX([0], { stroke: INK.muted, strokeDasharray: "3 3" }),
+              Plot.ruleX([0], RULE.zero),
               Plot.text([0], {
                 x: 0,
                 frameAnchor: "bottom",
@@ -3129,7 +3163,7 @@ export function histogramSpec(
         Plot.text([first.from], {
           frameAnchor: "bottom-left",
           dy: 18,
-          text: (v: number) => format(v),
+          text: () => histEnds[0]!,
           textAnchor: "start",
           fill: INK.muted,
           fontSize: 11,
@@ -3137,7 +3171,7 @@ export function histogramSpec(
         Plot.text([last.to], {
           frameAnchor: "bottom-right",
           dy: 18,
-          text: (v: number) => format(v),
+          text: () => histEnds[1]!,
           textAnchor: "end",
           fill: INK.muted,
           fontSize: 11,
@@ -3288,7 +3322,7 @@ export function fanSpec(
                 y: "point",
                 stroke: banded,
                 strokeWidth: 2,
-                strokeDasharray: "5 4",
+                ...RULE.projection,
                 className: "fan-mid",
               }),
             ]
@@ -3514,18 +3548,26 @@ export function seriesSpec(
   const reference = ref
     ? [
         Plot.ruleY([ref.value], {
-          stroke: INK.muted,
-          strokeDasharray: "3 3",
+          ...RULE.reference,
           className: "series-reference",
         }),
+        /*
+         * At the right end, under the rule, on a halo (#662). It sat at the left end above the
+         * rule, where both lines start — the blue one ran through "What ±1σ claims to hold" at
+         * every width on `/method`, and through "No bias" on both projection-bias panels. A halo
+         * in the card's own colour is painted first, so a line that still crosses it is cut
+         * rather than read through.
+         */
         Plot.text([ref.value], {
-          x: first.at,
+          x: last.at,
           y: ref.value,
-          dx: 2,
-          dy: -6,
+          dx: -2,
+          dy: 8,
           text: () => sentence(ref.label),
-          textAnchor: "start",
+          textAnchor: "end",
           fill: INK.muted,
+          stroke: INK.surface,
+          strokeWidth: 3,
           fontSize: 11,
           className: "series-reference",
         }),

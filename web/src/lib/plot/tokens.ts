@@ -106,3 +106,29 @@ export const INK = {
  * and a bar filled with it would leave the ring 1:1 against its own mark.
  */
 export const SUBJECT = INK.primary;
+
+/**
+ * Every rule a chart draws that is not data, by what it means rather than by how it looked (#662).
+ *
+ * Zero was solid `INK.rule` on signed bars and the plane but dashed `INK.muted` on strips and
+ * histograms, a reference was "3 3" in one form and a range marker "3,3" in rule grey in another,
+ * and the literals sat at six sites in `spec.ts`. A baseline is solid everywhere: it is what the
+ * marks are measured from, not a claim about them. A dash says *this line is a stated value, not a
+ * measured one*, and each dash below names which.
+ *
+ * Spread straight into a Plot mark, so the keys are Plot's own option names. `plotSpec.spec.ts`
+ * fails on a `strokeDasharray` literal anywhere in `spec.ts`.
+ */
+export const RULE = {
+  /** The baseline the marks are measured from. Solid, recessive. */
+  zero: { stroke: INK.rule },
+  /** A stated value read against the data: a series reference, a range chart's plan marker. */
+  reference: { stroke: INK.muted, strokeDasharray: "3 3" },
+  /**
+   * A spread's boundaries, told apart by dash rather than hue (#611): a boundary is arithmetic and
+   * the hues are the classes. In order; `ruleDash` in `spec.ts` pairs each with its swatch.
+   */
+  boundary: ["4 3", "1.5 3"],
+  /** A projection's central path, which is a model's value and not an observation. */
+  projection: { strokeDasharray: "5 4" },
+} as const;

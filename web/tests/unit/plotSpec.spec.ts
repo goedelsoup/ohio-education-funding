@@ -1068,6 +1068,36 @@ test("the reference is drawn muted and once, not as a third series", () => {
   }
 });
 
+test("the reference label sits at the right end on a halo, not where both lines start", () => {
+  /*
+   * #662. At the left end above the rule, the series lines ran through "What ±1σ claims to hold"
+   * at every width on `/method`. A halo in the card's colour cuts a line that still crosses it.
+   */
+  const svg = renderToString(
+    (w) =>
+      seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", {
+        width: w,
+        tick: (at) => `${at}`,
+        reference: { value: 0.683, label: "what ±1σ claims" },
+      }),
+    "presentational",
+  );
+  const { document } = parseHTML(`<div>${svg}</div>`);
+  const labels = [...document.querySelectorAll("g.series-reference")].filter((g) => g.querySelector("text"));
+  expect(labels).toHaveLength(DRAWINGS);
+  for (const label of labels) {
+    expect(label.getAttribute("text-anchor")).toBe("end");
+    expect(label.getAttribute("stroke")).toBe(INK.surface);
+  }
+});
+
+test("every dash in the chart forms comes from the rule tokens", () => {
+  // #662: four dash patterns and two greys meant the same thing in different charts. A literal
+  // here is a fifth.
+  const source = readFileSync(resolve(process.cwd(), "src/lib/plot/spec.ts"), "utf8");
+  expect(source.match(/strokeDasharray:\s*["'`]/g) ?? []).toEqual([]);
+});
+
 test("both corner labels are the caller's, so a horizon is not written as a fiscal year", () => {
   const svg = renderToString(
     (w) =>

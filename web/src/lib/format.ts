@@ -115,6 +115,21 @@ export function compactMoney(v: number | null | undefined): string {
 const COMPACT = new Intl.NumberFormat("en-US", { notation: "compact", maximumSignificantDigits: 3 });
 
 /**
+ * {@link compactMoney} for the labels of one axis, which are written in one style (#662).
+ *
+ * `compactMoney` keeps a figure under ten thousand whole so a label agrees with the prose beside
+ * it, and that is right for a direct label. A tick set is read as a scale, and the rule split it:
+ * `/statewide`'s wealth-offset axis read "$1,000" beside "$20K" and `/districts` "$5,000" beside
+ * "$25K". So once any tick reaches ten thousand the whole set is compact.
+ */
+export function compactMoneyTicks(values: number[]): string[] {
+  if (!values.some((v) => Number.isFinite(v) && Math.abs(v) >= 10_000)) return values.map(compactMoney);
+  return values.map((v) =>
+    !Number.isFinite(v) ? "—" : (v < 0 ? "−" : "") + "$" + COMPACT.format(Math.abs(v)),
+  );
+}
+
+/**
  * A plain number to three significant figures, grouped, with a true minus.
  *
  * For an axis end on a ratio scale. `corpusSeries.ts` writes ratios to four places, which is the
