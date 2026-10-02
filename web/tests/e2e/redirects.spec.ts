@@ -30,6 +30,15 @@ const sample = (from: string): string =>
 
 test.describe("addresses that moved", () => {
   test("every source in _redirects lands on a page that exists", async ({ request }) => {
+    /*
+     * Two requests a rule, the second following the hop, one after another over every rule the
+     * build wrote: 762 since the unpadded addresses were generated (#596), so about 2,300 round
+     * trips in one test. That took 17.0s alone and 24.6s beside three other workers on a laptop,
+     * and it timed out at the default 30s mid-loop on the 4-vCPU runner, at a different request
+     * each time, in both of the first two runs with four workers per shard (#647). Slow triples
+     * the budget. The cost is bounded by the rule count, not by anything a request waits on.
+     */
+    test.slow();
     expect(RULES.length).toBeGreaterThan(0);
     for (const rule of RULES) {
       const from = sample(rule.from);
