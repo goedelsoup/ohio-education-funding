@@ -19,7 +19,8 @@
  * refuses to produce one, because a forecast exists for the narrow measure only and appending it
  * would extend a wide series with a narrow number. See `crates/project/src/biennium.rs`.
  */
-import { money, signedMoney } from "./format.ts";
+import { countyRank, largestMove, rankPhrase, signedPct, yearChange } from "./change.ts";
+import { escapeHtml, money, signedMoney } from "./format.ts";
 import * as routes from "./routes.ts";
 import { anchor } from "./section.ts";
 import type { District } from "./types.ts";
@@ -66,7 +67,7 @@ function lines(baseline: number): ReadonlyArray<{
  * Returns the empty string for a district the payment files do not carry, which is none of the
  * 609 the feed ships — the guard is for a future panel that adds one.
  */
-export function renderBiennium(d: District): string {
+export function renderBiennium(d: District, districts: readonly District[]): string {
   const b = d.biennium;
   if (b.total_baseline <= 0) return "";
 
@@ -78,12 +79,13 @@ export function renderBiennium(d: District): string {
   ];
   const wide = b.total_terminal - b.total_baseline;
   const narrow = b.foundation_terminal - b.foundation_baseline;
-  const measures: ReadonlyArray<[string, number, number, number, number]> = [
+  const measures: ReadonlyArray<[string, number, number, number, number, number]> = [
     [
       "Total state support",
       b.total_baseline,
       b.total_middle,
       b.total_terminal,
+      b.total_terminal - b.total_middle,
       wide,
     ],
     [
@@ -91,9 +93,14 @@ export function renderBiennium(d: District): string {
       b.foundation_baseline,
       b.foundation_middle,
       b.foundation_terminal,
+      b.foundation_terminal - b.foundation_middle,
       narrow,
     ],
   ];
+  // The year on year, which is what a reader asking "why did we get less this year" means.
+  const total = yearChange(b, "total");
+  const foundation = yearChange(b, "foundation");
+  const moved = largestMove(b);
 
   return `
     <div class="card" id="biennium" data-part="biennium">
@@ -108,23 +115,36 @@ export function renderBiennium(d: District): string {
           <thead>
             <tr><th scope="col">Measure</th>
               ${years.map((year) => `<th scope="col" class="tnum">FY${year}</th>`).join("")}
-              <th scope="col" class="tnum">Change</th></tr>
+              <th scope="col" class="tnum">FY${years[1]} to FY${years[2]}</th>
+              <th scope="col" class="tnum">FY${years[0]} to FY${years[2]}</th></tr>
           </thead>
           <tbody>
             ${measures
               .map(
-                ([label, a, m, t, change]) => `
+                ([label, a, m, t, year, change]) => `
             <tr><th scope="row">${label}</th>
               <td class="tnum">${money(a)}</td>
               <td class="tnum">${money(m)}</td>
               <td class="tnum">${money(t)}</td>
+              <td class="tnum">${signedMoney(year)}</td>
               <td class="tnum">${signedMoney(change)}</td></tr>`,
               )
               .join("")}
           </tbody>
         </table>
       </div>
-      <p class="note">The change column is the last year against the first. A two-year budget pays
+      <p class="note">From the FY${years[1]} model to the FY${years[2]} model — the department's
+        models of those years, not payments — total state support moves
+        <strong>${signedPct(total.ratio)}</strong> and foundation aid
+        <strong>${signedPct(foundation.ratio)}</strong>. On total state support that is
+        ${escapeHtml(rankPhrase(countyRank(d, districts, "total"), d.county))}${
+          moved
+            ? `, and the line that moved it most is ${escapeHtml(moved.label.charAt(0).toLowerCase() + moved.label.slice(1))}, at
+               <strong>${signedMoney(moved.change)}</strong>`
+            : ""
+        }. <a href="${routes.districtChange(d.irn)}">Every line, the phase-in and the county's
+        other districts</a> are on the Change tab.</p>
+      <p class="note">The last column is the last year against the first. A two-year budget pays
         both of its years, so the biennium's whole departure from the year it is measured from is
         <strong>${signedMoney(b.total_middle - b.total_baseline + wide)}</strong> on total state
         support — each year counted against FY${years[0]}, not against the year before it.</p>

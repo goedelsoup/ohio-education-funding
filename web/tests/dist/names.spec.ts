@@ -143,8 +143,14 @@ describe("one name per district tab", () => {
     const tabs = [...dashboard.querySelectorAll(".subnav a[href]")]
       .map((a) => ({ href: a.getAttribute("href") ?? "", label: text(a) }))
       .filter((tab) => tab.href === home || tab.href.startsWith(`${home}/`));
-    // Guard against the selector going stale, as above: the dashboard and its three siblings.
-    expect(tabs.map((t) => t.href)).toEqual([home, `${home}/outcome`, `${home}/finances`, `${home}/taxes`]);
+    // Guard against the selector going stale, as above: the dashboard and its four siblings.
+    expect(tabs.map((t) => t.href)).toEqual([
+      home,
+      `${home}/outcome`,
+      `${home}/finances`,
+      `${home}/taxes`,
+      `${home}/change`,
+    ]);
 
     for (const tab of tabs) {
       const doc = read(fileFor(tab.href));

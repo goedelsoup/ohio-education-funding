@@ -62,12 +62,13 @@ test.describe("the document arrives complete", () => {
      * one written at build time, and rather more likely to be missed.
      */
     const unaddressed: string[] = [];
-    // The fifth tab is the runner opened on the district, not a route of the district's own (#548).
+    // The last tab is the runner opened on the district, not a route of the district's own (#548).
     const views: [string, string][] = [
       ["/dashboard", `/district/${CLEVELAND}`],
       ["/finances", `/district/${CLEVELAND}/finances`],
       ["/outcome", `/district/${CLEVELAND}/outcome`],
       ["/taxes", `/district/${CLEVELAND}/taxes`],
+      ["/change", `/district/${CLEVELAND}/change`],
       ["/scenario", `/scenario?d=${CLEVELAND}`],
     ];
     for (const [suffix, url] of views) {
@@ -117,6 +118,7 @@ const ROUTES_WITH_FIGURES = [
   `/district/${CLEVELAND}/finances`,
   `/district/${CLEVELAND}/outcome`,
   `/district/${CLEVELAND}/taxes`,
+  `/district/${CLEVELAND}/change`,
   `/scenario?d=${CLEVELAND}`,
   /*
    * `/scenario` was missing, and the omission is the same shape the docstring above describes.

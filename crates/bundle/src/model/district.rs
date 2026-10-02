@@ -745,6 +745,14 @@ pub struct BienniumYear {
     pub enrollment_growth: Dollars,
     /// The performance supplement.
     pub performance: Dollars,
+    /// Transportation, before the special education line.
+    pub transportation: Dollars,
+    /// Special education transportation, after the year's proration.
+    pub special_education_transportation: Dollars,
+    /// Preschool special education.
+    pub preschool_special_education: Dollars,
+    /// Enrolled ADM as the year's file states it. `None` where the year carries none.
+    pub enrolled_adm: Option<f64>,
     /// The FY2020 funding base the phase-in interpolates from.
     pub funding_base: Dollars,
     /// What the foundation formula computes, before the phase-in and the guarantee.

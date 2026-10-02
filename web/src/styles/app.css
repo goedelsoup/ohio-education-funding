@@ -773,6 +773,25 @@ a:focus-visible { color: var(--link); text-decoration-thickness: 2px; }
 .basis-scope input[data-basis="nominal"]:focus-visible ~ .basis label[data-basis="real"],
 .basis-scope input[data-basis="real"]:focus-visible ~ .basis label[data-basis="nominal"] { outline: none; }
 /*
+ * The measure switch on a district's `/change` tab: the same two-radio pattern, keyed on the
+ * measure rather than the dollar basis. Total state support is the headline and checked first.
+ */
+.measure-panel.foundation { display: none; }
+.measure-scope input[data-measure="foundation"]:checked ~ .measure-panel.foundation { display: block; }
+.measure-scope input[data-measure="foundation"]:checked ~ .measure-panel.total { display: none; }
+.measure-scope .basis label { margin: 0; }
+.measure-scope input[data-measure="total"]:checked ~ .basis label[data-measure="total"],
+.measure-scope input[data-measure="foundation"]:checked ~ .basis label[data-measure="foundation"] {
+  background: var(--surface-1);
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+  font-weight: var(--weight-semibold);
+}
+.measure-scope input:focus-visible ~ .basis label[data-measure="total"],
+.measure-scope input:focus-visible ~ .basis label[data-measure="foundation"] { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.measure-scope input[data-measure="total"]:focus-visible ~ .basis label[data-measure="foundation"],
+.measure-scope input[data-measure="foundation"]:focus-visible ~ .basis label[data-measure="total"] { outline: none; }
+/*
  * The display face, and the only place on this site it appears besides the lead.
  *
  * `--font-serif` is a platform stack — Iowan Old Style, Palatino, Charter, Georgia — so what a

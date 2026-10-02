@@ -209,3 +209,66 @@ fn every_year_states_the_same_funding_base() {
         );
     }
 }
+
+/// Each year is its named lines: foundation aid, the three paid lines and the named supplements
+/// sum to total state support, to within cent rounding, in all three years and every district.
+///
+/// This is what lets a page draw the three years line by line with a total under them, rather
+/// than only the FY2025→FY2027 change [`biennium::Lines`] carries.
+#[test]
+fn every_year_is_its_named_lines() {
+    for row in biennium::frame() {
+        for (year, detail) in [BASELINE_YEAR, MIDDLE_YEAR, MODEL_YEAR]
+            .into_iter()
+            .zip(row.years)
+        {
+            let named = row.foundation.at(year).expect("observed")
+                + detail.paid.transportation
+                + detail.paid.special_education_transportation
+                + detail.paid.preschool_special_education
+                + detail.supplements.total();
+            let total = row.total.at(year).expect("observed");
+            assert!(
+                close(named, total, 0.03),
+                "{} ({}) FY{}: lines sum to {named}, total state support is {total}",
+                row.total.name,
+                row.total.irn,
+                year.0
+            );
+        }
+    }
+}
+
+/// The levels agree with the change [`biennium::Lines`] already carried.
+#[test]
+fn the_levels_difference_to_the_lines() {
+    for row in biennium::frame() {
+        let [first, _, last] = row.years.map(|year| year.paid);
+        for (change, line) in [
+            (
+                last.transportation - first.transportation,
+                row.lines.transportation,
+            ),
+            (
+                last.special_education_transportation - first.special_education_transportation,
+                row.lines.special_education_transportation,
+            ),
+            (
+                last.preschool_special_education - first.preschool_special_education,
+                row.lines.preschool_special_education,
+            ),
+        ] {
+            assert!(close(change, line, 0.005), "{}", row.total.irn);
+        }
+    }
+}
+
+/// Enrolled ADM is published for the two model years and not for the payment report.
+#[test]
+fn enrolled_adm_is_absent_in_fy2025() {
+    for row in biennium::frame() {
+        let [fy25, fy26, fy27] = row.years.map(|year| year.enrolled_adm);
+        assert!(fy25.is_none());
+        assert!(fy26.is_some_and(|adm| adm > 0.0) && fy27.is_some_and(|adm| adm > 0.0));
+    }
+}

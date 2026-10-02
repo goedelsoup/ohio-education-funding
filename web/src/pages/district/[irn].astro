@@ -163,7 +163,7 @@ const description = district.on_guarantee
   <Supplements district={district} statewide={bundle.statewide} />
   {/* Everything above is one year. This is the three the budget actually covers, on both
       measures, because they disagree in sign statewide. */}
-  <Fragment set:html={renderBiennium(district)} />
+  <Fragment set:html={renderBiennium(district, bundle.districts)} />
   <Position bundle={bundle} district={district} valuations={valuations} expenditures={expenditures} />
   {/* Ohio describing itself cannot say whether Ohio is unusual. This is the one card that can. */}
   <NationalPosition district={district} />

@@ -784,6 +784,11 @@ const DistrictSchema = z
      * does not publish — FY2025 has no state share, FY2026 no transfers — and is never a zero.
      * The named supplements' change matches `line_supplements` to within cent rounding.
      *
+     * Each entry also carries the three other payment lines as levels — `transportation`,
+     * `special_education_transportation`, `preschool_special_education` — so foundation aid, those
+     * three and the five supplements make up `total_*` in every year to within cent rounding. And
+     * the year's `enrolled_adm`, null for FY2025, whose payment report carries no enrollment inputs.
+     *
      * `valuation` is assessed valuation for the tax years in `valuation_tax_years`, oldest first.
      */
     biennium: z
@@ -797,6 +802,10 @@ const DistrictSchema = z
                 base_funding: num,
                 enrollment_growth: num,
                 performance: num,
+                transportation: num,
+                special_education_transportation: num,
+                preschool_special_education: num,
+                enrolled_adm: maybeNum,
                 funding_base: num,
                 phase_in_calculated: num,
                 phase_in_paid: num,

@@ -396,6 +396,8 @@ export const FIELD_DENOMINATORS: Record<string, DenominatorKey | null> = {
   // The enrollment growth supplement as each biennium year paid it: a dollar total, named for the
   // count its eligibility is tested on. Not a quantity over a pupil count.
   "districts[].biennium.observed[].enrollment_growth": null,
+  // A pupil count itself, as each biennium year's file states it.
+  "districts[].biennium.observed[].enrolled_adm": null,
 
   // Dimensionless: a change, and correlations whose parts each cancel their own denominator.
   "districts[].enrollment_change": null,

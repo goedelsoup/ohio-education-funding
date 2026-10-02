@@ -41,6 +41,12 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `50.0.0` added each biennium year's three remaining payment lines as levels — transportation,
+/// special education transportation and preschool special education — and the enrolled ADM the
+/// year's file states, so a page can set the three years side by side line by line. With
+/// foundation aid and the named supplements the lines make up total state support in every year.
+/// `enrolled_adm` is `null` for FY2025, whose payment report carries no enrollment inputs.
+///
 /// `49.0.0` added the detail behind `biennium`'s two measures, so a page can say *why* a district
 /// moved and not only how far: per year, the five supplements by name, the phase-in's base,
 /// calculated and paid figures, the published state share, and transfers with net funding; per
@@ -261,7 +267,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "49.0.0";
+pub const CONTRACT_VERSION: &str = "50.0.0";
 
 mod model;
 mod serialize;

@@ -979,6 +979,16 @@ impl Bundle {
                             y.num("base_funding", year.base_funding);
                             y.num("enrollment_growth", year.enrollment_growth);
                             y.num("performance", year.performance);
+                            y.num("transportation", year.transportation);
+                            y.num(
+                                "special_education_transportation",
+                                year.special_education_transportation,
+                            );
+                            y.num(
+                                "preschool_special_education",
+                                year.preschool_special_education,
+                            );
+                            y.opt("enrolled_adm", year.enrolled_adm);
                             y.num("funding_base", year.funding_base);
                             y.num("phase_in_calculated", year.phase_in_calculated);
                             y.num("phase_in_paid", year.phase_in_paid);

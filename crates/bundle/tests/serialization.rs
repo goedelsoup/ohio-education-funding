@@ -214,6 +214,7 @@ fn sample() -> District {
                     funding_base: 7_700_000.0,
                     phase_in_calculated: 7_650_000.0,
                     phase_in_paid: 7_660_000.0,
+                    transportation: 900_000.0,
                     transfers: Some(-40_000.0),
                     net_state_funding: Some(9_060_000.0),
                     ..BienniumYear::default()
@@ -225,6 +226,7 @@ fn sample() -> District {
                     phase_in_calculated: 7_640_000.0,
                     phase_in_paid: 7_650_000.0,
                     state_share: Some(0.4125),
+                    enrolled_adm: Some(1_204.5),
                     ..BienniumYear::default()
                 },
                 BienniumYear {
@@ -887,6 +889,17 @@ fn an_unpublished_biennium_figure_is_null_and_the_years_keep_their_positions() {
     assert_eq!(years.len(), 3, "{observed}");
     assert!(years[0].contains("\"transfers\": -40000"), "{}", years[0]);
     assert!(years[0].contains("\"state_share\": null"), "{}", years[0]);
+    assert!(years[0].contains("\"enrolled_adm\": null"), "{}", years[0]);
+    assert!(
+        years[0].contains("\"transportation\": 900000"),
+        "{}",
+        years[0]
+    );
+    assert!(
+        years[1].contains("\"enrolled_adm\": 1204.5"),
+        "{}",
+        years[1]
+    );
     assert!(years[1].contains("\"transfers\": null"), "{}", years[1]);
     assert!(
         years[1].contains("\"net_state_funding\": null"),

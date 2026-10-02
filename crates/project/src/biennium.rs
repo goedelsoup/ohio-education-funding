@@ -39,7 +39,7 @@
 
 use std::collections::HashMap;
 
-use edfund_core::{Dollars, FiscalYear};
+use edfund_core::{Adm, Dollars, FiscalYear};
 
 use crate::baseline::{self, Fy2025};
 use crate::panel::{panel, DistrictRecord, MODEL_YEAR};
@@ -237,11 +237,33 @@ pub struct Transfers {
     pub net_state_funding: Dollars,
 }
 
+/// The three payment lines outside both the formula and the supplements, at their level in one
+/// year.
+///
+/// [`Lines`] carries these as the FY2025→FY2027 change; this is each year's figure, so a page can
+/// set the three years side by side and a reader can see which year a line moved in. With
+/// foundation aid and [`Supplements::total`] they make up total state support to within cent
+/// rounding — `every_year_is_its_named_lines`.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct Paid {
+    /// Transportation, before the special education line.
+    pub transportation: Dollars,
+    /// Special education transportation, after the year's proration.
+    pub special_education_transportation: Dollars,
+    /// Preschool special education.
+    pub preschool_special_education: Dollars,
+}
+
 /// One observed year of one district, beyond its two measures.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Year {
     /// The supplements paid, by name.
     pub supplements: Supplements,
+    /// The other three payment lines outside foundation aid.
+    pub paid: Paid,
+    /// Enrolled ADM as the year's file states it. `None` for FY2025, whose payment report carries
+    /// no capacity or enrollment inputs.
+    pub enrolled_adm: Option<Adm>,
     /// The foundation formula's stages.
     pub phase_in: PhaseIn,
     /// Transfers and net funding. `None` for FY2026, whose model publishes no transfer columns —
@@ -285,11 +307,10 @@ fn at_fy2027(record: &DistrictRecord) -> (Dollars, Dollars, Dollars, Dollars, Do
 
 /// The FY2026 reading, on the two measures only.
 ///
-/// The middle year carries the same five payment lines and this deliberately does not read them.
 /// [`Lines`] is stated as the FY2025→FY2027 split — the biennium's endpoints — and a middle-year
 /// decomposition would be a second, differently-shaped object rather than more of this one. The
-/// year is fully present in both level series and in [`Change::biennium`]; what it is not is a
-/// third column of [`Lines`].
+/// middle year's lines are read as levels instead, into [`Year::paid`], where all three years
+/// carry them alike.
 fn at_fy2026(row: &Prior) -> (Dollars, Dollars) {
     (
         row.foundation_funding + row.guarantee,
@@ -316,6 +337,12 @@ fn year_2025(row: &Fy2025) -> Year {
             formula_transition: row.formula_transition_supplement,
             ..Supplements::default()
         },
+        paid: Paid {
+            transportation: row.transportation,
+            special_education_transportation: row.special_education_transportation,
+            preschool_special_education: row.preschool_special_education,
+        },
+        enrolled_adm: None,
         phase_in: PhaseIn {
             funding_base: row.funding_base,
             calculated: row.foundation_calculated,
@@ -342,6 +369,12 @@ fn year_2026(row: &Prior) -> Year {
             enrollment_growth: row.enrollment_growth_supplement,
             performance: row.performance_supplement,
         },
+        paid: Paid {
+            transportation: row.transportation,
+            special_education_transportation: row.summary_special_education_transportation,
+            preschool_special_education: row.preschool_special_education,
+        },
+        enrolled_adm: Some(row.enrolled_adm),
         phase_in: PhaseIn {
             funding_base: row.funding_base,
             calculated: row.foundation_calculated,
@@ -364,6 +397,12 @@ fn year_2027(record: &DistrictRecord) -> Year {
             enrollment_growth: record.supplements.growth,
             performance: record.performance.amount,
         },
+        paid: Paid {
+            transportation: record.transportation.total,
+            special_education_transportation: record.transportation.special_education,
+            preschool_special_education: record.preschool_special_education.total,
+        },
+        enrolled_adm: Some(record.current_year_adm),
         phase_in: PhaseIn {
             funding_base: record.transition.funding_base,
             calculated: record.core_foundation_funding,

@@ -1,0 +1,65 @@
+---
+/**
+ * Why this district's funding moved across the biennium (#639).
+ *
+ * The dashboard's biennium card says *that* it moved, on both measures, and stays short (#602).
+ * This tab says what moved: every payment line in the three years, the phase-in's stages, the
+ * inputs underneath, what was deducted before payment, and where the district sits in its county.
+ * See `lib/change.ts` for what the page may and may not attribute a change to.
+ */
+import DistrictNav from "../../../components/DistrictNav.astro";
+import Base from "../../../layouts/Base.astro";
+import {
+  MEASURES,
+  renderByLine,
+  renderDrivers,
+  renderNeighbors,
+  renderPhaseIn,
+  renderTransfers,
+  signedPct,
+  yearChange,
+  yearsOf,
+} from "../../../lib/change.ts";
+import { districtPaths, loadFeed, qualifiedName } from "../../../lib/feed.ts";
+import { signedMoney } from "../../../lib/format.ts";
+import { districtTitle, NAMES } from "../../../lib/nav.ts";
+import * as routes from "../../../lib/routes.ts";
+
+export const getStaticPaths = districtPaths;
+
+const { district } = Astro.props;
+const { bundle } = loadFeed();
+const years = yearsOf(district.biennium);
+const total = yearChange(district.biennium, "total");
+
+const description = `${district.name}'s ${MEASURES.total.name} moved ${signedPct(total.ratio)} (${signedMoney(total.dollars)}) from the FY${years[1]} model to the FY${years[2]} model, line by line.`;
+---
+
+<Base
+  title={districtTitle(qualifiedName(district), "change")}
+  description={description}
+  image={routes.og.district(district.irn)}
+  imageAlt={`${district.name}: state aid per pupil, and how much of it comes from the guarantee`}
+  section="districts"
+>
+  <p class="crumb">
+    <a href={NAMES.districts.href}>{NAMES.districts.name}</a> ›{" "}
+    <a href={routes.district(district.irn)}>{qualifiedName(district)}</a>
+  </p>
+  <h1>{qualifiedName(district)}</h1>
+  <p class="lead">
+    What moved this district's funding from FY{years[0]} to FY{years[2]}, line by line — on total
+    state support, and on the foundation aid this site models — and where it sits among its
+    county's districts.
+  </p>
+
+  <DistrictNav irn={district.irn} current="change" />
+
+  <div class="rail-layout"><div class="rail-main">
+    <Fragment set:html={renderByLine(district)} />
+    <Fragment set:html={renderPhaseIn(district)} />
+    <Fragment set:html={renderDrivers(district)} />
+    <Fragment set:html={renderTransfers(district)} />
+    <Fragment set:html={renderNeighbors(district, bundle.districts)} />
+  </div></div>
+</Base>

@@ -209,6 +209,7 @@ test.describe("the type system, as the page sets it", () => {
     "/district/043786/finances",
     "/district/043786/outcome",
     "/district/043786/taxes",
+    "/district/043786/change",
     "/scenario",
     "/scenario/reach",
     "/compare?a=043786&b=049056",

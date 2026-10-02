@@ -40,6 +40,7 @@ export const FAMILIES: readonly { pattern: RegExp; visit: string }[] = [
   { pattern: /^\/district\/\d{6}\/finances$/, visit: "/district/043786/finances" },
   { pattern: /^\/district\/\d{6}\/outcome$/, visit: "/district/043786/outcome" },
   { pattern: /^\/district\/\d{6}\/taxes$/, visit: "/district/043786/taxes" },
+  { pattern: /^\/district\/\d{6}\/change$/, visit: "/district/043786/change" },
   { pattern: /^\/county\/[a-z-]+$/, visit: "/county/ottawa" },
   { pattern: /^\/house\/\d{3}$/, visit: "/house/090" },
   { pattern: /^\/senate\/\d{2,3}$/, visit: "/senate/001" },
