@@ -413,23 +413,49 @@ export function renderTransfers(d: District): string {
     </div>`;
 }
 
-/** One measure's chart of the county, this district marked. */
+/**
+ * The fewest districts a county chart is drawn for (#651). Below it the chart compares a district
+ * with itself or one other, which the lead sentence above it already says in words.
+ */
+const MIN_NEIGHBORS = 3;
+
+/** Every county peer's year-on-year ratio, on both measures — the domain the two panels share. */
+function neighborsDomain(peers: readonly District[]): number[] {
+  return (Object.keys(MEASURES) as MeasureKey[]).flatMap((m) =>
+    peers.map((p) => yearChange(p.biennium, m).ratio),
+  );
+}
+
+/**
+ * One measure's chart of the county, this district marked.
+ *
+ * Drawn on one domain for both measures: the panels are toggled in place, and a scale that jumped
+ * with the toggle would say a 3% move on one measure was as long as a 20% move on the other. The
+ * ends of the ranking and the subject carry their values, so the chart has numbers without a foot.
+ */
 function neighborsChart(d: District, peers: readonly District[], measure: MeasureKey): string {
+  if (peers.length < MIN_NEIGHBORS) return "";
   const b = d.biennium;
   const years = yearsOf(b);
   const name = MEASURES[measure].name;
   const ranked = peers
     .map((p) => ({ p, change: yearChange(p.biennium, measure) }))
     .sort((x, y) => y.change.ratio - x.change.ratio);
-  const bars: Bar[] = ranked.map(({ p, change }) => ({
+  const last = ranked.length - 1;
+  const bars: Bar[] = ranked.map(({ p, change }, i) => ({
     label: p.name,
     value: change.ratio,
     hover: `${p.name}: ${signedPct(change.ratio)} (${signedMoney(change.dollars)}) in ${name}, FY${years[1]} to FY${years[2]}`,
     current: p.irn === d.irn,
+    ...(i === 0 || i === last || p.irn === d.irn ? { direct: signedPct(change.ratio) } : {}),
   }));
+  const ratios = neighborsDomain(peers);
+  const high = Math.max(0, ...ratios);
+  const low = Math.min(0, ...ratios);
+  const labelChars = Math.max(...ratios.map((r) => signedPct(r).length));
   const label = `Change in ${name} from FY${years[1]} to FY${years[2]}, as a percentage of FY${years[1]}, for each of the ${peers.length} districts in ${d.county} County; ${d.name} is marked`;
   return `<div class="chartwrap" data-chart="neighbors-${measure}">${renderToString(
-    (w) => barSpec(bars, { width: w, scale: { format: (v) => signedPct(v), says: `change in ${name}` } }),
+    (w) => barSpec(bars, { width: w, polarity: true, max: high, min: low, labelChars }),
     { label },
   )}</div>`;
 }
