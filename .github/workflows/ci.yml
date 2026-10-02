@@ -71,8 +71,30 @@ jobs:
         env:
           RUSTDOCFLAGS: -D warnings
 
-  web:
-    name: web
+  # The web gate is five jobs, because only one thing in it has to come first: the build. It ran as
+  # one serial job for most of its life, and at 415–604s it was the critical path of every push
+  # while the crates beside it finished in ~155s (#647).
+  #
+  #   web-static (check, lint, unit)         ─┐
+  #   web-build  (build → dist.tar.zst)      ─┼─> web-dist  (check:dist, test:dist)
+  #                                           └─> web-e2e   [shard 1/3 + measure, 2/3, 3/3]
+  #   web        needs all four, and is the check the `main` ruleset requires by name
+  #
+  # The single job carried two ordering rules, and both survive as something stronger than step
+  # order. "Unit before build", so a formula defect reads as a formula failure: `web-static` and
+  # `web-build` are separate jobs now, and each failure is reported under its own name. "After
+  # `build`" for everything that reads `dist/`: that is a `needs:` edge, and the thing they read is
+  # not a directory that happens to be there but the one tarball `web-build` uploaded.
+  #
+  # One tarball, not 4,500 loose files: uploading the tree was the slow path, and a single
+  # `tar --zstd` file is one object to move. Every consumer and `deploy` downloads that same file,
+  # so "the bytes Chromium was served are the bytes deployed" holds by construction across jobs, as
+  # it used to hold within one.
+  #
+  # The checkout, pnpm and Node steps repeat in four jobs. They are three lines each and pinned by
+  # SHA, and a composite action to share them would be one more file to pin and read.
+  web-static:
+    name: web static
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -107,27 +129,133 @@ jobs:
       - name: unit
         run: pnpm test:unit
 
-      # The only build in the run, and everything after it reads what it produced. The build is
+  web-build:
+    name: web build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      # The default shallow clone. The build reads the tree and never the history — nothing under
+      # `src/`, `scripts/` or the configs spawns `git` — and the one test that reads the log runs
+      # in `web-static`, which keeps the full clone.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+        with:
+          version: 11
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      # The only build in the run, and every job after it reads what it produced. The build is
       # where the formula is checked against the Rust checkpoints and where the corpus is parsed,
       # so a failure in either reads as a build failure rather than as a browser that never got a
-      # server to talk to. `test:e2e` used to build again; `webServer.command` in
-      # playwright.config.ts is gated on `CI` now, so Chromium is served this `dist/` too.
+      # server to talk to. `webServer.command` in playwright.config.ts is gated on `CI`, so
+      # Chromium is served this build too, unpacked from the tarball below.
       - name: build
         run: pnpm build
 
+      - name: Pack
+        run: tar --zstd -cf dist.tar.zst dist && ls -l dist.tar.zst
+
+      # On every run, not only the ones that deploy: `web-dist` and `web-e2e` read it. Already
+      # compressed, so the action is told not to compress it again.
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dist
+          path: web/dist.tar.zst
+          compression-level: 0
+          retention-days: 7
+
+  web-dist:
+    name: web dist
+    needs: web-build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+        with:
+          version: 11
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: dist
+          path: web
+
+      - name: Unpack
+        run: tar --zstd -xf dist.tar.zst
+
       # Asks of the built HTML what the route-table test structurally cannot ask of the route
       # table: is there an anchor here a static host cannot serve? Forty relative hrefs shipped
-      # while that suite was green. Must follow `build` — scanning a stale `dist/` reports on the
-      # previous commit.
+      # while that suite was green.
       - name: dist links
         run: pnpm check:dist
 
-      # Twenty-three assertions about the built files, which used to run inside the Playwright
-      # suite without ever opening a browser. Same placement rule as `dist links`: after `build`,
-      # never in `unit`, which runs first on purpose.
+      # The assertions about the built files, which used to run inside the Playwright suite
+      # without ever opening a browser. In this job and never in `unit`, which runs without a
+      # build on purpose.
       - name: dist
         run: pnpm test:dist
 
+  web-e2e:
+    name: web e2e (${{ matrix.shard }}/3)
+    needs: web-build
+    runs-on: ubuntu-latest
+    strategy:
+      # Every shard runs to the end, so one red shard does not hide what the other two would have
+      # found.
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+        with:
+          version: 11
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: dist
+          path: web
+
+      - name: Unpack
+        run: tar --zstd -xf dist.tar.zst
+
+      # On the runner image, not in Playwright's container: the container's fonts differ, and the
+      # chrome width and the chart layout are both font-sensitive.
       - name: Install the browser
         run: pnpm exec playwright install --with-deps chromium
 
@@ -137,38 +265,45 @@ jobs:
       # print, because the 2026-08 audit found 96 findings behind a gate that was green and never
       # once looked at the page.
       #
-      # After the browser install, which is the whole reason it sits here rather than beside
-      # `dist links`: it needs Chromium for computed style and layout. And note the runner's fonts
-      # are not a laptop's — the font-sensitive columns carry the advance width that produced them
-      # so the two are comparable rather than merely different.
+      # In one shard only, since it prints rather than grades, and in this job because it needs
+      # Chromium for computed style and layout. The runner's fonts are not a laptop's — the
+      # font-sensitive columns carry the advance width that produced them so the two are
+      # comparable rather than merely different.
       - name: measure
+        if: matrix.shard == 1
         run: pnpm measure
 
       # The e2e suite is what catches the class of bug unit tests structurally cannot: the
       # verification gate held shut on every tab except the one it exists for, and only a real
-      # browser found it.
+      # browser found it. `fullyParallel` is on, so Playwright splits by test rather than by file.
       - name: e2e
-        run: pnpm test:e2e
-
-      # The bytes Chromium was just served are the bytes that get deployed, and now that is true by
-      # construction rather than by two builds agreeing: `webServer.command` is gated on `CI`, so
-      # `check:dist`, `test:dist`, `measure` and the browser all read the one `dist/` the `build`
-      # step wrote, and this uploads that same tree. 194 MB across 4,568 files, so it is uploaded
-      # only on the runs that actually deploy.
-      - name: Keep the built site for the deploy job
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: dist
-          path: web/dist
-          retention-days: 7
+        run: pnpm test:e2e --shard=${{ matrix.shard }}/3
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: failure()
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.shard }}
           path: web/playwright-report/
           retention-days: 7
+
+  # The `main` ruleset requires a check named `web`, and that name predates the split. This job is
+  # that check: it passes only when every web job above succeeded, and a skipped or cancelled one
+  # counts against it. `if: always()` is what makes it report at all when one of them fails — a job
+  # whose `needs` failed is otherwise skipped, and a skipped required check reads as passing.
+  web:
+    name: web
+    needs: [web-static, web-build, web-dist, web-e2e]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every web job succeeded
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "web-static web-build web-dist web-e2e: $RESULTS"
+          for result in $RESULTS; do
+            [ "$result" = success ] || exit 1
+          done
 
   # Two generated artifacts, both committed, both easy to forget: the feed the site serves and
   # the REGEN blocks the READMEs carry. If either drifts, the repository is describing itself
@@ -267,6 +402,8 @@ jobs:
   # wrong in its numbers and perfectly green in its tests.
   deploy:
     name: deploy to production
+    # `web` is the aggregate of the five web jobs, so this waits on `web-static`, `web-dist` and
+    # every `web-e2e` shard, not only on the build that produced the tarball.
     needs: [rust, web, generated]
     # A `pull_request` event resolves `github.ref` to the PR's merge ref rather than to
     # `refs/heads/main`, so it is already excluded. The event test is for `workflow_dispatch`,
@@ -298,12 +435,15 @@ jobs:
       name: production
       url: https://ohio-education-funding.pages.dev
     steps:
-      # No checkout. Nothing here needs the sources: the deployable tree is the artifact the web
-      # job built, and rebuilding it would mean deploying something no test has seen.
+      # No checkout. Nothing here needs the sources: the deployable tree is the tarball
+      # `web-build` packed, the same file `web-dist` and every `web-e2e` shard unpacked and tested,
+      # and rebuilding it would mean deploying something no test has seen.
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: dist
-          path: dist
+
+      - name: Unpack
+        run: tar --zstd -xf dist.tar.zst
 
       # `--branch main` is not optional and cannot be inferred. On direct upload wrangler labels
       # the deployment with whatever branch it can find, and this job has no git tree to find one

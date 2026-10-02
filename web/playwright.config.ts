@@ -25,6 +25,13 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env["CI"],
   retries: process.env["CI"] ? 2 : 0,
+  // Playwright's default is half the cores, which is 2 on a 4-vCPU GitHub runner. Each `web-e2e`
+  // shard has the runner to itself and `vite preview` serves static files, so on CI it gets all
+  // four. `retries` above is what would surface the preview server falling behind: a test that
+  // passes only on retry is contention, and the run's flaky count says so (#647). Locally the
+  // default stands — written out, since `exactOptionalPropertyTypes` refuses an `undefined` — because
+  // a laptop running the suite is usually doing something else too.
+  workers: process.env["CI"] ? 4 : "50%",
   reporter: process.env["CI"] ? [["github"], ["html", { open: "never" }]] : [["list"]],
 
   use: {
@@ -38,11 +45,12 @@ export default defineConfig({
     // `vite preview` rather than `astro preview`, which daemonizes itself and so outlives the
     // run that started it. This stays in the foreground and dies with Playwright.
     //
-    // On CI the build in front of it is gone: the workflow has already built, and three steps
-    // between the build and this one — `check:dist`, `test:dist` and `measure` — read `dist/`
-    // directly. Building again here served Chromium a *second* build and left those three
-    // reporting on the first, which is the one difference a reader of the artefacts cannot see.
-    // Now there is one build per run and everything, the browser included, sees the same bytes.
+    // On CI the build in front of it is gone. The `web-build` job builds once and uploads `dist/`
+    // as one tarball; `web-dist` (`check:dist`, `test:dist`) and each `web-e2e` shard (`measure`
+    // and this suite) unpack that same file, and `deploy` publishes it. Building again here
+    // served Chromium a *second* build and left the others reporting on the first, which is the
+    // one difference a reader of the artefacts cannot see. Now there is one build per run and
+    // everything, the browser included, sees the same bytes.
     //
     // Locally the build stays, because locally there is usually no build to serve. `pnpm test:e2e`
     // on a clean checkout has to be a command that works.
