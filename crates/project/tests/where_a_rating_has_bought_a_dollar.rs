@@ -9,14 +9,16 @@
 //! Asked as one question — where has an Ohio rating determined a funding amount? — the twelve
 //! committed LSC greenbooks answer it for every biennium from FY2002 to FY2024.
 //!
-//! # Two episodes, eight quiet bienniums, and a reversal
+//! # Three episodes, seven quiet bienniums, and a reversal
 //!
-//! A rating drove a formula payment in four greenbooks and no others. It paid on *failure* in
-//! FY2008-09 and on *success* in FY2016-19, and the supplement in force now pays on success
-//! without the wealth equaliser the middle episode carried.
+//! A rating drove a formula payment in five greenbooks and no others. It paid on *failure* in
+//! FY2008-09 and on *success* in FY2012-13 and FY2016-21, and the supplement in force now pays on
+//! success without the wealth equaliser that only the FY2016 bonuses ever carried.
 //!
 //! One of the six acts is answered by an absence: H.B. 59 rebuilt the report card and carried the
-//! third-grade reading guarantee while coupling no dollars to any rating at all.
+//! third-grade reading guarantee while coupling no new dollar to any rating. Its guarantee base
+//! held H.B. 153's FY2013 high performance subsidy, which is a past rating's dollar kept, not a
+//! payment on a current one.
 //!
 //! H.B. 166 is answered by something better than an absence. Its freeze held every district at
 //! FY2019 foundation aid, severing the link for them, while requiring community and STEM schools'
@@ -62,22 +64,22 @@ fn each_coupling_is_evidenced_in_its_own_greenbook() {
         );
         checked += 1;
     }
-    assert_eq!(checked, 7, "couplings evidenced against a greenbook");
+    assert_eq!(checked, 8, "couplings evidenced against a greenbook");
 }
 
-/// A rating drove a formula payment in three greenbooks, and nine carry nothing.
+/// A rating drove a formula payment in five greenbooks, and seven carry nothing.
 ///
-/// This is the shape of the answer. Had the terms been scattered across the twelve, the two
-/// episodes would be an artefact of where anyone happened to look.
+/// This is the shape of the answer. Had the terms been scattered across the twelve, the episodes
+/// would be an artefact of where anyone happened to look.
 #[test]
-fn nine_of_the_twelve_bienniums_couple_no_dollar_to_a_rating() {
+fn seven_of_the_twelve_bienniums_couple_no_dollar_to_a_rating() {
     let quiet = ratings::quiet();
     assert_eq!(
         quiet,
-        vec!["hb94", "hb95", "hb66", "hb1", "hb153", "hb59", "hb110", "hb33"],
+        vec!["hb94", "hb95", "hb66", "hb1", "hb59", "hb110", "hb33"],
         "the greenbooks with no rating-driven formula payment"
     );
-    assert_eq!(quiet.len(), 8, "quiet bienniums");
+    assert_eq!(quiet.len(), 7, "quiet bienniums");
 
     // And the four that are not quiet are the ones the couplings name.
     let noisy: Vec<&str> = project::greenbook::greenbooks()
@@ -85,13 +87,22 @@ fn nine_of_the_twelve_bienniums_couple_no_dollar_to_a_rating() {
         .map(|g| g.bill)
         .filter(|bill| !quiet.contains(bill))
         .collect();
-    assert_eq!(noisy, vec!["hb119", "hb64", "hb49", "hb166"]);
+    assert_eq!(noisy, vec!["hb119", "hb153", "hb64", "hb49", "hb166"]);
 
-    // H.B. 59 is the one act of the six whose answer is a pure absence: a budget that rebuilt the
-    // report card and coupled no dollar to it.
+    // H.B. 59 is the one act of the six whose answer is an absence: a budget that rebuilt the
+    // report card and coupled no new dollar to it. It does name H.B. 153's subsidy, as a term of
+    // its guarantee base, and that is why the census term is the subsidy's heading rather than
+    // its name. Were the two to converge, H.B. 59 would read as noisy for holding a past dollar.
     assert!(
         quiet.contains(&"hb59"),
         "hb59 was expected to couple nothing"
+    );
+    assert!(
+        ratings::quotes(
+            "hb59",
+            "FY 2013 bridge formula funding, supplemental guarantee, and high performance subsidy"
+        ),
+        "hb59's guarantee base no longer names the subsidy, so this distinction proves nothing"
     );
 
     // H.B. 166 is not quiet, and reading it as quiet is the mistake this test exists to prevent.
@@ -109,7 +120,7 @@ fn nine_of_the_twelve_bienniums_couple_no_dollar_to_a_rating() {
 #[test]
 fn the_formula_couplings_reverse_direction_and_then_lose_the_equaliser() {
     let formula = ratings::formula_couplings();
-    assert_eq!(formula.len(), 5, "formula couplings across the whole span");
+    assert_eq!(formula.len(), 6, "formula couplings across the whole span");
 
     // Oldest pays on failure; everything after it pays on success.
     assert_eq!(formula[0].name, "Closing the Achievement Gap");
@@ -122,8 +133,9 @@ fn the_formula_couplings_reverse_direction_and_then_lose_the_equaliser() {
         formula.iter().map(|c| c.direction).collect::<Vec<_>>()
     );
 
-    // The equalised versions are the district ones, and the un-equalised ones are the charter
-    // version and the supplement now in force.
+    // The equalised versions are Closing the Achievement Gap and the district bonuses. The first
+    // payment on success was un-equalised, and so are the charter bonuses and the supplement now
+    // in force.
     let equalised: Vec<&str> = formula
         .iter()
         .filter(|c| c.equalised == Equalised::Yes)
@@ -145,10 +157,11 @@ fn the_formula_couplings_reverse_direction_and_then_lose_the_equaliser() {
     assert_eq!(
         gross,
         vec![
+            "Subsidy for High Performance",
             "Graduation and third grade reading bonuses for community and STEM schools",
             "Performance supplement"
         ],
-        "the un-equalised form is the charter one and the one Ohio readopted"
+        "the un-equalised form came first, survived in the charter version, and was readopted"
     );
 
     // The un-equalised charter version outlives the equalised district one, which is the freeze.
@@ -163,9 +176,12 @@ fn the_formula_couplings_reverse_direction_and_then_lose_the_equaliser() {
     assert_eq!(district.years, (2016, 2019));
     assert_eq!(charter.years, (2016, 2021));
 
-    // The gaps are what make these episodes: nothing between FY2010 and FY2015, and nothing for
+    // The gaps are what make these episodes: nothing in FY2010-11 or FY2014-15, and nothing for
     // anyone between FY2022 and FY2025.
     assert_eq!(formula[0].years, (2008, 2009));
+    assert_eq!(formula[1].years, (2012, 2013));
+    assert_eq!(formula[1].direction, Direction::OnSuccess);
+    assert_eq!(formula[2].years.0, 2016);
     assert_eq!(
         formula.last().unwrap().act,
         "H.B. 96 of the 136th General Assembly"
@@ -306,4 +322,62 @@ fn the_second_episode_paid_fifty_times_the_rate_of_the_first() {
         (0.075_f64 / 0.0015 - 50.0).abs() < 1e-9,
         "the two rates are no longer a factor of fifty apart"
     );
+}
+
+/// H.B. 153 paid on a rating, and the first census missed it.
+///
+/// Its subsidy is the reversal — the first formula payment on a good rating — and it shares no
+/// word with the terms the census first searched. Recorded in `hb-153-2011` and `bridge-formula`
+/// while the census counted FY2012-13 as quiet; #535.
+#[test]
+fn the_high_performance_subsidy_paid_on_the_previous_years_rating() {
+    assert!(
+        ratings::quotes(
+            "hb153",
+            "school districts and community schools that were rated either \"Excellent\" or \"Excellent with Distinction\" on the report card for the previous school year"
+        ),
+        "the qualification rule is not in the greenbook as written"
+    );
+    assert!(
+        ratings::quotes("hb153", "In both FY 2012 and FY 2013, these districts"),
+        "the two years are not in the greenbook as written"
+    );
+
+    let subsidy = ratings::COUPLINGS
+        .iter()
+        .find(|c| c.greenbook == "hb153")
+        .expect("the H.B. 153 coupling");
+    assert_eq!(subsidy.route, Route::Formula);
+    assert_eq!(subsidy.direction, Direction::OnSuccess);
+    // A flat $17 per pupil carries no wealth term.
+    assert_eq!(subsidy.equalised, Equalised::No);
+}
+
+/// The census is of formula components, and rating-keyed money outside the formula continued.
+///
+/// The census could be read as saying a rating bought nothing from FY2022 until H.B. 96. That is
+/// true of the formula only: H.B. 110's greenbook carries two rating-keyed payments to community
+/// schools, outside it.
+#[test]
+fn rating_keyed_payments_outside_the_formula_continued_after_the_earmarks() {
+    assert!(
+        ratings::quotes(
+            "hb110",
+            "additional funds to community schools that meet certain quality standards with respect to report card grades"
+        ),
+        "the Quality Community Schools rule is not in the greenbook as written"
+    );
+    assert!(
+        ratings::quotes("hb110", "$54.0 million per year from lottery profits"),
+        "the Quality Community Schools appropriation is not in the greenbook as written"
+    );
+    assert!(
+        ratings::quotes(
+            "hb110",
+            "exceeded standards on the graduation component of the most recent report card"
+        ),
+        "the e-school pilot's rule is not in the greenbook as written"
+    );
+    // And neither is a formula component, which is why H.B. 110 is quiet.
+    assert!(ratings::quiet().contains(&"hb110"));
 }

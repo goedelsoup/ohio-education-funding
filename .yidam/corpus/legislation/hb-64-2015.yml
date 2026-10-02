@@ -99,10 +99,13 @@ properties:
     shape on third-grade reading proficiency. [verified] (crates/project, `rating_payments`,
     pinned by test)
 
-    **It is the reversal.** Ohio's only prior formula coupling, H.B. 119's Closing the Achievement
-    Gap, paid more to districts with more failing buildings and only to poor ones. This pays more
-    to districts with better results, at fifty times the rate, and the state share index makes the
-    payment larger in poorer districts rather than gating it on poverty. [verified]
+    **It is the equalized one.** H.B. 119's Closing the Achievement Gap paid more to districts with
+    more failing buildings and only to poor ones; [H.B. 153](hb-153-2011.yml)'s subsidy for high
+    performance had already reversed that, paying $17 a pupil on an Excellent rating, flat at any
+    valuation. This pays more to districts with better results, at fifty times Closing the
+    Achievement Gap's rate, and the state share index makes the payment larger in poorer districts
+    rather than gating it on poverty. No other Ohio payment on success has carried an equalizer.
+    [verified]
 
     The mechanism, its wealth gradient and its disappearance are at
     [performance supplement rate](../parameter/performance-supplement-rate.yml); the chronology of

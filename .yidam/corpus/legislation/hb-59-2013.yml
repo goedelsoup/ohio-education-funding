@@ -91,18 +91,24 @@ properties:
     with disabilities from the core-subject teacher retesting requirement.
   accountability_effect: |
     Carried the third-grade reading guarantee's retention provisions and a new generation of
-    assessments, and coupled no dollar to any of it.
+    assessments, and coupled no new dollar to any of it.
 
     **This is the act that rebuilt Ohio's report card and left the funding formula rating-blind.**
     Its nine foundation components — the opportunity grant, targeted assistance, and seven
-    categorical aids — contain no rating term, and its greenbook is one of the eight of twelve
+    categorical aids — contain no rating term, and its greenbook is one of the seven of twelve
     carrying no rating-driven formula payment at all.
     [verified] (crates/project, `rating_payments::quiet`, pinned by test)
 
+    It did not let go of the last rating payment, though. Its transitional aid guarantee base is
+    the sum of each district's FY2013 Bridge funding, supplemental guarantee and **high performance
+    subsidy** — [H.B. 153](hb-153-2011.yml)'s $17 a pupil on an Excellent rating — so a guaranteed
+    district carried that dollar into FY2014-15 while no FY2014-15 rating could move it. [verified]
+    ([greenbook](../../../crates/project/fixtures/lsc-education-greenbooks.txt))
+
     Worth stating rather than leaving as an absence: the A-F report card and the third-grade
-    reading guarantee's retention provisions arrived here, two years before the first formula
-    component that paid on results. Ohio built the measure first and priced it afterwards. See
-    [Ohio report card](../accountability-regime/ohio-report-card.yml).
+    reading guarantee's retention provisions arrived here, between H.B. 153's payment on the old
+    ratings and H.B. 64's on the new measures. Ohio rebuilt the measure in a biennium that priced
+    neither. See [Ohio report card](../accountability-regime/ohio-report-card.yml).
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of
