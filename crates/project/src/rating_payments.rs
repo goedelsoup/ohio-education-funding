@@ -13,14 +13,30 @@
 //! Asked once instead of six times, that is a single question with a chronology for an answer, and
 //! the twelve LSC greenbooks in [`crate::greenbook`] cover every biennium from FY2002 to FY2024.
 //!
-//! # A rating has determined a formula payment in exactly two episodes
+//! # A rating has determined a formula payment in three episodes
 //!
 //! Searched across all twelve for the terms that only occur where a rating drives a formula
-//! component — `academic distress index`, `graduation bonus`, `third grade reading bonus`,
-//! `performance bonus` — the hits fall in **four greenbooks and no others**: H.B. 119 for
-//! FY2008-09, H.B. 64 and H.B. 49 for FY2016-19, and H.B. 166, which mentions them only to say
-//! what its freeze did to them. Eight of the twelve carry none. [`quiet`] is that list, and it is
-//! as much the finding as [`COUPLINGS`] is.
+//! component — `academic distress index`, `subsidy for high performance`, `graduation bonus`,
+//! `third grade reading bonus`, `performance bonus` — the hits fall in **five greenbooks and no
+//! others**: H.B. 119 for FY2008-09, H.B. 153 for FY2012-13, H.B. 64 and H.B. 49 for FY2016-19,
+//! and H.B. 166, whose freeze kept the bonuses running for community and STEM schools. Seven of
+//! the twelve carry none. [`quiet`] is that list, and it is as much the finding as [`COUPLINGS`]
+//! is.
+//!
+//! The census is of **formula components**. Appropriations keyed to a rating outside the formula
+//! did not stop after H.B. 95: H.B. 110's greenbook carries the Quality Community Schools payment,
+//! which pays community schools on report card grades, and an e-school pilot keyed on the
+//! graduation component. Neither is a payment to a district, and [`COUPLINGS`] lists earmarks only
+//! where they go to districts.
+//!
+//! The second term was missing until #535. H.B. 153's subsidy is named for what it pays on and
+//! shares no word with the other four, so the census read FY2012-13 as quiet while the corpus
+//! recorded the subsidy in two nodes.
+//!
+//! H.B. 59 stays quiet, and the reason is worth stating. Its guarantee base is "FY 2013 bridge
+//! formula funding, supplemental guarantee, and high performance subsidy", so a guaranteed district
+//! carried its FY2013 subsidy into FY2014-15 — but that holds a dollar a past rating bought, and no
+//! FY2014-15 rating moves it. The term is the subsidy's own heading, which H.B. 59 never uses.
 //!
 //! # And the direction reversed
 //!
@@ -35,10 +51,16 @@
 //! qualified in FY2008 and lowered its distress percentage received its FY2008 subsidy times
 //! 1.035, and one that did not improve received the same amount flat.
 //!
+//! **H.B. 153's subsidy paid on success, and flat.** Districts and community schools rated
+//! Excellent or Excellent with Distinction on the previous year's report card received an extra
+//! $17 times current-year ADM in FY2012 and FY2013. That is the reversal: the first formula payment
+//! on a good rating, three years after the last one on a bad one, and it carried no wealth term.
+//!
 //! **The bonuses paid on success.** `Graduation rate × 0.075 × formula amount × graduate count ×
 //! state share index`, and the same shape for third-grade reading proficiency. Better results
-//! meant more money — fifty times the rate of the earlier programme — and the state share index
-//! made the payment larger in poorer districts.
+//! meant more money — fifty times the rate of Closing the Achievement Gap — and the state share
+//! index made the payment larger in poorer districts. Of the payments on success, these are the
+//! only ones that carried an equaliser.
 //!
 //! **And the freeze severed the link for districts while leaving it for charters.** H.B. 166 held
 //! every traditional district and JVSD at its FY2019 foundation aid, so a district's bonus stopped
@@ -57,9 +79,10 @@
 //! consequence: per pupil it runs 2.56 times higher in the least-poor fifth of districts than in
 //! the poorest.
 //!
-//! So Ohio has coupled ratings to formula dollars three times in twenty years, and each time on a
-//! different principle: to the worst-off and poorest, then to the best-performing with a wealth
-//! equaliser, then to the best-performing without one.
+//! So Ohio has coupled ratings to formula dollars in four episodes in twenty years, and paid on
+//! failure only in the first: to the worst-off and poorest, then to the best-rated flat, then to
+//! the best-performing with a wealth equaliser, then to the best-performing without one again.
+//! The equalised episode is the exception among the payments on success, not the rule they lost.
 //!
 //! # Two other routes, which are not formula components
 //!
@@ -134,6 +157,10 @@ pub struct Coupling {
 }
 
 /// Every coupling this corpus can evidence, oldest first.
+///
+/// Every formula component, and the earmarks that go to districts. A rating-keyed appropriation to
+/// community schools outside the formula, such as H.B. 110's Quality Community Schools payment, is
+/// not listed — see the module documentation.
 pub const COUPLINGS: &[Coupling] = &[
     Coupling {
         name: "Ohio Graduation Test professional development grants",
@@ -176,6 +203,18 @@ pub const COUPLINGS: &[Coupling] = &[
         route: Route::Formula,
         equalised: Equalised::Yes,
         evidence: "0.0015 x formula amount x poverty index x academic distress index",
+    },
+    Coupling {
+        name: "Subsidy for High Performance",
+        act: "H.B. 153 of the 129th General Assembly",
+        greenbook: "hb153",
+        // H.B. 59 carried the FY2013 amount into its guarantee base, which holds the dollar and
+        // stops it moving with the rating, so the coupling ends with the act's own biennium.
+        years: (2012, 2013),
+        direction: Direction::OnSuccess,
+        route: Route::Formula,
+        equalised: Equalised::No,
+        evidence: "receive an extra $17 multiplied by their current year ADM",
     },
     Coupling {
         name: "Graduation bonus",
@@ -227,8 +266,12 @@ pub const COUPLINGS: &[Coupling] = &[
 ];
 
 /// The terms that occur in a greenbook only where a rating drives a formula component.
-pub const FORMULA_TERMS: [&str; 4] = [
+///
+/// `subsidy for high performance` is H.B. 153's heading for its payment and not the phrase H.B. 59
+/// uses when it folds the FY2013 amount into a guarantee base. See the module documentation.
+pub const FORMULA_TERMS: [&str; 5] = [
     "academic distress index",
+    "subsidy for high performance",
     "graduation bonus",
     "third grade reading bonus",
     "performance bonus",
@@ -236,7 +279,7 @@ pub const FORMULA_TERMS: [&str; 4] = [
 
 /// The greenbooks carrying no rating-driven formula payment at all.
 ///
-/// Nine of the twelve. The bienniums with nothing in them are the reason the two episodes read as
+/// Seven of the twelve. The bienniums with nothing in them are the reason the episodes read as
 /// episodes rather than as a policy Ohio has continuously held.
 ///
 /// Searched against [`greenbook::Greenbook::flat`] and not `mentions`. These are PDF extractions

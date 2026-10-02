@@ -18,12 +18,13 @@ description: |
   prior year's distribution, and the formula becomes advisory. [inference] How many districts
   sat outside the formula in each year of this period is not established. [open]
 
-  [H.B. 153](../legislation/hb-153-2011.yml) did two further things that compounded the effect
-  on the districts least able to absorb it: it removed the funding guarantee, and it began the
-  phase-out of the tangible personal property tax replacement payments. [verified] A district
-  in an industrial county experienced FY2012 as three simultaneous reductions — the formula
-  freeze, the expiry of federal stimulus, and the reimbursement phase-out — none of which is
-  visible in a base cost figure. [inference]
+  [H.B. 153](../legislation/hb-153-2011.yml) kept a guarantee and changed what it held: each
+  district's FY2011 state aid **minus the portion federal stimulus had paid for**, where the
+  Evidence-Based Model's transitional aid had held 98% of the prior year's aid. [verified] (the
+  greenbook) It also began the phase-out of the tangible personal property tax replacement
+  payments. [verified] A district in an industrial county experienced FY2012 as three
+  simultaneous reductions — the formula freeze, the expiry of federal stimulus, and the
+  reimbursement phase-out — none of which is visible in a base cost figure. [inference]
 
   **And this regime did not end when it was superseded.** FY2020 — one of the two frozen years,
   under a formula that was explicitly a placeholder — is the baseline for the Fair School
@@ -163,6 +164,20 @@ properties:
     (H.B. 166) — and in that last biennium the bounds are the whole of the distribution. A regime
     boundary drawn at a formula overlay would cut the mechanism that persisted and keep the ones
     that did not. [verified] (the four greenbooks)
+revisions:
+  - was: |
+      H.B. 153 "removed the funding guarantee", one of "two further things that compounded the
+      effect on the districts least able to absorb it".
+    now: |
+      It kept one. Its supplemental allocation held each district at FY2011 state aid net of the
+      federal stimulus portion, replacing the Evidence-Based Model's transitional aid at 98% of
+      the prior year. The reimbursement phase-out is the change that remains.
+    found_by: |
+      #536, from H.B. 59's guarantee base, which names H.B. 153's "supplemental guarantee", and from
+      this node's own anchor chain, which assumes a guarantee in every biennium.
+    reach: |
+      Copied from `hb-153-2011` and corrected with it. The anchor chain and the boundary note are
+      unaffected; both already read the guarantee as continuous.
 links:
   - target: ../fiscal-period/fy2012-13.yml
     relationship: opened-in

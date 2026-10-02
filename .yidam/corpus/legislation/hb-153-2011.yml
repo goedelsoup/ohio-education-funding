@@ -17,12 +17,18 @@ description: |
   frozen near FY2011 levels while federal stimulus money simultaneously expired. [inference]
   The placeholder lasted a decade.
 
-  Two further changes compounded the effect on the districts least able to absorb it. The act
-  removed the funding guarantee, and it began the phase-out of the tangible personal property
-  tax reimbursements created by [H.B. 66](hb-66-2005.yml). [verified] Those reimbursements were
-  concentrated in districts with industrial tax bases, so the phase-out fell hardest on
-  communities that had already lost the underlying tax base by state decision six years earlier
-  — a second withdrawal from the same places. [inference]
+  It kept a guarantee and changed what it held. [H.B. 1](hb-1-2009.yml)'s transitional aid had
+  guaranteed 98% of a district's prior-year state aid in FY2011; this act's supplemental allocation
+  guaranteed its FY2011 state aid **minus the portion federal stimulus had paid for**, so the floor
+  excluded the one-time money. [verified] (the greenbook) What it repealed was the Evidence-Based
+  Model's guarantee, not the guarantee.
+
+  One further change compounded the effect on the districts least able to absorb it. The act
+  began the phase-out of the tangible personal property tax reimbursements created by
+  [H.B. 66](hb-66-2005.yml). [verified] Those reimbursements were concentrated in districts with
+  industrial tax bases, so the phase-out fell hardest on communities that had already lost the
+  underlying tax base by state decision six years earlier — a second withdrawal from the same
+  places. [inference]
 
   This is also the act that makes the case for modeling regimes and reimbursements separately.
   A district in an industrial county experienced FY2012 as three simultaneous reductions — the
@@ -99,6 +105,24 @@ revisions:
       which a freeze would not do, and that the statewide adjustment is solved to fit the
       appropriation, which makes this the one formula in the corpus that runs backwards from
       available money. It also fixes the depth of the anchor chain at FY2011.
+  - was: |
+      The act "removed the funding guarantee", stated in the description and the subject, and
+      given as one of two changes that "compounded the effect on the districts least able to
+      absorb it".
+    now: |
+      It kept a guarantee. The supplemental allocation held every district at its FY2011 state aid
+      net of the federal stimulus portion. What went was H.B. 1's transitional aid, the
+      Evidence-Based Model's guarantee, which had held 98% of prior-year aid. The compounding
+      argument now rests on the reimbursement phase-out alone, because the stimulus netting
+      applied to every district's floor and not to the least able in particular.
+    found_by: |
+      This node's own findings, whose formula box is the supplemental allocation, and H.B. 59's
+      greenbook, which defines its guarantee base as FY2013 Bridge funding plus "supplemental
+      guarantee" plus the high performance subsidy. Filed as #536.
+    reach: |
+      The same sentence was copied into `bridge-formula`, corrected with it. The anchor chain in
+      both nodes already assumed a guarantee in every biennium, so nothing downstream depended on
+      the removal.
 properties:
   designation: Am. Sub. H.B. 153
   general_assembly: 129th General Assembly
@@ -113,9 +137,10 @@ properties:
   subject: |
     Enacted the FY2012-13 operating budget. Repealed the Evidence-Based Model and replaced it
     with the Bridge formula, distributing state aid by reference to prior-year amounts with
-    funding held near FY2011 levels. Removed the funding guarantee. Began the phase-out of
-    tangible personal property tax replacement payments. Signing date to be confirmed against
-    the enrolled act. [open]
+    funding held near FY2011 levels. Replaced the Evidence-Based Model's transitional aid with a
+    supplemental allocation guaranteeing FY2011 state aid net of federal stimulus. Began the
+    phase-out of tangible personal property tax replacement payments. Signing date to be confirmed
+    against the enrolled act. [open]
   vetoes: |
     One, and it is not a funding provision. [verified] (the greenbook)
 
@@ -130,10 +155,14 @@ properties:
     **It paid on a rating, and on success.** Districts and community schools rated Excellent or
     Excellent with Distinction received an extra $17 times current-year ADM in FY2012 and FY2013,
     and H.B. 59 then wrote this high performance subsidy into its guarantee base. [verified]
-    ([greenbook](../../../crates/project/fixtures/lsc-education-greenbooks.txt)) The census of
-    rating-driven payments in [Ohio report card](../accountability-regime/ohio-report-card.yml)
-    searches four terms, none of which is this subsidy's name, and so counts FY2012-13 among the
-    bienniums with none; the two cannot both stand. [open]
+    ([greenbook](../../../crates/project/fixtures/lsc-education-greenbooks.txt))
+
+    It is the reversal. Ohio's only earlier formula coupling, H.B. 119's Closing the Achievement
+    Gap, paid on failure; this is the first formula payment on a good rating, and it carried no
+    wealth term. The census of rating-driven payments in
+    [Ohio report card](../accountability-regime/ohio-report-card.yml) first missed it, because none
+    of its four terms is this subsidy's name, and now searches the subsidy's own heading.
+    [verified] (crates/project, `rating_payments`, pinned by test)
 
     It also keyed consequences to a statewide performance index ranking rather than to a rating
     alone: a district school in the lowest 5% for three consecutive years and in academic watch or

@@ -1375,7 +1375,7 @@ pub static FIGURES: &[Figure] = &[
         unit: Unit::Count,
         label: "LSC greenbooks from FY2002 to FY2024 carrying no rating-driven formula payment \
                 at all, of twelve",
-        pinned: 8.0,
+        pinned: 7.0,
         tolerance: 0.0,
         compute: |_| project::rating_payments::quiet().len() as f64,
     },
@@ -1385,7 +1385,7 @@ pub static FIGURES: &[Figure] = &[
         unit: Unit::Count,
         label: "Points at which an Ohio accountability rating has determined a formula payment, \
                 FY2002 to FY2027",
-        pinned: 5.0,
+        pinned: 6.0,
         tolerance: 0.0,
         compute: |_| project::rating_payments::formula_couplings().len() as f64,
     },

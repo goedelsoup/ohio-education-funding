@@ -116,29 +116,40 @@ findings: |
   rating has determined a funding amount — and the twelve committed LSC greenbooks cover every
   biennium from FY2002 to FY2024.
 
-  **A rating has driven a formula payment in exactly two episodes.** The terms that occur only
-  where one does — *academic distress index*, *graduation bonus*, *third grade reading bonus*,
-  *performance bonus* — appear in four of the twelve greenbooks and no others: H.B. 119, H.B. 64,
-  H.B. 49, and H.B. 166, which mentions them only to say what its freeze did to them. **8 of the 12
-  bienniums carry none at all.** [verified] (crates/project, `rating_payments::quiet`, pinned by
-  test)
+  **Inside the greenbook window a rating has driven a formula payment in three episodes.** The
+  terms that occur only where one does — *academic distress index*, *subsidy for high
+  performance*, *graduation bonus*, *third grade reading bonus*, *performance bonus* — appear in
+  five of the twelve greenbooks and no others: H.B. 119, H.B. 153, H.B. 64, H.B. 49, and H.B. 166,
+  whose freeze kept the bonuses running for community and STEM schools. **7 of the 12 bienniums
+  carry none at all.** [verified] (crates/project, `rating_payments::quiet`, pinned by test)
+
+  The census is of formula components, and the claim is no wider than that. Rating-keyed
+  appropriations outside the formula did not end with H.B. 95: H.B. 110's greenbook carries the
+  Quality Community Schools payment, $54.0 million a year to community schools meeting standards
+  that include report card grades, and an e-school pilot for dropout-recovery schools that exceeded
+  standards on the graduation component. [verified] (crates/project, `rating_payments`, pinned by
+  test) Neither goes to a district, and neither is in the table.
 
       FY2004-05   H.B.  95   earmarks to academic emergency districts     on failure   outside the formula
       FY2006-07   H.B.  66   EdChoice eligibility on building ratings     on failure   deducted from the district
       FY2008-09   H.B. 119   Closing the Achievement Gap                  on failure   0.15% of the formula amount
+      FY2012-13   H.B. 153   subsidy for high performance                 on success   $17 a pupil, no state share index
       FY2016-19   H.B.  64   graduation and third grade reading bonuses   on success   7.5%, times the state share index
       FY2020-21   H.B. 166   the same bonuses, community and STEM only    on success   7.5%, no state share index
       FY2026-27   H.B.  96   performance supplement                       on success   $13 x stars, no state share index
 
-  5 of the 6 are formula components; the first two rows reach a district's money without passing
-  through the formula at all. [verified]
+  6 of the couplings in the table are formula components — the H.B. 64 row is two — and the
+  first two rows reach a district's money without passing through the formula at all. [verified]
 
-  **The direction reversed and then the equalizer went.** Closing the Achievement Gap paid more
-  where more buildings were rated badly, and only to districts whose poverty index was 1.0 or
-  above — thirty-one qualified. The bonuses paid more where results were better, at fifty times
-  the rate, and multiplied by the state share index, which makes a payment larger in a poorer
-  district. The supplement now in force pays on results and multiplies by no wealth term at all.
-  [verified] (crates/project, `rating_payments`, pinned by test)
+  **The direction reversed in FY2012, and the equalizer was the exception.** Closing the
+  Achievement Gap paid more where more buildings were rated badly, and only to districts whose
+  poverty index was 1.0 or above — thirty-one qualified. H.B. 153's subsidy paid $17 a pupil to
+  districts and community schools rated Excellent or Excellent with Distinction, flat at any
+  valuation. The bonuses paid more where results were better, at fifty times the rate of the
+  first episode, and multiplied by the state share index, which makes a payment larger in a
+  poorer district. The supplement now in force pays on results and multiplies by no wealth term
+  at all. So of the four payments on success, only the FY2016 district bonuses carried an
+  equalizer. [verified] (crates/project, `rating_payments`, pinned by test)
 
   **The un-equalized form is the one that survived.** H.B. 166's freeze held every district and
   JVSD at its FY2019 foundation aid, so a district's bonus stopped moving with its report card,
@@ -147,7 +158,7 @@ findings: |
   the calculation of the payment for traditional districts except that it does not use the state
   share index"* — so for two years the only Ohio schools whose funding moved with their own
   results were charters and STEM schools, on the un-equalized calculation Ohio then readopted for
-  everyone. [verified]
+  everyone — and had first used in FY2012. [verified]
 
   What that costs is measured at
   [performance supplement rate](../parameter/performance-supplement-rate.yml): per pupil the
@@ -155,20 +166,21 @@ findings: |
   poorest. [verified]
 
   **Ohio built the measure long before it priced it.** The report card predates the first formula
-  coupling by years in both episodes, and H.B. 59 — the act that rebuilt the card as A-F — coupled
-  no dollar to it at all. [verified] Whether the couplings were designed against the composition
-  effect this node's own findings describe, or arrived at independently of it, is not established.
-  [open]
+  coupling by years, and H.B. 59 — the act that rebuilt the card as A-F — coupled no new dollar to
+  it. Its guarantee base held each district's FY2013 high performance subsidy, which keeps a
+  dollar an old rating bought without letting a new one move it. [verified] Whether the couplings
+  were designed against the composition effect this node's own findings describe, or arrived at
+  independently of it, is not established. [open]
 
 figures:
   - key: project/bienniums-coupling-no-dollar-to-a-rating
-    value: 8.0
+    value: 7.0
     field: findings
-    as_written: "**8 of the 12\n  bienniums carry none at all.**"
+    as_written: "**7 of the 12 bienniums\n  carry none at all.**"
   - key: project/rating-driven-formula-couplings
-    value: 5.0
+    value: 6.0
     field: findings
-    as_written: "5 of the 6 are formula components"
+    as_written: "6 of the couplings in the table are formula components"
   - key: dispersion/achievement-maximum-2425
     value: 109.8
     field: findings
@@ -238,6 +250,24 @@ revisions:
     reach: |
       Corrected together with the parameter node and two crate doc comments. The table's "no
       section of the Revised Code" framing is unaffected, because 265.239 is uncodified.
+  - was: |
+      "A rating has driven a formula payment in exactly two episodes", with 8 of the 12 greenbook
+      bienniums carrying none, 5 formula couplings, and the bonuses of FY2016 read as the point
+      where the direction reversed.
+    now: |
+      Three episodes inside the greenbook window, 7 quiet bienniums and 6 formula couplings. H.B.
+      153's subsidy for high performance paid $17 a pupil on an Excellent rating in FY2012-13, so
+      the reversal is FY2012, and it was un-equalized. The equalizer belongs to the FY2016 bonuses
+      alone. The census is scoped to formula components where it is stated.
+    found_by: |
+      Writing H.B. 153's accountability effect (#534), which quoted the subsidy from its greenbook.
+      The census searched four terms and the subsidy's heading contains none of them, while
+      `hb-153-2011` and `bridge-formula` already recorded it. Filed as #535.
+    reach: |
+      `rating_payments` gained a fifth term and a sixth formula coupling, and the two bound counts
+      moved. The same misreading was corrected in `hb-64-2015`, which called itself the reversal,
+      and in `hb-59-2013`, which put the first payment on results after it; `hb-110-2021`'s
+      inference about the four terms is now a verified claim.
 unfilled:
   - field: the components other than performance index and progress
     why: Early literacy, graduation and chronic absenteeism are named in the section and not modeled here.

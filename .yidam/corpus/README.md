@@ -464,12 +464,12 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 2025 | supported by a committed primary source |
-| `[inference]` | 431 | drawn from verified facts, not witnessed |
-| `[open]` | 218 | a live question — unknown, contested, or being worked |
+| `[verified]` | 2032 | supported by a committed primary source |
+| `[inference]` | 430 | drawn from verified facts, not witnessed |
+| `[open]` | 217 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-218 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+217 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
@@ -492,7 +492,6 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `caveats` | 2 | 0 |
 | `boundary_note` | 2 | 0 |
 | `adoption_evidence` | 2 | 0 |
-| `accountability_effect` | 2 | 0 |
 | `trigger` | 1 | 0 |
 | `status` | 1 | 0 |
 | `sponsors` | 1 | 0 |
@@ -507,8 +506,9 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `context` | 1 | 0 |
 | `calculator` | 1 | 0 |
 | `appropriating_bill` | 1 | 0 |
+| `accountability_effect` | 1 | 0 |
 
-**125 recorded withdrawals across 55 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**128 recorded withdrawals across 56 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Relationship vocabulary
@@ -648,13 +648,13 @@ Sorted by: kind, then alphabetically.
 | [`hb-1-2009`](legislation/hb-1-2009.yml) | legislation | Am. Sub. H.B. 1 (2009) — FY2010-11 Budget; Evidence-Based Model | 4 | 7 |
 | [`hb-110-2021`](legislation/hb-110-2021.yml) | legislation | Am. Sub. H.B. 110 (2021) — FY2022-23 Budget; Fair School Funding Plan | 11 | 11 |
 | [`hb-119-2007`](legislation/hb-119-2007.yml) | legislation | Am. Sub. H.B. 119 (2007) — FY2008-09 Budget; Two Protections Removed | 8 | 3 |
-| [`hb-153-2011`](legislation/hb-153-2011.yml) | legislation | Am. Sub. H.B. 153 (2011) — FY2012-13 Budget; Bridge Formula | 8 | 7 |
+| [`hb-153-2011`](legislation/hb-153-2011.yml) | legislation | Am. Sub. H.B. 153 (2011) — FY2012-13 Budget; Bridge Formula | 8 | 8 |
 | [`hb-166-2019`](legislation/hb-166-2019.yml) | legislation | Am. Sub. H.B. 166 (2019) — FY2020-21 Budget; the Year There Was No Formula | 7 | 7 |
 | [`hb-33-2023`](legislation/hb-33-2023.yml) | legislation | Am. Sub. H.B. 33 (2023) — FY2024-25 Budget | 9 | 15 |
 | [`hb-49-2017`](legislation/hb-49-2017.yml) | legislation | Am. Sub. H.B. 49 (2017) — FY2018-19 Budget; the Guarantee Made Conditional | 6 | 4 |
 | [`hb-583-2022`](legislation/hb-583-2022.yml) | legislation | Sub. H.B. 583 (2022) — corrective and technical changes to the Fair School Funding Plan | 10 | 4 |
 | [`hb-59-2013`](legislation/hb-59-2013.yml) | legislation | Am. Sub. H.B. 59 (2013) — FY2014-15 Budget; a Formula Over the Bridge | 6 | 3 |
-| [`hb-64-2015`](legislation/hb-64-2015.yml) | legislation | Am. Sub. H.B. 64 (2015) — FY2016-17 Budget; Capacity Aid | 9 | 5 |
+| [`hb-64-2015`](legislation/hb-64-2015.yml) | legislation | Am. Sub. H.B. 64 (2015) — FY2016-17 Budget; Capacity Aid | 10 | 5 |
 | [`hb-66-2005`](legislation/hb-66-2005.yml) | legislation | Am. Sub. H.B. 66 (2005) — FY2006-07 Budget; Tangible Personal Property Tax Phase-Out | 5 | 8 |
 | [`hb-920-1976`](legislation/hb-920-1976.yml) | legislation | Am. Sub. H.B. 920 (1976) — Tax Reduction Factors | 5 | 13 |
 | [`hb-94-2001`](legislation/hb-94-2001.yml) | legislation | Am. Sub. H.B. 94 (2001) — FY2002-03 Budget; the post-DeRolph II formula | 12 | 5 |

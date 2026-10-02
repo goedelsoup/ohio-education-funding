@@ -98,9 +98,13 @@ properties:
     **It is where the rating bonuses ended.** Its greenbook carries none of the four terms the
     census in [Ohio report card](../accountability-regime/ohio-report-card.yml) searches for, where
     H.B. 166's still carried the graduation and third grade reading bonuses. [verified]
-    (crates/project, `rating_payments::quiet`, pinned by test) That the formula paid on no rating
-    from FY2022 until [H.B. 96](hb-96-2025.yml) rests on the same four terms, which miss
-    [H.B. 153](hb-153-2011.yml)'s high performance subsidy. [inference]
+    (crates/project, `rating_payments::quiet`, pinned by test) The census now also searches the
+    heading of [H.B. 153](hb-153-2011.yml)'s high performance subsidy, which its first four terms
+    missed, and the greenbooks for this act and H.B. 33 still carry none of the five: the formula
+    paid on no rating from FY2022 until [H.B. 96](hb-96-2025.yml). [verified] (crates/project,
+    `rating_payments::quiet`, pinned by test) Outside the formula a rating still bought money, for
+    community schools: the Quality Community Schools payment rose to $54.0 million a year, on
+    standards that include report card grades. [verified]
 
     It barred new academic distress commissions for 2021-22 and 2022-23 and gave Lorain, East
     Cleveland and Youngstown a way out of theirs through an improvement plan; barred automatic
