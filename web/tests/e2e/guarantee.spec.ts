@@ -14,7 +14,7 @@ import { expect, test } from "@playwright/test";
 test.describe("outside the formula", () => {
   test("the card says plainly that the guarantee does not hold these", async ({ page }) => {
     /*
-     * The structural point. Everything above this card is `[H] Foundation Funding`, which the
+     * The structural point. Every payment above this card is `[H] Foundation Funding`, which the
      * guarantee protects; these sit in `[R] Total State Support` and nothing cushions a fall in
      * them. A district that drops a star loses the money outright.
      */

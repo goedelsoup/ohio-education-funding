@@ -246,8 +246,13 @@ const charts = node.series.map((binding) => {
       label: series!.label,
       note:
         `By ${series!.axis.charAt(0).toLowerCase()}${series!.axis.slice(1)}, one panel each and ` +
-        `one scale across all ${multiples.panels.length}, in ${barScale(series!).says}. Hover or focus a ` +
-        `bar for its value.`,
+        `one scale across all ${multiples.panels.length}, in ${barScale(series!).says}. ` +
+        // Said before the grid, because the panel it names draws no bars to say it (#661).
+        (multiples.zero.length
+          ? `${multiples.zero.join(" and ")} ${multiples.zero.length === 1 ? "is" : "are"} zero in every row, ` +
+            `so ${multiples.zero.length === 1 ? "its panel prints its" : "their panels print their"} values in place of bars. `
+          : "") +
+        `Hover or focus a bar for its value.`,
       panels: multiples.panels.map((panel) => ({
         label: panel.label,
         html: renderPanelToString(

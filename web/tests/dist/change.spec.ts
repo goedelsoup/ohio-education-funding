@@ -4,7 +4,7 @@
  * `tests/unit/change.spec.ts` pins the renderers; this pins what the build actually wrote, so a
  * page that dropped a card, or a feed that reached the page with a different year, fails here.
  */
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { parseHTML } from "linkedom";
@@ -91,5 +91,24 @@ describe("Allen County's who-gained card (#640)", () => {
 
   test("loads the sort script", () => {
     expect(document.querySelector('script[type="module"]')).toBeTruthy();
+  });
+});
+
+describe("every county's who-gained card (#661)", () => {
+  const pages = readdirSync(join(DIST, "county")).filter((f) => f.endsWith(".html"));
+
+  test("draws each measure's districts, wherever there are three to compare", () => {
+    let drawn = 0;
+    for (const page of pages) {
+      const card = read(`county/${page}`).querySelector("#who-gained");
+      if (!card) continue;
+      for (const panel of card.querySelectorAll(".measure-panel")) {
+        // Below three the chart would compare a district with itself or one other (#651).
+        if (panel.querySelectorAll("tbody tr").length < 3) continue;
+        expect(panel.querySelector('[data-chart^="neighbors-"]'), page).toBeTruthy();
+        drawn++;
+      }
+    }
+    expect(drawn, "the build has counties to draw, or this passed on nothing").toBeGreaterThan(100);
   });
 });

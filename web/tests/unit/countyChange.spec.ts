@@ -7,8 +7,10 @@
 import { parseHTML } from "linkedom";
 import { expect, test } from "vitest";
 
+import { signedPct } from "../../src/lib/change.ts";
 import { counties } from "../../src/lib/county.ts";
 import {
+  finding,
   renderWhoGained,
   stepSentence,
   tally,
@@ -93,6 +95,41 @@ test("Lima's row names the repealed supplement as the line that moved it most", 
   expect(text(lima)).toContain("−$1,859,367");
   // The foundation panel has no line column: foundation aid is one line.
   expect(card.querySelectorAll(".measure-panel.foundation thead th")).toHaveLength(9);
+});
+
+test("each measure draws its county between the sentences and the table, in the table's order", () => {
+  // #661: the card was a table and a bullet list, where the district tab draws the same comparison.
+  for (const measure of ["total", "foundation"] as const) {
+    const panel = card.querySelector(`.measure-panel.${measure}`)!;
+    const parts = [...panel.children].map((el) =>
+      el.matches("ul") ? "sentences" : el.matches("[data-chart]") ? "chart" : el.matches(".scroll") ? "table" : null,
+    );
+    expect(parts.filter(Boolean)).toEqual(["sentences", "chart", "table"]);
+    const chart = panel.querySelector(`[data-chart="neighbors-${measure}"]`)!;
+    // No district is the subject on a county page, so none is marked and the ends alone carry values.
+    expect(chart.innerHTML).not.toContain("is marked");
+    const wide = chart.querySelector('[data-at="wide"]')!;
+    const values = [...wide.querySelectorAll(".bar-value text, text.bar-value")].map((t) => t.textContent);
+    const rows = [...panel.querySelectorAll("tbody tr")];
+    const step = (r: Element) => signedPct(Number(r.querySelectorAll("td")[5]!.getAttribute("data-sort-value")));
+    expect(values).toEqual([step(rows[0]!), step(rows.at(-1)!)]);
+    expect(chart.innerHTML).toContain("FY2025 to FY2027");
+  }
+});
+
+test("the card leads on what its first chart draws, in a number", () => {
+  // #653's rule, which the card owes once it draws (#661): five of Allen's nine are cut.
+  expect(text(card.querySelector("p.note strong"))).toBe(
+    "On total state support from FY2025 to FY2027, 4 of the 9 districts here rose and 5 fell.",
+  );
+  const single = all.find((c) => c.districts.length === 1)!;
+  expect(finding(single)).toMatch(/^.+'s total state support (rose|fell|did not move).* from FY2025 to FY2027\.$/);
+});
+
+test("a county of one or two districts draws no chart", () => {
+  for (const c of all.filter((c) => c.districts.length < 3)) {
+    expect(renderWhoGained(c), c.name).not.toContain("<svg");
+  }
 });
 
 test("state share falls in every Allen district, and Delphos reaches the minimum", () => {

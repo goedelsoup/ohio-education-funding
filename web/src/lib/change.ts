@@ -207,7 +207,7 @@ function filesNote(years: [number, number, number]): string {
     are its models of those years, not payments. Every figure is in nominal dollars.`;
 }
 
-/** Section 1: every named line in the three years, and both measures labelled. */
+/** Section 2: every named line in the three years, and both measures labelled. */
 export function renderByLine(d: District): string {
   const b = d.biennium;
   const years = yearsOf(b);
@@ -249,7 +249,7 @@ export function renderByLine(d: District): string {
 }
 
 /**
- * Section 2: the phase-in's three published stages, and what the guarantee added.
+ * Section 3: the phase-in's three published stages, and what the guarantee added.
  *
  * R.C. 3317.022 pays `base + rate × (calculated − base)`. A district whose formula calculates
  * about its base gains little however far the rate rises, which this card says in words where
@@ -320,7 +320,7 @@ export function renderPhaseIn(d: District): string {
 }
 
 /**
- * Section 3: state share, valuation and enrollment, each beside the dollars it bears on.
+ * Section 4: state share, valuation and enrollment, each beside the dollars it bears on.
  *
  * Beside, not apportioned. The three files publish the inputs and the payment, never how much of
  * the payment's change each input is, so each sentence states one input's movement and the
@@ -375,7 +375,7 @@ export function renderDrivers(d: District): string {
     </div>`;
 }
 
-/** Section 4: transfers and net funding — FY2025's total, FY2027's items, FY2026 unpublished. */
+/** Section 5: transfers and net funding — FY2025's total, FY2027's items, FY2026 unpublished. */
 export function renderTransfers(d: District): string {
   const b = d.biennium;
   const years = yearsOf(b);
@@ -419,41 +419,49 @@ export function renderTransfers(d: District): string {
  */
 const MIN_NEIGHBORS = 3;
 
-/** Every county peer's year-on-year ratio, on both measures — the domain the two panels share. */
-function neighborsDomain(peers: readonly District[]): number[] {
+/** Every county peer's change over one step, on both measures — the domain the two panels share. */
+function neighborsDomain(peers: readonly District[], from: YearIndex, to: YearIndex): number[] {
   return (Object.keys(MEASURES) as MeasureKey[]).flatMap((m) =>
-    peers.map((p) => yearChange(p.biennium, m).ratio),
+    peers.map((p) => levelChange(p.biennium, m, from, to).ratio),
   );
 }
 
 /**
- * One measure's chart of the county, this district marked.
+ * One measure's chart of a county's districts, ranked on their change over one step.
  *
  * Drawn on one domain for both measures: the panels are toggled in place, and a scale that jumped
  * with the toggle would say a 3% move on one measure was as long as a 20% move on the other. The
- * ends of the ranking and the subject carry their values, so the chart has numbers without a foot.
+ * ends of the ranking carry their values, and so does `subject` where there is one, so the chart
+ * has numbers without a foot.
+ *
+ * The district tab draws the middle year to the last with the district marked; the county page's
+ * who-gained card draws the whole biennium, the step its table is sorted on, with no one marked
+ * (#661).
  */
-function neighborsChart(d: District, peers: readonly District[], measure: MeasureKey): string {
+export function neighborsChart(
+  peers: readonly District[],
+  measure: MeasureKey,
+  { subject, from = 1, to = 2 }: { subject?: District; from?: YearIndex; to?: YearIndex } = {},
+): string {
   if (peers.length < MIN_NEIGHBORS) return "";
-  const b = d.biennium;
-  const years = yearsOf(b);
+  const years = yearsOf(peers[0]!.biennium);
   const name = MEASURES[measure].name;
   const ranked = peers
-    .map((p) => ({ p, change: yearChange(p.biennium, measure) }))
+    .map((p) => ({ p, change: levelChange(p.biennium, measure, from, to) }))
     .sort((x, y) => y.change.ratio - x.change.ratio);
   const last = ranked.length - 1;
   const bars: Bar[] = ranked.map(({ p, change }, i) => ({
     label: p.name,
     value: change.ratio,
-    hover: `${p.name}: ${signedPct(change.ratio)} (${signedMoney(change.dollars)}) in ${name}, FY${years[1]} to FY${years[2]}`,
-    current: p.irn === d.irn,
-    ...(i === 0 || i === last || p.irn === d.irn ? { direct: signedPct(change.ratio) } : {}),
+    hover: `${p.name}: ${signedPct(change.ratio)} (${signedMoney(change.dollars)}) in ${name}, FY${years[from]} to FY${years[to]}`,
+    current: p.irn === subject?.irn,
+    ...(i === 0 || i === last || p.irn === subject?.irn ? { direct: signedPct(change.ratio) } : {}),
   }));
-  const ratios = neighborsDomain(peers);
+  const ratios = neighborsDomain(peers, from, to);
   const high = Math.max(0, ...ratios);
   const low = Math.min(0, ...ratios);
   const labelChars = Math.max(...ratios.map((r) => signedPct(r).length));
-  const label = `Change in ${name} from FY${years[1]} to FY${years[2]}, as a percentage of FY${years[1]}, for each of the ${peers.length} districts in ${d.county} County; ${d.name} is marked`;
+  const label = `Change in ${name} from FY${years[from]} to FY${years[to]}, as a percentage of FY${years[from]}, for each of the ${peers.length} districts in ${peers[0]!.county} County${subject ? `; ${subject.name} is marked` : ""}`;
   return `<div class="chartwrap" data-chart="neighbors-${measure}">${renderToString(
     (w) => barSpec(bars, { width: w, hue: "polarity", max: high, min: low, labelChars }),
     { label },
@@ -461,7 +469,8 @@ function neighborsChart(d: District, peers: readonly District[], measure: Measur
 }
 
 /**
- * Section 5: every county peer's change on the selected measure.
+ * Section 1: every county peer's change on the selected measure, first because the tab is there
+ * to compare (#661).
  *
  * The measure is a pair of radios and two panels switched by a sibling selector, as
  * `BasisToggle.astro` switches dollar bases, so the control works with no script running.
@@ -476,7 +485,7 @@ export function renderNeighbors(d: District, districts: readonly District[]): st
         <p class="note"><strong>On ${MEASURES[measure].name}, ${escapeHtml(d.name)} moved
           ${signedPct(change.ratio)} (${signedMoney(change.dollars)}) from FY${years[1]} to
           FY${years[2]}: ${rankPhrase(rank, d.county)}.</strong></p>
-        ${neighborsChart(d, peers, measure)}
+        ${neighborsChart(peers, measure, { subject: d })}
       </div>`;
   };
   return `
