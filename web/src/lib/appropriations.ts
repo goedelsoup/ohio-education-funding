@@ -154,7 +154,7 @@ export function renderAppropriations(
         formula itself is paid from. Property tax reimbursement lines are excluded — they are
         numbered as the department's and are not its budget.</p>
 
-      <div class="scroll">${chart}</div>
+      <div class="chartwrap" data-chart="appropriations">${chart}</div>
 
       <p class="note">The same series on the other basis tells a different story, which is the reason this card
         carries the switch: a nominal total that rises every biennium is compatible with a real
