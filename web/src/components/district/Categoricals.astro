@@ -15,7 +15,7 @@
  * qualify. **DPIA is poverty-driven.** A district whose categorical total rose could be poorer or
  * could be less wealthy, and the total cannot tell you which.
  */
-import type { Bar } from "../../lib/chart.ts";
+import { categoricalBars, categoricalParts } from "../../lib/categoricals.ts";
 import { count, money, pct } from "../../lib/format.ts";
 import { barSpec } from "../../lib/plot/spec.ts";
 import { renderToString } from "../../lib/plot/ssr.ts";
@@ -33,44 +33,16 @@ import TargetedAssistance from "./TargetedAssistance.astro";
 interface Props {
   district: District;
   statewide: Statewide;
+  /** The chart's name gutter, shared with the base-cost chart above it — see `barSpec`. */
+  nameGutter?: number;
 }
 
-const { district: d, statewide } = Astro.props;
+const { district: d, statewide, nameGutter } = Astro.props;
 const c = d.categoricals;
 const total = d.categorical_funding;
 
-// Each program links to the corpus node describing its mechanism. The six were one residual
-// until recently and had nothing to link to; now each is a `formula-component` in its own right,
-// and the link out from a figure to what the figure *means* is the reason the wiki exists.
-const parts = [
-  ["Targeted assistance", c.targeted_assistance, "Equalization for low-valuation districts. Zero once a district has enough.", "fsfp-targeted-assistance"],
-  ["Special education", c.special_education, "Six weighted categories of disability, spanning a factor of sixteen.", "fsfp-special-education-weights"],
-  ["Disadvantaged Pupil Impact Aid", c.dpia, "Two poverty counts blended, indexed on the state's, and squared.", "fsfp-disadvantaged-pupil-impact-aid"],
-  ["Career-technical education", c.career_technical, "Five weights against a base cost 20% above the one the rest of the plan uses.", "fsfp-career-technical-weights"],
-  ["Gifted", c.gifted, "Mostly staffing units, with a floor 370 districts sit on.", "fsfp-gifted-units"],
-  // "unlike every other categorical" until this commit, which is the same over-claim the drill-down
-  // below carried and the same one the corpus node carried: career-technical's five weights descend
-  // too. What is true of this program alone is that its weights fall along a *need* gradient.
-  ["English learners", c.english_learners, "Three weights that descend as need persists, alone among the six.", "fsfp-english-learner-weights"],
-] as const;
-
-/*
- * All six, a program the district receives none of included as a stub labelled `$0` (#659). The
- * chart drew only the non-zero parts under a heading saying six, and 316 of 609 districts have at
- * least one zero, so more than half the dashboards showed five bars or fewer and the reader could
- * not tell an omitted program from one the chart had no room for. In dollars rather than `0%`,
- * because `0%` is also what a program under half a percent rounds to, and this is not that.
- */
-const bars: Bar[] = parts.map(([label, value]) =>
-  value > 0
-    ? {
-        label,
-        value,
-        direct: pct(value / total, 0),
-        hover: `${label}: ${money(value)}, ${pct(value / total, 1)} of this district's categoricals`,
-      }
-    : { label, value: 0, direct: money(0), hover: `${label}: ${money(0)}. This district receives none.` },
-);
+const parts = categoricalParts(d);
+const bars = categoricalBars(d);
 
 const share = total / (total + d.base_cost_state_share);
 ---
@@ -79,7 +51,7 @@ const share = total / (total + d.base_cost_state_share);
   total > 0 && (
     <div class="card" id="categoricals" data-part="categoricals">
       <h2><SectionAnchor id="categoricals" />The categorical half, in its six parts<Fragment set:html={yearChip("formula")} /></h2>
-      <div class="chartwrap" data-chart="categoricals" set:html={renderToString((w) => barSpec(bars, { width: w, hue: "formula" }), { label: `This district's categorical funding by program, each as a share of its ${money(total)} total, ${yearOf("formula")}` })} />
+      <div class="chartwrap" data-chart="categoricals" set:html={renderToString((w) => barSpec(bars, { width: w, hue: "formula", nameGutter }), { label: `This district's categorical funding by program, each as a share of its ${money(total)} total, ${yearOf("formula")}` })} />
 
       {/* Dollars only (#659): the chart above labels each program's share, and a Share column here
           repeated it, clipped to "SHA" at 375. */}

@@ -83,20 +83,22 @@ test.describe("charts on a phone", () => {
       return out;
     });
 
-  test("on a phone, chart text is painted between 9px and 12px", async ({ page }) => {
+  test("on a phone, chart text is painted between 9px and 12.8px", async ({ page }) => {
     // 375 is the common iPhone and 360 the common Android, the narrowest worth drawing for. The
     // floor is 9px rather than a round 10 because `WIDTHS.narrow` is sized to scale by at least 0.9
     // at 360, and the 10px axis marks are the smallest type any of these forms uses. Only 375 was
     // tested until #609, and at 360 the county labels painted at 8.8px. The ceiling is the 12.8px
     // HTML legend beside these charts: a chart should not be both the smallest and the largest
-    // type on a phone page.
+    // type on a phone page. It was written as 12, under the legend it names, and held only while
+    // a phone chart was 295px; bled into its card's padding it is 313, and a 12-unit label paints
+    // at 12.5 (#660).
     const outside: string[] = [];
     for (const width of [360, 375]) {
       await page.setViewportSize({ width, height: 900 });
       for (const route of CHARTED) {
         await visit(page, route);
         for (const mark of await paintedText(page)) {
-          if (mark.px < 9 || mark.px > 12) {
+          if (mark.px < 9 || mark.px > 12.8) {
             outside.push(`${route} at ${width} [${mark.chart}] "${mark.text}" at ${mark.px.toFixed(1)}px`);
           }
         }
@@ -125,7 +127,13 @@ test.describe("charts on a phone", () => {
      *
      * One load per route and the viewport walked under it: the container queries answer a resize
      * without a reload, which is the behaviour a reader dragging a window gets.
+     *
+     * Slow, as the redirect walk is (#647): 47 widths on every charted route. That is 4.9s alone
+     * and 6.0s beside three other workers on a laptop, and on the 4-vCPU runner it timed out at the
+     * default 30s on its first attempt in every main run, passing only on retry, until #660 left
+     * it no retry to pass on. The cost is bounded by the routes and the widths.
      */
+    test.slow();
     const thin: string[] = [];
     const jumps: string[] = [];
     for (const route of CHARTED) {
@@ -221,6 +229,107 @@ test.describe("charts on a phone", () => {
     }
     expect(seen, "the routes carry notes under charts").toBeGreaterThan(0);
     expect(over.slice(0, 10), "notes wider than their chart").toEqual([]);
+  });
+
+  test("a card with a chart has one right edge, on a wide page as on a reading one", async ({ page }) => {
+    /*
+     * #660. On the wide templates a card was 1084px inside and a chart stops at 800, so
+     * `/county/franklin` drew one card with its charts ending at x=898 and its tables at 1182; and
+     * the district dashboard's HTML aid bar ran 28px past every SVG chart under it. Now a wide page
+     * with a chart frames its cards at the rail layout's card column, and the bar is capped where
+     * the charts are.
+     *
+     * Every table's box against the chart's in the same card: the `.scroll` it sits in, which is
+     * what is painted, rather than a table that runs on behind the scroll. 32px is the most the
+     * column leaves beside an 800px chart (28), and a glyph's slack.
+     */
+    await page.setViewportSize({ width: 1280, height: 900 });
+    const apart: string[] = [];
+    let cards = 0;
+    for (const route of CHARTED) {
+      await visit(page, route);
+      const found = await page.evaluate(() =>
+        [...document.querySelectorAll(".card")].flatMap((card) => {
+          const charts = [
+            ...[...card.querySelectorAll(".chartwrap svg.plot")].filter(
+              (svg) => svg.getClientRects().length && svg.closest(".chart-at")?.getAttribute("data-at") !== "panel",
+            ),
+            ...card.querySelectorAll(".barwrap"),
+          ].map((el) => el.getBoundingClientRect().right);
+          if (!charts.length) return [];
+          const chart = Math.max(...charts);
+          const tables = [...card.querySelectorAll("table")]
+            .filter((table) => table.getClientRects().length)
+            .map((table) => (table.closest(".scroll") ?? table).getBoundingClientRect().right);
+          return [{ card: card.id || "unnamed", chart, tables }];
+        }),
+      );
+      cards += found.length;
+      for (const { card, chart, tables } of found) {
+        for (const table of tables) {
+          if (Math.abs(table - chart) > 32) {
+            apart.push(`${route} #${card}: chart ends at ${Math.round(chart)}, a table at ${Math.round(table)}`);
+          }
+        }
+      }
+    }
+    expect(cards, "the routes carry cards with charts").toBeGreaterThan(0);
+    expect(apart.slice(0, 10), "a chart and a table in one card ending apart").toEqual([]);
+  });
+
+  test("on a phone, every chart in a card is one width", async ({ page }) => {
+    /*
+     * #660. At 375 a chart was 295px, 79% of the screen, inside the page's padding and its card's;
+     * the reach plot alone was 313, because its card's padding alone was overridden. A chart now
+     * bleeds into the card's padding, so every one is the width reach's was. 2px is rounding.
+     *
+     * A panel of a small multiple is out: it is a share of a row by design.
+     */
+    await page.setViewportSize({ width: 375, height: 900 });
+    const widths = new Map<number, string>();
+    for (const route of CHARTED) {
+      await visit(page, route);
+      const found = await page.locator(".card .chartwrap").evaluateAll((wraps) =>
+        wraps
+          .filter(
+            (wrap) =>
+              wrap.getClientRects().length &&
+              !wrap.querySelector('.chart-at[data-at="panel"]') &&
+              wrap.querySelector("svg.plot"),
+          )
+          .map((wrap) => ({
+            width: Math.round(wrap.getBoundingClientRect().width),
+            chart: wrap.getAttribute("data-chart") ?? "unnamed",
+          })),
+      );
+      for (const { width, chart } of found) if (!widths.has(width)) widths.set(width, `${route} [${chart}]`);
+    }
+    const sizes = [...widths.keys()];
+    expect(widths.size, "the routes carry charts in cards").toBeGreaterThan(0);
+    expect(Math.max(...sizes) - Math.min(...sizes), `chart widths: ${JSON.stringify([...widths])}`).toBeLessThanOrEqual(2);
+  });
+
+  test("the dashboard's bar charts start their bars at one x", async ({ page }) => {
+    /*
+     * #660. Each bar chart fits its name gutter to its own names, so the base-cost bars started
+     * at x=408 at 1280 and the categoricals bars one card below at 382, and the baseline jumped
+     * sideways on the scroll. The page passes both one `nameGutter`. At 375 too: the gutter is
+     * capped at a share of the frame there, and both frames are one width.
+     */
+    for (const width of [375, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(`/district/${CLEVELAND}`);
+      const starts = await page.evaluate(() =>
+        ["base-cost", "categoricals"].map((name) => {
+          const fills = [...document.querySelectorAll(`[data-chart="${name}"] .bar-fill > *`)]
+            .map((bar) => bar.getBoundingClientRect())
+            .filter((box) => box.width > 0);
+          return fills.length ? Math.min(...fills.map((box) => box.left)) : null;
+        }),
+      );
+      expect(starts[0], `${width}px: the base-cost chart is drawn`).not.toBeNull();
+      expect(Math.abs(starts[0]! - starts[1]!), `${width}px: ${JSON.stringify(starts)}`).toBeLessThanOrEqual(0.5);
+    }
   });
 
   test("on a wide page, no chart text is painted larger than the body text", async ({ page }) => {

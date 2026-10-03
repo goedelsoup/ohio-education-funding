@@ -20,12 +20,14 @@ import Position from "../../components/district/Position.astro";
 import Supplements from "../../components/district/Supplements.astro";
 import WhatThisIsNot from "../../components/district/WhatThisIsNot.astro";
 import Base from "../../layouts/Base.astro";
-import { renderBaseCostBuildUp } from "../../lib/basecost.ts";
+import { baseCostBars, renderBaseCostBuildUp } from "../../lib/basecost.ts";
+import { categoricalBars } from "../../lib/categoricals.ts";
 import { renderBiennium } from "../../lib/biennium.ts";
 import { districtPaths, loadFeed, qualifiedName } from "../../lib/feed.ts";
 import { districtTitle, NAMES } from "../../lib/nav.ts";
 import * as routes from "../../lib/routes.ts";
 import { fig, money, pct } from "../../lib/format.ts";
+import { nameGutterOf } from "../../lib/plot/spec.ts";
 import { yearOf } from "../../lib/year.ts";
 
 export const getStaticPaths = districtPaths;
@@ -45,6 +47,13 @@ const senateSeats = bundle.senate_districts
   .sort();
 
 const houseSeats = [...district.house_districts].sort((a, b) => Number(a.number) - Number(b.number));
+
+/*
+ * The base-cost and categoricals charts are read one card after the other, so their bars start at
+ * one x rather than each at its own names' width (#660): the base-cost bars began 26px right of
+ * the categoricals' at 1280, and the baseline jumped sideways on the scroll.
+ */
+const nameGutter = nameGutterOf(baseCostBars(district), categoricalBars(district));
 
 const guaranteePP = district.realized_aid_per_pupil - district.formula_aid_per_pupil;
 const description = district.on_guarantee
@@ -156,9 +165,9 @@ const description = district.on_guarantee
   {/* Third clause of that question, answered directly: for the 294 guaranteed districts this
       card says a year of enrollment is worth nothing to them. It was in position six. */}
   <EnrollmentYears bundle={bundle} district={district} forecastable={forecastable} />
-  <Fragment set:html={renderBaseCostBuildUp(district, bundle.statewide.districts)} />
+  <Fragment set:html={renderBaseCostBuildUp(district, bundle.statewide.districts, nameGutter)} />
   {/* The other half of formula aid, decomposed the same way and for the same reason. */}
-  <Categoricals district={district} statewide={bundle.statewide} />
+  <Categoricals district={district} statewide={bundle.statewide} nameGutter={nameGutter} />
   {/* Where the district stands, as a figure. It sat after the biennium, and from the categoricals
       chart to its strips a 1280px page ran 6,800px with no figure: the categoricals card's own
       tables and Supplements are most of that, so the strips come before both (#661). */}

@@ -471,12 +471,21 @@ test.describe("the tip's placement", () => {
     await page.goto(route);
     const chart = page.locator("svg.plot:visible").filter({ has: page.locator("[data-hover]") }).last();
     await chart.scrollIntoViewIfNeeded();
-    await chart.evaluate((svg) => window.scrollBy(0, svg.getBoundingClientRect().bottom - window.innerHeight));
+    // The lowest mark at the window's foot, not the drawing's: the axis under the marks is a share
+    // of the drawing, so parking the SVG's bottom there left the mark higher the wider a phone
+    // chart was drawn, and at 313px the mark had room for the tip below it by 0.3px (#660).
+    await chart.evaluate((svg) => {
+      const bottoms = [...svg.querySelectorAll("[data-hover]")]
+        .map((mark) => mark.getBoundingClientRect())
+        .filter((box) => box.width > 0 && box.height > 0)
+        .map((box) => box.bottom);
+      window.scrollBy(0, Math.max(...bottoms) - window.innerHeight);
+    });
     await settled(page);
     const at = await chart.evaluate((svg) => {
       const boxes = [...svg.querySelectorAll("[data-hover]")]
         .map((mark) => mark.getBoundingClientRect())
-        .filter((box) => box.width > 0 && box.height > 0 && box.bottom <= window.innerHeight);
+        .filter((box) => box.width > 0 && box.height > 0 && box.bottom <= window.innerHeight + 0.5);
       const box = boxes.reduce((low, box) => (box.bottom > low.bottom ? box : low));
       // Its lower edge, where a pointer still reads it: the lowest place a hover can be.
       return { x: box.left + box.width / 2, y: box.bottom - 2 };

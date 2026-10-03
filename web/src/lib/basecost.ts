@@ -163,18 +163,28 @@ function staff(value: number): string {
   return count(Math.round(value));
 }
 
-/** Render the build-up for one district. */
-export function renderBaseCostBuildUp(d: District, districts: number): string {
-  const b = d.base_cost_build_up;
-  const parts = groups(b);
-  const aggregate = b.computed_aggregate;
-
-  const bars: Bar[] = parts.map((group) => ({
+/** The build-up's chart: one bar per component group, each as a share of the aggregate. */
+export function baseCostBars(d: District): Bar[] {
+  const aggregate = d.base_cost_build_up.computed_aggregate;
+  return groups(d.base_cost_build_up).map((group) => ({
     label: group.label,
     value: group.total,
     direct: pct(group.total / aggregate, 0),
     hover: `${group.label} (R.C. ${group.section}): ${money(group.total)}, ${pct(group.total / aggregate, 1)} of base cost`,
   }));
+}
+
+/**
+ * Render the build-up for one district.
+ *
+ * `nameGutter` is the bar chart's, shared with the charts it is scrolled between — see the
+ * option of that name on `barSpec`.
+ */
+export function renderBaseCostBuildUp(d: District, districts: number, nameGutter?: number): string {
+  const b = d.base_cost_build_up;
+  const parts = groups(b);
+  const aggregate = b.computed_aggregate;
+  const bars = baseCostBars(d);
 
   // Dollars only (#659). The chart labels each group's share, and a Share column here repeated it,
   // clipped to "SHA" inside the scroll wrapper at 375.
@@ -214,7 +224,7 @@ export function renderBaseCostBuildUp(d: District, districts: number): string {
         ${staff(b.funded_special_teachers)} special teachers, across
         ${staff(d.adm)} pupils.</p>
 
-      <div class="chartwrap" data-chart="base-cost">${renderToString((w) => barSpec(bars, { width: w, hue: "formula" }), { label: `Aggregate base cost by component group of R.C. 3317.011, each as a share of its ${money(aggregate)} total${yearOf("formula") ? `, ${yearOf("formula")}` : ""}` })}</div>
+      <div class="chartwrap" data-chart="base-cost">${renderToString((w) => barSpec(bars, { width: w, hue: "formula", nameGutter }), { label: `Aggregate base cost by component group of R.C. 3317.011, each as a share of its ${money(aggregate)} total${yearOf("formula") ? `, ${yearOf("formula")}` : ""}` })}</div>
 
       <div class="scroll"><table>
         <thead><tr><th>Element</th><th>Amount</th></tr></thead>
