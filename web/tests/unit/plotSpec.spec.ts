@@ -492,45 +492,80 @@ function placed(svg: string, className: string): { x: number; y: number; text: s
   });
 }
 
-test("a banded trace is named in the gutter, behind a swatch of its band", () => {
+/** Each `.scatter-trace` path's stroke, `d`, and the stroke of the path drawn just before it. */
+function tracePaths(svg: string): { stroke: string; d: string; under: string }[] {
+  const doc = parseHTML(`<div>${svg.slice(0, svg.indexOf("</svg>") + 6)}</div>`).document;
+  return [...doc.querySelectorAll("g.scatter-trace")].map((g) => {
+    const under = g.previousElementSibling;
+    return {
+      stroke: g.getAttribute("stroke") ?? "",
+      d: g.querySelector("path")?.getAttribute("d") ?? "",
+      under: under?.matches("g.scatter-trace-halo") ? (under.getAttribute("stroke") ?? "") : "",
+    };
+  });
+}
+
+/** The last vertex of an SVG path's `d`, in viewBox units. */
+function lastVertex(d: string): { x: number; y: number } {
+  const xy = [...d.matchAll(/[ML]([-\d.]+),([-\d.]+)/g)].at(-1)!;
+  return { x: Number(xy[1]), y: Number(xy[2]) };
+}
+
+test("a banded or pooled trace is named on its line, over a halo of the card", () => {
   /*
-   * On `/outcomes` one legend keyed two banded scatters from above both — 171px above the first at
-   * 1280, a screen above the second (#657). Each median line is named where it ends instead, in
-   * the gutter so the names stay off the cloud, in text ink because the ramp's end steps are near
-   * 2.2:1 against the card, and behind a swatch so the hue is still on the page.
+   * #657 moved the band names off a legend above two charts and into each chart's gutter, behind
+   * a swatch — which on `/outcomes` put them about 390 units from where the lines ended: a legend
+   * again, beside the chart (#702). Each name sits at its own line's end now, in text ink because
+   * the ramp's end steps are near 2.2:1 against the card, and every line is drawn over a halo of
+   * the card because it is painted over dots of its own hue for most of its length.
    *
    * Three lines ending a fraction of a unit apart is the hard case: their names must not print on
    * each other, and each must still sit in the order its line ends.
    */
   const points = cloud(Array.from({ length: 30 }, (_, i) => 10_000 + i * 400));
-  const banded: Trace[] = ["Least poor", "Middle", "Poorest"].map((label, band) => ({
-    label,
-    series: "formula",
-    band,
-    points: [{ x: 10_000, y: 50 }, { x: 20_000, y: 55 + band * 0.1 }],
-  }));
+  const banded: Trace[] = [
+    { label: "All districts", series: "formula", pooled: true, points: [{ x: 10_000, y: 52 }, { x: 18_000, y: 54 }] },
+    ...["Least poor", "Middle", "Poorest"].map((label, band) => ({
+      label,
+      series: "formula" as const,
+      band,
+      points: [{ x: 10_000, y: 50 }, { x: 20_000, y: 55 + band * 0.1 }],
+    })),
+  ];
 
   const spec = scatterSpec(points, AXES, banded, W)!;
-  const bare = scatterSpec(points, AXES, [], W)!;
-  // The names get their room, or they run off the viewBox.
-  expect(spec.options.marginRight).toBeGreaterThan(bare.options.marginRight!);
-
   const svg = renderToString(() => spec, "presentational");
   const names = placed(svg, "scatter-trace-end");
-  const swatches = placed(svg, "scatter-band-key");
-  expect(names.map((n) => n.text)).toEqual(["Poorest", "Middle", "Least poor"]);
-  expect(swatches.map((s) => s.fill)).toEqual([ORDINAL[2], ORDINAL[1], ORDINAL[0]]);
+  expect(svg).not.toContain("scatter-band-key");
+  expect(names.map((n) => n.text)).toEqual(["Poorest", "Middle", "Least poor", "All districts"]);
 
-  const frame = W.width - spec.options.marginRight!;
+  const paths = tracePaths(svg);
+  expect(paths).toHaveLength(4);
+  for (const path of paths) expect(path.under, "a halo under every line").toBe(INK.surface);
+  expect(paths[0]!.stroke, "the pooled line is neutral").toBe(INK.muted);
+  expect(paths.slice(1).map((p) => p.stroke)).toEqual([ORDINAL[0], ORDINAL[1], ORDINAL[2]]);
+
+  // Each name by the line it names: the order the traces were passed in, sorted as the names are.
+  const ends = new Map(banded.map((t, i) => [t.label, lastVertex(paths[i]!.d)]));
   for (const [i, name] of names.entries()) {
+    const end = ends.get(name.text)!;
     expect(name.fill, "text ink, not the band's hue").toBe(INK.secondary);
-    expect(name.x, `${name.text} sits in the gutter`).toBeGreaterThan(frame);
-    expect(swatches[i]!.x).toBeGreaterThan(frame);
-    expect(swatches[i]!.x).toBeLessThan(name.x);
-    expect(Math.abs(swatches[i]!.y - name.y), "a swatch on its name's line").toBeLessThan(0.01);
-    expect(name.x + name.text.length * 7.2, `${name.text} inside the viewBox`).toBeLessThanOrEqual(W.width);
-    if (i > 0) expect(name.y - names[i - 1]!.y, "clear of the name above").toBeGreaterThanOrEqual(13);
+    expect(Math.abs(name.x - end.x), `${name.text} at its line's end`).toBeLessThanOrEqual(12);
+    expect(name.x + name.text.length * 7.2 * 1.08, `${name.text} inside the viewBox`).toBeLessThanOrEqual(W.width);
+    if (i > 0) expect(name.y - names[i - 1]!.y, "clear of the name above").toBeGreaterThanOrEqual(16);
   }
+});
+
+test("a line that ends short of the frame costs the gutter only its name's overhang", () => {
+  // A name on a line ending mid-frame sits over the plot, so the margin is sized from the end and
+  // not from the frame's edge (#702).
+  const points = cloud(Array.from({ length: 30 }, (_, i) => 10_000 + i * 400));
+  const at = (x: number): Trace[] => [
+    { label: "Least poor", series: "formula", band: 0, points: [{ x: 10_000, y: 50 }, { x, y: 55 }] },
+  ];
+  const short = scatterSpec(points, AXES, at(14_000), W)!;
+  const long = scatterSpec(points, AXES, at(21_600), W)!;
+  expect(short.options.marginRight).toBeLessThan(long.options.marginRight!);
 });
 
 test("a small multiple can be put on one horizontal scale", () => {
@@ -552,6 +587,30 @@ test("a small multiple can be put on one horizontal scale", () => {
   expect(own.options.x!.domain).not.toEqual(b.options.x!.domain);
 });
 
+test("a plot height holds the plot area where an axis name wraps", () => {
+  /*
+   * At 375 the spending pair on `/outcomes` wrapped one x-axis name to two lines and not the
+   * other, and a total height let the taller foot take its line out of the plot: the same fifty
+   * points of Performance Index were 9% taller on one panel (#702).
+   */
+  const points = cloud(Array.from({ length: 30 }, (_, i) => 10_000 + i * 400));
+  const named = (label: string) => ({ ...AXES, x: { ...AXES.x, label } });
+  const short = named("spending");
+  const long = named("spending per need-weighted pupil, in the department's own published figures");
+  const area = (spec: Spec) =>
+    spec.options.height! - spec.options.marginTop! - spec.options.marginBottom!;
+
+  const total = { width: WIDTHS.narrow, height: 270 };
+  const a = scatterSpec(points, short, [], total)!;
+  const b = scatterSpec(points, long, [], total)!;
+  expect(b.options.marginBottom, "the long name wraps").toBeGreaterThan(a.options.marginBottom!);
+  expect(area(b), "a total height gives the foot's line to the plot").toBeLessThan(area(a));
+
+  const plot = { width: WIDTHS.narrow, plotHeight: 200 };
+  expect(area(scatterSpec(points, short, [], plot)!)).toBe(200);
+  expect(area(scatterSpec(points, long, [], plot)!)).toBe(200);
+});
+
 test("a fixed domain holds against an outlier rather than being widened by one", () => {
   /*
    * The defect this closes, which was mine and which I shipped once.
@@ -571,8 +630,13 @@ test("a fixed domain holds against an outlier rather than being widened by one",
   const fixed: [number, number] = [0, 3_000];
 
   const spec = scatterSpec(points, AXES, [], { ...W, xDomain: fixed, yDomain: fixed })!;
-  expect(spec.options.x!.domain).toEqual(fixed);
-  expect(spec.options.y!.domain).toEqual(fixed);
+  // Widened by a dot's reach in pixels and nothing more, so a point on the bound is whole (#702).
+  const [lo, hi] = spec.options.x!.domain as [number, number];
+  const plot = W.width - spec.options.marginLeft! - spec.options.marginRight!;
+  const px = (v: number) => ((v - lo) / (hi - lo)) * plot;
+  expect(px(0)).toBeGreaterThanOrEqual(DOT.radius.plain);
+  expect(px(0)).toBeLessThan(DOT.radius.plain + 1);
+  expect(plot - px(3_000)).toBeCloseTo(px(0), 6);
 
   // Removing the outlier must not move it either, which is the same property stated from the
   // other side: the frame is a function of the caller's bound and of nothing in the data.
@@ -820,9 +884,22 @@ test("a fitted panel is squared, so that a slope of one is drawn as a diagonal",
   })!;
   const { height, marginLeft, marginRight, marginTop, marginBottom } = spec.options;
   expect(height! - marginTop! - marginBottom!).toBe(width - marginLeft! - marginRight!);
-  // The frame is the caller's, drawn as given: a padded log domain would move both ends of it.
-  expect(spec.options.x!.domain).toEqual([50, 20_000]);
-  expect(spec.options.y!.domain).toEqual([500, 200_000]);
+  // The frame is the caller's, inset by the same few pixels on both axes so a district on the
+  // bound is whole (#702) — the same pixels on a square plot, so a slope of one is still 45°.
+  const plot = width - marginLeft! - marginRight!;
+  const inset = (shown: unknown, bound: [number, number]) => {
+    const [lo, hi] = (shown as [number, number]).map(Math.log) as [number, number];
+    return [
+      ((Math.log(bound[0]) - lo) / (hi - lo)) * plot,
+      plot - ((Math.log(bound[1]) - lo) / (hi - lo)) * plot,
+    ];
+  };
+  const x = inset(spec.options.x!.domain, [50, 20_000]);
+  const y = inset(spec.options.y!.domain, [500, 200_000]);
+  for (const edge of [...x, ...y]) {
+    expect(edge).toBeGreaterThanOrEqual(DOT.radius.plain);
+    expect(edge).toBeCloseTo(x[0]!, 6);
+  }
 });
 
 test("a fitted line without the frame it was fitted in is refused", () => {

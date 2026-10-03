@@ -1502,37 +1502,95 @@ function byPosition<T extends { x: number; y: number }>(marks: readonly T[]): T[
   return [...marks].sort((a, b) => a.x - b.x || a.y - b.y);
 }
 
-/** The room a band's swatch takes ahead of its name in the gutter, in pixels. */
-const BAND_KEY = 12;
-
-/** The least distance between two gutter names' baselines, in pixels: the 10px type and a gap. */
-const BAND_LEADING = 13;
+/** A dot's reach past its centre, in pixels: the plain radius and half a ring's stroke. */
+const DOT_REACH = DOT.radius.plain + 0.5;
 
 /**
- * A banded trace's name, in the right gutter at the height its line ends, behind a swatch of its
- * band's hue (#657).
+ * `[lo, hi]` widened so a point on either bound is drawn a dot's reach inside the frame (#702).
  *
- * The bands were keyed by a legend, and on `/outcomes` one legend served two charts: 171px above
- * the first at 1280 with a paragraph between, and a screen above the second. At three lines the
- * convention — and `/history`'s own practice — is to name each where it ends. In the gutter rather
- * than at the line's last point, because that point is the median of the top bin and sits inside
- * the cloud; names there ran across its densest part.
+ * A supplied domain was drawn exactly, and the marks are clipped to the frame, so a district on the
+ * bound was cut in half: Batavia Local on `/outcomes`, on the shared spending scale's left end. The
+ * widening is in pixels rather than a share of the range, so it is the same few pixels on every
+ * axis and every width — and a square plot keeps equal units per pixel on its two axes.
+ */
+function insetDomain(lo: number, hi: number, log: boolean, length: number): [number, number] {
+  const t = (v: number) => (log ? Math.log(v) : v);
+  const back = (v: number) => (log ? Math.exp(v) : v);
+  const span = t(hi) - t(lo);
+  if (!(span > 0) || length <= 2 * DOT_REACH) return [lo, hi];
+  const pad = (span * DOT_REACH) / (length - 2 * DOT_REACH);
+  return [back(t(lo) - pad), back(t(hi) + pad)];
+}
+
+/** How far a line's name sits right of its last point, in pixels (#702). */
+const END_DX = 6;
+
+/**
+ * The least distance between two end names' baselines, in pixels: the 10px type, the 3px halo
+ * stroke a browser counts into the name's box, and a gap. 13 cleared the bare type and drew
+ * "All districts" through "Middle" on a phone, where the frame is drawn at 1.25x.
+ */
+const END_LEADING = 16;
+
+/** Whether a trace is named at its own end in text ink, rather than in its series' hue. */
+function namedAtEnd(trace: Trace): boolean {
+  return trace.band != null || trace.pooled === true;
+}
+
+/** The drawn width of an end name: the 10px type at 7.2px a character, set at 600. */
+function endNamePx(label: string): number {
+  return label.length * 7.2 * BOLD_WIDENS;
+}
+
+/**
+ * The right margin a set of end names needs: as much of each name as runs past the frame.
+ *
+ * A name at its line's end sits inside the plot wherever the line stops short of the right edge,
+ * so it costs the gutter only its overhang. The overhang depends on the plot's width and the plot's
+ * width on the gutter; solved for the margin directly, `share * (W - L - R) + L + dx + w <= W - 2`.
+ */
+function endGutter(
+  traces: readonly Trace[],
+  width: number,
+  marginLeft: number,
+  domain: [number, number],
+  log: boolean,
+): number {
+  const t = (v: number) => (log ? Math.log(v) : v);
+  const span = t(domain[1]) - t(domain[0]) || 1;
+  return Math.max(
+    0,
+    ...traces
+      .filter((trace) => namedAtEnd(trace) && trace.points.length > 0)
+      .map((trace) => {
+        const share = Math.min(1, Math.max(0, (t(lastOf(trace.points).x) - t(domain[0])) / span));
+        const room = width - marginLeft - END_DX - endNamePx(trace.label) - 2;
+        return share > 0 ? width - marginLeft - room / share : END_DX + endNamePx(trace.label) + 2;
+      }),
+  );
+}
+
+/**
+ * A banded or pooled trace's name, on the line where it ends, over a halo of the card (#702).
+ *
+ * The names sat in the right gutter behind a swatch of each band (#657), about 390 units from where
+ * the lines ended on `/outcomes` — a legend beside the chart, which is what #657 set out to remove.
+ * They are on the marks now, and the halo under each line and each name is what keeps both legible
+ * where they cross the cloud: the least-poor line vanished into its own dots in light mode.
  *
  * The ramp's end steps are near 2.2:1 against the card, so the name is set in text ink and not in
- * the band's hue, as a legend's would be. The swatch carries the hue and the height carries the
- * line: each name moves off its line's end only as far as keeps it clear of the others, in the
- * order the lines end, and stays inside the plot's height.
+ * the band's hue; the line beside it carries the hue. Each name moves off its line's end only as
+ * far as keeps it clear of the others, in the order the lines end, and stays inside the plot.
  */
-function bandLabels(
+function endLabels(
   traces: readonly Trace[],
   domain: [number, number],
   log: boolean,
   frame: { top: number; bottom: number },
-  right: number,
 ) {
   const t = (v: number) => (log ? Math.log(v) : v);
   const ends = traces
-    .filter((trace) => trace.band != null && trace.points.length > 0)
+    .filter((trace) => namedAtEnd(trace) && trace.points.length > 0)
     .map((trace) => {
       const end = lastOf(trace.points);
       const share = (t(end.y) - t(domain[0])) / (t(domain[1]) - t(domain[0]));
@@ -1542,37 +1600,26 @@ function bandLabels(
   // Down from the top, then back up from the floor, so a crowd at either edge stays inside it.
   const at = ends.map((e) => e.py);
   for (let i = 0; i < at.length; i += 1) {
-    at[i] = Math.max(at[i]!, frame.top + 4, i > 0 ? at[i - 1]! + BAND_LEADING : -Infinity);
+    at[i] = Math.max(at[i]!, frame.top + 4, i > 0 ? at[i - 1]! + END_LEADING : -Infinity);
   }
   for (let i = at.length - 1; i >= 0; i -= 1) {
-    at[i] = Math.min(at[i]!, frame.bottom - 4, i < at.length - 1 ? at[i + 1]! - BAND_LEADING : Infinity);
+    at[i] = Math.min(at[i]!, frame.bottom - 4, i < at.length - 1 ? at[i + 1]! - END_LEADING : Infinity);
   }
-  return ends.flatMap(({ trace, end, py }, i) => {
-    const dy = at[i]! - py;
-    return [
-      Plot.dot([end], {
-        x: () => right,
-        y: "y",
-        dx: 8 + 4,
-        dy,
-        r: 4,
-        symbol: "square",
-        fill: ORDINAL[Math.min(ORDINAL.length - 1, Math.max(0, trace.band!))] as string,
-        stroke: "none",
-        className: "scatter-band-key",
-      }),
-      Plot.text([end], {
-        x: () => right,
-        y: "y",
-        dx: 8 + BAND_KEY + 2,
-        dy,
-        text: () => trace.label,
-        textAnchor: "start",
-        fill: INK.secondary,
-        className: "scatter-trace-end",
-      }),
-    ];
-  });
+  return ends.map(({ trace, end, py }, i) =>
+    Plot.text([end], {
+      x: "x",
+      y: "y",
+      dx: END_DX,
+      dy: at[i]! - py,
+      text: () => trace.label,
+      textAnchor: "start",
+      fill: INK.secondary,
+      fontWeight: 600,
+      stroke: INK.surface,
+      strokeWidth: 3,
+      className: "scatter-trace-end",
+    }),
+  );
 }
 
 export function scatterSpec(
@@ -1585,6 +1632,16 @@ export function scatterSpec(
   options: {
     width: number;
     height?: number;
+    /**
+     * The plot area's height, with the margins added around it, in place of a total `height`.
+     *
+     * For a small multiple compared on its vertical axis. A total height holds the frame and lets
+     * the plot absorb whatever the margins take: at 375 the spending pair on `/outcomes` wrapped
+     * one x-axis name to two lines and not the other, and the same 50 points of Performance Index
+     * came out 9% taller on one panel than the other under a dek promising "the same two axes"
+     * (#702). Fixed here, the margins vary and the plot does not.
+     */
+    plotHeight?: number;
     /**
      * Draw the line y = x, and put both axes on one domain so that it is a diagonal.
      *
@@ -1708,20 +1765,23 @@ export function scatterSpec(
   const yMin = both ? xMin : yLo;
   const yMax = both ? xMax : yHi;
   /*
-   * A fitted axis is padded so the extreme points are not on the frame. A supplied one is not.
+   * A fitted linear axis is padded by a share of its range, so the extreme points are not on the
+   * frame. A supplied one, and a log one, is padded by a dot instead — see {@link insetDomain}.
    *
-   * The padding is a tenth of the reason a fitted axis reads well and the whole of the reason a
+   * The share is a tenth of the reason a fitted axis reads well and the whole of the reason a
    * supplied one would not: a caller who asks for `[0, 19175]` because a dollar figure is read as
    * a height above zero gets `[-767, 19942]` instead, and the baseline floats above the axis line
-   * under a label still reading `$0`. The caller chose the bound; this draws it.
+   * under a label still reading `$0`. The caller chose the bound; this draws it, with the frame
+   * rule on the bound itself and only a dot's width of plot beyond it.
    *
    * With `identity` the two axes are one domain, so a domain supplied for either end fixes both.
    */
   const supplied = both
     ? options.xDomain != null || options.yDomain != null
     : options.xDomain != null;
-  const xPad = supplied ? 0 : pad(xMin, xMax);
-  const yPad = (both ? supplied : options.yDomain != null) ? 0 : pad(yMin, yMax);
+  const ySupplied = both ? supplied : options.yDomain != null;
+  const xPad = supplied || axes.x.log ? 0 : pad(xMin, xMax);
+  const yPad = ySupplied || axes.y.log ? 0 : pad(yMin, yMax);
 
   /*
    * `"neutral"` and no series at all land in the same place and mean different things: one is an
@@ -1767,16 +1827,22 @@ export function scatterSpec(
   const { width } = options;
   const marginLeft = 62;
   /*
-   * Sized to the labels that are drawn, and every trace carries one (#657): a banded trace's sits
-   * in the gutter behind a swatch of its band, which is the extra `BAND_KEY`. Short names are the
-   * caller's to choose — called "least poor third", the bands' gutter came to 22% of a 640px frame.
+   * Sized to the labels that are drawn, and every trace carries one (#657). A series trace's name
+   * is budgeted as if its line ran to the frame's right edge; a banded or pooled one's is sized
+   * from where its line actually ends (#702), which is what put the names on the lines rather than
+   * in a gutter beside them. Short names are the caller's to choose.
    */
   const marginRight = gutter(
     width,
-    traces.length > 0
-      ? Math.max(...traces.map((t) => 24 + (t.band != null ? BAND_KEY : 0) + t.label.length * 7.2))
-      : 24,
+    Math.max(
+      24,
+      ...traces.filter((t) => !namedAtEnd(t)).map((t) => 24 + t.label.length * 7.2),
+      endGutter(traces, width, marginLeft, [xMin, xMax], axes.x.log ?? false),
+    ),
   );
+  const xShown: [number, number] = supplied || axes.x.log
+    ? insetDomain(xMin, xMax, axes.x.log ?? false, width - marginLeft - marginRight)
+    : [xMin - xPad, xMax + xPad];
   const title = yTitle(width, marginLeft, axes.y.label + (axes.y.log ? LOG_SCALE : ""), 28);
   const marginTop = title.marginTop;
   const foot = axisFoot({
@@ -1785,18 +1851,14 @@ export function scatterSpec(
     marginRight,
     dy: 20,
     says: axes.x.label + (axes.x.log ? LOG_SCALE : ""),
-    scale: {
-      domain: axes.x.log ? [xMin, xMax] : [xMin - xPad, xMax + xPad],
-      log: axes.x.log,
-      format: axes.x.format,
-    },
+    scale: { domain: xShown, log: axes.x.log, format: axes.x.format },
   });
   const marginBottom = 40 + foot.extraBottom;
 
   /*
    * Square where a reference line's *angle* is the claim — `identity`, so that y = x is drawn at
-   * 45°, and `fit`, so that a slope of one is. Everywhere else the caller's height, or a default
-   * that suits a wide cloud.
+   * 45°, and `fit`, so that a slope of one is. Everywhere else the caller's plot height, its total
+   * height, or a default that suits a wide cloud.
    *
    * The two get there differently and end in the same place. `identity` puts both axes on one
    * domain here; `fit` is handed two domains the crate has already given the same span, and a
@@ -1805,14 +1867,20 @@ export function scatterSpec(
   const height =
     options.identity || options.fit
       ? width - marginLeft - marginRight + marginTop + marginBottom
-      : (options.height ?? 420);
-  const bandKeys = bandLabels(
-    traces,
-    axes.y.log ? [yMin, yMax] : [yMin - yPad, yMax + yPad],
-    axes.y.log ?? false,
-    { top: marginTop, bottom: height - marginBottom },
-    axes.x.log ? xMax : xMax + xPad,
-  );
+      : options.plotHeight != null
+        ? options.plotHeight + marginTop + marginBottom
+        : (options.height ?? 420);
+  const yShown: [number, number] = ySupplied || axes.y.log
+    ? insetDomain(yMin, yMax, axes.y.log ?? false, height - marginTop - marginBottom)
+    : [yMin - yPad, yMax + yPad];
+  // Where the frame's two rules sit: on a supplied bound itself, so `$0` is the baseline it reads
+  // as, and otherwise at the padded edge of the plot.
+  const xRule = supplied ? xMin : xShown[0];
+  const yRule = ySupplied ? yMin : yShown[0];
+  const names = endLabels(traces, yShown, axes.y.log ?? false, {
+    top: marginTop,
+    bottom: height - marginBottom,
+  });
   return {
     options: {
       width,
@@ -1837,18 +1905,18 @@ export function scatterSpec(
       x: {
         axis: null,
         type: axes.x.log ? "log" : "linear",
-        domain: axes.x.log ? [xMin, xMax] : [xMin - xPad, xMax + xPad],
+        domain: xShown,
       },
       y: {
         axis: null,
         type: axes.y.log ? "log" : "linear",
-        domain: axes.y.log ? [yMin, yMax] : [yMin - yPad, yMax + yPad],
+        domain: yShown,
       },
       marks: [
         // The frame, drawn as two rules rather than Plot's axes: recessive, and the same two
         // strokes every other chart here bounds itself with.
-        Plot.ruleY([axes.y.log ? yMin : yMin - yPad], { stroke: INK.rule, className: "axis" }),
-        Plot.ruleX([axes.x.log ? xMin : xMin - xPad], { stroke: INK.rule, className: "axis" }),
+        Plot.ruleY([yRule], { stroke: INK.rule, className: "axis" }),
+        Plot.ruleX([xRule], { stroke: INK.rule, className: "axis" }),
 
         // Under the cloud, because it is what the cloud is being read against rather than a mark
         // in it. Neutral: it asserts no polarity and is not one of the two series.
@@ -1959,19 +2027,32 @@ export function scatterSpec(
         }),
 
         ...traces.flatMap((trace) => [
+          /*
+           * A halo of the card under every line, the idiom #662 introduced for text (#702). A
+           * median line is painted over dots of its own hue for most of its length, and without
+           * one the least-poor line on `/outcomes` vanished into its dots in light mode and the
+           * poorest into its own in dark.
+           */
           Plot.line(trace.points, {
             x: "x",
             y: "y",
-            stroke: traceHue(trace),
-            strokeWidth: 2,
+            stroke: INK.surface,
+            strokeWidth: 5,
+            className: "scatter-trace-halo",
+          }),
+          Plot.line(trace.points, {
+            x: "x",
+            y: "y",
+            ...(trace.pooled
+              ? { stroke: INK.muted, strokeWidth: 1.5, strokeDasharray: RULE.reference.strokeDasharray }
+              : { stroke: traceHue(trace), strokeWidth: 2 }),
             className: "scatter-trace",
           }),
           /*
-           * A direct label at the line's end, except for a banded trace, whose name goes in the
-           * gutter instead — see `bandLabels`. Three names at the line ends ran across the densest
-           * part of the cloud.
+           * A direct label at the line's end in its series' hue. A banded or pooled trace is named
+           * by `endLabels` instead, in text ink and clear of the others.
            */
-          ...(trace.band != null
+          ...(namedAtEnd(trace)
             ? []
             : [
                 Plot.text([lastOf(trace.points)], {
@@ -1980,13 +2061,12 @@ export function scatterSpec(
                   dx: 8,
                   text: () => trace.label,
                   textAnchor: "start",
-                  // A banded trace is not labelled here, so the label is always one of the pair.
                   fill: SERIES_TEXT[trace.series],
                   className: "scatter-trace-end",
                 }),
               ]),
         ]),
-        ...bandKeys,
+        ...names,
 
         /*
          * The two numbers, in the one corner of a fitted panel that is empty in both of them.
@@ -2037,7 +2117,7 @@ export function scatterSpec(
          * once and "Performance Index" and the 113 it labels were drawn through each other.
          */
         ...yEnds(
-          axes.y.log ? [yMin, yMax] : [yMin - yPad, yMax + yPad],
+          yShown,
           axes.y.format,
           marginLeft,
           axes.y.log,

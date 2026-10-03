@@ -113,8 +113,8 @@ export function medianTrace(
  * A median line says what the middle of the cloud does. Banding says what the cloud is *made of* —
  * and where the banding measure is a third variable, it shows a structure no line can: on
  * `/outcomes` the three poverty bands occupy the same range of spending per need-weighted pupil,
- * p10 within $500 of each other and p90 within $100, while their median Performance Index differs
- * by eighteen points. Three horizontal bands stacked at one x range is the card's whole argument,
+ * their tenth and ninetieth percentiles each a few hundred dollars apart, while their median
+ * Performance Index differs by eighteen points. Three horizontal bands stacked at one x range is the card's whole argument,
  * drawn.
  *
  * Three and not five is a measurement, not a preference: a scatter is an all-pairs form and five
