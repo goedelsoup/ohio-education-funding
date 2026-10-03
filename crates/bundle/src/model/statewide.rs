@@ -569,7 +569,7 @@ pub struct Bundle {
     pub appropriations: Vec<AppropriationYear>,
     /// The meal-program poverty share, October by October, oldest first. Empty if absent.
     ///
-    /// Reaches back further than [`Self::history`] — FY2001 against FY2009 — and on a third
+    /// Reaches back further than [`Self::history`] — FY1999 against FY2009 — and on a third
     /// measurement again. See [`MealProgramYear`].
     pub meal_program: Vec<MealProgramYear>,
     /// The whole casino county student fund, fiscal year by fiscal year, oldest first.
@@ -881,11 +881,11 @@ pub struct AppropriationLine {
 /// here so that a reader watching the share move can see the population move underneath it.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct MealProgramYear {
-    /// The October counted, as a fiscal year.
+    /// The fiscal year the October count falls in: October 1998 is FY1999.
     pub fiscal_year: u16,
     /// Public sponsors the year is computed over, after excluding published corruption.
     ///
-    /// The FY2005 file gives one elementary school an enrollment of 342,332. It is excluded by
+    /// The FY2006 file gives one elementary school an enrollment of 342,332. It is excluded by
     /// name upstream rather than repaired, so this count is one lower that year than the file
     /// implies.
     pub sponsors: usize,
@@ -899,10 +899,10 @@ pub struct MealProgramYear {
     pub enrollment: f64,
     /// Free and reduced-price applications approved, summed over those sponsors.
     ///
-    /// From FY2012 this is short by every child in a community-eligibility school, because those
+    /// From FY2013 this is short by every child in a community-eligibility school, because those
     /// sponsors collect no applications. See [`Self::streams`].
     pub approved: f64,
-    /// Directly certified children in community-eligibility schools. Zero before FY2012.
+    /// Directly certified children in community-eligibility schools. Zero before FY2013.
     ///
     /// Not an approval and not comparable to one. Direct certification reaches families already on
     /// SNAP, TANF, foster care or a homeless roll; an application reaches anyone under the income
@@ -912,7 +912,7 @@ pub struct MealProgramYear {
     /// [`Self::approved`] over [`Self::enrollment`], which is the figure worth reading — while the
     /// report is one file.
     ///
-    /// `None` from FY2012, and that is the finding rather than a gap. Three publications counting
+    /// `None` from FY2013, and that is the finding rather than a gap. Three publications counting
     /// three different things do not add up to a share, so those years carry
     /// [`Self::floor`] and [`Self::ceiling`] instead and nothing writes a number between them.
     pub share: Option<f64>,
@@ -927,23 +927,23 @@ pub struct MealProgramYear {
     pub ceiling: f64,
     /// The share of the October's enrollment under sponsors that collect no applications.
     ///
-    /// Zero through FY2011 and a sixth by FY2014. This is the size of the hole in
+    /// Zero through FY2012 and a sixth by FY2015. This is the size of the hole in
     /// [`Self::approved`], and it grows because community eligibility is open to schools whose
     /// poverty is already high — the population leaving the applications-based count is not a
     /// random sample of it.
     pub without_applications: f64,
-    /// How many files the October was published as: one through FY2011, three from FY2012.
+    /// How many files the October was published as: one through FY2012, three from FY2013.
     ///
-    /// The field a consumer has to read before drawing a line. From FY2012 the report splits into
+    /// The field a consumer has to read before drawing a line. From FY2013 the report splits into
     /// Traditional, Provision 2 and Community Eligibility, and only the first still counts
     /// applications — so a series that joins across this reads the poorest sponsors leaving the
     /// form as poverty falling.
     pub streams: usize,
-    /// Which denominator that is: `adm` through FY2009, `ce` from FY2010.
+    /// Which denominator that is: `adm` through FY2010, `ce` from FY2011.
     ///
     /// The definition changes mid-series. `CECount` is "the highest daily number of students with
     /// access to the program", which is neither ADM nor the count that preceded it, so the share
-    /// is not continuous across FY2009/FY2010 and nothing here splices it. A consumer that plots
+    /// is not continuous across FY2010/FY2011 and nothing here splices it. A consumer that plots
     /// this as one line without breaking it at the basis change is making the error this field
     /// exists to prevent.
     pub basis: String,

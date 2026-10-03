@@ -112,9 +112,9 @@ const HISTORICAL: Record<string, Allowance> = {
       "FY2023 is the profile report's valuation vintage — a property of a fixture that will move, declared here rather than derived because the feed does not carry it, beside the spending year that is read with `yearOf`.",
   },
   "lib/history.ts": {
-    allowed: ["FY2009", "FY2011", "FY2020"],
+    allowed: ["FY2020"],
     reason:
-      "FY2009-FY2011 as the Census panel's own caveat window, and FY2020 as the furthest back anything else in the feed reaches.",
+      "FY2020 as the furthest back anything else in the feed reaches. The FY2009-FY2011 caveat window it also carried is computed from the series now (#705).",
   },
   "lib/outcomes.ts": {
     allowed: ["FY2020"],
@@ -137,9 +137,9 @@ const HISTORICAL: Record<string, Allowance> = {
       "FY2008 gap aid, a superseded mechanism, and FY2027 as the counterfactual's stated input year. This is the entry that exposed the defect: it also covered a rendered TY2024 describing the moving tax-year fixture, which is read off the district's own panel now.",
   },
   "lib/denominators.ts": {
-    allowed: ["FY2009", "FY2010"],
+    allowed: ["FY2010", "FY2011"],
     reason:
-      "MR-81's definitional break — `AdmCount` through FY2009, then `CECount` from FY2010 — is a fact about a closed series that ended in FY2014, not a label on a moving fixture. Every other year in this file is now read from `series_years`.",
+      "MR-81's definitional break — `AdmCount` through FY2010, then `CECount` from FY2011, the Octobers of 2009 and 2010 (#705) — is a fact about the count's history, not a label on a moving fixture. Every other year in this file is now read from `series_years`.",
   },
   "lib/basecost.ts": {
     allowed: ["FY2022", "FY2027"],

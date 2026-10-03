@@ -13,7 +13,7 @@ use super::text::fixed;
 /// Columns of the MR-81 sponsor panel.
 ///
 /// `stream`, `identified` and `claimable` exist for the same reason `enrollment_basis` does: the
-/// report stops being one report. From FY2012 it is published as three, and the three do not
+/// report stops being one report. From October 2012 it is published as three, and the three do not
 /// count the same thing. See [`build_mr81`].
 pub const MR81_HEADER: &[&str] = &[
     "fiscal_year",
@@ -39,17 +39,19 @@ pub const MR81_HEADER: &[&str] = &[
 /// one.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Stream {
-    /// FY1998 through FY2011, when the report was one file covering every sponsor.
+    /// October 1998 through October 2011, when the report was one file covering every sponsor.
     Single,
-    /// From FY2012: sponsors still collecting meal applications. The header says outright that it
+    /// From October 2012: sponsors still collecting meal applications. The header says outright
+    /// that it
     /// *"Excludes Provision 2 and Community Eligibility Option (CEO) sponsors."*
     Traditional,
-    /// From FY2012: sponsors serving under Provision 2, whose approvals are **frozen at a base
-    /// year**. `ProvisionYear` names it, and the same sponsor reports the same free and reduced
-    /// counts in FY2012, FY2013 and FY2014 while its enrolment moves underneath them.
+    /// From October 2012: sponsors serving under Provision 2, whose approvals are **frozen at a
+    /// base year**. `ProvisionYear` names it, and the same sponsor reports the same free and
+    /// reduced counts in October 2012, October 2013 and October 2014 while its enrolment moves
+    /// underneath them.
     Provision2,
-    /// From FY2012: community eligibility. **No applications are collected at all**, so free and
-    /// reduced are structurally zero and the comparable quantity is `identified`.
+    /// From October 2012: community eligibility. **No applications are collected at all**, so free
+    /// and reduced are structurally zero and the comparable quantity is `identified`.
     Community,
 }
 
@@ -91,8 +93,8 @@ pub const WAIVER_OCTOBERS: [u16; 2] = [2020, 2021];
 /// How a year's file is laid out, which decides which reader runs.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Mr81Layout {
-    /// FY1998 through FY2000: one row per **school**, 170 characters wide, with the district
-    /// named and numbered on every row.
+    /// October 1998 through October 2000: one row per **school**, 170 characters wide, with the
+    /// district named and numbered on every row.
     ///
     /// Nominally comma-separated and actually fixed-width, which is the whole reason it is read
     /// by offset. Seven district names a year carry a comma — `Graham School, The`,
@@ -100,7 +102,8 @@ pub enum Mr81Layout {
     /// separators sit at the same thirteen offsets in all 4,246 rows of all three files, so
     /// slicing never meets the problem.
     SchoolCentric,
-    /// FY2001 through FY2014: one row per school **site**, with its sponsor named on the row.
+    /// October 2001 through October 2014: one row per school **site**, with its sponsor named on
+    /// the row.
     Delimited,
     /// The printed report, for the one stream-year posted no other way.
     ///
@@ -125,10 +128,10 @@ pub struct Mr81Report<'a> {
 ///
 /// # Why a workbook is not another `Mr81Layout`
 ///
-/// Through FY2014 a filing *is* a file, so the year, the stream and the reader travel together.
-/// From FY2015 the department publishes **one workbook an October** with an `NSLP Provision`
-/// column, so the three streams are rows. The driver splits them and hands three filings over,
-/// because a filing is still what everything below is written against — the site floors, the
+/// Through October 2014 a filing *is* a file, so the year, the stream and the reader travel
+/// together. From October 2015 the department publishes **one workbook an October** with an `NSLP
+/// Provision` column, so the three streams are rows. The driver splits them and hands three filings
+/// over, because a filing is still what everything below is written against — the site floors, the
 /// denominator agreement check, the per-stream claimable rule. Making the *stream* a property of
 /// the row instead would have meant rewriting all three.
 #[derive(Debug, Clone)]
@@ -178,9 +181,9 @@ struct Site {
     reported_share: f64,
     /// How many of this site's application cells the publisher censored as `<10`.
     ///
-    /// Zero for every file through FY2014, which censors nothing. From FY2015 a count under ten
-    /// is printed `<10` — or `< 10` in the last two Octobers — and the cell it replaces is a
-    /// number this repository does not have. See [`workbook_sites`].
+    /// Zero for every file through October 2014, which censors nothing. From October 2015 a count
+    /// under ten is printed `<10` — or `< 10` in the last two Octobers — and the cell it replaces
+    /// is a number this repository does not have. See [`workbook_sites`].
     censored: i64,
 }
 
@@ -220,7 +223,7 @@ impl Identity {
     /// The county is tried first and the name alone second.
     ///
     /// The fallback is not tidiness. `Believe to Achieve-Canton` is filed under Cuyahoga in the
-    /// FY2012 file and under Stark in the FY2013 one — the publisher moved it, and on a
+    /// October 2012 file and under Stark in the October 2013 one — the publisher moved it, and on a
     /// name-and-county key it would be a sponsor this repository had never seen.
     fn get(&self, name: &str, county: &str) -> Option<&(String, String)> {
         self.by_place
@@ -251,13 +254,13 @@ const SPONSOR_TYPES: [&str; 4] = [
 ///
 /// # Three breaks, each carried on the row rather than annotated
 ///
-/// **The denominator is renamed in FY2010.** Through FY2009 the column is `AdmCount`. From
-/// FY2010 it is `CECount`, and the report's own header defines CE as the *"highest daily number
-/// of students with access to the program"* — not average daily membership and not the same
+/// **The denominator is renamed in October 2010.** Through October 2009 the column is `AdmCount`.
+/// From October 2010 it is `CECount`, and the report's own header defines CE as the *"highest daily
+/// number of students with access to the program"* — not average daily membership and not the same
 /// quantity. `enrollment_basis` says which.
 ///
-/// **The report splits into three in FY2012**, and the three count differently. Traditional is
-/// current-year applications. Provision 2 is applications **frozen at a base year** — the same
+/// **The report splits into three in October 2012**, and the three count differently. Traditional
+/// is current-year applications. Provision 2 is applications **frozen at a base year** — the same
 /// sponsor reports the same free and reduced counts three years running while its enrolment moves
 /// underneath them. Community eligibility collects **no applications at all**: its free and
 /// reduced columns are zero by construction, and what it publishes instead is
@@ -269,14 +272,14 @@ const SPONSOR_TYPES: [&str; 4] = [
 /// the published directly-certified count — a floor, because direct certification reaches SNAP,
 /// TANF, foster and homeless children and nobody else. `claimable` is that count run through
 /// USDA's 1.6 multiplier and capped at enrolment, which is the ceiling the programme itself uses
-/// and which reproduces the report's own printed percentage in all 735 of the FY2014 rows. For
-/// the two application streams both equal the approvals, so a consumer can carry either bound
+/// and which reproduces the report's own printed percentage in all 735 of the October 2014 rows.
+/// For the two application streams both equal the approvals, so a consumer can carry either bound
 /// across the whole panel without a special case.
 ///
-/// **The grain changes in FY2001.** FY1998-FY2000 are one row per school with the district on it;
-/// everything later is one row per site with the sponsor on it. Both aggregate to the same shape,
-/// but a district is not a sponsor: the earlier files have no sponsor-type column at all, so
-/// their rows are written `Unknown` rather than guessed at.
+/// **The grain changes in October 2001.** Octobers 1998-2000 are one row per school with the
+/// district on it; everything later is one row per site with the sponsor on it. Both aggregate to
+/// the same shape, but a district is not a sponsor: the earlier files have no sponsor-type column
+/// at all, so their rows are written `Unknown` rather than guessed at.
 ///
 /// # Sponsors are not districts
 ///
@@ -288,10 +291,10 @@ const SPONSOR_TYPES: [&str; 4] = [
 ///
 /// # Every row is checked against the percentage printed beside it
 ///
-/// The FY2001 file is the only comma-delimited one, and nine of its rows carry a comma inside a
-/// school name. Split positionally, those rows put a **site IRN into the enrolment column** —
+/// The October 2001 file is the only comma-delimited one, and nine of its rows carry a comma inside
+/// a school name. Split positionally, those rows put a **site IRN into the enrolment column** —
 /// `00026450` and `00093153` for two Cleveland City schools, adding 119,603 students to a
-/// district of 73,562 and understating the statewide FY2001 poverty share by 1.8 points. The
+/// district of 73,562 and understating the statewide October 2001 poverty share by 1.8 points. The
 /// figure was plausible, the row count was right, and the panel shipped that way.
 ///
 /// So the columns are checked against each other: the report prints free-and-reduced as a share
@@ -343,7 +346,7 @@ pub fn build_mr81(reports: &[Mr81Report<'_>]) -> Result<Vec<Vec<String>>, String
             Mr81Body::Text { layout, text } => match layout {
                 Mr81Layout::SchoolCentric => (school_centric_sites(text, &label)?, "adm"),
                 Mr81Layout::Delimited => delimited_sites(text, &label)?,
-                // The one printed file is FY2013's, which is well inside the CE era. Stated
+                // The one printed file is October 2013's, which is well inside the CE era. Stated
                 // rather than sniffed because the printed heading spells CE out in prose and not
                 // in a column name.
                 Mr81Layout::Printed => (printed_sites(text, &identity, &label)?, "ce"),
@@ -366,11 +369,11 @@ pub fn build_mr81(reports: &[Mr81Report<'_>]) -> Result<Vec<Vec<String>>, String
         /*
          * A floor, so a filing that parsed to nothing is not written as a sponsor that closed.
          *
-         * Through FY2014 it can be per stream: the single and traditional *files* never carried
-         * fewer than three thousand sites, and the other two are small by construction.
+         * Through October 2014 it can be per stream: the single and traditional *files* never
+         * carried fewer than three thousand sites, and the other two are small by construction.
          *
-         * From FY2015 it cannot, and the reason is the finding rather than an inconvenience. The
-         * Traditional stream is emptying into community eligibility — **2,849 sites in October
+         * From October 2015 it cannot, and the reason is the finding rather than an inconvenience.
+         * The Traditional stream is emptying into community eligibility — **2,849 sites in October
          * 2015 against 1,782 in October 2025**, while CEP goes 844 to 1,754 — so any number this
          * floor could name would be a claim about the migration and not about the parser. And
          * under USDA's pandemic waivers it falls to 207 and then **23**, because a sponsor could
@@ -464,9 +467,9 @@ pub fn build_mr81(reports: &[Mr81Report<'_>]) -> Result<Vec<Vec<String>>, String
         .collect())
 }
 
-/// Zero-padded to six, because the years disagree: FY2004 writes `00043786` and FY2005 writes
-/// `43786` for Cleveland. Joining the panel to itself across years — or to anything else in this
-/// repository, which uses the padded form — silently matches nothing for whichever half is
+/// Zero-padded to six, because the years disagree: October 2004 writes `00043786` and October 2005
+/// writes `43786` for Cleveland. Joining the panel to itself across years — or to anything else in
+/// this repository, which uses the padded form — silently matches nothing for whichever half is
 /// written the other way.
 fn sponsor_key(raw: &str) -> Option<String> {
     let trimmed = raw.trim().trim_start_matches('0');
@@ -485,9 +488,9 @@ fn without_comma(raw: &str) -> String {
 /// How closely a row's counts must reproduce the percentage printed beside them.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Reproduces {
-    /// Through FY2014, to a hundredth of a percentage point — which those files hold exactly.
+    /// Through October 2014, to a hundredth of a percentage point — which those files hold exactly.
     ToTheHundredth,
-    /// From FY2015, to one pupil.
+    /// From October 2015, to one pupil.
     ///
     /// Two reasons, and both are properties of the publication rather than slack chosen to make
     /// a test pass. The percentages are printed to four decimals of a *fraction*, so at a site of
@@ -538,8 +541,8 @@ fn check_reported_share(site: &Site, label: &str, how: Reproduces) -> Result<(),
 ///
 /// # What the spellings mean, measured rather than assumed
 ///
-/// Three non-numeric spellings appear in the application columns from FY2015 and they do **not**
-/// mean the same thing:
+/// Three non-numeric spellings appear in the application columns from October 2015 and they do
+/// **not** mean the same thing:
 ///
 /// - **`-`.** Recovers **0 in all 133 cases** in October 2016. Not a mask: the department writing
 ///   a dash where the count is none. A community row says the same thing in words — the Notes
@@ -560,7 +563,7 @@ fn is_masked(cell: &str) -> bool {
 
 /// Split one October's workbook into the filings it holds.
 ///
-/// From FY2015 the report is one file again and the stream is a column, so this is where the
+/// From October 2015 the report is one file again and the stream is a column, so this is where the
 /// three come back apart. A stream with no rows is not emitted: October 2021 has **no Provision 2
 /// filing at all**, and an empty filing would trip the site floor as though the parser had failed.
 ///
@@ -633,22 +636,23 @@ pub fn workbook_filings<'a>(
         .collect())
 }
 
-/// FY2015 onward: one October's workbook, already split to one stream's rows.
+/// October 2015 onward: one October's workbook, already split to one stream's rows.
 ///
 /// # What the workbook says that the delimited files did not
 ///
 /// Its Notes sheet states the community-eligibility rule outright — *"CEP eligible students are
 /// multiplied by 1.6 in order to account for underestimation of eligible students from direct
 /// certification. ((CEP eligible students \*1.6)/CE)"*. That is exactly the `claimable` quantity
-/// [`build_mr81`] computes, and which this repository had previously *measured* off the FY2014
-/// file rather than read anywhere. The publisher now says it, so the ceiling half of the corpus's
-/// band is the programme's own arithmetic rather than an inference from 735 rows.
+/// [`build_mr81`] computes, and which this repository had previously *measured* off the October
+/// 2014 file rather than read anywhere. The publisher now says it, so the ceiling half of the
+/// corpus's band is the programme's own arithmetic rather than an inference from 735 rows.
 ///
 /// # Two things the sheet does not carry
 ///
 /// **No sponsor type.** The delimited files had a `SponsorType` column and these do not, so the
-/// type comes from `identity` — the same lookup the printed FY2013 file uses — and a sponsor that
-/// appears for the first time after FY2014 is written `Unknown`, as FY1998-FY2000 are.
+/// type comes from `identity` — the same lookup the printed October 2013 file uses — and a sponsor
+/// that appears for the first time after October 2014 is written `Unknown`, as Octobers 1998-2000
+/// are.
 ///
 /// **A percentage rather than a share.** `Percent Free and Reduced Price Lunch` is `0.5154` where
 /// the delimited files printed `51.54`, so it is scaled here before
@@ -729,18 +733,18 @@ fn workbook_sites(
     Ok(sites)
 }
 
-/// FY2001-FY2014, one row per site, and which denominator the file is on.
+/// Octobers 2001-2014, one row per site, and which denominator the file is on.
 fn delimited_sites(text: &str, label: &str) -> Result<(Vec<Site>, &'static str), String> {
     let mut lines = text.lines();
     let header_line = lines.next().unwrap_or_default();
-    // FY2001 is comma-delimited and every later year is tab. Sniffed rather than tabulated,
+    // October 2001 is comma-delimited and every later year is tab. Sniffed rather than tabulated,
     // because the delimiter is visible in the file and a table is another thing to maintain.
     let delimiter = if header_line.contains('\t') {
         '\t'
     } else {
         ','
     };
-    // The FY2012 community file's header carries an empty column before `CEOEligibleStudents`
+    // The October 2012 community file's header carries an empty column before `CEOEligibleStudents`
     // that its data rows do not, so the header is one wider than every row beneath it. Dropped
     // here, because a name resolved against it would point one past the end of the data.
     let head: Vec<String> = delimited_fields(header_line, delimiter)
@@ -787,7 +791,7 @@ fn delimited_sites(text: &str, label: &str) -> Result<(Vec<Site>, &'static str),
             reduced: number(reduced),
             identified: identified.map_or(0, number),
             reported_share: field(share).parse::<f64>().unwrap_or(0.0),
-            // Nothing before FY2015 is censored: these files print every count.
+            // Nothing before October 2015 is censored: these files print every count.
             censored: 0,
         });
     }
@@ -796,7 +800,7 @@ fn delimited_sites(text: &str, label: &str) -> Result<(Vec<Site>, &'static str),
 
 /// Put a row back together when an unquoted name has split across the delimiter.
 ///
-/// Nine FY2001 rows do this and nothing else in the panel does. The repair anchors from the
+/// Nine October 2001 rows do this and nothing else in the panel does. The repair anchors from the
 /// right, where the shape is fixed — site IRN, kitchen type, base IRN and six figures close every
 /// row — and finds the sponsor type in what is left, since it comes from a four-word vocabulary
 /// no school name collides with. What precedes the type is the sponsor's name and what follows it
@@ -838,7 +842,7 @@ fn rejoin(fields: Vec<String>, expected: usize) -> Vec<String> {
     }
 }
 
-/// FY1998-FY2000, one fixed-width row per school with its district named on it.
+/// Octobers 1998-2000, one fixed-width row per school with its district named on it.
 ///
 /// The header names fourteen columns and the rows are 170 characters with the separators at the
 /// same offsets throughout, so the fields are taken by offset. `% REDU` is misnamed in that
@@ -904,15 +908,15 @@ fn school_centric_sites(text: &str, label: &str) -> Result<Vec<Site>, String> {
             sponsor_irn: key,
             sponsor_name: without_comma(at(DISTRICT).trim_end_matches('.')),
             county: without_comma(&at(COUNTY)),
-            // These files have no sponsor type. Resolved from FY2001 downstream, where the same
-            // district carries the same number; left visible rather than guessed at here.
+            // These files have no sponsor type. Resolved from October 2001 downstream, where the
+            // same district carries the same number; left visible rather than guessed at here.
             kind: "Unknown".to_string(),
             enrollment: number(ADM),
             free: number(FREE),
             reduced: number(REDUCED),
             identified: 0,
             reported_share: at(SHARE).parse::<f64>().unwrap_or(0.0),
-            // Nothing before FY2015 is censored: these files print every count.
+            // Nothing before October 2015 is censored: these files print every count.
             censored: 0,
         });
     }
@@ -924,7 +928,7 @@ fn school_centric_sites(text: &str, label: &str) -> Result<Vec<Site>, String> {
 
 /// The printed report, for the one stream-year published no other way.
 ///
-/// FY2013's community file is posted rendered and not delimited, so this reads the rendering.
+/// October 2013's community file is posted rendered and not delimited, so this reads the rendering.
 /// Both the per-sponsor and the statewide totals it prints are recomputed against what was
 /// parsed, so a row this misses is an error rather than a quietly smaller number — which is how
 /// the two sites whose IRN is printed seven digits wide instead of eight were found.
@@ -1003,7 +1007,7 @@ fn printed_sites(text: &str, identity: &Identity, label: &str) -> Result<Vec<Sit
             reduced: number(2),
             identified: number(6),
             reported_share: figures[5].parse::<f64>().unwrap_or(0.0),
-            // Nothing before FY2015 is censored: these files print every count.
+            // Nothing before October 2015 is censored: these files print every count.
             censored: 0,
         });
     }

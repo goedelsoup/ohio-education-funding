@@ -17,15 +17,15 @@ test.describe("the count the poverty weight is paid on", () => {
     await page.goto("/history");
     const card = page.locator(".card", { hasText: "What the poverty weight is counted on" });
     await expect(card).toBeVisible();
-    await expect(card).toContainText("FY1998");
-    await expect(card).toContainText("FY2014");
+    await expect(card).toContainText("FY1999");
+    await expect(card).toContainText("FY2015");
   });
 
   test("the break in the denominator is stated where the chart is, not in a footnote", async ({
     page,
   }) => {
     /*
-     * The share steps up at FY2010 and part of that step is the divisor changing definition. A
+     * The share steps up at FY2011 and part of that step is the divisor changing definition. A
      * reader who takes the eleven years as one trend gets a number nothing in the source supports,
      * so the page has to refuse the reading before the eye has finished drawing the line.
      */
@@ -105,7 +105,7 @@ test.describe("the count the poverty weight is paid on", () => {
     page,
   }) => {
     /*
-     * The finding this extension exists for. From FY2012 only one of the three files still
+     * The finding this extension exists for. From FY2013 only one of the three files still
      * counts applications, so the table has to print a band rather than a figure — and the page
      * has to say that the figure a reader could compute instead would read as poverty
      * collapsing.

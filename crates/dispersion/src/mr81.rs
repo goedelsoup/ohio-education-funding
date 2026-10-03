@@ -12,12 +12,12 @@
 //!
 //! # Four things that will produce a wrong reading
 //!
-//! **The denominator changes definition in FY2010.** `AdmCount` becomes `CECount` — "the highest
-//! daily number of students with access to the program" — which is neither ADM nor the count that
-//! preceded it. [`Sponsor::basis`] carries which, and [`poverty_share_by_year`] reports it, so a
-//! series crossing FY2009 is spliced knowingly or not at all.
+//! **The denominator changes definition in October 2010.** `AdmCount` becomes `CECount` — "the
+//! highest daily number of students with access to the program" — which is neither ADM nor the
+//! count that preceded it. [`Sponsor::basis`] carries which, and [`poverty_share_by_year`] reports
+//! it, so a series crossing October 2009 is spliced knowingly or not at all.
 //!
-//! **The report becomes three reports in FY2012, and they do not count the same thing.** The
+//! **The report becomes three reports in October 2012, and they do not count the same thing.** The
 //! Traditional file collects applications and says in its own header that it excludes the other
 //! two. Provision 2 reports applications frozen at a base year. Community eligibility collects no
 //! applications at all: its approval columns are zero by construction. Adding the three gives a
@@ -30,28 +30,29 @@
 //! and community schools as well as traditional districts, and the report also carries non-public
 //! schools, residential child care institutions and camps. The sponsor count rising from 718 to
 //! 973 across the window is mostly community schools opening, not districts appearing. It is 973
-//! and not the 1,001 rows FY2014 carries, because from FY2012 a sponsor may file in more than one
-//! stream — see [`PovertyYear::sponsors`], which counts bodies, and [`PovertyYear::filings`],
-//! which counts returns.
+//! and not the 1,001 rows October 2014 carries, because from October 2012 a sponsor may file in
+//! more than one stream — see [`PovertyYear::sponsors`], which counts bodies, and
+//! [`PovertyYear::filings`], which counts returns.
 //!
-//! **The first three Octobers do not state a type at all.** FY1998-FY2000 are one row per school
-//! with the district on it and no sponsor-type column anywhere, so the extract writes `Unknown`
-//! and [`resolved_kind`] supplies the type from FY2001. Some thirty-five sponsors a year are not
-//! in FY2001 and stay `Unknown` — children's services boards, camps, parish schools and one
-//! renamed career centre, carrying eight thousand pupils between them against 1.8 million.
+//! **The first three Octobers do not state a type at all.** Octobers 1998-2000 are one row per
+//! school with the district on it and no sponsor-type column anywhere, so the extract writes
+//! `Unknown` and [`resolved_kind`] supplies the type from October 2001. Some thirty-five sponsors a
+//! year are not in October 2001 and stay `Unknown` — children's services boards, camps, parish
+//! schools and one renamed career centre, carrying eight thousand pupils between them against 1.8
+//! million.
 //!
 //! # One published cell is wrong by two orders of magnitude, and three others were ours
 //!
-//! See [`implausible_sponsors`]: the FY2005 file gives Wilson Elementary School an `AdmCount` of
-//! 342,332, which puts Portsmouth City at 344,048 students across nine sites. The extractor
+//! See [`implausible_sponsors`]: the October 2005 file gives Wilson Elementary School an `AdmCount`
+//! of 342,332, which puts Portsmouth City at 344,048 students across nine sites. The extractor
 //! transcribes it, because an extractor that quietly repairs its source is worse than one that
-//! ships a visible error — but nothing should aggregate FY2005 without excluding it.
+//! ships a visible error — but nothing should aggregate October 2005 without excluding it.
 //!
 //! That list used to hold four sponsor-years, and the other three were this repository's doing.
-//! FY2001 is the only comma-delimited file; nine of its rows carry a comma inside a school name;
-//! and split positionally those rows put a site IRN into the enrollment column. Two were Cleveland
-//! City SD, which reached the aggregate as 192,147 students against its real 73,562 and held the
-//! published FY2001 poverty share 1.8 points below what the file says.
+//! October 2001 is the only comma-delimited file; nine of its rows carry a comma inside a school
+//! name; and split positionally those rows put a site IRN into the enrollment column. Two were
+//! Cleveland City SD, which reached the aggregate as 192,147 students against its real 73,562 and
+//! held the published October 2001 poverty share 1.8 points below what the file says.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::OnceLock;
@@ -93,14 +94,14 @@ pub struct Sponsor {
     /// What kind of sponsor: `Public`, `Non-Public`, two smaller kinds, and `Unknown` for the
     /// three Octobers whose files carry no type column.
     pub kind: String,
-    /// Which publication this row came from: `single` through FY2011, then `traditional`,
+    /// Which publication this row came from: `single` through October 2011, then `traditional`,
     /// `provision2` or `community`.
     pub stream: String,
     /// How many school sites the sponsor reported.
     pub sites: usize,
-    /// The meal-program denominator, whose definition changes in FY2010.
+    /// The meal-program denominator, whose definition changes in October 2010.
     pub enrollment: f64,
-    /// `adm` through FY2009, `ce` from FY2010.
+    /// `adm` through October 2009, `ce` from October 2010.
     pub basis: String,
     /// Free lunch applications. Zero for every community-eligibility row, because those sponsors
     /// collect none.
@@ -114,9 +115,9 @@ pub struct Sponsor {
     pub claimable: f64,
     /// How many of this sponsor-year's application cells the publisher printed as `<10`.
     ///
-    /// Zero for every October through FY2014, which masks nothing. From FY2015 a count is masked
-    /// when either half of the free/reduced pair falls under ten — **not** when the cell itself
-    /// does, which is why it is not a bound. The extractor recovers the number from the
+    /// Zero for every October through October 2014, which masks nothing. From October 2015 a count
+    /// is masked when either half of the free/reduced pair falls under ten — **not** when the cell
+    /// itself does, which is why it is not a bound. The extractor recovers the number from the
     /// percentage the workbook prints beside it, on an identity that reproduces all 42,983
     /// unmasked cells exactly, so the counts here are the publisher's own. This column says how
     /// many of them arrived by the second route.
@@ -164,7 +165,7 @@ fn parse() -> Vec<Sponsor> {
         .collect()
 }
 
-/// Sponsor type by IRN, as FY2001 states it.
+/// Sponsor type by IRN, as October 2001 states it.
 ///
 /// The three school-centric Octobers before it are one row per school with the district named and
 /// numbered on the row and **no sponsor-type column at all**. Ohio's meal-program sponsors are not
@@ -172,11 +173,11 @@ fn parse() -> Vec<Sponsor> {
 /// and every non-public school in the state are in the same file — so a poverty series that does
 /// not distinguish them is not a series of anything.
 ///
-/// FY2001 rather than the whole panel, and rather than a guess from the IRN's range. It is the
-/// adjacent October, it numbers districts the same way, and asking one year avoids inheriting an
-/// answer from a decade later when an IRN has been reused. What it costs is about twenty sponsors
-/// a year that had gone by 2001 — three thousand pupils between them, against 1.8 million — and
-/// those stay `Unknown` rather than being assigned a type nothing states.
+/// October 2001 rather than the whole panel, and rather than a guess from the IRN's range. It is
+/// the adjacent October, it numbers districts the same way, and asking one year avoids inheriting
+/// an answer from a decade later when an IRN has been reused. What it costs is about twenty
+/// sponsors a year that had gone by 2001 — three thousand pupils between them, against 1.8 million
+/// — and those stay `Unknown` rather than being assigned a type nothing states.
 #[must_use]
 pub fn types_in_2001() -> BTreeMap<String, String> {
     panel()
@@ -186,8 +187,8 @@ pub fn types_in_2001() -> BTreeMap<String, String> {
         .collect()
 }
 
-/// The sponsor's type, from its own row where the file states one and from FY2001 where it does
-/// not.
+/// The sponsor's type, from its own row where the file states one and from October 2001 where it
+/// does not.
 #[must_use]
 pub fn resolved_kind<'a>(sponsor: &'a Sponsor, types: &'a BTreeMap<String, String>) -> &'a str {
     if sponsor.kind == "Unknown" {
@@ -220,15 +221,15 @@ pub fn implausible_sponsors() -> Vec<Sponsor> {
 pub struct PovertyYear {
     /// Public sponsors counted — **distinct entities**, not rows.
     ///
-    /// From FY2012 the report is three files and a sponsor may file in more than one of them, so
-    /// the rows are filings and counting them counts the same body twice. This was that count
-    /// until it was corrected: it published 1,001 public sponsors for FY2014 where 973 exist, and
-    /// turned the FY2011-FY2014 rise of 2.5% into one of 5.5%, which is the growth of *filings*
-    /// wearing the label of the growth of *sponsors*. See [`Self::filings`].
+    /// From October 2012 the report is three files and a sponsor may file in more than one of them,
+    /// so the rows are filings and counting them counts the same body twice. This was that count
+    /// until it was corrected: it published 1,001 public sponsors for October 2014 where 973 exist,
+    /// and turned the Octobers 2011-2014 rise of 2.5% into one of 5.5%, which is the growth of
+    /// *filings* wearing the label of the growth of *sponsors*. See [`Self::filings`].
     pub sponsors: usize,
     /// Rows the year is summed over: one per sponsor per stream.
     ///
-    /// Equal to [`Self::sponsors`] through FY2011 and above it after. Carried rather than
+    /// Equal to [`Self::sponsors`] through October 2011 and above it after. Carried rather than
     /// dropped, because it is the right denominator for a question about the report — how many
     /// returns were filed — and the wrong one for every question about Ohio, and the two were
     /// indistinguishable while only one number was published.
@@ -238,7 +239,7 @@ pub struct PovertyYear {
     /// Free and reduced approvals, summed over those sponsors.
     pub approved: f64,
     /// Directly certified children under community eligibility, where the sponsor collects no
-    /// applications. Zero before FY2012.
+    /// applications. Zero before October 2012.
     pub identified: f64,
     /// Whether this October's filings are a reading of the state at all.
     ///
@@ -251,9 +252,9 @@ pub struct PovertyYear {
     pub claimable: f64,
     /// Approvals as a share of enrollment.
     ///
-    /// **This is the poverty share only while the report is one file.** From FY2012 it divides
-    /// applications by an enrollment that includes sponsors who collect none, so it falls as
-    /// community eligibility spreads and would read as poverty falling. Kept because it is what
+    /// **This is the poverty share only while the report is one file.** From October 2012 it
+    /// divides applications by an enrollment that includes sponsors who collect none, so it falls
+    /// as community eligibility spreads and would read as poverty falling. Kept because it is what
     /// a naive extension of the series produces, and a test holds how far wrong it goes.
     pub applications_share: f64,
     /// The lowest share the source supports: approvals plus directly certified children.
@@ -271,21 +272,21 @@ pub struct PovertyYear {
     pub ceiling: f64,
     /// The poverty share, where the source supports one number.
     ///
-    /// `None` from FY2012, and that is the finding rather than a gap. The three publications count
-    /// three different things, so an October published as three files has a band and does not have
-    /// a share. Every consumer that wants one line has to decide what to do about that, which is
-    /// the decision this field exists to force rather than to make.
+    /// `None` from October 2012, and that is the finding rather than a gap. The three publications
+    /// count three different things, so an October published as three files has a band and does not
+    /// have a share. Every consumer that wants one line has to decide what to do about that, which
+    /// is the decision this field exists to force rather than to make.
     pub share: Option<f64>,
     /// The share of the October's enrollment under sponsors that collect no applications.
     ///
-    /// Zero before FY2012 and a sixth by FY2014. This is the size of the hole in
+    /// Zero before October 2012 and a sixth by October 2014. This is the size of the hole in
     /// [`Self::applications_share`], and the reason the hole grows is that community eligibility
     /// is open to schools whose poverty is already high — so the population leaving the
     /// applications-based measure is not a random sample of it.
     pub without_applications: f64,
     /// Whether the denominator that year is `adm` or `ce`.
     pub basis_is_ce: bool,
-    /// How many publications the October was split across: one through FY2011, three after.
+    /// How many publications the October was split across: one through October 2011, three after.
     pub streams: usize,
 }
 
@@ -302,8 +303,8 @@ pub fn poverty_share_by_year() -> BTreeMap<u16, PovertyYear> {
     let types = types_in_2001();
 
     // The fifth slot is the set of sponsor IRNs. A sponsor that files in two of the three
-    // post-FY2011 streams is two rows and one body: the sums want both rows, and the count wants
-    // one entry, and keeping the set is the only way to have both.
+    // post-October 2011 streams is two rows and one body: the sums want both rows, and the count
+    // wants one entry, and keeping the set is the only way to have both.
     type Totals = (PovertyYear, BTreeSet<String>, bool, f64, BTreeSet<String>);
     let mut totals: BTreeMap<u16, Totals> = BTreeMap::new();
     for s in panel() {
@@ -339,7 +340,7 @@ pub fn poverty_share_by_year() -> BTreeMap<u16, PovertyYear> {
             totals.comparable = !WAIVER_OCTOBERS.contains(&year);
             // One file, one share. The three readings coincide there because `identified` is
             // zero and `claimable` is the approvals, so which of them is written is arbitrary —
-            // what is not arbitrary is that from FY2012 there is nothing to write.
+            // what is not arbitrary is that from October 2012 there is nothing to write.
             totals.share = (totals.streams == 1).then_some(totals.ceiling);
             (year, totals)
         })
@@ -364,9 +365,9 @@ pub struct StreamYear {
 /// Public sponsors by stream, for the three Octobers the report is published as three files.
 ///
 /// The number this exists for is `community.of_enrollment`: a fourteenth of Ohio's public
-/// meal-program enrollment in FY2012 and a sixth by FY2014. That is the population that left the
-/// applications-based measure, and it left because its poverty was high enough to qualify for
-/// feeding every child without asking.
+/// meal-program enrollment in October 2012 and a sixth by October 2014. That is the population that
+/// left the applications-based measure, and it left because its poverty was high enough to qualify
+/// for feeding every child without asking.
 #[must_use]
 pub fn streams_by_year() -> BTreeMap<u16, BTreeMap<String, StreamYear>> {
     let bad: BTreeSet<(u16, String)> = implausible_sponsors()
@@ -425,9 +426,9 @@ mod tests {
     /// The one published defect, pinned by name so a new one cannot hide behind it.
     ///
     /// This test used to assert four, and the other three were a parse defect of this
-    /// repository's own — FY2001 rows whose columns had shifted across an unquoted comma, putting
-    /// site IRNs in the enrollment column. They are gone because the file is now read correctly,
-    /// not because the filter changed.
+    /// repository's own — October 2001 rows whose columns had shifted across an unquoted comma,
+    /// putting site IRNs in the enrollment column. They are gone because the file is now read
+    /// correctly, not because the filter changed.
     #[test]
     fn the_published_defect_is_the_one_known_one() {
         let bad = implausible_sponsors();
@@ -449,9 +450,10 @@ mod tests {
 
     /// The repair, held from the outside: no row's enrollment may be one of the file's own IRNs.
     ///
-    /// The nine shifted FY2001 rows all failed the same way, by reading an eight-digit identifier
-    /// as a count. A site IRN is six or eight digits and a sponsor of that many pupils does not
-    /// exist, so an enrollment that matches a live IRN is the signature rather than the size.
+    /// The nine shifted October 2001 rows all failed the same way, by reading an eight-digit
+    /// identifier as a count. A site IRN is six or eight digits and a sponsor of that many pupils
+    /// does not exist, so an enrollment that matches a live IRN is the signature rather than the
+    /// size.
     #[test]
     fn no_sponsor_reports_an_identifier_as_its_enrollment() {
         let irns: BTreeSet<String> = panel().into_iter().map(|s| s.irn).collect();
@@ -486,17 +488,17 @@ mod tests {
     #[test]
     fn the_poverty_share_rises_across_the_single_stream_window() {
         let by_year = poverty_share_by_year();
-        let first = by_year[&1998].share.expect("FY1998 is one file");
+        let first = by_year[&1998].share.expect("October 1998 is one file");
         let last = by_year[&LAST_SINGLE_STREAM]
             .share
-            .expect("FY2011 is one file");
+            .expect("October 2011 is one file");
         assert!(
             (first - 0.289).abs() < 0.005,
-            "FY1998 share is {first:.4}, not 0.289"
+            "October 1998 share is {first:.4}, not 0.289"
         );
         assert!(
             (last - 0.463).abs() < 0.005,
-            "FY2011 share is {last:.4}, not 0.463"
+            "October 2011 share is {last:.4}, not 0.463"
         );
         assert!(
             last - first > 0.15,
@@ -505,28 +507,31 @@ mod tests {
         );
     }
 
-    /// FY2001 is the year the comma repair moves, and it moves it up.
+    /// October 2001 is the year the comma repair moves, and it moves it up.
     ///
-    /// The published series had FY2001 at 27.7%, below FY2000 and below FY1998, which read as
-    /// poverty falling for three years and then turning. It was two Cleveland rows.
+    /// The published series had October 2001 at 27.7%, below October 2000 and below October 1998,
+    /// which read as poverty falling for three years and then turning. It was two Cleveland rows.
     #[test]
     fn fy2001_is_no_longer_a_trough() {
         let by_year = poverty_share_by_year();
         let share = |year: u16| by_year[&year].share.expect("one file");
         assert!(
             (share(2001) - 0.2946).abs() < 0.002,
-            "FY2001 share is {:.4}, not the 0.2946 the file supports",
+            "October 2001 share is {:.4}, not the 0.2946 the file supports",
             share(2001)
         );
-        assert!(share(2001) > share(2000), "FY2001 is below FY2000 again");
+        assert!(
+            share(2001) > share(2000),
+            "October 2001 is below October 2000 again"
+        );
         assert!(
             by_year[&2001].enrollment < 1_850_000.0,
-            "FY2001 enrollment is {:.0}, which is the inflated figure back",
+            "October 2001 enrollment is {:.0}, which is the inflated figure back",
             by_year[&2001].enrollment
         );
     }
 
-    /// The denominator changes in FY2010 and the panel says so rather than smoothing it.
+    /// The denominator changes in October 2010 and the panel says so rather than smoothing it.
     #[test]
     fn the_denominator_changes_definition_in_2010_and_is_labelled() {
         let by_year = poverty_share_by_year();
@@ -536,7 +541,7 @@ mod tests {
         );
         assert!(
             (2010..=2014).all(|y| by_year[&y].basis_is_ce),
-            "a year from FY2010 is not labelled CE"
+            "a year from October 2010 is not labelled CE"
         );
     }
 
@@ -545,39 +550,40 @@ mod tests {
     /// Summing the three streams' applications gives a share that falls thirteen points in three
     /// years, at the end of a decade in which it rose eighteen. Nothing about poverty happened;
     /// the sponsors most likely to raise the share stopped collecting the forms it is counted
-    /// from. The honest reading is a band, and the band does not fall through FY2011's figure.
+    /// from. The honest reading is a band, and the band does not fall through October 2011's
+    /// figure.
     #[test]
     fn adding_the_three_streams_would_read_as_poverty_collapsing() {
         let by_year = poverty_share_by_year();
         let fy2011 = by_year[&LAST_SINGLE_STREAM]
             .share
-            .expect("FY2011 is one file");
+            .expect("October 2011 is one file");
         let naive = by_year[&2014].applications_share;
         assert!(
             fy2011 - naive > 0.10,
-            "the naive FY2014 share is {naive:.4} against FY2011's {fy2011:.4}, and the collapse \
-             this test is about has stopped happening"
+            "the naive October 2014 share is {naive:.4} against October 2011's {fy2011:.4}, and \
+             the collapse this test is about has stopped happening"
         );
         for year in 2012..=2014 {
             let y = &by_year[&year];
             assert_eq!(
                 y.share, None,
-                "FY{year} is three files and claims one share"
+                "October {year} is three files and claims one share"
             );
             assert!(
                 y.floor <= y.ceiling,
-                "FY{year}'s floor {:.4} is above its ceiling {:.4}",
+                "October {year}'s floor {:.4} is above its ceiling {:.4}",
                 y.floor,
                 y.ceiling
             );
             assert!(
                 y.applications_share < y.floor,
-                "FY{year}'s applications share is no longer the lowest of the three"
+                "October {year}'s applications share is no longer the lowest of the three"
             );
             assert!(
                 y.floor < fy2011 && fy2011 < y.ceiling,
-                "FY{year}'s band [{:.4}, {:.4}] no longer brackets FY2011's {fy2011:.4}, which is \
-                 the whole reason the source cannot settle the direction",
+                "October {year}'s band [{:.4}, {:.4}] no longer brackets October 2011's \
+                 {fy2011:.4}, which is the whole reason the source cannot settle the direction",
                 y.floor,
                 y.ceiling
             );
@@ -590,9 +596,9 @@ mod tests {
         let by_year = poverty_share_by_year();
         for (year, y) in &by_year {
             let single = *year <= LAST_SINGLE_STREAM;
-            assert_eq!(y.share.is_some(), single, "FY{year}");
+            assert_eq!(y.share.is_some(), single, "October {year}");
             /*
-             * Three streams from FY2012 — except October 2021, which has **two**.
+             * Three streams from October 2012 — except October 2021, which has **two**.
              *
              * Under USDA's nationwide free-meal waivers a sponsor could serve every student free
              * without collecting an application, and that October **not one Provision 2 sponsor
@@ -606,12 +612,12 @@ mod tests {
             } else {
                 3
             };
-            assert_eq!(y.streams, expected, "FY{year}");
+            assert_eq!(y.streams, expected, "October {year}");
             if single {
                 assert_eq!(
                     (y.applications_share, y.floor),
                     (y.ceiling, y.ceiling),
-                    "FY{year} is one file and its three readings differ"
+                    "October {year} is one file and its three readings differ"
                 );
             }
         }
@@ -622,19 +628,19 @@ mod tests {
     fn the_sponsor_count_counts_bodies_and_the_filing_count_counts_returns() {
         let years = poverty_share_by_year();
 
-        // Through FY2011 the report is one file, so every sponsor files once and the two counts
-        // are the same number. That is what made the error invisible for the fourteen years
+        // Through October 2011 the report is one file, so every sponsor files once and the two
+        // counts are the same number. That is what made the error invisible for the fourteen years
         // before it started being wrong.
         for year in 1998..=LAST_SINGLE_STREAM {
             assert_eq!(
                 years[&year].sponsors, years[&year].filings,
-                "FY{year} is one file and cannot have a sponsor filing twice"
+                "October {year} is one file and cannot have a sponsor filing twice"
             );
         }
 
-        // And from FY2012 they separate. 1,001 was published as a sponsor count for FY2014; it is
-        // the number of returns filed, and 28 of them are a second return from a body already
-        // counted.
+        // And from October 2012 they separate. 1,001 was published as a sponsor count for October
+        // 2014; it is the number of returns filed, and 28 of them are a second return from a body
+        // already counted.
         assert_eq!(years[&2014].filings, 1_001);
         assert_eq!(years[&2014].sponsors, 973);
         assert!(
@@ -650,7 +656,7 @@ mod tests {
         let (bodies, returns) = (growth(|y| y.sponsors), growth(|y| y.filings));
         assert!(
             (bodies - 0.0253).abs() < 0.0005 && (returns - 0.0548).abs() < 0.0005,
-            "FY2011-FY2014: {bodies:.4} of sponsors against {returns:.4} of filings"
+            "Octobers 2011-2014: {bodies:.4} of sponsors against {returns:.4} of filings"
         );
         assert!(returns > bodies * 2.0);
 
@@ -670,12 +676,12 @@ mod tests {
         let share = |year: u16| streams[&year]["community"].of_enrollment;
         assert!(
             (share(2012) - 0.070).abs() < 0.005,
-            "FY2012 community share is {:.4}, not 0.070",
+            "October 2012 community share is {:.4}, not 0.070",
             share(2012)
         );
         assert!(
             (share(2014) - 0.166).abs() < 0.005,
-            "FY2014 community share is {:.4}, not 0.166",
+            "October 2014 community share is {:.4}, not 0.166",
             share(2014)
         );
         assert!(share(2012) < share(2013) && share(2013) < share(2014));
@@ -685,7 +691,7 @@ mod tests {
         for year in 2012..=2014 {
             assert!(
                 (by_year[&year].without_applications - share(year)).abs() < 1e-9,
-                "FY{year}: the year says {:.6} and the streams say {:.6}",
+                "October {year}: the year says {:.6} and the streams say {:.6}",
                 by_year[&year].without_applications,
                 share(year)
             );
@@ -701,15 +707,15 @@ mod tests {
             assert_eq!(
                 by_stream.len(),
                 if *year == 2021 { 2 } else { 3 },
-                "FY{year} does not carry the streams it should"
+                "October {year} does not carry the streams it should"
             );
             assert_eq!(
                 by_stream["community"].approved, 0.0,
-                "FY{year}'s community sponsors report approvals, which they cannot collect"
+                "October {year}'s community sponsors report approvals, which they cannot collect"
             );
             assert_eq!(
                 by_stream["traditional"].identified, 0.0,
-                "FY{year}'s traditional file reports directly certified children"
+                "October {year}'s traditional file reports directly certified children"
             );
         }
     }
@@ -725,12 +731,12 @@ mod tests {
             let y = &by_year[&year];
             assert!(
                 !y.comparable,
-                "FY{year} should not be drawn with its neighbours"
+                "October {year} should not be drawn with its neighbours"
             );
             // A third of the sponsors and a quarter of the pupils the years either side carry.
             assert!(
                 y.sponsors < by_year[&2019].sponsors / 2,
-                "FY{year} has {} sponsors against FY2019's {}",
+                "October {year} has {} sponsors against October 2019's {}",
                 y.sponsors,
                 by_year[&2019].sponsors
             );
@@ -738,7 +744,7 @@ mod tests {
             // And the floor reads far above the years on either side, which is the defect.
             assert!(
                 y.floor > by_year[&2019].floor + 0.15 && y.floor > by_year[&2022].floor + 0.15,
-                "FY{year}'s floor of {:.4} is not the outlier this test is about",
+                "October {year}'s floor of {:.4} is not the outlier this test is about",
                 y.floor
             );
         }
@@ -751,16 +757,20 @@ mod tests {
         );
     }
 
-    /// The three Octobers with no type column of their own, and what borrowing FY2001 costs.
+    /// The three Octobers with no type column of their own, and what borrowing October 2001 costs.
     #[test]
     fn the_school_centric_years_borrow_their_sponsor_types() {
         let types = types_in_2001();
-        assert!(types.len() > 1_000, "FY2001 names {} sponsors", types.len());
+        assert!(
+            types.len() > 1_000,
+            "October 2001 names {} sponsors",
+            types.len()
+        );
         for year in 1998..=2000 {
             let rows: Vec<Sponsor> = panel().into_iter().filter(|s| s.year == year).collect();
             assert!(
                 rows.iter().all(|s| s.kind == "Unknown"),
-                "FY{year} states a sponsor type, so it should not be borrowing one"
+                "October {year} states a sponsor type, so it should not be borrowing one"
             );
             let unresolved: Vec<&Sponsor> = rows
                 .iter()
@@ -768,7 +778,7 @@ mod tests {
                 .collect();
             assert!(
                 unresolved.len() < 50,
-                "FY{year} leaves {} sponsors untyped",
+                "October {year} leaves {} sponsors untyped",
                 unresolved.len()
             );
             // Half a per cent of the October. Bounded rather than pinned, and bounded tightly:
@@ -777,7 +787,7 @@ mod tests {
             let lost: f64 = unresolved.iter().map(|s| s.enrollment).sum();
             assert!(
                 lost < 10_000.0,
-                "FY{year} leaves {lost:.0} pupils under an untyped sponsor"
+                "October {year} leaves {lost:.0} pupils under an untyped sponsor"
             );
         }
     }

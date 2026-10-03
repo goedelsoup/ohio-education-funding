@@ -30,12 +30,12 @@ findings: |
   does not begin where the narration puts it. It begins after FY2009, in the biennium that enacted
   the Evidence-Based Model.
 
-  ### Poverty crossed 40% here
+  ### Poverty neared 40% here
 
-  **39.6% then 42.6%** approved for free or reduced-price meals, over 896 and 913 sponsors — up
-  **11.4 points from FY2002**, on one unbroken basis. [verified] (`mr81-sponsor-panel.csv`) FY2009
-  is the last year of that basis; the department moves to a different one in FY2010 and the two
-  cannot be compared directly.
+  **36.6% then 39.6%** approved for free or reduced-price meals, over 883 and 896 sponsors — up
+  **10.1 points from FY2002**, on one unbroken basis. [verified] (`mr81-sponsor-panel.csv`) It
+  passes 40% the year after, at 42.6% in FY2010, the last year of that basis; the department moves
+  to a different one in FY2011 and the two cannot be compared directly.
 properties:
   label: FY2008-2009
   kind: biennium

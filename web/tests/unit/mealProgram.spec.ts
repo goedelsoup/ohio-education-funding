@@ -2,10 +2,10 @@
  * The meal-program series, and the two ways it misleads that the other long series do not.
  *
  * `history` can mislead by population, by dollars, and by a hole in the middle. This one has two
- * further failures available to it. Its denominator changes definition at FY2010, so a chart that
+ * further failures available to it. Its denominator changes definition at FY2011, so a chart that
  * draws it as a single line reports a step in the data that is partly a step in the divisor. And
- * from FY2012 the report is published as three files of which only one counts applications, so a
- * line joined across FY2011 falls thirteen points for a reason that is not poverty.
+ * from FY2013 the report is published as three files of which only one counts applications, so a
+ * line joined across FY2012 falls thirteen points for a reason that is not poverty.
  *
  * Every test here is about keeping both breaks visible.
  */
@@ -15,6 +15,7 @@ import { expect, test } from "vitest";
 import { loadFeed } from "../../src/lib/feed.ts";
 import {
   basisChange,
+  dekEnds,
   renderMealProgram,
   singleStream,
   splitByBasis,
@@ -31,8 +32,8 @@ test("the feed carries the series at all", () => {
   // October 2014 — the Internet Archive holds nothing later either — but the report moved to the
   // department's own page and has been published every year since. See #16.
   expect(meal.length).toBe(28);
-  expect(meal[0]!.fiscal_year).toBe(1998);
-  expect(meal[meal.length - 1]!.fiscal_year).toBe(2025);
+  expect(meal[0]!.fiscal_year).toBe(1999);
+  expect(meal[meal.length - 1]!.fiscal_year).toBe(2026);
 });
 
 test("years are ordered and unique, because a chart reads them as an axis", () => {
@@ -60,9 +61,9 @@ test("the split years carry a band and no share, and the band is checkable too",
    * not, and either would be read as a number.
    */
   const split = splitStream(meal);
-  // Every October from FY2012 except the two waiver years, which `splitStream` holds out.
+  // Every October from FY2013 except the two waiver years, which `splitStream` holds out.
   expect(split.map((y) => y.fiscal_year)).toEqual([
-    2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2022, 2023, 2024, 2025,
+    2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2023, 2024, 2025, 2026,
   ]);
   for (const y of split) {
     expect(y.share, `FY${y.fiscal_year}`).toBeNull();
@@ -81,10 +82,10 @@ test("the split years carry a band and no share, and the band is checkable too",
 /**
  * The direction the source cannot settle — and the three Octobers where it can.
  *
- * For six years after the split the band contains FY2011's share, which is what made the level
- * readable and the direction not. Eleven more Octobers changed that: in **FY2018, FY2019 and
- * FY2022 the whole band sits below FY2011**, so on any reading the measured need had fallen. Then
- * community eligibility widens again — 1,082 sites in FY2023 against 1,638 in FY2024 — the ceiling
+ * For six years after the split the band contains FY2012's share, which is what made the level
+ * readable and the direction not. Eleven more Octobers changed that: in **FY2019, FY2020 and
+ * FY2023 the whole band sits below FY2012**, so on any reading the measured need had fallen. Then
+ * community eligibility widens again — 1,082 sites in FY2024 against 1,638 in FY2025 — the ceiling
  * rises with it, and the band brackets once more.
  *
  * Both halves are asserted. A test that only held the bracketing would have quietly stopped being
@@ -95,10 +96,10 @@ test("the band brackets the last year that has a share, except in three Octobers
   const clears = splitStream(meal)
     .filter((y) => y.ceiling < last.share!)
     .map((y) => y.fiscal_year);
-  expect(clears, "the years the source does settle the direction for").toEqual([2018, 2019, 2022]);
+  expect(clears, "the years the source does settle the direction for").toEqual([2019, 2020, 2023]);
 
   for (const y of splitStream(meal)) {
-    // The floor is under FY2011 in every one of them: the level never reads as having risen.
+    // The floor is under FY2012 in every one of them: the level never reads as having risen.
     expect(y.floor, `FY${y.fiscal_year}`).toBeLessThan(last.share!);
     if (!clears.includes(y.fiscal_year)) {
       expect(y.ceiling, `FY${y.fiscal_year}`).toBeGreaterThan(last.share!);
@@ -107,7 +108,7 @@ test("the band brackets the last year that has a share, except in three Octobers
 });
 
 test("the population that stopped filing grows, and the feed says how much", () => {
-  // A sixth of the enrollment by FY2014, from nothing three years earlier. This is the size of
+  // A sixth of the enrollment by FY2015, from nothing three years earlier. This is the size of
   // the hole in `approved`, and it is the reason the naive series falls.
   const split = splitStream(meal);
   expect(split[0]!.without_applications).toBeGreaterThan(0.05);
@@ -118,14 +119,14 @@ test("the population that stopped filing grows, and the feed says how much", () 
   }
 });
 
-test("the denominator changes exactly once, at FY2010", () => {
-  expect(basisChange(meal)).toBe(2010);
+test("the denominator changes exactly once, at FY2011", () => {
+  expect(basisChange(meal)).toBe(2011);
   expect(meal.filter((y) => y.basis === "adm").map((y) => y.fiscal_year)).toEqual([
-    1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+    1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
   ]);
   expect(meal.filter((y) => y.basis === "ce").map((y) => y.fiscal_year)).toEqual([
-    2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024,
-    2025,
+    2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025,
+    2026,
   ]);
 });
 
@@ -134,7 +135,7 @@ test("the two eras are two series with nothing joining them", () => {
    * The load-bearing test. `a` and `b` must never both be non-null in one year: if they were,
    * the chart would connect the eras and draw a continuous line across a redefinition. A single
    * series with a null gap would be wrong in the other direction — a gap says "not measured",
-   * and FY2010 was measured, on something else.
+   * and FY2011 was measured, on something else.
    */
   const points = splitByBasis(meal);
   expect(points.length).toBe(singleStream(meal).length);
@@ -151,7 +152,7 @@ test("the split years are not on the chart at all", () => {
   // Neither bound is plottable: drawing the floor asserts poverty fell, drawing the ceiling
   // asserts it rose, and drawing their midpoint asserts a precision nothing supports.
   const years = splitByBasis(meal).map((p) => p.at);
-  expect(years.at(-1)).toBe(2011);
+  expect(years.at(-1)).toBe(2012);
   for (const y of splitStream(meal)) expect(years).not.toContain(y.fiscal_year);
 });
 
@@ -166,7 +167,7 @@ test("the page says the two lines are not one line", () => {
 
 test("the page says why the line stops before the data does", () => {
   /*
-   * A chart that simply ended at FY2011 would read as the archive ending there. It does not:
+   * A chart that simply ended at FY2012 would read as the archive ending there. It does not:
    * three more Octobers exist and are in the table. The page has to account for the difference,
    * or the most interesting thing about the source is invisible.
    */
@@ -175,7 +176,7 @@ test("the page says why the line stops before the data does", () => {
   expect(html).toContain("community\n        eligibility");
   expect(html).toContain("poverty collapsing");
   // The band is quoted with both ends, and the table prints it as a range rather than a figure.
-  // The band is quoted with both ends of the *last comparable* October, which is FY2025.
+  // The band is quoted with both ends of the *last comparable* October, which is FY2026.
   expect(html).toMatch(/44\.5% to 55\.9%/);
   // And the two waiver Octobers are named, in the table and in a paragraph of their own.
   expect(html).toContain("not the state");
@@ -205,8 +206,8 @@ test("a feed without the series renders nothing rather than an empty chart", () 
 /**
  * A series that changes how it counts must show the break in the table, not only in the chart.
  *
- * The chart has split this into two series since it was built — `AdmCount` through FY2009,
- * `CECount` from FY2010 — because "the share steps up across it" and a line drawn through is a
+ * The chart has split this into two series since it was built — `AdmCount` through FY2010,
+ * `CECount` from FY2011 — because "the share steps up across it" and a line drawn through is a
  * lie. The table beside it ran straight through the same break, carrying the distinction only in a
  * per-row "Counted on" cell, which a reader meets after the eye has already gone down the column.
  *
@@ -227,4 +228,33 @@ test("the table marks the definitional break the chart already draws", () => {
   expect(html).toContain("AdmCount");
   expect(html).toContain("CECount");
   expect(html).toMatch(/two series/);
+});
+
+/**
+ * The lead compares two years on one count (#705).
+ *
+ * It compared FY1999 "by enrollment" with FY2012 "by access" and called the step one rise, two
+ * lines above the note saying the two lines must not be joined — and it called the second figure a
+ * share "of the enrollment count", which it is not.
+ */
+test("the lead sentence's two endpoints share a basis", () => {
+  const ends = dekEnds(meal)!;
+  expect(ends.from.basis).toBe(ends.to.basis);
+  expect(ends.from.fiscal_year).toBe(1999);
+  expect(ends.to.fiscal_year).toBe(basisChange(meal)! - 1);
+
+  const html = renderMealProgram(meal);
+  const lead = html.match(/<strong>Approved applications[\s\S]*?<\/strong>/)![0];
+  expect(lead).toMatch(/28\.9% of enrollment in FY1999 to\s+42\.6% in FY2010/);
+  expect(lead).toContain("before the count changed definition");
+  // The by-access figure is not in the lead at all.
+  expect(lead).not.toContain("46.3%");
+});
+
+test("the chart's end labels carry the lead's one decimal place", () => {
+  // #610 matched the places everywhere else; this chart still wrote "29%" under "28.9%".
+  const html = renderMealProgram(meal);
+  const svg = html.match(/<svg[\s\S]*?<\/svg>/)![0];
+  expect(svg).toContain(">28.9%<");
+  expect(svg).not.toMatch(/>\d+%</);
 });

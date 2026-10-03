@@ -135,7 +135,7 @@ export const DENOMINATORS = {
     label: "Meal-program denominator, `AdmCount` then `CECount`",
     source: "Ohio DEW, Office for Child Nutrition, MR-81",
     series: "meal_program",
-    note: "The only count here that changes definition inside its own series: `AdmCount` through FY2009, then `CECount` — 'the highest daily number of students with access to the program' — from FY2010, which is neither ADM nor the count before it. The population is sponsors, not districts: community schools and county boards of developmental disabilities are in, and the count rises across the window mostly because community schools opened. Every row carries its own `basis` so a reader cannot splice the two halves without being told.",
+    note: "The only count here that changes definition inside its own series: `AdmCount` through FY2010, then `CECount` — 'the highest daily number of students with access to the program' — from FY2011, which is neither ADM nor the count before it. The population is sponsors, not districts: community schools and county boards of developmental disabilities are in, and the count rises across the window mostly because community schools opened. Every row carries its own `basis` so a reader cannot splice the two halves without being told.",
     /*
      * The sponsor counts used to be written here as "rises from 730 to 949". The series was later
      * extended in both directions — FY1998 at the near end, FY2014 at the far one — and the
@@ -471,10 +471,10 @@ export const DELIBERATELY_UNCOMPARABLE: [string, string][] = [
   // population, a different count, and a decade apart.
   ["history[].poorest_local_per_pupil", "districts[].valuation_per_pupil"],
   // The meal-program count against the two panels it sits beside on `/history`. Recorded because
-  // the invitation here is stronger than the one above: MR-81 covers FY2001-FY2011 and the Census
-  // panel starts in FY2009, so three years overlap and a reader will want to read across them.
+  // the invitation here is stronger than the one above: MR-81 reaches back to FY1999 and on past
+  // the Census panel's FY2009 start, so the two overlap and a reader will want to read across them.
   // They are different sponsors on different counts, and the meal-program denominator changes
-  // definition inside those three years.
+  // definition inside the overlap.
   ["meal_program[].enrollment", "history[].poorest_local_per_pupil"],
 ];
 

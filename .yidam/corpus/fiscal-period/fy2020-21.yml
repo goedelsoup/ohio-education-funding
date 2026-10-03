@@ -21,7 +21,7 @@ findings: |
   categories doing it, so a series from Ohio's own reporting would measure the reporting.
   [inference]
 
-  **The appropriating act set the department's own budget at $11.88 billion in FY2020 and $12.10 billion in FY2021.** That is what was appropriated to the Department of Education across every line in its chapter, less the property tax reimbursement items that are numbered as the department's and are carried in the State Revenue Distributions section instead. [verified] (the appropriation series, `lsc-appropriation-spreadsheet`) It is a ceiling rather than a payment; what districts received is `dew-foundation`.
+  **The appropriating act set the department's own budget at $11.75 billion in FY2020 and $11.98 billion in FY2021.** That is what was appropriated to the Department of Education across every line in its chapter, less the property tax reimbursement items that are numbered as the department's and are carried in the State Revenue Distributions section instead. [verified] (the appropriation series, `lsc-appropriation-spreadsheet`) It is a ceiling rather than a payment; what districts received is `dew-foundation`.
 properties:
   label: FY2020-2021
   kind: biennium

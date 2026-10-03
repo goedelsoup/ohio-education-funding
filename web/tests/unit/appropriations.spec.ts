@@ -86,6 +86,18 @@ test("a year the index cannot reach is dropped from the real view, not shown un-
   }
 });
 
+test("the real view names the years it drops and the span the index covers", () => {
+  // It said "2 years are absent" and left a reader to find which (#705).
+  const kept = new Set(inBase(rows, bundle.deflator, base!, "real").map((r) => r.fiscal_year));
+  const dropped = rows.filter((r) => !kept.has(r.fiscal_year)).map((r) => r.fiscal_year);
+  const covered = bundle.deflator!.points.map((p) => p.fiscal_year);
+  const html = renderAppropriations(rows, bundle.deflator, base, "real").replace(/\s+/g, " ");
+  expect(dropped.length).toBeGreaterThan(0);
+  for (const year of dropped) expect(html).toContain(`FY${year}`);
+  expect(html).toContain(`covers FY${Math.min(...covered)} through FY${Math.max(...covered)}`);
+  expect(renderAppropriations(rows, bundle.deflator, base, "nominal")).not.toContain("absent here");
+});
+
 test("the card says the other basis tells a different story, on both bases", () => {
   // Whichever one a reader lands on. `BasisToggle` is symmetric by design, so neither panel can
   // rely on the other having been read first.

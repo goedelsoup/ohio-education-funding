@@ -1,5 +1,5 @@
 /**
- * The longest run of the count the formula's poverty weight is paid on, FY1998 to FY2014.
+ * The longest run of the count the formula's poverty weight is paid on, FY1999 to FY2026.
  *
  * # Why this is on the history route and not the outcomes one
  *
@@ -15,10 +15,10 @@
  * So it belongs where the other long series live, on a route whose whole premise is that its
  * figures are measured differently from the formula side and must not be read across to it.
  *
- * # The break at FY2010 is drawn, not annotated
+ * # The break at FY2011 is drawn, not annotated
  *
- * The denominator changes mid-series: `AdmCount` through FY2009, `CECount` — "the highest daily
- * number of students with access to the program" — from FY2010. That is not a redefinition at the
+ * The denominator changes mid-series: `AdmCount` through FY2010, `CECount` — "the highest daily
+ * number of students with access to the program" — from FY2011. That is not a redefinition at the
  * margins; it is a different population in the divisor, and the share steps up across it.
  *
  * A footnote saying so would be read after the eye has already drawn the line. So the two eras are
@@ -26,16 +26,16 @@
  * seventeen-year trend has to decide to splice it, which is the decision this module exists to
  * make visible rather than to make for them.
  *
- * # The break at FY2012 is not drawn at all
+ * # The break at FY2013 is not drawn at all
  *
- * The second break is worse than the first, and the card handles it by stopping. From FY2012 the
+ * The second break is worse than the first, and the card handles it by stopping. From FY2013 the
  * department publishes MR-81 as three files and only one of them still counts applications:
  * community-eligibility sponsors collect none, because every child in those schools eats free. A
- * line joined across FY2011 falls thirteen points in three years and would read as poverty
+ * line joined across FY2012 falls thirteen points in three years and would read as poverty
  * collapsing during a period when the share of enrolment in those schools more than doubled.
  *
- * The chart therefore ends at FY2011. What follows is a band — the directly certified count as a
- * floor, what those schools may claim for as a ceiling — and the band brackets FY2011 rather than
+ * The chart therefore ends at FY2012. What follows is a band — the directly certified count as a
+ * floor, what those schools may claim for as a ceiling — and the band brackets FY2012 rather than
  * sitting below it, so what the source will not settle is the *direction*. That is stated in prose
  * and in the table, and no line is drawn through it, because a line through a band is a claim.
  *
@@ -46,8 +46,8 @@
  * because community schools opened. The count is on the page for that reason — a rising share over
  * a changing population is two facts, and showing one without the other states the wrong one.
  *
- * The endpoint used to be written here as 1,001, which is the number of *returns* FY2014 carries:
- * from FY2012 the report is three files and a sponsor may file in more than one, so the rows are
+ * The endpoint used to be written here as 1,001, which is the number of *returns* FY2015 carries:
+ * from FY2013 the report is three files and a sponsor may file in more than one, so the rows are
  * filings and the bodies are 973. Counting the rows put the growth of the population at more than
  * twice its real figure. The card reads both endpoints off the feed, so this sentence and the one
  * it renders cannot disagree; the number above is here to be read, not to be trusted.
@@ -110,6 +110,25 @@ export function splitByBasis(meal: MealProgramYear[]): {
   }));
 }
 
+/**
+ * The two years the lead sentence compares, both on the first denominator (#705).
+ *
+ * The lead used to take the first and last single-file years, which sit either side of the basis
+ * change: 28.9% "by enrollment" against 46.3% "by access", called one rise, directly above a note
+ * saying the two lines must not be joined. Both ends now come from the first era, so the sentence
+ * says only what one count supports. `null` if that era has a single year and nothing to compare.
+ */
+export function dekEnds(
+  meal: MealProgramYear[],
+): { from: MealProgramYear; to: MealProgramYear } | null {
+  const single = singleStream(meal);
+  if (single.length === 0) return null;
+  const from = firstOf(single);
+  const era = single.filter((y) => y.basis === from.basis);
+  const to = lastOf(era);
+  return to === from ? null : { from, to };
+}
+
 /** The meal-program poverty share, October by October. */
 export function renderMealProgram(meal: MealProgramYear[]): string {
   const single = singleStream(meal);
@@ -119,6 +138,7 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
   const first = firstOf(single);
   const last = lastOf(single);
   const change = basisChange(single);
+  const ends = dekEnds(meal);
   const end = split[split.length - 1];
   /** The Octobers the feed marks as not a reading of the state. See `splitStream`. */
   const waived = meal.filter((y) => !y.comparable);
@@ -130,7 +150,8 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
         // The reader's words for the two denominators (#658). `ADM` and `CE` are the source's
         // columns, and the note under the chart names them for a reader who goes looking.
         { a: "by enrollment", b: "by access" },
-        (v) => `${fixed(v, 0)}%`,
+        // To the place the lead and the tooltip use (#610): "29%" sat under a sentence saying 28.9%.
+        (v) => `${fixed(v, 1)}%`,
         (p) => {
           const value = p.a ?? p.b;
           if (value == null) return `FY${p.at}`;
@@ -144,9 +165,13 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
   return `
     <div class="card" id="meal-program" data-part="meal-program">
       <h2>${anchor("meal-program")}What the poverty weight is counted on${yearChip("meal_program")}</h2>
-      <p class="note"><strong>Approved applications ${last.share! < first.share! ? "fell" : "rose"} from ${pct(first.share!, 1)} of
-        the enrollment count in FY${first.fiscal_year} to ${pct(last.share!, 1)} in
-        FY${last.fiscal_year}.</strong> Free and reduced-price lunch applications approved, as a
+      <p class="note">${
+        ends == null
+          ? ""
+          : `<strong>Approved applications ${ends.to.share! < ends.from.share! ? "fell" : "rose"} from
+        ${pct(ends.from.share!, 1)} of enrollment in FY${ends.from.fiscal_year} to
+        ${pct(ends.to.share!, 1)} in FY${ends.to.fiscal_year}${change == null ? "" : ", before the count changed definition"}.</strong> `
+      }Free and reduced-price lunch applications approved, as a
         share of the meal-program enrollment count, across every public sponsor in the Office for
         Child Nutrition's MR-81 — fourteen Octobers, where the rest of this site has six years of
         anything.</p>
@@ -210,7 +235,7 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
         eligibility, or against any figure on the formula side.</p>
 
       <div class="scroll"><table>
-        <thead><tr><th>October</th><th class="tnum">Sponsors</th><th class="tnum">Enrollment</th>
+        <thead><tr><th>Year</th><th class="tnum">Sponsors</th><th class="tnum">Enrollment</th>
           <th class="tnum">Approved</th><th class="tnum">Share</th><th>Counted on</th></tr></thead>
         <tbody>${meal
           .map((y, index) => {
@@ -218,7 +243,7 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
              * The break, as a real gap rather than a column a reader reads afterwards.
              *
              * The chart has drawn this as two separate series since it was built — `a` through
-             * FY2009 on `AdmCount`, `b` from FY2010 on `CECount` — while the table beside it ran
+             * FY2010 on `AdmCount`, `b` from FY2011 on `CECount` — while the table beside it ran
              * straight through, carrying the distinction only in a per-row "Counted on" cell. That
              * is a fact met after the eye has already gone down the column.
              *
