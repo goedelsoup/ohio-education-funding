@@ -40,6 +40,26 @@ function coefficient(v: number): string {
  */
 const PAIR_PLOT_HEIGHT = 186;
 
+/**
+ * Where the poverty measure stops ordering districts: an economically disadvantaged share within a
+ * point of 100%.
+ *
+ * 31 districts publish exactly 100% and 31 more sit between 99% and it — 62 dots standing as one
+ * column at the right edge of the poverty cloud (#703). The chart's note and the limits card both
+ * count from this, so the number on the picture is the number in the prose.
+ */
+const CEILING_FROM = 0.99;
+
+/** The districts at the poverty measure's ceiling, by {@link CEILING_FROM}. */
+function atCeiling(districts: District[]): District[] {
+  return districts.filter(
+    (d) =>
+      d.economically_disadvantaged != null &&
+      d.economically_disadvantaged >= CEILING_FROM &&
+      d.outcome?.performance_index != null,
+  );
+}
+
 /** A median line's first-to-last change, as a verb phrase in Performance Index points. */
 function movement(points: number): string {
   const by = fixed(Math.abs(points), 1);
@@ -85,6 +105,7 @@ export function renderOutcomes(bundle: Bundle): string {
     .filter((v): v is number => v != null)
     .sort((a, b) => a - b);
   const saturated = onCeiling.length;
+  const nearCeiling = atCeiling(bundle.districts).length;
   const saturatedLow = fixed(ceilingScores[0] ?? 0, 1);
   const saturatedHigh = fixed(ceilingScores[ceilingScores.length - 1] ?? 0, 1);
   const saturatedShare = pct(
@@ -110,22 +131,55 @@ export function renderOutcomes(bundle: Bundle): string {
     (d, poverty, index) =>
       `${d.name}: ${fixed(poverty, 0)}% economically disadvantaged, Performance Index ${fixed(index, 1)}`,
   );
+  // "Median" and not "median of each fifth": the dek says what the line is, and the long name
+  // took 135 units of a phone's 300 (#703).
   const povertyTrace = medianTrace(
     povertyPoints.map((p) => ({ x: p.x, y: p.y })),
     5,
-    "median of each fifth",
+    "Median",
     "formula",
   );
+  const povertyAxes = {
+    x: { label: "economically disadvantaged share", format: (v: number) => `${fixed(v, 0)}%` },
+    y: { label: "Performance Index", format: (v: number) => fixed(v, 0) },
+  };
+  const ceiling = {
+    label: `${nearCeiling} districts at ${fixed(CEILING_FROM * 100, 0)}–100%: the measure's ceiling`,
+  };
   const povertyScatter: Drawing = (w) =>
+    scatterSpec(povertyPoints, povertyAxes, [povertyTrace], { width: w, ceiling });
+
+  /*
+   * The guarantee trap, drawn as the confound it is (#703): the same cloud, coloured by regime, with
+   * a median line through each. Guaranteed districts score higher because they sit further left,
+   * and at any one poverty the two lines nearly coincide — which is the finding, and what a table
+   * of two medians and two coefficients could only assert.
+   *
+   * Orange is the guarantee, as it is everywhere on this site (#187).
+   */
+  const regimePoints = pairs(
+    bundle.districts,
+    (d) => (d.economically_disadvantaged == null ? null : d.economically_disadvantaged * 100),
+    perf,
+    (d, poverty, index) =>
+      `${d.name}: ${fixed(poverty, 0)}% economically disadvantaged, Performance Index ${fixed(index, 1)}, on the ${d.on_guarantee ? "guarantee" : "formula"}`,
+    { series: (d) => (d.on_guarantee ? "guarantee" : "formula") },
+  );
+  const regimeTrace = (series: "formula" | "guarantee", label: string) =>
+    medianTrace(
+      regimePoints.filter((p) => p.series === series).map((p) => ({ x: p.x, y: p.y })),
+      5,
+      label,
+      series,
+    );
+  const regimeScatter: Drawing = (w) =>
     scatterSpec(
-      povertyPoints,
-      {
-        x: { label: "economically disadvantaged share", format: (v) => `${fixed(v, 0)}%` },
-        y: { label: "Performance Index", format: (v) => fixed(v, 0) },
-      },
-      [povertyTrace],
+      regimePoints,
+      povertyAxes,
+      [regimeTrace("formula", "Formula"), regimeTrace("guarantee", "Guarantee")],
       { width: w },
     );
+  const onGuarantee = regimePoints.filter((p) => p.series === "guarantee").length;
 
   /*
    * The two denominators, drawn at one size against one vertical scale so they can be compared —
@@ -280,7 +334,9 @@ export function renderOutcomes(bundle: Bundle): string {
         correlation of ${coefficient(o.poverty_vs_performance)}.</strong> One dot per district: the
         share of its pupils the state counts as economically disadvantaged, against its Performance Index. The line is the median of each
         fifth of districts, least poor on the left — the summary this card used to show on its
-        own, now drawn over the ${count(povertyPoints.length)} districts it summarizes.</p>
+        own, now drawn over the ${count(povertyPoints.length)} districts it summarizes. The column
+        at the right edge is the poverty measure's ceiling, explained under
+        <a href="#limits">what this cannot tell you</a>.</p>
       <div class="chartwrap" data-chart="poverty-and-performance">${renderToString(povertyScatter, { label: `Economically disadvantaged share against Performance Index across ${count(povertyPoints.length)} districts, with the median of each poverty fifth, ${yearOf("outcome.performance")}` })}</div>
       <p class="note">That is most of Ohio's attainment measure. Any other district-level variable correlated with it will
         appear to predict achievement, and mostly will not be.</p>
@@ -288,6 +344,13 @@ export function renderOutcomes(bundle: Bundle): string {
 
     <div class="card" id="guarantee-trap" data-part="guarantee-trap">
       <h2>${anchor("guarantee-trap")}The guarantee is that trap, exactly${yearChipPair("outcome.performance", "formula", "guarantee")}</h2>
+      <p class="note"><strong>The guarantee's advantage is poverty: at the same poverty, the two
+        groups score alike (held against poverty,
+        ${coefficient(o.guarantee_vs_performance_controlled)} against
+        ${coefficient(o.guarantee_vs_performance)} unadjusted).</strong> The cloud from the card above, each district
+        colored by whether the guarantee is what it is paid under — ${count(onGuarantee)} of
+        ${count(regimePoints.length)} are — with the median of each fifth of either group.</p>
+      <div class="chartwrap" data-chart="guarantee-trap">${renderToString(regimeScatter, { label: `Economically disadvantaged share against Performance Index across ${count(regimePoints.length)} districts, colored by whether each is on the guarantee or the formula, with the median of each poverty fifth of either group, ${yearOf("outcome.performance")}` })}</div>
       <div class="scroll"><table><tbody>
         <tr><th>Median Performance Index, districts on the guarantee</th>
             <td class="tnum">${fixed(o.median_performance_on_guarantee, 1)}</td></tr>
@@ -368,10 +431,10 @@ export function renderOutcomes(bundle: Bundle): string {
       <p class="note">${withoutReportCard} of the ${count(bundle.statewide.districts)} districts
         in the funding model have no report card and are absent from everything above. They are
         the three smallest in Ohio.</p>
-          <p class="note"><strong>The poverty measure has a ceiling, and ${saturated} districts are
-        on it.</strong> The ${yearOf("profile")} District Profile Report publishes an economically disadvantaged
-        share of exactly 100% for them — not a value this site caps, and not a break in the
-        distribution: the shares just below run 99.83%, 99.87%, 99.91% and so on to 99.99%. It is
+          <p class="note"><strong>The poverty measure has a ceiling: ${saturated} districts are on
+        it, ${nearCeiling} within a point of it.</strong> The ${yearOf("profile")} District Profile
+        Report publishes an economically disadvantaged share of exactly 100% for ${saturated} — not
+        a value this site caps, and not a break in the distribution: the shares just below run 99.83%, 99.87%, 99.91% and so on to 99.99%. It is
         what universal certification produces, and it is true as published.
         <br><br>
         It is still a ceiling. Those ${saturated} districts span

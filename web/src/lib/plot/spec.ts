@@ -1598,56 +1598,115 @@ function endGutter(
   );
 }
 
+/** The type a series trace's name is drawn in, and the spacing a wrapped one's lines take. */
+const TRACE_TYPE = 10;
+const TRACE_LINE = 12;
+
+/** How far a series trace's name sits right of its last point, in pixels. */
+const SERIES_DX = 8;
+
 /**
- * A banded or pooled trace's name, on the line where it ends, over a halo of the card (#702).
+ * A series trace's name, broken to the width a narrow frame can give it (#703).
  *
- * The names sat in the right gutter behind a swatch of each band (#657), about 390 units from where
- * the lines ended on `/outcomes` — a legend beside the chart, which is what #657 set out to remove.
- * They are on the marks now, and the halo under each line and each name is what keeps both legible
- * where they cross the cloud: the least-poor line vanished into its own dots in light mode.
+ * Sized unwrapped, "median of each fifth" asked 135 units of a 300-unit frame on `/outcomes` and
+ * left the cloud 103 wide by 320 tall, which steepens the slope the card is about. A fifth of the
+ * width, and never under 60 so a phone's line holds a word, at the 7.2px a character the gutter is
+ * sized at — so the gutter is sized from the lines that are drawn.
+ */
+function seriesLines(label: string, width: number): string[] {
+  return wrapText(label, Math.max(60, width * 0.2), 7.2 / EM_PER_CHAR);
+}
+
+/** The right margin a series trace's name needs, budgeted as if its line ran to the frame's edge. */
+function seriesGutter(trace: Trace, width: number): number {
+  return 24 + Math.max(...seriesLines(trace.label, width).map((line) => line.length * 7.2));
+}
+
+/**
+ * Every trace's name at its line's end, moved off it only as far as keeps it clear of the others.
  *
- * The ramp's end steps are near 2.2:1 against the card, so the name is set in text ink and not in
- * the band's hue; the line beside it carries the hue. Each name moves off its line's end only as
- * far as keeps it clear of the others, in the order the lines end, and stays inside the plot.
+ * A banded or pooled trace is named on the line where it ends, over a halo of the card (#702). The
+ * names sat in the right gutter behind a swatch of each band (#657), about 390 units from where the
+ * lines ended on `/outcomes` — a legend beside the chart, which is what #657 set out to remove. The
+ * ramp's end steps are near 2.2:1 against the card, so the name is set in text ink and not in the
+ * band's hue; the line beside it carries the hue.
+ *
+ * A series trace is named in its series' text token, wrapped by {@link seriesLines}. Its halo is
+ * the same one: the guarantee pair on `/outcomes` ends among the ceiling column's dots, and two
+ * series lines that nearly coincide end at nearly one height, so they are spread with the rest.
+ *
+ * Spread in the order the lines end, down from the top and back up from the floor, so a crowd at
+ * either edge stays inside the plot.
  */
 function endLabels(
   traces: readonly Trace[],
   domain: [number, number],
   log: boolean,
   frame: { top: number; bottom: number },
+  width: number,
 ) {
   const t = (v: number) => (log ? Math.log(v) : v);
   const ends = traces
-    .filter((trace) => namedAtEnd(trace) && trace.points.length > 0)
+    .filter((trace) => trace.points.length > 0)
     .map((trace) => {
       const end = lastOf(trace.points);
       const share = (t(end.y) - t(domain[0])) / (t(domain[1]) - t(domain[0]));
-      return { trace, end, py: frame.bottom - share * (frame.bottom - frame.top) };
+      const lines = namedAtEnd(trace) ? [trace.label] : seriesLines(trace.label, width);
+      // The block a name takes: a one-line name's leading, and a line's spacing per line past it.
+      const tall = END_LEADING + (lines.length - 1) * TRACE_LINE;
+      return { trace, end, lines, tall, py: frame.bottom - share * (frame.bottom - frame.top) };
     })
     .sort((a, b) => a.py - b.py);
-  // Down from the top, then back up from the floor, so a crowd at either edge stays inside it.
   const at = ends.map((e) => e.py);
   for (let i = 0; i < at.length; i += 1) {
-    at[i] = Math.max(at[i]!, frame.top + 4, i > 0 ? at[i - 1]! + END_LEADING : -Infinity);
+    const e = ends[i]!;
+    const floor = i > 0 ? at[i - 1]! + (ends[i - 1]!.tall + e.tall) / 2 : -Infinity;
+    at[i] = Math.max(at[i]!, frame.top + 4 + (e.tall - END_LEADING) / 2, floor);
   }
   for (let i = at.length - 1; i >= 0; i -= 1) {
-    at[i] = Math.min(at[i]!, frame.bottom - 4, i < at.length - 1 ? at[i + 1]! - END_LEADING : Infinity);
+    const e = ends[i]!;
+    const ceiling = i < at.length - 1 ? at[i + 1]! - (ends[i + 1]!.tall + e.tall) / 2 : Infinity;
+    at[i] = Math.min(at[i]!, frame.bottom - 4 - (e.tall - END_LEADING) / 2, ceiling);
   }
-  return ends.map(({ trace, end, py }, i) =>
+  return ends.map(({ trace, end, lines, py }, i) =>
     Plot.text([end], {
       x: "x",
       y: "y",
-      dx: END_DX,
       dy: at[i]! - py,
-      text: () => trace.label,
+      text: () => lines.join("\n"),
       textAnchor: "start",
-      fill: INK.secondary,
-      fontWeight: 600,
       stroke: INK.surface,
       strokeWidth: 3,
+      ...(namedAtEnd(trace)
+        ? { dx: END_DX, fill: INK.secondary, fontWeight: 600 }
+        : {
+            dx: SERIES_DX,
+            fill: SERIES_TEXT[trace.series],
+            // Only on a wrapped name: a spacing moves a one-line name's baseline too (#608).
+            ...(lines.length > 1 ? { lineHeight: TRACE_LINE / TRACE_TYPE } : {}),
+          }),
       className: "scatter-trace-end",
     }),
   );
+}
+
+/** A cloud's {@link scatterSpec} `ceiling` note, wrapped to most of the plot's width. */
+function ceilingNote(label: string, plotWidth: number) {
+  const lines = wrapText(label, Math.min(260, plotWidth * 0.8));
+  return Plot.text([0], {
+    frameAnchor: "top-right",
+    dx: -4,
+    dy: 2,
+    text: () => lines.join("\n"),
+    textAnchor: "end",
+    lineAnchor: "top",
+    ...(lines.length > 1 ? { lineHeight: LABEL_LINE / 11 } : {}),
+    fill: INK.muted,
+    fontSize: 11,
+    stroke: INK.surface,
+    strokeWidth: 3,
+    className: "scatter-ceiling",
+  });
 }
 
 export function scatterSpec(
@@ -1764,6 +1823,16 @@ export function scatterSpec(
      * segment's `ariaLabel` so the line is named where a legend cannot be read.
      */
     rules?: { label: string; from: { x: number; y: number }; to: { x: number; y: number } }[];
+    /**
+     * Name the column of dots at the right edge where the x measure stops ordering districts (#703).
+     *
+     * On `/outcomes` 62 districts publish an economically disadvantaged share of 99% or more, and
+     * they stand as a wall at the right of the poverty cloud that the poorest fifth's median line
+     * ends inside. The explanation was three cards further down. Printed muted at the frame's top
+     * right, above the wall, because it is a fact about the measure and not a mark in the cloud;
+     * the caller counts the column and writes the sentence, so the count is the one its prose uses.
+     */
+    ceiling?: { label: string };
   },
 ): Spec | null {
   // Two points are not a cloud. Same rule as the line forms, for the same reason: a scatter of
@@ -1864,7 +1933,7 @@ export function scatterSpec(
     width,
     Math.max(
       24,
-      ...traces.filter((t) => !namedAtEnd(t)).map((t) => 24 + t.label.length * 7.2),
+      ...traces.filter((t) => !namedAtEnd(t)).map((t) => seriesGutter(t, width)),
       endGutter(traces, width, marginLeft, [xMin, xMax], axes.x.log ?? false),
     ),
   );
@@ -1905,10 +1974,13 @@ export function scatterSpec(
   // as, and otherwise at the padded edge of the plot.
   const xRule = supplied ? xMin : xShown[0];
   const yRule = ySupplied ? yMin : yShown[0];
-  const names = endLabels(traces, yShown, axes.y.log ?? false, {
-    top: marginTop,
-    bottom: height - marginBottom,
-  });
+  const names = endLabels(
+    traces,
+    yShown,
+    axes.y.log ?? false,
+    { top: marginTop, bottom: height - marginBottom },
+    width,
+  );
   return {
     options: {
       width,
@@ -2076,23 +2148,6 @@ export function scatterSpec(
               : { stroke: traceHue(trace), strokeWidth: 2 }),
             className: "scatter-trace",
           }),
-          /*
-           * A direct label at the line's end in its series' hue. A banded or pooled trace is named
-           * by `endLabels` instead, in text ink and clear of the others.
-           */
-          ...(namedAtEnd(trace)
-            ? []
-            : [
-                Plot.text([lastOf(trace.points)], {
-                  x: "x",
-                  y: "y",
-                  dx: 8,
-                  text: () => trace.label,
-                  textAnchor: "start",
-                  fill: SERIES_TEXT[trace.series],
-                  className: "scatter-trace-end",
-                }),
-              ]),
         ]),
         ...names,
 
@@ -2117,6 +2172,8 @@ export function scatterSpec(
               }),
             ]
           : []),
+
+        ...(options.ceiling ? [ceilingNote(options.ceiling.label, width - marginLeft - marginRight)] : []),
 
         ...(options.identity
           ? [

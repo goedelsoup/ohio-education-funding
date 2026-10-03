@@ -678,6 +678,66 @@ test("a line that ends short of the frame costs the gutter only its name's overh
   expect(short.options.marginRight).toBeLessThan(long.options.marginRight!);
 });
 
+test("a series trace's name wraps, so a phone's cloud keeps most of its frame", () => {
+  /*
+   * Sized unwrapped, "median of each fifth" took 135 of the 300 units `/outcomes` draws its poverty
+   * cloud at on a phone, and left the plot 103 wide by 320 tall (#703). Every scatter here, with
+   * one name or two, long or short, holds its right margin to under a third of a phone's frame.
+   */
+  const points = cloud(Array.from({ length: 30 }, (_, i) => 10_000 + i * 400));
+  const trace = (label: string, series: "formula" | "guarantee", y: number): Trace => ({
+    label,
+    series,
+    points: [{ x: 10_000, y: 50 }, { x: 21_600, y }],
+  });
+  const sets: Trace[][] = [
+    [trace("median of each fifth", "formula", 55)],
+    [trace("Formula", "formula", 55), trace("Guarantee", "guarantee", 55.1)],
+    [trace("aid received", "guarantee", 55), trace("formula aid", "formula", 53)],
+  ];
+  expect(WIDTHS.narrow).toBe(300);
+  for (const traces of sets) {
+    const spec = scatterSpec(points, AXES, traces, { width: WIDTHS.narrow })!;
+    expect(spec.options.marginRight!, traces.map((t) => t.label).join(", ")).toBeLessThanOrEqual(
+      WIDTHS.narrow * 0.3,
+    );
+  }
+});
+
+test("two series names whose lines end together are spread apart, in their series' ink", () => {
+  // The guarantee pair on `/outcomes` nearly coincides, which is its finding (#703); the names must
+  // not print on each other where the lines meet.
+  const points = cloud(Array.from({ length: 30 }, (_, i) => 10_000 + i * 400));
+  const traces: Trace[] = (["formula", "guarantee"] as const).map((series, i) => ({
+    label: series === "formula" ? "Formula" : "Guarantee",
+    series,
+    points: [{ x: 10_000, y: 50 }, { x: 21_600, y: 55 + i * 0.05 }],
+  }));
+  const svg = renderToString(() => scatterSpec(points, AXES, traces, W), "presentational");
+  const names = placed(svg, "scatter-trace-end");
+  expect(names.map((n) => n.text).sort()).toEqual(["Formula", "Guarantee"]);
+  expect(Math.abs(names[0]!.y - names[1]!.y), "a line of type apart").toBeGreaterThanOrEqual(16);
+  expect(new Set(names.map((n) => n.fill))).toEqual(new Set([SERIES_TEXT.formula, SERIES_TEXT.guarantee]));
+});
+
+test("a ceiling note is printed muted at the frame's top right", () => {
+  const points = cloud(Array.from({ length: 30 }, (_, i) => i));
+  const label = "62 districts at 99–100%: the measure's ceiling";
+  for (const width of Object.values(WIDTHS)) {
+    const svg = renderToString(
+      () => scatterSpec(points, AXES, [], { width, ceiling: { label } }),
+      "presentational",
+    );
+    const doc = parseHTML(`<div>${svg.slice(0, svg.indexOf("</svg>") + 6)}</div>`).document;
+    const note = doc.querySelector("g.scatter-ceiling");
+    expect(note?.getAttribute("fill"), `at ${width}`).toBe(INK.muted);
+    // Each wrapped line is a tspan; read with a space at each break, the sentence is whole.
+    const tspans = [...(note?.querySelectorAll("tspan") ?? [])].map((t) => t.textContent);
+    const lines = tspans.length > 0 ? tspans : [note?.textContent];
+    expect(lines.join(" "), `at ${width}`).toBe(label);
+  }
+});
+
 test("a small multiple can be put on one horizontal scale", () => {
   /*
    * The spending pair on `/outcomes` is the same numerator over two denominators, and the card's
