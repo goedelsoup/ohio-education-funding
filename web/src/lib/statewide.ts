@@ -105,7 +105,7 @@ export function renderStatewideFinances(bundle: Bundle, basis: Basis): string {
           <div class="n">real; ${pct(nominalAid, 1)} nominal</div></div>
       </div>
 
-      <div class="chartwrap" data-chart="statewide-cash">${renderToString((w) => seriesSpec(cash, { a: "held", b: "" }, compactMoney, cashHover, { width: w, tick: fiscalYear, plain: true }), { label: `General fund cash held at 30 June, summed over the ${count(bundle.statewide.districts)} districts in this feed, by fiscal year, FY${first.fiscal_year} to FY${latest.fiscal_year}, ${label}` })}</div>
+      <div class="chartwrap" data-chart="statewide-cash">${renderToString((w) => seriesSpec(cash, { a: "held", b: "" }, compactMoney, cashHover, { width: w, tick: fiscalYear, hues: { a: "plain", b: "plain" } }), { label: `General fund cash held at 30 June, summed over the ${count(bundle.statewide.districts)} districts in this feed, by fiscal year, FY${first.fiscal_year} to FY${latest.fiscal_year}, ${label}` })}</div>
       <p class="note">${
           converted
             ? `<strong>In constant dollars the balance ends ${against(cashChange == null || !first.ending_cash ? null : cashChange / first.ending_cash)}

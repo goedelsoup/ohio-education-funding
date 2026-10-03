@@ -196,6 +196,8 @@ export function renderCoverage(c: Coverage): string {
         {
           width,
           tick: (at) => years(at),
+          // Two ways of counting one band's coverage, neither of them formula aid nor the guarantee.
+          hues: { a: "plain", b: "plain-strong" },
           reference: { value: c.reference.value, label: c.reference.label },
         },
       ),

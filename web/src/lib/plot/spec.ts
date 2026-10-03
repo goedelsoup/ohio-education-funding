@@ -854,9 +854,22 @@ function axisFoot(options: {
    * classed `axis-head` so the two can be told apart.
    */
   top?: boolean;
-} & ({ low: string; high: string } | { scale: FootScale })): {
+} & (
+  | {
+      low: string;
+      high: string;
+      /**
+       * Labelled positions between the two ends, placed on `domain` (#706). Each is kept only where
+       * it clears the ends and the ones kept before it; {@link between} in the result says which.
+       */
+      between?: { domain: [number, number]; ticks: { value: number; label: string }[]; className: string };
+    }
+  | { scale: FootScale }
+)): {
   marks: Plot.Markish[];
   extraBottom: number;
+  /** The interior positions that were labelled, for the caller to tick. */
+  between: number[];
 } {
   const { width, marginLeft, marginRight, dy, fontSize = 11, top = false } = options;
   const says = sentence(options.says);
@@ -881,6 +894,7 @@ function axisFoot(options: {
     y: number,
     label: string,
     textAnchor: "start" | "middle" | "end",
+    className = top ? "axis-head" : "axis-foot",
   ) =>
     Plot.text([value], {
       ...("x" in position
@@ -897,12 +911,13 @@ function axisFoot(options: {
       ...(textAnchor === "middle" ? {} : { textAnchor }),
       fill: INK.muted,
       fontSize,
-      className: top ? "axis-head" : "axis-foot",
+      className,
     });
 
   /** The labels, and the spans of the frame they occupy, measured from its left edge. */
   let ends: Plot.Markish[];
   let taken: [number, number][];
+  const between: number[] = [];
   if ("scale" in options) {
     const { domain, log = false, format, floor } = options.scale;
     const beside = options.scale.beside && {
@@ -952,6 +967,18 @@ function axisFoot(options: {
       [0, textPx(low)],
       [frame - textPx(high), frame],
     ];
+    if (options.between) {
+      const { domain: [lo, hi], ticks, className } = options.between;
+      for (const tick of ticks) {
+        const x = (frame * (tick.value - lo)) / (hi - lo);
+        const half = textPx(tick.label, fontSize) / 2;
+        const span: [number, number] = [x - half, x + half];
+        if (!taken.every((k) => span[0] >= k[1] + 8 || span[1] <= k[0] - 8)) continue;
+        taken.push(span);
+        between.push(tick.value);
+        ends.push(text(tick.value, { x: tick.value }, dy, tick.label, "middle", className));
+      }
+    }
   }
   // A gap either side of the centre, so "fits" means legibly rather than exactly.
   const half = textPx(says) / 2;
@@ -976,9 +1003,9 @@ function axisFoot(options: {
    * units past the SVG. So it wraps to what it has, and every line past the first costs another
    * `line` of bottom margin.
    */
-  if (says === "") return { marks: ends, extraBottom: 0 };
+  if (says === "") return { marks: ends, extraBottom: 0, between };
   if (fits) {
-    return { marks: [...ends, text(0, { frameAnchor: "bottom" }, dy, says, "middle")], extraBottom: 0 };
+    return { marks: [...ends, text(0, { frameAnchor: "bottom" }, dy, says, "middle")], extraBottom: 0, between };
   }
   const lines = wrapText(says, width - marginLeft - 4);
   return {
@@ -987,6 +1014,7 @@ function axisFoot(options: {
       text(0, { frameAnchor: "bottom-left" }, dy + line * lines.length, lines.join("\n"), "start"),
     ],
     extraBottom: line * lines.length,
+    between,
   };
 }
 
@@ -3948,7 +3976,36 @@ export function truncatedDomain(values: number[]): [number, number] {
   const low = Math.min(...values);
   const high = Math.max(...values);
   const pad = (high - low) * 0.12 || Math.abs(high) * 0.02 || 1;
-  return [low - pad, high + pad];
+  /*
+   * The lower bound rounded down to a 1-2-5 step of the frame's height (#706). The foot prints it,
+   * and "axis starts at 31.1%" read as a data point where "30%" reads as a scale — #610 rounded
+   * every other builder's domain with `nice()` and missed this one. A tenth of the height is the
+   * step: at most that much more empty frame under the lower line, and never enough to reach zero
+   * from a series that sits well clear of it.
+   */
+  const step = niceStep((high - low + 2 * pad) / 10);
+  return [clean(Math.floor((low - pad) / step) * step), high + pad];
+}
+
+/** What a series line says by its colour — see {@link SeriesOptions.hues}. */
+export type SeriesHue = "formula" | "guarantee" | "plain" | "plain-strong";
+
+/**
+ * The stroke and the text ink of each {@link SeriesHue}.
+ *
+ * The plain pair is ink and not a third hue (#182): `INK.muted` and `INK.primary` tell two lines
+ * apart by weight, and say nothing about formula aid or the guarantee.
+ */
+const SERIES_HUE: Record<SeriesHue, { stroke: string; text: string }> = {
+  formula: { stroke: SERIES.formula, text: SERIES_TEXT.formula },
+  guarantee: { stroke: SERIES.guarantee, text: SERIES_TEXT.guarantee },
+  plain: { stroke: INK.muted, text: INK.muted },
+  "plain-strong": { stroke: INK.primary, text: INK.primary },
+};
+
+/** The round step interior index ticks fall on, from the span they cover (#706). */
+export function indexStep(span: number): number {
+  return span <= 20 ? 5 : span <= 50 ? 10 : 20;
 }
 
 /** What a caller tells {@link seriesSpec} beyond the points themselves. */
@@ -3961,14 +4018,32 @@ export interface SeriesOptions {
    * index counts and the wrong one prints `FY13` under a thirteen-year horizon.
    */
   tick: (at: number) => string;
+  /**
+   * What each line's colour says, chosen by the caller (#706) as `barSpec`'s fill is (#652).
+   *
+   * It was `SERIES.formula` for the first line and `SERIES.guarantee` for the second whatever they
+   * were, so the appropriations card drew the line it labels "the formula" in guarantee orange,
+   * and three other cards borrowed both hues for pairs that are neither. Required, because every
+   * default is a claim about what the lines are:
+   *
+   *   - `"formula"` / `"guarantee"` — the line is formula aid, or the guarantee, and nothing else.
+   *   - `"plain"` / `"plain-strong"` — it is neither: `INK.muted` and `INK.primary`, a pair told
+   *     apart by ink rather than hue. A lone line that is neither (cash held, #659) is `"plain"`.
+   */
+  hues: { a: SeriesHue; b: SeriesHue };
   /** A value the lines are measured against, drawn as a rule and held inside the frame. */
   reference?: { value: number; label: string };
   /**
-   * Draw the first series in `INK.muted`, for a lone line that is neither formula aid nor the
-   * guarantee — cash held (#659). The bar chart it replaced was `hue: "plain"` for the reason
-   * #652 gives, and the categorical pair's first hue would have said "formula" again.
+   * Values the frame must hold beyond the points' own — the same chart on its other basis (#706).
+   *
+   * A card with a nominal / constant-dollar switch draws each basis as its own drawing. On its own
+   * truncated domain, each rescaled to fit its line, and the change the switch exists to show was
+   * absorbed by the axis. Passing both bases' values to both drawings puts them in one frame, so
+   * the real line visibly sits below the nominal one as the reader switches.
    */
-  plain?: boolean;
+  span?: number[];
+  /** What the values are in, said in the foot ahead of the truncation: "in constant FY2009 dollars". */
+  unit?: string;
 }
 
 /**
@@ -4022,9 +4097,13 @@ export function seriesSpec(
 
   // The reference is inside the domain by construction rather than by luck: the lines are read
   // for their distance from it, and a rule drawn off the frame states no distance at all.
-  const [min, max] = truncatedDomain(
-    options.reference ? [...values, options.reference.value] : values,
-  );
+  const [min, max] = truncatedDomain([
+    ...values,
+    ...(options.reference ? [options.reference.value] : []),
+    ...(options.span ?? []),
+  ]);
+  const hueA = SERIES_HUE[options.hues.a];
+  const hueB = SERIES_HUE[options.hues.b];
 
   const first = firstOf(points);
   const last = lastOf(points);
@@ -4178,14 +4257,31 @@ export function seriesSpec(
   const marginRight = stacked
     ? Math.max(0, Math.min(gutter(options.width, 32 + longestLine * 7.2), cap - marginLeft))
     : gutter(options.width, wantedRight);
+  /*
+   * The interior positions at a round step (#706). The ends alone left a reader unable to find
+   * FY2014's gap, the FY2010 basis break or the year of a spike on a 220px frame over thirty
+   * years. The foot keeps the ones that clear the ends and each other, and a tick is drawn only
+   * where its label is.
+   */
+  const step = indexStep(last.at - first.at);
+  const interior: number[] = [];
+  for (let at = Math.ceil(first.at / step) * step; at < last.at; at += step) {
+    if (at > first.at) interior.push(at);
+  }
+  const truncation = `axis starts at ${format(min)}, not zero`;
   const foot = axisFoot({
     width: options.width,
     marginLeft,
     marginRight,
     dy: 18,
     low: options.tick(first.at),
-    says: `axis starts at ${format(min)}, not zero`,
+    says: options.unit ? `${options.unit}; ${truncation}` : truncation,
     high: options.tick(last.at),
+    between: {
+      domain: [first.at, last.at],
+      ticks: interior.map((at) => ({ value: at, label: options.tick(at) })),
+      className: "series-tick",
+    },
   });
 
   return {
@@ -4200,13 +4296,22 @@ export function seriesSpec(
       y: { axis: null, domain: [min, max] },
       marks: [
         ...reference(options.width - marginLeft - marginRight),
-        line("a", options.plain ? INK.muted : SERIES.formula, "series-a"),
-        line("b", SERIES.guarantee, "series-b"),
-        ...endLabel(endA, "a", options.plain ? INK.muted : SERIES_TEXT.formula, stacked),
-        ...endLabel(endB, "b", SERIES_TEXT.guarantee, stacked),
-        ...startLabel(startA, "a", options.plain ? INK.muted : SERIES_TEXT.formula),
-        ...startLabel(startB, "b", SERIES_TEXT.guarantee),
+        line("a", hueA.stroke, "series-a"),
+        line("b", hueB.stroke, "series-b"),
+        ...endLabel(endA, "a", hueA.text, stacked),
+        ...endLabel(endB, "b", hueB.text, stacked),
+        ...startLabel(startA, "a", hueA.text),
+        ...startLabel(startB, "b", hueB.text),
         Plot.ruleY([min], { stroke: INK.rule, className: "axis" }),
+        // Under the axis rule, at each interior label the foot kept.
+        Plot.ruleX(foot.between, {
+          x: (at: number) => at,
+          y1: min,
+          y2: min,
+          insetBottom: -4,
+          stroke: INK.rule,
+          className: "series-tick-mark",
+        }),
         ...foot.marks,
         // One full-height column per year, above every mark, as the fan chart does.
         Plot.rect(points, {

@@ -10,7 +10,10 @@
 import { expect, test } from "vitest";
 
 import { BILLIONS, fromActs, fromCatalog, growth, inBase, renderAppropriations } from "../../src/lib/appropriations.ts";
+import { parseHTML } from "linkedom";
+
 import { truncatedDomain } from "../../src/lib/plot/spec.ts";
+import { INK, SERIES } from "../../src/lib/plot/tokens.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
 import { baseYear } from "../../src/lib/real.ts";
 
@@ -143,4 +146,36 @@ test("the truncated-axis annotation does not understate the truncation", () => {
 
   // And it is the site's unit, not one of the card's own.
   expect(annotation).toMatch(/^\$[\d,]+\.\d{1,2}[BM]$/);
+});
+
+/** The first drawing on a rendered card, and its foot's words with the whitespace taken out. */
+function drawing(html: string): { svg: SVGSVGElement; foot: string } {
+  const svg = parseHTML(`<div>${html}</div>`).document.querySelector("svg")! as unknown as SVGSVGElement;
+  const foot = [...svg.querySelectorAll("g.axis-foot text")].map((t) => t.textContent).join(" ");
+  return { svg, foot: foot.replace(/\s+/g, "") };
+}
+
+test("the line labelled the formula is the formula's hue, and the whole appropriation is not", () => {
+  /*
+   * #706. `seriesSpec` gave its second line the guarantee's hue whatever it was, and the second
+   * line here is the formula's own appropriation: "the formula" was drawn orange.
+   */
+  const { svg } = drawing(renderAppropriations(rows, bundle.deflator, base, "nominal"));
+  expect(svg.querySelector(".series-b")!.getAttribute("stroke")).toBe(SERIES.formula);
+  expect(svg.querySelector(".series-a")!.getAttribute("stroke")).toBe(INK.muted);
+});
+
+test("the nominal and constant-dollar drawings share one frame, and each foot names its basis", () => {
+  /*
+   * #706. Each basis was drawn on a domain truncated to its own line, so switching rescaled the
+   * frame and the line kept nearly the same shape — the change the switch exists to show was
+   * absorbed by the axis. One domain over both bases means one axis start on both.
+   */
+  const nominal = drawing(renderAppropriations(rows, bundle.deflator, base, "nominal")).foot;
+  const real = drawing(renderAppropriations(rows, bundle.deflator, base, "real")).foot;
+  const start = (foot: string) => /axisstartsat(.+?),notzero/i.exec(foot)?.[1];
+  expect(start(nominal)).toBeDefined();
+  expect(start(real)).toBe(start(nominal));
+  expect(nominal).toContain("Inthedollarsofeachyear");
+  expect(real).toContain(`InconstantFY${base}dollars`);
 });

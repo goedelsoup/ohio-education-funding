@@ -216,6 +216,8 @@ function panel(p: Population, width: number, panelText: string): string {
         {
           width,
           tick: (at) => years(at),
+          // Two forecasts' errors, neither of them formula aid nor the guarantee.
+          hues: { a: "plain", b: "plain-strong" },
           reference: { value: 0, label: "No bias" },
         },
       ),
