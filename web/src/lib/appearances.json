@@ -382,6 +382,21 @@
       ]
     },
     {
+      "route": "/explained/poverty-count",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/poverty-count",
+        "title": "How does Ohio count poor students?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    },
+    {
       "route": "/scenario",
       "pages": 1,
       "of": 1,
@@ -1167,6 +1182,25 @@
     }
   ],
   "legislation/hb-96-2025": [
+    {
+      "route": "/explained/poverty-count",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/poverty-count",
+        "title": "How does Ohio count poor students?"
+      },
+      "sections": [
+        {
+          "id": "rule",
+          "label": "The rule, written out"
+        },
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    },
     {
       "route": "/legislation",
       "pages": 1,

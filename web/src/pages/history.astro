@@ -80,6 +80,8 @@ const appropriationBase = bundle.deflator
       appropriations.map((y) => y.fiscal_year),
     )
   : null;
+// The card renders nothing under two single-stream years; its link should not outlive it.
+const mealCard = renderMealProgram(meal);
 ---
 
 <Base
@@ -132,7 +134,12 @@ const appropriationBase = bundle.deflator
   }
 
   {/* Outside the `history.length` gate: a different source, absent for its own reasons. */}
-  <Fragment set:html={renderMealProgram(meal)} />
+  {mealCard && (
+    <>
+      <Fragment set:html={mealCard} />
+      <Fragment set:html={whatIsThis("poverty-count")} />
+    </>
+  )}
 
   {/*
     The plain toggle, not a real-first variant. `BasisToggle` states that neither basis is the
