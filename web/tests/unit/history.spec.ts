@@ -10,10 +10,14 @@
 import { expect, test } from "vitest";
 
 import { loadFeed } from "../../src/lib/feed.ts";
+import { pct } from "../../src/lib/format.ts";
 import {
+  federalNote,
+  federalPeak,
   gaps,
   inBase,
   renderEqualization,
+  renderProvenance,
   renderRevenueMix,
   residual,
   withGaps,
@@ -178,7 +182,7 @@ test("both cards render, and say which population they measured", () => {
   expect(mix).toContain("<svg");
   expect(mix).toContain("FY2022");
   // The federal caveat is the one a reader most needs and least expects.
-  expect(mix).toContain("pandemic relief peak");
+  expect(mix).toContain("on pandemic relief");
 
   const base = baseYear(bundle.deflator!, historyYears)!;
   const real = renderEqualization(history, bundle.deflator, base, "real");
@@ -186,6 +190,46 @@ test("both cards render, and say which population they measured", () => {
   expect(renderEqualization(history, bundle.deflator, base, "nominal")).toContain(
     "In the dollars of each year.",
   );
+});
+
+test("the year the federal note calls the pandemic peak is the series' largest federal share", () => {
+  // It named the panel's last year, FY2024 at 11.9%, when FY2022 stood at 14.0% (#705).
+  const argmax = history.reduce((m, y) => (y.federal_share > m.federal_share ? y : m));
+  expect(federalPeak(history)).toBe(argmax);
+  const note = federalNote(history);
+  expect(note).toContain(`${pct(argmax.federal_share, 1)} in FY${argmax.fiscal_year} on pandemic relief`);
+  const last = history[history.length - 1]!;
+  expect(argmax).not.toBe(last);
+  expect(note).toContain(`still ${pct(last.federal_share, 1)} in FY${last.fiscal_year}`);
+  // The stimulus peak is the largest share inside ARRA's window, not its first year.
+  const stimulus = federalPeak(history, [2009, 2012])!;
+  expect(note).toContain(`${pct(stimulus.federal_share, 1)} in FY${stimulus.fiscal_year} on stimulus money`);
+});
+
+test("the revenue lead gives the local share's own endpoints rather than saying it met the state's fall", () => {
+  const first = history[0]!;
+  const last = history[history.length - 1]!;
+  const mix = renderRevenueMix(history);
+  expect(mix).not.toContain("rose to meet it");
+  expect(mix).toMatch(
+    new RegExp(`local share rose from\\s+${pct(first.local_share, 1)} to ${pct(last.local_share, 1)}`),
+  );
+});
+
+test("the provenance note excludes the agencies the comparable filter excludes", () => {
+  const card = renderProvenance(bundle);
+  expect(card).not.toContain("among them");
+  expect(card).toMatch(/not counting community schools/);
+});
+
+test("a base year is the earliest year the index covers, even when the series starts before it", () => {
+  // real.ts documents "earliest"; history.astro's comment said "most recent" (#705). The
+  // appropriation series opens in FY1998, a year the index does not reach.
+  const covered = bundle.deflator!.points.map((p) => p.fiscal_year);
+  const years = bundle.appropriations.map((y) => y.fiscal_year);
+  const first = Math.min(...years);
+  expect(covered).not.toContain(first);
+  expect(baseYear(bundle.deflator!, years)).toBe(Math.min(...years.filter((y) => covered.includes(y))));
 });
 
 test("a panel too short to be a series draws nothing rather than a degenerate axis", () => {

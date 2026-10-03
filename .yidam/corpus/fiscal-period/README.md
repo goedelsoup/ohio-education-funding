@@ -85,13 +85,13 @@ They carry a different pair, and both reach further back than the panel does:
 
 - the **enacted appropriation**, from `appropriation-lines.csv`, which runs FY1999 to FY2027 —
   the department's total, the foundation lines inside it, and its share; and
-- the **free and reduced-price meal share**, from `mr81-sponsor-panel.csv`, which runs FY1998 to
-  FY2014 and is the only per-district measure of need the corpus holds for these years.
+- the **free and reduced-price meal share**, from `mr81-sponsor-panel.csv`, which runs FY1999 to
+  FY2026 and is the only per-district measure of need the corpus holds for these years.
 
 That is a statewide grain rather than a per-district one, and it is stated as such on each node.
 What it is enough for is the shape of the decade: real foundation aid peaks in FY2009, falls 14.1%
-by FY2011, and ends below where FY2002 started, while the meal share rises 11.4 points on one
-unbroken basis.
+by FY2011, and ends below where FY2002 started, while the meal share rises 13.2 points to FY2010
+on one unbroken basis.
 
 **FY2006-07 is read from the wrong act's greenbook**, and there is no alternative: H.B. 66's own
 education greenbook prints no line-item table, the single gap in the `lsc-budget` series. Those two
@@ -102,7 +102,7 @@ nodes is enacted. [verified]
 
 **Nothing before FY2002.** The equal yield formula, the whole *DeRolph* trial record, and
 everything back to 1851 still have no periods, so a query about FY1997 has nowhere to land. The
-appropriation series reaches FY1999 and the meal panel FY1998, so two of the three biennia between
+appropriation series reaches FY1999 and the meal panel FY1999, so two of the three biennia between
 1997 and 2002 are already measurable; what is missing is their acts. H.B. 215 of the 122nd and
 H.B. 282 of the 123rd are both retrieved and pinned, and writing them is the reading step
 `ohio-session-laws` does not automate. Below the 122nd the legislature's own version index stops

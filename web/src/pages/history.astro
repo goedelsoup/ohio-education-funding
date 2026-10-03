@@ -57,7 +57,7 @@ const last = history[history.length - 1];
  * The oldest year anything on this page reaches.
  *
  * Two panels with different spans, so the sentence at the top cannot name either one's first
- * year and be true. MR-81 starts in FY2001 and the Census panel in FY2009; taking the minimum
+ * year and be true. MR-81 starts in FY1999 and the Census panel in FY2009; taking the minimum
  * means the claim stays right if either series is extended or absent.
  */
 const earliest = Math.min(
@@ -69,9 +69,9 @@ const earliest = Math.min(
 /**
  * The base year for the appropriation card, computed over its own span rather than the panel's.
  *
- * `baseYear` picks the most recent year the index covers across the years it is given, and the
- * appropriation series runs four years past the Census panel. Passing the panel's years would
- * restate a twenty-six-year series into a base chosen for a fourteen-year one.
+ * `baseYear` picks the earliest year the index covers among the years it is given, and the
+ * appropriation series starts eleven years before the Census panel. Passing the panel's years would
+ * restate a thirty-year series into a base chosen for a sixteen-year one.
  */
 const appropriationBase = bundle.deflator
   ? baseYear(

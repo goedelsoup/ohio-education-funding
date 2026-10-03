@@ -1413,7 +1413,7 @@ const HistoryYearSchema = z
  * One October of the free and reduced-price lunch report, MR-81.
  *
  * The third population and the third enrollment count in this feed, and the only series whose
- * denominator changes inside itself — `adm` through FY2009, `ce` from FY2010. `basis` is required
+ * denominator changes inside itself — `adm` through FY2010, `ce` from FY2011. `basis` is required
  * on every row rather than inferred from the year, because a consumer that has to know the
  * cutover to read a row is a consumer that will get it wrong once.
  *
@@ -1423,7 +1423,7 @@ const HistoryYearSchema = z
  *
  * # Why `share` is nullable
  *
- * From FY2012 the department publishes MR-81 as three files, and only one of them still counts
+ * From FY2013 the department publishes MR-81 as three files, and only one of them still counts
  * applications. Community-eligibility sponsors collect none at all — every child eats free — so
  * their approval columns are zero by construction, and adding the three streams gives a share that
  * falls thirteen points in three years for a reason that is not poverty. Those Octobers carry
@@ -1432,6 +1432,7 @@ const HistoryYearSchema = z
  */
 const MealProgramYearSchema = z
   .object({
+    /** The fiscal year the October falls in: October 1998 is FY1999. Contract 52.0.0 (#705). */
     fiscal_year: z.number().int(),
     /** Public sponsors the year is computed over, after excluding published corruption. */
     sponsors: z.number().int().positive(),
@@ -1442,10 +1443,10 @@ const MealProgramYearSchema = z
      * its guard walks field names, and `share` is not one it recognises.
      */
     enrollment: num,
-    /** Approvals, summed over those sponsors. Short by the community stream from FY2012. */
+    /** Approvals, summed over those sponsors. Short by the community stream from FY2013. */
     approved: num,
     /**
-     * Directly certified children under community eligibility, and zero before FY2012.
+     * Directly certified children under community eligibility, and zero before FY2013.
      *
      * Not an approval. Direct certification reaches families already on SNAP, TANF, foster care or
      * a homeless roll; an application reaches anyone under the income line who files one.
@@ -1460,12 +1461,12 @@ const MealProgramYearSchema = z
     /**
      * The share of the October's enrollment under sponsors that collect no applications.
      *
-     * Zero through FY2011 and a sixth by FY2014. The size of the hole in `approved`, and it grows
+     * Zero through FY2012 and a sixth by FY2015. The size of the hole in `approved`, and it grows
      * because community eligibility is open to schools whose poverty is already high.
      */
     without_applications: num,
     /**
-     * How many filings the October carries. One through FY2011, three from FY2012 — and **two**
+     * How many filings the October carries. One through FY2012, three from FY2013 — and **two**
      * in October 2021, when not one Provision 2 sponsor filed at all.
      */
     streams: z.number().int().positive(),

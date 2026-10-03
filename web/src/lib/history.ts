@@ -5,9 +5,10 @@
  *
  * Every other figure on this site is one fiscal year of the Fair School Funding Plan, computed
  * for the 609 traditional districts in the department's own calculator. This is a different
- * measurement of a different population: roughly 950 Ohio agencies a year — community schools and
- * educational service centres included — surveyed by the federal government, on the Bureau's
- * enrollment count rather than ADM, with revenue classified the Bureau's way.
+ * measurement of a different population: the six hundred or so comparable Ohio school systems
+ * the federal government surveys a year — community schools, joint vocational districts and
+ * educational service centres excluded — on the Bureau's enrollment count rather than ADM, with
+ * revenue classified the Bureau's way.
  *
  * The two do not reconcile, and putting them on one page would invite a reader to subtract one
  * from the other. So the history lives on its own route, says on its face what it is measuring,
@@ -33,9 +34,9 @@
  * The prose beside the chart is computed rather than written, so it says "held" or "moved"
  * according to what the panel does.
  *
- * Both endpoints flatter the federal column: FY2009-FY2011 carry the ARRA tail and FY2022-FY2023
- * carry ESSER, so the federal contribution is roughly double its ordinary size at each end. The
- * card says so, because a reader taking the federal line at face value would draw the wrong
+ * Both ends flatter the federal column: FY2009-FY2012 carry the ARRA tail and FY2020 onward
+ * carries ESSER, so the federal contribution is well above its ordinary size at each end. The card
+ * says so, with the peaks found in the series rather than written (#705), because a reader taking the federal line at face value would draw the wrong
  * conclusion from exactly the years that are easiest to notice.
  *
  * # Real dollars are not optional here
@@ -64,6 +65,48 @@ import { yearChip } from "./year.ts";
  * The corpus states the band from here for the same reason; see `doctrine/equity`.
  */
 const BAND_FROM = 2012;
+
+/**
+ * The two federal relief windows, inclusive: ARRA's tail, and ESSER's.
+ *
+ * The years between them are the federal share's ordinary size. The windows are the programmes'
+ * reach into the panel, not where the share happens to peak — the peak is found in the series by
+ * {@link federalPeak}, because the note once named the panel's last year as the pandemic peak when
+ * FY2022 was (#705).
+ */
+const STIMULUS: readonly [number, number] = [2009, 2012];
+const RELIEF: readonly [number, number] = [2020, Infinity];
+
+/** The year with the largest federal share within `[from, to]`, or null if none falls there. */
+export function federalPeak(
+  history: HistoryYear[],
+  [from, to]: readonly [number, number] = [-Infinity, Infinity],
+): HistoryYear | null {
+  return history
+    .filter((y) => y.fiscal_year >= from && y.fiscal_year <= to)
+    .reduce<HistoryYear | null>((m, y) => (m == null || y.federal_share > m.federal_share ? y : m), null);
+}
+
+/** The federal note: its ordinary range, both relief peaks, and where the panel leaves it. */
+export function federalNote(history: HistoryYear[]): string {
+  const ordinary = history
+    .filter((y) => y.fiscal_year > STIMULUS[1] && y.fiscal_year < RELIEF[0])
+    .map((y) => y.federal_share * 100);
+  const stimulus = federalPeak(history, STIMULUS);
+  const relief = federalPeak(history, RELIEF);
+  const last = lastOf(history);
+  const peaks = [
+    stimulus && `to ${pct(stimulus.federal_share, 1)} in FY${stimulus.fiscal_year} on stimulus money`,
+    relief && `to ${pct(relief.federal_share, 1)} in FY${relief.fiscal_year} on pandemic relief`,
+  ].filter(Boolean);
+  const range =
+    ordinary.length > 0
+      ? `ran ${Math.round(Math.min(...ordinary))}–${Math.round(Math.max(...ordinary))}% in ordinary years, `
+      : "";
+  const still =
+    relief != null && relief !== last ? `, and was still ${pct(last.federal_share, 1)} in FY${last.fiscal_year}` : "";
+  return peaks.length === 0 ? "" : `The federal share ${range}rose ${peaks.join(" and ")}${still}.`;
+}
 import { anchor } from "./section.ts";
 import { firstOf, lastOf } from "./ends.ts";
 
@@ -181,16 +224,16 @@ export function renderRevenueMix(history: HistoryYear[]): string {
       <h2>${anchor("revenue-mix")}Where the money came from${yearChip("history")}</h2>
       <p class="note"><strong>The state share ${last.state_share < first.state_share ? "fell" : "rose"} from
         ${pct(first.state_share, 1)} in FY${first.fiscal_year} to ${pct(last.state_share, 1)} in
-        FY${last.fiscal_year}, and the local share ${last.state_share < first.state_share ? "rose to meet it" : "gave way"}.</strong>
+        FY${last.fiscal_year}, and the local share ${last.local_share < first.local_share ? "fell" : "rose"} from
+        ${pct(first.local_share, 1)} to ${pct(last.local_share, 1)}, with federal money covering the
+        rest.</strong>
         Local, state and federal revenue as shares of the total, across every comparable Ohio
         school system the Census Bureau surveyed.</p>
 
       <div class="scroll">${chart}</div>
 
       <p class="note">The federal line is left off the chart and kept in the table below, because
-        it is the one series whose ends cannot be read at face value: FY2009 through FY2011 carry
-        the federal stimulus tail and FY${last.fiscal_year} is the pandemic relief peak, so the
-        federal share is roughly double its ordinary size at both ends of this window.
+        it is the one series whose ends cannot be read at face value. ${federalNote(history)}
         ${missing.length > 0 ? `FY${missing.join(", FY")} ${missing.length === 1 ? "is" : "are"} absent from the Bureau's archive, and the line breaks rather than bridging it.` : ""}</p>
 
       <div class="scroll"><table>
@@ -343,8 +386,8 @@ export function renderProvenance(bundle: Bundle): string {
       <p class="note">The two cards above are drawn from the U.S. Census Bureau's Annual Survey
         of School System Finances, FY${first.fiscal_year} through FY${last.fiscal_year}. They are not the state's
         funding formula and they do not reconcile with it. The survey counts about
-        ${last.districts} comparable Ohio systems a year — community schools and educational
-        service centers among them — on its own enrollment count and its own revenue
+        ${last.districts} comparable Ohio systems a year — not counting community schools, joint
+        vocational districts or educational service centers — on its own enrollment count and its own revenue
         classification, where everything else on this site is the Department of Education and
         Workforce's FY${bundle.fiscal_year} model of ${bundle.statewide.districts} traditional
         districts.</p>

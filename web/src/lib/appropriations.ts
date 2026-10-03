@@ -97,6 +97,11 @@ export function growth(rows: AppropriationYear[]): number | null {
  */
 export const BILLIONS = (v: number): string => millions(v).replace("+", "");
 
+/** "FY1998", "FY1998 and FY2027", or "FY1998, FY2026 and FY2027". */
+function list(each: string[]): string {
+  return each.length <= 2 ? each.join(" and ") : `${each.slice(0, -1).join(", ")} and ${each[each.length - 1]}`;
+}
+
 /** The appropriation, year by year, on one basis. */
 export function renderAppropriations(
   rows: AppropriationYear[],
@@ -113,7 +118,10 @@ export function renderAppropriations(
   const first = firstOf(shown);
   const last = lastOf(shown);
   const multiple = growth(shown);
-  const dropped = rows.length - shown.length;
+  // Named rather than counted (#705): "2 years are absent" left a reader to find which.
+  const kept = new Set(shown.map((r) => r.fiscal_year));
+  const dropped = rows.filter((r) => !kept.has(r.fiscal_year)).map((r) => `FY${r.fiscal_year}`);
+  const covered = deflator?.points.map((p) => p.fiscal_year) ?? [];
   const catalogYears = fromCatalog(rows);
   const actYears = fromActs(rows);
 
@@ -159,8 +167,8 @@ export function renderAppropriations(
       <p class="note">The same series on the other basis tells a different story, which is the reason this card
         carries the switch: a nominal total that rises every biennium is compatible with a real
         total that does not move, and both sentences are true.${
-          dropped > 0
-            ? ` ${dropped} ${dropped === 1 ? "year is" : "years are"} absent here because the price index does not reach ${dropped === 1 ? "it" : "them"}.`
+          dropped.length > 0 && covered.length > 0
+            ? ` ${list(dropped)} ${dropped.length === 1 ? "is" : "are"} absent here because the price index covers FY${Math.min(...covered)} through FY${Math.max(...covered)}.`
             : ""
         }</p>
 

@@ -1554,8 +1554,16 @@ fn appropriation_lines() -> Vec<AppropriationLine> {
 /// The meal-program poverty share, year by year.
 ///
 /// Computed and tested in [`dispersion::mr81`], which excludes non-public sponsors and the
-/// sponsor-years whose published enrollment cannot be right. It reaches back to FY1998, eleven
-/// years before anything else in this feed, and forward to FY2014, where the archive stops.
+/// sponsor-years whose published enrollment cannot be right. It reaches back to October 1998,
+/// which is FY1999 and ten years before anything else in this feed.
+///
+/// # The panel is keyed by October and the feed by fiscal year
+///
+/// MR-81 is an October count, and the panel's year is the October's calendar year — the source
+/// directory is `MR81_October_1998`. An October belongs to the fiscal year that began the July
+/// before it, so October 1998 is FY1999. The feed calls the field `fiscal_year` and every reader
+/// prints it with an `FY`, so it is converted here, once, by [`fiscal_year_of_october`]. Until #705
+/// it was not, and every year on the meal-program card read one year early.
 ///
 /// Deliberately not passed to [`deflator_years`]: every field here is a count or a share, so
 /// there is nothing to deflate, and adding FY1998-FY2008 to the deflator would extend a price
@@ -1629,8 +1637,8 @@ fn casino_by_district() -> HashMap<String, (Vec<CasinoYear>, Option<usize>)> {
 fn meal_program() -> Vec<MealProgramYear> {
     poverty_share_by_year()
         .into_iter()
-        .map(|(fiscal_year, year)| MealProgramYear {
-            fiscal_year,
+        .map(|(october, year)| MealProgramYear {
+            fiscal_year: fiscal_year_of_october(october),
             sponsors: year.sponsors,
             enrollment: year.enrollment,
             approved: year.approved,
@@ -1647,6 +1655,11 @@ fn meal_program() -> Vec<MealProgramYear> {
             comparable: year.comparable,
         })
         .collect()
+}
+
+/// The fiscal year an October count belongs to: the one that began the July before it.
+fn fiscal_year_of_october(october: u16) -> u16 {
+    october + 1
 }
 
 /// Every year either axis of the feed carries, oldest first.
@@ -2422,6 +2435,29 @@ mod tests {
             .expect("a leading year")
             + 1;
         assert_eq!(REPORT_CARD_SPENDING_YEAR, ends_in);
+    }
+
+    #[test]
+    fn the_meal_program_is_keyed_by_the_fiscal_year_its_october_falls_in() {
+        /*
+         * MR-81 counts an October, and the panel's year is that October's calendar year. The feed
+         * prints every year as `FY`, so the conversion happens here or every label on the card is
+         * a year early — which it was until #705. The waiver Octobers are the check a reader can
+         * make without the source: USDA's nationwide waivers covered the 2020-21 and 2021-22
+         * school years, which are FY2021 and FY2022.
+         */
+        let feed: Vec<u16> = meal_program().iter().map(|m| m.fiscal_year).collect();
+        let octobers: Vec<u16> = poverty_share_by_year().keys().copied().collect();
+        assert_eq!(feed.len(), octobers.len());
+        for (fiscal, october) in feed.iter().zip(&octobers) {
+            assert_eq!(*fiscal, october + 1, "October {october}");
+        }
+        let waived: Vec<u16> = meal_program()
+            .iter()
+            .filter(|m| !m.comparable)
+            .map(|m| m.fiscal_year)
+            .collect();
+        assert_eq!(waived, [2021, 2022]);
     }
 
     /// The provenance sentence counts its own populations (#571).

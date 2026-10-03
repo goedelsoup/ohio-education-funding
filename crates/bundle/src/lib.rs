@@ -41,6 +41,11 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `52.0.0` moved every `meal_program` year forward by one. MR-81 counts an October and the
+/// block carried the October's calendar year in a field named `fiscal_year`, so a page printing
+/// `FY` before it was a year early on every row: October 1998 is FY1999. The values did not change
+/// and what they are called did, which is the case `2.0.0` describes.
+///
 /// `51.0.0` added each biennium year's Disadvantaged Pupil Impact Aid as the formula computes it,
 /// so a page can say what H.B. 96's change to the disadvantaged count did between the two model
 /// years. `null` for FY2025, whose payment report does not itemize the formula. A component of
@@ -273,7 +278,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "51.0.0";
+pub const CONTRACT_VERSION: &str = "52.0.0";
 
 mod model;
 mod serialize;
