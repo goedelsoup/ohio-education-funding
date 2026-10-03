@@ -61,6 +61,10 @@ test.describe("axe", () => {
 
   for (const [what, route] of FAMILIES) {
     test(`${what} has no violation axe can name`, async ({ page }) => {
+      // The district index is 609 rows of controls, and axe walks every cell: 6.4s alone and
+      // 8.7s beside three other workers on a laptop, and past the default 30s on the 4-vCPU
+      // runner's first attempt in every main run, passing only on retry (#647, #660).
+      if (route === "/districts") test.slow();
       await page.goto(route);
       // The scenario and comparison routes compute in the browser; scanning before they have
       // rendered would be scanning an empty container and calling it clean.

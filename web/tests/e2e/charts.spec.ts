@@ -127,7 +127,13 @@ test.describe("charts on a phone", () => {
      *
      * One load per route and the viewport walked under it: the container queries answer a resize
      * without a reload, which is the behaviour a reader dragging a window gets.
+     *
+     * Slow, as the redirect walk is (#647): 47 widths on every charted route. That is 4.9s alone
+     * and 6.0s beside three other workers on a laptop, and on the 4-vCPU runner it timed out at the
+     * default 30s on its first attempt in every main run, passing only on retry, until #660 left
+     * it no retry to pass on. The cost is bounded by the routes and the widths.
      */
+    test.slow();
     const thin: string[] = [];
     const jumps: string[] = [];
     for (const route of CHARTED) {
