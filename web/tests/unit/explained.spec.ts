@@ -14,6 +14,7 @@ import { parseHTML } from "linkedom";
 import { describe, expect, test } from "vitest";
 
 import { loadCorpus } from "../../src/lib/corpus.ts";
+import { loadFigureManifest } from "../../src/lib/corpusFigures.ts";
 import {
   IDENTITY as GUARANTEE_IDENTITY,
   ORIGIN_YEAR,
@@ -38,6 +39,12 @@ import {
   renderShortAnswer,
   renderTopic,
 } from "../../src/lib/explained/render.ts";
+import {
+  identity as shareRule,
+  example as medianMover,
+  reach,
+  shareOf,
+} from "../../src/lib/explained/state-share.ts";
 import { TOPICS, topicModule } from "../../src/lib/explained/registry.ts";
 import {
   CATEGORICALS,
@@ -580,5 +587,53 @@ describe("Why are so many districts paid an old amount? (#716)", () => {
     // An even count averages the two middle shares, so the nearest district is either one.
     const below = held.filter((d) => share(d) < share(ex)).length;
     expect([Math.floor((held.length - 1) / 2), Math.floor(held.length / 2)]).toContain(below);
+  });
+});
+
+describe("Why do so many districts sit on the state's floor? (#716)", () => {
+  const bundle = loadFeed().bundle;
+  const districts = bundle.districts;
+  const floor = bundle.statewide.minimum_state_share;
+  const r = reach(bundle);
+
+  test("the published share is max(1 − L/B, m) on every district", () => {
+    expect(reconciles(shareRule(floor), districts)).toEqual([]);
+  });
+
+  test("a floor district published at its unfloored share fails it", () => {
+    const real = districts.find((d) => d.at_minimum_state_share)!;
+    const unfloored = 1 - real.regime!.local_capacity! / real.base_cost_per_pupil;
+    const doctored = {
+      ...real,
+      irn: "999999",
+      biennium: {
+        ...real.biennium,
+        observed: real.biennium.observed.map((row, i) =>
+          i === 2 ? { ...row, state_share: unfloored } : row,
+        ) as typeof real.biennium.observed,
+      },
+    };
+    expect(reconciles(shareRule(floor), [...districts, doctored])).toEqual(["999999"]);
+  });
+
+  test("the floor binds exactly where the feed says, and the bound figure counts the same districts", () => {
+    for (const d of districts) expect(shareOf(d, floor) === floor, d.irn).toBe(d.at_minimum_state_share);
+    const figure = loadFigureManifest().figures.find((f) => f.key === "project/districts-at-the-minimum-state-share")!;
+    expect(r.onFloor.length).toBe(figure.value);
+  });
+
+  test("the lower floor reaches only districts on the floor, and every one it misses is on the guarantee", () => {
+    expect(r.low).toBeLessThan(floor);
+    expect(r.moved.length).toBeGreaterThan(0);
+    expect(r.moved.every((o) => o.atMinimumStateShare && o.delta < 0)).toBe(true);
+    expect(r.moved.length + r.heldByGuarantee.length).toBe(r.onFloor.length);
+    expect(r.saved).toBeLessThan(r.naive);
+  });
+
+  test("the example is the median mover by its loss, and not on the guarantee", () => {
+    const ex = medianMover(r.moved);
+    expect(ex.onGuarantee).toBe(false);
+    const below = r.moved.filter((o) => o.delta < ex.delta).length;
+    expect([Math.floor((r.moved.length - 1) / 2), Math.floor(r.moved.length / 2)]).toContain(below);
   });
 });
