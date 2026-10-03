@@ -5,15 +5,13 @@
  * `/explained` its index, `[slug].astro` its routes and `og/pages.ts` its cards. A topic added by
  * hand-editing `nav.ts` would be a link the index does not list, which is the disagreement the bar
  * and the homepage were built to rule out.
- *
- * Empty until the pilot (#715). The section exists before its first topic so the chrome change it
- * needs lands alone.
  */
 
 import { PHASE_IN } from "./phase-in.ts";
 import type { TopicModule } from "./topic.ts";
+import { WHAT_A_DISTRICT_GETS } from "./what-a-district-gets.ts";
 
-export const TOPICS: readonly TopicModule[] = [PHASE_IN];
+export const TOPICS: readonly TopicModule[] = [WHAT_A_DISTRICT_GETS, PHASE_IN];
 
 /** One topic by slug, or a thrown error naming the slug no module registered. */
 export function topicModule(slug: string): TopicModule {
