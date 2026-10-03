@@ -316,6 +316,23 @@
       ]
     }
   ],
+  "formula-component/fsfp-base-cost-calculation": [
+    {
+      "route": "/explained/phase-in",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/phase-in",
+        "title": "What does the phase-in do?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    }
+  ],
   "formula-component/fsfp-career-technical-weights": [
     {
       "route": "/district/[irn]",
@@ -1505,6 +1522,21 @@
   ],
   "parameter/fsfp-phase-in-percentage": [
     {
+      "route": "/explained/phase-in",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/phase-in",
+        "title": "What does the phase-in do?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    },
+    {
       "route": "/what-changed",
       "pages": 1,
       "of": 1,
@@ -1516,6 +1548,23 @@
         {
           "id": "phase-in",
           "label": "The phase-in"
+        }
+      ]
+    }
+  ],
+  "parameter/guarantee-funding-base": [
+    {
+      "route": "/explained/phase-in",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/phase-in",
+        "title": "What does the phase-in do?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
         }
       ]
     }

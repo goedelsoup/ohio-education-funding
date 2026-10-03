@@ -62,7 +62,8 @@ export function renderNumbers(topic: Topic): string {
   return card(
     ID.numbers,
     "The numbers",
-    paragraphs(n.intro) +
+    `<p class="note"><strong>${n.finding}</strong></p>` +
+      paragraphs(n.intro) +
       `<ol class="note">${n.steps.map((s) => `<li>${s}</li>`).join("")}</ol>` +
       chart +
       paragraphs(n.after),

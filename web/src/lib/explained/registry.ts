@@ -10,9 +10,10 @@
  * needs lands alone.
  */
 
+import { PHASE_IN } from "./phase-in.ts";
 import type { TopicModule } from "./topic.ts";
 
-export const TOPICS: readonly TopicModule[] = [];
+export const TOPICS: readonly TopicModule[] = [PHASE_IN];
 
 /** One topic by slug, or a thrown error naming the slug no module registered. */
 export function topicModule(slug: string): TopicModule {
