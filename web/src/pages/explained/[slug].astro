@@ -11,6 +11,7 @@ import Base from "../../layouts/Base.astro";
 import { TOPICS } from "../../lib/explained/registry.ts";
 import { renderTopic } from "../../lib/explained/render.ts";
 import { description, topic, type TopicModule } from "../../lib/explained/topic.ts";
+import { NAMES } from "../../lib/nav.ts";
 import * as routes from "../../lib/routes.ts";
 
 export function getStaticPaths() {
@@ -28,6 +29,7 @@ const t = topic(module);
   imageAlt={t.question}
   section="explained"
 >
+  <p class="crumb"><a href={NAMES.explained.href}>{NAMES.explained.name}</a></p>
   <h1>{t.question}</h1>
   <Fragment set:html={renderTopic(t)} />
 </Base>

@@ -7,7 +7,7 @@
  * including the ones no test visits — and each of them was wrong on a scale no visit would have
  * found. 13,164 two-axis tables carried no `scope`. 32 wiki pages went from `<h1>` straight to
  * `<h3>`. Prose read ragged-left on 1,433 of 3,492 pages. 14,767 scrolling boxes were unfocusable
- * and unnamed. `measure.ts` grades the same ragged-left property over eight routes, and fixing
+ * and unnamed. `measure.ts` grades the same ragged-left property over nine routes, and fixing
  * those eight would have satisfied it.
  *
  * That is the argument for reading the artefact rather than driving a browser: a rule that only
@@ -92,7 +92,7 @@ describe("document semantics", () => {
    * Two sweeps in one walk, because both are about every page and the walk is the expensive part.
    *
    * `measure.ts` now carries `rightAlignedProse: 0`, and that is the deterministic gate — but the
-   * report it grades walks eight routes and the defect was on **1,433 of 3,492 pages**. Fixing the
+   * report it grades walks nine routes and the defect was on **1,433 of 3,492 pages**. Fixing the
    * eight would have satisfied it. This is the half that reads the build.
    *
    * The anchor half is here rather than in `measure.ts` because it is not a number about layout:

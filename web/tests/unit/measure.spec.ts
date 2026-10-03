@@ -16,11 +16,13 @@ import { parseHTML } from "linkedom";
 import { describe, expect, test } from "vitest";
 import {
   FIRST_FIGURE_CEILINGS,
+  PAGE_HEIGHT_CEILINGS,
   ROUTES,
   THRESHOLDS,
   WIDTHS,
   countWikiToData,
   firstFigureCeiling,
+  pageHeightCeiling,
   formatReport,
   violations,
   widestGap,
@@ -234,6 +236,30 @@ describe("the first-figure ceilings (#549)", () => {
     expect(firstFigureCeiling("/county/van-wert.html")).toBe(900);
     expect(firstFigureCeiling("/district/043786/finances.html")).toBeNull();
     expect(firstFigureCeiling("/wiki/funding-regime/fair-school-funding-plan.html")).toBeNull();
+  });
+});
+
+describe("the page-height ceilings (#712)", () => {
+  test("classify each sampled route under its own class, and every sample is a measured route", () => {
+    for (const kind of PAGE_HEIGHT_CEILINGS) {
+      for (const route of kind.sample) {
+        expect(PAGE_HEIGHT_CEILINGS.filter((c) => c.pattern.test(route)).map((c) => c.name)).toEqual([kind.name]);
+        expect(pageHeightCeiling(route)).toBe(kind.ceiling);
+      }
+      expect(kind.sample.some((route) => (ROUTES as readonly string[]).includes(route))).toBe(true);
+    }
+  });
+
+  test("are the worse measurement plus a tenth, rounded up to the next hundred", () => {
+    for (const kind of PAGE_HEIGHT_CEILINGS) {
+      expect(kind.ceiling).toBe(Math.ceil((kind.measured * 1.1) / 100) * 100);
+    }
+  });
+
+  test("cover every topic and only topics", () => {
+    expect(pageHeightCeiling("/explained/some-later-topic.html")).toBe(4900);
+    expect(pageHeightCeiling("/explained.html")).toBeNull();
+    expect(pageHeightCeiling("/method.html")).toBeNull();
   });
 });
 

@@ -58,6 +58,14 @@ export interface Numbers {
    * series, so one chip on the heading dates all of it.
    */
   chip: SeriesKey;
+  /**
+   * The example's result in one sentence, with its figure: the card's bold lead.
+   *
+   * A chart card on this site opens on a bold sentence holding a number
+   * (`tests/dist/findings.spec.ts`), so that a reader who stops there has the answer. Here it is
+   * the worked example's outcome, which the steps then derive.
+   */
+  finding: Prose;
   /** Who the example district is and why it was chosen: the rule, not a name typed by hand. */
   intro: Prose[];
   /** The steps, in order. Each is one sentence a reader can check against the one before it. */
