@@ -334,12 +334,11 @@ export function renderOutcomes(bundle: Bundle): string {
         correlation of ${coefficient(o.poverty_vs_performance)}.</strong> One dot per district: the
         share of its pupils the state counts as economically disadvantaged, against its Performance Index. The line is the median of each
         fifth of districts, least poor on the left — the summary this card used to show on its
-        own, now drawn over the ${count(povertyPoints.length)} districts it summarizes. The column
-        at the right edge is the poverty measure's ceiling, explained under
-        <a href="#limits">what this cannot tell you</a>.</p>
+        own, now drawn over the ${count(povertyPoints.length)} districts it summarizes.</p>
       <div class="chartwrap" data-chart="poverty-and-performance">${renderToString(povertyScatter, { label: `Economically disadvantaged share against Performance Index across ${count(povertyPoints.length)} districts, with the median of each poverty fifth, ${yearOf("outcome.performance")}` })}</div>
       <p class="note">That is most of Ohio's attainment measure. Any other district-level variable correlated with it will
-        appear to predict achievement, and mostly will not be.</p>
+        appear to predict achievement, and mostly will not be. The column at the right edge is the
+        poverty measure's ceiling, explained under <a href="#limits">what this cannot tell you</a>.</p>
     </div>
 
     <div class="card" id="guarantee-trap" data-part="guarantee-trap">
