@@ -19,7 +19,7 @@
  * refuses to produce one, because a forecast exists for the narrow measure only and appending it
  * would extend a wide series with a narrow number. See `crates/project/src/biennium.rs`.
  */
-import { countyRank, largestMove, rankPhrase, signedPct, yearChange } from "./change.ts";
+import { countyRank, largestMove, rankPhrase, signedPct, statewideNote, yearChange } from "./change.ts";
 import { escapeHtml, money, signedMoney } from "./format.ts";
 import * as routes from "./routes.ts";
 import { anchor } from "./section.ts";
@@ -144,6 +144,7 @@ export function renderBiennium(d: District, districts: readonly District[]): str
             : ""
         }. <a href="${routes.districtChange(d.irn)}">Every line, the phase-in and the county's
         other districts</a> are on the Change tab.</p>
+      ${statewideNote()}
       <p class="note">The last column is the last year against the first. A two-year budget pays
         both of its years, so the biennium's whole departure from the year it is measured from is
         <strong>${signedMoney(b.total_middle - b.total_baseline + wide)}</strong> on total state

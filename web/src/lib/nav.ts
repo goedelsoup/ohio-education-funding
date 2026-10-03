@@ -83,7 +83,7 @@ export type Section =
  */
 export const NAMES = {
   statewide: { href: "/statewide", name: "Statewide" },
-  changed: { href: "/what-changed", name: "What changed" },
+  changed: { href: routes.WHAT_CHANGED, name: "What changed" },
   districts: { href: "/districts", name: "Find a district" },
   counties: { href: "/counties", name: "Counties" },
   house: { href: "/house", name: "House districts" },

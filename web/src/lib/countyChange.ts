@@ -24,6 +24,7 @@ import {
   type MeasureKey,
   neighborsChart,
   signedPct,
+  statewideNote,
   UNMOVED,
   type YearIndex,
   yearsOf,
@@ -283,6 +284,7 @@ export function renderWhoGained(c: County): string {
         own figures by line.</p>
       ${withoutSentence(c)}
       ${shareSentence(c)}
+      ${statewideNote()}
       <p class="note">A district whose territory crosses a county line is filed under the one
         county the department assigns it, so it appears on that county's page and on no other.</p>
     </div>`;
