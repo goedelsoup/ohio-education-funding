@@ -22,13 +22,28 @@ import type { Bundle, District, OutcomeStatewide } from "./types.ts";
 import { schoolYearBefore, seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
 import { term } from "./glossary.ts";
 import { anchor } from "./section.ts";
-import { median, quintiles } from "./stats.ts";
+import { median, percentile, quintiles } from "./stats.ts";
 import { bands, medianTrace, pairs } from "./relationships.ts";
 import { firstOf, lastOf } from "./ends.ts";
 
 /** A correlation, signed and to three places. */
 function coefficient(v: number): string {
   return signed(v, 3);
+}
+
+/**
+ * The plot area's height for each of the two spending panels, in pixels.
+ *
+ * 270 less the margins the wide layout draws — 28 above, and 56 below because the log axis's foot
+ * takes a second line — so the pair is the 270px frames that put it on one screen at 1280x800
+ * (#657), and at every width the two plot areas are the same height (#702).
+ */
+const PAIR_PLOT_HEIGHT = 186;
+
+/** A median line's first-to-last change, as a verb phrase in Performance Index points. */
+function movement(points: number): string {
+  const by = fixed(Math.abs(points), 1);
+  return points > 0 ? `rises ${by} points` : points < 0 ? `falls ${by} points` : "is level";
 }
 
 /** Districts grouped into fifths by poverty, poorest last. */
@@ -119,17 +134,17 @@ export function renderOutcomes(bundle: Bundle): string {
    *
    * A single median line through either cloud says what the middle does and hides what the cloud
    * is made of. Banded, the weighted chart shows three poverty groups occupying the *same* range
-   * of spending — p10 within $500 of each other, p90 within $100 — at Performance Index medians
-   * eighteen points apart. That is what a −0.004 correlation looks like from the inside, and it is
-   * the difference between reading "the denominator absorbs the poverty difference" and seeing it.
+   * of spending — their tenth and ninetieth percentiles each a few hundred dollars apart — at
+   * Performance Index medians eighteen points apart. That is what a −0.004 correlation looks like
+   * from the inside, and it is the difference between reading "the denominator absorbs the poverty difference" and seeing it.
    *
    * The bands are computed once, off poverty, and shared by both charts. Recomputing them per
    * chart would let the two disagree about which districts are poor, which is the one thing a
    * side-by-side comparison must not do.
    */
   const povertyBands = bands(bundle.districts, (d) => d.economically_disadvantaged);
-  // Each median line's name, drawn in the chart's gutter where the line ends (#657). Short,
-  // because the gutter is taken from the cloud; the dek says they are thirds.
+  // Each median line's name, drawn on the line where it ends (#702). Short, because a name runs
+  // over the cloud or into the gutter; the dek says they are thirds.
   const BAND_LABELS = ["Least poor", "Middle", "Poorest"];
 
   /*
@@ -161,33 +176,58 @@ export function renderOutcomes(bundle: Bundle): string {
       { band: (d) => povertyBands.get(d) },
     );
 
-    // One median per band rather than one through everything: three lines that stay level
-    // together, or three that separate, is the finding either way.
-    const traces = BAND_LABELS.map((label, band) =>
-      medianTrace(
-        points.filter((p) => p.band === band).map((p) => ({ x: p.x, y: p.y })),
-        4,
-        label,
-        "formula",
-      ),
-    ).map((trace, band) => ({ ...trace, band }));
+    /*
+     * One median per band, and one through everything under them (#702).
+     *
+     * The bands are what the cloud is made of. The pooled line is what each lead-in states: the
+     * −0.004 is a correlation over every district, and drawn by band alone the "flat" panel showed
+     * the least-poor line rising about five points and the poorest falling about five, with
+     * nothing flat on it.
+     * Flat is their cancellation, and the dashed line is where a reader can see it.
+     */
+    const pooled = {
+      ...medianTrace(points.map((p) => ({ x: p.x, y: p.y })), 5, "All districts", "formula"),
+      pooled: true,
+    };
+    const traces = [
+      pooled,
+      ...BAND_LABELS.map((label, band) => ({
+        ...medianTrace(
+          points.filter((p) => p.band === band).map((p) => ({ x: p.x, y: p.y })),
+          4,
+          label,
+          "formula",
+        ),
+        band,
+      })),
+    ];
 
+    /*
+     * On a log axis (#702): linear from the cheapest district to the dearest, seven in ten dots
+     * sat in the left 30% of the frame and five in six overlapped another. Money is drawn on log
+     * axes elsewhere on the site for the same reason, and the domain is still the one shared one.
+     */
     const drawing: Drawing = (w) =>
       scatterSpec(
         points,
         {
-          x: { label: `spending per ${label}`, format: compactMoney },
+          x: { label: `spending per ${label}`, format: compactMoney, log: true },
           y: { label: "Performance Index", format: (v) => fixed(v, 0) },
         },
         traces,
-        // 270 so the pair is one screen at 1280x800: at 330 the two drew 894px from the first
-        // lead-in, and the card's argument is the contrast between them (#657).
-        { width: w, height: 270, xDomain: spendingDomain },
+        // The plot's height, not the frame's (#702): a total height let a two-line axis name at
+        // 375 shrink one panel's vertical scale and not the other's. At 1280 it is the 270px frame
+        // that put the pair on one screen at 1280x800 (#657).
+        { width: w, plotHeight: PAIR_PLOT_HEIGHT, xDomain: spendingDomain },
       );
-    return drawing;
+    return { drawing, bands: traces.slice(1).map((t) => t.points) };
   };
-  const weightedScatter = spending((d) => d.outcome?.per_equivalent_pupil, "need-weighted pupil");
-  const enrolledScatter = spending((d) => d.outcome?.per_enrolled_pupil, "enrolled pupil");
+  const weighted = spending((d) => d.outcome?.per_equivalent_pupil, "need-weighted pupil");
+  const enrolled = spending((d) => d.outcome?.per_enrolled_pupil, "enrolled pupil");
+  // A line's change from its first point to its last, in Performance Index points.
+  const change = (line: { y: number }[]) => lastOf(line).y - firstOf(line).y;
+  const leastPoorChange = change(firstOf(weighted.bands));
+  const poorestChange = change(lastOf(weighted.bands));
 
   /* Stated rather than left to the eye. Read off the same banding the charts are drawn from, so a
      regenerated bundle moves the sentence with the picture. */
@@ -205,6 +245,20 @@ export function renderOutcomes(bundle: Bundle): string {
     bandMedian(2, (d) => d.outcome?.per_enrolled_pupil) -
       bandMedian(0, (d) => d.outcome?.per_enrolled_pupil),
   );
+  // How far apart the thirds' tenth and ninetieth percentiles of weighted spending sit: a literal
+  // $500 here was $512 on the data (#702).
+  const weightedSpread = (q: number) => {
+    const at = [0, 1, 2].map((band) =>
+      percentile(
+        bundle.districts
+          .filter((d) => povertyBands.get(d) === band)
+          .map((d) => d.outcome?.per_equivalent_pupil)
+          .filter((v): v is number => v != null),
+        q,
+      ),
+    );
+    return Math.round(Math.max(...at) - Math.min(...at));
+  };
 
   return `
     <div class="tiles">
@@ -260,21 +314,25 @@ export function renderOutcomes(bundle: Bundle): string {
         attainment at ${coefficient(o.weighted_spending_vs_performance)}; divided by enrolled
         pupils, at ${coefficient(o.enrolled_spending_vs_performance)}.</strong> The same districts
         and the same two axes, twice — both charts are drawn on
-        one horizontal scale spanning the wider of the two denominators, so a difference in
-        horizontal position is a difference in dollars and not in the frame. Above, the department
+        one horizontal scale spanning the wider of the two denominators, logarithmic, so a
+        difference in horizontal position is a proportion of spending and not a difference in the
+        frame. Above, the department
         divides spending by a count weighted upward for disadvantage, English learners and
         disability; below, by the pupils actually enrolled. Each dot is shaded by the third of the
         state its district's poverty rate falls in — the variable neither axis carries, and the one
         both charts are really about.</p>
       <p class="note"><strong>Flat:</strong> per <em>need-weighted</em> pupil, spending predicts
-        nothing (${coefficient(o.weighted_spending_vs_performance)}).</p>
-      <div class="chartwrap" data-chart="weighted-spending">${renderToString(weightedScatter, { label: `Spending per need-weighted pupil against Performance Index, one dot per district shaded by poverty third, with a median line for each third, ${yearOf("outcome.spending")} spending and ${yearOf("outcome.performance")} attainment` })}</div>
+        nothing (${coefficient(o.weighted_spending_vs_performance)}). The dashed line through all
+        districts is level; under it the least poor third's line ${movement(leastPoorChange)} and the
+        poorest third's ${movement(poorestChange)}.</p>
+      <div class="chartwrap" data-chart="weighted-spending">${renderToString(weighted.drawing, { label: `Spending per need-weighted pupil against Performance Index, one dot per district shaded by poverty third, with a median line for each third and a dashed one through all districts, ${yearOf("outcome.spending")} spending and ${yearOf("outcome.performance")} attainment` })}</div>
       <p class="note"><strong>Falls:</strong> per <em>enrolled</em> pupil, attainment falls as
-        spending rises (${coefficient(o.enrolled_spending_vs_performance)}).</p>
-      <div class="chartwrap" data-chart="enrolled-spending">${renderToString(enrolledScatter, { label: `Spending per enrolled pupil against Performance Index, one dot per district shaded by poverty third, with a median line for each third, ${yearOf("outcome.spending")} spending and ${yearOf("outcome.performance")} attainment` })}</div>
+        spending rises (${coefficient(o.enrolled_spending_vs_performance)}), along the dashed line
+        through all districts.</p>
+      <div class="chartwrap" data-chart="enrolled-spending">${renderToString(enrolled.drawing, { label: `Spending per enrolled pupil against Performance Index, one dot per district shaded by poverty third, with a median line for each third and a dashed one through all districts, ${yearOf("outcome.spending")} spending and ${yearOf("outcome.performance")} attainment` })}</div>
       <p class="note">In the upper chart <strong>the three thirds sit at the same spending and
-        at different attainment</strong>: their tenth percentiles are within
-        ${money(500)} of each other and their ninetieths within ${money(100)}, while their median
+        at different attainment</strong>: their tenth percentiles are
+        ${money(weightedSpread(0.1))} apart and their ninetieths ${money(weightedSpread(0.9))}, while their median
         Performance Index runs ${bandMedians[0]}, ${bandMedians[1]}, ${bandMedians[2]}. The
         denominator has absorbed the difference between them, which is what a coefficient of
         ${coefficient(o.weighted_spending_vs_performance)} looks like from the inside.</p>

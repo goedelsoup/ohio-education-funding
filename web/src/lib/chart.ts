@@ -170,6 +170,14 @@ export interface Trace {
   series: "formula" | "guarantee";
   /** Draw in this step of the ordinal ramp instead, for a trace summarising one band. */
   band?: number;
+  /**
+   * The median through every band at once, drawn neutral and dashed under the band lines (#702).
+   *
+   * A banded chart's lead-in states the pooled correlation, and the band lines alone do not draw
+   * it: on `/outcomes` the need-weighted thirds tilt in opposite directions and "flat" is their
+   * cancellation. This is the line a pooled claim is true of, so the claim names a visible mark.
+   */
+  pooled?: boolean;
   points: { x: number; y: number }[];
 }
 

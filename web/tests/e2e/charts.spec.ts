@@ -623,18 +623,21 @@ test.describe("colour that carries a third variable", () => {
      * and here that is the card's whole argument: the three poverty thirds sit at the same
      * spending per need-weighted pupil and at different attainment.
      *
-     * The ramp's end steps sit near 2.2:1 against their surface, which obliges a key in text ink.
-     * One legend keyed both charts from above the first until #657; each chart now names its own
-     * three lines in its gutter, behind a swatch of each band.
+     * The ramp's end steps sit near 2.2:1 against their surface, which obliges names in text ink.
+     * One legend keyed both charts from above the first until #657, and a gutter key beside each
+     * until #702; each line is now named where it ends, with a dashed line through all districts
+     * that the lead-ins' pooled correlations are true of.
      */
     await page.goto("/outcomes");
     const card = page.locator('[data-part="two-denominators"]');
     await expect(card.locator(".legend")).toHaveCount(0);
     for (const key of ["weighted-spending", "enrolled-spending"]) {
       const chart = card.locator(`[data-chart="${key}"] svg.plot:visible`);
-      await expect(chart.locator(".scatter-trace")).toHaveCount(3);
-      await expect(chart.locator(".scatter-band-key > *")).toHaveCount(3);
+      await expect(chart.locator(".scatter-trace")).toHaveCount(4);
+      await expect(chart.locator(".scatter-trace-halo")).toHaveCount(4);
+      await expect(chart.locator(".scatter-band-key")).toHaveCount(0);
       expect((await chart.locator(".scatter-trace-end").allTextContents()).sort()).toEqual([
+        "All districts",
         "Least poor",
         "Middle",
         "Poorest",
