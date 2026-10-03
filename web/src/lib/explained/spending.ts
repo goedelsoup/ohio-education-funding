@@ -125,7 +125,7 @@ function chart(districts: readonly District[], spent: string, scored: string) {
     svg,
     caption:
       "Each dot is one district: across is spending per need-weighted pupil, up is its score. " +
-      "Each solid line follows the middle of one poverty third. The dashed line follows all of them, and is close to level because the others tilt in opposite ways.",
+      "Each solid line is for one third of districts by poverty, and the dashed line is for all of them.",
   };
 }
 
@@ -156,11 +156,9 @@ export const SPENDING: TopicModule = {
         rest: "Poorer districts get more money and score lower, and that explains most of the link.",
       },
       picture:
-        "It is like comparing hospitals. The ones that spend the most on each patient treat the sickest patients. " +
-        "So across hospitals, more money goes with worse health, and no one thinks the money makes people ill.",
+        "It is like comparing hospitals. The ones that spend the most on each patient treat the sickest. " +
+        "So more money goes with worse health, and no one thinks the money makes people ill.",
       breaks: [
-        "A hospital spends on how sick each patient is. A school's money follows its pupils' needs only in part, " +
-          "and its pupils differ in ways the money does not follow at all.",
         "A single number can show how closely two things move together. It runs from minus one, through zero for not at all, to one. " +
           `Spending in ${spent} against scores in ${scored} gives ${coefficient(enrolled.pooled)} for each enrolled pupil, ` +
           `and ${coefficient(weighted.pooled)} for each pupil weighted for need. The weighting counts poorer pupils as more than one.`,
@@ -171,8 +169,7 @@ export const SPENDING: TopicModule = {
         chip: "outcome.performance",
         finding: `In ${spent}, ${name} spent ${money(MEASURES.enrolled.of(d)!)} for each enrolled pupil, and scored ${fixed(score(d)!, 1)} in ${scored}.`,
         intro: [
-          `The example is the middle district when the ${count(all.length)} with a score are ranked by spending per enrolled pupil. ` +
-            `It is ${name}.`,
+          `The example is the middle one of the ${count(all.length)} districts with a score, by spending on each enrolled pupil: ${name}.`,
         ],
         steps: [
           `In ${spent}, ${name} spent ${money(MEASURES.enrolled.of(d)!)} for each pupil enrolled.`,
@@ -184,7 +181,7 @@ export const SPENDING: TopicModule = {
         after: [
           `Across the thirds, the median score falls from ${fixed(thirdMedian(0, score), 1)} to ${fixed(thirdMedian(2, score), 1)}, ` +
             `and median spending per enrolled pupil in ${spent} rises from ${money(thirdMedian(0, MEASURES.enrolled.of))} to ${money(thirdMedian(2, MEASURES.enrolled.of))}. ` +
-            "That is why the enrolled number is negative: the money follows poverty, and so do the scores.",
+            "The money follows poverty, and so do the scores.",
           "None of this says what a dollar does to a score. It says which districts get more, and that poverty sits behind both.",
         ],
       },
