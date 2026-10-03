@@ -2201,6 +2201,10 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
   column-gap: var(--space-8);
 }
 .chart-values li { break-inside: avoid; }
+/* The rows of a long table past its first few, folded (#708). Summary styled as a chart's values. */
+.table-rest { margin-top: var(--space-2); }
+.table-rest > summary { cursor: pointer; font-size: var(--text-sm); color: var(--text-secondary); }
+.table-rest > summary:hover { color: var(--text-primary); }
 .chart-anchor { color: var(--text-muted); text-decoration: none; }
 .chart-anchor:hover { color: var(--text-primary); }
 .chart-anchor:focus-visible {

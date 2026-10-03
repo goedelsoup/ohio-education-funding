@@ -3,8 +3,8 @@
  *
  * # The finding
  *
- * The card above this one shows what the legislature set aside. This shows what the setting-aside
- * consists of: about ninety appropriation lines, created by acts spanning half a century. The
+ * The appropriation card on /history shows what the legislature set aside. This shows what the
+ * setting-aside consists of: about ninety appropriation lines, created by acts spanning half a century. The
  * oldest still-live line predates every funding regime this corpus documents — including the one
  * struck down in *DeRolph*.
  *
@@ -30,6 +30,7 @@
  */
 
 import { escapeHtml } from "./format.ts";
+import { foldedTable } from "./fold.ts";
 import type { AppropriationLine } from "./types.ts";
 import { yearChip } from "./year.ts";
 import { anchor } from "./section.ts";
@@ -61,6 +62,29 @@ export function ordinal(n: number): string {
   const two = n % 100;
   if (two >= 11 && two <= 13) return `${n}th`;
   return `${n}${["th", "st", "nd", "rd"][n % 10] ?? "th"}`;
+}
+
+/**
+ * How many lines the card shows before the rest fold (#708).
+ *
+ * Sixty-nine rows ran about 4,000px at 1280, ahead of the page's longest chart. Ten show the
+ * table's shape — the oldest lines, since it is sorted by age — and the rest are one click away,
+ * in a closed `details` as a chart's values are.
+ */
+export const SHOWN = 10;
+
+const HEAD = `<thead><tr><th class="tnum">Line</th><th>Name</th><th>Fund</th>
+          <th>Established by</th><th class="tnum">Convened</th></tr></thead>`;
+
+/** One live line as a table row. */
+function row(l: AppropriationLine): string {
+  return `<tr>
+              <th class="tnum n">${escapeHtml(l.ali)}</th>
+              <td>${escapeHtml(l.name)}</td>
+              <td class="n">${escapeHtml(l.fund)}</td>
+              <td>${l.established_by === "" ? '<span class="n">not stated</span>' : escapeHtml(l.established_by)}</td>
+              <td class="tnum n">${l.convened ?? "—"}</td>
+            </tr>`;
 }
 
 /** The lines the department is funded through, and where each came from. */
@@ -99,21 +123,7 @@ export function renderLineOrigins(lines: AppropriationLine[]): string {
         inherited.</p>`
       }
 
-      <div class="scroll"><table>
-        <thead><tr><th class="tnum">Line</th><th>Name</th><th>Fund</th>
-          <th>Established by</th><th class="tnum">Convened</th></tr></thead>
-        <tbody>${live
-          .map(
-            (l) => `<tr>
-              <th class="tnum n">${escapeHtml(l.ali)}</th>
-              <td>${escapeHtml(l.name)}</td>
-              <td class="n">${escapeHtml(l.fund)}</td>
-              <td>${l.established_by === "" ? '<span class="n">not stated</span>' : escapeHtml(l.established_by)}</td>
-              <td class="tnum n">${l.convened ?? "—"}</td>
-            </tr>`,
-          )
-          .join("")}</tbody>
-      </table></div>
+      ${foldedTable(HEAD, live.map(row), SHOWN, `The other ${live.length - SHOWN} lines`)}
 
       <p class="note">${undated} of these lines name no establishing act. The Catalog gives every
         line a legal basis and only sometimes says which act created it; where it does not, this

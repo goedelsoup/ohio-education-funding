@@ -4151,6 +4151,40 @@ export function indexStep(span: number): number {
   return span <= 20 ? 5 : span <= 50 ? 10 : 20;
 }
 
+/** A dated event drawn across a series' index — see {@link SeriesOptions.events}. */
+export interface SeriesEvent {
+  at: number;
+  label: string;
+}
+
+/** One position on one line, named on the chart — see {@link SeriesOptions.callouts}. */
+export interface SeriesCallout {
+  at: number;
+  key: "a" | "b";
+  label: string;
+}
+
+/** The drop per line of an event label above the frame: 11px type and the space under it. */
+const EVENT_LINE = 13;
+
+/** The most lines an event label may take before it is dropped rather than wrapped further. */
+const EVENT_LINES = 2;
+
+/** The most lines a callout may take before its text is dropped and its dot kept. */
+const CALLOUT_LINES = 3;
+
+/** How many rows of event labels may stack above a series frame. */
+const EVENT_TIERS = 2;
+
+/**
+ * The space between one tier of event labels and the next.
+ *
+ * A one-line name's drawn box is the whole of {@link EVENT_LINE}, so tiers spaced at exactly that
+ * touched: 0.1px apart in one drawing and 0.1px through each other in the next, on /history's
+ * meal chart at 600 (#708).
+ */
+const EVENT_TIER_GAP = 3;
+
 /** What a caller tells {@link seriesSpec} beyond the points themselves. */
 export interface SeriesOptions {
   width: number;
@@ -4187,6 +4221,23 @@ export interface SeriesOptions {
   span?: number[];
   /** What the values are in, said in the foot ahead of the truncation: "in constant FY2009 dollars". */
   unit?: string;
+  /**
+   * Dated events on the index — the change of law a time series is read against (#708).
+   *
+   * Each inside the index's span is a full-height dashed rule, named above the frame and wrapped
+   * to the room before the next one. A name that will not fit is dropped and its rule kept, so a
+   * caller passing events also says them in text beside the chart: at a phone's width two regimes
+   * two years apart leave room for one name. An event at the first position is not drawn — a
+   * boundary at the frame's edge separates nothing.
+   */
+  events?: SeriesEvent[];
+  /**
+   * Positions on a line named where they are drawn: a spike the prose explains (#708).
+   *
+   * A dot on the line and a label beside it on a halo, on the side the frame has room. Not a
+   * hover — the point of it is that a reader who never moves the pointer still reads it.
+   */
+  callouts?: SeriesCallout[];
 }
 
 /**
@@ -4301,6 +4352,9 @@ export function seriesSpec(
         textAnchor: "start",
         lineAnchor,
         fill: ink,
+        // A halo, so an event rule behind the label is cut rather than read through (#708).
+        stroke: INK.surface,
+        strokeWidth: 3,
         className: "series-end",
       }),
     ];
@@ -4325,6 +4379,9 @@ export function seriesSpec(
         text: () => startText(point, key),
         textAnchor: "end",
         fill: ink,
+        // A halo, so an event rule behind the label is cut rather than read through (#708).
+        stroke: INK.surface,
+        strokeWidth: 3,
         className: "series-start",
       }),
     ];
@@ -4401,6 +4458,67 @@ export function seriesSpec(
     ? Math.max(0, Math.min(gutter(options.width, 32 + longestLine * 7.2), cap - marginLeft))
     : gutter(options.width, wantedRight);
   /*
+   * The events, named above the frame (#708). Above rather than inside it, so a name never sits on
+   * a line: the top of the frame is where these charts' highest values are drawn.
+   *
+   * In tiers, placed from the right. A regime can last two years, and a name held to the room
+   * before the next rule would drop the short one at every width. Placing the latest first and
+   * each earlier name on the lowest tier where it clears what is already there means a name only
+   * ever sits right of the rules it is above, so the rule extended up to its name crosses nothing.
+   * A name is wrapped to the drawing's right edge, and one that fits no tier is dropped.
+   *
+   * The right gutter is open above the frame — the end labels sit at their values, inside it —
+   * so a name may run into it, unless the end labels are stacked: the upper one then grows up from
+   * its value, and at the top of the range it reaches above the frame.
+   */
+  const frame = options.width - marginLeft - marginRight;
+  const xAt = (at: number) => ((at - first.at) / (last.at - first.at)) * frame;
+  const events = (options.events ?? [])
+    .filter((e) => e.at > first.at && e.at <= last.at)
+    .sort((x, y) => x.at - y.at);
+  const edge = stacked ? frame : frame + marginRight - 4;
+  /** Where each tier's leftmost placed name begins. */
+  const clear: number[] = Array.from({ length: EVENT_TIERS }, () => edge);
+  const placed: (SeriesEvent & { text: string; lines: number; tier: number })[] = [];
+  for (const event of [...events].reverse()) {
+    const x = xAt(event.at);
+    // 3 is the name's offset from its rule and 6 the gap it keeps from the next name; wrapping to
+    // any more than what is left after both would make a name that fits no tier.
+    const lines = wrapText(event.label, edge - x - 9);
+    if (lines.length > EVENT_LINES) continue;
+    const right = x + 3 + Math.max(...lines.map((l) => textPx(l)));
+    const tier = clear.findIndex((edge) => right + 6 <= edge);
+    if (tier < 0) continue;
+    clear[tier] = x;
+    placed.push({ ...event, text: lines.join("\n"), lines: lines.length, tier });
+  }
+  /** Each tier's height, and how far above the frame it starts. */
+  const tierLines = clear.map((_, t) => Math.max(0, ...placed.filter((e) => e.tier === t).map((e) => e.lines)));
+  const below = (tier: number) =>
+    tierLines.slice(0, tier).reduce((sum, n) => sum + (n > 0 ? n * EVENT_LINE + EVENT_TIER_GAP : 0), 0);
+  const named = placed.map((e) => ({ ...e, lift: 4 + below(e.tier), reach: below(e.tier) + e.lines * EVENT_LINE }));
+  const raised = below(EVENT_TIERS);
+  const marginTop = 14 + (raised > 0 ? raised + 4 : 0);
+
+  /*
+   * The callouts, on whichever side of their point has the room: left of a point in the right half
+   * of the frame, right of one in the left. Hung from the frame's top rather than centred on the
+   * point, so a note on a spike stays under the event names however many lines it takes; wrapped
+   * to two-fifths of the frame, and past three lines the note is dropped and the dot kept — the
+   * card's prose says what it is.
+   */
+  const callouts = (options.callouts ?? []).flatMap((c) => {
+    const point = points.find((p) => p.at === c.at);
+    const value = point?.[c.key];
+    if (value == null) return [];
+    const left = xAt(c.at) > frame / 2;
+    const room = Math.min(frame * 0.4, left ? xAt(c.at) - 10 : frame - xAt(c.at) - 10);
+    const lines = wrapText(c.label, room);
+    const fits = lines.length <= CALLOUT_LINES && lines.every((l) => textPx(l) <= room);
+    return [{ at: c.at, value, key: c.key, left, text: fits ? lines.join("\n") : "" }];
+  });
+
+  /*
    * The interior positions at a round step (#706). The ends alone left a reader unable to find
    * FY2014's gap, the FY2010 basis break or the year of a spike on a 220px frame over thirty
    * years. The foot keeps the ones that clear the ends and each other, and a tick is drawn only
@@ -4430,21 +4548,74 @@ export function seriesSpec(
   return {
     options: {
       width: options.width,
-      height: 220,
-      marginTop: 14,
+      // The frame keeps its height; the event names add to the drawing above it.
+      height: 220 + (marginTop - 14),
+      marginTop,
       marginBottom: 26 + foot.extraBottom,
       marginLeft,
       marginRight,
       x: { axis: null, domain: [first.at, last.at] },
       y: { axis: null, domain: [min, max] },
       marks: [
-        ...reference(options.width - marginLeft - marginRight),
+        ...reference(frame),
+        // Under the lines, as the reference is: what they are read against, not among them.
+        /*
+         * One rule per event, to the frame's top; a named one reaches on up beside its name, so a
+         * name on the second tier is not left floating over the first's.
+         */
+        ...events.map((event) => {
+          const name = named.find((e) => e.at === event.at && e.label === event.label);
+          // `y1` the top: Plot applies `insetTop` to `y1` whichever end it is.
+          return Plot.ruleX([event], {
+            x: "at",
+            y1: max,
+            y2: min,
+            insetTop: name ? -name.reach : 0,
+            ...RULE.event,
+            className: "series-event",
+          });
+        }),
+        ...named.map((e) =>
+          Plot.text([e], {
+            x: "at",
+            y: max,
+            dx: 3,
+            dy: -e.lift,
+            text: "text",
+            textAnchor: "start",
+            lineAnchor: "bottom",
+            fill: INK.muted,
+            stroke: INK.surface,
+            strokeWidth: 3,
+            fontSize: 11,
+            className: "series-event-label",
+          }),
+        ),
         line("a", hueA.stroke, "series-a"),
         line("b", hueB.stroke, "series-b"),
         ...endLabel(endA, "a", hueA.text, stacked),
         ...endLabel(endB, "b", hueB.text, stacked),
         ...startLabel(startA, "a", hueA.text),
         ...startLabel(startB, "b", hueB.text),
+        ...callouts.flatMap((c) => {
+          const hue = c.key === "a" ? hueA : hueB;
+          return [
+            Plot.dot([c], { x: "at", y: "value", r: 3, fill: hue.stroke, className: "series-callout" }),
+            Plot.text(c.text ? [c] : [], {
+              x: "at",
+              y: max,
+              dx: c.left ? -7 : 7,
+              text: "text",
+              textAnchor: c.left ? "end" : "start",
+              lineAnchor: "top",
+              fill: hue.text,
+              stroke: INK.surface,
+              strokeWidth: 3,
+              fontSize: 11,
+              className: "series-callout",
+            }),
+          ];
+        }),
         Plot.ruleY([min], { stroke: INK.rule, className: "axis" }),
         // Under the axis rule, at each interior label the foot kept.
         Plot.ruleX(foot.between, {

@@ -284,3 +284,35 @@ test.describe("the statute timeline", () => {
     await expect(page.locator("#acts tbody td:empty")).toHaveCount(0);
   });
 });
+
+test.describe("the page's charts are near each other", () => {
+  test("no two consecutive charts are more than 2,500px apart at 1280", async ({ page }) => {
+    /*
+     * #708. A 69-row table and a 30-row one stood between charts, and at 1280 the reader scrolled
+     * 5,400px from one drawing to the next. Measured on the charts a reader is shown — the hidden
+     * basis's drawings have no box — so a basis toggle does not count its charts twice.
+     */
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto("/history");
+    const tops = await page.evaluate(() =>
+      [...document.querySelectorAll("svg.plot")]
+        .map((svg) => svg.getBoundingClientRect())
+        .filter((box) => box.height > 0)
+        .map((box) => Math.round(box.top + window.scrollY)),
+    );
+    expect(tops.length, "the page draws its charts").toBeGreaterThanOrEqual(4);
+    const far = tops.slice(1).flatMap((top, i) => (top - tops[i]! > 2_500 ? [`${tops[i]} → ${top}`] : []));
+    expect(far, "consecutive charts farther apart than 2,500px").toEqual([]);
+  });
+
+  test("each chart that crosses a change of formula marks it, and says which", async ({ page }) => {
+    // #708: thirty years across four regimes, and no time axis marked one of them. FY2012 because
+    // every chart here spans it; the meal series stops before FY2022, so its key ends at Bridge.
+    await page.goto("/history");
+    for (const part of ["revenue-mix", "equity-gap", "meal-program", "appropriations"]) {
+      const card = page.locator(`.card[data-part="${part}"]`).first();
+      await expect(card.locator(".series-event").first(), part).toBeAttached();
+      await expect(card.locator(".regime-key"), part).toContainText("FY2012, Bridge Formula");
+    }
+  });
+});

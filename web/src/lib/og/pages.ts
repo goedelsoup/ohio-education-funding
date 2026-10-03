@@ -20,7 +20,7 @@
 import { census } from "../bounds.ts";
 import { loadCorpus } from "../corpus.ts";
 import { loadFeed } from "../feed.ts";
-import { acts, regimes } from "../legislation.ts";
+import { acts, regimes, regimesCrossed } from "../legislation.ts";
 import { count, millions, pct } from "../format.ts";
 import type { Card } from "./card.ts";
 import { firstOf, lastOf } from "../ends.ts";
@@ -51,6 +51,11 @@ export function pageCards(): Record<string, Card> {
       ? 0
       : (lastOf(spans).to ?? Math.max(...statutes.map((a) => a.year)));
   const spanStart = spans.length === 0 ? 0 : firstOf(spans).from;
+  /* The years `/history` draws, across its three sources, and the regimes they cross (#708). */
+  const drawn = [bundle.history, bundle.meal_program, bundle.appropriations].flatMap((rows) =>
+    rows.map((r) => r.fiscal_year),
+  );
+  const crossed = drawn.length === 0 ? [] : regimesCrossed(spans, Math.min(...drawn), Math.max(...drawn));
   const s = bundle.statewide;
   const fy = `FY${bundle.fiscal_year}`;
   const aid = millions(s.realized_aid_total).replace("+", "");
@@ -180,7 +185,7 @@ export function pageCards(): Record<string, Card> {
     history: {
       eyebrow: SITE,
       headline: "How Ohio got here",
-      figure: "Four funding regimes",
+      figure: `${crossed.length} funding regimes`,
       figureNote:
         "From the foundation formula through DeRolph to the Fair School Funding Plan, and what each one paid",
       meta: `${fy} model, on a panel that starts in FY2009`,

@@ -133,4 +133,9 @@ export const RULE = {
   boundary: ["4 3", "1.5 3"],
   /** A projection's central path, which is a model's value and not an observation. */
   projection: { strokeDasharray: "5 4" },
+  /**
+   * A dated event on a time axis — a change of law (#708). Rule ink, not muted: it is where a
+   * reader looks for a cause, and it stays recessive behind every line the chart is about.
+   */
+  event: { stroke: INK.rule, strokeDasharray: "4 3" },
 } as const;
