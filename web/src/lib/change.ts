@@ -51,6 +51,20 @@ export const MEASURES: Record<
   },
 };
 
+/** A card on `/what-changed`, which explains a provision for every district at once (#694). */
+const changed = (id: routes.Section) => routes.at(routes.WHAT_CHANGED, id);
+
+/**
+ * The one sentence the dashboard's biennium card and the county page's who-gained card send a
+ * reader to the statewide reading with (#694). It names what the page reads, never why any of it
+ * was done.
+ */
+export function statewideNote(): string {
+  return `<p class="note">The same steps for every district in Ohio, one provision at a time — the
+    supplement H.B. 96 repealed, the new count in DPIA, reappraisal through local capacity and the
+    phase-in — are on <a href="${routes.WHAT_CHANGED}">What changed</a>.</p>`;
+}
+
 /** The model's three fiscal years, read from the feed. */
 export function yearsOf(b: Biennium): [number, number, number] {
   return [b.year_baseline, b.year_middle, b.year_terminal];
@@ -169,6 +183,8 @@ export interface Line {
   levels: [number, number, number];
   /** Foundation aid is the narrow measure itself, and is marked as one. */
   measure?: MeasureKey;
+  /** The `/what-changed` card for the provision that moved this line, where the district had it. */
+  provision?: string;
 }
 
 export function namedLines(b: Biennium): Line[] {
@@ -182,7 +198,14 @@ export function namedLines(b: Biennium): Line[] {
     { label: "Transportation", levels: at((o) => o.transportation) },
     { label: "Special education transportation", levels: at((o) => o.special_education_transportation) },
     { label: "Preschool special education", levels: at((o) => o.preschool_special_education) },
-    { label: "Supplemental targeted assistance (repealed by H.B. 96)", levels: at((o) => o.targeted_assistance) },
+    {
+      label: "Supplemental targeted assistance (repealed by H.B. 96)",
+      levels: at((o) => o.targeted_assistance),
+      // Only where the first year paid it: a district that never had the line lost nothing to its repeal.
+      ...(b.observed[0]!.targeted_assistance >= UNMOVED
+        ? { provision: changed(routes.SECTIONS.changed.targetedAssistance) }
+        : {}),
+    },
     { label: "Formula transition supplement", levels: at((o) => o.formula_transition) },
     { label: "Base funding supplement", levels: at((o) => o.base_funding) },
     { label: "Enrollment growth supplement", levels: at((o) => o.enrollment_growth) },
@@ -230,9 +253,10 @@ export function renderByLine(d: District): string {
   const b = d.biennium;
   const years = yearsOf(b);
   const total = MEASURES.total.levels(b);
-  const row = (label: string, levels: [number, number, number], strong = false) => {
+  const row = (label: string, levels: [number, number, number], strong = false, href?: string) => {
     const cells = levels.map((v) => `<td class="tnum">${money(v)}</td>`).join("");
-    const head = strong ? `<strong>${escapeHtml(label)}</strong>` : escapeHtml(label);
+    const text = href ? `<a href="${href}">${escapeHtml(label)}</a>` : escapeHtml(label);
+    const head = strong ? `<strong>${text}</strong>` : text;
     return `<tr><th scope="row">${head}</th>${cells}<td class="tnum">${signedMoney(levels[2] - levels[1])}</td></tr>`;
   };
   return `
@@ -252,7 +276,12 @@ export function renderByLine(d: District): string {
           <tbody>
             ${namedLines(b)
               .map((line) =>
-                row(line.measure ? `${line.label} (the narrow measure)` : line.label, line.levels, line.measure != null),
+                row(
+                  line.measure ? `${line.label} (the narrow measure)` : line.label,
+                  line.levels,
+                  line.measure != null,
+                  line.provision,
+                ),
               )
               .join("")}
             ${row("Total state support (the wide measure)", total, true)}
@@ -272,6 +301,9 @@ export function renderByLine(d: District): string {
  * R.C. 3317.022 pays `base + rate × (calculated − base)`. A district whose formula calculates
  * about its base gains little however far the rate rises, which this card says in words where
  * it is so rather than leaving the reader to subtract.
+ *
+ * Every district is at its base in a model year or moved on foundation aid through the phase-in,
+ * so every one of them links to the statewide phase-in card (#694), and the link is unconditional.
  */
 export function renderPhaseIn(d: District): string {
   const b = d.biennium;
@@ -334,6 +366,9 @@ export function renderPhaseIn(d: District): string {
              and a change to its rate moves this district by little or nothing.</p>`
           : ""
       }
+      <p class="note">The <a href="${changed(routes.SECTIONS.changed.phaseIn)}">phase-in
+        statewide</a> counts the districts paid exactly their base in each year, which a higher rate
+        does not reach, and what it paid above everyone else's.</p>
     </div>`;
 }
 
@@ -357,7 +392,13 @@ export function renderDrivers(d: District): string {
           ${pct(last!.state_share, 1)} in FY${years[2]}. It is the part of base cost the state pays
           after the district's local capacity is charged, so it reaches the dollars through
           foundation aid, which moved ${signedMoney(foundation.dollars)} over the same two
-          years.</li>`
+          years.${
+            last!.state_share < middle!.state_share
+              ? ` <a href="${changed(routes.SECTIONS.changed.reappraisal)}">Reappraisal and the state
+                share</a> sets the fall beside every district's valuation change, by the share it
+                started at.`
+              : ""
+          }</li>`
       : `<li><strong>State share</strong> is not published for one of FY${years[1]} and
           FY${years[2]} for this district.</li>`;
   const valuation = `<li><strong>Assessed valuation</strong> went from ${money(v0)} in tax year ${t0}

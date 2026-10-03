@@ -41,6 +41,22 @@ describe("Lima City's change tab", () => {
     expect(card).toContain("the phase-in has almost nothing to phase in");
   });
 
+  test("links each provision that moved it to the card that reads it statewide (#694)", () => {
+    const supplement = document.querySelector('#by-line th a[href="/what-changed#targeted-assistance"]');
+    expect(text(supplement)).toBe("Supplemental targeted assistance (repealed by H.B. 96)");
+    expect(document.querySelector('#phase-in a[href="/what-changed#phase-in"]')).toBeTruthy();
+    expect(document.querySelector('#drivers a[href="/what-changed#reappraisal"]')).toBeTruthy();
+  });
+
+  test("lands every one of those links on a card the built page has", () => {
+    const changed = read("what-changed.html");
+    const fragments = [...document.querySelectorAll('a[href^="/what-changed#"]')].map(
+      (a) => a.getAttribute("href")!.split("#")[1]!,
+    );
+    expect(fragments).toHaveLength(3);
+    for (const id of fragments) expect(changed.getElementById(id), id).toBeTruthy();
+  });
+
   test("shows FY2026 transfers as unpublished, and FY2027's items", () => {
     const card = document.querySelector("#transfers")!;
     const cells = [...card.querySelectorAll("tbody tr")].map((row) =>
@@ -68,6 +84,7 @@ describe("Elida Local's dashboard", () => {
     const card = document.querySelector("#biennium")!;
     expect(text(card)).toContain("the 3rd-largest fall of 9 in Allen County");
     expect(card.querySelector('a[href="/district/045773/change"]')).toBeTruthy();
+    expect(card.querySelector('a[href="/what-changed"]')).toBeTruthy();
   });
 });
 
@@ -87,6 +104,7 @@ describe("Allen County's who-gained card (#640)", () => {
     expect(words).toContain("Supplemental targeted assistance (repealed by H.B. 96)");
     expect(words).toContain("Without supplemental targeted assistance");
     expect(words).toContain("Delphos City is at the formula's minimum state share");
+    expect(card!.querySelector('a[href="/what-changed"]')).toBeTruthy();
   });
 
   test("loads the sort script", () => {

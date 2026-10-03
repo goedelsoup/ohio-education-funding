@@ -26,6 +26,7 @@ import {
   yearsOf,
 } from "../../src/lib/change.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
+import * as routes from "../../src/lib/routes.ts";
 import type { District } from "../../src/lib/types.ts";
 
 const { bundle } = loadFeed();
@@ -200,4 +201,48 @@ test("the dashboard card carries the year on year, the rank, the line and the ta
   expect(html).toContain("the 3rd-largest fall of 9 in Allen County");
   expect(html).toContain("the line that moved it most is");
   expect(html).toContain(`href="/district/${ELIDA.irn}/change"`);
+});
+
+/** The `/what-changed` cards the Change tab links to (#694). */
+const TO = {
+  targetedAssistance: routes.at(routes.WHAT_CHANGED, routes.SECTIONS.changed.targetedAssistance),
+  phaseIn: routes.at(routes.WHAT_CHANGED, routes.SECTIONS.changed.phaseIn),
+  reappraisal: routes.at(routes.WHAT_CHANGED, routes.SECTIONS.changed.reappraisal),
+};
+const links = (html: string) => [...parseHTML(html).document.querySelectorAll("a")].map((a) => a.getAttribute("href"));
+
+test("the repealed supplement's row links to its statewide card, for the 36 districts it paid", () => {
+  const row = parseHTML(renderByLine(LIMA)).document.querySelector(`a[href="${TO.targetedAssistance}"]`);
+  expect(row?.closest("th")?.textContent).toBe("Supplemental targeted assistance (repealed by H.B. 96)");
+  // Elida never had the line, so its repeal took nothing from it and its row is plain.
+  expect(links(renderByLine(ELIDA))).not.toContain(TO.targetedAssistance);
+  const paid = districts.filter((d) => d.biennium.observed[0]!.targeted_assistance > 0);
+  expect(paid).toHaveLength(36);
+  expect(districts.filter((d) => links(renderByLine(d)).includes(TO.targetedAssistance))).toEqual(paid);
+});
+
+test("every district reaches the statewide phase-in card, which is why the link is unconditional", () => {
+  for (const d of districts) {
+    const b = d.biennium;
+    const atBase = ([1, 2] as const).some(
+      (i) => Math.abs(MEASURES.foundation.levels(b)[i] - b.observed[i]!.funding_base) < 1,
+    );
+    const phased =
+      Math.abs(yearChange(b, "foundation").dollars) >= 0.005 &&
+      ([1, 2] as const).some((i) => b.observed[i]!.phase_in_paid > b.observed[i]!.funding_base);
+    expect(atBase || phased, d.irn).toBe(true);
+  }
+  expect(links(renderPhaseIn(LIMA))).toContain(TO.phaseIn);
+});
+
+test("a falling state share links to reappraisal, and a rising one does not", () => {
+  // State share falls in every Allen district from one model year to the next.
+  expect(links(renderDrivers(ELIDA))).toContain(TO.reappraisal);
+  const brooklyn = byIrn("043653");
+  expect(brooklyn.biennium.observed[2]!.state_share!).toBeGreaterThan(brooklyn.biennium.observed[1]!.state_share!);
+  expect(links(renderDrivers(brooklyn))).not.toContain(TO.reappraisal);
+});
+
+test("the dashboard card sends a reader to the statewide reading", () => {
+  expect(links(renderBiennium(ELIDA, districts))).toContain(routes.WHAT_CHANGED);
 });

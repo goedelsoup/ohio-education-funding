@@ -58,6 +58,15 @@ export const REACH = "/scenario/reach";
 export const BOUNDS = "/bounds";
 
 /**
+ * The biennium statewide, by provision (#641).
+ *
+ * A constant for the reason `BOUNDS` is one: the Change tab, the county page's who-gained card and
+ * the dashboard's biennium card each send a reader to the card that explains a provision (#694),
+ * and `at(WHAT_CHANGED, …)` keeps the section name typed.
+ */
+export const WHAT_CHANGED = "/what-changed";
+
+/**
  * The district index, sorted on one of its columns when it opens (#693).
  *
  * `column` is a header button's `data-sort` key. Query parameters for the reason `?q=` is one: the

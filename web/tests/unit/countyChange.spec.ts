@@ -153,3 +153,10 @@ test("every county renders, the single-district ones included", () => {
   const single = all.find((c) => c.districts.length === 1)!;
   expect(stepSentence(single.districts, "total", 0, 1)).toMatch(/(rose|fell|did not move)\.<\/li>$/);
 });
+
+test("the card sends a reader to the statewide reading of the same steps (#694)", () => {
+  for (const c of all) {
+    const hrefs = [...parseHTML(renderWhoGained(c)).document.querySelectorAll("a")].map((a) => a.getAttribute("href"));
+    expect(hrefs, c.name).toContain(routes.WHAT_CHANGED);
+  }
+});
