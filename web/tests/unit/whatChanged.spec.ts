@@ -15,6 +15,7 @@ import * as routes from "../../src/lib/routes.ts";
 import { median } from "../../src/lib/stats.ts";
 import {
   dpia,
+  foundationIdentity,
   phaseIn,
   renderByCounty,
   renderDirectCertification,
@@ -85,6 +86,23 @@ test("the phase-in rate is two-thirds, five-sixths and whole, read off the files
   expect(p[2]!.gap).toBeLessThan(p[0]!.gap);
 });
 
+test("the fall in foundation aid is the phase-in's: the bases do not move (#695)", () => {
+  const f = foundationIdentity(districts);
+  // One base under all three years, so foundation aid moves only through what is paid above it.
+  for (const x of f) expect(x.base).toBeCloseTo(6_395_281_649.73, 0);
+  // What is left is the open enrollment clawback, in the districts it holds below their base. A
+  // new term in foundation aid, or a clawback that grew, fails here.
+  expect(f.map((x) => x.below)).toEqual([16, 0, 22]);
+  for (const [i, v] of [3_073_454.87, 0, 3_037_536.64].entries()) expect(f[i]!.clawback).toBeCloseTo(v, 1);
+  for (const x of f) expect(x.aid).toBeCloseTo(x.base + x.above - x.clawback, 2);
+  // So the two −$114.5M on the page are one figure, to within the clawback's own change.
+  const aid = f[2]!.aid - f[0]!.aid;
+  const above = f[2]!.above - f[0]!.above;
+  expect(millions(aid)).toBe("−$114.5M");
+  expect(millions(above)).toBe("−$114.5M");
+  expect(Math.abs(aid - above)).toBeLessThan(50_000);
+});
+
 test("the lower a district's state share, the larger the share of it a year takes away", () => {
   const bands = shareBands(districts);
   expect(bands.reduce((n, b) => n + b.districts.length, 0)).toBe(609);
@@ -120,6 +138,17 @@ const { document } = parseHTML(
     .map((render) => render(districts))
     .join("")}</main>`,
 );
+
+test("the page says the two −$114.5M are one figure, and names the clawback", () => {
+  const phase = text(document.querySelector(`#${routes.SECTIONS.changed.phaseIn}`));
+  expect(phase).toContain("The funding bases sum to $6.40B in all three years");
+  expect(phase).toContain("foundation aid fell $114.5M and the phase-in's payment above bases fell $114.5M");
+  expect(phase).toContain(
+    "the same money, to within $35,918. That difference is the open enrollment clawback, which holds some districts below their base: $3.1M across 16 districts in FY2025 and $3.0M across 22 in FY2027, and nothing in the FY2026 model.",
+  );
+  const first = document.querySelector(`#${routes.SECTIONS.changed.twoMeasures}`)!;
+  expect(first.querySelector(`a[href="#${routes.SECTIONS.changed.phaseIn}"]`)).toBeTruthy();
+});
 
 test("every card is addressed and dated", () => {
   for (const id of Object.values(routes.SECTIONS.changed)) {

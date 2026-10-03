@@ -58,9 +58,12 @@ function years(districts: readonly District[]): [number, number, number] {
 
 const span = (y: readonly number[], from: YearIndex, to: YearIndex) => `FY${y[from]} to FY${y[to]}`;
 
+/** "$145.0M", unsigned, for a figure whose direction the sentence already says. */
+const size = (v: number) => millions(Math.abs(v)).replace("+", "");
+
 /** "$145.0M" with a verb for its sign, where a signed figure would read as a typo in a sentence. */
 function moved(v: number): string {
-  const magnitude = millions(Math.abs(v)).replace("+", "");
+  const magnitude = size(v);
   return Math.abs(v) < UNMOVED ? "did not move" : v > 0 ? `rose ${magnitude}` : `fell ${magnitude}`;
 }
 
@@ -118,7 +121,9 @@ export function renderTwoMeasures(districts: readonly District[]): string {
         line the department pays a district through; <strong>foundation aid</strong> is core
         foundation funding and the guarantee alone. The difference between them is transportation,
         the two special education lines and the named supplements, and from FY${y[0]} to FY${y[2]}
-        those together ${moved(others)}.</p>
+        those together ${moved(others)}. The funding bases foundation aid is paid from do not move,
+        so its change is paid above them, and <a href="#${SECTION.phaseIn}">the
+        phase-in</a> is where that payment is set out.</p>
       <div class="scroll"><table>
         <thead><tr><th scope="col">Measure, all ${count(districts.length)} districts</th>
           ${y.map((v, i) => th(`FY${v} ${i === 0 ? "paid" : "model"}`)).join("")}
@@ -380,11 +385,34 @@ export function phaseIn(districts: readonly District[]) {
   });
 }
 
+/**
+ * Foundation aid is the funding base plus what the phase-in pays above it, less the open
+ * enrollment clawback, in every year (#695).
+ *
+ * The base is the same figure in all three years, so foundation aid can move only through the
+ * other two terms. The clawback is whatever the first two leave, and holds a district below its
+ * base: 16 districts in FY2025, none in the FY2026 model and 22 in FY2027.
+ * `crates/project/tests/the_fall_in_foundation_aid_is_the_phase_ins.rs` matches it district by
+ * district against the department's `[I1]`.
+ */
+export function foundationIdentity(districts: readonly District[]) {
+  const aid = statewideLevels(districts, "foundation");
+  const p = phaseIn(districts);
+  return ([0, 1, 2] as const).map((i) => {
+    const base = districts.reduce((s, d) => s + d.biennium.observed[i]!.funding_base, 0);
+    const below = districts.filter((d) => MEASURES.foundation.levels(d.biennium)[i] < d.biennium.observed[i]!.funding_base - 1);
+    return { base, aid: aid[i], above: p[i]!.paid, clawback: base + p[i]!.paid - aid[i], below: below.length };
+  });
+}
+
 /** Section 6, rendered. */
 export function renderPhaseIn(districts: readonly District[]): string {
   const id = SECTION.phaseIn;
   const y = years(districts);
   const p = phaseIn(districts);
+  const f = foundationIdentity(districts);
+  const clawed = ([0, 1, 2] as const).filter((i) => f[i]!.below > 0);
+  const spared = ([0, 1, 2] as const).filter((i) => f[i]!.below === 0);
   const row = (label: string, f: (x: (typeof p)[number]) => string) =>
     `<tr><th scope="row">${label}</th>${p.map((x) => td(f(x))).join("")}</tr>`;
   const [first, , last] = p as [(typeof p)[0], (typeof p)[0], (typeof p)[0]];
@@ -416,6 +444,14 @@ export function renderPhaseIn(districts: readonly District[]): string {
         had one at all. A district whose formula calculates at or below its base gains nothing from a
         higher rate: ${count(last.atBase)} are paid exactly their base in FY${y[2]}, and the phase-in
         does not reach them.</p>
+      <p class="note">The funding bases sum to ${size(f[0]!.base)} in all three years, so the bases
+        do not move, and the change in foundation aid is paid above them.
+        From FY${y[0]} to FY${y[2]}, foundation aid ${moved(f[2]!.aid - f[0]!.aid)} and the phase-in's
+        payment above bases ${moved(f[2]!.above - f[0]!.above)}: the same money, to within
+        ${money(Math.abs(f[2]!.clawback - f[0]!.clawback))}. That difference is the
+        <a href="${routes.wikiNode("formula-component", "guarantee-open-enrolment-clawback")}">open
+        enrollment clawback</a>, which holds some districts below their base:
+        ${clawed.map((i, n) => `${size(f[i]!.clawback)} across ${count(f[i]!.below)}${n ? "" : " districts"} in FY${y[i]}`).join(" and ")}${spared.length ? `, and nothing in the FY${spared.map((i) => y[i]).join(" or FY")} model` : ""}.</p>
     </div>`;
 }
 
