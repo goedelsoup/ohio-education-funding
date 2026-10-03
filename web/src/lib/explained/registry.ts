@@ -7,11 +7,12 @@
  * and the homepage were built to rule out.
  */
 
+import { GUARANTEE } from "./guarantee.ts";
 import { PHASE_IN } from "./phase-in.ts";
 import type { TopicModule } from "./topic.ts";
 import { WHAT_A_DISTRICT_GETS } from "./what-a-district-gets.ts";
 
-export const TOPICS: readonly TopicModule[] = [WHAT_A_DISTRICT_GETS, PHASE_IN];
+export const TOPICS: readonly TopicModule[] = [WHAT_A_DISTRICT_GETS, PHASE_IN, GUARANTEE];
 
 /** One topic by slug, or a thrown error naming the slug no module registered. */
 export function topicModule(slug: string): TopicModule {

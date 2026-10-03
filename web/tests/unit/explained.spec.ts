@@ -15,6 +15,13 @@ import { describe, expect, test } from "vitest";
 
 import { loadCorpus } from "../../src/lib/corpus.ts";
 import {
+  IDENTITY as GUARANTEE_IDENTITY,
+  ORIGIN_YEAR,
+  computed as foundationAid,
+  example as medianByGuarantee,
+  floorOf,
+} from "../../src/lib/explained/guarantee.ts";
+import {
   BASE_YEAR,
   PHASE_IN as PHASE_IN_TOPIC,
   example,
@@ -533,5 +540,45 @@ describe("How does Ohio decide what a district gets? (#716)", () => {
       d.biennium.observed[2]!.phase_in_calculated / d.categorical_adm;
     const smaller = districts.filter((d) => perPupil(d) < perPupil(ex)).length;
     expect(smaller).toBe(Math.floor(districts.length / 2));
+  });
+});
+
+describe("Why are so many districts paid an old amount? (#716)", () => {
+  const districts = loadFeed().bundle.districts;
+
+  test("[I] = max([H2] − [I1] − [H], 0) holds on every district, to the cent", () => {
+    expect(reconciles(GUARANTEE_IDENTITY, districts)).toEqual([]);
+  });
+
+  test("a guarantee computed without the open enrollment charge fails it", () => {
+    const real = districts.find((d) => d.on_guarantee && d.transition.open_enrollment_adjustment > 0)!;
+    const doctored = {
+      ...real,
+      irn: "999999",
+      guarantee: Math.max(real.transition.funding_base - foundationAid(real), 0),
+    };
+    expect(reconciles(GUARANTEE_IDENTITY, [...districts, doctored])).toEqual(["999999"]);
+  });
+
+  test("the rebuilt floor is the feed's, and the guarantee pays exactly the districts flagged", () => {
+    for (const d of districts) {
+      expect(floorOf(d), d.irn).toBeCloseTo(d.guarantee_floor, 2);
+      expect(d.guarantee > 0, d.irn).toBe(d.on_guarantee);
+    }
+  });
+
+  test("the chain's first year is the corpus's", () => {
+    const node = loadCorpus().byId.get("parameter/guarantee-funding-base")!;
+    expect(node.findings).toContain(`bottoms out at FY${ORIGIN_YEAR}`);
+  });
+
+  test("the example is the median guaranteed district by the guarantee's share of what it receives", () => {
+    const ex = medianByGuarantee(districts);
+    const held = districts.filter((d) => d.on_guarantee);
+    const share = (d: (typeof districts)[number]) => d.guarantee / (foundationAid(d) + d.guarantee);
+    expect(ex.on_guarantee).toBe(true);
+    // An even count averages the two middle shares, so the nearest district is either one.
+    const below = held.filter((d) => share(d) < share(ex)).length;
+    expect([Math.floor((held.length - 1) / 2), Math.floor(held.length / 2)]).toContain(below);
   });
 });
