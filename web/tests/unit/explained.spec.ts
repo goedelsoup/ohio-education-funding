@@ -45,6 +45,12 @@ import {
   reach,
   shareOf,
 } from "../../src/lib/explained/state-share.ts";
+import {
+  IDENTITY as POVERTY_IDENTITY,
+  blend,
+  breaks,
+  example as medianPoverty,
+} from "../../src/lib/explained/poverty-count.ts";
 import { TOPICS, topicModule } from "../../src/lib/explained/registry.ts";
 import {
   FLOOR,
@@ -770,6 +776,47 @@ describe("Why don't my taxes rise when my house value does? (#718)", () => {
     const below = above.filter((d) => r(d) < r(ex)).length;
     const tied = above.filter((d) => r(d) === r(ex)).length;
     const mid = (above.length - 1) / 2;
+    expect(below).toBeLessThanOrEqual(Math.ceil(mid));
+    expect(below + tied - 1).toBeGreaterThanOrEqual(Math.floor(mid));
+  });
+});
+
+describe("How does Ohio count poor students? (#718)", () => {
+  const { districts, meal_program: meal } = loadFeed().bundle;
+
+  test("the capped blend is the department's weighted count on every district", () => {
+    expect(districts.length).toBeGreaterThan(600);
+    expect(reconciles(POVERTY_IDENTITY, districts)).toEqual([]);
+  });
+
+  test("a district counted on the uncapped blend fails it", () => {
+    // Edgerton Local is the corpus's identification of the cap: the one district whose blend
+    // exceeds its enrollment. Without the cap its count is the blend, and the identity must see it.
+    const real = districts.find((d) => blend(d) > d.current_year_adm)!;
+    expect(real.name).toContain("Edgerton");
+    const doctored = { ...real, irn: "999999", dpia: { ...real.dpia, weighted_adm: blend(real) } };
+    expect(reconciles(POVERTY_IDENTITY, [...districts, doctored])).toEqual(["999999"]);
+  });
+
+  test("the blend's weight is the corpus's", () => {
+    const node = loadCorpus().byId.get("formula-component/fsfp-disadvantaged-pupil-impact-aid")!;
+    const w = Math.round(blend({ dpia: { economically_disadvantaged_adm: 0, directly_certified_adm: 100 } } as never));
+    expect(node.description).toContain(`${100 - w}/${w} blend is in the act`);
+  });
+
+  test("the waiver years are the Octobers of 2020 and 2021, keyed on their fiscal years (#705)", () => {
+    const { split, waived, after } = breaks(meal);
+    expect(waived.map((y) => fiscalYear(y.fiscal_year))).toEqual([fiscalYear(2021), fiscalYear(2022)]);
+    expect(after.fiscal_year).toBe(2023);
+    expect(split.fiscal_year).toBe(2013);
+  });
+
+  test("the example is the median share", () => {
+    const ex = medianPoverty(districts);
+    const p = (d: (typeof districts)[number]) => d.dpia.percentage;
+    const below = districts.filter((d) => p(d) < p(ex)).length;
+    const tied = districts.filter((d) => p(d) === p(ex)).length;
+    const mid = (districts.length - 1) / 2;
     expect(below).toBeLessThanOrEqual(Math.ceil(mid));
     expect(below + tied - 1).toBeGreaterThanOrEqual(Math.floor(mid));
   });
