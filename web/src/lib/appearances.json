@@ -655,6 +655,23 @@
       ]
     }
   ],
+  "formula-component/guarantee-open-enrolment-clawback": [
+    {
+      "route": "/what-changed",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/what-changed",
+        "title": "What changed"
+      },
+      "sections": [
+        {
+          "id": "phase-in",
+          "label": "The phase-in"
+        }
+      ]
+    }
+  ],
   "formula-component/temporary-transitional-aid-guarantee": [
     {
       "route": "/district/[irn]",

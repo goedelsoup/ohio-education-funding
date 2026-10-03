@@ -219,6 +219,17 @@ impl PhaseIn {
     pub fn step(&self) -> Dollars {
         self.paid - self.funding_base
     }
+
+    /// What the phase-in pays above the base: [`Self::step`] where the formula calculates above
+    /// it, and nothing where it does not, because there the guarantee pays the shortfall.
+    ///
+    /// Foundation aid is `funding_base + above_base()` for every district the open enrollment
+    /// clawback does not reach, and the base is the same in all three years. So a change in
+    /// foundation aid between years is a change in this — `the_fall_in_foundation_aid_is_the_phase_ins.rs`.
+    #[must_use]
+    pub fn above_base(&self) -> Dollars {
+        self.step().max(0.0)
+    }
 }
 
 /// What the department subtracts from total state support to reach net state funding.
