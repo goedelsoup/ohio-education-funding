@@ -8,7 +8,7 @@
 import { parseHTML } from "linkedom";
 import { expect, test } from "vitest";
 
-import { levelChange } from "../../src/lib/change.ts";
+import { levelChange, SHARE_COLUMN, shareChange, signedPct, signedPoints } from "../../src/lib/change.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
 import { millions } from "../../src/lib/format.ts";
 import * as routes from "../../src/lib/routes.ts";
@@ -16,7 +16,6 @@ import { median } from "../../src/lib/stats.ts";
 import {
   dpia,
   phaseIn,
-  renderByCounty,
   renderDirectCertification,
   renderDistribution,
   renderPhaseIn,
@@ -102,9 +101,9 @@ test("in Allen County, Elida and Shawnee fall most on foundation aid across the 
   const fall = (d: (typeof allen)[number]) => levelChange(d.biennium, "foundation", 0, 1).ratio;
   const largest = [...allen].sort((a, b) => fall(a) - fall(b)).slice(0, 2);
   expect(largest.map((d) => d.name)).toEqual(["Elida Local", "Shawnee Local"]);
-  const rows = [...document.querySelectorAll(`#${routes.SECTIONS.changed.byCounty} tbody tr[data-county="Allen"]`)];
-  const elida = rows.find((r) => r.querySelector("th a")?.getAttribute("href") === routes.districtChange("045773"))!;
-  expect(text(elida)).toContain("−6.4%");
+  // By IRN, not by name: 607 districts share 580 names.
+  const elida = allen.find((d) => d.irn === "045773")!;
+  expect(signedPct(fall(elida))).toBe("−6.4%");
 });
 
 const { document } = parseHTML(
@@ -115,7 +114,6 @@ const { document } = parseHTML(
     renderDirectCertification,
     renderReappraisal,
     renderPhaseIn,
-    renderByCounty,
   ]
     .map((render) => render(districts))
     .join("")}</main>`,
@@ -140,15 +138,22 @@ test("the distribution card carries both measures under the toggle", () => {
   expect(card.querySelector('input[data-measure="total"]')?.hasAttribute("checked")).toBe(true);
 });
 
-test("the county table is every district, each linking to its change tab", () => {
-  const rows = [...document.querySelectorAll(`#${routes.SECTIONS.changed.byCounty} tbody tr`)];
-  expect(rows).toHaveLength(609);
-  // By IRN, not by name: 607 districts share 580 names.
-  const hrefs = rows.map((row) => row.querySelector("th a")?.getAttribute("href"));
-  expect(new Set(hrefs)).toEqual(new Set(districts.map((d) => routes.districtChange(d.irn))));
-  expect(rows.filter((r) => r.getAttribute("data-county") === "Allen")).toHaveLength(9);
-  const options = document.querySelectorAll(`#${routes.SECTIONS.changed.byCounty}-county option`);
-  expect(options).toHaveLength(89);
+test("no card lists every district: the directory and the county pages do (#693)", () => {
+  // The by-county table was 609 rows and 437 KB of a 469 KB page, repeating both.
+  for (const table of document.querySelectorAll("table")) {
+    expect(table.querySelectorAll("tbody tr").length).toBeLessThan(20);
+  }
+  const link = document.querySelector(`#${routes.SECTIONS.changed.reappraisal} a[href^="/districts"]`);
+  expect(link?.getAttribute("href")).toBe(routes.directorySorted(SHARE_COLUMN, "ascending"));
+});
+
+test("the state share change is in points between the two models, which publish it for all 609", () => {
+  expect(districts.filter((d) => shareChange(d.biennium) == null)).toHaveLength(0);
+  // Elida again: its share fell nearly seven points across the model years.
+  const elida = districts.find((d) => d.irn === "045773")!;
+  expect(signedPoints(shareChange(elida.biennium)!)).toBe("−6.7 pts");
+  expect(signedPoints(-0.004)).toBe("−0.4 pts");
+  expect(signedPoints(0.012)).toBe("+1.2 pts");
 });
 
 test("a year the files do not publish is a word, never a zero", () => {

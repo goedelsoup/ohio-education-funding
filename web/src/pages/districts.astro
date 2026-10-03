@@ -12,7 +12,16 @@
  */
 import Base from "../layouts/Base.astro";
 import { NAMES } from "../lib/nav.ts";
-import { MEASURES as CHANGE_MEASURES, levelChange, signedPct, yearsOf, type YearIndex } from "../lib/change.ts";
+import {
+  MEASURES as CHANGE_MEASURES,
+  levelChange,
+  SHARE_COLUMN,
+  shareChange,
+  signedPct,
+  signedPoints,
+  yearsOf,
+  type YearIndex,
+} from "../lib/change.ts";
 import { loadFeed, qualifiedName } from "../lib/feed.ts";
 import { compactMoney, count, fig, money, NOT_REPORTED, pct, reported } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
@@ -81,6 +90,18 @@ const CHANGES = (["total", "foundation"] as const).flatMap((measure) =>
     span: `FY${biennium[from]} to FY${biennium[to]}`,
   })),
 );
+
+/*
+ * The seventh (#693): the state share across the two model years, in percentage points. It was the
+ * one column of `/what-changed`'s by-county table found nowhere else, and that table went. FY2025's
+ * payment report publishes no share, so there is one step and not three, and the head says
+ * "models" because both years are the department's models and neither is a payment.
+ */
+const SHARE = {
+  key: SHARE_COLUMN,
+  head: "State share Δ, models",
+  span: `FY${biennium[1]} to FY${biennium[2]}`,
+};
 
 /** A cell whose sort key is not what it displays: dollars with separators, blanks, percentages. */
 const sortable = (value: number | null) => (value == null ? "" : String(value));
@@ -281,6 +302,7 @@ const years = Object.fromEntries(MEASURES.map((m) => [m.key, m.year])) as Record
           {CHANGES.map((c) => (
             <th aria-sort="none"><button type="button" data-sort={c.key} set:html={fig(c.head, c.span)} /></th>
           ))}
+          <th aria-sort="none"><button type="button" data-sort={SHARE.key} set:html={fig(SHARE.head, SHARE.span)} /></th>
         </tr>
       </thead>
       <tbody>
@@ -330,6 +352,18 @@ const years = Object.fromEntries(MEASURES.map((m) => [m.key, m.year])) as Record
                     </td>
                   );
                 })}
+                {(() => {
+                  const points = shareChange(d.biennium);
+                  return (
+                    <td
+                      data-sort-value={sortable(points)}
+                      data-label={`${SHARE.head} ${SHARE.span}`}
+                      class={points != null && points < 0 ? "loss" : ""}
+                    >
+                      {reported(points, signedPoints)}
+                    </td>
+                  );
+                })()}
               </tr>
             );
           })
@@ -349,7 +383,9 @@ const years = Object.fromEntries(MEASURES.map((m) => [m.key, m.year])) as Record
     {CHANGE_MEASURES.foundation.name}, as a share of its own earlier year. FY{biennium[0]} is the
     department's final payment report; FY{biennium[1]} and FY{biennium[2]} are its models of those
     years, not payments. A district held at its funding base reads no change in foundation aid
-    whatever its other lines do. Each district's own change tab splits its figures by line.
+    whatever its other lines do. The state share change is in percentage points between the
+    department's two models; its FY{biennium[0]} report publishes no share. Each district's own
+    change tab splits its figures by line.
   </p>
   <p class="note">
     A zero means nothing was paid; "{NOT_REPORTED}" means the source has no figure for that district.

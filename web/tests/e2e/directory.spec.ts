@@ -83,6 +83,28 @@ test.describe("finding things", () => {
     await expect(cell, "a second press reverses it").toHaveAttribute("aria-sort", "ascending");
   });
 
+  test("/what-changed sends a reader to the directory sorted on a change column (#693)", async ({ page }) => {
+    /*
+     * The page's by-county table went because this one has the same columns and sorts them; the
+     * link is what keeps "who fell furthest" one click away. Followed, not built, so a key the
+     * header does not carry fails here rather than opening an alphabetical table.
+     */
+    await page.goto("/what-changed");
+    await page.locator("main a", { hasText: "state share's change" }).click();
+    await expect(page).toHaveURL(/\/districts\?sort=share-1-2&order=ascending$/);
+    const cell = page.locator('#district-table thead th:has(button[data-sort="share-1-2"])');
+    await expect(cell).toHaveAttribute("aria-sort", "ascending");
+    await expect(
+      page.locator('#district-table thead th:has(button[data-sort="name"])'),
+    ).toHaveAttribute("aria-sort", "none");
+    const first = await page
+      .locator("#district-table tbody tr")
+      .evaluateAll((rows) => rows.slice(0, 3).map((r) => Number((r.lastElementChild as HTMLElement).dataset.sortValue)));
+    expect(first[0]).toBeLessThan(0);
+    expect(first[0]).toBeLessThanOrEqual(first[1]!);
+    expect(first[1]).toBeLessThanOrEqual(first[2]!);
+  });
+
   test("comparison puts two districts side by side", async ({ page }) => {
     await page.goto(`/compare?a=${NORTHERN}&b=044933`);
     const table = page.locator("#compare-out table");
