@@ -104,10 +104,13 @@ export const LOOSENINGS: readonly string[] = [
 /**
  * The Flesch–Kincaid grade the short answer, the picture and where it breaks must not exceed.
  *
- * Unset until the pilot (#715) measures it on a real page: a ceiling chosen before a page exists
- * is either one nothing meets or one nothing tests.
+ * Measured on the pilot (#715), "What does the phase-in do?": its short answer reads at grade 4.6,
+ * its picture at 2.9 and where the picture breaks at 3.7. The ceiling is #712's 8 and not the
+ * pilot's 4.6, because the pilot is the smallest identity in the plan and the outcome and
+ * projection topics have more to name. A dense picture in `tests/unit/explained.spec.ts` is
+ * what shows the check bites at this ceiling and not only at zero.
  */
-export const GRADE_CEILING: number | undefined = undefined;
+export const GRADE_CEILING: number | undefined = 8;
 
 /** Abbreviations the site writes that end in a full stop without ending a sentence. */
 const ABBREVIATIONS = /\b(?:R\.C|H\.B|S\.B|Am|Sub|U\.S|e\.g|i\.e|vs|No|Inc|St)\.$/;
@@ -269,6 +272,7 @@ export function plainSections(topic: Topic): { where: string; html: Prose; step:
     { where: "shortAnswer", html: `${topic.shortAnswer.lead} ${topic.shortAnswer.rest}`, step: false },
     { where: "picture", html: topic.picture, step: false },
     ...topic.breaks.map((html, i) => ({ where: `breaks[${i}]`, html, step: false })),
+    { where: "numbers.finding", html: n.finding, step: false },
     ...n.intro.map((html, i) => ({ where: `numbers.intro[${i}]`, html, step: false })),
     ...n.steps.map((html, i) => ({ where: `numbers.steps[${i}]`, html, step: true })),
     ...(n.chart ? [{ where: "numbers.chart", html: n.chart.caption, step: false }] : []),
@@ -292,6 +296,7 @@ export function lint(topic: Topic, ceiling: number | undefined = GRADE_CEILING):
   empty("shortAnswer.rest", topic.shortAnswer.rest);
   empty("picture", topic.picture);
   empty("breaks", topic.breaks);
+  empty("numbers.finding", topic.numbers.finding);
   empty("numbers.intro", topic.numbers.intro);
   empty("numbers.steps", topic.numbers.steps);
   empty("numbers.after", topic.numbers.after);

@@ -1,8 +1,8 @@
 /**
  * Explained (#712): the template every topic renders through, checked on a fixture topic.
  *
- * The registry is empty until the pilot (#715), so these tests render a topic written here. What
- * they hold is the template's contract — every section present, in order, addressable, and the
+ * The template tests render a topic written here rather than a registered one, so that a topic's
+ * prose changing cannot move them. What they hold is the template's contract — every section present, in order, addressable, and the
  * claim badges in "How we know" and nowhere else — so a topic module can rely on it rather than
  * re-check it.
  */
@@ -14,6 +14,14 @@ import { parseHTML } from "linkedom";
 import { describe, expect, test } from "vitest";
 
 import { loadCorpus } from "../../src/lib/corpus.ts";
+import {
+  BASE_YEAR,
+  PHASE_IN as PHASE_IN_TOPIC,
+  example,
+  fy2026PhaseIn,
+  identity,
+  sides,
+} from "../../src/lib/explained/phase-in.ts";
 import {
   renderHowWeKnow,
   renderNumbers,
@@ -53,6 +61,7 @@ import {
   type Topic,
   type TopicModule,
 } from "../../src/lib/explained/topic.ts";
+import { loadFeed } from "../../src/lib/feed.ts";
 import { SECTIONS } from "../../src/lib/routes.ts";
 
 const FIXTURE: TopicModule = {
@@ -68,6 +77,7 @@ const FIXTURE: TopicModule = {
     breaks: ["A model home is built to sell. A fixture is built to be checked."],
     numbers: {
       chip: "formula",
+      finding: "The fixture has two steps.",
       intro: ["The example is the fixture itself."],
       steps: ["Start with the lead.", "Add the rest."],
       after: ["Together they are the description."],
@@ -255,23 +265,33 @@ describe("the style guide", () => {
     for (const m of TOPICS) expect(lint(topic(m)), m.slug).toEqual([]);
   });
 
+  // Without the grade ceiling: a 30-word sentence reads above grade 8 on its own, and these
+  // isolate the rule each one doctors. The ceiling has its own test below.
   test.each(DOCTORED)("a doctored topic fails $rule: $why", ({ rule, doctor }) => {
-    expect(rules(lint(doctor(t)))).toEqual([rule]);
+    expect(rules(lint(doctor(t), Infinity))).toEqual([rule]);
   });
 
   test("the grade ceiling bites once set, and the clean fixture is under any honest one", () => {
     expect(rules(lint(t, 0))).toEqual(["grade"]);
     expect(lint(t, 12)).toEqual([]);
-    // The pilot sets it (#715). Until then it is unset, not guessed.
-    if (GRADE_CEILING !== undefined) expect(GRADE_CEILING).toBeGreaterThan(0);
+    // Set from the pilot (#715), and it bites at its own value, not only at zero.
+    expect(GRADE_CEILING).toBe(8);
+    const dense = {
+      ...t,
+      picture:
+        "Notwithstanding considerable administrative complexity, apportionment institutionalizes " +
+        "intergovernmental redistribution through categorical calculations.",
+    };
+    expect(grade(plain(dense.picture))).toBeGreaterThan(GRADE_CEILING!);
+    expect(rules(lint(dense))).toContain("grade");
   });
 
   test("one long sentence per paragraph is allowed if it carries a figure with its unit and year", () => {
     const long = `In FY2024 the state paid this district $4,120,000, which is ${sentenceOf(20).toLowerCase()}`;
     expect(words(long).length).toBeGreaterThan(LIMITS.sentenceWords);
     expect(words(long).length).toBeLessThanOrEqual(LIMITS.longSentenceWords);
-    expect(rules(lint({ ...t, picture: long }))).toEqual([]);
-    expect(rules(lint({ ...t, picture: `${long} ${long}` }))).toContain("sentence");
+    expect(rules(lint({ ...t, picture: long }, Infinity))).toEqual([]);
+    expect(rules(lint({ ...t, picture: `${long} ${long}` }, Infinity))).toContain("sentence");
   });
 
   test("school funding and the funding formula name the system and pass", () => {
@@ -399,5 +419,61 @@ describe("a topic's identity", () => {
     const doctored = { irn: "000003", paid: 100, base: 100, computed: 200, p: 0.5 };
     expect(reconciles(PHASE_IN, [...rows, doctored])).toEqual(["000003"]);
     expect(reconciles(PHASE_IN, [{ ...rows[0]!, paid: Number.NaN }])).toEqual(["000001"]);
+  });
+});
+
+describe("What does the phase-in do? (#715)", () => {
+  const districts = loadFeed().bundle.districts;
+  const { year, p } = fy2026PhaseIn(districts);
+
+  test("the dial is read in the biennium's middle year, where it is short of the end", () => {
+    expect(year).toBe(districts[0]!.biennium.year_middle);
+    // At 100% the interpolation and a multiplier pay the same figure, and the check below proves nothing.
+    expect(p).toBeGreaterThan(0);
+    expect(p).toBeLessThan(1);
+  });
+
+  test("paid = base + p × (computed − base) holds on every district, to the cent", () => {
+    expect(reconciles(identity(p), districts)).toEqual([]);
+  });
+
+  test("a district paid p × computed fails it, by IRN", () => {
+    const real = example(districts);
+    const o = real.biennium.observed[1]!;
+    const doctored = {
+      ...real,
+      irn: "999999",
+      biennium: {
+        ...real.biennium,
+        observed: real.biennium.observed.map((row, i) =>
+          i === 1 ? { ...row, phase_in_paid: p * o.phase_in_calculated } : row,
+        ) as typeof real.biennium.observed,
+      },
+    };
+    expect(reconciles(identity(p), [...districts, doctored])).toEqual(["999999"]);
+  });
+
+  test("the base year is the corpus's", () => {
+    const node = loadCorpus().byId.get("parameter/guarantee-funding-base")!;
+    expect(node.summary).toContain(`FY${BASE_YEAR}`);
+  });
+
+  test("the example is the median district by step, and moves with the feed", () => {
+    const ex = example(districts);
+    const step = (d: (typeof districts)[number]) =>
+      d.biennium.observed[1]!.phase_in_calculated - d.biennium.observed[1]!.funding_base;
+    const smaller = districts.filter((d) => step(d) < step(ex)).length;
+    expect(smaller).toBe(Math.floor(districts.length / 2));
+  });
+
+  test("every district is on one side of its base, and the guarantee holds those below", () => {
+    const s = sides(districts);
+    expect(s.above.length + s.below.length).toBe(districts.length);
+    expect(s.held.length).toBeLessThanOrEqual(s.below.length);
+    expect(s.restored).toBeGreaterThan(0);
+  });
+
+  test("its description fits a search result", () => {
+    for (const m of [...TOPICS, PHASE_IN_TOPIC]) expect(description(topic(m)).length, m.slug).toBeLessThanOrEqual(160);
   });
 });

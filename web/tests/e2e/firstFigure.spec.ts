@@ -6,7 +6,7 @@
  * `firstFigureY`, so this reads the same number the measure report prints rather than a second
  * definition of it that could drift.
  *
- * `pnpm measure` walks eight routes and fails nothing on CI; this is the half that bites. It runs
+ * `pnpm measure` walks nine routes and fails nothing on CI; this is the half that bites. It runs
  * under whatever face the runner resolves, which is why the ceilings carry the headroom they
  * document rather than the figure measured on one machine.
  */

@@ -115,7 +115,7 @@ try {
 
 /*
  * wikiToData walks every page in the build, not the eight in ROUTES — the question is whether the
- * corpus as a whole ever points a reader at a data view, and eight routes can only answer that for
+ * corpus as a whole ever points a reader at a data view, and nine routes can only answer that for
  * themselves. Parsed with `linkedom` rather than opened in the browser above: 274 pages is 274
  * page loads for a boolean apiece, and the question is which links a page's markup carries, which
  * a parse answers exactly as well as a render does.
