@@ -1525,6 +1525,38 @@ test("a series chart prints where each line starts, as well as where it ends", (
   }
 });
 
+test("a series chart's plot keeps half a phone drawing, its end labels stacked to make room", () => {
+  /*
+   * #707. Each gutter was capped at 45% on its own, so the two could take 90% between them, and at
+   * 300 `/history`'s plots were 36-46% of the drawing. The labels here are the page's own strings.
+   */
+  const percent = (v: number) => `${v.toFixed(1)}%`;
+  const dollars = (v: number) => `$${Math.round(v).toLocaleString("en-US")}`;
+  const cases: [SeriesPoint[], { a: string; b: string }, (v: number) => string][] = [
+    [[{ at: 2009, a: 47.5, b: 45.9 }, { at: 2016, a: 50.2, b: 40.1 }, { at: 2024, a: 53.6, b: 34.5 }], { a: "local", b: "state" }, percent],
+    [[{ at: 2009, a: 5364, b: 2950 }, { at: 2016, a: 7800, b: 4100 }, { at: 2024, a: 10527, b: 5799 }], { a: "gap", b: "unclosed" }, dollars],
+    [[{ at: 1998, a: 6.84e9, b: 4.1e9 }, { at: 2012, a: 9.9e9, b: 6.5e9 }, { at: 2027, a: 15.27e9, b: 9.4e9 }], { a: "all lines", b: "the formula" }, (v) => `$${(v / 1e9).toFixed(2)}B`],
+  ];
+  for (const [points, labels, format] of cases) {
+    const at = (width: number) => seriesSpec(points, labels, format, () => "", { width, tick: (y) => `FY${y}` })!;
+    const narrow = at(WIDTHS.narrow).options;
+    const frame = WIDTHS.narrow - narrow.marginLeft! - narrow.marginRight!;
+    expect(frame, labels.a).toBeGreaterThanOrEqual(WIDTHS.narrow / 2);
+
+    const svg = drawingAt(() => at(WIDTHS.narrow));
+    expect(overruns(svg), labels.a).toEqual([]);
+    const { document } = parseHTML(`<div>${svg}</div>`);
+    const ends = [...document.querySelectorAll("g.series-end text")];
+    expect(ends, labels.a).toHaveLength(2);
+    // Name above value, so the gutter holds the longer of the two rather than both side by side.
+    for (const end of ends) expect([...end.querySelectorAll("tspan")].map((t) => t.textContent)).toHaveLength(2);
+
+    // Where the room is there, a label stays on one line.
+    const wide = drawingAt(() => at(WIDTHS.wide));
+    expect(parseHTML(`<div>${wide}</div>`).document.querySelectorAll("g.series-end tspan")).toHaveLength(0);
+  }
+});
+
 test("a series that opens on a gap is labelled at its first value, inside the frame", () => {
   const gapped: SeriesPoint[] = [{ at: 1, a: 0.5, b: null }, ...HELD.slice(1)];
   for (const width of Object.values(WIDTHS)) {

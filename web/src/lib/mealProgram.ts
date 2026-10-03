@@ -176,7 +176,7 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
         Child Nutrition's MR-81 — fourteen Octobers, where the rest of this site has six years of
         anything.</p>
 
-      <div class="scroll">${chart}</div>
+      <div class="chartwrap" data-chart="meal-program">${chart}</div>
 
       ${
         change == null

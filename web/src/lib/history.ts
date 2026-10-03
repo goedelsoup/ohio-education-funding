@@ -230,7 +230,7 @@ export function renderRevenueMix(history: HistoryYear[]): string {
         Local, state and federal revenue as shares of the total, across every comparable Ohio
         school system the Census Bureau surveyed.</p>
 
-      <div class="scroll">${chart}</div>
+      <div class="chartwrap" data-chart="revenue-mix">${chart}</div>
 
       <p class="note">The federal line is left off the chart and kept in the table below, because
         it is the one series whose ends cannot be read at face value. ${federalNote(history)}
@@ -327,7 +327,7 @@ export function renderEqualization(
         state nor federal aid closes, which is the part a district actually experiences.
         ${basis === "real" ? `In FY${base} dollars.` : "In the dollars of each year."}</p>
 
-      <div class="scroll">${chart}</div>
+      <div class="chartwrap" data-chart="equity-gap">${chart}</div>
 
       <p class="note">State aid's share of the gap ${rateHeld} — ${pct(Math.min(...band), 0)} to
         ${pct(Math.max(...band), 0)} in every year from FY${bandFirst} — while the gap itself grew

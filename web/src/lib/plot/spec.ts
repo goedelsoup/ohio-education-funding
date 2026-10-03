@@ -4033,10 +4033,10 @@ export function seriesSpec(
   const endOf = (key: "a" | "b") => [...points].reverse().find((p) => p[key] != null);
   const endA = endOf("a");
   const endB = endOf("b");
-  /** What the end labels say, which is what the right gutter has to hold. */
-  const endText = (point: SeriesPoint | undefined, key: "a" | "b"): string =>
-    point ? `${sentence(key === "a" ? labels.a : labels.b)} ${format(point[key] ?? 0)}` : "";
-  const longestEnd = Math.max(endText(endA, "a").length, endText(endB, "b").length);
+  /** What the end labels say, name then value, which is what the right gutter has to hold. */
+  const endLines = (point: SeriesPoint | undefined, key: "a" | "b"): string[] =>
+    point ? [sentence(key === "a" ? labels.a : labels.b), format(point[key] ?? 0)] : [];
+  const longestEnd = Math.max(endLines(endA, "a").join(" ").length, endLines(endB, "b").join(" ").length);
   /*
    * And the first value of each, at the left (#655). Every dek over these charts is a
    * start-to-end comparison — "fell from 45.9% to 34.5%" — and the end alone left the start to be
@@ -4061,20 +4061,28 @@ export function seriesSpec(
       className,
     });
 
-  const endLabel = (point: SeriesPoint | undefined, key: "a" | "b", ink: string) =>
-    point
-      ? [
-          Plot.text([point], {
-            x: point.at,
-            y: point[key] ?? 0,
-            dx: 8,
-            text: () => endText(point, key),
-            textAnchor: "start",
-            fill: ink,
-            className: "series-end",
-          }),
-        ]
-      : [];
+  /*
+   * Stacked, the upper line's label grows up from its end and the lower one's down, so the two
+   * cannot meet however close the ends are; a lone line's is centred on it.
+   */
+  const endLabel = (point: SeriesPoint | undefined, key: "a" | "b", ink: string, stacked: boolean) => {
+    if (!point) return [];
+    const value = point[key] ?? 0;
+    const other = key === "a" ? endB?.b : endA?.a;
+    const lineAnchor = !stacked || other == null ? "middle" : value >= other ? "bottom" : "top";
+    return [
+      Plot.text([point], {
+        x: point.at,
+        y: value,
+        dx: 8,
+        text: () => endLines(point, key).join(stacked ? "\n" : " "),
+        textAnchor: "start",
+        lineAnchor,
+        fill: ink,
+        className: "series-end",
+      }),
+    ];
+  };
 
   /*
    * Above the upper line's start and below the lower one's, so two starts a few units apart do not
@@ -4149,13 +4157,27 @@ export function seriesSpec(
    * At 640 the shortfall was absorbed by the slack in the 7.2px-per-character estimate; at
    * `WIDTHS.narrow` it put both of `/history`'s end labels outside the frame.
    */
-  const marginRight = gutter(options.width, 32 + longestEnd * 7.2);
+  const wantedRight = 32 + longestEnd * 7.2;
   /*
    * The start labels' gutter: the string drawn at `BASE`'s 12px, the 6px offset from the line, and
    * 6px clear. Not the 7.2px-a-character the right gutter uses, which is slack on a long name and
    * none on three glyphs — `29%` and `64%` were drawn 2-3px off the left edge at 375 and 600.
    */
   const marginLeft = gutter(options.width, 12 + widestStart);
+  /*
+   * The two gutters together hold to half the drawing (#707), and past that each end label goes
+   * on two lines, its name above its value, so the right gutter holds the longer line alone.
+   *
+   * `gutter` caps each side at 45%, which let the two take 90% between them: at 375 the plot on
+   * `/history` was 36-46% of the drawing, a line the width of its own labels. Stacking halves the
+   * right gutter's want on every label these charts carry; the cap is what is left if it does not.
+   */
+  const cap = Math.round(options.width * 0.5);
+  const stacked = marginLeft + gutter(options.width, wantedRight) > cap;
+  const longestLine = Math.max(0, ...[...endLines(endA, "a"), ...endLines(endB, "b")].map((t) => t.length));
+  const marginRight = stacked
+    ? Math.max(0, Math.min(gutter(options.width, 32 + longestLine * 7.2), cap - marginLeft))
+    : gutter(options.width, wantedRight);
   const foot = axisFoot({
     width: options.width,
     marginLeft,
@@ -4180,8 +4202,8 @@ export function seriesSpec(
         ...reference(options.width - marginLeft - marginRight),
         line("a", options.plain ? INK.muted : SERIES.formula, "series-a"),
         line("b", SERIES.guarantee, "series-b"),
-        ...endLabel(endA, "a", options.plain ? INK.muted : SERIES_TEXT.formula),
-        ...endLabel(endB, "b", SERIES_TEXT.guarantee),
+        ...endLabel(endA, "a", options.plain ? INK.muted : SERIES_TEXT.formula, stacked),
+        ...endLabel(endB, "b", SERIES_TEXT.guarantee, stacked),
         ...startLabel(startA, "a", options.plain ? INK.muted : SERIES_TEXT.formula),
         ...startLabel(startB, "b", SERIES_TEXT.guarantee),
         Plot.ruleY([min], { stroke: INK.rule, className: "axis" }),
