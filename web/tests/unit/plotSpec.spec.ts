@@ -31,6 +31,7 @@ import {
   barSpec,
   distributionSpec,
   fanSpec,
+  histogramSpec,
   MAX_SCALE,
   panelWidth,
   placeLabels,
@@ -371,6 +372,37 @@ test("a column with bars on both sides of zero draws its rule at every width", (
     "presentational",
   );
   expect(unsigned).not.toContain("<line");
+});
+
+test("a histogram draws the members that did not move at zero, as their own mark (#697)", () => {
+  /*
+   * On foundation aid a third of Ohio's districts are held at their base and do not move. Binned,
+   * they would be the bins either side of zero and read as small changes; `held` draws them as a
+   * muted stem in the gap the bins leave at zero, hoverable like the bars, and its text last.
+   */
+  const bins = [
+    { from: -0.04, to: -0.02, count: 3 },
+    { from: -0.02, to: 0, count: 5 },
+    { from: 0, to: 0.02, count: 4 },
+  ];
+  const held = { count: 9, label: "9 did not move", hover: "9 districts did not move" };
+  const svg = renderToString((w) => histogramSpec(bins, (v) => pct(v, 0), { width: w, held }), "presentational");
+  const { document } = parseHTML(svg);
+  const wide = document.querySelector('[data-at="wide"]')!;
+  const hovers = [...wide.querySelectorAll("[data-hover]")].map((m) => m.getAttribute("data-hover"));
+  expect(hovers).toHaveLength(4);
+  expect(hovers.at(-1)).toBe("9 districts did not move");
+  expect(wide.querySelector(".hist-held")?.getAttribute("fill")).toBe(INK.muted);
+  expect(wide.textContent).toContain("9 did not move");
+  // The stem is the tallest mark here, so it sets the count axis.
+  expect(histogramSpec(bins, String, { width: 640, held }).options.y?.domain).toEqual([0, 9]);
+
+  // None held, no stem: the bars alone, as before.
+  const none = renderToString(
+    (w) => histogramSpec(bins, String, { width: w, held: { ...held, count: 0 } }),
+    "presentational",
+  );
+  expect(none).not.toContain("hist-held");
 });
 
 test("a signed distribution draws its zero, and an unsigned one does not", () => {

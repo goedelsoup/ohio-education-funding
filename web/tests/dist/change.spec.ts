@@ -130,3 +130,31 @@ describe("every county's who-gained card (#661)", () => {
     expect(drawn, "the build has counties to draw, or this passed on nothing").toBeGreaterThan(100);
   });
 });
+
+describe("/what-changed's distribution card (#697)", () => {
+  const card = read("what-changed.html").querySelector("#distribution");
+
+  test("draws a histogram for each step in both measures, before the table", () => {
+    expect(card).toBeTruthy();
+    const panels = [...card!.querySelectorAll(".measure-panel")];
+    expect(panels.map((p) => p.getAttribute("data-measure"))).toEqual(["total", "foundation"]);
+    for (const panel of panels) {
+      const charts = panel.querySelectorAll('[data-chart^="change-"]');
+      expect(charts).toHaveLength(3);
+      for (const chart of charts) {
+        // Every width drawn, the phone's among them.
+        expect(chart.querySelector('.chart-at[data-at="narrow"] svg.plot .hist')).toBeTruthy();
+        expect(chart.querySelector('.chart-at[data-at="wide"] svg.plot .hist')).toBeTruthy();
+      }
+    }
+  });
+
+  test("draws the districts held at base on foundation aid as their own mark", () => {
+    const foundation = card!.querySelector('.measure-panel[data-measure="foundation"]')!;
+    const stems = [...foundation.querySelectorAll('.chart-at[data-at="wide"] .hist-held > *')];
+    expect(stems).toHaveLength(3);
+    expect(stems.map((s) => s.getAttribute("data-hover"))).toContain(
+      "219 districts did not move: foundation aid, FY2026 to FY2027 models",
+    );
+  });
+});
