@@ -7,16 +7,17 @@
  * "why did my district's aid fall" finds the provisions that moved everyone's. It sits in Places
  * beside Statewide because it is a view of all of Ohio rather than an analysis of it.
  *
- * Every card is in the document; the county filter and the sort only hide and reorder rows.
+ * Every district's own change is not listed here: the directory has each measure and step as a
+ * sortable column, with the state share's change beside them, and each county page compares its
+ * districts. A 609-row table repeating both was 437 KB of this page's 469 (#693).
  */
 import Base from "../layouts/Base.astro";
 import { NAMES } from "../lib/nav.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { count } from "../lib/format.ts";
 import * as routes from "../lib/routes.ts";
-import { yearsOf } from "../lib/change.ts";
+import { SHARE_COLUMN, yearsOf } from "../lib/change.ts";
 import {
-  renderByCounty,
   renderDirectCertification,
   renderDistribution,
   renderPhaseIn,
@@ -52,10 +53,12 @@ const y = yearsOf(alphabetical[0]!.biennium);
   <Fragment set:html={renderDirectCertification(alphabetical)} />
   <Fragment set:html={renderReappraisal(alphabetical)} />
   <Fragment set:html={renderPhaseIn(alphabetical)} />
-  <Fragment set:html={renderByCounty(alphabetical)} />
 
-  <script>
-    import "../scripts/sortable.ts";
-    import "../scripts/whatChanged.ts";
-  </script>
+  <p class="note">
+    Each district's own change, on both measures and across each step, is a column of the{" "}
+    <a href={routes.directorySorted("foundation-0-2", "ascending")}>directory</a>, which sorts every
+    district on any of them and on its <a href={routes.directorySorted(SHARE_COLUMN, "ascending")}>state
+    share's change</a>. Each <a href={NAMES.counties.href}>county</a>'s page compares its own
+    districts on both measures and all three steps.
+  </p>
 </Base>

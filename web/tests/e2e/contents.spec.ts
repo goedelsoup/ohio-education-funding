@@ -86,7 +86,8 @@ test("a row far down the district directory names each of its figures", async ({
       heads: [...document.querySelectorAll("#district-table thead th")].slice(1).map((th) => th.textContent ?? ""),
     };
   });
-  expect(labels).toHaveLength(12);
+  // Six figures, the six biennium changes, and the state share across the model years (#693).
+  expect(labels).toHaveLength(13);
   labels.forEach((label, i) => {
     // `content` serialises with its quotes, and the alternative text after a solidus.
     const name = /^"([^"]+)"/.exec(label)?.[1];

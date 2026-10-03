@@ -58,6 +58,16 @@ export const REACH = "/scenario/reach";
 export const BOUNDS = "/bounds";
 
 /**
+ * The district index, sorted on one of its columns when it opens (#693).
+ *
+ * `column` is a header button's `data-sort` key. Query parameters for the reason `?q=` is one: the
+ * page is one static file and the sort is the reader's. Without script the page opens
+ * alphabetical, which is the whole table still.
+ */
+export const directorySorted = (column: string, order: "ascending" | "descending"): string =>
+  `/districts?sort=${encodeURIComponent(column)}&order=${order}`;
+
+/**
  * How the model is built, and what it does not claim.
  *
  * A constant for the reason `BOUNDS` is one, and reached the list the same way: `corpusSeries.ts`
@@ -243,7 +253,6 @@ export const SECTIONS = {
     directCertification: "direct-certification",
     reappraisal: "reappraisal",
     phaseIn: "phase-in",
-    byCounty: "by-county",
   },
 
   /** `/house`, `/senate`, and `/[chamber]/[number]`. */

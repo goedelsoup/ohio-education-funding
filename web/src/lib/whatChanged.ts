@@ -26,6 +26,7 @@
 import {
   levelChange,
   MEASURES,
+  SHARE_COLUMN,
   type MeasureKey,
   signedPct,
   UNMOVED,
@@ -33,9 +34,7 @@ import {
   yearsOf,
 } from "./change.ts";
 import { tally, withoutTargetedAssistance } from "./countyChange.ts";
-import { qualifiedName } from "./feed.ts";
 import { count, escapeHtml, millions, money, pct } from "./format.ts";
-import { compare } from "./order.ts";
 import * as routes from "./routes.ts";
 import { anchor } from "./section.ts";
 import { median, percentile } from "./stats.ts";
@@ -357,8 +356,8 @@ export function renderReappraisal(districts: readonly District[]): string {
         longer does, so the bands set those apart. Valuation
         is the department's three tax years and the share its two model years; the files publish
         both and not how much of a share's fall the valuation caused, which also moves with
-        enrollment and income. The county table below puts each district's share beside its
-        neighbors'.</p>
+        enrollment and income. The <a href="${routes.directorySorted(SHARE_COLUMN, "ascending")}">directory</a>
+        sorts every district on its own share's change.</p>
     </div>`;
 }
 
@@ -419,59 +418,3 @@ export function renderPhaseIn(districts: readonly District[]): string {
     </div>`;
 }
 
-/** Section 7: every district, filterable by county, each linked to its change tab. */
-export function renderByCounty(districts: readonly District[]): string {
-  const id = SECTION.byCounty;
-  const y = years(districts);
-  const counties = [...new Set(districts.map((d) => d.county))].sort(compare);
-  const cell = (text: string, sort: number | null, loss = false) =>
-    `<td class="tnum${loss ? " loss" : ""}" data-sort-value="${sort ?? ""}">${text}</td>`;
-  const head = (label: string, key: string, sorted?: "ascending") =>
-    `<th scope="col" aria-sort="${sorted ?? "none"}"><button type="button" data-sort="${key}">${label}</button></th>`;
-  const rows = [...districts]
-    .sort((a, b) => compare(a.county, b.county) || compare(a.name, b.name))
-    .map((d) => {
-      const changes = (["total", "foundation"] as const).flatMap((m) =>
-        STEPS.map(([a, b]) => levelChange(d.biennium, m, a, b).ratio),
-      );
-      const o = d.biennium.observed;
-      const share =
-        o[1]!.state_share == null || o[2]!.state_share == null ? null : o[2]!.state_share - o[1]!.state_share;
-      return `<tr data-county="${escapeHtml(d.county)}">
-        <th scope="row" data-sort-value="${escapeHtml(d.name)}"><a href="${routes.districtChange(d.irn)}">${escapeHtml(qualifiedName(d))}</a></th>
-        <td data-sort-value="${escapeHtml(d.county)}">${escapeHtml(d.county)}</td>
-        ${changes.map((r) => cell(signedPct(r), r, r < 0)).join("")}
-        ${cell(share == null ? "not published" : `${share > 0 ? "+" : ""}${pct(share, 1).replace("%", "")} pts`, share, share != null && share < 0)}
-      </tr>`;
-    });
-  return `
-    <div class="card" id="${id}" data-part="${id}">
-      <h2>${anchor(id)}By county${yearChip("biennium")}</h2>
-      <p class="note">Every district, under the county the department attributes it to. Each name
-        opens the district's change tab, which splits its own figures by line; each county's page
-        compares its districts on both measures and all three steps.</p>
-      <form class="filters" id="${id}-filter" role="search">
-        <div class="field">
-          <label for="${id}-county">County</label>
-          <select id="${id}-county">
-            <option value="">All ${count(counties.length)}</option>
-            ${counties.map((c) => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("")}
-          </select>
-        </div>
-        <p class="count" id="${id}-count" aria-live="polite">${count(districts.length)} districts</p>
-      </form>
-      <div class="scroll"><table data-sortable>
-        <thead><tr>
-          ${head("District", "name")}${head("County", "name", "ascending")}
-          ${(["total", "foundation"] as const)
-            .flatMap((m) => STEPS.map(([a, b]) => head(`${m === "total" ? "Total state support" : "Foundation aid"}, ${span(y, a, b)}`, `${m}-${a}-${b}`)))
-            .join("")}
-          ${head(`State share, ${span(y, 1, 2)}`, "share")}
-        </tr></thead>
-        <tbody>${rows.join("")}</tbody>
-      </table></div>
-      <p class="note">Each change is the district's own, as a share of its level in the earlier year;
-        the state share change is in percentage points, and the FY${y[0]} payment report does not
-        publish a share.</p>
-    </div>`;
-}

@@ -81,6 +81,24 @@ export function yearChange(b: Biennium, measure: MeasureKey): { dollars: number;
   return levelChange(b, measure, 1, 2);
 }
 
+/**
+ * The state share's change across the two model years, as a difference of shares — `0.012` is 1.2
+ * points. `null` where either model does not publish a share; FY2025's report publishes none, so
+ * there is no earlier step to take.
+ */
+export function shareChange(b: Biennium): number | null {
+  const [middle, last] = [b.observed[1]!.state_share, b.observed[2]!.state_share];
+  return middle == null || last == null ? null : last - middle;
+}
+
+/** The directory's `data-sort` key for {@link shareChange}, which `/what-changed` links to sorted. */
+export const SHARE_COLUMN = "share-1-2";
+
+/** A difference of shares in percentage points with its sign, `+1.2 pts` or `−0.4 pts`. */
+export function signedPoints(v: number): string {
+  return `${v > 0 ? "+" : ""}${pct(v, 1).replace("%", "")} pts`;
+}
+
 /** Under a cent is no change: the files publish to the cent. */
 export const UNMOVED = 0.005;
 

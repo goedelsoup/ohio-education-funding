@@ -140,21 +140,37 @@ if (table && body && nameInput && statusSelect && countOut) {
    * "Not currently sorted" is now `none` rather than the attribute being absent, so a column that
    * can be sorted always says so.
    */
+  const sortOn = (button: HTMLButtonElement, descending: boolean) => {
+    showMeasure(button.dataset.sort ?? "");
+    const cell = button.closest("th") as HTMLTableCellElement;
+    for (const other of table.querySelectorAll("thead th[aria-sort]")) {
+      other.setAttribute("aria-sort", "none");
+    }
+    cell.setAttribute("aria-sort", descending ? "descending" : "ascending");
+    sortBy(cell.cellIndex, descending);
+  };
+
   for (const button of table.querySelectorAll<HTMLButtonElement>("thead button[data-sort]")) {
     button.addEventListener("click", () => {
-      showMeasure(button.dataset.sort ?? "");
-      const cell = button.closest("th") as HTMLTableCellElement;
-      const was = cell.getAttribute("aria-sort");
+      const was = button.closest("th")?.getAttribute("aria-sort");
       const first = was == null || was === "none";
-      for (const other of table.querySelectorAll("thead th[aria-sort]")) {
-        other.setAttribute("aria-sort", "none");
-      }
       // Names read best ascending on first click; every other column is a quantity, and the
       // question a reader has about a quantity is almost always "who is at the top".
-      const descending = first ? button.dataset.sort !== "name" : was === "ascending";
-      cell.setAttribute("aria-sort", descending ? "descending" : "ascending");
-      sortBy(cell.cellIndex, descending);
+      sortOn(button, first ? button.dataset.sort !== "name" : was === "ascending");
     });
+  }
+
+  /*
+   * `?sort=` and `?order=` open the table sorted (#693), which is how `/what-changed` sends a reader
+   * to "who fell furthest" rather than to an alphabetical list. A key no header carries is ignored,
+   * and without an order the column sorts as its first click would.
+   */
+  const params = new URLSearchParams(location.search);
+  const key = params.get("sort");
+  const column = key == null ? null : table.querySelector<HTMLButtonElement>(`thead button[data-sort="${CSS.escape(key)}"]`);
+  if (column) {
+    const order = params.get("order");
+    sortOn(column, order === "ascending" || order === "descending" ? order === "descending" : key !== "name");
   }
 }
 
