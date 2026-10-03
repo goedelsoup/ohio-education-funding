@@ -188,3 +188,40 @@ export function plain(html: string): string {
 export function description(body: Pick<TopicBody, "shortAnswer">): string {
   return plain(`${body.shortAnswer.lead} ${body.shortAnswer.rest}`);
 }
+
+/**
+ * A topic's stated identity, as two sides computed per district.
+ *
+ * Each topic's worked example states a relation — `paid = base + p × (computed − base)` — and the
+ * page is only right if it holds on every district, not on the one it shows. A topic module exports
+ * one of these beside itself, and its test runs {@link reconciles} over the year the page reads.
+ */
+export interface Identity<R extends { irn: string }> {
+  /** The left side, as the payment report or the feed states it. */
+  left: (row: R) => number;
+  /** The right side, as the page's rule computes it. */
+  right: (row: R) => number;
+  /**
+   * How far apart the two may be: half the published precision. A figure published to the dollar
+   * reconciles within 0.5, and a tolerance wider than that would pass a rounding the page does not do.
+   */
+  tolerance: number;
+}
+
+/**
+ * The districts, by IRN, on which an identity fails. Empty when it holds everywhere.
+ *
+ * Keyed on IRN because district names are not unique. A test pairs it with a doctored row that
+ * must come back, so the guard is not one that every row passes by construction.
+ */
+export function reconciles<R extends { irn: string }>(
+  identity: Identity<R>,
+  districts: readonly R[],
+): string[] {
+  return districts
+    .filter((row) => {
+      const gap = Math.abs(identity.left(row) - identity.right(row));
+      return !(gap <= identity.tolerance);
+    })
+    .map((row) => row.irn);
+}
