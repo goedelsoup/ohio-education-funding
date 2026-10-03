@@ -55,7 +55,12 @@ function years(districts: readonly District[]): [number, number, number] {
   return yearsOf(districts[0]!.biennium);
 }
 
-const span = (y: readonly number[], from: YearIndex, to: YearIndex) => `FY${y[from]} to FY${y[to]}`;
+/** A year as a heading: the first is the department's payment report, the other two its models (#696). */
+const yearHead = (y: readonly number[], i: YearIndex) => `FY${y[i]} ${i === 0 ? "paid" : "model"}`;
+
+/** A step as a heading, saying which file each end is read from. */
+const span = (y: readonly number[], from: YearIndex, to: YearIndex) =>
+  from === 0 ? `${yearHead(y, from)} to ${yearHead(y, to)}` : `FY${y[from]} to FY${y[to]} models`;
 
 /** "$145.0M", unsigned, for a figure whose direction the sentence already says. */
 const size = (v: number) => millions(Math.abs(v)).replace("+", "");
@@ -125,7 +130,7 @@ export function renderTwoMeasures(districts: readonly District[]): string {
         phase-in</a> is where that payment is set out.</p>
       <div class="scroll"><table>
         <thead><tr><th scope="col">Measure, all ${count(districts.length)} districts</th>
-          ${y.map((v, i) => th(`FY${v} ${i === 0 ? "paid" : "model"}`)).join("")}
+          ${([0, 1, 2] as const).map((i) => th(yearHead(y, i))).join("")}
           ${STEPS.map(([a, b]) => th(span(y, a, b))).join("")}
         </tr></thead>
         <tbody>${rows.join("")}</tbody>
@@ -270,12 +275,12 @@ export function renderDirectCertification(districts: readonly District[]): strin
         text.</p>
       <div class="scroll"><table>
         <thead><tr><th scope="col">DPIA as the formula computes it</th>
-          ${th(`FY${y[1]} model`)}${th(`FY${y[2]} model`)}${th("Change")}
+          ${th(yearHead(y, 1))}${th(yearHead(y, 2))}${th("Change")}
         </tr></thead>
         <tbody>
           ${row(`All ${count(districts.length)} districts`, x.all)}
-          ${row(`The ${count(x.formula.districts)} whose FY${y[2]} formula calculates above their base`, x.formula)}
-          ${row(`The ${count(x.held.districts)} whose FY${y[2]} formula calculates at or below it`, x.held)}
+          ${row(`The ${count(x.formula.districts)} whose formula in the ${yearHead(y, 2)} calculates above their base`, x.formula)}
+          ${row(`The ${count(x.held.districts)} whose formula in the ${yearHead(y, 2)} calculates at or below it`, x.held)}
         </tbody>
       </table></div>
       <p class="note">DPIA fell in ${count(x.fell)} of the ${count(districts.length)}. It is a
@@ -325,8 +330,8 @@ export function renderReappraisal(districts: readonly District[]): string {
   const rows = shareBands(districts).map(({ label, districts: band }) => {
     const valuation = band
       .map((d) => d.biennium.valuation)
-      .filter((v) => v[0] != null && v[2] != null && v[0] > 0)
-      .map((v) => v[2]! / v[0]! - 1);
+      .filter((v) => v[1] != null && v[2] != null && v[1] > 0)
+      .map((v) => v[2]! / v[1]! - 1);
     const share = band.map((d) => {
       const o = d.biennium.observed;
       return o[2]!.state_share! / o[1]!.state_share! - 1;
@@ -348,21 +353,26 @@ export function renderReappraisal(districts: readonly District[]): string {
         part of a small share than of a large one. So the lower a district's share starts, the more
         of its aid a valuation rise takes.</p>
       <div class="scroll"><table>
-        <thead><tr><th scope="col">State share, FY${y[1]}</th>${th("Districts")}
-          ${th(`Median valuation change, TY${ty[0]} to TY${ty[2]}`)}
+        <thead><tr><th scope="col">State share, ${yearHead(y, 1)}</th>${th("Districts")}
+          ${th(`Median valuation change, TY${ty[1]} to TY${ty[2]}`)}
           ${th(`Median state share change, ${span(y, 1, 2)}`)}
           ${th(`Foundation aid fell, ${span(y, 1, 2)}`)}
-          ${th(`At their base, FY${y[2]}`)}
+          ${th(`At their base, ${yearHead(y, 2)}`)}
         </tr></thead>
         <tbody>${rows.join("")}</tbody>
       </table></div>
       <p class="note">The state share change is relative to the share itself. At the minimum the share cannot fall further, and a district held at its base
         loses no foundation aid when its share falls, because the guarantee pays what the formula no
-        longer does, so the bands set those apart. Valuation
-        is the department's three tax years and the share its two model years; the files publish
-        both and not how much of a share's fall the valuation caused, which also moves with
-        enrollment and income. The <a href="${routes.directorySorted(SHARE_COLUMN, "ascending")}">directory</a>
-        sorts every district on its own share's change.</p>
+        longer does, so the bands set those apart. The files publish the valuation and the share
+        and not how much of a share's fall the valuation caused, which also moves with enrollment
+        and income.</p>
+      <p class="note">This card sees one step, ${span(y, 1, 2)}, because FY${y[0]}'s payment
+        report publishes no state share; the valuation is measured over the tax years that step
+        reads, TY${ty[1]} to TY${ty[2]}. A district reappraised for tax year ${ty[1]} takes its fall
+        on the step before, ${span(y, 0, 1)}, which this card cannot show: it is on that district's
+        Change tab. The directory sorts every district on its
+        <a href="${routes.directorySorted("foundation-0-1", "ascending")}">foundation aid across that step</a>
+        and on <a href="${routes.directorySorted(SHARE_COLUMN, "ascending")}">its own share's change</a>.</p>
     </div>`;
 }
 
@@ -424,7 +434,7 @@ export function renderPhaseIn(districts: readonly District[]): string {
         below is read off the files, as what each district above its base was paid of its gap.</p>
       <div class="scroll"><table>
         <thead><tr><th scope="col">All ${count(districts.length)} districts</th>
-          ${y.map((v, i) => th(`FY${v} ${i === 0 ? "paid" : "model"}`)).join("")}
+          ${([0, 1, 2] as const).map((i) => th(yearHead(y, i))).join("")}
         </tr></thead>
         <tbody>
           ${row("Phase-in rate", (x) => pct(x.rate, 1))}

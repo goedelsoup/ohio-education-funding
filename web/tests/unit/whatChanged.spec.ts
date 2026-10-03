@@ -8,7 +8,7 @@
 import { parseHTML } from "linkedom";
 import { expect, test } from "vitest";
 
-import { levelChange, SHARE_COLUMN, shareChange, signedPct, signedPoints } from "../../src/lib/change.ts";
+import { levelChange, SHARE_COLUMN, shareChange, signedPct, signedPoints, yearsOf } from "../../src/lib/change.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
 import { millions } from "../../src/lib/format.ts";
 import * as routes from "../../src/lib/routes.ts";
@@ -172,8 +172,8 @@ test("no card lists every district: the directory and the county pages do (#693)
   for (const table of document.querySelectorAll("table")) {
     expect(table.querySelectorAll("tbody tr").length).toBeLessThan(20);
   }
-  const link = document.querySelector(`#${routes.SECTIONS.changed.reappraisal} a[href^="/districts"]`);
-  expect(link?.getAttribute("href")).toBe(routes.directorySorted(SHARE_COLUMN, "ascending"));
+  const links = [...document.querySelectorAll(`#${routes.SECTIONS.changed.reappraisal} a[href^="/districts"]`)];
+  expect(links.map((a) => a.getAttribute("href"))).toContain(routes.directorySorted(SHARE_COLUMN, "ascending"));
 });
 
 test("the state share change is in points between the two models, which publish it for all 609", () => {
@@ -188,4 +188,25 @@ test("the state share change is in points between the two models, which publish 
 test("a year the files do not publish is a word, never a zero", () => {
   const card = text(document.querySelector(`#${routes.SECTIONS.changed.directCertification}`));
   expect(card).toContain("does not itemize DPIA");
+});
+
+test("every heading naming a model year says it is a model (#696)", () => {
+  const [, middle, last] = yearsOf(districts[0]!.biennium);
+  const heads = [...document.querySelectorAll("th")].map(text).filter((h) => h.includes(`FY${middle}`) || h.includes(`FY${last}`));
+  expect(heads.length).toBeGreaterThan(10);
+  for (const head of heads) expect(head, head).toMatch(/model/);
+  const repeal = text(document.querySelector(`#${routes.SECTIONS.changed.targetedAssistance} thead`));
+  expect(repeal).toContain("Total state support cut, FY2025 paid to FY2026 model");
+});
+
+test("the reappraisal card names the one step it sees, and measures valuation over it (#696)", () => {
+  const card = document.querySelector(`#${routes.SECTIONS.changed.reappraisal}`)!;
+  expect(text(card.querySelector("thead"))).toContain("Median valuation change, TY2024 to TY2025");
+  expect(text(card)).toContain(
+    "This card sees one step, FY2026 to FY2027 models, because FY2025's payment report publishes no state share",
+  );
+  // Elida and Shawnee's fall is on the step before; the card points at where it is.
+  expect(text(card)).toContain("A district reappraised for tax year 2024 takes its fall on the step before, FY2025 paid to FY2026 model");
+  const link = card.querySelector(`a[href="${routes.directorySorted("foundation-0-1", "ascending")}"]`);
+  expect(link).toBeTruthy();
 });
