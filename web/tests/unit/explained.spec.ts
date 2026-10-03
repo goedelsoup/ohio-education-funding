@@ -47,6 +47,12 @@ import {
 } from "../../src/lib/explained/state-share.ts";
 import { TOPICS, topicModule } from "../../src/lib/explained/registry.ts";
 import {
+  FLOOR,
+  IDENTITY as LEVY_IDENTITY,
+  example as medianReduction,
+  rows as levies,
+} from "../../src/lib/explained/reduction-factors.ts";
+import {
   BREAK_YEAR,
   IDENTITY as SHARES_IDENTITY,
   reliefPeak,
@@ -727,5 +733,44 @@ describe("Where does school money come from? (#716)", () => {
       "utf8",
     );
     expect(catalog).toContain(`changes definition at ${fiscalYear(BREAK_YEAR)}`);
+  });
+});
+
+describe("Why don't my taxes rise when my house value does? (#718)", () => {
+  const districts = loadFeed().bundle.districts;
+  const all = levies(districts);
+
+  test("effective = voted × (1 − r) holds on every district carrying the three", () => {
+    expect(all.length).toBeGreaterThan(600);
+    expect(reconciles(LEVY_IDENTITY, all)).toEqual([]);
+  });
+
+  test("a district whose reduction is read off the following year's rate fails it", () => {
+    // The reduction is measured against the year before `millage.tax_year`; one recomputed from the
+    // observed year is the slip the identity exists to catch, on a district whose rate moved.
+    const real = all.find((d) => Math.abs(d.millage.observed_rate - d.millage.prior_rate) > 0.5)!;
+    const doctored = {
+      ...real,
+      irn: "999999",
+      millage: { ...real.millage, cumulative_reduction: 1 - real.millage.observed_rate / real.voted_operating_millage },
+    };
+    expect(reconciles(LEVY_IDENTITY, [...all, doctored])).toEqual(["999999"]);
+  });
+
+  test("the floor is the corpus's", () => {
+    const node = loadCorpus().byId.get("parameter/twenty-mill-floor")!;
+    expect(node.description).toContain(`Set at ${FLOOR} mills for school`);
+  });
+
+  test("the example is above the floor, at the median reduction among districts that are", () => {
+    const ex = medianReduction(districts);
+    const above = all.filter((d) => d.millage.prior_rate > FLOOR + 0.005);
+    const r = (d: (typeof all)[number]) => d.millage.cumulative_reduction;
+    expect(ex.millage.prior_rate).toBeGreaterThan(FLOOR);
+    const below = above.filter((d) => r(d) < r(ex)).length;
+    const tied = above.filter((d) => r(d) === r(ex)).length;
+    const mid = (above.length - 1) / 2;
+    expect(below).toBeLessThanOrEqual(Math.ceil(mid));
+    expect(below + tied - 1).toBeGreaterThanOrEqual(Math.floor(mid));
   });
 });

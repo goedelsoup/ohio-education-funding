@@ -452,8 +452,9 @@ test.describe("routes", () => {
     // "How does Ohio decide what a district gets?" (#716), thirty-nine with "Why are so many
     // districts paid an old amount?" (#716), forty with "Why do so many districts sit on the
     // state's floor?" (#716), forty-one with "Does spending more raise test scores?" (#716), and
-    // forty-two with "Where does school money come from?" (#716).
-    expect(hrefs).toHaveLength(42);
+    // forty-two with "Where does school money come from?" (#716). Forty-three with "Why don't my
+    // taxes rise when my house value does?" (#718).
+    expect(hrefs).toHaveLength(43);
     for (const href of hrefs) {
       await page.goto(href);
       await expect(page.locator("h1"), `${href} has no heading`).toBeVisible();

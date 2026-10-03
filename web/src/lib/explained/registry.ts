@@ -9,6 +9,7 @@
 
 import { GUARANTEE } from "./guarantee.ts";
 import { PHASE_IN } from "./phase-in.ts";
+import { REDUCTION_FACTORS } from "./reduction-factors.ts";
 import { SOURCES } from "./sources.ts";
 import { SPENDING } from "./spending.ts";
 import { STATE_SHARE } from "./state-share.ts";
@@ -17,7 +18,7 @@ import * as routes from "../routes.ts";
 import { topic, type Topic, type TopicModule } from "./topic.ts";
 import { WHAT_A_DISTRICT_GETS } from "./what-a-district-gets.ts";
 
-export const TOPICS: readonly TopicModule[] = [WHAT_A_DISTRICT_GETS, STATE_SHARE, PHASE_IN, GUARANTEE, SPENDING, SOURCES];
+export const TOPICS: readonly TopicModule[] = [WHAT_A_DISTRICT_GETS, STATE_SHARE, PHASE_IN, GUARANTEE, SPENDING, SOURCES, REDUCTION_FACTORS];
 
 /** One topic by slug, or a thrown error naming the slug no module registered. */
 export function topicModule(slug: string): TopicModule {

@@ -1098,6 +1098,21 @@
   ],
   "legislation/hb-920-1976": [
     {
+      "route": "/explained/reduction-factors",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/reduction-factors",
+        "title": "Why don't my taxes rise when my house value does?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    },
+    {
       "route": "/legislation",
       "pages": 1,
       "of": 1,
@@ -1341,6 +1356,21 @@
         {
           "id": "millage",
           "label": "What voters approved, and what the factors left"
+        }
+      ]
+    },
+    {
+      "route": "/explained/reduction-factors",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/reduction-factors",
+        "title": "Why don't my taxes rise when my house value does?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
         }
       ]
     }
@@ -1686,6 +1716,21 @@
         {
           "id": "valuation-change",
           "label": "TY2023 to TY2024"
+        }
+      ]
+    },
+    {
+      "route": "/explained/reduction-factors",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/reduction-factors",
+        "title": "Why don't my taxes rise when my house value does?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
         }
       ]
     },
