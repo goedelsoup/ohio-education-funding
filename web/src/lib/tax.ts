@@ -47,6 +47,7 @@ import { term } from "./glossary.ts";
 import { anchor } from "./section.ts";
 import { pageDenominators } from "./denominators.ts";
 import { lastOf } from "./ends.ts";
+import { whatIsThis } from "./explained/registry.ts";
 
 /**
  * The statutory reduction-factor floor, in mills — `millage::SCHOOL_DISTRICT_FLOOR`.
@@ -414,7 +415,8 @@ export function renderMillage(d: District, statewide: Statewide): string {
         times, which is the inequality
         <a href="${routes.metric("state-share-percentage")}">the state share</a> exists to
         offset.</p>
-    </div>`;
+    </div>
+    ${whatIsThis("reduction-factors")}`;
 }
 
 /**
