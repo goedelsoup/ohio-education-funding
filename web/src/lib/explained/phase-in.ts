@@ -252,7 +252,7 @@ export const PHASE_IN: TopicModule = {
         },
       ],
       readNext: {
-        topics: [],
+        topics: ["guarantee"],
         data: {
           href: routes.districtChange(ex.irn),
           label: `${name}'s Change tab`,
