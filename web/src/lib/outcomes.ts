@@ -400,6 +400,8 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
     bundle.districts.flatMap((d) => (d.outcome?.performance_index == null ? [] : [d.outcome.performance_index])),
   );
   const reference = { value: ohioMedian, label: `Ohio median ${fixed(ohioMedian, 1)}` };
+  // The number the sentence compares against, on the rule that draws it (#704).
+  const fifthMedian = { value: peerMedian, label: `Fifth's median ${fixed(peerMedian, 1)}` };
   const peerPercentile = ordinal(Math.round(percentileOf(scores, o.performance_index) * 100));
   const peerBox: Drawing = (w) =>
     distributionSpec(
@@ -407,7 +409,7 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
         value: d.outcome!.performance_index!,
         hover: `${d.name}: Performance Index ${fixed(d.outcome!.performance_index!, 1)}, ${pct(d.economically_disadvantaged!, 0)} economically disadvantaged`,
       })),
-      { width: w, format: (v) => fixed(v, 0), marker, reference },
+      { width: w, format: (v) => fixed(v, 0), marker, median: fifthMedian, reference },
     );
 
   return `
@@ -435,9 +437,8 @@ export function renderOutcomeContext(bundle: Bundle, district: District): string
                  ? `level with the median of its poverty fifth, ${fixed(peerMedian, 1)}`
                  : `${fixed(Math.abs(gap), 1)} points ${gap < 0 ? "below" : "above"} the median of its poverty fifth: ${fixed(o.performance_index, 1)} against ${fixed(peerMedian, 1)}`
              }.</strong> Every district in that fifth, by Performance Index — the shaded box is
-             its middle half, the line inside it the middle of the fifth, and the
-             rule marked ${escapeHtml(district.name)} is this district. The gap in the third tile is
-             worth what the width of this box says it is worth.</p>
+             its middle half, and the rule marked ${escapeHtml(district.name)} is this district. The
+             gap in the third tile is worth what the width of this box says it is worth.</p>
              <div class="strip-head"><span>Performance Index</span>
                <strong class="tnum">${fixed(o.performance_index, 1)}
                  <span class="n">${peerPercentile} percentile of its fifth</span></strong></div>

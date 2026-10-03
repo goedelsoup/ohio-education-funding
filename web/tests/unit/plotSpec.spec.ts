@@ -263,6 +263,114 @@ test("a strip names its two ends when asked, and only then", () => {
   expect(plain!.options.height).toBe(64);
 });
 
+test("a strip labels the median it was told, on the rule at that value", () => {
+  /*
+   * #704. Columbus's outcomes card reads "60.7 against 74.3" and the strip under it labelled only
+   * Ohio's median: the 74.3 was the box's rule, unlabelled, and drawn at 74.6, the nearest rank,
+   * where `stats.median` interpolates. A label on that rule would have named a number it is not on.
+   */
+  const values = Array.from({ length: 30 }, (_, i) => ({ value: i, hover: `d${i}` }));
+  // One drawing, at the phone's width, which is where the band is tightest.
+  const N = { width: WIDTHS.narrow };
+  const rules = (svg: string, className: string) =>
+    [...parseHTML(`<div>${svg}</div>`).document.querySelectorAll(`g.${className} line`)].map((l) =>
+      Number(l.getAttribute("x1")),
+    );
+  const labelX = (svg: string, className: string) =>
+    [...parseHTML(`<div>${svg}</div>`).document.querySelectorAll(`g.${className} text`)].map((t) =>
+      Number(/translate\(([\d.]+)/.exec(t.getAttribute("transform") ?? "")?.[1] ?? t.getAttribute("x")),
+    );
+  const told = renderPanelToString(
+    () => distributionSpec(values, { ...N, format: String, median: { value: 14.5, label: "Fifth's median 14.5" } }),
+    "presentational",
+    N.width,
+  );
+  expect(texts(told, "dist-median-label")).toEqual(["Fifth's median 14.5"]);
+  const [rule] = rules(told, "dist-median");
+  expect(labelX(told, "dist-median-label")).toEqual([rule]);
+
+  // Untold, the rule stays on the nearest rank, a member, and carries no name.
+  const untold = renderPanelToString(() => distributionSpec(values, { ...N, format: String }), "presentational", N.width);
+  expect(texts(untold, "dist-median-label")).toEqual([]);
+  expect(rules(untold, "dist-median")[0]).toBeGreaterThan(rule!);
+});
+
+test("a marker's name turns rather than end on another rule", () => {
+  /*
+   * #704. At 375px Columbus's name ran from its own rule to x=260, where Ohio's median rule stood,
+   * and read as naming that one too. Swept, because where a name ends is the type estimate's
+   * business: across every reference position the name runs its preferred way except in one band
+   * about its far end — the four tenths of its estimated width a real font may stop short in, and
+   * the clearance either side.
+   */
+  const values = Array.from({ length: 100 }, (_, i) => ({ value: i, hover: `d${i}` }));
+  const N = { width: WIDTHS.narrow };
+  const anchorAt = (reference: number) => {
+    const svg = renderPanelToString(
+      () =>
+        distributionSpec(values, {
+          ...N,
+          format: String,
+          marker: { value: 80, label: "Marked" },
+          reference: { value: reference, label: "R" },
+        }),
+      "presentational",
+      N.width,
+    );
+    return parseHTML(`<div>${svg}</div>`).document.querySelector("g.dist-marker-label")!.getAttribute("text-anchor");
+  };
+  // Right of centre, so the name runs left; with the reference at the far end it has no reason not to.
+  // Short enough to fit either way, so turning is open to it, and far enough from the box's median
+  // rule, at 50, that that one never turns it.
+  const preferred = anchorAt(99);
+  expect(preferred).toBe("end");
+  // From 50 to 78, which holds the name's far end, x ≈ 188–208, and some way either side of it.
+  const step = 0.2;
+  const swept = Array.from({ length: Math.round(28 / step) + 1 }, (_, i) => 50 + i * step);
+  const turned = swept.filter((r) => anchorAt(r) !== preferred);
+  expect(turned[0], "the band does not reach the sweep's ends").toBeGreaterThan(swept[0]!);
+  expect(turned.at(-1)).toBeLessThan(swept.at(-1)!);
+  expect(turned.length, "some reference position sits at the name's far end").toBeGreaterThan(0);
+  // One band: "Marked" is estimated at 6 × 0.667 × 11 × 1.08 ≈ 47.5px, so 0.4 × 47.5 + 2 × 4 ≈ 27px.
+  // A unit is (300 - 4) / (99 * 1.06) ≈ 2.82px.
+  const px = (turned.at(-1)! - turned[0]!) * ((N.width - 4) / (99 * 1.06));
+  expect(px).toBeGreaterThan(2 * 4);
+  expect(px).toBeLessThanOrEqual(0.4 * 47.5 + 2 * 4 + 1);
+  expect(turned.length).toBe(Math.round((turned.at(-1)! - turned[0]!) / step) + 1);
+});
+
+test("a name that cannot turn off another rule goes up a row", () => {
+  /*
+   * #704's own case. Columbus's name, on a phone, fits only running right, and Ohio's median rule
+   * stood where it ended. Turning would run it off the frame, so it rises a row and the reference's
+   * name, which does clear, takes the row on the rules' tops.
+   */
+  const values = Array.from({ length: 100 }, (_, i) => ({ value: i, hover: `d${i}` }));
+  const N = { width: WIDTHS.narrow };
+  const rowsOf = (reference: number) => {
+    const spec = distributionSpec(values, {
+      ...N,
+      format: String,
+      marker: { value: 10, label: "Columbus City School District" },
+      reference: { value: reference, label: "R" },
+    });
+    const d = parseHTML(`<div>${renderPanelToString(() => spec, "presentational", N.width)}</div>`).document;
+    // A row is the group's offset; the text's own is the frame's top, the same for every row.
+    const y = (className: string) =>
+      Number(/translate\(0,(-?[\d.]+)\)/.exec(d.querySelector(`g.${className}`)!.getAttribute("transform")!)![1]);
+    return { marker: y("dist-marker-label"), reference: y("dist-reference-label"), height: spec!.options.height };
+  };
+  // Where the name may end: Columbus is estimated at 229px from x ≈ 39, so its end is drawn
+  // somewhere in 176–268, and a rule at 75 is at x ≈ 222.
+  const touching = rowsOf(75);
+  expect(touching.marker, "the name sits above the reference's").toBeLessThan(touching.reference);
+  expect(touching.reference - touching.marker).toBe(15);
+  // Well past its end, both are on the bottom row.
+  const clear = rowsOf(99);
+  expect(clear.marker).toBe(clear.reference);
+  expect(touching.height! - clear.height!).toBe(15);
+});
+
 test("two names that would collide take two rows, and the strip grows to hold them", () => {
   // The marker and the reference a few units apart: one row cannot hold both names.
   const values = Array.from({ length: 30 }, (_, i) => ({ value: i, hover: `d${i}` }));

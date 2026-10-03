@@ -3071,6 +3071,26 @@ interface StripLabel {
 const STRIP_LABEL_GAP = 8;
 
 /**
+ * The clear space between a label's far end and a rule it does not name, in pixels.
+ *
+ * A label starts at its own rule, so the end it runs to is the one a reader may take for a second
+ * pointer. Columbus's name ended at x=260 on a 375px phone, exactly where Ohio's median rule stood,
+ * and read as naming both (#704).
+ */
+const STRIP_RULE_CLEAR = 4;
+
+/**
+ * The least of its `textPx` estimate a label is drawn at, as a share.
+ *
+ * The estimate is pessimistic by design, so where a label actually ends is not one point but a
+ * range: from this share of the estimate to all of it. Columbus's name was estimated at 229 units
+ * and drawn at 164, so a check against the estimated end put it 65 units clear of a rule it was
+ * touching. Measured in Chromium on all 612 directory names at 11px weight 600, the share ran from
+ * 0.62 to 0.85 (#704).
+ */
+const STRIP_LABEL_SHORTEST = 0.6;
+
+/**
  * The pitch of a strip's label band, in pixels.
  *
  * Not `LABEL_LINE`'s 13: that spaces the lines of one wrapped label, and these are separate labels
@@ -3088,19 +3108,27 @@ const STRIP_LABEL_LINE = 15;
  * in order — the marker's name first, then the reference's, then the ends — and a label goes to the
  * lowest row where it clears every label already there, turning to run the other way first if that
  * is what clears it, so the subject's name is the one nearest its rule and the band is as few rows
- * as the names allow. The widths are `textPx`'s estimate, set near the 90th percentile of a character, with
- * {@link STRIP_LABEL_GAP} of slack on top.
+ * as the names allow. The widths are `textPx`'s estimate, set near the 90th percentile of a
+ * character, with {@link STRIP_LABEL_GAP} of slack on top.
+ *
+ * The bottom row sits on the tops of the rules, so a name there must not end on any rule but its
+ * own (#704): none of the other `rules` may fall in the range its far end can be drawn at (see
+ * {@link STRIP_LABEL_SHORTEST}), widened by {@link STRIP_RULE_CLEAR}. A name that would turns to
+ * run the other way, and one that cannot turn goes up a row, where a row of the band lies between
+ * it and the rule. The bottom row may then be left empty, and is counted all the same.
  */
 function stripLabels(
   wanted: Omit<StripLabel, "anchor" | "row">[],
   domain: [number, number],
   width: number,
+  rules: number[],
 ): StripLabel[] {
   const [lo, hi] = domain;
   const left = 2;
   const right = width - 2;
   const px = (v: number) => left + ((v - lo) / (hi - lo || 1)) * (right - left);
-  const rows: { from: number; to: number }[][] = [];
+  // The bottom row exists from the start, so a name kept off it lands above it.
+  const rows: { from: number; to: number }[][] = [[]];
   return wanted.map((label) => {
     const at = px(label.value);
     const w = textPx(label.text, 11) * (label.bold ? BOLD_WIDENS : 1);
@@ -3115,11 +3143,18 @@ function stripLabels(
       return span.from >= left && span.to <= right;
     });
     const anchors = fitting.length > 0 ? fitting : [preferred];
+    // Its own rule is the one it starts at; any other where its far end may be drawn is a misreading.
+    const others = rules.map(px).filter((x) => Math.abs(x - at) >= 0.5);
+    const clearsRules = (a: "start" | "end") => {
+      const sign = a === "start" ? 1 : -1;
+      const [near, far] = [at + sign * w * STRIP_LABEL_SHORTEST, at + sign * w].sort((m, n) => m - n);
+      return others.every((x) => x <= near! - STRIP_RULE_CLEAR || x >= far! + STRIP_RULE_CLEAR);
+    };
     const clear = (span: { from: number; to: number }, taken: { from: number; to: number }[]) =>
       taken.every((t) => span.to + STRIP_LABEL_GAP <= t.from || span.from >= t.to + STRIP_LABEL_GAP);
     // The lowest row either way clears, so a label turns to the other side before it goes up.
     for (const [row, taken] of rows.entries()) {
-      const anchor = anchors.find((a) => clear(spanOf(a), taken));
+      const anchor = anchors.find((a) => clear(spanOf(a), taken) && (row > 0 || clearsRules(a)));
       if (anchor) {
         taken.push(spanOf(anchor));
         return { ...label, anchor, row };
@@ -3149,6 +3184,16 @@ export function distributionSpec(
      * label names that rule.
      */
     reference?: { value: number; label: string } | null;
+    /**
+     * Label the box's median rule, and draw that rule at `value` rather than at the nearest rank.
+     *
+     * For a card whose sentence states the median it compares against: the outcomes peer strip says
+     * "60.7 against 74.3", and 74.3 is `stats.median`, interpolated, where the box drew its rule at
+     * 74.6, the nearest rank (#704). A strip labelling the rule it compares against has to put the
+     * rule on the number the sentence prints, so the caller states both. Without it the rule is
+     * drawn where it always was, unlabelled.
+     */
+    median?: { value: number; label: string } | null;
     /**
      * Name the lowest and highest members above them, from each one's `name`.
      *
@@ -3181,7 +3226,7 @@ export function distributionSpec(
   const sorted = [...values].sort((a, b) => a.value - b.value);
   const at = (q: number) => nearestRank(sorted.map((v) => v.value), q);
   const q1 = at(0.25);
-  const med = at(0.5);
+  const med = options.median?.value ?? at(0.5);
   const q3 = at(0.75);
   const iqr = q3 - q1;
   const lowFence = q1 - 1.5 * iqr;
@@ -3199,6 +3244,9 @@ export function distributionSpec(
 
   const dots = options.dots ?? values.length <= DOTS_UP_TO;
   const box = values.length >= BOX_FROM;
+  // Not drawn within a pixel of the box's own median rule, which it would only double; the label
+  // then names that rule.
+  const referenceRule = reference != null && !(box && Math.abs(reference.value - med) <= (domain[1] - domain[0]) / (options.width - 4));
   /*
    * A signed distribution states where zero is, on the same terms `histogramSpec` does.
    *
@@ -3231,6 +3279,9 @@ export function distributionSpec(
       ...(options.marker
         ? [{ text: options.marker.label, value: options.marker.value, fill: SUBJECT, bold: true, className: "dist-marker-label" }]
         : []),
+      ...(options.median && box
+        ? [{ text: options.median.label, value: med, fill: INK.secondary, bold: false, className: "dist-median-label" }]
+        : []),
       ...(reference
         ? [{ text: reference.label, value: reference.value, fill: INK.muted, bold: false, className: "dist-reference-label" }]
         : []),
@@ -3246,6 +3297,14 @@ export function distributionSpec(
     ],
     domain,
     options.width,
+    // The rules that reach the band. Not the box's median, which stops at the box, 8px under the
+    // frame's top: a name in the bottom row is 11px above it, and kept off it the phone's Columbus
+    // strip lifted all three names and left the bottom row empty.
+    [
+      ...(options.marker ? [options.marker.value] : []),
+      ...(referenceRule ? [reference.value] : []),
+      ...(crossesZero ? [0] : []),
+    ],
   );
   const band = labels.length === 0 ? 0 : Math.max(...labels.map((l) => l.row)) + 1;
   // Room under the strip for one line of labels. Every strip has the line now, so the six on
@@ -3308,15 +3367,13 @@ export function distributionSpec(
                 fillOpacity: STRIP.box,
                 rx: 3,
               }),
-              Plot.ruleX([med], { y1: -11, y2: 11, stroke: INK.secondary, strokeWidth: 2 }),
+              Plot.ruleX([med], { y1: -11, y2: 11, stroke: INK.secondary, strokeWidth: 2, className: "dist-median" }),
             ]
           : []),
 
-        // The stated value, full height and dashed, under the dots it is read against. Not drawn
-        // within a pixel of the box's own median rule, which it would only double; the label then
-        // names that rule.
-        ...(reference && !(box && Math.abs(reference.value - med) <= (domain[1] - domain[0]) / (options.width - 4))
-          ? [Plot.ruleX([reference.value], { y1: -19, y2: 19, ...RULE.reference, className: "dist-reference" })]
+        // The stated value, full height and dashed, under the dots it is read against.
+        ...(referenceRule
+          ? [Plot.ruleX([reference!.value], { y1: -19, y2: 19, ...RULE.reference, className: "dist-reference" })]
           : []),
 
         Plot.dot(drawn, {
