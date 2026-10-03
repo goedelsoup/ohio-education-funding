@@ -450,9 +450,9 @@ test.describe("routes", () => {
     // Thirty-six with `Explained` (#713): its index, and one more for each topic as it lands.
     // Thirty-seven with the first, "What does the phase-in do?" (#715), thirty-eight with
     // "How does Ohio decide what a district gets?" (#716), thirty-nine with "Why are so many
-    // districts paid an old amount?" (#716), and forty with "Why do so many districts sit on the
-    // state's floor?" (#716).
-    expect(hrefs).toHaveLength(40);
+    // districts paid an old amount?" (#716), forty with "Why do so many districts sit on the
+    // state's floor?" (#716), and forty-one with "Does spending more raise test scores?" (#716).
+    expect(hrefs).toHaveLength(41);
     for (const href of hrefs) {
       await page.goto(href);
       await expect(page.locator("h1"), `${href} has no heading`).toBeVisible();

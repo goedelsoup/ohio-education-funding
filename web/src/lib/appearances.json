@@ -1400,6 +1400,21 @@
           "label": "Where the money came from"
         }
       ]
+    },
+    {
+      "route": "/explained/spending",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/spending",
+        "title": "Does spending more raise test scores?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
     }
   ],
   "metric/per-pupil-operating-expenditure": [
@@ -1447,6 +1462,21 @@
         {
           "id": "comparable-poverty",
           "label": "Against districts with comparable poverty"
+        }
+      ]
+    },
+    {
+      "route": "/explained/spending",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/spending",
+        "title": "Does spending more raise test scores?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
         }
       ]
     }

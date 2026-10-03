@@ -46,6 +46,7 @@ import {
   shareOf,
 } from "../../src/lib/explained/state-share.ts";
 import { TOPICS, topicModule } from "../../src/lib/explained/registry.ts";
+import { example as medianSpender, measure, rows } from "../../src/lib/explained/spending.ts";
 import {
   CATEGORICALS,
   example as medianByAid,
@@ -635,5 +636,54 @@ describe("Why do so many districts sit on the state's floor? (#716)", () => {
     expect(ex.onGuarantee).toBe(false);
     const below = r.moved.filter((o) => o.delta < ex.delta).length;
     expect([Math.floor((r.moved.length - 1) / 2), Math.floor(r.moved.length / 2)]).toContain(below);
+  });
+});
+
+describe("Does spending more raise test scores? (#716)", () => {
+  const bundle = loadFeed().bundle;
+  const districts = bundle.districts;
+  const published = bundle.statewide.outcomes!;
+  const weighted = measure(districts, "weighted");
+  const enrolled = measure(districts, "enrolled");
+
+  // The feed prints each coefficient to four places, so half the last one.
+  const PRINTED = 5e-5;
+
+  test("the pooled coefficients are the feed's, on both denominators", () => {
+    expect(Math.abs(weighted.pooled - published.weighted_spending_vs_performance)).toBeLessThan(PRINTED);
+    expect(Math.abs(enrolled.pooled - published.enrolled_spending_vs_performance)).toBeLessThan(PRINTED);
+  });
+
+  test("the enrolled coefficient is the corpus's bound figure, which counts the same districts", () => {
+    const figure = loadFigureManifest().figures.find(
+      (f) => f.key === "dispersion/headcount-estimate-negative-excluding-top-spender",
+    )!;
+    expect(enrolled.pooled).toBeLessThan(0);
+    expect(Math.abs(Math.abs(enrolled.pooled) - figure.value)).toBeLessThan(1e-9);
+  });
+
+  test("one district's spending doctored moves the pooled coefficient off the feed's", () => {
+    const real = rows(districts)[0]!.d;
+    const doctored = districts.map((d) =>
+      d.irn === real.irn ? { ...d, outcome: { ...d.outcome!, per_enrolled_pupil: d.outcome!.per_enrolled_pupil! * 3 } } : d,
+    );
+    const moved = measure(doctored, "enrolled").pooled;
+    expect(Math.abs(moved - published.enrolled_spending_vs_performance)).toBeGreaterThan(PRINTED);
+  });
+
+  test("the near zero is a cancellation: the least poor third rises, the poorest falls, and the pool is weaker than any third", () => {
+    const [rich, middle, poor] = weighted.thirds;
+    expect(rich!).toBeGreaterThan(0);
+    expect(poor!).toBeLessThan(0);
+    for (const t of [rich!, middle!, poor!]) expect(Math.abs(weighted.pooled)).toBeLessThan(Math.abs(t));
+    expect(rows(districts).length).toBe(published.districts);
+  });
+
+  test("the example is the median district by spending per enrolled pupil", () => {
+    const ex = medianSpender(districts);
+    const all = rows(districts);
+    const spend = (d: (typeof all)[number]["d"]) => d.outcome!.per_enrolled_pupil!;
+    const below = all.filter((x) => spend(x.d) < spend(ex.d)).length;
+    expect([Math.floor((all.length - 1) / 2), Math.floor(all.length / 2)]).toContain(below);
   });
 });
