@@ -2089,7 +2089,15 @@ td.reads {
 tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 
 .strip-row { margin-bottom: var(--space-6); }
-.strip-head { display: flex; justify-content: space-between; font-size: var(--text-base); gap: var(--space-6); }
+/* Capped where the drawing under it is, 640 × `MAX_SCALE`, so its value ends over the strip's
+   right edge rather than 28px past it (#704; `.barwrap` is the same cap, #660). */
+.strip-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-base);
+  gap: var(--space-6);
+  max-width: calc(640px * 1.25);
+}
 /* The percentile rides with the value it describes. Centred under the box it read as a label
    on the middle of the axis, which is the one place the district being described is not. */
 .strip-head .n { margin-left: var(--space-3); font-weight: var(--weight-regular); }
