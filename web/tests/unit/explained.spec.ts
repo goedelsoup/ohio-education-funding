@@ -46,6 +46,13 @@ import {
   shareOf,
 } from "../../src/lib/explained/state-share.ts";
 import { TOPICS, topicModule } from "../../src/lib/explained/registry.ts";
+import {
+  BREAK_YEAR,
+  IDENTITY as SHARES_IDENTITY,
+  reliefPeak,
+  usualFederal,
+  years,
+} from "../../src/lib/explained/sources.ts";
 import { example as medianSpender, measure, rows } from "../../src/lib/explained/spending.ts";
 import {
   CATEGORICALS,
@@ -84,6 +91,7 @@ import {
   type TopicModule,
 } from "../../src/lib/explained/topic.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
+import { fiscalYear } from "../../src/lib/yearLabel.ts";
 import { SECTIONS } from "../../src/lib/routes.ts";
 
 const FIXTURE: TopicModule = {
@@ -685,5 +693,39 @@ describe("Does spending more raise test scores? (#716)", () => {
     const spend = (d: (typeof all)[number]["d"]) => d.outcome!.per_enrolled_pupil!;
     const below = all.filter((x) => spend(x.d) < spend(ex.d)).length;
     expect([Math.floor((all.length - 1) / 2), Math.floor(all.length / 2)]).toContain(below);
+  });
+});
+
+describe("Where does school money come from? (#716)", () => {
+  const history = loadFeed().bundle.history;
+
+  test("the three shares add to the whole in every year of the panel", () => {
+    expect(reconciles(SHARES_IDENTITY, years(history))).toEqual([]);
+  });
+
+  test("a year with its federal share doubled fails it", () => {
+    const real = history.at(-1)!;
+    const doctored = { ...real, fiscal_year: 1900, federal_share: real.federal_share * 2 };
+    expect(reconciles(SHARES_IDENTITY, years([...history, doctored]))).toEqual(["1900"]);
+  });
+
+  test("local money is the largest part in every year, as the page says", () => {
+    const not = history.filter((y) => !(y.local_share > y.state_share && y.local_share > y.federal_share));
+    expect(not.map((y) => y.fiscal_year)).toEqual([]);
+  });
+
+  test("the relief peak is about twice the federal share's usual size", () => {
+    const { times } = reliefPeak(history);
+    expect(times).toBeGreaterThan(1.75);
+    expect(times).toBeLessThan(2.25);
+    expect(usualFederal(history)).toBeGreaterThan(0);
+  });
+
+  test("the break year is the one the survey's catalog entry names", () => {
+    const catalog = readFileSync(
+      resolve(import.meta.dirname, "../../../.yidam/catalog/census-f33-school-system-finances.md"),
+      "utf8",
+    );
+    expect(catalog).toContain(`changes definition at ${fiscalYear(BREAK_YEAR)}`);
   });
 });

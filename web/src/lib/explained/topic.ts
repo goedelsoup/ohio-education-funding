@@ -90,9 +90,14 @@ export interface Rule {
    * does not need a typesetter.
    */
   notation: string;
-  /** The section of the Revised Code that states the rule, as written: "R.C. 3317.022". */
+  /**
+   * The section of the Revised Code that states the rule, as written: "R.C. 3317.022".
+   *
+   * Or, where the rule is a definition no statute states — what the Census Bureau counts as local
+   * revenue — the publication that does, named as a reader would look for it.
+   */
   statute: string;
-  /** Where a reader can read it: the corpus node that vendors the section, or the code itself. */
+  /** Where a reader can read it: the corpus node or catalog entry that holds it, or the code itself. */
   href: string;
   /** What each symbol in {@link notation} stands for, one item each. */
   symbols: Prose[];
