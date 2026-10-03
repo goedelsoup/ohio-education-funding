@@ -22,9 +22,10 @@ import { loadCorpus } from "../corpus.ts";
 import { loadFeed } from "../feed.ts";
 import { acts, regimes } from "../legislation.ts";
 import { count, millions, pct } from "../format.ts";
-import type { Card } from "./card.ts";
+import { clamp, type Card } from "./card.ts";
 import { firstOf, lastOf } from "../ends.ts";
 import { statewideLevels } from "../whatChanged.ts";
+import { TOPICS } from "../explained/registry.ts";
 
 /** The eyebrow every card wears unless it has a better one. */
 export const SITE = "Ohio school funding";
@@ -252,6 +253,14 @@ export function pageCards(): Record<string, Card> {
       meta: `Data downloads · ${fy}`,
     },
 
+    explained: {
+      eyebrow: SITE,
+      headline: "The formula, one question at a time",
+      figure: "Explained",
+      figureNote: "The guarantee, the phase-in and the state share, in plain words",
+      meta: "Every page ends at the evidence that proves it",
+    },
+
     wiki: {
       eyebrow: `${SITE} · Library`,
       headline: "How Ohio funds its public schools",
@@ -270,4 +279,24 @@ export function pageCards(): Record<string, Card> {
       meta: "Provenance is one hop from every figure on this site",
     },
   };
+}
+
+/**
+ * One card per Explained topic, keyed by slug: the question as the headline, and no figure.
+ *
+ * A topic's numbers come from its worked example, which is the whole page's computation, so the
+ * card names the question and leaves the answer to the page. Read from the registry, so a topic
+ * gets its card the day it is registered (#713).
+ */
+export function explainedCards(): Record<string, Card> {
+  return Object.fromEntries(
+    TOPICS.map((t) => [
+      t.slug,
+      {
+        eyebrow: `${SITE} · Explained`,
+        headline: clamp(t.question, 90),
+        meta: `${t.group} · in plain words, with the math behind it`,
+      },
+    ]),
+  );
 }

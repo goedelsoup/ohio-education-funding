@@ -77,6 +77,16 @@ export const directorySorted = (column: string, order: "ascending" | "descending
   `/districts?sort=${encodeURIComponent(column)}&order=${order}`;
 
 /**
+ * The plain-language section, and one of its topics (#712).
+ *
+ * Constants for the reason `BOUNDS` is one: the bar, the index, the template and the preview cards
+ * all name these, and a topic's address is what every "Read next" link and every "In plain terms"
+ * link elsewhere on the site is built from.
+ */
+export const EXPLAINED = "/explained";
+export const explained = (slug: string): string => `${EXPLAINED}/${slug}`;
+
+/**
  * How the model is built, and what it does not claim.
  *
  * A constant for the reason `BOUNDS` is one, and reached the list the same way: `corpusSeries.ts`
@@ -283,6 +293,28 @@ export const SECTIONS = {
     provenance: "provenance",
     notHere: "not-here",
     checkingItYourself: "checking-it-yourself",
+  },
+
+  /**
+   * `/explained/[slug]` — the sections of #712's template. The question is the page's `h1` and
+   * the short answer its lead, which carries the id but no card; the rest are one card each.
+   */
+  explained: {
+    shortAnswer: "short-answer",
+    picture: "picture",
+    breaks: "breaks",
+    numbers: "numbers",
+    rule: "rule",
+    howWeKnow: "how-we-know",
+    readNext: "read-next",
+  },
+
+  /** `/explained` — one card per run of the bar's panel, or one saying none has a topic yet. */
+  explainedIndex: {
+    coming: "coming",
+    split: "split",
+    moves: "moves",
+    shows: "shows",
   },
 
   /** `/data`. */
@@ -524,6 +556,8 @@ export const og = {
   wikiDecision: (slug: string): string => `/og/wiki/decision/${slug}.png`,
   /** A top-level page — `/`, `/method`, `/data` — keyed by the slug in `src/lib/og/pages.ts`. */
   page: (slug: string): string => `/og/page/${slug}.png`,
+  /** An Explained topic's card, under the section as the page is. */
+  explained: (slug: string): string => `/og/explained/${slug}.png`,
 } as const;
 
 /** A corpus node, by its class and file stem. */

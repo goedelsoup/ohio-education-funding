@@ -18,6 +18,8 @@
 import { expect, test } from "vitest";
 
 import { loadCorpus } from "../../src/lib/corpus.ts";
+import { GROUPS } from "../../src/lib/explained/topic.ts";
+import { TOPICS } from "../../src/lib/explained/registry.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
 import {
   DISTRICT_VIEWS,
@@ -37,14 +39,16 @@ const entries = nav(bundle, corpus);
 const links = navLinks(entries);
 const groups = entries.filter((e): e is NavGroup => e.kind === "group");
 
-test("the bar is six entries by task, two of them flat links", () => {
+test("the bar is seven entries by task, two of them flat links", () => {
   /*
-   * #548's target, written out. The two flat entries are the two things a reader most often came
-   * to do — find one district, change the formula — and a menu in front of either is a click that
-   * decides nothing.
+   * #548's target, written out, with #713's `Explained` second: understanding the formula comes
+   * before analyzing it. The two flat entries are the two things a reader most often came to do —
+   * find one district, change the formula — and a menu in front of either is a click that decides
+   * nothing.
    */
   expect(entries.map((e) => [e.kind, e.label])).toEqual([
     ["place", "Find a district"],
+    ["group", "Explained"],
     ["group", "Places"],
     ["group", "Analysis"],
     ["place", "Change the formula"],
@@ -87,6 +91,29 @@ test("Library leads with the record, each with its glyph, and only Library has a
   }
   const iconed = links.filter((l) => l.icon != null).map((l) => l.href);
   expect(iconed).toEqual(library.lead!.map((l) => l.href));
+});
+
+test("Explained opens on its index, then one run per group, read from the registry", () => {
+  /*
+   * The panel is built from `TOPICS`, so a topic module adds its own link and the panel and the
+   * index cannot list different questions. A group with no topic yet has no run: an empty heading
+   * is a promise the panel cannot keep.
+   */
+  const explained = groups.find((g) => g.key === "explained");
+  expect(explained).toBeDefined();
+  const [index, ...runs] = explained!.sections;
+  expect(index!.heading).toBeUndefined();
+  expect(index!.links.map((l) => l.href)).toEqual([NAMES.explained.href]);
+  const expected = GROUPS.map((heading) => ({
+    heading,
+    hrefs: TOPICS.filter((t) => t.group === heading).map((t) => `/explained/${t.slug}`),
+  })).filter((run) => run.hrefs.length > 0);
+  expect(runs.map((r) => ({ heading: r.heading, hrefs: r.links.map((l) => l.href) }))).toEqual(
+    expected,
+  );
+  expect(runs.flatMap((r) => r.links.map((l) => l.label))).toEqual(
+    expected.flatMap((r) => TOPICS.filter((t) => t.group === r.heading).map((t) => t.question)),
+  );
 });
 
 test("every corpus class is two clicks from the bar: one to open Library, one to arrive", () => {

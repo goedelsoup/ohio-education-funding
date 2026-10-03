@@ -1,0 +1,33 @@
+---
+/**
+ * One Explained topic: the question as the `h1`, and the sections under it.
+ *
+ * Every topic renders through this one template and `render.ts`, so every page has the same
+ * sections in the same order, and a topic module computes data and decides no markup. The
+ * question is the page's name — its `<title>` and the start of its `h1` — because it is the bar's
+ * label for the page (`tests/dist/names.spec.ts`).
+ */
+import Base from "../../layouts/Base.astro";
+import { TOPICS } from "../../lib/explained/registry.ts";
+import { renderTopic } from "../../lib/explained/render.ts";
+import { description, topic, type TopicModule } from "../../lib/explained/topic.ts";
+import * as routes from "../../lib/routes.ts";
+
+export function getStaticPaths() {
+  return TOPICS.map((module) => ({ params: { slug: module.slug }, props: { module } }));
+}
+
+const { module } = Astro.props as { module: TopicModule };
+const t = topic(module);
+---
+
+<Base
+  title={t.question}
+  description={description(t)}
+  image={routes.og.explained(t.slug)}
+  imageAlt={t.question}
+  section="explained"
+>
+  <h1>{t.question}</h1>
+  <Fragment set:html={renderTopic(t)} />
+</Base>

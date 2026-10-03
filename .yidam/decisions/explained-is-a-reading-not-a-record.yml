@@ -1,0 +1,59 @@
+id: explained-is-a-reading-not-a-record
+summary: >-
+  The site explains its three largest mechanisms — the guarantee, the phase-in and the state share
+  — nowhere a newcomer can start from. Explained is a section of short pages, one question each,
+  in plain words. Each page is a web module computed from the feed, not a corpus class, and it ends
+  at the corpus nodes that prove what it says.
+context: |
+  The site holds two kinds of writing. **Data pages** — Statewide, a district's tabs, Analysis —
+  compute their prose from the feed, the way `web/src/lib/bounds.ts` does. **The corpus** is an
+  evidence register: every assertion carries a claim tag, a description stops at 400 words, and
+  its first sentence is a page's meta description.
+
+  Neither is written for a reader who does not yet know what a "state share" is. The glossary
+  admits a term only where a page calls it, and #551 retired `guarantee`, `phase-in` and
+  `state-share` because no page did. Those three words name the formula's three biggest effects,
+  and nothing on the site explained them from zero.
+
+  The plan is in [#712](https://github.com/goedelsoup/ohio-education-funding/issues/712); this
+  record is its phase 0 (#713).
+decision: |
+  **The topics are web modules, not a corpus class.** Each topic is
+  `web/src/lib/explained/<slug>.ts`. It returns typed sections computed from `loadFeed()` and the
+  crates' manifests, on the pattern of `bounds.ts`. One template,
+  `web/src/pages/explained/[slug].astro`, renders every topic, and the `Topic` type in
+  `web/src/lib/explained/topic.ts` makes each section a required field: a topic that leaves one out
+  does not compile.
+
+  **Each topic defers to the corpus for proof.** Its last section, "How we know", names the corpus
+  nodes, the `crates/figures.json` keys and the sources behind each claim. Explained reads the
+  evidence and does not copy it; a plain page never states a figure the feed does not compute.
+
+  **Claim badges appear in "How we know" and nowhere else.** The plain sections stay plain, and the
+  rigour stays one click away.
+
+  **The pages are static.** No prose is computed in the browser, because the dist gates cannot see
+  a client-rendered DOM. A "your district" step is a link to the district tab that shows the same
+  term, not a widget.
+consequences: |
+  **The topics answer to their own gates, not the corpus's.** Phase 1 (#714) writes a style guide
+  as data and a linter over the rendered plain sections: sentence and paragraph length, a house
+  dictionary of forbidden synonyms, a readability ceiling, and a scan that rejects a hand-typed
+  number in topic prose. The corpus gates — claim tags on every assertion, the description ceiling
+  — do not reach these pages, and were not meant to.
+
+  **A seventh entry in the bar.** `Explained` is a group, second after `Find a district`, because
+  the bar is ordered by task and understanding the formula comes before analyzing it. Its panel is
+  built from the topic registry, so a topic module adds its own link.
+
+  **Every number moves with the feed.** A topic's worked example is chosen by rule — the median
+  district among those the topic concerns, keyed on IRN — so the example changes when the feed
+  does, and no page holds a figure that a regenerated panel makes wrong.
+alternatives: |
+  **An `explainer` corpus class.** It would put plain prose under gates built for an encyclopedic
+  register: a claim tag on every assertion, the 400-word ceiling, and the first-sentence rule. It
+  would need an ontology change and a place in `LIBRARY`. And the evidence is already in the
+  corpus, so the class would copy it rather than read it.
+
+  **More wiki.** Plain sections on existing nodes would mix two registers on one page, and a node
+  is about one concept where a reader's question usually spans three.
