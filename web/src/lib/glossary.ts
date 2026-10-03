@@ -28,9 +28,15 @@
  * that defines them — the twenty-mill floor five times in `tax.ts`, the state share once — and a
  * tooltip beside a link to the same definition says the same thing twice. Git has the
  * definitions; an entry comes back with the call site that needs it.
+ *
+ * Three came back with #717, each with one: `guarantee` on the aid tile of a district on it,
+ * `phase-in` in the Change tab's phase-in card, and `state-share` in the categoricals note, all
+ * places the word sat as plain text. Theirs point at the Explained topic rather than the node, and
+ * the topic's "How we know" carries the reader on to the node.
  */
 
 import { escapeHtml } from "./format.ts";
+import * as routes from "./routes.ts";
 
 /** One defined term. */
 export interface Term {
@@ -82,6 +88,30 @@ export const GLOSSARY: Record<string, Term> = {
       "most of what it appears to say about a district is poverty.",
     href: "/wiki/metric/performance-index",
     hrefLabel: "Performance Index",
+  },
+  guarantee: {
+    definition:
+      "A district is on the guarantee when the formula computes less for it than an older " +
+      "baseline, and the state pays the baseline instead. It says the formula falls short for " +
+      "that district, not that the district is favored, though the money is real.",
+    href: routes.explained("guarantee"),
+    hrefLabel: "In plain terms",
+  },
+  "phase-in": {
+    definition:
+      "The share of the gap between what the formula computes and a district's older base that " +
+      "is actually paid. A district below its base is held at the base, so a higher phase-in " +
+      "does not reach it.",
+    href: routes.explained("phase-in"),
+    hrefLabel: "In plain terms",
+  },
+  "state-share": {
+    definition:
+      "The fraction of a district's base cost the state pays rather than the district, set by a " +
+      "measure of local capacity and floored at a statutory minimum. A district at the minimum " +
+      "is one the formula says could fund almost all of itself.",
+    href: routes.explained("state-share"),
+    hrefLabel: "In plain terms",
   },
   adm: {
     definition:

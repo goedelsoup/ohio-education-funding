@@ -12,7 +12,9 @@ import { PHASE_IN } from "./phase-in.ts";
 import { SOURCES } from "./sources.ts";
 import { SPENDING } from "./spending.ts";
 import { STATE_SHARE } from "./state-share.ts";
-import type { TopicModule } from "./topic.ts";
+import { escapeHtml } from "../format.ts";
+import * as routes from "../routes.ts";
+import { topic, type Topic, type TopicModule } from "./topic.ts";
 import { WHAT_A_DISTRICT_GETS } from "./what-a-district-gets.ts";
 
 export const TOPICS: readonly TopicModule[] = [WHAT_A_DISTRICT_GETS, STATE_SHARE, PHASE_IN, GUARANTEE, SPENDING, SOURCES];
@@ -22,4 +24,31 @@ export function topicModule(slug: string): TopicModule {
   const found = TOPICS.find((t) => t.slug === slug);
   if (!found) throw new Error(`No Explained topic has the slug \`${slug}\``);
   return found;
+}
+
+let built: readonly Topic[] | undefined;
+
+/** Every topic built, once per process, in registry order. */
+export function builtTopics(): readonly Topic[] {
+  return (built ??= TOPICS.map(topic));
+}
+
+/**
+ * The topics whose "How we know" cites a node, in registry order (#717).
+ *
+ * The wiki's link back to a topic is this inversion, read from what each topic cites, so a topic
+ * that drops a citation drops the link back with it. Typed by hand, the two would drift apart.
+ */
+export function topicsCiting(nodeId: string): readonly Topic[] {
+  return builtTopics().filter((t) => t.howWeKnow.some((proof) => proof.nodes.includes(nodeId)));
+}
+
+/**
+ * The link a data page sets under a card, from the term it shows to the topic that explains it.
+ *
+ * Under the card and not inside it (#717), so the card keeps the height the measure baseline holds.
+ */
+export function whatIsThis(slug: string): string {
+  const t = topicModule(slug);
+  return `<p class="note" data-explained="${slug}">What is this? <a href="${routes.explained(slug)}">${escapeHtml(t.question)}</a></p>`;
 }

@@ -13,6 +13,7 @@
  */
 import BasisToggle from "../components/BasisToggle.astro";
 import Base from "../layouts/Base.astro";
+import { whatIsThis } from "../lib/explained/registry.ts";
 import { NAMES } from "../lib/nav.ts";
 import { loadFeed } from "../lib/feed.ts";
 import {
@@ -107,6 +108,7 @@ const appropriationBase = bundle.deflator
     ) : (
       <>
         <Fragment set:html={renderRevenueMix(history)} />
+        <Fragment set:html={whatIsThis("sources")} />
 
         <BasisToggle id="history-basis" section="equity-gap" base={base}>
           <Fragment

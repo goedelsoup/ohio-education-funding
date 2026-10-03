@@ -7,6 +7,9 @@
  * report card's school year typed into an Astro `<meta>` description.
  */
 
+import { readFileSync, readdirSync } from "node:fs";
+import { join, resolve } from "node:path";
+
 import { expect, test } from "vitest";
 
 import { loadFeed } from "../../src/lib/feed.ts";
@@ -119,7 +122,13 @@ test("every glossary definition is a distinction, and every link resolves to a n
    * on purpose: a page where every third word is underlined has taught the reader to ignore them.
    */
   const { loadCorpus } = await import("../../src/lib/corpus.ts");
-  const nodes = new Set(loadCorpus().nodes.map((n) => `/wiki/${n.id}`));
+  const { TOPICS } = await import("../../src/lib/explained/registry.ts");
+  const { explained } = await import("../../src/lib/routes.ts");
+  // A node, or an Explained topic: the three entries #717 brought back point at the topic (#717).
+  const nodes = new Set([
+    ...loadCorpus().nodes.map((n) => `/wiki/${n.id}`),
+    ...TOPICS.map((t) => explained(t.slug)),
+  ]);
 
   expect(Object.keys(GLOSSARY).length).toBeGreaterThan(0);
   const broken: string[] = [];
@@ -128,6 +137,21 @@ test("every glossary definition is a distinction, and every link resolves to a n
     if (entry.href && !nodes.has(entry.href)) broken.push(`${slug} -> ${entry.href}`);
   }
   expect(broken).toEqual([]);
+});
+
+test("every glossary entry has a caller", () => {
+  /*
+   * An entry is a call site, not a vocabulary (#551): one no page passes to `term` is a definition
+   * no reader can reach. Read off the source, since a caller is a line of code and not a page.
+   */
+  const src = resolve(import.meta.dirname, "../../src");
+  const files = readdirSync(src, { recursive: true, encoding: "utf8" }).filter((f) => /\.(ts|astro)$/.test(f));
+  const callers = files.map((f) => readFileSync(join(src, f), "utf8")).join("\n");
+  const called = (slug: string, text: string) => text.includes(`term("${slug}"`);
+  expect(Object.keys(GLOSSARY).filter((slug) => !called(slug, callers))).toEqual([]);
+  // And it bites: the same check over the glossary alone, which defines every slug and calls none.
+  const glossary = readFileSync(join(src, "lib/glossary.ts"), "utf8");
+  expect(Object.keys(GLOSSARY).filter((slug) => !called(slug, glossary))).toEqual(Object.keys(GLOSSARY));
 });
 
 test("a term renders as a focusable control with its definition in the markup", () => {
