@@ -9,12 +9,13 @@
 
 import { GUARANTEE } from "./guarantee.ts";
 import { PHASE_IN } from "./phase-in.ts";
+import { SOURCES } from "./sources.ts";
 import { SPENDING } from "./spending.ts";
 import { STATE_SHARE } from "./state-share.ts";
 import type { TopicModule } from "./topic.ts";
 import { WHAT_A_DISTRICT_GETS } from "./what-a-district-gets.ts";
 
-export const TOPICS: readonly TopicModule[] = [WHAT_A_DISTRICT_GETS, STATE_SHARE, PHASE_IN, GUARANTEE, SPENDING];
+export const TOPICS: readonly TopicModule[] = [WHAT_A_DISTRICT_GETS, STATE_SHARE, PHASE_IN, GUARANTEE, SPENDING, SOURCES];
 
 /** One topic by slug, or a thrown error naming the slug no module registered. */
 export function topicModule(slug: string): TopicModule {

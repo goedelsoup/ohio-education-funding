@@ -1931,6 +1931,74 @@
       ]
     }
   ],
+  "revenue-stream/esser": [
+    {
+      "route": "/explained/sources",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/sources",
+        "title": "Where does school money come from?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    }
+  ],
+  "revenue-stream/local-property-tax": [
+    {
+      "route": "/explained/sources",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/sources",
+        "title": "Where does school money come from?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    }
+  ],
+  "revenue-stream/state-foundation-aid": [
+    {
+      "route": "/explained/sources",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/sources",
+        "title": "Where does school money come from?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    }
+  ],
+  "revenue-stream/title-i": [
+    {
+      "route": "/explained/sources",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/sources",
+        "title": "Where does school money come from?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    }
+  ],
   "scenario/fsfp-input-year-refresh": [
     {
       "route": "/district/[irn]",
