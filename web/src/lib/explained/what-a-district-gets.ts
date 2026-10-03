@@ -168,7 +168,7 @@ export const WHAT_A_DISTRICT_GETS: TopicModule = {
         "The less someone can pay, the more the friend puts in.",
       breaks: [
         "At a dinner there is one bill. Here every district has its own. " +
-          `The formula prices the staff each district needs, so one pupil costs from ${money(costliest.at(-1)!.base_cost_per_pupil)} to ${money(costliest[0]!.base_cost_per_pupil)}. ` +
+          `The formula prices the staff each district needs, so one pupil costs from ${money(costliest.at(-1)!.base_cost_per_pupil)} to ${money(costliest[0]!.base_cost_per_pupil)} in ${fy}. ` +
           `The top is ${escapeHtml(costliest[0]!.name)}, with ${count(Math.round(costliest[0]!.categorical_adm))} pupils.`,
         `The friend also always pays something. The state pays at least ${pct(floor, 0)} of the cost, however much a district can raise. ` +
           `For ${count(onFloor.length)} districts in ${fy}, that floor decides the share, and what they can raise no longer matters.`,
