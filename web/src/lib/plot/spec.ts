@@ -3385,16 +3385,49 @@ export function distributionSpec(
  * drawn neutral rather than assigned to a side, because assigning it would state a polarity the
  * data does not have. The zero rule is drawn and labelled "no change" — a reader has to be able
  * to see where zero is, not infer it from the hues.
+ *
+ * # A mass at exactly zero
+ *
+ * Foundation aid holds a district at its funding base, so on that measure a third of Ohio does not
+ * move at all (#697). Binned, those districts would be the bin either side of zero and read as
+ * small changes. `held` draws them as their own mark instead: a 2px muted stem at zero, in the gap
+ * the bins' insets leave there, with its count written at its head. The caller leaves them out of
+ * `bins`, and aligns the bins on zero so none straddles it.
  */
 export function histogramSpec(
   bins: Bin[],
   format: (v: number) => string,
-  options: { width: number },
+  options: {
+    width: number;
+    /** 150 unless given: the small multiples on `/what-changed` stack three to a panel. */
+    height?: number;
+    /** The count axis's ceiling, so panels toggled in place share one (as `neighborsChart` does). */
+    max?: number;
+    /** The members that did not move, drawn at zero apart from the bins. */
+    held?: { count: number; label: string; hover: string } | null;
+  },
 ): Spec {
   const first = firstOf(bins);
   const last = lastOf(bins);
-  const histEnds = tickLabels([first.from, last.to], format);
   const crossesZero = first.from < 0 && last.to > 0;
+  // Labelled at round values where they fall, as the strips are, with "no change" kept clear.
+  const foot = axisFoot({
+    width: options.width,
+    marginLeft: 0,
+    marginRight: 0,
+    dy: 18,
+    says: "",
+    scale: {
+      domain: [first.from, last.to],
+      format,
+      ...(crossesZero ? { beside: { value: 0, label: "no change" } } : {}),
+    },
+  });
+  const held = options.held && options.held.count > 0 ? options.held : null;
+  // The domain is the whole grid; an empty bin paints nothing, so it is not drawn or pointed at.
+  const filled = bins.filter((b) => b.count > 0);
+  // One pixel in the value's units: the stem fills the 2px gap the bins' insets leave at zero.
+  const pixel = (last.to - first.from) / options.width;
 
   const side = (b: Bin) =>
     b.to <= 0 ? SERIES.guarantee : b.from >= 0 ? SERIES.formula : SERIES.neutral;
@@ -3402,15 +3435,15 @@ export function histogramSpec(
   return {
     options: {
       width: options.width,
-      height: 150,
-      marginTop: 4,
+      height: options.height ?? 150,
+      marginTop: held ? 18 : 4,
       marginBottom: 26,
       marginLeft: 0,
       marginRight: 0,
       x: { axis: null, domain: [first.from, last.to] },
-      y: { axis: null, domain: [0, Math.max(...bins.map((b) => b.count), 1)] },
+      y: { axis: null, domain: [0, options.max ?? Math.max(...bins.map((b) => b.count), held?.count ?? 0, 1)] },
       marks: [
-        Plot.rectY(bins, {
+        Plot.rectY(filled, {
           x1: "from",
           x2: "to",
           y: "count",
@@ -3422,44 +3455,42 @@ export function histogramSpec(
           className: "hist",
         }),
         Plot.ruleY([0], RULE.zero),
-        ...(crossesZero
+        ...(crossesZero ? [Plot.ruleX([0], RULE.zero)] : []),
+        ...foot.marks,
+        // After the zero rule, which it stands on, and in the muted ink: no change has no polarity.
+        ...(held
           ? [
-              Plot.ruleX([0], RULE.zero),
-              Plot.text([0], {
+              Plot.rectY([held], {
+                x1: -pixel,
+                x2: pixel,
+                y: "count",
+                fill: INK.muted,
+                className: "hist-held",
+              }),
+              Plot.text([held], {
                 x: 0,
-                frameAnchor: "bottom",
-                dy: 18,
-                text: () => "No change",
+                y: "count",
+                dy: -4,
+                lineAnchor: "bottom",
+                text: "label",
                 fill: INK.muted,
                 fontSize: 11,
               }),
             ]
           : []),
-        Plot.text([first.from], {
-          frameAnchor: "bottom-left",
-          dy: 18,
-          text: () => histEnds[0]!,
-          textAnchor: "start",
-          fill: INK.muted,
-          fontSize: 11,
-        }),
-        Plot.text([last.to], {
-          frameAnchor: "bottom-right",
-          dy: 18,
-          text: () => histEnds[1]!,
-          textAnchor: "end",
-          fill: INK.muted,
-          fontSize: 11,
-        }),
       ],
     },
     hovers: {
-      selector: ".hist > *",
-      text: bins.map((b) =>
-        escapeHtml(
-          `${b.count} district${b.count === 1 ? "" : "s"}: ${format(b.from)} to ${format(b.to)}`,
+      // Document order: the stem is drawn after the bins, so its text goes last.
+      selector: held ? ".hist > *, .hist-held > *" : ".hist > *",
+      text: [
+        ...filled.map((b) =>
+          escapeHtml(
+            `${b.count} district${b.count === 1 ? "" : "s"}: ${format(b.from)} to ${format(b.to)}`,
+          ),
         ),
-      ),
+        ...(held ? [escapeHtml(held.hover)] : []),
+      ],
       cursor: { second: "the mark itself" },
     },
   };

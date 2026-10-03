@@ -33,8 +33,11 @@ import {
   type YearIndex,
   yearsOf,
 } from "./change.ts";
+import type { Bin } from "./chart.ts";
 import { tally, withoutTargetedAssistance } from "./countyChange.ts";
 import { count, escapeHtml, millions, money, pct } from "./format.ts";
+import { histogramSpec } from "./plot/spec.ts";
+import { renderToString } from "./plot/ssr.ts";
 import * as routes from "./routes.ts";
 import { anchor } from "./section.ts";
 import { median, percentile } from "./stats.ts";
@@ -141,9 +144,110 @@ export function renderTwoMeasures(districts: readonly District[]): string {
     </div>`;
 }
 
+/** The width of a histogram bin, as a share: two points of change. */
+const BIN = 0.02;
+
+/**
+ * Every moved district's change on one measure and step, binned on a grid through zero.
+ *
+ * The grid is `BIN` wide from `lo` to `hi`, both multiples of it, so zero is a bin edge and no bin
+ * straddles it: every bin is a fall or a rise. A district that did not move is not in any bin —
+ * {@link changeHistogram} draws those apart, at zero (#697).
+ */
+export function changeBins(
+  districts: readonly District[],
+  measure: MeasureKey,
+  [from, to]: readonly [YearIndex, YearIndex],
+  [lo, hi]: readonly [number, number],
+): Bin[] {
+  const steps = Math.round((hi - lo) / BIN);
+  const first = Math.round(lo / BIN);
+  const bins: Bin[] = Array.from({ length: steps }, (_, i) => ({
+    from: (first + i) * BIN,
+    to: (first + i + 1) * BIN,
+    count: 0,
+  }));
+  const { rise, fall } = tally(districts, measure, from, to);
+  for (const d of [...rise, ...fall]) {
+    const ratio = levelChange(d.biennium, measure, from, to).ratio;
+    bins[Math.min(steps - 1, Math.max(0, Math.floor(ratio / BIN) - first))]!.count++;
+  }
+  return bins;
+}
+
+/**
+ * The domain every histogram on the card shares: both measures, all three steps, out to the
+ * nearest bin edge. One scale, so the toggle and the three steps compare by position, on the
+ * argument `neighborsDomain` makes for the county chart.
+ */
+function changeDomain(districts: readonly District[]): [number, number] {
+  const ratios = (Object.keys(MEASURES) as MeasureKey[]).flatMap((m) =>
+    STEPS.flatMap(([a, b]) => districts.map((d) => levelChange(d.biennium, m, a, b).ratio)),
+  );
+  return [Math.floor(Math.min(0, ...ratios) / BIN) * BIN, Math.ceil(Math.max(0, ...ratios) / BIN) * BIN];
+}
+
+/** The tallest mark any of the card's histograms draws, so all six share a count axis. */
+function changeCeiling(districts: readonly District[], domain: readonly [number, number]): number {
+  return Math.max(
+    ...(Object.keys(MEASURES) as MeasureKey[]).flatMap((m) =>
+      STEPS.flatMap((step) => [
+        ...changeBins(districts, m, step, domain).map((b) => b.count),
+        tally(districts, m, step[0], step[1]).none.length,
+      ]),
+    ),
+  );
+}
+
+/** One step's histogram on one measure, with the districts that did not move at zero. */
+function changeHistogram(
+  districts: readonly District[],
+  measure: MeasureKey,
+  step: readonly [YearIndex, YearIndex],
+  domain: readonly [number, number],
+  max: number,
+): string {
+  const y = years(districts);
+  const [a, b] = step;
+  const name = MEASURES[measure].name;
+  const none = tally(districts, measure, a, b).none.length;
+  const bins = changeBins(districts, measure, step, domain);
+  const label = `Districts by change in ${name}, ${span(y, a, b)}, as a percentage of FY${y[a]}, in bins of ${pct(BIN, 0)}${none ? `; ${count(none)} did not move` : ""}`;
+  return `<div class="chartwrap" data-chart="change-${measure}-${a}-${b}">${renderToString(
+    (w) =>
+      histogramSpec(bins, signedPct, {
+        width: w,
+        height: 120,
+        max,
+        held: {
+          count: none,
+          label: `${count(none)} did not move`,
+          hover: `${count(none)} districts did not move: ${name}, ${span(y, a, b)}`,
+        },
+      }),
+    { label, description: `Bins span ${signedPct(domain[0])} to ${signedPct(domain[1])}` },
+  )}</div>`;
+}
+
 /** One measure's distribution: who rose and who fell on each step, and by how much. */
 function distributionPanel(districts: readonly District[], measure: MeasureKey): string {
   const y = years(districts);
+  const domain = changeDomain(districts);
+  const max = changeCeiling(districts, domain);
+  const charts = STEPS.map((step, i) => {
+    const t = tally(districts, measure, step[0], step[1]);
+    return `<p class="note"><strong>${span(y, step[0], step[1])}:</strong> ${count(t.rise.length)}
+        rose and ${count(t.fall.length)} fell${t.none.length ? `; ${count(t.none.length)} did not move` : ""}.</p>
+      ${
+        i === 0
+          ? `<div class="legend">
+          <span><i class="sw" data-series="loss"></i> Fell</span>
+          <span><i class="sw" data-series="gain"></i> Rose</span>
+        </div>`
+          : ""
+      }
+      ${changeHistogram(districts, measure, step, domain, max)}`;
+  });
   const rows = STEPS.map(([a, b]) => {
     const t = tally(districts, measure, a, b);
     const ratios = districts.map((d) => levelChange(d.biennium, measure, a, b).ratio);
@@ -153,6 +257,7 @@ function distributionPanel(districts: readonly District[], measure: MeasureKey):
     </tr>`;
   });
   return `<div class="measure-panel" data-measure="${measure}">
+      ${charts.join("")}
       <div class="scroll"><table>
         <thead><tr><th scope="col">${MEASURES[measure].name[0]!.toUpperCase()}${MEASURES[measure].name.slice(1)}</th>
           ${th("Rose")}${th("Fell")}${th("Did not move")}
@@ -167,12 +272,17 @@ function distributionPanel(districts: readonly District[], measure: MeasureKey):
 export function renderDistribution(districts: readonly District[]): string {
   const id = SECTION.distribution;
   const y = years(districts);
+  const [total, foundation] = [tally(districts, "total", 0, 2), tally(districts, "foundation", 0, 2)];
   return `
     <div class="card measure-scope" id="${id}" data-part="${id}">
       <h2>${anchor(id)}Who gained and who lost${yearChip("biennium")}</h2>
-      <p class="note">The ${count(districts.length)} districts on the measure selected. The
-        percentiles are of each district's change as a share of its own earlier year, so a city and
-        a village count alike; a change under a cent is no change.</p>
+      <p class="note"><strong>From FY${y[0]} to FY${y[2]}, total state support rose in
+        ${count(total.rise.length)} districts, and foundation aid in ${count(foundation.rise.length)}:
+        ${count(foundation.none.length)} did not move on it at all.</strong>
+        The ${count(districts.length)} districts on the measure selected, one chart
+        per step on one scale. Each district's change is a share of its own earlier year, so a city
+        and a village count alike; a change under a cent is no change, drawn as a grey stem at zero
+        rather than counted into the bins beside it.</p>
       <input class="vh" type="radio" name="${id}-measure" id="${id}-total"
         data-measure="total" aria-label="Measure: Total state support" checked />
       <input class="vh" type="radio" name="${id}-measure" id="${id}-foundation"
@@ -186,7 +296,8 @@ export function renderDistribution(districts: readonly District[]): string {
       ${distributionPanel(districts, "foundation")}
       <p class="note">Every district moves on total state support, because transportation alone
         changes everywhere. On foundation aid a district held at its funding base does not move at
-        all, which is why that measure has a column of districts that did neither.</p>
+        all, which is why that measure has a stem at zero and a column of districts that did
+        neither.</p>
     </div>`;
 }
 

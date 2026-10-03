@@ -8,12 +8,13 @@
 import { parseHTML } from "linkedom";
 import { expect, test } from "vitest";
 
-import { levelChange, SHARE_COLUMN, shareChange, signedPct, signedPoints, yearsOf } from "../../src/lib/change.ts";
+import { levelChange, SHARE_COLUMN, shareChange, signedPct, signedPoints, UNMOVED, yearsOf } from "../../src/lib/change.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
 import { millions } from "../../src/lib/format.ts";
 import * as routes from "../../src/lib/routes.ts";
 import { median } from "../../src/lib/stats.ts";
 import {
+  changeBins,
   dpia,
   foundationIdentity,
   phaseIn,
@@ -165,6 +166,37 @@ test("the distribution card carries both measures under the toggle", () => {
   const card = document.querySelector(`#${routes.SECTIONS.changed.distribution}`)!;
   expect(card.querySelectorAll(".measure-panel")).toHaveLength(2);
   expect(card.querySelector('input[data-measure="total"]')?.hasAttribute("checked")).toBe(true);
+});
+
+test("the distribution card draws each step on both measures before its table (#697)", () => {
+  const card = document.querySelector(`#${routes.SECTIONS.changed.distribution}`)!;
+  for (const panel of card.querySelectorAll(".measure-panel")) {
+    const measure = panel.getAttribute("data-measure");
+    const charts = [...panel.querySelectorAll('[data-chart^="change-"]')];
+    expect(charts.map((c) => c.getAttribute("data-chart"))).toEqual(
+      ["0-1", "1-2", "0-2"].map((step) => `change-${measure}-${step}`),
+    );
+    for (const chart of charts) expect(chart.querySelector("svg.plot"), measure!).toBeTruthy();
+    // Chart first, then the table, as #661 orders a card.
+    const table = panel.querySelector(".scroll")!;
+    expect(charts.every((c) => c.compareDocumentPosition(table) & 4)).toBe(true);
+    // Foundation aid's districts held at base are their own mark; total state support has none.
+    expect(panel.querySelectorAll(".hist-held").length > 0).toBe(measure === "foundation");
+  }
+});
+
+test("every moved district is in exactly one bin, and no bin straddles zero (#697)", () => {
+  for (const measure of ["total", "foundation"] as const) {
+    for (const step of [[0, 1], [1, 2], [0, 2]] as const) {
+      const bins = changeBins(districts, measure, step, [-0.4, 0.6]);
+      expect(bins.every((b) => b.to <= 0 || b.from >= 0)).toBe(true);
+      const moved = districts.filter((d) => Math.abs(levelChange(d.biennium, measure, step[0], step[1]).dollars) >= UNMOVED);
+      expect(bins.reduce((s, b) => s + b.count, 0)).toBe(moved.length);
+    }
+  }
+  // 219 of the 609 are not in the foundation-aid bins between the models: the stem at zero holds them.
+  const held = districts.filter((d) => Math.abs(levelChange(d.biennium, "foundation", 1, 2).dollars) < UNMOVED);
+  expect(held).toHaveLength(219);
 });
 
 test("no card lists every district: the directory and the county pages do (#693)", () => {
