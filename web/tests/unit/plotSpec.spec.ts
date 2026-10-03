@@ -40,6 +40,8 @@ import {
   rankSpec,
   ruleSwatch,
   scatterSpec,
+  indexStep,
+  type SeriesHue,
   seriesSpec,
   type BarHue,
   type Box,
@@ -134,21 +136,21 @@ test("a lone plain series is drawn in no series' hue, and labels only its own li
     { at: 2021, a: 5, b: null },
     { at: 2022, a: 4, b: null },
   ];
-  const svg = (plain: boolean) =>
+  const svg = (hues: { a: SeriesHue; b: SeriesHue }) =>
     parseHTML(
       `<div>${renderToString(
-        (w) => seriesSpec(cash, { a: "held", b: "" }, (v) => `$${v}`, () => "", { width: w, tick: (at) => `${at}`, plain }),
+        (w) => seriesSpec(cash, { a: "held", b: "" }, (v) => `$${v}`, () => "", { width: w, tick: (at) => `${at}`, hues }),
         "presentational",
       )}</div>`,
     ).document;
-  const plain = svg(true);
+  const plain = svg({ a: "plain", b: "plain" });
   expect(plain.querySelector(".series-a")!.getAttribute("stroke")).toBe(INK.muted);
   expect(plain.querySelector(".series-end")!.getAttribute("fill")).toBe(INK.muted);
   expect(plain.querySelector(".series-start")!.getAttribute("fill")).toBe(INK.muted);
   // One end label, in the first of the chart's drawings: the empty second series has none.
   expect(plain.querySelector("svg")!.querySelectorAll(".series-end text")).toHaveLength(1);
   expect(plain.querySelector(".series-end text")!.textContent).toBe("Held $4");
-  expect(svg(false).querySelector(".series-a")!.getAttribute("stroke")).toBe(SERIES.formula);
+  expect(svg({ a: "formula", b: "plain" }).querySelector(".series-a")!.getAttribute("stroke")).toBe(SERIES.formula);
 });
 
 test("the subject is one colour whatever form it is drawn in", () => {
@@ -906,8 +908,35 @@ test("the truncated domain is the one the annotation has to name", () => {
   const [low, high] = truncatedDomain([10, 20]);
   expect(low).toBeLessThan(10);
   expect(high).toBeGreaterThan(20);
-  // Padded by a tenth of the span at each end, never anchored at zero.
-  expect(low).toBeCloseTo(10 - 1.2, 6);
+  // Padded by 12% of the span at each end, the low end then rounded down to a 1-2-5 step of the
+  // frame's height (#706): 8.8 down to 8, never anchored at zero.
+  expect(low).toBe(8);
+});
+
+test("the axis start the foot prints is a round number, not a data point", () => {
+  /*
+   * #706. The feet read "31.1%", "$1,696" and "$3.09B" — each the lowest value less a pad, which
+   * reads as a measurement. The lower bound is a whole multiple of a 1-2-5 step no finer than a
+   * tenth of the frame, so two significant figures always hold it, and it still sits under every
+   * value and clear of zero.
+   */
+  for (const values of [
+    [34.5, 45.9, 46.1, 53.2],
+    [1_912, 2_400, 3_850, 4_229],
+    [3.41e9, 7.2e9, 15.7e9],
+    [0.6, 0.683, 0.71],
+  ]) {
+    const [low] = truncatedDomain(values);
+    const lowest = Math.min(...values);
+    expect(low, `${values}`).toBeLessThan(lowest);
+    expect(low, `${values}`).toBeGreaterThan(0);
+    expect(Number(low.toPrecision(2)), `${values}`).toBe(low);
+    // A fixed point: the bound it rounds to is the bound it already is.
+    const [again] = truncatedDomain([low + (lowest - low) / 2, ...values]);
+    expect(Number(again.toPrecision(2))).toBe(again);
+  }
+  // Not 30: a 5-point step on a frame 23 points tall would leave a quarter of it empty.
+  expect(truncatedDomain([34.5, 45.9, 46.1, 53.2])[0]).toBe(32);
 });
 
 const AXES = {
@@ -1389,6 +1418,91 @@ const HELD: SeriesPoint[] = [
 
 const share = (v: number) => `${(v * 100).toFixed(0)}%`;
 
+test("a plain series pair is drawn in ink, never in a series hue", () => {
+  /*
+   * #706. `seriesSpec` painted its first line formula blue and its second guarantee orange whatever
+   * they were, so the line `/history` labels "the formula" was orange. A pair that is neither is
+   * `plain` / `plain-strong`, and nothing it draws may resolve to a `SERIES` token.
+   */
+  const svg = renderToString(
+    (w) =>
+      seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", {
+        width: w,
+        tick: (at) => `${at}`,
+        hues: { a: "plain", b: "plain-strong" },
+      }),
+    "presentational",
+  );
+  const { document } = parseHTML(`<div>${svg}</div>`);
+  const hues = new Set<string>([...Object.values(SERIES), ...Object.values(SERIES_TEXT)]);
+  const painted = [...document.querySelectorAll("[stroke], [fill]")].flatMap((el) => [
+    el.getAttribute("stroke") ?? "",
+    el.getAttribute("fill") ?? "",
+  ]);
+  expect(painted.filter((c) => hues.has(c))).toEqual([]);
+  expect(document.querySelector(".series-a")!.getAttribute("stroke")).toBe(INK.muted);
+  expect(document.querySelector(".series-b")!.getAttribute("stroke")).toBe(INK.primary);
+});
+
+test("a long series prints the years between its ends", () => {
+  /*
+   * #706. The axis foot printed the first and last year and nothing between, so a reader of a
+   * sixteen-year frame could not find FY2014's gap. Interior ticks at a round step, each labelled
+   * where it clears the ends, and a tick mark only where there is a label.
+   */
+  expect(indexStep(16)).toBe(5);
+  expect(indexStep(30)).toBe(10);
+  const sixteen: SeriesPoint[] = Array.from({ length: 16 }, (_, i) => ({
+    at: 2009 + i,
+    a: 40 + i,
+    b: 50 - i / 2,
+  }));
+  /*
+   * At the narrow width the frame between the gutters is about 145px, and two six-character end
+   * labels leave no 5-year position clear of both. The foot drops what would collide rather than
+   * print over the ends — so the narrow drawing is held only to that.
+   */
+  const drawn = (width: number) => {
+    const svg = renderToString(
+      () =>
+        seriesSpec(sixteen, { a: "local", b: "state" }, (v) => `${v}%`, () => "", {
+          width,
+          tick: (at) => `FY${at}`,
+          hues: { a: "plain", b: "plain-strong" },
+        }),
+      "presentational",
+    );
+    const drawing = parseHTML(`<div>${svg}</div>`).document.querySelector("svg")!;
+    const labels = [...drawing.querySelectorAll("g.series-tick text")].map((t) => t.textContent ?? "");
+    expect(labels.every((l) => /^FY20(1[05]|20)$/.test(l)), `${labels}`).toBe(true);
+    expect(drawing.querySelectorAll("g.series-tick-mark line")).toHaveLength(labels.length);
+    return labels;
+  };
+  expect(drawn(WIDTHS.wide).length).toBeGreaterThanOrEqual(2);
+  drawn(WIDTHS.narrow);
+});
+
+test("a span outside the points widens the frame to hold it", () => {
+  // #706: what lets a card's nominal and constant-dollar drawings share one domain.
+  const alone = seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", {
+    width: WIDTHS.wide,
+    tick: (at) => `${at}`,
+    hues: PAIR,
+  })!;
+  const spanned = seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", {
+    width: WIDTHS.wide,
+    tick: (at) => `${at}`,
+    hues: PAIR,
+    span: [0.1, 0.95],
+  })!;
+  const [low, high] = spanned.options.y!.domain as number[];
+  expect(low).toBeLessThan(0.1);
+  expect(high).toBeGreaterThan(0.95);
+  expect(spanned.options.y!.domain).not.toEqual(alone.options.y!.domain);
+});
+/** The formula/guarantee pair, which the drawings below were written against. */
+const PAIR = { a: "formula", b: "guarantee" } as const;
+
 test("a reference the lines are measured against is inside the frame they are drawn in", () => {
   /*
    * The counterpart of the fan chart's rule above, and its opposite case. There, a reference not
@@ -1400,6 +1514,7 @@ test("a reference the lines are measured against is inside the frame they are dr
   const plain = seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", {
     width: WIDTHS.wide,
     tick: (at) => `${at}`,
+    hues: PAIR,
   })!;
   const [, high] = plain.options.y!.domain as number[];
   expect(high).toBeLessThan(0.75);
@@ -1407,6 +1522,7 @@ test("a reference the lines are measured against is inside the frame they are dr
   const held = seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", {
     width: WIDTHS.wide,
     tick: (at) => `${at}`,
+    hues: PAIR,
     reference: { value: 0.9, label: "what it claims" },
   })!;
   const [, withReference] = held.options.y!.domain as number[];
@@ -1419,6 +1535,7 @@ test("the reference is drawn muted and once, not as a third series", () => {
       seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", {
         width: w,
         tick: (at) => `${at}`,
+        hues: PAIR,
         reference: { value: 0.683, label: "what ±1σ claims" },
       }),
     "presentational",
@@ -1442,6 +1559,7 @@ test("the reference label sits at the right end on a halo, not where both lines 
       seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", {
         width: w,
         tick: (at) => `${at}`,
+        hues: PAIR,
         reference: { value: 0.683, label: "what ±1σ claims" },
       }),
     "presentational",
@@ -1468,6 +1586,7 @@ test("both corner labels are the caller's, so a horizon is not written as a fisc
       seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", {
         width: w,
         tick: (at) => (at === 1 ? "one year" : `${at} years`),
+        hues: PAIR,
       }),
     "presentational",
   );
@@ -1489,6 +1608,7 @@ test("the reference label is wrapped to the frame, so it cannot reach the start 
     const spec = seriesSpec(HELD, { a: "pooled", b: "cross-district" }, share, () => "", {
       width,
       tick: (at) => `${at}`,
+      hues: PAIR,
       reference: { value: 0.683, label },
     })!;
     const frame = width - Number(spec.options.marginLeft) - Number(spec.options.marginRight);
@@ -1508,7 +1628,7 @@ test("a series chart prints where each line starts, as well as where it ends", (
    * and only the end was drawn, so the start had to be read off a line with no axis.
    */
   const svg = renderToString(
-    (w) => seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", { width: w, tick: (at) => `${at}` }),
+    (w) => seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", { width: w, hues: PAIR, tick: (at) => `${at}` }),
     "presentational",
   );
   const { document } = parseHTML(`<div>${svg}</div>`);
@@ -1538,7 +1658,7 @@ test("a series chart's plot keeps half a phone drawing, its end labels stacked t
     [[{ at: 1998, a: 6.84e9, b: 4.1e9 }, { at: 2012, a: 9.9e9, b: 6.5e9 }, { at: 2027, a: 15.27e9, b: 9.4e9 }], { a: "all lines", b: "the formula" }, (v) => `$${(v / 1e9).toFixed(2)}B`],
   ];
   for (const [points, labels, format] of cases) {
-    const at = (width: number) => seriesSpec(points, labels, format, () => "", { width, tick: (y) => `FY${y}` })!;
+    const at = (width: number) => seriesSpec(points, labels, format, () => "", { width, tick: (y) => `FY${y}`, hues: PAIR })!;
     const narrow = at(WIDTHS.narrow).options;
     const frame = WIDTHS.narrow - narrow.marginLeft! - narrow.marginRight!;
     expect(frame, labels.a).toBeGreaterThanOrEqual(WIDTHS.narrow / 2);
@@ -1561,7 +1681,7 @@ test("a series that opens on a gap is labelled at its first value, inside the fr
   const gapped: SeriesPoint[] = [{ at: 1, a: 0.5, b: null }, ...HELD.slice(1)];
   for (const width of Object.values(WIDTHS)) {
     const svg = drawingAt(() =>
-      seriesSpec(gapped, { a: "pooled", b: "cross" }, share, () => "", { width, tick: (at) => `${at}` }),
+      seriesSpec(gapped, { a: "pooled", b: "cross" }, share, () => "", { width, hues: PAIR, tick: (at) => `${at}` }),
     );
     expect(svg).toContain(`>${share(HELD[1]!.b!)}<`);
     expect(overruns(svg), `${width}px`).toEqual([]);
@@ -1685,6 +1805,7 @@ test("the hit layer is one full-height column per position on the index", () => 
   const spec = seriesSpec(HELD, { a: "pooled", b: "cross" }, share, (p) => `at ${p.at}`, {
     width: WIDTHS.wide,
     tick: (at) => `${at}`,
+    hues: PAIR,
   })!;
   expect(spec.hovers!.text).toEqual(["at 1", "at 2", "at 3"]);
   const marks = (spec.options.marks ?? []) as unknown as { className?: string }[];
@@ -1695,7 +1816,7 @@ test("no drawing is scaled up past the ceiling that keeps its type at body size"
   // Every width a chart is drawn at — the three of `pair` and a panel's own — against the viewBox it
   // actually came out at, so a builder that ignored its width would fail here, not pass on it.
   const series = (w: number) =>
-    seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", { width: w, tick: (at) => `${at}` });
+    seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", { width: w, hues: PAIR, tick: (at) => `${at}` });
   const drawn = renderToString(series, "presentational") + renderPanelToString(series, "presentational", panelWidth(2));
   const svgs = [...drawn.matchAll(/<svg\b[^>]*>/g)].map((m) => m[0]);
   expect(svgs).toHaveLength(4);
@@ -1880,7 +2001,7 @@ test("a panel is never drawn at the width of a whole chart", () => {
   // `panelWidth(1)` is the wide frame, and a one-panel spread drawn once at it was the 640
   // drawing on a phone. `renderToString` is the route for a chart with no sibling.
   const series = (w: number) =>
-    seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", { width: w, tick: (at) => `${at}` });
+    seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", { width: w, hues: PAIR, tick: (at) => `${at}` });
   expect(() => renderPanelToString(() => series(panelWidth(1)), "presentational", panelWidth(1))).toThrow(
     /renderToString/,
   );
@@ -2067,6 +2188,7 @@ test("no chart text is filled with a series or ordinal mark colour", () => {
         seriesSpec(HELD, { a: "pooled", b: "cross" }, share, () => "", {
           width,
           tick: (at) => `${at}`,
+          hues: PAIR,
           reference: { value: 0.683, label: "what it claims" },
         }),
     ],

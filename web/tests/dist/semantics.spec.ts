@@ -335,7 +335,7 @@ describe("document semantics", () => {
         if (name.includes("..")) bad.push(`${at}: "${name}"`);
       }
       for (const group of page.matchAll(
-        /<g\b[^>]*\bclass="(axis-foot|axis-head|y-title|series-end|series-reference)"[^>]*>([\s\S]*?)<\/g>/g,
+        /<g\b[^>]*\bclass="(axis-foot|axis-head|y-title|series-end|series-reference|series-tick)"[^>]*>([\s\S]*?)<\/g>/g,
       )) {
         for (const text of (group[2] ?? "").matchAll(/<text\b[^>]*>(?:<tspan\b[^>]*>)?\s*([^<]*)/g)) {
           if (/^\p{Ll}/u.test(text[1] ?? "")) bad.push(`${at}: ${group[1]} "${text[1]}"`);

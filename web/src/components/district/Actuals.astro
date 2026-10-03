@@ -99,7 +99,7 @@ const cashHover = (p: SeriesPoint): string => {
     : `${fiscalYear(p.at)}: ${money(y.ending_cash)} held, ${money(y.total_revenue)} in, ${money(y.total_expenditure)} out`;
 };
 const cashChart: Drawing = (w) =>
-  seriesSpec(cash, { a: "held", b: "" }, compactMoney, cashHover, { width: w, tick: fiscalYear, plain: true });
+  seriesSpec(cash, { a: "held", b: "" }, compactMoney, cashHover, { width: w, tick: fiscalYear, hues: { a: "plain", b: "plain" } });
 ---
 
 <div class="card" data-part="actuals">

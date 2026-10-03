@@ -137,7 +137,19 @@ export function renderAppropriations(
         BILLIONS,
         (p) =>
           `FY${p.at}: ${BILLIONS(p.a ?? 0)} appropriated, ${BILLIONS(p.b ?? 0)} of it the formula`,
-        { width: w, tick: (year) => `FY${year}` },
+        {
+          width: w,
+          tick: (year) => `FY${year}`,
+          // The lower line is the formula's own appropriation, so it and only it is formula blue;
+          // the whole appropriation is every line, and plain (#706).
+          hues: { a: "plain", b: "formula" },
+          // Both bases in one frame, so the switch moves the line rather than the axis (#706).
+          span: [
+            ...inBase(rows, deflator, base ?? 0, "nominal"),
+            ...(base == null ? [] : inBase(rows, deflator, base, "real")),
+          ].flatMap((r) => [r.enacted, r.foundation_funding]),
+          unit: basis === "real" ? `in constant FY${base} dollars` : "in the dollars of each year",
+        },
       ),
   { label: `Appropriation and the formula's share of it, billions of dollars by fiscal year, FY${first.fiscal_year} to FY${last.fiscal_year}, in ${basis === "real" ? `constant FY${base} dollars` : "the dollars of each year"}` },
   );
