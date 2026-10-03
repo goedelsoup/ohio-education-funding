@@ -1594,6 +1594,40 @@
       ]
     }
   ],
+  "parameter/local-capacity-percentage": [
+    {
+      "route": "/explained/state-share",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/state-share",
+        "title": "Why do so many districts sit on the state's floor?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    }
+  ],
+  "parameter/minimum-state-share": [
+    {
+      "route": "/explained/state-share",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/state-share",
+        "title": "Why do so many districts sit on the state's floor?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    }
+  ],
   "parameter/twenty-mill-floor": [
     {
       "route": "/district/[irn]",
