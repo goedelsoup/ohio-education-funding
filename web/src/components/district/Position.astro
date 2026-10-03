@@ -20,6 +20,7 @@
  * numbers for one district, 4.4% apart for Delphos City, and the dashboard's carried the wrong
  * year while the other carried no denominator. The note below names both.
  */
+import { whatIsThis } from "../../lib/explained/registry.ts";
 import * as routes from "../../lib/routes.ts";
 import { ordinal, percentileOf } from "../../lib/format.ts";
 import { hasDenominators } from "../../lib/tax.ts";
@@ -99,3 +100,4 @@ const finding =
     <em>whom</em>" — is <a href={routes.compare(d.irn)}>the comparison table</a>, which puts
     this district's figures beside any one other district's.</p>
 </div>
+<Fragment set:html={whatIsThis("state-share")} />

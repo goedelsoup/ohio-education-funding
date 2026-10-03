@@ -1795,6 +1795,10 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
    margin only it sat flush against that card on `/county/*` and `/house/*` (#578); this is the gap
    `.lead` leaves before the first card on the routes that open with one. */
 main > .note { margin-bottom: var(--space-6); }
+/* A card's "What is this?" link to its Explained topic (#717). It sits outside the card so the card
+   keeps its measured height, and so it takes back most of the card's bottom margin to read as the
+   card's own line rather than a lede to the next one. */
+.note[data-explained] { margin: calc(var(--space-3) - var(--space-10)) 0 var(--space-10); }
 /*
  * The dek: the note directly above a chart, or above the key directly above one.
  *

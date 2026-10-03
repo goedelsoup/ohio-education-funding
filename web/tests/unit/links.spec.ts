@@ -27,6 +27,7 @@ import { renderBaseCostBuildUp } from "../../src/lib/basecost.ts";
 import { FROM_CATALOG, FROM_DECISION, loadCorpus, resolveTarget } from "../../src/lib/corpus.ts";
 import { loadFeed } from "../../src/lib/feed.ts";
 import { counties } from "../../src/lib/county.ts";
+import { TOPICS, builtTopics, topicsCiting } from "../../src/lib/explained/registry.ts";
 import * as routes from "../../src/lib/routes.ts";
 import { anchor } from "../../src/lib/section.ts";
 import { bands, medianTrace, pairs } from "../../src/lib/relationships.ts";
@@ -82,6 +83,8 @@ const PAGES = new Set<string>([
   "/wiki",
   "/wiki/source",
   "/wiki/decision",
+  routes.EXPLAINED,
+  ...TOPICS.map((t) => routes.explained(t.slug)),
   "/counties",
   ...counties(bundle.districts).map((c) => routes.county(c.slug)),
   "/house",
@@ -346,6 +349,24 @@ test("every source page is reachable and every citation resolves", () => {
     }
   }
   expect(broken).toEqual([]);
+});
+
+test("a topic and the nodes it cites link both ways (#717)", () => {
+  // Out: every node a topic's "How we know" cites is a page. Back: that node's page lists the topic,
+  // because its "In plain terms" line is `topicsCiting` — and a node no topic cites lists none.
+  const broken: string[] = [];
+  for (const t of builtTopics()) {
+    expect(known(routes.explained(t.slug)), t.slug).toBe(true);
+    for (const id of t.howWeKnow.flatMap((p) => p.nodes)) {
+      const [cls, name] = id.split("/");
+      if (!known(routes.wikiNode(cls!, name!))) broken.push(`${t.slug} → ${id} (no such page)`);
+      if (!topicsCiting(id).some((back) => back.slug === t.slug)) broken.push(`${id} ↛ ${t.slug}`);
+    }
+  }
+  expect(broken).toEqual([]);
+  const cited = new Set(builtTopics().flatMap((t) => t.howWeKnow.flatMap((p) => p.nodes)));
+  const uncited = corpus.nodes.find((n) => !cited.has(n.id))!;
+  expect(topicsCiting(uncited.id)).toEqual([]);
 });
 
 test("the metric routes the district pages link to are real nodes", () => {

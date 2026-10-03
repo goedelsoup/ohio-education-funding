@@ -24,6 +24,7 @@
  */
 
 import type { Bar } from "./chart.ts";
+import { whatIsThis } from "./explained/registry.ts";
 import { count, escapeHtml, money, pct } from "./format.ts";
 import { barSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
@@ -262,5 +263,6 @@ export function renderBaseCostBuildUp(d: District, districts: number, nameGutter
         every one of them a district the model already flags as being <em>at</em> that minimum. How
         Ohio intends the floor to apply across the two counts is not something this site has
         established, so it says only that the ratio is not the percentage.</p>
-    </div>`;
+    </div>
+    ${whatIsThis("what-a-district-gets")}`;
 }
