@@ -209,20 +209,16 @@ export function renderCensus(c: Census): string {
         inert === 0
           ? ""
           : `, and ${inert === 1 ? "one" : count(inert)} of the ${count(c.rows.length)} ${inert === 1 ? "decides" : "decide"} it for none`
-      }.</strong> Ranked by districts decided, most first. Each row is one floor, one ceiling or
-        one clamp written into the funding formula, and its mark is the number of districts for
-        which that bound — rather than the quantity it is bounding — is what actually decides the
-        amount.${
-          fewer === 0
-            ? ""
-            : ` A row is out of all ${count(c.whole)} unless it says otherwise: the ${count(fewer)}
-        that apply to fewer districts print the number they are out of.`
+      }.</strong> Ranked by districts decided, most first. Each row is a floor, ceiling or clamp
+        in the funding formula, marked at the number of districts for which the bound — not the
+        quantity it bounds — decides the amount.${
+          fewer === 0 ? "" : ` Rows out of fewer than all ${count(c.whole)} say so.`
         } The scale is logarithmic because the two ends of this census are
         ${count(c.most.value)} districts and ${count(c.leastDrawn.value)}${
           stubs === 0
             ? "."
             : `, and on a linear axis the ${stubs === 1 ? "smallest" : `${count(stubs)} smallest`}
-        would each be drawn at under 1% of its length.`
+        would each be under 1% of its length.`
         }</p>
       <div class="chartwrap" data-chart="bounds-census">${chart}</div>
       <p class="note">The two ends of the chart, and the ${count(c.families.length)} family totals
