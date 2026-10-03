@@ -56,8 +56,8 @@ export const DICTIONARY: readonly Term[] = [
     write: "local share",
     not: [/\bcharge[- ]off\b/i],
     why: "the charge-off was repealed; a page about the old formula names it, and no other does",
-    // The history topic (#718's "Why is 2011 still inside the formula?") adds its slug here.
-    allowedIn: [],
+    // "Why is FY2011 still inside the formula?" (#718) names the charge-off its first copy carried.
+    allowedIn: ["anchor-chain"],
   },
   {
     write: "foundation aid, or total state support",

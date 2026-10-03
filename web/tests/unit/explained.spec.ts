@@ -45,6 +45,7 @@ import {
   reach,
   shareOf,
 } from "../../src/lib/explained/state-share.ts";
+import { CHAIN, EMPTYING_FLOOR, EMPTYING_LOSS, inflation } from "../../src/lib/explained/anchor-chain.ts";
 import {
   IDENTITY as POVERTY_IDENTITY,
   blend,
@@ -819,5 +820,35 @@ describe("How does Ohio count poor students? (#718)", () => {
     const mid = (districts.length - 1) / 2;
     expect(below).toBeLessThanOrEqual(Math.ceil(mid));
     expect(below + tied - 1).toBeGreaterThanOrEqual(Math.floor(mid));
+  });
+});
+
+describe("Why is FY2011 still inside the formula? (#718)", () => {
+  const corpus = loadCorpus();
+  const chain = corpus.byId.get("funding-regime/bridge-formula")!.findings!;
+
+  test("every link is the corpus's: the act, and the year it set the floor at", () => {
+    const [first, ...rest] = CHAIN;
+    expect(chain).toMatch(new RegExp(`FY${first.year}\\s+Evidence-Based Model run[\\s\\S]*?↓\\s+${first.act}:`));
+    for (const link of rest) expect(chain, link.act).toMatch(new RegExp(`FY${link.year}\\s+${link.act}:`));
+  });
+
+  test("H.B. 49's exception is the corpus's", () => {
+    const pc = (v: number) => `${Math.round(v * 100)}%`;
+    expect(chain).toContain(`except ${pc(EMPTYING_FLOOR)} for districts whose ADM fell ${pc(EMPTYING_LOSS)} or`);
+  });
+
+  test("the chain starts where the guarantee topic says it does, and ends at the phase-in's base", () => {
+    expect(CHAIN[0].year).toBe(ORIGIN_YEAR);
+    expect(CHAIN.at(-1)!.year).toBe(BASE_YEAR);
+  });
+
+  test("the price rise is measured from the base year to the deflator's last", () => {
+    const deflator = loadFeed().bundle.deflator!;
+    const { last, rise } = inflation(deflator);
+    const at = (y: number) => deflator.points.find((p) => p.fiscal_year === y)!.index;
+    expect(last).toBeGreaterThan(BASE_YEAR);
+    expect(rise).toBeCloseTo(at(last) / at(BASE_YEAR) - 1, 12);
+    expect(rise).toBeGreaterThan(0);
   });
 });

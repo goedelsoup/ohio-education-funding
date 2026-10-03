@@ -768,6 +768,21 @@
   ],
   "funding-regime/bridge-formula": [
     {
+      "route": "/explained/anchor-chain",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/anchor-chain",
+        "title": "Why is FY2011 still inside the formula?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    },
+    {
       "route": "/explained/guarantee",
       "pages": 1,
       "of": 1,
@@ -820,6 +835,21 @@
     }
   ],
   "funding-regime/evidence-based-model": [
+    {
+      "route": "/explained/anchor-chain",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/anchor-chain",
+        "title": "Why is FY2011 still inside the formula?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    },
     {
       "route": "/legislation",
       "pages": 1,
@@ -972,6 +1002,21 @@
     }
   ],
   "legislation/hb-153-2011": [
+    {
+      "route": "/explained/anchor-chain",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/anchor-chain",
+        "title": "Why is FY2011 still inside the formula?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    },
     {
       "route": "/legislation",
       "pages": 1,
@@ -1657,6 +1702,21 @@
     }
   ],
   "parameter/guarantee-funding-base": [
+    {
+      "route": "/explained/anchor-chain",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/anchor-chain",
+        "title": "Why is FY2011 still inside the formula?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    },
     {
       "route": "/explained/guarantee",
       "pages": 1,

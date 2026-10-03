@@ -14,6 +14,7 @@
 import Base from "../layouts/Base.astro";
 import { NAMES } from "../lib/nav.ts";
 import { loadCorpus } from "../lib/corpus.ts";
+import { whatIsThis } from "../lib/explained/registry.ts";
 import { acts, regimes, renderTimeline } from "../lib/legislation.ts";
 import * as routes from "../lib/routes.ts";
 import { firstOf, lastOf } from "../lib/ends.ts";
@@ -43,4 +44,5 @@ const covered = (lastOf(spans).to ?? latest) - firstOf(spans).from + 1;
   </p>
 
   <Fragment set:html={renderTimeline(corpus)} />
+  <Fragment set:html={whatIsThis("anchor-chain")} />
 </Base>
