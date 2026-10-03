@@ -466,9 +466,11 @@ fn every_bound_names_its_authority_and_the_statute_states_each_one() {
 /// enough to collide if nobody is checking.
 #[test]
 fn every_bound_has_a_distinct_short_name_that_fits_a_chart_gutter() {
-    /// What `rankSpec`'s name gutter is sized for — `web/src/lib/plot/spec.ts`. A name past this
-    /// is not truncated by the chart, it wraps, and a wrapped row is a taller row for all 38.
-    const GUTTER: usize = 40;
+    /// What `rankSpec`'s widest name gutter holds on one line: `RANK_LABEL_CHARS` in
+    /// `web/src/lib/plot/spec.ts`, which `web/tests/unit/bounds.spec.ts` holds this to. A name
+    /// past it is not truncated by the chart, it wraps, and a wrapped row is a taller row for all
+    /// 38. It was 40 against a gutter that held 34, and 17 of the 38 rows wrapped (#709).
+    const GUTTER: usize = 34;
 
     let mut seen = std::collections::BTreeSet::new();
     for bound in Bound::all() {

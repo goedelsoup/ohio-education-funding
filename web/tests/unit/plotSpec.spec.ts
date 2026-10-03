@@ -37,6 +37,7 @@ import {
   placeLabels,
   planeSpec,
   rangeSpec,
+  RANK_LABEL_CHARS,
   rankSpec,
   ruleSwatch,
   scatterSpec,
@@ -1187,6 +1188,82 @@ test("the marked row's phrase is reserved for where it is drawn, not where it is
   // At the floor the whole plot lies to the phrase's right, so nothing is held back for it.
   // 16px, which is `gutter`'s answer for the bare axis overhang every form reserves.
   expect(atFloor.options.marginRight).toBe(16);
+});
+
+/**
+ * The census with names as long as the gutter holds, which is what `/bounds` draws: the frame is
+ * narrowest, so the floor and the decades have the least room. Not the marked row, which is drawn
+ * bold and so holds `RANK_LABEL_CHARS / BOLD_WIDENS` on one line, 31 characters.
+ */
+function longCensus(values: number[]): Rank[] {
+  return census(values).map((r) =>
+    r.marked != null ? r : { ...r, label: `${r.label} `.padEnd(RANK_LABEL_CHARS, "x") },
+  );
+}
+
+/** A foot label's drawn span at 11px, from where `footLabels` reads it and how it is anchored. */
+const span = (label: { x: number; text: string }, anchor: "middle" | "end" = "middle") => {
+  const w = label.text.length * 0.667 * 11;
+  return anchor === "end" ? [label.x - w, label.x] : [label.x - w / 2, label.x + w / 2];
+};
+
+test("the floor's word clears the smallest value's label, and the label is kept", () => {
+  /*
+   * #709. The floor was half the smallest value, always, and its label ran right from the frame's
+   * edge: on `/bounds` "under 1" sat over the dots at exactly 1 and the "1" tick was dropped for
+   * colliding with it. The floor is now as far below the smallest value as its word needs.
+   */
+  for (const width of Object.values(WIDTHS)) {
+    const labels = footLabels(drawingAt(() => rankSpec(longCensus([554, 499, 43, 1, 0]), COUNT, { width })));
+    const floor = labels.find((l) => l.text === "None");
+    const one = labels.find((l) => l.text === "1");
+    expect(floor, `the floor is named at ${width}`).toBeDefined();
+    expect(one, `the 1 survives at ${width}`).toBeDefined();
+    expect(floor!.x, `at ${width}`).toBeLessThan(one!.x - 12);
+    expect(span(one!)[0]! - span(floor!)[1]!, `clear space at ${width}`).toBeGreaterThanOrEqual(8);
+  }
+});
+
+test("a log rank foot keeps every power of ten in its domain at the narrow width", () => {
+  /*
+   * #709. At 375 the foot kept its two ends, "under 1" and "500", and dropped 10 and 100 for room:
+   * a log axis with two labels does not read as a log axis. The top tick goes before a decade.
+   */
+  const labels = footLabels(
+    drawingAt(() => rankSpec(longCensus([554, 499, 43, 1, 0]), COUNT, { width: WIDTHS.narrow })),
+  ).map((l) => l.text);
+  expect(labels).toEqual(expect.arrayContaining(["1", "10", "100"]));
+});
+
+test("a name as long as the rank gutter holds is drawn on one line at the wide width", () => {
+  /*
+   * #709. The gutter was `6.8 × length` and the wrap measures 7.34 a character, so the longest
+   * name always wrapped, and 17 of the census's 38 with it: every wrapped row doubled the band,
+   * and the chart was 1,425px tall at 1280 where it needed about 855.
+   */
+  const rows = longCensus([554, 499, 43, 1, 0]);
+  expect(rows[0]!.label).toHaveLength(RANK_LABEL_CHARS);
+  const spec = rankSpec(rows, COUNT, W)!;
+  expect(spec.options.marginLeft! - 10).toBeGreaterThanOrEqual(RANK_LABEL_CHARS * 0.667 * 11);
+  const { document } = parseHTML(`<div>${drawingAt(() => spec)}</div>`);
+  const names = [...document.querySelectorAll("g.rank-label text")];
+  expect(names).toHaveLength(rows.length);
+  for (const name of names) expect(name.querySelectorAll("tspan"), name.textContent ?? "").toHaveLength(0);
+});
+
+test("a row counted out of fewer than the rest prints its population, and the rest print nothing", () => {
+  // #710: "Clawback larger than the guarantee", 22 of 43, ranked below 38 of 609 with nothing on
+  // the chart to say the two were out of different populations.
+  const rows = census([554, 499, 43, 22, 0]);
+  rows[3] = { ...rows[3]!, note: "of 43" };
+  const spec = rankSpec(rows, COUNT, W)!;
+  expect(layerRows(spec, "rank-note")).toBe(1);
+  expect(placed(drawingAt(() => spec), "rank-note").map((t) => t.text)).toEqual(["of 43"]);
+  // A note is reserved for where it is drawn, as the marked phrase is: near the top of the scale
+  // it overhangs the frame, and the margin grows to hold it.
+  const high = census([554, 499, 43, 22, 0]);
+  high[1] = { ...high[1]!, note: "of 563" };
+  expect(rankSpec(high, COUNT, W)!.options.marginRight!).toBeGreaterThan(spec.options.marginRight!);
 });
 
 /**

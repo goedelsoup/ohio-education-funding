@@ -63,6 +63,7 @@ export interface Census {
   series: ManifestSeries;
   /** The rows in the crate's own order, which is the ranking: most districts first. */
   rows: SeriesRow[];
+  /** As `rows`, for the chart. A row counted out of fewer than `whole` carries that population. */
   ranks: Rank[];
   /** By count of bounds, descending — the order the card reads them in. */
   families: Family[];
@@ -71,7 +72,13 @@ export interface Census {
   /** The populations, largest first, so the ones that are not the whole are visible. */
   populations: Population[];
   most: SeriesRow;
-  least: SeriesRow;
+  /**
+   * The smallest count above zero: the low end of what a log scale can draw.
+   *
+   * Not the last row, which is at zero. The dek argued the log scale from "554 districts and 0",
+   * and a log axis is the one scale that cannot draw a 0 (#710).
+   */
+  leastDrawn: SeriesRow;
   /** Bounds the model can never reach, whatever the inputs. The chart marks these. */
   cannotBind: SeriesRow[];
   /** Bounds that can bind and do not, for any district in this panel. */
@@ -135,12 +142,17 @@ export function census(): Census {
   return {
     series,
     rows,
-    ranks: ranksOf(series),
+    ranks: ranksOf(series).map((rank, i) => {
+      // The note is what the count is out of, on the rows where that is not the whole (#710).
+      const of = rows[i]?.of;
+      return of === undefined || of === whole ? rank : { ...rank, note: `of ${count(of)}` };
+    }),
     families,
     whole,
     populations,
     most: firstOf(rows),
-    least: lastOf(rows),
+    // Throws where no row is above zero, which is a census with nothing on its scale to draw.
+    leastDrawn: lastOf(rows.filter((row) => row.value > 0)),
     cannotBind: rows.filter((row) => row.marked != null),
     /* The second null result, and the harder one to see: a bound that *could* bind and does not
        for any district in this panel. It is the complement of the marked rows at zero, so it is
@@ -151,15 +163,8 @@ export function census(): Census {
   };
 }
 
-/** `554 of 609`, or just `554` where the population is the whole model. */
-function outOf(c: Census, row: SeriesRow): string {
-  return row.of === undefined || row.of === c.whole
-    ? count(row.value)
-    : `${count(row.value)} of ${count(row.of)}`;
-}
-
 /**
- * The chart, and the two ends of it in words.
+ * The chart, and what it is ranked by, out of, and drawn on.
  *
  * Server-rendered, like every other static chart here — and on this page that is load-bearing
  * rather than conventional: `check:dist` reads the built HTML, and the endpoints it has to find
@@ -167,22 +172,31 @@ function outOf(c: Census, row: SeriesRow): string {
  */
 export function renderCensus(c: Census): string {
   const year = yearOf("formula");
+  // The bounds no district is on, for the card's finding (#653).
+  const inert = c.rows.filter((row) => row.value === 0).length;
+  // The rows counted out of fewer than the whole, which the chart prints the population of (#710).
+  const fewer = c.ranks.filter((rank) => rank.note != null).length;
+  /*
+   * The rows a linear axis would draw at under 1% of its length, which is the argument for the
+   * log scale. Counted rather than written: the dek said "everything below about forty", a
+   * figure nothing derived, beside an end it gave as 0 (#710).
+   */
+  const stubs = c.rows.filter((row) => row.value > 0 && row.value < c.most.value / 100).length;
+
   const naming = {
     label:
       `Every bound in the modeled formula, ranked by how many of Ohio's ${count(c.whole)} ` +
       `school districts each one is the operative term for${year ? `, ${year}` : ""}`,
-    description: `Logarithmic scale, from ${count(c.most.value)} districts down to ${count(c.least.value)}.`,
+    description:
+      `Logarithmic scale, from ${count(c.most.value)} districts down to ${count(c.leastDrawn.value)}` +
+      (inert === 0
+        ? "."
+        : `, with the ${inert === 1 ? "bound" : `${count(inert)} bounds`} at none drawn at its floor.`),
   };
   const chart = renderToString(
-    (width) =>
-      rankSpec(c.ranks, { label: "Districts the bound is the operative term for", format: count }, {
-        width,
-      }),
+    (width) => rankSpec(c.ranks, { label: "Districts the bound decides", format: count }, { width }),
     naming,
   );
-
-  // The bounds no district is on, for the card's finding (#653).
-  const inert = c.rows.filter((row) => row.value === 0).length;
 
   return `
     <div class="card" id="census" data-part="census">
@@ -195,20 +209,20 @@ export function renderCensus(c: Census): string {
         inert === 0
           ? ""
           : `, and ${inert === 1 ? "one" : count(inert)} of the ${count(c.rows.length)} ${inert === 1 ? "decides" : "decide"} it for none`
-      }.</strong> Each row is one floor, one ceiling or one clamp written into the funding
-        formula, and its mark is the number of districts for which that bound — rather than the
-        quantity it is bounding — is what actually decides the amount. The scale is logarithmic
-        because the two ends of this census are ${count(c.most.value)} districts and
-        ${count(c.least.value)}, and on a linear axis everything below about forty would be an
-        indistinguishable stub against the axis.</p>
+      }.</strong> Ranked by districts decided, most first. Each row is a floor, ceiling or clamp
+        in the funding formula, marked at the number of districts for which the bound — not the
+        quantity it bounds — decides the amount.${
+          fewer === 0 ? "" : ` Rows out of fewer than all ${count(c.whole)} say so.`
+        } The scale is logarithmic because the two ends of this census are
+        ${count(c.most.value)} districts and ${count(c.leastDrawn.value)}${
+          stubs === 0
+            ? "."
+            : `, and on a linear axis the ${stubs === 1 ? "smallest" : `${count(stubs)} smallest`}
+        would each be under 1% of its length.`
+        }</p>
       <div class="chartwrap" data-chart="bounds-census">${chart}</div>
-      <p class="note"><strong>${escapeHtml(c.most.label)}</strong> is the widest-reaching bound in
-        the plan: it is the operative term for ${outOf(c, c.most)} districts, under
-        ${escapeHtml(c.most.cites ?? "the statute")}. At the other end,
-        <strong>${escapeHtml(c.least.label)}</strong> is operative for
-        ${c.least.value === 0 ? "none of them" : outOf(c, c.least)}. Both figures, and the
-        ${count(c.families.length)} family totals below, are pinned in
-        <a href="${routes.source("crates/figures.json")}">the site's figure register</a> and quoted by <a href="${nodeHref(c)}">the corpus node for
+      <p class="note">The two ends of the chart, and the ${count(c.families.length)} family totals
+        below, are pinned in <a href="${routes.source("crates/figures.json")}">the site's figure register</a> and quoted by <a href="${nodeHref(c)}">the corpus node for
         the plan itself</a> — which is where a claim about the whole plan is answered for, this
         page having no node of its own to bind it to.</p>
     </div>`;
@@ -330,9 +344,8 @@ export function renderNulls(c: Census): string {
              (${escapeHtml(row.cites ?? "the statute")}) is operative for
              <strong>no district in the state</strong>, and cannot be. It is a floor beneath a
              quantity that is never smaller than it — so it is written into the statute, it is
-             modeled here, and it decides nothing. The chart above draws it at the foot of the
-             scale rather than dropping it: a bound with no force is a finding, and a bar of
-             length nought states nothing at all.</p>`,
+             modeled here, and it decides nothing. The chart above draws it at the floor of the
+             scale rather than dropping it: a bound with no force is a finding.</p>`,
           )
           .join("");
 

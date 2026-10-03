@@ -509,62 +509,62 @@ impl Bound {
     /// chart is a name gutter wider than the chart. This is the same bound named for a reader who
     /// already has the axis above it telling them what the count is of.
     ///
-    /// Held to forty characters and to uniqueness by
-    /// `the_bounds_that_cannot_bind_and_the_ones_that_never_have.rs`, because a short name that
-    /// collides with another short name is two rows of a chart a reader cannot tell apart — and
-    /// the two gifted unit floors, the two staffing support ceilings and the two 50% transport
-    /// floors are all near enough to collide if nobody is checking.
+    /// Held to thirty-four characters, which is what the chart's gutter holds on one line, and to
+    /// uniqueness, by `the_bounds_that_cannot_bind_and_the_ones_that_never_have.rs` — because a
+    /// short name that collides with another short name is two rows of a chart a reader cannot
+    /// tell apart, and the two gifted unit floors, the two staffing support ceilings and the two
+    /// 50% transport floors are all near enough to collide if nobody is checking.
     ///
     /// It is the one of the three a chart prints, so it is written in the reader's words rather
     /// than the code's (#658). "Mile base over rider base" and "Decrease threshold, floor of
     /// twenty" were the model's own terms on a public chart, and "ADM" was an initialism nothing on
     /// `/bounds` expands. The variant is the key tests and the corpus cite; this can be reworded
     /// freely, and the same test holds it to no bare "ADM".
+    ///
+    /// A staffing minimum is named for being *held at* it — "EMIS support held at one" — rather
+    /// than as the head count, because "One EMIS support employee" down a ranked chart of bounds
+    /// read as a count of staff (#710).
     #[must_use]
     pub const fn short(self) -> &'static str {
         match self {
-            Self::StaffingFloor(Minimum::SpecialTeachers) => "Six special teachers",
-            Self::StaffingFloor(Minimum::Counselors) => "One guidance counselor",
-            Self::StaffingFloor(Minimum::Wellness) => "Five wellness and success staff",
-            Self::StaffingFloor(Minimum::OtherAdministrators) => {
-                "Two other district administrators"
-            }
-            Self::StaffingFloor(Minimum::FiscalSupport) => "Two fiscal support staff",
-            Self::StaffingFloor(Minimum::Emis) => "One EMIS support employee",
-            Self::StaffingFloor(Minimum::LeadershipSupport) => "One leadership support staff",
-            Self::StaffingFloor(Minimum::BuildingSupport) => {
-                "One building support staff per building"
-            }
-            Self::StaffingCeiling(Ceiling::FiscalSupport) => "Thirty-five fiscal support staff",
-            Self::StaffingCeiling(Ceiling::BuildingSupport) => "Three building support staff each",
-            Self::SizeBandSmall => "Size-banded salaries, under 500 pupils",
-            Self::SizeBandLarge => "Size-banded salaries, over 4,000 pupils",
-            Self::BaseCostEnrolledAdm => "Current enrollment above the average",
-            Self::ValuationLesserOf => "Current valuation below the average",
-            Self::IncomeLesserOf => "Current income below the average",
+            Self::StaffingFloor(Minimum::SpecialTeachers) => "Special teachers held at six",
+            Self::StaffingFloor(Minimum::Counselors) => "Counselors held at one",
+            Self::StaffingFloor(Minimum::Wellness) => "Wellness staff held at five",
+            Self::StaffingFloor(Minimum::OtherAdministrators) => "Other administrators held at two",
+            Self::StaffingFloor(Minimum::FiscalSupport) => "Fiscal support held at two",
+            Self::StaffingFloor(Minimum::Emis) => "EMIS support held at one",
+            Self::StaffingFloor(Minimum::LeadershipSupport) => "Leadership support held at one",
+            Self::StaffingFloor(Minimum::BuildingSupport) => "Building support held at one each",
+            Self::StaffingCeiling(Ceiling::FiscalSupport) => "Fiscal support capped at 35",
+            Self::StaffingCeiling(Ceiling::BuildingSupport) => "Building support capped at 3 each",
+            Self::SizeBandSmall => "Size-banded pay, under 500 pupils",
+            Self::SizeBandLarge => "Size-banded pay, over 4,000 pupils",
+            Self::BaseCostEnrolledAdm => "Current enrollment over average",
+            Self::ValuationLesserOf => "Current valuation under average",
+            Self::IncomeLesserOf => "Current income under average",
             Self::CapacityRateCeiling => "Local capacity rate capped at 2.5%",
             Self::MinimumStateShare => "Minimum state share of base cost",
-            Self::DpiaCountCap => "Poverty aid count capped at enrollment",
+            Self::DpiaCountCap => "Poverty count capped at enrollment",
             Self::GiftedCoordinatorFloor => "Gifted coordinator units, floor",
             Self::GiftedCoordinatorCeiling => "Gifted coordinator units, ceiling",
-            Self::GiftedSpecialistK8Floor => "K-8 gifted specialist units, floor",
-            Self::GiftedSpecialist912Floor => "9-12 gifted specialist units, floor",
-            Self::CapacityTierZero => "No capacity aid from median wealth up",
+            Self::GiftedSpecialistK8Floor => "K-8 gifted specialists, floor",
+            Self::GiftedSpecialist912Floor => "9-12 gifted specialists, floor",
+            Self::CapacityTierZero => "Capacity aid ends at median wealth",
             Self::CapacityTierSizeCutoff => "No capacity aid under 200 pupils",
-            Self::CapacityTierSizeRamp => "Capacity aid phased in to 600 pupils",
-            Self::WealthTierZero => "No wealth-tier aid under an index of 0.8",
+            Self::CapacityTierSizeRamp => "Capacity aid phased in to 600",
+            Self::WealthTierZero => "No wealth-tier aid under index 0.8",
             Self::FundingBaseClampAtZero => "Guarantee base held at zero",
             Self::Guarantee => "The guarantee itself",
-            Self::DecreaseThresholdFloor => "Clawback threshold: 20 pupils, not 10%",
+            Self::DecreaseThresholdFloor => "Clawback threshold: 20, not 10%",
             Self::ClawbackClampAtZero => "Clawback larger than the guarantee",
             Self::TransitionSupplement => "Formula transition supplement",
-            Self::TransportationFloor => "Transportation share at the 50% floor",
-            Self::MileBase => "Transport paid on miles, not riders",
-            Self::EfficiencyZero => "No efficiency adjustment under index 1.0",
-            Self::EfficiencyCeiling => "Efficiency adjustment capped at 15%",
-            Self::DensityZero => "No density aid from 28 riders a sq. mile",
+            Self::TransportationFloor => "Transport share at the 50% floor",
+            Self::MileBase => "Transport on miles, not riders",
+            Self::EfficiencyZero => "No efficiency adjustment below 1.0",
+            Self::EfficiencyCeiling => "Efficiency adjustment at 15% cap",
+            Self::DensityZero => "No density aid at 28+ riders/sq mi",
             Self::TransportationGuarantee => "Transportation's own guarantee",
-            Self::SpecialEducationTransportFloor => "Special education transport, 50% floor",
+            Self::SpecialEducationTransportFloor => "Special ed transport at 50% floor",
         }
     }
 
