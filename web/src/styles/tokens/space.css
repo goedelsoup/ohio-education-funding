@@ -62,6 +62,10 @@
 
   --wrap-read: 900px;
   --wrap-wide: 1180px;
+  /* The district dashboard's contents rail, from 1000px. Not a third width: the card column beside
+     it is `--wrap-wide` less the rail, and a wide page that draws a chart frames its cards there
+     too (#660). See `.rail-layout` in `app.css`. */
+  --rail-width: 13.5rem;
 
   /*
    * How much of the viewport is covered by something `position: sticky`, so a fragment link can

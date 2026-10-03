@@ -1476,8 +1476,9 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
   .tiles > .tile:first-child:nth-last-child(2n + 1) { grid-column: 1 / -1; }
 }
 
-/* Stacked bar: a 2px surface gap so the two quantities read as separate. */
-.barwrap { margin: var(--space-1) 0 0; }
+/* Stacked bar: a 2px surface gap so the two quantities read as separate. Capped where every SVG
+   chart is, 640 × `MAX_SCALE`, so it ends at their right edge rather than 28px past it (#660). */
+.barwrap { margin: var(--space-1) 0 0; max-width: calc(640px * 1.25); }
 .bar { display: flex; height: 22px; border-radius: 5px; overflow: hidden; background: var(--surface-2); gap: 2px; }
 .seg { height: 100%; border-radius: var(--radius-sm); }
 .seg[data-series="formula"] { background: var(--series-formula); }
@@ -1685,7 +1686,7 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
   body:has(main > .rail-layout) footer.site > .wrap { max-width: var(--wrap-wide); }
   .rail-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 13.5rem;
+    grid-template-columns: minmax(0, 1fr) var(--rail-width);
     column-gap: var(--space-9);
     align-items: start;
   }
@@ -1705,6 +1706,28 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
   }
   .rail-layout > .contents ul { columns: auto; }
   .rail-layout > .contents li { font-size: var(--text-sm); }
+}
+
+/*
+ * A wide page that draws a chart frames its cards at the rail layout's card column (#660).
+ *
+ * A chart stops at 800px — 640 × `MAX_SCALE`, so its type is never painted larger than the prose
+ * beside it — and a card on a wide page is 1084px inside. So `/county/franklin` drew one card with
+ * three right edges: its charts at 800px, its sentences at the measure and its tables at 1084, with
+ * 284px of empty card to the right of every chart. The district dashboard's card column is 828px
+ * inside, and a chart there fills all but 28px of it.
+ *
+ * So the cards on such a page take that column's width, at every width and with or without a
+ * rail beside them, and a table that wants more scrolls in its `.scroll`. Raising `MAX_SCALE`
+ * instead would have filled the width by scaling the chart text up with it.
+ *
+ * Only on a page with a chart, because the frame is the chart's. `/legislation` and the seat
+ * rosters are tables and nothing else: capped, the acts table scrolled by 27px to align with a
+ * chart that is not on the page. `.chartwrap` alone, because the one HTML chart, the aid bar, is
+ * drawn only on the district dashboard, which is not a wide page.
+ */
+.wrap[data-width="wide"]:has(.chartwrap) .card {
+  max-width: calc(var(--wrap-wide) - 2 * var(--space-7) - var(--rail-width) - var(--space-9));
 }
 
 /*
@@ -2073,6 +2096,22 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 /* The flat strip this replaced is gone — see `distributionSpec`. What is left is the frame the
    box plot sits in: the label and value above it. The drawing states its own ends. */
 .strip-row .chartwrap { margin: .1rem 0 .1rem; }
+/*
+ * On a phone a chart takes most of its card's side padding (#660).
+ *
+ * At 375px a chart was 295px wide — 79% of the screen, inside the page's 20px and the card's 20px
+ * on each side — and the one on `/scenario/reach` was 313, because its card's padding alone was
+ * overridden. The padding is a frame for sentences; a drawing carries its own margins inside its
+ * viewBox. So the chart bleeds `--space-3` into the card padding on each side and every chart
+ * comes to 313, the width reach's had, and the override now begins above the phone breakpoint.
+ *
+ * The breakpoint is the card's: below it the card's side padding is `--space-7` (see `.card`),
+ * which is what the bleed is taken out of. After `.strip-row .chartwrap` and `.measure
+ * .chartwrap`, whose `margin` shorthand would otherwise put the inline margins back.
+ */
+@media (max-width: 640.98px) {
+  .card .chartwrap { margin-inline: calc(-1 * var(--space-3)); }
+}
 
 /*
  * Charts. Marks are thin, axes recessive, text wears text tokens rather than series color.
@@ -2442,9 +2481,13 @@ svg.plot [data-hover] {
 }
 .reach-stage { min-width: 0; }
 
-/* The stage's own card: the plot is the page, so it loses the inner padding that would inset a
-   640px drawing inside a box inside a column. */
-.stage { padding: var(--space-4) var(--space-4) var(--space-5); }
+/* The stage's own card, from the card's phone breakpoint up: the plot is the page, so it loses the
+   inner padding that would inset a 640px drawing inside a box inside a column, and at 1024 keeps
+   the wide drawing. On a phone it is a card like any other and its chart bleeds as theirs do, so
+   every phone chart is one width (#660). */
+@media (min-width: 641px) {
+  .stage { padding: var(--space-4) var(--space-4) var(--space-5); }
+}
 
 /* What is plotted, stated on the plot's own frame rather than among the levers — these change the
    drawing and not the model, and a reader must not read an axis change as a policy change. */

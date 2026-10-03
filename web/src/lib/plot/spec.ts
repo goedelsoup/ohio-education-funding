@@ -1046,6 +1046,27 @@ const BAR_HUE: Record<BarHue, string> = {
 };
 
 /**
+ * The name gutter {@link barSpec} fits to these bars, in layout pixels, before the frame caps it.
+ *
+ * Sized to the longest category name, as the right gutter is sized to the longest direct label.
+ * This was a fixed 160, which silently clipped anything longer — "Building leadership and
+ * operation" rendered as "g leadership and operation", which reads as a rendering fault rather
+ * than a truncation and is exactly the kind of thing nobody reports.
+ *
+ * A marked name is drawn at 600, which is wider than the same name at normal weight, so it is
+ * counted at the width it is drawn at — see {@link BOLD_WIDENS}.
+ *
+ * Given several sets, the widest: the one gutter every chart of the set can share.
+ */
+export function nameGutterOf(...sets: readonly Bar[][]): number {
+  const longestLabel = Math.max(
+    0,
+    ...sets.flat().map((b) => b.label.length * (b.current ? BOLD_WIDENS : 1)),
+  );
+  return Math.max(120, Math.min(260, Math.round(longestLabel * 7.1) + 14));
+}
+
+/**
  * A horizontal bar chart: magnitude compared across a handful of named categories.
  *
  * Horizontal because the categories are text and vertical bars would need rotated labels, which
@@ -1098,6 +1119,17 @@ export function barSpec(
      * deficit drawn in the same colour as a surplus is the defect signed mode was written for.
      */
     hue: BarHue;
+    /**
+     * The name gutter, for bar charts a reader scrolls between (#660).
+     *
+     * Each chart fits its gutter to its own names, so on the district dashboard the base-cost bars
+     * started at x=408 and the categoricals bars one card below at x=382: the baseline jumped
+     * sideways on the scroll. A caller drawing charts that are read in sequence passes the
+     * {@link nameGutterOf} of all of them to each. A floor rather than a value, so a chart whose own
+     * names want more is never cut to fit a sibling; it breaks the alignment instead, which
+     * `charts.spec.ts` sees.
+     */
+    nameGutter?: number | undefined;
   },
 ): Spec {
   const { width } = options;
@@ -1141,16 +1173,6 @@ export function barSpec(
    * in the set and every panel reserves the same room, whether it has a label in it or not.
    */
   const longest = options.labelChars ?? Math.max(0, ...bars.map((b) => b.direct?.length ?? 0));
-  // Sized to the longest category name, as the right gutter is sized to the longest direct label.
-  // This was a fixed 160, which silently clipped anything longer — "Building leadership and
-  // operation" rendered as "g leadership and operation", which reads as a rendering fault rather
-  // than a truncation and is exactly the kind of thing nobody reports.
-  // A marked name is drawn at 600 (below), which is wider than the same name at normal weight, so
-  // it is counted at the width it is drawn at — see {@link BOLD_WIDENS}.
-  const longestLabel = Math.max(
-    0,
-    ...bars.map((b) => b.label.length * (b.current ? BOLD_WIDENS : 1)),
-  );
   /*
    * The name gutter, and what it costs when the frame is a phone wide.
    *
@@ -1163,7 +1185,7 @@ export function barSpec(
    * than at the top of the function. See {@link EM_PER_CHAR} for why the wrap budget is not simply
    * the gutter divided by the type size.
    */
-  const wanted = Math.max(120, Math.min(260, Math.round(longestLabel * 7.1) + 14));
+  const wanted = Math.max(nameGutterOf(bars), options.nameGutter ?? 0);
   const nameGutter = gutter(width, wanted);
   const wraps = nameGutter < wanted;
   const rowHeight = wraps ? 40 : 30;
