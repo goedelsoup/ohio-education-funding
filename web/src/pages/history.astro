@@ -15,6 +15,8 @@ import BasisToggle from "../components/BasisToggle.astro";
 import Base from "../layouts/Base.astro";
 import { NAMES } from "../lib/nav.ts";
 import { loadFeed } from "../lib/feed.ts";
+import { loadCorpus } from "../lib/corpus.ts";
+import { regimeEvents, regimes, regimesCrossed } from "../lib/legislation.ts";
 import {
   renderAbsent,
   renderEqualization,
@@ -29,6 +31,13 @@ import * as routes from "../lib/routes.ts";
 import { yearOf } from "../lib/year.ts";
 
 const { bundle } = loadFeed();
+/*
+ * Every change of formula, which each chart marks where its span reaches (#708). This is the time
+ * page, and its four series ran across four regimes with none of them drawn: a reader could not
+ * tell whether the state share's fall lined up with a change of law.
+ */
+const spans = regimes(loadCorpus());
+const events = regimeEvents(spans);
 
 /*
  * Where the rest of the site starts, read rather than asserted.
@@ -66,6 +75,14 @@ const earliest = Math.min(
   ),
 );
 
+/** The years the page draws, end to end, and so how many regimes it crosses. */
+const latest = Math.max(
+  ...[last?.fiscal_year, meal[meal.length - 1]?.fiscal_year, appropriations[appropriations.length - 1]?.fiscal_year].filter(
+    (y) => y != null,
+  ),
+);
+const crossed = regimesCrossed(spans, earliest, latest);
+
 /**
  * The base year for the appropriation card, computed over its own span rather than the panel's.
  *
@@ -89,7 +106,7 @@ const appropriationBase = bundle.deflator
       : "This feed carries no historical panel."
   }
   image={routes.og.page("history")}
-  imageAlt="Four regimes of Ohio school funding, and what each one paid"
+  imageAlt={`${crossed.length} regimes of Ohio school funding, and what each one paid`}
   section="history"
 >
   <h1>{NAMES.history.name}</h1>
@@ -106,31 +123,25 @@ const appropriationBase = bundle.deflator
       <Fragment set:html={renderAbsent()} />
     ) : (
       <>
-        <Fragment set:html={renderRevenueMix(history)} />
+        <Fragment set:html={renderRevenueMix(history, events)} />
 
         <BasisToggle id="history-basis" section="equity-gap" base={base}>
           <Fragment
             slot="nominal"
-            set:html={renderEqualization(history, bundle.deflator, base, "nominal")}
+            set:html={renderEqualization(history, bundle.deflator, base, "nominal", events)}
           />
           <Fragment
             slot="real"
-            set:html={renderEqualization(history, bundle.deflator, base, "real")}
+            set:html={renderEqualization(history, bundle.deflator, base, "real", events)}
           />
         </BasisToggle>
         {/* Where the two cards above come from, and what they do not reconcile with. Apparatus,
             so after the answer rather than ahead of it (#549): the lead has already said whose
             measurement this is, and this is the detail a reader checking it wants. */}
         <Fragment set:html={renderProvenance(bundle)} />
-
-  {/* What the totals above are made of. No dollars here, so no basis toggle. */}
-  <Fragment set:html={renderLineOrigins(lines)} />
       </>
     )
   }
-
-  {/* Outside the `history.length` gate: a different source, absent for its own reasons. */}
-  <Fragment set:html={renderMealProgram(meal)} />
 
   {/*
     The plain toggle, not a real-first variant. `BasisToggle` states that neither basis is the
@@ -141,11 +152,25 @@ const appropriationBase = bundle.deflator
   <BasisToggle id="appropriation-basis" section="appropriations" base={appropriationBase}>
     <Fragment
       slot="nominal"
-      set:html={renderAppropriations(appropriations, bundle.deflator, appropriationBase, "nominal")}
+      set:html={renderAppropriations(appropriations, bundle.deflator, appropriationBase, "nominal", events)}
     />
     <Fragment
       slot="real"
-      set:html={renderAppropriations(appropriations, bundle.deflator, appropriationBase, "real")}
+      set:html={renderAppropriations(appropriations, bundle.deflator, appropriationBase, "real", events)}
     />
   </BasisToggle>
+
+  {/*
+    Outside the `history.length` gate: a different source, absent for its own reasons. After the
+    appropriation rather than before it (#708): its 28-row table is a test's subject and cannot
+    fold, so it goes last but one, where its length delays no later chart.
+  */}
+  <Fragment set:html={renderMealProgram(meal, events)} />
+
+  {/*
+    What the appropriation totals are made of. No dollars here, so no basis toggle. Below the
+    chart it breaks down rather than above it (#708): ahead of it, its table put 5,400px between
+    the page's charts at 1280. Outside the panel gate, since it is not the Census panel's.
+  */}
+  <Fragment set:html={renderLineOrigins(lines)} />
 </Base>

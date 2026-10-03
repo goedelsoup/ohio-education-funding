@@ -27,7 +27,17 @@
 import { expect, test } from "vitest";
 
 import { loadCorpus } from "../../src/lib/corpus.ts";
-import { acts, fiscalYear, regimes, renderTimeline, succession } from "../../src/lib/legislation.ts";
+import {
+  acts,
+  eventsWithin,
+  fiscalYear,
+  regimeEvents,
+  regimes,
+  regimesCrossed,
+  renderRegimeKey,
+  renderTimeline,
+  succession,
+} from "../../src/lib/legislation.ts";
 
 const corpus = loadCorpus();
 const spans = regimes(corpus);
@@ -275,4 +285,37 @@ test("every fiscal span on the page is written one way", () => {
 test("an empty corpus renders nothing rather than an empty chart", () => {
   const bare = { ...corpus, byClass: new Map() } as typeof corpus;
   expect(renderTimeline(bare)).toBe("");
+});
+
+test("/history's thirty years cross four regimes, and three changes of formula fall inside them", () => {
+  /*
+   * #708. The OG card said "Four" in words while the corpus held five regimes, and no chart on the
+   * page marked any of them. The count is now computed from the span drawn, and this is the claim
+   * it computes: FY1998-FY2027 starts inside Foundation Base Cost, so Equal Yield is not crossed.
+   */
+  const crossed = regimesCrossed(spans, 1998, 2027);
+  expect(spans).toHaveLength(5);
+  expect(crossed).toHaveLength(4);
+  expect(crossed.map((r) => r.name)).not.toContain("Equal Yield");
+  expect(eventsWithin(regimeEvents(spans), 1998, 2027).map((e) => e.at)).toEqual([2010, 2012, 2022]);
+});
+
+test("a regime touching either end of a span is crossed, and one ending the year before is not", () => {
+  const at = (from: number, to: number | null) =>
+    ({ id: `r${from}`, name: `R${from}`, href: "/", from, to, status: "", establishedBy: null });
+  const tiled = [at(1, 4), at(5, 8), at(9, null)];
+  expect(regimesCrossed(tiled, 4, 5).map((r) => r.from)).toEqual([1, 5]);
+  expect(regimesCrossed(tiled, 5, 8).map((r) => r.from)).toEqual([5]);
+  expect(regimesCrossed(tiled, 100, 200).map((r) => r.from)).toEqual([9]);
+});
+
+test("the regime key names and links each boundary the chart draws, and only those", () => {
+  const events = regimeEvents(spans);
+  const key = renderRegimeKey(events, 1998, 2027);
+  for (const e of eventsWithin(events, 1998, 2027)) {
+    expect(key).toContain(`FY${e.at}, <a href="${e.href}">`);
+  }
+  // The first year is where the series starts, not a change it shows.
+  expect(renderRegimeKey(events, 2010, 2011)).toBe("");
+  expect(renderRegimeKey(events, 2009, 2011)).toContain("line marks a change");
 });

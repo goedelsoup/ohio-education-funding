@@ -7,9 +7,20 @@
  * carries no denominator, and `denominators.ts` records why.
  */
 
+import { readFileSync } from "node:fs";
+
 import { expect, test } from "vitest";
 
-import { BILLIONS, fromActs, fromCatalog, growth, inBase, renderAppropriations } from "../../src/lib/appropriations.ts";
+import {
+  BILLIONS,
+  fromActs,
+  fromCatalog,
+  growth,
+  inBase,
+  ONE_TIME,
+  RECENT,
+  renderAppropriations,
+} from "../../src/lib/appropriations.ts";
 import { parseHTML } from "linkedom";
 
 import { truncatedDomain } from "../../src/lib/plot/spec.ts";
@@ -178,4 +189,69 @@ test("the nominal and constant-dollar drawings share one frame, and each foot na
   expect(start(real)).toBe(start(nominal));
   expect(nominal).toContain("Inthedollarsofeachyear");
   expect(real).toContain(`InconstantFY${base}dollars`);
+});
+
+/** Each line's enacted amount by fiscal year, out of the crate's fixture. */
+function enactedLines(): Map<string, Map<number, { amount: number; bill: string; title: string }>> {
+  const text = readFileSync(new URL("../../../crates/project/fixtures/appropriation-lines.csv", import.meta.url), "utf8");
+  const [head, ...body] = text.trim().split("\n");
+  const cols = head!.split(",");
+  const at = (name: string) => cols.indexOf(name);
+  const out = new Map<string, Map<number, { amount: number; bill: string; title: string }>>();
+  for (const line of body) {
+    const cells = line.split(",");
+    expect(cells, line).toHaveLength(cols.length);
+    if (cells[at("kind")] !== "enacted") continue;
+    const ali = cells[at("line_item")]!;
+    const year = Number(cells[at("fiscal_year")]);
+    const years = out.get(ali) ?? new Map();
+    const prior = years.get(year)?.amount ?? 0;
+    years.set(year, {
+      amount: prior + Number(cells[at("amount")]),
+      bill: cells[at("bill")]!,
+      title: cells[at("title")]!,
+    });
+    out.set(ali, years);
+  }
+  return out;
+}
+
+test("the FY2024 spike the card names is the line the fixture says, and the year's largest rise", () => {
+  /*
+   * #708. The card names one line as the whole of the spike, from a constant, because the feed
+   * carries totals and not lines. This is what keeps the constant honest: the amount, the act,
+   * that it ends the next year, and that no other line rose as far into the same year.
+   */
+  const lines = enactedLines();
+  const relief = lines.get(ONE_TIME.line)!;
+  const year = relief.get(ONE_TIME.fiscal_year)!;
+  expect(year.amount).toBe(ONE_TIME.amount);
+  expect(year.title.toLowerCase()).toBe(ONE_TIME.title);
+  expect(`H.B. ${year.bill.replace(/^hb/, "")}`).toBe(ONE_TIME.act);
+  expect(relief.get(ONE_TIME.fiscal_year + 1)?.amount).toBe(0);
+
+  const rise = (years: Map<number, { amount: number }>) =>
+    (years.get(ONE_TIME.fiscal_year)?.amount ?? 0) - (years.get(ONE_TIME.fiscal_year - 1)?.amount ?? 0);
+  const [largest] = [...lines].sort(([, a], [, b]) => rise(b) - rise(a));
+  expect(largest![0]).toBe(ONE_TIME.line);
+});
+
+test("the card names the spike in its note and marks it on its chart", () => {
+  const html = renderAppropriations(rows, bundle.deflator, base, "nominal").replace(/\s+/g, " ");
+  expect(html).toContain(`<code>${ONE_TIME.line}</code>`);
+  expect(html).toContain(`which ${ONE_TIME.act} appropriated for that year alone`);
+  expect(html).toContain('class="series-callout"');
+});
+
+test("the table opens on the newest years and folds the rest, so the chart after it is near", () => {
+  // #708: thirty rows put 2,900px between this chart and the next at 1280.
+  const { document } = parseHTML(renderAppropriations(rows, bundle.deflator, base, "nominal"));
+  const [open, rest] = [...document.querySelectorAll("table")];
+  expect(open!.closest("details")).toBeNull();
+  expect(rest!.closest("details.table-rest")).not.toBeNull();
+  const years = (t: Element) => [...t.querySelectorAll("tbody th")].map((th) => th.textContent);
+  expect(years(open!)).toHaveLength(RECENT);
+  expect(years(open!)[0]).toBe(`FY${rows[rows.length - 1]!.fiscal_year}`);
+  // Every year is still in the document, once.
+  expect([...years(open!), ...years(rest!)].sort()).toEqual(rows.map((r) => `FY${r.fiscal_year}`));
 });

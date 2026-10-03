@@ -6,10 +6,12 @@
  * case is a table that looks complete.
  */
 
+import { parseHTML } from "linkedom";
 import { expect, test } from "vitest";
 
 import { loadFeed } from "../../src/lib/feed.ts";
-import { byAge, ordinal, renderLineOrigins, span } from "../../src/lib/lineOrigins.ts";
+import { foldedTable } from "../../src/lib/fold.ts";
+import { byAge, ordinal, renderLineOrigins, SHOWN, span } from "../../src/lib/lineOrigins.ts";
 
 const { bundle } = loadFeed();
 const lines = bundle.appropriation_lines;
@@ -77,4 +79,26 @@ test("the card refuses to let the discontinued flag mean abolition", () => {
 test("an empty feed renders nothing", () => {
   expect(renderLineOrigins([])).toBe("");
   expect(span([])).toBeNull();
+});
+
+test("the table opens on the oldest lines and folds the rest, every line still in the document", () => {
+  // #708: sixty-nine rows ran about 4,000px at 1280, ahead of the page's longest chart.
+  const { document } = parseHTML(renderLineOrigins(lines));
+  const [open, rest] = [...document.querySelectorAll("table")];
+  expect(open!.closest("details")).toBeNull();
+  expect(rest!.closest("details.table-rest")).not.toBeNull();
+  const live = byAge(lines);
+  const ids = (t: Element) => [...t.querySelectorAll("tbody th")].map((th) => th.textContent);
+  expect(ids(open!)).toEqual(live.slice(0, SHOWN).map((l) => l.ali));
+  expect(ids(rest!)).toEqual(live.slice(SHOWN).map((l) => l.ali));
+  expect(document.querySelector("details summary")!.textContent).toBe(`The other ${live.length - SHOWN} lines`);
+});
+
+test("a table no longer than its open rows does not fold", () => {
+  const head = "<thead><tr><th>A</th></tr></thead>";
+  const rows = ["<tr><td>1</td></tr>", "<tr><td>2</td></tr>"];
+  expect(foldedTable(head, rows, 2, "more")).not.toContain("<details");
+  const folded = parseHTML(foldedTable(head, rows, 1, "more")).document;
+  expect(folded.querySelectorAll("table")).toHaveLength(2);
+  expect(folded.querySelector("details > summary")!.textContent).toBe("more");
 });

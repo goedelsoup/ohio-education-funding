@@ -2238,3 +2238,84 @@ test("a chart's values are listed as text, from the hovers its marks carry (#616
   const hidden = renderToString((w) => barSpec(bars, { width: w, hue: "formula" }), "presentational");
   expect(hidden).not.toContain("chart-values");
 });
+
+// --- Events on a time axis (#708) -------------------------------------------------------------
+
+/** Thirty fiscal years, as /history draws them. */
+const YEARS: SeriesPoint[] = Array.from({ length: 30 }, (_, i) => ({
+  at: 1998 + i,
+  a: 0.4 + i * 0.005,
+  b: 0.5 - i * 0.004,
+}));
+
+/** The regime boundaries, with one either side of the frame and one on its first year. */
+const REGIMES = [
+  { at: 1976, label: "Equal Yield" },
+  { at: 1998, label: "On the first year" },
+  { at: 2010, label: "Evidence-Based Model" },
+  { at: 2012, label: "Bridge Formula" },
+  { at: 2022, label: "Fair School Funding Plan" },
+  { at: 2031, label: "After the last year" },
+];
+
+/** Every drawing `renderToString` makes of one builder. */
+function drawings(build: (w: number) => Spec | null): string[] {
+  return [...renderToString(build, "presentational").matchAll(/<svg\b[\s\S]*?<\/svg>/g)].map((m) => m[0]);
+}
+
+const withEvents = (w: number, extra: Partial<Parameters<typeof seriesSpec>[4]> = {}) =>
+  seriesSpec(YEARS, { a: "local", b: "state" }, share, () => "", {
+    width: w,
+    tick: (at) => `FY${at}`,
+    hues: PAIR,
+    events: REGIMES,
+    ...extra,
+  });
+
+test("an event inside the domain is one full-height rule, and one outside it is none", () => {
+  /*
+   * #708. /history drew thirty years across four funding regimes and marked none of them. A
+   * boundary on the first year is not a change the chart shows — the series starts there — so it
+   * is left off with those outside the frame.
+   */
+  const all = drawings((w) => withEvents(w));
+  expect(all).toHaveLength(DRAWINGS);
+  for (const svg of all) {
+    const { document } = parseHTML(`<!doctype html><html><body>${svg}</body></html>`);
+    const rules = [...document.querySelectorAll(".series-event line")];
+    expect(rules).toHaveLength(3);
+    // Each reaches the x axis: Plot's `y2` is the frame's bottom, whatever the top inset.
+    const bottoms = new Set(rules.map((r) => r.getAttribute("y2")));
+    expect(bottoms.size).toBe(1);
+  }
+});
+
+test("without events the chart is the chart it was", () => {
+  const plain = drawings((w) =>
+    seriesSpec(YEARS, { a: "local", b: "state" }, share, () => "", { width: w, tick: (at) => `FY${at}`, hues: PAIR }),
+  );
+  const none = drawings((w) => withEvents(w, { events: [] }));
+  expect(none).toEqual(plain);
+  for (const svg of plain) expect(svg).not.toContain("series-event");
+});
+
+test("every event name it keeps fits the drawing, and the wide one keeps all three", () => {
+  // A name that does not fit is dropped rather than clipped; the key under the chart names it.
+  const all = drawings((w) => withEvents(w));
+  for (const svg of all) expect(overruns(svg)).toEqual([]);
+  const wide = drawingAt(() => withEvents(WIDTHS.wide));
+  for (const name of ["Evidence-Based Model", "Bridge Formula", "Fair School Funding Plan"]) {
+    expect(wide.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ")).toContain(name);
+  }
+});
+
+test("a callout marks its point and keeps inside the drawing at every width", () => {
+  const all = drawings((w) =>
+    withEvents(w, { callouts: [{ at: 2024, key: "b", label: "FY2024: one-time $1.8B, coronavirus relief" }] }),
+  );
+  for (const svg of all) {
+    const { document } = parseHTML(`<!doctype html><html><body>${svg}</body></html>`);
+    expect(document.querySelectorAll(".series-callout circle")).toHaveLength(1);
+    expect(overruns(svg)).toEqual([]);
+  }
+});
