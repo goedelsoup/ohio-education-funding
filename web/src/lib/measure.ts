@@ -436,10 +436,11 @@ export const PAGE_HEIGHT_CEILINGS = [
   {
     name: "explained topic",
     pattern: /^\/explained\/[a-z0-9-]+\.html$/,
-    // The pilot, /explained/phase-in, under system-ui.
+    // The pilot, /explained/phase-in, under system-ui. /explained/what-a-district-gets reads
+    // 4,616 under system-ui and 4,252 under DejaVu, after cutting it from 5,066 to fit.
     measured: 4438,
     ceiling: 4900,
-    sample: ["/explained/phase-in.html"],
+    sample: ["/explained/phase-in.html", "/explained/what-a-district-gets.html"],
   },
 ] as const;
 

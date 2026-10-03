@@ -33,6 +33,13 @@ import {
 } from "../../src/lib/explained/render.ts";
 import { TOPICS, topicModule } from "../../src/lib/explained/registry.ts";
 import {
+  CATEGORICALS,
+  example as medianByAid,
+  shareIdentity,
+  statePerPupil,
+  sumIdentity,
+} from "../../src/lib/explained/what-a-district-gets.ts";
+import {
   DICTIONARY,
   GRADE_CEILING,
   LIMITS,
@@ -475,5 +482,56 @@ describe("What does the phase-in do? (#715)", () => {
 
   test("its description fits a search result", () => {
     for (const m of [...TOPICS, PHASE_IN_TOPIC]) expect(description(topic(m)).length, m.slug).toBeLessThanOrEqual(160);
+  });
+});
+
+describe("How does Ohio decide what a district gets? (#716)", () => {
+  const feed = loadFeed().bundle;
+  const districts = feed.districts;
+  const floor = feed.statewide.minimum_state_share;
+
+  test("the state share of base cost per pupil is max(B − L, m × B), to the cent, on every district", () => {
+    expect(reconciles(shareIdentity(floor), districts)).toEqual([]);
+  });
+
+  test("a floor district paid B − L, as if there were no floor, fails it", () => {
+    const real = districts.find((d) => d.at_minimum_state_share)!;
+    const unfloored = Math.max(real.base_cost_per_pupil - real.regime!.local_capacity!, 0);
+    const doctored = { ...real, irn: "999999", base_cost_state_share: unfloored * real.categorical_adm };
+    expect(reconciles(shareIdentity(floor), [...districts, doctored])).toEqual(["999999"]);
+  });
+
+  test("the floor is the one in force, and it binds exactly where the feed says", () => {
+    expect(floor).toBeGreaterThan(0);
+    for (const d of districts) {
+      const atFloor = statePerPupil(d, floor) === floor * d.base_cost_per_pupil;
+      expect(atFloor, d.irn).toBe(d.at_minimum_state_share);
+    }
+  });
+
+  test("the state share plus the six categoricals is the computed amount, on every district", () => {
+    expect(reconciles(sumIdentity, districts)).toEqual([]);
+  });
+
+  test("a district missing one categorical fails the sum", () => {
+    const real = medianByAid(districts);
+    const doctored = {
+      ...real,
+      irn: "999999",
+      categoricals: { ...real.categoricals, gifted: 0, targeted_assistance: 0 },
+    };
+    expect(reconciles(sumIdentity, [...districts, doctored])).toEqual(["999999"]);
+  });
+
+  test("the six are the feed's six, so a seventh cannot go unsummed", () => {
+    expect(CATEGORICALS.map(([key]) => key).sort()).toEqual(Object.keys(districts[0]!.categoricals).sort());
+  });
+
+  test("the example is the median district by computed aid per pupil", () => {
+    const ex = medianByAid(districts);
+    const perPupil = (d: (typeof districts)[number]) =>
+      d.biennium.observed[2]!.phase_in_calculated / d.categorical_adm;
+    const smaller = districts.filter((d) => perPupil(d) < perPupil(ex)).length;
+    expect(smaller).toBe(Math.floor(districts.length / 2));
   });
 });

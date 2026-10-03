@@ -448,8 +448,9 @@ test.describe("routes", () => {
     // provision by provision, a place in time rather than on the map.
     //
     // Thirty-six with `Explained` (#713): its index, and one more for each topic as it lands.
-    // Thirty-seven with the first, "What does the phase-in do?" (#715).
-    expect(hrefs).toHaveLength(37);
+    // Thirty-seven with the first, "What does the phase-in do?" (#715), and thirty-eight with
+    // "How does Ohio decide what a district gets?" (#716).
+    expect(hrefs).toHaveLength(38);
     for (const href of hrefs) {
       await page.goto(href);
       await expect(page.locator("h1"), `${href} has no heading`).toBeVisible();
