@@ -329,6 +329,7 @@ describe("the card routes", () => {
       "history",
       "scenario",
       "bounds",
+      "explained",
       "method",
       "data",
       "wiki",

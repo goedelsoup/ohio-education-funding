@@ -1,0 +1,70 @@
+---
+/**
+ * The Explained section's front door: every question, under the run of the bar it sits in.
+ *
+ * Read from the topic registry, as the bar's panel is, so the two cannot list different topics. A
+ * run with no topic yet is left out, and with no topic at all the page says the section is coming
+ * rather than drawing an empty list (#713).
+ *
+ * The rule for what a topic is, and why it is a web module and not a corpus node, is in
+ * `.yidam/decisions/explained-is-a-reading-not-a-record.yml`.
+ */
+import Base from "../../layouts/Base.astro";
+import SectionAnchor from "../../components/SectionAnchor.astro";
+import { NAMES } from "../../lib/nav.ts";
+import { GROUPS, type Group } from "../../lib/explained/topic.ts";
+import { TOPICS } from "../../lib/explained/registry.ts";
+import * as routes from "../../lib/routes.ts";
+
+const ID = routes.SECTIONS.explainedIndex;
+/** Each run's address on this page. Typed by group, so a new group does not compile without one. */
+const RUN_ID: Record<Group, string> = {
+  "How the money is split": ID.split,
+  "Why it moves": ID.moves,
+  "What it does and does not show": ID.shows,
+};
+const runs = GROUPS.map((heading) => ({
+  heading,
+  id: RUN_ID[heading],
+  topics: TOPICS.filter((t) => t.group === heading),
+})).filter((run) => run.topics.length > 0);
+---
+
+<Base
+  title={NAMES.explained.name}
+  description="Short pages that each answer one question about how Ohio pays its school districts, in plain words, with the math and the evidence behind every number."
+  image={routes.og.page("explained")}
+  imageAlt="Explained: Ohio's school funding formula, one question at a time"
+  section="explained"
+>
+  <h1>{NAMES.explained.name}</h1>
+  <p class="lead">
+    Each page here answers one question a reader would ask about how Ohio pays its school
+    districts. The words are plain, every number is computed from the same data as the rest of the
+    site, and every page ends at the evidence that proves it.
+  </p>
+
+  {
+    runs.length === 0 ? (
+      <div class="card" id={ID.coming} data-part={ID.coming}>
+        <h2><SectionAnchor id={ID.coming} />The first questions are on their way</h2>
+        <p class="note">
+          This section is new and holds no page yet. Until it does, the{" "}
+          <a href={NAMES.statewide.href}>statewide view</a> lays out what the state pays, and the{" "}
+          <a href={NAMES.wiki.href}>Library</a> holds the evidence these pages will rest on.
+        </p>
+      </div>
+    ) : (
+      runs.map((run) => (
+        <div class="card" id={run.id} data-part={run.id}>
+          <h2><SectionAnchor id={run.id} />{run.heading}</h2>
+          <ul class="note">
+            {run.topics.map((t) => (
+              <li><a href={routes.explained(t.slug)}>{t.question}</a></li>
+            ))}
+          </ul>
+        </div>
+      ))
+    )
+  }
+</Base>

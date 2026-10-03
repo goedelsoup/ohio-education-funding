@@ -235,7 +235,7 @@ test.describe("the statute timeline", () => {
     // not an index, and the one a reader asking "how did this get here" wants before any single
     // act. Only the record's three tiles sit above it, across both columns.
     await page.goto("/");
-    const law = page.locator("header.site nav details.menu").nth(2);
+    const law = page.locator("header.site nav details.menu").nth(3);
     await law.locator("summary").click();
     const first = law.locator(".menu-runs a").first();
     await expect(first).toHaveAttribute("href", "/legislation");

@@ -88,12 +88,12 @@ test.describe("the chrome above the fold", () => {
      */
     const room: string[] = [];
     /*
-     * 820 is the tightest the loose bar gets: the first width at which the six entries sit in the
-     * row rather than inside `Menu`. #548 widened that row — two flat entries and four menus,
-     * where there had been five menus — so it is measured where it is narrowest rather than at
-     * 900, where it has room it does not have at 820.
+     * 920 is the tightest the loose bar gets: the first width at which the seven entries sit in
+     * the row rather than inside `Menu`. #713 moved it from 820 when `Explained` joined the bar,
+     * and 820 stays in the sweep as a width inside `Menu`. The loose row is measured where it is
+     * narrowest rather than at 1000, where it has room it does not have at 920.
      */
-    for (const width of [360, 390, 480, 520, 700, 820, 900, 1000, 1280]) {
+    for (const width of [360, 390, 480, 520, 700, 820, 920, 1000, 1280]) {
       await page.setViewportSize({ width, height: 800 });
       await page.goto("/district/043786");
       const state = await page.evaluate(() => {
@@ -132,7 +132,7 @@ test.describe("the chrome above the fold", () => {
       "520: header 52, h1 at 108",
       "700: header 52, h1 at 108",
       "820: header 52, h1 at 108",
-      "900: header 52, h1 at 108",
+      "920: header 52, h1 at 108",
       "1000: header 52, h1 at 108",
       "1280: header 52, h1 at 108",
     ]);
@@ -446,7 +446,9 @@ test.describe("routes", () => {
     //
     // Thirty-five when `/what-changed` joined Places beside Statewide (#641): the biennium read
     // provision by provision, a place in time rather than on the map.
-    expect(hrefs).toHaveLength(35);
+    //
+    // Thirty-six with `Explained` (#713): its index, and one more for each topic as it lands.
+    expect(hrefs).toHaveLength(36);
     for (const href of hrefs) {
       await page.goto(href);
       await expect(page.locator("h1"), `${href} has no heading`).toBeVisible();
@@ -517,7 +519,7 @@ test.describe("the section menus", () => {
      */
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto("/");
-    const library = page.locator("header.site nav details.menu").nth(2);
+    const library = page.locator("header.site nav details.menu").nth(3);
     await library.locator("summary").click();
     // The runs and not the panel: the lead above them spans both columns, and is held below.
     const columns = await library.locator(".menu-runs").evaluate((panel) => {
@@ -549,7 +551,7 @@ test.describe("the section menus", () => {
      */
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto("/");
-    const library = page.locator("header.site nav details.menu").nth(2);
+    const library = page.locator("header.site nav details.menu").nth(3);
     await library.locator("summary").click();
     const lead = library.locator(".menu-lead a");
     expect(await lead.evaluateAll((as) => as.map((a) => a.getAttribute("href")))).toEqual([
@@ -582,7 +584,7 @@ test.describe("the section menus", () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/");
     await page.locator("header.site nav details.menu-all > summary").click();
-    const phone = page.locator("header.site nav details.menu").nth(2);
+    const phone = page.locator("header.site nav details.menu").nth(3);
     await phone.locator("summary").click();
     const rows = await phone.locator(".menu-lead").evaluate((lead) => {
       const tiles = [...lead.querySelectorAll("a")].map((a) => a.getBoundingClientRect());
@@ -603,18 +605,18 @@ test.describe("the section menus", () => {
     /*
      * `Library` is every class of the corpus, and one column of it ran to about 800px — past the
      * fold of a laptop, in an absolutely positioned box a reader cannot scroll to. It is two
-     * columns above 640px, and above 820px it hangs from its own right edge, because it is the
-     * fifth entry of six and a 30rem box hung from its left would run off the right of the window.
+     * columns above 640px, and above 920px it hangs from its own right edge, because it is the
+     * sixth entry of seven and a 30rem box hung from its left would run off the right of the window.
      *
-     * 700 is inside the `Menu` disclosure; 820 is the narrowest loose bar; 1280 is the widest the
+     * 820 is inside the `Menu` disclosure; 920 is the narrowest loose bar; 1280 is the widest the
      * header grows. At each, the whole panel is on screen: nothing clipped at either side, and the
      * last link above the bottom of an 800px window.
      */
-    for (const width of [700, 820, 1280]) {
+    for (const width of [820, 920, 1280]) {
       await page.setViewportSize({ width, height: 800 });
       await page.goto("/");
-      if (width < 820) await page.locator("header.site nav details.menu-all > summary").click();
-      const library = page.locator("header.site nav details.menu").nth(2);
+      if (width < 920) await page.locator("header.site nav details.menu-all > summary").click();
+      const library = page.locator("header.site nav details.menu").nth(3);
       await library.locator("summary").click();
       const panel = library.locator(".menu-panel");
       const box = (await panel.boundingBox())!;
@@ -658,7 +660,7 @@ test.describe("the section menus", () => {
     await page.locator("header.site nav details.menu-all > summary").click();
     // `Library` since #548: every class of the corpus, twenty-two links in five headed runs, and
     // one column at this width. `Law` was seven.
-    const library = page.locator("header.site nav details.menu").nth(2);
+    const library = page.locator("header.site nav details.menu").nth(3);
     await library.locator("summary").click();
     await expect(library).toHaveAttribute("open", "");
 

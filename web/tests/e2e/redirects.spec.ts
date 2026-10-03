@@ -126,6 +126,7 @@ test.describe("the page an address that is not there lands on (#596)", () => {
     await page.goto("/404");
     await expect(page.locator("#where-to-go li a")).toHaveText([
       "Find a district",
+      "Explained",
       "Places",
       "Analysis",
       "Change the formula",

@@ -25,6 +25,8 @@ import type { Bundle } from "./types.ts";
 import { loadCorpus, type Corpus } from "./corpus.ts";
 import * as routes from "./routes.ts";
 import type { NavIcon } from "./icons.ts";
+import { GROUPS } from "./explained/topic.ts";
+import { TOPICS } from "./explained/registry.ts";
 
 /**
  * What a page passes as `section`, naming where it sits in the bar.
@@ -35,6 +37,7 @@ import type { NavIcon } from "./icons.ts";
  */
 export type Section =
   // The groups.
+  | "explained"
   | "places"
   | "analysis"
   | "library"
@@ -85,6 +88,7 @@ export const NAMES = {
   statewide: { href: "/statewide", name: "Statewide" },
   changed: { href: routes.WHAT_CHANGED, name: "What changed" },
   districts: { href: "/districts", name: "Find a district" },
+  explained: { href: routes.EXPLAINED, name: "Explained" },
   counties: { href: "/counties", name: "Counties" },
   house: { href: "/house", name: "House districts" },
   senate: { href: "/senate", name: "Senate districts" },
@@ -333,6 +337,29 @@ export const LIBRARY: readonly { heading: string; classes: readonly string[] }[]
   { heading: "Proposals", classes: ["draft-legislation", "model-policy", "scenario"] },
 ];
 
+/**
+ * `Explained`'s panel: the index, then each topic under the run its module names.
+ *
+ * Built from the registry, so a topic module adds its own link and nobody edits this file to list
+ * it. A run with no topic yet is left out rather than drawn empty, and while there is no topic at
+ * all the panel holds the index alone.
+ *
+ * The question is the link's label because it is the page's name: its `<title>` and the start of
+ * its `h1` (`tests/dist/names.spec.ts`). A reader choosing what to read sees the questions before
+ * choosing, which is why this is a panel and not a flat link (#712).
+ */
+function explainedRuns(): NavSection[] {
+  const index: NavSection = { links: [place("explained", "every question, in plain words")] };
+  const runs = GROUPS.map((heading) => ({
+    heading,
+    links: TOPICS.filter((t) => t.group === heading).map((t) => ({
+      href: routes.explained(t.slug),
+      label: t.question,
+    })),
+  })).filter((run) => run.links.length > 0);
+  return [index, ...runs];
+}
+
 /** The heading of the run that holds any class {@link LIBRARY} does not place. */
 export const UNPLACED = "Also in the corpus";
 
@@ -351,12 +378,15 @@ export const sectionForClass: (className: string) => Section = () => "library";
 /**
  * The bar.
  *
- * # Six entries, by what a reader came to do
+ * # Seven entries, by what a reader came to do
  *
  * It was organised by the corpus's own taxonomy — Places, Law, Formula, Research, Reference — which
  * is how the repository is built and not how it is read. It is organised by task now (#548):
- * find one district; look at a place; read an analysis; change the formula; look something up; learn how
- * the figures are made.
+ * find one district; understand the formula; look at a place; read an analysis; change the formula;
+ * look something up; learn how the figures are made.
+ *
+ * `Explained` is second (#712). Understanding the formula comes before analysing it, and a reader who
+ * has found their district and does not yet know what a "state share" is wants it next.
  *
  * # Two of them are links, not menus
  *
@@ -399,6 +429,14 @@ export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavEntry[] {
       // length: a count that a regenerated panel makes wrong is worse than no count.
       blurb: `All ${bundle.statewide.districts}, by name or IRN, each with the formula's answer beside the one it receives.`,
       label: NAMES.districts.name,
+    },
+    {
+      kind: "group",
+      key: "explained",
+      front: NAMES.explained.href,
+      blurb: "The formula's largest effects, one question at a time, in plain words with the math behind them.",
+      label: NAMES.explained.name,
+      sections: explainedRuns(),
     },
     {
       kind: "group",
