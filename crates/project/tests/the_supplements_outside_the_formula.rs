@@ -399,6 +399,39 @@ fn no_district_has_met_the_distress_trigger_on_a_star_rated_card() {
     assert_eq!(met, 0, "districts below two stars on all three held cards");
 }
 
+/// The three commission districts on the three held cards, read against division (N).
+///
+/// A transition out of R.C. 3302.10 begins with an overall rating of three stars or higher and
+/// ends after two further years at two stars or higher. East Cleveland reaches three on the
+/// 2024-25 card, Youngstown on the 2025-26 card, and Lorain on neither.
+#[test]
+fn the_commission_districts_on_the_held_cards() {
+    let exit = project::statute::section("3302.10").body;
+    assert!(
+        exit.contains("overall performance rating of three stars or higher")
+            && exit.contains("two stars or higher"),
+        "R.C. 3302.10(N) reads as this test assumes"
+    );
+
+    let editions = [
+        overall_ratings("overall_star_rating_2324"),
+        overall_ratings("overall_star_rating_2425"),
+        overall_ratings("overall_star_rating_2526"),
+    ];
+    let stars = |irn: &str| editions.each_ref().map(|e| e.get(irn).copied());
+    assert_eq!(
+        stars("043901"),
+        [Some(2.0), Some(3.0), Some(3.0)],
+        "East Cleveland"
+    );
+    assert_eq!(stars("044263"), [Some(2.0), Some(2.0), Some(2.5)], "Lorain");
+    assert_eq!(
+        stars("045161"),
+        [Some(2.0), Some(2.5), Some(3.0)],
+        "Youngstown"
+    );
+}
+
 /// The progress columns are a year later than their headers say, and `O2 > O3` compares
 /// 2024-25 against 2023-24.
 ///
