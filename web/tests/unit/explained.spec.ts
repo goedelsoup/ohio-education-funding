@@ -45,6 +45,8 @@ import {
   reach,
   shareOf,
 } from "../../src/lib/explained/state-share.ts";
+import { CHECKED, IDENTITY as BOUNDS_IDENTITY, example as boundsExample, recounts } from "../../src/lib/explained/bounds.ts";
+import { census } from "../../src/lib/bounds.ts";
 import { CHAIN, EMPTYING_FLOOR, EMPTYING_LOSS, inflation } from "../../src/lib/explained/anchor-chain.ts";
 import { DISTRICT_FAN_YEARS } from "../../src/lib/project.ts";
 import { IDENTITY as PROJECTION_IDENTITY, example as projectionExample } from "../../src/lib/explained/projection.ts";
@@ -1000,5 +1002,40 @@ describe("How is a bus ride paid for? (#718)", () => {
     const below = districts.filter((d) => bus(d) < bus(ex)).length;
     const above = districts.filter((d) => bus(d) > bus(ex)).length;
     expect(Math.abs(below - above)).toBeLessThanOrEqual(1);
+  });
+});
+
+describe("What is a floor or a ceiling, and whom does it decide? (#718)", () => {
+  const { districts } = loadFeed().bundle;
+  const { rows } = census();
+
+  test("every checked bound's census count is the feed's recount, exactly", () => {
+    const counted = recounts(rows, districts);
+    expect(counted).toHaveLength(CHECKED.length);
+    expect(reconciles(BOUNDS_IDENTITY, counted)).toEqual([]);
+  });
+
+  test("a census row off by one district fails it", () => {
+    const doctored = rows.map((r) => (r.label === "The guarantee itself" ? { ...r, value: r.value + 1 } : r));
+    expect(reconciles(BOUNDS_IDENTITY, recounts(doctored, districts))).toEqual(["The guarantee itself"]);
+  });
+
+  test("a renamed census row fails loudly rather than vanishing", () => {
+    const renamed = rows.map((r) => (r.label === "Guarantee base held at zero" ? { ...r, label: "renamed" } : r));
+    expect(() => recounts(renamed, districts)).toThrow(/Guarantee base held at zero/);
+  });
+
+  test("the example sits on at least as many checked bounds as any district", () => {
+    const on = (d: (typeof districts)[number]) => CHECKED.filter((b) => b.on(d)).length;
+    const ex = boundsExample(districts);
+    for (const d of districts) expect(on(d)).toBeLessThanOrEqual(on(ex));
+  });
+
+  test("the census's two ends are the corpus's", () => {
+    // The node's prose is wrapped, so a phrase can break across lines anywhere.
+    const text = loadCorpus().byId.get("funding-regime/fair-school-funding-plan")!.findings!.replace(/\s+/g, " ");
+    const c = census();
+    expect(text).toContain(`**${c.rows.length}** such bounds, and exactly **${c.cannotBind.length}** of them cannot bind`);
+    expect(text).toContain(`operative term for **${c.most.value}** of the ${c.most.of} districts`);
   });
 });
