@@ -1,0 +1,74 @@
+diff --git a/cjs/interface/event-target.js b/cjs/interface/event-target.js
+index 450b3d6331e1fe138defa8168a28458908e69d39..2dfb925aa4f32159528389e808e88e876ee0f685 100644
+--- a/cjs/interface/event-target.js
++++ b/cjs/interface/event-target.js
+@@ -41,9 +41,10 @@ function invokeListeners({currentTarget, target}) {
+  */
+ class DOMEventTarget {
+ 
+-  constructor() {
+-    wm.set(this, new Map);
+-  }
++  // Patched (ohio-education-funding #648): the listener map is made on the first
++  // addEventListener rather than for every node. One WeakMap entry per node made the build
++  // spend over a quarter of its time in the garbage collector; no node it renders has a listener.
++  constructor() {}
+ 
+   /**
+    * @protected
+@@ -53,7 +54,8 @@ class DOMEventTarget {
+   }
+ 
+   addEventListener(type, listener, options) {
+-    const map = wm.get(this);
++    let map = wm.get(this);
++    if (!map) wm.set(this, map = new Map);
+     if (!map.has(type)) 
+       map.set(type, new Map);
+     map.get(type).set(listener, options);
+@@ -61,7 +63,7 @@ class DOMEventTarget {
+ 
+   removeEventListener(type, listener) {
+     const map = wm.get(this);
+-    if (map.has(type)) {
++    if (map && map.has(type)) {
+       const listeners = map.get(type);
+       if (listeners.delete(listener) && !listeners.size)
+         map.delete(type);
+diff --git a/esm/interface/event-target.js b/esm/interface/event-target.js
+index edffded19e2af9c11d91795e1a6c2625665330d5..47272f2683994e1f61e1f5bcff078d04ae8e03d8 100644
+--- a/esm/interface/event-target.js
++++ b/esm/interface/event-target.js
+@@ -40,9 +40,10 @@ function invokeListeners({currentTarget, target}) {
+  */
+ class DOMEventTarget {
+ 
+-  constructor() {
+-    wm.set(this, new Map);
+-  }
++  // Patched (ohio-education-funding #648): the listener map is made on the first
++  // addEventListener rather than for every node. One WeakMap entry per node made the build
++  // spend over a quarter of its time in the garbage collector; no node it renders has a listener.
++  constructor() {}
+ 
+   /**
+    * @protected
+@@ -52,7 +53,8 @@ class DOMEventTarget {
+   }
+ 
+   addEventListener(type, listener, options) {
+-    const map = wm.get(this);
++    let map = wm.get(this);
++    if (!map) wm.set(this, map = new Map);
+     if (!map.has(type)) 
+       map.set(type, new Map);
+     map.get(type).set(listener, options);
+@@ -60,7 +62,7 @@ class DOMEventTarget {
+ 
+   removeEventListener(type, listener) {
+     const map = wm.get(this);
+-    if (map.has(type)) {
++    if (map && map.has(type)) {
+       const listeners = map.get(type);
+       if (listeners.delete(listener) && !listeners.size)
+         map.delete(type);

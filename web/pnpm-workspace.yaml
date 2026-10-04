@@ -1,3 +1,5 @@
 allowBuilds:
   esbuild: true
   sharp: true
+patchedDependencies:
+  linkedom@0.18.13: patches/linkedom@0.18.13.patch
