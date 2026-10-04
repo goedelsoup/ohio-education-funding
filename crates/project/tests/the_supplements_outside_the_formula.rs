@@ -137,7 +137,8 @@ fn two_of_the_three_qualifying_routes_do_not_require_a_good_rating() {
 /// # And the threshold that pays is below the threshold that releases
 ///
 /// R.C. 3302.10(N)(1) needs **three stars** to begin a transition out of a commission. 59
-/// districts in this panel sit below that — Youngstown among them at 2.5 — and 15 of them are
+/// districts in this panel sit below that on the 2024-25 report card — Youngstown among them at
+/// 2.5, as the next test dates it — and 15 of them are
 /// paid, $3.0m in total, not one of them through the star route. A district can be too poorly
 /// rated to start its own release and well enough rated to be paid for its performance in the
 /// same year.
@@ -253,6 +254,75 @@ fn the_supplement_reaches_districts_the_same_report_card_put_under_state_control
         "the trigger band's one paid district receives {}",
         paid_at_the_trigger[0].performance.amount
     );
+}
+
+/// The overall rating in the department's own download, one column per report card edition.
+const OVERALL_RATINGS: &str =
+    include_str!("../../dispersion/fixtures/report-card-overall-ratings.csv");
+
+/// One edition's overall rating by IRN, from [`OVERALL_RATINGS`].
+fn overall_ratings(column: &str) -> std::collections::HashMap<&'static str, f64> {
+    let mut lines = OVERALL_RATINGS.lines();
+    let header: Vec<&str> = lines.next().unwrap().split(',').collect();
+    let at = header
+        .iter()
+        .position(|h| *h == column)
+        .unwrap_or_else(|| panic!("no {column} column"));
+    lines
+        .filter_map(|line| {
+            let cells: Vec<&str> = line.split(',').collect();
+            assert_eq!(cells.len(), header.len(), "ragged row: {line}");
+            Some((cells[0], cells[at].parse().ok()?))
+        })
+        .collect()
+}
+
+/// The calculator's overall rating is the 2024-25 report card, and Youngstown's next one is three.
+///
+/// The FY2027 calculator labels `O1` only "Overall Performance Rating Stars", with no year. Its
+/// `Directions` sheet says the performance supplement "uses 2023-2024 and 2024-2025 report
+/// cards". The department's `DISTRICT_HIGH_LEVEL_2425.xlsx` settles which: `O1` equals its
+/// overall rating for **every one of the 607 rated districts**, and the districts the calculator
+/// zero-fills are not in the download at all. So the 2.5 stars above is Youngstown's 2024-25
+/// rating, correctly dated, and the 59 below three stars are counted on that card.
+///
+/// The 2025-26 card, released in September 2026, rates Youngstown at **three stars**, the
+/// threshold R.C. 3302.10(N)(1) needs to begin a transition out. East Cleveland holds at three
+/// and Lorain moves from two to two and a half.
+#[test]
+fn the_overall_rating_the_model_pays_on_is_the_2024_25_card() {
+    let panel = panel::panel();
+    let rated_2425 = overall_ratings("overall_star_rating_2425");
+
+    let mut matched = 0;
+    for record in &panel {
+        let Some(stars) = record.performance.stars else {
+            continue;
+        };
+        match rated_2425.get(record.irn.as_str()) {
+            Some(&rating) => {
+                assert_eq!(
+                    stars, rating,
+                    "{} reads {stars} in the calculator and {rating} on the 2024-25 card",
+                    record.name
+                );
+                matched += 1;
+            }
+            None => assert_eq!(
+                stars, 0.0,
+                "{} is rated {stars} in the calculator but absent from the 2024-25 card",
+                record.name
+            ),
+        }
+    }
+    assert_eq!(matched, 607, "rated districts matched to the 2024-25 card");
+    assert_eq!(rated_2425.len(), 607);
+
+    let rated_2526 = overall_ratings("overall_star_rating_2526");
+    let years = |irn: &str| (rated_2425.get(irn).copied(), rated_2526.get(irn).copied());
+    assert_eq!(years("045161"), (Some(2.5), Some(3.0)), "Youngstown");
+    assert_eq!(years("043901"), (Some(3.0), Some(3.0)), "East Cleveland");
+    assert_eq!(years("044263"), (Some(2.0), Some(2.5)), "Lorain");
 }
 
 /// The finding: a component of an equalising formula, distributed inversely to need.

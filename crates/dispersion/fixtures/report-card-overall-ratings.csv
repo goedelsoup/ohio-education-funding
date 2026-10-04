@@ -1,0 +1,608 @@
+irn,district,overall_star_rating_2425,overall_star_rating_2526
+000442,Manchester Local,3.5,3.5
+043489,Akron City,3.5,3
+043497,Alliance City,3,3
+043505,Ashland City,4,4
+043513,Ashtabula Area City,2,2.5
+043521,Athens City School District,4,4
+043539,Barberton City,2.5,3
+043547,Bay Village City,5,5
+043554,Beachwood City,5,5
+043562,Bedford City,3,3
+043570,Bellaire Local,3,3
+043588,Bellefontaine City,3.5,3.5
+043596,Bellevue City,4,4
+043604,Belpre City,3,3.5
+043612,Berea City,4,4
+043620,Bexley City,5,5
+043638,Bowling Green City School District,4.5,4.5
+043646,Brecksville-Broadview Heights City,5,5
+043653,Brooklyn City,4,4
+043661,Brunswick City,4.5,4.5
+043679,Bryan City,3.5,3.5
+043687,Bucyrus City,3,3.5
+043695,Cambridge City,2.5,2.5
+043703,Campbell City,2.5,2.5
+043711,Canton City,2.5,2
+043729,Celina City,3.5,3.5
+043737,Centerville City,5,4.5
+043745,Chillicothe City,2.5,3
+043752,Cincinnati Public Schools,2.5,3
+043760,Circleville City,3,3
+043778,Claymont City,3,3
+043786,Cleveland Municipal,2.5,2.5
+043794,Cleveland Heights-University Heights City,3.5,3.5
+043802,Columbus City Schools District,2,2.5
+043810,Conneaut Area City,3,3
+043828,Coshocton City,3.5,3.5
+043836,Cuyahoga Falls City School District,3,3.5
+043844,Dayton City,2,2
+043851,Deer Park Community City,3.5,4
+043869,Defiance City,3.5,4
+043877,Delaware City,4,4.5
+043885,Delphos City,3.5,3
+043893,Dover City,3.5,3.5
+043901,East Cleveland City School District,3,3
+043919,East Liverpool City,3,2.5
+043927,East Palestine City,2.5,3
+043935,Eaton Community City,4,3.5
+043943,Elyria City Schools,2,2.5
+043950,Euclid City,2.5,3
+043968,Fairborn City,4,4
+043976,Fairview Park City,4.5,4
+043984,Findlay City,3.5,3
+043992,Fostoria City,2.5,2.5
+044008,Franklin City,2.5,3
+044016,Fremont City,3.5,3.5
+044024,Galion City,3,3
+044032,Gallipolis City,3,3
+044040,Garfield Heights City Schools,3,2.5
+044057,Geneva Area City,3,3
+044065,Girard City School District,3.5,3.5
+044073,Grandview Heights Schools,5,5
+044081,Winton Woods City,2.5,3
+044099,Greenville City,3,3.5
+044107,Hamilton City,3,3.5
+044115,Heath City,4,4
+044123,Hillsboro City,3.5,3.5
+044131,Huron City Schools,4.5,4.5
+044149,Ironton City School District,3.5,3.5
+044156,Jackson City,3,3.5
+044164,Kent City,4.5,4.5
+044172,Kenton City,2.5,3
+044180,Kettering City School District,4,4.5
+044198,Lakewood City,4,3.5
+044206,Lancaster City,3.5,3.5
+044214,Lebanon City,4,4.5
+044222,Lima City,2,2
+044230,Lockland Local,3,2.5
+044248,Logan-Hocking Local,3.5,3.5
+044255,London City,3.5,3.5
+044263,Lorain City,2,2.5
+044271,Loveland City,4.5,5
+044289,Madeira City,5,5
+044297,Mansfield City,3,3
+044305,Maple Heights City,3,3
+044313,Mariemont City,5,5
+044321,Marietta City,3,3
+044339,Marion City,3,3
+044347,Martins Ferry City,2.5,3
+044354,Massillon City,2.5,2.5
+044362,Maumee City,4,3.5
+044370,Mayfield City,5,5
+044388,Medina City SD,4.5,4
+044396,Miamisburg City,3.5,3.5
+044404,Middletown City,2,2
+044412,Mt Healthy City,2.5,2.5
+044420,Mount Vernon City,4,4.5
+044438,Napoleon Area City,3.5,3.5
+044446,Nelsonville-York City,3,3
+044453,Newark City,2.5,2.5
+044461,New Boston Local,3.5,3
+044479,New Lexington School District,3,3
+044487,New Philadelphia City,3.5,3
+044495,Niles City,3.5,3
+044503,North Canton City,4.5,4.5
+044511,North College Hill City,2,2.5
+044529,North Olmsted City,3.5,4
+044537,North Ridgeville City,4,4.5
+044545,North Royalton City,4.5,4.5
+044552,Norton City,4,4.5
+044560,Norwalk City,3,3
+044578,Norwood City,3.5,3.5
+044586,Oakwood City,5,5
+044594,Oberlin City Schools,4.5,4
+044602,Oregon City,4,3.5
+044610,Orrville City,3.5,3.5
+044628,Painesville City Local,3,3
+044636,Parma City,4,4
+044644,Piqua City,3.5,4
+044651,Port Clinton City,4,4.5
+044669,Portsmouth City,3,2.5
+044677,Princeton City,4,4
+044685,Ravenna City,2.5,2.5
+044693,Reading Community City,3.5,3.5
+044701,Rocky River City,5,5
+044719,St Bernard-Elmwood Place City,3.5,3.5
+044727,St Marys City,3,3.5
+044735,Salem City,3,3
+044743,Sandusky City,2.5,2.5
+044750,Shaker Heights City,4,4
+044768,Sheffield-Sheffield Lake City,3,3.5
+044776,Shelby City,4.5,4
+044784,Sidney City,2.5,3
+044792,South Euclid-Lyndhurst City,3.5,3
+044800,South-Western City,3,3.5
+044818,Springfield City School District,2.5,2.5
+044826,Steubenville City,4,5
+044834,Stow-Munroe Falls City School District,4,4.5
+044842,Strongsville City,4.5,5
+044859,Struthers City,4,3.5
+044867,Sycamore Community City,4.5,5
+044875,Sylvania Schools,4,4.5
+044883,Tallmadge City,4,4
+044891,Tiffin City Schools,3,3.5
+044909,Toledo City,2,2
+044917,Toronto City,3,3
+044925,Troy City,4.5,4.5
+044933,Upper Arlington City,5,5
+044941,Urbana City,3,3
+044958,Vandalia-Butler City,3.5,4
+044966,Van Wert City,3.5,3.5
+044974,Wadsworth City,4.5,4.5
+044982,Wapakoneta City,3.5,3.5
+044990,Warren City,2.5,3
+045005,Warrensville Heights City,3.5,3
+045013,Washington Court House City,2.5,3
+045021,Wellston City,3,3.5
+045039,Wellsville Local,2,3
+045047,Westerville City,3.5,3.5
+045054,West Carrollton City,3,3
+045062,Westlake City,4.5,5
+045070,Whitehall City,2.5,3
+045088,Wickliffe City,3,3.5
+045096,Willard City,3.5,4
+045104,Willoughby-Eastlake City,3.5,3.5
+045112,Wilmington City,3,3
+045120,Wooster City,4,4.5
+045138,Worthington City,4,4
+045146,Wyoming City,5,5
+045153,Xenia Community City,3,3
+045161,Youngstown City,2.5,3
+045179,Zanesville City,3,3
+045187,Ada Exempted Village,4,4
+045195,Amherst Exempted Village,4,4
+045203,Barnesville Exempted Village,3.5,4
+045211,Bluffton Exempted Village,4.5,4.5
+045229,Bradford Exempted Village,3.5,3
+045237,Bridgeport Exempted Village,3,3
+045245,Harrison Hills City,2.5,3
+045252,Caldwell Exempted Village,3,3
+045260,Carey Exempted Village Schools,3.5,3.5
+045278,Carrollton Exempted Village,4,4
+045286,Chagrin Falls Exempted Village,5,5
+045294,Chesapeake Union Exempted Village,3.5,4
+045302,Clyde-Green Springs Exempted Village,4,4
+045310,Coldwater Exempted Village,4.5,4.5
+045328,Columbiana Exempted Village,4.5,5
+045336,Covington Exempted Village,4,4
+045344,Crestline Exempted Village,2,2.5
+045351,Crooksville Exempted Village,2.5,2.5
+045369,Fairport Harbor Exempted Village,3,3
+045377,Georgetown Exempted Village,4.5,4.5
+045385,Gibsonburg Exempted Village,3.5,3.5
+045393,Granville Exempted Village,5,5
+045401,Greenfield Exempted Village,3.5,3.5
+045419,Hicksville Exempted Village School District,4.5,5
+045427,Hubbard Exempted Village,3,3.5
+045435,Indian Hill Exempted Village,5,5
+045443,Leetonia Exempted Village School District,4,3
+045450,Lisbon Exempted Village,3,3.5
+045468,Loudonville-Perrysville Exempted Village,4,4
+045476,Marysville Exempted Village,4,3.5
+045484,Mechanicsburg Exempted Village,4,4
+045492,Mentor Exempted Village,4.5,4.5
+045500,Milford Exempted Village,4.5,4.5
+045518,Milton-Union Exempted Village,3.5,3.5
+045526,Montpelier Exempted Village,3,3
+045534,Mount Gilead Exempted Village,4,4
+045542,Newcomerstown Exempted Village,3.5,3
+045559,New Richmond Exempted Village,3.5,3.5
+045567,Newton Falls Exempted Village,3.5,3.5
+045575,Paulding Exempted Village,3.5,3.5
+045583,Perrysburg Exempted Village,5,5
+045591,Rittman Exempted Village,4.5,4.5
+045609,Rossford Exempted Village,3.5,3.5
+045617,Tipp City Exempted Village,4.5,4
+045625,Upper Sandusky Exempted Village,4,4
+045633,Versailles Exempted Village,5,5
+045641,Wauseon Exempted Village,3.5,4
+045658,Wellington Exempted Village,3,3
+045666,Windham Exempted Village,3,3
+045674,Yellow Springs Exempted Village,4.5,4.5
+045757,Allen East Local,4,3
+045765,Bath Local,3.5,4
+045773,Elida Local,3.5,3.5
+045781,Perry Local,3.5,4
+045799,Shawnee Local,4,4
+045807,Spencerville Local,4.5,4
+045823,Hillsdale Local,4,4
+045831,Mapleton Local,4,4
+045856,Buckeye Local,3.5,4
+045864,Grand Valley Local,3.5,3.5
+045872,Jefferson Area Local,4,4.5
+045880,Pymatuning Valley Local School District,3,2.5
+045906,Alexander Local,4,3.5
+045914,Federal Hocking Local,3,3
+045922,Trimble Local,2.5,2
+045948,Minster Local,5,5
+045955,New Bremen Local,5,5
+045963,New Knoxville Local,4.5,5
+045971,Waynesfield-Goshen Local,3.5,4
+045997,St Clairsville-Richland City,3.5,3.5
+046003,Shadyside Local,3.5,3.5
+046011,Union Local,3,3
+046037,Eastern Local School District,4,4
+046045,Fayetteville-Perry Local,3.5,4
+046060,Western Brown Local,3.5,3.5
+046078,Ripley-Union-Lewis-Huntington Local,3,3.5
+046094,Edgewood City School District,3,3.5
+046102,Fairfield City,3.5,4
+046110,Lakota Local,4.5,4.5
+046128,Madison Local,3.5,3.5
+046136,New Miami Local,3,3
+046144,Ross Local,4.5,4.5
+046151,Talawanda City,4,4.5
+046177,Brown Local,3,3.5
+046193,Graham Local,4.5,4.5
+046201,Triad Local,3.5,3.5
+046219,West Liberty-Salem Local,4.5,4.5
+046235,Greenon Local,3.5,3
+046243,Tecumseh Local,3.5,3
+046250,Northeastern Local,3,3.5
+046268,Northwestern Local,3.5,3.5
+046276,Southeastern Local,4,3.5
+046284,Clark-Shawnee Local,4.5,4
+046300,Batavia Local,4,4.5
+046318,Bethel-Tate Local,4,4
+046326,Clermont Northeastern Local,3,2.5
+046334,Felicity-Franklin Local,3,3
+046342,Goshen Local,4.5,5
+046359,West Clermont Local,3.5,4
+046367,Williamsburg Local,4.5,5
+046383,Blanchester Local,4.5,4.5
+046391,Clinton-Massie Local,4.5,4.5
+046409,East Clinton Local,3.5,3.5
+046425,Beaver Local,4.5,4.5
+046433,Crestview Local,3.5,4
+046441,Southern Local,3,3
+046458,United Local,3.5,4
+046474,Ridgewood Local,4,4
+046482,River View Local,3,3
+046508,Buckeye Central Local,4,4
+046516,Colonel Crawford Local,4.5,4.5
+046524,Wynford Local,3.5,4
+046557,Cuyahoga Heights Local,5,5
+046565,Independence Local,5,4.5
+046573,Olmsted Falls City,4.5,4.5
+046581,Orange City,5,5
+046599,Richmond Heights Local,3,3.5
+046607,Solon City,5,5
+046623,Ansonia Local,4,4
+046631,Arcanum-Butler Local,4,4
+046649,Franklin Monroe Local,4.5,4
+046672,Mississinawa Valley Local,3.5,4
+046680,Tri-Village Local,4.5,4
+046706,Ayersville Local,3.5,4
+046714,Central Local,4.5,4.5
+046722,Northeastern Local,4.5,4
+046748,Big Walnut Local,4,4
+046755,Buckeye Valley Local,5,5
+046763,Olentangy Local,5,5
+046789,Edison Local (formerly Berlin-Milan),4,4
+046805,Margaretta Local,4,4
+046813,Perkins Local,3.5,4.5
+046821,Vermilion Local,3.5,3.5
+046847,Amanda-Clearcreek Local,3,3
+046854,Berne Union Local,3.5,4
+046862,Bloom-Carroll Local,4,4
+046870,Fairfield Union Local,4,4.5
+046888,Liberty Union-Thurston Local,4.5,4
+046896,Pickerington Local,4,4.5
+046904,Walnut Township Local,2.5,3
+046920,Miami Trace Local,3.5,4
+046946,Canal Winchester Local,4,4
+046953,Hamilton Local,2.5,2.5
+046961,Gahanna-Jefferson City,4,4
+046979,Groveport Madison Local,3.5,3.5
+046995,New Albany-Plain Local,5,5
+047001,Reynoldsburg City,3,3.5
+047019,Hilliard City,4,4.5
+047027,Dublin City,4.5,4.5
+047043,Archbold-Area Local,4,4
+047050,Evergreen Local,4.5,4
+047068,Fayette Local,3,2.5
+047076,Pettisville Local,4,4
+047084,Pike-Delta-York Local,4,4
+047092,Swanton Local,3.5,3.5
+047167,Berkshire Local,4,4
+047175,Cardinal Local,3.5,3.5
+047183,Chardon Local,4.5,5
+047191,Kenston Local,4.5,5
+047225,West Geauga Local,5,5
+047241,Beavercreek City,4.5,4.5
+047258,Cedar Cliff Local,4,4.5
+047266,Greeneview Local,3.5,3.5
+047274,Bellbrook-Sugarcreek Local,5,5
+047308,Rolling Hills Local,3,3.5
+047332,Finneytown Local,2.5,2.5
+047340,Forest Hills Local,4.5,5
+047365,Northwest Local,3.5,4
+047373,Oak Hills Local,4,4
+047381,Southwest Local,4,4
+047399,Three Rivers Local,4.5,4.5
+047415,Arcadia Local,4,4
+047423,Arlington Local,4,4
+047431,Cory-Rawson Local,3,3
+047449,Liberty-Benton Local,4.5,4.5
+047456,McComb Local,3.5,3.5
+047464,Van Buren Local,4,4
+047472,Vanlue Local,3.5,3.5
+047498,Hardin Northern Local,3.5,4
+047506,Ridgemont Local,3,3.5
+047514,Riverdale Local,3,3
+047522,Upper Scioto Valley Local,3.5,3.5
+047548,Conotton Valley Union Local,4.5,4.5
+047571,Holgate Local,3.5,3.5
+047589,Liberty Center Local,4.5,4
+047597,Patrick Henry Local,4,4.5
+047613,Bright Local,3.5,4
+047621,Fairfield Local,4.5,4.5
+047639,Lynchburg-Clay Local,4,4
+047688,East Holmes Local,3.5,4
+047696,West Holmes Local,3.5,3.5
+047712,Monroeville Local,3.5,3.5
+047720,New London Local,3,3
+047738,South Central Local,3.5,3.5
+047746,Western Reserve Local,3.5,4
+047761,Oak Hill Union Local,2.5,2.5
+047787,Buckeye Local,2.5,3
+047795,Edison Local,3.5,4
+047803,Indian Creek Local,3.5,3.5
+047829,Centerburg Local,3.5,4
+047837,Danville Local,4,4.5
+047845,East Knox Local,3.5,3
+047852,Fredericktown Local,4,4
+047878,Kirtland Local,5,5
+047886,Madison Local,3,3.5
+047894,Riverside Local,3.5,3.5
+047902,Perry Local,4.5,4.5
+047928,Dawson-Bryant Local,4,3.5
+047936,Fairland Local,3.5,3.5
+047944,Rock Hill Local,3,3
+047951,South Point Local,3,3
+047969,Symmes Valley Local,3.5,3.5
+047985,Johnstown-Monroe Local,3.5,4
+047993,Lakewood Local,3.5,4
+048009,Licking Heights Local,4,4.5
+048017,Licking Valley Local,3,3
+048025,North Fork Local,3,2.5
+048033,Northridge Local,4,4
+048041,Southwest Licking Local,4,4
+048074,Benjamin Logan Local,4,4
+048082,Indian Lake Local,4,4
+048090,Riverside Local,3.5,3.5
+048116,Avon Local,5,5
+048124,Avon Lake City,4.5,4.5
+048132,Clearview Local,3,2.5
+048140,Columbia Local,4,4.5
+048157,Firelands Local,4,4
+048165,Keystone Local,4,4
+048173,Midview Local,4,4
+048207,Anthony Wayne Local,4.5,4.5
+048215,Ottawa Hills Local,5,5
+048223,Springfield Local,3,3.5
+048231,Washington Local,3,3
+048256,Jefferson Local,3.5,3.5
+048264,Jonathan Alder Local,4.5,4.5
+048272,Madison-Plains Local,3.5,4
+048298,Austintown Local Schools,4,4
+048306,Boardman Local,3.5,3.5
+048314,Canfield Local,4.5,4.5
+048322,Jackson-Milton Local,4,4
+048330,Lowellville Local,3.5,4
+048348,Poland Local,4,4
+048355,Sebring Local,3.5,4
+048363,South Range Local,4.5,4
+048371,Springfield Local,3.5,3.5
+048389,West Branch Local,4.5,4.5
+048397,Western Reserve Local,4,4.5
+048413,Elgin Local,3.5,3.5
+048421,Pleasant Local,4,3.5
+048439,Ridgedale Local,3.5,3
+048447,River Valley Local,3.5,3.5
+048462,Black River Local,4,3.5
+048470,Buckeye Local,4,4
+048488,Cloverleaf Local,4.5,4
+048496,Highland Local,5,5
+048512,Eastern Local,2,3
+048520,Meigs Local,2.5,2.5
+048538,Southern Local,2.5,3
+048553,Marion Local,5,5
+048579,Parkway Local,4,4
+048587,St Henry Consolidated Local,4.5,4.5
+048595,Fort Recovery Local,5,5
+048611,Bethel Local,4,3.5
+048629,Miami East Local,5,5
+048637,Newton Local,4,4
+048652,Switzerland of Ohio Local,3,3
+048678,Brookville Local,4.5,4.5
+048686,Jefferson Township Local,2,3
+048694,Trotwood-Madison City,2.5,3
+048702,Mad River Local,3,3
+048710,New Lebanon Local School District,3,3
+048728,Northmont City,4,4
+048736,Northridge Local,2.5,2.5
+048744,Valley View Local,4,4
+048751,Huber Heights City,2.5,3
+048777,Morgan Local,3,3
+048793,Cardington-Lincoln Local,3,3
+048801,Highland Local,3.5,4
+048819,Northmor Local,4.5,4
+048835,East Muskingum Local,4,3.5
+048843,Franklin Local,3,3.5
+048850,Maysville Local,3,3
+048876,Tri-Valley Local,4,4
+048884,West Muskingum Local,3.5,3.5
+048900,Noble Local,3.5,3.5
+048926,Benton Carroll Salem Local,4.5,4.5
+048934,Danbury Local,4,4.5
+048942,Genoa Area Local,4,3.5
+048975,Put-In-Bay Local,2.5,3.5
+048991,Antwerp Local,3.5,4
+049031,Wayne Trace Local,4,3.5
+049056,Northern Local,3,3.5
+049064,Southern Local,3.5,3.5
+049080,Logan Elm Local,3.5,3.5
+049098,Teays Valley Local,4,4
+049106,Westfall Local,3,3
+049122,Eastern Local School District,3.5,3
+049130,Scioto Valley Local,3,3.5
+049148,Waverly City,3,3
+049155,Western Local,2.5,3
+049171,Aurora City,5,5
+049189,Crestwood Local,3.5,4
+049197,Field Local,4,3.5
+049205,James A Garfield Local,4,4.5
+049213,Rootstown Local,4,3.5
+049221,Southeast Local,3,3.5
+049239,Streetsboro City,4,4
+049247,Waterloo Local,3.5,3
+049270,National Trail Local,3.5,3.5
+049288,Preble Shawnee Local,3,3.5
+049296,Twin Valley Community Local,3.5,3
+049312,Columbus Grove Local,4.5,4.5
+049320,Continental Local,4,4
+049338,Jennings Local,4,4
+049346,Kalida Local,4.5,5
+049353,Leipsic Local,4.5,4
+049361,Miller City-New Cleveland Local,4.5,4
+049379,Ottawa-Glandorf Local,4,4
+049387,Ottoville Local,4.5,5
+049395,Pandora-Gilboa Local,3.5,3.5
+049411,Clear Fork Valley Local,3.5,4
+049429,Crestview Local,3.5,3.5
+049437,Lexington Local,4,4
+049445,Lucas Local,4,4
+049452,Madison Local,3.5,4
+049460,Plymouth-Shiloh Local,4,4
+049478,Ontario Local,4,4
+049494,Adena Local,2.5,3
+049502,Huntington Local,3,3
+049510,Paint Valley Local,3,3
+049528,Southeastern Local,3.5,4
+049536,Union-Scioto Local,3.5,3.5
+049544,Zane Trace Local,3,3
+049569,Lakota Local,4,3.5
+049577,Woodmore Local,3.5,3.5
+049593,Bloom-Vernon Local,4,4.5
+049601,Clay Local,3.5,3.5
+049619,Green Local,4,3.5
+049627,Minford Local,3,3
+049635,Northwest Local,4.5,4
+049643,Valley Local,4,3.5
+049650,Washington-Nile Local,3.5,3
+049668,Wheelersburg Local,4,4.5
+049684,Seneca East Local,5,4.5
+049700,Hopewell-Loudon Local,4,4
+049718,New Riegel Local,4.5,4.5
+049726,Old Fort Local,3.5,4
+049759,Anna Local,5,5
+049767,Botkins Local,4.5,4.5
+049775,Fairlawn Local,3.5,4
+049783,Fort Loramie Local,5,5
+049791,Hardin-Houston Local,5,5
+049809,Jackson Center Local,5,5
+049817,Russia Local,5,5
+049833,Canton Local,4,4
+049841,Fairless Local,3.5,3.5
+049858,Jackson Local,4.5,4.5
+049866,Lake Local,4.5,4.5
+049874,Louisville City,4,4.5
+049882,Marlington Local,3.5,4
+049890,Minerva Local,4,3.5
+049908,Northwest Local,4,4
+049916,Osnaburg Local,3.5,3.5
+049924,Perry Local,4,4.5
+049932,Plain Local,3.5,3.5
+049940,Sandy Valley Local,3.5,3
+049957,Tuslaw Local,4.5,4.5
+049973,Woodridge Local,3.5,4
+049981,Copley-Fairlawn City,4,4
+049999,Coventry Local,3,3.5
+050005,Manchester Local,4,4
+050013,Green Local,4.5,4.5
+050021,Hudson City,5,5
+050039,Mogadore Local,3.5,3.5
+050047,Nordonia Hills City,4,4
+050054,Revere Local,5,5
+050062,Springfield Local,3.5,3.5
+050070,Twinsburg City,4.5,4.5
+050096,Bloomfield-Mespo Local,2.5,4
+050112,Bristol Local,3.5,4
+050120,Brookfield Local,3.5,3
+050138,Champion Local,4.5,4.5
+050153,Mathews Local,3.5,3.5
+050161,Howland Local,4,4
+050179,Joseph Badger Local,4,4
+050187,Lakeview Local,4,5
+050195,Liberty Local,2.5,3
+050203,Lordstown Local,3.5,3.5
+050211,Maplewood Local,4.5,5
+050229,McDonald Local,4.5,4
+050237,Southington Local,3.5,3.5
+050245,LaBrae Local,3,3.5
+050252,Weathersfield Local,4.5,4.5
+050278,Garaway Local,4,4
+050286,Indian Valley Local,4.5,4.5
+050294,Strasburg-Franklin Local,3.5,3.5
+050302,Tuscarawas Valley Local,4.5,4
+050328,Fairbanks Local,4.5,4.5
+050336,North Union Local School District,3.5,3.5
+050351,Crestview Local,4,3.5
+050369,Lincolnview Local,4,4
+050393,Vinton County Local,3,3
+050419,Carlisle Local,3.5,3.5
+050427,Springboro Community City,4.5,4.5
+050435,Kings Local,4,4.5
+050443,Little Miami Local,4,4.5
+050450,Mason City,5,5
+050468,Wayne Local,5,4.5
+050484,Fort Frye Local,4.5,5
+050492,Frontier Local,3,3
+050500,Warren Local,4,4
+050518,Wolf Creek Local,3.5,3
+050534,Chippewa Local,4.5,4
+050542,Dalton Local,4,4.5
+050559,Green Local,4.5,4.5
+050567,Norwayne Local,4.5,4
+050575,Northwestern Local,3.5,4
+050583,Waynedale Local,3.5,4.5
+050591,Triway Local,4,4
+050617,Edgerton Local,4,4
+050625,Edon Northwest Local,3.5,3.5
+050633,Millcreek-West Unity Local,4,3.5
+050641,North Central Local,3,2.5
+050658,Stryker Local,3.5,3.5
+050674,Eastwood Local,4.5,4.5
+050682,Elmwood Local,3.5,3
+050690,Lake Local,3.5,3.5
+050708,North Baltimore Local,3,3.5
+050716,Northwood Local Schools,4,4
+050724,Otsego Local,4,4
+050740,Mohawk Local,4,3.5
+061903,Adams County Ohio Valley Local,3,3
+065680,Gallia County Local,2.5,3
+069682,East Guernsey Local,4,3.5
+091397,Tri-County North Local,3.5,4
+139303,Monroe Local,4.5,4
