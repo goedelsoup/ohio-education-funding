@@ -715,6 +715,21 @@
           "label": "Outside the formula"
         }
       ]
+    },
+    {
+      "route": "/explained/transportation",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/transportation",
+        "title": "How is a bus ride paid for?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
     }
   ],
   "formula-component/guarantee-open-enrolment-clawback": [

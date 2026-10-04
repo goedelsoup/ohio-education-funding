@@ -456,8 +456,9 @@ test.describe("routes", () => {
     // taxes rise when my house value does?" (#718), forty-four with "How does Ohio count poor
     // students?" (#718), forty-five with "Why is FY2011 still inside the formula?" (#718), and
     // forty-six with "What happened to the deduction for community schools and vouchers?" (#718),
-    // and forty-seven with "How sure is a projection?" (#718).
-    expect(hrefs).toHaveLength(47);
+    // forty-seven with "How sure is a projection?" (#718), and forty-eight with "How is a bus ride
+    // paid for?" (#718).
+    expect(hrefs).toHaveLength(48);
     for (const href of hrefs) {
       await page.goto(href);
       await expect(page.locator("h1"), `${href} has no heading`).toBeVisible();
