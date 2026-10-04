@@ -52,9 +52,15 @@ pub struct PerformanceSupplement {
     /// A report card cannot rate students it is forbidden to report, so a zero here means
     /// unrated, and any count of districts "below" a star threshold includes those two.
     pub stars: Option<f64>,
-    /// `O2`/`O3` — the progress component rating, and the year before it.
+    /// `O2` — the progress component rating on the **2024-25** report card.
+    ///
+    /// The workbook heads it "2023-2024". That header is a year stale: the column equals the
+    /// department's 2024-25 rating for every rated district, as `O1` does.
     pub progress: Option<f64>,
-    /// The year before, which the third qualifying route compares against.
+    /// `O3` — the progress rating on the **2023-24** card, which the third qualifying route
+    /// compares against. Headed "2022-2023", a year stale in the same way. A district the
+    /// 2023-24 card did not rate reads **0**, so Put-in-Bay, `NR` that year, qualifies on any
+    /// progress rating at all.
     pub progress_prior: Option<f64>,
     /// `Q4` — whether any of the three routes qualified it.
     pub eligible: bool,

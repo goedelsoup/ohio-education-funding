@@ -477,7 +477,8 @@ mod performance_columns {
     pub const IRN: usize = 0;
     /// `O1 Overall Performance Rating Stars` — 0 to 5 in half steps. One district reads `N/A`.
     pub const STARS: usize = 4;
-    /// `O2`/`O3` — the progress component rating for 2023-24 and the year before it.
+    /// `O2`/`O3` — the progress component rating on the 2024-25 and 2023-24 report cards. The
+    /// workbook heads them 2023-2024 and 2022-2023, each a year stale.
     pub const PROGRESS: usize = 5;
     pub const PROGRESS_PRIOR: usize = 6;
     /// `Q4. Overall Eligibility` — `Yes` on any of the three routes.

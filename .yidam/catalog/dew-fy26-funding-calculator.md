@@ -61,6 +61,10 @@ against the committed digest like any other source.
 - **There is an "Inflation factor" of 0.05 beside the rates, in both years, and it is in no
   section.** In FY2026 the adjacent cell carries $63.75, which is 5% of $1,275; in FY2027 that
   cell is zero. What it does is not established. [open]
+- **The `Performance Supplement` sheet is the FY2027 one's, headers included.** Its `O1`, `O2` and
+  `O3` match the FY2027 workbook's for all 612 rows, so they carry the same stale headers. `O2`,
+  headed 2023-2024, is the 2024-25 progress rating, and `O3`, headed 2022-2023, is the 2023-24
+  one. No FY2026 panel is extracted, so only the FY2027 columns are pinned by a test. [verified]
 
 **What is taken, and what this entry got wrong first.** It read:
 

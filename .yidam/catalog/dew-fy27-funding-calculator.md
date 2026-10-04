@@ -102,6 +102,14 @@ needing a spreadsheet engine.
   `Notes` sheet carries the same table for the FY2024 and FY2025 models and is byte-identical in
   both workbooks — two biennia stale, carried forward with everything else. Committed at
   `crates/project/fixtures/calculator-vintages.tsv`.
+
+  **The `Performance Supplement` sheet's headers are a year early, and the `Directions` sheet is
+  right again.** `O2` is headed "Progress Component Rating 2023-2024" and `O3` "… 2022-2023".
+  Against the department's high-level downloads, `O2` is the 2024-25 progress rating for all 607
+  rated districts and `O3` the 2023-24 one for all 606 that card rates. `O1`, headed with no year,
+  is the 2024-25 overall rating. A district a card did not rate reads 0. Pinned at
+  `crates/project/tests/the_supplements_outside_the_formula.rs`; see
+  [`dew-report-card-overall`](dew-report-card-overall.md).
 - **Display sheets and data sheets are different things.** `Base Cost`, `Local Capacity`, and
   `Summary SFPR` (with spaces) are single-district display views driven by a selector. The
   per-district tables are the underscore variants: `Base_Cost`, `Local_Capacity`,
