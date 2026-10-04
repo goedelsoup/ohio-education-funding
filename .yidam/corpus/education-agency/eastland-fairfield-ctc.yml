@@ -116,6 +116,38 @@ findings: |
   in the 1980s. Bexley appears there only as a district sending tuition-paying students in 1968.
   [verified]
   ([Wayback 20181011134351](http://web.archive.org/web/20181011134351/http://www.eastlandfairfield.com/50YearsALegacyofExcellence.aspx))
+
+  ### When the district was organized
+
+  The district was organized on May 13, 1965, more than three years before it opened, and under
+  another name. The Eastern Spectator of May 20, 1965 reports that "the five-man board of the
+  Eastern Franklin County Joint Vocational District held its organizational meeting last
+  Thursday", and that the district was "formed by action of the Canal Winchester, Groveport,
+  Whitehall, Reynoldsburg and Gahanna Schools". The board elected James Dugan its president.
+  [verified]
+  ([Eastern Spectator, May 20, 1965](https://archive.org/details/easternspectator00hart_0/page/n57/mode/1up))
+
+  The same paper had described the steps six weeks earlier. A county-wide plan among fourteen
+  districts had failed, and five of the six districts that tried again stood firm. The county
+  superintendent would take their proposal to the State Board of Education on April 12, the
+  local boards would approve it once more, and only then would a governing board be appointed:
+  three members from the Franklin County Board of Education and two from Whitehall's. [verified]
+  ([Eastern Spectator, April 8, 1965](https://archive.org/details/easternspectator00hart/page/n897/mode/1up))
+  The board that met on May 13 is that board: three of its members represent the county board and
+  two the Whitehall board. [verified] An organizational meeting is therefore the last of those
+  steps, and the district existed when it was held. Under R.C. 3311.18 the initiating unit, here the county board, sets the
+  date a joint vocational district is established. No source read here gives that date, and it
+  falls between April 12 and May 13, 1965. [inference]
+
+  The Eastland name came a year later. The board chose "Eastland Vocational" from a student's
+  entry for "the proposed Eastern Franklin County Vocational School", and Dugan presented her
+  prize. [verified]
+  ([Southside Spectator, April 27, 1966](https://archive.org/details/southsidespectat00ccar_0/page/n343/mode/1up))
+  Voters in the five districts rejected the first bond issue and operating levy on December 7,
+  1965 and passed both on May 3, 1966. That second vote is the 1966 bond issue Whitehall's
+  history records. [verified]
+  ([Eastern Spectator, December 16, 1965](https://archive.org/details/easternspectator00hart_0/page/n757/mode/1up);
+  [May 4, 1966](https://archive.org/details/easternspectator00hart_1/page/n6/mode/1up))
 properties:
   seeded_because: |
     JVSDs are funded on rules that differ from traditional districts in ways easy to overlook and
@@ -128,6 +160,7 @@ properties:
     child-nutrition return to establish.
   agency_type: joint-vocational
   county: Franklin and Fairfield
+  established: 1965-05-13
   typology: |
     Not applicable in the standard department typology, which classifies traditional districts.
     How JVSDs are grouped for peer comparison was recorded here as unresolved; the corpus's own
@@ -176,6 +209,23 @@ revisions:
     reach: |
       `established` is now the only unfilled field. The county pairing's count of twelve is
       unchanged: it tests the roster a name gives, and this one came from elsewhere.
+  - was: |
+      "Bounded, not dated." `established` was unfilled, with organization placed before the
+      September 1968 opening and probably by 1966, because the audits recite R.C. 3311.18 and no
+      date and the organizing resolutions were not found.
+    now: |
+      Organized May 13, 1965, as the Eastern Franklin County Joint Vocational School District,
+      when its five-member board held its organizational meeting. It took the Eastland name in
+      April 1966.
+    found_by: |
+      Searching for the district under a name it had already given up. A local weekly in the
+      member districts' area, digitized by the Internet Archive, covered each step from the
+      failed county-wide plan to the board's first meeting, all under the earlier name. Every
+      source checked before had been searched as Eastland.
+    reach: |
+      No field is unfilled now, and the last required-property omission leaves the lint baseline.
+      The opening date and the five founders are unchanged; the bond issue the node had dated by
+      Whitehall's history is now the second of two votes.
 figures:
   - key: dispersion/joint-vocational-districts
     value: 49
@@ -221,17 +271,6 @@ figures:
     value: 15
     field: findings
     as_written: "and **15** of them carry"
-unfilled:
-  - field: established
-    why: >-
-      Bounded, not dated. The district's own history says it "opened its doors in September 1968
-      as Eastland Vocational Center" after planning among five districts, and Whitehall's says a
-      1966 bond issue funded it; Fairfield Career Center, opened in 1987, is a second campus of the
-      same district, renamed Eastland-Fairfield about 2000, so there is no merger date to choose
-      between. Organization under R.C. 3311.18 therefore falls before September 1968 and probably
-      by 1966, but the Auditor of State's audits recite the section and no date, and the
-      organizing resolutions and the State Board's approval were not found. The department's
-      district profile does not carry the field.
 links:
   - target: ../education-agency.ont.yml
     relationship: instance-of

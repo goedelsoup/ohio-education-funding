@@ -464,8 +464,8 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 2049 | supported by a committed primary source |
-| `[inference]` | 433 | drawn from verified facts, not witnessed |
+| `[verified]` | 2054 | supported by a committed primary source |
+| `[inference]` | 434 | drawn from verified facts, not witnessed |
 | `[open]` | 215 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
@@ -508,7 +508,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `appropriating_bill` | 1 | 0 |
 | `accountability_effect` | 1 | 0 |
 
-**133 recorded withdrawals across 56 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**134 recorded withdrawals across 56 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Relationship vocabulary
@@ -554,14 +554,13 @@ writes an absence it has looked for.
 | declared `required: true` | 113 |
 | declared `required: false` | 8 |
 | declarations that do not say | 0 |
-| omissions of a required property | 1 |
+| omissions of a required property | 0 |
 | omissions of an optional property | 18 |
 
-**112 of the 121 declared properties are carried by every instance of their class.** An omission of a required property gates `yidam lint`, so the only one is listed in `.yidam/lint-baseline.yml` and the next is attributable to the commit that makes it. An omission of an optional one is reported and is not a defect. Every property some instance omits:
+**113 of the 121 declared properties are carried by every instance of their class.** An omission of a required property gates `yidam lint`, so none is listed in `.yidam/lint-baseline.yml` and the next is attributable to the commit that makes it. An omission of an optional one is reported and is not a defect. Every property some instance omits:
 
 | Property | Required | Instances omitting it | Instances |
 |---|---|--:|--:|
-| `education-agency.established` | yes | 1 | 7 |
 | `formula-component.function_tex` | no | 2 | 18 |
 | `funding-regime.boundary_note` | no | 1 | 5 |
 | `legislation.effective_note` | no | 2 | 16 |

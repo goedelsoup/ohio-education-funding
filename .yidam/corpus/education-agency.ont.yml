@@ -61,8 +61,8 @@ properties:
       Date the agency was chartered or organized, at the precision a source gives it — a year
       alone is common. No department file carries it: the district profile has no date column and
       the directory records only a system timestamp. It comes from an Auditor of State audit's
-      organization note where one recites a date, and otherwise from the district's own history,
-      and the node's claim tag says which. An agency no source dates records it under `unfilled:`
+      organization note where one recites a date, and otherwise from the district's own history
+      or a contemporary record of its organization, and the node's claim tag says which. An agency no source dates records it under `unfilled:`
       and stays in the baseline.
   - name: roles
     label: Roles

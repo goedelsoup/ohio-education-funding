@@ -23,8 +23,4 @@
 #
 # `detail` is informational. Violations are identified by check id and node, so rewording
 # a message does not make the baseline stale.
-violations:
-  missing-property:
-  - node: .yidam/corpus/education-agency/eastland-fairfield-ctc.yml
-    detail: '`established` is declared by `.yidam/corpus/education-agency.ont.yml` as `required: true` and this instance does not carry it'
-    since: e0e1c69e5849e0e2cf47fefd3c17560f6aef192d
+violations: {}
