@@ -14,7 +14,13 @@ import { compactMoney, money } from "../../lib/format.ts";
 import { fanSpec } from "../../lib/plot/spec.ts";
 import { renderToString } from "../../lib/plot/ssr.ts";
 import { currentLaw, modelOf } from "../../lib/policy.ts";
-import { forecastPath, growthPrior, meanDistrictBias, statuteNote } from "../../lib/project.ts";
+import {
+  DISTRICT_FAN_YEARS,
+  forecastPath,
+  growthPrior,
+  meanDistrictBias,
+  statuteNote,
+} from "../../lib/project.ts";
 import { heading } from "../../lib/section.ts";
 import type { Bundle, District } from "../../lib/types.ts";
 import BiasNote from "./BiasNote.astro";
@@ -31,7 +37,7 @@ const model = modelOf(bundle.statewide);
 const path = forecastPath(
   [d],
   currentLaw(model),
-  meta.base_year + 6,
+  meta.base_year + DISTRICT_FAN_YEARS,
   meta.base_year,
   meta.method,
   meta.damping,

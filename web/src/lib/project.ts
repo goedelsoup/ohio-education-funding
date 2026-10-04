@@ -93,6 +93,14 @@ export function spread(prior: Prior, horizon: number): number {
   return prior.z * prior.sigma * Math.pow(horizon, HORIZON_EXPONENT);
 }
 
+/**
+ * How many years past the base year a district's own fan is drawn.
+ *
+ * Six: the leg `scenario/guarantee-phase-out` projects, and the deepest horizon both bias
+ * populations reach. `projection.horizon` is only the lever's ceiling.
+ */
+export const DISTRICT_FAN_YEARS = 6;
+
 /** Standard deviation over `n − 1`. */
 export function standardDeviation(values: number[]): number {
   if (values.length < 2) return 0;
