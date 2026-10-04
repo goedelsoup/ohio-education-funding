@@ -54,6 +54,7 @@
  */
 
 import { count, escapeHtml, fixed, pct } from "./format.ts";
+import { renderRegimeKey, type RegimeEvent } from "./legislation.ts";
 import { seriesSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import type { MealProgramYear } from "./types.ts";
@@ -130,7 +131,7 @@ export function dekEnds(
 }
 
 /** The meal-program poverty share, October by October. */
-export function renderMealProgram(meal: MealProgramYear[]): string {
+export function renderMealProgram(meal: MealProgramYear[], events: RegimeEvent[] = []): string {
   const single = singleStream(meal);
   const split = splitStream(meal);
   if (single.length < 2) return "";
@@ -158,7 +159,7 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
           return `FY${p.at}: ${fixed(value, 1)}% ${p.a != null ? "of enrollment" : "of students with program access"}`;
         },
         // Neither denominator is formula aid or the guarantee, so neither line takes their hue (#706).
-        { width: w, tick: (year) => `FY${year}`, hues: { a: "plain", b: "plain-strong" } },
+        { width: w, tick: (year) => `FY${year}`, hues: { a: "plain", b: "plain-strong" }, events },
       ),
   { label: `Free and reduced-price lunch applications approved as a share of meal-program enrollment, FY${first.fiscal_year} to FY${last.fiscal_year}, across every public sponsor in the MR-81`, description: `${change == null ? "" : `Drawn as two unjoined lines because the denominator changes in FY${change}, so the step across it is partly the definition moving`}` },
   );
@@ -178,6 +179,7 @@ export function renderMealProgram(meal: MealProgramYear[]): string {
         anything.</p>
 
       <div class="chartwrap" data-chart="meal-program">${chart}</div>
+      ${renderRegimeKey(events, first.fiscal_year, last.fiscal_year)}
 
       ${
         change == null

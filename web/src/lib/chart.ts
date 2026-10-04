@@ -289,6 +289,16 @@ export interface Rank {
    * a colour, and the colour is the second channel rather than the only one.
    */
   marked?: string;
+  /**
+   * What the count is out of, where that is not what the rest of the chart's rows are out of:
+   * "of 43". Printed after the mark in muted ink.
+   *
+   * The census ranks raw counts, and seven of its thirty-eight bounds can reach fewer than the
+   * whole. "Clawback larger than the guarantee" decides 22 of the 43 districts it can reach and
+   * ranked below a bound at 38 of 609, with nothing on the chart to say so (#710). Ranking by share
+   * would change the question; the note keeps the count ranking and makes it honest.
+   */
+  note?: string;
 }
 
 /**

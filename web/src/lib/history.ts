@@ -50,6 +50,7 @@
 
 import type { SeriesPoint } from "./chart.ts";
 import { escapeHtml, money, pct } from "./format.ts";
+import { renderRegimeKey, type RegimeEvent } from "./legislation.ts";
 import { seriesSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import { convert, type Basis } from "./real.ts";
@@ -190,7 +191,7 @@ export function inBase(
 }
 
 /** Where the money came from, year by year. */
-export function renderRevenueMix(history: HistoryYear[]): string {
+export function renderRevenueMix(history: HistoryYear[], events: RegimeEvent[] = []): string {
   if (history.length < 2) return "";
 
   const first = firstOf(history);
@@ -214,7 +215,7 @@ export function renderRevenueMix(history: HistoryYear[]): string {
             : `FY${p.at}: ${p.a.toFixed(1)}% local, ${(p.b ?? 0).toFixed(1)}% state`,
         // Census shares, and state revenue there is not foundation aid: neither line takes the
         // formula's hue or the guarantee's (#706).
-        { width: w, tick: (year) => `FY${year}`, hues: { a: "plain", b: "plain-strong" } },
+        { width: w, tick: (year) => `FY${year}`, hues: { a: "plain", b: "plain-strong" }, events },
       ),
   { label: `Local and state shares of total school revenue across the Census Bureau's Ohio school systems, percent, FY${first.fiscal_year} to FY${last.fiscal_year}`, description: "The axis is truncated to the range of the two shares rather than starting at zero" },
   );
@@ -233,6 +234,7 @@ export function renderRevenueMix(history: HistoryYear[]): string {
         school system the Census Bureau surveyed.</p>
 
       <div class="chartwrap" data-chart="revenue-mix">${chart}</div>
+      ${renderRegimeKey(events, first.fiscal_year, last.fiscal_year)}
 
       <p class="note">The federal line is left off the chart and kept in the table below, because
         it is the one series whose ends cannot be read at face value. ${federalNote(history)}
@@ -262,6 +264,7 @@ export function renderEqualization(
   deflator: Deflator | null,
   base: number | null,
   basis: Basis,
+  events: RegimeEvent[] = [],
 ): string {
   if (history.length < 2) return "";
 
@@ -312,6 +315,7 @@ export function renderEqualization(
           hues: { a: "plain", b: "plain-strong" },
           span: both,
           unit: basis === "real" && base != null ? `in constant FY${base} dollars` : "in the dollars of each year",
+          events,
         },
       ),
   { label: `Gap in local revenue per pupil between the poorest and richest quarter of districts, and the part neither state nor federal aid closes, FY${first.fiscal_year} to FY${last.fiscal_year}, ${basis === "real" && base != null ? `in FY${base} dollars` : "in the dollars of each year"}`, description: "The axis is truncated to the range of the two series rather than starting at zero, and the line breaks at any year the panel skips" },
@@ -349,6 +353,7 @@ export function renderEqualization(
         ${basis === "real" ? `In FY${base} dollars.` : "In the dollars of each year."}</p>
 
       <div class="chartwrap" data-chart="equity-gap">${chart}</div>
+      ${renderRegimeKey(events, first.fiscal_year, last.fiscal_year)}
 
       <p class="note">State aid's share of the gap ${rateHeld} — ${pct(Math.min(...band), 0)} to
         ${pct(Math.max(...band), 0)} in every year from FY${bandFirst} — while the gap itself grew

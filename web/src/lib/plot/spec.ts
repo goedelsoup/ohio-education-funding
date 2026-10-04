@@ -685,7 +685,7 @@ function yTitle(width: number, marginLeft: number, label: string, marginTop: num
  * A numeric scale whose ends a foot labels where they fall, rather than at the frame's corners.
  *
  * `format` is the chart's own formatter for a label. `floor`, where given, is what the low end of
- * the domain says instead of a number: `rankSpec`'s domain starts half a step below its smallest
+ * the domain says instead of a number: `rankSpec`'s domain starts a step below its smallest
  * drawable value, so the row at zero has somewhere to sit, and a log scale reaches no zero to
  * label. It printed "0" there, a value the axis cannot hold.
  */
@@ -693,7 +693,15 @@ export interface FootScale {
   domain: [number, number];
   log?: boolean | undefined;
   format: (v: number) => string;
-  floor?: string;
+  /**
+   * The word centred on the low end of the domain, and the smallest value labelled as a number.
+   *
+   * Centred because it names the mark drawn there. It was anchored at its start, so it ran right
+   * from the frame's edge across the first round value: on `/bounds` "under 1" sat over the dots
+   * at exactly 1 and the "1" tick was dropped for colliding with it (#709). `from` keeps a round
+   * value between the floor and the data — 0.5 on a scale of districts — from being printed.
+   */
+  floor?: { label: string; from: number };
   /**
    * A label the scale's own labels keep clear of, centred on its value: the strips' "no change" at
    * zero. Drawn by the foot so that it is measured with the rest rather than drawn over them.
@@ -833,7 +841,8 @@ function clean(v: number): number {
  * whose domain is exactly its first and last year, which is what the fan and the series pass. A
  * {@link FootScale} is labelled at round values where they fall instead (see {@link axisTicks}),
  * and an interior label that would collide with its neighbours is left out rather than drawn
- * through them. The ends are kept first, because they are what says how far the scale runs.
+ * through them. The ends are kept first, because they are what says how far the scale runs, and
+ * on a log scale the powers of ten with them.
  */
 function axisFoot(options: {
   width: number;
@@ -927,19 +936,27 @@ function axisFoot(options: {
     const [lo, hi] = domain;
     const px = (v: number) =>
       frame * (log ? Math.log(v / lo) / Math.log(hi / lo) : (v - lo) / (hi - lo));
-    const ticks = axisTicks(domain, log).filter((v) => v > lo || floor == null);
+    const ticks = axisTicks(domain, log).filter((v) => floor == null || v >= floor.from);
     const labels = tickLabels(ticks, format);
     const candidates = [
-      ...(floor != null ? [{ value: lo, label: floor }] : []),
+      ...(floor != null ? [{ value: lo, label: floor.label }] : []),
       ...ticks.map((value, i) => ({ value, label: labels[i]! })),
     ].map((c, i, all) => {
       const anchor: "start" | "middle" | "end" =
-        i === 0 ? "start" : i === all.length - 1 ? "end" : "middle";
+        i === 0 && floor == null ? "start" : i === all.length - 1 ? "end" : "middle";
       const x = px(c.value);
       const w = textPx(c.label, fontSize);
       const span: [number, number] =
         anchor === "start" ? [x, x + w] : anchor === "end" ? [x - w, x] : [x - w / 2, x + w / 2];
-      return { ...c, anchor, span, end: i === 0 || i === all.length - 1 };
+      /*
+       * Which labels are kept first: the ends, which say how far the scale runs, and on a log
+       * scale its powers of ten too. Two labels say nothing about a log axis's spacing, and at
+       * 375 `/bounds` printed "under 1" and "500" and dropped 10 and 100 to make room for the
+       * second (#709). Kept from the bottom up, so a top tick that is not a decade goes before a
+       * decade does.
+       */
+      const decade = log && clean(10 ** Math.round(Math.log10(c.value))) === c.value;
+      return { ...c, anchor, span, end: i === 0 || i === all.length - 1 || decade };
     });
     const fixed = beside
       ? [beside].map((b) => {
@@ -948,8 +965,8 @@ function axisFoot(options: {
           return { ...b, anchor: "middle" as const, span: [x - w / 2, x + w / 2] as [number, number], end: false };
         })
       : [];
-    // The fixed label first, then the ends, then the interior in order, each only where it clears
-    // what is already kept.
+    // The fixed label first, then the ends and any decades from the bottom up, then the interior
+    // in order, each only where it clears what is already kept.
     const kept: typeof candidates = [...fixed];
     for (const c of [...candidates.filter((c) => c.end), ...candidates.filter((c) => !c.end)]) {
       if (kept.every((k) => c.span[0] >= k.span[1] + 8 || c.span[1] <= k.span[0] - 8)) kept.push(c);
@@ -1598,56 +1615,115 @@ function endGutter(
   );
 }
 
+/** The type a series trace's name is drawn in, and the spacing a wrapped one's lines take. */
+const TRACE_TYPE = 10;
+const TRACE_LINE = 12;
+
+/** How far a series trace's name sits right of its last point, in pixels. */
+const SERIES_DX = 8;
+
 /**
- * A banded or pooled trace's name, on the line where it ends, over a halo of the card (#702).
+ * A series trace's name, broken to the width a narrow frame can give it (#703).
  *
- * The names sat in the right gutter behind a swatch of each band (#657), about 390 units from where
- * the lines ended on `/outcomes` — a legend beside the chart, which is what #657 set out to remove.
- * They are on the marks now, and the halo under each line and each name is what keeps both legible
- * where they cross the cloud: the least-poor line vanished into its own dots in light mode.
+ * Sized unwrapped, "median of each fifth" asked 135 units of a 300-unit frame on `/outcomes` and
+ * left the cloud 103 wide by 320 tall, which steepens the slope the card is about. A fifth of the
+ * width, and never under 60 so a phone's line holds a word, at the 7.2px a character the gutter is
+ * sized at — so the gutter is sized from the lines that are drawn.
+ */
+function seriesLines(label: string, width: number): string[] {
+  return wrapText(label, Math.max(60, width * 0.2), 7.2 / EM_PER_CHAR);
+}
+
+/** The right margin a series trace's name needs, budgeted as if its line ran to the frame's edge. */
+function seriesGutter(trace: Trace, width: number): number {
+  return 24 + Math.max(...seriesLines(trace.label, width).map((line) => line.length * 7.2));
+}
+
+/**
+ * Every trace's name at its line's end, moved off it only as far as keeps it clear of the others.
  *
- * The ramp's end steps are near 2.2:1 against the card, so the name is set in text ink and not in
- * the band's hue; the line beside it carries the hue. Each name moves off its line's end only as
- * far as keeps it clear of the others, in the order the lines end, and stays inside the plot.
+ * A banded or pooled trace is named on the line where it ends, over a halo of the card (#702). The
+ * names sat in the right gutter behind a swatch of each band (#657), about 390 units from where the
+ * lines ended on `/outcomes` — a legend beside the chart, which is what #657 set out to remove. The
+ * ramp's end steps are near 2.2:1 against the card, so the name is set in text ink and not in the
+ * band's hue; the line beside it carries the hue.
+ *
+ * A series trace is named in its series' text token, wrapped by {@link seriesLines}. Its halo is
+ * the same one: the guarantee pair on `/outcomes` ends among the ceiling column's dots, and two
+ * series lines that nearly coincide end at nearly one height, so they are spread with the rest.
+ *
+ * Spread in the order the lines end, down from the top and back up from the floor, so a crowd at
+ * either edge stays inside the plot.
  */
 function endLabels(
   traces: readonly Trace[],
   domain: [number, number],
   log: boolean,
   frame: { top: number; bottom: number },
+  width: number,
 ) {
   const t = (v: number) => (log ? Math.log(v) : v);
   const ends = traces
-    .filter((trace) => namedAtEnd(trace) && trace.points.length > 0)
+    .filter((trace) => trace.points.length > 0)
     .map((trace) => {
       const end = lastOf(trace.points);
       const share = (t(end.y) - t(domain[0])) / (t(domain[1]) - t(domain[0]));
-      return { trace, end, py: frame.bottom - share * (frame.bottom - frame.top) };
+      const lines = namedAtEnd(trace) ? [trace.label] : seriesLines(trace.label, width);
+      // The block a name takes: a one-line name's leading, and a line's spacing per line past it.
+      const tall = END_LEADING + (lines.length - 1) * TRACE_LINE;
+      return { trace, end, lines, tall, py: frame.bottom - share * (frame.bottom - frame.top) };
     })
     .sort((a, b) => a.py - b.py);
-  // Down from the top, then back up from the floor, so a crowd at either edge stays inside it.
   const at = ends.map((e) => e.py);
   for (let i = 0; i < at.length; i += 1) {
-    at[i] = Math.max(at[i]!, frame.top + 4, i > 0 ? at[i - 1]! + END_LEADING : -Infinity);
+    const e = ends[i]!;
+    const floor = i > 0 ? at[i - 1]! + (ends[i - 1]!.tall + e.tall) / 2 : -Infinity;
+    at[i] = Math.max(at[i]!, frame.top + 4 + (e.tall - END_LEADING) / 2, floor);
   }
   for (let i = at.length - 1; i >= 0; i -= 1) {
-    at[i] = Math.min(at[i]!, frame.bottom - 4, i < at.length - 1 ? at[i + 1]! - END_LEADING : Infinity);
+    const e = ends[i]!;
+    const ceiling = i < at.length - 1 ? at[i + 1]! - (ends[i + 1]!.tall + e.tall) / 2 : Infinity;
+    at[i] = Math.min(at[i]!, frame.bottom - 4 - (e.tall - END_LEADING) / 2, ceiling);
   }
-  return ends.map(({ trace, end, py }, i) =>
+  return ends.map(({ trace, end, lines, py }, i) =>
     Plot.text([end], {
       x: "x",
       y: "y",
-      dx: END_DX,
       dy: at[i]! - py,
-      text: () => trace.label,
+      text: () => lines.join("\n"),
       textAnchor: "start",
-      fill: INK.secondary,
-      fontWeight: 600,
       stroke: INK.surface,
       strokeWidth: 3,
+      ...(namedAtEnd(trace)
+        ? { dx: END_DX, fill: INK.secondary, fontWeight: 600 }
+        : {
+            dx: SERIES_DX,
+            fill: SERIES_TEXT[trace.series],
+            // Only on a wrapped name: a spacing moves a one-line name's baseline too (#608).
+            ...(lines.length > 1 ? { lineHeight: TRACE_LINE / TRACE_TYPE } : {}),
+          }),
       className: "scatter-trace-end",
     }),
   );
+}
+
+/** A cloud's {@link scatterSpec} `ceiling` note, wrapped to most of the plot's width. */
+function ceilingNote(label: string, plotWidth: number) {
+  const lines = wrapText(label, Math.min(260, plotWidth * 0.8));
+  return Plot.text([0], {
+    frameAnchor: "top-right",
+    dx: -4,
+    dy: 2,
+    text: () => lines.join("\n"),
+    textAnchor: "end",
+    lineAnchor: "top",
+    ...(lines.length > 1 ? { lineHeight: LABEL_LINE / 11 } : {}),
+    fill: INK.muted,
+    fontSize: 11,
+    stroke: INK.surface,
+    strokeWidth: 3,
+    className: "scatter-ceiling",
+  });
 }
 
 export function scatterSpec(
@@ -1764,6 +1840,16 @@ export function scatterSpec(
      * segment's `ariaLabel` so the line is named where a legend cannot be read.
      */
     rules?: { label: string; from: { x: number; y: number }; to: { x: number; y: number } }[];
+    /**
+     * Name the column of dots at the right edge where the x measure stops ordering districts (#703).
+     *
+     * On `/outcomes` 62 districts publish an economically disadvantaged share of 99% or more, and
+     * they stand as a wall at the right of the poverty cloud that the poorest fifth's median line
+     * ends inside. The explanation was three cards further down. Printed muted at the frame's top
+     * right, above the wall, because it is a fact about the measure and not a mark in the cloud;
+     * the caller counts the column and writes the sentence, so the count is the one its prose uses.
+     */
+    ceiling?: { label: string };
   },
 ): Spec | null {
   // Two points are not a cloud. Same rule as the line forms, for the same reason: a scatter of
@@ -1864,7 +1950,7 @@ export function scatterSpec(
     width,
     Math.max(
       24,
-      ...traces.filter((t) => !namedAtEnd(t)).map((t) => 24 + t.label.length * 7.2),
+      ...traces.filter((t) => !namedAtEnd(t)).map((t) => seriesGutter(t, width)),
       endGutter(traces, width, marginLeft, [xMin, xMax], axes.x.log ?? false),
     ),
   );
@@ -1905,10 +1991,13 @@ export function scatterSpec(
   // as, and otherwise at the padded edge of the plot.
   const xRule = supplied ? xMin : xShown[0];
   const yRule = ySupplied ? yMin : yShown[0];
-  const names = endLabels(traces, yShown, axes.y.log ?? false, {
-    top: marginTop,
-    bottom: height - marginBottom,
-  });
+  const names = endLabels(
+    traces,
+    yShown,
+    axes.y.log ?? false,
+    { top: marginTop, bottom: height - marginBottom },
+    width,
+  );
   return {
     options: {
       width,
@@ -2076,23 +2165,6 @@ export function scatterSpec(
               : { stroke: traceHue(trace), strokeWidth: 2 }),
             className: "scatter-trace",
           }),
-          /*
-           * A direct label at the line's end in its series' hue. A banded or pooled trace is named
-           * by `endLabels` instead, in text ink and clear of the others.
-           */
-          ...(namedAtEnd(trace)
-            ? []
-            : [
-                Plot.text([lastOf(trace.points)], {
-                  x: "x",
-                  y: "y",
-                  dx: 8,
-                  text: () => trace.label,
-                  textAnchor: "start",
-                  fill: SERIES_TEXT[trace.series],
-                  className: "scatter-trace-end",
-                }),
-              ]),
         ]),
         ...names,
 
@@ -2117,6 +2189,8 @@ export function scatterSpec(
               }),
             ]
           : []),
+
+        ...(options.ceiling ? [ceilingNote(options.ceiling.label, width - marginLeft - marginRight)] : []),
 
         ...(options.identity
           ? [
@@ -2835,6 +2909,30 @@ export function rangeSpec(
   };
 }
 
+/** The widest name gutter {@link rankSpec} reserves, before the frame caps it. */
+const RANK_GUTTER = 260;
+
+/** What {@link rankSpec} leaves between a name and the gutter's edges: 8 to the frame, 2 outside. */
+const RANK_NAME_PAD = 10;
+
+/**
+ * The longest name {@link rankSpec} draws on one line in its widest gutter, in characters: 34.
+ *
+ * Derived rather than chosen, from the same measure `wrapText` breaks lines with. The census's
+ * names come from `Bound::short` in `crates/project`, whose test held them to 40 against a gutter
+ * that holds 34, so every name over 34 wrapped and took its row to two lines (#709). That test
+ * now asserts this number, and `bounds.spec.ts` that the Rust and the TypeScript agree.
+ */
+export const RANK_LABEL_CHARS = Math.floor((RANK_GUTTER - RANK_NAME_PAD) / textPx("x"));
+
+/**
+ * What the foot of {@link rankSpec} says at its floor, where the rows at zero are drawn.
+ *
+ * Not "0", which is a value a log axis has no position for, and not "under 1", which was this
+ * until #709: it named a range the scale does not draw, and was printed over the dots at 1.
+ */
+const FLOOR_WORD = "None";
+
 /**
  * Many items on one count, ranked, on a logarithmic axis — with the item at zero drawn.
  *
@@ -2853,10 +2951,10 @@ export function rangeSpec(
  * Zero is nowhere on a log scale, and a zero-length bar says nothing on any scale — but the bound
  * that **cannot bind** is the most interesting row in the census and dropping it would be a chart
  * that reports thirty-seven bounds and calls itself a map of thirty-eight. So a row at zero is
- * drawn at the axis floor, half a decade below the smallest value that can be placed, in the
- * contrasting hue and with its own phrase printed beside it — see {@link Rank.marked}. It is
- * visibly outside the run of the data rather than being the shortest member of it, which is what
- * a reader has to understand about it.
+ * drawn at the axis floor, a clear step below the smallest value that can be placed, in the
+ * contrasting hue and with its own phrase printed beside it — see {@link Rank.marked} — and the
+ * foot names the floor {@link FLOOR_WORD}. It is visibly outside the run of the data rather than
+ * being the shortest member of it, which is what a reader has to understand about it.
  *
  * # Dot and stem, not a bar
  *
@@ -2879,23 +2977,20 @@ export function rankSpec(
   const smallest = Math.min(...values);
   const positive = values.filter((v) => v > 0);
   if (positive.length === 0 || max <= 0) return null;
-  /*
-   * The left end of the drawn domain.
-   *
-   * Where nothing is at zero it is simply the smallest value. Where something is, it is half the
-   * smallest value that *can* be drawn — a clear step below the axis's own bottom mark, so the
-   * zero row reads as off the scale rather than as the last rung of it.
-   */
-  const floor = smallest > 0 ? smallest : Math.min(...positive) / 2;
-  const at = (r: Rank) => (r.value > 0 ? r.value : floor);
-
-  const longest = Math.max(...rows.map((r) => r.label.length));
+  const least = Math.min(...positive);
   const { width } = options;
-  // Sized to the longest name, like `barSpec`'s, and to 260 rather than `rangeSpec`'s 150: these
-  // names are sentences about a provision and not county names. Where the cap bites, the row
-  // grows to hold two lines rather than the name being cut — the 16px row `rangeSpec` draws
-  // cannot, which is why that form truncates and this one wraps.
-  const wanted = Math.max(90, Math.min(260, Math.round(longest * 6.8) + 12));
+
+  // Sized to the longest name at the width `wrapText` measures it at, like `barSpec`'s, and to
+  // `RANK_GUTTER` rather than `rangeSpec`'s 150: these names are sentences about a provision and
+  // not county names. It was `6.8 × length`, a second estimate beside the 7.34 the wrap uses, so
+  // the gutter was always 7% short of the name it was sized from and 17 of the census's 38 names
+  // wrapped at 1280 (#709). Where the cap bites, the row grows to hold two lines rather than the
+  // name being cut — the 16px row `rangeSpec` draws cannot, which is why that form truncates and
+  // this one wraps.
+  const longest = Math.max(
+    ...rows.map((r) => textPx(r.label) * (r.marked != null ? BOLD_WIDENS : 1)),
+  );
+  const wanted = Math.max(90, Math.min(RANK_GUTTER, Math.ceil(longest) + RANK_NAME_PAD));
   const marginLeft = gutter(width, wanted);
   /*
    * Wrapped here rather than by Plot's `lineWidth`, so the row knows how many lines it holds. At
@@ -2906,7 +3001,10 @@ export function rankSpec(
   const wrapped = new Map(
     rows.map((r) => [
       r.label,
-      wrapText(r.label, (marginLeft - 10) / (r.marked != null ? BOLD_WIDENS : 1)).join("\n"),
+      wrapText(
+        r.label,
+        (marginLeft - RANK_NAME_PAD) / (r.marked != null ? BOLD_WIDENS : 1),
+      ).join("\n"),
     ]),
   );
   const lines = Math.max(...[...wrapped.values()].map((t) => t.split("\n").length));
@@ -2916,51 +3014,82 @@ export function rankSpec(
   const marked = rows.filter((r) => r.marked != null);
   const plain = rows.filter((r) => r.marked == null);
   /*
-   * Room at the right for the marked row's phrase, which is the one direct label this form draws.
-   *
-   * Not simply the phrase's width. It is printed outward from its own mark, so what it needs
-   * *past the frame* is its width less whatever empty plot already lies to the right of that
-   * mark — and the row this form exists for sits at the axis floor, where the whole width of the
-   * plot is empty to its right and the reserve is nothing at all. Reserving for it anyway cost
-   * 95px of a 320px frame: a third of the narrow drawing, held blank, for text drawn at the
-   * opposite edge.
-   *
-   * Measured against a first pass with no reserve, which is the smaller frame, so the answer errs
-   * toward leaving room rather than toward cutting the phrase.
+   * What is printed to the right of a row's dot: the marked row's phrase, and the population of a
+   * row counted out of fewer than the rest. One text a row, so the two cannot be drawn over each
+   * other where a row carries both.
    */
-  const phrase = Math.max(0, ...marked.map((r) => textPx(r.marked ?? "", 11)));
-  const inner = Math.max(1, width - marginLeft - gutter(width, 16));
-  const decades = Math.log(max / floor);
-  const rightmost = Math.max(floor, ...marked.map(at));
-  const beyond = inner * (1 - (decades > 0 ? Math.log(rightmost / floor) / decades : 0));
-  const marginRight = gutter(width, 16 + Math.max(0, 8 + phrase - beyond));
+  const beside = (r: Rank) => [r.marked, r.note].filter((t) => t != null).join(", ");
+  const noted = plain.filter((r) => r.note != null);
 
+  /*
+   * The left end of the drawn domain, and the right margin, which depend on each other.
+   *
+   * Where nothing is at zero the floor is simply the smallest value. Where something is, it is a
+   * step below the smallest value that *can* be drawn, so the zero row reads as off the scale
+   * rather than as the last rung of it — and a step wide enough that the floor's word, centred on
+   * the zero row's dot, clears the label of that smallest value. It was always half of it, and at
+   * 375 half of 1 sat 15px left of the 1: "under 1" was drawn over the dots at exactly 1 and the
+   * "1" tick dropped for colliding with it (#709). So the step is half or the clearance,
+   * whichever is wider, in pixels of the frame the floor is actually drawn in.
+   *
+   * The right margin is room for what `beside` prints. Not simply the text's width: it is printed
+   * outward from its own mark, so what it needs *past the frame* is its width less whatever empty
+   * plot already lies to the right of that mark — and the row this form exists for sits at the
+   * axis floor, where the whole width of the plot is empty to its right and the reserve is
+   * nothing at all. Reserving for it anyway cost 95px of a 320px frame: a third of the narrow
+   * drawing, held blank, for text drawn at the opposite edge.
+   *
+   * The floor needs the frame, which needs the right margin, which needs the floor. Two rounds
+   * from the frame with no reserve settle it: the second moves neither by more than a pixel.
+   */
+  const floorLabel = smallest > 0 ? null : FLOOR_WORD;
+  const clearance =
+    floorLabel == null ? 0 : textPx(floorLabel) / 2 + 8 + textPx(axis.format(least)) / 2 + 2;
+  const floorFor = (frame: number): number => {
+    if (floorLabel == null) return smallest;
+    const span = Math.log(max / least);
+    const step = frame > clearance ? (clearance * span) / (frame - clearance) : Math.LN2;
+    return least / Math.exp(Math.max(Math.LN2, step));
+  };
+  const reserveFor = (frame: number, lo: number): number => {
+    const decades = Math.log(max / lo);
+    const past = (r: Rank) => {
+      const x = decades > 0 ? Math.log((r.value > 0 ? r.value : lo) / lo) / decades : 0;
+      return 8 + textPx(beside(r)) - frame * (1 - x);
+    };
+    return gutter(width, 16 + Math.max(0, ...[...marked, ...noted].map(past)));
+  };
+  let marginRight = gutter(width, 16);
+  let floor = smallest;
+  for (let round = 0; round < 2; round++) {
+    const frame = Math.max(1, width - marginLeft - marginRight);
+    floor = floorFor(frame);
+    marginRight = reserveFor(Math.max(1, width - marginLeft - gutter(width, 16)), floor);
+  }
+  const at = (r: Rank) => (r.value > 0 ? r.value : floor);
+
+  const scale: FootScale = {
+    domain: [floor, max],
+    log: true,
+    format: axis.format,
+    // The zero row sits at the floor, which is below every value the scale can hold. "0" there
+    // named a point a log axis has no position for, and "under 1" a range rather than the row.
+    ...(floorLabel == null ? {} : { floor: { label: floorLabel, from: least } }),
+  };
   const foot = axisFoot({
     width,
     marginLeft,
     marginRight,
     dy: 16,
     says: `${axis.label}${LOG_SCALE}`,
-    scale: {
-      domain: [floor, max],
-      log: true,
-      format: axis.format,
-      // The zero row sits at the floor, which is below every value the scale can hold. "0" there
-      // named a point a log axis has no position for.
-      ...(smallest > 0 ? {} : { floor: `under ${axis.format(Math.min(...positive))}` }),
-    },
+    scale,
   });
 
   const head = tallHead(22 + foot.extraBottom + rows.length * rowHeight, {
     width,
     marginLeft,
     marginRight,
-    scale: {
-      domain: [floor, max],
-      log: true,
-      format: axis.format,
-      ...(smallest > 0 ? {} : { floor: `under ${axis.format(Math.min(...positive))}` }),
-    },
+    scale,
   });
 
   return {
@@ -3033,11 +3162,25 @@ export function rankSpec(
                 y: "label",
                 x: at,
                 dx: 8,
-                text: "marked",
+                text: beside,
                 textAnchor: "start",
                 fill: INK.primary,
                 fontSize: 11,
                 className: "rank-mark",
+              }),
+            ]
+          : []),
+        ...(noted.length > 0
+          ? [
+              Plot.text(noted, {
+                y: "label",
+                x: at,
+                dx: 8,
+                text: beside,
+                textAnchor: "start",
+                fill: INK.muted,
+                fontSize: 11,
+                className: "rank-note",
               }),
             ]
           : []),
@@ -4008,6 +4151,40 @@ export function indexStep(span: number): number {
   return span <= 20 ? 5 : span <= 50 ? 10 : 20;
 }
 
+/** A dated event drawn across a series' index — see {@link SeriesOptions.events}. */
+export interface SeriesEvent {
+  at: number;
+  label: string;
+}
+
+/** One position on one line, named on the chart — see {@link SeriesOptions.callouts}. */
+export interface SeriesCallout {
+  at: number;
+  key: "a" | "b";
+  label: string;
+}
+
+/** The drop per line of an event label above the frame: 11px type and the space under it. */
+const EVENT_LINE = 13;
+
+/** The most lines an event label may take before it is dropped rather than wrapped further. */
+const EVENT_LINES = 2;
+
+/** The most lines a callout may take before its text is dropped and its dot kept. */
+const CALLOUT_LINES = 3;
+
+/** How many rows of event labels may stack above a series frame. */
+const EVENT_TIERS = 2;
+
+/**
+ * The space between one tier of event labels and the next.
+ *
+ * A one-line name's drawn box is the whole of {@link EVENT_LINE}, so tiers spaced at exactly that
+ * touched: 0.1px apart in one drawing and 0.1px through each other in the next, on /history's
+ * meal chart at 600 (#708).
+ */
+const EVENT_TIER_GAP = 3;
+
 /** What a caller tells {@link seriesSpec} beyond the points themselves. */
 export interface SeriesOptions {
   width: number;
@@ -4044,6 +4221,23 @@ export interface SeriesOptions {
   span?: number[];
   /** What the values are in, said in the foot ahead of the truncation: "in constant FY2009 dollars". */
   unit?: string;
+  /**
+   * Dated events on the index — the change of law a time series is read against (#708).
+   *
+   * Each inside the index's span is a full-height dashed rule, named above the frame and wrapped
+   * to the room before the next one. A name that will not fit is dropped and its rule kept, so a
+   * caller passing events also says them in text beside the chart: at a phone's width two regimes
+   * two years apart leave room for one name. An event at the first position is not drawn — a
+   * boundary at the frame's edge separates nothing.
+   */
+  events?: SeriesEvent[];
+  /**
+   * Positions on a line named where they are drawn: a spike the prose explains (#708).
+   *
+   * A dot on the line and a label beside it on a halo, on the side the frame has room. Not a
+   * hover — the point of it is that a reader who never moves the pointer still reads it.
+   */
+  callouts?: SeriesCallout[];
 }
 
 /**
@@ -4158,6 +4352,9 @@ export function seriesSpec(
         textAnchor: "start",
         lineAnchor,
         fill: ink,
+        // A halo, so an event rule behind the label is cut rather than read through (#708).
+        stroke: INK.surface,
+        strokeWidth: 3,
         className: "series-end",
       }),
     ];
@@ -4182,6 +4379,9 @@ export function seriesSpec(
         text: () => startText(point, key),
         textAnchor: "end",
         fill: ink,
+        // A halo, so an event rule behind the label is cut rather than read through (#708).
+        stroke: INK.surface,
+        strokeWidth: 3,
         className: "series-start",
       }),
     ];
@@ -4258,6 +4458,67 @@ export function seriesSpec(
     ? Math.max(0, Math.min(gutter(options.width, 32 + longestLine * 7.2), cap - marginLeft))
     : gutter(options.width, wantedRight);
   /*
+   * The events, named above the frame (#708). Above rather than inside it, so a name never sits on
+   * a line: the top of the frame is where these charts' highest values are drawn.
+   *
+   * In tiers, placed from the right. A regime can last two years, and a name held to the room
+   * before the next rule would drop the short one at every width. Placing the latest first and
+   * each earlier name on the lowest tier where it clears what is already there means a name only
+   * ever sits right of the rules it is above, so the rule extended up to its name crosses nothing.
+   * A name is wrapped to the drawing's right edge, and one that fits no tier is dropped.
+   *
+   * The right gutter is open above the frame — the end labels sit at their values, inside it —
+   * so a name may run into it, unless the end labels are stacked: the upper one then grows up from
+   * its value, and at the top of the range it reaches above the frame.
+   */
+  const frame = options.width - marginLeft - marginRight;
+  const xAt = (at: number) => ((at - first.at) / (last.at - first.at)) * frame;
+  const events = (options.events ?? [])
+    .filter((e) => e.at > first.at && e.at <= last.at)
+    .sort((x, y) => x.at - y.at);
+  const edge = stacked ? frame : frame + marginRight - 4;
+  /** Where each tier's leftmost placed name begins. */
+  const clear: number[] = Array.from({ length: EVENT_TIERS }, () => edge);
+  const placed: (SeriesEvent & { text: string; lines: number; tier: number })[] = [];
+  for (const event of [...events].reverse()) {
+    const x = xAt(event.at);
+    // 3 is the name's offset from its rule and 6 the gap it keeps from the next name; wrapping to
+    // any more than what is left after both would make a name that fits no tier.
+    const lines = wrapText(event.label, edge - x - 9);
+    if (lines.length > EVENT_LINES) continue;
+    const right = x + 3 + Math.max(...lines.map((l) => textPx(l)));
+    const tier = clear.findIndex((edge) => right + 6 <= edge);
+    if (tier < 0) continue;
+    clear[tier] = x;
+    placed.push({ ...event, text: lines.join("\n"), lines: lines.length, tier });
+  }
+  /** Each tier's height, and how far above the frame it starts. */
+  const tierLines = clear.map((_, t) => Math.max(0, ...placed.filter((e) => e.tier === t).map((e) => e.lines)));
+  const below = (tier: number) =>
+    tierLines.slice(0, tier).reduce((sum, n) => sum + (n > 0 ? n * EVENT_LINE + EVENT_TIER_GAP : 0), 0);
+  const named = placed.map((e) => ({ ...e, lift: 4 + below(e.tier), reach: below(e.tier) + e.lines * EVENT_LINE }));
+  const raised = below(EVENT_TIERS);
+  const marginTop = 14 + (raised > 0 ? raised + 4 : 0);
+
+  /*
+   * The callouts, on whichever side of their point has the room: left of a point in the right half
+   * of the frame, right of one in the left. Hung from the frame's top rather than centred on the
+   * point, so a note on a spike stays under the event names however many lines it takes; wrapped
+   * to two-fifths of the frame, and past three lines the note is dropped and the dot kept — the
+   * card's prose says what it is.
+   */
+  const callouts = (options.callouts ?? []).flatMap((c) => {
+    const point = points.find((p) => p.at === c.at);
+    const value = point?.[c.key];
+    if (value == null) return [];
+    const left = xAt(c.at) > frame / 2;
+    const room = Math.min(frame * 0.4, left ? xAt(c.at) - 10 : frame - xAt(c.at) - 10);
+    const lines = wrapText(c.label, room);
+    const fits = lines.length <= CALLOUT_LINES && lines.every((l) => textPx(l) <= room);
+    return [{ at: c.at, value, key: c.key, left, text: fits ? lines.join("\n") : "" }];
+  });
+
+  /*
    * The interior positions at a round step (#706). The ends alone left a reader unable to find
    * FY2014's gap, the FY2010 basis break or the year of a spike on a 220px frame over thirty
    * years. The foot keeps the ones that clear the ends and each other, and a tick is drawn only
@@ -4287,21 +4548,74 @@ export function seriesSpec(
   return {
     options: {
       width: options.width,
-      height: 220,
-      marginTop: 14,
+      // The frame keeps its height; the event names add to the drawing above it.
+      height: 220 + (marginTop - 14),
+      marginTop,
       marginBottom: 26 + foot.extraBottom,
       marginLeft,
       marginRight,
       x: { axis: null, domain: [first.at, last.at] },
       y: { axis: null, domain: [min, max] },
       marks: [
-        ...reference(options.width - marginLeft - marginRight),
+        ...reference(frame),
+        // Under the lines, as the reference is: what they are read against, not among them.
+        /*
+         * One rule per event, to the frame's top; a named one reaches on up beside its name, so a
+         * name on the second tier is not left floating over the first's.
+         */
+        ...events.map((event) => {
+          const name = named.find((e) => e.at === event.at && e.label === event.label);
+          // `y1` the top: Plot applies `insetTop` to `y1` whichever end it is.
+          return Plot.ruleX([event], {
+            x: "at",
+            y1: max,
+            y2: min,
+            insetTop: name ? -name.reach : 0,
+            ...RULE.event,
+            className: "series-event",
+          });
+        }),
+        ...named.map((e) =>
+          Plot.text([e], {
+            x: "at",
+            y: max,
+            dx: 3,
+            dy: -e.lift,
+            text: "text",
+            textAnchor: "start",
+            lineAnchor: "bottom",
+            fill: INK.muted,
+            stroke: INK.surface,
+            strokeWidth: 3,
+            fontSize: 11,
+            className: "series-event-label",
+          }),
+        ),
         line("a", hueA.stroke, "series-a"),
         line("b", hueB.stroke, "series-b"),
         ...endLabel(endA, "a", hueA.text, stacked),
         ...endLabel(endB, "b", hueB.text, stacked),
         ...startLabel(startA, "a", hueA.text),
         ...startLabel(startB, "b", hueB.text),
+        ...callouts.flatMap((c) => {
+          const hue = c.key === "a" ? hueA : hueB;
+          return [
+            Plot.dot([c], { x: "at", y: "value", r: 3, fill: hue.stroke, className: "series-callout" }),
+            Plot.text(c.text ? [c] : [], {
+              x: "at",
+              y: max,
+              dx: c.left ? -7 : 7,
+              text: "text",
+              textAnchor: c.left ? "end" : "start",
+              lineAnchor: "top",
+              fill: hue.text,
+              stroke: INK.surface,
+              strokeWidth: 3,
+              fontSize: 11,
+              className: "series-callout",
+            }),
+          ];
+        }),
         Plot.ruleY([min], { stroke: INK.rule, className: "axis" }),
         // Under the axis rule, at each interior label the foot kept.
         Plot.ruleX(foot.between, {

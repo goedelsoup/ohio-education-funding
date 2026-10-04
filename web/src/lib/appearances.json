@@ -691,6 +691,29 @@
   ],
   "funding-regime/bridge-formula": [
     {
+      "route": "/history",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/history",
+        "title": "History"
+      },
+      "sections": [
+        {
+          "id": "revenue-mix",
+          "label": "Where the money came from"
+        },
+        {
+          "id": "what-this-is",
+          "label": "What this is, and what it is not"
+        },
+        {
+          "id": "meal-program",
+          "label": "What the poverty weight is counted on"
+        }
+      ]
+    },
+    {
       "route": "/legislation",
       "pages": 1,
       "of": 1,
@@ -729,6 +752,29 @@
   ],
   "funding-regime/evidence-based-model": [
     {
+      "route": "/history",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/history",
+        "title": "History"
+      },
+      "sections": [
+        {
+          "id": "revenue-mix",
+          "label": "Where the money came from"
+        },
+        {
+          "id": "what-this-is",
+          "label": "What this is, and what it is not"
+        },
+        {
+          "id": "meal-program",
+          "label": "What the poverty weight is counted on"
+        }
+      ]
+    },
+    {
       "route": "/legislation",
       "pages": 1,
       "of": 1,
@@ -761,6 +807,25 @@
         {
           "id": "census",
           "label": "38 bounds, and who is on each"
+        }
+      ]
+    },
+    {
+      "route": "/history",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/history",
+        "title": "History"
+      },
+      "sections": [
+        {
+          "id": "revenue-mix",
+          "label": "Where the money came from"
+        },
+        {
+          "id": "what-this-is",
+          "label": "What this is, and what it is not"
         }
       ]
     },

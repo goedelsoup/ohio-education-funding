@@ -203,6 +203,51 @@ export function regimes(corpus: Corpus): Regime[] {
   return built.sort((a, b) => a.from - b.from);
 }
 
+/** A regime's first year, as an event a time series is drawn against (#708). */
+export interface RegimeEvent {
+  at: number;
+  label: string;
+  href: string;
+}
+
+/**
+ * Every change of formula, as the events a time series marks on its axis.
+ *
+ * The regime's first year and not the act's: the act is signed in one fiscal year and the formula
+ * it writes pays from the next, and what a series of payments moves with is the paying.
+ */
+export function regimeEvents(spans: Regime[]): RegimeEvent[] {
+  return spans.map((r) => ({ at: r.from, label: r.name, href: r.href }));
+}
+
+/**
+ * The regimes in force at any point from `from` to `to` — how many a page spanning those years
+ * crosses. Five in the corpus, four across `/history`'s FY1998-on charts, and the count on its
+ * card is this rather than a word (#708).
+ */
+export function regimesCrossed(spans: Regime[], from: number, to: number): Regime[] {
+  return spans.filter((r) => r.from <= to && (r.to ?? Infinity) >= from);
+}
+
+/** The changes of formula strictly after `from` and no later than `to` — the ones a frame draws. */
+export function eventsWithin(events: RegimeEvent[], from: number, to: number): RegimeEvent[] {
+  return events.filter((e) => e.at > from && e.at <= to);
+}
+
+/**
+ * The key under a chart that marks regimes: each boundary inside its span, named and linked.
+ *
+ * Always printed, not only where the chart drops a name. A drawing does not know which width the
+ * reader is shown, and the names above the frame are the ones a screen reader and a phone lose.
+ */
+export function renderRegimeKey(events: RegimeEvent[], from: number, to: number): string {
+  const inside = eventsWithin(events, from, to);
+  if (inside.length === 0) return "";
+  const each = inside.map((e) => `FY${e.at}, <a href="${e.href}">${escapeHtml(e.label)}</a>`);
+  return `<p class="note regime-key">The dashed ${inside.length === 1 ? "line marks a change" : "lines mark each change"}
+    of formula: ${each.join("; ")}.</p>`;
+}
+
 /**
  * Whether the regimes actually tile the years, and where they do not.
  *

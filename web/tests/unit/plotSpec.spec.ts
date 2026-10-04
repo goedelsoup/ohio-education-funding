@@ -37,6 +37,7 @@ import {
   placeLabels,
   planeSpec,
   rangeSpec,
+  RANK_LABEL_CHARS,
   rankSpec,
   ruleSwatch,
   scatterSpec,
@@ -678,6 +679,66 @@ test("a line that ends short of the frame costs the gutter only its name's overh
   expect(short.options.marginRight).toBeLessThan(long.options.marginRight!);
 });
 
+test("a series trace's name wraps, so a phone's cloud keeps most of its frame", () => {
+  /*
+   * Sized unwrapped, "median of each fifth" took 135 of the 300 units `/outcomes` draws its poverty
+   * cloud at on a phone, and left the plot 103 wide by 320 tall (#703). Every scatter here, with
+   * one name or two, long or short, holds its right margin to under a third of a phone's frame.
+   */
+  const points = cloud(Array.from({ length: 30 }, (_, i) => 10_000 + i * 400));
+  const trace = (label: string, series: "formula" | "guarantee", y: number): Trace => ({
+    label,
+    series,
+    points: [{ x: 10_000, y: 50 }, { x: 21_600, y }],
+  });
+  const sets: Trace[][] = [
+    [trace("median of each fifth", "formula", 55)],
+    [trace("Formula", "formula", 55), trace("Guarantee", "guarantee", 55.1)],
+    [trace("aid received", "guarantee", 55), trace("formula aid", "formula", 53)],
+  ];
+  expect(WIDTHS.narrow).toBe(300);
+  for (const traces of sets) {
+    const spec = scatterSpec(points, AXES, traces, { width: WIDTHS.narrow })!;
+    expect(spec.options.marginRight!, traces.map((t) => t.label).join(", ")).toBeLessThanOrEqual(
+      WIDTHS.narrow * 0.3,
+    );
+  }
+});
+
+test("two series names whose lines end together are spread apart, in their series' ink", () => {
+  // The guarantee pair on `/outcomes` nearly coincides, which is its finding (#703); the names must
+  // not print on each other where the lines meet.
+  const points = cloud(Array.from({ length: 30 }, (_, i) => 10_000 + i * 400));
+  const traces: Trace[] = (["formula", "guarantee"] as const).map((series, i) => ({
+    label: series === "formula" ? "Formula" : "Guarantee",
+    series,
+    points: [{ x: 10_000, y: 50 }, { x: 21_600, y: 55 + i * 0.05 }],
+  }));
+  const svg = renderToString(() => scatterSpec(points, AXES, traces, W), "presentational");
+  const names = placed(svg, "scatter-trace-end");
+  expect(names.map((n) => n.text).sort()).toEqual(["Formula", "Guarantee"]);
+  expect(Math.abs(names[0]!.y - names[1]!.y), "a line of type apart").toBeGreaterThanOrEqual(16);
+  expect(new Set(names.map((n) => n.fill))).toEqual(new Set([SERIES_TEXT.formula, SERIES_TEXT.guarantee]));
+});
+
+test("a ceiling note is printed muted at the frame's top right", () => {
+  const points = cloud(Array.from({ length: 30 }, (_, i) => i));
+  const label = "62 districts at 99–100%: the measure's ceiling";
+  for (const width of Object.values(WIDTHS)) {
+    const svg = renderToString(
+      () => scatterSpec(points, AXES, [], { width, ceiling: { label } }),
+      "presentational",
+    );
+    const doc = parseHTML(`<div>${svg.slice(0, svg.indexOf("</svg>") + 6)}</div>`).document;
+    const note = doc.querySelector("g.scatter-ceiling");
+    expect(note?.getAttribute("fill"), `at ${width}`).toBe(INK.muted);
+    // Each wrapped line is a tspan; read with a space at each break, the sentence is whole.
+    const tspans = [...(note?.querySelectorAll("tspan") ?? [])].map((t) => t.textContent);
+    const lines = tspans.length > 0 ? tspans : [note?.textContent];
+    expect(lines.join(" "), `at ${width}`).toBe(label);
+  }
+});
+
 test("a small multiple can be put on one horizontal scale", () => {
   /*
    * The spending pair on `/outcomes` is the same numerator over two denominators, and the card's
@@ -1187,6 +1248,82 @@ test("the marked row's phrase is reserved for where it is drawn, not where it is
   // At the floor the whole plot lies to the phrase's right, so nothing is held back for it.
   // 16px, which is `gutter`'s answer for the bare axis overhang every form reserves.
   expect(atFloor.options.marginRight).toBe(16);
+});
+
+/**
+ * The census with names as long as the gutter holds, which is what `/bounds` draws: the frame is
+ * narrowest, so the floor and the decades have the least room. Not the marked row, which is drawn
+ * bold and so holds `RANK_LABEL_CHARS / BOLD_WIDENS` on one line, 31 characters.
+ */
+function longCensus(values: number[]): Rank[] {
+  return census(values).map((r) =>
+    r.marked != null ? r : { ...r, label: `${r.label} `.padEnd(RANK_LABEL_CHARS, "x") },
+  );
+}
+
+/** A foot label's drawn span at 11px, from where `footLabels` reads it and how it is anchored. */
+const span = (label: { x: number; text: string }, anchor: "middle" | "end" = "middle") => {
+  const w = label.text.length * 0.667 * 11;
+  return anchor === "end" ? [label.x - w, label.x] : [label.x - w / 2, label.x + w / 2];
+};
+
+test("the floor's word clears the smallest value's label, and the label is kept", () => {
+  /*
+   * #709. The floor was half the smallest value, always, and its label ran right from the frame's
+   * edge: on `/bounds` "under 1" sat over the dots at exactly 1 and the "1" tick was dropped for
+   * colliding with it. The floor is now as far below the smallest value as its word needs.
+   */
+  for (const width of Object.values(WIDTHS)) {
+    const labels = footLabels(drawingAt(() => rankSpec(longCensus([554, 499, 43, 1, 0]), COUNT, { width })));
+    const floor = labels.find((l) => l.text === "None");
+    const one = labels.find((l) => l.text === "1");
+    expect(floor, `the floor is named at ${width}`).toBeDefined();
+    expect(one, `the 1 survives at ${width}`).toBeDefined();
+    expect(floor!.x, `at ${width}`).toBeLessThan(one!.x - 12);
+    expect(span(one!)[0]! - span(floor!)[1]!, `clear space at ${width}`).toBeGreaterThanOrEqual(8);
+  }
+});
+
+test("a log rank foot keeps every power of ten in its domain at the narrow width", () => {
+  /*
+   * #709. At 375 the foot kept its two ends, "under 1" and "500", and dropped 10 and 100 for room:
+   * a log axis with two labels does not read as a log axis. The top tick goes before a decade.
+   */
+  const labels = footLabels(
+    drawingAt(() => rankSpec(longCensus([554, 499, 43, 1, 0]), COUNT, { width: WIDTHS.narrow })),
+  ).map((l) => l.text);
+  expect(labels).toEqual(expect.arrayContaining(["1", "10", "100"]));
+});
+
+test("a name as long as the rank gutter holds is drawn on one line at the wide width", () => {
+  /*
+   * #709. The gutter was `6.8 × length` and the wrap measures 7.34 a character, so the longest
+   * name always wrapped, and 17 of the census's 38 with it: every wrapped row doubled the band,
+   * and the chart was 1,425px tall at 1280 where it needed about 855.
+   */
+  const rows = longCensus([554, 499, 43, 1, 0]);
+  expect(rows[0]!.label).toHaveLength(RANK_LABEL_CHARS);
+  const spec = rankSpec(rows, COUNT, W)!;
+  expect(spec.options.marginLeft! - 10).toBeGreaterThanOrEqual(RANK_LABEL_CHARS * 0.667 * 11);
+  const { document } = parseHTML(`<div>${drawingAt(() => spec)}</div>`);
+  const names = [...document.querySelectorAll("g.rank-label text")];
+  expect(names).toHaveLength(rows.length);
+  for (const name of names) expect(name.querySelectorAll("tspan"), name.textContent ?? "").toHaveLength(0);
+});
+
+test("a row counted out of fewer than the rest prints its population, and the rest print nothing", () => {
+  // #710: "Clawback larger than the guarantee", 22 of 43, ranked below 38 of 609 with nothing on
+  // the chart to say the two were out of different populations.
+  const rows = census([554, 499, 43, 22, 0]);
+  rows[3] = { ...rows[3]!, note: "of 43" };
+  const spec = rankSpec(rows, COUNT, W)!;
+  expect(layerRows(spec, "rank-note")).toBe(1);
+  expect(placed(drawingAt(() => spec), "rank-note").map((t) => t.text)).toEqual(["of 43"]);
+  // A note is reserved for where it is drawn, as the marked phrase is: near the top of the scale
+  // it overhangs the frame, and the margin grows to hold it.
+  const high = census([554, 499, 43, 22, 0]);
+  high[1] = { ...high[1]!, note: "of 563" };
+  expect(rankSpec(high, COUNT, W)!.options.marginRight!).toBeGreaterThan(spec.options.marginRight!);
 });
 
 /**
@@ -2237,4 +2374,85 @@ test("a chart's values are listed as text, from the hovers its marks carry (#616
   // A hidden chart gets none: it is hidden because the text beside it says what it says.
   const hidden = renderToString((w) => barSpec(bars, { width: w, hue: "formula" }), "presentational");
   expect(hidden).not.toContain("chart-values");
+});
+
+// --- Events on a time axis (#708) -------------------------------------------------------------
+
+/** Thirty fiscal years, as /history draws them. */
+const YEARS: SeriesPoint[] = Array.from({ length: 30 }, (_, i) => ({
+  at: 1998 + i,
+  a: 0.4 + i * 0.005,
+  b: 0.5 - i * 0.004,
+}));
+
+/** The regime boundaries, with one either side of the frame and one on its first year. */
+const REGIMES = [
+  { at: 1976, label: "Equal Yield" },
+  { at: 1998, label: "On the first year" },
+  { at: 2010, label: "Evidence-Based Model" },
+  { at: 2012, label: "Bridge Formula" },
+  { at: 2022, label: "Fair School Funding Plan" },
+  { at: 2031, label: "After the last year" },
+];
+
+/** Every drawing `renderToString` makes of one builder. */
+function drawings(build: (w: number) => Spec | null): string[] {
+  return [...renderToString(build, "presentational").matchAll(/<svg\b[\s\S]*?<\/svg>/g)].map((m) => m[0]);
+}
+
+const withEvents = (w: number, extra: Partial<Parameters<typeof seriesSpec>[4]> = {}) =>
+  seriesSpec(YEARS, { a: "local", b: "state" }, share, () => "", {
+    width: w,
+    tick: (at) => `FY${at}`,
+    hues: PAIR,
+    events: REGIMES,
+    ...extra,
+  });
+
+test("an event inside the domain is one full-height rule, and one outside it is none", () => {
+  /*
+   * #708. /history drew thirty years across four funding regimes and marked none of them. A
+   * boundary on the first year is not a change the chart shows — the series starts there — so it
+   * is left off with those outside the frame.
+   */
+  const all = drawings((w) => withEvents(w));
+  expect(all).toHaveLength(DRAWINGS);
+  for (const svg of all) {
+    const { document } = parseHTML(`<!doctype html><html><body>${svg}</body></html>`);
+    const rules = [...document.querySelectorAll(".series-event line")];
+    expect(rules).toHaveLength(3);
+    // Each reaches the x axis: Plot's `y2` is the frame's bottom, whatever the top inset.
+    const bottoms = new Set(rules.map((r) => r.getAttribute("y2")));
+    expect(bottoms.size).toBe(1);
+  }
+});
+
+test("without events the chart is the chart it was", () => {
+  const plain = drawings((w) =>
+    seriesSpec(YEARS, { a: "local", b: "state" }, share, () => "", { width: w, tick: (at) => `FY${at}`, hues: PAIR }),
+  );
+  const none = drawings((w) => withEvents(w, { events: [] }));
+  expect(none).toEqual(plain);
+  for (const svg of plain) expect(svg).not.toContain("series-event");
+});
+
+test("every event name it keeps fits the drawing, and the wide one keeps all three", () => {
+  // A name that does not fit is dropped rather than clipped; the key under the chart names it.
+  const all = drawings((w) => withEvents(w));
+  for (const svg of all) expect(overruns(svg)).toEqual([]);
+  const wide = drawingAt(() => withEvents(WIDTHS.wide));
+  for (const name of ["Evidence-Based Model", "Bridge Formula", "Fair School Funding Plan"]) {
+    expect(wide.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ")).toContain(name);
+  }
+});
+
+test("a callout marks its point and keeps inside the drawing at every width", () => {
+  const all = drawings((w) =>
+    withEvents(w, { callouts: [{ at: 2024, key: "b", label: "FY2024: one-time $1.8B, coronavirus relief" }] }),
+  );
+  for (const svg of all) {
+    const { document } = parseHTML(`<!doctype html><html><body>${svg}</body></html>`);
+    expect(document.querySelectorAll(".series-callout circle")).toHaveLength(1);
+    expect(overruns(svg)).toEqual([]);
+  }
 });

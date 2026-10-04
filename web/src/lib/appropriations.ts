@@ -31,6 +31,8 @@
  */
 
 import { escapeHtml, millions, money, pct } from "./format.ts";
+import { foldedTable } from "./fold.ts";
+import { renderRegimeKey, type RegimeEvent } from "./legislation.ts";
 import { seriesSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import { convert, type Basis } from "./real.ts";
@@ -97,10 +99,38 @@ export function growth(rows: AppropriationYear[]): number | null {
  */
 export const BILLIONS = (v: number): string => millions(v).replace("+", "");
 
+/**
+ * The series' one-year spike, and the line that is all of it but its growth (#708).
+ *
+ * The appropriation rises $3.05B into FY2024 and gives $1.35B back the year after, and the
+ * formula's share of it dips eight points and recovers, so the money sat outside the formula. It
+ * is one line: `200640`, Federal Coronavirus School Relief, appropriated $1.80B by H.B. 33 for
+ * FY2024 and zero for FY2025. Federal money, passed through the department's budget once.
+ *
+ * A constant because the feed carries totals and not lines, and the card names the line. What
+ * keeps it true is `appropriations.spec.ts`, which reads it back out of
+ * `crates/project/fixtures/appropriation-lines.csv` and checks it is the year's largest rise.
+ */
+export const ONE_TIME = {
+  fiscal_year: 2024,
+  line: "200640",
+  title: "federal coronavirus school relief",
+  act: "H.B. 33",
+  amount: 1_800_000_000,
+} as const;
+
 /** "FY1998", "FY1998 and FY2027", or "FY1998, FY2026 and FY2027". */
 function list(each: string[]): string {
   return each.length <= 2 ? each.join(" and ") : `${each.slice(0, -1).join(", ")} and ${each[each.length - 1]}`;
 }
+
+/**
+ * How many years the table shows before the rest fold (#708).
+ *
+ * Thirty rows put 2,900px between this chart and the next at 1280. The newest ten carry the
+ * current formula and the FY2024 spike; the earlier years are in a closed `details` beneath.
+ */
+export const RECENT = 10;
 
 /** The appropriation, year by year, on one basis. */
 export function renderAppropriations(
@@ -108,6 +138,7 @@ export function renderAppropriations(
   deflator: Deflator | null,
   base: number | null,
   basis: Basis,
+  events: RegimeEvent[] = [],
 ): string {
   if (rows.length < 2) return "";
   if (basis === "real" && base == null) return "";
@@ -117,6 +148,8 @@ export function renderAppropriations(
 
   const first = firstOf(shown);
   const last = lastOf(shown);
+  // Newest first, so the open rows are the years a reader came for and the fold holds the rest.
+  const recentFirst = [...shown].reverse();
   const multiple = growth(shown);
   // Named rather than counted (#705): "2 years are absent" left a reader to find which.
   const kept = new Set(shown.map((r) => r.fiscal_year));
@@ -124,6 +157,14 @@ export function renderAppropriations(
   const covered = deflator?.points.map((p) => p.fiscal_year) ?? [];
   const catalogYears = fromCatalog(rows);
   const actYears = fromActs(rows);
+  // The spike, on this drawing's basis, where the drawing reaches it.
+  const spike = shown.find((r) => r.fiscal_year === ONE_TIME.fiscal_year);
+  const relief =
+    spike == null
+      ? null
+      : basis === "real"
+        ? (deflator && base != null ? convert(deflator, ONE_TIME.amount, ONE_TIME.fiscal_year, base) : null)
+        : ONE_TIME.amount;
 
   const chart = renderToString(
     (w) =>
@@ -149,6 +190,11 @@ export function renderAppropriations(
             ...(base == null ? [] : inBase(rows, deflator, base, "real")),
           ].flatMap((r) => [r.enacted, r.foundation_funding]),
           unit: basis === "real" ? `in constant FY${base} dollars` : "in the dollars of each year",
+          events,
+          callouts:
+            relief == null
+              ? []
+              : [{ at: ONE_TIME.fiscal_year, key: "a", label: `FY${ONE_TIME.fiscal_year}: one-time ${BILLIONS(relief)}, coronavirus relief` }],
         },
       ),
   { label: `Appropriation and the formula's share of it, billions of dollars by fiscal year, FY${first.fiscal_year} to FY${last.fiscal_year}, in ${basis === "real" ? `constant FY${base} dollars` : "the dollars of each year"}` },
@@ -175,22 +221,29 @@ export function renderAppropriations(
         numbered as the department's and are not its budget.</p>
 
       <div class="chartwrap" data-chart="appropriations">${chart}</div>
+      ${renderRegimeKey(events, first.fiscal_year, last.fiscal_year)}
 
       <p class="note">The same series on the other basis tells a different story, which is the reason this card
         carries the switch: a nominal total that rises every biennium is compatible with a real
         total that does not move, and both sentences are true.${
+          spike == null || relief == null
+            ? ""
+            : ` The spike in FY${ONE_TIME.fiscal_year} is one line: ${BILLIONS(relief)} of
+        ${ONE_TIME.title} (<code>${ONE_TIME.line}</code>), which ${ONE_TIME.act} appropriated for
+        that year alone. It is why the formula's share falls to ${pct(spike.foundation_funding / spike.enacted, 0)}
+        that year and recovers the next.`
+        }${
           dropped.length > 0 && covered.length > 0
             ? ` ${list(dropped)} ${dropped.length === 1 ? "is" : "are"} absent here because the price index covers FY${Math.min(...covered)} through FY${Math.max(...covered)}.`
             : ""
         }</p>
 
-      <div class="scroll"><table>
-        <thead><tr><th>Year</th><th class="tnum">Appropriated</th>
+      ${foldedTable(
+        `<thead><tr><th>Year</th><th class="tnum">Appropriated</th>
           <th class="tnum">The formula's share</th><th class="tnum">Lines</th>
-          <th>Source</th></tr></thead>
-        <tbody>${shown
-          .map(
-            (r) => `<tr>
+          <th>Source</th></tr></thead>`,
+        recentFirst.map(
+          (r) => `<tr>
               <th>FY${r.fiscal_year}</th>
               <td class="tnum">${money(r.enacted)}</td>
               <td class="tnum n">${pct(r.foundation_funding / r.enacted, 0)}</td>
@@ -199,9 +252,12 @@ export function renderAppropriations(
                 r.source === "catalog" ? "Catalog" : r.source === "act" ? "The act" : "Greenbook",
               )}</td>
             </tr>`,
-          )
-          .join("")}</tbody>
-      </table></div>
+        ),
+        RECENT,
+        recentFirst.length > RECENT
+          ? `The ${recentFirst.length - RECENT} years before, FY${first.fiscal_year} to FY${recentFirst[RECENT]!.fiscal_year}`
+          : "",
+      )}
 
       <p class="note">Three publications answer for this series.
         ${
