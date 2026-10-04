@@ -336,7 +336,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 351 |
 | [`edfund-connect`](edfund-connect/) | The `edfund-connect` CLI over `connect`, and the README index it regenerates | 31 |
 | [`edfund-core`](edfund-core/) | Shared domain types for the Ohio education funding computer | 45 |
-| [`figures`](figures/) | The figures the corpus quotes, computed from the crates that own them | 52 |
+| [`figures`](figures/) | The figures the corpus quotes, computed from the crates that own them | 53 |
 | [`foundation`](foundation/) | Fair School Funding Plan base cost build-up, per R.C. 3317.011 | 58 |
 | [`local-capacity`](local-capacity/) | Fair School Funding Plan local capacity and state share, per R.C. 3317.017 | 22 |
 | [`millage`](millage/) | Effective operating millage under H.B. 920 reduction factors, and 20-mill floor status | 15 |
@@ -346,7 +346,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 79 |
 | [`xcheck`](xcheck/) | Tests that hold one crate against another's fixtures, at the top of the graph | 66 |
 
-15 crates, 2056 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+15 crates, 2057 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status
