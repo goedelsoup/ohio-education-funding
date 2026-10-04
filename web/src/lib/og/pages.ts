@@ -25,7 +25,7 @@ import { count, millions, pct } from "../format.ts";
 import { clamp, type Card } from "./card.ts";
 import { firstOf, lastOf } from "../ends.ts";
 import { statewideLevels } from "../whatChanged.ts";
-import { TOPICS } from "../explained/registry.ts";
+import { published } from "../explained/registry.ts";
 
 /** The eyebrow every card wears unless it has a better one. */
 export const SITE = "Ohio school funding";
@@ -253,13 +253,18 @@ export function pageCards(): Record<string, Card> {
       meta: `Data downloads · ${fy}`,
     },
 
-    explained: {
-      eyebrow: SITE,
-      headline: "The formula, one question at a time",
-      figure: "Explained",
-      figureNote: "The guarantee, the phase-in and the state share, in plain words",
-      meta: "Every page ends at the evidence that proves it",
-    },
+    // Only where the build publishes the index it is the card for (#718).
+    ...(published().length > 0
+      ? {
+          explained: {
+            eyebrow: SITE,
+            headline: "The formula, one question at a time",
+            figure: "Explained",
+            figureNote: "The guarantee, the phase-in and the state share, in plain words",
+            meta: "Every page ends at the evidence that proves it",
+          },
+        }
+      : {}),
 
     wiki: {
       eyebrow: `${SITE} · Library`,
@@ -290,7 +295,7 @@ export function pageCards(): Record<string, Card> {
  */
 export function explainedCards(): Record<string, Card> {
   return Object.fromEntries(
-    TOPICS.map((t) => [
+    published().map((t) => [
       t.slug,
       {
         eyebrow: `${SITE} · Explained`,

@@ -24,6 +24,7 @@
  */
 import type { Bar } from "./chart.ts";
 import { escapeHtml, fixed, money, ordinal, pct, signedMoney } from "./format.ts";
+import { term } from "./glossary.ts";
 import { barSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import * as routes from "./routes.ts";
@@ -338,9 +339,9 @@ export function renderPhaseIn(d: District): string {
   return `
     <div class="card" id="phase-in" data-part="phase-in">
       <h2>${anchor("phase-in")}The phase-in${yearChip("biennium")}</h2>
-      <p class="note">Foundation aid is paid as the funding base plus a share of the gap between
-        what the formula calculates and that base, and the guarantee holds it up where the result
-        would fall. These are the department's own three figures for each year.
+      <p class="note">Foundation aid is paid as the funding base plus the ${term("phase-in", "phase-in")}'s
+        share of the gap between what the formula calculates and that base, and the guarantee holds
+        it up where the result would fall. These are the department's own three figures for each year.
         ${filesNote(years)}</p>
       <div class="scroll">
         <table>

@@ -513,9 +513,11 @@ header.site nav .menu-runs { display: contents; }
  * `break-inside: avoid` so a run is never split from its heading. The columns are set on
  * `.menu-runs` and not on the panel, so the lead above them spans both.
  *
- * Above the nav's breakpoint it hangs from its own right edge: `Library` is the fifth entry of
- * six, and a 30rem panel hung from its left edge would run off the right of the window. Below
- * 640px the panel is static and one column like every other — see the rule after this.
+ * Above the nav's breakpoint `Library` hangs from its own right edge: it sits in the right half of
+ * the bar, and a 30rem panel hung from its left edge would run off the right of the window.
+ * `Explained`, wide since its thirteenth question (#718), sits in the left half and hangs from its
+ * left edge as every narrow panel does; `data-hang` is which of the two a panel is. Below 640px
+ * the panel is static and one column like every other — see the rule after this.
  */
 @media (min-width: 641px) {
   header.site nav .menu-panel[data-width="wide"] {
@@ -546,7 +548,7 @@ header.site nav .menu-runs { display: contents; }
   header.site nav [data-width="wide"] .menu-run:not(:last-child) { padding-bottom: var(--space-2); }
 }
 @media (min-width: 920px) {
-  header.site nav .menu-panel[data-width="wide"] { left: auto; right: 0; }
+  header.site nav .menu-panel[data-width="wide"][data-hang="right"] { left: auto; right: 0; }
 }
 /* Narrow viewports: the header already wraps, and an absolutely positioned panel next to a
    wrapped row lands on top of the row below it. Let the menu push the header open instead. */
@@ -1795,6 +1797,10 @@ output { font-variant-numeric: tabular-nums; color: var(--text-primary); font-we
    margin only it sat flush against that card on `/county/*` and `/house/*` (#578); this is the gap
    `.lead` leaves before the first card on the routes that open with one. */
 main > .note { margin-bottom: var(--space-6); }
+/* A card's "What is this?" link to its Explained topic (#717). It sits outside the card so the card
+   keeps its measured height, and so it takes back most of the card's bottom margin to read as the
+   card's own line rather than a lede to the next one. */
+.note[data-explained] { margin: calc(var(--space-3) - var(--space-10)) 0 var(--space-10); }
 /*
  * The dek: the note directly above a chart, or above the key directly above one.
  *

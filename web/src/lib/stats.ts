@@ -71,6 +71,31 @@ export function percentile(values: number[], q: number): number {
 }
 
 /**
+ * Pearson's correlation between two lists of equal length, or zero where either does not vary.
+ *
+ * Centred before it multiplies, as `crates/dispersion` is, so a spending axis in the tens of
+ * thousands does not lose its low digits to the square. Pairing and filtering are the caller's:
+ * a district missing either measure has to be dropped from both lists together.
+ */
+export function correlation(xs: readonly number[], ys: readonly number[]): number {
+  if (xs.length !== ys.length) throw new Error(`correlation of ${xs.length} values against ${ys.length}`);
+  const mean = (v: readonly number[]) => v.reduce((s, x) => s + x, 0) / v.length;
+  const mx = mean(xs);
+  const my = mean(ys);
+  let sxy = 0;
+  let sxx = 0;
+  let syy = 0;
+  xs.forEach((x, i) => {
+    const dx = x - mx;
+    const dy = ys[i]! - my;
+    sxy += dx * dy;
+    sxx += dx * dx;
+    syy += dy * dy;
+  });
+  return sxx === 0 || syy === 0 ? 0 : sxy / Math.sqrt(sxx * syy);
+}
+
+/**
  * Five groups of equal count, ordered by `key` ascending.
  *
  * The last group takes the remainder, so integer division drops nobody: at n=609 the groups are

@@ -74,8 +74,8 @@ const BAND_FROM = 2012;
  * {@link federalPeak}, because the note once named the panel's last year as the pandemic peak when
  * FY2022 was (#705).
  */
-const STIMULUS: readonly [number, number] = [2009, 2012];
-const RELIEF: readonly [number, number] = [2020, Infinity];
+export const STIMULUS: readonly [number, number] = [2009, 2012];
+export const RELIEF: readonly [number, number] = [2020, Infinity];
 
 /** The year with the largest federal share within `[from, to]`, or null if none falls there. */
 export function federalPeak(

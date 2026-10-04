@@ -15,8 +15,9 @@
 
 import { expect, test } from "@playwright/test";
 
+import { explainedOn } from "../../src/lib/explained/flag.ts";
 import { REQUIRED_CONTRACT } from "../../src/lib/types.ts";
-import { CLEVELAND } from "./helpers.ts";
+import { CLEVELAND, menu } from "./helpers.ts";
 
 test.describe("the document arrives complete", () => {
   test("a district page carries its figures before any script runs", async ({ page }) => {
@@ -515,7 +516,7 @@ test.describe("with JavaScript disabled", () => {
     await expect(page.locator("h1")).toBeVisible();
   });
 
-  test("two entries are links and five are disclosures, and every one of them opens", async ({
+  test("two entries are links and the rest are disclosures, and every one of them opens", async ({
     page,
   }) => {
     /*
@@ -530,14 +531,16 @@ test.describe("with JavaScript disabled", () => {
     await expect(flat.nth(0)).toHaveAttribute("href", "/districts");
     await expect(flat.nth(1)).toHaveAttribute("href", "/scenario");
     const menus = page.locator("header.site nav details.menu");
-    await expect(menus).toHaveCount(5);
+    // Four where the build does not publish Explained, which is dev only for now (#718).
+    const labels = [...(explainedOn() ? ["Explained"] : []), "Places", "Analysis", "Library", "About"];
+    await expect(menus).toHaveCount(labels.length);
 
     /*
      * By position and not by `filter({ hasText })`: the panels carry prose, `hasText` is a
      * case-insensitive substring, and `Library` holds a run headed "Formula" and a class called
      * "Scenario" — a filter on either word matches a menu it does not name.
      */
-    for (const [index, label] of ["Explained", "Places", "Analysis", "Library", "About"].entries()) {
+    for (const [index, label] of labels.entries()) {
       const menu = menus.nth(index);
       await expect(menu.locator("summary"), `entry ${index} is not ${label}`).toHaveText(label);
       const first = menu.locator(".menu-panel a").first();
@@ -590,7 +593,7 @@ test.describe("with JavaScript disabled", () => {
      * with neither is an index nobody sorted.
      */
     await page.goto("/");
-    const library = page.locator("header.site nav details.menu").nth(3);
+    const library = menu(page, "Library");
     await library.locator("summary").click();
     await expect(library.locator(".menu-heading")).toHaveText([
       "Law",
@@ -614,7 +617,7 @@ test.describe("with JavaScript disabled", () => {
     // Marking the summary as the current *page* would tell a screen reader the reader is on a
     // thing that is not a destination.
     await page.goto("/history");
-    const analysis = page.locator("header.site nav details.menu").nth(2);
+    const analysis = menu(page, "Analysis");
     await expect(analysis.locator("summary")).toHaveAttribute("aria-current", "true");
     await analysis.locator("summary").click();
     await expect(analysis.locator('a[href="/history"]')).toHaveAttribute("aria-current", "page");

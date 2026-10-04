@@ -316,38 +316,6 @@
       ]
     }
   ],
-  "formula-component/fsfp-base-cost-calculation": [
-    {
-      "route": "/explained/phase-in",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/phase-in",
-        "title": "What does the phase-in do?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
-    {
-      "route": "/explained/what-a-district-gets",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/what-a-district-gets",
-        "title": "How does Ohio decide what a district gets?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    }
-  ],
   "formula-component/fsfp-career-technical-weights": [
     {
       "route": "/district/[irn]",
@@ -526,21 +494,6 @@
     }
   ],
   "formula-component/fsfp-local-capacity-measure": [
-    {
-      "route": "/explained/what-a-district-gets",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/what-a-district-gets",
-        "title": "How does Ohio decide what a district gets?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
     {
       "route": "/what-changed",
       "pages": 1,
@@ -734,39 +687,9 @@
           "label": "Where the state aid comes from"
         }
       ]
-    },
-    {
-      "route": "/explained/guarantee",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/guarantee",
-        "title": "Why are so many districts paid an old amount?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
     }
   ],
   "funding-regime/bridge-formula": [
-    {
-      "route": "/explained/guarantee",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/guarantee",
-        "title": "Why are so many districts paid an old amount?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
     {
       "route": "/legislation",
       "pages": 1,
@@ -1483,21 +1406,6 @@
       ]
     },
     {
-      "route": "/explained/what-a-district-gets",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/what-a-district-gets",
-        "title": "How does Ohio decide what a district gets?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
-    {
       "route": "/what-changed",
       "pages": 1,
       "of": 1,
@@ -1532,21 +1440,6 @@
   ],
   "parameter/fsfp-phase-in-percentage": [
     {
-      "route": "/explained/phase-in",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/phase-in",
-        "title": "What does the phase-in do?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
-    {
       "route": "/what-changed",
       "pages": 1,
       "of": 1,
@@ -1558,72 +1451,6 @@
         {
           "id": "phase-in",
           "label": "The phase-in"
-        }
-      ]
-    }
-  ],
-  "parameter/guarantee-funding-base": [
-    {
-      "route": "/explained/guarantee",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/guarantee",
-        "title": "Why are so many districts paid an old amount?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
-    {
-      "route": "/explained/phase-in",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/phase-in",
-        "title": "What does the phase-in do?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    }
-  ],
-  "parameter/local-capacity-percentage": [
-    {
-      "route": "/explained/state-share",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/state-share",
-        "title": "Why do so many districts sit on the state's floor?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    }
-  ],
-  "parameter/minimum-state-share": [
-    {
-      "route": "/explained/state-share",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/state-share",
-        "title": "Why do so many districts sit on the state's floor?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
         }
       ]
     }

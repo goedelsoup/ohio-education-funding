@@ -8,6 +8,8 @@
 
 import { expect, test } from "@playwright/test";
 
+import { menu } from "./helpers.ts";
+
 test.describe("the count the poverty weight is paid on", () => {
   test("the seventeen-year series is on the page, which is the point of exporting it", async ({
     page,
@@ -235,7 +237,7 @@ test.describe("the statute timeline", () => {
     // not an index, and the one a reader asking "how did this get here" wants before any single
     // act. Only the record's three tiles sit above it, across both columns.
     await page.goto("/");
-    const law = page.locator("header.site nav details.menu").nth(3);
+    const law = menu(page, "Library");
     await law.locator("summary").click();
     const first = law.locator(".menu-runs a").first();
     await expect(first).toHaveAttribute("href", "/legislation");

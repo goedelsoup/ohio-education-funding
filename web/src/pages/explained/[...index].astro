@@ -8,13 +8,21 @@
  *
  * The rule for what a topic is, and why it is a web module and not a corpus node, is in
  * `.yidam/decisions/explained-is-a-reading-not-a-record.yml`.
+ *
+ * A rest route with an empty parameter rather than `index.astro`, because a static page cannot
+ * decline to build and this one must: a build that does not publish Explained (#718) has no
+ * front door either. The empty parameter writes `/explained`, where `index.astro` wrote it.
  */
 import Base from "../../layouts/Base.astro";
 import SectionAnchor from "../../components/SectionAnchor.astro";
 import { NAMES } from "../../lib/nav.ts";
-import { GROUPS, type Group } from "../../lib/explained/topic.ts";
-import { TOPICS } from "../../lib/explained/registry.ts";
+import { GROUPS, description, type Group } from "../../lib/explained/topic.ts";
+import { builtTopics, published } from "../../lib/explained/registry.ts";
 import * as routes from "../../lib/routes.ts";
+
+export function getStaticPaths() {
+  return published().length > 0 ? [{ params: { index: undefined } }] : [];
+}
 
 const ID = routes.SECTIONS.explainedIndex;
 /** Each run's address on this page. Typed by group, so a new group does not compile without one. */
@@ -23,10 +31,12 @@ const RUN_ID: Record<Group, string> = {
   "Why it moves": ID.moves,
   "What it does and does not show": ID.shows,
 };
+/** Each topic's short answer, under its question (#717): the page's own meta description. */
+const answers = new Map(builtTopics().map((t) => [t.slug, description(t)]));
 const runs = GROUPS.map((heading) => ({
   heading,
   id: RUN_ID[heading],
-  topics: TOPICS.filter((t) => t.group === heading),
+  topics: published().filter((t) => t.group === heading),
 })).filter((run) => run.topics.length > 0);
 ---
 
@@ -60,7 +70,7 @@ const runs = GROUPS.map((heading) => ({
           <h2><SectionAnchor id={run.id} />{run.heading}</h2>
           <ul class="note">
             {run.topics.map((t) => (
-              <li><a href={routes.explained(t.slug)}>{t.question}</a></li>
+              <li><a href={routes.explained(t.slug)}>{t.question}</a> {answers.get(t.slug)}</li>
             ))}
           </ul>
         </div>
