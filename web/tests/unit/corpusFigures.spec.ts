@@ -386,10 +386,16 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * Recomputed at **1176/82** when the five metrics without a `series` were given one (#524). All
  * thirty-nine bind `field: series`; the two new carriers are `metric/effective-operating-millage`
  * and `metric/state-share-percentage`, which had bound nothing before.
+ *
+ * Recomputed at **1189/82** when the auxiliary services rate was paired with every rate LSC
+ * printed for it (#758). Twelve bindings, no new carrier, all on `program/auxiliary-services`:
+ * four quotients that reproduce a published rate, two that are the readings which do not, the two
+ * ends of FY2013's interval, and the line's and the rate's nominal and real path. The floor was
+ * one under again — 1177 actual against 1176 declared.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1176 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1176,
+  expect(bindings.length, "1189 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1189,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,

@@ -106,6 +106,30 @@ fn base_cost_growth(from: u16, to: u16) -> (f64, f64) {
     project::base_cost::growth(from, to).expect("both years carry an amount")
 }
 
+/// One fiscal year of the auxiliary services quotient, on every denominator the department
+/// published.
+///
+/// # Panics
+///
+/// If the greenbooks or the October extract stop reaching the year.
+fn auxiliary_rate(fiscal_year: u16) -> project::auxiliary_rate::Rate {
+    project::auxiliary_rate::rates()
+        .into_iter()
+        .find(|rate| rate.fiscal_year == fiscal_year)
+        .unwrap_or_else(|| panic!("no auxiliary services quotient for FY{fiscal_year}"))
+}
+
+/// The auxiliary services line itself, nominal and real, across two fiscal years.
+fn auxiliary_line_growth(from: u16, to: u16) -> (f64, f64) {
+    use project::ledger::nonpublic_support as nonpublic;
+    let line = nonpublic::series(nonpublic::AUXILIARY_SERVICES, edfund_core::FiscalYear(to));
+    let window: Vec<_> = [from, to]
+        .iter()
+        .filter_map(|year| nonpublic::at(&line, *year))
+        .collect();
+    nonpublic::growth(&window).expect("the catalog reaches both years")
+}
+
 /// The current freeze, as `(the anchor amount restated in FY2026 dollars, what is paid, the loss)`.
 ///
 /// The last of [`project::base_cost::freezes`], which is FY2024's and is still running.
@@ -13069,6 +13093,129 @@ pub static FIGURES: &[Figure] = &[
             )
             .expect("a positive rate")
         },
+    },
+    Figure {
+        key: "project/auxiliary-services-rate-fy2017",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The FY2017 auxiliary services quotient over the in-state count the 2014-2019 \
+                compilation restates for October 2016 — LSC printed $867",
+        pinned: 867.03,
+        tolerance: 0.005,
+        compute: |_| auxiliary_rate(2017).statutory().expect("the compilation restates FY2017"),
+    },
+    Figure {
+        key: "project/auxiliary-services-rate-fy2017-on-the-annual-file",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The same quotient over the in-state figure October 2016\u{2019}s own file states, \
+                which is the compilation\u{2019}s total and reproduces nothing LSC printed",
+        pinned: 859.32,
+        tolerance: 0.005,
+        compute: |_| auxiliary_rate(2017).on_the_annual_file.expect("the annual file"),
+    },
+    Figure {
+        key: "project/auxiliary-services-rate-fy2019",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The FY2019 auxiliary services quotient — LSC printed roughly $900",
+        pinned: 897.44,
+        tolerance: 0.005,
+        compute: |_| auxiliary_rate(2019).statutory().expect("an exact October"),
+    },
+    Figure {
+        key: "project/auxiliary-services-rate-fy2021",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The FY2021 auxiliary services quotient — LSC printed $927",
+        pinned: 927.18,
+        tolerance: 0.005,
+        compute: |_| auxiliary_rate(2021).statutory().expect("an exact October"),
+    },
+    Figure {
+        key: "project/auxiliary-services-rate-fy2023",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The FY2023 auxiliary services quotient — LSC printed $927 again, and the quotient \
+                rounds to it rather than truncating",
+        pinned: 926.52,
+        tolerance: 0.005,
+        compute: |_| auxiliary_rate(2023).statutory().expect("an exact October"),
+    },
+    Figure {
+        key: "project/auxiliary-services-rate-fy2015-on-the-compilation",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The FY2015 quotient over the compilation\u{2019}s in-state count for October 2014 — \
+                a dollar\u{2019}s rounding above the $787 LSC printed, and the one published rate \
+                with a point estimate that does not close",
+        pinned: 787.55,
+        tolerance: 0.005,
+        compute: |_| auxiliary_rate(2015).on_the_compilation.expect("the compilation"),
+    },
+    Figure {
+        key: "project/auxiliary-services-rate-fy2013-low",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The lowest FY2013 quotient October 2012\u{2019}s masked building sheet permits",
+        pinned: 636.41,
+        tolerance: 0.005,
+        compute: |_| auxiliary_rate(2013).bound.expect("a building sheet").0,
+    },
+    Figure {
+        key: "project/auxiliary-services-rate-fy2013-high",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "And the highest — LSC printed about $710, inside the interval",
+        pinned: 825.6,
+        tolerance: 0.005,
+        compute: |_| auxiliary_rate(2013).bound.expect("a building sheet").1,
+    },
+    Figure {
+        key: "project/auxiliary-services-rate-nominal-growth-fy2017-fy2025",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "What the auxiliary services rate gained in cash per pupil across FY2017-FY2025, \
+                the first and last years that close on an exact October",
+        pinned: 0.0531,
+        tolerance: 0.0005,
+        compute: |_| {
+            project::auxiliary_rate::rate_growth(2017, 2025)
+                .expect("both years close")
+                .0
+        },
+    },
+    Figure {
+        key: "project/auxiliary-services-rate-real-decline-fy2017-fy2025",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "And what it lost per pupil in constant FY2025 dollars over the same years",
+        pinned: 0.2002,
+        tolerance: 0.0005,
+        compute: |_| {
+            -project::auxiliary_rate::rate_growth(2017, 2025)
+                .expect("both years close")
+                .1
+        },
+    },
+    Figure {
+        key: "project/auxiliary-services-nominal-growth-fy2017-fy2025",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "What the auxiliary services line gained in cash across FY2017-FY2025",
+        pinned: 0.1187,
+        tolerance: 0.0005,
+        compute: |_| auxiliary_line_growth(2017, 2025).0,
+    },
+    Figure {
+        key: "project/auxiliary-services-real-decline-fy2017-fy2025",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "And what the line lost in constant FY2025 dollars — five points less than the \
+                rate, because the in-state count grew under it",
+        pinned: 0.1504,
+        tolerance: 0.0005,
+        compute: |_| -auxiliary_line_growth(2017, 2025).1,
     },
     Figure {
         key: "project/auxiliary-services-per-pupil-on-the-landscape-count",
