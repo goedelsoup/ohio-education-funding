@@ -207,7 +207,7 @@ header.site {
 header.site nav { display: flex; gap: .15rem; margin-right: auto; }
 
 /*
- * The five section menus, inside one disclosure below 820px and loose above it.
+ * The section menus, inside one disclosure below 920px and loose above it.
  *
  * # What was wrong
  *
@@ -291,8 +291,20 @@ header.site nav { display: flex; gap: .15rem; margin-right: auto; }
  *
  * #550 put the row's gap on `--space-5`, 14.4px where it was 16, so the two gaps give 3.2px back
  * and the runner's 125 spare is 128. `--space-6` was as near, and would have taken 3.2px away.
+ *
+ * # Seven entries, and the fold at 920 (#713)
+ *
+ * `Explained` joined the bar second, and on the runner the loose nav is 706px. At 820 the row
+ * read 30 + 706 + 31 + 29 = 796 of 780 — fifteen short, and it wrapped — and at 900 it had 65
+ * spare. The fold moved to 920, where it has 85: past the margin the measurements above settled
+ * on, rather than the bare clearance a wrap would take back with one more letter. Read off a CI
+ * run failed on purpose, as the last one was.
+ *
+ * The cost is the one the previous section weighed the other way: a reader between 820 and 919px
+ * now gets the `Menu` disclosure, one click further from a section, which is the price of a
+ * seventh entry being in the bar at all.
  */
-@media (min-width: 820px) {
+@media (min-width: 920px) {
   .menu-all > summary { display: none; }
   .menu-all::details-content { content-visibility: visible; block-size: auto; }
   .menu-all > .menu-groups { flex-direction: row; padding: 0; }
@@ -533,7 +545,7 @@ header.site nav .menu-runs { display: contents; }
   }
   header.site nav [data-width="wide"] .menu-run:not(:last-child) { padding-bottom: var(--space-2); }
 }
-@media (min-width: 820px) {
+@media (min-width: 920px) {
   header.site nav .menu-panel[data-width="wide"] { left: auto; right: 0; }
 }
 /* Narrow viewports: the header already wraps, and an absolutely positioned panel next to a
@@ -3313,6 +3325,22 @@ tr.series-break > td {
     forced-color-adjust: none;
   }
 }
+
+/*
+ * Explained (#712). A topic's rule is one formula set on its own line in the maths face, the way
+ * `math.ts`'s display blocks are, without a typesetter: `<var>` and `<sub>` are what a single
+ * formula needs. The proof line under each claim in "How we know" is apparatus, so it takes the
+ * annotation ink and the note size; the claim above it keeps the reading register.
+ */
+.explained-rule {
+  font-family: var(--font-math);
+  font-size: var(--text-lead);
+  margin: var(--space-5) 0;
+  overflow-x: auto;
+}
+.explained-rule var { font-style: italic; }
+.explained-proof { display: block; color: var(--text-annotation); font-size: var(--text-base); }
+.explained-chart { margin: var(--space-5) 0; }
 
 /*
  * Paper only: furniture, and where the page is allowed to break.
