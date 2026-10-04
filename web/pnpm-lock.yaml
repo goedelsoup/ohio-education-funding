@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  linkedom@0.18.13: 9839db645bb0c8d9359ed41b5aaa8ea784c1e5c7c59322cd2adbc449b356fc95
+
 importers:
 
   .:
@@ -50,7 +53,7 @@ importers:
         version: 2.0.0
       linkedom:
         specifier: ^0.18.13
-        version: 0.18.13
+        version: 0.18.13(patch_hash=9839db645bb0c8d9359ed41b5aaa8ea784c1e5c7c59322cd2adbc449b356fc95)
       oxlint:
         specifier: ^1.86.0
         version: 1.86.0
@@ -4292,7 +4295,7 @@ snapshots:
       base64-js: 0.0.8
       unicode-trie: 2.0.0
 
-  linkedom@0.18.13:
+  linkedom@0.18.13(patch_hash=9839db645bb0c8d9359ed41b5aaa8ea784c1e5c7c59322cd2adbc449b356fc95):
     dependencies:
       css-select: 7.0.0
       cssom: 0.5.0
