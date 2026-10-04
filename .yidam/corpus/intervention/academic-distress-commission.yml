@@ -287,12 +287,22 @@ findings: |
   (crates/dispersion) An intervention's end reaches the scholarship channel through a column in a
   spreadsheet, and it reached it late.
 
-  **What is still not established.** Whether any commission changed outcomes, which is what the apparatus rests on. [open] And the
-  trigger itself has not been computed: R.C. 3302.10(A)(1) needs three consecutive years of the
-  **overall** district rating, and the corpus now holds three, the 2023-24 to 2025-26 editions
-  of the department's high-level download, but no test reads a run off them. [open] That gap bounds
-  what any reproduction here could check — the trigger predicts establishment, not existence, so it
-  could not have audited the column above in any case. [inference]
+  **No district has met the trigger since the star ratings began.** R.C. 3302.10(A)(1)(b) needs an
+  overall rating of "less than two stars" for three consecutive years, and R.C. 3302.03(D)(3)(g)
+  assigns that rating "beginning with the 2022-2023 school year". So the earliest card a
+  star-rated run could end on is 2024-25, and every run ending on a card issued so far includes
+  it. **No district is below two stars on the 2024-25 card, and none on the 2025-26 card.** Across
+  the three held editions, 2023-24 to 2025-26, one district is below two stars in any year:
+  Jefferson Township Local, 1.5 stars on the 2023-24 card, then 2, then 3. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_supplements_outside_the_formula.rs))
+
+  The three commissions this node records were all established before the star system. No new
+  one can be established under division (A)(1) before the 2028-29 card, because a run has to
+  start after the 2025-26 card, which puts no district below two stars. [inference]
+
+  **What is still not established.** Whether any commission changed outcomes, which is what the
+  apparatus rests on. [open] The trigger predicts establishment, not existence, so it could not
+  have audited the column above in any case. [inference]
 revisions:
   - was: |
       "H.B. 110 is modeled as the Fair School Funding Plan act, and the 2021 improvement-plan
@@ -506,12 +516,6 @@ properties:
     So the section appoints a manager for the district and pays its alternatives. Neither channel
     is in the funding formula, and the first is a deduction the formula does not see coming.
     [inference]
-unfilled:
-  - field: the overall district rating, three consecutive years
-    why: >-
-      R.C. 3302.10(A)(1)'s trigger needs three consecutive editions. Three are held, the
-      department's high-level download for 2023-24 to 2025-26 in `dew-report-card-overall`, but
-      no test computes a three-year run from them, so the field is not filled.
 links:
   - target: ../intervention.ont.yml
     relationship: instance-of

@@ -44,9 +44,12 @@ equals the 2023-24 progress rating for all 606 districts that card rates. So the
 - **The layout moves between editions.** The 2025-26 file inserts a `Performance Index` column
   after `Performance Index Percent`, and writes numbers where 2024-25 wrote text. The extract
   reads columns by header name. [verified]
-- **Three editions are held, and the trigger has not been read off them.** R.C. 3302.10(A)(1)
-  needs three consecutive years of the overall rating, and 2023-24 to 2025-26 are now held. No
-  test yet computes the run. [open]
+- **Three editions are held, and no district meets the trigger on them.** R.C. 3302.10(A)(1)
+  needs three consecutive years below two stars. One district is below two in any held year,
+  Jefferson Township Local on the 2023-24 card, and none on the 2024-25 or 2025-26 card, so no
+  star-rated run has completed. The 2022-23 edition is not held and could not change that.
+  [verified]
+  ([`crates/project/tests/the_supplements_outside_the_formula.rs`](../../crates/project/tests/the_supplements_outside_the_formula.rs))
 - **`NR` is not zero, but the calculators write it as zero.** Put-in-Bay's 2023-24 progress
   rating is `NR`; the extract leaves it blank, and the calculators' `O3` reads 0. [verified]
 - **Zero is not a rating.** The calculators write 0 stars for four districts the download does

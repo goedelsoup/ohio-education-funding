@@ -325,6 +325,80 @@ fn the_overall_rating_the_model_pays_on_is_the_2024_25_card() {
     assert_eq!(years("044263"), (Some(2.0), Some(2.5)), "Lorain");
 }
 
+/// R.C. 3302.10(A)(1)'s trigger, read off the three held editions: no district has met it.
+///
+/// A commission is established for a district rated "less than two stars" overall for three
+/// consecutive years. R.C. 3302.03(D)(3)(g) assigns the overall star rating "beginning with the
+/// 2022-2023 school year", so the earliest a star-rated run of three could end is the 2024-25
+/// card. Every run ending on a card issued so far therefore includes the 2024-25 card, and **no
+/// district is below two stars on it**. None is below two on the 2025-26 card either. So no
+/// district has met the trigger on any card the star system has issued, and the 2022-23 edition,
+/// which is not held, could not change that.
+///
+/// Across the three held editions, one rated district is below two stars in any year: Jefferson
+/// Township Local, at 1.5 on the 2023-24 card, 2 on the next and 3 on the one after.
+///
+/// And since the 2025-26 card puts no district below two, a new run has to start on the 2026-27
+/// card at the earliest. The 2028-29 card is the first that could complete one.
+#[test]
+fn no_district_has_met_the_distress_trigger_on_a_star_rated_card() {
+    let trigger = project::statute::section("3302.10").body;
+    assert!(
+        trigger.contains("The district has for three consecutive years received either")
+            && trigger.contains("overall performance rating of less than two stars"),
+        "R.C. 3302.10(A)(1) reads as this test assumes"
+    );
+    assert!(
+        project::statute::section("3302.03")
+            .body
+            .contains("beginning with the 2022-2023 school year"),
+        "the overall star rating starts with the 2022-23 card"
+    );
+
+    let editions = [
+        overall_ratings("overall_star_rating_2324"),
+        overall_ratings("overall_star_rating_2425"),
+        overall_ratings("overall_star_rating_2526"),
+    ];
+    assert_eq!(
+        editions.each_ref().map(|e| e.len()),
+        [607; 3],
+        "rated districts per edition"
+    );
+
+    fn below_two(edition: &std::collections::HashMap<&'static str, f64>) -> Vec<&'static str> {
+        let mut irns: Vec<&'static str> = edition
+            .iter()
+            .filter(|(_, stars)| **stars < 2.0)
+            .map(|(irn, _)| *irn)
+            .collect();
+        irns.sort_unstable();
+        irns
+    }
+    assert_eq!(
+        editions.each_ref().map(below_two),
+        [vec!["048686"], vec![], vec![]],
+        "districts below two stars on the 2023-24, 2024-25 and 2025-26 cards"
+    );
+
+    let jefferson = editions.each_ref().map(|e| e.get("048686").copied());
+    assert_eq!(
+        jefferson,
+        [Some(1.5), Some(2.0), Some(3.0)],
+        "Jefferson Township Local"
+    );
+
+    let met = editions[0]
+        .keys()
+        .filter(|irn| {
+            editions
+                .iter()
+                .all(|e| e.get(*irn).is_some_and(|s| *s < 2.0))
+        })
+        .count();
+    assert_eq!(met, 0, "districts below two stars on all three held cards");
+}
+
 /// The progress columns are a year later than their headers say, and `O2 > O3` compares
 /// 2024-25 against 2023-24.
 ///
