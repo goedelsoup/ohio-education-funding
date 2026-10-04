@@ -56,6 +56,15 @@ export const headingText = (heading: Locator): Promise<string> =>
   });
 
 /** Cleveland Municipal. On the guarantee, so the guarantee copy has something to render. */
+/**
+ * One menu of the bar, found by its label rather than its position: which entries the bar holds
+ * depends on the build, and `Explained` is in it only where the build publishes it (#718).
+ */
+export const menu = (page: Page, label: string): Locator =>
+  page
+    .locator("header.site nav details.menu")
+    .filter({ has: page.locator(":scope > summary", { hasText: new RegExp(`^\\s*${label}\\s*$`) }) });
+
 export const CLEVELAND = "043786";
 /** Northern Local (Perry County). The corpus's property-poor exemplar. */
 export const NORTHERN = "049056";

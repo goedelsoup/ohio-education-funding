@@ -18,6 +18,7 @@
  * For a district just below, the card prints the amount forgone, which is the only honest way to
  * show a cliff.
  */
+import { whatIsThis } from "../../lib/explained/registry.ts";
 import { fixed, money, pct } from "../../lib/format.ts";
 import * as routes from "../../lib/routes.ts";
 import type { District, Statewide } from "../../lib/types.ts";
@@ -42,6 +43,7 @@ const nearTheCliff = !s.growth_eligible && s.enrollment_change > 0.02;
 
 {
   total > 0 && (
+    <>
     <div class="card" id="supplements" data-part="supplements">
       <h2><SectionAnchor id="supplements" />Outside the formula<Fragment set:html={yearChip("formula")} /></h2>
       <p class="note">These are paid on top of formula aid and the guarantee does not hold a
@@ -114,5 +116,7 @@ const nearTheCliff = !s.growth_eligible && s.enrollment_change > 0.02;
         Ohio's attainment measures track intake, so a program keyed to them follows intake whatever
         its intent — which explains the gradient without removing it.</p>
     </div>
+    {d.transportation.total > 0 && <Fragment set:html={whatIsThis("transportation")} />}
+    </>
   )
 }

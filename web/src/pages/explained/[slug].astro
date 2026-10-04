@@ -8,13 +8,14 @@
  * label for the page (`tests/dist/names.spec.ts`).
  */
 import Base from "../../layouts/Base.astro";
-import { TOPICS } from "../../lib/explained/registry.ts";
+import { published } from "../../lib/explained/registry.ts";
 import { renderTopic } from "../../lib/explained/render.ts";
 import { description, topic, type TopicModule } from "../../lib/explained/topic.ts";
+import { NAMES } from "../../lib/nav.ts";
 import * as routes from "../../lib/routes.ts";
 
 export function getStaticPaths() {
-  return TOPICS.map((module) => ({ params: { slug: module.slug }, props: { module } }));
+  return published().map((module) => ({ params: { slug: module.slug }, props: { module } }));
 }
 
 const { module } = Astro.props as { module: TopicModule };
@@ -28,6 +29,7 @@ const t = topic(module);
   imageAlt={t.question}
   section="explained"
 >
+  <p class="crumb"><a href={NAMES.explained.href}>{NAMES.explained.name}</a></p>
   <h1>{t.question}</h1>
   <Fragment set:html={renderTopic(t)} />
 </Base>

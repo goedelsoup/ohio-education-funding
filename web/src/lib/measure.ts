@@ -62,6 +62,11 @@ export const BOX_MIN_RADIUS = 4;
  * chart-bearing card. 3,492 pages collapse into these five shapes, and a sixth route of a shape
  * already here would cost a browser page load and tell nobody anything.
  *
+ * The Explained topic (#712) is a sixth shape and earns its route: a reading page held to a
+ * reading grade, whose answer is a sentence rather than a figure, and whose whole length is the
+ * thing its template promises to keep short ({@link PAGE_HEIGHT_CEILINGS}). The pilot topic stands
+ * for the class; every topic renders through the same template.
+ *
  * `build.format` is `"file"`, so these are the paths a host serves.
  */
 export const ROUTES = [
@@ -73,6 +78,7 @@ export const ROUTES = [
   "/method.html",
   "/wiki/funding-regime/fair-school-funding-plan.html",
   "/wiki/decision/the-four-kinds-of-parameter.html",
+  "/explained/phase-in.html",
 ] as const;
 
 /**
@@ -286,7 +292,7 @@ export const THRESHOLDS: Thresholds = {
    * it per column from what the column holds, so a new table is covered the day it is written and
    * nobody has to remember a class.
    *
-   * This report walks eight routes and the defect was on 1,433 pages, so the threshold alone would
+   * This report walks nine routes and the defect was on 1,433 pages, so the threshold alone would
    * have been satisfied by fixing five of them. The build-wide sweep in `tests/dist/semantics.spec.ts` is
    * the half that reads every page.
    */
@@ -407,6 +413,40 @@ export const FIRST_FIGURE_CEILINGS = [
 /** The first-figure ceiling a route is held to, or `null` for a route no class covers. */
 export function firstFigureCeiling(route: string): number | null {
   return FIRST_FIGURE_CEILINGS.find((c) => c.pattern.test(route))?.ceiling ?? null;
+}
+
+/**
+ * How long an Explained topic may be on a phone, whole page (#712).
+ *
+ * A topic is one question answered in eight short sections, and the template's promise is that a
+ * newcomer reads it to the end. Nothing else in the measure holds a page's length, and length is
+ * the way that promise breaks: a second chart, a longer worked example, another card of caveats.
+ * The ceiling is on `pageHeight` at 375px, the narrowest width and so the longest page.
+ *
+ * Measured and rounded as {@link FIRST_FIGURE_CEILINGS} are: the worse of system-ui and DejaVu at
+ * 375px, plus ten percent, up to the next hundred. Here system-ui read the longer, 4,438 against
+ * DejaVu's 4,089 — the chart is the bulk of the page and its height does not follow the face, so
+ * the prose that does is a minority of the length.
+ *
+ * One class rather than one number per topic, because every topic renders through one template.
+ * Each topic joins the sample as it lands; a topic that needs more room than the pilot earned is a
+ * topic with too much in it, and the answer is to cut it, not to raise the class.
+ */
+export const PAGE_HEIGHT_CEILINGS = [
+  {
+    name: "explained topic",
+    pattern: /^\/explained\/[a-z0-9-]+\.html$/,
+    // The pilot, /explained/phase-in, under system-ui. /explained/what-a-district-gets reads
+    // 4,616 under system-ui and 4,252 under DejaVu, after cutting it from 5,066 to fit.
+    measured: 4438,
+    ceiling: 4900,
+    sample: ["/explained/phase-in.html", "/explained/what-a-district-gets.html", "/explained/guarantee.html", "/explained/state-share.html", "/explained/spending.html", "/explained/sources.html", "/explained/reduction-factors.html", "/explained/poverty-count.html", "/explained/anchor-chain.html", "/explained/deduction.html", "/explained/projection.html", "/explained/transportation.html", "/explained/bounds.html"],
+  },
+] as const;
+
+/** The page-height ceiling a route is held to, or `null` for a route no class covers. */
+export function pageHeightCeiling(route: string): number | null {
+  return PAGE_HEIGHT_CEILINGS.find((c) => c.pattern.test(route))?.ceiling ?? null;
 }
 
 /** One breach of one threshold, named so the message says what to do rather than what happened. */

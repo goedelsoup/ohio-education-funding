@@ -16,6 +16,7 @@ import BasisToggle from "../components/BasisToggle.astro";
 import Base from "../layouts/Base.astro";
 import { NAMES } from "../lib/nav.ts";
 import { loadFeed } from "../lib/feed.ts";
+import { whatIsThis } from "../lib/explained/registry.ts";
 import { count, millions } from "../lib/format.ts";
 import { baseYear } from "../lib/real.ts";
 import * as routes from "../lib/routes.ts";
@@ -61,6 +62,7 @@ const base = bundle.deflator
       other forty-nine, and a reader who leaves after the structural cards should not leave
       believing the district unit is the whole of it. */}
   <Fragment set:html={renderFundingUnits(bundle.funding_units)} />
+  {bundle.funding_units && <Fragment set:html={whatIsThis("deduction")} />}
   <Fragment set:html={renderNonpublicSupport(bundle.funding_units)} />
   <Fragment set:html={renderNational(bundle.national)} />
 

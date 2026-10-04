@@ -25,7 +25,9 @@
  * median $112,601 and by $8.2m for Cleveland. `currentRealizedAid` sums the components instead,
  * which is exact — the same reason `scenario.astro` reaches for it.
  */
+import { whatIsThis } from "../../lib/explained/registry.ts";
 import { count, money, pct } from "../../lib/format.ts";
+import { term } from "../../lib/glossary.ts";
 import { currentRealizedAid } from "../../lib/policy.ts";
 import * as routes from "../../lib/routes.ts";
 import type { Bundle, District } from "../../lib/types.ts";
@@ -124,7 +126,7 @@ if (d.enrollment_change != null && d.enrollment_change !== 0) {
       <div class="v">{money(realizedPP)}</div>
       <div class="n">{
         d.on_guarantee
-          ? money(guaranteePP) + " of it from the guarantee"
+          ? <Fragment set:html={money(guaranteePP) + " of it from the " + term("guarantee", "guarantee")} />
           : "all from the formula"
       }</div></div>
     <div class="tile"><div class="k">Base-cost ADM</div>
@@ -186,3 +188,4 @@ if (d.enrollment_change != null && d.enrollment_change !== 0) {
   }
   <HoldHarmless district={d} />
 </div>
+{d.on_guarantee && <Fragment set:html={whatIsThis("guarantee")} />}

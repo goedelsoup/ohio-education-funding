@@ -20,6 +20,7 @@ import { renderToString } from "./plot/ssr.ts";
 import { compactMoney, count, escapeHtml, fixed, money, ordinal, pct, percentileOf, signed } from "./format.ts";
 import type { Bundle, District, OutcomeStatewide } from "./types.ts";
 import { schoolYearBefore, seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
+import { whatIsThis } from "./explained/registry.ts";
 import { term } from "./glossary.ts";
 import { anchor } from "./section.ts";
 import { median, percentile, quintiles } from "./stats.ts";
@@ -420,6 +421,7 @@ export function renderOutcomes(bundle: Bundle): string {
         control, same year. An outcome-based adequacy standard has to pick one, and the choice
         decides which districts are found wanting.</p>
     </div>
+    ${whatIsThis("spending")}
 
     <div class="card" data-card="apparatus" id="limits" data-part="limits">
       <h2>${anchor("limits")}What this cannot tell you</h2>

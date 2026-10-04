@@ -81,10 +81,23 @@ export function routeOf(file: string): { path: string; route: string } {
   return { path, route };
 }
 
-/** Whether a built file is a page this inverts — anything a reader reaches that is not the corpus. */
+/**
+ * Whether a built file is a page this inverts — anything a reader reaches that is not the corpus.
+ *
+ * Nor Explained, while it is dev only (#718): the committed file can describe one build, and it is
+ * the one that deploys, which has no Explained page. A wiki node still links its topics through
+ * "In plain terms" where the build has them, so nothing a reader of Explained wants is lost.
+ */
 function isCited(file: string): boolean {
   const f = file.replace(/\\/g, "/");
-  return !(f === "wiki.html" || f.startsWith("wiki/") || f.startsWith("og/") || f === "404.html");
+  return !(
+    f === "wiki.html" ||
+    f.startsWith("wiki/") ||
+    f.startsWith("og/") ||
+    f === "404.html" ||
+    f === "explained.html" ||
+    f.startsWith("explained/")
+  );
 }
 
 /**

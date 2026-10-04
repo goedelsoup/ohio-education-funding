@@ -13,6 +13,7 @@
 import Base from "../../../layouts/Base.astro";
 import { loadCorpus, propertyLabel, relationshipLabel } from "../../../lib/corpus.ts";
 import { loadAppearances } from "../../../lib/appearances.ts";
+import { topicsCiting } from "../../../lib/explained/registry.ts";
 import { leadAndBody } from "../../../lib/lead.ts";
 import { DISTRICT_VIEWS, NAMES, sectionForClass } from "../../../lib/nav.ts";
 import { loadFeed } from "../../../lib/feed.ts";
@@ -328,6 +329,7 @@ const district = irn ? byIrn.get(irn) : undefined;
  * `lib/appearances.ts` for why it is read off the build rather than declared.
  */
 const appearances = loadAppearances()[node.id] ?? [];
+const plainTerms = topicsCiting(node.id);
 
 const stated = node.out.filter((edge) => edge.stated);
 const mentions = node.out.filter((edge) => !edge.stated);
@@ -444,6 +446,15 @@ const properties = shownProperties(node.properties.filter((p) => p.name !== "see
       ? ` · ${node.revisions.length} correction${node.revisions.length === 1 ? "" : "s"}`
       : ""}
   </p>
+  {
+    /* Back to the topics that cite this node in "How we know" (#717): the inversion of what each
+       topic cites, so the link and the citation cannot disagree. */
+    plainTerms.map((t) => (
+      <p class="sub" data-part="in-plain-terms">
+        In plain terms: <a href={routes.explained(t.slug)}>{t.question}</a>
+      </p>
+    ))
+  }
 
   {
     draft && (

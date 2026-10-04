@@ -16,6 +16,7 @@ import { resolve } from "node:path";
 import { expect, test } from "@playwright/test";
 
 import { parseRedirects } from "../../src/lib/redirects.ts";
+import { explainedOn } from "../../src/lib/explained/flag.ts";
 import { CLEVELAND, NORTHERN } from "./helpers.ts";
 
 const DIST = resolve(import.meta.dirname, "../../dist");
@@ -126,7 +127,8 @@ test.describe("the page an address that is not there lands on (#596)", () => {
     await page.goto("/404");
     await expect(page.locator("#where-to-go li a")).toHaveText([
       "Find a district",
-      "Explained",
+      // Only where the build publishes it (#718).
+      ...(explainedOn() ? ["Explained"] : []),
       "Places",
       "Analysis",
       "Change the formula",

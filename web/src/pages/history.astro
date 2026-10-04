@@ -13,6 +13,7 @@
  */
 import BasisToggle from "../components/BasisToggle.astro";
 import Base from "../layouts/Base.astro";
+import { whatIsThis } from "../lib/explained/registry.ts";
 import { NAMES } from "../lib/nav.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { loadCorpus } from "../lib/corpus.ts";
@@ -96,6 +97,8 @@ const appropriationBase = bundle.deflator
       appropriations.map((y) => y.fiscal_year),
     )
   : null;
+// The card renders nothing under two single-stream years; its link should not outlive it.
+const mealCard = renderMealProgram(meal, events);
 ---
 
 <Base
@@ -124,6 +127,7 @@ const appropriationBase = bundle.deflator
     ) : (
       <>
         <Fragment set:html={renderRevenueMix(history, events)} />
+        <Fragment set:html={whatIsThis("sources")} />
 
         <BasisToggle id="history-basis" section="equity-gap" base={base}>
           <Fragment
@@ -165,7 +169,12 @@ const appropriationBase = bundle.deflator
     appropriation rather than before it (#708): its 28-row table is a test's subject and cannot
     fold, so it goes last but one, where its length delays no later chart.
   */}
-  <Fragment set:html={renderMealProgram(meal, events)} />
+  {mealCard && (
+    <>
+      <Fragment set:html={mealCard} />
+      <Fragment set:html={whatIsThis("poverty-count")} />
+    </>
+  )}
 
   {/*
     What the appropriation totals are made of. No dollars here, so no basis toggle. Below the

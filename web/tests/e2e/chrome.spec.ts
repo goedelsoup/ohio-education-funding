@@ -11,7 +11,8 @@
 
 import { expect, test } from "@playwright/test";
 
-import { CLEVELAND, NORTHERN } from "./helpers.ts";
+import { explainedOn } from "../../src/lib/explained/flag.ts";
+import { CLEVELAND, NORTHERN, menu } from "./helpers.ts";
 
 test.describe("the chrome above the fold", () => {
   /**
@@ -448,7 +449,21 @@ test.describe("routes", () => {
     // provision by provision, a place in time rather than on the map.
     //
     // Thirty-six with `Explained` (#713): its index, and one more for each topic as it lands.
-    expect(hrefs).toHaveLength(36);
+    // Thirty-seven with the first, "What does the phase-in do?" (#715), thirty-eight with
+    // "How does Ohio decide what a district gets?" (#716), thirty-nine with "Why are so many
+    // districts paid an old amount?" (#716), forty with "Why do so many districts sit on the
+    // state's floor?" (#716), forty-one with "Does spending more raise test scores?" (#716), and
+    // forty-two with "Where does school money come from?" (#716). Forty-three with "Why don't my
+    // taxes rise when my house value does?" (#718), forty-four with "How does Ohio count poor
+    // students?" (#718), forty-five with "Why is FY2011 still inside the formula?" (#718), and
+    // forty-six with "What happened to the deduction for community schools and vouchers?" (#718),
+    // forty-seven with "How sure is a projection?" (#718), forty-eight with "How is a bus ride
+    // paid for?" (#718), and forty-nine with "What is a floor or a ceiling, and whom does it
+    // decide?" (#718).
+    //
+    // And back to thirty-five in a build that does not publish Explained, which is the one that
+    // deploys while the section is dev only (#718): the index and its thirteen questions go.
+    expect(hrefs).toHaveLength(explainedOn() ? 49 : 35);
     for (const href of hrefs) {
       await page.goto(href);
       await expect(page.locator("h1"), `${href} has no heading`).toBeVisible();
@@ -519,7 +534,7 @@ test.describe("the section menus", () => {
      */
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto("/");
-    const library = page.locator("header.site nav details.menu").nth(3);
+    const library = menu(page, "Library");
     await library.locator("summary").click();
     // The runs and not the panel: the lead above them spans both columns, and is held below.
     const columns = await library.locator(".menu-runs").evaluate((panel) => {
@@ -551,7 +566,7 @@ test.describe("the section menus", () => {
      */
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto("/");
-    const library = page.locator("header.site nav details.menu").nth(3);
+    const library = menu(page, "Library");
     await library.locator("summary").click();
     const lead = library.locator(".menu-lead a");
     expect(await lead.evaluateAll((as) => as.map((a) => a.getAttribute("href")))).toEqual([
@@ -584,7 +599,7 @@ test.describe("the section menus", () => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/");
     await page.locator("header.site nav details.menu-all > summary").click();
-    const phone = page.locator("header.site nav details.menu").nth(3);
+    const phone = menu(page, "Library");
     await phone.locator("summary").click();
     const rows = await phone.locator(".menu-lead").evaluate((lead) => {
       const tiles = [...lead.querySelectorAll("a")].map((a) => a.getBoundingClientRect());
@@ -599,7 +614,7 @@ test.describe("the section menus", () => {
     expect(rows.beside, "the glyph sits beside its label on a phone").toBe(true);
   });
 
-  test("the Library panel opens inside the window at every width it hangs from the bar", async ({
+  test("every two-column panel opens inside the window at every width it hangs from the bar", async ({
     page,
   }) => {
     /*
@@ -611,19 +626,32 @@ test.describe("the section menus", () => {
      * 820 is inside the `Menu` disclosure; 920 is the narrowest loose bar; 1280 is the widest the
      * header grows. At each, the whole panel is on screen: nothing clipped at either side, and the
      * last link above the bottom of an 800px window.
+     *
+     * `Explained` went to two columns at its thirteenth question (#718) and sits second in the bar,
+     * so the same right-hand hang put 163px of it off the left of a 1280px window. Both are held
+     * here, found by their width rather than by position, so the next wide panel is held too.
      */
     for (const width of [820, 920, 1280]) {
       await page.setViewportSize({ width, height: 800 });
       await page.goto("/");
-      if (width < 920) await page.locator("header.site nav details.menu-all > summary").click();
-      const library = page.locator("header.site nav details.menu").nth(3);
-      await library.locator("summary").click();
-      const panel = library.locator(".menu-panel");
-      const box = (await panel.boundingBox())!;
-      expect(box.x, `Library runs off the left at ${width}px`).toBeGreaterThanOrEqual(0);
-      expect(box.x + box.width, `Library runs off the right at ${width}px`).toBeLessThanOrEqual(width);
-      expect(box.y + box.height, `Library runs below the window at ${width}px`).toBeLessThanOrEqual(800);
-      await expect(panel.locator("a").last()).toBeInViewport();
+      const wide = page.locator('header.site nav details.menu:has(> .menu-panel[data-width="wide"])');
+      const labels = await wide.locator("> summary").allTextContents();
+      expect(labels.map((l) => l.trim())).toEqual(explainedOn() ? ["Explained", "Library"] : ["Library"]);
+      for (const [i, label] of labels.entries()) {
+        const name = label.trim();
+        if (width < 920) {
+          const all = page.locator("header.site nav details.menu-all");
+          if ((await all.getAttribute("open")) === null) await all.locator("> summary").click();
+        }
+        await wide.nth(i).locator("> summary").click();
+        const panel = wide.nth(i).locator("> .menu-panel");
+        const box = (await panel.boundingBox())!;
+        expect(box.x, `${name} runs off the left at ${width}px`).toBeGreaterThanOrEqual(0);
+        expect(box.x + box.width, `${name} runs off the right at ${width}px`).toBeLessThanOrEqual(width);
+        expect(box.y + box.height, `${name} runs below the window at ${width}px`).toBeLessThanOrEqual(800);
+        await expect(panel.locator("a").last()).toBeInViewport();
+        await wide.nth(i).locator("> summary").click();
+      }
     }
   });
 
@@ -660,7 +688,7 @@ test.describe("the section menus", () => {
     await page.locator("header.site nav details.menu-all > summary").click();
     // `Library` since #548: every class of the corpus, twenty-two links in five headed runs, and
     // one column at this width. `Law` was seven.
-    const library = page.locator("header.site nav details.menu").nth(3);
+    const library = menu(page, "Library");
     await library.locator("summary").click();
     await expect(library).toHaveAttribute("open", "");
 

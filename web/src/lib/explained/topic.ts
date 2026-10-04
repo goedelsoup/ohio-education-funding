@@ -58,6 +58,14 @@ export interface Numbers {
    * series, so one chip on the heading dates all of it.
    */
   chip: SeriesKey;
+  /**
+   * The example's result in one sentence, with its figure: the card's bold lead.
+   *
+   * A chart card on this site opens on a bold sentence holding a number
+   * (`tests/dist/findings.spec.ts`), so that a reader who stops there has the answer. Here it is
+   * the worked example's outcome, which the steps then derive.
+   */
+  finding: Prose;
   /** Who the example district is and why it was chosen: the rule, not a name typed by hand. */
   intro: Prose[];
   /** The steps, in order. Each is one sentence a reader can check against the one before it. */
@@ -82,9 +90,14 @@ export interface Rule {
    * does not need a typesetter.
    */
   notation: string;
-  /** The section of the Revised Code that states the rule, as written: "R.C. 3317.022". */
+  /**
+   * The section of the Revised Code that states the rule, as written: "R.C. 3317.022".
+   *
+   * Or, where the rule is a definition no statute states — what the Census Bureau counts as local
+   * revenue — the publication that does, named as a reader would look for it.
+   */
   statute: string;
-  /** Where a reader can read it: the corpus node that vendors the section, or the code itself. */
+  /** Where a reader can read it: the corpus node or catalog entry that holds it, or the code itself. */
   href: string;
   /** What each symbol in {@link notation} stands for, one item each. */
   symbols: Prose[];
@@ -187,4 +200,41 @@ export function plain(html: string): string {
 /** The short answer as one line of text: the page's meta description. */
 export function description(body: Pick<TopicBody, "shortAnswer">): string {
   return plain(`${body.shortAnswer.lead} ${body.shortAnswer.rest}`);
+}
+
+/**
+ * A topic's stated identity, as two sides computed per district.
+ *
+ * Each topic's worked example states a relation — `paid = base + p × (computed − base)` — and the
+ * page is only right if it holds on every district, not on the one it shows. A topic module exports
+ * one of these beside itself, and its test runs {@link reconciles} over the year the page reads.
+ */
+export interface Identity<R extends { irn: string }> {
+  /** The left side, as the payment report or the feed states it. */
+  left: (row: R) => number;
+  /** The right side, as the page's rule computes it. */
+  right: (row: R) => number;
+  /**
+   * How far apart the two may be: half the published precision. A figure published to the dollar
+   * reconciles within 0.5, and a tolerance wider than that would pass a rounding the page does not do.
+   */
+  tolerance: number;
+}
+
+/**
+ * The districts, by IRN, on which an identity fails. Empty when it holds everywhere.
+ *
+ * Keyed on IRN because district names are not unique. A test pairs it with a doctored row that
+ * must come back, so the guard is not one that every row passes by construction.
+ */
+export function reconciles<R extends { irn: string }>(
+  identity: Identity<R>,
+  districts: readonly R[],
+): string[] {
+  return districts
+    .filter((row) => {
+      const gap = Math.abs(identity.left(row) - identity.right(row));
+      return !(gap <= identity.tolerance);
+    })
+    .map((row) => row.irn);
 }
