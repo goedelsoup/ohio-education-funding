@@ -57,6 +57,15 @@ import {
 } from "../../src/lib/explained/poverty-count.ts";
 import { TOPICS, topicModule } from "../../src/lib/explained/registry.ts";
 import {
+  PER_MILE,
+  PER_RIDER,
+  SCHOOL_DAYS,
+  base as busBase,
+  example as transportationExample,
+  identity as transportationIdentity,
+  share as busShare,
+} from "../../src/lib/explained/transportation.ts";
+import {
   FLOOR,
   IDENTITY as LEVY_IDENTITY,
   example as medianReduction,
@@ -940,5 +949,56 @@ describe("How sure is a projection? (#718)", () => {
     const horizon = node.properties.find((p) => p.name === "horizon")!.value;
     expect(horizon).toContain(`one projected leg to FY${meta.base_year + DISTRICT_FAN_YEARS}`);
     expect(meta.base_year + DISTRICT_FAN_YEARS).toBeLessThanOrEqual(meta.horizon);
+  });
+});
+
+describe("How is a bus ride paid for? (#718)", () => {
+  const { districts, statewide } = loadFeed().bundle;
+  const floor = statewide.transportation_floor;
+  const IDENTITY = transportationIdentity(floor);
+
+  test("the school bus payment is the greater base at the floored share, rounded down to the dime", () => {
+    expect(districts.length).toBeGreaterThan(600);
+    expect(reconciles(IDENTITY, districts)).toEqual([]);
+  });
+
+  test("a payment at the district's own share, below the floor, fails it", () => {
+    const real = districts.find((d) => d.transportation_state_share < floor && busBase(d) > 0)!;
+    const unfloored = busBase(real) * real.transportation_state_share;
+    const doctored = { ...real, irn: "999999", transportation: { ...real.transportation, school_bus: unfloored } };
+    expect(reconciles(IDENTITY, [...districts, doctored])).toEqual(["999999"]);
+  });
+
+  test("a payment rounded to the nearest dime, where that differs, fails it", () => {
+    // The truncation is the department's alone; a rule that rounded would pass on most rows.
+    const real = districts.find((d) => {
+      const x = busBase(d) * busShare(d, floor) * 10;
+      return Math.round(x) !== Math.floor(x + 1e-6);
+    })!;
+    const nearest = Math.round(busBase(real) * busShare(real, floor) * 10) / 10;
+    const doctored = { ...real, irn: "999999", transportation: { ...real.transportation, school_bus: nearest } };
+    expect(reconciles(IDENTITY, [...districts, doctored])).toEqual(["999999"]);
+  });
+
+  test("the rider base is the weighted riders at the per-rider rate, on every district", () => {
+    for (const d of districts) {
+      const t = d.transportation;
+      expect(t.weighted_riders, d.irn).toBe(t.public_riders + 2 * t.nonpublic_riders + 1.5 * t.community_riders);
+      expect(Math.abs(t.per_rider_base - t.weighted_riders * PER_RIDER), d.irn).toBeLessThan(0.005);
+    }
+  });
+
+  test("the mile rate and the school year are the corpus's", () => {
+    const node = loadCorpus().byId.get("formula-component/fsfp-transportation")!;
+    expect(node.description).toContain(`$${PER_RIDER.toLocaleString("en-US", { maximumFractionDigits: 3 })} per weighted rider`);
+    expect(node.description).toContain(`$${PER_MILE} per bus mile across a ${SCHOOL_DAYS}-day year`);
+  });
+
+  test("the example is the median school bus payment", () => {
+    const ex = transportationExample(districts);
+    const bus = (d: (typeof districts)[number]) => d.transportation.school_bus;
+    const below = districts.filter((d) => bus(d) < bus(ex)).length;
+    const above = districts.filter((d) => bus(d) > bus(ex)).length;
+    expect(Math.abs(below - above)).toBeLessThanOrEqual(1);
   });
 });
