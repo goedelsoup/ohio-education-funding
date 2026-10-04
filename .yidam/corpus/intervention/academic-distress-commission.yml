@@ -49,12 +49,24 @@ findings: |
   been in both positions at once. It was checkable. **Youngstown City is under an academic
   distress commission today and the department's FY2027 model pays it $162,207.67** on the
   [performance supplement](../formula-component/fsfp-performance-supplement.yml). All three
-  districts that have had a commission are in that model: [verified] (computed; see
+  districts that have had a commission are in that model, rated on the 2024-25 report card:
+  [verified] (computed; see
   [`crates/project/tests/the_supplements_outside_the_formula.rs`](../../../crates/project/tests/the_supplements_outside_the_formula.rs))
 
       East Cleveland   3 stars    progress 4   released                 $55,029.14
       Lorain           2 stars    progress 2   dissolved by H.B. 33            $0
       Youngstown       2.5 stars  progress 3   still under one         $162,207.67
+
+  **The ratings are the 2024-25 card's, and Youngstown has since reached three.** The calculator
+  gives its overall-rating column no year, and its `Directions` sheet says the supplement "uses
+  2023-2024 and 2024-2025 report cards". The department's 2024-25 high-level download settles
+  which: the calculator's overall rating equals that card's for all 607 rated districts.
+  [verified] (computed; see
+  [`crates/project/tests/the_supplements_outside_the_formula.rs`](../../../crates/project/tests/the_supplements_outside_the_formula.rs))
+  On the 2025-26 card, released in September 2026, Youngstown is rated three stars, East
+  Cleveland three and Lorain two and a half. [verified]
+  ([`dew-report-card-overall`](../../catalog/dew-report-card-overall.md)) The model pays FY2027 on
+  the older card, so the table dates the money correctly and Youngstown's rating a year back.
 
   **But it is not the same number, and that is why both positions can be held at once.** R.C.
   3302.10 triggers on the *overall* rating. The supplement pays on the greater of the overall and
@@ -66,8 +78,8 @@ findings: |
   [growth](../metric/progress-value-added.yml). [verified]
 
   **The threshold that pays sits below the threshold that releases.** Division (N)(1) needs three
-  stars to *begin* a transition out. 59 districts sit below that — Youngstown among them at 2.5,
-  though its own exit runs through R.C. 3302.103 rather than (N), below —
+  stars to *begin* a transition out. On the 2024-25 card 59 districts sit below that — Youngstown
+  among them at 2.5, though its own exit runs through R.C. 3302.103 rather than (N), below —
   and **15 of them are paid, $3,036,977.90 between them, not one through the star route.** A
   district can be too poorly rated to start its own release and well enough rated to be paid for
   its performance in the same year. [verified] (computed)
@@ -143,7 +155,7 @@ findings: |
   between two and three stars can neither re-trigger nor begin its exit under division (N). That
   is still how the section reads, but none of the three has been subject to it since July 2022,
   and the department names no other district under a commission.
-  Youngstown sits at 2.5, and in January 2026 the department told reporters that its removal
+  Youngstown sat at 2.5 on the 2024-25 card, and in January 2026 the department told reporters that its removal
   "would have to be the result of state legislation". [verified] Under 3302.103 a district that
   misses a majority may apply for up to two one-year extensions. If it misses at the end of five
   years, or an extension is refused, division (F)(1)(b) returns it to R.C. 3302.10 with a new chief
@@ -166,6 +178,14 @@ findings: |
   recorded: the department's page lists no second application or approval, and it has not been
   modified since 10 February 2026. [open] So of the three, one left on its plan, one by statute,
   and the third has done neither. [verified]
+
+  **The 2025-26 card does not say which, but it changes what the third outcome would mean.** The
+  extension year is the year that card rates, and on it Youngstown reaches three stars. The
+  plan's benchmarks are its own 24, not the overall rating, and no held source scores them for
+  2025-26. [open] If Youngstown is back under R.C. 3302.10, three stars is the rating division
+  (N)(1) needs to begin a transition out, so the two-to-three star trap below would no longer
+  describe it. Whether a rating for a year spent outside the section can begin that transition
+  the section does not say. [open]
 
   All three were under oversight when a 2021 change in state law required an academic
   improvement plan running three school years with annual benchmarks; revised plans were
@@ -243,8 +263,8 @@ findings: |
   is not re-triggering, and it cannot start the exit clock either, because that needs three.
   [inference] The section sets no maximum duration; how long a commission lasts is entirely what
   division (N) makes of the ratings. Which years each of the three districts here cleared is not
-  established — the corpus holds no district's year-by-year overall rating, only the current
-  cross-section. [open]
+  established — the corpus holds the overall rating for 2024-25 and 2025-26 only, and no earlier
+  edition. [open]
 
   There is one other exit, in division (O): if reconstitution or closure leaves the district
   operating no schools at all, the commission ceases to exist. [verified] An intervention whose
@@ -269,8 +289,8 @@ findings: |
 
   **What is still not established.** Whether any commission changed outcomes, which is what the apparatus rests on. [open] And the
   trigger itself is uncomputable from what is held: R.C. 3302.10(A)(1) needs three consecutive
-  years of the **overall** district rating, and the corpus holds one year of the Achievement
-  component star and no overall rating in any cached report card download. [open] That gap bounds
+  years of the **overall** district rating, and the corpus holds two: the 2024-25 and 2025-26
+  editions of the department's high-level download. [open] That gap bounds
   what any reproduction here could check — the trigger predicts establishment, not existence, so it
   could not have audited the column above in any case. [inference]
 revisions:
@@ -378,6 +398,22 @@ revisions:
     reach: |
       The literal-(C) reading stays an inference about the statute. What changed is that the
       department's practice is now sourced to its own rule rather than read off one file.
+  - was: |
+      Youngstown "at 2.5" stars, in the findings table and the release-threshold count, with no
+      report card year.
+    now: |
+      The 2.5 is Youngstown's 2024-25 overall rating, which is the card the FY2026 and FY2027
+      calculators pay on. On the 2025-26 card Youngstown is rated three stars, the rating division
+      (N)(1) needs to begin a transition out.
+    found_by: |
+      A WOSU report of 18 September 2026 that Youngstown received three stars on the card released
+      that week. The calculator's overall-rating column was then matched against the department's
+      2024-25 high-level download for all 607 rated districts, and the 2025-26 edition was read
+      for #686.
+    reach: |
+      The table and the release-threshold count were right for the year they measure, which they
+      did not name. What changes is the trap: if Youngstown returned to R.C. 3302.10 at the end of
+      its extension, the star band no longer holds it.
 figures:
   - key: project/performance-supplement-to-youngstown
     value: 162207.67
@@ -473,10 +509,9 @@ properties:
 unfilled:
   - field: the overall district rating, three consecutive years
     why: >-
-      R.C. 3302.10(A)(1)'s trigger needs it and no held source carries it: the report card fixture
-      has one year of the Achievement component star, and none of the six cached report card
-      downloads carries an overall rating at all. The department publishes an overall-rating
-      download the registry does not hold, and three consecutive years means three editions.
+      R.C. 3302.10(A)(1)'s trigger needs three consecutive editions and two are held: the
+      department's high-level download for 2024-25 and 2025-26, in `dew-report-card-overall`. An
+      earlier edition is not registered, so no three-year run can be read yet.
 links:
   - target: ../intervention.ont.yml
     relationship: instance-of

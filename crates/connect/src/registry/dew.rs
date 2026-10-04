@@ -496,6 +496,36 @@ pub(super) const REPORT_CARD: Connector = Connector {
                    is NOT the Cupp Report's measure.",
         },
         Source {
+            key: "district-high-level-2425",
+            title: None,
+            url: "https://reportcardstorage.education.ohio.gov/data-download-2025/\
+                  DISTRICT_HIGH_LEVEL_2425.xlsx?sv=2020-08-04&ss=b&srt=sco&sp=rlx\
+                  &se=2031-07-28T05:10:18Z&st=2021-07-27T21:10:18Z&spr=https\
+                  &sig=nPOvW%2Br2caitHi%2F8WhYwU7xqalHo0dFrudeJq%2B%2Bmyuo%3D",
+            filename: "district-high-level-2425.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-report-card-overall"),
+            fixtures: &[crate::fixtures::OVERALL_RATINGS_FIXTURE],
+            note: "The overall star rating, the one rating R.C. 3302.10 reads, with every \
+                   component rating beside it. The FY2026 and FY2027 calculators' `O1` is this \
+                   file's 2024-25 overall rating for every rated district.",
+        },
+        Source {
+            key: "district-high-level-2526",
+            title: None,
+            url: "https://reportcardstorage.education.ohio.gov/data-download-2026/\
+                  DISTRICT_HIGH_LEVEL_2526.xlsx?sv=2020-08-04&ss=b&srt=sco&sp=rlx\
+                  &se=2031-07-28T05:10:18Z&st=2021-07-27T21:10:18Z&spr=https\
+                  &sig=nPOvW%2Br2caitHi%2F8WhYwU7xqalHo0dFrudeJq%2B%2Bmyuo%3D",
+            filename: "district-high-level-2526.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-report-card-overall"),
+            fixtures: &[crate::fixtures::OVERALL_RATINGS_FIXTURE],
+            note: "The same file a year on, released September 2026. Its layout adds a \
+                   `Performance Index` column, so it is read by header. No calculator yet \
+                   reads this edition.",
+        },
+        Source {
             key: "achievement-building-2425",
             title: None,
             url: "https://reportcardstorage.education.ohio.gov/data-download-2025/\

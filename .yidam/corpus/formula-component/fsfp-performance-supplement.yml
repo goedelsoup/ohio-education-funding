@@ -50,7 +50,7 @@ findings: |
   Ohio has had three academic distress commissions — a state takeover of a district's budget
   authority, triggered by R.C. 3302.10 on three consecutive years below two stars. All three
   districts are in the FY2027 model, and **the one still under a commission is paid**: Youngstown
-  City, 2.5 stars and a progress rating of 3, **$162,207.67**. East Cleveland, released, takes
+  City, on the 2024-25 report card 2.5 stars and a progress rating of 3, **$162,207.67**. East Cleveland, released, takes
   $55,029.14. Lorain, whose commission an act of the General Assembly dissolved, qualifies on
   none of the three routes and takes nothing. [verified]
   (`crates/project/tests/the_supplements_outside_the_formula.rs`)

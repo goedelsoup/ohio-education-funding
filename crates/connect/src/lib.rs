@@ -1673,6 +1673,32 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         &report_card,
     )?);
 
+    // The overall rating, which no other held download carries, one column per edition. Both
+    // editions or neither: a fixture with one year blank would read as a district unrated.
+    out.push(
+        match (|| -> Result<Vec<Vec<String>>, String> {
+            let mut sheets = Vec::new();
+            for key in ["district-high-level-2425", "district-high-level-2526"] {
+                sheets.push(
+                    open_workbook(root, registered(key))
+                        .map_err(|e| e.to_string())?
+                        .rows(fixtures::OVERALL_SHEET)
+                        .map_err(|e| e.to_string())?,
+                );
+            }
+            let editions: Vec<&[Vec<String>]> = sheets.iter().map(Vec::as_slice).collect();
+            fixtures::build_overall_ratings(&editions)
+        })() {
+            Ok(rows) => csv_fixture(
+                root,
+                fixtures::OVERALL_RATINGS_FIXTURE,
+                fixtures::OVERALL_RATINGS_HEADER,
+                &rows,
+            )?,
+            Err(reason) => Rebuilt::skipped(fixtures::OVERALL_RATINGS_FIXTURE, reason),
+        },
+    );
+
     // The same report card at building grain. A separate fixture rather than more columns,
     // because it is a different unit: the funding formula pays agencies and the accountability
     // system identifies schools, and one file cannot be keyed on both.

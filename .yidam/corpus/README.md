@@ -464,16 +464,16 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 2042 | supported by a committed primary source |
+| `[verified]` | 2044 | supported by a committed primary source |
 | `[inference]` | 431 | drawn from verified facts, not witnessed |
-| `[open]` | 213 | a live question — unknown, contested, or being worked |
+| `[open]` | 215 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-213 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+215 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 96 | 0 |
+| `findings` | 98 | 0 |
 | `description` | 42 | 0 |
 | `revisions` | 11 | 0 |
 | `series` | 7 | 0 |
@@ -508,7 +508,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `appropriating_bill` | 1 | 0 |
 | `accountability_effect` | 1 | 0 |
 
-**132 recorded withdrawals across 56 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**133 recorded withdrawals across 56 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Relationship vocabulary
