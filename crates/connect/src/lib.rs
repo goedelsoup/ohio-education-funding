@@ -1673,12 +1673,17 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         &report_card,
     )?);
 
-    // The overall rating, which no other held download carries, one column per edition. Both
-    // editions or neither: a fixture with one year blank would read as a district unrated.
+    // The overall and progress ratings, one column per edition. The overall rating is in no
+    // other held download. Every edition or none: a fixture with one year blank would read as
+    // a district unrated.
     out.push(
         match (|| -> Result<Vec<Vec<String>>, String> {
             let mut sheets = Vec::new();
-            for key in ["district-high-level-2425", "district-high-level-2526"] {
+            for key in [
+                "district-high-level-2324",
+                "district-high-level-2425",
+                "district-high-level-2526",
+            ] {
                 sheets.push(
                     open_workbook(root, registered(key))
                         .map_err(|e| e.to_string())?

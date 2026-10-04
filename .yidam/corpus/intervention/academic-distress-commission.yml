@@ -288,9 +288,9 @@ findings: |
   spreadsheet, and it reached it late.
 
   **What is still not established.** Whether any commission changed outcomes, which is what the apparatus rests on. [open] And the
-  trigger itself is uncomputable from what is held: R.C. 3302.10(A)(1) needs three consecutive
-  years of the **overall** district rating, and the corpus holds two: the 2024-25 and 2025-26
-  editions of the department's high-level download. [open] That gap bounds
+  trigger itself has not been computed: R.C. 3302.10(A)(1) needs three consecutive years of the
+  **overall** district rating, and the corpus now holds three, the 2023-24 to 2025-26 editions
+  of the department's high-level download, but no test reads a run off them. [open] That gap bounds
   what any reproduction here could check — the trigger predicts establishment, not existence, so it
   could not have audited the column above in any case. [inference]
 revisions:
@@ -509,9 +509,9 @@ properties:
 unfilled:
   - field: the overall district rating, three consecutive years
     why: >-
-      R.C. 3302.10(A)(1)'s trigger needs three consecutive editions and two are held: the
-      department's high-level download for 2024-25 and 2025-26, in `dew-report-card-overall`. An
-      earlier edition is not registered, so no three-year run can be read yet.
+      R.C. 3302.10(A)(1)'s trigger needs three consecutive editions. Three are held, the
+      department's high-level download for 2023-24 to 2025-26 in `dew-report-card-overall`, but
+      no test computes a three-year run from them, so the field is not filled.
 links:
   - target: ../intervention.ont.yml
     relationship: instance-of

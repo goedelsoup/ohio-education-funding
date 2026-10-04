@@ -496,6 +496,21 @@ pub(super) const REPORT_CARD: Connector = Connector {
                    is NOT the Cupp Report's measure.",
         },
         Source {
+            key: "district-high-level-2324",
+            title: None,
+            url: "https://reportcardstorage.education.ohio.gov/data-download-2024/\
+                  DISTRICT_HIGH_LEVEL_2324.xlsx?sv=2020-08-04&ss=b&srt=sco&sp=rlx\
+                  &se=2031-07-28T05:10:18Z&st=2021-07-27T21:10:18Z&spr=https\
+                  &sig=nPOvW%2Br2caitHi%2F8WhYwU7xqalHo0dFrudeJq%2B%2Bmyuo%3D",
+            filename: "district-high-level-2324.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dew-report-card-overall"),
+            fixtures: &[crate::fixtures::OVERALL_RATINGS_FIXTURE],
+            note: "The same file a year earlier. The FY2026 and FY2027 calculators' `O3`, \
+                   headed 2022-2023, is this file's 2023-24 progress rating for every \
+                   district it rates.",
+        },
+        Source {
             key: "district-high-level-2425",
             title: None,
             url: "https://reportcardstorage.education.ohio.gov/data-download-2025/\
@@ -508,7 +523,8 @@ pub(super) const REPORT_CARD: Connector = Connector {
             fixtures: &[crate::fixtures::OVERALL_RATINGS_FIXTURE],
             note: "The overall star rating, the one rating R.C. 3302.10 reads, with every \
                    component rating beside it. The FY2026 and FY2027 calculators' `O1` is this \
-                   file's 2024-25 overall rating for every rated district.",
+                   file's 2024-25 overall rating for every rated district, and `O2`, headed \
+                   2023-2024, is its 2024-25 progress rating.",
         },
         Source {
             key: "district-high-level-2526",

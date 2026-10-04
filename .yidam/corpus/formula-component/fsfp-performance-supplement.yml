@@ -45,6 +45,30 @@ findings: |
   says so. The progress routes are what hold the gradient to 2.56 rather than whatever it would
   otherwise be. [inference] (the mechanism) [verified] (the measurement)
 
+  ### It compares two report cards, and the column headers name neither
+
+  The calculators head `O2` "Progress Component Rating 2023-2024" and `O3` "… 2022-2023". Both
+  headers are a year early. `O2` is the **2024-25** progress rating for every one of the 607
+  rated districts, and `O3` the **2023-24** rating for every one of the 606 that card rates,
+  each matched against the department's high-level download for that year. The two cards
+  differ for 233 districts, so neither match can be a coincidence. `O1`, the overall rating, is
+  the 2024-25 card too. [verified]
+  (`crates/project/tests/the_supplements_outside_the_formula.rs`) The FY2026 workbook carries the
+  same headers and the same values in all three columns for all 612 rows, so it pays on the same
+  two cards. [verified] (read from the cached workbook; no test holds it, because no FY2026 panel
+  is extracted)
+
+  So the `Directions` sheet's "uses 2023-2024 and 2024-2025 report cards" is right and its own
+  column headers contradict it. The third route pays for a progress rating that **rose from
+  2023-24 to 2024-25**.
+
+  **One district clears it on a rating the card never gave.** The 2023-24 card rates
+  Put-in-Bay's progress `NR`, and the calculator writes that as 0. A 2024-25 rating of 1 star
+  is then "higher than the year before", and Put-in-Bay is paid **$2,057.90** through the third
+  route, one of the 18 it alone qualifies. [verified]
+  (`crates/project/tests/the_supplements_outside_the_formula.rs`) Whether the department means an
+  unrated year to count as zero, the sheet does not say. [open]
+
   ### It pays districts the same report card put under state control
 
   Ohio has had three academic distress commissions — a state takeover of a district's budget
@@ -247,6 +271,9 @@ properties:
     Q4 Eligibility = "Yes" if  O1 overall stars > 3.5
                      or        O2 progress rating >= 3
                      or        O2 > O3 (progress higher than the year before)
+
+    O1 and O2 are the 2024-25 report card and O3 the 2023-24 one, whatever the workbook's
+    headers say; an unrated year reads 0.
     O  Supplement  = if eligible then max(O1, O2) x $13 x enrolled ADM else 0
 
     Paid on `[a] Enrolled ADM`, the same count four of the six categoricals use. Reported in

@@ -256,11 +256,11 @@ fn the_supplement_reaches_districts_the_same_report_card_put_under_state_control
     );
 }
 
-/// The overall rating in the department's own download, one column per report card edition.
+/// The overall and progress ratings in the department's own download, one column per edition.
 const OVERALL_RATINGS: &str =
     include_str!("../../dispersion/fixtures/report-card-overall-ratings.csv");
 
-/// One edition's overall rating by IRN, from [`OVERALL_RATINGS`].
+/// One rating column by IRN, from [`OVERALL_RATINGS`]. An unrated district has no entry.
 fn overall_ratings(column: &str) -> std::collections::HashMap<&'static str, f64> {
     let mut lines = OVERALL_RATINGS.lines();
     let header: Vec<&str> = lines.next().unwrap().split(',').collect();
@@ -323,6 +323,118 @@ fn the_overall_rating_the_model_pays_on_is_the_2024_25_card() {
     assert_eq!(years("045161"), (Some(2.5), Some(3.0)), "Youngstown");
     assert_eq!(years("043901"), (Some(3.0), Some(3.0)), "East Cleveland");
     assert_eq!(years("044263"), (Some(2.0), Some(2.5)), "Lorain");
+}
+
+/// The progress columns are a year later than their headers say, and `O2 > O3` compares
+/// 2024-25 against 2023-24.
+///
+/// The calculators head `O2` "Progress Component Rating 2023-2024" and `O3` "… 2022-2023". The
+/// department's `DISTRICT_HIGH_LEVEL` downloads disagree with both headers:
+///
+/// - `O2` equals the **2024-25** progress rating for all 607 rated districts, as `O1` equals
+///   the 2024-25 overall rating;
+/// - `O3` equals the **2023-24** progress rating for all 606 districts that card rates.
+///
+/// The two cards differ for 233 districts, so neither identity can hold by accident. The
+/// `Directions` sheet's "uses 2023-2024 and 2024-2025 report cards" is right and the column
+/// headers are not.
+///
+/// So the third qualifying route, "progress higher than the year before", pays for a progress
+/// rating that rose from 2023-24 to 2024-25. 129 districts satisfy it in the panel and 128 on
+/// the cards. The extra one is **Put-in-Bay**: the 2023-24 card rates its progress `NR`, the
+/// calculator writes that as 0, and so a rating of 1 star counts as an improvement. It is
+/// paid $2,057.90 that way, one of the 18 districts the third route alone qualifies.
+#[test]
+fn the_progress_ratings_are_the_2024_25_and_2023_24_cards() {
+    let panel = panel::panel();
+    let progress_2425 = overall_ratings("progress_star_rating_2425");
+    let progress_2324 = overall_ratings("progress_star_rating_2324");
+
+    let mut matched = (0, 0);
+    for record in &panel {
+        let performance = &record.performance;
+        let (Some(current), Some(prior)) = (performance.progress, performance.progress_prior)
+        else {
+            continue;
+        };
+        for (cell, card, year, count) in [
+            (current, &progress_2425, "2024-25", &mut matched.0),
+            (prior, &progress_2324, "2023-24", &mut matched.1),
+        ] {
+            match card.get(record.irn.as_str()) {
+                Some(&rating) => {
+                    assert_eq!(
+                        cell, rating,
+                        "{} reads {cell} in the calculator and {rating} on the {year} card",
+                        record.name
+                    );
+                    *count += 1;
+                }
+                None => assert_eq!(
+                    cell, 0.0,
+                    "{} reads {cell} in the calculator but is unrated on the {year} card",
+                    record.name
+                ),
+            }
+        }
+    }
+    assert_eq!(
+        matched,
+        (607, 606),
+        "rated districts matched to the 2024-25 and 2023-24 cards"
+    );
+
+    let differ = progress_2425
+        .iter()
+        .filter(|(irn, rating)| {
+            progress_2324
+                .get(*irn)
+                .is_some_and(|prior| prior != *rating)
+        })
+        .count();
+    assert_eq!(differ, 233, "districts whose two progress ratings differ");
+
+    let rose_on_the_cards = progress_2425
+        .iter()
+        .filter(|(irn, rating)| progress_2324.get(*irn).is_some_and(|prior| prior < *rating))
+        .count();
+    let rose_in_the_panel: Vec<_> = panel
+        .iter()
+        .filter(|r| {
+            matches!(
+                (r.performance.progress, r.performance.progress_prior),
+                (Some(current), Some(prior)) if current > prior
+            )
+        })
+        .collect();
+    assert_eq!((rose_on_the_cards, rose_in_the_panel.len()), (128, 129));
+
+    let put_in_bay = rose_in_the_panel
+        .iter()
+        .find(|r| r.irn == "048975")
+        .expect("Put-in-Bay rises only because an unrated year reads 0");
+    assert!(
+        !progress_2324.contains_key("048975"),
+        "Put-in-Bay is NR on the 2023-24 card"
+    );
+    let performance = &put_in_bay.performance;
+    assert_eq!(
+        (
+            performance.stars,
+            performance.progress,
+            performance.progress_prior
+        ),
+        (Some(2.5), Some(1.0), Some(0.0))
+    );
+    assert_eq!(
+        performance.route(),
+        Some("a progress rating higher than the year before")
+    );
+    assert!(
+        (performance.amount - 2_057.90).abs() < 0.005,
+        "{}",
+        performance.amount
+    );
 }
 
 /// The finding: a component of an equalising formula, distributed inversely to need.
