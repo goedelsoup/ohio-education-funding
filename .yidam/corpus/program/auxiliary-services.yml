@@ -140,9 +140,25 @@ findings: |
   [verified]
   ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
 
-  What the October series still cannot say is which district a building sits in, and under
-  R.C. 3317.024(E)(1) that is the district the money moves through. No file on the department's
-  page carries a district column in any of the six layouts it has used. [open]
+  ### Which district a school sits in
+
+  Under R.C. 3317.024(E)(1) the district a school is located in is the district the money moves
+  through, and no October file carries a district column in any of the six layouts the department
+  has used. The department's directory does not either: it names each school's diocese or
+  association as its parent. What it does give is a mailing address against the building IRN the
+  October files share. Geocoded into the 2020 census blocks, and each block joined to the district
+  it lay in, that places **714 of October 2025's 749 buildings — 95.3%** — in a district. Of the
+  35 left, six have left the directory since October and 29 are addresses the geocoder could not
+  place; both sets are pinned by IRN. Across the whole directory 755 of 787 schools are placed, in
+  278 districts. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_district_a_nonpublic_school_sits_in.rs))
+
+  The directory is a snapshot of the schools open today, at today's addresses, so this reaches the
+  present and not the past: 688 of October 2023's 711 buildings are still in it, and those are
+  placed where they are now, not necessarily where they were. One school, St Helen in Newbury,
+  sits in a district that ceased after the census the blocks record, and is resolved to West
+  Geauga through the territory transfer. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_district_a_nonpublic_school_sits_in.rs))
 
   ### The third line is this line's own money coming back
 
@@ -184,15 +200,6 @@ properties:
     from `crates/project/fixtures/catalog-line-items.csv` across every LSC catalog edition from
     2006, at the newest vintage that answers for each year. [verified]
 unfilled:
-  - field: the district each chartered nonpublic school is located in
-    why: |
-      R.C. 3317.024(E)(1) pays the school district a nonpublic school is located in, so the
-      resident-side incidence of this line is a district question and nothing here can answer it.
-      No file on the department's Enrollment Data page carries a district column in any of the six
-      layouts it has used, and the Chartered Nonpublic School Information page publishes no
-      directory to join against. A join on school name was rejected rather than attempted: October
-      2023's 711 schools carry 601 distinct names, sixteen of them `St Mary`, and Ohio's 607 public
-      districts carry 580 between them.
   - field: how the schools split between the district route and the direct route
     why: |
       R.C. 3317.024(E)(2) makes it a per-school election and neither the redbook nor the greenbook
@@ -387,6 +394,12 @@ links:
       Forty-nine Octobers of chartered nonpublic enrollment, at the building and at the sector. The
       denominator R.C. 3317.024(E)(2)(d) names, which this node carried as an unfilled field until
       the department's Enrollment Data page got a connector.
+  - target: ../../catalog/dew-oeds-directory.md
+    relationship: sourced-from
+    note: >-
+      The department's directory of open nonpublic schools: an address against each building IRN,
+      geocoded into the 2020 blocks to give the district R.C. 3317.024(E)(1) pays through. A
+      snapshot of the present, which this node carried as an unfilled field until it was read.
   - target: ../../catalog/lsc-dew-redbook.md
     relationship: sourced-from
     note: The published $913 rate, the College Credit Plus earmark, and the FY2013 transfer fact.

@@ -1,0 +1,788 @@
+irn,school,county,geocoder_match,block,district_irn,district,directory_year
+000176,Al Ihsan Islamic School,Cuyahoga,Exact,390351237002006,043786,Cleveland Municipal,2023
+000468,Columbus Adventist Academy,Franklin,Non_Exact,390490101001057,043802,Columbus City Schools District,2023
+000476,Saint Martin de Porres High School,Cuyahoga,Exact,390351989002001,043786,Cleveland Municipal,2023
+000479,Guiding Shepherd Christian School,Clark,Exact,390230027022029,046243,Tecumseh Local,2023
+000551,Liberty Christian Academy - East Campus,Licking,Exact,390897574013006,048041,Southwest Licking Local,2023
+000601,Lebanon Christian School,Warren,Exact,391650313002006,044214,Lebanon City,2023
+000660,Risen Christ Lutheran School,Clark,Exact,390230022002004,046284,Clark-Shawnee Local,2023
+008019,Cincinnati Hills Christian Academy- the Edyth B. Lindner Ele,Hamilton,Exact,390610243014009,044867,Sycamore Community City,2023
+008070,Linworth Children's Center,Franklin,Exact,390490063874003,047027,Dublin City,2023
+008071,Temple Christian School,Allen,Exact,390030110001002,045773,Elida Local,2023
+008096,The CinDay Academy,Warren,Exact,391650305043014,050427,Springboro Community City,2023
+008163,Worthington Adventist Academy,Franklin,Exact,390490067101017,045138,Worthington City,2023
+008246,Ohio Valley Christian School,Gallia,No_Match,,,,
+008973,Heaven's Treasures Academy,Hamilton,Exact,390610205052000,047365,Northwest Local,2023
+009124,The Goddard School,Warren,Exact,391650322041032,050435,Kings Local,2023
+009270,Lawrence School-Upper School Campus,Summit,Exact,391535327051002,050047,Nordonia Hills City,2023
+009374,Creative World of Montessori,Montgomery,Exact,391130505033008,044396,Miamisburg City,2023
+009435,The Islamic Academy of Youngstown,Mahoning,Exact,390998024001008,045161,Youngstown City,2023
+009443,Al Ihsan School,Cuyahoga,Exact,390351771014000,044636,Parma City,2023
+009453,Sts. Peter and Paul Academy,Hamilton,Exact,390610232012002,044693,Reading Community City,2023
+009467,Genoa Christian Academy,Delaware,Exact,390410117631027,046748,Big Walnut Local,2023
+009484,Coshocton Christian School,Coshocton,No_Match,,,,
+009485,Monclova Christian School,Lucas,Exact,390950090032008,048207,Anthony Wayne Local,2023
+010184,Oakstone Academy Middle/High School,Franklin,Exact,390490071141001,045047,Westerville City,2023
+010203,Kinder Garden School West Chester,Butler,Exact,390170111223011,046110,Lakota Local,2023
+010210,Northside Christian Academy,Medina,Exact,391034060002028,048496,Highland Local,2023
+010275,The Hebrew Academy of Cleveland-Oakwood Campus,Cuyahoga,Exact,390351408001008,043794,Cleveland Heights-University Heights City,2023
+010582,S.U.P.E.R. Learning Center's Faith Christian Academy,Summit,Non_Exact,391535311011021,050062,Springfield Local,2023
+010608,Wilmington Christian Academy,Clinton,Exact,390279647001023,045112,Wilmington City,2023
+011374,Paint Creek Academy,Ross,No_Match,,,,
+011492,Hillsboro Christian Academy,Highland,Exact,390719548004005,044123,Hillsboro City,2023
+011576,Ross County Christian Academy,Ross,Exact,391419556033028,049536,Union-Scioto Local,2023
+011933,Grace Community School,Delaware,Exact,390410105205001,043877,Delaware City,2023
+012508,DePaul Cristo Rey High School,Hamilton,Exact,390610072001002,043752,Cincinnati Public Schools,2023
+012873,Eagle Wings Academy,Licking,Exact,390897586023032,047993,Lakewood Local,2023
+012900,Crossroads Christian Academy,Pickaway,Exact,391290217002005,049080,Logan Elm Local,2023
+012974,High Road School of Lima,Allen,Exact,390030141002030,044222,Lima City,2023
+013208,Discovery Express School,Lucas,Exact,390950089052015,048207,Anthony Wayne Local,2023
+013209,Westside Christian Academy,Cuyahoga,Exact,390351891072000,045062,Westlake City,2023
+013257,Center for Adolescent Services,Montgomery,No_Match,,,,
+013258,Montgomery County Juvenile Court Detention Center,Montgomery,Exact,391130015013032,043844,Dayton City,2023
+013835,Tooba Academy,Franklin,Exact,390490069331013,043802,Columbus City Schools District,2023
+014040,Cristo Rey Columbus High School,Franklin,Exact,390490040011022,043802,Columbus City Schools District,2023
+014110,Spectrum Growth,Lorain,Exact,390930973001008,044263,Lorain City,2023
+014173,Creative World of Montessori-Beavercreek,Greene,Exact,390572102011013,047241,Beavercreek City,2023
+015179,The Bridge Avenue School,Cuyahoga,Exact,390351976001010,043786,Cleveland Municipal,2023
+015331,Portsmouth Stem Academy,Scioto,Exact,391450036002039,044669,Portsmouth City,2023
+015489,The Golden Key Center for Exceptional Children,Stark,Exact,391517007012015,049932,Plain Local,2023
+015521,Dominion Academy of Dayton,Montgomery,Non_Exact,391130012002014,043844,Dayton City,2023
+015696,ACLD School,Mahoning,Exact,390998137004006,045161,Youngstown City,2023
+016119,Creative World of Montessori-Wilmington Pike,Montgomery,Non_Exact,390572202023004,047274,Bellbrook-Sugarcreek Local,2023
+016431,Northern Ohio Adventist Academy,Lorain,Exact,390930212001005,044768,Sheffield-Sheffield Lake City,2023
+016433,Highland Community Learning Center,Franklin,Exact,390490063511011,043802,Columbus City Schools District,2023
+016680,New Horizons Academy at Sara's Garden,Fulton,Exact,390510407012004,045641,Wauseon Exempted Village,2023
+016689,STEPS Academy,Cuyahoga,Exact,390351775052001,044636,Parma City,2023
+016974,Julie Billiart School of St Sebastian Parish,Summit,Exact,391535061003009,043489,Akron City,2023
+016978,The Reserve School,Cuyahoga,Exact,390351833003002,044750,Shaker Heights City,2023
+017029,Canton Montessori Association,Stark,Exact,391517115024003,049932,Plain Local,2023
+017030,Yeshiva Derech Hatorah,Cuyahoga,Exact,390351852031004,044792,South Euclid-Lyndhurst City,2023
+017151,GEC School,Franklin,Exact,390490080021005,047019,Hilliard City,2023
+017153,The Goddard School of Centerville,Montgomery,Exact,391130404063000,043737,Centerville City,2023
+017161,Yeshiva High School of Cleveland,Cuyahoga,Exact,390351311034006,043554,Beachwood City,2023
+017232,The Learning Spectrum,Franklin,Exact,390490099001007,045138,Worthington City,2023
+017333,St Benedict Early Learning Center,Cuyahoga,Exact,390351712062003,044305,Maple Heights City,2023
+017404,Chaviva High School,Cuyahoga,Exact,390351791011003,046581,Orange City,2023
+017433,Summit Academy of Southwest Ohio,Hamilton,Exact,390610082013003,043752,Cincinnati Public Schools,2023
+017446,Sleek Academy,Wood,Exact,391730219013020,043638,Bowling Green City School District,2023
+017448,TES School,Summit,Exact,391535322024001,049981,Copley-Fairlawn City,2023
+017460,Bethel Christian Academy,Hamilton,Exact,390610271001005,043752,Cincinnati Public Schools,2023
+017487,The Learning Spectrum LTD - Canal Winchester,Franklin,Exact,390490094971010,046946,Canal Winchester Local,2023
+017488,The Learning Spectrum LTD - Johnstown,Licking,Non_Exact,390897550004011,048033,Northridge Local,2023
+017611,Insightful Minds,Cuyahoga,Exact,390351361041004,043646,Brecksville-Broadview Heights City,2023
+017998,Al Pi Darko Initiative,Hamilton,Exact,390610237023001,043851,Deer Park Community City,2023
+018003,Mentor Christian School,Lake,Exact,390852027003003,045492,Mentor Exempted Village,2023
+018011,Urban Community School,Cuyahoga,Exact,390351035001008,043786,Cleveland Municipal,2023
+018018,Heartland High School,Franklin,Exact,390490036002024,043802,Columbus City Schools District,2023
+018997,Azalea Montessori School,Hamilton,Exact,390610255002003,044578,Norwood City,2023
+019039,The Garden Christian Academy,Cuyahoga,Exact,390351976001010,043786,Cleveland Municipal,2023
+019081,New Horizons Academy Springfield,Lucas,Non_Exact,390950073043000,048223,Springfield Local,2023
+019086,Tree of Life Christian Schools,Delaware,Exact,390410124003009,046763,Olentangy Local,2023
+019097,Almadina Academy,Franklin,Exact,390490077301000,043802,Columbus City Schools District,2023
+019379,EA Academy - Brook Park,Cuyahoga,Exact,390351381091007,043612,Berea City,2023
+019381,Alive Vineyard Academy,Licking,Non_Exact,390897519001002,044453,Newark City,2023
+019386,Bridgeway Academy,Franklin,Exact,390490087301003,043802,Columbus City Schools District,2023
+019387,High Road School of Bucyrus,Crawford,Exact,390339743001030,046524,Wynford Local,2023
+019395,Calvary Christian School,Logan,Exact,390910038001047,043588,Bellefontaine City,2023
+019400,REWIRED,Licking,Non_Exact,390897528021007,044115,Heath City,2023
+019503,Heritage Christian School,Hancock,Exact,390630004006010,043984,Findlay City,2023
+019518,Enon Montessori,Greene,Exact,390572003001014,043968,Fairborn City,2023
+019559,Queen of Apostles School,Lucas,Exact,390950103003026,044909,Toledo City,2023
+019846,NewPath Academy,Hamilton,Exact,390610064003014,043752,Cincinnati Public Schools,2023
+019848,Mesivta of Cincinnati,Hamilton,Exact,390610234001004,043752,Cincinnati Public Schools,2023
+019850,Julie Billiart School,Cuyahoga,Exact,390351891084001,045062,Westlake City,2023
+019880,New Story Schools Sandusky,Erie,Exact,390430408012011,044743,Sandusky City,2023
+019881,New Story Schools Circleville,Pickaway,Exact,391290203201035,043760,Circleville City,2023
+019882,New Story Schools Athens,Athens,Exact,390099738003028,045906,Alexander Local,2023
+019884,New Story Schools Columbus,Franklin,Exact,390490063973002,047027,Dublin City,2023
+019891,Akili Christian High School,Franklin,Exact,390490002201002,043802,Columbus City Schools District,2023
+019895,Universal Muslim Academy,Hamilton,Exact,390610026002001,043752,Cincinnati Public Schools,2023
+019897,The Nest School,Summit,Exact,391535332003001,050021,Hudson City,2023
+019911,The Mastery School of Hawken,Cuyahoga,Exact,390351968003009,043786,Cleveland Municipal,2023
+019990,Della School of Coding and Design,Franklin,Exact,390490094981000,046979,Groveport Madison Local,2023
+020136,Brown County Christian Academy,Brown,Exact,390159514001034,046037,Eastern Local School District,2023
+020357,New Story Schools Independence,Cuyahoga,Exact,390351923001017,046557,Cuyahoga Heights Local,2023
+020358,The Greater Dayton School,Montgomery,Non_Exact,391130034043008,043844,Dayton City,2023
+020368,EA Academy - Bedford,Cuyahoga,Exact,390351323022019,043562,Bedford City,2023
+020398,EA Academy - Cuyahoga Falls,Summit,Exact,391535201054009,043836,Cuyahoga Falls City,2023
+020399,Christian Community School,Lorain,Exact,390930911001024,048173,Midview Local,2023
+020400,Yeshivas Toras Chaim,Cuyahoga,No_Match,,,,
+020401,Shepherd of All God's Children Learning Center/Preschool,Mahoning,Exact,390998030001000,045161,Youngstown City,2023
+020406,EA Academy - Ravenna,Portage,Exact,391336010001023,044685,Ravenna City,2023
+020407,EA Academy - Elyria,Lorain,Exact,390930701024008,043943,Elyria City Schools,2023
+020408,EA Academy - Springfield,Summit,Exact,391535311022000,050062,Springfield Local,2023
+020435,Westside Christian School,Franklin,Exact,390490083222000,043802,Columbus City Schools District,2023
+020497,Enon Montessori,Greene,Exact,390230030011027,046235,Greenon Local,2023
+020513,UrbaNeXt - Cincinnati,Hamilton,Exact,390610110001004,043752,Cincinnati Public Schools,2023
+020548,EA Academy - Painesville,Lake,Exact,390852045001002,044628,Painesville City Local,2023
+020733,Global Connection Academy,Geauga,Exact,390553101002023,047167,Berkshire Local,2023
+020795,Providence Academy,Cuyahoga,Exact,390351776052000,044636,Parma City,2023
+020973,Icon Preparatory School Cleveland,Cuyahoga,Exact,390351242021000,043786,Cleveland Municipal,2023
+021042,St. John Dublin Lutheran School,Franklin,Exact,390490062412006,047019,Hilliard City,2023
+021087,Crown Preparatory Academy,Franklin,Exact,390490075501005,043802,Columbus City Schools District,2023
+021240,Shekinah Christian School,Madison,Exact,390970401011011,048264,Jonathan Alder Local,2023
+021241,The Juniper School,Franklin,Exact,390490068222007,043802,Columbus City Schools District,2023
+021429,Albayan Academy,Warren,Exact,391650307001008,044008,Franklin City,2023
+021430,Milford Christian Academy,Clermont,Exact,390250407022001,045500,Milford Exempted Village,2023
+021471,St. Philomena Montessori,Shelby,Exact,391499715003044,049759,Anna Local,2023
+021472,Northside Christian School,Franklin,Exact,390490071141012,045047,Westerville City,2023
+021498,Roman Avery Academy,Lorain,Non_Exact,390930241002001,048132,Clearview Local,2023
+021499,Heritage Classical Academy - Pepper Pike,Cuyahoga,Exact,390351791022018,046581,Orange City,2023
+021501,Heritage Classical Academy - Peninsula,Summit,Exact,391535326003043,049973,Woodridge Local,2023
+021502,Laurel School - Butler Campus,Geauga,Exact,390553115002012,047225,West Geauga Local,2023
+021530,Wayside Christian School,Crawford,Exact,390339743001019,046524,Wynford Local,2023
+021531,The Calvary Academy,Hamilton,Exact,390610215011000,044677,Princeton City,2023
+021532,Harvest Temple Christian Academy,Sandusky,Exact,391439620005014,045302,Clyde-Green Springs Exempted Village,2023
+021533,Guardian Academy,Delaware,Exact,390410114212005,046763,Olentangy Local,2023
+021685,Julie Billiart School Brecksville,Cuyahoga,Exact,390351351043003,043646,Brecksville-Broadview Heights City,2023
+021686,Ohio Ihsan Academy,Franklin,Exact,390490062412032,047019,Hilliard City,2023
+021687,Tarbiya Learning Academy,Franklin,Exact,390490077101011,043802,Columbus City Schools District,2023
+021688,Ummah Center School,Lorain,Exact,390930901001025,048140,Columbia Local,2023
+021696,Fayette Christian School,Fayette,Exact,390479260001003,046920,Miami Trace Local,2023
+021697,Hillside Christian Academy,Hamilton,Exact,390610212021005,043752,Cincinnati Public Schools,2023
+021698,SPIRE Academy,Ashtabula,No_Match,,,,
+021699,Xavier Jesuit Academy,Hamilton,Exact,390610064002000,043752,Cincinnati Public Schools,2023
+021700,Spectrum Academy,Ashtabula,Exact,390070007041030,043513,Ashtabula Area City,2023
+021701,Best Point Education - Cambridge,Butler,Exact,390170004005021,044107,Hamilton City,2023
+021727,Chesterton Academy of St. Joseph,Greene,Exact,390572003002024,043968,Fairborn City,2023
+021819,Al-Mahdi Academy,Lucas,Exact,390950086021016,044909,Toledo City,2023
+021820,Red Oak Community School,Franklin,Exact,390490001203000,043802,Columbus City Schools District,2023
+021902,ICM Learning Academy,Warren,Exact,391650319042008,050450,Mason City,2023
+021903,Salem Christian Academy,Montgomery,Exact,391131201011029,048694,Trotwood-Madison City,2023
+021937,Trout Lily Montessori School,Hamilton,Exact,390610255002004,044578,Norwood City,2023
+021941,Montessori Earth School,Franklin,Exact,390490025103048,043802,Columbus City Schools District,2023
+021942,Urban Promise Academy,Hamilton,Exact,390610088002000,043752,Cincinnati Public Schools,2023
+021976,Spectrum Inspires Elyria Campus,Lorain,Exact,390930706004010,043943,Elyria City Schools,2023
+021977,Veritas Classical Academy,Washington,Exact,391670204001029,044321,Marietta City,2023
+022013,Temple Christian School,Richland,Exact,391390008001016,049452,Madison Local,2023
+022014,KUEST Academy,Marion,Exact,391010104002000,048421,Pleasant Local,2023
+022015,Summit Christian Academy,Lucas,Exact,390950083042011,044875,Sylvania Schools,2023
+022016,SCI The Bryan Center,Williams,Exact,391719507001012,043679,Bryan City,2023
+022030,Anchor Christian Academy,Muskingum,Exact,391199122003006,045179,Zanesville City,2023
+022031,Hametown Christian Academy,Summit,Exact,391535320013025,044552,Norton City,2023
+022032,Tabor Ridge Christian School,Morgan,Exact,391159691001049,048777,Morgan Local,2023
+022035,Wings of Change Learning Center,Summit,Exact,391535202021004,043836,Cuyahoga Falls City,2023
+022070,Bible Believers Christian School,Allen,Exact,390030118002004,045799,Shawnee Local,2023
+022071,Eastern Road Christian Academy,Wayne,Exact,391690034003008,045591,Rittman Exempted Village,2023
+022072,Flying Trees Academy,Mahoning,Non_Exact,390998115002018,048306,Boardman Local,2023
+022097,The Christian Academy,Licking,Non_Exact,390897528011019,044115,Heath City,2023
+022197,Al Hidaya Academy,Franklin,Exact,390490074241021,046961,Gahanna-Jefferson City,2023
+022198,Baraka Islamic School,Stark,Exact,391517119001047,049858,Jackson Local,2023
+022199,Applied Behavioral Services Dayton,Montgomery,Exact,391130505041020,044396,Miamisburg City,2023
+022201,Generations Matter Academy,Lake,Exact,390852057012002,047886,Madison Local,2023
+022203,Universal Academy of Columbus,Franklin,Exact,390490075111003,043802,Columbus City Schools District,2023
+022204,Forest City Academy,Cuyahoga,Exact,390351164003006,043786,Cleveland Municipal,2023
+022207,Berean Christian Academy,Marion,Exact,391010104003002,048421,Pleasant Local,2023
+022208,Rhema Academy,Marion,Exact,391010101004024,048447,River Valley Local,2023
+022214,Kingdom Connection Academy,Van Wert,Exact,391610206001003,044966,Van Wert City,2023
+022215,Kids Thrive Cincinnati,Hamilton,Exact,390610271004005,043752,Cincinnati Public Schools,2023
+022216,Applied Behavioral Services Cincinnati,Hamilton,Exact,390610230011013,044677,Princeton City,2023
+022224,Rapha Leadership Academy,Lorain,Exact,390930706004004,043943,Elyria City Schools,2023
+022253,Dreams Academy,Summit,Exact,391535067001002,043489,Akron City,2023
+022268,High Street Christian Academy,Franklin,Exact,390490070411022,045138,Worthington City,2023
+022386,OneSchool Global - Ashland,Ashland,Exact,390059710002018,045823,Hillsdale Local,2023
+022393,Agape Christian Academy,Geauga,Exact,390553120001013,047167,Berkshire Local,2023
+022394,Crossroads Christian Academy Middle and High School,Pickaway,Exact,391290202003009,043760,Circleville City,2023
+022395,Lifeway Lead Academy,Greene,Exact,390572106032001,047241,Beavercreek City,2023
+022408,Speiro Academy School of Ministry and Fine Arts,Belmont,Exact,390130116001021,043570,Bellaire Local,2023
+022423,Chesterton Academy of Akron,Summit,Exact,391535048005017,043489,Akron City,2023
+022424,Kids Thrive Columbus,Franklin,Exact,390490060002011,043802,Columbus City Schools District,2023
+022425,Chesterton Academy of St. Benedict,Franklin,No_Match,,,,
+022427,Legacy Christian High School,Tuscarawas,Exact,391570213001002,050278,Garaway Local,2023
+022428,Piqua Christian School,Miami,Exact,391093150025004,044644,Piqua City,2023
+022447,Classical Christian Academy,Cuyahoga,Exact,390351835024007,044750,Shaker Heights City,2023
+022448,Clermont Christian School,Clermont,Exact,390250413053000,046359,West Clermont Local,2023
+022449,Legacy Christian Academy,Scioto,Exact,391450029022035,049668,Wheelersburg Local,2023
+022450,New Story Schools Berea,Cuyahoga,Exact,390351342041011,043612,Berea City,2023
+022453,Oak Grove Christian School,Washington,No_Match,,,,
+022454,St. Edmund Campion Academy,Hamilton,Exact,390610028002027,043752,Cincinnati Public Schools,2023
+022455,Possibility Academy Cleveland,Cuyahoga,Non_Exact,390351013002001,043786,Cleveland Municipal,2023
+022456,New Story Schools Toledo,Lucas,Exact,390950071042028,044362,Maumee City,2023
+022457,Ignite STEAM Academy,Clark,Exact,390230009021029,044818,Springfield City School District,2023
+022563,The Genesis School,Cuyahoga,Exact,390351051001011,043786,Cleveland Municipal,2023
+022564,BrightPath Active Learning,Delaware,Exact,390410117621000,045047,Westerville City,2023
+022565,Defiance Christian Academy,Defiance,Exact,390399588004028,046706,Ayersville Local,2023
+022567,The Resonance Lab,Hamilton,Exact,390610235224002,044867,Sycamore Community City,2023
+022568,Grace Baptist Academy,Crawford,Exact,390339749004027,045344,Crestline Exempted Village,2023
+022569,Gray Road Christian Academy,Hamilton,Exact,390610081001006,043752,Cincinnati Public Schools,2023
+022573,McComb Christian Academy,Hancock,No_Match,,,,
+022575,Cheder Torah Ohr,Cuyahoga,Exact,390351852033000,044792,South Euclid-Lyndhurst City,2023
+022576,St. Gregory Classical Academy,Summit,Exact,391535048005017,043489,Akron City,2023
+022577,Sunny Day Leadership and Reclamation Academy,Cuyahoga,Exact,390351087011016,043786,Cleveland Municipal,2023
+022578,Northwest Presbyterian Christian Academy,Franklin,Exact,390490104022008,047027,Dublin City,2023
+022579,Excel Academy,Cuyahoga,Exact,390351960001021,043794,Cleveland Heights-University Heights City,2023
+022583,Akiva Academy Middle School,Trumbull,Non_Exact,391559319003003,050195,Liberty Local,2023
+022584,Ave Maria Academy,Franklin,Exact,390490063863007,045138,Worthington City,2023
+052613,Andrews Osborne Academy,Lake,No_Match,,,,
+052621,Archbishop Alter,Montgomery,Exact,391130206021001,044180,Kettering City School District,2023
+052639,Archbishop Hoban,Summit,No_Match,,,,
+052647,Stephen T Badin,Butler,Exact,390170013002006,044107,Hamilton City,2023
+052654,Beaumont School,Cuyahoga,Exact,390351416012010,043794,Cleveland Heights-University Heights City,2023
+052662,Benedictine,Cuyahoga,Exact,390351196003000,043786,Cleveland Municipal,2023
+052670,Wm V Fisher Catholic,Fairfield,Exact,390450314011018,044206,Lancaster City,2023
+052696,Bishop Hartley,Franklin,Exact,390490093321000,043802,Columbus City Schools District,2023
+052704,Bishop Ready,Franklin,Exact,390490083213011,043802,Columbus City Schools District,2023
+052712,Bishop Rosecrans,Muskingum,Exact,391199120003015,045179,Zanesville City,2023
+052720,Bishop Watterson,Franklin,Exact,390490002101007,043802,Columbus City Schools District,2023
+052779,Calvert Catholic Schools,Seneca,Exact,391479636003002,044891,Tiffin City Schools,2023
+052787,Cardinal Mooney,Mahoning,Exact,390998017002018,045161,Youngstown City,2023
+052795,Cardinal Stritch Catholic High School & Academy,Lucas,Exact,390950101005004,044602,Oregon City,2023
+052803,Archbishop Carroll High School,Montgomery,Exact,391130910002002,047241,Beavercreek City,2023
+052829,Catholic Central,Clark,Exact,390230004001013,044818,Springfield City School District,2023
+052837,Catholic Central,Jefferson,No_Match,,,,
+052845,Central Catholic,Stark,Exact,391517134012005,049924,Perry Local,2023
+052852,Central Catholic,Lucas,Exact,390950017001005,044909,Toledo City,2023
+052860,Central Christian,Wayne,No_Match,,,,
+052878,Chaminade-Julienne,Montgomery,Exact,391130034041021,043844,Dayton City,2023
+052894,Cincinnati Country Day,Hamilton,Exact,390610244022015,045435,Indian Hill Exempted Village,2023
+052902,Seven Hills School,Hamilton,Exact,390610055004002,043752,Cincinnati Public Schools,2023
+052910,Columbus Academy,Franklin,Exact,390490074923002,046961,Gahanna-Jefferson City,2023
+052928,Columbus School For Girls,Franklin,Exact,390490090003003,043620,Bexley City,2023
+052936,Spring Valley Academy,Montgomery,Non_Exact,391130403023033,043737,Centerville City,2023
+052951,Elder,Hamilton,Exact,390610097001004,043752,Cincinnati Public Schools,2023
+052969,Elyria Catholic,Lorain,Exact,390930706001008,043943,Elyria City Schools,2023
+052977,Bishop Fenwick,Warren,No_Match,,,,
+052985,Olney Friends,Belmont,Exact,390130109011049,045203,Barnesville Exempted Village,2023
+052993,Gilmour Academy,Cuyahoga,Exact,390351945001032,044370,Mayfield City,2023
+053009,Aldersgate Christian Academy,Hamilton,Exact,390610018002010,043752,Cincinnati Public Schools,2023
+053033,Hathaway Brown,Cuyahoga,Exact,390351832001006,044750,Shaker Heights City,2023
+053041,Hawken School,Geauga,Exact,390553106001000,047225,West Geauga Local,2023
+053058,Hebrew Academy Of Cleveland,Cuyahoga,Exact,390351407013005,043794,Cleveland Heights-University Heights City,2023
+053082,Lehman High School,Shelby,Non_Exact,391499718001008,044784,Sidney City,2023
+053116,Central Catholic Tuscarawas Co,Tuscarawas,Exact,391570209001028,044487,New Philadelphia City,2023
+053124,John F Kennedy Catholic Upper School,Trumbull,Exact,391559216003018,044990,Warren City,2023
+053140,Lasalle,Hamilton,Exact,390610208113003,047365,Northwest Local,2023
+053165,Lima Central Catholic,Allen,Exact,390030109003020,045799,Shawnee Local,2023
+053199,Lutheran East,Cuyahoga,No_Match,,,,
+053207,Lutheran West,Cuyahoga,Exact,390351812044001,044701,Rocky River City,2023
+053215,Magnificat,Cuyahoga,Exact,390351812041004,044701,Rocky River City,2023
+053256,Trinity,Cuyahoga,Exact,390351546012005,044040,Garfield Heights City Schools,2023
+053272,Mercy McAuley High School,Hamilton,Exact,390610082023000,043752,Cincinnati Public Schools,2023
+053298,McNicholas,Hamilton,Exact,390610046021007,043752,Cincinnati Public Schools,2023
+053306,Moeller,Hamilton,Exact,390610240021006,045435,Indian Hill Exempted Village,2023
+053322,Mount Notre Dame,Hamilton,Exact,390610232222002,044693,Reading Community City,2023
+053348,Holy Name High School,Cuyahoga,Exact,390351781025003,044636,Parma City,2023
+053355,Newark Catholic,Licking,Exact,390897536001001,044453,Newark City,2023
+053363,Notre Dame Jr/Sr,Scioto,Exact,391450033002015,044669,Portsmouth City,2023
+053371,Notre Dame-Cathedral Latin,Geauga,Exact,390553108002006,047183,Chardon Local,2023
+053389,Notre Dame Academy,Lucas,Exact,390950077001001,048231,Washington Local,2023
+053439,Padua Franciscan,Cuyahoga,Exact,390351776083002,044636,Parma City,2023
+053454,Purcell-Marian,Hamilton,Exact,390610041002006,043752,Cincinnati Public Schools,2023
+053488,Roger Bacon,Hamilton,No_Match,,,,
+053496,Bonner Academy at The Buckeye Ranch,Franklin,Exact,390490046203001,043802,Columbus City Schools District,2023
+053520,St Charles Preparatory,Franklin,Exact,390490090002011,043620,Bexley City,2023
+053546,St Edward,Cuyahoga,Non_Exact,390351605002009,044198,Lakewood City,2023
+053587,St Francis De Sales,Franklin,Exact,390490077214002,043802,Columbus City Schools District,2023
+053595,St Francis De Sales School,Lucas,Exact,390950024013002,044909,Toledo City,2023
+053611,St Joan Of Arc,Lucas,Exact,390950072042022,048223,Springfield Local,2023
+053629,St Ignatius High School,Cuyahoga,Exact,390351977003028,043786,Cleveland Municipal,2023
+053637,Saint John School,Ashtabula,Exact,390070007023005,043513,Ashtabula Area City,2023
+053645,St John Elementary and High School,Allen,Exact,390030139002003,043885,Delphos City,2023
+053660,Villa Angela-St Joseph,Cuyahoga,Exact,390351177005001,043786,Cleveland Municipal,2023
+053686,Bishop Hoffman Catholic St Joseph Central Catholic HS,Sandusky,Exact,391439614003004,044016,Fremont City,2023
+053702,St Joseph Academy,Cuyahoga,Exact,390351234004003,043786,Cleveland Municipal,2023
+053728,St Joseph Central,Lawrence,Exact,390870503003004,044149,Ironton City School District,2023
+053751,Sandusky Central Catholic School,Erie,Non_Exact,390430408012012,044743,Sandusky City,2023
+053769,Norwalk Catholic School,Huron,Exact,390779155004011,044560,Norwalk City,2023
+053801,St Rita School for the Deaf,Hamilton,Exact,390610231001015,044677,Princeton City,2023
+053827,St Thomas Aquinas,Stark,Exact,391517124001014,049874,Louisville City,2023
+053835,St Ursula Academy,Hamilton,Exact,390610020001003,043752,Cincinnati Public Schools,2023
+053843,St Ursula Academy,Lucas,Exact,390950077002040,048215,Ottawa Hills Local,2023
+053850,St Vincent St Mary,Summit,Exact,391535074001031,043489,Akron City,2023
+053876,St Xavier,Hamilton,Exact,390610222002005,047332,Finneytown Local,2023
+053884,Seton,Hamilton,Exact,390610097001004,043752,Cincinnati Public Schools,2023
+053900,Summit Country Day,Hamilton,Exact,390610049004011,043752,Cincinnati Public Schools,2023
+053918,Telshe,Lake,Exact,390852009002010,045088,Wickliffe City,2023
+053926,The University School - College Prep,Cuyahoga,Exact,390351963001011,046581,Orange City,2023
+053934,Ursuline,Mahoning,Exact,390998040002016,045161,Youngstown City,2023
+053942,Ursuline Academy,Hamilton,Exact,390610235212009,044867,Sycamore Community City,2023
+053975,Western Reserve Academy,Summit,Exact,391535331022007,050021,Hudson City,2023
+053983,Cleveland Central Catholic,Cuyahoga,Exact,390351981001002,043786,Cleveland Municipal,2023
+054015,St John's Jesuit,Lucas,Exact,390950072042009,048223,Springfield Local,2023
+054031,Clifton Christian Academy,Hamilton,Exact,390610070001009,043752,Cincinnati Public Schools,2023
+054148,Mount Vernon Seventh-Day Adven,Knox,Exact,390830072005002,044420,Mount Vernon City,2023
+054163,Toledo Junior Academy,Lucas,Exact,390950083031010,044875,Sylvania Schools,2023
+054171,Mayfair Christian School,Summit,Exact,391535329993012,050013,Green Local,2023
+054205,All Saints,Hamilton,Non_Exact,390610240021006,045435,Indian Hill Exempted Village,2023
+054213,Annunciation,Hamilton,Exact,390610071002004,043752,Cincinnati Public Schools,2023
+054239,Ascension,Montgomery,Exact,391130211003027,044180,Kettering City School District,2023
+054270,Cardinal Pacelli,Hamilton,Exact,390610047033006,043752,Cincinnati Public Schools,2023
+054288,St. Benedict the Moor Catholic School,Montgomery,Exact,391130039002019,043844,Dayton City,2023
+054312,St Andrew/St Elizabeth A Seton,Clermont,Exact,390250407023004,045500,Milford Exempted Village,2023
+054320,Guardian Angels,Hamilton,Exact,390610046031001,043752,Cincinnati Public Schools,2023
+054338,Holy Angels,Montgomery,Exact,391130034021030,043844,Dayton City,2023
+054346,Holy Angels,Shelby,Exact,391499720004000,044784,Sidney City,2023
+054361,Holy Family,Hamilton,Exact,390610093002009,043752,Cincinnati Public Schools,2023
+054387,Holy Rosary,Auglaize,Exact,390110406001026,044727,St Marys City,2023
+054411,Immaculate Conception,Mercer,Exact,391079674001032,043729,Celina City,2023
+054429,Immaculate Conception,Montgomery,Exact,391130029002006,043844,Dayton City,2023
+054437,Immaculate Heart Of Mary,Hamilton,Exact,390610251024000,047340,Forest Hills Local,2023
+054445,Incarnation,Montgomery,Exact,391130404013003,043737,Centerville City,2023
+054486,Nativity,Hamilton,Exact,390610057022000,043752,Cincinnati Public Schools,2023
+054510,Our Lady Of Lourdes,Hamilton,Exact,390610102013013,043752,Cincinnati Public Schools,2023
+054544,Our Lady Of Rosary,Montgomery,Exact,391130018022014,043844,Dayton City,2023
+054577,Our Lady Of Victory,Hamilton,Exact,390610213033004,047373,Oak Hills Local,2023
+054585,Our Lady Of Visitation,Hamilton,Exact,390610211021001,047373,Oak Hills Local,2023
+054601,Mother Maria Anna Brunner Catholic,Montgomery,Exact,391130707001001,048694,Trotwood-Madison City,2023
+054627,Queen Of Peace,Butler,Exact,390170150002030,046144,Ross Local,2023
+054635,Resurrection,Hamilton,Exact,390610098001013,043752,Cincinnati Public Schools,2023
+054650,Sacred Heart,Butler,Exact,390170109014000,046102,Fairfield City,2023
+054692,St Albert The Great,Montgomery,Exact,391130203001010,044180,Kettering City School District,2023
+054718,St Aloysius Gonzaga,Hamilton,Exact,390610210011008,047373,Oak Hills Local,2023
+054742,Our Lady of Grace Catholic School,Hamilton,Exact,390610207052001,047365,Northwest Local,2023
+054759,St Ann,Butler,Exact,390170002003006,044107,Hamilton City,2023
+054783,St Antoninus,Hamilton,Exact,390610212024000,043752,Cincinnati Public Schools,2023
+054809,John Paul II Catholic School,Hamilton,Exact,390610221012002,044081,Winton Woods City,2023
+054817,St Bernadette,Clermont,Exact,390250415042012,046359,West Clermont Local,2023
+054833,St Bernard School,Hamilton,Exact,390610206013004,047365,Northwest Local,2023
+054866,St Boniface,Hamilton,Exact,390610277003005,043752,Cincinnati Public Schools,2023
+054882,St Brigid,Greene,Exact,390572401001003,045153,Xenia Community City,2023
+054890,St Catharine Of Siena,Hamilton,Exact,390610102021000,043752,Cincinnati Public Schools,2023
+054908,St Cecilia,Hamilton,Exact,390610053013000,043752,Cincinnati Public Schools,2023
+054916,St Charles Borromeo,Montgomery,Exact,391130206021001,044180,Kettering City School District,2023
+054932,St Christopher,Montgomery,Exact,391131150113001,044958,Vandalia-Butler City,2023
+054957,St Clement,Hamilton,No_Match,,,,
+054965,St Columban,Clermont,Non_Exact,390250403011017,044271,Loveland City,2023
+054973,St Dominic,Hamilton,Exact,390610214222002,047373,Oak Hills Local,2023
+054999,St Francis Desales,Hamilton,Exact,390610041002006,043752,Cincinnati Public Schools,2023
+055004,St Francis Desales,Warren,Non_Exact,391650315002008,044214,Lebanon City,2023
+055012,St Francis Seraph,Hamilton,Exact,390610017002013,043752,Cincinnati Public Schools,2023
+055020,St Gabriel,Hamilton,Exact,390610224002008,044677,Princeton City,2023
+055038,Corryville Catholic,Hamilton,Exact,390610030003008,043752,Cincinnati Public Schools,2023
+055046,St Gertrude,Hamilton,Exact,390610241006016,044289,Madeira City,2023
+055053,St Helen,Montgomery,Exact,391130909002002,048702,Mad River Local,2023
+055087,St Ignatius Loyola,Hamilton,Exact,390610208021001,047365,Northwest Local,2023
+055103,St James,Hamilton,Exact,390610207072007,047365,Northwest Local,2023
+055129,St. John XXIII Catholic School,Butler,Exact,390170127002000,044404,Middletown City,2023
+055137,St John The Baptist,Hamilton,Exact,390610205022004,047365,Northwest Local,2023
+055145,St John The Baptist,Hamilton,Exact,390610261032001,047381,Southwest Local,2023
+055178,St Joseph,Butler,Exact,390170003001028,044107,Hamilton City,2023
+055210,St Jude,Hamilton,Exact,390610210012000,047373,Oak Hills Local,2023
+055228,St Lawrence,Hamilton,Exact,390610094001014,043752,Cincinnati Public Schools,2023
+055244,St Louis,Clermont,Exact,390250408004004,046326,Clermont Northeastern Local,2023
+055251,St Luke,Greene,Exact,390572106022001,047241,Beavercreek City,2023
+055319,St Mary,Hamilton,Exact,390610050002006,043752,Cincinnati Public Schools,2023
+055335,St Mary,Darke,Exact,390375551012007,044099,Greenville City,2023
+055368,Piqua Catholic Elementary,Miami,Exact,391093151005001,044644,Piqua City,2023
+055400,St Michael Consolidated,Brown,Exact,390159517002016,046078,Ripley-Union-Lewis-Huntington Local,2023
+055418,St Michael,Hamilton,Exact,390610230023005,044677,Princeton City,2023
+055434,St Patrick,Miami,Exact,391093652001008,044925,Troy City,2023
+055442,St Peter,Montgomery,Exact,391131002033009,048751,Huber Heights City,2023
+055475,St Peter In Chains,Butler,Exact,390170147001007,044107,Hamilton City,2023
+055566,St Susanna,Warren,Exact,391650319081015,050450,Mason City,2023
+055582,St Teresa Of Avila,Hamilton,Exact,390610099012000,043752,Cincinnati Public Schools,2023
+055590,St Thomas More,Clermont,Exact,390250413052000,046359,West Clermont Local,2023
+055608,St Ursula Villa,Hamilton,Exact,390610047033000,043752,Cincinnati Public Schools,2023
+055632,St Vincent Ferrer,Hamilton,Exact,390610240016000,045435,Indian Hill Exempted Village,2023
+055640,St Vivian,Hamilton,Exact,390610222002014,047332,Finneytown Local,2023
+055657,St William,Hamilton,Non_Exact,390610097003003,043752,Cincinnati Public Schools,2023
+055749,Holy Name,Cuyahoga,Exact,390351158002002,043786,Cleveland Municipal,2023
+055814,Our Lady Of Angels,Cuyahoga,Exact,390351234004003,043786,Cleveland Municipal,2023
+055822,Mary Queen of Peace School,Cuyahoga,Exact,390351066001000,043786,Cleveland Municipal,2023
+055855,Our Lady Of Mt Carmel West,Cuyahoga,Exact,390351012012002,043786,Cleveland Municipal,2023
+055913,St Adalbert,Cuyahoga,Exact,390351972004014,043786,Cleveland Municipal,2023
+055947,St Agatha-St Aloysius,Cuyahoga,Exact,390351165001000,043786,Cleveland Municipal,2023
+056010,St Francis,Cuyahoga,Exact,390351989001011,043786,Cleveland Municipal,2023
+056036,Archbishop Lyke-St Henry Campus,Cuyahoga,Non_Exact,390351221002000,043786,Cleveland Municipal,2023
+056051,St Ignatius,Cuyahoga,Exact,390351022001001,043786,Cleveland Municipal,2023
+056069,St Jerome,Cuyahoga,Exact,390351171013000,043786,Cleveland Municipal,2023
+056127,St Leo The Great,Cuyahoga,No_Match,,,,
+056143,St Mark,Cuyahoga,Exact,390351231001007,043786,Cleveland Municipal,2023
+056242,St Rocco,Cuyahoga,Exact,390351029001006,043786,Cleveland Municipal,2023
+056267,St Stanislaus,Cuyahoga,Exact,390351981001002,043786,Cleveland Municipal,2023
+056275,Metro Catholic Parish,Cuyahoga,Exact,390351975003002,043786,Cleveland Municipal,2023
+056283,St Thomas Aquinas,Cuyahoga,Exact,390351990002016,043786,Cleveland Municipal,2023
+056358,St Mary Byzantine,Cuyahoga,No_Match,,,,
+056366,St Raphael,Cuyahoga,Exact,390351301052012,043547,Bay Village City,2023
+056408,St Mary,Cuyahoga,Exact,390351342043000,043612,Berea City,2023
+056416,Assumption,Cuyahoga,Exact,390351361041001,043646,Brecksville-Broadview Heights City,2023
+056424,St Thomas More,Cuyahoga,Exact,390351371011004,043653,Brooklyn City,2023
+056432,St Joan Of Arc,Cuyahoga,Exact,390351959002011,045286,Chagrin Falls Exempted Village,2023
+056440,Saint Ann School at Communion of Saints Parish,Cuyahoga,Exact,390351414001005,043794,Cleveland Heights-University Heights City,2023
+056481,Our Lady of the Lake School,Cuyahoga,Exact,390351521011004,043950,Euclid City,2023
+056531,SS. Robert & William Catholic School LLC,Cuyahoga,Exact,390351523023002,043950,Euclid City,2023
+056549,St Angela Merici,Cuyahoga,Non_Exact,390351531052012,043976,Fairview Park City,2023
+056556,St Benedict Catholic School,Cuyahoga,Exact,390351546042009,044040,Garfield Heights City Schools,2023
+056580,St Francis Of Assisi,Cuyahoga,Exact,390351945001017,044370,Mayfield City,2023
+056598,St Paschal Baylon,Cuyahoga,Exact,390351551022013,044370,Mayfield City,2023
+056606,St Michael,Cuyahoga,Exact,390351561021000,046565,Independence Local,2023
+056648,Lakewood Catholic Academy,Cuyahoga,Exact,390351604001001,044198,Lakewood City,2023
+056655,Corpus Christi Academy,Cuyahoga,Exact,390351701022000,044792,South Euclid-Lyndhurst City,2023
+056689,Academy Of St Bartholomew,Cuyahoga,Exact,390351731061000,043612,Berea City,2023
+056697,St Brendan,Cuyahoga,Exact,390351742072003,044529,North Olmsted City,2023
+056713,St Albert The Great,Cuyahoga,Exact,390351751052005,044545,North Royalton City,2023
+056721,St Mary Of The Falls,Cuyahoga,Exact,390351761002014,046573,Olmsted Falls City,2023
+056739,Holy Family,Cuyahoga,Exact,390351776062007,044636,Parma City,2023
+056747,St Anthony Of Padua,Cuyahoga,Exact,390351776083002,044636,Parma City,2023
+056762,St Charles Borromeo,Cuyahoga,Exact,390351774063008,044636,Parma City,2023
+056770,St Columbkille,Cuyahoga,Exact,390351775031001,044636,Parma City,2023
+056804,St Christopher,Cuyahoga,Exact,390351812032003,044701,Rocky River City,2023
+056812,St Dominic,Cuyahoga,Exact,390351835012007,044750,Shaker Heights City,2023
+056820,St Rita,Cuyahoga,Exact,390351841061007,046607,Solon City,2023
+056853,Sts Joseph & John Interparochi,Cuyahoga,Exact,390351861032005,044842,Strongsville City,2023
+056861,Gesu Catholic School,Cuyahoga,Exact,390351871052007,043794,Cleveland Heights-University Heights City,2023
+056887,St Bernadette,Cuyahoga,Exact,390351891072007,045062,Westlake City,2023
+056911,Julie Billiart,Cuyahoga,Exact,390351702011004,044792,South Euclid-Lyndhurst City,2023
+056937,Our Lady Of The Elms,Summit,Exact,391535061002000,043489,Akron City,2023
+056945,Incarnate Word Academy,Cuyahoga,Exact,390351781011003,044636,Parma City,2023
+056994,St Anthony Of Padua,Summit,Exact,391535022001010,043489,Akron City,2023
+057018,St Francis De Sales,Summit,Exact,391535318012010,049999,Coventry Local,2023
+057034,St Hilary,Summit,Exact,391535322022030,049981,Copley-Fairlawn City,2023
+057067,St Mary Elementary,Summit,Exact,391535019001000,043489,Akron City,2023
+057109,St Vincent De Paul,Summit,Exact,391535083012000,043489,Akron City,2023
+057117,St Joseph,Lorain,Exact,390930502002026,045195,Amherst Exempted Village,2023
+057125,St Edward,Ashland,Non_Exact,390059704004016,043505,Ashland City,2023
+057133,Holy Trinity,Lorain,Exact,390930131012000,048116,Avon Local,2023
+057141,St Mary Immaculate Conception,Lorain,Exact,390930132011006,048116,Avon Local,2023
+057158,St Joseph,Lorain,Exact,390930103001012,048124,Avon Lake City,2023
+057182,St Augustine,Summit,Exact,391535101003029,043539,Barberton City,2023
+057208,St Ambrose,Medina,No_Match,,,,
+057216,Notre Dame School,Geauga,Exact,390553108002006,047183,Chardon Local,2023
+057224,St Mary,Geauga,Exact,390553122015000,047183,Chardon Local,2023
+057232,Immaculate Heart Of Mary,Summit,Exact,391535204004006,043836,Cuyahoga Falls City,2023
+057257,Sts Peter And Paul,Wayne,Exact,391690029011017,050534,Chippewa Local,2023
+057299,St Jude,Lorain,Exact,390930706001011,043943,Elyria City Schools,2023
+057307,St Mary,Lorain,Exact,390930976004037,043943,Elyria City Schools,2023
+057356,St Anthony Of Padua,Lorain,Exact,390930222002003,044263,Lorain City,2023
+057406,St Peter,Lorain,Exact,390930235002013,044263,Lorain City,2023
+057422,St Gabriel,Lake,Exact,390852050011000,045492,Mentor Exempted Village,2023
+057430,St Mary Of The Assumption,Lake,Exact,390852034003010,045492,Mentor Exempted Village,2023
+057448,St Helen,Geauga,Exact,390553114004027,047217,Newbury Local,2020
+057455,St Barnabas,Summit,Exact,391535327032008,050047,Nordonia Hills City,2023
+057463,St Peter,Lorain,Exact,390930806003003,044537,North Ridgeville City,2023
+057513,Holy Family,Summit,Exact,391535305011004,044834,Stow-Munroe Falls City School District,2023
+057521,Sacred Heart Of Jesus,Medina,Exact,391034171001015,044974,Wadsworth City,2023
+057539,Mater Dei Academy,Lake,Exact,390852008001000,045088,Wickliffe City,2023
+057562,St Mary Immaculate Conception,Wayne,Exact,391690001004010,045120,Wooster City,2023
+057570,Blessed Sacrament,Licking,Exact,390897525001014,044453,Newark City,2023
+057588,All Saints Academy,Franklin,Exact,390490027801001,043802,Columbus City Schools District,2023
+057646,Holy Spirit,Franklin,Exact,390490092402000,045070,Whitehall City,2023
+057653,Holy Trinity,Perry,Exact,391279659011021,049056,Northern Local,2023
+057661,Immaculate Conception,Franklin,Exact,390490004203000,043802,Columbus City Schools District,2023
+057679,Immaculate Conception,Tuscarawas,Exact,391570216004021,043778,Claymont City,2023
+057687,Our Lady Of Peace,Franklin,Exact,390490001202004,043802,Columbus City Schools District,2023
+057695,Our Lady Of Perpetual Help,Franklin,Exact,390490097114006,044800,South-Western City,2023
+057729,Sacred Heart,Coshocton,Exact,390319615002012,043828,Coshocton City,2023
+057745,St Agatha,Franklin,Exact,390490064302006,044933,Upper Arlington City,2023
+057778,St Andrew,Franklin,Exact,390490063212010,044933,Upper Arlington City,2023
+057810,St Bernadette,Fairfield,Exact,390450310003036,044206,Lancaster City,2023
+057836,St Brendan,Franklin,Exact,390490079641000,047019,Hilliard City,2023
+057844,St Catharine,Franklin,Exact,390490027601003,043802,Columbus City Schools District,2023
+057851,St Cecilia,Franklin,Exact,390490081631003,044800,South-Western City,2023
+057869,St. Christopher Catholic School,Franklin,Exact,390490019024006,043802,Columbus City Schools District,2023
+057885,St Francis De Sales,Licking,Exact,390897590001004,044453,Newark City,2023
+057901,St James The Less,Franklin,Exact,390490077103009,043802,Columbus City Schools District,2023
+057919,St John,Hocking,Exact,390739653002007,044248,Logan-Hocking Local,2023
+057943,Tuscarawas Central Catholic Elementary School,Tuscarawas,Exact,391570207006037,043893,Dover City,2023
+057950,St Joseph Montessori,Franklin,Exact,390490022002023,043802,Columbus City Schools District,2023
+057992,Bishop Flaget School,Ross,Exact,391419562003008,043745,Chillicothe City,2023
+058008,St Mary,Franklin,Exact,390490057003006,043802,Columbus City Schools District,2023
+058016,St Mary,Delaware,Exact,390410101002032,043877,Delaware City,2023
+058024,St Mary,Fairfield,Exact,390450322003030,044206,Lancaster City,2023
+058032,St Mary,Marion,Exact,391010009003014,044339,Marion City,2023
+058040,Notre Dame,Scioto,Exact,391450036003023,044669,Portsmouth City,2023
+058057,St Mary Magdalene,Franklin,Exact,390490046102008,043802,Columbus City Schools District,2023
+058065,St Matthew,Franklin,Exact,390490074273000,046961,Gahanna-Jefferson City,2023
+058073,St Josephine Bakhita School,Franklin,Exact,390490077214002,043802,Columbus City Schools District,2023
+058081,St Michael,Franklin,Non_Exact,390490068101003,045138,Worthington City,2023
+058099,Bishop Fenwick School,Muskingum,Exact,391199120003015,045179,Zanesville City,2023
+058115,St Paul School,Delaware,Exact,390410117622021,045047,Westerville City,2023
+058156,St Pius X,Franklin,Exact,390490093821014,047001,Reynoldsburg City,2023
+058206,St Timothy,Franklin,Exact,390490078113002,043802,Columbus City Schools District,2023
+058214,St Vincent De Paul,Knox,Exact,390830072003022,044420,Mount Vernon City,2023
+058255,St Benedict,Guernsey,Exact,390599776002014,043695,Cambridge City,2023
+058305,Bishop John King Mussio Central Elementary - Rosemont Campus,Jefferson,Exact,390810006002009,044826,Steubenville City,2023
+058339,St John,Washington,No_Match,,,,
+058370,St Lawrence,Lawrence,Exact,390870503001023,044149,Ironton City School District,2023
+058388,St Mary,Washington,Exact,391670208002018,044321,Marietta City,2023
+058396,St Mary Central,Belmont,Exact,390130121001045,044347,Martins Ferry City,2023
+058404,St Mary,Belmont,Exact,390130123002010,045997,St Clairsville-Richland City,2023
+058479,St Sylvester,Monroe,Exact,391119668003025,048652,Switzerland of Ohio Local,2023
+058487,Blessed Sacrament,Lucas,Exact,390950062002004,044909,Toledo City,2023
+058495,Christ The King,Lucas,No_Match,,,,
+058503,Gesu,Lucas,Exact,390950024013002,044909,Toledo City,2023
+058552,Immaculate Conception,Huron,Exact,390779160004053,043596,Bellevue City,2023
+058560,Immaculate Conception,Ottawa,Exact,391230506002019,044651,Port Clinton City,2023
+058602,St Benedict Catholic School,Lucas,Exact,390950085012012,044909,Toledo City,2023
+058628,St Mary,Richland,Exact,391390025001011,044776,Shelby City,2023
+058651,Our Lady Of Consolation,Wyandot,Exact,391759381003008,045260,Carey Exempted Village Schools,2023
+058677,Our Lady Of Perpetual Help,Lucas,Non_Exact,390950045012019,044909,Toledo City,2023
+058685,Regina Coeli,Lucas,Exact,390950057041002,048231,Washington Local,2023
+058693,Rosary Cathedral School,Lucas,Exact,390950016022009,044909,Toledo City,2023
+058727,Sacred Heart,Richland,Tie,,,,
+058768,St Aloysius,Wood,Exact,391730217023003,043638,Bowling Green City School District,2023
+058826,St Anthony Of Padua,Putnam,Exact,391370305001022,049312,Columbus Grove Local,2023
+058834,St Augustine,Henry,Exact,390690004003019,044438,Napoleon Area City,2023
+058859,St Boniface,Ottawa,Non_Exact,391230507001020,048926,Benton Carroll Salem Local,2023
+058875,St Charles,Allen,Exact,390030109003000,045799,Shawnee Local,2023
+058909,All Saints Catholic,Wood,Exact,391730203003020,045609,Rossford Exempted Village,2023
+058933,St Francis Xavier,Huron,Exact,390779163002015,045096,Willard City,2023
+058941,St Gerard,Allen,Exact,390030124002024,044222,Lima City,2023
+059014,Divine Mercy School,Paulding,Exact,391259603004043,049031,Wayne Trace Local,2023
+059022,Holy Cross Catholic School of Defiance,Defiance,Exact,390399589004018,043869,Defiance City,2023
+059055,St Joseph,Crawford,Exact,390339749003008,045344,Crestline Exempted Village,2023
+059071,St Joseph,Crawford,Exact,390339751002023,044024,Galion City,2023
+059089,St Joseph,Lucas,Exact,390950071024025,044362,Maumee City,2023
+059097,St Joseph,Huron,Exact,390779159001044,047712,Monroeville Local,2023
+059105,St Joseph,Lucas,Non_Exact,390950082072003,044875,Sylvania Schools,2023
+059139,St Louis,Wood,Exact,391730214003080,043638,Bowling Green City School District,2023
+059170,St Mary,Williams,Exact,391719509002030,050617,Edgerton Local,2023
+059196,St Mary,Putnam,Exact,391370301003037,049353,Leipsic Local,2023
+059204,St Mary Catholic School,Richland,Exact,391390019004033,049452,Madison Local,2023
+059246,Holy Trinity Assumption,Fulton,Exact,390510401002034,047050,Evergreen Local,2023
+059279,St Mary,Van Wert,Exact,391610209003009,044966,Van Wert City,2023
+059303,St Michael the Archangel School,Hancock,Exact,390630007002002,043984,Findlay City,2023
+059337,St Patrick,Williams,Exact,391719507004001,043679,Bryan City,2023
+059345,St Patrick Of Heatherdowns,Lucas,Exact,390950072022000,044362,Maumee City,2023
+059360,St Peter,Erie,Exact,390430405004030,044131,Huron City Schools,2023
+059378,St Peter,Richland,Exact,391390031002015,044297,Mansfield City,2023
+059386,St Peter,Wyandot,Exact,391759383004012,045625,Upper Sandusky Exempted Village,2023
+059394,Sts Peter And Paul,Putnam,Exact,391370303013003,049379,Ottawa-Glandorf Local,2023
+059428,St Pius X,Lucas,Exact,390950065002004,044909,Toledo City,2023
+059436,St Richard,Fulton,Exact,390510402002007,047092,Swanton Local,2023
+059444,St Rose,Allen,Exact,390030123001025,044222,Lima City,2023
+059451,St Rose,Wood,Exact,391730205001003,045583,Perrysburg Exempted Village,2023
+059535,Regina Coeli,Stark,Exact,391517103003005,043497,Alliance City,2023
+059592,St Charles,Mahoning,Exact,390998120014000,048306,Boardman Local,2023
+059626,St Joseph The Provider,Mahoning,Exact,390998140001022,045161,Youngstown City,2023
+059634,Sts Philip And James,Stark,Exact,391517112111050,049908,Northwest Local,2023
+059667,St Joan Of Arc,Stark,Exact,391517134012005,049924,Perry Local,2023
+059691,St Michael,Stark,Exact,391517115024009,049932,Plain Local,2023
+059717,St Peter,Stark,Exact,391517001001021,043711,Canton City,2023
+059733,Our Lady Of Peace,Stark,Exact,391517117004000,049932,Plain Local,2023
+059790,St Rose,Trumbull,Non_Exact,391559322001023,044065,Girard City School District,2023
+059816,St Patrick,Portage,Exact,391336012004011,044164,Kent City,2023
+059881,St Mary,Stark,Exact,391517137002015,044354,Massillon City,2023
+059956,St Paul,Stark,Exact,391517119003033,044503,North Canton City,2023
+059964,Holy Family,Mahoning,Exact,390998112001000,048348,Poland Local,2023
+059980,St Paul,Columbiana,Exact,390299505001002,044735,Salem City,2023
+060004,St Nicholas,Mahoning,Exact,390998107005003,044859,Struthers City,2023
+060012,St Joseph,Portage,Exact,391336020004024,049247,Waterloo Local,2023
+060020,John F. Kennedy Catholic Lower School,Trumbull,Exact,391559214001000,050161,Howland Local,2023
+060095,St James,Stark,No_Match,,,,
+060152,St Christine,Mahoning,Exact,390998027021004,045161,Youngstown City,2023
+060301,Bethany Lutheran School,Cuyahoga,Exact,390351774051004,044636,Parma City,2023
+060327,Immanuel Lutheran,Butler,Exact,390170148002000,044107,Hamilton City,2023
+060343,Luther Memorial,Cuyahoga,Exact,390351974003004,043786,Cleveland Municipal,2023
+060368,Redeemer Lutheran,Summit,Exact,391535204001016,043836,Cuyahoga Falls City,2023
+060384,St John Lutheran,Cuyahoga,Exact,390351176001010,043786,Cleveland Municipal,2023
+060426,St John Lutheran,Union,Exact,391590507011051,050328,Fairbanks Local,2023
+060434,St John Lutheran,Henry,Exact,390690002001054,044438,Napoleon Area City,2023
+060491,St Paul Lutheran,Henry,Exact,390690003002009,044438,Napoleon Area City,2023
+060509,St Paul Lutheran,Cuyahoga,Exact,390351891114000,045062,Westlake City,2023
+060533,St Thomas Lutheran,Cuyahoga,Exact,390351812012000,044701,Rocky River City,2023
+060541,Trinity Lutheran,Lucas,Exact,390950072021002,044909,Toledo City,2023
+060574,Messiah Lutheran,Cuyahoga,Exact,390351531061001,043976,Fairview Park City,2023
+060582,Celeryville Christian,Huron,Exact,390779163003046,045096,Willard City,2023
+060590,Cincinnati Hebrew Day Chofetz,Hamilton,Exact,390610234004001,043752,Cincinnati Public Schools,2023
+060624,Bethany,Hamilton,Exact,390610224001010,044677,Princeton City,2023
+060640,Canton Country Day School,Stark,Exact,391517115021005,049932,Plain Local,2023
+060657,Chapel Hill Christian North,Summit,Exact,391535201031042,043836,Cuyahoga Falls City,2023
+060723,Hawken Lower-Middle,Cuyahoga,Exact,390351702011004,044792,South Euclid-Lyndhurst City,2023
+060764,Laurel School,Cuyahoga,Exact,390351833001010,044750,Shaker Heights City,2023
+060806,Maumee Valley Country Day,Lucas,Exact,390950072081001,044909,Toledo City,2023
+060848,Old Trail,Summit,No_Match,,,,
+060863,Solomon Lutheran,Sandusky,Exact,391439610002017,049577,Woodmore Local,2023
+060889,Trinity Ev Lutheran,Hancock,Exact,390630013005056,047431,Cory-Rawson Local,2023
+060905,The University School,Cuyahoga,Exact,390351833002009,044750,Shaker Heights City,2023
+060921,St Paul Lutheran,Franklin,Non_Exact,390490057002041,043802,Columbus City Schools District,2023
+060947,St Anselm,Geauga,Exact,390553107002006,047225,West Geauga Local,2023
+060954,St Francis Xavier,Medina,Exact,391034083011003,044388,Medina City SD,2023
+060962,St Sebastian,Summit,Exact,391535061005013,043489,Akron City,2023
+062463,Grand River Academy,Ashtabula,Exact,390070010023006,044057,Geneva Area City,2023
+062471,Lake Ridge Academy,Lorain,Exact,390930805001003,044537,North Ridgeville City,2023
+062489,Walsh Jesuit,Summit,Exact,391535329023008,050021,Hudson City,2023
+062497,Trinity Lutheran,Union,Non_Exact,391590505021039,045476,Marysville Exempted Village,2023
+062521,Hillel Academy Of Dayton,Montgomery,Exact,391130101001003,044586,Oakwood City,2023
+062604,Rockwern Academy,Hamilton,Exact,390610240021011,045435,Indian Hill Exempted Village,2023
+062612,Ridgewood School The,Clark,Exact,390230037001049,046250,Northeastern Local,2023
+062620,Columbus Torah Academy,Franklin,Exact,390490093614009,043802,Columbus City Schools District,2023
+064394,Lake Catholic,Lake,Exact,390852029011003,045492,Mentor Exempted Village,2023
+064402,Joseph and Florence Mandel Jewish Day School,Cuyahoga,Non_Exact,390359810001003,043554,Beachwood City,2023
+064915,Lake Center Christian School,Stark,Exact,391517111112004,049866,Lake Local,2023
+064923,Central Baptist Academy - Elementary,Hamilton,Exact,390610222001000,047332,Finneytown Local,2023
+064931,The Childrens Home of Cincinnati,Hamilton,Exact,390610055003005,043752,Cincinnati Public Schools,2023
+065003,Heritage Christian,Stark,Exact,391517015003005,043711,Canton City,2023
+065722,The Lippman School,Summit,Exact,391535334004014,043489,Akron City,2023
+065730,Ratner School The,Cuyahoga,Non_Exact,390351791011017,046581,Orange City,2023
+065755,Bishop Leibold E And W Campus,Montgomery,Exact,391130501052021,044396,Miamisburg City,2023
+066555,Dayton Christian School,Montgomery,Exact,391130501071022,044396,Miamisburg City,2023
+067447,Mercy Montessori Center,Hamilton,Exact,390610020001000,043752,Cincinnati Public Schools,2023
+067546,Legacy Christian Academy,Greene,Exact,390572407001033,045153,Xenia Community City,2023
+067603,Springer School & Center,Hamilton,Exact,390610049003009,043752,Cincinnati Public Schools,2023
+067611,Cuyahoga Valley Christian Acad,Summit,Exact,391535329023016,050021,Hudson City,2023
+067629,Mansfield Christian School,Richland,Exact,391390021011019,049437,Lexington Local,2023
+067637,The Miami Valley School,Montgomery,Exact,391130401021002,043737,Centerville City,2023
+068031,Lial Catholic School,Lucas,Exact,390950089033006,048207,Anthony Wayne Local,2023
+068056,St Veronica,Clermont,Exact,390250414031009,046359,West Clermont Local,2023
+068189,Ramah Christian Academy,Cuyahoga,Exact,390351222002003,043786,Cleveland Municipal,2023
+068205,Delaware Christian,Delaware,Exact,390410105301000,043877,Delaware City,2023
+068338,Ashland Christian,Ashland,Exact,390059703003010,043505,Ashland City,2023
+068403,Valley Christian School,Mahoning,Exact,390998015002018,045161,Youngstown City,2023
+069906,Zion Lutheran,Lucas,Exact,390950066001008,044909,Toledo City,2023
+069914,Lawrence School,Cuyahoga,Non_Exact,390351361033004,043646,Brecksville-Broadview Heights City,2023
+070136,First Baptist Christian,Lorain,Exact,390930715002030,048165,Keystone Local,2023
+070151,East Liverpool Christian School,Columbiana,No_Match,,,,
+070243,Zanesville Seventh-Day Advent,Muskingum,Exact,391199117001001,045179,Zanesville City,2023
+070250,Piqua Seventh-Day Adventist,Miami,Non_Exact,391093150011022,044644,Piqua City,2023
+070276,Eastwood Seventh-day Adventist Junior Academy,Franklin,Non_Exact,390490100002010,045047,Westerville City,2023
+070409,Cincinnati Christian Schools,Butler,Exact,390170110033000,046102,Fairfield City,2023
+070664,All Saints School,Lake,Exact,390852009002009,045088,Wickliffe City,2023
+070748,Ruffing Montessori Ingalls,Cuyahoga,Exact,390351417002005,043794,Cleveland Heights-University Heights City,2023
+070771,Ruffing Montessori Rocky River,Cuyahoga,Exact,390351811005001,044701,Rocky River City,2023
+070789,Discovery,Richland,Exact,391390012002000,044297,Mansfield City,2023
+070912,The New School,Hamilton,Exact,390610065022006,043752,Cincinnati Public Schools,2023
+070961,Mater Dei Academy,Franklin,Exact,390490092202012,045070,Whitehall City,2023
+070979,Hudson Montessori,Summit,Exact,391535331013006,050021,Hudson City,2023
+071001,Worthington Christian School,Franklin,Exact,390490067223000,045138,Worthington City,2023
+071571,Chapel Hill Christian Green Campus,Summit,Exact,391535311032013,050062,Springfield Local,2023
+081851,Toledo Christian,Lucas,Exact,390950045043004,044909,Toledo City,2023
+083295,Valley Christian Academy,Portage,Exact,391336003042023,049171,Aurora City,2023
+083923,Tree Of Life-Clintonville,Franklin,Exact,390490068212004,043802,Columbus City Schools District,2023
+084202,Middletown Christian,Warren,Exact,391650307001044,044404,Middletown City,2023
+084335,Massillon Christian,Stark,Exact,391517141002006,044354,Massillon City,2023
+085688,Parma Heights Christian Acad,Cuyahoga,Exact,390351782043000,044636,Parma City,2023
+086033,Gross Schechter Day School,Cuyahoga,Exact,390351791011003,046581,Orange City,2023
+086520,West Side Montessori,Lucas,Exact,390950087014002,048223,Springfield Local,2023
+086546,Clintonville Academy,Franklin,Exact,390490002201001,043802,Columbus City Schools District,2023
+086678,Yeshiva Derech Hatorah,Cuyahoga,Exact,390351408001000,043794,Cleveland Heights-University Heights City,2023
+087809,Holy Cross Lutheran School,Cuyahoga,Exact,390351236022002,043786,Cleveland Municipal,2023
+088062,Tree Of Life-Northridge Branch,Franklin,Exact,390490003102011,043802,Columbus City Schools District,2023
+088070,Marburn Academy,Franklin,Non_Exact,390490072111005,046995,New Albany-Plain Local,2023
+088104,Our Lady Of Bethlehem,Franklin,Exact,390490078121003,043802,Columbus City Schools District,2023
+088112,Grace Christian School,Franklin,Exact,390490073011022,046961,Gahanna-Jefferson City,2023
+088377,Nicholas-Liberty,Montgomery,Exact,391130602001032,048686,Jefferson Township Local,2023
+089409,Welsh Hills School,Licking,Exact,390897539003017,045393,Granville Exempted Village,2023
+089722,Madison Christian School,Franklin,Exact,390490094954044,046979,Groveport Madison Local,2023
+089979,Medina Christian Academy,Medina,Exact,391034083012003,044388,Medina City SD,2023
+090209,The Wellington School,Franklin,Exact,390490063212017,044933,Upper Arlington City,2023
+090233,Troy Christian Elementary School,Miami,Non_Exact,391093653012013,044925,Troy City,2023
+090274,Open Door Christian Schools,Lorain,Exact,390930709023007,043943,Elyria City Schools,2023
+090456,Victory Christian,Trumbull,Exact,391559320001005,050195,Liberty Local,2023
+090464,Our Shepherd Evangel Lutheran,Lake,No_Match,,,,
+090472,The Sonshine Christian Academy,Franklin,Exact,390490007303004,043802,Columbus City Schools District,2023
+090746,Adams County Christian,Adams,Exact,390017704004007,061903,Adams County Ohio Valley Local,2023
+091314,Montessori Children's School,Cuyahoga,Exact,390351891082001,045062,Westlake City,2023
+091777,Calumet Christian,Franklin,Exact,390490006003000,043802,Columbus City Schools District,2023
+092247,Gilead Christian,Morrow,Exact,391179652021011,045534,Mount Gilead Exempted Village,2023
+093021,McGuffey Montessori School,Butler,Exact,390170101022015,046151,Talawanda City,2023
+093039,South Suburban Montessori,Cuyahoga,Exact,390351351054004,043646,Brecksville-Broadview Heights City,2023
+093757,Fuchs Mizrachi Of Cleveland,Cuyahoga,Non_Exact,390359810001003,043554,Beachwood City,2023
+093864,Christian Star Academy,Knox,Exact,390830072002034,044420,Mount Vernon City,2023
+094250,Hershey Montessori,Lake,Exact,390852050021004,047894,Riverside Local,2023
+094268,Bethel Christian Academy,Cuyahoga,Exact,390351776052000,044636,Parma City,2023
+094490,Beautiful Savior Lutheran,Hamilton,Exact,390610205042001,047365,Northwest Local,2023
+094565,New Beginnings Christian,Franklin,Exact,390490088254017,043802,Columbus City Schools District,2023
+094946,Firelands Montessori Academy,Erie,Exact,390430405004015,044131,Huron City Schools,2023
+095158,Children's Meeting House,Clermont,Exact,390250403022001,044271,Loveland City,2023
+095364,St. Peter Faber Academy,Hamilton,Exact,390610066001003,043752,Cincinnati Public Schools,2023
+095711,Akiva Academy,Mahoning,Non_Exact,390998042002003,045161,Youngstown City,2023
+096164,Fairfield Educational Building,Butler,Exact,390170109032004,046102,Fairfield City,2023
+096172,Blue Ash Educational Bldg,Hamilton,Exact,390610235221000,044867,Sycamore Community City,2023
+096263,Alexandria Montessori,Montgomery,Exact,391130403022001,043737,Centerville City,2023
+096289,Dayton Montessori Society,Montgomery,Exact,391131003022000,048751,Huber Heights City,2023
+096297,St Margaret Of York,Warren,Exact,391650320113004,050435,Kings Local,2023
+096347,Linden Grove School,Hamilton,Exact,390610236001006,043851,Deer Park Community City,2023
+096693,Spring Garden,Summit,Exact,391535334001014,049981,Copley-Fairlawn City,2023
+096719,Harvest Preparatory School,Franklin,Exact,390490102032000,046946,Canal Winchester Local,2023
+096909,The Montessori School of the Mahoning Valley,Mahoning,Exact,390998014001021,045161,Youngstown City,2023
+096966,Summit Christian School,Summit,Exact,391535329021007,049973,Woodridge Local,2023
+096974,Canton Montessori,Stark,Exact,391517006002036,043711,Canton City,2023
+097279,Columbus Montessori Ed Ctr,Franklin,Exact,390490027602000,043802,Columbus City Schools District,2023
+097527,Nurtury,Medina,Exact,391034080013008,044388,Medina City SD,2023
+097683,Birchwood School of Hawken,Cuyahoga,Exact,390351245001000,043786,Cleveland Municipal,2023
+097923,East Dayton Christian,Montgomery,Exact,391130909002006,048702,Mad River Local,2023
+097931,Salem Christian Academy,Montgomery,Exact,391131201012005,048728,Northmont City,2023
+098525,Beautiful Savior Lutheran,Franklin,Exact,390490097551029,044800,South-Western City,2023
+098533,St Vincent Family Centers,Franklin,Exact,390490037004021,043802,Columbus City Schools District,2023
+110031,Wooster Christian,Wayne,Exact,391690005002041,050591,Triway Local,2023
+110403,Mansion Day School - Excel Preparatory Schools,Franklin,Exact,390490025203006,043802,Columbus City Schools District,2023
+110411,Jefferson County Christian,Jefferson,Exact,390810012001011,047803,Indian Creek Local,2023
+110619,Eleanor Gerson Sn,Cuyahoga,Non_Exact,390351013001005,043786,Cleveland Municipal,2023
+110684,Miami Montessori School The,Miami,Exact,391093650011000,044925,Troy City,2023
+110692,Martins Ferry Christian School,Belmont,Exact,390130119001002,044347,Martins Ferry City,2023
+111484,Osu Child Care Center,Franklin,Exact,390490078201004,043802,Columbus City Schools District,2023
+111898,Cincinnati Hills Christian Academy,Hamilton,Exact,390610243014009,044867,Sycamore Community City,2023
+112110,East Richland Christian Schools,Belmont,Exact,390130122022024,045997,St Clairsville-Richland City,2023
+112227,Grove City Christian,Franklin,Exact,390490097551025,044800,South-Western City,2023
+112490,Nightingale Montessori Inc,Clark,Exact,390230037001043,044818,Springfield City School District,2023
+112508,Montessori School of Bowling Green,Wood,Exact,391730219012001,043638,Bowling Green City School District,2023
+112680,Willoughby Montessori Dayschl,Lake,Exact,390852013002004,045104,Willoughby-Eastlake City,2023
+113050,Arlington Christian Academy,Summit,Exact,391535034001032,043489,Akron City,2023
+113522,Christian Academy Schools,Shelby,Exact,391499717002032,044784,Sidney City,2023
+114751,Mansfield Seventh-Day Advent,Richland,Exact,391390012002004,044297,Mansfield City,2023
+115535,Kingsway Christian,Wayne,Exact,391690014001003,050583,Southeast Local,2023
+115592,Lebanon United Methodist Kdg,Warren,Exact,391650315004008,044214,Lebanon City,2023
+118216,Royal Redeemer Lutheran,Cuyahoga,Exact,390351751101003,044545,North Royalton City,2023
+119248,Montessori Community,Licking,Exact,390897539002010,044453,Newark City,2023
+119313,Gloria Dei Montessori,Montgomery,Exact,391130802001004,043844,Dayton City,2023
+119917,Hitchcock Woods,Mahoning,Exact,390998120022019,048306,Boardman Local,2023
+119990,Weaver Child Development Center Inc,Stark,Exact,391517122012000,049932,Plain Local,2023
+120675,Central Montessori Academy,Hamilton,Exact,390610215091016,044412,Mt Healthy City,2023
+120865,Emmanuel Christian Academy,Summit,Exact,391535065001008,043489,Akron City,2023
+121053,Smoky Row Children's Center,Franklin,Exact,390490063933004,045138,Worthington City,2023
+121277,Village Christian Schools,Warren,Exact,391650324003013,046342,Goshen Local,2023
+122457,Brice Christian Academy,Franklin,No_Match,,,,
+122465,Nicholas School,Miami,Exact,391093001002077,044644,Piqua City,2023
+122473,Montessori Center of South Dayton,Montgomery,Exact,391130213021008,044180,Kettering City School District,2023
+122481,Terry's Montessori School,Hamilton,Exact,390610226023003,045146,Wyoming City,2023
+122697,Cincinnati Hills Christian Academy,Hamilton,Exact,390610223021013,044677,Princeton City,2023
+122879,Miracle City Academy,Pike,No_Match,,,,
+123109,Decolores Montessori School,Darke,Exact,390375551013020,044099,Greenville City,2023
+123133,Villa Maria Teresa,Trumbull,Non_Exact,391559320001069,050195,Liberty Local,2023
+123356,Pike Christian Academy,Pike,Exact,391319525003000,049148,Waverly City,2023
+123950,Cypress Christian,Franklin,Exact,390490081663009,043802,Columbus City Schools District,2023
+124883,St Brigid Of Kildare,Franklin,Exact,390490104023008,047027,Dublin City,2023
+125278,Heartland Christian School,Columbiana,Exact,390299502003008,045328,Columbiana Exempted Village,2023
+125310,Troy Christian High School,Miami,Exact,391093653012013,044925,Troy City,2023
+125997,Safely Home,Cuyahoga,Exact,390351321003022,043562,Bedford City,2023
+126144,Granville Christian Academy,Licking,Exact,390897577011050,045393,Granville Exempted Village,2023
+126151,Akron Montessori,Summit,Exact,391535335012012,049981,Copley-Fairlawn City,2023
+126417,Sunrise Academy,Franklin,Exact,390490106021000,047019,Hilliard City,2023
+126599,Seton Catholic,Summit,Exact,391535331021000,050021,Hudson City,2023
+126615,Miami Valley Christian Academy,Hamilton,Exact,390610249011018,047340,Forest Hills Local,2023
+132282,Montessori Academy of Cincinnati,Warren,Exact,391650320081008,050435,Kings Local,2023
+132316,Columbus Jewish Day School,Franklin,Exact,390490072111003,046995,New Albany-Plain Local,2023
+132373,Tree Of Life-Dublin Branch,Franklin,Exact,390490063022006,047027,Dublin City,2023
+132456,Hanna Perkins,Cuyahoga,Exact,390351832001015,044750,Shaker Heights City,2023
+132498,Shepherd Christian,Franklin,Exact,390490074261028,046961,Gahanna-Jefferson City,2023
+132506,Hillcrest Training School,Hamilton,Exact,390610225002022,044677,Princeton City,2023
+132530,Emmanuel Christian School,Lucas,Exact,390950083032001,044875,Sylvania Schools,2023
+132571,Springs East School,Hamilton,Exact,390610243225007,045435,Indian Hill Exempted Village,2023
+132597,BrightPath Bridgetown,Hamilton,Exact,390610211021000,047373,Oak Hills Local,2023
+132621,Ohio Valley Voices,Clermont,Exact,390250403011022,044271,Loveland City,2023
+132647,Royalmont Academy,Warren,Exact,391650319053001,050450,Mason City,2023
+132662,The Goddard School,Delaware,No_Match,,,,
+132696,Hershey Montessori Farm School,Geauga,Exact,390553110001008,047175,Cardinal Local,2023
+132704,St Mark's Evangelical Lutheran,Clermont,Exact,390250407031008,045500,Milford Exempted Village,2023
+132712,International Academy Of Cincinnati Inc.,Butler,Exact,390170111252001,046110,Lakota Local,2023
+132829,Montessori School of Wooster,Wayne,Exact,391690008004020,045120,Wooster City,2023
+132878,Potential Development/Autism,Mahoning,Exact,390998021001030,045161,Youngstown City,2023
+132928,Christian Life Academy,Jackson,Exact,390799573003044,044156,Jackson City,2023
+132936,Bright Beginnings,Greene,Exact,390572106024003,047241,Beavercreek City,2023
+133033,Cleveland Clinic Lerner School for Autism,Cuyahoga,Exact,390351196001004,043786,Cleveland Municipal,2023
+133082,Monarch School of Bellefaire JCB,Cuyahoga,Exact,390351833003002,044750,Shaker Heights City,2023
+133116,All The Children Of The World Academy,Delaware,Exact,390410117651011,045047,Westerville City,2023
+133140,Cornerstone Christian Academy,Lake,Exact,390852010003017,045104,Willoughby-Eastlake City,2023
+133165,Minerva Area Christian,Stark,Exact,391517129004030,049890,Minerva Local,2023
+133207,Cincinnati Hills-Otto Armleder,Hamilton,Exact,390610007002017,043752,Cincinnati Public Schools,2023
+134304,Logan Christian School,Hocking,Exact,390739654004008,044248,Logan-Hocking Local,2023
+134312,Mother Teresa Catholic,Butler,No_Match,,,,
+134338,Cincinnati Waldorf School,Hamilton,Exact,390610248003018,044313,Mariemont City,2023
+134353,Harambee Christian,Franklin,Exact,390490015002014,043802,Columbus City Schools District,2023
+134387,Central College Christian School,Franklin,Non_Exact,390490071022004,045047,Westerville City,2023
+134429,Toledo Islamic Academy,Lucas,Non_Exact,390950081002001,044875,Sylvania Schools,2023
+134460,Cornerstone Community,Summit,Exact,391535309012015,044883,Tallmadge City,2023
+134478,Cleveland Montessori,Cuyahoga,No_Match,,,,
+134510,Fairfield Christian Academy,Fairfield,Exact,390450315002000,044206,Lancaster City,2023
+134528,New Hope Christian Academy,Pickaway,Exact,391290203202001,043760,Circleville City,2023
+134536,Dayton Islamic School Inc,Greene,Exact,390572103002012,047241,Beavercreek City,2023
+134619,Emmanuel Christian Academy,Clark,Exact,390230025011039,046250,Northeastern Local,2023
+134817,Schilling School For Gifted,Hamilton,Exact,390610223024019,044867,Sycamore Community City,2023
+138073,The Good Shepherd Catholic Montessori,Hamilton,Exact,390610244013007,043752,Cincinnati Public Schools,2023
+143008,Bowling Green Christian Acdmy,Wood,Exact,391730216011012,043638,Bowling Green City School District,2023
+143040,Bethlehem Lutheran School,Greene,Exact,390572005004011,043968,Fairborn City,2023
+143081,Beatrice J. Stone Yavne,Cuyahoga,Exact,390351311033005,043554,Beachwood City,2023
+143099,Liberty Bible Academy,Warren,Exact,391650320081027,050450,Mason City,2023
+143248,Faith Islamic Academy,Summit,Exact,391535329025001,049973,Woodridge Local,2023

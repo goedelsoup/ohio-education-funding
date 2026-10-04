@@ -1,0 +1,96 @@
+id: nonpublic-school-location
+summary: >-
+  dew-directory, and the Census batch geocoder under census-geography: each open chartered
+  nonpublic school is placed in the 2020 block its address geocodes to and the district that block
+  lay in, keyed on building IRN, with the reach stated as a rate and a pinned unmatched set.
+context: |
+  R.C. 3317.024(E)(1) pays auxiliary services through the district a chartered nonpublic school is
+  located in. `program/auxiliary-services` carried "the district each chartered nonpublic school
+  is located in" as an unfilled field, and
+  [`nonpublic-enrollment-connector`](nonpublic-enrollment-connector.yml) recorded why: no October
+  file in any era has the column, and a join on name fails because October 2023 holds 711 schools
+  under 601 names, sixteen of them `St Mary`.
+
+  [#759](https://github.com/goedelsoup/ohio-education-funding/issues/759) named three candidate
+  sources in order: the department's directory (OEDS), geocoding into the Census block geography
+  the legislative crosswalk already reads, and NCES's Private School Survey as a cross-check.
+
+  OEDS has a public extract. It lists every open nonpublic school by building IRN with a mailing
+  address and a parent organisation — the diocese or association, never the public district. The
+  directory has no field for that. So the first source supplies the key and the address, and the
+  second has to supply the district.
+decision: |
+  Declare `dew-directory`, `Wired`, feeding `school`, with one source: the OEDS extract for
+  organisation type 5, fetched by POST. Add `geocoder-nonpublic-schools` to `census-geography`:
+  the Census Bureau's batch geocoder's answer for every address in that extract, against the
+  current address ranges and reporting 2020 blocks.
+
+  Build `crates/project/fixtures/nonpublic-school-district.csv` from three joins, each on a key:
+  building IRN to address, address to 2020 block, block to district through the `_SDUNI` member of
+  `baf-2020-oh`, and district code to IRN through the CCD directory. No boundary file is added: the
+  blocks are the ones the legislative crosswalk already apportions.
+
+  **Two request shapes in the fetch layer.** Neither source is a file at a URL. `registry::REQUESTS`
+  holds them beside the registry — a form POST and a multipart geocoder upload built from another
+  source's cached bytes — rather than as a field on `Source`, which would mean writing `Get` into
+  four hundred literals. A test insists every key there is a registered source and that the
+  geocoder's input is fetched first.
+
+  **Every school is a row, placed or not.** A school the geocoder could not place carries its
+  outcome (`No_Match` or `Tie`) and a blank district, so the unmatched set is in the fixture and
+  not only in a count.
+
+  **The district is written as the block file found it.** A district that has ceased since 2020
+  keeps its own IRN with the last CCD year that listed it. Rewriting it to the receiving district
+  in the builder would hide the one row where the census and the present disagree.
+consequences: |
+  **The reach, against October 2025.** 749 buildings reported; 743 are in the directory and 714 are
+  placed — **95.3%**. Of the 35 without a district, six are absent from the directory and 29 are in
+  it unplaced: 28 the geocoder could not match and one it matched to two places equally.
+  `crates/project/tests/the_district_a_nonpublic_school_sits_in.rs` pins the rate and both sets
+  by IRN, so a refresh that changes either fails with the school named. Directory-wide it is 787
+  schools, 755 placed, in 278 districts.
+
+  **A snapshot, and the rate decays backward.** The directory lists schools open on the day it was
+  generated. October 2024 has 710 of 722 buildings in it and October 2023 688 of 711. Nothing here
+  is projected onto an earlier October: a school that has moved is placed where it is now.
+
+  **One school sits in a district that has since ceased.** St Helen, in Newbury, geocodes to
+  Newbury Local, which the 2020 blocks still record and whose territory went to West Geauga on
+  July 1, 2020. The test resolves it against the territory-transfer record. The same gap affects
+  the legislative crosswalk, which joins blocks to the 2022-23 CCD directory alone and so drops
+  Newbury's blocks from West Geauga's apportionment without a word. That is outside this record
+  and is filed separately.
+
+  **A boundary is a hypothesis about address ranges.** The whole extract was geocoded a second
+  time against `Public_AR_Census2020`. It placed 750 rather than 755; of the 742 both placed, 30
+  landed in different blocks and **two in different districts** — 067629 (Mansfield, 04943 against
+  04945) and 022583 (Youngstown, 05019 against 04516). So a school near a boundary is placed by an
+  interpolation along a street segment, not a surveyed point, and about one school in four hundred
+  moves district with the reference data.
+
+  **Both digests move on every refresh.** The extract's first line is a generation timestamp, and
+  the geocoder answers in no fixed order against address ranges the Bureau revises. A changed
+  digest is expected; a changed fixture is the thing to read.
+alternatives: |
+  **Leave the field unfilled, as `nonpublic-enrollment-connector` decided.** That record rejected
+  matching "by name or by geography" because the result "would be wrong for an unknown fraction of
+  buildings and look exactly like a right one". The objection is to the unknown fraction, and it is
+  answered rather than overruled. No step here matches a name: the school is keyed on its IRN, the
+  district on its code. The fraction is known and pinned — 35 of 749, by IRN — and every row
+  carries the geocoder's own verdict on itself. The residual error that cannot be pinned, a school
+  near a boundary, is measured by the second benchmark at two schools in 742.
+
+  **Take the 2020 benchmark's answer where the current one misses.** It matched eight of the 32
+  current misses. Rejected: one benchmark is one set of address ranges, and a fixture whose block
+  depends on which pass found it cannot say what any single row was placed against.
+
+  **Cross-check against NCES's Private School Survey.** Named by #759 as the third source. Not
+  attempted: the survey carries an address and a county rather than a district, so it would test
+  the directory's addresses, not the placement. It stays open as a check, not as a blocker.
+
+  **A district boundary file.** Rejected: the block assignment file is already a district
+  boundary, at block resolution, and is the one the legislative crosswalk uses. A second boundary
+  source would let the two disagree at the edges.
+connectors:
+  - dew-directory

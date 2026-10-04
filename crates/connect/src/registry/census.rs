@@ -252,7 +252,10 @@ pub(super) const GEOGRAPHY: Connector = Connector {
             filename: "BlockAssign_ST39_OH.zip",
             format: Format::Zip,
             catalog: Some("census-block-geography"),
-            fixtures: &[crate::fixtures::CROSSWALK_FIXTURE],
+            fixtures: &[
+                crate::fixtures::CROSSWALK_FIXTURE,
+                crate::fixtures::NONPUBLIC_LOCATION_FIXTURE,
+            ],
             note: "`SDUNI` gives the unified school district for each of Ohio's 276,428 \
                    census blocks. The archive also carries an `SLDL` file and it is the \
                    WRONG one to use: it is the 2020-cycle map, and 66.3% of Ohio's blocks \
@@ -303,6 +306,22 @@ pub(super) const GEOGRAPHY: Connector = Connector {
                    apportionment weight: 2,591,886 Ohioans under 18, 22.0% of the state. \
                    Total population would weight a seat full of retirees like one full of \
                    families, against a quantity that is school funding.",
+        },
+        Source {
+            key: "geocoder-nonpublic-schools",
+            title: None,
+            url: "https://geocoding.geo.census.gov/geocoder/geographies/addressbatch",
+            filename: "geocoder-nonpublic-schools.csv",
+            format: Format::Csv,
+            catalog: Some("census-block-geography"),
+            fixtures: &[crate::fixtures::NONPUBLIC_LOCATION_FIXTURE],
+            note: "The batch geocoder's answer for every address in `oeds-nonpublic-schools`, \
+                   built from that extract and uploaded (`registry::REQUESTS`). An answer, not \
+                   a publication: the rows come back in no fixed order and the address ranges \
+                   behind `Public_AR_Current` are revised, so the digest moves on every refresh \
+                   and a refresh can move a school near a boundary. Run against \
+                   `Public_AR_Census2020` as well, the two benchmarks placed 742 schools in \
+                   common and disagreed on the district of two.",
         },
     ],
 };
