@@ -3013,6 +3013,8 @@ footer { color: var(--text-muted); font-size: var(--text-sm); margin-top: var(--
  */
 footer p { margin: var(--space-2) 0; max-width: var(--measure-note); }
 footer.site { border-top: 1px solid var(--border); padding-top: var(--space-6); margin-top: var(--space-9); }
+/* The page's address, for paper only — see the print block. */
+footer.site .print-url { display: none; overflow-wrap: anywhere; }
 
 /*
  * The district index. 609 rows is too many to scroll and too few to paginate, so it filters in
@@ -3352,11 +3354,45 @@ tr.series-break > td {
  * Paper only: furniture, and where the page is allowed to break.
  *
  * There was no fragmentation control at all, and the tallest chart printed two pages away from the
- * heading and legend that explain it, after 60% of a blank sheet, sliced through a data row. A
- * card is the unit a reader thinks in on this site, so a card is the unit that stays together.
+ * heading and legend that explain it, after 60% of a blank sheet, sliced through a data row. The
+ * first answer kept every card whole, and a card taller than what was left of a sheet then went to
+ * the next one and left the rest blank (#602): the district page printed its first sheet 60% empty
+ * and a later one with two lines on it. So the units that stay together are the ones that cannot
+ * be read in two halves — a chart, a tile, a row — and a card breaks between them.
  */
 @media print {
-  header.site { position: static; }
+  /*
+   * Everything a screen uses to move around, which on paper is a sheet of controls that do
+   * nothing. The district page spent its first sheet on the menu, the theme button, five tabs and
+   * the contents list before its first figure (#602). The address a printed page came from is in
+   * the footer instead — `.print-url`.
+   */
+  header.site, nav.subnav, nav.contents, #theme { display: none; }
+  /* A control's position is a fact about the figures beside it; the control is not. A slider's
+     position is already said in the `<output>` its label carries, and a button does nothing on
+     paper. */
+  input[type="range"], input[type="text"], input[type="search"], button { display: none; }
+  /* A select is the one control whose position is not said elsewhere, so it prints as the option
+     it holds, with nothing that says it could be opened. */
+  select { appearance: none; border: 0; padding: 0; background: none; color: inherit; }
+  /*
+   * A switch prints as what it is set to. Both halves of the pair used to print, as pills, and
+   * a reader could not tell which basis the chart below them was drawn on; hiding the pair would
+   * leave the chart with no basis at all. So the half not chosen goes, and the chosen one prints
+   * as a word. Its "FYnnnn dollars" note names the constant basis, so it goes with nominal.
+   */
+  .basis label { border: 0; padding: 0; background: none; font-weight: var(--weight-semibold); }
+  .basis-scope input[data-basis="nominal"]:checked ~ .basis label[data-basis="real"],
+  .basis-scope input[data-basis="real"]:checked ~ .basis label[data-basis="nominal"],
+  .basis-scope input[data-basis="nominal"]:checked ~ .basis .n,
+  .measure-scope input[data-measure="total"]:checked ~ .basis label[data-measure="foundation"],
+  .measure-scope input[data-measure="foundation"]:checked ~ .basis label[data-measure="total"] {
+    display: none;
+  }
+  /* The footer's links are for a screen; its data date stays, and the address takes their place. */
+  footer.site .print-url { display: block; }
+  footer.site .screen-links { display: none; }
+
   /* A tooltip is a pointer's shadow. There is no pointer on paper. */
   #tip { display: none; }
 
@@ -3377,7 +3413,10 @@ tr.series-break > td {
   /* A chart's values list and its link are for a screen; paper has the drawing itself (#616). */
   .chart-foot { display: none; }
 
-  .card, .chartwrap, .tile, .strip-row, .flags, tr { break-inside: avoid; }
+  .chartwrap, .tile, .strip-row, .flags, tr { break-inside: avoid; }
+  .card { break-inside: auto; }
+  /* A card that does break leaves at least three lines on each side, never one stranded. */
+  p, li { orphans: 3; widows: 3; }
   /* A heading, and a legend, belong to what follows them. */
   h1, h2, h3, .contents-label { break-after: avoid; }
   /* A key sits directly above its chart (#657), so it is kept with the chart below it. */

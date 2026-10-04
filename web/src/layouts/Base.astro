@@ -419,7 +419,7 @@ const body = applySemantics(listed).html;
             >Report an error</a
           >
         </p>
-        <p>
+        <p class="screen-links">
           <a href="/method">How these figures are made</a> · <a href="/data">Download the data</a>
         </p>
         {/*
@@ -435,7 +435,7 @@ const body = applySemantics(listed).html;
           Inline rather than fetched: the content security policy admits no third-party origin, and
           one 16px path is cheaper than a request would be even if it did.
         */}
-        <p>
+        <p class="screen-links">
           <a
             class="mark"
             href={REPOSITORY}
@@ -451,6 +451,13 @@ const body = applySemantics(listed).html;
             <span>Source on GitHub</span>
           </a>
         </p>
+        {/*
+          Paper only: the address this page was printed from (#602). A printed district page is
+          carried to a meeting and read away from the screen, and without it nothing on the sheet
+          leads back to the page — the browser's own header line is a print-dialog option a reader
+          may have turned off.
+        */}
+        <p class="print-url">{canonical.href}</p>
       </div>
     </footer>
 
