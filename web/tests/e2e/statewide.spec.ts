@@ -148,13 +148,19 @@ test.describe("presentation", () => {
     expect(breaks).toEqual({ card: "auto", chart: "avoid" });
   });
 
-  test("a district page prints to at most sixteen sheets", async ({ page }) => {
+  /**
+   * The bound is the runner's count, not this machine's. The page is the same and the fonts are
+   * not: the fixed stylesheet prints 16 sheets on a Mac and 17 on CI, and the one before #602
+   * printed 20 on the same Mac. Print layout is font-sensitive in the way chart layout is, so a
+   * lower bound has to be read off a CI log rather than a local run.
+   */
+  test("a district page prints to at most seventeen sheets", async ({ page }) => {
     await page.goto(`/district/${CLEVELAND}`);
     const pdf = await page.pdf({ format: "Letter" });
     // Each sheet is one `/Type /Page` object; `/Type /Pages` is the tree that holds them.
     const sheets = pdf.toString("latin1").match(/\/Type\s*\/Page(?!s)/g)?.length ?? 0;
     expect(sheets).toBeGreaterThan(0);
-    expect(sheets).toBeLessThanOrEqual(16);
+    expect(sheets).toBeLessThanOrEqual(17);
   });
 
   /**
