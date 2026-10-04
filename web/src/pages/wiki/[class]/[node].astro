@@ -15,7 +15,7 @@ import { loadCorpus, propertyLabel, relationshipLabel } from "../../../lib/corpu
 import { loadAppearances } from "../../../lib/appearances.ts";
 import { topicsCiting } from "../../../lib/explained/registry.ts";
 import { leadAndBody } from "../../../lib/lead.ts";
-import { DISTRICT_VIEWS, NAMES, sectionForClass } from "../../../lib/nav.ts";
+import { DISTRICT_VIEWS, NAMES } from "../../../lib/nav.ts";
 import { loadFeed } from "../../../lib/feed.ts";
 import { money } from "../../../lib/format.ts";
 import { isBlockProperty, isListProperty, isMathProperty, renderListProperty, renderMathProperty, renderProse, renderPropertyValue, shownProperties, snippet } from "../../../lib/prose.ts";
@@ -429,7 +429,7 @@ const properties = shownProperties(node.properties.filter((p) => p.name !== "see
   description={metaDescription}
   image={routes.og.wikiNode(node.className, node.name)}
   imageAlt={`${node.label}, a node in the Ohio school funding corpus`}
-  section={sectionForClass(node.className)}
+  section="library"
 >
   <p class="crumb">
     <a href="/wiki">The corpus</a> ›{" "}

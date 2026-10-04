@@ -29,7 +29,6 @@ import {
   districtTitle,
   nav,
   navLinks,
-  sectionForClass,
   type NavGroup,
 } from "../../src/lib/nav.ts";
 
@@ -174,12 +173,6 @@ test("the catch-all run appears when a class is unplaced, and carries it", () =>
   const library = nav(bundle, doctored).find((e) => e.key === "library") as NavGroup;
   const run = library.sections.find((s) => s.heading === UNPLACED);
   expect(run?.links.map((l) => l.href)).toEqual(["/wiki/made-up-class"]);
-});
-
-test("every corpus page reports itself as Library", () => {
-  // A class page claiming a group that cannot reach it would tell a reader on H.B. 110 they are
-  // somewhere the bar does not show them.
-  for (const c of corpus.classes) expect(sectionForClass(c.className), c.className).toBe("library");
 });
 
 test("every corpus link in the bar lands on a class that exists", () => {

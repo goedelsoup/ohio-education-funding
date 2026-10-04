@@ -367,18 +367,6 @@ function explainedRuns(): NavSection[] {
 export const UNPLACED = "Also in the corpus";
 
 /**
- * Where a wiki page sits in the bar: under `Library`, whatever its class.
- *
- * The point of lifting a class was that a reader standing on one of its nodes can see where they
- * are. When seven classes were lifted into `Law` and `Formula` this chose between those and
- * `wiki`; every class is under `Library` now, so the group is the answer for all of them and the
- * class index — a link in the panel — marks itself by path. Kept as a function of the class
- * because the wiki routes call it that way, and a class that one day earns a place of its own
- * changes one line here rather than every route. It reads no argument today, so it names none.
- */
-export const sectionForClass: (className: string) => Section = () => "library";
-
-/**
  * The bar.
  *
  * # Seven entries, by what a reader came to do
