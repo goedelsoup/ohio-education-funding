@@ -253,7 +253,8 @@ pub const REPORT_CARD_FIXTURE: &str =
 /// A fixture of its own rather than columns on [`REPORT_CARD_FIXTURE`], which is one edition by
 /// name and by construction. This one is a series: R.C. 3302.10's trigger and exit both read the
 /// overall rating across consecutive years, so its unit is the year as much as the district.
-pub const OVERALL_RATINGS_FIXTURE: &str = "crates/dispersion/fixtures/report-card-overall-ratings.csv";
+pub const OVERALL_RATINGS_FIXTURE: &str =
+    "crates/dispersion/fixtures/report-card-overall-ratings.csv";
 /// Where the FY2025 expenditure-function fixture is written, relative to the repository root.
 pub const FUNCTIONS_FIXTURE: &str = "crates/dispersion/fixtures/expenditure-functions-fy25.csv";
 

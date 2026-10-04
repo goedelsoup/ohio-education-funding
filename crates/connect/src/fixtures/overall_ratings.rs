@@ -132,13 +132,19 @@ mod tests {
             &["043901", "East Cleveland City School District", "1 Star"],
         ]);
         let out = build_overall_ratings(&[&older, &newer]).unwrap();
-        assert_eq!(out[0], vec!["043901", "East Cleveland City School District", "", "1"]);
+        assert_eq!(
+            out[0],
+            vec!["043901", "East Cleveland City School District", "", "1"]
+        );
     }
 
     #[test]
     fn a_moved_rating_column_is_named() {
         let moved = rows(&[&["District IRN", "District Name", "Overall Rating"]]);
         let err = build_overall_ratings(&[&moved]).unwrap_err();
-        assert!(err.contains("2024-25") && err.contains("Overall Star Rating"), "{err}");
+        assert!(
+            err.contains("2024-25") && err.contains("Overall Star Rating"),
+            "{err}"
+        );
     }
 }
