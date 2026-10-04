@@ -36,6 +36,9 @@ export default getViteConfig({
           // which are Playwright's and fail in confusing ways when run by anything else.
           include: ["tests/unit/**/*.spec.ts"],
           environment: "node",
+          // The unit suite reads Explained as the dev build has it (#718): the topics, their bar
+          // entry and their links. What an off build drops is tested by stubbing this back.
+          env: { PUBLIC_EXPLAINED: "1" },
         },
       },
       {

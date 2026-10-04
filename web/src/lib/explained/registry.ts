@@ -10,6 +10,7 @@
 import { ANCHOR_CHAIN } from "./anchor-chain.ts";
 import { BOUNDS } from "./bounds.ts";
 import { DEDUCTION } from "./deduction.ts";
+import { explainedOn } from "./flag.ts";
 import { GUARANTEE } from "./guarantee.ts";
 import { PHASE_IN } from "./phase-in.ts";
 import { POVERTY_COUNT } from "./poverty-count.ts";
@@ -25,6 +26,13 @@ import { topic, type Topic, type TopicModule } from "./topic.ts";
 import { WHAT_A_DISTRICT_GETS } from "./what-a-district-gets.ts";
 
 export const TOPICS: readonly TopicModule[] = [WHAT_A_DISTRICT_GETS, STATE_SHARE, PHASE_IN, GUARANTEE, SPENDING, SOURCES, REDUCTION_FACTORS, POVERTY_COUNT, ANCHOR_CHAIN, DEDUCTION, PROJECTION, TRANSPORTATION, BOUNDS];
+
+/**
+ * The topics this build publishes: all of them where {@link explainedOn}, none where not. Every
+ * route, card and link to a topic is drawn from this rather than from {@link TOPICS}, so turning
+ * the section off removes it whole. The modules and their identities stay checked either way.
+ */
+export const published = (): readonly TopicModule[] => (explainedOn() ? TOPICS : []);
 
 /** One topic by slug, or a thrown error naming the slug no module registered. */
 export function topicModule(slug: string): TopicModule {
@@ -47,6 +55,7 @@ export function builtTopics(): readonly Topic[] {
  * that drops a citation drops the link back with it. Typed by hand, the two would drift apart.
  */
 export function topicsCiting(nodeId: string): readonly Topic[] {
+  if (!explainedOn()) return [];
   return builtTopics().filter((t) => t.howWeKnow.some((proof) => proof.nodes.includes(nodeId)));
 }
 
@@ -54,8 +63,10 @@ export function topicsCiting(nodeId: string): readonly Topic[] {
  * The link a data page sets under a card, from the term it shows to the topic that explains it.
  *
  * Under the card and not inside it (#717), so the card keeps the height the measure baseline holds.
+ * Empty where the build does not publish Explained; the slug is still checked.
  */
 export function whatIsThis(slug: string): string {
   const t = topicModule(slug);
+  if (!explainedOn()) return "";
   return `<p class="note" data-explained="${slug}">What is this? <a href="${routes.explained(slug)}">${escapeHtml(t.question)}</a></p>`;
 }
