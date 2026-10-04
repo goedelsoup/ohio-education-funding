@@ -487,7 +487,10 @@ mod tests {
         let (_, source) = registry::source("oeds-nonpublic-schools").unwrap();
         let arguments = request_arguments(registry::request(source), Path::new("x"));
         assert_eq!(arguments[0], "--data-urlencode");
-        assert!(arguments[1].starts_with(r#"jsonData={"OrgTypes":[5]"#), "{arguments:?}");
+        assert!(
+            arguments[1].starts_with(r#"jsonData={"OrgTypes":[5]"#),
+            "{arguments:?}"
+        );
     }
 
     #[test]

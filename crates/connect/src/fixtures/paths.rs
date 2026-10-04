@@ -392,7 +392,8 @@ pub const NONPUBLIC_SECTOR_FIXTURE: &str = "crates/project/fixtures/nonpublic-se
 /// One row per building IRN the department's directory lists as an open nonpublic school, with the
 /// census block its address geocodes to and the school district that block lay in at the 2020
 /// census. A snapshot of the directory, not a series: see [`super::nonpublic_location`].
-pub const NONPUBLIC_LOCATION_FIXTURE: &str = "crates/project/fixtures/nonpublic-school-district.csv";
+pub const NONPUBLIC_LOCATION_FIXTURE: &str =
+    "crates/project/fixtures/nonpublic-school-district.csv";
 
 /// Where the building-level report card extract is written, relative to the repository root.
 pub const BUILDING_FIXTURE: &str = "crates/dispersion/fixtures/report-card-2425-buildings.csv";

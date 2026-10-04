@@ -1951,16 +1951,18 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     // The district each open nonpublic school sits in: the department's directory, geocoded into
     // the 2020 blocks, joined to the district each block lay in. Needs the CCD directory's rows to
     // turn a district code into an IRN, so a directory that could not be read skips this too.
-    out.push(match directory.and_then(|ccd| nonpublic_locations(root, &ccd)) {
-        Ok(Ok(rows)) => csv_fixture(
-            root,
-            fixtures::NONPUBLIC_LOCATION_FIXTURE,
-            fixtures::NONPUBLIC_LOCATION_HEADER,
-            &rows,
-        )?,
-        Ok(Err(layout)) => return Err(RebuildError::Layout(layout)),
-        Err(reason) => Rebuilt::skipped(fixtures::NONPUBLIC_LOCATION_FIXTURE, reason),
-    });
+    out.push(
+        match directory.and_then(|ccd| nonpublic_locations(root, &ccd)) {
+            Ok(Ok(rows)) => csv_fixture(
+                root,
+                fixtures::NONPUBLIC_LOCATION_FIXTURE,
+                fixtures::NONPUBLIC_LOCATION_HEADER,
+                &rows,
+            )?,
+            Ok(Err(layout)) => return Err(RebuildError::Layout(layout)),
+            Err(reason) => Rebuilt::skipped(fixtures::NONPUBLIC_LOCATION_FIXTURE, reason),
+        },
+    );
 
     // School districts across legislative seats. The last extraction because it is the only one
     // that depends on another fixture's contents rather than only on a cached publication: the

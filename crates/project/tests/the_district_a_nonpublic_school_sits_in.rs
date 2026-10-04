@@ -80,9 +80,9 @@ fn the_thirty_five_october_2025_buildings_without_a_district() {
     /*
      * The unmatched set, by name of cause rather than as a remainder.
      *
-     * Six are not in the directory at all. The extract lists open organisations only, so these are
+     * Six are not in the directory at all. The extract lists open organizations only, so these are
      * buildings that reported in October 2025 and have closed or been re-designated since; the
-     * directory's search API reaches closed organisations and is not read.
+     * directory's search API reaches closed organizations and is not read.
      *
      * Twenty-nine are in the directory and the geocoder did not place: 28 addresses it could not
      * match and one it matched to two places equally (`058727`, a Shelby address on a state

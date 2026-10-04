@@ -56,7 +56,7 @@ pub const NONPUBLIC_LOCATION_HEADER: &[&str] = &[
 pub struct DirectorySchool {
     /// Six-digit building IRN.
     pub irn: String,
-    /// The organisation name, cleaned of commas.
+    /// The organization name, cleaned of commas.
     pub name: String,
     /// The designated county.
     pub county: String,
@@ -192,7 +192,11 @@ fn parse_geocoded(text: &str) -> Result<BTreeMap<String, Geocoded>, String> {
                 outcome: outcome.to_string(),
                 block: None,
             },
-            _ => return Err(format!("the geocoder answered a line this cannot read: {line}")),
+            _ => {
+                return Err(format!(
+                    "the geocoder answered a line this cannot read: {line}"
+                ))
+            }
         };
         if let Some(block) = &geocoded.block {
             if block.len() != 15 || !block.starts_with("39") {

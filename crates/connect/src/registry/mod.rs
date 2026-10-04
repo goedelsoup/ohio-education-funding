@@ -450,7 +450,10 @@ mod tests {
         // `request` falls back to a GET for any key it does not find, so a typo in `REQUESTS`
         // would not fail: the source would be fetched the plain way and refused with a 403.
         for (key, request) in REQUESTS {
-            assert!(source(key).is_some(), "REQUESTS names {key}, which is not a source");
+            assert!(
+                source(key).is_some(),
+                "REQUESTS names {key}, which is not a source"
+            );
             if let Request::Geocode { addresses, .. } = request {
                 assert!(
                     sources()

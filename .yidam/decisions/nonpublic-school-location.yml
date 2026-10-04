@@ -16,12 +16,12 @@ context: |
   the legislative crosswalk already reads, and NCES's Private School Survey as a cross-check.
 
   OEDS has a public extract. It lists every open nonpublic school by building IRN with a mailing
-  address and a parent organisation — the diocese or association, never the public district. The
+  address and a parent organization — the diocese or association, never the public district. The
   directory has no field for that. So the first source supplies the key and the address, and the
   second has to supply the district.
 decision: |
   Declare `dew-directory`, `Wired`, feeding `school`, with one source: the OEDS extract for
-  organisation type 5, fetched by POST. Add `geocoder-nonpublic-schools` to `census-geography`:
+  organization type 5, fetched by POST. Add `geocoder-nonpublic-schools` to `census-geography`:
   the Census Bureau's batch geocoder's answer for every address in that extract, against the
   current address ranges and reporting 2020 blocks.
 
@@ -60,7 +60,8 @@ consequences: |
   July 1, 2020. The test resolves it against the territory-transfer record. The same gap affects
   the legislative crosswalk, which joins blocks to the 2022-23 CCD directory alone and so drops
   Newbury's blocks from West Geauga's apportionment without a word. That is outside this record
-  and is filed separately.
+  and is filed separately as
+  [#769](https://github.com/goedelsoup/ohio-education-funding/issues/769).
 
   **A boundary is a hypothesis about address ranges.** The whole extract was geocoded a second
   time against `Public_AR_Census2020`. It placed 750 rather than 755; of the 742 both placed, 30

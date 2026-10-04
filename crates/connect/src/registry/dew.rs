@@ -3301,14 +3301,14 @@ pub(super) const DIRECTORY: Connector = Connector {
     feeds: &["school"],
     status: Status::Wired {
         still_blocked: Some(
-            "the extract lists organisations open on the day it is generated, so it places \
+            "the extract lists organizations open on the day it is generated, so it places \
              today's schools at today's addresses and nothing earlier. Six buildings in the \
              2025-26 October and 23 in 2023-24 are not in it. The directory's search API \
-             (`Api/searchOrg`) returns closed organisations too, and is not read",
+             (`Api/searchOrg`) returns closed organizations too, and is not read",
         ),
     },
     note: "The only public record of where a chartered nonpublic school is: an address against \
-           a building IRN. It names a parent organisation, which is the diocese or association, \
+           a building IRN. It names a parent organization, which is the diocese or association, \
            and has no field for the public school district — that is placed by geocoding the \
            address into the 2020 census blocks. See \
            .yidam/decisions/nonpublic-school-location.yml.",

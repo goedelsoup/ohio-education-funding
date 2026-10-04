@@ -6,13 +6,13 @@ used-by:
 
 **Source.** Ohio Department of Education and Workforce, **Ohio Educational Directory System
 (OEDS)**, the public data extract.
-**Type.** Primary source — the department's own register of organisations, generated on request.
+**Type.** Primary source — the department's own register of organizations, generated on request.
 **Location.** `https://oeds.education.ohio.gov/DataExtract/GetRequestOrgExtract`, as a POST of one
-form field, `jsonData`, naming the organisation types wanted. Type 5 is Nonpublic School. A GET of
+form field, `jsonData`, naming the organization types wanted. Type 5 is Nonpublic School. A GET of
 the same URL is refused with a 403 by the department's gateway, so the registry carries the form
 (`connect::registry::REQUESTS`) rather than only a URL.
 
-**What it contains.** One row per open organisation per school type, 24 columns: building IRN,
+**What it contains.** One row per open organization per school type, 24 columns: building IRN,
 name, school type, grade span, status, designated county, web address, email, mailing address,
 phone, principal, and a parent IRN and name. For nonpublic schools the parent is the diocese or
 association — the Cleveland Catholic Diocese is parent to 114 — and **never the public school
@@ -25,7 +25,7 @@ elementary and middle grades appears once per type, with the same name and addre
 extraction collapses them and fails if two rows for one IRN ever disagree.
 
 **Why this is here.** R.C. 3317.024(E)(1) pays auxiliary services through the district a
-chartered nonpublic school is located in, and no October enrolment file says which district that
+chartered nonpublic school is located in, and no October enrollment file says which district that
 is ([`dew-nonpublic-enrollment`](dew-nonpublic-enrollment.md)). This extract is the only public
 record of where a nonpublic school is: an address against a building IRN, which the October files
 share. The address is geocoded into the 2020 census blocks by the Census Bureau's batch geocoder,
@@ -44,5 +44,5 @@ geographic match `nonpublic-enrollment-connector` rejected.
   fetch, so the digest moves whether or not a school did.
 - **The `Selected` field.** The request carries a list of columns wanted and the extract ignores
   it, returning all 24 whatever is asked for.
-- **Closed organisations.** The directory's search API (`Api/searchOrg`) reaches them and is not
+- **Closed organizations.** The directory's search API (`Api/searchOrg`) reaches them and is not
   read.
