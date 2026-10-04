@@ -46,6 +46,7 @@ import {
   shareOf,
 } from "../../src/lib/explained/state-share.ts";
 import { CHAIN, EMPTYING_FLOOR, EMPTYING_LOSS, inflation } from "../../src/lib/explained/anchor-chain.ts";
+import { IDENTITY as DEDUCTION_IDENTITY, example as deductionExample, terminal, transfers } from "../../src/lib/explained/deduction.ts";
 import {
   IDENTITY as POVERTY_IDENTITY,
   blend,
@@ -850,5 +851,57 @@ describe("Why is FY2011 still inside the formula? (#718)", () => {
     expect(last).toBeGreaterThan(BASE_YEAR);
     expect(rise).toBeCloseTo(at(last) / at(BASE_YEAR) - 1, 12);
     expect(rise).toBeGreaterThan(0);
+  });
+});
+
+describe("What happened to the deduction for community schools and vouchers? (#718)", () => {
+  const { districts } = loadFeed().bundle;
+  const corpus = loadCorpus();
+
+  test("net state funding is total state support plus the two transfer lines on every district", () => {
+    expect(districts.length).toBeGreaterThan(600);
+    expect(reconciles(DEDUCTION_IDENTITY, districts)).toEqual([]);
+  });
+
+  test("a payment with a third line taken off fails it", () => {
+    // A deduction would be a charge between total state support and the net payment that neither
+    // transfer line carries. Two cents is the smallest the three cent figures cannot absorb.
+    const real = deductionExample(districts);
+    const o = terminal(real);
+    const doctored = {
+      ...real,
+      irn: "999999",
+      biennium: {
+        ...real.biennium,
+        observed: [
+          real.biennium.observed[0]!,
+          real.biennium.observed[1]!,
+          { ...o, net_state_funding: o.net_state_funding! - 0.02 },
+        ],
+      },
+    };
+    expect(reconciles(DEDUCTION_IDENTITY, [...districts, doctored])).toEqual(["999999"]);
+  });
+
+  test("the two lines are the payment report's own transfers, to the cent", () => {
+    for (const d of districts) expect(Math.abs(transfers(d) - terminal(d).transfers!), d.irn).toBeLessThan(0.01);
+  });
+
+  test("the example is the district the state pays the most", () => {
+    const ex = deductionExample(districts);
+    for (const d of districts) expect(d.biennium.total_terminal).toBeLessThanOrEqual(ex.biennium.total_terminal);
+  });
+
+  test("the one negative guarantee base is the corpus's", () => {
+    const below = districts.filter((d) => d.transition.funding_base < 0);
+    expect(below).toHaveLength(1);
+    const text = corpus.byId.get("parameter/guarantee-funding-base")!.findings!;
+    const dollars = Math.abs(below[0]!.transition.funding_base).toLocaleString("en-US", { minimumFractionDigits: 2 });
+    expect(text).toContain(`${below[0]!.name} at **-$${dollars}**`);
+  });
+
+  test("the corpus says community school students are paid directly, not deducted", () => {
+    const plan = corpus.byId.get("funding-regime/fair-school-funding-plan")!;
+    expect(plan.description).toMatch(/funded directly by the state rather than by deducting from a resident district's\s+foundation payment/);
   });
 });

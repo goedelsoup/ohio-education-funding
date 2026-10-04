@@ -887,6 +887,21 @@
       ]
     },
     {
+      "route": "/explained/deduction",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/deduction",
+        "title": "What happened to the deduction for community schools and vouchers?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    },
+    {
       "route": "/legislation",
       "pages": 1,
       "of": 1,
@@ -1718,6 +1733,21 @@
       ]
     },
     {
+      "route": "/explained/deduction",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/deduction",
+        "title": "What happened to the deduction for community schools and vouchers?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    },
+    {
       "route": "/explained/guarantee",
       "pages": 1,
       "of": 1,
@@ -1927,6 +1957,21 @@
   ],
   "program/edchoice-expansion": [
     {
+      "route": "/explained/deduction",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/deduction",
+        "title": "What happened to the deduction for community schools and vouchers?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    },
+    {
       "route": "/method",
       "pages": 1,
       "of": 1,
@@ -1970,6 +2015,21 @@
         {
           "id": "not",
           "label": "What this page is not"
+        }
+      ]
+    },
+    {
+      "route": "/explained/deduction",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/deduction",
+        "title": "What happened to the deduction for community schools and vouchers?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
         }
       ]
     },
