@@ -251,7 +251,10 @@ export interface NavGroup extends NavEntryBase {
    * `.menu-panel[data-width="wide"]` in `app.css`.
    */
   sections: NavSection[];
-  /** Lay the runs out in two columns where there is room. `Library` only. */
+  /**
+   * Lay the runs out in two columns where there is room: `Library`, and `Explained` since its
+   * thirteenth question took one column past what `nav.spec.ts` lets it hold (#718).
+   */
   wide?: boolean;
   /**
    * Links set above the runs, across the whole panel, each with its glyph. `Library` only.
@@ -437,6 +440,7 @@ export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavEntry[] {
       blurb: "The formula's largest effects, one question at a time, in plain words with the math behind them.",
       label: NAMES.explained.name,
       sections: explainedRuns(),
+      wide: true,
     },
     {
       kind: "group",

@@ -440,7 +440,7 @@ export const PAGE_HEIGHT_CEILINGS = [
     // 4,616 under system-ui and 4,252 under DejaVu, after cutting it from 5,066 to fit.
     measured: 4438,
     ceiling: 4900,
-    sample: ["/explained/phase-in.html", "/explained/what-a-district-gets.html", "/explained/guarantee.html", "/explained/state-share.html", "/explained/spending.html", "/explained/sources.html", "/explained/reduction-factors.html", "/explained/poverty-count.html", "/explained/anchor-chain.html", "/explained/deduction.html", "/explained/projection.html", "/explained/transportation.html"],
+    sample: ["/explained/phase-in.html", "/explained/what-a-district-gets.html", "/explained/guarantee.html", "/explained/state-share.html", "/explained/spending.html", "/explained/sources.html", "/explained/reduction-factors.html", "/explained/poverty-count.html", "/explained/anchor-chain.html", "/explained/deduction.html", "/explained/projection.html", "/explained/transportation.html", "/explained/bounds.html"],
   },
 ] as const;
 

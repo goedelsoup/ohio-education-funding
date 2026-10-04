@@ -513,9 +513,11 @@ header.site nav .menu-runs { display: contents; }
  * `break-inside: avoid` so a run is never split from its heading. The columns are set on
  * `.menu-runs` and not on the panel, so the lead above them spans both.
  *
- * Above the nav's breakpoint it hangs from its own right edge: `Library` is the fifth entry of
- * six, and a 30rem panel hung from its left edge would run off the right of the window. Below
- * 640px the panel is static and one column like every other — see the rule after this.
+ * Above the nav's breakpoint `Library` hangs from its own right edge: it sits in the right half of
+ * the bar, and a 30rem panel hung from its left edge would run off the right of the window.
+ * `Explained`, wide since its thirteenth question (#718), sits in the left half and hangs from its
+ * left edge as every narrow panel does; `data-hang` is which of the two a panel is. Below 640px
+ * the panel is static and one column like every other — see the rule after this.
  */
 @media (min-width: 641px) {
   header.site nav .menu-panel[data-width="wide"] {
@@ -546,7 +548,7 @@ header.site nav .menu-runs { display: contents; }
   header.site nav [data-width="wide"] .menu-run:not(:last-child) { padding-bottom: var(--space-2); }
 }
 @media (min-width: 920px) {
-  header.site nav .menu-panel[data-width="wide"] { left: auto; right: 0; }
+  header.site nav .menu-panel[data-width="wide"][data-hang="right"] { left: auto; right: 0; }
 }
 /* Narrow viewports: the header already wraps, and an absolutely positioned panel next to a
    wrapped row lands on top of the row below it. Let the menu push the header open instead. */

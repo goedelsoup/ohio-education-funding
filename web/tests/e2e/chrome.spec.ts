@@ -456,9 +456,10 @@ test.describe("routes", () => {
     // taxes rise when my house value does?" (#718), forty-four with "How does Ohio count poor
     // students?" (#718), forty-five with "Why is FY2011 still inside the formula?" (#718), and
     // forty-six with "What happened to the deduction for community schools and vouchers?" (#718),
-    // forty-seven with "How sure is a projection?" (#718), and forty-eight with "How is a bus ride
-    // paid for?" (#718).
-    expect(hrefs).toHaveLength(48);
+    // forty-seven with "How sure is a projection?" (#718), forty-eight with "How is a bus ride
+    // paid for?" (#718), and forty-nine with "What is a floor or a ceiling, and whom does it
+    // decide?" (#718).
+    expect(hrefs).toHaveLength(49);
     for (const href of hrefs) {
       await page.goto(href);
       await expect(page.locator("h1"), `${href} has no heading`).toBeVisible();
@@ -609,7 +610,7 @@ test.describe("the section menus", () => {
     expect(rows.beside, "the glyph sits beside its label on a phone").toBe(true);
   });
 
-  test("the Library panel opens inside the window at every width it hangs from the bar", async ({
+  test("every two-column panel opens inside the window at every width it hangs from the bar", async ({
     page,
   }) => {
     /*
@@ -621,19 +622,32 @@ test.describe("the section menus", () => {
      * 820 is inside the `Menu` disclosure; 920 is the narrowest loose bar; 1280 is the widest the
      * header grows. At each, the whole panel is on screen: nothing clipped at either side, and the
      * last link above the bottom of an 800px window.
+     *
+     * `Explained` went to two columns at its thirteenth question (#718) and sits second in the bar,
+     * so the same right-hand hang put 163px of it off the left of a 1280px window. Both are held
+     * here, found by their width rather than by position, so the next wide panel is held too.
      */
     for (const width of [820, 920, 1280]) {
       await page.setViewportSize({ width, height: 800 });
       await page.goto("/");
-      if (width < 920) await page.locator("header.site nav details.menu-all > summary").click();
-      const library = page.locator("header.site nav details.menu").nth(3);
-      await library.locator("summary").click();
-      const panel = library.locator(".menu-panel");
-      const box = (await panel.boundingBox())!;
-      expect(box.x, `Library runs off the left at ${width}px`).toBeGreaterThanOrEqual(0);
-      expect(box.x + box.width, `Library runs off the right at ${width}px`).toBeLessThanOrEqual(width);
-      expect(box.y + box.height, `Library runs below the window at ${width}px`).toBeLessThanOrEqual(800);
-      await expect(panel.locator("a").last()).toBeInViewport();
+      const wide = page.locator('header.site nav details.menu:has(> .menu-panel[data-width="wide"])');
+      const labels = await wide.locator("> summary").allTextContents();
+      expect(labels.map((l) => l.trim())).toEqual(["Explained", "Library"]);
+      for (const [i, label] of labels.entries()) {
+        const name = label.trim();
+        if (width < 920) {
+          const all = page.locator("header.site nav details.menu-all");
+          if ((await all.getAttribute("open")) === null) await all.locator("> summary").click();
+        }
+        await wide.nth(i).locator("> summary").click();
+        const panel = wide.nth(i).locator("> .menu-panel");
+        const box = (await panel.boundingBox())!;
+        expect(box.x, `${name} runs off the left at ${width}px`).toBeGreaterThanOrEqual(0);
+        expect(box.x + box.width, `${name} runs off the right at ${width}px`).toBeLessThanOrEqual(width);
+        expect(box.y + box.height, `${name} runs below the window at ${width}px`).toBeLessThanOrEqual(800);
+        await expect(panel.locator("a").last()).toBeInViewport();
+        await wide.nth(i).locator("> summary").click();
+      }
     }
   });
 

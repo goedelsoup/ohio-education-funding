@@ -902,6 +902,21 @@
       ]
     },
     {
+      "route": "/explained/bounds",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/bounds",
+        "title": "What is a floor or a ceiling, and whom does it decide?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    },
+    {
       "route": "/explained/deduction",
       "pages": 1,
       "of": 1,
