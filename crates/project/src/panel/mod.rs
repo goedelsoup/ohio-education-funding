@@ -4,7 +4,7 @@
 //! at compile time, so this is pure and deterministic like the calculators — no filesystem, no
 //! clock, no network — and a projection run years from now reads the same numbers.
 //!
-//! # What the columns mean, and one that was mislabelled
+//! # What the columns mean, and one that was mislabeled
 //!
 //! `enrolled_adm_fy24/25/26` are the three years R.C. 3317.011 averages to get base cost
 //! enrolled ADM for FY2027. The department's `Base_Cost` sheet labels the same three columns

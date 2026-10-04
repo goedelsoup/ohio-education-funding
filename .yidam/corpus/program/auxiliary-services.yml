@@ -77,6 +77,49 @@ findings: |
   out eight dollars lower and matches nothing anyone publishes. [verified]
   ([`crates/project`](../../../crates/project/tests/the_october_the_statute_divides_by.rs))
 
+  ### Seven published rates, and five of them close
+
+  LSC has printed a per-pupil rate for this line in seven fiscal years, every one of them odd: the
+  year before each budget it analyses, from H.B. 59's FY2013 to H.B. 96's FY2025. Every greenbook
+  since H.B. 119 also prints what is left of the line after its earmark, and the earmark is older
+  than College Credit Plus — H.B. 66 set aside $2,000,000 a year in the same place for
+  postsecondary enrollment options. That remainder over the school year's own October, in-state,
+  closes five of the seven: **$867.03** for FY2017 against $867, **$897.44** for FY2019 against
+  "roughly $900", **$927.18** for FY2021 and **$926.52** for FY2023 against $927 both times, and
+  FY2025's $913.10. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_rate_the_greenbooks_published.rs))
+
+  The three readings FY2025 needed are not that year's accident. In FY2017, FY2021, FY2023 and
+  FY2025 alike, the line gross of its earmark misses high, the October's whole total with
+  out-of-state pupils included misses low, and the next October misses — each year rules out the
+  alternatives on its own. FY2019's "roughly" is too coarse to rule out the October. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_rate_the_greenbooks_published.rs))
+
+  FY2017 closes only on the 2014-2019 compilation, and that settles a disagreement between two of
+  the department's files. October 2016's own file states 171,426 pupils living in Ohio; the
+  compilation states 169,901 in Ohio and 171,426 in all. Over the annual file's figure the
+  quotient is **$859.32**, which nobody printed. So the annual file's in-state column is the whole
+  sector mislabeled, and the quotient takes the compilation wherever it restates an October.
+  [verified]
+  ([`crates/project`](../../../crates/project/tests/the_rate_the_greenbooks_published.rs))
+
+  The two that do not close are the two with no exact October under them, since the department
+  published no sector total before October 2015. Both printed rates sit inside the interval the
+  masked building sheet leaves: FY2013's "about $710" lies between **$636.41** and
+  **$825.60**. FY2015's $787 has a second witness in the compilation, and on it the quotient is
+  **$787.55** — a dollar's rounding high. LSC called both of those an "average per-pupil amount",
+  which may be a different statistic from the quotient; the fixtures cannot say. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_rate_the_greenbooks_published.rs))
+
+  ### Per pupil, the real fall is a fifth
+
+  From FY2017 to FY2025, the first and last years that close on an exact October, the line rose
+  **11.87%** in cash and fell **15.04%** in constant FY2025 dollars. The rate rose **5.31%** and
+  fell **20.02%**. The in-state count the quotient divides by grew from 169,901 to 179,693 over
+  the same years, so a pupil's share of a line shrinking in real terms shrank faster than the
+  line. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_rate_the_greenbooks_published.rs))
+
   ### What the bound was, and why it missed
 
   Before this series the corpus divided by the department's landscape sheet — **173,156** pupils
@@ -201,6 +244,54 @@ figures:
     value: 0.1039
     field: findings
     as_written: "and fell **10.39%**"
+  - key: project/auxiliary-services-rate-fy2017
+    value: 867.03
+    field: findings
+    as_written: "**$867.03** for FY2017"
+  - key: project/auxiliary-services-rate-fy2019
+    value: 897.44
+    field: findings
+    as_written: "**$897.44** for FY2019"
+  - key: project/auxiliary-services-rate-fy2021
+    value: 927.18
+    field: findings
+    as_written: "**$927.18** for FY2021"
+  - key: project/auxiliary-services-rate-fy2023
+    value: 926.52
+    field: findings
+    as_written: "**$926.52** for FY2023"
+  - key: project/auxiliary-services-rate-fy2017-on-the-annual-file
+    value: 859.32
+    field: findings
+    as_written: "quotient is **$859.32**, which nobody printed"
+  - key: project/auxiliary-services-rate-fy2013-low
+    value: 636.41
+    field: findings
+    as_written: "lies between **$636.41**"
+  - key: project/auxiliary-services-rate-fy2013-high
+    value: 825.6
+    field: findings
+    as_written: "and\n  **$825.60**"
+  - key: project/auxiliary-services-rate-fy2015-on-the-compilation
+    value: 787.55
+    field: findings
+    as_written: "**$787.55** — a dollar's rounding high"
+  - key: project/auxiliary-services-nominal-growth-fy2017-fy2025
+    value: 0.1187
+    field: findings
+    as_written: "**11.87%** in cash"
+  - key: project/auxiliary-services-real-decline-fy2017-fy2025
+    value: 0.1504
+    field: findings
+    as_written: "fell **15.04%** in constant FY2025 dollars"
+  - key: project/auxiliary-services-rate-nominal-growth-fy2017-fy2025
+    value: 0.0531
+    field: findings
+    as_written: "The rate rose **5.31%**"
+  - key: project/auxiliary-services-rate-real-decline-fy2017-fy2025
+    value: 0.2002
+    field: findings
+    as_written: "fell **20.02%**"
   - key: project/chartered-nonpublic-octobers-held
     value: 49
     field: findings

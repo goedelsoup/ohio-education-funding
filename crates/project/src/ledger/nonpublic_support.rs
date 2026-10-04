@@ -31,6 +31,9 @@
 //! quotient was a bound computed on a landscape sheet a year early; what changed is the source,
 //! not the arithmetic.
 //!
+//! The same quotient for every other year is [`mod@crate::auxiliary_rate`]'s, outside the ledger
+//! because it reads the greenbooks.
+//!
 //! **There are two payment routes and the line title implies one.** R.C. 3317.024(E)(1) pays the
 //! school district the nonpublic school sits in; (E)(2) pays the chartered nonpublic school
 //! directly where it elects to be paid that way, and the school may designate an organization to
