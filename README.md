@@ -23,7 +23,7 @@ Fields: one row per directory; every count derived from the directory itself.
 | [`.yidam/corpus/`](.yidam/corpus/) | The knowledge graph: 135 nodes across 18 classes — regimes, components, parameters, litigation, doctrine, exemplar districts |
 | [`.yidam/catalog/`](.yidam/catalog/) | 60 source records. Every numeric claim in the corpus should reach one in a single hop |
 | [`.yidam/decisions/`](.yidam/decisions/) | 62 records of why the repository is shaped the way it is, including the ones that turned out wrong |
-| [`crates/`](crates/) | The domain computer: 15 Rust crates, 2056 test functions, no crates.io dependencies |
+| [`crates/`](crates/) | The domain computer: 15 Rust crates, 2057 test functions, no crates.io dependencies |
 | [`web/`](web/) | The site — a page per district, statewide views, and a scenario runner, all static |
 | [`agents/`](agents/), [`.yidam/skills/`](.yidam/skills/) | 5 traversals and 15 procedures this domain keeps needing |
 <!-- /REGEN -->
@@ -61,7 +61,7 @@ Tasks are [mise](https://mise.jdx.dev) tasks. `mise install` provisions Rust, No
 mise run //:ci             everything the CI workflow runs, in the same order
 mise run //crates:gate     fmt, clippy, test, doc
 mise run //web:gate        check, lint, unit, build, e2e
-mise run //:generated      fail if the feed or any README block is stale
+mise run //:generated      fail if the feed, a manifest, the icon or a README block is stale
 mise run //crates:connectors   what is retrievable, and how far each connector got
 ```
 
@@ -72,7 +72,7 @@ the record — `cargo doc` with warnings as errors was failing for at least two 
 said so. `//:ci` is still the thing to run before pushing; the workflow is the thing that catches
 what a dirty local tree hides.
 
-The site deploys itself. A push to `main` that clears all three jobs uploads the built site to
+The site deploys itself. A push to `main` that clears both build jobs uploads the built site to
 Cloudflare Pages, and it is live at <https://ohio-education-funding.pages.dev> a minute or two
 later — the same `dist/` the browser suite ran against rather than a rebuild of it, so what is
 served is what was tested. `mise run //:deploy` publishes by hand and is the escape hatch; note

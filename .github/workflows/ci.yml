@@ -71,6 +71,30 @@ jobs:
         env:
           RUSTDOCFLAGS: -D warnings
 
+      # Every committed generated artifact: the feed the site serves, both corpus manifests
+      # (`figures.json`, `series.json`), the README REGEN blocks, and the site icon. The task is
+      # the one the local gate runs, called rather than copied — this job used to carry a
+      # hand-written copy that checked two of the five, so a stale `figures.json` merged green
+      # and went red on the next person's `//:ci`, where it read as their own finding (#495).
+      #
+      # Last in this job so it reuses the build above rather than cold-compiling the workspace on
+      # a runner of its own. `mise run` installs the `[tools]` it finds missing; Rust is already
+      # the pinned toolchain from the first step, so what it actually fetches is node, for
+      # `design/logo/outline.ts --check`.
+      - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
+        with:
+          install: false
+          cache: false
+
+      # Same reason as in `graph-lint`: an untrusted config is silently an empty one.
+      - name: Trust the configs
+        working-directory: .
+        run: mise trust --all
+
+      - name: generated files are current
+        working-directory: .
+        run: mise run //:generated
+
   # The web gate is five jobs, because only one thing in it has to come first: the build. It ran as
   # one serial job for most of its life, and at 415–604s it was the critical path of every push
   # while the crates beside it finished in ~155s (#647).
@@ -359,35 +383,6 @@ jobs:
             [ "$result" = success ] || exit 1
           done
 
-  # Two generated artifacts, both committed, both easy to forget: the feed the site serves and
-  # the REGEN blocks the READMEs carry. If either drifts, the repository is describing itself
-  # wrongly and nothing else would notice.
-  generated:
-    name: generated files are current
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
-
-      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
-        with:
-          workspaces: crates
-
-      - name: The web feed
-        run: |
-          cargo run --manifest-path crates/Cargo.toml -p bundle > /tmp/bundle.json
-          if ! diff -q /tmp/bundle.json web/public/data/bundle.json; then
-            echo "::error::web/public/data/bundle.json is stale."
-            echo "Regenerate: cargo run --manifest-path crates/Cargo.toml -p bundle > web/public/data/bundle.json"
-            diff /tmp/bundle.json web/public/data/bundle.json | head -40
-            exit 1
-          fi
-
-      # `--check` rather than regenerate-then-`git diff`. The diff form works here, because a
-      # checkout is clean, and fails against any dirty tree — so the same command could not be
-      # used by the local gate that actually runs, and the two would drift.
-      - name: The README indexes
-        run: cargo run --manifest-path crates/Cargo.toml -p edfund-connect -- index --check
-
   # The corpus's own gate: `yidam lint`, against the baseline ratchet in `.yidam/`.
   #
   # It ran nowhere but a developer's shell until #437. An `edge-target-class` finding reached
@@ -401,7 +396,7 @@ jobs:
   # branch that deliberately introduces an error-severity finding has to `mise run //:graph-lint-
   # bless` in the same PR, with the reason in the commit, which is the ratchet working.
   #
-  # `deploy` deliberately does NOT list this job in `needs`. The three gates it does wait on are
+  # `deploy` deliberately does NOT list this job in `needs`. The two gates it does wait on are
   # the ones that decide whether the built site is *correct*; a lint finding about a corpus edge
   # does not make a deployed page wrong, and holding a good build behind one would be a different
   # policy than the one written below.
@@ -448,17 +443,17 @@ jobs:
         run: mise run //:graph-lint
 
   # The site goes live from here, and from nowhere else that anyone should be relying on: a push
-  # to `main` that cleared all three gates above. `mise run //:deploy` still exists and is still
+  # to `main` that cleared both gates above. `mise run //:deploy` still exists and is still
   # occasionally the right thing, but it is no longer how production changes.
   #
-  # Gating on `generated` matters as much as gating on `web`. The district figures are written
-  # into the HTML at build time, so a build over a stale `bundle.json` produces a site that is
-  # wrong in its numbers and perfectly green in its tests.
+  # Gating on the generated-file check, which runs inside `crates`, matters as much as gating on
+  # `web`. The district figures are written into the HTML at build time, so a build over a stale
+  # `bundle.json` produces a site that is wrong in its numbers and perfectly green in its tests.
   deploy:
     name: deploy to production
     # `web` is the aggregate of the web jobs, so this waits on `web-static`, `web-dist`, every
     # `web-e2e` shard and `web-explained`, not only on the build that produced the tarball.
-    needs: [rust, web, generated]
+    needs: [rust, web]
     # A `pull_request` event resolves `github.ref` to the PR's merge ref rather than to
     # `refs/heads/main`, so it is already excluded. The event test is for `workflow_dispatch`,
     # which can be aimed at `main` and would otherwise redeploy with no commit behind it.

@@ -208,8 +208,32 @@ fn coordinate(value: f64) -> String {
     format!("{value:?}")
 }
 
+/// A number that is only ever drawn, at nine decimal places rather than every bit.
+///
+/// A spread's coordinates are logs, and `f64::ln` is the platform's: glibc and Apple's libm
+/// disagree in the last bit on some inputs, so a manifest written at [`coordinate`]'s precision
+/// was stale on the CI runner the moment it was regenerated on a Mac (#495). Nothing binds these
+/// numbers — a spread's census is its binding and that is a count — so they can be cut far above
+/// that noise and far below a pixel. Every number of a spread goes through here, the frame
+/// included, because the rounding is monotone: a mark inside its frame stays inside it, and a
+/// boundary that ends on the frame's edge still does.
+fn drawn(value: f64) -> String {
+    assert!(
+        value.is_finite(),
+        "a spread carries {value}, which is not a number JSON can carry"
+    );
+    let cut = (value * 1e9).round() / 1e9;
+    // `+ 0.0` so that a value that rounds to zero is written `0.0`, never `-0.0`.
+    format!("{:?}", cut + 0.0)
+}
+
 /// One axis, as a member of the object that holds it.
 fn axis(name: &str, a: &Axis) -> String {
+    framed(name, a, coordinate)
+}
+
+/// One axis, its two ends written by `write`.
+fn framed(name: &str, a: &Axis, write: fn(f64) -> String) -> String {
     assert!(
         writable(a.label),
         "{:?}: an axis label carries a character this writer cannot escape",
@@ -220,8 +244,8 @@ fn axis(name: &str, a: &Axis) -> String {
          \"log\": {}}}",
         a.label,
         a.unit.name(),
-        coordinate(a.min),
-        coordinate(a.max),
+        write(a.min),
+        write(a.max),
         a.log,
     )
 }
@@ -518,8 +542,8 @@ fn spreads(out: &mut String) {
             s.owner,
             s.subject,
             s.label,
-            axis("x", x),
-            axis("y", y),
+            framed("x", x, drawn),
+            framed("y", y, drawn),
         );
         assert!(
             classes.iter().all(|c| writable(c)),
@@ -545,10 +569,10 @@ fn spreads(out: &mut String) {
                 out,
                 "       {{\"label\": \"{}\", \"from\": [{}, {}], \"to\": [{}, {}]}}{comma}",
                 line.label,
-                coordinate(from.0),
-                coordinate(from.1),
-                coordinate(to.0),
-                coordinate(to.1),
+                drawn(from.0),
+                drawn(from.1),
+                drawn(to.0),
+                drawn(to.1),
             );
         }
         let _ = writeln!(out, "     ],");
@@ -612,8 +636,8 @@ fn spreads(out: &mut String) {
                     out,
                     "         {{\"label\": \"{}\", \"x\": {}, \"y\": {}, \"class\": {}}}{comma}",
                     mark.label,
-                    coordinate(mark.x),
-                    coordinate(mark.y),
+                    drawn(mark.x),
+                    drawn(mark.y),
                     mark.class,
                 );
             }
@@ -837,6 +861,22 @@ mod tests {
         // The one that matters: a value the manifest must not round, because the corpus quotes it
         // to the cent and the check compares against what is written here.
         assert_eq!(number(Unit::Dollars, 392_151_306.63), "392151306.63");
+    }
+
+    #[test]
+    fn a_drawn_number_survives_a_last_bit_disagreement() {
+        // Two of the three marks that differed between a Mac and the CI runner (#495).
+        assert_eq!(
+            drawn(0.104_954_868_868_934_06),
+            drawn(0.104_954_868_868_934_04)
+        );
+        assert_eq!(
+            drawn(0.014_915_793_426_295_398),
+            drawn(0.014_915_793_426_295_454)
+        );
+        assert_eq!(drawn(0.104_954_868_868_934_06), "0.104954869");
+        assert_eq!(drawn(-0.000_000_000_1), "0.0");
+        assert_eq!(drawn(-3.536_983_927_490_525_5), "-3.536983927");
     }
 
     #[test]
