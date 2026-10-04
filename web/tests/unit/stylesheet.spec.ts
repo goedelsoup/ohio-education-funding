@@ -320,19 +320,24 @@ test("the findings card is not the only card by its ground alone", () => {
 });
 
 /**
- * A card is the unit a reader thinks in, so a card is the unit that stays together.
+ * The units that cannot be read in two halves stay together, and a card is not one of them.
  *
- * Without this the tallest chart printed two pages from the heading and legend that explain it.
+ * Without the first half the tallest chart printed two pages from the heading and legend that
+ * explain it. With a card kept whole as well, a card taller than what was left of a sheet went to
+ * the next one and left the rest of the sheet blank — 60% of a district page's first (#602).
  */
 test("paper is told where the page may break", () => {
-  for (const target of [".card", ".chartwrap"]) {
-    const broken = [...PAPER.matchAll(/([^{}]+)\{([^{}]*)\}/g)].some(
+  const rule = (target: string, value: string) =>
+    [...PAPER.matchAll(/([^{}]+)\{([^{}]*)\}/g)].some(
       ([, selector, body]) =>
         new RegExp(`(^|,)\\s*${target.replace(".", "\\.")}\\s*(,|$)`).test(selector!.trim()) &&
-        /break-inside\s*:\s*avoid/.test(body!),
+        new RegExp(`break-inside\\s*:\\s*${value}`).test(body!),
     );
-    expect(broken, `${target} may be sliced across a page break`).toBe(true);
+  for (const target of [".chartwrap", ".tile", "tr"]) {
+    expect(rule(target, "avoid"), `${target} may be sliced across a page break`).toBe(true);
   }
+  expect(rule(".card", "avoid"), ".card is kept whole and strands a blank sheet").toBe(false);
+  expect(rule(".card", "auto"), ".card does not say it may break").toBe(true);
 });
 
 /**

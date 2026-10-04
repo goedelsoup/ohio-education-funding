@@ -103,6 +103,88 @@ test.describe("presentation", () => {
     ]);
   });
 
+  /**
+   * A district page is what a legislator prints and takes to a meeting, and it printed 19 sheets:
+   * the first held the menu, the theme button, five tabs and the contents list and was 60% blank,
+   * because every card was kept whole and the first one went to the next sheet; a later sheet held
+   * two stranded lines (#602).
+   */
+  test("paper leaves out the screen's chrome and lets a card break", async ({ page }) => {
+    await page.goto(`/district/${CLEVELAND}`);
+    await page.emulateMedia({ media: "print" });
+    const shown = await page.evaluate(() =>
+      [
+        "header.site",
+        "nav.subnav",
+        "nav.contents",
+        "#theme",
+        "footer.site .screen-links",
+        "footer.site .print-url",
+        "input[type=range]",
+        "button",
+      ].map((selector) => {
+        const element = document.querySelector(selector);
+        if (!element) return `${selector} is not on the page`;
+        return `${selector} ${getComputedStyle(element).display}`;
+      }),
+    );
+    expect(shown).toEqual([
+      "header.site none",
+      "nav.subnav none",
+      "nav.contents none",
+      "#theme none",
+      "footer.site .screen-links none",
+      "footer.site .print-url block",
+      "input[type=range] is not on the page",
+      "button none",
+    ]);
+    await expect(page.locator("footer.site .print-url")).toHaveText(
+      new RegExp(`/district/${CLEVELAND}$`),
+    );
+    const breaks = await page.evaluate(() => ({
+      card: getComputedStyle(document.querySelector(".card")!).breakInside,
+      chart: getComputedStyle(document.querySelector(".chartwrap")!).breakInside,
+    }));
+    expect(breaks).toEqual({ card: "auto", chart: "avoid" });
+  });
+
+  test("a district page prints to at most sixteen sheets", async ({ page }) => {
+    await page.goto(`/district/${CLEVELAND}`);
+    const pdf = await page.pdf({ format: "Letter" });
+    // Each sheet is one `/Type /Page` object; `/Type /Pages` is the tree that holds them.
+    const sheets = pdf.toString("latin1").match(/\/Type\s*\/Page(?!s)/g)?.length ?? 0;
+    expect(sheets).toBeGreaterThan(0);
+    expect(sheets).toBeLessThanOrEqual(16);
+  });
+
+  /**
+   * A control prints as its position. A switch prints the half that is chosen, as a word, so the
+   * chart under it still says which basis it is drawn on; a slider's position is in its label's
+   * `<output>`, so the slider itself goes; a select prints the option it holds.
+   */
+  test("a control prints as the position it is in", async ({ page }) => {
+    await page.goto("/statewide");
+    await page.emulateMedia({ media: "print" });
+    const basis = page.locator(".basis-scope").first();
+    await expect(basis.locator('.basis label[data-basis="nominal"]')).toBeVisible();
+    await expect(basis.locator('.basis label[data-basis="real"]')).toBeHidden();
+    await expect(basis.locator(".basis .n")).toBeHidden();
+
+    await page.goto("/scenario");
+    await page.emulateMedia({ media: "print" });
+    await expect(page.locator("#lv-base")).toBeHidden();
+    await expect(page.locator("#lv-base-out")).toBeVisible();
+    await expect(page.locator("#scenario-reset")).toBeHidden();
+    const select = await page
+      .locator("#lv-guarantee")
+      .evaluate((element) => {
+        const style = getComputedStyle(element);
+        return `${style.display} ${style.appearance} ${style.borderTopWidth}`;
+      });
+    expect(select).not.toMatch(/^none /);
+    expect(select).toMatch(/ none 0px$/);
+  });
+
   test("the page does not scroll sideways on a phone", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     for (const path of [
