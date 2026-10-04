@@ -63,7 +63,7 @@ export const CHECKED: readonly Checked[] = [
     says: (_, m) => `Its wealth puts its formula share below ${pct(m, 0)}, so that floor sets its share.`,
   },
   {
-    label: "Transport paid on miles, not riders",
+    label: "Transport on miles, not riders",
     on: (d) => d.transportation.paid_on_miles,
     says: () => "Its bus aid is counted by the mile, because the miles pay more than the riders.",
   },
@@ -73,12 +73,12 @@ export const CHECKED: readonly Checked[] = [
     says: (d) => `Its bus aid fell below an earlier level, so a second guarantee adds ${money(d.transportation.guarantee)}.`,
   },
   {
-    label: `Efficiency adjustment capped at ${pct(EFFICIENCY_MOST, 0)}`,
+    label: `Efficiency adjustment at ${pct(EFFICIENCY_MOST, 0)} cap`,
     on: (d) => d.transportation.efficiency_index >= EFFICIENCY_CEILING,
     says: () => `Its buses are full enough that the efficiency bonus stops at its ceiling, ${pct(EFFICIENCY_MOST, 0)} more.`,
   },
   {
-    label: `No density aid from ${count(DENSITY_CUTOFF)} riders a sq. mile`,
+    label: `No density aid at ${count(DENSITY_CUTOFF)}+ riders/sq mi`,
     on: (d) => d.transportation.district_density >= DENSITY_CUTOFF,
     says: (d) =>
       `It has ${fixed(d.transportation.district_density, 1)} riders a square mile, at least ${count(DENSITY_CUTOFF)}, so its density aid is zero.`,
@@ -89,7 +89,7 @@ export const CHECKED: readonly Checked[] = [
     says: () => "Its old base is below zero, so the guarantee holds that base at zero.",
   },
   {
-    label: "Poverty aid count capped at enrollment",
+    label: "Poverty count capped at enrollment",
     on: (d) => blend(d) > d.current_year_adm,
     says: () => "Its count of poor pupils would exceed its enrollment, so enrollment caps it.",
   },
