@@ -8,7 +8,6 @@
  * hover layer, the theme switch, and the nominal/constant-dollar toggle on top of a page that
  * already reads correctly without them.
  */
-import { contentsOf, withContents } from "../lib/contents.ts";
 import { applySemantics } from "../lib/semantics.ts";
 import { loadFeed } from "../lib/feed.ts";
 import { groupLinks, nav, type Section } from "../lib/nav.ts";
@@ -174,17 +173,17 @@ const forecasts = verification.forecasts.length;
  * Nothing on this site hydrates, so rendering the slot early costs nothing beyond the parse.
  */
 const rendered = await Astro.slots.render("default");
-const listed = contents ? withContents(rendered, contentsOf(rendered)) : rendered;
 /*
  * What the markup means, decided where the whole body is in hand: which cell heads which row, what
  * each scrolling box is called, and how deep the corpus's own headings sit in the page they were
  * placed into. See `semantics.ts` for why each of those is a property of the document rather than
  * of the renderer that wrote a piece of it.
  *
- * After the contents list, so the list is walked too, and after `contentsOf` has read the headings
- * — that reads what the corpus authored, and this is what places it.
+ * The contents list goes in first, over the same parse, so the list is walked too, and its
+ * headings are read before any pass moves them — that reads what the corpus authored, and the
+ * passes are what place it. One parse rather than two is #648.
  */
-const body = applySemantics(listed).html;
+const body = applySemantics(rendered, { contents }).html;
 ---
 
 <!doctype html>

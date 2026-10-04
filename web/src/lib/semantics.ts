@@ -61,6 +61,8 @@
 
 import { parseHTML } from "linkedom";
 
+import { withContents } from "./contents.ts";
+
 /**
  * A heading's words, without the two annotations sharing its line.
  *
@@ -659,7 +661,11 @@ function anchorCharts(document: Document): number {
  * no name and a heading that skips a level are both silent failures, visible only to a reader who
  * is not the one writing the markup.
  */
-export function applySemantics(body: string): {
+export function applySemantics(
+  body: string,
+  /** Put a contents list above the sections first, read off this same parse — see `withContents`. */
+  { contents = false }: { contents?: boolean } = {},
+): {
   html: string;
   unnamed: number;
   scoped: number;
@@ -684,6 +690,7 @@ export function applySemantics(body: string): {
    */
   const { document } = parseHTML("<!doctype html><html><body></body></html>");
   document.body.innerHTML = body;
+  if (contents) withContents(document);
 
   // Document order as a number, so "the nearest heading above this" is a comparison rather than a
   // tree walk that has to know how the cards are nested. Taken once, before anything moves.

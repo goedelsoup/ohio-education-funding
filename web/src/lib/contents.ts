@@ -70,7 +70,11 @@ const MINIMUM = 4;
  * at.
  */
 export function contentsOf(body: string): Entry[] {
-  const { document } = parseHTML(`<body>${body}</body>`);
+  return contentsIn(parseHTML(`<body>${body}</body>`).document);
+}
+
+/** {@link contentsOf}, over a body already parsed — the layout's, which `applySemantics` holds. */
+function contentsIn(document: Document): Entry[] {
   const order: string[] = [];
   const headings = new Map<string, string[]>();
 
@@ -200,13 +204,13 @@ export function renderContents(entries: Entry[]): string {
 }
 
 /**
- * The opening tag a page writes to have its contents list set in a rail beside its sections.
+ * The class a page gives a bare `div` to have its contents list set in a rail beside its sections.
  *
  * `withContents` looks for it and nothing else does; the layout is `app.css`'s. The district
  * dashboard is the one route that asks (#549): the longest page with the most sections, and the
  * one a reader moves around in rather than reads down.
  */
-const RAIL = `<div class="rail-layout">`;
+const RAIL = "rail-layout";
 
 /**
  * Put the list above the sections it lists.
@@ -221,8 +225,15 @@ const RAIL = `<div class="rail-layout">`;
  *
  * So the boundary is found rather than marked, and the boundary is well defined: the first section
  * element in the body. Everything before it is the page introducing itself and everything from it
- * on is the page. Nothing is parsed to find it — the string is machine-generated and the opening
- * tag of a section is one of two shapes.
+ * on is the page. The markup is machine-generated and the opening tag of a section is one of two
+ * shapes: a `div` whose first attribute is a class list beginning `card` or `basis-scope`.
+ *
+ * # Why it takes a document and not a string
+ *
+ * It took the rendered string and spliced the list in, which needed `contentsOf` to parse the
+ * body once for the headings and `applySemantics` to parse it again straight after. On the
+ * district routes that second parse was five of the build's sixty seconds (#648). So the layout
+ * hands this the document `applySemantics` already holds, and the list goes in as nodes.
  *
  * # A page that asks for a rail
  *
@@ -230,11 +241,19 @@ const RAIL = `<div class="rail-layout">`;
  * child instead, so the stylesheet can set it in a column beside the sections from 1000px up. It
  * is still before them in the document, which is where a screen reader and a phone meet it.
  */
-export function withContents(body: string, entries: Entry[]): string {
-  if (entries.length < MINIMUM) return body;
-  const first = body.search(/<div class="(?:card|basis-scope)[ "]/);
-  if (first === -1) return body;
-  const rail = body.indexOf(RAIL);
-  const at = rail !== -1 && rail < first ? rail + RAIL.length : first;
-  return body.slice(0, at) + renderContents(entries) + body.slice(at);
+export function withContents(document: Document): void {
+  const entries = contentsIn(document);
+  if (entries.length < MINIMUM) return;
+
+  let rail: Element | undefined;
+  for (const div of document.querySelectorAll("div")) {
+    const [attribute] = div.attributes;
+    if (attribute?.name !== "class") continue;
+    if (/^(?:card|basis-scope)(?: |$)/.test(attribute.value)) {
+      if (rail) rail.insertAdjacentHTML("afterbegin", renderContents(entries));
+      else div.insertAdjacentHTML("beforebegin", renderContents(entries));
+      return;
+    }
+    if (!rail && div.attributes.length === 1 && attribute.value === RAIL) rail = div;
+  }
 }

@@ -12,6 +12,14 @@ import { expect, test } from "vitest";
 import { contentsOf, renderContents, withContents } from "../../src/lib/contents.ts";
 import { anchor } from "../../src/lib/section.ts";
 
+/** The body with its contents list put in, as `applySemantics` does over its one parse (#648). */
+function listed(body: string): string {
+  const { document } = parseHTML("<!doctype html><html><body></body></html>");
+  document.body.innerHTML = body;
+  withContents(document);
+  return document.body.innerHTML;
+}
+
 /** A card as the renderers write one. */
 const card = (id: string, heading: string, chip = "") =>
   `<div class="card" id="${id}" data-part="${id}"><h2>${anchor(id)}${heading}${chip}</h2><p>body</p></div>`;
@@ -137,7 +145,7 @@ test("the list goes above the first section and below the page introducing itsel
    */
   const intro = `<h1>Cleveland Municipal</h1><p class="sub">IRN 043786</p><nav class="subnav"><a href="/x">Dashboard</a></nav>`;
   const sections = card("a", "One") + card("b", "Two") + card("c", "Three") + card("d", "Four");
-  const out = withContents(intro + sections, contentsOf(intro + sections));
+  const out = listed(intro + sections);
 
   expect(out.indexOf("<nav class=\"contents\"")).toBeGreaterThan(out.indexOf("subnav"));
   expect(out.indexOf("<nav class=\"contents\"")).toBeLessThan(out.indexOf('<div class="card" id="a"'));
@@ -148,10 +156,10 @@ test("the list goes above the first section and below the page introducing itsel
 test("a page with too few sections gets no list at all", () => {
   // A list of three is longer than what it lists.
   const body = card("a", "One") + card("b", "Two") + card("c", "Three");
-  expect(withContents(body, contentsOf(body))).toBe(body);
+  expect(listed(body)).toBe(body);
 
   const four = body + card("d", "Four");
-  expect(withContents(four, contentsOf(four))).toContain('nav class="contents"');
+  expect(listed(four)).toContain('nav class="contents"');
 });
 
 test("a page that opens a rail gets the list inside it, still ahead of the sections", () => {
@@ -163,7 +171,7 @@ test("a page that opens a rail gets the list inside it, still ahead of the secti
   const intro = `<h1>Cleveland Municipal</h1><nav class="subnav"><a href="/x">Dashboard</a></nav>`;
   const sections = card("a", "One") + card("b", "Two") + card("c", "Three") + card("d", "Four");
   const body = `${intro}<div class="rail-layout"><div class="rail-main">${sections}</div></div>`;
-  const out = withContents(body, contentsOf(body));
+  const out = listed(body);
 
   expect(out).toContain('<div class="rail-layout"><nav class="contents"');
   expect(out.indexOf('<nav class="contents"')).toBeLessThan(out.indexOf('<div class="card" id="a"'));
@@ -171,7 +179,7 @@ test("a page that opens a rail gets the list inside it, still ahead of the secti
 
   // A rail opened after the first section is not this page asking for one.
   const late = sections + `<div class="rail-layout"></div>`;
-  expect(withContents(late, contentsOf(late)).indexOf('<nav class="contents"')).toBe(0);
+  expect(listed(late).indexOf('<nav class="contents"')).toBe(0);
 });
 
 test("the list is a disclosure, labelled by the one label that is not its control", () => {
