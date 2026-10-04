@@ -100,9 +100,18 @@ export function indexedPng(pixels: Buffer, width: number, height: number): Buffe
   const seen = new Map<number, number>();
   const palette: number[] = [];
 
+  // A card is long runs of one colour, so the pixel before is nearly always the answer, and asking
+  // it first skips most of the map lookups: one per pixel, ~850 million across a build (#648).
+  let previous = -1;
+  let previousIndex = 0;
+
   for (let at = 0, pixel = 0; at < pixels.length; at += 4, pixel += 1) {
     if (pixels[at + 3] !== 255) return null;
     const colour = (pixels[at]! << 16) | (pixels[at + 1]! << 8) | pixels[at + 2]!;
+    if (colour === previous) {
+      indexes[pixel] = previousIndex;
+      continue;
+    }
     let index = seen.get(colour);
     if (index === undefined) {
       if (palette.length === 256) return null;
@@ -111,6 +120,8 @@ export function indexedPng(pixels: Buffer, width: number, height: number): Buffe
       seen.set(colour, index);
     }
     indexes[pixel] = index;
+    previous = colour;
+    previousIndex = index;
   }
 
   // One filter byte per row, then the row. See {@link NO_FILTER} for why the byte is always zero.
