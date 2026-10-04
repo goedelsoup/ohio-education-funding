@@ -22,6 +22,7 @@ import { yearChip, yearOf } from "../lib/year.ts";
 import { coverage, coverageFinding, renderCoverage } from "../lib/coverage.ts";
 import { pinnedSources } from "../lib/digests.ts";
 import { bias, renderBias } from "../lib/bias.ts";
+import { whatIsThis } from "../lib/explained/registry.ts";
 import { scatterSpec } from "../lib/plot/spec.ts";
 import { renderToString } from "../lib/plot/ssr.ts";
 import { pairs } from "../lib/relationships.ts";
@@ -533,6 +534,7 @@ const millageScatter = renderToString(
       number would inherit the second's error while wearing the first's precision.
     </p>
   </div>
+  <Fragment set:html={whatIsThis("projection")} />
 
   <div class="card" id="provenance" data-part="provenance">
     <h2><SectionAnchor id="provenance" />Provenance and the source manifest</h2>

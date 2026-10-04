@@ -2232,6 +2232,21 @@
   ],
   "scenario/guarantee-phase-out": [
     {
+      "route": "/explained/projection",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/explained/projection",
+        "title": "How sure is a projection?"
+      },
+      "sections": [
+        {
+          "id": "how-we-know",
+          "label": "How we know"
+        }
+      ]
+    },
+    {
       "route": "/method",
       "pages": 1,
       "of": 1,

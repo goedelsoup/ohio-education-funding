@@ -46,6 +46,8 @@ import {
   shareOf,
 } from "../../src/lib/explained/state-share.ts";
 import { CHAIN, EMPTYING_FLOOR, EMPTYING_LOSS, inflation } from "../../src/lib/explained/anchor-chain.ts";
+import { DISTRICT_FAN_YEARS } from "../../src/lib/project.ts";
+import { IDENTITY as PROJECTION_IDENTITY, example as projectionExample } from "../../src/lib/explained/projection.ts";
 import { IDENTITY as DEDUCTION_IDENTITY, example as deductionExample, terminal, transfers } from "../../src/lib/explained/deduction.ts";
 import {
   IDENTITY as POVERTY_IDENTITY,
@@ -903,5 +905,40 @@ describe("What happened to the deduction for community schools and vouchers? (#7
   test("the corpus says community school students are paid directly, not deducted", () => {
     const plan = corpus.byId.get("funding-regime/fair-school-funding-plan")!;
     expect(plan.description).toMatch(/funded directly by the state rather than by deducting from a resident district's\s+foundation payment/);
+  });
+});
+
+describe("How sure is a projection? (#718)", () => {
+  const { districts, projection } = loadFeed().bundle;
+  const meta = projection!;
+  const row = { irn: "sigma", stated: meta.sigma, districts };
+
+  test("the band's sigma is the spread of the districts' growth rates", () => {
+    expect(reconciles(PROJECTION_IDENTITY, [row])).toEqual([]);
+  });
+
+  test("a panel with one district's growth doubled fails it", () => {
+    // The smallest district moves the spread least; if it still moves sigma past the printed
+    // precision, the identity is reading the panel and not the feed's own figure back.
+    const smallest = [...districts].sort((a, b) => a.adm_history.at(-1)! - b.adm_history.at(-1)!)[0]!;
+    const history = [...smallest.adm_history] as typeof smallest.adm_history;
+    history[history.length - 1] = history.at(-1)! * 2;
+    const doctored = districts.map((d) => (d === smallest ? { ...d, adm_history: history } : d));
+    expect(reconciles(PROJECTION_IDENTITY, [{ ...row, districts: doctored }])).toEqual(["sigma"]);
+  });
+
+  test("the example is the median district by latest enrollment", () => {
+    const ex = projectionExample(districts);
+    const latest = (d: (typeof districts)[number]) => d.adm_history.at(-1)!;
+    const below = districts.filter((d) => latest(d) < latest(ex)).length;
+    const above = districts.filter((d) => latest(d) > latest(ex)).length;
+    expect(Math.abs(below - above)).toBeLessThanOrEqual(1);
+  });
+
+  test("the district fan's depth is the scenario node's six-year leg, inside the feed's horizon", () => {
+    const node = loadCorpus().byId.get("scenario/guarantee-phase-out")!;
+    const horizon = node.properties.find((p) => p.name === "horizon")!.value;
+    expect(horizon).toContain(`one projected leg to FY${meta.base_year + DISTRICT_FAN_YEARS}`);
+    expect(meta.base_year + DISTRICT_FAN_YEARS).toBeLessThanOrEqual(meta.horizon);
   });
 });
