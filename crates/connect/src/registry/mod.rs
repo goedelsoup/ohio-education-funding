@@ -128,6 +128,84 @@ pub enum Format {
     /// document carries records the last *write*, not the response — so these pin by digest the
     /// way a published file does, and a changed digest means the department rewrote the record.
     Json,
+    /// A comma-separated file with a header, which [`crate::fixtures`] reads by column name.
+    ///
+    /// Distinct from [`Self::Text`] because nothing about it is positional, and from
+    /// [`Self::Zip`] because it arrives bare. The department's directory extract and the
+    /// Census geocoder's answer come this way, and neither is a file anyone posted: both are
+    /// produced by a request, and [`request`] says which.
+    Csv,
+}
+
+/// How a source is asked for, when a plain GET is not enough.
+///
+/// Two sources are answers to a request rather than files at a URL. The department's directory
+/// returns its extract only to a POST carrying the fields wanted — a GET of the same URL is
+/// refused with a 403 — and the Census batch geocoder takes a multipart upload of addresses that
+/// another source supplies.
+///
+/// Held in [`REQUESTS`] beside the registry rather than as a field of [`Source`], because a field
+/// would have to be written into every one of the four hundred-odd `Source` literals to say `Get`
+/// for all but two of them. Not `PartialEq` — [`Self::Geocode`] carries a function — which is the
+/// other reason it is not a field: `Source` is compared.
+#[derive(Debug, Clone, Copy)]
+pub enum Request {
+    /// A GET of the URL, which is every source but the ones named in [`REQUESTS`].
+    Get,
+    /// A POST of one url-encoded form field.
+    Form {
+        /// The field name.
+        field: &'static str,
+        /// Its value, sent as written.
+        value: &'static str,
+    },
+    /// A multipart POST of an address file to the Census batch geocoder.
+    Geocode {
+        /// The source whose cached bytes the addresses are built from. Fetch that first.
+        addresses: &'static str,
+        /// Turns those bytes into the geocoder's `id,street,city,state,zip` lines.
+        build: fn(&str) -> Result<String, String>,
+        /// The address ranges to match against.
+        benchmark: &'static str,
+        /// The geography to report for each match.
+        vintage: &'static str,
+    },
+}
+
+/// Every source fetched by something other than a GET.
+pub const REQUESTS: &[(&str, Request)] = &[
+    (
+        "oeds-nonpublic-schools",
+        Request::Form {
+            field: "jsonData",
+            // Organisation type 5 is Nonpublic School in the directory's own type list
+            // (`Api/generalPage/RefOrgDetailsExtract`). `OrgCats` empty is every category.
+            // `Selected` names the columns wanted and is ignored — the extract carries all
+            // twenty-four whatever it asks for — so it is sent empty rather than as a list that
+            // reads as though it chose something.
+            value: r#"{"OrgTypes":[5],"OrgCats":[],"Selected":[]}"#,
+        },
+    ),
+    (
+        "geocoder-nonpublic-schools",
+        Request::Geocode {
+            addresses: "oeds-nonpublic-schools",
+            build: crate::fixtures::geocoder_addresses,
+            // The current address ranges, reporting 2020 blocks: the blocks the 2020 block
+            // assignment file describes. `Public_AR_Census2020` places five fewer schools.
+            benchmark: "Public_AR_Current",
+            vintage: "Census2020_Current",
+        },
+    ),
+];
+
+/// How to ask for a source: its entry in [`REQUESTS`], or a GET.
+#[must_use]
+pub fn request(source: &Source) -> Request {
+    REQUESTS
+        .iter()
+        .find(|(key, _)| *key == source.key)
+        .map_or(Request::Get, |(_, request)| *request)
 }
 
 /// One retrievable publication.
@@ -218,6 +296,9 @@ pub const CONNECTORS: &[Connector] = &[
     ofcc::PROJECTS,
     census::F33,
     nces::CCD,
+    // Ahead of the Census geography, because the geocoder source there is built from this one's
+    // extract and `fetch --all` walks this array in order.
+    dew::DIRECTORY,
     census::GEOGRAPHY,
     dew::CHILD_NUTRITION,
     dew::SCHOOL_IMPROVEMENT,
@@ -362,6 +443,26 @@ mod tests {
             "approved in a decision record and missing from the registry: {missing:?}. \
              Removing a connector means withdrawing its approval in the record, not deleting a line."
         );
+    }
+
+    #[test]
+    fn every_request_names_a_registered_source() {
+        // `request` falls back to a GET for any key it does not find, so a typo in `REQUESTS`
+        // would not fail: the source would be fetched the plain way and refused with a 403.
+        for (key, request) in REQUESTS {
+            assert!(
+                source(key).is_some(),
+                "REQUESTS names {key}, which is not a source"
+            );
+            if let Request::Geocode { addresses, .. } = request {
+                assert!(
+                    sources()
+                        .position(|(_, s)| s.key == *addresses)
+                        .lt(&sources().position(|(_, s)| s.key == *key)),
+                    "{key} is built from {addresses}, so `fetch --all` must reach {addresses} first"
+                );
+            }
+        }
     }
 
     #[test]

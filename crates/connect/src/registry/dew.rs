@@ -2887,14 +2887,13 @@ pub(super) const NONPUBLIC_ENROLLMENT: Connector = Connector {
     status: Status::Wired {
         still_blocked: Some(
             "wired for every October the department publishes, 1977 through 2025, at the \
-             building and at the sector. What it cannot reach is the district each building \
-             sits in. Auxiliary services under R.C. 3317.06 flows to a nonpublic school \
-             through the district its building is located in, so a per-district question \
-             about the nonpublic sector needs that column; no file in any of the three eras \
-             carries it, the Chartered Nonpublic School Information page publishes no \
-             directory, and `edchoice-designated` is public buildings only. County and \
-             school type are published for 1977-78 through 2006-07 and then stop, so even \
-             the coarser geography is gone for the modern years",
+             building and at the sector. No file in any of the three eras carries the \
+             district a building sits in, which is what auxiliary services under R.C. \
+             3317.024(E)(1) pays through. `dew-directory` now supplies it for the schools \
+             open today, keyed on building IRN — and only for them, and only at their \
+             present address: an October before the directory's is not reached, and a \
+             building that has since closed has no address to place. County and school \
+             type are published for 1977-78 through 2006-07 and then stop",
         ),
     },
     note: "Forty-nine Octobers of chartered nonpublic enrolment by building — the denominator \
@@ -3294,4 +3293,37 @@ pub(super) const NONPUBLIC_ENROLLMENT: Connector = Connector {
                    settles what `nonpub_fy17.xls` holds.",
         },
     ],
+};
+
+pub(super) const DIRECTORY: Connector = Connector {
+    key: "dew-directory",
+    publisher: "Ohio Department of Education and Workforce, Ohio Educational Directory System",
+    feeds: &["school"],
+    status: Status::Wired {
+        still_blocked: Some(
+            "the extract lists organizations open on the day it is generated, so it places \
+             today's schools at today's addresses and nothing earlier. Six buildings in the \
+             2025-26 October and 23 in 2023-24 are not in it. The directory's search API \
+             (`Api/searchOrg`) returns closed organizations too, and is not read",
+        ),
+    },
+    note: "The only public record of where a chartered nonpublic school is: an address against \
+           a building IRN. It names a parent organization, which is the diocese or association, \
+           and has no field for the public school district — that is placed by geocoding the \
+           address into the 2020 census blocks. See \
+           .yidam/decisions/nonpublic-school-location.yml.",
+    sources: &[Source {
+        key: "oeds-nonpublic-schools",
+        title: None,
+        url: "https://oeds.education.ohio.gov/DataExtract/GetRequestOrgExtract",
+        filename: "oeds-nonpublic-schools.csv",
+        format: Format::Csv,
+        catalog: Some("dew-oeds-directory"),
+        fixtures: &[crate::fixtures::NONPUBLIC_LOCATION_FIXTURE],
+        note: "A POST, not a file: `registry::REQUESTS` carries the form, and a GET of the same \
+               URL is refused with a 403. The first line is `Generated on <timestamp>`, so the \
+               digest changes on every fetch whether or not a school did. Each school is listed \
+               once per school type — 903 rows for 787 buildings — and every IRN is written \
+               as `=\"057539\"` so a spreadsheet keeps the leading zero.",
+    }],
 };

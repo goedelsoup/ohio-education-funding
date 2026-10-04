@@ -1904,14 +1904,15 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
 
     // Sixteen school years of the federal agency directory, Ohio only. The one fixture here whose
     // point is *membership* rather than any figure: which agencies existed in which year.
-    out.push(match ccd_directory(root) {
+    let directory = ccd_directory(root);
+    out.push(match &directory {
         Ok(rows) => csv_fixture(
             root,
             fixtures::CCD_DIRECTORY_FIXTURE,
             fixtures::CCD_DIRECTORY_HEADER,
-            &rows,
+            rows,
         )?,
-        Err(reason) => Rebuilt::skipped(fixtures::CCD_DIRECTORY_FIXTURE, reason),
+        Err(reason) => Rebuilt::skipped(fixtures::CCD_DIRECTORY_FIXTURE, reason.clone()),
     });
 
     // Seventeen Octobers of the child nutrition report, aggregated from school sites to sponsors.
@@ -1946,6 +1947,22 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
             out.push(Rebuilt::skipped(fixtures::NONPUBLIC_SECTOR_FIXTURE, reason));
         }
     }
+
+    // The district each open nonpublic school sits in: the department's directory, geocoded into
+    // the 2020 blocks, joined to the district each block lay in. Needs the CCD directory's rows to
+    // turn a district code into an IRN, so a directory that could not be read skips this too.
+    out.push(
+        match directory.and_then(|ccd| nonpublic_locations(root, &ccd)) {
+            Ok(Ok(rows)) => csv_fixture(
+                root,
+                fixtures::NONPUBLIC_LOCATION_FIXTURE,
+                fixtures::NONPUBLIC_LOCATION_HEADER,
+                &rows,
+            )?,
+            Ok(Err(layout)) => return Err(RebuildError::Layout(layout)),
+            Err(reason) => Rebuilt::skipped(fixtures::NONPUBLIC_LOCATION_FIXTURE, reason),
+        },
+    );
 
     // School districts across legislative seats. The last extraction because it is the only one
     // that depends on another fixture's contents rather than only on a cached publication: the
@@ -2068,6 +2085,24 @@ fn legislative_crosswalk(
         directory: &zip_member(root, directory, ".csv")?,
         panel,
     })
+}
+
+/// The nonpublic location fixture, from the directory extract, its geocoding and the block file.
+///
+/// Two layers of failure, as the landscape extraction has: the outer `Err` is a
+/// source not cached, which skips the fixture, and the inner one is a join that missed, which is a
+/// layout change and must stop the rebuild.
+fn nonpublic_locations(
+    root: &Path,
+    ccd: &[Vec<String>],
+) -> Result<Result<Vec<Vec<String>>, String>, String> {
+    let text = |key: &str| cached_text(root, registered(key)).map_err(|cause| cause.to_string());
+    Ok(fixtures::build_nonpublic_locations(&fixtures::Locations {
+        directory: &text("oeds-nonpublic-schools")?,
+        geocoded: &text("geocoder-nonpublic-schools")?,
+        school_districts: &zip_member(root, registered("baf-2020-oh"), "_SDUNI.txt")?,
+        ccd,
+    }))
 }
 
 /// The per-district F-33 panel, from the survey archive and the directory that keys it to IRN.

@@ -22,7 +22,8 @@
 //! **What it still cannot say.** Not one file in any era carries the district a building sits in,
 //! and R.C. 3317.06 pays through that district under the first of the two routes. The building
 //! panel is keyed on IRN because the alternative does not work: October 2023 holds 711 schools
-//! under 601 names.
+//! under 601 names. The IRN is what lets the department's directory supply the district instead —
+//! see `the_district_a_nonpublic_school_sits_in.rs`.
 
 use std::collections::{BTreeMap, BTreeSet};
 

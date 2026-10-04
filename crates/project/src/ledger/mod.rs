@@ -1,6 +1,6 @@
 //! The appropriations ledger: what the General Assembly set aside, line by line and year by year.
 //!
-//! Six modules, and the boundary they sit behind is the point of the directory.
+//! Seven modules, and the boundary they sit behind is the point of the directory.
 //!
 //! | Module | Question it answers |
 //! |---|---|
@@ -10,6 +10,7 @@
 //! | [`budget_analysis`] | what a line's earmarks are, and whether they survived the legislature |
 //! | [`nonpublic_support`] | what the three Category 3 lines pay the chartered nonpublic schools |
 //! | [`nonpublic_enrolment`] | the October count R.C. 3317.024(E)(2)(d) divides the first of them by |
+//! | [`nonpublic_location`] | the district each school sits in, which R.C. 3317.024(E)(1) pays through |
 //!
 //! # The invariant: the ledger knows nothing about districts
 //!
@@ -44,6 +45,7 @@ pub mod appropriations;
 pub mod budget_analysis;
 pub mod line_origins;
 pub mod nonpublic_enrolment;
+pub mod nonpublic_location;
 pub mod nonpublic_support;
 pub mod session_laws;
 
@@ -58,14 +60,14 @@ mod tests {
     ///
     /// Comment lines are dropped before the search, because a comment cannot create an edge and
     /// both this file's prose and this docstring have to be able to name what they forbid. The
-    /// three needles are spelled in halves for the same reason: this file is one of the seven it
+    /// three needles are spelled in halves for the same reason: this file is one of the eight it
     /// searches, and a literal `crate` followed by two colons would match itself.
     ///
-    /// The sources are read at compile time, which costs the test binary a copy of seven files it
+    /// The sources are read at compile time, which costs the test binary a copy of eight files it
     /// already contains and costs the library nothing.
     #[test]
     fn the_ledger_reaches_nothing_outside_itself() {
-        const SOURCES: [(&str, &str); 7] = [
+        const SOURCES: [(&str, &str); 8] = [
             ("mod.rs", include_str!("mod.rs")),
             ("appropriations.rs", include_str!("appropriations.rs")),
             ("budget_analysis.rs", include_str!("budget_analysis.rs")),
@@ -75,6 +77,10 @@ mod tests {
             (
                 "nonpublic_enrolment.rs",
                 include_str!("nonpublic_enrolment.rs"),
+            ),
+            (
+                "nonpublic_location.rs",
+                include_str!("nonpublic_location.rs"),
             ),
         ];
         const ABSOLUTE: &str = concat!("crate", "::");

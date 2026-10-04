@@ -25,7 +25,7 @@ use std::io;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use crate::registry::Source;
+use crate::registry::{self, Request, Source};
 use crate::sha256::digest_hex;
 
 /// Environment variable holding a contact address for the agent string.
@@ -207,6 +207,33 @@ pub fn fetch(root: &Path, source: &Source, refresh: bool) -> Result<PathBuf, Fet
     // leaves a truncated file that later runs would treat as cached.
     let partial = destination.with_extension("partial");
     let resolved = resolved_url(source)?;
+    let request = registry::request(source);
+    // A geocoder upload is built from another source's cached bytes, and written beside the
+    // partial file so curl can read it as a form part. The name must end in `.csv`: the geocoder
+    // answers 400 to the same bytes under any other extension.
+    let addresses = destination.with_extension("upload.csv");
+    if let Request::Geocode {
+        addresses: upstream,
+        build,
+        ..
+    } = request
+    {
+        let (_, upstream) = registry::source(upstream).ok_or_else(|| FetchError::Transfer {
+            key: source.key.to_string(),
+            detail: format!("{upstream} is not a registered source"),
+        })?;
+        let text = String::from_utf8(read_cached(root, upstream)?).map_err(|cause| {
+            FetchError::Transfer {
+                key: source.key.to_string(),
+                detail: format!("{} is not UTF-8: {cause}", upstream.key),
+            }
+        })?;
+        let lines = build(&text).map_err(|detail| FetchError::Transfer {
+            key: source.key.to_string(),
+            detail,
+        })?;
+        fs::write(&addresses, lines)?;
+    }
     let output = Command::new("curl")
         .args([
             "--fail",
@@ -218,6 +245,7 @@ pub fn fetch(root: &Path, source: &Source, refresh: bool) -> Result<PathBuf, Fet
             "--user-agent",
         ])
         .arg(user_agent())
+        .args(request_arguments(request, &addresses))
         .args(["--output"])
         .arg(&partial)
         .arg(&resolved)
@@ -230,6 +258,7 @@ pub fn fetch(root: &Path, source: &Source, refresh: bool) -> Result<PathBuf, Fet
             }
         })?;
 
+    let _ = fs::remove_file(&addresses);
     if !output.status.success() {
         let _ = fs::remove_file(&partial);
         let mut detail = String::from_utf8_lossy(&output.stderr).trim().to_string();
@@ -246,6 +275,29 @@ pub fn fetch(root: &Path, source: &Source, refresh: bool) -> Result<PathBuf, Fet
     }
     fs::rename(&partial, &destination)?;
     Ok(destination)
+}
+
+/// The curl arguments a request adds to a plain GET.
+///
+/// `addresses` is where a geocoder upload was written; it is read only for
+/// [`Request::Geocode`].
+fn request_arguments(request: Request, addresses: &Path) -> Vec<String> {
+    match request {
+        Request::Get => Vec::new(),
+        Request::Form { field, value } => {
+            vec!["--data-urlencode".into(), format!("{field}={value}")]
+        }
+        Request::Geocode {
+            benchmark, vintage, ..
+        } => vec![
+            "--form".into(),
+            format!("addressFile=@{}", addresses.display()),
+            "--form".into(),
+            format!("benchmark={benchmark}"),
+            "--form".into(),
+            format!("vintage={vintage}"),
+        ],
+    }
 }
 
 /// Read a cached source's bytes, without going to the network.
@@ -420,6 +472,42 @@ mod tests {
             sha256: sha.into(),
             bytes: 10,
         }
+    }
+
+    #[test]
+    fn a_plain_source_adds_nothing_to_the_get() {
+        let (_, source) = registry::source("baf-2020-oh").unwrap();
+        assert!(request_arguments(registry::request(source), Path::new("x")).is_empty());
+    }
+
+    #[test]
+    fn the_directory_extract_is_a_post_of_its_form() {
+        // A GET of the extract URL is refused with a 403 by the department's gateway; the
+        // `--data-urlencode` is what makes curl send a POST.
+        let (_, source) = registry::source("oeds-nonpublic-schools").unwrap();
+        let arguments = request_arguments(registry::request(source), Path::new("x"));
+        assert_eq!(arguments[0], "--data-urlencode");
+        assert!(
+            arguments[1].starts_with(r#"jsonData={"OrgTypes":[5]"#),
+            "{arguments:?}"
+        );
+    }
+
+    #[test]
+    fn the_geocoder_upload_names_the_file_and_the_2020_blocks() {
+        let (_, source) = registry::source("geocoder-nonpublic-schools").unwrap();
+        let arguments = request_arguments(registry::request(source), Path::new("/c/a.upload.csv"));
+        assert_eq!(
+            arguments,
+            [
+                "--form",
+                "addressFile=@/c/a.upload.csv",
+                "--form",
+                "benchmark=Public_AR_Current",
+                "--form",
+                "vintage=Census2020_Current"
+            ]
+        );
     }
 
     #[test]

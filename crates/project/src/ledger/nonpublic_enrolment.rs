@@ -36,9 +36,10 @@
 //!
 //! **The district each building sits in.** No nonpublic file in any era carries a district column,
 //! and R.C. 3317.06 flows through the district a school is located in under the first of the two
-//! payment routes. So this module can say what a school's membership was and not whose
-//! entitlement it generated. The catalog entry records the search; the decision record
-//! `nonpublic-enrollment-connector` records why a name match was rejected as a substitute.
+//! payment routes. The decision record `nonpublic-enrollment-connector` records why a name match
+//! was rejected as a substitute. [`super::nonpublic_location`] holds the column instead, joined on
+//! [`Building::irn`] — for the schools open on the directory's day, which is the present and not
+//! any October before it.
 //!
 //! [`Building::school`] is there to be read, never to be keyed on: October 2023 holds sixteen
 //! schools named `St Mary` across 711 buildings with 601 distinct names. [`Building::irn`] is the
