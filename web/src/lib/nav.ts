@@ -26,7 +26,7 @@ import { loadCorpus, type Corpus } from "./corpus.ts";
 import * as routes from "./routes.ts";
 import type { NavIcon } from "./icons.ts";
 import { GROUPS } from "./explained/topic.ts";
-import { TOPICS } from "./explained/registry.ts";
+import { published } from "./explained/registry.ts";
 
 /**
  * What a page passes as `section`, naming where it sits in the bar.
@@ -355,7 +355,7 @@ function explainedRuns(): NavSection[] {
   const index: NavSection = { links: [place("explained", "every question, in plain words")] };
   const runs = GROUPS.map((heading) => ({
     heading,
-    links: TOPICS.filter((t) => t.group === heading).map((t) => ({
+    links: published().filter((t) => t.group === heading).map((t) => ({
       href: routes.explained(t.slug),
       label: t.question,
     })),
@@ -433,15 +433,20 @@ export function nav(bundle: Bundle, corpus: Corpus = loadCorpus()): NavEntry[] {
       blurb: `All ${bundle.statewide.districts}, by name or IRN, each with the formula's answer beside the one it receives.`,
       label: NAMES.districts.name,
     },
-    {
-      kind: "group",
-      key: "explained",
-      front: NAMES.explained.href,
-      blurb: "The formula's largest effects, one question at a time, in plain words with the math behind them.",
-      label: NAMES.explained.name,
-      sections: explainedRuns(),
-      wide: true,
-    },
+    // Only in a build that publishes Explained (#718); with no topic there is no index either.
+    ...(published().length > 0
+      ? [
+          {
+            kind: "group",
+            key: "explained",
+            front: NAMES.explained.href,
+            blurb: "The formula's largest effects, one question at a time, in plain words with the math behind them.",
+            label: NAMES.explained.name,
+            sections: explainedRuns(),
+            wide: true,
+          } satisfies NavEntry,
+        ]
+      : []),
     {
       kind: "group",
       key: "places",

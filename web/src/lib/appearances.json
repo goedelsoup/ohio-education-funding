@@ -316,38 +316,6 @@
       ]
     }
   ],
-  "formula-component/fsfp-base-cost-calculation": [
-    {
-      "route": "/explained/phase-in",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/phase-in",
-        "title": "What does the phase-in do?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
-    {
-      "route": "/explained/what-a-district-gets",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/what-a-district-gets",
-        "title": "How does Ohio decide what a district gets?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    }
-  ],
   "formula-component/fsfp-career-technical-weights": [
     {
       "route": "/district/[irn]",
@@ -378,21 +346,6 @@
         {
           "id": "categoricals",
           "label": "The categorical half, in its six parts"
-        }
-      ]
-    },
-    {
-      "route": "/explained/poverty-count",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/poverty-count",
-        "title": "How does Ohio count poor students?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
         }
       ]
     },
@@ -541,21 +494,6 @@
     }
   ],
   "formula-component/fsfp-local-capacity-measure": [
-    {
-      "route": "/explained/what-a-district-gets",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/what-a-district-gets",
-        "title": "How does Ohio decide what a district gets?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
     {
       "route": "/what-changed",
       "pages": 1,
@@ -715,21 +653,6 @@
           "label": "Outside the formula"
         }
       ]
-    },
-    {
-      "route": "/explained/transportation",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/transportation",
-        "title": "How is a bus ride paid for?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
     }
   ],
   "formula-component/guarantee-open-enrolment-clawback": [
@@ -764,54 +687,9 @@
           "label": "Where the state aid comes from"
         }
       ]
-    },
-    {
-      "route": "/explained/guarantee",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/guarantee",
-        "title": "Why are so many districts paid an old amount?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
     }
   ],
   "funding-regime/bridge-formula": [
-    {
-      "route": "/explained/anchor-chain",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/anchor-chain",
-        "title": "Why is FY2011 still inside the formula?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
-    {
-      "route": "/explained/guarantee",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/guarantee",
-        "title": "Why are so many districts paid an old amount?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
     {
       "route": "/legislation",
       "pages": 1,
@@ -851,21 +729,6 @@
   ],
   "funding-regime/evidence-based-model": [
     {
-      "route": "/explained/anchor-chain",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/anchor-chain",
-        "title": "Why is FY2011 still inside the formula?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
-    {
       "route": "/legislation",
       "pages": 1,
       "of": 1,
@@ -898,36 +761,6 @@
         {
           "id": "census",
           "label": "38 bounds, and who is on each"
-        }
-      ]
-    },
-    {
-      "route": "/explained/bounds",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/bounds",
-        "title": "What is a floor or a ceiling, and whom does it decide?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
-    {
-      "route": "/explained/deduction",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/deduction",
-        "title": "What happened to the deduction for community schools and vouchers?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
         }
       ]
     },
@@ -1047,21 +880,6 @@
     }
   ],
   "legislation/hb-153-2011": [
-    {
-      "route": "/explained/anchor-chain",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/anchor-chain",
-        "title": "Why is FY2011 still inside the formula?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
     {
       "route": "/legislation",
       "pages": 1,
@@ -1203,21 +1021,6 @@
   ],
   "legislation/hb-920-1976": [
     {
-      "route": "/explained/reduction-factors",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/reduction-factors",
-        "title": "Why don't my taxes rise when my house value does?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
-    {
       "route": "/legislation",
       "pages": 1,
       "of": 1,
@@ -1272,25 +1075,6 @@
     }
   ],
   "legislation/hb-96-2025": [
-    {
-      "route": "/explained/poverty-count",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/poverty-count",
-        "title": "How does Ohio count poor students?"
-      },
-      "sections": [
-        {
-          "id": "rule",
-          "label": "The rule, written out"
-        },
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
     {
       "route": "/legislation",
       "pages": 1,
@@ -1482,21 +1266,6 @@
           "label": "What voters approved, and what the factors left"
         }
       ]
-    },
-    {
-      "route": "/explained/reduction-factors",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/reduction-factors",
-        "title": "Why don't my taxes rise when my house value does?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
     }
   ],
   "metric/enrolled-adm": [
@@ -1554,21 +1323,6 @@
           "label": "Where the money came from"
         }
       ]
-    },
-    {
-      "route": "/explained/spending",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/spending",
-        "title": "Does spending more raise test scores?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
     }
   ],
   "metric/per-pupil-operating-expenditure": [
@@ -1618,21 +1372,6 @@
           "label": "Against districts with comparable poverty"
         }
       ]
-    },
-    {
-      "route": "/explained/spending",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/spending",
-        "title": "Does spending more raise test scores?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
     }
   ],
   "metric/state-share-percentage": [
@@ -1663,21 +1402,6 @@
         {
           "id": "millage",
           "label": "What voters approved, and what the factors left"
-        }
-      ]
-    },
-    {
-      "route": "/explained/what-a-district-gets",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/what-a-district-gets",
-        "title": "How does Ohio decide what a district gets?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
         }
       ]
     },
@@ -1716,21 +1440,6 @@
   ],
   "parameter/fsfp-phase-in-percentage": [
     {
-      "route": "/explained/phase-in",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/phase-in",
-        "title": "What does the phase-in do?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
-    {
       "route": "/what-changed",
       "pages": 1,
       "of": 1,
@@ -1742,102 +1451,6 @@
         {
           "id": "phase-in",
           "label": "The phase-in"
-        }
-      ]
-    }
-  ],
-  "parameter/guarantee-funding-base": [
-    {
-      "route": "/explained/anchor-chain",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/anchor-chain",
-        "title": "Why is FY2011 still inside the formula?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
-    {
-      "route": "/explained/deduction",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/deduction",
-        "title": "What happened to the deduction for community schools and vouchers?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
-    {
-      "route": "/explained/guarantee",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/guarantee",
-        "title": "Why are so many districts paid an old amount?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
-    {
-      "route": "/explained/phase-in",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/phase-in",
-        "title": "What does the phase-in do?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    }
-  ],
-  "parameter/local-capacity-percentage": [
-    {
-      "route": "/explained/state-share",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/state-share",
-        "title": "Why do so many districts sit on the state's floor?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    }
-  ],
-  "parameter/minimum-state-share": [
-    {
-      "route": "/explained/state-share",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/state-share",
-        "title": "Why do so many districts sit on the state's floor?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
         }
       ]
     }
@@ -1870,21 +1483,6 @@
         {
           "id": "valuation-change",
           "label": "TY2023 to TY2024"
-        }
-      ]
-    },
-    {
-      "route": "/explained/reduction-factors",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/reduction-factors",
-        "title": "Why don't my taxes rise when my house value does?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
         }
       ]
     },
@@ -1987,21 +1585,6 @@
   ],
   "program/edchoice-expansion": [
     {
-      "route": "/explained/deduction",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/deduction",
-        "title": "What happened to the deduction for community schools and vouchers?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
-    {
       "route": "/method",
       "pages": 1,
       "of": 1,
@@ -2045,21 +1628,6 @@
         {
           "id": "not",
           "label": "What this page is not"
-        }
-      ]
-    },
-    {
-      "route": "/explained/deduction",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/deduction",
-        "title": "What happened to the deduction for community schools and vouchers?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
         }
       ]
     },
@@ -2160,74 +1728,6 @@
       ]
     }
   ],
-  "revenue-stream/esser": [
-    {
-      "route": "/explained/sources",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/sources",
-        "title": "Where does school money come from?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    }
-  ],
-  "revenue-stream/local-property-tax": [
-    {
-      "route": "/explained/sources",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/sources",
-        "title": "Where does school money come from?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    }
-  ],
-  "revenue-stream/state-foundation-aid": [
-    {
-      "route": "/explained/sources",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/sources",
-        "title": "Where does school money come from?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    }
-  ],
-  "revenue-stream/title-i": [
-    {
-      "route": "/explained/sources",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/sources",
-        "title": "Where does school money come from?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    }
-  ],
   "scenario/fsfp-input-year-refresh": [
     {
       "route": "/district/[irn]",
@@ -2261,21 +1761,6 @@
     }
   ],
   "scenario/guarantee-phase-out": [
-    {
-      "route": "/explained/projection",
-      "pages": 1,
-      "of": 1,
-      "example": {
-        "href": "/explained/projection",
-        "title": "How sure is a projection?"
-      },
-      "sections": [
-        {
-          "id": "how-we-know",
-          "label": "How we know"
-        }
-      ]
-    },
     {
       "route": "/method",
       "pages": 1,

@@ -35,6 +35,7 @@
  * the topic's "How we know" carries the reader on to the node.
  */
 
+import { explainedOn } from "./explained/flag.ts";
 import { escapeHtml } from "./format.ts";
 import * as routes from "./routes.ts";
 
@@ -47,6 +48,10 @@ export interface Term {
   /** Link text, where the node's label is not the term itself. */
   hrefLabel?: string;
 }
+
+/** A term's link to the topic that explains it (#717), only where the build publishes Explained (#718). */
+const plainTerms = (slug: string): Pick<Term, "href" | "hrefLabel"> =>
+  explainedOn() ? { href: routes.explained(slug), hrefLabel: "In plain terms" } : {};
 
 /**
  * The glossary, keyed by the slug a page passes to {@link term}.
@@ -94,24 +99,21 @@ export const GLOSSARY: Record<string, Term> = {
       "A district is on the guarantee when the formula computes less for it than an older " +
       "baseline, and the state pays the baseline instead. It says the formula falls short for " +
       "that district, not that the district is favored, though the money is real.",
-    href: routes.explained("guarantee"),
-    hrefLabel: "In plain terms",
+    ...plainTerms("guarantee"),
   },
   "phase-in": {
     definition:
       "The share of the gap between what the formula computes and a district's older base that " +
       "is actually paid. A district below its base is held at the base, so a higher phase-in " +
       "does not reach it.",
-    href: routes.explained("phase-in"),
-    hrefLabel: "In plain terms",
+    ...plainTerms("phase-in"),
   },
   "state-share": {
     definition:
       "The fraction of a district's base cost the state pays rather than the district, set by a " +
       "measure of local capacity and floored at a statutory minimum. A district at the minimum " +
       "is one the formula says could fund almost all of itself.",
-    href: routes.explained("state-share"),
-    hrefLabel: "In plain terms",
+    ...plainTerms("state-share"),
   },
   adm: {
     definition:

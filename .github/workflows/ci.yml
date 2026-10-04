@@ -286,13 +286,67 @@ jobs:
           path: web/playwright-report/
           retention-days: 7
 
+  # Explained is dev only until it ships (#718), so the build above — the one every job tests and
+  # `deploy` publishes — has none of it, and the suites that read it skip. This job builds a second
+  # time with `PUBLIC_EXPLAINED=1` and runs them: the dist checks and the whole browser suite, so a
+  # topic, its links and the bar's two-column panel stay tested while no reader can reach them.
+  # Its build is never uploaded, so it cannot be the one that deploys. One unsharded job rather
+  # than a second matrix: it runs beside the others, and sharding would build three more times.
+  # Delete it, and the flag, when the section ships.
+  web-explained:
+    name: web explained
+    runs-on: ubuntu-latest
+    env:
+      PUBLIC_EXPLAINED: "1"
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+        with:
+          version: 11
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: build
+        run: pnpm build
+
+      - name: dist links
+        run: pnpm check:dist
+
+      - name: dist
+        run: pnpm test:dist
+
+      # On the runner image, for the reason `web-e2e` gives: the chrome width is font-sensitive.
+      - name: Install the browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: e2e
+        run: pnpm test:e2e
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: failure()
+        with:
+          name: playwright-report-explained
+          path: web/playwright-report/
+          retention-days: 7
+
   # The `main` ruleset requires a check named `web`, and that name predates the split. This job is
   # that check: it passes only when every web job above succeeded, and a skipped or cancelled one
   # counts against it. `if: always()` is what makes it report at all when one of them fails — a job
   # whose `needs` failed is otherwise skipped, and a skipped required check reads as passing.
   web:
     name: web
-    needs: [web-static, web-build, web-dist, web-e2e]
+    needs: [web-static, web-build, web-dist, web-e2e, web-explained]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -300,7 +354,7 @@ jobs:
         env:
           RESULTS: ${{ join(needs.*.result, ' ') }}
         run: |
-          echo "web-static web-build web-dist web-e2e: $RESULTS"
+          echo "web-static web-build web-dist web-e2e web-explained: $RESULTS"
           for result in $RESULTS; do
             [ "$result" = success ] || exit 1
           done
@@ -402,8 +456,8 @@ jobs:
   # wrong in its numbers and perfectly green in its tests.
   deploy:
     name: deploy to production
-    # `web` is the aggregate of the five web jobs, so this waits on `web-static`, `web-dist` and
-    # every `web-e2e` shard, not only on the build that produced the tarball.
+    # `web` is the aggregate of the web jobs, so this waits on `web-static`, `web-dist`, every
+    # `web-e2e` shard and `web-explained`, not only on the build that produced the tarball.
     needs: [rust, web, generated]
     # A `pull_request` event resolves `github.ref` to the PR's merge ref rather than to
     # `refs/heads/main`, so it is already excluded. The event test is for `workflow_dispatch`,

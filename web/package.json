@@ -4,7 +4,7 @@
   "type": "module",
   "description": "The interface layer for the Ohio school funding model: district, statewide, and scenario views over the crates/bundle feed.",
   "scripts": {
-    "dev": "astro dev",
+    "dev": "PUBLIC_EXPLAINED=${PUBLIC_EXPLAINED:-1} astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",

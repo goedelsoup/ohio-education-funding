@@ -17,9 +17,13 @@ import {
   collect,
   pageHeightCeiling,
 } from "../../src/lib/measure.ts";
+import { explainedOn } from "../../src/lib/explained/flag.ts";
 import { SECTIONS } from "../../src/lib/routes.ts";
 
 const FOLD = 800;
+
+// Only a build that publishes Explained has a topic to load (#718); the `web explained` job is one.
+test.skip(!explainedOn(), "this build does not publish Explained");
 
 for (const kind of PAGE_HEIGHT_CEILINGS) {
   test.describe(`the ${kind.name} class at 375px`, () => {
