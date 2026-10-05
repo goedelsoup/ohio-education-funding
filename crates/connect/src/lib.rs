@@ -1676,6 +1676,24 @@ fn rebuild_statute_and_acts(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(cause) => Rebuilt::skipped(fixtures::REDBOOK_FIXTURE, cause),
     });
 
+    // One item of a monthly report, sliced for the same reason the final analysis is: the rest of
+    // the issue is the whole state's GRF, and the corpus cites a page of it.
+    let footnotes = registered("budget-footnotes-2026-01");
+    out.push(
+        match cache::pdf_text(root, footnotes)
+            .map_err(RebuildError::from)
+            .and_then(|text| {
+                fixtures::extract_edchoice_update(&text).ok_or_else(|| {
+                    RebuildError::Io(std::io::Error::other(
+                        "the January 2026 issue no longer contains its traditional EdChoice item",
+                    ))
+                })
+            }) {
+            Ok(text) => text_fixture(root, fixtures::FOOTNOTES_EDCHOICE_FIXTURE, &text)?,
+            Err(cause) => Rebuilt::skipped(fixtures::FOOTNOTES_EDCHOICE_FIXTURE, cause),
+        },
+    );
+
     Ok(out)
 }
 

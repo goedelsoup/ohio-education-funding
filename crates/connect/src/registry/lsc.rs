@@ -341,6 +341,22 @@ pub(super) const BUDGET: Connector = Connector {
                unwired for four phases while the corpus quoted the executive proposal.",
     },
     Source {
+        key: "budget-footnotes-2026-01",
+        title: Some("Budget Footnotes, January 2026"),
+        url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\
+              files/fy-2026-budget-footnotes-january-2026.pdf",
+        filename: "budget-footnotes-2026-01.pdf",
+        format: Format::Pdf,
+        catalog: Some("lsc-budget-footnotes"),
+        fixtures: &[crate::fixtures::FOOTNOTES_EDCHOICE_FIXTURE],
+        note: "The Legislative Budget Office's monthly report, of which one item is extracted: \
+               the traditional EdChoice update, with an in-year count of FY2026 recipients and \
+               an estimate of their cost. The only figure for a fiscal year after H.B. 96 that \
+               is not one of the act's own budget estimates. Hedged twice over — \
+               approximately, and as of December 2025 — so it bounds the year and does not \
+               measure it.",
+    },
+    Source {
         key: "hb96-final-analysis",
         title: None,
         url: "https://www.lsc.ohio.gov/assets/legislation/136/hb96/en0/files/\

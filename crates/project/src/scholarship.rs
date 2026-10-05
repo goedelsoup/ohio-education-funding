@@ -1122,6 +1122,12 @@ pub mod bounds {
     /// The committed census.
     const FIXTURE: &str = include_str!("../fixtures/scholarship-bounds.tsv");
 
+    /// The one item of LSC's *Budget Footnotes* the census quotes: January 2026's traditional
+    /// EdChoice update, the only in-year FY2026 figure a committed source states. Not a budget
+    /// analysis — a monthly report from the same office — and so resolved here rather than through
+    /// [`crate::ledger::budget_analysis`].
+    const FOOTNOTES: &str = include_str!("../fixtures/budget-footnotes-edchoice-2026-01.txt");
+
     const EXPECTED_HEADER: &str =
         "program\tfiscal_year\tmeasure\tvalue\tdenominator\tprecision\tsource\tquote";
 
@@ -1236,7 +1242,7 @@ pub mod bounds {
     pub enum Precision {
         /// Stated without qualification.
         Exact,
-        /// "About" or "approximately" — the same hedge in two words.
+        /// "About", "approximately" or "roughly" — the same hedge in three words.
         About,
         /// "An estimated average", or a forward estimate in a table.
         Estimated,
@@ -1393,6 +1399,7 @@ pub mod bounds {
     /// record header [`crate::greenbook`] reads; the two FY2026-27 documents are extracts of their
     /// own, and `dew-redbook-table-5` names a table inside one of them rather than a second
     /// document.
+    /// `budget-footnotes-2026-01` is the one source that is not a budget analysis at all.
     ///
     /// # Panics
     ///
@@ -1407,6 +1414,7 @@ pub mod bounds {
             "dew-greenbook" | "dew-greenbook-table-3" => {
                 flatten(crate::ledger::budget_analysis::GREENBOOK)
             }
+            "budget-footnotes-2026-01" => flatten(FOOTNOTES),
             record => crate::greenbook::greenbooks()
                 .into_iter()
                 .find(|g| g.id == record)

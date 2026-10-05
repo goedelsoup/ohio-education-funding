@@ -262,6 +262,27 @@ findings: |
   commission decides, and which of Option B's two criteria moved each entrant is not decomposed
   here. [open]
 
+  ### FY2026 has an in-year count, and it sits below the enacted estimate
+
+  No actual for FY2026 is published yet: the *Scholarship Annual Report* reaches 2024-25, and
+  LSC's catalog of budget line items for 2026 has not appeared. What does exist is an in-year
+  figure. LSC's January 2026
+  [*Budget Footnotes*](../../catalog/lsc-budget-footnotes.md) counts **42,000** traditional
+  EdChoice recipients as of December 2025, a 1.5% fall from FY2025, and estimates their cost at
+  **$280 million**. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_points_that_bound_the_participation_hole.rs))
+  The fall closes on the report: 42,607 less 1.5% is 41,968, which rounds to the stated figure.
+
+  The enacted greenbook's Table 3 had put the same year at **45,260** students and
+  **$316.5 million**. The in-year figures sit below both, by **3,260** students and
+  **$36.5 million**: a gap of 7.2% in heads and 11.5% in dollars. [verified] (crates/project)
+
+  **This is a mid-year estimate, not an actual, and it bounds the year without measuring it.** Every
+  figure in the paragraph is hedged: approximately, as of December, estimated, roughly. The
+  program takes applications all year, and LSC says the figures "may change throughout the school
+  year". So the gap says the enacted estimate was running high in December. It does not say the
+  year closed below it. [open]
+
 figures:
   - key: project/traditional-greatest-k8-share
     value: 0.345625
@@ -331,6 +352,30 @@ figures:
     value: 1
     field: findings
     as_written: "1 of the 27 held Option A"
+  - key: project/traditional-footnotes-students-fy2026
+    value: 42000.0
+    field: findings
+    as_written: "counts **42,000** traditional"
+  - key: project/traditional-footnotes-payments-fy2026
+    value: 280000000.0
+    field: findings
+    as_written: "**$280 million**"
+  - key: project/traditional-enacted-students-fy2026
+    value: 45260.0
+    field: findings
+    as_written: "**45,260** students"
+  - key: project/traditional-enacted-payments-fy2026
+    value: 316500000.0
+    field: findings
+    as_written: "**$316.5 million**"
+  - key: project/traditional-footnotes-students-below-enacted-fy2026
+    value: 3260.0
+    field: findings
+    as_written: "by **3,260** students"
+  - key: project/traditional-footnotes-payments-below-enacted-fy2026
+    value: 36500000.0
+    field: findings
+    as_written: "**$36.5 million**"
 series:
   - key: dispersion/edchoice-designated-by-edition
     field: findings
