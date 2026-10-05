@@ -1727,6 +1727,23 @@
       ]
     }
   ],
+  "program/emergency-assistance-to-nonpublic-schools": [
+    {
+      "route": "/statewide",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/statewide",
+        "title": "Statewide"
+      },
+      "sections": [
+        {
+          "id": "nonpublic-support",
+          "label": "Nonpublic school support"
+        }
+      ]
+    }
+  ],
   "program/jon-peterson-special-needs": [
     {
       "route": "/method",
@@ -1789,6 +1806,23 @@
         {
           "id": "casino",
           "label": "The money that reaches this district outside the formula"
+        }
+      ]
+    }
+  ],
+  "revenue-stream/idea-part-b": [
+    {
+      "route": "/statewide",
+      "pages": 1,
+      "of": 1,
+      "example": {
+        "href": "/statewide",
+        "title": "Statewide"
+      },
+      "sections": [
+        {
+          "id": "nonpublic-support",
+          "label": "Nonpublic school support"
         }
       ]
     }

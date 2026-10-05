@@ -464,27 +464,27 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 2063 | supported by a committed primary source |
-| `[inference]` | 434 | drawn from verified facts, not witnessed |
-| `[open]` | 215 | a live question — unknown, contested, or being worked |
+| `[verified]` | 2087 | supported by a committed primary source |
+| `[inference]` | 437 | drawn from verified facts, not witnessed |
+| `[open]` | 219 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-215 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+219 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 98 | 0 |
+| `findings` | 99 | 0 |
 | `description` | 42 | 0 |
 | `revisions` | 11 | 0 |
 | `series` | 7 | 0 |
+| `mechanism_note` | 6 | 0 |
+| `amount` | 6 | 0 |
 | `unpriced` | 5 | 0 |
-| `mechanism_note` | 5 | 0 |
-| `amount` | 5 | 0 |
+| `eligibility` | 4 | 0 |
 | `vetoes` | 3 | 0 |
 | `statutory_basis` | 3 | 0 |
 | `roles` | 3 | 0 |
 | `restriction` | 3 | 0 |
-| `eligibility` | 3 | 0 |
 | `contested` | 3 | 0 |
 | `subject` | 2 | 0 |
 | `legal_basis` | 2 | 0 |
@@ -508,7 +508,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `appropriating_bill` | 1 | 0 |
 | `accountability_effect` | 1 | 0 |
 
-**134 recorded withdrawals across 56 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**136 recorded withdrawals across 57 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Relationship vocabulary
@@ -523,13 +523,13 @@ leave the corpus and are not counted.
 -->
 | Measure | Count |
 |---|--:|
-| edges between nodes | 593 |
-| distinct relationships in use | 171 |
+| edges between nodes | 599 |
+| distinct relationships in use | 172 |
 | relationships declared across every class | 70 |
-| edges whose relationship its class does not declare | 307 |
-| relationships used exactly once | 83 |
+| edges whose relationship its class does not declare | 313 |
+| relationships used exactly once | 84 |
 
-**51% of edges use a relationship the class does not declare**, and 83 of the 171 relationships in use are used a single time. That is the case for `edge_policy: characteristic`: closing the vocabulary would reject those edges or require 83 declarations that each describe one link.
+**52% of edges use a relationship the class does not declare**, and 84 of the 172 relationships in use are used a single time. That is the case for `edge_policy: characteristic`: closing the vocabulary would reject those edges or require 84 declarations that each describe one link.
 <!-- /REGEN -->
 
 This was a hand-written sentence in fifteen ontology files, in the paragraph above, and in
@@ -568,7 +568,7 @@ writes an absence it has looked for.
 | `litigation.procedural_history` | no | 3 | 6 |
 | `parameter.simulation_key` | no | 1 | 18 |
 | `parameter.written_as` | no | 5 | 18 |
-| `program.mechanism_note` | no | 3 | 8 |
+| `program.mechanism_note` | no | 3 | 9 |
 <!-- /REGEN -->
 
 ## Node index
@@ -696,20 +696,21 @@ Sorted by: kind, then alphabetically.
 | [`transportation-cost-rates`](parameter/transportation-cost-rates.yml) | parameter | Transportation Cost Rates | 6 | 2 |
 | [`twenty-mill-floor`](parameter/twenty-mill-floor.yml) | parameter | Twenty-Mill Floor | 6 | 9 |
 | [`autism-scholarship`](program/autism-scholarship.yml) | program | Autism Scholarship | 4 | 1 |
-| [`auxiliary-services`](program/auxiliary-services.yml) | program | Auxiliary Services | 2 | 1 |
+| [`auxiliary-services`](program/auxiliary-services.yml) | program | Auxiliary Services | 4 | 3 |
 | [`classroom-facilities-assistance`](program/classroom-facilities-assistance.yml) | program | Classroom Facilities Assistance Program | 3 | 2 |
 | [`cleveland-scholarship`](program/cleveland-scholarship.yml) | program | Cleveland Scholarship and Tutoring Program | 4 | 4 |
 | [`edchoice-expansion`](program/edchoice-expansion.yml) | program | EdChoice Expansion Scholarship | 8 | 10 |
 | [`edchoice-scholarship`](program/edchoice-scholarship.yml) | program | Traditional EdChoice Scholarship | 4 | 4 |
+| [`emergency-assistance-to-nonpublic-schools`](program/emergency-assistance-to-nonpublic-schools.yml) | program | Emergency Assistance to Non-Public Schools | 3 | 3 |
 | [`jon-peterson-special-needs`](program/jon-peterson-special-needs.yml) | program | Jon Peterson Special Needs Scholarship | 4 | 2 |
-| [`nonpublic-administrative-cost-reimbursement`](program/nonpublic-administrative-cost-reimbursement.yml) | program | Nonpublic Administrative Cost Reimbursement | 1 | 1 |
+| [`nonpublic-administrative-cost-reimbursement`](program/nonpublic-administrative-cost-reimbursement.yml) | program | Nonpublic Administrative Cost Reimbursement | 1 | 2 |
 | [`casino-tax-distribution`](revenue-stream/casino-tax-distribution.yml) | revenue-stream | Casino Tax — County Student Fund | 6 | 1 |
-| [`esser`](revenue-stream/esser.yml) | revenue-stream | ESSER — Elementary and Secondary School Emergency Relief | 4 | 3 |
-| [`idea-part-b`](revenue-stream/idea-part-b.yml) | revenue-stream | IDEA Part B | 5 | 3 |
+| [`esser`](revenue-stream/esser.yml) | revenue-stream | ESSER — Elementary and Secondary School Emergency Relief | 4 | 4 |
+| [`idea-part-b`](revenue-stream/idea-part-b.yml) | revenue-stream | IDEA Part B | 7 | 5 |
 | [`local-property-tax`](revenue-stream/local-property-tax.yml) | revenue-stream | Local Property Tax | 6 | 8 |
 | [`lottery-profits`](revenue-stream/lottery-profits.yml) | revenue-stream | Lottery Profits Education Fund | 4 | 1 |
 | [`state-foundation-aid`](revenue-stream/state-foundation-aid.yml) | revenue-stream | State Foundation Aid | 7 | 23 |
-| [`title-i`](revenue-stream/title-i.yml) | revenue-stream | Title I, Part A | 5 | 5 |
+| [`title-i`](revenue-stream/title-i.yml) | revenue-stream | Title I, Part A | 7 | 5 |
 | [`tpp-replacement-payments`](revenue-stream/tpp-replacement-payments.yml) | revenue-stream | Tangible Personal Property Tax Replacement Payments | 6 | 7 |
 | [`fsfp-input-year-refresh`](scenario/fsfp-input-year-refresh.yml) | scenario | FSFP Cost Input Refresh vs. Freeze | 10 | 10 |
 | [`guarantee-phase-out`](scenario/guarantee-phase-out.yml) | scenario | Phasing Out the Temporary Transitional Aid Guarantee | 12 | 6 |
@@ -717,7 +718,7 @@ Sorted by: kind, then alphabetically.
 | [`barrington-road-elementary`](school/barrington-road-elementary.yml) | school | Barrington Road Elementary School | 4 | 2 |
 | [`sheridan-high-school`](school/sheridan-high-school.yml) | school | Sheridan High School | 6 | 2 |
 
-135 nodes across 18 classes, and **1 with nothing pointing at them** — counting a citation in somebody's prose as pointing. Whether that is a gap depends on the class: `web/tests/unit/reachability.spec.ts` holds every node to having an inbound *edge* and exempts `draft-legislation`, where a node with nothing pointing at it is the design.
+136 nodes across 18 classes, and **1 with nothing pointing at them** — counting a citation in somebody's prose as pointing. Whether that is a gap depends on the class: `web/tests/unit/reachability.spec.ts` holds every node to having an inbound *edge* and exempts `draft-legislation`, where a node with nothing pointing at it is the design.
 <!-- /REGEN -->
 
 ## Semantic index status
@@ -727,5 +728,5 @@ Regenerated by: `edfund-connect index`
 Fields: total nodes indexed, embedding model, index freshness (last indexed commit vs HEAD),
         stale node count.
 -->
-No semantic index is built. The corpus is 135 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
+No semantic index is built. The corpus is 136 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
 <!-- /REGEN -->

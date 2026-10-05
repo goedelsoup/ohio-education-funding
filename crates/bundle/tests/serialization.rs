@@ -495,6 +495,18 @@ fn bundle(districts: Vec<District>, checkpoints: Vec<Checkpoint>) -> Bundle {
                     amount: 172_262_613.0,
                     node: "auxiliary-services".into(),
                 }],
+                federal: vec![NonpublicFederal {
+                    slug: "eans".into(),
+                    name: "Emergency Assistance to Non-Public Schools".into(),
+                    authority: "Pub. L. 117-2 §2002".into(),
+                    series: "funding_units.nonpublic_federal.eans".into(),
+                    fiscal_year: 2025,
+                    kind: "actual".into(),
+                    amount: 48_578_449.0,
+                    ended: true,
+                    class: "program".into(),
+                    node: "emergency-assistance-to-nonpublic-schools".into(),
+                }],
             },
         }),
         senate_districts: vec![HouseDistrict {

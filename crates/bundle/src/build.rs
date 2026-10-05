@@ -45,10 +45,11 @@ use crate::{
     Bundle, CareerTechnical, CasinoYear, Categoricals, Checkpoint, Deflator, District,
     DistrictOutcome, Dpia, Draft, DraftProvision, EnglishLearners, FinanceYear, ForecastCheckpoint,
     FundingUnit, FundingUnitProgramme, FundingUnits, Gifted, HistoryYear, HouseDistrictMember,
-    HouseDistrictShare, MealProgramYear, MillageAnalysis, National, NonpublicSupport,
-    NonpublicSupportLine, OutcomeStatewide, PolicyShape, Projection, ProjectionBias,
-    PropertyTaxYear, RegimeCounterfactual, SeriesYear, SpecialEducation, SpendingByFunction,
-    StateFinance, Statewide, TargetedAssistance, Typology, YearKind, CONTRACT_VERSION,
+    HouseDistrictShare, MealProgramYear, MillageAnalysis, National, NonpublicFederal,
+    NonpublicSupport, NonpublicSupportLine, OutcomeStatewide, PolicyShape, Projection,
+    ProjectionBias, PropertyTaxYear, RegimeCounterfactual, SeriesYear, SpecialEducation,
+    SpendingByFunction, StateFinance, Statewide, TargetedAssistance, Typology, YearKind,
+    CONTRACT_VERSION,
 };
 use dispersion::census_states::StateFinance as CensusState;
 use dispersion::mr81::poverty_share_by_year;
@@ -1191,6 +1192,18 @@ fn series_years(
         label: format!("FY{}", funding_units.nonpublic_support.fiscal_year),
         source: "Legislative Service Commission, Category 3 nonpublic school support".into(),
     });
+    for channel in &funding_units.nonpublic_support.federal {
+        out.push(SeriesYear {
+            series: channel.series.clone(),
+            kind: YearKind::Fiscal,
+            label: format!("FY{}", channel.fiscal_year),
+            source: match channel.slug.as_str() {
+                "eans" => "Legislative Service Commission, Catalog of Budget Line Items, fund 3HQ0",
+                _ => "DEW IDEA Part B final allocations",
+            }
+            .into(),
+        });
+    }
     out.push(SeriesYear {
         series: "designated".into(),
         kind: YearKind::School,
@@ -1410,7 +1423,48 @@ fn nonpublic_support() -> NonpublicSupport {
                 node: node.to_string(),
             })
             .collect(),
+        federal: nonpublic_federal(fiscal_year),
     }
+}
+
+/// The federal channels beside Category 3, each at the last year its source answers for.
+///
+/// Not summed into [`NonpublicSupport::total`] and not given Category 3's year: EANS closed in
+/// FY2025 and the allocation panel stops at FY2024, while Category 3 runs to the model year. A
+/// shared year would put a zero beside an appropriation, or an appropriation beside nothing.
+fn nonpublic_federal(category_three_year: u16) -> Vec<NonpublicFederal> {
+    use project::ledger::nonpublic_federal as source;
+
+    let mut out = Vec::new();
+    if let Some(year) = source::eans(MODEL_YEAR).last() {
+        out.push(NonpublicFederal {
+            slug: "eans".to_string(),
+            name: "Emergency Assistance to Non-Public Schools".to_string(),
+            authority: "Pub. L. 116-260 div. M §312(d); Pub. L. 117-2 §2002".to_string(),
+            series: "funding_units.nonpublic_federal.eans".to_string(),
+            fiscal_year: year.fiscal_year,
+            kind: year.kind.clone(),
+            amount: year.nominal,
+            ended: year.fiscal_year < category_three_year,
+            class: "program".to_string(),
+            node: "emergency-assistance-to-nonpublic-schools".to_string(),
+        });
+    }
+    if let Some(year) = source::idea_part_b().last() {
+        out.push(NonpublicFederal {
+            slug: "idea-proportionate-share".to_string(),
+            name: "IDEA Part B proportionate share".to_string(),
+            authority: "20 U.S.C. 1412(a)(10); 34 CFR 300.133".to_string(),
+            series: "funding_units.nonpublic_federal.idea".to_string(),
+            fiscal_year: year.fiscal_year,
+            kind: "allocation".to_string(),
+            amount: year.proportionate_share,
+            ended: false,
+            class: "revenue-stream".to_string(),
+            node: "idea-part-b".to_string(),
+        });
+    }
+    out
 }
 
 fn history() -> Vec<HistoryYear> {

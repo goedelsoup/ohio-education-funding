@@ -242,3 +242,49 @@ fn the_block_survives_into_the_document() {
         "a unit with nothing derived says so rather than omitting the key"
     );
 }
+
+#[test]
+fn the_federal_layer_is_beside_category_three_and_never_in_its_total() {
+    /*
+     * EANS at its last year, FY2025, and the IDEA proportionate share at the allocation panel's
+     * last, FY2024. Neither is Category 3's year, so each names its own series, and the total
+     * still sums the three state lines and nothing else.
+     */
+    let built = bundle::build::build();
+    let support = &built
+        .funding_units
+        .as_ref()
+        .expect("the real build sizes all six")
+        .nonpublic_support;
+    let federal: Vec<(&str, u16, &str, bool)> = support
+        .federal
+        .iter()
+        .map(|c| (c.slug.as_str(), c.fiscal_year, c.kind.as_str(), c.ended))
+        .collect();
+    assert_eq!(
+        federal,
+        [
+            ("eans", 2025, "actual", true),
+            ("idea-proportionate-share", 2024, "allocation", false),
+        ]
+    );
+    assert!((support.federal[0].amount - 48_578_449.0).abs() < CENT);
+    assert!((support.federal[1].amount - 16_433_446.71).abs() < CENT);
+
+    let lines: f64 = support.lines.iter().map(|l| l.amount).sum();
+    assert!(
+        (lines - support.total).abs() < CENT,
+        "the total is the three state lines; a federal channel has been added to it"
+    );
+
+    for channel in &support.federal {
+        assert_ne!(channel.series, support.series);
+        let year = built
+            .series_years
+            .iter()
+            .find(|y| y.series == channel.series)
+            .unwrap_or_else(|| panic!("`{}` has no year in the index", channel.slug));
+        assert_eq!(year.label, format!("FY{}", channel.fiscal_year));
+        assert!(!support.lines.iter().any(|l| l.node == channel.node));
+    }
+}

@@ -1,5 +1,5 @@
 {
-  "contract_version": "52.0.0",
+  "contract_version": "53.0.0",
   "provenance": "Ohio DEW TRAD State Foundation Funding Calculator (a projection, not an actual) joined with the District Profile Report, the Department of Taxation's Table SD-1, and the Ohio School Report Card on IRN. 606 of the 609 districts appear in all four; the rest are missing from at least one. Enrolled ADM spans three years, of which the last is partly departmental estimate. Each block states the year it is measured in beside its own figures; see .yidam/catalog/ for what each source can be trusted for.",
   "fiscal_year": 2027,
   "series_years": [
@@ -12,6 +12,8 @@
     {"series": "formula", "kind": "fiscal", "label": "FY2027", "source": "DEW FY27 TRAD State Foundation Funding Calculator"},
     {"series": "funding_units.community", "kind": "fiscal", "label": "FY2027", "source": "DEW FY27 community school funding calculator"},
     {"series": "funding_units.district", "kind": "fiscal", "label": "FY2027", "source": "DEW FY27 TRAD State Foundation Funding Calculator"},
+    {"series": "funding_units.nonpublic_federal.eans", "kind": "fiscal", "label": "FY2025", "source": "Legislative Service Commission, Catalog of Budget Line Items, fund 3HQ0"},
+    {"series": "funding_units.nonpublic_federal.idea", "kind": "fiscal", "label": "FY2024", "source": "DEW IDEA Part B final allocations"},
     {"series": "funding_units.nonpublic_support", "kind": "fiscal", "label": "FY2027", "source": "Legislative Service Commission, Category 3 nonpublic school support"},
     {"series": "funding_units.scholarship", "kind": "school", "label": "2024-25", "source": "DEW 2025 Scholarship Annual Report"},
     {"series": "history", "kind": "fiscal", "label": "FY2009-FY2024", "source": "Census Bureau, Annual Survey of School System Finances"},
@@ -73,7 +75,8 @@
       "fiscal_year": 2027,
       "kind": "appropriation",
       "total": 250737573,
-      "lines": [{"ali": "200511", "name": "Auxiliary Services", "authority": "R.C. 3317.024(E), 3317.06 and 3317.062", "amount": 172262613, "node": "auxiliary-services"}, {"ali": "200532", "name": "Nonpublic Administrative Cost Reimbursement", "authority": "R.C. 3317.063", "amount": 77824960, "node": "nonpublic-administrative-cost-reimbursement"}, {"ali": "200659", "name": "Auxiliary Services Reimbursement", "authority": "R.C. 3317.064", "amount": 650000, "node": "auxiliary-services"}]
+      "lines": [{"ali": "200511", "name": "Auxiliary Services", "authority": "R.C. 3317.024(E), 3317.06 and 3317.062", "amount": 172262613, "node": "auxiliary-services"}, {"ali": "200532", "name": "Nonpublic Administrative Cost Reimbursement", "authority": "R.C. 3317.063", "amount": 77824960, "node": "nonpublic-administrative-cost-reimbursement"}, {"ali": "200659", "name": "Auxiliary Services Reimbursement", "authority": "R.C. 3317.064", "amount": 650000, "node": "auxiliary-services"}],
+      "federal": [{"slug": "eans", "name": "Emergency Assistance to Non-Public Schools", "authority": "Pub. L. 116-260 div. M §312(d); Pub. L. 117-2 §2002", "series": "funding_units.nonpublic_federal.eans", "fiscal_year": 2025, "kind": "actual", "amount": 48578449, "ended": true, "class": "program", "node": "emergency-assistance-to-nonpublic-schools"}, {"slug": "idea-proportionate-share", "name": "IDEA Part B proportionate share", "authority": "20 U.S.C. 1412(a)(10); 34 CFR 300.133", "series": "funding_units.nonpublic_federal.idea", "fiscal_year": 2024, "kind": "allocation", "amount": 16433446.71, "ended": false, "class": "revenue-stream", "node": "idea-part-b"}]
     }
   },
   "checkpoints": [

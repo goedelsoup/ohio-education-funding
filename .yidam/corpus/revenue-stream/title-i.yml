@@ -86,6 +86,30 @@ findings: |
   What remains open is the effort factor. No fixture here carries state personal income, so it is
   not computed — though the statute bounds it to 0.95 and 1.05, which caps its whole range at a
   tenth of the rate against a ladder that at 0.20 doubles the top rung. [open]
+
+  ### The equitable-services share, and why it is not held
+
+  Title I has its own set-aside for private school pupils, and it is the third federal channel
+  that reaches chartered nonpublic schools, beside
+  [Emergency Assistance to Non-Public Schools](../program/emergency-assistance-to-nonpublic-schools.yml)
+  and the [IDEA proportionate share](idea-part-b.yml). A district must provide eligible private
+  school children "on an equitable basis" with services "after timely and meaningful consultation
+  with appropriate private school officials". The money for them "shall be equal to the
+  proportion of funds allocated to participating school attendance areas based on the number of
+  children from low-income families who attend private schools". That share is taken from the
+  district's whole allocation "prior to any allowable expenditures or transfers". [verified]
+  (20 U.S.C. 6320(a)(1), (a)(4)(A))
+
+  Like the IDEA share, it stays with a public agency: "the control of funds provided under this
+  part, and title to materials, equipment, and property purchased with such funds, shall be in a
+  public agency". [verified] (20 U.S.C. 6320(d)(1)) So it sits beside Category 3, and adding it
+  would describe a payment to private schools that the statute forbids. [inference]
+  Unlike the IDEA share, no amount is held. The statute requires the state to give private school
+  officials "notice in a timely manner" of each district's allocation for these services, so the
+  amounts exist. [verified] (20 U.S.C. 6320(a)(4)(C)) No source here retrieves them, and the
+  department's Title I files that are held, the formula counts behind the EdChoice designation,
+  carry counts and shares and no dollars. [verified]
+  ([`title1-formula-counts.csv`](../../../crates/dispersion/fixtures/title1-formula-counts.csv))
 revisions:
   - was: |
       "it weights allocations by a state's own equity and effort, so Ohio's local-reliance
@@ -184,6 +208,12 @@ properties:
 unfilled:
   - field: a Title I-specific series
     why: No connector retrieves the allocations, and the F-33 does not decompose the federal column.
+  - field: the equitable-services share for private school pupils
+    why: |
+      20 U.S.C. 6320(a)(4) sets each district's share and requires the state to notify private
+      school officials of it, so the amount exists for every district and year. No source this
+      project retrieves publishes it. Until one does, the third federal channel to nonpublic
+      pupils is named and not sized, and any total of federal money reaching them is a floor.
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of
@@ -197,3 +227,8 @@ links:
     relationship: measured-against
   - target: ../../catalog/census-f33-school-system-finances.md
     relationship: sourced-from
+  - target: ../program/emergency-assistance-to-nonpublic-schools.yml
+    relationship: parallels
+    note: >-
+      Another federal channel to chartered nonpublic pupils, delivered as services by public
+      agencies. EANS is sized; this one's equitable-services share is not.

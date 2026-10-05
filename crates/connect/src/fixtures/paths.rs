@@ -495,6 +495,13 @@ pub const EDCHOICE_DESIGNATED_2425_FIXTURE: &str =
 /// precision the ranking is actually decided on.
 pub const PI_RANKING_FIXTURE: &str = "crates/dispersion/fixtures/edchoice-pi-rankings.csv";
 
+/// The department's IDEA Part B final allocations, FY2021-FY2024, one row per agency per year.
+///
+/// The only held source that prices the federal special-education money reaching parentally
+/// placed nonpublic pupils: its `proportionate_share` is the part of each agency's allocation
+/// 34 CFR 300.133 requires it to spend on them.
+pub const IDEA_PART_B_FIXTURE: &str = "crates/project/fixtures/idea-part-b-allocations.csv";
+
 /// The three years of district Title I formula counts the designation's other criterion is cut
 /// from, decomposed into the five categories the formula adds.
 ///
@@ -568,6 +575,7 @@ pub const REBUILT: &[&str] = &[
     EDCHOICE_DESIGNATED_2425_FIXTURE,
     PI_RANKING_FIXTURE,
     TITLE1_FIXTURE,
+    IDEA_PART_B_FIXTURE,
     CROSSWALK_FIXTURE,
     STATUTE_FIXTURE,
     ENACTED_FIXTURE,

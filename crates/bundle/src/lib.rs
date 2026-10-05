@@ -41,6 +41,12 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `53.0.0` added a `federal` layer to `nonpublic_support`: Emergency Assistance to Non-Public
+/// Schools and the IDEA Part B proportionate share, each at its own year under its own series.
+/// Breaking because `total` still means the three Category 3 lines and nothing else, and a page
+/// that added the new array to it would publish a state appropriation the General Assembly never
+/// made.
+///
 /// `52.0.0` moved every `meal_program` year forward by one. MR-81 counts an October and the
 /// block carried the October's calendar year in a field named `fiscal_year`, so a page printing
 /// `FY` before it was a year early on every row: October 1998 is FY1999. The values did not change
@@ -278,7 +284,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "52.0.0";
+pub const CONTRACT_VERSION: &str = "53.0.0";
 
 mod model;
 mod serialize;

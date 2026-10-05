@@ -303,6 +303,7 @@ pub const CONNECTORS: &[Connector] = &[
     dew::CHILD_NUTRITION,
     dew::SCHOOL_IMPROVEMENT,
     dew::NONPUBLIC_ENROLLMENT,
+    dew::IDEA_PART_B,
     jhu::HOMESCHOOL_HUB,
 ];
 
