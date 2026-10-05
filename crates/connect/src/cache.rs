@@ -462,6 +462,57 @@ pub fn pdf_text(root: &Path, source: &Source) -> Result<String, FetchError> {
     Ok(String::from_utf8_lossy(&output.stdout).into_owned())
 }
 
+/// One page of a cached PDF, as its text layer and as its drawing.
+///
+/// For a chart whose values are drawn and never printed. The text layer carries the axis labels
+/// and the year row; the drawing carries the bars, lines and gridlines, which `pdftotext` cannot
+/// see at all. `pdftocairo -svg` writes the page's vector paths in page coordinates, and it is
+/// the same poppler install [`pdf_text`] already needs, so this adds no tool a refresh did not
+/// already require.
+///
+/// `page` is one-based, as poppler counts.
+///
+/// # Errors
+///
+/// As [`pdf_text`]: [`FetchError::NotCached`] if the file is absent, or an I/O error carrying the
+/// tool's own message.
+pub fn pdf_page(root: &Path, source: &Source, page: usize) -> Result<(String, String), FetchError> {
+    let path = cached_path(root, source);
+    if !path.exists() {
+        return Err(FetchError::NotCached {
+            key: source.key.to_string(),
+            path,
+        });
+    }
+    let page = page.to_string();
+    let run = |tool: &str, args: &[&str]| -> Result<String, FetchError> {
+        let output = Command::new(tool)
+            .args(args)
+            .args(["-f", &page, "-l", &page])
+            .arg(&path)
+            .arg("-")
+            .output()
+            .map_err(|cause| {
+                FetchError::Io(io::Error::new(
+                    cause.kind(),
+                    format!("{tool} is required to read {}: {cause}", source.key),
+                ))
+            })?;
+        if !output.status.success() {
+            return Err(FetchError::Io(io::Error::other(format!(
+                "{tool} failed on {} page {page}: {}",
+                source.key,
+                String::from_utf8_lossy(&output.stderr).trim()
+            ))));
+        }
+        Ok(String::from_utf8_lossy(&output.stdout).into_owned())
+    };
+    Ok((
+        run("pdftotext", &["-layout"])?,
+        run("pdftocairo", &["-svg"])?,
+    ))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

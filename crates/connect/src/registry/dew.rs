@@ -2223,6 +2223,7 @@ pub(super) const SCHOLARSHIP_REPORTS: Connector = Connector {
                 crate::fixtures::SCHOLARSHIP_FIXTURE,
                 crate::fixtures::SCHOLARSHIP_JPSN_FIXTURE,
                 crate::fixtures::SCHOLARSHIP_JPSN_CATEGORY_FIXTURE,
+                crate::fixtures::SCHOLARSHIP_CHARTS_FIXTURE,
             ],
             note: "Participation and award totals for all five scholarship programmes, \
                    2024-25. The only committed source here that sizes the channel from the \

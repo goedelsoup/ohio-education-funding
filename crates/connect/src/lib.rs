@@ -799,6 +799,30 @@ fn rebuild_budget_documents(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         }
     }
 
+    // The consolidated report's participation charts, which print no value: each is read off
+    // its page's drawing against the gridlines the page's text labels.
+    out.push(
+        match (|| -> Result<Vec<Vec<String>>, String> {
+            let report = registered("scholarship-annual-2025");
+            let text = cache::pdf_text(root, report).map_err(|cause| cause.to_string())?;
+            let mut rows = Vec::new();
+            for (chart, page) in fixtures::chart_pages(&text)? {
+                let (page_text, svg) =
+                    cache::pdf_page(root, report, page).map_err(|cause| cause.to_string())?;
+                rows.extend(fixtures::chart_rows(&chart, &page_text, &svg)?);
+            }
+            Ok(rows)
+        })() {
+            Ok(rows) => csv_fixture(
+                root,
+                fixtures::SCHOLARSHIP_CHARTS_FIXTURE,
+                fixtures::SCHOLARSHIP_CHART_HEADER,
+                &rows,
+            )?,
+            Err(cause) => Rebuilt::skipped(fixtures::SCHOLARSHIP_CHARTS_FIXTURE, cause),
+        },
+    );
+
     // The same channel before the Fair School Funding Plan, and the only source here that
     // counts applications and payments separately. An archival snapshot rather than a series:
     // the department wrote it once in October 2018 out of the system the Enterprise Application

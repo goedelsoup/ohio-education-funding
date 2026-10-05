@@ -120,6 +120,31 @@ findings: |
   line. [verified]
   ([`crates/project`](../../../crates/project/tests/the_rate_the_greenbooks_published.rs))
 
+  ### Most of the October the rate divides by now holds a scholarship
+
+  The scholarships and this line share a population. Traditional EdChoice, the expansion and
+  Cleveland pay tuition at a chartered nonpublic school, so their pupils are counted in the October
+  this rate divides by. The 2025 scholarship report draws each program's participation by year
+  and prints no value; read off the drawing to a tenth of a point, the charts reproduce all 42
+  values printed elsewhere. Over that October, the scholarships held between **21.9%** and
+  **26.9%** of the in-state count in FY2017, and between **84.5%** and **92.8%** in FY2025. The
+  floor counts only the three school-bound programs and the ceiling adds Autism and Jon Peterson,
+  whose providers need not be schools. The floor first passed three quarters in FY2024, the
+  universal expansion's first year, at **79.9%**. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_share_of_the_sector_the_scholarships_pay_for.rs))
+
+  Scholarship growth reached the rate's denominator hardly at all. From FY2017 to FY2025 the
+  school-bound programs grew by at least **114,422** pupils, while the in-state count grew by
+  **9,792**. So at least nine in ten of the new scholarships went to pupils inside a count that
+  barely moved, and the line was split over almost the same number of pupils as before. The
+  denominator's rise was under a tenth of the scholarships'. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_share_of_the_sector_the_scholarships_pay_for.rs))
+
+  The ratio overstates the October share by an amount no source publishes. A scholarship count
+  is everyone who took part in the year, and the October count is one day; a pupil who left
+  before October or arrived after it is in the first and not the second. Which schools the
+  scholarship pupils attend is not held either, so the share cannot be stated per school. [open]
+
   ### What the bound was, and why it missed
 
   Before this series the corpus divided by the department's landscape sheet — **173,156** pupils
@@ -347,6 +372,34 @@ figures:
     value: 179712.76
     field: findings
     as_written: "wants **179,713** pupils against the 179,693 counted"
+  - key: project/scholarship-share-of-the-sector-fy2017-floor
+    value: 0.2188
+    field: findings
+    as_written: "held between **21.9%** and"
+  - key: project/scholarship-share-of-the-sector-fy2017-ceiling
+    value: 0.26945
+    field: findings
+    as_written: "**26.9%** of the in-state count in FY2017"
+  - key: project/scholarship-share-of-the-sector-fy2025-floor
+    value: 0.8448
+    field: findings
+    as_written: "and between **84.5%** and"
+  - key: project/scholarship-share-of-the-sector-fy2025-ceiling
+    value: 0.9278
+    field: findings
+    as_written: "**92.8%** in FY2025"
+  - key: project/scholarship-share-of-the-sector-fy2024-floor
+    value: 0.7986
+    field: findings
+    as_written: "universal expansion's first year, at **79.9%**"
+  - key: project/school-bound-scholarship-least-growth-fy2017-fy2025
+    value: 114421.9
+    field: findings
+    as_written: "grew by at least **114,422** pupils"
+  - key: project/nonpublic-in-state-growth-fy2017-fy2025
+    value: 9792
+    field: findings
+    as_written: "the in-state count grew by\n  **9,792**"
   - key: project/auxiliary-services-reimbursement-fy2025
     value: 534753
     field: findings

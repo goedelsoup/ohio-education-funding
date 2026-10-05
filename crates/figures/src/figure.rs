@@ -13417,6 +13417,107 @@ pub static FIGURES: &[Figure] = &[
             .expect("a positive rate")
         },
     },
+    Figure {
+        key: "project/scholarship-share-of-the-sector-fy2017-floor",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The least share of the in-state chartered nonpublic October count the FY2017 \
+                scholarships could be, counting only the three programmes that pay a school",
+        pinned: 0.2188,
+        tolerance: 0.0005,
+        compute: |_| {
+            project::scholarship::participation::share(FiscalYear(2017))
+                .expect("every chart draws FY2017 and its October is published")
+                .share
+                .0
+        },
+    },
+    Figure {
+        key: "project/scholarship-share-of-the-sector-fy2017-ceiling",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The most it could be, counting all five programmes",
+        pinned: 0.2694,
+        tolerance: 0.0005,
+        compute: |_| {
+            project::scholarship::participation::share(FiscalYear(2017))
+                .expect("every chart draws FY2017 and its October is published")
+                .share
+                .1
+        },
+    },
+    Figure {
+        key: "project/scholarship-share-of-the-sector-fy2024-floor",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The least share in FY2024, the universal expansion\u{2019}s first year",
+        pinned: 0.7986,
+        tolerance: 0.0005,
+        compute: |_| {
+            project::scholarship::participation::share(FiscalYear(2024))
+                .expect("every chart draws FY2024 and its October is published")
+                .share
+                .0
+        },
+    },
+    Figure {
+        key: "project/scholarship-share-of-the-sector-fy2025-floor",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The least share in FY2025",
+        pinned: 0.8448,
+        tolerance: 0.0005,
+        compute: |_| {
+            project::scholarship::participation::share(FiscalYear(2025))
+                .expect("every chart draws FY2025 and its October is published")
+                .share
+                .0
+        },
+    },
+    Figure {
+        key: "project/scholarship-share-of-the-sector-fy2025-ceiling",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The most share in FY2025",
+        pinned: 0.9278,
+        tolerance: 0.0005,
+        compute: |_| {
+            project::scholarship::participation::share(FiscalYear(2025))
+                .expect("every chart draws FY2025 and its October is published")
+                .share
+                .1
+        },
+    },
+    Figure {
+        key: "project/school-bound-scholarship-least-growth-fy2017-fy2025",
+        owner: "crates/project",
+        unit: Unit::Pupils,
+        label: "The least the three school-bound scholarships grew from FY2017 to FY2025, read \
+                off the report\u{2019}s charts at a tenth of a point",
+        pinned: 114_421.9,
+        tolerance: 0.5,
+        compute: |_| {
+            project::scholarship::participation::least_school_bound_growth(
+                FiscalYear(2017),
+                FiscalYear(2025),
+            )
+            .expect("both years are drawn")
+        },
+    },
+    Figure {
+        key: "project/nonpublic-in-state-growth-fy2017-fy2025",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "What the in-state chartered nonpublic October count the auxiliary rate divides \
+                by grew by over the same years",
+        pinned: 9_792.0,
+        tolerance: 0.0,
+        compute: |_| {
+            project::ledger::nonpublic_enrolment::statutory_membership(2025).expect("counted")
+                - project::ledger::nonpublic_enrolment::statutory_membership(2017)
+                    .expect("restated")
+        },
+    },
 ];
 
 /// The same band on enrolled ADM, which is the statistic the unweighted one was read as.

@@ -15,7 +15,9 @@
 //! label in the text layer — only the axis gridlines do — so `pdftotext` reaches the axis and not
 //! the bars. Those two series are the ones that would fill the FY2014-FY2023 participation hole
 //! rather than bound it, and recovering them means reading the chart's geometry, which is a
-//! different instrument from this one.
+//! different instrument from this one. [`super::scholarship_charts`] is that instrument, and reads
+//! the consolidated edition's applications chart along with the other four programmes'. The grade
+//! chart is still not read.
 
 use super::text::{count_before, flatten};
 
