@@ -57,13 +57,14 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | `dew-five-year-forecast` | **wired** | 2 | education-agency, revenue-stream, metric, fiscal-period |
 | [`tax-abstract`](sources/tax-abstract.md) | **wired** | 4 | revenue-stream, parameter, metric |
 | [`tax-casino`](sources/tax-casino.md) | **wired**, in part | 16 | revenue-stream, education-agency, metric |
+| `tax-income-credits` | **wired**, in part | 6 | program, metric |
 | [`dew-payment-reports`](sources/dew-payment-reports.md) | declared | 0 | program, education-agency, revenue-stream |
 | `dew-scholarship-reports` | **wired**, in part | 7 | program, education-agency, school |
 | `dew-facts-and-figures` | **wired**, in part | 1 | metric, program |
 | `dew-typology` | **wired** | 1 | education-agency |
 | `lsc-catalog` | **wired**, in part | 18 | fiscal-period, program, legislation, parameter |
 | [`lsc-budget`](sources/lsc-budget.md) | **wired**, in part | 31 | legislation, fiscal-period, program, parameter |
-| [`ohio-laws`](sources/ohio-laws.md) | **wired** | 43 | legislation, parameter, formula-component |
+| [`ohio-laws`](sources/ohio-laws.md) | **wired** | 44 | legislation, parameter, formula-component |
 | `ohio-session-laws` | **wired**, in part | 5 | legislation, fiscal-period |
 | `ohio-bill-versions` | **wired** | 1 | formula-component, legislation |
 | `ohio-bills` | retrievable | 3 | draft-legislation |
@@ -80,11 +81,12 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | `dew-idea-part-b` | **wired**, in part | 4 | revenue-stream, program, education-agency |
 | `jhu-homeschool-hub` | **wired**, in part | 1 | metric, education-agency |
 
-29 connectors, 431 sources between them. 26 are wired and 3 are not; 15 of the wired ones reach only part of what they feed, and say so below.
+30 connectors, 438 sources between them. 27 are wired and 3 are not; 16 of the wired ones reach only part of what they feed, and say so below.
 
 **What is blocked, in the registry's own words.**
 
 - `tax-casino` — still blocked on: wired for every per-district distribution the department publishes as a workbook — eighteen of them, the August 2015 distribution through the January 2024 one. It stops there because the department's own casino page stops there, and the distributions before it have no machine-readable twin: January 2015 and earlier are `Final SD Distribution` PDFs
+- `tax-income-credits` — still blocked on: wired for the scholarship donation credit of R.C. 5747.73 alone — its column of Table Y-1 and its entry in two editions of the Tax Expenditure Report. Neither document says which organizations received the donations or what scholarships they paid, and the statute requires no organization to report either
 - `dew-payment-reports` — blocked on: the deduct-era reports (1999-2021) are behind OH|ID authentication on the department's reports portal; the current-era ones are open and indexed but post-date the deduction entirely. The portal is an obstacle to an unattended agent and not to a person who holds an OH|ID account, so wiring this means a human fetching the files into the cache and a refresh path that says so — `edfund-connect fetch` will not re-run it
 - `dew-scholarship-reports` — still blocked on: wired for everything the department publishes openly about this channel: the current statewide aggregates, the archived participation series FY1997-FY2013, and per-building eligibility for three editions of the designated list. Two holes are left, and they are different in kind. Per-district *participation* is still a file nobody has fetched — the annual report cites two routes for it on the department's reports portal, which answers every path with the same application shell and serves its reports as Power BI embeds behind an entitlement its anonymous token does not carry, so the breakdown is referenced by a current departmental document, has not been found, and was never shown to be taken down; see `dew-payment-reports` for the deduct-era half of that gap. And the archived series stops at FY2013 while the consolidated annual report starts at 2024-25, so FY2014 through FY2022 has no participation series for the channel as a whole — LSC's greenbooks quote rounded counts inside it, which bounds that hole rather than filling it. The hole is one year shorter than it was and only for one programme: what precedes 2024-25 is a per-programme lineage, and Jon Peterson's FY2023 and FY2024 editions are now held, which gives that programme FY2023 through FY2025 unbroken and no other programme anything. Three earlier JPSN editions — FY2016, FY2017 and FY2020 — and an Ohio ACE report are named on archived captures of the Annual Reports page and not held; the department serves neither, so they are an archive fetch rather than a live one. The designated list is current-edition-only at the department: the EdChoice Resources page carries one edition at a time and deletes the last, so 2023-2024, 2024-2025 and 2025-2026 all return this host's genuine 404. Two of those three are held from the Internet Archive; 2023-2024 is linked from captures of the page and was never itself crawled, so a fourth edition is named and not retrievable
 - `dew-facts-and-figures` — still blocked on: Only the current edition. The department replaces the sheet in place and the prior-year URLs return an identical 1,245-byte 404, so this is a series with one retrievable member.
@@ -102,7 +104,7 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 - `dew-idea-part-b` — still blocked on: wired for the four final editions FY2021-FY2024, which share one column layout. FY2011-FY2020 are served from the same folder as `_Adjusted` editions in a different layout and are not read; the FY2022 American Rescue Plan supplement carries its own proportionate share and is not read; FY2025 and later have no final edition on the page, only an estimate
 - `jhu-homeschool-hub` — still blocked on: One school year per district, and the workbook labels it wrongly. The department holds the R.C. 3321.042 notice counts per district for every year and releases them on request; nothing below the state total is published, so the other years need a records request rather than a connector. What the count measures — notices received or children named on them — is undocumented and the two differ by household size.
 
-18 of them have no long form in [`sources/`](sources/): `dew-report-card`, `eia-diesel`, `dew-five-year-forecast`, `dew-scholarship-reports`, `dew-facts-and-figures`, `dew-typology`, `lsc-catalog`, `ohio-session-laws`, `ohio-bill-versions`, `ohio-bills`, `ohio-auditor`, `dew-directory`, `census-geography`, `dew-child-nutrition`, `dew-school-improvement`, `dew-nonpublic-enrollment`, `dew-idea-part-b`, `jhu-homeschool-hub`. Those are the connectors added after the original nine stubs, whose prose was never written — the decision record is the only account of why each exists.
+19 of them have no long form in [`sources/`](sources/): `dew-report-card`, `eia-diesel`, `dew-five-year-forecast`, `tax-income-credits`, `dew-scholarship-reports`, `dew-facts-and-figures`, `dew-typology`, `lsc-catalog`, `ohio-session-laws`, `ohio-bill-versions`, `ohio-bills`, `ohio-auditor`, `dew-directory`, `census-geography`, `dew-child-nutrition`, `dew-school-improvement`, `dew-nonpublic-enrollment`, `dew-idea-part-b`, `jhu-homeschool-hub`. Those are the connectors added after the original nine stubs, whose prose was never written — the decision record is the only account of why each exists.
 <!-- /REGEN -->
 
 A `declared` connector says **what blocks it** — that string is a field on the record, and a
