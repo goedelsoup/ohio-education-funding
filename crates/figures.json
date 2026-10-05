@@ -1054,6 +1054,14 @@
     {"key": "project/donation-credit-estimate-2026-27-fy2024", "owner": "crates/project", "unit": "dollars", "value": 21000000.0, "label": "The Tax Expenditure Report's 2026-27 edition estimate of the R.C. 5747.73 credit for FY2024 — an estimate, never a cost"},
     {"key": "project/donation-credit-estimate-2026-27-fy2027", "owner": "crates/project", "unit": "dollars", "value": 25500000.0, "label": "The Tax Expenditure Report's 2026-27 edition estimate of the R.C. 5747.73 credit for FY2027 — an estimate, never a cost"},
     {"key": "project/sgo-certified-2026-10-05", "owner": "crates/project", "unit": "count", "value": 81, "label": "Scholarship granting organizations whose Attorney General certification held on 2026-10-05, distinct by EIN"},
-    {"key": "project/sgo-ever-certified", "owner": "crates/project", "unit": "count", "value": 89, "label": "Scholarship granting organizations ever on the Attorney General's list, distinct by EIN, as read on 2026-10-05"}
+    {"key": "project/sgo-ever-certified", "owner": "crates/project", "unit": "count", "value": 89, "label": "Scholarship granting organizations ever on the Attorney General's list, distinct by EIN, as read on 2026-10-05"},
+    {"key": "project/autism-ceiling-fy2025", "owner": "crates/project", "unit": "dollars", "value": 32445.0, "label": "The Autism Scholarship ceiling in force in FY2025, the year the annual report measures — not the $34,000 the vendored statute carries, which is H.B. 96’s"},
+    {"key": "project/autism-average-share-of-fy2025-ceiling", "owner": "crates/project", "unit": "share", "value": 0.819814455231931, "label": "The FY2025 average Autism award as a share of the FY2025 ceiling"},
+    {"key": "project/autism-ceiling-hb96-rise", "owner": "crates/project", "unit": "dollars", "value": 1555.0, "label": "What H.B. 96 added to the Autism ceiling, by amendment, for FY2026 and FY2027"},
+    {"key": "project/jpsn-ceiling-fy2025", "owner": "crates/project", "unit": "dollars", "value": 32445.0, "label": "The Jon Peterson ceiling in force in FY2025, set by H.B. 33 and level with the Autism ceiling that year"},
+    {"key": "project/jpsn-hb96-maximum-rise", "owner": "crates/project", "unit": "share", "value": 0.04799165362545654, "label": "How much H.B. 96 raised every Jon Peterson effective maximum, FY2025 to FY2026 — the same at all six categories"},
+    {"key": "project/jpsn-hb96-category-one-amount-rise", "owner": "crates/project", "unit": "share", "value": 0.1920668058455115, "label": "How much the category one amount rose under H.B. 96 — the base held flat, so the amount carried the whole of a uniform rise in the maximum"},
+    {"key": "project/jpsn-hb96-category-five-amount-rise", "owner": "crates/project", "unit": "share", "value": 0.06430155210643007, "label": "How much the category five amount rose under H.B. 96, the least of the five uncapped categories"},
+    {"key": "project/jpsn-hb33-fy2024-maximum-rise", "owner": "crates/project", "unit": "share", "value": 0.1209879638916751, "label": "How much H.B. 33 raised the Jon Peterson maxima from FY2023 to FY2024 — the year the department’s FY2023 edition makes look flat"}
   ]
 }

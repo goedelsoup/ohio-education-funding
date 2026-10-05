@@ -33,6 +33,23 @@ description: |
   carries it. [verified] [open]
 revisions:
   - was: |
+      `amount` gave the six supplements and a $34,000 ceiling with no year, and inferred that an
+      unindexed cap over indexed terms would bind progressively. `findings` read the department's
+      award tables as a uniform fraction of the statute, recomputed by index, and the FY23 and FY24
+      editions' shared table as an index that stood still.
+    now: |
+      The supplements and the $34,000 are H.B. 96's, for FY2026 and FY2027; FY2025's ceiling was
+      $32,445. Every schedule since FY2016 was enacted outright, and the cap has moved with it each
+      time. The FY23 edition's table is H.B. 33's FY2024 schedule, and the fractions are ratios of
+      enacted schedules.
+    found_by: |
+      [#779](https://github.com/goedelsoup/ohio-education-funding/issues/779), checking the
+      vendored R.C. 3317.022 against LSC's schedules in the H.B. 110, H.B. 33 and H.B. 96 analyses.
+    reach: |
+      The open question on the FY2023 edition narrows from two columns to one sentence. The
+      $39,122 and $5,122 stand: they are H.B. 96's arithmetic and are now labeled as such.
+      `dew-jpsn-annual-report` carried the same reading and is corrected alongside.
+  - was: |
       The description said the per-district breakdown "has been withdrawn": the annual report
       links a route that returns 404, so the file was published and then taken down.
     now: |
@@ -97,9 +114,7 @@ findings: |
   [verified] ([`dew-jpsn-annual-report`](../../catalog/dew-jpsn-annual-report.md)) The three older
   editions — FY2016, FY2017 and FY2020 — exist only in the archive and are not extracted. [open]
 
-  ### Which of the FY2023 edition's figures are FY2023's is open
-
-  Two things in that edition do not sit with the rest of it, and they point at different columns.
+  ### The FY2023 edition's award table is FY2024's, and one sentence in it stays open
 
   **The one expenditure total stated in words is dated to another year.** It says "Total
   expenditures for the JPSN program during the 2021-2022 school year sum to $81,773,133.70" in a
@@ -108,20 +123,25 @@ findings: |
   edition deletes the sentence and keeps the paragraph and the chart, a deletion rather than a
   correction. [verified] [open]
 
-  **The FY23 and FY24 editions print the same award table**, all six maxima to the dollar. What each
-  edition prints is a uniform fraction of the statutory vector R.C. 3317.022(A)(13) fixes — 0.8901
-  in those two editions and 0.9542 in FY2025, holding at every position to within a ten-thousandth —
-  so the table is recomputed annually, and printing one table twice means an index that stood still.
-  [verified]
+  **The award table the FY23 edition prints is H.B. 33's FY2024 schedule.** The FY23 and FY24
+  editions print the same six maxima to the dollar, $8,941 to $30,000. Two LSC analyses, H.B.
+  110's and H.B. 33's, state the FY2023 schedule, and it runs $7,976 to $27,000. The FY24 edition
+  and the consolidated report print their own years' enacted schedules exactly. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_ceilings_the_budget_acts_wrote.rs))
 
-  Set those beside the arithmetic: between FY2023 and FY2024 the award table did not move and
-  spending per student rose 11.6%; between FY2024 and FY2025 the table rose 7.2% and spending per
-  student 7.4%. Two readings survive. Either the FY2023 edition's spending chart lags its heading,
-  or its award table was copied forward from FY24 when the two files were produced together — and
-  under the second the spending chart is FY2023's after all and the 11.6% is real. Against the
-  first: the FY2024 chart is corroborated by a second publisher, the FY2025 chart is labeled with
-  its year, and a lagged FY2023 chart would leave FY2023 with no spending figure anywhere. **This
-  corpus commits to neither and carries every column as published.** [open]
+  This node used to read each table as a uniform fraction of the statutory vector, recomputed by
+  index each year, so that two editions printing one table meant an index that stood still. The
+  fractions are real, but they are ratios of enacted schedules. FY2025's 0.9542 is $32,445 over
+  $34,000, because H.B. 96 raised every position alike. Nothing stood still: H.B. 33 raised
+  categories one to five 12.1% between FY2023 and FY2024. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_ceilings_the_budget_acts_wrote.rs))
+
+  That removes the tension the two readings turned on. Between the editions, spending per student
+  rose 11.6% and the schedule 12.1%; between FY2024 and FY2025, 7.4% and 7.2%. The spend tracks the
+  schedule in both years, which is what a FY2023 chart under a FY2023 heading would show.
+  [inference] Only the expenditure sentence's "2021-2022" still dates the chart to another year,
+  and nothing in the documents settles it. **This corpus carries every column as published.**
+  [open]
 
   ### The two publishers agree on this program's money and not on its counts
 
@@ -194,45 +214,80 @@ properties:
     What is still open is the per-district arithmetic the deduction produced, not the rule that
     produced it. `dew-payment-reports` is the source for that. [open]
   eligibility: |
-    A child in kindergarten through grade 12 identified as having a specific disability, with an
-    Evaluation Team Report and an individualized education program specifying the services
-    required. [verified] (2025 Scholarship Annual Report) The provider must be an alternative
+    A child identified as having a specific disability, with an Evaluation Team Report and an
+    individualized education program specifying the services required. [verified] (2025
+    Scholarship Annual Report) The provider must be an alternative
     public provider or a registered private provider as R.C. 3310.51 defines those terms.
     [verified]
 
     Subject to the five per cent statewide cap in R.C. 3310.52(B). Whether the cap has ever bound
     — whether applications have been refused for reaching it — is not established. [open]
+
+    **H.B. 96 widened the doors from FY2026.** The 2025 report describes kindergarten through
+    grade 12. Under prior law three- and four-year-olds and nineteen- to twenty-one-year-olds were
+    ineligible, and the act aligned both special-needs scholarships at ages three through
+    twenty-one, ending at twenty-two. It admitted a child enrolled in a chartered or nonchartered
+    nonpublic school, or home educated. It let a child contract with several providers at once,
+    and it let services be delivered virtually. [verified] (R.C. 3310.51 and 3310.52 as held; the
+    H.B. 96 greenbook)
+
+    It also requires the department to keep a public list of registered private providers and
+    their locations. [verified] (the H.B. 96 greenbook; of the sections vendored, only the Autism
+    section, R.C. 3310.41(O), writes the duty out) The directory both
+    editions of this program's report link is recorded at
+    [`dew-scholarship-provider-directory`](../../catalog/dew-scholarship-provider-directory.md):
+    a Power BI report this project cannot read anonymously. Whether it is keyed on IRN is not
+    established. [open]
   amount: |
     **FY2025: 8,680 students, $103,944,388.15, across 530 approved providers.** [verified] (2025
     Scholarship Annual Report; the dollar figure is the sum of the report's six disability-category
     totals, which the report displays without totaling)
 
+    LSC's H.B. 96 analysis estimated FY2025 at 8,311 students and $101.1 million, and projects
+    8,727 and $112.4 million for FY2026 and 9,163 and $119.2 million for FY2027. [verified] (the
+    H.B. 96 greenbook, Table 3)
+
     The statutory bound is the **least of three** things: the fees charged by the student's
-    provider; $7,190 plus a supplement determined by disability category; and **$34,000**.
-    [verified] (R.C. 3317.022(A)(13), read by
+    provider; $7,190 plus a supplement determined by disability category; and a ceiling. The
+    section as held is the text H.B. 96 left, effective 30 September 2025, so its figures are
+    FY2026's and FY2027's. [verified] (R.C. 3317.022(A)(13), read by
     [`crates/project`](../../../crates/project/tests/the_award_the_statute_computes.rs)) The six
-    supplements, which this node held only the first of —
+    supplements, beside the effective maxima LSC gives for that biennium and the year before —
 
-        category   supplement   base + supplement
-        one          $2,855        $10,045
-        two          $5,879        $13,069
-        three       $12,879        $20,069
-        four        $16,890        $24,080
-        five        $22,560        $29,750
-        six         $31,932        $39,122   capped at $34,000
+        category   supplement   base + supplement   FY2026-27 maximum   FY2025 maximum
+        one          $2,855        $10,045             $10,045              $9,585
+        two          $5,879        $13,069             $13,069             $12,470
+        three       $12,879        $20,069             $20,069             $19,150
+        four        $16,890        $24,080             $24,080             $22,977
+        five        $22,560        $29,750             $29,750             $28,387
+        six         $31,932        $39,122             $34,000             $32,445
 
-    **The formula already exceeds its own ceiling.** A category six student computes to $39,122
-    and is paid at most $34,000 — a $5,122 haircut on the most severely disabled category in the
-    program, before any year of indexing. [verified] Category five is $4,250 below the ceiling
-    and rising.
+    **The formula exceeds its own ceiling.** A category six student computes to $39,122 and is
+    paid at most $34,000 — a $5,122 haircut on the most severely disabled category in the
+    program. [verified] Category five sits $4,250 below the ceiling.
 
-    That matters because the three terms are indexed differently. The $7,190 base rises with the
-    statewide average base cost per pupil; the six supplements rise with the special education
-    category amounts under R.C. 3317.022(A)(3); **the $34,000 ceiling carries no indexing clause
-    at all** — the same silence `program/autism-scholarship` records for its own $34,000, which is
-    the same figure in the adjacent division. [verified] Two indexed terms under an unindexed cap
-    means the cap binds progressively: it reaches category five next, and then each category in
-    turn. [inference]
+    The three terms are written to move differently. The base carries a clause indexing it to the
+    statewide average base cost per pupil; the supplements carry one indexing them to the special
+    education category amounts under R.C. 3317.022(A)(3); the ceiling carries none, the same
+    silence `program/autism-scholarship` records for its own. [verified] This node once drew from
+    that an inference that the cap would bind progressively, reaching category five next. **The
+    budget acts have not let it.** Each has rewritten the schedule outright. [verified]
+    ([`crates/project`](../../../crates/project/tests/the_ceilings_the_budget_acts_wrote.rs))
+
+        fiscal years       ceiling   set by
+        FY2016-FY2023      $27,000   H.B. 64, from $20,000
+        FY2024             $30,000   H.B. 33
+        FY2025             $32,445   H.B. 33
+        FY2026-FY2027      $34,000   H.B. 96
+
+    In FY2025 the ceiling was $32,445, level with Autism's, and H.B. 96 moved both to $34,000.
+    [verified] ([`crates/project`](../../../crates/project/tests/the_ceilings_the_budget_acts_wrote.rs))
+    Its schedule raised every effective maximum by the same 4.80%, the ceiling included. The base
+    did not move: LSC says the act "keeps the base per-pupil award amount flat at $7,190", and it
+    held the statewide average base cost per pupil at its FY2024 value. So the whole rise fell on
+    the supplements, and unevenly — category one's amount rose 19.2% and category five's 6.4%.
+    [verified] ([`crates/project`](../../../crates/project/tests/the_ceilings_the_budget_acts_wrote.rs))
+    A uniform rise in the maximum is steepest in the smallest supplement. [inference]
 
     The award is therefore category-scaled in the same way the special education weights are, and
     the six category totals in the annual report are the only published decomposition of this
@@ -299,6 +354,26 @@ figures:
     value: 46.0
     field: findings
     as_written: "46 more"
+  - key: project/jpsn-hb33-fy2024-maximum-rise
+    value: 0.1209879638916751
+    field: findings
+    as_written: "one to five 12.1%"
+  - key: project/jpsn-ceiling-fy2025
+    value: 32445.0
+    field: amount
+    as_written: "In FY2025 the ceiling was $32,445"
+  - key: project/jpsn-hb96-maximum-rise
+    value: 0.04799165362545654
+    field: amount
+    as_written: "the same 4.80%"
+  - key: project/jpsn-hb96-category-one-amount-rise
+    value: 0.1920668058455115
+    field: amount
+    as_written: "rose 19.2%"
+  - key: project/jpsn-hb96-category-five-amount-rise
+    value: 0.06430155210643007
+    field: amount
+    as_written: "five's 6.4%"
 links:
   - target: ../program.ont.yml
     relationship: instance-of
@@ -329,6 +404,28 @@ links:
     note: >-
       The program's own annual report, FY23 and FY24 editions, and the only source that gives
       this channel more than one year of participation for any program.
+  - target: ../legislation/hb-110-2021.yml
+    relationship: revised-by
+    note: >-
+      Ended the deduction, paying the scholarship to its own funding unit, and set the FY2022 and
+      FY2023 schedules under a $27,000 ceiling it left alone.
+  - target: ../legislation/hb-33-2023.yml
+    relationship: revised-by
+    note: >-
+      Raised the base from $6,414 to $7,190 and the ceiling to $30,000 for FY2024 and $32,445 for
+      FY2025, level with Autism's. The FY23 edition of this program's report prints its FY2024
+      schedule.
+  - target: ../legislation/hb-96-2025.yml
+    relationship: revised-by
+    note: >-
+      Raised every effective maximum 4.8% and the ceiling to $34,000, with the base held at $7,190.
+      Aligned eligibility at ages three through twenty-one, admitted nonchartered and home-educated
+      children, and required a public list of registered private providers.
+  - target: ../../catalog/lsc-hb96-analysis.md
+    relationship: sourced-from
+    note: >-
+      Where each schedule and ceiling in the amount field is stated, in the analysis of the act
+      that set it.
   - target: ../../catalog/dew-scholarship-historical-data.md
     relationship: sourced-from
     note: >-

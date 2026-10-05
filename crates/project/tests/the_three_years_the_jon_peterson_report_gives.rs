@@ -27,17 +27,17 @@
 //!
 //! # What they do not settle
 //!
-//! Which of the FY2023 edition's figures are FY2023's. Its award table is identical to FY2024's,
-//! its per-student spend is 11.6% lower, and the one total it states in words it attributes to the
-//! 2021-2022 school year — while the award table it shares with FY2024 is a uniform fraction of a
-//! statutory vector whose fraction moves between the other editions, so printing one table twice
-//! means an index that stood still. Two readings survive all of that. Either the spending chart
-//! lags its edition, or the award table was copied forward from FY24 when the two documents were
-//! produced in one sitting — and under the second the spending chart is FY2023's after all. Against
-//! the first: the FY2024 chart is corroborated by a second publisher, the FY2025 chart is labelled
-//! with its year, and a lagged FY2023 chart would leave FY2023 with no spending figure anywhere.
-//! The arithmetic both readings have to explain is pinned here; the reading is left open in
-//! `program/jon-peterson-special-needs`.
+//! Which of the FY2023 edition's spending figures are FY2023's. The one total it states in words
+//! it attributes to the 2021-2022 school year, in a report headed FY 2023 throughout. Its award
+//! table is no longer part of the question: it is H.B. 33's FY2024 schedule, which two LSC analyses
+//! date and the FY2023 schedule they also print is not — see
+//! [`the_ceilings_the_budget_acts_wrote`](the_ceilings_the_budget_acts_wrote.rs). This file read
+//! that table as a uniform fraction of the statutory vector recomputed by index, and so read two
+//! editions printing one table as an index that stood still; the tables are enacted schedules and
+//! the fraction is a ratio of two of them. With the table dated, the FY2023 spending chart sits
+//! beside a schedule that rose 12.1% against a per-student spend that rose 11.6%, and the reading
+//! that the chart lags its edition has lost the evidence that favoured it. It is still not refuted,
+//! and `program/jon-peterson-special-needs` holds the sentence's year open.
 
 use project::scholarship::bounds::{self, Measure};
 use project::scholarship::jpsn::Series;
@@ -284,19 +284,15 @@ fn a_chart_position_is_not_a_category_and_the_award_table_is() {
 #[test]
 fn two_editions_share_an_award_table_and_do_not_share_a_per_student_spend() {
     /*
-     * The open question, as arithmetic. FY2023 and FY2024 print identical award maxima — the same
-     * six figures to the dollar — so the ceiling on what a student could be paid did not move
-     * between them. The spend per student rose 11.6% anyway. FY2024 to FY2025 behaves the other
-     * way: the ceiling rises 7.2% and the spend 7.4%, which is what a year of the same programme
-     * under a raised ceiling looks like.
+     * FY2023 and FY2024 print identical award maxima — the same six figures to the dollar — and the
+     * spend per student rose 11.6% between them. FY2024 to FY2025 the printed table rises 7.2% and
+     * the spend 7.4%.
      *
-     * Either the FY2023 chart is not FY2023's — which would fit its own expenditure sentence naming
-     * the 2021-2022 school year, and would leave FY2023 with no spending figure anywhere — or the
-     * programme's category mix shifted sharply in a single year. The disability shares did move
-     * between those two editions, and they are only published to one decimal place in the first, so
-     * the mix explanation is not refuted either.
-     *
-     * Nothing here chooses. Both readings have to explain these four numbers.
+     * The first pair is not a ceiling standing still. The FY2023 edition prints H.B. 33's FY2024
+     * schedule; the FY2023 schedule was $7,976 to $27,000, and from it the maxima rose 12.1%
+     * (`the_ceilings_the_budget_acts_wrote`). So the four numbers below are pinned as the editions
+     * print them, and the tension the last assertion names is a property of the printed tables,
+     * not of the programme.
      */
     let editions = jpsn::editions();
     let per_student: Vec<f64> = editions
@@ -343,8 +339,8 @@ fn two_editions_share_an_award_table_and_do_not_share_a_per_student_spend() {
         (spend_second - ceiling_second).abs() < 0.002,
         "{spend_second:.4} against {ceiling_second:.4}"
     );
-    // And the size of the thing left open: a year in which the ceiling did not move and the spend
-    // per student rose by more than a tenth.
+    // And the size of what the copied table made look anomalous: a printed ceiling that did not
+    // move against a spend per student that rose by more than a tenth.
     assert!(
         spend_first > 0.10,
         "the first year's spend growth fell below a tenth against a ceiling that did not move; the \
@@ -353,29 +349,19 @@ fn two_editions_share_an_award_table_and_do_not_share_a_per_student_spend() {
 }
 
 #[test]
-fn the_award_table_is_recomputed_each_year_and_two_editions_print_the_same_one() {
+fn each_award_table_is_a_fixed_fraction_of_hb96s_and_two_editions_print_the_same_one() {
     /*
-     * The other half of the dating question, and the half that is checkable against the statute.
+     * Each edition's table is a uniform fraction of the six amounts R.C. 3317.022(A)(13) computes
+     * as held — 0.8901 in FY2023 and FY2024, 0.9542 in FY2025 — and that is arithmetic, pinned
+     * below. What it was read as was wrong. This test once took the fraction for an index applied
+     * to one statutory vector each year, and so took two editions printing one table for an index
+     * that did not move.
      *
-     * R.C. 3317.022(A)(13) does not fix the six award amounts. It fixes a base indexed to the
-     * statewide average base cost per pupil, six supplements indexed to the special education
-     * category amounts, and a ceiling — so `scholarship::jon_peterson_award` is one vintage of a
-     * vector that moves. What each edition prints turns out to be a **uniform fraction** of that
-     * vector, the same fraction at every position, which is how a prorated statutory amount
-     * behaves and not how an independently chosen table does.
-     *
-     * The fraction is 0.8901 in FY2023 and FY2024 and 0.9542 in FY2025. Two different fractions
-     * across three editions is the evidence that the table is recomputed annually. And FY2023 and
-     * FY2024 print it to the dollar identically, which under an annual recomputation means the
-     * index did not move between them at all.
-     *
-     * That is the second reason the FY2023 edition's figures are held open, and it points somewhere
-     * the per-student arithmetic alone does not: at the award table rather than at the spending
-     * chart. If the FY2023 table were copied forward from FY2024 when the two documents were
-     * produced — and the catalog record has them exported from Word twenty minutes apart on one
-     * afternoon in March 2025, nine months after FY2024 closed — then the spending chart is FY2023's
-     * after all and the 11.6% per-student rise is real. Nothing here chooses between that reading
-     * and a genuinely flat index. Both are recorded in `program/jon-peterson-special-needs`.
+     * The vector is H.B. 96's FY2026 schedule, and each printed table is an earlier enacted
+     * schedule. 0.9542 is $32,445 over $34,000, because H.B. 96 raised every position alike by
+     * 4.80%; 0.8901 is H.B. 33's FY2024 schedule against it. And the FY2023 edition's table is the
+     * FY2024 schedule, which is why it matches FY2024's: two LSC analyses give FY2023 as $7,976 to
+     * $27,000. `the_ceilings_the_budget_acts_wrote` dates all three tables.
      */
     let statutory: Vec<f64> = (1..=jpsn::CATEGORIES)
         .map(project::scholarship::jon_peterson_award)
@@ -397,10 +383,10 @@ fn the_award_table_is_recomputed_each_year_and_two_editions_print_the_same_one()
     assert!((0.9542..0.9543).contains(&fy2025[0]), "{:.4}", fy2025[0]);
 
     /*
-     * FY2023 and FY2024 prorate the first five alike and pin the sixth at a round $30,000, which is
-     * $262.94 below what the same fraction would give against a $34,000 ceiling. That is why the
-     * fixture's sixth position is the wrong column to measure the table's movement on, and why this
-     * test measures the fraction on the five that are not rounded.
+     * The FY2024 schedule holds the first five in one ratio to H.B. 96's and sets the sixth at
+     * H.B. 33's FY2024 ceiling, $30,000 — $262.94 below what the same fraction would give against
+     * $34,000. A ceiling, not a rounding. That is why the sixth position is the wrong column to
+     * measure the table's movement on, and why this test measures the fraction on the other five.
      */
     for fiscal_year in [2023u16, 2024] {
         let f = factor(fiscal_year);
@@ -417,10 +403,13 @@ fn the_award_table_is_recomputed_each_year_and_two_editions_print_the_same_one()
             jpsn::series(year(fiscal_year), Series::Maximum)[5],
             30_000.0
         );
-        assert!(f[5] < f[0], "the round cap stopped being a rounding down");
+        assert!(
+            f[5] < f[0],
+            "the FY2024 ceiling stopped sitting below the uniform fraction"
+        );
     }
 
-    // The fraction moves, so the table is not a constant the department reprints.
+    // The fraction moves because the schedule was re-enacted, not because an index ran.
     assert!(factor(2025)[0] > factor(2024)[0] + 0.06);
 
     // And these two editions print one table anyway.

@@ -13958,6 +13958,118 @@ pub static FIGURES: &[Figure] = &[
         tolerance: 0.0,
         compute: |_| project::donation_credit::ever_certified() as f64,
     },
+    Figure {
+        key: "project/autism-ceiling-fy2025",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The Autism Scholarship ceiling in force in FY2025, the year the annual report \
+                measures \u{2014} not the $34,000 the vendored statute carries, which is H.B. 96\u{2019}s",
+        pinned: 32_445.0,
+        tolerance: 0.005,
+        compute: |_| {
+            use project::scholarship::ceilings::{ceiling, Programme};
+            ceiling(Programme::Autism, FiscalYear(2025)).expect("H.B. 110 set FY2025's")
+        },
+    },
+    Figure {
+        key: "project/autism-average-share-of-fy2025-ceiling",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The FY2025 average Autism award as a share of the FY2025 ceiling",
+        pinned: 0.819_814_455_231_931,
+        tolerance: 0.000_1,
+        compute: |_| {
+            use project::scholarship::ceilings::{ceiling, Programme};
+            let average = project::scholarship::report::programmes()["autism"]
+                .published_average
+                .expect("the report prints autism\u{2019}s average");
+            average / ceiling(Programme::Autism, FiscalYear(2025)).expect("H.B. 110 set FY2025's")
+        },
+    },
+    Figure {
+        key: "project/autism-ceiling-hb96-rise",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "What H.B. 96 added to the Autism ceiling, by amendment, for FY2026 and FY2027",
+        pinned: 1_555.0,
+        tolerance: 0.005,
+        compute: |_| {
+            use project::scholarship::ceilings::{ceiling, Programme};
+            ceiling(Programme::Autism, FiscalYear(2026)).expect("H.B. 96 set FY2026's")
+                - ceiling(Programme::Autism, FiscalYear(2025)).expect("H.B. 110 set FY2025's")
+        },
+    },
+    Figure {
+        key: "project/jpsn-ceiling-fy2025",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The Jon Peterson ceiling in force in FY2025, set by H.B. 33 and level with the \
+                Autism ceiling that year",
+        pinned: 32_445.0,
+        tolerance: 0.005,
+        compute: |_| {
+            use project::scholarship::ceilings::{ceiling, Programme};
+            ceiling(Programme::JonPeterson, FiscalYear(2025)).expect("H.B. 33 set FY2025's")
+        },
+    },
+    Figure {
+        key: "project/jpsn-hb96-maximum-rise",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "How much H.B. 96 raised every Jon Peterson effective maximum, FY2025 to FY2026 \
+                \u{2014} the same at all six categories",
+        pinned: 0.047_991_653_625_456_54,
+        tolerance: 0.000_01,
+        compute: |_| {
+            project::scholarship::ceilings::jpsn_rise(FiscalYear(2025), FiscalYear(2026))
+                .expect("LSC prints both years")[0]
+        },
+    },
+    Figure {
+        key: "project/jpsn-hb96-category-one-amount-rise",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "How much the category one amount rose under H.B. 96 \u{2014} the base held flat, \
+                so the amount carried the whole of a uniform rise in the maximum",
+        pinned: 0.192_066_805_845_511_5,
+        tolerance: 0.000_1,
+        compute: |_| {
+            let before = project::scholarship::ceilings::jpsn_supplements(FiscalYear(2025))
+                .expect("LSC prints FY2025");
+            let after = project::scholarship::ceilings::jpsn_supplements(FiscalYear(2026))
+                .expect("LSC prints FY2026");
+            after[0].expect("uncapped") / before[0].expect("uncapped") - 1.0
+        },
+    },
+    Figure {
+        key: "project/jpsn-hb96-category-five-amount-rise",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "How much the category five amount rose under H.B. 96, the least of the five \
+                uncapped categories",
+        pinned: 0.064_301_552_106_430_07,
+        tolerance: 0.000_1,
+        compute: |_| {
+            let before = project::scholarship::ceilings::jpsn_supplements(FiscalYear(2025))
+                .expect("LSC prints FY2025");
+            let after = project::scholarship::ceilings::jpsn_supplements(FiscalYear(2026))
+                .expect("LSC prints FY2026");
+            after[4].expect("uncapped") / before[4].expect("uncapped") - 1.0
+        },
+    },
+    Figure {
+        key: "project/jpsn-hb33-fy2024-maximum-rise",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "How much H.B. 33 raised the Jon Peterson maxima from FY2023 to FY2024 \
+                \u{2014} the year the department\u{2019}s FY2023 edition makes look flat",
+        pinned: 0.120_987_963_891_675_1,
+        tolerance: 0.000_1,
+        compute: |_| {
+            project::scholarship::ceilings::jpsn_rise(FiscalYear(2023), FiscalYear(2024))
+                .expect("LSC prints both years")[0]
+        },
+    },
 ];
 
 /// The same band on enrolled ADM, which is the statistic the unweighted one was read as.
