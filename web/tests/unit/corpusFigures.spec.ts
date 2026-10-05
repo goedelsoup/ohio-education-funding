@@ -402,15 +402,20 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * four actuals, its total, its two adjusted appropriations and its size against Category 3, and
  * `revenue-stream/idea-part-b`, which had bound nothing before and now binds the proportionate
  * share's four years, its FY2024 rate, and the agencies and pupils it was owed for.
+ *
+ * Recomputed at **1222/85** when the scholarship donation credit got a node (#763).
+ * `program/scholarship-donation-credit` is the eighty-fifth carrier, binding eleven figures: four
+ * years of claims and one year's returns, the tax year 2022 average over the single cap, three
+ * estimates from two Tax Expenditure Report editions, and two counts of certified organizations.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1211 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1211,
+  expect(bindings.length, "1222 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1222,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "84 nodes carry bindings; raise this when an eighty-fifth does",
-  ).toBeGreaterThanOrEqual(84);
+    "85 nodes carry bindings; raise this when an eighty-sixth does",
+  ).toBeGreaterThanOrEqual(85);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

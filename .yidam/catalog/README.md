@@ -26,6 +26,7 @@ Sorted by: type, then slug.
 -->
 | Entry | Title | Cited by |
 |---|---|--:|
+| [`ago-sgo-certifications`](ago-sgo-certifications.md) | Scholarship granting organization certifications — Ohio Attorney General | 1 |
 | [`alec-education-savings-account-act`](alec-education-savings-account-act.md) | ALEC — Education Savings Account Act | 1 |
 | [`alec-parental-choice-scholarship-act`](alec-parental-choice-scholarship-act.md) | ALEC — Parental Choice Scholarship Program Act (Universal Eligibility) | 1 |
 | [`alec-state-education-freedom-index`](alec-state-education-freedom-index.md) | ALEC — Index of State Education Freedom (2025, 2nd edition) | 3 |
@@ -67,6 +68,8 @@ Sorted by: type, then slug.
 | [`dot-casino-student-distribution`](dot-casino-student-distribution.md) | County Student Distribution — gross casino revenue county student fund | 1 |
 | [`dot-reappraisal-calendar`](dot-reappraisal-calendar.md) | Ohio's sexennial reappraisal and triennial update calendar | 1 |
 | [`dot-sd1-school-district-taxes`](dot-sd1-school-district-taxes.md) | Table SD-1 — School district taxable value and taxes charged | 5 |
+| [`dot-tax-expenditure-report`](dot-tax-expenditure-report.md) | Tax Expenditure Report | 1 |
+| [`dot-y1-individual-income-returns`](dot-y1-individual-income-returns.md) | Table Y-1 — Ohio individual income tax credits by income class | 1 |
 | [`eia-diesel-prices`](eia-diesel-prices.md) | Midwest No. 2 diesel retail prices — the EIA monthly series | 1 |
 | [`fordham-base-cost-critique`](fordham-base-cost-critique.md) | Fordham Institute — Ohio Base Cost Model Commentary | 2 |
 | [`fordham-house-bridge-commentary`](fordham-house-bridge-commentary.md) | Fordham Institute — "Ohio House puts the brakes on Cupp-Patterson" | 4 |
@@ -77,6 +80,7 @@ Sorted by: type, then slug.
 | [`lsc-dew-redbook`](lsc-dew-redbook.md) | LSC Redbook — Ohio Department of Education and Workforce | 11 |
 | [`lsc-hb96-analysis`](lsc-hb96-analysis.md) | LSC Budget Analysis — H.B. 96 (FY2026-27) | 17 |
 | [`lsc-school-funding-complete-resource`](lsc-school-funding-complete-resource.md) | LSC School Funding Complete Resource | 2 |
+| [`lsc-tax-credit-analyses`](lsc-tax-credit-analyses.md) | LSC analyses of the scholarship donation credit | 1 |
 | [`nces-ccd-lea-directory`](nces-ccd-lea-directory.md) | Common Core of Data: local education agency directory | 1 |
 | [`ocg-fact-check-021`](ocg-fact-check-021.md) | OCG Ground Truth Fact-Check RL-2026-021 — Toledo–Perrysburg Special-Needs Spending | 3 |
 | [`ocg-white-paper-013`](ocg-white-paper-013.md) | OCG White Paper No. 013 — Does Per-Pupil Spending Track Academic Performance? | 4 |
@@ -85,11 +89,11 @@ Sorted by: type, then slug.
 | [`ohio-bill-versions`](ohio-bill-versions.md) | Ohio bill versions — what was proposed, not what was enacted | 1 |
 | [`ohio-bills`](ohio-bills.md) | Ohio bills before enactment — the text as introduced | 13 |
 | [`ohio-essa-state-plan`](ohio-essa-state-plan.md) | Ohio's Consolidated State Plan under ESSA, and the April 2026 School Improvement amendment | 5 |
-| [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 21 |
+| [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 22 |
 | [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 4 |
 | [`us-public-laws`](us-public-laws.md) | United States public laws — the enrolled federal acts | 1 |
 
-62 entries, 0 not yet cited by any corpus node. 431 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+66 entries, 0 not yet cited by any corpus node. 438 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

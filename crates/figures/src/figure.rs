@@ -13737,6 +13737,129 @@ pub static FIGURES: &[Figure] = &[
             )
         },
     },
+    Figure {
+        key: "project/donation-credit-claimed-ty2021",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "R.C. 5747.73 scholarship donation credit claimed on tax year 2021 returns, Y-1 Total row — as claimed, before application to liability",
+        pinned: 268_616.0,
+        tolerance: 0.5,
+        compute: |_| {
+            project::donation_credit::total(2021)
+                .and_then(|total| total.claimed)
+                .expect("a TY2021 total")
+        },
+    },
+    Figure {
+        key: "project/donation-credit-claimed-ty2022",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "R.C. 5747.73 scholarship donation credit claimed on tax year 2022 returns, Y-1 Total row — as claimed, before application to liability",
+        pinned: 11_924_685.0,
+        tolerance: 0.5,
+        compute: |_| {
+            project::donation_credit::total(2022)
+                .and_then(|total| total.claimed)
+                .expect("a TY2022 total")
+        },
+    },
+    Figure {
+        key: "project/donation-credit-claimed-ty2023",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "R.C. 5747.73 scholarship donation credit claimed on tax year 2023 returns, Y-1 Total row — as claimed, before application to liability",
+        pinned: 26_808_131.10,
+        tolerance: 0.5,
+        compute: |_| {
+            project::donation_credit::total(2023)
+                .and_then(|total| total.claimed)
+                .expect("a TY2023 total")
+        },
+    },
+    Figure {
+        key: "project/donation-credit-claimed-ty2024",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "R.C. 5747.73 scholarship donation credit claimed on tax year 2024 returns, Y-1 Total row — as claimed, before application to liability",
+        pinned: 35_509_908.41,
+        tolerance: 0.5,
+        compute: |_| {
+            project::donation_credit::total(2024)
+                .and_then(|total| total.claimed)
+                .expect("a TY2024 total")
+        },
+    },
+    Figure {
+        key: "project/donation-credit-returns-ty2024",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Tax year 2024 returns claiming the R.C. 5747.73 credit, Y-1 Total row",
+        pinned: 30_584.0,
+        tolerance: 0.0,
+        compute: |_| {
+            f64::from(
+                project::donation_credit::total(2024)
+                    .and_then(|total| total.returns)
+                    .expect("a TY2024 total"),
+            )
+        },
+    },
+    Figure {
+        key: "project/donation-credit-average-ty2022",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Average R.C. 5747.73 claim per return in tax year 2022, over the $750 single cap then in the statute",
+        pinned: 1_091.30,
+        tolerance: 0.5,
+        compute: |_| project::donation_credit::average_claim(2022).expect("TY2022"),
+    },
+    Figure {
+        key: "project/donation-credit-estimate-2024-25-fy2025",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The Tax Expenditure Report's 2024-25 edition estimate of the R.C. 5747.73 credit for FY2025 — an estimate, never a cost",
+        pinned: 50_500_000.0,
+        tolerance: 0.5,
+        compute: |_| project::donation_credit::estimate("2024-25", 2025).expect("an estimate") * 1e6,
+    },
+    Figure {
+        key: "project/donation-credit-estimate-2026-27-fy2024",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The Tax Expenditure Report's 2026-27 edition estimate of the R.C. 5747.73 credit for FY2024 — an estimate, never a cost",
+        pinned: 21_000_000.0,
+        tolerance: 0.5,
+        compute: |_| project::donation_credit::estimate("2026-27", 2024).expect("an estimate") * 1e6,
+    },
+    Figure {
+        key: "project/donation-credit-estimate-2026-27-fy2027",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The Tax Expenditure Report's 2026-27 edition estimate of the R.C. 5747.73 credit for FY2027 — an estimate, never a cost",
+        pinned: 25_500_000.0,
+        tolerance: 0.5,
+        compute: |_| project::donation_credit::estimate("2026-27", 2027).expect("an estimate") * 1e6,
+    },
+    Figure {
+        key: "project/sgo-certified-2026-10-05",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Scholarship granting organizations whose Attorney General certification held on 2026-10-05, distinct by EIN",
+        pinned: 81.0,
+        tolerance: 0.0,
+        compute: |_| {
+            project::donation_credit::certified_on(project::donation_credit::RETRIEVED) as f64
+        },
+    },
+    Figure {
+        key: "project/sgo-ever-certified",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Scholarship granting organizations ever on the Attorney General's list, distinct by EIN, as read on 2026-10-05",
+        pinned: 89.0,
+        tolerance: 0.0,
+        compute: |_| project::donation_credit::ever_certified() as f64,
+    },
 ];
 
 /// The same band on enrolled ADM, which is the statistic the unweighted one was read as.

@@ -1,0 +1,224 @@
+class: program
+label: Scholarship Donation Credit
+summary: >-
+  A nonrefundable income tax credit, R.C. 5747.73, for gifts to scholarship organizations the
+  Attorney General certifies: up to $750 a taxpayer, $1,500 on a joint return. Returns claimed
+  $35.5 million for tax year 2024. No appropriation carries it, and nothing reports a scholarship
+  it paid for.
+description: |
+  R.C. 5747.73(B) allows "a nonrefundable credit against a taxpayer's aggregate tax liability"
+  equal to cash donated to scholarship granting organizations. It cannot exceed $1,500 on a joint
+  return or $750 otherwise, and on a joint return each spouse's gifts count for at most $750. The
+  taxpayer must send the Tax Commissioner the organization's receipt. [verified]
+  ([`revised-code.txt`](../../../crates/project/fixtures/revised-code.txt))
+
+  **The section is 5747.73, not 5747.75.** Issue #763 cited R.C. 5747.75. That section is the
+  credit for tuition paid to a nonchartered nonpublic school, a different credit that the Tax
+  Expenditure Report lists as its own entry. [verified]
+  ([`dot-tax-expenditure-report`](../../catalog/dot-tax-expenditure-report.md))
+
+  **The Attorney General certifies; nobody reports.** Under division (C) the Attorney General must
+  certify an applicant that is a 501(c)(3) organization, "primarily awards academic scholarships
+  for primary and secondary school students", and "prioritizes" low-income students, and must
+  decide within 30 days. The statute defines neither "low-income" nor "prioritizes", sets no term
+  for a certification, and requires no organization to report a scholarship. It also does not
+  require the organization or the school to be in Ohio, or the school to be chartered. [verified]
+  ([`revised-code.txt`](../../../crates/project/fixtures/revised-code.txt))
+
+  **The state pays nothing out.** The credit reduces what a taxpayer owes, so its cost is revenue
+  the General Revenue Fund never collects. LSC noted that the Local Government Fund and the Public
+  Library Fund, which "each receive 1.66% of GRF tax revenues", bear part of that loss. [verified]
+  ([`lsc-tax-credit-analyses`](../../catalog/lsc-tax-credit-analyses.md))
+findings: |
+  ### What returns claimed
+
+  Taxation's Table Y-1 reports **$268,616** claimed on 523 returns for tax year 2021,
+  **$11,924,685** for tax year 2022, **$26,808,131.10** for tax year 2023, and
+  **$35,509,908.41** on **30,584** returns for tax year 2024. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_credit_beside_the_scholarships.rs))
+
+  These are upper bounds, not costs. Y-1 reports each credit "as claimed on each individual return
+  before application to income or tax liability", and a nonrefundable credit cannot exceed what
+  the taxpayer owes. [verified]
+  ([`dot-y1-individual-income-returns`](../../catalog/dot-y1-individual-income-returns.md))
+
+  Tax year 2021 is small because the window was short. The credit applied to taxable years
+  beginning in 2021, and the first organizations were certified in November 2021. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_credit_beside_the_scholarships.rs))
+
+  ### The tax year 2022 average is over the cap then written
+
+  Tax year 2022's claims average **$1,091** a return. As enacted, the statute capped the credit at
+  $750 "per taxpayer" and said nothing about joint returns. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_credit_beside_the_scholarships.rs))
+  H.B. 66 of the 134th General Assembly set the $1,500 joint cap, effective April 3, 2023, with no
+  applicability section for R.C. 5747.73, and LSC called the change "clarifying that both filers
+  on a joint return are entitled to a $750 credit". [verified]
+  ([`lsc-tax-credit-analyses`](../../catalog/lsc-tax-credit-analyses.md)) Tax year 2022 returns
+  were filed in that season, so the average is most likely joint returns claiming two spouses'
+  gifts. [inference] How much of it Taxation allowed is not reported. [open]
+
+  ### What Taxation estimated
+
+  Every figure here is an estimate of revenue forgone, and the two editions disagree. The FY2024-25
+  Tax Expenditure Report put the credit at **$50.5 million** a year for FY2022 through FY2025. The
+  FY2026-27 edition put FY2024 at **$21.0 million**, rising to **$25.5 million** in FY2027. Both
+  editions cite data codes B and C, from other governments and other sources. Neither cites code
+  A, the department's own returns. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_credit_beside_the_scholarships.rs))
+
+  The returns ran ahead of the later edition. Tax year 2024's claims are more than the
+  FY2026-27 edition's estimate for any year it covers. Because claims are an upper bound and the
+  estimate is not built from them, the two measure different things, and neither is the cost.
+  [inference]
+
+  ### How many organizations could receive a gift
+
+  On 2026-10-05, **81** organizations held a valid certification, counted once each by EIN.
+  **89** have been certified since 2021. Seven held a valid certification on January 1, 2022, and
+  72 on January 1, 2026. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_credit_beside_the_scholarships.rs))
+  The list is a hand extract from the Attorney General's page, because the page cannot be pinned
+  by digest. [verified]
+  ([`ago-sgo-certifications`](../../catalog/ago-sgo-certifications.md))
+
+  ### Two instruments for the same tuition
+
+  EdChoice pays tuition from state funds appropriated to a scholarship funding unit, and the
+  department records each award. The credit pays tuition from an organization's gifts, and the
+  state's part is the tax it forgoes on them. A family can hold both: nothing in R.C. 5747.73 bars
+  an organization from awarding a scholarship to an EdChoice student, so a single year's tuition
+  can be paid by two state subsidies, one appropriated and one forgone. [inference] Whether that
+  happens, and how often, is not reported by anyone. [open]
+
+  ### The federal credit
+
+  Federal law enacted in July 2025 creates a federal credit for gifts to scholarship granting
+  organizations from 2027, in states that elect into it. No source held here records it, whether
+  Ohio has elected, or whether its certified organizations would qualify. [open]
+properties:
+  name: Credit for donations to scholarship granting organizations
+  mechanism: tax-credit
+  mechanism_note: |
+    A nonrefundable credit against personal income tax liability, paid in revenue forgone rather
+    than by appropriation. The state pays nothing to the organization or the family. The program
+    has been a credit since it was enacted. [verified] None of the class's other six mechanisms
+    fits, so `tax-credit` was added for it; the
+    [decision record](../../decisions/tax-income-credits-connector.yml) gives the reasons.
+  eligibility: |
+    A taxpayer who gives cash to a certified scholarship granting organization and sends the Tax
+    Commissioner its receipt. An investor in a pass-through entity that gives may claim a share,
+    but all investors together may claim no more than $750. Since H.B. 33 of the 135th General
+    Assembly a gift made by the return's unextended due date counts, and one contribution cannot
+    be claimed in two years. [verified] Who receives the scholarships is set by each organization,
+    under a statutory priority for low-income students that no term defines. [verified]
+  amount: |
+    The cash donated, up to $750 a taxpayer; since H.B. 66 of the 134th General Assembly, up to
+    $1,500 on a joint return with each spouse's share capped at $750. [verified] The credit is
+    nonrefundable, so a taxpayer with less liability than the gift receives less than the cap.
+    [verified]
+  appropriation_line: |
+    None. The credit has no fund or ALI; its cost is General Revenue Fund tax revenue forgone, part
+    of which the Local Government Fund and the Public Library Fund bear. [verified]
+unfilled:
+  - field: scholarships awarded and their recipients
+    why: |
+      R.C. 5747.73 requires no organization to report what it awarded, to whom, or for which
+      school, and the Attorney General's list carries none of it. Without that, the credit's reach
+      to families, its overlap with EdChoice, and the share that reaches low-income students
+      cannot be measured.
+  - field: revenue forgone
+    why: |
+      Taxation publishes claims before application to liability and estimates built without
+      return data. The amount the credit actually reduced liability by is in the returns and is
+      not published.
+figures:
+  - key: project/donation-credit-claimed-ty2021
+    value: 268616
+    field: findings
+    as_written: "**$268,616** claimed"
+  - key: project/donation-credit-claimed-ty2022
+    value: 11924685
+    field: findings
+    as_written: "**$11,924,685** for"
+  - key: project/donation-credit-claimed-ty2023
+    value: 26808131.1
+    field: findings
+    as_written: "**$26,808,131.10** for"
+  - key: project/donation-credit-claimed-ty2024
+    value: 35509908.41
+    field: findings
+    as_written: "**$35,509,908.41** on"
+  - key: project/donation-credit-returns-ty2024
+    value: 30584
+    field: findings
+    as_written: "**30,584** returns"
+  - key: project/donation-credit-average-ty2022
+    value: 1091.3045666697171
+    field: findings
+    as_written: "**$1,091** a return"
+  - key: project/donation-credit-estimate-2024-25-fy2025
+    value: 50500000
+    field: findings
+    as_written: "**$50.5 million** a year"
+  - key: project/donation-credit-estimate-2026-27-fy2024
+    value: 21000000
+    field: findings
+    as_written: "**$21.0 million**, rising"
+  - key: project/donation-credit-estimate-2026-27-fy2027
+    value: 25500000
+    field: findings
+    as_written: "**$25.5 million** in"
+  - key: project/sgo-certified-2026-10-05
+    value: 81
+    field: findings
+    as_written: "**81** organizations"
+  - key: project/sgo-ever-certified
+    value: 89
+    field: findings
+    as_written: "**89** have been certified"
+links:
+  - target: ../program.ont.yml
+    relationship: instance-of
+  - target: edchoice-scholarship.yml
+    relationship: parallels
+    note: >-
+      The same tuition, subsidized by a different instrument. EdChoice is appropriated and paid
+      through a funding unit with every award recorded; the credit is revenue forgone on gifts to
+      an organization that reports no award. Nothing bars one student from both.
+  - target: edchoice-expansion.yml
+    relationship: parallels
+    note: >-
+      The income-based scholarship whose universal eligibility arrived in the same act, H.B. 33,
+      that last amended the credit. The two reach the same families by appropriation and by
+      forgone tax.
+  - target: ../legislation/hb-110-2021.yml
+    relationship: created-by
+    note: >-
+      Enacted R.C. 5747.73 at $750 a taxpayer for taxable years beginning in 2021.
+  - target: ../legislation/hb-33-2023.yml
+    relationship: revised-by
+    note: >-
+      Counted gifts made by the return's unextended due date and barred claiming one contribution
+      twice.
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+    note: >-
+      R.C. 5747.73 as in force, with its effective date and the act that last amended it.
+  - target: ../../catalog/dot-y1-individual-income-returns.md
+    relationship: sourced-from
+    note: >-
+      Claims and returns by income class, tax years 2021-2024.
+  - target: ../../catalog/dot-tax-expenditure-report.md
+    relationship: sourced-from
+    note: >-
+      The FY2024-25 and FY2026-27 estimates, each labeled as an estimate.
+  - target: ../../catalog/ago-sgo-certifications.md
+    relationship: sourced-from
+    note: >-
+      The certification list, extracted on 2026-10-05.
+  - target: ../../catalog/lsc-tax-credit-analyses.md
+    relationship: sourced-from
+    note: >-
+      The Senate's $1,000 proposal, Taxation's $70 million upper bound, the LGF and PLF shares,
+      and the H.B. 66 joint-return clarification.

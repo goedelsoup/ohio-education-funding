@@ -27,6 +27,13 @@ the federal money beside that pair: a pandemic grant that bought services for th
 through public agencies from FY2022 to FY2025. It is the only program here paid from a federal
 fund, and it is measured against the state lines and never added to them.
 
+The [scholarship donation credit](scholarship-donation-credit.yml) is the one program here the
+state pays nothing into. R.C. 5747.73 credits a taxpayer's gift to a certified scholarship
+granting organization against income tax, so the subsidy is revenue never collected, on no
+appropriation line, and its cost is held only as claims that overstate it and estimates that are
+not built from returns. It subsidizes the same tuition EdChoice does, by a different instrument,
+and no source reports a scholarship it paid for.
+
 See the class definition: [program.ont.yml](../program.ont.yml).
 
 ## Instances
@@ -42,6 +49,7 @@ See the class definition: [program.ont.yml](../program.ont.yml).
 | [edchoice-scholarship](edchoice-scholarship.yml) | scholarship | Away from resident district |
 | [autism-scholarship](autism-scholarship.yml) | scholarship | Away from resident district |
 | [jon-peterson-special-needs](jon-peterson-special-needs.yml) | scholarship | Away from resident district |
+| [scholarship-donation-credit](scholarship-donation-credit.yml) | tax credit | Toward scholarship granting organization, as revenue forgone |
 
 ## Known gaps
 

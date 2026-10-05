@@ -281,6 +281,7 @@ pub const CONNECTORS: &[Connector] = &[
     dew::FIVE_YEAR_FORECAST,
     tax::ABSTRACT,
     tax::CASINO,
+    tax::INCOME_CREDITS,
     dew::PAYMENT_REPORTS,
     dew::SCHOLARSHIP_REPORTS,
     dew::FACTS_AND_FIGURES,

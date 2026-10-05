@@ -21,11 +21,13 @@ properties:
     label: Mechanism
     type: string
     required: true
-    values: [deduction, direct-appropriation, funding-unit, reimbursement, competitive-grant, capital-assistance]
+    values: [deduction, direct-appropriation, funding-unit, reimbursement, competitive-grant, capital-assistance, tax-credit]
     description: >-
       How the program's money reaches its recipient now. `funding-unit` is payment to one of the
       funding units R.C. 3317.022 names beside the districts; `deduction` is a transfer out of the
-      resident district's aid, which is how the scholarships ran before FY2022
+      resident district's aid, which is how the scholarships ran before FY2022; `tax-credit` is
+      revenue the state forgoes against a taxpayer's liability, on no appropriation line, so its
+      cost is an estimate or a claims total and never an expenditure
   - name: mechanism_note
     label: Why this mechanism
     type: text
