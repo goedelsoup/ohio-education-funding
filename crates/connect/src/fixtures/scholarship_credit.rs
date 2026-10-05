@@ -167,7 +167,7 @@ fn millions(token: &str) -> Option<String> {
 
 /// The credit's entry in one edition of the Tax Expenditure Report, read from its text.
 ///
-/// The entry opens with [`CITATION`] and is followed by an `Estimate:` line naming four fiscal
+/// The entry opens with `R.C. 5747.73;` and is followed by an `Estimate:` line naming four fiscal
 /// years, a line of four figures in millions, and a `Data Source Code:` line. All three are read
 /// from the first of each after the citation; anything else in between is description.
 ///
