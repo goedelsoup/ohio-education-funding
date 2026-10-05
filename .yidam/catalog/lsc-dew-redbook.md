@@ -8,6 +8,7 @@ used-by:
   - ../corpus/legislation/hb-64-2015.yml
   - ../corpus/legislation/hb-95-2003.yml
   - ../corpus/program/auxiliary-services.yml
+  - ../corpus/program/emergency-assistance-to-nonpublic-schools.yml
   - ../corpus/program/nonpublic-administrative-cost-reimbursement.yml
   - ../corpus/revenue-stream/lottery-profits.yml
 ---
