@@ -17,6 +17,8 @@ used-by:
   - ../corpus/parameter/enrolment-supplement-amounts.yml
   - ../corpus/parameter/fsfp-phase-in-percentage.yml
   - ../corpus/parameter/performance-supplement-rate.yml
+  - ../corpus/program/autism-scholarship.yml
+  - ../corpus/program/jon-peterson-special-needs.yml
 ---
 # LSC Budget Analysis — H.B. 96 (FY2026-27)
 
