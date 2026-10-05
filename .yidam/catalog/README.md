@@ -66,6 +66,7 @@ Sorted by: type, then slug.
 | [`dew-scholarship-historical-data`](dew-scholarship-historical-data.md) | Historical Scholarship Data — the deduct era, counted two ways | 4 |
 | [`dew-sfpr-line-by-line`](dew-sfpr-line-by-line.md) | School Finance Payment Report — Line by Line Explanation | 8 |
 | [`dot-casino-student-distribution`](dot-casino-student-distribution.md) | County Student Distribution — gross casino revenue county student fund | 1 |
+| [`dot-it1040-instructions`](dot-it1040-instructions.md) | Ohio IT 1040 instruction booklets, tax years 2021 and 2022 | 1 |
 | [`dot-reappraisal-calendar`](dot-reappraisal-calendar.md) | Ohio's sexennial reappraisal and triennial update calendar | 1 |
 | [`dot-sd1-school-district-taxes`](dot-sd1-school-district-taxes.md) | Table SD-1 — School district taxable value and taxes charged | 5 |
 | [`dot-tax-expenditure-report`](dot-tax-expenditure-report.md) | Tax Expenditure Report | 1 |
@@ -93,7 +94,7 @@ Sorted by: type, then slug.
 | [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 4 |
 | [`us-public-laws`](us-public-laws.md) | United States public laws — the enrolled federal acts | 1 |
 
-66 entries, 0 not yet cited by any corpus node. 438 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+67 entries, 0 not yet cited by any corpus node. 438 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

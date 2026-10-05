@@ -46,7 +46,7 @@ findings: |
   beginning in 2021, and the first organizations were certified in November 2021. [verified]
   ([`crates/project`](../../../crates/project/tests/the_credit_beside_the_scholarships.rs))
 
-  ### The tax year 2022 average is over the cap then written
+  ### The tax year 2022 average is over the statute's cap and under the forms'
 
   Tax year 2022's claims average **$1,091** a return. As enacted, the statute capped the credit at
   $750 "per taxpayer" and said nothing about joint returns. [verified]
@@ -54,9 +54,17 @@ findings: |
   H.B. 66 of the 134th General Assembly set the $1,500 joint cap, effective April 3, 2023, with no
   applicability section for R.C. 5747.73, and LSC called the change "clarifying that both filers
   on a joint return are entitled to a $750 credit". [verified]
-  ([`lsc-tax-credit-analyses`](../../catalog/lsc-tax-credit-analyses.md)) Tax year 2022 returns
-  were filed in that season, so the average is most likely joint returns claiming two spouses'
-  gifts. [inference] How much of it Taxation allowed is not reported. [open]
+  ([`lsc-tax-credit-analyses`](../../catalog/lsc-tax-credit-analyses.md))
+
+  Taxation's forms had already applied that reading. The printed tax year 2022 instructions,
+  "accurate as of December 12, 2022", told joint filers whose spouses both gave that "each of you
+  can claim this credit (up to $1,500 total)". The tax year 2021 instructions say nothing about
+  joint returns. [verified]
+  ([`dot-it1040-instructions`](../../catalog/dot-it1040-instructions.md)) So H.B. 66 wrote down
+  what filers had been told for tax year 2022, and the average is under the cap Taxation
+  administered. Under those instructions only a joint return could claim more than $750, so the
+  amount over $750 is joint returns claiming two spouses' gifts, or claims made in error.
+  [inference] How much of it Taxation allowed is not reported. [open]
 
   ### What Taxation estimated
 

@@ -27,12 +27,14 @@ fn what_taxpayers_claimed() {
 }
 
 #[test]
-fn the_tax_year_2022_average_is_over_the_single_cap() {
+fn the_tax_year_2022_average_is_between_the_single_and_joint_caps() {
     // The $750 cap was the only cap in R.C. 5747.73 for tax year 2022 as enacted; H.B. 66 set
     // $1,500 for a joint return in April 2023 with no applicability section, during that year's
-    // filing season. An average over $750 cannot come from single-cap returns alone.
+    // filing season. An average over $750 cannot come from single-cap returns alone. Taxation's
+    // tax year 2022 instructions, printed in December 2022, already told joint filers $1,500, so
+    // the average sits under the cap the forms administered.
     let average = average_claim(2022).expect("TY2022");
-    assert!(average > 750.0, "{average}");
+    assert!(average > 750.0 && average < 1_500.0, "{average}");
     assert!((average - 1_091.30).abs() < 0.01, "{average}");
     assert!(average_claim(2021).expect("TY2021") < 750.0);
 }
