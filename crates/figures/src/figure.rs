@@ -13517,6 +13517,225 @@ pub static FIGURES: &[Figure] = &[
                 - project::ledger::nonpublic_enrolment::statutory_membership(2017)
                     .expect("restated")
         },
+    },    Figure {
+        key: "project/eans-actual-fy2022",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "3HQ0 200651 Emergency Assistance to Non-Public Schools, FY2022 actual — federal money, never part of Category 3",
+        pinned: 55_331_436.0,
+        tolerance: 0.5,
+        compute: |_| {
+            project::ledger::nonpublic_federal::eans(FiscalYear(2025))
+                .iter()
+                .find(|year| year.fiscal_year == 2022)
+                .expect("EANS spent in FY2022")
+                .nominal
+        },
+    },
+    Figure {
+        key: "project/eans-actual-fy2023",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "3HQ0 200651 Emergency Assistance to Non-Public Schools, FY2023 actual — federal money, never part of Category 3",
+        pinned: 95_051_480.0,
+        tolerance: 0.5,
+        compute: |_| {
+            project::ledger::nonpublic_federal::eans(FiscalYear(2025))
+                .iter()
+                .find(|year| year.fiscal_year == 2023)
+                .expect("EANS spent in FY2023")
+                .nominal
+        },
+    },
+    Figure {
+        key: "project/eans-actual-fy2024",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "3HQ0 200651 Emergency Assistance to Non-Public Schools, FY2024 actual — federal money, never part of Category 3",
+        pinned: 86_446_473.0,
+        tolerance: 0.5,
+        compute: |_| {
+            project::ledger::nonpublic_federal::eans(FiscalYear(2025))
+                .iter()
+                .find(|year| year.fiscal_year == 2024)
+                .expect("EANS spent in FY2024")
+                .nominal
+        },
+    },
+    Figure {
+        key: "project/eans-actual-fy2025",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "3HQ0 200651 Emergency Assistance to Non-Public Schools, FY2025 actual — federal money, never part of Category 3",
+        pinned: 48_578_449.0,
+        tolerance: 0.5,
+        compute: |_| {
+            project::ledger::nonpublic_federal::eans(FiscalYear(2025))
+                .iter()
+                .find(|year| year.fiscal_year == 2025)
+                .expect("EANS spent in FY2025")
+                .nominal
+        },
+    },
+    Figure {
+        key: "project/eans-total-fy2022-fy2025",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Everything EANS spent across its four years, nominal — more than Category 3 spent in FY2025, its largest year",
+        pinned: 285_407_838.0,
+        tolerance: 0.5,
+        compute: |_| project::ledger::nonpublic_federal::eans_total(),
+    },
+    Figure {
+        key: "project/eans-adjusted-fy2023",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "EANS's adjusted appropriation for FY2023, as the 2022 edition states it — the enacted figure was zero",
+        pinned: 254_755_326.0,
+        tolerance: 0.5,
+        compute: |_| {
+            project::ledger::nonpublic_federal::eans_adjusted()
+                .iter()
+                .find(|(fiscal_year, _, _)| *fiscal_year == 2023)
+                .expect("adjusted in FY2023")
+                .2
+        },
+    },
+    Figure {
+        key: "project/eans-adjusted-fy2025",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "EANS's adjusted appropriation for FY2025, as the 2024 edition states it — the enacted figure was zero",
+        pinned: 64_585_482.0,
+        tolerance: 0.5,
+        compute: |_| {
+            project::ledger::nonpublic_federal::eans_adjusted()
+                .iter()
+                .find(|(fiscal_year, _, _)| *fiscal_year == 2025)
+                .expect("adjusted in FY2025")
+                .2
+        },
+    },
+    Figure {
+        key: "project/eans-against-category-three-fy2022-fy2025",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "EANS as a fraction of Category 3 over the same four years, both nominal — a \
+                comparison of size, never a sum",
+        pinned: 0.305,
+        tolerance: 0.0005,
+        compute: |_| {
+            let years = project::ledger::nonpublic_federal::against_category_three();
+            years.iter().map(|year| year.eans).sum::<f64>()
+                / years.iter().map(|year| year.category_three).sum::<f64>()
+        },
+    },
+    Figure {
+        key: "project/idea-proportionate-share-fy2021",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The IDEA Part B proportionate share for parentally placed nonpublic pupils, FY2021, summed over the department's final allocations",
+        pinned: 15_174_643.47,
+        tolerance: 0.5,
+        compute: |_| {
+            project::ledger::nonpublic_federal::idea_part_b()
+                .iter()
+                .find(|year| year.fiscal_year == 2021)
+                .expect("FY2021 allocations")
+                .proportionate_share
+        },
+    },
+    Figure {
+        key: "project/idea-proportionate-share-fy2022",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The IDEA Part B proportionate share for parentally placed nonpublic pupils, FY2022, summed over the department's final allocations",
+        pinned: 15_560_688.50,
+        tolerance: 0.5,
+        compute: |_| {
+            project::ledger::nonpublic_federal::idea_part_b()
+                .iter()
+                .find(|year| year.fiscal_year == 2022)
+                .expect("FY2022 allocations")
+                .proportionate_share
+        },
+    },
+    Figure {
+        key: "project/idea-proportionate-share-fy2023",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The IDEA Part B proportionate share for parentally placed nonpublic pupils, FY2023, summed over the department's final allocations",
+        pinned: 16_267_189.29,
+        tolerance: 0.5,
+        compute: |_| {
+            project::ledger::nonpublic_federal::idea_part_b()
+                .iter()
+                .find(|year| year.fiscal_year == 2023)
+                .expect("FY2023 allocations")
+                .proportionate_share
+        },
+    },
+    Figure {
+        key: "project/idea-proportionate-share-fy2024",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "The IDEA Part B proportionate share for parentally placed nonpublic pupils, FY2024, summed over the department's final allocations",
+        pinned: 16_433_446.71,
+        tolerance: 0.5,
+        compute: |_| {
+            project::ledger::nonpublic_federal::idea_part_b()
+                .iter()
+                .find(|year| year.fiscal_year == 2024)
+                .expect("FY2024 allocations")
+                .proportionate_share
+        },
+    },
+    Figure {
+        key: "project/idea-proportionate-share-rate-fy2024",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The FY2024 proportionate share as a fraction of the school-age allocation",
+        pinned: 0.0365,
+        tolerance: 0.00005,
+        compute: |_| {
+            project::ledger::nonpublic_federal::idea_part_b()
+                .iter()
+                .find(|year| year.fiscal_year == 2024)
+                .expect("FY2024 allocations")
+                .share()
+        },
+    },
+    Figure {
+        key: "project/idea-sharing-agencies-fy2024",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Agencies that owed a proportionate share above zero in FY2024",
+        pinned: 232.0,
+        tolerance: 0.0,
+        compute: |_| {
+            project::ledger::nonpublic_federal::idea_part_b()
+                .iter()
+                .find(|year| year.fiscal_year == 2024)
+                .expect("FY2024 allocations")
+                .sharing_agencies as f64
+        },
+    },
+    Figure {
+        key: "project/idea-nonpublic-swd-fy2024",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Nonpublic students with disabilities the FY2024 allocations count, none suppressed",
+        pinned: 10_245.0,
+        tolerance: 0.0,
+        compute: |_| {
+            f64::from(
+                project::ledger::nonpublic_federal::idea_part_b()
+                    .iter()
+                    .find(|year| year.fiscal_year == 2024)
+                    .expect("FY2024 allocations")
+                    .nonpublic_swd,
+            )
+        },
     },
 ];
 

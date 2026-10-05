@@ -45,6 +45,7 @@ pub mod appropriations;
 pub mod budget_analysis;
 pub mod line_origins;
 pub mod nonpublic_enrolment;
+pub mod nonpublic_federal;
 pub mod nonpublic_location;
 pub mod nonpublic_support;
 pub mod session_laws;

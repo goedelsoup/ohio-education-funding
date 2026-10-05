@@ -244,9 +244,34 @@ pub struct Year {
 /// One line's series, latest vintage per year, restated into `base` dollars.
 #[must_use]
 pub fn series(ali: &str, base: FiscalYear) -> Vec<Year> {
+    vintage(claims(ali), base)
+}
+
+/// Every claim any edition makes about `ali` **in `fund`**, oldest edition first.
+///
+/// [`claims`] keys on the line item alone, which is safe for [`CATEGORY_THREE`] and not in
+/// general: the catalog reuses an ALI once its program has closed. `200651` has been three
+/// programs in three funds — see [`super::nonpublic_federal`] — and a reader of any line outside
+/// Category 3 names the fund as well.
+#[must_use]
+pub fn claims_in(fund: &str, ali: &str) -> Vec<Claim> {
+    claims(ali)
+        .into_iter()
+        .filter(|claim| claim.fund == fund)
+        .collect()
+}
+
+/// [`series`] for one fund's use of `ali`, under the rule [`claims_in`] states.
+#[must_use]
+pub fn series_in(fund: &str, ali: &str, base: FiscalYear) -> Vec<Year> {
+    vintage(claims_in(fund, ali), base)
+}
+
+/// The latest vintage of each year `claims` speaks for, restated into `base` dollars.
+fn vintage(claims: Vec<Claim>, base: FiscalYear) -> Vec<Year> {
     let cpi = CpiSeries::cpi_u_june();
     let mut answered: BTreeMap<u16, Claim> = BTreeMap::new();
-    for claim in claims(ali) {
+    for claim in claims {
         if claim.amount.is_none() {
             continue;
         }
