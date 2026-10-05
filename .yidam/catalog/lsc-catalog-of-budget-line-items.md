@@ -11,6 +11,7 @@ used-by:
   - ../corpus/fiscal-period/fy2020-21.yml
   - ../corpus/parameter/appropriation-proration-factor.yml
   - ../corpus/program/auxiliary-services.yml
+  - ../corpus/program/emergency-assistance-to-nonpublic-schools.yml
   - ../corpus/program/nonpublic-administrative-cost-reimbursement.yml
 ---
 # Catalog of Budget Line Items — what each appropriation line was given
