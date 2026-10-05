@@ -489,6 +489,19 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
                widens rather than narrows a proportional change.",
     },
     Source {
+        key: "rc-5747-73",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-5747.73",
+        filename: "rc-5747-73.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 5747.73. The scholarship donation credit — the one nonpublic tuition subsidy \
+               with no appropriation line. Not R.C. 5747.75, which the corpus's own issue cited: \
+               that number is the nonchartered nonpublic tuition credit, and it was itself \
+               enacted in a third form by the same act, so the two are easy to cross.",
+    },
+    Source {
         key: "rc-5753-02",
         title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-5753.02",

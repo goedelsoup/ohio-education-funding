@@ -2,7 +2,8 @@
 //!
 //! The local side of school funding. The abstract carries assessed valuation and rates by
 //! district; the casino distribution is the one revenue stream paid to districts directly rather
-//! than through the formula.
+//! than through the formula. And one subsidy that is not paid at all: the scholarship donation
+//! credit, which reaches nonpublic tuition as income tax not collected.
 
 use super::{Connector, Format, Source, Status};
 
@@ -295,6 +296,100 @@ pub(super) const CASINO: Connector = Connector {
                    reconciling the districts against the county allocations — where they \
                    differ by four cents.",
             fixtures: &[crate::fixtures::CASINO_FIXTURE],
+        },
+    ],
+};
+
+pub(super) const INCOME_CREDITS: Connector = Connector {
+    key: "tax-income-credits",
+    publisher: "Ohio Department of Taxation",
+    feeds: &["program", "metric"],
+    status: Status::Wired {
+        still_blocked: Some(
+            "wired for the scholarship donation credit of R.C. 5747.73 alone — its column of \
+             Table Y-1 and its entry in two editions of the Tax Expenditure Report. Neither \
+             document says which organizations received the donations or what scholarships \
+             they paid, and the statute requires no organization to report either",
+        ),
+    },
+    note: "The one education subsidy in this repository with no appropriation line. What it \
+           costs is income tax the general revenue fund never collects, so no budget table \
+           sees it, and the department that collects the tax is the only publisher of its size.",
+    sources: &[
+        Source {
+            key: "y1-ty2021",
+            title: Some("Table Y-1, Summary of Ohio Individual Income Tax Returns, Tax Year 2021"),
+            url: "https://dam.assets.ohio.gov/raw/upload/tax.ohio.gov/tax_analysis/\
+                  tax_data_series/individual_income/y1/Y1TY21.xlsx",
+            filename: "y1-ty2021.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dot-y1-individual-income-returns"),
+            fixtures: &[crate::fixtures::SGO_CLAIMS_FIXTURE],
+            note: "The credit's first year, and nearly empty: 523 returns. The Attorney General \
+                   certified the first organizations in November 2021, so a TY2021 donation \
+                   had about six weeks in which there was anyone eligible to receive it. Also \
+                   linked from tax.ohio.gov under `static/`, which refuses a non-browser agent; \
+                   this path serves the same bytes.",
+        },
+        Source {
+            key: "y1-ty2022",
+            title: Some("Table Y-1, Summary of Ohio Individual Income Tax Returns, Tax Year 2022"),
+            url: "https://dam.assets.ohio.gov/raw/upload/tax.ohio.gov/tax_analysis/\
+                  tax_data_series/individual_income/y1/Y1_TY2022.xlsx",
+            filename: "y1-ty2022.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dot-y1-individual-income-returns"),
+            fixtures: &[crate::fixtures::SGO_CLAIMS_FIXTURE],
+            note: "The first full year, at the single $750 cap H.B. 110 enacted.",
+        },
+        Source {
+            key: "y1-ty2023",
+            title: Some("Table Y-1, Summary of Ohio Individual Income Tax Returns, Tax Year 2023"),
+            url: "https://dam.assets.ohio.gov/raw/upload/tax.ohio.gov/tax_analysis/\
+                  tax_data_series/individual_income/y1/Y1_TY2023.xlsx",
+            filename: "y1-ty2023.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dot-y1-individual-income-returns"),
+            fixtures: &[crate::fixtures::SGO_CLAIMS_FIXTURE],
+            note: "The first year of the $1,500 joint-filer cap H.B. 66 enacted.",
+        },
+        Source {
+            key: "y1-ty2024",
+            title: Some("Table Y-1, Summary of Ohio Individual Income Tax Returns, Tax Year 2024"),
+            url: "https://dam.assets.ohio.gov/raw/upload/tax.ohio.gov/tax_analysis/\
+                  tax_data_series/individual_income/y1/Y1_TY2024.xlsx",
+            filename: "y1-ty2024.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dot-y1-individual-income-returns"),
+            fixtures: &[crate::fixtures::SGO_CLAIMS_FIXTURE],
+            note: "Split into one sheet per schedule, with the line's name repeated in every \
+                   column header; the credit is on `2024 Nonrefundable Credits`.",
+        },
+        Source {
+            key: "ter-fy2024-fy2025",
+            title: Some("Tax Expenditure Report, FY2024-2025"),
+            url: "https://archives.obm.ohio.gov/Files/Budget_and_Planning/Operating_Budget/\
+                  Fiscal_Years_2024-2025/ExecutiveBudget/Book_Two_Tax_Expenditure_Report.pdf",
+            filename: "ter-fy2024-fy2025.pdf",
+            format: Format::Pdf,
+            catalog: Some("dot-tax-expenditure-report"),
+            fixtures: &[crate::fixtures::SGO_ESTIMATES_FIXTURE],
+            note: "Book Two of the FY2024-2025 executive budget, prepared by Taxation and \
+                   published by the Office of Budget and Management. Guessed filenames on the \
+                   same archive answer 200 with an HTML page, so a fetch that succeeds is not \
+                   evidence of the file.",
+        },
+        Source {
+            key: "ter-fy2026-fy2027",
+            title: Some("Tax Expenditure Report, FY2026-2027"),
+            url: "https://dam.assets.ohio.gov/image/upload/tax.ohio.gov/research/publications/\
+                  Tax_Expenditure_Report_2026-2027_-_Final.pdf",
+            filename: "ter-fy2026-fy2027.pdf",
+            format: Format::Pdf,
+            catalog: Some("dot-tax-expenditure-report"),
+            fixtures: &[crate::fixtures::SGO_ESTIMATES_FIXTURE],
+            note: "Taxation's own copy. The budget office posts one with a different digest \
+                   and the same text; this one is held because it is the publisher's.",
         },
     ],
 };

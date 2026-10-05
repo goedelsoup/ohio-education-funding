@@ -502,6 +502,20 @@ pub const PI_RANKING_FIXTURE: &str = "crates/dispersion/fixtures/edchoice-pi-ran
 /// 34 CFR 300.133 requires it to spend on them.
 pub const IDEA_PART_B_FIXTURE: &str = "crates/project/fixtures/idea-part-b-allocations.csv";
 
+/// The scholarship donation credit as Ohio returns claimed it, one row per tax year per income
+/// class, from Taxation's Table Y-1.
+///
+/// What was **claimed**, not what was allowed: the table records each credit before it is applied
+/// to liability, and the credit is nonrefundable, so a claim can exceed what it saved the filer.
+pub const SGO_CLAIMS_FIXTURE: &str = "crates/project/fixtures/sgo-credit-claims.csv";
+
+/// The scholarship donation credit as Taxation estimated it, one row per edition of the Tax
+/// Expenditure Report per fiscal year.
+///
+/// Beside [`SGO_CLAIMS_FIXTURE`] because the two answer one question from opposite ends: an
+/// estimate of revenue forgone made before the year, and the claims filed after it.
+pub const SGO_ESTIMATES_FIXTURE: &str = "crates/project/fixtures/sgo-credit-estimates.csv";
+
 /// The three years of district Title I formula counts the designation's other criterion is cut
 /// from, decomposed into the five categories the formula adds.
 ///
@@ -576,6 +590,8 @@ pub const REBUILT: &[&str] = &[
     PI_RANKING_FIXTURE,
     TITLE1_FIXTURE,
     IDEA_PART_B_FIXTURE,
+    SGO_CLAIMS_FIXTURE,
+    SGO_ESTIMATES_FIXTURE,
     CROSSWALK_FIXTURE,
     STATUTE_FIXTURE,
     ENACTED_FIXTURE,

@@ -76,6 +76,11 @@ const CITED: &[&str] = &[
     // proportional rise rather than narrowing it, so the retail series understates the increase
     // a district's fuel bill actually took.
     "5735.05",
+    // The scholarship donation credit. Cited by `scholarship-donation-credit` for the cap, the
+    // three tests the Attorney General certifies an organization on, and the absence of any duty
+    // to report what the organization did with the money. Not 5747.75, which the issue asking
+    // for the node cited: that is the nonchartered nonpublic tuition credit.
+    "5747.73",
     "5753.02",
     "5753.03",
     "5753.11",

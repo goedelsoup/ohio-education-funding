@@ -480,6 +480,72 @@ fn rebuild_appropriation_lines(root: &Path) -> Result<Vec<Rebuilt>, RebuildError
     Ok(out)
 }
 
+/// The scholarship donation credit, as claimed on returns and as estimated in advance.
+///
+/// Two fixtures from one connector, and each is all-or-nothing: a claims series missing a year
+/// reads as the credit's growth stalling, and an estimates file missing an edition loses the
+/// revision that is the reason for holding two.
+fn rebuild_income_tax_credit(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
+    let mut out = Vec::new();
+
+    // Table Y-1 for each tax year the credit has existed. The sheet is named differently in
+    // every edition, and in TY2024 the table became a workbook of one sheet per schedule.
+    let claims = (|| -> Result<Result<Vec<Vec<String>>, String>, String> {
+        let mut rows = Vec::new();
+        for (key, tax_year, sheet) in [
+            ("y1-ty2021", 2021, "Y1 TY2021"),
+            ("y1-ty2022", 2022, "Y1 2022"),
+            ("y1-ty2023", 2023, "Y1 2023"),
+            ("y1-ty2024", 2024, "2024 Nonrefundable Credits"),
+        ] {
+            let sheet = sheet_rows(root, key, sheet)?;
+            match fixtures::sgo_credit_claims(&sheet, tax_year) {
+                Ok(read) => rows.extend(read),
+                Err(layout) => return Ok(Err(layout)),
+            }
+        }
+        Ok(Ok(rows))
+    })();
+    out.push(match claims {
+        Ok(Ok(rows)) => csv_fixture(
+            root,
+            fixtures::SGO_CLAIMS_FIXTURE,
+            fixtures::SGO_CLAIMS_HEADER,
+            &rows,
+        )?,
+        Ok(Err(layout)) => return Err(RebuildError::Layout(layout)),
+        Err(reason) => Rebuilt::skipped(fixtures::SGO_CLAIMS_FIXTURE, reason),
+    });
+
+    // The Tax Expenditure Report's entry for the credit, oldest edition first.
+    let estimates = (|| -> Result<Result<Vec<Vec<String>>, String>, String> {
+        let mut rows = Vec::new();
+        for (key, edition) in [
+            ("ter-fy2024-fy2025", "2024-25"),
+            ("ter-fy2026-fy2027", "2026-27"),
+        ] {
+            let text = cache::pdf_text(root, registered(key)).map_err(|cause| cause.to_string())?;
+            match fixtures::sgo_credit_estimates(&text, edition) {
+                Ok(read) => rows.extend(read),
+                Err(layout) => return Ok(Err(layout)),
+            }
+        }
+        Ok(Ok(rows))
+    })();
+    out.push(match estimates {
+        Ok(Ok(rows)) => csv_fixture(
+            root,
+            fixtures::SGO_ESTIMATES_FIXTURE,
+            fixtures::SGO_ESTIMATES_HEADER,
+            &rows,
+        )?,
+        Ok(Err(layout)) => return Err(RebuildError::Layout(layout)),
+        Err(reason) => Rebuilt::skipped(fixtures::SGO_ESTIMATES_FIXTURE, reason),
+    });
+
+    Ok(out)
+}
+
 /// The local side of the ledger: district filings, the tax abstract, and casino distributions.
 ///
 /// Reads only the registry and the cache, so it threads none of the rebuild's shared state.
@@ -1843,6 +1909,8 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     });
 
     out.extend(rebuild_local_finance(root)?);
+
+    out.extend(rebuild_income_tax_credit(root)?);
 
     out.extend(rebuild_statute_and_acts(root)?);
 
