@@ -284,6 +284,20 @@ pub fn membership(fiscal_year: u16) -> Option<f64> {
     october(fiscal_year)?.published_in_state
 }
 
+/// The in-state count the auxiliary services quotient divides by, for `fiscal_year`.
+///
+/// The compilation's where it restates the October, [`membership`] otherwise, which is the choice
+/// `auxiliary_rate::Rate::statutory` makes and for the same reasons. October 2015's annual total
+/// sits below its own building sheet, and October 2016's states the whole sector as in-state. The
+/// compilation is the only file right everywhere it can be checked. So this reaches back to
+/// FY2014, two years before [`membership`] does.
+#[must_use]
+pub fn statutory_membership(fiscal_year: u16) -> Option<f64> {
+    restatement(fiscal_year)
+        .and_then(|restated| restated.published_in_state)
+        .or_else(|| membership(fiscal_year))
+}
+
 /// How many chartered nonpublic schools the department listed in `fiscal_year`'s October.
 ///
 /// 711 in October 2023, 722 in October 2024, 749 in October 2025. `None` for October 2016, whose

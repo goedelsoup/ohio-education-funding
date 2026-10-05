@@ -65,6 +65,7 @@ pub mod paths;
 pub mod rankings;
 pub mod report_card;
 pub mod scholarship;
+pub mod scholarship_charts;
 pub mod scholarship_history;
 pub mod sd1;
 pub mod session_laws;
@@ -160,15 +161,17 @@ pub use paths::{
     MR81_FIXTURE, NONPUBLIC_BUILDING_FIXTURE, NONPUBLIC_LOCATION_FIXTURE, NONPUBLIC_SECTOR_FIXTURE,
     NOT_REGENERATED, OPINIONS_FIXTURE, OVERALL_RATINGS_FIXTURE, PI_RANKING_FIXTURE,
     PLAN_BILL_FIXTURE, PROFILE_FIXTURE, REBUILT, REDBOOK_FIXTURE, REPORT_CARD_FIXTURE,
-    SCHOLARSHIP_FIXTURE, SCHOLARSHIP_HISTORY_FIXTURE, SCHOLARSHIP_JPSN_CATEGORY_FIXTURE,
-    SCHOLARSHIP_JPSN_FIXTURE, SD1_FIXTURE, SESSION_LAW_FIXTURE, SFPR_FIXTURE, STATUTE_FIXTURE,
-    TITLE1_FIXTURE, TRANSFER_FIXTURE, TRANSPORT_RATES_FIXTURE, TYPOLOGY_FIXTURE,
+    SCHOLARSHIP_CHARTS_FIXTURE, SCHOLARSHIP_FIXTURE, SCHOLARSHIP_HISTORY_FIXTURE,
+    SCHOLARSHIP_JPSN_CATEGORY_FIXTURE, SCHOLARSHIP_JPSN_FIXTURE, SD1_FIXTURE, SESSION_LAW_FIXTURE,
+    SFPR_FIXTURE, STATUTE_FIXTURE, TITLE1_FIXTURE, TRANSFER_FIXTURE, TRANSPORT_RATES_FIXTURE,
+    TYPOLOGY_FIXTURE,
 };
 pub use rankings::{build_pi_rankings, PI_RANKING_HEADER, PI_RANKING_SHEETS};
 pub use report_card::{
     build_function_extract, build_report_card_extract, FUNCTIONS_HEADER, REPORT_CARD_HEADER,
 };
 pub use scholarship::scholarship_programmes;
+pub use scholarship_charts::{chart_pages, chart_rows, SCHOLARSHIP_CHART_HEADER};
 pub use scholarship_history::{build_scholarship_history, SCHOLARSHIP_HISTORY_HEADER};
 pub use sd1::{build_sd1_extract, Sd1Year, SD1_HEADER};
 pub use session_laws::{build_session_laws, reprinted_section, ActText, SESSION_LAW_HEADER};

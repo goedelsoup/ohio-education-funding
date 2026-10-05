@@ -392,10 +392,14 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * four quotients that reproduce a published rate, two that are the readings which do not, the two
  * ends of FY2013's interval, and the line's and the rate's nominal and real path. The floor was
  * one under again — 1177 actual against 1176 declared.
+ *
+ * Recomputed at **1196/82** when the scholarship charts were read and set against the October the
+ * rate divides by (#761). Seven bindings, no new carrier, again all on `program/auxiliary-services`:
+ * the share's two ends in FY2017 and FY2025, FY2024's floor, and the two growths it compares.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1189 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1189,
+  expect(bindings.length, "1196 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1196,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,

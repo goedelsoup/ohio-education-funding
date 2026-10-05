@@ -447,6 +447,17 @@ pub const SCHOLARSHIP_JPSN_FIXTURE: &str = "crates/project/fixtures/scholarship-
 pub const SCHOLARSHIP_JPSN_CATEGORY_FIXTURE: &str =
     "crates/project/fixtures/scholarship-jpsn-categories.csv";
 
+/// The scholarship annual report's five participation-by-year charts, one row per programme per
+/// year drawn.
+///
+/// The only committed series that carries every programme across FY2014-FY2022, the years between
+/// the historical file's last and the consolidated report's first. Values are read off the drawing
+/// rather than printed, so each row carries its chart's `pupils_per_point` and a reader states the
+/// tolerance it trusts in points; `measure` is the chart title's word, which for three of the five
+/// is not what the chart drew before FY2014.
+pub const SCHOLARSHIP_CHARTS_FIXTURE: &str =
+    "crates/project/fixtures/scholarship-participation.csv";
+
 /// Where the EdChoice designated list is written, relative to the repository root.
 ///
 /// In `dispersion` rather than `project` because it is a per-building panel over every district,
@@ -569,6 +580,7 @@ pub const REBUILT: &[&str] = &[
     SCHOLARSHIP_HISTORY_FIXTURE,
     SCHOLARSHIP_JPSN_FIXTURE,
     SCHOLARSHIP_JPSN_CATEGORY_FIXTURE,
+    SCHOLARSHIP_CHARTS_FIXTURE,
     CATALOG_FIXTURE,
     CATALOG_BASIS_FIXTURE,
 ];

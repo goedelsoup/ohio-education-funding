@@ -421,9 +421,9 @@ pub mod history {
     //!
     //! The deduct era, statewide, and the only source this repository holds that counts
     //! applications and payments as separate quantities. [`super::report`] is the same channel eleven
-    //! years later under the Fair School Funding Plan; between FY2014 and FY2023 there is no
-    //! series at all — only the quoted points [`super::bounds`] holds, which bound that hole and
-    //! cannot be joined to either end of it.
+    //! years later under the Fair School Funding Plan. Between the two, the only series is the one
+    //! [`super::participation`] reads off the report's charts, and for two programmes it joins to
+    //! this one on the applications measure rather than on used.
     //!
     //! # The two measures are not two views of one number
     //!
@@ -570,6 +570,243 @@ renewal_low_income";
     }
 }
 
+pub mod participation {
+    //! The report's five participation charts, FY2014 through FY2025, and what share of the
+    //! chartered nonpublic sector the scholarships pay for.
+    //!
+    //! [`super::history`] ends at FY2013 and [`super::report`] holds FY2025 alone. The consolidated
+    //! report draws every programme's participation by fiscal year from that programme's first year
+    //! to FY2025, and prints no value on any of them; `connect::fixtures::scholarship_charts` reads
+    //! them off the drawing. This is the only series in the repository that crosses the hole for
+    //! all five programmes.
+    //!
+    //! # A drawn value is an interval
+    //!
+    //! Each row carries the chart's scale, so a value is read as `value ± TOLERANCE_POINTS` points
+    //! of drawing. The tolerance is not chosen to make anything close: it is the one under which
+    //! every drawn value the archive and the reports also print, 42 of them, reproduces — see
+    //! `the_share_of_the_sector_the_scholarships_pay_for`.
+    //!
+    //! # Three of the charts change what they count
+    //!
+    //! Traditional EdChoice and Cleveland are titled "participants" and draw the archive's
+    //! **applications** column for every year through FY2013, then participants. Autism draws the
+    //! archive's used column. Jon Peterson is titled "applications" and draws what its own report
+    //! calls students for FY2023 onward. [`Point::measure`] carries the title's word, because that
+    //! is all the chart states; the splice is pinned in the test file.
+    //!
+    //! # The share
+    //!
+    //! [`share`] divides a year's scholarship count by the October count of chartered nonpublic
+    //! pupils living in Ohio, which is the denominator of the auxiliary services rate. Both ends of
+    //! the interval are stated rather than chosen:
+    //!
+    //! - **The numerator's floor** is the three programmes whose pupils attend a chartered
+    //!   nonpublic school by statute — [`SCHOOL_BOUND`] — each at its lowest reading. Autism and
+    //!   Jon Peterson pay non-school providers too, and nothing published says how many of their
+    //!   pupils sit in a chartered building, so they are left out of the floor entirely.
+    //! - **The ceiling** is all five at their highest reading.
+    //! - **The denominator** is the in-state October count the auxiliary rate divides by,
+    //!   [`nonpublic_enrolment::statutory_membership`]: the 2014-2019 compilation where it restates
+    //!   the October and the annual file otherwise. It is one number, so the interval's width is
+    //!   all the numerator's.
+    //!
+    //! # What the ratio is not
+    //!
+    //! A scholarship count is a year's participants and the October count is one day. Everyone on
+    //! the October roster who holds a scholarship that year is among the year's participants, but
+    //! so is everyone who left before October or joined after it, so the ratio overstates the
+    //! October share by that churn. No source publishes the churn, and the interval does not
+    //! include it.
+
+    use std::collections::BTreeMap;
+    use std::sync::OnceLock;
+
+    use edfund_core::FiscalYear;
+
+    use crate::ledger::nonpublic_enrolment;
+
+    /// The committed extract of the five charts.
+    const FIXTURE: &str = include_str!("../fixtures/scholarship-participation.csv");
+
+    const EXPECTED_HEADER: &str = "program,fiscal_year,measure,value,pupils_per_point";
+
+    /// How far, in points of drawing, a value may sit from what the department counted.
+    ///
+    /// A tenth of a point. The widest miss among the 42 drawn values that are also printed
+    /// elsewhere is 0.068 points.
+    pub const TOLERANCE_POINTS: f64 = 0.1;
+
+    /// The programmes whose scholarships pay tuition at a chartered nonpublic school.
+    ///
+    /// Autism and Jon Peterson pay an alternative public provider or a registered private
+    /// provider, which may be a nonpublic school but need not be, so neither is here.
+    pub const SCHOOL_BOUND: [&str; 3] = ["traditional-edchoice", "edchoice-expansion", "cleveland"];
+
+    /// What a chart's title says it counts.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum Measure {
+        /// Titled "participants".
+        Participants,
+        /// Titled "applications".
+        Applications,
+    }
+
+    /// One programme-year as its chart draws it.
+    #[derive(Debug, Clone, PartialEq)]
+    pub struct Point {
+        /// The programme slug, shared with [`super::report::programmes`].
+        pub program: String,
+        /// The fiscal year.
+        pub year: FiscalYear,
+        /// The chart title's word for what it counts.
+        pub measure: Measure,
+        /// The value read off the drawing, to a tenth of a pupil.
+        pub value: f64,
+        /// The chart's fitted scale.
+        pub pupils_per_point: f64,
+    }
+
+    impl Point {
+        /// [`TOLERANCE_POINTS`] in this chart's pupils.
+        #[must_use]
+        pub fn tolerance(&self) -> f64 {
+            TOLERANCE_POINTS * self.pupils_per_point
+        }
+
+        /// The least the department can have counted.
+        #[must_use]
+        pub fn floor(&self) -> f64 {
+            self.value - self.tolerance()
+        }
+
+        /// The most.
+        #[must_use]
+        pub fn ceiling(&self) -> f64 {
+            self.value + self.tolerance()
+        }
+
+        /// Whether a figure printed elsewhere is what this point drew.
+        #[must_use]
+        pub fn admits(&self, printed: f64) -> bool {
+            (self.floor()..=self.ceiling()).contains(&printed)
+        }
+    }
+
+    /// Every drawn point, in fixture order: by chart, then by year.
+    ///
+    /// # Panics
+    ///
+    /// If the fixture's header is not the one this was written against, or a row names a measure
+    /// this module does not know.
+    #[must_use]
+    pub fn points() -> Vec<Point> {
+        static POINTS: OnceLock<Vec<Point>> = OnceLock::new();
+        POINTS.get_or_init(parse_points).clone()
+    }
+
+    /// The fixture, read.
+    fn parse_points() -> Vec<Point> {
+        edfund_core::csv::rows(FIXTURE, EXPECTED_HEADER)
+            .map(|row| Point {
+                program: row.str(0).to_string(),
+                year: FiscalYear(row.num(1).expect("every row names a fiscal year") as u16),
+                measure: match row.str(2) {
+                    "participants" => Measure::Participants,
+                    "applications" => Measure::Applications,
+                    other => panic!("a chart measure this module does not know: {other}"),
+                },
+                value: row.num(3).expect("every row has a value"),
+                pupils_per_point: row.num(4).expect("every row has a scale"),
+            })
+            .collect()
+    }
+
+    /// One programme's chart, by fiscal year.
+    #[must_use]
+    pub fn series(program: &str) -> BTreeMap<FiscalYear, Point> {
+        points()
+            .into_iter()
+            .filter(|point| point.program == program)
+            .map(|point| (point.year, point))
+            .collect()
+    }
+
+    /// A closed interval, low end first.
+    pub type Interval = (f64, f64);
+
+    /// One year's share of the sector, with the two quantities it divides.
+    #[derive(Debug, Clone, PartialEq)]
+    pub struct Share {
+        /// The fiscal year. Its October is the one in the fall of the school year.
+        pub year: FiscalYear,
+        /// Scholarship pupils: [`SCHOOL_BOUND`] at their floors to all five at their ceilings.
+        pub scholarships: Interval,
+        /// Chartered nonpublic pupils living in Ohio in this year's October, as the auxiliary rate
+        /// counts them.
+        pub sector: f64,
+        /// The first over the second.
+        pub share: Interval,
+    }
+
+    impl Share {
+        /// The sector's pupils who hold no scholarship, under the same reading: the rest.
+        #[must_use]
+        pub fn unfunded(&self) -> Interval {
+            (
+                self.sector - self.scholarships.1,
+                self.sector - self.scholarships.0,
+            )
+        }
+    }
+
+    /// [`SCHOOL_BOUND`]'s pupils in `year`, each programme at its floor and at its ceiling.
+    #[must_use]
+    pub fn school_bound(year: FiscalYear) -> Option<Interval> {
+        SCHOOL_BOUND
+            .iter()
+            .try_fold((0.0, 0.0), |(low, high), program| {
+                let point = series(program).remove(&year)?;
+                Some((low + point.floor(), high + point.ceiling()))
+            })
+    }
+
+    /// How many more pupils [`SCHOOL_BOUND`] held in `to` than in `from`, at the least.
+    ///
+    /// `to`'s floor less `from`'s ceiling: the growth no reading of either chart can shrink.
+    #[must_use]
+    pub fn least_school_bound_growth(from: FiscalYear, to: FiscalYear) -> Option<f64> {
+        Some(school_bound(to)?.0 - school_bound(from)?.1)
+    }
+
+    /// `year`'s share, where every chart draws the year and the department counted its October.
+    #[must_use]
+    pub fn share(year: FiscalYear) -> Option<Share> {
+        let drawn: Vec<Point> = points().into_iter().filter(|p| p.year == year).collect();
+        if drawn.len() != super::report::programmes().len() {
+            return None;
+        }
+        let floor = school_bound(year)?.0;
+        let ceiling = drawn.iter().map(Point::ceiling).sum::<f64>();
+        let sector = nonpublic_enrolment::statutory_membership(year.0)?;
+        Some(Share {
+            year,
+            scholarships: (floor, ceiling),
+            sector,
+            share: (floor / sector, ceiling / sector),
+        })
+    }
+
+    /// Every year [`share`] can be computed, oldest first.
+    #[must_use]
+    pub fn shares() -> Vec<Share> {
+        let mut years: Vec<FiscalYear> = points().iter().map(|p| p.year).collect();
+        years.sort_unstable();
+        years.dedup();
+        years.into_iter().filter_map(share).collect()
+    }
+}
+
 pub mod jpsn {
     //! The Jon Peterson programme's own annual report, FY2023 through FY2025.
     //!
@@ -594,8 +831,8 @@ pub mod jpsn {
     //!
     //! Each edition also prints a bar chart of total applications by fiscal year from FY2014
     //! onward, which is the series that would *fill* the hole rather than shorten it. Its bars
-    //! carry no data labels in the text layer, so `pdftotext` reaches the axis and not the values,
-    //! and the extractor does not attempt them.
+    //! carry no data labels in the text layer, so this extractor does not attempt them;
+    //! [`super::participation`] reads the consolidated edition's chart off its drawing.
     //!
     //! # The expenditure total is stated once and dated to another year
     //!
