@@ -496,6 +496,38 @@ pub struct NonpublicSupport {
     pub total: Dollars,
     /// The three, in the order the Legislative Service Commission prints them.
     pub lines: Vec<NonpublicSupportLine>,
+    /// Federal money that reaches the same pupils, each channel at its own year.
+    ///
+    /// A separate layer and never part of [`Self::total`]: these are federal grants on federal
+    /// formulas, spent as services a public agency controls, and none of them is a Category 3
+    /// line. Each names its own series because no two of them answer for the same year.
+    pub federal: Vec<NonpublicFederal>,
+}
+
+/// One federal channel to nonpublic school pupils, beside Category 3 and not inside it.
+#[derive(Debug, Clone, PartialEq)]
+pub struct NonpublicFederal {
+    /// A stable key: `eans`, `idea-proportionate-share`.
+    pub slug: String,
+    /// The channel's name.
+    pub name: String,
+    /// The federal authority it is paid under.
+    pub authority: String,
+    /// The [`SeriesYear::series`] key carrying this channel's year. Never a year label.
+    pub series: String,
+    /// The fiscal year [`Self::amount`] is for: the last one the channel's source answers.
+    pub fiscal_year: u16,
+    /// `actual` where the amount was spent, `allocation` where it is what the department's final
+    /// allocation required an agency to set aside.
+    pub kind: String,
+    /// The amount in that year's dollars.
+    pub amount: Dollars,
+    /// Whether the channel has closed: its last year is before Category 3's.
+    pub ended: bool,
+    /// The corpus class of [`Self::node`]: `program` or `revenue-stream`.
+    pub class: String,
+    /// The corpus node documenting it, at `/wiki/<class>/<node>`.
+    pub node: String,
 }
 
 /// One Category 3 appropriation line.

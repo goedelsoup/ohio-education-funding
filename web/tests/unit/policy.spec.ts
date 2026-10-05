@@ -20,6 +20,7 @@ import { bin } from "../../src/lib/chart.ts";
 import { money, millions, ordinal, pct, percentileOf, signedMoney } from "../../src/lib/format.ts";
 import {
   guaranteeRateByQuintile,
+  renderNonpublicSupport,
   renderRegimeDifference,
   wealthQuintiles,
 } from "../../src/lib/statewide.ts";
@@ -521,4 +522,24 @@ test("a scenario that moves one lever and nothing else is not reported as curren
     );
     expect(rendered, `${what} rendered no outcome`).toContain('data-part="outcome"');
   }
+});
+
+test("the federal layer renders beside Category 3 and is never in its total", () => {
+  /*
+   * #762: EANS and the IDEA proportionate share are federal grants at their own years. The card
+   * gives each its own chip and no total row, and the Category 3 total still sums its three lines.
+   */
+  const support = bundle.funding_units!.nonpublic_support;
+  const lines = support.lines.reduce((sum, line) => sum + line.amount, 0);
+  expect(Math.abs(lines - support.total)).toBeLessThan(0.01);
+  expect(support.federal.map((c) => c.slug)).toEqual(["eans", "idea-proportionate-share"]);
+
+  const html = renderNonpublicSupport(bundle.funding_units);
+  const layer = html.slice(html.indexOf('data-part="nonpublic-federal"'));
+  expect(layer).not.toBe(html);
+  for (const channel of support.federal) {
+    expect(layer).toContain(`data-series="${channel.series}"`);
+    expect(layer).toContain(`/wiki/${channel.class}/${channel.node}`);
+  }
+  expect(layer).not.toMatch(/<th>Total<\/th>/);
 });

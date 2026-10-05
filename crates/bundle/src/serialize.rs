@@ -339,14 +339,32 @@ impl Bundle {
                     n.count("fiscal_year", f.nonpublic_support.fiscal_year);
                     n.text("kind", &f.nonpublic_support.kind);
                     n.num("total", f.nonpublic_support.total);
-                    let mut list = n.arr("lines");
-                    for line in &f.nonpublic_support.lines {
-                        let mut e = list.obj();
-                        e.text("ali", &line.ali);
-                        e.text("name", &line.name);
-                        e.text("authority", &line.authority);
-                        e.num("amount", line.amount);
-                        e.text("node", &line.node);
+                    {
+                        let mut list = n.arr("lines");
+                        for line in &f.nonpublic_support.lines {
+                            let mut e = list.obj();
+                            e.text("ali", &line.ali);
+                            e.text("name", &line.name);
+                            e.text("authority", &line.authority);
+                            e.num("amount", line.amount);
+                            e.text("node", &line.node);
+                        }
+                    }
+                    {
+                        let mut list = n.arr("federal");
+                        for channel in &f.nonpublic_support.federal {
+                            let mut e = list.obj();
+                            e.text("slug", &channel.slug);
+                            e.text("name", &channel.name);
+                            e.text("authority", &channel.authority);
+                            e.text("series", &channel.series);
+                            e.count("fiscal_year", channel.fiscal_year);
+                            e.text("kind", &channel.kind);
+                            e.num("amount", channel.amount);
+                            e.flag("ended", channel.ended);
+                            e.text("class", &channel.class);
+                            e.text("node", &channel.node);
+                        }
                     }
                 }
             }

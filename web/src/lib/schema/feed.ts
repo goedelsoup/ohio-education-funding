@@ -1635,6 +1635,29 @@ const NonpublicSupportLineSchema = z
   .strict();
 
 /**
+ * One federal channel to nonpublic school pupils, beside Category 3 and never inside it.
+ *
+ * Each is at its own year under its own series: EANS closed after FY2025 and the IDEA allocation
+ * panel stops at FY2024, so neither shares Category 3's year or each other's.
+ */
+const NonpublicFederalSchema = z
+  .object({
+    slug: z.enum(["eans", "idea-proportionate-share"]),
+    name: z.string().min(1),
+    authority: z.string().min(1),
+    series: z.enum(["funding_units.nonpublic_federal.eans", "funding_units.nonpublic_federal.idea"]),
+    fiscal_year: z.number().int(),
+    /** `actual` where it was spent; `allocation` where it is what an agency had to set aside. */
+    kind: z.enum(["actual", "allocation"]),
+    amount: z.number(),
+    /** The channel's last year is before Category 3's: the grant has closed. */
+    ended: z.boolean(),
+    class: z.enum(["program", "revenue-stream"]),
+    node: z.string().min(1),
+  })
+  .strict();
+
+/**
  * Category 3 nonpublic school support, which is **not** one of the six funding units.
  *
  * It moves under R.C. 3317.024, 3317.06, 3317.062, 3317.063 and 3317.064, and a reader asking
@@ -1654,6 +1677,11 @@ const NonpublicSupportSchema = z
     kind: z.string().min(1),
     total: z.number(),
     lines: z.array(NonpublicSupportLineSchema),
+    /**
+     * Federal money that reaches the same pupils. A separate layer: `total` is the three lines
+     * above and must never have these added to it.
+     */
+    federal: z.array(NonpublicFederalSchema),
   })
   .strict();
 
@@ -1750,6 +1778,7 @@ export type ProjectionMeta = z.infer<typeof ProjectionMetaSchema>;
 export type FundingUnitProgramme = z.infer<typeof FundingUnitProgrammeSchema>;
 export type FundingUnit = z.infer<typeof FundingUnitSchema>;
 export type NonpublicSupportLine = z.infer<typeof NonpublicSupportLineSchema>;
+export type NonpublicFederal = z.infer<typeof NonpublicFederalSchema>;
 export type NonpublicSupport = z.infer<typeof NonpublicSupportSchema>;
 export type FundingUnits = z.infer<typeof FundingUnitsSchema>;
 export type Designated = z.infer<typeof DesignatedSchema>;

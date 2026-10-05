@@ -63,6 +63,8 @@ export type SeriesKey =
   | "funding_units.community"
   | "funding_units.scholarship"
   | "funding_units.nonpublic_support"
+  | "funding_units.nonpublic_federal.eans"
+  | "funding_units.nonpublic_federal.idea"
   | "designated";
 
 /**

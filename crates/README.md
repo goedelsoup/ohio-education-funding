@@ -330,7 +330,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 -->
 | Crate | Description | `#[test]` fns |
 |---|---|--:|
-| [`bundle`](bundle/) | Export a versioned JSON feed of the corpus's district-level findings for the web layer | 67 |
+| [`bundle`](bundle/) | Export a versioned JSON feed of the corpus's district-level findings for the web layer | 68 |
 | [`connect`](connect/) | Retrieval and extraction: the department's publications into committed fixtures | 242 |
 | [`deflator`](deflator/) | Convert nominal Ohio school finance figures to constant dollars, fiscal-year aligned | 17 |
 | [`dispersion`](dispersion/) | School finance equity statistics: dispersion and wealth neutrality across agencies | 351 |
@@ -346,7 +346,7 @@ Fields per crate: name, capability type (connector/calculator/feature-engineerin
 | [`spreadsheet`](spreadsheet/) | Read the department's published workbooks with no dependencies | 79 |
 | [`xcheck`](xcheck/) | Tests that hold one crate against another's fixtures, at the top of the graph | 66 |
 
-15 crates, 2110 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
+15 crates, 2111 test functions, no crates.io dependencies. `cargo test` reports a different total: it adds doc-tests and counts each integration binary separately.
 <!-- /REGEN -->
 
 ## Index status

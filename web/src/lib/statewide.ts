@@ -7,7 +7,7 @@ import { compactMoney, count, escapeHtml, fig, fixed, millions, money, ordinal, 
 import { realChange, series, type Basis } from "./real.ts";
 import * as routes from "./routes.ts";
 import type { TaxStatewide } from "./feed.ts";
-import type { Bundle, District, FundingUnit, FundingUnits, National } from "./types.ts";
+import type { Bundle, District, FundingUnit, FundingUnits, National, NonpublicFederal } from "./types.ts";
 import { median, quintiles } from "./stats.ts";
 import { seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
 import { anchor } from "./section.ts";
@@ -695,6 +695,47 @@ export function renderNonpublicSupport(units: FundingUnits | null): string {
       </table></div>
       <p class="note">These lines <em>may</em> be added, and are, because all three are the same
         kind of figure in the same fiscal year — which is the difference between this table and the
-        one above it.</p>
+        one above it.</p>${renderNonpublicFederal(support.federal)}
     </div>`;
+}
+
+/**
+ * The federal money beside Category 3, as its own table under the state one.
+ *
+ * # Why there is no total row
+ *
+ * Every channel is a federal grant on a federal formula, spent as services a public agency
+ * controls, and each is at its own year: one has closed and the other's panel stops earlier than
+ * Category 3's. Adding them to each other would sum two years, and adding them to the table above
+ * would describe a state appropriation that was never made. So each row carries its own chip and
+ * nothing is summed.
+ */
+function renderNonpublicFederal(federal: NonpublicFederal[]): string {
+  if (federal.length === 0) return "";
+  const kind = { actual: "spent", allocation: "set aside" };
+  return `
+      <h3>Federal money beside it</h3>
+      <p class="note">Federal grants that buy services for the same pupils through public
+        agencies. They are not Category 3 and are not added to it, or to each other: each row is
+        at its own year.</p>
+      <div class="scroll"><table data-part="nonpublic-federal">
+        <thead><tr>
+          <th>Federal channel</th><th>Authority</th><th class="tnum">Amount</th>
+        </tr></thead>
+        <tbody>${federal
+          .map(
+            (channel) => `
+          <tr>
+            <th><a href="${routes.wikiNode(channel.class, channel.node)}">${escapeHtml(
+              channel.name,
+            )}</a> <span class="n">${kind[channel.kind]}${
+              channel.ended ? ", ended" : ""
+            }</span>${yearChip(channel.series)}</th>
+            <td><span class="tnum">${escapeHtml(channel.authority)}</span></td>
+            <td class="tnum">${fig(millions(channel.amount).replace("+", ""), yearOf(channel.series))}</td>
+          </tr>`,
+          )
+          .join("")}
+        </tbody>
+      </table></div>`;
 }
