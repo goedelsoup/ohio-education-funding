@@ -1,5 +1,6 @@
 ---
-used-by: []
+used-by:
+  - ../corpus/program/edchoice-scholarship.yml
 ---
 # Budget Footnotes — the Legislative Budget Office's monthly report
 
