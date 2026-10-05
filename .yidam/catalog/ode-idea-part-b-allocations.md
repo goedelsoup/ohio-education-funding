@@ -23,7 +23,7 @@ Funding → Special Education Part B Allocations. Every edition is attached unde
 **What it contains.** One row per receiving entity: IRN, entity name, count of public school
 students with disabilities, count of non-public students with disabilities, the FY allocation
 amount, and the proportionate share amount owed for non-public students. The FY2021 file lists
-**979 entities** — traditional districts, community schools, and county boards of developmental
+**997 entities** — traditional districts, community schools, and county boards of developmental
 disabilities.
 
 Used here as the corpus's first source of IRNs and its first per-agency numbers of any kind.

@@ -1,0 +1,186 @@
+class: program
+label: Emergency Assistance to Non-Public Schools
+summary: >-
+  A federal pandemic grant that bought services for chartered nonpublic schools through public
+  agencies from FY2022 to FY2025: $285.4 million over four years, about a third of what
+  Category 3 paid in the same years. It is federal money beside Category 3 and is never part of it.
+description: |
+  Fund 3HQ0, ALI 200651. The redbook names its source as FAL 84.425C, "Education Stabilization
+  Fund - Governor's Emergency Education Relief Fund", and its legal basis as Section 287.10 of
+  H.B. 45 of the 134th General Assembly and Sections 265.460, 265.465, 265.550 and 505.80 of H.B.
+  33 of the 135th, "originally established by H.B. 170 of the 134th G.A." [verified]
+  ([`lsc-dew-redbook`](../../catalog/lsc-dew-redbook.md))
+
+  **Congress funded it twice, on different terms.** The Coronavirus Response and Relief
+  Supplemental Appropriations Act, 2021, created the program in section 312(d) of division M. It
+  reserved $2,750,000,000 of the Governor's fund, allotted each state's share by "the number of
+  children aged 5 through 17 at or below 185 percent of poverty who are enrolled in non-public
+  schools in the State", and had the Governor "designate the State educational agency to
+  administer the program". It required that "the control of funds for the services or assistance
+  provided to a non-public school … shall be in a public agency", and it permitted some
+  reimbursement of expenses a school had already incurred. The American Rescue Plan Act's section
+  2002 appropriated a second $2,750,000,000 for "services or assistance to non-public schools that
+  enroll a significant percentage of low-income students and are most impacted by the qualifying
+  emergency". It also provided that those funds "shall not be used to provide reimbursements to any
+  non-public school". [verified] ([`us-public-laws`](../../catalog/us-public-laws.md))
+
+  **In Ohio a school applied, and an educational service center delivered.** Nonpublic schools
+  "were required to apply to receive services or assistance", schools enrolling many low-income
+  students received priority, and the department "contracted with ESCs to administer these funds
+  on its behalf". It sized each school's amount by "a weighted per-pupil approach based on
+  enrollment, low-income data, and information collected on the application". [verified]
+  ([`lsc-dew-redbook`](../../catalog/lsc-dew-redbook.md))
+
+  That is why this is a node beside [auxiliary services](auxiliary-services.yml) and not a fourth
+  Category 3 line. Both buy secular services for the same schools through public agencies. The
+  money here came from a federal grant on a federal formula, under a federal rule that a public
+  agency keep title to whatever it bought. Adding it to Category 3 would describe a state
+  appropriation that the General Assembly never made.
+findings: |
+  ### What it spent
+
+  The 2025 catalog edition records **$55,331,436** in FY2022, **$95,051,480** in FY2023,
+  **$86,446,473** in FY2024 and **$48,578,449** in FY2025: **$285,407,838** over the four years,
+  and nothing before or after. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_federal_money_beside_category_three.rs))
+
+  ### It was never enacted
+
+  Every catalog edition records the line's enacted appropriation as $0. The money arrived as a
+  federal grant, and the line was raised mid-biennium. So the only appropriation figures are
+  adjusted ones, and the catalog states two of them: **$254,755,326** for FY2023 in the 2022
+  edition, and **$64,585,482** for FY2025 in the 2024 edition. No held edition states one for
+  FY2022 or FY2024, and none is filled in here. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_federal_money_beside_category_three.rs))
+
+  The unspent part did not lapse. In May 2023 "the Controlling Board approved the reallocation of
+  $52.4 million in unused EANS funds for other purposes in accordance with federal law", half to "a
+  program similar to EANS" and half to tutoring for public and nonpublic pupils. [verified]
+  ([`lsc-dew-redbook`](../../catalog/lsc-dew-redbook.md)) H.B. 33 then earmarked $1 million of the
+  line's FY2024 balance for a Montgomery County pupil transportation pilot, from "reallocated
+  federal Emergency Assistance to Non-Public Schools (EANS) funds that went unused for their
+  original purpose". [verified]
+  ([`lsc-education-greenbooks.txt`](../../../crates/project/fixtures/lsc-education-greenbooks.txt))
+  So the later actuals are not all services to nonpublic schools: some of the FY2024 and FY2025
+  spending is reallocated money, and the catalog does not separate it. [inference]
+
+  ### Beside Category 3, not inside it
+
+  Year by year EANS came to between a fifth and two fifths of what Category 3 paid: 24.3% in
+  FY2022, 41.3% in FY2023, 36.5% in FY2024 and 20.0% in FY2025. Over the four years together it
+  was **30.5%** of Category 3, and its four-year total is more than Category 3 paid in FY2025,
+  $242,688,919. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_federal_money_beside_category_three.rs))
+
+  These are comparisons of size and nothing more. A per-pupil figure that added the two would
+  divide federal services by a state membership. It would also show an FY2023 jump that no
+  Category 3 line made and an FY2026 fall that was the grant ending, not a state cut.
+
+  ### The line number has been three programs
+
+  ALI 200651 was Child Nutrition Services in fund 5B1, then Title IID Technology in fund 3DM0
+  under the 2009 stimulus, and only then EANS in fund 3HQ0. Read by ALI alone, the catalog shows
+  spending in FY2002-FY2004 and FY2010-FY2012 as well as FY2022-FY2025, and only the last four
+  years are this program. The series here is read by fund and line together, and a fourth use of
+  the number would fail the test that pins the three. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_federal_money_beside_category_three.rs))
+properties:
+  name: Emergency Assistance to Non-Public Schools
+  mechanism: direct-appropriation
+  mechanism_note: |
+    The nearest of the six mechanisms, and not an exact fit. The state passed a federal grant
+    through an appropriation line to services that public agencies bought for each applying school.
+    Nothing is deducted, nobody competed for it and no funding unit is paid, so
+    `direct-appropriation` is the closest. Unlike [auxiliary services](auxiliary-services.yml), the
+    school never received money under the American Rescue Plan round: section 2002 bars
+    reimbursements to any non-public school. [verified] The first round permitted some
+    reimbursement, and how much of Ohio's spending took that form is not held. [open]
+  eligibility: |
+    Nonpublic schools that applied, with priority to those enrolling a significant percentage of
+    low-income students and most affected by the pandemic. [verified] The federal act sets the
+    state's allotment by the count of low-income nonpublic pupils aged 5 through 17, but Ohio's
+    allocation to schools used a weighted per-pupil approach. The weights are not published in any
+    source held here. [open]
+  amount: |
+    A weighted per-pupil amount for each applying school, delivered as services or assistance
+    rather than cash. Statewide it spent $285.4 million over FY2022-FY2025. [verified] What any one
+    school received is not held. [open]
+  appropriation_line: |
+    Fund 3HQ0, ALI 200651, read from `crates/project/fixtures/catalog-line-items.csv` by fund and
+    line together through `project::ledger::nonpublic_federal`. [verified]
+unfilled:
+  - field: Ohio's federal award under each round
+    why: |
+      The two acts set the national totals and the allotment formula. Ohio's allotment in each round
+      is in the U.S. Department of Education's award notices, which no source here retrieves, so the
+      share of the award Ohio spent cannot be computed.
+  - field: what each nonpublic school received
+    why: |
+      The department's allocations to schools and the ESCs' contracts are the only record of who
+      was served. No source here publishes them, so this node cannot say which schools the money
+      reached or whether it followed the low-income priority.
+figures:
+  - key: project/eans-actual-fy2022
+    value: 55331436
+    field: findings
+    as_written: "**$55,331,436** in FY2022"
+  - key: project/eans-actual-fy2023
+    value: 95051480
+    field: findings
+    as_written: "**$95,051,480** in FY2023"
+  - key: project/eans-actual-fy2024
+    value: 86446473
+    field: findings
+    as_written: "**$86,446,473** in FY2024"
+  - key: project/eans-actual-fy2025
+    value: 48578449
+    field: findings
+    as_written: "**$48,578,449** in FY2025"
+  - key: project/eans-total-fy2022-fy2025
+    value: 285407838
+    field: findings
+    as_written: "**$285,407,838** over the four years"
+  - key: project/eans-adjusted-fy2023
+    value: 254755326
+    field: findings
+    as_written: "**$254,755,326** for FY2023"
+  - key: project/eans-adjusted-fy2025
+    value: 64585482
+    field: findings
+    as_written: "**$64,585,482** for FY2025"
+  - key: project/eans-against-category-three-fy2022-fy2025
+    value: 0.305
+    field: findings
+    as_written: "**30.5%** of Category 3"
+links:
+  - target: ../program.ont.yml
+    relationship: instance-of
+  - target: auxiliary-services.yml
+    relationship: parallels
+    note: >-
+      The state line that buys secular services for the same schools through public agencies. EANS
+      did the same with federal money for four years, beside it and never added to it.
+  - target: nonpublic-administrative-cost-reimbursement.yml
+    relationship: parallels
+    note: >-
+      The other Category 3 line that the four-year comparison is measured against.
+  - target: ../revenue-stream/esser.yml
+    relationship: enacted-beside
+    note: >-
+      The same three acts' public-school channel. EANS was reserved out of the Governor's fund in
+      the second act and funded on its own in the third.
+  - target: ../../catalog/us-public-laws.md
+    relationship: sourced-from
+    note: >-
+      Pub. L. 116-260, division M, section 312(d), and Pub. L. 117-2, section 2002: the allotment
+      formula, the public-control rule and the bar on reimbursement.
+  - target: ../../catalog/lsc-catalog-of-budget-line-items.md
+    relationship: sourced-from
+    note: >-
+      The actual and adjusted series, read by fund and ALI together because ALI 200651 has been
+      three programs.
+  - target: ../../catalog/lsc-dew-redbook.md
+    relationship: sourced-from
+    note: >-
+      The federal source, the legal basis, how Ohio allocated and delivered the money, and the May
+      2023 reallocation.

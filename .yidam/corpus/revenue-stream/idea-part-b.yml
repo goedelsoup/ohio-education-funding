@@ -23,10 +23,11 @@ description: |
   **The proportionate share is a real deduction.** Part B requires a district to spend a
   proportionate share of its allocation on children with disabilities enrolled by their parents in
   non-public schools within its boundaries — money the district administers and does not control.
-  The FY2021 allocation file carries it as its own column beside the district's own count.
-  [verified] ([`ode-idea-part-b-allocations`](../../catalog/ode-idea-part-b-allocations.md))
+  Each allocation file carries it as its own column beside the district's own count, and four
+  years of it are now a held series. [verified]
+  ([`ode-idea-part-b-allocations`](../../catalog/ode-idea-part-b-allocations.md))
 
-  **The receiving-entity list is not the district list.** The FY2021 file lists 979 entities:
+  **The receiving-entity list is not the district list.** The FY2021 file lists 997 entities:
   traditional districts, community schools, and county boards of developmental disabilities.
   **Joint vocational school districts do not appear at all**, because federal special education
   money reaches career-technical students through their member districts — so a statewide roll-up
@@ -40,6 +41,50 @@ description: |
   figure has run far below that for the whole life of the statute, which is why the shortfall is a
   standing item in every state's budget politics. The Ohio-specific number is not established
   here. [open]
+findings: |
+  ### The proportionate share, as the department's files add up
+
+  The four final editions put the statewide proportionate share at **$15,174,643.47** in FY2021,
+  **$15,560,688.50** in FY2022, **$16,267,189.29** in FY2023 and **$16,433,446.71** in FY2024. No
+  edition prints a total row, so each figure is this repository's sum of every agency's cell.
+  [verified]
+  ([`crates/project`](../../../crates/project/tests/the_federal_money_beside_category_three.rs))
+
+  In FY2024 the share was **3.65%** of the school-age allocation. It was owed by **232** agencies,
+  and the same editions count **10,245** non-public school students with disabilities. Every other
+  agency on the list owes nothing. Across the four years the share stays between 3.6% and 3.9% of
+  the allocation, and the number of agencies owing it between 225 and 232. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_federal_money_beside_category_three.rs))
+
+  FY2021's count is a floor. Fifty-seven of its nonpublic count cells are printed `<10`, and
+  Brookville Local's share is printed blank rather than zero. FY2022 to FY2024 suppress no
+  nonpublic count. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_federal_money_beside_category_three.rs))
+
+  ### Beside Category 3, never inside it
+
+  The share is the second federal channel that reaches chartered nonpublic pupils, after
+  [Emergency Assistance to Non-Public Schools](../program/emergency-assistance-to-nonpublic-schools.yml).
+  It is smaller than either that program or any year of Category 3, and it is not paid to the
+  schools at all. The district keeps the money and buys services it controls for the pupils.
+  Adding it to [auxiliary services](../program/auxiliary-services.yml) would turn a federal
+  set-aside inside a public district's grant into a state payment to private schools. [inference]
+
+  The FY2022 American Rescue Plan supplement carries a proportionate share of its own. It is a
+  separate grant and is not included above. [verified]
+  ([`ode-idea-part-b-allocations`](../../catalog/ode-idea-part-b-allocations.md))
+revisions:
+  - was: |
+      The description said the FY2021 allocation file "lists 979 entities".
+    now: |
+      It lists 997. The count was made by hand before the file was parsed. The connector now reads
+      every IRN line, refuses a duplicate, and the test pins 997 rows for FY2021.
+    found_by: |
+      Building `dew-idea-part-b` for
+      [#762](https://github.com/goedelsoup/ohio-education-funding/issues/762).
+    reach: |
+      One count. The claim it supports, that the list is not the district list, is unchanged, and
+      the catalog entry carried the same figure and is corrected with it.
 properties:
   name: Individuals with Disabilities Education Act, Part B — Grants to States
   level: federal
@@ -71,18 +116,19 @@ properties:
     identified population has grown since 1999 is funded on a twenty-five-year-old base.
     [inference]
   series_path: |
-    No IDEA-specific series. Target remains
-    [`ode-idea-part-b-allocations`](../../catalog/ode-idea-part-b-allocations.md) — cataloged,
-    with a known reader (`pdftotext -layout`) and no connector. IDEA is inside the undifferentiated
-    federal column of crates/dispersion/fixtures/f33-ohio-panel.csv and cannot be separated from
-    it.
+    `crates/project/fixtures/idea-part-b-allocations.csv`, built by the `dew-idea-part-b` connector
+    from the department's final allocation editions for FY2021-FY2024. It has one row per agency
+    per year, keyed on IRN, with both student counts, the allocation and the proportionate share.
+    `project::ledger::nonpublic_federal::idea_part_b` totals it by year. [verified]
 
-    The allocation tables are cataloged and have never been retrieved: they are one PDF per fiscal
-    year, and `pdftotext -layout` reads them cleanly, so this is extraction work rather than a
-    blocker. [verified]
+    In the F-33 panel, crates/dispersion/fixtures/f33-ohio-panel.csv, IDEA is still inside the
+    undifferentiated federal column and cannot be separated from it.
 unfilled:
-  - field: an IDEA-specific series
-    why: Target remains the department's Part B allocations, cataloged and not extracted.
+  - field: the series before FY2021 and the American Rescue Plan supplement
+    why: |
+      The department serves FY2011-FY2020 as `_Adjusted` editions in a different layout, and the
+      FY2022 supplement is a second grant with its own share. Neither is read, so the series is
+      four years long and covers the regular grant only.
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of
@@ -98,3 +144,37 @@ links:
     relationship: bears-on
   - target: ../../catalog/ode-idea-part-b-allocations.md
     relationship: sourced-from
+  - target: ../program/emergency-assistance-to-nonpublic-schools.yml
+    relationship: parallels
+    note: >-
+      The other federal channel to chartered nonpublic pupils. Both are measured beside Category 3
+      and neither is added to it.
+figures:
+  - key: project/idea-proportionate-share-fy2021
+    value: 15174643.47
+    field: findings
+    as_written: "**$15,174,643.47** in FY2021"
+  - key: project/idea-proportionate-share-fy2022
+    value: 15560688.5
+    field: findings
+    as_written: "**$15,560,688.50** in FY2022"
+  - key: project/idea-proportionate-share-fy2023
+    value: 16267189.29
+    field: findings
+    as_written: "**$16,267,189.29** in FY2023"
+  - key: project/idea-proportionate-share-fy2024
+    value: 16433446.71
+    field: findings
+    as_written: "**$16,433,446.71** in FY2024"
+  - key: project/idea-proportionate-share-rate-fy2024
+    value: 0.0365
+    field: findings
+    as_written: "the share was **3.65%** of the school-age allocation"
+  - key: project/idea-sharing-agencies-fy2024
+    value: 232
+    field: findings
+    as_written: "owed by **232** agencies"
+  - key: project/idea-nonpublic-swd-fy2024
+    value: 10245
+    field: findings
+    as_written: "count **10,245** non-public school students with disabilities"

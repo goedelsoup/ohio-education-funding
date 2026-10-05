@@ -23,7 +23,7 @@ description: |
   serves.
 
   **An absence that confirms the point.** This agency does not appear in the FY2021 IDEA Part B
-  allocation list, which names 979 entities including every traditional district, community
+  allocation list, which names 997 entities including every traditional district, community
   school, and county board of developmental disabilities in the state. [verified] Federal
   special education money flows to JVSD students through their member districts, not to the
   JVSD — so a JVSD is invisible in a dataset that otherwise covers everything. [inference]
@@ -176,6 +176,17 @@ properties:
       crates/dispersion/fixtures/f33-ohio-panel.csv           FY2023-FY2024 for this agency
       crates/dispersion/fixtures/mr81-sponsor-panel.csv       1998-2014 free and reduced lunch
 revisions:
+  - was: |
+      The FY2021 IDEA Part B list "names 979 entities".
+    now: |
+      It names 997. The count was made by hand. The list is now parsed into
+      `idea-part-b-allocations.csv`, and IRN 051003 is absent from all four editions it holds,
+      FY2021 to FY2024.
+    found_by: |
+      Building the `dew-idea-part-b` connector for
+      [#762](https://github.com/goedelsoup/ohio-education-funding/issues/762).
+    reach: |
+      One count. The absence it supports holds in every edition read, not only FY2021.
   - was: |
       "IRN, member district list, enrollment, and funding series remain unpopulated." The node
       said this while its own `irn` property carried 051003 and its own `series_path` named the

@@ -396,15 +396,21 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * Recomputed at **1196/82** when the scholarship charts were read and set against the October the
  * rate divides by (#761). Seven bindings, no new carrier, again all on `program/auxiliary-services`:
  * the share's two ends in FY2017 and FY2025, FY2024's floor, and the two growths it compares.
+ *
+ * Recomputed at **1211/84** when the federal money beside Category 3 was read (#762). Fifteen
+ * bindings and two new carriers: `program/emergency-assistance-to-nonpublic-schools`, with EANS's
+ * four actuals, its total, its two adjusted appropriations and its size against Category 3, and
+ * `revenue-stream/idea-part-b`, which had bound nothing before and now binds the proportionate
+ * share's four years, its FY2024 rate, and the agencies and pupils it was owed for.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1196 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1196,
+  expect(bindings.length, "1211 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1211,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "82 nodes carry bindings; raise this when an eighty-third does",
-  ).toBeGreaterThanOrEqual(82);
+    "84 nodes carry bindings; raise this when an eighty-fifth does",
+  ).toBeGreaterThanOrEqual(84);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

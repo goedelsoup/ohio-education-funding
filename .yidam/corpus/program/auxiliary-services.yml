@@ -205,6 +205,33 @@ findings: |
   security officers with them. The vendored section carries the act as its own source and shows
   both changes in divisions (D), (E) and (P). [verified]
   ([`crates/project`](../../../crates/project/tests/the_lines_that_pay_the_nonpublic_schools.rs))
+
+  ### GRF 200492 is not the earmark
+
+  Its title, "College Credit Plus – Auxiliary Funding", reads like this line's College Credit Plus
+  earmark moved onto a line of its own. It is a different program. The H.B. 33 greenbook files it
+  as C2:6, under Category 2, Educational Enhancements, and not under Category 3. The line "will
+  be used by DEW to provide grants to school districts offering new College Credit Plus courses
+  taught in secondary schools by high school teachers with appropriate credentials", at least
+  $1,000 for each new course. The same greenbook still prints the nonpublic earmark inside 200511,
+  as C3:1. [verified]
+  ([`lsc-education-greenbooks.txt`](../../../crates/project/fixtures/lsc-education-greenbooks.txt))
+
+  So 200492 pays public districts. It spent $904,000 in FY2025 while the earmark inside 200511
+  spent $2,739,015, and the quotient is net of the earmark alone. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_rate_the_greenbooks_published.rs))
+
+  ### Federal money beside it
+
+  Two federal channels bought services for the same schools while this line ran, and neither is
+  part of Category 3. [Emergency Assistance to Non-Public
+  Schools](emergency-assistance-to-nonpublic-schools.yml) spent $285.4 million over FY2022-FY2025.
+  The [IDEA Part B proportionate share](../revenue-stream/idea-part-b.yml) is about $16 million a
+  year. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_federal_money_beside_category_three.rs))
+  Title I's equitable-services share is a third and is not sized. [open] All three are
+  delivered by public agencies and none is a payment to the school, so the statewide card shows
+  the two that are sized as a separate layer and never adds them to this line.
 properties:
   name: Auxiliary Services
   mechanism: direct-appropriation
@@ -411,6 +438,11 @@ figures:
 links:
   - target: ../program.ont.yml
     relationship: instance-of
+  - target: emergency-assistance-to-nonpublic-schools.yml
+    relationship: parallels
+    note: >-
+      Federal pandemic money that bought services for the same schools through public agencies
+      from FY2022 to FY2025. Shown beside this line and never added to it.
   - target: nonpublic-administrative-cost-reimbursement.yml
     relationship: parallels
     note: >-

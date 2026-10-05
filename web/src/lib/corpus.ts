@@ -1380,7 +1380,9 @@ export function loadCorpus(): Corpus {
  * title, so a new record whose slug needs a word here fails there rather than shipping "mr81".
  */
 const DECISION_WORDS: Record<string, string> = {
+  b: "B",
   greenbook: "Greenbook",
+  idea: "IDEA",
   jvsd: "JVSD",
   mr81: "MR-81",
   ohio: "Ohio",

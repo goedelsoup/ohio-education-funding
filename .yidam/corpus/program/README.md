@@ -22,6 +22,11 @@ this repository since the 2006 catalog edition and read by nothing until now. Th
 the corpus's clearest worked contrast between the two mechanisms this class names: one divides an
 appropriation by a membership, the other repays what a school can show it spent.
 
+[Emergency Assistance to Non-Public Schools](emergency-assistance-to-nonpublic-schools.yml) is
+the federal money beside that pair: a pandemic grant that bought services for the same schools
+through public agencies from FY2022 to FY2025. It is the only program here paid from a federal
+fund, and it is measured against the state lines and never added to them.
+
 See the class definition: [program.ont.yml](../program.ont.yml).
 
 ## Instances
@@ -30,6 +35,7 @@ See the class definition: [program.ont.yml](../program.ont.yml).
 |------|-----------|-----------|
 | [auxiliary-services](auxiliary-services.yml) | direct appropriation | Toward chartered nonpublic school |
 | [nonpublic-administrative-cost-reimbursement](nonpublic-administrative-cost-reimbursement.yml) | reimbursement | Toward chartered nonpublic school |
+| [emergency-assistance-to-nonpublic-schools](emergency-assistance-to-nonpublic-schools.yml) | direct appropriation, federal | Toward chartered nonpublic school, as services |
 | [cleveland-scholarship](cleveland-scholarship.yml) | scholarship | Away from resident district |
 | [edchoice-expansion](edchoice-expansion.yml) | scholarship | Away from resident district |
 | [classroom-facilities-assistance](classroom-facilities-assistance.yml) | capital assistance | Toward district |
