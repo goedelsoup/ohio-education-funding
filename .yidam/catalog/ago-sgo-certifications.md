@@ -1,5 +1,6 @@
 ---
-used-by: []
+used-by:
+  - ../corpus/program/scholarship-donation-credit.yml
 ---
 # Scholarship granting organization certifications — Ohio Attorney General
 
