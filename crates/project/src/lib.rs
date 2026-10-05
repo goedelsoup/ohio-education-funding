@@ -71,6 +71,7 @@ pub mod counts;
 pub mod crosswalk;
 pub mod decline_adjustment;
 pub mod decline_reach;
+pub mod donation_credit;
 pub mod drafts;
 pub mod enrollment_decline;
 pub mod esser;
