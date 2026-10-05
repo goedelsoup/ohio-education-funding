@@ -1988,6 +1988,35 @@ pub fn rebuild(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         },
     );
 
+    // The IDEA Part B allocations and their proportionate share, oldest edition first.
+    out.push(
+        match (|| -> Result<Vec<Vec<String>>, String> {
+            let mut rows = Vec::new();
+            for (key, fiscal_year) in [
+                ("idea-part-b-fy21", 2021),
+                ("idea-part-b-fy22", 2022),
+                ("idea-part-b-fy23", 2023),
+                ("idea-part-b-fy24", 2024),
+            ] {
+                let text =
+                    cache::pdf_text(root, registered(key)).map_err(|cause| cause.to_string())?;
+                rows.extend(
+                    fixtures::idea_part_b_allocations(&text, fiscal_year)
+                        .map_err(|cause| format!("{key}: {cause}"))?,
+                );
+            }
+            Ok(rows)
+        })() {
+            Ok(rows) => csv_fixture(
+                root,
+                fixtures::IDEA_PART_B_FIXTURE,
+                fixtures::IDEA_PART_B_HEADER,
+                &rows,
+            )?,
+            Err(reason) => Rebuilt::skipped(fixtures::IDEA_PART_B_FIXTURE, reason),
+        },
+    );
+
     // School districts across legislative seats. The last extraction because it is the only one
     // that depends on another fixture's contents rather than only on a cached publication: the
     // panel it apportions is the FY2027 model's 609 districts.

@@ -1,0 +1,59 @@
+id: idea-part-b-connector
+summary: >-
+  dew-idea-part-b: the department's FY2021-FY2024 final IDEA Part B allocations, read into one
+  panel keyed on IRN, so the proportionate share for parentally placed nonpublic pupils is a held
+  number rather than a hand citation.
+context: |
+  [#762](https://github.com/goedelsoup/ohio-education-funding/issues/762) asked what federal money
+  reaches chartered nonpublic schools beside the state's Category 3 lines, and named IDEA's
+  proportionate share as one channel. `revenue-stream/idea-part-b` described the share in prose
+  and cited the FY2021 allocation file by hand. The catalog entry for that file said "cataloged,
+  never retrieved", and the blocker it named was a PDF reader for each year.
+
+  The department still serves every edition from FY2011 on, from one folder named for FY2015.
+  The four final editions FY2021-FY2024 share a layout of six columns: IRN, name, public students
+  with disabilities, nonpublic students with disabilities, the school-age allocation, and the
+  proportionate share. FY2011-FY2020 are `_Adjusted` editions in a different layout, and FY2022
+  has a second, American Rescue Plan edition with its own share.
+decision: |
+  Declare `dew-idea-part-b`, `Wired`, with the four final editions FY2021-FY2024 as sources, and
+  build `crates/project/fixtures/idea-part-b-allocations.csv`: one row per agency per fiscal year,
+  keyed on IRN.
+
+  **The name is dropped.** A long name wraps onto the line above or below the IRN, so the line
+  that carries the numbers often carries a fragment of the name. The IRN is the key, and names
+  are not unique in Ohio, so rebuilding the name from neighboring lines would add a column that
+  is wrong for some rows and gives no sign of it.
+
+  **Each row is read from the right.** The editions differ in spacing, in thousands separators,
+  and in how a zero share is printed (a bare `0` in FY2021). They agree on the order of the
+  trailing cells, so share, allocation and the two counts are taken from the end of each IRN
+  line, and an IRN line with no allocation at its end fails the rebuild.
+
+  **Absences are kept as printed.** Blank counts beside a `$0.00` allocation stay blank. The
+  suppression marks `<10` and `-` stay verbatim. FY2021 prints no share for Brookville Local
+  (048678), and that cell stays blank rather than becoming zero.
+consequences: |
+  **The share is a held series.** Statewide, the proportionate share is $15,174,643.47 in FY2021,
+  $15,560,688.50 in FY2022, $16,267,189.29 in FY2023 and $16,433,446.71 in FY2024, between 3.6% and
+  3.9% of the school-age allocation, owed by 225 to 232 agencies. The ledger reads these totals
+  from the fixture. They are not copied into prose.
+
+  **The editions print no total row,** so nothing published checks the sum. What does check the
+  read is that every IRN line parses, no IRN appears twice in an edition, and each edition names
+  the year it is registered for.
+
+  **The ARP supplement and the earlier layout are not read.** The share above is the regular
+  Part B grant only. The status names both gaps.
+alternatives: |
+  **Read FY2011-FY2020 in the same pass.** Deferred. The `_Adjusted` editions print a zero as
+  `$ -` and lay their columns out differently. #762 asks for the share as it stands, and four
+  years state it. A second reader would extend the series back without changing what it shows.
+
+  **Sum the ARP supplement into the FY2022 share.** Rejected. It is a separate grant with its own
+  appropriation, and adding it would make FY2022 look like a jump in the regular program.
+
+  **Keep the name for readability.** Rejected for the reason in the decision. A reader that wants
+  a name joins on IRN to a directory that holds one.
+connectors:
+  - dew-idea-part-b

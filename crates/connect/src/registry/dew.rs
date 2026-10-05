@@ -3328,3 +3328,87 @@ pub(super) const DIRECTORY: Connector = Connector {
                as `=\"057539\"` so a spreadsheet keeps the leading zero.",
     }],
 };
+
+/// The base of every IDEA Part B allocation edition the department still serves.
+///
+/// The folder is named for FY2015 and holds every edition since: a `getattachment` path is the
+/// page the file was first attached to, not the year it describes.
+macro_rules! idea_part_b_url {
+    ($name:literal) => {
+        concat!(
+            "https://education.ohio.gov/getattachment/Topics/Special-Education/\
+             Special-Education-Data-and-Funding/Special-Education-Part-B-Allocations/\
+             Fiscal-Year-FY-15-IDEA-Part-B-Allocation/",
+            $name,
+            ".pdf.aspx?lang=en-US"
+        )
+    };
+}
+
+pub(super) const IDEA_PART_B: Connector = Connector {
+    key: "dew-idea-part-b",
+    publisher: "Ohio Department of Education and Workforce",
+    feeds: &["revenue-stream", "program", "education-agency"],
+    status: Status::Wired {
+        still_blocked: Some(
+            "wired for the four final editions FY2021-FY2024, which share one column layout. \
+             FY2011-FY2020 are served from the same folder as `_Adjusted` editions in a \
+             different layout and are not read; the FY2022 American Rescue Plan supplement \
+             carries its own proportionate share and is not read; FY2025 and later have no \
+             final edition on the page, only an estimate",
+        ),
+    },
+    note: "The department's per-agency IDEA Part B subgrants, with the proportionate share \
+           34 CFR 300.133 sets aside for parentally placed nonpublic pupils. The only held \
+           source that prices federal special-education money reaching nonpublic schools. See \
+           .yidam/decisions/idea-part-b-connector.yml.",
+    sources: &[
+        Source {
+            key: "idea-part-b-fy24",
+            title: Some("FY24 Final Allocations for IDEA Part B"),
+            url: idea_part_b_url!("FY24-Final-Allocations-for-IDEA-Part-B"),
+            filename: "idea-part-b-fy24.pdf",
+            format: Format::Pdf,
+            catalog: Some("ode-idea-part-b-allocations"),
+            fixtures: &[crate::fixtures::IDEA_PART_B_FIXTURE],
+            note: "1,024 agencies. Eleven are listed with blank counts and a $0.00 allocation, \
+                   among them the state schools for the deaf and the blind.",
+        },
+        Source {
+            key: "idea-part-b-fy23",
+            title: Some("FY23 Final Allocations IDEA Part B"),
+            url: idea_part_b_url!("FY23-Final-Allocations-IDEA-Part-B"),
+            filename: "idea-part-b-fy23.pdf",
+            format: Format::Pdf,
+            catalog: Some("ode-idea-part-b-allocations"),
+            fixtures: &[crate::fixtures::IDEA_PART_B_FIXTURE],
+            note: "1,007 agencies.",
+        },
+        Source {
+            key: "idea-part-b-fy22",
+            title: Some("FY22 Final IDEA Part B Allocations"),
+            url: idea_part_b_url!("FY22-Final-IDEA-Part-B-Allocations"),
+            filename: "idea-part-b-fy22.pdf",
+            format: Format::Pdf,
+            catalog: Some("ode-idea-part-b-allocations"),
+            fixtures: &[crate::fixtures::IDEA_PART_B_FIXTURE],
+            note: "995 agencies. Suppresses a small count as `-`, kept verbatim.",
+        },
+        Source {
+            key: "idea-part-b-fy21",
+            title: Some(
+                "Fiscal Year 2021 IDEA Part B Special Education funds allocation to districts",
+            ),
+            url: idea_part_b_url!(
+                "Fiscal-Year-2021-IDEA-Part-B-Special-Education-funds-allocation-to-districts"
+            ),
+            filename: "idea-part-b-fy21.pdf",
+            format: Format::Pdf,
+            catalog: Some("ode-idea-part-b-allocations"),
+            fixtures: &[crate::fixtures::IDEA_PART_B_FIXTURE],
+            note: "997 agencies. Suppresses a small count as `<10` and prints a zero share as a \
+                   bare `0`; Brookville Local (048678) has no share printed at all, and its \
+                   cell stays blank.",
+        },
+    ],
+};

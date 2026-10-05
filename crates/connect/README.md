@@ -77,9 +77,10 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | `dew-child-nutrition` | **wired**, in part | 34 | education-agency, metric, formula-component |
 | `dew-school-improvement` | **wired**, in part | 3 | school, education-agency, accountability-regime |
 | `dew-nonpublic-enrollment` | **wired**, in part | 23 | school, metric, program |
+| `dew-idea-part-b` | **wired**, in part | 4 | revenue-stream, program, education-agency |
 | `jhu-homeschool-hub` | **wired**, in part | 1 | metric, education-agency |
 
-28 connectors, 427 sources between them. 25 are wired and 3 are not; 14 of the wired ones reach only part of what they feed, and say so below.
+29 connectors, 431 sources between them. 26 are wired and 3 are not; 15 of the wired ones reach only part of what they feed, and say so below.
 
 **What is blocked, in the registry's own words.**
 
@@ -98,9 +99,10 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 - `dew-child-nutrition` — still blocked on: wired for every October the archive holds, 1998 through 2014, across all three of the streams the report splits into from 2012. Three things it still cannot reach: October 2014 is where the directory stops, nine years short of the corpus's FY2024 observations; the three split Octobers have a band and not a poverty share, because community-eligibility sponsors collect no applications at all; and the 1998-2000 files state no sponsor type, so some thirty-five sponsors a year predate the FY2001 file they borrow one from and stay untyped
 - `dew-school-improvement` — still blocked on: wired for the current identification lists only. The department republishes each list in place under a dated filename rather than archiving prior cycles, so there is no history here: a school that exited before this file was written is indistinguishable from one never identified
 - `dew-nonpublic-enrollment` — still blocked on: wired for every October the department publishes, 1977 through 2025, at the building and at the sector. No file in any of the three eras carries the district a building sits in, which is what auxiliary services under R.C. 3317.024(E)(1) pays through. `dew-directory` now supplies it for the schools open today, keyed on building IRN — and only for them, and only at their present address: an October before the directory's is not reached, and a building that has since closed has no address to place. County and school type are published for 1977-78 through 2006-07 and then stop
+- `dew-idea-part-b` — still blocked on: wired for the four final editions FY2021-FY2024, which share one column layout. FY2011-FY2020 are served from the same folder as `_Adjusted` editions in a different layout and are not read; the FY2022 American Rescue Plan supplement carries its own proportionate share and is not read; FY2025 and later have no final edition on the page, only an estimate
 - `jhu-homeschool-hub` — still blocked on: One school year per district, and the workbook labels it wrongly. The department holds the R.C. 3321.042 notice counts per district for every year and releases them on request; nothing below the state total is published, so the other years need a records request rather than a connector. What the count measures — notices received or children named on them — is undocumented and the two differ by household size.
 
-17 of them have no long form in [`sources/`](sources/): `dew-report-card`, `eia-diesel`, `dew-five-year-forecast`, `dew-scholarship-reports`, `dew-facts-and-figures`, `dew-typology`, `lsc-catalog`, `ohio-session-laws`, `ohio-bill-versions`, `ohio-bills`, `ohio-auditor`, `dew-directory`, `census-geography`, `dew-child-nutrition`, `dew-school-improvement`, `dew-nonpublic-enrollment`, `jhu-homeschool-hub`. Those are the connectors added after the original nine stubs, whose prose was never written — the decision record is the only account of why each exists.
+18 of them have no long form in [`sources/`](sources/): `dew-report-card`, `eia-diesel`, `dew-five-year-forecast`, `dew-scholarship-reports`, `dew-facts-and-figures`, `dew-typology`, `lsc-catalog`, `ohio-session-laws`, `ohio-bill-versions`, `ohio-bills`, `ohio-auditor`, `dew-directory`, `census-geography`, `dew-child-nutrition`, `dew-school-improvement`, `dew-nonpublic-enrollment`, `dew-idea-part-b`, `jhu-homeschool-hub`. Those are the connectors added after the original nine stubs, whose prose was never written — the decision record is the only account of why each exists.
 <!-- /REGEN -->
 
 A `declared` connector says **what blocks it** — that string is a field on the record, and a

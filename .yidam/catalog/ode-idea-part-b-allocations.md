@@ -10,17 +10,15 @@ used-by:
 **Source.** Ohio Department of Education (now DEW), Special Education Data and Funding —
 annual IDEA Part B special education allocation tables, one per fiscal year.
 **Type.** Primary source — official allocation record.
-**Status.** *Cataloged, never retrieved, cited by hand.* There is no connector for it, so
-nothing here rests on bytes this repository holds. Four corpus nodes draw on it anyway: two
-name the federal channel itself, and two are districts read off the FY2021 list by hand. It is
-kept because the special education weights are a live question the corpus cannot currently
-answer — federal IDEA money is a separate channel from Ohio's six special education categories
-and is often conflated with them — and the entry records where the answer would come from.
-Retrieving it means a PDF-per-year reader, the same blocker as `lsc-budget`. Until then this is
-a pointer, not a source, and the claims resting on it say so.
+**Status.** *Retrieved and parsed for FY2021-FY2024.* The connector
+[`dew-idea-part-b`](../decisions/idea-part-b-connector.yml) fetches the four final editions and
+builds `crates/project/fixtures/idea-part-b-allocations.csv`, one row per agency per year keyed
+on IRN. The two district nodes read off the FY2021 list by hand predate it. FY2011-FY2020 are
+served as `_Adjusted` editions in a different layout and are not read. Neither is the FY2022
+American Rescue Plan supplement, which carries its own proportionate share.
 **Location.** `education.ohio.gov`, Topics → Special Education → Special Education Data and
-Funding → Special Education Part B Allocations. The FY2021 file is
-`Fiscal-Year-2021-IDEA-Part-B-Special-Education-funds-allocation-to-districts.pdf`.
+Funding → Special Education Part B Allocations. Every edition is attached under the
+`Fiscal-Year-FY-15-IDEA-Part-B-Allocation` folder, whatever year it describes.
 
 **What it contains.** One row per receiving entity: IRN, entity name, count of public school
 students with disabilities, count of non-public students with disabilities, the FY allocation
@@ -30,8 +28,9 @@ disabilities.
 
 Used here as the corpus's first source of IRNs and its first per-agency numbers of any kind.
 
-**Access constraints.** Freely available. The PDF does not extract through standard text
-conversion; `pdftotext -layout` reads it cleanly and preserves the column structure.
+**Access constraints.** Freely available. `pdftotext -layout` reads each edition and keeps its
+columns. A long agency name wraps onto the lines around its IRN, so the fixture keeps the IRN
+and drops the name.
 
 **Caveats.**
 
@@ -44,13 +43,14 @@ conversion; `pdftotext -layout` reads it cleanly and preserves the column struct
   from the file itself. This is how
   [`eastland-fairfield-ctc`](../corpus/education-agency/eastland-fairfield-ctc.yml) was
   confirmed as structurally different rather than merely missing.
-- **Small counts are suppressed**, appearing as "<10". Any aggregation must decide how to treat
-  suppressed cells rather than reading them as zero.
+- **Small counts are suppressed**, as "<10" in FY2021 and "-" in FY2022. Any aggregation must
+  decide how to treat suppressed cells rather than reading them as zero.
+- **No edition prints a total row**, so a statewide figure is a sum this repository computes.
 - **Name collisions are real.** "Northern Local" (049056) and "Hardin Northern Local" (047498)
   are different districts. The file carries no county column, so IRN-to-county attribution needs
   a separate crosswalk.
 
 ## Feeds connector
 
-[`dew-foundation`](../../crates/connect/sources/dew-foundation.md), and the IRN crosswalk
-[`nces-ccd`](../../crates/connect/sources/nces-ccd.md) depends on.
+`dew-idea-part-b`, recorded in
+[`idea-part-b-connector`](../decisions/idea-part-b-connector.yml).
