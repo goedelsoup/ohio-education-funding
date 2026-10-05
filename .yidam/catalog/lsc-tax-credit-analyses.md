@@ -1,5 +1,6 @@
 ---
-used-by: []
+used-by:
+  - ../corpus/program/scholarship-donation-credit.yml
 ---
 # LSC analyses of the scholarship donation credit
 
