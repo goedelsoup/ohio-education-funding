@@ -19,6 +19,7 @@ used-by:
   - ../corpus/program/edchoice-scholarship.yml
   - ../corpus/program/jon-peterson-special-needs.yml
   - ../corpus/program/nonpublic-administrative-cost-reimbursement.yml
+  - ../corpus/program/scholarship-donation-credit.yml
   - ../corpus/revenue-stream/casino-tax-distribution.yml
   - ../corpus/revenue-stream/lottery-profits.yml
 ---
