@@ -94,6 +94,24 @@ for; there is no consolidated series to find. The consolidated five-program acco
 is now partly read rather than only named, so the gap in *this* channel is FY2014 through FY2022
 and Jon Peterson's is FY2014 through FY2022 as well.
 
+## The charts fill the gap, and two of them change measure inside it
+
+The report's five participation-by-year charts are now read, which fills that gap for every
+program. None prints a value. They are vector drawings, so `pdftocairo -svg` gives each mark's
+position in page points, and the gridlines the text layer labels give the scale.
+`connect::fixtures::scholarship_charts` reads them into `scholarship-participation.csv`, and each
+row carries its chart's pupils-per-point so a reader can state a tolerance.
+
+At a tenth of a point the charts reproduce all 42 values they share with a printed source. Those
+are the archive through FY2013, this report's own FY2025 counts, and the three Jon Peterson
+editions. That calibration also shows what the charts drew, which is not always what the titles
+say. Traditional EdChoice and Cleveland are titled "participants" and draw the archive's
+**applications** column through FY2013, missing its used column by 2.5 points or more every year.
+Autism draws used. Jon Peterson is titled "applications" and draws what its own editions call
+students. From FY2014 the charts are the department's own system, and this record reads them as
+participants on the FY2025 match. The [auxiliary services](../corpus/program/auxiliary-services.yml)
+node is the first to use the series.
+
 The two editions that are read also correct the shape of that lineage. They were not a rolling
 one-at-a-time replacement: three older JPSN editions were served from this page as late as June
 2023 and gone by June 2024, and FY23 and FY24 were both exported from Word on one afternoon in
