@@ -13,9 +13,9 @@ returns.
 `archives.obm.ohio.gov`; the FY2026-27 edition is `Tax_Expenditure_Report_2026-2027_-_Final.pdf`
 on `dam.assets.ohio.gov`. Both are digest-pinned by the `tax-income-credits` connector.
 
-**What it contains.** One entry for each tax expenditure, with its statute, the year it was
-enacted, a one-paragraph description, an estimate for each of four fiscal years in millions of
-dollars, and a data source code. Code A is the department's own return data, B is data from other
+**What it contains.** One entry for each tax expenditure, with four years of estimates. Each
+entry gives its statute, the year it was enacted, a one-paragraph description, an estimate for
+each of four fiscal years in millions of dollars, and a data source code. Code A is the department's own return data, B is data from other
 governments, and C is everything else.
 
 **What this corpus reads.** Entry 2.25, the credit for donations to scholarship organizations,

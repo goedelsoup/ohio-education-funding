@@ -440,3 +440,8 @@ links:
     note: >-
       The department's archive of the deduct era, FY1997 through FY2013, and the only held source
       that counts applications and payments separately.
+  - target: scholarship-donation-credit.yml
+    relationship: parallels
+    note: >-
+      A second state subsidy for the same tuition, by a different instrument: a tax credit for gifts
+      to an organization that awards scholarships and reports none of them.

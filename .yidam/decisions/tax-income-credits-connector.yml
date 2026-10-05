@@ -1,9 +1,8 @@
 id: tax-income-credits-connector
 summary: >-
-  tax-income-credits: Taxation's Table Y-1 and two Tax Expenditure Report editions, read for R.C.
-  5747.73's scholarship donation credit, so what taxpayers claimed and what Taxation estimated are
-  held series; the Attorney General's certification list is held as a dated extract, and
-  `program.mechanism` gains `tax-credit`.
+  tax-income-credits: what taxpayers claimed under R.C. 5747.73 and what Taxation estimated. Table
+  Y-1 and two Tax Expenditure Report editions are read into held series, the Attorney General's
+  certification list is held as a dated extract, and `program.mechanism` gains `tax-credit`.
 context: |
   [#763](https://github.com/goedelsoup/ohio-education-funding/issues/763) asked for a node on the
   tax-credit scholarship and found that the program class had no mechanism for it. The issue cites

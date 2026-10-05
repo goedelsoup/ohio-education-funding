@@ -357,3 +357,8 @@ links:
     relationship: sourced-from
   - target: ../../catalog/heritage-education-freedom-report-card.md
     relationship: sourced-from
+  - target: scholarship-donation-credit.yml
+    relationship: parallels
+    note: >-
+      The tax credit that H.B. 33 last amended in the same act that made this scholarship
+      universal. It subsidizes the same tuition through forgone tax rather than appropriation.

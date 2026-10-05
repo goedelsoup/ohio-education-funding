@@ -523,10 +523,10 @@ leave the corpus and are not counted.
 -->
 | Measure | Count |
 |---|--:|
-| edges between nodes | 603 |
+| edges between nodes | 605 |
 | distinct relationships in use | 173 |
 | relationships declared across every class | 70 |
-| edges whose relationship its class does not declare | 317 |
+| edges whose relationship its class does not declare | 319 |
 | relationships used exactly once | 84 |
 
 **52% of edges use a relationship the class does not declare**, and 84 of the 173 relationships in use are used a single time. That is the case for `edge_policy: characteristic`: closing the vocabulary would reject those edges or require 84 declarations that each describe one link.
@@ -699,12 +699,12 @@ Sorted by: kind, then alphabetically.
 | [`auxiliary-services`](program/auxiliary-services.yml) | program | Auxiliary Services | 4 | 3 |
 | [`classroom-facilities-assistance`](program/classroom-facilities-assistance.yml) | program | Classroom Facilities Assistance Program | 3 | 2 |
 | [`cleveland-scholarship`](program/cleveland-scholarship.yml) | program | Cleveland Scholarship and Tutoring Program | 4 | 4 |
-| [`edchoice-expansion`](program/edchoice-expansion.yml) | program | EdChoice Expansion Scholarship | 8 | 11 |
-| [`edchoice-scholarship`](program/edchoice-scholarship.yml) | program | Traditional EdChoice Scholarship | 4 | 5 |
+| [`edchoice-expansion`](program/edchoice-expansion.yml) | program | EdChoice Expansion Scholarship | 9 | 11 |
+| [`edchoice-scholarship`](program/edchoice-scholarship.yml) | program | Traditional EdChoice Scholarship | 5 | 5 |
 | [`emergency-assistance-to-nonpublic-schools`](program/emergency-assistance-to-nonpublic-schools.yml) | program | Emergency Assistance to Non-Public Schools | 3 | 3 |
 | [`jon-peterson-special-needs`](program/jon-peterson-special-needs.yml) | program | Jon Peterson Special Needs Scholarship | 4 | 2 |
 | [`nonpublic-administrative-cost-reimbursement`](program/nonpublic-administrative-cost-reimbursement.yml) | program | Nonpublic Administrative Cost Reimbursement | 1 | 2 |
-| [`scholarship-donation-credit`](program/scholarship-donation-credit.yml) | program | Scholarship Donation Credit | 4 | 0 |
+| [`scholarship-donation-credit`](program/scholarship-donation-credit.yml) | program | Scholarship Donation Credit | 4 | 2 |
 | [`casino-tax-distribution`](revenue-stream/casino-tax-distribution.yml) | revenue-stream | Casino Tax — County Student Fund | 6 | 1 |
 | [`esser`](revenue-stream/esser.yml) | revenue-stream | ESSER — Elementary and Secondary School Emergency Relief | 4 | 4 |
 | [`idea-part-b`](revenue-stream/idea-part-b.yml) | revenue-stream | IDEA Part B | 7 | 5 |
@@ -719,7 +719,7 @@ Sorted by: kind, then alphabetically.
 | [`barrington-road-elementary`](school/barrington-road-elementary.yml) | school | Barrington Road Elementary School | 4 | 2 |
 | [`sheridan-high-school`](school/sheridan-high-school.yml) | school | Sheridan High School | 6 | 2 |
 
-137 nodes across 18 classes, and **2 with nothing pointing at them** — counting a citation in somebody's prose as pointing. Whether that is a gap depends on the class: `web/tests/unit/reachability.spec.ts` holds every node to having an inbound *edge* and exempts `draft-legislation`, where a node with nothing pointing at it is the design.
+137 nodes across 18 classes, and **1 with nothing pointing at them** — counting a citation in somebody's prose as pointing. Whether that is a gap depends on the class: `web/tests/unit/reachability.spec.ts` holds every node to having an inbound *edge* and exempts `draft-legislation`, where a node with nothing pointing at it is the design.
 <!-- /REGEN -->
 
 ## Semantic index status
