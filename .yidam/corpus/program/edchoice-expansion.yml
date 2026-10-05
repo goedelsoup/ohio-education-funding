@@ -193,9 +193,9 @@ findings: |
   on this program in FY2027 against 100,011 in FY2025. It is forward-looking and it is LSC's, so
   it bounds the channel's expected size rather than measuring anyone; what makes it worth holding
   is that its column closes on its own printed total in all three years where the dollar column
-  beside it does not. [verified] (crates/project) The whole census of such points — one hundred of
-  them across eight budget analyses, with the reasons not one can be joined to either committed
-  series — is
+  beside it does not. [verified] (crates/project) The whole census of such points — one hundred and
+  two of them, from eight budget analyses and one issue of LSC's *Budget Footnotes*, with the
+  reasons not one can be joined to either committed series — is
   [`scholarship-bounds.tsv`](../../../crates/project/fixtures/scholarship-bounds.tsv), asserted by
   [`crates/project`](../../../crates/project/tests/the_points_that_bound_the_participation_hole.rs).
   [verified]

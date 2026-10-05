@@ -12,8 +12,8 @@
 //! the hole and cannot be spliced onto the series".
 //!
 //! That sentence was the whole of the evidence. Issue #472 asked for it to become a fixture, and
-//! [`project::scholarship::bounds`] is that fixture: one hundred quoted quantities from eight
-//! committed budget analyses, each carrying its denominator, the publisher's hedge, and the
+//! [`project::scholarship::bounds`] is that fixture: one hundred and two quoted quantities from
+//! eight committed budget analyses and one issue of LSC's monthly *Budget Footnotes*, each carrying its denominator, the publisher's hedge, and the
 //! publisher's own words. These tests are what make the fixture an argument rather than a list.
 //!
 //! # What is asserted here
@@ -21,7 +21,7 @@
 //! - **The transcription is re-checked, not trusted.** Every quote must appear verbatim in the
 //!   document its `source` column names, and must contain the row's own value as the publisher
 //!   printed it. A fixture built by reading prose is otherwise correct only on the day it is typed.
-//! - **No bound is joinable.** [`Bound::spliceable`] is `None` for all one hundred, and
+//! - **No bound is joinable.** [`Bound::spliceable`] is `None` for all one hundred and two, and
 //!   [`the_splice_guard_is_not_vacuous`] shows the predicate can say otherwise on each of the
 //!   three series, so the first assertion is a measurement of the fixture and not of the code.
 //! - **The overlap years are the reason.** Five bounds fall inside the archive's own span, where
@@ -53,11 +53,11 @@ const HOLE: std::ops::RangeInclusive<u16> = 2014..=2022;
 #[test]
 fn the_census_is_a_census_and_reaches_across_the_hole() {
     let all = bounds::census();
-    assert_eq!(all.len(), 100);
+    assert_eq!(all.len(), 102);
 
-    // Eight documents — six greenbooks of enacted acts, and both editions of the FY2026-27
-    // analysis — under nine source values, because the redbook's Table 5 is addressed separately
-    // from its prose. The two editions are kept apart for the reason
+    // Nine documents — six greenbooks of enacted acts, both editions of the FY2026-27 analysis, and
+    // the January 2026 issue of *Budget Footnotes* — under eleven source values, because each
+    // edition's scholarship table is addressed separately from its prose. The two editions are kept apart for the reason
     // `project::ledger::budget_analysis` exists: they print the same table under the same heading
     // with different numbers in it.
     let mut sources: Vec<&str> = all.iter().map(|b| b.source.as_str()).collect();
@@ -66,6 +66,7 @@ fn the_census_is_a_census_and_reaches_across_the_hole() {
     assert_eq!(
         sources,
         [
+            "budget-footnotes-2026-01",
             "dew-greenbook",
             "dew-greenbook-table-3",
             "dew-redbook",
@@ -82,7 +83,7 @@ fn the_census_is_a_census_and_reaches_across_the_hole() {
         .iter()
         .map(|s| s.trim_end_matches("-table-5").trim_end_matches("-table-3"))
         .collect::<std::collections::BTreeSet<&str>>();
-    assert_eq!(documents.len(), 8);
+    assert_eq!(documents.len(), 9);
 
     // Where the bounds fall relative to the three series. The census is worth holding because of
     // the middle number: twenty-one quoted quantities in nine years that no fixture measures.
@@ -96,7 +97,7 @@ fn the_census_is_a_census_and_reaches_across_the_hole() {
     let after = all.iter().filter(|b| b.year.0 > *HOLE.end()).count();
     assert_eq!(inside_the_archive, 8);
     assert_eq!(inside_the_hole, 21);
-    assert_eq!(after, 71);
+    assert_eq!(after, 73);
     assert_eq!(inside_the_archive + inside_the_hole + after, all.len());
 
     // And the hole is still a hole: no committed series has grown into it.
@@ -194,7 +195,7 @@ fn no_bound_counts_what_the_archive_counts() {
         "a bound now names one of the archive's denominators"
     );
 
-    // Seven populations across one hundred rows, which is the second reason: the denominator moves
+    // Seven populations across one hundred and two rows, which is the second reason: the denominator moves
     // from row to row, and for two thirds of them the publisher gave none at all.
     let mut used: Vec<Denominator> = all.iter().map(|b| b.denominator).collect();
     used.sort_unstable();
@@ -215,7 +216,7 @@ fn no_bound_counts_what_the_archive_counts() {
         .iter()
         .filter(|b| b.denominator == Denominator::Unstated)
         .count();
-    assert_eq!(unstated, 78);
+    assert_eq!(unstated, 79);
 
     // The FY2026-27 redbook counts two programmes in FTE and three in students, in one sequence of
     // paragraphs about one channel. Nothing in the document reconciles them.
@@ -241,7 +242,7 @@ fn no_bound_counts_what_the_archive_counts() {
 fn three_quarters_of_the_census_is_qualified_or_estimated() {
     let all = bounds::census();
     let hedged = all.iter().filter(|b| b.precision.is_hedged()).count();
-    assert_eq!(hedged, 73);
+    assert_eq!(hedged, 75);
     assert!(hedged * 2 > all.len());
 
     // "Over 480 chartered nonpublic schools" and "over 10,800 K-5 students" — the only two
@@ -274,8 +275,8 @@ fn every_quote_is_verbatim_and_carries_its_own_figure() {
         );
         let printed = as_printed(&bound);
         assert!(
-            bound.quote.contains(&printed),
-            "FY{} {} {:?}: the quote {:?} does not carry {printed}",
+            printed.iter().any(|form| bound.quote.contains(form)),
+            "FY{} {} {:?}: the quote {:?} carries none of {printed:?}",
             bound.year.0,
             bound.program,
             bound.measure,
@@ -717,6 +718,63 @@ fn the_enacted_tables_students_add_up_where_its_payments_do_not() {
     );
 }
 
+/// The only figure after H.B. 96 that is not one of the act's own estimates sits below them.
+///
+/// LSC's January 2026 *Budget Footnotes* counts traditional EdChoice recipients in-year — about
+/// 42,000 as of December 2025 — and estimates their cost at roughly $280 million. The enacted
+/// greenbook's Table 3 had estimated the same year at 45,260 students and $316.5 million. The
+/// in-year figures are below on both measures, by 3,260 students and $36.5 million: the same
+/// direction as Table 5's FY2025 estimate against the annual report, and wider.
+///
+/// Neither row is an actual. Both are hedged, the count is a snapshot of a program with a
+/// year-round application window, and the issue says the figures "may change throughout the school
+/// year". This pins the gap as LSC stated it; whether the year closed there is #780's question.
+#[test]
+fn the_fy2026_footnotes_sit_below_the_enacted_estimate() {
+    let cell = |source: &str, measure: Measure| -> f64 {
+        bounds::census()
+            .into_iter()
+            .find(|b| {
+                b.source == source
+                    && b.program == "traditional-edchoice"
+                    && b.year.0 == 2026
+                    && b.measure == measure
+            })
+            .unwrap_or_else(|| panic!("{source} has no FY2026 traditional {measure:?} row"))
+            .value
+    };
+
+    let in_year = (
+        cell("budget-footnotes-2026-01", Measure::Participation),
+        cell("budget-footnotes-2026-01", Measure::Payments),
+    );
+    let enacted = (
+        cell("dew-greenbook-table-3", Measure::Participation),
+        cell("dew-greenbook-table-3", Measure::Payments),
+    );
+    assert_eq!(enacted.0 - in_year.0, 3_260.0);
+    assert_eq!(enacted.1 - in_year.1, 36_500_000.0);
+
+    // The shortfall is wider in dollars than in heads — 11.5% against 7.2% — so the in-year
+    // average sits below the enacted one too. Not a finding about awards: one is a snapshot and
+    // the other a full-year estimate, so their quotients do not share a denominator.
+    let count_gap = 1.0 - in_year.0 / enacted.0;
+    let dollar_gap = 1.0 - in_year.1 / enacted.1;
+    assert!((count_gap - 0.072).abs() < 0.0005, "{count_gap}");
+    assert!((dollar_gap - 0.115).abs() < 0.0005, "{dollar_gap}");
+
+    // The issue's own arithmetic closes on the annual report: 42,607 students in 2024-25, less the
+    // 1.5% it states, is 41,968, which "approximately 42,000" rounds to the thousand.
+    let footnotes = bounds::source_text("budget-footnotes-2026-01");
+    assert!(footnotes.contains("a 1.5% decrease from FY 2025"));
+    let reported = report::programmes()["traditional-edchoice"].students;
+    assert_eq!(reported, 42_607.0);
+    assert_eq!(
+        (reported * (1.0 - 0.015) / 1_000.0).round() * 1_000.0,
+        in_year.0
+    );
+}
+
 /// The archive's measured figure a bound can be held against, where one exists.
 ///
 /// `None` for every measure the archive does not publish — the averages, the school and provider
@@ -732,14 +790,24 @@ fn archived(bound: &Bound) -> Option<f64> {
         .and_then(|counts| counts.total)
 }
 
-/// The bound's value as its publisher printed it, for checking it against the quote.
+/// The bound's value as its publisher may have printed it, for checking it against the quote.
 ///
 /// Dollar totals are printed in millions to a tenth and everything else in whole units, both with
-/// thousands separators — which is LSC's convention throughout, not a choice made here.
-fn as_printed(bound: &Bound) -> String {
+/// thousands separators — which is LSC's convention throughout, not a choice made here. The one
+/// exception is *Budget Footnotes*' "roughly $280 million", a round figure printed without its
+/// tenth; a whole-million total is therefore also accepted as `$280 million`, which a figure with a
+/// nonzero tenth can never match.
+fn as_printed(bound: &Bound) -> Vec<String> {
     match bound.measure {
-        Measure::Payments => separated(bound.value / 1e6, 1),
-        _ => separated(bound.value, 0),
+        Measure::Payments => {
+            let millions = bound.value / 1e6;
+            let mut forms = vec![separated(millions, 1)];
+            if millions.fract() == 0.0 {
+                forms.push(format!("${} million", separated(millions, 0)));
+            }
+            forms
+        }
+        _ => vec![separated(bound.value, 0)],
     }
 }
 

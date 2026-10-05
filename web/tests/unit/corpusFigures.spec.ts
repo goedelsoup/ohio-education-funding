@@ -407,10 +407,15 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * `program/scholarship-donation-credit` is the eighty-fifth carrier, binding eleven figures: four
  * years of claims and one year's returns, the tax year 2022 average over the single cap, three
  * estimates from two Tax Expenditure Report editions, and two counts of certified organizations.
+ *
+ * Recomputed at **1228/85** when LSC's January 2026 *Budget Footnotes* was registered (#780). Six
+ * bindings, no new carrier, all on `program/traditional-edchoice-scholarship`: the in-year count
+ * and cost for FY2026, the enacted Table 3 estimate for the same year, and the two gaps between
+ * them, bound as gaps because the prose argues from the difference. The floor was at its count.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1222 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1222,
+  expect(bindings.length, "1228 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1228,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,

@@ -1164,6 +1164,20 @@ fn table_three(program: &str, measure: project::scholarship::bounds::Measure, ye
         .value
 }
 
+/// A Traditional EdChoice FY2026 figure from LSC's January 2026 *Budget Footnotes*.
+///
+/// # Panics
+///
+/// If the census holds no Footnotes row for that measure.
+fn footnotes_traditional_fy2026(measure: project::scholarship::bounds::Measure) -> f64 {
+    use project::scholarship::bounds;
+    bounds::of("traditional-edchoice", measure)
+        .into_iter()
+        .find(|b| b.source == "budget-footnotes-2026-01" && b.year.0 == 2026)
+        .unwrap_or_else(|| panic!("the Footnotes have no traditional {measure:?} row"))
+        .value
+}
+
 /// Every figure this repository exports for the corpus to be checked against.
 ///
 /// Ordered by owning crate, then by what the figure is about. The order is the manifest's order,
@@ -4331,6 +4345,90 @@ pub static FIGURES: &[Figure] = &[
                 project::scholarship::bounds::Measure::Participation,
                 2027,
             )
+        },
+    },
+    // The one FY2026 figure after H.B. 96 that is not the act's own estimate: LSC's in-year count
+    // and cost of traditional EdChoice, against the enacted greenbook's Table 3. Bound as levels
+    // and as gaps, since a gap is what the prose argues from and a level binding does not hold it.
+    Figure {
+        key: "project/traditional-enacted-students-fy2026",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "LSC\u{2019}s estimate of traditional EdChoice participation, FY2026, for the \
+                enacted act",
+        pinned: 45_260.0,
+        tolerance: 0.0,
+        compute: |_| {
+            table_three(
+                "traditional-edchoice",
+                project::scholarship::bounds::Measure::Participation,
+                2026,
+            )
+        },
+    },
+    Figure {
+        key: "project/traditional-enacted-payments-fy2026",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "LSC\u{2019}s estimate of traditional EdChoice payments, FY2026, for the enacted act",
+        pinned: 316_500_000.0,
+        tolerance: 1.0,
+        compute: |_| {
+            table_three(
+                "traditional-edchoice",
+                project::scholarship::bounds::Measure::Payments,
+                2026,
+            )
+        },
+    },
+    Figure {
+        key: "project/traditional-footnotes-students-fy2026",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Traditional EdChoice recipients as of December 2025, per LSC\u{2019}s January \
+                2026 Budget Footnotes",
+        pinned: 42_000.0,
+        tolerance: 0.0,
+        compute: |_| {
+            footnotes_traditional_fy2026(project::scholarship::bounds::Measure::Participation)
+        },
+    },
+    Figure {
+        key: "project/traditional-footnotes-payments-fy2026",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "LSC\u{2019}s in-year estimate of traditional EdChoice payments, FY2026, per its \
+                January 2026 Budget Footnotes",
+        pinned: 280_000_000.0,
+        tolerance: 1.0,
+        compute: |_| footnotes_traditional_fy2026(project::scholarship::bounds::Measure::Payments),
+    },
+    Figure {
+        key: "project/traditional-footnotes-students-below-enacted-fy2026",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "How far LSC\u{2019}s in-year count of traditional EdChoice recipients sits below \
+                the enacted estimate, FY2026",
+        pinned: 3_260.0,
+        tolerance: 0.0,
+        compute: |_| {
+            use project::scholarship::bounds::Measure;
+            table_three("traditional-edchoice", Measure::Participation, 2026)
+                - footnotes_traditional_fy2026(Measure::Participation)
+        },
+    },
+    Figure {
+        key: "project/traditional-footnotes-payments-below-enacted-fy2026",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "How far LSC\u{2019}s in-year estimate of traditional EdChoice payments sits below \
+                the enacted estimate, FY2026",
+        pinned: 36_500_000.0,
+        tolerance: 1.0,
+        compute: |_| {
+            use project::scholarship::bounds::Measure;
+            table_three("traditional-edchoice", Measure::Payments, 2026)
+                - footnotes_traditional_fy2026(Measure::Payments)
         },
     },
     Figure {

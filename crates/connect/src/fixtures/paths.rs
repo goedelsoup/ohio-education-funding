@@ -1,6 +1,6 @@
 //! Where every committed fixture is written, and the manifest of the ones the rebuild produces.
 //!
-//! Fifty-eight path constants and [`REBUILT`], which lists the subset a full rebuild
+//! Seventy path constants and [`REBUILT`], which lists the subset a full rebuild
 //! regenerates.
 //!
 //! # Why they are together
@@ -286,6 +286,11 @@ pub const REDBOOK_FIXTURE: &str = "crates/project/fixtures/dew-redbook.txt";
 
 /// The same analysis as enacted. See [`REDBOOK_FIXTURE`], which is the introduced one.
 pub const GREENBOOK_FIXTURE: &str = "crates/project/fixtures/dew-greenbook.txt";
+
+/// One item of LSC's January 2026 *Budget Footnotes*: the traditional EdChoice update, which carries
+/// the only in-year FY2026 participation and cost figures any committed source states.
+pub const FOOTNOTES_EDCHOICE_FIXTURE: &str =
+    "crates/project/fixtures/budget-footnotes-edchoice-2026-01.txt";
 
 /// Where the court opinion extract is written, relative to the repository root.
 pub const OPINIONS_FIXTURE: &str = "crates/regime-diff/fixtures/derolph-opinions.txt";
@@ -597,6 +602,7 @@ pub const REBUILT: &[&str] = &[
     ENACTED_FIXTURE,
     REDBOOK_FIXTURE,
     GREENBOOK_FIXTURE,
+    FOOTNOTES_EDCHOICE_FIXTURE,
     OPINIONS_FIXTURE,
     EDCHOICE_FIXTURE,
     APPROPRIATION_FIXTURE,
