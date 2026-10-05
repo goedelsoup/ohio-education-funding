@@ -1,5 +1,6 @@
 ---
-used-by: []
+used-by:
+  - ../corpus/program/scholarship-donation-credit.yml
 ---
 # Table Y-1 — Ohio individual income tax credits by income class
 
