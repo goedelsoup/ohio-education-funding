@@ -1,0 +1,64 @@
+id: tax-income-credits-connector
+summary: >-
+  tax-income-credits: Taxation's Table Y-1 and two Tax Expenditure Report editions, read for R.C.
+  5747.73's scholarship donation credit, so what taxpayers claimed and what Taxation estimated are
+  held series; the Attorney General's certification list is held as a dated extract, and
+  `program.mechanism` gains `tax-credit`.
+context: |
+  [#763](https://github.com/goedelsoup/ohio-education-funding/issues/763) asked for a node on the
+  tax-credit scholarship and found that the program class had no mechanism for it. The issue cites
+  R.C. 5747.75. That section is the nonchartered nonpublic school tuition credit; the credit for
+  donations to scholarship granting organizations is R.C. 5747.73, and the statute fixture now
+  holds it.
+
+  Three sources describe the credit, and they measure different things. Table Y-1 tabulates what
+  returns claimed, by income class, before the credit is applied to liability. The Tax Expenditure
+  Report estimates revenue forgone for four fiscal years. The Attorney General's list says which
+  organizations could receive a creditable gift. None reports a scholarship awarded.
+decision: |
+  **One connector for Taxation's two publications.** Declare `tax-income-credits`, `Wired`, with
+  the four Y-1 workbooks for tax years 2021-2024 and the FY2024-25 and FY2026-27 Tax Expenditure
+  Reports as sources. Both come from the same department, both are reached anonymously from
+  `dam.assets.ohio.gov` or the budget office's archive, and both describe the same credit. Two
+  fixtures come out: `sgo-credit-claims.csv`, each income class and the `Total` row as printed,
+  and `sgo-credit-estimates.csv`, each edition's four years with its data source codes.
+
+  **The `Total` row is read, not computed.** Tax year 2021 suppresses twenty-four of its forty
+  classes, so a computed sum would be short. The reader requires exactly one `Total` row a year.
+
+  **The certification list is a hand extract, not a source.** The Attorney General's page is an
+  ASP.NET form whose later pages are reached by postback, and every response carries a fresh view
+  state and anti-forgery token, so no digest could pin it. It is held as
+  `sgo-certifications.tsv`, read on 2026-10-05, as `scholarship-bounds.tsv` holds figures no
+  connector can reach. The retrieval date is a constant in `project::donation_credit`, and the
+  certification count is stated as of that day.
+
+  **`program.mechanism` gains `tax-credit`.** The credit is a program in the class's sense: it
+  binds the state, a recipient organization and, through the scholarship, a family. None of the
+  six mechanisms describes it. No appropriation line carries it, nothing is deducted or
+  reimbursed, and no funding unit is paid. The money never enters the treasury. Placing it in
+  `revenue-stream` instead was considered and rejected below.
+consequences: |
+  **What the credit costs is held only as two kinds of bound.** Y-1's claims overstate what is
+  used, because a nonrefundable credit cannot exceed liability. The Tax Expenditure Report's
+  figures are estimates from data codes B and C, not from returns. The node states both as what
+  they are, and neither as the cost.
+
+  **The statute fixture gains R.C. 5747.73**, and the test that pins the extract's section list
+  names it.
+
+  **No recipient or award is held,** because the statute requires no report of either. The node
+  records that as unfilled rather than estimating it.
+alternatives: |
+  **Model the credit as a revenue stream.** Rejected. A revenue stream in this corpus is money a
+  district or school receives. The credit reaches an organization, which pays a family's tuition
+  at a school of its choosing, and the state's part is revenue it never collects.
+
+  **Record it under `direct-appropriation` with a note.** Rejected. That mechanism names an
+  appropriation line, and the node's `appropriation_line` would have to say there is none. A
+  mechanism that every reader must be told does not apply is the wrong one.
+
+  **Pin the Attorney General's page.** Not possible, for the reason in the decision. A postback
+  scraper in the connector would fetch different bytes every time and could not be verified.
+connectors:
+  - tax-income-credits
