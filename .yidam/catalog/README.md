@@ -64,6 +64,7 @@ Sorted by: type, then slug.
 | [`dew-report-card-value-added`](dew-report-card-value-added.md) | Ohio School Report Cards — District Value-Added Details | 1 |
 | [`dew-scholarship-annual-report`](dew-scholarship-annual-report.md) | Scholarship Annual Report — the department's own account of the channel | 5 |
 | [`dew-scholarship-historical-data`](dew-scholarship-historical-data.md) | Historical Scholarship Data — the deduct era, counted two ways | 4 |
+| [`dew-scholarship-provider-directory`](dew-scholarship-provider-directory.md) | Ohio Scholarship Providers Interactive Directory — the list the statute requires, unread | 2 |
 | [`dew-sfpr-line-by-line`](dew-sfpr-line-by-line.md) | School Finance Payment Report — Line by Line Explanation | 8 |
 | [`dot-casino-student-distribution`](dot-casino-student-distribution.md) | County Student Distribution — gross casino revenue county student fund | 1 |
 | [`dot-it1040-instructions`](dot-it1040-instructions.md) | Ohio IT 1040 instruction booklets, tax years 2021 and 2022 | 1 |
@@ -80,7 +81,7 @@ Sorted by: type, then slug.
 | [`lsc-budget-footnotes`](lsc-budget-footnotes.md) | Budget Footnotes — the Legislative Budget Office's monthly report | 1 |
 | [`lsc-catalog-of-budget-line-items`](lsc-catalog-of-budget-line-items.md) | Catalog of Budget Line Items — what each appropriation line was given | 13 |
 | [`lsc-dew-redbook`](lsc-dew-redbook.md) | LSC Redbook — Ohio Department of Education and Workforce | 11 |
-| [`lsc-hb96-analysis`](lsc-hb96-analysis.md) | LSC Budget Analysis — H.B. 96 (FY2026-27) | 17 |
+| [`lsc-hb96-analysis`](lsc-hb96-analysis.md) | LSC Budget Analysis — H.B. 96 (FY2026-27) | 19 |
 | [`lsc-school-funding-complete-resource`](lsc-school-funding-complete-resource.md) | LSC School Funding Complete Resource | 2 |
 | [`lsc-tax-credit-analyses`](lsc-tax-credit-analyses.md) | LSC analyses of the scholarship donation credit | 1 |
 | [`nces-ccd-lea-directory`](nces-ccd-lea-directory.md) | Common Core of Data: local education agency directory | 1 |
@@ -95,7 +96,7 @@ Sorted by: type, then slug.
 | [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 4 |
 | [`us-public-laws`](us-public-laws.md) | United States public laws — the enrolled federal acts | 1 |
 
-68 entries, 0 not yet cited by any corpus node. 439 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+69 entries, 0 not yet cited by any corpus node. 439 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source
