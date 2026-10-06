@@ -412,15 +412,21 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * bindings, no new carrier, all on `program/traditional-edchoice-scholarship`: the in-year count
  * and cost for FY2026, the enacted Table 3 estimate for the same year, and the two gaps between
  * them, bound as gaps because the prose argues from the difference. The floor was at its count.
+ *
+ * Recomputed at **1236/86** when the two special-needs ceilings were dated (#779).
+ * `program/autism-scholarship` is the eighty-sixth carrier, binding the FY2025 ceiling, the
+ * average award's share of it and what H.B. 96 added. `program/jon-peterson-special-needs` binds
+ * five: its FY2025 ceiling, H.B. 96's uniform rise in the maxima and the two ends of the uneven
+ * rise it made in the category amounts, and H.B. 33's FY2024 rise. The floor was at its count.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1228 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1228,
+  expect(bindings.length, "1236 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1236,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "85 nodes carry bindings; raise this when an eighty-sixth does",
-  ).toBeGreaterThanOrEqual(85);
+    "86 nodes carry bindings; raise this when an eighty-seventh does",
+  ).toBeGreaterThanOrEqual(86);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

@@ -55,10 +55,12 @@ pub const EDCHOICE_BASE_K8: Dollars = 5_500.0;
 /// The same for grades nine through twelve, and the same indexing.
 pub const EDCHOICE_BASE_9_12: Dollars = 7_500.0;
 
-/// R.C. 3317.022(A)(12)(a)(ii): the autism scholarship ceiling.
+/// R.C. 3317.022(A)(12)(a)(ii): the autism scholarship ceiling, as H.B. 96 enacted it for FY2026
+/// and FY2027.
 ///
 /// **Carries no indexing clause**, unlike every EdChoice and Jon Peterson amount in the same
-/// division, which `program/autism-scholarship` records.
+/// division, and has only ever moved by amendment. It was $32,445 in FY2025; [`ceilings`] holds
+/// every earlier value.
 pub const AUTISM_CEILING: Dollars = 34_000.0;
 
 /// R.C. 3317.022(A)(13)(a)(ii): the Jon Peterson award before its category supplement.
@@ -67,10 +69,11 @@ pub const AUTISM_CEILING: Dollars = 34_000.0;
 pub const JON_PETERSON_BASE: Dollars = 7_190.0;
 
 /// R.C. 3317.022(A)(13)(a)(iii): the Jon Peterson ceiling. The same figure as [`AUTISM_CEILING`],
-/// and like it carrying no indexing clause.
+/// like it carrying no indexing clause, and like it H.B. 96's: $32,445 in FY2025.
 pub const JON_PETERSON_CEILING: Dollars = 34_000.0;
 
-/// R.C. 3317.022(A)(13)(a)(ii)(I) to (VI), by special education category one through six.
+/// R.C. 3317.022(A)(13)(a)(ii)(I) to (VI), by special education category one through six, as
+/// H.B. 96 enacted them. [`ceilings::jpsn_supplements`] recovers earlier years' from LSC's tables.
 ///
 /// Indexed to the special education category amounts under division (A)(3) rather than to base
 /// cost, so these move with the weights in
@@ -845,13 +848,12 @@ pub mod jpsn {
     //!
     //! # Which figures in the FY2023 edition are FY2023's
     //!
-    //! Open, and the open part is narrower than the whole edition. Its award table is identical to
-    //! FY2024's, and `the_award_table_is_recomputed_each_year_and_two_editions_print_the_same_one`
-    //! shows the table is a uniform fraction of the statutory vector with the fraction moving
-    //! between editions — so printing one table twice means an index that did not move. Set beside
-    //! the two documents having been produced in one sitting, the reading that impugns the table
-    //! rather than the spending chart is as available as the reverse, and this module commits to
-    //! neither: every column is carried as published.
+    //! Its award table is not: it is H.B. 33's FY2024 schedule, which [`super::ceilings`] dates from
+    //! two LSC analyses that also print a different FY2023 schedule, $7,976 to $27,000. The FY2024
+    //! and FY2025 editions print their own years' schedules to the dollar. What stays open is the
+    //! spending chart, whose one total in words names the 2021-2022 school year. Every column is
+    //! still carried as published; the copied table is why [`Series::Maximum`] for FY2023 must not
+    //! be read as FY2023's.
 
     use std::collections::BTreeMap;
     use std::ops::RangeInclusive;
@@ -1503,6 +1505,233 @@ pub fn decay_explaining_the_whole_gap(expansion: Dollars, reference: Dollars) ->
 pub fn income_paying(factor: f64) -> Option<f64> {
     ((MINIMUM_SHARE..=1.0).contains(&factor))
         .then(|| FULL_AWARD_CEILING + factor.ln() / CONSTANT_MULTIPLIER.ln())
+}
+
+pub mod ceilings {
+    //! The two special-needs ceilings and the Jon Peterson award schedule, by fiscal year, as LSC
+    //! states them in its analysis of each budget act that moved them.
+    //!
+    //! # Why the statute is not enough
+    //!
+    //! [`super::AUTISM_CEILING`], [`super::JON_PETERSON_CEILING`], [`super::JON_PETERSON_BASE`] and
+    //! [`super::JON_PETERSON_SUPPLEMENTS`] are read off `revised-code.txt`, which is R.C. 3317.022
+    //! as H.B. 96 left it: the text in force for FY2026 and FY2027 and for no earlier year. A node
+    //! that sets an FY2025 average award beside them is setting one year's payments against
+    //! another year's law. The section cannot say what it used to read; the greenbooks can, and
+    //! two of them state each superseded value.
+    //!
+    //! # Neither ceiling has ever moved by index
+    //!
+    //! Every step below is an amendment in a budget act. Neither division carries an indexing
+    //! clause, and the indexed terms around them — the Jon Peterson base and its six category
+    //! amounts — were rewritten by hand in H.B. 33 and again in H.B. 96 rather than left to their
+    //! indexes. Both programmes stood at $20,000 until H.B. 64; Autism rose first and Jon Peterson
+    //! caught it up in FY2025, and H.B. 96 kept the two at parity.
+    //!
+    //! # Each schedule is an enacted table, not a computation
+    //!
+    //! [`jpsn_maxima`] is LSC's "effective maximum" by category — base plus category amount, under
+    //! the ceiling — for each year an analysis prints one. The department's own annual reports
+    //! print the same tables, and that is what dates them: see
+    //! `crates/project/tests/the_ceilings_the_budget_acts_wrote.rs`.
+
+    use edfund_core::{Dollars, FiscalYear};
+
+    use crate::greenbook;
+    use crate::ledger::budget_analysis;
+
+    /// Which of the two special-needs programmes a ceiling caps.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub enum Programme {
+        /// R.C. 3317.022(A)(12): a flat ceiling on the special education programme's tuition.
+        Autism,
+        /// R.C. 3317.022(A)(13)(a)(iii): a ceiling over base plus category amount.
+        JonPeterson,
+    }
+
+    /// One ceiling, in force from `from` until the next step for the same programme.
+    #[derive(Debug, Clone, Copy, PartialEq)]
+    pub struct Step {
+        /// The programme it caps.
+        pub programme: Programme,
+        /// The first fiscal year it applies to.
+        pub from: u16,
+        /// The ceiling.
+        pub amount: Dollars,
+        /// The act that set it, as the greenbook extract names it (`hb64`, `hb96`).
+        pub act: &'static str,
+        /// LSC's sentence stating it, whitespace-collapsed, so a test can find it.
+        pub quote: &'static str,
+    }
+
+    /// The last fiscal year any committed analysis reaches: the second year of H.B. 96's biennium.
+    pub const LAST_YEAR: u16 = 2027;
+
+    /// Every step, oldest first within each programme.
+    ///
+    /// Begins at H.B. 64 because that is the first act whose analysis states the value it replaced
+    /// ($20,000) beside the one it set; the $20,000 itself is not given a start year here.
+    pub const STEPS: [Step; 7] = [
+        Step {
+            programme: Programme::Autism,
+            from: 2016,
+            amount: 27_000.0,
+            act: "hb64",
+            quote:
+                "Autism and Jon Peterson Special Needs (JPSN) Scholarship programs from $20,000 \
+                    to $27,000.",
+        },
+        Step {
+            programme: Programme::Autism,
+            from: 2022,
+            amount: 31_500.0,
+            act: "hb110",
+            quote: "The budget increases the maximum amount of an Autism scholarship from $27,000 \
+                    to $31,500 for FY 2022 and $32,445 for FY 2023 and each year thereafter.",
+        },
+        Step {
+            programme: Programme::Autism,
+            from: 2023,
+            amount: 32_445.0,
+            act: "hb110",
+            quote: "The budget increases the maximum amount of an Autism scholarship from $27,000 \
+                    to $31,500 for FY 2022 and $32,445 for FY 2023 and each year thereafter.",
+        },
+        Step {
+            programme: Programme::Autism,
+            from: 2026,
+            amount: 34_000.0,
+            act: "hb96",
+            quote: "increases the maximum award amount for students who receive the Autism \
+                    scholarship from $32,445 in FY 2025 to $34,000 in each fiscal year",
+        },
+        Step {
+            programme: Programme::JonPeterson,
+            from: 2016,
+            amount: 27_000.0,
+            act: "hb64",
+            quote:
+                "Autism and Jon Peterson Special Needs (JPSN) Scholarship programs from $20,000 \
+                    to $27,000.",
+        },
+        Step {
+            programme: Programme::JonPeterson,
+            from: 2024,
+            amount: 30_000.0,
+            act: "hb33",
+            quote: "so that a scholarship may not exceed $30,000 in FY 2024 and $32,445 in FY \
+                    2025, up from $27,000 in FY 2023.",
+        },
+        Step {
+            programme: Programme::JonPeterson,
+            from: 2025,
+            amount: 32_445.0,
+            act: "hb33",
+            quote: "so that a scholarship may not exceed $30,000 in FY 2024 and $32,445 in FY \
+                    2025, up from $27,000 in FY 2023.",
+        },
+    ];
+
+    /// The H.B. 96 step for Jon Peterson, kept apart from [`STEPS`] only because its sentence
+    /// names the ceiling once for both years.
+    pub const JPSN_HB96: Step = Step {
+        programme: Programme::JonPeterson,
+        from: 2026,
+        amount: 34_000.0,
+        act: "hb96",
+        quote: "so that a scholarship may not exceed $34,000 in FY 2026 and FY 2027.",
+    };
+
+    /// Every step for one programme, oldest first.
+    #[must_use]
+    pub fn steps(programme: Programme) -> Vec<Step> {
+        let mut all: Vec<Step> = STEPS
+            .iter()
+            .chain(std::iter::once(&JPSN_HB96))
+            .filter(|s| s.programme == programme)
+            .copied()
+            .collect();
+        all.sort_by_key(|s| s.from);
+        all
+    }
+
+    /// The ceiling in force for `year`, or `None` outside FY2016 through [`LAST_YEAR`].
+    #[must_use]
+    pub fn ceiling(programme: Programme, year: FiscalYear) -> Option<Dollars> {
+        if year.0 > LAST_YEAR {
+            return None;
+        }
+        steps(programme)
+            .into_iter()
+            .rev()
+            .find(|s| s.from <= year.0)
+            .map(|s| s.amount)
+    }
+
+    /// The Jon Peterson base amount, the term the six category amounts are added to.
+    ///
+    /// $6,414 in FY2023, $7,190 from FY2024 by H.B. 33, held at $7,190 by H.B. 96. `None` for any
+    /// year neither analysis states.
+    #[must_use]
+    pub fn jpsn_base(year: FiscalYear) -> Option<Dollars> {
+        match year.0 {
+            2023 => Some(6_414.0),
+            2024..=LAST_YEAR => Some(7_190.0),
+            _ => None,
+        }
+    }
+
+    /// LSC's effective maximum Jon Peterson award by category one through six.
+    ///
+    /// FY2022 and FY2023 from the H.B. 110 analysis, FY2023 again and FY2024-FY2025 from H.B. 33's,
+    /// FY2025 again and FY2026-FY2027 from H.B. 96's. Where two analyses print the same year they
+    /// agree to the dollar, which the tests check.
+    #[must_use]
+    pub fn jpsn_maxima(year: FiscalYear) -> Option<[Dollars; 6]> {
+        match year.0 {
+            2022 => Some([7_731.0, 10_058.0, 15_682.0, 18_861.0, 23_410.0, 27_000.0]),
+            2023 => Some([7_976.0, 10_377.0, 15_936.0, 19_121.0, 23_623.0, 27_000.0]),
+            2024 => Some([8_941.0, 11_632.0, 17_863.0, 21_433.0, 26_480.0, 30_000.0]),
+            2025 => Some([9_585.0, 12_470.0, 19_150.0, 22_977.0, 28_387.0, 32_445.0]),
+            2026 | 2027 => Some([10_045.0, 13_069.0, 20_069.0, 24_080.0, 29_750.0, 34_000.0]),
+            _ => None,
+        }
+    }
+
+    /// The category amount each effective maximum implies: maximum less base, for a category the
+    /// ceiling does not cap. `None` at a capped position, where the maximum is the ceiling and the
+    /// uncapped sum is not recoverable.
+    #[must_use]
+    pub fn jpsn_supplements(year: FiscalYear) -> Option<[Option<Dollars>; 6]> {
+        let maxima = jpsn_maxima(year)?;
+        let base = jpsn_base(year)?;
+        let cap = ceiling(Programme::JonPeterson, year)?;
+        Some(maxima.map(|m| (m < cap).then_some(m - base)))
+    }
+
+    /// How much a schedule rose between two years, category by category, as a share.
+    #[must_use]
+    pub fn jpsn_rise(from: FiscalYear, to: FiscalYear) -> Option<[f64; 6]> {
+        let (a, b) = (jpsn_maxima(from)?, jpsn_maxima(to)?);
+        Some(std::array::from_fn(|i| b[i] / a[i] - 1.0))
+    }
+
+    /// The analysis an act's step is quoted from, whitespace-collapsed.
+    ///
+    /// # Panics
+    ///
+    /// If the act has no committed analysis. Every [`Step::act`] names one.
+    #[must_use]
+    pub fn analysis(act: &str) -> String {
+        if act == "hb96" {
+            budget_analysis::GREENBOOK
+                .split_whitespace()
+                .collect::<Vec<_>>()
+                .join(" ")
+        } else {
+            greenbook::greenbook(act).flat()
+        }
+    }
 }
 
 #[cfg(test)]

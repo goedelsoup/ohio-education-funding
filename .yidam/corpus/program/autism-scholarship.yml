@@ -13,8 +13,12 @@ description: |
   **It is the outlier of this channel on every axis except size.** At 6,016 students in 2024-2025
   it is the smallest of the five programs, and at an average award of $26,598.88 it pays roughly
   four times what any other pays and more than five times the EdChoice expansion. [verified] (2025
-  Scholarship Annual Report) Its statutory ceiling is $34,000 against EdChoice's $5,500 and
-  $7,500. [verified] (R.C. 3317.022(A)(12), (A)(10))
+  Scholarship Annual Report) That year its ceiling was $32,445, and the average award is 82.0% of
+  it, against EdChoice's $5,500 and $7,500. [verified] (2025 Scholarship Annual Report; R.C.
+  3317.022(A)(10); the ceiling and the share
+  ([`crates/project`](../../../crates/project/tests/the_ceilings_the_budget_acts_wrote.rs)))
+  H.B. 96 raised the ceiling to $34,000 for FY2026 and FY2027, and that is the figure the section
+  now carries.
 
   That ratio is the program's whole character: it buys a special education placement, not
   tuition at a chartered nonpublic school, and the two are not the same purchase. Reading this
@@ -28,6 +32,21 @@ description: |
   one is exact and the others are not suggests the difference is a denominator rather than an
   error, and nothing in the report says which. [inference] [open]
 revisions:
+  - was: |
+      The description set the FY2025 average award beside a "statutory ceiling" of $34,000, and
+      `amount` left open whether that ceiling had been raised by amendment rather than by index.
+    now: |
+      $34,000 is the ceiling H.B. 96 wrote for FY2026 and FY2027. In FY2025 the ceiling was
+      $32,445, set by H.B. 110. Every move the ceiling has made since $20,000 was an amendment in
+      a budget act, and none was an index.
+    found_by: |
+      [#779](https://github.com/goedelsoup/ohio-education-funding/issues/779). The vendored
+      R.C. 3317.022 is the text H.B. 96 left, effective 30 September 2025, and LSC's analysis of
+      that act states the FY2025 figure in the sentence that raises it.
+    reach: |
+      The average award sits at 82.0% of the ceiling in force, not 78%. No other figure in this
+      node leaned on the $34,000. `program/jon-peterson-special-needs` carried the same vintage
+      error in its award table and is corrected alongside.
   - was: |
       `eligibility` called the per-district file that would compare the two programs' district
       footprints "the withdrawn one".
@@ -106,15 +125,55 @@ properties:
     [verified] Whether that difference shows up in the two programs' district footprints is not
     established — the per-district file that would answer it is the one the annual report cites
     and this project has not reached. [open]
+
+    **H.B. 96 widened the doors.** It set eligibility for both special-needs scholarships at ages
+    three through twenty-one, ending at twenty-two. It admitted a child enrolled in a chartered or
+    nonchartered nonpublic school, or home educated, and for this program one whose IEP includes
+    services related to autism. It allowed a child to contract with several providers at once, and
+    it allowed services to be delivered virtually. [verified] (R.C. 3310.41 as held; the H.B. 96
+    greenbook) LSC names only Jon Peterson's three- and four-year-olds and nineteen- to
+    twenty-one-year-olds as ineligible under prior law, so the age alignment widened that program
+    rather than this one. [inference] (the H.B. 96 greenbook)
+
+    It also requires the department to "maintain a list of each registered private provider and
+    the location of that provider on its publicly accessible web site". [verified] (R.C.
+    3310.41(O)) What the department serves under that duty is recorded at
+    [`dew-scholarship-provider-directory`](../../catalog/dew-scholarship-provider-directory.md):
+    a Power BI report this project cannot read anonymously. Whether it is keyed on IRN is not
+    established. [open]
   amount: |
     **FY2025: 6,016 students, $160,018,883.30, average award $26,598.88.** [verified] (2025
     Scholarship Annual Report)
 
-    The statutory bound is the lesser of the tuition charged for the student's special education
-    program, or **$34,000**. [verified] (R.C. 3317.022(A)(12)) Unlike the pilot project
-    program's $5,500 and $7,500, this ceiling carries no indexing clause in the same section, so
-    it does not rise with the statewide average base cost per pupil. [verified] Whether it has been
-    raised by amendment rather than by index is not established. [open]
+    LSC's H.B. 96 analysis estimated FY2025 at 5,031 students and $150.7 million, and projects
+    5,333 students and $169.1 million for FY2026 and 5,653 and $181.0 million for FY2027.
+    [verified] (the H.B. 96 greenbook, Table 3) The estimate for the year the department reports
+    sits nearly a thousand students below the department's count. Neither publisher says whether
+    the two count the same population. [open]
+
+    The award is the lesser of the tuition charged for the student's special education program and
+    a ceiling. **In FY2025 that ceiling was $32,445**, which makes the average award 82.0% of it.
+    [verified] ([`crates/project`](../../../crates/project/tests/the_ceilings_the_budget_acts_wrote.rs)) The
+    statute as held reads $34,000, and that is H.B. 96's figure for FY2026 and FY2027 — the
+    section in `revised-code.txt` is the text that act left, effective 30 September 2025.
+    [verified] (R.C. 3317.022(A)(12))
+
+    Unlike the pilot project program's $5,500 and $7,500, this ceiling carries no indexing clause,
+    so it does not rise with the statewide average base cost per pupil. **Every move it has made
+    was an amendment in a budget act.** [verified]
+    ([`crates/project`](../../../crates/project/tests/the_ceilings_the_budget_acts_wrote.rs))
+
+        fiscal years       ceiling   set by
+        FY2016-FY2021      $27,000   H.B. 64, from $20,000
+        FY2022             $31,500   H.B. 110
+        FY2023-FY2025      $32,445   H.B. 110
+        FY2026-FY2027      $34,000   H.B. 96
+
+    Each figure is a sentence in LSC's analysis of the act that set it. In that table H.B. 96
+    added $1,555, and LSC gives the reason as "providing parity with the JPSN capped amount". The
+    two ceilings were already level: H.B. 33 had raised Jon Peterson's to $32,445 for FY2025, so
+    H.B. 96 moved both together. [verified]
+    ([`crates/project`](../../../crates/project/tests/the_ceilings_the_budget_acts_wrote.rs))
   appropriation_line: |
     **No line of its own — paid from the foundation aid appropriation**, from the same five line
     items that support foundation aid for all public school students: GRF ALI 200550 Foundation
@@ -123,6 +182,19 @@ properties:
     `dew-greenbook.txt`. Checked against the act as enacted, not only as introduced: the five
     lines and the sentence naming them are identical in both. The *amounts* in that table are
     not — foundation aid was enacted $82m above the proposal — so nothing here quotes one.)
+figures:
+  - key: project/autism-ceiling-fy2025
+    value: 32445.0
+    field: amount
+    as_written: "that ceiling was $32,445"
+  - key: project/autism-average-share-of-fy2025-ceiling
+    value: 0.819814455231931
+    field: amount
+    as_written: "82.0% of it"
+  - key: project/autism-ceiling-hb96-rise
+    value: 1555.0
+    field: amount
+    as_written: "added $1,555"
 links:
   - target: ../program.ont.yml
     relationship: instance-of
@@ -142,6 +214,21 @@ links:
     note: >-
       The authorizing sections this node cites by number — eligibility, the award, and the
       deduction that pays for it.
+  - target: ../legislation/hb-110-2021.yml
+    relationship: revised-by
+    note: >-
+      Raised the ceiling from $27,000 to $31,500 for FY2022 and $32,445 from FY2023, and ended the
+      deduction: the scholarship has been paid to its own funding unit since.
+  - target: ../legislation/hb-96-2025.yml
+    relationship: revised-by
+    note: >-
+      Raised the ceiling from $32,445 to $34,000 for parity with Jon Peterson, and widened
+      eligibility to nonchartered and home-educated children. It also required a public list of
+      registered private providers.
+  - target: ../../catalog/lsc-hb96-analysis.md
+    relationship: sourced-from
+    note: >-
+      Where each ceiling in the amount table is stated, in the analysis of the act that set it.
   - target: ../../catalog/dew-scholarship-historical-data.md
     relationship: sourced-from
     note: >-

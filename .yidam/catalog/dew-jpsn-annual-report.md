@@ -94,24 +94,23 @@ figures printed directly beneath it, **to the cent**. The department totals this
 and that is what licenses summing the same chart in the two editions that state nothing — including
 the $103,944,388.15 the consolidated report's Jon Peterson section implies and never writes.
 
-**The FY23 and FY24 editions print the same award table.** All six maxima agree to the dollar:
-$8,941, $11,632, $17,863, $21,433, $26,480, $30,000. The amounts R.C. 3317.022(A)(13) fixes are
-indexed — the base to the statewide average base cost per pupil, the six supplements to the special
-education category amounts — and what each edition prints is a **uniform fraction** of one statutory
-vector: 0.8901 in FY23 and FY24, 0.9542 in FY2025, holding at every position to within a
-ten-thousandth. A moving fraction means the table is recomputed annually, and two consecutive
-editions printing one table means an index that stood still.
+**The FY23 and FY24 editions print the same award table, and it is FY2024's.** All six maxima
+agree to the dollar: $8,941, $11,632, $17,863, $21,433, $26,480, $30,000. That is H.B. 33's
+schedule for FY2024. Two LSC analyses, H.B. 110's and H.B. 33's, state FY2023's, and it runs
+$7,976 to $27,000. The FY24 edition and the consolidated report print their own years' enacted
+schedules exactly.
 
-The two open readings are held in `program/jon-peterson-special-needs` and pinned as arithmetic in
-`crates/project/tests/the_three_years_the_jon_peterson_report_gives.rs`. Either the FY23
-edition's spending chart lags its heading, or its award table was copied forward from FY24 when the
-two files were produced together — and under the second reading the spending chart is FY2023's and
-the 11.6% rise in spend per student between the two editions is real. Nothing in the documents
-chooses.
+This entry used to read each table as a uniform fraction of one statutory vector, recomputed by
+index each year, and so read two editions printing one table as an index that stood still. The
+fractions are real, 0.8901 and then 0.9542, but they are ratios of enacted schedules to H.B. 96's.
+0.9542 is $32,445 over $34,000, because H.B. 96 raised every position alike. H.B. 33 raised
+categories one to five 12.1% between FY2023 and FY2024.
 
-*In FY23 and FY24 the sixth maximum is a round $30,000, some $263 below what the same fraction gives
-against the $34,000 ceiling. It is the one position that is not prorated, and the wrong column to
-measure the table's movement on.*
+So the FY23 edition prints the schedule for the year after its own, which fits the two files
+being produced together. The spending chart's 11.6% rise per student tracks the schedule's 12.1%,
+so nothing makes that chart lag its heading. Pinned in
+`crates/project/tests/the_ceilings_the_budget_acts_wrote.rs`, and held in
+`program/jon-peterson-special-needs`. What stays open is the expenditure sentence's "2021-2022".
 
 ## What the department and the Legislative Service Commission disagree about
 
