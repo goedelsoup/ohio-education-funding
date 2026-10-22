@@ -280,7 +280,12 @@ jobs:
 
       # On the runner image, not in Playwright's container: the container's fonts differ, and the
       # chrome width and the chart layout are both font-sensitive.
+      #
+      # The timeout is for the `--with-deps` apt step, which has hung here with no output and nothing
+      # to stop it short of the six-hour job limit. The install takes under thirty seconds; ten
+      # minutes fails a stuck one while the run is still worth re-running.
       - name: Install the browser
+        timeout-minutes: 10
         run: pnpm exec playwright install --with-deps chromium
 
       # What the built pages look like, as numbers — reading measure, the census of font sizes,
@@ -351,7 +356,9 @@ jobs:
         run: pnpm test:dist
 
       # On the runner image, for the reason `web-e2e` gives: the chrome width is font-sensitive.
+      # The timeout is `web-e2e`'s too.
       - name: Install the browser
+        timeout-minutes: 10
         run: pnpm exec playwright install --with-deps chromium
 
       - name: e2e
