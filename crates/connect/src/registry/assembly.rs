@@ -736,6 +736,19 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
                widens rather than narrows a proportional change.",
     },
     Source {
+        key: "rc-5709-92",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-5709.92",
+        filename: "rc-5709-92.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 5709.92. The phase-down of the school district replacement payments for \
+               tangible personal property and utility losses — the section H.B. 153 wrote, H.B. \
+               64 rewrote and S.B. 208 rewrote again. Current text only, so the schedule each \
+               act enacted is dated from the greenbooks, not from here.",
+    },
+    Source {
         key: "rc-5747-73",
         title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-5747.73",
@@ -747,6 +760,30 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
                with no appropriation line. Not R.C. 5747.75, which the corpus's own issue cited: \
                that number is the nonchartered nonpublic tuition credit, and it was itself \
                enacted in a third form by the same act, so the two are easy to cross.",
+    },
+    Source {
+        key: "rc-5751-20",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-5751.20",
+        filename: "rc-5751-20.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 5751.20. H.B. 66's definitions for the replacement payments — fixed-rate and \
+               fixed-sum levies, and the taxable value loss each district's payment is computed \
+               on.",
+    },
+    Source {
+        key: "rc-5751-21",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-5751.21",
+        filename: "rc-5751-21.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 5751.21. The payments themselves, out of the School District Tangible \
+               Property Tax Replacement Fund, and the H.B. 66 schedule for fixed-rate and \
+               fixed-sum levy losses.",
     },
     Source {
         key: "rc-5753-02",

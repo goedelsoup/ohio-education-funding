@@ -179,6 +179,16 @@ const CITED: &[&str] = &[
     "5709.62",
     "5709.63",
     "5709.68",
+    // The tangible personal property replacement payments. Cited by `tpp-replacement-payments`
+    // for the schedule each budget enacted: 5751.20 defines the FY2010-based total resources and
+    // the 2% and 4% thresholds H.B. 153 phased the payment down against, 5751.21 holds H.B. 66's
+    // year-by-year schedule and its own last payment date of June 30, 2015, and 5709.92 is where
+    // H.B. 64 moved the payment, with its capacity-quintile thresholds, S.B. 208's one-sixteenth
+    // of one per cent reduction from FY2018, and the fixed-sum levy payments' end after tax year
+    // 2021.
+    "5709.92",
+    "5751.20",
+    "5751.21",
 ];
 
 /// The extract is what it claims to be: every cited section, each with a date and an act.
