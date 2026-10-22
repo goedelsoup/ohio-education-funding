@@ -14373,6 +14373,66 @@ pub static FIGURES: &[Figure] = &[
         tolerance: 0.000_05,
         compute: |_| project::levy::anticipation_note_share("5705.199").unwrap_or(f64::NAN),
     },
+    // `revenue-stream/capital-finance-without-a-vote`: the unvoted routes to a building, read
+    // from R.C. 3313.372, 3313.375, 133.06(G) and 9.17.
+    Figure {
+        key: "project/rc-3313-372-term-years",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Most years an energy conservation installment contract may run, R.C. \
+                3313.372(B)(2)",
+        pinned: 15.0,
+        tolerance: 0.0,
+        compute: |_| project::capital::energy_contract_term_years().map_or(f64::NAN, |y| y as f64),
+    },
+    Figure {
+        key: "project/rc-3313-372-measures",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Energy conservation measures R.C. 3313.372(A) enumerates, H.B. 15 version",
+        pinned: 10.0,
+        tolerance: 0.0,
+        compute: |_| project::capital::energy_measures_in_force() as f64,
+    },
+    Figure {
+        key: "project/rc-3313-372-measures-before-hb15",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Energy conservation measures R.C. 3313.372(A) enumerated, September 29, 2017 \
+                version",
+        pinned: 9.0,
+        tolerance: 0.0,
+        compute: |_| project::capital::energy_measures_before_hb15() as f64,
+    },
+    Figure {
+        key: "project/rc-3313-375-term-ceiling-years",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Most years a lease-purchase agreement may run, R.C. 3313.375(A)",
+        pinned: 30.0,
+        tolerance: 0.0,
+        compute: |_| {
+            project::capital::lease_purchase_term_ceiling_years().map_or(f64::NAN, |y| y as f64)
+        },
+    },
+    Figure {
+        key: "project/rc-9-17-bidding-threshold-2024",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Competitive bidding threshold through calendar year 2024, R.C. 9.17(A)(1)",
+        pinned: 75_000.0,
+        tolerance: 0.0,
+        compute: |_| project::capital::bidding_threshold_through_2024().map_or(f64::NAN, |d| d as f64),
+    },
+    Figure {
+        key: "project/rc-9-17-escalator",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "Yearly increase in the competitive bidding threshold after 2024, R.C. 9.17(A)(2)",
+        pinned: 0.03,
+        tolerance: 0.000_05,
+        compute: |_| project::capital::bidding_threshold_escalator().unwrap_or(f64::NAN),
+    },
     Figure {
         key: "dispersion/median-debt-capacity-per-pupil-ty2024",
         owner: "crates/dispersion",
@@ -14394,6 +14454,34 @@ pub static FIGURES: &[Figure] = &[
         pinned: 251.271_187_1,
         tolerance: 0.5,
         compute: |_| median_value_per_pupil(2024) * project::levy::unvoted_limit(),
+    },
+    // R.C. 3313.372(D)'s and 133.06(G)(3)'s limits, one per cent and nine-tenths of one, are
+    // too small for the manifest's percentage guard as well, and are bound the same way.
+    Figure {
+        key: "dispersion/median-energy-securities-capacity-per-pupil-ty2024",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "R.C. 133.06(G)(3)'s energy securities limit applied to the median district's \
+                taxable value per pupil, Table SD-1, TY2024",
+        pinned: 2_261.440_684,
+        tolerance: 0.5,
+        compute: |_| {
+            median_value_per_pupil(2024)
+                * project::capital::energy_securities_principal_limit().unwrap_or(f64::NAN)
+        },
+    },
+    Figure {
+        key: "dispersion/median-energy-unvoted-debt-capacity-per-pupil-ty2024",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "R.C. 3313.372(D)'s unvoted ceiling applied to the median district's taxable \
+                value per pupil, Table SD-1, TY2024",
+        pinned: 2_512.711_871,
+        tolerance: 0.5,
+        compute: |_| {
+            median_value_per_pupil(2024)
+                * project::capital::energy_notes_unvoted_ceiling().unwrap_or(f64::NAN)
+        },
     },
 ];
 

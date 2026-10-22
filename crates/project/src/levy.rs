@@ -13,8 +13,9 @@ use crate::statute::{prior, section};
 ///
 /// The section writes its limits as words: "nine per cent", "four per cent", "three per cent",
 /// and the unvoted limit as "one-tenth of one per cent"; R.C. 5705.199 writes its note limit as
-/// "fifty per cent". A single number word up to ten, a round ten up to ninety, or a fraction of
-/// one per cent are the shapes read, and a phrase in none is refused rather than guessed at.
+/// "fifty per cent"; R.C. 133.06(G)(3) writes its energy securities limit as "nine-tenths of one
+/// per cent". A single number word up to ten, a round ten up to ninety, or a fraction of one per
+/// cent are the shapes read, and a phrase in none is refused rather than guessed at.
 #[must_use]
 pub fn per_cent_in_words(words: &str) -> Option<f64> {
     const UNITS: [&str; 10] = [
@@ -40,8 +41,8 @@ pub fn per_cent_in_words(words: &str) -> Option<f64> {
             // "one-tenth of one per cent".
             let (numerator, denominator) = of.split_once('-')?;
             let denominator = match denominator {
-                "tenth" => 10.0,
-                "hundredth" => 100.0,
+                "tenth" | "tenths" => 10.0,
+                "hundredth" | "hundredths" => 100.0,
                 _ => return None,
             };
             return Some(whole(numerator)? / denominator / 100.0);
@@ -163,6 +164,8 @@ mod tests {
         assert_eq!(per_cent_in_words("fifty per cent"), Some(0.5));
         let tenth = per_cent_in_words("one-tenth of one per cent").expect("reads");
         assert!((tenth - 0.001).abs() < 1e-15, "{tenth}");
+        let tenths = per_cent_in_words("nine-tenths of one per cent").expect("reads");
+        assert!((tenths - 0.009).abs() < 1e-15, "{tenths}");
     }
 
     #[test]
