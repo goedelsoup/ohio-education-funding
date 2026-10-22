@@ -41,6 +41,11 @@ export const CAPACITY_AGREEMENT = 1e-5;
 export interface CapacityTerm {
   /** The measure before weighting, per base-cost pupil. */
   base: number;
+  /**
+   * The same measure in the year before's model, or `null` where that model has none. Shown, not
+   * checked: the closure above is this year's, and the year before's rate is not in the feed.
+   */
+  prior: number | null;
   /** Its weight in the blend, recovered from the feed rather than typed. */
   weight: number;
   /** The weighted measure times the capacity rate, per base-cost pupil. */
@@ -87,17 +92,27 @@ export function decomposeCapacity(
     );
   }
 
-  const term = (base: number, rated: number): CapacityTerm => ({
+  const term = (base: number, rated: number, prior: number | null): CapacityTerm => ({
     base,
+    prior,
     // To the whole percent: the statute's weights are whole percents, and the quotient carries
     // the feed's rounding in its seventh place.
     weight: Math.round((rated / (base * c.capacity_rate)) * 100) / 100,
     term: rated,
     share: rated / c.per_pupil,
   });
-  const valuation = term(c.valuation_per_pupil, c.valuation_term_per_pupil);
-  const grossIncome = term(c.gross_income_per_pupil, c.gross_income_term_per_pupil);
-  const medianIncome = term(c.median_income_per_pupil, c.median_income_term_per_pupil);
+  const p = c.prior;
+  const valuation = term(c.valuation_per_pupil, c.valuation_term_per_pupil, p?.valuation_per_pupil ?? null);
+  const grossIncome = term(
+    c.gross_income_per_pupil,
+    c.gross_income_term_per_pupil,
+    p?.gross_income_per_pupil ?? null,
+  );
+  const medianIncome = term(
+    c.median_income_per_pupil,
+    c.median_income_term_per_pupil,
+    p?.median_income_per_pupil ?? null,
+  );
   const weights = valuation.weight + grossIncome.weight + medianIncome.weight;
   if (!(Math.abs(weights - 1) < 1e-9)) {
     throw new Error(`District ${d.irn}: the capacity weights recovered from the feed add to ${weights}, not 1.`);

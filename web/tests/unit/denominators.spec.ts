@@ -263,9 +263,10 @@ test("the taxes page's pupil-count card renders a row for every count the page d
   const { bundle } = loadFeed();
   const expected = pageDenominators("district/[irn]/taxes");
 
-  // Four counts, all four distinct, and the district the omission was found on: Delphos City
-  // reads 1,034 resident, 824 enrolled, 898 unweighted and 831 funded — a 25.6% spread, and the
-  // page showed a property-tax share over the third of them while naming the other three.
+  // The district the omission was found on: Delphos City reads 1,034 resident, 824 enrolled, 898
+  // unweighted and 831 funded — a 25.6% spread, and the page showed a property-tax share over the
+  // third of them while naming the other three. The fifth is the funded count a year earlier,
+  // which the local capacity card's earlier column divides by.
   const delphos = bundle.districts.find((d) => d.irn === "043885");
   expect(delphos, "Delphos City is in the feed").toBeDefined();
 
@@ -278,6 +279,7 @@ test("the taxes page's pupil-count card renders a row for every count the page d
         delphos!.adm_history[0]!,
         delphos!.spending_by_function!.adm,
         delphos!.adm,
+        delphos!.capacity!.prior!.base_cost_enrolled_adm,
       ].map(Math.round),
     ),
   );

@@ -8,6 +8,10 @@
  * base-cost pupil, each weighted and then multiplied by the district's capacity rate, adding to
  * the figure the charge-off card states.
  *
+ * Each measure also stands beside the same measure in the year before's model (#801), the
+ * calculator's own column rather than a reconstruction. Only the measures: that year's terms would
+ * need that year's rate, and the closure this card checks is this year's.
+ *
  * Every number is read from the feed. The weights are recovered from it too (`capacity.ts` says
  * how), so a change to R.C. 3317.017 reaches this table through the crate and nowhere else. And
  * `decomposeCapacity` throws unless the terms close on the published figure: a decomposition that
@@ -70,31 +74,38 @@ const largest = !k
         The plan's local capacity, {money(k.total, 2)} per pupil here, is three measures of what
         the district could raise, each divided by its {fixed(d.adm, 2)} base cost pupils, weighted,
         and multiplied by one rate. The parts below add to the department's published figure.
+        Beside each measure is the same measure a year earlier, over that year's base cost pupils.
       </p>
       <div class="scroll"><table data-program="capacity">
-        <thead><tr><th>Term</th><th class="tnum">Measure</th><th class="tnum">At the rate</th><th class="tnum">Share of capacity</th></tr></thead>
+        <thead><tr><th>Term</th><th class="tnum">Measure<Fragment set:html={yearChip("formula.prior")} /></th><th class="tnum">Measure<Fragment set:html={yearChip("formula")} /></th><th class="tnum">At the rate</th><th class="tnum">Share of capacity</th></tr></thead>
         <tbody>
           <tr><th>Valuation per pupil, weighted {pct(k.valuation.weight, 0)}</th>
+            <td class="tnum">{k.valuation.prior == null ? "" : money(k.valuation.prior)}</td>
             <td class="tnum">{money(k.valuation.base)}</td>
             <td class="tnum">{money(k.valuation.term, 2)}</td>
             <td class="tnum">{pct(k.valuation.share, 1)}</td></tr>
           <tr><th>Federal adjusted gross income per pupil, weighted {pct(k.grossIncome.weight, 0)}</th>
+            <td class="tnum">{k.grossIncome.prior == null ? "" : money(k.grossIncome.prior)}</td>
             <td class="tnum">{money(k.grossIncome.base)}</td>
             <td class="tnum">{money(k.grossIncome.term, 2)}</td>
             <td class="tnum">{pct(k.grossIncome.share, 1)}</td></tr>
           <tr><th>Median income times returns per pupil, weighted {pct(k.medianIncome.weight, 0)}</th>
+            <td class="tnum">{k.medianIncome.prior == null ? "" : money(k.medianIncome.prior)}</td>
             <td class="tnum">{money(k.medianIncome.base)}</td>
             <td class="tnum">{money(k.medianIncome.term, 2)}</td>
             <td class="tnum">{pct(k.medianIncome.share, 1)}</td></tr>
           <tr><th>Income ratio, the district's median over the state's</th>
+            <td class="tnum"></td>
             <td class="tnum">{fixed(k.incomeRatio, 4)}</td>
             <td class="tnum"></td>
             <td class="tnum"></td></tr>
           <tr><th>Capacity rate</th>
+            <td class="tnum"></td>
             <td class="tnum">{pct(k.rate, 3)}</td>
             <td class="tnum"></td>
             <td class="tnum"></td></tr>
           <tr class="current"><th>Local capacity per pupil</th>
+            <td class="tnum"></td>
             <td class="tnum"></td>
             <td class="tnum">{money(k.total, 2)}</td>
             <td class="tnum">{pct(1, 0)}</td></tr>
