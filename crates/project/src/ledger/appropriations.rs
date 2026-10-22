@@ -349,6 +349,106 @@ pub fn reimbursements(base: FiscalYear) -> Vec<Year> {
         .collect()
 }
 
+/// The tangible personal property replacement payments' line items, in succession.
+///
+/// Two streams ran side by side until FY2015. `200909 School District Property Tax
+/// Replacement-Business` carries the payments H.B. 66 created, from FY2006, and `200900 School
+/// District Property Tax Replacement-Utility` the older payments for the utility assessment cuts
+/// of S.B. 3 and S.B. 287 of the 123rd General Assembly. H.B. 64 merged them in FY2016 into
+/// `200902 Property Tax Replacement Phase Out - Education`, which LSC describes as replacing both,
+/// and H.B. 96 moved the merged payments to the GRF as `200417` from FY2026. Each entry is the line
+/// and the first and last fiscal years it carries the stream; the series starts at FY2006 because
+/// that is where the business half starts, although the utility half is older. The FY2016 `200909`
+/// and `200900` rows and the FY2026 `200902` row are all at $0, which the tests on this list
+/// assert rather than assume.
+pub const TPP_REPLACEMENT_LINES: [(&str, u16, u16); 4] = [
+    ("200909", 2006, 2015),
+    ("200900", 2006, 2015),
+    ("200902", 2016, 2025),
+    ("200417", 2026, 2027),
+];
+
+/// The line items that carry the replacement payments in `fiscal_year`: two through FY2015, one
+/// after, none outside the series.
+#[must_use]
+pub fn tpp_replacement_lines(fiscal_year: u16) -> Vec<&'static str> {
+    TPP_REPLACEMENT_LINES
+        .iter()
+        .filter(|(_, first, last)| (*first..=*last).contains(&fiscal_year))
+        .map(|(line, _, _)| *line)
+        .collect()
+}
+
+/// What a line actually spent in a fiscal year, from the latest committed restatement of it.
+///
+/// The Catalog restates each actual in up to four editions, and the latest is preferred because
+/// it is the department's own final figure. Where the Catalog does not carry the line — it prints
+/// the department's section, and `200902` sits in Revenue Distribution — the workbook series
+/// answers, and every actual row it holds for that line and year must agree to the dollar.
+///
+/// The order matters once. The FY2008-09 greenbook's FY2007 `200909` row is $420,000,000, the
+/// FY2007 estimate in a column the series reads as an actual; the Catalog's FY2008 edition
+/// reports $418,161,375 spent. Preferring the Catalog takes the spending.
+///
+/// # Panics
+///
+/// If the workbook series holds two actuals for the line and year that differ by more than a
+/// dollar, which would mean two documents disagree and this would be choosing between them
+/// silently.
+#[must_use]
+pub fn latest_actual(line_item: &str, fiscal_year: u16) -> Option<f64> {
+    let from_catalog = edfund_core::csv::rows(CATALOG, CATALOG_HEADER)
+        .filter(|row| {
+            row.str(catalog_column::ALI) == line_item
+                && row.str(catalog_column::KIND) == "actual"
+                && row.str(catalog_column::FISCAL_YEAR).parse() == Ok(fiscal_year)
+        })
+        .filter_map(|row| {
+            Some((
+                row.str(0).parse::<u16>().ok()?,
+                row.num(catalog_column::AMOUNT)?,
+            ))
+        })
+        .max_by_key(|(edition, _)| *edition)
+        .map(|(_, amount)| amount);
+    if from_catalog.is_some() {
+        return from_catalog;
+    }
+    let found: Vec<f64> = lines()
+        .into_iter()
+        .filter(|l| l.kind == "actual" && l.line_item == line_item && l.fiscal_year == fiscal_year)
+        .map(|l| l.amount)
+        .collect();
+    let first = *found.first()?;
+    assert!(
+        found.iter().all(|a| (a - first).abs() <= 1.0),
+        "the series holds disagreeing actuals for {line_item} in FY{fiscal_year}: {found:?}"
+    );
+    Some(first)
+}
+
+/// The replacement payments made in a fiscal year: business and utility together, on whichever
+/// lines carried them.
+///
+/// Summing the two lines before FY2016 is what makes the series continuous across H.B. 64's
+/// merger; the business line alone would show FY2016 falling by the utility payments as well as by
+/// the phase-down. `None` when any carrying line has no actual, so a partial year never passes for
+/// a whole one.
+///
+/// Excludes the FY2016-18 `200697 School District TPP Supplement`, which is a guarantee paid
+/// beside the payments rather than one of them; read it with [`latest_actual`].
+#[must_use]
+pub fn tpp_replacement_paid(fiscal_year: u16) -> Option<f64> {
+    let carrying = tpp_replacement_lines(fiscal_year);
+    if carrying.is_empty() {
+        return None;
+    }
+    carrying
+        .into_iter()
+        .map(|line| latest_actual(line, fiscal_year))
+        .sum()
+}
+
 /// The lines the formula itself is paid from, across the renumbering in the middle of the series.
 ///
 /// `200550` and `200612` are both titled `Foundation Funding` and are the GRF and Lottery Profits
