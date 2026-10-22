@@ -1,5 +1,7 @@
 ---
-used-by: []
+used-by:
+  - ../corpus/legislation/hb-96-2025.yml
+  - ../corpus/parameter/cfap-required-percentage.yml
 ---
 # LSC Greenbook — Ohio Facilities Construction Commission
 
