@@ -21,8 +21,13 @@ used-by:
   - ../corpus/program/jon-peterson-special-needs.yml
   - ../corpus/program/nonpublic-administrative-cost-reimbursement.yml
   - ../corpus/program/scholarship-donation-credit.yml
+  - ../corpus/revenue-stream/bond-levy.yml
   - ../corpus/revenue-stream/casino-tax-distribution.yml
+  - ../corpus/revenue-stream/current-expense-levy.yml
+  - ../corpus/revenue-stream/emergency-levy.yml
   - ../corpus/revenue-stream/lottery-profits.yml
+  - ../corpus/revenue-stream/permanent-improvement-levy.yml
+  - ../corpus/revenue-stream/substitute-levy.yml
 ---
 # Ohio Revised Code — the sections this corpus cites
 
