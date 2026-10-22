@@ -464,16 +464,16 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 2190 | supported by a committed primary source |
-| `[inference]` | 460 | drawn from verified facts, not witnessed |
-| `[open]` | 229 | a live question — unknown, contested, or being worked |
+| `[verified]` | 2206 | supported by a committed primary source |
+| `[inference]` | 464 | drawn from verified facts, not witnessed |
+| `[open]` | 230 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-229 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+230 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 106 | 0 |
+| `findings` | 107 | 0 |
 | `description` | 43 | 0 |
 | `revisions` | 11 | 0 |
 | `series` | 7 | 0 |
@@ -523,13 +523,13 @@ leave the corpus and are not counted.
 -->
 | Measure | Count |
 |---|--:|
-| edges between nodes | 646 |
-| distinct relationships in use | 180 |
+| edges between nodes | 650 |
+| distinct relationships in use | 182 |
 | relationships declared across every class | 70 |
-| edges whose relationship its class does not declare | 353 |
-| relationships used exactly once | 84 |
+| edges whose relationship its class does not declare | 357 |
+| relationships used exactly once | 86 |
 
-**54% of edges use a relationship the class does not declare**, and 84 of the 180 relationships in use are used a single time. That is the case for `edge_policy: characteristic`: closing the vocabulary would reject those edges or require 84 declarations that each describe one link.
+**54% of edges use a relationship the class does not declare**, and 86 of the 182 relationships in use are used a single time. That is the case for `edge_policy: characteristic`: closing the vocabulary would reject those edges or require 86 declarations that each describe one link.
 <!-- /REGEN -->
 
 This was a hand-written sentence in fifteen ontology files, in the paragraph above, and in
@@ -706,7 +706,8 @@ Sorted by: kind, then alphabetically.
 | [`jon-peterson-special-needs`](program/jon-peterson-special-needs.yml) | program | Jon Peterson Special Needs Scholarship | 7 | 2 |
 | [`nonpublic-administrative-cost-reimbursement`](program/nonpublic-administrative-cost-reimbursement.yml) | program | Nonpublic Administrative Cost Reimbursement | 1 | 2 |
 | [`scholarship-donation-credit`](program/scholarship-donation-credit.yml) | program | Scholarship Donation Credit | 4 | 2 |
-| [`bond-levy`](revenue-stream/bond-levy.yml) | revenue-stream | Bond Levy | 2 | 3 |
+| [`bond-levy`](revenue-stream/bond-levy.yml) | revenue-stream | Bond Levy | 3 | 4 |
+| [`capital-finance-without-a-vote`](revenue-stream/capital-finance-without-a-vote.yml) | revenue-stream | Capital Finance Without a Vote | 2 | 2 |
 | [`casino-tax-distribution`](revenue-stream/casino-tax-distribution.yml) | revenue-stream | Casino Tax — County Student Fund | 6 | 1 |
 | [`current-expense-levy`](revenue-stream/current-expense-levy.yml) | revenue-stream | Current Expense Levy | 5 | 4 |
 | [`emergency-levy`](revenue-stream/emergency-levy.yml) | revenue-stream | Emergency Levy | 5 | 5 |
@@ -714,7 +715,7 @@ Sorted by: kind, then alphabetically.
 | [`idea-part-b`](revenue-stream/idea-part-b.yml) | revenue-stream | IDEA Part B | 7 | 5 |
 | [`local-property-tax`](revenue-stream/local-property-tax.yml) | revenue-stream | Local Property Tax | 11 | 14 |
 | [`lottery-profits`](revenue-stream/lottery-profits.yml) | revenue-stream | Lottery Profits Education Fund | 4 | 1 |
-| [`permanent-improvement-levy`](revenue-stream/permanent-improvement-levy.yml) | revenue-stream | Permanent Improvement Levy | 4 | 4 |
+| [`permanent-improvement-levy`](revenue-stream/permanent-improvement-levy.yml) | revenue-stream | Permanent Improvement Levy | 5 | 5 |
 | [`state-foundation-aid`](revenue-stream/state-foundation-aid.yml) | revenue-stream | State Foundation Aid | 7 | 23 |
 | [`substitute-levy`](revenue-stream/substitute-levy.yml) | revenue-stream | Substitute Levy | 5 | 5 |
 | [`title-i`](revenue-stream/title-i.yml) | revenue-stream | Title I, Part A | 7 | 5 |
@@ -725,7 +726,7 @@ Sorted by: kind, then alphabetically.
 | [`barrington-road-elementary`](school/barrington-road-elementary.yml) | school | Barrington Road Elementary School | 4 | 2 |
 | [`sheridan-high-school`](school/sheridan-high-school.yml) | school | Sheridan High School | 6 | 2 |
 
-143 nodes across 18 classes, and **1 with nothing pointing at them** — counting a citation in somebody's prose as pointing. Whether that is a gap depends on the class: `web/tests/unit/reachability.spec.ts` holds every node to having an inbound *edge* and exempts `draft-legislation`, where a node with nothing pointing at it is the design.
+144 nodes across 18 classes, and **1 with nothing pointing at them** — counting a citation in somebody's prose as pointing. Whether that is a gap depends on the class: `web/tests/unit/reachability.spec.ts` holds every node to having an inbound *edge* and exempts `draft-legislation`, where a node with nothing pointing at it is the design.
 <!-- /REGEN -->
 
 ## Semantic index status
@@ -735,5 +736,5 @@ Regenerated by: `edfund-connect index`
 Fields: total nodes indexed, embedding model, index freshness (last indexed commit vs HEAD),
         stale node count.
 -->
-No semantic index is built. The corpus is 143 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
+No semantic index is built. The corpus is 144 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
 <!-- /REGEN -->
