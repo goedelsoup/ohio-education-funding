@@ -21,8 +21,15 @@ description: |
   renegotiation every biennium — concentrated in exactly the districts with the most
   industrial property. [inference]
 
-  The per-district magnitude of the substitution and the current status of the phase-down are
-  not established here. [open]
+  The schedule this act wrote held fixed-rate levy losses harmless through tax year 2010 and then
+  phased the direct reimbursement out at 3/17 a year for two years and 2/17 a year after, to end
+  after tax year 2018; it never ran as written. H.B. 1 deferred it, H.B. 153 replaced it, and the
+  payments are now paid under R.C. 5709.92 rather than this act's 5751.21, which made its last
+  payment in FY2015. The year-by-year schedule, and the act that set each year, is in
+  [`tpp-replacement-payments`](../revenue-stream/tpp-replacement-payments.yml). [verified]
+  (the greenbooks; R.C. 5751.21 as vendored)
+
+  The per-district magnitude of the substitution is not established here. [open]
 properties:
   designation: Am. Sub. H.B. 66
   general_assembly: 126th General Assembly

@@ -81,16 +81,18 @@ properties:
 
     **The TPP supplement's second year.** The FY2017 appropriation of **$78.3 million** and its
     supporting formula calculations, plus a related provision transferring $12 million of GRF cash
-    to the School District TPP Supplement Fund in each fiscal year. **Vetoed**, leaving FY2016's
-    supplement in place and FY2017's not. The transfers from the Medicaid Reserve Fund and the
+    to the School District TPP Supplement Fund in each fiscal year. **Vetoed**, and paid anyway: the
+    supplement's FY2017 actual is not zero, under an adjusted appropriation whose authority no held
+    document names. The transfers from the Medicaid Reserve Fund and the
     FY2015 surplus were retained. See
     [`tpp-replacement-payments`](../revenue-stream/tpp-replacement-payments.yml).
 
     Also vetoed: an exemption from the property tax replacement phase-out for districts containing
     a nuclear power plant where replacement payments were 10% or more of total resources, which
     would have reached exactly two districts — Perry Local in Lake County and Benton-Carroll-Salem
-    in Ottawa County; and the removal of the rule requiring a JVSD to spend at least 75% of its
-    state career-technical funding on career-technical programs.
+    in Ottawa County, and which H.B. 166 enacted four years later on FY2017 payments; and the
+    removal of the rule requiring a JVSD to spend at least 75% of its state career-technical
+    funding on career-technical programs.
   accountability_effect: |
     Introduced the graduation and third-grade reading bonuses, which pay on report-card measures
     and so join the funding and accountability systems.
@@ -111,6 +113,19 @@ properties:
     [performance supplement rate](../parameter/performance-supplement-rate.yml); the chronology of
     every rating-to-dollar coupling is at
     [Ohio report card](../accountability-regime/ohio-report-card.yml).
+revisions:
+  - was: |
+      "**Vetoed**, leaving FY2016's supplement in place and FY2017's not."
+    now: |
+      The FY2017 appropriation was vetoed and the supplement was paid in FY2017 and FY2018 under
+      an adjusted appropriation; the amounts and the open question of its authority are in
+      tpp-replacement-payments.
+    found_by: |
+      Reading line 200697's actuals while building the year-by-year replacement payment series
+      (#784).
+    reach: |
+      The same sentence in tpp-replacement-payments, revised there. The veto itself stands as
+      written.
 links:
   - target: ../legislation.ont.yml
     relationship: instance-of
