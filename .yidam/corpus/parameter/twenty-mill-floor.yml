@@ -510,3 +510,16 @@ links:
     note: >-
       The statute behind the floor: R.C. 319.301, and the fixed-sum exemption the node quotes,
       which names R.C. 5705.199 and 5748.09.
+  - target: ../revenue-stream/current-expense-levy.yml
+    relationship: holds-up
+    note: >-
+      The floor is computed on taxes for current expenses, and suspends their reduction.
+  - target: ../revenue-stream/emergency-levy.yml
+    relationship: excludes
+    note: >-
+      One approved before January 1, 2026, from the floor's taxes charged and payable until the
+      county's next reappraisal or update year.
+  - target: ../revenue-stream/substitute-levy.yml
+    relationship: excludes
+    note: >-
+      On the same terms as the emergency levy it substituted for.

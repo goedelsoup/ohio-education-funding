@@ -18,6 +18,11 @@ See the class definition: [revenue-stream.ont.yml](../revenue-stream.ont.yml).
 | Node | Level | Constraint |
 |------|-------|-----------|
 | [local-property-tax](local-property-tax.yml) | local | Frozen against inflation by H.B. 920 reduction factors |
+| [current-expense-levy](current-expense-levy.yml) | local | Reduced; since 2026 renewed only at its effective rate or less |
+| [permanent-improvement-levy](permanent-improvement-levy.yml) | local | Reduced and restricted; no renewal with an increase since 2026 |
+| [emergency-levy](emergency-levy.yml) | local | A fixed sum; new ones only in fiscal distress or a disaster since 2026 |
+| [substitute-levy](substitute-levy.yml) | local | Grows by new construction; no new ones since 2026 |
+| [bond-levy](bond-levy.yml) | local | Follows the debt; bounded by R.C. 133.06's net indebtedness limits |
 | [state-foundation-aid](state-foundation-aid.yml) | state | Re-appropriated each biennium |
 | [tpp-replacement-payments](tpp-replacement-payments.yml) | state | Phase-down schedule revised repeatedly |
 | [casino-tax-distribution](casino-tax-distribution.yml) | state | Constitutionally earmarked; never touches the formula or the department's budget |

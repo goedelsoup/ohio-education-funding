@@ -55,3 +55,23 @@ links:
     relationship: funds
   - target: ../doctrine/equity.yml
     relationship: bears-on
+  - target: current-expense-levy.yml
+    relationship: levied-as
+    note: >-
+      The voted operating levy, a rate the reduction factor holds to its first dollars.
+  - target: permanent-improvement-levy.yml
+    relationship: levied-as
+    note: >-
+      A voted rate restricted to permanent improvements, reduced like an operating levy.
+  - target: emergency-levy.yml
+    relationship: levied-as
+    note: >-
+      A sum voted for current expenses, exempt from reduction.
+  - target: substitute-levy.yml
+    relationship: levied-as
+    note: >-
+      A sum that grows by new construction, exempt from reduction by name.
+  - target: bond-levy.yml
+    relationship: levied-as
+    note: >-
+      The levy outside the ten-mill limitation that pays a bond issue's debt charges.

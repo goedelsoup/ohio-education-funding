@@ -228,3 +228,21 @@ links:
     relationship: sourced-from
   - target: ../../catalog/cupp-district-profile-report.md
     relationship: sourced-from
+  - target: ../revenue-stream/current-expense-levy.yml
+    relationship: reduces
+  - target: ../revenue-stream/permanent-improvement-levy.yml
+    relationship: reduces
+    note: >-
+      By inference: division (D) reaches "each tax" and (A) does not list it.
+  - target: ../revenue-stream/emergency-levy.yml
+    relationship: exempts
+    note: >-
+      By the general words of (A)(1), a tax producing a specified amount.
+  - target: ../revenue-stream/substitute-levy.yml
+    relationship: exempts
+    note: >-
+      By name, in (A)(1).
+  - target: ../revenue-stream/bond-levy.yml
+    relationship: exempts
+    note: >-
+      (A)(1): an amount to pay debt charges.
