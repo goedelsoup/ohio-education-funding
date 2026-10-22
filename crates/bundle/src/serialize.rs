@@ -224,6 +224,11 @@ impl Bundle {
                     "targeted_assistance_median_wealth_per_pupil",
                     w.targeted_assistance_median_wealth_per_pupil,
                 );
+                st.num(
+                    "capacity_statewide_median_income",
+                    w.capacity_statewide_median_income,
+                );
+                st.share("capacity_benchmark_ratio", w.capacity_benchmark_ratio);
                 st.num("preschool_appropriation", w.preschool_appropriation);
                 // Eight places, like `sigma` above and unlike everything else here: the district
                 // page prints the factor as published and the feed's four-place default would
@@ -1105,6 +1110,29 @@ impl Bundle {
                     )],
                     &[],
                 );
+                // R.C. 3317.017 term by term. The ratio and the rate to eight places: at four the
+                // rate 0.02361… would print as 0.0236 and the page's product would miss the total
+                // by a dollar and more.
+                match &d.capacity {
+                    None => o.raw("capacity", "null"),
+                    Some(c) => {
+                        let mut e = o.obj("capacity");
+                        e.num("valuation_per_pupil", c.valuation_per_pupil);
+                        e.num("gross_income_per_pupil", c.gross_income_per_pupil);
+                        e.num("median_income_per_pupil", c.median_income_per_pupil);
+                        e.num("median_income", c.median_income);
+                        e.num("tax_returns", c.tax_returns);
+                        e.share("income_ratio", c.income_ratio);
+                        e.share("capacity_rate", c.capacity_rate);
+                        e.num("valuation_term_per_pupil", c.valuation_term_per_pupil);
+                        e.num("gross_income_term_per_pupil", c.gross_income_term_per_pupil);
+                        e.num(
+                            "median_income_term_per_pupil",
+                            c.median_income_term_per_pupil,
+                        );
+                        e.num("per_pupil", c.per_pupil);
+                    }
+                }
                 fields(
                     &mut o,
                     "gifted",

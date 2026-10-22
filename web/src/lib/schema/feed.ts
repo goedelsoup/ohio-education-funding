@@ -712,6 +712,33 @@ const DistrictSchema = z
       })
       .strict(),
     /**
+     * R.C. 3317.017's per-pupil local capacity, term by term.
+     *
+     * 60% of the three-year valuation, 20% of gross income, and 20% of median income times
+     * returns, each per base-cost pupil, with each weighted term **already multiplied by the
+     * rate**. The page adds the three and never applies a weight itself, so the weights live in
+     * `crates/local-capacity` alone. The terms must sum to `per_pupil`, and `per_pupil` must
+     * match `regime.local_capacity`, the department's published figure; `capacity.ts` checks
+     * both before the table is drawn. Nullable for a district missing an income input, which no
+     * district in the FY2027 calculator is.
+     */
+    capacity: z
+      .object({
+        valuation_per_pupil: num,
+        gross_income_per_pupil: num,
+        median_income_per_pupil: num,
+        median_income: num,
+        tax_returns: num,
+        income_ratio: num,
+        capacity_rate: num,
+        valuation_term_per_pupil: num,
+        gross_income_term_per_pupil: num,
+        median_income_term_per_pupil: num,
+        per_pupil: num,
+      })
+      .strict()
+      .nullable(),
+    /**
      * Gifted: two per-pupil amounts and three kinds of unit, with floors and a cap.
      *
      * A unit is a headcount entitlement priced like a salary. Coordinator units are floored at 0.5
@@ -1049,6 +1076,10 @@ const StatewideSchema = z
      */
     targeted_assistance_median_weighted_wealth: num,
     targeted_assistance_median_wealth_per_pupil: num,
+    /** The statewide median federal income R.C. 3317.017 divides each district's median by. */
+    capacity_statewide_median_income: num,
+    /** The income ratio at which the capacity rate reaches its 2.5% ceiling. */
+    capacity_benchmark_ratio: num,
     /** The limit the preschool special education sheet prints beside its factor. */
     preschool_appropriation: num,
     /** That factor, carried to the eight places the sheet publishes it to. */

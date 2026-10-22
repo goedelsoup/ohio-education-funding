@@ -183,6 +183,7 @@ export const SECTIONS = {
     millage: "millage",
     denominators: "denominators",
     chargeOff: "charge-off",
+    capacity: "capacity",
     taxEffort: "tax-effort",
     spendingByFunction: "spending-by-function",
     casino: "casino",

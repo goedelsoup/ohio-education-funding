@@ -351,6 +351,47 @@ pub struct TargetedAssistance {
     pub supplement_eligible: bool,
 }
 
+/// Local capacity, R.C. 3317.017, term by term — the blend the plan charges a district against.
+///
+/// [`District::regime`] carries capacity as one per-pupil number, and one number cannot say
+/// whether a district's capacity comes from its property or its residents' income. These are
+/// [`local_capacity::CapacityResult`]'s own intermediates, all on base cost enrolled ADM
+/// ([`District::adm`]), plus each weighted term already multiplied by the capacity rate, so the
+/// three terms sum to [`per_pupil`](Self::per_pupil) without a consumer having to know the
+/// weights.
+///
+/// The terms are carried rather than left to the page because a page multiplying the three
+/// per-pupil figures by weights it typed itself would be a second implementation of the statute,
+/// free to disagree with this one silently. `web/tests/unit/capacity.spec.ts` asserts the terms
+/// close on the total for all 609 districts, and that the total is the department's published
+/// figure.
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct LocalCapacity {
+    /// C1: capacity valuation — the lesser of the recent year and the three-year average — per
+    /// pupil.
+    pub valuation_per_pupil: Dollars,
+    /// C2: capacity federal adjusted gross income, the lesser of recent and average, per pupil.
+    pub gross_income_per_pupil: Dollars,
+    /// C3: the district's federal median income times its number of returns, per pupil.
+    pub median_income_per_pupil: Dollars,
+    /// The district's federal median income, with the department's adjustment factor applied.
+    pub median_income: Dollars,
+    /// Federal returns filed in the district, the multiplier on the median.
+    pub tax_returns: f64,
+    /// C4: the district's median income over the statewide median.
+    pub income_ratio: f64,
+    /// C6: the capacity rate the sliding scale assigns that ratio.
+    pub capacity_rate: f64,
+    /// C1 × 60% × the rate: what property contributes to [`per_pupil`](Self::per_pupil).
+    pub valuation_term_per_pupil: Dollars,
+    /// C2 × 20% × the rate: what aggregate income contributes.
+    pub gross_income_term_per_pupil: Dollars,
+    /// C3 × 20% × the rate: what median income contributes.
+    pub median_income_term_per_pupil: Dollars,
+    /// C7: local capacity per pupil, the sum of the three terms.
+    pub per_pupil: Dollars,
+}
+
 /// Career-technical education's five categories, plus associated services.
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct CareerTechnical {
@@ -919,6 +960,9 @@ pub struct District {
     pub dpia: Dpia,
     /// The largest, and the only equalisation among the six.
     pub targeted_assistance: TargetedAssistance,
+    /// Local capacity's three terms, the income ratio and the rate. `None` only where an income
+    /// input is missing from the calculator, which it is for none of the 609.
+    pub capacity: Option<LocalCapacity>,
     /// Five weights against a career-technical base cost, plus associated services.
     pub career_technical: CareerTechnical,
     /// Three weights that descend rather than ascend.

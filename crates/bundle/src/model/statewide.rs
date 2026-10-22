@@ -96,6 +96,13 @@ pub struct Statewide {
     /// The statewide median weighted wealth per resident pupil, which the wealth index divides
     /// by — `project::panel::categoricals::TA_MEDIAN_WEALTH_PER_PUPIL`.
     pub targeted_assistance_median_wealth_per_pupil: Dollars,
+    /// R.C. 3317.017(A)(4)(a)'s median of the 609 district median federal incomes, which every
+    /// district's capacity income ratio divides by. The calculator's `[I7]`, read rather than
+    /// derived, the way [`local_capacity`] takes it.
+    pub capacity_statewide_median_income: Dollars,
+    /// The income ratio of the fortieth highest district, at and above which the capacity rate
+    /// is 2.5%. The calculator's `[C5]`.
+    pub capacity_benchmark_ratio: f64,
     /// The appropriation limit the preschool special education sheet prints beside its factor.
     ///
     /// `project::panel::supplements::PREK_SPED_APPROPRIATION`. It is the FY2025 estimate rather

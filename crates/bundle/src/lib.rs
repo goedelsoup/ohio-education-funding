@@ -41,6 +41,14 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `54.0.0` added a nullable `capacity` block per district: R.C. 3317.017's per-pupil capacity
+/// term by term, three weighted terms already multiplied by the rate, together with the income
+/// ratio and the rate they rest on. It also added the two statewide inputs the rate is indexed
+/// against, `capacity_statewide_median_income` and `capacity_benchmark_ratio`. Breaking because
+/// the page must find that the three terms sum to `per_pupil` and that `per_pupil` matches
+/// `regime.local_capacity` before it draws the table, and a consumer pinned to `53.0.0` cannot
+/// know that rule exists.
+///
 /// `53.0.0` added a `federal` layer to `nonpublic_support`: Emergency Assistance to Non-Public
 /// Schools and the IDEA Part B proportionate share, each at its own year under its own series.
 /// Breaking because `total` still means the three Category 3 lines and nothing else, and a page
@@ -284,7 +292,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "53.0.0";
+pub const CONTRACT_VERSION: &str = "54.0.0";
 
 mod model;
 mod serialize;

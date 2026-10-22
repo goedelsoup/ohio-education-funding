@@ -530,6 +530,7 @@ export const formulaInputs = ({
     english_learners: _el,
     dpia: _d,
     targeted_assistance: _ta,
+    capacity: _cap,
     gifted: _g,
     house_districts: _hd,
     supplements: _sup,

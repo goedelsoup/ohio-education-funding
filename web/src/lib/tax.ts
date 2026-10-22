@@ -669,7 +669,8 @@ export function renderChargeOff(d: District, statewide: Statewide, tax: TaxState
               r.local_capacity == null
                 ? `Not published for this district.`
                 : `Sixty percent of assessed valuation blended with two income measures, scaled by
-                   a rate that rises with income. This is the department's published figure, and
+                   a rate that rises with income — <a href="#capacity">term by term below</a>.
+                   This is the department's published figure, and
                    <a href="/method">this project's own run of R.C. 3317.017 reproduces it
                    exactly</a> — for all 609 districts, to within a hundredth of a percent.`
             }</td></tr>
