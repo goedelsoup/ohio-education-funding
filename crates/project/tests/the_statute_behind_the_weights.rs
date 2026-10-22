@@ -116,6 +116,15 @@ const CITED: &[&str] = &[
     // to report what the organization did with the money. Not 5747.75, which the issue asking
     // for the node cited: that is the nonchartered nonpublic tuition credit.
     "5747.73",
+    // The school district income tax: the two bases, the resolution, the Tax Commissioner's
+    // estimate, the ballot, the two combined issues. Cited by
+    // `revenue-stream/school-district-income-tax.yml`.
+    "5748.01",
+    "5748.02",
+    "5748.021",
+    "5748.03",
+    "5748.08",
+    "5748.09",
     "5753.02",
     "5753.03",
     "5753.11",
