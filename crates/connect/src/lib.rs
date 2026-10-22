@@ -618,7 +618,7 @@ fn rebuild_local_finance(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
 
     // The school district income tax: Table SD-2-Q4, which districts levy one under R.C. Chapter
     // 5748, at what rate and on which base. See `build_sd2_extract` for the three checks.
-    let sd2_sheets: Result<Vec<(u16, Vec<Vec<String>>)>, RebuildError> =
+    let sd2_sheets: Result<Vec<(u16, _)>, RebuildError> =
         [(2024, "sd2-fy2024"), (2025, "sd2-fy2025")]
             .into_iter()
             .map(|(fiscal_year, key)| {
