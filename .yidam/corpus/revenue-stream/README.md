@@ -25,6 +25,7 @@ See the class definition: [revenue-stream.ont.yml](../revenue-stream.ont.yml).
 | [bond-levy](bond-levy.yml) | local | Follows the debt; bounded by R.C. 133.06's net indebtedness limits |
 | [capital-finance-without-a-vote](capital-finance-without-a-vote.yml) | local | Energy debt capped by its savings; lease-purchase outside net indebtedness |
 | [property-tax-exemption-compensation](property-tax-exemption-compensation.yml) | local | Owed only where the exemption's own instrument provides it |
+| [school-district-income-tax](school-district-income-tax.yml) | local | Voted at a rate rounded to the quarter point; grows with residents' income |
 | [state-foundation-aid](state-foundation-aid.yml) | state | Re-appropriated each biennium |
 | [tpp-replacement-payments](tpp-replacement-payments.yml) | state | Phase-down schedule revised repeatedly |
 | [casino-tax-distribution](casino-tax-distribution.yml) | state | Constitutionally earmarked; never touches the formula or the department's budget |

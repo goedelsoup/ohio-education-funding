@@ -1008,3 +1008,9 @@ links:
     relationship: governed-by
   - target: ../parameter/minimum-state-share.yml
     relationship: governed-by
+  - target: ../revenue-stream/school-district-income-tax.yml
+    relationship: excludes
+    note: >-
+      Capacity reads residents' federal adjusted gross income, not the income tax a district
+      levies on it. 210 districts levied one in FY2025, and none of them is charged more capacity
+      for it.

@@ -80,3 +80,9 @@ links:
       The levy outside the ten-mill limitation that pays a bond issue's debt charges.
   - target: property-tax-exemption-compensation.yml
     relationship: diverted-by
+  - target: school-district-income-tax.yml
+    relationship: parallels
+    note: >-
+      The other tax a district's voters levy. The Tax Commissioner prices a proposed income tax
+      against the property rate that would raise the same amount, and no reduction factor holds
+      its yield flat.

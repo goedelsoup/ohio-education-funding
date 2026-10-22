@@ -443,15 +443,21 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * figures: twenty years paid, FY2006 to FY2025, with business and utility summed through FY2015;
  * H.B. 96's two enacted years; the supplement's three paid years and its FY2017 adjusted
  * appropriation; and FY2025's share of the FY2011 peak.
+ *
+ * Recomputed at **1312/96** when the school district income tax got a node (#787).
+ * `revenue-stream/school-district-income-tax` is the ninety-sixth carrier, binding eleven
+ * figures from Table SD-2-Q4: the districts with a tax in force in two years and by base, two
+ * years of distributions, the rural and small-town count, and the four that test the low-wealth
+ * hypothesis. The floor was at its count.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1301 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1301,
+  expect(bindings.length, "1312 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1312,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "95 nodes carry bindings; raise this when a ninety-sixth does",
-  ).toBeGreaterThanOrEqual(95);
+    "96 nodes carry bindings; raise this when a ninety-seventh does",
+  ).toBeGreaterThanOrEqual(96);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

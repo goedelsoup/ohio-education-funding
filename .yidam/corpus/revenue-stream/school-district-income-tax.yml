@@ -1,0 +1,243 @@
+class: revenue-stream
+label: School District Income Tax
+summary: >-
+  A tax a district's voters levy on residents' income under R.C. Chapter 5748, beside the
+  property tax. 210 districts had one in force in FY2025. Most are rural or small-town, and the
+  state formula's capacity measure does not read the tax.
+description: |
+  A tax a district's voters levy on their own income, beside the property tax. Taxation collects
+  it with the state income tax and pays it to the district each quarter. [verified] (R.C. 5748.01,
+  5748.02)
+
+  **Two bases.** The resolution names one. The traditional base is Ohio modified adjusted gross
+  income less the R.C. 5747.025 exemptions, which reaches pensions, interest and dividends. The
+  earned-income base is wages, salaries, tips and self-employment earnings alone. [verified]
+  (R.C. 5748.01(E)) A district cannot hold one tax on each base. [verified] (R.C. 5748.02(E)) A
+  district with a traditional tax can replace it with an earned-income tax at a new election.
+  [verified] (R.C. 5748.021)
+
+  **The ballot.** Any board except a joint vocational district resolves to raise a stated
+  amount. It certifies the resolution to the Tax Commissioner at least 100 days before the
+  election. Within ten days the commissioner estimates two rates that would raise that amount: a
+  property tax rate and an income tax rate. The board may then propose the income tax at the
+  estimated rate rounded to the nearest quarter point. The tax runs for a set number of years or
+  continuously, and begins on 1 January after the election. A board may submit the question at
+  most twice a year, and if twice, once at the general election. [verified] (R.C. 5748.02(A)-(D))
+  A board may also offer the tax in place of part of a continuing property levy. [verified] (R.C.
+  5748.02(B)(2)) Two combined forms exist. R.C. 5748.08 puts the tax and a bond issue on one
+  question at a special election, by a two-thirds board vote. R.C. 5748.09 joined it to a
+  property levy, and H.B. 96 closed that form to new resolutions. [verified] (R.C. 5748.08,
+  5748.09)
+
+  **Who levies it.** In FY2025, 210 districts had a tax in force: 146 on the traditional base and
+  64 on earned income. [verified] (`dispersion::income_tax`, Table SD-2-Q4) Every rate sits on the
+  quarter-point grid, from 0.25% to 2%, and 1% is the most common. [verified]
+  (`crates/dispersion/fixtures/school-district-income-tax.csv`) Of the 210, 193 are rural or
+  small-town districts in the department's typology. [verified] (`dispersion::income_tax`)
+
+  **It is not where low property wealth is.** The levying districts' median valuation per pupil
+  is somewhat below the others'. But the lowest-valuation quarter of districts levies the tax less
+  often than the second quarter, and among rural and small-town districts the two medians are
+  within 2%. [verified] (`dispersion::income_tax`) See the findings.
+findings: |
+  ### What the table counts
+
+  Table SD-2-Q4 lists every district Taxation paid income tax to in the fiscal year, so a row is
+  a payment, not a levy. FY2025 has 223 rows. Eleven are taxes that had expired and were paying
+  out their last withholding. Two are Ledgemont LSD and Bettsville LSD, which merged into
+  Berkshire and Old Fort a decade ago and still receive late payments under their own IRNs.
+  Setting those aside leaves **210 districts with a tax in force** in FY2025, against 212 in
+  FY2024. [verified] (`dispersion::income_tax`, which reads the status off each row's footnote
+  flag) Of the 210, 64 levy on earned income and 146 on the traditional base. [verified]
+  (`dispersion::income_tax::count_by_base`)
+
+  Taxation distributed **$737.7 million** in FY2025 and **$680.5 million** in FY2024, every row
+  included. [verified] (`dispersion::income_tax::distributed`, checked against the printed
+  statewide total to within a dollar)
+
+  ### The low-wealth hypothesis, tested
+
+  The issue suggested that some low-wealth rural districts rely on the tax because their property
+  base is small. The rural part holds: 193 of the 210 are rural or small-town districts.
+  [verified] (`dispersion::income_tax::rural_or_small_town_levying`, joined to the 2013
+  typology) The low-wealth part does not.
+
+  Ranked on TY2024 taxable value per pupil, 35 districts in the lowest quarter levy the tax,
+  against 85 in the second quarter. [verified]
+  (`dispersion::income_tax::levying_by_valuation_quartile`) The median levying district has
+  **$242,148** of valuation per pupil, against **$259,828** for the districts that do not levy
+  it. [verified] (`dispersion::income_tax::median_valuation`) That gap is mostly a locale effect.
+  Among rural and small-town districts alone, the two medians are within 2%. [verified]
+  (`dispersion::income_tax` tests) The tax is a rural and small-town instrument, and within
+  those districts it is not concentrated where property is thin. [inference]
+
+  Whether any district *relies* on it is a share-of-revenue question, and it is not measured
+  here. [open]
+
+  ### How it enters the formula, and how it does not
+
+  The state share is computed from a per-pupil capacity that reads the district's valuation and
+  its residents' federal adjusted gross income, which the Tax Commissioner certifies. [verified]
+  (R.C. 3317.017(A), 3317.021(A)(5)) No term reads the district's own income tax: a district that
+  levies 2% and one that levies nothing are charged the same capacity for the same residents and
+  valuation.
+  [verified] (R.C. 3317.017) The weights are on
+  [`fsfp-local-capacity-measure`](../formula-component/fsfp-local-capacity-measure.yml). Capacity
+  also reads federal AGI whichever base the district taxes. An earned-income district is charged
+  capacity on its residents' pensions and dividends, which its own tax does not reach.
+  [inference] (R.C. 3317.017, 5748.01(E))
+
+  Chapter 3317 names the tax in one place. If a district fails the qualification requirement of
+  R.C. 3317.01(A), the Tax Commissioner converts its current-expense income tax into mills. The
+  conversion divides the year's estimated liability by one mill of the district's taxable value,
+  and those mills count toward the requirement. [verified] (R.C. 3317.021(C)) The text of R.C.
+  3317.01 is not in the statute fixture. [open]
+
+  ### The districts' own books agree, with five exceptions
+
+  217 districts' FY2025 five-year forecasts book income tax on line 1.030. Euclid City and
+  Orrville City book it and are not on SD-2. Bluffton EVSD, Northridge LSD and Triway LSD have a
+  tax in force on SD-2 and book none. [verified]
+  (`crates/project/tests/the_income_tax_two_publishers_record.rs`) What Euclid and Orrville book
+  is not a Chapter 5748 tax that Taxation distributed. [inference] What it is instead is open.
+  [open]
+unfilled:
+  - field: the count of levying districts before FY2024
+    why: |
+      Table SD-2 is published quarterly in the same directory back to FY1991, as a Wayback CDX
+      listing shows. The years before FY2024 are .xls files or use other layouts the extract does
+      not read. FY2026 is published only through its second quarter, `sd2q2fy26.xlsx`.
+  - field: revenue by base and income class
+    why: |
+      Table SD-5 publishes the tax-year return data by district, with separate sheets for the
+      earned and traditional bases, for TY2016 through TY2023. It is not read. Taxation's
+      `sdit_list.pdf`, `SDITqa.pdf` and its guide to the tax describe the rates for employers,
+      not the distributions.
+  - field: the tax as a share of district revenue
+    why: |
+      This is what "rely on" means, and it needs line 1.030 against total revenue on the forecast
+      panel. That join is not made here.
+figures:
+  - key: dispersion/income-tax-districts-fy2025
+    value: 210
+    field: findings
+    as_written: "**210 districts with a tax in force** in FY2025"
+  - key: dispersion/income-tax-districts-fy2024
+    value: 212
+    field: findings
+    as_written: "against 212 in\n  FY2024"
+  - key: dispersion/income-tax-earned-fy2025
+    value: 64
+    field: findings
+    as_written: "Of the 210, 64 levy on earned income"
+  - key: dispersion/income-tax-traditional-fy2025
+    value: 146
+    field: findings
+    as_written: "146 on the traditional base"
+  - key: dispersion/income-tax-distributed-fy2025
+    value: 737718964.2199999
+    field: findings
+    as_written: "**$737.7 million** in FY2025"
+  - key: dispersion/income-tax-distributed-fy2024
+    value: 680506527.29
+    field: findings
+    as_written: "**$680.5 million** in FY2024"
+  - key: dispersion/income-tax-rural-small-town-fy2025
+    value: 193
+    field: findings
+    as_written: "193 of the 210 are rural or small-town districts"
+  - key: dispersion/income-tax-lowest-valuation-quarter-levying
+    value: 35
+    field: findings
+    as_written: "35 districts in the lowest quarter"
+  - key: dispersion/income-tax-second-valuation-quarter-levying
+    value: 85
+    field: findings
+    as_written: "against 85 in the second quarter"
+  - key: dispersion/income-tax-levying-median-valuation
+    value: 242147.5701
+    field: findings
+    as_written: "**$242,148** of valuation per pupil"
+  - key: dispersion/income-tax-non-levying-median-valuation
+    value: 259828.3228
+    field: findings
+    as_written: "against **$259,828** for the districts"
+revisions:
+  - was: |
+      Issue #787 suggested that some low-wealth rural districts rely on the income tax because
+      their property base is small.
+    now: |
+      The tax is rural and small-town, but it is not concentrated among the districts with the
+      least property. The lowest-valuation quarter levies it less often than the second, and
+      among rural and small-town districts the levying and non-levying medians are within 2%.
+    found_by: |
+      Joining SD-2-Q4 for FY2025 to TY2024 valuation per pupil from Table SD-1 and to the 2013
+      typology.
+    reach: |
+      A small property base does not explain why a district turns to the income tax. Whether the
+      levying districts depend on it more than on property is still open.
+  - was: |
+      Issue #787 framed local capacity as measuring residents' income rather than the district's
+      property.
+    now: |
+      Capacity blends both. Valuation per pupil is one term, and residents' federal adjusted
+      gross income makes up the other two. The district's own income tax is in none of them.
+    found_by: |
+      Reading R.C. 3317.017(A)(5) in the statute fixture.
+    reach: |
+      The income tax sits outside the capacity measure. It enters Chapter 3317 only through the
+      qualification requirement, by R.C. 3317.021(C).
+properties:
+  name: School district income tax
+  level: local
+  legal_basis: |
+    R.C. Chapter 5748: 5748.01 (definitions and the two bases), 5748.02 (resolution, the Tax
+    Commissioner's estimate and the election), 5748.021 (replacing a traditional tax with an
+    earned-income tax), 5748.03 (ballot form), 5748.08 (with a bond issue) and 5748.09 (with a
+    property levy, closed to new resolutions by H.B. 96). R.C. 3317.021(C) converts it into
+    mills for the qualification requirement. [verified]
+  restriction: |
+    Set by the resolution. A tax may be for current expenses, for permanent improvements, or for
+    both with the rate apportioned between them, and the apportionment binds each year's levy.
+    [verified] (R.C. 5748.02(B)(1))
+  growth_behavior: |
+    Grows with residents' income, because the rate applies to a base that rises with wages, and
+    on the traditional base with retirement and investment income as well. There is no reduction
+    factor. This is the opposite of a voted property levy, whose yield H.B. 920 holds roughly
+    flat. [inference] The rate changes only by a new election.
+  series_path: |
+    crates/dispersion/fixtures/school-district-income-tax.csv — one row per district per fiscal
+    year, FY2024 and FY2025, from Table SD-2-Q4, read through `dispersion::income_tax`. Each row
+    carries its rate, base and status. [verified] The districts' own figure is line 1.030 of
+    the five-year forecast, in crates/project/fixtures/district-finances.csv.
+links:
+  - target: ../revenue-stream.ont.yml
+    relationship: instance-of
+  - target: local-property-tax.yml
+    relationship: parallels
+    note: >-
+      The other tax a district's voters levy, and the one R.C. 5748.02 prices it against: the Tax
+      Commissioner estimates both rates for the same amount. The property levy is held flat by
+      reduction factors and the income tax is not.
+  - target: ../education-agency/perrysburg-exempted-village.yml
+    relationship: funds
+    note: >-
+      0.5% on the traditional base since 1992, and $10.4 million in FY2025.
+  - target: ../formula-component/fsfp-local-capacity-measure.yml
+    relationship: bears-on
+    note: >-
+      Capacity reads residents' federal AGI and not the district's own income tax, so a levying
+      district and a non-levying one are charged alike.
+  - target: ../parameter/twenty-mill-floor.yml
+    relationship: bears-on
+    note: >-
+      R.C. 319.301(A)(1) exempts a property tax levied under R.C. 5748.09 from reduction
+      factors. Separately, R.C. 3317.021(C) counts the income tax in mills toward the R.C.
+      3317.01(A) qualification requirement.
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+  - target: ../../catalog/dot-sd2-school-district-income-tax.md
+    relationship: sourced-from
+    note: >-
+      Taxation's own record of what it distributed, with the rate, the base and the status of
+      every district it paid.
