@@ -1,5 +1,6 @@
 ---
-used-by: []
+used-by:
+  - ../corpus/revenue-stream/school-district-income-tax.yml
 ---
 # Table SD-2-Q4 — school district income tax distributions, by district
 
