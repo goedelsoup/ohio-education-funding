@@ -13,6 +13,7 @@ used-by:
   - ../corpus/program/auxiliary-services.yml
   - ../corpus/program/emergency-assistance-to-nonpublic-schools.yml
   - ../corpus/program/nonpublic-administrative-cost-reimbursement.yml
+  - ../corpus/revenue-stream/tpp-replacement-payments.yml
 ---
 # Catalog of Budget Line Items — what each appropriation line was given
 
