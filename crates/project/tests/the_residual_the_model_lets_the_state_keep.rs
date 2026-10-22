@@ -211,7 +211,15 @@ fn cleveland_returned_the_residual_the_same_budget_let_the_state_keep() {
 fn the_only_state_and_local_per_pupil_amount_in_the_code_stays_inside_the_district() {
     let carrying: Vec<&str> = statute::sections()
         .into_iter()
-        .filter(|section| section.body.contains("state and local"))
+        // R.C. 5709.68(D) reports "the state and local taxes not paid" in each enterprise zone: a
+        // statewide tally of forgone tax, not an amount computed from a district's revenue, so an
+        // occurrence followed by "taxes" is not the phrase this finding is about.
+        .filter(|section| {
+            section
+                .body
+                .match_indices("state and local")
+                .any(|(at, phrase)| !section.body[at + phrase.len()..].starts_with(" taxes"))
+        })
         .map(|section| section.number)
         .collect();
 

@@ -159,6 +159,26 @@ const CITED: &[&str] = &[
     // the department's average cost of pupil transportation for the previous school year, which
     // is the same lagged endogenous statistic R.C. 3317.0212(C) and (D) make the two rates.
     "3327.02",
+    // Property tax exemptions for development, and what each gives a school board. Cited by
+    // `revenue-stream/property-tax-exemption-compensation` for the three tax increment forms
+    // (municipal, township, county) and their seventy-five per cent and ten-year approval line;
+    // the service payment in lieu of taxes and who it reaches; the community reinvestment area
+    // exemption and its commercial agreement; the two enterprise zone forms and their different
+    // lines; the compensation section and the notice section every one of them points to; and
+    // the annual enterprise zone report a board of education receives. Read together with
+    // 3317.021(A)(4) above, whose list of exemptions carved out of the certified exempt value
+    // names six of these: 3735.67, 5709.40, 5709.62, 5709.63, 5709.73 and 5709.78.
+    "5709.40",
+    "5709.42",
+    "5709.73",
+    "5709.78",
+    "5709.82",
+    "5709.83",
+    "3735.67",
+    "3735.671",
+    "5709.62",
+    "5709.63",
+    "5709.68",
 ];
 
 /// The extract is what it claims to be: every cited section, each with a date and an act.
