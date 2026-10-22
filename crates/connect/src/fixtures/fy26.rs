@@ -23,7 +23,7 @@
 //!
 //! So this takes thirty-five columns rather than 162 — the two sides of the state share, the
 //! local capacity build-up, the disadvantaged pupil blend, and the payment lines — which is about
-//! a hundred kilobytes and answers the questions. Everything else on those sheets is either
+//! two hundred kilobytes and answers the questions. Everything else on those sheets is either
 //! already held for FY2027 or genuinely does restate it.
 //!
 //! # Fourteen of the thirty-five are the payment lines, and they came later
