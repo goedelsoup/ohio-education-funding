@@ -7,6 +7,7 @@ used-by:
   - ../corpus/metric/assessed-valuation-per-pupil.yml
   - ../corpus/metric/effective-operating-millage.yml
   - ../corpus/metric/performance-index.yml
+  - ../corpus/parameter/tax-reduction-factor.yml
 ---
 # District Profile Report — the "Cupp Report"
 
