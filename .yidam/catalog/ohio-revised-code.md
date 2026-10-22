@@ -3,6 +3,7 @@ used-by:
   - ../corpus/accountability-regime/ohio-report-card.yml
   - ../corpus/intervention/academic-distress-commission.yml
   - ../corpus/parameter/career-technical-category-multiples.yml
+  - ../corpus/parameter/cfap-required-percentage.yml
   - ../corpus/parameter/dpia-per-pupil-amount.yml
   - ../corpus/parameter/english-learner-category-multiples.yml
   - ../corpus/parameter/gifted-funding-rates.yml
@@ -16,6 +17,7 @@ used-by:
   - ../corpus/parameter/twenty-mill-floor.yml
   - ../corpus/program/autism-scholarship.yml
   - ../corpus/program/auxiliary-services.yml
+  - ../corpus/program/classroom-facilities-assistance.yml
   - ../corpus/program/cleveland-scholarship.yml
   - ../corpus/program/edchoice-scholarship.yml
   - ../corpus/program/jon-peterson-special-needs.yml
