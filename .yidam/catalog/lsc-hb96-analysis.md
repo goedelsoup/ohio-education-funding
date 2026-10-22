@@ -49,6 +49,15 @@ pins it in `source-digests.txt`, and commits the extract as
 [`dew-greenbook.txt`](../../crates/project/fixtures/dew-greenbook.txt), so enacted figures drawn
 from it are `[verified]` rather than inference.
 
+The as-enacted final analysis, `hb96-final-analysis`, yields two extracts. One is the school
+funding section. The other,
+[`enacted-levy-limits.txt`](../../crates/project/fixtures/enacted-levy-limits.txt), runs from the
+excess carry-over limit to the vetoed twenty-mill floor change. It is the record of what an
+effective date cannot show: that the General Assembly overrode the veto, and that the levy limits
+apply to elections held on or after January 1, 2026. It is a stage's description of the law and
+can be stale against a later act. It lists R.C. 5705.195 and 5705.197 as repealed, and H.B. 129
+re-enacted both in March 2026.
+
 **Caveat — the most important one in the catalog.** LSC publishes at every stage of passage,
 and the versions differ materially. The House-passed *Budget in Brief* describes bridge-formula
 funding of $11.24 billion in FY2026 and $11.49 billion in FY2027; that is the House proposal,
