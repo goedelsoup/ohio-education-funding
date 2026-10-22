@@ -6,6 +6,7 @@ used-by:
   - ../corpus/parameter/local-share-charge-off-millage.yml
   - ../corpus/parameter/tax-reduction-factor.yml
   - ../corpus/revenue-stream/bond-levy.yml
+  - ../corpus/revenue-stream/capital-finance-without-a-vote.yml
   - ../corpus/revenue-stream/casino-tax-distribution.yml
 ---
 # Table SD-1 — School district taxable value and taxes charged

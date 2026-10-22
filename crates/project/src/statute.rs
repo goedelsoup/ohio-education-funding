@@ -199,8 +199,10 @@ mod tests {
             assert!(!s.number.is_empty());
             assert!(!s.title.is_empty(), "{} has no title", s.number);
             assert!(!s.effective.is_empty(), "{} has no date", s.number);
+            // 300 rather than 400: R.C. 9.17, the bidding threshold, is a whole section in 389
+            // characters. A parse that loses a body loses nearly all of it.
             assert!(
-                s.body.len() > 400,
+                s.body.len() > 300,
                 "{} body is {} chars",
                 s.number,
                 s.body.len()

@@ -1,0 +1,170 @@
+class: revenue-stream
+label: Capital Finance Without a Vote
+summary: >-
+  The routes by which a school board pays for buildings and equipment without a ballot:
+  energy conservation notes or contracts repaid from guaranteed savings, energy securities, and
+  lease-purchase agreements paid as operating expense. Each sits outside or above R.C. 133.06's
+  unvoted limit on its own terms.
+description: |
+  A bond issue needs the voters under R.C. 133.18. Three routes to a building do not.
+  [verified] (`crates/project/tests/how_a_district_builds_without_a_ballot.rs`)
+
+  **Energy conservation notes and contracts, R.C. 3313.372.** The version in force is H.B. 15's
+  of the 136th General Assembly, effective August 14, 2025. A board may buy energy conservation
+  measures, including "Heating, ventilating, or air conditioning system modifications or
+  replacements", on an installment contract or notes, and levy the taxes to repay them "without
+  the vote of the electors". Payments "shall not exceed" the calculated savings, are made "only
+  to the extent that the savings ... actually occur", and the energy services company guarantees
+  the savings. The balance is paid within **15** years. The facilities construction commission
+  must find the board's savings finding reasonable. [verified] (`crates/project/src/capital.rs`,
+  `crates/project/tests/how_a_district_builds_without_a_ballot.rs`)
+
+  Division (E) leaves the debt out of the R.C. 133.06 count of net indebtedness. Division (D)
+  still caps all unvoted net indebtedness, "under this and all other sections", at one per cent
+  of tax valuation, and R.C. 133.06(A) names 3313.372(D) among the exceptions to its own
+  one-tenth of one per cent. [verified] (`crates/project/src/capital.rs`)
+
+  **Energy securities, R.C. 133.06(G).** The parallel route issues securities instead of notes,
+  on the same report, a fifteen-year savings finding and the commission's approval, up to
+  nine-tenths of one per cent of tax valuation inside the same one per cent. [verified]
+  (`crates/project/src/capital.rs`)
+
+  **Lease-purchase, R.C. 3313.375.** H.B. 64 of the 131st General Assembly wrote the version in
+  force, effective September 29, 2015. A board leases a facility in one-year renewable terms of
+  at most **30** years, and title vests when the obligations are met. Payments "may be deemed to
+  be, and paid as, current operating expenses", and the obligations "shall not be considered to
+  be net indebtedness" under R.C. 133.06. The section mentions no election. [verified]
+  (`crates/project/src/capital.rs`)
+
+  **Certificates of participation.** No section names them for a school district. R.C.
+  133.01(N), effective March 27, 2020, defines them as "fractionalized interests in public
+  obligations", and (GG)(2) counts payments "under installment sale, lease, lease purchase, or
+  similar agreements" as public obligations. R.C. 9.94 bars a third party from selling them
+  without the obligor's written approval. [verified]
+  (`crates/project/tests/how_a_district_builds_without_a_ballot.rs`) So a certificate is a share
+  of a lease-purchase or installment contract, not a separate grant of borrowing power.
+  [inference]
+findings: |
+  ### What the energy ceiling buys at the median district
+
+  Applied to the median district's taxable value per pupil in Table SD-1, TY2024, the one per
+  cent ceiling allows **$2,513** per pupil of unvoted debt, and energy securities alone
+  **$2,261** per pupil, against **$251** under R.C. 133.06(A). [verified]
+  (`crates/dispersion/fixtures/sd1-district-taxes.csv`, `crates/project/src/capital.rs`) The
+  savings cap, not the per cent, is the binding limit on a contract: the payments cannot exceed
+  what the measures save. [inference]
+
+  ### Outside R.C. 133.06, and under a ceiling
+
+  The hypothesis tested was that an HVAC replacement financed under R.C. 3313.372 is debt outside
+  R.C. 133.06. Division (E) says so, and division (D) caps the same unvoted debt at one per cent. [verified]
+  (`crates/project/src/capital.rs`) Whether (D) counts debt that (E) leaves out of the
+  calculation is not settled by the text. [open]
+
+  ### What H.B. 15 changed
+
+  The measures R.C. 3313.372(A) lists rose from **9** in the September 29, 2017 version to
+  **10**: H.B. 15 added "Solar panels", and division (G), a loan from the school energy
+  performance contracting loan fund. [verified] (`crates/project/src/capital.rs`)
+
+  ### Urgent necessity
+
+  R.C. 3313.46 requires competitive bidding on work above the amount in R.C. 9.17 "except in
+  cases of urgent necessity". The section neither defines the phrase nor says who decides it.
+  [verified] (`crates/project/src/capital.rs`) R.C. 3311.75, a municipal school district's rule
+  for supplies and services, alone requires "two-thirds vote of the board". [verified]
+  (`crates/project/src/capital.rs`) A keyword search of the whole Code found the phrase in seven
+  sections and a definition in none; the search is not committed. [inference] The board that
+  "determines to build" is the one that invokes the exception. [inference]
+
+  H.B. 96, effective September 30, 2025, widened the rule from "any school building" to "any
+  building or other property". S.B. 168, effective October 24, 2024, had tied the threshold to
+  R.C. 9.17: **$75,000** through 2024, raised **3%** a year. [verified]
+  (`crates/project/src/capital.rs`)
+revisions: []
+unfilled:
+  - field: which districts use each route
+    why: |
+      No committed fixture lists energy conservation contracts, commission approvals,
+      lease-purchase agreements or certificates of participation by district, so how much
+      building is financed without a vote is not measured.
+  - field: the bidding threshold after 2024
+    why: |
+      R.C. 9.17 has the director of commerce determine and publish each later year's amount, and
+      no committed fixture carries a published figure.
+properties:
+  name: Capital finance without a vote
+  level: local
+  legal_basis: |
+    R.C. 3313.372 (energy conservation installment contracts and notes), R.C. 133.06(G) (energy
+    securities), R.C. 3313.375 (lease-purchase), and R.C. 133.01(N) and 9.94 for certificates of
+    participation; R.C. 3313.46 and 9.17 for the bidding these purchases go through.
+  restriction: |
+    Restricted to the purpose each section names: energy conservation measures, or the facility
+    a lease-purchase agreement covers. [verified]
+  growth_behavior: |
+    Not a tax base. An energy contract's payments are capped by the savings it produces; a
+    lease-purchase's run as a scheduled operating expense; and unvoted energy debt is capped at a
+    share of tax valuation, so the ceiling rises with values. [verified]
+  series_path: |
+    None. No committed fixture carries a district's energy contracts or lease-purchase payments;
+    crates/dispersion/fixtures/sd1-district-taxes.csv gives only the taxable value the ceiling
+    applies to. [verified]
+links:
+  - target: ../revenue-stream.ont.yml
+    relationship: instance-of
+  - target: bond-levy.yml
+    relationship: bypasses
+    note: >-
+      The voted route to a building, which these three routes do without.
+  - target: permanent-improvement-levy.yml
+    relationship: parallels
+    note: >-
+      A lease-purchase is paid from operating revenue; a permanent improvement levy is voted for
+      the same buildings.
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+    note: >-
+      R.C. 3313.372 in force and as it read on September 29, 2017; 3313.375; 133.01; 133.06; 9.94;
+      9.17; 3311.75; and 3313.46 in force and as it read on October 24, 2024.
+  - target: ../../catalog/dot-sd1-school-district-taxes.md
+    relationship: sourced-from
+    note: >-
+      The taxable value per pupil the ceiling is applied to.
+figures:
+  - key: project/rc-3313-372-term-years
+    value: 15
+    field: description
+    as_written: "within **15** years"
+  - key: project/rc-3313-375-term-ceiling-years
+    value: 30
+    field: description
+    as_written: "at most **30** years"
+  - key: dispersion/median-energy-unvoted-debt-capacity-per-pupil-ty2024
+    value: 2512.711871
+    field: findings
+    as_written: "**$2,513** per pupil"
+  - key: dispersion/median-energy-securities-capacity-per-pupil-ty2024
+    value: 2261.4406839
+    field: findings
+    as_written: "**$2,261** per pupil"
+  - key: dispersion/median-unvoted-debt-capacity-per-pupil-ty2024
+    value: 251.2711871
+    field: findings
+    as_written: "**$251** under"
+  - key: project/rc-3313-372-measures-before-hb15
+    value: 9
+    field: findings
+    as_written: "from **9** in"
+  - key: project/rc-3313-372-measures
+    value: 10
+    field: findings
+    as_written: "to **10**:"
+  - key: project/rc-9-17-bidding-threshold-2024
+    value: 75000
+    field: findings
+    as_written: "**$75,000** through"
+  - key: project/rc-9-17-escalator
+    value: 0.03
+    field: findings
+    as_written: "**3%** a year"

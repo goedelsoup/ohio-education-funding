@@ -22,6 +22,7 @@ used-by:
   - ../corpus/program/nonpublic-administrative-cost-reimbursement.yml
   - ../corpus/program/scholarship-donation-credit.yml
   - ../corpus/revenue-stream/bond-levy.yml
+  - ../corpus/revenue-stream/capital-finance-without-a-vote.yml
   - ../corpus/revenue-stream/casino-tax-distribution.yml
   - ../corpus/revenue-stream/current-expense-levy.yml
   - ../corpus/revenue-stream/emergency-levy.yml
@@ -42,13 +43,17 @@ and the twenty-mill floor, R.C. 5705.391 for the five-year forecast, the Chapter
 sections, R.C. 3302.01, 3302.03, 3302.10 and 3302.12 for the report card and the academic distress
 commission, R.C. 5747.73 for the scholarship donation credit, and the levy sections behind the
 `revenue-stream/` levy modalities: R.C. 5705.19, 5705.21, 5705.25, 5705.194, 5705.195, 5705.197
-and 5705.199, with R.C. 133.06 and 133.18 for the bond levy.
+and 5705.199, with R.C. 133.06 and 133.18 for the bond levy. The unvoted routes to a building
+add R.C. 3313.372 (energy conservation notes), 3313.375 (lease-purchase), 133.01 and 9.94 (what a
+certificate of participation is, and who may sell one), and the bidding sections R.C. 3313.46,
+9.17 and 3311.75.
 
 **Superseded versions.** codes.ohio.gov also serves each prior version of a section at
-`section-<number>/<effective date>`. Two are committed, in
+`section-<number>/<effective date>`. Four are committed, in
 [`crates/project/fixtures/revised-code-prior.txt`](../../crates/project/fixtures/revised-code-prior.txt)
 and cited as `section@version`: R.C. 5705.21 and 5705.25 as they read on April 9, 2025, the
-versions H.B. 96 replaced. A repealed section is not served at all, in any version: every request
+versions H.B. 96 replaced; R.C. 3313.372 as it read from September 29, 2017, before H.B. 15 of
+the 136th General Assembly; and R.C. 3313.46 as it read from October 24, 2024, before H.B. 96. A repealed section is not served at all, in any version: every request
 for R.C. 5705.192 redirects to a number-not-found page.
 
 This entry said "fourteen" for as long as the extract held fourteen, and kept saying it through

@@ -45,7 +45,10 @@ findings: |
   **$251** per pupil. [verified]
   (`crates/dispersion/fixtures/sd1-district-taxes.csv`, `crates/project/src/levy.rs`) The
   unvoted figure is why a school building is a ballot question: what a board can borrow alone
-  would not furnish a classroom. [inference]
+  would not furnish a classroom. [inference] The
+  [routes that need no vote](capital-finance-without-a-vote.yml) are narrower: energy
+  conservation debt under a higher ceiling, and lease-purchase payments R.C. 3313.375 keeps out
+  of net indebtedness. [verified] (`crates/project/src/capital.rs`)
 
   The comparison is an approximation in two ways. R.C. 133.06 measures "tax valuation", and the
   SD-1 per-pupil value is the published taxable value over the published pupil count. Net
@@ -90,6 +93,11 @@ links:
     relationship: instance-of
   - target: local-property-tax.yml
     relationship: part-of
+  - target: capital-finance-without-a-vote.yml
+    relationship: bypassed-by
+    note: >-
+      Energy conservation notes and securities, and lease-purchase, finance a building with no
+      bond election.
   - target: ../parameter/tax-reduction-factor.yml
     relationship: exempt-from
     note: >-

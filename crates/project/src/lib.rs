@@ -66,6 +66,7 @@ pub mod baseline;
 pub mod biennium;
 pub mod bounds;
 pub mod capacity_denominator;
+pub mod capital;
 pub mod cli;
 pub mod counts;
 pub mod crosswalk;

@@ -96,6 +96,10 @@ links:
     note: >-
       Two ways to pay for the same building: a rate collected in advance, or a debt repaid by a
       levy that follows it.
+  - target: capital-finance-without-a-vote.yml
+    relationship: parallels
+    note: >-
+      A lease-purchase pays for the same buildings out of operating revenue, with no levy voted.
   - target: ../parameter/tax-reduction-factor.yml
     relationship: reduced-by
   - target: ../../catalog/ohio-revised-code.md

@@ -481,6 +481,107 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
                limitation that pays its debt charges.",
     },
     Source {
+        key: "rc-133-01",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-133.01",
+        filename: "rc-133-01.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 133.01. Definitions for the Uniform Public Securities Law, including \
+               fractionalized interests in public obligations (certificates of participation) and \
+               lease-purchase payments as public obligations.",
+    },
+    Source {
+        key: "rc-9-94",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-9.94",
+        filename: "rc-9-94.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 9.94. Third parties may not sell fractionalized interests in a public \
+               obligation without the obligor's written approval.",
+    },
+    Source {
+        key: "rc-9-17",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-9.17",
+        filename: "rc-9-17.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 9.17. The dollar threshold for competitive bidding that R.C. 3313.46 \
+               adopts: seventy-five thousand dollars, raised three per cent a year from 2025.",
+    },
+    Source {
+        key: "rc-3313-372",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3313.372",
+        filename: "rc-3313-372.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3313.372. Energy conservation measures financed by installment payment \
+               contract or notes without a vote, repaid from guaranteed savings over fifteen \
+               years.",
+    },
+    Source {
+        key: "rc-3313-372-at-9-29-2017",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3313.372/9-29-2017",
+        filename: "rc-3313-372-at-9-29-2017.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::PRIOR_STATUTE_FIXTURE],
+        note: "R.C. 3313.372 as it read before H.B. 15 of the 136th General Assembly: the \
+               version effective September 29, 2017, before solar panels and the loan fund.",
+    },
+    Source {
+        key: "rc-3313-375",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3313.375",
+        filename: "rc-3313-375.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3313.375. Lease-purchase of buildings and equipment in one-year renewable \
+               terms of up to thirty years, paid as current operating expenses.",
+    },
+    Source {
+        key: "rc-3313-46",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3313.46",
+        filename: "rc-3313-46.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3313.46. Competitive bidding on school construction and repair, and its \
+               exception for cases of urgent necessity.",
+    },
+    Source {
+        key: "rc-3313-46-at-10-24-2024",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3313.46/10-24-2024",
+        filename: "rc-3313-46-at-10-24-2024.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::PRIOR_STATUTE_FIXTURE],
+        note: "R.C. 3313.46 as it read before H.B. 96: the version effective October 24, 2024, \
+               when the bidding rule reached only a school building.",
+    },
+    Source {
+        key: "rc-3311-75",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3311.75",
+        filename: "rc-3311-75.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3311.75. A municipal school district's bidding rule, whose urgent \
+               necessity exception requires a two-thirds vote of the board.",
+    },
+    Source {
         key: "rc-5705-195",
         title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-5705.195",

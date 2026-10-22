@@ -424,15 +424,21 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * statutory figure each, and the bond levy binds four, R.C. 133.06's two limits and the two
  * per-pupil debt capacity medians. **The floor was seventeen bindings and one carrier under before
  * those were added**, on the reduction-factor branch (#785) this one is stacked on.
+ *
+ * Recomputed at **1270/93** when capital finance without a vote got a node (#789).
+ * `revenue-stream/capital-finance-without-a-vote` is the ninety-third carrier and binds nine: the
+ * energy contract's term and the lease-purchase ceiling, the measures R.C. 3313.372 counted
+ * before and after H.B. 15, the bidding threshold and its escalator, and three per-pupil debt
+ * capacity medians. The floor was at its count.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1261 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1261,
+  expect(bindings.length, "1270 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1270,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "92 nodes carry bindings; raise this when a ninety-third does",
-  ).toBeGreaterThanOrEqual(92);
+    "93 nodes carry bindings; raise this when a ninety-fourth does",
+  ).toBeGreaterThanOrEqual(93);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

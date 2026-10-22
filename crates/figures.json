@@ -1085,7 +1085,15 @@
     {"key": "project/rc-5705-194-term-ceiling-years", "owner": "crates/project", "unit": "count", "value": 5, "label": "Most years an emergency levy may run, R.C. 5705.194"},
     {"key": "project/rc-5705-21-term-ceiling-years", "owner": "crates/project", "unit": "count", "value": 5, "label": "Most years a school levy may run when it is not for current expenses or general permanent improvements, R.C. 5705.21(A)"},
     {"key": "project/rc-5705-199-anticipation-note-share", "owner": "crates/project", "unit": "share", "value": 0.5, "label": "Share of a substitute levy's first-year proceeds a board may borrow against in anticipation notes, R.C. 5705.199(D)"},
+    {"key": "project/rc-3313-372-term-years", "owner": "crates/project", "unit": "count", "value": 15, "label": "Most years an energy conservation installment contract may run, R.C. 3313.372(B)(2)"},
+    {"key": "project/rc-3313-372-measures", "owner": "crates/project", "unit": "count", "value": 10, "label": "Energy conservation measures R.C. 3313.372(A) enumerates, H.B. 15 version"},
+    {"key": "project/rc-3313-372-measures-before-hb15", "owner": "crates/project", "unit": "count", "value": 9, "label": "Energy conservation measures R.C. 3313.372(A) enumerated, September 29, 2017 version"},
+    {"key": "project/rc-3313-375-term-ceiling-years", "owner": "crates/project", "unit": "count", "value": 30, "label": "Most years a lease-purchase agreement may run, R.C. 3313.375(A)"},
+    {"key": "project/rc-9-17-bidding-threshold-2024", "owner": "crates/project", "unit": "dollars", "value": 75000.0, "label": "Competitive bidding threshold through calendar year 2024, R.C. 9.17(A)(1)"},
+    {"key": "project/rc-9-17-escalator", "owner": "crates/project", "unit": "share", "value": 0.03, "label": "Yearly increase in the competitive bidding threshold after 2024, R.C. 9.17(A)(2)"},
     {"key": "dispersion/median-debt-capacity-per-pupil-ty2024", "owner": "crates/dispersion", "unit": "dollars", "value": 22614.406839, "label": "R.C. 133.06(B)'s limit applied to the median district's taxable value per pupil, Table SD-1, TY2024"},
-    {"key": "dispersion/median-unvoted-debt-capacity-per-pupil-ty2024", "owner": "crates/dispersion", "unit": "dollars", "value": 251.27118710000002, "label": "R.C. 133.06(A)'s unvoted limit applied to the median district's taxable value per pupil, Table SD-1, TY2024"}
+    {"key": "dispersion/median-unvoted-debt-capacity-per-pupil-ty2024", "owner": "crates/dispersion", "unit": "dollars", "value": 251.27118710000002, "label": "R.C. 133.06(A)'s unvoted limit applied to the median district's taxable value per pupil, Table SD-1, TY2024"},
+    {"key": "dispersion/median-energy-securities-capacity-per-pupil-ty2024", "owner": "crates/dispersion", "unit": "dollars", "value": 2261.4406839000003, "label": "R.C. 133.06(G)(3)'s energy securities limit applied to the median district's taxable value per pupil, Table SD-1, TY2024"},
+    {"key": "dispersion/median-energy-unvoted-debt-capacity-per-pupil-ty2024", "owner": "crates/dispersion", "unit": "dollars", "value": 2512.711871, "label": "R.C. 3313.372(D)'s unvoted ceiling applied to the median district's taxable value per pupil, Table SD-1, TY2024"}
   ]
 }
