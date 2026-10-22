@@ -17,7 +17,10 @@ description: |
   [verified] Growth comes from three places only: new construction added to the tax base, new
   levies approved by voters, and reaching the
   [20-mill floor](../parameter/twenty-mill-floor.yml), below which reduction factors stop
-  operating. [verified]
+  operating. [verified] The first of the three can be diverted before a levy reaches it: a tax
+  increment, reinvestment area or enterprise zone
+  [exemption](property-tax-exemption-compensation.yml) takes new value off the tax list, and the
+  school district is paid for it only if the instrument says so. [inference]
 
   A district's revenue trajectory is therefore set less by its wealth than by its levy
   history and its voters' willingness. Two districts with identical valuation can be on
@@ -75,3 +78,5 @@ links:
     relationship: levied-as
     note: >-
       The levy outside the ten-mill limitation that pays a bond issue's debt charges.
+  - target: property-tax-exemption-compensation.yml
+    relationship: diverted-by

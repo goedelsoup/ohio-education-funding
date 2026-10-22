@@ -24,6 +24,7 @@ See the class definition: [revenue-stream.ont.yml](../revenue-stream.ont.yml).
 | [substitute-levy](substitute-levy.yml) | local | Grows by new construction; no new ones since 2026 |
 | [bond-levy](bond-levy.yml) | local | Follows the debt; bounded by R.C. 133.06's net indebtedness limits |
 | [capital-finance-without-a-vote](capital-finance-without-a-vote.yml) | local | Energy debt capped by its savings; lease-purchase outside net indebtedness |
+| [property-tax-exemption-compensation](property-tax-exemption-compensation.yml) | local | Owed only where the exemption's own instrument provides it |
 | [state-foundation-aid](state-foundation-aid.yml) | state | Re-appropriated each biennium |
 | [tpp-replacement-payments](tpp-replacement-payments.yml) | state | Phase-down schedule revised repeatedly |
 | [casino-tax-distribution](casino-tax-distribution.yml) | state | Constitutionally earmarked; never touches the formula or the department's budget |

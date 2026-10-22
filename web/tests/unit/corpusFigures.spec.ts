@@ -430,15 +430,22 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * energy contract's term and the lease-purchase ceiling, the measures R.C. 3313.372 counted
  * before and after H.B. 15, the bidding threshold and its escalator, and three per-pupil debt
  * capacity medians. The floor was at its count.
+ *
+ * Recomputed at **1274/94** when development exemptions got a node (#788).
+ * `revenue-stream/property-tax-exemption-compensation` is the ninety-fourth carrier, binding
+ * four: the two exempt-value shares past which H.B. 1 and H.B. 59 relieved a district, the count
+ * of exemption authorities R.C. 3317.021(A)(4) carves out of certified exempt value, and the
+ * wealth charge's reach, a key the local capacity measure already bound. The floor was at its
+ * count.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1270 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1270,
+  expect(bindings.length, "1274 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1274,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "93 nodes carry bindings; raise this when a ninety-fourth does",
-  ).toBeGreaterThanOrEqual(93);
+    "94 nodes carry bindings; raise this when a ninety-fifth does",
+  ).toBeGreaterThanOrEqual(94);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

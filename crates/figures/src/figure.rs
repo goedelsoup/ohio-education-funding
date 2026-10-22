@@ -528,6 +528,53 @@ fn evidence_based_local_share() -> String {
     project::greenbook::greenbook("hb1").around("Under prior law, school districts contributed", 9)
 }
 
+/// The first number written after `marker`, read off the text rather than retyped from it.
+///
+/// # Panics
+///
+/// If the marker is absent or no number follows it — which means the extract has changed under
+/// the sentence a figure quotes.
+fn number_after(text: &str, marker: &str) -> f64 {
+    let at = text
+        .find(marker)
+        .unwrap_or_else(|| panic!("the extract no longer carries {marker:?}"))
+        + marker.len();
+    let digits: String = text[at..]
+        .chars()
+        .take_while(|c| c.is_ascii_digit() || *c == '.')
+        .collect();
+    digits
+        .trim_end_matches('.')
+        .parse()
+        .unwrap_or_else(|_| panic!("no number follows {marker:?}"))
+}
+
+/// The exemption authorities R.C. 3317.021(A)(4)(b) names, in the statute's order.
+///
+/// The list the Tax Commissioner subtracts from a district's certified exempt value: two chapters
+/// and ten sections, among them every tax increment, community reinvestment area and enterprise
+/// zone form. Counted off the vendored text so that an amendment adding an authority moves the
+/// figure rather than leaving the prose stale.
+fn development_exemptions_carved_out() -> Vec<String> {
+    const OPEN: &str = "district exempted from taxation under ";
+    const CLOSE: &str = " of the Revised Code";
+    let body = project::statute::section("3317.021").body;
+    let start = body
+        .find("(b) The value of real and public utility real property in the district")
+        .expect("R.C. 3317.021(A)(4)(b) is no longer worded as it was");
+    let clause = &body[start..];
+    let from = clause.find(OPEN).expect("(A)(4)(b) names no authority") + OPEN.len();
+    let to = from
+        + clause[from..]
+            .find(CLOSE)
+            .expect("(A)(4)(b) does not close");
+    clause[from..to]
+        .split([',', ' '])
+        .filter(|token| token.chars().any(|c| c.is_ascii_digit()))
+        .map(|token| token.trim_end_matches('.').to_string())
+        .collect()
+}
+
 /// LSC's account of what the Bridge formula's state share index implies, as one paragraph.
 fn bridge_implied_charge_off() -> String {
     project::greenbook::greenbook("hb59").around("Prior to FY 2010, the school funding formula", 11)
@@ -5837,6 +5884,47 @@ pub static FIGURES: &[Figure] = &[
                 "(0.33%) of their recognized",
             )
         },
+    },
+    Figure {
+        key: "project/evidence-based-model-exempt-value-threshold",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The share of potential taxable value a district had to have exempted before the \
+                Evidence-Based Model took the excess off its valuation",
+        pinned: 0.25,
+        tolerance: 0.0005,
+        compute: |_| {
+            number_after(
+                &project::greenbook::greenbook("hb1").flat(),
+                "for districts with more than ",
+            ) / 100.0
+        },
+    },
+    Figure {
+        key: "project/bridge-formula-exempt-value-threshold",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "The share of potential value above which the FY2014 formula took exempt value off \
+                the three-year average valuation, as LSC prints its adjusted valuation",
+        pinned: 0.30,
+        tolerance: 0.0005,
+        compute: |_| {
+            number_after(
+                &project::greenbook::greenbook("hb59").flat(),
+                "(Exempt property value - ",
+            )
+        },
+    },
+    Figure {
+        key: "project/development-exemptions-outside-certified-exempt-value",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Exemption authorities R.C. 3317.021(A)(4)(b) subtracts from the exempt value the \
+                Tax Commissioner certifies \u{2014} tax increment financing, community \
+                reinvestment areas and enterprise zones among them",
+        pinned: 12.0,
+        tolerance: 0.0,
+        compute: |_| development_exemptions_carved_out().len() as f64,
     },
     Figure {
         key: "project/bridge-formula-implied-charge-off-low",

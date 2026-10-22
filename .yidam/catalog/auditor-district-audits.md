@@ -4,6 +4,7 @@ used-by:
   - ../corpus/education-agency/electronic-classroom-of-tomorrow.yml
   - ../corpus/education-agency/northern-local-perry.yml
   - ../corpus/education-agency/upper-arlington-city.yml
+  - ../corpus/revenue-stream/property-tax-exemption-compensation.yml
   - ../corpus/revenue-stream/state-foundation-aid.yml
 ---
 # Auditor of State — district and service center audit reports

@@ -28,6 +28,7 @@ used-by:
   - ../corpus/revenue-stream/emergency-levy.yml
   - ../corpus/revenue-stream/lottery-profits.yml
   - ../corpus/revenue-stream/permanent-improvement-levy.yml
+  - ../corpus/revenue-stream/property-tax-exemption-compensation.yml
   - ../corpus/revenue-stream/substitute-levy.yml
 ---
 # Ohio Revised Code — the sections this corpus cites
@@ -41,7 +42,11 @@ last amended it**. The sections retrieved include the Chapter 3317 foundation pr
 the formula components rest on, the Chapter 3310 scholarship sections, R.C. 319.301 for H.B. 920
 and the twenty-mill floor, R.C. 5705.391 for the five-year forecast, the Chapter 5753 casino
 sections, R.C. 3302.01, 3302.03, 3302.10 and 3302.12 for the report card and the academic distress
-commission, R.C. 5747.73 for the scholarship donation credit, and the levy sections behind the
+commission, R.C. 5747.73 for the scholarship donation credit, the development exemptions a
+board of education is noticed of or consents to — tax increment financing under R.C. 5709.40,
+5709.73 and 5709.78 with the service payments of R.C. 5709.42, community reinvestment areas under
+R.C. 3735.67 and 3735.671, enterprise zones under R.C. 5709.62 and 5709.63 with the annual report
+of R.C. 5709.68, and the compensation and notice sections, R.C. 5709.82 and 5709.83 — and the levy sections behind the
 `revenue-stream/` levy modalities: R.C. 5705.19, 5705.21, 5705.25, 5705.194, 5705.195, 5705.197
 and 5705.199, with R.C. 133.06 and 133.18 for the bond levy. The unvoted routes to a building
 add R.C. 3313.372 (energy conservation notes), 3313.375 (lease-purchase), 133.01 and 9.94 (what a

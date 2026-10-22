@@ -11,6 +11,7 @@ used-by:
   - ../corpus/program/emergency-assistance-to-nonpublic-schools.yml
   - ../corpus/program/nonpublic-administrative-cost-reimbursement.yml
   - ../corpus/revenue-stream/lottery-profits.yml
+  - ../corpus/revenue-stream/property-tax-exemption-compensation.yml
 ---
 # LSC Redbook — Ohio Department of Education and Workforce
 

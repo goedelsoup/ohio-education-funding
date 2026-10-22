@@ -1,0 +1,217 @@
+class: revenue-stream
+label: Property Tax Exemption Compensation
+summary: >-
+  What a school district receives in place of property tax that a tax increment financing,
+  community reinvestment area or enterprise zone exemption forgoes: a service payment, a
+  negotiated compensation, or nothing. The exempt value also leaves the valuation the state
+  formula charges a district for.
+description: |
+  Ohio lets a municipality, township or county exempt new real property value from tax to attract
+  development: tax increment financing under R.C. 5709.40, 5709.73 and 5709.78, community
+  reinvestment areas under R.C. 3735.67, and enterprise zones under R.C. 5709.62 and 5709.63.
+  [verified] ([Revised Code](../../catalog/ohio-revised-code.md)) The school district levies on
+  that value and does not grant the exemption. What the law gives it is a notice, past a line a
+  consent, and sometimes a payment.
+
+  **Its own revenue.** Exempt value is off the tax list, so no school levy reaches it. A
+  municipality may require the owner of a tax-increment parcel to make service payments in lieu
+  of taxes equal to the tax forgone, but R.C. 5709.42(B) distributes the whole of them to the
+  municipality unless the ordinance directs a school share. [verified] R.C. 5709.40(F) lets
+  service payments follow a new levy for thirteen named purposes, from libraries to parks; a
+  school levy is not one of them. [verified] So the one source of growth that
+  [H.B. 920](../legislation/hb-920-1976.yml) leaves an existing levy, new construction, is the
+  value a tax increment district diverts. [inference]
+
+  **Its state aid.** R.C. 3317.02(MM) defines total taxable value as the amounts certified under
+  R.C. 3317.021(A)(1) and (2), and both certify property *subject to taxation*, so exempt value is
+  outside the formula's valuation by definition. [verified] The Tax Commissioner certifies exempt
+  value separately under (A)(4), less a list of exemption authorities that names every tax
+  increment, reinvestment area and enterprise zone form, and no formula section in the extract
+  reads (A)(4) at all. [verified] (crates/project) An exemption therefore lowers the base the
+  [local capacity measure](../formula-component/fsfp-local-capacity-measure.yml) charges, which
+  raises state aid for a district on a computed share and changes nothing for one held by the
+  minimum share or a guarantee. [inference] No section of Chapter 3317 held here mentions a
+  payment in lieu of taxes, so a service payment a district does receive is not charged against
+  it. [verified]
+
+  **The disclosure.** The board receives the instrument under R.C. 5709.83 and, for an enterprise
+  zone, an annual report under R.C. 5709.68. [verified] A district's audited statements are where
+  a tax abatement note would sit, and the one audit read here for it carries none. [verified]
+  ([Auditor of State](../../catalog/auditor-district-audits.md))
+
+  Which instrument needs a board's consent, what compensation the law compels, and how earlier
+  formulas treated exempt value are in the findings below.
+findings: |
+  ### A board consents past a line and is otherwise only told
+
+  The lines are approval lines, not compensation lines. Below each, a board of education receives
+  the R.C. 5709.83 notice at least fourteen days before the instrument is adopted, may comment, and
+  may waive even that. [verified] Above each, it may refuse, and a refusal is what a compensation
+  agreement is negotiated against.
+
+  - **Tax increment financing.** Without the board's approval an exemption runs no more than ten
+    years and covers no more than seventy-five per cent of the improvement; with it, up to thirty
+    years and one hundred per cent. [verified] The notice is due forty-five business days ahead and
+    the board's resolution fourteen days ahead. If the two sides fail to agree compensation, the
+    exemption is held to the unapproved limits; if the board fails to certify a resolution in time,
+    the exemption proceeds as proposed. [verified] The township form (R.C. 5709.73) and the county
+    form (R.C. 5709.78) repeat the municipal line. [verified]
+  - **The exception that removes the board.** A municipal ordinance that pays the school district
+    service payments equal to the taxes it would have received may exceed seventy-five per cent and
+    run to thirty years without the board's approval, under R.C. 5709.40(D)(1). [verified]
+  - **Community reinvestment areas.** A commercial or industrial exemption needs a written
+    agreement under R.C. 3735.671, and the agreement needs the board's approval unless the taxes
+    still paid on the property, plus any payment to the school, reach twenty-five per cent of the
+    taxes forgone each year. [verified] The exemption may reach one hundred per cent for up to
+    fifteen years, or thirty on a megaproject site. [verified] A residential exemption reaches the
+    board as a notice only.
+  - **Enterprise zones.** A municipal agreement may exempt up to seventy-five per cent, and more in
+    a year only if the average over the agreement stays at or under sixty per cent or the board
+    approves; a county agreement's lines are sixty and fifty. Either form needs the board's approval
+    to run past ten years. [verified]
+
+  So the research note's reading that "many abatements reach schools as notice only" is right, and
+  for a different reason than it gave: a board's leverage is set by the approval lines above, and
+  R.C. 5709.82 is where compensation is negotiated once that leverage exists. [inference]
+
+  ### What compensation the law compels
+
+  Almost none. R.C. 5709.82(B) permits an agreement under which a school is compensated for revenue
+  forgone; the owner may join it or make its own, and whatever rate a city, local or exempted
+  village district receives, the joint vocational district must receive too. [verified]
+
+  The one duty is in division (C). Where a **municipality** that taxes incomes grants an exemption
+  and the payroll of the new employees reaches one million dollars a year (two million, indexed,
+  for a reinvestment area), the municipality and the board must attempt to negotiate. If six months
+  pass without agreement, division (D) requires the municipality to pay the school half of the
+  income tax it collects from those new employees, less infrastructure costs, which may not exceed
+  thirty-five per cent of that tax without the board's consent. [verified] Division (C)'s list of
+  authorities does not include R.C. 5709.73 or 5709.78, so a township or county tax increment
+  district never triggers it. [verified]
+
+  ### How the formula has treated exempt value
+
+  The plan is not the first formula to see exempt value, only the first in some years to ignore it.
+  LSC's greenbooks record each change. [verified] (crates/project, reading
+  [the greenbooks](../../catalog/lsc-dew-redbook.md))
+
+  - Before FY2007 every exempt parcel was excluded from the valuation the local share was charged
+    on. [H.B. 66](../legislation/hb-66-2005.yml) then added the value of certain exempt property
+    for which a district receives payments in lieu of taxes, and
+    [H.B. 1](../legislation/hb-1-2009.yml) kept that adjustment. [verified] That rule ran the other
+    way from the current one: it charged a district for value it was paid on.
+  - H.B. 1 also relieved districts with heavy exemption: for districts with more than 25% of
+    potential taxable value exempted, the excess over that share came off the valuation before the
+    local share was charged. [verified] (crates/project) The same rule is recorded under the
+    [charge-off](../parameter/local-share-charge-off-millage.yml).
+  - [H.B. 59](../legislation/hb-59-2013.yml)'s FY2014 formula did the same at 30% of potential
+    value, subtracting exempt value above that share from the three-year average valuation.
+    [verified] (crates/project)
+  - The plan has neither. R.C. 3317.021(A)(4) still certifies exempt value, less 12 exemption
+    authorities, and nothing held reads it. [verified] (crates/project)
+
+  Whether the 25% and 30% tests measured the (A)(4) figure, with development exemptions carved
+  out, is not said in either greenbook. If they did, a district could never have qualified for
+  relief by abating. [open]
+
+  ### Why state aid only partly backfills the loss
+
+  Exempt value lowers taxable value, and lower taxable value is charged less local capacity. The
+  local capacity measure's wealth charge reaches 268 districts; for the rest an exemption moves no
+  state aid, because the minimum share or a guarantee already decides their aid. [verified]
+  (crates/project) Where it does move aid, it moves a fraction of the tax forgone, because the
+  measure charges a share of value rather than the district's own millage. [inference] The
+  research note's first hypothesis, that state aid partly backfills an exemption, therefore holds
+  for districts on a computed share and fails for the rest. [inference]
+
+  ### Where an exemption is reported
+
+  - **To the board.** A copy of each instrument under R.C. 5709.83, unless waived; for an
+    enterprise zone, by March 31 each year, a report under R.C. 5709.68 of every agreement in force,
+    with the value exempted under each one reviewed. [verified]
+  - **To the state.** A municipal tax increment ordinance goes to the director of development, with
+    an annual status report that summarizes the service payments received (R.C. 5709.40(I)).
+    Enterprise zone agreements, and any terms affecting school revenue, go to the director of
+    development services and the tax commissioner (R.C. 5709.62(H) and 5709.63(H)). From the zone
+    reports the tax commissioner reports each year, for each zone, the state and local taxes not
+    paid because of exemptions (R.C. 5709.68(D)). [verified]
+  - **In the district's own audit.** GASB Statement No. 77 is the accounting standard for tax
+    abatement disclosure. The West Geauga Local audit for the year ended June 30, 2020, the one
+    audit held here from after the standard took effect, has no note on tax abatements, and its
+    text does not use the word. [verified] Whether that silence means none applied or none was
+    reported is not settled by one report, so the research note's reading that district notes
+    often state "no material abatements" stays untested. [open]
+properties:
+  name: Property tax exemption compensation
+  level: local
+  legal_basis: |
+    R.C. 5709.40, 5709.73 and 5709.78 (tax increment financing), with R.C. 5709.42 (service
+    payments in lieu of taxes); R.C. 3735.67 and 3735.671 (community reinvestment areas); R.C.
+    5709.62, 5709.63 and 5709.68 (enterprise zones); R.C. 5709.82 (school compensation) and
+    5709.83 (school notice). Read against R.C. 3317.02(MM) and 3317.021(A), which define the
+    valuation the formula charges.
+  restriction: |
+    Set by each instrument. A service payment directed to a school is distributed at the same time
+    and in the same manner as real property tax (R.C. 5709.42(B)); compensation under R.C. 5709.82
+    may be cash, property or services. No section held here restricts what the district spends it
+    on.
+  growth_behavior: |
+    Fixed by the instrument that grants the exemption and ends with it, after ten years unless a
+    board approved longer, and never past thirty. A service payment equal to the forgone tax moves
+    with the improvement's value and the district's millage; an R.C. 5709.82(D) payment moves with
+    the new employees' municipal income tax. An exemption below the approval lines need carry no
+    payment to the school at all.
+  series_path: |
+    None. No source held reports exempt value, service payments or compensation by district. Table
+    SD-1 (crates/dispersion/fixtures/sd1-district-taxes.csv) carries taxable value only,
+    crates/project/fixtures/district-finances.csv has no payment in lieu of taxes column, and the
+    R.C. 3317.021(A)(4) certification of exempt value is made to the department and the budget
+    office and is not in any source held.
+unfilled:
+  - field: district-level exempt value and service payments
+    why: |
+      The Tax Commissioner's R.C. 3317.021(A)(4) certification is the one statewide per-district
+      measure of exempt value, and it is not published in any source this repository holds. Table
+      SD-1 carries taxable value only. County auditors hold the parcel lists, one county at a time.
+  - field: statewide counts of agreements and of value exempted
+    why: |
+      R.C. 5709.68(D) requires the tax commissioner to report the taxes not paid in each enterprise
+      zone, and the Department of Development receives every zone report and tax increment status
+      report. None is fetched. Adding one is a connector, which needs a decision record before the
+      five artifacts it costs.
+  - field: GASB Statement No. 77 notes across districts
+    why: |
+      One post-standard audit is held, read for a different paragraph. A census of abatement notes
+      needs the audits of many districts.
+figures:
+  - key: project/development-exemptions-outside-certified-exempt-value
+    value: 12
+    field: findings
+    as_written: "less 12 exemption authorities"
+  - key: project/evidence-based-model-exempt-value-threshold
+    value: 0.25
+    field: findings
+    as_written: "for districts with more than 25% of potential taxable value exempted"
+  - key: project/bridge-formula-exempt-value-threshold
+    value: 0.30
+    field: findings
+    as_written: "did the same at 30% of potential value"
+  - key: project/wealth-charge-districts
+    value: 268
+    field: findings
+    as_written: "wealth charge reaches 268 districts"
+links:
+  - target: ../revenue-stream.ont.yml
+    relationship: instance-of
+  - target: local-property-tax.yml
+    relationship: substitutes-for
+  - target: ../formula-component/fsfp-local-capacity-measure.yml
+    relationship: lowers-the-base-of
+  - target: ../parameter/local-share-charge-off-millage.yml
+    relationship: parallels
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+  - target: ../../catalog/lsc-dew-redbook.md
+    relationship: sourced-from
+  - target: ../../catalog/auditor-district-audits.md
+    relationship: sourced-from

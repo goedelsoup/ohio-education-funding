@@ -304,8 +304,9 @@ test("citations are counted from both the forms the corpus writes them in", () =
   // Cited ten ways through structured `sourced-from` edges and, in the transportation
   // component, through both a structured edge and a markdown link at once — so the eleventh entry
   // only appears if the two forms are unioned rather than added. The new EANS node also cites it
-  // both ways, and still counts once.
-  expect(count("lsc-dew-redbook")).toBe(11);
+  // both ways, and still counts once. The twelfth is the exemption compensation node, which cites
+  // it both ways too, for the H.B. 1 and H.B. 59 exempt-value adjustments.
+  expect(count("lsc-dew-redbook")).toBe(12);
   // Cited both ways: seven structured edges and two markdown links, overlapping in the
   // transportation component, which cites the line-by-line editions for the department's
   // rationale for the rider weights. One number that a reader dropping either form gets wrong.

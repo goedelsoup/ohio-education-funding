@@ -550,10 +550,30 @@ findings: |
   [verified] (crates/project)
 
   Where any agency exists is a school board's part in consenting to property tax exemptions, an
-  exemption being the one instrument that lowers the base this charge is levied on. **[open]**
-  Nothing in this repository models abatement and no catalog record reaches district-level exempt
-  value, so whether 1.2 cents is large enough to move a consent vote is not answered here.
+  exemption being the one instrument that lowers the base this charge is levied on. Exempt value is
+  outside the taxable value this measure reads, and the board's consent is required only past
+  approval lines set in each exemption statute; both are recorded under
+  [property tax exemption compensation](../revenue-stream/property-tax-exemption-compensation.yml).
+  [verified] (crates/project) **[open]** No catalog record reaches district-level exempt value, so
+  whether 1.2 cents is large enough to move a consent vote is not answered here.
 revisions:
+  - was: |
+      "Nothing in this repository models abatement": a school board's part in consenting to a
+      property tax exemption was named as the one agency the charge leaves it, with no account of
+      when that consent is needed or whether exempt value reaches the base at all.
+    now: |
+      Both are recorded. Exempt value is outside the valuation by definition, and the
+      certification of exempt value carves out every development exemption besides. A board
+      consents only past the approval line of the statute that grants the exemption, and is
+      otherwise noticed.
+    found_by: |
+      Vendoring the eleven exemption, compensation and notice sections into the statute extract and
+      reading R.C. 3317.021(A) against them, in
+      `crates/project/tests/the_statute_behind_the_weights.rs` and the
+      `project/development-exemptions-outside-certified-exempt-value` figure.
+    reach: |
+      The open question narrows to its quantity. Whether the charge is large enough to move a vote
+      still needs exempt value by district, which no source held carries.
   - was: |
       Whether the General Assembly had ever been shown the comparison between the rising phase-in
       and the rolling capacity window was recorded as "not established by anything here".
@@ -976,6 +996,8 @@ links:
     relationship: replaces
   - target: ../revenue-stream/state-foundation-aid.yml
     relationship: distributes
+  - target: ../revenue-stream/property-tax-exemption-compensation.yml
+    relationship: excludes-the-value-of
   - target: ../doctrine/equity.yml
     relationship: operationalizes
   - target: ../metric/state-share-percentage.yml
