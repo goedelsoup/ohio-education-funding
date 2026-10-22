@@ -14345,6 +14345,35 @@ pub static FIGURES: &[Figure] = &[
         compute: |_| project::levy::renew_and_increase_sentences_before_hb96() as f64,
     },
     Figure {
+        key: "project/rc-5705-194-term-ceiling-years",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Most years an emergency levy may run, R.C. 5705.194",
+        pinned: 5.0,
+        tolerance: 0.0,
+        compute: |_| project::levy::term_ceiling_years("5705.194").map_or(f64::NAN, |y| y as f64),
+    },
+    Figure {
+        key: "project/rc-5705-21-term-ceiling-years",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Most years a school levy may run when it is not for current expenses or general \
+                permanent improvements, R.C. 5705.21(A)",
+        pinned: 5.0,
+        tolerance: 0.0,
+        compute: |_| project::levy::term_ceiling_years("5705.21").map_or(f64::NAN, |y| y as f64),
+    },
+    Figure {
+        key: "project/rc-5705-199-anticipation-note-share",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "Share of a substitute levy's first-year proceeds a board may borrow against in \
+                anticipation notes, R.C. 5705.199(D)",
+        pinned: 0.5,
+        tolerance: 0.000_05,
+        compute: |_| project::levy::anticipation_note_share("5705.199").unwrap_or(f64::NAN),
+    },
+    Figure {
         key: "dispersion/median-debt-capacity-per-pupil-ty2024",
         owner: "crates/dispersion",
         unit: Unit::Dollars,

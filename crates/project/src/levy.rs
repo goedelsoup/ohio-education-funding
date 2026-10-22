@@ -12,15 +12,29 @@ use crate::statute::{prior, section};
 /// A per cent of tax valuation as R.C. 133.06 writes one, as a fraction of one.
 ///
 /// The section writes its limits as words: "nine per cent", "four per cent", "three per cent",
-/// and the unvoted limit as "one-tenth of one per cent". Those are the only two shapes, and a
-/// phrase in neither is refused rather than guessed at.
+/// and the unvoted limit as "one-tenth of one per cent"; R.C. 5705.199 writes its note limit as
+/// "fifty per cent". A single number word up to ten, a round ten up to ninety, or a fraction of
+/// one per cent are the shapes read, and a phrase in none is refused rather than guessed at.
 #[must_use]
 pub fn per_cent_in_words(words: &str) -> Option<f64> {
     const UNITS: [&str; 10] = [
         "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
     ];
+    const TENS: [&str; 8] = [
+        "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety",
+    ];
     let words = words.trim();
-    let whole = |w: &str| UNITS.iter().position(|u| *u == w).map(|i| (i + 1) as f64);
+    let whole = |w: &str| {
+        UNITS
+            .iter()
+            .position(|u| *u == w)
+            .map(|i| (i + 1) as f64)
+            .or_else(|| {
+                TENS.iter()
+                    .position(|t| *t == w)
+                    .map(|i| (i as f64 + 2.0) * 10.0)
+            })
+    };
     if let Some(rest) = words.strip_suffix(" per cent") {
         if let Some(of) = rest.strip_suffix(" of one") {
             // "one-tenth of one per cent".
@@ -105,6 +119,39 @@ pub fn renew_and_increase_sentences_in_force() -> usize {
     renew_and_increase_sentences(section("5705.21").body)
 }
 
+/// The most years a levy under a section may run for a stated term: the first "may be any number
+/// not exceeding" in the section, read as a number word.
+///
+/// R.C. 5705.194 writes one ceiling, five years. R.C. 5705.21 writes its general ceiling first,
+/// five years for any purpose but current expenses and general permanent improvements, and the
+/// ten-year ceiling of its partnering community school levy after it. `None` if the section
+/// writes no such phrase.
+#[must_use]
+pub fn term_ceiling_years(number: &str) -> Option<usize> {
+    const UNITS: [&str; 10] = [
+        "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+    ];
+    const LEAD: &str = "may be any number not exceeding ";
+    let body = section(number).body;
+    let start = body.find(LEAD)? + LEAD.len();
+    let word = body[start..]
+        .split(|c: char| !c.is_ascii_alphabetic())
+        .next()?;
+    UNITS.iter().position(|u| *u == word).map(|i| i + 1)
+}
+
+/// The share of a levy's first-year proceeds a board may borrow against in anticipation notes,
+/// read from the section's "principal amount not exceeding ... of the total estimated proceeds".
+#[must_use]
+pub fn anticipation_note_share(number: &str) -> Option<f64> {
+    const LEAD: &str = "principal amount not exceeding ";
+    const TAIL: &str = " of the total estimated proceeds";
+    let body = section(number).body;
+    let start = body.find(LEAD)? + LEAD.len();
+    let end = start + body[start..].find(TAIL)?;
+    per_cent_in_words(&body[start..end])
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -113,6 +160,7 @@ mod tests {
     fn both_shapes_of_a_written_per_cent_are_read() {
         assert_eq!(per_cent_in_words("nine per cent"), Some(0.09));
         assert_eq!(per_cent_in_words("four per cent"), Some(0.04));
+        assert_eq!(per_cent_in_words("fifty per cent"), Some(0.5));
         let tenth = per_cent_in_words("one-tenth of one per cent").expect("reads");
         assert!((tenth - 0.001).abs() < 1e-15, "{tenth}");
     }
@@ -120,7 +168,8 @@ mod tests {
     #[test]
     fn a_phrase_in_neither_shape_is_refused() {
         assert_eq!(per_cent_in_words("nine percent"), None);
-        assert_eq!(per_cent_in_words("ninety per cent"), None);
+        assert_eq!(per_cent_in_words("ninety-five per cent"), None);
+        assert_eq!(per_cent_in_words("eleven per cent"), None);
         assert_eq!(per_cent_in_words("one-third of one per cent"), None);
     }
 
@@ -131,6 +180,22 @@ mod tests {
         assert!((consent_threshold() - 0.04).abs() < 1e-15);
         // (D) lists exclusions and states no per cent of tax valuation.
         assert_eq!(indebtedness_limit("D"), None);
+    }
+
+    #[test]
+    fn the_term_ceilings_are_read_from_each_section() {
+        assert_eq!(term_ceiling_years("5705.194"), Some(5));
+        assert_eq!(term_ceiling_years("5705.21"), Some(5));
+        // R.C. 133.06 writes no term ceiling.
+        assert_eq!(term_ceiling_years("133.06"), None);
+    }
+
+    #[test]
+    fn the_substitute_levy_borrows_against_half_its_first_year() {
+        assert_eq!(anticipation_note_share("5705.199"), Some(0.5));
+        // The emergency levy may borrow against the whole of its first year, a phrase of
+        // another shape.
+        assert_eq!(anticipation_note_share("5705.194"), None);
     }
 
     #[test]
