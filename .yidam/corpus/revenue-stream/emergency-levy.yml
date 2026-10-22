@@ -2,8 +2,8 @@ class: revenue-stream
 label: Emergency Levy
 summary: >-
   A school levy voted as a sum of dollars for current expenses, for up to five years. Exempt from
-  reduction factors because it is a fixed sum. Since 2026 a new one needs fiscal distress or a
-  disaster declaration, and one voted before then renews only at the same or a lesser sum.
+  reduction factors as a fixed sum. Since 2026 a new one needs fiscal distress or a
+  disaster declaration, and a renewal is at the same or a lesser sum.
 description: |
   A tax in excess of the ten-mill limitation under R.C. 5705.194, voted as "the amount of money
   it is necessary to raise for the current expenses of the district for each calendar year". It
