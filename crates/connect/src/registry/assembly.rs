@@ -481,6 +481,28 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
                limitation that pays its debt charges.",
     },
     Source {
+        key: "rc-5705-195",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-5705.195",
+        filename: "rc-5705-195.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 5705.195. The election on an emergency levy, which R.C. 5705.194 says governs \
+               its submission. The H.B. 96 final analysis lists the section as repealed.",
+    },
+    Source {
+        key: "rc-5705-197",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-5705.197",
+        filename: "rc-5705-197.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 5705.197. The emergency levy ballot. The H.B. 96 final analysis lists the \
+               section as repealed.",
+    },
+    Source {
         key: "rc-5705-21-at-4-9-2025",
         title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-5705.21/4-9-2025",

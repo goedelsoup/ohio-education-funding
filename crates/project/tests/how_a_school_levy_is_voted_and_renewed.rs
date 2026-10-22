@@ -224,3 +224,74 @@ fn the_analysis_dates_the_limits_by_election_and_records_the_override() {
         );
     }
 }
+
+/// The fixed-sum levies after H.B. 129: the emergency levy renewed as a sum, its election still
+/// governed by a section the analysis listed as repealed, and both kinds taken out of the
+/// floor's base when approved before 2026.
+#[test]
+fn the_fixed_sum_levies_renew_as_sums_and_leave_the_floor() {
+    let emergency = section("5705.194");
+    assert_eq!(emergency.effective, "March 20, 2026");
+    assert!(emergency.legislation.contains("House Bill 129"));
+    for words in [
+        "Notwithstanding the original purpose of the existing tax, the purpose of the renewal \
+         levy shall be for the current expenses of the district.",
+        "the sum levied shall not be increased as otherwise described in section 5705.199",
+        "Section 5705.195 of the Revised Code shall govern the arrangements for the submission \
+         of questions to the electors under this section",
+        "issue anticipation notes in an amount not exceeding the total estimated proceeds of the \
+         levy to be collected during the first year of the levy",
+    ] {
+        assert!(
+            emergency.body.contains(words),
+            "5705.194 no longer reads {words:?}"
+        );
+    }
+    assert!(section("5705.199").body.contains(
+        "for the purpose of providing for the necessary requirements of the school district"
+    ));
+
+    let reduction = section("319.301").body;
+    assert!(reduction.contains("or an amount to pay debt charges"));
+    assert!(reduction.contains(
+        "excludes any tax charged and payable from a tax levied under section 5705.194 or \
+         5705.199 of the Revised Code that is approved by electors at an election held before \
+         January 1, 2026"
+    ));
+}
+
+/// The analysis lists R.C. 5705.195 and 5705.197 as repealed. Both are in force, re-enacted by
+/// H.B. 129 as the fixed-sum levy's election and ballot, and answer only to R.C. 5705.194.
+#[test]
+fn the_emergency_levy_election_sections_were_re_enacted() {
+    let analysis = LEVY_LIMITS.split_whitespace().collect::<Vec<_>>().join(" ");
+    assert!(analysis.contains("5705.195, repealed, 5705.196, repealed, 5705.197, repealed"));
+    let election = section("5705.195");
+    let ballot = section("5705.197");
+    for s in [&election, &ballot] {
+        assert_eq!(s.effective, "March 20, 2026");
+        assert!(s.legislation.contains("House Bill 129"));
+    }
+    assert!(election.title.starts_with("Fixed-sum levy"));
+    assert!(election.body.starts_with(
+        "Within ten days after a resolution adopted under division (B), (C), or (D) of section \
+         5705.194 of the Revised Code is certified to the county auditor"
+    ));
+    assert!(ballot
+        .body
+        .contains("\"Shall a fixed-sum levy be imposed by the"));
+    assert!(ballot
+        .body
+        .contains("(A) \"Renewing an existing levy\" in the case of a proposal to renew an existing tax in the same amount;"));
+}
+
+/// A school levy resolution has one purpose, and a bond ballot states an average, not a rate.
+#[test]
+fn a_levy_has_one_purpose_and_a_bond_ballot_states_an_average() {
+    assert!(section("5705.21").body.contains(
+        "A resolution adopted under this division shall be confined to a single purpose"
+    ));
+    assert!(section("133.18").body.contains(
+        "estimated by the county auditor to average over the repayment period of the bond issue"
+    ));
+}
