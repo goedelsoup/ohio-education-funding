@@ -22,6 +22,7 @@ used-by:
   - ../corpus/program/nonpublic-administrative-cost-reimbursement.yml
   - ../corpus/program/scholarship-donation-credit.yml
   - ../corpus/revenue-stream/bond-levy.yml
+  - ../corpus/revenue-stream/capital-finance-without-a-vote.yml
   - ../corpus/revenue-stream/casino-tax-distribution.yml
   - ../corpus/revenue-stream/current-expense-levy.yml
   - ../corpus/revenue-stream/emergency-levy.yml
