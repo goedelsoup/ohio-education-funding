@@ -61,6 +61,7 @@ See the class definition: [parameter.ont.yml](../parameter.ont.yml).
 | [dpia-per-pupil-amount](dpia-per-pupil-amount.yml) | dollars per pupil | R.C. 3317.022(A)(4); the count's blend is the department's |
 | [enrolment-supplement-amounts](enrolment-supplement-amounts.yml) | dollars per pupil | H.B. 96 temporary law — in no section |
 | [performance-supplement-rate](performance-supplement-rate.yml) | dollars per pupil | H.B. 96 temporary law — in no section |
+| [cfap-required-percentage](cfap-required-percentage.yml) | percent | R.C. 3318.01(K) and 3318.011, capped by 3318.032(D) |
 
 ## The four kinds, and where each one is
 

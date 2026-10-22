@@ -82,6 +82,7 @@ Sorted by: type, then slug.
 | [`lsc-budget-footnotes`](lsc-budget-footnotes.md) | Budget Footnotes — the Legislative Budget Office's monthly report | 1 |
 | [`lsc-catalog-of-budget-line-items`](lsc-catalog-of-budget-line-items.md) | Catalog of Budget Line Items — what each appropriation line was given | 14 |
 | [`lsc-dew-redbook`](lsc-dew-redbook.md) | LSC Redbook — Ohio Department of Education and Workforce | 12 |
+| [`lsc-fcc-greenbook`](lsc-fcc-greenbook.md) | LSC Greenbook — Ohio Facilities Construction Commission | 2 |
 | [`lsc-hb96-analysis`](lsc-hb96-analysis.md) | LSC Budget Analysis — H.B. 96 (FY2026-27) | 24 |
 | [`lsc-school-funding-complete-resource`](lsc-school-funding-complete-resource.md) | LSC School Funding Complete Resource | 2 |
 | [`lsc-tax-credit-analyses`](lsc-tax-credit-analyses.md) | LSC analyses of the scholarship donation credit | 1 |
@@ -90,14 +91,15 @@ Sorted by: type, then slug.
 | [`ocg-white-paper-013`](ocg-white-paper-013.md) | OCG White Paper No. 013 — Does Per-Pupil Spending Track Academic Performance? | 4 |
 | [`ocg-white-paper-015`](ocg-white-paper-015.md) | OCG White Paper No. 015 — Has Ohio Been Defunding Public Education? | 2 |
 | [`ode-idea-part-b-allocations`](ode-idea-part-b-allocations.md) | IDEA Part B Allocations to Districts | 4 |
+| [`ofcc-equity-list`](ofcc-equity-list.md) | OFCC K-12 Equity List and CFAP Status Editions | 2 |
 | [`ohio-bill-versions`](ohio-bill-versions.md) | Ohio bill versions — what was proposed, not what was enacted | 1 |
 | [`ohio-bills`](ohio-bills.md) | Ohio bills before enactment — the text as introduced | 13 |
 | [`ohio-essa-state-plan`](ohio-essa-state-plan.md) | Ohio's Consolidated State Plan under ESSA, and the April 2026 School Improvement amendment | 5 |
-| [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 32 |
+| [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 34 |
 | [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 4 |
 | [`us-public-laws`](us-public-laws.md) | United States public laws — the enrolled federal acts | 1 |
 
-70 entries, 0 not yet cited by any corpus node. 483 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+72 entries, 0 not yet cited by any corpus node. 490 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

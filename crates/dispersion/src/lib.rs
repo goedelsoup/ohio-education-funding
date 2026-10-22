@@ -42,6 +42,7 @@ pub mod deduct;
 pub mod designated;
 pub mod designated_editions;
 pub mod equity_factor;
+pub mod equity_rank;
 pub mod exemplars;
 pub mod facilities;
 pub mod functions;

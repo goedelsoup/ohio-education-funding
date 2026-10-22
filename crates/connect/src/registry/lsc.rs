@@ -341,6 +341,20 @@ pub(super) const BUDGET: Connector = Connector {
                unwired for four phases while the corpus quoted the executive proposal.",
     },
     Source {
+        key: "hb96-fcc-greenbook",
+        title: None,
+        url: "https://www.lsc.ohio.gov/assets/legislation/136/hb96/en0/files/\
+              hb96-fcc-greenbook-as-enacted-136th-general-assembly.pdf",
+        filename: "hb96-fcc-greenbook.pdf",
+        format: Format::Pdf,
+        catalog: Some("lsc-fcc-greenbook"),
+        fixtures: &[crate::fixtures::FCC_GREENBOOK_FIXTURE],
+        note: "The Facilities Construction Commission's analysis as enacted, at the sibling path \
+               to the department's. Read for two of the act's capital provisions: the end of the \
+               net-indebtedness method of setting a district's local share, and the one-time \
+               Project Support line, ALI 230647, at $20,000,000 in FY2026.",
+    },
+    Source {
         key: "budget-footnotes-2026-01",
         title: Some("Budget Footnotes, January 2026"),
         url: "https://www.lsc.ohio.gov/assets/organizations/legislative-service-commission/\

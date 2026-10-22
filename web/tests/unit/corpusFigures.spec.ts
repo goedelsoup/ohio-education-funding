@@ -449,15 +449,21 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * figures from Table SD-2-Q4: the districts with a tax in force in two years and by base, two
  * years of distributions, the rural and small-town count, and the four that test the low-wealth
  * hypothesis. The floor was at its count.
+ *
+ * Recomputed at **1319/97** when the facilities share rule was read from the statute (#790).
+ * `parameter/cfap-required-percentage` is the ninety-seventh carrier, binding seven: the 609
+ * districts the FY2025 equity list ranks, New Philadelphia's rank and share on it and its FY2026
+ * rank, the percentile the Commission's rank-307 example rounds to, the districts at and lowered
+ * by the cap, and H.B. 96's one-time Project Support line. The floor was at its count.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1312 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1312,
+  expect(bindings.length, "1319 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1319,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "96 nodes carry bindings; raise this when a ninety-seventh does",
-  ).toBeGreaterThanOrEqual(96);
+    "97 nodes carry bindings; raise this when a ninety-eighth does",
+  ).toBeGreaterThanOrEqual(97);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

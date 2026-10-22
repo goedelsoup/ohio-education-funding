@@ -270,6 +270,12 @@ links:
     relationship: appropriates-for
   - target: ../parameter/fsfp-phase-in-percentage.yml
     relationship: sets
+  - target: ../parameter/cfap-required-percentage.yml
+    relationship: sets
+    note: >-
+      Makes the percentile the whole of a district's share of a classroom facilities project by
+      striking the net-indebtedness alternative from R.C. 3318.032(A), effective 30 September
+      2025, and adds a one-time Project Support line, ALI 230647, for FY2026.
   - target: ../formula-component/fsfp-community-school-equity-supplement.yml
     relationship: codifies
     note: >-
@@ -286,6 +292,11 @@ links:
     relationship: continues
   - target: ../../catalog/lsc-hb96-analysis.md
     relationship: sourced-from
+  - target: ../../catalog/lsc-fcc-greenbook.md
+    relationship: sourced-from
+    note: >-
+      The Facilities Construction Commission's greenbook, for the act's two school facilities
+      provisions.
   - target: ../../catalog/fordham-house-bridge-commentary.md
     relationship: sourced-from
     note: >-

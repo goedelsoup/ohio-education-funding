@@ -64,14 +64,15 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | `dew-facts-and-figures` | **wired**, in part | 1 | metric, program |
 | `dew-typology` | **wired** | 1 | education-agency |
 | `lsc-catalog` | **wired**, in part | 18 | fiscal-period, program, legislation, parameter |
-| [`lsc-budget`](sources/lsc-budget.md) | **wired**, in part | 32 | legislation, fiscal-period, program, parameter |
-| [`ohio-laws`](sources/ohio-laws.md) | **wired** | 86 | legislation, parameter, formula-component |
+| [`lsc-budget`](sources/lsc-budget.md) | **wired**, in part | 33 | legislation, fiscal-period, program, parameter |
+| [`ohio-laws`](sources/ohio-laws.md) | **wired** | 89 | legislation, parameter, formula-component |
 | `ohio-session-laws` | **wired**, in part | 5 | legislation, fiscal-period |
 | `ohio-bill-versions` | **wired** | 1 | formula-component, legislation |
 | `ohio-bills` | retrievable | 3 | draft-legislation |
 | `ohio-auditor` | **wired**, in part | 5 | education-agency, legislation |
 | [`ohio-courts`](sources/ohio-courts.md) | **wired**, in part | 5 | litigation |
 | [`ofcc-projects`](sources/ofcc-projects.md) | declared | 0 | program, education-agency |
+| `ofcc-equity-lists` | **wired**, in part | 3 | parameter, program |
 | [`census-f33`](sources/census-f33.md) | **wired** | 17 | metric, education-agency |
 | [`nces-ccd`](sources/nces-ccd.md) | **wired**, in part | 30 | education-agency |
 | `dew-directory` | **wired**, in part | 1 | school |
@@ -82,7 +83,7 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 | `dew-idea-part-b` | **wired**, in part | 4 | revenue-stream, program, education-agency |
 | `jhu-homeschool-hub` | **wired**, in part | 1 | metric, education-agency |
 
-31 connectors, 483 sources between them. 28 are wired and 3 are not; 17 of the wired ones reach only part of what they feed, and say so below.
+32 connectors, 490 sources between them. 29 are wired and 3 are not; 18 of the wired ones reach only part of what they feed, and say so below.
 
 **What is blocked, in the registry's own words.**
 
@@ -98,6 +99,7 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 - `ohio-auditor` — still blocked on: wired for the five reports that recite a territory transfer, which is what the corpus needed and not what the Auditor mostly publishes. The executed resolutions are not here at all -- those sit in educational service center minute books behind a vendor firewall, and reaching them is a records request rather than a fetch
 - `ohio-courts` — still blocked on: the 2025 EdChoice merits ruling is a common pleas decision, which the Ohio Reporter of Decisions does not publish and the Franklin County clerk publishes under conditions that forbid redistribution and direct organizations to a records request. And `citing_cases` stays unfilled: a free citation graph exists, and it identifies ten of the twenty-five Ohio decisions that cite DeRolph I by reporter citation in its own corpus
 - `ofcc-projects` — blocked on: the site refuses a self-identifying agent — an identical 5,248-byte 404 to every path including robots.txt, 200 to a browser string — and its project data is rendered by interactive maps rather than served as files. The alternate publishers are surveyed and none allocates: the capital acts appropriate the programme as two lump lines, and the archive holds only the portal shell
+- `ofcc-equity-lists` — still blocked on: wired for the FY2024 and FY2025 K-12 lists by rank, recovered from the Internet Archive. The FY2026 list has no capture at any path the CDX index knows; its ranks survive only beside each district's status in the rolling CFAP edition, which is committed as text and not parsed into rows. The Commission's 2024-2026 meeting minutes, which state each approved project's state and local shares, are archived nowhere, so no project share is held as data
 - `nces-ccd` — still blocked on: wired for every school year the directory publishes with an Ohio slice this reader can take, 1994-95 through 2023-24. The nine years before 1994-95 exist and are not held: 1986-87 through 1993-94 are the same fixed-width family, and nothing consumes them. The identifier-change history is still not derivable from this source, and thirty years of it now say so rather than sixteen: Ohio has never once filed the status code that marks a consolidation
 - `dew-directory` — still blocked on: the extract lists organizations open on the day it is generated, so it places today's schools at today's addresses and nothing earlier. Six buildings in the 2025-26 October and 23 in 2023-24 are not in it. The directory's search API (`Api/searchOrg`) returns closed organizations too, and is not read
 - `dew-child-nutrition` — still blocked on: wired for every October the archive holds, 1998 through 2014, across all three of the streams the report splits into from 2012. Three things it still cannot reach: October 2014 is where the directory stops, nine years short of the corpus's FY2024 observations; the three split Octobers have a band and not a poverty share, because community-eligibility sponsors collect no applications at all; and the 1998-2000 files state no sponsor type, so some thirty-five sponsors a year predate the FY2001 file they borrow one from and stay untyped
@@ -106,7 +108,7 @@ Fields per connector: key, status, source count, corpus classes fed; then every 
 - `dew-idea-part-b` — still blocked on: wired for the four final editions FY2021-FY2024, which share one column layout. FY2011-FY2020 are served from the same folder as `_Adjusted` editions in a different layout and are not read; the FY2022 American Rescue Plan supplement carries its own proportionate share and is not read; FY2025 and later have no final edition on the page, only an estimate
 - `jhu-homeschool-hub` — still blocked on: One school year per district, and the workbook labels it wrongly. The department holds the R.C. 3321.042 notice counts per district for every year and releases them on request; nothing below the state total is published, so the other years need a records request rather than a connector. What the count measures — notices received or children named on them — is undocumented and the two differ by household size.
 
-20 of them have no long form in [`sources/`](sources/): `dew-report-card`, `eia-diesel`, `dew-five-year-forecast`, `tax-income-credits`, `tax-school-district-income`, `dew-scholarship-reports`, `dew-facts-and-figures`, `dew-typology`, `lsc-catalog`, `ohio-session-laws`, `ohio-bill-versions`, `ohio-bills`, `ohio-auditor`, `dew-directory`, `census-geography`, `dew-child-nutrition`, `dew-school-improvement`, `dew-nonpublic-enrollment`, `dew-idea-part-b`, `jhu-homeschool-hub`. Those are the connectors added after the original nine stubs, whose prose was never written — the decision record is the only account of why each exists.
+21 of them have no long form in [`sources/`](sources/): `dew-report-card`, `eia-diesel`, `dew-five-year-forecast`, `tax-income-credits`, `tax-school-district-income`, `dew-scholarship-reports`, `dew-facts-and-figures`, `dew-typology`, `lsc-catalog`, `ohio-session-laws`, `ohio-bill-versions`, `ohio-bills`, `ohio-auditor`, `ofcc-equity-lists`, `dew-directory`, `census-geography`, `dew-child-nutrition`, `dew-school-improvement`, `dew-nonpublic-enrollment`, `dew-idea-part-b`, `jhu-homeschool-hub`. Those are the connectors added after the original nine stubs, whose prose was never written — the decision record is the only account of why each exists.
 <!-- /REGEN -->
 
 A `declared` connector says **what blocks it** — that string is a field on the record, and a

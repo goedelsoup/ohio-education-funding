@@ -696,6 +696,48 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
                that makes the school rather than the district the unit, which is why the \
                corpus needs a building class.",
     },
+    // School facilities: the capital channel's share rule. Chapter 3318 is where the Classroom
+    // Facilities Assistance Program's wealth ranking and the district's share of a project are
+    // defined, and the three sections below are the whole of the arithmetic.
+    Source {
+        key: "rc-3318-01",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3318.01",
+        filename: "rc-3318-01.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3318.01. School facilities definitions. Division (K) sets the district's \
+               required percentage of basic project costs at one per cent times its percentile, \
+               which makes the local share the percentile itself; division (Q) points the \
+               percentile at R.C. 3318.011.",
+    },
+    Source {
+        key: "rc-3318-011",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3318.011",
+        filename: "rc-3318-011.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3318.011. The equity ranking: income-adjusted valuation per pupil, averaged \
+               over three years, ranked lowest to highest and divided into percentiles of one \
+               per cent of districts each. The division that settles how a rank becomes a \
+               percentile.",
+    },
+    Source {
+        key: "rc-3318-032",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-3318.032",
+        filename: "rc-3318-032.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 3318.032. The district's portion of basic project cost: the required \
+               percentage, fixed at Controlling Board approval, and never more than ninety-five \
+               per cent. As amended by H.B. 96 of the 136th General Assembly, which removed the \
+               net-indebtedness alternative.",
+    },
     Source {
         key: "rc-3770-06",
         title: None,

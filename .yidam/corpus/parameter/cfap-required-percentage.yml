@@ -1,0 +1,185 @@
+class: parameter
+label: CFAP Required Percentage
+summary: >-
+  The share of a classroom facilities project a district pays, which is its wealth percentile
+  among all 609 districts, capped at ninety-five. The statute never says how to round, and only
+  rounding up fits its text.
+description: |
+  The district's portion of the basic project cost under the Classroom Facilities Assistance
+  Program. Three sections of the Revised Code make it, and none of them is in the Commission's
+  rules. R.C. 3318.011 has the department rank every city, local and exempted village district on
+  its three-year average adjusted valuation per pupil, lowest first, and divide the ranking into
+  percentiles. R.C. 3318.01(K) makes the required percentage "one per cent of the basic project
+  costs times the percentile". R.C. 3318.032(D) caps the district's portion at ninety-five per
+  cent. [verified] (`ohio-laws`)
+
+  **The percentile is read from the list for the fiscal year before the approval.** A project the
+  controlling board approves in FY2026 reads the FY2025 list. The Commission publishes each list
+  as a table of rank, name, county and valuation. The FY2025 list ranks as many districts as the
+  foundation model holds, 609. [verified] (`crates/dispersion`,
+  [`ofcc-equity-ranks.csv`](../../../crates/dispersion/fixtures/ofcc-equity-ranks.csv))
+
+  **On a list of 609, a rank has to be rounded into a whole percentile, and the statute does not
+  say how.** Division (D) settles it anyway. It puts the lowest one per cent of districts in the
+  first percentile and the highest in the one-hundredth. Rounding down puts six districts in a
+  zeroth percentile the section does not have, and rounding to the nearest puts three there.
+  Rounding up is the only reading that leaves none out. [verified]
+  ([`crates/dispersion`](../../../crates/dispersion/tests/the_rank_that_rounds_up.rs))
+
+  **H.B. 96 made the percentile the whole rule.** Until 30 September 2025 a district paid the
+  greater of its required percentage and a required level of indebtedness, a share of its
+  valuation that rises with its percentile. The act removed the second test. [verified]
+  (`lsc-fcc-greenbook`)
+findings: |
+  ### The ceiling is the reading the Commission pays
+
+  On the ceiling, New Philadelphia City, rank 271 on the FY2025 list, pays 45%. Rounding down or
+  to the nearest gives it 44. [verified] (`crates/dispersion`) The Commission approved its
+  project in July 2025 at a local share of exactly 45.00% of the basic project cost. Two
+  Madison-Plains Local approvals, its first segment in September 2024 and its project in July
+  2025, agree with the ceiling too, though neither distinguishes the three readings. [inference]
+  The minutes that state those dollars are a copy
+  in the research folder and are archived nowhere, so the test transcribes them as constants and
+  no figure here is bound to them.
+
+  ### The Commission's own example is a point short
+
+  The status edition explains the rule by example: rank 307 "would have a state/local split of
+  50/50". 307 of 609 is 50.4%, and the statute's percentile is 51%. The example gives the rule's
+  shape and not its rounding. [verified] (`crates/dispersion`)
+
+  ### The cap moves 31 districts
+
+  On the FY2025 list 37 districts pay the capped ninety-five per cent, and for 31 of them the
+  cap is lower than their percentile. They are the wealthiest twentieth of the state, and the
+  state pays at least a twentieth of any project they build. [verified] (`crates/dispersion`)
+
+  ### The prior-project rule no longer moves anything
+
+  R.C. 3318.032(E) gives a district assisted in the past twenty years the lesser of the (A)
+  amount and the greater of its required percentage and its previous share. With (A) now equal
+  to the required percentage, the lesser is always (A). [verified]
+  ([`crates/project`](../../../crates/project/tests/the_share_is_the_percentile.rs)) Nothing
+  states whether the act meant to leave the division with no effect. [open]
+
+  ### Before the act, shares sat above the percentile
+
+  Several projects approved in 2024 and the first half of 2025 carry a local share well above the
+  district's percentile. That is what the greater-of test produces for a district whose
+  indebtedness amount exceeds its percentage. [inference] No held source states any district's
+  indebtedness amount, so no single departure is explained.
+
+  ### A one-time line beside the program
+
+  H.B. 96 appropriated $20,000,000 in FY2026 to Project Support, ALI 230647, and nothing in
+  FY2027. It goes to a district with buildings in a county of more than one hundred thousand
+  people and in another of fewer than fifty thousand, whose project was deferred or lapsed, for a
+  building put up before 30 June 1925. The state share must be at least ninety per cent.
+  [verified] (`lsc-fcc-greenbook`) On rank alone only about the poorest tenth of districts would
+  reach that share, so for most districts that qualify the line pays more than the program
+  would. [inference]
+properties:
+  name: Required percentage of the basic project costs
+  unit: percent
+  kind: |
+    **Legislated.** The method is written in R.C. 3318.01(K), 3318.011 and 3318.032, and changes
+    only by an act. The value for a given district is measured: it moves when the district's
+    valuation and income move against everyone else's, and nobody decides it. [verified]
+  series: |
+    FY2025 approvals   FY2024 list, 609 districts, and the greater-of test   [verified]
+    FY2026 approvals   FY2025 list; the greater-of test until 30 Sep 2025    [verified]
+    FY2027 approvals   FY2026 ranking, with the percentile alone             [verified]
+
+    **The FY2026 list is not archived.** Its ranks survive only beside each district's status in
+    the Commission's edition as of 31 December 2025, which prints New Philadelphia City at rank
+    269. [verified] (`crates/dispersion`) R.C. 3318.011(D) reads the same in H.B. 49's version
+    of 2017 on codes.ohio.gov as it does now. Which act first wrote the percentile rule,
+    and the share series before FY2025, are not established here. [open]
+  statutory_basis: |
+    R.C. 3318.01(K) and (Q), 3318.011(D) and 3318.032(A) and (D), read. 3318.01 is effective 1
+    January 2026 and 3318.032 is effective 30 September 2025, both as H.B. 96 left them. 3318.011
+    is as H.B. 33 left it, effective 3 October 2023. [verified] (`ohio-laws`) The dated versions on
+    codes.ohio.gov show 3318.032(A) carrying the greater-of test in its H.B. 33 version, and
+    3318.01(K) unchanged by H.B. 96. Only the current text is committed. [verified]
+
+    3318.01(J) still defines the required level of indebtedness as five per cent of valuation
+    plus two one-hundredths of a per cent for each percentile above the first. That is the range
+    LSC states, 5.00% to 6.98%, and it agrees with a first and a one-hundredth percentile.
+    [verified] (`crates/project`)
+  sensitivity: |
+    A rank moves the share by a point for every six districts it passes, so the parameter is a
+    step function of relative wealth. A district whose valuation rises while its neighbors' rise
+    faster pays less, not more. [inference] The cap binds only at the top, and the ninety per
+    cent floor in ALI 230647 overrides the rule for the one class of district it names.
+    [verified]
+unfilled:
+  - field: the FY2026 equity list, as a list
+    why: |
+      No capture exists of it, or of anything under the Commission's 2025 and 2026 ranking
+      directories. Its ranks are read one district at a time from the status edition, which
+      abbreviates some names. A third list year waits for a reader that matches those names.
+  - field: approved projects' shares and dollars
+    why: |
+      The Commission's minutes state them, and those from 2024 on are archived nowhere this
+      repository can fetch from. The pairs the test reproduces are transcribed constants.
+  - field: the required level of indebtedness, per district
+    why: |
+      It decided some shares before 30 September 2025, and no held source states a district's
+      valuation, net indebtedness and qualifying debt together. So the departures above the
+      percentile are explained in kind and not one by one.
+  - field: the districts ALI 230647 reaches
+    why: |
+      The greenbook states the conditions and not the districts that meet them, and the
+      applications closed on 31 December 2025.
+figures:
+  - key: project/model-districts
+    value: 609
+    field: description
+    as_written: "foundation model holds, 609."
+  - key: dispersion/cfap-new-philadelphia-share-fy2025
+    value: 0.45
+    field: findings
+    as_written: "rank 271 on the FY2025 list, pays 45%"
+  - key: dispersion/cfap-share-at-rank-307
+    value: 0.51
+    field: findings
+    as_written: "the statute's percentile is 51%"
+  - key: dispersion/cfap-districts-at-the-cap-fy2025
+    value: 37
+    field: findings
+    as_written: "On the FY2025 list 37 districts pay the capped ninety-five per cent"
+  - key: dispersion/cfap-districts-the-cap-lowers-fy2025
+    value: 31
+    field: findings
+    as_written: "for 31 of them the\n  cap is lower than their percentile"
+  - key: dispersion/fcc-project-support-fy2026
+    value: 20000000
+    field: findings
+    as_written: "$20,000,000 in FY2026 to Project Support"
+  - key: dispersion/cfap-new-philadelphia-rank-fy2026
+    value: 269
+    field: series
+    as_written: "New Philadelphia City at rank\n    269"
+links:
+  - target: ../parameter.ont.yml
+    relationship: instance-of
+  - target: ../legislation/hb-96-2025.yml
+    relationship: set-by
+    note: >-
+      Removed the greater-of test from R.C. 3318.032(A), effective 30 September 2025, and
+      appropriated the one-time Project Support line.
+  - target: ../legislation/hb-33-2023.yml
+    relationship: set-by
+    note: >-
+      The act behind the current R.C. 3318.011, and behind the 3318.032 that still carried the
+      greater-of test.
+  - target: ../fiscal-period/fy2024-25.yml
+    relationship: valued-in
+  - target: ../fiscal-period/fy2026-27.yml
+    relationship: valued-in
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+  - target: ../../catalog/ofcc-equity-list.md
+    relationship: sourced-from
+  - target: ../../catalog/lsc-fcc-greenbook.md
+    relationship: sourced-from

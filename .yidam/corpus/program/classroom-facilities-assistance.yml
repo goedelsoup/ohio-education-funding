@@ -80,9 +80,26 @@ findings: |
   corpus had no series for, and it has been contracting for the whole period the corpus can see.
   [verified]
 
-  What the survey cannot say is which project a district-year's money belongs to, or what share of
-  an approved project's assessed cost the state set. Those are in the Commission's own records and
-  in the capital appropriations act, and neither is retrieved here. [open]
+  What the survey cannot say is which project a district-year's money belongs to. The rule that
+  sets an approved project's share is now held, in
+  [`cfap-required-percentage`](../parameter/cfap-required-percentage.yml), but the per-project
+  amounts are in the Commission's own records and in the capital appropriations act, and neither
+  is retrieved here. [open]
+revisions:
+  - was: |
+      `eligibility` said the ranking method and the statutory share schedule were not held, and
+      `unfilled` placed the schedule "in the Commission's rules rather than in any source here".
+    now: |
+      Both are in the Revised Code. R.C. 3318.011 sets the ranking, R.C. 3318.01(K) makes the share
+      the percentile, and R.C. 3318.032(D) caps it at ninety-five per cent. All three sections are
+      vendored, and the Commission's FY2024 and FY2025 equity lists are held as a fixture.
+    found_by: |
+      [#790](https://github.com/goedelsoup/ohio-education-funding/issues/790), which vendored the
+      three sections and recovered the lists from the Internet Archive.
+    reach: |
+      The `unfilled` entry for the schedule goes. The gradient the payments show is unchanged,
+      and it is now the product of a rule the corpus holds rather than of one it guessed at.
+      Per-project amounts are still not held.
 properties:
   name: Classroom Facilities Assistance Program
   mechanism: capital-assistance
@@ -90,9 +107,15 @@ properties:
     School districts, prioritized by relative wealth ranking, with the state share percentage
     determined on the same basis — which the payments confirm: the state covered 57.56% of the
     poorest fifth's capital spending against 18.95% of the wealthiest's. [verified] Districts must
-    provide the local share, generally through a voter-approved bond issue. The exact ranking
-    methodology and the statutory share schedule are still not held; what is held is the gradient
-    they produce. [open]
+    provide the local share, generally through a voter-approved bond issue.
+
+    The ranking and the schedule are both statutory. R.C. 3318.011 ranks the city, local and
+    exempted village districts on three-year average adjusted valuation per pupil and divides the
+    ranking into percentiles. R.C. 3318.01(K) makes the district's share its percentile of the
+    basic project cost, and R.C. 3318.032(D) caps it at ninety-five per cent. [verified]
+    (`ohio-laws`) The Commission's equity lists for FY2024 and FY2025 are held, and the rule,
+    its rounding and the cap are in `parameter/cfap-required-percentage`. [verified]
+    (`crates/dispersion`)
   amount: |
     $12.65 billion reaching districts between FY2009 and FY2024, 38.0% of what they spent on
     buildings, from crates/dispersion/fixtures/f33-ohio-panel.csv. [verified] Read
@@ -112,10 +135,6 @@ unfilled:
       It is in the capital appropriations act, which no connector retrieves. This blocks the
       appropriated figure only — what districts received is now held per district and per year, so
       the field it used to block, `amount`, is filled from the receiving side instead.
-  - field: the statutory share schedule by wealth percentile
-    why: |
-      The payments give the gradient the schedule produces and not the schedule itself, which is in
-      the Commission's rules rather than in any source here.
 figures:
   - key: dispersion/facilities-state-money
     value: 12651245000
@@ -178,3 +197,11 @@ links:
       The construction money this node is about. `dispersion::facilities` computes every figure
       here from `crate::ohio_panel`, which is the F-33 panel committed as `f33-ohio-panel.csv`;
       `C35` is the F-33's own capital-outlay column.
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+    note: >-
+      R.C. 3318.01, 3318.011 and 3318.032, the ranking, the share rule and the cap.
+  - target: ../../catalog/ofcc-equity-list.md
+    relationship: sourced-from
+    note: >-
+      The Commission's FY2024 and FY2025 equity lists, read by `dispersion::equity_rank`.

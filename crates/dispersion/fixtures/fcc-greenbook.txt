@@ -1,0 +1,393 @@
+Greenbook
+                 LBO Analysis of Enacted Budget
+
+Ohio Facilities Construction Commission
+
+                                Jason Glover, Senior Budget Analyst
+                                           August 2025
+
+
+                                               TABLE OF CONTENTS
+ Quick look... .......................................................................................................................... 1
+ Overview............................................................................................................................... 1
+ Agency overview ............................................................................................................................. 1
+ Appropriation summary.................................................................................................................. 2
+ Analysis of FY 2026-FY 2027 budget ....................................................................................... 2
+ Funding for operating expenses ..................................................................................................... 2
+   Operating Expenses (ALI 230321) .............................................................................................. 2
+   State Construction Management Operations (ALI 230639) ...................................................... 3
+ Funding for special school facilities projects .................................................................................. 4
+   Project Support (ALI 230647) ..................................................................................................... 4
+ Funding for debt service payments ................................................................................................ 4
+   Cultural Facilities Lease Rental Bond Payments (ALI 230401) ................................................... 5
+   Common Schools General Obligation Bond Debt Service (ALI 230908) .................................... 5
+ Notable budget provisions .............................................................................................................. 5
+   Ohio Cultural and Sports Facility Performance Grant Fund ...................................................... 5
+   Local share calculation for CFAP ................................................................................................ 6
+   Facilities construction process ................................................................................................... 6
+   Vocational Facilities Assistance Program ................................................................................... 7
+
+ Attachment:
+           Appropriation Spreadsheet
+                                    LBO Greenbook
+              Ohio Facilities Construction
+                     Commission
+Quick look...
+ ➢ The Ohio Facilities Construction Commission (OFCC) guides capital projects for state agencies, state-
+   supported universities and community colleges, public K-12 schools, and state-funded cultural facilities.
+ ➢ OFCC is a seven-member commission, three of whom are voting members: the directors of the
+   Office of Budget and Management (OBM) and the Department of Administrative Services (DAS) and
+   an additional administrative department head appointed by the Governor.
+ ➢ Total budget appropriations: $332.8 million for FY 2026 and $288.5 million for FY 2027.
+   • Sources of the budget: GRF (93.6%), state construction management fees deposited into an
+       Internal Service Activity Fund (3.2%), and commercial activity tax (CAT) revenue deposited into
+       a Revenue Distribution Fund (3.2%).
+   • Uses of the budget: 90.1% for debt service on bonds issued to support school facilities and
+       cultural and sports facilities, 6.7% for OFCC’s operations, and 3.2% for the construction or
+       renovation of a school building that meets certain criteria.
+                                      FY 2024             FY 2025           FY 2026            FY 2027
+         Fund Group
+                                       Actual              Actual         Appropriation      Appropriation
+General Revenue                      $408,011,278       $339,674,910       $303,250,000        $278,250,000
+Dedicated Purpose                    $110,451,627       $102,516,749                   $0                 $0
+Internal Service Activity              $7,930,654          $8,161,170         $9,590,355        $10,233,822
+Revenue Distribution                            $0                  $0       $20,000,000                  $0
+                            Total    $526,393,559       $450,352,829       $332,840,355        $288,483,822
+                       % change                  --            -14.4%             -26.1%              -13.3%
+                 GRF % change                    --            -16.7%             -10.7%               -8.2%
+
+
+Overview
+Agency overview
+       The Ohio Facilities Construction Commission (OFCC) guides capital construction projects
+for state agencies and state-supported universities and community colleges, as well as
+overseeing Ohio’s comprehensive public primary and secondary school construction and
+renovation program. OFCC also administers grants for cultural facilities. OFCC is a seven-member
+commission with three voting members. The voting members are the Director of Budget and
+Management, the Director of Administrative Services, and an additional administrative
+department head who is appointed by the Governor. Of the four nonvoting members, two are
+appointed by the President of the Senate and two are appointed by the Speaker of the House of
+Legislative Budget Office of the Legislative Service Commission                                       Page 1
+Greenbook                                                  Ohio Facilities Construction Commission
+
+
+
+Representatives. The Commission appoints an executive director who oversees the day-to-day
+operations of the agency. As of July 2025, OFCC has a staff of 99 full-time and four part-time or
+intermittent employees.
+
+Appropriation summary
+       The budget provides total appropriations of $332.8 million in FY 2026 and $288.5 million
+in FY 2027 for OFCC. As an agency focused on capital projects, OFCC’s funding mostly is
+appropriated in the capital budget. Of the biennial operating funding of $621.3 million,
+$560.0 million (90.1%) is for debt service on bonds issued to support school facilities and cultural
+and sports facilities, $41.3 million (6.7%) supports OFCC’s operating costs, and $20.0 million
+(3.2%) supports the construction or renovation of a school building that meets certain criteria.
+        The preceding table shown in the “Quick look” section presents the appropriations by
+fund group. The General Revenue Fund (GRF) supports 93.6% of the budget appropriations for
+OFCC. Non-GRF appropriations make up the remaining 6.4% of OFCC’s budget with 3.2% of
+OFCC’s appropriations each supported by state construction management fees deposited into an
+Internal Service Activity Fund and commercial activity tax (CAT) revenue deposited into a
+Revenue Distribution Fund. The budget does not appropriate any funding from a Dedicated
+Purpose Fund (DPF) in the FY 2026-FY 2027 biennium. In FY 2024 and FY 2025, federal American
+Rescue Plan Act (ARPA) funds were deposited into certain DPF funds to support construction
+projects at career-technical schools, grants to improve school security, radios in schools under
+the Multi-Agency Radio Communications System (MARCS)-in-Schools Program, and grants to
+establish community innovation centers in the Appalachian region of the state. These programs
+were not appropriated new money in the budget.
+
+Analysis of FY 2026-FY 2027 budget
+Funding for operating expenses
+       The line items in this category are used to provide oversight of capital projects for K-12
+schools, cultural facilities, 20 state agencies that perform construction, and 27 state-supported
+universities and community colleges. Total appropriations for operating expenses increase by
+8.1% from a spending level of $18.8 million in FY 2025 to $20.3 million in FY 2026, then by 3.2%
+to $21.0 million in FY 2027. According to the Ohio Facilities Construction Commission (OFCC), the
+budget for operating expenses will support a total of 110 full-time positions, four part-time and
+intermittent staff, and two interns.
+
+   Operating Expenses (ALI 230321)
+   FY 2022          FY 2023           FY 2024          FY 2025        FY 2026          FY 2027
+    Actual           Actual            Actual           Actual      Appropriation    Appropriation
+GRF ALI 230321, Operating Expenses
+    $5,735,027       $6,772,155      $10,165,497      $10,659,596      $10,750,000      $10,750,000
+     % change             18.1%            50.1%             4.9%             0.8%             0.0%
+
+
+
+
+Legislative Budget Office of the Legislative Service Commission                              Page 2
+Greenbook                                                  Ohio Facilities Construction Commission
+
+
+
+   FY 2022          FY 2023           FY 2024          FY 2025           FY 2026         FY 2027
+    Actual           Actual            Actual           Actual         Appropriation   Appropriation
+GRF ALI 230458, State Construction Management Services
+    $1,395,469       $1,906,019         $127,706                  $0              $0              $0
+        % change          36.6%           -93.3%          -100.0%               N/A              N/A
+Total
+    $7,130,496       $8,678,174      $10,293,203      $10,659,596        $10,750,000     $10,750,000
+        % change          21.7%            18.6%             3.6%               0.8%            0.0%
+
+         Line item 230321 provides funding for OFCC’s administration and oversight of various
+school facilities assistance programs and cultural facilities projects. Since FY 2024, it has also
+integrated line item 230458 to support OFCC staff who, in addition to administering cultural
+facilities projects and school safety grants, oversee the enterprise-wide project management
+system known as the Ohio Administrative Knowledge System Capital Improvement (OAKS-CI)
+module. OAKS-CI is the information technology (IT) application that supports state agency and
+university projects and is embedded in OFCC technology initiatives and financial processes.
+Funding largely supports personal services, such as agency payroll, but also supports contracts,
+supplies and maintenance, and equipment.
+         This line item will also be used for additional IT investments. OFCC’s IT staff develop
+software and data systems that track project budgets, contracts, and other construction project
+information. In the FY 2026-FY 2027 biennium, OFCC also plans to upgrade the Educational
+Facilities Planning Guide, converting it into a dynamic website tailored to the specific needs of
+different users. The guide is an essential resource for districts as they begin exploring or planning
+new school facility projects. It provides important insights into working with OFCC, design
+considerations, and key decisions required before starting facility renovations or construction.
+
+   State Construction Management Operations (ALI 230639)
+   FY 2022          FY 2023           FY 2024          FY 2025           FY 2026         FY 2027
+    Actual           Actual            Actual           Actual         Appropriation   Appropriation
+Fund 1310 ALI 230639, State Construction Management Operations
+    $5,578,876       $6,239,909       $7,930,654       $8,161,170         $9,590,355     $10,233,822
+        % change          11.8%            27.1%             2.9%             17.5%             6.7%
+
+       This non-GRF line item is funded in part via fees charged to state agencies and
+state-supported universities and community colleges for managing capital construction and
+energy projects. By law, agencies must use OFCC for projects greater than $3.0 million. Line
+item 230639 supports OFCC staff who provide capital project management, contract
+management, and competitive selection services to state agencies, universities, and community
+colleges and the Office of Energy Services (OES) unit that provides state agency, higher education,
+and K-12 school clients with energy engineering and design services, energy auditing, and
+performance contracting to achieve cost-effective, efficient energy use.
+
+Legislative Budget Office of the Legislative Service Commission                               Page 3
+Greenbook                                                     Ohio Facilities Construction Commission
+
+
+
+         OFCC administrative fees vary widely, mostly determined by the scope and type of project
+staff is administering. The project administration fee for OFCC administered single-site projects
+is calculated on a sliding scale based upon the total project costs: 3% for the first $4 million, 1%
+on costs from $4 million to $20 million, and 0.75% on costs above $20 million. OFCC administered
+multi-site projects are also calculated on a similar sliding scale with slightly higher fee rates to
+account for increased project management responsibilities. Fees for locally administered projects
+are 1% of total project costs. Agencies that use OFCC’s prequalified consultant list for
+architectural and engineering services pay a flat fee of $2,000 per agreement. OFCC’s criteria
+architect fees range from 1.5% to 3.0% of total construction costs. The fees are deposited into
+the Ohio Facilities Construction Commission Fund (Fund 1310).
+
+Funding for special school facilities projects
+    Project Support (ALI 230647)
+   FY 2022           FY 2023           FY 2024           FY 2025          FY 2026           FY 2027
+    Actual            Actual            Actual            Actual        Appropriation     Appropriation
+Fund 7047 ALI 230647, Project Support
+             $0                $0                $0                $0      $20,000,000                 $0
+      % change               N/A               N/A               N/A               N/A           -100.0%
+
+         This new line item will be used to support the construction or renovation of a school
+building that meets certain criteria. OFCC must provide facilities funding under this line item to
+each district for which all of the following apply: (1) the district operates at least one school building
+in a county with a population of more than 100,000 people and at least one school building in
+another county with a population of less than 50,000 people, (2) the district’s classroom facilities
+project was deferred or lapsed, and (3) the existing building included in the project for which the
+district applies for funding was originally constructed prior to June 30, 1925. School districts must
+apply for funding by December 31, 2025, in a form and manner prescribed by OFCC. The amount
+of state funding will be based on the district’s most recent equity ranking provided that the state
+share must be at least 90% of the cost of the project. If necessary, OFCC may proportionately
+reduce funding for each district so as not to exceed the amount appropriated for this purpose. The
+budget reappropriates the unused balance of line item 230647 at the end of FY 2026 for the same
+purpose in FY 2027.
+
+Funding for debt service payments
+         The line items in this category support OFCC’s debt service payments for K-12 and cultural
+facility capital projects appropriated through the biennial capital budget. These debt service
+payments are funded exclusively through the GRF.
+
+
+
+
+Legislative Budget Office of the Legislative Service Commission                                    Page 4
+Greenbook                                                    Ohio Facilities Construction Commission
+
+
+
+   Cultural Facilities Lease Rental Bond Payments (ALI 230401)
+   FY 2022           FY 2023          FY 2024           FY 2025         FY 2026           FY 2027
+    Actual            Actual           Actual            Actual       Appropriation     Appropriation
+GRF ALI 230401, Cultural Facilities Lease Rental Bond Payments
+  $27,553,710       $28,687,241       $30,860,700      $30,845,528       $37,500,000      $37,500,000
+     % change              4.1%              7.6%              0.0%            21.6%              0.0%
+
+        This line item supports the repayment of bonds issued by the Treasurer of State, the
+proceeds of which go towards the costs of capital improvement and construction projects for
+cultural, sports, and state historical facilities. Projects for cultural organizations are funded
+through a grant that requires a match of $1 of nonstate resources for every $2 of state funding.
+Generally, sports facilities projects must raise a local match of at least 85% of the initial estimated
+construction costs. OFCC does not approve these grants until the necessary project funding has
+been raised.
+
+   Common Schools General Obligation Bond Debt Service
+   (ALI 230908)
+   FY 2022           FY 2023          FY 2024           FY 2025         FY 2026           FY 2027
+    Actual            Actual           Actual            Actual       Appropriation     Appropriation
+GRF ALI 230908, Common Schools General Obligation Bond Debt Service
+ $417,931,002      $381,462,381     $366,857,374      $298,169,786     $255,000,000      $230,000,000
+     % change              -8.7%            -3.8%            -18.7%           -14.5%             -9.8%
+
+         This line item is used to pay debt service on general obligation bonds issued to raise funds
+for the state share of school facilities projects. General obligation bonds are backed by the full
+faith and credit of the state and thus can be issued at lower interest rates than other types of
+bonds. Since FY 2000, only general obligation bonds have been issued for state-supported school
+facilities projects. According to OFCC, the reduction in payments for debt service over the last
+several years is due to fewer bonds being issued. For example, in June 2023 and June 2024, the
+Office of Budget and Management (OBM) Director transferred $150 million and $500 million,
+respectively, out of the GRF to support the School Building Program Assistance Fund (Fund 7032)
+pursuant to H.B. 687, the capital appropriations act of the 134th General Assembly.
+
+Notable budget provisions
+   Ohio Cultural and Sports Facility Performance Grant Fund
+       The budget establishes the Ohio Cultural and Sports Facility Performance Grant Fund
+(Fund 5CY1) to support construction or renovation costs of cultural facilities, sports facilities, and
+major sports facilities throughout Ohio. It earmarks $600.0 million of the $1.0 billion
+appropriated for Fund 5CY1 under the budget of OBM to support construction of the Cleveland
+Browns transformational major sports facility mixed-use project in the city of Brook Park, with
+the remaining $400.0 million for other qualifying projects. Fund 5CY1 consists of unclaimed funds
+Legislative Budget Office of the Legislative Service Commission                                 Page 5
+Greenbook                                                    Ohio Facilities Construction Commission
+
+
+
+deposited into the fund by the Director of Commerce (COM). Generally, Fund 5CY1 grants will be
+administered by OBM, in consultation with OFCC. For more details about these provisions and
+Fund 5CY1, please see the LSC bill analysis, comparison document for H.B. 96, and LBO’s COM
+and OBM Greenbooks.
+
+   Local share calculation for CFAP
+        As described in the “Classroom Facilities Assistance Program: State and
+local share determination” section of LBO’s OFCC Redbook (PDF) for H.B. 96, a school
+district is responsible for financing its share of the basic project cost with local resources to
+receive state funding for a facilities project under the Classroom Facilities Assistance Program
+(CFAP), OFCC’s main school facilities assistance program. Under current law, a school district’s
+local share is the greater amount calculated (up to a maximum 95%) from either (1) the district’s
+required percentage of the basic project cost or (2) the district’s required level of indebtedness,
+which can range from 5.00% to 6.98% of its total taxable valuation, depending on the district’s
+percentile ranking, and includes its local share plus its current debt that qualifies for the
+calculation.
+          The budget eliminates the latter method of determining a school district’s local share of
+its facilities assistance project, meaning that a school district’s local share will be determined by
+only its required percentage of the basic project cost. Historically, nearly all school districts served
+under CFAP have had their local shares determined by their percentage of the basic project cost,
+so OFCC expects the elimination of the net indebtedness method will affect only a small number
+of school districts in the future by not penalizing them for not having debt. OFCC anticipates that
+when qualifying for CFAP these school districts will have a lower local share than they otherwise
+would have had calculated under the current method of local share determination.
+        Similarly, a school district that opts to segment its classroom facilities project has its local
+share determined by the greater of either the district’s required percentage of the basic project
+cost or the required level of indebtedness method. The budget, instead, requires for a segmented
+project that the local share of the basic project cost for the first segment be calculated using the
+required percentage of the basic project costs method. It further requires that any future
+segment’s portion of the basic project cost use the same share as the one calculated in the first
+segment.
+
+   Facilities construction process
+        The budget contains a number of provisions related to streamlining the facilities
+construction process, some of which are summarized below. According to OFCC, these provisions
+will generally provide more flexibility, reduce project delays, and significantly improve efficiency.
+For more details about these provisions, please see the LSC bill analysis and comparison
+document for H.B. 96. The budget:
+   ▪ Establishes, for contracts between public authorities and construction managers at risk
+       (CMR) or design-build firms (DBF), an expedited proposal and selection process for
+       projects under $4.0 million whereby an authority may require a CMR or DBF to submit an
+       initial qualification proposal or statement, respectively, and pricing proposal at the same
+       time, instead of sending them in separate rounds.
+
+Legislative Budget Office of the Legislative Service Commission                                  Page 6
+Greenbook                                                    Ohio Facilities Construction Commission
+
+
+
+     ▪ Decreases, for partial payments on a public improvements contract, the public authority’s
+         required retainage amount from 8% on the first 50%, and 0% on the second 50%, of the
+         contract to 4% or less for 100% of the contract and eliminates certain current law
+         requirements that the public authority deposit the retained amount in an escrow account.
+     ▪ Requires, for contracts authorized by competitive bidding, a state agency or political
+         subdivision that finds a low bidder is not responsive or responsible to send the bidder a
+         notice electronically, permitting certified mail delivery only if an electronic method is not
+         available (rather than by either method).
+     ▪ Requires, for contracts to employ a construction manager or CMR, a public authority to
+         advertise its intent by electronic means and permits advertising in news media available
+         in the county (rather than requiring advertisement in a newspaper of general circulation
+         and permitting electronic advertisement).
+     ▪ Reduces the minimum advertisement period for contracts to employ a construction
+         manager from 30 days to 14 days.
+
+     Vocational Facilities Assistance Program
+        Created by H.B. 675 of the 124th General Assembly, the Vocational Facilities Assistance
+Program (VFAP) provides classroom facilities assistance to the state’s 49 joint vocational school
+districts (JVSDs). The program is similar to CFAP in that lower wealth JVSDs are generally served
+first and with a greater state share. Under prior law, OFCC had the authority to spend 2% of its
+annual capital appropriations on VFAP projects. The budget, instead, permits OFCC to set aside a
+portion of its capital appropriations to provide assistance to at least two JVSDs per biennium.
+
+
+
+
+FCC/zg
+
+
+
+Legislative Budget Office of the Legislative Service Commission                                Page 7
+FY 2026 - FY 2027 Final Appropriations
+                                                                                                                                                                 H.B. 96 - Main Operating Appropriations Bill
+All Fund Groups - Detail
+                                                                                                                                                        Appropriation     Appropriation FY 2025 to FY 2026 FY 2026 to FY 2027
+Detail by Agency                                                                                                          FY 2024        FY 2025          FY 2026           FY 2027         % Change           % Change
+
+FCC    Ohio Facilities Construction Commission                                         AIId-64
+
+
+
+
+GRF    230321 Operating Expenses           IId-3757                                                                        $10,165,497    $10,659,596       $10,750,000       $10,750,000            0.85%             0.00%
+
+GRF    230401 Cultural Facilities Lease Rental Bond Payments                                                   IId-3499    $30,860,700    $30,845,528       $37,500,000       $37,500,000           21.57%             0.00%
+
+GRF    230458 State Construction Management Services                                    IId-3640                             $127,706              $0               $0                $0              N/A                N/A
+
+GRF    230908 Common Schools General Obligation Bond Debt Service
+                 IId-2497
+                                                                                                                          $366,857,374   $298,169,786      $255,000,000      $230,000,000          -14.48%             -9.80%
+
+General Revenue Fund Subtotal                                                                                             $408,011,278   $339,674,909     $303,250,000       $278,250,000          -10.72%             -8.24%
+
+5CV3   230650 ARPA School Security                    IId-4301                                                              $9,995,000             $0               $0                $0              N/A                N/A
+
+5CV3   230652 Career-Technical Construction Program                         IId-4463                                      $100,456,627    $99,464,012               $0                $0          -100.00%               N/A
+                 Multi-Agency Radio Communication System (MARCS)-
+5CV3   230655                                                                                                                       $0      $651,309                $0                $0          -100.00%               N/A
+                 In-School Security Grant                        IId-4601
+
+
+
+
+5CV5   230654 Appalachian Community Innovation Centers                                             IId-4602                         $0     $2,401,428               $0                $0          -100.00%               N/A
+
+Dedicated Purpose Fund Group Subtotal                                                                                     $110,451,627   $102,516,749               $0                $0          -100.00%               N/A
+
+1310   230639 State Construction Management Operations                                              IId-3653                $7,930,654     $8,161,170        $9,590,355       $10,233,822           17.51%             6.71%
+
+Internal Service Activity Fund Group Subtotal                                                                               $7,930,654     $8,161,170        $9,590,355       $10,233,822           17.51%             6.71%
+
+7047   230647 Project Support   IId-4692                                                                                            $0             $0       $20,000,000               $0              N/A            -100.00%
+
+Revenue Distribution Fund Group Subtotal                                                                                            $0             $0       $20,000,000               $0              N/A            -100.00%
+
+Ohio Facilities Construction Commission Total                                                                             $526,393,559   $450,352,829     $332,840,355       $288,483,822          -26.09%            -13.33%
+
+
+
+
+Legislative Budget Office of the Legislative Service Commission                                                                                                                                                             1

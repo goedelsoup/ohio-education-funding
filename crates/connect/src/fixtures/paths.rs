@@ -512,6 +512,28 @@ pub const EDCHOICE_DESIGNATED_2526_FIXTURE: &str =
 pub const EDCHOICE_DESIGNATED_2425_FIXTURE: &str =
     "crates/dispersion/fixtures/edchoice-designated-2425.csv";
 
+/// The Facilities Construction Commission's K-12 equity lists, FY2024 and FY2025, one row per
+/// district per list year: the R.C. 3318.011 rank, name, county and adjusted valuation per pupil.
+///
+/// Recovered from the Internet Archive; the Commission's own host refuses this repository's agent.
+/// A list year governs the approvals of the fiscal year after it, under R.C. 3318.01(K).
+pub const OFCC_EQUITY_FIXTURE: &str = "crates/dispersion/fixtures/ofcc-equity-ranks.csv";
+
+/// The Commission's rolling *Classroom Facilities Assistance Program Status* edition, as text.
+///
+/// Committed whole, as the greenbooks are: it is one short document about one programme. It
+/// carries the Commission's own worked example of the share rule ("the school at ranking 307 would
+/// have a state/local split of 50/50") and every district's FY2026 rank beside its programme
+/// status, which no archived FY2026 equity list does.
+pub const CFAP_STATUS_FIXTURE: &str = "crates/dispersion/fixtures/ofcc-cfap-status.txt";
+
+/// LSC's greenbook for the Facilities Construction Commission under H.B. 96, as text.
+///
+/// Committed whole for the reason [`GREENBOOK_FIXTURE`] is. It is the committed statement of the
+/// act's two changes to the capital channel: the end of the net-indebtedness alternative to the
+/// required percentage, and the one-time Project Support line, ALI 230647.
+pub const FCC_GREENBOOK_FIXTURE: &str = "crates/dispersion/fixtures/fcc-greenbook.txt";
+
 /// The three building-level Performance Index rankings the designation is cut from.
 ///
 /// Beside [`EDCHOICE_DESIGNATED_FIXTURE`] because it is that file's first input, and in
@@ -617,6 +639,9 @@ pub const REBUILT: &[&str] = &[
     PI_RANKING_FIXTURE,
     TITLE1_FIXTURE,
     IDEA_PART_B_FIXTURE,
+    OFCC_EQUITY_FIXTURE,
+    CFAP_STATUS_FIXTURE,
+    FCC_GREENBOOK_FIXTURE,
     SGO_CLAIMS_FIXTURE,
     SGO_ESTIMATES_FIXTURE,
     CROSSWALK_FIXTURE,

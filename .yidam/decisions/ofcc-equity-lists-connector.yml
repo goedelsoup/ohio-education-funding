@@ -1,0 +1,63 @@
+id: ofcc-equity-lists-connector
+summary: >-
+  ofcc-equity-lists: the Commission's FY2024 and FY2025 K-12 equity lists by rank and its rolling
+  program status edition, recovered from the Internet Archive, so the share a district pays of a
+  classroom facilities project is computed from the rank the statute reads it from.
+context: |
+  [#790](https://github.com/goedelsoup/ohio-education-funding/issues/790) asked how the Classroom
+  Facilities Assistance Program sets a district's share. `program/classroom-facilities-assistance`
+  had recorded the schedule as "in the Commission's rules" and not held. It is in statute: R.C.
+  3318.011 ranks the districts, 3318.01(K) makes the percentile the share, and 3318.032(D) caps
+  it. The rank is the one input the statute does not supply.
+
+  `ofcc-projects` is blocked because `ofcc.ohio.gov` refuses a self-identifying agent, and
+  `the-capital-channel-has-no-second-publisher` found that the archive held the portal shell and
+  none of the data. That survey looked at the portal's own host. The Commission's documents are
+  served from a different one, `dam.assets.ohio.gov`, and the Wayback Machine captured several of
+  them as PDFs.
+decision: |
+  Declare `ofcc-equity-lists`, `Wired`, with three Wayback captures as sources: the FY2025 and
+  FY2024 lists by rank and the rolling status edition as of 31 December 2025. Build
+  `crates/dispersion/fixtures/ofcc-equity-ranks.csv` from the two lists, one row per district per
+  list year, and commit the status edition as text.
+
+  **The archive is the publisher.** Each source is a `web.archive.org/web/<timestamp>id_/` URL, so
+  the bytes are the ones captured and not a replay page. Wayback is an accepted publisher here, and
+  the connector sends this repository's own agent string.
+
+  **Rows are keyed on name and county.** The list carries no IRN, and the name alone is not a key:
+  Lakota Local is in two counties and Buckeye Local in three. The reader refuses an edition where
+  the pair repeats or the ranks are not exactly `1..=n`.
+
+  **One exception, and it is the edition's.** The FY2024 text layer prints ranks 445 to 448 twice,
+  cell for cell. A repeat identical in all four cells is dropped, and any other repeat is refused.
+
+  **The status edition is not parsed into rows.** Its rank column is the FY2026 ranking, which no
+  archive holds as a list. The library reads it one district at a time. It does not add a third
+  list year, because the edition abbreviates some names and a list built from it would differ in
+  its keys from the two read in full.
+consequences: |
+  **The rounding is a tested reading.** `crates/dispersion/tests/the_rank_that_rounds_up.rs` shows
+  that only the ceiling of `100 × rank / n` gives no district a zeroth percentile. It also shows
+  that one project the Commission approved in July 2025 pays the ceiling, where the floor and the
+  nearest whole number are each a point short.
+
+  **What a project cost is still not held.** The Commission's minutes state each approved
+  project's state and local dollars, and those from 2024 on are archived nowhere. The New
+  Philadelphia pair the test reproduces is transcribed from the research folder's copy into the
+  test as constants. The corpus binds the half of the pair that comes from the list.
+
+  **`ofcc-projects` stays `Declared`.** Nothing here allocates the capital channel. The share rule
+  says what fraction a district pays and not how much the state spent.
+alternatives: |
+  **Commit the research folder's FY2026 lists.** Rejected. No publisher serves them to this
+  repository's agent and no archive holds them, so a fixture built from them could never be
+  re-fetched or re-verified.
+
+  **Parse the status edition as a third list year.** Deferred, for the reason in the decision. A
+  question that needs FY2026 ranks in bulk is the trigger to write that reader.
+
+  **Read the older lists, FY2007 to FY2023, from the former host's captures.** Deferred. They would
+  extend the rank series back, but #790 asks for the rule in force, and two years state it.
+connectors:
+  - ofcc-equity-lists
