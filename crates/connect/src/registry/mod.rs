@@ -282,6 +282,7 @@ pub const CONNECTORS: &[Connector] = &[
     tax::ABSTRACT,
     tax::CASINO,
     tax::INCOME_CREDITS,
+    tax::SCHOOL_DISTRICT_INCOME_TAX,
     dew::PAYMENT_REPORTS,
     dew::SCHOLARSHIP_REPORTS,
     dew::FACTS_AND_FIGURES,

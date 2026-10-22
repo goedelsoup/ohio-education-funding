@@ -191,6 +191,12 @@ pub const HOME_EDUCATION_FIXTURE: &str = "crates/dispersion/fixtures/home-educat
 /// Where the SD-1 taxable value and taxes charged panel is written, relative to the root.
 pub const SD1_FIXTURE: &str = "crates/dispersion/fixtures/sd1-district-taxes.csv";
 
+/// Where the school district income tax panel is written, relative to the root.
+///
+/// Table SD-2-Q4 for FY2024 and FY2025: every district Taxation distributed income tax to, with
+/// its rate, its base and whether the tax was still in force. See [`super::sd2`].
+pub const SD2_FIXTURE: &str = "crates/dispersion/fixtures/school-district-income-tax.csv";
+
 /// Where the per-district casino distribution panel is written, relative to the root.
 pub const CASINO_FIXTURE: &str = "crates/dispersion/fixtures/casino-district-distributions.csv";
 
@@ -581,6 +587,7 @@ pub const REBUILT: &[&str] = &[
     HOME_EDUCATION_STATEWIDE_FIXTURE,
     HOME_EDUCATION_FIXTURE,
     SD1_FIXTURE,
+    SD2_FIXTURE,
     CASINO_FIXTURE,
     LSC_GREENBOOK_FIXTURE,
     CPI_FIXTURE,

@@ -71,6 +71,7 @@ pub mod scholarship_charts;
 pub mod scholarship_credit;
 pub mod scholarship_history;
 pub mod sd1;
+pub mod sd2;
 pub mod session_laws;
 pub mod statute;
 pub mod text;
@@ -169,8 +170,9 @@ pub use paths::{
     PLAN_BILL_FIXTURE, PRIOR_STATUTE_FIXTURE, PROFILE_FIXTURE, REBUILT, REDBOOK_FIXTURE,
     REPORT_CARD_FIXTURE, SCHOLARSHIP_CHARTS_FIXTURE, SCHOLARSHIP_FIXTURE,
     SCHOLARSHIP_HISTORY_FIXTURE, SCHOLARSHIP_JPSN_CATEGORY_FIXTURE, SCHOLARSHIP_JPSN_FIXTURE,
-    SD1_FIXTURE, SESSION_LAW_FIXTURE, SFPR_FIXTURE, SGO_CLAIMS_FIXTURE, SGO_ESTIMATES_FIXTURE,
-    STATUTE_FIXTURE, TITLE1_FIXTURE, TRANSFER_FIXTURE, TRANSPORT_RATES_FIXTURE, TYPOLOGY_FIXTURE,
+    SD1_FIXTURE, SD2_FIXTURE, SESSION_LAW_FIXTURE, SFPR_FIXTURE, SGO_CLAIMS_FIXTURE,
+    SGO_ESTIMATES_FIXTURE, STATUTE_FIXTURE, TITLE1_FIXTURE, TRANSFER_FIXTURE,
+    TRANSPORT_RATES_FIXTURE, TYPOLOGY_FIXTURE,
 };
 pub use rankings::{build_pi_rankings, PI_RANKING_HEADER, PI_RANKING_SHEETS};
 pub use report_card::{
@@ -183,6 +185,7 @@ pub use scholarship_credit::{
 };
 pub use scholarship_history::{build_scholarship_history, SCHOLARSHIP_HISTORY_HEADER};
 pub use sd1::{build_sd1_extract, Sd1Year, SD1_HEADER};
+pub use sd2::{build_sd2_extract, Sd2Year, SD2_HEADER};
 pub use session_laws::{build_session_laws, reprinted_section, ActText, SESSION_LAW_HEADER};
 pub use statute::{
     build_records, parse_statute, parse_statute_version, version_of, Record, RECORD_MARKER,

@@ -1,0 +1,446 @@
+irn,district,county,fiscal_year,sd_number,year_began,rate,base,status,terms,distributed
+043521,Athens CSD,Athens,2024,502,2007,1,earned,in-force,expires 2028,5002097.99
+043521,Athens CSD,Athens,2025,502,2007,1,earned,in-force,expires 2028,5336581.44
+043596,Bellevue CSD,Huron,2024,3901,2002,0.5,traditional,in-force,expires 2026,1920185.55
+043596,Bellevue CSD,Huron,2025,3901,2002,0.5,traditional,in-force,expires 2026,2078639.7
+043620,Bexley CSD,Franklin,2024,2501,2005,0.75,traditional,in-force,,9386552.99
+043620,Bexley CSD,Franklin,2025,2501,2005,0.75,traditional,in-force,,9906910.66
+043638,Bowling Green CSD,Wood,2024,8701,1993,0.5,traditional,in-force,,4665393.1
+043638,Bowling Green CSD,Wood,2025,8701,1993,0.5,traditional,in-force,,4818019.86
+043679,Bryan CSD,Williams,2024,8601,2007,1,traditional,in-force,,4107403.08
+043679,Bryan CSD,Williams,2025,8601,2007,1,traditional,in-force,,4324113.43
+043729,Celina CSD,Mercer,2024,5401,2004,1,earned,in-force,expires 2028,4570141.1
+043729,Celina CSD,Mercer,2025,5401,2004,1,earned,in-force,expires 2028,4838593.94
+043760,Circleville CSD,Pickaway,2024,6501,2006,0.75,earned,in-force,,2451642.3
+043760,Circleville CSD,Pickaway,2025,6501,2006,0.75,earned,in-force,,2686131.16
+043869,Defiance CSD,Defiance,2024,2003,1992,0.5,traditional,in-force,,2271729.59
+043869,Defiance CSD,Defiance,2025,2003,1992,0.5,traditional,in-force,,2481294.28
+043885,Delphos CSD,Allen,2024,204,2021,0.5,traditional,in-force,expires 2025,1676205.72
+043885,Delphos CSD,Allen,2025,204,2021,0.5,traditional,in-force,expires 2025,1825525.53
+043927,East Palestine CSD,Columbiana,2024,1505,2021,0.5,earned,in-force,expires 2025,765762.44
+043927,East Palestine CSD,Columbiana,2025,1505,2021,0.5,earned,in-force,expires 2025,933892.18
+043935,Eaton CSD,Preble,2024,6803,1993,1.5,traditional,in-force,0.75% expires 2025 / 0.75% CPT,5851206.74
+043935,Eaton CSD,Preble,2025,6803,1993,1.5,traditional,in-force,0.75% expires 2030 / 0.75% CPT,6114886.63
+043968,Fairborn CSD,Greene,2024,2903,1990,0.5,traditional,in-force,,5664734.27
+043968,Fairborn CSD,Greene,2025,2903,1990,0.5,traditional,in-force,,6227471.14
+044016,Fremont CSD,Sandusky,2024,7202,1994,1.25,traditional,in-force,expires 2028,10357522.11
+044016,Fremont CSD,Sandusky,2025,7202,1994,1.25,traditional,in-force,expires 2028,10797331.17
+044057,Geneva Area CSD,Ashtabula,2024,404,2019,1.25,earned,in-force,expires 2028,4312103.11
+044057,Geneva Area CSD,Ashtabula,2025,404,2019,1.25,earned,in-force,expires 2028,4642167.07
+044099,Greenville CSD,Darke,2024,1904,1990,0.5,traditional,in-force,,2869608.31
+044099,Greenville CSD,Darke,2025,1904,1990,0.5,traditional,in-force,,3117874.78
+044123,Hillsboro CSD,Highland,2024,3604,1992,1,traditional,in-force,,3932706.5
+044123,Hillsboro CSD,Highland,2025,3604,1992,1,traditional,in-force,,4147765.29
+044172,Kenton CSD,Hardin,2024,3303,1996,1,traditional,in-force,,2783013.37
+044172,Kenton CSD,Hardin,2025,3303,1996,1,traditional,in-force,,2906020.03
+044206,Lancaster CSD,Fairfield,2024,2305,2007,1.5,earned,in-force,,16904453.09
+044206,Lancaster CSD,Fairfield,2025,2305,2007,1.5,earned,in-force,,18387424.4
+044255,London CSD,Madison,2024,4903,2006,1,traditional,in-force,,4734309.91
+044255,London CSD,Madison,2025,4903,2006,1,traditional,in-force,,5340494.59
+044354,Massillon CSD,Stark,2024,7609,1998,0.75,,expired,,6655.19
+044354,Massillon CSD,Stark,2025,7609,1998,0.75,,expired,,31372.17
+044453,Newark CSD,Licking,2024,4507,1998,1,traditional,in-force,,12459935.93
+044453,Newark CSD,Licking,2025,4507,1998,1,traditional,in-force,,13880419.06
+044552,Norton CSD,Summit,2024,7711,2019,0.5,earned,in-force,,1998142.91
+044552,Norton CSD,Summit,2025,7711,2019,0.5,earned,in-force,,2147775.85
+044560,Norwalk CSD,Huron,2024,3904,1992,0.5,traditional,in-force,,2967715.69
+044560,Norwalk CSD,Huron,2025,3904,1992,0.5,traditional,in-force,,3241431
+044594,Oberlin CSD,Lorain,2024,4712,1991,2,traditional,in-force,0.75% expires 2027 / 1.25% CPT,5785490.35
+044594,Oberlin CSD,Lorain,2025,4712,1991,2,traditional,in-force,0.75% expires 2027 / 1.25% CPT,6885176.17
+044644,Piqua CSD,Miami,2024,5507,1991,1.25,traditional,in-force,,8523850.16
+044644,Piqua CSD,Miami,2025,5507,1991,1.25,traditional,in-force,,8941193.86
+044727,St Marys CSD,Auglaize,2024,604,2019,1,earned,in-force,expires 2028,3367590.19
+044727,St Marys CSD,Auglaize,2025,604,2019,1,earned,in-force,expires 2028,3638563.34
+044735,Salem CSD,Columbiana,2024,1508,1996,1,,expired,,0.66
+044735,Salem CSD,Columbiana,2025,1508,1996,1,,expired,,5756.08
+044776,Shelby CSD,Richland,2024,7008,2006,1,traditional,in-force,,4241435.92
+044776,Shelby CSD,Richland,2025,7008,2006,1,traditional,in-force,,3545136.77
+044784,Sidney CSD,Shelby,2024,7508,2022,0.75,earned,in-force,expires 2031,4228684
+044784,Sidney CSD,Shelby,2025,7508,2022,0.75,earned,in-force,expires 2031,4642842.74
+044925,Troy CSD,Miami,2024,5509,2007,1.5,earned,in-force,,13932523.25
+044925,Troy CSD,Miami,2025,5509,2007,1.5,earned,in-force,,15057958.25
+044966,Van Wert CSD,Van Wert,2024,8104,2004,1,traditional,in-force,,3846435.73
+044966,Van Wert CSD,Van Wert,2025,8104,2004,1,traditional,in-force,,4018762.66
+044982,Wapakoneta CSD,Auglaize,2024,605,1991,0.75,traditional,in-force,,4671428.08
+044982,Wapakoneta CSD,Auglaize,2025,605,1991,0.75,traditional,in-force,,5100378.53
+045013,Washington Court House CSD,Fayette,2024,2402,2021,1,earned,in-force,expires 2027,2643053.49
+045013,Washington Court House CSD,Fayette,2025,2402,2021,1,earned,in-force,expires 2027,3114086.14
+045096,Willard CSD,Huron,2024,3907,2012,0.75,earned,in-force,,1688167.39
+045096,Willard CSD,Huron,2025,3907,2012,0.75,earned,in-force,,1819109.99
+045112,Wilmington CSD,Clinton,2024,1404,2003,1,,expired,,972216.28
+045112,Wilmington CSD,Clinton,2025,1404,2003,1,,expired,,341698.78
+045146,Wyoming CSD,Hamilton,2024,3122,1990,1.25,traditional,in-force,,8786107.35
+045146,Wyoming CSD,Hamilton,2025,3122,1990,1.25,traditional,in-force,,9186810.74
+045153,Xenia Community CSD,Greene,2024,2906,1998,0.5,traditional,in-force,expires 2030,6142374.55
+045153,Xenia Community CSD,Greene,2025,2906,1998,0.5,traditional,in-force,expires 2030,5446260.24
+045187,Ada EVSD,Hardin,2024,3301,1993,1.5,traditional,in-force,0.75% expires 2027 / 0.75% CPT,2582387.32
+045187,Ada EVSD,Hardin,2025,3301,1993,1.5,traditional,in-force,0.75% expires 2027 / 0.75% CPT,2769936.15
+045203,Barnesville EVSD,Belmont,2024,701,1996,0.5,,expired,,90.64
+045203,Barnesville EVSD,Belmont,2025,701,1996,0.5,,expired,,917.28
+045211,Bluffton EVSD,Allen,2024,203,2008,0.5,traditional,in-force,expires 2025,1114015.86
+045211,Bluffton EVSD,Allen,2025,203,2008,0.5,traditional,in-force,expires 2025,1162927.11
+045229,Bradford EVSD,Miami,2024,5502,1983,1.75,traditional,in-force,,1577162.78
+045229,Bradford EVSD,Miami,2025,5502,1983,1.75,traditional,in-force,,1682745.83
+045260,Carey EVSD,Wyandot,2024,8801,2005,1,traditional,in-force,expires 2029,1623330.96
+045260,Carey EVSD,Wyandot,2025,8801,2005,1,traditional,in-force,expires 2029,1688531.41
+045302,Clyde-Green Springs EVSD,Sandusky,2024,7201,2009,1.5,earned,in-force,0.50% expires 2030 / 1.00% CPT,4324342.48
+045302,Clyde-Green Springs EVSD,Sandusky,2025,7201,2009,1.5,earned,in-force,0.50% expires 2030 / 1.00% CPT,4573238.18
+045310,Coldwater EVSD,Mercer,2024,5402,1990,0.5,traditional,in-force,,1517692.36
+045310,Coldwater EVSD,Mercer,2025,5402,1990,0.5,traditional,in-force,,1539702.81
+045328,Columbiana EVSD,Columbiana,2024,1502,2003,1,traditional,in-force,,2781688.71
+045328,Columbiana EVSD,Columbiana,2025,1502,2003,1,traditional,in-force,,2922150.36
+045336,Covington EVSD,Miami,2024,5503,1994,2,traditional,in-force,1.25% expires 2025 / 0.75% CPT,3185546.24
+045336,Covington EVSD,Miami,2025,5503,1994,2,traditional,in-force,1.25% expires 2030 / 0.75% CPT,3679091.64
+045344,Crestline EVSD,Crawford,2024,1704,2010,0.25,earned,in-force,,252465.45
+045344,Crestline EVSD,Crawford,2025,1704,2010,0.25,earned,in-force,,276759.42
+045385,Gibsonburg EVSD,Sandusky,2024,7203,2014,1,earned,in-force,expires 2028,1338203.69
+045385,Gibsonburg EVSD,Sandusky,2025,7203,2014,1,earned,in-force,expires 2028,1437461.78
+045393,Granville EVSD,Licking,2024,4501,2019,0.75,traditional,in-force,expires 2028,6796084.76
+045393,Granville EVSD,Licking,2025,4501,2019,0.75,traditional,in-force,expires 2028,7078654.77
+045401,Greenfield EVSD,Highland,2024,3603,2004,1.25,earned,in-force,,2907510.53
+045401,Greenfield EVSD,Highland,2025,3603,2004,1.25,earned,in-force,,3192526.93
+045419,Hicksville EVSD,Defiance,2024,2004,1992,1.5,traditional,in-force,0.75% expires 2029 / 0.75% CPT,2378144.07
+045419,Hicksville EVSD,Defiance,2025,2004,1992,1.5,traditional,in-force,0.75% expires 2029 / 0.75% CPT,2395115.91
+045468,Loudonville-Perrysville EVSD,Ashland,2024,303,1992,1.25,traditional,in-force,,2560864.96
+045468,Loudonville-Perrysville EVSD,Ashland,2025,303,1992,1.25,traditional,in-force,,2815557.36
+045484,Mechanicsburg EVSD,Champaign,2024,1102,1997,1.5,traditional,in-force,1.00% expires 2026 / 0.50% CPT,2439541.21
+045484,Mechanicsburg EVSD,Champaign,2025,1102,1997,1.5,traditional,in-force,1.00% expires 2026 / 0.50% CPT,2523090.89
+045518,Milton Union EVSD,Miami,2024,5505,2009,1.25,earned,in-force,,3325697.56
+045518,Milton Union EVSD,Miami,2025,5505,2009,1.25,earned,in-force,,3317556.82
+045526,Montpelier EVSD,Williams,2024,8605,2000,1.25,earned,in-force,,1534615.79
+045526,Montpelier EVSD,Williams,2025,8605,2000,1.25,earned,in-force,,1622160.35
+045534,Mount Gilead EVSD,Morrow,2024,5903,1995,1.5,traditional,in-force,0.75% expires 2024 / 0.75% CPT,3324951.06
+045534,Mount Gilead EVSD,Morrow,2025,5903,1995,0.75,traditional,in-force,0.75% CPT,3454265.13
+045575,Paulding EVSD,Paulding,2024,6302,1991,1,traditional,in-force,,2654818.89
+045575,Paulding EVSD,Paulding,2025,6302,1991,1,traditional,in-force,,2834679.5
+045583,Perrysburg EVSD,Wood,2024,8708,1992,0.5,traditional,in-force,,9699899.54
+045583,Perrysburg EVSD,Wood,2025,8708,1992,0.5,traditional,in-force,,10397998.41
+045625,Upper Sandusky EVSD,Wyandot,2024,8803,1996,1.25,traditional,in-force,expires 2029,4552593.26
+045625,Upper Sandusky EVSD,Wyandot,2025,8803,1996,1.25,traditional,in-force,expires 2029,4779210.35
+045633,Versailles EVSD,Darke,2024,1907,2005,1,traditional,in-force,expires 2024,3097441.57
+045633,Versailles EVSD,Darke,2025,1907,2005,1,traditional,in-force,expires 2028,4003167.35
+045641,Wauseon EVSD,Fulton,2024,2607,2023,1.75,earned,in-force,expires 2027,3738338.29
+045641,Wauseon EVSD,Fulton,2025,2607,2023,1.75,earned,in-force,expires 2027,4971696.49
+045658,Wellington EVSD,Lorain,2024,4715,1991,1,traditional,in-force,,2559142.29
+045658,Wellington EVSD,Lorain,2025,4715,1991,1,traditional,in-force,,2826338.96
+045674,Yellow Springs EVSD,Greene,2024,2907,2002,2,traditional,in-force,,1879272.27
+045674,Yellow Springs EVSD,Greene,2025,2907,2002,2,traditional,in-force,,4901203.14
+045807,Spencerville LSD,Allen,2024,209,1993,1,traditional,in-force,expires 2027,1519023.38
+045807,Spencerville LSD,Allen,2025,209,1993,1,traditional,in-force,expires 2027,1569667.71
+045823,Hillsdale LSD,Ashland,2024,302,2014,1.25,earned,in-force,expires 2033,2168040.26
+045823,Hillsdale LSD,Ashland,2025,302,2014,1.25,earned,in-force,expires 2033,2331057.77
+045906,Alexander LSD,Athens,2024,501,2020,1,earned,in-force,expires 2024,2151143.18
+045906,Alexander LSD,Athens,2025,501,2020,1,,expired,expired 2024,2053788.04
+045948,Minster LSD,Auglaize,2024,601,2007,1,traditional,in-force,expires 2031,2426266.54
+045948,Minster LSD,Auglaize,2025,601,2007,1,traditional,in-force,expires 2031,2513297.79
+045955,New Bremen LSD,Auglaize,2024,602,2005,1,traditional,in-force,,3131390.4
+045955,New Bremen LSD,Auglaize,2025,602,2005,1,traditional,in-force,,3418100.41
+045963,New Knoxville LSD,Auglaize,2024,603,2005,1.25,traditional,in-force,0.25% expires 2029 / 1.00% CPT,1160397.29
+045963,New Knoxville LSD,Auglaize,2025,603,2005,1.25,traditional,in-force,0.25% expires 2029 / 1.00% CPT,1268146.4
+045971,Waynesfield-Goshen LSD,Auglaize,2024,606,1992,1,traditional,in-force,expires 2026,940187.88
+045971,Waynesfield-Goshen LSD,Auglaize,2025,606,1992,1,traditional,in-force,expires 2026,1059073.13
+046128,Madison LSD,Butler,2024,905,1991,0.5,traditional,in-force,,1449994.83
+046128,Madison LSD,Butler,2025,905,1991,0.5,traditional,in-force,,1682079.42
+046136,New Miami LSD,Butler,2024,907,1990,1,traditional,in-force,,766378.58
+046136,New Miami LSD,Butler,2025,907,1990,1,traditional,in-force,,823981.18
+046144,Ross LSD,Butler,2024,908,2006,1.25,earned,in-force,,6413013.36
+046144,Ross LSD,Butler,2025,908,2006,1.25,earned,in-force,,6878301.22
+046151,Talawanda CSD,Butler,2024,909,2005,1,traditional,in-force,,8851370.1
+046151,Talawanda CSD,Butler,2025,909,2005,1,traditional,in-force,,9294603.77
+046201,Triad LSD,Champaign,2024,1103,1990,1.5,traditional,in-force,0.50% expires 2025 / 1.00% CPT,2893942.59
+046201,Triad LSD,Champaign,2025,1103,1990,1.5,traditional,in-force,0.50% expires 2025 / 1.00% CPT,3358883.61
+046219,West Liberty-Salem LSD,Champaign,2024,1105,1984,1.75,traditional,in-force,1.00% expires 2027 / 0.25% expires 2036 / 0.50% CPT,3671520.39
+046219,West Liberty-Salem LSD,Champaign,2025,1105,1984,1.75,traditional,in-force,1.00% expires 2027 / 0.25% expires 2036 / 0.50% CPT,4325249.59
+046250,Northeastern LSD,Clark,2024,1203,2016,1,earned,in-force,expires 2025,5914694.4
+046250,Northeastern LSD,Clark,2025,1203,2016,1,earned,in-force,expires 2025,6532387.38
+046268,Northwestern LSD,Clark,2024,1204,2010,1,earned,in-force,,2785869.42
+046268,Northwestern LSD,Clark,2025,1204,2010,1,earned,in-force,,3042757.66
+046276,Southeastern LSD,Clark,2024,1205,1990,1,traditional,in-force,,1413156.7
+046276,Southeastern LSD,Clark,2025,1205,1990,1,traditional,in-force,,1462604.23
+046326,Clermont-Northeastern LSD,Clermont,2024,1303,1996,1,traditional,in-force,,4616420.29
+046326,Clermont-Northeastern LSD,Clermont,2025,1303,1996,1,traditional,in-force,,5062845.56
+046342,Goshen LSD,Clermont,2024,1305,1991,1,traditional,in-force,,4842372.33
+046342,Goshen LSD,Clermont,2025,1305,1991,1,traditional,in-force,,5249072.51
+046383,Blanchester LSD,Clinton,2024,1401,2024,1,earned,in-force,expires 2028,112002.59
+046383,Blanchester LSD,Clinton,2025,1401,2024,1,earned,in-force,expires 2028,1364960.53
+046391,Clinton Massie LSD,Clinton,2024,1402,2020,0.5,earned,in-force,expires 2024,1597875.35
+046391,Clinton Massie LSD,Clinton,2025,1402,2020,0.5,,expired,,1620093.33
+046433,Crestview LSD,Columbiana,2024,1503,1990,1,traditional,in-force,,1798571.77
+046433,Crestview LSD,Columbiana,2025,1503,1990,1,traditional,in-force,,1868390.09
+046458,United LSD,Columbiana,2024,1510,1992,0.5,traditional,in-force,,1026824.09
+046458,United LSD,Columbiana,2025,1510,1992,0.5,traditional,in-force,,1147350.81
+046508,Buckeye Central LSD,Crawford,2024,1701,1990,1.5,traditional,in-force,,2560104.19
+046508,Buckeye Central LSD,Crawford,2025,1701,1990,1.5,traditional,in-force,,2732558.07
+046516,Colonel Crawford LSD,Crawford,2024,1703,2008,1.25,traditional,in-force,,2085449.81
+046516,Colonel Crawford LSD,Crawford,2025,1703,2008,1.25,traditional,in-force,,2286258.8
+046623,Ansonia LSD,Darke,2024,1901,1992,1.75,traditional,in-force,1.00% expires 2025 / 0.75% CPT,1865034.06
+046623,Ansonia LSD,Darke,2025,1901,1992,1.75,traditional,in-force,1.00% expires 2025 / 0.75% CPT,2053143.45
+046631,Arcanum-Butler LSD,Darke,2024,1902,1992,1.5,traditional,in-force,0.75% expires 2025 / 0.75% CPT,2802369.71
+046631,Arcanum-Butler LSD,Darke,2025,1902,1992,1.5,traditional,in-force,0.75% expires 2030 / 0.75% CPT,2932162.1
+046649,Franklin Monroe LSD,Darke,2024,1903,1993,0.75,traditional,in-force,,906903.57
+046649,Franklin Monroe LSD,Darke,2025,1903,1993,0.75,traditional,in-force,,985699.67
+046672,Mississinawa Valley LSD,Darke,2024,1905,1990,1.75,traditional,in-force,0.75% expires 2026 / 1.00% CPT,1555510.21
+046672,Mississinawa Valley LSD,Darke,2025,1905,1990,1.75,traditional,in-force,0.75% expires 2026 / 1.00% CPT,1664220.39
+046680,Tri-Village LSD,Darke,2024,1906,1991,1.5,traditional,in-force,,1834269.71
+046680,Tri-Village LSD,Darke,2025,1906,1991,1.5,traditional,in-force,,1980791.99
+046706,Ayersville LSD,Defiance,2024,2001,2008,1,traditional,in-force,expires 2027,1215715.44
+046706,Ayersville LSD,Defiance,2025,2001,2008,1,traditional,in-force,expires 2027,1235321.52
+046714,Central LSD,Defiance,2024,2002,1992,1.25,traditional,in-force,0.50% expires 2029 / 0.75% CPT,2338478.36
+046714,Central LSD,Defiance,2025,2002,1992,1.25,traditional,in-force,0.50% expires 2029 / 0.75% CPT,2259690.73
+046748,Big Walnut LSD,Delaware,2024,2101,1995,0.75,traditional,in-force,,10962692.09
+046748,Big Walnut LSD,Delaware,2025,2101,1995,0.75,traditional,in-force,,12430264.24
+046755,Buckeye Valley LSD,Delaware,2024,2102,1993,1,traditional,in-force,,9687874.65
+046755,Buckeye Valley LSD,Delaware,2025,2102,1993,1,traditional,in-force,,10674092.33
+046847,Amanda-Clearcreek LSD,Fairfield,2024,2301,2020,2,earned,in-force,expires 2034,4842917.67
+046847,Amanda-Clearcreek LSD,Fairfield,2025,2301,2020,2,earned,in-force,expires 2034,5236944.8
+046854,Berne Union LSD,Fairfield,2024,2302,2006,2,earned,in-force,,2641073.99
+046854,Berne Union LSD,Fairfield,2025,2302,2006,2,earned,in-force,,2838547.22
+046862,Bloom-Carroll LSD,Fairfield,2024,2303,1997,1.25,traditional,in-force,,7167771.55
+046862,Bloom-Carroll LSD,Fairfield,2025,2303,1997,1.25,traditional,in-force,,7923806.79
+046870,Fairfield Union LSD,Fairfield,2024,2304,1991,2,traditional,in-force,1.00% expires 2036 / 1.00% CPT,7082374.18
+046870,Fairfield Union LSD,Fairfield,2025,2304,1991,2,traditional,in-force,1.00% expires 2036 / 1.00% CPT,7427533.61
+046888,Liberty Union-Thurston LSD,Fairfield,2024,2306,1991,1.75,traditional,in-force,,4967163.76
+046888,Liberty Union-Thurston LSD,Fairfield,2025,2306,1991,1.75,traditional,in-force,,5074759.99
+046896,Pickerington LSD,Fairfield,2024,2307,1991,1,traditional,in-force,,24533651.4
+046896,Pickerington LSD,Fairfield,2025,2307,1991,1,traditional,in-force,,26607733.34
+046904,Walnut Township LSD,Fairfield,2024,2308,2004,1.75,earned,in-force,expires 2033,2007656.55
+046904,Walnut Township LSD,Fairfield,2025,2308,2004,1.75,earned,in-force,expires 2033,2182777.07
+046946,Canal Winchester LSD,Franklin,2024,2502,1991,0.75,traditional,in-force,,6586964.76
+046946,Canal Winchester LSD,Franklin,2025,2502,1991,0.75,traditional,in-force,,7215135.85
+047001,Reynoldsburg CSD,Franklin,2024,2509,1990,0.5,traditional,in-force,,6858272.3
+047001,Reynoldsburg CSD,Franklin,2025,2509,1990,0.5,traditional,in-force,,7283306.58
+047050,Evergreen LSD,Fulton,2024,2602,1990,1.5,traditional,in-force,0.25% expires 2027 / 0.50% expires 2024 / 0.75% CPT,4337565.47
+047050,Evergreen LSD,Fulton,2025,2602,1990,1.5,traditional,in-force,0.25% expires 2027 / 0.50% expires 2024 / 0.75% CPT,4927531.54
+047068,Gorham Fayette LSD,Fulton,2024,2603,1992,1,traditional,in-force,,667212.62
+047068,Gorham Fayette LSD,Fulton,2025,2603,1992,1,traditional,in-force,,687255.18
+047076,Pettisville LSD,Fulton,2024,2604,2004,1,traditional,in-force,,788727.93
+047076,Pettisville LSD,Fulton,2025,2604,2004,1,traditional,in-force,,761008.34
+047084,Pike-Delta-York LSD,Fulton,2024,2605,2022,1,traditional,in-force,expires 2026,2452149.83
+047084,Pike-Delta-York LSD,Fulton,2025,2605,2022,1,traditional,in-force,expires 2026,2492837.76
+047092,Swanton LSD,Fulton,2024,2606,2005,0.75,traditional,in-force,expires 2029,2313746.33
+047092,Swanton LSD,Fulton,2025,2606,2005,0.75,traditional,in-force,expires 2029,2474682.86
+047167,Berkshire LSD,Geauga,2024,2801,1993,1,earned,in-force,,3659305.55
+047167,Berkshire LSD,Geauga,2025,2801,1993,1,earned,in-force,,3921157.3
+047209,Ledgemont LSD,Geauga,2024,2805,2011,1.25,,merged,,15962.25
+047209,Ledgemont LSD,Geauga,2025,2805,2011,1.25,,merged,,12383.96
+047258,Cedar Cliff LSD,Greene,2024,2902,1991,1.25,traditional,in-force,0.25% expires 2038 / 1.00% CPT,1659906.63
+047258,Cedar Cliff LSD,Greene,2025,2902,1991,1.25,traditional,in-force,0.25% expires 2038 / 1.00% CPT,1798810.36
+047266,Greeneview LSD,Greene,2024,2904,1991,1,traditional,in-force,,2620437.55
+047266,Greeneview LSD,Greene,2025,2904,1991,1,traditional,in-force,,3011827.91
+047381,Southwest LSD,Hamilton,2024,3118,2007,0.75,earned,in-force,,6395416.36
+047381,Southwest LSD,Hamilton,2025,3118,2007,0.75,earned,in-force,,6775241.98
+047415,Arcadia LSD,Hancock,2024,3201,2005,1,traditional,in-force,expires 2024,1245331.38
+047415,Arcadia LSD,Hancock,2025,3201,2005,1,traditional,in-force,expires 2029,1447106
+047423,Arlington LSD,Hancock,2024,3202,1984,1.75,traditional,in-force,,2107270.78
+047423,Arlington LSD,Hancock,2025,3202,1984,1.75,traditional,in-force,,2332412.07
+047431,Cory-Rawson LSD,Hancock,2024,3203,1992,1.75,traditional,in-force,0.75% expires 2028 / 1.00% CPT,2293963.84
+047431,Cory-Rawson LSD,Hancock,2025,3203,1992,1.75,traditional,in-force,0.75% expires 2028 / 1.00% CPT,2449246.13
+047449,Liberty-Benton LSD,Hancock,2024,3205,1995,0.75,traditional,in-force,expires 2030,2942505.18
+047449,Liberty-Benton LSD,Hancock,2025,3205,1995,0.75,traditional,in-force,expires 2030,2848350.72
+047456,McComb LSD,Hancock,2024,3206,1984,1.5,traditional,in-force,,1797496.8
+047456,McComb LSD,Hancock,2025,3206,1984,1.5,traditional,in-force,,1950533.85
+047464,Van Buren LSD,Hancock,2024,3207,2021,1,traditional,in-force,expires 2025,3193746.36
+047464,Van Buren LSD,Hancock,2025,3207,2021,1,traditional,in-force,expires 2030,3605250.07
+047472,Vanlue LSD,Hancock,2024,3208,1996,1,traditional,in-force,,571463.8
+047472,Vanlue LSD,Hancock,2025,3208,1996,1,traditional,in-force,,596672.48
+047498,Hardin Northern LSD,Hardin,2024,3302,1991,1.75,traditional,in-force,,1396525.28
+047498,Hardin Northern LSD,Hardin,2025,3302,1991,1.75,traditional,in-force,,1448586.82
+047506,Ridgemont LSD,Hardin,2024,3304,1991,1.75,traditional,in-force,0.75% expires 2025 / 1.00% CPT,1489207.72
+047506,Ridgemont LSD,Hardin,2025,3304,1991,1.75,traditional,in-force,0.75% expires 2030 / 1.00% CPT,1582875.23
+047514,Riverdale LSD,Hardin,2024,3305,2000,1,traditional,in-force,expires 2026,2144550.18
+047514,Riverdale LSD,Hardin,2025,3305,2000,1,traditional,in-force,expires 2026,1850888.64
+047522,Upper Scioto Valley LSD,Hardin,2024,3306,1996,0.5,traditional,in-force,,543179.22
+047522,Upper Scioto Valley LSD,Hardin,2025,3306,1996,0.5,traditional,in-force,,580021.68
+047571,Holgate LSD,Henry,2024,3501,1992,1.5,traditional,in-force,,1071624.88
+047571,Holgate LSD,Henry,2025,3501,1992,1.5,traditional,in-force,,1136791.43
+047589,Liberty Center LSD,Henry,2024,3502,1996,1.75,traditional,in-force,,3169855.84
+047589,Liberty Center LSD,Henry,2025,3502,1996,1.75,traditional,in-force,,3487529.58
+047597,Patrick Henry LSD,Henry,2024,3504,1991,1.75,traditional,in-force,,2887530.29
+047597,Patrick Henry LSD,Henry,2025,3504,1991,1.75,traditional,in-force,,3147732.91
+047712,Monroeville LSD,Huron,2024,3902,2010,1.5,earned,in-force,,1597556.17
+047712,Monroeville LSD,Huron,2025,3902,2010,1.5,earned,in-force,,1690061.88
+047720,New London LSD,Huron,2024,3903,1991,1,traditional,in-force,,1598241.39
+047720,New London LSD,Huron,2025,3903,1991,1,traditional,in-force,,1731089.14
+047738,South Central LSD,Huron,2024,3905,1991,1.25,traditional,in-force,,1523206.33
+047738,South Central LSD,Huron,2025,3905,1991,1.25,traditional,in-force,,1523304.18
+047746,Western Reserve LSD,Huron,2024,3906,1991,1.25,traditional,in-force,,2548645.11
+047746,Western Reserve LSD,Huron,2025,3906,1991,1.25,traditional,in-force,,2695092.5
+047829,Centerburg LSD,Knox,2024,4201,1990,0.75,traditional,in-force,,1857955.22
+047829,Centerburg LSD,Knox,2025,4201,1990,0.75,traditional,in-force,,2064397.08
+047837,Danville LSD,Knox,2024,4202,1990,1.5,traditional,in-force,1.00% expires 2024 / 0.50% CPT,1628471.56
+047837,Danville LSD,Knox,2025,4202,1990,1.75,traditional,in-force,1.25% expires 2034 / 0.50% CPT,1779351.71
+047985,Johnstown-Monroe LSD,Licking,2024,4503,2004,1,traditional,in-force,expires 2028,5216172.41
+047985,Johnstown-Monroe LSD,Licking,2025,4503,2004,1,traditional,in-force,expires 2028,5360784.68
+048017,Licking Valley LSD,Licking,2024,4506,1994,1,traditional,in-force,,3677972.39
+048017,Licking Valley LSD,Licking,2025,4506,1994,1,traditional,in-force,,3982692.78
+048025,North Fork LSD,Licking,2024,4508,2008,1,earned,in-force,expires 2028,2998117.52
+048025,North Fork LSD,Licking,2025,4508,2008,1,earned,in-force,expires 2028,3292778.01
+048033,Northridge LSD,Licking,2024,4509,2020,0.5,earned,in-force,expires 2046,1569335.61
+048033,Northridge LSD,Licking,2025,4509,2020,0.5,earned,in-force,expires 2046,1696492.21
+048041,Southwest Licking LSD,Licking,2024,4510,1991,0.75,traditional,in-force,,8732220.94
+048041,Southwest Licking LSD,Licking,2025,4510,1991,0.75,traditional,in-force,,9421478.47
+048090,Riverside LSD,Logan,2024,4604,1995,1.5,earned,in-force,,1309854.78
+048090,Riverside LSD,Logan,2025,4604,1995,1.5,earned,in-force,,1383470.24
+048256,Jefferson LSD,Madison,2024,4901,1995,1,earned,in-force,expires 2026,1989908.53
+048256,Jefferson LSD,Madison,2025,4901,1995,1,earned,in-force,expires 2026,2154508.21
+048264,Jonathan Alder LSD,Madison,2024,4902,2007,1.25,earned,in-force,0.75% expires 2026 0.50% expires 2031,5813446.03
+048264,Jonathan Alder LSD,Madison,2025,4902,2007,1.25,earned,in-force,0.75% expires 2026 0.50% expires 2031,6661883.53
+048272,Madison Plains LSD,Madison,2024,4904,2019,1.25,earned,in-force,expires 2033,2986055.83
+048272,Madison Plains LSD,Madison,2025,4904,2019,1.25,earned,in-force,expires 2033,3370470.41
+048355,Sebring LSD,Mahoning,2024,5008,2007,1,earned,in-force,expires 2026,682755.84
+048355,Sebring LSD,Mahoning,2025,5008,2007,1,earned,in-force,expires 2026,731309.57
+048371,Springfield LSD,Mahoning,2024,5010,2000,1,traditional,in-force,expires 2025,2763771.31
+048371,Springfield LSD,Mahoning,2025,5010,2000,1,traditional,in-force,expires 2029,3107841.99
+048389,West Branch LSD,Mahoning,2025,5012,1993,1,,expired,,84.68
+048413,Elgin LSD,Marion,2024,5101,2010,0.75,earned,in-force,,1200808.39
+048413,Elgin LSD,Marion,2025,5101,2010,0.75,earned,in-force,,1330808.15
+048421,Pleasant LSD,Marion,2024,5103,2020,1,earned,in-force,expires 2029,2233556.69
+048421,Pleasant LSD,Marion,2025,5103,2020,1,earned,in-force,expires 2029,2446887.5
+048439,Ridgedale LSD,Marion,2024,5104,2021,1,earned,in-force,,1024059.46
+048439,Ridgedale LSD,Marion,2025,5104,2021,1,earned,in-force,,1178563.06
+048447,River Valley LSD,Marion,2024,5105,2020,1,earned,in-force,expires 2029,2831968.12
+048447,River Valley LSD,Marion,2025,5105,2020,1,earned,in-force,expires 2029,3148155.27
+048488,Cloverleaf LSD,Medina,2024,5204,2007,1,earned,in-force,0.75% expires 2034 0.50% CPT,6299065.13
+048488,Cloverleaf LSD,Medina,2025,5204,2007,1,earned,in-force,0.75% expires 2034 0.50% CPT,6518933.82
+048553,Marion LSD,Mercer,2024,5403,2024,0.5,earned,in-force,expires 2053,66113.86
+048553,Marion LSD,Mercer,2025,5403,2024,0.5,earned,in-force,expires 2053,585402.64
+048579,Parkway LSD,Mercer,2024,5405,1996,1,traditional,in-force,expires 2025,1653449.98
+048579,Parkway LSD,Mercer,2025,5405,1996,1,traditional,in-force,expires 2025,1661636.85
+048595,Fort Recovery LSD,Mercer,2024,5406,1991,1.5,traditional,in-force,,3170967.86
+048595,Fort Recovery LSD,Mercer,2025,5406,1991,1.5,traditional,in-force,,3950255.46
+048611,Bethel LSD,Miami,2024,5501,2011,0.75,earned,in-force,expires 2025,2411445.71
+048611,Bethel LSD,Miami,2025,5501,2011,0.75,earned,in-force,expires 2025,2762398.48
+048629,Miami East LSD,Miami,2024,5504,1992,1.75,earned,in-force,,4914101.92
+048629,Miami East LSD,Miami,2025,5504,1992,1.75,earned,in-force,,5167977.49
+048637,Newton LSD,Miami,2024,5506,1993,1.75,traditional,in-force,0.75% expires 2025 / 1.00% CPT,2099131.11
+048637,Newton LSD,Miami,2025,5506,1993,1.75,traditional,in-force,0.75% expires 2028 / 1.00% CPT,2446992.17
+048710,New Lebanon LSD,Montgomery,2024,5708,1998,1.25,traditional,in-force,0.75% expires 2025 / 0.50% CPT,2210225.83
+048710,New Lebanon LSD,Montgomery,2025,5708,1998,1.25,traditional,in-force,0.75% expires 2025 / 0.50% CPT,2364851.63
+048744,Valley View LSD,Montgomery,2024,5713,1992,1.75,traditional,in-force,,6568071.76
+048744,Valley View LSD,Montgomery,2025,5713,1992,1.75,traditional,in-force,,6991074.35
+048793,Cardington-Lincoln LSD,Morrow,2024,5901,2014,0.75,earned,in-force,expires 2028,1284422.97
+048793,Cardington-Lincoln LSD,Morrow,2025,5901,2014,0.75,earned,in-force,expires 2028,1436976.17
+048801,Highland LSD,Morrow,2024,5902,1992,0.5,traditional,in-force,,1823061.78
+048801,Highland LSD,Morrow,2025,5902,1992,0.5,traditional,in-force,,1902461.3
+048819,Northmor LSD,Morrow,2024,5904,1993,1,traditional,in-force,,2148705.34
+048819,Northmor LSD,Morrow,2025,5904,1993,1,traditional,in-force,,2361680.67
+048991,Antwerp LSD,Paulding,2024,6301,1991,1.5,traditional,in-force,0.75% expires 2025 / 0.75% CPT,1610594.47
+048991,Antwerp LSD,Paulding,2025,6301,1991,1.5,traditional,in-force,0.75% expires 2030 / 0.75% CPT,1684000.11
+049031,Wayne Trace LSD,Paulding,2024,6303,1992,1.25,traditional,in-force,0.75% expires 2026 / 0.50% CPT,2885289.84
+049031,Wayne Trace LSD,Paulding,2025,6303,1992,1.25,traditional,in-force,0.75% expires 2026 / 0.50% CPT,2667481.15
+049080,Logan Elm LSD,Pickaway,2024,6502,2006,1,earned,in-force,expires 2025,3360724.8
+049080,Logan Elm LSD,Pickaway,2025,6502,2006,1,earned,in-force,expires 2025,3755217.65
+049098,Teays Valley LSD,Pickaway,2024,6503,1992,1.5,earned,in-force,,11545952.13
+049098,Teays Valley LSD,Pickaway,2025,6503,1992,1.5,earned,in-force,,12874985.79
+049205,James A Garfield LSD,Portage,2024,6704,2019,1.5,earned,in-force,expires 2028,3205359.08
+049205,James A Garfield LSD,Portage,2025,6704,2019,1.5,earned,in-force,expires 2028,3459572.1
+049270,National Trail LSD,Preble,2024,6802,1992,1.75,traditional,in-force,0.75% expires 2025 / 1.00% CPT,3011655.92
+049270,National Trail LSD,Preble,2025,6802,1992,1.75,traditional,in-force,0.75% expires 2030 / 1.00% CPT,3158842.05
+049288,Preble-Shawnee LSD,Preble,2024,6804,1991,1.75,traditional,in-force,0.75% expires 2026 / 1.00% CPT,4349549.74
+049288,Preble-Shawnee LSD,Preble,2025,6804,1991,1.75,traditional,in-force,0.75% expires 2026 / 1.00% CPT,4739711.27
+049296,Twin Valley Community LSD,Preble,2024,6805,2003,1.5,traditional,in-force,0.75% expires 2028 / 0.75% expires 2027,2286287.4
+049296,Twin Valley Community LSD,Preble,2025,6805,2003,1.5,traditional,in-force,0.75% expires 2028 / 0.75% expires 2027,2385961.83
+049312,Columbus Grove LSD,Putnam,2024,6901,1996,1,traditional,in-force,0.75% expires 2025 / 0.25% expires 2032,1676020.49
+049312,Columbus Grove LSD,Putnam,2025,6901,1996,1,traditional,in-force,0.75% expires 2030 / 0.25% expires 2032,1791259.29
+049320,Continental LSD,Putnam,2024,6902,1991,1,traditional,in-force,,995457.48
+049320,Continental LSD,Putnam,2025,6902,1991,1,traditional,in-force,,1035248.13
+049338,Jennings LSD,Putnam,2024,6903,2006,0.75,traditional,in-force,expires 2025,646067.31
+049338,Jennings LSD,Putnam,2025,6903,2006,0.75,traditional,in-force,expires 2030,652480.99
+049346,Kalida LSD,Putnam,2024,6904,2006,1,traditional,in-force,,1524403.58
+049346,Kalida LSD,Putnam,2025,6904,2006,1,traditional,in-force,,2199641.38
+049353,Leipsic LSD,Putnam,2024,6905,1992,0.75,traditional,in-force,,828414.14
+049353,Leipsic LSD,Putnam,2025,6905,1992,0.75,traditional,in-force,,878083.47
+049361,Miller City-New Cleveland LSD,Putnam,2024,6906,1993,1.25,traditional,in-force,,1017361.99
+049361,Miller City-New Cleveland LSD,Putnam,2025,6906,1993,1.25,traditional,in-force,,1105790.61
+049379,Ottawa-Glandorf LSD,Putnam,2024,6907,1993,1.5,traditional,in-force,,5134259.09
+049379,Ottawa-Glandorf LSD,Putnam,2025,6907,1993,1.5,traditional,in-force,,5889768.3
+049387,Ottoville LSD,Putnam,2024,6908,2010,0.75,traditional,in-force,,891123.73
+049387,Ottoville LSD,Putnam,2025,6908,2010,0.75,traditional,in-force,,925761.62
+049395,Pandora-Gilboa LSD,Putnam,2024,6909,1994,1.75,traditional,in-force,0.75% expires 2033 / 1.00% expires 2026,2114193.7
+049395,Pandora-Gilboa LSD,Putnam,2025,6909,1994,1.75,traditional,in-force,0.75% expires 2033 / 1.00% expires 2026,2456119.74
+049411,Clear Fork Valley LSD,Richland,2024,7001,2013,1,earned,in-force,expires 2037,2699514.68
+049411,Clear Fork Valley LSD,Richland,2025,7001,2013,1,earned,in-force,expires 2037,2935969.23
+049460,Plymouth-Shiloh LSD,Richland,2024,7007,1991,1,traditional,in-force,,1417266.96
+049460,Plymouth-Shiloh LSD,Richland,2025,7007,1991,1,traditional,in-force,,1415984.02
+049494,Adena LSD,Ross,2024,7101,2007,1,,expired,,2993.01
+049494,Adena LSD,Ross,2025,7101,2007,1,,expired,,5414.72
+049510,Paint Valley LSD,Ross,2024,7104,1993,0.5,,expired,,0.02
+049510,Paint Valley LSD,Ross,2025,7104,1993,0.5,,expired,,184.11
+049528,Southeastern LSD,Ross,2024,7105,2000,0.75,,expired,,3119.29
+049528,Southeastern LSD,Ross,2025,7105,2000,0.75,,expired,,13056.48
+049536,Union-Scioto LSD,Ross,2024,7106,1992,0.5,traditional,in-force,expires 2024,1825448.34
+049536,Union-Scioto LSD,Ross,2025,7106,1992,0.5,traditional,in-force,expires 2029,1961637.86
+049544,Zane Trace LSD,Ross,2024,7107,2016,0.75,earned,in-force,expires 2026,1861728.92
+049544,Zane Trace LSD,Ross,2025,7107,2016,0.75,earned,in-force,expires 2026,2043330.62
+049569,Lakota LSD,Sandusky,2024,7204,2005,1.5,traditional,in-force,,3168783.46
+049569,Lakota LSD,Sandusky,2025,7204,2005,1.5,traditional,in-force,,3313758.22
+049684,Seneca East LSD,Seneca,2024,7406,2001,1,traditional,in-force,expires 2025,1704931.49
+049684,Seneca East LSD,Seneca,2025,7406,2001,1,traditional,in-force,expires 2030,1766735.64
+049692,Bettsville LSD,Seneca,2024,7401,1994,1,,merged,,3401.33
+049692,Bettsville LSD,Seneca,2025,7401,1994,1,,merged,,2377.42
+049700,Hopewell-Loudon LSD,Seneca,2024,7403,2011,0.5,earned,in-force,expires 2048,571321.79
+049700,Hopewell-Loudon LSD,Seneca,2025,7403,2011,0.5,earned,in-force,expires 2048,642624.82
+049718,New Riegel LSD,Seneca,2024,7404,1990,1.5,traditional,in-force,0.75% expires 2026 / 0.75% CPT,982980.06
+049718,New Riegel LSD,Seneca,2025,7404,1990,1.5,traditional,in-force,0.75% expires 2026 / 0.75% CPT,1003231.52
+049726,Old Fort LSD,Seneca,2024,7405,2005,1,traditional,in-force,,962293.24
+049726,Old Fort LSD,Seneca,2025,7405,2005,1,traditional,in-force,,1011734.63
+049759,Anna LSD,Shelby,2024,7501,1983,1.5,traditional,in-force,,3291002.69
+049759,Anna LSD,Shelby,2025,7501,1983,1.5,traditional,in-force,,3508408.52
+049767,Botkins LSD,Shelby,2024,7502,2009,1.25,earned,in-force,,854185.55
+049767,Botkins LSD,Shelby,2025,7502,2009,1.25,earned,in-force,,881473.4
+049775,Fairlawn LSD,Shelby,2024,7503,1991,0.75,traditional,in-force,,478505.58
+049775,Fairlawn LSD,Shelby,2025,7503,1991,0.75,traditional,in-force,,535818.91
+049783,Fort Loramie LSD,Shelby,2024,7504,1995,1.5,traditional,in-force,expires 2024,2470412.87
+049783,Fort Loramie LSD,Shelby,2025,7504,1995,1.5,traditional,in-force,expires 2029,2858168.72
+049791,Hardin-Houston LSD,Shelby,2024,7505,1991,0.75,traditional,in-force,,1144218.65
+049791,Hardin-Houston LSD,Shelby,2025,7505,1991,0.75,traditional,in-force,,1246429.68
+049809,Jackson Center LSD,Shelby,2024,7506,2010,1.5,earned,in-force,,1104479.18
+049809,Jackson Center LSD,Shelby,2025,7506,2010,1.5,earned,in-force,,1209756.52
+049817,Russia LSD,Shelby,2024,7507,1992,0.75,traditional,in-force,,704743.95
+049817,Russia LSD,Shelby,2025,7507,1992,0.75,traditional,in-force,,832541.17
+049908,Northwest LSD,Stark,2024,7612,2011,1,earned,in-force,expires 2025,3731422.39
+049908,Northwest LSD,Stark,2025,7612,2011,1,earned,in-force,expires 2032,4026029.7
+050328,Fairbanks LSD,Union,2024,8001,1990,1,traditional,in-force,0.25% expires 2026 / 0.75% CPT,3406803.7
+050328,Fairbanks LSD,Union,2025,8001,1990,1,traditional,in-force,0.25% expires 2026 / 0.75% CPT,3648159.01
+050336,North Union LSD,Union,2024,8003,1991,1,traditional,in-force,,2715424.95
+050336,North Union LSD,Union,2025,8003,1991,1,traditional,in-force,,2876989.13
+050351,Crestview LSD,Van Wert,2024,8101,2005,1,traditional,in-force,,1549352.73
+050351,Crestview LSD,Van Wert,2025,8101,2005,1,traditional,in-force,,1634236.32
+050393,Vinton County LSD,Vinton,2024,8201,1995,0.5,,expired,,131.48
+050393,Vinton County LSD,Vinton,2025,8201,1995,0.5,,expired,,0
+050419,Carlisle LSD,Warren,2024,8301,2004,1,traditional,in-force,,3287626.61
+050419,Carlisle LSD,Warren,2025,8301,2004,1,traditional,in-force,,3526901.96
+050534,Chippewa LSD,Wayne,2024,8501,2008,1,earned,in-force,expires 2027,2495601.33
+050534,Chippewa LSD,Wayne,2025,8501,2008,1,earned,in-force,expires 2027,2702790.99
+050542,Dalton LSD,Wayne,2024,8502,2005,0.75,traditional,in-force,,1788109.4
+050542,Dalton LSD,Wayne,2025,8502,2005,0.75,traditional,in-force,,1886118.76
+050559,Green LSD,Wayne,2024,8503,2019,0.5,earned,in-force,expires 2028,921332.5
+050559,Green LSD,Wayne,2025,8503,2019,0.5,earned,in-force,expires 2028,973065.85
+050567,Norwayne LSD,Wayne,2024,8504,2014,0.75,earned,in-force,expires 2028,1608298.12
+050567,Norwayne LSD,Wayne,2025,8504,2014,0.75,earned,in-force,expires 2028,1707202.38
+050575,Northwestern LSD,Wayne,2024,8505,1990,1.25,traditional,in-force,,2851338.53
+050575,Northwestern LSD,Wayne,2025,8505,1990,1.25,traditional,in-force,,2998283.46
+050591,Triway LSD,Wayne,2024,8509,2013,1,earned,in-force,expires 2045,3102509.51
+050591,Triway LSD,Wayne,2025,8509,2013,1,earned,in-force,expires 2045,3436526.83
+050617,Edgerton LSD,Williams,2024,8602,1992,1,traditional,in-force,,1235230.94
+050617,Edgerton LSD,Williams,2025,8602,1992,1,traditional,in-force,,1158710.66
+050625,Edon-Northwest LSD,Williams,2024,8603,2016,1,earned,in-force,expires 2025,718214.78
+050625,Edon-Northwest LSD,Williams,2025,8603,2016,1,earned,in-force,expires 2025,737596.9
+050633,Millcreek-West Unity LSD,Williams,2024,8604,2005,1,traditional,in-force,,921671.65
+050633,Millcreek-West Unity LSD,Williams,2025,8604,2005,1,traditional,in-force,,968506.79
+050658,Stryker LSD,Williams,2024,8607,1991,1.5,traditional,in-force,0.25% expires 2031 / 1.25% CPT,1245286.57
+050658,Stryker LSD,Williams,2025,8607,1991,1.5,traditional,in-force,0.25% expires 2031 / 1.25% CPT,1310839.23
+050674,Eastwood LSD,Wood,2024,8702,2007,1,earned,in-force,expires 2026,2613541.01
+050674,Eastwood LSD,Wood,2025,8702,2007,1,earned,in-force,expires 2026,2802095.13
+050682,Elmwood LSD,Wood,2024,8703,1992,1.25,traditional,in-force,0.50% expires 2030 / 0.75% expires 2031,2543370.25
+050682,Elmwood LSD,Wood,2025,8703,1992,1.25,traditional,in-force,0.50% expires 2030 / 0.75% expires 2031,3109844.42
+050708,North Baltimore LSD,Wood,2024,8705,2008,1.25,earned,in-force,1.00% expires 2027 / 0.25% expires 2034,1187760.1
+050708,North Baltimore LSD,Wood,2025,8705,2008,1.25,earned,in-force,1.00% expires 2027 / 0.25% expires 2034,1263733.1
+050716,Northwood LSD,Wood,2024,8706,2015,0.25,earned,in-force,,385982.05
+050716,Northwood LSD,Wood,2025,8706,2015,0.25,earned,in-force,,392671.52
+050724,Otsego LSD,Wood,2024,8707,2003,1,traditional,in-force,,3921235.05
+050724,Otsego LSD,Wood,2025,8707,2003,1,traditional,in-force,,4160669.7
+050740,Mohawk LSD,Wyandot,2024,8802,1996,1,traditional,in-force,expires 2025,1922569.03
+050740,Mohawk LSD,Wyandot,2025,8802,1996,1,traditional,in-force,expires 2030,2048117.9
+091397,Tri-County North LSD,Preble,2024,6806,2015,1,earned,in-force,expires 2029,1435019.1
+091397,Tri-County North LSD,Preble,2025,6806,2015,1,earned,in-force,expires 2029,1518437.05
