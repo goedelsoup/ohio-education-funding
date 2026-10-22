@@ -3,6 +3,7 @@ used-by:
   - ../corpus/fiscal-period/fy2022-23.yml
   - ../corpus/fiscal-period/fy2024-25.yml
   - ../corpus/fiscal-period/fy2026-27.yml
+  - ../corpus/revenue-stream/tpp-replacement-payments.yml
 ---
 # LSC appropriation spreadsheet
 
