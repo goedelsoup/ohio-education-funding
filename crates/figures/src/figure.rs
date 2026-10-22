@@ -700,6 +700,26 @@ fn base_cost_fy2022() -> f64 {
     )
 }
 
+/// The tangible personal property replacement payments made in one fiscal year.
+///
+/// # Panics
+///
+/// If no committed source reports an actual for the year.
+fn tpp_paid(fiscal_year: u16) -> f64 {
+    project::ledger::appropriations::tpp_replacement_paid(fiscal_year)
+        .unwrap_or_else(|| panic!("no replacement payment actual for FY{fiscal_year}"))
+}
+
+/// The School District TPP Supplement paid in one fiscal year.
+///
+/// # Panics
+///
+/// If no committed source reports an actual for the year.
+fn supplement_paid(fiscal_year: u16) -> f64 {
+    project::ledger::appropriations::latest_actual("200697", fiscal_year)
+        .unwrap_or_else(|| panic!("no TPP supplement actual for FY{fiscal_year}"))
+}
+
 /// One appropriation line's enacted amount in one fiscal year.
 ///
 /// # Panics
@@ -4520,6 +4540,262 @@ pub static FIGURES: &[Figure] = &[
             table_three("traditional-edchoice", Measure::Payments, 2026)
                 - footnotes_traditional_fy2026(Measure::Payments)
         },
+    },
+    // The tangible personal property replacement payments, one actual per fiscal year across the
+    // lines that carried them (#784), business and utility summed through FY2015. Bound per year
+    // because the node states the schedule year by year, and a level binding is what a sentence
+    // about one year argues from.
+    Figure {
+        key: "project/tpp-replacement-paid-fy2006",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, business and utility together, FY2006",
+        pinned: 193_121_397.0,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2006),
+    },
+    Figure {
+        key: "project/tpp-replacement-paid-fy2007",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, business and utility together, FY2007",
+        pinned: 520_306_777.0,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2007),
+    },
+    Figure {
+        key: "project/tpp-replacement-paid-fy2008",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, business and utility together, FY2008",
+        pinned: 706_305_208.0,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2008),
+    },
+    Figure {
+        key: "project/tpp-replacement-paid-fy2009",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, business and utility together, FY2009",
+        pinned: 881_780_537.0,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2009),
+    },
+    Figure {
+        key: "project/tpp-replacement-paid-fy2010",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, business and utility together, FY2010",
+        pinned: 1_121_205_247.0,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2010),
+    },
+    Figure {
+        key: "project/tpp-replacement-paid-fy2011",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, business and utility together, FY2011",
+        pinned: 1_129_069_307.0,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2011),
+    },
+    Figure {
+        key: "project/tpp-replacement-paid-fy2012",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, business and utility together, FY2012",
+        pinned: 759_915_156.0,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2012),
+    },
+    Figure {
+        key: "project/tpp-replacement-paid-fy2013",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, business and utility together, FY2013",
+        pinned: 510_103_809.0,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2013),
+    },
+    Figure {
+        key: "project/tpp-replacement-paid-fy2014",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, business and utility together, FY2014",
+        pinned: 509_654_246.0,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2014),
+    },
+    Figure {
+        key: "project/tpp-replacement-paid-fy2015",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, business and utility together, FY2015",
+        pinned: 509_467_946.0,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2015),
+    },
+    Figure {
+        key: "project/tpp-replacement-paid-fy2016",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, FY2016",
+        pinned: 357_705_800.41,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2016),
+    },
+    Figure {
+        key: "project/tpp-replacement-paid-fy2017",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, FY2017",
+        pinned: 245_472_982.75,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2017),
+    },
+    Figure {
+        key: "project/tpp-replacement-paid-fy2018",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, FY2018",
+        pinned: 204_889_269.03,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2018),
+    },
+    Figure {
+        key: "project/tpp-replacement-paid-fy2019",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, FY2019",
+        pinned: 162_559_213.60,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2019),
+    },
+    Figure {
+        key: "project/tpp-replacement-paid-fy2020",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, FY2020",
+        pinned: 132_343_760.90,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2020),
+    },
+    Figure {
+        key: "project/tpp-replacement-paid-fy2021",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, FY2021",
+        pinned: 107_117_742.48,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2021),
+    },
+    Figure {
+        key: "project/tpp-replacement-paid-fy2022",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, FY2022",
+        pinned: 84_516_160.58,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2022),
+    },
+    Figure {
+        key: "project/tpp-replacement-paid-fy2023",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, FY2023",
+        pinned: 67_964_347.75,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2023),
+    },
+    Figure {
+        key: "project/tpp-replacement-paid-fy2024",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, FY2024",
+        pinned: 58_694_690.38,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2024),
+    },
+    Figure {
+        key: "project/tpp-replacement-paid-fy2025",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments made to school districts, FY2025",
+        pinned: 51_409_161.60,
+        tolerance: 1.0,
+        compute: |_| tpp_paid(2025),
+    },
+    Figure {
+        key: "project/tpp-supplement-paid-fy2016",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "School District TPP Supplement paid, FY2016",
+        pinned: 39_290_230.0,
+        tolerance: 1.0,
+        compute: |_| supplement_paid(2016),
+    },
+    Figure {
+        key: "project/tpp-supplement-paid-fy2017",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "School District TPP Supplement paid, FY2017",
+        pinned: 44_208_587.0,
+        tolerance: 1.0,
+        compute: |_| supplement_paid(2017),
+    },
+    Figure {
+        key: "project/tpp-supplement-paid-fy2018",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "School District TPP Supplement paid, FY2018",
+        pinned: 9_467_328.0,
+        tolerance: 1.0,
+        compute: |_| supplement_paid(2018),
+    },
+    // The supplement's FY2017 appropriation as adjusted, against an enacted $0: H.B. 64's veto
+    // struck the $78.3 million, and the H.B. 64 actuals workbook still carries $44 million of
+    // authority for the year. Bound because the node says the payment had authority it cannot name.
+    Figure {
+        key: "project/tpp-supplement-adjusted-fy2017",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "School District TPP Supplement adjusted appropriation, FY2017",
+        pinned: 44_000_000.0,
+        tolerance: 1.0,
+        compute: |_| {
+            project::ledger::appropriations::lines()
+                .into_iter()
+                .find(|l| l.line_item == "200697" && l.fiscal_year == 2017 && l.kind == "adjusted")
+                .expect("the H.B. 64 actuals workbook carries an FY2017 adjusted row")
+                .amount
+        },
+    },
+    Figure {
+        key: "project/tpp-replacement-enacted-fy2026",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments appropriated by H.B. 96, FY2026",
+        pinned: 46_478_241.0,
+        tolerance: 1.0,
+        compute: |_| enacted_line("200417", 2026),
+    },
+    Figure {
+        key: "project/tpp-replacement-enacted-fy2027",
+        owner: "crates/project",
+        unit: Unit::Dollars,
+        label: "Tangible personal property replacement payments appropriated by H.B. 96, FY2027",
+        pinned: 42_618_185.0,
+        tolerance: 1.0,
+        compute: |_| enacted_line("200417", 2027),
+    },
+    Figure {
+        key: "project/tpp-replacement-fy2025-share-of-fy2011",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "Replacement payments made in FY2025 as a share of the FY2011 peak",
+        pinned: 0.0455,
+        tolerance: 0.0005,
+        compute: |_| tpp_paid(2025) / tpp_paid(2011),
     },
     Figure {
         key: "dispersion/community-school-comprehensive-tilt",

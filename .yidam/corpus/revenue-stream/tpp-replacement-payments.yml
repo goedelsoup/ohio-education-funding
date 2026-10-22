@@ -1,90 +1,341 @@
 class: revenue-stream
 label: Tangible Personal Property Tax Replacement Payments
 summary: >-
-  State payments created by H.B. 66 to hold districts harmless for the phase-out of the
-  tangible personal property tax. Later they did the same for the utility assessment phase-down. Funded from
-  the commercial activity tax the same act created.
+  State payments created by H.B. 66 to hold districts harmless for the repeal of the tangible
+  personal property tax, paid beside older utility replacement payments. They peaked in FY2011 and
+  every budget since has rewritten the phase-down; by FY2025 they were under a twentieth of the
+  peak.
 description: |
   State payments created by [H.B. 66](../legislation/hb-66-2005.yml) to hold districts harmless
-  for the phase-out of the tangible personal property tax on general business, and later
-  extended to the phase-down of utility tangible personal property assessment. [verified]
-  Funded from the commercial activity tax the same act created. [verified]
+  for the phase-out of the tangible personal property tax on general business, paid beside the
+  older replacement payments for the utility assessment cuts of S.B. 3 and S.B. 287 of the 123rd
+  General Assembly. H.B. 64 merged the two in FY2016. [verified] Funded from the commercial activity tax the same act created, and from
+  FY2026 from the GRF. [verified]
 
   A district's tax base was reduced by a state decision and replaced with a state payment. The
   immediate effect was neutral by construction.
   The structural effect was not. What had been a locally-levied tax — subject to the district's
   own voted millage, growing or shrinking with local industrial activity, and beyond the reach
   of the state budget — became an appropriation whose continuation depends on each biennium.
-  [inference] The replacement payments were designed to phase down, and the schedule has been
-  revised more than once. [verified]
+  [inference]
+
+  The record bears that out. H.B. 66's schedule never ran as written: H.B. 1 deferred it,
+  [H.B. 153](../legislation/hb-153-2011.yml) accelerated it and then froze it,
+  [H.B. 64](../legislation/hb-64-2015.yml) restarted it on a different base, and S.B. 208 of the
+  131st General Assembly replaced H.B. 64's method before its third year. Of the nine budgets from H.B. 1
+  to [H.B. 96](../legislation/hb-96-2025.yml), seven changed the schedule, the money it was paid
+  from, or the line it was paid on; H.B. 59's greenbook records no change to any of the three,
+  and H.B. 49's records changes that were vetoed. [verified] (the schedule under Findings)
+
+  The payments are the direct reimbursement only. The other half of H.B. 66's hold-harmless, the
+  state education aid offset, was paid through the formula and is in no line here. [verified]
 
   The exposure is concentrated. Districts with large industrial or utility tangible personal
   property bases lost far more of their tax base than districts without, and are correspondingly
   more exposed to each revision of the phase-down. [inference] Which districts those are, and
-  what the payments are worth to them now, is not established here. [open]
+  what the payments are worth to them now, is not established here: the per-district files exist
+  and are not read. [open]
 findings: |
-  ### The phase-down has been contested three times, and every time the protection was vetoed
+  ### The schedule, year by year
 
-  "The schedule has been revised more than once" is true and understates what happened. Three times
-  the General Assembly wrote a protection against these losses into a budget act and the Governor
-  struck it out. Not once did one survive. [verified] (the greenbooks, committed at
-  [`lsc-education-greenbooks.txt`](../../../crates/project/fixtures/lsc-education-greenbooks.txt))
+  Each row is what the department paid, from the latest committed restatement, and the provision
+  in force for that year. Through FY2015 the figure is the business line `200909` and the utility
+  line `200900` summed; from FY2016 it is the merged `200902`, and from FY2026 the GRF's `200417`,
+  for which only the enacted amount exists. Summing the two early lines is what makes the series
+  continuous: H.B. 64's greenbook reports **$510.0 million** appropriated for FY2015 and the two
+  together spent **$509,467,946**, where the business line alone falls $28 million short.
+  [verified] ([`crates/project`](../../../crates/project/tests/the_payments_that_replaced_a_tax.rs))
+  The provisions are from the greenbook of each act, committed at
+  [`lsc-education-greenbooks.txt`](../../../crates/project/fixtures/lsc-education-greenbooks.txt),
+  and from R.C. 5751.20, 5751.21 and 5709.92 as vendored at
+  [`revised-code.txt`](../../../crates/project/fixtures/revised-code.txt). [verified]
 
-  - **[H.B. 1](../legislation/hb-1-2009.yml)** — the largest, and the earliest. The act as passed
-    would have **reimbursed districts in full in perpetuity** rather than phasing the payments down
-    from FY2012 to FY2018. The Governor kept full reimbursement through FY2013 and vetoed the rest,
-    so the phase-down resumed on its original schedule from FY2014. The legislature voted to end
-    the phase-down altogether and got a two-year delay instead.
-  - **[H.B. 64](../legislation/hb-64-2015.yml)** appropriated **$78.3 million** for a second year
-    of the TPP supplement in FY2017, with the supporting formula calculations and a $12 million
-    annual GRF cash transfer into the School District TPP Supplement Fund. All of it vetoed;
-    FY2016's supplement stood and FY2017's did not. The same act's veto also removed an exemption
-    from the phase-out for districts containing a nuclear power plant where replacement payments
-    were 10% or more of total resources — which would have reached Perry Local in Lake County and
-    Benton-Carroll-Salem in Ottawa County, and no one else.
-  - **[H.B. 49](../legislation/hb-49-2017.yml)** capped a district's fixed-rate TPP reimbursement
-    loss, including loss of the supplement, at **3.5% of total resources** in FY2018, extended the
-    cap to JVSDs, and slowed the phase-down to one-fourth of one mill of average valuation from
-    FY2020. Vetoed entire.
+  | Year | Paid | Schedule in force | Set by |
+  |---|---|---|---|
+  | FY2006 | **$193,121,397** | Hold-harmless: offset plus direct reimbursement equals the base loss | H.B. 66 |
+  | FY2007 | **$520,306,777** | Hold-harmless | H.B. 66 |
+  | FY2008 | **$706,305,208** | Hold-harmless | H.B. 66 |
+  | FY2009 | **$881,780,537** | Hold-harmless | H.B. 66 |
+  | FY2010 | **$1,121,205,247** | Hold-harmless; the phase-out H.B. 66 set from TY2011 deferred | H.B. 1 |
+  | FY2011 | **$1,129,069,307** | Hold-harmless; the peak | H.B. 1 |
+  | FY2012 | **$759,915,156** | Payment less 2% of FY2010-based total resources | H.B. 153 |
+  | FY2013 | **$510,103,809** | Payment less 4% of the same | H.B. 153 |
+  | FY2014 | **$509,654,246** | Frozen at the FY2013 payment | H.B. 153, kept by H.B. 59 |
+  | FY2015 | **$509,467,946** | Frozen | H.B. 153, kept by H.B. 59 |
+  | FY2016 | **$357,705,800.41** | Resumed on FY2015 payments: 1% to 2% of total resources by capacity quintile; last year for permanent improvement levies | H.B. 64 |
+  | FY2017 | **$245,472,982.75** | 2% to 4% by quintile | H.B. 64 |
+  | FY2018 | **$204,889,269.03** | Prior year less one-sixteenth of one percent of average TY2014-16 value | S.B. 208, kept by H.B. 49 |
+  | FY2019 | **$162,559,213.60** | The same | S.B. 208, kept by H.B. 49 |
+  | FY2020 | **$132,343,760.90** | The same; the two nuclear-plant districts held at FY2017 | H.B. 166 |
+  | FY2021 | **$107,117,742.48** | The same | H.B. 166 |
+  | FY2022 | **$84,516,160.58** | The same, nuclear exception through FY2026; last emergency levy payments | H.B. 110 |
+  | FY2023 | **$67,964,347.75** | The same | H.B. 110 |
+  | FY2024 | **$58,694,690.38** | The same; CAT transfer of "an amount ... appropriate" replaces 13% | H.B. 33 |
+  | FY2025 | **$51,409,161.60** | The same | H.B. 33 |
+  | FY2026 | **$46,478,241** enacted | The same, paid from the GRF | H.B. 96 |
+  | FY2027 | **$42,618,185** enacted | The same | H.B. 96 |
 
-  ### Why none of this is visible in any series here
+  FY2025 paid **4.55%** of the FY2011 peak. [verified]
+  ([`crates/figures`](../../../crates/figures/src/figure.rs))
+
+  What each act did, in its greenbook's words where they decide it:
+
+  - **H.B. 66** grouped levies into fixed-rate and fixed-sum. Fixed-rate losses were held harmless
+    through TY2010, then "phased out at a rate of 3/17 in the first two years and then at a rate of
+    2/17 per year until completely eliminated after TY 2018". Fixed-sum losses were reimbursed above
+    a 0.5 mill threshold, emergency levies through TY2010 and on renewal after, bond levies for
+    their lives. R.C. 5751.21(C) is the schedule and 5751.20(E)(2) the threshold. [verified]
+  - **H.B. 1** passed full reimbursement in perpetuity; the Governor kept it through FY2013 and
+    vetoed the rest, returning the phase-down "to its original plan beginning in FY 2014".
+    [verified]
+  - **H.B. 153** overrode both. It "accelerates the phase-out ... and bases the phase-out in
+    FY 2012 and FY 2013 for each district on the proportion of the district's state and local
+    funding attributable to the reimbursement in FY 2011", and "eliminates the phase-out after
+    FY 2013". R.C. 5751.20(A)(41) makes the threshold "two per cent for fiscal year 2012 and four
+    per cent for fiscal years 2013 and thereafter", of the total resources (A)(22) defines from
+    FY2010 aid and TY2008-09 taxes. [verified] LSC's "fell by up to 2% per year" is the same
+    rule stated as reliance. [inference]
+  - **H.B. 59** changed nothing: "Current law freezes the direct reimbursements at their FY 2013
+    level for FY 2014 and future years." The freeze is H.B. 153's. [verified]
+  - **H.B. 64** resumed the phase-out "in FY 2016 on the basis of a district's combined business
+    and utility property tax replacement payments in FY 2015", reducing current expense payments
+    "by a certain percentage of total resources each year, starting between 1% and 2% in FY 2016".
+    R.C. 5709.92(A)(7) sets the five quintiles' thresholds at 1% to 2% for FY2016 and 2% to 4% for FY2017, JVSDs
+    at the top rate. Emergency levies were phased out over five years and permanent improvement
+    levies ended after FY2016. R.C. 5751.21 stopped: "No ... payments shall be made under this
+    section after June 30, 2015." [verified]
+  - **S.B. 208** of the 131st General Assembly, not a budget, replaced the percentage of total
+    resources from FY2018 with "One-sixteenth of one per cent of the average of the total taxable
+    value of the district for tax years 2014, 2015, and 2016", subtracted from the prior year's
+    payment, which LSC writes as "5⁄8 mill (0.000625)". **H.B. 49** "does not change that
+    methodology". [verified]
+  - **H.B. 166** held Benton-Carroll-Salem and Perry Local at their FY2017 payments in FY2020 and
+    FY2021, which LSC prices at $1.6 million and $2.2 million. **H.B. 110** extended it through
+    FY2026, and it is R.C. 5709.92(I). Operating fixed-sum levy payments ended with tax year 2021
+    under 5709.92(D); LSC's H.B. 33 analysis has emergency levy payments ending "after FY 2022".
+    [verified]
+  - **H.B. 33** replaced the 13% share of commercial activity tax receipts with an amount
+    "appropriate to make these payments" from FY2024, and **H.B. 96** moved the payments onto
+    GRF `200417`, the introduced and enacted amounts the same in both editions. [verified]
+
+  ### Reading both editions
+
+  The issue asked for each greenbook in both editions. For these lines that pairing is between
+  acts, not within one: each act's greenbook states the enacted amounts for its biennium, and the
+  next act's restates them as actuals, which is how every row above was read. A second edition of
+  the same act exists only for H.B. 96, where the redbook's introduced amounts for `200417` are
+  the enacted ones. [verified] No redbook from H.B. 66 through H.B. 33 is held, so whether an
+  earlier Governor proposed a different schedule than the one enacted is not known here. [open]
+
+  The one row the pairing changed is FY2007. The FY2008-09 greenbook prints the business line at
+  $420,000,000, the estimate; the Catalog's later editions report $418,161,375 spent, and the
+  series takes the spending. [verified]
+  ([`crates/project`](../../../crates/project/tests/the_payments_that_replaced_a_tax.rs))
+
+  ### The supplement, and the fight over the schedule
+
+  "The schedule has been revised more than once" understates what happened, and so did this
+  node's first account of it, which said every protection was vetoed. Most were, and two were
+  not. [verified]
+
+  - **H.B. 1** passed full reimbursement in perpetuity and kept it through FY2013, the two years
+    H.B. 153 then took back.
+  - **H.B. 64** created the School District TPP Supplement, guaranteeing that foundation funding
+    plus fixed-rate reimbursements would not fall below FY2015 in FY2016, at **$50.6 million**
+    appropriated and **$39,290,230** paid. It appropriated **$78.3 million** more for FY2017 and
+    the Governor vetoed it, with a $12 million annual GRF transfer and an exemption for districts
+    containing a nuclear power plant, which would have reached Perry Local and
+    Benton-Carroll-Salem and no one else. [verified]
+  - **The vetoed year was paid anyway.** The supplement paid **$44,208,587** in FY2017 and
+    **$9,467,328** in FY2018, against an enacted $0 for both, and the H.B. 64 actuals workbook
+    carries a FY2017 adjusted appropriation of **$44,000,000**. [verified]
+    ([`crates/project`](../../../crates/project/tests/the_payments_that_replaced_a_tax.rs))
+    The authority for it is not in any held document: neither the H.B. 64 nor the H.B. 49
+    greenbook names it, and a Controlling Board release or S.B. 208 are the candidates. [open]
+  - **H.B. 49** capped a district's fixed-rate loss, supplement included, at 3.5% of total
+    resources in FY2018 and slowed the phase-down to one-fourth of one mill from FY2020. Vetoed
+    entire. The slower phase-down already in force was S.B. 208's. [verified]
+  - **H.B. 166** enacted the nuclear-plant exemption H.B. 64's veto removed, on FY2017 payments
+    rather than FY2015, and H.B. 110 extended it. The protection the Governor struck in 2015 was
+    law four years later. [verified]
 
   A vetoed appropriation is never appropriated, so it appears in no enacted total, no actual, and
-  no line item — the whole apparatus of this repository reads documents that record what happened.
-  The $78.3 million that did not reach districts in FY2017 is not a hole in the data; it is a
-  quantity that has no place in the data at all. **The only committed source in which it exists is
-  LSC's analysis of the act that contained it.** [verified]
-
-  That is the argument for reading acts rather than only the money they moved, and this stream is
-  where it pays best: the phase-down is the thing being fought over, and the record of the fight is
-  entirely in provisions that never took effect. [inference]
-
-  It also changes what the phase-down *is*. Read from the enacted figures alone it looks like
-  settled policy revised at the margin. Read with the vetoes it is a policy the General Assembly
-  tried to stop in 2009, tried to cushion in 2015, and tried to cap in 2017, and which survived
-  each time by one signature. [inference]
+  no line item. **The only committed source in which the $78.3 million exists is LSC's analysis of
+  the act that contained it.** [verified] Read with the vetoes, the phase-down is a policy the
+  General Assembly tried to stop in 2009, cushioned in 2015, tried to cap in 2017, and softened for
+  two districts in 2019. [inference]
 properties:
   name: Tangible personal property tax replacement payments
   level: state
   legal_basis: |
-    Created by Am. Sub. H.B. 66 (2005); provisions codified in R.C. 5751 (commercial activity
-    tax) and the school funding chapter, with phase-down schedules revised in subsequent
-    budget acts. Exact citations not established. [open]
+    R.C. 5751.20 (definitions: total resources, threshold per cent, fixed-sum levy loss) and
+    R.C. 5751.21 (the FY2006-FY2015 payments and schedule, enacted by Am. Sub. H.B. 66 of the
+    126th General Assembly and amended by H.B. 1, H.B. 153 and H.B. 64), and R.C. 5709.92 (the
+    payments from FY2016, enacted by Am. Sub. H.B. 64 of the 131st General Assembly and amended
+    by S.B. 208, H.B. 166 and H.B. 110), as vendored in
+    crates/project/fixtures/revised-code.txt. The appropriation is ALI 200909 and 200900 through
+    FY2015, 200902 from Fund 7047 FY2016-FY2025, and GRF 200417 from FY2026.
   restriction: Unrestricted; paid into the district general fund as the lost tax revenue was.
   growth_behavior: |
-    Declining by design. Scheduled to phase down after an initial hold-harmless period, with
-    the schedule repeatedly revised by later budget acts. Does not grow with the underlying
-    business activity it replaced, so a district that adds industrial capacity gains no
-    replacement revenue from it.
+    Declining by design. Each year's fixed-rate payment is the prior year's less a reduction
+    fixed by statute, one-sixteenth of one percent of average TY2014-16 taxable value from
+    FY2018, so a district's payment reaches zero on a date set by the size of its payment against its
+    valuation. Does not
+    grow with the underlying business activity it replaced, so a district that adds industrial
+    capacity gains no replacement revenue from it.
   series_path: |
-    Not yet populated, and it is the one stream here whose series genuinely does not exist in what
-    is held. The replacement payments are a line inside state aid rather than a
-    reported category, so they are not separable from the state column of
-    crates/dispersion/fixtures/f33-ohio-panel.csv nor identified in the FY2027 model. The
-    phase-down schedule is an appropriation history, which makes this an `lsc-budget` target.
+    crates/project/src/ledger/appropriations.rs (tpp_replacement_paid) holds the statewide series,
+    FY2006-FY2025 actuals, from the Catalog and appropriation workbook fixtures. No per-agency
+    series is held; see unfilled.
 unfilled:
   - field: a per-district series
-    why: The one stream here whose series genuinely does not exist in what is held.
+    why: |
+      The Department of Taxation published per-district workbooks under
+      tax.ohio.gov/portals/0/personal_property/, retired from the live site and captured in the
+      Wayback Machine: School_JVS_TPP_Fixed_Rate_Levy_2006-2011.xls (20130308075044),
+      School_JVS_Reimbursement_Allocation_FY08-11.xls (20130308075305),
+      School_Fixed_Sum_Levy.xls (20130308075547), TPPKWH_Reliance_School.xls (20130308075254)
+      and school_jvs_fy.xls (20161221091637), whose strings carry fixed-rate levy losses by
+      district, county and levy for FY2010 through FY2018. They are legacy workbooks, which
+      crates/connect reads, so nothing blocks a connector but the decision record a new connector
+      needs; no file has been fetched through it, none is a fixture, and no figure here rests on
+      one. Local_Personal_Reimbursements_All.xlsx (20170127071739) covers local governments and
+      libraries, not schools. Payments after FY2018 by district were not found.
+figures:
+  - key: project/tpp-replacement-paid-fy2015
+    value: 509467946.0
+    field: findings
+    as_written: "together spent **$509,467,946**"
+  - key: project/tpp-replacement-paid-fy2006
+    value: 193121397.0
+    field: findings
+    as_written: "| FY2006 | **$193,121,397** |"
+  - key: project/tpp-replacement-paid-fy2007
+    value: 520306777.0
+    field: findings
+    as_written: "| FY2007 | **$520,306,777** |"
+  - key: project/tpp-replacement-paid-fy2008
+    value: 706305208.0
+    field: findings
+    as_written: "| FY2008 | **$706,305,208** |"
+  - key: project/tpp-replacement-paid-fy2009
+    value: 881780537.0
+    field: findings
+    as_written: "| FY2009 | **$881,780,537** |"
+  - key: project/tpp-replacement-paid-fy2010
+    value: 1121205247.0
+    field: findings
+    as_written: "| FY2010 | **$1,121,205,247** |"
+  - key: project/tpp-replacement-paid-fy2011
+    value: 1129069307.0
+    field: findings
+    as_written: "| FY2011 | **$1,129,069,307** |"
+  - key: project/tpp-replacement-paid-fy2012
+    value: 759915156.0
+    field: findings
+    as_written: "| FY2012 | **$759,915,156** |"
+  - key: project/tpp-replacement-paid-fy2013
+    value: 510103809.0
+    field: findings
+    as_written: "| FY2013 | **$510,103,809** |"
+  - key: project/tpp-replacement-paid-fy2014
+    value: 509654246.0
+    field: findings
+    as_written: "| FY2014 | **$509,654,246** |"
+  - key: project/tpp-replacement-paid-fy2016
+    value: 357705800.41
+    field: findings
+    as_written: "| FY2016 | **$357,705,800.41** |"
+  - key: project/tpp-replacement-paid-fy2017
+    value: 245472982.75
+    field: findings
+    as_written: "| FY2017 | **$245,472,982.75** |"
+  - key: project/tpp-replacement-paid-fy2018
+    value: 204889269.03
+    field: findings
+    as_written: "| FY2018 | **$204,889,269.03** |"
+  - key: project/tpp-replacement-paid-fy2019
+    value: 162559213.6
+    field: findings
+    as_written: "| FY2019 | **$162,559,213.60** |"
+  - key: project/tpp-replacement-paid-fy2020
+    value: 132343760.9
+    field: findings
+    as_written: "| FY2020 | **$132,343,760.90** |"
+  - key: project/tpp-replacement-paid-fy2021
+    value: 107117742.48
+    field: findings
+    as_written: "| FY2021 | **$107,117,742.48** |"
+  - key: project/tpp-replacement-paid-fy2022
+    value: 84516160.58
+    field: findings
+    as_written: "| FY2022 | **$84,516,160.58** |"
+  - key: project/tpp-replacement-paid-fy2023
+    value: 67964347.75
+    field: findings
+    as_written: "| FY2023 | **$67,964,347.75** |"
+  - key: project/tpp-replacement-paid-fy2024
+    value: 58694690.38
+    field: findings
+    as_written: "| FY2024 | **$58,694,690.38** |"
+  - key: project/tpp-replacement-paid-fy2025
+    value: 51409161.6
+    field: findings
+    as_written: "| FY2025 | **$51,409,161.60** |"
+  - key: project/tpp-replacement-enacted-fy2026
+    value: 46478241.0
+    field: findings
+    as_written: "| FY2026 | **$46,478,241** enacted |"
+  - key: project/tpp-replacement-enacted-fy2027
+    value: 42618185.0
+    field: findings
+    as_written: "| FY2027 | **$42,618,185** enacted |"
+  - key: project/tpp-replacement-fy2025-share-of-fy2011
+    value: 0.04553233471255808
+    field: findings
+    as_written: "FY2025 paid **4.55%** of the FY2011 peak"
+  - key: project/tpp-supplement-paid-fy2016
+    value: 39290230.0
+    field: findings
+    as_written: "**$39,290,230** paid"
+  - key: project/tpp-supplement-paid-fy2017
+    value: 44208587.0
+    field: findings
+    as_written: "**$44,208,587** in FY2017"
+  - key: project/tpp-supplement-paid-fy2018
+    value: 9467328.0
+    field: findings
+    as_written: "**$9,467,328** in FY2018"
+  - key: project/tpp-supplement-adjusted-fy2017
+    value: 44000000.0
+    field: findings
+    as_written: "adjusted appropriation of **$44,000,000**"
+revisions:
+  - was: |
+      "Three times the General Assembly wrote a protection against these losses into a budget act
+      and the Governor struck it out. Not once did one survive."
+    now: |
+      Two survived. H.B. 1's full reimbursement stood through FY2013, until H.B. 153 accelerated
+      the phase-out over it, and H.B. 166 enacted for FY2020 and FY2021 the nuclear-plant
+      exemption H.B. 64's veto had removed, which H.B. 110 extended through FY2026.
+    found_by: |
+      Reading the H.B. 166 and H.B. 110 greenbooks for the schedule (#784). The H.B. 1 half was in
+      the sentence that followed the claim.
+    reach: |
+      The heading and the closing inference of the section. hb-1-2009's "passed and lost" and
+      hb-49-2017's count of vetoes cited this node and are corrected with it.
+  - was: |
+      "FY2016's supplement stood and FY2017's did not."
+    now: |
+      FY2017's appropriation did not stand and the payment was made: $44,208,587 in FY2017 and
+      $9,467,328 in FY2018 against an enacted $0, under a $44,000,000 adjusted appropriation whose
+      authority is open.
+    found_by: |
+      Reading line 200697's actuals in the H.B. 49 and H.B. 166 workbooks while building the
+      year-by-year series (#784).
+    reach: |
+      hb-64-2015's account of the veto, which said the same; nothing bound the claim, because a
+      vetoed amount has no figure to bind and the payment had not been looked for.
 links:
   - target: ../revenue-stream.ont.yml
     relationship: instance-of
@@ -92,3 +343,15 @@ links:
     relationship: substitutes-for
   - target: ../doctrine/equity.yml
     relationship: bears-on
+  - target: ../legislation/hb-66-2005.yml
+    relationship: constrained-by
+  - target: ../legislation/hb-153-2011.yml
+    relationship: constrained-by
+  - target: ../legislation/hb-64-2015.yml
+    relationship: constrained-by
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+  - target: ../../catalog/lsc-catalog-of-budget-line-items.md
+    relationship: sourced-from
+  - target: ../../catalog/lsc-appropriation-spreadsheet.md
+    relationship: sourced-from

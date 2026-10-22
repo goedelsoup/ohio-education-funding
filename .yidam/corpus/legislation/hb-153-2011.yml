@@ -25,7 +25,8 @@ description: |
 
   One further change compounded the effect on the districts least able to absorb it. The act
   began the phase-out of the tangible personal property tax reimbursements created by
-  [H.B. 66](hb-66-2005.yml). [verified] Those reimbursements were concentrated in districts with
+  [H.B. 66](hb-66-2005.yml), two years before H.B. 1 had left it to begin, and then froze the
+  payments at their FY2013 level. [verified] Those reimbursements were concentrated in districts with
   industrial tax bases, so the phase-out fell hardest on communities that had already lost the
   underlying tax base by state decision six years earlier — a second withdrawal from the same
   places. [inference]
@@ -35,8 +36,14 @@ description: |
   formula freeze, the stimulus expiry, and the reimbursement phase-out — none of which appears
   in a base cost figure. [inference]
 
-  Appropriation totals, the exact reimbursement phase-out schedule, and the number of districts
-  affected are not yet recorded. [open]
+  The phase-out schedule is R.C. 5751.20(A)(41) and 5751.21(C)(12): each district's payment less
+  two per cent of its FY2010-based total resources in FY2012 and four per cent in FY2013, with no
+  further reduction after FY2013, which held until H.B. 64 resumed the phase-out in FY2016. What
+  that moved, year by year, is in
+  [`tpp-replacement-payments`](../revenue-stream/tpp-replacement-payments.yml). [verified]
+  (R.C. 5751.20 and 5751.21 as vendored; the greenbook)
+
+  Appropriation totals and the number of districts affected are not yet recorded. [open]
 findings: |
   ### The mechanism, which the corpus had only ever characterized
 

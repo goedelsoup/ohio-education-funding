@@ -30,6 +30,7 @@ used-by:
   - ../corpus/revenue-stream/permanent-improvement-levy.yml
   - ../corpus/revenue-stream/property-tax-exemption-compensation.yml
   - ../corpus/revenue-stream/substitute-levy.yml
+  - ../corpus/revenue-stream/tpp-replacement-payments.yml
 ---
 # Ohio Revised Code — the sections this corpus cites
 

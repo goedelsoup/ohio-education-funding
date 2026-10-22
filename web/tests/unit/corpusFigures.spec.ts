@@ -437,15 +437,21 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * of exemption authorities R.C. 3317.021(A)(4) carves out of certified exempt value, and the
  * wealth charge's reach, a key the local capacity measure already bound. The floor was at its
  * count.
+ *
+ * Recomputed at **1301/95** when the TPP replacement schedule was read year by year (#784).
+ * `revenue-stream/tpp-replacement-payments` is the ninety-fifth carrier, binding twenty-seven
+ * figures: twenty years paid, FY2006 to FY2025, with business and utility summed through FY2015;
+ * H.B. 96's two enacted years; the supplement's three paid years and its FY2017 adjusted
+ * appropriation; and FY2025's share of the FY2011 peak.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1274 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1274,
+  expect(bindings.length, "1301 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1301,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "94 nodes carry bindings; raise this when a ninety-fifth does",
-  ).toBeGreaterThanOrEqual(94);
+    "95 nodes carry bindings; raise this when a ninety-sixth does",
+  ).toBeGreaterThanOrEqual(95);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",
