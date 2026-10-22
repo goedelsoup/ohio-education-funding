@@ -29,6 +29,7 @@ used-by:
   - ../corpus/revenue-stream/lottery-profits.yml
   - ../corpus/revenue-stream/permanent-improvement-levy.yml
   - ../corpus/revenue-stream/property-tax-exemption-compensation.yml
+  - ../corpus/revenue-stream/school-district-income-tax.yml
   - ../corpus/revenue-stream/substitute-levy.yml
   - ../corpus/revenue-stream/tpp-replacement-payments.yml
 ---

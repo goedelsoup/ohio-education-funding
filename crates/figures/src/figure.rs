@@ -8808,6 +8808,125 @@ pub static FIGURES: &[Figure] = &[
         compute: |i| i.casino[&2024],
     },
     Figure {
+        key: "dispersion/income-tax-districts-fy2025",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "School districts with an income tax in force under R.C. Chapter 5748 in FY2025, \
+                expired taxes and merged predecessors excluded",
+        pinned: 210.0,
+        tolerance: 0.0,
+        compute: |_| dispersion::income_tax::in_force(2025).len() as f64,
+    },
+    Figure {
+        key: "dispersion/income-tax-districts-fy2024",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "School districts with an income tax in force in FY2024",
+        pinned: 212.0,
+        tolerance: 0.0,
+        compute: |_| dispersion::income_tax::in_force(2024).len() as f64,
+    },
+    Figure {
+        key: "dispersion/income-tax-earned-fy2025",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Of those in FY2025, the districts levying on the earned-income base",
+        pinned: 64.0,
+        tolerance: 0.0,
+        compute: |_| {
+            dispersion::income_tax::count_by_base(2025)
+                .get(&dispersion::income_tax::Base::Earned)
+                .copied()
+                .unwrap_or_default() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/income-tax-traditional-fy2025",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Of those in FY2025, the districts levying on the traditional base",
+        pinned: 146.0,
+        tolerance: 0.0,
+        compute: |_| {
+            dispersion::income_tax::count_by_base(2025)
+                .get(&dispersion::income_tax::Base::Traditional)
+                .copied()
+                .unwrap_or_default() as f64
+        },
+    },
+    Figure {
+        key: "dispersion/income-tax-distributed-fy2025",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "School district income tax Taxation distributed in FY2025, every row of SD-2-Q4",
+        pinned: 737_718_964.22,
+        tolerance: 1.0,
+        compute: |_| dispersion::income_tax::distributed(2025),
+    },
+    Figure {
+        key: "dispersion/income-tax-distributed-fy2024",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "School district income tax Taxation distributed in FY2024",
+        pinned: 680_506_527.29,
+        tolerance: 1.0,
+        compute: |_| dispersion::income_tax::distributed(2024),
+    },
+    Figure {
+        key: "dispersion/income-tax-rural-small-town-fy2025",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Of the FY2025 levying districts, those the department types rural or small town",
+        pinned: 193.0,
+        tolerance: 0.0,
+        compute: |_| dispersion::income_tax::rural_or_small_town_levying(2025) as f64,
+    },
+    Figure {
+        key: "dispersion/income-tax-lowest-valuation-quarter-levying",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts in the lowest quarter of TY2024 valuation per pupil levying the tax in \
+                FY2025",
+        pinned: 35.0,
+        tolerance: 0.0,
+        compute: |_| dispersion::income_tax::levying_by_valuation_quartile(2024, 2025)[0].1 as f64,
+    },
+    Figure {
+        key: "dispersion/income-tax-second-valuation-quarter-levying",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "The same count in the second quarter of valuation per pupil",
+        pinned: 85.0,
+        tolerance: 0.0,
+        compute: |_| dispersion::income_tax::levying_by_valuation_quartile(2024, 2025)[1].1 as f64,
+    },
+    Figure {
+        key: "dispersion/income-tax-levying-median-valuation",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "Median TY2024 valuation per pupil of the districts levying the tax in FY2025",
+        pinned: 242_147.57,
+        tolerance: 1.0,
+        compute: |_| {
+            dispersion::income_tax::median_valuation(2024, 2025, |_| true)
+                .0
+                .unwrap_or_default()
+        },
+    },
+    Figure {
+        key: "dispersion/income-tax-non-levying-median-valuation",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "The same for the districts not levying it",
+        pinned: 259_828.32,
+        tolerance: 1.0,
+        compute: |_| {
+            dispersion::income_tax::median_valuation(2024, 2025, |_| true)
+                .1
+                .unwrap_or_default()
+        },
+    },
+    Figure {
         key: "project/hb-96-refresh-run-cost",
         owner: "crates/project",
         unit: Unit::Dollars,

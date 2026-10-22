@@ -70,6 +70,7 @@ Sorted by: type, then slug.
 | [`dot-it1040-instructions`](dot-it1040-instructions.md) | Ohio IT 1040 instruction booklets, tax years 2021 and 2022 | 1 |
 | [`dot-reappraisal-calendar`](dot-reappraisal-calendar.md) | Ohio's sexennial reappraisal and triennial update calendar | 1 |
 | [`dot-sd1-school-district-taxes`](dot-sd1-school-district-taxes.md) | Table SD-1 — School district taxable value and taxes charged | 8 |
+| [`dot-sd2-school-district-income-tax`](dot-sd2-school-district-income-tax.md) | Table SD-2-Q4 — school district income tax distributions, by district | 1 |
 | [`dot-tax-expenditure-report`](dot-tax-expenditure-report.md) | Tax Expenditure Report | 1 |
 | [`dot-y1-individual-income-returns`](dot-y1-individual-income-returns.md) | Table Y-1 — Ohio individual income tax credits by income class | 1 |
 | [`eia-diesel-prices`](eia-diesel-prices.md) | Midwest No. 2 diesel retail prices — the EIA monthly series | 1 |
@@ -92,11 +93,11 @@ Sorted by: type, then slug.
 | [`ohio-bill-versions`](ohio-bill-versions.md) | Ohio bill versions — what was proposed, not what was enacted | 1 |
 | [`ohio-bills`](ohio-bills.md) | Ohio bills before enactment — the text as introduced | 13 |
 | [`ohio-essa-state-plan`](ohio-essa-state-plan.md) | Ohio's Consolidated State Plan under ESSA, and the April 2026 School Improvement amendment | 5 |
-| [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 31 |
+| [`ohio-revised-code`](ohio-revised-code.md) | Ohio Revised Code — the sections this corpus cites | 32 |
 | [`ohio-session-laws`](ohio-session-laws.md) | Ohio session laws — the appropriation acts themselves | 4 |
 | [`us-public-laws`](us-public-laws.md) | United States public laws — the enrolled federal acts | 1 |
 
-69 entries, 0 not yet cited by any corpus node. 475 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
+70 entries, 0 not yet cited by any corpus node. 483 retrieved files are pinned by SHA-256 in [`crates/connect/source-digests.txt`](../../crates/connect/source-digests.txt).
 <!-- /REGEN -->
 
 ## Adding a source

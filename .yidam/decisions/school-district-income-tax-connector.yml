@@ -1,0 +1,51 @@
+id: school-district-income-tax-connector
+summary: >-
+  tax-school-district-income: Table SD-2-Q4 for FY2024 and FY2025, the one list of which districts
+  levy an income tax under R.C. Chapter 5748, at what rate and on which base. Read into
+  `school-district-income-tax.csv`, one row per district per fiscal year, with each row's status.
+context: |
+  [#787](https://github.com/goedelsoup/ohio-education-funding/issues/787) found that the corpus
+  had no node for the school district income tax, though roughly a third of Ohio's districts levy
+  one. Chapter 5748 says how a district adopts the tax and on which base. It does not say which
+  districts have. That list is the Department of Taxation's, because Taxation collects the tax
+  and distributes it quarterly to each district that levies it.
+
+  Taxation publishes it as Table SD-2 in its tax data series, one workbook a quarter, under
+  `tax_analysis/tax_data_series/school_district_data/sd2/` on `dam.assets.ohio.gov`. The
+  fourth-quarter table of a fiscal year carries all four distributions and their total. A Wayback
+  CDX listing of the directory shows quarterly files back to FY1991. The older years are `.xls`
+  files or use other layouts.
+decision: |
+  **One connector, two fiscal years.** Declare `tax-school-district-income`, `Wired`, with the
+  FY2024 and FY2025 fourth-quarter workbooks as its sources. Those are the two most recent
+  complete fiscal years, and their columns agree. FY2026 is published only through its second
+  quarter, so a full year cannot be read from it yet.
+
+  **A row is a payment, and each row says what kind.** Column I flags the earned-income base with
+  `(c)`, an expired tax with `(e)`, and two merged predecessors (Ledgemont LSD and Bettsville LSD)
+  with `(d)` and `(f)`. The extract writes a `status` of `in-force`, `expired` or `merged`, and a
+  `base` of `earned` or `traditional` only for a tax in force. A flag the table does not define
+  fails the build.
+
+  **The sheet is made to check itself.** The districts must sum to the printed statewide total
+  within a dollar. Every rate must sit on the quarter-point grid that R.C. 5748.02(B)(1) rounds
+  to. No IRN may appear twice in a year.
+consequences: |
+  **The count of levying districts is bound for one stated year.** FY2025 has 210 districts with
+  a tax in force and 223 rows. The 13 rows without a tax in force are 11 expired taxes and 2
+  merged predecessors.
+
+  **The earlier years and SD-5 remain unread.** SD-5 is the tax-year return data by district and
+  income class. The node lists both under `unfilled`, with where they are.
+
+  **The statute fixture gains R.C. 5748.01, .02, .021, .03, .08 and .09.**
+alternatives: |
+  **Read the five-year forecasts' income tax line instead.** Rejected as the source, kept as a
+  cross-check. Line 1.030 is the district's own projection of receipts. It gives neither the rate
+  nor the base, and for FY2025 two districts that are not on SD-2 report income tax on it.
+
+  **Read Taxation's employer withholding rate list.** Rejected. It is a PDF for a calendar year,
+  written for employers. It lists new, expired and changed taxes, but it states no distribution
+  and no flag for a merged district.
+connectors:
+  - tax-school-district-income

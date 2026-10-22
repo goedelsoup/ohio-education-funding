@@ -393,3 +393,49 @@ pub(super) const INCOME_CREDITS: Connector = Connector {
         },
     ],
 };
+
+/// Table SD-2-Q4: the school district income tax by district, one workbook per fiscal year.
+pub(super) const SCHOOL_DISTRICT_INCOME_TAX: Connector = Connector {
+    key: "tax-school-district-income",
+    publisher: "Ohio Department of Taxation",
+    feeds: &["revenue-stream"],
+    status: Status::Wired {
+        still_blocked: Some(
+            "wired for FY2024 and FY2025 alone. Table SD-2 reaches back to FY1991 in the same \
+             directory, but the earlier years are .xls or carry other layouts, and SD-5 — the \
+             tax-year return data by district and income class — is not read",
+        ),
+    },
+    note: "The one list of which districts levy an income tax under R.C. Chapter 5748, at what \
+           rate and on which base. The fourth-quarter table of each fiscal year names every \
+           district Taxation distributed income tax to, its rate, the year the tax began, a flag \
+           for the earned-income base, and the four quarterly distributions with their total. A \
+           flagged expired tax or a merged predecessor still appears while late withholding \
+           pays out, so the rows are a little wider than the districts with a tax in force.",
+    sources: &[
+        Source {
+            key: "sd2-fy2024",
+            title: Some("Table SD-2-Q4, School District Income Tax Distributions, FY2024"),
+            url: "https://dam.assets.ohio.gov/raw/upload/tax.ohio.gov/tax_analysis/\
+                  tax_data_series/school_district_data/sd2/sd2qfy24.xlsx",
+            filename: "sd2-fy2024.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dot-sd2-school-district-income-tax"),
+            fixtures: &[crate::fixtures::SD2_FIXTURE],
+            note: "The four FY2024 distributions, dated 2 May 2024; rates are those in force on \
+                   1 January 2024.",
+        },
+        Source {
+            key: "sd2-fy2025",
+            title: Some("Table SD-2-Q4, School District Income Tax Distributions, FY2025"),
+            url: "https://dam.assets.ohio.gov/raw/upload/tax.ohio.gov/tax_analysis/\
+                  tax_data_series/school_district_data/sd2/sd2qfy25.xlsx",
+            filename: "sd2-fy2025.xlsx",
+            format: Format::Xlsx,
+            catalog: Some("dot-sd2-school-district-income-tax"),
+            fixtures: &[crate::fixtures::SD2_FIXTURE],
+            note: "The four FY2025 distributions, dated 12 May 2025; rates are those in force on \
+                   1 January 2025. The FY2026 file in the directory is the second quarter only.",
+        },
+    ],
+};

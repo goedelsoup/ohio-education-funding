@@ -616,6 +616,35 @@ fn rebuild_local_finance(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(cause) => Rebuilt::skipped(fixtures::SD1_FIXTURE, cause),
     });
 
+    // The school district income tax: Table SD-2-Q4, which districts levy one under R.C. Chapter
+    // 5748, at what rate and on which base. See `build_sd2_extract` for the three checks.
+    let sd2_sheets: Result<Vec<(u16, _)>, RebuildError> =
+        [(2024, "sd2-fy2024"), (2025, "sd2-fy2025")]
+            .into_iter()
+            .map(|(fiscal_year, key)| {
+                let book = open_workbook(root, registered(key))?;
+                Ok((fiscal_year, sheet_by_prefix(&book, "SD2Q_FY")?))
+            })
+            .collect();
+    out.push(match sd2_sheets {
+        Ok(read) => {
+            let years: Vec<fixtures::Sd2Year<'_>> = read
+                .iter()
+                .map(|(fiscal_year, rows)| fixtures::Sd2Year {
+                    fiscal_year: *fiscal_year,
+                    rows,
+                })
+                .collect();
+            match fixtures::build_sd2_extract(&years) {
+                Ok(panel) => {
+                    csv_fixture(root, fixtures::SD2_FIXTURE, fixtures::SD2_HEADER, &panel)?
+                }
+                Err(cause) => Rebuilt::skipped(fixtures::SD2_FIXTURE, cause),
+            }
+        }
+        Err(cause) => Rebuilt::skipped(fixtures::SD2_FIXTURE, cause),
+    });
+
     // The casino distribution, eighteen half-years of it. See `build_casino_extract` for what the
     // sheets are made to prove about themselves, and `crates/connect/sources/tax-casino.md` for
     // why a channel of this size was invisible until it was retrieved.

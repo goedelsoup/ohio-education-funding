@@ -464,16 +464,16 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 2255 | supported by a committed primary source |
-| `[inference]` | 470 | drawn from verified facts, not witnessed |
-| `[open]` | 233 | a live question — unknown, contested, or being worked |
+| `[verified]` | 2280 | supported by a committed primary source |
+| `[inference]` | 474 | drawn from verified facts, not witnessed |
+| `[open]` | 236 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
-233 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
+236 unresolved marks, and every one of them is a live question. The fourth mark is gone from the prose: a field nobody has filled in is carried as `unfilled:` structure on the node it belongs to, which is what `[unentered]` used to say inline on an axis it did not belong to.
 
 | Field | `[open]` | `[unentered]` |
 |---|--:|--:|
-| `findings` | 111 | 0 |
+| `findings` | 114 | 0 |
 | `description` | 43 | 0 |
 | `revisions` | 11 | 0 |
 | `series` | 7 | 0 |
@@ -508,7 +508,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `appropriating_bill` | 1 | 0 |
 | `accountability_effect` | 1 | 0 |
 
-**143 recorded withdrawals across 59 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**145 recorded withdrawals across 60 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Relationship vocabulary
@@ -523,10 +523,10 @@ leave the corpus and are not counted.
 -->
 | Measure | Count |
 |---|--:|
-| edges between nodes | 658 |
+| edges between nodes | 664 |
 | distinct relationships in use | 185 |
 | relationships declared across every class | 70 |
-| edges whose relationship its class does not declare | 364 |
+| edges whose relationship its class does not declare | 369 |
 | relationships used exactly once | 89 |
 
 **55% of edges use a relationship the class does not declare**, and 89 of the 185 relationships in use are used a single time. That is the case for `edge_policy: characteristic`: closing the vocabulary would reject those edges or require 89 declarations that each describe one link.
@@ -599,7 +599,7 @@ Sorted by: kind, then alphabetically.
 | [`eastland-fairfield-ctc`](education-agency/eastland-fairfield-ctc.yml) | education-agency | Eastland-Fairfield Career and Technical Schools | 3 | 3 |
 | [`electronic-classroom-of-tomorrow`](education-agency/electronic-classroom-of-tomorrow.yml) | education-agency | Electronic Classroom of Tomorrow (closed) | 2 | 2 |
 | [`northern-local-perry`](education-agency/northern-local-perry.yml) | education-agency | Northern Local School District (Perry County) | 9 | 13 |
-| [`perrysburg-exempted-village`](education-agency/perrysburg-exempted-village.yml) | education-agency | Perrysburg Exempted Village School District | 5 | 2 |
+| [`perrysburg-exempted-village`](education-agency/perrysburg-exempted-village.yml) | education-agency | Perrysburg Exempted Village School District | 5 | 3 |
 | [`toledo-city`](education-agency/toledo-city.yml) | education-agency | Toledo City School District | 4 | 4 |
 | [`upper-arlington-city`](education-agency/upper-arlington-city.yml) | education-agency | Upper Arlington City School District | 3 | 8 |
 | [`fy2002-03`](fiscal-period/fy2002-03.yml) | fiscal-period | FY2002-2003 Biennium | 4 | 2 |
@@ -628,7 +628,7 @@ Sorted by: kind, then alphabetically.
 | [`fsfp-formula-transition-supplement`](formula-component/fsfp-formula-transition-supplement.yml) | formula-component | FSFP Formula Transition Supplement | 9 | 8 |
 | [`fsfp-gifted-units`](formula-component/fsfp-gifted-units.yml) | formula-component | FSFP Gifted Identification and Units | 4 | 3 |
 | [`fsfp-jvsd-state-share-of-base-cost`](formula-component/fsfp-jvsd-state-share-of-base-cost.yml) | formula-component | FSFP JVSD State Share of Base Cost | 6 | 2 |
-| [`fsfp-local-capacity-measure`](formula-component/fsfp-local-capacity-measure.yml) | formula-component | FSFP Local Capacity Measure | 12 | 14 |
+| [`fsfp-local-capacity-measure`](formula-component/fsfp-local-capacity-measure.yml) | formula-component | FSFP Local Capacity Measure | 13 | 15 |
 | [`fsfp-performance-supplement`](formula-component/fsfp-performance-supplement.yml) | formula-component | FSFP Performance Supplement | 10 | 8 |
 | [`fsfp-preschool-special-education`](formula-component/fsfp-preschool-special-education.yml) | formula-component | FSFP Preschool Special Education | 6 | 4 |
 | [`fsfp-special-education-weights`](formula-component/fsfp-special-education-weights.yml) | formula-component | FSFP Special Education Weights | 6 | 10 |
@@ -695,7 +695,7 @@ Sorted by: kind, then alphabetically.
 | [`targeted-assistance-rates`](parameter/targeted-assistance-rates.yml) | parameter | Targeted Assistance Rates | 6 | 1 |
 | [`tax-reduction-factor`](parameter/tax-reduction-factor.yml) | parameter | Tax Reduction Factor | 9 | 7 |
 | [`transportation-cost-rates`](parameter/transportation-cost-rates.yml) | parameter | Transportation Cost Rates | 6 | 2 |
-| [`twenty-mill-floor`](parameter/twenty-mill-floor.yml) | parameter | Twenty-Mill Floor | 10 | 14 |
+| [`twenty-mill-floor`](parameter/twenty-mill-floor.yml) | parameter | Twenty-Mill Floor | 10 | 15 |
 | [`autism-scholarship`](program/autism-scholarship.yml) | program | Autism Scholarship | 6 | 1 |
 | [`auxiliary-services`](program/auxiliary-services.yml) | program | Auxiliary Services | 4 | 3 |
 | [`classroom-facilities-assistance`](program/classroom-facilities-assistance.yml) | program | Classroom Facilities Assistance Program | 3 | 2 |
@@ -713,10 +713,11 @@ Sorted by: kind, then alphabetically.
 | [`emergency-levy`](revenue-stream/emergency-levy.yml) | revenue-stream | Emergency Levy | 5 | 5 |
 | [`esser`](revenue-stream/esser.yml) | revenue-stream | ESSER — Elementary and Secondary School Emergency Relief | 4 | 4 |
 | [`idea-part-b`](revenue-stream/idea-part-b.yml) | revenue-stream | IDEA Part B | 7 | 5 |
-| [`local-property-tax`](revenue-stream/local-property-tax.yml) | revenue-stream | Local Property Tax | 12 | 15 |
+| [`local-property-tax`](revenue-stream/local-property-tax.yml) | revenue-stream | Local Property Tax | 13 | 16 |
 | [`lottery-profits`](revenue-stream/lottery-profits.yml) | revenue-stream | Lottery Profits Education Fund | 4 | 1 |
 | [`permanent-improvement-levy`](revenue-stream/permanent-improvement-levy.yml) | revenue-stream | Permanent Improvement Levy | 5 | 5 |
 | [`property-tax-exemption-compensation`](revenue-stream/property-tax-exemption-compensation.yml) | revenue-stream | Property Tax Exemption Compensation | 7 | 2 |
+| [`school-district-income-tax`](revenue-stream/school-district-income-tax.yml) | revenue-stream | School District Income Tax | 4 | 2 |
 | [`state-foundation-aid`](revenue-stream/state-foundation-aid.yml) | revenue-stream | State Foundation Aid | 7 | 23 |
 | [`substitute-levy`](revenue-stream/substitute-levy.yml) | revenue-stream | Substitute Levy | 5 | 5 |
 | [`title-i`](revenue-stream/title-i.yml) | revenue-stream | Title I, Part A | 7 | 5 |
@@ -727,7 +728,7 @@ Sorted by: kind, then alphabetically.
 | [`barrington-road-elementary`](school/barrington-road-elementary.yml) | school | Barrington Road Elementary School | 4 | 2 |
 | [`sheridan-high-school`](school/sheridan-high-school.yml) | school | Sheridan High School | 6 | 2 |
 
-145 nodes across 18 classes, and **1 with nothing pointing at them** — counting a citation in somebody's prose as pointing. Whether that is a gap depends on the class: `web/tests/unit/reachability.spec.ts` holds every node to having an inbound *edge* and exempts `draft-legislation`, where a node with nothing pointing at it is the design.
+146 nodes across 18 classes, and **1 with nothing pointing at them** — counting a citation in somebody's prose as pointing. Whether that is a gap depends on the class: `web/tests/unit/reachability.spec.ts` holds every node to having an inbound *edge* and exempts `draft-legislation`, where a node with nothing pointing at it is the design.
 <!-- /REGEN -->
 
 ## Semantic index status
@@ -737,5 +738,5 @@ Regenerated by: `edfund-connect index`
 Fields: total nodes indexed, embedding model, index freshness (last indexed commit vs HEAD),
         stale node count.
 -->
-No semantic index is built. The corpus is 145 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
+No semantic index is built. The corpus is 146 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
 <!-- /REGEN -->

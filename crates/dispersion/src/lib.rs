@@ -48,6 +48,7 @@ pub mod functions;
 pub mod fy2016;
 pub mod home_education;
 pub mod identified;
+pub mod income_tax;
 pub mod jvsd_funding;
 pub mod lea_directory;
 pub mod mr81;
