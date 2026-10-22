@@ -133,6 +133,30 @@ pub fn section(number: &str) -> Section<'static> {
     records::record(FIXTURE, number).into()
 }
 
+/// The committed superseded versions, cited as `5705.21@4-9-2025`.
+///
+/// A second file because [`FIXTURE`] is one vintage and [`section`] must give one answer. An
+/// amendment's date is the current record's [`Section::effective`]; what it changed is the
+/// difference between that record's body and the one here.
+pub const PRIOR_FIXTURE: &str = include_str!("../fixtures/revised-code-prior.txt");
+
+/// One superseded version of a section, by number and by the version's `codes.ohio.gov` date
+/// segment, as `prior("5705.21", "4-9-2025")`.
+///
+/// # Panics
+///
+/// If the prior-version extract holds no such version.
+#[must_use]
+pub fn prior(number: &str, version: &str) -> Section<'static> {
+    records::record(PRIOR_FIXTURE, &format!("{number}@{version}")).into()
+}
+
+/// Every superseded version the extract holds, in file order.
+#[must_use]
+pub fn priors() -> Vec<Section<'static>> {
+    records::records(PRIOR_FIXTURE).map(Section::from).collect()
+}
+
 /// Every `multiple of X` a section states, in the order it states them.
 ///
 /// This is how the Revised Code writes a funding weight: `a multiple of 2.0961` for special

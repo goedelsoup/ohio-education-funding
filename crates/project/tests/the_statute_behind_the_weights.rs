@@ -61,6 +61,17 @@ const CITED: &[&str] = &[
     "5705.194",
     "5705.199",
     "5705.391",
+    // How a school levy is voted and renewed. Cited by the levy modality nodes in
+    // `revenue-stream/`: 5705.19 for the purposes a school levy names and for its first
+    // sentence, which says it is not a school district's grant; 5705.21 for the grant itself and
+    // the renewal sentences H.B. 96 cut; 5705.25 for the election every levy goes through; 133.06
+    // and 133.18 for the bond levy and the debt it pays. `how_a_school_levy_is_voted_and_renewed.rs`
+    // reads all five.
+    "5705.19",
+    "5705.21",
+    "5705.25",
+    "133.06",
+    "133.18",
     // The report card and what it triggers. Cited by `ohio-report-card` for the six components,
     // the 2:2:1:1:1 weighting of the overall rating, and the delegation of the star thresholds to
     // administrative rule; by `academic-distress-commission` for the trigger, the escalation

@@ -37,3 +37,56 @@ pub fn extract_school_funding(text: &str) -> Option<String> {
         .unwrap_or(rest.len());
     Some(rest[..end].trim().to_string())
 }
+
+/// The heading the final analysis's school district levy limits begin at.
+const LEVY_HEADING: &str = "Levy restrictions due to excess carry-over";
+
+/// The heading they run to: the overview of a provision the Governor vetoed and the General
+/// Assembly let stand vetoed, which is where the analysis turns from what the act does to what
+/// it would have done.
+const LEVY_END: &str = "20-mill floor: overview";
+
+/// Reduce a final analysis to its school district levy limits.
+///
+/// The property tax provisions the corpus cites are in the analysis's tax chapter, not the
+/// department's, so [`extract_school_funding`] does not reach them: the carry-over limit on new
+/// current expense levies, the end of new emergency and substitute levies, the end of renewing
+/// and increasing, the end of replacement levies, the ballot's "market value", and the vetoed
+/// change to the twenty-mill floor. Each of the first five says the General Assembly overrode the
+/// veto, and the passage says when they apply. Those two facts are what an amendment's effective
+/// date on `codes.ohio.gov` cannot say.
+///
+/// Returns `None` if either heading is absent after the contents list.
+#[must_use]
+pub fn extract_levy_limits(text: &str) -> Option<String> {
+    // The heading is in the contents list first, with its dot leaders, and in the body second.
+    let start = text.match_indices(LEVY_HEADING).map(|(i, _)| i).nth(1)?;
+    let rest = &text[start..];
+    let end = rest.find(LEVY_END)?;
+    Some(rest[..end].trim().to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn the_levy_limits_are_the_body_passage_and_stop_before_the_vetoed_overview() {
+        let text = "Contents\n  Levy restrictions due to excess carry-over ..... 483\n  \
+                    20-mill floor: overview ..... 485\nOther law\n  \
+                    Levy restrictions due to excess carry-over (VETO OVERRIDDEN)\n  \
+                    Replacement property tax levies (VETO OVERRIDDEN)\n  \
+                    20-mill floor limits (VETOED)\n      20-mill floor: overview\n  Detail";
+        let slice = extract_levy_limits(text).expect("both headings present");
+        assert!(slice.starts_with("Levy restrictions due to excess carry-over (VETO OVERRIDDEN)"));
+        assert!(slice.contains("Replacement property tax levies"));
+        assert!(slice.ends_with("20-mill floor limits (VETOED)"));
+        assert!(!slice.contains("Detail"));
+    }
+
+    #[test]
+    fn a_contents_list_alone_is_not_the_passage() {
+        let text = "Levy restrictions due to excess carry-over ..... 483\n20-mill floor: overview";
+        assert_eq!(extract_levy_limits(text), None);
+    }
+}

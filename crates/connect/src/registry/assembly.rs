@@ -422,6 +422,88 @@ pub const OHIO_LAWS_SECTIONS: &[Source] = &[
         note: "R.C. 5705.199. The school district substitute levy, voted as a sum of money.",
     },
     Source {
+        key: "rc-5705-19",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-5705.19",
+        filename: "rc-5705-19.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 5705.19. The purposes a subdivision may levy above the ten-mill limitation \
+               for — and, in its first sentence, not a school district's grant: \"This section \
+               does not apply to school districts\". A school levy names a purpose here and is \
+               voted under R.C. 5705.21.",
+    },
+    Source {
+        key: "rc-5705-21",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-5705.21",
+        filename: "rc-5705-21.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 5705.21. The school district's own grant to levy above the ten-mill \
+               limitation — current expenses, permanent improvements and the rest — and its \
+               renewal sentences, from which H.B. 96 struck \"increase or\".",
+    },
+    Source {
+        key: "rc-5705-25",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-5705.25",
+        filename: "rc-5705-25.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 5705.25. The election on a levy, for every subdivision: notice, ballot form, \
+               and when a renewal may be placed on the ballot.",
+    },
+    Source {
+        key: "rc-133-06",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-133.06",
+        filename: "rc-133-06.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 133.06. A school district's net indebtedness limits: one-tenth of one per \
+               cent of tax valuation unvoted, nine per cent in all, and the classroom facilities \
+               exception in division (I).",
+    },
+    Source {
+        key: "rc-133-18",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-133.18",
+        filename: "rc-133-18.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::STATUTE_FIXTURE],
+        note: "R.C. 133.18. The election on a bond issue, and the levy outside the ten-mill \
+               limitation that pays its debt charges.",
+    },
+    Source {
+        key: "rc-5705-21-at-4-9-2025",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-5705.21/4-9-2025",
+        filename: "rc-5705-21-at-4-9-2025.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::PRIOR_STATUTE_FIXTURE],
+        note: "R.C. 5705.21 as it read before H.B. 96: the version effective April 9, 2025. \
+               Committed beside the current text so that what H.B. 96 struck is read rather \
+               than reported.",
+    },
+    Source {
+        key: "rc-5705-25-at-4-9-2025",
+        title: None,
+        url: "https://codes.ohio.gov/ohio-revised-code/section-5705.25/4-9-2025",
+        filename: "rc-5705-25-at-4-9-2025.html",
+        format: Format::Html,
+        catalog: Some("ohio-revised-code"),
+        fixtures: &[crate::fixtures::PRIOR_STATUTE_FIXTURE],
+        note: "R.C. 5705.25 as it read before H.B. 96: the version effective April 9, 2025. Its \
+               renew-and-increase ballot form survived the act, and this is how that is known.",
+    },
+    Source {
         key: "rc-5705-391",
         title: None,
         url: "https://codes.ohio.gov/ohio-revised-code/section-5705.391",

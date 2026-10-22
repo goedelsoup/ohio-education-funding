@@ -14313,7 +14313,69 @@ pub static FIGURES: &[Figure] = &[
                 .expect("LSC prints both years")[0]
         },
     },
+    // `revenue-stream/bond-levy` and `revenue-stream/levy-renewal`: R.C. 133.06's limits and
+    // what H.B. 96 struck from R.C. 5705.21, read from the committed sections.
+    Figure {
+        key: "project/rc-133-06-total-limit",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "Net indebtedness a school district may incur in all, as a share of tax \
+                valuation, R.C. 133.06(B)",
+        pinned: 0.09,
+        tolerance: 0.000_05,
+        compute: |_| project::levy::total_limit(),
+    },
+    Figure {
+        key: "project/rc-133-06-consent-threshold",
+        owner: "crates/project",
+        unit: Unit::Share,
+        label: "Net indebtedness above which a bond question needs state consent to reach the \
+                ballot, as a share of tax valuation, R.C. 133.06(C)",
+        pinned: 0.04,
+        tolerance: 0.000_05,
+        compute: |_| project::levy::consent_threshold(),
+    },
+    Figure {
+        key: "project/rc-5705-21-renew-and-increase-sentences-before-hb96",
+        owner: "crates/project",
+        unit: Unit::Count,
+        label: "Renewal sentences of R.C. 5705.21 allowing an increase, April 9, 2025 version",
+        pinned: 2.0,
+        tolerance: 0.0,
+        compute: |_| project::levy::renew_and_increase_sentences_before_hb96() as f64,
+    },
+    Figure {
+        key: "dispersion/median-debt-capacity-per-pupil-ty2024",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "R.C. 133.06(B)'s limit applied to the median district's taxable value per \
+                pupil, Table SD-1, TY2024",
+        pinned: 22_614.406_839,
+        tolerance: 0.5,
+        compute: |_| median_value_per_pupil(2024) * project::levy::total_limit(),
+    },
+    // The unvoted limit is one-tenth of one per cent, too small a share for the manifest's
+    // percentage guard, so it is bound through what it buys.
+    Figure {
+        key: "dispersion/median-unvoted-debt-capacity-per-pupil-ty2024",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "R.C. 133.06(A)'s unvoted limit applied to the median district's taxable value \
+                per pupil, Table SD-1, TY2024",
+        pinned: 251.271_187_1,
+        tolerance: 0.5,
+        compute: |_| median_value_per_pupil(2024) * project::levy::unvoted_limit(),
+    },
 ];
+
+/// The median district's published taxable value per pupil, Table SD-1.
+fn median_value_per_pupil(tax_year: u16) -> f64 {
+    let per_pupil = dispersion::sd1::rows()
+        .into_iter()
+        .filter(|row| row.tax_year == tax_year)
+        .filter_map(|row| row.value_per_pupil);
+    median_interpolated(per_pupil).unwrap_or(f64::NAN)
+}
 
 /// The same band on enrolled ADM, which is the statistic the unweighted one was read as.
 ///
