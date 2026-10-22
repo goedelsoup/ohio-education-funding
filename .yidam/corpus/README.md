@@ -464,8 +464,8 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 -->
 | Tag | Count | What it records |
 |---|--:|---|
-| `[verified]` | 2120 | supported by a committed primary source |
-| `[inference]` | 442 | drawn from verified facts, not witnessed |
+| `[verified]` | 2135 | supported by a committed primary source |
+| `[inference]` | 447 | drawn from verified facts, not witnessed |
 | `[open]` | 225 | a live question — unknown, contested, or being worked |
 | `[unentered]` | 0 | a knowable value nobody has typed in yet |
 
@@ -508,7 +508,7 @@ Fields: count per claim tag across every node; then the unresolved marks by the 
 | `appropriating_bill` | 1 | 0 |
 | `accountability_effect` | 1 | 0 |
 
-**138 recorded withdrawals across 57 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
+**139 recorded withdrawals across 57 nodes.** A claim the corpus published and no longer stands behind is kept in a `revisions:` block rather than edited out, with the test or source that settled it — see [`the-four-genres-of-a-description`](../decisions/the-four-genres-of-a-description.yml). Counted here for the same reason the tags above are: how often this corpus has corrected itself is a fact about it, and one nobody would think to update by hand.
 <!-- /REGEN -->
 
 ## Relationship vocabulary
@@ -523,10 +523,10 @@ leave the corpus and are not counted.
 -->
 | Measure | Count |
 |---|--:|
-| edges between nodes | 610 |
+| edges between nodes | 613 |
 | distinct relationships in use | 173 |
 | relationships declared across every class | 70 |
-| edges whose relationship its class does not declare | 324 |
+| edges whose relationship its class does not declare | 325 |
 | relationships used exactly once | 84 |
 
 **53% of edges use a relationship the class does not declare**, and 84 of the 173 relationships in use are used a single time. That is the case for `edge_policy: characteristic`: closing the vocabulary would reject those edges or require 84 declarations that each describe one link.
@@ -555,7 +555,7 @@ writes an absence it has looked for.
 | declared `required: false` | 8 |
 | declarations that do not say | 0 |
 | omissions of a required property | 0 |
-| omissions of an optional property | 18 |
+| omissions of an optional property | 20 |
 
 **113 of the 121 declared properties are carried by every instance of their class.** An omission of a required property gates `yidam lint`, so none is listed in `.yidam/lint-baseline.yml` and the next is attributable to the commit that makes it. An omission of an optional one is reported and is not a defect. Every property some instance omits:
 
@@ -566,8 +566,8 @@ writes an absence it has looked for.
 | `legislation.effective_note` | no | 2 | 16 |
 | `legislation.accountability_effect` | no | 1 | 16 |
 | `litigation.procedural_history` | no | 3 | 6 |
-| `parameter.simulation_key` | no | 1 | 18 |
-| `parameter.written_as` | no | 5 | 18 |
+| `parameter.simulation_key` | no | 2 | 19 |
+| `parameter.written_as` | no | 6 | 19 |
 | `program.mechanism_note` | no | 3 | 10 |
 <!-- /REGEN -->
 
@@ -615,7 +615,7 @@ Sorted by: kind, then alphabetically.
 | [`fy2022`](fiscal-period/fy2022.yml) | fiscal-period | Fiscal Year 2022 | 3 | 3 |
 | [`fy2022-23`](fiscal-period/fy2022-23.yml) | fiscal-period | FY2022-23 Biennium | 6 | 4 |
 | [`fy2024-25`](fiscal-period/fy2024-25.yml) | fiscal-period | FY2024-25 Biennium | 5 | 5 |
-| [`fy2026`](fiscal-period/fy2026.yml) | fiscal-period | Fiscal Year 2026 | 4 | 8 |
+| [`fy2026`](fiscal-period/fy2026.yml) | fiscal-period | Fiscal Year 2026 | 4 | 9 |
 | [`fy2026-27`](fiscal-period/fy2026-27.yml) | fiscal-period | FY2026-27 Biennium | 5 | 18 |
 | [`fy2027`](fiscal-period/fy2027.yml) | fiscal-period | Fiscal Year 2027 | 6 | 3 |
 | [`charge-off-local-share`](formula-component/charge-off-local-share.yml) | formula-component | Charge-Off Local Share | 6 | 8 |
@@ -655,7 +655,7 @@ Sorted by: kind, then alphabetically.
 | [`hb-59-2013`](legislation/hb-59-2013.yml) | legislation | Am. Sub. H.B. 59 (2013) — FY2014-15 Budget; a Formula Over the Bridge | 6 | 3 |
 | [`hb-64-2015`](legislation/hb-64-2015.yml) | legislation | Am. Sub. H.B. 64 (2015) — FY2016-17 Budget; Capacity Aid | 10 | 5 |
 | [`hb-66-2005`](legislation/hb-66-2005.yml) | legislation | Am. Sub. H.B. 66 (2005) — FY2006-07 Budget; Tangible Personal Property Tax Phase-Out | 5 | 8 |
-| [`hb-920-1976`](legislation/hb-920-1976.yml) | legislation | Am. Sub. H.B. 920 (1976) — Tax Reduction Factors | 5 | 13 |
+| [`hb-920-1976`](legislation/hb-920-1976.yml) | legislation | Am. Sub. H.B. 920 (1976) — Tax Reduction Factors | 6 | 14 |
 | [`hb-94-2001`](legislation/hb-94-2001.yml) | legislation | Am. Sub. H.B. 94 (2001) — FY2002-03 Budget; the post-DeRolph II formula | 12 | 5 |
 | [`hb-95-2003`](legislation/hb-95-2003.yml) | legislation | Am. Sub. H.B. 95 (2003) — FY2004-05 Budget; the First After DeRolph | 5 | 3 |
 | [`hb-96-2025`](legislation/hb-96-2025.yml) | legislation | Am. Sub. H.B. 96 (2025) — FY2026-27 Budget | 12 | 32 |
@@ -693,8 +693,9 @@ Sorted by: kind, then alphabetically.
 | [`preschool-special-education-amounts`](parameter/preschool-special-education-amounts.yml) | parameter | Preschool Special Education Amounts | 6 | 5 |
 | [`special-education-category-multiples`](parameter/special-education-category-multiples.yml) | parameter | Special Education Category Multiples | 6 | 5 |
 | [`targeted-assistance-rates`](parameter/targeted-assistance-rates.yml) | parameter | Targeted Assistance Rates | 6 | 1 |
+| [`tax-reduction-factor`](parameter/tax-reduction-factor.yml) | parameter | Tax Reduction Factor | 4 | 2 |
 | [`transportation-cost-rates`](parameter/transportation-cost-rates.yml) | parameter | Transportation Cost Rates | 6 | 2 |
-| [`twenty-mill-floor`](parameter/twenty-mill-floor.yml) | parameter | Twenty-Mill Floor | 6 | 9 |
+| [`twenty-mill-floor`](parameter/twenty-mill-floor.yml) | parameter | Twenty-Mill Floor | 7 | 10 |
 | [`autism-scholarship`](program/autism-scholarship.yml) | program | Autism Scholarship | 6 | 1 |
 | [`auxiliary-services`](program/auxiliary-services.yml) | program | Auxiliary Services | 4 | 3 |
 | [`classroom-facilities-assistance`](program/classroom-facilities-assistance.yml) | program | Classroom Facilities Assistance Program | 3 | 2 |
@@ -708,7 +709,7 @@ Sorted by: kind, then alphabetically.
 | [`casino-tax-distribution`](revenue-stream/casino-tax-distribution.yml) | revenue-stream | Casino Tax — County Student Fund | 6 | 1 |
 | [`esser`](revenue-stream/esser.yml) | revenue-stream | ESSER — Elementary and Secondary School Emergency Relief | 4 | 4 |
 | [`idea-part-b`](revenue-stream/idea-part-b.yml) | revenue-stream | IDEA Part B | 7 | 5 |
-| [`local-property-tax`](revenue-stream/local-property-tax.yml) | revenue-stream | Local Property Tax | 6 | 8 |
+| [`local-property-tax`](revenue-stream/local-property-tax.yml) | revenue-stream | Local Property Tax | 6 | 9 |
 | [`lottery-profits`](revenue-stream/lottery-profits.yml) | revenue-stream | Lottery Profits Education Fund | 4 | 1 |
 | [`state-foundation-aid`](revenue-stream/state-foundation-aid.yml) | revenue-stream | State Foundation Aid | 7 | 23 |
 | [`title-i`](revenue-stream/title-i.yml) | revenue-stream | Title I, Part A | 7 | 5 |
@@ -719,7 +720,7 @@ Sorted by: kind, then alphabetically.
 | [`barrington-road-elementary`](school/barrington-road-elementary.yml) | school | Barrington Road Elementary School | 4 | 2 |
 | [`sheridan-high-school`](school/sheridan-high-school.yml) | school | Sheridan High School | 6 | 2 |
 
-137 nodes across 18 classes, and **1 with nothing pointing at them** — counting a citation in somebody's prose as pointing. Whether that is a gap depends on the class: `web/tests/unit/reachability.spec.ts` holds every node to having an inbound *edge* and exempts `draft-legislation`, where a node with nothing pointing at it is the design.
+138 nodes across 18 classes, and **1 with nothing pointing at them** — counting a citation in somebody's prose as pointing. Whether that is a gap depends on the class: `web/tests/unit/reachability.spec.ts` holds every node to having an inbound *edge* and exempts `draft-legislation`, where a node with nothing pointing at it is the design.
 <!-- /REGEN -->
 
 ## Semantic index status
@@ -729,5 +730,5 @@ Regenerated by: `edfund-connect index`
 Fields: total nodes indexed, embedding model, index freshness (last indexed commit vs HEAD),
         stale node count.
 -->
-No semantic index is built. The corpus is 137 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
+No semantic index is built. The corpus is 138 nodes and fits in context; an index is added when direct retrieval stops working, which has not happened.
 <!-- /REGEN -->

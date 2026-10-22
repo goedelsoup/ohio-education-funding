@@ -61,5 +61,7 @@ links:
     relationship: produces
   - target: ../parameter/twenty-mill-floor.yml
     relationship: sets
+  - target: ../parameter/tax-reduction-factor.yml
+    relationship: sets
   - target: ../doctrine/equity.yml
     relationship: bears-on

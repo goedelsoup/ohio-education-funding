@@ -1,0 +1,230 @@
+class: parameter
+label: Tax Reduction Factor
+summary: >-
+  The percentage by which H.B. 920 cuts each voted levy on real property every year, class by
+  class, so the levy raises the same dollars from property it already taxed. Which levies it
+  reaches decides which grow with reappraisal.
+description: |
+  The percentage by which the Tax Commissioner reduces the sum each levy would raise on real
+  property, computed every year under R.C. 319.301 as [H.B. 920](../legislation/hb-920-1976.yml)
+  enacted it. Division (D)(1) sets the factor so that a tax "levy the same number of dollars"
+  against carryover property, class by class, as it did the year before. [verified]
+  (`ohio-laws`, `crates/project/tests/what_a_reduction_factor_reaches.rs`)
+
+  ### Why voted millage stops tracking value
+
+  Division (F): "No reduction shall be made under this section in the rate at which any tax is
+  levied." The voted rate stays on the books and only the sum charged is cut. Carryover property
+  excludes land and improvements not taxed in both years, so new construction is charged at the
+  reduced rate and is the only growth an existing levy has. [verified] A district therefore
+  carries two rates, the one its voters approved and the one each class actually pays, and every
+  reappraisal widens the gap.
+
+  ### Two classes, two factors
+
+  Division (C) makes "separate determinations" for the two classes of R.C. 5713.041:
+  residential and agricultural property, and everything else. That classification exists
+  "solely for the purpose of making the reductions". [verified] Reappraisal raises homes faster
+  than businesses, so Class I is cut deeper, and the split keeps the faster-rising class from
+  taking over a larger share of the same levy. [inference]
+
+  ### Which levies it reaches
+
+  A levy voted as a rate is reduced. A levy voted as a sum is not: division (A)(1) exempts taxes
+  "required to produce a specified amount of tax money", which covers bond levies for debt
+  charges, the emergency levy of R.C. 5705.194 and the substitute levy of R.C. 5705.199.
+  Inside millage within the one per cent limitation is exempt by (A)(2). [verified] A fixed-sum
+  levy's rate falls as values rise, because the sum does not. Reaching the twenty-mill floor
+  suspends the factor for current-expense levies, and since H.B. 186 R.C. 319.303 reduces only
+  the taxes the floor holds up. [verified] (`ohio-laws`, `crates/project/tests/what_a_reduction_factor_reaches.rs`)
+  The [floor](twenty-mill-floor.yml) is its own node, and how each levy type is voted and renewed
+  belongs to the levy modalities.
+
+  The committed abstract carries the gross rate as well as both class rates, so the factor can be
+  measured per district, per class and per year. [verified] (Table SD-1, `crates/dispersion`)
+findings: |
+  ### What grows with reappraisal, what does not, and why
+
+  | levy | reduced? | grows with reappraisal? |
+  |---|---|---|
+  | voted operating levy above the floor | yes, (D)(1) | no; new construction only |
+  | voted operating levy at the floor | held by (E)(2) | yes, now capped by R.C. 319.303 |
+  | permanent improvement and other voted rates | yes, (D)(1) | no; new construction only |
+  | bond levy | no, (A)(1) debt charges | no; the rate follows the debt |
+  | emergency levy, R.C. 5705.194 | no, (A)(1) | no; a sum voted for up to five years |
+  | substitute levy, R.C. 5705.199 | no, (A)(1) | no; new construction only, by its own terms |
+  | inside millage | no, (A)(2) | yes |
+
+  [verified] (`ohio-laws`, `crates/project/tests/what_a_reduction_factor_reaches.rs`) Two rows
+  rest on what the section does not say. A permanent improvement levy is reduced because (D)
+  reaches "each tax" and (A) does not list it; an emergency levy is exempt by the general words of
+  (A)(1), since only 5705.199 and 5748.09 are named. [inference]
+
+  A renewal keeps the reduction. Division (D)(1) fixes a new levy against the prior year's value
+  only for "a tax levied for the first time that is not a renewal", so a renewal carries the
+  reduced rate of the levy it renews rather than its full voted rate. [verified]
+  (`crates/project/tests/what_a_reduction_factor_reaches.rs`)
+
+  ### The gross rate was already in the abstract
+
+  Table SD-1 publishes a public utility millage for every district, and utility property is not
+  real property, so R.C. 319.301 never reduces it. It matches the District Profile's voted current
+  operating millage in **606** of the 606 districts the two share, TY2023. [verified]
+  (`crates/dispersion/tests/the_rate_the_utilities_pay_is_the_voted_rate.rs`) It is therefore
+  the gross rate for all four tax years, which the profile could give for one.
+
+  Measured against it, reduction factors had removed a median **42.6%** of gross current-expense
+  millage from Class I in TY2024 and **33.5%** from Class II. The Class II rate is the higher of
+  the two in **437** of the **611** districts. [verified]
+  (`crates/dispersion/tests/the_rate_the_utilities_pay_is_the_voted_rate.rs`) Each is an
+  aggregate across a district's levies: its fixed-sum levies are not reduced at all, and the
+  abstract does not separate them.
+
+  ### The floor is reached class by class
+
+  In TY2024, **74** districts sat at exactly twenty mills in Class II against **155** in Class I,
+  and **57** in both. [verified] (`crates/dispersion/src/sd1.rs`) So 17 sat on the floor in
+  Class II alone. Wilmington City is one: on the floor in Class II, just above it in Class I.
+  Division (E)(2) applies "for either class", and a district can be growing with reappraisal in
+  one class while its other class is held flat.
+
+  ### One reappraisal, worked
+
+  Cuyahoga County reappraised for TY2024. Cleveland Heights-University Heights carried a gross
+  rate of **149.5** mills in both years. Class I value rose **40.9%** and its effective rate fell
+  from **70.02** to **51.05** mills; Class I taxes charged rose **2.8%**. Class II value rose
+  **9.5%**, its rate fell from **90.78** to **84.63**, and its taxes rose **2.1%**. [verified]
+  (Table SD-1, `crates/dispersion/tests/the_rate_the_utilities_pay_is_the_voted_rate.rs`)
+  Each class lost rate in proportion to its own value growth, and what remains of each tax
+  increase is property that was not carryover. [inference] A levy voted as a rate kept its
+  dollars and lost its rate. Had one factor served both classes, Class I would have carried more
+  of the same levy. [inference]
+
+  ### The H.B. 186 credit applies only at the floor
+
+  R.C. 319.303 gives an "Inflation Cap Credit" in a reappraisal or update year to a district on
+  the floor in a class, or below twenty mills of current expense. It holds floor-held taxes to the
+  prior year's amount grown by the change in the GDP deflator over the three preceding years, for
+  that year and the two after, and "shall reduce only the taxes charged
+  and payable of taxes whose effective tax rate is adjusted by operation of division (E)".
+  [verified] (`crates/project/tests/what_a_reduction_factor_reaches.rs`) It closes, in part,
+  the one channel by which an existing operating levy grew with reappraisal.
+revisions: []
+unfilled:
+  - field: per-levy reduction factors
+    why: |
+      The Tax Commissioner certifies a factor for each levy and each class, and no committed
+      fixture carries one. Table SD-1 publishes each district's aggregate class rate, so the share
+      of a reduction that falls on fixed-rate rather than fixed-sum levies cannot be separated,
+      and no single levy's factor can be shown.
+  - field: when the two classes entered the law
+    why: |
+      H.B. 920 of 1976 is the origin of the factor, and nothing committed says whether it had two
+      classes from the start. R.C. 5713.041's committed text is its 2012 version, which dates the
+      section's last amendment and not the classification, and no committed source dates the split.
+  - field: the H.B. 186 credit by district
+    why: |
+      R.C. 319.303 is committed and no fixture carries the credit charged to any district, so who
+      receives it and how much it takes from floor-held taxes are not measured.
+figures:
+  - key: dispersion/utility-millage-matches-voted-millage-ty2023
+    value: 606
+    field: findings
+    as_written: "in **606** of the"
+  - key: dispersion/median-class1-reduction-ty2024
+    value: 0.426
+    field: findings
+    as_written: "a median **42.6%** of gross current-expense"
+  - key: dispersion/median-class2-reduction-ty2024
+    value: 0.335
+    field: findings
+    as_written: "**33.5%** from Class II"
+  - key: dispersion/class2-rate-above-class1-ty2024
+    value: 437
+    field: findings
+    as_written: "in **437** of the"
+  - key: dispersion/class-reduction-districts-ty2024
+    value: 611
+    field: findings
+    as_written: "**611** districts"
+  - key: dispersion/districts-at-twenty-class2-ty2024
+    value: 74
+    field: findings
+    as_written: "**74** districts sat at exactly twenty mills"
+  - key: dispersion/districts-at-twenty-mills-on-class-one-ty2024
+    value: 155
+    field: findings
+    as_written: "against **155** in Class I"
+  - key: dispersion/districts-at-twenty-both-classes-ty2024
+    value: 57
+    field: findings
+    as_written: "**57** in both"
+  - key: dispersion/cleveland-heights-gross-millage-ty2024
+    value: 149.5
+    field: findings
+    as_written: "rate of **149.5** mills"
+  - key: dispersion/cleveland-heights-class1-value-growth-ty2024
+    value: 0.409
+    field: findings
+    as_written: "Class I value rose **40.9%**"
+  - key: dispersion/cleveland-heights-class1-rate-ty2023
+    value: 70.02
+    field: findings
+    as_written: "from **70.02** to"
+  - key: dispersion/cleveland-heights-class1-rate-ty2024
+    value: 51.05
+    field: findings
+    as_written: "to **51.05** mills"
+  - key: dispersion/cleveland-heights-class1-taxes-growth-ty2024
+    value: 0.028
+    field: findings
+    as_written: "Class I taxes charged rose **2.8%**"
+  - key: dispersion/cleveland-heights-class2-value-growth-ty2024
+    value: 0.095
+    field: findings
+    as_written: "Class II value rose **9.5%**"
+  - key: dispersion/cleveland-heights-class2-rate-ty2023
+    value: 90.78
+    field: findings
+    as_written: "from **90.78** to"
+  - key: dispersion/cleveland-heights-class2-rate-ty2024
+    value: 84.63
+    field: findings
+    as_written: "to **84.63**, and"
+  - key: dispersion/cleveland-heights-class2-taxes-growth-ty2024
+    value: 0.021
+    field: findings
+    as_written: "its taxes rose **2.1%**"
+properties:
+  name: Tax reduction factor
+  unit: ratio
+  kind: |
+    Measured. R.C. 319.301(D) specifies the computation and the Tax Commissioner runs it every
+    year over each district's values, levy by levy and class by class. [verified] No act sets a
+    factor; the General Assembly set the rule in 1976, and a factor moves whenever values do.
+  series: |
+    Recomputed every tax year for every levy and both classes, and used only for its own year.
+    Table SD-1 carries the aggregate result for TY2021 to TY2024 as each district's class rates
+    beside its gross rate. [verified] (Table SD-1, `crates/dispersion/src/sd1.rs`)
+  statutory_basis: R.C. 319.301, with the classes at R.C. 5713.041 and the credit at R.C. 319.303
+  sensitivity: |
+    Decides whether a levy's yield follows reappraisal. Above the floor a voted rate yields the
+    same dollars on the same property however values move, so any simulation that applies a
+    voted rate to a reappraised value overstates local revenue by the reduction. [inference]
+links:
+  - target: ../parameter.ont.yml
+    relationship: instance-of
+  - target: ../revenue-stream/local-property-tax.yml
+    relationship: constrains
+  - target: ../fiscal-period/fy2026.yml
+    relationship: valued-in
+    note: >-
+      The section as amended in March 2026, which the committed text holds.
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+    note: >-
+      R.C. 319.301, 319.303, 5713.041, 5705.194 and 5705.199.
+  - target: ../../catalog/dot-sd1-school-district-taxes.md
+    relationship: sourced-from
+  - target: ../../catalog/cupp-district-profile-report.md
+    relationship: sourced-from

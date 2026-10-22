@@ -44,6 +44,7 @@ See the class definition: [parameter.ont.yml](../parameter.ont.yml).
 |------|------|--------|
 | [base-cost-per-pupil](base-cost-per-pupil.yml) | dollars per pupil | Biennial budget |
 | [twenty-mill-floor](twenty-mill-floor.yml) | mills | H.B. 920, R.C. 319.301 |
+| [tax-reduction-factor](tax-reduction-factor.yml) | ratio | H.B. 920, R.C. 319.301; computed by the Tax Commissioner each year |
 | [local-share-charge-off-millage](local-share-charge-off-millage.yml) | mills | Biennial budget |
 | [fsfp-phase-in-percentage](fsfp-phase-in-percentage.yml) | percent | Biennial budget |
 | [guarantee-funding-base](guarantee-funding-base.yml) | dollars per district | H.B. 166 (2019), and never re-based |
