@@ -52,6 +52,14 @@ const CITED: &[&str] = &[
     "3317.0217",
     "3317.03",
     "319.301",
+    // What a reduction factor reaches, for `parameter/tax-reduction-factor`: the H.B. 186 credit
+    // that reduces only floor-adjusted taxes, the two classes R.C. 319.301(C) computes factors
+    // for, and the emergency and substitute levy sections, which are the two fixed-sum school
+    // levies R.C. 319.301 names and which the floor node had attributed the wrong way round.
+    "319.303",
+    "5713.041",
+    "5705.194",
+    "5705.199",
     "5705.391",
     // The report card and what it triggers. Cited by `ohio-report-card` for the six components,
     // the 2:2:1:1:1 weighting of the overall rating, and the delegation of the star thresholds to
@@ -333,7 +341,8 @@ fn the_dpia_blend_is_departmental_rather_than_statutory() {
 /// rule". **That conclusion was wrong, and the statute is explicit.** R.C. 319.301(A)(1): the
 /// reductions "do not apply to ... taxes levied at whatever rate is required to produce a
 /// specified amount of tax money, including a tax levied under section 5705.199" — which is the
-/// emergency levy section.
+/// substitute levy section. This note first called it the emergency levy section; that is
+/// R.C. 5705.194, and `what_a_reduction_factor_reaches.rs` reads both.
 ///
 /// What the data actually showed was narrower than what was concluded from it: the exclusion does
 /// not explain the 155 districts sitting exactly on the floor, because those districts have no
@@ -362,7 +371,7 @@ fn the_floor_is_a_percentage_and_fixed_sum_levies_are_exempt_from_reduction() {
         .contains("required to produce a specified amount of tax money"));
     assert!(
         s.body.contains("5705.199"),
-        "the emergency levy section is named in the exemption"
+        "the substitute levy section is named in the exemption"
     );
 
     // And it is current law under a very recent amendment, which is its own caution: Ohio changed
