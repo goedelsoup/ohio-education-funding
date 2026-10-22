@@ -75,6 +75,19 @@ const CITED: &[&str] = &[
     "133.18",
     "5705.195",
     "5705.197",
+    // How a school district builds without a ballot. Cited by
+    // `revenue-stream/capital-finance-without-a-vote`: 3313.372 for energy conservation notes,
+    // 3313.375 for lease-purchase, 133.01 and 9.94 for what a certificate of participation is
+    // and who may sell one, 3313.46 for the bidding rule and its undefined urgent necessity, 9.17
+    // for the threshold 3313.46 borrows, and 3311.75 for the one school bidding rule that says
+    // who finds an urgent necessity. `how_a_district_builds_without_a_ballot.rs` reads all seven.
+    "3313.372",
+    "3313.375",
+    "133.01",
+    "9.94",
+    "3313.46",
+    "9.17",
+    "3311.75",
     // The report card and what it triggers. Cited by `ohio-report-card` for the six components,
     // the 2:2:1:1:1 weighting of the overall rating, and the delegation of the star thresholds to
     // administrative rule; by `academic-distress-commission` for the trigger, the escalation
