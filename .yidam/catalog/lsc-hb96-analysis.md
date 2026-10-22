@@ -19,6 +19,11 @@ used-by:
   - ../corpus/parameter/performance-supplement-rate.yml
   - ../corpus/program/autism-scholarship.yml
   - ../corpus/program/jon-peterson-special-needs.yml
+  - ../corpus/revenue-stream/bond-levy.yml
+  - ../corpus/revenue-stream/current-expense-levy.yml
+  - ../corpus/revenue-stream/emergency-levy.yml
+  - ../corpus/revenue-stream/permanent-improvement-levy.yml
+  - ../corpus/revenue-stream/substitute-levy.yml
 ---
 # LSC Budget Analysis — H.B. 96 (FY2026-27)
 
