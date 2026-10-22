@@ -805,6 +805,49 @@ fn sd1_at_twenty(
         .count()
 }
 
+/// Districts whose Table SD-1 utility millage matches the FY2024 profile's voted current
+/// operating millage to the abstract's two-decimal grain, TY2023.
+fn utility_millage_matches_voted() -> usize {
+    dispersion::profile::districts()
+        .into_iter()
+        .filter(|district| {
+            let Some(voted) = district.current_operating_millage else {
+                return false;
+            };
+            dispersion::sd1::at(&district.irn, 2023)
+                .as_ref()
+                .and_then(dispersion::sd1::gross_millage)
+                .is_some_and(|gross| (gross - voted).abs() <= 0.005 + 1e-9)
+        })
+        .count()
+}
+
+/// One district's year-over-year growth in a class quantity, Table SD-1.
+fn sd1_class_growth(
+    irn: &str,
+    to_year: u16,
+    class: dispersion::sd1::Class,
+    pick: fn(dispersion::sd1::Class, &dispersion::sd1::TaxRow) -> Option<f64>,
+) -> f64 {
+    let (Some(before), Some(after)) = (
+        dispersion::sd1::at(irn, to_year - 1),
+        dispersion::sd1::at(irn, to_year),
+    ) else {
+        return f64::NAN;
+    };
+    match (pick(class, &before), pick(class, &after)) {
+        (Some(from), Some(to)) if from > 0.0 => to / from - 1.0,
+        _ => f64::NAN,
+    }
+}
+
+/// One district's published class rate for one tax year, Table SD-1.
+fn sd1_class_rate(irn: &str, tax_year: u16, class: dispersion::sd1::Class) -> f64 {
+    dispersion::sd1::at(irn, tax_year)
+        .and_then(|row| class.rate(&row))
+        .unwrap_or(f64::NAN)
+}
+
 /// The Class I rate implied by the charges, in mills.
 ///
 /// TY2023's workbook publishes the rate to two decimals and the shortfalls below are read in the
@@ -4795,6 +4838,206 @@ pub static FIGURES: &[Figure] = &[
         pinned: 240.0,
         tolerance: 0.0,
         compute: |_| dispersion::sd1::rates(2024).map_or(0.0, |rates| rates.near_the_floor as f64),
+    },
+    // `parameter/tax-reduction-factor`: the class split of the reduction, read against the
+    // utility millage, which no reduction factor reaches.
+    Figure {
+        key: "dispersion/utility-millage-matches-voted-millage-ty2023",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts whose Table SD-1 public utility millage matches the profile's voted \
+                current operating millage, TY2023",
+        pinned: 606.0,
+        tolerance: 0.0,
+        compute: |_| utility_millage_matches_voted() as f64,
+    },
+    Figure {
+        key: "dispersion/median-class1-reduction-ty2024",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Median share of gross current-expense millage removed from Class I by \
+                reduction factors, TY2024",
+        pinned: 0.425_592_859,
+        tolerance: 0.000_05,
+        compute: |_| {
+            dispersion::sd1::class_reductions(2024).map_or(f64::NAN, |year| year.class1_median)
+        },
+    },
+    Figure {
+        key: "dispersion/median-class2-reduction-ty2024",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Median share of gross current-expense millage removed from Class II by \
+                reduction factors, TY2024",
+        pinned: 0.334_634_175,
+        tolerance: 0.000_05,
+        compute: |_| {
+            dispersion::sd1::class_reductions(2024).map_or(f64::NAN, |year| year.class2_median)
+        },
+    },
+    Figure {
+        key: "dispersion/districts-at-twenty-class2-ty2024",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts whose effective Class II rate is exactly twenty mills, TY2024",
+        pinned: 74.0,
+        tolerance: 0.0,
+        compute: |_| {
+            dispersion::sd1::class_reductions(2024)
+                .map_or(f64::NAN, |year| year.class2_at_the_floor as f64)
+        },
+    },
+    Figure {
+        key: "dispersion/districts-at-twenty-both-classes-ty2024",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts at exactly twenty mills in both classes, TY2024",
+        pinned: 57.0,
+        tolerance: 0.0,
+        compute: |_| {
+            dispersion::sd1::class_reductions(2024)
+                .map_or(f64::NAN, |year| year.both_at_the_floor as f64)
+        },
+    },
+    Figure {
+        key: "dispersion/class2-rate-above-class1-ty2024",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts whose effective Class II rate is above their Class I rate, TY2024",
+        pinned: 437.0,
+        tolerance: 0.0,
+        compute: |_| {
+            dispersion::sd1::class_reductions(2024)
+                .map_or(f64::NAN, |year| year.class2_above_class1 as f64)
+        },
+    },
+    Figure {
+        key: "dispersion/class-reduction-districts-ty2024",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts publishing a gross rate and both class rates, TY2024",
+        pinned: 611.0,
+        tolerance: 0.0,
+        compute: |_| {
+            dispersion::sd1::class_reductions(2024).map_or(f64::NAN, |year| year.districts as f64)
+        },
+    },
+    // Cleveland Heights-University Heights through Cuyahoga County's TY2024 reappraisal.
+    Figure {
+        key: "dispersion/cleveland-heights-gross-millage-ty2024",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Cleveland Heights-University Heights gross current-expense millage, TY2024",
+        pinned: 149.5,
+        tolerance: 0.0005,
+        compute: |_| {
+            dispersion::sd1::at("043794", 2024)
+                .as_ref()
+                .and_then(dispersion::sd1::gross_millage)
+                .unwrap_or(f64::NAN)
+        },
+    },
+    Figure {
+        key: "dispersion/cleveland-heights-class1-value-growth-ty2024",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Cleveland Heights-University Heights Class I value growth, TY2023 to TY2024",
+        pinned: 0.409_293_224,
+        tolerance: 0.000_05,
+        compute: |_| {
+            sd1_class_growth(
+                "043794",
+                2024,
+                dispersion::sd1::Class::One,
+                dispersion::sd1::Class::value,
+            )
+        },
+    },
+    Figure {
+        key: "dispersion/cleveland-heights-class2-value-growth-ty2024",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Cleveland Heights-University Heights Class II value growth, TY2023 to TY2024",
+        pinned: 0.095_274_682,
+        tolerance: 0.000_05,
+        compute: |_| {
+            sd1_class_growth(
+                "043794",
+                2024,
+                dispersion::sd1::Class::Two,
+                dispersion::sd1::Class::value,
+            )
+        },
+    },
+    Figure {
+        key: "dispersion/cleveland-heights-class1-taxes-growth-ty2024",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Cleveland Heights-University Heights Class I current-expense taxes charged \
+                growth, TY2023 to TY2024",
+        pinned: 0.027_543_054,
+        tolerance: 0.000_05,
+        compute: |_| {
+            sd1_class_growth(
+                "043794",
+                2024,
+                dispersion::sd1::Class::One,
+                dispersion::sd1::Class::taxes_charged,
+            )
+        },
+    },
+    Figure {
+        key: "dispersion/cleveland-heights-class2-taxes-growth-ty2024",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "Cleveland Heights-University Heights Class II current-expense taxes charged \
+                growth, TY2023 to TY2024",
+        pinned: 0.021_121_212,
+        tolerance: 0.000_05,
+        compute: |_| {
+            sd1_class_growth(
+                "043794",
+                2024,
+                dispersion::sd1::Class::Two,
+                dispersion::sd1::Class::taxes_charged,
+            )
+        },
+    },
+    Figure {
+        key: "dispersion/cleveland-heights-class1-rate-ty2023",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Cleveland Heights-University Heights effective Class I rate, TY2023, in mills",
+        pinned: 70.02,
+        tolerance: 0.0005,
+        compute: |_| sd1_class_rate("043794", 2023, dispersion::sd1::Class::One),
+    },
+    Figure {
+        key: "dispersion/cleveland-heights-class1-rate-ty2024",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Cleveland Heights-University Heights effective Class I rate, TY2024, in mills",
+        pinned: 51.0509,
+        tolerance: 0.0005,
+        compute: |_| sd1_class_rate("043794", 2024, dispersion::sd1::Class::One),
+    },
+    Figure {
+        key: "dispersion/cleveland-heights-class2-rate-ty2023",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Cleveland Heights-University Heights effective Class II rate, TY2023, in mills",
+        pinned: 90.78,
+        tolerance: 0.0005,
+        compute: |_| sd1_class_rate("043794", 2023, dispersion::sd1::Class::Two),
+    },
+    Figure {
+        key: "dispersion/cleveland-heights-class2-rate-ty2024",
+        owner: "crates/dispersion",
+        unit: Unit::Ratio,
+        label: "Cleveland Heights-University Heights effective Class II rate, TY2024, in mills",
+        pinned: 84.6313,
+        tolerance: 0.0005,
+        compute: |_| sd1_class_rate("043794", 2024, dispersion::sd1::Class::Two),
     },
     Figure {
         key: "dispersion/toledo-classroom-share-percentile",

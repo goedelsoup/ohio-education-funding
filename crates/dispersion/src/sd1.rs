@@ -3,8 +3,8 @@
 //! # Why this is the second half of every millage claim
 //!
 //! `millage` is written from the statute: R.C. 319.301 says reduction factors hold a levy's
-//! dollar yield roughly constant as valuation rises, and R.C. 319.301(D) says they may not carry
-//! a rate below twenty mills. Nothing in that crate proves the arithmetic describes Ohio. This
+//! dollar yield roughly constant as valuation rises, and R.C. 319.301(E) says they may not carry
+//! a district's current-expense rate below twenty mills. Nothing in that crate proves the arithmetic describes Ohio. This
 //! table does: it carries, per district per tax year, every quantity `millage` takes and every
 //! quantity it returns, so each claim becomes a statement that survives four tax years of
 //! published data or does not.
@@ -18,8 +18,17 @@
 //! exactly where a levy has just passed, which is where a comparison is most likely to be drawn.
 //!
 //! **Class I is residential and agricultural; Class II is everything else.** They carry separate
-//! values, separate charges and separate effective rates, and the twenty-mill floor is a Class I
-//! rule. A figure that mixes them is not a rate on anything.
+//! values, separate charges and separate effective rates. R.C. 319.301(C) computes a separate
+//! reduction factor for each, and the twenty-mill floor of (E)(2) applies "for either class", so a
+//! district can sit on the floor in one class and well above it in the other. A figure that mixes
+//! them is not a rate on anything.
+//!
+//! # The utility column is the rate before reduction
+//!
+//! Reduction factors reach real property only. Public utility tangible property is not real
+//! property and is charged at the full voted rate, so [`TaxRow::public_utility_millage`] is each
+//! district's gross current-expense millage and [`reduction`] is the share of it a class's
+//! reduction factors have taken away.
 //!
 //! # The JVSD column is a superset, and a membership list
 //!
@@ -348,6 +357,134 @@ pub fn rates(tax_year: u16) -> Option<Rates> {
         at_the_floor: within(AT_THE_FLOOR),
         near_the_floor: within(NEAR_THE_FLOOR),
     })
+}
+
+/// One of the two classes of real property R.C. 5713.041 sorts each parcel into.
+///
+/// The classification exists, in the section's own words, "solely for the purpose of making the
+/// reductions in taxes required by section 319.301".
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Class {
+    /// Residential and agricultural.
+    One,
+    /// Everything else: commercial, industrial, mineral and railroad.
+    Two,
+}
+
+impl Class {
+    /// The class's effective current-expense rate on one row, in mills.
+    #[must_use]
+    pub fn rate(self, row: &TaxRow) -> Option<f64> {
+        match self {
+            Self::One => row.class1_rate,
+            Self::Two => row.class2_rate,
+        }
+    }
+
+    /// The class's taxable value on one row, in dollars.
+    #[must_use]
+    pub fn value(self, row: &TaxRow) -> Option<f64> {
+        match self {
+            Self::One => row.class1_value,
+            Self::Two => row.class2_value,
+        }
+    }
+
+    /// The class's current-expense taxes charged on one row, in dollars.
+    #[must_use]
+    pub fn taxes_charged(self, row: &TaxRow) -> Option<f64> {
+        match self {
+            Self::One => row.class1_taxes_charged,
+            Self::Two => row.class2_taxes_charged,
+        }
+    }
+}
+
+/// A district's gross current-expense millage: the rate before any reduction factor.
+///
+/// Read off the public utility column, because R.C. 319.301 reduces taxes on real property only
+/// and utility property is charged the voted rate in full. That this column is the voted rate is
+/// a measured fact rather than an assumption: it matches the current operating millage of the
+/// FY2024 district profile in every district both publish (see
+/// `tests/the_rate_the_utilities_pay_is_the_voted_rate.rs`).
+///
+/// `None` where the abstract publishes no utility rate or a zero one.
+#[must_use]
+pub fn gross_millage(row: &TaxRow) -> Option<f64> {
+    row.public_utility_millage.filter(|mills| *mills > 0.0)
+}
+
+/// The share of a district's gross current-expense millage one class's reduction factors have
+/// taken away: one minus the effective class rate over the gross rate.
+///
+/// This is an aggregate across levies. Fixed-sum levies are not reduced at all and fixed-rate
+/// levies are each reduced by their own factor, so a district's figure mixes the two in
+/// proportion to its levies, and the abstract does not publish them one by one.
+#[must_use]
+pub fn reduction(row: &TaxRow, class: Class) -> Option<f64> {
+    let gross = gross_millage(row)?;
+    Some(1.0 - class.rate(row)? / gross)
+}
+
+/// How one tax year's reductions divide between the two classes.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct ClassReductions {
+    /// The tax year.
+    pub tax_year: u16,
+    /// Districts publishing a gross rate and both class rates that year.
+    pub districts: usize,
+    /// The median Class I [`reduction`], by [`edfund_core::stats::median_upper_middle`].
+    pub class1_median: f64,
+    /// The median Class II [`reduction`].
+    pub class2_median: f64,
+    /// Districts whose Class I rate reads exactly twenty to the hundredth.
+    pub class1_at_the_floor: usize,
+    /// Districts whose Class II rate reads exactly twenty to the hundredth.
+    pub class2_at_the_floor: usize,
+    /// Districts at the floor in both classes.
+    pub both_at_the_floor: usize,
+    /// Districts whose effective Class II rate is above their Class I rate by more than the
+    /// rounding grain.
+    pub class2_above_class1: usize,
+}
+
+/// The class split of one tax year's reductions, or `None` for a year the abstract does not
+/// carry.
+#[must_use]
+pub fn class_reductions(tax_year: u16) -> Option<ClassReductions> {
+    let mut out = ClassReductions {
+        tax_year,
+        districts: 0,
+        class1_median: 0.0,
+        class2_median: 0.0,
+        class1_at_the_floor: 0,
+        class2_at_the_floor: 0,
+        both_at_the_floor: 0,
+        class2_above_class1: 0,
+    };
+    let (mut one, mut two) = (Vec::new(), Vec::new());
+    for row in cached().iter().filter(|row| row.tax_year == tax_year) {
+        let (Some(r1), Some(r2), Some(c1), Some(c2)) = (
+            reduction(row, Class::One),
+            reduction(row, Class::Two),
+            row.class1_rate,
+            row.class2_rate,
+        ) else {
+            continue;
+        };
+        out.districts += 1;
+        one.push(r1);
+        two.push(r2);
+        let floor1 = (c1 - FLOOR_MILLS).abs() < AT_THE_FLOOR;
+        let floor2 = (c2 - FLOOR_MILLS).abs() < AT_THE_FLOOR;
+        out.class1_at_the_floor += usize::from(floor1);
+        out.class2_at_the_floor += usize::from(floor2);
+        out.both_at_the_floor += usize::from(floor1 && floor2);
+        out.class2_above_class1 += usize::from(c2 > c1 + AT_THE_FLOOR);
+    }
+    out.class1_median = edfund_core::stats::median_upper_middle(one)?;
+    out.class2_median = edfund_core::stats::median_upper_middle(two)?;
+    Some(out)
 }
 
 #[cfg(test)]
