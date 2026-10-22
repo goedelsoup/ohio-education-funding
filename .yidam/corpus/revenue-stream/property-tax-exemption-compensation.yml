@@ -159,7 +159,8 @@ properties:
     Fixed by the instrument that grants the exemption and ends with it, after ten years unless a
     board approved longer, and never past thirty. A service payment equal to the forgone tax moves
     with the improvement's value and the district's millage; an R.C. 5709.82(D) payment moves with
-    the new employees' municipal income tax. Most exemptions carry no payment to the school at all.
+    the new employees' municipal income tax. An exemption below the approval lines need carry no
+    payment to the school at all.
   series_path: |
     None. No source held reports exempt value, service payments or compensation by district. Table
     SD-1 (crates/dispersion/fixtures/sd1-district-taxes.csv) carries taxable value only,
