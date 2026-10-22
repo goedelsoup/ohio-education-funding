@@ -171,6 +171,12 @@ fn sample() -> District {
             gross_income_term_per_pupil: 1_861.89,
             median_income_term_per_pupil: 1_212.09,
             per_pupil: 7_223.32,
+            prior: Some(CapacityMeasures {
+                valuation_per_pupil: 280_114.07,
+                gross_income_per_pupil: 371_906.12,
+                median_income_per_pupil: 241_330.58,
+                base_cost_enrolled_adm: 2_131.44,
+            }),
         }),
         career_technical: CareerTechnical {
             fte: [40.5, 22.25, 8.0, 4.5, 1.25],
@@ -1151,6 +1157,27 @@ fn a_district_the_designated_list_does_not_carry_says_null_rather_than_no_buildi
     }
     .to_json();
     assert!(json.contains("\"designated\": null"));
+}
+
+#[test]
+fn the_prior_capacity_measures_nest_inside_capacity_and_say_null_when_absent() {
+    // The year before's three measures and the count they are over, keyed without a year: the
+    // year is `formula.prior` in `series_years`.
+    let json = bundle(vec![sample()], vec![]).to_json();
+    assert!(json.contains("\"prior\": {"), "{json}");
+    assert!(
+        json.contains("\"gross_income_per_pupil\": 371906.12"),
+        "{json}"
+    );
+    assert!(
+        json.contains("\"base_cost_enrolled_adm\": 2131.44"),
+        "{json}"
+    );
+
+    let mut district = sample();
+    district.capacity.as_mut().unwrap().prior = None;
+    let json = bundle(vec![district], vec![]).to_json();
+    assert!(json.contains("\"prior\": null"), "{json}");
 }
 
 #[test]

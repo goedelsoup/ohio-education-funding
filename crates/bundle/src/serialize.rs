@@ -1131,6 +1131,19 @@ impl Bundle {
                             c.median_income_term_per_pupil,
                         );
                         e.num("per_pupil", c.per_pupil);
+                        // The FY2026 model's three measures, unrated. Its year is the
+                        // `formula.prior` series rather than a key, for the reason `biennium`
+                        // names its years `baseline`/`middle`/`terminal`.
+                        match &c.prior {
+                            None => e.raw("prior", "null"),
+                            Some(p) => {
+                                let mut prior = e.obj("prior");
+                                prior.num("valuation_per_pupil", p.valuation_per_pupil);
+                                prior.num("gross_income_per_pupil", p.gross_income_per_pupil);
+                                prior.num("median_income_per_pupil", p.median_income_per_pupil);
+                                prior.num("base_cost_enrolled_adm", p.base_cost_enrolled_adm);
+                            }
+                        }
                     }
                 }
                 fields(
