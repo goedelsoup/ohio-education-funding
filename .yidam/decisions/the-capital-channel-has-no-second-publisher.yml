@@ -54,6 +54,13 @@ decision: |
   trap recorded elsewhere in this repository as a lesson: a Wayback 200 on a portal proves the
   crawler stored a shell, not that it captured anything.
 
+  > **QUALIFIED by [#790](https://github.com/goedelsoup/ohio-education-funding/issues/790).** This
+  > survey read the portal's own host. The Commission's documents are served from a second one,
+  > `dam.assets.ohio.gov`, and the archive holds some of them as PDFs: the K-12 equity lists for
+  > FY2024 and FY2025, and the program status editions. None states what a project cost, so the
+  > conclusion stands for allocating the channel. They do hold the rank a district's share is
+  > read from. See [`ofcc-equity-lists-connector`](ofcc-equity-lists-connector.yml).
+
 consequences: |
   `ofcc-projects` stays `Declared` and stays `needs-access`, with a `blocked_on` that now says what
   was tried rather than only what stands in the way.

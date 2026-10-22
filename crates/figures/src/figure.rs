@@ -14966,6 +14966,80 @@ pub static FIGURES: &[Figure] = &[
                 * project::capital::energy_notes_unvoted_ceiling().unwrap_or(f64::NAN)
         },
     },
+    // The Classroom Facilities Assistance Program's share rule (#790): R.C. 3318.01(K) read
+    // against the Commission's FY2025 equity list, which governs FY2026 approvals.
+    Figure {
+        key: "dispersion/cfap-districts-at-the-cap-fy2025",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts on the FY2025 equity list whose required percentage is the capped \
+                ninety-five",
+        pinned: 37.0,
+        tolerance: 0.0,
+        compute: |_| dispersion::equity_rank::at_cap(2025) as f64,
+    },
+    Figure {
+        key: "dispersion/cfap-districts-the-cap-lowers-fy2025",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "Districts on the FY2025 equity list whose percentile is above ninety-five, so \
+                that the cap lowers their share",
+        pinned: 31.0,
+        tolerance: 0.0,
+        compute: |_| dispersion::equity_rank::lowered_by_cap(2025) as f64,
+    },
+    Figure {
+        key: "dispersion/cfap-share-at-rank-307",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "The required percentage at rank 307 of 609, the rank the Commission\u{2019}s \
+                status edition calls a fifty-fifty split",
+        pinned: 0.51,
+        tolerance: 0.000_5,
+        compute: |_| {
+            let (rank, _) = dispersion::equity_rank::worked_example();
+            let n = dispersion::equity_rank::status_total();
+            f64::from(dispersion::equity_rank::required_percent(rank, n)) / 100.0
+        },
+    },
+    Figure {
+        key: "dispersion/cfap-new-philadelphia-share-fy2025",
+        owner: "crates/dispersion",
+        unit: Unit::Share,
+        label: "New Philadelphia City\u{2019}s required percentage on the FY2025 equity list, \
+                rank 271",
+        pinned: 0.45,
+        tolerance: 0.000_5,
+        compute: |_| {
+            let list = dispersion::equity_rank::districts(2025);
+            dispersion::equity_rank::rank_of(2025, "New Philadelphia City SD", "Tuscarawas")
+                .map_or(f64::NAN, |rank| {
+                    f64::from(dispersion::equity_rank::required_percent(rank, list)) / 100.0
+                })
+        },
+    },
+    Figure {
+        key: "dispersion/cfap-new-philadelphia-rank-fy2026",
+        owner: "crates/dispersion",
+        unit: Unit::Count,
+        label: "New Philadelphia City\u{2019}s FY2026 rank, as the status edition prints it \
+                beside its program status",
+        pinned: 269.0,
+        tolerance: 0.0,
+        compute: |_| {
+            dispersion::equity_rank::fy2026_rank("New Philadelphia City SD", "Tuscarawas")
+                .map_or(f64::NAN, f64::from)
+        },
+    },
+    Figure {
+        key: "dispersion/fcc-project-support-fy2026",
+        owner: "crates/dispersion",
+        unit: Unit::Dollars,
+        label: "H.B. 96\u{2019}s one-time appropriation to ALI 230647, Project Support, FY2026",
+        pinned: 20_000_000.0,
+        tolerance: 0.5,
+        compute: |_| dispersion::equity_rank::project_support_fy2026() as f64,
+    },
 ];
 
 /// The median district's published taxable value per pupil, Table SD-1.
