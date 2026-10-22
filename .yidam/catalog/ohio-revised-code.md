@@ -11,6 +11,7 @@ used-by:
   - ../corpus/parameter/preschool-special-education-amounts.yml
   - ../corpus/parameter/special-education-category-multiples.yml
   - ../corpus/parameter/targeted-assistance-rates.yml
+  - ../corpus/parameter/tax-reduction-factor.yml
   - ../corpus/parameter/transportation-cost-rates.yml
   - ../corpus/parameter/twenty-mill-floor.yml
   - ../corpus/program/autism-scholarship.yml
