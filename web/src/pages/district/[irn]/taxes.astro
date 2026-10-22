@@ -23,6 +23,7 @@ import {
   renderTaxChange,
 } from "../../../lib/tax.ts";
 import SectionAnchor from "../../../components/SectionAnchor.astro";
+import LocalCapacity from "../../../components/district/LocalCapacity.astro";
 
 export const getStaticPaths = districtPaths;
 
@@ -131,6 +132,9 @@ const description = latest
             valuations per pupil needs the reason before the second one, not after. */}
         <Fragment set:html={renderDenominators(district)} />
         <Fragment set:html={renderChargeOff(district, bundle.statewide, tax)} />
+        {/* Directly under the charge-off card, which prints the plan's local capacity as one
+            figure: this is that figure in its three terms, checked to add up to it (#791). */}
+        <LocalCapacity district={district} statewide={bundle.statewide} />
 
         <div class="card" id="not" data-part="not">
           <h2><SectionAnchor id="not" />Where these figures come from, and what they are not</h2>

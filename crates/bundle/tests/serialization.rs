@@ -158,6 +158,20 @@ fn sample() -> District {
             resident_adm: 2_108.5,
             supplement_eligible: true,
         },
+        // A rate that four places would visibly round: the serializer writes it to eight.
+        capacity: Some(LocalCapacity {
+            valuation_per_pupil: 292_865.33,
+            gross_income_per_pupil: 394_242.49,
+            median_income_per_pupil: 256_651.72,
+            median_income: 65_820.0,
+            tax_returns: 9_810.0,
+            income_ratio: 1.214_793_11,
+            capacity_rate: 0.023_613_21,
+            valuation_term_per_pupil: 4_149.34,
+            gross_income_term_per_pupil: 1_861.89,
+            median_income_term_per_pupil: 1_212.09,
+            per_pupil: 7_223.32,
+        }),
         career_technical: CareerTechnical {
             fte: [40.5, 22.25, 8.0, 4.5, 1.25],
             aid: [180_000.0, 78_000.0, 10_000.0, 4_800.0, 1_100.0],
@@ -366,6 +380,8 @@ fn zero_statewide() -> Statewide {
         // zero would not show whether it still does.
         targeted_assistance_median_weighted_wealth: 392_151_306.632_980_76,
         targeted_assistance_median_wealth_per_pupil: 276_708.97,
+        capacity_statewide_median_income: 54_546.637_5,
+        capacity_benchmark_ratio: 1.465_036_36,
         preschool_appropriation: 147_500_000.0,
         preschool_proration: 0.968_544_48,
         preschool_total: 148_408_183.76,

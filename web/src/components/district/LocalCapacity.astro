@@ -1,0 +1,117 @@
+---
+/**
+ * Local capacity, term by term (#791).
+ *
+ * The charge-off card above prints the plan's local capacity as one figure, the department's own
+ * `[b1]`, and describes it in a sentence: valuation blended with two income measures, scaled by a
+ * rate that rises with income. This card is that sentence with its numbers in. Three measures per
+ * base-cost pupil, each weighted and then multiplied by the district's capacity rate, adding to
+ * the figure the charge-off card states.
+ *
+ * Every number is read from the feed. The weights are recovered from it too (`capacity.ts` says
+ * how), so a change to R.C. 3317.017 reaches this table through the crate and nowhere else. And
+ * `decomposeCapacity` throws unless the terms close on the published figure: a decomposition that
+ * did not add up to the number two cards above would be a second answer to one question.
+ */
+import { decomposeCapacity } from "../../lib/capacity.ts";
+import { count, fixed, money, pct } from "../../lib/format.ts";
+import type { District, Statewide } from "../../lib/types.ts";
+import { yearChip } from "../../lib/year.ts";
+import SectionAnchor from "../SectionAnchor.astro";
+
+interface Props {
+  district: District;
+  statewide: Statewide;
+}
+
+const { district: d, statewide } = Astro.props;
+const k = decomposeCapacity(d);
+const c = d.capacity;
+
+const benchmark = statewide.capacity_benchmark_ratio;
+const median = statewide.capacity_statewide_median_income;
+
+// Where on the rate's scale this district sits, read off the ratio rather than stated.
+const rateNote = !k
+  ? ""
+  : k.incomeRatio >= benchmark
+    ? `Its income ratio is at or above the benchmark of ${fixed(benchmark, 4)}, so the rate is the
+       statute's ceiling.`
+    : k.incomeRatio > 1
+      ? `Its income ratio is between the state median and the benchmark of ${fixed(benchmark, 4)},
+         so the rate is interpolated between the rate at each.`
+      : `Its median income is at or below the state median, so the rate is the median rate scaled
+         down by the ratio.`;
+
+// The terms are printed to the cent and summed before rounding, so three roundings can leave the
+// printed parts a cent from the printed total. Said only where it happens.
+const cents = (v: number) => Math.round(v * 100);
+const printedGap = !k
+  ? 0
+  : cents(k.valuation.term) + cents(k.grossIncome.term) + cents(k.medianIncome.term) - cents(k.total);
+
+// The measure that carries most of this district's capacity. Valuation for most, but not all.
+const largest = !k
+  ? ""
+  : (
+      [
+        { name: "valuation", share: k.valuation.share },
+        { name: "gross income", share: k.grossIncome.share },
+        { name: "median income", share: k.medianIncome.share },
+      ] as const
+    ).reduce((a, b) => (b.share > a.share ? b : a)).name;
+---
+
+{
+  k && c && (
+    <div class="card" id="capacity" data-part="capacity">
+      <h2><SectionAnchor id="capacity" />What local capacity is made of<Fragment set:html={yearChip("formula")} /></h2>
+      <p class="note">
+        The plan's local capacity, {money(k.total, 2)} per pupil here, is three measures of what
+        the district could raise, each divided by its {fixed(d.adm, 2)} base cost pupils, weighted,
+        and multiplied by one rate. The parts below add to the department's published figure.
+      </p>
+      <div class="scroll"><table data-program="capacity">
+        <thead><tr><th>Term</th><th class="tnum">Measure</th><th class="tnum">At the rate</th><th class="tnum">Share of capacity</th></tr></thead>
+        <tbody>
+          <tr><th>Valuation per pupil, weighted {pct(k.valuation.weight, 0)}</th>
+            <td class="tnum">{money(k.valuation.base)}</td>
+            <td class="tnum">{money(k.valuation.term, 2)}</td>
+            <td class="tnum">{pct(k.valuation.share, 1)}</td></tr>
+          <tr><th>Federal adjusted gross income per pupil, weighted {pct(k.grossIncome.weight, 0)}</th>
+            <td class="tnum">{money(k.grossIncome.base)}</td>
+            <td class="tnum">{money(k.grossIncome.term, 2)}</td>
+            <td class="tnum">{pct(k.grossIncome.share, 1)}</td></tr>
+          <tr><th>Median income times returns per pupil, weighted {pct(k.medianIncome.weight, 0)}</th>
+            <td class="tnum">{money(k.medianIncome.base)}</td>
+            <td class="tnum">{money(k.medianIncome.term, 2)}</td>
+            <td class="tnum">{pct(k.medianIncome.share, 1)}</td></tr>
+          <tr><th>Income ratio, the district's median over the state's</th>
+            <td class="tnum">{fixed(k.incomeRatio, 4)}</td>
+            <td class="tnum"></td>
+            <td class="tnum"></td></tr>
+          <tr><th>Capacity rate</th>
+            <td class="tnum">{pct(k.rate, 3)}</td>
+            <td class="tnum"></td>
+            <td class="tnum"></td></tr>
+          <tr class="current"><th>Local capacity per pupil</th>
+            <td class="tnum"></td>
+            <td class="tnum">{money(k.total, 2)}</td>
+            <td class="tnum">{pct(1, 0)}</td></tr>
+        </tbody>
+      </table></div>
+      <p class="note">
+        Valuation and gross income are each the lesser of the latest year and the three-year
+        average. The median income term is the district's median federal income,{" "}
+        {money(c.median_income)}, times its {count(c.tax_returns)} returns. The income ratio
+        sets the rate: {money(c.median_income)} over the statewide median of {money(median)}.{" "}
+        {rateNote} Here {largest} is the largest of the three terms.{
+          printedGap !== 0 && (
+            <> Each term is rounded to the cent on its own, so as printed the three miss the total
+               by {money(Math.abs(printedGap) / 100, 2)}.</>
+          )
+        }
+      </p>
+    </div>
+  )
+}

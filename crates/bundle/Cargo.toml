@@ -13,6 +13,7 @@ deflator = { path = "../deflator" }
 edfund-core = { path = "../edfund-core" }
 dispersion = { path = "../dispersion" }
 foundation = { path = "../foundation" }
+local-capacity = { path = "../local-capacity" }
 millage = { path = "../millage" }
 regime-diff = { path = "../regime-diff" }
 scenario-delta = { path = "../scenario-delta" }

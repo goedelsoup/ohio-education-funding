@@ -144,7 +144,7 @@ test("the renderers #503 migrated format no number by hand", () => {
   const DISTRICT = readdirSync(join(SRC, "components/district"))
     .filter((name) => name.endsWith(".astro"))
     .map((name) => `components/district/${name}`);
-  expect(DISTRICT).toHaveLength(22);
+  expect(DISTRICT).toHaveLength(23);
   const MIGRATED = [
     "lib/compare.ts",
     ...DISTRICT,

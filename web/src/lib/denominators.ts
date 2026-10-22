@@ -335,6 +335,18 @@ export const FIELD_DENOMINATORS: Record<string, DenominatorKey | null> = {
   "districts[].targeted_assistance.resident_adm": null,
   "districts[].categorical_adm": null,
 
+  // R.C. 3317.017's capacity, term by term. Every quantity is over the funded count, the same
+  // `base_cost_enrolled_adm` the crate divides by, which is why the total can be set against
+  // `base_cost_per_pupil` at all. `median_income` and `tax_returns` are a dollar figure and a
+  // count of returns, not pupils, and match no pattern.
+  "districts[].capacity.valuation_per_pupil": "base-cost-adm",
+  "districts[].capacity.gross_income_per_pupil": "base-cost-adm",
+  "districts[].capacity.median_income_per_pupil": "base-cost-adm",
+  "districts[].capacity.valuation_term_per_pupil": "base-cost-adm",
+  "districts[].capacity.gross_income_term_per_pupil": "base-cost-adm",
+  "districts[].capacity.median_income_term_per_pupil": "base-cost-adm",
+  "districts[].capacity.per_pupil": "base-cost-adm",
+
   // DPIA's counts. `percentage` is the blended count over enrolled ADM and `index` is that over
   // the statewide share and squared — both dimensionless, because the denominator cancels.
   "districts[].dpia.economically_disadvantaged_adm": null,
@@ -508,6 +520,14 @@ export const PAGE_FIGURES: Record<string, string[]> = {
     "districts[].valuation_per_pupil",
     // "Against what the district spends" — the ratio this whole declaration was written for.
     "districts[].spending_by_function.operating_per_pupil",
+    // The capacity decomposition: three bases and three rated terms, all on the funded count.
+    "districts[].capacity.valuation_per_pupil",
+    "districts[].capacity.gross_income_per_pupil",
+    "districts[].capacity.median_income_per_pupil",
+    "districts[].capacity.valuation_term_per_pupil",
+    "districts[].capacity.gross_income_term_per_pupil",
+    "districts[].capacity.median_income_term_per_pupil",
+    "districts[].capacity.per_pupil",
     // The seam sentence, and the funded count the charge-off is computed against.
     "districts[].adm",
   ],

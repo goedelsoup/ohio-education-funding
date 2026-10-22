@@ -45,11 +45,11 @@ use crate::{
     Bundle, CareerTechnical, CasinoYear, Categoricals, Checkpoint, Deflator, District,
     DistrictOutcome, Dpia, Draft, DraftProvision, EnglishLearners, FinanceYear, ForecastCheckpoint,
     FundingUnit, FundingUnitProgramme, FundingUnits, Gifted, HistoryYear, HouseDistrictMember,
-    HouseDistrictShare, MealProgramYear, MillageAnalysis, National, NonpublicFederal,
-    NonpublicSupport, NonpublicSupportLine, OutcomeStatewide, PolicyShape, Projection,
-    ProjectionBias, PropertyTaxYear, RegimeCounterfactual, SeriesYear, SpecialEducation,
-    SpendingByFunction, StateFinance, Statewide, TargetedAssistance, Typology, YearKind,
-    CONTRACT_VERSION,
+    HouseDistrictShare, LocalCapacity, MealProgramYear, MillageAnalysis, National,
+    NonpublicFederal, NonpublicSupport, NonpublicSupportLine, OutcomeStatewide, PolicyShape,
+    Projection, ProjectionBias, PropertyTaxYear, RegimeCounterfactual, SeriesYear,
+    SpecialEducation, SpendingByFunction, StateFinance, Statewide, TargetedAssistance, Typology,
+    YearKind, CONTRACT_VERSION,
 };
 use dispersion::census_states::StateFinance as CensusState;
 use dispersion::mr81::poverty_share_by_year;
@@ -868,6 +868,7 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
                 .resident_adm(record.categorical_enrolled_adm),
             supplement_eligible: record.targeted_assistance.supplement_eligible,
         },
+        capacity: capacity_of(record),
         career_technical: CareerTechnical {
             fte: record.career_technical.fte,
             aid: record.career_technical.aid,
@@ -1978,6 +1979,50 @@ fn millage_analysis(
 /// pupil. `recognized_share` carries the per-district ratio and `overstated_by` carries what the
 /// old base was adding, because the page should be able to show the correction rather than only
 /// its result.
+/// R.C. 3317.017's local capacity for one district, with each term of the blend on its own.
+///
+/// The inputs are the calculator's, read rather than reconstructed, exactly as
+/// `xcheck/tests/against_the_departments_own_capacity.rs` builds them — and that test is what
+/// says this reproduces the department's `[b1] Per Pupil Capacity Amount` for all 609 districts,
+/// worst residual 6.364e-6. `None` where the calculator lacks an income input or the statute's
+/// own preconditions fail, which happens for none of the 609.
+///
+/// Each weighted term is multiplied by the rate here, once, so that the feed's three terms sum
+/// to its total and the page never multiplies by a weight of its own.
+fn capacity_of(record: &DistrictRecord) -> Option<LocalCapacity> {
+    let inputs = local_capacity::CapacityInputs {
+        valuation_recent: record.valuation_three_year[0],
+        valuation_three_year: record.valuation_three_year,
+        agi_recent: record.agi_three_year[0],
+        agi_three_year: record.agi_three_year,
+        federal_median_income: record.median_income?,
+        tax_returns: record.tax_returns?,
+        statewide_median_income: record.statewide_median_income?,
+        benchmark_ratio: record.benchmark_ratio?,
+        base_cost_enrolled_adm: record.base_cost_adm(),
+    };
+    let r = local_capacity::local_capacity(&inputs).ok()?;
+    Some(LocalCapacity {
+        valuation_per_pupil: r.valuation_per_pupil,
+        gross_income_per_pupil: r.gross_income_per_pupil,
+        median_income_per_pupil: r.median_income_per_pupil,
+        median_income: inputs.federal_median_income,
+        tax_returns: inputs.tax_returns,
+        income_ratio: r.income_ratio,
+        capacity_rate: r.capacity_rate,
+        valuation_term_per_pupil: r.valuation_per_pupil
+            * local_capacity::VALUATION_WEIGHT
+            * r.capacity_rate,
+        gross_income_term_per_pupil: r.gross_income_per_pupil
+            * local_capacity::GROSS_INCOME_WEIGHT
+            * r.capacity_rate,
+        median_income_term_per_pupil: r.median_income_per_pupil
+            * local_capacity::MEDIAN_INCOME_WEIGHT
+            * r.capacity_rate,
+        per_pupil: r.per_pupil,
+    })
+}
+
 fn regime_counterfactual(
     record: &DistrictRecord,
     taxes: Option<&Vec<PropertyTaxYear>>,
@@ -2275,6 +2320,17 @@ pub fn build() -> Bundle {
         // the constant moves. See `Statewide::targeted_assistance_median_weighted_wealth`.
         targeted_assistance_median_weighted_wealth: TA_MEDIAN_WEIGHTED_WEALTH,
         targeted_assistance_median_wealth_per_pupil: TA_MEDIAN_WEALTH_PER_PUPIL,
+        // The two statewide inputs R.C. 3317.017 indexes every district against. One value per
+        // workbook, repeated on every row of the calculator; the first row that carries them
+        // speaks for all, and the decomposition card on the district page prints both.
+        capacity_statewide_median_income: records
+            .iter()
+            .find_map(|r| r.statewide_median_income)
+            .unwrap_or(0.0),
+        capacity_benchmark_ratio: records
+            .iter()
+            .find_map(|r| r.benchmark_ratio)
+            .unwrap_or(0.0),
         preschool_appropriation: PREK_SPED_APPROPRIATION,
         preschool_proration: PREK_SPED_PRORATION,
         preschool_total: districts
