@@ -1,0 +1,136 @@
+class: revenue-stream
+label: Current Expense Levy
+summary: >-
+  The voted school operating levy, a rate in mills above the ten-mill limitation for the current
+  expenses of the district. Reduction factors hold it to its first dollars, and since 2026 it can
+  be renewed only at its effective rate or less.
+description: |
+  A tax "in excess of" the ten-mill limitation that a board of education proposes by a two-thirds
+  vote and the district's electors approve, for "one of the purposes specified in division (A),
+  (D), (F), (H), or (DD) of section 5705.19". Division (A) of R.C. 5705.19 is current expenses.
+  The grant is R.C. 5705.21, not 5705.19: the general levy section's first sentence reads "This
+  section does not apply to school districts". [verified]
+  (`crates/project/tests/how_a_school_levy_is_voted_and_renewed.rs`)
+
+  A current expense levy is voted as a rate and may run "for a continuing period of time",
+  where a levy for any purpose other than current expenses or general permanent improvements is
+  limited to five years. [verified] It is the levy the
+  [reduction factor](../parameter/tax-reduction-factor.yml) reaches every year and the
+  [twenty-mill floor](../parameter/twenty-mill-floor.yml) holds up, so it is the part of the
+  [local property tax](local-property-tax.yml) whose yield stops following value once voted.
+  [verified] (`crates/project/tests/what_a_reduction_factor_reaches.rs`)
+
+  ### How it ends: renewal, replacement, and H.B. 96
+
+  A levy for a stated term ends unless voters extend it, and there were three ways to extend
+  one. A renewal carries the levy on at its effective rate, after reduction; a replacement
+  carried it on at its original voted rate, recapturing the value growth reduction had
+  removed; and a renewal with an increase added millage on top of the effective rate.
+  [verified] (H.B. 96 final analysis, `crates/project/tests/how_a_school_levy_is_voted_and_renewed.rs`)
+
+  [H.B. 96](../legislation/hb-96-2025.yml) ended the last two for elections held on or after
+  January 1, 2026, with the General Assembly overriding the Governor's veto. It repealed R.C.
+  5705.192, the replacement levy, and struck "increase or" from R.C. 5705.21's renewal
+  sentences. [verified] What survives is a renewal "at its current effective rate or at a
+  lesser rate". A district that wants more operating money from the same property now asks for
+  a new levy, and a new current expense levy is barred while the district's general fund
+  carry-over exceeds its prior year's general fund expenditures. [verified] (H.B. 96 final
+  analysis, `crates/project/fixtures/enacted-levy-limits.txt`) No vendored section carries the
+  carry-over bar, and the analysis's heading names none. [open]
+findings: |
+  ### Dating the strike from the dated versions
+
+  R.C. 5705.21 as it read on April 9, 2025, enacted by H.B. 496 of the 135th General Assembly,
+  held **2** renewal sentences that allowed an increase: one for a levy imposed under division
+  (A) or (B), "to increase or decrease a single levy imposed under either such division", and one
+  for permanent improvement levies. The version effective January 1, 2026, enacted by H.B. 96,
+  holds none. [verified]
+  (`crates/project/src/levy.rs`, `crates/project/tests/how_a_school_levy_is_voted_and_renewed.rs`)
+  The partnering community school levy of division (B) lost the same power by a third edit: its
+  "total rate may be increased, decreased, or remain the same" became "may be decreased or remain
+  the same". [verified]
+
+  The effective date dates the text and not the rule. The final analysis says the limits "apply
+  to elections held on or after January 1, 2026", which is the date that decides whether a
+  ballot question was lawful. [verified] (`crates/project/fixtures/enacted-levy-limits.txt`)
+
+  ### R.C. 5705.25 kept its words
+
+  The election section still provides that "a resolution to renew or to renew and increase or
+  renew and decrease an existing levy, regardless of the section of the Revised Code under which
+  the tax was imposed", reaches the ballot only on certain dates, and it keeps the ballot form "A
+  renewal of ________ mills and an increase of ______ mills". H.B. 96 changed it only to say
+  "market value" and to bar renewing and increasing an R.C. 5705.2111 levy. [verified]
+  (`crates/project/tests/how_a_school_levy_is_voted_and_renewed.rs`) R.C. 5705.25 times and
+  words a question some other section authorizes and grants no levy, so its surviving words do
+  not revive a power R.C. 5705.21 no longer gives. [inference] The analysis lists 5705.25 among
+  the sections of the prohibition, and the residual words still apply to subdivisions other than
+  school districts. [verified] Whether R.C. 5705.212, 5705.217 and 5705.2114, the other school
+  sections the analysis lists, read the same way is not checked: none is vendored. [open]
+
+  ### The replacement levy left R.C. 319.301 too
+
+  R.C. 319.301 as it reads now does not contain the word "replacement", and the analysis lists
+  it among the sections the repeal touched. [verified]
+  (`crates/project/tests/how_a_school_levy_is_voted_and_renewed.rs`) R.C. 5705.192 itself could
+  not be vendored: codes.ohio.gov redirects every version of a repealed section to a
+  number-not-found page, so the repealed text is known only through the analysis.
+revisions: []
+unfilled:
+  - field: the repealed text of R.C. 5705.192
+    why: |
+      codes.ohio.gov serves no version of a repealed section, current or dated, and redirects
+      each request to a number-not-found page. What a replacement levy was is committed only as
+      the final analysis describes it.
+  - field: current expense levies by district
+    why: |
+      Table SD-1 publishes each district's aggregate class rates and gross millage, not its
+      levies one by one, so how much of a district's operating millage is in levies for a stated
+      term, and so exposed to renewal, is not measured.
+properties:
+  name: Current expense levy
+  level: local
+  legal_basis: |
+    R.C. 5705.21(A), for the purpose of R.C. 5705.19(A); renewal at R.C. 5705.21 and the election
+    at R.C. 5705.25; the H.B. 96 limits apply to elections on or after January 1, 2026.
+  restriction: |
+    Unrestricted: paid into the general fund for the current expenses of the district. A
+    resolution is confined to a single purpose, and a current expense levy's purpose is the
+    general operating budget. [verified]
+  growth_behavior: |
+    Fixed in dollars on carryover property once voted. Reduction factors cut its effective rate as
+    values rise, so it grows only with new construction, or with value while the district sits on
+    the twenty-mill floor. Since 2026 a renewal cannot restore the rate lost, by replacement or by
+    increase. [verified]
+  series_path: |
+    No per-levy series. crates/dispersion/fixtures/sd1-district-taxes.csv carries each district's
+    gross and effective class rates, TY2021 through TY2024, which aggregate its current expense
+    levies with its fixed-sum and permanent improvement levies. [verified]
+links:
+  - target: ../revenue-stream.ont.yml
+    relationship: instance-of
+  - target: local-property-tax.yml
+    relationship: part-of
+  - target: permanent-improvement-levy.yml
+    relationship: parallels
+    note: >-
+      The same grant and the same renewal sentence's fate, for a restricted purpose.
+  - target: ../parameter/tax-reduction-factor.yml
+    relationship: reduced-by
+  - target: ../parameter/twenty-mill-floor.yml
+    relationship: held-up-by
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+    note: >-
+      R.C. 5705.19, 5705.21 in force and as it read on April 9, 2025, 5705.25 in both versions,
+      and 319.301.
+  - target: ../../catalog/lsc-hb96-analysis.md
+    relationship: sourced-from
+    note: >-
+      The final analysis's levy limits: the override, the election date, and the replacement levy
+      as it was.
+figures:
+  - key: project/rc-5705-21-renew-and-increase-sentences-before-hb96
+    value: 2
+    field: findings
+    as_written: "held **2** renewal sentences"

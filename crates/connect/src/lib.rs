@@ -1609,8 +1609,12 @@ fn rebuild_statute_and_acts(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
     // extract as a fourteen-section file and reported it as a success. A statute the corpus cites
     // that is silently absent from the extract is worse than an extract that is not there, because
     // the first looks like an answer.
+    //
+    // The current text only: a source that names a dated version declares the prior-version
+    // extract instead, and is rebuilt below.
     let statutes: Result<Vec<fixtures::Record>, String> = registry::OHIO_LAWS_SECTIONS
         .iter()
+        .filter(|source| source.fixtures.contains(&fixtures::STATUTE_FIXTURE))
         .map(|source| {
             let page = cache::read_cached(root, source).map_err(|cause| cause.to_string())?;
             let page = String::from_utf8_lossy(&page);
@@ -1639,6 +1643,37 @@ fn rebuild_statute_and_acts(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(reason) => Rebuilt::skipped(fixtures::STATUTE_FIXTURE, reason),
     });
 
+    // The superseded versions, all or none for the same reason as the current text. The section
+    // and version are read off the URL, which is the only place a dated version is named.
+    let prior: Result<Vec<fixtures::Record>, String> = registry::OHIO_LAWS_SECTIONS
+        .iter()
+        .filter(|source| source.fixtures.contains(&fixtures::PRIOR_STATUTE_FIXTURE))
+        .map(|source| {
+            let (section, version) = fixtures::version_of(source.url)
+                .ok_or_else(|| format!("{} names no version of a section", source.url))?;
+            let page = cache::read_cached(root, source).map_err(|cause| cause.to_string())?;
+            let page = String::from_utf8_lossy(&page);
+            fixtures::parse_statute_version(section, version, &page).ok_or_else(|| {
+                format!(
+                    "{section}@{version} did not parse; {} is no longer the page it was",
+                    source.url
+                )
+            })
+        })
+        .collect();
+    out.push(match prior {
+        Ok(prior) => text_fixture(
+            root,
+            fixtures::PRIOR_STATUTE_FIXTURE,
+            &fixtures::build_records(
+                "Ohio Revised Code, superseded versions of sections this corpus cites. \
+                 One record per version, cited as section@version.",
+                &prior,
+            ),
+        )?,
+        Err(reason) => Rebuilt::skipped(fixtures::PRIOR_STATUTE_FIXTURE, reason),
+    });
+
     // The enacted budget act. Skipped rather than fatal on two counts: the PDF may not be cached,
     // and `pdftotext` may not be installed — see `cache::pdf_text` for why that is a weaker
     // guarantee than the one `curl` gets. Either way the committed extract stands and the rebuild
@@ -1656,6 +1691,22 @@ fn rebuild_statute_and_acts(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
             }) {
             Ok(text) => text_fixture(root, fixtures::ENACTED_FIXTURE, &text)?,
             Err(cause) => Rebuilt::skipped(fixtures::ENACTED_FIXTURE, cause),
+        },
+    );
+    // The same analysis's levy limits, which sit in its tax chapter rather than the
+    // department's. Skipped on the same two counts.
+    out.push(
+        match cache::pdf_text(root, enacted)
+            .map_err(RebuildError::from)
+            .and_then(|text| {
+                fixtures::extract_levy_limits(&text).ok_or_else(|| {
+                    RebuildError::Io(std::io::Error::other(
+                        "the final analysis no longer contains its school district levy limits",
+                    ))
+                })
+            }) {
+            Ok(text) => text_fixture(root, fixtures::ENACTED_LEVY_FIXTURE, &text)?,
+            Err(cause) => Rebuilt::skipped(fixtures::ENACTED_LEVY_FIXTURE, cause),
         },
     );
 

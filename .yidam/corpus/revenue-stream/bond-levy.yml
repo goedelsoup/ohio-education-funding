@@ -1,0 +1,123 @@
+class: revenue-stream
+label: Bond Levy
+summary: >-
+  The tax a school district's voters approve with a bond issue, levied outside the ten-mill
+  limitation at whatever rate the debt charges need while the bonds are outstanding. Not reduced
+  by reduction factors, and bounded by R.C. 133.06's limits on net indebtedness.
+description: |
+  A school district borrows for buildings by asking voters two things at once. Under R.C. 133.18
+  the board's resolution "declares the necessity of levying a tax outside the tax limitation to
+  pay the debt charges on the bonds", and the electors approve the bonds "with the levy and
+  collection of a property tax outside the tax limitation during the period the securities are
+  outstanding". [verified]
+  (`crates/project/tests/how_a_school_levy_is_voted_and_renewed.rs`)
+
+  The voters approve a debt, not a rate. The ballot states a levy "estimated by the county
+  auditor to average over the repayment period of the bond issue" so many mills. [verified]
+  (`crates/project/tests/how_a_school_levy_is_voted_and_renewed.rs`) The
+  [reduction factor](../parameter/tax-reduction-factor.yml) does not reach it: R.C.
+  319.301(A)(1) exempts taxes levied at whatever rate produces "an amount to pay debt charges".
+  [verified] (`crates/project/tests/what_a_reduction_factor_reaches.rs`) Its yield follows the
+  debt schedule, not property values. [inference] It is the part of the
+  [local property tax](local-property-tax.yml) that ends when the bonds are paid and is never
+  renewed.
+
+  ### The limits
+
+  R.C. 133.06, as amended by H.B. 455 effective October 9, 2026, bounds the debt and so the
+  levy. Division (A) caps net indebtedness incurred without a vote at "one-tenth of one per cent"
+  of tax valuation. Division (B) caps all net indebtedness at **9%**, "except as provided in
+  divisions (E), (F), and (I)". Division (C) bars a vote on securities that would carry net
+  indebtedness above **4%** unless the director of education and workforce and the tax
+  commissioner consent. [verified]
+  (`crates/project/src/levy.rs`, `crates/project/tests/how_a_school_levy_is_voted_and_renewed.rs`)
+
+  Division (I) is the exception that matters most for buildings: a district may exceed the (B)
+  or (C) limit "when necessary to raise the school district portion of the basic project cost"
+  of a Chapter 3318 classroom facilities project. [verified] Division (E) lets a special needs
+  district exceed (B) on a showing of need, and (D) excludes school bus and other listed debt
+  from the count. [verified]
+findings: |
+  ### What the limits buy at the median district
+
+  Applied to the median district's taxable value per pupil in Table SD-1, TY2024, the nine
+  percent limit allows net indebtedness of **$22,614** per pupil, and the unvoted limit
+  **$251** per pupil. [verified]
+  (`crates/dispersion/fixtures/sd1-district-taxes.csv`, `crates/project/src/levy.rs`) The
+  unvoted figure is why a school building is a ballot question: what a board can borrow alone
+  would not furnish a classroom. [inference]
+
+  The comparison is an approximation in two ways. R.C. 133.06 measures "tax valuation", and the
+  SD-1 per-pupil value is the published taxable value over the published pupil count. Net
+  indebtedness also excludes division (D)'s debt, so a district's headroom is the limit less
+  only its counted debt. [inference] No committed fixture carries any district's outstanding
+  debt, so headroom is not measured.
+
+  ### H.B. 96 and the bond levy
+
+  The final analysis lists R.C. 133.18 only among the ballot-language sections: "county
+  auditor's market value" replaces "appraised value" for elections from 2026. The prohibitions
+  on new emergency, substitute and renewal-increase levies do not name it. [verified]
+  (`crates/project/fixtures/enacted-levy-limits.txt`) A bond levy was never renewed, so the end
+  of renewal with an increase does not reach it. [inference]
+revisions: []
+unfilled:
+  - field: outstanding debt by district
+    why: |
+      No committed fixture carries a district's net indebtedness or its bond levy millage, so
+      the headroom under R.C. 133.06 and the bond share of local taxes are not measured.
+  - field: Chapter 3318 projects
+    why: |
+      Division (I)'s exception follows the classroom facilities program, and no committed
+      fixture lists which districts have borrowed above the nine percent limit under it.
+properties:
+  name: Bond levy
+  level: local
+  legal_basis: |
+    R.C. 133.18 (the bond election and the levy outside the tax limitation) and R.C. 133.06 (net
+    indebtedness of a school district), with Chapter 3318 for the division (I) exception.
+  restriction: |
+    Debt charges on the bonds it secures, for as long as they are outstanding. [verified]
+  growth_behavior: |
+    Follows the debt schedule. The rate is whatever produces the debt charges due, so it falls
+    as values rise, and the levy ends when the securities are no longer outstanding. [verified]
+  series_path: |
+    None. Table SD-1 aggregates bond millage into each district's class rates, and no committed
+    fixture carries a district's debt; crates/dispersion/fixtures/sd1-district-taxes.csv gives
+    only the taxable value the limits apply to. [verified]
+links:
+  - target: ../revenue-stream.ont.yml
+    relationship: instance-of
+  - target: local-property-tax.yml
+    relationship: part-of
+  - target: ../parameter/tax-reduction-factor.yml
+    relationship: exempt-from
+    note: >-
+      R.C. 319.301(A)(1): a tax for debt charges produces a specified amount.
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+    note: >-
+      R.C. 133.06, 133.18 and 319.301.
+  - target: ../../catalog/lsc-hb96-analysis.md
+    relationship: sourced-from
+  - target: ../../catalog/dot-sd1-school-district-taxes.md
+    relationship: sourced-from
+    note: >-
+      The taxable value per pupil the limits are applied to.
+figures:
+  - key: project/rc-133-06-total-limit
+    value: 0.09
+    field: description
+    as_written: "net indebtedness at **9%**"
+  - key: project/rc-133-06-consent-threshold
+    value: 0.04
+    field: description
+    as_written: "above **4%** unless"
+  - key: dispersion/median-debt-capacity-per-pupil-ty2024
+    value: 22614.41
+    field: findings
+    as_written: "**$22,614** per pupil"
+  - key: dispersion/median-unvoted-debt-capacity-per-pupil-ty2024
+    value: 251.27
+    field: findings
+    as_written: "**$251** per pupil"

@@ -1,0 +1,111 @@
+class: revenue-stream
+label: Permanent Improvement Levy
+summary: >-
+  A voted school levy for buildings, equipment and other permanent improvements, either a
+  specific improvement for a stated term or general improvements for any term. It is reduced
+  like an operating levy, its money is restricted, and since 2026 it cannot be renewed with an
+  increase.
+description: |
+  A school district votes a permanent improvement levy under R.C. 5705.21, not R.C. 5705.19.
+  R.C. 5705.21(A) authorizes a levy for "one of the purposes specified in division (A), (D), (F),
+  (H), or (DD) of section 5705.19" or "for general permanent improvements", and R.C. 5705.19
+  opens "This section does not apply to school districts". [verified]
+  (`crates/project/tests/how_a_school_levy_is_voted_and_renewed.rs`)
+
+  The two kinds differ by one clause. A levy for the purpose of R.C. 5705.19(F) is for "any
+  specific permanent improvement or class of improvements that the taxing authority of the
+  subdivision may include in a single bond issue". General permanent improvements are defined as improvements "without regard to the
+  limitation of division (F)". A levy for a specific improvement runs at most **5** years; a
+  general permanent improvement levy, like a current expense levy, may run "for a continuing
+  period of time". [verified] (`crates/project/src/levy.rs`)
+
+  The levy is voted as a rate and the [reduction factor](../parameter/tax-reduction-factor.yml)
+  reduces it: R.C. 319.301(D) reaches "each tax" and (A) does not exempt it. [inference] It does
+  does not count toward the [twenty-mill floor](../parameter/twenty-mill-floor.yml), which R.C.
+  319.301(E) computes on taxes "for current expenses". [inference] It is confined to its single
+  purpose, so it is part of the [local property tax](local-property-tax.yml) that the funding
+  formula's operating cost cannot use. [verified]
+  (`crates/project/tests/how_a_school_levy_is_voted_and_renewed.rs`)
+findings: |
+  ### Does H.B. 96 reach a levy for the 5705.19(F) purpose?
+
+  The question the issue carried was whether the strike in R.C. 5705.21 reaches a permanent
+  improvement levy "originally passed under 5705.19(F)" as well as one passed under 5705.21. The
+  text answers it in two steps.
+
+  First, a school district has no R.C. 5705.19 levy to pass. The exclusion of school districts
+  is the section's first sentence in the version in force, H.B. 110's of September 30, 2021.
+  [verified] (`crates/project/tests/how_a_school_levy_is_voted_and_renewed.rs`) A school levy
+  "for the purpose of 5705.19(F)" is a 5705.21 levy. The 2014 and 2020 versions read the same
+  on codes.ohio.gov, and neither is committed.
+
+  Second, the renewal sentence is keyed on the purpose, not the section that imposed the levy:
+  "If the board of education imposes one or more existing levies for the purpose specified in
+  division (F) of section 5705.19 ..., the resolution may propose to renew one or more of those
+  existing levies, or to decrease a single such existing levy, for the purpose of general
+  permanent improvements." Before January 1, 2026 it read "or to increase or decrease". [verified]
+  (`crates/project/tests/how_a_school_levy_is_voted_and_renewed.rs`) So the strike reaches every
+  existing levy a board imposes for the (F) purpose, whatever section first imposed it, and every
+  general permanent improvement levy through the division (A) sentence. [inference]
+
+  Two things stay open. Whether any school district still levies a tax first voted under R.C.
+  5705.19 before school districts were excluded is not known, since no committed version
+  predates 2021. [open] And the purpose-keyed sentence renews such a levy "for the purpose of
+  general permanent improvements", so a renewal converts it from a specific to a general levy.
+  That follows from the words and is not tested against any ballot. [inference]
+
+  ### Five years, or continuing
+
+  R.C. 5705.21(A)'s general ceiling is any number of years "not exceeding five", except for
+  current expenses and general permanent improvements. [verified] (`crates/project/src/levy.rs`)
+  So a district that wants a permanent improvement levy that never returns to the ballot votes it
+  as general, and a levy for a specific improvement returns within five years to be renewed at
+  its effective rate or less.
+revisions: []
+unfilled:
+  - field: permanent improvement millage by district
+    why: |
+      Table SD-1 aggregates every levy into its class rates, and no committed fixture separates a
+      district's permanent improvement millage from its operating millage.
+  - field: school levies first voted under R.C. 5705.19
+    why: |
+      No committed version of R.C. 5705.19 predates H.B. 110's of 2021, so when school districts
+      were excluded, and whether any levy they voted under it survives, is unknown.
+properties:
+  name: Permanent improvement levy
+  level: local
+  legal_basis: |
+    R.C. 5705.21(A), for the purpose of R.C. 5705.19(F) or for general permanent improvements;
+    renewal at R.C. 5705.21 and the election at R.C. 5705.25.
+  restriction: |
+    Restricted to permanent improvements, the single purpose its resolution states. It is not
+    available for the current expenses the funding formula computes. [verified]
+  growth_behavior: |
+    Fixed in dollars on carryover property, as a rate reduced by R.C. 319.301; it grows only with
+    new construction. Since 2026 a renewal may only keep or lower its effective rate. [verified]
+  series_path: |
+    No per-levy series. crates/dispersion/fixtures/sd1-district-taxes.csv aggregates permanent
+    improvement millage into each district's class rates, TY2021 through TY2024. [verified]
+links:
+  - target: ../revenue-stream.ont.yml
+    relationship: instance-of
+  - target: local-property-tax.yml
+    relationship: part-of
+  - target: bond-levy.yml
+    relationship: parallels
+    note: >-
+      Two ways to pay for the same building: a rate collected in advance, or a debt repaid by a
+      levy that follows it.
+  - target: ../parameter/tax-reduction-factor.yml
+    relationship: reduced-by
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+    note: >-
+      R.C. 5705.19, and 5705.21 in force and as it read on April 9, 2025.
+  - target: ../../catalog/lsc-hb96-analysis.md
+    relationship: sourced-from
+figures:
+  - key: project/rc-5705-21-term-ceiling-years
+    value: 5
+    field: description
+    as_written: "runs at most **5** years"

@@ -364,7 +364,10 @@ pub(super) const BUDGET: Connector = Connector {
         filename: "hb96-final-analysis.pdf",
         format: Format::Pdf,
         catalog: Some("lsc-hb96-analysis"),
-        fixtures: &[crate::fixtures::ENACTED_FIXTURE],
+        fixtures: &[
+            crate::fixtures::ENACTED_FIXTURE,
+            crate::fixtures::ENACTED_LEVY_FIXTURE,
+        ],
         note: "**As enacted**, and the distinction is not pedantic. The as-passed-by-the-House \
                analysis sits at a sibling URL and gives the base funding supplement as $20 and \
                $30 and the enrolment growth supplement as a tiered schedule — neither of which \

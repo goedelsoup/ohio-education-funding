@@ -1,0 +1,80 @@
+Levy restrictions due to excess carry-over (VETO OVERRIDDEN)
+        The act prohibits a school district from submitting any new current expense levy,
+excluding a renewal levy, to voters if it has a general fund carry-over balance of more than 100%
+of its general fund expenditures for the preceding fiscal year. The act allows a district to
+designate, by resolution, an amount of general funds for permanent improvement expenses to
+be used within the next three years and to exclude those funds from the carry-over balance
+calculation.
+        In addition, when a current expense levy is placed on the ballot by a school district with a
+carry-over balance under the 100% threshold, the provision requires the election notice and
+ballot language for that levy to state the percentage and amount of the district’s general fund
+carry-over balance.
+        The General Assembly overrode the Governor’s veto of this provision. The provision
+applies to levies placed on the ballot at elections held on or after January 1, 2026.
+  Additional limitations on school district levies (VETO
+  OVERRIDDEN)
+       The General Assembly overrode the Governor’s veto of two additional limitations on
+school district property taxes, both of which will apply to elections held on or after January 1,
+2026.
+      Emergency and substitute levies
+      (R.C. 5705.03, 5705.194, 5705.195, repealed, 5705.196, repealed, 5705.197, repealed,
+      5705.199, 5705.219, 5709.92, and 5748.09; Section 801.310)
+      The act prohibits school districts from levying any new emergency levy, substitute levy,
+or combined school district income tax and current expense property tax levy.
+        An emergency levy is a tax designed to raise a fixed amount each year, i.e., a “fixed-sum”
+levy, for the emergency requirements of the school district or to avoid an operating deficit. A
+substitute levy is a tax that “substitutes” for an emergency levy. It raises a fixed sum in the first
+year, but that sum also grows each year as new property is added to the tax base. The third levy
+option authorizes a district to combine a school district income tax with a fixed-sum current
+expense property tax.
+      Renewal and increase levies
+      (R.C. 5705.21, 5705.212, 5705.217, 5705.2114, and 5705.25; Section 801.310)
+        The act also prohibits school districts from proposing to renew and increase an existing
+levy. Under continuing law, renewal levies can extend the term of an existing levy at its current
+effective millage rate, or at its current rate with either an increase or decrease. Under the act, a
+school district will only be allowed to renew a levy at its current effective rate or at a lesser rate.
+
+
+
+
+P a g e | 484                                                                                    H.B. 96
+                                                                                           Final Analysis
+Office of Research and Drafting                 LSC                            Legislative Budget Office
+
+
+
+  Replacement property tax levies (VETO OVERRIDDEN)
+  (R.C. 319.301, 319.302, 523.06, 1545.21, 3316.041, 3316.06, 3358.11, 3505.06, 5705.03,
+  5705.192, repealed, 5705.218, 5705.2111, 5705.221, 5705.233, 5705.261, and 5705.412;
+  Section 801.310)
+       The General Assembly overrode the Governor’s veto of provisions that eliminate the
+authority of political subdivisions to levy replacement property tax levies, beginning with
+elections held on or after January 1, 2026.
+         A replacement levy extends the term of an existing levy at the same original millage rate
+of the levy it is replacing. By contrast, renewal levies extend the term of an existing levy at its
+current effective millage rate – i.e., its rate after reductions resulting from the H.B. 920 tax
+reduction factors. The tax reduction factors have the effect of lowering a levy’s effective millage
+over time, since they are designed to prevent a subdivision’s tax revenue from growing at the
+same rate as property values. Consequently, unlike a renewal levy, a replacement levy allows
+subdivisions to receive the benefit of any growth in property tax values that occurred during the
+life of the existing levy.
+  Tax levy ballot language (VETO OVERRIDDEN)
+  (R.C. 133.18, 306.32, 306.322, 345.01, 345.03, 345.04, 505.37, 505.48, 505.481, 511.28,
+  511.34, 513.18, 755.181, 1545.041, 1545.21, 1711.30, 3311.50, 3318.01, 3318.06, 3318.061,
+  3318.062, 3318.063, 3318.361, 3318.45, 3381.03, 4582.024, 4582.26, 5705.01, 5705.03,
+  5705.21, 5705.213, 5705.215, 5705.218, 5705.219, 5705.233, 5705.25, 5705.251, 5705.261,
+  5705.55, 5748.01, 5748.02, 5748.03, 5748.08, and 5748.09; Section 801.310)
+        The act modifies the language used on property tax ballots and election notices to
+describe a property’s value. The General Assembly overrode the Governor’s veto of this
+provision.
+        For elections held before 2026, the true value of property, or the price at which it would
+be sold between a willing buyer and seller, is described as the “county auditor’s appraised value.”
+The act instead requires that, beginning with elections held in 2026, ballots and election notices
+use the term “county auditor’s market value.”
+  20-mill floor limits (VETOED)
+  (R.C. 319.301; Section 801.280)
+        The Governor vetoed a provision that would have modified the calculation of the 20-mill
+floor that guarantees school districts a certain level of property tax revenue. Specifically, the act
+would have added all current fixed-sum levies to the calculation of the floor. Although the act
+also would have prohibited schools from levying certain new fixed-sum levies after January 1,
+2026, this addition would have been applied to all of those taxes levied before that date.

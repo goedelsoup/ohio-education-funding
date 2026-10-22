@@ -52,7 +52,29 @@ const CITED: &[&str] = &[
     "3317.0217",
     "3317.03",
     "319.301",
+    // What a reduction factor reaches, for `parameter/tax-reduction-factor`: the H.B. 186 credit
+    // that reduces only floor-adjusted taxes, the two classes R.C. 319.301(C) computes factors
+    // for, and the emergency and substitute levy sections, which are the two fixed-sum school
+    // levies R.C. 319.301 names and which the floor node had attributed the wrong way round.
+    "319.303",
+    "5713.041",
+    "5705.194",
+    "5705.199",
     "5705.391",
+    // How a school levy is voted and renewed. Cited by the levy modality nodes in
+    // `revenue-stream/`: 5705.19 for the purposes a school levy names and for its first
+    // sentence, which says it is not a school district's grant; 5705.21 for the grant itself and
+    // the renewal sentences H.B. 96 cut; 5705.25 for the election every levy goes through; 133.06
+    // and 133.18 for the bond levy and the debt it pays; 5705.195 and 5705.197 for the emergency
+    // levy's election and ballot, which the H.B. 96 analysis lists as repealed and H.B. 129
+    // re-enacted. `how_a_school_levy_is_voted_and_renewed.rs` reads all seven.
+    "5705.19",
+    "5705.21",
+    "5705.25",
+    "133.06",
+    "133.18",
+    "5705.195",
+    "5705.197",
     // The report card and what it triggers. Cited by `ohio-report-card` for the six components,
     // the 2:2:1:1:1 weighting of the overall rating, and the delegation of the star thresholds to
     // administrative rule; by `academic-distress-commission` for the trigger, the escalation
@@ -333,7 +355,8 @@ fn the_dpia_blend_is_departmental_rather_than_statutory() {
 /// rule". **That conclusion was wrong, and the statute is explicit.** R.C. 319.301(A)(1): the
 /// reductions "do not apply to ... taxes levied at whatever rate is required to produce a
 /// specified amount of tax money, including a tax levied under section 5705.199" — which is the
-/// emergency levy section.
+/// substitute levy section. This note first called it the emergency levy section; that is
+/// R.C. 5705.194, and `what_a_reduction_factor_reaches.rs` reads both.
 ///
 /// What the data actually showed was narrower than what was concluded from it: the exclusion does
 /// not explain the 155 districts sitting exactly on the floor, because those districts have no
@@ -362,7 +385,7 @@ fn the_floor_is_a_percentage_and_fixed_sum_levies_are_exempt_from_reduction() {
         .contains("required to produce a specified amount of tax money"));
     assert!(
         s.body.contains("5705.199"),
-        "the emergency levy section is named in the exemption"
+        "the substitute levy section is named in the exemption"
     );
 
     // And it is current law under a very recent amendment, which is its own caution: Ohio changed

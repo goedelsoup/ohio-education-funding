@@ -418,15 +418,21 @@ test("every bound figure in the corpus agrees with the crate it cites", () => {
  * average award's share of it and what H.B. 96 added. `program/jon-peterson-special-needs` binds
  * five: its FY2025 ceiling, H.B. 96's uniform rise in the maxima and the two ends of the uneven
  * rise it made in the category amounts, and H.B. 33's FY2024 rise. The floor was at its count.
+ *
+ * Recomputed at **1261/92** when the levy modalities got nodes (#786). Eight bindings on five new
+ * carriers: the current expense, permanent improvement, emergency and substitute levies bind one
+ * statutory figure each, and the bond levy binds four, R.C. 133.06's two limits and the two
+ * per-pupil debt capacity medians. **The floor was seventeen bindings and one carrier under before
+ * those were added**, on the reduction-factor branch (#785) this one is stacked on.
  */
 test("the corpus binds no fewer figures than it did", () => {
-  expect(bindings.length, "1236 bindings; raise this when you add one").toBeGreaterThanOrEqual(
-    1236,
+  expect(bindings.length, "1261 bindings; raise this when you add one").toBeGreaterThanOrEqual(
+    1261,
   );
   expect(
     corpus.nodes.filter((node) => node.figures.length > 0).length,
-    "86 nodes carry bindings; raise this when an eighty-seventh does",
-  ).toBeGreaterThanOrEqual(86);
+    "92 nodes carry bindings; raise this when a ninety-third does",
+  ).toBeGreaterThanOrEqual(92);
   expect(
     new Set(bindings.map((binding) => binding.key)).size,
     "every figure the manifest exports is bound by some node",

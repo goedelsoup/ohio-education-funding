@@ -278,8 +278,23 @@ pub const F33_OHIO_PANEL_FIXTURE: &str = "crates/dispersion/fixtures/f33-ohio-pa
 /// Where the statute extract is written, relative to the repository root.
 pub const STATUTE_FIXTURE: &str = "crates/project/fixtures/revised-code.txt";
 
+/// Where the prior versions of a few statute sections are written, relative to the root.
+///
+/// A second file rather than more records in [`STATUTE_FIXTURE`], because that file is one
+/// vintage — the current text of each section — and a reader that asks it for `5705.21` must get
+/// one answer. An amendment is dated by its version, and its content by the text it replaced:
+/// what H.B. 96 struck from R.C. 5705.21 is visible only beside the version before it.
+pub const PRIOR_STATUTE_FIXTURE: &str = "crates/project/fixtures/revised-code-prior.txt";
+
 /// Where the enacted-act extract is written, relative to the repository root.
 pub const ENACTED_FIXTURE: &str = "crates/project/fixtures/enacted-school-funding.txt";
+
+/// Where the final analysis's school district levy limits are written, relative to the root.
+///
+/// The one passage of the H.B. 96 final analysis outside the department's chapter that the corpus
+/// cites: the property tax provisions the General Assembly enacted over the Governor's veto, and
+/// the ones it did not.
+pub const ENACTED_LEVY_FIXTURE: &str = "crates/project/fixtures/enacted-levy-limits.txt";
 
 /// Where the department's redbook extract is written, relative to the repository root.
 pub const REDBOOK_FIXTURE: &str = "crates/project/fixtures/dew-redbook.txt";
@@ -599,7 +614,9 @@ pub const REBUILT: &[&str] = &[
     SGO_ESTIMATES_FIXTURE,
     CROSSWALK_FIXTURE,
     STATUTE_FIXTURE,
+    PRIOR_STATUTE_FIXTURE,
     ENACTED_FIXTURE,
+    ENACTED_LEVY_FIXTURE,
     REDBOOK_FIXTURE,
     GREENBOOK_FIXTURE,
     FOOTNOTES_EDCHOICE_FIXTURE,

@@ -82,6 +82,50 @@ pub fn parse_statute(section: &str, page: &str) -> Option<Record> {
     })
 }
 
+/// The section and version a dated `codes.ohio.gov` URL names.
+///
+/// `https://codes.ohio.gov/ohio-revised-code/section-5705.21/4-9-2025` is the April 9, 2025
+/// version of R.C. 5705.21, and this returns `("5705.21", "4-9-2025")`. The version is the URL's
+/// own spelling — month, day, year — kept verbatim because it is what the publisher answers to.
+/// `None` for a URL with no version segment, which is the current text and belongs in the
+/// statute extract instead.
+#[must_use]
+pub fn version_of(url: &str) -> Option<(&str, &str)> {
+    let rest = url.split("/section-").nth(1)?;
+    let (section, version) = rest.split_once('/')?;
+    let version = version.trim_end_matches('/');
+    (!section.is_empty() && !version.is_empty() && !version.contains('/'))
+        .then_some((section, version))
+}
+
+/// Pull one dated, superseded version of a section out of its page.
+///
+/// The body, title and effective date are read as [`parse_statute`] reads them. Two things
+/// differ. The record is cited as `5705.21@4-9-2025`, so that it can never be mistaken for the
+/// current text of the section. And a superseded version's page prints no "Latest Legislation"
+/// line, so the act is read from the page's own version list instead: the entry beginning with
+/// the version's effective date, as `April 9, 2025 – Amended by House Bill 496 - 135th General
+/// Assembly`, less its "Amended by".
+///
+/// Returns `None` if the page does not parse as a section or its version list has no entry for
+/// its own effective date — either says the page is not the one this was written against.
+#[must_use]
+pub fn parse_statute_version(section: &str, version: &str, page: &str) -> Option<Record> {
+    let mut record = parse_statute(section, page)?;
+    if record.date.is_empty() {
+        return None;
+    }
+    let text = crate::html::to_text(page);
+    let entry = format!("{} \u{2013} ", record.date);
+    let act = text
+        .lines()
+        .map(|l| l.split_whitespace().collect::<Vec<_>>().join(" "))
+        .find_map(|l| l.strip_prefix(&entry).map(str::to_string))?;
+    record.source = act.strip_prefix("Amended by ").unwrap_or(&act).to_string();
+    record.id = format!("{section}@{version}");
+    Some(record)
+}
+
 /// The marker that begins every record, at the start of a line.
 ///
 /// This was `§ `, justified on the grounds that the Revised Code's own text never prints a
@@ -132,4 +176,49 @@ pub fn build_records(caption: &str, records: &[Record]) -> String {
         ));
     }
     out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// The shape of a superseded version's page, cut to its landmarks.
+    const PRIOR: &str = "<h1>Section 5705.21 | Election on additional tax levy.</h1>\
+        <div>View Current Version</div><div>Effective:</div><div>April 9, 2025</div>\
+        <a>Download Authenticated PDF</a>\
+        <p>A resolution may propose to increase or decrease a single levy.</p>\
+        <h2>Available Versions of this Section</h2>\
+        <div>September 29, 2015 \u{2013} House Bill 64 - 131st General Assembly</div>\
+        <div>April 9, 2025 \u{2013} Amended  by House Bill 496 - 135th General Assembly</div>\
+        <div>January 1, 2026 \u{2013} Amended  by House Bill 96 - 136th General Assembly</div>";
+
+    #[test]
+    fn a_dated_url_names_its_section_and_version() {
+        assert_eq!(
+            version_of("https://codes.ohio.gov/ohio-revised-code/section-5705.21/4-9-2025"),
+            Some(("5705.21", "4-9-2025"))
+        );
+        assert_eq!(
+            version_of("https://codes.ohio.gov/ohio-revised-code/section-5705.21"),
+            None,
+            "the current text has no version segment"
+        );
+    }
+
+    #[test]
+    fn a_prior_version_is_cited_by_its_version_and_dated_by_its_own_entry() {
+        let record = parse_statute_version("5705.21", "4-9-2025", PRIOR).expect("parses");
+        assert_eq!(record.id, "5705.21@4-9-2025");
+        assert_eq!(record.date, "April 9, 2025");
+        // Its own entry: not the newest one, and not the first.
+        assert_eq!(record.source, "House Bill 496 - 135th General Assembly");
+        assert!(record.body.contains("increase or decrease"));
+        assert!(!record.body.contains("Available Versions"));
+    }
+
+    #[test]
+    fn a_version_list_without_the_pages_own_date_is_refused() {
+        let page = PRIOR.replace("April 9, 2025 \u{2013}", "April 10, 2025 \u{2013}");
+        assert_eq!(parse_statute_version("5705.21", "4-9-2025", &page), None);
+    }
 }

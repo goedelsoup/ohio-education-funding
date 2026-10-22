@@ -1,0 +1,96 @@
+class: revenue-stream
+label: Substitute Levy
+summary: >-
+  A school levy that replaced emergency levies with a sum that grows by new construction each
+  year. Exempt from reduction factors by name. No new one could be voted after H.B. 96, and one
+  voted before 2026 renews as a fixed sum that does not grow.
+description: |
+  A tax in excess of the ten-mill limitation under R.C. 5705.199, "proposed as a substitute for
+  all or a portion of one or more existing levies imposed under section 5705.194", the
+  [emergency levy](emergency-levy.yml), or under 5705.199 itself. In its first year it raises
+  the dollars of the levies it replaces. Each later year it raises the prior year's dollars plus
+  the levy's prior-year rate applied to taxable real property "excluding carryover property": new
+  construction, at the rate the sum implied. [verified]
+  (`crates/project/tests/how_a_school_levy_is_voted_and_renewed.rs`)
+
+  It is voted as a sum and the [reduction factor](../parameter/tax-reduction-factor.yml) does
+  not reach it, because R.C. 319.301(A)(1) names R.C. 5705.199 among the exempt taxes. It grows
+  as a reduced levy would grow, with new construction only, but by its own formula rather than by
+  reduction. [verified] (`crates/project/tests/what_a_reduction_factor_reaches.rs`) Like the
+  emergency levy, one approved before 2026 is taken out of the
+  [twenty-mill floor](../parameter/twenty-mill-floor.yml)'s base until the county's next
+  reappraisal or update. [verified]
+
+  ### Closed by H.B. 96
+
+  [H.B. 96](../legislation/hb-96-2025.yml) amended R.C. 5705.199, effective January 1, 2026, so
+  that a board may propose one only "at any time before the effective date of this amendment",
+  and the final analysis records the prohibition of new substitute levies for elections on or
+  after that date, with the veto overridden. [verified]
+  (`crates/project/tests/how_a_school_levy_is_voted_and_renewed.rs`) What remains is the renewal
+  in R.C. 5705.194(D), as H.B. 129 wrote it: up to the proceeds of the final year, levied each
+  year as that sum, which "shall not be increased as otherwise described in section 5705.199".
+  A renewed substitute levy is an emergency levy in all but name. [inference]
+findings: |
+  ### Half a year's proceeds in notes
+
+  A board may borrow against a newly approved substitute levy in anticipation notes of up to
+  **50%** of the first year's estimated proceeds, repaid over at most five years. [verified]
+  (`crates/project/src/levy.rs`) An emergency levy's notes may reach the whole of the first
+  year's proceeds. [verified] The difference no longer matters for a new levy, since neither may
+  now be voted except an emergency levy under R.C. 5705.194(B)'s conditions. [inference]
+
+  ### Why the levy existed
+
+  The final analysis describes it as a tax that "raises a fixed sum in the first year, but that
+  sum also grows each year as new property is added to the tax base". [verified]
+  (`crates/project/fixtures/enacted-levy-limits.txt`) It gave a district on emergency levies the
+  growth a rate levy has, without the rate. The substitute-for edge records that it was created
+  to carry on emergency levies, not to sit beside them.
+revisions: []
+unfilled:
+  - field: substitute levies by district
+    why: |
+      Table SD-1 aggregates fixed-sum levies into each district's class rates, so no committed
+      fixture names which districts carry a substitute levy or what its growth adds each year.
+properties:
+  name: Substitute levy
+  level: local
+  legal_basis: |
+    R.C. 5705.199 as amended by H.B. 96, effective January 1, 2026, which confines new levies to
+    resolutions before that date; renewal at R.C. 5705.194(D).
+  restriction: |
+    "The necessary requirements of the school district", the purpose of the levies it replaced;
+    a renewal under R.C. 5705.194(D) is for current expenses. [verified]
+  growth_behavior: |
+    Grows each year by its prior-year rate on new construction, by its own formula and not by
+    reduction. A renewal under R.C. 5705.194(D) freezes the sum. [verified]
+  series_path: |
+    No per-levy series. crates/dispersion/fixtures/sd1-district-taxes.csv aggregates fixed-sum
+    levies into each district's class rates, TY2021 through TY2024. [verified]
+links:
+  - target: ../revenue-stream.ont.yml
+    relationship: instance-of
+  - target: emergency-levy.yml
+    relationship: substitutes-for
+  - target: local-property-tax.yml
+    relationship: part-of
+  - target: ../parameter/tax-reduction-factor.yml
+    relationship: exempt-from
+    note: >-
+      R.C. 319.301(A)(1) names R.C. 5705.199.
+  - target: ../parameter/twenty-mill-floor.yml
+    relationship: excluded-from
+    note: >-
+      A levy approved before January 1, 2026, until the county's next reappraisal or update year.
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+    note: >-
+      R.C. 5705.199, 5705.194 and 319.301.
+  - target: ../../catalog/lsc-hb96-analysis.md
+    relationship: sourced-from
+figures:
+  - key: project/rc-5705-199-anticipation-note-share
+    value: 0.5
+    field: findings
+    as_written: "**50%** of the first"

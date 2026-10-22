@@ -292,3 +292,20 @@ links:
       The House-passed stage this act departs from, and the only committed account of what that
       stage would have paid each sector. A secondary source with a stated alignment; the enacted
       figures beside it are the greenbook's.
+  - target: ../revenue-stream/current-expense-levy.yml
+    relationship: constrains
+    note: >-
+      Ends renewal with an increase and the replacement levy, for elections on or after January
+      1, 2026, by veto override.
+  - target: ../revenue-stream/permanent-improvement-levy.yml
+    relationship: constrains
+    note: >-
+      Strikes "increase or" from R.C. 5705.21's permanent improvement renewal sentence.
+  - target: ../revenue-stream/emergency-levy.yml
+    relationship: constrains
+    note: >-
+      Prohibits new emergency levies; H.B. 129 reopened them for districts in fiscal distress.
+  - target: ../revenue-stream/substitute-levy.yml
+    relationship: constrains
+    note: >-
+      Confines R.C. 5705.199 to resolutions adopted before January 1, 2026.

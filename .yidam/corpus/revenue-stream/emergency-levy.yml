@@ -1,0 +1,100 @@
+class: revenue-stream
+label: Emergency Levy
+summary: >-
+  A school levy voted as a sum of dollars for current expenses, for up to five years. Exempt from
+  reduction factors as a fixed sum. Since 2026 a new one needs fiscal distress or a
+  disaster declaration, and a renewal is at the same or a lesser sum.
+description: |
+  A tax in excess of the ten-mill limitation under R.C. 5705.194, voted as "the amount of money
+  it is necessary to raise for the current expenses of the district for each calendar year". It
+  runs for any number of years "not exceeding five". [verified]
+  (`crates/project/src/levy.rs`, `crates/project/tests/what_a_reduction_factor_reaches.rs`)
+
+  Because it is voted as a sum, the [reduction factor](../parameter/tax-reduction-factor.yml)
+  does not reach it: R.C. 319.301(A)(1) exempts taxes "required to produce a specified amount of
+  tax money". Its rate falls as values rise, and its dollars do not move. It is the fixed-sum
+  part of the [local property tax](local-property-tax.yml). [verified] Since 2026 one voted before
+  that year is also taken out of the [twenty-mill floor](../parameter/twenty-mill-floor.yml)'s
+  base until the county's next reappraisal or update. [verified]
+  (`crates/project/tests/how_a_school_levy_is_voted_and_renewed.rs`)
+
+  ### Closed by one act, reopened by the next
+
+  [H.B. 96](../legislation/hb-96-2025.yml) prohibited any new emergency levy for elections on or
+  after January 1, 2026, and the final analysis lists R.C. 5705.195, 5705.196 and 5705.197, the
+  sections that governed its election, as repealed. [verified]
+  (`crates/project/fixtures/enacted-levy-limits.txt`) The section in force is not H.B. 96's. It
+  is H.B. 129's of March 20, 2026, and it reopened the levy on conditions. Division (B) lets a
+  district "in fiscal caution, fiscal watch, or fiscal emergency or ... impacted by an emergency
+  that is the subject of a disaster declaration" levy one, and such a levy "may not be renewed".
+  Division (C) lets a district renew one approved before January 1, 2026, "for the same or a
+  lesser sum", as a current expense levy. [verified]
+  (`crates/project/tests/what_a_reduction_factor_reaches.rs`,
+  `crates/project/tests/how_a_school_levy_is_voted_and_renewed.rs`)
+findings: |
+  ### What the analysis said was repealed came back
+
+  The analysis lists R.C. 5705.195 and 5705.197 as repealed, and both are in force. H.B. 129
+  re-enacted them effective March 20, 2026, retitled for the "fixed-sum levy": 5705.195 has the
+  county auditor certify the millage for a resolution "adopted under division (B), (C), or (D)
+  of section 5705.194", and 5705.197 is the ballot, "Shall a fixed-sum levy be imposed", with a
+  renewal reading "Renewing an existing levy" when the sum is unchanged. R.C. 5705.194 still says
+  5705.195 "shall govern the arrangements for the submission of questions to the electors".
+  [verified] (`crates/project/tests/how_a_school_levy_is_voted_and_renewed.rs`) The analysis is
+  right about H.B. 96 and stale about the law: a single list of repeals in it did not survive the
+  next act. [inference] Whether R.C. 5705.196 also came back is not checked. [open]
+
+  ### Five years, then a renewal of the same sum
+
+  The term ceiling is **5** years. [verified] (`crates/project/src/levy.rs`) Before 2026 a
+  district at the end of its term could renew the levy, or replace it with a
+  [substitute levy](substitute-levy.yml) whose sum grows with new construction. After 2026 the
+  substitute is gone and the renewal, under division (C), keeps the sum or cuts it. A pre-2026
+  emergency levy therefore holds its nominal dollars for as long as voters renew it, and its real
+  yield falls every year by construction. [inference]
+revisions: []
+unfilled:
+  - field: emergency levies by district
+    why: |
+      Table SD-1 aggregates fixed-sum levies into each district's class rates, so no committed
+      fixture names which districts carry an emergency levy or how much it raises.
+properties:
+  name: Emergency levy
+  level: local
+  legal_basis: |
+    R.C. 5705.194 as amended by H.B. 129 (136th General Assembly), effective March 20, 2026; the
+    election at R.C. 5705.195 and the ballot at 5705.197, both re-enacted by the same act; the
+    H.B. 96 prohibition on new levies for elections from January 1, 2026.
+  restriction: |
+    Current expenses of the district. A renewal under division (C) is for current expenses
+    "notwithstanding the original purpose of the existing tax". [verified]
+  growth_behavior: |
+    Flat in nominal dollars by design: voted as a sum, exempt from reduction, and renewable only
+    at the same or a lesser sum. Its rate falls as values rise. [verified]
+  series_path: |
+    No per-levy series. crates/dispersion/fixtures/sd1-district-taxes.csv aggregates fixed-sum
+    levies into each district's class rates, TY2021 through TY2024. [verified]
+links:
+  - target: ../revenue-stream.ont.yml
+    relationship: instance-of
+  - target: local-property-tax.yml
+    relationship: part-of
+  - target: ../parameter/tax-reduction-factor.yml
+    relationship: exempt-from
+    note: >-
+      R.C. 319.301(A)(1), by the general words for a tax producing a specified amount.
+  - target: ../parameter/twenty-mill-floor.yml
+    relationship: excluded-from
+    note: >-
+      A levy approved before January 1, 2026, until the county's next reappraisal or update year.
+  - target: ../../catalog/ohio-revised-code.md
+    relationship: sourced-from
+    note: >-
+      R.C. 5705.194, 5705.195, 5705.197 and 319.301.
+  - target: ../../catalog/lsc-hb96-analysis.md
+    relationship: sourced-from
+figures:
+  - key: project/rc-5705-194-term-ceiling-years
+    value: 5
+    field: findings
+    as_written: "The term ceiling is **5** years"

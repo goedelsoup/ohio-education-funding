@@ -27,8 +27,10 @@ description: |
   R.C. 319.301(A)(1): the reductions "do not apply to ... taxes levied at whatever rate is
   required to produce a specified amount of tax money, including a tax levied under section
   5705.199 or 5748.09 of the Revised Code, or an amount to pay debt charges." R.C. 5705.199 is
-  the emergency levy section. Fixed-sum levies are exempt from reduction as a matter of law.
-  [verified] (`ohio-laws`, `crates/project/tests/the_statute_behind_the_weights.rs`)
+  the substitute levy section; the emergency levy, R.C. 5705.194, is exempt by the general words.
+  Fixed-sum levies are exempt from reduction as a matter of law. [verified] (`ohio-laws`,
+  `crates/project/tests/what_a_reduction_factor_reaches.rs`) Which levies the factor reaches,
+  class by class, is the [tax reduction factor](tax-reduction-factor.yml)'s own node.
 
   An absence of an effect in one group is not an absence of the mechanism, and the correction
   is recorded rather than quietly replaced because the wrong reading was the more natural one.
@@ -279,6 +281,19 @@ findings: |
   [inference]
 revisions:
   - was: |
+      R.C. 5705.199 is the emergency levy section.
+    now: |
+      R.C. 5705.199 is the substitute levy section; the emergency levy, R.C. 5705.194, is exempt by
+      the general words of (A)(1).
+    found_by: |
+      Vendoring R.C. 5705.194 and 5705.199 for #785. Section 5705.199 provides for a levy
+      "proposed as a substitute for all or a portion of one or more existing levies imposed under
+      section 5705.194", which is the emergency levy section.
+    reach: |
+      None on the floor. Both levies are fixed-sum and both are exempt from reduction, so the
+      exemption this node relies on stands; only the name attached to the cited section was wrong.
+      The same attribution in `the_statute_behind_the_weights.rs` is corrected with it.
+  - was: |
       Of the 193 districts that began TY2023 at the floor, **7** saw their effective Class 1 rate
       fall by TY2024 — an at-floor fall rate of **3.6%**, against a headline **97.7%** of all
       effective-rate reductions occurring above the floor. The end-year-classification variant
@@ -493,5 +508,18 @@ links:
   - target: ../../catalog/ohio-revised-code.md
     relationship: sourced-from
     note: >-
-      The statute behind the floor: R.C. 5705.199 and 5748.09, and the fixed-sum exemption the
-      node quotes.
+      The statute behind the floor: R.C. 319.301, and the fixed-sum exemption the node quotes,
+      which names R.C. 5705.199 and 5748.09.
+  - target: ../revenue-stream/current-expense-levy.yml
+    relationship: holds-up
+    note: >-
+      The floor is computed on taxes for current expenses, and suspends their reduction.
+  - target: ../revenue-stream/emergency-levy.yml
+    relationship: excludes
+    note: >-
+      One approved before January 1, 2026, from the floor's taxes charged and payable until the
+      county's next reappraisal or update year.
+  - target: ../revenue-stream/substitute-levy.yml
+    relationship: excludes
+    note: >-
+      On the same terms as the emergency levy it substituted for.

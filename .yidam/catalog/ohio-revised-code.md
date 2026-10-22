@@ -11,6 +11,7 @@ used-by:
   - ../corpus/parameter/preschool-special-education-amounts.yml
   - ../corpus/parameter/special-education-category-multiples.yml
   - ../corpus/parameter/targeted-assistance-rates.yml
+  - ../corpus/parameter/tax-reduction-factor.yml
   - ../corpus/parameter/transportation-cost-rates.yml
   - ../corpus/parameter/twenty-mill-floor.yml
   - ../corpus/program/autism-scholarship.yml
@@ -20,8 +21,13 @@ used-by:
   - ../corpus/program/jon-peterson-special-needs.yml
   - ../corpus/program/nonpublic-administrative-cost-reimbursement.yml
   - ../corpus/program/scholarship-donation-credit.yml
+  - ../corpus/revenue-stream/bond-levy.yml
   - ../corpus/revenue-stream/casino-tax-distribution.yml
+  - ../corpus/revenue-stream/current-expense-levy.yml
+  - ../corpus/revenue-stream/emergency-levy.yml
   - ../corpus/revenue-stream/lottery-profits.yml
+  - ../corpus/revenue-stream/permanent-improvement-levy.yml
+  - ../corpus/revenue-stream/substitute-levy.yml
 ---
 # Ohio Revised Code — the sections this corpus cites
 
@@ -34,7 +40,16 @@ last amended it**. The sections retrieved include the Chapter 3317 foundation pr
 the formula components rest on, the Chapter 3310 scholarship sections, R.C. 319.301 for H.B. 920
 and the twenty-mill floor, R.C. 5705.391 for the five-year forecast, the Chapter 5753 casino
 sections, R.C. 3302.01, 3302.03, 3302.10 and 3302.12 for the report card and the academic distress
-commission, and R.C. 5747.73 for the scholarship donation credit.
+commission, R.C. 5747.73 for the scholarship donation credit, and the levy sections behind the
+`revenue-stream/` levy modalities: R.C. 5705.19, 5705.21, 5705.25, 5705.194, 5705.195, 5705.197
+and 5705.199, with R.C. 133.06 and 133.18 for the bond levy.
+
+**Superseded versions.** codes.ohio.gov also serves each prior version of a section at
+`section-<number>/<effective date>`. Two are committed, in
+[`crates/project/fixtures/revised-code-prior.txt`](../../crates/project/fixtures/revised-code-prior.txt)
+and cited as `section@version`: R.C. 5705.21 and 5705.25 as they read on April 9, 2025, the
+versions H.B. 96 replaced. A repealed section is not served at all, in any version: every request
+for R.C. 5705.192 redirects to a number-not-found page.
 
 This entry said "fourteen" for as long as the extract held fourteen, and kept saying it through
 three additions; it then said "thirty-five" while the extract held forty-three. The list is the record and the count is not: the registry names the sections and
@@ -46,7 +61,8 @@ sat `Declared` since genesis on "codes.ohio.gov serves HTML with no bulk export;
 is rendered rather than published as data." The first clause is true and was read as though it
 meant the text was unreachable. **It is server-rendered**: the operative text is in the response
 body of a plain `curl`. The second clause remains true, and the corpus takes the current text and
-its effective date rather than attempting a version series.
+its effective date rather than attempting a version series, except for the superseded versions
+above, vendored where an amendment is itself the finding.
 
 **What it settled that nothing else could.** Every weight in the formula had been transcribed from
 the department's spreadsheet and confirmed against the department's own published amounts — which
