@@ -44,7 +44,8 @@ last amended it**. The sections retrieved include the Chapter 3317 foundation pr
 the formula components rest on, the Chapter 3310 scholarship sections, R.C. 319.301 for H.B. 920
 and the twenty-mill floor, R.C. 5705.391 for the five-year forecast, the Chapter 5753 casino
 sections, R.C. 3302.01, 3302.03, 3302.10 and 3302.12 for the report card and the academic distress
-commission, R.C. 5747.73 for the scholarship donation credit, the development exemptions a
+commission, R.C. 5747.73 for the scholarship donation credit, R.C. 3318.01, 3318.011 and 3318.032
+for the share of a school building a district pays, the development exemptions a
 board of education is noticed of or consents to — tax increment financing under R.C. 5709.40,
 5709.73 and 5709.78 with the service payments of R.C. 5709.42, community reinvestment areas under
 R.C. 3735.67 and 3735.671, enterprise zones under R.C. 5709.62 and 5709.63 with the annual report

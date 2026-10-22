@@ -296,6 +296,7 @@ pub const CONNECTORS: &[Connector] = &[
     auditor::REPORTS,
     courts::OPINIONS,
     ofcc::PROJECTS,
+    ofcc::EQUITY_LISTS,
     census::F33,
     nces::CCD,
     // Ahead of the Census geography, because the geocoder source there is built from this one's

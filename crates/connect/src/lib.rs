@@ -1750,6 +1750,47 @@ fn rebuild_statute_and_acts(root: &Path) -> Result<Vec<Rebuilt>, RebuildError> {
         Err(cause) => Rebuilt::skipped(fixtures::GREENBOOK_FIXTURE, cause),
     });
 
+    // The Facilities Construction Commission's greenbook, whole for the same reason.
+    out.push(
+        match cache::pdf_text(root, registered("hb96-fcc-greenbook")) {
+            Ok(text) => text_fixture(root, fixtures::FCC_GREENBOOK_FIXTURE, text.trim())?,
+            Err(cause) => Rebuilt::skipped(fixtures::FCC_GREENBOOK_FIXTURE, cause),
+        },
+    );
+
+    // The equity lists, oldest first, and the programme status edition beside them. The status
+    // edition is committed as text: its rows wrap a status marker and two ranks around a name the
+    // Commission abbreviates differently from its own lists, and what the corpus reads from it is
+    // a sentence and a handful of ranks rather than a table.
+    out.push(
+        match (|| -> Result<Vec<Vec<String>>, String> {
+            let mut rows = Vec::new();
+            for (key, list_year) in [("ofcc-equity-fy24", 2024), ("ofcc-equity-fy25", 2025)] {
+                let text =
+                    cache::pdf_text(root, registered(key)).map_err(|cause| cause.to_string())?;
+                rows.extend(
+                    fixtures::equity_ranks(&text, list_year)
+                        .map_err(|cause| format!("{key}: {cause}"))?,
+                );
+            }
+            Ok(rows)
+        })() {
+            Ok(rows) => csv_fixture(
+                root,
+                fixtures::OFCC_EQUITY_FIXTURE,
+                fixtures::EQUITY_RANK_HEADER,
+                &rows,
+            )?,
+            Err(reason) => Rebuilt::skipped(fixtures::OFCC_EQUITY_FIXTURE, reason),
+        },
+    );
+    out.push(
+        match cache::pdf_text(root, registered("ofcc-cfap-status")) {
+            Ok(text) => text_fixture(root, fixtures::CFAP_STATUS_FIXTURE, text.trim())?,
+            Err(cause) => Rebuilt::skipped(fixtures::CFAP_STATUS_FIXTURE, cause),
+        },
+    );
+
     let redbook = registered("hb96-edu-redbook");
     out.push(match cache::pdf_text(root, redbook) {
         Ok(text) => text_fixture(root, fixtures::REDBOOK_FIXTURE, text.trim())?,

@@ -1,0 +1,1219 @@
+list_year,rank,district,county,adjusted_valuation_per_pupil
+2024,1,Campbell City SD,Mahoning,39567
+2024,2,Warren City SD,Trumbull,40930
+2024,3,Youngstown City SD,Mahoning,41283
+2024,4,Clearview Local SD,Lorain,52538
+2024,5,Lorain City SD,Lorain,54416
+2024,6,Lima City SD,Allen,54757
+2024,7,East Cleveland City SD,Cuyahoga,54792
+2024,8,Canton City SD,Stark,55668
+2024,9,Painesville City Local SD,Lake,57286
+2024,10,Mad River Local SD,Montgomery,59048
+2024,11,Dayton City SD,Montgomery,59274
+2024,12,Trotwood-Madison City SD,Montgomery,60705
+2024,13,Maple Heights City SD,Cuyahoga,61857
+2024,14,Steubenville City SD,Jefferson,62064
+2024,15,Whitehall City SD,Franklin,64651
+2024,16,Trimble Local SD,Athens,66728
+2024,17,Marion City SD,Marion,67236
+2024,18,Toledo City SD,Lucas,68516
+2024,19,Springfield City SD,Clark,69244
+2024,20,McDonald Local SD,Trumbull,69910
+2024,21,North College Hill City SD,Hamilton,70030
+2024,22,Garfield Heights City SD,Cuyahoga,71283
+2024,23,East Liverpool City SD,Columbiana,71350
+2024,24,Struthers City SD,Mahoning,72152
+2024,25,Mount Healthy City SD,Hamilton,73083
+2024,26,Huntington Local SD,Ross,73362
+2024,27,Wellsville Local SD,Columbiana,73530
+2024,28,Mansfield City SD,Richland,73900
+2024,29,Dawson-Bryant Local SD,Lawrence,74793
+2024,30,Northridge Local SD,Montgomery,75787
+2024,31,Washington-Nile Local SD,Scioto,77208
+2024,32,Fostoria City SD,Seneca,78826
+2024,33,New Miami Local SD,Butler,79320
+2024,34,Girard City SD,Trumbull,80238
+2024,35,Euclid City SD,Cuyahoga,81530
+2024,36,New Boston Local SD,Scioto,83368
+2024,37,Hamilton City SD,Butler,83989
+2024,38,Alliance City SD,Stark,84563
+2024,39,Bucyrus City SD,Crawford,85981
+2024,40,Portsmouth City SD,Scioto,87100
+2024,41,Western Local SD,Pike,87151
+2024,42,Windham Ex Vill SD,Portage,87528
+2024,43,Northwest Local SD,Scioto,88834
+2024,44,Coshocton City SD,Coshocton,90631
+2024,45,Niles City SD,Trumbull,90736
+2024,46,Southern Local SD,Perry,90937
+2024,47,Akron City SD,Summit,92172
+2024,48,Barberton City SD,Summit,92239
+2024,49,Valley Local SD,Scioto,92411
+2024,50,Hamilton Local SD,Franklin,92720
+2024,51,Wellston City SD,Jackson,92919
+2024,52,Galion City SD,Crawford,93128
+2024,53,Fairport Harbor Ex Vill SD,Lake,93853
+2024,54,Lockland City SD,Hamilton,95016
+2024,55,Washington Court House City SD,Fayette,95782
+2024,56,Crestline Ex Vill SD,Crawford,96266
+2024,57,Zanesville City SD,Muskingum,96568
+2024,58,Minford Local SD,Scioto,97949
+2024,59,New Lebanon Local SD,Montgomery,98717
+2024,60,Cleveland Municipal SD,Cuyahoga,98895
+2024,61,Meigs Local SD,Meigs,98982
+2024,62,Middletown City SD,Butler,99289
+2024,63,Lowellville Local SD,Mahoning,99671
+2024,64,Eastern Local SD,Pike,100551
+2024,65,Bethel Local SD,Miami,101498
+2024,66,Western Brown Local SD,Brown,101622
+2024,67,Maysville Local SD,Muskingum,103343
+2024,68,Claymont City SD,Tuscarawas,104512
+2024,69,Sebring Local SD,Mahoning,105123
+2024,70,Clay Local SD,Scioto,105520
+2024,71,Defiance City SD,Defiance,105578
+2024,72,La Brae Local SD,Trumbull,106538
+2024,73,Greenfield Ex Vill SD,Highland,107166
+2024,74,Weathersfield Local SD,Trumbull,107363
+2024,75,Crestview Local SD,Columbiana,108235
+2024,76,College Corner Local SD,Preble,108555
+2024,77,Crooksville Ex Vill SD,Perry,108805
+2024,78,Ohio Valley Local SD,Adams,108875
+2024,79,Batavia Local SD,Clermont,109218
+2024,80,Massillon City SD,Stark,109335
+2024,81,St Bernard-Elmwood Place City SD,Hamilton,109585
+2024,82,Washington Local SD,Lucas,110397
+2024,83,Botkins Local SD,Shelby,111096
+2024,84,Madison Local SD,Richland,111227
+2024,85,Reynoldsburg City SD,Franklin,111864
+2024,86,Tecumseh Local SD,Clark,111896
+2024,87,Fairfield Local SD,Highland,112394
+2024,88,Symmes Valley Local SD,Lawrence,113273
+2024,89,Southeastern Local SD,Ross,114364
+2024,90,Montpelier Ex Vill SD,Williams,114463
+2024,91,Ashtabula Area City SD,Ashtabula,115211
+2024,92,Ansonia Local SD,Darke,115873
+2024,93,Bloom-Vernon Local SD,Scioto,117246
+2024,94,Sandusky City SD,Erie,117336
+2024,95,Union Scioto Local SD,Ross,117848
+2024,96,Winton Woods City SD,Hamilton,118147
+2024,97,Hubbard Ex Vill SD,Trumbull,118481
+2024,98,Fairlawn Local SD,Shelby,118700
+2024,99,Newton Falls Ex Vill SD,Trumbull,118705
+2024,100,Reading Community City SD,Hamilton,118944
+2024,101,East Palestine City SD,Columbiana,119238
+2024,102,Ironton City SD,Lawrence,119280
+2024,103,Mogadore Local SD,Summit,119758
+2024,104,Goshen Local SD,Clermont,120163
+2024,105,Bradford Ex Vill SD,Miami,120354
+2024,106,Huber Heights City SD,Montgomery,121425
+2024,107,Wheelersburg Local SD,Scioto,121524
+2024,108,Rittman Ex Vill SD,Wayne,121722
+2024,109,West Carrollton City SD,Montgomery,122601
+2024,110,Piqua City SD,Miami,123012
+2024,111,Elyria City SD,Lorain,123331
+2024,112,Wauseon Ex Vill SD,Fulton,123372
+2024,113,Toronto City SD,Jefferson,123722
+2024,114,Bellefontaine City SD,Logan,124056
+2024,115,Nelsonville-York City SD,Athens,124592
+2024,116,Carlisle Local SD,Warren,124791
+2024,117,Waverly City SD,Pike,125214
+2024,118,South-Western City SD,Franklin,127345
+2024,119,Van Wert City SD,Van Wert,127364
+2024,120,Lynchburg-Clay Local SD,Highland,127992
+2024,121,Clyde-Green Springs Ex Vill SD,Sandusky,128514
+2024,122,Norwalk City SD,Huron,128540
+2024,123,Indian Valley Local SD,Tuscarawas,128629
+2024,124,Miller City-New Cleveland Local SD,Putnam,129491
+2024,125,Plymouth-Shiloh Local SD,Richland,129895
+2024,126,Georgetown Ex Vill SD,Brown,130494
+2024,127,Ravenna City SD,Portage,130570
+2024,128,Brookfield Local SD,Trumbull,131214
+2024,129,Groveport Madison Local SD,Franklin,131469
+2024,130,Madison Local SD,Butler,131595
+2024,131,Coldwater Ex Vill SD,Mercer,132411
+2024,132,Preble-Shawnee Local SD,Preble,132899
+2024,133,Newark City SD,Licking,132935
+2024,134,Scioto Valley Local SD,Pike,133239
+2024,135,Lisbon Ex Vill SD,Columbiana,133381
+2024,136,Paint Valley Local SD,Ross,133432
+2024,137,Willard City SD,Huron,133518
+2024,138,Ada Ex Vill SD,Hardin,134257
+2024,139,Hicksville Ex Vill SD,Defiance,134431
+2024,140,Cambridge City SD,Guernsey,134629
+2024,141,Kenton City SD,Hardin,135252
+2024,142,West Liberty-Salem Local SD,Champaign,135638
+2024,143,Chillicothe City SD,Ross,136146
+2024,144,South Central Local SD,Huron,136856
+2024,145,Felicity-Franklin Local SD,Clermont,137048
+2024,146,Conneaut Area City SD,Ashtabula,137215
+2024,147,Eastern Local SD,Meigs,137452
+2024,148,Blanchester Local SD,Clinton,138181
+2024,149,Sidney City SD,Shelby,138429
+2024,150,Mississinawa Valley Local SD,Darke,138463
+2024,151,New Lexington City SD,Perry,138587
+2024,152,Bethel-Tate Local SD,Clermont,138755
+2024,153,Pettisville Local SD,Fulton,139186
+2024,154,Arcanum Butler Local SD,Darke,139205
+2024,155,Mechanicsburg Ex Vill SD,Champaign,139904
+2024,156,Gallipolis City SD,Gallia,139947
+2024,157,Ripley-Union-Lewis Local SD,Brown,140073
+2024,158,Osnaburg Local SD,Stark,140481
+2024,159,South Point Local SD,Lawrence,140528
+2024,160,Wapakoneta City SD,Auglaize,140535
+2024,161,Champion Local SD,Trumbull,140878
+2024,162,Carey Ex Vill SD,Wyandot,140926
+2024,163,Northwood Local SD,Wood,141337
+2024,164,New London Local SD,Huron,141394
+2024,165,Spencerville Local SD,Allen,142129
+2024,166,Leetonia Ex Vill SD,Columbiana,142152
+2024,167,Northwestern Local SD,Wayne,142222
+2024,168,Pickerington Local SD,Fairfield,142962
+2024,169,Antwerp Local SD,Paulding,143239
+2024,170,Fort Recovery Local SD,Mercer,143755
+2024,171,Cardington-Lincoln Local SD,Morrow,143850
+2024,172,New Riegel Local SD,Seneca,143969
+2024,173,Russia Local SD,Shelby,144164
+2024,174,Williamsburg Local SD,Clermont,144191
+2024,175,East Clinton Local SD,Clinton,144620
+2024,176,Cincinnati City SD,Hamilton,144769
+2024,177,Jackson City SD,Jackson,144845
+2024,178,Southern Local SD,Meigs,144883
+2024,179,Tiffin City SD,Seneca,144894
+2024,180,Licking Valley Local SD,Licking,145100
+2024,181,Bridgeport Ex Vill SD,Belmont,145145
+2024,182,Buckeye Local SD,Ashtabula,145233
+2024,183,Paulding Ex Vill SD,Paulding,145309
+2024,184,Frontier Local SD,Washington,145416
+2024,185,St Marys City SD,Auglaize,145457
+2024,186,Norwayne Local SD,Wayne,145620
+2024,187,Northmont City SD,Montgomery,145719
+2024,188,Ayersville Local SD,Defiance,145841
+2024,189,Bluffton Ex Vill SD,Allen,145974
+2024,190,Adena Local SD,Ross,146239
+2024,191,Fairborn City SD,Greene,147188
+2024,192,Green Local SD,Scioto,147506
+2024,193,Ridgewood Local SD,Coshocton,147685
+2024,194,Newton Local SD,Miami,148297
+2024,195,Brookville Local SD,Montgomery,148436
+2024,196,Monroe Local SD,Butler,148484
+2024,197,Salem City SD,Columbiana,148819
+2024,198,Austintown Local SD,Mahoning,148923
+2024,199,Leipsic Local SD,Putnam,148992
+2024,200,Circleville City SD,Pickaway,149509
+2024,201,Urbana City SD,Champaign,149780
+2024,202,Old Fort Local SD,Seneca,149819
+2024,203,Edgewood City SD,Butler,149823
+2024,204,Newcomerstown Ex Vill SD,Tuscarawas,149968
+2024,205,Fredericktown Local SD,Knox,150112
+2024,206,Oak Hill Union Local SD,Jackson,150543
+2024,207,Minerva Local SD,Stark,150563
+2024,208,Bryan City SD,Williams,150585
+2024,209,Chesapeake Union Ex Vill SD,Lawrence,150607
+2024,210,Canal Winchester Local SD,Franklin,150898
+2024,211,Danville Local SD,Knox,151030
+2024,212,Hillsboro City SD,Highland,151327
+2024,213,Norton City SD,Summit,151342
+2024,214,James A Garfield Local SD,Portage,151435
+2024,215,Versailles Ex Vill SD,Darke,151449
+2024,216,Licking Heights Local SD,Licking,151520
+2024,217,Ontario Local SD,Richland,151674
+2024,218,Columbus City SD,Franklin,151881
+2024,219,Amanda-Clearcreek Local SD,Fairfield,151904
+2024,220,Pike-Delta-York Local SD,Fulton,152083
+2024,221,Liberty Benton Local SD,Hancock,152487
+2024,222,Allen East Local SD,Allen,152489
+2024,223,Bright Local SD,Highland,153577
+2024,224,Green Local SD,Wayne,153699
+2024,225,Cleveland Hts-Univ Hts City SD,Cuyahoga,154740
+2024,226,Fairland Local SD,Lawrence,154913
+2024,227,Fayetteville-Perry Local SD,Brown,154989
+2024,228,Valley View Local SD,Montgomery,155136
+2024,229,Marion Local SD,Mercer,155247
+2024,230,Clear Fork Valley Local SD,Richland,155581
+2024,231,Riverside Local SD,Logan,156253
+2024,232,Lexington Local SD,Richland,156354
+2024,233,Shelby City SD,Richland,156670
+2024,234,Riverdale Local SD,Hancock,156910
+2024,235,Colonel Crawford Local SD,Crawford,157181
+2024,236,Dover City SD,Tuscarawas,157218
+2024,237,Madison Local SD,Lake,157536
+2024,238,Mount Gilead Ex Vill SD,Morrow,157678
+2024,239,Oak Hills Local SD,Hamilton,157682
+2024,240,Finneytown Local SD,Hamilton,157778
+2024,241,Millcreek-West Unity Local SD,Williams,157805
+2024,242,Louisville City SD,Stark,158972
+2024,243,Continental Local SD,Putnam,159125
+2024,244,Lake Local SD,Stark,159358
+2024,245,Genoa Area Local SD,Ottawa,159835
+2024,246,Pymatuning Valley Local SD,Ashtabula,160174
+2024,247,Lancaster City SD,Fairfield,160599
+2024,248,Milton-Union Ex Vill SD,Miami,160805
+2024,249,Orrville City SD,Wayne,160934
+2024,250,Liberty Local SD,Trumbull,161696
+2024,251,Warrensville Heights City SD,Cuyahoga,162366
+2024,252,Jefferson Area Local SD,Ashtabula,162637
+2024,253,Covington Ex Vill SD,Miami,162882
+2024,254,Bellevue City SD,Huron,164042
+2024,255,Ottawa-Glandorf Local SD,Putnam,164319
+2024,256,Martins Ferry City SD,Belmont,164499
+2024,257,Fayette Local SD,Fulton,164718
+2024,258,Northwestern Local SD,Clark,164728
+2024,259,Heath City SD,Licking,164870
+2024,260,Waynesfield-Goshen Local SD,Auglaize,165271
+2024,261,Celina City SD,Mercer,165417
+2024,262,Western Reserve Local SD,Huron,165501
+2024,263,Tri-Village Local SD,Darke,165630
+2024,264,Maplewood Local SD,Trumbull,165867
+2024,265,New Philadelphia City SD,Tuscarawas,166254
+2024,266,Southeast Local SD,Portage,166356
+2024,267,Teays Valley Local SD,Pickaway,166638
+2024,268,Anna Local SD,Shelby,166660
+2024,269,St Henry Consolidated Local SD,Mercer,167274
+2024,270,Sandy Valley Local SD,Stark,167542
+2024,271,Xenia Community City SD,Greene,167934
+2024,272,Fairfield Union Local SD,Fairfield,167958
+2024,273,New Knoxville Local SD,Auglaize,168307
+2024,274,Southington Local SD,Trumbull,168373
+2024,275,Bath Local SD,Allen,168538
+2024,276,Greenon Local SD,Clark,168569
+2024,277,Warren Local SD,Washington,168727
+2024,278,Eaton Community Schools City SD,Preble,168770
+2024,279,Highland Local SD,Morrow,169222
+2024,280,Pleasant Local SD,Marion,169357
+2024,281,National Trail Local SD,Preble,169381
+2024,282,Centerburg Local SD,Knox,169944
+2024,283,River Valley Local SD,Marion,170065
+2024,284,Columbus Grove Local SD,Putnam,170469
+2024,285,Findlay City SD,Hancock,170621
+2024,286,Triad Local SD,Champaign,170693
+2024,287,Southwest Local SD,Hamilton,170804
+2024,288,Liberty Center Local SD,Henry,170894
+2024,289,Mapleton Local SD,Ashland,170974
+2024,290,Franklin City SD,Warren,170980
+2024,291,Amherst Ex Vill SD,Lorain,171450
+2024,292,Elida Local SD,Allen,171749
+2024,293,New Bremen Local SD,Auglaize,171829
+2024,294,West Branch Local SD,Mahoning,171914
+2024,295,Hardin-Houston Local SD,Shelby,172066
+2024,296,Delaware City SD,Delaware,172566
+2024,297,Central Local SD,Defiance,172604
+2024,298,Edgerton Local SD,Williams,173187
+2024,299,Arlington Local SD,Hancock,173238
+2024,300,Perry Local SD,Stark,173270
+2024,301,Manchester Local SD,Adams,174062
+2024,302,Marysville Ex Vill SD,Union,174161
+2024,303,Jennings Local SD,Putnam,174924
+2024,304,South Range Local SD,Mahoning,174964
+2024,305,Gibsonburg Ex Vill SD,Sandusky,175599
+2024,306,Mount Vernon City SD,Knox,175860
+2024,307,Fairfield City SD,Butler,176354
+2024,308,Geneva Area City SD,Ashtabula,176408
+2024,309,Edon-Northwest Local SD,Williams,176468
+2024,310,Fremont City SD,Sandusky,176706
+2024,311,North Union Local SD,Union,176791
+2024,312,Lakeview Local SD,Trumbull,177010
+2024,313,Ross Local SD,Butler,177170
+2024,314,Southwest Licking Local SD,Licking,177745
+2024,315,Greenville City SD,Darke,178106
+2024,316,Beaver Local SD,Columbiana,178329
+2024,317,Tri-County North Local SD,Preble,178554
+2024,318,Shadyside Local SD,Belmont,178703
+2024,319,Oregon City SD,Lucas,178717
+2024,320,Tri-Valley Local SD,Muskingum,178781
+2024,321,Plain Local SD,Stark,178890
+2024,322,Lake Local SD,Wood,178939
+2024,323,Federal Hocking Local SD,Athens,179072
+2024,324,Ashland City SD,Ashland,179701
+2024,325,Barnesville Ex Vill SD,Belmont,179761
+2024,326,Tallmadge City SD,Summit,180001
+2024,327,Olmsted Falls City SD,Cuyahoga,180227
+2024,328,Jackson Center Local SD,Shelby,180949
+2024,329,Northeastern Local SD,Clark,180996
+2024,330,Ottawa Hills Local SD,Lucas,181229
+2024,331,Twin Valley Community Local SD,Preble,181343
+2024,332,Southern Local SD,Columbiana,181799
+2024,333,Northwest Local SD,Hamilton,182055
+2024,334,London City SD,Madison,182131
+2024,335,Fort Loramie Local SD,Shelby,182931
+2024,336,Wynford Local SD,Crawford,182967
+2024,337,Ottoville Local SD,Putnam,183117
+2024,338,North Central Local SD,Williams,183717
+2024,339,Perry Local SD,Allen,183844
+2024,340,East Muskingum Local SD,Muskingum,184229
+2024,341,Franklin-Monroe Local SD,Darke,184606
+2024,342,Liberty Union-Thurston Local SD,Fairfield,184657
+2024,343,West Clermont Local SD,Clermont,184667
+2024,344,Western Reserve Local SD,Mahoning,184698
+2024,345,Eastern Local SD,Brown,185054
+2024,346,North Fork Local SD,Licking,185094
+2024,347,Parkway Local SD,Mercer,185646
+2024,348,Kettering City SD,Montgomery,185847
+2024,349,Bristol Local SD,Trumbull,185890
+2024,350,Tuslaw Local SD,Stark,186317
+2024,351,Elgin Local SD,Marion,187019
+2024,352,Milford Ex Vill SD,Clermont,187174
+2024,353,Morgan Local SD,Morgan,187485
+2024,354,Tipp City Ex Vill SD,Miami,187504
+2024,355,Miamisburg City SD,Montgomery,188042
+2024,356,Lincolnview Local SD,Van Wert,188244
+2024,357,Caldwell Ex Vill SD,Noble,188497
+2024,358,Upper Scioto Valley Local SD,Hardin,189250
+2024,359,Miami East Local SD,Miami,189967
+2024,360,Pandora-Gilboa Local SD,Putnam,190387
+2024,361,Jefferson Township Local SD,Montgomery,190420
+2024,362,Waterloo Local SD,Portage,190750
+2024,363,McComb Local SD,Hancock,190806
+2024,364,Seneca East Local SD,Seneca,190992
+2024,365,Troy City SD,Miami,191254
+2024,366,Zane Trace Local SD,Ross,191280
+2024,367,Wadsworth City SD,Medina,191934
+2024,368,Ridgemont Local SD,Hardin,192242
+2024,369,Upper Sandusky Ex Vill SD,Wyandot,192400
+2024,370,Kalida Local SD,Putnam,192513
+2024,371,Three Rivers Local SD,Hamilton,192543
+2024,372,Indian Creek Local SD,Jefferson,192692
+2024,373,Belpre City SD,Washington,192925
+2024,374,Rolling Hills Local SD,Guernsey,193200
+2024,375,Northwest Local SD,Stark,193491
+2024,376,Joseph Badger Local SD,Trumbull,193788
+2024,377,Cedar Cliff Local SD,Greene,195255
+2024,378,Parma City SD,Cuyahoga,195267
+2024,379,Shaker Heights City SD,Cuyahoga,195607
+2024,380,Rootstown Local SD,Portage,195664
+2024,381,Holgate Local SD,Henry,195793
+2024,382,Stryker Local SD,Williams,196562
+2024,383,Lakota Local SD,Sandusky,196569
+2024,384,Swanton Local SD,Fulton,197311
+2024,385,Graham Local SD,Champaign,197723
+2024,386,North Canton City SD,Stark,198181
+2024,387,Springfield Local SD,Summit,198205
+2024,388,Clinton-Massie Local SD,Clinton,198698
+2024,389,Greeneview Local SD,Greene,198732
+2024,390,Cuyahoga Falls City SD,Summit,198972
+2024,391,Vinton County Local SD,Vinton,199330
+2024,392,Westerville City SD,Franklin,199419
+2024,393,Alexander Local SD,Athens,200224
+2024,394,Brunswick City SD,Medina,200390
+2024,395,Napoleon City SD,Henry,200839
+2024,396,Bloom Carroll Local SD,Fairfield,200887
+2024,397,Clark-Shawnee Local SD,Clark,200897
+2024,398,Northern Local SD,Perry,201188
+2024,399,Wyoming City SD,Hamilton,201277
+2024,400,Wilmington City SD,Clinton,201453
+2024,401,Oakwood City SD,Montgomery,201908
+2024,402,Cory-Rawson Local SD,Hancock,202054
+2024,403,Hilliard City SD,Franklin,202177
+2024,404,Minster Local SD,Auglaize,202348
+2024,405,Springfield Local SD,Lucas,202726
+2024,406,Manchester Local SD,Summit,203034
+2024,407,Southeastern Local SD,Clark,203161
+2024,408,Hardin Northern Local SD,Hardin,203494
+2024,409,Lebanon City SD,Warren,203616
+2024,410,Boardman Local SD,Mahoning,205231
+2024,411,North Baltimore Local SD,Wood,205434
+2024,412,Sylvania City SD,Lucas,205578
+2024,413,Wooster City SD,Wayne,205861
+2024,414,Midview Local SD,Lorain,207251
+2024,415,Monroeville Local SD,Huron,207427
+2024,416,Kent City SD,Portage,207552
+2024,417,Perrysburg Ex Vill SD,Wood,207702
+2024,418,Shawnee Local SD,Allen,207960
+2024,419,Lakota Local SD,Butler,208541
+2024,420,Otsego Local SD,Wood,208916
+2024,421,Maumee City SD,Lucas,209312
+2024,422,Coventry Local SD,Summit,209325
+2024,423,Bellaire Local SD,Belmont,209711
+2024,424,Jonathan Alder Local SD,Madison,210332
+2024,425,Grand Valley Local SD,Ashtabula,211660
+2024,426,Springfield Local SD,Mahoning,212083
+2024,427,Logan-Hocking Local SD,Hocking,212283
+2024,428,Northmor Local SD,Morrow,212884
+2024,429,Black River Local SD,Medina,214051
+2024,430,Loudonville-Perrysville Ex Vill SD,Ashland,214276
+2024,431,Crestview Local SD,Van Wert,215182
+2024,432,Wayne Trace Local SD,Paulding,215569
+2024,433,Forest Hills Local SD,Hamilton,215638
+2024,434,Wickliffe City SD,Lake,215676
+2024,435,Johnstown-Monroe Local SD,Licking,217368
+2024,436,Columbiana Ex Vill SD,Columbiana,218520
+2024,437,Logan Elm Local SD,Pickaway,218663
+2024,438,Dalton Local SD,Wayne,218870
+2024,439,Archbold-Area Local SD,Fulton,220746
+2024,440,Delphos City SD,Allen,221218
+2024,441,Little Miami Local SD,Warren,221906
+2024,442,Crestview Local SD,Richland,222062
+2024,443,Stow-Munroe Falls City SD,Summit,222405
+2024,444,Strasburg-Franklin Local SD,Tuscarawas,222427
+2024,445,Crestwood Local SD,Portage,222936
+2024,446,Green Local SD,Summit,223218
+2024,447,Howland Local SD,Trumbull,223471
+2024,448,Kings Local SD,Warren,223542
+2024,449,North Ridgeville City SD,Lorain,223931
+2024,450,Deer Park Community City SD,Hamilton,224026
+2024,451,Yellow Springs Ex Vill SD,Greene,224147
+2024,452,Wayne Local SD,Warren,224481
+2024,453,Canton Local SD,Stark,224700
+2024,454,Marietta City SD,Washington,224814
+2024,455,Firelands Local SD,Lorain,224901
+2024,456,Chippewa Local SD,Wayne,226103
+2024,457,Worthington City SD,Franklin,226258
+2024,458,Vandalia-Butler City SD,Montgomery,226351
+2024,459,Clermont-Northeastern Local SD,Clermont,227913
+2024,460,Jefferson Local SD,Madison,228226
+2024,461,Wellington Ex Vill SD,Lorain,228306
+2024,462,Richmond Heights Local SD,Cuyahoga,230022
+2024,463,Brown Local SD,Carroll,230492
+2024,464,Keystone Local SD,Lorain,230860
+2024,465,Gahanna-Jefferson City SD,Franklin,231574
+2024,466,South Euclid-Lyndhurst City SD,Cuyahoga,231672
+2024,467,Olentangy Local SD,Delaware,233076
+2024,468,Mason City SD,Warren,233247
+2024,469,Vanlue Local SD,Hancock,234011
+2024,470,Franklin Local SD,Muskingum,234377
+2024,471,Norwood City SD,Hamilton,234977
+2024,472,Woodmore Local SD,Sandusky,235374
+2024,473,Rossford Ex Vill SD,Wood,235807
+2024,474,Loveland City SD,Hamilton,235965
+2024,475,Bedford City SD,Cuyahoga,236345
+2024,476,North Olmsted City SD,Cuyahoga,236818
+2024,477,West Muskingum Local SD,Muskingum,237306
+2024,478,Field Local SD,Portage,237412
+2024,479,West Holmes Local SD,Holmes,237520
+2024,480,Poland Local SD,Mahoning,238321
+2024,481,Medina City SD,Medina,238364
+2024,482,Fairless Local SD,Stark,238564
+2024,483,Perry Local SD,Lake,239077
+2024,484,Avon Local SD,Lorain,239703
+2024,485,Lucas Local SD,Richland,240287
+2024,486,River View Local SD,Coshocton,240351
+2024,487,Marlington Local SD,Stark,243246
+2024,488,Willoughby-Eastlake City SD,Lake,243531
+2024,489,Granville Ex Vill SD,Licking,243606
+2024,490,Sheffield-Sheffield Lake City SD,Lorain,245098
+2024,491,Streetsboro City SD,Portage,245125
+2024,492,Ridgedale Local SD,Marion,246152
+2024,493,Edison Local SD,Erie,247086
+2024,494,Gallia County Local SD,Gallia,247899
+2024,495,Mathews Local SD,Trumbull,247955
+2024,496,Elmwood Local SD,Wood,248654
+2024,497,New Richmond Ex Vill SD,Clermont,249222
+2024,498,Dublin City SD,Franklin,249391
+2024,499,New Albany-Plain Local SD,Franklin,250501
+2024,500,Springboro Community City SD,Warren,250602
+2024,501,Twinsburg City SD,Summit,251166
+2024,502,Sugarcreek Local SD,Greene,251411
+2024,503,Canfield Local SD,Mahoning,253660
+2024,504,Benjamin Logan Local SD,Logan,255482
+2024,505,Evergreen Local SD,Fulton,257015
+2024,506,Bowling Green City SD,Wood,258982
+2024,507,United Local SD,Columbiana,259167
+2024,508,Lakewood City SD,Cuyahoga,260255
+2024,509,Garaway Local SD,Tuscarawas,260346
+2024,510,Beavercreek City SD,Greene,261592
+2024,511,Berea City SD,Cuyahoga,264604
+2024,512,Centerville City SD,Montgomery,265062
+2024,513,Bexley City SD,Franklin,266078
+2024,514,Riverside Local SD,Lake,266536
+2024,515,Athens City SD,Athens,269225
+2024,516,Madison-Plains Local SD,Madison,269256
+2024,517,Jackson Local SD,Stark,271003
+2024,518,Princeton City SD,Hamilton,271192
+2024,519,Triway Local SD,Wayne,272311
+2024,520,Miami Trace Local SD,Fayette,272359
+2024,521,Mentor Ex Vill SD,Lake,272460
+2024,522,Chardon Local SD,Geauga,273162
+2024,523,Fairview Park City SD,Cuyahoga,274587
+2024,524,Anthony Wayne Local SD,Lucas,275656
+2024,525,Talawanda City SD,Butler,275968
+2024,526,Oberlin City SD,Lorain,277390
+2024,527,Aurora City SD,Portage,278641
+2024,528,Mariemont City SD,Hamilton,280510
+2024,529,Eastwood Local SD,Wood,280952
+2024,530,Vermilion Local SD,Erie,283239
+2024,531,Union Local SD,Belmont,283497
+2024,532,Berkshire Local SD,Geauga,283861
+2024,533,Lakewood Local SD,Licking,284820
+2024,534,Bloomfield-Mespo Local SD,Trumbull,285481
+2024,535,Fairbanks Local SD,Union,285642
+2024,536,Madeira City SD,Hamilton,285768
+2024,537,East Knox Local SD,Knox,286077
+2024,538,Bay Village City SD,Cuyahoga,286940
+2024,539,Brooklyn City SD,Cuyahoga,287242
+2024,540,Columbia Local SD,Lorain,287977
+2024,541,Berne Union Local SD,Fairfield,289875
+2024,542,Big Walnut Local SD,Delaware,290086
+2024,543,Mohawk Local SD,Wyandot,290317
+2024,544,Buckeye Local SD,Jefferson,290593
+2024,545,East Guernsey Local SD,Guernsey,292001
+2024,546,Cloverleaf Local SD,Medina,295039
+2024,547,Westfall Local SD,Pickaway,295477
+2024,548,Woodridge Local SD,Summit,296324
+2024,549,Arcadia Local SD,Hancock,296526
+2024,550,Hudson City SD,Summit,297207
+2024,551,Van Buren Local SD,Hancock,298086
+2024,552,Tuscarawas Valley Local SD,Tuscarawas,298271
+2024,553,Buckeye Local SD,Medina,298415
+2024,554,Hopewell-Loudon Local SD,Seneca,299870
+2024,555,Jackson-Milton Local SD,Mahoning,300335
+2024,556,Highland Local SD,Medina,300543
+2024,557,Fort Frye Local SD,Washington,301607
+2024,558,Benton Carroll Salem Local SD,Ottawa,304140
+2024,559,Northridge Local SD,Licking,305051
+2024,560,Avon Lake City SD,Lorain,305497
+2024,561,Edison Local SD,Jefferson,306152
+2024,562,Solon City SD,Cuyahoga,307006
+2024,563,Margaretta Local SD,Erie,309497
+2024,564,Perkins Local SD,Erie,310728
+2024,565,North Royalton City SD,Cuyahoga,311589
+2024,566,Strongsville City SD,Cuyahoga,311777
+2024,567,Lordstown Local SD,Trumbull,316568
+2024,568,Nordonia Hills City SD,Summit,322087
+2024,569,Rock Hill Local SD,Lawrence,323935
+2024,570,Patrick Henry Local SD,Henry,327907
+2024,571,Huron City SD,Erie,330667
+2024,572,Kirtland Local SD,Lake,331143
+2024,573,Carrollton Ex Vill SD,Carroll,332925
+2024,574,Brecksville-Broadview Heights City,Cuyahoga,333716
+2024,575,Indian Lake Local SD,Logan,333899
+2024,576,Buckeye Valley Local SD,Delaware,334052
+2024,577,Copley-Fairlawn City SD,Summit,352812
+2024,578,Walnut Township Local SD,Fairfield,360763
+2024,579,Wolf Creek Local SD,Washington,361359
+2024,580,Kenston Local SD,Geauga,363259
+2024,581,Mayfield City SD,Cuyahoga,363373
+2024,582,Upper Arlington City SD,Franklin,364285
+2024,583,St Clairsville-Richland City SD,Belmont,367148
+2024,584,Cardinal Local SD,Geauga,368394
+2024,585,Chagrin Falls Ex Vill SD,Cuyahoga,375012
+2024,586,Rocky River City SD,Cuyahoga,375556
+2024,587,Sycamore Community City SD,Hamilton,378686
+2024,588,Grandview Heights City SD,Franklin,392769
+2024,589,Northeastern Local SD,Defiance,397161
+2024,590,East Holmes Local SD,Holmes,403634
+2024,591,Southeast Local SD,Wayne,404761
+2024,592,West Geauga Local SD,Geauga,407444
+2024,593,Revere Local SD,Summit,419720
+2024,594,Buckeye Central Local SD,Crawford,446309
+2024,595,Harrison Hills City SD,Harrison,453782
+2024,596,Hillsdale Local SD,Ashland,458592
+2024,597,Port Clinton City SD,Ottawa,460760
+2024,598,Independence Local SD,Cuyahoga,479254
+2024,599,Cuyahoga Heights Local SD,Cuyahoga,504845
+2024,600,Westlake City SD,Cuyahoga,510079
+2024,601,Beachwood City SD,Cuyahoga,552339
+2024,602,Switzerland Of Ohio Local SD,Monroe,608458
+2024,603,Orange City SD,Cuyahoga,617640
+2024,604,Noble Local SD,Noble,618472
+2024,605,Conotton Valley Union Local,Harrison,634616
+2024,606,Indian Hill Ex Vill SD,Hamilton,656865
+2024,607,Danbury Local SD,Ottawa,1033376
+2024,608,Put-In-Bay Local SD,Ottawa,2315543
+2024,609,Kelleys Island Local SD,Erie,10884215
+2025,1,Warren City SD,Trumbull,42315
+2025,2,Campbell City SD,Mahoning,43287
+2025,3,Youngstown City SD,Mahoning,43294
+2025,4,Lorain City SD,Lorain,57360
+2025,5,Canton City SD,Stark,58094
+2025,6,Clearview Local SD,Lorain,58151
+2025,7,Lima City SD,Allen,59113
+2025,8,East Cleveland City SD,Cuyahoga,59539
+2025,9,Mad River Local SD,Montgomery,60923
+2025,10,Painesville City Local SD,Lake,61008
+2025,11,Dayton City SD,Montgomery,61590
+2025,12,Trotwood-Madison City SD,Montgomery,62983
+2025,13,Steubenville City SD,Jefferson,63047
+2025,14,Whitehall City SD,Franklin,66411
+2025,15,Maple Heights City SD,Cuyahoga,67318
+2025,16,Marion City SD,Marion,70385
+2025,17,Toledo City SD,Lucas,71672
+2025,18,Springfield City SD,Clark,71936
+2025,19,Trimble Local SD,Athens,72762
+2025,20,McDonald Local SD,Trumbull,73990
+2025,21,North College Hill City SD,Hamilton,74309
+2025,22,Mansfield City SD,Richland,75602
+2025,23,East Liverpool City SD,Columbiana,75944
+2025,24,Garfield Heights City SD,Cuyahoga,76139
+2025,25,Struthers City SD,Mahoning,76429
+2025,26,Mount Healthy City SD,Hamilton,77349
+2025,27,Northridge Local SD,Montgomery,77472
+2025,28,Wellsville Local SD,Columbiana,77586
+2025,29,Huntington Local SD,Ross,78843
+2025,30,Fostoria City SD,Seneca,83157
+2025,31,Girard City SD,Trumbull,83695
+2025,32,Washington-Nile Local SD,Scioto,84613
+2025,33,Dawson-Bryant Local SD,Lawrence,86260
+2025,34,New Miami Local SD,Butler,86778
+2025,35,Euclid City SD,Cuyahoga,87991
+2025,36,Portsmouth City SD,Scioto,89152
+2025,37,Alliance City SD,Stark,89819
+2025,38,Hamilton City SD,Butler,90389
+2025,39,New Boston Local SD,Scioto,90445
+2025,40,Bucyrus City SD,Crawford,91001
+2025,41,Western Local SD,Pike,92022
+2025,42,Windham Ex Vill SD,Portage,92284
+2025,43,Coshocton City SD,Coshocton,93188
+2025,44,Southern Local SD,Perry,93811
+2025,45,Niles City SD,Trumbull,93982
+2025,46,Northwest Local SD,Scioto,95532
+2025,47,Akron City SD,Summit,96817
+2025,48,Crestline Ex Vill SD,Crawford,97261
+2025,49,Barberton City SD,Summit,98328
+2025,50,Hamilton Local SD,Franklin,98357
+2025,51,Galion City SD,Crawford,98667
+2025,52,Bethel Local SD,Miami,98955
+2025,53,Valley Local SD,Scioto,99205
+2025,54,Zanesville City SD,Muskingum,100019
+2025,55,Lockland City SD,Hamilton,100104
+2025,56,Fairport Harbor Ex Vill SD,Lake,101854
+2025,57,College Corner Local SD,Preble,102591
+2025,58,Washington Court House City,Fayette,102855
+2025,59,New Lebanon Local SD,Montgomery,103268
+2025,60,Minford Local SD,Scioto,103787
+2025,61,Cleveland Municipal SD,Cuyahoga,104584
+2025,62,Middletown City SD,Butler,105069
+2025,63,Eastern Local SD,Pike,105229
+2025,64,Meigs Local SD,Meigs,105759
+2025,65,Western Brown Local SD,Brown,105922
+2025,66,Wellston City SD,Jackson,106333
+2025,67,Lowellville Local SD,Mahoning,107258
+2025,68,Defiance City SD,Defiance,109746
+2025,69,Sebring Local SD,Mahoning,109884
+2025,70,Maysville Local SD,Muskingum,109918
+2025,71,La Brae Local SD,Trumbull,110358
+2025,72,Clay Local SD,Scioto,111672
+2025,73,Weathersfield Local SD,Trumbull,112584
+2025,74,Botkins Local SD,Shelby,112645
+2025,75,Greenfield Ex Vill SD,Highland,112798
+2025,76,Claymont City SD,Tuscarawas,113112
+2025,77,Massillon City SD,Stark,114002
+2025,78,Batavia Local SD,Clermont,114094
+2025,79,Crestview Local SD,Columbiana,115474
+2025,80,Montpelier Ex Vill SD,Williams,115656
+2025,81,Ansonia Local SD,Darke,116036
+2025,82,Washington Local SD,Lucas,116784
+2025,83,Fairfield Local SD,Highland,116903
+2025,84,Ohio Valley Local SD,Adams,116952
+2025,85,Reynoldsburg City SD,Franklin,117130
+2025,86,St Bernard-Elmwood Place Cit,Hamilton,117883
+2025,87,Ashtabula Area City SD,Ashtabula,120074
+2025,88,Tecumseh Local SD,Clark,120151
+2025,89,Madison Local SD,Richland,120389
+2025,90,Sandusky City SD,Erie,121817
+2025,91,Southeastern Local SD,Ross,122104
+2025,92,Bloom-Vernon Local SD,Scioto,122244
+2025,93,Crooksville Ex Vill SD,Perry,122443
+2025,94,Fairlawn Local SD,Shelby,122779
+2025,95,Winton Woods City SD,Hamilton,122834
+2025,96,Goshen Local SD,Clermont,123559
+2025,97,Bradford Ex Vill SD,Miami,124503
+2025,98,Union Scioto Local SD,Ross,124718
+2025,99,Hubbard Ex Vill SD,Trumbull,125314
+2025,100,Ironton City SD,Lawrence,125753
+2025,101,Newton Falls Ex Vill SD,Trumbull,126218
+2025,102,East Palestine City SD,Columbiana,126700
+2025,103,Huber Heights City SD,Montgomery,127121
+2025,104,Wheelersburg Local SD,Scioto,127226
+2025,105,Elyria City SD,Lorain,127675
+2025,106,Miller City-New Cleveland Lo,Putnam,128593
+2025,107,Wauseon Ex Vill SD,Fulton,128676
+2025,108,Reading Community City SD,Hamilton,128792
+2025,109,West Carrollton City SD,Montgomery,128926
+2025,110,Mogadore Local SD,Summit,129451
+2025,111,Toronto City SD,Jefferson,130638
+2025,112,Van Wert City SD,Van Wert,130885
+2025,113,Piqua City SD,Miami,131096
+2025,114,Plymouth-Shiloh Local SD,Richland,131868
+2025,115,Rittman Ex Vill SD,Wayne,132030
+2025,116,Bellefontaine City SD,Logan,132120
+2025,117,Waverly City SD,Pike,132485
+2025,118,Carlisle Local SD,Warren,132818
+2025,119,Clyde-Green Springs Ex Vill,Sandusky,133968
+2025,120,Coldwater Ex Vill SD,Mercer,134578
+2025,121,Ada Ex Vill SD,Hardin,134615
+2025,122,Norwalk City SD,Huron,135077
+2025,123,Nelsonville-York City SD,Athens,135660
+2025,124,Lynchburg-Clay Local SD,Highland,135857
+2025,125,Georgetown Ex Vill SD,Brown,136048
+2025,126,South-Western City SD,Franklin,136131
+2025,127,Groveport Madison Local SD,Franklin,136981
+2025,128,Kenton City SD,Hardin,137178
+2025,129,Brookfield Local SD,Trumbull,137261
+2025,130,Hicksville Ex Vill SD,Defiance,137623
+2025,131,Preble-Shawnee Local SD,Preble,138128
+2025,132,Madison Local SD,Butler,138563
+2025,133,Mississinawa Valley Local SD,Darke,138966
+2025,134,Scioto Valley Local SD,Pike,139100
+2025,135,Ravenna City SD,Portage,139315
+2025,136,Felicity-Franklin Local SD,Clermont,139656
+2025,137,South Central Local SD,Huron,139681
+2025,138,Arcanum Butler Local SD,Darke,140207
+2025,139,Conneaut Area City SD,Ashtabula,140625
+2025,140,Indian Valley Local SD,Tuscarawas,140723
+2025,141,Paint Valley Local SD,Ross,140876
+2025,142,Cambridge City SD,Guernsey,140976
+2025,143,West Liberty-Salem Local SD,Champaign,141868
+2025,144,Chillicothe City SD,Ross,142007
+2025,145,Willard City SD,Huron,142107
+2025,146,Symmes Valley Local SD,Lawrence,142355
+2025,147,New London Local SD,Huron,142675
+2025,148,Lisbon Ex Vill SD,Columbiana,143098
+2025,149,Manchester Local SD,Adams,143436
+2025,150,Ripley-Union-Lewis Local SD,Brown,143811
+2025,151,Newark City SD,Licking,144020
+2025,152,Mechanicsburg Ex Vill SD,Champaign,144513
+2025,153,Spencerville Local SD,Allen,144533
+2025,154,Fort Recovery Local SD,Mercer,146405
+2025,155,Eastern Local SD,Meigs,146506
+2025,156,Gallipolis City SD,Gallia,147137
+2025,157,Bethel-Tate Local SD,Clermont,147355
+2025,158,Carey Ex Vill SD,Wyandot,147521
+2025,159,Sidney City SD,Shelby,147779
+2025,160,Champion Local SD,Trumbull,147904
+2025,161,New Riegel Local SD,Seneca,147952
+2025,162,Wapakoneta City SD,Auglaize,148951
+2025,163,Osnaburg Local SD,Stark,149060
+2025,164,Bridgeport Ex Vill SD,Belmont,149087
+2025,165,Williamsburg Local SD,Clermont,149093
+2025,166,East Clinton Local SD,Clinton,149141
+2025,167,Leipsic Local SD,Putnam,149163
+2025,168,Ayersville Local SD,Defiance,149538
+2025,169,Russia Local SD,Shelby,149626
+2025,170,Paulding Ex Vill SD,Paulding,150161
+2025,171,St Marys City SD,Auglaize,150291
+2025,172,Old Fort Local SD,Seneca,150319
+2025,173,Buckeye Local SD,Ashtabula,150766
+2025,174,Tiffin City SD,Seneca,150852
+2025,175,Blanchester Local SD,Clinton,150988
+2025,176,Pettisville Local SD,Fulton,151193
+2025,177,Pickerington Local SD,Fairfield,151256
+2025,178,Brookville Local SD,Montgomery,151352
+2025,179,Northwood Local SD,Wood,151408
+2025,180,Bluffton Ex Vill SD,Allen,151473
+2025,181,Northwestern Local SD,Wayne,151811
+2025,182,Cincinnati City SD,Hamilton,151917
+2025,183,Antwerp Local SD,Paulding,152103
+2025,184,Cardington-Lincoln Local SD,Morrow,152175
+2025,185,Adena Local SD,Ross,152233
+2025,186,Northmont City SD,Montgomery,152617
+2025,187,Southern Local SD,Meigs,152682
+2025,188,New Lexington City SD,Perry,152822
+2025,189,Millcreek-West Unity Local S,Williams,152944
+2025,190,Newton Local SD,Miami,153161
+2025,191,Licking Valley Local SD,Licking,153441
+2025,192,Ridgewood Local SD,Coshocton,153702
+2025,193,Frontier Local SD,Washington,153879
+2025,194,Continental Local SD,Putnam,154511
+2025,195,South Point Local SD,Lawrence,154657
+2025,196,Monroe Local SD,Butler,155207
+2025,197,Austintown Local SD,Mahoning,155318
+2025,198,Fairborn City SD,Greene,155401
+2025,199,Norwayne Local SD,Wayne,155577
+2025,200,Jackson City SD,Jackson,155615
+2025,201,Pike-Delta-York Local SD,Fulton,155829
+2025,202,Fredericktown Local SD,Knox,156200
+2025,203,Salem City SD,Columbiana,156314
+2025,204,Allen East Local SD,Allen,156893
+2025,205,Leetonia Ex Vill SD,Columbiana,156916
+2025,206,Hillsboro City SD,Highland,157072
+2025,207,Edgewood City SD,Butler,157358
+2025,208,Bryan City SD,Williams,157393
+2025,209,Danville Local SD,Knox,157569
+2025,210,Urbana City SD,Champaign,157768
+2025,211,Marion Local SD,Mercer,158313
+2025,212,Versailles Ex Vill SD,Darke,158357
+2025,213,Ontario Local SD,Richland,158700
+2025,214,Riverdale Local SD,Hancock,159475
+2025,215,Liberty Benton Local SD,Hancock,160449
+2025,216,Bright Local SD,Highland,160605
+2025,217,Valley View Local SD,Montgomery,160865
+2025,218,Licking Heights Local SD,Licking,160924
+2025,219,Cleveland Hts-Univ Hts City,Cuyahoga,161016
+2025,220,James A Garfield Local SD,Portage,161091
+2025,221,Liberty Local SD,Trumbull,161219
+2025,222,Green Local SD,Scioto,161384
+2025,223,Circleville City SD,Pickaway,161765
+2025,224,Minerva Local SD,Stark,162171
+2025,225,Riverside Local SD,Logan,162564
+2025,226,Colonel Crawford Local SD,Crawford,162689
+2025,227,Columbus City SD,Franklin,163218
+2025,228,Fayetteville-Perry Local SD,Brown,163507
+2025,229,Lexington Local SD,Richland,163547
+2025,230,Chesapeake Union Ex Vill SD,Lawrence,163576
+2025,231,Mount Gilead Ex Vill SD,Morrow,163809
+2025,232,Green Local SD,Wayne,163904
+2025,233,Canal Winchester Local SD,Franklin,163969
+2025,234,Norton City SD,Summit,164292
+2025,235,Fairland Local SD,Lawrence,164403
+2025,236,Waynesfield-Goshen Local SD,Auglaize,164685
+2025,237,Pymatuning Valley Local SD,Ashtabula,164741
+2025,238,Oak Hills Local SD,Hamilton,164770
+2025,239,Jefferson Area Local SD,Ashtabula,165081
+2025,240,Amanda-Clearcreek Local SD,Fairfield,165131
+2025,241,Newcomerstown Ex Vill SD,Tuscarawas,165142
+2025,242,Oak Hill Union Local SD,Jackson,165732
+2025,243,Fayette Local SD,Fulton,166110
+2025,244,Warrensville Heights City SD,Cuyahoga,166298
+2025,245,Dover City SD,Tuscarawas,166533
+2025,246,Genoa Area Local SD,Ottawa,166842
+2025,247,Clear Fork Valley Local SD,Richland,166942
+2025,248,Milton-Union Ex Vill SD,Miami,167034
+2025,249,Tri-Village Local SD,Darke,167057
+2025,250,Madison Local SD,Lake,167072
+2025,251,Covington Ex Vill SD,Miami,167159
+2025,252,Louisville City SD,Stark,167296
+2025,253,St Henry Consolidated Local,Mercer,169157
+2025,254,New Knoxville Local SD,Auglaize,169510
+2025,255,National Trail Local SD,Preble,169551
+2025,256,Finneytown Local SD,Hamilton,169830
+2025,257,Northwestern Local SD,Clark,170789
+2025,258,New Bremen Local SD,Auglaize,171272
+2025,259,Lake Local SD,Stark,171374
+2025,260,Lancaster City SD,Fairfield,171378
+2025,261,Orrville City SD,Wayne,171573
+2025,262,Anna Local SD,Shelby,171659
+2025,263,Celina City SD,Mercer,171692
+2025,264,River Valley Local SD,Marion,171706
+2025,265,Shelby City SD,Richland,171851
+2025,266,Western Reserve Local SD,Huron,172232
+2025,267,Bellevue City SD,Huron,172479
+2025,268,Ottawa-Glandorf Local SD,Putnam,173031
+2025,269,Arlington Local SD,Hancock,173169
+2025,270,Central Local SD,Defiance,173959
+2025,271,New Philadelphia City SD,Tuscarawas,174205
+2025,272,Eaton Community Schools City,Preble,174625
+2025,273,Fairfield Union Local SD,Fairfield,174865
+2025,274,Heath City SD,Licking,174900
+2025,275,Teays Valley Local SD,Pickaway,175068
+2025,276,Liberty Center Local SD,Henry,175936
+2025,277,Southeast Local SD,Portage,176216
+2025,278,Edon-Northwest Local SD,Williams,176549
+2025,279,Maplewood Local SD,Trumbull,177322
+2025,280,Warren Local SD,Washington,177390
+2025,281,Greenon Local SD,Clark,177402
+2025,282,Mapleton Local SD,Ashland,177665
+2025,283,Edgerton Local SD,Williams,178696
+2025,284,Amherst Ex Vill SD,Lorain,178943
+2025,285,Columbus Grove Local SD,Putnam,178964
+2025,286,Martins Ferry City SD,Belmont,179164
+2025,287,Southwest Local SD,Hamilton,179395
+2025,288,Xenia Community City SD,Greene,179409
+2025,289,Marysville Ex Vill SD,Union,179631
+2025,290,Hardin-Houston Local SD,Shelby,179679
+2025,291,Parkway Local SD,Mercer,179964
+2025,292,Pleasant Local SD,Marion,180041
+2025,293,Highland Local SD,Morrow,180051
+2025,294,Sandy Valley Local SD,Stark,180359
+2025,295,Findlay City SD,Hancock,180760
+2025,296,Southington Local SD,Trumbull,180776
+2025,297,Bath Local SD,Allen,181004
+2025,298,Elida Local SD,Allen,181095
+2025,299,Triad Local SD,Champaign,181412
+2025,300,Franklin City SD,Warren,181791
+2025,301,Jackson Center Local SD,Shelby,181853
+2025,302,South Range Local SD,Mahoning,182991
+2025,303,West Branch Local SD,Mahoning,183204
+2025,304,Geneva Area City SD,Ashtabula,183288
+2025,305,Lakeview Local SD,Trumbull,183625
+2025,306,Greenville City SD,Darke,184341
+2025,307,Upper Scioto Valley Local SD,Hardin,184534
+2025,308,Tri-County North Local SD,Preble,184839
+2025,309,Twin Valley Community Local,Preble,185253
+2025,310,Centerburg Local SD,Knox,185580
+2025,311,Perry Local SD,Stark,185608
+2025,312,Delaware City SD,Delaware,186269
+2025,313,Jennings Local SD,Putnam,186749
+2025,314,Ottoville Local SD,Putnam,186802
+2025,315,Franklin-Monroe Local SD,Darke,187119
+2025,316,North Union Local SD,Union,187265
+2025,317,Fairfield City SD,Butler,187316
+2025,318,Pandora-Gilboa Local SD,Putnam,187337
+2025,319,Ottawa Hills Local SD,Lucas,187383
+2025,320,Tallmadge City SD,Summit,187967
+2025,321,Ridgemont Local SD,Hardin,188220
+2025,322,Fremont City SD,Sandusky,188569
+2025,323,Ross Local SD,Butler,188697
+2025,324,Oregon City SD,Lucas,189334
+2025,325,Lake Local SD,Wood,189448
+2025,326,London City SD,Madison,189500
+2025,327,Mount Vernon City SD,Knox,189500
+2025,328,Southwest Licking Local SD,Licking,189570
+2025,329,Plain Local SD,Stark,189658
+2025,330,Beaver Local SD,Columbiana,189805
+2025,331,Fort Loramie Local SD,Shelby,190438
+2025,332,North Central Local SD,Williams,190496
+2025,333,Barnesville Ex Vill SD,Belmont,190549
+2025,334,Northwest Local SD,Hamilton,191086
+2025,335,Southern Local SD,Columbiana,191131
+2025,336,Ashland City SD,Ashland,191226
+2025,337,Wynford Local SD,Crawford,191393
+2025,338,Northeastern Local SD,Clark,191517
+2025,339,Olmsted Falls City SD,Cuyahoga,191549
+2025,340,Jefferson Township Local SD,Montgomery,191735
+2025,341,Gibsonburg Ex Vill SD,Sandusky,192153
+2025,342,Lincolnview Local SD,Van Wert,193046
+2025,343,West Clermont Local SD,Clermont,193535
+2025,344,McComb Local SD,Hancock,193819
+2025,345,East Muskingum Local SD,Muskingum,193957
+2025,346,Federal Hocking Local SD,Athens,194304
+2025,347,Tri-Valley Local SD,Muskingum,194512
+2025,348,Kettering City SD,Montgomery,195090
+2025,349,Seneca East Local SD,Seneca,195281
+2025,350,Shadyside Local SD,Belmont,196075
+2025,351,North Fork Local SD,Licking,196947
+2025,352,Liberty Union-Thurston Local,Fairfield,197238
+2025,353,Eastern Local SD,Brown,197486
+2025,354,Milford Ex Vill SD,Clermont,197527
+2025,355,Perry Local SD,Allen,198392
+2025,356,Bristol Local SD,Trumbull,198396
+2025,357,Kalida Local SD,Putnam,198601
+2025,358,Miamisburg City SD,Montgomery,198636
+2025,359,Stryker Local SD,Williams,199180
+2025,360,Elgin Local SD,Marion,199747
+2025,361,Tipp City Ex Vill SD,Miami,199935
+2025,362,Tuslaw Local SD,Stark,200335
+2025,363,Upper Sandusky Ex Vill SD,Wyandot,200379
+2025,364,Greeneview Local SD,Greene,200581
+2025,365,Hardin Northern Local SD,Hardin,200838
+2025,366,Miami East Local SD,Miami,200876
+2025,367,Lakota Local SD,Sandusky,202065
+2025,368,Cedar Cliff Local SD,Greene,202633
+2025,369,Cory-Rawson Local SD,Hancock,202660
+2025,370,Shaker Heights City SD,Cuyahoga,202731
+2025,371,Rolling Hills Local SD,Guernsey,203010
+2025,372,Indian Creek Local SD,Jefferson,203045
+2025,373,Holgate Local SD,Henry,203199
+2025,374,Troy City SD,Miami,203320
+2025,375,Western Reserve Local SD,Mahoning,203587
+2025,376,Crestview Local SD,Van Wert,203675
+2025,377,Caldwell Ex Vill SD,Noble,203692
+2025,378,Zane Trace Local SD,Ross,204407
+2025,379,Joseph Badger Local SD,Trumbull,205707
+2025,380,Morgan Local SD,Morgan,205717
+2025,381,Clark-Shawnee Local SD,Clark,205732
+2025,382,Graham Local SD,Champaign,205880
+2025,383,Oakwood City SD,Montgomery,206918
+2025,384,Wadsworth City SD,Medina,206982
+2025,385,Northern Local SD,Perry,207987
+2025,386,Waterloo Local SD,Portage,207987
+2025,387,North Canton City SD,Stark,208003
+2025,388,Parma City SD,Cuyahoga,208136
+2025,389,Minster Local SD,Auglaize,208391
+2025,390,Napoleon City SD,Henry,208937
+2025,391,Wyoming City SD,Hamilton,209007
+2025,392,Rootstown Local SD,Portage,209750
+2025,393,Swanton Local SD,Fulton,209825
+2025,394,Clinton-Massie Local SD,Clinton,210028
+2025,395,Cuyahoga Falls City SD,Summit,210363
+2025,396,Southeastern Local SD,Clark,210449
+2025,397,Northwest Local SD,Stark,211090
+2025,398,Bloom Carroll Local SD,Fairfield,211136
+2025,399,Westerville City SD,Franklin,211527
+2025,400,Belpre City SD,Washington,212040
+2025,401,Sylvania City SD,Lucas,212570
+2025,402,Monroeville Local SD,Huron,212777
+2025,403,Alexander Local SD,Athens,212903
+2025,404,Wilmington City SD,Clinton,213285
+2025,405,Shawnee Local SD,Allen,213772
+2025,406,Boardman Local SD,Mahoning,213855
+2025,407,Springfield Local SD,Lucas,214023
+2025,408,Three Rivers Local SD,Hamilton,214324
+2025,409,Perrysburg Ex Vill SD,Wood,214485
+2025,410,Hilliard City SD,Franklin,215500
+2025,411,Springfield Local SD,Summit,216523
+2025,412,Kent City SD,Portage,217417
+2025,413,Brunswick City SD,Medina,217783
+2025,414,Maumee City SD,Lucas,217975
+2025,415,Lakota Local SD,Butler,218152
+2025,416,Otsego Local SD,Wood,218497
+2025,417,Manchester Local SD,Summit,218578
+2025,418,North Baltimore Local SD,Wood,218733
+2025,419,Jonathan Alder Local SD,Madison,219441
+2025,420,Lebanon City SD,Warren,219572
+2025,421,Wooster City SD,Wayne,219757
+2025,422,Springfield Local SD,Mahoning,220844
+2025,423,Wayne Trace Local SD,Paulding,220917
+2025,424,Northmor Local SD,Morrow,221538
+2025,425,Vinton County Local SD,Vinton,223095
+2025,426,Bellaire Local SD,Belmont,224084
+2025,427,Wickliffe City SD,Lake,225173
+2025,428,Loudonville-Perrysville Ex V,Ashland,226241
+2025,429,Forest Hills Local SD,Hamilton,227473
+2025,430,Richmond Heights Local SD,Cuyahoga,228311
+2025,431,Logan Elm Local SD,Pickaway,228461
+2025,432,Grand Valley Local SD,Ashtabula,228576
+2025,433,Delphos City SD,Allen,229138
+2025,434,Dalton Local SD,Wayne,231266
+2025,435,Black River Local SD,Medina,231602
+2025,436,Vanlue Local SD,Hancock,231626
+2025,437,Coventry Local SD,Summit,231646
+2025,438,Vandalia-Butler City SD,Montgomery,231966
+2025,439,Little Miami Local SD,Warren,232161
+2025,440,Midview Local SD,Lorain,232635
+2025,441,Firelands Local SD,Lorain,232655
+2025,442,Howland Local SD,Trumbull,233556
+2025,443,Stow-Munroe Falls City SD,Summit,234340
+2025,444,Columbiana Ex Vill SD,Columbiana,236215
+2025,445,Johnstown-Monroe Local SD,Licking,236399
+2025,446,Wayne Local SD,Warren,236617
+2025,447,Worthington City SD,Franklin,236746
+2025,448,Deer Park Community City SD,Hamilton,237259
+2025,449,Kings Local SD,Warren,237307
+2025,450,Clermont-Northeastern Local,Clermont,238136
+2025,451,Canton Local SD,Stark,238193
+2025,452,Green Local SD,Summit,239114
+2025,453,Archbold-Area Local SD,Fulton,239291
+2025,454,Olentangy Local SD,Delaware,239405
+2025,455,Gahanna-Jefferson City SD,Franklin,239444
+2025,456,Strasburg-Franklin Local SD,Tuscarawas,239847
+2025,457,Logan-Hocking Local SD,Hocking,240085
+2025,458,Marietta City SD,Washington,241230
+2025,459,North Ridgeville City SD,Lorain,241294
+2025,460,Crestwood Local SD,Portage,241615
+2025,461,South Euclid-Lyndhurst City,Cuyahoga,242969
+2025,462,Jefferson Local SD,Madison,243797
+2025,463,West Muskingum Local SD,Muskingum,244065
+2025,464,Yellow Springs Ex Vill SD,Greene,244690
+2025,465,Wellington Ex Vill SD,Lorain,245359
+2025,466,Bedford City SD,Cuyahoga,246670
+2025,467,Woodmore Local SD,Sandusky,247066
+2025,468,Poland Local SD,Mahoning,247469
+2025,469,North Olmsted City SD,Cuyahoga,247493
+2025,470,Loveland City SD,Hamilton,248116
+2025,471,River View Local SD,Coshocton,248307
+2025,472,Rossford Ex Vill SD,Wood,248307
+2025,473,Ridgedale Local SD,Marion,248744
+2025,474,Chippewa Local SD,Wayne,249673
+2025,475,Norwood City SD,Hamilton,250177
+2025,476,Keystone Local SD,Lorain,250501
+2025,477,Perry Local SD,Lake,251235
+2025,478,Mason City SD,Warren,251648
+2025,479,Granville Ex Vill SD,Licking,251927
+2025,480,Field Local SD,Portage,252097
+2025,481,Franklin Local SD,Muskingum,252934
+2025,482,Avon Local SD,Lorain,253395
+2025,483,New Richmond Ex Vill SD,Clermont,253446
+2025,484,Brown Local SD,Carroll,254303
+2025,485,Medina City SD,Medina,256705
+2025,486,Crestview Local SD,Richland,257025
+2025,487,Gallia County Local SD,Gallia,257685
+2025,488,Sheffield-Sheffield Lake Cit,Lorain,257694
+2025,489,Willoughby-Eastlake City SD,Lake,258568
+2025,490,West Holmes Local SD,Holmes,259139
+2025,491,New Albany-Plain Local SD,Franklin,262358
+2025,492,Streetsboro City SD,Portage,262539
+2025,493,Dublin City SD,Franklin,263105
+2025,494,Sugarcreek Local SD,Greene,263613
+2025,495,Mathews Local SD,Trumbull,264173
+2025,496,Springboro Community City SD,Warren,265406
+2025,497,Marlington Local SD,Stark,265718
+2025,498,Twinsburg City SD,Summit,266360
+2025,499,Canfield Local SD,Mahoning,266605
+2025,500,Benjamin Logan Local SD,Logan,266826
+2025,501,Edison Local SD,Erie,269555
+2025,502,Elmwood Local SD,Wood,269654
+2025,503,Fairless Local SD,Stark,269896
+2025,504,Madison-Plains Local SD,Madison,270595
+2025,505,Beavercreek City SD,Greene,271595
+2025,506,Centerville City SD,Montgomery,273216
+2025,507,Bowling Green City SD,Wood,273930
+2025,508,Bexley City SD,Franklin,275887
+2025,509,Miami Trace Local SD,Fayette,275968
+2025,510,Princeton City SD,Hamilton,276120
+2025,511,Evergreen Local SD,Fulton,276328
+2025,512,Athens City SD,Athens,277498
+2025,513,Garaway Local SD,Tuscarawas,278171
+2025,514,Berea City SD,Cuyahoga,281512
+2025,515,Riverside Local SD,Lake,281558
+2025,516,Lakewood City SD,Cuyahoga,282598
+2025,517,Jackson Local SD,Stark,285243
+2025,518,Talawanda City SD,Butler,286089
+2025,519,Lucas Local SD,Richland,287423
+2025,520,Eastwood Local SD,Wood,287515
+2025,521,Mentor Ex Vill SD,Lake,289853
+2025,522,Chardon Local SD,Geauga,290878
+2025,523,Madeira City SD,Hamilton,291925
+2025,524,Aurora City SD,Portage,293422
+2025,525,Berkshire Local SD,Geauga,294054
+2025,526,Fairview Park City SD,Cuyahoga,297087
+2025,527,Anthony Wayne Local SD,Lucas,297195
+2025,528,Mariemont City SD,Hamilton,297370
+2025,529,Vermilion Local SD,Erie,300322
+2025,530,Fort Frye Local SD,Washington,301749
+2025,531,Westfall Local SD,Pickaway,301965
+2025,532,Bay Village City SD,Cuyahoga,301992
+2025,533,Columbia Local SD,Lorain,302877
+2025,534,Fairbanks Local SD,Union,303760
+2025,535,Big Walnut Local SD,Delaware,303784
+2025,536,Bloomfield-Mespo Local SD,Trumbull,304050
+2025,537,Triway Local SD,Wayne,304367
+2025,538,Union Local SD,Belmont,305580
+2025,539,Oberlin City SD,Lorain,306014
+2025,540,Lakewood Local SD,Licking,306296
+2025,541,Brooklyn City SD,Cuyahoga,308288
+2025,542,East Knox Local SD,Knox,310980
+2025,543,East Guernsey Local SD,Guernsey,311063
+2025,544,Jackson-Milton Local SD,Mahoning,311519
+2025,545,Hudson City SD,Summit,313112
+2025,546,United Local SD,Columbiana,314753
+2025,547,Van Buren Local SD,Hancock,315753
+2025,548,Solon City SD,Cuyahoga,315766
+2025,549,Arcadia Local SD,Hancock,315928
+2025,550,Woodridge Local SD,Summit,315955
+2025,551,Mohawk Local SD,Wyandot,317074
+2025,552,Highland Local SD,Medina,317714
+2025,553,Buckeye Local SD,Jefferson,318378
+2025,554,Benton Carroll Salem Local S,Ottawa,319963
+2025,555,Strongsville City SD,Cuyahoga,322129
+2025,556,Northridge Local SD,Licking,322515
+2025,557,North Royalton City SD,Cuyahoga,322535
+2025,558,Perkins Local SD,Erie,326760
+2025,559,Avon Lake City SD,Lorain,327459
+2025,560,Buckeye Local SD,Medina,328236
+2025,561,Rock Hill Local SD,Lawrence,328854
+2025,562,Tuscarawas Valley Local SD,Tuscarawas,328949
+2025,563,Cloverleaf Local SD,Medina,331080
+2025,564,Berne Union Local SD,Fairfield,332370
+2025,565,Edison Local SD,Jefferson,334542
+2025,566,Carrollton Ex Vill SD,Carroll,337592
+2025,567,Nordonia Hills City SD,Summit,339479
+2025,568,Hopewell-Loudon Local SD,Seneca,341183
+2025,569,Lordstown Local SD,Trumbull,345003
+2025,570,Patrick Henry Local SD,Henry,346813
+2025,571,Buckeye Valley Local SD,Delaware,350758
+2025,572,Brecksville-Broadview Height,Cuyahoga,350974
+2025,573,Kirtland Local SD,Lake,352096
+2025,574,Huron City SD,Erie,352855
+2025,575,Margaretta Local SD,Erie,358339
+2025,576,Copley-Fairlawn City SD,Summit,360330
+2025,577,Indian Lake Local SD,Logan,360623
+2025,578,Mayfield City SD,Cuyahoga,374487
+2025,579,Upper Arlington City SD,Franklin,376916
+2025,580,Wolf Creek Local SD,Washington,377759
+2025,581,St Clairsville-Richland City,Belmont,380364
+2025,582,Kenston Local SD,Geauga,380948
+2025,583,Sycamore Community City SD,Hamilton,386362
+2025,584,Rocky River City SD,Cuyahoga,398232
+2025,585,Cardinal Local SD,Geauga,398573
+2025,586,Walnut Township Local SD,Fairfield,398584
+2025,587,Chagrin Falls Ex Vill SD,Cuyahoga,399653
+2025,588,Grandview Heights City SD,Franklin,403152
+2025,589,West Geauga Local SD,Geauga,423752
+2025,590,Revere Local SD,Summit,433480
+2025,591,Northeastern Local SD,Defiance,436139
+2025,592,East Holmes Local SD,Holmes,442500
+2025,593,Southeast Local SD,Wayne,450993
+2025,594,Harrison Hills City SD,Harrison,493464
+2025,595,Independence Local SD,Cuyahoga,498557
+2025,596,Buckeye Central Local SD,Crawford,503881
+2025,597,Port Clinton City SD,Ottawa,504156
+2025,598,Westlake City SD,Cuyahoga,529771
+2025,599,Hillsdale Local SD,Ashland,531167
+2025,600,Cuyahoga Heights Local SD,Cuyahoga,534427
+2025,601,Beachwood City SD,Cuyahoga,576753
+2025,602,Orange City SD,Cuyahoga,632120
+2025,603,Switzerland Of Ohio Local SD,Monroe,660938
+2025,604,Indian Hill Ex Vill SD,Hamilton,669154
+2025,605,Noble Local SD,Noble,670432
+2025,606,Conotton Valley Union Local,Harrison,709717
+2025,607,Danbury Local SD,Ottawa,1107064
+2025,608,Put-In-Bay Local SD,Ottawa,2327175
+2025,609,Kelleys Island Local SD,Erie,11593904

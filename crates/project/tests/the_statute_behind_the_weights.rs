@@ -101,6 +101,13 @@ const CITED: &[&str] = &[
     // release on a majority of benchmarks, and for the years its division (A) dates the three to.
     "3302.103",
     "3302.12",
+    // The capital channel's share rule. Cited by `cfap-required-percentage`: 3318.011 ranks the
+    // districts and divides the ranking into percentiles, 3318.01(K) makes the percentile the
+    // district's share, and 3318.032 caps it at ninety-five per cent and handles segments and a
+    // repeat project. Not part of the operating formula; the extract holds what the corpus cites.
+    "3318.01",
+    "3318.011",
+    "3318.032",
     // The two constitutional earmarks — lottery profits and the casino tax — and the school share
     // of each. Not part of the formula, which is the finding the `casino-tax-distribution` node
     // rests on, but cited by it, and the extract holds what the corpus cites.
