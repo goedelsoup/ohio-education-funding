@@ -42,12 +42,12 @@ use std::collections::{BTreeMap, BTreeSet, HashMap};
 
 use crate::{
     AppropriationLine, AppropriationYear, BaseCostBuildUp, Biennium, BienniumLines, BienniumYear,
-    Bundle, CareerTechnical, CasinoYear, Categoricals, Checkpoint, Deflator, District,
-    DistrictOutcome, Dpia, Draft, DraftProvision, EnglishLearners, FinanceYear, ForecastCheckpoint,
-    FundingUnit, FundingUnitProgramme, FundingUnits, Gifted, HistoryYear, HouseDistrictMember,
-    HouseDistrictShare, LocalCapacity, MealProgramYear, MillageAnalysis, National,
-    NonpublicFederal, NonpublicSupport, NonpublicSupportLine, OutcomeStatewide, PolicyShape,
-    Projection, ProjectionBias, PropertyTaxYear, RegimeCounterfactual, SeriesYear,
+    Bundle, CapacityMeasures, CareerTechnical, CasinoYear, Categoricals, Checkpoint, Deflator,
+    District, DistrictOutcome, Dpia, Draft, DraftProvision, EnglishLearners, FinanceYear,
+    ForecastCheckpoint, FundingUnit, FundingUnitProgramme, FundingUnits, Gifted, HistoryYear,
+    HouseDistrictMember, HouseDistrictShare, LocalCapacity, MealProgramYear, MillageAnalysis,
+    National, NonpublicFederal, NonpublicSupport, NonpublicSupportLine, OutcomeStatewide,
+    PolicyShape, Projection, ProjectionBias, PropertyTaxYear, RegimeCounterfactual, SeriesYear,
     SpecialEducation, SpendingByFunction, StateFinance, Statewide, TargetedAssistance, Typology,
     YearKind, CONTRACT_VERSION,
 };
@@ -655,6 +655,9 @@ struct Joins<'a> {
     /// `None` for a district the list does not carry. Built once for the whole panel, because
     /// `dispersion::designated::by_district` reads 2,877 rows per call.
     designated: Option<&'a (usize, usize)>,
+    /// The district in the FY2026 model, or `None` for one it does not carry. Built once for the
+    /// whole panel, like `biennium`.
+    prior: Option<&'a project::prior_model::Prior>,
 }
 
 /// The biennium block, or zeroes for a district the payment files do not carry.
@@ -738,6 +741,7 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
         typology,
         biennium,
         designated,
+        prior,
     } = *joins;
     let adm = record.base_cost_adm();
     District {
@@ -868,7 +872,7 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
                 .resident_adm(record.categorical_enrolled_adm),
             supplement_eligible: record.targeted_assistance.supplement_eligible,
         },
-        capacity: capacity_of(record),
+        capacity: capacity_of(record, prior),
         career_technical: CareerTechnical {
             fte: record.career_technical.fte,
             aid: record.career_technical.aid,
@@ -1040,6 +1044,14 @@ fn series_years(
             kind: YearKind::Fiscal,
             label: format!("FY{PROFILE_YEAR}"),
             source: "DEW District Profile Report".into(),
+        },
+        // The year before `formula`, whose three capacity measures the local capacity card sets
+        // beside this year's. The middle year of the biennium is the FY2026 model's year.
+        SeriesYear {
+            series: "formula.prior".into(),
+            kind: YearKind::Fiscal,
+            label: format!("FY{}", project::biennium::MIDDLE_YEAR.0),
+            source: "DEW FY26 TRAD State Foundation Funding Calculator".into(),
         },
         // The span, derived from the module's own endpoints rather than written. Three files and
         // three years; the label is a range because no single year is the figure's year.
@@ -1989,7 +2001,12 @@ fn millage_analysis(
 ///
 /// Each weighted term is multiplied by the rate here, once, so that the feed's three terms sum
 /// to its total and the page never multiplies by a weight of its own.
-fn capacity_of(record: &DistrictRecord) -> Option<LocalCapacity> {
+///
+/// `prior` is the district in the FY2026 model, whose three measures ride along as published.
+fn capacity_of(
+    record: &DistrictRecord,
+    prior: Option<&project::prior_model::Prior>,
+) -> Option<LocalCapacity> {
     let inputs = local_capacity::CapacityInputs {
         valuation_recent: record.valuation_three_year[0],
         valuation_three_year: record.valuation_three_year,
@@ -2020,6 +2037,14 @@ fn capacity_of(record: &DistrictRecord) -> Option<LocalCapacity> {
             * local_capacity::MEDIAN_INCOME_WEIGHT
             * r.capacity_rate,
         per_pupil: r.per_pupil,
+        prior: prior
+            .filter(|p| p.capacity_per_pupil > 0.0)
+            .map(|p| CapacityMeasures {
+                valuation_per_pupil: p.valuation_per_pupil,
+                gross_income_per_pupil: p.gross_income_per_pupil,
+                median_income_per_pupil: p.median_income_per_pupil,
+                base_cost_enrolled_adm: p.base_cost_enrolled_adm,
+            }),
     })
 }
 
@@ -2196,6 +2221,9 @@ pub fn build() -> Bundle {
         .map(|row| (row.total.irn.clone(), row))
         .collect();
 
+    // The FY2026 model, joined once. See `Joins::prior`.
+    let prior = project::prior_model::by_irn();
+
     let districts: Vec<District> = records
         .iter()
         .map(|record| {
@@ -2214,6 +2242,7 @@ pub fn build() -> Bundle {
                     typology: typology.get(&record.irn),
                     biennium: biennium.get(&record.irn),
                     designated: designated.get(&record.irn),
+                    prior: prior.get(&record.irn),
                 },
             )
         })

@@ -99,3 +99,23 @@ test("Shawnee Local's capacity is the figure the charge-off card prints, in thre
   expect(k.total).toBeCloseTo(7119.41, 2);
   expect(d.regime!.local_capacity).toBeCloseTo(7119.41, 2);
 });
+
+test("every district carries the year before's three measures beside this year's (#801)", () => {
+  // The FY2026 calculator's `[C1]` to `[C3]`, which close on its own `[b1]` with its own rate
+  // (`the_two_clocks_the_plan_runs_on.rs`). Gross income per pupil rose a median 6.8% between the
+  // two models and fell in 14 districts, which is what the earlier column is there to show.
+  const rises: number[] = [];
+  let fell = 0;
+  for (const d of bundle.districts) {
+    const k = decomposeCapacity(d)!;
+    expect(k.grossIncome.prior, `${d.irn} has no prior measure`).not.toBeNull();
+    expect(k.valuation.prior).toBe(d.capacity!.prior!.valuation_per_pupil);
+    expect(k.medianIncome.prior).toBe(d.capacity!.prior!.median_income_per_pupil);
+    const change = k.grossIncome.base / k.grossIncome.prior! - 1;
+    rises.push(change);
+    if (change < 0) fell += 1;
+  }
+  rises.sort((a, b) => a - b);
+  expect(fell).toBe(14);
+  expect(rises[Math.floor(rises.length / 2)]).toBeCloseTo(0.068, 3);
+});

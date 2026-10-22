@@ -80,9 +80,11 @@ moves **−8.58%** with none unchanged. Generalizing from the one sheet that was
 thirty that were not is the error, and it foreclosed the question the file was closest to
 answering.
 
-Sixteen columns are taken now — the two sides of the state share, the local capacity build-up and
-the disadvantaged pupil blend — as `crates/project/fixtures/fy26-department-model.csv`, about a
-hundred kilobytes. Built by
+Thirty-five columns are taken now — the two sides of the state share, the local capacity build-up
+with all three of its measures, the disadvantaged pupil blend, transportation and the payment
+lines — as `crates/project/fixtures/fy26-department-model.csv`, about two hundred kilobytes. The
+three capacity measures `[C1]`, `[C2]` and `[C3]` close on `[b1]` with `[C6]` for all 609
+districts, and the district page sets each beside its FY2027 counterpart. Built by
 [`crates/connect/src/fixtures/fy26.rs`](../../crates/connect/src/fixtures/fy26.rs) and read by
 [`project::prior_model`](../../crates/project/src/prior_model.rs). The rest of the per-district
 tables genuinely do restate what FY2027 already holds, and are still not taken.

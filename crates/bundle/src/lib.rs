@@ -41,6 +41,11 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `55.0.0` added a nullable `prior` inside each district's `capacity`: the FY2026 calculator's
+/// `[C1]`, `[C2]` and `[C3]`, so the local capacity card can set each measure beside the year
+/// before, and a `formula.prior` series year to date them. Breaking because the page's schema
+/// is strict and a consumer pinned to `54.0.0` would reject the block.
+///
 /// `54.0.0` added a nullable `capacity` block per district: R.C. 3317.017's per-pupil capacity
 /// term by term, three weighted terms already multiplied by the rate, together with the income
 /// ratio and the rate they rest on. It also added the two statewide inputs the rate is indexed
@@ -292,7 +297,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "54.0.0";
+pub const CONTRACT_VERSION: &str = "55.0.0";
 
 mod model;
 mod serialize;

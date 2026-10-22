@@ -46,6 +46,7 @@ import { fiscalYear } from "./yearLabel.ts";
 /** The series keys this site asks for, so a typo is a type error rather than a missing chip. */
 export type SeriesKey =
   | "formula"
+  | "formula.prior"
   | "enrollment"
   | "outcome.performance"
   | "outcome.spending"

@@ -104,6 +104,13 @@ export const DENOMINATORS = {
     note: "Children resident in the district, including those attending community schools or using scholarships.",
     field: "districts[].property_tax[].adm",
   },
+  "base-cost-adm-prior": {
+    label: "Base cost ADM, the year before",
+    source: "Department of Education, the year before's calculator, `[A1]`",
+    series: "formula.prior",
+    note: "The same measure as base cost ADM, counted a year earlier. The local capacity card's earlier measures are over this count, so a measure can move between the years because the pupils did.",
+    field: "districts[].capacity.prior.base_cost_enrolled_adm",
+  },
   "categorical-enrolled-adm": {
     label: "Enrolled ADM, `[a]`",
     source: "Department of Education, calculator, `ADM Data` column 3",
@@ -346,6 +353,11 @@ export const FIELD_DENOMINATORS: Record<string, DenominatorKey | null> = {
   "districts[].capacity.gross_income_term_per_pupil": "base-cost-adm",
   "districts[].capacity.median_income_term_per_pupil": "base-cost-adm",
   "districts[].capacity.per_pupil": "base-cost-adm",
+  // The year before's measures, over that year's own funded count, which the block carries.
+  "districts[].capacity.prior.valuation_per_pupil": "base-cost-adm-prior",
+  "districts[].capacity.prior.gross_income_per_pupil": "base-cost-adm-prior",
+  "districts[].capacity.prior.median_income_per_pupil": "base-cost-adm-prior",
+  "districts[].capacity.prior.base_cost_enrolled_adm": null,
 
   // DPIA's counts. `percentage` is the blended count over enrolled ADM and `index` is that over
   // the statewide share and squared — both dimensionless, because the denominator cancels.
@@ -528,6 +540,9 @@ export const PAGE_FIGURES: Record<string, string[]> = {
     "districts[].capacity.gross_income_term_per_pupil",
     "districts[].capacity.median_income_term_per_pupil",
     "districts[].capacity.per_pupil",
+    "districts[].capacity.prior.valuation_per_pupil",
+    "districts[].capacity.prior.gross_income_per_pupil",
+    "districts[].capacity.prior.median_income_per_pupil",
     // The seam sentence, and the funded count the charge-off is computed against.
     "districts[].adm",
   ],

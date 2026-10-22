@@ -530,6 +530,14 @@ export function renderDenominators(d: District): string {
       usedFor: `What ${term("base-cost", "base cost")} per pupil divides by — funded rather than
         enrolled, so it is ${pct(Math.abs(d.adm / enrolled - 1), 1)} from the profile row.`,
     },
+    "base-cost-adm-prior": {
+      publisher: "Education, base cost ADM, the year before",
+      year: seriesYear("formula.prior")?.label ?? "—",
+      pupils: d.capacity?.prior?.base_cost_enrolled_adm ?? null,
+      valuePerPupil: null,
+      usedFor: `The earlier column of <a href="#capacity">what local capacity is made of</a>. The
+        same count a year before, so a measure there can move because the pupils did.`,
+    },
   };
 
   const body = pageDenominators("district/[irn]/taxes")

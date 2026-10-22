@@ -390,6 +390,26 @@ pub struct LocalCapacity {
     pub median_income_term_per_pupil: Dollars,
     /// C7: local capacity per pupil, the sum of the three terms.
     pub per_pupil: Dollars,
+    /// The same three measures in the FY2026 model, so the page can set each beside the year
+    /// before. `None` where that model carries no capacity for the district.
+    pub prior: Option<CapacityMeasures>,
+}
+
+/// R.C. 3317.017's three per-pupil measures as one calculator publishes them, `[C1]` to `[C3]`.
+///
+/// Read rather than recomputed: the FY2026 calculator's own columns, which close on its `[b1]`
+/// with its `[C6]` for all 609 districts (`the_two_clocks_the_plan_runs_on.rs`).
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct CapacityMeasures {
+    /// C1: capacity valuation per pupil.
+    pub valuation_per_pupil: Dollars,
+    /// C2: capacity federal adjusted gross income per pupil.
+    pub gross_income_per_pupil: Dollars,
+    /// C3: federal median income times returns, per pupil.
+    pub median_income_per_pupil: Dollars,
+    /// `[A1]`, the base cost enrolled ADM all three are divided by. That year's own count, which
+    /// is not [`District::adm`].
+    pub base_cost_enrolled_adm: f64,
 }
 
 /// Career-technical education's five categories, plus associated services.

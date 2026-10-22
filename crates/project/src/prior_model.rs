@@ -58,6 +58,7 @@ const FIXTURE: &str = include_str!("../fixtures/fy26-department-model.csv");
 const EXPECTED_HEADER: &str = "irn,district,enrolled_adm,base_cost_enrolled_adm,\
                                aggregate_base_cost,base_cost_per_pupil,capacity_per_pupil,\
                                state_share_percentage,valuation_per_pupil,\
+                               gross_income_per_pupil,median_income_per_pupil,\
                                local_capacity_percentage,benchmark_ratio,\
                                dpia_econ_disadvantaged_adm,dpia_directly_certified_adm,\
                                dpia_weighted_adm,dpia_percentage,dpia_aid,\
@@ -228,6 +229,10 @@ pub struct Prior {
     pub state_share_percentage: f64,
     /// `[C1]` assessed valuation per pupil.
     pub valuation_per_pupil: Dollars,
+    /// `[C2]` federal adjusted gross income per pupil, `[I1]` over `[A1]`.
+    pub gross_income_per_pupil: Dollars,
+    /// `[C3]` federal median income times returns, per pupil.
+    pub median_income_per_pupil: Dollars,
     /// `[C6]` local capacity percentage.
     pub local_capacity_percentage: f64,
     /// `[C5]` the fortieth-highest district's income ratio, identical on every row.
@@ -311,30 +316,32 @@ fn parse_frame() -> Vec<Prior> {
             capacity_per_pupil: row.num(6).unwrap_or(0.0),
             state_share_percentage: row.num(7).unwrap_or(0.0),
             valuation_per_pupil: row.num(8).unwrap_or(0.0),
-            local_capacity_percentage: row.num(9).unwrap_or(0.0),
-            benchmark_ratio: row.num(10).unwrap_or(0.0),
-            dpia_econ_disadvantaged_adm: row.num(11).unwrap_or(0.0),
-            dpia_directly_certified_adm: row.num(12).unwrap_or(0.0),
-            dpia_weighted_adm: row.num(13).unwrap_or(0.0),
-            dpia_percentage: row.num(14).unwrap_or(0.0),
-            dpia_aid: row.num(15).unwrap_or(0.0),
-            reported_sped_transport_cost: row.num(16).unwrap_or(0.0),
-            special_education_transportation: row.num(17).unwrap_or(0.0),
-            transportation_total: row.num(18).unwrap_or(0.0),
-            funding_base: row.num(19).unwrap_or(0.0),
-            foundation_calculated: row.num(20).unwrap_or(0.0),
-            foundation_phase_in: row.num(21).unwrap_or(0.0),
-            foundation_funding: row.num(22).unwrap_or(0.0),
-            guarantee: row.num(23).unwrap_or(0.0),
-            transportation: row.num(24).unwrap_or(0.0),
-            formula_transition_supplement: row.num(25).unwrap_or(0.0),
-            base_funding_supplement: row.num(26).unwrap_or(0.0),
-            enrollment_growth_supplement: row.num(27).unwrap_or(0.0),
-            total_formula_funding: row.num(28).unwrap_or(0.0),
-            performance_supplement: row.num(29).unwrap_or(0.0),
-            preschool_special_education: row.num(30).unwrap_or(0.0),
-            summary_special_education_transportation: row.num(31).unwrap_or(0.0),
-            total_state_support: row.num(32).unwrap_or(0.0),
+            gross_income_per_pupil: row.num(9).unwrap_or(0.0),
+            median_income_per_pupil: row.num(10).unwrap_or(0.0),
+            local_capacity_percentage: row.num(11).unwrap_or(0.0),
+            benchmark_ratio: row.num(12).unwrap_or(0.0),
+            dpia_econ_disadvantaged_adm: row.num(13).unwrap_or(0.0),
+            dpia_directly_certified_adm: row.num(14).unwrap_or(0.0),
+            dpia_weighted_adm: row.num(15).unwrap_or(0.0),
+            dpia_percentage: row.num(16).unwrap_or(0.0),
+            dpia_aid: row.num(17).unwrap_or(0.0),
+            reported_sped_transport_cost: row.num(18).unwrap_or(0.0),
+            special_education_transportation: row.num(19).unwrap_or(0.0),
+            transportation_total: row.num(20).unwrap_or(0.0),
+            funding_base: row.num(21).unwrap_or(0.0),
+            foundation_calculated: row.num(22).unwrap_or(0.0),
+            foundation_phase_in: row.num(23).unwrap_or(0.0),
+            foundation_funding: row.num(24).unwrap_or(0.0),
+            guarantee: row.num(25).unwrap_or(0.0),
+            transportation: row.num(26).unwrap_or(0.0),
+            formula_transition_supplement: row.num(27).unwrap_or(0.0),
+            base_funding_supplement: row.num(28).unwrap_or(0.0),
+            enrollment_growth_supplement: row.num(29).unwrap_or(0.0),
+            total_formula_funding: row.num(30).unwrap_or(0.0),
+            performance_supplement: row.num(31).unwrap_or(0.0),
+            preschool_special_education: row.num(32).unwrap_or(0.0),
+            summary_special_education_transportation: row.num(33).unwrap_or(0.0),
+            total_state_support: row.num(34).unwrap_or(0.0),
         })
         .collect()
 }

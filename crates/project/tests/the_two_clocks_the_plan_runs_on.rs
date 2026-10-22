@@ -336,3 +336,30 @@ fn the_enacted_analysis_keeps_one_clock_and_drops_the_other() {
         );
     }
 }
+
+#[test]
+fn the_fy2026_capacity_closes_on_its_three_measures() {
+    // `[C2]` and `[C3]` are extracted so the district page can set FY2026's measures beside
+    // FY2027's (#801). That they are the columns the rate multiplies is shown by closing them on
+    // `[b1]`: R.C. 3317.017's 60/20/20 blend of `[C1]`, `[C2]` and `[C3]`, times `[C6]`.
+    // Middle Bass and North Bass carry zeros on the whole sheet, as they do in FY2027, which
+    // leaves the same 609 districts the FY2027 card decomposes.
+    let measured: Vec<_> = prior_model::frame()
+        .into_iter()
+        .filter(|row| row.capacity_per_pupil > 0.0)
+        .collect();
+    assert_eq!(measured.len(), 609);
+    assert!(measured
+        .iter()
+        .all(|row| row.gross_income_per_pupil > 0.0 && row.median_income_per_pupil > 0.0));
+    let worst = measured
+        .iter()
+        .map(|row| {
+            let blend = 0.6 * row.valuation_per_pupil
+                + 0.2 * row.gross_income_per_pupil
+                + 0.2 * row.median_income_per_pupil;
+            (blend * row.local_capacity_percentage - row.capacity_per_pupil).abs()
+        })
+        .fold(0.0, f64::max);
+    assert!(worst < 0.01, "worst residual {worst}");
+}

@@ -735,6 +735,20 @@ const DistrictSchema = z
         gross_income_term_per_pupil: num,
         median_income_term_per_pupil: num,
         per_pupil: num,
+        /**
+         * The same three measures in the year before's model, as that calculator publishes them
+         * and unrated: dated by the `formula.prior` series, never by a key. Null where that model
+         * carries no capacity for the district.
+         */
+        prior: z
+          .object({
+            valuation_per_pupil: num,
+            gross_income_per_pupil: num,
+            median_income_per_pupil: num,
+            base_cost_enrolled_adm: num,
+          })
+          .strict()
+          .nullable(),
       })
       .strict()
       .nullable(),

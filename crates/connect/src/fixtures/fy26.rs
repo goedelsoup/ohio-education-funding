@@ -1,6 +1,6 @@
 //! The department's FY2026 calculator, in the columns that answer what moved.
 //!
-//! # Why a second year, and why only thirty-three columns of it
+//! # Why a second year, and why only thirty-five columns of it
 //!
 //! [`super::fy27`] turns eleven sheets of the department's FY2027 workbook into the 162-column
 //! fixture every calculator crate reads. This is the same workbook a year earlier, and the
@@ -21,14 +21,14 @@
 //! - per-pupil local capacity moves **+9.34% at the median**, and 2 districts of 609 are unchanged;
 //! - disadvantaged pupil impact aid moves **-8.57%**, and none is unchanged.
 //!
-//! So this takes thirty-three columns rather than 162 — the two sides of the state share, the
+//! So this takes thirty-five columns rather than 162 — the two sides of the state share, the
 //! local capacity build-up, the disadvantaged pupil blend, and the payment lines — which is about
-//! a hundred kilobytes and answers the questions. Everything else on those sheets is either
+//! two hundred kilobytes and answers the questions. Everything else on those sheets is either
 //! already held for FY2027 or genuinely does restate it.
 //!
-//! # Fourteen of the thirty-three are the payment lines, and they came later
+//! # Fourteen of the thirty-five are the payment lines, and they came later
 //!
-//! The first nineteen columns answer *why* a district's formula amount moved. They cannot say
+//! The first twenty-one columns answer *why* a district's formula amount moved. They cannot say
 //! whether the district was paid any of it, because the guarantee sits between the two and is on
 //! neither `Detail_SFPR` nor `Base_Cost`. `Summary_SFPR` carries the whole run-up — the `[Ha]`
 //! `[Hb]` `[Hc]` `[Hd]` foundation quadruple, the guarantee, transportation, the three
@@ -41,7 +41,7 @@
 //! because at 100% the calculated column is the funded column and the department dropped the
 //! other three.
 //!
-//! # And three of the first nineteen are transportation, for a reason the count does not show
+//! # And three of the first twenty-one are transportation, for a reason the count does not show
 //!
 //! `[j] Reported Spec Ed Trans Cost`, `[J] Special Education Transportation` and
 //! `[G] Transportation Funding` are here because a **proration factor is a quotient and neither
@@ -76,6 +76,10 @@ pub const FY26_HEADER: &[&str] = &[
     "capacity_per_pupil",
     "state_share_percentage",
     "valuation_per_pupil",
+    // `[C2]` and `[C3]`, the two income measures beside `[C1]`. With `[C6]` they close on
+    // `[b1]`, which is what shows these are the columns the rate multiplies.
+    "gross_income_per_pupil",
+    "median_income_per_pupil",
     "local_capacity_percentage",
     "benchmark_ratio",
     "dpia_econ_disadvantaged_adm",
@@ -194,7 +198,7 @@ pub fn build_fy26_model(sheets: &Fy26Sheets<'_>) -> Result<Vec<Vec<String>>, Str
     let (summary_header, summary) = table(sheets.summary, SUMMARY_SHEET)?;
 
     let name_at = column(detail_header, "District Names", DETAIL_SHEET)?;
-    let joins: [Join<'_>; 31] = [
+    let joins: [Join<'_>; 33] = [
         (detail, detail_header, "[a] Enrolled ADM", DETAIL_SHEET),
         (
             base,
@@ -212,6 +216,8 @@ pub fn build_fy26_model(sheets: &Fy26Sheets<'_>) -> Result<Vec<Vec<String>>, Str
         (detail, detail_header, "[b1]", DETAIL_SHEET),
         (detail, detail_header, "[b4]", DETAIL_SHEET),
         (capacity, capacity_header, "[C1]", LOCAL_CAPACITY_SHEET),
+        (capacity, capacity_header, "[C2]", LOCAL_CAPACITY_SHEET),
+        (capacity, capacity_header, "[C3]", LOCAL_CAPACITY_SHEET),
         (capacity, capacity_header, "[C6]", LOCAL_CAPACITY_SHEET),
         (capacity, capacity_header, "[C5]", LOCAL_CAPACITY_SHEET),
         (dpia, dpia_header, "d1a", DPIA_SHEET),
@@ -253,8 +259,8 @@ pub fn build_fy26_model(sheets: &Fy26Sheets<'_>) -> Result<Vec<Vec<String>>, Str
 
     // Places per column, matching how `fy27` writes the same quantity. Shares and ratios carry
     // more than dollars because a share rounded to two places is not a share any more.
-    const PLACES: [usize; 31] = [
-        4, 4, 2, 2, 2, 10, 2, 12, 10, 4, 4, 4, 12, 2, 2, 12, 12, //
+    const PLACES: [usize; 33] = [
+        4, 4, 2, 2, 2, 10, 2, 2, 2, 12, 10, 4, 4, 4, 12, 2, 2, 12, 12, //
         // Every `Summary_SFPR` column is dollars.
         2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
     ];
