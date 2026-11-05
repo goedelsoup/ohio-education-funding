@@ -20,6 +20,7 @@ After bootstrap, a derived repository has two tiers:
 
 **`.yidam/`** — yidam-managed infrastructure:
 - `.yidam/catalog/` — provenance anchors for corpus knowledge
+- `.yidam/sources/` — source packs this repository wrote *(created on first use)*
 - `.yidam/corpus/` — the living knowledge graph
 - `.yidam/tonpa.toml` and `.yidam/tonpa/` — the corpora this one depends on, and where they land
 - `.yidam/decisions/` — structured records of choices made during this repo's life
@@ -45,8 +46,8 @@ the directory is absent. [why](directories.evidence.md#created-on-first-use)
 Agent definitions for agents that operate in this repository.
 
 **What belongs here:** Agent definitions (system prompts, role descriptions, capability
-declarations) for named agents whose purpose is specific to this domain. Generic agents
-inherited from yidam live in `.yidam/.vendor/prelude/`; domain-specific agents live here.
+declarations) for named agents whose purpose is specific to this domain. The prelude ships
+no agents; every definition here is this repository's own.
 
 ---
 
@@ -221,14 +222,16 @@ rule somebody has to remember per file is a rule that gets forgotten.
 ---
 name: Pearl 2009
 description: Causality — models, reasoning, inference.
-type: paper                  # paper | dataset | api | database | other
+type: paper                  # paper | dataset | api | database | statute | report | standard | document | other
 obtained: true               # absent means true; see below
 retrieved: 2026-08-22        # optional; when it was last actually fetched
 ttl_days: 3650               # optional; how long this record may stand
 location:
-  - kind: url                # url | url_template | address | file
+  - kind: url                # url | url_template | address | file | identifier
     value: https://example.org/pearl-2009
     description: publisher's copy   # required only when there are several locations
+  - kind: identifier         # scheme:local-id
+    value: doi:10.1167/tvst.8.5.14
 used-by:
   - ../corpus/concept/confounding.yml
 artifacts:                     # optional; what was actually obtained
@@ -239,8 +242,19 @@ artifacts:                     # optional; what was actually obtained
     from: 0                    # which `location` it came from, or a URL
     vault: sources             # optional; overrides the route its kind takes. `none` = local only
     redistributable: false     # whether they may leave this machine at all
+    readings:                  # optional; written by `yidam catalog-extract`
+      - sha256: 41d0a7…
+        media_type: text/plain
+        by: pdf-extract 0.12.1 # or <pack>@<version>/<transform>@sha256:<hash>
 ---
 ```
+
+- **`type`** names the source's form, not its standing: `document` is any other single
+  document, such as a manual or a filing. `catalog-type-unknown` reports any other word,
+  `primary` included.
+- **`kind: identifier`** takes `scheme:local-id`, such as `pmc:PMC6753881`, and the source pack
+  declaring that scheme fetches it. `yidam migrate locations` rewrites an older `kind: doi` or
+  `kind: pmc`.
 
 - **`obtained: false`** declares a source registered ahead of the extraction that will use it.
   It exempts the entry from `catalog-uncited` — which is the honest reason for a source nothing
@@ -302,6 +316,8 @@ artifacts:                     # optional; what was actually obtained
     [why](directories.evidence.md#vault-route-override)
   - `redistributable` is a **licensing fact about the source**, and it is deliberately not
     folded into `vault`. [why](directories.evidence.md#redistributable-separate)
+  - `readings` are derived from the bytes, and a quotation is compared with the first
+    `text/plain` one. An older entry's `text:` is still read.
 
   **What no check here can tell you is whether the bytes are present or correct.** That is a
   fact about the machine asking rather than about `HEAD`; `yidam vault verify` answers it, per
@@ -311,7 +327,7 @@ Run `yidam schema` to emit JSON Schema for this shape (and for corpus nodes and 
 definitions) into `.yidam/schemas/`, then `yidam schema --settings` for the editor mapping that
 validates them as you type.
 
-**Relationship to `.yidam/corpus/`:** Corpus nodes link to catalog nodes as edges. A corpus
+**Relationship to `.yidam/corpus/`:** Corpus nodes cite catalog nodes by link. A corpus
 node on a concept that draws on a source writes `[Pearl 2009](../../catalog/pearl-2009.md)`
 rather than embedding a full citation.
 
@@ -658,6 +674,10 @@ after  = ["travel-tier"]       # optional
 connector or a featurizer parses, plans, and is refused by name before anything runs, with the
 reason particular to its kind. [why](directories.evidence.md#declarable-not-executable)
 
+**A capability with no `run` is declared and not built.** It is where a calculator goes before
+the corpus can compute it: its `reads`, `writes` and `verb` are fixed, and every plan holding it
+is refused by name until it gains a `run`. `run = []` is still refused as empty.
+
 `yidam run travel-tier` then checks the declared `reads` out of `HEAD` into a scratch directory,
 invokes the step there, and lands what it wrote — plus a receipt — as one commit. `yidam run`
 with no step runs the whole manifest; `yidam run --dry-run` resolves the plan, reports what is
@@ -778,6 +798,11 @@ output it describes. It records the commit the inputs came from, a digest of the
 the config that governed the run, every input file by digest, and every output by digest. The
 series is the git history of that file, which is where a repository's series of anything already
 lives.
+
+Since `format_version: 2` it can also record what produced the output: `model`, `version`,
+`config` and `image_digest`, each only where it applies. They are not part of the input state, so
+upgrading yidam does not make a step stale. An `image_digest` comes only from an image reference
+pinned by `@sha256:`, never from a tag.
 
 **A receipt carries no timestamp.** The commit it lands in has a committer date, which is the
 real one — and it is what an `ageing_days` interval is measured against.
@@ -901,7 +926,8 @@ skills that require knowledge of this domain's corpus or toolkit live here.
 
 The inherited yidam prelude, moved here by the `vendor:` commit during bootstrap.
 
-**What belongs here:** `prelude/` and nothing else. The vendor step moves `yidam/prelude/` to
+**What belongs here:** `prelude/`, plus the `domains/` and `sources/` that
+`.yidam/decisions/proposals.yml` pins (see below). The vendor step moves `yidam/prelude/` to
 `.yidam/.vendor/prelude/` and deletes the rest of the template.
 
 **What deliberately does not belong here:** yidam's CLI source, its bootstrap test harness, its
@@ -915,8 +941,8 @@ by re-vendoring — which is why `yidam lint` reports a broken link here at info
 than as a violation of this repository. See `.yidam/authorship.yml` above, of which this
 directory is the built-in instance.
 
-**Note:** Paths to inherited skills and agents use `.yidam/.vendor/prelude/` — for example, the
-bootstrap skill lives at `.yidam/.vendor/prelude/skills/bootstrap.md` after genesis.
+**Note:** Paths to inherited files use `.yidam/.vendor/prelude/` — for example, the glossary
+lives at `.yidam/.vendor/prelude/GLOSSARY.md` after genesis.
 
 ---
 
@@ -950,17 +976,23 @@ mise run yidam-vendor-status    # what you are pinned to, and what is newer
 mise run yidam-vendor-update    # fetch, replace prelude/ and mise.yidam.toml, re-pin .yidam.toml
 ```
 
-The update replaces `.yidam/.vendor/prelude/` wholesale, rewrites `.yidam.toml`, and replaces
-`mise.yidam.toml`. It touches nothing else — `corpus/`, `catalog/`, `decisions/`, `skills/`,
-`crates/`, and every other top-level file are domain-owned and are never overwritten by an
-update.
+The update replaces `.yidam/.vendor/prelude/` wholesale, rewrites `.yidam.toml` and
+`mise.yidam.toml`, and edits marked regions: the yidam pin in `mise.toml` and the `YIDAM:`
+regions of `.claude/CLAUDE.md` and `.github/workflows/ci.yml`. It seeds a missing
+`.yidam/lint-baseline.yml`. Corpus, catalog, decisions, skills and crates are untouched.
 
-**`prelude/domains/` is the one part of that replacement that is not wholesale**, because its
-contents are a decision rather than a copy. The update reads `prelude_domains` from
-`.yidam/decisions/proposals.yml` and prunes to it, and where no such declaration exists it keeps
-exactly what this repository already vendored. Adding a name to that field and re-running the
-update is how a domain is vendored later; it is also the only thing that survives the next one.
+**`.yidam/.vendor/domains/` is replaced by a decision rather than a copy.** The domain
+libraries are not part of the prelude; the update reads `prelude_domains` from
+`.yidam/decisions/proposals.yml` and copies exactly those, and where no such declaration exists
+it keeps exactly what this repository already vendored. Adding a name to that field and
+re-running the update is how a domain is vendored later.
 [why](directories.evidence.md#prelude-domains-not-wholesale)
+
+**`.yidam/.vendor/sources/` holds the source packs `prelude_sources` pins** in the same file,
+as `<pack>@<range>` or `<pack>@<range> from <repo>@<commit>`. No pins vendors none, and a pin
+the update cannot satisfy changes nothing. A pack this repository writes lives in
+`.yidam/sources/<pack>/` and is read first. `yidam source check` holds packs and pins to the
+format; see [Source packs](https://github.com/goedelsoup/yidam/blob/main/docs/source-packs.md).
 
 `mise.yidam.toml` is on that list because it is inherited, not domain-owned: it is the task
 layer, as much yidam's to correct as the prelude is, and it sits at the repo root only because

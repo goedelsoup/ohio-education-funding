@@ -250,7 +250,7 @@ tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 git clone --quiet --filter=blob:none "$origin" "$tmp/yidam"
 git -C "$tmp/yidam" checkout --quiet "$commit"
-# The light `reports` build: no protoc, no fastembed, no lancedb. Add
+# The light `reports` build: no fastembed, no ONNX runtime. Add
 # `--features full` if you need index-build or sqlite export. NOT tonpa,
 # vault-s3 or export-graph — each joined the `default` set (#203, #482, #532),
 # so the released binary carries them and so does this build.
@@ -292,7 +292,7 @@ echo "yidam from somewhere else will answer for this repository."
 # correction made upstream reaches this repository.
 
 [yidam-vendor-status]
-description = "Show the pinned yidam commit and whether the origin has moved past it."
+description = "Show the pinned yidam commit and whether a newer cli/v* release exists (or YIDAM_REF, if set)."
 run = """
 set -eu
 if [ ! -f .yidam.toml ]; then
@@ -303,26 +303,55 @@ origin=$(sed -n 's/^ *origin *= *"\\(.*\\)"/\\1/p' .yidam.toml)
 commit=$(sed -n 's/^ *commit *= *"\\(.*\\)"/\\1/p' .yidam.toml)
 template=$(sed -n 's/^ *template *= *"\\(.*\\)"/\\1/p' .yidam.toml)
 committed=$(sed -n 's/^ *committed *= *"\\(.*\\)"/\\1/p' .yidam.toml)
-ref="${YIDAM_REF:-HEAD}"
 echo "origin    $origin"
 echo "pinned    $commit ($template, committed $committed)"
-# `head -n1`: `git ls-remote <url> HEAD` can match more than one ref — HEAD itself and
-# a refs/remotes/origin/HEAD the origin happens to carry — and every extra line went
-# into $remote, so the equality test below could never be true. This task reported
-# "origin has moved" unconditionally, including when the pin was exactly current.
-remote=$(git ls-remote "$origin" "$ref" 2>/dev/null | cut -f1 | head -n1)
+# What a re-vendor would adopt, asked the way yidam-vendor-update asks it: the newest
+# `cli/v*` release unless YIDAM_REF names something else (#1308). Measured against the
+# origin's HEAD, this reported "origin has moved" on almost every run — main is rarely
+# tagged — and told the operator to run an update that, by default, now changes nothing.
+# NEWEST-RELEASE BEGIN
+# The newest `cli/vX.Y.Z` tag at an origin, as `<tag> <commit>`; nothing if it has none.
+# By version, not by date: `releases/latest` and tag dates span four layers. The peeled
+# `^{}` line is the commit of an annotated (signed) tag, so it wins over the bare line,
+# and the refspec globs because ls-remote emits peeled lines only for a glob.
+# No backslashes, for the reason the tools block gives.
+newest_release() {
+  git ls-remote --tags "$1" 'refs/tags/cli/v*' 2>/dev/null | awk '
+    { ref = substr($2, 11); peeled = 0
+      if (substr(ref, length(ref) - 2) == "^{}") { ref = substr(ref, 1, length(ref) - 3); peeled = 1 }
+      if (ref !~ "^cli/v[0-9]+[.][0-9]+[.][0-9]+$") next
+      if (peeled || !(ref in sha)) sha[ref] = $1 }
+    END { for (t in sha) print substr(t, 6), t, sha[t] }
+  ' | sort -t. -k1,1n -k2,2n -k3,3n | tail -n1 | cut -d' ' -f2,3
+}
+# NEWEST-RELEASE END
+if [ -n "${YIDAM_REF:-}" ]; then
+  ref="$YIDAM_REF"
+  # `head -n1`: `git ls-remote <url> HEAD` can match more than one ref — HEAD itself and
+  # a refs/remotes/origin/HEAD the origin happens to carry — and every extra line went
+  # into $remote, so the equality test below could never be true. This task reported
+  # "origin has moved" unconditionally, including when the pin was exactly current.
+  remote=$(git ls-remote "$origin" "$ref" 2>/dev/null | cut -f1 | head -n1)
+else
+  release=$(newest_release "$origin")
+  ref="${release%% *}"
+  remote="${release#* }"
+  if [ -z "$release" ]; then
+    # An origin with no release at all — a fork, say — has only HEAD to offer.
+    ref=HEAD
+    remote=$(git ls-remote "$origin" HEAD 2>/dev/null | cut -f1 | head -n1)
+  fi
+fi
 if [ -z "$remote" ]; then
   echo "remote    unreachable — cannot compare"
   exit 0
 fi
-echo "origin/$ref  $remote"
+echo "$ref  $remote"
 if [ "$remote" = "$commit" ]; then
   echo
   echo "up to date"
   exit 0
 fi
-echo
-echo "origin has moved — run 'mise run yidam-vendor-update' to adopt it"
 # "Has moved" is a boolean, and a boolean is not enough to act on. How far, how old,
 # and — the part that actually costs something — whether the CLOSED COMMIT VOCABULARY
 # changed, because that is what this repository has already written history against
@@ -333,17 +362,29 @@ echo "origin has moved — run 'mise run yidam-vendor-update' to adopt it"
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 if ! git clone --quiet --filter=blob:none --no-checkout "$origin" "$tmp/y" 2>/dev/null; then
+  echo
+  echo "$ref is not the pin — run 'mise run yidam-vendor-update' to adopt it"
   echo "(could not fetch $origin for detail)"
   exit 0
 fi
-behind=$(git -C "$tmp/y" rev-list --count "$commit..origin/HEAD" 2>/dev/null || echo 0)
+# A pin taken with YIDAM_REF=HEAD is usually AHEAD of the newest release. That is not
+# staleness, and telling the operator to "adopt" a release would be telling them to roll
+# back — which yidam-vendor-update refuses to do without being asked.
+if git -C "$tmp/y" merge-base --is-ancestor "$remote" "$commit" 2>/dev/null; then
+  echo
+  echo "pinned ahead of $ref — nothing to adopt until a newer release"
+  exit 0
+fi
+echo
+echo "$ref is newer than the pin — run 'mise run yidam-vendor-update' to adopt it"
+behind=$(git -C "$tmp/y" rev-list --count "$commit..$remote" 2>/dev/null || echo 0)
 pinned_at=$(git -C "$tmp/y" log -1 --format=%at "$commit" 2>/dev/null || echo "")
 if [ -n "$pinned_at" ]; then
   days=$(( ( $(date +%s) - pinned_at ) / 86400 ))
   echo
   echo "behind    $behind commit(s), pinned $days day(s) ago"
 fi
-moved=$(git -C "$tmp/y" diff --name-only "$commit" origin/HEAD -- yidam/prelude/ 2>/dev/null | wc -l | tr -d ' ')
+moved=$(git -C "$tmp/y" diff --name-only "$commit" "$remote" -- yidam/prelude/ 2>/dev/null | wc -l | tr -d ' ')
 echo "prelude   $moved file(s) changed since the pin"
 # The verbs, and only the verbs. A row is a verb because its table's header is
 # `| Verb | When |`, not because its first cell is a backticked lowercase word.
@@ -369,11 +410,11 @@ verbs_from_graph() {
     { t = 0 }
   ' | sort -u
 }
-if git -C "$tmp/y" diff --name-only "$commit" origin/HEAD -- yidam/prelude/GRAPH.md 2>/dev/null | grep -q .; then
+if git -C "$tmp/y" diff --name-only "$commit" "$remote" -- yidam/prelude/GRAPH.md 2>/dev/null | grep -q .; then
   before="$tmp/vb"; after="$tmp/va"
   git -C "$tmp/y" show "$commit:yidam/prelude/GRAPH.md" 2>/dev/null \\
     | verbs_from_graph > "$before" || true
-  git -C "$tmp/y" show "origin/HEAD:yidam/prelude/GRAPH.md" 2>/dev/null \\
+  git -C "$tmp/y" show "$remote:yidam/prelude/GRAPH.md" 2>/dev/null \\
     | verbs_from_graph > "$after" || true
   added=$(comm -13 "$before" "$after" || true)
   removed=$(comm -23 "$before" "$after" || true)
@@ -387,7 +428,7 @@ fi
 """
 
 [yidam-vendor-update]
-description = "Re-vendor .yidam/.vendor/prelude/ from the origin and re-pin .yidam.toml. Set YIDAM_REF to target a tag or branch."
+description = "Re-vendor .yidam/.vendor/prelude/ at the newest cli/v* release and re-pin .yidam.toml. Set YIDAM_REF to target another tag, branch or HEAD."
 run = """
 set -eu
 origin="git@github.com:goedelsoup/yidam.git"
@@ -395,7 +436,44 @@ if [ -f .yidam.toml ]; then
   found=$(sed -n 's/^ *origin *= *"\\(.*\\)"/\\1/p' .yidam.toml)
   [ -n "$found" ] && origin="$found"
 fi
-ref="${YIDAM_REF:-HEAD}"
+# NEWEST-RELEASE BEGIN
+# The newest `cli/vX.Y.Z` tag at an origin, as `<tag> <commit>`; nothing if it has none.
+# By version, not by date: `releases/latest` and tag dates span four layers. The peeled
+# `^{}` line is the commit of an annotated (signed) tag, so it wins over the bare line,
+# and the refspec globs because ls-remote emits peeled lines only for a glob.
+# No backslashes, for the reason the tools block gives.
+newest_release() {
+  git ls-remote --tags "$1" 'refs/tags/cli/v*' 2>/dev/null | awk '
+    { ref = substr($2, 11); peeled = 0
+      if (substr(ref, length(ref) - 2) == "^{}") { ref = substr(ref, 1, length(ref) - 3); peeled = 1 }
+      if (ref !~ "^cli/v[0-9]+[.][0-9]+[.][0-9]+$") next
+      if (peeled || !(ref in sha)) sha[ref] = $1 }
+    END { for (t in sha) print substr(t, 6), t, sha[t] }
+  ' | sort -t. -k1,1n -k2,2n -k3,3n | tail -n1 | cut -d' ' -f2,3
+}
+# NEWEST-RELEASE END
+# The ref to adopt: the newest `cli/v*` release, unless YIDAM_REF names one (#1308).
+#
+# A release, because a release is the pin `yidam-build` can DOWNLOAD. A pin on an
+# untagged commit compiles the CLI from a clone on every machine, in every repository
+# that takes it — ~560 crates, cold, under cargo's machine-wide package-cache lock, so
+# three repositories building at once queue behind each other. Main is rarely tagged,
+# so pinning HEAD made that the common path rather than the exception.
+#
+# An unreleased commit is still a pin a repository is entitled to: YIDAM_REF=HEAD (or a
+# sha, branch or tag) asks for it, and yidam-build compiles it as before.
+# RESOLVE-REF BEGIN
+if [ -n "${YIDAM_REF:-}" ]; then
+  ref="$YIDAM_REF"
+else
+  release=$(newest_release "$origin")
+  ref="${release%% *}"
+  if [ -z "$release" ]; then
+    echo "no cli/v* release at $origin — pinning its HEAD, which 'mise run yidam-build' compiles" >&2
+    ref=HEAD
+  fi
+fi
+# RESOLVE-REF END
 # The pin being replaced, captured before .yidam.toml is overwritten below. It is what
 # makes the vocabulary report at the end possible.
 previous=""
@@ -415,42 +493,247 @@ if [ "$ref" != "HEAD" ]; then
   git -C "$tmp/yidam" checkout --quiet "$ref"
 fi
 commit=$(git -C "$tmp/yidam" rev-parse HEAD)
+# NO-ROLLBACK BEGIN
+# Never a silent step backwards. A repository pinned with YIDAM_REF=HEAD sits ahead of
+# the newest release, and the default above would quietly re-vendor it to an older prelude
+# and binary. Moving back is allowed, but only when asked for by name. A previous pin the
+# clone does not hold (another origin, or "unknown") cannot be ordered, so it is not judged.
+if [ -z "${YIDAM_REF:-}" ] && [ -n "$previous" ] && [ "$previous" != "$commit" ] \
+   && git -C "$tmp/yidam" cat-file -e "$previous^{commit}" 2>/dev/null \
+   && ! git -C "$tmp/yidam" merge-base --is-ancestor "$previous" "$commit"; then
+  echo "ERROR: this repository is pinned at $previous, which $ref ($commit) does not contain." >&2
+  echo "       Re-vendoring to the newest release would move it backwards. Either:" >&2
+  echo "         YIDAM_REF=HEAD mise run yidam-vendor-update    # stay on unreleased main (compiles)" >&2
+  echo "         YIDAM_REF=$ref mise run yidam-vendor-update    # take the release, deliberately" >&2
+  exit 1
+fi
+# NO-ROLLBACK END
 template=$(git -C "$tmp/yidam" describe --tags --exact-match --match 'v[0-9]*' HEAD 2>/dev/null || echo untagged)
 committed=$(git -C "$tmp/yidam" log -1 --format=%as HEAD)
 if [ ! -d "$tmp/yidam/yidam/prelude" ]; then
   echo "ERROR: $origin@$commit has no yidam/prelude/ — wrong origin?" >&2
   exit 1
 fi
+# ── source packs, and the version each pin asked for (RFC-0048) ─
+#
+# `prelude_sources` in .yidam/decisions/proposals.yml pins each pack this repository
+# vendors: `<pack>@<range>` names one the template ships in `yidam/sources/`, and
+# `<pack>@<range> from <repo>@<commit>` names one another corpus wrote in its own
+# `.yidam/sources/`. Each is copied wholesale into .yidam/.vendor/sources/, and the copy
+# records the pin it satisfied under `[vendored]`.
+#
+# A commit holds exactly one version of a pack, so a range is checked against it and
+# never resolved: this task does not go looking for a version that would satisfy it.
+# A pin it cannot satisfy refuses the whole update, and it runs before the prelude is
+# replaced, so a refusal leaves this repository as it was. No pins, or no record,
+# vendors none.
+#
+# No backslashes, for the reason the tools block gives. `satisfies` is the grammar
+# `yidam source check` reads (src/sources/version.rs); tests/task_layer.rs holds the two
+# to one table.
+# VENDOR-SOURCES BEGIN
+# SATISFIES BEGIN
+satisfies() {
+  awk -v v="$1" -v r="$2" '
+    function digits(s) { return s != "" && s !~ /[^0-9]/ }
+    BEGIN {
+      if (split(v, a, ".") != 3 || !digits(a[1]) || !digits(a[2]) || !digits(a[3])) exit 1
+      op = substr(r, 1, 1)
+      if (op == "^" || op == "~" || op == "=") rest = substr(r, 2)
+      else { op = "^"; rest = r }
+      n = split(rest, b, ".")
+      if (n < 1 || n > 3) exit 1
+      for (i = 1; i <= n; i++) if (!digits(b[i])) exit 1
+      for (i = n + 1; i <= 3; i++) b[i] = 0
+      l1 = b[1] + 0; l2 = b[2] + 0; l3 = b[3] + 0
+      if (op == "=" && n == 3) { h1 = l1; h2 = l2; h3 = l3 + 1 }
+      else if ((op == "=" || op == "~") && n == 1) { h1 = l1 + 1; h2 = 0; h3 = 0 }
+      else if (op == "=" || op == "~") { h1 = l1; h2 = l2 + 1; h3 = 0 }
+      else if (n == 1 || l1 > 0) { h1 = l1 + 1; h2 = 0; h3 = 0 }
+      else if (n == 2 || l2 > 0) { h1 = 0; h2 = l2 + 1; h3 = 0 }
+      else { h1 = 0; h2 = 0; h3 = l3 + 1 }
+      x1 = a[1] + 0; x2 = a[2] + 0; x3 = a[3] + 0
+      ge = x1 > l1 || (x1 == l1 && (x2 > l2 || (x2 == l2 && x3 >= l3)))
+      lt = x1 < h1 || (x1 == h1 && (x2 < h2 || (x2 == h2 && x3 < h3)))
+      exit !(ge && lt)
+    }'
+}
+# SATISFIES END
+# `version` in a pack.toml's [pack] table, unquoted.
+pack_version() {
+  awk '
+    BEGIN { q = sprintf("%c%c", 34, 39) }
+    substr($0, 1, 1) == "[" { t = $0; sub(/[ ]*#.*$/, "", t); gsub(/[ ]/, "", t); next }
+    t == "[pack]" && $0 ~ /^[ ]*version[ ]*=/ {
+      v = $0; sub(/^[^=]*=/, "", v); sub(/#.*$/, "", v); gsub("[ " q "]", "", v); print v; exit
+    }' "$1"
+}
+proposals=.yidam/decisions/proposals.yml
+pins=""
+if [ -f "$proposals" ]; then
+  pins=$(awk '
+    BEGIN { q = sprintf("%c%c", 34, 39) }
+    function emit(s) {
+      sub(/[ ]*#.*$/, "", s); gsub("[" q "]", "", s); sub(/^[ ]+/, "", s); sub(/[ ]+$/, "", s)
+      if (s != "") print s
+    }
+    /^prelude_sources:/ {
+      line = $0
+      sub(/^prelude_sources:[ ]*/, "", line)
+      sub(/[ ]*#.*$/, "", line)
+      if (substr(line, 1, 1) == "[") {
+        gsub(/[][]/, "", line)
+        n = split(line, items, ",")
+        for (i = 1; i <= n; i++) emit(items[i])
+      } else if (line == "") { block = 1 }
+      next
+    }
+    block == 1 && $0 ~ /^[ ]*-[ ]+/ { s = $0; sub(/^[ ]*-[ ]+/, "", s); emit(s); next }
+    block == 1 && $0 ~ /^[^ ]/ { block = 0 }
+  ' "$proposals")
+fi
+staged="$tmp/sources"
+rm -rf "$staged"
+mkdir -p "$staged"
+refused=0
+peers=0
+set -f
+while IFS= read -r pin; do
+  [ -n "$pin" ] || continue
+  set -- $pin
+  if [ $# -eq 1 ]; then
+    peer=""
+  elif [ $# -eq 3 ] && [ "$2" = from ]; then
+    peer=$3
+  else
+    echo "ERROR: prelude_sources: '$pin' is neither <pack>@<range> nor <pack>@<range> from <repo>@<commit>" >&2
+    refused=1; continue
+  fi
+  pack=${1%%@*}
+  range=${1#*@}
+  if [ "$pack" = "$1" ] || [ -z "$pack" ] || [ -z "$range" ]; then
+    echo "ERROR: prelude_sources: '$pin' names no range; write $1@^<major>.<minor>" >&2
+    refused=1; continue
+  fi
+  # The pack-name rule `yidam source check` holds a pin to, checked before the name is a
+  # path: `a/b` or `../x` would otherwise reach `cp`. Letters are spelled out, since a
+  # locale may collate `[a-z]` to take capitals too.
+  case "$pack" in
+    [abcdefghijklmnopqrstuvwxyz]*)
+      case "$pack" in *[!abcdefghijklmnopqrstuvwxyz0123456789-]*) bad=1 ;; *) bad=0 ;; esac ;;
+    *) bad=1 ;;
+  esac
+  if [ "$bad" -ne 0 ]; then
+    echo "ERROR: prelude_sources: '$pin': '$pack' is not a pack name: lowercase letters, digits and -, starting with a letter" >&2
+    refused=1; continue
+  fi
+  if [ -e "$staged/$pack" ]; then
+    echo "ERROR: prelude_sources: $pack is pinned twice" >&2
+    refused=1; continue
+  fi
+  if [ -z "$peer" ]; then
+    src="$tmp/yidam/yidam/sources/$pack"
+    from="$origin"
+    at="$commit"
+  else
+    from=${peer%@*}
+    at=${peer##*@}
+    case "$at" in
+      *[!0-9a-f]*) at="" ;;
+    esac
+    # Length by `expr`, not the parameter-length expansion: mise renders `run` through Tera
+    # first, where a brace followed by `#` opens a comment and the task never starts (#1367).
+    if [ "$from" = "$peer" ] || [ -z "$from" ] || [ "$(expr "$at" : '.*')" -ne 40 ]; then
+      echo "ERROR: prelude_sources: '$pin' does not end in <repo>@<40-hex commit>" >&2
+      refused=1; continue
+    fi
+    case "$from" in
+      *://* | git@* | /* | .*) url="$from" ;;
+      *) url="https://$from" ;;
+    esac
+    peers=$((peers + 1))
+    clone="$tmp/peer-$peers"
+    rm -rf "$clone"
+    if ! git clone --quiet --filter=blob:none "$url" "$clone" || ! git -C "$clone" checkout --quiet "$at"; then
+      echo "ERROR: prelude_sources: '$pin': cannot check out $at from $url" >&2
+      refused=1; continue
+    fi
+    src="$clone/.yidam/sources/$pack"
+  fi
+  if [ ! -f "$src/pack.toml" ]; then
+    echo "ERROR: prelude_sources: '$pin': $from at $at has no $pack pack" >&2
+    refused=1; continue
+  fi
+  version=$(pack_version "$src/pack.toml")
+  if ! satisfies "$version" "$range"; then
+    echo "ERROR: prelude_sources: '$pin': $pack is ${version:-unversioned} at $from@$at, which $range does not admit" >&2
+    refused=1; continue
+  fi
+  if grep -qx '[[]vendored[]]' "$src/pack.toml"; then
+    echo "ERROR: prelude_sources: '$pin': $from carries $pack as a vendored copy; pin the corpus that wrote it" >&2
+    refused=1; continue
+  fi
+  cp -R "$src" "$staged/$pack"
+  cat >> "$staged/$pack/pack.toml" <<VENDORED
+
+# Written by yidam-vendor-update: the pin this copy satisfied, and where it came from.
+[vendored]
+pin = "$pin"
+from = "$from"
+commit = "$at"
+VENDORED
+  echo "sources/$pack: $version from $from@$at (per $pin)"
+done <<PINS
+$pins
+PINS
+set +f
+if [ "$refused" -ne 0 ]; then
+  echo "ERROR: a prelude_sources pin was refused; nothing in this repository has changed." >&2
+  exit 1
+fi
+rm -rf .yidam/.vendor/sources
+if [ -n "$(ls "$staged")" ]; then
+  mkdir -p .yidam/.vendor
+  cp -R "$staged" .yidam/.vendor/sources
+else
+  echo "sources/: none pinned (per $proposals)"
+fi
+# VENDOR-SOURCES END
 # Wholesale replacement, not a merge: the prelude is read-only in a derived
 # repo, so there is nothing local to preserve. Anything that WAS edited locally
 # shows up in the diff below, which is the point.
 #
-# `prelude/domains/` is the exception, and it is not a local edit — it is a choice
-# bootstrap made and recorded. Read what this repository vendors now, before the
-# replacement erases it; the prune below needs it as a fallback.
+# The domain libraries are not part of the prelude and are not in that copy; the
+# block below adds the ones this repository chose. Read what it vendors now first —
+# under `.yidam/.vendor/domains/`, or under `prelude/domains/` for a repository
+# vendored before the layer moved out (#934) — since the line below erases the latter.
 vendored=""
-if [ -d .yidam/.vendor/prelude/domains ]; then
-  vendored=$(ls .yidam/.vendor/prelude/domains)
-fi
+for dir in .yidam/.vendor/domains .yidam/.vendor/prelude/domains; do
+  if [ -d "$dir" ]; then
+    vendored="$vendored $(ls "$dir" | grep -vxE 'README.md|parity' || true)"
+  fi
+done
+# VENDOR-PRELUDE BEGIN
 rm -rf .yidam/.vendor/prelude
 mkdir -p .yidam/.vendor
 cp -R "$tmp/yidam/yidam/prelude" .yidam/.vendor/prelude
+# The SDKs are yidam's to build and test, and no derived repository builds them, so
+# they sit beside the prelude (#1311). A ref from before the move carries them
+# inside it; never leave them in the copy.
+rm -rf .yidam/.vendor/prelude/sdks
+# The bootstrap skill made this repository and is never run in it again; genesis drops
+# it, and so does every update. Only those two files: a prelude skill meant for derived
+# repositories would sit beside them and must survive.
+rm -f .yidam/.vendor/prelude/skills/bootstrap.md .yidam/.vendor/prelude/skills/bootstrap.evidence.md
+rmdir .yidam/.vendor/prelude/skills 2>/dev/null || true
+# VENDOR-PRELUDE END
 # ── the domain libraries, and the choice this repository already made ─
 #
-# `prelude/domains/` is fifteen libraries in three languages each — around 320 of
-# the ~540 files the line above just wrote, and the majority of the bytes. Step 8
-# of bootstrap keeps only what a step 5 calculator named, and the common case
-# names none: a derived repository has no task that builds them, no workspace that
-# includes them, and no CI job that runs them. `domain-parity` is yidam's gate and
-# does not travel.
-#
-# The copy is wholesale, so it puts every one of them back. For as long as this
-# task read no declaration that is exactly what it did — every re-vendor silently
-# reinstating a decision genesis had made, and the affordance the bootstrap skill
-# describes ("add it to prelude_domains and re-run") naming a mechanism that was
-# never written. A repository a few hours old declined to run this task at all
-# rather than take the 320 files back, which also froze the inherited task layer
-# this task is the only update path for (#808).
+# `yidam/domains/` is fifteen libraries in three languages each, and a derived
+# repository has no task that builds them, no workspace that includes them, and no
+# CI job that runs them unless it wires one in. They sit beside the prelude rather
+# than inside it so that the copy above never brings them: this block copies only
+# what the repository opted into, and the common case opts into none.
 #
 # Two sources, in order, and neither is a guess:
 #
@@ -458,12 +741,17 @@ cp -R "$tmp/yidam/yidam/prelude" .yidam/.vendor/prelude
 #      writes and step 8 reads. The repository's own declaration, the same
 #      standing as `[build] features` above.
 #   2. Failing that, what this repository already had. A re-vendor may not decide
-#      something nobody declared: a repository predating the drop keeps its
-#      fifteen, one bootstrapped after it keeps none, and neither is surprised.
+#      something nobody declared: a repository that vendored domains before the
+#      record existed keeps them, and one that vendored none gets none.
 #
-# PRUNE-DOMAINS BEGIN
-domains=.yidam/.vendor/prelude/domains
+# VENDOR-DOMAINS BEGIN
+domains=.yidam/.vendor/domains
 proposals=.yidam/decisions/proposals.yml
+# A ref from before #934 carries the libraries inside its prelude; take them from
+# there, and never leave them in the prelude copy.
+upstream="$tmp/yidam/yidam/domains"
+[ -d "$upstream" ] || upstream="$tmp/yidam/yidam/prelude/domains"
+rm -rf .yidam/.vendor/prelude/domains
 if [ -f "$proposals" ] && grep -q '^prelude_domains:' "$proposals"; then
   keep=$(awk '
     /^prelude_domains:/ {
@@ -491,24 +779,26 @@ else
 fi
 # One line, whatever form the declaration took: a flow list, a block list, or an ls.
 keep=$(echo $keep)
-if [ -d "$domains" ]; then
-  if [ -z "$keep" ]; then
-    rm -rf "$domains"
-    echo "prelude/domains/: nothing kept (per $source) — directory removed"
-  else
-    # README.md is the index that says what the layer is and how a domain is wired
-    # into crates/Cargo.toml; `parity` is how a kept domain is checked across its
-    # three languages. Both are kept whenever anything is.
-    for d in $(ls "$domains"); do
-      case " $keep README.md parity " in
-        *" $d "*) ;;
-        *) rm -rf "$domains/$d" ;;
-      esac
-    done
-    echo "prelude/domains/: kept $keep (per $source)"
-  fi
+rm -rf "$domains"
+if [ -z "$keep" ]; then
+  echo "domains/: none vendored (per $source)"
+else
+  mkdir -p "$domains"
+  # README.md is the index that says what the layer is and how a domain is wired
+  # into crates/Cargo.toml; `parity` is how a kept domain is checked across its
+  # three languages. Both come with anything that does.
+  for d in $keep README.md parity; do
+    if [ -e "$domains/$d" ]; then
+      continue
+    elif [ -e "$upstream/$d" ]; then
+      cp -R "$upstream/$d" "$domains/$d"
+    else
+      echo "WARNING: domains/$d: named (per $source) but not in $upstream" >&2
+    fi
+  done
+  echo "domains/: vendored $keep (per $source)"
 fi
-# PRUNE-DOMAINS END
+# VENDOR-DOMAINS END
 # This file too. It is the inherited TASK layer — as read-only as the prelude and
 # as much yidam's to correct, but it does not live under .yidam/.vendor/ because
 # mise has to find it at the repo root. For a long time that meant it had no
@@ -839,7 +1129,7 @@ fi
 # writes nothing to stdout, and must not stop the re-vendor. One line, so a test can run it.
 contract=$(yidam doctor --only contract --strict 2>/dev/null) || [ -z "$contract" ] || printf '\\n%s\\n\\n' "$contract"
 echo "review the diff, then commit it as its own event:"
-echo "  git add .yidam/.vendor/prelude .yidam.toml mise.yidam.toml mise.toml .yidam/lint-baseline.yml .github/workflows/ci.yml .claude/CLAUDE.md"
+echo "  git add .yidam/.vendor .yidam.toml mise.yidam.toml mise.toml .yidam/lint-baseline.yml .github/workflows/ci.yml .claude/CLAUDE.md"
 echo "  git commit -m 'vendor: re-vendor prelude at $commit — <what changed>'"
 """
 
@@ -1041,7 +1331,7 @@ description = "Extract embedding text from corpus instances and catalog sources 
 run = "yidam embed"
 
 [index-build]
-description = "Build LanceDB vector index from embeddings and export Arrow IPC. Downloads model (~22 MB) on first run."
+description = "Build the vector index from embeddings, as Arrow IPC. Downloads model (~22 MB) on first run."
 depends = ["embed"]
 run = "yidam index-build"
 

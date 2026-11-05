@@ -1,9 +1,0 @@
-function = "set_theory.is_subset"
-description = "equal sets satisfy subset relation"
-
-[input]
-a = [1, 2, 3]
-b = [1, 2, 3]
-
-[expected]
-result = true
