@@ -1,9 +1,0 @@
-function = "reference_conforms"
-description = "one segment is not a node path, however well-formed the segment is"
-
-[input]
-kind = "node"
-path = "foo"
-
-[expected]
-conforms = false

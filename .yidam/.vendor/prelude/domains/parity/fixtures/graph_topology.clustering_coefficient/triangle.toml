@@ -1,6 +1,0 @@
-description = "node embedded in a triangle has coefficient 1.0"
-[input]
-degree = 2
-triangle_count = 1
-[expected]
-coefficient = 1.0

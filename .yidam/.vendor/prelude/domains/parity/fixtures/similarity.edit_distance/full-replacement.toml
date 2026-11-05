@@ -1,8 +1,0 @@
-description = "completely different strings of equal length require one substitution per character"
-
-[input]
-s1 = "abc"
-s2 = "xyz"
-
-[expected]
-distance = 3

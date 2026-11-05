@@ -1,8 +1,0 @@
-function = "is_recognized_verb"
-description = "Establish: recognition is case-sensitive; the vocabulary is lowercase"
-
-[input]
-verb = "Establish"
-
-[expected]
-recognized = false

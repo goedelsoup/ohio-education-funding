@@ -16,7 +16,7 @@ and it is not part of the recurring read.
 | File | Knowledge node — a concept, document, artifact, or relation |
 | Commit | Knowledge event — an addition, revision, or synthesis |
 | Commit message | Event description — what changed and why |
-| Link (`[label](path)`) | Edge — an explicit relationship from one node to another |
+| A `links:` entry | Edge — a typed relationship from one node to another |
 | Branch | Parallel inquiry thread — speculative or in-progress |
 | Merge commit | Synthesis — two threads of knowledge joined |
 | Tag | Stable checkpoint — a named state of the graph |
@@ -44,10 +44,10 @@ Node types are distinguished by directory, not by filename:
 
 | Directory | Node type | What it represents |
 |---|---|---|
-| `corpus/` | Knowledge node | A concept, relation, artifact, or open question in the domain |
-| `catalog/` | Source node | A data source — dataset, paper, API, external knowledge base |
+| `.yidam/corpus/<class>/` | Knowledge node | A concept, relation, artifact, or open question in the domain |
+| `.yidam/catalog/` | Source node | A data source — dataset, paper, API, external knowledge base |
 
-Corpus nodes represent derived knowledge; catalog nodes represent its provenance. An edge
+Corpus nodes represent derived knowledge; catalog nodes represent its provenance. A link
 from a corpus node to a catalog node reads as "this concept draws on this source." Catalog
 nodes do not contain derived knowledge — only enough to locate and characterize the source.
 
@@ -77,11 +77,11 @@ is unsettled; the `?` says the node **is** the question.
 
 ## Edges
 
-Edges are explicit markdown references: `[label](path)`. An agent reading the graph can
-follow edges to traverse related knowledge.
+An edge is a `links:` entry: a `target:` relative to the node's file, and a
+`relationship:` its class declares. A link in prose cites; it is not an edge.
 
-Edges are **directional** — the file containing the reference is the source node, the
-referenced file is the target. Bidirectional relationships require a reference in both files.
+Edges are **directional**, written once, read from both ends: `query` walks one backwards
+as `<-rel-`.
 
 ## The class contract
 
@@ -96,6 +96,7 @@ against it:
 | `unlicensed-edge` | a relationship the class does not declare | only under `edge_policy: exhaustive` |
 | `edge-target-class` | an edge resolving to a node of the wrong class | yes |
 | `interval-overlap` | more instances holding one target at once than it seats, or an end before its start | only where the class declares `interval:` |
+| `interval-gap` | a span inside a finished line of holders that fewer hold than it seats | no, and only on a target marking its line finished |
 | `missing-property` | a declared property the instance omits | only where the class says `required: true` |
 | `claim-property-undeclared` | a value spelling a standing in a property the class did not declare `type: claim` | no |
 
@@ -124,10 +125,20 @@ hold one office at once, and `capacity: seats` lets each office say how many may
 are half-open, compared at the precision both sides share, and open while the end is absent.
 [why](GRAPH.evidence.md#interval-overlap)
 
+**A target may mark its line of holders finished.** `complete: line_complete` asks
+`interval-gap` to warn on a span inside the line of an office marked `line_complete: true`
+that fewer hold than it seats. Before the first holder and after the last are not gaps.
+[why](GRAPH.evidence.md#interval-gap)
+
 **A `quotation` is words copied from a catalog entry**: `of:` names the entry, `span:` holds
 the words, and `sha256:` names the artifact when the entry holds more than one.
 `quotation-span-drift` fails when the fetched bytes lack the words; where they are not
 fetched, `quotation-unchecked` says so. [why](GRAPH.evidence.md#quotation-bytes)
+
+**A `list` holds several values**: `items: number` makes each item a number, and `fields:`
+declares the record each item is, closed to keys it does not name. A record's `claim` field is
+that entry's standing, not the node's. Beside one, `source` must resolve as a link's does.
+[why](GRAPH.evidence.md#list)
 
 **Silence is not a contract**, read one field at a time. A class with no `properties:` has
 said nothing about properties and none are checked; a class with no `edges:` has said nothing
@@ -242,8 +253,8 @@ corpus, and one must not arrive as a side effect of the other.
 [why](GRAPH.evidence.md#edge-claims-two-keys)
 
 `edge-standing-unheld` reads an edge's standing against the ones its **own endpoints** declare.
-A node's standing here is a property its class declared `type: claim` — the node's own grade,
-not the weakest marker in its prose. A node that declares no such property has no standing and
+A node's standing here is a top-level property its class declared `type: claim` — the node's
+own grade, not the weakest marker in its prose. A node that declares no such property has no standing and
 is compared to nothing. The end an edge is measured against is the **weaker** of the two that
 declare one, and the edge's own standing is the **strongest** it spells. It never gates.
 [why](GRAPH.evidence.md#edge-standing-unheld)

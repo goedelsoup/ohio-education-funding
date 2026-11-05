@@ -1,9 +1,0 @@
-function = "set_theory.intersection"
-description = "intersection of identical sets is the set itself"
-
-[input]
-a = [1, 2, 3]
-b = [1, 2, 3]
-
-[expected]
-elements = [1, 2, 3]

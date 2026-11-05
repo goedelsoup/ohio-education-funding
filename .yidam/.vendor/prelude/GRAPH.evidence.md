@@ -108,6 +108,17 @@ pass exactly that mistake. The bytes come from this machine's vault cache, becau
 only the record of them. A runner with no cache reports every quotation unchecked, at Info:
 an unchecked quotation is not a compared one, and an empty cache is not a defect in the corpus.
 
+## list
+
+Two corpora held values that each carried their own evidence: a short-run and a long-run fare
+elasticity, one resting on 33 studies and the other on 3. One coined `type: effect`, which the
+gate left alone, so a dead `source` and a `claim_tag` of `definitely-true` both passed. The
+other left the list untyped, and the claim reader, which then walked a node at any depth, read
+an entry's `open` as the node's standing. Measured over twenty corpora before the reader was
+narrowed, every declared claim value sat at the top of `properties:`, so the narrowing moved no
+count. A record is closed because a class is: an open one lets a misspelled `claim_tg` pass as
+an entry with no standing.
+
 ## values-closed
 
 Before the field existed a class spelled its set in the description — `extant | demolished |
@@ -126,12 +137,27 @@ property names are declared because corpora spell the pair at least five ways. E
 shared precision is adjacency, not overlap: a term ending `1893` and one beginning `1893-06-01`
 may have met in June, and reporting them would invent a day nobody recorded. An absent end is
 open because that is what *still serving* looks like, and two holders both still serving is the
-corpus contradicting itself today. Gaps in coverage are not reported.
+corpus contradicting itself today. Gaps in coverage are a separate check.
 
 The count is the target's, because one `office` class holds both a sheriff and a board of
 three. Measured on allen-county-ohio's 25 offices: without `capacity:` the check reported 19
 tenures, 13 of them correct terms on commissioner, judicial and council seats. With `capacity:
 seats` it reported 6, all overlapping one 1842 mayoralty whose end the corpus never recorded.
+
+## interval-gap
+
+Gaps are opt-in because most corpora are incomplete by design, and reporting every one would put
+a permanent finding on every office whose early history nobody has transcribed. Measured on
+allen-county-ohio with all 25 offices marked finished: 2 gaps, on the commissioners from 1886
+to 2023 and the prosecutor from 1855 to 2025. The corpus's own succession calculator reports the
+same spans between the same holders. Both are lines nobody has finished, which is why the mark
+is the target's. The 39-tenure sheriff line reports none.
+
+A gap is reported only where a holder certainly begins after it. A term ending `1893` and one
+beginning `1893-06-01` may have met, so the gap cannot be shown at the precision they share.
+A span with fewer holders than seats counts, because a missing commissioner on a board of three
+is exactly the tenure a finished line should not lack. The check warns rather than gates: a
+line marked finished may already hold real gaps, and finding them is the point.
 
 ## silence-is-not-a-contract
 

@@ -1,6 +1,0 @@
-Decisions
-  disclose/at_rest       inherited
-  disclose/derived       inherited
-  disclose/record        inherited
-
-Every decision is the one this binary shipped.

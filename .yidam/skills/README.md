@@ -1,8 +1,8 @@
 # skills
 
-Domain-specific skills available to agents in this repository. Generic skills inherited
-from yidam live in [`.vendor/prelude/skills/`](../.vendor/prelude/skills/); skills that
-require knowledge of this domain's corpus or toolkit live here.
+Domain-specific skills available to agents in this repository: skills that require knowledge
+of this domain's corpus or toolkit. yidam no longer vendors any generic skill into the prelude;
+its own skills ship with the yidam plugin.
 
 **Two kinds live here.** A *calculator* skill describes one crate: what it computes, what it
 reads, what it returns. A *procedure* skill composes several of them into a repeatable traversal,
@@ -47,9 +47,3 @@ Fields per skill: filename, name, description, agents that invoke it.
 | [`scenario-delta`](scenario-delta.md) | Produce the per-agency winners-and-losers table between a baseline run and a perturbed run, with incidence across wealth and state share |
 | [`scenario-run`](scenario-run.md) | Perturb a parameter set, run baseline against perturbed, and commit the result as a scenario node with its reach, incidence, and provenance |
 <!-- /REGEN -->
-
-## Inherited from prelude
-
-| Skill | Purpose |
-|---|---|
-| [`bootstrap`](../.vendor/prelude/skills/bootstrap.md) | Repository initialization |

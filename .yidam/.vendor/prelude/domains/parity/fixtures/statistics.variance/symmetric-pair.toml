@@ -1,5 +1,0 @@
-description = "population variance of [2, 4]"
-[input]
-values = [2.0, 4.0]
-[expected]
-variance = 1.0

@@ -1,7 +1,0 @@
-description = "mean of a single-element list equals that element"
-
-[input]
-values = [5.0]
-
-[expected]
-mean = 5.0
