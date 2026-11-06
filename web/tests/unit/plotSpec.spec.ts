@@ -2456,3 +2456,46 @@ test("a callout marks its point and keeps inside the drawing at every width", ()
     expect(overruns(svg)).toEqual([]);
   }
 });
+
+test("a bounded position is a whisker beside the line and never joined to it", () => {
+  /*
+   * #765. The nonpublic October count is masked before the department published a total, and the
+   * masked count lies between two values thousands apart. A line through the midpoints would be a
+   * series nobody published. The whiskers widen the domain, the line takes only the exact years,
+   * and a series that opens on whiskers prints no start value — its first point is not its start.
+   */
+  const points: SeriesPoint[] = [
+    { at: 2008, a: null, b: null, aRange: [240, 270] },
+    { at: 2009, a: 200, b: null },
+    { at: 2010, a: null, b: null, aRange: [180, 230] },
+    { at: 2011, a: 175, b: null },
+    { at: 2012, a: 178, b: null },
+  ];
+  const spec = seriesSpec(points, { a: "pupils", b: "" }, (v) => `${v}`, (p) => `at ${p.at}`, {
+    width: WIDTHS.wide,
+    tick: (at) => `${at}`,
+    hues: { a: "plain-strong", b: "plain" },
+  })!;
+  const domain = (spec.options.y as { domain: [number, number] }).domain;
+  expect(domain[1]).toBeGreaterThanOrEqual(270);
+  // The hover anchors at the whisker's top where there is no point.
+  expect(spec.hovers!.anchor![0]).toBe(270);
+
+  const document = parseHTML(`<div>${renderToString(() => spec, "presentational")}</div>`).document;
+  const svg = document.querySelector("svg")!;
+  // A rule and two caps per bounded position, and one dot for the exact year between them.
+  expect(svg.querySelectorAll(".series-interval line").length).toBe(6);
+  expect(svg.querySelectorAll(".series-interval circle").length).toBe(1);
+  expect(svg.querySelectorAll(".series-start text")).toHaveLength(0);
+
+  // A chart with no ranges draws none of it, so the five existing callers are unchanged.
+  const plain = seriesSpec(
+    points.map(({ at, a, b }) => ({ at, a, b })),
+    { a: "pupils", b: "" },
+    (v) => `${v}`,
+    () => "",
+    { width: WIDTHS.wide, tick: (at) => `${at}`, hues: { a: "plain", b: "plain" } },
+  )!;
+  const marks = (plain.options.marks ?? []) as unknown as { className?: string }[];
+  expect(marks.filter((mark) => mark.className === "series-interval")).toHaveLength(0);
+});

@@ -4,10 +4,19 @@ import type { Bar, SeriesPoint } from "./chart.ts";
 import { barSpec, type Drawing, scatterSpec, seriesSpec } from "./plot/spec.ts";
 import { renderToString } from "./plot/ssr.ts";
 import { compactMoney, count, escapeHtml, fig, fixed, millions, money, ordinal, pct } from "./format.ts";
-import { realChange, series, type Basis } from "./real.ts";
+import { convert, realChange, series, type Basis } from "./real.ts";
 import * as routes from "./routes.ts";
 import type { TaxStatewide } from "./feed.ts";
-import type { Bundle, District, FundingUnit, FundingUnits, National, NonpublicFederal } from "./types.ts";
+import type {
+  Bundle,
+  Deflator,
+  District,
+  FundingUnit,
+  FundingUnits,
+  National,
+  NonpublicFederal,
+  NonpublicSupport,
+} from "./types.ts";
 import { median, quintiles } from "./stats.ts";
 import { seriesYear, yearChip, yearChipPair, yearOf } from "./year.ts";
 import { anchor } from "./section.ts";
@@ -648,7 +657,7 @@ export function renderFundingUnits(units: FundingUnits | null): string {
  * own `kind` says which, and the note repeats it, because an appropriation quoted beside two
  * columns of actuals reads as one.
  */
-export function renderNonpublicSupport(units: FundingUnits | null): string {
+export function renderNonpublicSupport(units: FundingUnits | null, deflator: Deflator | null): string {
   if (!units) return "";
   const support = units.nonpublic_support;
   const kind = {
@@ -661,8 +670,12 @@ export function renderNonpublicSupport(units: FundingUnits | null): string {
       <h2>${anchor("nonpublic-support")}Nonpublic school support${yearChip(
         "funding_units.nonpublic_support",
       )}</h2>
-      <p class="note">State money for pupils in chartered nonpublic schools that is
-        <em>not</em> one of the six funding units and not a scholarship. It is appropriated by line
+      <p class="note"><strong>The state appropriated ${millions(support.total).replace(
+        "+",
+        "",
+      )} for pupils in chartered nonpublic schools in ${yearOf(
+        "funding_units.nonpublic_support",
+      )}.</strong> It is <em>not</em> one of the six funding units and not a scholarship. It is appropriated by line
         item and paid to districts and to the schools themselves for services — health, guidance,
         textbooks, testing, and the cost of the state's own paperwork. Shown ${kind}.</p>
       <div class="scroll"><table>
@@ -695,8 +708,150 @@ export function renderNonpublicSupport(units: FundingUnits | null): string {
       </table></div>
       <p class="note">These lines <em>may</em> be added, and are, because all three are the same
         kind of figure in the same fiscal year — which is the difference between this table and the
-        one above it.</p>${renderNonpublicFederal(support.federal)}
+        one above it.</p>${renderNonpublicReach(support, deflator)}${renderNonpublicFederal(support.federal)}
     </div>`;
+}
+
+/** `low`–`high`, or the one figure where the two are equal. */
+function between(low: number, high: number, write: (v: number) => string): string {
+  return low === high ? write(low) : `${write(low)}–${write(high)}`;
+}
+
+/**
+ * Who the appropriation is for, and what it comes to per pupil (#765).
+ *
+ * # Why the early years are whiskers and not a line
+ *
+ * Before the department published a sector total, the only count of an October is its building
+ * sheet, and that sheet masked every cell under ten. The masked count lies between a floor and a
+ * ceiling thousands apart, and a line through the midpoints would be a series nobody published.
+ * So a bounded year is a whisker, an exact one is on the line, and the two never join. The rate
+ * inherits the same split: it divides by the same October.
+ *
+ * # Why real beside nominal, in one frame
+ *
+ * The question a reader brings to a per-pupil rate is whether it kept up, and the nominal line
+ * alone cannot answer it. Both lines share one axis because they are the same quantity in two
+ * years' dollars.
+ */
+function renderNonpublicReach(support: NonpublicSupport, deflator: Deflator | null): string {
+  const octobers = support.octobers;
+  const rates = support.rates;
+  if (octobers.length < 2 || rates.length < 2) return "";
+  const placement = support.placement;
+  const latest = lastOf(octobers);
+  const first = firstOf(octobers);
+  const bounded = octobers.filter((o) => !o.exact);
+  const censored = Math.max(0, ...bounded.map((o) => o.censored));
+  // The exact run the line draws: the first year after which every year is exact.
+  const runStart = octobers.findLast((o, i) => !o.exact && i < octobers.length - 1);
+  const run = runStart ? octobers.filter((o) => o.fiscal_year > runStart.fiscal_year) : octobers;
+  const runFirst = firstOf(run);
+  const trough = run.reduce((low, o) => (o.floor < low.floor ? o : low), runFirst);
+
+  const sector: SeriesPoint[] = octobers.map((o) => ({
+    at: o.fiscal_year,
+    a: o.exact ? o.floor : null,
+    b: null,
+    aRange: o.exact ? null : [o.floor, o.ceiling],
+  }));
+  const sectorHover = (p: SeriesPoint) => {
+    const o = octobers.find((row) => row.fiscal_year === p.at)!;
+    return o.exact
+      ? `${fiscalYear(o.fiscal_year)}: ${count(o.floor)} pupils`
+      : `${fiscalYear(o.fiscal_year)}: between ${count(o.floor)} and ${count(o.ceiling)} pupils; ${count(o.censored)} cells masked`;
+  };
+
+  const exactRates = rates.filter((r) => r.exact);
+  const rateRunStart = rates.findLast((r, i) => !r.exact && i < rates.length - 1);
+  const rateRun = rateRunStart ? exactRates.filter((r) => r.fiscal_year > rateRunStart.fiscal_year) : exactRates;
+  const rateFirst = firstOf(rateRun);
+  const rateLast = lastOf(rateRun);
+  // Priced in the run's first year, so the two lines leave one point and the gap that opens
+  // between them is what the rate lost. In the last year's dollars they would end on one value,
+  // and their names on one line.
+  const base = rateFirst.fiscal_year;
+  // A feed with no index draws the nominal line alone rather than a real one at nominal values.
+  const real = (v: number, from: number) => (deflator ? convert(deflator, v, from, base) : null);
+  const rate: SeriesPoint[] = rates.map((r) => {
+    const low = real(r.low, r.fiscal_year);
+    const high = real(r.high, r.fiscal_year);
+    return {
+      at: r.fiscal_year,
+      a: r.exact ? r.low : null,
+      b: r.exact ? low : null,
+      aRange: r.exact ? null : [r.low, r.high],
+      bRange: r.exact || low == null || high == null ? null : [low, high],
+    };
+  });
+  const dollars = (v: number) => money(v);
+  const rateHover = (p: SeriesPoint) => {
+    const r = rates.find((row) => row.fiscal_year === p.at)!;
+    const low = real(r.low, r.fiscal_year);
+    const high = real(r.high, r.fiscal_year);
+    const realText = low == null || high == null ? "no real figure" : `${between(low, high, dollars)} in ${fiscalYear(base)} dollars`;
+    return `${fiscalYear(r.fiscal_year)}: ${between(r.low, r.high, dollars)} nominal; ${realText}`;
+  };
+  const realLast = real(rateLast.low, rateLast.fiscal_year);
+  const realChangeOver = realLast == null ? null : realLast / rateFirst.low - 1;
+  const outside = placement.placed - placement.listed;
+
+  return `
+      <h3>The pupils it is for${yearChip(support.octobers_series)}</h3>
+      <p class="note">Kindergarten through twelfth grade in every chartered nonpublic school, one
+        count each October. ${fig(count(latest.floor), fiscalYear(latest.fiscal_year))} in the
+        latest, against ${between(first.floor, first.ceiling, count)} in the first. Where a year is
+        a bar rather than a point on the line, the department published no total: its building
+        sheets masked small cells (up to ${count(censored)} of them in one year), and the count is
+        only known to lie between the bar's ends. The line starts at ${fiscalYear(runFirst.fiscal_year)},
+        the first year of an unbroken published run, and its low is
+        ${count(trough.floor)} in ${fiscalYear(trough.fiscal_year)}.</p>
+      <div class="chartwrap" data-chart="nonpublic-octobers">${renderToString(
+        (w) =>
+          seriesSpec(sector, { a: "pupils", b: "" }, (v) => count(Math.round(v)), sectorHover, {
+            width: w,
+            tick: fiscalYear,
+            hues: { a: "plain-strong", b: "plain" },
+          }),
+        {
+          label: `Pupils in chartered nonpublic schools, kindergarten through twelfth grade, each October, ${
+            seriesYear(support.octobers_series)?.label ?? ""
+          }; a range where the department masked small counts`,
+        },
+      )}</div>
+      <h3>Auxiliary services per pupil${yearChip(support.rates_series)}</h3>
+      <p class="note">The Auxiliary Services line, less what the budget earmarks out of it, divided
+        by that October's count — the per-pupil amount R.C. 3317.024(E) computes — so it moves
+        with both terms: ${fig(money(rateLast.low), fiscalYear(rateLast.fiscal_year))} against
+        ${money(rateFirst.low)} in ${fiscalYear(rateFirst.fiscal_year)}, which is ${
+          realChangeOver == null
+            ? "a change the price index cannot reach"
+            : `${pct(Math.abs(realChangeOver), 0)} ${realChangeOver < 0 ? "less" : "more"} in ${fiscalYear(base)} dollars`
+        }. The early bars divide by a masked count and carry its range.</p>
+      <div class="chartwrap" data-chart="nonpublic-rate">${renderToString(
+        (w) =>
+          seriesSpec(rate, { a: "nominal", b: deflator ? `${fiscalYear(base)} dollars` : "" }, dollars, rateHover, {
+            width: w,
+            tick: fiscalYear,
+            hues: { a: "plain", b: "plain-strong" },
+          }),
+        {
+          label: `Auxiliary services per pupil, nominal and in ${fiscalYear(base)} dollars, ${
+            seriesYear(support.rates_series)?.label ?? ""
+          }; a range where the count it divides by was masked`,
+        },
+      )}</div>
+      <p class="note">The schools are on each district's page, and the money is not: nothing this
+        site reads says what a district was paid for the schools in it.
+        ${fig(count(placement.listed), yearOf(placement.series))} of the
+        ${count(placement.schools)} schools in the latest October are listed on a district's page.
+        ${count(placement.schools - placement.placed)} could not be placed in a district from their
+        address${
+          outside > 0
+            ? `, and ${count(outside)} ${outside === 1 ? "sits" : "sit"} in a district that has
+        since ceased and has no page`
+            : ""
+        }.</p>`;
 }
 
 /**

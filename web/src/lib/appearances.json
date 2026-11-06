@@ -1601,6 +1601,21 @@
   ],
   "program/auxiliary-services": [
     {
+      "route": "/district/[irn]",
+      "pages": 609,
+      "of": 609,
+      "example": {
+        "href": "/district/043786",
+        "title": "Cleveland Municipal"
+      },
+      "sections": [
+        {
+          "id": "nonpublic",
+          "label": "Nonpublic schools here"
+        }
+      ]
+    },
+    {
       "route": "/statewide",
       "pages": 1,
       "of": 1,

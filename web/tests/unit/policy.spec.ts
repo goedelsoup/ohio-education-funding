@@ -534,7 +534,7 @@ test("the federal layer renders beside Category 3 and is never in its total", ()
   expect(Math.abs(lines - support.total)).toBeLessThan(0.01);
   expect(support.federal.map((c) => c.slug)).toEqual(["eans", "idea-proportionate-share"]);
 
-  const html = renderNonpublicSupport(bundle.funding_units);
+  const html = renderNonpublicSupport(bundle.funding_units, bundle.deflator);
   const layer = html.slice(html.indexOf('data-part="nonpublic-federal"'));
   expect(layer).not.toBe(html);
   for (const channel of support.federal) {
@@ -542,4 +542,26 @@ test("the federal layer renders beside Category 3 and is never in its total", ()
     expect(layer).toContain(`/wiki/${channel.class}/${channel.node}`);
   }
   expect(layer).not.toMatch(/<th>Total<\/th>/);
+});
+
+test("the October and the rate are drawn on the nonpublic card, bounded where the count was masked", () => {
+  /*
+   * #765. Every bounded year is a whisker and none is on the line; the latest October is the count
+   * quoted; and the placement sentence accounts for every school the district pages do not list.
+   */
+  const support = bundle.funding_units!.nonpublic_support;
+  expect(support.octobers.every((o) => o.exact === (o.floor === o.ceiling && o.censored === 0))).toBe(true);
+  expect(support.placement.listed).toBeLessThanOrEqual(support.placement.placed);
+  expect(support.placement.placed).toBeLessThanOrEqual(support.placement.schools);
+
+  const html = renderNonpublicSupport(bundle.funding_units, bundle.deflator);
+  expect(html).toContain('data-chart="nonpublic-octobers"');
+  expect(html).toContain('data-chart="nonpublic-rate"');
+  expect(html).toContain(`data-series="${support.octobers_series}"`);
+  expect(html).toContain(`data-series="${support.rates_series}"`);
+  expect(html).toContain('class="series-interval"');
+  // Reach before federal, so the federal layer stays the card's last table.
+  expect(html.indexOf("nonpublic-rate")).toBeLessThan(html.indexOf('data-part="nonpublic-federal"'));
+  // No dollar figure per district: the placement sentence counts schools only.
+  expect(html).toMatch(/of the\s+[\d,]+ schools in the latest October/);
 });

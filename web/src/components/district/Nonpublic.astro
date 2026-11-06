@@ -1,0 +1,93 @@
+---
+/**
+ * The chartered nonpublic schools located in a district, at the latest October (#765).
+ *
+ * # Counts, and no dollars
+ *
+ * R.C. 3317.024(E)(1) pays auxiliary services through the district a chartered nonpublic school is
+ * located in, so a reader of a district's page will ask what it received for them. Nothing this
+ * site reads says: the appropriation is statewide, and a per-pupil rate times these counts would
+ * be a figure the department never paid. The card lists the schools and their counts, says why the
+ * money is missing, and links to the statewide card where the rate is.
+ *
+ * # A count is a range where the department masked it
+ *
+ * The October file masks every cell under ten, so a school's kindergarten-through-twelve count is
+ * known only to lie between a floor and a ceiling wherever one of its grades was small. The cell
+ * prints the range, never one end of it, and the sentence above the table says how many cells the
+ * district's total rests on.
+ *
+ * # Placed by address
+ *
+ * The district is the one the school's address lay in at the 2020 census. Not every school could
+ * be placed, so a district with none listed here is a district with none *placed*; the statewide
+ * card counts the rest.
+ */
+import { count, escapeHtml } from "../../lib/format.ts";
+import { foldedTable } from "../../lib/fold.ts";
+import * as routes from "../../lib/routes.ts";
+import type { Bundle, District } from "../../lib/types.ts";
+import { yearChip, yearOf } from "../../lib/year.ts";
+import SectionAnchor from "../SectionAnchor.astro";
+
+interface Props {
+  bundle: Bundle;
+  district: District;
+}
+
+const { bundle, district: d } = Astro.props;
+const schools = d.nonpublic_schools;
+const placement = bundle.funding_units?.nonpublic_support.placement ?? null;
+const range = (low: number, high: number) => (low === high ? count(low) : `${count(low)}–${count(high)}`);
+const floor = schools.reduce((sum, s) => sum + s.floor, 0);
+const ceiling = schools.reduce((sum, s) => sum + s.ceiling, 0);
+const censored = schools.reduce((sum, s) => sum + s.censored, 0);
+const masked = schools.filter((s) => s.censored > 0).length;
+const auxiliary = routes.wikiNode("program", "auxiliary-services");
+const statewide = routes.at("/statewide", routes.SECTIONS.statewide.nonpublicSupport);
+const SHOWN = 12;
+const table = foldedTable(
+  `<thead><tr><th>School</th><th class="tnum">Pupils, K–12</th></tr></thead>`,
+  schools.map(
+    (s) =>
+      `<tr><th>${escapeHtml(s.name)} <span class="n">${s.irn}</span></th><td class="tnum">${range(
+        s.floor,
+        s.ceiling,
+      )}</td></tr>`,
+  ),
+  SHOWN,
+  `The other ${count(Math.max(0, schools.length - SHOWN))} schools`,
+);
+---
+
+<div class="card" id="nonpublic" data-part="nonpublic">
+  <h2><SectionAnchor id="nonpublic" />Nonpublic schools here<Fragment set:html={yearChip("nonpublic_schools")} /></h2>
+  {
+    schools.length === 0 ? (
+      <p class="note">No chartered nonpublic school in the {yearOf("nonpublic_schools")} October
+        count is placed in this district. That is a statement about addresses: {placement
+          ? `${count(placement.schools - placement.placed)} of the ${count(placement.schools)} schools statewide could not be placed from theirs`
+          : "some schools statewide could not be placed from theirs"}, and a{" "}
+        <a href={statewide}>statewide card</a> counts them.</p>
+    ) : (
+      <>
+        <p class="note"><strong>{count(schools.length)} chartered nonpublic
+          school{schools.length === 1 ? " is" : "s are"} located in this district</strong>, with{" "}
+          {range(floor, ceiling)} pupils in kindergarten through twelfth grade in the{" "}
+          {yearOf("nonpublic_schools")} October count.{" "}
+          {masked === 0
+            ? "Every count is exact."
+            : `The department masked ${count(censored)} small cell${censored === 1 ? "" : "s"} in ${count(masked)} of ${
+                schools.length === 1 ? "it" : "them"
+              }, so ${masked === schools.length && masked === 1 ? "its" : "those"} counts are ranges.`}
+        </p>
+        <Fragment set:html={table} />
+      </>
+    )
+  }
+  <p class="note"><a href={auxiliary}>Auxiliary services</a> is paid through the district a school
+    is located in, under R.C. 3317.024(E)(1). What this district received for these schools is not
+    in anything this site reads, so there is no dollar figure here; the statewide per-pupil rate is
+    on the <a href={statewide}>statewide card</a>. A school is placed by the district its address
+    lay in at the 2020 census.</p>
+</div>
