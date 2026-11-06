@@ -16,6 +16,7 @@ import AidSource from "../../components/district/AidSource.astro";
 import Categoricals from "../../components/district/Categoricals.astro";
 import EnrollmentYears from "../../components/district/EnrollmentYears.astro";
 import NationalPosition from "../../components/district/NationalPosition.astro";
+import Nonpublic from "../../components/district/Nonpublic.astro";
 import Position from "../../components/district/Position.astro";
 import Supplements from "../../components/district/Supplements.astro";
 import WhatThisIsNot from "../../components/district/WhatThisIsNot.astro";
@@ -179,6 +180,9 @@ const description = district.on_guarantee
   <Fragment set:html={renderBiennium(district, bundle.districts)} />
   {/* Ohio describing itself cannot say whether Ohio is unusual. This is the one card that can. */}
   <NationalPosition district={district} />
+  {/* The schools auxiliary services is paid through this district for, counted and not priced:
+      nothing published says what the district received (#765). */}
+  <Nonpublic bundle={bundle} district={district} />
   {/* Three of the four siblings close by declaring what they are not. This route has the most
       collisions to declare and was the last to say so. */}
   <WhatThisIsNot bundle={bundle} district={district} />

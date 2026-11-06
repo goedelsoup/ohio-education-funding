@@ -334,6 +334,15 @@ export interface SeriesPoint {
   a: number | null;
   /** The second, in the same units. There is no third and no second axis. */
   b: number | null;
+  /**
+   * Where the first series is known only to lie between two values: `[low, high]`.
+   *
+   * Drawn as a whisker, not a line, and normally beside a null `a` — a position whose count was
+   * masked has no point value, and drawing a midpoint would be a measurement nobody published.
+   */
+  aRange?: readonly [number, number] | null;
+  /** The same for the second series. */
+  bRange?: readonly [number, number] | null;
 }
 
 /**

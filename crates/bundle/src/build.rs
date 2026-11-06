@@ -46,8 +46,9 @@ use crate::{
     District, DistrictOutcome, Dpia, Draft, DraftProvision, EnglishLearners, FinanceYear,
     ForecastCheckpoint, FundingUnit, FundingUnitProgramme, FundingUnits, Gifted, HistoryYear,
     HouseDistrictMember, HouseDistrictShare, LocalCapacity, MealProgramYear, MillageAnalysis,
-    National, NonpublicFederal, NonpublicSupport, NonpublicSupportLine, OutcomeStatewide,
-    PolicyShape, Projection, ProjectionBias, PropertyTaxYear, RegimeCounterfactual, SeriesYear,
+    National, NonpublicFederal, NonpublicOctober, NonpublicPlacement, NonpublicRate,
+    NonpublicSchool, NonpublicSupport, NonpublicSupportLine, OutcomeStatewide, PolicyShape,
+    Projection, ProjectionBias, PropertyTaxYear, RegimeCounterfactual, SeriesYear,
     SpecialEducation, SpendingByFunction, StateFinance, Statewide, TargetedAssistance, Typology,
     YearKind, CONTRACT_VERSION,
 };
@@ -655,6 +656,9 @@ struct Joins<'a> {
     /// `None` for a district the list does not carry. Built once for the whole panel, because
     /// `dispersion::designated::by_district` reads 2,877 rows per call.
     designated: Option<&'a (usize, usize)>,
+    /// The chartered nonpublic schools placed in the district at the latest October. Empty for
+    /// none. Built once for the whole panel: grouping walks the building panel's 38,000 rows.
+    nonpublic_schools: &'a [NonpublicSchool],
     /// The district in the FY2026 model, or `None` for one it does not carry. Built once for the
     /// whole panel, like `biennium`.
     prior: Option<&'a project::prior_model::Prior>,
@@ -741,6 +745,7 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
         typology,
         biennium,
         designated,
+        nonpublic_schools,
         prior,
     } = *joins;
     let adm = record.base_cost_adm();
@@ -956,6 +961,7 @@ fn to_district(record: &DistrictRecord, joins: &Joins<'_>) -> District {
             listed: *listed,
             designated: *designated,
         }),
+        nonpublic_schools: nonpublic_schools.to_vec(),
         outcome: outcome.map(|joined| DistrictOutcome {
             performance_index: joined.outcome.performance_index,
             performance_index_prior: joined.outcome.performance_index_prior,
@@ -1217,6 +1223,33 @@ fn series_years(
             .into(),
         });
     }
+    let support = &funding_units.nonpublic_support;
+    if let Some((first, last)) = span(support.octobers.iter().map(|o| o.fiscal_year)) {
+        out.push(SeriesYear {
+            series: support.octobers_series.clone(),
+            kind: YearKind::Fiscal,
+            label: label_span(first, last, "FY"),
+            source: "DEW nonpublic school October enrollment files, 1977-78 onward".into(),
+        });
+    }
+    if let Some((first, last)) = span(support.rates.iter().map(|r| r.fiscal_year)) {
+        out.push(SeriesYear {
+            series: support.rates_series.clone(),
+            kind: YearKind::Fiscal,
+            label: label_span(first, last, "FY"),
+            source: "Legislative Service Commission greenbooks over DEW October enrollment".into(),
+        });
+    }
+    out.push(SeriesYear {
+        series: support.placement.series.clone(),
+        kind: YearKind::School,
+        // The October file's own school-year column, not a label derived from the fiscal year.
+        label: project::ledger::nonpublic_enrolment::buildings(support.placement.fiscal_year)
+            .first()
+            .map(|b| b.school_year.clone())
+            .unwrap_or_default(),
+        source: "DEW nonpublic school October enrollment, placed by the Census geocoder".into(),
+    });
     out.push(SeriesYear {
         series: "designated".into(),
         kind: YearKind::School,
@@ -1379,7 +1412,7 @@ fn funding_units(districts: &[District], statewide: &Statewide) -> FundingUnits 
     FundingUnits {
         authority: "R.C. 3317.022".to_string(),
         units: out,
-        nonpublic_support: nonpublic_support(),
+        nonpublic_support: nonpublic_support(districts),
     }
 }
 
@@ -1388,7 +1421,7 @@ fn funding_units(districts: &[District], statewide: &Statewide) -> FundingUnits 
 /// One year and not a series: this block sits beside six funding units at one year apiece, and a
 /// twenty-five-year panel next to them would be answering a question nobody on that card asked.
 /// The year is read off the fixture rather than named, so a closed edition moves it.
-fn nonpublic_support() -> NonpublicSupport {
+fn nonpublic_support(districts: &[District]) -> NonpublicSupport {
     use project::ledger::nonpublic_support as source;
 
     // The base is irrelevant — only `nominal` is carried — but the call has to name one, and the
@@ -1437,6 +1470,86 @@ fn nonpublic_support() -> NonpublicSupport {
             })
             .collect(),
         federal: nonpublic_federal(fiscal_year),
+        octobers: project::ledger::nonpublic_enrolment::sector()
+            .into_iter()
+            .map(|october| NonpublicOctober {
+                fiscal_year: october.fiscal_year,
+                floor: october.floor,
+                ceiling: october.ceiling,
+                censored: october.censored,
+                exact: october.exact,
+            })
+            .collect(),
+        octobers_series: "funding_units.nonpublic_octobers".to_string(),
+        rates: nonpublic_rates(),
+        rates_series: "funding_units.nonpublic_rate".to_string(),
+        placement: nonpublic_placement(districts),
+    }
+}
+
+/// Auxiliary services per pupil, nominal, each year as the quotient or the interval it leaves.
+///
+/// [`project::auxiliary_rate::Rate::statutory`] where it exists, and the masked building sheet's
+/// bound where it does not. A year with neither is dropped rather than drawn at zero.
+fn nonpublic_rates() -> Vec<NonpublicRate> {
+    project::auxiliary_rate::rates()
+        .into_iter()
+        .filter_map(|rate| {
+            let (low, high, exact) = match (rate.statutory(), rate.bound) {
+                (Some(quotient), _) => (quotient, quotient, true),
+                (None, Some((low, high))) => (low, high, false),
+                (None, None) => return None,
+            };
+            Some(NonpublicRate {
+                fiscal_year: rate.fiscal_year,
+                low,
+                high,
+                exact,
+            })
+        })
+        .collect()
+}
+
+/// The fiscal year of the latest October with a building sheet: the one district pages list.
+fn nonpublic_october() -> u16 {
+    project::ledger::nonpublic_enrolment::span().1
+}
+
+/// The latest October's schools grouped by district IRN, as a district page carries them.
+///
+/// A building with no kindergarten-through-twelve block is dropped; October 2025 has none.
+fn nonpublic_schools_by_district() -> HashMap<String, Vec<NonpublicSchool>> {
+    project::ledger::nonpublic_location::by_district(nonpublic_october())
+        .into_iter()
+        .map(|(district, buildings)| {
+            let schools = buildings
+                .into_iter()
+                .filter_map(|building| {
+                    let k12 = building.k12?;
+                    Some(NonpublicSchool {
+                        irn: building.irn,
+                        name: building.school,
+                        floor: k12.floor,
+                        ceiling: k12.ceiling,
+                        censored: k12.censored,
+                    })
+                })
+                .collect();
+            (district, schools)
+        })
+        .collect()
+}
+
+/// How far the district pages reach into the latest October. See [`NonpublicPlacement`].
+fn nonpublic_placement(districts: &[District]) -> NonpublicPlacement {
+    let fiscal_year = nonpublic_october();
+    let groups = project::ledger::nonpublic_location::by_district(fiscal_year);
+    NonpublicPlacement {
+        series: "nonpublic_schools".to_string(),
+        fiscal_year,
+        schools: project::ledger::nonpublic_enrolment::buildings(fiscal_year).len(),
+        placed: groups.values().map(Vec::len).sum(),
+        listed: districts.iter().map(|d| d.nonpublic_schools.len()).sum(),
     }
 }
 
@@ -2221,6 +2334,9 @@ pub fn build() -> Bundle {
         .map(|row| (row.total.irn.clone(), row))
         .collect();
 
+    // The latest October's nonpublic schools, grouped once. See `Joins::nonpublic_schools`.
+    let nonpublic_schools = nonpublic_schools_by_district();
+
     // The FY2026 model, joined once. See `Joins::prior`.
     let prior = project::prior_model::by_irn();
 
@@ -2242,6 +2358,9 @@ pub fn build() -> Bundle {
                     typology: typology.get(&record.irn),
                     biennium: biennium.get(&record.irn),
                     designated: designated.get(&record.irn),
+                    nonpublic_schools: nonpublic_schools
+                        .get(&record.irn)
+                        .map_or(&[][..], Vec::as_slice),
                     prior: prior.get(&record.irn),
                 },
             )

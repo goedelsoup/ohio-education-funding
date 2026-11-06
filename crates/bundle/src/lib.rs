@@ -41,6 +41,13 @@ use edfund_core::Dollars;
 
 /// The bundle schema version. Bump on any change to field names, units, or semantics.
 ///
+/// `56.0.0` added the nonpublic sector's coverage. `nonpublic_support` gains `octobers` (the
+/// whole sector's K-12 count since October 1977, as a count or as the interval its masked cells
+/// leave), `rates` (auxiliary services per pupil, nominal, exact or bounded the same way) and
+/// `placement` (how many of the latest October's schools a district page lists). Every district
+/// gains `nonpublic_schools`, the latest October's schools placed in it. Three new series years
+/// date them. Breaking because the page's schema is strict.
+///
 /// `55.0.0` added a nullable `prior` inside each district's `capacity`: the FY2026 calculator's
 /// `[C1]`, `[C2]` and `[C3]`, so the local capacity card can set each measure beside the year
 /// before, and a `formula.prior` series year to date them. Breaking because the page's schema
@@ -297,7 +304,7 @@ use edfund_core::Dollars;
 /// from FY2022-FY2024 to FY2024-FY2026 — the years the department's `ADM Data` sheet declares.
 /// The values did not change; what they are called did, which is exactly the kind of silent
 /// meaning change the version guard exists for.
-pub const CONTRACT_VERSION: &str = "55.0.0";
+pub const CONTRACT_VERSION: &str = "56.0.0";
 
 mod model;
 mod serialize;

@@ -152,6 +152,23 @@ const DesignatedSchema = z
   .strict();
 
 /**
+ * One chartered nonpublic school placed in a district, at the latest October.
+ *
+ * `floor` and `ceiling` are equal where the count is exact. Where they differ the department
+ * masked `censored` small cells and the count lies between them; a page must not print either end
+ * as the count.
+ */
+const NonpublicSchoolSchema = z
+  .object({
+    irn: z.string().regex(/^\d{6}$/),
+    name: z.string().min(1),
+    floor: z.number().nonnegative(),
+    ceiling: z.number().nonnegative(),
+    censored: z.number().int().nonnegative(),
+  })
+  .strict();
+
+/**
  * One closed fiscal year of a district's general fund.
  *
  * Every amount is `maybeNum`, and `null` means the five-year forecast filing carried no such
@@ -981,6 +998,14 @@ const DistrictSchema = z
      * designated.
      */
     designated: DesignatedSchema.nullable(),
+    /**
+     * The chartered nonpublic schools whose address lies in the district, at the October the
+     * `nonpublic_schools` series year names, in IRN order. Empty for none.
+     *
+     * Counts only. Auxiliary services is paid through this district, but no source this project
+     * reads says what the district received, so a page must not multiply these by a rate.
+     */
+    nonpublic_schools: z.array(NonpublicSchoolSchema),
   })
   .strict();
 
@@ -1703,6 +1728,46 @@ const NonpublicFederalSchema = z
   .strict();
 
 /**
+ * One October of the nonpublic sector: a published count, or the interval masked cells leave.
+ *
+ * `exact` is true exactly when `floor === ceiling` and `censored === 0`. A chart must not draw a
+ * line through a year that is not exact.
+ */
+const NonpublicOctoberSchema = z
+  .object({
+    fiscal_year: z.number().int(),
+    floor: z.number().nonnegative(),
+    ceiling: z.number().nonnegative(),
+    censored: z.number().int().nonnegative(),
+    exact: z.boolean(),
+  })
+  .strict();
+
+/** Auxiliary services per pupil for one fiscal year, nominal: the quotient, or its interval. */
+const NonpublicRateSchema = z
+  .object({
+    fiscal_year: z.number().int(),
+    low: z.number().nonnegative(),
+    high: z.number().nonnegative(),
+    exact: z.boolean(),
+  })
+  .strict();
+
+/**
+ * How many of the latest October's schools the district pages list. Nested: `listed` is within
+ * `placed`, which is within `schools`.
+ */
+const NonpublicPlacementSchema = z
+  .object({
+    series: z.literal("nonpublic_schools"),
+    fiscal_year: z.number().int(),
+    schools: z.number().int().nonnegative(),
+    placed: z.number().int().nonnegative(),
+    listed: z.number().int().nonnegative(),
+  })
+  .strict();
+
+/**
  * Category 3 nonpublic school support, which is **not** one of the six funding units.
  *
  * It moves under R.C. 3317.024, 3317.06, 3317.062, 3317.063 and 3317.064, and a reader asking
@@ -1727,6 +1792,13 @@ const NonpublicSupportSchema = z
      * above and must never have these added to it.
      */
     federal: z.array(NonpublicFederalSchema),
+    /** The whole sector's K-12 count since October 1977. */
+    octobers: z.array(NonpublicOctoberSchema).min(1),
+    octobers_series: z.literal("funding_units.nonpublic_octobers"),
+    /** Auxiliary services per pupil, nominal. */
+    rates: z.array(NonpublicRateSchema).min(1),
+    rates_series: z.literal("funding_units.nonpublic_rate"),
+    placement: NonpublicPlacementSchema,
   })
   .strict();
 
@@ -1825,6 +1897,10 @@ export type FundingUnit = z.infer<typeof FundingUnitSchema>;
 export type NonpublicSupportLine = z.infer<typeof NonpublicSupportLineSchema>;
 export type NonpublicFederal = z.infer<typeof NonpublicFederalSchema>;
 export type NonpublicSupport = z.infer<typeof NonpublicSupportSchema>;
+export type NonpublicOctober = z.infer<typeof NonpublicOctoberSchema>;
+export type NonpublicRate = z.infer<typeof NonpublicRateSchema>;
+export type NonpublicPlacement = z.infer<typeof NonpublicPlacementSchema>;
+export type NonpublicSchool = z.infer<typeof NonpublicSchoolSchema>;
 export type FundingUnits = z.infer<typeof FundingUnitsSchema>;
 export type Designated = z.infer<typeof DesignatedSchema>;
 export type SeriesYear = z.infer<typeof SeriesYearSchema>;

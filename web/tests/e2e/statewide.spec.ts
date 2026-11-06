@@ -153,14 +153,18 @@ test.describe("presentation", () => {
    * not: the fixed stylesheet prints 16 sheets on a Mac and 17 on CI, and the one before #602
    * printed 20 on the same Mac. Print layout is font-sensitive in the way chart layout is, so a
    * lower bound has to be read off a CI log rather than a local run.
+   *
+   * 18 since #765: the nonpublic schools card is new content, not a leak — Cleveland lists twelve
+   * of its schools open and folds the rest, and a closed fold stays closed on paper. The runner
+   * printed 18 with it.
    */
-  test("a district page prints to at most seventeen sheets", async ({ page }) => {
+  test("a district page prints to at most eighteen sheets", async ({ page }) => {
     await page.goto(`/district/${CLEVELAND}`);
     const pdf = await page.pdf({ format: "Letter" });
     // Each sheet is one `/Type /Page` object; `/Type /Pages` is the tree that holds them.
     const sheets = pdf.toString("latin1").match(/\/Type\s*\/Page(?!s)/g)?.length ?? 0;
     expect(sheets).toBeGreaterThan(0);
-    expect(sheets).toBeLessThanOrEqual(17);
+    expect(sheets).toBeLessThanOrEqual(18);
   });
 
   /**

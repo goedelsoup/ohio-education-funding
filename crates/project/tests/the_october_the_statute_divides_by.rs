@@ -373,3 +373,74 @@ fn the_membership_is_held_from_october_2015_and_not_before() {
     let whole = nonpublic::per_pupil(nonpublic::AUXILIARY_SERVICES, 2025).expect("FY2025");
     assert!((whole - 928.343_168_626_490_8).abs() < 1e-9, "{whole}");
 }
+
+#[test]
+fn the_sector_series_is_a_count_from_october_2013_and_a_bound_before_it() {
+    /*
+     * What the statewide chart draws, one reading per October. The point of asserting the split is
+     * that a line through the bounded years would claim a measurement nobody published: before
+     * October 2013 the only whole-sector figure is a building sheet with up to 5,700 masked cells.
+     *
+     * October 2009 is the exception inside the bounded run. Its file is a building ADM sheet that
+     * masked nothing, so it is exact on its own terms.
+     */
+    let series = enrolment::sector();
+    let (first, last) = enrolment::span();
+    assert_eq!(
+        series.len(),
+        usize::from(last - first) + 1,
+        "one reading an October"
+    );
+    assert!(series
+        .windows(2)
+        .all(|pair| pair[0].fiscal_year + 1 == pair[1].fiscal_year));
+
+    let exact: Vec<u16> = series
+        .iter()
+        .filter(|o| o.exact)
+        .map(|o| o.fiscal_year)
+        .collect();
+    let mut expected = vec![2010];
+    expected.extend(2014..=last);
+    assert_eq!(exact, expected);
+
+    for october in &series {
+        assert_eq!(
+            october.exact,
+            october.floor == october.ceiling,
+            "{october:?}"
+        );
+        assert_eq!(october.exact, october.censored == 0, "{october:?}");
+    }
+}
+
+#[test]
+fn every_exact_total_in_the_sector_series_sits_inside_its_own_building_sheet() {
+    /*
+     * The choice of total is the compilation's where it restates the October, and this is why: it
+     * is the reading that agrees with the bound under it in every year both exist. October 2015's
+     * annual total, 146,135, is below its own sheet's floor of 147,309; the compilation's 172,990 is
+     * inside it.
+     */
+    let mut checked = 0;
+    for october in enrolment::sector().iter().filter(|o| o.exact) {
+        let Some(k12) = enrolment::october(october.fiscal_year).and_then(|o| o.k12) else {
+            continue;
+        };
+        assert!(
+            k12.contains(october.floor),
+            "FY{}: {} outside {k12:?}",
+            october.fiscal_year,
+            october.floor
+        );
+        checked += 1;
+    }
+    // FY2010 and every year from FY2014 but FY2017, whose file printed no building sheet.
+    assert_eq!(checked, 13);
+
+    let fy2016 = enrolment::sector()
+        .into_iter()
+        .find(|o| o.fiscal_year == 2016)
+        .expect("October 2015 is in the series");
+    assert_eq!(fy2016.floor, 172_990.0);
+}

@@ -4286,7 +4286,10 @@ export function seriesSpec(
 ): Spec | null {
   // One point is not a series, exactly as in `fanSpec`.
   if (points.length < 2) return null;
-  const values = points.flatMap((p) => [p.a, p.b]).filter((v): v is number => v != null);
+  const rangeOf = (p: SeriesPoint, key: "a" | "b") => (key === "a" ? p.aRange : p.bRange) ?? null;
+  const values = points
+    .flatMap((p) => [p.a, p.b, ...(rangeOf(p, "a") ?? []), ...(rangeOf(p, "b") ?? [])])
+    .filter((v): v is number => v != null);
   if (values.length === 0) return null;
 
   // The reference is inside the domain by construction rather than by luck: the lines are read
@@ -4316,7 +4319,14 @@ export function seriesSpec(
    * estimated off a line with no axis. Bare numbers, since the end label already names the line
    * and the hue joins the two.
    */
-  const startOf = (key: "a" | "b") => points.find((p) => p[key] != null);
+  /*
+   * A series that opens on intervals has no first value to print: the gutter would hold the first
+   * point the line reaches, read as the start of a span it does not start. Its whiskers say it.
+   */
+  const startOf = (key: "a" | "b") => {
+    const first = points.find((p) => p[key] != null || rangeOf(p, key) != null);
+    return first?.[key] != null ? first : undefined;
+  };
   const startA = startOf("a");
   const startB = startOf("b");
   const startText = (point: SeriesPoint | undefined, key: "a" | "b"): string =>
@@ -4333,6 +4343,40 @@ export function seriesSpec(
       // reaches here as a point with a null value rather than as an absent point.
       className,
     });
+
+  /*
+   * The intervals (#765): a whisker with a cap at each end where a position is bounded rather than
+   * known. Beside a line, never joined to it, and offset when both series carry one at the same
+   * position so the two do not draw over each other. A point value with no neighbour is a dot,
+   * because Plot draws no line for a single position and an exact year between masked ones would
+   * otherwise vanish.
+   */
+  const both = points.some((p) => rangeOf(p, "a") != null && rangeOf(p, "b") != null);
+  const interval = (key: "a" | "b", stroke: string) => {
+    const bounded = points.flatMap((p) => {
+      const range = rangeOf(p, key);
+      return range ? [{ at: p.at, low: range[0], high: range[1] }] : [];
+    });
+    if (bounded.length === 0) return [];
+    const dx = both ? (key === "a" ? -2 : 2) : 0;
+    const lone = points.filter((p, i) => p[key] != null && points[i - 1]?.[key] == null && points[i + 1]?.[key] == null);
+    const cap = (y: "low" | "high") =>
+      Plot.ruleY(bounded, {
+        y,
+        x1: (d: { at: number }) => d.at - 0.25,
+        x2: (d: { at: number }) => d.at + 0.25,
+        dx,
+        stroke,
+        strokeWidth: 1.5,
+        className: "series-interval",
+      });
+    return [
+      Plot.ruleX(bounded, { x: "at", y1: "low", y2: "high", dx, stroke, strokeWidth: 1.5, className: "series-interval" }),
+      cap("low"),
+      cap("high"),
+      Plot.dot(lone, { x: "at", y: key, r: 2.5, fill: stroke, className: "series-interval" }),
+    ];
+  };
 
   /*
    * Stacked, the upper line's label grows up from its end and the lower one's down, so the two
@@ -4591,6 +4635,8 @@ export function seriesSpec(
             className: "series-event-label",
           }),
         ),
+        ...interval("a", hueA.stroke),
+        ...interval("b", hueB.stroke),
         line("a", hueA.stroke, "series-a"),
         line("b", hueB.stroke, "series-b"),
         ...endLabel(endA, "a", hueA.text, stacked),
@@ -4643,7 +4689,9 @@ export function seriesSpec(
       text: points.map((p) => escapeHtml(hover(p))),
       // The upper of the two lines, as the fan anchors at its topmost; a year with neither has none.
       anchor: points.map((p) => {
-        const here = [p.a, p.b].filter((v): v is number => v != null);
+        const here = [p.a, p.b, rangeOf(p, "a")?.[1], rangeOf(p, "b")?.[1]].filter(
+          (v): v is number => v != null,
+        );
         return here.length ? Math.max(...here) : null;
       }),
       cursor: {

@@ -66,6 +66,9 @@ export type SeriesKey =
   | "funding_units.nonpublic_support"
   | "funding_units.nonpublic_federal.eans"
   | "funding_units.nonpublic_federal.idea"
+  | "funding_units.nonpublic_octobers"
+  | "funding_units.nonpublic_rate"
+  | "nonpublic_schools"
   | "designated";
 
 /**

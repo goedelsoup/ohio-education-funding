@@ -336,6 +336,76 @@ fn compute_span() -> (u16, u16) {
     )
 }
 
+/// One October of the whole sector, read once: a count where one exists and a bound where none does.
+///
+/// What a series of the sector draws. [`Self::exact`] says which kind of reading it is, and where
+/// it is `false` the two ends are the building sheet's [`Bounded`] and must be drawn as an
+/// interval, never joined to their neighbours as if they were a point.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct SectorOctober {
+    /// The fiscal year whose school year the October opens: October 2024 is FY2025.
+    pub fiscal_year: u16,
+    /// The smallest value consistent with what was published.
+    pub floor: f64,
+    /// The largest. Equal to [`Self::floor`] exactly when [`Self::exact`].
+    pub ceiling: f64,
+    /// How many cells the building sheet masked. Zero for an exact reading.
+    pub censored: usize,
+    /// Whether the department stated the total before masking, or masked nothing.
+    pub exact: bool,
+}
+
+/// Every October of the whole sector, oldest first: kindergarten through twelve, in-state and out.
+///
+/// # Which total, where there are two
+///
+/// The one [`statutory_membership`] would choose, applied to the whole sector rather than the
+/// in-state part: the 2014-2019 compilation's total where it restates the October, the annual
+/// file's otherwise. So the exact run begins at October 2013 (FY2014), two Octobers before the
+/// annual files print a total of their own. October 2015's annual total sits below its own
+/// building sheet's floor; the compilation's is inside it.
+///
+/// # Where there is none
+///
+/// The annual file's building sheet as a [`Bounded`]. October 2009's sheet masked nothing, so it is
+/// exact on its own terms. An October with neither is left out rather than given a zero.
+#[must_use]
+pub fn sector() -> Vec<SectorOctober> {
+    let years: std::collections::BTreeSet<u16> = octobers()
+        .iter()
+        .filter(|row| row.is_annual())
+        .map(|row| row.fiscal_year)
+        .collect();
+    years
+        .into_iter()
+        .filter_map(|fiscal_year| {
+            let annual = october(fiscal_year)?;
+            let total = restatement(fiscal_year)
+                .and_then(|restated| restated.published_total)
+                .or(annual.published_total);
+            let exact = |count: f64| SectorOctober {
+                fiscal_year,
+                floor: count,
+                ceiling: count,
+                censored: 0,
+                exact: true,
+            };
+            match (total, annual.k12) {
+                (Some(count), _) => Some(exact(count)),
+                (None, Some(k12)) if k12.is_exact() => Some(exact(k12.floor)),
+                (None, Some(k12)) => Some(SectorOctober {
+                    fiscal_year,
+                    floor: k12.floor,
+                    ceiling: k12.ceiling,
+                    censored: k12.censored,
+                    exact: false,
+                }),
+                (None, None) => None,
+            }
+        })
+        .collect()
+}
+
 /// Every school the department listed in `fiscal_year`'s October.
 ///
 /// Reads the whole building extract each call, which is 39,440 rows of compiled-in text and costs

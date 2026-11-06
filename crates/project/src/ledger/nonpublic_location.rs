@@ -30,6 +30,7 @@
 //! 2020; [`Location::directory_year`] is the last CCD year that listed the district, and a reader
 //! wanting the present district resolves it against the territory-transfer record.
 
+use std::collections::BTreeMap;
 use std::sync::OnceLock;
 
 use edfund_core::csv;
@@ -114,6 +115,29 @@ pub fn location(irn: &str) -> Option<&'static Location> {
         .binary_search_by(|row| row.irn.as_str().cmp(irn))
         .ok()
         .map(|at| &locations()[at])
+}
+
+/// `fiscal_year`'s October buildings grouped by the district their address lies in, each list in
+/// IRN order.
+///
+/// A building the directory does not list, or lists but the geocoder did not place, is in no
+/// group; the caller counting coverage compares the groups' total with
+/// [`super::nonpublic_enrolment::buildings`]. The directory is one day's snapshot (see the module
+/// note), so a year other than the latest places a building where it is now.
+#[must_use]
+pub fn by_district(
+    fiscal_year: u16,
+) -> BTreeMap<String, Vec<super::nonpublic_enrolment::Building>> {
+    let mut groups: BTreeMap<String, Vec<_>> = BTreeMap::new();
+    for building in super::nonpublic_enrolment::buildings(fiscal_year) {
+        if let Some(district) = location(&building.irn).and_then(|row| row.district_irn.clone()) {
+            groups.entry(district).or_default().push(building);
+        }
+    }
+    for list in groups.values_mut() {
+        list.sort_by(|a, b| a.irn.cmp(&b.irn));
+    }
+    groups
 }
 
 #[cfg(test)]

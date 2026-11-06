@@ -63,7 +63,7 @@ const base = bundle.deflator
       believing the district unit is the whole of it. */}
   <Fragment set:html={renderFundingUnits(bundle.funding_units)} />
   {bundle.funding_units && <Fragment set:html={whatIsThis("deduction")} />}
-  <Fragment set:html={renderNonpublicSupport(bundle.funding_units)} />
+  <Fragment set:html={renderNonpublicSupport(bundle.funding_units, bundle.deflator)} />
   <Fragment set:html={renderNational(bundle.national)} />
 
   <BasisToggle id="statewide-basis" section="finances" base={base}>

@@ -371,6 +371,38 @@ impl Bundle {
                             e.text("node", &channel.node);
                         }
                     }
+                    {
+                        let mut list = n.arr("octobers");
+                        for october in &f.nonpublic_support.octobers {
+                            let mut e = list.obj();
+                            e.count("fiscal_year", october.fiscal_year);
+                            e.num("floor", october.floor);
+                            e.num("ceiling", october.ceiling);
+                            e.count("censored", october.censored);
+                            e.flag("exact", october.exact);
+                        }
+                    }
+                    n.text("octobers_series", &f.nonpublic_support.octobers_series);
+                    {
+                        let mut list = n.arr("rates");
+                        for rate in &f.nonpublic_support.rates {
+                            let mut e = list.obj();
+                            e.count("fiscal_year", rate.fiscal_year);
+                            e.num("low", rate.low);
+                            e.num("high", rate.high);
+                            e.flag("exact", rate.exact);
+                        }
+                    }
+                    n.text("rates_series", &f.nonpublic_support.rates_series);
+                    {
+                        let placement = &f.nonpublic_support.placement;
+                        let mut e = n.obj("placement");
+                        e.text("series", &placement.series);
+                        e.count("fiscal_year", placement.fiscal_year);
+                        e.count("schools", placement.schools);
+                        e.count("placed", placement.placed);
+                        e.count("listed", placement.listed);
+                    }
                 }
             }
 
@@ -1292,6 +1324,17 @@ impl Bundle {
                         let mut e = o.obj("designated");
                         e.count("listed", designated.listed);
                         e.count("designated", designated.designated);
+                    }
+                }
+                {
+                    let mut list = o.arr("nonpublic_schools");
+                    for school in &d.nonpublic_schools {
+                        let mut e = list.obj();
+                        e.text("irn", &school.irn);
+                        e.text("name", &school.name);
+                        e.num("floor", school.floor);
+                        e.num("ceiling", school.ceiling);
+                        e.count("censored", school.censored);
                     }
                 }
             }
