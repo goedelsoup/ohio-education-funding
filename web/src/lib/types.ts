@@ -40,6 +40,10 @@ export type {
   FundingUnitProgramme,
   FundingUnits,
   NonpublicFederal,
+  NonpublicOctober,
+  NonpublicPlacement,
+  NonpublicRate,
+  NonpublicSchool,
   NonpublicSupport,
   NonpublicSupportLine,
   OutcomeStatewide,
@@ -58,7 +62,7 @@ import type { Bundle, District, Statewide } from "./schema/feed.ts";
  * the build and the scenario routes refuse to proceed past when the two disagree — the deliberate
  * half of drift detection, where the strictness of the schemas is the accidental half.
  */
-export const REQUIRED_CONTRACT = "55.0.0";
+export const REQUIRED_CONTRACT = "56.0.0";
 
 /**
  * A district with only the fields the funding formula reads.
@@ -87,6 +91,8 @@ export const REQUIRED_CONTRACT = "55.0.0";
  * scholarship the formula does not compute and no lever moves — under R.C. 3317.022 the
  * educational choice unit is paid beside the district unit, not out of it — so a browser holding
  * it could only put a building count next to a dollar figure the building count does not enter.
+ *
+ * `nonpublic_schools` goes out for the same reason: a list of buildings the formula never reads.
  *
  * `house_districts` goes out for the same reason and one more: it is a *derived* estimate, and the
  * scenario builder re-runs the formula per district from exact figures. A browser holding an
@@ -137,6 +143,7 @@ export type PanelDistrict = Omit<
   | "casino"
   | "casino_counties"
   | "designated"
+  | "nonpublic_schools"
   | "biennium"
 > & {
   /**

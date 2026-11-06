@@ -509,6 +509,72 @@ pub struct NonpublicSupport {
     /// formulas, spent as services a public agency controls, and none of them is a Category 3
     /// line. Each names its own series because no two of them answer for the same year.
     pub federal: Vec<NonpublicFederal>,
+    /// The whole sector's kindergarten-through-twelve count, one reading per October since 1977.
+    ///
+    /// Carried under [`Self::octobers_series`]. An interval wherever the department published no
+    /// total — every October before 2013 but 2009 — because its building sheets masked small
+    /// cells and the masked count lies between a floor and a ceiling. A page must not draw a line
+    /// through those years: the line would be a measurement nobody published.
+    pub octobers: Vec<NonpublicOctober>,
+    /// The [`SeriesYear::series`] key carrying [`Self::octobers`]' span.
+    pub octobers_series: String,
+    /// Auxiliary services per pupil: the line net of its earmark over the October it divides by.
+    ///
+    /// Nominal. Exact where the department published a total and an interval before it, like
+    /// [`Self::octobers`]. Carried under [`Self::rates_series`].
+    pub rates: Vec<NonpublicRate>,
+    /// The [`SeriesYear::series`] key carrying [`Self::rates`]' span.
+    pub rates_series: String,
+    /// How much of the latest October the district pages can show.
+    pub placement: NonpublicPlacement,
+}
+
+/// One October of the nonpublic sector, as a count or as the interval its masked cells leave.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct NonpublicOctober {
+    /// The fiscal year the October opens. October 2025 is FY2026.
+    pub fiscal_year: u16,
+    /// The count, or the interval's low end.
+    pub floor: f64,
+    /// The count, or the interval's high end. Equal to [`Self::floor`] exactly when
+    /// [`Self::exact`] is.
+    pub ceiling: f64,
+    /// Masked cells behind the interval. Zero for an exact year.
+    pub censored: usize,
+    /// Whether the year is a published total rather than an interval.
+    pub exact: bool,
+}
+
+/// One fiscal year's auxiliary services per-pupil quotient, nominal.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct NonpublicRate {
+    /// The fiscal year.
+    pub fiscal_year: u16,
+    /// The quotient, or its low end: the remainder over the October's ceiling.
+    pub low: f64,
+    /// The quotient, or its high end: the remainder over the October's floor.
+    pub high: f64,
+    /// Whether the October's denominator was published rather than bounded.
+    pub exact: bool,
+}
+
+/// How many of the latest October's schools a district page lists.
+///
+/// Three nested counts because each loss has its own cause: a school the department's directory
+/// no longer lists, an address the Census geocoder could not place, and a district that has
+/// ceased since the 2020 census (St Helen, in Newbury) and so has no page.
+#[derive(Debug, Clone, PartialEq)]
+pub struct NonpublicPlacement {
+    /// The [`SeriesYear::series`] key carrying the October's school year.
+    pub series: String,
+    /// The fiscal year the October opens.
+    pub fiscal_year: u16,
+    /// Schools the October reports.
+    pub schools: usize,
+    /// Of those, the ones placed in a 2020 census district.
+    pub placed: usize,
+    /// Of those, the ones whose district has a page in this feed.
+    pub listed: usize,
 }
 
 /// One federal channel to nonpublic school pupils, beside Category 3 and not inside it.

@@ -335,6 +335,13 @@ fn sample() -> District {
             listed: 9,
             designated: 3,
         }),
+        nonpublic_schools: vec![bundle::NonpublicSchool {
+            irn: "061234".into(),
+            name: "St Example School".into(),
+            floor: 286.0,
+            ceiling: 349.0,
+            censored: 7,
+        }],
         outcome: Some(DistrictOutcome {
             performance_index: Some(89.9),
             performance_index_prior: Some(89.1),
@@ -529,6 +536,37 @@ fn bundle(districts: Vec<District>, checkpoints: Vec<Checkpoint>) -> Bundle {
                     class: "program".into(),
                     node: "emergency-assistance-to-nonpublic-schools".into(),
                 }],
+                octobers: vec![
+                    bundle::NonpublicOctober {
+                        fiscal_year: 2013,
+                        floor: 177_000.0,
+                        ceiling: 181_000.0,
+                        censored: 4_100,
+                        exact: false,
+                    },
+                    bundle::NonpublicOctober {
+                        fiscal_year: 2014,
+                        floor: 175_690.0,
+                        ceiling: 175_690.0,
+                        censored: 0,
+                        exact: true,
+                    },
+                ],
+                octobers_series: "funding_units.nonpublic_octobers".into(),
+                rates: vec![bundle::NonpublicRate {
+                    fiscal_year: 2014,
+                    low: 701.5,
+                    high: 701.5,
+                    exact: true,
+                }],
+                rates_series: "funding_units.nonpublic_rate".into(),
+                placement: bundle::NonpublicPlacement {
+                    series: "nonpublic_schools".into(),
+                    fiscal_year: 2026,
+                    schools: 749,
+                    placed: 714,
+                    listed: 713,
+                },
             },
         }),
         senate_districts: vec![HouseDistrict {

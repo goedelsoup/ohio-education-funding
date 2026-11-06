@@ -172,3 +172,34 @@ fn a_school_in_newbury_sits_in_a_district_that_ceased_after_the_census() {
     assert_eq!(transfer.effective_date, "July 1, 2020");
     assert_eq!(transfer.section, "3311.22");
 }
+
+#[test]
+fn the_district_grouping_holds_every_placed_building_once() {
+    /*
+     * The district page lists the schools in this grouping, so its total is the reach the
+     * statewide card quotes: 714 of 749. A building in two groups would be counted on two district
+     * pages; one in none would drop off every page without a trace, which is why the remainder is
+     * pinned beside it.
+     */
+    let groups = location::by_district(OCTOBER);
+    let placed: Vec<&str> = groups.values().flatten().map(|b| b.irn.as_str()).collect();
+    let unique: BTreeSet<&str> = placed.iter().copied().collect();
+    assert_eq!(placed.len(), 714);
+    assert_eq!(unique.len(), placed.len(), "no building in two districts");
+    assert_eq!(enrolment::buildings(OCTOBER).len() - placed.len(), 35);
+
+    for (district, list) in &groups {
+        assert!(
+            list.windows(2).all(|pair| pair[0].irn < pair[1].irn),
+            "{district}"
+        );
+        for building in list {
+            let row = location::location(&building.irn).expect("grouped means listed");
+            assert_eq!(row.district_irn.as_deref(), Some(district.as_str()));
+        }
+    }
+
+    // The largest lists, which the district card folds.
+    let size = |irn: &str| groups.get(irn).map_or(0, Vec::len);
+    assert!(size("043752") >= 40, "Cincinnati");
+}

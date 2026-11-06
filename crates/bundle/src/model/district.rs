@@ -1090,6 +1090,30 @@ pub struct District {
     /// apply. Nothing published says which district a scholarship was charged against, so this is
     /// as close as the per-district question gets — see [`dispersion::designated`].
     pub designated: Option<Designated>,
+    /// The chartered nonpublic schools whose address lies in the district, at the latest October,
+    /// in IRN order.
+    ///
+    /// Empty for a district with none, and for none placed: about one school in twenty is not
+    /// placed anywhere, which [`crate::NonpublicPlacement`] counts. Counts only — no dollars.
+    /// Auxiliary services is paid through this district, but no source this project reads says
+    /// what the district received, and a per-pupil rate times this count would be a figure the
+    /// department never paid.
+    pub nonpublic_schools: Vec<NonpublicSchool>,
+}
+
+/// One chartered nonpublic school on a district page.
+#[derive(Debug, Clone, PartialEq)]
+pub struct NonpublicSchool {
+    /// Six-digit building IRN.
+    pub irn: String,
+    /// The October file's name for it.
+    pub name: String,
+    /// Kindergarten-through-twelve count, or its floor where cells were masked.
+    pub floor: f64,
+    /// The count, or its ceiling.
+    pub ceiling: f64,
+    /// Masked cells between the two. Zero where the count is exact.
+    pub censored: usize,
 }
 
 /// One district's row on the EdChoice designated list.
